@@ -20,8 +20,16 @@ Keyboard Map:
 
 The scale/keymap sizes are generated internally by counting the number of entries in the strings.
 
-When saving scales, for floating point numbers we now include the text it was derived from. On re-loading we then use this text to regenerate the number rather than the stored string representation of the number. This eliminates progressive loss of accuracy which would otherwise result from repeated load and save operations.
+When saving scales, for floating point numbers we now include the text it was derived from. On re-loading we then use this text to regenerate the number rather than the stored string representation of the number. This eliminates progressive loss of accuracy which could otherwise result from repeated load and save operations.
 
 However, the stored representation is still saved for backward compatibility with older versions of Yoshimi.
 
-We also now use doubles here instead of floats, as the conversion to and from string form is more accurate.
+We also now use doubles here instead of floats, as the conversion to and from string form seems to be more accurate.
+
+When setting scales, or importing .scl files the following error numbers are returned
+-1  float value too small
+-2  invalid characters for division
+-3  no file
+-4  empty file
+-5  short/corrupted file
+-6  invalid octave size

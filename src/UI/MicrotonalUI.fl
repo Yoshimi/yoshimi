@@ -137,7 +137,7 @@ send_data(4, o->value(), 0xc0);}
               if (filename == NULL)
                   return;
               int result = microtonal->loadscl(string(filename));
-              if (result == 0)
+              if (result > 0)
               {
                    updateTuningsInput();
                    nameinput->cut(0, nameinput->maximum_size());
@@ -150,7 +150,7 @@ send_data(4, o->value(), 0xc0);}
                    octavesizeoutput->do_callback();
               }
               else
-                  fl_alert("Error: Could not load the file.");
+                  fl_alert("Error: Could not load the file. Err. %d", result);
               send_data(48, 0, 0xc0);}
             comment {o->value() will generate miscMsg}
             tooltip {Inport Scala .scl file (tunnings)} xywh {85 417 100 20} box THIN_UP_BOX labelfont 1 labelsize 10
@@ -430,21 +430,23 @@ switch (control)
         break;
 
     case 32:
+    case 48:
         tuningsinput->value(miscMsgPop(par2).c_str());
-        octavesizeoutput->value(insert);
+        octavesizeoutput->value(value_int);
         break;
     case 33:
+    case 49:
         mappinginput->value(miscMsgPop(par2).c_str());
         mapsizeoutput->value(insert);
         break;
-        
+
     case 64:
         nameinput->value(miscMsgPop(par2).c_str());
         break;
     case 65:
         commentinput->value(miscMsgPop(par2).c_str());
         break;
-        
+
    case 96:
        Hide();
        make_window();
@@ -498,11 +500,18 @@ switch (control)
   }
   Function {apply()} {} {
     code {//
-    int err = microtonal->texttotunings(tuningsinput->value());
-    if (err >= 0)
-        fl_alert("Parse Error: The input may contain only numbers (like 232.59)\\n or divisions (like 121/64).");
-    if (err == -2)
-        fl_alert("Parse Error: The input is empty.");
+    switch (microtonal->texttotunings(tuningsinput->value()))
+    {
+        case 0:
+            fl_alert("Parse Error: The input is empty.");
+            break;
+        case -1:
+            fl_alert("Parse Error: The input value is too small.");
+            break;
+        case -2:
+            fl_alert("Parse Error: The input may contain only numbers (like 232.59)\\n or divisions (like 121/64).");
+            break;
+    }
     octavesizeoutput->do_callback();
 
     microtonal->texttomapping(mappinginput->value());

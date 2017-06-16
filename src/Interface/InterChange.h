@@ -53,6 +53,7 @@ class InterChange : private MiscFuncs
         jack_ringbuffer_t *fromGUI;
         jack_ringbuffer_t *toGUI;
         jack_ringbuffer_t *fromMIDI;
+        jack_ringbuffer_t *returnsLoopback;
 
         void mediate();
         void returns(CommandBlock *getData);

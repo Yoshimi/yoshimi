@@ -116,6 +116,19 @@ bool InterChange::Init(SynthEngine *_synth)
     }
     jack_ringbuffer_reset(fromMIDI);
 
+    if (!(returnsLoopback = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
+    {
+        synth->getRuntime().Log("InterChange failed to create 'returnsLoopback' ringbuffer");
+        goto bail_out;
+    }
+    if (jack_ringbuffer_mlock(returnsLoopback))
+    {
+        synth->getRuntime().Log("Failed to lock 'returnsLoopback' memory");
+        goto bail_out;
+    }
+    jack_ringbuffer_reset(returnsLoopback);
+
+
     if (!synth->getRuntime().startThread(&sortResultsThreadHandle, _sortResultsThread, this, false, 0, false, "CLI"))
     {
         synth->getRuntime().Log("Failed to start CLI resolve thread");
@@ -148,6 +161,11 @@ bail_out:
     if (fromMIDI)
     {
         jack_ringbuffer_free(fromMIDI);
+        fromGUI = NULL;
+    }
+    if (returnsLoopback)
+    {
+        jack_ringbuffer_free(returnsLoopback);
         fromGUI = NULL;
     }
     return false;
@@ -183,10 +201,10 @@ void *InterChange::sortResultsThread(void)
             toread = commandSize;
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(toCLI, point, toread);
-            if (getData.data.parameter == 0xf0)
-                transfertext(&getData);
-            else if(getData.data.part == 0xd8) // special midi-learn)
+            if(getData.data.part == 0xd8) // special midi-learn - needs improving
                 synth->midilearn.generalOpps(getData.data.value, getData.data.type, getData.data.control, getData.data.part, getData.data.kit, getData.data.engine, getData.data.insert, getData.data.parameter, getData.data.par2);
+            else if ((getData.data.parameter & 0x80) && getData.data.parameter < 0xff)
+                transfertext(&getData);
             else
                 resolveReplies(&getData);
         }
@@ -237,6 +255,7 @@ InterChange::~InterChange()
 
 void InterChange::transfertext(CommandBlock *getData)
 {
+    int value = lrint(getData->data.value);
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -252,32 +271,79 @@ void InterChange::transfertext(CommandBlock *getData)
         {
             case 32:
                 text = formatScales(text);
-                synth->microtonal.texttotunings(text.c_str());
+                getData->data.parameter &= 0x7f;
+                value = synth->microtonal.texttotunings(text.c_str());
                 synth->setAllPartMaps();
-                getData->data.insert = synth->microtonal.getoctavesize();
+                if (value < 1)
+                    cout << ".scl error " << value << endl;
                 break;
             case 33:
                 text = formatScales(text);
+                getData->data.parameter &= 0x7f;
                 synth->microtonal.texttomapping(text.c_str());
                 synth->setAllPartMaps();
                 getData->data.insert = synth->microtonal.Pmapsize;
                 break;
 
+            case 48:
+                value = synth->microtonal.loadscl(text);
+                if(value > 0)
+                {
+                    text = "";
+                    char *buf = new char[100];
+                    for (int i = 0; i < value; ++ i)
+                    {
+                        synth->microtonal.tuningtoline(i, buf, 100);
+                        if (i > 0)
+                            text += "\n";
+                        text += string(buf);
+                    }
+                    delete [] buf;
+                    getData->data.parameter &= 0x7f;
+                }
+                else
+                    cout << ".scl error " << value << endl;
+                break;
+            case 49:
+                if(synth->microtonal.loadkbm(text) == 0)
+                {
+                    int size = synth->microtonal.Pmapsize;// this needs to be better
+                    getData->data.insert = size;
+                    text = "";
+                    int map;
+                    for (int i = 0; i < size; ++ i)
+                    {
+                        if (i > 0)
+                            text += "\n";
+                        map = synth->microtonal.Pmapping[i];
+                        if (map == -1)
+                            text += 'x';
+                        else
+                            text += to_string(map);
+                    }
+                    getData->data.parameter &= 0x7f;
+                }
+                else
+                    cout << ".kbm error" << endl;
+                break;
+
             case 64:
                 synth->microtonal.Pname = text;
+                getData->data.parameter &= 0x7f;
                 break;
             case 65:
                 synth->microtonal.Pcomment = text;
+                getData->data.parameter &= 0x7f;
                 break;
         }
     }
 
-    if (synth->guiMaster && !(getData->data.type & 0x20))
-        if (jack_ringbuffer_write_space(toGUI) >= commandSize)
-        {
-            getData->data.par2 = miscMsgPush(text); // pass it on
-            jack_ringbuffer_write(toGUI, (char*) getData->bytes, commandSize);
-        }
+
+    if (!(getData->data.parameter & 0x80) && jack_ringbuffer_write_space(returnsLoopback) >= commandSize)
+    {
+        getData->data.par2 = miscMsgPush(text); // pass it on
+        jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
+    }
 }
 
 
@@ -731,6 +797,11 @@ string InterChange::resolveMain(CommandBlock *getData)
             break;
         case 49:
             contstr = "Chan 'solo' Switch CC";
+            break;
+
+        case 88:
+            showValue = false;
+            contstr = "Scale loaded";
             break;
 
         case 96: // doMasterReset(
@@ -2373,6 +2444,16 @@ void InterChange::mediate()
                 synth->mididecode.midiProcess(getData.data.kit, getData.data.engine, getData.data.insert, false);
             }
         }
+        size = jack_ringbuffer_read_space(returnsLoopback);
+        if (size >= commandSize)
+        {
+            if (size > commandSize)
+                more = true;
+            toread = commandSize;
+            point = (char*) &getData.bytes;
+            jack_ringbuffer_read(returnsLoopback, point, toread);
+            returns(&getData);
+        }
     }
     while (more && synth->getRuntime().runSynth);
 }
@@ -2389,7 +2470,7 @@ void InterChange::returns(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-    if (getData->data.parameter == 0xf0)
+    if ((getData->data.parameter & 0x80) && getData->data.parameter < 0xff)
     {
         if (jack_ringbuffer_write_space(toCLI) >= commandSize)
         jack_ringbuffer_write(toCLI, (char*) getData->bytes, commandSize); // this will redirect where needed.
@@ -2449,7 +2530,8 @@ bool InterChange::commandSend(CommandBlock *getData)
 bool InterChange::commandSendReal(CommandBlock *getData)
 {
     float value = getData->data.value;
-    if (getData->data.parameter == 0xf0)
+    unsigned char parameter = getData->data.parameter;
+    if ((parameter & 0x80) && parameter < 0xff)
         return true; // text message transfer
     if (value == FLT_MAX)
     {

@@ -200,7 +200,7 @@ string Microtonal::reformatline(string text)
 }
 
 
-// Convert a line to tunings; returns -1 if it ok
+// Convert a line to tunings; returns 0 if ok
 int Microtonal::linetotunings(unsigned int nline, const char *line)
 {
     int x1 = -1, x2 = -1, type = -1;
@@ -218,7 +218,7 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
         {   // double number case
             x = stod(string(line));
             if (x < 0.000001)
-                return 1;
+                return -1;
             type = 1; // double type(cents)
         }
     }
@@ -226,7 +226,7 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
     {   // M/N case
         sscanf(line, "%d/%d", &x1, &x2);
         if (x1 < 0 || x2 < 0)
-            return 1;
+            return -2;
         if (!x2)
             x2 = 1;
         type = 2; // division
@@ -255,7 +255,7 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
     tmpoctave[nline].x1 = x1;
     tmpoctave[nline].x2 = x2;
 
-    return -1; // ok
+    return 0; // ok
 }
 
 
@@ -279,10 +279,10 @@ int Microtonal::texttotunings(const char *text)
         if (!strlen(lin))
             continue;
         int err = linetotunings(nl, lin);
-        if (err != -1)
+        if (err != 0)
         {
             delete [] lin;
-            return nl; // Parse error
+            return err; // Parse error
         }
         nl++;
     }
@@ -290,7 +290,7 @@ int Microtonal::texttotunings(const char *text)
     if (nl > MAX_OCTAVE_SIZE)
         nl = MAX_OCTAVE_SIZE;
     if (!nl)
-        return -2; // the input is empty
+        return 0; // the input is empty
     octavesize = nl;
     for (i = 0; i < octavesize; ++i)
     {
@@ -300,7 +300,7 @@ int Microtonal::texttotunings(const char *text)
         octave[i].x1 = tmpoctave[i].x1;
         octave[i].x2 = tmpoctave[i].x2;
     }
-    return -1; // ok
+    return octavesize; // ok
 }
 
 
@@ -369,7 +369,7 @@ int Microtonal::loadline(FILE *file, char *line)
 {
     do {
         if (!fgets(line, 500, file))
-            return 1;
+            return -5;
     } while (line[0] == '!');
     return 0;
 }
@@ -380,13 +380,13 @@ int Microtonal::loadscl(string filename)
 {
     FILE *file = fopen(filename.c_str(), "r");
     if (!file)
-        return 2;
+        return -3;
     char tmp[500];
 
     fseek(file, 0, SEEK_SET);
     // loads the short description
     if (loadline(file, &tmp[0]))
-        return 2;
+        return -4;
     for (int i = 0; i < 500; ++i)
         if (tmp[i] < 32)
             tmp[i] = 0;
@@ -394,17 +394,19 @@ int Microtonal::loadscl(string filename)
     Pcomment = string(tmp);
     // loads the number of the notes
     if (loadline(file, &tmp[0]))
-        return 2;
+        return -5;
     int nnotes = MAX_OCTAVE_SIZE;
     sscanf(&tmp[0], "%d", &nnotes);
     if (nnotes > MAX_OCTAVE_SIZE)
-        return 2;
+        return -6;
     // load the tunnings
     for (int nline = 0; nline < nnotes; ++nline)
     {
-        if (loadline(file, &tmp[0]))
-            return 2;
-        linetotunings(nline, &tmp[0]);
+        int err = loadline(file, &tmp[0]);
+        if (err == 0)
+            err = linetotunings(nline, &tmp[0]);
+        if (err < 0)
+            return err;
     }
     fclose(file);
 
@@ -418,7 +420,7 @@ int Microtonal::loadscl(string filename)
         octave[i].x2 = tmpoctave[i].x2;
     }
     synth->setAllPartMaps();
-    return 0;
+    return nnotes;
 }
 
 
