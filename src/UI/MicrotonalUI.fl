@@ -446,7 +446,7 @@ switch (control)
         msg = (miscMsgPop(par2)); // must always fetch it
         if (value_int > 0)
         {
-            mappinginput->value(miscMsgPop(par2).c_str());
+            mappinginput->value(msg.c_str());
             mapsizeoutput->value(value_int);
         }
         else if (isGui)

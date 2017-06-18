@@ -256,12 +256,12 @@ InterChange::~InterChange()
 void InterChange::transfertext(CommandBlock *getData)
 {
     int value = lrint(getData->data.value);
-    unsigned char type = getData->data.type;
+//    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit;
-    unsigned char engine = getData->data.engine;
-    unsigned char insert = getData->data.insert;
+//    unsigned char kititem = getData->data.kit;
+//    unsigned char engine = getData->data.engine;
+//    unsigned char insert = getData->data.insert;
 
     string text = miscMsgPop(getData->data.par2);
     //cout << text << endl;
@@ -282,7 +282,6 @@ void InterChange::transfertext(CommandBlock *getData)
                 value = synth->microtonal.texttomapping(text.c_str());
                 if (value > 0)
                     synth->setAllPartMaps();
-                getData->data.insert = synth->microtonal.Pmapsize;
                 break;
 
             case 48:
@@ -318,10 +317,8 @@ void InterChange::transfertext(CommandBlock *getData)
                         else
                             text += to_string(map);
                     }
-                    getData->data.parameter &= 0x7f;
                 }
-                else
-                    cout << ".kbm error" << endl;
+                getData->data.parameter &= 0x7f;
                 break;
 
             case 64:
@@ -334,7 +331,6 @@ void InterChange::transfertext(CommandBlock *getData)
                 break;
         }
     }
-
 
     if (!(getData->data.parameter & 0x80) && jack_ringbuffer_write_space(returnsLoopback) >= commandSize)
     {
@@ -685,7 +681,7 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
     unsigned char control = getData->data.control;
 
     // this is unique and placed here to avoid Xruns
-    if (control != 32 && control != 48)
+    if (control <= 32 && control >= 49)
         synth->setAllPartMaps();
 
 
@@ -729,7 +725,7 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
             showValue = false;
             break;
         case 33:
-            contstr = "Keyboard Map";
+            contstr = "Keyboard Map ";
             showValue = false;
             break;
         case 34:
@@ -738,11 +734,11 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
             break;
 
         case 48:
-            contstr = "Import .scl File";
+            contstr = "Import .scl file ";
             showValue = false;
             break;
         case 49:
-            contstr = "Import .kbm File";
+            contstr = "Import .kbm file ";
             showValue = false;
             break;
 
@@ -769,8 +765,11 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
     {
         switch (value)
         {
+            case 0:
+                contstr += "Empty entry";
+                break;
             case -1:
-                contstr += "value too small";
+                contstr += "Value too small";
                 break;
             case -2:
                 contstr += "Invalid entry";
@@ -785,7 +784,16 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
                 contstr += "Short or corrupted file";
                 break;
             case -6:
-                contstr += "Invalid octave size";
+                if ((control & 1) == 0)
+                    contstr += "Invalid octave size";
+                else
+                    contstr += "Invalid keymap size";
+                break;
+            case -7:
+                contstr += "Invalid note number";
+                break;
+            case -8:
+                contstr += "Out of range";
                 break;
         }
     }
@@ -2491,11 +2499,11 @@ void InterChange::returns(CommandBlock *getData)
     if (value == FLT_MAX)
         return; // need to sort this out later
     unsigned char type = getData->data.type | 4; // back from synth
-    unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit;
-    unsigned char engine = getData->data.engine;
-    unsigned char insert = getData->data.insert;
+//    unsigned char control = getData->data.control;
+//    unsigned char npart = getData->data.part;
+//    unsigned char kititem = getData->data.kit;
+//    unsigned char engine = getData->data.engine;
+//    unsigned char insert = getData->data.insert;
     if ((getData->data.parameter & 0x80) && getData->data.parameter < 0xff)
     {
         if (jack_ringbuffer_write_space(toCLI) >= commandSize)
@@ -2570,7 +2578,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-    bool isCli = type & 0x10;
+//    bool isCli = type & 0x10;
     bool isGui = type & 0x20;
     char button = type & 3;
 
@@ -3009,15 +3017,12 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
         case 33: // Keyboard Map
             showValue = false; // done eslewhere
             break;
-        case 34: // Retune
-            showValue = false; // done eslewhere
-            break;
 
         case 48: // Import .scl File
-            showValue = false;
+            showValue = false; // done eslewhere
             break;
         case 49: // Import .kbm File
-            showValue = false;
+            showValue = false; // done eslewhere
             break;
 
         case 64: // Name
@@ -3027,7 +3032,10 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
             showValue = false; // done eslewhere
             break;
 
-        case 96:
+        case 80: // Retune
+            showValue = false; // done eslewhere
+            break;
+        case 96: // Clear scales
             synth->microtonal.defaults();
             break;
     }

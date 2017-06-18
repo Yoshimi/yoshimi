@@ -4,6 +4,7 @@ yoshimi 1.5.2 M
 * Tuning error reporting completed.
 * Keymap error reporting completed.
 * Updated docs.
+* Scales code cleanups and optimisations.
 
 2017-6-16 Will
 * Added loopback for low priority functions into 'returns'.

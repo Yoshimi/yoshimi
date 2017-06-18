@@ -2416,7 +2416,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                             if (name < "!")
                                 name = "no file";
                             par2 = miscMsgPush(name);
-                            cout << name << endl;
+                            //cout << name << endl;
                         }
                         else if (point[0] != 0)
                             par2 = string2int(point);

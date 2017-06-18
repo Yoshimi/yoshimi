@@ -385,7 +385,7 @@ int Microtonal::loadscl(string filename)
 {
     FILE *file = fopen(filename.c_str(), "r");
     if (!file)
-        return -3;
+        return -3; // last time we can return before fclose
     char tmp[500];
     int err = 0;
     int nnotes;
@@ -429,14 +429,7 @@ int Microtonal::loadscl(string filename)
         return err;
 
     octavesize = nnotes;
-    for (int i = 0; i < octavesize; ++i)
-    {
-        octave[i].text = tmpoctave[i].text;
-        octave[i].tuning = tmpoctave[i].tuning;
-        octave[i].type = tmpoctave[i].type;
-        octave[i].x1 = tmpoctave[i].x1;
-        octave[i].x2 = tmpoctave[i].x2;
-    }
+    swap(octave, tmpoctave);
     synth->setAllPartMaps();
     return nnotes;
 }
@@ -447,79 +440,72 @@ int Microtonal::loadkbm(string filename)
 {
     FILE *file = fopen(filename.c_str(), "r");
     if (!file)
-        return -3;
+        return -3; // last time we can return before fclose
     char tmp[500];
     int err = 0;
-    int tmpMapSize, tmpFirst, tmpLast, tmpMid, tmpNote;
-    float tmpPAfreq;
-    int x;
-
+    int tmpMapSize;
     fseek(file, 0, SEEK_SET);
     // loads the mapsize
     if (loadline(file,&tmp[0]))
         err = -4;
-    else if (!sscanf(&tmp[0], "%d",&x))
+    else if (!sscanf(&tmp[0], "%d",&tmpMapSize))
         err = -2;
+
     if (err == 0)
     {
-        if (x < 1 || x > 127)
-            err = -7;
-        else
-            tmpMapSize = x;
+        if (tmpMapSize < 1 || tmpMapSize > 127)
+            err = -6;
     }
 
+    int tmpFirst;
     if (err == 0)
     {
         // loads first MIDI note to retune
         if (loadline(file, &tmp[0]))
             err = -5;
-        else if (!sscanf(&tmp[0], "%d", &x))
+        else if (!sscanf(&tmp[0], "%d", &tmpFirst))
             return -6;
-        else if (x < 0 || x > 127)
+        else if (tmpFirst < 0 || tmpFirst > 127)
             err = -7;
-        else
-            tmpFirst = x;
     }
 
+    int tmpLast;
     if (err == 0)
     {
         // loads last MIDI note to retune
        if (loadline(file, &tmp[0]))
             err = -5;
-        else if (!sscanf(&tmp[0], "%d", &x))
+        else if (!sscanf(&tmp[0], "%d", &tmpLast))
             return -6;
-        else if (x < 0 || x > 127)
+        else if (tmpLast < 0 || tmpLast > 127)
             err = -7;
-        else
-            tmpLast = x;
     }
 
+    int tmpMid;
     if (err == 0)
     {
         // loads the middle note where scale fro scale degree=0
        if (loadline(file, &tmp[0]))
             err = -5;
-        else if (!sscanf(&tmp[0], "%d", &x))
+        else if (!sscanf(&tmp[0], "%d", &tmpMid))
             return -6;
-        else if (x < 0 || x > 127)
+        else if (tmpMid < 0 || tmpMid > 127)
             err = -7;
-        else
-            tmpMid = x;
     }
 
+    int tmpNote;
     if (err == 0)
     {
         // loads the reference note
        if (loadline(file, &tmp[0]))
             err = -5;
-        else if (!sscanf(&tmp[0], "%d", &x))
+        else if (!sscanf(&tmp[0], "%d", &tmpNote))
             return -6;
-        else if (x < 0 || x > 127)
+        else if (tmpNote < 0 || tmpNote > 127)
             err = -7;
-        else
-            tmpNote = x;
     }
 
+    float tmpPAfreq;
     if (err == 0)
     {
         // loads the reference freq.
@@ -538,10 +524,11 @@ int Microtonal::loadkbm(string filename)
     // the scale degree(which is the octave) is not loaded
     // it is obtained by the tunnings with getoctavesize() method
     if (loadline(file, &tmp[0]))
-        return 2;
+        err = -6;
 
     // load the mappings
     int tmpMap [128];
+    int x;
     if (err == 0)
     {
         for (int nline = 0; nline < tmpMapSize; ++nline)
@@ -555,11 +542,11 @@ int Microtonal::loadkbm(string filename)
                 x = -1;
             tmpMap[nline] = x;
         }
-        Pmappingenabled = 1;
     }
     fclose(file);
     if (err < 0)
         return err;
+
     Pmappingenabled = 1;
     Pmapsize = tmpMapSize;
     swap(Pmapping, tmpMap);
