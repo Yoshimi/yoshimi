@@ -150,7 +150,7 @@ send_data(4, o->value(), 0xc0);}
                    octavesizeoutput->do_callback();
               }
               else
-                  fl_alert("Error: Could not load the file. Err. %d", result);
+                  errors(result, true);
               send_data(48, 0, 0xc0);}
             comment {o->value() will generate miscMsg}
             tooltip {Inport Scala .scl file (tunnings)} xywh {85 417 100 20} box THIN_UP_BOX labelfont 1 labelsize 10
@@ -249,7 +249,7 @@ send_data(4, o->value(), 0xc0);}
               if (filename == NULL)
                   return;
               int result = microtonal->loadkbm(string(filename));
-              if (result == 0)
+              if (result > 0)
               {
                   updateMappingInput();
                   mappinginput->position(0);
@@ -265,7 +265,7 @@ send_data(4, o->value(), 0xc0);}
                   anotecounter->do_callback();
               }
               else
-                  fl_alert("Error: Could not load the file.");
+                  errors(result, false);
               send_data(49, 0, 0xc0);}
             comment {o->value() will generate miscMsg}
             tooltip {Inport Scala .kbm file (keyboard mapping)} xywh {285 417 104 20} box THIN_UP_BOX labelfont 1 labelsize 10
@@ -293,7 +293,7 @@ send_data(4, o->value(), 0xc0);}
           callback {apply();
 send_data(32, o->value(), 0xc0);
 send_data(33, o->value(), 0xc0);
-send_data(34, o->value(), 0xc0);}
+send_data(80, o->value(), 0xc0);}
           tooltip {Retune the synth according to the inputs from "Tunnings" and "Keyboard Mapping"} xywh {152 447 107 28} box THIN_UP_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13
         }
       }
@@ -377,11 +377,12 @@ collect_data(synth, value, (Fl::event_button() | type), control, 0xe8, 0xff, 0xf
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
 float value = getData->data.value;
+bool isGui = (getData->data.type & 0x20);
 unsigned char control = getData->data.control;
-unsigned char insert = getData->data.insert;
 unsigned char par2 = getData->data.par2;
 int value_int = lrint(value);
 bool value_bool = (value > 0.5f);
+string msg;
 
 switch (control)
 {
@@ -431,13 +432,25 @@ switch (control)
 
     case 32:
     case 48:
-        tuningsinput->value(miscMsgPop(par2).c_str());
-        octavesizeoutput->value(value_int);
+        msg = (miscMsgPop(par2)); // must always fetch it
+        if (value_int > 0)
+        {
+            tuningsinput->value(msg.c_str());
+            octavesizeoutput->value(value_int);
+        }
+        else if (isGui)
+            errors(value_int, true);
         break;
     case 33:
     case 49:
-        mappinginput->value(miscMsgPop(par2).c_str());
-        mapsizeoutput->value(insert);
+        msg = (miscMsgPop(par2)); // must always fetch it
+        if (value_int > 0)
+        {
+            mappinginput->value(miscMsgPop(par2).c_str());
+            mapsizeoutput->value(value_int);
+        }
+        else if (isGui)
+            errors(value_int, true);
         break;
 
     case 64:
@@ -500,21 +513,20 @@ switch (control)
   }
   Function {apply()} {} {
     code {//
-    switch (microtonal->texttotunings(tuningsinput->value()))
+    int value = microtonal->texttotunings(tuningsinput->value());
+    if (value < 1)
     {
-        case 0:
-            fl_alert("Parse Error: The input is empty.");
-            break;
-        case -1:
-            fl_alert("Parse Error: The input value is too small.");
-            break;
-        case -2:
-            fl_alert("Parse Error: The input may contain only numbers (like 232.59)\\n or divisions (like 121/64).");
-            break;
+        errors(value, true);
+        return;
     }
     octavesizeoutput->do_callback();
 
-    microtonal->texttomapping(mappinginput->value());
+    value = microtonal->texttomapping(mappinginput->value());
+    if (value < 1)
+    {
+        errors(value, false);
+        return;
+    }
     synth->setAllPartMaps();
     mapsizeoutput->do_callback();
     anotecounter->do_callback();} {}
@@ -524,6 +536,50 @@ switch (control)
     centerinvertcounter->deactivate();
 else
     centerinvertcounter->activate();} {}
+  }
+  Function {errors(int value, bool type)} {} {
+    code {string message;
+if (type)
+    message = "Tuning: ";
+else
+    message = "Keymap: ";
+switch (value)
+{
+    case 0:
+        message += "Nothing entered";
+        break;
+    case -1:
+        message += "Value is too small";
+        break;
+    case -2:
+        if(type)
+            message += "Must be numbers (like 232.59)\\n or divisions (like 121/64)";
+        else
+            message += "Invalid characters";
+        break;
+    case -3:
+        message += "File not found";
+        break;
+    case -4:
+        message += "Empty file";
+        break;
+    case -5:
+        message += "Short or corrupted file";
+        break;
+    case -6:
+        if (type)
+            message += "Invalid octave size";
+        else
+            message += "Invalid keymap size";
+        break;
+    case -7:
+        message += "Invalid note number";
+        break;
+    case -8:
+        message += "Value out of range";
+        break;
+}
+fl_alert("%s", message.c_str());} {}
   }
   decl {Microtonal *microtonal;} {private local
   }

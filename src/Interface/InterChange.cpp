@@ -273,15 +273,15 @@ void InterChange::transfertext(CommandBlock *getData)
                 text = formatScales(text);
                 getData->data.parameter &= 0x7f;
                 value = synth->microtonal.texttotunings(text.c_str());
-                synth->setAllPartMaps();
-                if (value < 1)
-                    cout << ".scl error " << value << endl;
+                if (value > 0)
+                    synth->setAllPartMaps();
                 break;
             case 33:
                 text = formatScales(text);
                 getData->data.parameter &= 0x7f;
-                synth->microtonal.texttomapping(text.c_str());
-                synth->setAllPartMaps();
+                value = synth->microtonal.texttomapping(text.c_str());
+                if (value > 0)
+                    synth->setAllPartMaps();
                 getData->data.insert = synth->microtonal.Pmapsize;
                 break;
 
@@ -299,19 +299,16 @@ void InterChange::transfertext(CommandBlock *getData)
                         text += string(buf);
                     }
                     delete [] buf;
-                    getData->data.parameter &= 0x7f;
                 }
-                else
-                    cout << ".scl error " << value << endl;
+                getData->data.parameter &= 0x7f;
                 break;
             case 49:
-                if(synth->microtonal.loadkbm(text) == 0)
+                value = synth->microtonal.loadkbm(text);
+                if(value > 0)
                 {
-                    int size = synth->microtonal.Pmapsize;// this needs to be better
-                    getData->data.insert = size;
                     text = "";
                     int map;
-                    for (int i = 0; i < size; ++ i)
+                    for (int i = 0; i < value; ++ i)
                     {
                         if (i > 0)
                             text += "\n";
@@ -341,6 +338,7 @@ void InterChange::transfertext(CommandBlock *getData)
 
     if (!(getData->data.parameter & 0x80) && jack_ringbuffer_write_space(returnsLoopback) >= commandSize)
     {
+        getData->data.value = float(value);
         getData->data.par2 = miscMsgPush(text); // pass it on
         jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
     }
@@ -683,10 +681,13 @@ string InterChange::resolveVector(CommandBlock *getData)
 
 string InterChange::resolveMicrotonal(CommandBlock *getData)
 {
-    // this is unique and placed here to avoid Xruns
-    synth->setAllPartMaps();
-
+    int value = getData->data.value;
     unsigned char control = getData->data.control;
+
+    // this is unique and placed here to avoid Xruns
+    if (control != 32 && control != 48)
+        synth->setAllPartMaps();
+
 
     string contstr = "";
     switch (control)
@@ -724,7 +725,7 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
             break;
 
         case 32:
-            contstr = "Tuning";
+            contstr = "Tuning ";
             showValue = false;
             break;
         case 33:
@@ -762,6 +763,31 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
             showValue = false;
             contstr = "Unrecognised";
 
+    }
+
+    if (value < 1 && control >= 32 && control <= 49)
+    {
+        switch (value)
+        {
+            case -1:
+                contstr += "value too small";
+                break;
+            case -2:
+                contstr += "Invalid entry";
+                break;
+            case -3:
+                contstr += "File not found";
+                break;
+            case -4:
+                contstr += "Empty file";
+                break;
+            case -5:
+                contstr += "Short or corrupted file";
+                break;
+            case -6:
+                contstr += "Invalid octave size";
+                break;
+        }
     }
     return ("Scales " + contstr);
 }

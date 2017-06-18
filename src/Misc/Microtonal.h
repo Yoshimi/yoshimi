@@ -77,7 +77,7 @@ class Microtonal : private MiscFuncs
         int loadscl(string filename); // load the tunnings from a .scl file
         int loadkbm(string filename); // load the mapping from .kbm file
         int texttotunings(const char *text);
-        void texttomapping(const char *text);
+        int texttomapping(const char *text);
 
         string Pname;
         string Pcomment;

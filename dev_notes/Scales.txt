@@ -26,10 +26,16 @@ However, the stored representation is still saved for backward compatibility wit
 
 We also now use doubles here instead of floats, as the conversion to and from string form seems to be more accurate.
 
-When setting scales, or importing .scl files the following error numbers are returned
--1  float value too small
--2  invalid characters for division
+When setting scales/keymaps, or importing .scl/.kbm files the following error numbers may be returned:
+
+ 0  empty entry
+-1  value too small
+-2  invalid characters
 -3  no file
 -4  empty file
 -5  short/corrupted file
--6  invalid octave size
+-6  invalid octave size / invalid map size
+-7  invalid note number
+-8  out of range
+
+
