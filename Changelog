@@ -1,5 +1,8 @@
 yoshimi 1.5.2 M
 
+2017-6-19 Will
+* CLI can now write or load tunings and keymaps.
+
 2017-6-18 Will
 * Tuning error reporting completed.
 * Keymap error reporting completed.

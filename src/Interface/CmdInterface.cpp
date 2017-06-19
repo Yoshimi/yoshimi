@@ -857,6 +857,37 @@ int CmdInterface::commandVector()
     return reply;
 }
 
+int CmdInterface::commandScale()
+{
+    Config &Runtime = synth->getRuntime();
+    int reply = todo_msg;
+    char command = 0xff;
+    string name;
+    if (matchnMove(1, point, "tuning"))
+        command = 0x20;
+    else if (matchnMove(1, point, "keymap"))
+        command = 0x21;
+
+    if (command == 0x20 || command == 0x21)
+    {
+        if (isRead)
+        {
+            Runtime.Log("Write only");
+            return done_msg;
+        }
+        if (matchnMove(3, point, "import"))
+        {
+            command += 0x10;
+        }
+         name = (string)point;
+        if (name == "")
+            return value_msg;
+       sendDirect(0, 0x40, command, 0xe8, 0xff, 0xff, 0xff, 0x80, miscMsgPush(name));
+        return done_msg;
+    }
+    return reply;
+}
+
 
 int CmdInterface::commandPart(bool justSet)
 {
@@ -1337,14 +1368,20 @@ int CmdInterface::commandReadnSet()
         else
             reply = value_msg;
     }
-
+    else if (bitTest(level, scale_lev))
+        reply = commandScale();
     else if (bitTest(level, part_lev))
         reply = commandPart(false);
     else if (bitTest(level, vect_lev))
         reply = commandVector();
     if (reply > todo_msg)
         return reply;
-
+    if (matchnMove(1, point, "scale"))
+    {
+        level = 0; // clear all first
+        bitSet(level, scale_lev);
+        return commandScale();
+    }
     if (matchnMove(1, point, "part"))
     {
         nFX = 0; // effects number limit changed
@@ -2212,12 +2249,12 @@ bool CmdInterface::cmdIfaceProcessCommand()
         }
         else if (matchnMove(2, point, "scale"))
         {
-            if (point[0] == 0)
+            string name = (string)point;
+            if (name == "")
                 reply = name_msg;
             else
             {
-                synth->microtonal.loadXML((string) point);
-                synth->setAllPartMaps();
+                sendDirect(0, 64, 88, 0xf0, 0xff, 0xff, 0xff, 0xff, miscMsgPush(name));
                 reply = done_msg;
             }
         }
@@ -2561,6 +2598,8 @@ void CmdInterface::cmdIfaceCommandLoop()
                 if (nFXtype > 0)
                     prompt += ("-" + asString(nFXpreset + 1));
             }
+            if (bitTest(level, scale_lev))
+                prompt += "Scale ";
             if (bitTest(level, vect_lev))
             {
                 prompt += (" Vect Ch " + asString(chan + 1) + " ");

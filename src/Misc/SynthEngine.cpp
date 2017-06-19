@@ -2487,18 +2487,7 @@ void SynthEngine::loadMicrotonal(unsigned char msg, unsigned char type)
     {
         case 0: // scale
             microtonal.defaults();
-            if (!microtonal.loadXML(fname))
-                ok = false;
-            setAllPartMaps();
-            break;
-        case 1: // .scl
-            microtonal.defaults();
-            if (microtonal.loadscl(fname) != 0)
-                ok = false;
-            break;
-        case 2: // .kbm
-            microtonal.defaults();
-            if (!microtonal.loadkbm(fname) != 0)
+            if (!microtonal.loadXML(setExtension(fname, "xsz")))
                 ok = false;
             break;
     }

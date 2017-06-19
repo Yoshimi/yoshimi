@@ -285,7 +285,7 @@ void InterChange::transfertext(CommandBlock *getData)
                 break;
 
             case 48:
-                value = synth->microtonal.loadscl(text);
+                value = synth->microtonal.loadscl(setExtension(text,"scl"));
                 if(value > 0)
                 {
                     text = "";
@@ -302,7 +302,7 @@ void InterChange::transfertext(CommandBlock *getData)
                 getData->data.parameter &= 0x7f;
                 break;
             case 49:
-                value = synth->microtonal.loadkbm(text);
+                value = synth->microtonal.loadkbm(setExtension(text,"kbm"));
                 if(value > 0)
                 {
                     text = "";
@@ -681,7 +681,7 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
     unsigned char control = getData->data.control;
 
     // this is unique and placed here to avoid Xruns
-    if (control <= 32 && control >= 49)
+    if (control <= 32 || control >= 49)
         synth->setAllPartMaps();
 
 
@@ -725,7 +725,7 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
             showValue = false;
             break;
         case 33:
-            contstr = "Keyboard Map ";
+            contstr = "Keymap ";
             showValue = false;
             break;
         case 34:
@@ -734,11 +734,11 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
             break;
 
         case 48:
-            contstr = "Import .scl file ";
+            contstr = "Tuning Import .scl file ";
             showValue = false;
             break;
         case 49:
-            contstr = "Import .kbm file ";
+            contstr = "Keymap Import .kbm file ";
             showValue = false;
             break;
 

@@ -1,7 +1,7 @@
 /*
     CmdInterface.h
 
-    Copyright 2015-2016, Will Godfrey & others.
+    Copyright 2015-2017, Will Godfrey & others.
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -15,6 +15,8 @@
 
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+
+    Modified June 2017
 */
 
 #ifndef CMDINTERFACE_H
@@ -31,7 +33,7 @@ using namespace std;
 extern map<SynthEngine *, MusicClient *> synthInstances;
 
 // all_fx and ins_fx MUST be the first two
-typedef enum { all_fx = 0, ins_fx, vect_lev, part_lev, } level_bits;
+typedef enum { all_fx = 0, ins_fx, vect_lev, scale_lev, part_lev, } level_bits;
 
 typedef enum { todo_msg = 0, done_msg, value_msg, name_msg, opp_msg, what_msg, range_msg, low_msg, high_msg, unrecognised_msg, parameter_msg, level_msg, available_msg,} error_messages;
 
@@ -52,6 +54,7 @@ class CmdInterface : private MiscFuncs
         int volPanVel();
         int keyShift(int part);
         int commandVector();
+        int commandScale();
         int commandPart(bool justSet);
         int commandReadnSet();
         int sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff);
