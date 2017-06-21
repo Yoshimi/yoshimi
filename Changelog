@@ -1,5 +1,8 @@
 yoshimi 1.5.2 M
 
+2017-6-21 Will
+* Revised CLI help menu for greater clarity.
+
 2017-6-19 Will
 * CLI can now write or load tunings and keymaps.
 

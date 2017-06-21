@@ -93,7 +93,6 @@ string basics[] = {
     "  Bank <n>",                   "delete bank ID (and all contents) from current root",
     "  MLearn <s> [n]",             "delete midi learned 'ALL' whole list, or '@'(n) line",
     "Set / Read",                   "set or read all main parameters",
-    "  SWitcher [{CC}n] [s]",       "define CC n to set single part in group (Row / Column)",
     "  REPorts [s]",                "destination (Gui/Stderr)",
     "  ",                           "  non-fatal (SHow/Hide)",
     "  Root <n>",                   "current root path to ID",
@@ -119,8 +118,8 @@ string toplist [] = {
     "Volume <n>",                 "master volume",
     "SHift <n>",                  "master key shift semitones (0 no shift)",
     "DEtune <n>",                 "master fine detune",
-    "SOlo <n>",                   "channel 'solo' switcher (off, row, col, loop)",
-    "SCC <n>",                     "Incoming 'solo' channel number",
+    "SOlo <n>",                   "channel 'solo' switcher (0 = off, 1 = row, 2 = col, 3 = loop)",
+    "SCC <n>",                    "Incoming 'solo' channel number",
     "TIMes [s]",                  "time display on instrument load message (ENable / other",
     "PREferred Midi <s>",         "* MIDI connection type (Jack, Alsa)",
     "PREferred Audio <s>",        "* audio connection type (Jack, Alsa)",
@@ -272,27 +271,46 @@ void CmdInterface::helpLoop(list<string>& msg, string *commands, int indent)
 }
 
 
-bool CmdInterface::helpList()
+bool CmdInterface::helpList(unsigned int local)
 {
     if (!matchnMove(1, point, "help") && !matchnMove(1, point, "?"))
         return false;
-    list<string>msg;
-    msg.push_back("Commands:");
-    helpLoop(msg, basics, 2);
 
-    if (!bitTest(level, vect_lev))
-        msg.push_back("    Part [n1]                 - set part ID operations");
-    if (bitTest(level, part_lev))
-        helpLoop(msg, partlist, 6);
-    else
-        msg.push_back("    VEctor [n1]               - vector CHANNEL, operations");
-
-    if (bitTest(level, vect_lev))
-        helpLoop(msg, vectlist, 6);
-
-    if (level <= 3)
+    string prefix = "";
+    if (matchnMove(1, point, "@"))
     {
-        helpLoop(msg, toplist, 4);
+        local = 0;
+        if (matchnMove(1, point, "part"))
+        {
+            bitSet(local, part_lev);
+            prefix = "Part ";
+        }
+        else if  (matchnMove(1, point, "vector"))
+        {
+            bitSet(local, vect_lev);
+            prefix =  "Vector ";
+        }
+    }
+    list<string>msg;
+    msg.push_back(prefix + "Commands:");
+    if (local == 0)
+    {
+        helpLoop(msg, basics, 2);
+        msg.push_back(" ");
+        msg.push_back("@   Part [n1]                 - set part ID operations");
+        msg.push_back("@   VEctor [n1]               - vector CHANNEL, operations");
+        msg.push_back(" ");
+    }
+
+    if (bitTest(local, part_lev))
+        helpLoop(msg, partlist, 2);
+    else if(bitTest(local, vect_lev))
+        helpLoop(msg, vectlist, 2);
+
+    if (local == 0)
+    {
+        helpLoop(msg, toplist, 2);
+        msg.push_back("'@' help sub-menu");
         msg.push_back("'*' entries need to be saved and Yoshimi restarted to activate");
     }
 
@@ -1213,71 +1231,6 @@ int CmdInterface::commandReadnSet()
         }
         return done_msg;
     }
-    else if(matchnMove(2, point, "Switcher"))
-    {
-        if (isRead)
-        {
-            name = "Switcher CC is ";
-            if (Runtime.channelSwitchType == 0)
-                name += "disabled";
-            else
-            {
-                name += to_string((int) Runtime.channelSwitchCC);
-                if (Runtime.channelSwitchType == 1)
-                    name += " Row type";
-                else if (Runtime.channelSwitchType == 1)
-                    name += " Column type";
-                else
-                    name += " Loop type";
-            }
-            Runtime.Log(name);
-            reply = done_msg;
-        }
-        else
-        {
-            int value = string2int(point);
-            if (value > 0)
-            {
-                name = Runtime.masterCCtest(value);
-                if (name > "")
-                {
-                    Runtime.Log("Already used by " + name);
-                    return done_msg;
-                }
-            point = skipChars(point);
-            }
-            Runtime.channelSwitchValue = 0;
-            name = "Set switcher CC as ";
-            if (value && matchnMove(1, point, "row"))
-            {
-                Runtime.channelSwitchType = 1;
-                Runtime.channelSwitchCC = value;
-                name += (to_string(value) + " Row type");
-
-            }
-            else if (value && matchnMove(1, point, "column"))
-            {
-                Runtime.channelSwitchType = 2;
-                Runtime.channelSwitchCC = value;
-                name += (to_string(value) + " Column type");
-            }
-            else if (value && matchnMove(2, point, "loop"))
-            {
-                Runtime.channelSwitchType = 2;
-                Runtime.channelSwitchCC = value;
-                name += (to_string(value) + " Loop type");
-            }
-            else
-            {
-                Runtime.channelSwitchType = 0;
-                Runtime.channelSwitchCC = 128;
-                name += "disabled";
-            }
-            Runtime.Log(name);
-            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateConfig, 4);
-            reply = done_msg;
-        }
-    }
     else if (matchnMove(3, point, "reports"))
     {
         if (isRead)
@@ -1892,7 +1845,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         if (point[0] == 0)
             return false;
     }
-    if (helpList())
+    if (helpList(level))
         return false;
     if (matchnMove(2, point, "stop"))
         sendDirect(0, 64, 128, 240);

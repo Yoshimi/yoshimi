@@ -1133,8 +1133,15 @@ void SynthEngine::cliOutput(list<string>& msg_buf, unsigned int lines)
         cout << "\nReports sent to console window\n\n";
     }
     else if (msg_buf.size() < lines) // Output will fit the screen
+    {
+        string text = "";
         for (it = msg_buf.begin(); it != msg_buf.end(); ++it)
-            Runtime.Log(*it);
+        {
+            text += *it;
+            text += "\n";
+        }
+        Runtime.Log(text);
+    }
     else // Output is too long, page it
     {
         // JBS: make that a class member variable
