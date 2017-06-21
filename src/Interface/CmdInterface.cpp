@@ -65,6 +65,8 @@ string basics[] = {
     "  Instruments [n]",            "instruments in bank ID or current",
     "  Parts",                      "parts with instruments installed",
     "  Vectors",                    "settings for all enabled vectors",
+    "  Tuning",                     "Microtonal scale tunings",
+    "  Keymap",                     "Microtonal scale keyboard map",
     "  Settings",                   "dynamic settings",
     "  MLearn [s<n>]",              "midi learned controls ('@' n for full details on one line)",
     "  History [s]",                "recent files (Patchsets, SCales, STates, Vectors, MLearn)",
@@ -1906,6 +1908,10 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 }
             else
                 synth->SetSystemValue(107, LINES);
+        else if (matchnMove(1, point, "tuning"))
+            Runtime.Log("Tuning:\n" + synth->microtonal.tuningtotext());
+        else if (matchnMove(1, point, "keymap"))
+            Runtime.Log("Keymap:\n" + synth->microtonal.keymaptotext());
         else if (matchnMove(1, point, "history"))
         {
             reply = done_msg;

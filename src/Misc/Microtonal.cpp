@@ -349,6 +349,21 @@ int Microtonal::texttomapping(const char *text)
 }
 
 
+string Microtonal::keymaptotext(void)
+{
+    string text;
+    for (int i = 0; i < Pmapsize; ++i)
+    {
+        if (i > 0)
+            text += "\n";
+        if (Pmapping[i] == -1)
+            text += "x";
+        else
+            text += to_string(Pmapping[i]);
+    }
+    return text;
+}
+
 // Convert tunning to text line
 void Microtonal::tuningtoline(int n, char *line, int maxn)
 {
@@ -367,6 +382,22 @@ void Microtonal::tuningtoline(int n, char *line, int maxn)
     }
     if (octave[n].type == 2)
         snprintf(line, maxn, "%d/%d", octave[n].x1, octave[n].x2);
+}
+
+
+string Microtonal::tuningtotext()
+{
+    string text;
+    char *buff = new char[100];
+    for (int i = 0; i < octavesize; ++i)
+    {
+        if (i > 0)
+            text += "\n";
+        tuningtoline(i, buff, 100);
+        text += string(buff);
+    }
+    delete [] buff;
+    return text;
 }
 
 

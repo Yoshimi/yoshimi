@@ -74,6 +74,8 @@ class Microtonal : private MiscFuncs
 
         int getoctavesize(void);
         void tuningtoline(int n, char *line, int maxn);
+        string tuningtotext(void);
+        string keymaptotext(void);
         int loadscl(string filename); // load the tunnings from a .scl file
         int loadkbm(string filename); // load the mapping from .kbm file
         int texttotunings(const char *text);
