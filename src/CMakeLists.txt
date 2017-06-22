@@ -32,7 +32,7 @@ add_definitions(-std=gnu++11) # various versions of cmake
 
 # ^^^ comment these two out on release pushes ^^^
 
-set (YOSHIMI_VERSION "1.5.2")
+set (YOSHIMI_VERSION "1.5.2.1")
 
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 

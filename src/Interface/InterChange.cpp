@@ -2873,7 +2873,12 @@ void InterChange::commandPart(CommandBlock *getData)
             if (kitType)
             {
                 if (write)
-                    part->kit[kititem & 0x1f].Psendtoparteffect = value_int;
+                {
+                    if (value_int == 127)
+                        part->kit[kititem & 0x1f].Psendtoparteffect = 127;
+                    else
+                     part->kit[kititem & 0x1f].Psendtoparteffect = value_int - 1;
+                }
                 else
                     value = part->kit[kititem & 0x1f].Psendtoparteffect;
             }

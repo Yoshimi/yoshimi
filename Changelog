@@ -1,4 +1,6 @@
 yoshimi 1.5.2
+2017-6-22 Will
+* Fixed regression kitmode effect select works again.
 
 2017-5-12 Will
 * Merged in Robs SubSynth Overtones/Legato fix.
