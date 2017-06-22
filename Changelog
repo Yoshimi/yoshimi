@@ -1,5 +1,9 @@
 yoshimi 1.5.2 M
 
+2017-6-22 Will
+* Fixed regression kitmode effect select works again.
+  Also improved numbering.
+
 2017-6-21 Will
 * Revised CLI help menu for greater clarity.
 * Implemented CLI list tuning and keymap.

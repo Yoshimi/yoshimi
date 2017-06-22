@@ -109,7 +109,7 @@ Y : any : 18 : 0 to 63 : 0 to 15 : 255 : 32 : 255 : 255 : Kit item minimum to la
 Y : any : 19 : 0 to 63 : 0 to 15 : 255 : 32 : 255 : 255 : Kit item maximum to last key press
 Y : any : 20 : 0 to 63 : 0 to 15 : 255 : 32 : 255 : 255 : Kit item clear key limits
 
-Y : 1 to 3, 127 : 24 : 0 to 63 : 0 to 15 : 255 : 32 : 255 : 255 : Effect number to use – Off, 1, 2, 3 (off = 127)
+Y : 0 to 3 : 24 : 0 to 63 : 0 to 15 : 255 : 32 : 255 : 255 : Effect number to use – Off, 1, 2, 3
 
 Y : 0/1 : 57 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Drum mode
 Y : 0 to 3 : 58 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Mode – Off, Multi, Single, Crossfade
