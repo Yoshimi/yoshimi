@@ -3,6 +3,9 @@ yoshimi 1.5.2 M
 2017-6-23 Will
 * Added delay to CLI return so most ops complete first.
 * Small improvement to Crossfade smoothness.
+* Removed redundant & commented out code in PartUI.fl.
+* Improved range checks in Part.cpp.
+  Also removed redundant kit range checks.
 
 2017-6-22 Will
 * Fixed regression kitmode effect select works again.

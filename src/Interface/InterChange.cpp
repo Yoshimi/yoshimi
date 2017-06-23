@@ -3270,55 +3270,81 @@ void InterChange::commandPart(CommandBlock *getData)
             if (kitType)
             {
                 if (write)
-                    part->kit[kititem & 0x1f].Pmuted = value_bool;
+                    part->kit[kititem].Pmuted = value_bool;
                 else
-                    value = part->kit[kititem & 0x1f].Pmuted;
+                    value = part->kit[kititem].Pmuted;
             }
             break;
 
-        case 16:
+        case 16: // always return actual value
             if (kitType)
             {
                 if (write)
-                    part->kit[kititem & 0x1f].Pminkey = value_int;
-                else
-                    value = part->kit[kititem & 0x1f].Pminkey;
+                {
+                    if (value_int > part->kit[kititem].Pmaxkey)
+                        part->kit[kititem].Pminkey = value_int = part->kit[kititem].Pmaxkey;
+                    else
+                        part->kit[kititem].Pminkey = value_int;
+                }
+                value = part->kit[kititem].Pminkey;
             }
             else
             {
                 if (write)
-                    part->Pminkey = value_int;
-                else
-                    value = part->Pminkey;
+                {
+                    if (value_int > part->Pmaxkey)
+                        part->Pminkey = part->Pmaxkey;
+                    else
+                        part->Pminkey = value_int;
+                }
+                value = part->Pminkey;
             }
             break;
-        case 17:
+        case 17: // always return actual value
             if (kitType)
             {
                 if (write)
-                    part->kit[kititem & 0x1f].Pmaxkey = value_int;
-                else
-                    value = part->kit[kititem & 0x1f].Pmaxkey;
+                {
+                    if (value_int < part->kit[kititem].Pminkey)
+                        part->kit[kititem].Pmaxkey = part->kit[kititem].Pminkey;
+                    else
+                        part->kit[kititem].Pmaxkey = value_int;
+                }
+                value = part->kit[kititem].Pmaxkey;
             }
             else
             {
                 if (write)
-                    part->Pmaxkey = value_int;
-                else
-                    value = part->Pmaxkey;
+                {
+                    if (value_int < part->Pminkey)
+                        part->Pmaxkey = part->Pminkey;
+                    else
+                        part->Pmaxkey = value_int;
+                }
+                value = part->Pmaxkey;
             }
             break;
         case 18: // always return actual value
             if (kitType)
             {
                 if ((write) && part->lastnote >= 0)
-                    part->kit[kititem & 0x1f].Pminkey = part->lastnote;
-                value = part->kit[kititem & 0x1f].Pminkey;
+                {
+                    if (value_int >= part->kit[kititem].Pmaxkey)
+                        part->kit[kititem].Pminkey = part->kit[kititem].Pmaxkey;
+                    else
+                        part->kit[kititem].Pminkey = part->lastnote;
+                }
+                value = part->kit[kititem].Pminkey;
             }
             else
             {
                 if ((write) && part->lastnote >= 0)
-                    part->Pminkey = part->lastnote;
+                {
+                    if(value_int >= part->Pmaxkey)
+                        part->Pminkey = part->Pmaxkey;
+                    else
+                        part->Pminkey = part->lastnote;
+                }
                 value = part->Pminkey;
             }
             break;
@@ -3326,13 +3352,23 @@ void InterChange::commandPart(CommandBlock *getData)
             if (kitType)
             {
                 if ((write) && part->lastnote >= 0)
-                    part->kit[kititem & 0x1f].Pmaxkey = part->lastnote;
-                value = part->kit[kititem & 0x1f].Pmaxkey;
+                {
+                    if(value_int <= part->kit[kititem].Pminkey)
+                        part->kit[kititem].Pmaxkey = part->kit[kititem].Pminkey;
+                    else
+                        part->kit[kititem].Pmaxkey = part->lastnote;
+                }
+                value = part->kit[kititem].Pmaxkey;
             }
             else
             {
                 if ((write) && part->lastnote >= 0)
-                    part->Pmaxkey = part->lastnote;
+                {
+                    if(value_int <= part->Pminkey)
+                        part->Pmaxkey = part->Pminkey;
+                    else
+                        part->Pmaxkey = part->lastnote;
+                }
                 value = part->Pmaxkey;
             }
             break;
@@ -3341,8 +3377,8 @@ void InterChange::commandPart(CommandBlock *getData)
             {
                 if (write)
                 {
-                    part->kit[kititem & 0x1f].Pminkey = 0;
-                    part->kit[kititem & 0x1f].Pmaxkey = 127;
+                    part->kit[kititem].Pminkey = 0;
+                    part->kit[kititem].Pmaxkey = 127;
                 }
             }
             else
@@ -3361,12 +3397,12 @@ void InterChange::commandPart(CommandBlock *getData)
                 if (write)
                 {
                     if (value_int == 0 )
-                        part->kit[kititem & 0x1f].Psendtoparteffect = 127;
+                        part->kit[kititem].Psendtoparteffect = 127;
                     else
-                        part->kit[kititem & 0x1f].Psendtoparteffect = value_int - 1;
+                        part->kit[kititem].Psendtoparteffect = value_int - 1;
                 }
                 else
-                    value = part->kit[kititem & 0x1f].Psendtoparteffect;
+                    value = part->kit[kititem].Psendtoparteffect;
             }
             break;
 
@@ -3431,6 +3467,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 {
                     part->Pkitmode = 1;
                     part->Pkitfade = true;
+                    value = 1; // just to be sure
                 }
                 else
                 {
