@@ -1,5 +1,9 @@
 yoshimi 1.5.2 M
 
+2017-6-23 Will
+* Added delay to CLI return so most ops complete first.
+* Small improvement to Crossfade smoothness.
+
 2017-6-22 Will
 * Fixed regression kitmode effect select works again.
   Also improved numbering.

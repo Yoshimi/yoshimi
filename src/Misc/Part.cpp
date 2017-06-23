@@ -615,7 +615,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
                     }
                     if (range)
                     {
-                        vel = truevel * ((float)position / range);
+                        vel = truevel * (float(position) / float(range));
                         //cout << item << "  " << vel << endl;
                     }
                 }

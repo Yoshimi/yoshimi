@@ -2573,9 +2573,9 @@ void CmdInterface::cmdIfaceCommandLoop()
             sprintf(welcomeBuffer,"%s",prompt.c_str());
             if (synth) // it won't be until Process called
                 synth->getRuntime().CLIstring = prompt;
+            usleep(80000); // create enough delay for most ops to complete
         }
-        else
-            usleep(20000);
+        usleep(20000);
     }
 
     if (write_history(hist_filename.c_str()) != 0) // writing of history file failed
