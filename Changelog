@@ -6,6 +6,7 @@ yoshimi 1.5.2 M
 * Removed redundant & commented out code in PartUI.fl.
 * Improved range checks in Part.cpp.
   Also removed redundant kit range checks.
+* Fixed key range regression caused by last commit :(
 
 2017-6-22 Will
 * Fixed regression kitmode effect select works again.

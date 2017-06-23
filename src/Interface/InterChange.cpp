@@ -3282,7 +3282,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 if (write)
                 {
                     if (value_int > part->kit[kititem].Pmaxkey)
-                        part->kit[kititem].Pminkey = value_int = part->kit[kititem].Pmaxkey;
+                        part->kit[kititem].Pminkey = part->kit[kititem].Pmaxkey;
                     else
                         part->kit[kititem].Pminkey = value_int;
                 }
@@ -3325,11 +3325,12 @@ void InterChange::commandPart(CommandBlock *getData)
             }
             break;
         case 18: // always return actual value
+            value_int = part->lastnote;
             if (kitType)
             {
-                if ((write) && part->lastnote >= 0)
+                if ((write) && value_int >= 0)
                 {
-                    if (value_int >= part->kit[kititem].Pmaxkey)
+                    if (value_int > part->kit[kititem].Pmaxkey)
                         part->kit[kititem].Pminkey = part->kit[kititem].Pmaxkey;
                     else
                         part->kit[kititem].Pminkey = part->lastnote;
@@ -3340,7 +3341,7 @@ void InterChange::commandPart(CommandBlock *getData)
             {
                 if ((write) && part->lastnote >= 0)
                 {
-                    if(value_int >= part->Pmaxkey)
+                    if(value_int > part->Pmaxkey)
                         part->Pminkey = part->Pmaxkey;
                     else
                         part->Pminkey = part->lastnote;
@@ -3349,11 +3350,12 @@ void InterChange::commandPart(CommandBlock *getData)
             }
             break;
         case 19: // always return actual value
+            value_int = part->lastnote;
             if (kitType)
             {
                 if ((write) && part->lastnote >= 0)
                 {
-                    if(value_int <= part->kit[kititem].Pminkey)
+                    if(value_int < part->kit[kititem].Pminkey)
                         part->kit[kititem].Pmaxkey = part->kit[kititem].Pminkey;
                     else
                         part->kit[kititem].Pmaxkey = part->lastnote;
@@ -3364,7 +3366,7 @@ void InterChange::commandPart(CommandBlock *getData)
             {
                 if ((write) && part->lastnote >= 0)
                 {
-                    if(value_int <= part->Pminkey)
+                    if(value_int < part->Pminkey)
                         part->Pmaxkey = part->Pminkey;
                     else
                         part->Pmaxkey = part->lastnote;
