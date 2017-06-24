@@ -109,9 +109,12 @@ send_data(65, 0, 0xc0);}
         }
         Fl_Spinner scaleShift {
           label Shift
-          callback {microtonal->Pscaleshift=(int) o->value()+64;
+          callback {//
+int tmp = lrint(o->value());
+microtonal->Pscaleshift = tmp + 64;
 synth->setAllPartMaps();
-send_data(4, o->value(), 0xc0);}
+
+send_data(4, tmp, 0xc0);}
           xywh {320 68 52 20} labelsize 11 align 1 minimum -63 maximum 64 value 0 textfont 1
           code0 {o->value(microtonal->Pscaleshift-64);}
         }

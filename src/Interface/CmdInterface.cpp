@@ -53,94 +53,56 @@ using namespace std;
 static int currentInstance = 0;
 
 string basics[] = {
-    "?  Help",                      "show commands",
-    "STop",                         "all sound off",
-    "RESet",                        "return to start-up conditions (if 'y')",
-    "EXit",                         "tidy up and close Yoshimi (if 'y')",
-    "..",                           "step back one level",
-    "/",                            "step back to top level",
-    "List",                         "various available parameters",
-    "  Roots",                      "all available root paths",
-    "  Banks [n]",                  "banks in root ID or current",
-    "  Instruments [n]",            "instruments in bank ID or current",
-    "  Parts",                      "parts with instruments installed",
-    "  Vectors",                    "settings for all enabled vectors",
-    "  Tuning",                     "Microtonal scale tunings",
-    "  Keymap",                     "Microtonal scale keyboard map",
-    "  Settings",                   "dynamic settings",
-    "  MLearn [s<n>]",              "midi learned controls ('@' n for full details on one line)",
-    "  History [s]",                "recent files (Patchsets, SCales, STates, Vectors, MLearn)",
-    "  Effects [s]",                "effect types ('all' include preset numbers and names)",
-    "  PREsets",                    "all the presets for the currently selected effect",
-    "LOad",                         "load patch files",
-    "  Instrument <s>",             "instrument to current part from named file",
-    "  Patchset <s>",               "complete set of instruments from named file",
-    "  STate <s>",                  "all system settings and patch sets from named file",
-    "  SCale <s>",                  "scale settings from named file",
-    "  VEctor [{Channel}n] <s>",    "vector on channel n from named file",
-    "  MLearn <s>",                 "midi learned list from named file",
-    "SAve",                         "save various files",
-    "  Instrument <s>",             "current part to named file",
-    "  Patchset <s>",               "complete set of instruments to named file",
-    "  STate <s>",                  "all system settings and patch sets to named file",
-    "  SCale <s>",                  "current scale settings to named file",
-    "  VEctor <{Channel}n> <s>",    "vector on channel n to named file",
-    "  MLearn <s>",                 "midi learned list to named file",
-    "  Setup",                      "dynamic settings",
-    "ADD",                          "add paths and files",
-    "  Root <s>",                   "root path to list",
-    "  Bank <s>",                   "bank to current root",
-    "REMove",                       "remove paths, files and entries",
-    "  Root <n>",                   "de-list root path ID",
-    "  Bank <n>",                   "delete bank ID (and all contents) from current root",
-    "  MLearn <s> [n]",             "delete midi learned 'ALL' whole list, or '@'(n) line",
-    "Set / Read",                   "set or read all main parameters",
-    "  REPorts [s]",                "destination (Gui/Stderr)",
-    "  ",                           "  non-fatal (SHow/Hide)",
-    "  Root <n>",                   "current root path to ID",
-    "  Bank <n>",                   "current bank to ID",
-    "  MLearn <n> <s> [s]",         "midi learned line n control",
-    "  ",                           "(MUte, CC, CHan, MIn, MAx, LImit, BLock) Enable {other}",
+    "?  Help",                  "show commands",
+    "STop",                     "all sound off",
+    "RESet",                    "return to start-up conditions (if 'y')",
+    "EXit",                     "tidy up and close Yoshimi (if 'y')",
+    "..",                       "step back one level",
+    "/",                        "step back to top level",
     "end"
 };
 
 string toplist [] = {
-    "SYStem effects [n]",         "system effects for editing",
-    "- Send <n2> <n3>",           "send system effect to effect n2 at volume n3",
-    "- preset <n2>",              "set effect preset to number n2",
-    "INSert effects [n1]",        "insertion effects for editing",
-    "- Send <s>/<n2>",            "set where (Master, Off or part number)",
-    "- PREset <n2>",              "set numbered effect preset to n2",
-    "PRogram <n>",                "MIDI program change enabled (0 off, other on)",
-    "ACtivate <n>",               "MIDI program change activates part (0 off, other on)",
-    "CCRoot <n>",                 "CC for root path changes (> 119 disables)",
-    "CCBank <n>",                 "CC for bank changes (0, 32, other disables)",
-    "EXtend <n>",                 "CC for extended MIDI program change (> 119 disables)",
-    "AVailable <n>",              "available parts (16, 32, 64)",
-    "Volume <n>",                 "master volume",
-    "SHift <n>",                  "master key shift semitones (0 no shift)",
-    "DEtune <n>",                 "master fine detune",
-    "SOlo <n>",                   "channel 'solo' switcher (0 = off, 1 = row, 2 = col, 3 = loop)",
-    "SCC <n>",                    "Incoming 'solo' channel number",
-    "TIMes [s]",                  "time display on instrument load message (ENable / other",
-    "PREferred Midi <s>",         "* MIDI connection type (Jack, Alsa)",
-    "PREferred Audio <s>",        "* audio connection type (Jack, Alsa)",
-    "Alsa Midi <s>",              "* name of alsa MIDI source",
-    "Alsa Audio <s>",             "* name of alsa hardware device",
-    "Jack Midi <s>",              "* name of jack MIDI source",
-    "Jack Server <s>",            "* jack server name",
-    "Jack AUto <s>",              "* (0 off, other on)",
-    "AUTostate [s]",              "* autoload default state at start (ENable / other)",
-    "end"
-};
-
-string vectlist [] = {
-    "[X/Y] CC <n2>",            "CC n2 is used for CHANNEL X or Y axis sweep",
-    "[X/Y] Features <n2> <s>",   "sets CHANNEL X or Y features 1-4 (Enable, Reverse, {other} off)",
-    "[X] PRogram <l/r> <n2>",   "X program change ID for CHANNEL LEFT or RIGHT part",
-    "[Y] PRogram <d/u> <n2>",   "Y program change ID for CHANNEL DOWN or UP part",
-    "[X/Y] Control <n2> <n3>",  "sets n3 CC to use for X or Y feature n2 (2-4)",
-    "Off",                      "disable vector for CHANNEL",
+    "ADD",                      "add paths and files",
+    "  Root <s>",               "root path to list",
+    "  Bank <s>",               "bank to current root",
+    "REMove",                   "remove paths, files and entries",
+    "  Root <n>",               "de-list root path ID",
+    "  Bank <n>",               "delete bank ID (and all contents) from current root",
+    "  MLearn <s> [n]",         "delete midi learned 'ALL' whole list, or '@'(n) line",
+    "Set / Read",               "set or read all main parameters",
+    "  REPorts [s]",            "destination (Gui/Stderr)",
+    "  ",                       "  non-fatal (SHow/Hide)",
+    "  Root <n>",               "current root path to ID",
+    "  Bank <n>",               "current bank to ID",
+    "  MLearn <n> <s> [s]",     "midi learned line n control",
+    "  ",                       "(MUte, CC, CHan, MIn, MAx, LImit, BLock) Enable {other}",
+    "SYStem effects [n]",       "system effects for editing",
+    "- Send <n2> <n3>",         "send system effect to effect n2 at volume n3",
+    "- preset <n2>",            "set effect preset to number n2",
+    "INSert effects [n1]",      "insertion effects for editing",
+    "- Send <s>/<n2>",          "set where (Master, Off or part number)",
+    "- PREset <n2>",            "set numbered effect preset to n2",
+    "PRogram <n>",              "MIDI program change enabled (0 off, other on)",
+    "ACtivate <n>",             "MIDI program change activates part (0 off, other on)",
+    "CCRoot <n>",               "CC for root path changes (> 119 disables)",
+    "CCBank <n>",               "CC for bank changes (0, 32, other disables)",
+    "EXtend <n>",               "CC for extended MIDI program change (> 119 disables)",
+    "AVailable <n>",            "available parts (16, 32, 64)",
+    "Volume <n>",               "master volume",
+    "SHift <n>",                "master key shift semitones (0 no shift)",
+    "DEtune <n>",               "master fine detune",
+    "SOlo <n>",                 "channel 'solo' switcher (0 = off, 1 = row, 2 = col, 3 = loop)",
+    "SCC <n>",                  "Incoming 'solo' channel number",
+    "TIMes [s]",                "time display on instrument load message (ENable / other",
+    "PREferred Midi <s>",       "* MIDI connection type (Jack, Alsa)",
+    "PREferred Audio <s>",      "* audio connection type (Jack, Alsa)",
+    "Alsa Midi <s>",            "* name of alsa MIDI source",
+    "Alsa Audio <s>",           "* name of alsa hardware device",
+    "Jack Midi <s>",            "* name of jack MIDI source",
+    "Jack Server <s>",          "* jack server name",
+    "Jack AUto <s>",            "* (0 off, other on)",
+    "AUTostate [s]",            "* autoload default state at start (ENable / other)",
     "end"
 };
 
@@ -158,13 +120,80 @@ string partlist [] = {
     "MIn <n2>",                 "minimum MIDI note value",
     "MAx <n2>",                 "maximum MIDI note value",
     "EFfects [n2]",             "effects for editing",
-    "- Type <s>",               "the effect type",
-    "- PREset <n3>",            "set numbered effect preset to n3",
-    "- Send <n3> <n4>",         "send part to system effect n3 at volume n4",
+    "  Type <s>",               "the effect type",
+    "  PREset <n3>",            "set numbered effect preset to n3",
+    "  Send <n3> <n4>",         "send part to system effect n3 at volume n4",
     "PRogram <n2>",             "loads instrument ID",
     "NAme <s>",                 "sets the display name the part can be saved with",
     "Channel <n2>",             "MIDI channel (> 31 disables, > 15 note off only)",
     "Destination <s2>",         "jack audio destination (Main, Part, Both)",
+    "end"
+};
+
+string vectlist [] = {
+    "[X/Y] CC <n2>",            "CC n2 is used for X or Y axis sweep",
+    "[X/Y] Features <n2> [s]",   "sets X or Y features 1-4 (Enable, Reverse, {other} off)",
+    "[X] PRogram <l/r> <n2>",   "X program change ID for LEFT or RIGHT part",
+    "[Y] PRogram <d/u> <n2>",   "Y program change ID forL DOWN or UP part",
+    "[X/Y] Control <n2> <n3>",  "sets n3 CC to use for X or Y feature n2 (2-4)",
+    "Off",                      "disable vector for this channel",
+    "end"
+};
+
+string scalelist [] = {
+    "FRequency <n>",            "'A' note actual frequency",
+    "NOte <n>",                 "'A' note number",
+    "Invert [s]",               "Invert entire scale (Enable, {other} off)",
+    "CEntre <n>",               "Note number of key centre",
+    "SHift <n>",                "Shift entire scale up or down",
+    "SCale [s]",                "Activate microtonal scale (Enable, {other} off)",
+    "MApping [s]",              "Activate keyboard mapping (Enable, {other} off)",
+    "FIrst <n>",                "First note number to map",
+    "MIddle <n>",               "Middle note number to map",
+    "Last <n>",                 "Last note number to map",
+    "Tuning <s> [s2]",          "CSV tuning values (n1.n1 or n1/n1 ,  n2.n2 or n2/n2 , etc.)",
+    " ",                        "s2 = 'IMPort' from named file",
+    "Keymap <s> [s2]",          "CSV keymap (n1, n2, n3, etc.)",
+    " ",                        "s2 = 'IMPort' from named file",
+    "NAme <s>",                 "Internal name for this scale",
+    "COmment <s>",              "Comment line for this scale",
+    "CLEar",                    "Clear all settings and revert to standard scale",
+    "end"
+};
+
+string loadlist [] = {
+    "Instrument <s>",           "instrument to current part from named file",
+    "Patchset <s>",             "complete set of instruments from named file",
+    "STate <s>",                "all system settings and patch sets from named file",
+    "SCale <s>",                "scale settings from named file",
+    "VEctor [n] <s>",           "vector to channel n (or saved) from named file",
+    "MLearn <s>",               "midi learned list from named file",
+    "end"
+};
+
+string savelist [] = {
+    "Instrument <s>",           "current part to named file",
+    "Patchset <s>",             "complete set of instruments to named file",
+    "STate <s>",                "all system settings and patch sets to named file",
+    "SCale <s>",                "current scale settings to named file",
+    "VEctor <n> <s>",           "vector on channel n to named file",
+    "MLearn <s>",               "midi learned list to named file",
+    "Setup",                    "dynamic settings",
+};
+
+string listlist [] = {
+    "Roots",                    "all available root paths",
+    "Banks [n]",                "banks in root ID or current",
+    "Instruments [n]",          "instruments in bank ID or current",
+    "Parts",                    "parts with instruments installed",
+    "Vectors",                  "settings for all enabled vectors",
+    "Tuning",                   "Microtonal scale tunings",
+    "Keymap",                   "Microtonal scale keyboard map",
+    "Settings",                 "dynamic settings",
+    "MLearn [s<n>]",            "midi learned controls ('@' n for full details on one line)",
+    "History [s]",              "recent files (Patchsets, SCales, STates, Vectors, MLearn)",
+    "Effects [s]",              "effect types ('all' include preset numbers and names)",
+    "PREsets",                  "all the presets for the currently selected effect",
     "end"
 };
 
@@ -278,41 +307,77 @@ bool CmdInterface::helpList(unsigned int local)
     if (!matchnMove(1, point, "help") && !matchnMove(1, point, "?"))
         return false;
 
-    string prefix = "";
-    if (matchnMove(1, point, "@"))
-    {
-        local = 0;
+    int listnum = 0;
+
+    if (point[0] != 0)
+    { // 1 & 2 reserved for syseff & inseff
         if (matchnMove(1, point, "part"))
-        {
-            bitSet(local, part_lev);
-            prefix = "Part ";
-        }
-        else if  (matchnMove(1, point, "vector"))
-        {
-            bitSet(local, vect_lev);
-            prefix =  "Vector ";
-        }
+            listnum = 3;
+        else if (matchnMove(1, point, "vector"))
+            listnum = 4;
+        else if (matchnMove(1, point, "scale"))
+            listnum = 5;
+        else if (matchnMove(1, point, "load"))
+            listnum = 6;
+        else if (matchnMove(1, point, "save"))
+            listnum = 7;
+        else if (matchnMove(1, point, "list"))
+            listnum = 8;
     }
-    list<string>msg;
-    msg.push_back(prefix + "Commands:");
-    if (local == 0)
+    else
     {
-        helpLoop(msg, basics, 2);
-        msg.push_back(" ");
-        msg.push_back("@   Part [n1]                 - set part ID operations");
-        msg.push_back("@   VEctor [n1]               - vector CHANNEL, operations");
-        msg.push_back(" ");
+        if (bitTest(local, part_lev))
+            listnum = 3;
+        else if (bitTest(local, vect_lev))
+            listnum = 4;
+        else if (bitTest(local, scale_lev))
+            listnum = 5;
     }
 
-    if (bitTest(local, part_lev))
-        helpLoop(msg, partlist, 2);
-    else if(bitTest(local, vect_lev))
-        helpLoop(msg, vectlist, 2);
+    list<string>msg;
+    msg.push_back("Commands:");
+    helpLoop(msg, basics, 2);
+    switch(listnum)
+    {
+        case 0:
+            msg.push_back(" ");
+            msg.push_back("  Part [n1]   ...             - part operations");
+            msg.push_back("  VEctor [n1] ...             - vector operations");
+            msg.push_back("  List        ...             - various available parameters");
+            msg.push_back("  LOad        ...             - load various files");
+            msg.push_back("  SAve        ...             - save various files");
+            msg.push_back(" ");
+            break;
+        case 3:
+            msg.push_back("Part: [n1] = part number");
+            helpLoop(msg, partlist, 2);
+            break;
+        case 4:
+            msg.push_back("Vector: [n1] = base channel:");
+            helpLoop(msg, vectlist, 2);
+            break;
+        case 5:
+            msg.push_back("Scale:");
+            helpLoop(msg, scalelist, 2);
+            break;
+        case 6:
+            msg.push_back("Load:");
+            helpLoop(msg, loadlist, 2);
+            break;
+        case 7:
+            msg.push_back("Save:");
+            helpLoop(msg, savelist, 2);
+            break;
+        case 8:
+            msg.push_back("List:");
+            helpLoop(msg, listlist, 2);
+            break;
+    }
 
-    if (local == 0)
+    if (listnum == 0)
     {
         helpLoop(msg, toplist, 2);
-        msg.push_back("'@' help sub-menu");
+        msg.push_back("'...' help sub-menu");
         msg.push_back("'*' entries need to be saved and Yoshimi restarted to activate");
     }
 
@@ -705,7 +770,7 @@ int CmdInterface::volPanVel()
         case 4:
             if (!isRead && point[0] == 0)
                 return value_msg;
-            sendDirect(string2int127(point), cmdType, cmd, npart);
+            sendDirect(string2float(point), cmdType, cmd, npart);
             reply = done_msg;
     }
     return reply;
@@ -880,31 +945,117 @@ int CmdInterface::commandVector()
 int CmdInterface::commandScale()
 {
     Config &Runtime = synth->getRuntime();
-    int reply = todo_msg;
-    char command = 0xff;
+    int reply = done_msg;
+    float value = 0;
+    unsigned char type;
+    unsigned char command = 0xff;
+    unsigned char par = 255;
+    unsigned char par2 = 255;
+    if (isRead)
+    {
+        type = 0x80;
+        reply = done_msg;
+    }
+    else
+        type = 0xc0; // write, integer
+
     string name;
+
     if (matchnMove(1, point, "tuning"))
         command = 0x20;
     else if (matchnMove(1, point, "keymap"))
         command = 0x21;
+    else if (matchnMove(2, point, "name"))
+        command = 0x40;
+    else if (matchnMove(2, point, "comment"))
+        command = 0x41;
 
-    if (command == 0x20 || command == 0x21)
+    if (command >= 0x20 && command <= 0x41)
     {
-        if (isRead)
+        if (isRead && command < 0x40)
         {
-            Runtime.Log("Write only");
+            Runtime.Log("Write only - use list");
             return done_msg;
         }
-        if (matchnMove(3, point, "import"))
+        else if (command <= 0x21)
         {
-            command += 0x10;
+            if (matchnMove(3, point, "import"))
+                command += 0x10;
+            name = (string)point;
+            if (name == "")
+                return value_msg;
+            par = 0x80;
+            par2 = miscMsgPush(name);
         }
-         name = (string)point;
-        if (name == "")
-            return value_msg;
-       sendDirect(0, 0x40, command, 0xe8, 0xff, 0xff, 0xff, 0x80, miscMsgPush(name));
-        return done_msg;
     }
+    else
+    {
+        int min = 0;
+        int max = 127;
+        if (matchnMove(2, point, "frequency"))
+        {
+            command = 0;
+            min = 1;
+            max = 20000;
+            type &= 0x7f; // float
+        }
+        else if(matchnMove(2, point, "note"))
+            command = 1;
+        else if(matchnMove(1, point, "invert"))
+        {
+            command = 2;
+            max = 1;
+        }
+        else if(matchnMove(2, point, "centre"))
+            command = 3;
+        else if(matchnMove(2, point, "shift"))
+        {
+            command = 4;
+            min = -63;
+            max = 64;
+        }
+        else if(matchnMove(2, point, "scale"))
+        {
+            command = 8;
+            max = 1;
+        }
+        else if(matchnMove(2, point, "mapping"))
+        {
+            command = 16;
+            max = 1;
+        }
+        else if(matchnMove(2, point, "first"))
+            command = 17;
+        else if(matchnMove(2, point, "middle"))
+            command = 18;
+        else if(matchnMove(1, point, "last"))
+            command = 19;
+        else if(matchnMove(3, point, "CLEar"))
+        {
+            point -=1; // sneaky way to force a zero :)
+            command = 96;
+        }
+        else
+            return todo_msg;
+
+        if (!isRead)
+        {
+            if (point[0] == 0)
+                return value_msg;
+            if (matchnMove(1, point, "enable"))
+                value = 1;
+            else//if (isdigit(point[0]))
+            {
+                value = string2float(point);
+                if (value < min || value > max)
+                    return value_msg;
+            }
+            //else
+                //value = (matchnMove(1, point, "enable"));
+        }
+    }
+
+    sendDirect(value, type, command, 0xe8, 0xff, 0xff, 0xff, par, par2);
     return reply;
 }
 

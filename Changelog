@@ -1,5 +1,10 @@
 yoshimi 1.5.2 M
 
+2017-6-24 Will
+* More revisions of CLI help lists.
+* Implemented all CLI microtonal functions.
+* Updated docs.
+
 2017-6-23 Will
 * Added delay to CLI return so most ops complete first.
 * Small improvement to Crossfade smoothness.

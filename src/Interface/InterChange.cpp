@@ -573,7 +573,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     {
         actual = " Value ";
         if (type & 0x80)
-            actual += to_string(int(value + 0.5f));
+            actual += to_string(lrint(value));
         else
             actual += to_string(value);
     }
@@ -743,11 +743,11 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
             break;
 
         case 64:
-            contstr = "Name";
+            contstr = "Name: " + string(synth->microtonal.Pname);
             showValue = false;
             break;
         case 65:
-            contstr = "Comments";
+            contstr = "Comment: " + string(synth->microtonal.Pcomment);
             showValue = false;
             break;
         case 96:
@@ -2974,9 +2974,9 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
             break;
         case 4: // Scale Shift
             if (write)
-                synth->microtonal.Pscaleshift = value_int;
+                synth->microtonal.Pscaleshift = value_int + 64;
             else
-                value = synth->microtonal.Pscaleshift;
+                value = synth->microtonal.Pscaleshift - 64;
             break;
 
         case 8: // Enable Microtonal
