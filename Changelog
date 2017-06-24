@@ -1,5 +1,12 @@
 yoshimi 1.5.2 M
 
+2017-6-25 Will
+* Transferred scales to new controls.
+* Scale name now the leafname for .scl loads.
+* Changed scale 'Comment' to 'Description'.
+  matches Scala format better.
+* Doc updates.
+
 2017-6-24 Will
 * More revisions of CLI help lists.
 * Implemented all CLI microtonal functions.

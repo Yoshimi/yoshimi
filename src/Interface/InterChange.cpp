@@ -337,6 +337,15 @@ void InterChange::transfertext(CommandBlock *getData)
         getData->data.value = float(value);
         getData->data.par2 = miscMsgPush(text); // pass it on
         jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
+        if (control = 48) // loading ascale includes a name!
+        {
+            getData->data.control = 64;
+            getData->data.par2 = miscMsgPush(synth->microtonal.Pname);
+            jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
+            getData->data.control = 65;
+            getData->data.par2 = miscMsgPush(synth->microtonal.Pcomment);
+            jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
+        }
     }
 }
 
@@ -394,6 +403,10 @@ void InterChange::resolveReplies(CommandBlock *getData)
 
     Part *part;
     part = synth->part[npart];
+
+    // this is unique and placed here to avoid Xruns
+    if (npart == 0xe8 && (control <= 32 || control >= 49))
+        synth->setAllPartMaps();
 
     bool isCli = ((type & 0x30) == 0x10); // elminate Gui redraw
     bool isGui = type & 0x20;
@@ -679,11 +692,6 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
 {
     int value = getData->data.value;
     unsigned char control = getData->data.control;
-
-    // this is unique and placed here to avoid Xruns
-    if (control <= 32 || control >= 49)
-        synth->setAllPartMaps();
-
 
     string contstr = "";
     switch (control)
@@ -2510,6 +2518,7 @@ void InterChange::returns(CommandBlock *getData)
         jack_ringbuffer_write(toCLI, (char*) getData->bytes, commandSize); // this will redirect where needed.
         return;
     }
+
     bool isCliOrGuiRedraw = type & 0x10; // separated out for clarity
     bool isMidi = type & 8;
     bool write = (type & 0x40) > 0;
@@ -2926,9 +2935,9 @@ void InterChange::commandVector(CommandBlock *getData)
 
 void InterChange::commandMicrotonal(CommandBlock *getData)
 {
-#pragma message "Gui writes changed to reads"
-    if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;
+//#pragma message "Gui writes changed to reads"
+//    if (getData->data.type & 0x20)
+//        getData->data.type = getData->data.type & 0xbf;
 
     float value = getData->data.value;
     unsigned char type = getData->data.type;

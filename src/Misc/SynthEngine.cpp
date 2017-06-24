@@ -1357,7 +1357,7 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
     int root;
     string label;
 
-    msg_buf.push_back("Settings");
+    msg_buf.push_back("Configuration:");
     msg_buf.push_back("  Master volume " + asString((int) Pvolume));
     msg_buf.push_back("  Master key shift " + asString(Pkeyshift - 64));
 
@@ -1415,7 +1415,7 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
             break;
 
         case 1:
-            label = "jack";
+            label = "JACK";
             break;
 
         default:
@@ -1430,7 +1430,7 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
             break;
 
         case 1:
-            label = "jack";
+            label = "JACK";
             break;
 
         default:
@@ -1440,20 +1440,20 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
     msg_buf.push_back("  Preferred audio " + label);
     msg_buf.push_back("  ALSA MIDI " + Runtime.alsaMidiDevice);
     msg_buf.push_back("  ALSA audio " + Runtime.alsaAudioDevice);
-    msg_buf.push_back("  jack MIDI " + Runtime.jackMidiDevice);
-    msg_buf.push_back("  Jack server " + Runtime.jackServer);
+    msg_buf.push_back("  JACK MIDI " + Runtime.jackMidiDevice);
+    msg_buf.push_back("  JACK server " + Runtime.jackServer);
     if (Runtime.connectJackaudio)
         label = "on";
     else
         label = "off";
-    msg_buf.push_back("  Jack autoconnect " + label);
+    msg_buf.push_back("  JACK autoconnect " + label);
 
     if (Runtime.toConsole)
     {
         msg_buf.push_back("  Reports sent to console window");
     }
     else
-        msg_buf.push_back("  Reports sent to stderr");
+        msg_buf.push_back("  Reports sent to stdout");
     if (Runtime.loadDefaultState)
         msg_buf.push_back("  Autostate on");
     else
@@ -1813,10 +1813,10 @@ void SynthEngine::writeRBP(char type, char data0, char data1, char data2)
             ++tries;
         }
         if (towrite)
-            Runtime.Log("Unable to write data to Root/bank/Program");
+            Runtime.Log("Unable to write data to Root/Bank/Program");
     }
     else
-        Runtime.Log("Root/bank/Program buffer full!");
+        Runtime.Log("Root/Bank/Program buffer full!");
 }
 
 
@@ -1989,7 +1989,7 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             Runtime.nrpndata.vectorYaxis[chan] = 0xff;
             Runtime.nrpndata.vectorXfeatures[chan] = 0;
             Runtime.nrpndata.vectorYfeatures[chan] = 0;
-            Runtime.Log("Channel " + asString(int(chan) + 1) + " vector control disabled");
+            Runtime.Log("Channel " + asString(int(chan) + 1) + " Vector control disabled");
             break;
     }
 }

@@ -1,5 +1,5 @@
 This is intended for direct transfers of text between non-RT threads. Although sychronised and using miscMsg, these do not enter the Command functions at all.
 
-To identify such transfers Parameter is set to 0xf0 (240). Nowhere else does this value appear. Once recognised it is passed to a separate function that does all the decoding.
+To identify such transfers Parameter has bit 7 set (ORed with 0x80). Nowhere else does this value appear and it can be readily masked out where needed. Once recognised it is passed to a separate function that does all the decoding, bypassing the normal control system. For some operations it can loop back into the 'returns' path to update the GUI or send replies to the CLI.
 
 It is used mostly for setting names, but also for scales and keyboard mappings, which are string representations of number lists.

@@ -1,5 +1,3 @@
-Add scales control to CLI.
-Correct errors in tunings :(
 
 NRPN channels?
 
@@ -22,8 +20,7 @@ Make add voice & add/pad oscillator windows show kit number & name.
 
 Make vector window update when main window reduces number of available parts.
 
-Consider, Pitchwheel split range in Controllers, but that one seems
-a bit pointless to me!
+Consider, Pitchwheel split range in Controllers, but that one seems a bit pointless to me!
 
 Change root/bank/instrument lists to single file for all instances.
 

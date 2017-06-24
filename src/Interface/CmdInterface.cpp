@@ -78,11 +78,11 @@ string toplist [] = {
     "  MLearn <n> <s> [s]",     "midi learned line n control",
     "  ",                       "(MUte, CC, CHan, MIn, MAx, LImit, BLock) Enable {other}",
     "SYStem effects [n]",       "system effects for editing",
-    "- Send <n2> <n3>",         "send system effect to effect n2 at volume n3",
-    "- preset <n2>",            "set effect preset to number n2",
+    "  Send <n2> <n3>",         "send system effect to effect n2 at volume n3",
+    "  preset <n2>",            "set effect preset to number n2",
     "INSert effects [n1]",      "insertion effects for editing",
-    "- Send <s>/<n2>",          "set where (Master, Off or part number)",
-    "- PREset <n2>",            "set numbered effect preset to n2",
+    "  Send <s>/<n2>",          "set where (Master, Off or part number)",
+    "  PREset <n2>",            "set numbered effect preset to n2",
     "PRogram <n>",              "MIDI program change enabled (0 off, other on)",
     "ACtivate <n>",             "MIDI program change activates part (0 off, other on)",
     "CCRoot <n>",               "CC for root path changes (> 119 disables)",
@@ -163,22 +163,22 @@ string scalelist [] = {
 
 string loadlist [] = {
     "Instrument <s>",           "instrument to current part from named file",
-    "Patchset <s>",             "complete set of instruments from named file",
-    "STate <s>",                "all system settings and patch sets from named file",
     "SCale <s>",                "scale settings from named file",
     "VEctor [n] <s>",           "vector to channel n (or saved) from named file",
+    "Patchset <s>",             "complete set of instruments from named file",
     "MLearn <s>",               "midi learned list from named file",
+    "STate <s>",                "all system settings and patch sets from named file",
     "end"
 };
 
 string savelist [] = {
     "Instrument <s>",           "current part to named file",
-    "Patchset <s>",             "complete set of instruments to named file",
-    "STate <s>",                "all system settings and patch sets to named file",
     "SCale <s>",                "current scale settings to named file",
     "VEctor <n> <s>",           "vector on channel n to named file",
+    "Patchset <s>",             "complete set of instruments to named file",
     "MLearn <s>",               "midi learned list to named file",
-    "Setup",                    "dynamic settings",
+    "STate <s>",                "all system settings and patch sets to named file",
+    "Config",                   "current configuration",
 };
 
 string listlist [] = {
@@ -189,7 +189,7 @@ string listlist [] = {
     "Vectors",                  "settings for all enabled vectors",
     "Tuning",                   "Microtonal scale tunings",
     "Keymap",                   "Microtonal scale keyboard map",
-    "Settings",                 "dynamic settings",
+    "Config",                   "current configuration",
     "MLearn [s<n>]",            "midi learned controls ('@' n for full details on one line)",
     "History [s]",              "recent files (Patchsets, SCales, STates, Vectors, MLearn)",
     "Effects [s]",              "effect types ('all' include preset numbers and names)",
@@ -2037,7 +2037,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             synth->ListCurrentParts(msg);
             synth->cliOutput(msg, LINES);
         }
-        else if (matchnMove(1, point, "settings"))
+        else if (matchnMove(1, point, "config"))
         {
             synth->ListSettings(msg);
             synth->cliOutput(msg, LINES);
@@ -2466,7 +2466,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 Runtime.saveState(point);
                 reply = done_msg;
             }
-        else if(matchnMove(1, point, "setup"))
+        else if(matchnMove(1, point, "config"))
             synth->SetSystemValue(119, 255);
         else if (matchnMove(2, point, "scale"))
         {

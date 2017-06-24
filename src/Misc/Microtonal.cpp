@@ -430,7 +430,7 @@ int Microtonal::loadscl(string filename)
         for (int i = 0; i < 500; ++i)
             if (tmp[i] < 32)
                 tmp[i] = 0;
-        Pname = string(tmp);
+        Pname = findleafname(filename);
         Pcomment = string(tmp);
         // loads the number of the notes
         if (loadline(file, &tmp[0]))
