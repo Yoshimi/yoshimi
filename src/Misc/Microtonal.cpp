@@ -106,6 +106,7 @@ float Microtonal::getNoteFreq(int note, int keyshift)
         rap_keyshift *= powf(octave[octavesize - 1].tuning, ksoct);
     }
 
+    float freq;
     // if the mapping is enabled
     if (Pmappingenabled)
     {
@@ -151,13 +152,9 @@ float Microtonal::getNoteFreq(int note, int keyshift)
         degoct += degkey / octavesize;
         degkey %= octavesize;
 
-        float freq = (degkey == 0) ? (1.0f) : octave[degkey - 1].tuning;
+        freq = (degkey == 0) ? (1.0f) : octave[degkey - 1].tuning;
         freq *= powf(octave[octavesize - 1].tuning, degoct);
         freq *= PAfreq / rap_anote_middlenote;
-        freq *= globalfinedetunerap;
-        if(scaleshift != 0)
-            freq /= octave[scaleshift - 1].tuning;
-        return freq * rap_keyshift;
     }
     else // if the mapping is disabled
     {
@@ -166,15 +163,15 @@ float Microtonal::getNoteFreq(int note, int keyshift)
         int ntoct = (nt - ntkey) / octavesize;
 
         float oct  = octave[octavesize - 1].tuning;
-        float freq = octave[(ntkey + octavesize - 1) % octavesize].tuning
-                     * powf(oct, ntoct) * PAfreq;
+        freq = octave[(ntkey + octavesize - 1) % octavesize].tuning
+               * powf(oct, ntoct) * PAfreq;
         if (ntkey == 0)
             freq /= oct;
-        if (scaleshift != 0)
-            freq /= octave[scaleshift - 1].tuning;
-        freq *= globalfinedetunerap;
-        return freq * rap_keyshift;
     }
+    if (scaleshift != 0)
+        freq /= octave[scaleshift - 1].tuning;
+    freq *= globalfinedetunerap;
+    return freq * rap_keyshift;
 }
 
 

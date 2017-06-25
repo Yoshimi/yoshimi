@@ -98,7 +98,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 }
 
-class MasterUI {selected : {private MiscFuncs}
+class MasterUI {open : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -248,7 +248,8 @@ class MasterUI {selected : {private MiscFuncs}
       //if (partfxO)
           //partui->partfx->show();} {}
   }
-  Function {make_window()} {} {
+  Function {make_window()} {selected
+  } {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -443,14 +444,11 @@ paramsui->Show(2);}
           MenuItem {} {
             label {&Load...}
             callback {//
-    char *filename;
-    filename = fl_file_chooser("Open:", "({*.xsz})", NULL, 0);
+    const char *filename = fl_file_chooser("Open:", "({*.xsz})", NULL, 0);
     if (filename == NULL)
         return;
-    string fname = string(filename);
-    do_load_scale(fname);
-    RecentScale->activate();
-    //send_data(88, 0, 0xd0, 0x80);}
+
+    send_data(88, 0, 0xd0, 0x80, miscMsgPush(string(filename)));}
             xywh {35 35 100 20} labelsize 12
           }
           MenuItem {} {

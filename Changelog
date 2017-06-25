@@ -6,6 +6,8 @@ yoshimi 1.5.2 M
 * Changed scale 'Comment' to 'Description'.
   matches Scala format better.
 * Doc updates.
+* Further code refinements.
+* Added new scales info in the doc directory.
 
 2017-6-24 Will
 * More revisions of CLI help lists.
