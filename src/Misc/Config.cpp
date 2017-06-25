@@ -320,7 +320,7 @@ string Config::testCCvalue(int cc)
             break;
 
         case 77:
-            result = "resonance centre";
+            result = "resonance center";
             break;
 
         case 78:

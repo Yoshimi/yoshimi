@@ -8,7 +8,7 @@ Floating point numbers *must* include the decimal point and at least one digit (
 
 In keyboard maps, non-sounding notes should be entered as an 'x' instead of the key number.
 
-Tunings and keymaps are entered in CSV format.
+CLI tunings and keymaps are entered in CSV format.
 
 e.g.
 
@@ -20,12 +20,12 @@ Keymap:
 
 The tuning/keymap sizes are generated internally by counting the number of entries in the strings.
 
-When saving scales, for floating point numbers we now include the text it was derived from. This has some accuracy benefits, but also reasurs less experienced users in that the values they enter won't seem to change on re-loading.
+When saving scales, for floating point numbers we now include the text it was derived from. This has some accuracy benefits, but also reassures less experienced users, because the values they enter won't seem to change on re-loading.
 
 The stored value is still saved for backward compatibility with older versions of Yoshimi.
 
 Scale shift provides an offset to the scale start position, and only makes a difference if you have uneven interval sizes.
 
-Normally (for the even tempered scale) the scale starts on 'A' so as the intervals are all identical changing the octave start will make no difference. However, if you have (say) a 5 note pentatonic scale the intervals will be very different and the scale shift will effectively detirmine the key of the scale.
+Normally (for the even tempered scale) the scale starts on 'A', and as the intervals are all identical changing the octave start will make no difference. However, if you have (say) a 5 note pentatonic scale the intervals will be very different and the scale shift will effectively determine the key of the scale.
 
 

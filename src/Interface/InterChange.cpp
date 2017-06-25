@@ -706,7 +706,7 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
             contstr = "Invert Keys";
             break;
         case 3:
-            contstr = "Key Centre";
+            contstr = "Key Center";
             break;
         case 4:
             contstr = "Scale Shift";
@@ -1936,7 +1936,7 @@ string InterChange::resolveResonance(CommandBlock *getData)
             contstr = "Max dB";
             break;
         case 1:
-            contstr = "Centre Freq";
+            contstr = "Center Freq";
             break;
         case 2:
             contstr = "Octaves";
@@ -2971,7 +2971,7 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
             else
                 value = synth->microtonal.Pinvertupdown;
             break;
-        case 3: // Key Centre
+        case 3: // Key Center
             if (write)
                 synth->microtonal.Pinvertupdowncenter = value_int;
             else

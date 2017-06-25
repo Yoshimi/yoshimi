@@ -144,7 +144,7 @@ string scalelist [] = {
     "FRequency <n>",            "'A' note actual frequency",
     "NOte <n>",                 "'A' note number",
     "Invert [s]",               "Invert entire scale (Enable, {other} off)",
-    "CEntre <n>",               "Note number of key centre",
+    "CEnter <n>",               "Note number of key center",
     "SHift <n>",                "Shift entire scale up or down",
     "SCale [s]",                "Activate microtonal scale (Enable, {other} off)",
     "MApping [s]",              "Activate keyboard mapping (Enable, {other} off)",
@@ -1006,7 +1006,7 @@ int CmdInterface::commandScale()
             command = 2;
             max = 1;
         }
-        else if(matchnMove(2, point, "centre"))
+        else if(matchnMove(2, point, "center"))
             command = 3;
         else if(matchnMove(2, point, "shift"))
         {
