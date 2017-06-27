@@ -23,7 +23,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified May 2017
+Modified June 2017
 } {in_source in_header
 }
 
@@ -229,7 +229,8 @@ else
 {
     synth->getGuiMaster()->Reports->deactivate();
     synth->getGuiMaster()->yoshiLog->Hide();
-}}
+}
+synth->getRuntime().configChanged = true;}
             tooltip {Some system errors always go to stdout} xywh {200 195 150 20} down_box BORDER_BOX labelsize 12 textsize 13
             code0 {o->value(synth->getRuntime().toConsole);}
           } {

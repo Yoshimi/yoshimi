@@ -2494,7 +2494,9 @@ void SynthEngine::loadMicrotonal(unsigned char msg, unsigned char type)
     {
         case 0: // scale
             microtonal.defaults();
-            if (!microtonal.loadXML(setExtension(fname, "xsz")))
+            if (microtonal.loadXML(setExtension(fname, "xsz")))
+                addHistory(fname, 3);
+            else
                 ok = false;
             break;
     }
@@ -2819,6 +2821,7 @@ void SynthEngine::loadVectorAndUpdate(unsigned char baseChan, unsigned char name
     actionLock(unlock);
     if (baseChan > 0)
     {
+        addHistory(name, 5);
         baseChan &= 0xf;
         Runtime.Log("Loaded Vector " + name + " to " + to_string(int(baseChan) + 1));
         if (Runtime.showGui)
@@ -2868,7 +2871,6 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool 
             }
         }
         xml->endbranch(); // VECTOR
-        addHistory(file, 5);
     }
     delete xml;
     return baseChan | 0x20; // ensures we can get 'true' from channel 0

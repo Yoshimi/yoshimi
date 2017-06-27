@@ -98,7 +98,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 }
 
-class MasterUI {open : {private MiscFuncs}
+class MasterUI {selected : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -248,8 +248,7 @@ class MasterUI {open : {private MiscFuncs}
       //if (partfxO)
           //partui->partfx->show();} {}
   }
-  Function {make_window()} {selected
-  } {
+  Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -444,11 +443,10 @@ paramsui->Show(2);}
           MenuItem {} {
             label {&Load...}
             callback {//
-    const char *filename = fl_file_chooser("Open:", "({*.xsz})", NULL, 0);
-    if (filename == NULL)
-        return;
 
-    send_data(88, 0, 0xd0, 0x80, miscMsgPush(string(filename)));}
+    const char *filename = fl_file_chooser("Open:", "({*.xsz})", NULL, 0);
+    if (filename != NULL)
+        do_load_scale(string(filename));}
             xywh {35 35 100 20} labelsize 12
           }
           MenuItem {} {
@@ -1146,7 +1144,6 @@ else if (part == 0xf2)
     eng = ninseff;
 else
     eng = 0xff;
-
 collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng, insert, parameter, par2);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
@@ -1232,7 +1229,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
         case 49:
             updatepanel();
             break;
-            
+
         case 88:
             microtonalui->Hide();
             microtonalui->make_window();
@@ -1481,16 +1478,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   }
   Function {do_load_scale(string fname)} {} {
     code {//
-    synth->microtonal.defaults(); // clear all parameters
-    if (!synth->microtonal.loadXML(fname))
-    {
-        fl_alert("Failed to load scale settings file");
-        return;
-    }
-    if (NULL != microtonalui)
-        delete microtonalui;
-    microtonalui = new MicrotonalUI(&synth->microtonal, synth);
-    synth->addHistory(fname, 3);} {}
+    send_data(88, 0, 0xd0, 0xf0, 0xff, 0xff, 0xff, miscMsgPush(fname));} {}
   }
   Function {do_load_master(bool updatehistory, const char* file)} {} {
     code {//

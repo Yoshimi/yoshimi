@@ -1,5 +1,9 @@
 yoshimi 1.5.2 M
 
+2017-6-27 Will
+* Fixed regression GUI can load full scales again.
+* Simplifed GUI scale loading code.
+
 2017-6-25 Will
 * Transferred scales to new controls.
 * Scale name now the leafname for .scl loads.

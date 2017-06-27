@@ -755,7 +755,7 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
             showValue = false;
             break;
         case 65:
-            contstr = "Comment: " + string(synth->microtonal.Pcomment);
+            contstr = "Description: " + string(synth->microtonal.Pcomment);
             showValue = false;
             break;
         case 96:
