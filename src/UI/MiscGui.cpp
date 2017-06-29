@@ -143,6 +143,11 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
         return;
     }
 
+    if (npart == 0xf8)
+    {
+        synth->getGuiMaster()->configui->returns_update(getData);
+        return;
+    }
     if (npart >= 0xf0) // main / sys / ins
     {
         if (npart == 0xf0 && (control == 80 || control == 96))

@@ -1,5 +1,10 @@
 yoshimi 1.5.2 M
 
+2017-6-29 Will
+* Bugfix: CLI history was not being updated.
+* Removed empty virtual keyboard menu choice.
+* Started conversion of config for direct access.
+
 2017-6-27 Will
 * Fixed regression GUI can load full scales again.
 * Simplifed GUI scale loading code.

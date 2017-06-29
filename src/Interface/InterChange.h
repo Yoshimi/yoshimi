@@ -77,6 +77,7 @@ class InterChange : private MiscFuncs
         string formatScales(string text);
         string resolveVector(CommandBlock *getData);
         string resolveMicrotonal(CommandBlock *getData);
+        string resolveConfig(CommandBlock *getData);
         string resolveMain(CommandBlock *getData);
         string resolvePart(CommandBlock *getData);
         string resolveAdd(CommandBlock *getData);
@@ -93,6 +94,7 @@ class InterChange : private MiscFuncs
 
         void commandVector(CommandBlock *getData);
         void commandMicrotonal(CommandBlock *getData);
+        void commandConfig(CommandBlock *getData);
         void commandMain(CommandBlock *getData);
         void commandPart(CommandBlock *getData);
         void commandAdd(CommandBlock *getData);

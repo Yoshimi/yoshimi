@@ -337,7 +337,7 @@ void InterChange::transfertext(CommandBlock *getData)
         getData->data.value = float(value);
         getData->data.par2 = miscMsgPush(text); // pass it on
         jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
-        if (control = 48) // loading ascale includes a name!
+        if (control == 48) // loading ascale includes a name!
         {
             getData->data.control = 64;
             getData->data.par2 = miscMsgPush(synth->microtonal.Pname);
@@ -448,7 +448,8 @@ void InterChange::resolveReplies(CommandBlock *getData)
 
     else if (npart == 0xe8)
         commandName = resolveMicrotonal(getData);
-
+    else if (npart == 0xf8)
+        commandName = resolveConfig(getData);
     else if (npart == 0xf0)
         commandName = resolveMain(getData);
 
@@ -806,6 +807,129 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
         }
     }
     return ("Scales " + contstr);
+}
+
+string InterChange::resolveConfig(CommandBlock *getData)
+{
+    int value_int = lrint(getData->data.value);
+    unsigned char control = getData->data.control;
+
+    bool value_bool = value_int > 0;
+    string contstr = "";
+
+    switch (control)
+    {
+        case 0:
+            contstr = "AddSynth oscillator size";
+            break;
+        case 1:
+            contstr = "internal buffer size";
+            break;
+        case 2:
+            contstr = "PadSynth interpolation ";
+            if (value_bool)
+                contstr += "cubic";
+            else
+                contstr += "linear";
+            break;
+        case 3:
+            contstr = "virtual keyboard ";
+            switch (value_int)
+            {
+                case 1:
+                    contstr += "QWERTY";
+                    break;
+                case 2:
+                    contstr += "Dvorak";
+                    break;
+                case 3:
+                    contstr += "QWERTZ";
+                    break;
+                case 4:
+                    contstr += "AZERTY";
+                    break;
+            }
+            break;
+        case 4:
+            contstr = "XML compression";
+            break;
+        case 5:
+            contstr = "reports ";
+            if (value_bool)
+                contstr += "console window";
+            else
+                contstr += "stdout";
+            break;
+
+        case 16:
+            break;
+        case 17:
+            break;
+        case 18:
+            break;
+        case 19:
+            break;
+        case 20:
+            break;
+        case 21:
+            break;
+        case 22:
+            break;
+
+        case 32:
+            break;
+        case 33:
+            break;
+        case 34:
+            break;
+        case 35:
+            break;
+        case 36:
+            break;
+
+        case 48:
+            break;
+        case 49:
+            break;
+        case 50:
+            break;
+        case 51:
+            break;
+        case 52:
+            break;
+
+        case 64:
+            break;
+        case 65:
+            break;
+        case 66:
+            break;
+        case 67:
+            break;
+        case 68:
+            break;
+        case 69:
+            break;
+        case 70:
+            break;
+        case 71:
+            break;
+        case 72:
+            break;
+        case 73:
+            break;
+        case 74:
+            break;
+
+        case 80:
+            // this will have to go through RBP
+            break;
+        default:
+            contstr = "Unrecognised";
+            break;
+    }
+
+    return ("Config " + contstr);
 }
 
 
@@ -2604,6 +2728,11 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         commandMicrotonal(getData);
         return true;
     }
+    if (npart == 0xf8)
+    {
+        commandConfig(getData);
+        return true;
+    }
     if (npart == 0xf0)
     {
         commandMain(getData);
@@ -3047,6 +3176,137 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
 
     if (!write)
         getData->data.value = value;
+}
+
+
+void InterChange::commandConfig(CommandBlock *getData)
+{
+#pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char parameter = getData->data.parameter;
+    unsigned char par2 = getData->data.par2;
+
+    bool write = (type & 0x40) > 0;
+    bool mightChange = true;
+    int value_int = lrint(value);
+    bool value_bool = value_int > 0;
+
+    switch (control)
+    {
+        case 0:
+            if (write)
+                synth->getRuntime().Oscilsize = value_int;
+            else
+                value = synth->getRuntime().Oscilsize;
+            break;
+        case 1:
+            if (write)
+                synth->getRuntime().Buffersize = value_int;
+            else
+                value = synth->getRuntime().Buffersize;
+            break;
+        case 2:
+            if (write)
+                 synth->getRuntime().Interpolation = value_bool;
+            else
+                value = synth->getRuntime().Interpolation;
+            break;
+        case 3:
+            if (write)
+                 synth->getRuntime().VirKeybLayout = value_int;
+            else
+                value = synth->getRuntime().VirKeybLayout;
+            break;
+        case 4:
+            if (write)
+                 synth->getRuntime().GzipCompression = value_int;
+            else
+                value = synth->getRuntime().GzipCompression;
+            break;
+        case 5:
+            if (write)
+                 synth->getRuntime().toConsole = value_bool;
+            else
+                value = synth->getRuntime().toConsole;
+            break;
+
+        case 16:
+            break;
+        case 17:
+            break;
+        case 18:
+            break;
+        case 19:
+            break;
+        case 20:
+            break;
+        case 21:
+            break;
+        case 22:
+            break;
+
+        case 32: // done eslewhere
+            break;
+        case 33:
+            break;
+        case 34: // done eslewhere
+            break;
+        case 35:
+            break;
+        case 36:
+            break;
+
+        case 48: // done eslewhere
+            break;
+        case 49:
+            break;
+        case 50: // done eslewhere
+            break;
+        case 51:
+            break;
+        case 52:
+            break;
+
+        case 64:
+            break;
+        case 65:
+            break;
+        case 66:
+            break;
+        case 67:
+            break;
+        case 68:
+            break;
+        case 69:
+            break;
+        case 70:
+            break;
+        case 71:
+            break;
+        case 72:
+            break;
+        case 73:
+            break;
+        case 74:
+            break;
+
+        case 80:
+            // this will have to go through RBP
+            break;
+        default:
+            mightChange = false;
+        break;
+    }
+
+    if (!write)
+        getData->data.value = value;
+    else if (mightChange)
+        synth->getRuntime().configChanged == true;
 }
 
 

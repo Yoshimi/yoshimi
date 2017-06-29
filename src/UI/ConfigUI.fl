@@ -48,9 +48,10 @@ decl {\#include "Misc/Bank.h"} {private local
 decl {\#include "MasterUI.h"} {private local
 }
 
-class ConfigUI {selected : {private MiscFuncs}
+class ConfigUI {open : {private MiscFuncs}
 } {
-  Function {make_window()} {} {
+  Function {make_window()} {selected
+  } {
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {o->hide();}
@@ -65,7 +66,7 @@ class ConfigUI {selected : {private MiscFuncs}
           label {Main settings}
           xywh {5 25 382 277} labelsize 12
         } {
-          Fl_Choice {} {
+          Fl_Choice osc_size {
             label {* AddSynth Oscillator Size}
             callback {//
     unsigned int old = synth->getRuntime().Oscilsize;
@@ -74,7 +75,8 @@ class ConfigUI {selected : {private MiscFuncs}
     {
         synth->getRuntime().Oscilsize = changed;
         synth->getRuntime().configChanged = true;
-    }}
+    }
+    send_data(0, 256 << o->value(), 0xc0);}
             tooltip {ADSynth Oscillator Size (samples)} xywh {250 45 100 20} down_box BORDER_BOX labelsize 12 textsize 11
             code0 {o->value( (int)(logf(synth->getRuntime().Oscilsize / 256.0f - 1.0f) / logf(2.0f)) + 1);}
             code1 {if (synth->getUniqueId() != 0) o->hide();}
@@ -108,7 +110,7 @@ class ConfigUI {selected : {private MiscFuncs}
               xywh {75 75 100 20} labelfont 1
             }
           }
-          Fl_Choice {} {
+          Fl_Choice buff_size {
             label {* Internal Buffer Size}
             callback {//
     unsigned int old = synth->getRuntime().Buffersize;
@@ -117,7 +119,8 @@ class ConfigUI {selected : {private MiscFuncs}
     {
         synth->getRuntime().Buffersize = changed;
         synth->getRuntime().configChanged = true;
-    }}
+    }
+    send_data(1, 16 << o->value(), 0xc0);}
             tooltip {Number of samples} xywh {249 75 100 20} down_box BORDER_BOX labelsize 12 textsize 11
             code0 {o->value( (int)(logf(synth->getRuntime().Buffersize / 16.0f - 1.0f) / logf(2.0f)) + 1);}
             code1 {if (synth->getUniqueId() != 0) o->hide();}
@@ -159,13 +162,14 @@ class ConfigUI {selected : {private MiscFuncs}
               xywh {65 65 100 20} labelfont 1
             }
           }
-          Fl_Choice {} {
+          Fl_Choice pad_interpol {
             label {PADsynth Interpolation}
             callback {//
                 int tmp = synth->getRuntime().Interpolation;
                 synth->getRuntime().Interpolation = (int) o->value();
                 if (synth->getRuntime().Interpolation != tmp)
-                	synth->getRuntime().configChanged = true;}
+                	synth->getRuntime().configChanged = true;
+                send_data(2, o->value(), 0xc0);}
             xywh {250 105 100 20} down_box BORDER_BOX labelsize 12 textsize 12
             code0 {o->value(synth->getRuntime().Interpolation);}
           } {
@@ -178,20 +182,17 @@ class ConfigUI {selected : {private MiscFuncs}
               xywh {10 10 100 20} labelfont 1 labelsize 10
             }
           }
-          Fl_Choice {} {
+          Fl_Choice v_keyboard {
             label {Virtual Keyboard Layout}
             callback {//
                 int tmp = synth->getRuntime().VirKeybLayout;
                 synth->getRuntime().VirKeybLayout = (int) o->value();
                 if (synth->getRuntime().VirKeybLayout != tmp)
-                	synth->getRuntime().configChanged = true;}
+                	synth->getRuntime().configChanged = true;
+                send_data(3, o->value(), 0xc0);}
             xywh {250 135 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
             code0 {o->value(synth->getRuntime().VirKeybLayout);}
           } {
-            MenuItem {} {
-              label { }
-              xywh {5 5 100 20} labelfont 1 labelsize 11 deactivate
-            }
             MenuItem {} {
               label QWERTY
               xywh {15 15 100 20} labelfont 1 labelsize 11
@@ -215,7 +216,8 @@ class ConfigUI {selected : {private MiscFuncs}
 		unsigned int tmp = synth->getRuntime().GzipCompression;
 		synth->getRuntime().GzipCompression = (unsigned int) o->value();
 		if(synth->getRuntime().GzipCompression != tmp)
-			synth->getRuntime().configChanged = true;}
+			synth->getRuntime().configChanged = true;
+		send_data(4, o->value(), 0xc0);}
             tooltip {gzip compression level (0 - uncompressed)} xywh {284 165 65 20} type Simple labelsize 12 align 4 minimum 0 maximum 9 step 1 textsize 12
             code0 {o->value(synth->getRuntime().GzipCompression);}
             code1 {if (synth->getUniqueId() != 0) o->hide();}
@@ -230,7 +232,8 @@ else
     synth->getGuiMaster()->Reports->deactivate();
     synth->getGuiMaster()->yoshiLog->Hide();
 }
-synth->getRuntime().configChanged = true;}
+synth->getRuntime().configChanged = true;
+send_data(5, o->value(), 0xc0);}
             tooltip {Some system errors always go to stdout} xywh {200 195 150 20} down_box BORDER_BOX labelsize 12 textsize 13
             code0 {o->value(synth->getRuntime().toConsole);}
           } {
@@ -852,6 +855,114 @@ presets->hide();}
         xywh {345 268 105 20} box THIN_UP_BOX labelsize 12
       }
     }
+  }
+  Function {send_data(int control, float value, int type, int par = 0xff, int par2 = 0xff)} {} {
+    code {//
+collect_data(synth, value, (Fl::event_button() | type), control, 0xf8, 0xff, 0xff, 0xff, par, par2);} {}
+  }
+  Function {returns_update(CommandBlock *getData)} {} {
+    code {//
+    int value_int = lrint(getData->data.value);
+    unsigned char control = getData->data.control;
+
+    bool value_bool = value_int > 0;
+    int tmp;
+    switch (control)
+    {
+        case 0:
+            tmp = 0;
+            while (value_int > 256)
+            {
+                value_int = value_int >> 1;
+                ++ tmp;
+            }
+            osc_size->value(tmp);
+            break;
+        case 1:
+            tmp = 0;
+            while (value_int > 16)
+            {
+                value_int = value_int >> 1;
+                ++ tmp;
+            }
+            buff_size->value(tmp);
+            break;
+        case 2:
+            pad_interpol->value(value_int);
+            break;
+        case 3:
+            v_keyboard->value(value_int);
+            break;
+        case 4:
+            compression->value(value_int);
+            break;
+        case 5:
+            reports->value(value_int);
+            break;
+
+        case 16:
+            break;
+        case 17:
+            break;
+        case 18:
+            break;
+        case 19:
+            break;
+        case 20:
+            break;
+        case 21:
+            break;
+        case 22:
+            break;
+
+        case 32:
+            break;
+        case 33:
+            break;
+        case 34:
+            break;
+        case 35:
+            break;
+        case 36:
+            break;
+
+        case 48:
+            break;
+        case 49:
+            break;
+        case 50:
+            break;
+        case 51:
+            break;
+        case 52:
+            break;
+
+        case 64:
+            break;
+        case 65:
+            break;
+        case 66:
+            break;
+        case 67:
+            break;
+        case 68:
+            break;
+        case 69:
+            break;
+        case 70:
+            break;
+        case 71:
+            break;
+        case 72:
+            break;
+        case 73:
+            break;
+        case 74:
+            break;
+
+        case 80:
+            break;
+    }} {}
   }
   Function {ConfigUI(SynthEngine *_synth)} {} {
     code {//

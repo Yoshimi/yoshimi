@@ -102,7 +102,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     stateChanged(false),
     restoreJackSession(false),
     runSynth(true),
-    VirKeybLayout(1),
+    VirKeybLayout(0),
     audioEngine(DEFAULT_AUDIO),
     midiEngine(DEFAULT_MIDI),
     audioDevice("default"),

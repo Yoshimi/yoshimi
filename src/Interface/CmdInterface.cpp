@@ -2721,11 +2721,15 @@ void CmdInterface::cmdIfaceCommandLoop()
             if (rl_end > 0)
                 cout << endl;
             sprintf(welcomeBuffer,"%s",prompt.c_str());
-            if (synth) // it won't be until Process called
-                synth->getRuntime().CLIstring = prompt;
-            usleep(80000); // create enough delay for most ops to complete
+            if (!exit)
+            {
+                if (synth) // it won't be until Process called
+                    synth->getRuntime().CLIstring = prompt;
+                usleep(80000); // create enough delay for most ops to complete
+            }
         }
-        usleep(20000);
+        if (!exit)
+            usleep(20000);
     }
 
     if (write_history(hist_filename.c_str()) != 0) // writing of history file failed
