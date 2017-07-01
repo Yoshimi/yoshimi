@@ -326,7 +326,7 @@ send_data(21, o->value(), 0xc0);}
             label {Enable GUI}
             callback {//
     int tmp = o->value();
-    int doit;
+    int doit = true;
 
     if (tmp == 0)
         doit = fl_choice("Are you sure you want to disable?\\nThis can only be restored via the command line.", NULL, "No", "Yes") > 1;
@@ -375,7 +375,8 @@ send_data(23, o->value(), 0xc0);}
     {
         synth->getRuntime().jackMidiDevice = tmp;
         synth->getRuntime().configChanged = true;
-    }}
+    }
+    send_data(32, 0, 0xc0, 0x80, miscMsgPush(tmp));}
             tooltip {Device Jack tries to connect to for input.} xywh {195 62 120 22} labelsize 12 textsize 12
             code0 {o->insert(synth->getRuntime().jackMidiDevice.c_str());}
           }
@@ -386,7 +387,8 @@ if (o->value())
     synth->getRuntime().midiEngine = jack_midi;
 else
     synth->getRuntime().midiEngine = alsa_midi;
-synth->getRuntime().configChanged = true;}
+synth->getRuntime().configChanged = true;
+send_data(33, o->value(), 0xc0);}
             xywh {195 88 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().midiEngine == jack_midi) o->value(1);}
           }
@@ -398,7 +400,7 @@ synth->getRuntime().configChanged = true;}
     {
         synth->getRuntime().jackServer = tmp;
         synth->getRuntime().configChanged = true;
-    }}
+    }send_data(34, 0, 0xc0, 0x80, miscMsgPush(tmp));}
             tooltip {Name of the jack server to connect to - default, ...} xywh {195 182 120 22} labelsize 12 textsize 12
             code0 {o->insert(synth->getRuntime().jackServer.c_str());}
           }
@@ -409,7 +411,8 @@ if (o->value())
     synth->getRuntime().audioEngine = jack_audio;
 else
     synth->getRuntime().audioEngine = alsa_audio;
-synth->getRuntime().configChanged = true;}
+synth->getRuntime().configChanged = true;
+send_data(35, o->value(), 0xc0);}
             xywh {195 209 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().audioEngine == jack_audio) o->value(1);}
           }
@@ -419,9 +422,10 @@ synth->getRuntime().configChanged = true;}
 if (o->value() != tmp)
 {
     synth->getRuntime().connectJackaudio = o->value();
-    synth->getRuntime().audioEngine = alsa_audio;
+    synth->getRuntime().audioEngine = jack_audio;
     synth->getRuntime().configChanged = true;
-}}
+}
+send_data(36, o->value(), 0xc0);}
             xywh {195 233 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().connectJackaudio);}
           }
@@ -442,7 +446,8 @@ if (o->value() != tmp)
     {
         synth->getRuntime().alsaMidiDevice = tmp;
         synth->getRuntime().configChanged = true;
-    }}
+    }
+    send_data(48, 0, 0xc0, 0x80, miscMsgPush(tmp));}
             tooltip {Device Alsa tries to connect to for input.} xywh {195 52 120 22} labelsize 12 textsize 12
             code0 {o->insert(synth->getRuntime().alsaMidiDevice.c_str());}
           }
@@ -453,7 +458,8 @@ if (o->value())
     synth->getRuntime().midiEngine = alsa_midi;
 else
     synth->getRuntime().midiEngine = jack_midi;
-synth->getRuntime().configChanged = true;}
+synth->getRuntime().configChanged = true;
+send_data(49, o->value(), 0xc0);}
             xywh {195 80 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().midiEngine == alsa_midi) o->value(1);}
           }
@@ -465,7 +471,8 @@ synth->getRuntime().configChanged = true;}
     {
         synth->getRuntime().alsaAudioDevice = tmp;
         synth->getRuntime().configChanged = true;
-    }}
+    }
+    send_data(50, 0, 0xc0, 0x80, miscMsgPush(tmp));}
             tooltip {Alsa audio device - default, hw:0, ...} xywh {195 143 120 22} labelsize 12 textsize 12
             code0 {o->insert(synth->getRuntime().alsaAudioDevice.c_str());}
           }
@@ -476,7 +483,8 @@ if (o->value())
     synth->getRuntime().audioEngine = alsa_audio;
 else
     synth->getRuntime().audioEngine = jack_audio;
-synth->getRuntime().configChanged = true;}
+synth->getRuntime().configChanged = true;
+send_data(51, o->value(), 0xc0);}
             xywh {195 169 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().audioEngine == alsa_audio) o->value(1);}
           }
@@ -511,7 +519,8 @@ synth->getRuntime().configChanged = true;}
                         break;
                 }
                 synth->getRuntime().Samplerate = sample_rate;
-                synth->getRuntime().configChanged = true;}
+                synth->getRuntime().configChanged = true;
+                send_data(52, o->value(), 0xc0);}
             xywh {195 199 121 66} labelsize 12 align 4 when 1 textsize 12
             code0 {//
                 o->add("192000");
@@ -861,6 +870,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, 0xf8, 0xff, 0xf
     code {//
     int value_int = lrint(getData->data.value);
     unsigned char control = getData->data.control;
+    unsigned char par2 = getData->data.par2;
 
     bool value_bool = value_int > 0;
     int tmp;
@@ -895,6 +905,16 @@ collect_data(synth, value, (Fl::event_button() | type), control, 0xf8, 0xff, 0xf
             break;
         case 5:
             reports->value(value_bool);
+            if (value_bool)
+            {
+                synth->getGuiMaster()->Reports->activate();
+                synth->getGuiMaster()->yoshiLog->Show();
+            }
+            else
+            {
+                synth->getGuiMaster()->Reports->deactivate();
+                synth->getGuiMaster()->yoshiLog->Hide();
+            }
             break;
 
         case 16:
@@ -923,25 +943,49 @@ collect_data(synth, value, (Fl::event_button() | type), control, 0xf8, 0xff, 0xf
             break;
 
         case 32:
+            jackSource->value(miscMsgPop(par2).c_str());
             break;
         case 33:
+            jackMidi->value(value_bool);
+            alsaMidi->value(!value_bool);
             break;
         case 34:
+            jackServer->value(miscMsgPop(par2).c_str());
             break;
         case 35:
+            jackAudio->value(value_bool);
+            alsaAudio->value(!value_bool);
             break;
         case 36:
+            connectJackAudio->value(value_bool);
             break;
 
         case 48:
+            alsaSource->value(miscMsgPop(par2).c_str());
             break;
         case 49:
+            alsaMidi->value(value_bool);
+            jackMidi->value(!value_bool);
             break;
         case 50:
+            alsaDevice->value(miscMsgPop(par2).c_str());
             break;
         case 51:
+            alsaAudio->value(value_bool);
+            jackAudio->value(!value_bool);
             break;
         case 52:
+            switch(value_int)
+            {
+                case 192000:
+                    alsaRate->set_checked(1);
+                case 96000:
+                    alsaRate->set_checked(2);
+                case 48000:
+                    alsaRate->set_checked(3);
+                case 44100:
+                    alsaRate->set_checked(4);
+            }
             break;
 
         case 64:

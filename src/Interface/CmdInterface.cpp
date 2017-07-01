@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified June 2017
+    Modified July 2017
 */
 
 #include <iostream>
@@ -1958,7 +1958,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         if (query(replyString, false))
         {
             // this seems backwards but it *always* saves.
-            // seeing configChanged makes it reload the old settings first.
+            // seeing configChanged makes it reload the old config first.
             Runtime.runSynth = false;
             return true;
         }
@@ -2556,7 +2556,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                     {
                         param = string2int(point);
                         point = skipChars(point);
-                        if (((control == 80 || control == 84 || control == 88) && part == 240) || (part == 232 && param == 128))
+                        if (((control == 80 || control == 84 || control == 88) && part == 240) || (param == 128))
                         {
                             string name = string(point);
                             if (name < "!")

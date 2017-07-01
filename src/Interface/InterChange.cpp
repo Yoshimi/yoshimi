@@ -256,15 +256,15 @@ InterChange::~InterChange()
 void InterChange::transfertext(CommandBlock *getData)
 {
     int value = lrint(getData->data.value);
-//    unsigned char type = getData->data.type;
+    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
 //    unsigned char kititem = getData->data.kit;
 //    unsigned char engine = getData->data.engine;
 //    unsigned char insert = getData->data.insert;
-
+    bool (write) = type & 0x40;
     string text = miscMsgPop(getData->data.par2);
-    //cout << text << endl;
+
     if (npart == 232)
     {
         switch(control)
@@ -336,14 +336,47 @@ void InterChange::transfertext(CommandBlock *getData)
         switch (control)
         {
             case 32:
+                if (write)
+                {
+                    synth->getRuntime().jackMidiDevice = text;
+                    synth->getRuntime().configChanged = true;
+                }
+                else
+                    text = synth->getRuntime().jackMidiDevice;
+                getData->data.value = miscMsgPush(text);
                 break;
             case 34:
+                if (write)
+                {
+                    synth->getRuntime().jackServer = text;
+                    synth->getRuntime().configChanged = true;
+                }
+                else
+                    text = synth->getRuntime().jackServer;
+                getData->data.value = miscMsgPush(text);
                 break;
             case 48:
+                if (write)
+                {
+                    synth->getRuntime().alsaMidiDevice = text;
+                    synth->getRuntime().configChanged = true;
+                }
+                else
+                    text = synth->getRuntime().alsaMidiDevice;
+                getData->data.value = miscMsgPush(text);
                 break;
             case 50:
+                if (write)
+                {
+                    synth->getRuntime().alsaAudioDevice = text;
+                    synth->getRuntime().configChanged = true;
+                }
+                else
+                    text = synth->getRuntime().alsaAudioDevice;
+                getData->data.value = miscMsgPush(text);
                 break;
         }
+        getData->data.parameter &= 0x7f;
     }
 
     if (!(getData->data.parameter & 0x80) && jack_ringbuffer_write_space(returnsLoopback) >= commandSize)
@@ -912,25 +945,43 @@ string InterChange::resolveConfig(CommandBlock *getData)
             break;
 
         case 32:
+            contstr += "JACK MIDI source: ";
+            contstr += miscMsgPop(value_int);
+            showValue = false;
             break;
         case 33:
+            contstr += "Start with JACK MIDI";
             break;
         case 34:
+            contstr += "JACK server: ";
+            contstr += miscMsgPop(value_int);
+            showValue = false;
             break;
         case 35:
+            contstr += "Start with JACK audio";
             break;
         case 36:
+            contstr += "Auto-connect to JACK server";
             break;
 
         case 48:
+            contstr += "ALSA MIDI source: ";
+            contstr += miscMsgPop(value_int);
+            showValue = false;
             break;
         case 49:
+            contstr += "Start with ALSA MIDI";
             break;
         case 50:
+            contstr += "ALSA audio device: ";
+            contstr += miscMsgPop(value_int);
+            showValue = false;
             break;
         case 51:
+            contstr += "Start with ALSA audio";
             break;
         case 52:
+            contstr += "ALSA sample rate: ";
             break;
 
         case 64:
@@ -3231,8 +3282,8 @@ void InterChange::commandConfig(CommandBlock *getData)
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
-    unsigned char parameter = getData->data.parameter;
-    unsigned char par2 = getData->data.par2;
+//    unsigned char parameter = getData->data.parameter;
+//    unsigned char par2 = getData->data.par2;
 
     bool write = (type & 0x40) > 0;
     bool mightChange = true;
@@ -3327,26 +3378,78 @@ void InterChange::commandConfig(CommandBlock *getData)
                 value_bool = synth->getRuntime().showCLI;
             break;
 
-        case 32: // done eslewhere
+        case 32: // done elsewhere
             break;
         case 33:
+            if (write)
+            {
+                if (value_bool)
+                    synth->getRuntime().midiEngine = jack_midi;
+                else
+                    synth->getRuntime().midiEngine = alsa_midi;
+            }
+            else
+                value = (synth->getRuntime().midiEngine == jack_midi);
             break;
-        case 34: // done eslewhere
+        case 34: // done elsewhere
             break;
         case 35:
+            if (write)
+            {
+                if (value_bool)
+                    synth->getRuntime().audioEngine = jack_audio;
+                else
+                    synth->getRuntime().audioEngine = alsa_audio;
+            }
+            else
+                value = (synth->getRuntime().audioEngine == jack_audio);
             break;
         case 36:
+            if (write)
+            {
+                synth->getRuntime().connectJackaudio = value_bool;
+                synth->getRuntime().audioEngine = jack_audio;
+            }
+            else
+                value = synth->getRuntime().connectJackaudio;
             break;
 
-        case 48: // done eslewhere
+        case 48: // done elsewhere
             break;
         case 49:
+            if (write)
+            {
+                if (value_bool)
+                    synth->getRuntime().midiEngine = alsa_midi;
+                else
+                    synth->getRuntime().midiEngine = jack_midi;
+            }
+            else
+                value = (synth->getRuntime().midiEngine == alsa_midi);
             break;
-        case 50: // done eslewhere
+        case 50: // done elsewhere
             break;
         case 51:
+            if (write)
+            {
+                if (value_bool)
+                    synth->getRuntime().audioEngine = alsa_audio;
+                else
+                    synth->getRuntime().audioEngine = jack_audio;
+            }
+            else
+                value = (synth->getRuntime().audioEngine == alsa_audio);
             break;
         case 52:
+            if (write)
+            {
+                value = int(value / 48) * 48;
+                if (value < 48000 || value > 192000)
+                    value = 44100; // play safe
+                synth->getRuntime().Samplerate = value;
+            }
+            else
+                value = synth->getRuntime().Samplerate;
             break;
 
         case 64:
@@ -3383,7 +3486,7 @@ void InterChange::commandConfig(CommandBlock *getData)
     if (!write)
         getData->data.value = value;
     else if (mightChange)
-        synth->getRuntime().configChanged == true;
+        synth->getRuntime().configChanged = true;
 }
 
 

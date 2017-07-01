@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified June 2017
+    Modified July 2017
 */
 
 #include<stdio.h>
@@ -1724,7 +1724,7 @@ int SynthEngine::SetSystemValue(int type, int value)
 
         case 119: // obvious!
             Runtime.saveConfig();
-            Runtime.Log("Settings saved");
+            Runtime.Log("Config saved");
             break;
 
         case 128: // channel switch
