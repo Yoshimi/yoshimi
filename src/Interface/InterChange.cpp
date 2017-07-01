@@ -382,7 +382,10 @@ void InterChange::transfertext(CommandBlock *getData)
     if (!(getData->data.parameter & 0x80) && jack_ringbuffer_write_space(returnsLoopback) >= commandSize)
     {
         getData->data.value = float(value);
-        getData->data.par2 = miscMsgPush(text); // pass it on
+        if (write)
+            getData->data.par2 = miscMsgPush(text); // pass it on
+        else
+            getData->data.par2 = 0xff;
         jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
         if (npart == 232 && control == 48)
         {   // loading a scale includes a name!
@@ -2726,7 +2729,7 @@ void InterChange::returns(CommandBlock *getData)
         return; // need to sort this out later
     unsigned char type = getData->data.type | 4; // back from synth
 //    unsigned char control = getData->data.control;
-//    unsigned char npart = getData->data.part;
+    unsigned char npart = getData->data.part;
 //    unsigned char kititem = getData->data.kit;
 //    unsigned char engine = getData->data.engine;
 //    unsigned char insert = getData->data.insert;
@@ -2736,6 +2739,9 @@ void InterChange::returns(CommandBlock *getData)
         jack_ringbuffer_write(toCLI, (char*) getData->bytes, commandSize); // this will redirect where needed.
         return;
     }
+
+    if ((type & 0x20) && npart == 248)
+        miscMsgPop(getData->data.par2); // this needs sorting properly!
 
     bool isCliOrGuiRedraw = type & 0x10; // separated out for clarity
     bool isMidi = type & 8;
