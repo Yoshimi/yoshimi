@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified June 2017
+    Modified July 2017
 */
 
 #include <iostream>
@@ -331,14 +331,28 @@ void InterChange::transfertext(CommandBlock *getData)
                 break;
         }
     }
+    else if (npart == 248)
+    {
+        switch (control)
+        {
+            case 32:
+                break;
+            case 34:
+                break;
+            case 48:
+                break;
+            case 50:
+                break;
+        }
+    }
 
     if (!(getData->data.parameter & 0x80) && jack_ringbuffer_write_space(returnsLoopback) >= commandSize)
     {
         getData->data.value = float(value);
         getData->data.par2 = miscMsgPush(text); // pass it on
         jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
-        if (control == 48) // loading ascale includes a name!
-        {
+        if (npart == 232 && control == 48)
+        {   // loading a scale includes a name!
             getData->data.control = 64;
             getData->data.par2 = miscMsgPush(synth->microtonal.Pname);
             jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
@@ -815,6 +829,7 @@ string InterChange::resolveConfig(CommandBlock *getData)
     unsigned char control = getData->data.control;
 
     bool value_bool = value_int > 0;
+    bool yesno = false;
     string contstr = "";
 
     switch (control)
@@ -823,7 +838,7 @@ string InterChange::resolveConfig(CommandBlock *getData)
             contstr = "AddSynth oscillator size";
             break;
         case 1:
-            contstr = "internal buffer size";
+            contstr = "Internal buffer size";
             break;
         case 2:
             contstr = "PadSynth interpolation ";
@@ -833,7 +848,7 @@ string InterChange::resolveConfig(CommandBlock *getData)
                 contstr += "linear";
             break;
         case 3:
-            contstr = "virtual keyboard ";
+            contstr = "Virtual keyboard ";
             switch (value_int)
             {
                 case 1:
@@ -849,31 +864,51 @@ string InterChange::resolveConfig(CommandBlock *getData)
                     contstr += "AZERTY";
                     break;
             }
+            showValue = false;
             break;
         case 4:
             contstr = "XML compression";
             break;
         case 5:
-            contstr = "reports ";
+            contstr = "Reports to ";
             if (value_bool)
                 contstr += "console window";
             else
                 contstr += "stdout";
+            showValue = false;
             break;
 
         case 16:
+            contstr += "Autoload default state";
+            yesno = true;
             break;
         case 17:
+            contstr += "Hide non-fatal errors";
+            yesno = true;
             break;
         case 18:
+            contstr += "Show splash screen";
+            yesno = true;
             break;
         case 19:
+            contstr += "Log instrument load times";
+            yesno = true;
             break;
         case 20:
+            contstr += "Log XML headers";
+            yesno = true;
             break;
         case 21:
+            contstr += "Save ALL XML data";
+            yesno = true;
             break;
         case 22:
+            contstr += "Enable GUI";
+            yesno = true;
+            break;
+        case 23:
+            contstr += "Enable CLI";
+            yesno = true;
             break;
 
         case 32:
@@ -929,6 +964,14 @@ string InterChange::resolveConfig(CommandBlock *getData)
             break;
     }
 
+    if (yesno)
+    {
+        if (value_bool)
+            contstr += " - yes";
+        else
+            contstr += " - no";
+        showValue = false;
+    }
     return ("Config " + contstr);
 }
 
@@ -3236,18 +3279,52 @@ void InterChange::commandConfig(CommandBlock *getData)
             break;
 
         case 16:
+            if (write)
+                synth->getRuntime().loadDefaultState = value_bool;
+            else
+                value_bool = synth->getRuntime().loadDefaultState;
             break;
         case 17:
+            if (write)
+                synth->getRuntime().hideErrors = value_bool;
+            else
+                value_bool = synth->getRuntime().hideErrors;
             break;
         case 18:
+            if (write)
+                synth->getRuntime().showSplash = value_bool;
+            else
+                value_bool = synth->getRuntime().showSplash;
             break;
         case 19:
+            if (write)
+                synth->getRuntime().showTimes = value_bool;
+            else
+                value_bool = synth->getRuntime().showTimes;
             break;
         case 20:
+            if (write)
+                synth->getRuntime().logXMLheaders = value_bool;
+            else
+                value_bool = synth->getRuntime().logXMLheaders;
             break;
         case 21:
+            if (write)
+                synth->getRuntime().xmlmax = value_bool;
+            else
+                value_bool = synth->getRuntime().xmlmax;
             break;
         case 22:
+            if (write)
+                synth->getRuntime().showGui = value_bool;
+            else
+                value_bool = synth->getRuntime().showGui;
+            break;
+        case 23:
+            if (write)
+                synth->getRuntime().showCLI = value_bool;
+            else
+                value_bool = synth->getRuntime().showCLI;
             break;
 
         case 32: // done eslewhere

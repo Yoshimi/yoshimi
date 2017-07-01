@@ -23,7 +23,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified June 2017
+Modified July 2017
 } {in_source in_header
 }
 
@@ -48,10 +48,9 @@ decl {\#include "Misc/Bank.h"} {private local
 decl {\#include "MasterUI.h"} {private local
 }
 
-class ConfigUI {open : {private MiscFuncs}
+class ConfigUI {selected : {private MiscFuncs}
 } {
-  Function {make_window()} {selected
-  } {
+  Function {make_window()} {} {
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {o->hide();}
@@ -256,13 +255,14 @@ send_data(5, o->value(), 0xc0);}
           label Switches
           xywh {5 25 382 277} labelsize 12 hide
         } {
-          Fl_Check_Button autoState {
+          Fl_Check_Button setDefaultState {
             label {* Start With Default State}
             callback {if (synth->getRuntime().loadDefaultState != o->value())
 {
     synth->getRuntime().loadDefaultState = o->value();
     synth->getRuntime().configChanged = true;
-}}
+}
+send_data(16, o->value(), 0xc0);}
             xywh {270 60 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().loadDefaultState);}
           }
@@ -272,62 +272,63 @@ send_data(5, o->value(), 0xc0);}
 {
     synth->getRuntime().hideErrors = o->value();
     synth->getRuntime().configChanged = true;
-}}
+}
+send_data(17, o->value(), 0xc0);}
             xywh {270 80 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().hideErrors);}
           }
-          Fl_Check_Button {} {
+          Fl_Check_Button showSplash {
             label {Show Splash Screen}
             callback {if (synth->getRuntime().showSplash != o->value())
 {
     synth->getRuntime().showSplash = o->value();
     synth->getRuntime().configChanged = true;
-}}
+}
+send_data(18, o->value(), 0xc0);}
             xywh {270 100 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showSplash);}
             code1 {if (synth->getUniqueId() != 0) o->hide();}
           }
-          Fl_Check_Button times {
+          Fl_Check_Button logTimes {
             label {Log Load times}
             callback {if (synth->getRuntime().showTimes != o->value())
 {
     synth->getRuntime().showTimes = o->value();
     synth->getRuntime().configChanged = true;
-}}
+}
+send_data(19, o->value(), 0xc0);}
             xywh {270 120 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showTimes);}
           }
-          Fl_Check_Button {} {
+          Fl_Check_Button logXML {
             label {Log XML Headers}
             callback {if (synth->getRuntime().logXMLheaders != o->value())
 {
     synth->getRuntime().logXMLheaders = o->value();
     synth->getRuntime().configChanged = true;
-}}
+}
+send_data(20, o->value(), 0xc0);}
             xywh {270 140 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().logXMLheaders);}
           }
-          Fl_Check_Button {} {
+          Fl_Check_Button saveAllXML {
             label {Include disabled data in XML files}
             callback {if (synth->getRuntime().xmlmax != o->value())
 {
     synth->getRuntime().xmlmax = o->value();
     synth->getRuntime().configChanged = true;
-}}
+}
+send_data(21, o->value(), 0xc0);}
             xywh {270 160 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().xmlmax);}
           }
-          Fl_Check_Button {} {
+          Fl_Check_Button enableGUI {
             label {Enable GUI}
             callback {//
-    bool doit = true;
     int tmp = o->value();
-    /*if (tmp == 0 &&  synth->getRuntime().showCLI == 0)
-    {
-        fl_alert("You can't disable both interfaces!");
-        doit = false;
-    }*/
-    if (doit == true && tmp == 0)
+    int doit;
+
+    if (tmp == 0)
         doit = fl_choice("Are you sure you want to disable?\\nThis can only be restored via the command line.", NULL, "No", "Yes") > 1;
 
     if (doit)
@@ -339,24 +340,20 @@ send_data(5, o->value(), 0xc0);}
         }
     }
     else
-        o->value(1);}
+        o->value(1);
+    send_data(22, o->value(), 0xc0);}
             tooltip {Enable starting with this graphical  interface} xywh {270 200 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showGui);}
             code1 {if (synth->getUniqueId() != 0) o->hide();}
           }
-          Fl_Check_Button {} {
+          Fl_Check_Button enableCLI {
             label {Enable CLI}
-            callback {/*if (o->value() == 0 &&  synth->getRuntime().showGui == 0)
-{
-    fl_alert("You can't disable both interfaces!");
-    o->value(1);
-    return;
-}*/
-if (synth->getRuntime().showCLI != o->value())
+            callback {if (synth->getRuntime().showCLI != o->value())
 {
     synth->getRuntime().showCLI = o->value();
     synth->getRuntime().configChanged = true;
-}}
+}
+send_data(23, o->value(), 0xc0);}
             tooltip {Enable starting with interactive command line interface} xywh {270 220 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showCLI);}
             code1 {if (synth->getUniqueId() != 0) o->hide();}
@@ -897,22 +894,32 @@ collect_data(synth, value, (Fl::event_button() | type), control, 0xf8, 0xff, 0xf
             compression->value(value_int);
             break;
         case 5:
-            reports->value(value_int);
+            reports->value(value_bool);
             break;
 
         case 16:
+            setDefaultState->value(value_bool);
             break;
         case 17:
+            nonFatal->value(value_bool);
             break;
         case 18:
+            showSplash->value(value_bool);
             break;
         case 19:
+            logTimes->value(value_bool);
             break;
         case 20:
+            logXML->value(value_bool);
             break;
         case 21:
+            saveAllXML->value(value_bool);
             break;
         case 22:
+            enableGUI->value(value_bool);
+            break;
+        case 23:
+            enableCLI->value(value_bool);
             break;
 
         case 32:
@@ -1103,8 +1110,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, 0xf8, 0xff, 0xf
             break;
 
         case 5 : // Switches
-            autoState->value(synth->getRuntime().loadDefaultState > 0);
-            times->value(synth->getRuntime().showTimes > 0);
+            setDefaultState->value(synth->getRuntime().loadDefaultState > 0);
+            logTimes->value(synth->getRuntime().showTimes > 0);
             nonFatal->value(synth->getRuntime().hideErrors);
             break;
     }} {}
