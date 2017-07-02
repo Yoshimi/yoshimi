@@ -54,7 +54,7 @@ class ConfigUI {selected : {private MiscFuncs}
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {o->hide();}
-      xywh {141 187 390 330} type Double hide
+      xywh {120 89 390 330} type Double hide
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
     } {
@@ -574,7 +574,8 @@ send_data(51, o->value(), 0xc0);}
         } {
           Fl_Spinner BankRoot {
             label {Bank Root Change}
-            callback {Rpend->show();}
+            callback {Rpend->show();
+send_data(65, o->value(), 0xc0);}
             xywh {235 50 50 18} labelsize 12 minimum 0 maximum 127 value 0 textsize 12
             code0 {BankRootvalue = synth->getRuntime().midi_bank_root;}
             code1 {if (BankRootvalue < 128) o->value(BankRootvalue); else o->value(0);}
@@ -625,7 +626,8 @@ send_data(51, o->value(), 0xc0);}
          Rpend->show();
     }
     BankRoot->redraw();
-    synth->getRuntime().configChanged = true;}
+    synth->getRuntime().configChanged = true;
+    send_data(64, o->value(), 0xc0);}
             xywh {234 30 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value((synth->getRuntime().midi_bank_root < 128));}
             code1 {if (o->value() == 0) BankRoot->deactivate();}
@@ -658,7 +660,8 @@ send_data(51, o->value(), 0xc0);}
         fl_alert("In use for %s",name.c_str());
     }
     if (synth->getRuntime().midi_bank_C == tmp)
-        synth->getRuntime().configChanged = true;}
+        synth->getRuntime().configChanged = true;
+    send_data(67, o->value(), 0xc0);}
             tooltip {CC0 = msb, CC32 = lsb} xywh {235 80 53 18} down_box BORDER_BOX labelsize 12 align 132 textsize 12
             code0 {if (synth->getRuntime().midi_bank_C == 32) o->value(0); else if (synth->getRuntime().midi_bank_C == 0) o->value(1); else o->value(2);}
             code1 {oldBank = o->value();}
@@ -682,7 +685,8 @@ send_data(51, o->value(), 0xc0);}
 		int tmp = synth->getRuntime().EnableProgChange;
 		synth->getRuntime().EnableProgChange = o->value();
 		if (synth->getRuntime().EnableProgChange != tmp)
-			synth->getRuntime().configChanged = true;}
+			synth->getRuntime().configChanged = true;
+		send_data(68, o->value(), 0xc0);}
             tooltip {MIDI program change enable/disable} xywh {234 110 18 18} down_box DOWN_BOX value 1 labelsize 12 align 4
             code0 {o->value(synth->getRuntime().EnableProgChange);}
           }
@@ -692,13 +696,15 @@ send_data(51, o->value(), 0xc0);}
 		int tmp = synth->getRuntime().enable_part_on_voice_load;
 		synth->getRuntime().enable_part_on_voice_load = o->value();
 		if (synth->getRuntime().enable_part_on_voice_load != tmp)
-			synth->getRuntime().configChanged = true;}
+			synth->getRuntime().configChanged = true;
+		send_data(69, o->value(), 0xc0);}
             tooltip {Part enabled if MIDI program changed} xywh {234 130 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().enable_part_on_voice_load);}
           }
           Fl_Spinner EPCspinner {
             label {Extended Program Change}
-            callback {Epend->show();}
+            callback {Epend->show();
+send_data(71, o->value(), 0xc0);}
             xywh {235 180 50 18} labelsize 12 minimum 0 maximum 127 value 110 textsize 12
             code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
             code1 {if (EPCvalue < 128) o->value(EPCvalue); else o->value(110);}
@@ -730,7 +736,8 @@ send_data(51, o->value(), 0xc0);}
         EPCvalue = candidate;
         o->hide();
         synth->getRuntime().configChanged = true;
-    }}
+    }
+    send_data(70, o->value(), 0xc0);}
             tooltip {Click to set} xywh {300 180 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
           }
           Fl_Check_Button Epcheck {
@@ -746,7 +753,7 @@ send_data(51, o->value(), 0xc0);}
     else
     {
          EPCspinner->activate();
-         Epend->show();;
+         Epend->show();
          EPCspinner->value(110);
          EPCvalue = 128;
     }
@@ -756,27 +763,30 @@ send_data(51, o->value(), 0xc0);}
             code0 {o->value((synth->getRuntime().midi_upper_voice_C < 128));}
             code1 {if (o->value() == 0) EPCspinner->deactivate();}
           }
-          Fl_Check_Button {} {
+          Fl_Check_Button ignoreReset {
             label {Ignore Reset all CCs}
             callback {if (synth->getRuntime().ignoreResetCCs != o->value())
 {
     synth->getRuntime().ignoreResetCCs = o->value();
     synth->getRuntime().configChanged = true;
-}}
+}
+send_data(72, o->value(), 0xc0);}
             xywh {234 230 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().ignoreResetCCs);}
           }
           Fl_Check_Button midiMon {
             label {Log Incoming CCs}
             callback {synth->getRuntime().monitorCCin = o->value();
-synth->getRuntime().configChanged = true;}
+synth->getRuntime().configChanged = true;
+send_data(73, o->value(), 0xc0);}
             xywh {234 250 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().monitorCCin);}
           }
           Fl_Check_Button midiLearned {
             label {Show Learn Editor}
             callback {synth->getRuntime().showLearnedCC = o->value();
-synth->getRuntime().configChanged = true;}
+synth->getRuntime().configChanged = true;
+send_data(74, o->value(), 0xc0);}
             tooltip {Open the MIDI learn window for editing when a new CC has been learned} xywh {234 270 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showLearnedCC);}
           }
@@ -792,7 +802,8 @@ configwindow->do_callback();}
         label {Save and Close}
         callback {synth->getRuntime().saveConfig();
 synth->getGuiMaster()->bankui->readbankcfg();
-configwindow->do_callback();}
+configwindow->do_callback();
+send_data(80, o->value(), 0xc0);}
         xywh {155 305 105 20} box THIN_UP_BOX labelsize 12
       }
     }
@@ -988,30 +999,72 @@ collect_data(synth, value, (Fl::event_button() | type), control, 0xf8, 0xff, 0xf
             }
             break;
 
-        case 64:
-            break;
+        //case 64:
+            //rootcheck->value(value_bool);
+            //break;
         case 65:
-            break;
-        case 66:
-            break;
-        case 67:
-            break;
-        case 68:
-            break;
-        case 69:
-            break;
-        case 70:
-            break;
-        case 71:
-            break;
-        case 72:
-            break;
-        case 73:
-            break;
-        case 74:
+            if (value_int >= 119)
+            {;
+                BankRoot->value(0);
+                BankRoot->deactivate();
+                rootcheck->value(0);
+            }
+            else
+            {
+                BankRoot->value(value_int);
+                BankRoot->activate();
+                rootcheck->value(1);
+            }
             break;
 
-        case 80:
+        case 67:
+            switch (value_int)
+            {
+                case 0:
+                    bankchange->value(1);
+                    break;
+                case 32:
+                    bankchange->value(0);
+                    break;
+                default:
+                    bankchange->value(2);
+                    break;
+            }
+            break;
+        case 68:
+            progenable->value(value_bool);
+            break;
+        case 69:
+            progpartenable->value(value_bool);
+            break;
+        //case 70:
+            //Epcheck->value(value_bool);
+            //break;
+        case 71:
+            if (value_int > 119)
+            {
+                EPCspinner->value(110);
+                EPCspinner->deactivate();
+                Epcheck->value(0);
+            }
+            else
+            {
+                EPCspinner->value(value_int);
+                EPCspinner->activate();
+                Epcheck->value(1);
+            }
+            break;
+        case 72:
+            ignoreReset->value(value_bool);
+            break;
+        case 73:
+            midiMon->value(value_bool);
+            break;
+        case 74:
+            midiLearned->value(value_bool);
+            break;
+
+        case 80: // no action needed
             break;
     }} {}
   }

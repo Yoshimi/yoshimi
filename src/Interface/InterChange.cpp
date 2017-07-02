@@ -863,6 +863,7 @@ string InterChange::resolveConfig(CommandBlock *getData)
 {
     int value_int = lrint(getData->data.value);
     unsigned char control = getData->data.control;
+    bool write = getData->data.type & 0x40;
 
     bool value_bool = value_int > 0;
     bool yesno = false;
@@ -887,16 +888,16 @@ string InterChange::resolveConfig(CommandBlock *getData)
             contstr = "Virtual keyboard ";
             switch (value_int)
             {
-                case 1:
+                case 0:
                     contstr += "QWERTY";
                     break;
-                case 2:
+                case 1:
                     contstr += "Dvorak";
                     break;
-                case 3:
+                case 2:
                     contstr += "QWERTZ";
                     break;
-                case 4:
+                case 3:
                     contstr += "AZERTY";
                     break;
             }
@@ -954,6 +955,7 @@ string InterChange::resolveConfig(CommandBlock *getData)
             break;
         case 33:
             contstr += "Start with JACK MIDI";
+            yesno = true;
             break;
         case 34:
             contstr += "JACK server: ";
@@ -962,9 +964,11 @@ string InterChange::resolveConfig(CommandBlock *getData)
             break;
         case 35:
             contstr += "Start with JACK audio";
+            yesno = true;
             break;
         case 36:
             contstr += "Auto-connect to JACK server";
+            yesno = true;
             break;
 
         case 48:
@@ -974,6 +978,7 @@ string InterChange::resolveConfig(CommandBlock *getData)
             break;
         case 49:
             contstr += "Start with ALSA MIDI";
+            yesno = true;
             break;
         case 50:
             contstr += "ALSA audio device: ";
@@ -982,36 +987,70 @@ string InterChange::resolveConfig(CommandBlock *getData)
             break;
         case 51:
             contstr += "Start with ALSA audio";
+            yesno = true;
             break;
         case 52:
             contstr += "ALSA sample rate: ";
             break;
 
-        case 64:
-            break;
+        /*case 64:
+            contstr += "Enable bank root change";
+            yesno = true;
+            break;*/
         case 65:
+            contstr += "Bank root CC";
             break;
-        case 66:
-            break;
+
         case 67:
+            contstr += "Bank CC";
             break;
         case 68:
+            contstr += "Enable program change";
+            yesno = true;
             break;
         case 69:
+            contstr += "Program change enables part";
+            yesno = true;
             break;
-        case 70:
-            break;
+        /*case 70:
+            contstr += "Enable extended program change";
+            yesno = true;
+            break;*/
         case 71:
+            contstr += "CC for extended program change";
             break;
         case 72:
+            contstr += "Ignore 'reset all CCs'";
+            yesno = true;
             break;
         case 73:
+            contstr += "Log incomming CCs";
+            yesno = true;
             break;
         case 74:
+            contstr += "Auto-open GUI MIDI-learn editor";
+            yesno = true;
             break;
 
         case 80:
-            // this will have to go through RBP
+            if (write)
+            {
+                if (synth->getRuntime().configChanged)
+                usleep(2000); // delay to allow save to take place
+                if (synth->getRuntime().configChanged)
+                    contstr += "Save FAILED"; // it really failed!
+                else
+                    contstr += "Saved";
+            }
+            else
+            {
+                contstr += "Condition - ";
+                 if(synth->getRuntime().configChanged)
+                     contstr += "DIRTY";
+                 else
+                     contstr += "CLEAN";
+            }
+            showValue = false;
             break;
         default:
             contstr = "Unrecognised";
@@ -3298,6 +3337,7 @@ void InterChange::commandConfig(CommandBlock *getData)
 
     switch (control)
     {
+// main
         case 0:
             if (write)
                 synth->getRuntime().Oscilsize = value_int;
@@ -3334,56 +3374,56 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = synth->getRuntime().toConsole;
             break;
-
+// switches
         case 16:
             if (write)
                 synth->getRuntime().loadDefaultState = value_bool;
             else
-                value_bool = synth->getRuntime().loadDefaultState;
+                value = synth->getRuntime().loadDefaultState;
             break;
         case 17:
             if (write)
                 synth->getRuntime().hideErrors = value_bool;
             else
-                value_bool = synth->getRuntime().hideErrors;
+                value = synth->getRuntime().hideErrors;
             break;
         case 18:
             if (write)
                 synth->getRuntime().showSplash = value_bool;
             else
-                value_bool = synth->getRuntime().showSplash;
+                value = synth->getRuntime().showSplash;
             break;
         case 19:
             if (write)
                 synth->getRuntime().showTimes = value_bool;
             else
-                value_bool = synth->getRuntime().showTimes;
+                value = synth->getRuntime().showTimes;
             break;
         case 20:
             if (write)
                 synth->getRuntime().logXMLheaders = value_bool;
             else
-                value_bool = synth->getRuntime().logXMLheaders;
+                value = synth->getRuntime().logXMLheaders;
             break;
         case 21:
             if (write)
                 synth->getRuntime().xmlmax = value_bool;
             else
-                value_bool = synth->getRuntime().xmlmax;
+                value = synth->getRuntime().xmlmax;
             break;
         case 22:
             if (write)
                 synth->getRuntime().showGui = value_bool;
             else
-                value_bool = synth->getRuntime().showGui;
+                value = synth->getRuntime().showGui;
             break;
         case 23:
             if (write)
                 synth->getRuntime().showCLI = value_bool;
             else
-                value_bool = synth->getRuntime().showCLI;
+                value = synth->getRuntime().showCLI;
             break;
-
+// jack
         case 32: // done elsewhere
             break;
         case 33:
@@ -3419,7 +3459,7 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = synth->getRuntime().connectJackaudio;
             break;
-
+// alsa
         case 48: // done elsewhere
             break;
         case 49:
@@ -3449,40 +3489,108 @@ void InterChange::commandConfig(CommandBlock *getData)
         case 52:
             if (write)
             {
-                value = int(value / 48) * 48;
+                value = int(value_int / 48) * 48;
                 if (value < 48000 || value > 192000)
                     value = 44100; // play safe
                 synth->getRuntime().Samplerate = value;
+                getData->data.value = value;
             }
             else
                 value = synth->getRuntime().Samplerate;
             break;
-
-        case 64:
-            break;
+// midi
+/*        case 64:
+            if (write)
+                synth->getRuntime().midi_bank_root = value_bool * 128;
+            else
+                value = (synth->getRuntime().midi_bank_root >= 128);
+            break;*/
         case 65:
+            if (write)
+            {
+                if (value_int > 119)
+                {
+                    value_int = 128;
+                    getData->data.value = value_int;
+                }
+                synth->getRuntime().midi_bank_root = value_int;
+            }
+            else
+                value = synth->getRuntime().midi_bank_root;
             break;
-        case 66:
-            break;
+
         case 67:
+            if (write)
+            {
+                if (value_int != 0 && value_int != 32)
+                {
+                    value_int = 128;
+                    getData->data.value = value_int;
+                }
+                synth->getRuntime().midi_bank_C = value_int;
+            }
+            else
+                value = synth->getRuntime().midi_bank_C;
             break;
         case 68:
+            if (write)
+                synth->getRuntime().EnableProgChange = value_bool;
+            else
+                value = synth->getRuntime().EnableProgChange;
             break;
         case 69:
+            if (write)
+                synth->getRuntime().enable_part_on_voice_load = value_bool;
+            else
+                value = synth->getRuntime().enable_part_on_voice_load;
             break;
-        case 70:
-            break;
+/*        case 70:
+            if (write)
+            {
+                if (value_bool)
+                    synth->getRuntime().midi_upper_voice_C = 110;
+                else
+                    synth->getRuntime().midi_upper_voice_C = 128;
+            }
+            else
+                value = (synth->getRuntime().midi_upper_voice_C >= 128);
+            break;*/
         case 71:
+            if (write)
+            {
+                if (value_int > 119)
+                {
+                    value_int = 128;
+                    getData->data.value = value_int;
+                }
+                synth->getRuntime().midi_upper_voice_C = value_int;
+            }
+            else
+                value = synth->getRuntime().midi_upper_voice_C;
             break;
         case 72:
+            if (write)
+                synth->getRuntime().ignoreResetCCs = value_bool;
+            else
+                value = synth->getRuntime().ignoreResetCCs;
             break;
         case 73:
+            if (write)
+                synth->getRuntime().monitorCCin = value_bool;
+            else
+                value = synth->getRuntime().monitorCCin;
             break;
         case 74:
+            if (write)
+                synth->getRuntime().showLearnedCC = value_bool;
+            else
+                value = synth->getRuntime().showLearnedCC;
             break;
-
+// save config
         case 80:
-            // this will have to go through RBP
+            if (write)
+                synth->writeRBP(7, 0); // needs to go through RBP
+            mightChange = false;
             break;
         default:
             mightChange = false;

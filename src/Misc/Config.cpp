@@ -291,16 +291,8 @@ string Config::testCCvalue(int cc)
             result = "mod wheel";
             break;
 
-        case 10:
-            result = "panning";
-            break;
-
         case 11:
             result = "expression";
-            break;
-
-        case 38:
-            result = "data lsb";
             break;
 
         case 71:
@@ -345,6 +337,10 @@ string Config::masterCCtest(int cc)
 
         case 7:
             result = "volume";
+            break;
+
+        case 10:
+            result = "panning";
             break;
 
         case 38:
@@ -627,7 +623,7 @@ void Config::saveConfig(void)
     XMLwrapper *xmltree = new XMLwrapper(synth);
     if (!xmltree)
     {
-        Log("saveConfig failed xmltree allocation");
+        Log("saveConfig failed xmltree allocation", 2);
         return;
     }
     addConfigXML(xmltree);
@@ -636,7 +632,7 @@ void Config::saveConfig(void)
     if (xmltree->saveXMLfile(resConfigFile))
         configChanged = false;
     else
-        Log("Failed to save config to " + resConfigFile);
+        Log("Failed to save config to " + resConfigFile, 2);
 
     delete xmltree;
 }

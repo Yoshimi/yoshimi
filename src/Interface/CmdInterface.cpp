@@ -156,7 +156,7 @@ string scalelist [] = {
     "Keymap <s> [s2]",          "CSV keymap (n1, n2, n3, etc.)",
     " ",                        "s2 = 'IMPort' from named file",
     "NAme <s>",                 "Internal name for this scale",
-    "COmment <s>",              "Comment line for this scale",
+    "DEscription <s>",          "Description of this scale",
     "CLEar",                    "Clear all settings and revert to standard scale",
     "end"
 };
@@ -967,7 +967,7 @@ int CmdInterface::commandScale()
         command = 0x21;
     else if (matchnMove(2, point, "name"))
         command = 0x40;
-    else if (matchnMove(2, point, "comment"))
+    else if (matchnMove(2, point, "description"))
         command = 0x41;
 
     if (command >= 0x20 && command <= 0x41)

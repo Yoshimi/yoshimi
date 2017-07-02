@@ -1,5 +1,6 @@
 Y/n : Range : Control : Part : Kit : Engine : Insert : Parameter : Par 2 : Function / Description
 
+Top Level
 YL : 0 to 127 : 0 : 240 : 255 : 255 : 255 : 255 : 255 : Volume
 Y : 0 to 63 : 14 : 240 : 255 : 255 : 255 : 255 : 255 : Part number
 Y : 16, 32, 64 : 15 : 240 : 255 : 255 : 255 : 255 : 255 : Number of available parts
@@ -9,6 +10,44 @@ Y : 0 to 3 : 48 : 240 : 255 : 255 : 255 : 255 : 255 : Channel Switcher Type (Sol
 Y : 14 to 119 : 49 : 240 : 255 : 255 : 255 : 255 : 255 : Channel Switcher Incoming CC
 Y : any : 96 : 240 : 255 : 255 : 255 : 255 : 255 : Reset (clear all)
 Y : any : 128 : 240 : 255 : 255 : 255 : 255 : 255 : Stop
+
+Config
+Y : 256 to 16384 : 0 : 248 : 255 : 255 : 255 : 255 : 255 : Oscillator size – powers of 2
+Y : 16 to 4096 : 1 : 248 : 255 : 255 : 255 : 255 : 255 : Buffer size – powers of 2
+Y : 0/1 : 2 : 248 : 255 : 255 : 255 : 255 : 255 : PadSynth interpolation – linear, cubic
+Y : 0 to 3 : 3 : 248 : 255 : 255 : 255 : 255 : 255 : Virtual keyboard layout – QWERTY, Dvorak, QWERTZ, AZERTY
+Y : 0 to 9 : 4 : 248 : 255 : 255 : 255 : 255 : 255 : XML compression level
+Y : 0/1 : 5 : 248 : 255 : 255 : 255 : 255 : 255 : Reports destination
+
+Y : 0/1 : 16 : 248 : 255 : 255 : 255 : 255 : 255 : Start with default state (~/.config/yoshimi/yoshimi.state)
+Y : 0/1 : 17 : 248 : 255 : 255 : 255 : 255 : 255 : Hide non-fatal errors
+Y : 0/1 : 18 : 248 : 255 : 255 : 255 : 255 : 255 : Show splash screen
+Y : 0/1 : 19 : 248 : 255 : 255 : 255 : 255 : 255 : Log load times
+Y : 0/1 : 20 : 248 : 255 : 255 : 255 : 255 : 255 : Include disabled data in XML files
+Y : 0/1 : 21 : 248 : 255 : 255 : 255 : 255 : 255 : Enable GUI
+Y : 0/1 : 22 : 248 : 255 : 255 : 255 : 255 : 255 : Enable CLI
+
+Y : any : 32 : 248 : 255 : 255 : 255 : 128 : msg No. : Jack MIDI source
+Y : 0/1 : 33 : 248 : 255 : 255 : 255 : 255 : 255 : Set as preferred MIDI
+Y : any : 34 : 248 : 255 : 255 : 255 : 128 : msg No. : JACK server
+Y : 0/1 : 35 : 248 : 255 : 255 : 255 : 255 : 255 : Set JACK as preferred audio
+Y : 0/1 : 36 : 248 : 255 : 255 : 255 : 255 : 255 : Autoconnect audio
+Y
+Y : any : 48 : 248 : 255 : 255 : 255 : 128 : msg No. : Alsa MIDI source
+Y : 0/1 : 49 : 248 : 255 : 255 : 255 : 255 : 255 : Set ALSA as preferred MIDI
+Y : any : 50 : 248 : 255 : 255 : 255 : 128 : msg No. : ALSA audio device
+Y : 0/1 : 51 : 248 : 255 : 255 : 255 : 255 : 255 : Set ALSA as preferred audio
+Y : 0 to 3 : 52 : 248 : 255 : 255 : 255 : 255 : 255 : ALSA sample rate – 192000, 96000, 48000, 44100
+
+Y : 0 to 119, other : 65 : 248 : 255 : 255 : 255 : 255 : 255 : Bank root CC – other = off
+Y : 0, 32, other : 67 : 248 : 255 : 255 : 255 : 255 : 255 : Bank CC – MSB, LSB, Off
+Y : 0/1 : 68 : 248 : 255 : 255 : 255 : 255 : 255 : Enable program change
+Y : 0/1 : 69 : 248 : 255 : 255 : 255 : 255 : 255 : Enable part on program change
+Y : 0 to 119, other : 71 : 248 : 255 : 255 : 255 : 255 : 255 : Extended program change CC – other = off
+Y : 0/1 : 72 : 248 : 255 : 255 : 255 : 255 : 255 : Ignore reset all CC’s
+Y : 0/1 : 73 : 248 : 255 : 255 : 255 : 255 : 255 : Log incoming CC’s
+Y : 0/1 : 74 : 248 : 255 : 255 : 255 : 255 : 255 : Show learn editor
+Y : any : 80 : 248 : 255 : 255 : 255 : 255 : 255 : Save current config
 
 Scales (microtonal)
 Y : 1.0 to 20000.0 : 0 : 232 : 255 : 255 : 255 : 255 : 255 : 'A’ frequency

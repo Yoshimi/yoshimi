@@ -1,5 +1,10 @@
 yoshimi 1.5.2 M
 
+2017-7-2 Will
+* Config conversion almost done.
+  Still some non-fatal anomalies to clear up.
+* Updated docs
+
 2017-7-1 Will
 * Config switches converted.
 * Config jack & alsa converted.
