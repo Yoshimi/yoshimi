@@ -262,7 +262,7 @@ void InterChange::transfertext(CommandBlock *getData)
 //    unsigned char kititem = getData->data.kit;
 //    unsigned char engine = getData->data.engine;
 //    unsigned char insert = getData->data.insert;
-    bool (write) = type & 0x40;
+    bool (write) = (type & 0x40);
     string text = miscMsgPop(getData->data.par2);
 
     if (npart == 232)
@@ -343,7 +343,7 @@ void InterChange::transfertext(CommandBlock *getData)
                 }
                 else
                     text = synth->getRuntime().jackMidiDevice;
-                getData->data.value = miscMsgPush(text);
+                value = miscMsgPush(text);
                 break;
             case 34:
                 if (write)
@@ -353,7 +353,7 @@ void InterChange::transfertext(CommandBlock *getData)
                 }
                 else
                     text = synth->getRuntime().jackServer;
-                getData->data.value = miscMsgPush(text);
+                value = miscMsgPush(text);
                 break;
             case 48:
                 if (write)
@@ -363,7 +363,7 @@ void InterChange::transfertext(CommandBlock *getData)
                 }
                 else
                     text = synth->getRuntime().alsaMidiDevice;
-                getData->data.value = miscMsgPush(text);
+                value = miscMsgPush(text);
                 break;
             case 50:
                 if (write)
@@ -373,7 +373,7 @@ void InterChange::transfertext(CommandBlock *getData)
                 }
                 else
                     text = synth->getRuntime().alsaAudioDevice;
-                getData->data.value = miscMsgPush(text);
+                value = miscMsgPush(text);
                 break;
         }
         getData->data.parameter &= 0x7f;
@@ -381,6 +381,7 @@ void InterChange::transfertext(CommandBlock *getData)
 
     if (!(getData->data.parameter & 0x80) && jack_ringbuffer_write_space(returnsLoopback) >= commandSize)
     {
+
         getData->data.value = float(value);
         if (write)
             getData->data.par2 = miscMsgPush(text); // pass it on
@@ -2780,7 +2781,7 @@ void InterChange::returns(CommandBlock *getData)
     }
 
     if ((type & 0x20) && npart == 248)
-        miscMsgPop(getData->data.par2); // this needs sorting properly!
+        string dump = miscMsgPop(getData->data.par2); // this needs sorted properly!
 
     bool isCliOrGuiRedraw = type & 0x10; // separated out for clarity
     bool isMidi = type & 8;

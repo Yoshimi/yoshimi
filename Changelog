@@ -1,5 +1,9 @@
 yoshimi 1.5.2 M
 
+2017-7-3 Will
+* Temporarily disabled Jack/Alsa GUI to CLI IDs.
+  Cause of strange MiscMsg behaviour :(
+
 2017-7-2 Will
 * Config conversion almost done.
   Still some non-fatal anomalies to clear up.

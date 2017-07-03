@@ -376,7 +376,7 @@ send_data(23, o->value(), 0xc0);}
         synth->getRuntime().jackMidiDevice = tmp;
         synth->getRuntime().configChanged = true;
     }
-    send_data(32, 0, 0xc0, 0x80, miscMsgPush(tmp));}
+    //send_data(32, 0, 0xc0, 0x80, miscMsgPush(tmp));}
             tooltip {Device Jack tries to connect to for input.} xywh {195 62 120 22} labelsize 12 textsize 12
             code0 {o->insert(synth->getRuntime().jackMidiDevice.c_str());}
           }
@@ -400,7 +400,8 @@ send_data(33, o->value(), 0xc0);}
     {
         synth->getRuntime().jackServer = tmp;
         synth->getRuntime().configChanged = true;
-    }send_data(34, 0, 0xc0, 0x80, miscMsgPush(tmp));}
+    }
+    //send_data(34, 0, 0xc0, 0x80, miscMsgPush(tmp));}
             tooltip {Name of the jack server to connect to - default, ...} xywh {195 182 120 22} labelsize 12 textsize 12
             code0 {o->insert(synth->getRuntime().jackServer.c_str());}
           }
@@ -447,7 +448,7 @@ send_data(36, o->value(), 0xc0);}
         synth->getRuntime().alsaMidiDevice = tmp;
         synth->getRuntime().configChanged = true;
     }
-    send_data(48, 0, 0xc0, 0x80, miscMsgPush(tmp));}
+    //send_data(48, 0, 0xc0, 0x80, miscMsgPush(tmp));}
             tooltip {Device Alsa tries to connect to for input.} xywh {195 52 120 22} labelsize 12 textsize 12
             code0 {o->insert(synth->getRuntime().alsaMidiDevice.c_str());}
           }
@@ -472,7 +473,7 @@ send_data(49, o->value(), 0xc0);}
         synth->getRuntime().alsaAudioDevice = tmp;
         synth->getRuntime().configChanged = true;
     }
-    send_data(50, 0, 0xc0, 0x80, miscMsgPush(tmp));}
+    //send_data(50, 0, 0xc0, 0x80, miscMsgPush(tmp));}
             tooltip {Alsa audio device - default, hw:0, ...} xywh {195 143 120 22} labelsize 12 textsize 12
             code0 {o->insert(synth->getRuntime().alsaAudioDevice.c_str());}
           }

@@ -398,6 +398,8 @@ void MiscFuncs::miscMsgInit()
 
 int MiscFuncs::miscMsgPush(string _text)
 {
+    if (_text.empty())
+        return 255;
     sem_wait(&miscmsglock);
 
     string text = _text;
@@ -409,6 +411,7 @@ int MiscFuncs::miscMsgPush(string _text)
         if ( *it == "")
         {
             *it = text;
+            //cout << "Msg In " << int(idx) << " >" << text << "<" << endl;
             break;
         }
         ++ it;
@@ -419,7 +422,7 @@ int MiscFuncs::miscMsgPush(string _text)
         cerr << "List full :(" << endl;
         idx = -1;
     }
-    cout << "Message number " << int(idx) << endl;
+
     int result = idx; // in case of a new entry before return
     sem_post(&miscmsglock);
     return result;
@@ -439,7 +442,10 @@ string MiscFuncs::miscMsgPop(int _pos)
     while(it != miscList.end())
     {
         if (idx == pos)
+        {
+            //cout << "Msg Out " << int(idx) << " >" << *it << "<" << endl;
             break;
+        }
         ++ it;
         ++ idx;
     }
