@@ -556,7 +556,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     hideErrors = xml->getpar("hide_system_errors", hideErrors, 0, 1);
     showTimes = xml->getpar("report_load_times", showTimes, 0, 1);
     logXMLheaders = xml->getpar("report_XMLheaders", logXMLheaders, 0, 1);
-    VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 0, 10);
+    VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 1, 6) - 1;
     xmlmax = xml->getpar("full_parameters", xmlmax, 0, 1);
 
     // get preset dirs
@@ -646,7 +646,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("hide_system_errors", hideErrors);
     xmltree->addpar("report_load_times", showTimes);
     xmltree->addpar("report_XMLheaders", logXMLheaders);
-    xmltree->addpar("virtual_keyboard_layout", VirKeybLayout);
+    xmltree->addpar("virtual_keyboard_layout", VirKeybLayout + 1);
     xmltree->addpar("full_parameters", xmlmax);
 
     for (int i = 0; i < MAX_PRESET_DIRS; ++i)

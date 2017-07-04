@@ -4,6 +4,8 @@ yoshimi 1.5.2 M
 * Resolved GUI to CLI miscMsg problem. Back on course :)
   Was due to CLI reporting blocking some 'Resolves' that
   use miscMsg to return text messages.
+* Adjusted saved keymap to retain compatibility.
+  Internally now starts from zero.
 
 2017-7-3 Will
 * Temporarily disabled Jack/Alsa GUI to CLI IDs.
