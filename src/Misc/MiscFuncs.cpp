@@ -419,7 +419,7 @@ int MiscFuncs::miscMsgPush(string _text)
     }
     if (it == miscList.end())
     {
-        cerr << "List full :(" << endl;
+        cerr << "miscMsg list full :(" << endl;
         idx = -1;
     }
 

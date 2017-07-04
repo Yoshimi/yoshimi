@@ -470,7 +470,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
 #ifdef ENABLE_REPORTS
     if ((isGui && button < 2) || (isCli && button == 1))
 #else
-    if (isCli && button == 1)
+    if (false) // isCli && button == 1)
 #endif
     {
         if (button == 0)
@@ -492,7 +492,11 @@ void InterChange::resolveReplies(CommandBlock *getData)
                             + "\n  Insert " + to_string((int) insert)
                             + "\n  Parameter " + to_string((int) insertParam)
                             + "\n  2nd Parameter " + to_string((int) insertPar2));
-        return;
+//        return;
+/* we need to review the implications of commenting
+ * out various parts of this routine, but if active
+ * they screw up miscMsg for some calling routines.
+ */
     }
     if (npart >= 0xc0 && npart < 0xd0)
         commandName = resolveVector(getData);
@@ -654,13 +658,16 @@ void InterChange::resolveReplies(CommandBlock *getData)
         return;
     }
 
-#ifdef ENABLE_REPORTS
+/*#ifdef ENABLE_REPORTS
     else if((isGui && button == 2) || isCli)
         synth->getRuntime().Log(commandName + actual);
 #else
     else if(isCli)
         synth->getRuntime().Log(commandName + actual);
 #endif
+    */
+else if (isGui || isCli)
+    synth->getRuntime().Log(commandName + actual);
 }
 
 
@@ -865,11 +872,9 @@ string InterChange::resolveConfig(CommandBlock *getData)
     int value_int = lrint(getData->data.value);
     unsigned char control = getData->data.control;
     bool write = getData->data.type & 0x40;
-
     bool value_bool = value_int > 0;
     bool yesno = false;
     string contstr = "";
-
     switch (control)
     {
         case 0:
