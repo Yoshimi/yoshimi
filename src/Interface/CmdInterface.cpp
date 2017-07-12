@@ -2521,6 +2521,11 @@ bool CmdInterface::cmdIfaceProcessCommand()
         unsigned char type = 0;
         if (matchnMove(3, point, "limits"))
             value = FLT_MAX;
+        else if (matchnMove(3, point, "default"))
+        {
+            value = FLT_MAX / 1.5f;
+            type = 0x40;
+        }
         else
         {
             value = string2float(point);
@@ -2634,6 +2639,12 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
             deftype = to_string(float(def / 10.0f) + 0.000001).substr(0,4);
 
         synth->getRuntime().Log(name + "Min " + to_string(min)  + "   Def " + deftype + "   Max " + to_string(max) + valuetype);
+        return 0;
+    }
+    synth->interchange.testLimits(&putData);
+    if (part == 0xf8 && putData.data.par2 < 0xff && (control == 65 || control == 67 || control == 71))
+    {
+        synth->getRuntime().Log("In use by " + miscMsgPop(putData.data.par2) );
         return 0;
     }
     if (jack_ringbuffer_write_space(synth->interchange.fromCLI) >= commandSize)

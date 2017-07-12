@@ -61,6 +61,7 @@ class InterChange : private MiscFuncs
         void doClearPart(int npart);
         bool commandSend(CommandBlock *getData);
         void resolveReplies(CommandBlock *getData);
+        void testLimits(CommandBlock *getData);
         void returnLimits(CommandBlock *getData);
 
         void flagsWrite(unsigned int val){__sync_and_and_fetch(&flagsValue, val);}

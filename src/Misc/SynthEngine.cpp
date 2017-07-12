@@ -3460,3 +3460,103 @@ void SynthEngine::getLimits(CommandBlock *getData)
     getData->limits.def = def;
     getData->limits.max = max;
 }
+
+
+void SynthEngine::getConfigLimits(CommandBlock *getData)
+{
+    int control = getData->data.control;
+    // defaults
+    int type = (getData->data.type & 0x3f) | 0x80; // set as integer
+    int min = 0;
+    int def = 0;
+    int max = 1;
+    cout << "config control " << to_string(control) << endl;
+    switch (control)
+    {
+        case 0:
+            min = 256;
+            max = 16384;
+            break;
+        case 1:
+            min = 16;
+            max = 4096;
+           break;
+        case 2:
+            break;
+        case 3:
+            max = 3;
+            break;
+        case 4:
+            max = 9;
+            break;
+        case 5:
+            break;
+
+        case 16:
+            break;
+        case 17:
+            break;
+        case 18:
+            break;
+        case 19:
+            break;
+        case 20:
+            break;
+        case 21:
+            break;
+        case 22:
+            break;
+
+        case 32:
+            break;
+        case 33:
+            break;
+        case 34:
+            break;
+        case 35:
+            break;
+        case 36:
+            break;
+
+        case 48:
+            break;
+        case 49:
+            break;
+        case 50:
+            break;
+        case 51:
+            break;
+        case 52:
+            max = 3;
+            break;
+
+        case 64:
+            break;
+        case 65: // midi checked elsewhere
+            break;
+        case 67: // midi checked elsewhere
+            break;
+        case 68:
+            break;
+        case 69:
+            break;
+        case 70:
+            break;
+        case 71: // midi checked elsewhere
+            break;
+        case 72:
+            break;
+        case 73:
+            break;
+        case 74:
+            break;
+
+        case 80:
+            break;
+
+    }
+    getData->data.type = type;
+    getData->limits.min = min;
+    getData->limits.def = def;
+    getData->limits.max = max;
+}

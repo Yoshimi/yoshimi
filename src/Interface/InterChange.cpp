@@ -6476,11 +6476,64 @@ void InterChange::commandEffects(CommandBlock *getData)
         getData->data.value = value;
 }
 
+// tests and returns corrected values
+void InterChange::testLimits(CommandBlock *getData)
+{
+    float value = getData->data.value;
+    if (value == FLT_MAX)
+    {
+        returnLimits(getData);
+        return;
+    }
+    int control = getData->data.control;
+    // this is a special case as midi CCs need to be checked
+    if (getData->data.part == 0xf8 && (control == 65 || control == 67 || control == 71))
+    {
+        getData->data.par2 = 255; // just to be sure
+        if (value > 119)
+            return;
+        string text;
+        if (control == 65)
+        {
+            text = synth->getRuntime().masterCCtest(int(value));
+            if (text != "")
+                getData->data.par2 = miscMsgPush(text);
+            return;
+        }
+        if(control == 67)
+        {
+            if (value != 0 && value != 32)
+                return;
+            text = synth->getRuntime().masterCCtest(int(value));
+            if (text != "")
+                getData->data.par2 = miscMsgPush(text);
+            return;
+        }
+        text = synth->getRuntime().masterCCtest(int(value));
+        if (text != "")
+            getData->data.par2 = miscMsgPush(text);
+        return;
+    }
+
+    CommandBlock newData;
+    memcpy(newData.bytes, getData->bytes, commandSize);
+    returnLimits(&newData);
+    if (value >= FLT_MAX / 2)
+    {
+        getData->data.value = newData.limits.def / 10;
+        return;
+    }
+    if (value > newData.limits.max)
+        value = newData.limits.max;
+    else if (value < getData->limits.min)
+        value = newData.limits.min;
+    getData->data.value = value;
+}
+
 
 // a lot of work needed here :(
 void InterChange::returnLimits(CommandBlock *getData)
 {
-    // value is preserved so we know it's a limits test
     // lower bits of type are preseved so we know the source
     // bit 6 set is used to denote midi learnable
     // bit 7 set denotes the value is used as an integer
@@ -6494,6 +6547,12 @@ void InterChange::returnLimits(CommandBlock *getData)
     int par2 = getData->data.par2;
     getData->data.type &= 0x3f; //  clear top bits
     getData->data.type |= 0x80; // default is integer & not learnable
+
+    if (npart == 248) // config limits
+    {
+        synth->getConfigLimits(getData);
+        return;
+    }
 
     if (npart == 240) // main control limits
     {

@@ -1,5 +1,11 @@
 yoshimi 1.5.2 M
 
+2017-7-12 Will
+* Values can now be corrected for range by the CLI.
+* Controls can be set to defaults by the CLI.
+* CLI can now test and report 'occupied' CC ranges.
+* doc updates.
+
 2017-7-4 Will
 * Resolved GUI to CLI miscMsg problem. Back on course :)
   Was due to CLI reporting blocking some 'Resolves' that
