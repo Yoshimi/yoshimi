@@ -575,8 +575,7 @@ send_data(51, o->value(), 0xc0);}
         } {
           Fl_Spinner BankRoot {
             label {Bank Root Change}
-            callback {Rpend->show();
-send_data(65, o->value(), 0xc0);}
+            callback {Rpend->show();}
             xywh {235 50 50 18} labelsize 12 minimum 0 maximum 127 value 0 textsize 12
             code0 {BankRootvalue = synth->getRuntime().midi_bank_root;}
             code1 {if (BankRootvalue < 128) o->value(BankRootvalue); else o->value(0);}
@@ -590,7 +589,8 @@ send_data(65, o->value(), 0xc0);}
         o->hide();
         return;
     }
-    string name = synth->getRuntime().testCCvalue(candidate);
+
+    string name = testCC(candidate, 65);
     if (!name.empty())
     {
         fl_alert("In use for %s",name.c_str());
@@ -599,14 +599,14 @@ send_data(65, o->value(), 0xc0);}
             BankRoot->value(BankRootvalue);
             BankRoot->redraw();
         }
+        return;
     }
-    else
-    {
-        synth->getRuntime().midi_bank_root = candidate;
-        BankRootvalue = candidate;
-        o->hide();
-        synth->getRuntime().configChanged = true;
-    }}
+    synth->getRuntime().midi_bank_root = candidate;
+    BankRootvalue = candidate;
+    o->hide();
+    synth->getRuntime().configChanged = true;
+
+    send_data(65, o->value(), 0xc0);}
             tooltip {Click to set} xywh {300 50 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
           }
           Fl_Check_Button rootcheck {
@@ -651,7 +651,8 @@ send_data(65, o->value(), 0xc0);}
     }
     if (candidate == tmp)
         return;
-    string name = synth->getRuntime().testCCvalue(candidate);
+
+    string name = testCC(candidate, 67);
     if (name.empty())
         synth->getRuntime().midi_bank_C = candidate;
     else
@@ -662,6 +663,7 @@ send_data(65, o->value(), 0xc0);}
     }
     if (synth->getRuntime().midi_bank_C == tmp)
         synth->getRuntime().configChanged = true;
+
     send_data(67, o->value(), 0xc0);}
             tooltip {CC0 = msb, CC32 = lsb} xywh {235 80 53 18} down_box BORDER_BOX labelsize 12 align 132 textsize 12
             code0 {if (synth->getRuntime().midi_bank_C == 32) o->value(0); else if (synth->getRuntime().midi_bank_C == 0) o->value(1); else o->value(2);}
@@ -720,8 +722,7 @@ send_data(71, o->value(), 0xc0);}
         return;
     }
 
-
-    string name = synth->getRuntime().testCCvalue(candidate);
+    string name = testCC(candidate, 71);
     if (!name.empty())
     {
         fl_alert("In use for %s",name.c_str());
@@ -730,14 +731,13 @@ send_data(71, o->value(), 0xc0);}
         EPCspinner->value(EPCvalue);
         EPCspinner->redraw();
         }
+        return;
     }
-    else
-    {
-        synth->getRuntime().midi_upper_voice_C = candidate;
-        EPCvalue = candidate;
-        o->hide();
-        synth->getRuntime().configChanged = true;
-    }
+    synth->getRuntime().midi_upper_voice_C = candidate;
+    EPCvalue = candidate;
+    o->hide();
+    synth->getRuntime().configChanged = true;
+
     send_data(70, o->value(), 0xc0);}
             tooltip {Click to set} xywh {300 180 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
           }
@@ -987,16 +987,21 @@ collect_data(synth, value, (Fl::event_button() | type), control, 0xf8, 0xff, 0xf
             jackAudio->value(!value_bool);
             break;
         case 52:
+            alsaRate->check_none();
             switch(value_int)
             {
                 case 192000:
                     alsaRate->set_checked(1);
+                    break;
                 case 96000:
                     alsaRate->set_checked(2);
+                    break;
                 case 48000:
                     alsaRate->set_checked(3);
+                    break;
                 case 44100:
                     alsaRate->set_checked(4);
+                    break;
             }
             break;
 
@@ -1219,6 +1224,16 @@ collect_data(synth, value, (Fl::event_button() | type), control, 0xf8, 0xff, 0xf
   }
   Function {Hide()} {} {
     code {configwindow->hide();} {}
+  }
+  Function {testCC(int value, int control)} {return_type string
+  } {
+    code {//
+    CommandBlock getData;
+    getData.data.value = value;
+    getData.data.control = control;
+    getData.data.part = 248;
+    synth->interchange.testLimits(&getData);
+    return miscMsgPop(getData.data.par2);} {}
   }
   decl {SynthEngine *synth;} {private local
   }

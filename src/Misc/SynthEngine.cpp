@@ -3475,10 +3475,12 @@ void SynthEngine::getConfigLimits(CommandBlock *getData)
     {
         case 0:
             min = 256;
+            def = 10240;
             max = 16384;
             break;
         case 1:
             min = 16;
+            def = 5120;
             max = 4096;
            break;
         case 2:
@@ -3487,6 +3489,7 @@ void SynthEngine::getConfigLimits(CommandBlock *getData)
             max = 3;
             break;
         case 4:
+            def = 3;
             max = 9;
             break;
         case 5:
@@ -3497,6 +3500,7 @@ void SynthEngine::getConfigLimits(CommandBlock *getData)
         case 17:
             break;
         case 18:
+            def = 10;
             break;
         case 19:
             break;
@@ -3505,50 +3509,74 @@ void SynthEngine::getConfigLimits(CommandBlock *getData)
         case 21:
             break;
         case 22:
+            def = 10;
+            break;
+        case 23:
+            def = 10;
             break;
 
         case 32:
+            min = 3; // anything greater than max
+            def = miscMsgPush("default");
             break;
         case 33:
+            def = 10;
             break;
         case 34:
+            min = 3;
+            def = miscMsgPush("default");
             break;
         case 35:
+            def = 10;
             break;
         case 36:
+            def = 10;
             break;
 
         case 48:
+            min = 3;
+            def = miscMsgPush("default");
             break;
         case 49:
+            def = 10;
             break;
         case 50:
+            min = 3;
+            def = miscMsgPush("default");
             break;
         case 51:
             break;
         case 52:
+            def = 20;
             max = 3;
             break;
 
         case 64:
             break;
-        case 65: // midi checked elsewhere
+        case 65: // runtime midi checked elsewhere
+            max = 119;
             break;
-        case 67: // midi checked elsewhere
+        case 67: // runtime midi checked elsewhere
+            def = 320;
+            max = 119;
             break;
         case 68:
             break;
         case 69:
+            def = 10;
             break;
         case 70:
             break;
-        case 71: // midi checked elsewhere
+        case 71: // runtime midi checked elsewhere
+            def = 1100;
+            max = 119;
             break;
         case 72:
             break;
         case 73:
             break;
         case 74:
+            def = 10;
             break;
 
         case 80:

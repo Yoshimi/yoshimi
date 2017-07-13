@@ -2619,6 +2619,11 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
         short int min = putData.limits.min;
         short int def = putData.limits.def;
         short int max = putData.limits.max;
+        if (min > max)
+        {
+            synth->getRuntime().Log("Text: " + miscMsgPop(def));
+            return 0;
+        }
         if (min == -1 && def == -10 && max == -1)
         {
             synth->getRuntime().Log("Unrecognised Control");

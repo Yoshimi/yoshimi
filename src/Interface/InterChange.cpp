@@ -997,6 +997,26 @@ string InterChange::resolveConfig(CommandBlock *getData)
             break;
         case 52:
             contstr += "ALSA sample rate: ";
+            switch (value_int)
+            { // this is a hack :(
+                case 0:
+                case 192000:
+                    contstr += "0 (192000)";
+                    break;
+                case 1:
+                case 96000:
+                    contstr += "1 (96000)";
+                    break;
+                case 2:
+                case 48000:
+                    contstr += "2 (48000)";
+                    break;
+                case 3:
+                case 44100:
+                    contstr += "3 (44100)";
+                    break;
+            }
+            showValue = false;
             break;
 
         /*case 64:
@@ -3495,14 +3515,42 @@ void InterChange::commandConfig(CommandBlock *getData)
         case 52:
             if (write)
             {
-                value = int(value_int / 48) * 48;
-                if (value < 48000 || value > 192000)
-                    value = 44100; // play safe
+                switch(value_int)
+                {
+                    case 0:
+                        value = 192000;
+                        break;
+                    case 1:
+                        value = 96000;
+                        break;
+                    case 2:
+                        value = 48000;
+                        break;
+                    case 3:
+                    default:
+                        value = 44100;
+                        break;
+                }
                 synth->getRuntime().Samplerate = value;
                 getData->data.value = value;
             }
             else
-                value = synth->getRuntime().Samplerate;
+                switch(synth->getRuntime().Samplerate)
+                {
+                    case 192000:
+                        value = 0;
+                        break;
+                    case 96000:
+                        value = 1;
+                        break;
+                    case 48000:
+                        value = 2;
+                        break;
+                    case 44100:
+                    default:
+                        value = 3;
+                        break;
+                }
             break;
 // midi
 /*        case 64:
@@ -6480,15 +6528,29 @@ void InterChange::commandEffects(CommandBlock *getData)
 void InterChange::testLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    if (value == FLT_MAX)
+    if (value == FLT_MAX) // this one's destructive
     {
         returnLimits(getData);
         return;
     }
+
+    CommandBlock newData;
+    memcpy(newData.bytes, getData->bytes, commandSize);
+    returnLimits(&newData);
+
     int control = getData->data.control;
-    // this is a special case as midi CCs need to be checked
+    /*
+     * This is a special case as existing defined
+     * midi CCs need to be checked.
+     * I don't like special cases either :(
+     */
     if (getData->data.part == 0xf8 && (control == 65 || control == 67 || control == 71))
     {
+        if (value >= (FLT_MAX / 2)) // set default
+        {
+            value = newData.limits.def / 10;
+            getData->data.value = value;
+        }
         getData->data.par2 = 255; // just to be sure
         if (value > 119)
             return;
@@ -6515,10 +6577,7 @@ void InterChange::testLimits(CommandBlock *getData)
         return;
     }
 
-    CommandBlock newData;
-    memcpy(newData.bytes, getData->bytes, commandSize);
-    returnLimits(&newData);
-    if (value >= FLT_MAX / 2)
+    if (value >= (FLT_MAX / 2)) // set default
     {
         getData->data.value = newData.limits.def / 10;
         return;
