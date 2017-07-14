@@ -3470,7 +3470,7 @@ void SynthEngine::getConfigLimits(CommandBlock *getData)
     int min = 0;
     int def = 0;
     int max = 1;
-    cout << "config control " << to_string(control) << endl;
+    //cout << "config control " << to_string(control) << endl;
     switch (control)
     {
         case 0:
