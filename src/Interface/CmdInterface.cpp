@@ -91,38 +91,39 @@ string toplist [] = {
 };
 
 string configlist [] = {
-    "Oscillator <n>",           "* Add/Pad synth oscillator size (power 2 256-16384)",
-    "BUffer <n>",               "* internal buffer size (power 2 16-4096)",
-    "INterpolate [s]",          "PadSynth interplation type (Linear, other = cubic",
-    "Virtual <n>",              "virtual keyboard (0 = QWERTY, 1 = Dvorak, 2 = QWERTZ, 3 = AZERTY",
-    "Xml <n>",                  "XML compression 0-9)",
-    "REports [s]",              "reports destination (Stdout, other = console)",
+    "Oscillator <n>",           "* Add/Pad size (power 2 256-16384)",
+    "BUffer <n>",               "* internal size (power 2 16-4096)",
+    "PAdsynth [s]",             "interpolation type (Linear, other = cubic",
+    "Virtual <n>",              "keyboard (0 = QWERTY, 1 = Dvorak, 2 = QWERTZ, 3 = AZERTY",
+    "Xml <n>",                  "compression 0-9)",
+    "REports [s]",              "destination (Stdout, other = console)",
 
-    "STate [s]",            "* autoload default state at start (Enable / other)",
-    "Hide [s]",                 "hide non-fatal errors (Enable, other)",
-    "Show [s]",                 "show splash screen (Enable, other)",
-    "Times [s]",                "time display on instrument load message (Enable, other)",
-    "LOg [s]",                  "log XML headers (Enable, other)",
-    "Data [s]",                 "include inactive data in all file saves (Enable, other)",
-    "Gui [s]",                  "* Run with GUI (Enable, other)",
-    "Cli [s]",                  "* Run with CLI (Enable, other)",
+    "STate [s]",                "* autoload default at start (Enable {other})",
+    "Hide [s]",                 "non-fatal errors (Enable {other})",
+    "Display [s]",              "GUI splash screen (Enable {other})",
+    "Time [s]",                 "add to instrument load message (Enable {other})",
+    "Include [s]",              "XML headers on file load(Enable {other})",
+    "Keep [s]",                 "include inactive data on all file saves (Enable {other})",
+    "Gui [s]",                  "* Run with GUI (Enable, Disable)",
+    "Cli [s]",                  "* Run with CLI (Enable, Disable)",
 
-    "MIdi <s>",                 "* MIDI connection type (Jack, Alsa)",
-    "AUdio <s>",                "* audio connection type (Jack, Alsa)",
-    "ALsa Midi <s>",            "* name of alsa MIDI source",
-    "ALsa Audio <s>",           "* name of alsa hardware device",
-    "ALsa Sample <n>",          "* sample rate (0 = 192000, 1 = 96000, 2 = 48000, 3 = 44100)",
-    "Jack Midi <s>",            "* name of jack MIDI source",
-    "Jack Server <s>",          "* jack server name",
-    "Jack Auto <s>",            "* autoconnect jack on start (Enable, other)",
+    "MIdi <s>",                 "* connection type (Jack, Alsa)",
+    "AUdio <s>",                "* connection type (Jack, Alsa)",
+    "ALsa Midi <s>",            "* name of source",
+    "ALsa Audio <s>",           "* name of hardware device",
+    "ALsa Sample <n>",          "* rate (0 = 192000, 1 = 96000, 2 = 48000, 3 = 44100)",
+    "Jack Midi <s>",            "* name of source",
+    "Jack Server <s>",          "* name",
+    "Jack Auto <s>",            "* connect jack on start (Enable {other})",
 
-    "ROot [n]",                 "bank root CC (0 - 119, other disables)",
+    "ROot [n]",                 "root CC (0 - 119, other disables)",
     "BAnk [n]",                 "bank CC (0, 32, other disables)",
-    "PRogram [s]",              "program change (Enable, other)",
-    "ACtivate [s]",             "MIDI program change activates part (Enable, other)",
-    "Extended [s]",             "extended program change (Enable, other)",
-    "IGnore [s]",               "ignore 'reset all controllers' (Enable, other)",
-    "Learn [s]",                "show MIDI learn editor (Enable, other)",
+    "PRogram [s]",              "program change (Enable {other})",
+    "ACtivate [s]",             "program change activates part (Enable {other})",
+    "Extended [s]",             "extended program change (Enable {other})",
+    "Quiet [s]",                "ignore 'reset all controllers' (Enable {other})",
+    "Log [s]",                  "incomming MIDI CCs (Enable {other})",
+    "SHow [s]",                 "GUI MIDI learn editor (Enable {other})",
     "end"
 };
 
@@ -133,7 +134,7 @@ string partlist [] = {
     "Pan <n2>",                 "panning",
     "VElocity <n2>",            "velocity sensing sensitivity",
     "OFfset <n2>",              "velocity sense offest",
-    "POrtamento <s>",           "portamento (Enable, other - disable",
+    "POrtamento <s>",           "portamento (Enable {other}",
     "Mode <s>",                 "key mode (Poly, Mono, Legato)",
     "Note <n2>",                "note polyphony",
     "SHift <n2>",               "key shift semitones (0 no shift)",
@@ -806,6 +807,111 @@ int CmdInterface::volPanVel()
 }
 
 
+int CmdInterface::commandList()
+{
+    Config &Runtime = synth->getRuntime();
+    int ID;
+    int tmp;
+    list<string> msg;
+    int reply = done_msg;
+
+    if (matchnMove(1, point, "instruments") || matchnMove(2, point, "programs"))
+    {
+        if (point[0] == 0)
+            ID = 128;
+        else
+            ID = string2int(point);
+        synth->ListInstruments(ID, msg);
+        synth->cliOutput(msg, LINES);
+    }
+
+    else if (matchnMove(1, point, "banks"))
+    {
+        if (point[0] == 0)
+            ID = 128;
+        else
+            ID = string2int(point);
+        synth->ListBanks(ID, msg);
+        synth->cliOutput(msg, LINES);
+    }
+
+    else if (matchnMove(1, point, "roots"))
+    {
+        synth->ListPaths(msg);
+        synth->cliOutput(msg, LINES);
+    }
+
+    else if (matchnMove(1, point, "vectors"))
+    {
+        synth->ListVectors(msg);
+        synth->cliOutput(msg, LINES);
+    }
+
+    else if (matchnMove(1, point, "parts"))
+    {
+        synth->ListCurrentParts(msg);
+        synth->cliOutput(msg, LINES);
+    }
+
+    else if (matchnMove(1, point, "config"))
+    {
+        synth->ListSettings(msg);
+        synth->cliOutput(msg, LINES);
+    }
+
+    else if (matchnMove(2, point, "mlearn"))
+    {
+        if (point[0] == '@')
+            {
+                point += 1;
+                point = skipSpace(point);
+                tmp = string2int(point);
+                if (tmp > 0)
+                    synth->SetSystemValue(107, -(tmp - 1));
+                    /*
+                    * we use negative values to detail a single line
+                    * because positive ones are used for bulk line count
+                    */
+                else
+                    reply = value_msg;
+            }
+        else
+            synth->SetSystemValue(107, LINES);
+    }
+
+    else if (matchnMove(1, point, "tuning"))
+        Runtime.Log("Tuning:\n" + synth->microtonal.tuningtotext());
+    else if (matchnMove(1, point, "keymap"))
+        Runtime.Log("Keymap:\n" + synth->microtonal.keymaptotext());
+
+    else if (matchnMove(1, point, "history"))
+    {
+        reply = done_msg;
+        if (point[0] == 0)
+            historyList(0);
+        else if (matchnMove(1, point, "patchsets"))
+            historyList(2);
+        else if (matchnMove(2, point, "scales"))
+            historyList(3);
+        else if (matchnMove(2, point, "states"))
+            historyList(4);
+        else if (matchnMove(1, point, "vectors"))
+            historyList(5);
+        else if (matchnMove(2, point, "mlearn"))
+            historyList(6);
+        else
+            reply = todo_msg;
+    }
+
+    else if (matchnMove(1, point, "effects") || matchnMove(1, point, "efx"))
+        reply = effectsList();
+    else if (matchnMove(3, point, "presets"))
+        reply = effectsList(true);
+
+    return reply;
+}
+
+
 int CmdInterface::commandVector()
 {
     Config &Runtime = synth->getRuntime();
@@ -974,10 +1080,7 @@ int CmdInterface::commandVector()
 
 int CmdInterface::commandConfig()
 {
-    Config &Runtime = synth->getRuntime();
-    int reply = todo_msg;
     float value = 0;
-    string name;
 
     unsigned char type;
     unsigned char command = 0xff;
@@ -988,200 +1091,94 @@ int CmdInterface::commandConfig()
     else
         type = 0xc0; // write, integer
 
-    if (matchnMove(2, point, "reports"))
+    if (matchnMove(1, point, "oscillator"))
     {
-        if (isRead)
-        {
-            if (Runtime.hideErrors)
-                name = "Non-fatal reports";
-            else
-                name = "All reports";
-            name += " sent to ";
-            if (Runtime.toConsole)
-                name += "console window";
-            else
-                name += "stderr";
-            Runtime.Log(name, 1);
-            return done_msg;
-        }
-        if (matchnMove(1, point, "gui"))
-            synth->SetSystemValue(100, 127);
-        else if (matchnMove(1, point, "stderr"))
-            synth->SetSystemValue(100, 0);
-        else if (matchnMove(2, point, "show"))
-        {
-            synth->SetSystemValue(103, 0);
-            Runtime.Log("Showing all errors");
-        }
-        else if (matchnMove(1, point, "hide"))
-        {
-            synth->SetSystemValue(103, 127);
-            Runtime.Log("Hiding non-fatal errors");
-        }
-        else
-        {
-            synth->SetSystemValue(100, 0);
-            Runtime.hideErrors = false;
-            Runtime.Log("Showing all errors");
-        }
-        return done_msg;
-        Runtime.configChanged = true;
+        command = 0;
+        if (!isRead && point[0] == 0)
+            return value_msg;
+        value = string2int(point);
+    }
+    else if (matchnMove(2, point, "buffer"))
+    {
+        command = 1;
+        if (!isRead && point[0] == 0)
+            return value_msg;
+        value = string2int(point);
+    }
+    else if (matchnMove(2, point, "padsynth"))
+    {
+        command = 2;
+        value = !matchnMove(1, point, "linear");
+    }
+    else if (matchnMove(1, point, "virtual"))
+    {
+        command = 3;
+        if (!isRead && point[0] == 0)
+            return value_msg;
+        value = string2int(point);
+    }
+    else if (matchnMove(1, point, "xml"))
+    {
+        command = 4;
+        if (!isRead && point[0] == 0)
+            return value_msg;
+        value = string2int(point);
+    }
+    else if (matchnMove(2, point, "reports"))
+    {
+        command = 5;
+        value = !matchnMove(1, point, "stdout");
     }
 
     else if (matchnMove(2, point, "state"))
     {
+        command = 16;
+        value = matchnMove(1, point, "enable");
+    }
+    else if (matchnMove(1, point, "hide"))
+    {
+        command = 17;
+        value = matchnMove(1, point, "enable");
+    }
+    else if (matchnMove(1, point, "display"))
+    {
+        command = 18;
+        value = matchnMove(1, point, "enable");
+    }
+    else if (matchnMove(1, point, "time"))
+    {
+        command = 19;
+        value = matchnMove(1, point, "enable");
+    }
+    else if (matchnMove(1, point, "include"))
+    {
+        command = 20;
+        value = matchnMove(1, point, "enable");
+    }
+    else if (matchnMove(1, point, "keep"))
+    {
+        command = 21;
+        value = matchnMove(1, point, "enable");
+    }
+    else if (matchnMove(1, point, "gui"))
+    {
+        command = 22;
         if (matchnMove(1, point, "enable"))
-            synth->SetSystemValue(101, 127);
+            value = 1;
+        else if (matchnMove(1, point, "disable"))
+            value = 0;
         else
-            synth->SetSystemValue(101, 0);
-        return done_msg;
-        Runtime.configChanged = true;
+            return value_msg;
     }
-
-    else if (matchnMove(1, point, "times"))
+    else if (matchnMove(1, point, "cli"))
     {
+        command = 23;
         if (matchnMove(1, point, "enable"))
-            synth->SetSystemValue(102, 127);
-        else
-            synth->SetSystemValue(102, 0);
-        return done_msg;
-        Runtime.configChanged = true;
-    }
-
-    else if (matchnMove(2, point, "program") || matchnMove(4, point, "instrument"))
-    {
-        if (isRead)
-        {
-            string name = "MIDI program change ";
-            if (Runtime.EnableProgChange)
-                name += "enabled";
-            else
-                name += "disabled";
-            Runtime.Log(name, 1);
-            return done_msg;
-        }
-        if (matchnMove(1, point, "enable"))
-            synth->SetSystemValue(115, 127);
-        else
-            synth->SetSystemValue(115, 0);
-        Runtime.configChanged = true;
-        return done_msg;
-    }
-
-    else if (matchnMove(2, point, "activate"))
-    {
-        if (isRead)
-        {
-            string name = "Program change ";
-            if (Runtime.enable_part_on_voice_load)
-                name += "activates";
-            else
-                name += "ignores";
-            Runtime.Log(name + " part", 1);
-            return done_msg;
-        }
-        if (matchnMove(1, point, "enable"))
-            synth->SetSystemValue(116, 127);
-        else
-            synth->SetSystemValue(116, 0);
-        Runtime.configChanged = true;
-        return done_msg;
-    }
-
-
-    // got to here
-
-    else if (matchnMove(2, point, "root"))
-    {
-        command = 65;
-        if (isRead)
-            value = 128; // ignored by range check
-        else if (point[0] == 0)
-            return value_msg;
-        else
-            value = string2int(point);
-        reply = done_msg;
-    }
-
-    else if (matchnMove(2, point, "bank"))
-    {
-        command = 67;
-        if (isRead)
-            value = 128; // ignored by range check
-        else if (point[0] == 0)
-            return value_msg;
-        else
-            value = string2int(point);
-        reply = done_msg;
-    }
-
-    else if (matchnMove(1, point, "extend"))
-    {
-        command = 71;
-        if (isRead)
-            value = 128; // ignored by range check
-        else if (point[0] == 0)
-            return value_msg;
-        else
-            value = string2int(point);
-        reply = done_msg;
-    }
-
-    else if (matchnMove(2, point, "midi"))
-    {
-        value = 1;
-        if (matchnMove(1, point, "alsa"))
-            command = 49;
-        else if (isRead == true || matchnMove(1, point, "jack"))
-            command = 33;
+            value = 1;
+        else if (matchnMove(1, point, "disable"))
+            value = 0;
         else
             return value_msg;
-        reply = done_msg;
-    }
-
-    else if (matchnMove(2, point, "audio"))
-    {
-        value = 1;
-        if (matchnMove(1, point, "alsa"))
-            command = 51;
-        else if (isRead == true || matchnMove(1, point, "jack"))
-            command = 35;
-        else
-            return value_msg;
-        reply = done_msg;
-    }
-
-    else if (matchnMove(2, point, "alsa"))
-    {
-        if (matchnMove(1, point, "midi"))
-        {
-            command = 48;
-            par = 128;
-            if (isRead || point[0] != 0)
-            {
-                if (!isRead)
-                    par2 = miscMsgPush(string(point));
-                reply = done_msg;
-            }
-            else
-                reply = value_msg;
-        }
-        else if (matchnMove(1, point, "audio"))
-        {
-            command = 50;
-            par = 128;
-            if (isRead || point[0] != 0)
-            {
-                if (!isRead)
-                    par2 = miscMsgPush(string(point));
-                reply = done_msg;
-            }
-            else
-                reply = value_msg;
-        }
-        else
-            reply = opp_msg;
-        reply = done_msg;
     }
 
     else if (matchnMove(1, point, "jack"))
@@ -1194,10 +1191,9 @@ int CmdInterface::commandConfig()
             {
                 if (!isRead)
                     par2 = miscMsgPush(string(point));
-                reply = done_msg;
             }
             else
-                reply = value_msg;
+                return value_msg;
         }
         else if (matchnMove(1, point, "server"))
         {
@@ -1207,27 +1203,144 @@ int CmdInterface::commandConfig()
             {
                 if (!isRead)
                     par2 = miscMsgPush(string(point));
-                reply = done_msg;
             }
             else
-                reply = value_msg;
+                return value_msg;
         }
         else if (matchnMove(1, point, "auto"))
         {
-            name = "Jack autoconnect ";
             command = 36;
-            if (matchnMove(1, point, "enable"))
-                value = 1;
-            else
-                value = 0;
-            reply = done_msg;
+            value = (matchnMove(1, point, "enable"));
         }
         else
-            reply = opp_msg;
+            return opp_msg;
     }
-    if (reply == done_msg)
-      sendDirect(value, type, command, 0xf8, 0xff, 0xff, 0xff, par, par2);
-    return reply;
+
+    else if (matchnMove(2, point, "alsa"))
+    {
+        if (matchnMove(1, point, "midi"))
+        {
+            command = 48;
+            par = 128;
+            if (isRead || point[0] != 0)
+            {
+                if (!isRead)
+                    par2 = miscMsgPush(string(point));
+            }
+            else
+                return value_msg;
+        }
+        else if (matchnMove(1, point, "audio"))
+        {
+            command = 50;
+            par = 128;
+            if (isRead || point[0] != 0)
+            {
+                if (!isRead)
+                    par2 = miscMsgPush(string(point));
+            }
+            else
+                return value_msg;
+        }
+        else if (matchnMove(1, point, "s"))
+        {
+            command = 52;
+            if (!isRead)
+            {
+                if (point[0] == 0)
+                    return value_msg;
+                value = string2int(point);
+                if (value < 0 || value > 3)
+                    return range_msg;
+            }
+        }
+        else
+            return opp_msg;
+    }
+
+    else if (matchnMove(2, point, "midi"))
+    {
+        value = 1;
+        if (matchnMove(1, point, "alsa"))
+            command = 49;
+        else if (isRead == true || matchnMove(1, point, "jack"))
+            command = 33;
+        else
+            return value_msg;
+    }
+
+    else if (matchnMove(2, point, "audio"))
+    {
+        value = 1;
+        if (matchnMove(1, point, "alsa"))
+            command = 51;
+        else if (isRead == true || matchnMove(1, point, "jack"))
+            command = 35;
+        else
+            return value_msg;
+    }
+
+    else if (matchnMove(2, point, "root"))
+    {
+        command = 65;
+        if (isRead)
+            value = 128; // ignored by range check
+        else if (point[0] == 0)
+            return value_msg;
+        else
+            value = string2int(point);
+    }
+    else if (matchnMove(2, point, "bank"))
+    {
+        command = 67;
+        if (isRead)
+            value = 128; // ignored by range check
+        else if (point[0] == 0)
+            return value_msg;
+        else
+            value = string2int(point);
+    }
+    else if (matchnMove(2, point, "program") || matchnMove(2, point, "instrument"))
+    {
+        command = 68;
+        value = matchnMove(1, point, "enable");
+    }
+    else if (matchnMove(2, point, "activate"))
+    {
+        command = 69;
+        value = matchnMove(1, point, "enable");
+    }
+    else if (matchnMove(1, point, "extend"))
+    {
+        command = 71;
+        if (isRead)
+            value = 128; // ignored by range check
+        else if (point[0] == 0)
+            return value_msg;
+        else
+            value = string2int(point);
+    }
+    else if (matchnMove(1, point, "Quiet"))
+    {
+        command = 72;
+        value = matchnMove(1, point, "enable");
+    }
+    else if (matchnMove(1, point, "log"))
+    {
+        command = 73;
+        value = matchnMove(1, point, "enable");
+    }
+    else if (matchnMove(2, point, "show"))
+    {
+        command = 74;
+        value = matchnMove(1, point, "enable");
+    }
+
+    else
+        return todo_msg; // may be picked up later
+
+    sendDirect(value, type, command, 0xf8, 0xff, 0xff, 0xff, par, par2);
+    return done_msg;
 }
 
 
@@ -1339,8 +1452,6 @@ int CmdInterface::commandScale()
                 if (value < min || value > max)
                     return value_msg;
             }
-            //else
-                //value = (matchnMove(1, point, "enable"));
         }
     }
 
@@ -1937,7 +2048,6 @@ bool CmdInterface::cmdIfaceProcessCommand()
 
     replyString = "";
     npart = Runtime.currentPart;
-    int ID;
     int reply = todo_msg;
     int tmp;
 
@@ -2006,91 +2116,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         sendDirect(0, 64, 128, 240);
     else if (matchnMove(1, point, "list"))
     {
-        if (matchnMove(1, point, "instruments") || matchnMove(2, point, "programs"))
-        {
-            if (point[0] == 0)
-                ID = 128;
-            else
-                ID = string2int(point);
-            synth->ListInstruments(ID, msg);
-            synth->cliOutput(msg, LINES);
-        }
-        else if (matchnMove(1, point, "banks"))
-        {
-            if (point[0] == 0)
-                ID = 128;
-            else
-                ID = string2int(point);
-            synth->ListBanks(ID, msg);
-            synth->cliOutput(msg, LINES);
-        }
-        else if (matchnMove(1, point, "roots"))
-        {
-            synth->ListPaths(msg);
-            synth->cliOutput(msg, LINES);
-        }
-        else if (matchnMove(1, point, "vectors"))
-        {
-            synth->ListVectors(msg);
-            synth->cliOutput(msg, LINES);
-        }
-        else if (matchnMove(1, point, "parts"))
-        {
-            synth->ListCurrentParts(msg);
-            synth->cliOutput(msg, LINES);
-        }
-        else if (matchnMove(1, point, "config"))
-        {
-            synth->ListSettings(msg);
-            synth->cliOutput(msg, LINES);
-        }
-        else if (matchnMove(2, point, "mlearn"))
-            if (point[0] == '@')
-                {
-                    point += 1;
-                    point = skipSpace(point);
-                    tmp = string2int(point);
-                    if (tmp > 0)
-                        synth->SetSystemValue(107, -(tmp - 1));
-                        /*
-                         * we use negative values to detail a single line
-                         * because positive ones are used for bulk line count
-                         */
-                    else
-                        reply = value_msg;
-                }
-            else
-                synth->SetSystemValue(107, LINES);
-        else if (matchnMove(1, point, "tuning"))
-            Runtime.Log("Tuning:\n" + synth->microtonal.tuningtotext());
-        else if (matchnMove(1, point, "keymap"))
-            Runtime.Log("Keymap:\n" + synth->microtonal.keymaptotext());
-        else if (matchnMove(1, point, "history"))
-        {
-            reply = done_msg;
-            if (point[0] == 0)
-                historyList(0);
-            else if (matchnMove(1, point, "patchsets"))
-                historyList(2);
-            else if (matchnMove(2, point, "scales"))
-                historyList(3);
-            else if (matchnMove(2, point, "states"))
-                historyList(4);
-            else if (matchnMove(1, point, "vectors"))
-                historyList(5);
-            else if (matchnMove(2, point, "mlearn"))
-                historyList(6);
-            else
-            {
-                replyString = "list history";
-                reply = what_msg;
-            }
-        }
-        else if (matchnMove(1, point, "effects") || matchnMove(1, point, "efx"))
-            reply = effectsList();
-        else if (matchnMove(3, point, "presets"))
-            reply = effectsList(true);
-        else
+        if (commandList() == todo_msg)
         {
             replyString = "list";
             reply = what_msg;
@@ -2655,6 +2681,7 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
         synth->getRuntime().Log("In use by " + miscMsgPop(putData.data.par2) );
         return 0;
     }
+
     if (jack_ringbuffer_write_space(synth->interchange.fromCLI) >= commandSize)
     {
         jack_ringbuffer_write(synth->interchange.fromCLI, (char*) putData.bytes, commandSize);

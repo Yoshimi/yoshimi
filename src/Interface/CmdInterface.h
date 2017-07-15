@@ -53,6 +53,7 @@ class CmdInterface : private MiscFuncs
         int effects();
         int volPanVel();
         int keyShift(int part);
+        int commandList();
         int commandVector();
         int commandConfig();
         int commandScale();

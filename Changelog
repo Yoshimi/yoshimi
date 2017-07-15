@@ -1,5 +1,9 @@
 yoshimi 1.5.2 M
 
+2017-7-15 Will
+* Completed conversion of CLI config controls.
+* Reorganised CLI code.
+
 2017-7-14 Will
 * Created new 'config' CLI submenu.
 * Converted some 'normal' CLI config controls.

@@ -889,6 +889,7 @@ string InterChange::resolveConfig(CommandBlock *getData)
                 contstr += "cubic";
             else
                 contstr += "linear";
+            showValue = false;
             break;
         case 3:
             contstr = "Virtual keyboard ";
@@ -3366,13 +3367,21 @@ void InterChange::commandConfig(CommandBlock *getData)
 // main
         case 0:
             if (write)
-                synth->getRuntime().Oscilsize = value_int;
+            {
+                value = nearestPowerOf2(value_int, 256, 16384);
+                getData->data.value = value;
+                synth->getRuntime().Oscilsize = value;
+            }
             else
                 value = synth->getRuntime().Oscilsize;
             break;
         case 1:
             if (write)
-                synth->getRuntime().Buffersize = value_int;
+            {
+                value = nearestPowerOf2(value_int, 16, 4096);
+                getData->data.value = value;
+                synth->getRuntime().Buffersize = value;
+            }
             else
                 value = synth->getRuntime().Buffersize;
             break;
@@ -6582,9 +6591,10 @@ void InterChange::testLimits(CommandBlock *getData)
         getData->data.value = newData.limits.def / 10;
         return;
     }
+
     if (value > newData.limits.max)
         value = newData.limits.max;
-    else if (value < getData->limits.min)
+    else if (value < newData.limits.min)
         value = newData.limits.min;
     getData->data.value = value;
 }
