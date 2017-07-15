@@ -1854,7 +1854,7 @@ int CmdInterface::commandReadnSet()
     if (bitTest(level, all_fx))
         return effects();
 
-    else if (matchnMove(1, point, "root"))
+    if (matchnMove(1, point, "root"))
     {
         if (isRead)
         {
@@ -1864,12 +1864,13 @@ int CmdInterface::commandReadnSet()
         if (point[0] != 0)
         {
             synth->SetBankRoot(string2int(point));
-            reply = done_msg;
+            return done_msg;
         }
         else
-            reply = value_msg;
+            return value_msg;
     }
-    else if (matchnMove(1, point, "bank"))
+
+    if (matchnMove(1, point, "bank"))
     {
         if (isRead)
         {
@@ -1879,10 +1880,10 @@ int CmdInterface::commandReadnSet()
         if (point[0] != 0)
         {
             synth->SetBank(string2int(point));
-            reply = done_msg;
+            return done_msg;
         }
         else
-            reply = value_msg;
+            return value_msg;
     }
 
     int cmdType = 0;
@@ -1936,7 +1937,6 @@ int CmdInterface::commandReadnSet()
         sendDirect(value, cmdType, 49, 240);
         return done_msg;
     }
-
 
     else if (matchnMove(2, point, "available")) // 16, 32, 64
     {

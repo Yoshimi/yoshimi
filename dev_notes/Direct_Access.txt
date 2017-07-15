@@ -13,6 +13,7 @@ Also, see "Effect_Inserts" for the actual effect controllers and "Envelope_Inser
 Sections currently in place and tested:
 
 Top level controls
+Config
 Microtonal (scales)
 Midi-learn - used for all operations
 Main part controls - now used by GUI for writes

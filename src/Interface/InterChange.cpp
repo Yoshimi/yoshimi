@@ -3347,15 +3347,9 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
 
 void InterChange::commandConfig(CommandBlock *getData)
 {
-#pragma message "Gui writes changed to reads"
-    if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;
-
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
-//    unsigned char parameter = getData->data.parameter;
-//    unsigned char par2 = getData->data.par2;
 
     bool write = (type & 0x40) > 0;
     bool mightChange = true;
@@ -3562,12 +3556,8 @@ void InterChange::commandConfig(CommandBlock *getData)
                 }
             break;
 // midi
-/*        case 64:
-            if (write)
-                synth->getRuntime().midi_bank_root = value_bool * 128;
-            else
-                value = (synth->getRuntime().midi_bank_root >= 128);
-            break;*/
+        case 64:
+            break;
         case 65:
             if (write)
             {
@@ -3607,17 +3597,8 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = synth->getRuntime().enable_part_on_voice_load;
             break;
-/*        case 70:
-            if (write)
-            {
-                if (value_bool)
-                    synth->getRuntime().midi_upper_voice_C = 110;
-                else
-                    synth->getRuntime().midi_upper_voice_C = 128;
-            }
-            else
-                value = (synth->getRuntime().midi_upper_voice_C >= 128);
-            break;*/
+        case 70:
+            break;
         case 71:
             if (write)
             {
