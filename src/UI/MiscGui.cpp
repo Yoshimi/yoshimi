@@ -455,8 +455,10 @@ string convert_value(ValueType type, float val)
             return(custom_value_units(val / 127.0f * 200.0f,"%",1));
 
         case VC_LFOdepthFilter: // filter LFO
-            f=(int)val / 127.0f * 4800.0f; // 4 octaves
-            return variable_prec_units(f, "cents", 2);
+            val = (int)val / 127.0f * 4.0f; // 4 octaves
+            f = val * 1200.0f; // cents
+            return variable_prec_units(f, "cents", 2) + "\n("
+                + custom_value_units(val, "base pos. offset)", 2);
 
         case VC_LFOdelay:
             f = ((int)val) / 127.0f * 4.0f + 0.005f;
@@ -483,8 +485,10 @@ string convert_value(ValueType type, float val)
             return variable_prec_units(f, "cents", 2);
 
         case VC_EnvelopeFilterVal:
-            f=((int)val - 64.0f) / 64.0f * 7200.0f; // 6 octaves
-            return variable_prec_units(f, "cents", 2);
+            val = ((int)val - 64.0f) / 64.0f;
+            f = val * 7200.0f; // 6 octaves
+            return variable_prec_units(f, "cents", 2) + "\n("
+                + custom_value_units(val * 6.0f,"base pos. offset)",2);
 
         case VC_EnvelopeAmpSusVal:
             return(custom_value_units((1.0f - (int)val / 127.0f)
@@ -520,8 +524,8 @@ string convert_value(ValueType type, float val)
             else
                 return variable_prec_units(f, "Hz", 2);
 
-        case VC_FilterFreq1: // ToDo
-            return(custom_value_units(val,""));
+        case VC_FilterFreq1: // Formant filter - base position for sequence
+            return(custom_value_units((val / 64.0f - 1.0f) * 5.0f,"x stretch (modulo 1)",2));
 
         case VC_FilterQ:
         case VC_FilterQAnalogUnused:
@@ -534,10 +538,11 @@ string convert_value(ValueType type, float val)
             return(s);
 
         case VC_FilterVelocityAmp:
-            f = (int)val / 127.0 * -6.0;
-            f = powf(2.0f,f + log(1000.0f)/log(2.0f)); // getrealfreq
+            val = (int)val / 127.0 * -6.0; // formant offset value
+            f = powf(2.0f,val + log(1000.0f)/log(2.0f)); // getrealfreq
             f = log(f/1000.0f)/log(powf(2.0f,1.0f/12.0f))*100.0f; // in cents
-            return(custom_value_units(f-0.5, "cents"));
+            return custom_value_units(f-0.5, "cents") +
+                   "\n(Formant offset: " + custom_value_units(val, "x stretch)",2);
 
         case VC_FilterFreqTrack0:
             s.clear();
@@ -552,6 +557,18 @@ string convert_value(ValueType type, float val)
             f = val /64.0f * 100.0f;
             s += custom_value_units(f, "%", 1);
             return(s);
+
+        case VC_FormFilterClearness:
+            f = powf(10.0f, (val - 32.0f) / 48.0f);
+            return custom_value_units(f, " switch rate",2);
+
+        case VC_FormFilterSlowness:
+            f = powf(1.0f - (val / 128.0f), 3.0f);
+            return custom_value_units(f, " morph rate",4);
+
+        case VC_FormFilterStretch:
+            f = powf(0.1f, (val - 32.0f) / 48.0f);
+            return custom_value_units(f, " seq. scale factor",3);
 
         case VC_InstrumentVolume:
             return(custom_value_units(-60.0f*(1.0f-(int)val/96.0f),"dB",1));
@@ -936,10 +953,32 @@ void custom_graph_dimensions(ValueType vt, int& w, int& h)
         w = 256;
         h = 128;
         break;
+    case VC_FormFilterClearness:
+        w = 128;
+        h = 128;
+        break;
     default:
         w = 0;
         h = 0;
     }
+}
+
+inline void grid(int x, int y, int w, int h, int sections)
+{
+        fl_color(FL_GRAY);
+
+        int j = 1;
+        int gDist = h / sections;
+        for(; j < sections; j++) /* Vertical */
+        {
+            fl_line(x, y - gDist * j, x + w, y - gDist * j);
+        }
+
+        gDist = w / sections;
+        for(j = 1; j < sections; j++) /* Horizontal */
+        {
+            fl_line(x + gDist * j, y, x + gDist * j, y - h);
+        }
 }
 
 void custom_graphics(ValueType vt, float val,int W,int H)
@@ -958,21 +997,7 @@ void custom_graphics(ValueType vt, float val,int W,int H)
         p = powf(8.0f,(64.0f-(int)val)/64.0f);
 
         /* Grid */
-        fl_color(FL_GRAY);
-
-        int j = 1;
-        int gDist = _h / 4;
-        for(; j < 4; j++) /* Vertical */
-        {
-            fl_line(x0, y0 - gDist * j, x0 + _w, y0 - gDist * j);
-        }
-
-        gDist = _w / 4;
-        for(j = 1; j < 4; j++) /* Horizontal */
-        {
-            fl_line(x0 + gDist * j, y0, x0 + gDist * j, y0 - _h);
-        }
-
+        grid(x0,y0,_w,_h, 4);
         /*Function curve*/
         fl_color(FL_BLUE);
         if ((int)val == 127)
@@ -991,6 +1016,23 @@ void custom_graphics(ValueType vt, float val,int W,int H)
             }
             fl_end_line();
         }
+        break;
+    }
+    case VC_FormFilterClearness:
+    {
+        p = powf(10.0f, (val - 32.0f) / 48.0f); //clearness param
+        grid(x0,y0,_w,_h,10);
+        fl_color(FL_BLUE);
+        fl_begin_line();
+        x = 0;
+        float frac = 1.0f / (float)_w;
+        for(i = 0; i < _w; i++)
+        {
+            y = (atanf((x * 2.0f - 1.0f) * p) / atanf(p) + 1.0f) * 0.5f * _h;
+            fl_vertex((float)x0 + i, (float)y0 - y);
+            x += frac;
+        }
+        fl_end_line();
         break;
     }
     case VC_SubBandwidthScale:

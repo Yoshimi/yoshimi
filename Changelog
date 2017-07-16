@@ -1,5 +1,18 @@
 yoshimi 1.5.2 M
 
+
+2017-7-18 Jesper
+* Bugfix: Fixed segfault from edge cases when float->int
+  conversion was very close to zero in formant filter
+  transition calculations.
+* New formant filter editing tools - visual parameter
+  manipulation on the frequency graph, primarily
+  mouse-driven.
+* New tooltips for the formant filter control knobs and
+  amended related tooltips in filter envelopes/LFO's
+  to show the differences between formant filters and
+  the other types.
+
 2017-7-18 Will
 * Bugfix: Bank dropdown list was showing wrong entry
   on bank root change but actual contents correct.
