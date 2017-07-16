@@ -1130,7 +1130,12 @@ string InterChange::resolveMain(CommandBlock *getData)
 
         case 88:
             showValue = false;
-            contstr = "Scale loaded";
+            contstr = "Scale load";
+            break;
+
+        case 89:
+            showValue = false;
+            contstr = "Scale save";
             break;
 
         case 96: // doMasterReset(
@@ -3724,7 +3729,10 @@ void InterChange::commandMain(CommandBlock *getData)
                 synth->allStop(4 | (par2 << 8) | (kititem << 16));
             break;
         case 88: // load scale
-            synth->writeRBP(6, 6, par2);
+            synth->writeRBP(6, 6, par2, type);
+            break;
+        case 89: // save scale
+            synth->writeRBP(7, 6, par2, type);
             break;
         case 96: // master reset
             if (write)

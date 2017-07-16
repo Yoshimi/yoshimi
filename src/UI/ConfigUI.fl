@@ -633,17 +633,14 @@ class ConfigUI {selected : {private MiscFuncs}
       Fl_Button {} {
         label {Close Unsaved}
         callback {//
-                    synth->getGuiMaster()->bankui->readbankcfg();
                     configwindow->do_callback();}
         xywh {275 305 105 20} box THIN_UP_BOX labelsize 12
       }
       Fl_Button {} {
         label {Save and Close}
         callback {//
-                    synth->getRuntime().saveConfig();
-                    synth->getGuiMaster()->bankui->readbankcfg();
-                    configwindow->do_callback();
-                    send_data(80, o->value(), 0xc0);}
+                    send_data(80, o->value(), 0xc0);
+                    configwindow->do_callback();}
         xywh {155 305 105 20} box THIN_UP_BOX labelsize 12
       }
     }

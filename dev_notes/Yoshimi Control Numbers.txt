@@ -8,6 +8,10 @@ YL : 0 to 127 : 32 : 240 : 255 : 255 : 255 : 255 : 255 : Detune frequency
 Y : -36 to 36 : 35 : 240 : 255 : 255 : 255 : 255 : 255 : Key shift
 Y : 0 to 3 : 48 : 240 : 255 : 255 : 255 : 255 : 255 : Channel Switcher Type (Solo) - Off, Row, Column, Loop
 Y : 14 to 119 : 49 : 240 : 255 : 255 : 255 : 255 : 255 : Channel Switcher Incoming CC
+Y : any : 80 : 240 : 255 : 255 : 255 : 255 : msg No. : Load named patchset via miscMsg
+Y : any : 84 : 240 : 0 to 15 : 255 : 255 : 255 : msg No. : Load named vector to chan (kit) via miscMsg
+Y : any : 88 : 240 : 255 : 255 : 255 : 255 : msg No. : Load named scale via miscMgs
+Y : any : 89 : 240 : 255 : 255 : 255 : 255 : msg No. : Save named scale via miscMgs
 Y : any : 96 : 240 : 255 : 255 : 255 : 255 : 255 : Reset (clear all)
 Y : any : 128 : 240 : 255 : 255 : 255 : 255 : 255 : Stop
 

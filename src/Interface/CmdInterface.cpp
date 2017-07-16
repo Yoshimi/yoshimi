@@ -1080,8 +1080,9 @@ int CmdInterface::commandVector()
 
 int CmdInterface::commandConfig()
 {
+    if (point[0] == 0)
+        return done_msg;
     float value = 0;
-
     unsigned char type;
     unsigned char command = 0xff;
     unsigned char par = 255;
@@ -1346,6 +1347,8 @@ int CmdInterface::commandConfig()
 
 int CmdInterface::commandScale()
 {
+    if (point[0] == 0)
+        return done_msg;
     Config &Runtime = synth->getRuntime();
     int reply = done_msg;
     float value = 0;
@@ -2294,7 +2297,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 tmp = string2int(point);
                 if (tmp > 0)
                 {
-                    sendDirect(0, 0, 0xf2, 0xd8, 0, 0, 0, 0, tmp - 1);
+                    sendDirect(0, 64, 0xf2, 0xd8, 0, 0, 0, 0, tmp - 1);
                     reply = done_msg;
                 }
                 else
@@ -2305,7 +2308,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             {
                 if ((string) point > "")
                 {
-                    sendDirect(0, 0, 0xf1, 0xd8, 0, 0, 0, 0, miscMsgPush((string) point));
+                    sendDirect(0, 64, 0xf1, 0xd8, 0, 0, 0, 0, miscMsgPush((string) point));
                     reply = done_msg;
                 }
                 else
@@ -2462,7 +2465,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = name_msg;
             else
             {
-                sendDirect(0, 0, 0xf5, 0xd8, 0, 0, 0, 0, miscMsgPush((string) point));
+                sendDirect(0, 64, 0xf5, 0xd8, 0, 0, 0, 0, miscMsgPush((string) point));
                 reply = done_msg;
             }
         }
@@ -2495,14 +2498,15 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = done_msg;
             }
         else if(matchnMove(1, point, "config"))
-            synth->SetSystemValue(119, 255);
+            sendDirect(0,64, 80, 248);
+
         else if (matchnMove(2, point, "scale"))
         {
             if (point[0] == 0)
                 reply = name_msg;
             else
             {
-                synth->microtonal.saveXML((string) point);
+                sendDirect(0,64, 89, 0xf0, 0xff, 0xff, 0xff, 0xff, miscMsgPush(string(point)));
                 reply = done_msg;
             }
         }else if (matchnMove(1, point, "patchset"))
@@ -2544,6 +2548,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             replyString = "save";
             reply = what_msg;
         }
+
     else if (matchnMove(6, point, "direct"))
     {
         float value;

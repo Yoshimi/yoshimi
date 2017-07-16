@@ -460,17 +460,7 @@ paramsui->Show(2);}
                 if (isRegFile(string(filename)))
                     if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                         return;
-                synth->actionLock(lockmute);
-                bool result = synth->microtonal.saveXML(string(filename));
-                synth->actionLock(unlock);
-                if (!result)
-                    fl_alert("Failed to save scale settings");
-                else
-                {
-                    synth->addHistory(filename, 3);
-                    RecentScale->activate();
-                }
-                updatepanel();}
+                send_data(89, 0, 0xc0, 0xf0, 0xff, 0xff, 0xff, miscMsgPush(string(filename)));}
             xywh {25 25 100 20} labelsize 12
           }
           MenuItem RecentScale {

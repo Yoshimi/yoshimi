@@ -483,7 +483,7 @@ void *SynthEngine::RBPthread(void)
                                 break;
 
                             case 6: // load scale
-                                loadMicrotonal(block.data[2], 0);
+                                loadMicrotonal(block.data[2], 0, block.data[3]);
                                 break;
                         }
                         break;
@@ -495,6 +495,9 @@ void *SynthEngine::RBPthread(void)
                                     Runtime.saveConfig();
                                 // test configChanged
                                 // for success
+                                    break;
+                                case 6:
+                                    saveMicrotonal(block.data[2], 0, block.data[3]);
                                     break;
                             }
                         }
@@ -2498,7 +2501,7 @@ int SynthEngine::loadPatchSetAndUpdate(string fname)
 }
 
 
-void SynthEngine::loadMicrotonal(unsigned char msg, unsigned char type)
+void SynthEngine::loadMicrotonal(unsigned char msg, unsigned char type, char source)
 {
     string fname = miscMsgPop(msg);
     bool ok = true;
@@ -2515,8 +2518,29 @@ void SynthEngine::loadMicrotonal(unsigned char msg, unsigned char type)
     if (!ok)
     {
         Runtime.Log("Could not load " + fname);
-        if (Runtime.showGui)
+        if (Runtime.showGui && (source & 0x20))
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Could not load " + fname));
+    }
+}
+
+void SynthEngine::saveMicrotonal(unsigned char msg, unsigned char type, char source)
+{
+    string fname = miscMsgPop(msg);
+    bool ok = true;
+    switch (type)
+    {
+        case 0: // scale
+            if (microtonal.saveXML(setExtension(fname, "xsz")))
+                addHistory(fname, 3);
+            else
+                ok = false;
+            break;
+    }
+    if (!ok)
+    {
+        Runtime.Log("Could not save " + fname);
+        if (Runtime.showGui && (source & 0x20))
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Could not save " + fname));
     }
 }
 

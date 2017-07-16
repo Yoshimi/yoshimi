@@ -1,5 +1,11 @@
 yoshimi 1.5.2 M
 
+2017-7-16 Will
+* Refinements to CLI.
+* Direct access to loading and saving scales done.
+  More enhancements planned.
+* Updated docs.
+
 2017-7-15 Will
 * Completed conversion of CLI config controls.
 * Reorganised CLI code.
