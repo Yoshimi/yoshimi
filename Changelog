@@ -1,5 +1,9 @@
 yoshimi 1.5.2 M
 
+2017-7-18 Will
+* Bugfix: Bank dropdown list was showing wrong entry
+  on bank root change but actual contents correct.
+
 2017-7-16 Will
 * Refinements to CLI.
 * Direct access to loading and saving scales done.
