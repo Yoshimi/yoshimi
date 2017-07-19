@@ -1,5 +1,8 @@
 yoshimi 1.5.2 M
 
+2017-7-19 Will.
+* transfertext() now checks GUI exists before sending.
+
 2017-7-18 Will
 * Bugfix: Bank dropdown list was showing wrong entry
   on bank root change but actual contents correct.

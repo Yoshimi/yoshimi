@@ -383,13 +383,13 @@ void InterChange::transfertext(CommandBlock *getData)
     {
 
         getData->data.value = float(value);
-        if (write)
-            getData->data.par2 = miscMsgPush(text); // pass it on
+        if (synth->getRuntime().showGui && write && !((type & 0x20) && npart == 248))
+            getData->data.par2 = miscMsgPush(text); // pass it on to GUI
         else
             getData->data.par2 = 0xff;
         jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
-        if (npart == 232 && control == 48)
-        {   // loading a scale includes a name!
+        if (synth->getRuntime().showGui && npart == 232 && control == 48)
+        {   // loading a tuning includes a name!
             getData->data.control = 64;
             getData->data.par2 = miscMsgPush(synth->microtonal.Pname);
             jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
@@ -2810,9 +2810,6 @@ void InterChange::returns(CommandBlock *getData)
         jack_ringbuffer_write(toCLI, (char*) getData->bytes, commandSize); // this will redirect where needed.
         return;
     }
-
-    if ((type & 0x20) && npart == 248)
-        string dump = miscMsgPop(getData->data.par2); // this needs sorted properly!
 
     bool isCliOrGuiRedraw = type & 0x10; // separated out for clarity
     bool isMidi = type & 8;
