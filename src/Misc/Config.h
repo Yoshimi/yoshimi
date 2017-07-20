@@ -104,7 +104,7 @@ class Config : public MiscFuncs
         static bool          showCLI;
 
         bool          runSynth;
-
+        bool          finishedCLI;
         int           VirKeybLayout;
 
         audio_drivers audioEngine;

@@ -1,5 +1,10 @@
 yoshimi 1.5.2 M
 
+2017-7-20 Will.
+* Improved CLI handling of delays from slow actions.
+  Has a switch that only releases when action completes.
+* More doc updates and corrections.
+
 2017-7-19 Will.
 * transfertext() now checks GUI exists before sending.
 

@@ -5,7 +5,7 @@ This is filled with a normal data block as if a command was being sent, however 
 1st form: data.value = FLT_MAX
 From the command line enter 'direct' 'lim' control part kit etc.
 
-This will return limits.min limits.max and limits.def values (default will be *10).
+This will return limits.min limits.max and limits.def values.
 
 limits.def returns the actual default * 10. This is so that fractional values can be resolved. 0.5 comes up quite often. However the printed CLI response will be the actual value. All of these values may be negative.
 
@@ -13,7 +13,7 @@ limits.def returns the actual default * 10. This is so that fractional values ca
 
 The data block will be corrupted as these values are short integers in place of the normal bytes.
 
-If the routine returns min > max, it is a text entry and the default will be a miscMsg ID number.
+If the routine returns min > max, it is a text entry and def will be a miscMsg ID number.
 
 If the routine returns min and max as -1 and def as - 10 the command has not been recognised at all.
 

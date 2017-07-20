@@ -518,6 +518,8 @@ void *SynthEngine::RBPthread(void)
                         setPartMap(block.data[1]);
                         break;
                 }
+                // in case it was called from CLI
+                Runtime.finishedCLI = true;
             }
             else
                 Runtime.Log("Unable to read data from Root/Bank/Program");
@@ -928,7 +930,7 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
     string fname = bank.getfilename(pgm);
 
     if ((fname == "") || (bank.getname(pgm) < "!")) // can't get a program name less than this
-        Runtime.Log("No Program " + asString(pgm) + " in this bank");
+        Runtime.Log("No Program " + asString(pgm + 1) + " in this bank");
     else
     {
         if (chan <  NUM_MIDI_CHANNELS) // a normal program change

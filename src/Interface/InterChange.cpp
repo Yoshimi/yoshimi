@@ -6523,6 +6523,7 @@ void InterChange::commandEffects(CommandBlock *getData)
 void InterChange::testLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
+
     if (value == FLT_MAX) // this one's destructive
     {
         returnLimits(getData);
@@ -6578,7 +6579,7 @@ void InterChange::testLimits(CommandBlock *getData)
         return;
     }
 
-    if (value > newData.limits.max)
+    if (value > newData.limits.max) // adjust to limits
         value = newData.limits.max;
     else if (value < newData.limits.min)
         value = newData.limits.min;

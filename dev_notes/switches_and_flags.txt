@@ -3,7 +3,7 @@ Details of some of the internal controls.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 partonoffLock(int npart, int what)
-  A mutex locked version of:
+  A semaphore locked version of:
 
 
 partonoffWrite((int npart, int what)
@@ -14,9 +14,9 @@ partonoffWrite((int npart, int what)
 
   -1 moves it toward off and 2 moves it towards on.
 
-  The rationale here is that if a part status is unknown to a function, but it wants to perform an operation that needs the part to be off, but then wants to restore it to its original condition, it first uses -1. If it was already off it makes no difference, but it it was on it is now turned on. Once the operation can completed it uses 2 to restore the original state, so if it was off, it still is, but if it was on it is now on again.
+  The rationale here is that if a part status is unknown to a function, but it wants to perform an operation that needs the part to be off, but then wants to restore it to its original condition, it first uses -1. If it was already off it makes no difference, but it it was on it is now turned off. Once the operation has been completed it uses 2 to restore the original state, so if it was off, it still is, but if it was on it is now on again.
 
-  If you want to set its state regardless of the previous setting (such switching by a user) you use 0 and 1.
+  If you want to set its state regardless of the previous setting (such as switching by a user) you use 0 and 1.
 
 
 partonoffRead(int npart)

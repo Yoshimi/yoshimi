@@ -1534,7 +1534,10 @@ int CmdInterface::commandPart(bool justSet)
         }
         if (point[0] != 0) // force part not channel number
         {
-            tmp = string2int(point);
+            tmp = string2int(point) - 1;
+            if (tmp < 0 || tmp > 159)
+                return range_msg;
+            Runtime.finishedCLI = false;
             if (tmp < 128)
                 synth->writeRBP(3, npart | 0x80, tmp); // lower set
             else
@@ -2297,6 +2300,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 tmp = string2int(point);
                 if (tmp > 0)
                 {
+                    Runtime.finishedCLI = false;
                     sendDirect(0, 64, 0xf2, 0xd8, 0, 0, 0, 0, tmp - 1);
                     reply = done_msg;
                 }
@@ -2308,6 +2312,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             {
                 if ((string) point > "")
                 {
+                    Runtime.finishedCLI = false;
                     sendDirect(0, 64, 0xf1, 0xd8, 0, 0, 0, 0, miscMsgPush((string) point));
                     reply = done_msg;
                 }
@@ -2371,7 +2376,10 @@ bool CmdInterface::cmdIfaceProcessCommand()
                     }
                 }
                 if (ok)
+                {
+                    Runtime.finishedCLI = false;
                     sendDirect(0, 64, 84, 240, ch, 0, 0, 0, miscMsgPush(name));
+                }
                 reply = done_msg;
             }
         }
@@ -2379,13 +2387,18 @@ bool CmdInterface::cmdIfaceProcessCommand()
         {
             if (point[0] == 0)
                 reply = name_msg;
-            else if (Runtime.loadState(point))
+            else
             {
-                string name = (string) point;
-                //name += ".state";
-                Runtime.Log("Loaded " + name);
-                GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, (0x80 | (miscMsgPush(findleafname(name)) << 8)));
-                reply = done_msg;
+                Runtime.finishedCLI = false;
+                if (Runtime.loadState(point))
+                {
+                    string name = (string) point;
+                    //name += ".state";
+                    Runtime.Log("Loaded " + name);
+                    GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, (0x80 | (miscMsgPush(findleafname(name)) << 8)));
+                    reply = done_msg;
+                }
+                Runtime.finishedCLI = true;
             }
         }
         else if (matchnMove(2, point, "scale"))
@@ -2395,6 +2408,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = name_msg;
             else
             {
+                Runtime.finishedCLI = false;
                 sendDirect(0, 64, 88, 0xf0, 0xff, 0xff, 0xff, 0xff, miscMsgPush(name));
                 reply = done_msg;
             }
@@ -2438,6 +2452,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 }
                 if (ok)
                 {
+                    Runtime.finishedCLI = false;
                     sendDirect(0, 64, 80, 240, 255, 255, 255, 255, miscMsgPush(name));
                     reply = done_msg;
                 }
@@ -2448,7 +2463,10 @@ bool CmdInterface::cmdIfaceProcessCommand()
             if (point[0] == 0)
                 reply = name_msg;
             else
+            {
+                Runtime.finishedCLI = false;
                 synth->writeRBP(5, npart, miscMsgPush((string) point));
+            }
             reply = done_msg;
         }
         else
@@ -2465,6 +2483,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = name_msg;
             else
             {
+                Runtime.finishedCLI = false;
                 sendDirect(0, 64, 0xf5, 0xd8, 0, 0, 0, 0, miscMsgPush((string) point));
                 reply = done_msg;
             }
@@ -2484,8 +2503,10 @@ bool CmdInterface::cmdIfaceProcessCommand()
             else
             {
                 chan = tmp;
+                Runtime.finishedCLI = false;
                 if(synth->saveVector(chan, (string) point, true))
                     Runtime.Log("Saved channel " + asString(chan + 1) + " Vector to " + (string) point);
+                Runtime.finishedCLI = true;
                 reply = done_msg;
             }
         }
@@ -2498,7 +2519,10 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = done_msg;
             }
         else if(matchnMove(1, point, "config"))
+        {
+            Runtime.finishedCLI = false;
             sendDirect(0,64, 80, 248);
+        }
 
         else if (matchnMove(2, point, "scale"))
         {
@@ -2506,6 +2530,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = name_msg;
             else
             {
+                Runtime.finishedCLI = false;
                 sendDirect(0,64, 89, 0xf0, 0xff, 0xff, 0xff, 0xff, miscMsgPush(string(point)));
                 reply = done_msg;
             }
@@ -2515,12 +2540,14 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = name_msg;
             else
             {
+                Runtime.finishedCLI = false;
                 replyString = setExtension((string) point, "xmz");
                 tmp = synth->saveXML(replyString);
                 if (!tmp)
                     Runtime.Log("Could not save " + (string) point);
                 else
                     Runtime.Log("Saved " + replyString);
+                Runtime.finishedCLI = true;
             }
         }
         else if (matchnMove(1, point, "instrument"))
@@ -2534,6 +2561,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = name_msg;
             else
             {
+                Runtime.finishedCLI = false;
                 replyString = setExtension((string) point, "xiz");
                 tmp = synth->part[npart]->saveXML(replyString);
                 if (tmp)
@@ -2541,6 +2569,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 else
                     Runtime.Log("Failed to save " + replyString);
                 reply = done_msg;
+                Runtime.finishedCLI = true;
             }
         }
         else
@@ -2771,14 +2800,18 @@ void CmdInterface::cmdIfaceCommandLoop()
                     prompt += "Y";
             }
             prompt += "> ";
-            if (rl_end > 0)
-                cout << endl;
-            sprintf(welcomeBuffer,"%s",prompt.c_str());
             if (!exit)
             {
                 if (synth) // it won't be until Process called
+                {
+                    do
+                    { // create enough delay for most ops to complete
+                        usleep(2000);
+                    }
+                    while (synth->getRuntime().runSynth && !synth->getRuntime().finishedCLI);
                     synth->getRuntime().CLIstring = prompt;
-                usleep(80000); // create enough delay for most ops to complete
+                }
+                sprintf(welcomeBuffer,"%s",prompt.c_str());
             }
         }
         if (!exit)
