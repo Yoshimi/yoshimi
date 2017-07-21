@@ -1,11 +1,18 @@
 yoshimi 1.5.2 M
 
-2017-7-20 Will.
+2017-7-21 Will
+* Removed some redundant code.
+* State load is now 'silent'.
+* Implemented lock-free state load & save.
+* Fixed potential memory leak in session save.
+* Doc updates - of course :)
+
+2017-7-20 Will
 * Improved CLI handling of delays from slow actions.
   Has a switch that only releases when action completes.
 * More doc updates and corrections.
 
-2017-7-19 Will.
+2017-7-19 Will
 * transfertext() now checks GUI exists before sending.
 
 2017-7-18 Will

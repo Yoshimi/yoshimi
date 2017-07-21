@@ -64,8 +64,8 @@ class Config : public MiscFuncs
         string masterCCtest(int cc);
         void saveConfig(void);
         bool loadConfig(void);
-        void saveState() { saveSessionData(StateFile); }
-        void saveState(const string statefile)  { saveSessionData(statefile); }
+        bool saveState() { return saveSessionData(StateFile); }
+        bool saveState(const string statefile)  { return saveSessionData(statefile); }
         bool loadState(const string statefile)
             { return restoreSessionData(statefile, false); }
         bool stateRestore(void)
@@ -148,7 +148,6 @@ class Config : public MiscFuncs
         int           NumAvailableParts;
         int           currentPart;
         int           lastPatchSet;
-        string        CLIstring;
         unsigned char channelSwitchType;
         unsigned char channelSwitchCC;
         unsigned char channelSwitchValue;
@@ -185,7 +184,7 @@ class Config : public MiscFuncs
         bool extractBaseParameters(XMLwrapper *xml);
         bool extractConfigData(XMLwrapper *xml);
         void addConfigXML(XMLwrapper *xml);
-        void saveSessionData(string savefile);
+        bool saveSessionData(string savefile);
         bool restoreSessionData(string sessionfile, bool startup);
         int SSEcapability(void);
         void AntiDenormals(bool set_daz_ftz);

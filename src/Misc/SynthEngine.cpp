@@ -479,7 +479,7 @@ void *SynthEngine::RBPthread(void)
                                 loadVectorAndUpdate(block.data[3], block.data[2]);
                                 break;
                             case 5: // load state
-                                ; //to do
+                                loadStateAndUpdate(miscMsgPop(block.data[2]));
                                 break;
 
                             case 6: // load scale
@@ -496,7 +496,12 @@ void *SynthEngine::RBPthread(void)
                                 // test configChanged
                                 // for success
                                     break;
-                                case 6:
+                                case 5: // save state
+                                    name = miscMsgPop(block.data[2]);
+                                    if (Runtime.saveState(name))
+                                        addHistory(name, 4);
+                                    break;
+                                case 6: // save scale
                                     saveMicrotonal(block.data[2], 0, block.data[3]);
                                     break;
                             }
@@ -2318,8 +2323,8 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             unsigned char fadeType = fadeAll & 0xff;
             if (fadeAll > 0 && fadeAll < 3)
                 writeRBP(6, fadeAll); // stop and master reset
-            else if (fadeType == 3)
-                writeRBP(6, fadeType, fadeAll >> 8, 0); // load patchset
+            else if (fadeType == 3 || fadeType == 5)
+                writeRBP(6, fadeType, fadeAll >> 8, 0); // load patchset or state
             else if (fadeType == 4)
                 writeRBP(6, fadeType, (fadeAll >> 8) & 0xff, fadeAll >> 16); // load vector
             fadeAll = 0;
@@ -2474,7 +2479,27 @@ void SynthEngine::applyparameters(void)
 }
 
 
-int SynthEngine::loadPatchSetAndUpdate(string fname)
+void SynthEngine::loadStateAndUpdate(string filename)
+{
+    bool result = Runtime.loadState(filename);
+    if (result)
+    {
+        addHistory(filename, 4);
+        Runtime.Log("Loaded " + filename);
+        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0x80 | (miscMsgPush(findleafname(filename))));
+    }
+    else
+    {
+        Runtime.Log("Could not load " + filename);
+        if (Runtime.showGui)
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Could not load " + filename));
+    }
+    ShutUp();
+    Unmute();
+}
+
+
+void SynthEngine::loadPatchSetAndUpdate(string fname)
 {
     bool result = false;
     fname = setExtension(fname, "xmz");
@@ -2499,7 +2524,6 @@ int SynthEngine::loadPatchSetAndUpdate(string fname)
         if (Runtime.showGui)
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Could not load " + fname));
     }
-    return result;
 }
 
 
@@ -2512,7 +2536,9 @@ void SynthEngine::loadMicrotonal(unsigned char msg, unsigned char type, char sou
         case 0: // scale
             microtonal.defaults();
             if (microtonal.loadXML(setExtension(fname, "xsz")))
+            {
                 addHistory(fname, 3);
+            }
             else
                 ok = false;
             break;
@@ -2533,7 +2559,9 @@ void SynthEngine::saveMicrotonal(unsigned char msg, unsigned char type, char sou
     {
         case 0: // scale
             if (microtonal.saveXML(setExtension(fname, "xsz")))
+            {
                 addHistory(fname, 3);
+            }
             else
                 ok = false;
             break;
@@ -2625,11 +2653,7 @@ bool SynthEngine::saveBanks(int instance)
 
 void SynthEngine::addHistory(string name, int group)
 {
-    unsigned int name_start = name.rfind("/");
-    unsigned int name_end = name.rfind(".");
-
-    if (name_start == string::npos || name_end == string::npos
-            || (name_start - 1) >= name_end)
+    if (findleafname(name) < "!")
         return;
     unsigned int offset = 0;
     bool copy = false;
@@ -3041,7 +3065,9 @@ bool SynthEngine::saveVector(unsigned char baseChan, string name, bool full)
     insertVectorData(baseChan, true, xml);
 
     if (xml->saveXMLfile(file))
+    {
         addHistory(file, 5);
+    }
     else
     {
         Runtime.Log("Failed to save data to " + file, 2);

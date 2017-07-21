@@ -2389,16 +2389,40 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = name_msg;
             else
             {
-                Runtime.finishedCLI = false;
-                if (Runtime.loadState(point))
+                bool ok = true;
+                string name;
+                if (point[0] == '@')
                 {
-                    string name = (string) point;
-                    //name += ".state";
-                    Runtime.Log("Loaded " + name);
-                    GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, (0x80 | (miscMsgPush(findleafname(name)) << 8)));
+                    point += 1;
+                    point = skipSpace(point);
+                    tmp = string2int(point);
+                    if (tmp <= 0)
+                    {
+                        ok = false;
+                        reply = value_msg;
+                    }
+                    name = historySelect(4, tmp - 1);
+                    if (name == "")
+                    {
+                        ok = false;
+                        reply = done_msg;
+                    }
+                }
+                else
+                {
+                    name = (string)point;
+                    if (name == "")
+                    {
+                        ok = false;
+                        reply = name_msg;
+                    }
+                }
+                if (ok)
+                {
+                    Runtime.finishedCLI = false;
+                    sendDirect(0, 64, 92, 0xf0, 0xff, 0xff, 0xff, 0xff, miscMsgPush(name));
                     reply = done_msg;
                 }
-                Runtime.finishedCLI = true;
             }
         }
         else if (matchnMove(2, point, "scale"))
@@ -2515,7 +2539,8 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = value_msg;
             else
             {
-                Runtime.saveState(point);
+                Runtime.finishedCLI = false;
+                sendDirect(0, 64, 93, 0xf0, 0xff, 0xff, 0xff, 0xff, miscMsgPush(string(point)));
                 reply = done_msg;
             }
         else if(matchnMove(1, point, "config"))
@@ -2624,7 +2649,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                     {
                         param = string2int(point);
                         point = skipChars(point);
-                        if (((control == 80 || control == 84 || control == 88) && part == 240) || (param == 128))
+                        if (((control == 80 || control == 84 || control == 88 || control == 92 || control == 93) && part == 240) || (param == 128))
                         {
                             string name = string(point);
                             if (name < "!")
@@ -2809,7 +2834,6 @@ void CmdInterface::cmdIfaceCommandLoop()
                         usleep(2000);
                     }
                     while (synth->getRuntime().runSynth && !synth->getRuntime().finishedCLI);
-                    synth->getRuntime().CLIstring = prompt;
                 }
                 sprintf(welcomeBuffer,"%s",prompt.c_str());
             }

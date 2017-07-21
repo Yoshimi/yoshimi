@@ -801,11 +801,11 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
             break;
 
         case 48:
-            contstr = "Tuning Import .scl file ";
+            contstr = "Tuning Import";
             showValue = false;
             break;
         case 49:
-            contstr = "Keymap Import .kbm file ";
+            contstr = "Keymap Import";
             showValue = false;
             break;
 
@@ -1128,14 +1128,28 @@ string InterChange::resolveMain(CommandBlock *getData)
             contstr = "Chan 'solo' Switch CC";
             break;
 
+        case 80:
+            showValue = false;
+            contstr = "Patchset Load";
+
         case 88:
             showValue = false;
-            contstr = "Scale load";
+            contstr = "Scale Load";
             break;
 
         case 89:
             showValue = false;
-            contstr = "Scale save";
+            contstr = "Scale Save";
+            break;
+
+        case 92:
+            showValue = false;
+            contstr = "State Load";
+            break;
+
+        case 93:
+            showValue = false;
+            contstr = "State Save";
             break;
 
         case 96: // doMasterReset(
@@ -3730,6 +3744,13 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
         case 89: // save scale
             synth->writeRBP(7, 6, par2, type);
+            break;
+        case 92: // load state
+            if (write)
+                synth->allStop(5 | (par2 << 8));
+            break;
+        case 93: // save state
+            synth->writeRBP(7, 5, par2);
             break;
         case 96: // master reset
             if (write)
