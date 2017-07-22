@@ -2301,6 +2301,29 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 #ifdef MUTEX
         actionLock(unlock);
 #endif
+        if (fadeAll && fadeLevel <= 0.001f)
+        {
+            Mute();
+            unsigned char fadeType = fadeAll & 0xff;
+            switch (fadeType)
+            {
+                case 1:
+                case 2:
+                    writeRBP(6, fadeType); // stop and master reset
+                    break;
+                case 3:
+                    writeRBP(6, fadeType, fadeAll >> 8, 0); // load patchset
+                    break;
+                case 4:
+                    writeRBP(6, fadeType, (fadeAll >> 8) & 0xff, fadeAll >> 16); // load vector
+                    break;
+                case 5:
+                    writeRBP(6, fadeType, fadeAll >> 8, 0); // load state
+                    break;
+            }
+            fadeAll = 0;
+        }
+
         // Peak calculation for mixed outputs
         VUpeak.values.vuRmsPeakL = 1e-12f;
         VUpeak.values.vuRmsPeakR = 1e-12f;
@@ -2315,19 +2338,6 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             // RMS Peak
             VUpeak.values.vuRmsPeakL += mainL[idx] * mainL[idx];
             VUpeak.values.vuRmsPeakR += mainR[idx] * mainR[idx];
-        }
-
-        if (fadeAll && fadeLevel <= 0.001f)
-        {
-            Mute();
-            unsigned char fadeType = fadeAll & 0xff;
-            if (fadeAll > 0 && fadeAll < 3)
-                writeRBP(6, fadeAll); // stop and master reset
-            else if (fadeType == 3 || fadeType == 5)
-                writeRBP(6, fadeType, fadeAll >> 8, 0); // load patchset or state
-            else if (fadeType == 4)
-                writeRBP(6, fadeType, (fadeAll >> 8) & 0xff, fadeAll >> 16); // load vector
-            fadeAll = 0;
         }
 
         // Peak computation for part vu meters
@@ -2501,25 +2511,20 @@ void SynthEngine::loadStateAndUpdate(string filename)
 
 void SynthEngine::loadPatchSetAndUpdate(string fname)
 {
-    bool result = false;
+    actionLock(lockmute);
+    bool result;
     fname = setExtension(fname, "xmz");
-    if (loadXML(fname)) // load the data
-    {
-        result = true;
-        actionLock(lockmute);
-        setAllPartMaps();
-        addHistory(fname, 2);
-        actionLock(unlock);
-    }
-
+    result = loadXML(fname); // load the data
+    actionLock(unlock);
     if (result)
     {
+        setAllPartMaps();
+        addHistory(fname, 2);
         Runtime.Log("Loaded " + fname);
         GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
     }
     else
     {
-        Unmute();
         Runtime.Log("Could not load " + fname);
         if (Runtime.showGui)
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Could not load " + fname));
