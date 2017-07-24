@@ -383,13 +383,13 @@ void InterChange::transfertext(CommandBlock *getData)
     {
 
         getData->data.value = float(value);
-        if (write)
-            getData->data.par2 = miscMsgPush(text); // pass it on
+        if (synth->getRuntime().showGui && write && !((type & 0x20) && npart == 248))
+            getData->data.par2 = miscMsgPush(text); // pass it on to GUI
         else
             getData->data.par2 = 0xff;
         jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
-        if (npart == 232 && control == 48)
-        {   // loading a scale includes a name!
+        if (synth->getRuntime().showGui && npart == 232 && control == 48)
+        {   // loading a tuning includes a name!
             getData->data.control = 64;
             getData->data.par2 = miscMsgPush(synth->microtonal.Pname);
             jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
@@ -801,11 +801,11 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
             break;
 
         case 48:
-            contstr = "Tuning Import .scl file ";
+            contstr = "Tuning Import";
             showValue = false;
             break;
         case 49:
-            contstr = "Keymap Import .kbm file ";
+            contstr = "Keymap Import";
             showValue = false;
             break;
 
@@ -1128,14 +1128,28 @@ string InterChange::resolveMain(CommandBlock *getData)
             contstr = "Chan 'solo' Switch CC";
             break;
 
+        case 80:
+            showValue = false;
+            contstr = "Patchset Load";
+
         case 88:
             showValue = false;
-            contstr = "Scale load";
+            contstr = "Scale Load";
             break;
 
         case 89:
             showValue = false;
-            contstr = "Scale save";
+            contstr = "Scale Save";
+            break;
+
+        case 92:
+            showValue = false;
+            contstr = "State Load";
+            break;
+
+        case 93:
+            showValue = false;
+            contstr = "State Save";
             break;
 
         case 96: // doMasterReset(
@@ -2811,9 +2825,6 @@ void InterChange::returns(CommandBlock *getData)
         return;
     }
 
-    if ((type & 0x20) && npart == 248)
-        string dump = miscMsgPop(getData->data.par2); // this needs sorted properly!
-
     bool isCliOrGuiRedraw = type & 0x10; // separated out for clarity
     bool isMidi = type & 8;
     bool write = (type & 0x40) > 0;
@@ -3733,6 +3744,13 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
         case 89: // save scale
             synth->writeRBP(7, 6, par2, type);
+            break;
+        case 92: // load state
+            if (write)
+                synth->allStop(5 | (par2 << 8));
+            break;
+        case 93: // save state
+            synth->writeRBP(7, 5, par2);
             break;
         case 96: // master reset
             if (write)
@@ -6526,6 +6544,7 @@ void InterChange::commandEffects(CommandBlock *getData)
 void InterChange::testLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
+
     if (value == FLT_MAX) // this one's destructive
     {
         returnLimits(getData);
@@ -6581,7 +6600,7 @@ void InterChange::testLimits(CommandBlock *getData)
         return;
     }
 
-    if (value > newData.limits.max)
+    if (value > newData.limits.max) // adjust to limits
         value = newData.limits.max;
     else if (value < newData.limits.min)
         value = newData.limits.min;

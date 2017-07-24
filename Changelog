@@ -1,17 +1,35 @@
 yoshimi 1.5.2 M
 
-
-2017-7-18 Jesper
+2017-7-24 Jesper
 * Bugfix: Fixed segfault from edge cases when float->int
   conversion was very close to zero in formant filter
   transition calculations.
 * New formant filter editing tools - visual parameter
-  manipulation on the frequency graph, primarily
+  manipulation directly on the frequency graph, primarily
   mouse-driven.
 * New tooltips for the formant filter control knobs and
   amended related tooltips in filter envelopes/LFO's
   to show the differences between formant filters and
   the other types.
+
+2017-7-22 Will
+* Minor optimisations and clarifications.
+* Updated man page.
+
+2017-7-21 Will
+* Removed some redundant code.
+* State load is now 'silent'.
+* Implemented lock-free state load & save.
+* Fixed potential memory leak in session save.
+* Doc updates - of course :)
+
+2017-7-20 Will
+* Improved CLI handling of delays from slow actions.
+  Has a switch that only releases when action completes.
+* More doc updates and corrections.
+
+2017-7-19 Will
+* transfertext() now checks GUI exists before sending.
 
 2017-7-18 Will
 * Bugfix: Bank dropdown list was showing wrong entry

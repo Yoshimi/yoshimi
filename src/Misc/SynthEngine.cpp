@@ -479,7 +479,7 @@ void *SynthEngine::RBPthread(void)
                                 loadVectorAndUpdate(block.data[3], block.data[2]);
                                 break;
                             case 5: // load state
-                                ; //to do
+                                loadStateAndUpdate(miscMsgPop(block.data[2]));
                                 break;
 
                             case 6: // load scale
@@ -496,7 +496,12 @@ void *SynthEngine::RBPthread(void)
                                 // test configChanged
                                 // for success
                                     break;
-                                case 6:
+                                case 5: // save state
+                                    name = miscMsgPop(block.data[2]);
+                                    if (Runtime.saveState(name))
+                                        addHistory(name, 4);
+                                    break;
+                                case 6: // save scale
                                     saveMicrotonal(block.data[2], 0, block.data[3]);
                                     break;
                             }
@@ -518,6 +523,8 @@ void *SynthEngine::RBPthread(void)
                         setPartMap(block.data[1]);
                         break;
                 }
+                // in case it was called from CLI
+                Runtime.finishedCLI = true;
             }
             else
                 Runtime.Log("Unable to read data from Root/Bank/Program");
@@ -928,7 +935,7 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
     string fname = bank.getfilename(pgm);
 
     if ((fname == "") || (bank.getname(pgm) < "!")) // can't get a program name less than this
-        Runtime.Log("No Program " + asString(pgm) + " in this bank");
+        Runtime.Log("No Program " + asString(pgm + 1) + " in this bank");
     else
     {
         if (chan <  NUM_MIDI_CHANNELS) // a normal program change
@@ -2294,6 +2301,29 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 #ifdef MUTEX
         actionLock(unlock);
 #endif
+        if (fadeAll && fadeLevel <= 0.001f)
+        {
+            Mute();
+            unsigned char fadeType = fadeAll & 0xff;
+            switch (fadeType)
+            {
+                case 1:
+                case 2:
+                    writeRBP(6, fadeType); // stop and master reset
+                    break;
+                case 3:
+                    writeRBP(6, fadeType, fadeAll >> 8, 0); // load patchset
+                    break;
+                case 4:
+                    writeRBP(6, fadeType, (fadeAll >> 8) & 0xff, fadeAll >> 16); // load vector
+                    break;
+                case 5:
+                    writeRBP(6, fadeType, fadeAll >> 8, 0); // load state
+                    break;
+            }
+            fadeAll = 0;
+        }
+
         // Peak calculation for mixed outputs
         VUpeak.values.vuRmsPeakL = 1e-12f;
         VUpeak.values.vuRmsPeakR = 1e-12f;
@@ -2308,19 +2338,6 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             // RMS Peak
             VUpeak.values.vuRmsPeakL += mainL[idx] * mainL[idx];
             VUpeak.values.vuRmsPeakR += mainR[idx] * mainR[idx];
-        }
-
-        if (fadeAll && fadeLevel <= 0.001f)
-        {
-            Mute();
-            unsigned char fadeType = fadeAll & 0xff;
-            if (fadeAll > 0 && fadeAll < 3)
-                writeRBP(6, fadeAll); // stop and master reset
-            else if (fadeType == 3)
-                writeRBP(6, fadeType, fadeAll >> 8, 0); // load patchset
-            else if (fadeType == 4)
-                writeRBP(6, fadeType, (fadeAll >> 8) & 0xff, fadeAll >> 16); // load vector
-            fadeAll = 0;
         }
 
         // Peak computation for part vu meters
@@ -2472,32 +2489,46 @@ void SynthEngine::applyparameters(void)
 }
 
 
-int SynthEngine::loadPatchSetAndUpdate(string fname)
+void SynthEngine::loadStateAndUpdate(string filename)
 {
-    bool result = false;
-    fname = setExtension(fname, "xmz");
-    if (loadXML(fname)) // load the data
-    {
-        result = true;
-        actionLock(lockmute);
-        setAllPartMaps();
-        addHistory(fname, 2);
-        actionLock(unlock);
-    }
-
+    bool result = Runtime.loadState(filename);
     if (result)
     {
+        addHistory(filename, 4);
+        Runtime.Log("Loaded " + filename);
+        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0x80 | (miscMsgPush(findleafname(filename))));
+    }
+    else
+    {
+        Runtime.Log("Could not load " + filename);
+        if (Runtime.showGui)
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Could not load " + filename));
+    }
+    ShutUp();
+    Unmute();
+}
+
+
+void SynthEngine::loadPatchSetAndUpdate(string fname)
+{
+    actionLock(lockmute);
+    bool result;
+    fname = setExtension(fname, "xmz");
+    result = loadXML(fname); // load the data
+    actionLock(unlock);
+    if (result)
+    {
+        setAllPartMaps();
+        addHistory(fname, 2);
         Runtime.Log("Loaded " + fname);
         GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
     }
     else
     {
-        Unmute();
         Runtime.Log("Could not load " + fname);
         if (Runtime.showGui)
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Could not load " + fname));
     }
-    return result;
 }
 
 
@@ -2510,7 +2541,9 @@ void SynthEngine::loadMicrotonal(unsigned char msg, unsigned char type, char sou
         case 0: // scale
             microtonal.defaults();
             if (microtonal.loadXML(setExtension(fname, "xsz")))
+            {
                 addHistory(fname, 3);
+            }
             else
                 ok = false;
             break;
@@ -2531,7 +2564,9 @@ void SynthEngine::saveMicrotonal(unsigned char msg, unsigned char type, char sou
     {
         case 0: // scale
             if (microtonal.saveXML(setExtension(fname, "xsz")))
+            {
                 addHistory(fname, 3);
+            }
             else
                 ok = false;
             break;
@@ -2623,11 +2658,7 @@ bool SynthEngine::saveBanks(int instance)
 
 void SynthEngine::addHistory(string name, int group)
 {
-    unsigned int name_start = name.rfind("/");
-    unsigned int name_end = name.rfind(".");
-
-    if (name_start == string::npos || name_end == string::npos
-            || (name_start - 1) >= name_end)
+    if (findleafname(name) < "!")
         return;
     unsigned int offset = 0;
     bool copy = false;
@@ -3039,7 +3070,9 @@ bool SynthEngine::saveVector(unsigned char baseChan, string name, bool full)
     insertVectorData(baseChan, true, xml);
 
     if (xml->saveXMLfile(file))
+    {
         addHistory(file, 5);
+    }
     else
     {
         Runtime.Log("Failed to save data to " + file, 2);

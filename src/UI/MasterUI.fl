@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified June 2017
+Modified July 2017
 
 
 } {in_source in_header
@@ -498,7 +498,6 @@ paramsui->Show(3);}
     if (fle)
     {
         setState(fle);
-        synth->addHistory(fle, 4);
         RecentState->activate();
     }
     else
@@ -513,9 +512,8 @@ paramsui->Show(3);}
                                             laststatefile.c_str(), 0);
                 if (fle)
                 {
+                    send_data(93, 0, 0xc0, 0xf0, 0xff, 0xff, 0xff, miscMsgPush(string(fle)));
                     laststatefile = string(fle);
-                    synth->getRuntime().saveState(laststatefile);
-                    synth->addHistory(laststatefile, 4);
                     RecentState->activate();
                 }}
             tooltip {Save session state} xywh {10 10 34 21} labelsize 12
@@ -1637,6 +1635,10 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             }
         }} {}
   }
+  Function {setState(string filename)} {} {
+    code {//
+    send_data(92, 0, 0xc0, 0xf0, 0xff, 0xff, 0xff, miscMsgPush(filename));} {}
+  }
   Function {setPartWindowTitle(string prefix)} {return_type string
   } {
     code {//
@@ -1700,12 +1702,6 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     code {//
         if (_npart == npart)
             partui->instrumenteditwindow->show();} {}
-  }
-  Function {setState(string filename)} {} {
-    code {//
-    laststatefile = string(filename);
-    synth->getRuntime().loadState(filename);
-    synth->getGuiMaster()->refresh_master_ui(0x80 | (miscMsgPush(findleafname(filename)) << 8));} {}
   }
   Function {updateBankRootDirs()} {} {
     code {bankui->readbankcfg();} {}

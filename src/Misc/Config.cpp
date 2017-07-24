@@ -102,6 +102,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     stateChanged(false),
     restoreJackSession(false),
     runSynth(true),
+    finishedCLI(true),
     VirKeybLayout(0),
     audioEngine(DEFAULT_AUDIO),
     midiEngine(DEFAULT_MIDI),
@@ -686,7 +687,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
 }
 
 
-void Config::saveSessionData(string savefile)
+bool Config::saveSessionData(string savefile)
 {
     string ext = ".state";
     if (savefile.rfind(ext) != (savefile.length() - 6))
@@ -696,15 +697,22 @@ void Config::saveSessionData(string savefile)
     if (!xmltree)
     {
         Log("saveSessionData failed xmltree allocation", 1);
-        return;
+        return false;
     }
+    bool ok = true;
     addConfigXML(xmltree);
     synth->add2XML(xmltree);
     synth->midilearn.insertMidiListData(false, xmltree);
     if (xmltree->saveXMLfile(savefile))
         Log("Session data saved to " + savefile);
     else
+    {
+        ok = false;
         Log("Failed to save session data to " + savefile, 1);
+    }
+    if (xmltree)
+        delete xmltree;
+    return ok;
 }
 
 

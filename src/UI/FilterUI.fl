@@ -357,7 +357,7 @@ return Fl_Box::handle(event);} {}
   }
 }
 
-class FilterUI {: {public Fl_Group,PresetsUI_}
+class FilterUI {selected: {public Fl_Group,PresetsUI_}
 } {
   Function {FilterUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
@@ -578,7 +578,7 @@ send_data(10, o->value(), 0xc0);}
   Function {make_formant_window()} {} {
     Fl_Window formantparswindow {
       label {Formant Filter Parameters}
-      xywh {1219 21 700 205} type Double labelfont 1 labelsize 12 visible
+      xywh {89 20 700 205} type Double labelfont 1 labelsize 12 hide
     } {
       Fl_Group {} {
         xywh {485 47 105 113} box THIN_UP_BOX
@@ -603,7 +603,7 @@ send_data(33, o->value(), 0xc0);}
           code0 {o->bounds(0,FF_MAX_VOWELS-1);}
           code1 {o->value(nvowel);}
         }
-        Fl_Group formantparsgroup {open
+        Fl_Group formantparsgroup {
           xywh {490 105 95 50} box ENGRAVED_FRAME
         } {
           Fl_Dial formant_freq_dial {

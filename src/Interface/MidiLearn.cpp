@@ -375,6 +375,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         if (loadList(name))
             synth->getRuntime().Log("Loaded " + name);
         updateGui();
+        synth->getRuntime().finishedCLI = true;
         return;
     }
     if (control == 242) // list controls
@@ -382,7 +383,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         int tmp = synth->SetSystemValue(106, par2);
         if (tmp == -1)
         {
-            synth->getRuntime().Log("No entry for number " + to_string(int(par2)));
+            synth->getRuntime().Log("No entry for number " + to_string(int(par2 + 1)));
         }
         else
         {
@@ -391,6 +392,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
                 synth->getRuntime().Log("Loaded " + name);
             updateGui();
         }
+        synth->getRuntime().finishedCLI = true;
         return;
     }
     if (control == 245)
@@ -398,6 +400,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         name = (miscMsgPop(par2));
         if (saveList(name))
             synth->getRuntime().Log("Saved " + name);
+        synth->getRuntime().finishedCLI = true;
         return;
     }
     if (control == 255)

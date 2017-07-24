@@ -1,6 +1,6 @@
 The learn process comes after NRPNs and vectors, but before all other controllers.
 
-To learn, hold CTRL while right-clicking on any GUI control then operate physical control.
+To learn, hold CTRL while right-clicking on any GUI control then operate a physical control.
 
 Along with parameters, a text string is provided with precise details of this complete action.
 
@@ -12,7 +12,7 @@ Multiple actions on the same CC/channel pair.
 
 Range limiting or compression.
 
-Blocking of all later actions on the same CC.channel pair.
+Blocking of all later actions on the same CC / channel pair.
 
 Muting of this action.
 
