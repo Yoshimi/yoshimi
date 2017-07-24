@@ -478,7 +478,7 @@ void *SynthEngine::RBPthread(void)
                             case 4: // load vector
                                 loadVectorAndUpdate(block.data[3], block.data[2]);
                                 break;
-                            case 5: // load state
+                            case 5: // load state redundant?
                                 loadStateAndUpdate(miscMsgPop(block.data[2]));
                                 break;
 
@@ -496,7 +496,7 @@ void *SynthEngine::RBPthread(void)
                                 // test configChanged
                                 // for success
                                     break;
-                                case 5: // save state
+                                case 5: // save state redundant?
                                     name = miscMsgPop(block.data[2]);
                                     if (Runtime.saveState(name))
                                         addHistory(name, 4);
@@ -2303,6 +2303,15 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 #endif
         if (fadeAll && fadeLevel <= 0.001f)
         {
+            /*
+             * we can replace some of these with a
+             * direct call with param block to
+             * interchange.returns(getdata)
+             * setting parameter to 128
+             * then using the transfer text
+             * it's then possible to get return
+             * messages.
+             */
             Mute();
             unsigned char fadeType = fadeAll & 0xff;
             switch (fadeType)
@@ -2317,8 +2326,8 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                 case 4:
                     writeRBP(6, fadeType, (fadeAll >> 8) & 0xff, fadeAll >> 16); // load vector
                     break;
-                case 5:
-                    writeRBP(6, fadeType, fadeAll >> 8, 0); // load state
+                case 5: // load state
+                    interchange.mediate(fadeAll);
                     break;
             }
             fadeAll = 0;
@@ -2495,14 +2504,14 @@ void SynthEngine::loadStateAndUpdate(string filename)
     if (result)
     {
         addHistory(filename, 4);
-        Runtime.Log("Loaded " + filename);
-        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0x80 | (miscMsgPush(findleafname(filename))));
+        //Runtime.Log("Loaded " + filename);
+        //GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0x80 | (miscMsgPush(findleafname(filename))));
     }
     else
     {
         Runtime.Log("Could not load " + filename);
-        if (Runtime.showGui)
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Could not load " + filename));
+        //if (Runtime.showGui)
+            //GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Could not load " + filename));
     }
     ShutUp();
     Unmute();

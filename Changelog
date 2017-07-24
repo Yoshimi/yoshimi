@@ -1,5 +1,8 @@
 yoshimi 1.5.2 M
 
+2017-7-24 Will
+* Started refining loads and saves (state first).
+
 2017-7-22 Will
 * Minor optimisations and clarifications.
 * Updated man page.

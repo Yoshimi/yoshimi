@@ -331,6 +331,17 @@ void InterChange::transfertext(CommandBlock *getData)
                 break;
         }
     }
+    else if (npart == 240)
+    {
+        switch (control)
+        {
+            case 92:
+                synth->loadStateAndUpdate(text);
+                value = miscMsgPush(text);
+                getData->data.parameter &= 0x7f;
+                break;
+        }
+    }
     else if (npart == 248)
     {
         switch (control)
@@ -379,7 +390,7 @@ void InterChange::transfertext(CommandBlock *getData)
         getData->data.parameter &= 0x7f;
     }
 
-    if (!(getData->data.parameter & 0x80) && jack_ringbuffer_write_space(returnsLoopback) >= commandSize)
+    if (getData->data.parameter < 0x80 && jack_ringbuffer_write_space(returnsLoopback) >= commandSize)
     {
 
         getData->data.value = float(value);
@@ -444,6 +455,8 @@ void InterChange::resolveReplies(CommandBlock *getData)
 {
     float value = getData->data.value;
     unsigned char type = getData->data.type;
+    if (type == 0xff)
+        return; // no action required
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -666,8 +679,10 @@ void InterChange::resolveReplies(CommandBlock *getData)
         synth->getRuntime().Log(commandName + actual);
 #endif
     */
-else if (isGui || isCli)
-    synth->getRuntime().Log(commandName + actual);
+    else if (isGui || isCli)
+        synth->getRuntime().Log(commandName + actual);
+// in case it was called from CLI
+    synth->getRuntime().finishedCLI = true;
 }
 
 
@@ -1098,8 +1113,9 @@ string InterChange::resolveConfig(CommandBlock *getData)
 
 string InterChange::resolveMain(CommandBlock *getData)
 {
+    int value_int = int(getData->data.value);
     unsigned char control = getData->data.control;
-
+    string name;
     string contstr = "";
     switch (control)
     {
@@ -1144,12 +1160,14 @@ string InterChange::resolveMain(CommandBlock *getData)
 
         case 92:
             showValue = false;
-            contstr = "State Load";
+            name = miscMsgPop(value_int);
+            contstr = "Loaded State " + name;
+            //GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 0x80 | miscMsgPush(name));
             break;
 
         case 93:
             showValue = false;
-            contstr = "State Save";
+            contstr = "Saved State " + miscMsgPop(value_int);
             break;
 
         case 96: // doMasterReset(
@@ -2731,9 +2749,14 @@ string InterChange::resolveEffects(CommandBlock *getData)
 }
 
 
-void InterChange::mediate()
+void InterChange::mediate(int altData)
 {
     CommandBlock getData;
+    if (altData)
+    {
+        returnsDirect(&getData, altData);
+        return;
+    }
     size_t commandSize = sizeof(getData);
     bool more;
     size_t size;
@@ -2807,18 +2830,36 @@ void InterChange::mediate()
 }
 
 
+void InterChange::returnsDirect(CommandBlock *putData, int altData)
+{
+    memset(putData, 0xff, sizeof(putData));
+    switch (altData & 0xff)
+    {
+        case 5:
+            putData->data.control = 92;
+            putData->data.type = altData >> 24;
+            putData->data.part = 0xf0;
+            putData->data.parameter = 0x80;
+            putData->data.par2 = (altData >> 8) & 0xff;
+            break;
+        default:
+            return;
+            break;
+    }
+    returns(putData);
+}
+
 void InterChange::returns(CommandBlock *getData)
 {
     float value = getData->data.value;
-    if (value == FLT_MAX)
-        return; // need to sort this out later
+//    if (value == FLT_MAX)
+//        return; // need to sort this out later
     unsigned char type = getData->data.type | 4; // back from synth
-//    unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
-//    unsigned char kititem = getData->data.kit;
-//    unsigned char engine = getData->data.engine;
-//    unsigned char insert = getData->data.insert;
-    if ((getData->data.parameter & 0x80) && getData->data.parameter < 0xff)
+
+    if (type == 0xff)
+        return;
+    if ((getData->data.parameter & 0x80) && getData->data.parameter < 0xc0)
     {
         if (jack_ringbuffer_write_space(toCLI) >= commandSize)
         jack_ringbuffer_write(toCLI, (char*) getData->bytes, commandSize); // this will redirect where needed.
@@ -2880,22 +2921,27 @@ bool InterChange::commandSendReal(CommandBlock *getData)
 {
     float value = getData->data.value;
     unsigned char parameter = getData->data.parameter;
-    if ((parameter & 0x80) && parameter < 0xff)
+    if ((parameter & 0x80) && parameter < 0xc0)
         return true; // text message transfer
     if (value == FLT_MAX)
     {
         returnLimits(getData); // this can be accessed directly
         return false;
     }
+
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
+    unsigned char par2 = getData->data.par2;
 //    bool isCli = type & 0x10;
     bool isGui = type & 0x20;
     char button = type & 3;
+
+    //cout << "Type " << int(type) << "  Control " << int(control) << "  Part " << int(npart) << "  Kit " << int(kititem) << "  Engine " << int(engine) << endl;
+    //cout  << "Insert " << int(insert)<< "  Parameter " << int(parameter) << "  Par2 " << int(par2) << endl;
 
     if (!isGui && button == 1)
         return false;
@@ -3670,12 +3716,14 @@ void InterChange::commandMain(CommandBlock *getData)
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char kititem = getData->data.kit;
+    unsigned char insert = getData->data.insert;
+    unsigned char parameter = getData->data.parameter;
     unsigned char par2 = getData->data.par2;
 
     bool write = (type & 0x40) > 0;
 
     int value_int = lrint(value);
-
+string name;
     switch (control)
     {
         case 0:
@@ -3746,8 +3794,11 @@ void InterChange::commandMain(CommandBlock *getData)
             synth->writeRBP(7, 6, par2, type);
             break;
         case 92: // load state
-            if (write)
-                synth->allStop(5 | (par2 << 8));
+            if (write && (parameter == 0xc0))
+            {
+                synth->allStop(5 | (par2 << 8) | (type << 24));
+                getData->data.type = 0xff; // stop further action
+            }
             break;
         case 93: // save state
             synth->writeRBP(7, 5, par2);

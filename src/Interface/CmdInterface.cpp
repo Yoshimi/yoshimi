@@ -2420,7 +2420,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 if (ok)
                 {
                     Runtime.finishedCLI = false;
-                    sendDirect(0, 64, 92, 0xf0, 0xff, 0xff, 0xff, 0xff, miscMsgPush(name));
+                    sendDirect(0, 64, 92, 0xf0, 0xff, 0xff, 0xff, 0xc0, miscMsgPush(name));
                     reply = done_msg;
                 }
             }

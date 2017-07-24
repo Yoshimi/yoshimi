@@ -1,4 +1,8 @@
 
+State load and patchset load dn't set up vectors properly.
+panel is greyed, incoming CCs are both zero and no features.
+Hmmm, seems OK for the first base channel.
+
 NRPN channels?
 
 Fl::check() used too liberally. See where it can be removed - controls updating multiple windows seem the be the main problem.
