@@ -26,7 +26,6 @@
 #define FORMANT_FILTER_H
 
 #include "Misc/MiscFuncs.h"
-#include "Misc/Float2Int.h"
 #include "Misc/SynthHelper.h"
 #include "DSP/Filter_.h"
 #include "DSP/AnalogFilter.h"
@@ -34,7 +33,7 @@
 
 class SynthEngine;
 
-class FormantFilter : public Filter_, private MiscFuncs, private SynthHelper, private Float2Int
+class FormantFilter : public Filter_, private MiscFuncs, private SynthHelper
 {
     public:
         FormantFilter(FilterParams *pars, SynthEngine *_synth);

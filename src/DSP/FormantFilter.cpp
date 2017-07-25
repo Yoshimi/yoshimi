@@ -97,7 +97,7 @@ void FormantFilter::setpos(float input)
 {
     int p1, p2;
 
-    if (firsttime != 0)
+    if (firsttime)
         slowinput = input;
     else
         slowinput = slowinput * (1.0f - formantslowness) + input * formantslowness;
@@ -111,26 +111,23 @@ void FormantFilter::setpos(float input)
     } else
         oldinput = input;
 
-    float pos = fmodf(input * sequencestretch, 1.0f);
-    if (pos < 0.0f)
-        pos += 1.0f;
+    float pos = input * sequencestretch;
+    pos -= floorf(pos);
 
-    p2 = float2int(pos * sequencesize);
+    p2 = (int)(pos * sequencesize);
     p1 = p2 - 1;
     if (p1 < 0)
         p1 += sequencesize;
 
-    pos = fmodf(pos * sequencesize, 1.0f);
-    if (pos < 0.0f)
-        pos = 0.0f;
-    else if (pos > 1.0f)
-        pos = 1.0f;
+    pos = pos * sequencesize;
+    pos -= floorf(pos);
+
     pos = (atanf((pos * 2.0f - 1.0f) * vowelclearness) / atanf(vowelclearness) + 1.0f) * 0.5f;
 
     p1 = sequence[p1].nvowel;
     p2 = sequence[p2].nvowel;
 
-    if (firsttime != 0)
+    if (firsttime)
     {
         for (int i = 0; i < numformants; ++i)
         {
