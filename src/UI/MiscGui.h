@@ -44,14 +44,17 @@ enum ValueType {
     VC_EnvelopeAmpSusVal,
     VC_EnvelopeLinAmpSusVal,
     VC_EnvelopeBandwidthVal,
-    VC_FilterFreq0,
-    VC_FilterFreq1,
-    VC_FilterFreq2,
+    VC_FilterFreq0, // Analog
+    VC_FilterFreq1, // Formant
+    VC_FilterFreq2, // StateVar
     VC_FilterFreqTrack0,
     VC_FilterFreqTrack1,
     VC_FilterQ,
     VC_FilterVelocityAmp,
     VC_FilterVelocitySense,
+    VC_FormFilterClearness,
+    VC_FormFilterSlowness,
+    VC_FormFilterStretch,
     VC_InstrumentVolume,
     VC_ADDVoiceVolume,
     VC_ADDVoiceDelay,

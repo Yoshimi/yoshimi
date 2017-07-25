@@ -196,11 +196,11 @@ else
    fl_color(255,0,0);
    time=env->getdt(currentpoint);
 };
-char tmpstr[20];
+char tmpstr[40];
 if (time<1000.0)
-    snprintf((char *)&tmpstr,20,"%.1fms",time);
+    snprintf((char *)&tmpstr,40,"%.1fms",time);
 else
-    snprintf((char *)&tmpstr,20,"%.2fs",time/1000.0);
+    snprintf((char *)&tmpstr,40,"%.2fs",time/1000.0);
 fl_draw(tmpstr,ox+lx-20,oy+ly-10,20,10,FL_ALIGN_RIGHT,NULL,0);
 
 //Draw formatted point value in the top right corner when dragging points
@@ -231,7 +231,7 @@ if(currentpoint >= 0){
 
    strcpy(tmpstr, valDesc.c_str());
    fl_color(FL_CYAN);
-   fl_draw(tmpstr,ox+lx-20,oy,20,10,FL_ALIGN_RIGHT,NULL,0);
+   fl_draw(tmpstr,ox+lx-30,oy,30,25,FL_ALIGN_RIGHT,NULL,0);
 }} {}
   }
   Function {handle(int event)} {return_type int
