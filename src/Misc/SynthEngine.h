@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified March 2017
+    Modified July 2017
 */
 
 #ifndef SYNTHENGINE_H
@@ -82,7 +82,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         bool loadXML(string filename);
         void applyparameters(void);
-        void loadStateAndUpdate(string filename);
+        bool loadStateAndUpdate(string filename);
         void loadPatchSetAndUpdate(string filename);
         void loadMicrotonal(unsigned char msg, unsigned char type, char source);
         void saveMicrotonal(unsigned char msg, unsigned char type, char source);
@@ -95,7 +95,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool saveHistory(void);
         void loadVectorAndUpdate(unsigned char baseChan, unsigned char nameID);
         unsigned char loadVector(unsigned char baseChan, string name, bool full);
-        unsigned char extractVectorData(unsigned char *baseChan, bool full, XMLwrapper *xml);
+        unsigned char extractVectorData(unsigned char baseChan, XMLwrapper *xml);
         bool saveVector(unsigned char baseChan, string name, bool full);
         bool insertVectorData(unsigned char baseChan, bool full, XMLwrapper *xml);
 

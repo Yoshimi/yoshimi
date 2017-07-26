@@ -2341,7 +2341,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 ch = 255;
                 loadChan = "source channel";
             }
-            if (ch != 255 && tmp >= NUM_MIDI_CHANNELS)
+            if (ch != 255 && ch >= NUM_MIDI_CHANNELS)
                 reply = range_msg;
             else if (point[0] == 0)
                 reply = name_msg;
@@ -2378,7 +2378,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 if (ok)
                 {
                     Runtime.finishedCLI = false;
-                    sendDirect(0, 64, 84, 240, ch, 0, 0, 0, miscMsgPush(name));
+                    sendDirect(0, 64, 84, 240, ch, 255, 255, 255, miscMsgPush(name));
                 }
                 reply = done_msg;
             }

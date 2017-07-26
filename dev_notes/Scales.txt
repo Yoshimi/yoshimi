@@ -6,7 +6,7 @@ For scales, ratios or floating point numbers can be entered.
 
 Ratios are in the form n1 / n2 to a maximum of normal integer range. If just a numerator is set it will be regarded as n/1.
 
-Floating point numbers *must* include the decimal point and at least one digit (or zero) either side. These will be padded out with leading and trailing zeros in the form nnnn.nnnnnn
+Floating point numbers *must* include the decimal point and at least one digit (or a zero) either side. These will be padded out with leading and trailing zeros in the form nnnn.nnnnnn
 
 In keyboard maps, non-sounding notes should be marked with an 'x' instead of the key number.
 
@@ -24,7 +24,7 @@ When saving scales, for floating point numbers we now include the text it was de
 
 However, the stored representation is still saved for backward compatibility with older versions of Yoshimi.
 
-We also now use doubles here instead of floats, as the conversion to and from string form seems to be more accurate.
+We also now use doubles here in some places instead of floats, as the conversion to and from string form seems to be more accurate.
 
 When setting scales/keymaps, or importing .scl/.kbm files the following error numbers may be returned:
 

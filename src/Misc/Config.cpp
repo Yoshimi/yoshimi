@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified May 2017
+    Modified July 2017
 */
 
 #include <iostream>
@@ -753,11 +753,8 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
             }
             ok = synth->getfromXML(xml);
             if (ok)
-            {
-                xml->endbranch(); // we shouldn't need this here
                 synth->setAllPartMaps();
-            }
-            bool oklearn = synth->midilearn.extractMidiListData(true, xml);
+            bool oklearn = synth->midilearn.extractMidiListData(false, xml);
             if (oklearn)
                 synth->midilearn.updateGui(2);
                 // handles possibly undefined window

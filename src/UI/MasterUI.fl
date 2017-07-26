@@ -1137,6 +1137,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
+    bool wasFromHere = getData->data.type & 0x20;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char engine = getData->data.engine;
@@ -1225,8 +1226,10 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             microtonalui->make_window();
             break;
 
-        case 92:
+        case 92: // load state
             name = miscMsgPop(par2);
+            if (wasFromHere && name.find("FAILED") == 1)
+                fl_alert("%s",name.c_str());
             refresh_master_ui(0);
             break;
 
@@ -1547,8 +1550,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     	setMasterLabel(findleafname(synth->lastPatchSetSeen()));
     updatesendwindow();
     updatepanel();
-    for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
-        vectorui->updateAll(false);
+    vectorui->RefreshChans();
     bankui->Hide();
     if (synth->getRuntime().toConsole == false)
         Reports->deactivate();
@@ -1645,7 +1647,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   }
   Function {setState(string filename)} {} {
     code {//
-    send_data(92, 0, 0xc0, 0xf0, 0xff, 0xff, 0xc0, miscMsgPush(filename));} {}
+    send_data(92, 0, 0xf0, 0xf0, 0xff, 0xff, 0xc0, miscMsgPush(filename));} {}
   }
   Function {setPartWindowTitle(string prefix)} {return_type string
   } {

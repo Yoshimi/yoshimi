@@ -17,7 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-Modified March 2017
+Modified July 2017
 } {in_source in_header
 }
 
@@ -553,6 +553,18 @@ if (Xcontrol->value() >= 14)
     Ycontrol->activate();
 else
     Ycontrol->deactivate();} {}
+  }
+  Function {RefreshChans()} {} {
+    code {//
+            for (int i = NUM_MIDI_CHANNELS; i > 0; --i)
+            {
+                BaseChan = i - 1;
+                setInstrumentLabel(BaseChan);
+                setInstrumentLabel(BaseChan + NUM_MIDI_CHANNELS);
+                setInstrumentLabel(BaseChan + NUM_MIDI_CHANNELS * 2);
+                setInstrumentLabel(BaseChan + NUM_MIDI_CHANNELS * 3);
+                setbuttons();
+            }} {}
   }
   Function {setbuttons()} {} {
     code {//

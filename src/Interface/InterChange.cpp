@@ -336,7 +336,10 @@ void InterChange::transfertext(CommandBlock *getData)
         switch (control)
         {
             case 92:
-                synth->loadStateAndUpdate(text);
+                if (synth->loadStateAndUpdate(text))
+                    text = "ed " + text;
+                else
+                    text = " FAILED " + text;
                 value = miscMsgPush(text);
                 getData->data.parameter &= 0x7f;
                 break;
@@ -1161,13 +1164,12 @@ string InterChange::resolveMain(CommandBlock *getData)
         case 92:
             showValue = false;
             name = miscMsgPop(value_int);
-            contstr = "Loaded State " + name;
-            //GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 0x80 | miscMsgPush(name));
+            contstr = "State Load" + name;
             break;
 
         case 93:
             showValue = false;
-            contstr = "Saved State " + miscMsgPop(value_int);
+            contstr = "State Save" + miscMsgPop(value_int);
             break;
 
         case 96: // doMasterReset(
