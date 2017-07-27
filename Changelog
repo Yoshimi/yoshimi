@@ -1,10 +1,16 @@
 yoshimi 1.5.2 M
 
+2017-7-27 Will
+* Improved state save error reporting for GUI & CLI.
+* Tidied master GUI code.
+* Bugfix: Reports button not correctly responding.
+* doc updates.
+
 2017-7-26 Wiil
 * Resolved Vector display issues.
 * More refinements to Vector controls.
 * Improved messaging with state loads.
-* Fixed, non-fatal XML warning messages.
+* Fixed non-fatal XML warning messages.
 
 2017-7-25 Jesper
 * Bugfix: Fixed segfault from edge cases when float->int

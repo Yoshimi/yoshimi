@@ -2509,6 +2509,15 @@ bool SynthEngine::loadStateAndUpdate(string filename)
 }
 
 
+bool SynthEngine::saveState(string filename)
+{
+    bool result = Runtime.saveState(filename);
+    if (result)
+        addHistory(filename, 4);
+    return result;
+}
+
+
 void SynthEngine::loadPatchSetAndUpdate(string fname)
 {
     actionLock(lockmute);

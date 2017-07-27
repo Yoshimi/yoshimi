@@ -11,7 +11,7 @@ which builds an executable called yoshimi, installed by default in
     /usr/local/bin.
 
 
----- Sample instructions to compile/build using ccmake on Linux , outside-source-tree -----
+---- Sample instructions to compile/build using ccmake on Linux, outside-source-tree -----
 
 This uses "yoshimi-1.5.1" as an example, and should work fine with other versions.
 
@@ -35,8 +35,8 @@ Otherwise create it first with:
 
     mkdir yoshimi-1.5.1/build
 
-"/path/to/workDir/yoshimi-1.5.1/" is the source code directory.
-"/path/to/workDir/yoshimi/build" is now the current working directory, and will have make-related files (when ccmake is done with configuring and generates the files).
+"/path/to/workDir/yoshimi-1.5.1/src" is the source code directory.
+"/path/to/workDir/yoshimi-1.5.1/build" is now the current working directory, and will have make-related files (when ccmake is done with configuring and generates the files).
 
 Run ccmake:
 
@@ -64,7 +64,7 @@ For more fine tuned building see INSTALL_CUSTOM
 
 ---- Build and command line options ----
 
-Yoshimi builds with both Jack and Alsa audio and midi options.  Jack is the default for both audio and midi.  However, if this is not available Yoshimi will try for Alsa.  These, and other options can be nominated at runtime via command line parameters, and via the Graphical User Interface.
+Yoshimi builds with both Jack and Alsa audio and midi options.  Jack is the default for both audio and midi.  However, if this is not available Yoshimi will try for Alsa.  These, and other options can be nominated at runtime via command line parameters, and via the Graphical User Interface and Command Line Interface.
 
 
 ---- Instrument banks ----

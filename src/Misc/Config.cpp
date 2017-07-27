@@ -696,7 +696,7 @@ bool Config::saveSessionData(string savefile)
     XMLwrapper *xmltree = new XMLwrapper(synth);
     if (!xmltree)
     {
-        Log("saveSessionData failed xmltree allocation", 1);
+        Log("saveSessionData failed xmltree allocation", 3);
         return false;
     }
     bool ok = true;
@@ -704,11 +704,11 @@ bool Config::saveSessionData(string savefile)
     synth->add2XML(xmltree);
     synth->midilearn.insertMidiListData(false, xmltree);
     if (xmltree->saveXMLfile(savefile))
-        Log("Session data saved to " + savefile);
+        Log("Session data saved to " + savefile, 2);
     else
     {
         ok = false;
-        Log("Failed to save session data to " + savefile, 1);
+        Log("Failed to save session data to " + savefile, 2);
     }
     if (xmltree)
         delete xmltree;
@@ -725,17 +725,17 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
         sessionfile = setExtension(sessionfile, "state");
     if (!sessionfile.size() || !isRegFile(sessionfile))
     {
-        Log("Session file " + sessionfile + " not available", 1);
+        Log("Session file " + sessionfile + " not available", 2);
         goto end_game;
     }
     if (!(xml = new XMLwrapper(synth)))
     {
-        Log("Failed to init xmltree for restoreState", 1);
+        Log("Failed to init xmltree for restoreState", 3);
         goto end_game;
     }
     if (!xml->loadXMLfile(sessionfile))
     {
-        Log("Failed to load xml file " + sessionfile);
+        Log("Failed to load xml file " + sessionfile, 2);
         goto end_game;
     }
     if (startup)
@@ -775,10 +775,10 @@ void Config::Log(string msg, char tostderr)
     if (showGui && !(tostderr & 1) && toConsole)
         LogList.push_back(msg);
     else if (!tostderr & 1)
-        cout << msg << endl;
+        cout << msg << endl; // normal log
 
     else
-        cerr << msg << endl;
+        cerr << msg << endl; // error log
 }
 
 

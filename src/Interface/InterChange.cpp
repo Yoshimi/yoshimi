@@ -343,7 +343,16 @@ void InterChange::transfertext(CommandBlock *getData)
                 value = miscMsgPush(text);
                 getData->data.parameter &= 0x7f;
                 break;
+            case 93:
+                if (synth->saveState(text))
+                    text = "d " + text;
+                else
+                    text = " FAILED " + text;
+                value = miscMsgPush(text);
+                getData->data.parameter &= 0x7f;
+                break;
         }
+
     }
     else if (npart == 248)
     {

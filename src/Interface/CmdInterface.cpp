@@ -2540,7 +2540,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             else
             {
                 Runtime.finishedCLI = false;
-                sendDirect(0, 64, 93, 0xf0, 0xff, 0xff, 0xff, 0xff, miscMsgPush(string(point)));
+                sendDirect(0, 64, 93, 0xf0, 0xff, 0xff, 0xff, 0x80, miscMsgPush(string(point)));
                 reply = done_msg;
             }
         else if(matchnMove(1, point, "config"))

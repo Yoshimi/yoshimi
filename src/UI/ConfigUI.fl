@@ -198,7 +198,7 @@ class ConfigUI {selected : {private MiscFuncs}
           Fl_Choice reports {
             label {Send reports to:}
             callback {//
-                        send_data(5, o->value(), 0xc0);}
+                        send_data(5, o->value(), 0xf0);}
             tooltip {Some system errors always go to stdout} xywh {200 195 150 20} down_box BORDER_BOX labelsize 11 textsize 13
             code0 {o->value(synth->getRuntime().toConsole);}
           } {
@@ -756,16 +756,7 @@ class ConfigUI {selected : {private MiscFuncs}
                     break;
                 case 5:
                     reports->value(value_bool);
-                    if (value_bool)
-                    {
-                        synth->getGuiMaster()->Reports->activate();
-                        synth->getGuiMaster()->yoshiLog->Show();
-                    }
-                    else
-                    {
-                        synth->getGuiMaster()->Reports->deactivate();
-                        synth->getGuiMaster()->yoshiLog->Hide();
-                    }
+                    synth->getGuiMaster()->setLogging(value_bool);
                     break;
 
                 case 16:
