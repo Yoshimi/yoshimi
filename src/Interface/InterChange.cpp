@@ -259,11 +259,12 @@ void InterChange::transfertext(CommandBlock *getData)
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
-//    unsigned char kititem = getData->data.kit;
+    unsigned char kititem = getData->data.kit;
 //    unsigned char engine = getData->data.engine;
 //    unsigned char insert = getData->data.insert;
     bool (write) = (type & 0x40);
     string text = miscMsgPop(getData->data.par2);
+    unsigned char tmp;
 
     if (npart == 232)
     {
@@ -335,6 +336,19 @@ void InterChange::transfertext(CommandBlock *getData)
     {
         switch (control)
         {
+            case 84:
+                tmp = synth->loadVectorAndUpdate(kititem, text);
+                if ( tmp < 0xff)
+                {
+                    getData->data.kit = tmp;
+                    text = "ed " + text + " to " + to_string(int(kititem));
+                }
+                else
+                    text = " FAILED " + text;
+                value = miscMsgPush(text);
+                getData->data.parameter &= 0x7f;
+
+                break;
             case 92:
                 if (synth->loadStateAndUpdate(text))
                     text = "ed " + text;
@@ -1159,6 +1173,12 @@ string InterChange::resolveMain(CommandBlock *getData)
         case 80:
             showValue = false;
             contstr = "Patchset Load";
+
+        case 84:
+            showValue = false;
+            name = miscMsgPop(value_int);
+            contstr = "Vector Load" + name;
+            break;
 
         case 88:
             showValue = false;
@@ -2846,6 +2866,14 @@ void InterChange::returnsDirect(CommandBlock *putData, int altData)
     memset(putData, 0xff, sizeof(putData));
     switch (altData & 0xff)
     {
+        case 4:
+            putData->data.control = 84;
+            putData->data.type = altData >> 24;
+            putData->data.part = 0xf0;
+            putData->data.kit = (altData >> 16) & 0xff;
+            putData->data.parameter = 0x80;
+            putData->data.par2 = (altData >> 8) & 0xff;
+            break;
         case 5:
             putData->data.control = 92;
             putData->data.type = altData >> 24;
@@ -3795,8 +3823,11 @@ string name;
                 synth->allStop(3 | (par2 << 8));
             break;
         case 84: // load vector
-            if (write)
-                synth->allStop(4 | (par2 << 8) | (kititem << 16));
+            if (write && (parameter == 0xc0))
+            {
+                synth->allStop(4 | (par2 << 8) | (kititem << 16) | (type << 24));
+                getData->data.type = 0xff; // stop further action
+            }
             break;
         case 88: // load scale
             synth->writeRBP(6, 6, par2, type);

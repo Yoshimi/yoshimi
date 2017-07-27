@@ -90,15 +90,16 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool installBanks(int instance);
         bool saveBanks(int instance);
         void addHistory(string name, int group);
-        vector<string> * getHistory(int group);
+        vector<string> *getHistory(int group);
+        string vectorName[NUM_MIDI_CHANNELS];
         string lastPatchSetSeen(void);
         bool loadHistory(void);
         bool saveHistory(void);
-        void loadVectorAndUpdate(unsigned char baseChan, unsigned char nameID);
+        unsigned char loadVectorAndUpdate(unsigned char baseChan, string name);
         unsigned char loadVector(unsigned char baseChan, string name, bool full);
-        unsigned char extractVectorData(unsigned char baseChan, XMLwrapper *xml);
+        unsigned char extractVectorData(unsigned char baseChan, XMLwrapper *xml, string name);
         bool saveVector(unsigned char baseChan, string name, bool full);
-        bool insertVectorData(unsigned char baseChan, bool full, XMLwrapper *xml);
+        bool insertVectorData(unsigned char baseChan, bool full, XMLwrapper *xml, string name);
 
         bool getfromXML(XMLwrapper *xml);
 

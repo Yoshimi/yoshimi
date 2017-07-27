@@ -5,6 +5,8 @@ yoshimi 1.5.2 M
 * Tidied master GUI code.
 * Bugfix: Reports button not correctly responding.
 * doc updates.
+* Improved vector loading management.
+* Started making vactor name editable.
 
 2017-7-26 Wiil
 * Resolved Vector display issues.

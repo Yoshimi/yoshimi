@@ -497,6 +497,13 @@ send_data(32, o->value(), 0xc0);}
       }
       Fl_Button Loaded {
         label {No Name}
+        callback {string tmp = "";
+tmp = fl_input("Vector name:", loadlabel[BaseChan].c_str());
+if (!string(tmp).empty())
+{
+    o->copy_label(tmp.c_str());
+    loadlabel[BaseChan]  = tmp; 
+}}
         tooltip {Last saved or loaded vector file} xywh {45 265 198 20} box THIN_DOWN_BOX labelfont 1 labelsize 12
       }
     }
@@ -758,7 +765,7 @@ return col;} {}
         	return;
     	fname = string(filename);
     }
-    send_data(84, 0, 0xc0, 240, BaseChan, 255, 255, 255, miscMsgPush(fname));} {}
+    send_data(84, 0, 0xf0, 240, BaseChan, 255, 255, 192, miscMsgPush(fname));} {}
   }
   Function {saveVector()} {} {
     code {//
@@ -768,7 +775,7 @@ return col;} {}
                 return;
             filename = fl_filename_setext(filename, ".xvy");
             if (isRegFile(string(filename)))
-                if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") > 1)
+                if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                     return;
             synth->actionLock(lockmute);
             bool result = synth->saveVector(BaseChan, string(filename), true);
@@ -790,7 +797,7 @@ synth->getRuntime().nrpndata.vectorYaxis[BaseC] = 0xff;
 synth->getRuntime().nrpndata.vectorXfeatures[BaseC] = 0;
 synth->getRuntime().nrpndata.vectorYfeatures[BaseC] = 0;
 synth->getRuntime().nrpndata.vectorEnabled[BaseC] = false;
-loadlabel[BaseChan] = "No Name";
+loadlabel[BaseChan] = "No Name " + to_string(BaseChan);
 Loaded->copy_label(loadlabel[BaseC].c_str());
 setbuttons();
 Xcontrol->activate();

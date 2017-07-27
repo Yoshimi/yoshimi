@@ -124,6 +124,8 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     memset(&random_state, 0, sizeof(random_state));
 
     ctl = new Controller(this);
+    for (int i = 0; i < NUM_MIDI_CHANNELS; ++ i)
+        vectorName[i] = "No Name " + to_string(i);
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         part[npart] = NULL;
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
@@ -476,7 +478,7 @@ void *SynthEngine::RBPthread(void)
                                 break;
 
                             case 4: // load vector
-                                loadVectorAndUpdate(block.data[3], block.data[2]);
+                                //loadVectorAndUpdate(block.data[3], block.data[2]);
                                 break;
                             case 5: // load state redundant?
                                 loadStateAndUpdate(miscMsgPop(block.data[2]));
@@ -2323,8 +2325,9 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                 case 3:
                     writeRBP(6, fadeType, fadeAll >> 8, 0); // load patchset
                     break;
-                case 4:
-                    writeRBP(6, fadeType, (fadeAll >> 8) & 0xff, fadeAll >> 16); // load vector
+                case 4: // load vector
+                    interchange.mediate(fadeAll);
+                    //writeRBP(6, fadeType, (fadeAll >> 8) & 0xff, fadeAll >> 16); // load vector
                     break;
                 case 5: // load state
                     interchange.mediate(fadeAll);
@@ -2888,28 +2891,14 @@ bool SynthEngine::saveHistory()
 }
 
 
-void SynthEngine::loadVectorAndUpdate(unsigned char baseChan, unsigned char nameID)
+unsigned char SynthEngine::loadVectorAndUpdate(unsigned char baseChan, string name)
 {
-    actionLock(lockmute);
+    unsigned char result = loadVector(baseChan, name, true);
+    if (result < 255)
+        addHistory(name, 4);
     ShutUp();
-    string name = miscMsgPop(nameID);
-    baseChan = loadVector(baseChan, name, true);
-    actionLock(unlock);
-    if (baseChan == 255)
-    {
-        Runtime.Log("Vector load FAILED " + name);
-        return;
-    }
-    else
-    {
-        addHistory(name, 5);
-        Runtime.Log("Loaded Vector " + name + " to " + to_string(int(baseChan) + 1));
-        if (Runtime.showGui)
-        {
-            int tmp = 2 | (miscMsgPush(findleafname(name)) << 8) | baseChan << 16;
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, tmp);
-        }
-    }
+    Unmute();
+    return result;
 }
 
 
@@ -2939,7 +2928,7 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool 
             Runtime. Log("Extract Data, no VECTOR branch", 2);
     else
     {
-        actualBase = extractVectorData(baseChan, xml);
+        actualBase = extractVectorData(baseChan, xml, findleafname(name));
         int lastPart = NUM_MIDI_PARTS;
         if (Runtime.nrpndata.vectorYaxis[actualBase] >= 0x7f)
             lastPart = NUM_MIDI_CHANNELS * 2;
@@ -2960,12 +2949,22 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool 
 }
 
 
-unsigned char SynthEngine::extractVectorData(unsigned char baseChan, XMLwrapper *xml)
+unsigned char SynthEngine::extractVectorData(unsigned char baseChan, XMLwrapper *xml, string name)
 {
     int lastPart = NUM_MIDI_PARTS;
     unsigned char tmp;
+    string newname = xml->getparstr("name");
+
     if (baseChan >= NUM_MIDI_CHANNELS)
         baseChan = xml->getpar255("Source_channel", 0);
+
+    if (newname > "!" && newname.find("No Name") != 1)
+        vectorName[baseChan] = newname;
+    else if (!name.empty())
+        vectorName[baseChan] = name;
+    else
+        vectorName[baseChan] = "No Name " + to_string(baseChan);
+
     tmp = xml->getpar255("X_sweep_CC", 0xff);
     if (tmp >= 0x0e && tmp  < 0x7f)
     {
@@ -3077,7 +3076,7 @@ bool SynthEngine::saveVector(unsigned char baseChan, string name, bool full)
         return false;
     }
     xml->beginbranch("VECTOR");
-        insertVectorData(baseChan, true, xml);
+        insertVectorData(baseChan, true, xml, findleafname(file));
     xml->endbranch();
 
     if (xml->saveXMLfile(file))
@@ -3094,51 +3093,57 @@ bool SynthEngine::saveVector(unsigned char baseChan, string name, bool full)
 }
 
 
-bool SynthEngine::insertVectorData(unsigned char baseChan, bool full, XMLwrapper *xml)
+bool SynthEngine::insertVectorData(unsigned char baseChan, bool full, XMLwrapper *xml, string name)
 {
     int lastPart = NUM_MIDI_PARTS;
     int x_feat = Runtime.nrpndata.vectorXfeatures[baseChan];
     int y_feat = Runtime.nrpndata.vectorYfeatures[baseChan];
-        xml->addpar("Source_channel", baseChan);
-        xml->addpar("X_sweep_CC", Runtime.nrpndata.vectorXaxis[baseChan]);
-        xml->addpar("Y_sweep_CC", Runtime.nrpndata.vectorYaxis[baseChan]);
-        xml->addparbool("X_feature_1", (x_feat & 1) > 0);
-        xml->addparbool("X_feature_2", (x_feat & 2) > 0);
-        xml->addparbool("X_feature_2_R", (x_feat & 0x10) > 0);
-        xml->addparbool("X_feature_4", (x_feat & 4) > 0);
-        xml->addparbool("X_feature_4_R", (x_feat & 0x20) > 0);
-        xml->addparbool("X_feature_8", (x_feat & 8) > 0);
-        xml->addparbool("X_feature_8_R", (x_feat & 0x40) > 0);
-        xml->addpar("X_CCout_2",Runtime.nrpndata.vectorXcc2[baseChan]);
-        xml->addpar("X_CCout_4",Runtime.nrpndata.vectorXcc4[baseChan]);
-        xml->addpar("X_CCout_8",Runtime.nrpndata.vectorXcc8[baseChan]);
-        if (Runtime.nrpndata.vectorYaxis[baseChan] > 0x7f)
+
+    if (vectorName[baseChan].find("No Name") != 1)
+        xml->addparstr("name", vectorName[baseChan]);
+    else
+        xml->addparstr("name", name);
+
+    xml->addpar("Source_channel", baseChan);
+    xml->addpar("X_sweep_CC", Runtime.nrpndata.vectorXaxis[baseChan]);
+    xml->addpar("Y_sweep_CC", Runtime.nrpndata.vectorYaxis[baseChan]);
+    xml->addparbool("X_feature_1", (x_feat & 1) > 0);
+    xml->addparbool("X_feature_2", (x_feat & 2) > 0);
+    xml->addparbool("X_feature_2_R", (x_feat & 0x10) > 0);
+    xml->addparbool("X_feature_4", (x_feat & 4) > 0);
+    xml->addparbool("X_feature_4_R", (x_feat & 0x20) > 0);
+    xml->addparbool("X_feature_8", (x_feat & 8) > 0);
+    xml->addparbool("X_feature_8_R", (x_feat & 0x40) > 0);
+    xml->addpar("X_CCout_2",Runtime.nrpndata.vectorXcc2[baseChan]);
+    xml->addpar("X_CCout_4",Runtime.nrpndata.vectorXcc4[baseChan]);
+    xml->addpar("X_CCout_8",Runtime.nrpndata.vectorXcc8[baseChan]);
+    if (Runtime.nrpndata.vectorYaxis[baseChan] > 0x7f)
+    {
+        lastPart /= 2;
+    }
+    else
+    {
+        xml->addparbool("Y_feature_1", (y_feat & 1) > 0);
+        xml->addparbool("Y_feature_2", (y_feat & 2) > 0);
+        xml->addparbool("Y_feature_2_R", (y_feat & 0x10) > 0);
+        xml->addparbool("Y_feature_4", (y_feat & 4) > 0);
+        xml->addparbool("Y_feature_4_R", (y_feat & 0x20) > 0);
+        xml->addparbool("Y_feature_8", (y_feat & 8) > 0);
+        xml->addparbool("Y_feature_8_R", (y_feat & 0x40) > 0);
+        xml->addpar("Y_CCout_2",Runtime.nrpndata.vectorYcc2[baseChan]);
+        xml->addpar("Y_CCout_4",Runtime.nrpndata.vectorYcc4[baseChan]);
+        xml->addpar("Y_CCout_8",Runtime.nrpndata.vectorYcc8[baseChan]);
+    }
+    if (full)
+    {
+        xml->addpar("current_midi_parts", lastPart);
+        for (int npart = 0; npart < lastPart; npart += NUM_MIDI_CHANNELS)
         {
-            lastPart /= 2;
+            xml->beginbranch("PART",npart);
+            part[npart + baseChan]->add2XML(xml);
+            xml->endbranch();
         }
-        else
-        {
-            xml->addparbool("Y_feature_1", (y_feat & 1) > 0);
-            xml->addparbool("Y_feature_2", (y_feat & 2) > 0);
-            xml->addparbool("Y_feature_2_R", (y_feat & 0x10) > 0);
-            xml->addparbool("Y_feature_4", (y_feat & 4) > 0);
-            xml->addparbool("Y_feature_4_R", (y_feat & 0x20) > 0);
-            xml->addparbool("Y_feature_8", (y_feat & 8) > 0);
-            xml->addparbool("Y_feature_8_R", (y_feat & 0x40) > 0);
-            xml->addpar("Y_CCout_2",Runtime.nrpndata.vectorYcc2[baseChan]);
-            xml->addpar("Y_CCout_4",Runtime.nrpndata.vectorYcc4[baseChan]);
-            xml->addpar("Y_CCout_8",Runtime.nrpndata.vectorYcc8[baseChan]);
-        }
-        if (full)
-        {
-            xml->addpar("current_midi_parts", lastPart);
-            for (int npart = 0; npart < lastPart; npart += NUM_MIDI_CHANNELS)
-            {
-                xml->beginbranch("PART",npart);
-                    part[npart + baseChan]->add2XML(xml);
-                xml->endbranch();
-            }
-        }
+    }
     return true;
 }
 
@@ -3207,7 +3212,7 @@ void SynthEngine::add2XML(XMLwrapper *xml)
         if (Runtime.nrpndata.vectorXaxis[i] < 127)
         {
             xml->beginbranch("VECTOR", i);
-            insertVectorData(i, false, xml);
+            insertVectorData(i, false, xml, "");
             xml->endbranch(); // VECTOR
         }
     }
@@ -3368,7 +3373,7 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
     {
         if (xml->enterbranch("VECTOR", i))
         {
-            extractVectorData(i, xml);
+            extractVectorData(i, xml, "");
             xml->endbranch();
         }
     }

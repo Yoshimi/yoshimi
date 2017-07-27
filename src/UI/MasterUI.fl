@@ -98,7 +98,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 }
 
-class MasterUI {selected : {private MiscFuncs}
+class MasterUI {open : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1142,6 +1142,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     bool wasFromHere = getData->data.type & 0x20;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char par2 = getData->data.par2;
@@ -1221,6 +1222,17 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
         case 48:
         case 49:
             updatepanel();
+            break;
+
+        case 84: // load vector
+            name = miscMsgPop(par2);
+            if (wasFromHere && name.find("FAILED") == 1)
+                fl_alert("%s",name.c_str());
+            else
+            {
+                vectorui->setLoadLabelRemote(kititem, synth->vectorName[kititem]);
+                refresh_master_ui(2);
+            }
             break;
 
         case 88:
@@ -1531,7 +1543,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     }
     updatepanel();} {}
   }
-  Function {refresh_master_ui(int type)} {} {
+  Function {refresh_master_ui(int type)} {open
+  } {
     code {//
     if (microtonalui) // not taking chances!
         delete microtonalui;
@@ -1558,16 +1571,16 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
         setMasterLabel(findleafname(synth->lastPatchSetSeen()));
     updatesendwindow();
     updatepanel();
-    vectorui->RefreshChans();
+    if (!(type & 2))
+        vectorui->RefreshChans();
     bankui->Hide();
     if (synth->getRuntime().toConsole == false)
         Reports->deactivate();
     else
         Reports->activate();
     if (type & 1)
-        configui->update_config(4);
-    if (type & 2)
-        vectorui->setLoadLabelRemote(type >> 16, miscMsgPop((type >> 8) & 0xff));} {}
+        configui->update_config(4);} {selected
+    }
   }
   Function {checkmaxparts()} {return_type bool
   } {
