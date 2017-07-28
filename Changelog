@@ -3,6 +3,8 @@ yoshimi 1.5.2 M
 2017-7-28 Will
 * Refactored vector data structure.
 * It hasn't been purely nrpn based for a long time!
+* Further vector refactoring for overall consistency.
+* Updated docs.
 
 2017-7-27 Will
 * Improved state save error reporting for GUI & CLI.

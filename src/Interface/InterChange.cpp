@@ -259,7 +259,7 @@ void InterChange::transfertext(CommandBlock *getData)
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit;
+    unsigned char insert = getData->data.insert;
 //    unsigned char engine = getData->data.engine;
 //    unsigned char insert = getData->data.insert;
     bool (write) = (type & 0x40);
@@ -336,12 +336,12 @@ void InterChange::transfertext(CommandBlock *getData)
     {
         switch (control)
         {
-            case 84:
-                tmp = synth->loadVectorAndUpdate(kititem, text);
+            case 84: // vector load
+                tmp = synth->loadVectorAndUpdate(insert, text);
                 if ( tmp < 0xff)
                 {
-                    getData->data.kit = tmp;
-                    text = "ed " + text + " to " + to_string(int(kititem));
+                    getData->data.insert = tmp;
+                    text = "ed " + text + " to " + to_string(int(insert));
                 }
                 else
                     text = " FAILED " + text;
@@ -349,7 +349,7 @@ void InterChange::transfertext(CommandBlock *getData)
                 getData->data.parameter &= 0x7f;
 
                 break;
-            case 92:
+            case 92: // state load
                 if (synth->loadStateAndUpdate(text))
                     text = "ed " + text;
                 else
@@ -357,7 +357,7 @@ void InterChange::transfertext(CommandBlock *getData)
                 value = miscMsgPush(text);
                 getData->data.parameter &= 0x7f;
                 break;
-            case 93:
+            case 93: // state save
                 if (synth->saveState(text))
                     text = "d " + text;
                 else
@@ -537,9 +537,8 @@ void InterChange::resolveReplies(CommandBlock *getData)
  * they screw up miscMsg for some calling routines.
  */
     }
-    if (npart >= 0xc0 && npart < 0xd0)
+    if (npart == 0xc0)
         commandName = resolveVector(getData);
-
     else if (npart == 0xe8)
         commandName = resolveMicrotonal(getData);
     else if (npart == 0xf8)
@@ -715,7 +714,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
 string InterChange::resolveVector(CommandBlock *getData)
 {
     unsigned char control = getData->data.control;
-    unsigned int chan = getData->data.part & 0xf;
+    unsigned int chan = getData->data.insert;
 
     string contstr = "";
     switch (control)
@@ -2867,15 +2866,15 @@ void InterChange::returnsDirect(CommandBlock *putData, int altData)
     switch (altData & 0xff)
     {
         case 4:
-            putData->data.control = 84;
+            putData->data.control = 84; // vector load
             putData->data.type = altData >> 24;
             putData->data.part = 0xf0;
-            putData->data.kit = (altData >> 16) & 0xff;
+            putData->data.insert = (altData >> 16) & 0xff;
             putData->data.parameter = 0x80;
             putData->data.par2 = (altData >> 8) & 0xff;
             break;
         case 5:
-            putData->data.control = 92;
+            putData->data.control = 92; // sate load
             putData->data.type = altData >> 24;
             putData->data.part = 0xf0;
             putData->data.parameter = 0x80;
@@ -2985,7 +2984,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     if (!isGui && button == 1)
         return false;
 
-    if (npart >= 0xc0 && npart < 0xd0)
+    if (npart == 0xc0)
     {
         commandVector(getData);
         return true;
@@ -3160,7 +3159,7 @@ void InterChange::commandVector(CommandBlock *getData)
     int value = getData->data.value; // no floats here
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
-    unsigned int chan = getData->data.part & 0xf;
+    unsigned int chan = getData->data.insert;
     unsigned int bank = getData->data.kit;
     unsigned int root = getData->data.engine;
 
@@ -3754,7 +3753,7 @@ void InterChange::commandMain(CommandBlock *getData)
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
-    unsigned char kititem = getData->data.kit;
+    //unsigned char kititem = getData->data.kit;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
     unsigned char par2 = getData->data.par2;
@@ -3825,7 +3824,7 @@ string name;
         case 84: // load vector
             if (write && (parameter == 0xc0))
             {
-                synth->allStop(4 | (par2 << 8) | (kititem << 16) | (type << 24));
+                synth->allStop(4 | (par2 << 8) | (insert << 16) | (type << 24));
                 getData->data.type = 0xff; // stop further action
             }
             break;

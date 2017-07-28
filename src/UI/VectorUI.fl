@@ -302,7 +302,7 @@ else
         synth->vectorSet(0, BaseChan, tmp);
     Xgroup->activate();
     if (synth->getGuiMaster()->partmax < 32)
-    	synth->getGuiMaster()->partmax = 32;
+        synth->getGuiMaster()->partmax = 32;
     if (Ycc >= 14)
     {
       Ygroup->activate();
@@ -510,10 +510,12 @@ if (!string(tmp).empty())
   }
   Function {send_data(int control, float value, int type, int part = 255, int kit = 255, int engine = 255, int insert = 255, int parameter = 255, int par2 = 255)} {} {
     code {//
-    if (control == 84)
-        collect_data(synth, value, (Fl::event_button() | type), control, part, kit, engine, insert, parameter, par2);
-    else
-        collect_data(synth, value, (Fl::event_button() | type), control, 0xc0 | BaseChan);} {}
+    if (control != 84)
+    {
+        part = 192;
+        insert = BaseChan;
+    }
+    collect_data(synth, value, (Fl::event_button() | type), control, part, kit, engine, insert, parameter, par2);} {}
   }
   Function {VectorUI(SynthEngine *_synth, BankUI *_bankui, ParametersUI *_paramsui)} {} {
     code {//
@@ -546,7 +548,7 @@ if (everything)
     BaseChan = 0;
     setbasechan->value(BaseChan + 1);
     for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
-    	loadlabel[i] = "No Name";
+        loadlabel[i] = "No Name " + to_string(i);
 
 }
 setInstrumentLabel(BaseChan);
@@ -714,8 +716,7 @@ Loaded->copy_label(loadlabel[BaseChan].c_str());} {}
     loadlabel[chan] = name;
     BaseChan = chan;
     setbasechan->value(BaseChan + 1);
-    updateAll(false);
-    //Loaded->copy_label(name.c_str());} {}
+    updateAll(false);} {}
   }
   Function {findengines(int npart)} {return_type {unsigned int}
   } {
@@ -759,13 +760,13 @@ return col;} {}
     code {//
     if (fname == "")
     {
-    	char *filename;
-    	filename = fl_file_chooser("Open:", "({*.xvy})", NULL, 0);
-    	if (filename == NULL)
-        	return;
-    	fname = string(filename);
+        char *filename;
+        filename = fl_file_chooser("Open:", "({*.xvy})", NULL, 0);
+        if (filename == NULL)
+            return;
+        fname = string(filename);
     }
-    send_data(84, 0, 0xf0, 240, BaseChan, 255, 255, 192, miscMsgPush(fname));} {}
+    send_data(84, 0, 0xf0, 240, 255, 255, BaseChan, 192, miscMsgPush(fname));} {}
   }
   Function {saveVector()} {} {
     code {//
@@ -782,9 +783,9 @@ return col;} {}
             synth->actionLock(unlock);
             if (result)
             {
-            	recenthistory->activate();
-            	loadlabel[BaseChan] = findleafname((string)filename);
-            	Loaded->copy_label(loadlabel[BaseChan].c_str());
+                recenthistory->activate();
+                loadlabel[BaseChan] = findleafname((string)filename);
+                Loaded->copy_label(loadlabel[BaseChan].c_str());
 
             }
             else

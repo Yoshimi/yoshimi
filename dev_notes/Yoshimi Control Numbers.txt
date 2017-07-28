@@ -9,7 +9,7 @@ Y : -36 to 36 : 35 : 240 : 255 : 255 : 255 : 255 : 255 : Key shift
 Y : 0 to 3 : 48 : 240 : 255 : 255 : 255 : 255 : 255 : Channel Switcher Type (Solo) - Off, Row, Column, Loop
 Y : 14 to 119 : 49 : 240 : 255 : 255 : 255 : 255 : 255 : Channel Switcher Incoming CC
 Y : any : 80 : 240 : 255 : 255 : 255 : 255 : msg No. : Load named patchset via miscMsg
-Y : any : 84 : 240 : 0 to 15 : 255 : 255 : 192 : msg No. : Load named vector to chan (kit) via miscMsg
+Y : any : 84 : 240 : 255 : 255 : 0 to 15 : 192 : msg No. : Load named vector to chan (kit) via miscMsg
 Y : any : 88 : 240 : 255 : 255 : 255 : 255 : msg No. : Load named scale via miscMgs
 Y : any : 89 : 240 : 255 : 255 : 255 : 255 : msg No. : Save named scale via miscMgs
 Y : any : 92 : 240 : 255 : 255 : 255 : 192 : msg No. : Load named state via miscMgs
@@ -81,24 +81,24 @@ Y : any : 96 : 232 : 255 : 255 : 255 : 255 : : Clear all settings
 
 Vector control window
  :  :  : Base Channel
-n : 0 to 15 : 0 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Was Base channel Now does nothing
-n : 0 to 4 : 1 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Options - Load, Save, Recent, Clear Chan, Clear All
+n : 0 to 15 : 0 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Was Base channel Now does nothing
+n : 0 to 4 : 1 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Options - Load, Save, Recent, Clear Chan, Clear All
 
-Y : 0, 14 to 119 : 16 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X controller
-Y : any : 17 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X left instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
-Y : any : 18 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X right instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
-Y : 0/1 : 19 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 0 - off, on
-Y : 0 to 2 : 20 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 1 - off, on, reverse
-Y : 0 to 2 : 21 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 2 - off, on, reverse
-Y : 0 to 2 : 22 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 3 - off, on, reverse
+Y : 0, 14 to 119 : 16 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : X controller
+Y : any : 17 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : X left instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
+Y : any : 18 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : X right instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
+Y : 0/1 : 19 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : X feature 0 - off, on
+Y : 0 to 2 : 20 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : X feature 1 - off, on, reverse
+Y : 0 to 2 : 21 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : X feature 2 - off, on, reverse
+Y : 0 to 2 : 22 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : X feature 3 - off, on, reverse
 
-Y : 0, 14 to 119 : 32 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y controller
-Y : any : 33 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y up instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
-Y : any : 34 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y down instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
-Y : 0/1 : 35 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 0 - off, on
-Y : 0 to 2 : 36 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 1 - off, on, reverse
-Y : 0 to 2 : 37 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 2 - off, on, reverse
-Y : 0 to 2 : 38 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 3 - off, on, reverse
+Y : 0, 14 to 119 : 32 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Y controller
+Y : any : 33 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Y up instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
+Y : any : 34 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Y down instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
+Y : 0/1 : 35 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Y feature 0 - off, on
+Y : 0 to 2 : 36 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Y feature 1 - off, on, reverse
+Y : 0 to 2 : 37 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Y feature 2 - off, on, reverse
+Y : 0 to 2 : 38 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Y feature 3 - off, on, reverse
 
 Main part controls
 YL : 0 to 127 : 0 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Volume
