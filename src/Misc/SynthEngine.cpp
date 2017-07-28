@@ -125,7 +125,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
 
     ctl = new Controller(this);
     for (int i = 0; i < NUM_MIDI_CHANNELS; ++ i)
-        vectorName[i] = "No Name " + to_string(i);
+        Runtime.vectordata.Name[i] = "No Name " + to_string(i);
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         part[npart] = NULL;
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
@@ -1327,10 +1327,10 @@ void SynthEngine::ListVectors(list<string>& msg_buf)
 
 bool SynthEngine::SingleVector(list<string>& msg_buf, int chan)
 {
-    if (!Runtime.nrpndata.vectorEnabled[chan])
+    if (!Runtime.vectordata.Enabled[chan])
         return false;
 
-    int Xfeatures = Runtime.nrpndata.vectorXfeatures[chan];
+    int Xfeatures = Runtime.vectordata.Xfeatures[chan];
     string Xtext = "Features =";
     if (Xfeatures == 0)
         Xtext = "No Features :(";
@@ -1346,15 +1346,15 @@ bool SynthEngine::SingleVector(list<string>& msg_buf, int chan)
             Xtext += " 4";
     }
     msg_buf.push_back("Channel " + asString(chan + 1));
-    msg_buf.push_back("  X CC = " + asString((int)  Runtime.nrpndata.vectorXaxis[chan]) + ",  " + Xtext);
+    msg_buf.push_back("  X CC = " + asString((int)  Runtime.vectordata.Xaxis[chan]) + ",  " + Xtext);
     msg_buf.push_back("  L = " + part[chan]->Pname + ",  R = " + part[chan + 16]->Pname);
 
-    if (Runtime.nrpndata.vectorYaxis[chan] > 0x7f
+    if (Runtime.vectordata.Yaxis[chan] > 0x7f
         || Runtime.NumAvailableParts < NUM_MIDI_CHANNELS * 4)
         msg_buf.push_back("  Y axis disabled");
     else
     {
-        int Yfeatures = Runtime.nrpndata.vectorYfeatures[chan];
+        int Yfeatures = Runtime.vectordata.Yfeatures[chan];
         string Ytext = "Features =";
         if (Yfeatures == 0)
             Ytext = "No Features :(";
@@ -1369,7 +1369,7 @@ bool SynthEngine::SingleVector(list<string>& msg_buf, int chan)
             if (Yfeatures & 8)
                 Ytext += " 4";
         }
-        msg_buf.push_back("  Y CC = " + asString((int) Runtime.nrpndata.vectorYaxis[chan]) + ",  " + Ytext);
+        msg_buf.push_back("  Y CC = " + asString((int) Runtime.vectordata.Yaxis[chan]) + ",  " + Ytext);
         msg_buf.push_back("  U = " + part[chan + 32]->Pname + ",  D = " + part[chan + 48]->Pname);
     }
     return true;
@@ -1767,7 +1767,7 @@ int SynthEngine::SetSystemValue(int type, int value)
                 Runtime.channelSwitchValue = value;
                 for (int ch = 0; ch < NUM_MIDI_CHANNELS; ++ch)
                 {
-                    bool isVector = Runtime.nrpndata.vectorEnabled[ch];
+                    bool isVector = Runtime.vectordata.Enabled[ch];
                     if (ch != value)
                     {
                         part[ch]->Prcvchn = NUM_MIDI_CHANNELS;
@@ -1865,7 +1865,7 @@ bool SynthEngine::vectorInit(int dHigh, unsigned char chan, int par)
         }
         name = Runtime.testCCvalue(par);
     }
-    else if (!Runtime.nrpndata.vectorEnabled[chan])
+    else if (!Runtime.vectordata.Enabled[chan])
     {
         Runtime.Log("Vector control must be enabled first");
         return true;
@@ -1918,45 +1918,45 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
     switch (dHigh)
     {
         case 0:
-            Runtime.nrpndata.vectorXaxis[chan] = par;
-            if (!Runtime.nrpndata.vectorEnabled[chan])
+            Runtime.vectordata.Xaxis[chan] = par;
+            if (!Runtime.vectordata.Enabled[chan])
             {
-                Runtime.nrpndata.vectorEnabled[chan] = true;
+                Runtime.vectordata.Enabled[chan] = true;
                 Runtime.Log("Vector control enabled");
                 // enabling is only done with a valid X CC
             }
             SetPartChan(chan, chan);
             SetPartChan(chan | 16, chan);
-            Runtime.nrpndata.vectorXcc2[chan] = C_panning;
-            Runtime.nrpndata.vectorXcc4[chan] = C_filtercutoff;
-            Runtime.nrpndata.vectorXcc8[chan] = C_modwheel;
+            Runtime.vectordata.Xcc2[chan] = C_panning;
+            Runtime.vectordata.Xcc4[chan] = C_filtercutoff;
+            Runtime.vectordata.Xcc8[chan] = C_modwheel;
             //Runtime.Log("Vector " + asString((int) chan) + " X CC set to " + asString(par));
             break;
 
         case 1:
-            if (!Runtime.nrpndata.vectorEnabled[chan])
+            if (!Runtime.vectordata.Enabled[chan])
                 Runtime.Log("Vector X axis must be set before Y");
             else
             {
                 SetPartChan(chan | 32, chan);
                 SetPartChan(chan | 48, chan);
-                Runtime.nrpndata.vectorYaxis[chan] = par;
-                Runtime.nrpndata.vectorYcc2[chan] = C_panning;
-                Runtime.nrpndata.vectorYcc4[chan] = C_filtercutoff;
-                Runtime.nrpndata.vectorYcc8[chan] = C_modwheel;
+                Runtime.vectordata.Yaxis[chan] = par;
+                Runtime.vectordata.Ycc2[chan] = C_panning;
+                Runtime.vectordata.Ycc4[chan] = C_filtercutoff;
+                Runtime.vectordata.Ycc8[chan] = C_modwheel;
                 //Runtime.Log("Vector " + asString(int(chan) + 1) + " Y CC set to " + asString(par));
             }
             break;
 
         case 2:
-            Runtime.nrpndata.vectorXfeatures[chan] = par;
+            Runtime.vectordata.Xfeatures[chan] = par;
             Runtime.Log("Set X features " + featureList);
             break;
 
         case 3:
             if (Runtime.NumAvailableParts > NUM_MIDI_CHANNELS * 2)
             {
-                Runtime.nrpndata.vectorYfeatures[chan] = par;
+                Runtime.vectordata.Yfeatures[chan] = par;
                 Runtime.Log("Set Y features " + featureList);
             }
             break;
@@ -1978,41 +1978,41 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             break;
 
         case 8:
-            Runtime.nrpndata.vectorXcc2[chan] = par;
+            Runtime.vectordata.Xcc2[chan] = par;
             Runtime.Log("Channel " + asString((int) chan) + " X feature 2 set to " + asString(par));
             break;
 
         case 9:
-            Runtime.nrpndata.vectorXcc4[chan] = par;
+            Runtime.vectordata.Xcc4[chan] = par;
             Runtime.Log("Channel " + asString((int) chan) + " X feature 3 set to " + asString(par));
             break;
 
         case 10:
-            Runtime.nrpndata.vectorXcc8[chan] = par;
+            Runtime.vectordata.Xcc8[chan] = par;
             Runtime.Log("Channel " + asString((int) chan) + " X feature 4 set to " + asString(par));
             break;
 
         case 11:
-            Runtime.nrpndata.vectorYcc2[chan] = par;
+            Runtime.vectordata.Ycc2[chan] = par;
             Runtime.Log("Channel " + asString((int) chan) + " Y feature 2 set to " + asString(par));
             break;
 
         case 12:
-            Runtime.nrpndata.vectorYcc4[chan] = par;
+            Runtime.vectordata.Ycc4[chan] = par;
             Runtime.Log("Channel " + asString((int) chan) + " Y feature 3 set to " + asString(par));
             break;
 
         case 13:
-            Runtime.nrpndata.vectorYcc8[chan] = par;
+            Runtime.vectordata.Ycc8[chan] = par;
             Runtime.Log("Channel " + asString((int) chan) + " Y feature 4 set to " + asString(par));
             break;
 
         default:
-            Runtime.nrpndata.vectorEnabled[chan] = false;
-            Runtime.nrpndata.vectorXaxis[chan] = 0xff;
-            Runtime.nrpndata.vectorYaxis[chan] = 0xff;
-            Runtime.nrpndata.vectorXfeatures[chan] = 0;
-            Runtime.nrpndata.vectorYfeatures[chan] = 0;
+            Runtime.vectordata.Enabled[chan] = false;
+            Runtime.vectordata.Xaxis[chan] = 0xff;
+            Runtime.vectordata.Yaxis[chan] = 0xff;
+            Runtime.vectordata.Xfeatures[chan] = 0;
+            Runtime.vectordata.Yfeatures[chan] = 0;
             Runtime.Log("Channel " + asString(int(chan) + 1) + " Vector control disabled");
             break;
     }
@@ -2027,11 +2027,11 @@ void SynthEngine::ClearNRPNs(void)
 
     for (int chan = 0; chan < NUM_MIDI_CHANNELS; ++chan)
     {
-        Runtime.nrpndata.vectorEnabled[chan] = false;
-        Runtime.nrpndata.vectorXaxis[chan] = 0xff;
-        Runtime.nrpndata.vectorYaxis[chan] = 0xff;
-        Runtime.nrpndata.vectorXfeatures[chan] = 0;
-        Runtime.nrpndata.vectorYfeatures[chan] = 0;
+        Runtime.vectordata.Enabled[chan] = false;
+        Runtime.vectordata.Xaxis[chan] = 0xff;
+        Runtime.vectordata.Yaxis[chan] = 0xff;
+        Runtime.vectordata.Xfeatures[chan] = 0;
+        Runtime.vectordata.Yfeatures[chan] = 0;
     }
 }
 
@@ -2930,7 +2930,7 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool 
     {
         actualBase = extractVectorData(baseChan, xml, findleafname(name));
         int lastPart = NUM_MIDI_PARTS;
-        if (Runtime.nrpndata.vectorYaxis[actualBase] >= 0x7f)
+        if (Runtime.vectordata.Yaxis[actualBase] >= 0x7f)
             lastPart = NUM_MIDI_CHANNELS * 2;
         for (int npart = 0; npart < lastPart; npart += NUM_MIDI_CHANNELS)
         {
@@ -2959,33 +2959,33 @@ unsigned char SynthEngine::extractVectorData(unsigned char baseChan, XMLwrapper 
         baseChan = xml->getpar255("Source_channel", 0);
 
     if (newname > "!" && newname.find("No Name") != 1)
-        vectorName[baseChan] = newname;
+        Runtime.vectordata.Name[baseChan] = newname;
     else if (!name.empty())
-        vectorName[baseChan] = name;
+        Runtime.vectordata.Name[baseChan] = name;
     else
-        vectorName[baseChan] = "No Name " + to_string(baseChan);
+        Runtime.vectordata.Name[baseChan] = "No Name " + to_string(baseChan);
 
     tmp = xml->getpar255("X_sweep_CC", 0xff);
     if (tmp >= 0x0e && tmp  < 0x7f)
     {
-        Runtime.nrpndata.vectorXaxis[baseChan] = tmp;
-        Runtime.nrpndata.vectorEnabled[baseChan] = true;
+        Runtime.vectordata.Xaxis[baseChan] = tmp;
+        Runtime.vectordata.Enabled[baseChan] = true;
     }
     else
     {
-        Runtime.nrpndata.vectorXaxis[baseChan] = 0x7f;
-        Runtime.nrpndata.vectorEnabled[baseChan] = false;
+        Runtime.vectordata.Xaxis[baseChan] = 0x7f;
+        Runtime.vectordata.Enabled[baseChan] = false;
     }
 
     // should exit here if not enabled
 
     tmp = xml->getpar255("Y_sweep_CC", 0xff);
     if (tmp >= 0x0e && tmp  < 0x7f)
-        Runtime.nrpndata.vectorYaxis[baseChan] = tmp;
+        Runtime.vectordata.Yaxis[baseChan] = tmp;
     else
     {
         lastPart = NUM_MIDI_CHANNELS * 2;
-        Runtime.nrpndata.vectorYaxis[baseChan] = 0x7f;
+        Runtime.vectordata.Yaxis[baseChan] = 0x7f;
         partonoffWrite(baseChan + NUM_MIDI_CHANNELS * 2, 0);
         partonoffWrite(baseChan + NUM_MIDI_CHANNELS * 3, 0);
         // disable these - not in current vector definition
@@ -3007,9 +3007,9 @@ unsigned char SynthEngine::extractVectorData(unsigned char baseChan, XMLwrapper 
         x_feat |= 8;
     if (xml->getparbool("X_feature_8_R", false))
         x_feat |= 0x40;
-    Runtime.nrpndata.vectorXcc2[baseChan] = xml->getpar255("X_CCout_2", 10);
-    Runtime.nrpndata.vectorXcc4[baseChan] = xml->getpar255("X_CCout_4", 74);
-    Runtime.nrpndata.vectorXcc8[baseChan] = xml->getpar255("X_CCout_8", 1);
+    Runtime.vectordata.Xcc2[baseChan] = xml->getpar255("X_CCout_2", 10);
+    Runtime.vectordata.Xcc4[baseChan] = xml->getpar255("X_CCout_4", 74);
+    Runtime.vectordata.Xcc8[baseChan] = xml->getpar255("X_CCout_8", 1);
     if (lastPart == NUM_MIDI_PARTS)
     {
         if (xml->getparbool("Y_feature_1", false))
@@ -3026,12 +3026,12 @@ unsigned char SynthEngine::extractVectorData(unsigned char baseChan, XMLwrapper 
             y_feat |= 8;
         if (xml->getparbool("Y_feature_8_R", false))
             y_feat |= 0x40;
-        Runtime.nrpndata.vectorYcc2[baseChan] = xml->getpar255("Y_CCout_2", 10);
-        Runtime.nrpndata.vectorYcc4[baseChan] = xml->getpar255("Y_CCout_4", 74);
-        Runtime.nrpndata.vectorYcc8[baseChan] = xml->getpar255("Y_CCout_8", 1);
+        Runtime.vectordata.Ycc2[baseChan] = xml->getpar255("Y_CCout_2", 10);
+        Runtime.vectordata.Ycc4[baseChan] = xml->getpar255("Y_CCout_4", 74);
+        Runtime.vectordata.Ycc8[baseChan] = xml->getpar255("Y_CCout_8", 1);
     }
-    Runtime.nrpndata.vectorXfeatures[baseChan] = x_feat;
-    Runtime.nrpndata.vectorYfeatures[baseChan] = y_feat;
+    Runtime.vectordata.Xfeatures[baseChan] = x_feat;
+    Runtime.vectordata.Yfeatures[baseChan] = y_feat;
     if (Runtime.NumAvailableParts < lastPart)
         Runtime.NumAvailableParts = xml->getpar255("current_midi_parts", Runtime.NumAvailableParts);
 
@@ -3059,7 +3059,7 @@ bool SynthEngine::saveVector(unsigned char baseChan, string name, bool full)
         Runtime.Log("No filename");
         return false;
     }
-    if (Runtime.nrpndata.vectorEnabled[baseChan] == false)
+    if (Runtime.vectordata.Enabled[baseChan] == false)
     {
         Runtime.Log("No vector data on this channel");
         return false;
@@ -3096,17 +3096,17 @@ bool SynthEngine::saveVector(unsigned char baseChan, string name, bool full)
 bool SynthEngine::insertVectorData(unsigned char baseChan, bool full, XMLwrapper *xml, string name)
 {
     int lastPart = NUM_MIDI_PARTS;
-    int x_feat = Runtime.nrpndata.vectorXfeatures[baseChan];
-    int y_feat = Runtime.nrpndata.vectorYfeatures[baseChan];
+    int x_feat = Runtime.vectordata.Xfeatures[baseChan];
+    int y_feat = Runtime.vectordata.Yfeatures[baseChan];
 
-    if (vectorName[baseChan].find("No Name") != 1)
-        xml->addparstr("name", vectorName[baseChan]);
+    if (Runtime.vectordata.Name[baseChan].find("No Name") != 1)
+        xml->addparstr("name", Runtime.vectordata.Name[baseChan]);
     else
         xml->addparstr("name", name);
 
     xml->addpar("Source_channel", baseChan);
-    xml->addpar("X_sweep_CC", Runtime.nrpndata.vectorXaxis[baseChan]);
-    xml->addpar("Y_sweep_CC", Runtime.nrpndata.vectorYaxis[baseChan]);
+    xml->addpar("X_sweep_CC", Runtime.vectordata.Xaxis[baseChan]);
+    xml->addpar("Y_sweep_CC", Runtime.vectordata.Yaxis[baseChan]);
     xml->addparbool("X_feature_1", (x_feat & 1) > 0);
     xml->addparbool("X_feature_2", (x_feat & 2) > 0);
     xml->addparbool("X_feature_2_R", (x_feat & 0x10) > 0);
@@ -3114,10 +3114,10 @@ bool SynthEngine::insertVectorData(unsigned char baseChan, bool full, XMLwrapper
     xml->addparbool("X_feature_4_R", (x_feat & 0x20) > 0);
     xml->addparbool("X_feature_8", (x_feat & 8) > 0);
     xml->addparbool("X_feature_8_R", (x_feat & 0x40) > 0);
-    xml->addpar("X_CCout_2",Runtime.nrpndata.vectorXcc2[baseChan]);
-    xml->addpar("X_CCout_4",Runtime.nrpndata.vectorXcc4[baseChan]);
-    xml->addpar("X_CCout_8",Runtime.nrpndata.vectorXcc8[baseChan]);
-    if (Runtime.nrpndata.vectorYaxis[baseChan] > 0x7f)
+    xml->addpar("X_CCout_2",Runtime.vectordata.Xcc2[baseChan]);
+    xml->addpar("X_CCout_4",Runtime.vectordata.Xcc4[baseChan]);
+    xml->addpar("X_CCout_8",Runtime.vectordata.Xcc8[baseChan]);
+    if (Runtime.vectordata.Yaxis[baseChan] > 0x7f)
     {
         lastPart /= 2;
     }
@@ -3130,9 +3130,9 @@ bool SynthEngine::insertVectorData(unsigned char baseChan, bool full, XMLwrapper
         xml->addparbool("Y_feature_4_R", (y_feat & 0x20) > 0);
         xml->addparbool("Y_feature_8", (y_feat & 8) > 0);
         xml->addparbool("Y_feature_8_R", (y_feat & 0x40) > 0);
-        xml->addpar("Y_CCout_2",Runtime.nrpndata.vectorYcc2[baseChan]);
-        xml->addpar("Y_CCout_4",Runtime.nrpndata.vectorYcc4[baseChan]);
-        xml->addpar("Y_CCout_8",Runtime.nrpndata.vectorYcc8[baseChan]);
+        xml->addpar("Y_CCout_2",Runtime.vectordata.Ycc2[baseChan]);
+        xml->addpar("Y_CCout_4",Runtime.vectordata.Ycc4[baseChan]);
+        xml->addpar("Y_CCout_8",Runtime.vectordata.Ycc8[baseChan]);
     }
     if (full)
     {
@@ -3209,7 +3209,7 @@ void SynthEngine::add2XML(XMLwrapper *xml)
     actionLock(unlock);
     for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
     {
-        if (Runtime.nrpndata.vectorXaxis[i] < 127)
+        if (Runtime.vectordata.Xaxis[i] < 127)
         {
             xml->beginbranch("VECTOR", i);
             insertVectorData(i, false, xml, "");

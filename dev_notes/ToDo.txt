@@ -1,3 +1,5 @@
+Tidy up naming for vectors, especially after a reset or clear.
+
 
 NRPN channels?
 

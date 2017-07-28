@@ -1230,7 +1230,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
                 fl_alert("%s",name.c_str());
             else
             {
-                vectorui->setLoadLabelRemote(kititem, synth->vectorName[kititem]);
+                vectorui->setLoadLabelRemote(kititem, synth->getRuntime().vectordata.Name[kititem]);
                 refresh_master_ui(2);
             }
             break;

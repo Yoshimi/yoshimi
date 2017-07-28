@@ -929,7 +929,7 @@ int CmdInterface::commandVector()
     }
     if (point[0] == 0)
     {
-        if (Runtime.nrpndata.vectorEnabled[chan])
+        if (Runtime.vectordata.Enabled[chan])
             bitSet(level, vect_lev);
         else
             Runtime.Log("No vector on channel " + asString(chan + 1));
@@ -962,7 +962,7 @@ int CmdInterface::commandVector()
         axis = 0;
     else if (matchnMove(1, point, "yaxis"))
     {
-        if (!Runtime.nrpndata.vectorEnabled[chan])
+        if (!Runtime.vectordata.Enabled[chan])
         {
             Runtime.Log("Vector X must be set first");
             return done_msg;
@@ -980,17 +980,17 @@ int CmdInterface::commandVector()
         tmp = string2int(point);
         if (!synth->vectorInit(axis, chan, tmp))
             synth->vectorSet(axis, chan, tmp);
-        if(Runtime.nrpndata.vectorEnabled[chan])
+        if(Runtime.vectordata.Enabled[chan])
             bitSet(level, vect_lev);
         return done_msg;
     }
-    if (!Runtime.nrpndata.vectorEnabled[chan])
+    if (!Runtime.vectordata.Enabled[chan])
     {
         Runtime.Log("Vector X CC must be set first");
         return done_msg;
     }
 
-    if (axis == 1 && (Runtime.nrpndata.vectorYaxis[chan] > 0x7f))
+    if (axis == 1 && (Runtime.vectordata.Yaxis[chan] > 0x7f))
     {
         Runtime.Log("Vector Y CC must be set first");
         return done_msg;
@@ -1004,9 +1004,9 @@ int CmdInterface::commandVector()
         else
         {
             if (axis == 0)
-                vecfeat = Runtime.nrpndata.vectorXfeatures[chan];
+                vecfeat = Runtime.vectordata.Xfeatures[chan];
             else
-                vecfeat = Runtime.nrpndata.vectorYfeatures[chan];
+                vecfeat = Runtime.vectordata.Yfeatures[chan];
             tmp = string2int(point);
             if (tmp < 1 || tmp > 4)
                 return range_msg;

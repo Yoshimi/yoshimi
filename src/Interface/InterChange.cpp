@@ -3177,9 +3177,9 @@ void InterChange::commandVector(CommandBlock *getData)
                 synth->writeRBP(2, bank, 0);
         }
         else if (control >= 19 && control <= 22)
-            features = synth->getRuntime().nrpndata.vectorXfeatures[chan];
+            features = synth->getRuntime().vectordata.Xfeatures[chan];
         else if (control >= 35 && control <= 38)
-            features = synth->getRuntime().nrpndata.vectorYfeatures[chan];
+            features = synth->getRuntime().vectordata.Yfeatures[chan];
     }
 
     switch (control)
@@ -3322,9 +3322,9 @@ void InterChange::commandVector(CommandBlock *getData)
     if (write)
     {
         if (control >= 19 && control <= 22)
-            synth->getRuntime().nrpndata.vectorXfeatures[chan] = features;
+            synth->getRuntime().vectordata.Xfeatures[chan] = features;
         else if (control >= 35 && control <= 38)
-            synth->getRuntime().nrpndata.vectorYfeatures[chan] = features;
+            synth->getRuntime().vectordata.Yfeatures[chan] = features;
     }
 }
 

@@ -158,22 +158,23 @@ class Config : public MiscFuncs
         bool          nrpnActive;
 
         struct IOdata{
-            unsigned char vectorXaxis[NUM_MIDI_CHANNELS];
-            unsigned char vectorYaxis[NUM_MIDI_CHANNELS];
-            unsigned char vectorXfeatures[NUM_MIDI_CHANNELS];
-            unsigned char vectorYfeatures[NUM_MIDI_CHANNELS];
-            unsigned char vectorXcc2[NUM_MIDI_CHANNELS];
-            unsigned char vectorYcc2[NUM_MIDI_CHANNELS];
-            unsigned char vectorXcc4[NUM_MIDI_CHANNELS];
-            unsigned char vectorYcc4[NUM_MIDI_CHANNELS];
-            unsigned char vectorXcc8[NUM_MIDI_CHANNELS];
-            unsigned char vectorYcc8[NUM_MIDI_CHANNELS];
+            unsigned char Xaxis[NUM_MIDI_CHANNELS];
+            unsigned char Yaxis[NUM_MIDI_CHANNELS];
+            unsigned char Xfeatures[NUM_MIDI_CHANNELS];
+            unsigned char Yfeatures[NUM_MIDI_CHANNELS];
+            unsigned char Xcc2[NUM_MIDI_CHANNELS];
+            unsigned char Ycc2[NUM_MIDI_CHANNELS];
+            unsigned char Xcc4[NUM_MIDI_CHANNELS];
+            unsigned char Ycc4[NUM_MIDI_CHANNELS];
+            unsigned char Xcc8[NUM_MIDI_CHANNELS];
+            unsigned char Ycc8[NUM_MIDI_CHANNELS];
+            string Name[NUM_MIDI_CHANNELS];
             int Part;
             int Controller;
-            bool vectorEnabled[NUM_MIDI_CHANNELS];
+            bool Enabled[NUM_MIDI_CHANNELS];
         };
 
-        IOdata nrpndata;
+        IOdata vectordata;
 
         list<string> LogList;
         BodyDisposal *deadObjects;

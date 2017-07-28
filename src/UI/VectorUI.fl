@@ -185,7 +185,7 @@ send_data(18, o->value(), 0xc0);}
     bitClear(Xf, 0);
 else
     bitSet(Xf, 0);
-synth->getRuntime().nrpndata.vectorXfeatures[BaseChan] = Xf;
+synth->getRuntime().vectordata.Xfeatures[BaseChan] = Xf;
 send_data(19, o->value(), 0xc0);}
           xywh {208 53 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
@@ -208,7 +208,7 @@ if (o->value() >= 1)
     if (o->value() == 2)
          bitSet(Xf, 4);
 }
-synth->getRuntime().nrpndata.vectorXfeatures[BaseChan] = Xf;
+synth->getRuntime().vectordata.Xfeatures[BaseChan] = Xf;
 send_data(20, o->value(), 0xc0);}
           xywh {302 53 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
@@ -235,7 +235,7 @@ if (o->value() >= 1)
     if (o->value() == 2)
          bitSet(Xf, 5);
 }
-synth->getRuntime().nrpndata.vectorXfeatures[BaseChan] = Xf;
+synth->getRuntime().vectordata.Xfeatures[BaseChan] = Xf;
 send_data(21, o->value(), 0xc0);}
           xywh {208 115 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
@@ -262,7 +262,7 @@ if (o->value() >= 1)
     if (o->value() == 2)
          bitSet(Xf, 6);
 }
-synth->getRuntime().nrpndata.vectorXfeatures[BaseChan] = Xf;
+synth->getRuntime().vectordata.Xfeatures[BaseChan] = Xf;
 send_data(22, o->value(), 0xc0);}
           xywh {302 115 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
@@ -290,8 +290,8 @@ else if (tmp < 14)
 
 if (tmp < 14)
 {
-    synth->getRuntime().nrpndata.vectorXaxis[BaseChan] = 0xff;
-    synth->getRuntime().nrpndata.vectorEnabled[BaseChan] = false;
+    synth->getRuntime().vectordata.Xaxis[BaseChan] = 0xff;
+    synth->getRuntime().vectordata.Enabled[BaseChan] = false;
     Xgroup->deactivate();
     Ygroup->deactivate();
     Ycontrol->deactivate();;
@@ -373,7 +373,7 @@ send_data(34, o->value(), 0xc0);}
     bitClear(Yf, 0);
 else
     bitSet(Yf, 0);
-synth->getRuntime().nrpndata.vectorYfeatures[BaseChan] = Yf;
+synth->getRuntime().vectordata.Yfeatures[BaseChan] = Yf;
 send_data(35, o->value(), 0xc0);}
           xywh {208 163 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
@@ -396,7 +396,7 @@ if (o->value() >= 1)
     if (o->value() == 2)
          bitSet(Yf, 4);
 }
-synth->getRuntime().nrpndata.vectorYfeatures[BaseChan] = Yf;
+synth->getRuntime().vectordata.Yfeatures[BaseChan] = Yf;
 send_data(36, o->value(), 0xc0);}
           xywh {302 163 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
@@ -423,7 +423,7 @@ if (o->value() >= 1)
     if (o->value() == 2)
          bitSet(Yf, 5);
 }
-synth->getRuntime().nrpndata.vectorYfeatures[BaseChan] = Yf;
+synth->getRuntime().vectordata.Yfeatures[BaseChan] = Yf;
 send_data(37, o->value(), 0xc0);}
           xywh {208 225 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
@@ -450,7 +450,7 @@ if (o->value() >= 1)
     if (o->value() == 2)
          bitSet(Yf, 6);
 }
-synth->getRuntime().nrpndata.vectorYfeatures[BaseChan] = Yf;
+synth->getRuntime().vectordata.Yfeatures[BaseChan] = Yf;
 send_data(38, o->value(), 0xc0);}
           xywh {302 225 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
@@ -478,7 +478,7 @@ else if (tmp < 14)
 
 if (tmp < 14)
 {
-    synth->getRuntime().nrpndata.vectorYaxis[BaseChan] = 0xff;
+    synth->getRuntime().vectordata.Yaxis[BaseChan] = 0xff;
     Ygroup->deactivate();
 }
 else
@@ -502,7 +502,7 @@ tmp = fl_input("Vector name:", loadlabel[BaseChan].c_str());
 if (!string(tmp).empty())
 {
     o->copy_label(tmp.c_str());
-    loadlabel[BaseChan]  = tmp; 
+    loadlabel[BaseChan]  = tmp;
 }}
         tooltip {Last saved or loaded vector file} xywh {45 265 198 20} box THIN_DOWN_BOX labelfont 1 labelsize 12
       }
@@ -575,7 +575,7 @@ else
   }
   Function {setbuttons()} {} {
     code {//
-Xcc = synth->getRuntime().nrpndata.vectorXaxis[BaseChan];
+Xcc = synth->getRuntime().vectordata.Xaxis[BaseChan];
 if (Xcc > 119)
 {
     Xcc = 0;
@@ -587,9 +587,9 @@ if (Xcc > 119)
 }
 else
 {
-    Xf = synth->getRuntime().nrpndata.vectorXfeatures[BaseChan];
+    Xf = synth->getRuntime().vectordata.Xfeatures[BaseChan];
     Xgroup->activate();
-    Ycc = synth->getRuntime().nrpndata.vectorYaxis[BaseChan];
+    Ycc = synth->getRuntime().vectordata.Yaxis[BaseChan];
     if (Ycc > 119)
     {
         Ycc = 0;
@@ -597,7 +597,7 @@ else
     }
     else
     {
-        Yf = synth->getRuntime().nrpndata.vectorYfeatures[BaseChan];
+        Yf = synth->getRuntime().vectordata.Yfeatures[BaseChan];
         Ygroup->activate();
     }
 }
@@ -792,11 +792,11 @@ return col;} {}
   }
   Function {clearVector(int BaseC)} {} {
     code {//
-synth->getRuntime().nrpndata.vectorXaxis[BaseC] = 0xff;
-synth->getRuntime().nrpndata.vectorYaxis[BaseC] = 0xff;
-synth->getRuntime().nrpndata.vectorXfeatures[BaseC] = 0;
-synth->getRuntime().nrpndata.vectorYfeatures[BaseC] = 0;
-synth->getRuntime().nrpndata.vectorEnabled[BaseC] = false;
+synth->getRuntime().vectordata.Xaxis[BaseC] = 0xff;
+synth->getRuntime().vectordata.Yaxis[BaseC] = 0xff;
+synth->getRuntime().vectordata.Xfeatures[BaseC] = 0;
+synth->getRuntime().vectordata.Yfeatures[BaseC] = 0;
+synth->getRuntime().vectordata.Enabled[BaseC] = false;
 loadlabel[BaseChan] = "No Name " + to_string(BaseChan);
 Loaded->copy_label(loadlabel[BaseC].c_str());
 setbuttons();

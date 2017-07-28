@@ -91,7 +91,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool saveBanks(int instance);
         void addHistory(string name, int group);
         vector<string> *getHistory(int group);
-        string vectorName[NUM_MIDI_CHANNELS];
         string lastPatchSetSeen(void);
         bool loadHistory(void);
         bool saveHistory(void);
