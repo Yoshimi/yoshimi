@@ -1172,6 +1172,7 @@ string InterChange::resolveMain(CommandBlock *getData)
         case 80:
             showValue = false;
             contstr = "Patchset Load";
+            break;
 
         case 84:
             showValue = false;
@@ -3759,9 +3760,8 @@ void InterChange::commandMain(CommandBlock *getData)
     unsigned char par2 = getData->data.par2;
 
     bool write = (type & 0x40) > 0;
-
     int value_int = lrint(value);
-string name;
+
     switch (control)
     {
         case 0:

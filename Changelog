@@ -5,6 +5,7 @@ yoshimi 1.5.2 M
 * It hasn't been purely nrpn based for a long time!
 * Further vector refactoring for overall consistency.
 * Updated docs.
+* Bugfix: Missing 'break' stopped patchset loads :(
 
 2017-7-27 Will
 * Improved state save error reporting for GUI & CLI.
