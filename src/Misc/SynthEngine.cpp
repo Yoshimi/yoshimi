@@ -125,7 +125,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
 
     ctl = new Controller(this);
     for (int i = 0; i < NUM_MIDI_CHANNELS; ++ i)
-        Runtime.vectordata.Name[i] = "No Name " + to_string(i);
+        Runtime.vectordata.Name[i] = "No Name " + to_string(i + 1);
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         part[npart] = NULL;
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
@@ -3537,6 +3537,27 @@ void SynthEngine::getLimits(CommandBlock *getData)
             min = -1;
             def = -10;
             max = -1;
+            break;
+    }
+    getData->data.type = type;
+    getData->limits.min = min;
+    getData->limits.def = def;
+    getData->limits.max = max;
+}
+
+
+void SynthEngine::getVectorLimits(CommandBlock *getData)
+{
+    int control = getData->data.control;
+    // defaults
+    int type = (getData->data.type & 0x3f) | 0x80; // set as integer
+    int min = 0;
+    int def = 0;
+    int max = NUM_MIDI_CHANNELS;
+    //cout << "config control " << to_string(control) << endl;
+    switch (control)
+    {
+        default:
             break;
     }
     getData->data.type = type;

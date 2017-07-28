@@ -154,6 +154,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool isMuted(void) { return (__sync_add_and_fetch(&muted, 0) != 0); }
 
         void getLimits(CommandBlock *getData);
+        void getVectorLimits(CommandBlock *getData);
         void getConfigLimits(CommandBlock *getData);
 
         Part *part[NUM_MIDI_PARTS];

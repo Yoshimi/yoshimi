@@ -266,7 +266,21 @@ void InterChange::transfertext(CommandBlock *getData)
     string text = miscMsgPop(getData->data.par2);
     unsigned char tmp;
 
-    if (npart == 232)
+    if (npart == 192)
+    {
+        switch(control)
+        {
+            case 8:
+                if (write)
+                    synth->getRuntime().vectordata.Name[insert] = text;
+                else
+                    text = synth->getRuntime().vectordata.Name[insert];
+                value = miscMsgPush(text);
+                getData->data.parameter &= 0x7f;
+                break;
+        }
+    }
+    else if (npart == 232)
     {
         switch(control)
         {
@@ -713,6 +727,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
 
 string InterChange::resolveVector(CommandBlock *getData)
 {
+    int value_int = lrint(getData->data.value);
     unsigned char control = getData->data.control;
     unsigned int chan = getData->data.insert;
 
@@ -724,6 +739,10 @@ string InterChange::resolveVector(CommandBlock *getData)
             break;
         case 1:
             contstr = "Options";
+            break;
+        case 8:
+            showValue = false;
+            contstr = "Name " + miscMsgPop(value_int);
             break;
 
         case 16:
@@ -3210,6 +3229,8 @@ void InterChange::commandVector(CommandBlock *getData)
             }
             break;
 
+        case 8:
+            break; // handled elsewhere
         case 16:
             if (write)
             {
@@ -6726,6 +6747,12 @@ void InterChange::returnLimits(CommandBlock *getData)
     if (npart == 240) // main control limits
     {
         synth->getLimits(getData);
+        return;
+    }
+
+    if (npart == 192) // vector limits
+    {
+        synth->getVectorLimits(getData);
         return;
     }
 

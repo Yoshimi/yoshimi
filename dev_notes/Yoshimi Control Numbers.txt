@@ -84,6 +84,8 @@ Vector control window
 n : 0 to 15 : 0 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Was Base channel Now does nothing
 n : 0 to 4 : 1 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Options - Load, Save, Recent, Clear Chan, Clear All
 
+Y : any : 8 : 192 : 255 : 255 : 0 to 15 : 128 : msg No. : Displayed name
+
 Y : 0, 14 to 119 : 16 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : X controller
 Y : any : 17 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : X left instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
 Y : any : 18 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : X right instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID

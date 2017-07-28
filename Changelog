@@ -6,6 +6,7 @@ yoshimi 1.5.2 M
 * Further vector refactoring for overall consistency.
 * Updated docs.
 * Bugfix: Missing 'break' stopped patchset loads :(
+* Vector name now editable and saved internally.
 
 2017-7-27 Will
 * Improved state save error reporting for GUI & CLI.

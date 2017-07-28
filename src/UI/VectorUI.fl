@@ -59,7 +59,7 @@ send_data(0, o->value() - 1, 0xc0);}
         code0 {o->value(BaseChan + 1);}
       }
       Fl_Menu_Button {} {
-        label Options
+        label Options open
         xywh {275 12 74 20} labelsize 12 textsize 12
         code0 {o = o; // suppress warning}
         code1 {vector <string> listType = *synth->getHistory(5);}
@@ -129,8 +129,10 @@ send_data(1, 3, 0xc0);}
         MenuItem {} {
           label {Clear All}
           callback {//
-for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
+for (int i = NUM_MIDI_CHANNELS - 1; i >= 0; --i)
     clearVector(i);
+BaseChan = 0;
+setbasechan->value(0);
 send_data(1, 4, 0xc0);}
           xywh {40 40 34 20} labelsize 12
         }
@@ -497,14 +499,15 @@ send_data(32, o->value(), 0xc0);}
       }
       Fl_Button Loaded {
         label {No Name}
-        callback {string tmp = "";
+        callback {const char *tmp = NULL;
 tmp = fl_input("Vector name:", loadlabel[BaseChan].c_str());
-if (!string(tmp).empty())
+if (tmp != NULL && !string(tmp).empty())
 {
-    o->copy_label(tmp.c_str());
-    loadlabel[BaseChan]  = tmp;
+    o->copy_label(tmp);
+    loadlabel[BaseChan]  = string(tmp);
+    synth->getRuntime().vectordata.Name[BaseChan] = string(tmp);
 }}
-        tooltip {Last saved or loaded vector file} xywh {45 265 198 20} box THIN_DOWN_BOX labelfont 1 labelsize 12
+        tooltip {Last saved or loaded vector file - click to change} xywh {45 265 198 20} box THIN_DOWN_BOX labelfont 1 labelsize 12
       }
     }
   }
@@ -516,6 +519,26 @@ if (!string(tmp).empty())
         insert = BaseChan;
     }
     collect_data(synth, value, (Fl::event_button() | type), control, part, kit, engine, insert, parameter, par2);} {}
+  }
+  Function {returns_update(CommandBlock *getData)} {} {
+    code {//
+//float value = getData->data.value;
+//bool isGui = (getData->data.type & 0x20);
+unsigned char control = getData->data.control;
+unsigned char insert = getData->data.insert;
+unsigned char par2 = getData->data.par2;
+//int value_int = lrint(value);
+//bool value_bool = (value > 0.5f);
+string msg;
+
+switch (control)
+{
+    case 8:
+        msg = miscMsgPop(par2);;
+        loadlabel[insert] = msg;
+        Loaded->copy_label(msg.c_str());
+        break;
+}} {}
   }
   Function {VectorUI(SynthEngine *_synth, BankUI *_bankui, ParametersUI *_paramsui)} {} {
     code {//
@@ -548,7 +571,7 @@ if (everything)
     BaseChan = 0;
     setbasechan->value(BaseChan + 1);
     for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
-        loadlabel[i] = "No Name " + to_string(i);
+        loadlabel[i] = "No Name " + to_string(i + 1);
 
 }
 setInstrumentLabel(BaseChan);
@@ -770,26 +793,35 @@ return col;} {}
   }
   Function {saveVector()} {} {
     code {//
-            char *filename;
-            filename = fl_file_chooser("Save:", "({*.xvy})", NULL, 0);
-            if (filename == NULL)
+            const char *file = NULL;
+            file = fl_file_chooser("Save:", "({*.xvy})", NULL, 0);
+            if (file == NULL)
                 return;
-            filename = fl_filename_setext(filename, ".xvy");
-            if (isRegFile(string(filename)))
+                
+            string candidate;
+            string oldname = loadlabel[BaseChan];  
+            int pos = oldname.find("No Name");              
+            string filename = setExtension(string(file), "xvy");
+            if (isRegFile(filename))
                 if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                     return;
-            synth->actionLock(lockmute);
-            bool result = synth->saveVector(BaseChan, string(filename), true);
-            synth->actionLock(unlock);
-            if (result)
+            if (pos >=0 && pos < 2)
             {
-                recenthistory->activate();
-                loadlabel[BaseChan] = findleafname((string)filename);
-                Loaded->copy_label(loadlabel[BaseChan].c_str());
-
+                candidate = findleafname(filename);
+                loadlabel[BaseChan] = candidate;
+                Loaded->copy_label(candidate.c_str());
+                synth->getRuntime().vectordata.Name[BaseChan] = candidate;
             }
+
+            if (synth->saveVector(BaseChan, filename, true))
+                recenthistory->activate();
             else
-                fl_alert("Failed to save vector");} {}
+            {
+                loadlabel[BaseChan] = oldname;
+                Loaded->copy_label(oldname.c_str());
+
+                fl_alert("Failed to save vector");
+            }} {}
   }
   Function {clearVector(int BaseC)} {} {
     code {//
@@ -798,7 +830,7 @@ synth->getRuntime().vectordata.Yaxis[BaseC] = 0xff;
 synth->getRuntime().vectordata.Xfeatures[BaseC] = 0;
 synth->getRuntime().vectordata.Yfeatures[BaseC] = 0;
 synth->getRuntime().vectordata.Enabled[BaseC] = false;
-loadlabel[BaseChan] = "No Name " + to_string(BaseChan);
+loadlabel[BaseC] = "No Name " + to_string(BaseC + 1);
 Loaded->copy_label(loadlabel[BaseC].c_str());
 setbuttons();
 Xcontrol->activate();

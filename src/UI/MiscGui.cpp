@@ -119,9 +119,10 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
         synth->getGuiMaster()->microtonalui->returns_update(getData);
         return;
     }
-    if (npart >= 0xc0 && npart < 0xd0) // vector
+    if (npart == 0xc0) // vector
     {
-        return; // todo
+        synth->getGuiMaster()->vectorui->returns_update(getData);
+        return;
     }
     if (npart == 0xd8 && synth->getGuiMaster()->midilearnui != NULL)
     {
