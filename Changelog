@@ -1,5 +1,9 @@
 yoshimi 1.5.2 M
 
+2017-7-29 Will
+* Improved vector saving management.
+* Reset & state load now update Vector name :p
+
 2017-7-28 Will
 * Refactored vector data structure.
 * It hasn't been purely nrpn based for a long time!
@@ -14,7 +18,7 @@ yoshimi 1.5.2 M
 * Bugfix: Reports button not correctly responding.
 * doc updates.
 * Improved vector loading management.
-* Started making vactor name editable.
+* Started making vector name editable.
 
 2017-7-26 Wiil
 * Resolved Vector display issues.

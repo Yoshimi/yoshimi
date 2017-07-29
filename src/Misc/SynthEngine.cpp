@@ -481,7 +481,7 @@ void *SynthEngine::RBPthread(void)
                                 //loadVectorAndUpdate(block.data[3], block.data[2]);
                                 break;
                             case 5: // load state redundant?
-                                loadStateAndUpdate(miscMsgPop(block.data[2]));
+                                //loadStateAndUpdate(miscMsgPop(block.data[2]));
                                 break;
 
                             case 6: // load scale
@@ -499,9 +499,9 @@ void *SynthEngine::RBPthread(void)
                                 // for success
                                     break;
                                 case 5: // save state redundant?
-                                    name = miscMsgPop(block.data[2]);
-                                    if (Runtime.saveState(name))
-                                        addHistory(name, 4);
+                                    //name = miscMsgPop(block.data[2]);
+                                    //if (Runtime.saveState(name))
+                                        //addHistory(name, 4);
                                     break;
                                 case 6: // save scale
                                     saveMicrotonal(block.data[2], 0, block.data[3]);
@@ -2032,6 +2032,7 @@ void SynthEngine::ClearNRPNs(void)
         Runtime.vectordata.Yaxis[chan] = 0xff;
         Runtime.vectordata.Xfeatures[chan] = 0;
         Runtime.vectordata.Yfeatures[chan] = 0;
+        Runtime.vectordata.Name[chan] = "No Name " + to_string (chan + 1);
     }
 }
 
@@ -3045,25 +3046,16 @@ unsigned char SynthEngine::extractVectorData(unsigned char baseChan, XMLwrapper 
 }
 
 
-bool SynthEngine::saveVector(unsigned char baseChan, string name, bool full)
+unsigned char SynthEngine::saveVector(unsigned char baseChan, string name, bool full)
 {
-    bool ok = true;
+    unsigned char result = 0xff; // ok
 
     if (baseChan >= NUM_MIDI_CHANNELS)
-    {
-        Runtime.Log("Invalid channel number");
-        return false;
-    }
+        return miscMsgPush("Invalid channel number");
     if (name.empty())
-    {
-        Runtime.Log("No filename");
-        return false;
-    }
+        return miscMsgPush("No filename");
     if (Runtime.vectordata.Enabled[baseChan] == false)
-    {
-        Runtime.Log("No vector data on this channel");
-        return false;
-    }
+        return miscMsgPush("No vector data on this channel");
 
     string file = setExtension(name, "xvy");
     legit_pathname(file);
@@ -3073,23 +3065,21 @@ bool SynthEngine::saveVector(unsigned char baseChan, string name, bool full)
     if (!xml)
     {
         Runtime.Log("Save Vector failed xmltree allocation", 2);
-        return false;
+        return miscMsgPush("FAIL");
     }
     xml->beginbranch("VECTOR");
         insertVectorData(baseChan, true, xml, findleafname(file));
     xml->endbranch();
 
     if (xml->saveXMLfile(file))
-    {
         addHistory(file, 5);
-    }
     else
     {
         Runtime.Log("Failed to save data to " + file, 2);
-        ok = false;
+        result = miscMsgPush("FAIL");
     }
     delete xml;
-    return ok;
+    return result;
 }
 
 

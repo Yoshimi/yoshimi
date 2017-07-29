@@ -2528,8 +2528,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             {
                 chan = tmp;
                 Runtime.finishedCLI = false;
-                if(synth->saveVector(chan, (string) point, true))
-                    Runtime.Log("Saved channel " + asString(chan + 1) + " Vector to " + (string) point);
+                sendDirect(0, 64, 85, 0xf0, 0xff, 0xff, chan, 0x80, miscMsgPush((string) point));
                 Runtime.finishedCLI = true;
                 reply = done_msg;
             }
@@ -2649,7 +2648,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                     {
                         param = string2int(point);
                         point = skipChars(point);
-                        if (((control == 80 || control == 84 || control == 88 || control == 92 || control == 93) && part == 240) || (param == 128))
+                        if (((control == 80 || control == 88) && part == 240) || ((param & 0x80) && param < 0xff))
                         {
                             string name = string(point);
                             if (name < "!")

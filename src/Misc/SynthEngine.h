@@ -97,7 +97,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         unsigned char loadVectorAndUpdate(unsigned char baseChan, string name);
         unsigned char loadVector(unsigned char baseChan, string name, bool full);
         unsigned char extractVectorData(unsigned char baseChan, XMLwrapper *xml, string name);
-        bool saveVector(unsigned char baseChan, string name, bool full);
+        unsigned char saveVector(unsigned char baseChan, string name, bool full);
         bool insertVectorData(unsigned char baseChan, bool full, XMLwrapper *xml, string name);
 
         bool getfromXML(XMLwrapper *xml);

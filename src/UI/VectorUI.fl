@@ -59,7 +59,7 @@ send_data(0, o->value() - 1, 0xc0);}
         code0 {o->value(BaseChan + 1);}
       }
       Fl_Menu_Button {} {
-        label Options open
+        label Options
         xywh {275 12 74 20} labelsize 12 textsize 12
         code0 {o = o; // suppress warning}
         code1 {vector <string> listType = *synth->getHistory(5);}
@@ -513,7 +513,7 @@ if (tmp != NULL && !string(tmp).empty())
   }
   Function {send_data(int control, float value, int type, int part = 255, int kit = 255, int engine = 255, int insert = 255, int parameter = 255, int par2 = 255)} {} {
     code {//
-    if (control != 84)
+    if (control < 84 || control > 85)
     {
         part = 192;
         insert = BaseChan;
@@ -596,7 +596,10 @@ else
                 setInstrumentLabel(BaseChan + NUM_MIDI_CHANNELS * 2);
                 setInstrumentLabel(BaseChan + NUM_MIDI_CHANNELS * 3);
                 setbuttons();
-            }} {}
+                loadlabel[BaseChan] = synth->getRuntime().vectordata.Name[BaseChan];
+            }
+            Loaded->copy_label(loadlabel[0].c_str());
+            setbasechan->value(1);} {}
   }
   Function {setbuttons()} {} {
     code {//
@@ -797,10 +800,10 @@ return col;} {}
             file = fl_file_chooser("Save:", "({*.xvy})", NULL, 0);
             if (file == NULL)
                 return;
-                
+
             string candidate;
-            string oldname = loadlabel[BaseChan];  
-            int pos = oldname.find("No Name");              
+            string oldname = loadlabel[BaseChan];
+            int pos = oldname.find("No Name");
             string filename = setExtension(string(file), "xvy");
             if (isRegFile(filename))
                 if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
@@ -812,16 +815,7 @@ return col;} {}
                 Loaded->copy_label(candidate.c_str());
                 synth->getRuntime().vectordata.Name[BaseChan] = candidate;
             }
-
-            if (synth->saveVector(BaseChan, filename, true))
-                recenthistory->activate();
-            else
-            {
-                loadlabel[BaseChan] = oldname;
-                Loaded->copy_label(oldname.c_str());
-
-                fl_alert("Failed to save vector");
-            }} {}
+            send_data(85, 0, 0xf0, 240, 255, 255, BaseChan, 128, miscMsgPush(filename));} {}
   }
   Function {clearVector(int BaseC)} {} {
     code {//

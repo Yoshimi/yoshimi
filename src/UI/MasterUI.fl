@@ -1232,6 +1232,11 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
                 refresh_master_ui(2);
             }
             break;
+        case 85: // save vector
+            name = miscMsgPop(par2);
+            if (wasFromHere && name.find("FAILED") == 1)
+                fl_alert("%s",name.c_str());
+            break;
 
         case 88:
             microtonalui->Hide();
@@ -1244,7 +1249,6 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
                 fl_alert("%s",name.c_str());
             refresh_master_ui(0);
             break;
-
         case 93: // save state
             name = miscMsgPop(par2);
             if (wasFromHere && name.find("FAILED") == 1)

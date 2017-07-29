@@ -265,6 +265,7 @@ void InterChange::transfertext(CommandBlock *getData)
     bool (write) = (type & 0x40);
     string text = miscMsgPop(getData->data.par2);
     unsigned char tmp;
+    string name;
 
     if (npart == 192)
     {
@@ -355,13 +356,27 @@ void InterChange::transfertext(CommandBlock *getData)
                 if ( tmp < 0xff)
                 {
                     getData->data.insert = tmp;
-                    text = "ed " + text + " to " + to_string(int(insert));
+                    text = "ed " + text + " to chan " + to_string(int(tmp + 1));
                 }
                 else
                     text = " FAILED " + text;
                 value = miscMsgPush(text);
                 getData->data.parameter &= 0x7f;
-
+                break;
+            case 85: // vector save
+                tmp = synth->saveVector(insert, text, true);
+                if (tmp == 0xff)
+                    text = "d " + text;
+                else
+                {
+                    name = miscMsgPop(tmp);
+                    if (name != "FAIL")
+                        text = " " + name;
+                    else
+                        text = " FAILED " + text;
+                }
+                value = miscMsgPush(text);
+                getData->data.parameter &= 0x7f;
                 break;
             case 92: // state load
                 if (synth->loadStateAndUpdate(text))
@@ -1197,6 +1212,12 @@ string InterChange::resolveMain(CommandBlock *getData)
             showValue = false;
             name = miscMsgPop(value_int);
             contstr = "Vector Load" + name;
+            break;
+
+        case 85:
+            showValue = false;
+            name = miscMsgPop(value_int);
+            contstr = "Vector Save" + name;
             break;
 
         case 88:
@@ -3849,6 +3870,8 @@ void InterChange::commandMain(CommandBlock *getData)
                 getData->data.type = 0xff; // stop further action
             }
             break;
+        case 85:
+            break; // done elsewhere
         case 88: // load scale
             synth->writeRBP(6, 6, par2, type);
             break;
