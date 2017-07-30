@@ -53,8 +53,7 @@ class VectorUI {selected : {private MiscFuncs}
       Fl_Spinner setbasechan {
         label {Base Channel}
         callback {BaseChan = o->value() - 1;
-updateAll(false);
-send_data(0, o->value() - 1, 0xc0);}
+updateAll(false);}
         tooltip {The channel number for this vector} xywh {121 12 38 20} labelfont 1 labelsize 12 maximum 16 textsize 12
         code0 {o->value(BaseChan + 1);}
       }
@@ -67,8 +66,7 @@ send_data(0, o->value() - 1, 0xc0);}
       } {
         MenuItem {} {
           label Load
-          callback {loadVector("");
-//send_data(1, 0, 0xc0);}
+          callback {loadVector("");}
           xywh {0 0 34 20} labelsize 12
         }
         MenuItem {} {
@@ -107,23 +105,19 @@ else
 }
 
 if (ok)
-{
-    saveVector();
-    send_data(1, 1, 0xc0);
-}}
+    saveVector();}
           xywh {10 10 34 20} labelsize 12
         }
         MenuItem recenthistory {
           label Recent
           callback {paramsui->Recent->position(vectorwindow->x() + vectorwindow->w() - paramsui->Recent->w(),vectorwindow->y()+20);
-paramsui->Show(5);
-//send_data(1, 2, 0xc0);}
+paramsui->Show(5);}
           xywh {20 20 34 20} labelsize 12 deactivate
         }
         MenuItem {} {
           label {Clear Chan}
           callback {clearVector(BaseChan);
-send_data(1, 3, 0xc0);}
+//send_data(93, baseChan, 0xf0);}
           xywh {30 30 34 20} labelsize 12
         }
         MenuItem {} {
@@ -133,7 +127,7 @@ for (int i = NUM_MIDI_CHANNELS - 1; i >= 0; --i)
     clearVector(i);
 BaseChan = 0;
 setbasechan->value(1);
-send_data(1, 4, 0xc0);}
+//send_data(96, 0, 0xf0);}
           xywh {40 40 34 20} labelsize 12
         }
       }
@@ -156,7 +150,7 @@ send_data(1, 4, 0xc0);}
         Fl_Button XL {
           callback {synth->getGuiMaster()->npart = BaseChan;
 bankui->Show();
-send_data(17, o->value(), 0xc0);}
+//send_data(17, o->value(), 0xf0);}
           tooltip {Part corresponding to joystick 'left' position} xywh {20 53 160 20} box UP_FRAME color 51 labelsize 12 align 64
         }
         Fl_Box AddBackR {
@@ -174,7 +168,7 @@ send_data(17, o->value(), 0xc0);}
         Fl_Button XR {
           callback {synth->getGuiMaster()->npart = BaseChan + NUM_MIDI_CHANNELS;
 bankui->Show();
-send_data(18, o->value(), 0xc0);}
+//send_data(18, o->value(), 0xf0);}
           tooltip {Part corresponding to joystick 'right' position} xywh {20 115 160 20} box UP_FRAME color 51 labelsize 12 align 64
         }
         Fl_Text_Display Xfeat {
@@ -188,7 +182,7 @@ send_data(18, o->value(), 0xc0);}
 else
     bitSet(Xf, 0);
 synth->getRuntime().vectordata.Xfeatures[BaseChan] = Xf;
-send_data(19, o->value(), 0xc0);}
+//send_data(19, o->value(), 0xc0);}
           xywh {208 53 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
           MenuItem {} {
@@ -211,7 +205,7 @@ if (o->value() >= 1)
          bitSet(Xf, 4);
 }
 synth->getRuntime().vectordata.Xfeatures[BaseChan] = Xf;
-send_data(20, o->value(), 0xc0);}
+//send_data(20, o->value(), 0xc0);}
           xywh {302 53 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
           MenuItem {} {
@@ -238,7 +232,7 @@ if (o->value() >= 1)
          bitSet(Xf, 5);
 }
 synth->getRuntime().vectordata.Xfeatures[BaseChan] = Xf;
-send_data(21, o->value(), 0xc0);}
+//send_data(21, o->value(), 0xc0);}
           xywh {208 115 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
           MenuItem {} {
@@ -265,7 +259,7 @@ if (o->value() >= 1)
          bitSet(Xf, 6);
 }
 synth->getRuntime().vectordata.Xfeatures[BaseChan] = Xf;
-send_data(22, o->value(), 0xc0);}
+//send_data(22, o->value(), 0xc0);}
           xywh {302 115 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
           MenuItem {} {
@@ -316,7 +310,7 @@ else
 Xcc =  tmp;
 o->value(tmp);
 o->redraw();
-send_data(16, o->value(), 0xc0);}
+//send_data(16, o->value(), 0xc0);}
         tooltip {The MIDI CC this axis reponds to} xywh {110 85 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12
         code0 {o->value(Xcc);}
       }
@@ -344,7 +338,7 @@ send_data(16, o->value(), 0xc0);}
         Fl_Button YU {
           callback {synth->getGuiMaster()->npart = BaseChan + NUM_MIDI_CHANNELS * 2;
 bankui->Show();
-send_data(33, o->value(), 0xc0);}
+//send_data(33, o->value(), 0xc0);}
           tooltip {Part corresponding to joystick 'up' position} xywh {20 163 160 20} box UP_FRAME color 51 labelsize 12 align 64
         }
         Fl_Box AddBackD {
@@ -362,7 +356,7 @@ send_data(33, o->value(), 0xc0);}
         Fl_Button YD {
           callback {synth->getGuiMaster()->npart = BaseChan + NUM_MIDI_CHANNELS * 3;
 bankui->Show();
-send_data(34, o->value(), 0xc0);}
+//send_data(34, o->value(), 0xc0);}
           tooltip {Part corresponding to joystick 'down'position} xywh {20 225 160 20} box UP_FRAME color 51 labelsize 12 align 64
         }
         Fl_Text_Display Yfeat {
@@ -376,7 +370,7 @@ send_data(34, o->value(), 0xc0);}
 else
     bitSet(Yf, 0);
 synth->getRuntime().vectordata.Yfeatures[BaseChan] = Yf;
-send_data(35, o->value(), 0xc0);}
+//send_data(35, o->value(), 0xc0);}
           xywh {208 163 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
           MenuItem {} {
@@ -399,7 +393,7 @@ if (o->value() >= 1)
          bitSet(Yf, 4);
 }
 synth->getRuntime().vectordata.Yfeatures[BaseChan] = Yf;
-send_data(36, o->value(), 0xc0);}
+//send_data(36, o->value(), 0xc0);}
           xywh {302 163 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
           MenuItem {} {
@@ -426,7 +420,7 @@ if (o->value() >= 1)
          bitSet(Yf, 5);
 }
 synth->getRuntime().vectordata.Yfeatures[BaseChan] = Yf;
-send_data(37, o->value(), 0xc0);}
+//send_data(37, o->value(), 0xc0);}
           xywh {208 225 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
           MenuItem {} {
@@ -453,7 +447,7 @@ if (o->value() >= 1)
          bitSet(Yf, 6);
 }
 synth->getRuntime().vectordata.Yfeatures[BaseChan] = Yf;
-send_data(38, o->value(), 0xc0);}
+//send_data(38, o->value(), 0xc0);}
           xywh {302 225 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
           MenuItem {} {
@@ -493,7 +487,7 @@ else
 Ycc =  tmp;
 o->value(tmp);
 o->redraw();
-send_data(32, o->value(), 0xc0);}
+//send_data(32, o->value(), 0xc0);}
         tooltip {The MIDI CC this axis reponds to} xywh {110 195 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12 deactivate
         code0 {o->value(Ycc);}
       }
@@ -506,6 +500,7 @@ if (tmp != NULL && !string(tmp).empty())
     o->copy_label(tmp);
     loadlabel[BaseChan]  = string(tmp);
     synth->getRuntime().vectordata.Name[BaseChan] = string(tmp);
+//    send_data(8, 0, 0xc0, 192, 255, 255, 255, 128, miscMsgPush(string(tmp)));
 }}
         tooltip {Last saved or loaded vector file - click to change} xywh {45 265 198 20} box THIN_DOWN_BOX labelfont 1 labelsize 12
       }
@@ -830,7 +825,19 @@ setbuttons();
 Xcontrol->activate();
 Xcontrol->damage();
 Ycontrol->deactivate();
-Ycontrol->damage();} {}
+Ycontrol->damage();
+
+{
+if (BaseC < NUM_MIDI_CHANNELS)
+{
+//    send_data(93, BaseC, 0xf0, 192);
+    ;
+}
+else
+{
+//    send_data(96, 0, 0xf0, 192);
+    ;
+}} {}} {}
   }
   decl {SynthEngine *synth;} {private local
   }

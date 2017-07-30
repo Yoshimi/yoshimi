@@ -476,10 +476,6 @@ void *SynthEngine::RBPthread(void)
                             case 3: // load patchset
                                 loadPatchSetAndUpdate(miscMsgPop(block.data[2]));
                                 break;
-
-                            case 6: // load scale
-                                loadMicrotonal(block.data[2], 0, block.data[3]);
-                                break;
                         }
                         break;
                     case 7: // file saves
@@ -490,10 +486,6 @@ void *SynthEngine::RBPthread(void)
                                     Runtime.saveConfig();
                                 // test configChanged
                                 // for success
-                                    break;
-
-                                case 6: // save scale
-                                    saveMicrotonal(block.data[2], 0, block.data[3]);
                                     break;
                             }
                         }
@@ -2530,51 +2522,25 @@ void SynthEngine::loadPatchSetAndUpdate(string fname)
 }
 
 
-void SynthEngine::loadMicrotonal(unsigned char msg, unsigned char type, char source)
+bool SynthEngine::loadMicrotonal(string fname)
 {
-    string fname = miscMsgPop(msg);
     bool ok = true;
-    switch (type)
-    {
-        case 0: // scale
-            microtonal.defaults();
-            if (microtonal.loadXML(setExtension(fname, "xsz")))
-            {
-                addHistory(fname, 3);
-            }
-            else
-                ok = false;
-            break;
-    }
-    if (!ok)
-    {
-        Runtime.Log("Could not load " + fname);
-        if (Runtime.showGui && (source & 0x20))
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Could not load " + fname));
-    }
+    microtonal.defaults();
+    if (microtonal.loadXML(setExtension(fname, "xsz")))
+        addHistory(fname, 3);
+    else
+        ok = false;
+    return ok;
 }
 
-void SynthEngine::saveMicrotonal(unsigned char msg, unsigned char type, char source)
+bool SynthEngine::saveMicrotonal(string fname)
 {
-    string fname = miscMsgPop(msg);
     bool ok = true;
-    switch (type)
-    {
-        case 0: // scale
-            if (microtonal.saveXML(setExtension(fname, "xsz")))
-            {
-                addHistory(fname, 3);
-            }
-            else
-                ok = false;
-            break;
-    }
-    if (!ok)
-    {
-        Runtime.Log("Could not save " + fname);
-        if (Runtime.showGui && (source & 0x20))
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Could not save " + fname));
-    }
+    if (microtonal.saveXML(setExtension(fname, "xsz")))
+        addHistory(fname, 3);
+    else
+        ok = false;
+    return ok;
 }
 
 

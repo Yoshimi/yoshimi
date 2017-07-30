@@ -8,6 +8,8 @@ yoshimi 1.5.2 M
 * Console window now monospaced font.
 * Scales can now be loaded from histories.
 * Doc updates.
+* Improved scales load & save operations & messaging.
+* Further restructuring of Vectors.
 
 2017-7-29 Will
 * Improved vector saving management.

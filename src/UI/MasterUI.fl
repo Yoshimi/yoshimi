@@ -459,7 +459,7 @@ paramsui->Show(2);}
                 if (isRegFile(string(filename)))
                     if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                         return;
-                send_data(89, 0, 0xc0, 0xf0, 0xff, 0xff, 0xff, miscMsgPush(string(filename)));}
+                send_data(89, 0, 0xf0, 0xf0, 0xff, 0xff, 0x80, miscMsgPush(string(filename)));}
             xywh {25 25 100 20} labelsize 12
           }
           MenuItem RecentScale {
@@ -1232,15 +1232,31 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
                 refresh_master_ui(2);
             }
             break;
+
         case 85: // save vector
             name = miscMsgPop(par2);
             if (wasFromHere && name.find("FAILED") == 1)
                 fl_alert("%s",name.c_str());
             break;
 
-        case 88:
-            microtonalui->Hide();
-            microtonalui->make_window();
+        case 88: // load scales
+            name = miscMsgPop(par2);
+            if (name.find("FAILED") == 1)
+            {
+                if (wasFromHere)
+                    fl_alert("%s",name.c_str());
+            }
+            else
+            {
+                microtonalui->Hide();
+                microtonalui->make_window();
+            }
+            break;
+
+        case 89: // save scales
+            name = miscMsgPop(par2);
+            if (wasFromHere && name.find("FAILED") == 1)
+                    fl_alert("%s",name.c_str());
             break;
 
         case 92: // load state
@@ -1249,6 +1265,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
                 fl_alert("%s",name.c_str());
             refresh_master_ui(0);
             break;
+
         case 93: // save state
             name = miscMsgPop(par2);
             if (wasFromHere && name.find("FAILED") == 1)
@@ -1498,7 +1515,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   }
   Function {do_load_scale(string fname)} {} {
     code {//
-    send_data(88, 0, 0xf0, 0xf0, 0xff, 0xff, 0xff, miscMsgPush(fname));} {}
+    send_data(88, 0, 0xf0, 0xf0, 0xff, 0xff, 0x80, miscMsgPush(fname));} {}
   }
   Function {do_load_master(bool updatehistory, const char* file)} {} {
     code {//

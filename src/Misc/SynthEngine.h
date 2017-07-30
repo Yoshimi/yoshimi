@@ -85,8 +85,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool loadStateAndUpdate(string filename);
         bool saveState(string filename);
         void loadPatchSetAndUpdate(string filename);
-        void loadMicrotonal(unsigned char msg, unsigned char type, char source);
-        void saveMicrotonal(unsigned char msg, unsigned char type, char source);
+        bool loadMicrotonal(string fname);
+        bool saveMicrotonal(string fname);
         bool installBanks(int instance);
         bool saveBanks(int instance);
         void addHistory(string name, int group);

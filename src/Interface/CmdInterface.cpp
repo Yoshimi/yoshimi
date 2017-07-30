@@ -2462,7 +2462,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 if (ok)
                 {
                     Runtime.finishedCLI = false;
-                    sendDirect(0, 64, 88, 0xf0, 0xff, 0xff, 0xff, 0xff, miscMsgPush(name));
+                    sendDirect(0, 64, 88, 0xf0, 0xff, 0xff, 0xff, 0x80, miscMsgPush(name));
                     reply = done_msg;
                 }
             }
@@ -2585,7 +2585,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             else
             {
                 Runtime.finishedCLI = false;
-                sendDirect(0,64, 89, 0xf0, 0xff, 0xff, 0xff, 0xff, miscMsgPush(string(point)));
+                sendDirect(0,64, 89, 0xf0, 0xff, 0xff, 0xff, 0x80, miscMsgPush(string(point)));
                 reply = done_msg;
             }
         }else if (matchnMove(1, point, "patchset"))

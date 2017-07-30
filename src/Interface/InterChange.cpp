@@ -378,6 +378,22 @@ void InterChange::transfertext(CommandBlock *getData)
                 value = miscMsgPush(text);
                 getData->data.parameter &= 0x7f;
                 break;
+            case 88: // scales load
+                if (synth->loadMicrotonal(text))
+                    text = "ed " + text;
+                else
+                    text = " FAILED " + text;
+                value = miscMsgPush(text);
+                getData->data.parameter &= 0x7f;
+                break;
+            case 89: // scales save
+                if (synth->saveMicrotonal(text))
+                    text = "d " + text;
+                else
+                    text = " FAILED " + text;
+                value = miscMsgPush(text);
+                getData->data.parameter &= 0x7f;
+                break;
             case 92: // state load
                 if (synth->loadStateAndUpdate(text))
                     text = "ed " + text;
@@ -1222,12 +1238,14 @@ string InterChange::resolveMain(CommandBlock *getData)
 
         case 88:
             showValue = false;
-            contstr = "Scale Load";
+            name = miscMsgPop(value_int);
+            contstr = "Scale Load" + name;
             break;
 
         case 89:
             showValue = false;
-            contstr = "Scale Save";
+            name = miscMsgPop(value_int);
+            contstr = "Scale Save" + name;
             break;
 
         case 92:
@@ -2917,6 +2935,18 @@ void InterChange::returnsDirect(int altData)
             putData.data.parameter = 0x80;
             putData.data.par2 = (altData >> 8) & 0xff;
             break;
+        case 6:
+            putData.data.control = 88; // scales load
+            putData.data.type = altData >> 24;
+            putData.data.part = 0xf0;
+            putData.data.parameter = 0x80;
+            putData.data.par2 = (altData >> 8) & 0xff;
+        case 7:
+            putData.data.control = 89; // scales save
+            putData.data.type = altData >> 24;
+            putData.data.part = 0xf0;
+            putData.data.parameter = 0x80;
+            putData.data.par2 = (altData >> 8) & 0xff;
         default:
             return;
             break;
@@ -3187,9 +3217,10 @@ bool InterChange::commandSendReal(CommandBlock *getData)
 
 void InterChange::commandVector(CommandBlock *getData)
 {
-#pragma message "Gui writes changed to reads"
-    if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;
+/*
+ * Currently only CLI gets here apart from
+ * load and save which are also handled by the GUI
+ */
 
     int value = getData->data.value; // no floats here
     unsigned char type = getData->data.type;
@@ -3867,10 +3898,10 @@ void InterChange::commandMain(CommandBlock *getData)
         case 85:
             break; // done elsewhere
         case 88: // load scale
-            synth->writeRBP(6, 6, par2, type);
+            returnsDirect(6 | (par2 << 8) | (type << 24));
             break;
         case 89: // save scale
-            synth->writeRBP(7, 6, par2, type);
+            returnsDirect(7 | (par2 << 8) | (type << 24));
             break;
         case 92: // load state
             if (write && (parameter == 0xc0))
