@@ -2881,7 +2881,7 @@ unsigned char SynthEngine::loadVectorAndUpdate(unsigned char baseChan, string na
 {
     unsigned char result = loadVector(baseChan, name, true);
     if (result < 255)
-        addHistory(name, 4);
+        addHistory(name, 5);
     ShutUp();
     Unmute();
     return result;

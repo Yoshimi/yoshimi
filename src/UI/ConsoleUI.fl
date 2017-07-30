@@ -3,7 +3,7 @@ version 1.0304
 header_name {.h}
 code_name {.cc}
 comment {Copyright 2011, Alan Calvert
-Copyright 2015-2016, Will Godfrey
+Copyright 2015-2017, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,8 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
-} {selected in_source in_header
+
+Updated July 2017.} {in_source in_header
 }
 
 decl {\#include <set>} {public local
@@ -35,16 +36,17 @@ decl {\#include "Misc/Config.h"} {private global
 decl {\#include "MasterUI.h"} {private global
 }
 
-class ConsoleUI {} {
+class ConsoleUI {selected
+} {
   Function {make_window(void)} {} {
     Fl_Window logConsole {
       label {yoshimi console}
       callback {o->hide()}
-      xywh {5 20 385 185} type Double color 54 selection_color 36 labelfont 13 labelsize 13 align 0 when 1 hide resizable
+      xywh {5 20 385 185} type Double color 54 selection_color 36 labelsize 13 align 0 when 1 hide resizable
     } {
       Fl_Text_Display logText {
         label {log text}
-        xywh {0 0 385 185} color 54 labeltype NO_LABEL labelfont 13 labelsize 13 when 1 textfont 13 textsize 12 textcolor 35
+        xywh {0 0 385 185} color 54 labeltype NO_LABEL labelsize 13 when 1 textfont 4 textsize 12 textcolor 35
       }
     }
   }

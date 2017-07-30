@@ -2427,14 +2427,44 @@ bool CmdInterface::cmdIfaceProcessCommand()
         }
         else if (matchnMove(2, point, "scale"))
         {
-            string name = (string)point;
-            if (name == "")
+            if (point[0] == 0)
                 reply = name_msg;
             else
             {
-                Runtime.finishedCLI = false;
-                sendDirect(0, 64, 88, 0xf0, 0xff, 0xff, 0xff, 0xff, miscMsgPush(name));
-                reply = done_msg;
+                bool ok = true;
+                string name;
+                if (point[0] == '@')
+                {
+                    point += 1;
+                    point = skipSpace(point);
+                    tmp = string2int(point);
+                    if (tmp <= 0)
+                    {
+                        ok = false;
+                        reply = value_msg;
+                    }
+                    name = historySelect(3, tmp - 1);
+                    if (name == "")
+                    {
+                        ok = false;
+                        reply = done_msg;
+                    }
+                }
+                else
+                {
+                    name = (string)point;
+                    if (name == "")
+                    {
+                        ok = false;
+                        reply = name_msg;
+                    }
+                }
+                if (ok)
+                {
+                    Runtime.finishedCLI = false;
+                    sendDirect(0, 64, 88, 0xf0, 0xff, 0xff, 0xff, 0xff, miscMsgPush(name));
+                    reply = done_msg;
+                }
             }
         }
         else if (matchnMove(1, point, "patchset"))

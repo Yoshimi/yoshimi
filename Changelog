@@ -5,6 +5,9 @@ yoshimi 1.5.2 M
 * Optimised 'returnsDirect' access.
 * Loading scales from GUI now updates it!
 * Added microtonal demos to 'Examples'.
+* Console window now monospaced font.
+* Scales can now be loaded from histories.
+* Doc updates.
 
 2017-7-29 Will
 * Improved vector saving management.
