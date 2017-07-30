@@ -2820,14 +2820,9 @@ string InterChange::resolveEffects(CommandBlock *getData)
 }
 
 
-void InterChange::mediate(int altData)
+void InterChange::mediate()
 {
     CommandBlock getData;
-    if (altData)
-    {
-        returnsDirect(&getData, altData);
-        return;
-    }
     size_t commandSize = sizeof(getData);
     bool more;
     size_t size;
@@ -2901,38 +2896,37 @@ void InterChange::mediate(int altData)
 }
 
 
-void InterChange::returnsDirect(CommandBlock *putData, int altData)
+void InterChange::returnsDirect(int altData)
 {
-    memset(putData, 0xff, sizeof(putData));
+    CommandBlock putData;
+    memset(&putData, 0xff, sizeof(putData));
     switch (altData & 0xff)
     {
         case 4:
-            putData->data.control = 84; // vector load
-            putData->data.type = altData >> 24;
-            putData->data.part = 0xf0;
-            putData->data.insert = (altData >> 16) & 0xff;
-            putData->data.parameter = 0x80;
-            putData->data.par2 = (altData >> 8) & 0xff;
+            putData.data.control = 84; // vector load
+            putData.data.type = altData >> 24;
+            putData.data.part = 0xf0;
+            putData.data.insert = (altData >> 16) & 0xff;
+            putData.data.parameter = 0x80;
+            putData.data.par2 = (altData >> 8) & 0xff;
             break;
         case 5:
-            putData->data.control = 92; // sate load
-            putData->data.type = altData >> 24;
-            putData->data.part = 0xf0;
-            putData->data.parameter = 0x80;
-            putData->data.par2 = (altData >> 8) & 0xff;
+            putData.data.control = 92; // state load
+            putData.data.type = altData >> 24;
+            putData.data.part = 0xf0;
+            putData.data.parameter = 0x80;
+            putData.data.par2 = (altData >> 8) & 0xff;
             break;
         default:
             return;
             break;
     }
-    returns(putData);
+    returns(&putData);
 }
 
 void InterChange::returns(CommandBlock *getData)
 {
     float value = getData->data.value;
-//    if (value == FLT_MAX)
-//        return; // need to sort this out later
     unsigned char type = getData->data.type | 4; // back from synth
     unsigned char npart = getData->data.part;
 

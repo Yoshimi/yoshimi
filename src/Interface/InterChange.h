@@ -55,8 +55,8 @@ class InterChange : private MiscFuncs
         jack_ringbuffer_t *fromMIDI;
         jack_ringbuffer_t *returnsLoopback;
 
-        void mediate(int altData = 0);
-        void returnsDirect(CommandBlock *putData, int altData);
+        void mediate(void);
+        void returnsDirect(int altData);
         void returns(CommandBlock *getData);
         void setpadparams(int point);
         void doClearPart(int npart);

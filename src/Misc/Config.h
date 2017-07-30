@@ -157,7 +157,7 @@ class Config : public MiscFuncs
         unsigned char dataH;
         bool          nrpnActive;
 
-        struct IOdata{
+        struct{
             unsigned char Xaxis[NUM_MIDI_CHANNELS];
             unsigned char Yaxis[NUM_MIDI_CHANNELS];
             unsigned char Xfeatures[NUM_MIDI_CHANNELS];
@@ -172,9 +172,7 @@ class Config : public MiscFuncs
             int Part;
             int Controller;
             bool Enabled[NUM_MIDI_CHANNELS];
-        };
-
-        IOdata vectordata;
+        }vectordata;
 
         list<string> LogList;
         BodyDisposal *deadObjects;

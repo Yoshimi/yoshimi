@@ -477,13 +477,6 @@ void *SynthEngine::RBPthread(void)
                                 loadPatchSetAndUpdate(miscMsgPop(block.data[2]));
                                 break;
 
-                            case 4: // load vector
-                                //loadVectorAndUpdate(block.data[3], block.data[2]);
-                                break;
-                            case 5: // load state redundant?
-                                //loadStateAndUpdate(miscMsgPop(block.data[2]));
-                                break;
-
                             case 6: // load scale
                                 loadMicrotonal(block.data[2], 0, block.data[3]);
                                 break;
@@ -498,11 +491,7 @@ void *SynthEngine::RBPthread(void)
                                 // test configChanged
                                 // for success
                                     break;
-                                case 5: // save state redundant?
-                                    //name = miscMsgPop(block.data[2]);
-                                    //if (Runtime.saveState(name))
-                                        //addHistory(name, 4);
-                                    break;
+
                                 case 6: // save scale
                                     saveMicrotonal(block.data[2], 0, block.data[3]);
                                     break;
@@ -2304,39 +2293,6 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 #ifdef MUTEX
         actionLock(unlock);
 #endif
-        if (fadeAll && fadeLevel <= 0.001f)
-        {
-            /*
-             * we can replace some of these with a
-             * direct call with param block to
-             * interchange.returns(getdata)
-             * setting parameter to 128
-             * then using the transfer text
-             * it's then possible to get return
-             * messages.
-             */
-            Mute();
-            unsigned char fadeType = fadeAll & 0xff;
-            switch (fadeType)
-            {
-                case 1:
-                case 2:
-                    writeRBP(6, fadeType); // stop and master reset
-                    break;
-                case 3:
-                    writeRBP(6, fadeType, fadeAll >> 8, 0); // load patchset
-                    break;
-                case 4: // load vector
-                    interchange.mediate(fadeAll);
-                    //writeRBP(6, fadeType, (fadeAll >> 8) & 0xff, fadeAll >> 16); // load vector
-                    break;
-                case 5: // load state
-                    interchange.mediate(fadeAll);
-                    break;
-            }
-            fadeAll = 0;
-        }
-
         // Peak calculation for mixed outputs
         VUpeak.values.vuRmsPeakL = 1e-12f;
         VUpeak.values.vuRmsPeakR = 1e-12f;
@@ -2382,6 +2338,35 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                 else if (VUpeak.values.parts[npart] < -2.2) // fake peak is a negative value
                     VUpeak.values.parts[npart]+= 2;
             }
+        }
+/*
+ * This has to be at the end of the audio loop as some
+ * actions initiated by it may re-enter the 'mediate'
+ * function for as long as there are low priority updates
+ * to perform and audio is muted.
+ * This ensures no contention with VU updates etc.
+ */
+        if (fadeAll && fadeLevel <= 0.001f)
+        {
+            Mute();
+            unsigned char fadeType = fadeAll & 0xff;
+            switch (fadeType)
+            {
+                case 1:
+                case 2:
+                    writeRBP(6, fadeType); // stop and master reset
+                    break;
+                case 3:
+                    writeRBP(6, fadeType, fadeAll >> 8, 0); // load patchset
+                    break;
+                case 4: // load vector
+                    interchange.returnsDirect(fadeAll);
+                    break;
+                case 5: // load state
+                    interchange.returnsDirect(fadeAll);
+                    break;
+            }
+            fadeAll = 0;
         }
     }
     return p_buffersize;
@@ -3230,19 +3215,18 @@ void SynthEngine::putalldata(const char *data, int size)
         delete xml;
         return;
     }
-    //if (xml->enterbranch("MASTER"))
-    //{
+    if (xml->enterbranch("MASTER"))
+    {
         actionLock(lock);
         defaults();
         getfromXML(xml);
         actionLock(unlock);
         xml->exitbranch();
         midilearn.extractMidiListData(false, xml);
-        //midilearn.updateGui();
         setAllPartMaps();
-    //}
-    //else
-        //Runtime.Log("Master putAllData failed to enter MASTER branch");
+    }
+    else
+        Runtime.Log("Master putAllData failed to enter MASTER branch");
     delete xml;
 }
 
