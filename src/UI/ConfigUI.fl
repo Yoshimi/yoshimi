@@ -639,7 +639,7 @@ class ConfigUI {selected : {private MiscFuncs}
       Fl_Button {} {
         label {Save and Close}
         callback {//
-                    send_data(80, o->value(), 0xc0);
+                    send_data(80, o->value(), 0xf0, 0x80, miscMsgPush("DUMMY"));
                     configwindow->do_callback();}
         xywh {155 305 105 20} box THIN_UP_BOX labelsize 12
       }
@@ -720,11 +720,13 @@ class ConfigUI {selected : {private MiscFuncs}
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
             int value_int = lrint(getData->data.value);
+            bool wasFromHere = getData->data.type & 0x20;
             unsigned char control = getData->data.control;
             unsigned char par2 = getData->data.par2;
 
             bool value_bool = value_int > 0;
             int tmp;
+            string name;
             switch (control)
             {
                 case 0:
@@ -898,7 +900,10 @@ class ConfigUI {selected : {private MiscFuncs}
                     midiLearned->value(value_bool);
                     break;
 
-                case 80: // no action needed
+                case 80:
+                    name = miscMsgPop(par2);
+                    if (wasFromHere && name.find("FAILED") == 1)
+                        fl_alert("%s",name.c_str());
                     break;
     }} {}
   }

@@ -1081,7 +1081,11 @@ int CmdInterface::commandVector()
 int CmdInterface::commandConfig()
 {
     if (point[0] == 0)
+    {
+        if (isRead)
+            sendDirect(0, 0, 80, 248); // status
         return done_msg;
+    }
     float value = 0;
     unsigned char type;
     unsigned char command = 0xff;
@@ -2575,7 +2579,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         else if(matchnMove(1, point, "config"))
         {
             Runtime.finishedCLI = false;
-            sendDirect(0,64, 80, 248);
+            sendDirect(0, 64, 80, 248, 0xff, 0xff, 0xff, 0x80, miscMsgPush("DUMMY"));
         }
 
         else if (matchnMove(2, point, "scale"))

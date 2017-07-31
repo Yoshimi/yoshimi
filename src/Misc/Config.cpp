@@ -618,24 +618,29 @@ bool Config::extractConfigData(XMLwrapper *xml)
 }
 
 
-void Config::saveConfig(void)
+bool Config::saveConfig(void)
 {
+    bool result = false;
     xmlType = XML_CONFIG;
     XMLwrapper *xmltree = new XMLwrapper(synth);
     if (!xmltree)
     {
         Log("saveConfig failed xmltree allocation", 2);
-        return;
+        return result;
     }
     addConfigXML(xmltree);
     string resConfigFile = ConfigFile;
 
     if (xmltree->saveXMLfile(resConfigFile))
+    {
         configChanged = false;
+        result = true;
+    }
     else
         Log("Failed to save config to " + resConfigFile, 2);
 
     delete xmltree;
+    return result;
 }
 
 

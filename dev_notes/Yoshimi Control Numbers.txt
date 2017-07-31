@@ -55,7 +55,7 @@ Y : 0 to 119, other : 71 : 248 : 255 : 255 : 255 : 255 : 255 : Extended program 
 Y : 0/1 : 72 : 248 : 255 : 255 : 255 : 255 : 255 : Ignore reset all CC’s
 Y : 0/1 : 73 : 248 : 255 : 255 : 255 : 255 : 255 : Log incoming CC’s
 Y : 0/1 : 74 : 248 : 255 : 255 : 255 : 255 : 255 : Show learn editor
-Y : any : 80 : 248 : 255 : 255 : 255 : 255 : 255 : Save current config
+Y : any : 80 : 248 : 255 : 255 : 255 : 128 : msg No. : Save current config (any dummy message)
 
 Scales (microtonal)
 Y : 1.0 to 20000.0 : 0 : 232 : 255 : 255 : 255 : 255 : 255 : 'A’ frequency

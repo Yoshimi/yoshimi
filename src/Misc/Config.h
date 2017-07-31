@@ -62,7 +62,7 @@ class Config : public MiscFuncs
 
         string testCCvalue(int cc);
         string masterCCtest(int cc);
-        void saveConfig(void);
+        bool saveConfig(void);
         bool loadConfig(void);
         bool saveState() { return saveSessionData(StateFile); }
         bool saveState(const string statefile)  { return saveSessionData(statefile); }

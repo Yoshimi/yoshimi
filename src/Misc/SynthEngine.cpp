@@ -478,7 +478,7 @@ void *SynthEngine::RBPthread(void)
                                 break;
                         }
                         break;
-                    case 7: // file saves
+                    /*case 7: // file saves
                         {
                             switch(block.data[1] & 0xff)
                             {
@@ -489,7 +489,7 @@ void *SynthEngine::RBPthread(void)
                                     break;
                             }
                         }
-                        break;
+                        break;*/
 
                     case 10: // set global fine detune
                         microtonal.Pglobalfinedetune = block.data[1];

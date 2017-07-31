@@ -1,5 +1,9 @@
 yoshimi 1.5.2 M
 
+2017-7-31 Will
+* Improved config save operations & messaging.
+* Minor doc corrections & speeling chocks :)
+
 2017-7-30 Will
 * Corrected minor XML LV2 anomaly.
 * Optimised 'returnsDirect' access.

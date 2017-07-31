@@ -1,6 +1,6 @@
 It is now possible to fully control scales from the CLI.
 
-For tunings, ratios or floating point numbers can be entered.
+For tunings, either ratios or floating point numbers can be entered.
 
 Ratios are in the form n1 / n2 to a maximum of normal integer range. If just a numerator is set it will be regarded as n/1.
 

@@ -264,6 +264,7 @@ void InterChange::transfertext(CommandBlock *getData)
 //    unsigned char insert = getData->data.insert;
     bool (write) = (type & 0x40);
     string text = miscMsgPop(getData->data.par2);
+    getData->data.par2 = 0xff; // this may be reset later
     unsigned char tmp;
     string name;
 
@@ -277,72 +278,6 @@ void InterChange::transfertext(CommandBlock *getData)
                 else
                     text = synth->getRuntime().vectordata.Name[insert];
                 value = miscMsgPush(text);
-                getData->data.parameter &= 0x7f;
-                break;
-        }
-    }
-    else if (npart == 232)
-    {
-        switch(control)
-        {
-            case 32:
-                text = formatScales(text);
-                getData->data.parameter &= 0x7f;
-                value = synth->microtonal.texttotunings(text.c_str());
-                if (value > 0)
-                    synth->setAllPartMaps();
-                break;
-            case 33:
-                text = formatScales(text);
-                getData->data.parameter &= 0x7f;
-                value = synth->microtonal.texttomapping(text.c_str());
-                if (value > 0)
-                    synth->setAllPartMaps();
-                break;
-
-            case 48:
-                value = synth->microtonal.loadscl(setExtension(text,"scl"));
-                if(value > 0)
-                {
-                    text = "";
-                    char *buf = new char[100];
-                    for (int i = 0; i < value; ++ i)
-                    {
-                        synth->microtonal.tuningtoline(i, buf, 100);
-                        if (i > 0)
-                            text += "\n";
-                        text += string(buf);
-                    }
-                    delete [] buf;
-                }
-                getData->data.parameter &= 0x7f;
-                break;
-            case 49:
-                value = synth->microtonal.loadkbm(setExtension(text,"kbm"));
-                if(value > 0)
-                {
-                    text = "";
-                    int map;
-                    for (int i = 0; i < value; ++ i)
-                    {
-                        if (i > 0)
-                            text += "\n";
-                        map = synth->microtonal.Pmapping[i];
-                        if (map == -1)
-                            text += 'x';
-                        else
-                            text += to_string(map);
-                    }
-                }
-                getData->data.parameter &= 0x7f;
-                break;
-
-            case 64:
-                synth->microtonal.Pname = text;
-                getData->data.parameter &= 0x7f;
-                break;
-            case 65:
-                synth->microtonal.Pcomment = text;
                 getData->data.parameter &= 0x7f;
                 break;
         }
@@ -413,6 +348,72 @@ void InterChange::transfertext(CommandBlock *getData)
         }
 
     }
+    else if (npart == 232)
+    {
+        switch(control)
+        {
+            case 32:
+                text = formatScales(text);
+                getData->data.parameter &= 0x7f;
+                value = synth->microtonal.texttotunings(text.c_str());
+                if (value > 0)
+                    synth->setAllPartMaps();
+                break;
+            case 33:
+                text = formatScales(text);
+                getData->data.parameter &= 0x7f;
+                value = synth->microtonal.texttomapping(text.c_str());
+                if (value > 0)
+                    synth->setAllPartMaps();
+                break;
+
+            case 48:
+                value = synth->microtonal.loadscl(setExtension(text,"scl"));
+                if(value > 0)
+                {
+                    text = "";
+                    char *buf = new char[100];
+                    for (int i = 0; i < value; ++ i)
+                    {
+                        synth->microtonal.tuningtoline(i, buf, 100);
+                        if (i > 0)
+                            text += "\n";
+                        text += string(buf);
+                    }
+                    delete [] buf;
+                }
+                getData->data.parameter &= 0x7f;
+                break;
+            case 49:
+                value = synth->microtonal.loadkbm(setExtension(text,"kbm"));
+                if(value > 0)
+                {
+                    text = "";
+                    int map;
+                    for (int i = 0; i < value; ++ i)
+                    {
+                        if (i > 0)
+                            text += "\n";
+                        map = synth->microtonal.Pmapping[i];
+                        if (map == -1)
+                            text += 'x';
+                        else
+                            text += to_string(map);
+                    }
+                }
+                getData->data.parameter &= 0x7f;
+                break;
+
+            case 64:
+                synth->microtonal.Pname = text;
+                getData->data.parameter &= 0x7f;
+                break;
+            case 65:
+                synth->microtonal.Pcomment = text;
+                getData->data.parameter &= 0x7f;
+                break;
+        }
+    }
     else if (npart == 248)
     {
         switch (control)
@@ -457,6 +458,22 @@ void InterChange::transfertext(CommandBlock *getData)
                     text = synth->getRuntime().alsaAudioDevice;
                 value = miscMsgPush(text);
                 break;
+            case 80: // save config
+                if (write)
+                {
+                    text = synth->getRuntime().ConfigFile;
+                    if(synth->getRuntime().saveConfig())
+                        text = "d " + text;
+                    else
+                        text = " FAILED " + text;
+                }
+                else
+                    text = "READ";
+                value = miscMsgPush(text);
+                getData->data.par2 = miscMsgPush(text); // slightly odd case
+                getData->data.parameter &= 0x7f;
+                    value = miscMsgPush(text);
+                break;
         }
         getData->data.parameter &= 0x7f;
     }
@@ -467,8 +484,7 @@ void InterChange::transfertext(CommandBlock *getData)
         getData->data.value = float(value);
         if (synth->getRuntime().showGui && write && !((type & 0x20) && npart == 248))
             getData->data.par2 = miscMsgPush(text); // pass it on to GUI
-        else
-            getData->data.par2 = 0xff;
+
         jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
         if (synth->getRuntime().showGui && npart == 232 && control == 48)
         {   // loading a tuning includes a name!
@@ -1150,15 +1166,10 @@ string InterChange::resolveConfig(CommandBlock *getData)
             break;
 
         case 80:
+        {
+            string name = miscMsgPop(value_int);
             if (write)
-            {
-                if (synth->getRuntime().configChanged)
-                usleep(2000); // delay to allow save to take place
-                if (synth->getRuntime().configChanged)
-                    contstr += "Save FAILED"; // it really failed!
-                else
-                    contstr += "Saved";
-            }
+                contstr += ("save" + name);
             else
             {
                 contstr += "Condition - ";
@@ -1169,6 +1180,7 @@ string InterChange::resolveConfig(CommandBlock *getData)
             }
             showValue = false;
             break;
+        }
         default:
             contstr = "Unrecognised";
             break;
