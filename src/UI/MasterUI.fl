@@ -29,9 +29,9 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified July 2017
+Modified August 2017
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -97,7 +97,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 }
 
-class MasterUI {selected : {private MiscFuncs}
+class MasterUI {: {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1229,6 +1229,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             else
             {
                 vectorui->setLoadLabelRemote(insert, synth->getRuntime().vectordata.Name[insert]);
+                vectorui->recenthistory->activate();
                 refresh_master_ui(2);
             }
             break;
@@ -1237,6 +1238,10 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             name = miscMsgPop(par2);
             if (wasFromHere && name.find("FAILED") == 1)
                 fl_alert("%s",name.c_str());
+            else
+            {
+                vectorui->recenthistory->activate();
+            }
             break;
 
         case 88: // load scales

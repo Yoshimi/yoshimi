@@ -4,6 +4,8 @@ yoshimi 1.5.2 M
 * Removed mutex locks from patchset save.
   No longer needed, so patch sets and states
   now save silently.
+* Fixed regression. Vectors update 'recent' again.
+* Added 'Microtonal Ratio Scale' to examples.
 
 2017-7-31 Will
 * Improved config save operations & messaging.
