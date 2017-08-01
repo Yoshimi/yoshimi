@@ -1,5 +1,10 @@
 yoshimi 1.5.2 M
 
+2017-8-1 Will
+* Removed mutex locks from patchset save.
+  No longer needed, so patch sets and states
+  now save silently.
+
 2017-7-31 Will
 * Improved config save operations & messaging.
 * Minor doc corrections & speeling chocks :)

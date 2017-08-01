@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified July 2017
+    Modified August 2017
 */
 
 #include<stdio.h>
@@ -478,19 +478,6 @@ void *SynthEngine::RBPthread(void)
                                 break;
                         }
                         break;
-                    /*case 7: // file saves
-                        {
-                            switch(block.data[1] & 0xff)
-                            {
-                                case 0: // save config
-                                    Runtime.saveConfig();
-                                // test configChanged
-                                // for success
-                                    break;
-                            }
-                        }
-                        break;*/
-
                     case 10: // set global fine detune
                         microtonal.Pglobalfinedetune = block.data[1];
                         setAllPartMaps();
@@ -3092,7 +3079,6 @@ bool SynthEngine::insertVectorData(unsigned char baseChan, bool full, XMLwrapper
 void SynthEngine::add2XML(XMLwrapper *xml)
 {
     xml->beginbranch("MASTER");
-    actionLock(lockmute);
     xml->addpar("current_midi_parts", Runtime.NumAvailableParts);
     xml->addpar("volume", Pvolume);
     xml->addpar("key_shift", Pkeyshift);
@@ -3147,7 +3133,6 @@ void SynthEngine::add2XML(XMLwrapper *xml)
         xml->endbranch();
     }
     xml->endbranch(); // INSERTION_EFFECTS
-    actionLock(unlock);
     for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
     {
         if (Runtime.vectordata.Xaxis[i] < 127)
