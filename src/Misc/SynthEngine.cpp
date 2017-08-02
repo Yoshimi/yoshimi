@@ -160,6 +160,11 @@ SynthEngine::~SynthEngine()
         fftwf_free(Runtime.genTmp1);
     if (Runtime.genTmp2)
         fftwf_free(Runtime.genTmp2);
+    if (Runtime.genTmp3)
+        fftwf_free(Runtime.genTmp3);
+    if (Runtime.genTmp4)
+        fftwf_free(Runtime.genTmp4);
+
     if (tmpmixl)
         fftwf_free(tmpmixl);
     if (tmpmixr)
@@ -194,6 +199,8 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
      */
     Runtime.genTmp1 = (float*)fftwf_malloc(bufferbytes);
     Runtime.genTmp2 = (float*)fftwf_malloc(bufferbytes);
+    Runtime.genTmp3 = (float*)fftwf_malloc(bufferbytes);
+    Runtime.genTmp4 = (float*)fftwf_malloc(bufferbytes);
 
     oscilsize_f = oscilsize = Runtime.Oscilsize;
     halfoscilsize_f = halfoscilsize = oscilsize / 2;

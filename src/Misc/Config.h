@@ -183,6 +183,8 @@ class Config : public MiscFuncs
          */
         float *genTmp1;
         float *genTmp2;
+        float *genTmp3;
+        float *genTmp4;
 
         BodyDisposal *deadObjects;
 
