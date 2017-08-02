@@ -156,6 +156,10 @@ SynthEngine::~SynthEngine()
         if (sysefx[nefx])
             delete sysefx[nefx];
 
+    if (Runtime.genTmp1)
+        fftwf_free(Runtime.genTmp1);
+    if (Runtime.genTmp2)
+        fftwf_free(Runtime.genTmp2);
     if (tmpmixl)
         fftwf_free(tmpmixl);
     if (tmpmixr)
@@ -182,6 +186,15 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     p_all_buffersize_f = buffersize_f;
 
     bufferbytes = buffersize * sizeof(float);
+
+    /*
+     * These replace local memory allocations that
+     * were being made every time an add or sub note
+     * was processed. Now global so treat with care!
+     */
+    Runtime.genTmp1 = (float*)fftwf_malloc(bufferbytes);
+    Runtime.genTmp2 = (float*)fftwf_malloc(bufferbytes);
+
     oscilsize_f = oscilsize = Runtime.Oscilsize;
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
     fadeStep = 10.0f / samplerate; // 100mS fade

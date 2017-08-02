@@ -175,6 +175,15 @@ class Config : public MiscFuncs
         }vectordata;
 
         list<string> LogList;
+
+        /*
+         * These replace local memory allocations that
+         * were being made every time an add or sub note
+         * was processed. Now global so treat with care!
+         */
+        float *genTmp1;
+        float *genTmp2;
+
         BodyDisposal *deadObjects;
 
     private:

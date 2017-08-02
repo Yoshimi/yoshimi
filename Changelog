@@ -1,5 +1,8 @@
 yoshimi 1.5.2 M
 
+2017-8-2 Will
+* Small add/sub memory allocation optimisation.
+
 2017-8-1 Will
 * Removed mutex locks from patchset save.
   No longer needed, so patch sets and states

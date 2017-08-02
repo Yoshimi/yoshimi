@@ -55,8 +55,8 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
 {
     if (velocity > 1.0f)
         velocity = 1.0f;
-    tmpwavel = (float*)fftwf_malloc(synth->bufferbytes);
-    tmpwaver = (float*)fftwf_malloc(synth->bufferbytes);
+    //tmpwavel = (float*)fftwf_malloc(synth->bufferbytes);
+    //tmpwaver = (float*)fftwf_malloc(synth->bufferbytes);
     bypassl = (float*)fftwf_malloc(synth->bufferbytes);
     bypassr = (float*)fftwf_malloc(synth->bufferbytes);
 
@@ -847,8 +847,8 @@ ADnote::~ADnote()
 {
     if (NoteEnabled)
         killNote();
-    fftwf_free(tmpwavel);
-    fftwf_free(tmpwaver);
+    //fftwf_free(tmpwavel);
+    //fftwf_free(tmpwaver);
     fftwf_free(bypassl);
     fftwf_free(bypassr);
     for (int k = 0; k < max_unison; ++k)
@@ -1684,6 +1684,8 @@ void ADnote::ComputeVoicePinkNoise(int nvoice)
 // Compute the ADnote samples, returns 0 if the note is finished
 int ADnote::noteout(float *outl, float *outr)
 {
+    tmpwavel = synth->getRuntime().genTmp1;
+    tmpwaver = synth->getRuntime().genTmp2;
     int i, nvoice;
     memset(outl, 0, synth->p_bufferbytes);
     memset(outr, 0, synth->p_bufferbytes);

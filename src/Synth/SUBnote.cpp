@@ -53,8 +53,8 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
 {
     ready = 0;
 
-    tmpsmp = (float*)fftwf_malloc(synth->bufferbytes);
-    tmprnd = (float*)fftwf_malloc(synth->bufferbytes);
+    //tmpsmp = (float*)fftwf_malloc(synth->bufferbytes);
+    //tmprnd = (float*)fftwf_malloc(synth->bufferbytes);
 
     // Initialise some legato-specific vars
     Legato.msg = LM_Norm;
@@ -280,8 +280,8 @@ SUBnote::~SUBnote()
 {
     if (NoteEnabled)
         KillNote();
-    fftwf_free(tmpsmp);
-    fftwf_free(tmprnd);
+    //fftwf_free(tmpsmp);
+    //fftwf_free(tmprnd);
 }
 
 
@@ -597,6 +597,8 @@ void SUBnote::computecurrentparameters(void)
 // Note Output
 int SUBnote::noteout(float *outl, float *outr)
 {
+    tmpsmp = synth->getRuntime().genTmp1;
+    tmprnd = synth->getRuntime().genTmp2;
     memset(outl, 0, synth->p_bufferbytes);
     memset(outr, 0, synth->p_bufferbytes);
     if (!NoteEnabled)
