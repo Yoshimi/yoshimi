@@ -5,6 +5,7 @@ yoshimi 1.5.2 M
 * Minor date corrections etc.
 * Removed redundant internal part mute.
   Never activated and partonoff more sophisticated.
+* A few more cleanups.
 
 2017-8-2 Will
 * Small add/sub memory allocation optimisation.

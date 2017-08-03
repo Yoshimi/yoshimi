@@ -64,8 +64,8 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
     if (synth->isMuted())
         return; // nobody listening!
 
-    if (in_place || ((int)synth->getRuntime().audioEngine & (int)synth->getRuntime().midiEngine) == 1) // it's all jack
-    {
+    if (in_place || ((int)synth->getRuntime().audioEngine ==1 && (int)synth->getRuntime().midiEngine) == 1)
+    { // it's all jack
         synth->mididecode.midiProcess(par0, par1, par2, in_place);
         return;
     }
@@ -78,6 +78,11 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
     putData.data.insert = par2;
     unsigned int putSize = sizeof(putData);
     synth->midilearn.writeMidi(&putData, putSize, false);
+    /*
+     * we use the Midilearn ring buffer, but it returns
+     * to MidiDecode. This is safe because only a midi
+     * input passing through here can write to the buffer
+     */
 }
 
 
