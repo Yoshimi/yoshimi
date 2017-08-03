@@ -2151,7 +2151,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             if (Pinsparts[nefx] >= 0)
             {
                 int efxpart = Pinsparts[nefx];
-                if (partonoffRead(efxpart))
+                if (part[efxpart]->Penabled)
                     insefx[nefx]->out(part[efxpart]->partoutl, part[efxpart]->partoutr);
             }
         }

@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of original ZynAddSubFX code
-    Modified March 2017
+    Modified August 2017
 */
 
 #include <cmath>

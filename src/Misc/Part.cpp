@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified June 2017
+    Modified August 2017
 */
 
 #include <cstring>
@@ -253,7 +253,6 @@ Part::~Part()
 // Note On Messages
 void Part::NoteOn(int note, int velocity, int masterkeyshift)
 {
-//    if (!Pnoteon || note < Pminkey || note > Pmaxkey)
     if (note < Pminkey || note > Pmaxkey)
         return;
 
@@ -854,10 +853,7 @@ void Part::MonoMemRenote(void)
 {
     unsigned char mmrtempnote = monomemnotes.back(); // Last list element.
     monomemnotes.pop_back(); // We remove it, will be added again in NoteOn(...).
-/*    if (Pnoteon == 0)
-        RelaseNotePos(lastpos);
-    else*/
-        NoteOn(mmrtempnote, monomem[mmrtempnote].velocity,
+    NoteOn(mmrtempnote, monomem[mmrtempnote].velocity,
                monomem[mmrtempnote].mkeyshift);
 }
 
@@ -1292,7 +1288,6 @@ void Part::add2XML(XMLwrapper *xml)
     xml->addpar("velocity_sensing", Pvelsns);
     xml->addpar("velocity_offset", Pveloffs);
 
-//    xml->addparbool("note_on", Pnoteon);
     xml->addparbool("poly_mode", Ppolymode);
     xml->addpar("legato_mode", Plegatomode);
     xml->addpar("key_limit", Pkeylimit);
@@ -1473,7 +1468,6 @@ void Part::getfromXML(XMLwrapper *xml)
     Pvelsns = xml->getpar127("velocity_sensing", Pvelsns);
     Pveloffs = xml->getpar127("velocity_offset", Pveloffs);
 
-//    Pnoteon = xml->getparbool("note_on", Pnoteon);
     Ppolymode = xml->getparbool("poly_mode", Ppolymode);
     Plegatomode = xml->getparbool("legato_mode", Plegatomode); // older versions
     if (!Plegatomode)

@@ -1,5 +1,9 @@
 yoshimi 1.5.2 M
 
+2017-8-3 Will
+* BugFix: Insertion effects were always on.
+* Minor date corrections etc.
+
 2017-8-2 Will
 * Small add/sub memory allocation optimisation.
 
