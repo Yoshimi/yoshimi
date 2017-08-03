@@ -162,9 +162,6 @@ class Part : private MiscFuncs, SynthHelper
         void RelaseNotePos(int pos);
         void MonoMemRenote(void); // MonoMem stuff.
         void setPan(float value);
-        void Mute(void) { __sync_or_and_fetch(&partMuted, 0xFF); }
-        void Unmute(void) { __sync_and_and_fetch(&partMuted, 0); }
-        bool isMuted(void) { return (__sync_add_and_fetch(&partMuted, 0) != 0); }
 
         Microtonal *microtonal;
         FFTwrapper *fft;

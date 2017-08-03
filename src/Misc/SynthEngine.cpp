@@ -2044,7 +2044,10 @@ void SynthEngine::partonoffLock(int npart, int what)
     sem_post (&partlock);
 }
 
-
+/*
+ * Intellegent switch for unknown part status that always
+ * switches off and later returns original unknown state
+ */
 void SynthEngine::partonoffWrite(int npart, int what)
 {
     if (npart >= Runtime.NumAvailableParts)

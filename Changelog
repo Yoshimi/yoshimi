@@ -3,6 +3,8 @@ yoshimi 1.5.2 M
 2017-8-3 Will
 * BugFix: Insertion effects were always on.
 * Minor date corrections etc.
+* Removed redundant internal part mute.
+  Never activated and partonoff more sophisticated.
 
 2017-8-2 Will
 * Small add/sub memory allocation optimisation.

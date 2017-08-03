@@ -52,7 +52,6 @@ using namespace std;
 Part::Part(Microtonal *microtonal_, FFTwrapper *fft_, SynthEngine *_synth) :
     microtonal(microtonal_),
     fft(fft_),
-    partMuted(0),
     killallnotes(false),
     synth(_synth)
 {
@@ -953,13 +952,6 @@ void Part::setkeylimit(unsigned char Pkeylimit_)
 // Compute Part samples and store them in the partoutl[] and partoutr[]
 void Part::ComputePartSmps(void)
 {
-    if (isMuted())
-    {
-        memset(partoutl, 0, synth->p_bufferbytes);
-        memset(partoutr, 0, synth->p_bufferbytes);
-        return;
-    }
-
     int k;
     int noteplay; // 0 if there is nothing activated
     for (int nefx = 0; nefx < NUM_PART_EFX + 1; ++nefx)
