@@ -2358,8 +2358,8 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                 case 2:
                     writeRBP(6, fadeType); // stop and master reset
                     break;
-                case 3:
-                    writeRBP(6, fadeType, fadeAll >> 8, 0); // load patchset
+                case 3: // load patchset
+                    interchange.returnsDirect(fadeAll);
                     break;
                 case 4: // load vector
                     interchange.returnsDirect(fadeAll);
@@ -2509,7 +2509,7 @@ bool SynthEngine::saveState(string filename)
 }
 
 
-void SynthEngine::loadPatchSetAndUpdate(string fname)
+bool SynthEngine::loadPatchSetAndUpdate(string fname)
 {
     actionLock(lockmute);
     bool result;
@@ -2520,15 +2520,8 @@ void SynthEngine::loadPatchSetAndUpdate(string fname)
     {
         setAllPartMaps();
         addHistory(fname, 2);
-        Runtime.Log("Loaded " + fname);
-        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
     }
-    else
-    {
-        Runtime.Log("Could not load " + fname);
-        if (Runtime.showGui)
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Could not load " + fname));
-    }
+    return result;
 }
 
 

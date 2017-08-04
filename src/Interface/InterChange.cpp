@@ -286,6 +286,14 @@ void InterChange::transfertext(CommandBlock *getData)
     {
         switch (control)
         {
+            case 80:
+                if(synth->loadPatchSetAndUpdate(text))
+                    text = "ed " + text;
+                else
+                    text = " FAILED " + text;
+                value = miscMsgPush(text);
+                getData->data.parameter &= 0x7f;
+                break;
             case 81: // patch set save
                 if(synth->savePatchesXML(text))
                     text = "d " + text;
@@ -1241,7 +1249,7 @@ string InterChange::resolveMain(CommandBlock *getData)
 
         case 80:
             showValue = false;
-            contstr = "Patchset Load";
+            contstr = "Patchset Load" + miscMsgPop(value_int);
             break;
 
         case 81:
@@ -2945,6 +2953,13 @@ void InterChange::returnsDirect(int altData)
     memset(&putData, 0xff, sizeof(putData));
     switch (altData & 0xff)
     {
+        case 3:
+            putData.data.control = 80; // patch set load
+            putData.data.type = altData >> 24;
+            putData.data.part = 0xf0;
+            putData.data.parameter = 0x80;
+            putData.data.par2 = (altData >> 8) & 0xff;
+            break;
         case 4:
             putData.data.control = 84; // vector load
             putData.data.type = altData >> 24;
@@ -3910,8 +3925,11 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
 
         case 80: // load patchset
-            if (write)
-                synth->allStop(3 | (par2 << 8));
+            if (write && (parameter == 0xc0))
+            {
+                synth->allStop(3 | (par2 << 8) | (type << 24));
+                getData->data.type = 0xff; // stop further action
+            }
             break;
         case 84: // load vector
             if (write && (parameter == 0xc0))

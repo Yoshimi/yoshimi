@@ -2,6 +2,8 @@ yoshimi 1.5.2 M
 
 2017-8-4 Will
 * Properly integrated all patchset saves.
+* Improved patchset load operations & messaging.
+* BugFix: segfault if CLI load with garbage filename.
 
 2017-8-3 Will
 * BugFix: Insertion effects were always on.

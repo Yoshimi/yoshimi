@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified June 2017
+    Modified August 2017
 */
 
 #include "Misc/SynthEngine.h"
@@ -114,7 +114,7 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
     unsigned char insertParam = getData->data.parameter;
     //unsigned char insertPar2 = getData->data.par2;
 
-    if (npart == 0xe8)
+    if (npart == 0xe8) // scales
     {
         synth->getGuiMaster()->microtonalui->returns_update(getData);
         return;
@@ -151,7 +151,7 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
     }
     if (npart >= 0xf0) // main / sys / ins
     {
-        if (npart == 0xf0 && (control == 80 || control == 96))
+        if (npart == 0xf0 &&  control == 96)
             return; // gui in undefined state at this point
         synth->getGuiMaster()->returns_update(getData);
         return;

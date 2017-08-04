@@ -2511,7 +2511,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 if (ok)
                 {
                     Runtime.finishedCLI = false;
-                    sendDirect(0, 64, 80, 240, 255, 255, 255, 255, miscMsgPush(name));
+                    sendDirect(0, 64, 80, 240, 255, 255, 255, 192, miscMsgPush(name));
                     reply = done_msg;
                 }
             }

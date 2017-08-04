@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified July 2017
+    Modified August 2017
 */
 
 #ifndef SYNTHENGINE_H
@@ -84,7 +84,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void applyparameters(void);
         bool loadStateAndUpdate(string filename);
         bool saveState(string filename);
-        void loadPatchSetAndUpdate(string filename);
+        bool loadPatchSetAndUpdate(string filename);
         bool loadMicrotonal(string fname);
         bool saveMicrotonal(string fname);
         bool installBanks(int instance);

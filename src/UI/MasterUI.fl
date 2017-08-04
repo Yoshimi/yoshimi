@@ -1222,10 +1222,28 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             updatepanel();
             break;
 
+        case 80:
+            name = miscMsgPop(par2);
+            if (name.find("FAILED") == 1)
+            {
+                if (wasFromHere)
+                    fl_alert("%s",name.c_str());
+            }
+            else
+            {
+                setMasterLabel(findleafname(name));
+                refresh_master_ui(0);
+            }
+
+            break;
+
         case 81: // save patch set
             name = miscMsgPop(par2);
-            if (wasFromHere && name.find("FAILED") == 1)
-                fl_alert("%s",name.c_str());
+            if (name.find("FAILED") == 1)
+            {
+                if (wasFromHere)
+                    fl_alert("%s",name.c_str());
+            }
             else
             {
                 setMasterLabel(findleafname(name));
@@ -1236,8 +1254,11 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
 
         case 84: // load vector
             name = miscMsgPop(par2);
-            if (wasFromHere && name.find("FAILED") == 1)
-                fl_alert("%s",name.c_str());
+            if (name.find("FAILED") == 1)
+            {
+                if (wasFromHere)
+                    fl_alert("%s",name.c_str());
+            }
             else
             {
                 vectorui->setLoadLabelRemote(insert, synth->getRuntime().vectordata.Name[insert]);
@@ -1248,8 +1269,11 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
 
         case 85: // save vector
             name = miscMsgPop(par2);
-            if (wasFromHere && name.find("FAILED") == 1)
-                fl_alert("%s",name.c_str());
+            if (name.find("FAILED") == 1)
+            {
+                if (wasFromHere)
+                    fl_alert("%s",name.c_str());
+            }
             else
                 vectorui->recenthistory->activate();
             break;
@@ -1543,7 +1567,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             if (fname == NULL)
                 return;
         }
-        send_data(80, 0, 0xc0, 240, 255, 255, 0, miscMsgPush(fname));} {}
+        send_data(80, 0, 0xf0, 240, 255, 255, 192, miscMsgPush(fname));} {}
   }
   Function {do_save_master(const char* file = NULL)} {} {
     code {//
