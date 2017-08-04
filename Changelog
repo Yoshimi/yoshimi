@@ -4,6 +4,9 @@ yoshimi 1.5.2 M
 * Properly integrated all patchset saves.
 * Improved patchset load operations & messaging.
 * BugFix: segfault if CLI load with garbage filename.
+* Fixed regression. LV2 not loading patch sets.
+  These are now properly contained, but I forgot to
+  update (LV2 only) putalldata :(
 
 2017-8-3 Will
 * BugFix: Insertion effects were always on.

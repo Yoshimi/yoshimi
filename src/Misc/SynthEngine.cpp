@@ -3182,18 +3182,10 @@ void SynthEngine::putalldata(const char *data, int size)
         delete xml;
         return;
     }
-    if (xml->enterbranch("MASTER"))
-    {
-        actionLock(lock);
-        defaults();
-        getfromXML(xml);
-        actionLock(unlock);
-        xml->exitbranch();
-        midilearn.extractMidiListData(false, xml);
-        setAllPartMaps();
-    }
-    else
-        Runtime.Log("Master putAllData failed to enter MASTER branch");
+    defaults();
+    getfromXML(xml);
+    midilearn.extractMidiListData(false, xml);
+    setAllPartMaps();
     delete xml;
 }
 
