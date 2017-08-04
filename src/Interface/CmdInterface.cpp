@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified July 2017
+    Modified August 2017
 */
 
 #include <iostream>
@@ -2589,7 +2589,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             else
             {
                 Runtime.finishedCLI = false;
-                sendDirect(0,64, 89, 0xf0, 0xff, 0xff, 0xff, 0x80, miscMsgPush(string(point)));
+                sendDirect(0, 64, 89, 0xf0, 0xff, 0xff, 0xff, 0x80, miscMsgPush(string(point)));
                 reply = done_msg;
             }
         }else if (matchnMove(1, point, "patchset"))
@@ -2599,13 +2599,8 @@ bool CmdInterface::cmdIfaceProcessCommand()
             else
             {
                 Runtime.finishedCLI = false;
-                replyString = setExtension((string) point, "xmz");
-                tmp = synth->saveXML(replyString);
-                if (!tmp)
-                    Runtime.Log("Could not save " + (string) point);
-                else
-                    Runtime.Log("Saved " + replyString);
-                Runtime.finishedCLI = true;
+                sendDirect(0, 64, 81, 0xf0, 0xff, 0xff, 0xff, 0x80, miscMsgPush(string(point)));
+                reply = done_msg;
             }
         }
         else if (matchnMove(1, point, "instrument"))

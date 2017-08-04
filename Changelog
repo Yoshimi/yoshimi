@@ -1,5 +1,8 @@
 yoshimi 1.5.2 M
 
+2017-8-4 Will
+* Properly integrated all patchset saves.
+
 2017-8-3 Will
 * BugFix: Insertion effects were always on.
 * Minor date corrections etc.

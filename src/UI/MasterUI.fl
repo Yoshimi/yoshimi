@@ -31,7 +31,7 @@ This file is a derivative of the ZynAddSubFX original.
 
 Modified August 2017
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -97,7 +97,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 }
 
-class MasterUI {: {private MiscFuncs}
+class MasterUI {selected : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1222,6 +1222,18 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             updatepanel();
             break;
 
+        case 81: // save patch set
+            name = miscMsgPop(par2);
+            if (wasFromHere && name.find("FAILED") == 1)
+                fl_alert("%s",name.c_str());
+            else
+            {
+                setMasterLabel(findleafname(name));
+                RecentParams->activate();
+                updatepanel();
+            }
+            break;
+
         case 84: // load vector
             name = miscMsgPop(par2);
             if (wasFromHere && name.find("FAILED") == 1)
@@ -1239,9 +1251,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             if (wasFromHere && name.find("FAILED") == 1)
                 fl_alert("%s",name.c_str());
             else
-            {
                 vectorui->recenthistory->activate();
-            }
             break;
 
         case 88: // load scales
@@ -1556,16 +1566,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     }
     else
         fname = file;
-    result = synth->saveXML(fname);
-    if (!result)
-        fl_alert("Could not save the file.");
-    else
-    {
-        synth->addHistory(fname, 2);
-        RecentParams->activate();
-        setMasterLabel(findleafname(synth->lastPatchSetSeen()));
-    }
-    updatepanel();} {}
+    send_data(81, 0, 0xf0, 240, 255, 255, 128, miscMsgPush(string(fname)));} {}
   }
   Function {refresh_master_ui(int type)} {} {
     code {//

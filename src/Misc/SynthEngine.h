@@ -76,7 +76,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool Init(unsigned int audiosrate, int audiobufsize);
         bool actionLock(lockset request);
 
-        bool saveXML(string filename);
+        bool savePatchesXML(string filename);
         void add2XML(XMLwrapper *xml);
         void defaults(void);
 

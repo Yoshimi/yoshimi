@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified July 2017
+    Modified August 2017
 */
 
 #include <iostream>
@@ -286,9 +286,17 @@ void InterChange::transfertext(CommandBlock *getData)
     {
         switch (control)
         {
+            case 81: // patch set save
+                if(synth->savePatchesXML(text))
+                    text = "d " + text;
+                else
+                    text = " FAILED " + text;
+                value = miscMsgPush(text);
+                getData->data.parameter &= 0x7f;
+                break;
             case 84: // vector load
                 tmp = synth->loadVectorAndUpdate(insert, text);
-                if ( tmp < 0xff)
+                if (tmp < 0xff)
                 {
                     getData->data.insert = tmp;
                     text = "ed " + text + " to chan " + to_string(int(tmp + 1));
@@ -1234,6 +1242,11 @@ string InterChange::resolveMain(CommandBlock *getData)
         case 80:
             showValue = false;
             contstr = "Patchset Load";
+            break;
+
+        case 81:
+            showValue = false;
+            contstr = "Patchset Save" + miscMsgPop(value_int);
             break;
 
         case 84:

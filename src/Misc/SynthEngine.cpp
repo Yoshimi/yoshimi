@@ -3205,13 +3205,16 @@ void SynthEngine::putalldata(const char *data, int size)
 }
 
 
-bool SynthEngine::saveXML(string filename)
+bool SynthEngine::savePatchesXML(string filename)
 {
+    filename = setExtension(filename, "xmz");
     Runtime.xmlType = XML_PARAMETERS;
     XMLwrapper *xml = new XMLwrapper(this);
     add2XML(xml);
     bool result = xml->saveXMLfile(filename);
     delete xml;
+    if (result)
+        addHistory(filename,2);
     return result;
 }
 
