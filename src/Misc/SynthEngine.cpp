@@ -1131,16 +1131,14 @@ int SynthEngine::ReadPartKeyMode(int npart)
  * We also have to fake long pages when calling via NRPNs as there
  * is no readline entry to set the page length.
  */
-
 void SynthEngine::cliOutput(list<string>& msg_buf, unsigned int lines)
 {
     list<string>::iterator it;
-    list<string>::reverse_iterator rx;
 
     if (Runtime.toConsole)
-    { // reversed so they come out the right order in the console.
-        for (rx = msg_buf.rbegin(); rx != msg_buf.rend(); ++rx)
-            Runtime.Log(*rx);
+    {
+        for (it = msg_buf.begin(); it != msg_buf.end(); ++it)
+            Runtime.Log(*it);
             // we need this in case someone is working headless
         cout << "\nReports sent to console window\n\n";
     }
