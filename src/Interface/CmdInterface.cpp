@@ -2099,7 +2099,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
     if (matchnMove(3, point, "reset"))
     {
         if (query("Restore to basic settings", false))
-            sendDirect(0, 64, 96, 240);
+            sendDirect(0, 64, 96, 240, 255, 255, 255, 192);
         return false;
     }
 

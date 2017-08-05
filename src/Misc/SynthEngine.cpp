@@ -91,6 +91,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     Runtime(this, argc, argv),
     presetsstore(this),
     fadeAll(0),
+    fadeLevel(0),
     samplerate(48000),
     samplerate_f(samplerate),
     halfsamplerate_f(samplerate / 2),
@@ -480,21 +481,13 @@ void *SynthEngine::RBPthread(void)
                         SetProgramToPart(block.data[1], -1, miscMsgPop(block.data[2]));
                         break;
 
-                    case 6: // cease all sound or load named file via miscMsg
+                    case 6: // cease all sound
                         switch(block.data[1] & 0xff)
                         {
                             case 1:
                                 actionLock(lockmute);
                                 ShutUp();
                                 actionLock(unlock);
-                                break;
-
-                            case 2:
-                                resetAll();
-                                break;
-
-                            case 3: // load patchset
-                                loadPatchSetAndUpdate(miscMsgPop(block.data[2]));
                                 break;
                         }
                         break;
@@ -2029,8 +2022,7 @@ void SynthEngine::resetAll(void)
     defaults();
     ClearNRPNs();
     actionLock(unlock);
-    Runtime.Log("All dynamic values set to defaults.");
-    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 1);
+    //GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 1);
 }
 
 
@@ -2349,12 +2341,15 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         if (fadeAll && fadeLevel <= 0.001f)
         {
             Mute();
+            fadeLevel = 0; // just to be sure
             unsigned char fadeType = fadeAll & 0xff;
             switch (fadeType)
             {
                 case 1:
+                    writeRBP(6, fadeType); // stop
+                    break;
                 case 2:
-                    writeRBP(6, fadeType); // stop and master reset
+                    interchange.returnsDirect(fadeAll); // master reset
                     break;
                 case 3: // load patchset
                     interchange.returnsDirect(fadeAll);
@@ -2444,7 +2439,9 @@ void SynthEngine::ShutUp(void)
 void SynthEngine::allStop(unsigned int stopType)
 {
     fadeAll = stopType;
-    fadeLevel = 1.0f;
+    if (fadeLevel < 0.001)
+        fadeLevel = 1.0f;
+    // don't reset if it's already fading.
 }
 
 

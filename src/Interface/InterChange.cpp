@@ -263,7 +263,11 @@ void InterChange::transfertext(CommandBlock *getData)
 //    unsigned char engine = getData->data.engine;
 //    unsigned char insert = getData->data.insert;
     bool (write) = (type & 0x40);
-    string text = miscMsgPop(getData->data.par2);
+    string text;
+    if (getData->data.par2 < 0xff)
+        text = miscMsgPop(getData->data.par2);
+    else
+        text = "";
     getData->data.par2 = 0xff; // this may be reset later
     unsigned char tmp;
     string name;
@@ -359,6 +363,10 @@ void InterChange::transfertext(CommandBlock *getData)
                 else
                     text = " FAILED " + text;
                 value = miscMsgPush(text);
+                getData->data.parameter &= 0x7f;
+                break;
+            case 96: // master reset
+                synth->resetAll();
                 getData->data.parameter &= 0x7f;
                 break;
         }
@@ -1292,11 +1300,13 @@ string InterChange::resolveMain(CommandBlock *getData)
             contstr = "State Save" + miscMsgPop(value_int);
             break;
 
-        case 96: // doMasterReset(
+        case 96: // doMasterReset
+            showValue = false;
             contstr = "Reset All";
             break;
         case 128:
-            contstr = "Stop";
+            showValue = false;
+            contstr = "Sound Stopped";
             break;
 
         default:
@@ -2953,6 +2963,12 @@ void InterChange::returnsDirect(int altData)
     memset(&putData, 0xff, sizeof(putData));
     switch (altData & 0xff)
     {
+        case 2:
+            putData.data.control = 96; // master reset
+            putData.data.type = altData >> 24;
+            putData.data.part = 0xf0;
+            putData.data.parameter = 0x80;
+            break;
         case 3:
             putData.data.control = 80; // patch set load
             putData.data.type = altData >> 24;
@@ -3957,10 +3973,11 @@ void InterChange::commandMain(CommandBlock *getData)
             synth->writeRBP(7, 5, par2);
             break;
         case 96: // master reset
-            if (write)
+            if (write && (parameter == 0xc0))
             {
                 synth->getRuntime().lastPatchSet = -1;
-                synth->allStop(2);
+                synth->allStop(2 | (type << 24));
+                getData->data.type = 0xff; // stop further action);
             }
             break;
         case 128: // just stop

@@ -151,8 +151,8 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
     }
     if (npart >= 0xf0) // main / sys / ins
     {
-        if (npart == 0xf0 &&  control == 96)
-            return; // gui in undefined state at this point
+        //if (npart == 0xf0) &&  control == 96)
+            //return; // gui in undefined state at this point
         synth->getGuiMaster()->returns_update(getData);
         return;
     }
