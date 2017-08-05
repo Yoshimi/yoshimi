@@ -76,10 +76,10 @@ string toplist [] = {
     "  MLearn <n> <s> [s]",     "midi learned line n control",
     "  ",                       "(MUte, CC, CHan, MIn, MAx, LImit, BLock) Enable {other}",
     "SYStem effects [n]",       "system effects for editing",
-    "  Send <n2> <n3>",         "send system effect to effect n2 at volume n3",
+    "  SEnd <n2> <n3>",         "send system effect to effect n2 at volume n3",
     "  preset <n2>",            "set effect preset to number n2",
     "INSert effects [n1]",      "insertion effects for editing",
-    "  Send <s>/<n2>",          "set where (Master, Off or part number)",
+    "  SEnd <s>/<n2>",          "set where (Master, Off or part number)",
     "  PREset <n2>",            "set numbered effect preset to n2",
     "AVailable <n>",            "available parts (16, 32, 64)",
     "Volume <n>",               "master volume",
@@ -660,7 +660,7 @@ int CmdInterface::effects()
 
         return done_msg;
     }
-    else if (matchnMove(1, point, "send"))
+    else if (matchnMove(2, point, "send"))
     {
         if (point[0] == 0)
             return parameter_msg;

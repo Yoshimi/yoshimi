@@ -97,7 +97,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 }
 
-class MasterUI {selected : {private MiscFuncs}
+class MasterUI {open : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -247,7 +247,8 @@ class MasterUI {selected : {private MiscFuncs}
       //if (partfxO)
           //partui->partfx->show();} {}
   }
-  Function {make_window()} {} {
+  Function {make_window()} {selected
+  } {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -686,6 +687,7 @@ paramsui->Show(4);}
             label Effect
             callback {//
               ninseff = o->value() - 1;
+              //setInsEff(ninseff);
               insefftype->value(synth->insefx[ninseff]->geteffect());
               inseffpart->value(synth->Pinsparts[ninseff] + 2);
               inseffectui->refresh(synth->insefx[ninseff], 0xf2, ninseff);
@@ -1598,16 +1600,28 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     partmax = synth->getRuntime().NumAvailableParts;
     maxparts->value(partmax);
     checkmaxparts();
+
     npartcounter->value((synth->getRuntime().currentPart) + 1);
-    npartcounter->do_callback();
+    //npartcounter->do_callback();
+    int nval = synth->getRuntime().currentPart;
+    synth->getRuntime().currentPart = nval;
+    partNew(nval);
+
     nsyseff = 0;
     syseffnocounter->value(nsyseff + 1);
-    syseffnocounter->do_callback();
+    //syseffnocounter->do_callback();
+    sysefftype->value(synth->sysefx[nsyseff]->geteffect());
+    syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff);
+
     ninseff = 0;
     inseffnocounter->value(nsyseff + 1);
-    inseffnocounter->do_callback();
+    //inseffnocounter->do_callback();
+    setInsEff(ninseff);
+
     sysinsgroup->value(SystemEffectsGrp);
-    sysinsgroup->do_callback();
+    //sysinsgroup->do_callback();
+    showSysEfxUI();
+
     masterkeyshift->value(synth->Pkeyshift - 64);
     mastervolumedial->value(synth->Pvolume);
     globalfinedetune->value(synth->microtonal.Pglobalfinedetune);
@@ -1711,6 +1725,25 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
                 panellistitem[i]->partVUMeter->resetPart(true);
             }
         }} {}
+  }
+  Function {setInsEff(int effnum)} {} {
+    code {//
+              int ninseff = effnum;
+              insefftype->value(synth->insefx[ninseff]->geteffect());
+              inseffpart->value(synth->Pinsparts[ninseff] + 2);
+              inseffectui->refresh(synth->insefx[ninseff], 0xf2, ninseff);
+              if (synth->Pinsparts[ninseff] != -1)
+              {
+                insefftype->activate();
+                inseffectui->activate();
+                inseffectuigroup->activate();
+              }
+              else
+              {
+                insefftype->deactivate();
+                inseffectui->deactivate();
+                inseffectuigroup->deactivate();
+              }} {}
   }
   Function {setState(string filename)} {} {
     code {//

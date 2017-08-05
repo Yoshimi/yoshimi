@@ -3,6 +3,8 @@ yoshimi 1.5.2 M
 2017-8-5 Will
 * Master reset no longer needs threadmessage function.
 * Further cleanups and doc corrections.
+* Started revising sys/ins effects & replacing callbacks.
+  This will help make CLI and GUI consistent.
 
 2017-8-4 Will
 * Properly integrated all patchset saves.
