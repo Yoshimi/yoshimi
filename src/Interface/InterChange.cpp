@@ -2997,12 +2997,6 @@ void InterChange::returnsDirect(int altData)
             putData.data.part = 0xf0;
             putData.data.parameter = 0x80;
             putData.data.par2 = (altData >> 8) & 0xff;
-        case 7:
-            putData.data.control = 89; // scales save
-            putData.data.type = altData >> 24;
-            putData.data.part = 0xf0;
-            putData.data.parameter = 0x80;
-            putData.data.par2 = (altData >> 8) & 0xff;
         default:
             return;
             break;
@@ -3855,10 +3849,7 @@ void InterChange::commandConfig(CommandBlock *getData)
                 value = synth->getRuntime().showLearnedCC;
             break;
 // save config
-        case 80:
-            if (write)
-                synth->writeRBP(7, 0); // needs to go through RBP
-            mightChange = false;
+        case 80: //done elsewhere
             break;
         default:
             mightChange = false;
@@ -3959,8 +3950,7 @@ void InterChange::commandMain(CommandBlock *getData)
         case 88: // load scale
             returnsDirect(6 | (par2 << 8) | (type << 24));
             break;
-        case 89: // save scale
-            returnsDirect(7 | (par2 << 8) | (type << 24));
+        case 89: // done elsewhere
             break;
         case 92: // load state
             if (write && (parameter == 0xc0))
@@ -3969,8 +3959,7 @@ void InterChange::commandMain(CommandBlock *getData)
                 getData->data.type = 0xff; // stop further action
             }
             break;
-        case 93: // save state
-            synth->writeRBP(7, 5, par2);
+        case 93: // done elsewhere
             break;
         case 96: // master reset
             if (write && (parameter == 0xc0))

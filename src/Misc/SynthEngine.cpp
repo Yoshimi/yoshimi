@@ -2332,35 +2332,17 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             }
         }
 /*
- * This has to be at the end of the audio loop as some
- * actions initiated by it may re-enter the 'mediate'
- * function for as long as there are low priority updates
- * to perform and audio is muted.
- * This ensures no contention with VU updates etc.
+ * This has to be at the end of the audio loop to
+ * ensure no contention with VU updates etc.
  */
         if (fadeAll && fadeLevel <= 0.001f)
         {
             Mute();
             fadeLevel = 0; // just to be sure
-            unsigned char fadeType = fadeAll & 0xff;
-            switch (fadeType)
-            {
-                case 1:
-                    writeRBP(6, fadeType); // stop
-                    break;
-                case 2:
-                    interchange.returnsDirect(fadeAll); // master reset
-                    break;
-                case 3: // load patchset
-                    interchange.returnsDirect(fadeAll);
-                    break;
-                case 4: // load vector
-                    interchange.returnsDirect(fadeAll);
-                    break;
-                case 5: // load state
-                    interchange.returnsDirect(fadeAll);
-                    break;
-            }
+            if ((fadeAll & 0xff) == 1)
+                writeRBP(6, fadeAll); // stop
+            else
+                interchange.returnsDirect(fadeAll);
             fadeAll = 0;
         }
     }
