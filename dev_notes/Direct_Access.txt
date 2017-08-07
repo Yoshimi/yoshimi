@@ -70,7 +70,7 @@ par2 = an offset for some parameters.
 
 In some situations par2 is used as a miscMsg ID for passing text values between threads but synchronised via the RT thread. A failed push will return 255 and trying to pop 255 will return an empty string.
 
-If parameter has bit 7 set the command is passed to and alternative low priority function as there will be considerable text manipulation. If bit 6 is also set it will pass through a fade down and mute operation to aviod writing data the audio engine needs when active. The return will go via this alternative text heavy route.
+If parameter has bit 7 set the command is passed to and alternative low priority function as there will be considerable text manipulation. If bit 6 is also set it will pass through a fade down and mute operation to aviod writing data to the audio engine when active. The return will go via this alternative text heavy route.
 
 
 Limits testing now has it's own entry. See Limits.txt.

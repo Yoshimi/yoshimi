@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified June 2017
+Modified August 2017
 } {in_source in_header
 }
 
@@ -429,7 +429,7 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
       xywh {272 534 380 170} type Double box NO_BOX hide
       class Fl_Group
     } {
-      Fl_Group partgroupui {
+      Fl_Group partgroupui {open
         xywh {0 0 378 168}
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
@@ -555,7 +555,7 @@ send_data(4, o->value(), 0xc8);}
         else
             synth->getGuiMaster()->panellistitem[npart % NUM_MIDI_CHANNELS]->panellistitemgroup->activate();
     }
-    
+
     send_data(8, o->value(), 0xc0);}
         xywh {58 59 20 20} down_box DOWN_BOX labelsize 11 align 4
         code0 {o->value(part->Penabled == 1);}
@@ -692,7 +692,7 @@ send_data(17, tmp, 0xc0);}
         callback {//
     minkcounter->value(0);
     maxkcounter->value(127);
-    
+
     send_data(20, o->value(), 0xc0);}
         tooltip {Reset the minimum key to 0 and maximum key to 127} xywh {104 129 30 16} box PLASTIC_UP_BOX labelfont 1 labelsize 11
       }
@@ -1002,7 +1002,7 @@ send_data(198, o->value(), 0xc8);}
         x = 1;
     bypasseff->value(part->Pefxbypass[ninseff]);
     sendtochoice->value(x);
-            
+
     send_data(64, ninseff, 0xc0, 0xff, ninseff);}
         tooltip {Effect No.} xywh {35 8 35 22} labelsize 12 maximum 3 textsize 11
         code1 {o->value(ninseff+1);}
@@ -1055,7 +1055,7 @@ send_data(198, o->value(), 0xc8);}
           xywh {110 110 100 20} labelfont 1 labelsize 10
         }
       }
-      Fl_Group inseffectuigroup {
+      Fl_Group inseffectuigroup {open
         xywh {5 37 380 96} box FLAT_BOX color 48
       } {
         Fl_Group inseffectui {
@@ -1166,7 +1166,7 @@ if ((Fl::event_button() == 3))
         kitlist->activate();
     else
         kitlist->deactivate();
-        
+
     send_data(58, tmp, 0xc0);}
         tooltip {Single = only 1st item in defined note range sounds} xywh {35 348 88 19} down_box BORDER_BOX labelsize 11 textfont 1 textsize 11
         code0 {if (part->Pkitfade) {o->value(3);} else {o->value(part->Pkitmode);}}
@@ -1240,7 +1240,7 @@ send_data(57, o->value(), 0xc0);}
            partkititem[0]->adeditbutton->activate();
     }
     checkEngines();
-    
+
     send_data(8, o->value(), 0xc8, 0xff, 0);}
             tooltip {enable/disable ADsynth} xywh {15 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Padenabled);}
@@ -1281,7 +1281,7 @@ if ((Fl::event_button() == 3))
            partkititem[0]->subeditbutton->activate();
     }
     checkEngines();
-    
+
     send_data(8, o->value(), 0xc8, 0xff, 1);}
             tooltip {enable/disable SUBsynth} xywh {115 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Psubenabled);}
@@ -1322,7 +1322,7 @@ if ((Fl::event_button() == 3))
            partkititem[0]->padeditbutton->activate();
     }
     checkEngines();
-    
+
     send_data(8, o->value(), 0xc8, 0xff, 2);}
             tooltip {enable/disable PADsynth} xywh {215 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Ppadenabled);}
@@ -1803,8 +1803,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
             if (sameEff)
             {
                 insefftype->value(valInt);
-                part->partefx[tmp]->geteffect();
-                inseffectui->refresh(part->partefx[valInt], npart, valInt);
+                part->partefx[engine]->geteffect();
+                inseffectui->refresh(part->partefx[engine], npart, engine);
             }
             break;
 

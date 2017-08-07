@@ -97,7 +97,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 }
 
-class MasterUI {open : {private MiscFuncs}
+class MasterUI {selected : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -247,8 +247,7 @@ class MasterUI {open : {private MiscFuncs}
       //if (partfxO)
           //partui->partfx->show();} {}
   }
-  Function {make_window()} {selected
-  } {
+  Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -1157,6 +1156,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             {
                 sysefftype->value((int) value);
                 syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff); // needs improving
+                
             }
         }
         Fl::check();

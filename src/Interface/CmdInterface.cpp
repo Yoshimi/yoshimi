@@ -2762,7 +2762,8 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
         synth->getRuntime().Log(name + "Min " + to_string(min)  + "   Def " + deftype + "   Max " + to_string(max) + valuetype);
         return 0;
     }
-    synth->interchange.testLimits(&putData);
+    // next line screws effects :(
+    //synth->interchange.testLimits(&putData);
     if (part == 0xf8 && putData.data.par2 < 0xff && (control == 65 || control == 67 || control == 71))
     {
         synth->getRuntime().Log("In use by " + miscMsgPop(putData.data.par2) );
