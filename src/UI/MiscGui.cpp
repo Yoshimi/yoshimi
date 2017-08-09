@@ -140,7 +140,17 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
         else if (npart == 0xf2)
             synth->getGuiMaster()->inseffectui->returns_update(getData);
         else if (npart < NUM_MIDI_PARTS)
-            synth->getGuiMaster()->partui->inseffectui->returns_update(getData);
+        {
+            if (insert == 1) // dynefilter filter insert
+            {
+                // TODO
+                // kititem 0x88
+                // engine 0
+                cout << "dynfilter filter insert" << endl;
+            }
+            else
+                synth->getGuiMaster()->partui->inseffectui->returns_update(getData);
+        }
         return;
     }
 

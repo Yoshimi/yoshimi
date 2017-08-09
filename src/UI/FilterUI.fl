@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-Modified March 2017} {in_source in_header
+Modified August 2017} {selected in_source in_header
 }
 
 decl {\#include "UI/MiscGui.h"} {public local
@@ -81,8 +81,8 @@ class FormantFilterGraph {: {public Fl_Box, MiscFuncs}
 } {
   Function {FormantFilterGraph(int x, int y, int w, int h, FilterUI& parent_,
             FilterParams *pars_, int *nvowel_, int *nformant_):
-      Fl_Box(x,y,w,h), parent(parent_), pars(pars_), nvowel(nvowel_), nformant(nformant_)} {}
-  {code {//
+      Fl_Box(x,y,w,h), parent(parent_), pars(pars_), nvowel(nvowel_), nformant(nformant_)} {} {
+    code {//
         selectedFormant = -1;
         hoverFormant = -1;
         qMode = false;
@@ -271,7 +271,7 @@ switch(event)
       }
       else
       {
-         fl_cursor(FL_CURSOR_MOVE);  
+         fl_cursor(FL_CURSOR_MOVE);
           delegate(parent.formant_freq_dial, limit(freqRef - hDiff, 0, 127));
 
           if(qMode)
@@ -359,7 +359,7 @@ return Fl_Box::handle(event);} {}
   }
 }
 
-class FilterUI {selected : {public Fl_Group,PresetsUI_}
+class FilterUI {: {public Fl_Group,PresetsUI_}
 } {
   Function {FilterUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
@@ -871,12 +871,13 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     //unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char part = getData->data.part;
+    unsigned char kititem = getData->data.kit;
     unsigned char eng = getData->data.engine;
     //unsigned char insert = getData->data.insert;
     //unsigned char par = getData->data.parameter;
     //unsigned char par2 = getData->data.par2;
 
-    if (part != npart || ((eng >= 128 && eng != 136) && eng != engine))
+    if (part != npart || ((eng >= 128 && kititem != 136) && eng != engine))
         return;
 
     switch(control)

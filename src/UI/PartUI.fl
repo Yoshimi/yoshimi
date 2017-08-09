@@ -128,7 +128,7 @@ class PartKitItem {: {public Fl_Group}
         Fl_Check_Button mutedcheck {
           callback {//part->kit[n].Pmuted=(int)o->value();
 //synth->getGuiMaster()->partui->checkEngines();
-send_data(9, o->value(), 0xc8, n, 0xff, 32)}
+send_data(9, o->value(), 0xc8, n, 0xff, 32);}
           xywh {60 0 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Pmuted);}
         }
@@ -153,7 +153,7 @@ if (tmp >= other)
     o->value(tmp);
 }
 
-send_data(16, tmp, 0xc0, n, 0xff, 32)}
+send_data(16, tmp, 0xc0, n, 0xff, 32);}
           xywh {225 0 55 15} type Simple minimum 0 maximum 128 step 1
           code0 {o->value(part->kit[n].Pminkey);}
         }
@@ -171,7 +171,7 @@ else
     tmp = last;
 minkcounter->value(tmp);
 
-send_data(18, tmp, 0xc0, n, 0xff, 32)}
+send_data(18, tmp, 0xc0, n, 0xff, 32);}
           tooltip {set the minimum key to the last pressed key} xywh {285 3 15 12} box THIN_UP_BOX labelsize 10
         }
         Fl_Button {} {
@@ -188,7 +188,7 @@ else
     tmp = last;
 maxkcounter->value(tmp);
 
-send_data(19, tmp, 0xc0, n, 0xff, 32)}
+send_data(19, tmp, 0xc0, n, 0xff, 32);}
           tooltip {set the maximum key to the last pressed key} xywh {315 3 15 12} box THIN_UP_BOX labelsize 10
         }
         Fl_Button {} {
@@ -197,7 +197,7 @@ send_data(19, tmp, 0xc0, n, 0xff, 32)}
 minkcounter->value(0);
 maxkcounter->value(127);
 
-send_data(96, o->value(), 0xc0, n, 0xff, 32)}
+send_data(96, o->value(), 0xc0, n, 0xff, 32);}
           tooltip {reset the minimum key to 0 and maximum key to 127} xywh {300 3 15 12} box THIN_UP_BOX labelfont 1 labelsize 10
         }
         Fl_Counter maxkcounter {
@@ -208,7 +208,7 @@ if (tmp <= other)
     tmp = other;
     o->value(tmp);
 }
-send_data(17, tmp, 0xc0, n, 0xff, 32)}
+send_data(17, tmp, 0xc0, n, 0xff, 32);}
           xywh {335 0 55 15} type Simple minimum 0 maximum 128 step 1
           code0 {o->value(part->kit[n].Pmaxkey);}
         }
@@ -298,7 +298,7 @@ if ((Fl::event_button() == 3))
         }
         Fl_Choice sendtoeffect {
           callback {//
-    send_data(24, o->value(), 0xc0, n, 0xff, 32)}
+    send_data(24, o->value(), 0xc0, n, 0xff, 32);}
           xywh {615 0 45 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {o->add("OFF"); char nrstr[10]; for(int i = 0; i < NUM_PART_EFX; i++) {sprintf(nrstr,"FX%d",i+1);o->add(nrstr);};}
           code1 {o->value(part->kit[n].Psendtoparteffect+1);if (part->kit[n].Psendtoparteffect==127) o->value(0);}
@@ -321,7 +321,7 @@ if ((Fl::event_button() == 3))
             }
             else
                 o->value(1);
-            send_data(8, o->value(), 0xc0, n, 0xff, 32)}
+            send_data(8, o->value(), 0xc0, n, 0xff, 32);}
         xywh {30 0 20 15} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 4
         code0 {snprintf(label,10,"%d",n+1);o->label(label);}
         code1 {o->value(part->kit[n].Penabled);}

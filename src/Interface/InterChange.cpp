@@ -601,21 +601,22 @@ void InterChange::resolveReplies(CommandBlock *getData)
             isValue = "Request set default";
         else
         {
-            isValue = "\n  Value " + to_string(value);
+            isValue = "  Value " + to_string(value);
             if (!(type & 0x80))
                 isValue += "f";
         }
-        isValue +="\n  Type ";
+        isValue += "  Type ";
         for (int i = 7; i > -1; -- i)
             isValue += to_string((type >> i) & 1);
-        synth->getRuntime().Log(isValue
-                            + "\n  Control " + to_string((int) control)
-                            + "\n  Part " + to_string((int) npart)
-                            + "\n  Kit " + to_string((int) kititem)
-                            + "\n  Engine " + to_string((int) engine)
-                            + "\n  Insert " + to_string((int) insert)
-                            + "\n  Parameter " + to_string((int) insertParam)
-                            + "\n  2nd Parameter " + to_string((int) insertPar2));
+        isValue = isValue
+                + "  Control 0x" + asHexString((int) control)
+                + "  Part 0x" + asHexString((int) npart)
+                + "  Kit 0x" + asHexString((int) kititem)
+                + "\n  Engine 0x" + asHexString((int) engine)
+                + "  Insert 0x" + asHexString((int) insert)
+                + "  Parameter 0x" + asHexString((int) insertParam)
+                + "  2nd Parameter 0x" + asHexString((int) insertPar2);
+        synth->getRuntime().Log(isValue);
 //        return;
 /* we need to review the implications of commenting
  * out various parts of this routine, but if active
@@ -2760,7 +2761,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
     else
         name = "Part " + to_string(npart + 1);
 
-    if (kititem == 8 && getData->data.insert < 0xff)
+    if (kititem == 0x88 && getData->data.insert < 0xff)
     {
         if (npart == 0xf1)
             name = "System";
@@ -2769,7 +2770,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
         else name = "Part " + to_string(npart + 1);
         name += " Effect " + to_string(effnum + 1);
 
-        return (name + " DynFilter ~ Filter Parameter " + to_string(control));
+        return (name + " DynFilter ~ Filter Internal Control " + to_string(control));
     }
 
     name += " Effect " + to_string(effnum + 1);

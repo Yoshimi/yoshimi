@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-Modified March 2017
+Modified August 2017
 } {in_source in_header
 }
 
@@ -203,7 +203,7 @@ eff = eff_;
   }
 }
 
-class EffUI {open : {public Fl_Group,public PresetsUI_}
+class EffUI {selected : {public Fl_Group,public PresetsUI_}
 } {
   Function {EffUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
@@ -2080,14 +2080,13 @@ send_data(8, o->value(), 8, 0xc0);}
 //type = 0xc0; //temp!
 collect_data(synth, value, (Fl::event_button() | type), control, npart, group | 0x80, neff);} {}
   }
-  Function {returns_update(CommandBlock *getData)} {open
-  } {
+  Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
     //unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char efftype = getData->data.kit & 0x7f;
-    bool isdynfilter = getData->data.kit & 0x80;
+    bool isdynfilter = (getData->data.engine == 0x88);
     //unsigned char effnum = getData->data.engine;
 
     //cout << "cont " << (int)control << "  type " << (int)efftype << "  num " << (int)effnum << endl;
@@ -2353,8 +2352,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, group | 
     	    }
     	    break;
     }
-    Fl::check();} {selected
-    }
+    Fl::check();} {}
   }
   Function {init(EffectMgr *eff_, int npart_, int neff_)} {} {
     code {eff=eff_;

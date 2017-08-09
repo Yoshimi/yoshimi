@@ -1,5 +1,10 @@
 yoshimi 1.5.2 M
 
+2017-8-9 Will
+* Most of DynFilter updates on CLI direct access call.
+  Just the filter window itself to do. Difficult :(
+* Command test list values now hex and just 2 lines.
+
 2017-8-7 Will
 * Part effects now display on CLI direct access call.
 
