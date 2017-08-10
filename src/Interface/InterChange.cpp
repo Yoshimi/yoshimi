@@ -598,26 +598,30 @@ void InterChange::resolveReplies(CommandBlock *getData)
 #endif
     {
         if (button == 0)
-            isValue = "Request set default";
+            isValue = "\n  Request set default";
         else
         {
-            isValue = "  Value " + to_string(value);
+            isValue = "\n  Value      " + to_string(value);
             if (!(type & 0x80))
                 isValue += "f";
         }
-        isValue += "  Type ";
+        string typemsg = "  Type       ";
         for (int i = 7; i > -1; -- i)
-            isValue += to_string((type >> i) & 1);
-        isValue = isValue
-                + "  Control 0x" + asHexString((int) control)
-                + "  Part 0x" + asHexString((int) npart)
-                + "  Kit 0x" + asHexString((int) kititem)
-                + "\n  Engine 0x" + asHexString((int) engine)
-                + "  Insert 0x" + asHexString((int) insert)
-                + "  Parameter 0x" + asHexString((int) insertParam)
-                + "  2nd Parameter 0x" + asHexString((int) insertPar2);
-        synth->getRuntime().Log(isValue);
-//        return;
+            typemsg += to_string((type >> i) & 1);
+        list<string>msg;
+        msg.push_back(isValue);
+        msg.push_back(typemsg);
+        msg.push_back("  Control    0x" + asHexString(control) + "    " + asString(int(control)));
+        msg.push_back("  Part       0x" + asHexString(npart) + "    " + asString(int(npart)));
+        msg.push_back("  Kit        0x" + asHexString(kititem) + "    " + asString(int(kititem)));
+        msg.push_back("  Engine     0x" + asHexString(engine) + "    " + asString(int(engine)));
+        msg.push_back("  Insert     0x" + asHexString(insert) + "    " + asString(int(insert)));
+        msg.push_back("  Parameter  0x" + asHexString(insertParam) + "    " + asString(int(insertParam)));
+        msg.push_back("  2nd Param  0x" + asHexString(insertPar2) + "    " + asString(int(insertPar2)));
+        synth->cliOutput(msg, 10);
+        if (isCli)
+            return; // wanted for test only
+
 /* we need to review the implications of commenting
  * out various parts of this routine, but if active
  * they screw up miscMsg for some calling routines.
