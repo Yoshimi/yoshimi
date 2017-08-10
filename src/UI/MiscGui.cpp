@@ -144,8 +144,11 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
             if (insert == 1) // dynefilter filter insert
             {
                 // TODO
-                // kititem 0x88
-                // engine 0
+                // this is the pattern
+                // synth->getGuiMaster()->partui->adnoteui->filterui->returns_update(getData);
+
+                // but this fails to compile :(
+                //synth->getGuiMaster()->partui->inseffectui->filterui->returns_update(getData);
                 cout << "dynfilter filter insert" << endl;
             }
             else
@@ -163,6 +166,7 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
     {
         //if (npart == 0xf0) &&  control == 96)
             //return; // gui in undefined state at this point
+        // doesn't seem to be the case now ???
         synth->getGuiMaster()->returns_update(getData);
         return;
     }

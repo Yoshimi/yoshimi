@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-Modified August 2017} {selected in_source in_header
+Modified August 2017} {in_source in_header
 }
 
 decl {\#include "UI/MiscGui.h"} {public local
@@ -359,7 +359,7 @@ return Fl_Box::handle(event);} {}
   }
 }
 
-class FilterUI {: {public Fl_Group,PresetsUI_}
+class FilterUI {selected : {public Fl_Group,PresetsUI_}
 } {
   Function {FilterUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
@@ -877,7 +877,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     //unsigned char par = getData->data.parameter;
     //unsigned char par2 = getData->data.par2;
 
-    if (part != npart || ((eng >= 128 && kititem != 136) && eng != engine))
+    if (part != npart || (kititem != 136 && eng != engine))
         return;
 
     switch(control)
