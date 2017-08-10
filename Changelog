@@ -3,6 +3,8 @@ yoshimi 1.5.2 M
 2017-8-10 Will
 * Further improvements to command test list values.
   Hex and Dec shown, and in columns again.
+* Expanded CLI DynFilter control to include sys/ins
+  but not currently active.
 
 2017-8-9 Will
 * Most of DynFilter updates on CLI direct access call.

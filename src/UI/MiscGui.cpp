@@ -136,9 +136,25 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
     if (kititem >= 0x80 && kititem != 0xff) // effects
     {
         if (npart == 0xf1)
-            synth->getGuiMaster()->syseffectui->returns_update(getData);
+        {
+            if (insert == 1) // dynefilter filter insert
+            {
+                // TODO
+                cout << "system dynfilter filter insert" << endl;
+            }
+            else
+                synth->getGuiMaster()->syseffectui->returns_update(getData);
+        }
         else if (npart == 0xf2)
-            synth->getGuiMaster()->inseffectui->returns_update(getData);
+        {
+            if (insert == 1) // dynefilter filter insert
+            {
+                // TODO
+                cout << "insert dynfilter filter insert" << endl;
+            }
+            else
+                synth->getGuiMaster()->inseffectui->returns_update(getData);
+        }
         else if (npart < NUM_MIDI_PARTS)
         {
             if (insert == 1) // dynefilter filter insert
@@ -149,7 +165,7 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
 
                 // but this fails to compile :(
                 //synth->getGuiMaster()->partui->inseffectui->filterui->returns_update(getData);
-                cout << "dynfilter filter insert" << endl;
+                cout << "part dynfilter filter insert" << endl;
             }
             else
                 synth->getGuiMaster()->partui->inseffectui->returns_update(getData);
