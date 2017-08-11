@@ -201,6 +201,7 @@ string savelist [] = {
     "MLearn <s>",               "midi learned list to named file",
     "STate <s>",                "all system settings and patch sets to named file",
     "Config",                   "current configuration",
+    "end",
 };
 
 string listlist [] = {
@@ -369,7 +370,8 @@ bool CmdInterface::helpList(unsigned int local)
             msg.push_back(" ");
             msg.push_back("  Part [n1]   ...             - part operations");
             msg.push_back("  VEctor [n1] ...             - vector operations");
-            msg.push_back("  List        ...             - various available parameters");
+            msg.push_back("  SCale       ...             - scale (microtonal) operations");
+            msg.push_back("  LIst        ...             - various available parameters");
             msg.push_back("  LOad        ...             - load various files");
             msg.push_back("  SAve        ...             - save various files");
             msg.push_back("  COnfig      ...             - configuration settings");
