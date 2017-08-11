@@ -1,5 +1,8 @@
 yoshimi 1.5.2 M
 
+2017-8-11 Will
+* Implimented CLI naming of vectors.
+
 2017-8-10 Will
 * Further improvements to command test list values.
   Hex and Dec shown, and in columns again.

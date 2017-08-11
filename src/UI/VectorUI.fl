@@ -17,8 +17,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-Modified July 2017
-} {in_source in_header
+Modified August 2017
+} {selected in_source in_header
 }
 
 decl {using namespace std;} {public local
@@ -42,7 +42,7 @@ decl {\#include "BankUI.h"} {public local
 decl {\#include "ParametersUI.h"} {public local
 }
 
-class VectorUI {selected : {private MiscFuncs}
+class VectorUI {: {private MiscFuncs}
 } {
   Function {make_window(void)} {} {
     Fl_Window vectorwindow {
@@ -500,7 +500,7 @@ if (tmp != NULL && !string(tmp).empty())
     o->copy_label(tmp);
     loadlabel[BaseChan]  = string(tmp);
     synth->getRuntime().vectordata.Name[BaseChan] = string(tmp);
-//    send_data(8, 0, 0xc0, 192, 255, 255, 255, 128, miscMsgPush(string(tmp)));
+    send_data(8, 0, 0xc0, 192, 255, 255, BaseChan, 128, miscMsgPush(string(tmp)));
 }}
         tooltip {Last saved or loaded vector file - click to change} xywh {45 265 198 20} box THIN_DOWN_BOX labelfont 1 labelsize 12
       }

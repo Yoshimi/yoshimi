@@ -95,7 +95,7 @@ string configlist [] = {
     "BUffer <n>",               "* internal size (power 2 16-4096)",
     "PAdsynth [s]",             "interpolation type (Linear, other = cubic",
     "Virtual <n>",              "keyboard (0 = QWERTY, 1 = Dvorak, 2 = QWERTZ, 3 = AZERTY",
-    "Xml <n>",                  "compression 0-9)",
+    "Xml <n>",                  "compression (0-9)",
     "REports [s]",              "destination (Stdout, other = console)",
 
     "STate [s]",                "* autoload default at start (Enable {other})",
@@ -158,6 +158,7 @@ string vectlist [] = {
     "[Y] PRogram <d/u> <n2>",   "Y program change ID forL DOWN or UP part",
     "[X/Y] Control <n2> <n3>",  "sets n3 CC to use for X or Y feature n2 (2-4)",
     "Off",                      "disable vector for this channel",
+    "Name <s>",                 "Text name for this complete vector",
     "end"
 };
 
@@ -996,6 +997,21 @@ int CmdInterface::commandVector()
         return done_msg;
     }
 
+    if (matchnMove(1, point, "name"))
+    {
+        string name = "!";
+        unsigned char type = 64;
+        if (isRead)
+            type = 0;
+        else
+        {
+            name = string(point);
+            if (name <= "!")
+                return value_msg;
+        }
+        sendDirect(0, type, 8, 0xc0, 0xff, 0xff, chan, 0x80, miscMsgPush(name));
+        return done_msg;
+    }
     if (matchnMove(1, point, "features"))
     {
         unsigned int vecfeat;
