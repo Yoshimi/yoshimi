@@ -1,3 +1,6 @@
+Change appdata file and location
+
+Fix Mlearn request - now on all three buttons :(
 
 NRPN channels?
 

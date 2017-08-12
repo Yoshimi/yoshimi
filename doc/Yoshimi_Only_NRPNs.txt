@@ -1,0 +1,21 @@
+
+Shortform (doesn't use the data bytes).
+CC 99   CC 98
+MSB     LSB
+0x41    0-0x1f  set channel switch row mode
+0x42    0-0x3f  set channel switch column mode
+0x43    0-0x1f  set channel switch loop mode
+
+0x44    0x44    Shutdown Yoshimi immediately
+
+
+Full
+CC 99   CC 98
+MSB     LSB
+0x40    0       Direct part control
+                    (see Direct_Part_Control.txt)
+0x40    1       Vector control
+                    (see Vector_Control.txt)
+0x40    2       System settings
+                    (see Dynamic System Settings)
+

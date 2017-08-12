@@ -1,5 +1,11 @@
 yoshimi 1.5.2 M
 
+2017-8-12 Will
+* Added shortform NRPN to shutdown Yoshimi.
+  CC 99 & 98 both set to 68 (0x44).
+* BugFix: CTRL pressed *after* any mouse click learned.
+* Doc updates.
+
 2017-8-11 Will
 * Implimented CLI naming of vectors.
 * Corrected some CLI help entries.

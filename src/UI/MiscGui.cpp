@@ -42,12 +42,12 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
 
     if (part != 0xd8)
     {
-        if ((type & 3) == 3)
-        { // value type is now irrelevant
+        if (Fl::event_button3())
+        {
             if(Fl::event_state(FL_CTRL) != 0)
             {
                 if (type & 8)
-                    type = 3;
+                    type = 3; // previous type is now irrelevant
                 // identifying this for button 3 as MIDI learn
                 else
                 {

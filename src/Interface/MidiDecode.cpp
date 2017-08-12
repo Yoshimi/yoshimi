@@ -213,6 +213,11 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
                     }
                     return;
                 }
+                if (type == 0x44 && param == 0x44)
+                {
+                    synth->getRuntime().runSynth = false;
+                    return; // bye bye everyone
+                }
                 //synth->getRuntime().Log("Set nrpn LSB to " + asString(param));
             }
             nLow = param;
@@ -558,7 +563,10 @@ void MidiDecode:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
         /*
          * these have to go through the program change
          * thread otherwise they could block following
-         * MIDI messages
+         * MIDI messages.
+         * TODO
+         * We need to change this so it goes through
+         * the common RBP thread.
          */
         case 4:
             setMidiProgram(chan | 0x80, par);
