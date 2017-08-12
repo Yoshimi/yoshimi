@@ -140,6 +140,8 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
             if (insert == 1) // dynefilter filter insert
             {
                 // TODO
+                synth->getGuiMaster()->syseffectui->returns_update(getData);
+                synth->getGuiMaster()->syseffectui->fwin_filterui->returns_update(getData);
                 cout << "system dynfilter filter insert" << endl;
             }
             else
@@ -150,6 +152,8 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
             if (insert == 1) // dynefilter filter insert
             {
                 // TODO
+                synth->getGuiMaster()->inseffectui->returns_update(getData);
+                synth->getGuiMaster()->inseffectui->fwin_filterui->returns_update(getData);
                 cout << "insert dynfilter filter insert" << endl;
             }
             else
@@ -164,7 +168,10 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
                 // synth->getGuiMaster()->partui->adnoteui->filterui->returns_update(getData);
 
                 // but this fails to compile :(
-                //synth->getGuiMaster()->partui->inseffectui->filterui->returns_update(getData);
+                // ...because filterwindow set no permanent pointer to its inner filterui,
+                // but set that up only using the stack. EffUI->make_filter_window() tweaked
+                synth->getGuiMaster()->partui->inseffectui->returns_update(getData);
+                synth->getGuiMaster()->partui->inseffectui->fwin_filterui->returns_update(getData);
                 cout << "part dynfilter filter insert" << endl;
             }
             else

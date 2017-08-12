@@ -208,7 +208,8 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
   Function {EffUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
     eff = NULL;
-    filterwindow = NULL;} {}
+    filterwindow = NULL;
+    fwin_filterui = NULL;} {}
   }
   Function {~EffUI()} {} {
     code {effnullwindow->hide();        // delete (effnullwindow);
@@ -2061,7 +2062,7 @@ send_data(8, o->value(), 8, 0xc0);}
       label {Filter Parameters for DynFilter Eff.}
       xywh {1109 779 290 110} type Double hide
     } {
-      Fl_Group {} {
+      Fl_Group fwin_filterui {
         label {DynFilter effect  - Filter} open
         xywh {5 5 275 75} box FLAT_BOX color 50 labelsize 12 align 144
         code0 {o->init(eff->filterpars,NULL,NULL, npart, 0x88, neff);}
