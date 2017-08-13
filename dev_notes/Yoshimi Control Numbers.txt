@@ -433,7 +433,7 @@ YL : 0 to 127 : 7 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 0 : 0 to 2 : 255 : Fr
 YL : 0 to 127 : 8 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 0 : 0 to 2 : 255 : Stretch
 
 Filter parameters insert
- :  :  :  :  : See Note -> :  :  :  : This must be 136 for the filter component of DynFilter
+ :  :  :  : See Note -> :  :  :  :  : This must be 136 for the filter component of DynFilter
 YL : 0 to 127 : 0 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Centre frequency
 YL : 0 to 127 : 1 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Q
 YL : 0 to 127 : 2 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Frequency tracking
