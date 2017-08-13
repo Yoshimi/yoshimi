@@ -1,5 +1,9 @@
 yoshimi 1.5.2 M
 
+2017-8-13 Will + Rob
+* GUI DynFilter updates and learns correctly.
+* Learn bug sorted properly!
+
 2017-8-12 Will
 * Added shortform NRPN to shutdown Yoshimi.
   CC 99 & 98 both set to 68 (0x44).

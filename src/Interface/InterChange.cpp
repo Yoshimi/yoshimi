@@ -6858,7 +6858,17 @@ void InterChange::returnLimits(CommandBlock *getData)
         return;
     }
 
-    if(kititem == 0x87) //EQ in part effects
+// TODO sort this properly
+    if(kititem == 0x87) // EQ effects
+    {
+        getData->limits.min = 0;
+        getData->limits.def = 64;
+        getData->limits.max = 127;
+        return;
+    }
+
+// TODO sort this properly
+    if(kititem == 0x88) // DynFilter
     {
         getData->limits.min = 0;
         getData->limits.max = 127;
