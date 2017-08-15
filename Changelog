@@ -1,5 +1,9 @@
 yoshimi 1.5.2 M
 
+2017-8-15 Will.
+* Updated appdata and moved to metainfo.
+* Other doc updates.
+
 2017-8-13 Will + Rob
 * GUI DynFilter updates and learns correctly.
 * Learn bug sorted properly!
