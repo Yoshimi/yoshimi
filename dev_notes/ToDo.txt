@@ -1,4 +1,3 @@
-Change appdata file and location
 
 NRPN channels?
 

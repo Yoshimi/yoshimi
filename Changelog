@@ -1,4 +1,7 @@
-yoshimi 1.5.2 M
+yoshimi 1.5.3 rc1
+2017-8-16 Will.
+* Doc updates.
+* Set Version 1.5.3 rc1.
 
 2017-8-15 Will.
 * Updated appdata and moved to metainfo.
