@@ -7,6 +7,7 @@ yoshimi 1.5.3 rc2
 * Revised CLI MIDI learn for own context level.
 * GUI test reports are now specific to button 2 & 3.
 * Set Version 1.5.3 rc2.
+* Further small updates to CLI.
 
 2017-8-17 Jesper
 * Don't crash when autoconnect "fails" due to preexisting connections.

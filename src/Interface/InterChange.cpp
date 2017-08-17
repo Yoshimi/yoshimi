@@ -1245,7 +1245,23 @@ string InterChange::resolveMain(CommandBlock *getData)
             break;
 
         case 48:
-            contstr = "Chan 'solo' Switch Type";
+            showValue = false;
+            contstr = "Chan 'solo' Switch ";
+            switch (value_int)
+            {
+                case 0:
+                    contstr += "Off";
+                    break;
+                case 1:
+                    contstr += "Row";
+                    break;
+                case 2:
+                    contstr += "Column";
+                    break;
+                case 3:
+                    contstr += "Loop";
+                    break;
+            }
             break;
         case 49:
             contstr = "Chan 'solo' Switch CC";

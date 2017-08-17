@@ -71,20 +71,27 @@ string toplist [] = {
     "  Bank <n>",               "delete bank ID (and all contents) from current root",
     "  MLearn <s> [n]",         "delete midi learned 'ALL' whole list, or '@'(n) line",
     "Set / Read",               "set or read all main parameters",
+    "  Part",                   "enter context level",
+    "  VEctor",                 "enter context level",
+    "  SCale",                  "enter context level",
+    "  MLearn",                 "enter context level",
+    "  COnfig",                 "enter context level",
     "  Root <n>",               "current root path to ID",
     "  Bank <n>",               "current bank to ID",
-    "SYStem effects [n]",       "system effects for editing",
-    "  SEnd <n2> <n3>",         "send system effect to effect n2 at volume n3",
-    "  preset <n2>",            "set effect preset to number n2",
-    "INSert effects [n1]",      "insertion effects for editing",
-    "  SEnd <s>/<n2>",          "set where (Master, Off or part number)",
-    "  PREset <n2>",            "set numbered effect preset to n2",
-    "AVailable <n>",            "available parts (16, 32, 64)",
-    "Volume <n>",               "master volume",
-    "SHift <n>",                "master key shift semitones (0 no shift)",
-    "DEtune <n>",               "master fine detune",
-    "SOlo <n>",                 "channel 'solo' switcher (0 = off, 1 = row, 2 = col, 3 = loop)",
-    "SCC <n>",                  "Incoming 'solo' channel number",
+    "  SYStem effects [n]",     "enter effects context level",
+    "    Type <s>",             "the effect type",
+    "    PREset <n2>",          "set numbered effect preset to n2",
+    "    SEnd <n2> <n3>",       "send system effect to effect n2 at volume n3",
+    "  INSert effects [n1]",    "enter effects context level",
+    "    Type <s>",             "the effect type",
+    "    PREset <n2>",          "set numbered effect preset to n2",
+    "    SEnd <s>/<n2>",        "set where (Master, Off or part number)",
+    "  AVailable <n>",          "available parts (16, 32, 64)",
+    "  Volume <n>",             "master volume",
+    "  SHift <n>",              "master key shift semitones (0 no shift)",
+    "  DEtune <n>",             "master fine detune",
+    "  SOlo [s] [n]",           "channel 'solo' switcher (Row, Column, Loop, CC, {other} Disable)",
+    "      CC <n>",             "Incoming 'solo' CC number (type must be set first)",
     "end"
 };
 
@@ -132,13 +139,13 @@ string partlist [] = {
     "Pan <n2>",                 "panning",
     "VElocity <n2>",            "velocity sensing sensitivity",
     "OFfset <n2>",              "velocity sense offest",
-    "POrtamento <s>",           "portamento (Enable {other}",
+    "POrtamento <s>",           "portamento (Enable {other})",
     "Mode <s>",                 "key mode (Poly, Mono, Legato)",
     "Note <n2>",                "note polyphony",
     "SHift <n2>",               "key shift semitones (0 no shift)",
     "MIn <n2>",                 "minimum MIDI note value",
     "MAx <n2>",                 "maximum MIDI note value",
-    "EFfects [n2]",             "effects for editing",
+    "EFfects [n2]",             "enter effects context level",
     "  Type <s>",               "the effect type",
     "  PREset <n3>",            "set numbered effect preset to n3",
     "  Send <n3> <n4>",         "send part to system effect n3 at volume n4",
@@ -150,20 +157,20 @@ string partlist [] = {
 };
 
 string learnlist [] = {
-    "MUte <s>",                 "Enable/Disable this line (Enable, {other} off)",
-    "7Bit",                     "Set incoming NRPNs as 7 bit (Enable, {other} off)",
-    "CC <n>",                   "Set incoming controler value",
-    "CHan <n>",                 "Set incoming channel number",
-    "MIn <n>",                  "Set minimm percentage",
-    "MAx <n>",                  "set maximum percentage",
-    "LImit <s>",                "Limit instead of compress (Enable, {other} off)",
-    "BLock <s>",                "Inhibit others on this CC/Chan pair (Enable, {other} off)",
+    "MUte <s>",                 "Enable/Disable this line (Enable, {other})",
+    "7Bit",                     "Set incoming NRPNs as 7 bit (Enable, {other})",
+    "CC <n2>",                  "Set incoming controler value",
+    "CHan <n2>",                "Set incoming channel number",
+    "MIn <n2>",                 "Set minimm percentage",
+    "MAx <n2>",                 "set maximum percentage",
+    "LImit <s>",                "Limit instead of compress (Enable, {other})",
+    "BLock <s>",                "Inhibit others on this CC/Chan pair (Enable, {other})",
     "end"
 };
 
 string vectlist [] = {
     "[X/Y] CC <n2>",            "CC n2 is used for X or Y axis sweep",
-    "[X/Y] Features <n2> [s]",   "sets X or Y features 1-4 (Enable, Reverse, {other} off)",
+    "[X/Y] Features <n2> [s]",   "sets X or Y features 1-4 (Enable, Reverse, {other} Disable)",
     "[X] PRogram <l/r> <n2>",   "X program change ID for LEFT or RIGHT part",
     "[Y] PRogram <d/u> <n2>",   "Y program change ID forL DOWN or UP part",
     "[X/Y] Control <n2> <n3>",  "sets n3 CC to use for X or Y feature n2 (2-4)",
@@ -175,11 +182,11 @@ string vectlist [] = {
 string scalelist [] = {
     "FRequency <n>",            "'A' note actual frequency",
     "NOte <n>",                 "'A' note number",
-    "Invert [s]",               "Invert entire scale (Enable, {other} off)",
+    "Invert [s]",               "Invert entire scale (Enable, {other})",
     "CEnter <n>",               "Note number of key center",
     "SHift <n>",                "Shift entire scale up or down",
-    "SCale [s]",                "Activate microtonal scale (Enable, {other} off)",
-    "MApping [s]",              "Activate keyboard mapping (Enable, {other} off)",
+    "SCale [s]",                "Activate microtonal scale (Enable, {other})",
+    "MApping [s]",              "Activate keyboard mapping (Enable, {other})",
     "FIrst <n>",                "First note number to map",
     "MIddle <n>",               "Middle note number to map",
     "Last <n>",                 "Last note number to map",
@@ -387,7 +394,7 @@ bool CmdInterface::helpList(unsigned int local)
             msg.push_back("  Part [n1]   ...             - part operations");
             msg.push_back("  VEctor [n1] ...             - vector operations");
             msg.push_back("  SCale       ...             - scale (microtonal) operations");
-            msg.push_back("  MLearn      ...             - MIDI learn operations");
+            msg.push_back("  MLearn [n1] ...             - MIDI learn operations");
             msg.push_back("  COnfig      ...             - configuration settings");
             msg.push_back("  LIst        ...             - various available parameters");
             msg.push_back("  LOad        ...             - load various files");
@@ -425,7 +432,7 @@ bool CmdInterface::helpList(unsigned int local)
             msg.push_back("'*' entries need to be saved and Yoshimi restarted to activate");
             break;
         case 10:
-            msg.push_back("Mlearn:");
+            msg.push_back("Mlearn: [n1] = line number");
             helpLoop(msg, learnlist, 2);
             break;
     }
@@ -2078,33 +2085,35 @@ int CmdInterface::commandReadnSet()
 
     if (matchnMove(2, point, "solo"))
     {
-        if (!isRead && point[0] == 0)
-            return value_msg;
-        int value = string2int127(point);
-        if (value > 3)
-            return range_msg;
-        sendDirect(value, cmdType, 48, 240);
-        return done_msg;
-    }
-    if (matchnMove(3, point, "scc"))
-    {
         int value = 0;
-        if (!isRead)
+        int command = 48;
+
+        if (matchnMove(2, point, "cc"))
         {
-            if (point[0] == 0)
-                return value_msg;
-            value = string2int127(point);
-            string reply = Runtime.masterCCtest(value);
-            if (reply > "")
+            if (!isRead)
             {
-                Runtime.Log("In use for " + reply);
-                return done_msg;
+                if (point[0] == 0)
+                    return value_msg;
+                value = string2int127(point);
+                string reply = Runtime.masterCCtest(value);
+                if (reply > "")
+                {
+                    Runtime.Log("In use for " + reply);
+                    return done_msg;
+                }
             }
+            command = 49;
         }
-        sendDirect(value, cmdType, 49, 240);
+        else if (matchnMove(1, point, "loop"))
+            value = 3;
+        else if (matchnMove(1, point, "column"))
+            value = 2;
+        else if (matchnMove(1, point, "row"))
+            value = 1;
+
+        sendDirect(value, cmdType, command, 240);
         return done_msg;
     }
-
     else if (matchnMove(2, point, "available")) // 16, 32, 64
     {
         if (!isRead && point[0] == 0)
@@ -2120,7 +2129,6 @@ int CmdInterface::commandReadnSet()
         reply = opp_msg;
     return reply;
 }
-
 
 bool CmdInterface::cmdIfaceProcessCommand()
 {
