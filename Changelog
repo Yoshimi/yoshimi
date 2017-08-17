@@ -1,4 +1,8 @@
 yoshimi 1.5.3 rc1
+
+2017-8-17 Jesper
+* Don't crash when autoconnect "fails" due to preexisting connections.
+
 2017-8-16 Will.
 * Doc updates.
 * Set Version 1.5.3 rc1.
