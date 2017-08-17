@@ -590,11 +590,10 @@ void InterChange::resolveReplies(CommandBlock *getData)
     string commandName;
     unsigned char insertParam = getData->data.parameter;
     unsigned char insertPar2 = getData->data.par2;
-
 #ifdef ENABLE_REPORTS
-    if ((isGui && button < 2) || (isCli && button == 1))
+    if ((isGui && !(button & 1)) || (isCli && button == 1))
 #else
-    if (false) // isCli && button == 1)
+    if (isCli && button == 1)
 #endif
     {
         if (button == 0)
@@ -786,15 +785,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
         return;
     }
 
-/*#ifdef ENABLE_REPORTS
-    else if((isGui && button == 2) || isCli)
-        synth->getRuntime().Log(commandName + actual);
-#else
-    else if(isCli)
-        synth->getRuntime().Log(commandName + actual);
-#endif
-    */
-    else if (isGui || isCli)
+    else if (isGui || isCli) // not midi !!!
         synth->getRuntime().Log(commandName + actual);
 // in case it was called from CLI
     synth->getRuntime().finishedCLI = true;

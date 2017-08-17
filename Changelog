@@ -1,4 +1,12 @@
-yoshimi 1.5.3 rc1
+yoshimi 1.5.3 rc2
+
+2017-8-17
+* Minor correction to CLI vector level.
+* CLI now updates most of envelope graph.
+  freemode still to do.
+* Revised CLI MIDI learn for own context level.
+* GUI test reports are now specific to button 2 & 3.
+* Set Version 1.5.3 rc2.
 
 2017-8-17 Jesper
 * Don't crash when autoconnect "fails" due to preexisting connections.

@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified June 2017
+    Modified August 2017
 */
 
 #ifndef CMDINTERFACE_H
@@ -33,7 +33,7 @@ using namespace std;
 extern map<SynthEngine *, MusicClient *> synthInstances;
 
 // all_fx and ins_fx MUST be the first two
-typedef enum { all_fx = 0, ins_fx, conf_lev, vect_lev, scale_lev, part_lev, } level_bits;
+typedef enum { all_fx = 0, ins_fx, conf_lev, vect_lev, scale_lev, learn_lev, part_lev, } level_bits;
 
 typedef enum { todo_msg = 0, done_msg, value_msg, name_msg, opp_msg, what_msg, range_msg, low_msg, high_msg, unrecognised_msg, parameter_msg, level_msg, available_msg,} error_messages;
 
@@ -54,6 +54,7 @@ class CmdInterface : private MiscFuncs
         int volPanVel();
         int keyShift(int part);
         int commandList();
+        int commandMlearn();
         int commandVector();
         int commandConfig();
         int commandScale();
@@ -72,6 +73,7 @@ class CmdInterface : private MiscFuncs
         int nFXpreset;
         int chan;
         int axis;
+        int mline;
         unsigned int level;
         string replyString;
         bool isRead;

@@ -73,8 +73,6 @@ string toplist [] = {
     "Set / Read",               "set or read all main parameters",
     "  Root <n>",               "current root path to ID",
     "  Bank <n>",               "current bank to ID",
-    "  MLearn <n> <s> [s]",     "midi learned line n control",
-    "  ",                       "(MUte, CC, CHan, MIn, MAx, LImit, BLock) Enable {other}",
     "SYStem effects [n]",       "system effects for editing",
     "  SEnd <n2> <n3>",         "send system effect to effect n2 at volume n3",
     "  preset <n2>",            "set effect preset to number n2",
@@ -148,6 +146,18 @@ string partlist [] = {
     "NAme <s>",                 "sets the display name the part can be saved with",
     "Channel <n2>",             "MIDI channel (> 31 disables, > 15 note off only)",
     "Destination <s2>",         "jack audio destination (Main, Part, Both)",
+    "end"
+};
+
+string learnlist [] = {
+    "MUte <s>",                 "Enable/Disable this line (Enable, {other} off)",
+    "7Bit",                     "Set incoming NRPNs as 7 bit (Enable, {other} off)",
+    "CC <n>",                   "Set incoming controler value",
+    "CHan <n>",                 "Set incoming channel number",
+    "MIn <n>",                  "Set minimm percentage",
+    "MAx <n>",                  "set maximum percentage",
+    "LImit <s>",                "Limit instead of compress (Enable, {other} off)",
+    "BLock <s>",                "Inhibit others on this CC/Chan pair (Enable, {other} off)",
     "end"
 };
 
@@ -248,6 +258,7 @@ string fx_list [] = {
     "DYnfilter"
 };
 
+
 string fx_presets [] = {
     "1, off",
     "13, cathedral 1, cathedral 2, cathedral 3, hall 1, hall 2, room 1, room 2, basement, tunnel, echoed 1, echoed 2, very long 1, very long 2",
@@ -266,6 +277,7 @@ void CmdInterface::defaults()
     level = 0;
     chan = 0;
     axis = 0;
+    mline = 0;
     npart = 0;
     nFX = 0;
     nFXtype = 0;
@@ -348,6 +360,8 @@ bool CmdInterface::helpList(unsigned int local)
             listnum = 8;
         else if (matchnMove(1, point, "config"))
             listnum = 9;
+        else if (matchnMove(1, point, "mlearn"))
+            listnum = 10;
     }
     else
     {
@@ -359,6 +373,8 @@ bool CmdInterface::helpList(unsigned int local)
             listnum = 5;
         else if (bitTest(local, conf_lev))
             listnum = 9;
+        else if (bitTest(local, learn_lev))
+            listnum = 10;
     }
 
     list<string>msg;
@@ -371,10 +387,12 @@ bool CmdInterface::helpList(unsigned int local)
             msg.push_back("  Part [n1]   ...             - part operations");
             msg.push_back("  VEctor [n1] ...             - vector operations");
             msg.push_back("  SCale       ...             - scale (microtonal) operations");
+            msg.push_back("  MLearn      ...             - MIDI learn operations");
+            msg.push_back("  COnfig      ...             - configuration settings");
             msg.push_back("  LIst        ...             - various available parameters");
             msg.push_back("  LOad        ...             - load various files");
             msg.push_back("  SAve        ...             - save various files");
-            msg.push_back("  COnfig      ...             - configuration settings");
+
             msg.push_back(" ");
             break;
         case 3:
@@ -405,6 +423,10 @@ bool CmdInterface::helpList(unsigned int local)
             msg.push_back("Config:");
             helpLoop(msg, configlist, 2);
             msg.push_back("'*' entries need to be saved and Yoshimi restarted to activate");
+            break;
+        case 10:
+            msg.push_back("Mlearn:");
+            helpLoop(msg, learnlist, 2);
             break;
     }
 
@@ -915,13 +937,123 @@ int CmdInterface::commandList()
 }
 
 
+int CmdInterface::commandMlearn()
+{
+    Config &Runtime = synth->getRuntime();
+    list<string> msg;
+    int reply = todo_msg;
+    int lineNo;
+    int tmp = 0;
+    float value;
+    bitSet(level, learn_lev);
+
+    if (isRead)
+    {
+        Runtime.Log("Write only");
+        return done_msg; // will eventually be readable
+    }
+
+    if (!isdigit(point[0]))
+        value = mline;
+    else
+    {
+        lineNo = string2int(point) - 1;
+        point = skipChars(point);
+        if (lineNo < 0)
+            return value_msg;
+        else
+        {
+            value = lineNo;
+            mline = lineNo;
+        }
+    }
+    tmp = synth->midilearn.findSize();
+    if (tmp == 0 || tmp <= mline)
+    {
+        if (tmp == 0)
+            Runtime.Log("No learned lines");
+        else
+            Runtime.Log("Line " + to_string(mline + 1) + " Not found");
+        mline = 0;
+        return (done_msg);
+    }
+
+    tmp = 0;
+    if (matchnMove(2, point, "cc"))
+    {
+        if (!isdigit(point[0]))
+            return value_msg;
+        tmp = string2int(point);
+        if (tmp > 129)
+        {
+            Runtime.Log("Max CC value is 129");
+            return done_msg;
+        }
+        sendDirect(value, 0xff, 0x10, 0xd8, tmp);
+        Runtime.Log("Lines may be re-ordered");
+        reply = done_msg;
+    }
+    else if (matchnMove(2, point, "channel"))
+    {
+        tmp = string2int(point) - 1;
+        if (tmp < 0 || tmp > 16)
+            tmp = 16;
+        sendDirect(value, 0xff, 0x10, 0xd8, 0xff, tmp);
+        Runtime.Log("Lines may be re-ordered");
+        reply = done_msg;
+    }
+    else if (matchnMove(2, point, "minimum"))
+    {
+        int percent = int((string2float(point)* 2.0f) + 0.5f);
+        if (percent < 0 || percent > 200)
+            return value_msg;
+        sendDirect(value, 0xff, 5, 0xd8, 0xff, 0xff, percent);
+        reply = done_msg;
+    }
+    else if (matchnMove(2, point, "maximum"))
+    {
+        int percent = int((string2float(point)* 2.0f) + 0.5f);
+        if (percent < 0 || percent > 200)
+            return value_msg;
+        sendDirect(value, 0xff, 6, 0xd8, 0xff, 0xff, 0xff, percent);
+    }
+    else if (matchnMove(2, point, "mute"))
+    {
+        if (matchnMove(1, point, "enable"))
+            tmp = 4;
+        sendDirect(value, tmp, 2, 0xd8);
+    }
+    else if (matchnMove(2, point, "limit"))
+    {
+        if (matchnMove(1, point, "enable"))
+            tmp = 2;
+        sendDirect(value, tmp, 1, 0xd8);
+    }
+    else if (matchnMove(2, point, "block"))
+    {
+        if (matchnMove(1, point, "enable"))
+            tmp = 1;
+        sendDirect(value, tmp, 0, 0xd8);
+    }
+    else if (matchnMove(2, point, "7bit"))
+    {
+        if (matchnMove(1, point, "enable"))
+            tmp = 16;
+        sendDirect(value, tmp, 4, 0xd8);
+    }
+    else
+        reply = opp_msg;
+    return reply;
+}
+
+
 int CmdInterface::commandVector()
 {
     Config &Runtime = synth->getRuntime();
     list<string> msg;
     int reply = todo_msg;
     int tmp;
-
+    bitSet(level, vect_lev);
     if (isRead)
     {
         if (synth->SingleVector(msg, chan))
@@ -932,9 +1064,7 @@ int CmdInterface::commandVector()
     }
     if (point[0] == 0)
     {
-        if (Runtime.vectordata.Enabled[chan])
-            bitSet(level, vect_lev);
-        else
+        if (!Runtime.vectordata.Enabled[chan])
             Runtime.Log("No vector on channel " + asString(chan + 1));
         return done_msg;
     }
@@ -951,7 +1081,7 @@ int CmdInterface::commandVector()
             axis = 0;
         }
 
-        Runtime.Log("Vector channel set to " + asString(chan));
+        Runtime.Log("Vector channel set to " + asString(chan + 1));
     }
 
     if (matchWord(1, point, "off"))
@@ -1821,6 +1951,8 @@ int CmdInterface::commandReadnSet()
         reply = commandPart(false);
     else if (bitTest(level, vect_lev))
         reply = commandVector();
+    else if (bitTest(level, learn_lev))
+        reply = commandMlearn();
     if (reply > todo_msg)
         return reply;
 
@@ -1861,6 +1993,13 @@ int CmdInterface::commandReadnSet()
         level = 0; // clear all first
         return commandVector();
     }
+
+    if (matchnMove(2, point, "mlearn"))
+    {
+        level = 0; // clear all first
+        return commandMlearn();
+    }
+
     if (level < 4 && matchnMove(3, point, "system"))
     {
         level = 1;
@@ -1977,85 +2116,6 @@ int CmdInterface::commandReadnSet()
         return done_msg;
     }
 
-    else if (matchnMove(2, point, "mlearn"))
-    {
-        if (isRead)
-        {
-            Runtime.Log("Write only");
-            return done_msg;
-        }
-        if (point[0] == '@')
-            point +=1;
-        point = skipSpace(point);
-        float value = string2int(point) - 1;
-        if (value < 0)
-            return value_msg;
-        point = skipChars(point);
-        tmp = 0;
-        if (matchnMove(2, point, "cc"))
-        {
-            if (!isdigit(point[0]))
-                return value_msg;
-            tmp = string2int(point);
-            if (tmp > 129)
-            {
-                Runtime.Log("Max CC value is 129");
-                return done_msg;
-            }
-            sendDirect(value, 0xff, 0x10, 0xd8, tmp);
-            Runtime.Log("Lines may be re-ordered");
-            reply = done_msg;
-        }
-        else if (matchnMove(2, point, "channel"))
-        {
-            tmp = string2int(point) - 1;
-            if (tmp < 0 || tmp > 16)
-                tmp = 16;
-            sendDirect(value, 0xff, 0x10, 0xd8, 0xff, tmp);
-            Runtime.Log("Lines may be re-ordered");
-            reply = done_msg;
-        }
-        else if (matchnMove(2, point, "minimum"))
-        {
-            int percent = int((string2float(point)* 2.0f) + 0.5f);
-            if (percent < 0 || percent > 200)
-                return value_msg;
-            sendDirect(value, 0xff, 5, 0xd8, 0xff, 0xff, percent);
-            reply = done_msg;
-        }
-        else if (matchnMove(2, point, "maximum"))
-        {
-            int percent = int((string2float(point)* 2.0f) + 0.5f);
-            if (percent < 0 || percent > 200)
-            sendDirect(value, 0xff, 6, 0xd8, 0xff, 0xff, 0xff, percent);
-        }
-        else if (matchnMove(2, point, "mute"))
-        {
-            if (matchnMove(1, point, "enable"))
-                tmp = 4;
-            sendDirect(value, tmp, 2, 0xd8);
-        }
-        else if (matchnMove(2, point, "limit"))
-        {
-            if (matchnMove(1, point, "enable"))
-                tmp = 2;
-            sendDirect(value, tmp, 1, 0xd8);
-        }
-        else if (matchnMove(2, point, "block"))
-        {
-            if (matchnMove(1, point, "enable"))
-                tmp = 1;
-            sendDirect(value, tmp, 0, 0xd8);
-        }
-        else if (matchnMove(2, point, "7bit"))
-        {
-            if (matchnMove(1, point, "enable"))
-                tmp = 16;
-            sendDirect(value, tmp, 4, 0xd8);
-        }
-        else
-            reply = opp_msg;
-    }
     else
         reply = opp_msg;
     return reply;
@@ -2871,6 +2931,11 @@ void CmdInterface::cmdIfaceCommandLoop()
                 else
                     prompt += "Y";
             }
+            if (bitTest(level, learn_lev))
+            {
+                prompt += (" MLearn line " + asString(mline + 1) + " ");
+            }
+
             prompt += "> ";
             if (!exit)
             {

@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified February 2017
+    Modified August 2017
 */
 
 #ifndef MIDILEARN_H
@@ -77,6 +77,7 @@ class MidiLearn : private MiscFuncs
         bool runMidiLearn(int _value, unsigned int CC, unsigned char chan, unsigned char category);
         bool writeMidi(CommandBlock *putData, unsigned int writesize, bool in_place);
         int findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned int CC, unsigned char chan, LearnBlock *block, bool show);
+        int findSize();
         void listLine(int lineNo);
         void listAll(list<string>& msg_buf);
         bool remove(int itemNumber);

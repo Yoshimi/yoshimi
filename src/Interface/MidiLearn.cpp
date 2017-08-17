@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified May 2017
+    Modified August 2017
 */
 
 #include <iostream>
@@ -243,6 +243,12 @@ int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned int 
         ++ newpos;
     }
     return -2;
+}
+
+
+int MidiLearn::findSize()
+{
+    return int(midi_list.size());
 }
 
 
