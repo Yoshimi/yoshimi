@@ -1231,7 +1231,8 @@ string InterChange::resolveMain(CommandBlock *getData)
             break;
 
         case 14:
-            contstr = "Part Number";
+            showValue = false;
+            contstr = "Part Number " + to_string(value_int + 1);
             break;
         case 15:
             contstr = "Available Parts";
@@ -1332,6 +1333,7 @@ string InterChange::resolveMain(CommandBlock *getData)
 
 string InterChange::resolvePart(CommandBlock *getData)
 {
+    int value_int = lrint(getData->data.value);
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -1395,7 +1397,12 @@ string InterChange::resolvePart(CommandBlock *getData)
             contstr = "Vel Offset";
             break;
         case 5:
-            contstr = "Midi";
+            showValue = false;
+            contstr = "Midi CH " + to_string(value_int + 1);
+            if (value_int >= NUM_MIDI_CHANNELS * 2)
+                contstr += " Midi ignored";
+            else if (value_int >= NUM_MIDI_CHANNELS)
+                contstr = contstr + " Note off only on CH " + to_string(value_int + 1 - NUM_MIDI_CHANNELS);
             break;
         case 6:
             contstr = "Mode";

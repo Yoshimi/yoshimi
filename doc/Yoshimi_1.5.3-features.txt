@@ -22,7 +22,7 @@ You can now directly interact with the formant filter graphic display in a way t
 
 The Console window now scrolls the right way! One of yoshimi's little helpers worked out how to scroll the window to keep the most recent line visible at the bottom.
 
-It is now possible to run Yoshimi with both GUI and CLI input disabled, thus responsive only to MIDI input. In view of this we have added a new shortform NRPN that will shut it down cleanly. You simply send 68 on both NRPN CCs (99 and 98).
+It is now possible to run Yoshimi stand-alone with both GUI and CLI input disabled, thus responsive only to MIDI input. In view of this we have added a new shortform NRPN that will shut it down cleanly. You simply send 68 on both NRPN CCs (99 and 98).
 
 
 Under the hood:
@@ -31,7 +31,7 @@ As well as additional Gui controls transferred to the new lock-free system, some
 
 Some needlessly dynamic memory allocations have now been changed to fixed ones. This gives a noticable reduction to DSP peaks.
 
-There are few more old and new bugfixes. These days, there seem to be more new ones than old ones. In a sense this is actually good news.
+There are a few more old and new bugfixes. These days, there seem to be more new ones than old ones. In a sense this is actually good news.
 
 To build yoshimi fetch the tarball from either:
     http://sourceforge.net/projects/yoshimi

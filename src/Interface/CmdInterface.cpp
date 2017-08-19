@@ -138,7 +138,7 @@ string partlist [] = {
     "Volume <n2>",              "volume",
     "Pan <n2>",                 "panning",
     "VElocity <n2>",            "velocity sensing sensitivity",
-    "OFfset <n2>",              "velocity sense offest",
+    "OFfset <n2>",              "velocity sense offset",
     "POrtamento <s>",           "portamento (Enable {other})",
     "Mode <s>",                 "key mode (Poly, Mono, Legato)",
     "Note <n2>",                "note polyphony",
@@ -151,7 +151,7 @@ string partlist [] = {
     "  Send <n3> <n4>",         "send part to system effect n3 at volume n4",
     "PRogram <n2>",             "loads instrument ID",
     "NAme <s>",                 "sets the display name the part can be saved with",
-    "Channel <n2>",             "MIDI channel (> 31 disables, > 15 note off only)",
+    "Channel <n2>",             "MIDI channel (> 32 disables, > 16 note off only)",
     "Destination <s2>",         "jack audio destination (Main, Part, Both)",
     "end"
 };
@@ -172,7 +172,7 @@ string vectlist [] = {
     "[X/Y] CC <n2>",            "CC n2 is used for X or Y axis sweep",
     "[X/Y] Features <n2> [s]",   "sets X or Y features 1-4 (Enable, Reverse, {other} Disable)",
     "[X] PRogram <l/r> <n2>",   "X program change ID for LEFT or RIGHT part",
-    "[Y] PRogram <d/u> <n2>",   "Y program change ID forL DOWN or UP part",
+    "[Y] PRogram <d/u> <n2>",   "Y program change ID for DOWN or UP part",
     "[X/Y] Control <n2> <n3>",  "sets n3 CC to use for X or Y feature n2 (2-4)",
     "Off",                      "disable vector for this channel",
     "Name <s>",                 "Text name for this complete vector",
@@ -230,7 +230,7 @@ string listlist [] = {
     "Tuning",                   "Microtonal scale tunings",
     "Keymap",                   "Microtonal scale keyboard map",
     "Config",                   "current configuration",
-    "MLearn [s<n>]",            "midi learned controls ('@' n for full details on one line)",
+    "MLearn [s <n>]",           "midi learned controls ('@' n for full details on one line)",
     "History [s]",              "recent files (Patchsets, SCales, STates, Vectors, MLearn)",
     "Effects [s]",              "effect types ('all' include preset numbers and names)",
     "PREsets",                  "all the presets for the currently selected effect",
@@ -1708,26 +1708,21 @@ int CmdInterface::commandPart(bool justSet)
     }
     else if (matchnMove(1, point, "channel"))
     {
-        if (isRead || point[0] != 0)
-        {
-            if (isRead)
-                tmp = synth->part[npart]->Prcvchn;
-            else
-            {
-                tmp = string2int127(point);
-                if (tmp > 0)
-                synth->SetPartChan(npart, tmp - 1);
-            }
-            string name = "";
-            if (tmp >= NUM_MIDI_CHANNELS * 2)
-                name = " (no MIDI)";
-            else if (tmp >= NUM_MIDI_CHANNELS)
-                name = " (" + asString (tmp % NUM_MIDI_CHANNELS) + " note off only)";
-            Runtime.Log("Part " + asString(npart + 1) + " set to channel " + asString(tmp + 1) + name, isRead);
-            reply = done_msg;
-        }
+        tmp = string2int127(point);
+        if(!isRead && tmp < 1)
+            return value_msg;
+        tmp -= 1;
+        if (isRead)
+            tmp = synth->part[npart]->Prcvchn;
         else
-            reply = value_msg;
+            synth->SetPartChan(npart, tmp);
+        string name = "";
+        if (tmp >= NUM_MIDI_CHANNELS * 2)
+            name = " (no MIDI)";
+        else if (tmp >= NUM_MIDI_CHANNELS)
+            name = " (" + asString((tmp % NUM_MIDI_CHANNELS) + 1) + " note off only)";
+        Runtime.Log("Part " + asString(npart + 1) + " set to channel " + asString(tmp + 1) + name, isRead);
+        reply = done_msg;
     }
     else if (matchnMove(1, point, "destination"))
     {

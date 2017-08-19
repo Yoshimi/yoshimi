@@ -1,4 +1,8 @@
-yoshimi 1.5.3 rc2
+yoshimi 1.5.3 rc3
+
+2017-8-19 Will.
+* Further minor updates to CLI - mostly messages.
+* Set Version 1.5.3 rc3
 
 2017-8-17
 * Minor correction to CLI vector level.
