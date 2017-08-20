@@ -1,5 +1,10 @@
 yoshimi 1.5.3 rc3
 
+2017-8-20 Will.
+* Improved state saving extension checks.
+  This whole area needs looking at.
+* Set Version 1.5.3 rc4
+
 2017-8-19 Will.
 * Further minor updates to CLI - mostly messages.
 * Set Version 1.5.3 rc3

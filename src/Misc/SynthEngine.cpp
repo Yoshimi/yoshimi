@@ -2480,6 +2480,7 @@ bool SynthEngine::loadStateAndUpdate(string filename)
 
 bool SynthEngine::saveState(string filename)
 {
+    filename = setExtension(filename, "state");
     bool result = Runtime.saveState(filename);
     if (result)
         addHistory(filename, 4);

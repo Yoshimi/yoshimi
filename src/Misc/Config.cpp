@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified July 2017
+    Modified August 2017
 */
 
 #include <iostream>
@@ -694,9 +694,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
 
 bool Config::saveSessionData(string savefile)
 {
-    string ext = ".state";
-    if (savefile.rfind(ext) != (savefile.length() - 6))
-        savefile += ext;
+    savefile = setExtension(savefile, "state");
     synth->getRuntime().xmlType = XML_STATE;
     XMLwrapper *xmltree = new XMLwrapper(synth);
     if (!xmltree)

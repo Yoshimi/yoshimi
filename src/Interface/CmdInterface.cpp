@@ -445,7 +445,7 @@ bool CmdInterface::helpList(unsigned int local)
 
     if (synth->getRuntime().toConsole)
         // we need this in case someone is working headless
-        cout << "\nSet REPorts [s] - set report destination (gui/stderr)\n\n";
+        cout << "\nSet CONfig REPorts [s] - set report destination (gui/stderr)\n\n";
 
     synth->cliOutput(msg, LINES);
     return true;
