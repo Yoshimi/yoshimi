@@ -189,8 +189,7 @@ All changes made are immediately effective, however, disabling them will not dis
 
 The options menu allows you to load and save complete vector sets, and 'save' will double check that you have a valid set! Vectors appear in the saved histories file, so you can re-fetch a previously managed one.
 
-Either loading or saving a vector set will write its name in the small panel alongside the 'Close' button.
-
+Either loading or saving a vector set will write its name in the small panel alongside the 'Close' button. This is also editable and will be saved with the rest of the file as an 'internal' name. The behaviour is  similar to instrument names in that a stored name (once set) takes priority over a filename.
 
 Finally, you can clear just the vector set on the currently selected base channel, or clear all that may have been managed.
 

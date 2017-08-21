@@ -13,7 +13,7 @@ Apart from these, the command line works on a system of context levels, and norm
 
 Often you only need the first letter of a command - as long as it is unabiguous. The above examples show their minimum abbreviations in capitals. However, Yoshimi is quite pedantic, and if you type the command in full it must be exactly correct!
 
-All number ranges start from zero. This is different from the gui where most (but not all) start from one. So CLI part 0 is GUI part 1, but CLI bank 0 is GUI bank 0.
+All number ranges follow the same pattern as the GUI. Most (but not all) start from one. e.g. The first part number is 1, but the first bank is 0.
 
 The prompt will always show what level you are on along with relevant information. You will also get a confirmation message after each command, but - for clarity - those are not included in the examples below.
 
@@ -37,9 +37,9 @@ yoshimi part 4 off >
 You are now on part number 4, but that part is currently disabled.
 
 "s ef ty re"
-yoshimi part 4 off FX 0 REver-0 >
+yoshimi part 4 off efx 1 REver-0 >
 
-Sets the part's effect 0 to type 'reverb'
+Sets the part's effect 1 to type 'reverb'
 
 Even though the part is disabled you can still set up its characteristics. Also, notice the two capitals in reverb, these remind you of the minimum abbreviation.
 
@@ -50,14 +50,14 @@ From here you can set a preset for this effect:
 
 "s pre 3"
 
-yoshimi part 4 off FX 0 REver-3 >
+yoshimi part 4 off efx 1 REver-3 >
 
-Currently the presets are shown only numerically in the prompt.
+Currently the presets are shown only numerically in the prompt. this is because most of them include the name of the effect so it would be tedious to type them in.
 
 From the top level, settings that follow in a direct line through several levels can be made all at once and you will be left at the appropriate level:
 
 "s p 5 ef 2 ty re"
-yoshimi part 5 off FX 2 REver-0 >
+yoshimi part 5 off efx 2 REver-1 >
 
 You can't combine type and preset as they are both at the same level.
 
@@ -74,11 +74,11 @@ yoshimi >
 These last can also be put on the front of any other command.
 Starting where we were before:
 
-yoshimi part 4 off FX 2 REver-3 >
+yoshimi part 4 off efx 2 REver-3 >
 " ..s vol 70"
 yoshimi part 4 off>
 
-Part 4 volume is now at 70, and you are once again at part level, not part FX level.
+Part 4 volume is now at 70, and you are once again at part level, not part efx level.
 
 The help menus and lists are also partially context sensitive. This should help avoid clutter and confusion.
 

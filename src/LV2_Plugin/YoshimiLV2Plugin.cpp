@@ -2,6 +2,7 @@
     YoshimiLV2Plugin
 
     Copyright 2014, Andrew Deryabin <andrewderyabin@gmail.com>
+    Copyright 2016-2017, Will Godfrey & others.
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -16,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified March 2017
+    Modified May 2017
 */
 
 #include "YoshimiLV2Plugin.h"
@@ -185,17 +186,17 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         processed += to_process;
 
     }
-    
+
     LV2_Atom_Sequence *aSeq = static_cast<LV2_Atom_Sequence *>(_notifyDataPortOut);
     size_t neededAtomSize = sizeof(LV2_Atom_Event) + sizeof(LV2_Atom_Object_Body);
     size_t paddedSize = (neededAtomSize + 7U) & (~7U);
     if(synth->getNeedsSaving() && _notifyDataPortOut && aSeq->atom.size >= paddedSize) //notify host about plugin's changes
     {
-        synth->setNeedsSaving(false);        
+        synth->setNeedsSaving(false);
         aSeq->atom.type = _atom_type_sequence;
         aSeq->atom.size = sizeof(LV2_Atom_Sequence_Body);
         aSeq->body.unit = 0;
-        aSeq->body.pad = 0;        
+        aSeq->body.pad = 0;
         LV2_Atom_Event *ev = reinterpret_cast<LV2_Atom_Event *>(aSeq + 1);
         ev->time.frames = 0;
         LV2_Atom_Object *aObj = reinterpret_cast<LV2_Atom_Object *>(&ev->body);
@@ -203,15 +204,15 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         aObj->atom.size = sizeof(LV2_Atom_Object_Body);
         aObj->body.id = 0;
         aObj->body.otype =_atom_state_changed;
-        
-        aSeq->atom.size += paddedSize;        
+
+        aSeq->atom.size += paddedSize;
     }
     else if(aSeq)
     {
         aSeq->atom.size = sizeof(LV2_Atom_Sequence_Body);
-        
+
     }
-   
+
 }
 
 
@@ -242,7 +243,7 @@ void *YoshimiLV2Plugin::idleThread()
 //            Fl::wait(0.033333);
 //        else
             usleep(33333);
-            
+
     }
     return NULL;
 }
@@ -500,9 +501,7 @@ LV2_State_Status YoshimiLV2Plugin::stateRestore(LV2_State_Retrieve_Function retr
     const char *data = (const char *)retrieve(handle, _yosmihi_state_id, &sz, &type, &new_flags);
 
     if (sz > 0)
-    {
         _synth->putalldata(data, sz);
-    }
     return LV2_STATE_SUCCESS;
 }
 
@@ -711,7 +710,7 @@ void YoshimiLV2PluginUI::run()
         Fl::check();
 
         GuiThreadMsg::processGuiMessages();
-        
+
     }
     else
     {

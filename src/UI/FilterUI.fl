@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-Modified March 2017} {in_source in_header
+Modified August 2017} {in_source in_header
 }
 
 decl {\#include "UI/MiscGui.h"} {public local
@@ -62,26 +62,31 @@ decl {\#include "Params/FilterParams.h"} {public local
 decl {\#include "Misc/MiscFuncs.h"} {public local
 }
 
+decl {\#include <FL/Fl.H>} {private global
+}
+
+decl {\#include <FL/names.h>} {private global
+}
+
 decl {\#include "MasterUI.h"} {private global
 }
 
 decl {\#include "Misc/SynthEngine.h"} {public global
 }
 
+decl {class FilterUI;} {public global
+}
+
 class FormantFilterGraph {: {public Fl_Box, MiscFuncs}
 } {
-  Function {FormantFilterGraph(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
-    code {pars = NULL;
-        nvowel = NULL;
-        nformant = NULL;
-        graphpoints = NULL;} {}
-  }
-  Function {init(FilterParams *pars_,int *nvowel_,int *nformant_)} {} {
-    code {pars = pars_;
-        nvowel = nvowel_;
-        nformant = nformant_;
-        oldx = -1;
-        graphpoints = new float [w()];} {}
+  Function {FormantFilterGraph(int x, int y, int w, int h, FilterUI& parent_,
+            FilterParams *pars_, int *nvowel_, int *nformant_):
+      Fl_Box(x,y,w,h), parent(parent_), pars(pars_), nvowel(nvowel_), nformant(nformant_)} {} {
+    code {//
+        selectedFormant = -1;
+        hoverFormant = -1;
+        qMode = false;
+        graphpoints = new float [w];} {}
   }
   Function {draw_freq_line(float freq,int type)} {} {
     code {float freqx = pars->getfreqpos(freq);
@@ -111,9 +116,7 @@ class FormantFilterGraph {: {public Fl_Box, MiscFuncs}
 
         //draw the lines
         fl_color(FL_GRAY);
-
         fl_line_style(FL_SOLID);
-        //fl_line(ox+2,oy+ly/2,ox+lx-2,oy+ly/2);
 
         freqx = pars->getfreqpos(1000.0);
         if (freqx > 0.0 && freqx < 1.0)
@@ -168,6 +171,12 @@ class FormantFilterGraph {: {public Fl_Box, MiscFuncs}
             fl_draw(tmpstr.c_str(), ox + 1, oy + 15, 40, 12, FL_ALIGN_LEFT, NULL, 0);
         }
 
+        if(hoverFormant >= 0 && hoverFormant != *nformant)
+        {
+            fl_color(fl_darker(FL_YELLOW));
+            draw_freq_line(pars->getformantfreq(pars->Pvowels[*nvowel].formants[hoverFormant].freq), 0);
+        }
+
         // draw the data
         fl_color(FL_RED);
         fl_line_style(FL_SOLID);
@@ -186,13 +195,167 @@ class FormantFilterGraph {: {public Fl_Box, MiscFuncs}
   Function {~FormantFilterGraph()} {} {
     code {delete [] graphpoints;} {}
   }
+  decl {FilterUI& parent;} {private local
+  }
   decl {FilterParams *pars;} {private local
   }
-  decl {int oldx,oldy;} {private local
-  }
-  decl {int *nvowel,*nformant;} {private local
+  decl {int const *nvowel, *nformant;} {private local
   }
   decl {float *graphpoints;} {private local
+  }
+  decl {int selectedFormant, hoverFormant, yRef, xRef, qRef, ampRef, freqRef, cFreqRef;} {private local
+  }
+  decl {bool qMode;} {private local
+  }
+  Function {handle(int event)} {return_type int
+  } {
+    code {//
+
+switch(event)
+{
+  case FL_ENTER: // enable keyboard and drag events
+      Fl::focus(this);
+      Fl::belowmouse(this);
+      fl_cursor(FL_CURSOR_HAND);
+      return 1;
+  case FL_MOVE: // find formant closest to cursor
+  {
+      int minDiff = INT_MAX;
+      int relPos = (int)(127.0f * ((float) Fl::event_x() / w()));
+      for(int i = 0; i < pars->Pnumformants; ++i)
+      {
+          int diff = abs(pars->Pvowels[*nvowel].formants[i].freq - relPos);
+          if(diff < minDiff)
+          {
+              minDiff = diff;
+              hoverFormant = i;
+          }
+      }
+      redraw();
+      return 1;
+  }
+  case FL_PUSH:
+      if(Fl::event_key() > FL_Button + FL_RIGHT_MOUSE)
+      {
+          handle(FL_KEYDOWN); // Non-LMB/MMB/RMB button - check for forward/backward
+          return 0;
+      }
+
+      Fl::pushed(this);
+
+       // select formant closest to cursor
+      if(selectedFormant < 0 && Fl::event_button() != FL_MIDDLE_MOUSE)
+      {
+          selectedFormant = hoverFormant;
+          delegate(parent.formantnumber, hoverFormant);
+          hoverFormant = -1;
+      }
+
+      //Activate w. RMB, retain state when using MMB
+      qMode = Fl::event_button() == FL_RIGHT_MOUSE
+          || (Fl::event_button() == FL_MIDDLE_MOUSE && qMode);
+
+      update_refs();
+
+      return 1;
+  case FL_DRAG: // change frequency/amplitude/q for selected formant
+  {
+
+      int hDiff = 127 * (xRef - Fl::event_x()) / w();
+      int vDiff = 127 * (yRef - Fl::event_y()) / h();
+
+      if(Fl::event_button2()) // Always prioritize center frequency changes
+      {
+          fl_cursor(FL_CURSOR_WE);
+          delegate(parent.cfknob, limit(cFreqRef + hDiff, 0, 127));
+      }
+      else
+      {
+         fl_cursor(FL_CURSOR_MOVE);
+          delegate(parent.formant_freq_dial, limit(freqRef - hDiff, 0, 127));
+
+          if(qMode)
+              delegate(parent.formant_q_dial, limit(qRef + vDiff, 0, 127));
+          else
+              delegate(parent.formant_amp_dial, limit(ampRef + vDiff, 0, 127));
+      }
+      return 1;
+  }
+  case FL_KEYDOWN: // changes active vowel with left/right , x/z, or forward/back mouse buttons
+
+      if(Fl::event_key(FL_Left) || Fl::event_key(122) || Fl::event_key() == FL_Button + 8)
+      {
+          delegate(parent.vowelnumber, (FF_MAX_VOWELS + ((*nvowel) - 1)) % FF_MAX_VOWELS);
+          hoverFormant = -1;
+      }
+      else if(Fl::event_key(FL_Right) || Fl::event_key(120) || Fl::event_key() == FL_Button + 9)
+      {
+          delegate(parent.vowelnumber, ((*nvowel) + 1) % FF_MAX_VOWELS);
+          hoverFormant = -1;
+      }
+      return 1;
+  case FL_MOUSEWHEEL:
+  {
+      int offset = Fl::event_dy() * (Fl::event_ctrl() ? 1 : 4);
+      if(Fl::event_shift())
+          delegate(parent.cfknob, limit(pars->Pcenterfreq + offset, 0, 127));
+      else
+          delegate(parent.octknob, limit(pars->Poctavesfreq + offset, 0, 127));
+      return 1;
+  }
+  case FL_RELEASE:
+
+      if(Fl::event_inside(this))
+          fl_cursor(FL_CURSOR_HAND);
+
+      if(Fl::event_button() == FL_RIGHT_MOUSE)
+          qMode = false;
+      else if(Fl::event_button() == FL_LEFT_MOUSE)
+          qMode = true;
+
+      if(!Fl::event_button1() && !Fl::event_button3())
+      {
+          selectedFormant = -1;
+          return 1;
+      }
+      else
+      {
+          update_refs();
+      }
+      Fl::pushed(this);
+      return 1;
+  case FL_LEAVE:
+      if(!Fl::event_inside(this)) // Cover for some strange events when clicking
+      {
+          hoverFormant = -1;
+          qMode = false;
+          redraw();
+          fl_cursor(FL_CURSOR_DEFAULT);
+      }
+      return 1;
+}
+
+return Fl_Box::handle(event);} {}
+  }
+  Function {delegate(Fl_Valuator* w, int value)} {private return_type void
+  } {
+    code {// If widget value has changed, update and perform manual callback
+
+        if(w->value() != value)
+        {
+            w->value(value);
+            w->do_callback();
+        }} {}
+  }
+  Function {update_refs()} {private return_type {inline void}
+  } {
+    code {//
+        yRef = Fl::event_y();
+        xRef = Fl::event_x();
+        ampRef = pars->Pvowels[*nvowel].formants[selectedFormant].amp;
+        freqRef = pars->Pvowels[*nvowel].formants[selectedFormant].freq;
+        qRef = pars->Pvowels[*nvowel].formants[selectedFormant].q;
+        cFreqRef = pars->Pcenterfreq;} {}
   }
 }
 
@@ -487,7 +650,7 @@ update_formant_window();
 pars->changed = true;
 send_data(35, o->value(), 0xc0);}
           xywh {595 62 55 20} type Simple labelfont 1 labelsize 10 align 5 minimum 0 maximum 127 step 1 textfont 1 textsize 11
-          code0 {o->bounds(1,FF_MAX_SEQUENCE-1);}
+          code0 {o->bounds(1,FF_MAX_SEQUENCE);}
           code1 {o->value(pars->Psequencesize);}
         }
         Fl_Counter seqpos {
@@ -497,7 +660,7 @@ update_formant_window();
 pars->changed=true;
 send_data(36, o->value(), 0xc0);}
           tooltip {Current position from the sequence} xywh {595 97 40 15} type Simple labelfont 1 labelsize 10 align 9 minimum 0 maximum 127 step 1 textsize 10
-          code0 {o->bounds(0,FF_MAX_SEQUENCE-2);}
+          code0 {o->bounds(0,FF_MAX_SEQUENCE-1);}
           code1 {o->value(nseqpos);}
         }
         Fl_Counter vowel_counter {
@@ -524,6 +687,7 @@ send_data(21, o->value(), 0xc8);}
           tooltip {Sequence Stretch} xywh {595 130 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->init(40);}
           code1 {o->value(pars->Psequencestretch);}
+          code2 {o->setValueType(VC_FormFilterStretch);}
           class WidgetPDial
         }
       }
@@ -545,6 +709,7 @@ send_data(16, o->value(), 0xc8);}
         tooltip {Formant's Slowness (Morphing)} xywh {565 15 25 25} box ROUND_UP_BOX labelfont 1 labelsize 10 align 1 maximum 127 step 1
         code0 {o->init(64);}
         code1 {o->value(pars->Pformantslowness);}
+        code2 {o->setValueType(VC_FormFilterSlowness);}
         class WidgetPDial
       }
       Fl_Value_Output centerfreqvo {
@@ -588,18 +753,15 @@ send_data(23, o->value(), 0xc8);}
         code0 {o->value(pars->Poctavesfreq);}
         class mwheel_slider_rev
       }
-      Fl_Box formantfiltergraph {
-        xywh {5 5 475 195} box BORDER_BOX
-        code0 {o->init(pars,&nvowel,&nformant);}
-        class FormantFilterGraph
-      }
       Fl_Dial wvknob {
         label {Vw.Cl.}
         callback {pars->Pvowelclearness=(int) o->value();pars->changed = true;
 send_data(17, o->value(), 0xc8);}
-        tooltip {Vowel "clearness" (how the mixed vowels are avoided)} xywh {600 15 25 25} box ROUND_UP_BOX labelfont 1 labelsize 10 align 1 maximum 127 step 1
+        tooltip {Vowel "clearness" (transition between vowels)} xywh {600 15 25 25} box ROUND_UP_BOX labelfont 1 labelsize 10 align 1 maximum 127 step 1
         code0 {o->init(64);}
         code1 {o->value(pars->Pvowelclearness);}
+        code2 {o->setValueType(VC_FormFilterClearness);}
+        code3 {o->setGraphicsType(VC_FormFilterClearness);}
         class WidgetPDial
       }
       Fl_Button {} {
@@ -622,9 +784,15 @@ send_data(17, o->value(), 0xc8);}
         xywh {635 10 55 15}
       }
     }
+    code {// Formant graph
+{ FormantFilterGraph* o = formantfiltergraph = new FormantFilterGraph(5, 5, 475, 195, *this, pars, &nvowel, &nformant);
+      formantfiltergraph->box(FL_BORDER_BOX);
+      formantparswindow->add(o);
+    } // FormantFilterGraph* formantfiltergraph} {}
   }
   Function {update_formant_window()} {} {
-    code {formant_freq_dial->value(pars->Pvowels[nvowel].formants[nformant].freq);
+    code {//
+        formant_freq_dial->value(pars->Pvowels[nvowel].formants[nformant].freq);
         formant_q_dial->value(pars->Pvowels[nvowel].formants[nformant].q);
         formant_amp_dial->value(pars->Pvowels[nvowel].formants[nformant].amp);
         if (nformant < pars->Pnumformants)
@@ -640,7 +808,8 @@ send_data(17, o->value(), 0xc8);}
         vowel_counter->value(pars->Psequence[nseqpos].nvowel);} {}
   }
   Function {refresh()} {} {
-    code {update_formant_window();
+    code {//
+        update_formant_window();
         formantfiltergraph->redraw();
 
         if (pars->Pcategory == 0)
@@ -702,14 +871,15 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     //unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char part = getData->data.part;
+    unsigned char kititem = getData->data.kit;
     unsigned char eng = getData->data.engine;
     //unsigned char insert = getData->data.insert;
     //unsigned char par = getData->data.parameter;
     //unsigned char par2 = getData->data.par2;
 
-    if (part != npart || ((eng >= 128 && eng != 136) && eng != engine))
+    if (part != npart || (kititem != 136 && eng != engine))
         return;
-    
+
     switch(control)
     {
     	case 0:
@@ -906,6 +1076,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
           case 2:
              qdial->setValueType(VC_FilterQ);
        }} {}
+  }
+  decl {FormantFilterGraph *formantfiltergraph;} {public local
   }
   decl {FilterParams *pars;} {private local
   }

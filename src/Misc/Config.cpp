@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified April 2017
+    Modified August 2017
 */
 
 #include <iostream>
@@ -102,7 +102,8 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     stateChanged(false),
     restoreJackSession(false),
     runSynth(true),
-    VirKeybLayout(1),
+    finishedCLI(true),
+    VirKeybLayout(0),
     audioEngine(DEFAULT_AUDIO),
     midiEngine(DEFAULT_MIDI),
     audioDevice("default"),
@@ -122,6 +123,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     hideErrors(0),
     showTimes(0),
     logXMLheaders(0),
+    xmlmax(0),
     configChanged(false),
     rtprio(40),
     midi_bank_root(0), // 128 is used as 'disabled'
@@ -290,16 +292,8 @@ string Config::testCCvalue(int cc)
             result = "mod wheel";
             break;
 
-        case 10:
-            result = "panning";
-            break;
-
         case 11:
             result = "expression";
-            break;
-
-        case 38:
-            result = "data lsb";
             break;
 
         case 71:
@@ -319,7 +313,7 @@ string Config::testCCvalue(int cc)
             break;
 
         case 77:
-            result = "resonance centre";
+            result = "resonance center";
             break;
 
         case 78:
@@ -344,6 +338,10 @@ string Config::masterCCtest(int cc)
 
         case 7:
             result = "volume";
+            break;
+
+        case 10:
+            result = "panning";
             break;
 
         case 38:
@@ -532,11 +530,11 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
     showGui = xml->getparbool("enable_gui", showGui);
     showSplash = xml->getparbool("enable_splash", showSplash);
     showCLI = xml->getparbool("enable_CLI", showCLI);
-    if (!showGui && !showCLI)
+    /*if (!showGui && !showCLI)
     {
         showGui = true;
         showCLI = true; // sanity check!
-    }
+    }*/
     xml->exitbranch(); // BaseParameters
     return true;
 }
@@ -559,7 +557,8 @@ bool Config::extractConfigData(XMLwrapper *xml)
     hideErrors = xml->getpar("hide_system_errors", hideErrors, 0, 1);
     showTimes = xml->getpar("report_load_times", showTimes, 0, 1);
     logXMLheaders = xml->getpar("report_XMLheaders", logXMLheaders, 0, 1);
-    VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 0, 10);
+    VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 1, 6) - 1;
+    xmlmax = xml->getpar("full_parameters", xmlmax, 0, 1);
 
     // get preset dirs
     int count = 0;
@@ -619,24 +618,29 @@ bool Config::extractConfigData(XMLwrapper *xml)
 }
 
 
-void Config::saveConfig(void)
+bool Config::saveConfig(void)
 {
+    bool result = false;
     xmlType = XML_CONFIG;
     XMLwrapper *xmltree = new XMLwrapper(synth);
     if (!xmltree)
     {
-        Log("saveConfig failed xmltree allocation");
-        return;
+        Log("saveConfig failed xmltree allocation", 2);
+        return result;
     }
     addConfigXML(xmltree);
     string resConfigFile = ConfigFile;
 
     if (xmltree->saveXMLfile(resConfigFile))
+    {
         configChanged = false;
+        result = true;
+    }
     else
-        Log("Failed to save config to " + resConfigFile);
+        Log("Failed to save config to " + resConfigFile, 2);
 
     delete xmltree;
+    return result;
 }
 
 
@@ -648,7 +652,8 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("hide_system_errors", hideErrors);
     xmltree->addpar("report_load_times", showTimes);
     xmltree->addpar("report_XMLheaders", logXMLheaders);
-    xmltree->addpar("virtual_keyboard_layout", VirKeybLayout);
+    xmltree->addpar("virtual_keyboard_layout", VirKeybLayout + 1);
+    xmltree->addpar("full_parameters", xmlmax);
 
     for (int i = 0; i < MAX_PRESET_DIRS; ++i)
     {
@@ -687,25 +692,30 @@ void Config::addConfigXML(XMLwrapper *xmltree)
 }
 
 
-void Config::saveSessionData(string savefile)
+bool Config::saveSessionData(string savefile)
 {
-    string ext = ".state";
-    if (savefile.rfind(ext) != (savefile.length() - 6))
-        savefile += ext;
+    savefile = setExtension(savefile, "state");
     synth->getRuntime().xmlType = XML_STATE;
     XMLwrapper *xmltree = new XMLwrapper(synth);
     if (!xmltree)
     {
-        Log("saveSessionData failed xmltree allocation", 1);
-        return;
+        Log("saveSessionData failed xmltree allocation", 3);
+        return false;
     }
+    bool ok = true;
     addConfigXML(xmltree);
     synth->add2XML(xmltree);
     synth->midilearn.insertMidiListData(false, xmltree);
     if (xmltree->saveXMLfile(savefile))
-        Log("Session data saved to " + savefile);
+        Log("Session data saved to " + savefile, 2);
     else
-        Log("Failed to save session data to " + savefile, 1);
+    {
+        ok = false;
+        Log("Failed to save session data to " + savefile, 2);
+    }
+    if (xmltree)
+        delete xmltree;
+    return ok;
 }
 
 
@@ -718,17 +728,17 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
         sessionfile = setExtension(sessionfile, "state");
     if (!sessionfile.size() || !isRegFile(sessionfile))
     {
-        Log("Session file " + sessionfile + " not available", 1);
+        Log("Session file " + sessionfile + " not available", 2);
         goto end_game;
     }
     if (!(xml = new XMLwrapper(synth)))
     {
-        Log("Failed to init xmltree for restoreState", 1);
+        Log("Failed to init xmltree for restoreState", 3);
         goto end_game;
     }
     if (!xml->loadXMLfile(sessionfile))
     {
-        Log("Failed to load xml file " + sessionfile);
+        Log("Failed to load xml file " + sessionfile, 2);
         goto end_game;
     }
     if (startup)
@@ -746,11 +756,8 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
             }
             ok = synth->getfromXML(xml);
             if (ok)
-            {
-                xml->endbranch(); // we shouldn't need this here
                 synth->setAllPartMaps();
-            }
-            bool oklearn = synth->midilearn.extractMidiListData(true, xml);
+            bool oklearn = synth->midilearn.extractMidiListData(false, xml);
             if (oklearn)
                 synth->midilearn.updateGui(2);
                 // handles possibly undefined window
@@ -770,12 +777,11 @@ void Config::Log(string msg, char tostderr)
         return;
     if (showGui && !(tostderr & 1) && toConsole)
         LogList.push_back(msg);
+    else if (!tostderr & 1)
+        cout << msg << endl; // normal log
+
     else
-    {
-        cout << msg << endl;
-        cout << CLIstring;
-        cout << flush;
-    }
+        cerr << msg << endl; // error log
 }
 
 

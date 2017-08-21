@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified February 2017
+    Modified July 2017
 */
 
 #include <iostream>
@@ -66,6 +66,7 @@ void MidiDecode::midiProcess(unsigned char par0, unsigned char par1, unsigned ch
             break;
 
         case 0x90: // note-on
+            // cout << "note " << int(par1) << endl;
             note = par1;
             if (note)
             {
@@ -212,6 +213,11 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
                     }
                     return;
                 }
+                if (type == 0x44 && param == 0x44)
+                {
+                    synth->getRuntime().runSynth = false;
+                    return; // bye bye everyone
+                }
                 //synth->getRuntime().Log("Set nrpn LSB to " + asString(param));
             }
             nLow = param;
@@ -295,7 +301,7 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
         // force vectors to obey channel switcher
     else
         vecChan = ch;
-    if (synth->getRuntime().nrpndata.vectorEnabled[vecChan] && synth->getRuntime().NumAvailableParts > NUM_MIDI_CHANNELS)
+    if (synth->getRuntime().vectordata.Enabled[vecChan] && synth->getRuntime().NumAvailableParts > NUM_MIDI_CHANNELS)
     { // vector control is direct to parts
         if (nrpnRunVector(vecChan, ctrl, param))
             return; // **** test this it may be wrong!
@@ -342,14 +348,14 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
 
 bool MidiDecode::nrpnRunVector(unsigned char ch, int ctrl, int param)
 {
-    int Xopps = synth->getRuntime().nrpndata.vectorXfeatures[ch];
-    int Yopps = synth->getRuntime().nrpndata.vectorYfeatures[ch];
+    int Xopps = synth->getRuntime().vectordata.Xfeatures[ch];
+    int Yopps = synth->getRuntime().vectordata.Yfeatures[ch];
     int p_rev = 127 - param;
     int swap1;
     int swap2;
     unsigned char type;
 
-    if (ctrl == synth->getRuntime().nrpndata.vectorXaxis[ch])
+    if (ctrl == synth->getRuntime().vectordata.Xaxis[ch])
     {
         if (Xopps & 1) // fixed as volume
         {
@@ -358,7 +364,7 @@ bool MidiDecode::nrpnRunVector(unsigned char ch, int ctrl, int param)
         }
         if (Xopps & 2) // default is pan
         {
-            type = synth->getRuntime().nrpndata.vectorXcc2[ch];
+            type = synth->getRuntime().vectordata.Xcc2[ch];
             swap1 = (Xopps & 0x10) | 0x80;
             swap2 = swap1 ^ 0x10;
             synth->SetController(ch | swap1, type, param);
@@ -366,7 +372,7 @@ bool MidiDecode::nrpnRunVector(unsigned char ch, int ctrl, int param)
         }
         if (Xopps & 4) // default is 'brightness'
         {
-            type = synth->getRuntime().nrpndata.vectorXcc4[ch];
+            type = synth->getRuntime().vectordata.Xcc4[ch];
             swap1 = ((Xopps >> 1) & 0x10) | 0x80;
             swap2 = swap1 ^ 0x10;
             synth->SetController(ch | swap1, type, param);
@@ -374,7 +380,7 @@ bool MidiDecode::nrpnRunVector(unsigned char ch, int ctrl, int param)
         }
         if (Xopps & 8) // default is mod wheel
         {
-            type = synth->getRuntime().nrpndata.vectorXcc8[ch];
+            type = synth->getRuntime().vectordata.Xcc8[ch];
             swap1 = ((Xopps >> 2) & 0x10) | 0x80;
             swap2 = swap1 ^ 0x10;
             synth->SetController(ch | swap1, type, param);
@@ -382,7 +388,7 @@ bool MidiDecode::nrpnRunVector(unsigned char ch, int ctrl, int param)
         }
         return true;
     }
-    else if (ctrl == synth->getRuntime().nrpndata.vectorYaxis[ch])
+    else if (ctrl == synth->getRuntime().vectordata.Yaxis[ch])
     { // if Y hasn't been set these commands will be ignored
         if (Yopps & 1) // fixed as volume
         {
@@ -391,7 +397,7 @@ bool MidiDecode::nrpnRunVector(unsigned char ch, int ctrl, int param)
         }
         if (Yopps & 2) // default is pan
         {
-            type = synth->getRuntime().nrpndata.vectorYcc2[ch];
+            type = synth->getRuntime().vectordata.Ycc2[ch];
             swap1 = (Yopps & 0x10) | 0xa0;
             swap2 = swap1 ^ 0x10;
             synth->SetController(ch | swap1, type, param);
@@ -399,7 +405,7 @@ bool MidiDecode::nrpnRunVector(unsigned char ch, int ctrl, int param)
         }
         if (Yopps & 4) // default is 'brightness'
         {
-            type = synth->getRuntime().nrpndata.vectorYcc4[ch];
+            type = synth->getRuntime().vectordata.Ycc4[ch];
             swap1 = ((Yopps >> 1) & 0x10) | 0xa0;
             swap2 = swap1 ^ 0x10;
             synth->SetController(ch | swap1, type, param);
@@ -407,7 +413,7 @@ bool MidiDecode::nrpnRunVector(unsigned char ch, int ctrl, int param)
         }
         if (Yopps & 8) // default is mod wheel
         {
-            type = synth->getRuntime().nrpndata.vectorYcc8[ch];
+            type = synth->getRuntime().vectordata.Ycc8[ch];
             swap1 = ((Yopps >> 2) & 0x10) | 0xa0;
             swap2 = swap1 ^ 0x10;
             synth->SetController(ch | swap1, type, param);
@@ -508,7 +514,7 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
             if (par < synth->getRuntime().NumAvailableParts)
             {
                 synth->getRuntime().dataL = par;
-                synth->getRuntime().nrpndata.Part = par;
+                synth->getRuntime().vectordata.Part = par;
             }
             else // It's bad. Kill it
             {
@@ -518,29 +524,29 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
             break;
 
         case 1: // Program Change
-            setMidiProgram(synth->getRuntime().nrpndata.Part | 0x80, par);
+            setMidiProgram(synth->getRuntime().vectordata.Part | 0x80, par);
             break;
 
         case 2: // Set controller number
-            synth->getRuntime().nrpndata.Controller = par;
+            synth->getRuntime().vectordata.Controller = par;
             synth->getRuntime().dataL = par;
             break;
 
         case 3: // Set controller value
-            synth->SetController(synth->getRuntime().nrpndata.Part | 0x80, synth->getRuntime().nrpndata.Controller, par);
+            synth->SetController(synth->getRuntime().vectordata.Part | 0x80, synth->getRuntime().vectordata.Controller, par);
             break;
 
         case 4: // Set part's channel number
-            synth->SetPartChan(synth->getRuntime().nrpndata.Part, par);
+            synth->SetPartChan(synth->getRuntime().vectordata.Part, par);
             break;
 
         case 5: // Set part's audio destination
             if (par > 0 and par < 4)
-                synth->SetPartDestination(synth->getRuntime().nrpndata.Part, par);
+                synth->SetPartDestination(synth->getRuntime().vectordata.Part, par);
             break;
 
         case 64:
-            synth->SetPartShift(synth->getRuntime().nrpndata.Part, par);
+            synth->SetPartShift(synth->getRuntime().vectordata.Part, par);
             break;
     }
 }
@@ -557,7 +563,10 @@ void MidiDecode:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
         /*
          * these have to go through the program change
          * thread otherwise they could block following
-         * MIDI messages
+         * MIDI messages.
+         * TODO
+         * We need to change this so it goes through
+         * the common RBP thread.
          */
         case 4:
             setMidiProgram(chan | 0x80, par);

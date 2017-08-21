@@ -1,8 +1,9 @@
 /*
     MusicClient.h
 
-    Copyright 2009-2011 Alan Calvert
-    Copyright 2009 James Morris
+    Copyright 2009-2011, Alan Calvert
+    Copyright 2009, James Morris
+    Copyright 2016, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -16,6 +17,8 @@
 
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+
+    Modified December 2016
 */
 
 #ifndef MUSIC_CLIENT_H

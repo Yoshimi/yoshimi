@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified March 2017
+Modified August 2017
 } {in_source in_header
 }
 
@@ -196,11 +196,11 @@ else
    fl_color(255,0,0);
    time=env->getdt(currentpoint);
 };
-char tmpstr[20];
+char tmpstr[40];
 if (time<1000.0)
-    snprintf((char *)&tmpstr,20,"%.1fms",time);
+    snprintf((char *)&tmpstr,40,"%.1fms",time);
 else
-    snprintf((char *)&tmpstr,20,"%.2fs",time/1000.0);
+    snprintf((char *)&tmpstr,40,"%.2fs",time/1000.0);
 fl_draw(tmpstr,ox+lx-20,oy+ly-10,20,10,FL_ALIGN_RIGHT,NULL,0);
 
 //Draw formatted point value in the top right corner when dragging points
@@ -231,7 +231,7 @@ if(currentpoint >= 0){
 
    strcpy(tmpstr, valDesc.c_str());
    fl_color(FL_CYAN);
-   fl_draw(tmpstr,ox+lx-20,oy,20,10,FL_ALIGN_RIGHT,NULL,0);
+   fl_draw(tmpstr,ox+lx-30,oy,30,25,FL_ALIGN_RIGHT,NULL,0);
 }} {}
   }
   Function {handle(int event)} {return_type int
@@ -307,7 +307,7 @@ return(1);} {}
   }
 }
 
-class EnvelopeUI {: {public Fl_Group,PresetsUI_}
+class EnvelopeUI {selected : {public Fl_Group,PresetsUI_}
 } {
   Function {EnvelopeUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
@@ -758,7 +758,7 @@ send_data(group, 24, o->value(), 0xc0);}
       class Fl_Group
     } {
       Fl_Group {} {
-        label {BandWidth Env}
+        label {BandWidth Env} open
         xywh {0 0 210 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17
       } {
         Fl_Dial e4aval {
@@ -898,10 +898,12 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
 
     if (insert ==3 || insert == 4)
     {
+        // don't know what to do here :(
         Fl::check();
         return;
     }
 
+    bool change = true;
     switch(control)
     {
     	case 0:
@@ -1008,6 +1010,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	            e4envstretch->value(value);
     	            break;
     	    }
+    	    change = false;
     	    break;
 
     	case 16:
@@ -1026,17 +1029,21 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	            e4forcedrelease->value(value != 0);
     	            break;
     	    }
+    	    change = false;
     	    break;
 
     	case 17:
     	    if (par == 0)
     	        e1linearenvelope->value(value != 0);
+    	    change = false;
     	    break;
 
     	case 32:
     	    reinitcore(value != 0);
     	    break;
     }
+    if (change)
+    	freeedit->redraw();
     Fl::check();} {}
   }
   Function {init(EnvelopeParams *env_, int npart_, int kititem_, int engine_, int group_)} {} {

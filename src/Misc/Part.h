@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified March 2017
+    Modified August 2017
 */
 
 #ifndef PART_H
@@ -109,19 +109,19 @@ class Part : private MiscFuncs, SynthHelper
 
         SynthEngine *getSynthEngine() {return synth;}
 
-        char Penabled; // this *must* be signed
+        int PmapOffset;
+        float PnoteMap[256];
         float         Pvolume;
         float         TransVolume;
+        float         Ppanning;
+        float         TransPanning;
+        char Penabled; // this *must* be signed
         unsigned char Pminkey;
         unsigned char Pmaxkey;
         unsigned char Pkeyshift;
-        float PnoteMap[128];
         unsigned char Prcvchn;
-        float         Ppanning;
-        float         TransPanning;
         unsigned char Pvelsns;     // velocity sensing (amplitude velocity scale)
         unsigned char Pveloffs;    // velocity offset
-        unsigned char Pnoteon;     // if the part receives NoteOn messages
         unsigned char Pkitmode;    // if the kitmode is enabled
         bool          Pkitfade;    // enables cross fading
         unsigned char Pdrummode;   // if all keys are mapped and the system is 12tET (used for drums)
@@ -162,9 +162,6 @@ class Part : private MiscFuncs, SynthHelper
         void RelaseNotePos(int pos);
         void MonoMemRenote(void); // MonoMem stuff.
         void setPan(float value);
-        void Mute(void) { __sync_or_and_fetch(&partMuted, 0xFF); }
-        void Unmute(void) { __sync_and_and_fetch(&partMuted, 0); }
-        bool isMuted(void) { return (__sync_add_and_fetch(&partMuted, 0) != 0); }
 
         Microtonal *microtonal;
         FFTwrapper *fft;

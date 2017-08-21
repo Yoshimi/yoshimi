@@ -1,6 +1,353 @@
-yoshimi 1.5.2
+yoshimi 1.5.3
+
+2017-8-21 Will
+* Final clean-up.
+* Final doc updates.
+* Set Version 1.5.3 release.
+
+2017-8-20 Will.
+* Improved state saving extension checks.
+  This whole area needs looking at.
+* Set Version 1.5.3 rc4
+
+2017-8-19 Will.
+* Further minor updates to CLI - mostly messages.
+* Set Version 1.5.3 rc3
+
+2017-8-17
+* Minor correction to CLI vector level.
+* CLI now updates most of envelope graph.
+  freemode still to do.
+* Revised CLI MIDI learn for own context level.
+* GUI test reports are now specific to button 2 & 3.
+* Set Version 1.5.3 rc2.
+* Further small updates to CLI.
+
+2017-8-17 Jesper
+* Don't crash when autoconnect "fails" due to preexisting connections.
+
+2017-8-16 Will.
+* Doc updates.
+* Set Version 1.5.3 rc1.
+
+2017-8-15 Will.
+* Updated appdata and moved to metainfo.
+* Other doc updates.
+
+2017-8-13 Will + Rob
+* GUI DynFilter updates and learns correctly.
+* Learn bug sorted properly!
+* Code cleanups.
+* Doc updates.
+
+2017-8-12 Will
+* Added shortform NRPN to shutdown Yoshimi.
+  CC 99 & 98 both set to 68 (0x44).
+* BugFix: CTRL pressed *after* any mouse click learned.
+* Doc updates.
+
+2017-8-11 Will
+* Implimented CLI naming of vectors.
+* Corrected some CLI help entries.
+
+2017-8-10 Will
+* Further improvements to command test list values.
+  Hex and Dec shown, and in columns again.
+* Expanded CLI DynFilter control to include sys/ins
+  but not currently active.
+
+2017-8-9 Will
+* Most of DynFilter updates on CLI direct access call.
+  Just the filter window itself to do. Difficult :(
+* Command test list values now hex and just 2 lines.
+
+2017-8-7 Will
+* Part effects now display on CLI direct access call.
+
+2017-8-5 Will
+* Master reset no longer needs threadmessage function.
+* Further cleanups and doc corrections.
+* Started revising sys/ins effects & replacing callbacks.
+  This will help make CLI and GUI consistent.
+
+2017-8-4 Will
+* Properly integrated all patchset saves.
+* Improved patchset load operations & messaging.
+* BugFix: segfault if CLI load with garbage filename.
+* Fixed regression. LV2 not loading patch sets.
+  These are now properly contained, but I forgot to
+  update (LV2 only) putalldata :(
+* Patched in Jesper's improved Console scroll behavoir.
+  New entries now at bottom and always visible unless
+  scroll bars moved.
+
+2017-8-3 Will
+* BugFix: Insertion effects were always on.
+* Minor date corrections etc.
+* Removed redundant internal part mute.
+  Never activated and partonoff more sophisticated.
+* A few more cleanups.
+
+2017-8-2 Will
+* Small add/sub memory allocation optimisation.
+
+2017-8-1 Will
+* Removed mutex locks from patchset save.
+  No longer needed, so patch sets and states
+  now save silently.
+* Fixed regression. Vectors update 'recent' again.
+* Added 'Microtonal Ratio Scale' to examples.
+
+2017-7-31 Will
+* Improved config save operations & messaging.
+* Minor doc corrections & speeling chocks :)
+
+2017-7-30 Will
+* Corrected minor XML LV2 anomaly.
+* Optimised 'returnsDirect' access.
+* Loading scales from GUI now updates it!
+* Added microtonal demos to 'Examples'.
+* Console window now monospaced font.
+* Scales can now be loaded from histories.
+* Doc updates.
+* Improved scales load & save operations & messaging.
+* Further restructuring of Vectors.
+
+2017-7-29 Will
+* Improved vector saving management.
+* Reset & state load now update Vector name :p
+
+2017-7-28 Will
+* Refactored vector data structure.
+* It hasn't been purely nrpn based for a long time!
+* Further vector refactoring for overall consistency.
+* Updated docs.
+* Bugfix: Missing 'break' stopped patchset loads :(
+* Vector name now editable and saved internally.
+
+2017-7-27 Will
+* Improved state save error reporting for GUI & CLI.
+* Tidied master GUI code.
+* Bugfix: Reports button not correctly responding.
+* doc updates.
+* Improved vector loading management.
+* Started making vector name editable.
+
+2017-7-26 Wiil
+* Resolved Vector display issues.
+* More refinements to Vector controls.
+* Improved messaging with state loads.
+* Fixed non-fatal XML warning messages.
+
+2017-7-25 Jesper
+* Bugfix: Fixed segfault from edge cases when float->int
+  conversion was very close to zero in formant filter
+  transition calculations.
+* New formant filter editing tools - visual parameter
+  manipulation on the frequency graph, primarily
+  mouse-driven.
+* New tooltips for the formant filter control knobs and
+  amended related tooltips in filter envelopes/LFO's
+  to show the differences between formant filters and
+  the other types.
+
+2017-7-24 Will
+* Started refining loads and saves (state first).
+
+2017-7-22 Will
+* Minor optimisations and clarifications.
+* Updated man page.
+
+2017-7-21 Will
+* Removed some redundant code.
+* State load is now 'silent'.
+* Implemented lock-free state load & save.
+* Fixed potential memory leak in session save.
+* Doc updates - of course :)
+
+2017-7-20 Will
+* Improved CLI handling of delays from slow actions.
+  Has a switch that only releases when action completes.
+* More doc updates and corrections.
+
+2017-7-19 Will
+* transfertext() now checks GUI exists before sending.
+
+2017-7-18 Will
+* Bugfix: Bank dropdown list was showing wrong entry
+  on bank root change but actual contents correct.
+
+2017-7-16 Will
+* Refinements to CLI.
+* Direct access to loading and saving scales done.
+  More enhancements planned.
+* Updated docs.
+
+2017-7-15 Will
+* Completed conversion of CLI config controls.
+* Reorganised CLI code.
+* Config GUI also converted.
+* Reformatted config GUI code.
+  It was getting very untidy :(
+
+2017-7-14 Will
+* Created new 'config' CLI submenu.
+* Converted some 'normal' CLI config controls.
+
+2017-7-13 Will
+* All Config limits defined.
+* Updated docs.
+
+2017-7-12 Will
+* Values can now be corrected for range by the CLI.
+* Controls can be set to defaults by the CLI.
+* CLI can now test and report 'occupied' CC ranges.
+* doc updates.
+
+2017-7-4 Will
+* Resolved GUI to CLI miscMsg problem. Back on course :)
+  Was due to CLI reporting blocking some 'Resolves' that
+  use miscMsg to return text messages.
+* Adjusted saved keymap to retain compatibility.
+  Internally now starts from zero.
+
+2017-7-3 Will
+* Temporarily disabled Jack/Alsa GUI to CLI IDs.
+  Cause of strange MiscMsg behaviour :(
+
+2017-7-2 Will
+* Config conversion almost done.
+  Still some non-fatal anomalies to clear up.
+* Updated docs.
+
+2017-7-1 Will
+* Config switches converted.
+* Config jack & alsa converted.
+  Discovered odd behaviour from the GUI with miscMsg.
+  Not a disaster but needs to be sorted.
+
+2017-6-29 Will
+* Bugfix: CLI history was not being updated.
+* Removed empty virtual keyboard menu choice.
+* Started conversion of config for direct access.
+
+2017-6-27 Will
+* Fixed regression GUI can load full scales again.
+* Simplifed GUI scale loading code.
+
+2017-6-25 Will
+* Transferred scales to new controls.
+* Scale name now the leafname for .scl loads.
+* Changed scale 'Comment' to 'Description'.
+  matches Scala format better.
+* Doc updates.
+* Further code refinements.
+* Added new scales info in the doc directory.
+
+2017-6-24 Will
+* More revisions of CLI help lists.
+* Implemented all CLI microtonal functions.
+* Updated docs.
+
+2017-6-23 Will
+* Added delay to CLI return so most ops complete first.
+* Small improvement to Crossfade smoothness.
+* Removed redundant & commented out code in PartUI.fl.
+* Improved range checks in Part.cpp.
+  Also removed redundant kit range checks.
+* Fixed key range regression caused by last commit :(
+
 2017-6-22 Will
 * Fixed regression kitmode effect select works again.
+  Also improved numbering.
+
+2017-6-21 Will
+* Revised CLI help menu for greater clarity.
+* Implemented CLI list tuning and keymap.
+
+2017-6-19 Will
+* CLI can now write or load tunings and keymaps.
+
+2017-6-18 Will
+* Tuning error reporting completed.
+* Keymap error reporting completed.
+* Updated docs.
+* Scales code cleanups and optimisations.
+
+2017-6-16 Will
+* Added loopback for low priority functions into 'returns'.
+* Direct access writing now possible for all scale data.
+* Improved scales error reporting.
+  More to do.
+* Updated docs.
+
+2017-6-12 Will
+* Further refinements to scales accuracy
+  (no longer needing doubles)
+* Full XML float compatibility with ZynAddSubFX.
+
+2017-6-11 Will
+* Improved scales compatibility with old files/ versions.
+
+2017-6-9 Will
+* BugFix: miscMsgPop wasn't checking index range.
+* Loading patch sets always zeros 'Solo' channel number.
+
+2017-6-8 Will
+* BugFix Loading scales wasn't updating name/comment.
+* Direct access - more scales controls available.
+* Direct access scale loading in place.
+
+2017-6-7 Will
+* Scales no longer suffer from cumulative errors :)
+* Removed some (now unnecessary) mutex locks.
+* Direct access tunings and keymaps now CSV,
+  and reformatted to standard scales.
+
+2017-6-5 Will
+* Improved accuracy of scale number<=>text conversions.
+* Added "Musical Scale.odf" to 'doc'.
+
+2017-6-4 Will
+* Tunings and Keyboard map implemented.
+* Most Scales controls now available to direct access.
+* Added new Scales.txt doc to 'dev_notes'
+* Updated Yoshimi Control Numbers.ods file.
+
+2017-6-3 Will
+* Made Invert center key status clearer.
+* Identified more scales controls ready for direct access.
+* More doc updates.
+
+2017-6-1 Will
+* More part map optimisations.
+* Part maps now double buffered.
+
+2017-5-31 Will
+* Reorganised part map setting to remove multiple calls.
+* BugFix: Reverse scale centre was being set as type bool.
+* BugFix: Scale ratio values were limited to 127.
+
+2017-5-30 Will
+* Improved error traps and reporting.
+* Set default full XML saving to 'off'.
+  Done for previous consistency.
+
+2017-5-28 Will
+* Revised Scales GUI layout.
+* Added sane limits to key maps.
+* Discovered XML saving anomaly so created new Config switch.
+  Forces *all* data to be saved when set.
+* dev_notes updates.
+
+2017-5-26 Will
+* Started implementation of CLI scales access.
+* BugFix: neither .scl or .kbm were checked for no file :(
+
+2017-5-24 Will
+* BugFix: LV2 state restore was not setting partmaps.
+* Yoshi can now work with both CLI and GUI disabled.
+* Doc updates.
 
 2017-5-12 Will
 * Merged in Robs SubSynth Overtones/Legato fix.

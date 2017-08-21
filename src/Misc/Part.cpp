@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified March 2017
+    Modified August 2017
 */
 
 #include <cstring>
@@ -52,7 +52,6 @@ using namespace std;
 Part::Part(Microtonal *microtonal_, FFTwrapper *fft_, SynthEngine *_synth) :
     microtonal(microtonal_),
     fft(fft_),
-    partMuted(0),
     killallnotes(false),
     synth(_synth)
 {
@@ -127,6 +126,7 @@ void Part::defaults(void)
     setVolume(96);
     TransVolume = 128; // ensure it always gets set
     Pkeyshift = 64;
+    PmapOffset = 0;
     Prcvchn = 0;
     setPan(Ppanning = 64);
     TransPanning = 128; // ensure it always gets set
@@ -144,9 +144,9 @@ void Part::setNoteMap(int keyshift)
 {
     for (int i = 0; i < 128; ++i)
         if (Pdrummode)
-            PnoteMap[i] = microtonal->getFixedNoteFreq(i);
+            PnoteMap[128 - PmapOffset + i] = microtonal->getFixedNoteFreq(i);
         else
-            PnoteMap[i] = microtonal->getNoteFreq(i, keyshift + synth->Pkeyshift - 64);
+            PnoteMap[128 - PmapOffset + i] = microtonal->getNoteFreq(i, keyshift + synth->Pkeyshift - 64);
 }
 
 
@@ -252,7 +252,6 @@ Part::~Part()
 // Note On Messages
 void Part::NoteOn(int note, int velocity, int masterkeyshift)
 {
-//    if (!Pnoteon || note < Pminkey || note > Pmaxkey)
     if (note < Pminkey || note > Pmaxkey)
         return;
 
@@ -369,7 +368,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
 
         // initialise note frequency
         float notebasefreq;
-        if ((notebasefreq = PnoteMap[note]) < 0.0f)
+        if ((notebasefreq = PnoteMap[PmapOffset + note]) < 0.0f)
             return; // the key is not mapped
 
         // Humanise
@@ -614,7 +613,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
                     }
                     if (range)
                     {
-                        vel = truevel * ((float)position / range);
+                        vel = truevel * (float(position) / float(range));
                         //cout << item << "  " << vel << endl;
                     }
                 }
@@ -853,10 +852,7 @@ void Part::MonoMemRenote(void)
 {
     unsigned char mmrtempnote = monomemnotes.back(); // Last list element.
     monomemnotes.pop_back(); // We remove it, will be added again in NoteOn(...).
-/*    if (Pnoteon == 0)
-        RelaseNotePos(lastpos);
-    else*/
-        NoteOn(mmrtempnote, monomem[mmrtempnote].velocity,
+    NoteOn(mmrtempnote, monomem[mmrtempnote].velocity,
                monomem[mmrtempnote].mkeyshift);
 }
 
@@ -956,13 +952,6 @@ void Part::setkeylimit(unsigned char Pkeylimit_)
 // Compute Part samples and store them in the partoutl[] and partoutr[]
 void Part::ComputePartSmps(void)
 {
-    if (isMuted())
-    {
-        memset(partoutl, 0, synth->p_bufferbytes);
-        memset(partoutr, 0, synth->p_bufferbytes);
-        return;
-    }
-
     int k;
     int noteplay; // 0 if there is nothing activated
     for (int nefx = 0; nefx < NUM_PART_EFX + 1; ++nefx)
@@ -1291,7 +1280,6 @@ void Part::add2XML(XMLwrapper *xml)
     xml->addpar("velocity_sensing", Pvelsns);
     xml->addpar("velocity_offset", Pveloffs);
 
-//    xml->addparbool("note_on", Pnoteon);
     xml->addparbool("poly_mode", Ppolymode);
     xml->addpar("legato_mode", Plegatomode);
     xml->addpar("key_limit", Pkeylimit);
@@ -1466,13 +1454,12 @@ void Part::getfromXML(XMLwrapper *xml)
     Pminkey = xml->getpar127("min_key", Pminkey);
     Pmaxkey = xml->getpar127("max_key", Pmaxkey);
     Pkeyshift = xml->getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64);
-    setNoteMap(Pkeyshift - 64);
+
     Prcvchn = xml->getpar127("rcv_chn", Prcvchn);
 
     Pvelsns = xml->getpar127("velocity_sensing", Pvelsns);
     Pveloffs = xml->getpar127("velocity_offset", Pveloffs);
 
-//    Pnoteon = xml->getparbool("note_on", Pnoteon);
     Ppolymode = xml->getparbool("poly_mode", Ppolymode);
     Plegatomode = xml->getparbool("legato_mode", Plegatomode); // older versions
     if (!Plegatomode)

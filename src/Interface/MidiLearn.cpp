@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified May 2017
+    Modified August 2017
 */
 
 #include <iostream>
@@ -246,6 +246,12 @@ int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned int 
 }
 
 
+int MidiLearn::findSize()
+{
+    return int(midi_list.size());
+}
+
+
 void MidiLearn::listLine(int lineNo)
 {
     list<LearnBlock>::iterator it = midi_list.begin();
@@ -375,6 +381,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         if (loadList(name))
             synth->getRuntime().Log("Loaded " + name);
         updateGui();
+        synth->getRuntime().finishedCLI = true;
         return;
     }
     if (control == 242) // list controls
@@ -382,7 +389,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         int tmp = synth->SetSystemValue(106, par2);
         if (tmp == -1)
         {
-            synth->getRuntime().Log("No entry for number " + to_string(int(par2)));
+            synth->getRuntime().Log("No entry for number " + to_string(int(par2 + 1)));
         }
         else
         {
@@ -391,6 +398,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
                 synth->getRuntime().Log("Loaded " + name);
             updateGui();
         }
+        synth->getRuntime().finishedCLI = true;
         return;
     }
     if (control == 245)
@@ -398,6 +406,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         name = (miscMsgPop(par2));
         if (saveList(name))
             synth->getRuntime().Log("Saved " + name);
+        synth->getRuntime().finishedCLI = true;
         return;
     }
     if (control == 255)

@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2016 Will Godfrey
+    Copyright 2017 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -20,12 +20,15 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of original ZynAddSubFX code, modified October 2016
+    This file is derivative of original ZynAddSubFX code.
+
+    Modified June 2017
 */
 
 #include <cmath>
 #include <iostream>
-
+# include <algorithm>
+#include <limits.h>
 #include "Misc/Config.h"
 #include "Misc/XMLwrapper.h"
 #include "Misc/Microtonal.h"
@@ -54,7 +57,8 @@ void Microtonal::defaults(void)
 
     for (int i = 0; i < MAX_OCTAVE_SIZE; ++i)
     {
-        octave[i].tuning = tmpoctave[i].tuning = powf(2.0f, (i % octavesize + 1) / 12.0f);
+        octave[i].text = reformatline(to_string((i % octavesize + 1) * 100)+ ".0");
+        octave[i].tuning = tmpoctave[i].tuning = pow(2.0, (i % octavesize + 1) / 12.0);
         octave[i].type = tmpoctave[i].type = 1;
         octave[i].x1 = tmpoctave[i].x1 = (i % octavesize + 1) * 100;
         octave[i].x2 = tmpoctave[i].x2 = 0;
@@ -67,10 +71,6 @@ void Microtonal::defaults(void)
     Pglobalfinedetune = 64.0;
 }
 
-void Microtonal::setPartMaps(void)
-{
-    synth->setAllPartMaps();
-}
 
 // Get the frequency according to the note number
 float Microtonal::getNoteFreq(int note, int keyshift)
@@ -106,6 +106,7 @@ float Microtonal::getNoteFreq(int note, int keyshift)
         rap_keyshift *= powf(octave[octavesize - 1].tuning, ksoct);
     }
 
+    float freq;
     // if the mapping is enabled
     if (Pmappingenabled)
     {
@@ -151,13 +152,9 @@ float Microtonal::getNoteFreq(int note, int keyshift)
         degoct += degkey / octavesize;
         degkey %= octavesize;
 
-        float freq = (degkey == 0) ? (1.0f) : octave[degkey - 1].tuning;
+        freq = (degkey == 0) ? (1.0f) : octave[degkey - 1].tuning;
         freq *= powf(octave[octavesize - 1].tuning, degoct);
         freq *= PAfreq / rap_anote_middlenote;
-        freq *= globalfinedetunerap;
-        if(scaleshift != 0)
-            freq /= octave[scaleshift - 1].tuning;
-        return freq * rap_keyshift;
     }
     else // if the mapping is disabled
     {
@@ -166,23 +163,45 @@ float Microtonal::getNoteFreq(int note, int keyshift)
         int ntoct = (nt - ntkey) / octavesize;
 
         float oct  = octave[octavesize - 1].tuning;
-        float freq = octave[(ntkey + octavesize - 1) % octavesize].tuning
-                     * powf(oct, ntoct) * PAfreq;
+        freq = octave[(ntkey + octavesize - 1) % octavesize].tuning
+               * powf(oct, ntoct) * PAfreq;
         if (ntkey == 0)
             freq /= oct;
-        if (scaleshift != 0)
-            freq /= octave[scaleshift - 1].tuning;
-//	fprintf(stderr,"note=%d freq=%.3f cents=%d\n",note,freq,(int)floor(log(freq/PAfreq)/log(2.0)*1200.0+0.5));
-        freq *= globalfinedetunerap;
-        return freq * rap_keyshift;
     }
+    if (scaleshift != 0)
+        freq /= octave[scaleshift - 1].tuning;
+    freq *= globalfinedetunerap;
+    return freq * rap_keyshift;
 }
 
-// Convert a line to tunings; returns -1 if it ok
+
+string Microtonal::reformatline(string text)
+{
+    text.erase(remove_if( text.begin(), text.end(),
+     [](char c){ return (c =='\r' || c =='\t' || c == ' ' || c == '\n');}), text.end() );
+
+    size_t found;
+    found = text.find('.');
+    if (found < 4)
+    {
+        string tmp (4 - found, '0'); // leading zeros
+        text = tmp + text;
+    }
+    found = text.size();
+    if ( found < 11)
+    {
+        string tmp  (11 - found, '0'); // trailing zeros
+        text += tmp;
+    }
+    return text;
+}
+
+
+// Convert a line to tunings; returns 0 if ok
 int Microtonal::linetotunings(unsigned int nline, const char *line)
 {
     int x1 = -1, x2 = -1, type = -1;
-    float x = -1.0f, tmp, tuning = 1.0f;
+    double x = -1.0, tmp, tuning = 1.0;
 
     if (strstr(line, "/") == NULL)
     {
@@ -193,18 +212,18 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
             type = 2; // division
         }
         else
-        {   // float number case
-            sscanf(line, "%f", &x);
-            if (x < 0.000001f)
-                return 1;
-            type = 1; // float type(cents)
+        {   // double number case
+            x = stod(string(line));
+            if (x < 0.000001)
+                return -1;
+            type = 1; // double type(cents)
         }
     }
     else
     {   // M/N case
         sscanf(line, "%d/%d", &x1, &x2);
         if (x1 < 0 || x2 < 0)
-            return 1;
+            return -2;
         if (!x2)
             x2 = 1;
         type = 2; // division
@@ -213,32 +232,27 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
     if (x1 <= 0)
         x1 = 1; // not allow zero frequency sounds (consider 0 as 1)
 
-    // convert to float if the number are too big
-    if ((type==2) && ((x1 > (128 * 128 * 128 - 1)) || (x2 > (128 * 128* 128 - 1))))
-    {
-        type = 1;
-        x = ((float)x1) / x2;
-    }
     switch (type)
     {
         case 1:
-            x1 = (int) floorf(x);
-            tmp = fmodf(x, 1.0f);
-            x2 = (int)truncf(floorf(tmp * 1e6f));
-            tuning = powf(2.0f, x / 1200.0f);
+            x1 = (int) floor(x);
+            tmp = fmod(x, 1.0);
+            x2 = (int)truncf(floor(tmp * 1e6));
+            tuning = pow(2.0, x / 1200.0);
             break;
         case 2:
-            x = ((float)x1) / x2;
+            x = ((double)x1) / x2;
             tuning = x;
             break;
     }
 
+    tmpoctave[nline].text = reformatline(string(line));
     tmpoctave[nline].tuning = tuning;
     tmpoctave[nline].type = type;
     tmpoctave[nline].x1 = x1;
     tmpoctave[nline].x2 = x2;
 
-    return -1; // ok
+    return 0; // ok
 }
 
 
@@ -262,10 +276,10 @@ int Microtonal::texttotunings(const char *text)
         if (!strlen(lin))
             continue;
         int err = linetotunings(nl, lin);
-        if (err != -1)
+        if (err != 0)
         {
             delete [] lin;
-            return nl; // Parse error
+            return err; // Parse error
         }
         nl++;
     }
@@ -273,28 +287,29 @@ int Microtonal::texttotunings(const char *text)
     if (nl > MAX_OCTAVE_SIZE)
         nl = MAX_OCTAVE_SIZE;
     if (!nl)
-        return -2; // the input is empty
+        return 0; // the input is empty
     octavesize = nl;
     for (i = 0; i < octavesize; ++i)
     {
+        octave[i].text = tmpoctave[i].text;
         octave[i].tuning = tmpoctave[i].tuning;
         octave[i].type = tmpoctave[i].type;
         octave[i].x1 = tmpoctave[i].x1;
         octave[i].x2 = tmpoctave[i].x2;
     }
-    return -1; // ok
+    return octavesize; // ok
 }
 
 
 // Convert the text to mapping
-void Microtonal::texttomapping(const char *text)
+int Microtonal::texttomapping(const char *text)
 {
     unsigned int i, k = 0;
     char *lin;
-
+    int tmpMap [128];
     lin = new char[MAX_LINE_SIZE + 1];
     for (i = 0; i < 128; ++i)
-        Pmapping[i] = -1;
+        tmpMap[i] = -1;
     int tx = 0;
     while (k < strlen(text))
     {
@@ -313,18 +328,38 @@ void Microtonal::texttomapping(const char *text)
             tmp = -1;
         if (tmp < -1)
             tmp = -1;
-        Pmapping[tx] = tmp;
+        tmpMap[tx] = tmp;
 
         if ((tx++) > 127)
             break;
     }
     delete [] lin;
 
-    if (!tx)
-        tx = 1;
-    Pmapsize = tx;
+    if (tx)
+    {
+        Pmapsize = tx;
+        swap(Pmapping, tmpMap);
+    }
+    else
+        return -6;
+    return tx;
 }
 
+
+string Microtonal::keymaptotext(void)
+{
+    string text;
+    for (int i = 0; i < Pmapsize; ++i)
+    {
+        if (i > 0)
+            text += "\n";
+        if (Pmapping[i] == -1)
+            text += "x";
+        else
+            text += to_string(Pmapping[i]);
+    }
+    return text;
+}
 
 // Convert tunning to text line
 void Microtonal::tuningtoline(int n, char *line, int maxn)
@@ -335,9 +370,31 @@ void Microtonal::tuningtoline(int n, char *line, int maxn)
         return;
     }
     if (octave[n].type == 1)
-        snprintf(line, maxn, "%04d.%06d", octave[n].x1,octave[n].x2);
+    {
+        string text = octave[n].text;
+        if (text > " ")
+            snprintf(line, maxn, "%s", text.c_str());
+        else
+            snprintf(line, maxn, "%04d.%06d", octave[n].x1,octave[n].x2);
+    }
     if (octave[n].type == 2)
         snprintf(line, maxn, "%d/%d", octave[n].x1, octave[n].x2);
+}
+
+
+string Microtonal::tuningtotext()
+{
+    string text;
+    char *buff = new char[100];
+    for (int i = 0; i < octavesize; ++i)
+    {
+        if (i > 0)
+            text += "\n";
+        tuningtoline(i, buff, 100);
+        text += string(buff);
+    }
+    delete [] buff;
+    return text;
 }
 
 
@@ -345,7 +402,7 @@ int Microtonal::loadline(FILE *file, char *line)
 {
     do {
         if (!fgets(line, 500, file))
-            return 1;
+            return -5;
     } while (line[0] == '!');
     return 0;
 }
@@ -355,43 +412,54 @@ int Microtonal::loadline(FILE *file, char *line)
 int Microtonal::loadscl(string filename)
 {
     FILE *file = fopen(filename.c_str(), "r");
+    if (!file)
+        return -3; // last time we can return before fclose
     char tmp[500];
+    int err = 0;
+    int nnotes;
 
     fseek(file, 0, SEEK_SET);
     // loads the short description
     if (loadline(file, &tmp[0]))
-        return 2;
-    for (int i = 0; i < 500; ++i)
-        if (tmp[i] < 32)
-            tmp[i] = 0;
-    Pname = string(tmp);
-    Pcomment = string(tmp);
-    // loads the number of the notes
-    if (loadline(file, &tmp[0]))
-        return 2;
-    int nnotes = MAX_OCTAVE_SIZE;
-    sscanf(&tmp[0], "%d", &nnotes);
-    if (nnotes > MAX_OCTAVE_SIZE)
-        return 2;
-    // load the tunnings
-    for (int nline = 0; nline < nnotes; ++nline)
+        err = -4;
+    if (err == 0)
     {
+        for (int i = 0; i < 500; ++i)
+            if (tmp[i] < 32)
+                tmp[i] = 0;
+        Pname = findleafname(filename);
+        Pcomment = string(tmp);
+        // loads the number of the notes
         if (loadline(file, &tmp[0]))
-            return 2;
-        linetotunings(nline, &tmp[0]);
+            err = -5;
+    }
+    if (err == 0)
+    {
+        nnotes = MAX_OCTAVE_SIZE;
+        sscanf(&tmp[0], "%d", &nnotes);
+        if (nnotes > MAX_OCTAVE_SIZE || nnotes < 2)
+            err = -6;
+    }
+    if (err == 0)
+    {
+    // load the tunnings
+        for (int nline = 0; nline < nnotes; ++nline)
+        {
+            err = loadline(file, &tmp[0]);
+            if (err == 0)
+                err = linetotunings(nline, &tmp[0]);
+            if (err < 0)
+                break;
+        }
     }
     fclose(file);
+    if (err < 0)
+        return err;
 
     octavesize = nnotes;
-    for (int i = 0; i < octavesize; ++i)
-    {
-        octave[i].tuning = tmpoctave[i].tuning;
-        octave[i].type = tmpoctave[i].type;
-        octave[i].x1 = tmpoctave[i].x1;
-        octave[i].x2 = tmpoctave[i].x2;
-    }
-    setPartMaps();
-    return 0;
+    swap(octave, tmpoctave);
+    synth->setAllPartMaps();
+    return nnotes;
 }
 
 
@@ -399,106 +467,124 @@ int Microtonal::loadscl(string filename)
 int Microtonal::loadkbm(string filename)
 {
     FILE *file = fopen(filename.c_str(), "r");
-    int x;
+    if (!file)
+        return -3; // last time we can return before fclose
     char tmp[500];
-
+    int err = 0;
+    int tmpMapSize;
     fseek(file, 0, SEEK_SET);
     // loads the mapsize
     if (loadline(file,&tmp[0]))
-        return 2;
+        err = -4;
+    else if (!sscanf(&tmp[0], "%d",&tmpMapSize))
+        err = -2;
 
-    if (!sscanf(&tmp[0], "%d",&x))
-        return 2;
+    if (err == 0)
+    {
+        if (tmpMapSize < 1 || tmpMapSize > 127)
+            err = -6;
+    }
 
-    if (x < 1)
-        x = 0;
-    if (x > 127)
-        x = 127; // just in case...
-    Pmapsize = x;
-    // loads first MIDI note to retune
+    int tmpFirst;
+    if (err == 0)
+    {
+        // loads first MIDI note to retune
+        if (loadline(file, &tmp[0]))
+            err = -5;
+        else if (!sscanf(&tmp[0], "%d", &tmpFirst))
+            return -6;
+        else if (tmpFirst < 0 || tmpFirst > 127)
+            err = -7;
+    }
+
+    int tmpLast;
+    if (err == 0)
+    {
+        // loads last MIDI note to retune
+       if (loadline(file, &tmp[0]))
+            err = -5;
+        else if (!sscanf(&tmp[0], "%d", &tmpLast))
+            return -6;
+        else if (tmpLast < 0 || tmpLast > 127)
+            err = -7;
+    }
+
+    int tmpMid;
+    if (err == 0)
+    {
+        // loads the middle note where scale fro scale degree=0
+       if (loadline(file, &tmp[0]))
+            err = -5;
+        else if (!sscanf(&tmp[0], "%d", &tmpMid))
+            return -6;
+        else if (tmpMid < 0 || tmpMid > 127)
+            err = -7;
+    }
+
+    int tmpNote;
+    if (err == 0)
+    {
+        // loads the reference note
+       if (loadline(file, &tmp[0]))
+            err = -5;
+        else if (!sscanf(&tmp[0], "%d", &tmpNote))
+            return -6;
+        else if (tmpNote < 0 || tmpNote > 127)
+            err = -7;
+    }
+
+    float tmpPAfreq;
+    if (err == 0)
+    {
+        // loads the reference freq.
+        if (loadline(file, &tmp[0]))
+            err = -6;
+        else
+        {
+
+            if (!sscanf(&tmp[0], "%f", &tmpPAfreq))
+                err = -6;
+            else if (tmpPAfreq < 1 || tmpPAfreq > 20000)
+                err = -8;
+        }
+    }
+
+    // the scale degree(which is the octave) is not loaded
+    // it is obtained by the tunnings with getoctavesize() method
     if (loadline(file, &tmp[0]))
-        return 2;
-
-    if (!sscanf(&tmp[0], "%d", &x))
-        return 2;
-
-    if (x < 1)
-        x = 0;
-    if (x > 127)
-        x = 127; // just in case...
-    Pfirstkey = x;
-    // loads last MIDI note to retune
-    if (loadline(file, &tmp[0]))
-        return 2;
-
-    if (!sscanf(&tmp[0], "%d", &x))
-        return 2;
-
-    if (x < 1)
-        x = 0;
-    if (x > 127)
-        x = 127; // just in case...
-    Plastkey = x;
-    // loads last the middle note where scale fro scale degree=0
-    if (loadline(file, &tmp[0]))
-        return 2;
-
-    if (!sscanf(&tmp[0], "%d", &x))
-        return 2;
-
-    if (x < 1)
-        x = 0;
-    if (x > 127)
-        x = 127; // just in case...
-    Pmiddlenote = x;
-    // loads the reference note
-    if (loadline(file, &tmp[0]))
-        return 2;
-
-    if (!sscanf(&tmp[0], "%d", &x))
-        return 2;
-
-    if (x < 1)
-        x = 0;
-    if (x > 127)
-        x = 127; // just in case...
-    PAnote = x;
-    // loads the reference freq.
-    if (loadline(file, &tmp[0]))
-        return 2;
-
-    float tmpPAfreq = 440.0f;
-    if (!sscanf(&tmp[0], "%f", &tmpPAfreq))
-        return 2;
-
-    PAfreq = tmpPAfreq;
-
-    // the scale degree(which is the octave) is not loaded, it is obtained by the tunnings with getoctavesize() method
-    if (loadline(file, &tmp[0]))
-        return 2;
+        err = -6;
 
     // load the mappings
-    if (Pmapsize)
+    int tmpMap [128];
+    int x;
+    if (err == 0)
     {
-        for (int nline = 0; nline < Pmapsize; ++nline)
+        for (int nline = 0; nline < tmpMapSize; ++nline)
         {
             if (loadline(file, &tmp[0]))
-                return 2;
+            {
+                err = -5;
+                break;
+            }
             if (!sscanf(&tmp[0], "%d", &x))
                 x = -1;
-            Pmapping[nline] = x;
+            tmpMap[nline] = x;
         }
-        Pmappingenabled = 1;
-    }
-    else
-    {
-        Pmappingenabled = 0;
-        Pmapping[0] = 0;
-        Pmapsize = 1;
     }
     fclose(file);
+    if (err < 0)
+        return err;
 
-    return 0;
+    Pmappingenabled = 1;
+    Pmapsize = tmpMapSize;
+    swap(Pmapping, tmpMap);
+    Pfirstkey = tmpFirst;
+    Plastkey = tmpLast;
+    Pmiddlenote = tmpMid;
+    PAnote = tmpNote;
+    PAfreq = tmpPAfreq;
+    synth->setAllPartMaps();
+    return tmpMapSize;
 }
 
 
@@ -508,7 +594,7 @@ void Microtonal::add2XML(XMLwrapper *xml)
     xml->addparstr("comment", Pcomment.c_str());
 
     xml->addparbool("invert_up_down", Pinvertupdown);
-    xml->addparbool("invert_up_down_center", Pinvertupdowncenter);
+    xml->addpar("invert_up_down_center", Pinvertupdowncenter);
 
     xml->addparbool("enabled", Penabled);
     xml->addpar("global_fine_detune", lrint(Pglobalfinedetune));
@@ -532,7 +618,12 @@ void Microtonal::add2XML(XMLwrapper *xml)
             xml->beginbranch("DEGREE", i);
             if (octave[i].type == 1)
             {
+                xml->addparstr("cents_text",octave[i].text);
                 xml->addparreal("cents", octave[i].tuning);
+                /*
+                 * This is downgraded to preserve compatibility
+                 * with both Zyn and older Yoshi versions
+                 */
             }
             if (octave[i].type == 2)
             {
@@ -563,7 +654,7 @@ void Microtonal::getfromXML(XMLwrapper *xml)
     Pcomment = xml->getparstr("comment");
 
     Pinvertupdown=xml->getparbool("invert_up_down", Pinvertupdown);
-    Pinvertupdowncenter=xml->getparbool("invert_up_down_center", Pinvertupdowncenter);
+    Pinvertupdowncenter=xml->getpar127("invert_up_down_center", Pinvertupdowncenter);
 
     Penabled=xml->getparbool("enabled", Penabled);
     Pglobalfinedetune = xml->getpar127("global_fine_detune", Pglobalfinedetune);
@@ -585,22 +676,32 @@ void Microtonal::getfromXML(XMLwrapper *xml)
             {
                 if (!xml->enterbranch("DEGREE", i))
                     continue;
+                string text = xml->getparstr("cents_text");
                 octave[i].x2 = 0;
-                octave[i].tuning = xml->getparreal("cents", octave[i].tuning);
-                octave[i].x1 = xml->getpar127("numerator", octave[i].x1);
-                octave[i].x2 = xml->getpar127("denominator", octave[i].x2);
+                if (text > " ")
+                {
+                    octave[i].text = reformatline(text);
+                    octave[i].tuning = pow(2.0, stod(text) / 1200.0);
+                }
+                else
+                {
+                    octave[i].text = "";
+                    octave[i].tuning = xml->getparreal("cents", octave[i].tuning);
+                }
+                octave[i].x1 = xml->getpar("numerator", octave[i].x1, 0, INT_MAX);
+                octave[i].x2 = xml->getpar("denominator", octave[i].x2, 0, INT_MAX);
 
                 if (octave[i].x2)
                 {
                     octave[i].type = 2;
-                    octave[i].tuning = ((float)octave[i].x1) / octave[i].x2;
+                    octave[i].tuning = ((double)octave[i].x1) / octave[i].x2;
                 }
                 else {
                     octave[i].type = 1;
                     //populate fields for display
-                    float x = logf(octave[i].tuning) / LOG_2 * 1200.0f;
+                    double x = log(octave[i].tuning) / LOG_2 * 1200.0;
                     octave[i].x1 = (int) floor(x);
-                    octave[i].x2 = (int) (floor(fmodf(x, 1.0f) * 1e6));
+                    octave[i].x2 = (int) (floor(fmod(x, 1.0) * 1e6));
                 }
                 xml->exitbranch();
             }
@@ -645,7 +746,7 @@ bool Microtonal::loadXML(string filename)
     XMLwrapper *xml = new XMLwrapper(synth);
     if (NULL == xml)
     {
-        synth->getRuntime().Log("Microtonal: loadXML failed to instantiate new XMLwrapper");
+        synth->getRuntime().Log("Microtonal: loadXML failed to instantiate new XMLwrapper", 1);
         return false;
     }
     if (!xml->loadXMLfile(filename))
@@ -655,11 +756,11 @@ bool Microtonal::loadXML(string filename)
     }
     if (!xml->enterbranch("MICROTONAL"))
     {
-        synth->getRuntime().Log(filename + " is not a scale file");
+        synth->getRuntime().Log(filename + " is not a scale file", 1);
         return false;
     }
     getfromXML(xml);
-    setPartMaps();
+    synth->setAllPartMaps();
     xml->exitbranch();
     delete xml;
     return true;

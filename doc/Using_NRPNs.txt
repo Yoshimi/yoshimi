@@ -26,7 +26,7 @@ e.g. Starting with Dhigh = 6 and Dlow = 20
 
 Change Dlow to 15 and Yoshimi will regard this as a command Dhigh 6 + Dlow 15
 Alternatively change Dhigh to 2 and Yoshimi will regard this as a command Dhigh 2 + Dlow 20
-This can be useful but may have unintended consequeces!
+This can be useful but may have unintended consequences!
 
 If in doubt, change/resend either of the NRPN bytes and both data bytes will be cleared.
 

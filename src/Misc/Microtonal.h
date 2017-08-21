@@ -20,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified October 2016
+    This file is derivative of ZynAddSubFX original code.
+
+    Modified June 2017
 */
 
 #ifndef MICROTONAL_H
@@ -44,7 +46,6 @@ class Microtonal : private MiscFuncs
         Microtonal(SynthEngine *_synth): synth(_synth) { defaults(); }
         ~Microtonal() { }
         void defaults(void);
-        void setPartMaps(void);
         float getNoteFreq(int note, int keyshift);
         float getFixedNoteFreq(int note);
 
@@ -73,10 +74,12 @@ class Microtonal : private MiscFuncs
 
         int getoctavesize(void);
         void tuningtoline(int n, char *line, int maxn);
+        string tuningtotext(void);
+        string keymaptotext(void);
         int loadscl(string filename); // load the tunnings from a .scl file
         int loadkbm(string filename); // load the mapping from .kbm file
         int texttotunings(const char *text);
-        void texttomapping(const char *text);
+        int texttomapping(const char *text);
 
         string Pname;
         string Pcomment;
@@ -87,6 +90,7 @@ class Microtonal : private MiscFuncs
         bool loadXML(string filename);
 
     private:
+        string reformatline(string text);
         int linetotunings(unsigned int nline, const char *line);
         int loadline(FILE *file, char *line); // loads a line from the text file,
                                               // ignoring the lines beggining with "!"
@@ -94,10 +98,11 @@ class Microtonal : private MiscFuncs
 
         struct {
             unsigned char type; // 1 for cents or 2 for division
-            float tuning;       // the real tuning (eg. +1.05946 for one halftone)
+            double tuning;       // the real tuning (eg. +1.05946 for one halftone)
                                 // or 2.0 for one octave
             unsigned int x1; // the real tunning is x1 / x2
             unsigned int x2;
+            string text;
         } octave[MAX_OCTAVE_SIZE],
           tmpoctave[MAX_OCTAVE_SIZE];
 

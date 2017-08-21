@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>
 
-    Modifed February 2017
+    Modifed July 2017
 */
 
 #include <sys/stat.h>
@@ -102,6 +102,8 @@ string MiscFuncs::asString(float n)
 string MiscFuncs::asLongString(float n)
 {
    ostringstream oss;
+   oss.precision(9);
+   oss.width(9);
    oss << n;
    return oss.str();
 }
@@ -135,6 +137,15 @@ float MiscFuncs::string2float(string str)
     float fval;
     machine >> fval;
     return fval;
+}
+
+
+double MiscFuncs::string2double(string str)
+{
+    istringstream machine(str);
+    double dval;
+    machine >> dval;
+    return dval;
 }
 
 
@@ -387,6 +398,8 @@ void MiscFuncs::miscMsgInit()
 
 int MiscFuncs::miscMsgPush(string _text)
 {
+    if (_text.empty())
+        return 255;
     sem_wait(&miscmsglock);
 
     string text = _text;
@@ -398,6 +411,7 @@ int MiscFuncs::miscMsgPush(string _text)
         if ( *it == "")
         {
             *it = text;
+            //cout << "Msg In " << int(idx) << " >" << text << "<" << endl;
             break;
         }
         ++ it;
@@ -405,10 +419,10 @@ int MiscFuncs::miscMsgPush(string _text)
     }
     if (it == miscList.end())
     {
-        cout << "List full :(" << endl;
+        cerr << "miscMsg list full :(" << endl;
         idx = -1;
     }
-    //cout << "List size " << int(idx) << endl;
+
     int result = idx; // in case of a new entry before return
     sem_post(&miscmsglock);
     return result;
@@ -417,6 +431,8 @@ int MiscFuncs::miscMsgPush(string _text)
 
 string MiscFuncs::miscMsgPop(int _pos)
 {
+    if (_pos >= 255)
+        return "";
     sem_wait(&miscmsglock);
 
     int pos = _pos;
@@ -426,7 +442,10 @@ string MiscFuncs::miscMsgPop(int _pos)
     while(it != miscList.end())
     {
         if (idx == pos)
+        {
+            //cout << "Msg Out " << int(idx) << " >" << *it << "<" << endl;
             break;
+        }
         ++ it;
         ++ idx;
     }

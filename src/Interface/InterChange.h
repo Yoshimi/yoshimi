@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified February 2017
+    Modified July 2017
 */
 
 #ifndef INTERCH_H
@@ -53,13 +53,16 @@ class InterChange : private MiscFuncs
         jack_ringbuffer_t *fromGUI;
         jack_ringbuffer_t *toGUI;
         jack_ringbuffer_t *fromMIDI;
+        jack_ringbuffer_t *returnsLoopback;
 
-        void mediate();
+        void mediate(void);
+        void returnsDirect(int altData);
         void returns(CommandBlock *getData);
         void setpadparams(int point);
         void doClearPart(int npart);
         bool commandSend(CommandBlock *getData);
         void resolveReplies(CommandBlock *getData);
+        void testLimits(CommandBlock *getData);
         void returnLimits(CommandBlock *getData);
 
         void flagsWrite(unsigned int val){__sync_and_and_fetch(&flagsValue, val);}
@@ -72,8 +75,11 @@ class InterChange : private MiscFuncs
         void *sortResultsThread(void);
         static void *_sortResultsThread(void *arg);
         pthread_t  sortResultsThreadHandle;
-
+        void transfertext(CommandBlock *getData);
+        string formatScales(string text);
         string resolveVector(CommandBlock *getData);
+        string resolveMicrotonal(CommandBlock *getData);
+        string resolveConfig(CommandBlock *getData);
         string resolveMain(CommandBlock *getData);
         string resolvePart(CommandBlock *getData);
         string resolveAdd(CommandBlock *getData);
@@ -89,6 +95,8 @@ class InterChange : private MiscFuncs
         bool showValue;
 
         void commandVector(CommandBlock *getData);
+        void commandMicrotonal(CommandBlock *getData);
+        void commandConfig(CommandBlock *getData);
         void commandMain(CommandBlock *getData);
         void commandPart(CommandBlock *getData);
         void commandAdd(CommandBlock *getData);
@@ -107,9 +115,8 @@ class InterChange : private MiscFuncs
         void commandEffects(CommandBlock *getData);
 
         bool commandSendReal(CommandBlock *getData);
-        
+
         SynthEngine *synth;
-        //MidiDecode *mididecode;
 };
 
 #endif

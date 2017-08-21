@@ -21,11 +21,13 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of original ZynAddSubFX code.
-    Modified February 2017
+
+    Modified June 2017
 */
 
 #include <zlib.h>
 #include <sstream>
+#include <iostream>
 
 #include "Misc/Config.h"
 #include "Misc/XMLwrapper.h"
@@ -50,10 +52,10 @@ const char *XMLwrapper_whitespace_callback(mxml_node_t *node, int where)
 
 
 XMLwrapper::XMLwrapper(SynthEngine *_synth) :
-    minimal(true),
     stackpos(0),
     synth(_synth)
 {
+    minimal = 1 - synth->getRuntime().xmlmax;
     information.PADsynth_used = 0;
     information.ADDsynth_used = 0;
     information.SUBsynth_used = 0;
@@ -65,8 +67,8 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth) :
     {
         mxmlElementSetAttr(doctype, "ZynAddSubFX-data", NULL);
         node = root = mxmlNewElement(tree, "ZynAddSubFX-data");
-        mxmlElementSetAttr(root, "version-major", "2");
-        mxmlElementSetAttr(root, "version-minor", "5");
+        mxmlElementSetAttr(root, "version-major", "3");
+        mxmlElementSetAttr(root, "version-minor", "0");
         mxmlElementSetAttr(root, "ZynAddSubFX-author", "Nasca Octavian Paul");
     }
     else
@@ -380,6 +382,16 @@ void XMLwrapper::addpar(const string& name, int val)
 
 void XMLwrapper::addparreal(const string& name, float val)
 {
+    union { float in; uint32_t out; } convert;
+    char buf[11];
+    convert.in = val;
+    sprintf(buf, "0x%8X", convert.out);
+    addparams3("par_real", "name", name.c_str(), "value", asLongString(val), "exact_value", buf);
+}
+
+
+void XMLwrapper::addpardouble(const string& name, double val)
+{
     addparams2("par_real","name", name.c_str(), "value", asLongString(val));
 }
 
@@ -650,7 +662,15 @@ float XMLwrapper::getparreal(const string& name, float defaultpar)
                            MXML_DESCEND_FIRST);
     if (!node)
         return defaultpar;
-    const char *strval = mxmlElementGetAttr(node, "value");
+
+    const char *strval = mxmlElementGetAttr(node, "exact_value");
+    if (strval != NULL) {
+        union { float out; uint32_t in; } convert;
+        sscanf(strval+2, "%x", &convert.in);
+        return convert.out;
+    }
+
+    strval = mxmlElementGetAttr(node, "value");
     if (!strval)
         return defaultpar;
     return string2float(string(strval));
@@ -691,6 +711,18 @@ mxml_node_t *XMLwrapper::addparams2(const string& name, const string& par1, cons
     mxml_node_t *element = mxmlNewElement(node, name.c_str());
     mxmlElementSetAttr(element, par1.c_str(), val1.c_str());
     mxmlElementSetAttr(element, par2.c_str(), val2.c_str());
+    return element;
+}
+
+
+mxml_node_t *XMLwrapper::addparams3(const string& name, const string& par1, const string& val1,
+                                    const string& par2, const string& val2,
+                                    const string& par3, const string& val3)
+{
+    mxml_node_t *element = mxmlNewElement(node, name.c_str());
+    mxmlElementSetAttr(element, par1.c_str(), val1.c_str());
+    mxmlElementSetAttr(element, par2.c_str(), val2.c_str());
+    mxmlElementSetAttr(element, par3.c_str(), val3.c_str());
     return element;
 }
 

@@ -37,7 +37,7 @@ class EffectLFO
         unsigned char Pfreq;
         unsigned char Prandomness;
         unsigned char PLFOtype;
-        unsigned char Pstereo; // 64 = centre
+        unsigned char Pstereo; // 64 = center
     private:
         float getlfoshape(float x);
 

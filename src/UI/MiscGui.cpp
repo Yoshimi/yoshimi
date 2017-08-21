@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified April 2017
+    Modified August 2017
 */
 
 #include "Misc/SynthEngine.h"
@@ -42,12 +42,12 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
 
     if (part != 0xd8)
     {
-        if ((type & 3) == 3)
-        { // value type is now irrelevant
+        if ((type & 3) == 3 && Fl::event_is_click())
+        {
             if(Fl::event_state(FL_CTRL) != 0)
             {
                 if (type & 8)
-                    type = 3;
+                    type = 3; // previous type is now irrelevant
                 // identifying this for button 3 as MIDI learn
                 else
                 {
@@ -83,7 +83,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
     putData.data.insert = insert;
     putData.data.parameter = parameter;
     putData.data.par2 = par2;
-
+//cout << "here" << int(type) << " " << int(control) << " " << int(part) << " " << int(parameter) << " " << int(par2) << endl;
     if (jack_ringbuffer_write_space(synth->interchange.fromGUI) >= commandSize)
         jack_ringbuffer_write(synth->interchange.fromGUI, (char*) putData.bytes, commandSize);
 }
@@ -114,9 +114,15 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
     unsigned char insertParam = getData->data.parameter;
     //unsigned char insertPar2 = getData->data.par2;
 
-    if (npart >= 0xc0 && npart < 0xd0) // vector
+    if (npart == 0xe8) // scales
     {
-        return; // todo
+        synth->getGuiMaster()->microtonalui->returns_update(getData);
+        return;
+    }
+    if (npart == 0xc0) // vector
+    {
+        synth->getGuiMaster()->vectorui->returns_update(getData);
+        return;
     }
     if (npart == 0xd8 && synth->getGuiMaster()->midilearnui != NULL)
     {
@@ -130,18 +136,39 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
     if (kititem >= 0x80 && kititem != 0xff) // effects
     {
         if (npart == 0xf1)
-            synth->getGuiMaster()->syseffectui->returns_update(getData);
+        {
+            if (insert == 1) // dynefilter filter insert
+                synth->getGuiMaster()->syseffectui->fwin_filterui->returns_update(getData);
+            else
+                synth->getGuiMaster()->syseffectui->returns_update(getData);
+        }
         else if (npart == 0xf2)
-            synth->getGuiMaster()->inseffectui->returns_update(getData);
+        {
+            if (insert == 1) // dynefilter filter insert
+                synth->getGuiMaster()->inseffectui->fwin_filterui->returns_update(getData);
+            else
+                synth->getGuiMaster()->inseffectui->returns_update(getData);
+        }
         else if (npart < NUM_MIDI_PARTS)
-            synth->getGuiMaster()->partui->inseffectui->returns_update(getData);
+        {
+            if (insert == 1) // dynefilter filter insert
+                synth->getGuiMaster()->partui->inseffectui->fwin_filterui->returns_update(getData);
+            else
+                synth->getGuiMaster()->partui->inseffectui->returns_update(getData);
+        }
         return;
     }
 
+    if (npart == 0xf8)
+    {
+        synth->getGuiMaster()->configui->returns_update(getData);
+        return;
+    }
     if (npart >= 0xf0) // main / sys / ins
     {
-        if (npart == 0xf0 && (control == 80 || control == 96))
-            return; // gui in undefined state at this point
+        //if (npart == 0xf0) &&  control == 96)
+            //return; // gui in undefined state at this point
+        // doesn't seem to be the case now ???
         synth->getGuiMaster()->returns_update(getData);
         return;
     }
@@ -445,8 +472,10 @@ string convert_value(ValueType type, float val)
             return(custom_value_units(val / 127.0f * 200.0f,"%",1));
 
         case VC_LFOdepthFilter: // filter LFO
-            f=(int)val / 127.0f * 4800.0f; // 4 octaves
-            return variable_prec_units(f, "cents", 2);
+            val = (int)val / 127.0f * 4.0f; // 4 octaves
+            f = val * 1200.0f; // cents
+            return variable_prec_units(f, "cents", 2) + "\n("
+                + custom_value_units(val, "base pos. offset)", 2);
 
         case VC_LFOdelay:
             f = ((int)val) / 127.0f * 4.0f + 0.005f;
@@ -473,8 +502,10 @@ string convert_value(ValueType type, float val)
             return variable_prec_units(f, "cents", 2);
 
         case VC_EnvelopeFilterVal:
-            f=((int)val - 64.0f) / 64.0f * 7200.0f; // 6 octaves
-            return variable_prec_units(f, "cents", 2);
+            val = ((int)val - 64.0f) / 64.0f;
+            f = val * 7200.0f; // 6 octaves
+            return variable_prec_units(f, "cents", 2) + "\n("
+                + custom_value_units(val * 6.0f,"base pos. offset)",2);
 
         case VC_EnvelopeAmpSusVal:
             return(custom_value_units((1.0f - (int)val / 127.0f)
@@ -510,8 +541,8 @@ string convert_value(ValueType type, float val)
             else
                 return variable_prec_units(f, "Hz", 2);
 
-        case VC_FilterFreq1: // ToDo
-            return(custom_value_units(val,""));
+        case VC_FilterFreq1: // Formant filter - base position in vowel sequence
+            return(custom_value_units((val / 64.0f - 1.0f) * 5.0f,"x stretch (modulo 1)",2));
 
         case VC_FilterQ:
         case VC_FilterQAnalogUnused:
@@ -524,10 +555,11 @@ string convert_value(ValueType type, float val)
             return(s);
 
         case VC_FilterVelocityAmp:
-            f = (int)val / 127.0 * -6.0;
-            f = powf(2.0f,f + log(1000.0f)/log(2.0f)); // getrealfreq
+            val = (int)val / 127.0 * -6.0; // formant offset value
+            f = powf(2.0f,val + log(1000.0f)/log(2.0f)); // getrealfreq
             f = log(f/1000.0f)/log(powf(2.0f,1.0f/12.0f))*100.0f; // in cents
-            return(custom_value_units(f-0.5, "cents"));
+            return custom_value_units(f-0.5, "cents") +
+                   "\n(Formant offset: " + custom_value_units(val, "x stretch)",2);
 
         case VC_FilterFreqTrack0:
             s.clear();
@@ -542,6 +574,18 @@ string convert_value(ValueType type, float val)
             f = val /64.0f * 100.0f;
             s += custom_value_units(f, "%", 1);
             return(s);
+
+        case VC_FormFilterClearness:
+            f = powf(10.0f, (val - 32.0f) / 48.0f);
+            return custom_value_units(f, " switch rate",2);
+
+        case VC_FormFilterSlowness:
+            f = powf(1.0f - (val / 128.0f), 3.0f);
+            return custom_value_units(f, " morph rate",4);
+
+        case VC_FormFilterStretch:
+            f = powf(0.1f, (val - 32.0f) / 48.0f);
+            return custom_value_units(f, " seq. scale factor",3);
 
         case VC_InstrumentVolume:
             return(custom_value_units(-60.0f*(1.0f-(int)val/96.0f),"dB",1));
@@ -926,10 +970,32 @@ void custom_graph_dimensions(ValueType vt, int& w, int& h)
         w = 256;
         h = 128;
         break;
+    case VC_FormFilterClearness:
+        w = 128;
+        h = 128;
+        break;
     default:
         w = 0;
         h = 0;
     }
+}
+
+inline void grid(int x, int y, int w, int h, int sections)
+{
+        fl_color(FL_GRAY);
+
+        int j = 1;
+        int gDist = h / sections;
+        for(; j < sections; j++) /* Vertical */
+        {
+            fl_line(x, y - gDist * j, x + w, y - gDist * j);
+        }
+
+        gDist = w / sections;
+        for(j = 1; j < sections; j++) /* Horizontal */
+        {
+            fl_line(x + gDist * j, y, x + gDist * j, y - h);
+        }
 }
 
 void custom_graphics(ValueType vt, float val,int W,int H)
@@ -948,21 +1014,7 @@ void custom_graphics(ValueType vt, float val,int W,int H)
         p = powf(8.0f,(64.0f-(int)val)/64.0f);
 
         /* Grid */
-        fl_color(FL_GRAY);
-
-        int j = 1;
-        int gDist = _h / 4;
-        for(; j < 4; j++) /* Vertical */
-        {
-            fl_line(x0, y0 - gDist * j, x0 + _w, y0 - gDist * j);
-        }
-
-        gDist = _w / 4;
-        for(j = 1; j < 4; j++) /* Horizontal */
-        {
-            fl_line(x0 + gDist * j, y0, x0 + gDist * j, y0 - _h);
-        }
-
+        grid(x0,y0,_w,_h, 4);
         /*Function curve*/
         fl_color(FL_BLUE);
         if ((int)val == 127)
@@ -981,6 +1033,23 @@ void custom_graphics(ValueType vt, float val,int W,int H)
             }
             fl_end_line();
         }
+        break;
+    }
+    case VC_FormFilterClearness:
+    {
+        p = powf(10.0f, (val - 32.0f) / 48.0f); //clearness param
+        grid(x0,y0,_w,_h,10);
+        fl_color(FL_BLUE);
+        fl_begin_line();
+        x = 0;
+        float frac = 1.0f / (float)_w;
+        for(i = 0; i < _w; i++)
+        {
+            y = (atanf((x * 2.0f - 1.0f) * p) / atanf(p) + 1.0f) * 0.5f * _h;
+            fl_vertex((float)x0 + i, (float)y0 - y);
+            x += frac;
+        }
+        fl_end_line();
         break;
     }
     case VC_SubBandwidthScale:

@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0304
+header_name {.h}
 code_name {.cc}
 comment {BankUI.h} {not_in_source in_header
-} 
+}
 
-comment {BankUI.cc} {selected in_source not_in_header
-} 
+comment {BankUI.cc} {in_source not_in_header
+}
 
 comment {
 Original ZynAddSubFX author Nasca Octavian Paul
@@ -30,30 +30,30 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code.
 
-Modified February 2017
+Modified July 2017
 } {in_source in_header
-} 
+}
 
 decl {\#include <FL/Fl_Button.H>} {public local
-} 
+}
 
 decl {\#include <FL/Fl_File_Chooser.H>} {public local
-} 
+}
 
 decl {\#include <FL/Fl_Spinner.H>} {public local
-} 
+}
 
 decl {\#include "Misc/Bank.h"} {public local
-} 
+}
 
 decl {\#include "Misc/Config.h"} {public local
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public local
-} 
+}
 
 decl {\#include "MasterUI.h"} {private local
-} 
+}
 
 class BankProcess_ {} {
   Function {process(void)} {return_type {virtual void}
@@ -62,7 +62,7 @@ class BankProcess_ {} {
   }
   decl {Bank *bank;} {public local
   }
-} 
+}
 
 class BankSlot {: {public Fl_Button, BankProcess_}
 } {
@@ -191,7 +191,7 @@ class BankSlot {: {public Fl_Button, BankProcess_}
 
     if (Fl::focus() == this) draw_focus();} {}
   }
-} 
+}
 
 class RootProcess_ {} {
   Function {rootprocess(void)} {return_type {virtual void}
@@ -200,7 +200,7 @@ class RootProcess_ {} {
   }
   decl {Bank *root;} {public local
   }
-} 
+}
 
 class RootSlot {: {public Fl_Button, RootProcess_}
 } {
@@ -266,9 +266,9 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
   decl {RootProcess_ *rp;} {private local
   }
-} 
+}
 
-class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
+class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window instrumentuiwindow {
@@ -669,6 +669,7 @@ Pend->hide();}
         synth->saveBanks(synth->getUniqueId());
         readbankcfg();
         rescan_for_banks(false);
+        banklist->value(0);
     }
     activatebutton_rootdir(false);
     Pend->hide();}
@@ -1191,4 +1192,4 @@ instFrom = 0;} {}
   }
   decl {int instFrom;} {private local
   }
-} 
+}

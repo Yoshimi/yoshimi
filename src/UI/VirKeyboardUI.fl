@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0304
+header_name {.h}
 code_name {.cc}
 comment {VirKeyboard.h} {not_in_source in_header
-} 
+}
 
 comment {VirKeyboard.cc} {in_source not_in_header
-} 
+}
 
 comment {
 Original ZynAddSubFX author Nasca Octavian Paul
@@ -28,60 +28,62 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of origional ZynAddSubFX code, modified January 2017
+This file is a derivative of origional ZynAddSubFX code
+
+Modified June 2017
 } {in_source in_header
-} 
+}
 
 decl {\#include <stdlib.h>} {public local
-} 
+}
 
 decl {\#include <FL/fl_draw.H>} {public local
-} 
+}
 
 decl {\#include <FL/Fl_Box.H>} {public local
-} 
+}
 
 decl {\#include "Misc/Config.h"} {public local
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public local
-} 
+}
 
 decl {\#include "MusicIO/MidiControl.h"} {public local
-} 
+}
 
 decl {\#include "UI/WidgetPDial.h"} {public local
-} 
+}
 
 decl {\#include "UI/WidgetMWSlider.h"} {public local
-} 
+}
 
 decl {const int keyspos[12]={0,-1,1,-2,2,3,-4,4,-5,5,-6,6};} {private local
-} 
+}
 
 decl {const int keysoct1qwerty[]={'q','2','w','3','e','r','5','t','6','y','7','u','i','9','o','0','p','[','=',']','\\\\',FL_Enter,0};} {private local
-} 
+}
 
 decl {const int keysoct2qwerty[]={'z','s','x','d','c','v','g','b','h','n','j','m',',','l','.',';','/',0};} {private local
-} 
+}
 
 decl {const int keysoct1dw[]={'\\'','2',',','3','.','p','5','y','6','f','7','g','c','9','r','0','l','/',']','=','\\\\',FL_Enter,0};} {private local
-} 
+}
 
 decl {const int keysoct2dw[]={';','o','q','e','j','k','i','x','d','b','h','m','w','n','v','s','z',0};} {private local
-} 
+}
 
 decl {const int keysoct1qwertz[]={'q','2','w','3','e','r','5','t','6','z','7','u','i','9','o','0','p',252,'\\'','+','\\\\',FL_Enter,0};} {private local
-} 
+}
 
 decl {const int keysoct2qwertz[]={'y','s','x','d','c','v','g','b','h','n','j','m',',','l','.',246,'-',0};} {private local
-} 
+}
 
 decl {const int keysoct1azerty[]={'a',233,'z','\\"','e','r','(','t','-','y',232,'u','i',231,'o',224,'p',65106,'=','$',0};} {private local
-} 
+}
 
 decl {const int keysoct2azerty[]={'w','s','x','d','c','v','g','b','h','n','j',',',';','l',':','m','!',0};} {private local
-} 
+}
 
 class VirKeys {: {public Fl_Box}
 } {
@@ -211,17 +213,17 @@ for (int i = 0; i < N_OCT * 12 + 1; ++i)
         const int *keysoct1 = keysoct1qwerty;
         const int *keysoct2 = keysoct2qwerty;
 
-        if (synth->getRuntime().VirKeybLayout == 2)
+        if (synth->getRuntime().VirKeybLayout == 1)
         {
             keysoct1 = keysoct1dw;
             keysoct2 = keysoct2dw;
         }
-        else if (synth->getRuntime().VirKeybLayout == 3)
+        else if (synth->getRuntime().VirKeybLayout == 2)
         {
             keysoct1 = keysoct1qwertz;
             keysoct2 = keysoct2qwertz;
         }
-        else if (synth->getRuntime().VirKeybLayout == 4)
+        else if (synth->getRuntime().VirKeybLayout == 3)
         {
             keysoct1 = keysoct1azerty;
             keysoct2 = keysoct2azerty;
@@ -304,7 +306,7 @@ for (int i = 0; i < N_OCT * 12 + 1; ++i)
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+}
 
 class VirKeyboard {selected
 } {
@@ -529,4 +531,4 @@ virkeyboardwindow->hide();}
   }
   decl {std::string keyboardlabel;} {private local
   }
-} 
+}

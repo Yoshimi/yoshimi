@@ -36,11 +36,11 @@ On return from synth
 
 If both bits 4 & 5 are set it indicates a GUI source that needs a redraw *after* the command has been executed.
 
-bits 3-5 may also later be combined for new input sources.
-
 Within the GUI when sending, bits 0 + 1 = 3 is used to indicate that a particular control is MIDI-learnable. This will eventually be replaced by a new general limits/defaults test that is under development.
 
-Unused chars are set to 0xff as a general test.
+There is a special case where all bits are set (0xff). Anything seeing this will then silently ignore the entire command. It is used internally.
+
+Elsewhere, unused chars are set to 0xff as a general test.
 
 e.g.
 If 'part' is 0xf0 (main) and 'kit' is 0xff you're there and it is main volume, key shift etc.
@@ -48,6 +48,9 @@ If 'part' is 0xf0 (main) and 'kit' is 0xff you're there and it is main volume, k
 If part is < 0x40 and kit is 0xff it's the general part level controls.
 
 If part is < 0x40 and insert = 0x20 it's the kit engine enable controls.
+
+Microtonal (scales)
+This uses part number 0xe8
 
 Midi Learn
 This uses part number 0xd8

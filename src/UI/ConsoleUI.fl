@@ -1,9 +1,9 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0304
+header_name {.h}
 code_name {.cc}
 comment {Copyright 2011, Alan Calvert
-Copyright 2015-2016, Will Godfrey
+Copyright 2015-2017, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -17,35 +17,55 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
-} {in_source in_header
-} 
+
+Updated July 2017.} {in_source in_header
+}
 
 decl {\#include <set>} {public local
-} 
+}
 
 decl {\#include <string>} {public local
-} 
+}
+
+decl {\#include "FL/Fl_Text_Display.H"} {public local
+}
 
 decl {using namespace std;} {public local
-} 
+}
 
 decl {\#include "Misc/Config.h"} {private global
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
-class ConsoleUI {selected
+class ConsoleTextDisplay {: {public Fl_Text_Display}
 } {
+  Function {ConsoleTextDisplay(int x, int y, int w, int h, char* l = 0) : Fl_Text_Display(x,y,w,h,l)} {} {
+    code {// empty //} {}
+  }
+  Function {scroll_to_last_line()} {return_type void
+  } {
+    code {//
+    if(mVScrollBar->visible() &&
+       mVScrollBar->value() > mNBufferLines - mNVisibleLines)
+    {
+        insert_position(mBuffer->length());
+        show_insert_position();
+    }} {}
+  }
+}
+
+class ConsoleUI {} {
   Function {make_window(void)} {} {
     Fl_Window logConsole {
       label {yoshimi console}
       callback {o->hide()}
-      xywh {5 20 385 185} type Double color 54 selection_color 36 labelfont 13 labelsize 13 align 0 when 1 hide resizable
+      xywh {5 20 385 185} type Double color 54 selection_color 36 labelsize 13 align 0 when 1 hide resizable
     } {
       Fl_Text_Display logText {
-        label {log text}
-        xywh {0 0 385 185} color 54 labeltype NO_LABEL labelfont 13 labelsize 13 when 1 textfont 13 textsize 12 textcolor 35
+        xywh {0 0 385 185} color 54 labeltype NO_LABEL labelsize 13 when 1 textfont 4 textsize 12 textcolor 35
+        class ConsoleTextDisplay
       }
     }
   }
@@ -70,14 +90,14 @@ class ConsoleUI {selected
   Function {log(string msg)} {} {
     code {//
     msg += "\\n";
-    txtbuf->insert(0, msg.c_str());
-    logConsole->redraw();
-    int endpos = txtbuf->length();
-    if (endpos > (bufsize - 256))
-        txtbuf->remove(txtbuf->line_start(bufsize - 256), endpos);} {}
+    txtbuf->append(msg.c_str());
+    //Scroll to show last line unless manually scrolled elsewhere before
+    logText->scroll_to_last_line();
+    if (txtbuf->length() > (bufsize - 256))
+        txtbuf->remove(0, txtbuf->line_end(256));} {}
   }
   decl {Fl_Text_Buffer *txtbuf;} {private local
   }
   decl {int bufsize;} {private local
   }
-} 
+}

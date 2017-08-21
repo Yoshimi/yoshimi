@@ -1,0 +1,16 @@
+If you open this window, you see a graph with the controls alongside. What you can now do is control some of these by placing your mouse pointer over the yellow lines representing each formant.
+
+Hold down the left or right mouse buttons and move it sideways and you'll change the formant's centre frequency.
+
+Left button down and moving vertically will change the amplitude. Right button down and moving vertically changes the formant's Q factor.
+
+
+Anywhere on the graph, the scroll wheel changes the octave range, and holding down Shift at the same time changes the centre frequency.
+
+So now you can control most of these one-handed, quickly, while also playing on the keyboard.
+
+If your mouse has the extra buttons on the sides (mine hasn't) you can also use these to switch between the formats instead of moving the mouse across to the next one.
+
+While making these changes you'll see the respective knobs/sliders moving too, and these are still full functional.
+
+A detail that some people haven't noticed is that, uniquely, there is no 'default' value for formant frequency. This will be set quite randomly, but once saved, will be fixed like all the other controls.

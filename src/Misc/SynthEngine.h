@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified March 2017
+    Modified August 2017
 */
 
 #ifndef SYNTHENGINE_H
@@ -76,25 +76,29 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool Init(unsigned int audiosrate, int audiobufsize);
         bool actionLock(lockset request);
 
-        bool saveXML(string filename);
+        bool savePatchesXML(string filename);
         void add2XML(XMLwrapper *xml);
         void defaults(void);
 
         bool loadXML(string filename);
         void applyparameters(void);
-        int loadPatchSetAndUpdate(string filename);
+        bool loadStateAndUpdate(string filename);
+        bool saveState(string filename);
+        bool loadPatchSetAndUpdate(string filename);
+        bool loadMicrotonal(string fname);
+        bool saveMicrotonal(string fname);
         bool installBanks(int instance);
         bool saveBanks(int instance);
         void addHistory(string name, int group);
-        vector<string> * getHistory(int group);
+        vector<string> *getHistory(int group);
         string lastPatchSetSeen(void);
         bool loadHistory(void);
         bool saveHistory(void);
-        void loadVectorAndUpdate(unsigned char baseChan, unsigned char nameID);
+        unsigned char loadVectorAndUpdate(unsigned char baseChan, string name);
         unsigned char loadVector(unsigned char baseChan, string name, bool full);
-        unsigned char extractVectorData(unsigned char *baseChan, bool full, XMLwrapper *xml);
-        bool saveVector(unsigned char baseChan, string name, bool full);
-        bool insertVectorData(unsigned char baseChan, bool full, XMLwrapper *xml);
+        unsigned char extractVectorData(unsigned char baseChan, XMLwrapper *xml, string name);
+        unsigned char saveVector(unsigned char baseChan, string name, bool full);
+        bool insertVectorData(unsigned char baseChan, bool full, XMLwrapper *xml, string name);
 
         bool getfromXML(XMLwrapper *xml);
 
@@ -150,6 +154,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool isMuted(void) { return (__sync_add_and_fetch(&muted, 0) != 0); }
 
         void getLimits(CommandBlock *getData);
+        void getVectorLimits(CommandBlock *getData);
+        void getConfigLimits(CommandBlock *getData);
 
         Part *part[NUM_MIDI_PARTS];
         unsigned int fadeAll;

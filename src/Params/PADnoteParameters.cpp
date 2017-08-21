@@ -19,7 +19,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified February 2017
+    This file is a derivative of a ZynAddSubFX original.
+
+    Modified August 2017
 */
 
 #include <cmath>
@@ -217,8 +219,11 @@ float PADnoteParameters::getprofile(float *smp, int size)
         float x_before_freq_mult = x;
         // do the frequency multiplier
         x *= freqmult;
+
         // do the modulation of the profile
-        x += sinf(x_before_freq_mult * 3.1415926f * modfreq) * modpar1;
+        //x += sinf(x_before_freq_mult * 3.1415926f * modfreq) * modpar1;
+        x += sinf(x_before_freq_mult * PI * modfreq) * modpar1; // should be the same
+
         x = fmodf(x + 1000.0f, 1.0f) * 2.0f - 1.0f;
         // this is the base function of the profile
         float f;

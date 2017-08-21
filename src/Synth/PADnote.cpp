@@ -50,8 +50,6 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
     synth(_synth)
 
 {
-//    tmpwave = (float*)fftwf_malloc(synth->bufferbytes);
-
     // Initialise some legato-specific vars
     Legato.msg = LM_Norm;
     Legato.fade.length = (int)truncf(synth->samplerate_f * 0.005f); // 0.005 seems ok.
@@ -319,7 +317,6 @@ PADnote::~PADnote()
     delete NoteGlobalPar.GlobalFilterR;
     delete NoteGlobalPar.FilterEnvelope;
     delete NoteGlobalPar.FilterLfo;
-//    fftwf_free(tmpwave);
 }
 
 

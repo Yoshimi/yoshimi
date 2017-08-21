@@ -1,15 +1,14 @@
 
+NRPN channels?
+
 Fl::check() used too liberally. See where it can be removed - controls updating multiple windows seem the be the main problem.
 
-Direct access to envelope not updating Gui graph, but seems to work otherwise.
-
-Sort out direct access dynfilter->filter - controls work but don't update gui.
+Direct access to envelope not updating freemode Gui graph, but seems to work otherwise.
 
 Expand midi-learn to include:
     more switches
     learn groups
-    view by group but running search only by CC & chan
-    move lines between groups
+    GUI view by group but CLI and running search only by CC & chan
 
 Make NRPN midi learn able to be re-learned.
 
@@ -19,8 +18,7 @@ Make add voice & add/pad oscillator windows show kit number & name.
 
 Make vector window update when main window reduces number of available parts.
 
-Consider, Pitchwheel split range in Controllers, but that one seems
-a bit pointless to me!
+Consider, Pitchwheel split range in Controllers, but that one seems a bit pointless to me!
 
 Change root/bank/instrument lists to single file for all instances.
 
@@ -30,14 +28,13 @@ Startup state load doesn't set buffersize correctly - partially resolved. Size i
 
 Allow headless compilation.
 
-Add scales control to CLI.
-
 Make things like Echo delay either floats or much higher resolution.
 
 Consider enabling and disabling tooltips.
 
 Make attempt to start second independent instance open a new one in running yoshimi instead - saves memory and more consistent.
 
+Possible single state file (for standalone) including all currently open instances,
 
 RPNs (channel based)
 

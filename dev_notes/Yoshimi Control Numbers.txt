@@ -1,5 +1,6 @@
 Y/n : Range : Control : Part : Kit : Engine : Insert : Parameter : Par 2 : Function / Description
 
+Top Level
 YL : 0 to 127 : 0 : 240 : 255 : 255 : 255 : 255 : 255 : Volume
 Y : 0 to 63 : 14 : 240 : 255 : 255 : 255 : 255 : 255 : Part number
 Y : 16, 32, 64 : 15 : 240 : 255 : 255 : 255 : 255 : 255 : Number of available parts
@@ -7,29 +8,101 @@ YL : 0 to 127 : 32 : 240 : 255 : 255 : 255 : 255 : 255 : Detune frequency
 Y : -36 to 36 : 35 : 240 : 255 : 255 : 255 : 255 : 255 : Key shift
 Y : 0 to 3 : 48 : 240 : 255 : 255 : 255 : 255 : 255 : Channel Switcher Type (Solo) - Off, Row, Column, Loop
 Y : 14 to 119 : 49 : 240 : 255 : 255 : 255 : 255 : 255 : Channel Switcher Incoming CC
-Y : any : 96 : 240 : 255 : 255 : 255 : 255 : 255 : Reset (clear all)
+Y : any : 80 : 240 : 255 : 255 : 255 : 192 : msg No. : Load named patchset via miscMsg
+Y : any : 81 : 240 : 255 : 255 : 255 : 128 : msg No. : Save named patchset via miscMsg
+Y : any : 84 : 240 : 255 : 255 : 0 to 15 : 192 : msg No. : Load named vector to chan (insert) via miscMsg
+Y : any : 85 : 240 : 255 : 255 : 0 to 15 : 128 : msg No. : Save named vector to chan (insert) via miscMsg
+Y : any : 88 : 240 : 255 : 255 : 255 : 128 : msg No. : Load named scale via miscMgs
+Y : any : 89 : 240 : 255 : 255 : 255 : 128 : msg No. : Save named scale via miscMgs
+Y : any : 92 : 240 : 255 : 255 : 255 : 192 : msg No. : Load named state via miscMgs
+Y : any : 93 : 240 : 255 : 255 : 255 : 128 : msg No. : Save named state via miscMgs
+Y : any : 96 : 240 : 255 : 255 : 255 : 192 : 255 : Reset (clear all)
 Y : any : 128 : 240 : 255 : 255 : 255 : 255 : 255 : Stop
+
+Config
+Y : 256 to 16384 : 0 : 248 : 255 : 255 : 255 : 255 : 255 : Oscillator size – powers of 2
+Y : 16 to 4096 : 1 : 248 : 255 : 255 : 255 : 255 : 255 : Buffer size – powers of 2
+Y : 0/1 : 2 : 248 : 255 : 255 : 255 : 255 : 255 : PadSynth interpolation – linear, cubic
+Y : 0 to 3 : 3 : 248 : 255 : 255 : 255 : 255 : 255 : Virtual keyboard layout – QWERTY, Dvorak, QWERTZ, AZERTY
+Y : 0 to 9 : 4 : 248 : 255 : 255 : 255 : 255 : 255 : XML compression level
+Y : 0/1 : 5 : 248 : 255 : 255 : 255 : 255 : 255 : Reports destination
+
+Y : 0/1 : 16 : 248 : 255 : 255 : 255 : 255 : 255 : Start with default state (~/.config/yoshimi/yoshimi.state)
+Y : 0/1 : 17 : 248 : 255 : 255 : 255 : 255 : 255 : Hide non-fatal errors
+Y : 0/1 : 18 : 248 : 255 : 255 : 255 : 255 : 255 : Show splash screen
+Y : 0/1 : 19 : 248 : 255 : 255 : 255 : 255 : 255 : Log load times
+Y : 0/1 : 20 : 248 : 255 : 255 : 255 : 255 : 255 : Log XML headers
+Y : 0/1 : 21 : 248 : 255 : 255 : 255 : 255 : 255 : Include disabled data in XML files
+Y : 0/1 : 22 : 248 : 255 : 255 : 255 : 255 : 255 : Enable GUI
+Y : 0/1 : 23 : 248 : 255 : 255 : 255 : 255 : 255 : Enable CLI
+
+Y : any : 32 : 248 : 255 : 255 : 255 : 128 : msg No. : Jack MIDI source
+Y : 0/1 : 33 : 248 : 255 : 255 : 255 : 255 : 255 : Set as preferred MIDI
+Y : any : 34 : 248 : 255 : 255 : 255 : 128 : msg No. : JACK server
+Y : 0/1 : 35 : 248 : 255 : 255 : 255 : 255 : 255 : Set JACK as preferred audio
+Y : 0/1 : 36 : 248 : 255 : 255 : 255 : 255 : 255 : Autoconnect audio
+Y
+Y : any : 48 : 248 : 255 : 255 : 255 : 128 : msg No. : Alsa MIDI source
+Y : 0/1 : 49 : 248 : 255 : 255 : 255 : 255 : 255 : Set ALSA as preferred MIDI
+Y : any : 50 : 248 : 255 : 255 : 255 : 128 : msg No. : ALSA audio device
+Y : 0/1 : 51 : 248 : 255 : 255 : 255 : 255 : 255 : Set ALSA as preferred audio
+Y : 0 to 3 : 52 : 248 : 255 : 255 : 255 : 255 : 255 : ALSA sample rate – 192000, 96000, 48000, 44100
+
+Y : 0 to 119, other : 65 : 248 : 255 : 255 : 255 : 255 : 255 : Bank root CC – other = off
+Y : 0, 32, other : 67 : 248 : 255 : 255 : 255 : 255 : 255 : Bank CC – MSB, LSB, Off
+Y : 0/1 : 68 : 248 : 255 : 255 : 255 : 255 : 255 : Enable program change
+Y : 0/1 : 69 : 248 : 255 : 255 : 255 : 255 : 255 : Enable part on program change
+Y : 0 to 119, other : 71 : 248 : 255 : 255 : 255 : 255 : 255 : Extended program change CC – other = off
+Y : 0/1 : 72 : 248 : 255 : 255 : 255 : 255 : 255 : Ignore reset all CC’s
+Y : 0/1 : 73 : 248 : 255 : 255 : 255 : 255 : 255 : Log incoming CC’s
+Y : 0/1 : 74 : 248 : 255 : 255 : 255 : 255 : 255 : Show learn editor
+Y : any : 80 : 248 : 255 : 255 : 255 : 128 : msg No. : Save current config (any dummy message)
+
+Scales (microtonal)
+Y : 1.0 to 20000.0 : 0 : 232 : 255 : 255 : 255 : 255 : 255 : 'A’ frequency
+Y : 0 to 127 : 1 : 232 : 255 : 255 : 255 : 255 : 255 : 'A’ note
+Y : 0 / 1 : 2 : 232 : 255 : 255 : 255 : 255 : 255 : Invert keys
+Y : 0 to 127 : 3 : 232 : 255 : 255 : 255 : 255 : 255 : Key centre
+Y : -63 to 64 : 4 : 232 : 255 : 255 : 255 : 255 : 255 : Scale shift
+Y : 0 / 1 : 8 : 232 : 255 : 255 : 255 : 255 : 255 : Enable Microtonal
+
+Y : 0 / 1 : 16 : 232 : 255 : 255 : 255 : 255 : 255 : Enable keyboard mapping
+Y : 0 to 127 : 17 : 232 : 255 : 255 : 255 : 255 : 255 : Keyboard first note
+Y : 0 to 127 : 18 : 232 : 255 : 255 : 255 : 255 : 255 : Keyboard middle note
+Y : 0 to 127 : 19 : 232 : 255 : 255 : 255 : 255 : 255 : keyboard last note
+
+Y : return size/err : 32 : 232 : 255 : 255 : 255 : 128 : msg No. : Tunings
+Y : return size/err : 33 : 232 : 255 : 255 : 255 : 128 : msg No. : Keyboard map
+Y : return size/err : 48 : 232 : 255 : 255 : 255 : 255 : msg No. : Import .scl file
+Y : return size/err : 49 : 232 : 255 : 255 : 255 : 255 : msg No. : Import .kbm file
+
+Y : any : 64 : 232 : 255 : 255 : 255 : 128 : msg No. : Set name
+Y : any : 65 : 232 : 255 : 255 : 255 : 128 : msg No. : Set comment
+
+Y : any : 96 : 232 : 255 : 255 : 255 : 255 : : Clear all settings
 
 Vector control window
  :  :  : Base Channel
-n : 0 to 15 : 0 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Was Base channel Now does nothing
-n : 0 to 4 : 1 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Options - Load, Save, Recent, Clear Chan, Clear All
+n : 0 to 15 : 0 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Was Base channel Now does nothing
+n : 0 to 4 : 1 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Options - Load, Save, Recent, Clear Chan, Clear All
 
-Y : 0, 14 to 119 : 16 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X controller
-Y : any : 17 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X left instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
-Y : any : 18 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X right instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
-Y : 0/1 : 19 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 0 - off, on
-Y : 0 to 2 : 20 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 1 - off, on, reverse
-Y : 0 to 2 : 21 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 2 - off, on, reverse
-Y : 0 to 2 : 22 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 3 - off, on, reverse
+Y : any : 8 : 192 : 255 : 255 : 0 to 15 : 128 : msg No. : Displayed name
 
-Y : 0, 14 to 119 : 32 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y controller
-Y : any : 33 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y up instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
-Y : any : 34 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y down instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
-Y : 0/1 : 35 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 0 - off, on
-Y : 0 to 2 : 36 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 1 - off, on, reverse
-Y : 0 to 2 : 37 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 2 - off, on, reverse
-Y : 0 to 2 : 38 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 3 - off, on, reverse
+Y : 0, 14 to 119 : 16 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : X controller
+Y : any : 17 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : X left instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
+Y : any : 18 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : X right instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
+Y : 0/1 : 19 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : X feature 0 - off, on
+Y : 0 to 2 : 20 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : X feature 1 - off, on, reverse
+Y : 0 to 2 : 21 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : X feature 2 - off, on, reverse
+Y : 0 to 2 : 22 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : X feature 3 - off, on, reverse
+
+Y : 0, 14 to 119 : 32 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Y controller
+Y : any : 33 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Y up instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
+Y : any : 34 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Y down instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
+Y : 0/1 : 35 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Y feature 0 - off, on
+Y : 0 to 2 : 36 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Y feature 1 - off, on, reverse
+Y : 0 to 2 : 37 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Y feature 2 - off, on, reverse
+Y : 0 to 2 : 38 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Y feature 3 - off, on, reverse
 
 Main part controls
 YL : 0 to 127 : 0 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Volume
@@ -109,7 +182,7 @@ Y : any : 18 : 0 to 63 : 0 to 15 : 255 : 32 : 255 : 255 : Kit item minimum to la
 Y : any : 19 : 0 to 63 : 0 to 15 : 255 : 32 : 255 : 255 : Kit item maximum to last key press
 Y : any : 20 : 0 to 63 : 0 to 15 : 255 : 32 : 255 : 255 : Kit item clear key limits
 
-Y : 1 to 3, 127 : 24 : 0 to 63 : 0 to 15 : 255 : 32 : 255 : 255 : Effect number to use – Off, 1, 2, 3 (off = 127)
+Y : 0 to 3 : 24 : 0 to 63 : 0 to 15 : 255 : 32 : 255 : 255 : Effect number to use – Off, 1, 2, 3
 
 Y : 0/1 : 57 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Drum mode
 Y : 0 to 3 : 58 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Mode – Off, Multi, Single, Crossfade
@@ -360,7 +433,7 @@ YL : 0 to 127 : 7 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 0 : 0 to 2 : 255 : Fr
 YL : 0 to 127 : 8 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 0 : 0 to 2 : 255 : Stretch
 
 Filter parameters insert
- :  :  :  :  : See Note -> :  :  :  : This must be 136 for the filter component of DynFilter
+ :  :  :  : See Note -> :  :  :  :  : This must be 136 for the filter component of DynFilter
 YL : 0 to 127 : 0 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Centre frequency
 YL : 0 to 127 : 1 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Q
 YL : 0 to 127 : 2 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Frequency tracking

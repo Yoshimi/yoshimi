@@ -2,7 +2,7 @@
     JackEngine.cpp
 
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2017, Will Godfrey and others
+    Copyright 2014-2017, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -317,10 +317,19 @@ bool JackEngine::connectJackPorts(void)
         const char *port_name = jack_port_name(audio.ports[port + NUM_MIDI_PARTS * 2]);
         if ((ret = jack_connect(jackClient, port_name, playback_ports[port])))
         {
+            if(ret == EEXIST)
+            {
+            synth->getRuntime().Log(string(port_name)
+                        + " is already connected to jack port " + string(playback_ports[port])
+                        + ", status " + asString(ret));
+            }
+            else
+            {
             synth->getRuntime().Log("Cannot connect " + string(port_name)
                         + " to jack port " + string(playback_ports[port])
                         + ", status " + asString(ret));
             return false;
+            }
         }
     }
     return true;

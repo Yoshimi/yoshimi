@@ -26,7 +26,7 @@ Some of these will pull in other ones.
 LV2 plugin adds one more dependency:
     lv2-dev with minimum version >= 1.0.0.
 
-Optional alterative
-    libncursesw5-dev * only needed for wide (unicode) character recognition.
+Optional alterative instead of libncurses5-dev
+    libncursesw5-dev * only needed for wide (unicode) character recognition. Note the 'w'!
 
 Other distros may have slightly different names or version numbers, and may even have these installed by default. If in doubt try looking for just the main part of the name, but with the -dev extension where appropriate.

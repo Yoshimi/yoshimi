@@ -1,4 +1,4 @@
-.TH yoshimi 1 "May 2017" "yoshimi 1.5.2"
+.TH yoshimi 1 "August 2017" "yoshimi 1.5.3"
 .SH NAME
 yoshimi \- a software music synthesiser
 .SH SYNOPSIS
@@ -6,9 +6,13 @@ yoshimi \- a software music synthesiser
 .SH DESCRIPTION
 \fBYoshimi\fP is a polyphonic multi-part sound synthesiser utilising three distinct 'engines' that can be used separately or together. These can also be stacked into 'kits', typically for percussion. It fully supports both JACK and ALSA for MIDI input and audio output.
 .PP
-\fBYoshimi\fP can be run in a graphical interface, a command line interface, or with control from both. A number of controls can also be accessed via MIDI. The CLI has it's own Readline parser and built-in help system.
+\fBYoshimi\fP can be run in a graphical interface, a command line interface, or with control from both. A number of controls can also be accessed via MIDI. The CLI has its own Readline parser and built-in help system accessed by entering the commands '?' or 'help'.
 .PP
-\fBYoshimi\fP has recently gained a very extensive MIDI learn capability, exposing the majority of controls. This also has considerable post-learn editing capability.
+The CLI help system is context sensitive, and apart from reminders of common essential commands, only shows the relevant commands. However, it is possible to specifically call for help from other contexts.
+.PP
+e.g. Within the 'part' context '? config' will show the commands for configuration settings.
+.PP
+\fBYoshimi\fP has recently gained a very extensive MIDI learn capability, exposing the majority of controls. The same MIDI CC and Channel pair can be linked to multiple independent controls. There is also considerable post-learn editing capability.
 .SH COMMANDS
 .TP
 .BR \-? ", " \-\-help " Shows command syntax."
@@ -29,7 +33,7 @@ yoshimi \- a software music synthesiser
 .TP
 .BR \-I ", " \-\-gui " Enable graphical interface."
 .TP
-Attempting 'c' and 'i' will produce a warning and you will be left with the CLI only, regardless of the previous state.
+Attempting 'c' and 'i' will produce a warning, and although it is possible to run with both disabled (accepting only MIDI) it is not recommended.
 .TP
 .BR \-j ", " \-\-jack-midi[=<device>] " Use JACK MIDI input."
 .TP

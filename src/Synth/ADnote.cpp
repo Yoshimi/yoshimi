@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of original ZynAddSubFX code
-    Modified March 2017
+    Modified August 2017
 */
 
 #include <cmath>
@@ -55,10 +55,10 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
 {
     if (velocity > 1.0f)
         velocity = 1.0f;
-    tmpwavel = (float*)fftwf_malloc(synth->bufferbytes);
-    tmpwaver = (float*)fftwf_malloc(synth->bufferbytes);
-    bypassl = (float*)fftwf_malloc(synth->bufferbytes);
-    bypassr = (float*)fftwf_malloc(synth->bufferbytes);
+    //tmpwavel = (float*)fftwf_malloc(synth->bufferbytes);
+    //tmpwaver = (float*)fftwf_malloc(synth->bufferbytes);
+    //bypassl = (float*)fftwf_malloc(synth->bufferbytes);
+    //bypassr = (float*)fftwf_malloc(synth->bufferbytes);
 
     // Initialise some legato-specific vars
     Legato.msg = LM_Norm;
@@ -847,10 +847,10 @@ ADnote::~ADnote()
 {
     if (NoteEnabled)
         killNote();
-    fftwf_free(tmpwavel);
-    fftwf_free(tmpwaver);
-    fftwf_free(bypassl);
-    fftwf_free(bypassr);
+    //fftwf_free(tmpwavel);
+    //fftwf_free(tmpwaver);
+    //fftwf_free(bypassl);
+    //fftwf_free(bypassr);
     for (int k = 0; k < max_unison; ++k)
         fftwf_free(tmpwave_unison[k]);
     delete [] tmpwave_unison;
@@ -1331,43 +1331,42 @@ inline void ADnote::computeVoiceOscillatorLinearInterpolation(int nvoice)
 
  * The differences from the Linear are to little to deserve to be used.
  * This is because I am using a large zynMaster->getOscilsize(), >512
- *
+ */
 inline void ADnote::computeVoiceOscillatorCubicInterpolation(int nvoice)
 {
-    int i, poshi;
-    float poslo;
     for (int k = 0; k < unison_size[nvoice]; ++k)
     {
-        poshi = oscposhi[nvoice][k];
-        poslo = oscposlo[nvoice][k];
-        float *smps = NoteVoicePar[nvoice].OscilSmp;
-        float xm1,x0,x1,x2,a,b,c;
-        for (i = 0; i < synth->p_buffersize; ++i)
+        int    poshi = oscposhi[nvoice][k];
+        float  poslo = oscposlo[nvoice][k];
+        int    freqhi = oscfreqhi[nvoice][k];
+        int    freqlo = oscfreqlo[nvoice][k];
+        float  *smps = NoteVoicePar[nvoice].OscilSmp;
+        float  *tw = tmpwave_unison[k];
+        float  xm1, x0, x1, x2, a, b, c;
+        for (int i = 0; i < (synth->p_buffersize); ++i)
         {
-        x   m1 = smps[poshi];
+            xm1 = smps[poshi];
             x0 = smps[poshi + 1];
             x1 = smps[poshi + 2];
             x2 = smps[poshi + 3];
-            a = (3.0 * (x0 - x1) - xm1 + x2) / 2.0;
-            b = 2.0 * x1 + xm1 - (5.0 * x0 + x2) / 2.0;
-            c = (x1 - xm1) / 2.0;
-            tmpwave_unison[i][k] = (((a * poslo) + b) * poslo + c) * poslo + x0;
-            printf("a\n");
-            //tmpwave_unison[i][k] = smps[poshi] * (1.0 - poslo) + smps[poshi + 1] * poslo;
-            poslo += oscfreqlo[nvoice][k];
+            a = (3.0 * (x0 - x1) - xm1 + x2) * 0.5;
+            b = 2.0 * x1 + xm1 - (5.0 * x0 + x2) * 0.5;
+            c = (x1 - xm1) * 0.5;
+            tw[i] = (((a * poslo) + b) * poslo + c) * poslo + x0;
+            poslo += freqlo;
             if (poslo >= 1.0)
             {
-                    poslo -= 1.0;
-            ++poshi;
+                poslo -= 1.0;
+                ++poshi;
             }
-            poshi += oscfreqhi[nvoice][k];
+            poshi += freqhi;
             poshi &= synth->oscilsize - 1;
         }
         oscposhi[nvoice][k] = poshi;
         oscposlo[nvoice][k] = poslo;
     }
 }
-*/
+
 
 // Computes the Oscillator (Morphing)
 void ADnote::computeVoiceOscillatorMorph(int nvoice)
@@ -1684,6 +1683,10 @@ void ADnote::ComputeVoicePinkNoise(int nvoice)
 // Compute the ADnote samples, returns 0 if the note is finished
 int ADnote::noteout(float *outl, float *outr)
 {
+    tmpwavel = synth->getRuntime().genTmp1;
+    tmpwaver = synth->getRuntime().genTmp2;
+    bypassl = synth->getRuntime().genTmp3;
+    bypassr = synth->getRuntime().genTmp4;
     int i, nvoice;
     memset(outl, 0, synth->p_bufferbytes);
     memset(outr, 0, synth->p_bufferbytes);
@@ -1717,8 +1720,10 @@ int ADnote::noteout(float *outl, float *outr)
                         break;
                     default:
                         computeVoiceOscillatorLinearInterpolation(nvoice);
-                        // don't know how this sounds
-                        // Yoshi segfaults on it :(
+                        /*
+                         * cubic lost something over the years
+                         * it runs but sounds horrible :(
+                         */
                         //if (synth->getRuntime().Interpolation)
                             //computeVoiceOscillatorCubicInterpolation(nvoice);
                         break;

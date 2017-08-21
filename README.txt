@@ -1,3 +1,38 @@
+V 1.5.3 - Swift
+
+We have revised the whole of Microtonal (scales) for better accuracy, and fixing originally incorrect range limitations. This is now much closer to the Scala specification, although there seems to be an ambiguity when you have a keymap defined and have an inverted scale - which key is the pivot point?
+
+The GUI representation has been improved so you always see what you entered, not an approximation with strings of '9's!
+
+Microtonal settings are now fully accessible to the CLI.
+
+
+Vector control has had a makeover. Amongst other things, the name field is now editable and is stored when you save. This means it will be retained on patch sets and states as well, so when these are reloaded you will know what vectors are embedded.
+
+An entire state file can now be loaded silently in the same way as patch sets and vectors can.
+
+Further improvements to the CLI are full access to all configuration settings, and better organisation of command grouping and help lists.
+
+
+Some data was not ordinarily saved if features were disabled at the time of saving. We have added a switch to allow all data to be saved regardless. This makes for larger files of course, but does ensure that you can get an *exact* recovery if you need it.
+
+
+You can now directly interact with the formant filter graphic display in a way that is more intuitive and easier to use.
+
+The Console window now scrolls the right way! One of yoshimi's little helpers worked out how to scroll the window to keep the most recent line visible at the bottom.
+
+It is now possible to run Yoshimi stand-alone with both GUI and CLI input disabled, thus responsive only to MIDI input. In view of this we have added a new shortform NRPN that will shut it down cleanly. You simply send 68 on both NRPN CCs (99 and 98).
+
+
+Under the hood:
+
+As well as additional Gui controls transferred to the new lock-free system, some of the earlier implimentations of CLI controls have been transferred. One result is that much of the code is leaner, and easier to follow.
+
+Some needlessly dynamic memory allocations have now been changed to fixed ones. This gives a noticable reduction to DSP peaks.
+
+There are a few more old and new bugfixes. These days, there seem to be more new ones than old ones. In a sense this is actually good news.
+
+
 V 1.5.2 - Goldfinch
 
 We now implement the fairly new LV2 state:StateChanged URI
@@ -26,14 +61,6 @@ Under the hood:
 More Gui controls transferred to the new lock-free system.
 
 The usual round of ancient and modern bugfixes.
-
-To build yoshimi fetch the tarball from either:
-    http://sourceforge.net/projects/yoshimi
-Or:
-    https://github.com/Yoshimi/yoshimi
-
-Our user list archive is at:
-    https://www.freelists.org/archive/yoshimi
 
 
 V 1.5.1 - Jenny Wren
@@ -79,19 +106,3 @@ Filter tracking could never quite reach 100% so if using it to get 'notes' from 
 Many of the controls now have active tooltips that show the current value when you hover over them. Also, many have real-world terms. dB, Hz, mS etc.
 
 Finally, we have very full featured MIDI learn capability. It can be reached from the 'Yoshimi' drop-down menu, and tooltips will remind you of how it is used.
-
-
-V 1.4.1
-Lyrebird
-
-First of all, we have a new quick guide that's in Yoshimi's 'doc' directory. It's just something to help new users get started.
-
-We've always logged warnings if it wasn't possible to run either audio or MIDI, but now we also give a GUI alert.
-
-From this version onward it is possible to autoload a default state on startup, so you see Yoshimi already configured exactly as you like, with patches loaded and part destinations set.
-
-To make it easier to position patch changes in a running MIDI file, there is a new option to report the time these take to load.
-
-Vector control settings are now stored in patch set and state files.
-
-We implemented a simpler way to perform channel switching so the 'current' MIDI instrument can seem to be changed instantly, retaining the note tails of the previous one.

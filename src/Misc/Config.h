@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified March 2017
+    Modified August 2017
 */
 
 #ifndef CONFIG_H
@@ -62,10 +62,10 @@ class Config : public MiscFuncs
 
         string testCCvalue(int cc);
         string masterCCtest(int cc);
-        void saveConfig(void);
+        bool saveConfig(void);
         bool loadConfig(void);
-        void saveState() { saveSessionData(StateFile); }
-        void saveState(const string statefile)  { saveSessionData(statefile); }
+        //bool saveState() { return saveSessionData(StateFile); }
+        bool saveState(const string statefile)  { return saveSessionData(statefile); }
         bool loadState(const string statefile)
             { return restoreSessionData(statefile, false); }
         bool stateRestore(void)
@@ -104,7 +104,7 @@ class Config : public MiscFuncs
         static bool          showCLI;
 
         bool          runSynth;
-
+        bool          finishedCLI;
         int           VirKeybLayout;
 
         audio_drivers audioEngine;
@@ -132,6 +132,7 @@ class Config : public MiscFuncs
         bool          hideErrors;
         bool          showTimes;
         bool          logXMLheaders;
+        bool          xmlmax;
         bool          configChanged;
         int           rtprio;
         int           tempRoot;
@@ -147,7 +148,6 @@ class Config : public MiscFuncs
         int           NumAvailableParts;
         int           currentPart;
         int           lastPatchSet;
-        string        CLIstring;
         unsigned char channelSwitchType;
         unsigned char channelSwitchCC;
         unsigned char channelSwitchValue;
@@ -157,25 +157,35 @@ class Config : public MiscFuncs
         unsigned char dataH;
         bool          nrpnActive;
 
-        struct IOdata{
-            unsigned char vectorXaxis[NUM_MIDI_CHANNELS];
-            unsigned char vectorYaxis[NUM_MIDI_CHANNELS];
-            unsigned char vectorXfeatures[NUM_MIDI_CHANNELS];
-            unsigned char vectorYfeatures[NUM_MIDI_CHANNELS];
-            unsigned char vectorXcc2[NUM_MIDI_CHANNELS];
-            unsigned char vectorYcc2[NUM_MIDI_CHANNELS];
-            unsigned char vectorXcc4[NUM_MIDI_CHANNELS];
-            unsigned char vectorYcc4[NUM_MIDI_CHANNELS];
-            unsigned char vectorXcc8[NUM_MIDI_CHANNELS];
-            unsigned char vectorYcc8[NUM_MIDI_CHANNELS];
+        struct{
+            unsigned char Xaxis[NUM_MIDI_CHANNELS];
+            unsigned char Yaxis[NUM_MIDI_CHANNELS];
+            unsigned char Xfeatures[NUM_MIDI_CHANNELS];
+            unsigned char Yfeatures[NUM_MIDI_CHANNELS];
+            unsigned char Xcc2[NUM_MIDI_CHANNELS];
+            unsigned char Ycc2[NUM_MIDI_CHANNELS];
+            unsigned char Xcc4[NUM_MIDI_CHANNELS];
+            unsigned char Ycc4[NUM_MIDI_CHANNELS];
+            unsigned char Xcc8[NUM_MIDI_CHANNELS];
+            unsigned char Ycc8[NUM_MIDI_CHANNELS];
+            string Name[NUM_MIDI_CHANNELS];
             int Part;
             int Controller;
-            bool vectorEnabled[NUM_MIDI_CHANNELS];
-        };
-
-        IOdata nrpndata;
+            bool Enabled[NUM_MIDI_CHANNELS];
+        }vectordata;
 
         list<string> LogList;
+
+        /*
+         * These replace local memory allocations that
+         * were being made every time an add or sub note
+         * was processed. Now global so treat with care!
+         */
+        float *genTmp1;
+        float *genTmp2;
+        float *genTmp3;
+        float *genTmp4;
+
         BodyDisposal *deadObjects;
 
     private:
@@ -184,7 +194,7 @@ class Config : public MiscFuncs
         bool extractBaseParameters(XMLwrapper *xml);
         bool extractConfigData(XMLwrapper *xml);
         void addConfigXML(XMLwrapper *xml);
-        void saveSessionData(string savefile);
+        bool saveSessionData(string savefile);
         bool restoreSessionData(string sessionfile, bool startup);
         int SSEcapability(void);
         void AntiDenormals(bool set_daz_ftz);

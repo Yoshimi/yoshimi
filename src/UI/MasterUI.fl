@@ -29,8 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified May 2017
-
+Modified August 2017
 
 } {in_source in_header
 }
@@ -189,8 +188,8 @@ class MasterUI {selected : {private MiscFuncs}
       }
       partmax = synth->getRuntime().NumAvailableParts;
       filename += ".windows";
-      microtonalui = new MicrotonalUI(&synth->microtonal);
-      bankui = new BankUI(&npart, synth);;
+      microtonalui = new MicrotonalUI(&synth->microtonal, synth);
+      bankui = new BankUI(&npart, synth);
       virkeyboard = new VirKeyboard(synth);
       configui = new ConfigUI(synth);
       presetsui = new PresetsUI(synth);
@@ -203,11 +202,11 @@ class MasterUI {selected : {private MiscFuncs}
       loadWindowData();
       if(synth->getIsLV2Plugin())
       {
-      	masterwindow->label(_label);
+        masterwindow->label(_label);
       }
       else
       {
-	setMasterLabel(synth->getRuntime().paramsLoad);
+        setMasterLabel(synth->getRuntime().paramsLoad);
       }
       masterwindow->show();
 
@@ -338,7 +337,7 @@ mainCreateNewInstance(forceId);}
                 filename = fl_file_chooser("Load:", "({*.xiz})", NULL, 0);
                 if (filename == NULL)
                     return;
-	        synth->writeRBP(5, npart,miscMsgPush(filename));}
+                synth->writeRBP(5, npart,miscMsgPush(filename));}
             tooltip {Load an instrument (.xiz) file} xywh {30 30 100 20} labelsize 12
           }
           MenuItem {} {
@@ -443,13 +442,10 @@ paramsui->Show(2);}
           MenuItem {} {
             label {&Load...}
             callback {//
-    char *filename;
-    filename = fl_file_chooser("Open:", "({*.xsz})", NULL, 0);
-    if (filename == NULL)
-        return;
-    string fname = string(filename);
-    do_load_scale(fname);
-    RecentScale->activate();}
+
+    const char *filename = fl_file_chooser("Open:", "({*.xsz})", NULL, 0);
+    if (filename != NULL)
+        do_load_scale(string(filename));}
             xywh {35 35 100 20} labelsize 12
           }
           MenuItem {} {
@@ -463,17 +459,7 @@ paramsui->Show(2);}
                 if (isRegFile(string(filename)))
                     if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                         return;
-                synth->actionLock(lockmute);
-                bool result = synth->microtonal.saveXML(string(filename));
-                synth->actionLock(unlock);
-                if (!result)
-                    fl_alert("Failed to save scale settings");
-                else
-                {
-                    synth->addHistory(filename, 3);
-                    RecentScale->activate();
-                }
-                updatepanel();}
+                send_data(89, 0, 0xf0, 0xf0, 0xff, 0xff, 0x80, miscMsgPush(string(filename)));}
             xywh {25 25 100 20} labelsize 12
           }
           MenuItem RecentScale {
@@ -487,14 +473,12 @@ paramsui->Show(3);}
             callback {\#
     if (fl_choice("Set scales to the defaults?", NULL, "No", "Yes") > 1)
     {
-        synth->actionLock(lockmute);
         synth->microtonal.defaults();
         synth->setAllPartMaps();
-        synth->actionLock(unlock);
         if (NULL != microtonalui)
             delete microtonalui;
-        microtonalui = new MicrotonalUI(&synth->microtonal);
-
+        microtonalui = new MicrotonalUI(&synth->microtonal, synth);
+        send_data(96, 0, 0xd0, 0xe8);
     }}
             xywh {0 0 34 20} labelsize 12
           }
@@ -513,7 +497,6 @@ paramsui->Show(3);}
     if (fle)
     {
         setState(fle);
-        synth->addHistory(fle, 4);
         RecentState->activate();
     }
     else
@@ -528,9 +511,8 @@ paramsui->Show(3);}
                                             laststatefile.c_str(), 0);
                 if (fle)
                 {
+                    send_data(93, 0, 0xf0, 0xf0, 0xff, 0xff, 0x80, miscMsgPush(string(fle)));
                     laststatefile = string(fle);
-                    synth->getRuntime().saveState(laststatefile);
-                    synth->addHistory(laststatefile, 4);
                     RecentState->activate();
                 }}
             tooltip {Save session state} xywh {10 10 34 21} labelsize 12
@@ -561,9 +543,7 @@ paramsui->Show(4);}
           label Reset
           callback {//
     if (fl_choice("Set *ALL* dynamic values to their defaults?", NULL, "No", "Yes") > 1)
-    {
-        send_data(96, o->value(), 0xc0);
-    }}
+        send_data(96, 0, 0xf0, 0xf0, 0xff, 0xff, 0xc0);}
           tooltip {Clear all dynamic settings} xywh {7 60 70 24} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
         }
         Fl_Button {} {
@@ -597,12 +577,12 @@ paramsui->Show(4);}
           label Reports
           callback {yoshiLog->Show();}
           tooltip {Message Log} xywh {203 60 70 24} box PLASTIC_UP_BOX color 228 labelsize 11
-          code0 {if (synth->getRuntime().toConsole == false)Reports->deactivate();}
+          code0 {if (synth->getRuntime().toConsole == false){o->deactivate();yoshiLog->Hide();}}
         }
         Fl_Button vectors {
           label Vectors
           callback {//
-	vectorui->Show();}
+            vectorui->Show();}
           tooltip {Vector Setup Window} xywh {203 30 70 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
       }
@@ -706,6 +686,7 @@ paramsui->Show(4);}
             label Effect
             callback {//
               ninseff = o->value() - 1;
+              //setInsEff(ninseff);
               insefftype->value(synth->insefx[ninseff]->geteffect());
               inseffpart->value(synth->Pinsparts[ninseff] + 2);
               inseffectui->refresh(synth->insefx[ninseff], 0xf2, ninseff);
@@ -835,9 +816,9 @@ paramsui->Show(4);}
         } {}
       }
       Fl_Group partuigroup {
-        xywh {3 255 379 170} box ENGRAVED_FRAME
+        xywh {3 255 380 170} box ENGRAVED_FRAME
       } {
-        Fl_Group partui {open
+        Fl_Group partui {
           xywh {3 255 379 170} color 47
           code0 {o->init(synth->part[0],0,bankui);}
           code1 {o->show();}
@@ -1018,9 +999,10 @@ ZynAddSubFX}
       }
       Fl_Choice Panelgroups {
         label {Part Group}
-        callback {panelgroup = o->value() * NUM_MIDI_CHANNELS;
-Panelsmallgroups->value(o->value());
-updatepanel();}
+        callback {//
+                panelgroup = o->value() * NUM_MIDI_CHANNELS;
+                Panelsmallgroups->value(o->value());
+                updatepanel();}
         xywh {12 653 86 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
       } {
         MenuItem {} {
@@ -1042,9 +1024,10 @@ updatepanel();}
       }
       Fl_Choice Panelsmallgroups {
         label {Part Group}
-        callback {panelgroup = o->value() * NUM_MIDI_CHANNELS;
-Panelgroups->value(o->value());
-updatepanel();}
+        callback {//
+                panelgroup = o->value() * NUM_MIDI_CHANNELS;
+                Panelgroups->value(o->value());
+                updatepanel();}
         xywh {12 653 86 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
       } {
         MenuItem {} {
@@ -1149,16 +1132,17 @@ else if (part == 0xf2)
     eng = ninseff;
 else
     eng = 0xff;
-
 collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng, insert, parameter, par2);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
+    bool wasFromHere = getData->data.type & 0x20;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
+    unsigned char par2 = getData->data.par2;
     int nval = (int) value;
     if (npart == 0xf1)
     {
@@ -1172,6 +1156,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             {
                 sysefftype->value((int) value);
                 syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff); // needs improving
+                
             }
         }
         Fl::check();
@@ -1195,15 +1180,16 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
         Fl::check();
         return;
     }
+    string name;
 
     switch(control)
     {
-    	case 0:
-    	    mastervolumedial->value(value);
-    	    break;
+        case 0:
+            mastervolumedial->value(value);
+            break;
 
         case 14:
-    	    partuigroup->remove(partui);
+            partuigroup->remove(partui);
             delete partui;
             partui = new PartUI(0, 0, 765, 525);
             partuigroup->add(partui);
@@ -1224,11 +1210,11 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             break;
 
         case 32:
-    	    globalfinedetune->value(value);
-    	    break;
+            globalfinedetune->value(value);
+            break;
 
-    	case 35:
-    	    masterkeyshift->value(value);
+        case 35:
+            masterkeyshift->value(value);
             break;
 
         case 48:
@@ -1236,10 +1222,100 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             updatepanel();
             break;
 
-	case 96:
-	    if (npart == 0xff)
-	        return; // this is done elsewhere
-	    partNew(npart);
+        case 80:
+            name = miscMsgPop(par2);
+            if (name.find("FAILED") == 1)
+            {
+                if (wasFromHere)
+                    fl_alert("%s",name.c_str());
+            }
+            else
+            {
+                setMasterLabel(findleafname(name));
+                refresh_master_ui(0);
+            }
+
+            break;
+
+        case 81: // save patch set
+            name = miscMsgPop(par2);
+            if (name.find("FAILED") == 1)
+            {
+                if (wasFromHere)
+                    fl_alert("%s",name.c_str());
+            }
+            else
+            {
+                setMasterLabel(findleafname(name));
+                RecentParams->activate();
+                updatepanel();
+            }
+            break;
+
+        case 84: // load vector
+            name = miscMsgPop(par2);
+            if (name.find("FAILED") == 1)
+            {
+                if (wasFromHere)
+                    fl_alert("%s",name.c_str());
+            }
+            else
+            {
+                vectorui->setLoadLabelRemote(insert, synth->getRuntime().vectordata.Name[insert]);
+                vectorui->recenthistory->activate();
+                refresh_master_ui(2);
+            }
+            break;
+
+        case 85: // save vector
+            name = miscMsgPop(par2);
+            if (name.find("FAILED") == 1)
+            {
+                if (wasFromHere)
+                    fl_alert("%s",name.c_str());
+            }
+            else
+                vectorui->recenthistory->activate();
+            break;
+
+        case 88: // load scales
+            name = miscMsgPop(par2);
+            if (name.find("FAILED") == 1)
+            {
+                if (wasFromHere)
+                    fl_alert("%s",name.c_str());
+            }
+            else
+            {
+                microtonalui->Hide();
+                microtonalui->make_window();
+            }
+            break;
+
+        case 89: // save scales
+            name = miscMsgPop(par2);
+            if (wasFromHere && name.find("FAILED") == 1)
+                    fl_alert("%s",name.c_str());
+            break;
+
+        case 92: // load state
+            name = miscMsgPop(par2);
+            if (wasFromHere && name.find("FAILED") == 1)
+                fl_alert("%s",name.c_str());
+            refresh_master_ui(0);
+            break;
+
+        case 93: // save state
+            name = miscMsgPop(par2);
+            if (wasFromHere && name.find("FAILED") == 1)
+                fl_alert("%s",name.c_str());
+            break;
+
+        case 96:
+            if (npart == 240)
+                refresh_master_ui(1);
+            else if (npart < 64)
+                partNew(npart);
             break;
 
         case 128:
@@ -1247,11 +1323,11 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             vumeter->init(-1, synth);
             for(int i = 0; i < NUM_MIDI_CHANNELS; ++i)
             {
-              	if(panelwindow)
-              	{
-	         if(panellistitem[i]->partVUMeter)
-	             panellistitem[i]->partVUMeter->resetPart();
-              	 }
+                if(panelwindow)
+                {
+                    if(panellistitem[i]->partVUMeter)
+                    panellistitem[i]->partVUMeter->resetPart();
+                }
             }
             break;
     }
@@ -1273,31 +1349,31 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
         for (int npart = 0; npart < partmax; ++npart)
         {
             if (npart < NUM_MIDI_CHANNELS)
-            	panellistitem[npart]->refresh();
+                panellistitem[npart]->refresh();
             vectorui->setInstrumentLabel(npart);
         }
 
         if (synth->getRuntime().single_row_panel)
         {
-        	panelwindow->size(1085,345);
-	        Panelpack2->position(544,10);
-	        Panelclose->position(1018,314);
-	        Panelgroups->position(12,323);
-	        Panelsmallgroups->position(12,323);
-	        channelswitch->position(130,323);
-	        CSspinner->position(216,323);
-	        CSpend->position(276,321);
+                panelwindow->size(1085,345);
+                Panelpack2->position(544,10);
+                Panelclose->position(1018,314);
+                Panelgroups->position(12,323);
+                Panelsmallgroups->position(12,323);
+                channelswitch->position(130,323);
+                CSspinner->position(216,323);
+                CSpend->position(276,321);
         }
         else
         {
-	        panelwindow->size(550,675);
-	        Panelpack2->position(8,325);
-	        Panelclose->position(482,645);
-	        Panelgroups->position(12,653);
-	        Panelsmallgroups->position(12,653);
-	        channelswitch->position(130,653);
-	        CSspinner->position(216,653);
-	        CSpend->position(276,651);
+                panelwindow->size(550,675);
+                Panelpack2->position(8,325);
+                Panelclose->position(482,645);
+                Panelgroups->position(12,653);
+                Panelsmallgroups->position(12,653);
+                channelswitch->position(130,653);
+                CSspinner->position(216,653);
+                CSpend->position(276,651);
         }
 
         if (partmax == 64)
@@ -1464,14 +1540,14 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     string panel;
     if  (name.size())
     {
-    	prefix = synth->makeUniqueName(name);
-    	panel = synth->makeUniqueName("Mixer Panel - "+name);
+        prefix = synth->makeUniqueName(name);
+        panel = synth->makeUniqueName("Mixer Panel - "+name);
     }
     else
     {
-    	prefix = synth->makeUniqueName("");
-    	prefix = prefix.substr(0, prefix.length() - 3);
-    	panel = prefix + " : Mixer Panel";
+        prefix = synth->makeUniqueName("");
+        prefix = prefix.substr(0, prefix.length() - 3);
+        panel = prefix + " : Mixer Panel";
     }
     masterwindow->copy_label(prefix.c_str());
     panelwindow->copy_label(panel.c_str());
@@ -1479,17 +1555,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   }
   Function {do_load_scale(string fname)} {} {
     code {//
-    synth->actionLock(lockmute);
-    synth->microtonal.defaults(); // clear all parameters
-    bool result = synth->microtonal.loadXML(fname);
-    synth->actionLock(unlock);
-    if (NULL != microtonalui)
-        delete microtonalui;
-    microtonalui = new MicrotonalUI(&synth->microtonal);
-    if (!result)
-        fl_alert("Failed to load scale settings file");
-    else
-        synth->addHistory(fname, 3);} {}
+    send_data(88, 0, 0xf0, 0xf0, 0xff, 0xff, 0x80, miscMsgPush(fname));} {}
   }
   Function {do_load_master(bool updatehistory, const char* file)} {} {
     code {//
@@ -1502,7 +1568,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             if (fname == NULL)
                 return;
         }
-        send_data(80, 0, 0xc0, 240, 255, 255, 0, miscMsgPush(fname));} {}
+        send_data(80, 0, 0xf0, 240, 255, 255, 192, miscMsgPush(fname));} {}
   }
   Function {do_save_master(const char* file = NULL)} {} {
     code {//
@@ -1525,16 +1591,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     }
     else
         fname = file;
-    result = synth->saveXML(fname);
-    if (!result)
-        fl_alert("Could not save the file.");
-    else
-    {
-        synth->addHistory(fname, 2);
-        RecentParams->activate();
-        setMasterLabel(findleafname(synth->lastPatchSetSeen()));
-    }
-    updatepanel();} {}
+    send_data(81, 0, 0xf0, 240, 255, 255, 128, miscMsgPush(string(fname)));} {}
   }
   Function {refresh_master_ui(int type)} {} {
     code {//
@@ -1543,36 +1600,47 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     partmax = synth->getRuntime().NumAvailableParts;
     maxparts->value(partmax);
     checkmaxparts();
+
     npartcounter->value((synth->getRuntime().currentPart) + 1);
-    npartcounter->do_callback();
+    //npartcounter->do_callback();
+    int nval = synth->getRuntime().currentPart;
+    synth->getRuntime().currentPart = nval;
+    partNew(nval);
+
     nsyseff = 0;
     syseffnocounter->value(nsyseff + 1);
-    syseffnocounter->do_callback();
+    //syseffnocounter->do_callback();
+    sysefftype->value(synth->sysefx[nsyseff]->geteffect());
+    syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff);
+
     ninseff = 0;
     inseffnocounter->value(nsyseff + 1);
-    inseffnocounter->do_callback();
+    //inseffnocounter->do_callback();
+    setInsEff(ninseff);
+
     sysinsgroup->value(SystemEffectsGrp);
-    sysinsgroup->do_callback();
+    //sysinsgroup->do_callback();
+    showSysEfxUI();
+
     masterkeyshift->value(synth->Pkeyshift - 64);
     mastervolumedial->value(synth->Pvolume);
     globalfinedetune->value(synth->microtonal.Pglobalfinedetune);
-    microtonalui = new MicrotonalUI(&synth->microtonal);
+    microtonalui = new MicrotonalUI(&synth->microtonal, synth);
     if (type & 0x80)
         setMasterLabel(miscMsgPop((type >> 8) & 0xff));
     else
-    	setMasterLabel(findleafname(synth->lastPatchSetSeen()));
+        setMasterLabel(findleafname(synth->lastPatchSetSeen()));
     updatesendwindow();
     updatepanel();
-    vectorui->updateAll();
+    if (!(type & 2))
+        vectorui->RefreshChans();
     bankui->Hide();
     if (synth->getRuntime().toConsole == false)
         Reports->deactivate();
     else
         Reports->activate();
     if (type & 1)
-    	configui->update_config(4);
-    if (type & 2)
-        vectorui->setLoadLabelRemote(type >> 16, miscMsgPop((type >> 8) & 0xff));} {}
+        configui->update_config(4);} {}
   }
   Function {checkmaxparts()} {return_type bool
   } {
@@ -1658,6 +1726,29 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             }
         }} {}
   }
+  Function {setInsEff(int effnum)} {} {
+    code {//
+              int ninseff = effnum;
+              insefftype->value(synth->insefx[ninseff]->geteffect());
+              inseffpart->value(synth->Pinsparts[ninseff] + 2);
+              inseffectui->refresh(synth->insefx[ninseff], 0xf2, ninseff);
+              if (synth->Pinsparts[ninseff] != -1)
+              {
+                insefftype->activate();
+                inseffectui->activate();
+                inseffectuigroup->activate();
+              }
+              else
+              {
+                insefftype->deactivate();
+                inseffectui->deactivate();
+                inseffectuigroup->deactivate();
+              }} {}
+  }
+  Function {setState(string filename)} {} {
+    code {//
+    send_data(92, 0, 0xf0, 0xf0, 0xff, 0xff, 0xc0, miscMsgPush(filename));} {}
+  }
   Function {setPartWindowTitle(string prefix)} {return_type string
   } {
     code {//
@@ -1717,16 +1808,24 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     code {//
     panellistitem[_npart % NUM_MIDI_CHANNELS]->setPartLabel(_engine);} {}
   }
+  Function {setLogging(bool isConsole)} {} {
+    code {//
+                 if (isConsole)
+                 {
+                     Reports->activate();
+                     yoshiLog->Show();
+                 }
+                 else
+                 {
+                     Reports->deactivate();
+                     yoshiLog->Hide();
+                 }
+                 Fl::check();} {}
+  }
   Function {showInstrumentEditWindow(int _npart)} {} {
     code {//
         if (_npart == npart)
             partui->instrumenteditwindow->show();} {}
-  }
-  Function {setState(string filename)} {} {
-    code {//
-    laststatefile = string(filename);
-    synth->getRuntime().loadState(filename);
-    synth->getGuiMaster()->refresh_master_ui(0x80 | (miscMsgPush(findleafname(filename)) << 8));} {}
   }
   Function {updateBankRootDirs()} {} {
     code {bankui->readbankcfg();} {}
@@ -1948,7 +2047,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
              midilearnui->midilearnwindow->visible());
 
     if (partui->ctlwindow->x())
-    	putData("controllers",
+        putData("controllers",
                  partui->ctlwindow->x(),
                  partui->ctlwindow->y(),
                  partui->ctlwindow->visible());
@@ -1959,7 +2058,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
                  controllersO);
 
     if (partui->ctlwindow->x())
-    	putData("midcontrols",
+        putData("midcontrols",
                  partui->ctlmidi->x(),
                  partui->ctlmidi->y(),
                  partui->ctlmidi->visible());
@@ -2022,28 +2121,28 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     code {//
     if (NewWindows)
     {
-    	X = 1;
-    	Y = 1;
-    	O = 0;
+        X = 1;
+        Y = 1;
+        O = 0;
     }
     if (!ok)
         return false;
 
     ok = (fgets(word, 20, windows) != NULL);
     if (ok)
-    	ok = strstr(word, name.c_str());
+        ok = strstr(word, name.c_str());
     if (true)
     {
         ok = false;
         if (fgets(word, 20, windows) != NULL)
-    	    X = atoi(word);
+            X = atoi(word);
         if (fgets(word, 20, windows) != NULL)
-    	    Y = atoi(word);
-    	if (fgets(word, 20, windows) != NULL)
-    	{
-    	    O = atoi(word);
-    	    ok = true;
-    	}
+            Y = atoi(word);
+        if (fgets(word, 20, windows) != NULL)
+        {
+            O = atoi(word);
+            ok = true;
+        }
     }
     return ok;} {}
   }

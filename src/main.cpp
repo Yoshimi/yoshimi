@@ -2,6 +2,7 @@
     main.cpp
 
     Copyright 2009-2011, Alan Calvert
+    Copyright 2014-2017, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -15,6 +16,8 @@
 
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+
+    Modified May 2017
 */
 
 #include <sys/mman.h>
@@ -216,7 +219,7 @@ static void *mainGuiThread(void *arg)
         else
             usleep(33333);
     }
-    if (firstSynth->getRuntime().configChanged)
+    if (firstSynth->getRuntime().configChanged && (bShowGui | bShowCmdLine)) // don't want this if no cli or gui
     {
         size_t tmpRoot = firstSynth->ReadBankRoot();
         size_t tmpBank = firstSynth->ReadBank();
@@ -344,13 +347,13 @@ int main(int argc, char *argv[])
     firstSynth = it->first;
     bShowGui = firstRuntime->showGui;
     bShowCmdLine = firstRuntime->showCLI;
-    if (!(bShowGui | bShowCmdLine))
+    /*if (!(bShowGui | bShowCmdLine))
     {
         cout << "Can't disable both gui and command line!\nSet for command line.\n";
         firstRuntime->showCLI = true;
         bShowCmdLine = true;
         firstRuntime->configChanged = true;
-    }
+    }*/
 
     if(sem_init(&semGui, 0, 0) == 0)
     {

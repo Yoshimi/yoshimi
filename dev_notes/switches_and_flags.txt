@@ -1,0 +1,42 @@
+Details of some of the internal controls.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+partonoffLock(int npart, int what)
+  A semaphore locked version of:
+
+
+partonoffWrite((int npart, int what)
+  This sets or clears a part's status in one of 4 ways
+  depending on the value of 'what'.
+
+  Zero will always turn the part off, and 1 will always turn it on.
+
+  -1 moves it toward off and 2 moves it towards on.
+
+  The rationale here is that if a part status is unknown to a function, but it wants to perform an operation that needs the part to be off, but then wants to restore it to its original condition, it first uses -1. If it was already off it makes no difference, but if it was on it is now turned off. Once the operation has been completed it uses 2 to restore the original state, so if it was off, it still is, but if it was on it is now on again.
+
+  If you want to set its state regardless of the previous setting (such as switching by a user) you use 0 and 1.
+
+
+partonoffRead(int npart)
+  This returns the part's current status as either 0 or 1.
+
+  Be aware that the audio loop takes a copy of each part's state at the beginning of a period, and then uses that for all operations within that period, so any changes to partonoff will be ignored until the next period. This ensures there can be no inconsistencies.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+flagsWrite()
+flagsRead()
+flagsReadClear()
+
+These functions provide a link from the realtime thread, to a low priority one. Currently defined values are:
+
+npart | (kititem << 8)  range (0 to 0xf3f)
+  set a parts Pad parameters.
+
+npart | 0x2000          range (0x2000 to 0x203f)
+  set a part to the default instrument.
+
+0xf0000000 {not yet implemented}
+  system reset (via MIDI)

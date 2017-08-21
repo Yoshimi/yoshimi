@@ -1,0 +1,8 @@
+
+"Microtonal Tuning.scl" and "Microtonal Keymap.kbm" are a pair of Scala compatible files that can be imported to Yoshimi once Microtonal is enabled in the Scales window.
+
+The Tuning is a variation on the Even Tempered scale and incudes name and description fields.
+
+The keymap file changes the relative positions (or omits) the notes in the octave. As this example takes two notes out it will shift the entire scale.
+
+Finally, "Microtonal Ratio Scale.xsz" is a complete, purely integer ratio scale, that is a very close approximation to the Even Tempered scale. You can tell just how close it is by loading it, then alternately switching Microtonal Enable off and on.

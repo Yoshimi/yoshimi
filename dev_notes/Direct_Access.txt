@@ -2,9 +2,9 @@ This is a test feature only accessible from the command line.
 
                             *** WARNING ***
 
-There are virtually no error checks on this so you can easily crash Yoshimi with out of range values!
+There are very limited error checks on this so you can easily crash Yoshimi with out of range values! However, many 'ordindary' values are now range checked and adusted. So you you try to set master volume to (say) 200 it will actually be set to 127.
 
-It mostly updates the GUI too.
+It mostly updates the GUI.
 
 Refer to "Yoshimi Control Numbers.ods" for control numbers and actions and "GUI_Interpretations.txt" for further explanations.
 
@@ -13,6 +13,9 @@ Also, see "Effect_Inserts" for the actual effect controllers and "Envelope_Inser
 Sections currently in place and tested:
 
 Top level controls
+Config - now used by GUI for writes
+Vectors
+Microtonal (scales) - now used by GUI for writes
 Midi-learn - used for all operations
 Main part controls - now used by GUI for writes
 Controllers Window - now used by GUI for writes
@@ -31,11 +34,9 @@ Envelopes
 
 The remaining ones will display as if they had been written to, but won't actually change anything.
 
-This matches the results from using the middle mouse button in the GUI (assuming it was enabled at build time). Commands that are purely within the GUI,e.g window changes are recognised but not acted on. It is expected that any alternative input system will store its own copies of such intermediate information so that they remain fully independent.
+This matches the results from using the middle mouse button in the GUI (assuming it was enabled at build time). Some commands that are purely within the GUI, e.g window changes are recognised but not acted on. It is expected that any alternative input system will store its own copies of such intermediate information so that they remain fully independent.
 
-An alternative way to find out the correct command sequence is to click on a control with any button *except* the middle one. Trailing '255's can be ommitted if there are no following parameters set.
-
-In some situations par2 is used as a miscMsg ID for passing text values between threads but synchronised via the RT thread.
+If compiled with 'ShowGuiRreports' enabled, an alternative way to find out the correct command sequence is to click on a control with any button *except* the middle one. Trailing '255's can be ommitted if there are no following parameters set.
 
 
 The format is:
@@ -44,9 +45,10 @@ direct {value} {type} {control} {part} {kit} {engine} {insert} {parameter} {par2
 
 direct = the actual command name, must be typed in full.
 
-value = the value that will be set, may be negative and floating point (looks for the decimal point).
+value = the value that will be set, may be negative and/or floating point (looks for the decimal point).
 
-type = a subset of the command type: 0 for read and 64 for write. Sending 1 will just echo the bytes you sent.
+type = a subset of the command type: 0 for read and 64 for write.
+Sending 1 will just echo the bytes you sent.
 Sending 3 will turn it into a midi-learn command.
 
 control = the number representing the control being changed or queried.
@@ -60,26 +62,15 @@ kit = a part's kit number (if enabled otherwise zero).
 
 engine = the synth engine being adjusted.
 
-insert = harmonics, LFOs, filters etc.
+insert = harmonics, LFOs, filters etc. also some kit mode controls.
 
 parameter = subtype associated with some inserts.
 
 par2 = an offset for some parameters.
 
+In some situations par2 is used as a miscMsg ID for passing text values between threads but synchronised via the RT thread. A failed push will return 255 and trying to pop 255 will return an empty string.
 
-A variation of the above is when you set flt_max as the value. This will be interpreted as requesting the min, max, and default values for the command, and using the same 'CommandBlock' struct will return them as short integers in the form:
-limits.min
-limits.max
-limits.def (x10)
+If parameter has bit 7 set the command is passed to and alternative low priority function as there will be considerable text manipulation. If bit 6 is also set it will pass through a fade down and mute operation to aviod writing data to the audio engine when active. The return will go via this alternative text heavy route.
 
-From the command line enter at least the first three characters of "limits" in place of both value and type.
 
-Most of these up to 'engine' level are independently declared, all the rest have the values:
-min = 0
-max = 127
-def = 0
-
-def returns the actual default * 10. This is so that fractional values can be resolved. 0.5 comes up quite often. However the printed command line response will be the actual value. Default values (and the others) may be negative.
-
-'data.type' is returned with the read/write bit (0x40) used to tell whether this control is MIDI-learnable, and the float/integer bit (0x80) is correctly identified. All the other bits are returned as sent.
-
+Limits testing now has it's own entry. See Limits.txt.

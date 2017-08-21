@@ -1,0 +1,125 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ZynAddSubFX-data>
+<ZynAddSubFX-data version-major="3" version-minor="0"
+ZynAddSubFX-author="Nasca Octavian Paul"
+Yoshimi-author="Alan Ernest Calvert" Yoshimi-major="1" Yoshimi-minor="5">
+<INFORMATION>
+<string name="XMLtype">Scales</string>
+</INFORMATION>
+<BASE_PARAMETERS>
+<par name="max_midi_parts" value="16" />
+<par name="max_kit_items_per_instrument" value="16" />
+<par name="max_system_effects" value="4" />
+<par name="max_insertion_effects" value="8" />
+<par name="max_instrument_effects" value="3" />
+<par name="max_addsynth_voices" value="8" />
+</BASE_PARAMETERS>
+<MICROTONAL>
+<string name="name">12tET</string>
+<string name="comment">Ratio scale</string>
+<par_bool name="invert_up_down" value="no" />
+<par name="invert_up_down_center" value="60" />
+<par_bool name="enabled" value="yes" />
+<par name="global_fine_detune" value="64" />
+<par name="a_note" value="69" />
+<par_real name="a_freq" value="      440" exact_value="0x43DC0000" />
+<SCALE>
+<par name="scale_shift" value="64" />
+<par name="first_key" value="0" />
+<par name="last_key" value="127" />
+<par name="middle_note" value="60" />
+<OCTAVE>
+<par name="octave_size" value="12" />
+<DEGREE id="0">
+<par name="numerator" value="196" />
+<par name="denominator" value="185" />
+</DEGREE>
+<DEGREE id="1">
+<par name="numerator" value="211" />
+<par name="denominator" value="188" />
+</DEGREE>
+<DEGREE id="2">
+<par name="numerator" value="226" />
+<par name="denominator" value="190" />
+</DEGREE>
+<DEGREE id="3">
+<par name="numerator" value="247" />
+<par name="denominator" value="196" />
+</DEGREE>
+<DEGREE id="4">
+<par name="numerator" value="259" />
+<par name="denominator" value="194" />
+</DEGREE>
+<DEGREE id="5">
+<par name="numerator" value="263" />
+<par name="denominator" value="186" />
+</DEGREE>
+<DEGREE id="6">
+<par name="numerator" value="355" />
+<par name="denominator" value="237" />
+</DEGREE>
+<DEGREE id="7">
+<par name="numerator" value="327" />
+<par name="denominator" value="206" />
+</DEGREE>
+<DEGREE id="8">
+<par name="numerator" value="375" />
+<par name="denominator" value="223" />
+</DEGREE>
+<DEGREE id="9">
+<par name="numerator" value="335" />
+<par name="denominator" value="188" />
+</DEGREE>
+<DEGREE id="10">
+<par name="numerator" value="353" />
+<par name="denominator" value="187" />
+</DEGREE>
+<DEGREE id="11">
+<par name="numerator" value="2" />
+<par name="denominator" value="1" />
+</DEGREE>
+</OCTAVE>
+<KEYBOARD_MAPPING>
+<par name="map_size" value="12" />
+<par name="mapping_enabled" value="0" />
+<KEYMAP id="0">
+<par name="degree" value="0" />
+</KEYMAP>
+<KEYMAP id="1">
+<par name="degree" value="1" />
+</KEYMAP>
+<KEYMAP id="2">
+<par name="degree" value="2" />
+</KEYMAP>
+<KEYMAP id="3">
+<par name="degree" value="3" />
+</KEYMAP>
+<KEYMAP id="4">
+<par name="degree" value="4" />
+</KEYMAP>
+<KEYMAP id="5">
+<par name="degree" value="5" />
+</KEYMAP>
+<KEYMAP id="6">
+<par name="degree" value="6" />
+</KEYMAP>
+<KEYMAP id="7">
+<par name="degree" value="7" />
+</KEYMAP>
+<KEYMAP id="8">
+<par name="degree" value="8" />
+</KEYMAP>
+<KEYMAP id="9">
+<par name="degree" value="9" />
+</KEYMAP>
+<KEYMAP id="10">
+<par name="degree" value="10" />
+</KEYMAP>
+<KEYMAP id="11">
+<par name="degree" value="11" />
+</KEYMAP>
+</KEYBOARD_MAPPING>
+</SCALE>
+</MICROTONAL>
+</ZynAddSubFX-data>
