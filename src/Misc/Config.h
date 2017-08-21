@@ -64,7 +64,7 @@ class Config : public MiscFuncs
         string masterCCtest(int cc);
         bool saveConfig(void);
         bool loadConfig(void);
-        bool saveState() { return saveSessionData(StateFile); }
+        //bool saveState() { return saveSessionData(StateFile); }
         bool saveState(const string statefile)  { return saveSessionData(statefile); }
         bool loadState(const string statefile)
             { return restoreSessionData(statefile, false); }

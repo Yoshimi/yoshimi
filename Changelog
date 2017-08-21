@@ -1,4 +1,9 @@
-yoshimi 1.5.3 rc3
+yoshimi 1.5.3
+
+2017-8-21 Will
+* Final clean-up.
+* Final doc updates.
+* Set Version 1.5.3 release.
 
 2017-8-20 Will.
 * Improved state saving extension checks.
