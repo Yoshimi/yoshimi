@@ -1177,7 +1177,7 @@ string InterChange::resolveConfig(CommandBlock *getData)
             yesno = true;
             break;
         case 73:
-            contstr += "Log incomming CCs";
+            contstr += "Log incoming CCs";
             yesno = true;
             break;
         case 74:

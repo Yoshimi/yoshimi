@@ -127,7 +127,7 @@ string configlist [] = {
     "ACtivate [s]",             "program change activates part (Enable {other})",
     "Extended [s]",             "extended program change (Enable {other})",
     "Quiet [s]",                "ignore 'reset all controllers' (Enable {other})",
-    "Log [s]",                  "incomming MIDI CCs (Enable {other})",
+    "Log [s]",                  "incoming MIDI CCs (Enable {other})",
     "SHow [s]",                 "GUI MIDI learn editor (Enable {other})",
     "end"
 };
@@ -159,7 +159,7 @@ string partlist [] = {
 string learnlist [] = {
     "MUte <s>",                 "Enable/Disable this line (Enable, {other})",
     "7Bit",                     "Set incoming NRPNs as 7 bit (Enable, {other})",
-    "CC <n2>",                  "Set incoming controler value",
+    "CC <n2>",                  "Set incoming controller value",
     "CHan <n2>",                "Set incoming channel number",
     "MIn <n2>",                 "Set minimm percentage",
     "MAx <n2>",                 "set maximum percentage",
