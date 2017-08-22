@@ -27,9 +27,9 @@ It is now possible to run Yoshimi stand-alone with both GUI and CLI input disabl
 
 Under the hood:
 
-As well as additional Gui controls transferred to the new lock-free system, some of the earlier implimentations of CLI controls have been transferred. One result is that much of the code is leaner, and easier to follow.
+As well as additional Gui controls transferred to the new lock-free system, some of the earlier implementations of CLI controls have been transferred. One result is that much of the code is leaner, and easier to follow.
 
-Some needlessly dynamic memory allocations have now been changed to fixed ones. This gives a noticable reduction to DSP peaks.
+Some needlessly dynamic memory allocations have now been changed to fixed ones. This gives a noticeable reduction to DSP peaks.
 
 There are a few more old and new bugfixes. These days, there seem to be more new ones than old ones. In a sense this is actually good news.
 
