@@ -26,7 +26,7 @@ AddSynth Voice Editor
 Subsynth Editor - now used by GUI for writes
 Padsynth Editor
 Oscillator
-Resonance
+Resonance - now used by GUI for writes
 Effects
 LFOs
 Filters

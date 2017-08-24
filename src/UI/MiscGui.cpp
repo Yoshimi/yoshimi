@@ -83,7 +83,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
     putData.data.insert = insert;
     putData.data.parameter = parameter;
     putData.data.par2 = par2;
-//cout << "here" << int(type) << " " << int(control) << " " << int(part) << " " << int(parameter) << " " << int(par2) << endl;
+//cout << "collect_data " << int(type) << " " << int(control) << " " << int(part) << " " << int(kititem) << " " << int(engine) << " " << int(parameter) << " " << int(par2) << endl;
     if (jack_ringbuffer_write_space(synth->interchange.fromGUI) >= commandSize)
         jack_ringbuffer_write(synth->interchange.fromGUI, (char*) putData.bytes, commandSize);
 }

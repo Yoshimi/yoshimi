@@ -11,7 +11,7 @@ comment {PADNoteUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2015-2016, Will Godfrey
+Copyright 2015-2017, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-Modified April 2017
+Modified August 2017
 } {in_source in_header
 }
 
@@ -1272,18 +1272,26 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
 
     	case 48:
     	    hrpospar1->value(lrint(value));
+    	    overtonepos->redraw();
+            cbwidget->do_callback();
     	    break;
 
     	case 49:
     	    hrpospar2->value(lrint(value));
+    	    overtonepos->redraw();
+            cbwidget->do_callback();
     	    break;
 
     	case 50:
     	    hrpospar3->value(lrint(value));
+    	    overtonepos->redraw();
+            cbwidget->do_callback();
     	    break;
 
     	case 51:
     	    hrpostype->value(lrint(value));
+    	    overtonepos->redraw();
+            cbwidget->do_callback();
     	    break;
 
     	case 64:

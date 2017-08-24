@@ -1,6 +1,14 @@
+still not fully converted:
+    commandPad
+    commandOscillator
+    commandFilter - should be possible now
+    commandEnvelope
+    commandSysIns
+    commandEffects
+
 Do a dual scan for banks so that IDd ones are found first, then any new ones picked up on the second scan. This stops known ones being re-ordered.
 
-Allow both jack and als midi at trhe same time?
+Allow both jack and alsa midi at the same time?
 
 NRPN channels?
 
