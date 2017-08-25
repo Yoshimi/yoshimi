@@ -353,47 +353,6 @@ n=0;part=NULL;} {}
     padeditbutton->deactivate();
     sendtoeffect->value(1);} {}
   }
-  Function {refresh()} {} {
-    code {//
-        enabledcheck->value(part->kit[n].Penabled == 1);
-        if (part->kit[n].Penabled != 1)
-            partkititemgroup->deactivate();
-        else
-            partkititemgroup->activate();
-        mutedcheck->value(part->kit[n].Pmuted);
-        labelbutton->label(part->kit[n].Pname.c_str());
-        minkcounter->value(part->kit[n].Pminkey);
-        maxkcounter->value(part->kit[n].Pmaxkey);
-        adcheck->value(part->kit[n].Padenabled);
-        adcheck->do_callback();
-        subcheck->value(part->kit[n].Psubenabled);
-        subcheck->do_callback();
-
-        sendtoeffect->value(part->kit[n].Psendtoparteffect + 1);
-        if (part->kit[n].Psendtoparteffect == 127)
-            sendtoeffect->value(0);
-        this->redraw();} {
-      callback {//
-          int answer = 1;
-            if (!o->value())
-                answer = (fl_choice("Delete the item?", NULL, "No", "Yes") > 1);
-            if (answer)
-            {
-                synth->actionLock(lockmute);
-                part->setkititemstatus(n, o->value());
-                synth->actionLock(unlock);
-
-                if (!o->value())
-                    partkititemgroup->deactivate();
-                else
-                    partkititemgroup->activate();
-                o->redraw();
-                partui->showparameters(n, -1); // use to delete the ui, if it is not to item 0
-            }
-            else
-                o->value(1);}
-    }
-  }
   Function {init(Part *part_, int n_, int npart_, PartUI_ *partui_)} {} {
     code {//
       synth = part_->getSynthEngine();
@@ -1009,12 +968,7 @@ send_data(198, o->value(), 0xc8);}
       }
       Fl_Choice insefftype {
         callback {//
-    synth->actionLock(lockmute);
-    part->partefx[ninseff]->changeeffect(o->value());
-    synth->actionLock(unlock);
-    inseffectui->refresh(part->partefx[ninseff], npart, ninseff);
-
-    send_data(65, o->value(), 0xc0, 0xff, ninseff);}
+                send_data(65, o->value(), 0xd0, 0xff, ninseff);}
         tooltip {Effect Type} xywh {104 8 95 22} box UP_BOX down_box BORDER_BOX labelsize 11
         code0 {o->value(part->partefx[ninseff]->geteffect());}
       } {

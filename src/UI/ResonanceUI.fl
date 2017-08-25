@@ -284,7 +284,7 @@ this->applybutton=applybutton;} {}
   }
 }
 
-class ResonanceUI {open : PresetsUI_
+class ResonanceUI {selected : PresetsUI_
 } {
   Function {make_window()} {} {
     Fl_Window resonancewindow {
@@ -491,23 +491,15 @@ send_data(21, o->value(), 0xd0);}
       }
     }
   }
-  Function {send_data(int control, float value, int type)} {open
-  } {
+  Function {send_data(int control, float value, int type)} {} {
     code {//
 int insert;
 if (control == 104)
-{
     insert = 0xff;
-    type = 0xd1; // temp until padsynth complete
-}
 else
-{
     insert = 8;
-    type = type | Fl::event_button();
-}
 
-collect_data(synth, value, (type), control, npart, kititem, engine, insert);} {selected
-    }
+collect_data(synth, value, (type | Fl::event_button()), control, npart, kititem, engine, insert);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//

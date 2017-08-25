@@ -1,5 +1,9 @@
 yoshimi 1.5.3 M
 
+2017-8-25 Will
+* Removed duplicated effects command from GUI.
+* PadSynth conversion completed.
+
 2017-8-24 Will
 * Corrected GUI value for CLI resonance centre freq.
 * Resonance converted to lock-free.

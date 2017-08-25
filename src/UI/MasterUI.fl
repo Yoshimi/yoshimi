@@ -355,12 +355,11 @@ mainCreateNewInstance(forceId);}
     if (isRegFile(string(filename)))
         if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
             return;
-    synth->actionLock(lockmute);
+
     bool result = synth->part[npart]->saveXML(string(filename));
-    synth->actionLock(unlock);
+
     if (!result)
-        fl_alert("Failed to save instrument file");
-    updatepanel();}
+        fl_alert("Failed to save instrument file");}
             tooltip {Save current instrument to an .xiz file} xywh {20 20 100 20} labelsize 12
           }
           MenuItem {} {
@@ -1156,7 +1155,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             {
                 sysefftype->value((int) value);
                 syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff); // needs improving
-                
+
             }
         }
         Fl::check();

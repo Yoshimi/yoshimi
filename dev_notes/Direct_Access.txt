@@ -24,11 +24,11 @@ Kit edit window - now used by GUI for writes
 AddSynth Editor - now used by GUI for writes
 AddSynth Voice Editor
 Subsynth Editor - now used by GUI for writes
-Padsynth Editor
+Padsynth Editor - now used by GUI for writes
 Oscillator
 Resonance - now used by GUI for writes
 Effects
-LFOs
+LFOs - now used by GUI for writes
 Filters
 Envelopes
 

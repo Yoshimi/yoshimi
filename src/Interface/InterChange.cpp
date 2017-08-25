@@ -3060,7 +3060,7 @@ void InterChange::setpadparams(int point)
     int npart = point & 0xff;
     int kititem = point >> 8;
     synth->part[npart]->kit[kititem].padpars->applyparameters(false);
-    synth->partonoffWrite(npart, 1);
+    synth->partonoffWrite(npart, 2);
 }
 
 
@@ -5324,10 +5324,9 @@ void InterChange::commandSub(CommandBlock *getData)
 
 void InterChange::commandPad(CommandBlock *getData)
 {
-#pragma message "Gui writes changed to reads"
+/*#pragma message "Gui writes changed to reads"
     if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;
-
+        getData->data.type = getData->data.type & 0xbf;*/
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -5581,7 +5580,7 @@ void InterChange::commandPad(CommandBlock *getData)
         case 104: // setpadparams(
             if (write)
             {
-                synth->partonoffWrite(npart, 0);
+                synth->partonoffWrite(npart, -1);
                 flagsWrite(npart | (kititem << 8));
             }
             break;

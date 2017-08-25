@@ -1,10 +1,16 @@
 still not fully converted:
-    commandPad
     commandOscillator
     commandFilter - should be possible now
-    commandEnvelope
-    commandSysIns
-    commandEffects
+    commandEnvelope - freemode gui still a problem
+    commandSysIns - should be possible now
+    commandEffects - should be possible now
+
+AddSynth Bend/offset not working :(
+
+enable cli saving of pad sample set
+transfer instrument external load/save
+
+Requested: revise window states so engines etc can be made auto open.
 
 Do a dual scan for banks so that IDd ones are found first, then any new ones picked up on the second scan. This stops known ones being re-ordered.
 
