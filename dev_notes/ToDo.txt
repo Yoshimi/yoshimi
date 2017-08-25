@@ -5,8 +5,6 @@ still not fully converted:
     commandSysIns - should be possible now
     commandEffects - should be possible now
 
-AddSynth Bend/offset not working :(
-
 enable cli saving of pad sample set
 transfer instrument external load/save
 

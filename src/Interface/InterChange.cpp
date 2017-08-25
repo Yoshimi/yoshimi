@@ -4845,6 +4845,18 @@ void InterChange::commandAddVoice(CommandBlock *getData)
                 value = k;
             }
             break;
+        case 38:
+            if (write)
+                pars->VoicePar[nvoice].PBendAdjust = value_int;
+            else
+                value = pars->VoicePar[nvoice].PBendAdjust;
+            break;
+        case 39:
+            if (write)
+                pars->VoicePar[nvoice].POffsetHz = value_int;
+            else
+                value = pars->VoicePar[nvoice].POffsetHz;
+            break;
         case 40:
             if (write)
                 pars->VoicePar[nvoice].PFreqEnvelopeEnabled = value_int;
