@@ -1,5 +1,8 @@
 yoshimi 1.5.3 M
 
+2017-8-26 Will
+* Adjusted logging on memory error merge from iurien.
+
 2017-8-25 Will
 * Removed duplicated effects command from GUI.
 * PadSynth conversion completed.

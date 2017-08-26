@@ -786,7 +786,7 @@ void Config::Log(const string &msg, char tostderr)
 
 void Config::LogError(const string &msg)
 {
-    Log("[ERROR] " + msg, 3);
+    Log("[ERROR] " + msg, 1);
 }
 
 #ifndef YOSHIMI_LV2_PLUGIN
