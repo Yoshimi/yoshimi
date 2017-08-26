@@ -47,7 +47,13 @@ using namespace std;
 #include "MasterUI.h"
 
 InterChange::InterChange(SynthEngine *_synth) :
-    synth(_synth)
+    synth(_synth),
+    fromCLI(NULL),
+    toCLI(NULL),
+    fromGUI(NULL),
+    toGUI(NULL),
+    fromMIDI(NULL),
+    returnsLoopback(NULL)
 {
     ;
 }
@@ -63,7 +69,7 @@ bool InterChange::Init(SynthEngine *_synth)
     }
     if (jack_ringbuffer_mlock(fromCLI))
     {
-        synth->getRuntime().Log("Failed to lock fromCLI memory");
+        synth->getRuntime().LogError("Failed to lock fromCLI memory");
         goto bail_out;
     }
     jack_ringbuffer_reset(fromCLI);
