@@ -338,7 +338,10 @@ bool YoshimiLV2Plugin::init()
     if (!prepBuffers())
         return false;
 
-    _synth->Init(_sampleRate, _bufferSize);
+    if(!_synth->Init(_sampleRate, _bufferSize)) {
+        synth->getRuntime().LogError("Can't init synth engine");
+	return false;
+    }
 
     _synth->getRuntime().showGui = false;
 
@@ -367,8 +370,10 @@ LV2_Handle	YoshimiLV2Plugin::instantiate (const struct _LV2_Descriptor *desc, do
     YoshimiLV2Plugin *inst = new YoshimiLV2Plugin(synth, sample_rate, bundle_path, features, desc);
     if (inst->init())
         return static_cast<LV2_Handle>(inst);
-    else
+    else {
+        synth->getRuntime().LogError("Failed to create Yoshimi LV2 plugin");
         delete inst;
+    }
     return NULL;
 }
 

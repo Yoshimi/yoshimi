@@ -771,7 +771,7 @@ end_game:
 }
 
 
-void Config::Log(string msg, char tostderr)
+void Config::Log(const string &msg, char tostderr)
 {
     if ((tostderr & 2) && hideErrors)
         return;
@@ -784,6 +784,10 @@ void Config::Log(string msg, char tostderr)
         cerr << msg << endl; // error log
 }
 
+void Config::LogError(const string &msg)
+{
+    Log("[ERROR] " + msg, 3);
+}
 
 #ifndef YOSHIMI_LV2_PLUGIN
 void Config::StartupReport(MusicClient *musicClient)
