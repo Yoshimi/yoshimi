@@ -1,5 +1,10 @@
 yoshimi 1.5.3 M
 
+2017-8-28 Will
+* CLI can now save PadSynth sample sets.
+* Failure to save PadSynth sample sets now reported.
+* Updated docs.
+
 2017-8-26 Will
 * Adjusted logging on memory error merge from iurien.
 

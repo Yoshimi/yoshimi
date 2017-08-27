@@ -29,7 +29,7 @@ Make NRPN midi learn able to be re-learned.
 
 LV2: internal sound banks do not appear to be exposed as LV2 presets
 
-Make add voice & add/pad oscillator windows show kit number & name.
+Make add voice & add/pad oscillator and resonance windows show kit number & name.
 
 Make vector window update when main window reduces number of available parts.
 

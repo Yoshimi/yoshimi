@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
-Modified May 2017
+Modified August 2017
 } {in_source in_header
 }
 
@@ -101,7 +101,8 @@ decl {\#define MIN_DB -48.0} {public local
 decl {\#define NO_DB -68.0} {public local
 }
 
-class VUMeter {: {public Fl_Box, private MiscFuncs}
+class VUMeter {
+  comment {inherits MiscFuncs from GuiUpdates} selected : {public Fl_Box, private GuiUpdates}
 } {
   Function {VUMeter(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {npart=-1;} {}
@@ -420,7 +421,7 @@ class SysEffSend {: {public WidgetPDial, private MiscFuncs}
   }
 }
 
-class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
+class Panellistitem {: {public Fl_Group, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window panellistitem {

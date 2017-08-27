@@ -237,7 +237,7 @@ this->pars=pars;} {}
   }
 }
 
-class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
+class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window padnotewindow {
@@ -1164,23 +1164,35 @@ fl_filename_setext(filename,"");
 
 
 
-pars->export2wav(filename);}
+//pars->export2wav(filename);
+
+send_data(94, 0, 0xd0, miscMsgPush(string(filename)));}
         tooltip {Export samples as wav file} xywh {15 410 123 24} box THIN_UP_BOX color 51 labelfont 1 labelsize 12 align 128
       }
     }
   }
-  Function {send_data(int control, float value, int type)} {} {
+  Function {send_data(int control, float value, int type, int par2 = 0xff)} {} {
     code {//
-collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, 2);} {}
+unsigned char partnum = npart;
+unsigned char parameter = 0xff;
+if (par2 < 0xff)
+{
+    partnum = 0xf0; // main
+    parameter = 0x80 | npart;
+}
+
+collect_data(synth, value, (Fl::event_button() | type), control, partnum, kititem, 2, 0xff, parameter, par2);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
-    //unsigned char type = getData->data.type;
+    bool wasFromHere = getData->data.type & 0x20;
     unsigned char control = getData->data.control;
     //unsigned char npart = getData->data.part;
+    unsigned char par2 = getData->data.par2;
     //int tmp;
     float result;
+    string name;
 
     switch(control)
     {
@@ -1298,7 +1310,6 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    hpbasepar1->value(lrint(value));
     	    hprofile->redraw();
             cbwidget->do_callback();
-
     	    break;
 
     	case 65:
@@ -1387,6 +1398,15 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    cbwidget->do_callback();
     	    break;
 
+        case 94:
+            name = miscMsgPop(par2);
+            if (name.find("FAILED") == 1)
+            {
+                if (wasFromHere)
+                    fl_alert("Some samples have failed.");
+            }
+            break;
+
     	case 104:
     	    applybutton->color(FL_GRAY);
     	    applybutton->redraw();
@@ -1431,7 +1451,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
   Function {PADnoteUI(PADnoteParameters *parameters, int npart_, int kititem_)} {} {
     code {//
-	synth = parameters->getSynthEngine();
+        synth = parameters->getSynthEngine();
         pars = parameters;
         npart = npart_;
         kititem = kititem_;

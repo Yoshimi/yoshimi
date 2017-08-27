@@ -265,9 +265,9 @@ void InterChange::transfertext(CommandBlock *getData)
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
     unsigned char insert = getData->data.insert;
-//    unsigned char engine = getData->data.engine;
-//    unsigned char insert = getData->data.insert;
+    unsigned char parameter = getData->data.parameter;
     bool (write) = (type & 0x40);
     string text;
     if (getData->data.par2 < 0xff)
@@ -368,6 +368,16 @@ void InterChange::transfertext(CommandBlock *getData)
                     text = "d " + text;
                 else
                     text = " FAILED " + text;
+                value = miscMsgPush(text);
+                getData->data.parameter &= 0x7f;
+                break;
+            case 94:
+                synth->partonoffWrite(npart, -1);
+                setpadparams(parameter | (kititem << 8));
+                if (synth->part[parameter & 0x3f]->kit[kititem].padpars->export2wav(text))
+                    text = "d " + text;
+                else
+                    text = " FAILED some samples " + text;
                 value = miscMsgPush(text);
                 getData->data.parameter &= 0x7f;
                 break;
@@ -1317,6 +1327,11 @@ string InterChange::resolveMain(CommandBlock *getData)
         case 93:
             showValue = false;
             contstr = "State Save" + miscMsgPop(value_int);
+            break;
+
+        case 94:
+            showValue = false;
+            contstr = "PadSynth Samples Save" + miscMsgPop(value_int);
             break;
 
         case 96: // doMasterReset
@@ -3063,7 +3078,7 @@ void InterChange::returns(CommandBlock *getData)
 
 void InterChange::setpadparams(int point)
 {
-    int npart = point & 0xff;
+    int npart = point & 0x3f;
     int kititem = point >> 8;
     synth->part[npart]->kit[kititem].padpars->applyparameters(false);
     synth->partonoffWrite(npart, 2);

@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2017 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -695,11 +696,12 @@ void PADnoteParameters::setPan(char pan)
 
 
 // Ported from ZynAddSubFX V 2.4.4
-void PADnoteParameters::export2wav(std::string basefilename)
+bool PADnoteParameters::export2wav(std::string basefilename)
 {
-    synth->getRuntime().Log("Saving samples for " + basefilename);
-    applyparameters(true);
+    //synth->getRuntime().Log("Saving samples for " + basefilename);
+    //applyparameters(true);
     basefilename += "_PADsynth_";
+    bool isOK = true;
     for(int k = 0; k < PAD_MAX_SAMPLES; ++k)
     {
         if(sample[k].smp == NULL)
@@ -716,7 +718,10 @@ void PADnoteParameters::export2wav(std::string basefilename)
                 smps[i] = (short int)(sample[k].smp[i] * 32767.0f);
             wav.writeMonoSamples(nsmps, smps);
         }
+        else
+            isOK = false;
     }
+    return isOK;
 }
 
 

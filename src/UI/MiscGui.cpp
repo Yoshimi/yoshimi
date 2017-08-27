@@ -89,7 +89,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
 }
 
 
-void read_updates(SynthEngine *synth)
+void GuiUpdates::read_updates(SynthEngine *synth)
 {
     CommandBlock getData;
     size_t commandSize = sizeof(getData);
@@ -104,7 +104,7 @@ void read_updates(SynthEngine *synth)
 }
 
 
-void decode_updates(SynthEngine *synth, CommandBlock *getData)
+void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 {
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -112,7 +112,7 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char insertParam = getData->data.parameter;
-    //unsigned char insertPar2 = getData->data.par2;
+    unsigned char insertPar2 = getData->data.par2;
 
     if (npart == 0xe8) // scales
     {
@@ -163,6 +163,11 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
     {
         synth->getGuiMaster()->configui->returns_update(getData);
         return;
+    }
+    if (npart == 0xf0 && control == 94) // special case for pad sample save
+    {
+        npart = insertParam & 0x3f;
+        getData->data.part = npart;
     }
     if (npart >= 0xf0) // main / sys / ins
     {
@@ -259,6 +264,10 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
                         synth->getGuiMaster()->partui->padnoteui->resui->returns_update(getData);
                     break;
             }
+        }
+        else if(insertPar2 < 0xff)
+        {
+            miscMsgPop(insertPar2); // clearany text out.
         }
         return;
     }
