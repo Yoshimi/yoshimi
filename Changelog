@@ -4,6 +4,9 @@ yoshimi 1.5.3 M
 * CLI can now save PadSynth sample sets.
 * Failure to save PadSynth sample sets now reported.
 * Updated docs.
+* Removed reundant code.
+* Removed unnecessary mutex lock in Pad apply.
+* Fixed regression 'apply' in GUI oscillator.
 
 2017-8-26 Will
 * Adjusted logging on memory error merge from iurien.

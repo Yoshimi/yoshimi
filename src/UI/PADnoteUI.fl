@@ -1459,7 +1459,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, partnum, kitite
         resui = new ResonanceUI(pars->resonance, npart, kititem, 2);
         make_window();} {}
   }
-  Function {refresh(void)} {} {
+  /*Function {refresh(void)} {} {
     code {//
         volume->value(pars->PVolume);
         vsns->value(pars->PAmpVelocityScaleFunction);
@@ -1552,7 +1552,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, partnum, kitite
         pars->applyparameters(false);
         applybutton->color(FL_GRAY);
         applybutton->parent()->redraw();} {}
-  }
+  }*/
   Function {~PADnoteUI()} {return_type virtual
   } {
     code {//
