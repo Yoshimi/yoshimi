@@ -5664,9 +5664,9 @@ void InterChange::commandPad(CommandBlock *getData)
 
 void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
 {
-#pragma message "Gui writes changed to reads"
+/*#pragma message "Gui writes changed to reads"
     if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;
+        getData->data.type = getData->data.type & 0xbf;*/
 
     int value = lrint(getData->data.value); // no floats here!
     char value_bool = (getData->data.value > 0.5f);

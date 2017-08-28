@@ -7,9 +7,12 @@ yoshimi 1.5.3 M
 * Removed reundant code.
 * Removed unnecessary mutex lock in Pad apply.
 * Fixed regression 'apply' in GUI oscillator.
+* Oscillator converted to lock-free (phew!)
+  Alse corrected ancient anomally where base
+  function wasn't changed with 'Use as base".
 
 2017-8-26 Will
-* Adjusted logging on memory error merge from iurien.
+* Adjusted logging on memory error merge from Iurie.
 
 2017-8-25 Will
 * Removed duplicated effects command from GUI.

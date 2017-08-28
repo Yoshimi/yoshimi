@@ -1,11 +1,9 @@
 still not fully converted:
-    commandOscillator
     commandFilter - should be possible now
     commandEnvelope - freemode gui still a problem
     commandSysIns - should be possible now
     commandEffects - should be possible now
 
-enable cli saving of pad sample set
 transfer instrument external load/save
 
 Requested: revise window states so engines etc can be made auto open.
