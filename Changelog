@@ -1,5 +1,8 @@
 yoshimi 1.5.3 M
 
+2017-8-29 Will
+* All rotary controllers now MIDI learnable.
+
 2017-8-28 Will
 * CLI can now save PadSynth sample sets.
 * Failure to save PadSynth sample sets now reported.

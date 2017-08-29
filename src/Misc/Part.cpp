@@ -1611,6 +1611,49 @@ void Part::getLimits(CommandBlock *getData)
             break;
 
         // the following are learnable MIDI controllers
+        case 130:
+            max = 64;
+            type |= 0x40;
+            break;
+
+        case 131:
+            def = 800;
+            type |= 0x40;
+            break;
+
+        case 133:
+            type |= 0x40;
+            break;
+
+        case 138:
+            min = -6400;
+            def = 0;
+            max = 6400;
+            type |= 0x40;
+            break;
+
+        case 139:
+        case 140:
+        case 144:
+        case 145:
+            type |= 0x40;
+            break;
+
+        case 160:
+        case 161:
+            type |= 0x40;
+            break;
+
+        case 162:
+            def = 800;
+            type |= 0x40;
+            break;
+
+        case 166:
+            def = 900;
+            type |= 0x40;
+            break;
+
         case 192:
         case 197:
         case 198:

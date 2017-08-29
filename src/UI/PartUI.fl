@@ -388,7 +388,7 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
       xywh {272 534 380 170} type Double box NO_BOX hide
       class Fl_Group
     } {
-      Fl_Group partgroupui {open
+      Fl_Group partgroupui {
         xywh {0 0 378 168}
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
@@ -673,7 +673,7 @@ send_data(17, tmp, 0xc0);}
       Fl_Dial volrng {
         label {Vol Rng}
         callback {//
-send_data(128, o->value(), 0xc0);}
+send_data(128, o->value(), 0xc8);}
         tooltip {Volume Range} xywh {132 55 30 30} labelsize 10 minimum 64 maximum 127 step 1
         code0 {o->value(part->ctl->volume.data);}
         code1 {o->init(96);}
@@ -698,7 +698,7 @@ send_data(130, o->value(), 0xc8);}
       Fl_Dial modwh {
         label ModWh
         callback {//
-send_data(131, o->value(), 0xc0);}
+send_data(131, o->value(), 0xc8);}
         tooltip {Modulation Wheel depth} xywh {50 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->modwheel.depth);}
         code1 {o->init(80);}
@@ -751,6 +751,8 @@ send_data(136, o->value(), 0xc0);}
       Fl_Counter pwheelbrng {
         label {PWheel Rng (cents)}
         callback {//
+if (Fl::event_button() == 3)
+    o->value(200);
 send_data(138, o->value(), 0xc8);}
         tooltip {Pitch Wheel Bend Range (cents)} xywh {174 15 110 20} color 237 selection_color 0 labelsize 10 align 1 minimum -6400 maximum 6400 step 1
         code0 {o->value(part->ctl->pitchwheel.bendrange);}
@@ -759,7 +761,7 @@ send_data(138, o->value(), 0xc8);}
       Fl_Dial filtq {
         label FltQ
         callback {//
-send_data(139, o->value(), 0xc0);}
+send_data(139, o->value(), 0xc8);}
         tooltip {Filter Q depth} xywh {50 55 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->filterq.depth);}
         code1 {o->init(64);}
@@ -768,7 +770,7 @@ send_data(139, o->value(), 0xc0);}
       Fl_Dial fltcut {
         label FltCut
         callback {//
-send_data(140, o->value(), 0xc0);}
+send_data(140, o->value(), 0xc8);}
         tooltip {Filter Cutoff depth} xywh {90 55 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->filtercutoff.depth);}
         code1 {o->init(64);}
@@ -792,8 +794,8 @@ send_data(224, o->value(), 0xc0);}
       } {
         Fl_Dial cfdpth {
           label CFdpth
-          callback {part->ctl->resonancecenter.depth = o->value();
-send_data(144, o->value(), 0xc0);}
+          callback {//part->ctl->resonancecenter.depth = o->value();
+send_data(144, o->value(), 0xc8);}
           tooltip {Center Frequency controller Depth} xywh {300 20 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->resonancecenter.depth);}
           code1 {o->init(64);}
@@ -801,8 +803,8 @@ send_data(144, o->value(), 0xc0);}
         }
         Fl_Dial rbwdpth {
           label BWdpth
-          callback {part->ctl->resonancebandwidth.depth = o->value();
-send_data(145, o->value(), 0xc0);}
+          callback {//part->ctl->resonancebandwidth.depth = o->value();
+send_data(145, o->value(), 0xc8);}
           tooltip {BandWidth controller depth} xywh {300 60 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->resonancebandwidth.depth);}
           code1 {o->init(64);}
@@ -819,7 +821,7 @@ send_data(145, o->value(), 0xc0);}
         }
         Fl_Dial prtime {
           label time
-          callback {part->ctl->portamento.time = o->value();
+          callback {//
 send_data(160, o->value(), 0xc8);}
           tooltip {Portamento time} xywh {345 60 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.time);}
@@ -829,8 +831,6 @@ send_data(160, o->value(), 0xc8);}
         Fl_Dial timedu {
           label {t.dn/up}
           callback {//
-              int x = o->value();
-              part->ctl->portamento.updowntimestretch = x;
               send_data(161, o->value(), 0xc8);}
           tooltip {Portamento time stretch (up/down)} xywh {375 60 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.updowntimestretch);}
@@ -846,14 +846,14 @@ send_data(162, o->value(), 0xc8);}
         }
         Fl_Check_Button thtype {
           label {th.type}
-          callback {//part->ctl->portamento.pitchthreshtype = o->value();
+          callback {//
 send_data(163, o->value(), 0xc0);}
           tooltip {Threshold type (min/max)} xywh {425 68 15 15} down_box DOWN_BOX labelsize 10 align 2
           code0 {o->value(part->ctl->portamento.pitchthreshtype);}
         }
         Fl_Dial propta {
           label {Prp.Rate}
-          callback {part->ctl->portamento.propRate=(int) o->value();
+          callback {//
 send_data(165, o->value(), 0xc8);}
           tooltip {Distance required to double change from nonpropotinal portamento time} xywh {463 20 25 25} labelsize 9 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.propRate);}
@@ -862,7 +862,7 @@ send_data(165, o->value(), 0xc8);}
         }
         Fl_Dial proptb {
           label {Prp.Dpth}
-          callback {part->ctl->portamento.propDepth=(int) o->value();
+          callback {//
 send_data(166, o->value(), 0xc8);}
           tooltip {The difference from nonproportinal portamento} xywh {463 60 25 25} labelsize 9 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.propDepth);}
