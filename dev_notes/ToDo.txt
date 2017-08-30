@@ -1,7 +1,6 @@
 still not fully converted:
     commandFilter - should be possible now
     commandEnvelope - freemode gui still a problem
-    commandSysIns - should be possible now
     commandEffects - should be possible now
 
 transfer instrument external load/save

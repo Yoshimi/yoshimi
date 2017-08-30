@@ -3,6 +3,8 @@ yoshimi 1.5.3 M
 2017-9-30 Will
 * BugFix: Disabling a part was resetting all controllers.
 * Doc updates.
+* Sys/Ins effect controls now transferred to lock free.
+  But could be improved.
 
 2017-8-29 Will
 * All rotary controllers now MIDI learnable.
