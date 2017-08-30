@@ -203,7 +203,6 @@ void Part::cleanup(void)
     memset(tmpoutl, 0, synth->bufferbytes);
     memset(tmpoutr, 0, synth->bufferbytes);
 
-    ctl->resetall();
     for (int nefx = 0; nefx < NUM_PART_EFX; ++nefx)
         partefx[nefx]->cleanup();
     for (int n = 0; n < NUM_PART_EFX + 1; ++n)

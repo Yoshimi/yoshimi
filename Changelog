@@ -1,5 +1,9 @@
 yoshimi 1.5.3 M
 
+2017-9-30 Will
+* BugFix: Disabling a part was resetting all controllers.
+* Doc updates.
+
 2017-8-29 Will
 * All rotary controllers now MIDI learnable.
 

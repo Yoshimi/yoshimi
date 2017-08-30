@@ -138,28 +138,28 @@ Y : any : 96 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Set part to default instr
 Y : 1, 2, 3 : 120 : 0 to 63 : 255 : 255 : 255 : 255 :  : Audio destination
 
 Controllers
-Y : 64 to 127 : 128 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Volume range
+YL : 64 to 127 : 128 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Volume range
 Y : 0/1 : 129 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Volume enable
-Y : 0 to 64 : 130 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Panning width
-Y : 0 to 127 : 131 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Mod wheel depth
+YL : 0 to 64 : 130 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Panning width
+YL : 0 to 127 : 131 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Mod wheel depth
 Y : 0/1 : 132 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Exponential mod wheel
-Y : 0 to 127 : 133 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Bandwidth depth
+YL : 0 to 127 : 133 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Bandwidth depth
 Y : 0/1 : 134 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Exponential bandwidth
 Y : 0/1 : 135 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Expression enable
 Y : 0/1 : 136 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : FM amplitude enable
 Y : 0/1 : 137 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Sustain pedal enable
-Y : -6400 to 6400 : 138 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Pitch wheel range
-Y : 0 to 127 : 139 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Q depth
-Y : 0 to 127 : 140 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter cutoff depth
-Y : 0 to 127 : 144 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Resonance centre frequency controller depth
-Y : 0 to 127 : 145 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Resonance bandwidth controller depth
+YL : -6400 to 6400 : 138 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Pitch wheel range
+YL : 0 to 127 : 139 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Q depth
+YL : 0 to 127 : 140 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter cutoff depth
+YL : 0 to 127 : 144 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Resonance centre frequency controller depth
+YL : 0 to 127 : 145 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Resonance bandwidth controller depth
 YL : 0 to 127 : 160 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Portamento time
-Y : 0 to 127 : 161 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Portamento time stretch
-Y : 0 to 127 : 162 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Portamento threshold (cents x 100)
+YL : 0 to 127 : 161 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Portamento time stretch
+YL : 0 to 127 : 162 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Portamento threshold (cents x 100)
 Y : 0/1 : 163 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Portamento threshold type
 Y : 0/1 : 164 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Enable proportional portamento
-Y : 0 to 127 : 165 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Proportional portamento rate
-Y : 0 to 127 : 166 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Proportional portamento depth
+YL : 0 to 127 : 165 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Proportional portamento rate
+YL : 0 to 127 : 166 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Proportional portamento depth
 Y : 0/1 : 168 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Enable portamento control
 YL : 0 to 127 : 192 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Modulation (CC 1)
 YL : 0 to 127 : 194 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Expression (CC 11)
