@@ -1,5 +1,10 @@
 yoshimi 1.5.3 M
 
+2017-9-31 will
+* Cleaned up Sys/Ins controls.
+* Added cleanup when Ins destination set to 'off'.
+* Yet more doc updates :P
+
 2017-9-30 Will
 * BugFix: Disabling a part was resetting all controllers.
 * Doc updates.

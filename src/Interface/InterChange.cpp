@@ -6688,10 +6688,6 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
 
 void InterChange::commandSysIns(CommandBlock *getData)
 {
-/*#pragma message "Gui writes changed to reads"
-    if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;*/
-
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -6728,7 +6724,11 @@ void InterChange::commandSysIns(CommandBlock *getData)
                 break;
             case 2: // insert only
                 if (write)
+                {
                     synth->Pinsparts[effnum] = value_int;
+                    if (value_int == -1)
+                        synth->insefx[effnum]->cleanup();
+                }
                 else
                     value = synth->Pinsparts[effnum];
                 break;

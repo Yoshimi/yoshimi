@@ -5,7 +5,7 @@ code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
 }
 
-comment {MasterUI.cc} {selected in_source not_in_header
+comment {MasterUI.cc} {in_source not_in_header
 }
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
@@ -97,7 +97,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 }
 
-class MasterUI {: {private MiscFuncs}
+class MasterUI {selected : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -601,10 +601,7 @@ paramsui->Show(4);}
           Fl_Spinner syseffnocounter {
             label Effect
             callback {//
-              nsyseff = o->value() - 1;
-              sysefftype->value(synth->sysefx[nsyseff]->geteffect());
-              syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff);
-              send_data(0, o->value() - 1, 0xd0, 0xf1);}
+              send_data(0, o->value() - 1, 0xd0, 0xf1, o->value() - 1);}
             xywh {40 126 36 20} labeltype NO_LABEL labelsize 11 align 0 maximum 4 textfont 1 textsize 11
             code0 {o->range(1, NUM_SYS_EFX);}
             code1 {o->value(nsyseff + 1);}
@@ -612,12 +609,7 @@ paramsui->Show(4);}
           Fl_Choice sysefftype {
             label Type
             callback {//
-              /*synth->actionLock(lockmute);
-              synth->sysefx[nsyseff]->changeeffect(o->value());
-              synth->actionLock(unlock);
-              syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff);
-              showSysEfxUI();*/
-              send_data(1, o->value(), 0xd0, 0xf1);}
+              send_data(1, o->value(), 0xd0, 0xf1, nsyseff);}
             xywh {120 126 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 10 align 16
             code0 {o->value(synth->sysefx[nsyseff]->geteffect());}
           } {
@@ -684,24 +676,7 @@ paramsui->Show(4);}
           Fl_Spinner inseffnocounter {
             label Effect
             callback {//
-              ninseff = o->value() - 1;
-              setInsEff(ninseff);
-              insefftype->value(synth->insefx[ninseff]->geteffect());
-              inseffpart->value(synth->Pinsparts[ninseff] + 2);
-              inseffectui->refresh(synth->insefx[ninseff], 0xf2, ninseff);
-              if (synth->Pinsparts[ninseff] != -1)
-              {
-                insefftype->activate();
-                inseffectui->activate();
-                inseffectuigroup->activate();
-              }
-              else
-              {
-                insefftype->deactivate();
-                inseffectui->deactivate();
-                inseffectuigroup->deactivate();
-              }
-              send_data(0, o->value() - 1, 0xd0, 0xf2);}
+              send_data(0, o->value() - 1, 0xd0, 0xf2, o->value() - 1);}
             xywh {40 126 36 20} labeltype NO_LABEL labelsize 11 align 20 maximum 8 textfont 1 textsize 11
             code0 {o->range(1, NUM_INS_EFX);}
             code1 {o->value(ninseff + 1);}
@@ -709,12 +684,7 @@ paramsui->Show(4);}
           Fl_Choice insefftype {
             label Type
             callback {//
-              /*synth->actionLock(lockmute);
-              synth->insefx[ninseff]->changeeffect(o->value());
-              synth->actionLock(unlock);
-              inseffectui->refresh(synth->insefx[ninseff], 0xf2, ninseff);
-              showInsEfxUI();*/
-              send_data(1, o->value(), 0xd0, 0xf2);}
+              send_data(1, o->value(), 0xd0, 0xf2, ninseff);}
             xywh {120 126 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 0 textsize 12
             code0 {o->value(synth->insefx[ninseff]->geteffect());}
             code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
@@ -759,21 +729,7 @@ paramsui->Show(4);}
           Fl_Choice inseffpart {
             label {To }
             callback {//
-              /*synth->Pinsparts[ninseff] = o->value() - 2;
-              if (o->value() == 1)
-              {
-                inseffectuigroup->deactivate();
-                insefftype->deactivate();
-                inseffectui->deactivate();
-              }
-              else
-              {
-                inseffectuigroup->activate();
-                insefftype->activate();
-                inseffectui->activate();
-              }
-              synth->insefx[ninseff]->cleanup();*/
-              send_data(2, o->value() - 2, 0xd0, 0xf2);}
+              send_data(2, o->value() - 2, 0xd0, 0xf2, ninseff);}
             xywh {242 126 96 20} down_box BORDER_BOX labelfont 1 labelsize 10 textfont 1 textsize 11
             code0 {setinspartlist();}
             code3 {o->value(synth->Pinsparts[ninseff]+2);}
@@ -1124,14 +1080,8 @@ if (parameter == 0)
 }
 if (part == 0xff)
     part = 0xf0;
-int eng;
-if (part == 0xf1)
-    eng = nsyseff;
-else if (part == 0xf2)
-    eng = ninseff;
-else
-    eng = 0xff;
-collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng, insert, parameter, par2);} {}
+
+collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, engine, insert, parameter, par2);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
@@ -1142,35 +1092,51 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char par2 = getData->data.par2;
-    int nval = (int) value;
+    int nval = lrint(value);
     if (npart == 0xf1)
     {
         if (insert == 16)
         {
-            syseffsend[engine][control]->value(value);
+            if (!wasFromHere)
+                syseffsend[engine][control]->value(value);
         }
         else
         {
-            if (control == 1 && nsyseff == engine)
+            if (control == 0)
             {
-                sysefftype->value((int) value);
-                syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff); // needs improving
-
+                syseffnocounter->value(engine + 1);
+                nsyseff = engine;
+                sysefftype->value(synth->sysefx[nsyseff]->geteffect());
+                syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff);
+            }
+            else if (control == 1)
+            {
+                syseffnocounter->value(engine + 1);
+                nsyseff = engine;            
+                sysefftype->value(nval);
+                syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff);
+                showSysEfxUI();
             }
         }
         Fl::check();
         return;
     }
-    else if (npart == 0xf2 && ninseff == engine)
+    else if (npart == 0xf2)
     {
-        if (control == 1)
+        if (control == 0)
         {
-            insefftype->value((int) value);
-            inseffectui->refresh(synth->insefx[nsyseff], 0xf1, ninseff); // needs improving
+            ninseff = engine;
+            setInsEff(ninseff);;
+        }
+        else if (control == 1)
+        {
+            insefftype->value(nval);
+            inseffectui->refresh(synth->insefx[nsyseff], 0xf1, ninseff);
+            showInsEfxUI();
         }
         else if (control == 2)
         {
-            inseffpart->value((int) value + 2);
+            inseffpart->value(nval + 2);
             if (value == -1)
                 insefftype->deactivate();
             else
@@ -1201,7 +1167,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             break;
 
         case 15:
-            partmax = lrint(value);
+            partmax = nval;
             npartcounter->range(1, partmax);
             updatepart();
             updatepanel();
