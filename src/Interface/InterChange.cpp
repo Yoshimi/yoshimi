@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified August 2017
+    Modified September 2017
 */
 
 #include <iostream>
@@ -637,10 +637,6 @@ void InterChange::resolveReplies(CommandBlock *getData)
         if (isCli)
             return; // wanted for test only
 
-/* we need to review the implications of commenting
- * out various parts of this routine, but if active
- * they screw up miscMsg for some calling routines.
- */
     }
     if (npart == 0xc0)
         commandName = resolveVector(getData);
@@ -3046,9 +3042,9 @@ void InterChange::returnsDirect(int altData)
 
 void InterChange::returns(CommandBlock *getData)
 {
-    float value = getData->data.value;
+//    float value = getData->data.value;
     unsigned char type = getData->data.type | 4; // back from synth
-    unsigned char npart = getData->data.part;
+//    unsigned char npart = getData->data.part;
 
     if (type == 0xff)
         return;
@@ -3128,7 +3124,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-    unsigned char par2 = getData->data.par2;
+//    unsigned char par2 = getData->data.par2;
 //    bool isCli = type & 0x10;
     bool isGui = type & 0x20;
     char button = type & 3;
@@ -5357,9 +5353,6 @@ void InterChange::commandSub(CommandBlock *getData)
 
 void InterChange::commandPad(CommandBlock *getData)
 {
-/*#pragma message "Gui writes changed to reads"
-    if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;*/
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -5664,10 +5657,6 @@ void InterChange::commandPad(CommandBlock *getData)
 
 void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
 {
-/*#pragma message "Gui writes changed to reads"
-    if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;*/
-
     int value = lrint(getData->data.value); // no floats here!
     char value_bool = (getData->data.value > 0.5f);
     unsigned char type = getData->data.type;
@@ -5930,10 +5919,6 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
 
 void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
 {
-/*#pragma message "Gui writes changed to reads"
-    if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;
-*/
     int value = lrint(getData->data.value); // no floats here
     char value_bool = (getData->data.value > 0.5);
     unsigned char type = getData->data.type;

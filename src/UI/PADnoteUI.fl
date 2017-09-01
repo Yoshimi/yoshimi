@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-Modified August 2017
+Modified September 2017
 } {in_source in_header
 }
 
@@ -265,9 +265,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
             Fl_Dial hpbasepar1 {
               label Width
               callback {//
-/*    pars->Php.base.par1 = (int) o->value();
-    hprofile->redraw();
-    cbwidget->do_callback();*/
     send_data(64, o->value(), 0xd8);}
               xywh {20 75 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->Php.base.par1);}
@@ -277,9 +274,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
             Fl_Choice hpbasetype {
               label {Base Type}
               callback {//
-/*    pars->Php.base.type=o->value();
-    hprofile->redraw();
-    cbwidget->do_callback();*/
     send_data(69, o->value(), 0xd0);}
               xywh {15 45 75 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
               code0 {o->value(pars->Php.base.type);}
@@ -300,9 +294,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
             Fl_Dial hpfreqmult {
               label FreqMlt
               callback {//
-   /* pars->Php.freqmult=(int) o->value();
-    hprofile->redraw();
-    cbwidget->do_callback();*/
     send_data(65, o->value(), 0xd8);}
               xywh {55 75 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->Php.freqmult);}
@@ -312,9 +303,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
             Fl_Dial hpmpar1 {
               label Str
               callback {//
-   /* pars->Php.modulator.par1=(int) o->value();
-    hprofile->redraw();
-    cbwidget->do_callback();*/
     send_data(66, o->value(), 0xd8);}
               xywh {15 115 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->Php.modulator.par1);}
@@ -324,9 +312,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
             Fl_Dial hpmfreq {
               label SFreq
               callback {//
-    /*pars->Php.modulator.freq=(int) o->value();
-    hprofile->redraw();
-    cbwidget->do_callback();*/
     send_data(67, o->value(), 0xd8);}
               xywh {40 115 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->Php.modulator.freq);}
@@ -339,9 +324,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
               Fl_Choice hpamptype {
                 label AmpMultiplier
                 callback {//
-   /* pars->Php.amp.type=o->value();
-    hprofile->redraw();
-    cbwidget->do_callback();*/
     send_data(73, o->value(), 0xd0);}
                 xywh {15 175 70 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
                 code0 {o->value(pars->Php.amp.type);}
@@ -366,9 +348,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
               Fl_Choice hpampmode {
                 label AmpMode
                 callback {//
-    /*pars->Php.amp.mode=o->value();
-    hprofile->redraw();
-    cbwidget->do_callback();*/
     send_data(74, o->value(), 0xd0);}
                 xywh {15 205 70 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
                 code0 {o->value(pars->Php.amp.mode);}
@@ -393,9 +372,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
               Fl_Dial hpamppar1 {
                 label Par1
                 callback {//
-    /*pars->Php.amp.par1=(int) o->value();
-    hprofile->redraw();
-    cbwidget->do_callback();*/
     send_data(71, o->value(), 0xd8);}
                 xywh {15 235 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
                 code0 {o->value(pars->Php.amp.par1);}
@@ -405,9 +381,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
               Fl_Dial hpamppar2 {
                 label Par2
                 callback {//
-    /*pars->Php.amp.par2=(int) o->value();
-    hprofile->redraw();
-    cbwidget->do_callback();*/
     send_data(72, o->value(), 0xd8);}
                 xywh {55 235 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
                 code0 {o->value(pars->Php.amp.par2);}
@@ -418,18 +391,12 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
             Fl_Check_Button hpautoscale {
               label autoscale
               callback {//
-    /*pars->Php.autoscale=(int) o->value();
-    hprofile->redraw();
-    cbwidget->do_callback();*/
     send_data(75, o->value(), 0xd0);}
               xywh {10 270 60 15} down_box DOWN_BOX labelsize 10
               code0 {o->value(pars->Php.autoscale);}
             }
             Fl_Choice hponehalf {
               callback {//
-    /*pars->Php.onehalf=o->value();
-    hprofile->redraw();
-    cbwidget->do_callback();*/
     send_data(70, o->value(), 0xd0);}
               xywh {10 143 80 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
               code0 {o->value(pars->Php.onehalf);}
@@ -450,9 +417,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
             Fl_Dial hpwidth {
               label Size
               callback {//
-    /*pars->Php.width=(int) o->value();
-    hprofile->redraw();
-    cbwidget->do_callback();*/
     send_data(68, o->value(), 0xd8);}
               xywh {65 115 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->Php.width);}
@@ -495,8 +459,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
           Fl_Dial bwdial {
             label BandWidth
             callback {//
-      /*bwcents->value(pars->setPbandwidth((int) o->value()));
-      cbwidget->do_callback();*/
       send_data(16, o->value(), 0xd8);}
             xywh {15 295 35 35} box ROUND_UP_BOX labelsize 10 maximum 1000 step 1
             code0 {o->value(pars->Pbandwidth);}
@@ -518,9 +480,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
             Fl_Choice hrpostype {
               label OvertonesPosition
               callback {//
-                  /*pars->Phrpos.type=o->value();
-                  overtonepos->redraw();
-                  cbwidget->do_callback();*/
                   send_data(51, o->value(), 0xd0);}
               xywh {325 310 80 20} down_box BORDER_BOX labelsize 10 align 5 textsize 11
               code0 {o->value(pars->Phrpos.type);}
@@ -557,9 +516,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
             Fl_Dial hrpospar1 {
               label Par1
               callback {//
-    /*pars->Phrpos.par1=(int) o->value();
-    overtonepos->redraw();
-    cbwidget->do_callback();*/
     send_data(48, o->value(), 0xd8);}
               xywh {425 310 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 255 step 1
               code0 {o->value(pars->Phrpos.par1);}
@@ -569,9 +525,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
             Fl_Dial hrpospar2 {
               label Par2
               callback {//
-    /*pars->Phrpos.par2=(int) o->value();
-    overtonepos->redraw();
-    cbwidget->do_callback();*/
     send_data(49, o->value(), 0xd8);}
               xywh {460 310 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 255 step 1
               code0 {o->value(pars->Phrpos.par2);}
@@ -581,9 +534,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
             Fl_Dial hrpospar3 {
               label ForceH
               callback {//
-    /*pars->Phrpos.par3=(int) o->value();
-    overtonepos->redraw();
-    cbwidget->do_callback();*/
     send_data(50, o->value(), 0xd8);}
               xywh {495 310 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 255 step 1
               code0 {o->value(pars->Phrpos.par3);}
@@ -595,8 +545,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
           Fl_Choice bwscale {
             label {Bandwidth Scale}
             callback {//
-    /*pars->Pbwscale=(int) o->value();
-    cbwidget->do_callback();*/
     send_data(17, o->value(), 0xd0);}
             xywh {120 305 80 20} down_box BORDER_BOX labelsize 10 align 5 textsize 11
             code0 {o->value(pars->Pbwscale);}
@@ -643,8 +591,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
           Fl_Choice qsamplesize {
             label {Sample Size}
             callback {//
-    /*pars->Pquality.samplesize=(int) o->value();
-    cbwidget->do_callback();*/
     send_data(83, o->value(), 0xd0);}
             xywh {375 190 115 20} down_box BORDER_BOX labelsize 10 align 5 textsize 11
             code0 {o->value(pars->Pquality.samplesize);}
@@ -681,8 +627,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
           Fl_Choice qsmpoct {
             label {smp/oct}
             callback {//
-    /*pars->Pquality.smpoct=(int) o->value();
-    cbwidget->do_callback();*/
     send_data(81, o->value(), 0xd0);}
             xywh {430 155 45 20} down_box BORDER_BOX labelsize 11 align 5 textsize 11
             code0 {o->value(pars->Pquality.smpoct);}
@@ -719,8 +663,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
           Fl_Choice qoct {
             label {no.oct}
             callback {//
-    /*pars->Pquality.oct=(int) o->value();
-    cbwidget->do_callback();*/
     send_data(82, o->value(), 0xd0);}
             xywh {480 155 45 20} down_box BORDER_BOX labelsize 11 align 5 textsize 11
             code0 {o->value(pars->Pquality.oct);}
@@ -761,8 +703,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
           Fl_Choice qbasenote {
             label base
             callback {//
-    /*pars->Pquality.basenote=(int) o->value();
-    cbwidget->do_callback();*/
     send_data(80, o->value(), 0xd0);}
             xywh {375 155 50 20} down_box BORDER_BOX labelsize 11 align 5 textsize 11
             code0 {o->value(pars->Pquality.basenote);}
@@ -817,26 +757,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
           Fl_Choice spectrummode {
             label {Spectrum Mode}
             callback {//
-    /*pars->Pmode=(int) o->value();
-    if (pars->Pmode == 0)
-    {
-        bwprofilegroup->activate();
-        bwdial->activate();
-        bwcents->activate();
-        hprofile->activate();
-        hprofile->color(54);
-        bwscale->activate();
-    }
-    else
-    {
-        bwprofilegroup->deactivate();
-        bwdial->deactivate();
-        bwcents->deactivate();
-        hprofile->deactivate();
-        hprofile->color(48);
-        bwscale->deactivate();
-    }
-    cbwidget->do_callback();*/
     send_data(19, o->value(), 0xd0);}
             xywh {220 305 90 20} down_box BORDER_BOX labelfont 1 labelsize 10 align 5 textsize 11
             code0 {o->value(pars->Pmode);}
@@ -872,11 +792,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
             Fl_Counter octave {
               label Octave
               callback {//
-    /*int k=(int) o->value();
-    if (k<0)
-        k+=16;
-    pars->PCoarseDetune = k*1024+
-    pars->PCoarseDetune%1024;*/
     send_data(35, o->value(), 0xc8);}
               tooltip Octave xywh {465 305 45 15} type Simple color 237 selection_color 0 labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
               code0 {int k=pars->PCoarseDetune/1024;}
@@ -886,10 +801,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
             Fl_Counter coarsedet {
               label {Coarse det.}
               callback {//
-    /*int k = (int) o->value();
-    if (k < 0)
-        k += 1024;
-    pars->PCoarseDetune = k + (pars->PCoarseDetune / 1024) * 1024;*/
     send_data(37, o->value(), 0xc0);}
               tooltip {Coarse Detune} xywh {455 375 60 20} labelsize 10 align 5 minimum -64 maximum 63 step 1 textfont 1 textsize 11
               code0 {int k=pars->PCoarseDetune%1024;}
@@ -905,10 +816,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
             } {}
             Fl_Slider detune {
               callback {//
-    /* (Fl::event_button() == 3)
-        o->value(0);
-    pars->PDetune = (int)o->value() + 8192;
-    detunevalueoutput->do_callback();*/
     send_data(32, o->value(), 0xd8);}
               tooltip {Fine Detune (cents)} xywh {57 305 388 15} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
               code0 {o->value(pars->PDetune-8192);}
@@ -924,8 +831,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
             Fl_Choice detunetype {
               label {Detune Type}
               callback {//
-    /*pars->PDetuneType = (int) o->value() + 1;
-    detunevalueoutput->do_callback();*/
     send_data(36, o->value(), 0xd0);}
               xywh {450 345 75 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
               code0 {o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
@@ -935,11 +840,6 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
               label 440Hz
               callback {//
     int x = (int) o->value();
-    /*pars->Pfixedfreq = x;
-    if (x == 0)
-        fixedfreqetdial->deactivate();
-    else
-        fixedfreqetdial->activate();*/
     send_data(34, x, 0xd0);}
               tooltip {set the base frequency to 440Hz} xywh {365 284 50 15} down_box DOWN_BOX labelfont 1 labelsize 10
               code0 {o->value(pars->Pfixedfreq);}
@@ -1115,18 +1015,6 @@ send_data(112, o->value(), 0xc8);}
       Fl_Button applybutton {
         label {Apply Changes}
         callback {//
-/*            pars->applyparameters(false);
-            o->color(FL_GRAY);
-            if (oscui)
-            {
-                oscui->applybutton->color(FL_GRAY);
-                oscui->applybutton->redraw();
-            }
-            if (resui)
-            {
-                resui->applybutton->color(FL_GRAY);
-                resui->applybutton->redraw();
-            }*/
             send_data(104, o->value(), 0xd0);}
         xywh {324 410 123 24} box THIN_UP_BOX labelfont 1 labelsize 12
         code0 {o->color(FL_RED);}
@@ -1459,100 +1347,6 @@ collect_data(synth, value, (Fl::event_button() | type), control, partnum, kitite
         resui = new ResonanceUI(pars->resonance, npart, kititem, 2);
         make_window();} {}
   }
-  /*Function {refresh(void)} {} {
-    code {//
-        volume->value(pars->PVolume);
-        vsns->value(pars->PAmpVelocityScaleFunction);
-        pan->value(pars->PPanning);
-        stereo->value((pars->PStereo) ? 1 : 0);
-
-        pstr->value(pars->PPunchStrength);
-        pt->value(pars->PPunchTime);
-        pstc->value(pars->PPunchStretch);
-        pvel->value(pars->PPunchVelocitySensing);
-
-        detunevalueoutput->value(getDetune(pars->PDetuneType,0,pars->PDetune));
-        detune->value(pars->PDetune-8192);
-
-        int k=pars->PCoarseDetune/1024;if (k>=8) k-=16;
-        octave->value(k);
-
-        detunetype->value(pars->PDetuneType-1);
-        k=pars->PCoarseDetune%1024;if (k>=512) k-=1024;
-        coarsedet->value(k);
-
-        hz440->value(pars->Pfixedfreq);
-        fixedfreqetdial->value(pars->PfixedfreqET);
-
-        amplfo->refresh();
-        freqlfo->refresh();
-        filterlfo->refresh();
-
-        ampenv->refresh();
-        freqenv->refresh();
-        filterenv->refresh();
-        filterui->refresh();
-
-        /* harmonic structure parametrs */
-
-        resui->refresh();
-        if (oscui!=NULL) oscui->refresh();
-
-        hpbasetype->value(pars->Php.base.type);
-        hpbasepar1->value(pars->Php.base.par1);
-        hpfreqmult->value(pars->Php.freqmult);
-
-        hpmpar1->value(pars->Php.modulator.par1);
-        hpmfreq->value(pars->Php.modulator.freq);
-        hpwidth->value(pars->Php.width);
-
-        hponehalf->value(pars->Php.onehalf);
-        hpamptype->value(pars->Php.amp.type);
-        hpampmode->value(pars->Php.amp.mode);
-        hpamppar1->value(pars->Php.amp.par1);
-        hpamppar2->value(pars->Php.amp.par2);
-        hpautoscale->value(pars->Php.autoscale);
-
-        bwdial->value(pars->Pbandwidth);
-        if (pars->Pmode==0)
-        {
-           bwprofilegroup->activate();
-           bwdial->activate();
-           bwcents->activate();
-           hprofile->activate();
-           hprofile->color(54);
-           bwscale->activate();
-        }
-        else
-        {
-           bwprofilegroup->deactivate();
-           bwdial->deactivate();
-           bwcents->deactivate();
-           hprofile->deactivate();
-           hprofile->color(48);
-           bwscale->activate();
-        }
-
-        spectrummode->value(pars->Pmode);
-
-        qbasenote->value(pars->Pquality.basenote);
-        qsmpoct->value(pars->Pquality.smpoct);
-        qoct->value(pars->Pquality.oct);
-        qsamplesize->value(pars->Pquality.samplesize);
-
-        hrpostype->value(pars->Phrpos.type);
-        hrpospar1->value(pars->Phrpos.par1);
-        hrpospar2->value(pars->Phrpos.par2);
-        hrpospar3->value(pars->Phrpos.par3);
-
-        hprofile->redraw();
-        overtonepos->redraw();
-
-        osc->redraw();
-        pars->applyparameters(false);
-        applybutton->color(FL_GRAY);
-        applybutton->parent()->redraw();} {}
-  }*/
   Function {~PADnoteUI()} {return_type virtual
   } {
     code {//

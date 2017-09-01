@@ -1,5 +1,10 @@
 yoshimi 1.5.3 M
 
+2017-10-1 Will
+* BugFix: Oscillator phase was screwed up :(
+* Removed redundant code from PadSynth UI.
+* Preparing Filters for conversion.
+
 2017-9-31 will
 * Cleaned up Sys/Ins controls.
 * Added cleanup when Ins destination set to 'off'.

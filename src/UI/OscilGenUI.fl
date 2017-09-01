@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified August 2017
+Modified September 2017
 } {in_source in_header
 }
 
@@ -329,10 +329,10 @@ if (Fl::event_button3())
 {
     if (n == 0)
         x = 127;
-    o->value(127 -x);
+    o->value(127 - x);
 }
 else
-    x=127-(int)o->value();
+    x = 127 - (int)o->value();
 
 if (x==64)
     o->selection_color(0);
@@ -365,13 +365,13 @@ if (cbwidget!=NULL)
         class PSlider
       }
       Fl_Slider phase {
-        callback {int x=64;
+        callback {int x = 64;
 if (Fl::event_button3())
     o->value(x);
 else
-    x=(int)o->value();
+    x = (int)o->value();
 
-if (x==64)
+if (x == 64)
     o->selection_color(0);
 else
     o->selection_color(222);
@@ -381,7 +381,7 @@ oscil->Phphase[n]=x;
 oscil->prepare();
 synth->actionLock(unlock);*/
 
-send_data(7, n, x, 0xd8);
+send_data(7, n, 127 - x, 0xd8);
 
 /*display->redraw();
 oldosc->redraw();
