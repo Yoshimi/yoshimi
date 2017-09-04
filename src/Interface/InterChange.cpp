@@ -6126,9 +6126,9 @@ void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
 
 void InterChange::commandFilter(CommandBlock *getData)
 {
-#pragma message "Gui writes changed to reads"
-    if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;
+//#pragma message "Gui writes changed to reads"
+//    if (getData->data.type & 0x20)
+//        getData->data.type = getData->data.type & 0xbf;
 
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -6214,13 +6214,19 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             break;
         case 5:
             if (write)
+            {
                 pars->Pgain = val;
+                pars->changed = true;
+            }
             else
                 val = pars->Pgain;
             break;
         case 6:
             if (write)
+            {
                 pars->Pstages = value_int;
+                pars->changed = true;
+            }
             else
                 val = pars->Pstages;
             break;
@@ -6231,8 +6237,8 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
                 {
                     pars->Pgain = 64;
                     pars->Ptype = 0;
-                    pars->changed=true;
-                    pars->Pcategory = val;
+                    pars->changed = true;
+                    pars->Pcategory = value_int;
                 }
             }
             else
@@ -6243,14 +6249,17 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Ptype = value_int;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
-                val = pars->Ptype;;
+                val = pars->Ptype;
             break;
         case 10:
             if (write)
+            {
                 pars->Pfreqtrackoffset = (value_int != 0);
+                pars->changed = true;
+            }
             else
                 val = pars->Pfreqtrackoffset;
             break;
@@ -6259,7 +6268,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Pformantslowness = val;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Pformantslowness;
@@ -6268,7 +6277,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Pvowelclearness = val;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Pvowelclearness;
@@ -6277,7 +6286,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Pvowels[nvowel].formants[nformant].freq = val;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Pvowels[nvowel].formants[nformant].freq;
@@ -6286,7 +6295,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Pvowels[nvowel].formants[nformant].q = val;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Pvowels[nvowel].formants[nformant].q;
@@ -6295,7 +6304,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Pvowels[nvowel].formants[nformant].amp = val;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Pvowels[nvowel].formants[nformant].amp;
@@ -6304,7 +6313,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Psequencestretch = val;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Psequencestretch;
@@ -6313,7 +6322,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Pcenterfreq = val;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Pcenterfreq;
@@ -6322,7 +6331,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Poctavesfreq = val;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Poctavesfreq;
@@ -6332,7 +6341,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Pnumformants = value_int;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Pnumformants;
@@ -6345,7 +6354,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Psequencesize = value_int;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Psequencesize;
@@ -6356,7 +6365,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Psequence[nseqpos].nvowel = value_int;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Psequence[nseqpos].nvowel;
@@ -6365,7 +6374,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Psequencereversed = (value_int != 0);
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Psequencereversed;
@@ -6734,9 +6743,9 @@ void InterChange::commandSysIns(CommandBlock *getData)
 
 void InterChange::commandEffects(CommandBlock *getData)
 {
-#pragma message "Gui writes changed to reads"
-    if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;
+//#pragma message "Gui writes changed to reads"
+//    if (getData->data.type & 0x20)
+//        getData->data.type = getData->data.type & 0xbf;
 
     float value = getData->data.value;
     unsigned char type = getData->data.type;
@@ -6772,7 +6781,7 @@ void InterChange::commandEffects(CommandBlock *getData)
         if (control == 16 && kititem != 7)
             	eff->changepreset(lrint(value));
         else if (control != 1 || kititem != 7) // EQ selector is not a parameter
-             eff->seteffectpar(control,lrint(value));
+             eff->seteffectpar(control, lrint(value));
     }
     else
     {

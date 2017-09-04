@@ -1,7 +1,6 @@
 still not fully converted:
-    commandFilter - should be possible now
+    commandFilter - formant window not complete
     commandEnvelope - freemode gui still a problem
-    commandEffects - should be possible now
 
 transfer instrument external load/save
 

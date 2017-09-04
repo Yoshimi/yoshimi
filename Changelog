@@ -1,5 +1,12 @@
 yoshimi 1.5.3 M
 
+2017-10-4 Will
+* Effects transferred to lock free.
+  Noticed long-standing anomally with some dynfilter
+  control only working on release.
+* Filters mostly transferred to lock free.
+  Some formant controls not done yet.
+
 2017-10-1 Will
 * BugFix: Oscillator phase was screwed up :(
 * Removed redundant code from PadSynth UI.
