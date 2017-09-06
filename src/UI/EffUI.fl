@@ -2299,7 +2299,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, group | 
     	    break;
 
     	case 7: // EQ
-    	    synth->getRuntime().Log("EQ " + to_string(int(value)) + "  " + to_string(int(control)));
+    	    //synth->getRuntime().Log("EQ " + to_string(int(value)) + "  " + to_string(int(control)));
             if(control == 0)
             {
                 eqp0->value(value);

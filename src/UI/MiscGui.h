@@ -17,6 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+    Modified August 2017
 */
 
 #ifndef MISCGUI_H
@@ -122,6 +123,5 @@ public:
 private:
     void decode_updates(SynthEngine *synth, CommandBlock *getData);
 };
-
 
 #endif
