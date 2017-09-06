@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified May 2017
+    Modified September 2017
 */
 
 #include <sys/mman.h>
@@ -34,7 +34,6 @@ using namespace std;
 #include "MusicIO/MusicClient.h"
 #include "MasterUI.h"
 #include "UI/MiscGui.h"
-#include "Synth/BodyDisposal.h"
 #include <map>
 #include <list>
 #include <pthread.h>
@@ -155,7 +154,6 @@ static void *mainGuiThread(void *arg)
         {
             SynthEngine *_synth = it->first;
             MusicClient *_client = it->second;
-            _synth->getRuntime().deadObjects->disposeBodies();
             if (!_synth->getRuntime().runSynth && _synth->getUniqueId() > 0)
             {
                 if (_synth->getRuntime().configChanged)
@@ -177,7 +175,6 @@ static void *mainGuiThread(void *arg)
                 if (_synth)
                 {
                     _synth->saveBanks(tmpID);
-                    _synth->getRuntime().deadObjects->disposeBodies();
                     _synth->getRuntime().flushLog();
                     delete _synth;
                 }
@@ -436,7 +433,6 @@ bail_out:
 
         if (_synth)
         {
-            _synth->getRuntime().deadObjects->disposeBodies();
             _synth->getRuntime().flushLog();
             delete _synth;
         }

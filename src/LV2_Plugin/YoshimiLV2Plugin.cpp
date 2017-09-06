@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified May 2017
+    Modified September 2017
 */
 
 #include "YoshimiLV2Plugin.h"
@@ -28,7 +28,6 @@
 #include "Interface/MidiDecode.h"
 #include "MusicIO/MusicClient.h"
 #include "MasterUI.h"
-#include "Synth/BodyDisposal.h"
 #include <math.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -237,7 +236,6 @@ void *YoshimiLV2Plugin::idleThread()
 
     while (_synth->getRuntime().runSynth)
     {
-        _synth->getRuntime().deadObjects->disposeBodies();
 //        // where all the action is ...
 //        if (_synth->getRuntime().showGui)
 //            Fl::wait(0.033333);

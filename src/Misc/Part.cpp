@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified August 2017
+    Modified September 2017
 */
 
 #include <cstring>
@@ -46,7 +46,6 @@ using namespace std;
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
 #include "Synth/Resonance.h"
-#include "Synth/BodyDisposal.h"
 #include "Misc/Part.h"
 
 Part::Part(Microtonal *microtonal_, FFTwrapper *fft_, SynthEngine *_synth) :
@@ -890,17 +889,17 @@ void Part::KillNotePos(int pos)
     {
         if (partnote[pos].kititem[j].adnote)
         {
-            synth->getRuntime().deadObjects->addBody(partnote[pos].kititem[j].adnote);
+            delete partnote[pos].kititem[j].adnote;
             partnote[pos].kititem[j].adnote = NULL;
         }
         if (partnote[pos].kititem[j].subnote)
         {
-            synth->getRuntime().deadObjects->addBody(partnote[pos].kititem[j].subnote);
+            delete partnote[pos].kititem[j].subnote;
             partnote[pos].kititem[j].subnote = NULL;
         }
         if (partnote[pos].kititem[j].padnote)
         {
-            synth->getRuntime().deadObjects->addBody(partnote[pos].kititem[j].padnote);
+            delete partnote[pos].kititem[j].padnote;
             partnote[pos].kititem[j].padnote = NULL;
         }
     }
@@ -985,7 +984,7 @@ void Part::ComputePartSmps(void)
                 }
                 if (adnote->finished())
                 {
-                    synth->getRuntime().deadObjects->addBody(partnote[k].kititem[item].adnote);
+                    delete partnote[k].kititem[item].adnote;
                     partnote[k].kititem[item].adnote = NULL;
                 }
                 for (int i = 0; i < synth->p_buffersize; ++i)
@@ -1012,7 +1011,7 @@ void Part::ComputePartSmps(void)
                 }
                 if (subnote->finished())
                 {
-                    synth->getRuntime().deadObjects->addBody(partnote[k].kititem[item].subnote);
+                    delete partnote[k].kititem[item].subnote;
                     partnote[k].kititem[item].subnote = NULL;
                 }
             }
@@ -1031,7 +1030,7 @@ void Part::ComputePartSmps(void)
                 }
                 if (padnote->finished())
                 {
-                    synth->getRuntime().deadObjects->addBody(partnote[k].kititem[item].padnote);
+                    delete partnote[k].kititem[item].padnote;
                     partnote[k].kititem[item].padnote = NULL;
                 }
                 for (int i = 0 ; i < synth->p_buffersize; ++i)

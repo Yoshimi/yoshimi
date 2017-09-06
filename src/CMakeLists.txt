@@ -17,7 +17,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-# Modifed March 2017
+# Modifed September 2017
 
 project (Yoshimi)
 cmake_minimum_required (VERSION 2.6)
@@ -168,14 +168,6 @@ else (JACK_FOUND)
     message(FATAL_ERROR "Jack >=0.115.6 required but not found")
 endif (JACK_FOUND)
 
-# Boost
-find_package (Boost)
-if (Boost_FOUND)
-    message(STATUS "Found boost headers version " ${Boost_VERSION})
-else (Boost_FOUND)
-    message (FATAL_ERROR "boost headers required, but not found")
-endif (Boost_FOUND)
-
 # fontconfig
 pkg_check_modules (FONTCONFIG REQUIRED fontconfig>=0.22)
 mark_as_advanced(FONTCONFIG_LIBRARIES)
@@ -321,7 +313,6 @@ set (Params_sources
 set (Synth_sources
     Synth/ADnote.cpp  Synth/Envelope.cpp  Synth/LFO.cpp  Synth/OscilGen.cpp
     Synth/SUBnote.cpp  Synth/Resonance.cpp  Synth/PADnote.cpp
-    Synth/BodyDisposal.cpp
 )
 
 set (MusicIO_sources

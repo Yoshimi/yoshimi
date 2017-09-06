@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified August 2017
+    Modified September 2017
 */
 
 #ifndef CONFIG_H
@@ -40,7 +40,6 @@ using namespace std;
 #include "FL/Fl.H"
 
 class XMLwrapper;
-class BodyDisposal;
 
 class SynthEngine;
 
@@ -186,8 +185,6 @@ class Config : public MiscFuncs
         float *genTmp2;
         float *genTmp3;
         float *genTmp4;
-
-        BodyDisposal *deadObjects;
 
     private:
         void loadCmdArgs(int argc, char **argv);

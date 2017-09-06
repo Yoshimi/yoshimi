@@ -6,7 +6,6 @@ Some of these will pull in other ones.
     cmake-curses-gui
     dssi-dev
     fluid
-    libboost-dev
     libcairo2-dev
     libfftw3-dev
     libfltk1.3-dev

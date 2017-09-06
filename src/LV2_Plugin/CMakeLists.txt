@@ -58,7 +58,6 @@ file (GLOB yoshimi_params_files
 file (GLOB yoshimi_synth_files
     ../Synth/ADnote.cpp  ../Synth/Envelope.cpp  ../Synth/LFO.cpp  ../Synth/OscilGen.cpp
     ../Synth/SUBnote.cpp  ../Synth/Resonance.cpp  ../Synth/PADnote.cpp
-    ../Synth/BodyDisposal.cpp
     ../Synth/ADnote.h  ../Synth/Envelope.h  ../Synth/LFO.h  ../Synth/OscilGen.h
     ../Synth/SUBnote.h  ../Synth/Resonance.h  ../Synth/PADnote.h
     ../Synth/BodyDisposal.h)
