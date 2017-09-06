@@ -1,23 +1,29 @@
 yoshimi 1.5.3 M
 
-2017-10-4 Will
+2017-9-5 Will
+* Corrected last three dates here :(
+* Created noboost branch.
+[noboost] reverted note-offs to delete.
+[noboost] removed all references to boost.
+
+2017-9-4 Will
 * Effects transferred to lock free.
   Noticed long-standing anomally with some dynfilter
   control only working on release.
 * Filters mostly transferred to lock free.
   Some formant controls not done yet.
 
-2017-10-1 Will
+2017-9-1 Will
 * BugFix: Oscillator phase was screwed up :(
 * Removed redundant code from PadSynth UI.
 * Preparing Filters for conversion.
 
-2017-9-31 will
+2017-8-31 will
 * Cleaned up Sys/Ins controls.
 * Added cleanup when Ins destination set to 'off'.
 * Yet more doc updates :P
 
-2017-9-30 Will
+2017-8-30 Will
 * BugFix: Disabling a part was resetting all controllers.
 * Doc updates.
 * Sys/Ins effect controls now transferred to lock free.
