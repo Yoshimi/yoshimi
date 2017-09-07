@@ -6359,7 +6359,16 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             else
                 val = pars->Psequencesize;
             break;
-        case 36: // this is local to the source
+        case 36:
+            /*
+             * this appears to be just setting the GUI
+             * reference point yet sets pars changed.
+             * why?
+             */
+            if (write)
+                pars->changed = true;
+            else
+                ;
             break;
         case 37:
             if (write)
