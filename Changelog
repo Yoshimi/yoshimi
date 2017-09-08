@@ -1,5 +1,11 @@
 yoshimi 1.5.3 M
 
+2017-9-8 Will
+* Most of envelopes transferred.
+  Only graph points to do.
+* Improved add/delete point controls.
+* Updated docs.
+
 2017-9-7 Will
 * Completed filter transfer.
 * Improved formant tooltips.

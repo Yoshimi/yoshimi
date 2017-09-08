@@ -486,12 +486,12 @@ Y : 0 to 127 : 7 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : 255 : Stretch
 Y : 0/1 : 16 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : 255 : Forced release
 Y : 0/1 : 17 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : 255 : Envelope is Linear
 Graph points
-Y : any : 34 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : any : Returns ‘Par 2’ number of defined points
+Y : any : 34 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : any : Returns ‘Value’ number of defined points
 Y : 0-39 : 35 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : 255 : Sustain position – limited by number of defined points
 
  :  : See Note > :  :  :  :  :  :  : For the next three :  'Control’ is the point number
-Y : 0 to 127 : 64 + (0 to 39) : 0 to 63 : 0 to 15 : All : 3 : 0 to 3 : 0 to 127 : Add point - ‘Par 2’ is X incremental value, ‘Value’ is Y value
-Y : any : 0 to 39 : 0 to 63 : 0 to 15 : All : 3 : 0 to 3 : any : Delete point - Returns ‘Par 2’ number of points remaining
+Y : 0 to 127 : 0 to 39 : 0 to 63 : 0 to 15 : All : 3 : 0 to 3 : 0 to 127 : Add point - ‘Par 2’ is X incremental value, ‘Value’ is Y value
+Y : any : 0 to 39 : 0 to 63 : 0 to 15 : All : 3 : 0 to 3 : 255 : Delete point - Returns ‘Value’ number of points remaining
 Y : 0 to 127 : 0 to 39 : 0 to 63 : 0 to 15 : All : 4 : 0 to 3 : 0 to 127 : Adjust - ‘Par 2’ is X incremental value, ‘Value’ is Y value
 
 Insertion Effect Selector

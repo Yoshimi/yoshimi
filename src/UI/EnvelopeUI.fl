@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified August 2017
+Modified September 2017
 } {in_source in_header
 }
 
@@ -328,7 +328,7 @@ delete (freemodeeditwindow);} {}
   Function {make_freemode_edit_window()} {} {
     Fl_Window freemodeeditwindow {
       label Envelope
-      xywh {813 22 575 180} type Double hide
+      xywh {795 68 575 180} type Double hide
     } {
       Fl_Box freeedit {
         label Envelope
@@ -360,7 +360,7 @@ envfree->redraw();
 
 sustaincounter->value(env->Penvsustain);
 sustaincounter->maximum(env->Penvpoints-2);
-send_data(group, curpoint | 64, env->Penvval[curpoint], 0xc0, env->Penvdt[curpoint]);}
+send_data(group, curpoint, env->Penvval[curpoint], 0xc0, env->Penvdt[curpoint]);}
         xywh {115 155 80 20} box THIN_UP_BOX labelsize 11
         code0 {if (env->Pfreemode==0) o->hide();}
       }
@@ -387,7 +387,7 @@ envfree->redraw();
 
 sustaincounter->value(env->Penvsustain);
 sustaincounter->maximum(env->Penvpoints-2);
-send_data(group, curpoint, 0, 0xc0, env->Penvpoints - 1);}
+send_data(group, curpoint, 0, 0xc0);}
         xywh {200 155 80 20} box THIN_UP_BOX labelsize 11
         code0 {if (env->Pfreemode==0) o->hide();}
       }
@@ -893,12 +893,25 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     unsigned char insert = getData->data.insert;
     unsigned char par = getData->data.parameter;
 
+    int value_int = lrint(value);
+    bool value_bool = (value > 0.5);
+    bool isFreemode = (freemodebutton->value() > 0.5);
+    
     if (part != npart || (eng >= 128 && eng != engine))
         return;
 
     if (insert ==3 || insert == 4)
     {
-        // don't know what to do here :(
+        if (insert == 4) // adjust point
+            ;
+        else if (value > 255) // delete point
+            ;
+        else // add point
+            ;
+        freeedit->redraw();
+        envfree->redraw();
+        sustaincounter->value(env->Penvsustain);
+        sustaincounter->maximum(env->Penvpoints-2);
         Fl::check();
         return;
     }
@@ -1010,6 +1023,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	            e4envstretch->value(value);
     	            break;
     	    }
+    	    envstretchdial->value(value);
     	    change = false;
     	    break;
 
@@ -1017,29 +1031,38 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    switch (par)
     	    {
     	        case 0:
-    	            e1forcedrelease->value(value != 0);
+    	            e1forcedrelease->value(value_bool);
     	            break;
     	        case 1:
-    	            e2forcedrelease->value(value != 0);
+    	            e2forcedrelease->value(value_bool);
     	            break;
     	        case 2:
-    	            e3forcedrelease->value(value != 0);
+    	            e3forcedrelease->value(value_bool);
     	            break;
     	        case 3:
-    	            e4forcedrelease->value(value != 0);
+    	            e4forcedrelease->value(value_bool);
     	            break;
     	    }
+    	    forcedreleasecheck->value(value_bool);
     	    change = false;
     	    break;
 
     	case 17:
     	    if (par == 0)
-    	        e1linearenvelope->value(value != 0);
+    	    {
+    	        e1linearenvelope->value(value_bool);
+    	        linearenvelopecheck->value(value_bool);
+    	    }
     	    change = false;
     	    break;
 
     	case 32:
-    	    reinitcore(value != 0);
+    	    reinitcore(value_bool);
+    	    break;
+    	    
+    	case 35:
+    	    if (isFreemode)
+    	        sustaincounter->value(value_int);
     	    break;
     }
     if (change)
