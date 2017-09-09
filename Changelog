@@ -1,5 +1,10 @@
 yoshimi 1.5.3 M
 
+2017-9-9 Will
+* Corrected NRPN wrong displayed values.
+  Actual values were quite correct.
+* Replaced splash screen png with svg version.
+
 2017-9-8 Will
 * Most of envelopes transferred.
   Only graph points to do.
