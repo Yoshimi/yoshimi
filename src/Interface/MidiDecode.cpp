@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified July 2017
+    Modified September 2017
 */
 
 #include <iostream>
@@ -489,7 +489,7 @@ void MidiDecode::nrpnProcessData(unsigned char chan, int type, int par, bool in_
 
     if (nHigh != 64 && nLow < 0x7f)
     {
-        synth->getRuntime().Log("Go away NRPN 0x" + asHexString(nHigh >> 1) + asHexString(nLow) +" We don't know you!");
+        synth->getRuntime().Log("Go away NRPN 0x" + asHexString(nHigh) + " " + asHexString(nLow) +" We don't know you!");
         //done this way to ensure we see both bytes even if nHigh is zero
         synth->getRuntime().nrpnActive = false; // we were sent a turkey!
         return;

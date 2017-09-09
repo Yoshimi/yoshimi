@@ -2659,6 +2659,7 @@ string InterChange::resolveFilter(CommandBlock *getData)
 
 string InterChange::resolveEnvelope(CommandBlock *getData)
 {
+    int value = lrint(getData->data.value);
     bool write = (getData->data.type & 0x40) > 0;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -2708,10 +2709,13 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
         {
             return ("Freemode add/remove is write only. Current points " + to_string(int(par2)));
         }
-        if (control >= 0x40)
+        if (par2 < 255)
             return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Added Freemode Point " + to_string(int((control & 0x3f) + 1)) + " X increment " + to_string(int(par2)) + " Y");
         else
-            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Removed Freemode Point " +  to_string(int(control + 1)) + " Remaining " + to_string(int(par2)));
+        {
+            showValue = false;
+            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Removed Freemode Point " +  to_string(int(control + 1)) + "  Remaining " +  to_string(value));
+        }
     }
 
     if (insert == 4)
@@ -6359,7 +6363,16 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             else
                 val = pars->Psequencesize;
             break;
-        case 36: // this is local to the source
+        case 36:
+            /*
+             * this appears to be just setting the GUI
+             * reference point yet sets pars changed.
+             * why?
+             */
+            if (write)
+                pars->changed = true;
+            else
+                ;
             break;
         case 37:
             if (write)
@@ -6493,12 +6506,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
     unsigned char Xincrement = getData->data.par2;
 
     int envpoints = pars->Penvpoints;
-    bool isAddpoint = false;
-    if (point >= 0x40)
-    {
-        isAddpoint = true;
-        point &= 0x3f;
-    }
+    bool isAddpoint = (Xincrement < 0xff);
 
     if (insert == 3) // here be dragons :(
     {
@@ -6516,25 +6524,32 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
             return;
         }
 
-        if (isAddpoint && envpoints < MAX_ENVELOPE_POINTS)
+        if (isAddpoint)
         {
-            pars->Penvpoints += 1;
-            for (int i = envpoints; i >= point; -- i)
+            if (envpoints < MAX_ENVELOPE_POINTS)
             {
-                pars->Penvdt[i + 1] = pars->Penvdt[i];
-                pars->Penvval[i + 1] = pars->Penvval[i];
+                pars->Penvpoints += 1;
+                for (int i = envpoints; i >= point; -- i)
+                {
+                    pars->Penvdt[i + 1] = pars->Penvdt[i];
+                    pars->Penvval[i + 1] = pars->Penvval[i];
+                }
+                if (point <= pars->Penvsustain)
+                    ++ pars->Penvsustain;
+                pars->Penvdt[point] = Xincrement;
+                pars->Penvval[point] = val;
+                getData->data.value = val;
+                getData->data.par2 = Xincrement;
             }
-            if (point <= pars->Penvsustain)
-                ++ pars->Penvsustain;
-            pars->Penvdt[point] = Xincrement;
-            pars->Penvval[point] = val;
-            getData->data.value = val;
-            getData->data.par2 = Xincrement;
+            else
+                getData->data.value = 0xff;
             return;
         }
         else if (envpoints < 4)
         {
+            getData->data.value = 0xff;
             getData->data.par2 = 0xff;
+            return; // can't have less than 3
         }
         else
         {
@@ -6547,10 +6562,8 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
             if (point < pars->Penvsustain)
                 -- pars->Penvsustain;
             pars->Penvpoints = envpoints;
-            getData->data.par2 = envpoints;
+            getData->data.value = envpoints;
         }
-        getData->data.value = 0xff;
-
         return;
     }
 

@@ -1,5 +1,20 @@
 yoshimi 1.5.3 M
 
+2017-9-9 Will
+* Corrected NRPN wrong displayed values.
+  Actual values were quite correct.
+* Replaced splash screen png with svg version.
+
+2017-9-8 Will
+* Most of envelopes transferred.
+  Only graph points to do.
+* Improved add/delete point controls.
+* Updated docs.
+
+2017-9-7 Will
+* Completed filter transfer.
+* Improved formant tooltips.
+
 2017-9-5 Will
 * Corrected last three dates here :(
 * Created noboost branch.

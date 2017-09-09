@@ -52,6 +52,6 @@ There is additional control number 34 that returns the number of defined graph p
 
 The axis graph controls are 'Add point' and 'Delete Point' Both of which have Insert value 3. Also, 'Change Point' has Insert value 4.
 
-All of these use 'Control' to define the graph point being accessed. For 'Add' and 'Change' 'Par 2' is the X axis increment and 'Value' is the Y axis value. When adding a point the control number is ORred with 64.
+All of these use 'Control' to define the graph point being accessed. For 'Add' and 'Change' 'Par 2' is the X axis increment and 'Value' is the Y axis value. When deleting a point 'Par 2' is 255.
 
 Out of range or errors usually return X and/or Y as 0xff.

@@ -612,30 +612,30 @@ formantfiltergraph->redraw();
         } {
           Fl_Dial formant_freq_dial {
             label freq
-            callback {pars->Pvowels[nvowel].formants[nformant].freq = (int) o->value();
-formantfiltergraph->redraw();
-pars->changed = true;
-//send_data(18, o->value(), 0xd8);}
+            callback {//pars->Pvowels[nvowel].formants[nformant].freq = (int) o->value();
+//formantfiltergraph->redraw();
+//pars->changed = true;
+send_data(18, o->value(), 0xd8);}
             tooltip {Formant frequency} xywh {495 115 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
             code0 {o->init(-1);}
             class WidgetPDial
           }
           Fl_Dial formant_q_dial {
             label Q
-            callback {pars->Pvowels[nvowel].formants[nformant].q = (int) o->value();
-formantfiltergraph->redraw();
-pars->changed=true;
-//send_data(19, o->value(), 0xd8);}
+            callback {//pars->Pvowels[nvowel].formants[nformant].q = (int) o->value();
+//formantfiltergraph->redraw();
+//pars->changed=true;
+send_data(19, o->value(), 0xd8);}
             tooltip {Formant's Q} xywh {525 115 24 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
             code0 {o->init(64);}
             class WidgetPDial
           }
           Fl_Dial formant_amp_dial {
             label amp
-            callback {pars->Pvowels[nvowel].formants[nformant].amp = (int) o->value();
-formantfiltergraph->redraw();
-pars->changed = true;
-//send_data(20, o->value(), 0xd0);}
+            callback {//pars->Pvowels[nvowel].formants[nformant].amp = (int) o->value();
+//formantfiltergraph->redraw();
+//pars->changed = true;
+send_data(20, o->value(), 0xd0);}
             tooltip {Formant amplitude} xywh {555 115 24 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
             code0 {o->init(127);}
             class WidgetPDial
@@ -647,10 +647,10 @@ pars->changed = true;
       } {
         Fl_Counter seqsize {
           label {Seq.Size}
-          callback {pars->Psequencesize = (int) o->value();
-update_formant_window();
-pars->changed = true;
-//send_data(35, o->value(), 0xd0);}
+          callback {//pars->Psequencesize = (int) o->value();
+//update_formant_window();
+//pars->changed = true;
+send_data(35, o->value(), 0xd0);}
           xywh {595 62 55 20} type Simple labelfont 1 labelsize 10 align 5 minimum 0 maximum 127 step 1 textfont 1 textsize 11
           code0 {o->bounds(1,FF_MAX_SEQUENCE);}
           code1 {o->value(pars->Psequencesize);}
@@ -659,33 +659,33 @@ pars->changed = true;
           label {S.Pos.}
           callback {nseqpos = (int) o->value();
 update_formant_window();
-pars->changed=true;
-//send_data(36, o->value(), 0xd0);}
-          tooltip {Current position from the sequence} xywh {595 97 40 15} type Simple labelfont 1 labelsize 10 align 9 minimum 0 maximum 127 step 1 textsize 10
+//pars->changed=true;
+send_data(36, o->value(), 0xc0);}
+          tooltip {Current position in the sequence} xywh {595 97 40 15} type Simple labelfont 1 labelsize 10 align 9 minimum 0 maximum 127 step 1 textsize 10
           code0 {o->bounds(0,FF_MAX_SEQUENCE-1);}
           code1 {o->value(nseqpos);}
         }
         Fl_Counter vowel_counter {
           label Vowel
-          callback {pars->Psequence[nseqpos].nvowel=(int) o->value();
-pars->changed=true;
-//send_data(37, o->value(), 0xd0);}
-          xywh {640 97 40 15} type Simple labelsize 10 align 1 minimum 0 maximum 127 step 1 textsize 10
+          callback {//pars->Psequence[nseqpos].nvowel=(int) o->value();
+//pars->changed=true;
+send_data(37, o->value(), 0xd0);}
+          tooltip {Vowel number at the sequence position} xywh {640 97 40 15} type Simple labelsize 10 align 1 minimum 0 maximum 127 step 1 textsize 10
           code0 {o->bounds(0,FF_MAX_VOWELS-1);}
         }
         Fl_Check_Button neginput {
           label {Neg.Input}
-          callback {pars->Psequencereversed=(int) o->value();
-pars->changed=true;
-//send_data(38, o->value(), 0xd0);}
+          callback {//pars->Psequencereversed=(int) o->value();
+//pars->changed=true;
+send_data(38, o->value(), 0xd0);}
           tooltip {Negate the input from LFO/envelopes/etc.} xywh {625 132 60 20} down_box DOWN_BOX labelsize 10
           code0 {o->value(pars->Psequencereversed);}
         }
         Fl_Dial strchdial {
           label Strch
-          callback {pars->Psequencestretch=(int) o->value();
-pars->changed=true;
-//send_data(21, o->value(), 0xd8);}
+          callback {//pars->Psequencestretch=(int) o->value();
+//pars->changed=true;
+send_data(21, o->value(), 0xd8);}
           tooltip {Sequence Stretch} xywh {595 130 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->init(40);}
           code1 {o->value(pars->Psequencestretch);}
@@ -695,11 +695,11 @@ pars->changed=true;
       }
       Fl_Counter formantcount {
         label Formants
-        callback {pars->Pnumformants = (int) o->value();
-update_formant_window();
-pars->changed=true;
-formantfiltergraph->redraw();
-//send_data(32, o->value(), 0xd0);}
+        callback {//pars->Pnumformants = (int) o->value();
+//update_formant_window();
+//pars->changed=true;
+//formantfiltergraph->redraw();
+send_data(32, o->value(), 0xd0);}
         xywh {485 15 65 20} type Simple labelfont 1 labelsize 10 align 1 minimum 0 maximum 127 step 1 textsize 12
         code0 {o->bounds(1,FF_MAX_FORMANTS);}
         code1 {o->value(pars->Pnumformants);}
@@ -1069,7 +1069,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
         refresh();} {}
   }
   Function {use_for_dynamic_filter()} {
-    comment {Temporary mostly disabled}
+    comment {Mostly disabled
+Now also deactivates frequency tracking offset}
   } {
     code {//
         freqtrackoffset->deactivate();

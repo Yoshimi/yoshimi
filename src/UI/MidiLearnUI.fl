@@ -24,7 +24,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-Modified May 2017} {in_source in_header
+Modified September 2017} {in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -408,6 +408,7 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
     unsigned char parameter = getData->data.parameter;
     unsigned char par2 = getData->data.par2;
     string hex;
+    int nrpnTot;
     unsigned int IDold;
     unsigned int IDnew;
     switch(control)
@@ -436,7 +437,11 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
                 midilearnkititem[value]->maxval->value(parameter / 2.0f);
             break;
         case 9: // set NRPN fixed value in place
-            hex = (asHexString(int(engine))) + " " + (asHexString(int(kititem))) + " h";
+            nrpnTot = (int(engine) << 8) + (int(kititem));
+            /* These were stored 8 bit values so must be joined then
+             * split as two 7 bit values to give NRPN msb and lsb
+             */
+            hex = (asHexString(nrpnTot >> 7)) + " " + (asHexString(nrpnTot & 0x7f));
             midilearnkititem[value]->stat |= 0x10;
             midilearnkititem[value]->nrpn->copy_label(hex.c_str());
             midilearnkititem[value]->CCcounter->hide();
