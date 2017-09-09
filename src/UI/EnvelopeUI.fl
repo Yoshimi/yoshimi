@@ -896,7 +896,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     int value_int = lrint(value);
     bool value_bool = (value > 0.5);
     bool isFreemode = (freemodebutton->value() > 0.5);
-    
+   
     if (part != npart || (eng >= 128 && eng != engine))
         return;
 
@@ -905,9 +905,9 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
         if (insert == 4) // adjust point
             ;
         else if (value > 255) // delete point
-            ;
+            freeedit->lastpoint -= 1;
         else // add point
-            ;
+            freeedit->lastpoint += 1;
         freeedit->redraw();
         envfree->redraw();
         sustaincounter->value(env->Penvsustain);

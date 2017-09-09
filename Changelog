@@ -4,6 +4,8 @@ yoshimi 1.5.3 M
 * Corrected NRPN wrong displayed values.
   Actual values were quite correct.
 * Replaced splash screen png with svg version.
+* Finally got envelope graphs under control.
+  Tidying up and full conversion tomorrow :)
 
 2017-9-8 Will
 * Most of envelopes transferred.
