@@ -1,5 +1,8 @@
 yoshimi 1.5.3 M
 
+2017-9-10 Will
+* Envelopes converted.
+
 2017-9-9 Will
 * Corrected NRPN wrong displayed values.
   Actual values were quite correct.

@@ -1,6 +1,6 @@
 still not fully converted:
-    commandFilter - formant window not complete
-    commandEnvelope - freemode gui still a problem
+    vectors
+    addsynthvoice
 
 transfer instrument external load/save
 
