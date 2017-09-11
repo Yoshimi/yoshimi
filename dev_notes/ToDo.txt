@@ -1,6 +1,5 @@
 still not fully converted:
     vectors
-    addsynthvoice
 
 transfer instrument external load/save
 

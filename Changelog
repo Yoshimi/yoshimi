@@ -1,5 +1,9 @@
 yoshimi 1.5.3 M
 
+2017-9-11 Will
+* Improved AddSynth Voice controls code.
+* Corrected 'minus' tooltip.
+
 2017-9-10 Will
 * Envelopes converted.
 
