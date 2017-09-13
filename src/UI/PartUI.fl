@@ -908,7 +908,7 @@ send_data(164, o->value(), 0xc0);}
         callback {if (Fl::event_button() == 3)
     o->value(64);
 send_data(192, o->value(), 0xc8);}
-        tooltip {Modulation Wheel depth} xywh {20 10 30 30} labelsize 10 maximum 127 step 1
+        tooltip {Modulation Wheel} xywh {20 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->modwheel.data);}
         class WidgetPDial
       }
@@ -917,7 +917,7 @@ send_data(192, o->value(), 0xc8);}
         callback {if (Fl::event_button() == 3)
     o->value(127);
 send_data(194,  o->value(), 0xc8);}
-        tooltip {BandWidth depth} xywh {80 10 30 30} labelsize 10 maximum 127 step 1
+        tooltip Expression xywh {80 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->expression.data);}
         class WidgetPDial
       }
@@ -926,7 +926,7 @@ send_data(194,  o->value(), 0xc8);}
         callback {if (Fl::event_button() == 3)
     o->value(64);
 send_data(197, o->value(), 0xc8);}
-        tooltip {Filter Q depth} xywh {140 10 30 30} labelsize 10 maximum 127 step 1
+        tooltip {Filter Q} xywh {140 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->filterq.data);}
         class WidgetPDial
       }
@@ -935,7 +935,7 @@ send_data(197, o->value(), 0xc8);}
         callback {if (Fl::event_button() == 3)
     o->value(64);
 send_data(198, o->value(), 0xc8);}
-        tooltip {Filter Cutoff depth} xywh {200 10 30 30} labelsize 10 maximum 127 step 1
+        tooltip {Filter Cutoff} xywh {200 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->filtercutoff.data);}
         class WidgetPDial
       }
@@ -944,7 +944,7 @@ send_data(198, o->value(), 0xc8);}
         callback {if (Fl::event_button() == 3)
     o->value(64);
 send_data(199, o->value(), 0xc8);}
-        tooltip {Filter Cutoff depth} xywh {260 10 30 30} labelsize 10 maximum 127 step 1
+        tooltip {Master Bandwidth} xywh {260 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->bandwidth.data);}
         class WidgetPDial
       }
