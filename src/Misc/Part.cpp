@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified August 2017
+    Modified September 2017
 */
 
 #include <cstring>
@@ -136,7 +136,7 @@ void Part::defaults(void)
     Pfrand = 0;
     setDestination(1);
     defaultsinstrument();
-    ctl->defaults();
+    ctl->resetall();
     setNoteMap(0);
 }
 
@@ -1656,6 +1656,7 @@ void Part::getLimits(CommandBlock *getData)
         case 192:
         case 197:
         case 198:
+        case 199:
             type |= 0x40;
             break;
 

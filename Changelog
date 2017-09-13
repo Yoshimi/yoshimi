@@ -1,5 +1,11 @@
 yoshimi 1.5.3 M
 
+2017-9-13 Will
+* BugFix: reset not clearing master bandwidth.
+* Master bandwidth added to MIDI controls.
+* Master bandwidth now MIDI-learnable.
+* Docs updated.
+
 2017-9-11 Will
 * Improved AddSynth Voice controls code.
 * Corrected 'minus' tooltip.

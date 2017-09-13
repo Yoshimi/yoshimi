@@ -1607,6 +1607,9 @@ string InterChange::resolvePart(CommandBlock *getData)
         case 198:
             contstr = "Filter Cutoff";
             break;
+        case 199:
+            contstr = "Bandwidth";
+            break;
 
         case 222:
             showValue = false;
@@ -4567,6 +4570,12 @@ void InterChange::commandPart(CommandBlock *getData)
                 part->ctl->setfiltercutoff(value);
             else
                 value = part->ctl->filtercutoff.data;
+            break;
+        case 199:
+            if (write)
+                part->ctl->setbandwidth(value);
+            else
+                value = part->ctl->bandwidth.data;
             break;
 
         case 222:
