@@ -17,7 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-Modified August 2017
+Modified September 2017
 } {selected in_source in_header
 }
 
@@ -116,18 +116,18 @@ paramsui->Show(5);}
         }
         MenuItem {} {
           label {Clear Chan}
-          callback {clearVector(BaseChan);
-//send_data(93, baseChan, 0xf0);}
+          callback {//clearVector(BaseChan);
+send_data(96, 0, 0xf0, 192, 255, 255, BaseChan);}
           xywh {30 30 34 20} labelsize 12
         }
         MenuItem {} {
           label {Clear All}
           callback {//
-for (int i = NUM_MIDI_CHANNELS - 1; i >= 0; --i)
+/*for (int i = NUM_MIDI_CHANNELS - 1; i >= 0; --i)
     clearVector(i);
 BaseChan = 0;
-setbasechan->value(1);
-//send_data(96, 0, 0xf0);}
+setbasechan->value(1);*/
+send_data(96, 0, 0xf0);}
           xywh {40 40 34 20} labelsize 12
         }
       }
@@ -286,11 +286,12 @@ else if (tmp < 14)
 
 if (tmp < 14)
 {
-    synth->getRuntime().vectordata.Xaxis[BaseChan] = 0xff;
+    send_data(96, 0, 0xf0, 192, 255, 255, BaseChan);
+    /*synth->getRuntime().vectordata.Xaxis[BaseChan] = 0xff;
     synth->getRuntime().vectordata.Enabled[BaseChan] = false;
     Xgroup->deactivate();
     Ygroup->deactivate();
-    Ycontrol->deactivate();;
+    Ycontrol->deactivate();;*/
 }
 else
 {
@@ -506,11 +507,10 @@ if (tmp != NULL && !string(tmp).empty())
       }
     }
   }
-  Function {send_data(int control, float value, int type, int part = 255, int kit = 255, int engine = 255, int insert = 255, int parameter = 255, int par2 = 255)} {} {
+  Function {send_data(int control, float value, int type, int part = 192, int kit = 255, int engine = 255, int insert = 255, int parameter = 255, int par2 = 255)} {} {
     code {//
-    if (control < 84 || control > 85)
+    if (control != 84 && control != 85 && control != 96)
     {
-        part = 192;
         insert = BaseChan;
     }
     collect_data(synth, value, (Fl::event_button() | type), control, part, kit, engine, insert, parameter, par2);} {}
@@ -532,6 +532,18 @@ switch (control)
         msg = miscMsgPop(par2);;
         loadlabel[insert] = msg;
         Loaded->copy_label(msg.c_str());
+        break;
+
+    case 96:
+        if (insert >= NUM_MIDI_PARTS)
+        {
+            for (int i = NUM_MIDI_CHANNELS - 1; i >= 0; --i)
+                 clearVector(i);
+	    BaseChan = 0;
+            setbasechan->value(1);
+        }
+        else
+            clearVector(insert);
         break;
 }} {}
   }
@@ -814,11 +826,11 @@ return col;} {}
   }
   Function {clearVector(int BaseC)} {} {
     code {//
-synth->getRuntime().vectordata.Xaxis[BaseC] = 0xff;
-synth->getRuntime().vectordata.Yaxis[BaseC] = 0xff;
-synth->getRuntime().vectordata.Xfeatures[BaseC] = 0;
-synth->getRuntime().vectordata.Yfeatures[BaseC] = 0;
-synth->getRuntime().vectordata.Enabled[BaseC] = false;
+//synth->getRuntime().vectordata.Xaxis[BaseC] = 0xff;
+//synth->getRuntime().vectordata.Yaxis[BaseC] = 0xff;
+//synth->getRuntime().vectordata.Xfeatures[BaseC] = 0;
+//synth->getRuntime().vectordata.Yfeatures[BaseC] = 0;
+//synth->getRuntime().vectordata.Enabled[BaseC] = false;
 loadlabel[BaseC] = "No Name " + to_string(BaseC + 1);
 Loaded->copy_label(loadlabel[BaseC].c_str());
 setbuttons();
@@ -826,18 +838,18 @@ Xcontrol->activate();
 Xcontrol->damage();
 Ycontrol->deactivate();
 Ycontrol->damage();
-
+/*
 {
 if (BaseC < NUM_MIDI_CHANNELS)
 {
-//    send_data(93, BaseC, 0xf0, 192);
+//    send_data(96, BaseC, 0xf0, 192);
     ;
 }
 else
 {
-//    send_data(96, 0, 0xf0, 192);
+//    send_data(96, 255, 0xf0, 192);
     ;
-}} {}} {}
+}} {}*/} {}
   }
   decl {SynthEngine *synth;} {private local
   }

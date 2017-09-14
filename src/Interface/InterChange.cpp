@@ -860,6 +860,15 @@ string InterChange::resolveVector(CommandBlock *getData)
             contstr = "Down Instrument";
             break;
 
+        case 96:
+            showValue = false;
+            if (chan > NUM_MIDI_CHANNELS)
+                contstr = "all channels";
+            else
+                contstr = "chan " + to_string(chan + 1);
+            return("Vector cleared on " + contstr);
+            break;
+
         case 127:
             break;
 
@@ -3325,6 +3334,31 @@ void InterChange::commandVector(CommandBlock *getData)
     bool write = (type & 0x40) > 0;
     unsigned int features;
 
+    if (control == 96)
+    {
+        int start;
+        int end;
+        if (chan >= NUM_MIDI_CHANNELS)
+        {
+            start = 0;
+            end = NUM_MIDI_CHANNELS;
+        }
+        else
+        {
+            start = chan;
+            end = chan + 1;
+        }
+        for (int ch = start; ch < end; ++ ch)
+        {
+            synth->getRuntime().vectordata.Xaxis[ch] = 0xff;
+            synth->getRuntime().vectordata.Yaxis[ch] = 0xff;
+            synth->getRuntime().vectordata.Xfeatures[ch] = 0;
+            synth->getRuntime().vectordata.Yfeatures[ch] = 0;
+            synth->getRuntime().vectordata.Enabled[ch] = false;
+            synth->getRuntime().vectordata.Name[ch] = "No Name " + to_string(ch);
+        }
+        return;
+    }
     if (write)
     {
         if (control == 17 || control == 18 || control == 33 || control == 34)

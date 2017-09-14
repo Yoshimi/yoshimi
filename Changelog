@@ -1,5 +1,9 @@
 yoshimi 1.5.3 M
 
+2017-9-14 Will
+* Reinstated and improved ALSA MIDI ring buffer.
+* Started converting Vectors.
+
 2017-9-13 Will
 * BugFix: reset not clearing master bandwidth.
 * Master bandwidth added to MIDI controls.
