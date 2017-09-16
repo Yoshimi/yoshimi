@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code.
 
-Modified July 2017
+Modified September 2017
 } {in_source in_header
 }
 
@@ -273,7 +273,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
   Function {make_window()} {} {
     Fl_Window instrumentuiwindow {
       label Bank
-      xywh {210 403 780 575} type Double hide
+      xywh {203 349 780 575} type Double hide
     } {
       Fl_Choice banklist {
         callback {//
@@ -298,7 +298,8 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
     {
         rootFrom = 3;
         instrumentuiwindow->hide();
-    }}
+    }
+    instFrom = 0;}
         tooltip {Show root paths} xywh {350 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
       Fl_Button {} {
@@ -310,8 +311,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
         bankFrom = 3;
         instrumentuiwindow->hide();
     }
-    else
-        instFrom = 0;}
+    instFrom = 0;}
         tooltip {Show banks in current root} xywh {496 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
       Fl_Text_Display {} {
@@ -419,16 +419,20 @@ removeselection();}
       Fl_Button {} {
         label Close
         callback {//
-    instrumentuiwindow->hide();
+
+    synth->getRuntime().Log("Inst " + to_string(int(instFrom )));
     if (Fl::event_button() == 3)
     {
         if (instFrom == 2)
+        {
+            bankFrom = 3;
             bankuiwindow->show();
+        }
         else if (instFrom == 4)
             ; // todo open mixer panel
     }
-    else
-        instFrom = 0; // to avoid later confusion!}
+    instFrom = 0; // to avoid later confusion!
+    instrumentuiwindow->hide();}
         xywh {665 539 70 24} box THIN_UP_BOX labelsize 12
       }
       Fl_Group engines {
@@ -489,12 +493,10 @@ removeselection();}
       Fl_Button {} {
         label Instruments
         callback {//
+    instFrom = 2;
     instrumentuiwindow->show();
     if (Fl::event_button() == 3)
-    {
-        instFrom = 2;
-        bankuiwindow->hide();
-    }}
+        bankuiwindow->hide();}
         tooltip {Show instruments in current bank} xywh {627 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
       Fl_Group {} {
@@ -912,9 +914,11 @@ instFrom = 0;} {}
                           bankEntry.dirname.c_str());
                  setrootread();
                  return;
-             }
+            }
+            instFrom = 2;
             if (what == 3)
                 bankuiwindow->hide();
+
             cbwig->do_callback();
             instrumentuiwindow->show();
             set_bank_slot(); // needed by 'old' menu selector

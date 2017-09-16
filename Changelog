@@ -1,5 +1,10 @@
 yoshimi 1.5.3 M
 
+2017-9-16 Will
+* Removed redundant mutex from OscilGenUI.
+* Added check for old config file.
+* Improved Bank/Instrument window stacking.
+
 2017-9-14 Will
 * Reinstated and improved ALSA MIDI ring buffer.
 * Started converting Vectors.

@@ -13,8 +13,6 @@ NRPN channels?
 
 Fl::check() used too liberally. See where it can be removed - controls updating multiple windows seem the be the main problem.
 
-Direct access to envelope not updating freemode Gui graph, but seems to work otherwise.
-
 Expand midi-learn to include:
     more switches
     learn groups
