@@ -19,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified February 2017
+    This file is derivative of ZynAddSubFX original code, modified September 2017
 */
 
 #ifndef AD_NOTE_PARAMETERS_H
@@ -133,8 +133,7 @@ struct ADnoteVoiceParam { // Voice parameters
     float pangainL;         // derived from PPanning
     float pangainR;         // ^
     unsigned char PVolume;
-    unsigned char PVolumeminus; // ?? doesn't seem to be currently associated
-                                // with anything
+    unsigned char PVolumeminus; // reverse voice phase relative to others
 
     unsigned char PAmpVelocityScaleFunction; // Velocity sensing
 

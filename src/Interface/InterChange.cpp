@@ -860,6 +860,15 @@ string InterChange::resolveVector(CommandBlock *getData)
             contstr = "Down Instrument";
             break;
 
+        case 96:
+            showValue = false;
+            if (chan > NUM_MIDI_CHANNELS)
+                contstr = "all channels";
+            else
+                contstr = "chan " + to_string(chan + 1);
+            return("Vector cleared on " + contstr);
+            break;
+
         case 127:
             break;
 
@@ -1606,6 +1615,9 @@ string InterChange::resolvePart(CommandBlock *getData)
             break;
         case 198:
             contstr = "Filter Cutoff";
+            break;
+        case 199:
+            contstr = "Bandwidth";
             break;
 
         case 222:
@@ -3322,6 +3334,31 @@ void InterChange::commandVector(CommandBlock *getData)
     bool write = (type & 0x40) > 0;
     unsigned int features;
 
+    if (control == 96)
+    {
+        int start;
+        int end;
+        if (chan >= NUM_MIDI_CHANNELS)
+        {
+            start = 0;
+            end = NUM_MIDI_CHANNELS;
+        }
+        else
+        {
+            start = chan;
+            end = chan + 1;
+        }
+        for (int ch = start; ch < end; ++ ch)
+        {
+            synth->getRuntime().vectordata.Xaxis[ch] = 0xff;
+            synth->getRuntime().vectordata.Yaxis[ch] = 0xff;
+            synth->getRuntime().vectordata.Xfeatures[ch] = 0;
+            synth->getRuntime().vectordata.Yfeatures[ch] = 0;
+            synth->getRuntime().vectordata.Enabled[ch] = false;
+            synth->getRuntime().vectordata.Name[ch] = "No Name " + to_string(ch);
+        }
+        return;
+    }
     if (write)
     {
         if (control == 17 || control == 18 || control == 33 || control == 34)
@@ -4567,6 +4604,12 @@ void InterChange::commandPart(CommandBlock *getData)
                 part->ctl->setfiltercutoff(value);
             else
                 value = part->ctl->filtercutoff.data;
+            break;
+        case 199:
+            if (write)
+                part->ctl->setbandwidth(value);
+            else
+                value = part->ctl->bandwidth.data;
             break;
 
         case 222:
@@ -6401,9 +6444,9 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
 
 void InterChange::commandEnvelope(CommandBlock *getData)
 {
-#pragma message "Gui writes changed to reads"
-    if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;
+//#pragma message "Gui writes changed to reads"
+//    if (getData->data.type & 0x20)
+//        getData->data.type = getData->data.type & 0xbf;
 
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -6534,8 +6577,13 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
                     pars->Penvdt[i + 1] = pars->Penvdt[i];
                     pars->Penvval[i + 1] = pars->Penvval[i];
                 }
+
+                if (point == 0)
+                    pars->Penvdt[1] = 64;
+
                 if (point <= pars->Penvsustain)
                     ++ pars->Penvsustain;
+
                 pars->Penvdt[point] = Xincrement;
                 pars->Penvval[point] = val;
                 getData->data.value = val;
@@ -6549,7 +6597,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
         {
             getData->data.value = 0xff;
             getData->data.par2 = 0xff;
-            return; // can't have less than 3
+            return; // can't have less than 4
         }
         else
         {

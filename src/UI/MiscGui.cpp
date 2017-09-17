@@ -235,6 +235,8 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                         synth->getGuiMaster()->partui->padnoteui->filterui->returns_update(getData);
                     break;
                 case 2:
+                case 3:
+                case 4:
                     switch(insertParam)
                     {
                         case 0:
@@ -282,6 +284,8 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                         synth->getGuiMaster()->partui->subnoteui->filterui->returns_update(getData);
                     break;
                 case 2:
+                case 3:
+                case 4:
                     switch(insertParam)
                     {
                         case 0:
@@ -344,6 +348,8 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                             synth->getGuiMaster()->partui->adnoteui->advoice->voicefilter->returns_update(getData);
                         break;
                     case 2:
+                    case 3:
+                    case 4:
                         if (engine >= 0xC0)
                             switch(insertParam)
                             {
@@ -417,6 +423,8 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                         synth->getGuiMaster()->partui->adnoteui->filterui->returns_update(getData);
                     break;
                 case 2:
+                case 3:
+                case 4:
                     switch(insertParam)
                     {
                         case 0:

@@ -480,13 +480,21 @@ bool XMLwrapper::loadXMLfile(const string& filename)
     {
         xml_version.y_major = string2int(mxmlElementGetAttr(root, "Yoshimi-major"));
         yoshitoo = true;
+
 //        synth->getRuntime().Log("XML: Yoshimi " + asString(xml_version.y_major));
     }
+    else
+        synth->getRuntime().lastXMLmajor = 0;
+
     if (mxmlElementGetAttr(root, "Yoshimi-minor"))
     {
         xml_version.y_minor = string2int(mxmlElementGetAttr(root, "Yoshimi-minor"));
+
 //        synth->getRuntime().Log("XML: Yoshimi " + asString(xml_version.y_minor));
     }
+    else
+        synth->getRuntime().lastXMLminor = 0;
+
     if (synth->getRuntime().logXMLheaders)
     {
         if (zynfile)
@@ -573,6 +581,11 @@ bool XMLwrapper::enterbranch(const string& name)
     if (!node)
         return false;
     push(node);
+    if (name == "CONFIGURATION")
+    {
+        synth->getRuntime().lastXMLmajor = xml_version.y_major;
+        synth->getRuntime().lastXMLminor = xml_version.y_minor;
+    }
     return true;
 }
 

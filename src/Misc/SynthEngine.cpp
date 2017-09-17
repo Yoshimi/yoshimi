@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified August 2017
+    Modified September 2017
 */
 
 #include<stdio.h>
@@ -107,7 +107,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     ctl(NULL),
     microtonal(this),
     fft(NULL),
-    muted(0xFF),
+    muted(0),
     tmpmixl(NULL),
     tmpmixr(NULL),
     processLock(NULL),
@@ -174,6 +174,7 @@ SynthEngine::~SynthEngine()
         delete fft;
     pthread_mutex_destroy(&processMutex);
     sem_destroy(&partlock);
+    sem_destroy(&mutelock);
     if (ctl)
         delete ctl;
     getRemoveSynthId(true, uniqueId);
@@ -276,6 +277,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     }
 
     sem_init(&partlock, 0, 1);
+    sem_init(&mutelock, 0, 1);
 
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
@@ -488,9 +490,10 @@ void *SynthEngine::RBPthread(void)
                         switch(block.data[1] & 0xff)
                         {
                             case 1:
-                                actionLock(lockmute);
+                                //actionLock(lockmute);
                                 ShutUp();
-                                actionLock(unlock);
+                                //actionLock(unlock);
+                                Unmute();
                                 break;
                         }
                         break;
@@ -2022,10 +2025,11 @@ void SynthEngine::ClearNRPNs(void)
 
 void SynthEngine::resetAll(void)
 {
-    actionLock(lockmute);
+    //actionLock(lockmute);
     defaults();
     ClearNRPNs();
-    actionLock(unlock);
+    Unmute();
+    //actionLock(unlock);
     //GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 1);
 }
 
@@ -2086,6 +2090,51 @@ void SynthEngine::partonoffWrite(int npart, int what)
 char SynthEngine::partonoffRead(int npart)
 {
     return (part[npart]->Penabled == 1);
+}
+
+
+void SynthEngine::Unmute()
+{
+    sem_wait (&mutelock);
+    mutewrite(2);
+    sem_post (&mutelock);
+}
+
+void SynthEngine::Mute()
+{
+    sem_wait (&mutelock);
+    mutewrite(-1);
+    sem_post (&mutelock);
+}
+
+
+/*
+ * Intellegent switch for unknown mute status that always
+ * switches off and later returns original unknown state
+ */
+void SynthEngine::mutewrite(int what)
+{
+    unsigned char original = muted;
+    unsigned char tmp = original;
+    switch (what)
+    {
+        case 0: // always off
+            tmp = 0;
+            break;
+        case 1: // always on
+            tmp = 1;
+            break;
+        case -1: // further from on
+            tmp -= 1;
+            break;
+        case 2:
+            if (tmp != 1) // nearer to on
+                tmp += 1;
+            break;
+        default:
+            return;
+    }
+    muted = tmp;
 }
 
 
@@ -2493,11 +2542,12 @@ bool SynthEngine::saveState(string filename)
 
 bool SynthEngine::loadPatchSetAndUpdate(string fname)
 {
-    actionLock(lockmute);
+    //actionLock(lockmute);
     bool result;
     fname = setExtension(fname, "xmz");
     result = loadXML(fname); // load the data
-    actionLock(unlock);
+    //actionLock(unlock);
+    Unmute();
     if (result)
     {
         setAllPartMaps();

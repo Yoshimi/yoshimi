@@ -64,13 +64,7 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
     if (synth->isMuted())
         return; // nobody listening!
 
-/*
- * Currently not using the ring buffer.
- * It seems to fail to recognise ALSA engine
- * and we don't have LV2 sync done
- * so can't remove the master mutex anyway.
- */
-    if (true)//in_place || ((int)synth->getRuntime().audioEngine ==1 && (int)synth->getRuntime().midiEngine) == 1)
+    if ((synth->getRuntime().audioEngine != alsa_audio) && (synth->getRuntime().midiEngine != alsa_midi))
     { // it's all jack
         synth->mididecode.midiProcess(par0, par1, par2, in_place);
         return;

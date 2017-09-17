@@ -107,12 +107,12 @@ oscbase = oscbase_;} {}
         for (i = 0; i < n; ++i)
             spc[i] = 0.0;
 
-        synth->actionLock(lock);
+        //synth->actionLock(lock);
         if (oscbase == 0)
             oscil->getspectrum(n, spc, 0);
         else
             oscil->getspectrum(n, spc, 1);
-        synth->actionLock(unlock);
+        //synth->actionLock(unlock);
 
         // normalize
         float max = 0;
@@ -236,12 +236,12 @@ phase=phase_;} {}
   Function {draw()} {} {
     code {int ox = x(), oy = y(), lx = w(), ly = h() - 1;
             float smps[synth->oscilsize];
-            synth->actionLock(lock);
+            //synth->actionLock(lock);
             if (oscbase == 0)
                 oscil->get(smps, -1.0);
             else
                 oscil->getcurrentbasefunction(smps);
-            synth->actionLock(unlock);
+            //synth->actionLock(unlock);
 
             if (damage( )!= 1)
             {

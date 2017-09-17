@@ -1,9 +1,38 @@
 yoshimi 1.5.3 M
 
+2017-9-17 Will
+* Mute now uses the same structure as partonoff.
+  Only a few mutex locks left!
+
+2017-9-16 Will
+* Removed redundant mutex from OscilGenUI.
+* Added check for old config file.
+* Improved Bank/Instrument window stacking.
+
+2017-9-14 Will
+* Reinstated and improved ALSA MIDI ring buffer.
+* Started converting Vectors.
+
+2017-9-13 Will
+* BugFix: reset not clearing master bandwidth.
+* Master bandwidth added to MIDI controls.
+* Master bandwidth now MIDI-learnable.
+* Docs updated.
+* Corrected MIDI controls tooltips.
+
+2017-9-11 Will
+* Improved AddSynth Voice controls code.
+* Corrected 'minus' tooltip.
+
+2017-9-10 Will
+* Envelopes converted.
+
 2017-9-9 Will
 * Corrected NRPN wrong displayed values.
   Actual values were quite correct.
 * Replaced splash screen png with svg version.
+* Finally got envelope graphs under control.
+  Tidying up and full conversion tomorrow :)
 
 2017-9-8 Will
 * Most of envelopes transferred.

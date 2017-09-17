@@ -14,7 +14,9 @@ Sections currently in place and tested:
 
 Top level controls
 Config - now used by GUI for writes
-Vectors
+
+Vectors - to complete
+
 Microtonal (scales) - now used by GUI for writes
 Midi-learn - used for all operations
 Main part controls - now used by GUI for writes
@@ -22,17 +24,15 @@ Controllers Window - now used by GUI for writes
 MIDI learn editor window - used for all except incoming real MIDI
 Kit edit window - now used by GUI for writes
 AddSynth Editor - now used by GUI for writes
-AddSynth Voice Editor
+AddSynth Voice Editor - now used by GUI for writes
 Subsynth Editor - now used by GUI for writes
 Padsynth Editor - now used by GUI for writes
-Oscillator
+Oscillator - now used by GUI for writes
 Resonance - now used by GUI for writes
-Effects
+Effects - now used by GUI for writes
 LFOs - now used by GUI for writes
-Filters
-Envelopes
-
-The remaining ones will display as if they had been written to, but won't actually change anything.
+Filters - now used by GUI for writes
+Envelopes - now used by GUI for writes
 
 This matches the results from using the middle mouse button in the GUI (assuming it was enabled at build time with 'ShowGuiRreports'). Some commands that are purely within the GUI, e.g window changes are recognised but not acted on. It is expected that any alternative input system will store its own copies of such intermediate information so that they remain fully independent.
 

@@ -104,6 +104,7 @@ Y : 0/1 : 35 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Y feature 0 - off, on
 Y : 0 to 2 : 36 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Y feature 1 - off, on, reverse
 Y : 0 to 2 : 37 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Y feature 2 - off, on, reverse
 Y : 0 to 2 : 38 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Y feature 3 - off, on, reverse
+Y : any : 96 : 192 : 255 : 255 : 0 to 15, > : 255 : 255 : Clear channel - base > 15 = clear all
 
 Main part controls
 YL : 0 to 127 : 0 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Volume
@@ -165,6 +166,7 @@ YL : 0 to 127 : 192 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Modulation (CC 1)
 YL : 0 to 127 : 194 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Expression (CC 11)
 YL : 0 to 127 : 197 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Q (CC 71)
 YL : 0 to 127 : 198 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Cutoff (CC 74)
+YL : 0 to 127 : 199 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Master Bandwidth (CC 75)
 Y : any : 224 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Reset all controllers (for this part)
 
 Instrument edit window
