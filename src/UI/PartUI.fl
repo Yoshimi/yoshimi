@@ -955,7 +955,7 @@ send_data(199, o->value(), 0xc8);}
       }
     }
     Fl_Window partfx {
-      label {Part's Insert Effects}
+      label {Part's Insert Effects} open
       xywh {134 114 385 160} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Insert Effects").c_str());}
     } {
@@ -1070,9 +1070,9 @@ send_data(67, o->value(), 0xc0, 0xff, ninseff);}
       Fl_Button {} {
         label P
         callback {//
-            synth->actionLock(lockmute);
+            //synth->actionLock(lockmute);
             synth->getGuiMaster()->getPresetsUi()->paste(part->partefx[ninseff], inseffectui);
-            synth->actionLock(unlock);}
+            //synth->actionLock(unlock);}
         xywh {350 19 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
     }

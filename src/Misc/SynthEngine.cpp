@@ -713,9 +713,11 @@ void SynthEngine::SetZynControls()
             data |= (1 << 22);
             if (efftype == 0x40) // select effect
             {
-                actionLock(lockmute);
+                //actionLock(lockmute);
+                Mute();
                 insefx[effnum]->changeeffect(value);
-                actionLock(unlock);
+                Unmute();
+                //actionLock(unlock);
             }
             else if (efftype == 0x20) // select part
             {
@@ -2495,14 +2497,14 @@ bool SynthEngine::actionLock(lockset request)
             break;
 
         case unlock:
-            Unmute();
+            //Unmute();
             chk = pthread_mutex_unlock(processLock);
             break;
 
-        case lockmute:
+        /*case lockmute:
             Mute();
             chk = pthread_mutex_lock(processLock);
-            break;
+            break;*/
 
         default:
             break;

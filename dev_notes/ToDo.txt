@@ -1,7 +1,7 @@
 still not fully converted:
     vectors
 
-change mute to same style as partOnOff so no mutex needed.
+pasting effect doesn't update effect title.
 
 transfer instrument external load/save
 
