@@ -1,6 +1,8 @@
 still not fully converted:
     vectors
 
+change mute to same style as partOnOff so no mutex needed.
+
 transfer instrument external load/save
 
 Requested: revise window states so engines etc can be made auto open.

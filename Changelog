@@ -1,5 +1,9 @@
 yoshimi 1.5.3 M
 
+2017-9-17 Will
+* Mute now uses the same structure as partonoff.
+  Only a few mutex locks left!
+
 2017-9-16 Will
 * Removed redundant mutex from OscilGenUI.
 * Added check for old config file.

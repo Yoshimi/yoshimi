@@ -22,7 +22,7 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified August 2017
+    Modified September 2017
 */
 
 #include <cmath>
@@ -672,12 +672,12 @@ void PADnoteParameters::applyparameters(bool islocked)
     FFTwrapper::deleteFFTFREQS(&fftfreqs);
 
     // delete the additional samples that might exists and are not useful
-    if (!islocked)
-        synth->actionLock(lockmute);
+    //if (!islocked)
+    //    synth->actionLock(lockmute);
     for (int i = samplemax; i < PAD_MAX_SAMPLES; ++i)
         deletesample(i);
-    if (!islocked)
-        synth->actionLock(unlock);
+    //if (!islocked)
+    //    synth->actionLock(unlock);
 }
 
 

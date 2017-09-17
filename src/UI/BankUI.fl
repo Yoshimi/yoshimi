@@ -815,9 +815,9 @@ instFrom = 0;} {}
                     else
                     {
                         synth->part[*npart]->Pname = newname;
-                        synth->actionLock(lockmute);
+                        //synth->actionLock(lockmute);
                         bank->savetoslot(slot,synth->part[*npart]);
-                        synth->actionLock(unlock);
+                        //synth->actionLock(unlock);
                         bs[slot]->refresh();
                     }
                 }
@@ -845,10 +845,10 @@ instFrom = 0;} {}
             }
             if (doit)
             {
-                synth->actionLock(lockmute);
+                //synth->actionLock(lockmute);
                 if (!bank->savetoslot(slot,synth->part[*npart]))
                     fl_alert("Could not save to this location");
-                synth->actionLock(unlock);
+                //synth->actionLock(unlock);
                 bs[slot]->refresh();
                 setread();
             }
