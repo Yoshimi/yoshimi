@@ -97,7 +97,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 }
 
-class MasterUI {selected : {private MiscFuncs}
+class MasterUI {selected : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//

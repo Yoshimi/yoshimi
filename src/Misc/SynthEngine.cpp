@@ -140,6 +140,10 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
 SynthEngine::~SynthEngine()
 {
     closeGui();
+
+    if (RBPthreadHandle)
+        pthread_join(RBPthreadHandle, NULL);
+
     if (vuringbuf)
         jack_ringbuffer_free(vuringbuf);
     if (RBPringbuf)

@@ -269,7 +269,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         }
         else if(insertPar2 < 0xff)
         {
-            miscMsgPop(insertPar2); // clearany text out.
+            miscMsgPop(insertPar2); // clear any text out.
         }
         return;
     }

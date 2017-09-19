@@ -1687,9 +1687,9 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
                         break;
                 }
             }
-            instrumentaddbox->damage(1);
-            instrumentsubbox->damage(1);
-            instrumentpadbox->damage(1);
+            //instrumentaddbox->damage(1);
+            //instrumentsubbox->damage(1);
+            //instrumentpadbox->damage(1);
             instrumentlabel->copy_label(part->Pname.c_str());
             synth->getGuiMaster()->updatepanel();
             break;

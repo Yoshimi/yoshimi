@@ -1,5 +1,8 @@
 yoshimi 1.5.3 M
 
+2017-9-19 Will
+* Further CLI conversions and code cleanups.
+
 2017-9-17 Will
 * Mute now uses the same structure as partonoff.
   Only a few mutex locks left!

@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified August 2017
+    Modified September 2017
 */
 
 #include <iostream>
@@ -1648,14 +1648,10 @@ int CmdInterface::commandPart(bool justSet)
             if (npart != tmp)
             {
                 npart = tmp;
-                Runtime.currentPart = npart;
-                GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 0);
+                sendDirect(npart, 64, 14, 240);
             }
             if (point[0] == 0)
-            {
-                Runtime.Log("Part number set to " + asString(npart + 1));
                 return done_msg;
-            }
         }
     }
     if (matchnMove(2, point, "effects") || matchnMove(2, point, "efx"))
@@ -1670,21 +1666,19 @@ int CmdInterface::commandPart(bool justSet)
     tmp = volPanVel();
     if(tmp != todo_msg)
         return tmp;
+
+    tmp = -1;
     if (matchnMove(2, point, "enable"))
-    {
-        synth->partonoffLock(npart, 1);
-        Runtime.Log("Part enabled");
-        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePanelItem, npart);
-        reply = done_msg;
-    }
+        tmp = 1;
     else if (matchnMove(2, point, "disable"))
+        tmp = 0;
+    if (tmp >= 0)
     {
-        synth->partonoffLock(npart, 0);
-        Runtime.Log("Part disabled");
-        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePanelItem, npart);
-        reply = done_msg;
+        sendDirect(tmp, 64, 8, npart);
+        return done_msg;
     }
-    else if (matchnMove(2, point, "program") || matchnMove(1, point, "instrument"))
+
+    if (matchnMove(2, point, "program") || matchnMove(1, point, "instrument"))
     {
         if (isRead)
         {
@@ -1696,7 +1690,6 @@ int CmdInterface::commandPart(bool justSet)
             tmp = string2int(point) - 1;
             if (tmp < 0 || tmp > 159)
                 return range_msg;
-            Runtime.finishedCLI = false;
             if (tmp < 128)
                 synth->writeRBP(3, npart | 0x80, tmp); // lower set
             else
@@ -2385,7 +2378,6 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 tmp = string2int(point);
                 if (tmp > 0)
                 {
-                    Runtime.finishedCLI = false;
                     sendDirect(0, 64, 0xf2, 0xd8, 0, 0, 0, 0, tmp - 1);
                     reply = done_msg;
                 }
@@ -2397,7 +2389,6 @@ bool CmdInterface::cmdIfaceProcessCommand()
             {
                 if ((string) point > "")
                 {
-                    Runtime.finishedCLI = false;
                     sendDirect(0, 64, 0xf1, 0xd8, 0, 0, 0, 0, miscMsgPush((string) point));
                     reply = done_msg;
                 }
@@ -2462,7 +2453,6 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 }
                 if (ok)
                 {
-                    Runtime.finishedCLI = false;
                     sendDirect(0, 64, 84, 240, 255, 255, ch, 192, miscMsgPush(name));
                 }
                 reply = done_msg;
@@ -2504,7 +2494,6 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 }
                 if (ok)
                 {
-                    Runtime.finishedCLI = false;
                     sendDirect(0, 64, 92, 0xf0, 0xff, 0xff, 0xff, 0xc0, miscMsgPush(name));
                     reply = done_msg;
                 }
@@ -2546,7 +2535,6 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 }
                 if (ok)
                 {
-                    Runtime.finishedCLI = false;
                     sendDirect(0, 64, 88, 0xf0, 0xff, 0xff, 0xff, 0x80, miscMsgPush(name));
                     reply = done_msg;
                 }
@@ -2591,7 +2579,6 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 }
                 if (ok)
                 {
-                    Runtime.finishedCLI = false;
                     sendDirect(0, 64, 80, 240, 255, 255, 255, 192, miscMsgPush(name));
                     reply = done_msg;
                 }
@@ -2602,10 +2589,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             if (point[0] == 0)
                 reply = name_msg;
             else
-            {
-                Runtime.finishedCLI = false;
                 synth->writeRBP(5, npart, miscMsgPush((string) point));
-            }
             reply = done_msg;
         }
         else
@@ -2622,7 +2606,6 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = name_msg;
             else
             {
-                Runtime.finishedCLI = false;
                 sendDirect(0, 64, 0xf5, 0xd8, 0, 0, 0, 0, miscMsgPush((string) point));
                 reply = done_msg;
             }
@@ -2642,9 +2625,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             else
             {
                 chan = tmp;
-                Runtime.finishedCLI = false;
                 sendDirect(0, 64, 85, 0xf0, 0xff, 0xff, chan, 0x80, miscMsgPush((string) point));
-                Runtime.finishedCLI = true;
                 reply = done_msg;
             }
         }
@@ -2653,13 +2634,11 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = value_msg;
             else
             {
-                Runtime.finishedCLI = false;
                 sendDirect(0, 64, 93, 0xf0, 0xff, 0xff, 0xff, 0x80, miscMsgPush(string(point)));
                 reply = done_msg;
             }
         else if(matchnMove(1, point, "config"))
         {
-            Runtime.finishedCLI = false;
             sendDirect(0, 64, 80, 248, 0xff, 0xff, 0xff, 0x80, miscMsgPush("DUMMY"));
         }
 
@@ -2669,7 +2648,6 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = name_msg;
             else
             {
-                Runtime.finishedCLI = false;
                 sendDirect(0, 64, 89, 0xf0, 0xff, 0xff, 0xff, 0x80, miscMsgPush(string(point)));
                 reply = done_msg;
             }
@@ -2679,7 +2657,6 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = name_msg;
             else
             {
-                Runtime.finishedCLI = false;
                 sendDirect(0, 64, 81, 0xf0, 0xff, 0xff, 0xff, 0x80, miscMsgPush(string(point)));
                 reply = done_msg;
             }
@@ -2695,7 +2672,6 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = name_msg;
             else
             {
-                Runtime.finishedCLI = false;
                 replyString = setExtension((string) point, "xiz");
                 tmp = synth->part[npart]->saveXML(replyString);
                 if (tmp)
@@ -2703,7 +2679,6 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 else
                     Runtime.Log("Failed to save " + replyString);
                 reply = done_msg;
-                Runtime.finishedCLI = true;
             }
         }
         else
@@ -2853,6 +2828,7 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
 
     if (jack_ringbuffer_write_space(synth->interchange.fromCLI) >= commandSize)
     {
+        synth->getRuntime().finishedCLI = false;
         jack_ringbuffer_write(synth->interchange.fromCLI, (char*) putData.bytes, commandSize);
     }
     return 0; // no function for this yet
@@ -2891,6 +2867,20 @@ void CmdInterface::cmdIfaceCommandLoop()
             }
             free(cCmd);
             cCmd = NULL;
+
+            if (!exit)
+            {
+                if (synth) // it won't be until Process called
+                {
+                    do
+                    { // create enough delay for most ops to complete
+                        usleep(2000);
+                    }
+                    while (synth->getRuntime().runSynth && !synth->getRuntime().finishedCLI);
+                }
+            }
+
+
             string prompt = "yoshimi";
             if (currentInstance > 0)
                 prompt += (":" + asString(currentInstance));
@@ -2940,18 +2930,7 @@ void CmdInterface::cmdIfaceCommandLoop()
             }
 
             prompt += "> ";
-            if (!exit)
-            {
-                if (synth) // it won't be until Process called
-                {
-                    do
-                    { // create enough delay for most ops to complete
-                        usleep(2000);
-                    }
-                    while (synth->getRuntime().runSynth && !synth->getRuntime().finishedCLI);
-                }
-                sprintf(welcomeBuffer,"%s",prompt.c_str());
-            }
+            sprintf(welcomeBuffer,"%s",prompt.c_str());
         }
         if (!exit)
             usleep(20000);
