@@ -97,7 +97,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 }
 
-class MasterUI {selected : {private MiscFuncs}
+class MasterUI {selected : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -663,9 +663,9 @@ paramsui->Show(4);}
           Fl_Button {} {
             label P
             callback {//
-    synth->actionLock(lockmute);
+    //synth->actionLock(lockmute);
     presetsui->paste(synth->sysefx[nsyseff], syseffectui);
-    synth->actionLock(unlock);}
+    //synth->actionLock(unlock);}
             xywh {350 137 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
           }
         }
@@ -742,9 +742,9 @@ paramsui->Show(4);}
           Fl_Button {} {
             label P
             callback {//
-              synth->actionLock(lockmute);
+              //synth->actionLock(lockmute);
               presetsui->paste(synth->insefx[ninseff], inseffectui);
-              synth->actionLock(unlock);}
+              //synth->actionLock(unlock);}
             xywh {350 137 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
           }
         }
@@ -1112,7 +1112,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             else if (control == 1)
             {
                 syseffnocounter->value(engine + 1);
-                nsyseff = engine;            
+                nsyseff = engine;
                 sysefftype->value(nval);
                 syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff);
                 showSysEfxUI();

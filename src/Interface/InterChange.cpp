@@ -231,6 +231,9 @@ void *InterChange::sortResultsThread(void)
 
 InterChange::~InterChange()
 {
+    if (sortResultsThreadHandle)
+        pthread_join(sortResultsThreadHandle, NULL);
+
     if (fromCLI)
     {
         jack_ringbuffer_free(fromCLI);
@@ -635,7 +638,10 @@ void InterChange::resolveReplies(CommandBlock *getData)
         msg.push_back("  2nd Param  0x" + asHexString(insertPar2) + "    " + asString(int(insertPar2)));
         synth->cliOutput(msg, 10);
         if (isCli)
+        {
+            synth->getRuntime().finishedCLI = true;
             return; // wanted for test only
+        }
 
     }
     if (npart == 0xc0)
