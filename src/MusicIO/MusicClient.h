@@ -32,8 +32,8 @@ using namespace std;
 #include "MusicIO/MidiControl.h"
 
 
-enum audio_drivers { no_audio = 0, jack_audio, alsa_audio };
-enum midi_drivers { no_midi = 0, jack_midi, alsa_midi };
+enum audio_drivers { no_audio = 0, jack_audio, alsa_audio};
+enum midi_drivers { no_midi = 0, jack_midi, alsa_midi};
 
 class SynthEngine;
 class MusicIO;

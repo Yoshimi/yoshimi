@@ -52,7 +52,7 @@ private:
    LV2_Atom_Sequence *_midiDataPort;
    LV2_Atom_Sequence *_notifyDataPortOut;
    LV2_URID _midi_event_id;
-   LV2_URID _yosmihi_state_id;
+   LV2_URID _yoshimi_state_id;
    LV2_URID _atom_string_id;
    LV2_URID _atom_type_chunk;
    LV2_URID _atom_type_sequence;

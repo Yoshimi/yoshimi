@@ -1,5 +1,9 @@
 yoshimi 1.5.3 M
 
+2017-9-21 Will
+* BugFix: MusicIO was passing LV2 MIDI to ring buffer.
+* Improved example build instructions.
+
 2017-9-19 Will
 * Further CLI conversions and code cleanups.
 

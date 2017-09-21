@@ -285,7 +285,7 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
     if (_uridMap.map != NULL && options != NULL)
     {
         _midi_event_id = _uridMap.map(_uridMap.handle, LV2_MIDI__MidiEvent);
-        _yosmihi_state_id = _uridMap.map(_uridMap.handle, YOSHIMI_STATE_URI);
+        _yoshimi_state_id = _uridMap.map(_uridMap.handle, YOSHIMI_STATE_URI);
         _atom_string_id = _uridMap.map(_uridMap.handle, LV2_ATOM__String);
         LV2_URID maxBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__maxBlockLength);
         LV2_URID minBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__minBlockLength);
@@ -333,7 +333,7 @@ YoshimiLV2Plugin::~YoshimiLV2Plugin()
 
 bool YoshimiLV2Plugin::init()
 {
-    if (_uridMap.map == NULL || _sampleRate == 0 || _bufferSize == 0 || _midi_event_id == 0 || _yosmihi_state_id == 0 || _atom_string_id == 0)
+    if (_uridMap.map == NULL || _sampleRate == 0 || _bufferSize == 0 || _midi_event_id == 0 || _yoshimi_state_id == 0 || _atom_string_id == 0)
         return false;
     if (!prepBuffers())
         return false;
@@ -357,7 +357,6 @@ bool YoshimiLV2Plugin::init()
     }
 
     synth->getRuntime().Log("Starting in LV2 plugin mode");
-
     return true;
 }
 
@@ -491,7 +490,7 @@ LV2_State_Status YoshimiLV2Plugin::stateSave(LV2_State_Store_Function store, LV2
     char *data = NULL;
     int sz = _synth->getalldata(&data);
 
-    store(handle, _yosmihi_state_id, data, sz, _atom_string_id, LV2_STATE_IS_POD | LV2_STATE_IS_PORTABLE);
+    store(handle, _yoshimi_state_id, data, sz, _atom_string_id, LV2_STATE_IS_POD | LV2_STATE_IS_PORTABLE);
     free(data);
     return LV2_STATE_SUCCESS;
 }
@@ -503,7 +502,7 @@ LV2_State_Status YoshimiLV2Plugin::stateRestore(LV2_State_Retrieve_Function retr
     LV2_URID type = 0;
     uint32_t new_flags;
 
-    const char *data = (const char *)retrieve(handle, _yosmihi_state_id, &sz, &type, &new_flags);
+    const char *data = (const char *)retrieve(handle, _yoshimi_state_id, &sz, &type, &new_flags);
 
     if (sz > 0)
         _synth->putalldata(data, sz);

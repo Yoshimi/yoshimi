@@ -605,6 +605,7 @@ int CmdInterface::effects()
     {
         nFXavail = NUM_SYS_EFX;
     }
+
     if (point[0] == 0)
     {
         if (bitTest(level, part_lev))
