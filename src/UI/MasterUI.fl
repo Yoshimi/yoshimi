@@ -2,7 +2,7 @@
 version 1.0304
 header_name {.h}
 code_name {.cc}
-comment {MasterUI.h} {not_in_source in_header
+comment {MasterUI.h} {selected not_in_source in_header
 }
 
 comment {MasterUI.cc} {in_source not_in_header
@@ -97,7 +97,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 }
 
-class MasterUI {selected : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1093,6 +1093,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     unsigned char insert = getData->data.insert;
     unsigned char par2 = getData->data.par2;
     int nval = lrint(value);
+    bool check = true;
     if (npart == 0xf1)
     {
         if (insert == 16)
@@ -1154,6 +1155,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             break;
 
         case 14:
+            check = false;
             partuigroup->remove(partui);
             delete partui;
             partui = new PartUI(0, 0, 765, 525);
@@ -1296,7 +1298,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             }
             break;
     }
-    Fl::check();} {}
+    if (check)
+    	Fl::check();} {}
   }
   Function {updatesendwindow()} {} {
     code {//

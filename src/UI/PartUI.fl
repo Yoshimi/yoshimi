@@ -488,6 +488,122 @@ send_data(4, o->value(), 0xc8);}
           code2 {//o->init(96);}
           class WidgetPDial
         }
+        Fl_Check_Button enportamento {
+          label Portamento
+          callback {//
+send_data(7, o->value(), 0xc8);}
+          tooltip {Enable/Disable the portamento} xywh {83 61 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 11 align 8
+          code0 {o->value(part->ctl->portamento.portamento);}
+        }
+        Fl_Spinner midich {
+          label Midi
+          callback {//
+int tmp = ((int)o->value() -1);
+if (tmp > 15)
+{
+    tmp &= 15;
+    o->value(tmp +1);
+}
+o->textcolor(FL_BLACK);
+if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
+    synth->getGuiMaster()->setPanelPartMidiWidget(npart % NUM_MIDI_CHANNELS, tmp);
+
+send_data(5, tmp, 0xc0);}
+          tooltip {MIDI channel for this part} xywh {31 36 40 19} labelsize 11 maximum 16 textsize 11
+          code0 {o->value(part->Prcvchn + 1);}
+          code1 {if (part->Prcvchn < NUM_MIDI_CHANNELS) o->textcolor(FL_BLACK); else o->textcolor(FL_WHITE);}
+        }
+        Fl_Choice keymode {
+          label Mode
+          callback {//
+
+    send_data(6, o->value(), 0xc0);}
+          tooltip {Poly, Mono or Legato mode} xywh {83 36 68 19} down_box BORDER_BOX selection_color 49 labelsize 11 align 8 textfont 1 textsize 11
+          code0 {o->add("Poly"); o->add("Mono"); o->add("Legato");}
+          code1 {o->value(synth->ReadPartKeyMode(npart));}
+        } {}
+        Fl_Button {} {
+          label Controllers
+          callback {if (Fl::event_button() != 3)
+    ctlwindow->show();
+else
+    ctlmidi->show();}
+          tooltip {Left mouse button: Controller range settings, Right mouse button: MIDI CCs} xywh {8 81 167 25} box PLASTIC_UP_BOX color 222 labelsize 12
+        }
+        Fl_Spinner partkeyshift {
+          label {Key Shift}
+          callback {//
+send_data(35, o->value(), 0xc0);}
+          xywh {194 111 38 20} labelsize 10 minimum -36 maximum 36 textsize 11
+          code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
+          code1 {o->value(part->Pkeyshift - 64);}
+        }
+        Fl_Spinner partkeylimit {
+          label {Key Limit}
+          callback {//
+send_data(33, o->value(), 0xc0);}
+          tooltip {Maximum keys for this part} xywh {194 143 38 20} labelsize 10 value 20 textsize 11
+          code0 {o->range(1, POLIPHONY - 20); // enough for one part!}
+          code1 {o->value(part->Pkeylimit);}
+        }
+        Fl_Spinner minkcounter {
+          label {Min Note}
+          callback {//
+int tmp = o->value();
+int other = maxkcounter->value();
+if (tmp > other)
+{
+    tmp = other;
+    o->value(tmp);
+}
+
+send_data(16, tmp, 0xc0);}
+          tooltip {Minimum note the part receives} xywh {57 111 42 20} labelsize 10 minimum 0 maximum 127 textsize 11
+          code0 {o->range(0.0, 127.0);o->step(1.0);}
+          code1 {o->value(part->Pminkey);}
+        }
+        Fl_Spinner maxkcounter {
+          label {Max Note}
+          callback {//
+int tmp = o->value();
+int other = minkcounter->value();
+if (tmp < other)
+{
+    tmp = other;
+    o->value(tmp);
+}
+
+send_data(17, tmp, 0xc0);}
+          tooltip {Maximum note the part receives} xywh {57 143 42 20} labelsize 10 minimum 0 maximum 127 textsize 11
+          code0 {o->range(0.0, 127.0);o->step(1.0);}
+          code1 {o->value(part->Pmaxkey);}
+        }
+        Fl_Button {} {
+          label Set
+          callback {//
+    if (part->lastnote >= 0)
+        minkcounter->value(part->lastnote);
+
+    send_data(18, o->value(), 0xc0);}
+          tooltip {Set minimum note to the last note played} xywh {104 111 30 16} box PLASTIC_UP_BOX labelsize 10
+        }
+        Fl_Button {} {
+          label R
+          callback {//
+    minkcounter->value(0);
+    maxkcounter->value(127);
+
+    send_data(20, o->value(), 0xc0);}
+          tooltip {Reset the minimum key to 0 and maximum key to 127} xywh {104 129 30 16} box PLASTIC_UP_BOX labelfont 1 labelsize 11
+        }
+        Fl_Button {} {
+          label Set
+          callback {//
+    if (part->lastnote >= 0) maxkcounter->value(part->lastnote);
+
+    send_data(19, o->value(), 0xc0);}
+          tooltip {Set maximum note to the last note played} xywh {104 147 30 16} box PLASTIC_UP_BOX labelsize 10
+        }
         Fl_Box {} {
           xywh {240 96 134 69} box ENGRAVED_FRAME
         }
@@ -519,56 +635,6 @@ send_data(4, o->value(), 0xc8);}
         xywh {58 59 20 20} down_box DOWN_BOX labelsize 11 align 4
         code0 {o->value(part->Penabled == 1);}
       }
-      Fl_Spinner midich {
-        label Midi
-        callback {//
-int tmp = ((int)o->value() -1);
-if (tmp > 15)
-{
-    tmp &= 15;
-    o->value(tmp +1);
-}
-o->textcolor(FL_BLACK);
-if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-    synth->getGuiMaster()->setPanelPartMidiWidget(npart % NUM_MIDI_CHANNELS, tmp);
-
-send_data(5, tmp, 0xc0);}
-        tooltip {MIDI channel for this part} xywh {31 36 40 19} labelsize 11 maximum 16 textsize 11
-        code0 {o->value(part->Prcvchn + 1);}
-        code1 {if (part->Prcvchn < NUM_MIDI_CHANNELS) o->textcolor(FL_BLACK); else o->textcolor(FL_WHITE);}
-      }
-      Fl_Choice keymode {
-        label Mode
-        callback {//
-
-    send_data(6, o->value(), 0xc0);}
-        tooltip {Poly, Mono or Legato mode} xywh {78 36 68 19} down_box BORDER_BOX selection_color 49 labelsize 11 align 8 textfont 1 textsize 11
-        code0 {o->add("Poly"); o->add("Mono"); o->add("Legato");}
-        code1 {o->value(synth->ReadPartKeyMode(npart));}
-      } {}
-      Fl_Check_Button enportamento {
-        label Portamento
-        callback {//
-send_data(7, o->value(), 0xc8);}
-        tooltip {Enable/Disable the portamento} xywh {76 61 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 11 align 8
-        code0 {o->value(part->ctl->portamento.portamento);}
-      }
-      Fl_Spinner partkeyshift {
-        label {Key Shift}
-        callback {//
-send_data(35, o->value(), 0xc0);}
-        xywh {194 111 38 20} labelsize 10 minimum -36 maximum 36 textsize 11
-        code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
-        code1 {o->value(part->Pkeyshift - 64);}
-      }
-      Fl_Spinner partkeylimit {
-        label {Key Limit}
-        callback {//
-send_data(33, o->value(), 0xc0);}
-        tooltip {Maximum keys for this part} xywh {194 143 38 20} labelsize 10 value 20 textsize 11
-        code0 {o->range(1, POLIPHONY - 20); // enough for one part!}
-        code1 {o->value(part->Pkeylimit);}
-      }
       Fl_Box {} {
         label Mask
         xywh {242 98 128 63} box FLAT_BOX labeltype NO_LABEL
@@ -596,72 +662,6 @@ send_data(33, o->value(), 0xc0);}
               psyef[i]->init(npart, i, synth);
             }}
         } {}
-      }
-      Fl_Button {} {
-        label Controllers
-        callback {if (Fl::event_button() != 3)
-    ctlwindow->show();
-else
-    ctlmidi->show();}
-        tooltip {Left mouse button: Controller range settings, Right mouse button: MIDI CCs} xywh {3 81 167 25} box PLASTIC_UP_BOX color 222 labelsize 12
-      }
-      Fl_Spinner minkcounter {
-        label {Min Note}
-        callback {//
-int tmp = o->value();
-int other = maxkcounter->value();
-if (tmp > other)
-{
-    tmp = other;
-    o->value(tmp);
-}
-
-send_data(16, tmp, 0xc0);}
-        tooltip {Minimum note the part receives} xywh {57 111 42 20} labelsize 10 minimum 0 maximum 127 textsize 11
-        code0 {o->range(0.0, 127.0);o->step(1.0);}
-        code1 {o->value(part->Pminkey);}
-      }
-      Fl_Spinner maxkcounter {
-        label {Max Note}
-        callback {//
-int tmp = o->value();
-int other = minkcounter->value();
-if (tmp < other)
-{
-    tmp = other;
-    o->value(tmp);
-}
-
-send_data(17, tmp, 0xc0);}
-        tooltip {Maximum note the part receives} xywh {57 143 42 20} labelsize 10 minimum 0 maximum 127 textsize 11
-        code0 {o->range(0.0, 127.0);o->step(1.0);}
-        code1 {o->value(part->Pmaxkey);}
-      }
-      Fl_Button {} {
-        label Set
-        callback {//
-    if (part->lastnote >= 0)
-        minkcounter->value(part->lastnote);
-
-    send_data(18, o->value(), 0xc0);}
-        tooltip {Set minimum note to the last note played} xywh {104 111 30 16} box PLASTIC_UP_BOX labelsize 10
-      }
-      Fl_Button {} {
-        label R
-        callback {//
-    minkcounter->value(0);
-    maxkcounter->value(127);
-
-    send_data(20, o->value(), 0xc0);}
-        tooltip {Reset the minimum key to 0 and maximum key to 127} xywh {104 129 30 16} box PLASTIC_UP_BOX labelfont 1 labelsize 11
-      }
-      Fl_Button {} {
-        label Set
-        callback {//
-    if (part->lastnote >= 0) maxkcounter->value(part->lastnote);
-
-    send_data(19, o->value(), 0xc0);}
-        tooltip {Set maximum note to the last note played} xywh {104 147 30 16} box PLASTIC_UP_BOX labelsize 10
       }
     }
     Fl_Window ctlwindow {
@@ -955,7 +955,7 @@ send_data(199, o->value(), 0xc8);}
       }
     }
     Fl_Window partfx {
-      label {Part's Insert Effects} open
+      label {Part's Insert Effects}
       xywh {134 114 385 160} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Insert Effects").c_str());}
     } {
@@ -1018,7 +1018,7 @@ send_data(199, o->value(), 0xc8);}
           xywh {110 110 100 20} labelfont 1 labelsize 10
         }
       }
-      Fl_Group inseffectuigroup {open
+      Fl_Group inseffectuigroup {
         xywh {5 37 380 96} box FLAT_BOX color 48
       } {
         Fl_Group inseffectui {
@@ -1448,32 +1448,40 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     bool valBool = (value > 0.5f);
     int valInt = lrint(value);
     int tmp = (valInt & 15) + 1;
+    bool check = true;
 
+    npart = newpart;
     // these are specific to the mixer panel
     if (newpart >= *plgroup && newpart < (*plgroup + NUM_MIDI_CHANNELS))
     {
         int displaypart = newpart % NUM_MIDI_CHANNELS;
-        if (control == 0)
-            synth->getGuiMaster()->panellistitem[displaypart]->partvolume->value(value);
-        else if (control == 2)
-            synth->getGuiMaster()->panellistitem[displaypart]->partpanning->value(value);
-        else if (control == 5)
+        switch (control)
         {
-            synth->getGuiMaster()->panellistitem[displaypart]->partrcv->value(valInt);
-            if (valInt < NUM_MIDI_CHANNELS)
-                synth->getGuiMaster()->panellistitem[displaypart]->partrcv->textcolor(FL_BLACK);
-            else
-                synth->getGuiMaster()->panellistitem[displaypart]->partrcv->textcolor(FL_WHITE);
-        }
-        else if(control == 120)
-        {
-            int send = valInt - 1;
-            if (send < 0 or send > 2)
-                send = 0;
-            synth->getGuiMaster()->panellistitem[displaypart]->audiosend->value(send);
+            case 0:
+                synth->getGuiMaster()->panellistitem[displaypart]->partvolume->value(value);
+                break;
+            case 2:
+                synth->getGuiMaster()->panellistitem[displaypart]->partpanning->value(value);
+                break;
+            case 5:
+                synth->getGuiMaster()->panellistitem[displaypart]->partrcv->value(valInt);
+                if (valInt < NUM_MIDI_CHANNELS)
+                    synth->getGuiMaster()->panellistitem[displaypart]->partrcv->textcolor(FL_BLACK);
+                else
+                    synth->getGuiMaster()->panellistitem[displaypart]->partrcv->textcolor(FL_WHITE);
+                break;
+            case 8:
+                if (engine == 255)
+                    synth->getGuiMaster()->panellistitem[displaypart]->partenabled->value(valBool);
+                break;               
+            case 120:
+                int send = valInt - 1;
+                if (send < 0 or send > 2)
+                    send = 0;
+                synth->getGuiMaster()->panellistitem[displaypart]->audiosend->value(send);
         }
     }
-    if (npart != newpart)
+    if (npart != newpart && control != 8)
         return;
 
     bool sameEff = (engine == (inseffnocounter->value() - 1));
@@ -1672,7 +1680,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
                             instrumentpadbox->color(BASE_COLOUR);
                         }
                         break;
-                    default:
+                    case 255:
+                        check = false;
                         partGroupEnable->value(valBool);
                         if (valBool)
                         {
@@ -1911,8 +1920,12 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
         case 224:
             updatecontrollers();
             break;
+        default:
+            check = false;
+            break;
     }
-    Fl::check();} {}
+    if (check)
+        Fl::check();} {}
   }
   Function {PartUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//

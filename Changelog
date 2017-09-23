@@ -1,5 +1,11 @@
 yoshimi 1.5.3 M
 
+2017-9-23 Will
+* Improved part change display behaviour.
+* CLI part enable state can now be read as well.
+* Changing part enable state updates all of part
+  section in main window.
+
 2017-9-22 Will
 * Updated cmake policies.
 

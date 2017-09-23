@@ -1629,7 +1629,8 @@ int CmdInterface::commandPart(bool justSet)
     int reply = todo_msg;
     int tmp;
     bool partFlag = false;
-
+    bool changed = false;
+    npart = Runtime.currentPart; // belt and braces
     if (point[0] == 0)
         return done_msg;
     if (bitTest(level, all_fx))
@@ -1650,23 +1651,20 @@ int CmdInterface::commandPart(bool justSet)
             {
                 npart = tmp;
                 sendDirect(npart, 64, 14, 240);
+                changed = true;
             }
             if (point[0] == 0)
                 return done_msg;
         }
     }
+
+
     if (matchnMove(2, point, "effects") || matchnMove(2, point, "efx"))
     {
         level = 1; // clear out any higher levels
         bitSet(level, part_lev);
         return effects();
     }
-    tmp = keyShift(npart);
-    if (tmp != todo_msg)
-        return tmp;
-    tmp = volPanVel();
-    if(tmp != todo_msg)
-        return tmp;
 
     tmp = -1;
     if (matchnMove(2, point, "enable"))
@@ -1675,9 +1673,23 @@ int CmdInterface::commandPart(bool justSet)
         tmp = 0;
     if (tmp >= 0)
     {
-        sendDirect(tmp, 64, 8, npart);
+        if (isRead)
+            sendDirect(tmp, 0, 8, npart);
+        else
+        {
+            if (!changed) // needs to be better
+                sendDirect(npart, 64, 14, 240);
+            sendDirect(tmp, 64, 8, npart);
+        }
         return done_msg;
     }
+
+    tmp = keyShift(npart);
+    if (tmp != todo_msg)
+        return tmp;
+    tmp = volPanVel();
+    if(tmp != todo_msg)
+        return tmp;
 
     if (matchnMove(2, point, "program") || matchnMove(1, point, "instrument"))
     {
