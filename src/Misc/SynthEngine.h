@@ -46,13 +46,12 @@ using namespace std;
 #include "Misc/Config.h"
 #include "Params/PresetsStore.h"
 
-typedef enum { init, trylock, lock, unlock, lockmute, destroy } lockset;
+typedef enum { init, lock, unlock, destroy } lockset;
 
 class EffectMgr;
 class Part;
 class XMLwrapper;
 class Controller;
-//class CmdInterface;
 
 class MasterUI;
 

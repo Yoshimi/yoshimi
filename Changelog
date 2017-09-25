@@ -1,4 +1,9 @@
-yoshimi 1.5.3 M
+yoshimi 1.5.4 rc1
+
+2017-9-24 Will
+* Removed orphaned and disabled code.
+* Unified coding style
+* set as V 1.5.4 rc1
 
 2017-9-23 Will
 * Improved part change display behaviour.

@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of origional ZynAddSubFX code
 
-Modified June 2017
+Modified Septenber 2017
 } {in_source in_header
 }
 
@@ -97,202 +97,208 @@ class VirKeys {: {public Fl_Box}
     code {} {}
   }
   Function {init(SynthEngine *_synth)} {} {
-    code {synth = _synth;
-for (int i = 0; i < N_OCT * 12 + 1; ++i)
+    code {//
+    synth = _synth;
+    for (int i = 0; i < N_OCT * 12 + 1; ++i)
             pressed[i] = 0;
-        midich = 0;
-        midivel = 100;
-        midioct = 2;
-        keyoct1 = 3;
-        keyoct2 = 2;
-        rndvelocity = 0;} {}
+    midich = 0;
+    midivel = 100;
+    midioct = 2;
+    keyoct1 = 3;
+    keyoct2 = 2;
+    rndvelocity = 0;} {}
   }
   Function {draw()} {} {
-    code {int ox = x(), oy = y(), lx = w(), ly = h() - 1, i;
-        if (damage() != 1)
-        {
-            fl_color(250, 240, 230);
-            fl_rectf(ox, oy, lx, ly);
+    code {//
+    int ox = x();
+    int oy = y();
+    int lx = w();
+    int ly = h() - 1;
+    int i;
+    if (damage() != 1)
+    {
+        fl_color(250, 240, 230);
+        fl_rectf(ox, oy, lx, ly);
 
-            fl_color(FL_BLACK);
-            fl_line(ox, oy, ox + lx, oy);
-            fl_line(ox, oy + ly, ox + lx, oy + ly);
-            for (i = 0; i < N_OCT * 7 + 1; ++i)
-            {
-                fl_line(ox + i * SIZE_WHITE, oy, ox + i * SIZE_WHITE, oy + ly);
-                int ik = i % 7;
-                if (ik == 1 || ik == 2 || ik == 4 || ik == 5 || ik == 6)
-                    fl_rectf(ox + i * SIZE_WHITE - SIZE_BLACK / 2, oy,
-                             SIZE_BLACK + 1, ly * 3 / 5);
-            }
+        fl_color(FL_BLACK);
+        fl_line(ox, oy, ox + lx, oy);
+        fl_line(ox, oy + ly, ox + lx, oy + ly);
+        for (i = 0; i < N_OCT * 7 + 1; ++i)
+        {
+            fl_line(ox + i * SIZE_WHITE, oy, ox + i * SIZE_WHITE, oy + ly);
+            int ik = i % 7;
+            if (ik == 1 || ik == 2 || ik == 4 || ik == 5 || ik == 6)
+                fl_rectf(ox + i * SIZE_WHITE - SIZE_BLACK / 2, oy,
+                            SIZE_BLACK + 1, ly * 3 / 5);
         }
+    }
 
-        for (i = 0; i < N_OCT * 12; ++i)
-        {
-            // if (pressed[i]==0) continue;
-
-            int noct = i / 12;
-            int kv = keyspos[i % 12];
-            if (kv >= 0)
-            {   // white keys
-                if (pressed[i] == 0)
-                    fl_color(250, 240, 230);
-                else
-                    fl_color(FL_BLUE);
-                fl_rectf(ox + (kv + 7 * noct) * SIZE_WHITE + 3, oy + ly * 3 / 5 + 2,
-                         SIZE_WHITE - 4, ly * 2 / 5 - 3);
-            }
+    for (i = 0; i < N_OCT * 12; ++i)
+    {
+        int noct = i / 12;
+        int kv = keyspos[i % 12];
+        if (kv >= 0)
+        {   // white keys
+            if (pressed[i] == 0)
+                fl_color(250, 240, 230);
             else
-            {   // black keys
-                kv = keyspos[(i + 1) % 12];
-                if (pressed[i] == 0)
-                    fl_color(FL_BLACK);
-                else
-                    fl_color(FL_BLUE);
-                fl_rectf(ox + (kv + 7 * noct) * SIZE_WHITE - SIZE_BLACK / 2 + 2, oy + 2,
-                         SIZE_BLACK - 3, ly * 3 / 5 - 5);
-            }
-        }} {}
+                fl_color(FL_BLUE);
+            fl_rectf(ox + (kv + 7 * noct) * SIZE_WHITE + 3, oy + ly * 3 / 5 + 2,
+                        SIZE_WHITE - 4, ly * 2 / 5 - 3);
+        }
+        else
+        {   // black keys
+            kv = keyspos[(i + 1) % 12];
+            if (pressed[i] == 0)
+                fl_color(FL_BLACK);
+            else
+                fl_color(FL_BLUE);
+            fl_rectf(ox + (kv + 7 * noct) * SIZE_WHITE - SIZE_BLACK / 2 + 2, oy + 2,
+                        SIZE_BLACK - 3, ly * 3 / 5 - 5);
+        }
+    }} {}
   }
   Function {handle(int event)} {return_type int
   } {
-    code {int i;
-        int ly = h();
-        int x_ = Fl::event_x() - x();
-        int y_ = Fl::event_y() - y();
-        if (x_ < 0 && x_ > w() && y_ < 0 && y_>h())
-            return 0;
-        if (event == FL_PUSH || event == FL_DRAG || event == FL_RELEASE)
-        {
-            int kpos = -1;
+    code {//
+    int i;
+    int ly = h();
+    int x_ = Fl::event_x() - x();
+    int y_ = Fl::event_y() - y();
+    if (x_ < 0 && x_ > w() && y_ < 0 && y_>h())
+        return 0;
+    if (event == FL_PUSH || event == FL_DRAG || event == FL_RELEASE)
+    {
+        int kpos = -1;
 
-            if (y_ > ly * 3 / 5)
-            {   // white keys
-                int pos = x_ / SIZE_WHITE;
-                if (pos < 0)
-                    return 1;
-                for (i = 0; i < 12; ++i)
-                {
-                    if (pos % 7 == keyspos[i])
-                    {
-                        kpos = pos / 7 * 12 + i;
-                        break;
-                    }
-                }
-            }
-            else
-            {   // black keys
-                int pos = (x_ + SIZE_WHITE / 2) / SIZE_WHITE;
-                if (pos < 0)
-                    return 1;
-                for (i = 1; i < 12; ++i)
-                {
-                    if (pos % 7 == -keyspos[i])
-                    {
-                        kpos = pos / 7 * 12 + i;
-                        break;
-                    }
-                }
-            }
-
-            if (Fl::event_shift() == 0 && (event == FL_PUSH || event==FL_DRAG))
-                presskey(kpos, 1, 1);
-
-            if (event == FL_PUSH && Fl::event_shift() != 0)
+        if (y_ > ly * 3 / 5)
+        {   // white keys
+            int pos = x_ / SIZE_WHITE;
+            if (pos < 0)
+                return 1;
+            for (i = 0; i < 12; ++i)
             {
-                if (pressed[kpos] == 0)
-                    presskey(kpos, 0, 1);
-                else
-                    relasekey(kpos, 1);
+                if (pos % 7 == keyspos[i])
+                {
+                    kpos = pos / 7 * 12 + i;
+                    break;
+                }
             }
-            if (event == FL_RELEASE && Fl::event_shift() == 0)
-                relaseallkeys(1);
-            take_focus();
+        }
+        else
+        {   // black keys
+            int pos = (x_ + SIZE_WHITE / 2) / SIZE_WHITE;
+            if (pos < 0)
+                return 1;
+            for (i = 1; i < 12; ++i)
+            {
+                if (pos % 7 == -keyspos[i])
+                {
+                    kpos = pos / 7 * 12 + i;
+                    break;
+                }
+            }
         }
 
-        const int *keysoct1 = keysoct1qwerty;
-        const int *keysoct2 = keysoct2qwerty;
+        if (Fl::event_shift() == 0 && (event == FL_PUSH || event==FL_DRAG))
+            presskey(kpos, 1, 1);
 
-        if (synth->getRuntime().VirKeybLayout == 1)
+        if (event == FL_PUSH && Fl::event_shift() != 0)
         {
-            keysoct1 = keysoct1dw;
-            keysoct2 = keysoct2dw;
-        }
-        else if (synth->getRuntime().VirKeybLayout == 2)
-        {
-            keysoct1 = keysoct1qwertz;
-            keysoct2 = keysoct2qwertz;
-        }
-        else if (synth->getRuntime().VirKeybLayout == 3)
-        {
-            keysoct1 = keysoct1azerty;
-            keysoct2 = keysoct2azerty;
-        }
-
-        if (event == FL_KEYDOWN || event == FL_KEYUP)
-        {
-            int key = Fl::event_key();
-            int kpos = -1;
-            for (i = 0; keysoct1[i] != 0; ++i)
-                if (key == keysoct1[i])
-                    kpos = i + 12 * keyoct1;
-            for (i = 0; keysoct2[i] != 0; ++i)
-                if (key == keysoct2[i])
-                    kpos = i + 12 * keyoct2;
-
-            if (kpos == -1)
-                return 0;
-            if (event == FL_KEYUP && Fl::event_key(key) == 0 && Fl::get_key(key) != 0)
-                return 0;
-            if (event == FL_KEYDOWN)
-                presskey(kpos, 0, 2);
+            if (pressed[kpos] == 0)
+                presskey(kpos, 0, 1);
             else
-                relasekey(kpos, 2);
+                relasekey(kpos, 1);
         }
-        return 1;} {}
+        if (event == FL_RELEASE && Fl::event_shift() == 0)
+            relaseallkeys(1);
+        take_focus();
+    }
+
+    const int *keysoct1 = keysoct1qwerty;
+    const int *keysoct2 = keysoct2qwerty;
+
+    if (synth->getRuntime().VirKeybLayout == 1)
+    {
+        keysoct1 = keysoct1dw;
+        keysoct2 = keysoct2dw;
+    }
+    else if (synth->getRuntime().VirKeybLayout == 2)
+    {
+        keysoct1 = keysoct1qwertz;
+        keysoct2 = keysoct2qwertz;
+    }
+    else if (synth->getRuntime().VirKeybLayout == 3)
+    {
+        keysoct1 = keysoct1azerty;
+        keysoct2 = keysoct2azerty;
+    }
+
+    if (event == FL_KEYDOWN || event == FL_KEYUP)
+    {
+        int key = Fl::event_key();
+        int kpos = -1;
+        for (i = 0; keysoct1[i] != 0; ++i)
+            if (key == keysoct1[i])
+                kpos = i + 12 * keyoct1;
+        for (i = 0; keysoct2[i] != 0; ++i)
+            if (key == keysoct2[i])
+                kpos = i + 12 * keyoct2;
+
+        if (kpos == -1)
+            return 0;
+        if (event == FL_KEYUP && Fl::event_key(key) == 0 && Fl::get_key(key) != 0)
+            return 0;
+        if (event == FL_KEYDOWN)
+            presskey(kpos, 0, 2);
+        else
+            relasekey(kpos, 2);
+    }
+    return 1;} {}
   }
   Function {presskey(int nk,int exclusive,int type)} {} {
     code {// Exclusive means that multiple keys can be pressed at once
-        // when the user uses the shift key
-        if (nk >= N_OCT * 12)
-            return;
-        if (nk < 0 && exclusive == 0)
-        {
-            relaseallkeys(type);
-            return;
-        }
-        if (nk < 0)
-            return;
-        if (pressed[nk] != 0)
-            return; // the key is already pressed
+    // when the user uses the shift key
+    if (nk >= N_OCT * 12)
+        return;
+    if (nk < 0 && exclusive == 0)
+    {
+        relaseallkeys(type);
+        return;
+    }
+    if (nk < 0)
+        return;
+    if (pressed[nk] != 0)
+        return; // the key is already pressed
 
-        if (exclusive != 0)
-            relaseallkeys(type);
-        pressed[nk] = type;
+    if (exclusive != 0)
+        relaseallkeys(type);
+    pressed[nk] = type;
 
-        damage(1);
-        float vel = midivel;
-        if (rndvelocity != 0)
-        {
-            vel = midivel * (127.0 - rndvelocity) / 127.0 + synth->numRandom() * rndvelocity;
-        }
-        synth->NoteOn(midich, nk + midioct * 12, vel);} {}
+    damage(1);
+    float vel = midivel;
+    if (rndvelocity != 0)
+    {
+        vel = midivel * (127.0 - rndvelocity) / 127.0 + synth->numRandom() * rndvelocity;
+    }
+    synth->NoteOn(midich, nk + midioct * 12, vel);} {}
   }
   Function {relasekey(int nk,int type)} {} {
     code {//
-        if (nk < 0 || nk >= N_OCT * 12)
-            return;
-        if (pressed[nk] == 0)
-            return; // the key is not pressed
-        if (type != 0 && pressed[nk] != type)
-            return;
-        pressed[nk] = 0;
-        damage(1);
-        synth->NoteOff(midich, nk + 12 * midioct);} {}
+    if (nk < 0 || nk >= N_OCT * 12)
+        return;
+    if (pressed[nk] == 0)
+        return; // the key is not pressed
+    if (type != 0 && pressed[nk] != type)
+        return;
+    pressed[nk] = 0;
+    damage(1);
+    synth->NoteOff(midich, nk + 12 * midioct);} {}
   }
   Function {relaseallkeys(int type)} {} {
-    code {for (int i = 0; i < N_OCT * 12; ++i)
-            relasekey(i, type);} {}
+    code {//
+    for (int i = 0; i < N_OCT * 12; ++i)
+        relasekey(i, type);} {}
   }
   decl {int pressed[N_OCT * 12 + 1];} {private local
   }
@@ -313,8 +319,9 @@ class VirKeyboard {selected
   Function {make_window()} {} {
     Fl_Window virkeyboardwindow {
       label {Yoshimi Virtual Keyboard}
-      callback {relaseallkeys();
-virkeyboardwindow->hide();}
+      callback {//
+      relaseallkeys();
+      virkeyboardwindow->hide();}
       xywh {95 119 650 130} type Double hide
     } {
       Fl_Box virkeys {
@@ -325,9 +332,10 @@ virkeyboardwindow->hide();}
       }
       Fl_Counter {} {
         label {Key   }
-        callback {relaseallkeys();
-            virkeys->keyoct1 = (int)o->value();
-            virkeys->take_focus();}
+        callback {//
+        relaseallkeys();
+        virkeys->keyoct1 = (int)o->value();
+        virkeys->take_focus();}
         tooltip {. 2 3    5 6 7 ...
 q w e r  t y u ...} xywh {365 95 45 15} type Simple labelsize 10 align 4 when 6 minimum 0 maximum 5 step 1 textfont 1 textsize 10
         code0 {o->value(virkeys->keyoct1);}
@@ -338,9 +346,10 @@ q w e r  t y u ...} xywh {365 95 45 15} type Simple labelsize 10 align 4 when 6 
       }
       Fl_Counter {} {
         label {Maps  }
-        callback {relaseallkeys();
-virkeys->keyoct2=(int) o->value();
-virkeys->take_focus();}
+        callback {//
+        relaseallkeys();
+        virkeys->keyoct2=(int) o->value();
+        virkeys->take_focus();}
         tooltip {. s d   g h j ...
 z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 minimum 0 maximum 5 step 1 textfont 1 textsize 10
         code0 {o->value(virkeys->keyoct2);}
@@ -351,26 +360,29 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
       }
       Fl_Value_Slider {} {
         label Velocity
-        callback {if (Fl::event_button() == 3)
-    o->value(100);
-virkeys->midivel=(int) o->value();
-virkeys->take_focus();}
+        callback {//
+        if (Fl::event_button() == 3)
+            o->value(100);
+        virkeys->midivel=(int) o->value();
+        virkeys->take_focus();}
         tooltip Velocity xywh {96 106 110 16} type {Horz Knob} box FLAT_BOX labelsize 10 align 1 minimum 1 maximum 127 step 1
         code0 {o->value(virkeys->midivel);}
         class mwheel_val_slider_rev
       }
       Fl_Counter {} {
         label Octave
-        callback {relaseallkeys();
-virkeys->midioct=(int) o->value();
-virkeys->take_focus();}
+        callback {//
+        relaseallkeys();
+        virkeys->midioct=(int) o->value();
+        virkeys->take_focus();}
         tooltip {Midi Octave} xywh {257 106 56 18} type Simple labelsize 10 align 1 when 6 minimum 0 maximum 5 step 1 textfont 1 textsize 10
         code0 {o->value(virkeys->midioct);}
       }
       Fl_Button {} {
         label Close
-        callback {relaseallkeys();
-virkeyboardwindow->hide();}
+        callback {//
+        relaseallkeys();
+        virkeyboardwindow->hide();}
         xywh {452 101 55 20} box THIN_UP_BOX labelsize 12
       }
       Fl_Value_Output ctlval {
@@ -382,14 +394,14 @@ virkeyboardwindow->hide();}
       Fl_Slider {} {
         callback {//
         oldcontrol = 127 - o->value();
-	if (Fl::event_button() == 3)
-	{
-	    oldcontrol = 64;
-	    o->value(64);
-	    o->damage();
-	}
-	ctlval->do_callback();
-	int ctl = midictl;
+        if (Fl::event_button() == 3)
+        {
+            oldcontrol = 64;
+            o->value(64);
+            o->damage();
+        }
+        ctlval->do_callback();
+        int ctl = midictl;
         synth->SetController(virkeys->midich, ctl, oldcontrol);
         virkeys->take_focus();}
         tooltip {Controller value} xywh {628 25 18 96} type {Vert Fill} box ENGRAVED_BOX color 229 labelsize 8 align 5 maximum 127 step 1 value 64
@@ -398,23 +410,50 @@ virkeyboardwindow->hide();}
       }
       Fl_Choice {} {
         label Controller
-        callback {switch((int) o->value() + 1)
-            {
-                case 1: midictl = C_modwheel; break;
-                case 2: midictl = C_volume; break;
-                case 3: midictl = C_panning; break;
-                case 4: midictl = C_expression; break;
-                case 5: midictl = C_sustain; break;
-                case 6: midictl = C_portamento; break;
-                case 7: midictl = C_filterq; break;
-                case 8: midictl = C_filtercutoff; break;
-                case 9: midictl = C_bandwidth; break;
-                case 10: midictl = C_fmamp; break;
-                case 11: midictl = C_resonance_center; break;
-                case 12: midictl = C_resonance_bandwidth; break;
-                default: midictl = C_NULL; break;
-            }
-            virkeys->take_focus();}
+        callback {//
+        switch((int) o->value() + 1)
+        {
+            case 1:
+                midictl = C_modwheel;
+                break;
+            case 2:
+                midictl = C_volume;
+                break;
+            case 3:
+                midictl = C_panning;
+                break;
+            case 4:
+                midictl = C_expression;
+                break;
+            case 5:
+                midictl = C_sustain;
+                break;
+            case 6:
+                midictl = C_portamento;
+                break;
+            case 7:
+                midictl = C_filterq;
+                break;
+            case 8:
+                midictl = C_filtercutoff;
+                break;
+            case 9:
+                midictl = C_bandwidth;
+                break;
+            case 10:
+                midictl = C_fmamp;
+                break;
+            case 11:
+                midictl = C_resonance_center;
+                break;
+            case 12:
+                midictl = C_resonance_bandwidth;
+                break;
+            default:
+                midictl = C_NULL;
+                break;
+        }
+        virkeys->take_focus();}
         xywh {524 105 100 15} down_box BORDER_BOX labelsize 10 align 1 when 6 textfont 1 textsize 10
         code0 {midictl=C_filtercutoff;o->value(7);}
       } {
@@ -469,7 +508,8 @@ virkeyboardwindow->hide();}
       }
       Fl_Dial {} {
         label Vrnd
-        callback {virkeys->rndvelocity=(int) o->value();}
+        callback {//
+        virkeys->rndvelocity=(int) o->value();}
         tooltip {Velocity Randomness} xywh {221 106 20 21} box ROUND_UP_BOX labelsize 10 align 129 maximum 127 step 1
         code0 {o->value(virkeys->rndvelocity);}
         code1 {o->init(0);}
@@ -479,9 +519,9 @@ virkeyboardwindow->hide();}
       Fl_Spinner midichannel {
         label {MIDI Channel}
         callback {//
-            relaseallkeys();
-            virkeys->midich = lrint(o->value()) - 1;
-            virkeys->take_focus();}
+        relaseallkeys();
+        virkeys->midich = lrint(o->value()) - 1;
+        virkeys->take_focus();}
         xywh {45 106 36 17} labelsize 9 align 1 maximum 16 textsize 10
         code0 {o->value(virkeys->midich + 1);}
       }
@@ -495,7 +535,7 @@ virkeyboardwindow->hide();}
             o->value(old);
             o->damage();
         }
-	synth->SetController(virkeys->midich, C_pitchwheel, - old);
+        synth->SetController(virkeys->midich, C_pitchwheel, - old);
         virkeys->take_focus();}
         xywh {6 12 18 110} labelsize 8 align 1 minimum -8192 maximum 8191 step 1
         class mwheel_slider
@@ -504,21 +544,24 @@ virkeyboardwindow->hide();}
   }
   Function {VirKeyboard(SynthEngine *_synth)} {} {
     code {//
-	synth = _synth;
-	midictl = 75;
-	oldcontrol = 64;
-        make_window();
-        keyboardlabel = synth->makeUniqueName("Virtual Keyboard");
-        virkeyboardwindow->label(keyboardlabel.c_str());} {}
+    synth = _synth;
+    midictl = 75;
+    oldcontrol = 64;
+    make_window();
+    keyboardlabel = synth->makeUniqueName("Virtual Keyboard");
+    virkeyboardwindow->label(keyboardlabel.c_str());} {}
   }
   Function {~VirKeyboard()} {} {
-    code {delete virkeyboardwindow;} {}
+    code {//
+    delete virkeyboardwindow;} {}
   }
   Function {Show()} {} {
-    code {virkeyboardwindow->show();} {}
+    code {//
+    virkeyboardwindow->show();} {}
   }
   Function {Hide()} {} {
-    code {virkeyboardwindow->hide();} {}
+    code {//
+    virkeyboardwindow->hide();} {}
   }
   Function {relaseallkeys()} {} {
     code {virkeys->relaseallkeys(0);} {}
