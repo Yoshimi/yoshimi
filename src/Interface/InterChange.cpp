@@ -4180,11 +4180,12 @@ void InterChange::commandPart(CommandBlock *getData)
                         else
                             value = part->kit[0].Ppadenabled;
                         break;
-                    default:
+                    case 255:
                         if (write)
                             synth->partonoffWrite(npart, value_bool);
                         else
                             value = synth->partonoffRead(npart);
+                        break;
                 }
             }
             break;

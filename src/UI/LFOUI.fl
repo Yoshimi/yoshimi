@@ -73,7 +73,7 @@ pars=NULL;} {}
   }
   Function {~LFOUI()} {} {
     code {lfoui->hide();
-hide();
+    hide();
 //delete (lfoui);} {}
   }
   Function {make_window()} {} {
@@ -86,8 +86,9 @@ hide();
       } {
         Fl_Dial freq {
           label {Freq.}
-          callback {//pars->setPfreq(o->value());
-send_data(group, 0, o->value(), 0x48);}
+          callback {//]
+          pars->setPfreq(o->value());
+          send_data(group, 0, o->value(), 0x48);}
           tooltip {LFO Frequency} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 step 1e-05
           code0 {o->setValueType(VC_LFOfreq);}
           code1 {if (engine < 0x80){if (group == 1) o->init(0.551f); else o->init(0.63f);}}
@@ -97,12 +98,10 @@ send_data(group, 0, o->value(), 0x48);}
         Fl_Dial intensity {
           label Depth
           callback {//
-    int depth = lrint(o->value());
-    //pars->setPintensity(depth);
-    if (engine >= 0x80 && engine < 0x88 && group == 1) // special case to sync voice list vibrato
-        synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine &0xf]->voicelistvibratto->value(depth);
-
-    send_data(group, 1, depth, 0xc8);}
+          int depth = lrint(o->value());
+          if (engine >= 0x80 && engine < 0x88 && group == 1) // special case to sync voice list vibrato
+              synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine &0xf]->voicelistvibratto->value(depth);
+          send_data(group, 1, depth, 0xc8);}
           tooltip {LFO Amount} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(getLFOdepthType(group));}
           code1 {if (engine < 0x80) o->init(0); else if (group == 0) o->init(32); else if (group == 1) o->init(40); else o->init(20);}
@@ -110,8 +109,8 @@ send_data(group, 0, o->value(), 0x48);}
         }
         Fl_Dial delay {
           label Delay
-          callback {//pars->setPdelay((int)o->value());
-		  send_data(group, 2, o->value(), 0xc8);}
+          callback {//
+          send_data(group, 2, o->value(), 0xc8);}
           tooltip {LFO delay} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_LFOdelay);}
           code1 {if (engine >= 0x80 && group == 0) o->init(30); else o->init(0);}
@@ -119,8 +118,8 @@ send_data(group, 0, o->value(), 0x48);}
         }
         Fl_Dial startphase {
           label Start
-          callback {//pars->setPstartphase((int)o->value());
-		  send_data(group, 3, o->value(), 0xc8);}
+          callback {//
+          send_data(group, 3, o->value(), 0xc8);}
           tooltip {LFO Startphase (leftmost is Random)} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_LFOstartphase);}
           code1 {if (engine >= 0x80 && group == 1) o->init(0); else o->init(64);}
@@ -128,8 +127,8 @@ send_data(group, 0, o->value(), 0x48);}
         }
         Fl_Dial randomness {
           label {A.R.}
-          callback {//pars->setPrandomness((int)o->value());
-		  send_data(group, 4, o->value(), 0xc8);}
+          callback {//
+          send_data(group, 4, o->value(), 0xc8);}
           tooltip {LFO Amplitude Randomness} xywh {180 7 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->init(0);}
           code1 {o->setValueType(VC_percent127);}
@@ -137,8 +136,8 @@ send_data(group, 0, o->value(), 0x48);}
         }
         Fl_Choice LFOtype {
           label Type
-          callback {//pars->setPLFOtype((int)o->value());
-		  send_data(group, 5, o->value(), 0xc0);}
+          callback {//
+          send_data(group, 5, o->value(), 0xc0);}
           tooltip {LFO function} xywh {180 40 45 15} down_box BORDER_BOX labelsize 10 align 2 textsize 8
         } {
           MenuItem {} {
@@ -172,14 +171,14 @@ send_data(group, 0, o->value(), 0x48);}
         }
         Fl_Check_Button continous {
           label {C.}
-          callback {//pars->setPcontinous((int)o->value());
-		  send_data(group, 6, o->value(), 0xc0);}
+          callback {//
+          send_data(group, 6, o->value(), 0xc0);}
           tooltip {Continuous LFO} xywh {165 35 15 15} down_box DOWN_BOX labelsize 10 align 2
         }
         Fl_Dial freqrand {
           label {F.R.}
-          callback {//pars->setPfreqrand((int)o->value());
-		  send_data(group, 7, o->value(), 0xc8);}
+          callback {//
+          send_data(group, 7, o->value(), 0xc8);}
           tooltip {LFO Frequency Randomness} xywh {205 7 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->init(0);}
           code1 {o->setValueType(VC_percent127);}
@@ -187,8 +186,8 @@ send_data(group, 0, o->value(), 0x48);}
         }
         Fl_Dial stretch {
           label {Str.}
-          callback {//pars->setPstretch((int)o->value());
-send_data(group, 8, o->value(), 0xc8);}
+          callback {//
+          send_data(group, 8, o->value(), 0xc8);}
           tooltip {LFO frequency stretch} xywh {144 30 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->init(64);}
           code1 {o->setValueType(VC_LFOStretch);}
@@ -196,12 +195,14 @@ send_data(group, 8, o->value(), 0xc8);}
         }
         Fl_Button {} {
           label C
-          callback {synth->getGuiMaster()->getPresetsUi()->copy(pars);}
+          callback {//
+          synth->getGuiMaster()->getPresetsUi()->copy(pars);}
           xywh {145 10 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
         Fl_Button {} {
           label P
-          callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this);}
+          callback {//
+          synth->getGuiMaster()->getPresetsUi()->paste(pars,this);}
           xywh {162 10 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
         Fl_Box lfotype {
@@ -212,24 +213,24 @@ send_data(group, 8, o->value(), 0xc8);}
     }
   }
   Function {refresh()} {} {
-    code {freq->value(pars->Pfreq);
-intensity->value(pars->Pintensity);
-startphase->value(pars->Pstartphase);
-delay->value(pars->Pdelay);
-continous->value(pars->Pcontinous);
-stretch->value(pars->Pstretch);
-randomness->value(pars->Prandomness);
-freqrand->value(pars->Pfreqrand);
-LFOtype->value(pars->PLFOtype);} {}
+    code {//
+    freq->value(pars->Pfreq);
+    intensity->value(pars->Pintensity);
+    startphase->value(pars->Pstartphase);
+    delay->value(pars->Pdelay);
+    continous->value(pars->Pcontinous);
+    stretch->value(pars->Pstretch);
+    randomness->value(pars->Prandomness);
+    freqrand->value(pars->Pfreqrand);
+    LFOtype->value(pars->PLFOtype);} {}
   }
   Function {send_data(int group, int control, float value, int type)} {} {
     code {//
-collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, 0, group);} {}
+    collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, 0, group);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
-    //unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char part = getData->data.part;
     unsigned char eng = getData->data.engine;
@@ -240,61 +241,61 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
 
     switch(control)
     {
-    	case 0:
-    	    freq->value(value);
-    	    break;
+        case 0:
+            freq->value(value);
+            break;
 
-    	case 1:
-    	    intensity->value(value);
-    	    if (engine >= 128 && engine < 136 && par == 1) // rather special to sync voice list vibrato
-    	        synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine &0xf]->voicelistvibratto->value(value);
-    	    break;
+        case 1:
+            intensity->value(value);
+            if (engine >= 128 && engine < 136 && par == 1) // rather special to sync voice list vibrato
+                synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine &0xf]->voicelistvibratto->value(value);
+            break;
 
-    	case 2:
-    	    delay->value(value);
-    	    break;
+        case 2:
+            delay->value(value);
+            break;
 
-    	case 3:
-    	    startphase->value(value);
-    	    break;
+        case 3:
+            startphase->value(value);
+            break;
 
-    	case 4:
-    	    randomness->value(value);
-    	    break;
+        case 4:
+            randomness->value(value);
+            break;
 
-    	case 5:
-    	    LFOtype->value((int)value);
-    	    break;
+        case 5:
+            LFOtype->value((int)value);
+            break;
 
-    	case 6:
-    	    continous->value(value != 0);
-    	    break;
+        case 6:
+            continous->value(value != 0);
+            break;
 
-    	case 7:
-    	    freqrand->value(value);
-    	    break;
+        case 7:
+            freqrand->value(value);
+            break;
 
-    	case 8:
-    	    stretch->value(value);
-    	    break;
+        case 8:
+            stretch->value(value);
+            break;
     }
     Fl::check();} {}
   }
   Function {init(LFOParams *lfopars_, int npart_, int kititem_, int engine_, int group_)} {} {
-    code {pars=lfopars_;
-synth = pars->getSynthEngine();
-npart = npart_;
-kititem = kititem_;
-engine = engine_;
-group = group_;
-make_window();
-end();
+    code {//
+    pars=lfopars_;
+    synth = pars->getSynthEngine();
+    npart = npart_;
+    kititem = kititem_;
+    engine = engine_;
+    group = group_;
+    make_window();
+    end();
 
-refresh();
+    refresh();
 
-lfoui->resize(this->x(),this->y(),this->w(),this->h());
-
-lfotype->label(this->label());} {}
+    lfoui->resize(this->x(),this->y(),this->w(),this->h());
+    lfotype->label(this->label());} {}
   }
   decl {LFOParams *pars;} {private local
   }

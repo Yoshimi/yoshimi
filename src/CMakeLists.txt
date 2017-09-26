@@ -20,11 +20,11 @@
 # Modifed September 2017
 
 project (Yoshimi)
-cmake_minimum_required (VERSION 2.6)
-cmake_policy (VERSION 2.6)
-cmake_policy (SET CMP0004 OLD)
+cmake_minimum_required (VERSION 3.0)
+cmake_policy (VERSION 3.0)
+cmake_policy (SET CMP0004 NEW)
 if (POLICY CMP0046)
-    cmake_policy (SET CMP0046 OLD)
+    cmake_policy (SET CMP0046 NEW)
 endif (POLICY CMP0046)
 set (CMAKE_CXX_STANDARD 11) # we seem to need both for
 add_definitions(-std=gnu++11) # various versions of cmake
@@ -34,7 +34,7 @@ add_definitions(-Werror=format-security)
 
 # ^^^ comment these two out on release pushes ^^^
 
-set (YOSHIMI_VERSION "1.5.3 M")
+set (YOSHIMI_VERSION "1.5.4 rc1")
 
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 

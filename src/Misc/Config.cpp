@@ -527,11 +527,6 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
     showGui = xml->getparbool("enable_gui", showGui);
     showSplash = xml->getparbool("enable_splash", showSplash);
     showCLI = xml->getparbool("enable_CLI", showCLI);
-    /*if (!showGui && !showCLI)
-    {
-        showGui = true;
-        showCLI = true; // sanity check!
-    }*/
     xml->exitbranch(); // BaseParameters
     return true;
 }

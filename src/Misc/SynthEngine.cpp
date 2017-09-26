@@ -2113,7 +2113,6 @@ void SynthEngine::Mute()
     sem_post (&mutelock);
 }
 
-
 /*
  * Intellegent switch for unknown mute status that always
  * switches off and later returns original unknown state
@@ -2492,23 +2491,13 @@ bool SynthEngine::actionLock(lockset request)
 
     switch (request)
     {
-        case trylock:
-            chk = pthread_mutex_trylock(processLock);
-            break;
-
         case lock:
             chk = pthread_mutex_lock(processLock);
             break;
 
         case unlock:
-            //Unmute();
             chk = pthread_mutex_unlock(processLock);
             break;
-
-        /*case lockmute:
-            Mute();
-            chk = pthread_mutex_lock(processLock);
-            break;*/
 
         default:
             break;

@@ -31,9 +31,6 @@ using namespace std;
 
 #include "Params/ADnoteParameters.h"
 
-/*int ADnoteParameters::ADnote_unison_sizes[] = {
-    1, 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 0
-};*/
 int ADnoteParameters::ADnote_unison_sizes[] =
 {2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 0};
 

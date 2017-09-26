@@ -1,4 +1,18 @@
-yoshimi 1.5.3 M
+yoshimi 1.5.4 rc1
+
+2017-9-24 Will
+* Removed orphaned and disabled code.
+* Unified coding style
+* set as V 1.5.4 rc1
+
+2017-9-23 Will
+* Improved part change display behaviour.
+* CLI part enable state can now be read as well.
+* Changing part enable state updates all of part
+  section in main window.
+
+2017-9-22 Will
+* Updated cmake policies.
 
 2017-9-21 Will
 * BugFix: MusicIO was passing LV2 MIDI to ring buffer.
