@@ -494,9 +494,7 @@ void *SynthEngine::RBPthread(void)
                         switch(block.data[1] & 0xff)
                         {
                             case 1:
-                                //actionLock(lockmute);
                                 ShutUp();
-                                //actionLock(unlock);
                                 Unmute();
                                 break;
                         }
@@ -717,11 +715,9 @@ void SynthEngine::SetZynControls()
             data |= (1 << 22);
             if (efftype == 0x40) // select effect
             {
-                //actionLock(lockmute);
                 Mute();
                 insefx[effnum]->changeeffect(value);
                 Unmute();
-                //actionLock(unlock);
             }
             else if (efftype == 0x20) // select part
             {
@@ -843,7 +839,7 @@ void SynthEngine::SetBankRoot(int rootnum)
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateBankRootDirs, 0);
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::RescanForBanks, 0);
         }
-        name = asString(foundRoot) + " " + bank.getRootPath(foundRoot);
+        name = asString(foundRoot) + " \"" + bank.getRootPath(foundRoot) + "\"";
         if (rootnum != foundRoot)
             name = "Cant find ID " + asString(rootnum) + ". Current root is " + name;
         else
@@ -886,7 +882,7 @@ void SynthEngine::SetBank(int banknum)
     gettimeofday(&tv1, NULL);
     if (bank.setCurrentBankID(banknum, true))
     {
-        string name = "Bank set to " + asString(banknum) + " " + bank.roots [bank.currentRootID].banks [banknum].dirname;
+        string name = "Bank set to " + asString(banknum) + " \"" + bank.roots [bank.currentRootID].banks [banknum].dirname + "\"";
         if (Runtime.showTimes)
         {
             gettimeofday(&tv2, NULL);
@@ -2031,12 +2027,9 @@ void SynthEngine::ClearNRPNs(void)
 
 void SynthEngine::resetAll(void)
 {
-    //actionLock(lockmute);
     defaults();
     ClearNRPNs();
     Unmute();
-    //actionLock(unlock);
-    //GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 1);
 }
 
 
@@ -2537,11 +2530,9 @@ bool SynthEngine::saveState(string filename)
 
 bool SynthEngine::loadPatchSetAndUpdate(string fname)
 {
-    //actionLock(lockmute);
     bool result;
     fname = setExtension(fname, "xmz");
     result = loadXML(fname); // load the data
-    //actionLock(unlock);
     Unmute();
     if (result)
     {

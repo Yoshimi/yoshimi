@@ -658,26 +658,18 @@ void PADnoteParameters::applyparameters(bool islocked)
             newsample.smp[i + samplesize] = newsample.smp[i];
 
         // replace the current sample with the new computed sample
-    //    if (!islocked)
-    //        synth->actionLock(lockmute);
         deletesample(nsample);
         sample[nsample].smp = newsample.smp;
         sample[nsample].size = samplesize;
         sample[nsample].basefreq = basefreq * basefreqadjust;
-    //    if (!islocked)
-    //        synth->actionLock(unlock);
         newsample.smp = NULL;
     }
     delete fft;
     FFTwrapper::deleteFFTFREQS(&fftfreqs);
 
     // delete the additional samples that might exists and are not useful
-    //if (!islocked)
-    //    synth->actionLock(lockmute);
     for (int i = samplemax; i < PAD_MAX_SAMPLES; ++i)
         deletesample(i);
-    //if (!islocked)
-    //    synth->actionLock(unlock);
 }
 
 

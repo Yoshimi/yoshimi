@@ -2,7 +2,7 @@
 version 1.0304
 header_name {.h}
 code_name {.cc}
-comment {MasterUI.h} {selected not_in_source in_header
+comment {MasterUI.h} {not_in_source in_header
 }
 
 comment {MasterUI.cc} {in_source not_in_header
@@ -38,6 +38,9 @@ decl {\#include <string>} {public local
 }
 
 decl {\#include <iostream>} {public local
+}
+
+decl {\#include <fstream>} {public local
 }
 
 decl {using namespace std;} {public local
@@ -97,7 +100,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {selected : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -319,6 +322,26 @@ class MasterUI {: {private GuiUpdates}
             xywh {0 0 34 20} labelsize 12
           }
           MenuItem {} {
+            label {&View Manual}
+            callback {//
+            string path = findfile("/", "yoshimi-user-manual", "pdf");
+            if (path == "")
+            {
+                fl_alert("Can't find manual :(");
+                return;
+            }
+            string command = "xdg-open " + path + "&";
+            FILE *fp = popen(command.c_str(), "r");
+            if (fp == NULL)
+            {
+                fl_alert("Can't find PDF reader :(");
+                return;
+            }
+            pclose(fp);
+            return;}
+            xywh {0 0 34 20}
+          }
+          MenuItem {} {
             label {E&xit}
             callback {masterwindow->do_callback();}
             xywh {10 10 100 20} labelsize 12
@@ -406,9 +429,9 @@ class MasterUI {: {private GuiUpdates}
                 do_save_master();
             else
                 fl_alert("Nothing to save!");}
-                    tooltip {Save current parameters to an .xmz file} xywh {0 0 34 21} labelsize 12
-                }
-        MenuItem RecentParams {
+            tooltip {Save current parameters to an .xmz file} xywh {0 0 34 21} labelsize 12
+          }
+          MenuItem RecentParams {
             label {&Recent Sets...}
             callback {//
             paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
@@ -509,7 +532,7 @@ paramsui->Show(3);}
             }
             else
                 refresh_master_ui(0x80 | (miscMsgPush(" ") << 8));}
-                    tooltip {Load session state} xywh {0 0 34 21} labelsize 12
+            tooltip {Load session state} xywh {0 0 34 21} labelsize 12
           }
           MenuItem saveState {
             label {&Save...}
