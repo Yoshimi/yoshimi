@@ -1,4 +1,134 @@
-yoshimi 1.5.3 M
+yoshimi 1.5.4
+
+2017-9-27 Will
+* Merged in noboost branch. So no dependency on boost.
+  Resolves a long standing very rare segfault.
+* A few more tidy ups.
+* Included "Yoshimi Advanced User Manual" as a PDF.
+  Can be launched from the 'Yoshimi' dropdown menu.
+* Set Version 1.5.4 release.
+
+2017-9-24 Will
+* Removed orphaned and disabled code.
+* Unified coding style
+* set as V 1.5.4 rc1
+
+2017-9-23 Will
+* Improved part change display behaviour.
+* CLI part enable state can now be read as well.
+* Changing part enable state updates all of part
+  section in main window.
+
+2017-9-22 Will
+* Updated cmake policies.
+
+2017-9-21 Will
+* BugFix: MusicIO was passing LV2 MIDI to ring buffer.
+* Improved example build instructions.
+
+2017-9-19 Will
+* Further CLI conversions and code cleanups.
+
+2017-9-17 Will
+* Mute now uses the same structure as partonoff.
+  Only a few mutex locks left!
+* Paste no longer locks, but audio loop lock needed.
+
+2017-9-16 Will
+* Removed redundant mutex from OscilGenUI.
+* Added check for old config file.
+* Improved Bank/Instrument window stacking.
+
+2017-9-14 Will
+* Reinstated and improved ALSA MIDI ring buffer.
+* Started converting Vectors.
+
+2017-9-13 Will
+* BugFix: reset not clearing master bandwidth.
+* Master bandwidth added to MIDI controls.
+* Master bandwidth now MIDI-learnable.
+* Docs updated.
+* Corrected MIDI controls tooltips.
+
+2017-9-11 Will
+* Improved AddSynth Voice controls code.
+* Corrected 'minus' tooltip.
+
+2017-9-10 Will
+* Envelopes converted.
+
+2017-9-9 Will
+* Corrected NRPN wrong displayed values.
+  Actual values were quite correct.
+* Replaced splash screen png with svg version.
+* Finally got envelope graphs under control.
+  Tidying up and full conversion tomorrow :)
+
+2017-9-8 Will
+* Most of envelopes transferred.
+  Only graph points to do.
+* Improved add/delete point controls.
+* Updated docs.
+
+2017-9-7 Will
+* Completed filter transfer.
+* Improved formant tooltips.
+
+2017-9-5 Will
+* Corrected last three dates here :(
+* Created noboost branch.
+[noboost] reverted note-offs to delete.
+[noboost] removed all references to boost.
+
+2017-9-4 Will
+* Effects transferred to lock free.
+  Noticed long-standing anomally with some dynfilter
+  control only working on release.
+* Filters mostly transferred to lock free.
+  Some formant controls not done yet.
+
+2017-9-1 Will
+* BugFix: Oscillator phase was screwed up :(
+* Removed redundant code from PadSynth UI.
+* Preparing Filters for conversion.
+
+2017-8-31 will
+* Cleaned up Sys/Ins controls.
+* Added cleanup when Ins destination set to 'off'.
+* Yet more doc updates :P
+
+2017-8-30 Will
+* BugFix: Disabling a part was resetting all controllers.
+* Doc updates.
+* Sys/Ins effect controls now transferred to lock free.
+  But could be improved.
+
+2017-8-29 Will
+* All rotary controllers now MIDI learnable.
+
+2017-8-28 Will
+* CLI can now save PadSynth sample sets.
+* Failure to save PadSynth sample sets now reported.
+* Updated docs.
+* Removed reundant code.
+* Removed unnecessary mutex lock in Pad apply.
+* Fixed regression 'apply' in GUI oscillator.
+* Oscillator converted to lock-free (phew!)
+  Alse corrected ancient anomally where base
+  function wasn't changed with 'Use as base".
+
+2017-8-26 Will
+* Adjusted logging on memory error merge from Iurie.
+
+2017-8-25 Will
+* Removed duplicated effects command from GUI.
+* PadSynth conversion completed.
+* Fixed regression - AddVoice bend adjust not working.
+
+2017-8-24 Will
+* Corrected GUI value for CLI resonance centre freq.
+* Resonance converted to lock-free.
+* Preparing PadSynth for conversion.
 
 2017-8-22 Will
 * More speeling chucks :(

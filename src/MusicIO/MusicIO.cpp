@@ -16,7 +16,7 @@
 
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
-    Modified February 2017
+    Modified September 2017
 */
 
 #include <errno.h>
@@ -38,6 +38,7 @@ MusicIO::MusicIO(SynthEngine *_synth) :
 {
     memset(zynLeft, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
     memset(zynRight, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
+    LV2_engine = synth->getIsLV2Plugin();
 }
 
 
@@ -64,7 +65,7 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
     if (synth->isMuted())
         return; // nobody listening!
 
-    if (in_place || ((int)synth->getRuntime().audioEngine ==1 && (int)synth->getRuntime().midiEngine) == 1)
+    if (LV2_engine || (synth->getRuntime().audioEngine == jack_audio && synth->getRuntime().midiEngine == jack_midi))
     { // it's all jack
         synth->mididecode.midiProcess(par0, par1, par2, in_place);
         return;

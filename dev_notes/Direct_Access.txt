@@ -14,7 +14,9 @@ Sections currently in place and tested:
 
 Top level controls
 Config - now used by GUI for writes
-Vectors
+
+Vectors - to complete
+
 Microtonal (scales) - now used by GUI for writes
 Midi-learn - used for all operations
 Main part controls - now used by GUI for writes
@@ -22,22 +24,17 @@ Controllers Window - now used by GUI for writes
 MIDI learn editor window - used for all except incoming real MIDI
 Kit edit window - now used by GUI for writes
 AddSynth Editor - now used by GUI for writes
-AddSynth Voice Editor
+AddSynth Voice Editor - now used by GUI for writes
 Subsynth Editor - now used by GUI for writes
-Padsynth Editor
-Oscillator
-Resonance
-Effects
-LFOs
-Filters
-Envelopes
+Padsynth Editor - now used by GUI for writes
+Oscillator - now used by GUI for writes
+Resonance - now used by GUI for writes
+Effects - now used by GUI for writes
+LFOs - now used by GUI for writes
+Filters - now used by GUI for writes
+Envelopes - now used by GUI for writes
 
-The remaining ones will display as if they had been written to, but won't actually change anything.
-
-This matches the results from using the middle mouse button in the GUI (assuming it was enabled at build time). Some commands that are purely within the GUI, e.g window changes are recognised but not acted on. It is expected that any alternative input system will store its own copies of such intermediate information so that they remain fully independent.
-
-If compiled with 'ShowGuiRreports' enabled, an alternative way to find out the correct command sequence is to click on a control with any button *except* the middle one. Trailing '255's can be ommitted if there are no following parameters set.
-
+This matches the results from using the middle mouse button in the GUI (assuming it was enabled at build time with 'ShowGuiRreports'). Some commands that are purely within the GUI, e.g window changes are recognised but not acted on. It is expected that any alternative input system will store its own copies of such intermediate information so that they remain fully independent.
 
 The format is:
 
@@ -70,7 +67,7 @@ par2 = an offset for some parameters.
 
 In some situations par2 is used as a miscMsg ID for passing text values between threads but synchronised via the RT thread. A failed push will return 255 and trying to pop 255 will return an empty string.
 
-If parameter has bit 7 set the command is passed to and alternative low priority function as there will be considerable text manipulation. If bit 6 is also set it will pass through a fade down and mute operation to aviod writing data to the audio engine when active. The return will go via this alternative text heavy route.
+If parameter has bit 7 set the command is passed to an alternative low priority function as there will be considerable text manipulation. If bit 6 is also set it will pass through a fade down and mute operation to aviod writing data to the audio engine when active. The return will go via this alternative text heavy route.
 
 
 Limits testing now has it's own entry. See Limits.txt.

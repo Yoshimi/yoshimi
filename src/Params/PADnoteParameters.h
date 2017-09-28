@@ -19,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified February 2017
+    This file is a derivative of a ZynAddSubFX original, modified August 2017
 */
 
 #ifndef PAD_NOTE_PARAMETERS_H
@@ -152,7 +152,7 @@ class PADnoteParameters : public Presets
         float getNhr(int n); // gets the n-th overtone position relatively to N harmonic
 
         void applyparameters(bool islocked);
-        void export2wav(std::string basefilename);
+        bool export2wav(std::string basefilename);
 
         OscilGen *oscilgen;
         Resonance *resonance;

@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of original ZynAddSubFX code
-    Modified August 2017
+    Modified September 2017
 */
 
 #include <cmath>
@@ -677,7 +677,7 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
             powf(0.1f, 3.0f * (1.0f - adpars->VoicePar[nvoice].PVolume / 127.0f)) // -60 dB .. 0 dB
             * velF(velocity, adpars->VoicePar[nvoice].PAmpVelocityScaleFunction); // velocity
 
-        if (adpars->VoicePar[nvoice].PVolumeminus != 0)
+        if (adpars->VoicePar[nvoice].PVolumeminus)
             NoteVoicePar[nvoice].Volume = -NoteVoicePar[nvoice].Volume;
 
         if (adpars->randomVoicePan(nvoice))

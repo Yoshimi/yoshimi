@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified August 2017
+    Modified September 2017
 */
 
 #include<stdio.h>
@@ -107,7 +107,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     ctl(NULL),
     microtonal(this),
     fft(NULL),
-    muted(0xFF),
+    muted(0),
     tmpmixl(NULL),
     tmpmixr(NULL),
     processLock(NULL),
@@ -140,6 +140,10 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
 SynthEngine::~SynthEngine()
 {
     closeGui();
+
+    if (RBPthreadHandle)
+        pthread_join(RBPthreadHandle, NULL);
+
     if (vuringbuf)
         jack_ringbuffer_free(vuringbuf);
     if (RBPringbuf)
@@ -174,6 +178,7 @@ SynthEngine::~SynthEngine()
         delete fft;
     pthread_mutex_destroy(&processMutex);
     sem_destroy(&partlock);
+    sem_destroy(&mutelock);
     if (ctl)
         delete ctl;
     getRemoveSynthId(true, uniqueId);
@@ -210,7 +215,10 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     int found = 0;
 
     if (!interchange.Init(this))
+    {
+        Runtime.LogError("interChange init failed");
         goto bail_out;
+    }
 
     if (!pthread_mutex_init(&processMutex, NULL))
         processLock = &processMutex;
@@ -273,6 +281,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     }
 
     sem_init(&partlock, 0, 1);
+    sem_init(&mutelock, 0, 1);
 
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
@@ -485,9 +494,8 @@ void *SynthEngine::RBPthread(void)
                         switch(block.data[1] & 0xff)
                         {
                             case 1:
-                                actionLock(lockmute);
                                 ShutUp();
-                                actionLock(unlock);
+                                Unmute();
                                 break;
                         }
                         break;
@@ -707,9 +715,9 @@ void SynthEngine::SetZynControls()
             data |= (1 << 22);
             if (efftype == 0x40) // select effect
             {
-                actionLock(lockmute);
+                Mute();
                 insefx[effnum]->changeeffect(value);
-                actionLock(unlock);
+                Unmute();
             }
             else if (efftype == 0x20) // select part
             {
@@ -831,7 +839,7 @@ void SynthEngine::SetBankRoot(int rootnum)
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateBankRootDirs, 0);
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::RescanForBanks, 0);
         }
-        name = asString(foundRoot) + " " + bank.getRootPath(foundRoot);
+        name = asString(foundRoot) + " \"" + bank.getRootPath(foundRoot) + "\"";
         if (rootnum != foundRoot)
             name = "Cant find ID " + asString(rootnum) + ". Current root is " + name;
         else
@@ -874,7 +882,7 @@ void SynthEngine::SetBank(int banknum)
     gettimeofday(&tv1, NULL);
     if (bank.setCurrentBankID(banknum, true))
     {
-        string name = "Bank set to " + asString(banknum) + " " + bank.roots [bank.currentRootID].banks [banknum].dirname;
+        string name = "Bank set to " + asString(banknum) + " \"" + bank.roots [bank.currentRootID].banks [banknum].dirname + "\"";
         if (Runtime.showTimes)
         {
             gettimeofday(&tv2, NULL);
@@ -2019,11 +2027,9 @@ void SynthEngine::ClearNRPNs(void)
 
 void SynthEngine::resetAll(void)
 {
-    actionLock(lockmute);
     defaults();
     ClearNRPNs();
-    actionLock(unlock);
-    //GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 1);
+    Unmute();
 }
 
 
@@ -2083,6 +2089,50 @@ void SynthEngine::partonoffWrite(int npart, int what)
 char SynthEngine::partonoffRead(int npart)
 {
     return (part[npart]->Penabled == 1);
+}
+
+
+void SynthEngine::Unmute()
+{
+    sem_wait (&mutelock);
+    mutewrite(2);
+    sem_post (&mutelock);
+}
+
+void SynthEngine::Mute()
+{
+    sem_wait (&mutelock);
+    mutewrite(-1);
+    sem_post (&mutelock);
+}
+
+/*
+ * Intellegent switch for unknown mute status that always
+ * switches off and later returns original unknown state
+ */
+void SynthEngine::mutewrite(int what)
+{
+    unsigned char original = muted;
+    unsigned char tmp = original;
+    switch (what)
+    {
+        case 0: // always off
+            tmp = 0;
+            break;
+        case 1: // always on
+            tmp = 1;
+            break;
+        case -1: // further from on
+            tmp -= 1;
+            break;
+        case 2:
+            if (tmp != 1) // nearer to on
+                tmp += 1;
+            break;
+        default:
+            return;
+    }
+    muted = tmp;
 }
 
 
@@ -2434,22 +2484,12 @@ bool SynthEngine::actionLock(lockset request)
 
     switch (request)
     {
-        case trylock:
-            chk = pthread_mutex_trylock(processLock);
-            break;
-
         case lock:
             chk = pthread_mutex_lock(processLock);
             break;
 
         case unlock:
-            Unmute();
             chk = pthread_mutex_unlock(processLock);
-            break;
-
-        case lockmute:
-            Mute();
-            chk = pthread_mutex_lock(processLock);
             break;
 
         default:
@@ -2490,11 +2530,10 @@ bool SynthEngine::saveState(string filename)
 
 bool SynthEngine::loadPatchSetAndUpdate(string fname)
 {
-    actionLock(lockmute);
     bool result;
     fname = setExtension(fname, "xmz");
     result = loadXML(fname); // load the data
-    actionLock(unlock);
+    Unmute();
     if (result)
     {
         setAllPartMaps();

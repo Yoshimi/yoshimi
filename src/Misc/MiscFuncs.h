@@ -59,6 +59,7 @@ class MiscFuncs
         bool isFifo(string chkpath);
         void legit_filename(string& fname);
         void legit_pathname(string& fname);
+        string findfile(string path, string filename, string extension);
         string findleafname(string name);
         int findSplitPoint(string name);
         string setExtension(string fname, string ext);

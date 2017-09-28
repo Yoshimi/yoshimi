@@ -8,6 +8,8 @@ There are a group of commands that are always available. These are
 List
 RESet
 EXit
+..
+/
 
 Apart from these, the command line works on a system of context levels, and normally only the commands relevant to that level will be available.
 
@@ -91,4 +93,4 @@ More may be added, and the organisation of them may be changed slightly.
 If any configuration settings are changed, either here or in the gui, you will be given a warning when you exit, with the option to continue running so you can save the changes.
 
 
-As well as an immediate history, Yoshimi maintains a command history file, so provided you make a normal command line exit your last commands will be available on your next run.
+As well as a 'last used' history, Yoshimi maintains a command history file, so provided you make a normal command line exit your last commands will be available on your next run.

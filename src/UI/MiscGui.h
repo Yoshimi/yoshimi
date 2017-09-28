@@ -17,12 +17,14 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+    Modified August 2017
 */
 
 #ifndef MISCGUI_H
 #define MISCGUI_H
 
 #include "Misc/SynthEngine.h"
+#include "Misc/MiscFuncs.h"
 
 enum ValueType {
     VC_plainValue,
@@ -104,9 +106,6 @@ enum ValueType {
 
 void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff);
 
-void read_updates(SynthEngine *synth);
-void decode_updates(SynthEngine *synth, CommandBlock *getData);
-
 string convert_value(ValueType type, float val);
 
 string variable_prec_units(float v, string u, int maxPrec, bool roundup = false);
@@ -116,5 +115,13 @@ void custom_graphics(ValueType vt, float val,int W,int H);
 ValueType getLFOdepthType(int group);
 ValueType getFilterFreqType(int type);
 ValueType getFilterFreqTrackType(int offset);
+
+class GuiUpdates: public MiscFuncs{
+
+public:
+    void read_updates(SynthEngine *synth);
+private:
+    void decode_updates(SynthEngine *synth, CommandBlock *getData);
+};
 
 #endif

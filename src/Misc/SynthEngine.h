@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified August 2017
+    Modified September 2017
 */
 
 #ifndef SYNTHENGINE_H
@@ -46,13 +46,12 @@ using namespace std;
 #include "Misc/Config.h"
 #include "Params/PresetsStore.h"
 
-typedef enum { init, trylock, lock, unlock, lockmute, destroy } lockset;
+typedef enum { init, lock, unlock, destroy } lockset;
 
 class EffectMgr;
 class Part;
 class XMLwrapper;
 class Controller;
-//class CmdInterface;
 
 class MasterUI;
 
@@ -149,9 +148,11 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void setPartMap(int npart);
         void setAllPartMaps(void);
 
-        void Mute(void) { __sync_or_and_fetch(&muted, 0xFF); }
-        void Unmute(void) { __sync_and_and_fetch(&muted, 0); }
-        bool isMuted(void) { return (__sync_add_and_fetch(&muted, 0) != 0); }
+        void Unmute(void);
+        void Mute(void);
+        void mutewrite(int what);
+        bool isMuted(void) { return muted < 1; }
+        sem_t mutelock;
 
         void getLimits(CommandBlock *getData);
         void getVectorLimits(CommandBlock *getData);

@@ -2,6 +2,10 @@ Limits test can be accessed by directly calling synth->interchange.testLimits(&<
 
 This is filled with a normal data block as if a command was being sent, however it has several forms.
 
+*
+We may need to rethink all of this as some situations are now apparent where it isn't a good fit.
+*
+
 1st form: data.value = FLT_MAX
 From the command line enter 'direct' 'lim' control part kit etc.
 

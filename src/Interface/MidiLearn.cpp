@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified August 2017
+    Modified September 2017
 */
 
 #include <iostream>
@@ -681,10 +681,10 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
     unsigned int CCh = entry.CC;
     string CCtype;
     if (CCh < 0xff)
-        CCtype = to_string(CCh);
+        CCtype = "CC " + to_string(CCh);
     else
-        CCtype = asHexString((CCh >> 8) & 0x7f) + asHexString(CCh & 0x7f) + " h";
-    synth->getRuntime().Log("CC " + CCtype + "  Chan " + to_string((int)entry.chan + 1) + "  " + entry.name);
+        CCtype = "NRPN " + asHexString((CCh >> 7) & 0x7f) + " " + asHexString(CCh & 0x7f);
+    synth->getRuntime().Log(CCtype + "  Chan " + to_string((int)entry.chan + 1) + "  " + entry.name);
     updateGui(1);
     learning = false;
 }
@@ -765,7 +765,7 @@ void MidiLearn::updateGui(int opp)
         if (newCC > 0xff || (it->status & 8) > 0)
         { // status now used in case NRPN is < 0x100
             putData.data.control = 9; // it's an NRPN
-            putData.data.engine = ((newCC >> 8) & 0x7f);
+            putData.data.engine = ((newCC >> 8) & 0xff);
             writeToGui(&putData);
         }
         ++it;
@@ -830,7 +830,15 @@ bool MidiLearn::insertMidiListData(bool full,  XMLwrapper *xml)
             xml->addparbool("Mute", (it->status & 4) > 0);
             xml->addparbool("NRPN", (it->status & 8) > 0);
             xml->addparbool("7_bit", (it->status & 16) > 0);
-            xml->addpar("Midi_Controller", it->CC & 0x7fff); // clear out top bit
+            xml->addpar("Midi_Controller", it->CC & 0x7fff);
+            /*
+             * Clear out top bit - NRPN marker
+             * Yoshimi NRPNs are internally stored as
+             * integers in 'CC', not MIDI 14 bit pairs.
+             * A high bit marker is added to identify these.
+             * For user display they are split and shown as
+             * MSB and LSB.
+             */
             xml->addpar("Midi_Channel", it->chan);
             xml->addparreal("Midi_Min", it->min_in / 1.575f);
             xml->addparreal("Midi_Max", it->max_in / 1.575f);

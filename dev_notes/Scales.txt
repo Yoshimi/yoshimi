@@ -1,4 +1,4 @@
-Microtonal uses part number 0xe8
+Microtonal uses part number 232 (0xe8)
 
 For direct access, tunings and keyboard maps are both handled as strings of comma separated numbers. All spaces will be removed.
 

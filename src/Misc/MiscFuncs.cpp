@@ -245,6 +245,23 @@ void MiscFuncs::legit_pathname(string& fname)
 }
 
 
+string MiscFuncs::findfile(string path, string filename, string extension)
+{
+    string command = "find " + path + " -name " + filename + "." + extension + " 2>/dev/null -print -quit";
+#warning Using '2>/dev/null' here suppresses *all* error messages
+    FILE *fp = popen(command.c_str(), "r");
+    if (fp == NULL)
+        return "";
+    char line[1000];
+    fscanf(fp,"%[^\n]", line);
+    pclose(fp);
+
+    if (findleafname(line) == filename)
+        return line;
+    return "";
+}
+
+
 string MiscFuncs::findleafname(string name)
 {
     unsigned int name_start;

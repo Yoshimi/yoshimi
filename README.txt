@@ -1,3 +1,14 @@
+V 1.5.4 - Blackbird
+
+This is a very small release feature-wise but with a lot of cleanups in the code.
+
+It is now possible to MIDI-learn *all* rotary controllers. Also there is a new one in the small MIDI controls window. This is master bandwidth (CC75) and is most effective on instruments with a rich set of harmonics - especially SubSynth.
+
+Some of the tooltips were a bit ambiguous, and these have been changed to be more obvious.
+
+We now include "The Yoshimi Advanced User Manual" as a PDF, which when installed will be placed in /usr/local/share/yoshimi. If you have a preferred PDF reader installed, then you can fetch it from the 'Yoshimi' dropdown menu.
+
+
 V 1.5.3 - Swift
 
 We have revised the whole of Microtonal (scales) for better accuracy, and fixing originally incorrect range limitations. This is now much closer to the Scala specification, although there seems to be an ambiguity when you have a keymap defined and have an inverted scale - which key is the pivot point?

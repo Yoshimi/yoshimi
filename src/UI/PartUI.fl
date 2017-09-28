@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified August 2017
+Modified September 2017
 } {in_source in_header
 }
 
@@ -66,9 +66,9 @@ class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
       Fl_Dial sysend {
         label 01
         callback {//
-    if (Fl::event_button() == 3)
-        o->value(0);
-    send_data(neff, o->value(), 0xc8);}
+        if (Fl::event_button() == 3)
+            o->value(0);
+        send_data(neff, o->value(), 0xc8);}
         xywh {0 0 25 25} box ROUND_UP_BOX labelsize 10 align 130 maximum 127 step 1
         code0 {o->size(25,25);}
         code1 {o->value(synth->Psysefxvol[neff][npart]);}
@@ -80,24 +80,25 @@ class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
   }
   Function {PartSysEffSend(int x, int y, int w, int h) :
     Fl_Group(x, y, w, h, NULL)} {} {
-    code {neff = 0;npart = 0;} {}
+    code {//
+    neff = 0;npart = 0;} {}
   }
   Function {send_data(int control, float value, int type)} {} {
     code {//
-collect_data(synth, value, (Fl::event_button() | type), control + 0x28, npart);} {}
+    collect_data(synth, value, (Fl::event_button() | type), control + 0x28, npart);} {}
   }
   Function {init(int npart_, int neff_, SynthEngine *_synth)} {} {
     code {//
-        synth = _synth;
-        npart = npart_;
-        neff = neff_;
-        make_window();
-        syseffsend->show();
-        end();} {}
+    synth = _synth;
+    npart = npart_;
+    neff = neff_;
+    make_window();
+    syseffsend->show();
+    end();} {}
   }
   Function {~PartSysEffSend()} {} {
-    code {syseffsend->hide();
-        //delete(syseffsend);} {}
+    code {//
+    syseffsend->hide();} {}
   }
   decl {int neff;} {private local
   }
@@ -126,179 +127,183 @@ class PartKitItem {: {public Fl_Group}
         code0 {if (part->kit[n].Penabled == 0) o->deactivate();}
       } {
         Fl_Check_Button mutedcheck {
-          callback {//part->kit[n].Pmuted=(int)o->value();
-//synth->getGuiMaster()->partui->checkEngines();
-send_data(9, o->value(), 0xc8, n, 0xff, 32);}
+          callback {//
+          send_data(9, o->value(), 0xc8, n, 0xff, 32);}
           xywh {60 0 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Pmuted);}
         }
         Fl_Button labelbutton {
           label {Bass Drum}
           callback {//
-              const char *tmp = fl_input("Kit item name:", part->kit[n].Pname.c_str());
-              if (tmp != NULL)
-              {
-                part->kit[n].Pname = string(tmp);
-                o->copy_label(tmp);
-              }}
+          const char *tmp = fl_input("Kit item name:", part->kit[n].Pname.c_str());
+          if (tmp != NULL)
+          {
+              part->kit[n].Pname = string(tmp);
+              o->copy_label(tmp);
+          }}
           xywh {90 0 130 15} box THIN_DOWN_BOX down_box FLAT_BOX color 7 labelfont 1 labelsize 10 align 20
           code0 {o->copy_label(part->kit[n].Pname.c_str());}
         }
         Fl_Counter minkcounter {
-          callback {int tmp = o->value();
-int other = maxkcounter->value();
-if (tmp >= other)
-{
-    tmp = other;
-    o->value(tmp);
-}
+          callback {//
+          int tmp = o->value();
+          int other = maxkcounter->value();
+          if (tmp >= other)
+          {
+              tmp = other;
+              o->value(tmp);
+          }
 
-send_data(16, tmp, 0xc0, n, 0xff, 32);}
+          send_data(16, tmp, 0xc0, n, 0xff, 32);}
           xywh {225 0 55 15} type Simple minimum 0 maximum 128 step 1
           code0 {o->value(part->kit[n].Pminkey);}
         }
         Fl_Button {} {
           label m
           callback {//
-int last = part->lastnote;
-if (last <= 0)
-    return;
-int tmp;
-int other = maxkcounter->value();
-if (last >= other)
-    tmp = other;
-else
-    tmp = last;
-minkcounter->value(tmp);
+          int last = part->lastnote;
+          if (last <= 0)
+              return;
+          int tmp;
+          int other = maxkcounter->value();
+          if (last >= other)
+              tmp = other;
+          else
+              tmp = last;
+          minkcounter->value(tmp);
 
-send_data(18, tmp, 0xc0, n, 0xff, 32);}
+          send_data(18, tmp, 0xc0, n, 0xff, 32);}
           tooltip {set the minimum key to the last pressed key} xywh {285 3 15 12} box THIN_UP_BOX labelsize 10
         }
         Fl_Button {} {
           label M
           callback {//
-int last = part->lastnote;
-if (last <= 0)
-    return;
-int tmp;
-int other = minkcounter->value();
-if (last <= other)
-    tmp = other;
-else
-    tmp = last;
-maxkcounter->value(tmp);
+          int last = part->lastnote;
+          if (last <= 0)
+              return;
+          int tmp;
+          int other = minkcounter->value();
+          if (last <= other)
+              tmp = other;
+          else
+              tmp = last;
+          maxkcounter->value(tmp);
 
-send_data(19, tmp, 0xc0, n, 0xff, 32);}
+          send_data(19, tmp, 0xc0, n, 0xff, 32);}
           tooltip {set the maximum key to the last pressed key} xywh {315 3 15 12} box THIN_UP_BOX labelsize 10
         }
         Fl_Button {} {
           label R
           callback {//
-minkcounter->value(0);
-maxkcounter->value(127);
+          minkcounter->value(0);
+          maxkcounter->value(127);
 
-send_data(96, o->value(), 0xc0, n, 0xff, 32);}
+          send_data(96, o->value(), 0xc0, n, 0xff, 32);}
           tooltip {reset the minimum key to 0 and maximum key to 127} xywh {300 3 15 12} box THIN_UP_BOX labelfont 1 labelsize 10
         }
         Fl_Counter maxkcounter {
-          callback {int tmp = o->value();
-int other = minkcounter->value();
-if (tmp <= other)
-{
-    tmp = other;
-    o->value(tmp);
-}
-send_data(17, tmp, 0xc0, n, 0xff, 32);}
+          callback {//
+          int tmp = o->value();
+          int other = minkcounter->value();
+          if (tmp <= other)
+          {
+              tmp = other;
+              o->value(tmp);
+          }
+          send_data(17, tmp, 0xc0, n, 0xff, 32);}
           xywh {335 0 55 15} type Simple minimum 0 maximum 128 step 1
           code0 {o->value(part->kit[n].Pmaxkey);}
         }
         Fl_Button adeditbutton {
           label edit
-          callback {partui->showparameters(n,0);
-if ((Fl::event_button() == 3))
-    synth->getGuiMaster()->partui->instrumentkitlist->hide();}
+          callback {//
+          partui->showparameters(n,0);
+          if ((Fl::event_button() == 3))
+              synth->getGuiMaster()->partui->instrumentkitlist->hide();}
           xywh {420 0 40 15} box THIN_UP_BOX labelsize 11
           code0 {if (part->kit[n].Padenabled==0) o->deactivate();}
         }
         Fl_Check_Button adcheck {
           callback {//
-    int x = o->value();
-    if (x)
-        adeditbutton->activate();
-    else
-        adeditbutton->deactivate();
-    if (n == 0)
-    {
-        synth->getGuiMaster()->partui->adsynenabledcheck->value(x);
-        if (x)
-            synth->getGuiMaster()->partui->adeditbutton->activate();
-        else
-            synth->getGuiMaster()->partui->adeditbutton->deactivate();
-    }
-    synth->getGuiMaster()->partui->checkEngines();
-    send_data(8, o->value(), 0xc8, n, 0, 32);}
+          int x = o->value();
+          if (x)
+              adeditbutton->activate();
+          else
+              adeditbutton->deactivate();
+          if (n == 0)
+          {
+              synth->getGuiMaster()->partui->adsynenabledcheck->value(x);
+              if (x)
+                  synth->getGuiMaster()->partui->adeditbutton->activate();
+              else
+                  synth->getGuiMaster()->partui->adeditbutton->deactivate();
+          }
+          synth->getGuiMaster()->partui->checkEngines();
+          send_data(8, o->value(), 0xc8, n, 0, 32);}
           xywh {400 0 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Padenabled);}
         }
         Fl_Button subeditbutton {
           label edit
-          callback {partui->showparameters(n,1);
-if ((Fl::event_button() == 3))
-    synth->getGuiMaster()->partui->instrumentkitlist->hide();}
+          callback {//
+          partui->showparameters(n,1);
+          if ((Fl::event_button() == 3))
+              synth->getGuiMaster()->partui->instrumentkitlist->hide();}
           xywh {490 0 40 15} box THIN_UP_BOX labelsize 11
           code0 {if (part->kit[n].Psubenabled==0) o->deactivate();}
         }
         Fl_Check_Button subcheck {
           callback {//
-    int x = o->value();
-    if (x)
-        subeditbutton->activate();
-    else
-        subeditbutton->deactivate();
-    if (n == 0)
-    {
-        synth->getGuiMaster()->partui->subsynenabledcheck->value(x);
-        if (x)
-            synth->getGuiMaster()->partui->subeditbutton->activate();
-        else
-            synth->getGuiMaster()->partui->subeditbutton->deactivate();
-    }
-    synth->getGuiMaster()->partui->checkEngines();
-    send_data(8, o->value(), 0xc8, n, 1, 32);}
+          int x = o->value();
+          if (x)
+              subeditbutton->activate();
+          else
+              subeditbutton->deactivate();
+          if (n == 0)
+          {
+              synth->getGuiMaster()->partui->subsynenabledcheck->value(x);
+              if (x)
+                  synth->getGuiMaster()->partui->subeditbutton->activate();
+              else
+                  synth->getGuiMaster()->partui->subeditbutton->deactivate();
+          }
+          synth->getGuiMaster()->partui->checkEngines();
+          send_data(8, o->value(), 0xc8, n, 1, 32);}
           xywh {470 0 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Psubenabled);}
         }
         Fl_Button padeditbutton {
           label edit
-          callback {partui->showparameters(n,2);
-if ((Fl::event_button() == 3))
-    synth->getGuiMaster()->partui->instrumentkitlist->hide();}
+          callback {//
+          partui->showparameters(n,2);
+          if ((Fl::event_button() == 3))
+              synth->getGuiMaster()->partui->instrumentkitlist->hide();}
           xywh {560 0 40 15} box THIN_UP_BOX labelsize 11
           code0 {if (part->kit[n].Ppadenabled==0) o->deactivate();}
         }
         Fl_Check_Button padcheck {
           callback {//
-    int x = o->value();
-    if (x)
-        padeditbutton->activate();
-    else
-        padeditbutton->deactivate();
-    if (n == 0)
-    {
-        synth->getGuiMaster()->partui->padsynenabledcheck->value(x);
-        if (x)
-            synth->getGuiMaster()->partui->padeditbutton->activate();
-        else
-            synth->getGuiMaster()->partui->padeditbutton->deactivate();
-    }
-    synth->getGuiMaster()->partui->checkEngines();
-    send_data(8, o->value(), 0xc8, n, 2, 32);}
+          int x = o->value();
+          if (x)
+              padeditbutton->activate();
+          else
+              padeditbutton->deactivate();
+          if (n == 0)
+          {
+              synth->getGuiMaster()->partui->padsynenabledcheck->value(x);
+              if (x)
+                  synth->getGuiMaster()->partui->padeditbutton->activate();
+              else
+                  synth->getGuiMaster()->partui->padeditbutton->deactivate();
+          }
+          synth->getGuiMaster()->partui->checkEngines();
+          send_data(8, o->value(), 0xc8, n, 2, 32);}
           xywh {540 0 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Ppadenabled);}
         }
         Fl_Choice sendtoeffect {
           callback {//
-    send_data(24, o->value(), 0xc0, n, 0xff, 32);}
+          send_data(24, o->value(), 0xc0, n, 0xff, 32);}
           xywh {615 0 45 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {o->add("OFF"); char nrstr[10]; for(int i = 0; i < NUM_PART_EFX; i++) {sprintf(nrstr,"FX%d",i+1);o->add(nrstr);};}
           code1 {o->value(part->kit[n].Psendtoparteffect+1);if (part->kit[n].Psendtoparteffect==127) o->value(0);}
@@ -307,21 +312,21 @@ if ((Fl::event_button() == 3))
       Fl_Check_Button enabledcheck {
         label 01
         callback {//
-            int answer = 1;
+        int answer = 1;
+        if (o->value() == 0)
+            answer = (fl_choice("Delete the item?", NULL,"No","Yes") > 1);
+        if (answer != 0)
+        {
             if (o->value() == 0)
-                answer = (fl_choice("Delete the item?", NULL,"No","Yes") > 1);
-            if (answer != 0)
-            {
-                if (o->value() == 0)
-                    clearLine();
-                else
-                    partkititemgroup->activate();
-                o->redraw();
-                partui->showparameters(n, -1); // use to delete the ui, if it is not to item 0
-            }
+                clearLine();
             else
-                o->value(1);
-            send_data(8, o->value(), 0xc0, n, 0xff, 32);}
+                partkititemgroup->activate();
+            o->redraw();
+            partui->showparameters(n, -1); // use to delete the ui, if it is not to item 0
+        }
+        else
+            o->value(1);
+        send_data(8, o->value(), 0xc0, n, 0xff, 32);}
         xywh {30 0 20 15} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 4
         code0 {snprintf(label,10,"%d",n+1);o->label(label);}
         code1 {o->value(part->kit[n].Penabled);}
@@ -332,11 +337,11 @@ if ((Fl::event_button() == 3))
   }
   Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff, int insert = 0xff)} {} {
     code {//
-collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, insert);} {}
+    collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, insert);} {}
   }
   Function {PartKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
-n=0;part=NULL;} {}
+    n=0;part=NULL;} {}
   }
   Function {clearLine()} {} {
     code {//
@@ -353,60 +358,19 @@ n=0;part=NULL;} {}
     padeditbutton->deactivate();
     sendtoeffect->value(1);} {}
   }
-  Function {refresh()} {} {
-    code {//
-        enabledcheck->value(part->kit[n].Penabled == 1);
-        if (part->kit[n].Penabled != 1)
-            partkititemgroup->deactivate();
-        else
-            partkititemgroup->activate();
-        mutedcheck->value(part->kit[n].Pmuted);
-        labelbutton->label(part->kit[n].Pname.c_str());
-        minkcounter->value(part->kit[n].Pminkey);
-        maxkcounter->value(part->kit[n].Pmaxkey);
-        adcheck->value(part->kit[n].Padenabled);
-        adcheck->do_callback();
-        subcheck->value(part->kit[n].Psubenabled);
-        subcheck->do_callback();
-
-        sendtoeffect->value(part->kit[n].Psendtoparteffect + 1);
-        if (part->kit[n].Psendtoparteffect == 127)
-            sendtoeffect->value(0);
-        this->redraw();} {
-      callback {//
-          int answer = 1;
-            if (!o->value())
-                answer = (fl_choice("Delete the item?", NULL, "No", "Yes") > 1);
-            if (answer)
-            {
-                synth->actionLock(lockmute);
-                part->setkititemstatus(n, o->value());
-                synth->actionLock(unlock);
-
-                if (!o->value())
-                    partkititemgroup->deactivate();
-                else
-                    partkititemgroup->activate();
-                o->redraw();
-                partui->showparameters(n, -1); // use to delete the ui, if it is not to item 0
-            }
-            else
-                o->value(1);}
-    }
-  }
   Function {init(Part *part_, int n_, int npart_, PartUI_ *partui_)} {} {
     code {//
-      synth = part_->getSynthEngine();
-      part = part_;
-      n = n_;
-      npart = npart_;
-      partui = partui_;
-      make_window();
-      end();} {}
+    synth = part_->getSynthEngine();
+    part = part_;
+    n = n_;
+    npart = npart_;
+    partui = partui_;
+    make_window();
+    end();} {}
   }
   Function {~PartKitItem()} {} {
-    code {partkititem->hide();
-      //delete(partkititem);} {}
+    code {//
+    partkititem->hide();} {}
   }
   decl {Part *part;} {public local
   }
@@ -429,7 +393,7 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
       xywh {272 534 380 170} type Double box NO_BOX hide
       class Fl_Group
     } {
-      Fl_Group partgroupui {open
+      Fl_Group partgroupui {
         xywh {0 0 378 168}
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
@@ -448,39 +412,41 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
         }
         Fl_Button instrumentlab {
           callback {//
-    int event = Fl::event_button();
-    const char *tmp = NULL;
-    if (event == FL_LEFT_MOUSE)
-        bankui->Show();
-    else if (event == FL_RIGHT_MOUSE)
-    {
-        tmp = fl_input("Instrument name:", part->Pname.c_str());
-        if (tmp != NULL and not string(tmp).empty())
-        {
-            if (string(tmp) == "Simple Sound")
-                fl_alert("Can't use name of default sound");
-            else
-            {
-                unsigned char id = miscMsgPush(string(tmp));
-                send_data(222, 0, 0xd0, 0xff, 0xff, 0xff, 0xff, id);
-            }
-        }
-    }}
+          int event = Fl::event_button();
+          const char *tmp = NULL;
+          if (event == FL_LEFT_MOUSE)
+              bankui->Show();
+          else if (event == FL_RIGHT_MOUSE)
+          {
+              tmp = fl_input("Instrument name:", part->Pname.c_str());
+              if (tmp != NULL and not string(tmp).empty())
+              {
+                  if (string(tmp) == "Simple Sound")
+                      fl_alert("Can't use name of default sound");
+                  else
+                  {
+                      unsigned char id = miscMsgPush(string(tmp));
+                      send_data(222, 0, 0xd0, 0xff, 0xff, 0xff, 0xff, id);
+                  }
+              }
+          }}
           tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 7 192 20} box THIN_DOWN_FRAME labelfont 1 labelsize 12 align 16
           code0 {setinstrumentlabel();}
         }
         Fl_Button {} {
           label Edit
-          callback {instrumenteditwindow->show();}
+          callback {//
+          instrumenteditwindow->show();}
           xywh {330 6 40 22} box PLASTIC_UP_BOX color 22 labelfont 1 labelsize 12
         }
         Fl_Dial velocitysense {
           label {Velocity
 Sense}
-          callback {if (Fl::event_button() == 3)
-    o->value(64);
+          callback {//
+          if (Fl::event_button() == 3)
+              o->value(64);
 
-send_data(1, o->value(), 0xc8);}
+          send_data(1, o->value(), 0xc8);}
           xywh {200 40 28 28} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Pvelsns);}
           code1 {//o->init(64);}
@@ -490,10 +456,11 @@ send_data(1, o->value(), 0xc8);}
         Fl_Dial velocityoffset {
           label {Velocity
 Offset}
-          callback {if (Fl::event_button() == 3)
-    o->value(64);
+          callback {//
+          if (Fl::event_button() == 3)
+              o->value(64);
 
-send_data(4, o->value(), 0xc8);}
+          send_data(4, o->value(), 0xc8);}
           xywh {244 40 28 28} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Pveloffs);}
           code1 {//o->init(64);}
@@ -502,12 +469,12 @@ send_data(4, o->value(), 0xc8);}
         Fl_Dial partpan {
           label Pan
           callback {//;
-    if (Fl::event_button() == 3)
-        o->value(64);
-    if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-        synth->getGuiMaster()->setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, o->value());
+          if (Fl::event_button() == 3)
+              o->value(64);
+          if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
+              synth->getGuiMaster()->setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, o->value());
 
-    send_data(2, o->value(), 0x48);}
+          send_data(2, o->value(), 0x48);}
           xywh {289 39 32 32} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_PanningStd);}
           code1 {o->value(part->Ppanning);}
@@ -517,17 +484,133 @@ send_data(4, o->value(), 0xc8);}
         Fl_Dial partvol {
           label Volume
           callback {//;
-    if (Fl::event_button() == 3)
-        o->value(96);
-    if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-      synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, o->value());
+          if (Fl::event_button() == 3)
+              o->value(96);
+          if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
+          synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, o->value());
 
-    send_data(0, o->value(), 0x48);}
+          send_data(0, o->value(), 0x48);}
           xywh {335 39 32 32} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_PartVolume);}
           code1 {o->value(part->Pvolume);}
           code2 {//o->init(96);}
           class WidgetPDial
+        }
+        Fl_Check_Button enportamento {
+          label Portamento
+          callback {//
+          send_data(7, o->value(), 0xc8);}
+          tooltip {Enable/Disable the portamento} xywh {83 61 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 11 align 8
+          code0 {o->value(part->ctl->portamento.portamento);}
+        }
+        Fl_Spinner midich {
+          label Midi
+          callback {//
+          int tmp = ((int)o->value() -1);
+          if (tmp > 15)
+          {
+              tmp &= 15;
+              o->value(tmp +1);
+          }
+          o->textcolor(FL_BLACK);
+          if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
+              synth->getGuiMaster()->setPanelPartMidiWidget(npart % NUM_MIDI_CHANNELS, tmp);
+
+          send_data(5, tmp, 0xc0);}
+          tooltip {MIDI channel for this part} xywh {31 36 40 19} labelsize 11 maximum 16 textsize 11
+          code0 {o->value(part->Prcvchn + 1);}
+          code1 {if (part->Prcvchn < NUM_MIDI_CHANNELS) o->textcolor(FL_BLACK); else o->textcolor(FL_WHITE);}
+        }
+        Fl_Choice keymode {
+          label Mode
+          callback {//
+          send_data(6, o->value(), 0xc0);}
+          tooltip {Poly, Mono or Legato mode} xywh {83 36 68 19} down_box BORDER_BOX selection_color 49 labelsize 11 align 8 textfont 1 textsize 11
+          code0 {o->add("Poly"); o->add("Mono"); o->add("Legato");}
+          code1 {o->value(synth->ReadPartKeyMode(npart));}
+        } {}
+        Fl_Button {} {
+          label Controllers
+          callback {//
+          if (Fl::event_button() != 3)
+              ctlwindow->show();
+          else
+              ctlmidi->show();}
+          tooltip {Left mouse button: Controller range settings, Right mouse button: MIDI CCs} xywh {8 81 167 25} box PLASTIC_UP_BOX color 222 labelsize 12
+        }
+        Fl_Spinner partkeyshift {
+          label {Key Shift}
+          callback {//
+          send_data(35, o->value(), 0xc0);}
+          xywh {194 111 38 20} labelsize 10 minimum -36 maximum 36 textsize 11
+          code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
+          code1 {o->value(part->Pkeyshift - 64);}
+        }
+        Fl_Spinner partkeylimit {
+          label {Key Limit}
+          callback {//
+          send_data(33, o->value(), 0xc0);}
+          tooltip {Maximum keys for this part} xywh {194 143 38 20} labelsize 10 value 20 textsize 11
+          code0 {o->range(1, POLIPHONY - 20); // enough for one part!}
+          code1 {o->value(part->Pkeylimit);}
+        }
+        Fl_Spinner minkcounter {
+          label {Min Note}
+          callback {//
+          int tmp = o->value();
+          int other = maxkcounter->value();
+          if (tmp > other)
+          {
+              tmp = other;
+              o->value(tmp);
+          }
+
+          send_data(16, tmp, 0xc0);}
+          tooltip {Minimum note the part receives} xywh {57 111 42 20} labelsize 10 minimum 0 maximum 127 textsize 11
+          code0 {o->range(0.0, 127.0);o->step(1.0);}
+          code1 {o->value(part->Pminkey);}
+        }
+        Fl_Spinner maxkcounter {
+          label {Max Note}
+          callback {//
+          int tmp = o->value();
+          int other = minkcounter->value();
+          if (tmp < other)
+          {
+              tmp = other;
+              o->value(tmp);
+          }
+
+          send_data(17, tmp, 0xc0);}
+          tooltip {Maximum note the part receives} xywh {57 143 42 20} labelsize 10 minimum 0 maximum 127 textsize 11
+          code0 {o->range(0.0, 127.0);o->step(1.0);}
+          code1 {o->value(part->Pmaxkey);}
+        }
+        Fl_Button {} {
+          label Set
+          callback {//
+          if (part->lastnote >= 0)
+              minkcounter->value(part->lastnote);
+
+          send_data(18, o->value(), 0xc0);}
+          tooltip {Set minimum note to the last note played} xywh {104 111 30 16} box PLASTIC_UP_BOX labelsize 10
+        }
+        Fl_Button {} {
+          label R
+          callback {//
+          minkcounter->value(0);
+          maxkcounter->value(127);
+
+          send_data(20, o->value(), 0xc0);}
+          tooltip {Reset the minimum key to 0 and maximum key to 127} xywh {104 129 30 16} box PLASTIC_UP_BOX labelfont 1 labelsize 11
+        }
+        Fl_Button {} {
+          label Set
+          callback {//
+          if (part->lastnote >= 0) maxkcounter->value(part->lastnote);
+
+          send_data(19, o->value(), 0xc0);}
+          tooltip {Set maximum note to the last note played} xywh {104 147 30 16} box PLASTIC_UP_BOX labelsize 10
         }
         Fl_Box {} {
           xywh {240 96 134 69} box ENGRAVED_FRAME
@@ -536,79 +619,29 @@ send_data(4, o->value(), 0xc8);}
       Fl_Check_Button partGroupEnable {
         label Enabled
         callback {//;
-    if (o->value() != 1)
-    {
-        partgroupui->deactivate();
-        toSysEfx->deactivate();
-    }
-    else
-    {
-        partgroupui->activate();
-        toSysEfx->activate();
-    }
-
-    if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-    {
-        synth->getGuiMaster()->panellistitem[npart % NUM_MIDI_CHANNELS]->partenabled->value(o->value());
         if (o->value() != 1)
-            synth->getGuiMaster()->panellistitem[npart % NUM_MIDI_CHANNELS]->panellistitemgroup->deactivate();
+        {
+            partgroupui->deactivate();
+            toSysEfx->deactivate();
+        }
         else
-            synth->getGuiMaster()->panellistitem[npart % NUM_MIDI_CHANNELS]->panellistitemgroup->activate();
-    }
+        {
+            partgroupui->activate();
+            toSysEfx->activate();
+        }
 
-    send_data(8, o->value(), 0xc0);}
+        if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
+        {
+            synth->getGuiMaster()->panellistitem[npart % NUM_MIDI_CHANNELS]->partenabled->value(o->value());
+            if (o->value() != 1)
+                synth->getGuiMaster()->panellistitem[npart % NUM_MIDI_CHANNELS]->panellistitemgroup->deactivate();
+            else
+            synth->getGuiMaster()->panellistitem[npart % NUM_MIDI_CHANNELS]->panellistitemgroup->activate();
+        }
+
+        send_data(8, o->value(), 0xc0);}
         xywh {58 59 20 20} down_box DOWN_BOX labelsize 11 align 4
         code0 {o->value(part->Penabled == 1);}
-      }
-      Fl_Spinner midich {
-        label Midi
-        callback {//
-int tmp = ((int)o->value() -1);
-if (tmp > 15)
-{
-    tmp &= 15;
-    o->value(tmp +1);
-}
-o->textcolor(FL_BLACK);
-if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-    synth->getGuiMaster()->setPanelPartMidiWidget(npart % NUM_MIDI_CHANNELS, tmp);
-
-send_data(5, tmp, 0xc0);}
-        tooltip {MIDI channel for this part} xywh {31 36 40 19} labelsize 11 maximum 16 textsize 11
-        code0 {o->value(part->Prcvchn + 1);}
-        code1 {if (part->Prcvchn < NUM_MIDI_CHANNELS) o->textcolor(FL_BLACK); else o->textcolor(FL_WHITE);}
-      }
-      Fl_Choice keymode {
-        label Mode
-        callback {//
-
-    send_data(6, o->value(), 0xc0);}
-        tooltip {Poly, Mono or Legato mode} xywh {78 36 68 19} down_box BORDER_BOX selection_color 49 labelsize 11 align 8 textfont 1 textsize 11
-        code0 {o->add("Poly"); o->add("Mono"); o->add("Legato");}
-        code1 {o->value(synth->ReadPartKeyMode(npart));}
-      } {}
-      Fl_Check_Button enportamento {
-        label Portamento
-        callback {//
-send_data(7, o->value(), 0xc8);}
-        tooltip {Enable/Disable the portamento} xywh {76 61 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 11 align 8
-        code0 {o->value(part->ctl->portamento.portamento);}
-      }
-      Fl_Spinner partkeyshift {
-        label {Key Shift}
-        callback {//
-send_data(35, o->value(), 0xc0);}
-        xywh {194 111 38 20} labelsize 10 minimum -36 maximum 36 textsize 11
-        code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
-        code1 {o->value(part->Pkeyshift - 64);}
-      }
-      Fl_Spinner partkeylimit {
-        label {Key Limit}
-        callback {//
-send_data(33, o->value(), 0xc0);}
-        tooltip {Maximum keys for this part} xywh {194 143 38 20} labelsize 10 value 20 textsize 11
-        code0 {o->range(1, POLIPHONY - 20); // enough for one part!}
-        code1 {o->value(part->Pkeylimit);}
       }
       Fl_Box {} {
         label Mask
@@ -638,72 +671,6 @@ send_data(33, o->value(), 0xc0);}
             }}
         } {}
       }
-      Fl_Button {} {
-        label Controllers
-        callback {if (Fl::event_button() != 3)
-    ctlwindow->show();
-else
-    ctlmidi->show();}
-        tooltip {Left mouse button: Controller range settings, Right mouse button: MIDI CCs} xywh {3 81 167 25} box PLASTIC_UP_BOX color 222 labelsize 12
-      }
-      Fl_Spinner minkcounter {
-        label {Min Note}
-        callback {//
-int tmp = o->value();
-int other = maxkcounter->value();
-if (tmp > other)
-{
-    tmp = other;
-    o->value(tmp);
-}
-
-send_data(16, tmp, 0xc0);}
-        tooltip {Minimum note the part receives} xywh {57 111 42 20} labelsize 10 minimum 0 maximum 127 textsize 11
-        code0 {o->range(0.0, 127.0);o->step(1.0);}
-        code1 {o->value(part->Pminkey);}
-      }
-      Fl_Spinner maxkcounter {
-        label {Max Note}
-        callback {//
-int tmp = o->value();
-int other = minkcounter->value();
-if (tmp < other)
-{
-    tmp = other;
-    o->value(tmp);
-}
-
-send_data(17, tmp, 0xc0);}
-        tooltip {Maximum note the part receives} xywh {57 143 42 20} labelsize 10 minimum 0 maximum 127 textsize 11
-        code0 {o->range(0.0, 127.0);o->step(1.0);}
-        code1 {o->value(part->Pmaxkey);}
-      }
-      Fl_Button {} {
-        label Set
-        callback {//
-    if (part->lastnote >= 0)
-        minkcounter->value(part->lastnote);
-
-    send_data(18, o->value(), 0xc0);}
-        tooltip {Set minimum note to the last note played} xywh {104 111 30 16} box PLASTIC_UP_BOX labelsize 10
-      }
-      Fl_Button {} {
-        label R
-        callback {//
-    minkcounter->value(0);
-    maxkcounter->value(127);
-
-    send_data(20, o->value(), 0xc0);}
-        tooltip {Reset the minimum key to 0 and maximum key to 127} xywh {104 129 30 16} box PLASTIC_UP_BOX labelfont 1 labelsize 11
-      }
-      Fl_Button {} {
-        label Set
-        callback {//
-    if (part->lastnote >= 0) maxkcounter->value(part->lastnote);
-
-    send_data(19, o->value(), 0xc0);}
-        tooltip {Set maximum note to the last note played} xywh {104 147 30 16} box PLASTIC_UP_BOX labelsize 10
-      }
     }
     Fl_Window ctlwindow {
       label Controllers
@@ -714,7 +681,7 @@ send_data(17, tmp, 0xc0);}
       Fl_Dial volrng {
         label {Vol Rng}
         callback {//
-send_data(128, o->value(), 0xc0);}
+        send_data(128, o->value(), 0xc8);}
         tooltip {Volume Range} xywh {132 55 30 30} labelsize 10 minimum 64 maximum 127 step 1
         code0 {o->value(part->ctl->volume.data);}
         code1 {o->init(96);}
@@ -723,14 +690,14 @@ send_data(128, o->value(), 0xc0);}
       Fl_Check_Button vol {
         label Vol
         callback {//
-send_data(129, o->value(), 0xc0);}
+        send_data(129, o->value(), 0xc0);}
         tooltip {Volume enable} xywh {175 80 45 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->volume.receive);}
       }
       Fl_Dial panwidth {
         label PanWdth
         callback {//
-send_data(130, o->value(), 0xc8);}
+        send_data(130, o->value(), 0xc8);}
         tooltip {Panning Width} xywh {10 55 30 30} labelsize 10 maximum 64 step 1
         code0 {o->value(part->ctl->panning.depth);}
         code1 {o->init(64);}
@@ -739,7 +706,7 @@ send_data(130, o->value(), 0xc8);}
       Fl_Dial modwh {
         label ModWh
         callback {//
-send_data(131, o->value(), 0xc0);}
+        send_data(131, o->value(), 0xc8);}
         tooltip {Modulation Wheel depth} xywh {50 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->modwheel.depth);}
         code1 {o->init(80);}
@@ -748,14 +715,14 @@ send_data(131, o->value(), 0xc0);}
       Fl_Check_Button expmwh {
         label {Exp MWh}
         callback {//
-send_data(132, o->value(), 0xc0);}
+        send_data(132, o->value(), 0xc0);}
         tooltip {Exponential modulation wheel} xywh {10 15 40 25} down_box DOWN_BOX labelsize 10 align 148
         code0 {o->value(part->ctl->modwheel.exponential);}
       }
       Fl_Dial bwdpth {
         label BwDpth
         callback {//
-send_data(133, o->value(), 0xc8);}
+        send_data(133, o->value(), 0xc8);}
         tooltip {BandWidth depth} xywh {132 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->bandwidth.depth);}
         code1 {o->init(64);}
@@ -764,35 +731,37 @@ send_data(133, o->value(), 0xc8);}
       Fl_Check_Button expbw {
         label {Exp BW}
         callback {//
-send_data(134, o->value(), 0xc0);}
+        send_data(134, o->value(), 0xc0);}
         tooltip {Exponential BandWidth Controller} xywh {92 15 35 25} down_box DOWN_BOX labelsize 10 align 148
         code0 {o->value(part->ctl->bandwidth.exponential);}
       }
       Fl_Check_Button expr {
         label Expr
         callback {//
-send_data(135, o->value(), 0xc0);}
+        send_data(135, o->value(), 0xc0);}
         tooltip {Expression enable} xywh {175 55 45 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->expression.receive);}
       }
       Fl_Check_Button fmamp {
         label FMamp
         callback {//
-send_data(136, o->value(), 0xc0);}
+        send_data(136, o->value(), 0xc0);}
         tooltip {FM amplitude enable} xywh {225 55 60 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->fmamp.receive);}
       }
       Fl_Check_Button sustain {
         label Sustain
         callback {//
-    send_data(137, o->value(), 0xc0);}
+        send_data(137, o->value(), 0xc0);}
         tooltip {Sustain pedal enable} xywh {225 80 60 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->sustain.receive);}
       }
       Fl_Counter pwheelbrng {
         label {PWheel Rng (cents)}
         callback {//
-send_data(138, o->value(), 0xc8);}
+        if (Fl::event_button() == 3)
+            o->value(200);
+        send_data(138, o->value(), 0xc8);}
         tooltip {Pitch Wheel Bend Range (cents)} xywh {174 15 110 20} color 237 selection_color 0 labelsize 10 align 1 minimum -6400 maximum 6400 step 1
         code0 {o->value(part->ctl->pitchwheel.bendrange);}
         code1 {o->lstep(100);}
@@ -800,7 +769,7 @@ send_data(138, o->value(), 0xc8);}
       Fl_Dial filtq {
         label FltQ
         callback {//
-send_data(139, o->value(), 0xc0);}
+        send_data(139, o->value(), 0xc8);}
         tooltip {Filter Q depth} xywh {50 55 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->filterq.depth);}
         code1 {o->init(64);}
@@ -809,7 +778,7 @@ send_data(139, o->value(), 0xc0);}
       Fl_Dial fltcut {
         label FltCut
         callback {//
-send_data(140, o->value(), 0xc0);}
+        send_data(140, o->value(), 0xc8);}
         tooltip {Filter Cutoff depth} xywh {90 55 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->filtercutoff.depth);}
         code1 {o->init(64);}
@@ -818,13 +787,13 @@ send_data(140, o->value(), 0xc0);}
       Fl_Button {} {
         label Close
         callback {//
-ctlwindow->hide();}
+        ctlwindow->hide();}
         xywh {405 105 95 20} box THIN_UP_BOX
       }
       Fl_Button {} {
         label {Reset all controllers}
         callback {//
-send_data(224, o->value(), 0xc0);}
+        send_data(224, o->value(), 0xc0);}
         xywh {5 105 210 20} box THIN_UP_BOX
       }
       Fl_Group {} {
@@ -833,8 +802,8 @@ send_data(224, o->value(), 0xc0);}
       } {
         Fl_Dial cfdpth {
           label CFdpth
-          callback {part->ctl->resonancecenter.depth = o->value();
-send_data(144, o->value(), 0xc0);}
+          callback {//
+          send_data(144, o->value(), 0xc8);}
           tooltip {Center Frequency controller Depth} xywh {300 20 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->resonancecenter.depth);}
           code1 {o->init(64);}
@@ -842,8 +811,8 @@ send_data(144, o->value(), 0xc0);}
         }
         Fl_Dial rbwdpth {
           label BWdpth
-          callback {part->ctl->resonancebandwidth.depth = o->value();
-send_data(145, o->value(), 0xc0);}
+          callback {//
+          send_data(145, o->value(), 0xc8);}
           tooltip {BandWidth controller depth} xywh {300 60 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->resonancebandwidth.depth);}
           code1 {o->init(64);}
@@ -860,8 +829,8 @@ send_data(145, o->value(), 0xc0);}
         }
         Fl_Dial prtime {
           label time
-          callback {part->ctl->portamento.time = o->value();
-send_data(160, o->value(), 0xc8);}
+          callback {//
+          send_data(160, o->value(), 0xc8);}
           tooltip {Portamento time} xywh {345 60 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.time);}
           code1 {o->init(64);}
@@ -870,9 +839,7 @@ send_data(160, o->value(), 0xc8);}
         Fl_Dial timedu {
           label {t.dn/up}
           callback {//
-              int x = o->value();
-              part->ctl->portamento.updowntimestretch = x;
-              send_data(161, o->value(), 0xc8);}
+          send_data(161, o->value(), 0xc8);}
           tooltip {Portamento time stretch (up/down)} xywh {375 60 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.updowntimestretch);}
           code1 {o->init(64);}
@@ -880,22 +847,22 @@ send_data(160, o->value(), 0xc8);}
         }
         Fl_Counter thresh {
           label Thresh
-          callback {//part->ctl->portamento.pitchthresh = o->value();
-send_data(162, o->value(), 0xc8);}
+          callback {//
+          send_data(162, o->value(), 0xc8);}
           tooltip {Minimum or max. difference of the notes in order to do the portamento (x 100 cents)} xywh {400 20 50 20} type Simple color 237 selection_color 0 labelsize 10 minimum 0 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.pitchthresh);}
         }
         Fl_Check_Button thtype {
           label {th.type}
-          callback {//part->ctl->portamento.pitchthreshtype = o->value();
-send_data(163, o->value(), 0xc0);}
+          callback {//
+          send_data(163, o->value(), 0xc0);}
           tooltip {Threshold type (min/max)} xywh {425 68 15 15} down_box DOWN_BOX labelsize 10 align 2
           code0 {o->value(part->ctl->portamento.pitchthreshtype);}
         }
         Fl_Dial propta {
           label {Prp.Rate}
-          callback {part->ctl->portamento.propRate=(int) o->value();
-send_data(165, o->value(), 0xc8);}
+          callback {//
+          send_data(165, o->value(), 0xc8);}
           tooltip {Distance required to double change from nonpropotinal portamento time} xywh {463 20 25 25} labelsize 9 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.propRate);}
           code1 {o->init(80);}
@@ -903,8 +870,8 @@ send_data(165, o->value(), 0xc8);}
         }
         Fl_Dial proptb {
           label {Prp.Dpth}
-          callback {part->ctl->portamento.propDepth=(int) o->value();
-send_data(166, o->value(), 0xc8);}
+          callback {//
+          send_data(166, o->value(), 0xc8);}
           tooltip {The difference from nonproportinal portamento} xywh {463 60 25 25} labelsize 9 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.propDepth);}
           code1 {o->init(90);}
@@ -912,25 +879,25 @@ send_data(166, o->value(), 0xc8);}
         }
         Fl_Check_Button rcv {
           label Rcv
-          callback {//part->ctl->portamento.receive = o->value();
-send_data(168, o->value(), 0xc0);}
+          callback {//
+          send_data(168, o->value(), 0xc0);}
           tooltip {Receive Portamento Controllers} xywh {345 20 40 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
           code0 {o->value(part->ctl->portamento.receive);}
         }
         Fl_Check_Button proprt {
           label {Proprt.}
-          callback {//part->ctl->portamento.proportional=(int) o->value();
-if(o->value())
-{
-    propta->activate();
-    proptb->activate();
-}
-else
-{
-    propta->deactivate();
-    proptb->deactivate();
-}
-send_data(164, o->value(), 0xc0);}
+          callback {//
+          if(o->value())
+          {
+              propta->activate();
+              proptb->activate();
+          }
+          else
+          {
+              propta->deactivate();
+              proptb->deactivate();
+          }
+          send_data(164, o->value(), 0xc0);}
           tooltip {Enable Proportinal Portamento (over fixed Portamento)} xywh {345 40 50 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 9
           code0 {o->value(part->ctl->portamento.proportional);}
           code1 {if(o->value()){propta->activate();proptb->activate();}}
@@ -940,50 +907,65 @@ send_data(164, o->value(), 0xc0);}
     }
     Fl_Window ctlmidi {
       label {MIDI Controls}
-      xywh {259 191 365 60} type Double hide
+      xywh {661 261 365 60} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("MIDI Controls").c_str());}
       code1 {o->position(synth->getGuiMaster()->controllersX, synth->getGuiMaster()->controllersY);}
     } {
       Fl_Dial modulation {
         label Modulation
-        callback {if (Fl::event_button() == 3)
-    o->value(64);
-send_data(192, o->value(), 0xc8);}
-        tooltip {Modulation Wheel depth} xywh {30 10 30 30} labelsize 10 maximum 127 step 1
+        callback {//
+        if (Fl::event_button() == 3)
+            o->value(64);
+        send_data(192, o->value(), 0xc8);}
+        tooltip {Modulation Wheel} xywh {20 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->modwheel.data);}
         class WidgetPDial
       }
       Fl_Dial expression {
         label Expression
-        callback {if (Fl::event_button() == 3)
-    o->value(127);
-send_data(194,  o->value(), 0xc8);}
-        tooltip {BandWidth depth} xywh {90 10 30 30} labelsize 10 maximum 127 step 1
+        callback {//
+        if (Fl::event_button() == 3)
+            o->value(127);
+        send_data(194,  o->value(), 0xc8);}
+        tooltip Expression xywh {80 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->expression.data);}
         class WidgetPDial
       }
       Fl_Dial filterq {
         label {Filter Q}
-        callback {if (Fl::event_button() == 3)
-    o->value(64);
-send_data(197, o->value(), 0xc8);}
-        tooltip {Filter Q depth} xywh {150 10 30 30} labelsize 10 maximum 127 step 1
+        callback {//
+        if (Fl::event_button() == 3)
+            o->value(64);
+        send_data(197, o->value(), 0xc8);}
+        tooltip {Filter Q} xywh {140 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->filterq.data);}
         class WidgetPDial
       }
       Fl_Dial filtercutoff {
         label {Filter Cutoff}
-        callback {if (Fl::event_button() == 3)
-    o->value(64);
-send_data(198, o->value(), 0xc8);}
-        tooltip {Filter Cutoff depth} xywh {210 10 30 30} labelsize 10 maximum 127 step 1
+        callback {//
+        if (Fl::event_button() == 3)
+            o->value(64);
+        send_data(198, o->value(), 0xc8);}
+        tooltip {Filter Cutoff} xywh {200 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->filtercutoff.data);}
+        class WidgetPDial
+      }
+      Fl_Dial masterbandwidth {
+        label Bandwidth
+        callback {//
+        if (Fl::event_button() == 3)
+            o->value(64);
+        send_data(199, o->value(), 0xc8);}
+        tooltip {Master Bandwidth} xywh {260 10 30 30} labelsize 10 maximum 127 step 1
+        code0 {o->value(part->ctl->bandwidth.data);}
         class WidgetPDial
       }
       Fl_Button {} {
         label Close
-        callback {ctlmidi->hide();}
-        xywh {280 30 78 20} box THIN_UP_BOX
+        callback {//
+        ctlmidi->hide();}
+        xywh {309 35 50 20} box THIN_UP_BOX
       }
     }
     Fl_Window partfx {
@@ -993,28 +975,23 @@ send_data(198, o->value(), 0xc8);}
     } {
       Fl_Spinner inseffnocounter {
         callback {//
-    ninseff = o->value() - 1;
-    insefftype->value(part->partefx[ninseff]->geteffect());
+        ninseff = o->value() - 1;
+        insefftype->value(part->partefx[ninseff]->geteffect());
 
-    inseffectui->refresh(part->partefx[ninseff], npart, ninseff);
-    int x = part->Pefxroute[ninseff];
-    if (x == 127)
-        x = 1;
-    bypasseff->value(part->Pefxbypass[ninseff]);
-    sendtochoice->value(x);
+        inseffectui->refresh(part->partefx[ninseff], npart, ninseff);
+        int x = part->Pefxroute[ninseff];
+        if (x == 127)
+            x = 1;
+        bypasseff->value(part->Pefxbypass[ninseff]);
+        sendtochoice->value(x);
 
-    send_data(64, ninseff, 0xc0, 0xff, ninseff);}
+        send_data(64, ninseff, 0xc0, 0xff, ninseff);}
         tooltip {Effect No.} xywh {35 8 35 22} labelsize 12 maximum 3 textsize 11
         code1 {o->value(ninseff+1);}
       }
       Fl_Choice insefftype {
         callback {//
-    synth->actionLock(lockmute);
-    part->partefx[ninseff]->changeeffect(o->value());
-    synth->actionLock(unlock);
-    inseffectui->refresh(part->partefx[ninseff], npart, ninseff);
-
-    send_data(65, o->value(), 0xc0, 0xff, ninseff);}
+        send_data(65, o->value(), 0xd0, 0xff, ninseff);}
         tooltip {Effect Type} xywh {104 8 95 22} box UP_BOX down_box BORDER_BOX labelsize 11
         code0 {o->value(part->partefx[ninseff]->geteffect());}
       } {
@@ -1055,7 +1032,7 @@ send_data(198, o->value(), 0xc8);}
           xywh {110 110 100 20} labelfont 1 labelsize 10
         }
       }
-      Fl_Group inseffectuigroup {open
+      Fl_Group inseffectuigroup {
         xywh {5 37 380 96} box FLAT_BOX color 48
       } {
         Fl_Group inseffectui {
@@ -1066,15 +1043,16 @@ send_data(198, o->value(), 0xc8);}
       }
       Fl_Button {} {
         label Close
-        callback {partfx->hide();
-if ((Fl::event_button() == 3))
-    synth->getGuiMaster()->partui->instrumenteditwindow->show();}
+        callback {//
+        partfx->hide();
+        if ((Fl::event_button() == 3))
+            synth->getGuiMaster()->partui->instrumenteditwindow->show();}
         xywh {314 136 60 20} box THIN_UP_BOX
       }
       Fl_Choice sendtochoice {
         label To
         callback {//
-    send_data(66, o->value(), 0xc0, 0xff, ninseff);}
+        send_data(66, o->value(), 0xc0, 0xff, ninseff);}
         xywh {244 8 90 22} down_box BORDER_BOX labelfont 1 labelsize 11
         code0 {int x=part->Pefxroute[ninseff]; if (x==127) x=1;}
         code1 {o->value(x);}
@@ -1095,21 +1073,20 @@ if ((Fl::event_button() == 3))
       Fl_Check_Button bypasseff {
         label Bypass
         callback {//
-send_data(67, o->value(), 0xc0, 0xff, ninseff);}
+        send_data(67, o->value(), 0xc0, 0xff, ninseff);}
         tooltip {if the effect is not used (is bypassed)} xywh {55 135 20 22} down_box DOWN_BOX labelsize 12 align 4
         code0 {int x=part->Pefxbypass[ninseff];o->value(x);}
       }
       Fl_Button {} {
         label C
-        callback {synth->getGuiMaster()->getPresetsUi()->copy(part->partefx[ninseff]);}
+        callback {//
+        synth->getGuiMaster()->getPresetsUi()->copy(part->partefx[ninseff]);}
         xywh {350 3 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Button {} {
         label P
         callback {//
-            synth->actionLock(lockmute);
-            synth->getGuiMaster()->getPresetsUi()->paste(part->partefx[ninseff], inseffectui);
-            synth->actionLock(unlock);}
+        synth->getGuiMaster()->getPresetsUi()->paste(part->partefx[ninseff], inseffectui);}
         xywh {350 19 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
     }
@@ -1120,9 +1097,10 @@ send_data(67, o->value(), 0xc0, 0xff, ninseff);}
     } {
       Fl_Button {} {
         label Close
-        callback {instrumentkitlist->hide();
-if ((Fl::event_button() == 3))
-    synth->getGuiMaster()->partui->instrumenteditwindow->show();}
+        callback {//
+        instrumentkitlist->hide();
+        if ((Fl::event_button() == 3))
+        synth->getGuiMaster()->partui->instrumenteditwindow->show();}
         xywh {569 348 63 20} box THIN_UP_BOX
       }
       Fl_Scroll kitlist {
@@ -1160,14 +1138,14 @@ if ((Fl::event_button() == 3))
       Fl_Choice kitMode {
         label Mode
         callback {//
-    int tmp = o->value();
-    partKitOn = tmp > 0;
-    if (partKitOn)
-        kitlist->activate();
-    else
-        kitlist->deactivate();
+        int tmp = o->value();
+        partKitOn = tmp > 0;
+        if (partKitOn)
+            kitlist->activate();
+        else
+            kitlist->deactivate();
 
-    send_data(58, tmp, 0xc0);}
+        send_data(58, tmp, 0xc0);}
         tooltip {Single = only 1st item in defined note range sounds} xywh {35 348 88 19} down_box BORDER_BOX labelsize 11 textfont 1 textsize 11
         code0 {if (part->Pkitfade) {o->value(3);} else {o->value(part->Pkitmode);}}
         code1 {partKitOn = o->value() > 0;}
@@ -1193,7 +1171,7 @@ if ((Fl::event_button() == 3))
       Fl_Check_Button drumMode {
         label {Drum mode}
         callback {//
-send_data(57, o->value(), 0xc0);}
+        send_data(57, o->value(), 0xc0);}
         tooltip {Disables microtonal tuning} xywh {285 350 15 15} down_box DOWN_BOX labelsize 10
         code0 {o->value(part->Pdrummode);}
       }
@@ -1226,22 +1204,22 @@ send_data(57, o->value(), 0xc0);}
           Fl_Check_Button adsynenabledcheck {
             label Enabled
             callback {//
-    int x = o->value();
-    if (x == 0)
-        adeditbutton->deactivate();
-    else
-        adeditbutton->activate();
-    partkititem[0]->adcheck->value(x);
-    if (partKitOn)
-    {
-       if (x == 0)
-           partkititem[0]->adeditbutton->deactivate();
-       else
-           partkititem[0]->adeditbutton->activate();
-    }
-    checkEngines();
+            int x = o->value();
+            if (x == 0)
+                adeditbutton->deactivate();
+            else
+                adeditbutton->activate();
+            partkititem[0]->adcheck->value(x);
+            if (partKitOn)
+            {
+            if (x == 0)
+                partkititem[0]->adeditbutton->deactivate();
+            else
+                partkititem[0]->adeditbutton->activate();
+            }
+            checkEngines();
 
-    send_data(8, o->value(), 0xc8, 0xff, 0);}
+            send_data(8, o->value(), 0xc8, 0xff, 0);}
             tooltip {enable/disable ADsynth} xywh {15 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Padenabled);}
           }
@@ -1251,11 +1229,12 @@ send_data(57, o->value(), 0xc0);}
           }
           Fl_Button adeditbutton {
             label Edit
-            callback {showparameters(0,0);
-checkEngines();
-seteditname();
-if ((Fl::event_button() == 3))
-    instrumenteditwindow->hide();}
+            callback {//
+            showparameters(0,0);
+            checkEngines();
+            seteditname();
+            if ((Fl::event_button() == 3))
+                instrumenteditwindow->hide();}
             xywh {15 281 80 34} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
             code0 {if (part->kit[0].Padenabled==0) o->deactivate();}
           }
@@ -1267,22 +1246,22 @@ if ((Fl::event_button() == 3))
           Fl_Check_Button subsynenabledcheck {
             label Enabled
             callback {//
-    int x = o->value();
-    if (x == 0)
-        subeditbutton->deactivate();
-    else
-        subeditbutton->activate();
-    partkititem[0]->subcheck->value(x);
-    if (partKitOn)
-    {
-       if (x == 0)
-           partkititem[0]->subeditbutton->deactivate();
-       else
-           partkititem[0]->subeditbutton->activate();
-    }
-    checkEngines();
+            int x = o->value();
+            if (x == 0)
+                subeditbutton->deactivate();
+            else
+                subeditbutton->activate();
+            partkititem[0]->subcheck->value(x);
+            if (partKitOn)
+            {
+            if (x == 0)
+                partkititem[0]->subeditbutton->deactivate();
+            else
+                partkititem[0]->subeditbutton->activate();
+            }
+            checkEngines();
 
-    send_data(8, o->value(), 0xc8, 0xff, 1);}
+            send_data(8, o->value(), 0xc8, 0xff, 1);}
             tooltip {enable/disable SUBsynth} xywh {115 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Psubenabled);}
           }
@@ -1292,11 +1271,12 @@ if ((Fl::event_button() == 3))
           }
           Fl_Button subeditbutton {
             label Edit
-            callback {showparameters(0,1);
-checkEngines();
-seteditname();
-if ((Fl::event_button() == 3))
-    instrumenteditwindow->hide();}
+            callback {//
+            showparameters(0,1);
+            checkEngines();
+            seteditname();
+            if ((Fl::event_button() == 3))
+                instrumenteditwindow->hide();}
             xywh {115 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
             code0 {if (part->kit[0].Psubenabled==0) o->deactivate();}
           }
@@ -1308,22 +1288,22 @@ if ((Fl::event_button() == 3))
           Fl_Check_Button padsynenabledcheck {
             label Enabled
             callback {//
-    int x = o->value();
-    if (x == 0)
-        padeditbutton->deactivate();
-    else
-        padeditbutton->activate();
-    partkititem[0]->padcheck->value(x);
-    if (partKitOn)
-    {
-       if (x == 0)
-           partkititem[0]->padeditbutton->deactivate();
-       else
-           partkititem[0]->padeditbutton->activate();
-    }
-    checkEngines();
+            int x = o->value();
+            if (x == 0)
+                padeditbutton->deactivate();
+            else
+                padeditbutton->activate();
+            partkititem[0]->padcheck->value(x);
+            if (partKitOn)
+            {
+            if (x == 0)
+                partkititem[0]->padeditbutton->deactivate();
+            else
+                partkititem[0]->padeditbutton->activate();
+            }
+            checkEngines();
 
-    send_data(8, o->value(), 0xc8, 0xff, 2);}
+            send_data(8, o->value(), 0xc8, 0xff, 2);}
             tooltip {enable/disable PADsynth} xywh {215 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Ppadenabled);}
           }
@@ -1333,27 +1313,30 @@ if ((Fl::event_button() == 3))
           }
           Fl_Button padeditbutton {
             label Edit
-            callback {showparameters(0,2);
-checkEngines();
-seteditname();
-if ((Fl::event_button() == 3))
-    instrumenteditwindow->hide();}
+            callback {//
+            showparameters(0,2);
+            checkEngines();
+            seteditname();
+            if ((Fl::event_button() == 3))
+                instrumenteditwindow->hide();}
             xywh {215 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
             code0 {if (part->kit[0].Ppadenabled==0) o->deactivate();}
           }
         }
         Fl_Button {} {
           label {Kit Edit}
-          callback {instrumentkitlist->show();
-if ((Fl::event_button() == 3))
-    instrumenteditwindow->hide();}
+          callback {//
+          instrumentkitlist->show();
+          if ((Fl::event_button() == 3))
+              instrumenteditwindow->hide();}
           xywh {310 245 80 35} box PLASTIC_UP_BOX color 238 selection_color 220 labelfont 1 align 128
         }
         Fl_Button {} {
           label Effects
-          callback {partfx->show();
-if ((Fl::event_button() == 3))
-    instrumenteditwindow->hide();}
+          callback {//
+          partfx->show();
+          if ((Fl::event_button() == 3))
+              instrumenteditwindow->hide();}
           xywh {310 290 80 35} box PLASTIC_UP_BOX color 230 labelfont 1 labelsize 13
         }
       }
@@ -1362,21 +1345,24 @@ if ((Fl::event_button() == 3))
       } {
         Fl_Input {} {
           label {Author and Copyright}
-          callback {part->info.Pauthor = string(o->value());}
+          callback {//
+          part->info.Pauthor = string(o->value());}
           xywh {5 60 385 50} type Multiline color 26 labelsize 10 align 5
           code0 {o->maximum_size(MAX_INFO_TEXT_SIZE);}
           code1 {o->value(part->info.Pauthor.c_str());}
         }
         Fl_Input {} {
           label Comments
-          callback {part->info.Pcomments = string(o->value());}
+          callback {//
+          part->info.Pcomments = string(o->value());}
           xywh {5 125 385 90} type Multiline color 26 labelsize 11 align 5
           code0 {o->maximum_size(MAX_INFO_TEXT_SIZE);}
           code1 {o->value(part->info.Pcomments.c_str());}
         }
         Fl_Choice {} {
           label {Type:}
-          callback {part->info.Ptype=o->value();}
+          callback {//
+          part->info.Ptype=o->value();}
           xywh {5 25 155 20} down_box BORDER_BOX labelfont 1 labelsize 11 align 5 textsize 10
           code0 {o->value(part->info.Ptype);}
         } {
@@ -1452,10 +1438,11 @@ if ((Fl::event_button() == 3))
       }
       Fl_Value_Slider humanise {
         label Humanise
-        callback {if (Fl::event_button() == 3)
-    o->value(0);
+        callback {//
+        if (Fl::event_button() == 3)
+            o->value(0);
 
-send_data(48, o->value(), 0xc8);}
+        send_data(48, o->value(), 0xc8);}
         tooltip {Random detune of whole part in cents} xywh {8 337 201 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 8 maximum 50 step 1
         code0 {o->value(part->Pfrand);}
         class mwheel_val_slider_rev
@@ -1469,13 +1456,11 @@ send_data(48, o->value(), 0xc8);}
   }
   Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff, int insert = 0xff, int parameter = 0xff, int par2 = 0xff)} {} {
     code {//
-collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, insert, parameter, par2);} {}
+    collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, insert, parameter, par2);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
-    //int oldpart = npart;
     float value = getData->data.value;
-    //unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char newpart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -1485,32 +1470,40 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     bool valBool = (value > 0.5f);
     int valInt = lrint(value);
     int tmp = (valInt & 15) + 1;
+    bool check = true;
 
+    npart = newpart;
     // these are specific to the mixer panel
     if (newpart >= *plgroup && newpart < (*plgroup + NUM_MIDI_CHANNELS))
     {
         int displaypart = newpart % NUM_MIDI_CHANNELS;
-        if (control == 0)
-            synth->getGuiMaster()->panellistitem[displaypart]->partvolume->value(value);
-        else if (control == 2)
-            synth->getGuiMaster()->panellistitem[displaypart]->partpanning->value(value);
-        else if (control == 5)
+        switch (control)
         {
-            synth->getGuiMaster()->panellistitem[displaypart]->partrcv->value(valInt);
-            if (valInt < NUM_MIDI_CHANNELS)
-                synth->getGuiMaster()->panellistitem[displaypart]->partrcv->textcolor(FL_BLACK);
-            else
-                synth->getGuiMaster()->panellistitem[displaypart]->partrcv->textcolor(FL_WHITE);
-        }
-        else if(control == 120)
-        {
-            int send = valInt - 1;
-            if (send < 0 or send > 2)
-                send = 0;
-            synth->getGuiMaster()->panellistitem[displaypart]->audiosend->value(send);
+            case 0:
+                synth->getGuiMaster()->panellistitem[displaypart]->partvolume->value(value);
+                break;
+            case 2:
+                synth->getGuiMaster()->panellistitem[displaypart]->partpanning->value(value);
+                break;
+            case 5:
+                synth->getGuiMaster()->panellistitem[displaypart]->partrcv->value(valInt);
+                if (valInt < NUM_MIDI_CHANNELS)
+                    synth->getGuiMaster()->panellistitem[displaypart]->partrcv->textcolor(FL_BLACK);
+                else
+                    synth->getGuiMaster()->panellistitem[displaypart]->partrcv->textcolor(FL_WHITE);
+                break;
+            case 8:
+                if (engine == 255)
+                    synth->getGuiMaster()->panellistitem[displaypart]->partenabled->value(valBool);
+                break;
+            case 120:
+                int send = valInt - 1;
+                if (send < 0 or send > 2)
+                    send = 0;
+                synth->getGuiMaster()->panellistitem[displaypart]->audiosend->value(send);
         }
     }
-    if (npart != newpart)
+    if (npart != newpart && control != 8)
         return;
 
     bool sameEff = (engine == (inseffnocounter->value() - 1));
@@ -1709,7 +1702,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
                             instrumentpadbox->color(BASE_COLOUR);
                         }
                         break;
-                    default:
+                    case 255:
+                        check = false;
                         partGroupEnable->value(valBool);
                         if (valBool)
                         {
@@ -1724,9 +1718,6 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
                         break;
                 }
             }
-            instrumentaddbox->damage(1);
-            instrumentsubbox->damage(1);
-            instrumentpadbox->damage(1);
             instrumentlabel->copy_label(part->Pname.c_str());
             synth->getGuiMaster()->updatepanel();
             break;
@@ -1819,7 +1810,6 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
             break;
 
         case 96: // now done in master
-            // synth->getGuiMaster()->npartcounter->do_callback();
             break;
 
 // controllers
@@ -1937,6 +1927,9 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
         case 198:
             filtercutoff->value(value);
             break;
+        case 199:
+            masterbandwidth->value(value);
+            break;
 
         case 222:
             setinstrumentlabel();
@@ -1945,21 +1938,23 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
         case 224:
             updatecontrollers();
             break;
+        default:
+            check = false;
+            break;
     }
-    Fl::check();} {}
+    if (check)
+        Fl::check();} {}
   }
   Function {PartUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
-        part = NULL;
-        adnoteui = NULL;
-        subnoteui = NULL;
-        padnoteui = NULL;
-        lastkititem = -1;} {}
+    part = NULL;
+    adnoteui = NULL;
+    subnoteui = NULL;
+    padnoteui = NULL;
+    lastkititem = -1;} {}
   }
   Function {updatecontrollers()} {} {
     code {//
-    //part->SetController(C_resetallcontrollers,0);
-
     enportamento->value(0);
     expmwh->value(part->ctl->modwheel.exponential);
     modwh->value(part->ctl->modwheel.depth);
@@ -2217,24 +2212,24 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     filtercutoff->value(part->ctl->filtercutoff.data);} {}
   }
   Function {~PartUI()} {} {
-    code {if (adnoteui)
-            delete adnoteui;
-        if (subnoteui)
-            delete subnoteui;
-        if (padnoteui)
-            delete padnoteui;
-        partgroup->hide();
-        // delete(partgroup);
-        ctlwindow->hide();
-        delete ctlwindow;
-        ctlmidi->hide();
-        delete ctlmidi;
-        partfx->hide();
-        delete partfx;
-        instrumentkitlist->hide();
-        delete instrumentkitlist;
-        instrumenteditwindow->hide();
-        delete instrumenteditwindow;} {}
+    code {//
+    if (adnoteui)
+        delete adnoteui;
+    if (subnoteui)
+        delete subnoteui;
+    if (padnoteui)
+        delete padnoteui;
+    partgroup->hide();
+    ctlwindow->hide();
+    delete ctlwindow;
+    ctlmidi->hide();
+    delete ctlmidi;
+    partfx->hide();
+    delete partfx;
+    instrumentkitlist->hide();
+    delete instrumentkitlist;
+    instrumenteditwindow->hide();
+    delete instrumenteditwindow;} {}
   }
   decl {Part *part;} {public local
   }

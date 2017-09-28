@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified August 2017
+    Modified September 2017
 */
 
 #ifndef CONFIG_H
@@ -40,7 +40,6 @@ using namespace std;
 #include "FL/Fl.H"
 
 class XMLwrapper;
-class BodyDisposal;
 
 class SynthEngine;
 
@@ -55,7 +54,8 @@ class Config : public MiscFuncs
 #endif
         void Announce(void);
         void Usage(void);
-        void Log(string msg, char tostderr = 0); // 1 = cli only ored 2 = hideable
+        void Log(const string &msg, char tostderr = 0); // 1 = cli only ored 2 = hideable
+	void LogError(const string &msg);
         void flushLog(void);
 
         void clearPresetsDirlist(void);
@@ -94,6 +94,8 @@ class Config : public MiscFuncs
         string        StateFile;
         bool          restoreJackSession;
         string        jackSessionFile;
+        int           lastXMLmajor;
+        int           lastXMLminor;
 
         static unsigned int  Samplerate;
         static unsigned int  Buffersize;
@@ -185,8 +187,6 @@ class Config : public MiscFuncs
         float *genTmp2;
         float *genTmp3;
         float *genTmp4;
-
-        BodyDisposal *deadObjects;
 
     private:
         void loadCmdArgs(int argc, char **argv);

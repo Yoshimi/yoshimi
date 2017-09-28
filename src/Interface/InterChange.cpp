@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified August 2017
+    Modified September 2017
 */
 
 #include <iostream>
@@ -47,7 +47,13 @@ using namespace std;
 #include "MasterUI.h"
 
 InterChange::InterChange(SynthEngine *_synth) :
-    synth(_synth)
+    synth(_synth),
+    fromCLI(NULL),
+    toCLI(NULL),
+    fromGUI(NULL),
+    toGUI(NULL),
+    fromMIDI(NULL),
+    returnsLoopback(NULL)
 {
     ;
 }
@@ -63,7 +69,7 @@ bool InterChange::Init(SynthEngine *_synth)
     }
     if (jack_ringbuffer_mlock(fromCLI))
     {
-        synth->getRuntime().Log("Failed to lock fromCLI memory");
+        synth->getRuntime().LogError("Failed to lock fromCLI memory");
         goto bail_out;
     }
     jack_ringbuffer_reset(fromCLI);
@@ -225,6 +231,9 @@ void *InterChange::sortResultsThread(void)
 
 InterChange::~InterChange()
 {
+    if (sortResultsThreadHandle)
+        pthread_join(sortResultsThreadHandle, NULL);
+
     if (fromCLI)
     {
         jack_ringbuffer_free(fromCLI);
@@ -259,9 +268,9 @@ void InterChange::transfertext(CommandBlock *getData)
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
     unsigned char insert = getData->data.insert;
-//    unsigned char engine = getData->data.engine;
-//    unsigned char insert = getData->data.insert;
+    unsigned char parameter = getData->data.parameter;
     bool (write) = (type & 0x40);
     string text;
     if (getData->data.par2 < 0xff)
@@ -362,6 +371,16 @@ void InterChange::transfertext(CommandBlock *getData)
                     text = "d " + text;
                 else
                     text = " FAILED " + text;
+                value = miscMsgPush(text);
+                getData->data.parameter &= 0x7f;
+                break;
+            case 94:
+                synth->partonoffWrite(npart, -1);
+                setpadparams(parameter | (kititem << 8));
+                if (synth->part[parameter & 0x3f]->kit[kititem].padpars->export2wav(text))
+                    text = "d " + text;
+                else
+                    text = " FAILED some samples " + text;
                 value = miscMsgPush(text);
                 getData->data.parameter &= 0x7f;
                 break;
@@ -619,12 +638,11 @@ void InterChange::resolveReplies(CommandBlock *getData)
         msg.push_back("  2nd Param  0x" + asHexString(insertPar2) + "    " + asString(int(insertPar2)));
         synth->cliOutput(msg, 10);
         if (isCli)
+        {
+            synth->getRuntime().finishedCLI = true;
             return; // wanted for test only
+        }
 
-/* we need to review the implications of commenting
- * out various parts of this routine, but if active
- * they screw up miscMsg for some calling routines.
- */
     }
     if (npart == 0xc0)
         commandName = resolveVector(getData);
@@ -846,6 +864,15 @@ string InterChange::resolveVector(CommandBlock *getData)
             break;
         case 34:
             contstr = "Down Instrument";
+            break;
+
+        case 96:
+            showValue = false;
+            if (chan > NUM_MIDI_CHANNELS)
+                contstr = "all channels";
+            else
+                contstr = "chan " + to_string(chan + 1);
+            return("Vector cleared on " + contstr);
             break;
 
         case 127:
@@ -1313,6 +1340,11 @@ string InterChange::resolveMain(CommandBlock *getData)
             contstr = "State Save" + miscMsgPop(value_int);
             break;
 
+        case 94:
+            showValue = false;
+            contstr = "PadSynth Samples Save" + miscMsgPop(value_int);
+            break;
+
         case 96: // doMasterReset
             showValue = false;
             contstr = "Reset All";
@@ -1589,6 +1621,9 @@ string InterChange::resolvePart(CommandBlock *getData)
             break;
         case 198:
             contstr = "Filter Cutoff";
+            break;
+        case 199:
+            contstr = "Bandwidth";
             break;
 
         case 222:
@@ -2642,6 +2677,7 @@ string InterChange::resolveFilter(CommandBlock *getData)
 
 string InterChange::resolveEnvelope(CommandBlock *getData)
 {
+    int value = lrint(getData->data.value);
     bool write = (getData->data.type & 0x40) > 0;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -2691,10 +2727,13 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
         {
             return ("Freemode add/remove is write only. Current points " + to_string(int(par2)));
         }
-        if (control >= 0x40)
+        if (par2 < 255)
             return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Added Freemode Point " + to_string(int((control & 0x3f) + 1)) + " X increment " + to_string(int(par2)) + " Y");
         else
-            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Removed Freemode Point " +  to_string(int(control + 1)) + " Remaining " + to_string(int(par2)));
+        {
+            showValue = false;
+            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Removed Freemode Point " +  to_string(int(control + 1)) + "  Remaining " +  to_string(value));
+        }
     }
 
     if (insert == 4)
@@ -3025,9 +3064,9 @@ void InterChange::returnsDirect(int altData)
 
 void InterChange::returns(CommandBlock *getData)
 {
-    float value = getData->data.value;
+//    float value = getData->data.value;
     unsigned char type = getData->data.type | 4; // back from synth
-    unsigned char npart = getData->data.part;
+//    unsigned char npart = getData->data.part;
 
     if (type == 0xff)
         return;
@@ -3057,10 +3096,10 @@ void InterChange::returns(CommandBlock *getData)
 
 void InterChange::setpadparams(int point)
 {
-    int npart = point & 0xff;
+    int npart = point & 0x3f;
     int kititem = point >> 8;
     synth->part[npart]->kit[kititem].padpars->applyparameters(false);
-    synth->partonoffWrite(npart, 1);
+    synth->partonoffWrite(npart, 2);
 }
 
 
@@ -3107,7 +3146,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-    unsigned char par2 = getData->data.par2;
+//    unsigned char par2 = getData->data.par2;
 //    bool isCli = type & 0x10;
     bool isGui = type & 0x20;
     char button = type & 3;
@@ -3301,6 +3340,31 @@ void InterChange::commandVector(CommandBlock *getData)
     bool write = (type & 0x40) > 0;
     unsigned int features;
 
+    if (control == 96)
+    {
+        int start;
+        int end;
+        if (chan >= NUM_MIDI_CHANNELS)
+        {
+            start = 0;
+            end = NUM_MIDI_CHANNELS;
+        }
+        else
+        {
+            start = chan;
+            end = chan + 1;
+        }
+        for (int ch = start; ch < end; ++ ch)
+        {
+            synth->getRuntime().vectordata.Xaxis[ch] = 0xff;
+            synth->getRuntime().vectordata.Yaxis[ch] = 0xff;
+            synth->getRuntime().vectordata.Xfeatures[ch] = 0;
+            synth->getRuntime().vectordata.Yfeatures[ch] = 0;
+            synth->getRuntime().vectordata.Enabled[ch] = false;
+            synth->getRuntime().vectordata.Name[ch] = "No Name " + to_string(ch);
+        }
+        return;
+    }
     if (write)
     {
         if (control == 17 || control == 18 || control == 33 || control == 34)
@@ -4116,11 +4180,12 @@ void InterChange::commandPart(CommandBlock *getData)
                         else
                             value = part->kit[0].Ppadenabled;
                         break;
-                    default:
+                    case 255:
                         if (write)
                             synth->partonoffWrite(npart, value_bool);
                         else
                             value = synth->partonoffRead(npart);
+                        break;
                 }
             }
             break;
@@ -4547,6 +4612,12 @@ void InterChange::commandPart(CommandBlock *getData)
             else
                 value = part->ctl->filtercutoff.data;
             break;
+        case 199:
+            if (write)
+                part->ctl->setbandwidth(value);
+            else
+                value = part->ctl->bandwidth.data;
+            break;
 
         case 222:
             if (write)
@@ -4844,6 +4915,18 @@ void InterChange::commandAddVoice(CommandBlock *getData)
                     k -= 1024;
                 value = k;
             }
+            break;
+        case 38:
+            if (write)
+                pars->VoicePar[nvoice].PBendAdjust = value_int;
+            else
+                value = pars->VoicePar[nvoice].PBendAdjust;
+            break;
+        case 39:
+            if (write)
+                pars->VoicePar[nvoice].POffsetHz = value_int;
+            else
+                value = pars->VoicePar[nvoice].POffsetHz;
             break;
         case 40:
             if (write)
@@ -5324,10 +5407,6 @@ void InterChange::commandSub(CommandBlock *getData)
 
 void InterChange::commandPad(CommandBlock *getData)
 {
-#pragma message "Gui writes changed to reads"
-    if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;
-
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -5581,7 +5660,7 @@ void InterChange::commandPad(CommandBlock *getData)
         case 104: // setpadparams(
             if (write)
             {
-                synth->partonoffWrite(npart, 0);
+                synth->partonoffWrite(npart, -1);
                 flagsWrite(npart | (kititem << 8));
             }
             break;
@@ -5632,10 +5711,6 @@ void InterChange::commandPad(CommandBlock *getData)
 
 void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
 {
-#pragma message "Gui writes changed to reads"
-    if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;
-
     int value = lrint(getData->data.value); // no floats here!
     char value_bool = (getData->data.value > 0.5f);
     unsigned char type = getData->data.type;
@@ -5898,10 +5973,6 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
 
 void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
 {
-#pragma message "Gui writes changed to reads"
-    if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;
-
     int value = lrint(getData->data.value); // no floats here
     char value_bool = (getData->data.value > 0.5);
     unsigned char type = getData->data.type;
@@ -6109,9 +6180,9 @@ void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
 
 void InterChange::commandFilter(CommandBlock *getData)
 {
-#pragma message "Gui writes changed to reads"
-    if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;
+//#pragma message "Gui writes changed to reads"
+//    if (getData->data.type & 0x20)
+//        getData->data.type = getData->data.type & 0xbf;
 
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -6197,13 +6268,19 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             break;
         case 5:
             if (write)
+            {
                 pars->Pgain = val;
+                pars->changed = true;
+            }
             else
                 val = pars->Pgain;
             break;
         case 6:
             if (write)
+            {
                 pars->Pstages = value_int;
+                pars->changed = true;
+            }
             else
                 val = pars->Pstages;
             break;
@@ -6214,8 +6291,8 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
                 {
                     pars->Pgain = 64;
                     pars->Ptype = 0;
-                    pars->changed=true;
-                    pars->Pcategory = val;
+                    pars->changed = true;
+                    pars->Pcategory = value_int;
                 }
             }
             else
@@ -6226,14 +6303,17 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Ptype = value_int;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
-                val = pars->Ptype;;
+                val = pars->Ptype;
             break;
         case 10:
             if (write)
+            {
                 pars->Pfreqtrackoffset = (value_int != 0);
+                pars->changed = true;
+            }
             else
                 val = pars->Pfreqtrackoffset;
             break;
@@ -6242,7 +6322,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Pformantslowness = val;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Pformantslowness;
@@ -6251,7 +6331,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Pvowelclearness = val;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Pvowelclearness;
@@ -6260,7 +6340,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Pvowels[nvowel].formants[nformant].freq = val;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Pvowels[nvowel].formants[nformant].freq;
@@ -6269,7 +6349,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Pvowels[nvowel].formants[nformant].q = val;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Pvowels[nvowel].formants[nformant].q;
@@ -6278,7 +6358,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Pvowels[nvowel].formants[nformant].amp = val;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Pvowels[nvowel].formants[nformant].amp;
@@ -6287,7 +6367,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Psequencestretch = val;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Psequencestretch;
@@ -6296,7 +6376,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Pcenterfreq = val;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Pcenterfreq;
@@ -6305,7 +6385,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Poctavesfreq = val;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Poctavesfreq;
@@ -6315,7 +6395,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Pnumformants = value_int;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Pnumformants;
@@ -6328,18 +6408,27 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Psequencesize = value_int;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Psequencesize;
             break;
-        case 36: // this is local to the source
+        case 36:
+            /*
+             * this appears to be just setting the GUI
+             * reference point yet sets pars changed.
+             * why?
+             */
+            if (write)
+                pars->changed = true;
+            else
+                ;
             break;
         case 37:
             if (write)
             {
                 pars->Psequence[nseqpos].nvowel = value_int;
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Psequence[nseqpos].nvowel;
@@ -6348,7 +6437,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
             {
                 pars->Psequencereversed = (value_int != 0);
-                pars->changed=true;
+                pars->changed = true;
             }
             else
                 val = pars->Psequencereversed;
@@ -6362,9 +6451,9 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
 
 void InterChange::commandEnvelope(CommandBlock *getData)
 {
-#pragma message "Gui writes changed to reads"
-    if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;
+//#pragma message "Gui writes changed to reads"
+//    if (getData->data.type & 0x20)
+//        getData->data.type = getData->data.type & 0xbf;
 
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -6467,12 +6556,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
     unsigned char Xincrement = getData->data.par2;
 
     int envpoints = pars->Penvpoints;
-    bool isAddpoint = false;
-    if (point >= 0x40)
-    {
-        isAddpoint = true;
-        point &= 0x3f;
-    }
+    bool isAddpoint = (Xincrement < 0xff);
 
     if (insert == 3) // here be dragons :(
     {
@@ -6490,25 +6574,37 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
             return;
         }
 
-        if (isAddpoint && envpoints < MAX_ENVELOPE_POINTS)
+        if (isAddpoint)
         {
-            pars->Penvpoints += 1;
-            for (int i = envpoints; i >= point; -- i)
+            if (envpoints < MAX_ENVELOPE_POINTS)
             {
-                pars->Penvdt[i + 1] = pars->Penvdt[i];
-                pars->Penvval[i + 1] = pars->Penvval[i];
+                pars->Penvpoints += 1;
+                for (int i = envpoints; i >= point; -- i)
+                {
+                    pars->Penvdt[i + 1] = pars->Penvdt[i];
+                    pars->Penvval[i + 1] = pars->Penvval[i];
+                }
+
+                if (point == 0)
+                    pars->Penvdt[1] = 64;
+
+                if (point <= pars->Penvsustain)
+                    ++ pars->Penvsustain;
+
+                pars->Penvdt[point] = Xincrement;
+                pars->Penvval[point] = val;
+                getData->data.value = val;
+                getData->data.par2 = Xincrement;
             }
-            if (point <= pars->Penvsustain)
-                ++ pars->Penvsustain;
-            pars->Penvdt[point] = Xincrement;
-            pars->Penvval[point] = val;
-            getData->data.value = val;
-            getData->data.par2 = Xincrement;
+            else
+                getData->data.value = 0xff;
             return;
         }
         else if (envpoints < 4)
         {
+            getData->data.value = 0xff;
             getData->data.par2 = 0xff;
+            return; // can't have less than 4
         }
         else
         {
@@ -6521,10 +6617,8 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
             if (point < pars->Penvsustain)
                 -- pars->Penvsustain;
             pars->Penvpoints = envpoints;
-            getData->data.par2 = envpoints;
+            getData->data.value = envpoints;
         }
-        getData->data.value = 0xff;
-
         return;
     }
 
@@ -6656,10 +6750,6 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
 
 void InterChange::commandSysIns(CommandBlock *getData)
 {
-#pragma message "Gui writes changed to reads"
-    if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;
-
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -6696,7 +6786,11 @@ void InterChange::commandSysIns(CommandBlock *getData)
                 break;
             case 2: // insert only
                 if (write)
+                {
                     synth->Pinsparts[effnum] = value_int;
+                    if (value_int == -1)
+                        synth->insefx[effnum]->cleanup();
+                }
                 else
                     value = synth->Pinsparts[effnum];
                 break;
@@ -6717,9 +6811,9 @@ void InterChange::commandSysIns(CommandBlock *getData)
 
 void InterChange::commandEffects(CommandBlock *getData)
 {
-#pragma message "Gui writes changed to reads"
-    if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;
+//#pragma message "Gui writes changed to reads"
+//    if (getData->data.type & 0x20)
+//        getData->data.type = getData->data.type & 0xbf;
 
     float value = getData->data.value;
     unsigned char type = getData->data.type;
@@ -6755,7 +6849,7 @@ void InterChange::commandEffects(CommandBlock *getData)
         if (control == 16 && kititem != 7)
             	eff->changepreset(lrint(value));
         else if (control != 1 || kititem != 7) // EQ selector is not a parameter
-             eff->seteffectpar(control,lrint(value));
+             eff->seteffectpar(control, lrint(value));
     }
     else
     {

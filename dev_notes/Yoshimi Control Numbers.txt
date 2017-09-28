@@ -16,6 +16,7 @@ Y : any : 88 : 240 : 255 : 255 : 255 : 128 : msg No. : Load named scale via misc
 Y : any : 89 : 240 : 255 : 255 : 255 : 128 : msg No. : Save named scale via miscMgs
 Y : any : 92 : 240 : 255 : 255 : 255 : 192 : msg No. : Load named state via miscMgs
 Y : any : 93 : 240 : 255 : 255 : 255 : 128 : msg No. : Save named state via miscMgs
+Y : any : 94 : 240 : 255 : 255 : 255 : 128 + 0 to 63: msg No. : Export PadSynth samples to named prefix via miscMsg
 Y : any : 96 : 240 : 255 : 255 : 255 : 192 : 255 : Reset (clear all)
 Y : any : 128 : 240 : 255 : 255 : 255 : 255 : 255 : Stop
 
@@ -103,6 +104,7 @@ Y : 0/1 : 35 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Y feature 0 - off, on
 Y : 0 to 2 : 36 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Y feature 1 - off, on, reverse
 Y : 0 to 2 : 37 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Y feature 2 - off, on, reverse
 Y : 0 to 2 : 38 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Y feature 3 - off, on, reverse
+Y : any : 96 : 192 : 255 : 255 : 0 to 15, > : 255 : 255 : Clear channel - base > 15 = clear all
 
 Main part controls
 YL : 0 to 127 : 0 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Volume
@@ -137,33 +139,34 @@ Y : any : 96 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Set part to default instr
 Y : 1, 2, 3 : 120 : 0 to 63 : 255 : 255 : 255 : 255 :  : Audio destination
 
 Controllers
-Y : 64 to 127 : 128 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Volume range
+YL : 64 to 127 : 128 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Volume range
 Y : 0/1 : 129 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Volume enable
-Y : 0 to 64 : 130 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Panning width
-Y : 0 to 127 : 131 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Mod wheel depth
+YL : 0 to 64 : 130 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Panning width
+YL : 0 to 127 : 131 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Mod wheel depth
 Y : 0/1 : 132 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Exponential mod wheel
-Y : 0 to 127 : 133 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Bandwidth depth
+YL : 0 to 127 : 133 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Bandwidth depth
 Y : 0/1 : 134 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Exponential bandwidth
 Y : 0/1 : 135 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Expression enable
 Y : 0/1 : 136 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : FM amplitude enable
 Y : 0/1 : 137 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Sustain pedal enable
-Y : -6400 to 6400 : 138 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Pitch wheel range
-Y : 0 to 127 : 139 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Q depth
-Y : 0 to 127 : 140 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter cutoff depth
-Y : 0 to 127 : 144 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Resonance centre frequency controller depth
-Y : 0 to 127 : 145 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Resonance bandwidth controller depth
+YL : -6400 to 6400 : 138 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Pitch wheel range
+YL : 0 to 127 : 139 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Q depth
+YL : 0 to 127 : 140 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter cutoff depth
+YL : 0 to 127 : 144 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Resonance centre frequency controller depth
+YL : 0 to 127 : 145 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Resonance bandwidth controller depth
 YL : 0 to 127 : 160 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Portamento time
-Y : 0 to 127 : 161 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Portamento time stretch
-Y : 0 to 127 : 162 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Portamento threshold (cents x 100)
+YL : 0 to 127 : 161 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Portamento time stretch
+YL : 0 to 127 : 162 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Portamento threshold (cents x 100)
 Y : 0/1 : 163 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Portamento threshold type
 Y : 0/1 : 164 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Enable proportional portamento
-Y : 0 to 127 : 165 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Proportional portamento rate
-Y : 0 to 127 : 166 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Proportional portamento depth
+YL : 0 to 127 : 165 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Proportional portamento rate
+YL : 0 to 127 : 166 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Proportional portamento depth
 Y : 0/1 : 168 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Enable portamento control
 YL : 0 to 127 : 192 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Modulation (CC 1)
 YL : 0 to 127 : 194 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Expression (CC 11)
 YL : 0 to 127 : 197 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Q (CC 71)
 YL : 0 to 127 : 198 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Cutoff (CC 74)
+YL : 0 to 127 : 199 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Master Bandwidth (CC 75)
 Y : any : 224 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Reset all controllers (for this part)
 
 Instrument edit window
@@ -485,12 +488,12 @@ Y : 0 to 127 : 7 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : 255 : Stretch
 Y : 0/1 : 16 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : 255 : Forced release
 Y : 0/1 : 17 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : 255 : Envelope is Linear
 Graph points
-Y : any : 34 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : any : Returns ‘Par 2’ number of defined points
+Y : any : 34 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : any : Returns ‘Value’ number of defined points
 Y : 0-39 : 35 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : 255 : Sustain position – limited by number of defined points
 
  :  : See Note > :  :  :  :  :  :  : For the next three :  'Control’ is the point number
-Y : 0 to 127 : 64 + (0 to 39) : 0 to 63 : 0 to 15 : All : 3 : 0 to 3 : 0 to 127 : Add point - ‘Par 2’ is X incremental value, ‘Value’ is Y value
-Y : any : 0 to 39 : 0 to 63 : 0 to 15 : All : 3 : 0 to 3 : any : Delete point - Returns ‘Par 2’ number of points remaining
+Y : 0 to 127 : 0 to 39 : 0 to 63 : 0 to 15 : All : 3 : 0 to 3 : 0 to 127 : Add point - ‘Par 2’ is X incremental value, ‘Value’ is Y value
+Y : any : 0 to 39 : 0 to 63 : 0 to 15 : All : 3 : 0 to 3 : 255 : Delete point - Returns ‘Value’ number of points remaining
 Y : 0 to 127 : 0 to 39 : 0 to 63 : 0 to 15 : All : 4 : 0 to 3 : 0 to 127 : Adjust - ‘Par 2’ is X incremental value, ‘Value’ is Y value
 
 Insertion Effect Selector

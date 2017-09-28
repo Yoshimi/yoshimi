@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified August 2017
+    Modified September 2017
 */
 
 #include <cstring>
@@ -46,7 +46,6 @@ using namespace std;
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
 #include "Synth/Resonance.h"
-#include "Synth/BodyDisposal.h"
 #include "Misc/Part.h"
 
 Part::Part(Microtonal *microtonal_, FFTwrapper *fft_, SynthEngine *_synth) :
@@ -136,7 +135,7 @@ void Part::defaults(void)
     Pfrand = 0;
     setDestination(1);
     defaultsinstrument();
-    ctl->defaults();
+    ctl->resetall();
     setNoteMap(0);
 }
 
@@ -203,7 +202,6 @@ void Part::cleanup(void)
     memset(tmpoutl, 0, synth->bufferbytes);
     memset(tmpoutr, 0, synth->bufferbytes);
 
-    ctl->resetall();
     for (int nefx = 0; nefx < NUM_PART_EFX; ++nefx)
         partefx[nefx]->cleanup();
     for (int n = 0; n < NUM_PART_EFX + 1; ++n)
@@ -891,17 +889,17 @@ void Part::KillNotePos(int pos)
     {
         if (partnote[pos].kititem[j].adnote)
         {
-            synth->getRuntime().deadObjects->addBody(partnote[pos].kititem[j].adnote);
+            delete partnote[pos].kititem[j].adnote;
             partnote[pos].kititem[j].adnote = NULL;
         }
         if (partnote[pos].kititem[j].subnote)
         {
-            synth->getRuntime().deadObjects->addBody(partnote[pos].kititem[j].subnote);
+            delete partnote[pos].kititem[j].subnote;
             partnote[pos].kititem[j].subnote = NULL;
         }
         if (partnote[pos].kititem[j].padnote)
         {
-            synth->getRuntime().deadObjects->addBody(partnote[pos].kititem[j].padnote);
+            delete partnote[pos].kititem[j].padnote;
             partnote[pos].kititem[j].padnote = NULL;
         }
     }
@@ -986,7 +984,7 @@ void Part::ComputePartSmps(void)
                 }
                 if (adnote->finished())
                 {
-                    synth->getRuntime().deadObjects->addBody(partnote[k].kititem[item].adnote);
+                    delete partnote[k].kititem[item].adnote;
                     partnote[k].kititem[item].adnote = NULL;
                 }
                 for (int i = 0; i < synth->p_buffersize; ++i)
@@ -1013,7 +1011,7 @@ void Part::ComputePartSmps(void)
                 }
                 if (subnote->finished())
                 {
-                    synth->getRuntime().deadObjects->addBody(partnote[k].kititem[item].subnote);
+                    delete partnote[k].kititem[item].subnote;
                     partnote[k].kititem[item].subnote = NULL;
                 }
             }
@@ -1032,7 +1030,7 @@ void Part::ComputePartSmps(void)
                 }
                 if (padnote->finished())
                 {
-                    synth->getRuntime().deadObjects->addBody(partnote[k].kititem[item].padnote);
+                    delete partnote[k].kititem[item].padnote;
                     partnote[k].kititem[item].padnote = NULL;
                 }
                 for (int i = 0 ; i < synth->p_buffersize; ++i)
@@ -1611,9 +1609,53 @@ void Part::getLimits(CommandBlock *getData)
             break;
 
         // the following are learnable MIDI controllers
+        case 130:
+            max = 64;
+            type |= 0x40;
+            break;
+
+        case 131:
+            def = 800;
+            type |= 0x40;
+            break;
+
+        case 133:
+            type |= 0x40;
+            break;
+
+        case 138:
+            min = -6400;
+            def = 0;
+            max = 6400;
+            type |= 0x40;
+            break;
+
+        case 139:
+        case 140:
+        case 144:
+        case 145:
+            type |= 0x40;
+            break;
+
+        case 160:
+        case 161:
+            type |= 0x40;
+            break;
+
+        case 162:
+            def = 800;
+            type |= 0x40;
+            break;
+
+        case 166:
+            def = 900;
+            type |= 0x40;
+            break;
+
         case 192:
         case 197:
         case 198:
+        case 199:
             type |= 0x40;
             break;
 

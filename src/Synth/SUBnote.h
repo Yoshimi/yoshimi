@@ -21,13 +21,12 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is a derivative of a ZynAddSubFX original
-    Modified February 2017
+    Modified September 2017
 */
 
 #ifndef SUB_NOTE_H
 #define SUB_NOTE_H
 
-#include "Synth/Carcass.h"
 #include "Misc/SynthHelper.h"
 #include "Synth/LegatoTypes.h"
 
@@ -38,7 +37,7 @@ class Filter;
 
 class SynthEngine;
 
-class SUBnote : public Carcass, private SynthHelper
+class SUBnote : private SynthHelper
 {
     public:
         SUBnote(SUBnoteParameters *parameters, Controller *ctl_,

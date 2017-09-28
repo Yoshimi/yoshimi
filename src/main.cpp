@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified May 2017
+    Modified September 2017
 */
 
 #include <sys/mman.h>
@@ -34,7 +34,6 @@ using namespace std;
 #include "MusicIO/MusicClient.h"
 #include "MasterUI.h"
 #include "UI/MiscGui.h"
-#include "Synth/BodyDisposal.h"
 #include <map>
 #include <list>
 #include <pthread.h>
@@ -155,7 +154,6 @@ static void *mainGuiThread(void *arg)
         {
             SynthEngine *_synth = it->first;
             MusicClient *_client = it->second;
-            _synth->getRuntime().deadObjects->disposeBodies();
             if (!_synth->getRuntime().runSynth && _synth->getUniqueId() > 0)
             {
                 if (_synth->getRuntime().configChanged)
@@ -177,7 +175,6 @@ static void *mainGuiThread(void *arg)
                 if (_synth)
                 {
                     _synth->saveBanks(tmpID);
-                    _synth->getRuntime().deadObjects->disposeBodies();
                     _synth->getRuntime().flushLog();
                     delete _synth;
                 }
@@ -334,6 +331,9 @@ int main(int argc, char *argv[])
     pthread_attr_t attr;
     sem_t semGui;
 
+    int minVmajor = 1; // need to improve this idea
+    int minVminor = 5;
+
     // moved from mainGuiThread() to prevent leaking from early GuiThreadMessage
     Fl::lock();
 
@@ -347,14 +347,14 @@ int main(int argc, char *argv[])
     firstSynth = it->first;
     bShowGui = firstRuntime->showGui;
     bShowCmdLine = firstRuntime->showCLI;
-    /*if (!(bShowGui | bShowCmdLine))
-    {
-        cout << "Can't disable both gui and command line!\nSet for command line.\n";
-        firstRuntime->showCLI = true;
-        bShowCmdLine = true;
-        firstRuntime->configChanged = true;
-    }*/
 
+    if (firstRuntime->lastXMLmajor < minVmajor || firstRuntime->lastXMLminor < minVminor)
+    {
+
+        cout << "Existing config older than " << minVmajor << "." << minVminor << "\nCheck settings, save and restart."<< endl;
+        if (bShowGui)
+            fl_alert("Existing config older than V %d.%d\nCheck settings, save and restart.", minVmajor, minVminor);
+    }
     if(sem_init(&semGui, 0, 0) == 0)
     {
         if (pthread_attr_init(&attr) == 0)
@@ -436,7 +436,6 @@ bail_out:
 
         if (_synth)
         {
-            _synth->getRuntime().deadObjects->disposeBodies();
             _synth->getRuntime().flushLog();
             delete _synth;
         }

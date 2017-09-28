@@ -1,16 +1,17 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
-header_name {.h} 
+version 1.0302
+header_name {.h}
 code_name {.cc}
 comment {PresetsUI.h} {not_in_source in_header
-} 
+}
 
 comment {PresetsUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
+Copyright 2017, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -26,24 +27,25 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified January 2010
+This file is a derivative of the ZynAddSubFX original.
+Modified September 12017
 } {in_source in_header
-} 
+}
 
 decl {\#include <FL/fl_ask.H>} {public local
-} 
+}
 
 decl {\#include <string>} {public global
-} 
+}
 
 decl {using namespace std;} {public global
-} 
+}
 
 decl {\#include "Params/Presets.h"} {public local
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public global
-} 
+}
 
 class PresetsUI_ {} {
   Function {refresh()} {return_type {virtual void}
@@ -53,7 +55,7 @@ class PresetsUI_ {} {
   Function {~PresetsUI_()} {} {
     code {;} {}
   }
-} 
+}
 
 class PresetsUI {selected
 } {
@@ -86,26 +88,29 @@ class PresetsUI {selected
       }
       Fl_Button copypbutton {
         label {Copy to Preset}
-        callback {const char *tmp = presetname->value();
-          if (tmp != NULL)
-          {
-            if (strlen(tmp) > 0)
-            {
-              p->copy(tmp);
-              copywin->hide();
-            }
-          }}
+        callback {//
+        const char *tmp = presetname->value();
+        if (tmp != NULL)
+        {
+        if (strlen(tmp) > 0)
+        {
+            p->copy(tmp);
+            copywin->hide();
+        }
+        }}
         xywh {145 355 110 20} box THIN_UP_BOX
       }
       Fl_Button copybutton {
         label {Copy to Clipboard}
-        callback {p->copy(NULL);
-          copywin->hide();}
+        callback {//
+        p->copy(NULL);
+        copywin->hide();}
         xywh {25 385 90 35} box THIN_UP_BOX align 192
       }
       Fl_Button {} {
         label Cancel
-        callback {copywin->hide();}
+        callback {//
+        copywin->hide();}
         xywh {160 385 80 35} box THIN_UP_BOX align 192
       }
       Fl_Box {} {
@@ -116,19 +121,20 @@ class PresetsUI {selected
         xywh {50 5 205 15} box FLAT_BOX color 238 labelfont 1 labelsize 11 align 20
       }
       Fl_Input presetname {
-        callback {const char *tmp = o->value();
-          if (tmp == NULL)
-            tmp = "";
-          if (strlen(tmp) > 0)
-          {
+        callback {//
+        const char *tmp = o->value();
+        if (tmp == NULL)
+        tmp = "";
+        if (strlen(tmp) > 0)
+        {
             copybutton->deactivate();
             copypbutton->activate();
-          }
-          else
-          {
+        }
+        else
+        {
             copybutton->activate();
             copypbutton->deactivate();
-          }}
+        }}
         xywh {10 355 130 20} when 1
       }
     }
@@ -137,37 +143,41 @@ class PresetsUI {selected
       xywh {463 173 265 430} type Double box PLASTIC_THIN_UP_BOX color 238 hide modal
     } {
       Fl_Browser pastebrowse {
-        callback {if (o->value() == 0)
-          {
+        callback {//
+        if (o->value() == 0)
+        {
             pastepbutton->deactivate();
             deletepbutton->deactivate();
-          }
-          else
-          {
+        }
+        else
+        {
             pastepbutton->activate();
             deletepbutton->activate();
-          }}
+        }}
         xywh {10 25 245 320} type Hold
       }
       Fl_Button pastepbutton {
         label {Paste from Preset}
-        callback {int n = pastebrowse->value();
-          if ( n !=0 )
+        callback {//
+        int n = pastebrowse->value();
+        if ( n !=0 )
             p->paste(n);
-          pastewin->hide();
-          pui->refresh();}
+        pastewin->hide();
+        pui->refresh();}
         xywh {10 355 160 20} box THIN_UP_BOX
       }
       Fl_Button pastebutton {
         label {Paste from Clipboard}
-        callback {p->paste(0);
-          pastewin->hide();
-          pui->refresh();}
+        callback {//
+        p->paste(0);
+        pastewin->hide();
+        pui->refresh();}
         xywh {25 385 90 35} box THIN_UP_BOX align 192
       }
       Fl_Button {} {
         label Cancel
-        callback {pastewin->hide();}
+        callback {//
+        pastewin->hide();}
         xywh {160 385 80 35} box THIN_UP_BOX align 192
       }
       Fl_Box pastetypetext {
@@ -179,10 +189,11 @@ class PresetsUI {selected
       }
       Fl_Button deletepbutton {
         label Delete
-        callback {int n = pastebrowse->value();
-          if ( n != 0)
+        callback {//
+        int n = pastebrowse->value();
+        if ( n != 0)
             p->deletepreset(n);
-          rescan();}
+        rescan();}
         xywh {180 355 75 20} box THIN_UP_BOX
       }
     }
@@ -260,4 +271,4 @@ class PresetsUI {selected
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+}

@@ -21,14 +21,13 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is a derivative of a ZynAddSubFX original
-    Modified February 2017
+    Modified September 2017
 */
 
 #ifndef AD_NOTE_H
 #define AD_NOTE_H
 
 #include "Misc/SynthHelper.h"
-#include "Synth/Carcass.h"
 #include "Synth/LegatoTypes.h"
 #include "Misc/Float2Int.h"
 
@@ -46,7 +45,7 @@ class Filter;
 
 class SynthEngine;
 
-class ADnote : public Carcass, private SynthHelper, private Float2Int
+class ADnote : private SynthHelper, private Float2Int
 {
     public:
         ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_, float velocity_,

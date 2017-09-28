@@ -83,13 +83,13 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
     putData.data.insert = insert;
     putData.data.parameter = parameter;
     putData.data.par2 = par2;
-//cout << "here" << int(type) << " " << int(control) << " " << int(part) << " " << int(parameter) << " " << int(par2) << endl;
+//cout << "collect_data " << int(type) << " " << int(control) << " " << int(part) << " " << int(kititem) << " " << int(engine) << " " << int(parameter) << " " << int(par2) << endl;
     if (jack_ringbuffer_write_space(synth->interchange.fromGUI) >= commandSize)
         jack_ringbuffer_write(synth->interchange.fromGUI, (char*) putData.bytes, commandSize);
 }
 
 
-void read_updates(SynthEngine *synth)
+void GuiUpdates::read_updates(SynthEngine *synth)
 {
     CommandBlock getData;
     size_t commandSize = sizeof(getData);
@@ -104,7 +104,7 @@ void read_updates(SynthEngine *synth)
 }
 
 
-void decode_updates(SynthEngine *synth, CommandBlock *getData)
+void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 {
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -112,7 +112,7 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char insertParam = getData->data.parameter;
-    //unsigned char insertPar2 = getData->data.par2;
+    unsigned char insertPar2 = getData->data.par2;
 
     if (npart == 0xe8) // scales
     {
@@ -163,6 +163,11 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
     {
         synth->getGuiMaster()->configui->returns_update(getData);
         return;
+    }
+    if (npart == 0xf0 && control == 94) // special case for pad sample save
+    {
+        npart = insertParam & 0x3f;
+        getData->data.part = npart;
     }
     if (npart >= 0xf0) // main / sys / ins
     {
@@ -230,6 +235,8 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
                         synth->getGuiMaster()->partui->padnoteui->filterui->returns_update(getData);
                     break;
                 case 2:
+                case 3:
+                case 4:
                     switch(insertParam)
                     {
                         case 0:
@@ -260,6 +267,10 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
                     break;
             }
         }
+        else if(insertPar2 < 0xff)
+        {
+            miscMsgPop(insertPar2); // clear any text out.
+        }
         return;
     }
 
@@ -273,6 +284,8 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
                         synth->getGuiMaster()->partui->subnoteui->filterui->returns_update(getData);
                     break;
                 case 2:
+                case 3:
+                case 4:
                     switch(insertParam)
                     {
                         case 0:
@@ -335,6 +348,8 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
                             synth->getGuiMaster()->partui->adnoteui->advoice->voicefilter->returns_update(getData);
                         break;
                     case 2:
+                    case 3:
+                    case 4:
                         if (engine >= 0xC0)
                             switch(insertParam)
                             {
@@ -408,6 +423,8 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
                         synth->getGuiMaster()->partui->adnoteui->filterui->returns_update(getData);
                     break;
                 case 2:
+                case 3:
+                case 4:
                     switch(insertParam)
                     {
                         case 0:

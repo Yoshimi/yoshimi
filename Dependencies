@@ -3,10 +3,9 @@ Some of these will pull in other ones.
 
     automake
     build-essential * we now require C++11
-    cmake-curses-gui
+    cmake-curses-gui * 3.0 or later
     dssi-dev
     fluid
-    libboost-dev
     libcairo2-dev
     libfftw3-dev
     libfltk1.3-dev

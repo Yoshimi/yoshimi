@@ -17,7 +17,7 @@
 
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
-    Modified February 2017
+    Modified September 2017
 */
 
 #ifndef MUSIC_IO_H
@@ -45,6 +45,7 @@ class MusicIO : virtual protected MiscFuncs
         virtual void registerAudioPort(int) = 0;
 
     protected:
+        bool LV2_engine;
         bool prepBuffers(void);
         void getAudio(void) { if (synth) synth->MasterAudio(zynLeft, zynRight); }
         void setMidi(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place = false);

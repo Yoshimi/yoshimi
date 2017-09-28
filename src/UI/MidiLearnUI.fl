@@ -24,7 +24,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-Modified May 2017} {in_source in_header
+Modified September 2017} {in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -155,18 +155,21 @@ class MidiLearnKitItem {: {public Fl_Group}
           }
         }
         Fl_Check_Button compresscheck {
-          callback {send_data(1);}
+          callback {//
+          send_data(1);}
           tooltip {Limit or compress incoming value} xywh {324 0 15 15} down_box DOWN_BOX labelfont 1 align 4
         }
         Fl_Check_Button blockcheck {
-          callback {send_data(0);}
+          callback {//
+          send_data(0);}
           tooltip {Stop any later lines (or system controls) responding to this CC/Channel pair} xywh {360 0 20 15} down_box DOWN_BOX labelfont 1 align 4
         }
         Fl_Light_Button activity {
-          callback {if (o->value() != 0)
-    o->value(0);
-else
-    o->value(1);}
+          callback {//
+          if (o->value() != 0)
+              o->value(0);
+          else
+              o->value(1);}
           xywh {180 0 13 15} box NO_BOX color 15 selection_color 2
         }
         Fl_Spinner minval {
@@ -178,7 +181,8 @@ else
           xywh {240 0 15 16} box FLAT_BOX down_box FLAT_BOX
         }
         Fl_Spinner maxval {
-          callback {send_data(6);}
+          callback {//
+          send_data(6);}
           tooltip {Maximim % to pass on} xywh {261 0 52 15} type Float labelsize 12 minimum 0 step 0.5 value 100 textsize 12
         }
         Fl_Button {} {
@@ -187,18 +191,19 @@ else
         }
         Fl_Button commandName {
           label text
-          callback {send_data(8);}
+          callback {//
+          send_data(8);}
           tooltip {To delete, hold CTRL and click here.} xywh {395 0 400 15} box THIN_DOWN_BOX color 247 selection_color 247 labelfont 1 labelsize 10 align 64
         }
       }
       Fl_Check_Button mutecheck {
         label 999
         callback {//
-if (o->value())
-    midilearnkititemgroup->deactivate();
-else
-    midilearnkititemgroup->activate();
-send_data(2);}
+        if (o->value())
+            midilearnkititemgroup->deactivate();
+        else
+            midilearnkititemgroup->activate();
+        send_data(2);}
         tooltip {Completely ignore this line} xywh {39 0 21 15} down_box DOWN_BOX labelfont 1 labelsize 13 align 4
         code0 {o->copy_label(to_string(n + 1).c_str());}
       }
@@ -255,16 +260,17 @@ send_data(2);}
     code {n=0;} {}
   }
   Function {~MidiLearnKitItem()} {} {
-    code {midilearnkititem->hide();
-delete(midilearnkititem);} {}
+    code {//
+    midilearnkititem->hide();
+    delete(midilearnkititem);} {}
   }
   Function {init(SynthEngine *synth_, int n_)} {} {
     code {//
-synth = synth_;
-n = n_;
-make_window();
-show();
-end();} {}
+    synth = synth_;
+    n = n_;
+    make_window();
+    show();
+    end();} {}
   }
   decl {int n;} {private local
   }
@@ -334,39 +340,42 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
       }
       Fl_Button load {
         label Load
-        callback {char *filename;
-filename = fl_file_chooser("Load:", "({*.xly})", NULL, 0);
-if (filename == NULL)
-    return;
-loadMidi(filename);}
+        callback {//
+        char *filename;
+        filename = fl_file_chooser("Load:", "({*.xly})", NULL, 0);
+        if (filename == NULL)
+            return;
+        loadMidi(filename);}
         tooltip {Load complete learned list} xywh {30 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12
       }
       Fl_Button save {
         label Save
-        callback {char *filename;
-filename = fl_file_chooser("Load:", "({*.xly})", NULL, 0);
-if (filename == NULL)
-    return;
-send_data(245, 0, 0, 0, 0, 0, 0, miscMsgPush((string) filename));
-recent->activate();
-setWindowTitle(findleafname(filename));}
+        callback {//
+        char *filename;
+        filename = fl_file_chooser("Load:", "({*.xly})", NULL, 0);
+        if (filename == NULL)
+            return;
+        send_data(245, 0, 0, 0, 0, 0, 0, miscMsgPush((string) filename));
+        recent->activate();
+        setWindowTitle(findleafname(filename));}
         tooltip {Save complete learned list} xywh {130 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 deactivate
       }
       Fl_Button clear {
         label Clear
         callback {//
-if (fl_choice("Remove all entries", NULL, "No", "Yes") < 2)
-    return;
+        if (fl_choice("Remove all entries", NULL, "No", "Yes") < 2)
+            return;
 
-send_data(96,0,0);
-o->deactivate();
-setWindowTitle();}
+        send_data(96,0,0);
+        o->deactivate();
+        setWindowTitle();}
         tooltip {Remove all entries} xywh {330 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 deactivate
       }
       Fl_Button recent {
         label Recent
-        callback {synth->getGuiMaster()->paramsui->Recent->position(midilearnwindow->x() + recent->x() - 80, midilearnwindow->y() + recent->y() - 187);
-synth->getGuiMaster()->paramsui->Show(6);}
+        callback {//
+        synth->getGuiMaster()->paramsui->Recent->position(midilearnwindow->x() + recent->x() - 80, midilearnwindow->y() + recent->y() - 187);
+        synth->getGuiMaster()->paramsui->Show(6);}
         tooltip {Load from recently seen list} xywh {230 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12
         code0 {vector<string> &listType = *synth->getHistory(6);}
         code1 {if (listType.size() == 0) o->deactivate(); else o->activate();}
@@ -387,15 +396,16 @@ synth->getGuiMaster()->paramsui->Show(6);}
       }
       Fl_Button cancel {
         label Cancel
-        callback {send_data(255, 0, 3);
-o->hide();}
+        callback {//
+        send_data(255, 0, 3);
+        o->hide();}
         xywh {130 60 70 20} hide
       }
     }
   }
   Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff, int insert = 0xff, int parameter = 0xff, int par2 = 0xff)} {} {
     code {//
-collect_data(synth, value, type, control, 216, kititem, engine, insert, parameter, par2);} {}
+    collect_data(synth, value, type, control, 216, kititem, engine, insert, parameter, par2);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
@@ -408,6 +418,7 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
     unsigned char parameter = getData->data.parameter;
     unsigned char par2 = getData->data.par2;
     string hex;
+    int nrpnTot;
     unsigned int IDold;
     unsigned int IDnew;
     switch(control)
@@ -436,7 +447,11 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
                 midilearnkititem[value]->maxval->value(parameter / 2.0f);
             break;
         case 9: // set NRPN fixed value in place
-            hex = (asHexString(int(engine))) + " " + (asHexString(int(kititem))) + " h";
+            nrpnTot = (int(engine) << 8) + (int(kititem));
+            /* These were stored 8 bit values so must be joined then
+             * split as two 7 bit values to give NRPN msb and lsb
+             */
+            hex = (asHexString(nrpnTot >> 7)) + " " + (asHexString(nrpnTot & 0x7f));
             midilearnkititem[value]->stat |= 0x10;
             midilearnkititem[value]->nrpn->copy_label(hex.c_str());
             midilearnkititem[value]->CCcounter->hide();
@@ -514,51 +529,51 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
   }
   Function {MidiLearnUI(SynthEngine *_synth)} {} {
     code {//
-synth = _synth;
-for (int i = 0; i < MIDI_LEARN_BLOCK; ++i)
-    midilearnkititem[i] = NULL;
-make_window();
-setWindowTitle();
-num = 0;} {}
+    synth = _synth;
+    for (int i = 0; i < MIDI_LEARN_BLOCK; ++i)
+        midilearnkititem[i] = NULL;
+    make_window();
+    setWindowTitle();
+    num = 0;} {}
   }
   Function {~MidiLearnUI()} {} {
     code {;} {}
   }
   Function {Show()} {} {
     code {//
-midilearnwindow->show();} {}
+    midilearnwindow->show();} {}
   }
   Function {Hide()} {} {
     code {//
-midilearnwindow->hide();} {}
+    midilearnwindow->hide();} {}
   }
   Function {clearAll(bool empty)} {} {
     code {//
-kitlist->clear();
-for (int i = 0; i < MIDI_LEARN_BLOCK; ++i)
-    midilearnkititem[i] = NULL;
-if (empty)
-{
-    none->show();
-    clear->deactivate();
-    save->deactivate();
-    cancel->hide();
-    message->hide();
-}
-kitlist->redraw();
-kitlist->show();} {}
+    kitlist->clear();
+    for (int i = 0; i < MIDI_LEARN_BLOCK; ++i)
+        midilearnkititem[i] = NULL;
+    if (empty)
+    {
+        none->show();
+        clear->deactivate();
+        save->deactivate();
+        cancel->hide();
+        message->hide();
+    }
+    kitlist->redraw();
+    kitlist->show();} {}
   }
   Function {loadMidi(string file)} {} {
     code {//
-send_data(241, 0, 0, 0, 0, 0, 0, miscMsgPush((string) file));
-recent->activate();
-setWindowTitle(findleafname(file));} {}
+    send_data(241, 0, 0, 0, 0, 0, 0, miscMsgPush((string) file));
+    recent->activate();
+    setWindowTitle(findleafname(file));} {}
   }
   Function {setWindowTitle(string name = "")} {} {
     code {//
-if (name > "")
-    name = " - " + name;
-midilearnwindow->copy_label(synth->makeUniqueName("MIDI Learn" + name).c_str());} {}
+    if (name > "")
+        name = " - " + name;
+    midilearnwindow->copy_label(synth->makeUniqueName("MIDI Learn" + name).c_str());} {}
   }
   decl {int lastkititem;} {public local
   }

@@ -17,22 +17,24 @@
 #   You should have received a copy of the GNU General Public License
 #   along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
+# Modifed September 2017
+
 project (Yoshimi)
-cmake_minimum_required (VERSION 2.6)
-cmake_policy (VERSION 2.6)
-cmake_policy (SET CMP0004 OLD)
+cmake_minimum_required (VERSION 3.0)
+cmake_policy (VERSION 3.0)
+cmake_policy (SET CMP0004 NEW)
 if (POLICY CMP0046)
-    cmake_policy (SET CMP0046 OLD)
+    cmake_policy (SET CMP0046 NEW)
 endif (POLICY CMP0046)
 set (CMAKE_CXX_STANDARD 11) # we seem to need both for
 add_definitions(-std=gnu++11) # various versions of cmake
 
-add_definitions(-Wall)
-add_definitions(-Werror=format-security)
+#add_definitions(-Wall)
+#add_definitions(-Werror=format-security)
 
 # ^^^ comment these two out on release pushes ^^^
 
-set (YOSHIMI_VERSION "1.5.3 M")
+set (YOSHIMI_VERSION "1.5.4")
 
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
@@ -165,14 +167,6 @@ if (JACK_FOUND)
 else (JACK_FOUND)
     message(FATAL_ERROR "Jack >=0.115.6 required but not found")
 endif (JACK_FOUND)
-
-# Boost
-find_package (Boost)
-if (Boost_FOUND)
-    message(STATUS "Found boost headers version " ${Boost_VERSION})
-else (Boost_FOUND)
-    message (FATAL_ERROR "boost headers required, but not found")
-endif (Boost_FOUND)
 
 # fontconfig
 pkg_check_modules (FONTCONFIG REQUIRED fontconfig>=0.22)
@@ -319,7 +313,6 @@ set (Params_sources
 set (Synth_sources
     Synth/ADnote.cpp  Synth/Envelope.cpp  Synth/LFO.cpp  Synth/OscilGen.cpp
     Synth/SUBnote.cpp  Synth/Resonance.cpp  Synth/PADnote.cpp
-    Synth/BodyDisposal.cpp
 )
 
 set (MusicIO_sources
@@ -549,7 +542,8 @@ install (DIRECTORY ../doc/ DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/yoshimi
         GROUP_READ GROUP_WRITE GROUP_EXECUTE
         WORLD_READ WORLD_EXECUTE
 )
-
+install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../yoshimi-user-manual.pdf
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/yoshimi)
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/yoshimi.desktop
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications)
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.png

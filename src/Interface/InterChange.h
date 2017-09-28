@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified July 2017
+    Modified September 2017
 */
 
 #ifndef INTERCH_H
@@ -34,12 +34,13 @@ using namespace std;
 #include "Synth/OscilGen.h"
 #include "Synth/Resonance.h"
 
-//#include "Interface/MidiDecode.h"
 class SynthEngine;
-//class MidiDecode;
 
 class InterChange : private MiscFuncs
 {
+    private:
+        SynthEngine *synth;
+
     public:
         InterChange(SynthEngine *_synth);
         ~InterChange();
@@ -115,8 +116,6 @@ class InterChange : private MiscFuncs
         void commandEffects(CommandBlock *getData);
 
         bool commandSendReal(CommandBlock *getData);
-
-        SynthEngine *synth;
 };
 
 #endif

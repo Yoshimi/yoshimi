@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2010, Alan Calvert
+    Copyright 2017 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of a ZynAddSubFX original.
+
+    Modified September 2017
 */
 
 #include <dirent.h>
@@ -132,11 +135,6 @@ void PresetsStore::rescanforpresets(string type)
             if (dirname.at(dirname.size() - 1) != '/')
                 dirname += "/";
             presets[presetk].file = dirname + filename;
-         /* if (filename.find_last_of(ftype) != string::npos)
-                presets[presetk].name = filename;
-            else
-                presets[presetk].name =
-                    filename.substr(0, filename.find_last_of(ftype));*/
             presets[presetk].name =
                 filename.substr(0, filename.find(ftype));
             presetk++;

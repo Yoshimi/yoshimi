@@ -1,5 +1,7 @@
 This enables you to seem to instantly change just one part only to a specific channel while alowing others that were on that channel to only accept a note-off. The command takes two forms.
 
+See "Solo.txt" for GUI use.
+
 In the first form all 16 normally accessible parts will be changed to channel 1 but only one at a time is active, the others have their channel number set as 17 to only accept note-off.
 
 The value of this is that, as you are not actually switching parts on and off, there are no clicks and no messed up note release tails, yet with a pretty standard MIDI controller you can instantly switch between 16 totally different sounds *while* *actually* *playing*.

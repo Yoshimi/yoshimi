@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified August 2017
+    Modified September 2017
 */
 
 #include <iostream>
@@ -45,7 +45,6 @@
 
 using namespace std;
 
-#include "Synth/BodyDisposal.h"
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
@@ -143,7 +142,6 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     nrpnL(127),
     nrpnH(127),
     nrpnActive(false),
-    deadObjects(NULL),
     sigIntActive(0),
     ladi1IntActive(0),
     sse_level(0),
@@ -164,7 +162,6 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     //which befaves exactly the same when flag FE_TOWARDZERO is set
 
     cerr.precision(4);
-    deadObjects = new BodyDisposal();
     bRuntimeSetupCompleted = Setup(argc, argv);
 }
 
@@ -530,11 +527,6 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
     showGui = xml->getparbool("enable_gui", showGui);
     showSplash = xml->getparbool("enable_splash", showSplash);
     showCLI = xml->getparbool("enable_CLI", showCLI);
-    /*if (!showGui && !showCLI)
-    {
-        showGui = true;
-        showCLI = true; // sanity check!
-    }*/
     xml->exitbranch(); // BaseParameters
     return true;
 }
@@ -771,7 +763,7 @@ end_game:
 }
 
 
-void Config::Log(string msg, char tostderr)
+void Config::Log(const string &msg, char tostderr)
 {
     if ((tostderr & 2) && hideErrors)
         return;
@@ -784,6 +776,10 @@ void Config::Log(string msg, char tostderr)
         cerr << msg << endl; // error log
 }
 
+void Config::LogError(const string &msg)
+{
+    Log("[ERROR] " + msg, 1);
+}
 
 #ifndef YOSHIMI_LV2_PLUGIN
 void Config::StartupReport(MusicClient *musicClient)

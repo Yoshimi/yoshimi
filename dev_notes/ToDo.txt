@@ -1,12 +1,19 @@
+still not fully converted:
+    vectors
+
+pasting effect doesn't update effect title.
+
+transfer instrument external load/save
+
+Requested: revise window states so engines etc can be made auto open.
+
 Do a dual scan for banks so that IDd ones are found first, then any new ones picked up on the second scan. This stops known ones being re-ordered.
 
-Allow both jack and als midi at trhe same time?
+Allow both jack and alsa midi at the same time?
 
 NRPN channels?
 
 Fl::check() used too liberally. See where it can be removed - controls updating multiple windows seem the be the main problem.
-
-Direct access to envelope not updating freemode Gui graph, but seems to work otherwise.
 
 Expand midi-learn to include:
     more switches
@@ -17,7 +24,7 @@ Make NRPN midi learn able to be re-learned.
 
 LV2: internal sound banks do not appear to be exposed as LV2 presets
 
-Make add voice & add/pad oscillator windows show kit number & name.
+Make add voice & add/pad oscillator and resonance windows show kit number & name.
 
 Make vector window update when main window reduces number of available parts.
 
