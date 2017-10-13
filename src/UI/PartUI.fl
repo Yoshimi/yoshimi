@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified September 2017
+Modified October 2017
 } {in_source in_header
 }
 
@@ -1494,7 +1494,14 @@ Offset}
                 break;
             case 8:
                 if (engine == 255)
+                {
                     synth->getGuiMaster()->panellistitem[displaypart]->partenabled->value(valBool);
+                    if (valBool)
+                        synth->getGuiMaster()->panellistitem[displaypart]->panellistitemgroup->activate();
+                    else
+                        synth->getGuiMaster()->panellistitem[displaypart]->panellistitemgroup->deactivate();
+                    Fl::check(); // why is this not picked up later?
+                }
                 break;
             case 120:
                 int send = valInt - 1;

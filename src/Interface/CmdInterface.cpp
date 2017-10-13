@@ -1703,10 +1703,11 @@ int CmdInterface::commandPart(bool justSet)
             tmp = string2int(point) - 1;
             if (tmp < 0 || tmp > 159)
                 return range_msg;
-            if (tmp < 128)
-                synth->writeRBP(3, npart | 0x80, tmp); // lower set
-            else
-                synth->writeRBP(4, npart | 0x80, tmp - 128); // upper set
+            sendDirect(npart, 64, 74, 240, 255, 255, 255, 255, tmp);
+            //if (tmp < 128)
+                //synth->writeRBP(3, npart | 0x80, tmp); // lower set
+            //else
+                //synth->writeRBP(4, npart | 0x80, tmp - 128); // upper set
             reply = done_msg;
         }
         else
@@ -2602,7 +2603,8 @@ bool CmdInterface::cmdIfaceProcessCommand()
             if (point[0] == 0)
                 reply = name_msg;
             else
-                synth->writeRBP(5, npart, miscMsgPush((string) point));
+                sendDirect(npart, 64, 78, 240, 255, 255, 255, 255, miscMsgPush((string) point));
+                //synth->writeRBP(5, npart, miscMsgPush((string) point));
             reply = done_msg;
         }
         else
