@@ -1472,7 +1472,6 @@ Offset}
     int tmp = (valInt & 15) + 1;
     bool check = true;
 
-    npart = newpart;
     // these are specific to the mixer panel
     if (newpart >= *plgroup && newpart < (*plgroup + NUM_MIDI_CHANNELS))
     {
@@ -1500,7 +1499,6 @@ Offset}
                         synth->getGuiMaster()->panellistitem[displaypart]->panellistitemgroup->activate();
                     else
                         synth->getGuiMaster()->panellistitem[displaypart]->panellistitemgroup->deactivate();
-                    Fl::check(); // why is this not picked up later?
                 }
                 break;
             case 120:
@@ -1511,7 +1509,10 @@ Offset}
         }
     }
     if (npart != newpart && control != 8)
+    {
+        Fl::check();
         return;
+    }
 
     bool sameEff = (engine == (inseffnocounter->value() - 1));
     bool kitType = (insert == 0x20);
