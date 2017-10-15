@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-Modified September 2017} {in_source in_header
+Modified October 2017} {in_source in_header
 }
 
 decl {\#include "UI/MiscGui.h"} {public local
@@ -974,8 +974,7 @@ pars=NULL;
         case 38:
             neginput->value(value != 0);
             break;
-    }
-    Fl::check();} {}
+    }} {}
   }
   Function {init(FilterParams *filterpars_,unsigned char *velsnsamp_,unsigned char *velsns_, int npart_, int kititem_, int engine_)} {} {
     code {//

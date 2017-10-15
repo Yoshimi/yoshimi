@@ -20,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, last modified January 2015
+    This file is a derivative of a ZynAddSubFX original.
+
+    Modified October 2017
 */
 
 #include <set>
@@ -56,7 +58,6 @@ Bank::Bank(SynthEngine *_synth) :
     currentBankID(0)
 {
     roots.clear();
-    //addDefaultRootDirs();
 }
 
 
@@ -571,8 +572,6 @@ void Bank::scanrootdir(int root_idx)
             continue;
         }
         struct dirent *fname;
-        //int idx;
-        //char x;
         while ((fname = readdir(d)))
         {
             string possible = string(fname->d_name);

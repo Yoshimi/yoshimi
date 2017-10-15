@@ -1,4 +1,9 @@
-yoshimi 1.5.4.1 rc2
+yoshimi 1.5.4.1
+
+2017-10-16 Will
+* Finalised and cleaned up bugfix code.
+* Rationalised GUI updates (only one Fl::check() call).
+* set as V 1.5.4.1 release.
 
 2017-10-14 Will
 * Bugfix: Main part controls were responding to all

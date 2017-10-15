@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-Modified September 2017
+Modified October 2017
 } {in_source in_header
 }
 
@@ -552,7 +552,6 @@ class ResonanceUI {selected : PresetsUI_
     {
         if (eng == 2)
             redrawPADnoteApply();
-        //Fl::check();
     }} {}
   }
   Function {ResonanceUI(Resonance *respar_, int npart_, int kititem_, int engine_)} {} {

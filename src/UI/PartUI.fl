@@ -1470,7 +1470,6 @@ Offset}
     bool valBool = (value > 0.5f);
     int valInt = lrint(value);
     int tmp = (valInt & 15) + 1;
-    bool check = true;
 
     // these are specific to the mixer panel
     if (newpart >= *plgroup && newpart < (*plgroup + NUM_MIDI_CHANNELS))
@@ -1509,10 +1508,7 @@ Offset}
         }
     }
     if (npart != newpart && control != 8)
-    {
-        Fl::check();
         return;
-    }
 
     bool sameEff = (engine == (inseffnocounter->value() - 1));
     bool kitType = (insert == 0x20);
@@ -1711,7 +1707,6 @@ Offset}
                         }
                         break;
                     case 255:
-                        check = false;
                         partGroupEnable->value(valBool);
                         if (valBool)
                         {
@@ -1947,11 +1942,8 @@ Offset}
             updatecontrollers();
             break;
         default:
-            check = false;
             break;
-    }
-    if (check)
-        Fl::check();} {}
+    }} {}
   }
   Function {PartUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//

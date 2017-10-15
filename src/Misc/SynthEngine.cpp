@@ -958,23 +958,13 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
 // this replaces bank->loadfromslot for thread safety etc.
 bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
 {
-    //partonoffLock(npart, -1);
     bool loadOK = false;
-    //unsigned char enablestate;
     string loaded;
     struct timeval tv1, tv2;
     gettimeofday(&tv1, NULL);
 
-//    sem_wait(&partlock);
-
-    //if (Runtime.enable_part_on_voice_load)
-    //    enablestate = 1; // always on
-    //else
-    //    enablestate = 2; // on if it was before
-    //partonoffWrite(npart, -1); // more off than before :)
     if (part[npart]->loadXMLinstrument(fname))
     {
-        //partonoffWrite(npart, enablestate); // must be here to update gui
         loadOK = true;
         // show file instead of program if we got here from Instruments -> Load External...
         loaded = "Loaded " +
@@ -993,10 +983,6 @@ bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
             loaded += ("  Time " + to_string(actual) + "mS");
         }
     }
-    //else
-        //partonoffWrite(npart, enablestate); // also here to restore failed load state.
-
-//    sem_post(&partlock);
 
     if (!loadOK)
     {
@@ -3265,7 +3251,6 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
     Runtime.channelSwitchCC = xml->getpar127("channel_switch_CC", Runtime.channelSwitchCC);
     Runtime.channelSwitchValue = 0;
 
-//    partonoffWrite(0, 0); // why?;
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
         if (!xml->enterbranch("PART", npart))
@@ -3418,7 +3403,6 @@ void SynthEngine::closeGui()
     {
         delete guiMaster;
         guiMaster = NULL;
-        //Runtime.showGui = false;
     }
 }
 

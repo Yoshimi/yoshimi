@@ -808,10 +808,6 @@ class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
         {
             send_data(74, *npart, 0xc8, 240, 255, 255, 255, 255, slot);
             // Reads from slot
-            //if (slot < 128)
-                //synth->writeRBP(3, (*npart) | 0x80, slot);
-            //else
-                //synth->writeRBP(4, (*npart) | 0x80, slot - 128);
             if (what == 3)
                 instrumentuiwindow->hide();
             cbwig->do_callback();
@@ -1102,7 +1098,7 @@ class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
         if (!it->second.dirname.empty())
         {
             int n = banklist->add((asString(it->first) + ". " + it->second.dirname).c_str(), (const char *)0, (Fl_Callback*)0, reinterpret_cast<void *>(it->first));
-//            if(it->first == bank->getCurrentBankID())
+//            if(it->first == bank->getCurrentBankID()) // why?
             {
                 banklist->value(n);
             }

@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-Modified September 2017
+Modified October 2017
 } {in_source in_header
 }
 
@@ -2198,8 +2198,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                     break;
             }
             break;
-    }
-    Fl::check();} {}
+    }} {}
   }
   Function {init(EffectMgr *eff_, int npart_, int neff_)} {} {
     code {//
