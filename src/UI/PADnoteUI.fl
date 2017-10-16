@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-Modified September 2017
+Modified October 2017
 } {in_source in_header
 }
 
@@ -1326,8 +1326,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
             pvel->value(value);
             break;
 
-    }
-    Fl::check();} {}
+    }} {}
   }
   Function {PADnoteUI(PADnoteParameters *parameters, int npart_, int kititem_)} {} {
     code {//

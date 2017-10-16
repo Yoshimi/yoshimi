@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified September 2017
+    Modified October 2017
 */
 
 #include <cstring>
@@ -564,7 +564,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
                     continue;
 
 
-                // experimental cross fade on multi
+                // cross fade on multi
                 if (Pkitfade)
                 {
                     vel = truevel; // always start with correct value
@@ -1382,7 +1382,7 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
         Pkitmode = xml->getpar127("kit_mode", Pkitmode);
         Pkitfade = xml->getparbool("kit_crossfade", Pkitfade);
         Pdrummode = xml->getparbool("drum_mode", Pdrummode);
-        //setkititemstatus(0, 0); // does odd things :(
+
         for (int i = 0; i < NUM_KIT_ITEMS; ++i)
         {
             if (!xml->enterbranch("INSTRUMENT_KIT_ITEM", i))

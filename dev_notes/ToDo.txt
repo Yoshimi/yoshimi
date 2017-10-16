@@ -1,9 +1,8 @@
 still not fully converted:
     vectors
+    root, bank, instrument loads & saves
 
 pasting effect doesn't update effect title.
-
-transfer instrument external load/save
 
 Requested: revise window states so engines etc can be made auto open.
 

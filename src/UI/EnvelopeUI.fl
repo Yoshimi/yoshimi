@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified September 2017
+Modified October 2017
 } {in_source in_header
 }
 
@@ -883,7 +883,6 @@ send_data(group, curpoint, 0, 0xd0, 3);}
         envfree->redraw();
         sustaincounter->value(env->Penvsustain);
         sustaincounter->maximum(env->Penvpoints-2);
-        Fl::check();
         return;
     }
 
@@ -1053,7 +1052,7 @@ send_data(group, curpoint, 0, 0xd0, 3);}
     }
     if (change)
         freeedit->redraw();
-    Fl::check();} {}
+    } {}
   }
   Function {init(EnvelopeParams *env_, int npart_, int kititem_, int engine_, int group_)} {} {
     code {//

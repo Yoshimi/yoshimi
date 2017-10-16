@@ -18,7 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-Modified September 2017
+Modified October 2017
 } {in_source in_header
 }
 
@@ -51,7 +51,6 @@ class ParametersUI {selected
             return;
         CloseRecent->hide();
         Loading->show();
-        Fl::check();
         vector<string> listType = *synth->getHistory(H_type);
         string fle = listType.at(listType.size() - o->value());
         switch(H_type)

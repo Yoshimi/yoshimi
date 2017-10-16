@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified September 2017
+    Modified October 2017
 */
 
 #include <iostream>
@@ -617,25 +617,29 @@ void MidiDecode::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_pla
 
 void MidiDecode::setMidiProgram(unsigned char ch, int prg, bool in_place)
 {
-    int partnum;
-    if (ch < NUM_MIDI_CHANNELS)
-        partnum = ch;
-    else
-        partnum = ch & 0x7f; // this is for direct part access instead of channel
-    if (partnum >= synth->getRuntime().NumAvailableParts)
+    if (!synth->getRuntime().EnableProgChange)
         return;
-    if (synth->getRuntime().EnableProgChange)
+    if (ch >= synth->getRuntime().NumAvailableParts)
+        return;
+    if (ch < NUM_MIDI_CHANNELS)
+    { // this is a bit of a hack - needs sorting
+        for (int npart = 0; npart < NUM_MIDI_CHANNELS; ++ npart)
+        {
+            if (ch == synth->part[npart]->Prcvchn)
+                synth->partonoffLock(npart, -1);
+        }
+    }
+    else
+        synth->partonoffLock(ch, -1);
+    if (in_place)
     {
-        if (in_place)
-        {
-            //synth->getRuntime().Log("Freewheeling");
-            synth->SetProgram(ch, prg);
-        }
-        else
-        {
-            //synth->getRuntime().Log("Normal");
-            synth->writeRBP(3, ch ,prg);
-        }
+        //synth->getRuntime().Log("Freewheeling");
+        synth->SetProgram(ch, prg);
+    }
+    else
+    {
+        //synth->getRuntime().Log("Normal");
+        synth->writeRBP(3, ch ,prg);
     }
 }
 

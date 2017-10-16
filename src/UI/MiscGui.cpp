@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified August 2017
+    Modified October 2017
 */
 
 #include "Misc/SynthEngine.h"
@@ -93,14 +93,17 @@ void GuiUpdates::read_updates(SynthEngine *synth)
 {
     CommandBlock getData;
     size_t commandSize = sizeof(getData);
-
+    bool isChanged = false;
     while (jack_ringbuffer_read_space(synth->interchange.toGUI) >= commandSize)
     {
         int toread = commandSize;
         char *point = (char*) &getData.bytes;
         jack_ringbuffer_read(synth->interchange.toGUI, point, toread);
         decode_updates(synth, &getData);
+        isChanged = true;
     }
+    if (isChanged)
+        Fl::check();
 }
 
 

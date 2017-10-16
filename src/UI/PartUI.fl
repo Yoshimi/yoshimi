@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified September 2017
+Modified October 2017
 } {in_source in_header
 }
 
@@ -1470,9 +1470,7 @@ Offset}
     bool valBool = (value > 0.5f);
     int valInt = lrint(value);
     int tmp = (valInt & 15) + 1;
-    bool check = true;
 
-    npart = newpart;
     // these are specific to the mixer panel
     if (newpart >= *plgroup && newpart < (*plgroup + NUM_MIDI_CHANNELS))
     {
@@ -1494,7 +1492,13 @@ Offset}
                 break;
             case 8:
                 if (engine == 255)
+                {
                     synth->getGuiMaster()->panellistitem[displaypart]->partenabled->value(valBool);
+                    if (valBool)
+                        synth->getGuiMaster()->panellistitem[displaypart]->panellistitemgroup->activate();
+                    else
+                        synth->getGuiMaster()->panellistitem[displaypart]->panellistitemgroup->deactivate();
+                }
                 break;
             case 120:
                 int send = valInt - 1;
@@ -1703,7 +1707,6 @@ Offset}
                         }
                         break;
                     case 255:
-                        check = false;
                         partGroupEnable->value(valBool);
                         if (valBool)
                         {
@@ -1939,11 +1942,8 @@ Offset}
             updatecontrollers();
             break;
         default:
-            check = false;
             break;
-    }
-    if (check)
-        Fl::check();} {}
+    }} {}
   }
   Function {PartUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//

@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code.
 
-Modified September 2017
+Modified October 2017
 } {in_source in_header
 }
 
@@ -41,6 +41,9 @@ decl {\#include <FL/Fl_File_Chooser.H>} {public local
 }
 
 decl {\#include <FL/Fl_Spinner.H>} {public local
+}
+
+decl {\#include "UI/MiscGui.h"} {public local
 }
 
 decl {\#include "Misc/Bank.h"} {public local
@@ -272,7 +275,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
 }
 
-class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
+class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window instrumentuiwindow {
@@ -746,6 +749,11 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
       }
     }
   }
+  Function {send_data(int control, float value, int type, int part = 0xff, int kititem = 0xff, int engine = 0xff, int insert = 0xff, int parameter = 0xff, int par2 = 0xff)} {} {
+    code {//
+    collect_data(synth, value, (Fl::event_button() | type), control, part, kititem, engine, insert, parameter, par2);} {selected
+    }
+  }
   Function {BankUI(int *npart_, SynthEngine *_synth)} {} {
     code {//
     synth = _synth;
@@ -798,11 +806,8 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
         string thisname =  bank->getname(slot);
         if ((what == 1 || what == 3) && mode == 1 && !bank->emptyslot(slot))
         {
+            send_data(74, *npart, 0xc8, 240, 255, 255, 255, 255, slot);
             // Reads from slot
-            if (slot < 128)
-                synth->writeRBP(3, (*npart) | 0x80, slot);
-            else
-                synth->writeRBP(4, (*npart) | 0x80, slot - 128);
             if (what == 3)
                 instrumentuiwindow->hide();
             cbwig->do_callback();
@@ -1093,7 +1098,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
         if (!it->second.dirname.empty())
         {
             int n = banklist->add((asString(it->first) + ". " + it->second.dirname).c_str(), (const char *)0, (Fl_Callback*)0, reinterpret_cast<void *>(it->first));
-//            if(it->first == bank->getCurrentBankID())
+//            if(it->first == bank->getCurrentBankID()) // why?
             {
                 banklist->value(n);
             }

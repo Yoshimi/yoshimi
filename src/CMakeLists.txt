@@ -17,7 +17,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-# Modifed September 2017
+# Modifed October 2017
 
 project (Yoshimi)
 cmake_minimum_required (VERSION 3.0)
@@ -34,7 +34,7 @@ add_definitions(-std=gnu++11) # various versions of cmake
 
 # ^^^ comment these two out on release pushes ^^^
 
-set (YOSHIMI_VERSION "1.5.4")
+set (YOSHIMI_VERSION "1.5.4.1")
 
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 

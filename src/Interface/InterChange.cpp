@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified September 2017
+    Modified October 2017
 */
 
 #include <iostream>
@@ -4012,6 +4012,20 @@ void InterChange::commandMain(CommandBlock *getData)
             }
             else
                 value = synth->getRuntime().channelSwitchCC;
+            break;
+
+        case 74: // load instrument from ID
+            synth->partonoffLock(value_int, -1);
+            if (par2 < 128)
+                synth->writeRBP(3, value_int | 0x80, par2);
+            else
+                synth->writeRBP(4, value_int | 0x80, par2 - 128);
+            getData->data.type = 0xff; // stop further action
+            break;
+        case 78: // load named instrument
+            synth->partonoffLock(value_int & 0x3f, -1);
+            synth->writeRBP(5, value_int & 0x3f, par2);
+            getData->data.type = 0xff; // stop further action
             break;
 
         case 80: // load patchset

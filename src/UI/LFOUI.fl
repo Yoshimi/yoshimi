@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
-Modified March 2017
+Modified October 2017
 } {in_source in_header
 }
 
@@ -73,8 +73,7 @@ pars=NULL;} {}
   }
   Function {~LFOUI()} {} {
     code {lfoui->hide();
-    hide();
-//delete (lfoui);} {}
+    hide();} {}
   }
   Function {make_window()} {} {
     Fl_Window lfoui {
@@ -278,8 +277,7 @@ pars=NULL;} {}
         case 8:
             stretch->value(value);
             break;
-    }
-    Fl::check();} {}
+    }} {}
   }
   Function {init(LFOParams *lfopars_, int npart_, int kititem_, int engine_, int group_)} {} {
     code {//

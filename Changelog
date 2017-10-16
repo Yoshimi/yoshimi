@@ -1,4 +1,19 @@
-yoshimi 1.5.4
+yoshimi 1.5.4.1
+
+2017-10-16 Will
+* Finalised and cleaned up bugfix code.
+* Rationalised GUI updates (only one Fl::check() call).
+* set as V 1.5.4.1 release.
+
+2017-10-14 Will
+* Bugfix: Main part controls were responding to all
+  remote input channels but upper panel rows weren't.
+* set as V 1.5.4.1 rc2
+
+2017-10-13 Will
+* BugFix: Instrument loading now synchronised.
+* CLI enable/disable now updates panel.
+* set as V 1.5.4.1 rc1
 
 2017-9-27 Will
 * Merged in noboost branch. So no dependency on boost.

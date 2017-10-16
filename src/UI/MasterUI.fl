@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified September 2017
+Modified October 2017
 
 } {in_source in_header
 }
@@ -363,7 +363,7 @@ class MasterUI {selected : {private GuiUpdates}
                 filename = fl_file_chooser("Load:", "({*.xiz})", NULL, 0);
                 if (filename == NULL)
                     return;
-                synth->writeRBP(5, npart,miscMsgPush(filename));}
+                send_data(78, npart, 0xc8, 240, 255, 255, 255, miscMsgPush(filename));}
             tooltip {Load an instrument (.xiz) file} xywh {30 30 100 20} labelsize 12
           }
           MenuItem {} {
@@ -1128,7 +1128,6 @@ ZynAddSubFX}
     unsigned char insert = getData->data.insert;
     unsigned char par2 = getData->data.par2;
     int nval = lrint(value);
-    bool check = true;
     if (npart == 0xf1)
     {
         if (insert == 16)
@@ -1154,7 +1153,6 @@ ZynAddSubFX}
                 showSysEfxUI();
             }
         }
-        Fl::check();
         return;
     }
     else if (npart == 0xf2)
@@ -1162,7 +1160,7 @@ ZynAddSubFX}
         if (control == 0)
         {
             ninseff = engine;
-            setInsEff(ninseff);;
+            setInsEff(ninseff);
         }
         else if (control == 1)
         {
@@ -1178,7 +1176,6 @@ ZynAddSubFX}
             else
                 insefftype->activate();
         }
-        Fl::check();
         return;
     }
     string name;
@@ -1190,7 +1187,6 @@ ZynAddSubFX}
             break;
 
         case 14:
-            check = false;
             partuigroup->remove(partui);
             delete partui;
             partui = new PartUI(0, 0, 765, 525);
@@ -1332,9 +1328,7 @@ ZynAddSubFX}
                 }
             }
             break;
-    }
-    if (check)
-        Fl::check();} {}
+    }} {}
   }
   Function {updatesendwindow()} {} {
     code {//
@@ -1814,8 +1808,7 @@ ZynAddSubFX}
     {
         Reports->deactivate();
         yoshiLog->Hide();
-    }
-    Fl::check();} {}
+    }} {}
   }
   Function {showInstrumentEditWindow(int _npart)} {} {
     code {//
