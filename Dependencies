@@ -1,4 +1,4 @@
-Packages known to be needed to build in debian jessie.
+Packages known to be needed to build in debian jessie and later.
 Some of these will pull in other ones.
 
     automake

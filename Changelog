@@ -1,4 +1,8 @@
-yoshimi 1.5.4.1
+yoshimi 1.5.4 M
+
+2017-10-20 Will
+* Doc updates.
+* Added missing limits.h include to MiscFuncs.
 
 2017-10-16 Will
 * Finalised and cleaned up bugfix code.

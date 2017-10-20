@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>
 
-    Modifed July 2017
+    Modifed October 2017
 */
 
 #include <sys/stat.h>
@@ -29,6 +29,7 @@
 #include <iostream>
 #include <string.h>
 #include <mutex>
+#include <limits.h>
 
 using namespace std;
 
