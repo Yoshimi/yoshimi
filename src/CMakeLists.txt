@@ -118,6 +118,22 @@ else (PKG_CONFIG_FOUND)
     message(FATAL_ERROR "pkg-config required but not found")
 endif (PKG_CONFIG_FOUND)
 
+include (CheckFunctionExists)
+check_function_exists(random_r HAVE_RANDOM_R)
+
+# musl systems don’t have random_r() and also need argp-standalone
+if (HAVE_RANDOM_R)
+    add_definitions(-DHAVE_RANDOM_R=1)
+else(HAVE_RANDOM_R)
+    add_definitions(-DHAVE_RANDOM_R=0)
+    find_library (ARGP_LIB argp REQUIRED)
+    if (ARGP_LIB)
+        message(STATUS "Found argp")
+    else(ARGP_LIB)
+        message(FATAL_ERROR "argp required but not found")
+    endif(ARGP_LIB)
+endif(HAVE_RANDOM_R)
+
 # libz
 set (CMAKE_REQUIRED_LIBRARIES z)
 check_c_source_compiles (
@@ -496,6 +512,10 @@ set(ExternLibraries
 add_executable (yoshimi ${ProgSources} main.cpp)
 
 target_link_libraries (yoshimi ${ExternLibraries})
+
+if (NOT HAVE_RANDOM_R)
+    target_link_libraries (yoshimi ${ARGP_LIB})
+endif(NOT HAVE_RANDOM_R)
 
 install (TARGETS yoshimi RUNTIME DESTINATION bin)
 

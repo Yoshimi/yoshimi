@@ -137,7 +137,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void ClearNRPNs(void);
         void resetAll(void);
         float numRandom(void);
-        unsigned int random(void);
+        unsigned int randomSE(void);
         void ShutUp(void);
         void allStop(unsigned int stopType);
         int MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process = 0);
@@ -269,9 +269,16 @@ class SynthEngine : private SynthHelper, MiscFuncs
         XMLwrapper *stateXMLtree;
 
         char random_state[256];
+        float random_0_1;
+        int ret;
+
+#if (HAVE_RANDOM_R)
         struct random_data random_buf;
         int32_t random_result;
-        float random_0_1;
+#else
+        long int random_result;
+#endif
+
     public:
         MasterUI *guiMaster; // need to read this in InterChange::returns
     private:
@@ -285,7 +292,14 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
 inline float SynthEngine::numRandom(void)
 {
-    if (!random_r(&random_buf, &random_result))
+#if (HAVE_RANDOM_R)
+    ret = random_r(&random_buf, &random_result);
+#else
+    random_result = random();
+    ret = 0;
+#endif
+
+    if (!ret)
     {
         random_0_1 = (float)random_result / (float)INT_MAX;
         random_0_1 = (random_0_1 > 1.0f) ? 1.0f : random_0_1;
@@ -295,11 +309,16 @@ inline float SynthEngine::numRandom(void)
     return 0.05f;
 }
 
-inline unsigned int SynthEngine::random(void)
+inline unsigned int SynthEngine::randomSE(void)
 {
+#if (HAVE_RANDOM_R)
     if (!random_r(&random_buf, &random_result))
         return random_result + INT_MAX / 2;
     return INT_MAX / 2;
+#else
+    random_result = random();
+    return (unsigned int)random_result + INT_MAX / 2;
+#endif
 }
 
 #endif
