@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2016, Will Godfrey & others
+    Copyright 2014-2017, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified September 2017
+    Modified October 2017
 */
 
 #ifndef SYNTHENGINE_H
@@ -270,7 +270,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         char random_state[256];
         float random_0_1;
-        int ret;
 
 #if (HAVE_RANDOM_R)
         struct random_data random_buf;
@@ -292,6 +291,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
 inline float SynthEngine::numRandom(void)
 {
+    int ret;
 #if (HAVE_RANDOM_R)
     ret = random_r(&random_buf, &random_result);
 #else

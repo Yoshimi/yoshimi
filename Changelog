@@ -1,5 +1,10 @@
 yoshimi 1.5.4 M
 
+2017-10-21 Will
+* Minor adjustments to musl patch from newbluemoon.
+* Further code cleanups.
+* Doc updates.
+
 2017-10-20 Will
 * Doc updates.
 * Added missing limits.h include to MiscFuncs.

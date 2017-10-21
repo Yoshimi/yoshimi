@@ -119,20 +119,20 @@ else (PKG_CONFIG_FOUND)
 endif (PKG_CONFIG_FOUND)
 
 include (CheckFunctionExists)
-check_function_exists(random_r HAVE_RANDOM_R)
+check_function_exists(random_r randomR)
 
 # musl systems don’t have random_r() and also need argp-standalone
-if (HAVE_RANDOM_R)
-    add_definitions(-DHAVE_RANDOM_R=1)
-else(HAVE_RANDOM_R)
-    add_definitions(-DHAVE_RANDOM_R=0)
+if (randomR)
+    add_definitions(-DHAVE_RANDOM_R)
+    message(STATUS "Found random_r")
+else(randomR)
     find_library (ARGP_LIB argp REQUIRED)
     if (ARGP_LIB)
         message(STATUS "Found argp")
     else(ARGP_LIB)
         message(FATAL_ERROR "argp required but not found")
     endif(ARGP_LIB)
-endif(HAVE_RANDOM_R)
+endif(randomR)
 
 # libz
 set (CMAKE_REQUIRED_LIBRARIES z)

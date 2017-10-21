@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2017 Will Godfrey & others.
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of original ZynAddSubFX code, modified January 2011
+    This file is derivative of original ZynAddSubFX code.
+
+    Modified October 2017
 */
 
 #ifndef OSCIL_GEN_H
@@ -205,7 +208,6 @@ class OscilGen : public Presets, private WaveShapeSamples
 
         float random_0_1;
         char random_state[256];
-        int ret;
 
 #if (HAVE_RANDOM_R)
         int32_t random_result;
@@ -228,6 +230,7 @@ class OscilGen : public Presets, private WaveShapeSamples
 
 inline float OscilGen::numRandom(void)
 {
+    int ret;
 #if (HAVE_RANDOM_R)
     ret = random_r(&random_buf, &random_result);
 #else
@@ -238,22 +241,6 @@ inline float OscilGen::numRandom(void)
     if (!ret)
     {
         random_0_1 = (float)random_result / (float)INT_MAX;
-        if (isgreater(random_0_1, 1.0f))
-            random_0_1 = 1.0f;
-        else if (isless(random_0_1, 0.0f))
-            random_0_1 = 0.0f;
-        return random_0_1;
-    }
-    return 0.05f;
-}
-
-
-/**
-inline float OscilGen::numRandom(void)
-{
-    if (!random_r(&random_buf, &random_result))
-    {
-        random_0_1 = (float)random_result / (float)INT_MAX;
         random_0_1 = (random_0_1 > 1.0f) ? 1.0f : random_0_1;
         random_0_1 = (random_0_1 < 0.0f) ? 0.0f : random_0_1;
         return random_0_1;
@@ -261,11 +248,10 @@ inline float OscilGen::numRandom(void)
     return 0.05f;
 }
 
-**/
-
 
 inline float OscilGen::harmonicRandom(void)
 {
+    int ret;
 #if (HAVE_RANDOM_R)
     ret = random_r(&harmonic_random_buf, &harmonic_random_result);
 #else

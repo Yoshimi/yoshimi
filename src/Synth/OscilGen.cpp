@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011 Alan Calvert
     Copyright 2009 James Morris
-    Copyright 2016 Will Godfrey
+    Copyright 2016-2017 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -21,7 +21,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified December 2016
+    This file is a derivative of a ZynAddSubFX original.
+
+    Modified October 2017
 */
 
 #include <cmath>
@@ -947,7 +949,6 @@ void OscilGen::shiftharmonics(void)
 // Prepare the Oscillator
 void OscilGen::prepare(void)
 {
-    //int i, j, k;
     float a, b, c, d, hmagnew;
     memset(random_state, 0, sizeof(random_state));
 #if (HAVE_RANDOM_R)
@@ -1295,8 +1296,6 @@ int OscilGen::get(float *smps, float freqHz, int resonance)
     // Harmonic Amplitude Randomness
     if (freqHz > 0.1 && !ADvsPAD)
     {
-        // unsigned int realrnd = random();
-//        srandom_r(randseed, &harmonic_random_buf);
         memset(harmonic_random_state, 0, sizeof(harmonic_random_state));
 #if (HAVE_RANDOM_R)
         memset(&harmonic_random_buf, 0, sizeof(harmonic_random_buf));
@@ -1335,7 +1334,6 @@ int OscilGen::get(float *smps, float freqHz, int resonance)
                 }
                 break;
         }
-        // srandom_r(realrnd + 1, &random_data_buf);
     }
 
     if (freqHz > 0.1 && resonance != 0)
