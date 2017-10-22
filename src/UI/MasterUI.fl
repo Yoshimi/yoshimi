@@ -1478,8 +1478,7 @@ ZynAddSubFX}
          partui->midich->textcolor(FL_WHITE);
          partui->midich->redraw();
     }
-    npartcounter->do_callback();
-    updatepanel();} {}
+    partNew(_npart);} {}
   }
   Function {updateeffects(int data)} {} {
     code {//

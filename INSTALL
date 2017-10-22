@@ -10,7 +10,7 @@ It's a CMake build.  Simply cd to the src directory, then
 which builds an executable called yoshimi, installed by default in
     /usr/local/bin.
 
-If you have a multi-core processor, and know how many cores there are you can speed up compiling by entring
+If you have a multi-core processor, and know how many cores there are you can speed up compiling by entering
     make -j{n}
 where {n} is the number of cores.
 

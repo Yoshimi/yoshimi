@@ -1,5 +1,9 @@
 yoshimi 1.5.4 M
 
+2017-10-22 Will
+* Improved GUI behaviour on part changes.
+* More doc updates.
+
 2017-10-21 Will
 * Minor adjustments to musl patch from newbluemoon.
 * Further code cleanups.

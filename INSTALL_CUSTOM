@@ -29,6 +29,22 @@ The next option 'ShowGuiReports' is intended as a tool for developers, and will 
 Finally, there is 'ShowNoteOnTimes'. This is an option to display the time it takes for a note to be generated and is again for the benefit of developers.
 
 
+---- Build for 32 bit ----
+
+Sometimes you want to build for a machine that has a 64 bit processor but is running in 32 bit mode. This is what you need to do.
+
+cd to yoshimi source directory and before and:
+
+mkdir build-32
+
+cd build-32
+
+CC='gcc -m32' CXX='g++ -m32' cmake ../src
+
+make
+
+Remember all lib32- dependencies should be installed prior to building.
+
 ---- Help ----
 
 If you get stuck, ask for help on:

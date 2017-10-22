@@ -991,16 +991,20 @@ bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
 
     if (!loadOK)
     {
-        partonoffLock(npart, 2);
+        partonoffLock(npart, 2); // as before
         //GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Could not load " + fname));
     }
     else
     {
-        partonoffLock(npart, 2 - Runtime.enable_part_on_voice_load);
-        // on if enabled, otherwise as before
-        //if (part[npart]->Pname == "Simple Sound")
-            //GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Instrument is called 'Simple Sound', Yoshimi's basic sound name. You should change this if you wish to re-save."));
+        partonoffLock(npart, 2 - Runtime.enable_part_on_voice_load); // always on if enabled
+
+        /* error messages need to be made GUI sourced only
+
+        if (part[npart]->Pname == "Simple Sound")
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Instrument is called 'Simple Sound', Yoshimi's basic sound name. You should change this if you wish to re-save."));
+        */
         Runtime.Log(loaded);
+        Runtime.currentPart = npart;
         GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
     }
     return loadOK;
