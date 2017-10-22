@@ -105,7 +105,7 @@ set (BuildOptionsThisCPU
 
 set (BuildOptionsBasic
     "-O3 -msse -msse2 -mfpmath=sse -ffast-math -fomit-frame-pointer"
-    CACHE STRING "basic X86 complier options"
+    CACHE STRING "basic X86 compilier options"
 )
 
 set (BuildOptionsDebug
@@ -119,20 +119,32 @@ else (PKG_CONFIG_FOUND)
 endif (PKG_CONFIG_FOUND)
 
 include (CheckFunctionExists)
+# musl systems don’t have random_r() and also need argp-standalone
 check_function_exists(random_r randomR)
 
-# musl systems don’t have random_r() and also need argp-standalone
 if (randomR)
     add_definitions(-DHAVE_RANDOM_R)
-    message(STATUS "Found random_r")
-else(randomR)
+endif(randomR)
+
+check_c_source_compiles (
+    "#include <argp.h>
+     int main () {
+         int argc=1;
+         char *argv[]={\"test\"};
+         argp_parse(0,argc,argv,0,0,0);
+         return 0;
+     }" LIBC_HAS_ARGP
+)
+
+if (NOT LIBC_HAS_ARGP)
+    message(STATUS "libc does not have argp")
     find_library (ARGP_LIB argp REQUIRED)
     if (ARGP_LIB)
-        message(STATUS "Found argp")
+        message(STATUS "Found libargp")
     else(ARGP_LIB)
-        message(FATAL_ERROR "argp required but not found")
+        message(FATAL_ERROR "libargp required but not found")
     endif(ARGP_LIB)
-endif(randomR)
+endif(NOT LIBC_HAS_ARGP)
 
 # libz
 set (CMAKE_REQUIRED_LIBRARIES z)
@@ -513,9 +525,9 @@ add_executable (yoshimi ${ProgSources} main.cpp)
 
 target_link_libraries (yoshimi ${ExternLibraries})
 
-if (NOT HAVE_RANDOM_R)
+if (ARGP_LIB)
     target_link_libraries (yoshimi ${ARGP_LIB})
-endif(NOT HAVE_RANDOM_R)
+endif(ARGP_LIB)
 
 install (TARGETS yoshimi RUNTIME DESTINATION bin)
 
