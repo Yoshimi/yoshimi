@@ -1343,13 +1343,6 @@ ZynAddSubFX}
   }
   Function {updatepanel()} {} {
     code {//
-    for (int npart = 0; npart < partmax; ++npart)
-    {
-        if (npart < NUM_MIDI_CHANNELS)
-            panellistitem[npart]->refresh();
-        vectorui->setInstrumentLabel(npart);
-    }
-
     if (synth->getRuntime().single_row_panel)
     {
             panelwindow->size(1085,345);
@@ -1371,6 +1364,13 @@ ZynAddSubFX}
             channelswitch->position(130,653);
             CSspinner->position(216,653);
             CSpend->position(276,651);
+    }
+
+    for (int npart = 0; npart < partmax; ++npart)
+    {
+        if (npart < NUM_MIDI_CHANNELS)
+            panellistitem[npart]->refresh();
+        vectorui->setInstrumentLabel(npart);
     }
 
     if (partmax == 64)
@@ -1418,7 +1418,7 @@ ZynAddSubFX}
     npartcounter->value(nval + 1);
     npartcounter->redraw();
     npart = nval;
-    updatepanel();} {}
+    updatelistitem(npart);} {}
   }
   Function {updatepart()} {} {
     code {//

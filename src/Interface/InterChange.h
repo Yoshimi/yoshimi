@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified September 2017
+    Modified October 2017
 */
 
 #ifndef INTERCH_H
@@ -95,6 +95,7 @@ class InterChange : private MiscFuncs
         string resolveEffects(CommandBlock *getData);
         bool showValue;
 
+        void commandMidi(CommandBlock *getData);
         void commandVector(CommandBlock *getData);
         void commandMicrotonal(CommandBlock *getData);
         void commandConfig(CommandBlock *getData);

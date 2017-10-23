@@ -3130,6 +3130,12 @@ bool InterChange::commandSend(CommandBlock *getData)
 
 bool InterChange::commandSendReal(CommandBlock *getData)
 {
+    unsigned char npart = getData->data.part;
+    if (npart == 0xD9)
+    {
+        commandMidi(getData);
+        return false;
+    }
     float value = getData->data.value;
     unsigned char parameter = getData->data.parameter;
     if ((parameter & 0x80) && parameter < 0xc0)
@@ -3142,7 +3148,6 @@ bool InterChange::commandSendReal(CommandBlock *getData)
 
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
@@ -3322,6 +3327,39 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     return false;
 }
 
+
+void InterChange::commandMidi(CommandBlock *getData)
+{
+    unsigned char control = getData->data.control;
+    unsigned char chan = getData->data.kit;
+    unsigned char par1 = getData->data.engine;
+    unsigned char par2 = getData->data.insert;
+    //unsigned char par3 = getData->data.parameter;
+
+    switch(control)
+    {
+        case 0:
+            synth->NoteOn(chan, par1, par2);
+            break;
+        case 1:
+            synth->NoteOff(chan, par1);
+            break;
+        case 2:
+            synth->SetController(chan, par1, par2);
+            break;
+        case 3:
+            ;
+            break;
+        case 4:
+            ;
+            break;
+        case 5:
+            ;
+            break;
+    }
+    synth->getRuntime().finishedCLI = true;
+    getData->data.type = 0xff; // till we know what to do!
+}
 
 void InterChange::commandVector(CommandBlock *getData)
 {

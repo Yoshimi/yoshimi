@@ -1,5 +1,10 @@
 yoshimi 1.5.4 M
 
+2017-10-23 Will
+* GUI improvements to mixer panel.
+* Direct access to NoteOn, NoteOff, SetController.
+* Updated dev_notes/Yoshimi Control Numbers.ods
+
 2017-10-22 Will
 * Improved GUI behaviour on part changes.
 * More doc updates.
