@@ -3330,22 +3330,28 @@ bool InterChange::commandSendReal(CommandBlock *getData)
 
 void InterChange::commandMidi(CommandBlock *getData)
 {
+    int value_int = lrint(getData->data.value);
     unsigned char control = getData->data.control;
     unsigned char chan = getData->data.kit;
-    unsigned char par1 = getData->data.engine;
-    unsigned char par2 = getData->data.insert;
+    unsigned int par1 = getData->data.engine;
+    //unsigned char par2 = getData->data.insert;
     //unsigned char par3 = getData->data.parameter;
+
+    cout << "value " << value_int << "  control " << int(control) << "  chan " << int(chan) << "  par1 " << par1 << endl;
+
+    if (control == 2 && par1 >= 0x80)
+        par1 |= 0x200; // for 'specials'
 
     switch(control)
     {
         case 0:
-            synth->NoteOn(chan, par1, par2);
+            synth->NoteOn(chan, par1, value_int);
             break;
         case 1:
             synth->NoteOff(chan, par1);
             break;
         case 2:
-            synth->SetController(chan, par1, par2);
+            synth->SetController(chan, par1, value_int);
             break;
         case 3:
             ;
