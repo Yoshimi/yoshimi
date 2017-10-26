@@ -167,9 +167,9 @@ this->pars=pars;} {}
         float spc[n];
         for (int i = 0; i < n; i++)
             spc[i] = 0.0;
-        synth->actionLock(lock);
+        synth->actionLock(lockType);
         pars->oscilgen->getspectrum(n, spc, 0);
-        synth->actionLock(unlock);
+        synth->actionLock(unlockType);
 
         //normalize
         float max = 0;

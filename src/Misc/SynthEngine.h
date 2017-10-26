@@ -46,7 +46,7 @@ using namespace std;
 #include "Misc/Config.h"
 #include "Params/PresetsStore.h"
 
-typedef enum { init, lock, unlock, destroy } lockset;
+typedef enum { init, lockType, unlockType, destroy } lockset;
 
 class EffectMgr;
 class Part;
@@ -109,6 +109,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void SetController(unsigned char chan, int type, short int par);
         void SetZynControls();
         void SetEffects(unsigned char category, unsigned char command, unsigned char nFX, unsigned char nType, int nPar, unsigned char value);
+        void SetRBP(CommandBlock *getData);
         void SetBankRoot(int rootnum);
         void SetBank(int banknum);
         int ReadBankRoot(void);

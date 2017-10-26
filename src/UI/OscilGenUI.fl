@@ -1436,9 +1436,9 @@ class OscilEditor {selected : {public PresetsUI_}
     for (int i=0;i<MAX_AD_HARMONICS;i++)
         h[i]->refresh();
 
-    synth->actionLock(lock);
+    synth->actionLock(lockType);
     oscil->prepare();
-    synth->actionLock(unlock);
+    synth->actionLock(unlockType);
 
     basefuncdisplaygroup->redraw();
     redrawoscil();} {}

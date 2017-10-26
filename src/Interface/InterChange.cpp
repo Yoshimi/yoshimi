@@ -269,8 +269,10 @@ void InterChange::transfertext(CommandBlock *getData)
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
+    //unsigned char par2 = getData->data.par2;
     bool (write) = (type & 0x40);
     string text;
     if (getData->data.par2 < 0xff)
@@ -519,6 +521,15 @@ void InterChange::transfertext(CommandBlock *getData)
                 break;
         }
         getData->data.parameter &= 0x7f;
+    }
+
+    if (npart == 0xd9)
+    {
+        cout << " interchange prog " << value << "  chan " << int(kititem) << "  bank " << int(engine) << "  root " << int(insert) << endl;
+        if (text > "")
+            getData->data.par2 = miscMsgPush(text);
+        synth->SetRBP(getData);
+        synth->getRuntime().finishedCLI = true; // temp
     }
 
     if (getData->data.parameter < 0x80 && jack_ringbuffer_write_space(returnsLoopback) >= commandSize)
@@ -3333,25 +3344,30 @@ void InterChange::commandMidi(CommandBlock *getData)
     int value_int = lrint(getData->data.value);
     unsigned char control = getData->data.control;
     unsigned char chan = getData->data.kit;
-    unsigned int par1 = getData->data.engine;
-    //unsigned char par2 = getData->data.insert;
-    //unsigned char par3 = getData->data.parameter;
+    unsigned int char1 = getData->data.engine;
+    //unsigned char char2 = getData->data.insert;
+    //unsigned char parameter = getData->data.parameter;
+    unsigned char par2 = getData->data.par2;
 
-    cout << "value " << value_int << "  control " << int(control) << "  chan " << int(chan) << "  par1 " << par1 << endl;
+    //cout << "value " << value_int << "  control " << int(control) << "  chan " << int(chan) << "  char1 " << char1 << "  char2 " << int(char2) << "  param " << int(parameter) << "  par2 " << int(par2) << endl;
 
-    if (control == 2 && par1 >= 0x80)
-        par1 |= 0x200; // for 'specials'
+    if (control == 2 && char1 >= 0x80)
+        char1 |= 0x200; // for 'specials'
 
     switch(control)
     {
         case 0:
-            synth->NoteOn(chan, par1, value_int);
+            synth->NoteOn(chan, char1, value_int);
             break;
         case 1:
-            synth->NoteOff(chan, par1);
+            synth->NoteOff(chan, char1);
+            synth->getRuntime().finishedCLI = true;
+            getData->data.type = 0xff; // till we know what to do!
             break;
         case 2:
-            synth->SetController(chan, par1, value_int);
+            synth->SetController(chan, char1, value_int);
+            synth->getRuntime().finishedCLI = true;
+            getData->data.type = 0xff; // till we know what to do!
             break;
         case 3:
             ;
@@ -3359,12 +3375,19 @@ void InterChange::commandMidi(CommandBlock *getData)
         case 4:
             ;
             break;
-        case 5:
-            ;
+        case 8:
+            getData->data.parameter = 0x80;
+            if ((value_int < 0xff || par2 < 0xff) && chan < synth->getRuntime().NumAvailableParts)
+                //if (chan >= NUM_MIDI_CHANNELS) // individual parts
+                    synth->partonoffLock(chan & 0x7f, -1);
+                //else // normal channels
+                    //for (int i = 0; i < NUM_MIDI_CHANNELS)
+                    {
+                    //    if (if (chan == part[i]->Prcvchn)
+                    //        synth->partonoffLock(i, -1);
+                    }
             break;
     }
-    synth->getRuntime().finishedCLI = true;
-    getData->data.type = 0xff; // till we know what to do!
 }
 
 void InterChange::commandVector(CommandBlock *getData)

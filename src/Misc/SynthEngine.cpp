@@ -604,11 +604,11 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
                if (partonoffRead(npart))
                 {
 #ifdef MUTEX
-                    actionLock(lock);
+                    actionLock(lockType);
 #endif
                     part[npart]->NoteOn(note, velocity, keyshift);
 #ifdef MUTEX
-                    actionLock(unlock);
+                    actionLock(unlockType);
 #endif
                 }
                 else if (VUpeak.values.parts[npart] > (-velocity))
@@ -640,11 +640,11 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
         if (chan == (part[npart]->Prcvchn & 0xef) && partonoffRead(npart))
         {
 #ifdef MUTEX
-            actionLock(lock);
+            actionLock(lockType);
 #endif
             part[npart]->NoteOff(note);
 #ifdef MUTEX
-            actionLock(unlock);
+            actionLock(unlockType);
 #endif
         }
     }
@@ -818,6 +818,102 @@ void SynthEngine::SetEffects(unsigned char category, unsigned char command, unsi
             break;
     }
     GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateEffects, data);
+}
+
+
+void SynthEngine::SetRBP(CommandBlock *getData)
+{
+    int program = lrint(getData->data.value);
+    int npart = getData->data.kit;
+    int banknum = getData->data.engine;
+    int root = getData->data.insert;
+    int par2 = getData->data.par2;
+
+    string name;
+    int foundRoot;
+    int originalRoot = bank.getCurrentRootID();
+    int originalBank = bank.getCurrentBankID();
+    bool ok = true;
+
+    if (root <= 127)
+    {
+        if (bank.setCurrentRootID(root))
+        {
+            foundRoot = bank.getCurrentRootID();
+            if (foundRoot != root)
+            { // abort and recover old settings
+                bank.setCurrentRootID(originalRoot);
+                bank.setCurrentBankID(originalBank);
+                foundRoot = originalRoot;
+            }
+            name = asString(foundRoot) + " \"" + bank.getRootPath(foundRoot) + "\"";
+            if (root != foundRoot)
+            {
+                ok = false;
+                name = "Cant find ID " + asString(root) + ". Current root is " + name;
+            }
+            else
+            {
+                name = "Root set to " + name;
+            }
+        }
+        else
+        {
+            ok = false;
+            name = "No match for root ID " + asString(root);
+        }
+        cout << name << endl;
+    }
+
+    if (ok && banknum <= 127)
+    {
+        if (bank.setCurrentBankID(banknum, true))
+        {
+            name = "Bank set to " + asString(banknum) + " \"" + bank.roots [bank.currentRootID].banks [banknum].dirname + "\"";
+        }
+        else
+        {
+            ok = false;
+            name = "No bank " + asString(banknum)+ " in this root. Current bank is " + asString(ReadBank());
+        }
+        cout << name << endl;
+    }
+    if (program < 0xff || par2 < 0xff)
+    {
+        if (ok)
+        {
+            string fname;
+            if (program < 0xff)
+                fname = bank.getfilename(program);
+            else
+                fname = miscMsgPop(par2);
+            if (findleafname(fname) < "!") // can't get a program name less than this
+            {
+                name = "Can't find instrument ";
+                if (program < 0xff)
+                    name = name + asString(program + 1) + " in this bank";
+                else
+                    name += fname;
+                ok = false;
+            }
+            else
+            {
+                if (part[npart]->loadXMLinstrument(fname))
+                    name = "Loaded ";
+                else
+                {
+                    name = "Failed to load ";
+                    ok = false;
+                }
+                name += fname;
+            }
+            if (!ok)
+                partonoffLock(npart, 2); // as it was
+            else
+                partonoffLock(npart, 2 - Runtime.enable_part_on_voice_load); // always on if enabled
+            cout << name << endl;
+        }
+    }
 }
 
 
@@ -2183,7 +2279,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
     else
     {
 #ifdef MUTEX
-        actionLock(lock);
+        actionLock(lockType);
 #endif
         // Compute part samples and store them ->partoutl,partoutr
         for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
@@ -2337,7 +2433,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             }
         }
 #ifdef MUTEX
-        actionLock(unlock);
+        actionLock(unlockType);
 #endif
         // Peak calculation for mixed outputs
         VUpeak.values.vuRmsPeakL = 1e-12f;
@@ -2487,11 +2583,11 @@ bool SynthEngine::actionLock(lockset request)
 
     switch (request)
     {
-        case lock:
+        case lockType:
             chk = pthread_mutex_lock(processLock);
             break;
 
-        case unlock:
+        case unlockType:
             chk = pthread_mutex_unlock(processLock);
             break;
 

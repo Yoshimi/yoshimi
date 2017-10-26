@@ -1417,8 +1417,9 @@ ZynAddSubFX}
     partui->redraw();
     npartcounter->value(nval + 1);
     npartcounter->redraw();
-    npart = nval;
-    updatelistitem(npart);} {}
+    updatelistitem(npart);
+    updatelistitem(nval);
+    npart = nval;} {}
   }
   Function {updatepart()} {} {
     code {//
