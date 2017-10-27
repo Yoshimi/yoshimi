@@ -532,13 +532,15 @@ set(ExternLibraries
     dl
 )
 
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
+    link_directories(/usr/local/lib)
+endif()
+
 add_executable (yoshimi ${ProgSources} main.cpp)
 
 target_link_libraries (yoshimi ${ExternLibraries})
 
-if("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
-    link_directories(/usr/local/lib)
-endif()
+
 
 if (ARGP_LIB)
     target_link_libraries (yoshimi ${ARGP_LIB})
