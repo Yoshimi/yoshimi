@@ -27,6 +27,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <set>
+#include <unistd.h>
 
 string audio_drivers_str [] = {"no_audio", "jack_audio"
 #if defined(HAVE_ALSA)
