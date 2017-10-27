@@ -25,6 +25,7 @@
 #define MUSIC_CLIENT_H
 
 #include <string>
+#include <pthread.h>
 
 using namespace std;
 
