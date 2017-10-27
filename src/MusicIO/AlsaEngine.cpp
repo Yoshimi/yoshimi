@@ -20,7 +20,7 @@
     Modified February 2017
 */
 
-#include <endian.h>
+//#include <endian.h>
 
 using namespace std;
 
