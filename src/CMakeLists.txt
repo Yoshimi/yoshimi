@@ -195,9 +195,9 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
 	message(FATAL_ERROR "Alsa >=1.0.17 required but not found")
     endif (ALSA_FOUND)
      add_definitions(-DHAVE_ALSA)
-else(CMAKE_SYSTEM_NAME)
+else()
     
-endif(CMAKE_SYSTEM_NAME)
+endif()
 
 # Jack
 pkg_check_modules (JACK REQUIRED jack>=0.115.6)
@@ -535,6 +535,10 @@ set(ExternLibraries
 add_executable (yoshimi ${ProgSources} main.cpp)
 
 target_link_libraries (yoshimi ${ExternLibraries})
+
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
+    link_directories(/usr/local/lib)
+endif()
 
 if (ARGP_LIB)
     target_link_libraries (yoshimi ${ARGP_LIB})
