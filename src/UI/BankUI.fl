@@ -1043,9 +1043,10 @@ class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
         {
             int ns = nselected;
             nselected = slot;
-            if (rs > 0)
+            if (rs){
                 rs[ns]->rootrefresh();
-            rs[slot]->rootrefresh();
+        	rs[slot]->rootrefresh();
+    	    }
         }
     }} {}
   }
