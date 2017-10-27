@@ -187,12 +187,17 @@ else (MXML_FOUND)
 endif (MXML_FOUND)
 
 # Alsa
-pkg_check_modules (ALSA REQUIRED alsa>=1.0.17)
-if (ALSA_FOUND)
-    message(STATUS "Found Alsa ${ALSA_VERSION}")
-else (ALSA_FOUND)
-    message(FATAL_ERROR "Alsa >=1.0.17 required but not found")
-endif (ALSA_FOUND)
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+    pkg_check_modules (ALSA REQUIRED alsa>=1.0.17)
+    if (ALSA_FOUND)
+	message(STATUS "Found Alsa ${ALSA_VERSION}")
+    else (ALSA_FOUND)
+	message(FATAL_ERROR "Alsa >=1.0.17 required but not found")
+    endif (ALSA_FOUND)
+     add_definitions(-DHAVE_ALSA)
+else(CMAKE_SYSTEM_NAME)
+    
+endif(CMAKE_SYSTEM_NAME)
 
 # Jack
 pkg_check_modules (JACK REQUIRED jack>=0.115.6)

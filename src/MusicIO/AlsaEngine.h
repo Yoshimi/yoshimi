@@ -20,6 +20,8 @@
     Modified January 2017
 */
 
+#if defined(HAVE_ALSA)
+
 #ifndef ALSA_ENGINE_H
 #define ALSA_ENGINE_H
 
@@ -100,5 +102,7 @@ class AlsaEngine : public MusicIO
             pthread_t           pThread;
         } midi;
 };
+
+#endif
 
 #endif

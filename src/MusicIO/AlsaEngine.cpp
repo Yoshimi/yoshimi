@@ -20,6 +20,8 @@
     Modified February 2017
 */
 
+#if defined(HAVE_ALSA)
+
 //#include <endian.h>
 
 using namespace std;
@@ -694,3 +696,5 @@ bool AlsaEngine::alsaBad(int op_result, string err_msg)
                      + string(snd_strerror(op_result)));
     return isbad;
 }
+
+#endif
