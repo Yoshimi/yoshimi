@@ -126,6 +126,12 @@ if (randomR)
     add_definitions(-DHAVE_RANDOM_R)
 endif(randomR)
 
+check_function_exists(exp10f EXP10F)
+
+if(EXP10F)
+    add_definitions(-DHAVE_EXP10F)
+endif(EXP10F)
+
 check_c_source_compiles (
     "#include <argp.h>
      int main () {
