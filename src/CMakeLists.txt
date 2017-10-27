@@ -194,7 +194,8 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
     else (ALSA_FOUND)
 	message(FATAL_ERROR "Alsa >=1.0.17 required but not found")
     endif (ALSA_FOUND)
-     add_definitions(-DHAVE_ALSA)
+    add_definitions(-DHAVE_ALSA)
+    FIND_LIBRARY(LIBDL_LINUX NAMES dl)
 else()
     
 endif()
@@ -529,7 +530,7 @@ set(ExternLibraries
     ${CURSES_LIBRARIES}
     ${Readline_LIBRARY}
     z
-    dl
+    ${LIBDL_LINUX_LIBS}
 )
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
