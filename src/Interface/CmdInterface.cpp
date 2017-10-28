@@ -127,6 +127,7 @@ string configlist [] = {
     "ACtivate [s]",             "program change activates part (Enable {other})",
     "Extended [s]",             "extended program change (Enable {other})",
     "Quiet [s]",                "ignore 'reset all controllers' (Enable {other})",
+    "Nrpn [s]",                 "incoming NRPN (Enable {other})",
     "Log [s]",                  "incoming MIDI CCs (Enable {other})",
     "SHow [s]",                 "GUI MIDI learn editor (Enable {other})",
     "end"
@@ -1494,6 +1495,11 @@ int CmdInterface::commandConfig()
     else if (matchnMove(2, point, "show"))
     {
         command = 74;
+        value = matchnMove(1, point, "enable");
+    }
+    else if (matchnMove(1, point, "nrpn"))
+    {
+        command = 75;
         value = matchnMove(1, point, "enable");
     }
 

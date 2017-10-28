@@ -1223,6 +1223,11 @@ string InterChange::resolveConfig(CommandBlock *getData)
             yesno = true;
             break;
 
+        case 75:
+            contstr += "Enable NRPN";
+            yesno = true;
+            break;
+
         case 80:
         {
             string name = miscMsgPop(value_int);
@@ -3997,6 +4002,12 @@ void InterChange::commandConfig(CommandBlock *getData)
                 synth->getRuntime().showLearnedCC = value_bool;
             else
                 value = synth->getRuntime().showLearnedCC;
+            break;
+        case 75:
+            if (write)
+                synth->getRuntime().enable_NRPN = value_bool;
+            else
+                value = synth->getRuntime().enable_NRPN;
             break;
 // save config
         case 80: //done elsewhere

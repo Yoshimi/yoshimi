@@ -23,7 +23,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified July 2017
+Modified October 2017
 } {in_source in_header
 }
 
@@ -607,6 +607,13 @@ class ConfigUI {selected : {private MiscFuncs}
             code0 {o->value((synth->getRuntime().midi_upper_voice_C < 128));}
             code1 {if (o->value() == 0) EPCspinner->deactivate();}
           }
+          Fl_Check_Button enableNRPN {
+            label {Enable Incoming NRPNs}
+            callback {//
+                        send_data(75, o->value(), 0xc0);}
+            xywh {234 210 18 18} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().enable_NRPN);}
+          }
           Fl_Check_Button ignoreReset {
             label {Ignore Reset all CCs}
             callback {//
@@ -898,6 +905,9 @@ class ConfigUI {selected : {private MiscFuncs}
                     break;
                 case 74:
                     midiLearned->value(value_bool);
+                    break;
+                case 75:
+                    enableNRPN->value(value_bool);
                     break;
 
                 case 80:

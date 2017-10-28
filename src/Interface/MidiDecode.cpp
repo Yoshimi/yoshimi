@@ -130,8 +130,6 @@ void MidiDecode::midiProcess(unsigned char par0, unsigned char par1, unsigned ch
 
 void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool in_place)
 {
-    int nLow;
-    int nHigh;
     if (synth->getRuntime().monitorCCin)
     {
         string ctltype;
@@ -191,108 +189,10 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
         return;
     }
 
-    if (ctrl == C_nrpnL || ctrl == C_nrpnH)
+    if (synth->getRuntime().enable_NRPN)
     {
-        if (ctrl == C_nrpnL)
-        {
-            if (synth->getRuntime().nrpnL != param)
-            {
-                synth->getRuntime().nrpnL = param;
-                unsigned char type = synth->getRuntime().nrpnH;
-                if (type >= 0x41 && type <= 0x43)
-                { // shortform
-                    if (param > 0x77) // disable it
-                    {
-                        synth->getRuntime().channelSwitchType = 0;
-                        synth->getRuntime().channelSwitchCC = 0x80;
-                    }
-                    else
-                    {
-                        synth->getRuntime().channelSwitchType = type & 3; // row/column/loop
-                        synth->getRuntime().channelSwitchCC = param;
-                    }
-                    return;
-                }
-                if (type == 0x44 && param == 0x44)
-                {
-                    synth->getRuntime().runSynth = false;
-                    return; // bye bye everyone
-                }
-                //synth->getRuntime().Log("Set nrpn LSB to " + asString(param));
-            }
-            nLow = param;
-            nHigh = synth->getRuntime().nrpnH;
-        }
-        else // MSB
-        {
-            if (synth->getRuntime().nrpnH != param)
-            {
-                synth->getRuntime().nrpnH = param;
-                //synth->getRuntime().Log("Set nrpn MSB to " + asString(param));
-            if (param == 0x41) // set shortform
-            {
-                synth->getRuntime().nrpnL = 0x7f;
-                return;
-            }
-            }
-            nHigh = param;
-            nLow = synth->getRuntime().nrpnL;
-        }
-        synth->getRuntime().dataL = 0x80; //  we've changed the NRPN
-        synth->getRuntime().dataH = 0x80; //  so these are now invalid
-        synth->getRuntime().nrpnActive = (nLow < 0x7f && nHigh < 0x7f);
-//        synth->getRuntime().Log("Status nrpn " + asString(synth->getRuntime().nrpnActive));
-        return;
-    }
-
-    if (synth->getRuntime().nrpnActive)
-    {
-        if (ctrl == C_dataI || ctrl == C_dataD)
-        { // translate these to C_dataL and C_dataH
-            int dHigh = synth->getRuntime().dataH;
-            int dLow = synth->getRuntime().dataL;
-
-            bool msbPar = (param >= 0x40);
-            param &= 0x3f;
-            if (ctrl == C_dataI)
-            {
-                if (msbPar)
-                {
-                    dHigh &= 0x7f; // clear disabled state
-                    param += dHigh;
-                    ctrl = C_dataH; // change controller type
-                }
-                else
-                {
-                    dLow &= 0x7f; // clear disabled state
-                    param += dLow;
-                    ctrl = C_dataL; // change controller type
-                }
-                if (param > 0x7f)
-                    param = 0x7f;
-            }
-            else
-            { // data decrement
-                if (msbPar)
-                {
-                    param = dHigh - param;
-                    ctrl = C_dataH; // change controller type
-                }
-                else
-                {
-                    param = dLow - param;
-                    ctrl = C_dataL; // change controller type
-                }
-                if (param < 0)
-                    param = 0;
-            }
-        }
-
-        if (ctrl == C_dataL || ctrl == C_dataH)
-        {
-            nrpnProcessData(ch, ctrl, param, in_place);
+        if (nrpnDecode(ch, ctrl, param, in_place))
             return;
-        }
     }
 
     unsigned char vecChan;
@@ -343,6 +243,117 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
 
     // do what's left!
     synth->SetController(ch, ctrl, param);
+}
+
+
+bool MidiDecode::nrpnDecode(unsigned char ch, int ctrl, int param, bool in_place)
+{
+    int nLow;
+    int nHigh;
+    if (ctrl == C_nrpnL || ctrl == C_nrpnH)
+    {
+        if (ctrl == C_nrpnL)
+        {
+            if (synth->getRuntime().nrpnL != param)
+            {
+                synth->getRuntime().nrpnL = param;
+                unsigned char type = synth->getRuntime().nrpnH;
+                if (type >= 0x41 && type <= 0x43)
+                { // shortform
+                    if (param > 0x77) // disable it
+                    {
+                        synth->getRuntime().channelSwitchType = 0;
+                        synth->getRuntime().channelSwitchCC = 0x80;
+                    }
+                    else
+                    {
+                        synth->getRuntime().channelSwitchType = type & 3; // row/column/loop
+                        synth->getRuntime().channelSwitchCC = param;
+                    }
+                    return true;
+                }
+                if (type == 0x44 && param == 0x44)
+                {
+                    synth->getRuntime().runSynth = false;
+                    return true; // bye bye everyone
+                }
+                //synth->getRuntime().Log("Set nrpn LSB to " + asString(param));
+            }
+            nLow = param;
+            nHigh = synth->getRuntime().nrpnH;
+        }
+        else // MSB
+        {
+            if (synth->getRuntime().nrpnH != param)
+            {
+                synth->getRuntime().nrpnH = param;
+                //synth->getRuntime().Log("Set nrpn MSB to " + asString(param));
+            if (param == 0x41) // set shortform
+            {
+                synth->getRuntime().nrpnL = 0x7f;
+                return true;
+            }
+            }
+            nHigh = param;
+            nLow = synth->getRuntime().nrpnL;
+        }
+        synth->getRuntime().dataL = 0x80; //  we've changed the NRPN
+        synth->getRuntime().dataH = 0x80; //  so these are now invalid
+        synth->getRuntime().nrpnActive = (nLow < 0x7f && nHigh < 0x7f);
+//        synth->getRuntime().Log("Status nrpn " + asString(synth->getRuntime().nrpnActive));
+        return true;
+    }
+
+    if (synth->getRuntime().nrpnActive)
+    {
+        if (ctrl == C_dataI || ctrl == C_dataD)
+        { // translate these to C_dataL and C_dataH
+            int dHigh = synth->getRuntime().dataH;
+            int dLow = synth->getRuntime().dataL;
+
+            bool msbPar = (param >= 0x40);
+            param &= 0x3f;
+            if (ctrl == C_dataI)
+            {
+                if (msbPar)
+                {
+                    dHigh &= 0x7f; // clear disabled state
+                    param += dHigh;
+                    ctrl = C_dataH; // change controller type
+                }
+                else
+                {
+                    dLow &= 0x7f; // clear disabled state
+                    param += dLow;
+                    ctrl = C_dataL; // change controller type
+                }
+                if (param > 0x7f)
+                    param = 0x7f;
+            }
+            else
+            { // data decrement
+                if (msbPar)
+                {
+                    param = dHigh - param;
+                    ctrl = C_dataH; // change controller type
+                }
+                else
+                {
+                    param = dLow - param;
+                    ctrl = C_dataL; // change controller type
+                }
+                if (param < 0)
+                    param = 0;
+            }
+        }
+
+        if (ctrl == C_dataL || ctrl == C_dataH)
+        {
+            nrpnProcessData(ch, ctrl, param, in_place);
+            return true;
+        }
+    }
+    return false;
 }
 
 
@@ -473,7 +484,7 @@ void MidiDecode::nrpnProcessData(unsigned char chan, int type, int par, bool in_
                           + "   par " + asString((int)par));
     */
 
-    // midi learn must come before everything else
+    // For NRPNs midi learn must come before everything else
     if (synth->midilearn.runMidiLearn(dHigh << 7 | par, 0x10000 | (nHigh << 7) | nLow , chan, in_place | 2))
         return;
 

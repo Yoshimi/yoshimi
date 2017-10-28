@@ -17,6 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+    Modified October 2017
 */
 
 #ifndef MIDIDECODE_H
@@ -45,6 +46,7 @@ class MidiDecode : private MiscFuncs
 
     private:
         void setMidiController(unsigned char ch, int ctrl, int param, bool in_place = false);
+        bool nrpnDecode(unsigned char ch, int ctrl, int param, bool in_place);
         bool nrpnRunVector(unsigned char ch, int ctrl, int param);
         void nrpnProcessData(unsigned char chan, int type, int par, bool in_place);
         void nrpnDirectPart(int dHigh, int par);

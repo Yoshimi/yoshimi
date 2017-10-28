@@ -2,6 +2,9 @@ yoshimi 1.5.4 M
 
 2017-10-28 Will
 * MIDI note on/off routing much simplified.
+* Further work splitting up MIDI routing.
+  NRPNs partially separated out
+* NRPNs can now be completely ignored.
 
 2017-10-26 Will
 * Corrected GUI panel anomally when changing parts.
