@@ -53,14 +53,14 @@ void MidiDecode::midiProcess(unsigned char par0, unsigned char par1, unsigned ch
 {
     if (synth->isMuted())
         return; // nobody listening!
-    unsigned char channel, note, velocity;
+    unsigned char channel;//, note, velocity;
     int ctrltype, par;
     channel = par0 & 0x0F;
     unsigned int ev = par0 & 0xF0;
     par = 0;
     switch (ev)
     {
-        case 0x80: // note-off
+        /*case 0x80: // note-off
             note = par1;
             setMidiNoteOff(channel, note);
             break;
@@ -75,7 +75,7 @@ void MidiDecode::midiProcess(unsigned char par0, unsigned char par1, unsigned ch
             }
             else
                 setMidiNoteOff(channel, note);
-            break;
+            break;*/
 
         case 0xA0: // key aftertouch
             ctrltype = C_channelpressure;
@@ -644,7 +644,7 @@ void MidiDecode::setMidiProgram(unsigned char ch, int prg, bool in_place)
 }
 
 
-void MidiDecode::setMidiNote(unsigned char channel, unsigned char note,
+/*void MidiDecode::setMidiNote(unsigned char channel, unsigned char note,
                            unsigned char velocity)
 {
     synth->NoteOn(channel, note, velocity);
@@ -654,5 +654,6 @@ void MidiDecode::setMidiNote(unsigned char channel, unsigned char note,
 void MidiDecode::setMidiNoteOff(unsigned char channel, unsigned char note)
 {
     synth->NoteOff(channel, note);
-}
+}*/
+
 

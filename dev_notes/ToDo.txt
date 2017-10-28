@@ -1,3 +1,5 @@
+can't edit uppder voice rows from panel
+
 still not fully converted:
     vectors
     root, bank, instrument loads & saves

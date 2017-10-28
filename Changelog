@@ -1,5 +1,8 @@
 yoshimi 1.5.4 M
 
+2017-10-28 Will
+* MIDI note on/off routing much simplified.
+
 2017-10-26 Will
 * Corrected GUI panel anomally when changing parts.
 * Started implimenting unified root/bank/program change.
@@ -8,7 +11,7 @@ yoshimi 1.5.4 M
 
 2017-10-24 Will
 * Revised parameters for direct midi controls.
-* Virtual keyboad now uses these, so threadsafe.
+* Virtual keyboard now uses these, so threadsafe.
 * Updated control numbers.
 
 2017-10-23 Will
