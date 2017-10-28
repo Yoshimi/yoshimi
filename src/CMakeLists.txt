@@ -126,6 +126,12 @@ if (randomR)
     add_definitions(-DHAVE_RANDOM_R)
 endif(randomR)
 
+check_function_exists(exp10f EXP10F)
+
+if(EXP10F)
+    add_definitions(-DHAVE_EXP10F)
+endif(EXP10F)
+
 check_c_source_compiles (
     "#include <argp.h>
      int main () {
@@ -181,12 +187,18 @@ else (MXML_FOUND)
 endif (MXML_FOUND)
 
 # Alsa
-pkg_check_modules (ALSA REQUIRED alsa>=1.0.17)
-if (ALSA_FOUND)
-    message(STATUS "Found Alsa ${ALSA_VERSION}")
-else (ALSA_FOUND)
-    message(FATAL_ERROR "Alsa >=1.0.17 required but not found")
-endif (ALSA_FOUND)
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+    pkg_check_modules (ALSA REQUIRED alsa>=1.0.17)
+    if (ALSA_FOUND)
+	message(STATUS "Found Alsa ${ALSA_VERSION}")
+    else (ALSA_FOUND)
+	message(FATAL_ERROR "Alsa >=1.0.17 required but not found")
+    endif (ALSA_FOUND)
+    add_definitions(-DHAVE_ALSA)
+    FIND_LIBRARY(LIBDL_LINUX NAMES dl)
+else()
+    
+endif()
 
 # Jack
 pkg_check_modules (JACK REQUIRED jack>=0.115.6)
@@ -518,12 +530,18 @@ set(ExternLibraries
     ${CURSES_LIBRARIES}
     ${Readline_LIBRARY}
     z
-    dl
+    ${LIBDL_LINUX_LIBS}
 )
+
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
+    link_directories(/usr/local/lib)
+endif()
 
 add_executable (yoshimi ${ProgSources} main.cpp)
 
 target_link_libraries (yoshimi ${ExternLibraries})
+
+
 
 if (ARGP_LIB)
     target_link_libraries (yoshimi ${ARGP_LIB})

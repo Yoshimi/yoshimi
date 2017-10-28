@@ -140,7 +140,7 @@ target_link_libraries(yoshimi_lv2
                       ${LIBCAIRO_LIBRARIES}
                       ${JACK_LIBRARIES}
                       z
-                      dl
+                      ${LIBDL_LINUX_LIBS}
 )
 
 add_dependencies(yoshimi_lv2 yoshimi_lv2_ttl)

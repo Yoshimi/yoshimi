@@ -23,7 +23,6 @@
 */
 
 #include <cstring>
-#include <sys/sysinfo.h>
 
 using namespace std;
 
