@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified September 2017
+    Modified October 2017
 */
 
 #include <iostream>
@@ -2757,9 +2757,9 @@ bool CmdInterface::cmdIfaceProcessCommand()
                         if (((control == 80 || control == 88) && part == 240) || ((param & 0x80) && param < 0xff))
                         {
                             string name = string(point);
-                            if (name < "!")
-                                name = "no file";
-                            par2 = miscMsgPush(name);
+                            if (name > "!")
+                                //name = "no file";
+                                par2 = miscMsgPush(name);
                             //cout << name << endl;
                         }
                         else if (point[0] != 0)

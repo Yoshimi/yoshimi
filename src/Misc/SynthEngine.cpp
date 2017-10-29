@@ -821,7 +821,7 @@ void SynthEngine::SetEffects(unsigned char category, unsigned char command, unsi
 }
 
 
-void SynthEngine::SetRBP(CommandBlock *getData)
+int SynthEngine::SetRBP(CommandBlock *getData)
 {
     int program = lrint(getData->data.value);
     int npart = getData->data.kit;
@@ -829,7 +829,7 @@ void SynthEngine::SetRBP(CommandBlock *getData)
     int root = getData->data.insert;
     int par2 = getData->data.par2;
 
-    string name;
+    string name = "";
     int foundRoot;
     int originalRoot = bank.getCurrentRootID();
     int originalBank = bank.getCurrentBankID();
@@ -862,58 +862,66 @@ void SynthEngine::SetRBP(CommandBlock *getData)
             ok = false;
             name = "No match for root ID " + asString(root);
         }
-        cout << name << endl;
     }
 
     if (ok && banknum <= 127)
     {
         if (bank.setCurrentBankID(banknum, true))
         {
-            name = "Bank set to " + asString(banknum) + " \"" + bank.roots [bank.currentRootID].banks [banknum].dirname + "\"";
+            if (root < 0xff)
+                name = "Root " + to_string(root) + ". ";
+            name = name + "Bank set to " + asString(banknum) + " \"" + bank.roots [bank.currentRootID].banks [banknum].dirname + "\"";
         }
         else
         {
             ok = false;
-            name = "No bank " + asString(banknum)+ " in this root. Current bank is " + asString(ReadBank());
-        }
-        cout << name << endl;
-    }
-    if (program < 0xff || par2 < 0xff)
-    {
-        if (ok)
-        {
-            string fname;
-            if (program < 0xff)
-                fname = bank.getfilename(program);
+            name = "No bank " + asString(banknum);
+            if(root < 0xff)
+                name += " root " + to_string(root) + ".";
             else
-                fname = miscMsgPop(par2);
-            if (findleafname(fname) < "!") // can't get a program name less than this
+                name += " in this root.";
+            name += " Current bank is " + asString(ReadBank());
+        }
+    }
+    if (ok && (program < 0xff || par2 < 0xff))
+    {
+        string fname;
+        if (program < 0xff)
+            fname = bank.getfilename(program);
+        else
+            fname = miscMsgPop(par2);
+        if (findleafname(fname) < "!") // can't get a program name less than this
+        {
+            name = "Can't find instrument ";
+            if (program < 0xff)
+                name = findleafname(name) + asString(program + 1) + " in this bank";
+            else
+                name += fname;
+            ok = false;
+        }
+        else
+        {
+            if (part[npart]->loadXMLinstrument(fname))
+                name = "Loaded ";
+            else
             {
-                name = "Can't find instrument ";
-                if (program < 0xff)
-                    name = name + asString(program + 1) + " in this bank";
-                else
-                    name += fname;
+                name = name + "Failed to load ";
                 ok = false;
             }
+            if (program < 0xff)
+                name += findleafname(fname);
             else
-            {
-                if (part[npart]->loadXMLinstrument(fname))
-                    name = "Loaded ";
-                else
-                {
-                    name = "Failed to load ";
-                    ok = false;
-                }
                 name += fname;
-            }
-            if (!ok)
-                partonoffLock(npart, 2); // as it was
-            else
-                partonoffLock(npart, 2 - Runtime.enable_part_on_voice_load); // always on if enabled
-            cout << name << endl;
         }
+        if (!ok)
+            partonoffLock(npart, 2); // as it was
+        else
+            partonoffLock(npart, 2 - Runtime.enable_part_on_voice_load); // always on if enabled
     }
+    int msgID = miscMsgPush(name);
+    if (!ok)
+        msgID |= 0x1000;
+    return msgID;
 }
 
 

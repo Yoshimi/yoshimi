@@ -1124,10 +1124,38 @@ ZynAddSubFX}
     bool wasFromHere = getData->data.type & 0x20;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char par2 = getData->data.par2;
     int nval = lrint(value);
+    if (npart == 0xd9)
+    {
+        switch(control)
+        {
+            case 0:
+            case 1:
+                break;
+            case 2:
+                break;
+            case 8:
+                if (insert < 255)
+                {
+                    updateBankRootDirs();
+                    bankui->rescan_for_banks(false);
+                }
+                if (engine < 255)
+                {
+                    bankui->readbankcfg();
+                    bankui->rescan_for_banks(false);
+                }
+                if (nval < 255 || par2 < 255)
+                {
+                    updatelistitem(kititem);
+                    updatepartprogram(kititem);
+                }
+        }
+    }
     if (npart == 0xf1)
     {
         if (insert == 16)

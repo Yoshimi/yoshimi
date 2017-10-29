@@ -1,4 +1,6 @@
-can't edit uppder voice rows from panel
+can't edit upper voice rows from panel
+
+dropdown bank list not updating on bank change via new controls - not consistent :(
 
 still not fully converted:
     vectors

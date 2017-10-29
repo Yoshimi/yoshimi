@@ -269,10 +269,10 @@ void InterChange::transfertext(CommandBlock *getData)
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
-    unsigned char engine = getData->data.engine;
+//    unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
-    //unsigned char par2 = getData->data.par2;
+//    unsigned char par2 = getData->data.par2;
     bool (write) = (type & 0x40);
     string text;
     if (getData->data.par2 < 0xff)
@@ -523,13 +523,23 @@ void InterChange::transfertext(CommandBlock *getData)
         getData->data.parameter &= 0x7f;
     }
 
-    if (npart == 0xd9)
+    if (npart == 217) // program / bank / root
     {
-        cout << " interchange prog " << value << "  chan " << int(kititem) << "  bank " << int(engine) << "  root " << int(insert) << endl;
-        if (text > "")
+        //cout << " interchange prog " << value << "  chan " << int(kititem) << "  bank " << int(engine) << "  root " << int(insert) << endl;
+        if (text > "!")
             getData->data.par2 = miscMsgPush(text);
-        synth->SetRBP(getData);
+        int msgID = synth->SetRBP(getData);
+        if (msgID >= 0x1000)
+        {
+            msgID &= 0xff; // may be increased sometime
+            text = "FAILED ";
+        }
+        else
+            text = "";
+        text += miscMsgPop(msgID);
+        getData->data.value = miscMsgPush(text);
         synth->getRuntime().finishedCLI = true; // temp
+        getData->data.parameter &= 0x7f;
     }
 
     if (getData->data.parameter < 0x80 && jack_ringbuffer_write_space(returnsLoopback) >= commandSize)
@@ -661,7 +671,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
         commandName = resolveMicrotonal(getData);
     else if (npart == 0xf8)
         commandName = resolveConfig(getData);
-    else if (npart == 0xf0)
+    else if (npart == 0xd9 || npart == 0xf0)
         commandName = resolveMain(getData);
 
     else if (npart == 0xf1 || npart == 0xf2)
@@ -1265,8 +1275,27 @@ string InterChange::resolveMain(CommandBlock *getData)
 {
     int value_int = int(getData->data.value);
     unsigned char control = getData->data.control;
+    unsigned char par2 = getData->data.par2;
     string name;
     string contstr = "";
+    if (getData->data.part == 0xd9)
+    {
+        switch (control)
+        {
+            case 0:
+            case 1:
+                break;
+            case 2:
+                contstr = "Set CC";
+                break;
+            case 8:
+                showValue = false;
+                contstr = miscMsgPop(par2);
+                break;
+        }
+        return contstr;
+    }
+
     switch (control)
     {
         case 0:
@@ -3096,7 +3125,6 @@ void InterChange::returns(CommandBlock *getData)
     bool isCliOrGuiRedraw = type & 0x10; // separated out for clarity
     bool isMidi = type & 8;
     bool write = (type & 0x40) > 0;
-
     bool isOKtoRedraw = (isCliOrGuiRedraw && write) || isMidi;
 
     if (synth->guiMaster && isOKtoRedraw)
@@ -3363,6 +3391,8 @@ void InterChange::commandMidi(CommandBlock *getData)
     {
         case 0:
             synth->NoteOn(chan, char1, value_int);
+            synth->getRuntime().finishedCLI = true;
+            getData->data.type = 0xff; // till we know what to do!
             break;
         case 1:
             synth->NoteOff(chan, char1);
@@ -3371,8 +3401,6 @@ void InterChange::commandMidi(CommandBlock *getData)
             break;
         case 2:
             synth->SetController(chan, char1, value_int);
-            synth->getRuntime().finishedCLI = true;
-            getData->data.type = 0xff; // till we know what to do!
             break;
         case 3:
             ;
@@ -3380,17 +3408,10 @@ void InterChange::commandMidi(CommandBlock *getData)
         case 4:
             ;
             break;
-        case 8:
+        case 8: // Program / Bank / Root
             getData->data.parameter = 0x80;
             if ((value_int < 0xff || par2 < 0xff) && chan < synth->getRuntime().NumAvailableParts)
-                //if (chan >= NUM_MIDI_CHANNELS) // individual parts
-                    synth->partonoffLock(chan & 0x7f, -1);
-                //else // normal channels
-                    //for (int i = 0; i < NUM_MIDI_CHANNELS)
-                    {
-                    //    if (if (chan == part[i]->Prcvchn)
-                    //        synth->partonoffLock(i, -1);
-                    }
+            synth->partonoffLock(chan & 0x7f, -1);
             break;
     }
 }
