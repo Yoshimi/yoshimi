@@ -2209,7 +2209,8 @@ Offset}
     modulation->value(part->ctl->modwheel.data);
     expression->value(part->ctl->expression.data);
     filterq->value(part->ctl->filterq.data);
-    filtercutoff->value(part->ctl->filtercutoff.data);} {}
+    filtercutoff->value(part->ctl->filtercutoff.data);
+    masterbandwidth->value(part->ctl->bandwidth.data);} {}
   }
   Function {~PartUI()} {} {
     code {//

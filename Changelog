@@ -1,6 +1,10 @@
 yoshimi 1.5.4 M
 
-2017-10-2 Will
+2017-10-30 Will
+* MIDI controllers done for CLI  direct access
+  but disabled until rest of system done.
+
+2017-10-29 Will
 * Unified root/bank/program change complete
   for CLI direct access.
 

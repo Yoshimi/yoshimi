@@ -674,7 +674,7 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
                 part[npart]->SetController(type, par);
                 if (type == 7 || type == 10) // only a few
                     GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
-                else if (type == 1 || type == 11 || type == 71 || type == 74)
+                else if (type == 1 || type == 11 || type == 71 || type == 74 || type == 75)
                     GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateControllers, npart);
             }
         }

@@ -1123,21 +1123,60 @@ ZynAddSubFX}
     float value = getData->data.value;
     bool wasFromHere = getData->data.type & 0x20;
     unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
+    unsigned char newpart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char par2 = getData->data.par2;
     int nval = lrint(value);
-    if (npart == 0xd9)
+    if (newpart == 0xd9)
     {
+        /*for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)  ***** disabled till rest of system done
+        { // panel entries only
+            if(control == 2 && panellistitem[i]->partrcv->value() == kititem && panellistitem[i]->partenabled->value() != 0)
+            {
+                if (engine == 7)
+                    panellistitem[i]->partvolume->value(value);
+                else if (engine == 10)
+                    panellistitem[i]->partpanning->value(value);
+            }
+        }
+
+        bool isForUs = (partui->midich->value() == (kititem + 1) && partui->partGroupEnable->value() != 0);*/
         switch(control)
         {
             case 0:
             case 1:
                 break;
-            case 2:
-                break;
+            /*case 2: ***** disabled till rest of system done
+                if (isForUs)
+                {
+                    switch(engine)
+                    {
+                        case 1: // modulation
+                            partui->modulation->value(value);
+                            break;
+                        case 7: // volume
+                            partui->partvol->value(value);
+                            break;
+                        case 10: // panning
+                            partui->partpan->value(value);
+                            break;
+                        case 11: // expression
+                            partui->expression->value(value);
+                            break;
+                        case 71: // filter Q
+                            partui->filterq->value(value);
+                            break;
+                        case 74: // filter cutoff
+                            partui->filtercutoff->value(value);
+                            break;
+                        case 75: // bandwidth
+                            partui->masterbandwidth->value(value);
+                            break;
+                    }
+                }
+                break;*/
             case 8:
                 if (insert < 255)
                 {
@@ -1155,8 +1194,9 @@ ZynAddSubFX}
                     updatepartprogram(kititem);
                 }
         }
+        return;
     }
-    if (npart == 0xf1)
+    if (newpart == 0xf1)
     {
         if (insert == 16)
         {
@@ -1183,7 +1223,7 @@ ZynAddSubFX}
         }
         return;
     }
-    else if (npart == 0xf2)
+    else if (newpart == 0xf2)
     {
         if (control == 0)
         {
@@ -1221,7 +1261,7 @@ ZynAddSubFX}
             partuigroup->add(partui);
             partui->init(synth->part[nval], nval, bankui);
             partui->redraw();
-            npart = nval;
+            newpart = nval;
             npartcounter->value(nval + 1);
             npartcounter->redraw();
             updatepanel();
@@ -1338,10 +1378,10 @@ ZynAddSubFX}
             break;
 
         case 96:
-            if (npart == 240)
+            if (newpart == 240)
                 refresh_master_ui(1);
-            else if (npart < 64)
-                partNew(npart);
+            else if (newpart < 64)
+                partNew(newpart);
             break;
 
         case 128:
