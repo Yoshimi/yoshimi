@@ -844,9 +844,10 @@ int SynthEngine::SetRBP(CommandBlock *getData)
             { // abort and recover old settings
                 bank.setCurrentRootID(originalRoot);
                 bank.setCurrentBankID(originalBank);
-                foundRoot = originalRoot;
             }
-            name = asString(foundRoot) + " \"" + bank.getRootPath(foundRoot) + "\"";
+            else
+                originalRoot = foundRoot;
+            name = asString(foundRoot) + " \"" + bank.getRootPath(originalRoot) + "\"";
             if (root != foundRoot)
             {
                 ok = false;
@@ -868,13 +869,14 @@ int SynthEngine::SetRBP(CommandBlock *getData)
     {
         if (bank.setCurrentBankID(banknum, true))
         {
-            if (root < 0xff)
-                name = "Root " + to_string(root) + ". ";
-            name = name + "Bank set to " + asString(banknum) + " \"" + bank.roots [bank.currentRootID].banks [banknum].dirname + "\"";
+            name = "Root " + to_string(Runtime.midi_bank_root) + ". ";
+            name = name + "Bank set to " + asString(banknum) + " \"" + bank.roots [originalRoot].banks [banknum].dirname + "\"";
+            originalBank = banknum;
         }
         else
         {
             ok = false;
+            bank.setCurrentBankID(originalBank);
             name = "No bank " + asString(banknum);
             if(root < 0xff)
                 name += " root " + to_string(root) + ".";
@@ -883,41 +885,52 @@ int SynthEngine::SetRBP(CommandBlock *getData)
             name += " Current bank is " + asString(ReadBank());
         }
     }
-    if (ok && (program < 0xff || par2 < 0xff))
+    if (program < 0xff || par2 < 0xff)
     {
-        string fname;
-        if (program < 0xff)
-            fname = bank.getfilename(program);
-        else
-            fname = miscMsgPop(par2);
-        if (findleafname(fname) < "!") // can't get a program name less than this
+        if (ok)
         {
-            name = "Can't find instrument ";
+            string fname;
             if (program < 0xff)
-                name = findleafname(name) + asString(program + 1) + " in this bank";
+                fname = bank.getfilename(program);
             else
-                name += fname;
-            ok = false;
-        }
-        else
-        {
-            if (part[npart]->loadXMLinstrument(fname))
-                name = "Loaded ";
-            else
+                fname = miscMsgPop(par2);
+            if (findleafname(fname) < "!") // can't get a program name less than this
             {
-                name = name + "Failed to load ";
+                name = "Can't find instrument ";
+                if (program < 0xff)
+                    name = findleafname(name) + asString(program + 1) + " in this bank";
+                else
+                    name += fname;
                 ok = false;
             }
-            if (program < 0xff)
-                name += findleafname(fname);
             else
-                name += fname;
+            {
+                if (program < 0xff)
+                    name = "Root " + to_string(originalRoot) + ". Bank " + to_string(originalBank);
+                else
+                    name = "";
+
+                if (part[npart]->loadXMLinstrument(fname))
+                    name += ". Loaded ";
+                else
+                {
+                    name += ". Failed to load ";
+                    ok = false;
+                }
+                if (program < 0xff)
+                    name += findleafname(fname);
+                else
+                    name += fname;
+            }
+            if (!ok)
+                partonoffLock(npart, 2); // as it was
+            else
+                partonoffLock(npart, 2 - Runtime.enable_part_on_voice_load); // always on if enabled
         }
-        if (!ok)
-            partonoffLock(npart, 2); // as it was
         else
-            partonoffLock(npart, 2 - Runtime.enable_part_on_voice_load); // always on if enabled
+            partonoffLock(npart, 2); // as it was
     }
+
     int msgID = miscMsgPush(name);
     if (!ok)
         msgID |= 0x1000;

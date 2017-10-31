@@ -1,4 +1,4 @@
-can't edit upper voice rows from panel
+Sometimes can't edit upper voice rows from panel
 
 dropdown bank list not updating on bank change via new controls - not consistent :(
 
@@ -12,11 +12,7 @@ Requested: revise window states so engines etc can be made auto open.
 
 Do a dual scan for banks so that IDd ones are found first, then any new ones picked up on the second scan. This stops known ones being re-ordered.
 
-Allow both jack and alsa midi at the same time?
-
 NRPN channels?
-
-Fl::check() used too liberally. See where it can be removed - controls updating multiple windows seem the be the main problem.
 
 Expand midi-learn to include:
     more switches
