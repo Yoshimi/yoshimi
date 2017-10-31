@@ -1099,9 +1099,9 @@ class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
         if (!it->second.dirname.empty())
         {
             int n = banklist->add((asString(it->first) + ". " + it->second.dirname).c_str(), (const char *)0, (Fl_Callback*)0, reinterpret_cast<void *>(it->first));
-//            if(it->first == bank->getCurrentBankID()) // why?
+            if(it->first == bank->getCurrentBankID())
             {
-                banklist->value(n);
+                banklist->value(n); // ensure correct bank in list
             }
         }
     }

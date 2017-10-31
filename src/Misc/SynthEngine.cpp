@@ -846,7 +846,10 @@ int SynthEngine::SetRBP(CommandBlock *getData)
                 bank.setCurrentBankID(originalBank);
             }
             else
+            {
                 originalRoot = foundRoot;
+                originalBank = bank.getCurrentBankID();
+            }
             name = asString(foundRoot) + " \"" + bank.getRootPath(originalRoot) + "\"";
             if (root != foundRoot)
             {
@@ -918,9 +921,11 @@ int SynthEngine::SetRBP(CommandBlock *getData)
                     ok = false;
                 }
                 if (program < 0xff)
-                    name += findleafname(fname);
+                    name += bank.getname(program);
                 else
                     name += fname;
+                if (ok)
+                    name = name + " to Part " + to_string(npart + 1);
             }
             if (!ok)
                 partonoffLock(npart, 2); // as it was

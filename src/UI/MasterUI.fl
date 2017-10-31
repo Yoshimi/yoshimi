@@ -1180,7 +1180,7 @@ ZynAddSubFX}
             case 8:
                 if (insert < 255)
                 {
-                    updateBankRootDirs();
+                    //updateBankRootDirs();
                     bankui->rescan_for_banks(false);
                 }
                 if (engine < 255)
