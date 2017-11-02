@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified October 2017
+    Modified November 2017
 */
 
 #include<stdio.h>
@@ -474,15 +474,7 @@ void *SynthEngine::RBPthread(void)
             {
                 switch ((unsigned char)block.data[0])
                 {
-                    case 1: // load root
-                        SetBankRoot(block.data[1]);
-                        break;
-
-                    case 2: // load bank
-                        SetBank(block.data[1]);
-                        break;
-
-                    case 3: // load standard instrument
+                    /*case 3: // load standard instrument
                         SetProgram(block.data[1], block.data[2]);
                         break;
 
@@ -492,7 +484,7 @@ void *SynthEngine::RBPthread(void)
 
                     case 5: // load file named instrument via miscMsg
                         SetProgramToPart(block.data[1], -1, miscMsgPop(block.data[2]));
-                        break;
+                        break;*/
 
                     case 6: // cease all sound
                         switch(block.data[1] & 0xff)
@@ -656,7 +648,7 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
 {
     if (type == Runtime.midi_bank_C)
     {
-        SetBank(par); //shouldn't get here. Banks are set directly via SetBank method from MusicIO class
+        //shouldn't get here. Banks are set directly via SetBank method from MusicIO class
         return;
     }
     if (type == Runtime.channelSwitchCC)
@@ -670,26 +662,14 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
         for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
         {   // Send the controller to all part assigned to the channel
             if (chan == part[npart]->Prcvchn && partonoffRead(npart))
-            {
                 part[npart]->SetController(type, par);
-                if (type == 7 || type == 10) // only a few
-                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
-                else if (type == 1 || type == 11 || type == 71 || type == 74 || type == 75)
-                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateControllers, npart);
-            }
         }
     }
     else
     {
-        npart = chan & 0x7f;
+        npart = chan & 0x3f;
         if (npart < Runtime.NumAvailableParts)
-        {
             part[npart]->SetController(type, par);
-            if (type == 7 || type == 10) // only a few
-                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
-            else if (type == 1 || type == 11 || type == 71 || type == 74)
-                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateControllers, npart);
-        }
     }
     if (type == C_allsoundsoff)
     {   // cleanup insertion/system FX
@@ -821,7 +801,18 @@ void SynthEngine::SetEffects(unsigned char category, unsigned char command, unsi
 }
 
 
-int SynthEngine::SetRBP(CommandBlock *getData)
+int  SynthEngine::RootBank(int rootnum, int banknum)
+{
+    CommandBlock getData;
+    memset(&getData, 0xff, sizeof(getData));
+    getData.data.value = 0xff;
+    getData.data.engine = banknum;
+    getData.data.insert = rootnum;
+    return SetRBP(&getData);
+}
+
+
+int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
 {
     int program = lrint(getData->data.value);
     int npart = getData->data.kit;
@@ -854,7 +845,8 @@ int SynthEngine::SetRBP(CommandBlock *getData)
             if (root != foundRoot)
             {
                 ok = false;
-                name = "Cant find ID " + asString(root) + ". Current root is " + name;
+                if (notinplace)
+                    name = "Cant find ID " + asString(root) + ". Current root is " + name;
             }
             else
             {
@@ -864,7 +856,8 @@ int SynthEngine::SetRBP(CommandBlock *getData)
         else
         {
             ok = false;
-            name = "No match for root ID " + asString(root);
+            if (notinplace)
+                name = "No match for root ID " + asString(root);
         }
     }
 
@@ -872,20 +865,27 @@ int SynthEngine::SetRBP(CommandBlock *getData)
     {
         if (bank.setCurrentBankID(banknum, true))
         {
-            name = "Root " + to_string(Runtime.midi_bank_root) + ". ";
-            name = name + "Bank set to " + asString(banknum) + " \"" + bank.roots [originalRoot].banks [banknum].dirname + "\"";
+            if (notinplace)
+            {
+                if (root < 0xff)
+                    name = "Root " + to_string(root) + ". ";
+                name = name + "Bank set to " + asString(banknum) + " \"" + bank.roots [originalRoot].banks [banknum].dirname + "\"";
+            }
             originalBank = banknum;
         }
         else
         {
             ok = false;
             bank.setCurrentBankID(originalBank);
-            name = "No bank " + asString(banknum);
-            if(root < 0xff)
-                name += " root " + to_string(root) + ".";
-            else
-                name += " in this root.";
-            name += " Current bank is " + asString(ReadBank());
+            if (notinplace)
+            {
+                name = "No bank " + asString(banknum);
+                if(root < 0xff)
+                    name += " in root " + to_string(root) + ".";
+                else
+                    name += " in this root.";
+                name += " Current bank is " + asString(ReadBank());
+            }
         }
     }
     if (program < 0xff || par2 < 0xff)
@@ -899,33 +899,50 @@ int SynthEngine::SetRBP(CommandBlock *getData)
                 fname = miscMsgPop(par2);
             if (findleafname(fname) < "!") // can't get a program name less than this
             {
-                name = "Can't find instrument ";
-                if (program < 0xff)
+                if (notinplace)
+                {
+                    name = "Can't find instrument ";
+                    if (program < 0xff)
                     name = findleafname(name) + asString(program + 1) + " in this bank";
-                else
-                    name += fname;
+                    else
+                        name += fname;
+                }
                 ok = false;
             }
             else
             {
-                if (program < 0xff)
-                    name = "Root " + to_string(originalRoot) + ". Bank " + to_string(originalBank);
-                else
+                if (notinplace)
+                {
                     name = "";
+                    if (program < 0xff)
+                    {
+                        if (root < 0xff)
+                            name = "Root " + to_string(originalRoot) + ". ";
+                        if (banknum < 0xff)
+                            name = name + "Bank " + to_string(originalBank) + ". ";
+                    }
+                }
 
                 if (part[npart]->loadXMLinstrument(fname))
-                    name += ". Loaded ";
+                {
+                    if (notinplace)
+                        name += "Loaded ";
+                }
                 else
                 {
-                    name += ". Failed to load ";
+                    if (notinplace)
+                        name += "Failed to load ";
                     ok = false;
                 }
-                if (program < 0xff)
-                    name += bank.getname(program);
-                else
-                    name += fname;
-                if (ok)
-                    name = name + " to Part " + to_string(npart + 1);
+                if (notinplace)
+                {
+                    if (program < 0xff)
+                        name += bank.getname(program);
+                    else
+                        name += fname;
+                    if (ok)
+                        name = name + " to Part " + to_string(npart + 1);
+                }
             }
             if (!ok)
                 partonoffLock(npart, 2); // as it was
@@ -936,100 +953,18 @@ int SynthEngine::SetRBP(CommandBlock *getData)
             partonoffLock(npart, 2); // as it was
     }
 
-    int msgID = miscMsgPush(name);
+    int msgID = 0xff;
+    if (notinplace)
+        msgID = miscMsgPush(name);
     if (!ok)
         msgID |= 0x1000;
     return msgID;
 }
 
 
-void SynthEngine::SetBankRoot(int rootnum)
-{
-    string name;
-    int foundRoot;
-    struct timeval tv1, tv2;
-    gettimeofday(&tv1, NULL);
-    int originalRoot = bank.getCurrentRootID();
-    int originalBank = bank.getCurrentBankID();
-    if (bank.setCurrentRootID(rootnum))
-    {
-        foundRoot = bank.getCurrentRootID();
-        if (foundRoot != rootnum)
-        { // abort and recover old settings
-            bank.setCurrentRootID(originalRoot);
-            bank.setCurrentBankID(originalBank);
-            foundRoot = originalRoot;
-        }
-        if (Runtime.showGui)
-        {
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateBankRootDirs, 0);
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::RescanForBanks, 0);
-        }
-        name = asString(foundRoot) + " \"" + bank.getRootPath(foundRoot) + "\"";
-        if (rootnum != foundRoot)
-            name = "Cant find ID " + asString(rootnum) + ". Current root is " + name;
-        else
-        {
-            if (Runtime.showTimes)
-            {
-                gettimeofday(&tv2, NULL);
-                if (tv1.tv_usec > tv2.tv_usec)
-                {
-                    tv2.tv_sec--;
-                    tv2.tv_usec += 1000000;
-                }
-                int actual = (tv2.tv_sec - tv1.tv_sec) *1000000 + (tv2.tv_usec - tv1.tv_usec);
-                name += ("  Time " + to_string(actual) + "uS");
-            }
-            name = "Root set to " + name;
-        }
-        Runtime.Log(name);
-    }
-    else
-        Runtime.Log("No match for root ID " + asString(rootnum));
-}
-
-
 int SynthEngine::ReadBankRoot(void)
 {
     return bank.currentRootID;
-}
-
-
-void SynthEngine::SetBank(int banknum)
-{
-    /*  we use either msb or lsb for bank changes
-    128 banks is enough for anybody :-)
-    this is configurable to suit different hardware synths
-    */
-
-    //new implementation uses only 1 call :)
-    struct timeval tv1, tv2;
-    gettimeofday(&tv1, NULL);
-    if (bank.setCurrentBankID(banknum, true))
-    {
-        string name = "Bank set to " + asString(banknum) + " \"" + bank.roots [bank.currentRootID].banks [banknum].dirname + "\"";
-        if (Runtime.showTimes)
-        {
-            gettimeofday(&tv2, NULL);
-            if (tv1.tv_usec > tv2.tv_usec)
-            {
-                tv2.tv_sec--;
-                tv2.tv_usec += 1000000;
-            }
-            int actual = (tv2.tv_sec - tv1.tv_sec) *1000000 + (tv2.tv_usec - tv1.tv_usec);
-            name += ("  Time " + to_string(actual) + "uS");
-        }
-        Runtime.Log(name);
-        if (Runtime.showGui)
-        {
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::RefreshCurBank, 0);
-        }
-    }
-    else
-    {
-        Runtime.Log("No bank " + asString(banknum)+ " in this root. Current bank is " + asString(ReadBank()));
-    }
 }
 
 
@@ -2024,6 +1959,7 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
         }
     }
 
+    unsigned char part = 0;
     switch (dHigh)
     {
         case 0:
@@ -2071,23 +2007,27 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             break;
 
         case 4:
-            partonoffLock(chan, -1);
-            writeRBP(3, chan | 0x80, par);
+            //partonoffLock(chan, -1);
+            //writeRBP(3, chan | 0x80, par);
+            part = chan;
             break;
 
         case 5:
-            partonoffLock(chan | 0x10, -1);
-            writeRBP(3, chan | 0x90, par);
+            //partonoffLock(chan | 0x10, -1);
+            //writeRBP(3, chan | 0x90, par);
+            part = chan | 0x10;
             break;
 
         case 6:
-            partonoffLock(chan | 0x20, -1);
-            writeRBP(3, chan | 0xa0, par);
+            //partonoffLock(chan | 0x20, -1);
+            //writeRBP(3, chan | 0xa0, par);
+            part = chan | 0x20;
             break;
 
         case 7:
-            partonoffLock(chan | 0x30, -1);
-            writeRBP(3, chan | 0xb0, par);
+            //partonoffLock(chan | 0x30, -1);
+            //writeRBP(3, chan | 0xb0, par);
+            part = chan | 0x30;
             break;
 
         case 8:
@@ -2128,6 +2068,18 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             Runtime.vectordata.Yfeatures[chan] = 0;
             Runtime.Log("Channel " + asString(int(chan) + 1) + " Vector control disabled");
             break;
+    }
+    if (dHigh >= 4 && dHigh <= 7)
+    {
+        CommandBlock putData;
+        memset(&putData, 0xff, sizeof(putData));
+        putData.data.value = par;
+        putData.data.type = 0xd0;
+        putData.data.control = 8;
+        putData.data.part = 0xd9;
+        putData.data.kit = part;
+        putData.data.parameter = 0xc0;
+        midilearn.writeMidi(&putData, sizeof(putData), true);
     }
 }
 
@@ -2733,8 +2685,7 @@ bool SynthEngine::installBanks(int instance)
     bank.parseConfigFile(xml);
     xml->exitbranch();
     delete xml;
-    SetBankRoot(Runtime.tempRoot);
-    SetBank(Runtime.tempBank);
+    Runtime.Log(miscMsgPop(RootBank(Runtime.tempRoot, Runtime.tempBank)& 0xff));
     return true;
 }
 

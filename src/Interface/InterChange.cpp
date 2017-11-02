@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified October 2017
+    Modified November 2017
 */
 
 #include <iostream>
@@ -1275,6 +1275,7 @@ string InterChange::resolveMain(CommandBlock *getData)
 {
     int value_int = int(getData->data.value);
     unsigned char control = getData->data.control;
+    unsigned char engine = getData->data.engine;
     unsigned char par2 = getData->data.par2;
     string name;
     string contstr = "";
@@ -1284,9 +1285,10 @@ string InterChange::resolveMain(CommandBlock *getData)
         {
             case 0:
             case 1:
+                showValue = false;
                 break;
             case 2:
-                contstr = "Set CC";
+                contstr = "CC " + to_string(int(engine)) + " ";
                 break;
             case 8:
                 showValue = false;
@@ -3402,16 +3404,12 @@ void InterChange::commandMidi(CommandBlock *getData)
         case 2:
             synth->SetController(chan, char1, value_int);
             break;
-        case 3:
-            ;
-            break;
-        case 4:
-            ;
-            break;
+
         case 8: // Program / Bank / Root
             getData->data.parameter = 0x80;
             if ((value_int < 0xff || par2 < 0xff) && chan < synth->getRuntime().NumAvailableParts)
-            synth->partonoffLock(chan & 0x7f, -1);
+            synth->partonoffLock(chan & 0x3f, -1);
+            synth->getRuntime().finishedCLI = true;
             break;
     }
 }
@@ -3427,9 +3425,6 @@ void InterChange::commandVector(CommandBlock *getData)
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned int chan = getData->data.insert;
-    unsigned int bank = getData->data.kit;
-    unsigned int root = getData->data.engine;
-
     bool write = (type & 0x40) > 0;
     unsigned int features;
 
@@ -3460,14 +3455,7 @@ void InterChange::commandVector(CommandBlock *getData)
     }
     if (write)
     {
-        if (control == 17 || control == 18 || control == 33 || control == 34)
-        {
-            if (root < 0x80)
-                synth->writeRBP(1, root, 0);
-            if (bank < 0x80)
-                synth->writeRBP(2, bank, 0);
-        }
-        else if (control >= 19 && control <= 22)
+        if (control >= 19 && control <= 22)
             features = synth->getRuntime().vectordata.Xfeatures[chan];
         else if (control >= 35 && control <= 38)
             features = synth->getRuntime().vectordata.Yfeatures[chan];
@@ -3483,11 +3471,7 @@ void InterChange::commandVector(CommandBlock *getData)
                 switch (value)
                 {
                     case 0:
-                        //synth->partonoffWrite(chan, 0);
-                        break;
                     case 1:
-                        //synth->partonoffWrite(chan, 1);
-                        break;
                     case 2:  // local to source
                         break;
                     case 3:
@@ -4114,17 +4098,26 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
 
         case 74: // load instrument from ID
+            /*
+             * this is the lazy way to move all program changes
+             * to the new MIDI method.
+             */
             synth->partonoffLock(value_int, -1);
-            if (par2 < 128)
-                synth->writeRBP(3, value_int | 0x80, par2);
-            else
-                synth->writeRBP(4, value_int | 0x80, par2 - 128);
-            getData->data.type = 0xff; // stop further action
+            getData->data.control = 8;
+            getData->data.part = 0xd9;
+            getData->data.kit = value_int;
+            getData->data.value = par2;
+            getData->data.parameter = 0x80;
+            getData->data.par2 = 0xff;
             break;
         case 78: // load named instrument
             synth->partonoffLock(value_int & 0x3f, -1);
-            synth->writeRBP(5, value_int & 0x3f, par2);
-            getData->data.type = 0xff; // stop further action
+            // as above for named instruments :)
+            getData->data.control = 8;
+            getData->data.part = 0xd9;
+            getData->data.kit = value_int & 0x3f;
+            getData->data.value = 0xff;
+            getData->data.parameter = 0x80;
             break;
 
         case 80: // load patchset

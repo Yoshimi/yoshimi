@@ -16,7 +16,7 @@
 
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
-    Modified September 2017
+    Modified November 2017
 */
 
 #include <errno.h>
@@ -98,9 +98,9 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
         return;
     }
 
-    if (inSync)
+    if (true)//inSync)
     { // it's all jack
-        synth->mididecode.midiProcess(par0, par1, par2, in_place);
+        synth->mididecode.midiProcess(par0, par1, par2, in_place, inSync);
         return;
     }
 

@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified October 2017
+    Modified November 2017
 */
 
 #include <iostream>
@@ -49,7 +49,7 @@ MidiDecode::~MidiDecode()
 }
 
 
-void MidiDecode::midiProcess(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place)
+void MidiDecode::midiProcess(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place, bool inSync)
 {
     if (synth->isMuted())
         return; // nobody listening!
@@ -60,23 +60,6 @@ void MidiDecode::midiProcess(unsigned char par0, unsigned char par1, unsigned ch
     par = 0;
     switch (ev)
     {
-        /*case 0x80: // note-off
-            note = par1;
-            setMidiNoteOff(channel, note);
-            break;
-
-        case 0x90: // note-on
-            // cout << "note " << int(par1) << endl;
-            note = par1;
-            if (note)
-            {
-                velocity = par2;
-                setMidiNote(channel, note, velocity);
-            }
-            else
-                setMidiNoteOff(channel, note);
-            break;*/
-
         case 0xA0: // key aftertouch
             ctrltype = C_channelpressure;
             /*
@@ -128,7 +111,7 @@ void MidiDecode::midiProcess(unsigned char par0, unsigned char par1, unsigned ch
 }
 
 
-void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool in_place)
+void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool in_place, bool inSync)
 {
     if (synth->getRuntime().monitorCCin)
     {
@@ -203,7 +186,7 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
         vecChan = ch;
     if (synth->getRuntime().vectordata.Enabled[vecChan] && synth->getRuntime().NumAvailableParts > NUM_MIDI_CHANNELS)
     { // vector control is direct to parts
-        if (nrpnRunVector(vecChan, ctrl, param))
+        if (nrpnRunVector(vecChan, ctrl, param, inSync))
             return; // **** test this it may be wrong!
     }
     // pick up a drop-through if CC doesn't match the above
@@ -230,7 +213,7 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
 
     if (ctrl == C_breath)
     {
-        synth->SetController(ch, C_volume, param);
+        sendMidiCC(inSync, ch, C_volume, param);
         ctrl = C_filtercutoff;
     }
     else
@@ -242,7 +225,27 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
             param -= 8192;
 
     // do what's left!
-    synth->SetController(ch, ctrl, param);
+    sendMidiCC(inSync, ch, ctrl, param);
+}
+
+
+void MidiDecode::sendMidiCC(bool inSync, unsigned char chan, int type, short int par)
+{
+    if (inSync)
+    {
+        synth->SetController(chan, type, par);
+        return;
+    }
+
+    CommandBlock putData;
+    memset(&putData, 0xff, sizeof(putData));
+    putData.data.value = par;
+    putData.data.type = 0xc8;
+    putData.data.control = 2;
+    putData.data.part = 0xd9;
+    putData.data.kit = chan;
+    putData.data.engine = type;
+    synth->midilearn.writeMidi(&putData, sizeof(putData), true);
 }
 
 
@@ -357,7 +360,7 @@ bool MidiDecode::nrpnDecode(unsigned char ch, int ctrl, int param, bool in_place
 }
 
 
-bool MidiDecode::nrpnRunVector(unsigned char ch, int ctrl, int param)
+bool MidiDecode::nrpnRunVector(unsigned char ch, int ctrl, int param, bool inSync)
 {
     int Xopps = synth->getRuntime().vectordata.Xfeatures[ch];
     int Yopps = synth->getRuntime().vectordata.Yfeatures[ch];
@@ -370,32 +373,32 @@ bool MidiDecode::nrpnRunVector(unsigned char ch, int ctrl, int param)
     {
         if (Xopps & 1) // fixed as volume
         {
-            synth->SetController(ch | 0x80, C_volume,127 - (p_rev * p_rev / 127));
-            synth->SetController(ch | 0x90, C_volume, 127 - (param * param / 127));
+            sendMidiCC(inSync, ch | 0x80, C_volume,127 - (p_rev * p_rev / 127));
+            sendMidiCC(inSync, ch | 0x90, C_volume, 127 - (param * param / 127));
         }
         if (Xopps & 2) // default is pan
         {
             type = synth->getRuntime().vectordata.Xcc2[ch];
             swap1 = (Xopps & 0x10) | 0x80;
             swap2 = swap1 ^ 0x10;
-            synth->SetController(ch | swap1, type, param);
-            synth->SetController(ch | swap2, type, p_rev);
+            sendMidiCC(inSync, ch | swap1, type, param);
+            sendMidiCC(inSync, ch | swap2, type, p_rev);
         }
         if (Xopps & 4) // default is 'brightness'
         {
             type = synth->getRuntime().vectordata.Xcc4[ch];
             swap1 = ((Xopps >> 1) & 0x10) | 0x80;
             swap2 = swap1 ^ 0x10;
-            synth->SetController(ch | swap1, type, param);
-            synth->SetController(ch | swap2, type, p_rev);
+            sendMidiCC(inSync, ch | swap1, type, param);
+            sendMidiCC(inSync, ch | swap2, type, p_rev);
         }
         if (Xopps & 8) // default is mod wheel
         {
             type = synth->getRuntime().vectordata.Xcc8[ch];
             swap1 = ((Xopps >> 2) & 0x10) | 0x80;
             swap2 = swap1 ^ 0x10;
-            synth->SetController(ch | swap1, type, param);
-            synth->SetController(ch | swap2, type, p_rev);
+            sendMidiCC(inSync, ch | swap1, type, param);
+            sendMidiCC(inSync, ch | swap2, type, p_rev);
         }
         return true;
     }
@@ -403,32 +406,32 @@ bool MidiDecode::nrpnRunVector(unsigned char ch, int ctrl, int param)
     { // if Y hasn't been set these commands will be ignored
         if (Yopps & 1) // fixed as volume
         {
-            synth->SetController(ch | 0xa0, C_volume,127 - (p_rev * p_rev / 127));
-            synth->SetController(ch | 0xb0, C_volume, 127 - (param * param / 127));
+            sendMidiCC(inSync, ch | 0xa0, C_volume,127 - (p_rev * p_rev / 127));
+            sendMidiCC(inSync, ch | 0xb0, C_volume, 127 - (param * param / 127));
         }
         if (Yopps & 2) // default is pan
         {
             type = synth->getRuntime().vectordata.Ycc2[ch];
             swap1 = (Yopps & 0x10) | 0xa0;
             swap2 = swap1 ^ 0x10;
-            synth->SetController(ch | swap1, type, param);
-            synth->SetController(ch | swap2, type, p_rev);
+            sendMidiCC(inSync, ch | swap1, type, param);
+            sendMidiCC(inSync, ch | swap2, type, p_rev);
         }
         if (Yopps & 4) // default is 'brightness'
         {
             type = synth->getRuntime().vectordata.Ycc4[ch];
             swap1 = ((Yopps >> 1) & 0x10) | 0xa0;
             swap2 = swap1 ^ 0x10;
-            synth->SetController(ch | swap1, type, param);
-            synth->SetController(ch | swap2, type, p_rev);
+            sendMidiCC(inSync, ch | swap1, type, param);
+            sendMidiCC(inSync, ch | swap2, type, p_rev);
         }
         if (Yopps & 8) // default is mod wheel
         {
             type = synth->getRuntime().vectordata.Ycc8[ch];
             swap1 = ((Yopps >> 2) & 0x10) | 0xa0;
             swap2 = swap1 ^ 0x10;
-            synth->SetController(ch | swap1, type, param);
-            synth->SetController(ch | swap2, type, p_rev);
+            sendMidiCC(inSync, ch | swap1, type, param);
+            sendMidiCC(inSync, ch | swap2, type, p_rev);
         }
         return true;
     }
@@ -572,12 +575,9 @@ void MidiDecode:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
     switch (dHigh)
     {
         /*
-         * these have to go through the program change
+         * These have to go through the program change
          * thread otherwise they could block following
          * MIDI messages.
-         * TODO
-         * We need to change this so it goes through
-         * the common RBP thread.
          */
         case 4:
             setMidiProgram(chan | 0x80, par);
@@ -614,15 +614,25 @@ void MidiDecode::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_pla
     else
         if (bank_or_root_num == synth->getBankRef().getCurrentBankID())
             return; // still nothing to do!
-    if (in_place)
-        setRootDir ? synth->SetBankRoot(bank_or_root_num) : synth->SetBank(bank_or_root_num);
+
+    CommandBlock putData;
+    memset(&putData, 0xff, sizeof(putData));
+    putData.data.value = 0xff;
+    putData.data.type = 0xd0;
+    putData.data.control = 8;
+    putData.data.part = 0xd9;
+    putData.data.kit = 0;
+    putData.data.parameter = 0xc0;
+
+    if (setRootDir)
+        putData.data.insert = bank_or_root_num;
     else
-    {
-        if (setRootDir)
-            synth->writeRBP(1 ,bank_or_root_num,0);
-        else
-            synth->writeRBP(2 ,bank_or_root_num,0);
-    }
+        putData.data.engine = bank_or_root_num;
+
+    if (in_place)
+        synth->SetRBP(&putData, false);
+    else
+        synth->midilearn.writeMidi(&putData, sizeof(putData), false);
 }
 
 
@@ -632,39 +642,46 @@ void MidiDecode::setMidiProgram(unsigned char ch, int prg, bool in_place)
         return;
     if (ch >= synth->getRuntime().NumAvailableParts)
         return;
+
+    CommandBlock putData;
+    memset(&putData, 0xff, sizeof(putData));
+    putData.data.value = prg;
+    putData.data.type = 0xd0;
+    putData.data.control = 8;
+    putData.data.part = 0xd9;
+    putData.data.parameter = 0xc0;
+
     if (ch < NUM_MIDI_CHANNELS)
     { // this is a bit of a hack - needs sorting
         for (int npart = 0; npart < NUM_MIDI_CHANNELS; ++ npart)
         {
             if (ch == synth->part[npart]->Prcvchn)
-                synth->partonoffLock(npart, -1);
+            {
+                putData.data.kit = npart;
+                if (in_place)
+                {
+                    synth->partonoffLock(npart, -1);
+                    synth->SetRBP(&putData, false);
+                }
+                else
+                {
+                    synth->midilearn.writeMidi(&putData, sizeof(putData), false);
+                }
+            }
         }
-    }
-    else
-        synth->partonoffLock(ch, -1);
-    if (in_place)
-    {
-        //synth->getRuntime().Log("Freewheeling");
-        synth->SetProgram(ch, prg);
+        return;
     }
     else
     {
-        //synth->getRuntime().Log("Normal");
-        synth->writeRBP(3, ch ,prg);
+        putData.data.kit = ch & 0x3f;
+        if (in_place)
+        {
+            synth->partonoffLock(ch, -1);
+            synth->SetRBP(&putData, false);
+        }
+        else
+            synth->midilearn.writeMidi(&putData, sizeof(putData), true);
     }
 }
-
-
-/*void MidiDecode::setMidiNote(unsigned char channel, unsigned char note,
-                           unsigned char velocity)
-{
-    synth->NoteOn(channel, note, velocity);
-}
-
-
-void MidiDecode::setMidiNoteOff(unsigned char channel, unsigned char note)
-{
-    synth->NoteOff(channel, note);
-}*/
 
 

@@ -1,5 +1,10 @@
 yoshimi 1.5.4 M
 
+2017-11-2 Will.
+* Major split up of midi controls from audio thread.
+* Unification of CC from any source.
+* More on unified root/bank/program.
+
 2017-10-31 Will
 * Further inprovments to unified root/bank/program.
 * Added 'Root_Bank_Program.txt' to dev_notes.

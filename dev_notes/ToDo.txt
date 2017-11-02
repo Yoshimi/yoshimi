@@ -1,3 +1,9 @@
+setting vectors from CLI doesn't set number of parts
+and doesn't update vector gui.
+setting cli features doesn't update gui.
+
+jack and alsa midi/audio settings dont alternate properly.
+
 Sometimes can't edit upper voice rows from panel
 
 still not fully converted:

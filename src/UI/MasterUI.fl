@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified October 2017
+Modified November 2017
 
 } {in_source in_header
 }
@@ -1131,7 +1131,7 @@ ZynAddSubFX}
     int nval = lrint(value);
     if (newpart == 0xd9)
     {
-        /*for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)  ***** disabled till rest of system done
+        for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
         { // panel entries only
             if(control == 2 && panellistitem[i]->partrcv->value() == kititem && panellistitem[i]->partenabled->value() != 0)
             {
@@ -1142,13 +1142,13 @@ ZynAddSubFX}
             }
         }
 
-        bool isForUs = (partui->midich->value() == (kititem + 1) && partui->partGroupEnable->value() != 0);*/
+        bool isForUs = (partui->midich->value() == (kititem + 1) && partui->partGroupEnable->value() != 0);
         switch(control)
         {
             case 0:
             case 1:
                 break;
-            /*case 2: ***** disabled till rest of system done
+            case 2:
                 if (isForUs)
                 {
                     switch(engine)
@@ -1176,7 +1176,7 @@ ZynAddSubFX}
                             break;
                     }
                 }
-                break;*/
+                break;
             case 8:
                 if (insert < 255)
                 {

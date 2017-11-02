@@ -109,9 +109,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void SetController(unsigned char chan, int type, short int par);
         void SetZynControls();
         void SetEffects(unsigned char category, unsigned char command, unsigned char nFX, unsigned char nType, int nPar, unsigned char value);
-        int SetRBP(CommandBlock *getData);
-        void SetBankRoot(int rootnum);
-        void SetBank(int banknum);
+        int RootBank(int rootnum, int banknum);
+        int SetRBP(CommandBlock *getData, bool notinplace = true);
         int ReadBankRoot(void);
         int ReadBank(void);
         void SetProgram(unsigned char chan, unsigned short pgm);

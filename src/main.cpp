@@ -163,8 +163,7 @@ static void *mainGuiThread(void *arg)
                     size_t tmpRoot = _synth->ReadBankRoot();
                     size_t tmpBank = _synth->ReadBank();
                     _synth->getRuntime().loadConfig(); // restore old settings
-                    _synth->SetBankRoot(tmpRoot);
-                    _synth->SetBank(tmpBank); // but keep current root and bank
+                    _synth->RootBank(tmpRoot, tmpBank); // but keep current root and bank
                 }
                 _synth->getRuntime().saveConfig();
                 int tmpID =  _synth->getUniqueId();
@@ -223,8 +222,7 @@ static void *mainGuiThread(void *arg)
         size_t tmpRoot = firstSynth->ReadBankRoot();
         size_t tmpBank = firstSynth->ReadBank();
         firstSynth->getRuntime().loadConfig(); // restore old settings
-        firstSynth->SetBankRoot(tmpRoot);
-        firstSynth->SetBank(tmpBank); // but keep current root and bank
+        firstSynth->RootBank(tmpRoot, tmpBank); // but keep current root and bank
     }
     firstSynth->getRuntime().saveConfig();
     firstSynth->saveHistory();

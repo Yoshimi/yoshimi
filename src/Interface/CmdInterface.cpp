@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified October 2017
+    Modified November 2017
 */
 
 #include <iostream>
@@ -1710,10 +1710,6 @@ int CmdInterface::commandPart(bool justSet)
             if (tmp < 0 || tmp > 159)
                 return range_msg;
             sendDirect(npart, 64, 74, 240, 255, 255, 255, 255, tmp);
-            //if (tmp < 128)
-                //synth->writeRBP(3, npart | 0x80, tmp); // lower set
-            //else
-                //synth->writeRBP(4, npart | 0x80, tmp - 128); // upper set
             reply = done_msg;
         }
         else
@@ -2045,7 +2041,7 @@ int CmdInterface::commandReadnSet()
         }
         if (point[0] != 0)
         {
-            synth->SetBankRoot(string2int(point));
+            sendDirect(255, 64, 8, 217, 0, 255, string2int(point), 192);
             return done_msg;
         }
         else
@@ -2061,7 +2057,7 @@ int CmdInterface::commandReadnSet()
         }
         if (point[0] != 0)
         {
-            synth->SetBank(string2int(point));
+            sendDirect(255, 64, 8, 217, 0, string2int(point), 255, 192);
             return done_msg;
         }
         else
@@ -2610,7 +2606,6 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = name_msg;
             else
                 sendDirect(npart, 64, 78, 240, 255, 255, 255, 255, miscMsgPush((string) point));
-                //synth->writeRBP(5, npart, miscMsgPush((string) point));
             reply = done_msg;
         }
         else
@@ -2758,7 +2753,6 @@ bool CmdInterface::cmdIfaceProcessCommand()
                         {
                             string name = string(point);
                             if (name > "!")
-                                //name = "no file";
                                 par2 = miscMsgPush(name);
                             //cout << name << endl;
                         }
