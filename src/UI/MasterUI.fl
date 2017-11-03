@@ -100,7 +100,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 }
 
-class MasterUI {selected : {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1118,7 +1118,8 @@ ZynAddSubFX}
 
     collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, engine, insert, parameter, par2);} {}
   }
-  Function {returns_update(CommandBlock *getData)} {} {
+  Function {returns_update(CommandBlock *getData)} {open
+  } {
     code {//
     float value = getData->data.value;
     bool wasFromHere = getData->data.type & 0x20;
@@ -1131,12 +1132,13 @@ ZynAddSubFX}
     int nval = lrint(value);
     if (newpart == 0xd9)
     {
+        float vol = (value * synth->part[npart]->ctl->volume.data) / 127;
         for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
         { // panel entries only
             if(control == 2 && panellistitem[i]->partrcv->value() == kititem && panellistitem[i]->partenabled->value() != 0)
             {
                 if (engine == 7)
-                    panellistitem[i]->partvolume->value(value);
+                    panellistitem[i]->partvolume->value(vol);
                 else if (engine == 10)
                     panellistitem[i]->partpanning->value(value);
             }
@@ -1157,7 +1159,7 @@ ZynAddSubFX}
                             partui->modulation->value(value);
                             break;
                         case 7: // volume
-                            partui->partvol->value(value);
+                            partui->partvol->value(vol);
                             break;
                         case 10: // panning
                             partui->partpan->value(value);
@@ -1396,7 +1398,8 @@ ZynAddSubFX}
                 }
             }
             break;
-    }} {}
+    }} {selected
+    }
   }
   Function {updatesendwindow()} {} {
     code {//

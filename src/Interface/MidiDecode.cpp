@@ -204,34 +204,39 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
      * need to work out some kind of loop-back so optional
      * vector control CCs can be picked up.
      *
-     * Some controller valuse are >= 640 so they will be ignored by
+     * Some controller values are >= 640 so they will be ignored by
      * later calls, but are passed as 128+ for this call.
      * Pitch wheel is 640 and is 14 bit. It sets bit 1 of 'category'
      */
     if (synth->midilearn.runMidiLearn(param, ctrl & 255, ch, in_place | ((ctrl == 640) << 1)))
         return;
 
+    /*
+    * This is done here instead of in 'setMidi' so MidiLearn
+    * handles all 14 bit values the same.
+    */
+    if (ctrl == C_pitchwheel)
+    {
+        param -= 8192;
+        sendMidiCC(inSync, ch, ctrl, param);
+        return;
+    }
+
     if (ctrl == C_breath)
     {
         sendMidiCC(inSync, ch, C_volume, param);
         ctrl = C_filtercutoff;
     }
-    else
-        /*
-         * This is done here instead of in 'setMidi' so MidiLearn
-         * handles all 14 bit values the same.
-         */
-        if (ctrl == C_pitchwheel)
-            param -= 8192;
 
     // do what's left!
-    sendMidiCC(inSync, ch, ctrl, param);
+    if (ctrl < 128) // don't want to pick up strays
+        sendMidiCC(inSync, ch, ctrl, param);
 }
 
 
 void MidiDecode::sendMidiCC(bool inSync, unsigned char chan, int type, short int par)
 {
-    if (inSync)
+    if (inSync) // no CLI or GUI updates needed
     {
         synth->SetController(chan, type, par);
         return;

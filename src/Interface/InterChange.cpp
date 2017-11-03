@@ -1279,7 +1279,7 @@ string InterChange::resolveMain(CommandBlock *getData)
     unsigned char par2 = getData->data.par2;
     string name;
     string contstr = "";
-    if (getData->data.part == 0xd9)
+    if (getData->data.part == 0xd9) // MIDI
     {
         switch (control)
         {

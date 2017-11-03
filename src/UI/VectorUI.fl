@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
 Modified September 2017
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {using namespace std;} {public local
@@ -42,7 +42,7 @@ decl {\#include "BankUI.h"} {public local
 decl {\#include "ParametersUI.h"} {public local
 }
 
-class VectorUI {: {private MiscFuncs}
+class VectorUI {open : {private MiscFuncs}
 } {
   Function {make_window(void)} {} {
     Fl_Window vectorwindow {
@@ -529,14 +529,15 @@ class VectorUI {: {private MiscFuncs}
     }
     collect_data(synth, value, (Fl::event_button() | type), control, part, kit, engine, insert, parameter, par2);} {}
   }
-  Function {returns_update(CommandBlock *getData)} {} {
+  Function {returns_update(CommandBlock *getData)} {open
+  } {
     code {//
-    //float value = getData->data.value;
+    float value = getData->data.value;
     //bool isGui = (getData->data.type & 0x20);
     unsigned char control = getData->data.control;
     unsigned char insert = getData->data.insert;
     unsigned char par2 = getData->data.par2;
-    //int value_int = lrint(value);
+    int value_int = lrint(value);
     //bool value_bool = (value > 0.5f);
     string msg;
 
@@ -546,6 +547,49 @@ class VectorUI {: {private MiscFuncs}
             msg = miscMsgPop(par2);;
             loadlabel[insert] = msg;
             Loaded->copy_label(msg.c_str());
+            break;
+
+        case 16:
+            synth->getGuiMaster()->maxparts->value(NUM_MIDI_CHANNELS * 2);
+            synth->getGuiMaster()->partmax = NUM_MIDI_CHANNELS * 2;
+            synth->getGuiMaster()->updatepanel();
+            Xcontrol->value(value_int);
+            Xgroup->activate();
+            Ycontrol->activate();
+            break;
+
+        case 19:
+            Xfeat1->value(value_int);
+            break;
+        case 20:
+            Xfeat2->value(value_int);
+            break;
+        case 21:
+            Xfeat3->value(value_int);
+            break;
+        case 22:
+            Xfeat4->value(value_int);
+            break;
+
+        case 32:
+            synth->getGuiMaster()->maxparts->value(NUM_MIDI_CHANNELS * 4);
+            synth->getGuiMaster()->partmax = NUM_MIDI_CHANNELS * 4;
+            synth->getGuiMaster()->updatepanel();
+            Ycontrol->value(value_int);
+            Ygroup->activate();
+            break;
+
+        case 35:
+            Yfeat1->value(value_int);
+            break;
+        case 36:
+            Yfeat2->value(value_int);
+            break;
+        case 37:
+            Yfeat3->value(value_int);
+            break;
+        case 38:
+            Yfeat4->value(value_int);
             break;
 
         case 96:
@@ -559,7 +603,8 @@ class VectorUI {: {private MiscFuncs}
             else
                 clearVector(insert);
             break;
-}} {}
+}} {selected
+    }
   }
   Function {VectorUI(SynthEngine *_synth, BankUI *_bankui, ParametersUI *_paramsui)} {} {
     code {//
@@ -706,7 +751,7 @@ class VectorUI {: {private MiscFuncs}
         Yfeat4->value(1);
     else
         Yfeat4->value(0);} {}
-    }
+  }
   Function {setInstrumentLabel(int npart)} {} {
     code {//
     if ((npart & 0xf) != BaseChan)

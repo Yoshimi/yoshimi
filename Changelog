@@ -1,6 +1,10 @@
 yoshimi 1.5.4 M
 
-2017-11-2 Will.
+2017-11-3 Will
+* Restored MIDI volume GUI action.
+* Some more Vector controls now thread safe.
+
+2017-11-2 Will
 * Major split up of midi controls from audio thread.
 * Unification of CC from any source.
 * More on unified root/bank/program.
