@@ -474,18 +474,6 @@ void *SynthEngine::RBPthread(void)
             {
                 switch ((unsigned char)block.data[0])
                 {
-                    /*case 3: // load standard instrument
-                        SetProgram(block.data[1], block.data[2]);
-                        break;
-
-                    case 4: // load upper set instrument
-                        SetProgram(block.data[1], (block.data[2] + 128));
-                        break;
-
-                    case 5: // load file named instrument via miscMsg
-                        SetProgramToPart(block.data[1], -1, miscMsgPop(block.data[2]));
-                        break;*/
-
                     case 6: // cease all sound
                         switch(block.data[1] & 0xff)
                         {
@@ -586,27 +574,24 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
     struct timeval tv1, tv2;
     gettimeofday(&tv1, NULL);
 #endif
-    if (!velocity)
-        this->NoteOff(chan, note);
-    else if (!isMuted())
-        for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+    for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+    {
+        if (chan == part[npart]->Prcvchn)
         {
-            if (chan == part[npart]->Prcvchn)
+            if (partonoffRead(npart))
             {
-               if (partonoffRead(npart))
-                {
 #ifdef MUTEX
-                    actionLock(lockType);
+                actionLock(lockType);
 #endif
-                    part[npart]->NoteOn(note, velocity, keyshift);
+                part[npart]->NoteOn(note, velocity, keyshift);
 #ifdef MUTEX
-                    actionLock(unlockType);
+                actionLock(unlockType);
 #endif
-                }
-                else if (VUpeak.values.parts[npart] > (-velocity))
-                    VUpeak.values.parts[npart] = -(0.2 + velocity); // ensure fake is always negative
             }
+            else if (VUpeak.values.parts[npart] > (-velocity))
+                VUpeak.values.parts[npart] = -(0.2 + velocity); // ensure fake is always negative
         }
+    }
 #ifdef REPORT_NOTEON
     if (Runtime.showTimes)
     {
@@ -825,8 +810,13 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
     int originalRoot = bank.getCurrentRootID();
     int originalBank = bank.getCurrentBankID();
     bool ok = true;
+    bool hasProgChange = (program < 0xff || par2 < 0xff);
 
-    if (root <= 127)
+    struct timeval tv1, tv2;
+    if (Runtime.showTimes && hasProgChange)
+        gettimeofday(&tv1, NULL);
+
+    if (root < 0x80)
     {
         if (bank.setCurrentRootID(root))
         {
@@ -861,7 +851,7 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
         }
     }
 
-    if (ok && banknum <= 127)
+    if (ok && (banknum < 0x80))
     {
         if (bank.setCurrentBankID(banknum, true))
         {
@@ -888,7 +878,7 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
             }
         }
     }
-    if (program < 0xff || par2 < 0xff)
+    if (hasProgChange)
     {
         if (ok)
         {
@@ -953,6 +943,17 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
             partonoffLock(npart, 2); // as it was
     }
 
+    if (ok && Runtime.showTimes && hasProgChange)
+    {
+        gettimeofday(&tv2, NULL);
+        if (tv1.tv_usec > tv2.tv_usec)
+        {
+            tv2.tv_sec--;
+            tv2.tv_usec += 1000000;
+        }
+        int actual = ((tv2.tv_sec - tv1.tv_sec) *1000 + (tv2.tv_usec - tv1.tv_usec)/ 1000.0f) + 0.5f;
+        name += ("  Time " + to_string(actual) + "mS");
+    }
     int msgID = 0xff;
     if (notinplace)
         msgID = miscMsgPush(name);
@@ -971,100 +972,6 @@ int SynthEngine::ReadBankRoot(void)
 int SynthEngine::ReadBank(void)
 {
     return bank.currentBankID;
-}
-
-
-/*
- * If we want to change a *specific* part regardless of what MIDI chanel it
- * is listening to we use 0 - 63 ORed with 128
- *
- * Values 0 - 15 will change 'standard' parts listening to that channel
- */
-void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
-{
-    bool partOK = true;
-    int npart;
-    string fname = bank.getfilename(pgm);
-
-    if ((fname == "") || (bank.getname(pgm) < "!")) // can't get a program name less than this
-        Runtime.Log("No Program " + asString(pgm + 1) + " in this bank");
-    else
-    {
-        if (chan <  NUM_MIDI_CHANNELS) // a normal program change
-        {
-            for (npart = 0; npart < NUM_MIDI_CHANNELS; ++npart)
-                // we don't want upper parts (16 - 63) activiated!
-                if (chan == part[npart]->Prcvchn)
-                {
-                    // ensure all listening parts succeed
-                    if (!SetProgramToPart(npart, pgm, fname))
-                    {
-                        partOK = false;
-                        break;
-                    }
-                }
-        }
-        else
-        {
-            npart = chan & 0x7f;
-            if (npart < Runtime.NumAvailableParts)
-                partOK = SetProgramToPart(npart, pgm, fname);
-        }
-        if (!partOK)
-            Runtime.Log("SynthEngine setProgram: Invalid program data");
-    }
-}
-
-
-// for de-duplicating bits in SetProgram() and for calling from everywhere else
-// this replaces bank->loadfromslot for thread safety etc.
-bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
-{
-    bool loadOK = false;
-    string loaded;
-    struct timeval tv1, tv2;
-    gettimeofday(&tv1, NULL);
-
-    if (part[npart]->loadXMLinstrument(fname))
-    {
-        loadOK = true;
-        // show file instead of program if we got here from Instruments -> Load External...
-        loaded = "Loaded " +
-                    ((pgm == -1) ? fname : to_string(pgm + 1)
-                    + " \"" + bank.getname(pgm) + "\"")
-                    + " to Part " + to_string(npart + 1);
-        if (Runtime.showTimes)
-        {
-            gettimeofday(&tv2, NULL);
-            if (tv1.tv_usec > tv2.tv_usec)
-            {
-                tv2.tv_sec--;
-                tv2.tv_usec += 1000000;
-            }
-            int actual = ((tv2.tv_sec - tv1.tv_sec) *1000 + (tv2.tv_usec - tv1.tv_usec)/ 1000.0f) + 0.5f;
-            loaded += ("  Time " + to_string(actual) + "mS");
-        }
-    }
-
-    if (!loadOK)
-    {
-        partonoffLock(npart, 2); // as before
-        //GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Could not load " + fname));
-    }
-    else
-    {
-        partonoffLock(npart, 2 - Runtime.enable_part_on_voice_load); // always on if enabled
-
-        /* error messages need to be made GUI sourced only
-
-        if (part[npart]->Pname == "Simple Sound")
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Instrument is called 'Simple Sound', Yoshimi's basic sound name. You should change this if you wish to re-save."));
-        */
-        Runtime.Log(loaded);
-        Runtime.currentPart = npart;
-        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
-    }
-    return loadOK;
 }
 
 

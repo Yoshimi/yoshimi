@@ -23,7 +23,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified October 2017
+Modified November 2017
 } {in_source in_header
 }
 
@@ -307,7 +307,7 @@ class ConfigUI {selected : {private MiscFuncs}
           Fl_Check_Button jackMidi {
             label {Set as preferred MIDI}
             callback {//
-                        send_data(33, o->value(), 0xc0);}
+                        send_data(33, o->value(), 0xd0);}
             xywh {195 88 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().midiEngine == jack_midi) o->value(1);}
           }
@@ -322,7 +322,7 @@ class ConfigUI {selected : {private MiscFuncs}
           Fl_Check_Button jackAudio {
             label {Set as preferred audio}
             callback {//
-                        send_data(35, o->value(), 0xc0);}
+                        send_data(35, o->value(), 0xd0);}
             xywh {195 209 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().audioEngine == jack_audio) o->value(1);}
           }
@@ -353,7 +353,7 @@ class ConfigUI {selected : {private MiscFuncs}
           Fl_Check_Button alsaMidi {
             label {Set as preferred MIDI}
             callback {//
-                        send_data(49, o->value(), 0xc0);}
+                        send_data(49, o->value(), 0xd0);}
             xywh {195 80 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().midiEngine == alsa_midi) o->value(1);}
           }
@@ -368,7 +368,7 @@ class ConfigUI {selected : {private MiscFuncs}
           Fl_Check_Button alsaAudio {
             label {Set as preferred audio}
             callback {//
-                        send_data(51, o->value(), 0xc0);}
+                        send_data(51, o->value(), 0xd0);}
             xywh {195 169 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().audioEngine == alsa_audio) o->value(1);}
           }

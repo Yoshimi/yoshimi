@@ -1370,7 +1370,7 @@ ZynAddSubFX}
             name = miscMsgPop(par2);
             if (wasFromHere && name.find("FAILED") == 1)
                 fl_alert("%s",name.c_str());
-            refresh_master_ui(0);
+            refresh_master_ui(1);
             break;
 
         case 93: // save state
@@ -1412,7 +1412,7 @@ ZynAddSubFX}
     int tmp = part % NUM_MIDI_CHANNELS;
     panellistitem[tmp]->refresh();} {}
   }
-  Function {updatepanel()} {} {
+  Function {updatepanel(bool full = false)} {} {
     code {//
     if (synth->getRuntime().single_row_panel)
     {
@@ -1455,6 +1455,8 @@ ZynAddSubFX}
 
     int oldswitch = channelswitch->value();
     channelswitch->value(synth->getRuntime().channelSwitchType);
+    if (full)
+        oldswitch = channelswitch->value(); // disables 'pending'
     if (synth->getRuntime().channelSwitchType > 0)
     {
         if (oldswitch == 0)
@@ -1690,7 +1692,7 @@ ZynAddSubFX}
     else
         setMasterLabel(findleafname(synth->lastPatchSetSeen()));
     updatesendwindow();
-    updatepanel();
+    updatepanel(type & 1);
     if (!(type & 2))
         vectorui->RefreshChans();
     bankui->Hide();

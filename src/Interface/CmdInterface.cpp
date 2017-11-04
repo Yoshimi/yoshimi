@@ -1077,6 +1077,7 @@ int CmdInterface::commandVector()
             Runtime.Log("No vector on channel " + asString(chan + 1));
         return done_msg;
     }
+
     unsigned char ch = string2int127(point);
     if (ch > 0)
     {
@@ -1095,7 +1096,7 @@ int CmdInterface::commandVector()
 
     if (matchWord(1, point, "off"))
     {
-        synth->vectorSet(127, chan, 0);
+        sendDirect(0, 64, 96, 192, 255, 255, chan);
         axis = 0;
         bitClear(level, vect_lev);
         return done_msg;
@@ -1111,6 +1112,7 @@ int CmdInterface::commandVector()
         }
         axis = 1;
     }
+
     if (point[0] == 0)
         return done_msg;
 
@@ -1120,12 +1122,19 @@ int CmdInterface::commandVector()
             return value_msg;
 
         tmp = string2int(point);
-        if (!synth->vectorInit(axis, chan, tmp))
-            synth->vectorSet(axis, chan, tmp);
-        if(Runtime.vectordata.Enabled[chan])
+        if (axis == 0)
+        {
+            sendDirect(tmp, 192, 16, 192, 255, 255, chan);
             bitSet(level, vect_lev);
-        return done_msg;
+            return done_msg;
+        }
+        if (Runtime.vectordata.Enabled[chan])
+        {
+            sendDirect(tmp, 192, 32, 192, 255, 255, chan);
+            return done_msg;
+        }
     }
+
     if (!Runtime.vectordata.Enabled[chan])
     {
         Runtime.Log("Vector X CC must be set first");
@@ -1153,45 +1162,25 @@ int CmdInterface::commandVector()
         sendDirect(0, type, 8, 0xc0, 0xff, 0xff, chan, 0x80, miscMsgPush(name));
         return done_msg;
     }
+
     if (matchnMove(1, point, "features"))
     {
-        unsigned int vecfeat;
         if (point[0] == 0)
-            reply = value_msg;
-        else
-        {
-            if (axis == 0)
-                vecfeat = Runtime.vectordata.Xfeatures[chan];
-            else
-                vecfeat = Runtime.vectordata.Yfeatures[chan];
-            tmp = string2int(point);
-            if (tmp < 1 || tmp > 4)
-                return range_msg;
-            point = skipChars(point);
-            if (matchnMove(1, point, "enable"))
-            {
-                bitSet(vecfeat, tmp - 1);
-                if (tmp > 1) // volume is not reversible
-                    bitClear(vecfeat, (tmp + 2)); // disable reverse
-            }
-            else if(matchnMove(1, point, "reverse"))
-            {
-                bitSet(vecfeat, tmp - 1);
-                if (tmp > 1)
-                    bitSet(vecfeat, (tmp + 2));
-            }
-            else
-            {
-                bitClear(vecfeat, tmp - 1);
-                if (tmp > 1)
-                    bitClear(vecfeat, (tmp + 2));
-            }
-            if (!synth->vectorInit(axis + 2, chan, vecfeat))
-                synth->vectorSet(axis + 2, chan, vecfeat);
-            reply = done_msg;
-        }
+            return value_msg;
+        int feat = string2int(point);
+        if (feat < 1 || feat > 4)
+            return range_msg;
+        point = skipChars(point);
+        int enable = 0;
+        if (matchnMove(1, point, "enable"))
+            enable = 1;
+        else if (feat > 1 && matchnMove(1, point, "reverse"))
+            enable = 2;
+        sendDirect(enable, 192, 18 + (axis * 16) + feat , 192, 255, 255, chan);
+        return done_msg;
     }
-    else if (matchnMove(2, point, "program") || matchnMove(1, point, "instrument"))
+
+    if (matchnMove(2, point, "program") || matchnMove(1, point, "instrument"))
     {
         int hand = point[0] | 32;
         point = skipChars(point); // in case they type the entire word
@@ -1209,28 +1198,29 @@ int CmdInterface::commandVector()
         tmp = string2int(point);
         if (!synth->vectorInit(axis * 2 + hand + 4, chan, tmp))
             synth->vectorSet(axis * 2 + hand + 4, chan, tmp);
-        reply = done_msg;
+        return done_msg;
     }
-    else
+
+    if (!matchnMove(1, point, "control"))
+        return opp_msg;
+    if(isdigit(point[0]))
     {
-        if (!matchnMove(1, point, "control"))
-            return opp_msg;
-        if(isdigit(point[0]))
+        int cmd = string2int(point);
+        if (cmd < 2 || cmd > 4)
+            return range_msg;
+        point = skipChars(point);
+        if (point[0] == 0)
+            return value_msg;
+        tmp = string2int(point);
+        if (!synth->vectorInit(axis * 3 + cmd + 6, chan, tmp))
         {
-            int cmd = string2int(point);
-            if (cmd < 2 || cmd > 4)
-                return range_msg;
-            point = skipChars(point);
-            if (point[0] == 0)
-                return value_msg;
-            tmp = string2int(point);
-            if (!synth->vectorInit(axis * 3 + cmd + 6, chan, tmp))
             synth->vectorSet(axis * 3 + cmd + 6, chan, tmp);
             reply = done_msg;
         }
         else
             reply = value_msg;
     }
+
     return reply;
 }
 

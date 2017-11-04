@@ -113,8 +113,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         int SetRBP(CommandBlock *getData, bool notinplace = true);
         int ReadBankRoot(void);
         int ReadBank(void);
-        void SetProgram(unsigned char chan, unsigned short pgm);
-        bool SetProgramToPart(int npart, int pgm, string fname);
         void SetPartChan(unsigned char npart, unsigned char nchan);
         void SetPartDestination(unsigned char npart, unsigned char dest);
         void SetPartShift(unsigned char npart, unsigned char shift);

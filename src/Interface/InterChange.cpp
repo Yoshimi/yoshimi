@@ -528,6 +528,7 @@ void InterChange::transfertext(CommandBlock *getData)
         //cout << " interchange prog " << value << "  chan " << int(kititem) << "  bank " << int(engine) << "  root " << int(insert) << endl;
         if (text > "!")
             getData->data.par2 = miscMsgPush(text);
+
         int msgID = synth->SetRBP(getData);
         if (msgID >= 0x1000)
         {
@@ -3177,7 +3178,7 @@ bool InterChange::commandSend(CommandBlock *getData)
 bool InterChange::commandSendReal(CommandBlock *getData)
 {
     unsigned char npart = getData->data.part;
-    if (npart == 0xD9)
+    if (npart == 0xD9) // music input takes priority!
     {
         commandMidi(getData);
         return false;
@@ -3408,8 +3409,10 @@ void InterChange::commandMidi(CommandBlock *getData)
         case 8: // Program / Bank / Root
             getData->data.parameter = 0x80;
             if ((value_int < 0xff || par2 < 0xff) && chan < synth->getRuntime().NumAvailableParts)
-            synth->partonoffLock(chan & 0x3f, -1);
-            synth->getRuntime().finishedCLI = true;
+            {
+                synth->partonoffLock(chan & 0x3f, -1);
+                synth->getRuntime().finishedCLI = true;
+            }
             break;
     }
 }
@@ -6286,10 +6289,6 @@ void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
 
 void InterChange::commandFilter(CommandBlock *getData)
 {
-//#pragma message "Gui writes changed to reads"
-//    if (getData->data.type & 0x20)
-//        getData->data.type = getData->data.type & 0xbf;
-
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
@@ -6557,10 +6556,6 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
 
 void InterChange::commandEnvelope(CommandBlock *getData)
 {
-//#pragma message "Gui writes changed to reads"
-//    if (getData->data.type & 0x20)
-//        getData->data.type = getData->data.type & 0xbf;
-
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
@@ -6917,10 +6912,6 @@ void InterChange::commandSysIns(CommandBlock *getData)
 
 void InterChange::commandEffects(CommandBlock *getData)
 {
-//#pragma message "Gui writes changed to reads"
-//    if (getData->data.type & 0x20)
-//        getData->data.type = getData->data.type & 0xbf;
-
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;

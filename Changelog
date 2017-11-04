@@ -1,5 +1,10 @@
 yoshimi 1.5.4 M
 
+2017-11-4 Will
+* Vector CLI controls fully thread-safe.
+  Some GUI and MIDI ones to complete.
+* Corrected JACK / ALSA GUI selections.
+
 2017-11-3 Will
 * Restored MIDI volume GUI action.
 * Some more Vector controls now thread safe.
