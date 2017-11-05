@@ -570,6 +570,11 @@ void SynthEngine::setAllPartMaps(void)
 // Note On Messages (velocity == 0 => NoteOff)
 void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char velocity)
 {
+    if (velocity == 0)
+    {
+        NoteOff(chan, note);
+        return;
+    }
 #ifdef REPORT_NOTEON
     struct timeval tv1, tv2;
     gettimeofday(&tv1, NULL);

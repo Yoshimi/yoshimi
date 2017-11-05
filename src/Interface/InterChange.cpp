@@ -3405,7 +3405,6 @@ void InterChange::commandMidi(CommandBlock *getData)
             break;
         case 2:
             synth->SetController(chan, char1, value_int);
-            getData->data.kit = (chan & 0x3f); // clear direct type
             break;
 
         case 8: // Program / Bank / Root

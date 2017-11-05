@@ -5,6 +5,7 @@ yoshimi 1.5.4 M
   Stable, but some details to be improved.
 * Further refinements to vector control,
   and improved error handling.
+* BugFix: MIDI zero velocity not sent to noteoff :(
 
 2017-11-4 Will
 * Vector CLI controls fully thread-safe.
