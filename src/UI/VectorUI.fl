@@ -302,7 +302,7 @@ class VectorUI {: {private MiscFuncs}
         string name = synth->getRuntime().masterCCtest(tmp);
         if (name != "")
         {
-            errorlabel("In use for " + name);
+            errorlabel("CC " + to_string(tmp) +" in use for " + name);
             return;
         }
 
@@ -490,7 +490,7 @@ class VectorUI {: {private MiscFuncs}
         string name = synth->getRuntime().masterCCtest(tmp);
         if (name != "")
         {
-            errorlabel("In use for " + name);
+            errorlabel("CC " + to_string(tmp) +" in use for " + name);
             return;
         }
 
@@ -919,7 +919,6 @@ class VectorUI {: {private MiscFuncs}
   }
   Function {errorlabel(string msg)} {} {
     code {//
-            msg = "Error: " + msg;
             synth->getGuiMaster()->midilearnui->words->copy_label(msg.c_str());
             synth->getGuiMaster()->midilearnui->message->show();
             synth->getGuiMaster()->midilearnui->message->position(Fl::event_x_root() + 16, Fl::event_y_root());} {}

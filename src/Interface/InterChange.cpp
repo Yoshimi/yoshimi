@@ -3132,6 +3132,7 @@ void InterChange::returns(CommandBlock *getData)
 
     if (synth->guiMaster && isOKtoRedraw)
     {
+        //cout << "writing to GUI" << endl;
         if (jack_ringbuffer_write_space(toGUI) >= commandSize)
             jack_ringbuffer_write(toGUI, (char*) getData->bytes, commandSize);
     }
@@ -3404,6 +3405,7 @@ void InterChange::commandMidi(CommandBlock *getData)
             break;
         case 2:
             synth->SetController(chan, char1, value_int);
+            getData->data.kit = (chan & 0x3f); // clear direct type
             break;
 
         case 8: // Program / Bank / Root
@@ -3419,11 +3421,6 @@ void InterChange::commandMidi(CommandBlock *getData)
 
 void InterChange::commandVector(CommandBlock *getData)
 {
-/*
- * Currently only CLI gets here apart from
- * load and save which are also handled by the GUI
- */
-
     int value = getData->data.value; // no floats here
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -3490,32 +3487,35 @@ void InterChange::commandVector(CommandBlock *getData)
 
         case 8:
             break; // handled elsewhere
-        case 16:
+
+        case 16: // enable vector and set X CC
             if (write)
             {
                 if (value >= 14)
                 {
                     if (!synth->vectorInit(0, chan, value))
                         synth->vectorSet(0, chan, value);
+                    else
+                        getData->data.value = 0;
                 }
             }
             else
                 ;
             break;
-        case 17:
+        case 17: // left instrument
             if (write)
                 synth->vectorSet(4, chan, value);
             else
                 ;
             break;
-        case 18:
+        case 18: // right instrument
             if (write)
                 synth->vectorSet(5, chan, value);
             else
                 ;
             break;
         case 19:
-        case 35:
+        case 35: // volume feature
             if (write)
                 if (value == 0)
                     bitClear(features, 0);
@@ -3525,7 +3525,7 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             break;
         case 20:
-        case 36:
+        case 36: // panning feature
             if (write)
             {
                 bitClear(features, 1);
@@ -3541,7 +3541,7 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             break;
         case 21:
-        case 37:
+        case 37: // filter cutoff feature
             if (write)
             {
                 bitClear(features, 2);
@@ -3557,7 +3557,7 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             break;
         case 22:
-        case 38:
+        case 38: // modulation feature
             if (write)
             {
                 bitClear(features, 3);
@@ -3573,25 +3573,27 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             break;
 
-        case 32:
+        case 32: // enable Y and set CC
             if (write)
             {
                 if (value >= 14)
                 {
                     if (!synth->vectorInit(1, chan, value))
                         synth->vectorSet(1, chan, value);
+                    else
+                        getData->data.value = 0;
                 }
             }
             else
                 ;
             break;
-        case 33:
+        case 33: // up instrument
             if (write)
                 synth->vectorSet(6, chan, value);
             else
                 ;
             break;
-        case 34:
+        case 34: // down instrument
             if (write)
                 synth->vectorSet(7, chan, value);
             else

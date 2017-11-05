@@ -238,10 +238,12 @@ void MidiDecode::sendMidiCC(bool inSync, unsigned char chan, int type, short int
 {
     if (inSync) // no CLI or GUI updates needed
     {
+        //cout << "CC inSync" << endl;
         synth->SetController(chan, type, par);
         return;
     }
 
+    //cout << "CC buffered" << endl;
     CommandBlock putData;
     memset(&putData, 0xff, sizeof(putData));
     putData.data.value = par;
@@ -378,7 +380,7 @@ bool MidiDecode::nrpnRunVector(unsigned char ch, int ctrl, int param, bool inSyn
     {
         if (Xopps & 1) // fixed as volume
         {
-            sendMidiCC(inSync, ch | 0x80, C_volume,127 - (p_rev * p_rev / 127));
+            sendMidiCC(inSync, ch | 0x80, C_volume, 127 - (p_rev * p_rev / 127));
             sendMidiCC(inSync, ch | 0x90, C_volume, 127 - (param * param / 127));
         }
         if (Xopps & 2) // default is pan
@@ -411,7 +413,7 @@ bool MidiDecode::nrpnRunVector(unsigned char ch, int ctrl, int param, bool inSyn
     { // if Y hasn't been set these commands will be ignored
         if (Yopps & 1) // fixed as volume
         {
-            sendMidiCC(inSync, ch | 0xa0, C_volume,127 - (p_rev * p_rev / 127));
+            sendMidiCC(inSync, ch | 0xa0, C_volume, 127 - (p_rev * p_rev / 127));
             sendMidiCC(inSync, ch | 0xb0, C_volume, 127 - (param * param / 127));
         }
         if (Yopps & 2) // default is pan
@@ -645,7 +647,8 @@ void MidiDecode::setMidiProgram(unsigned char ch, int prg, bool in_place)
 {
     if (!synth->getRuntime().EnableProgChange)
         return;
-    if (ch >= synth->getRuntime().NumAvailableParts)
+    int maxparts = synth->getRuntime().NumAvailableParts;
+    if (ch >= maxparts)
         return;
 
     CommandBlock putData;
@@ -656,9 +659,15 @@ void MidiDecode::setMidiProgram(unsigned char ch, int prg, bool in_place)
     putData.data.part = 0xd9;
     putData.data.parameter = 0xc0;
 
+    /*
+     * This is a bit slow as we send each part individually
+     * but it is the simplest way to ensure partonoff doesn't
+     * get out of step.
+     * Changes won't normally happen while MIDI is incomming.
+     */
     if (ch < NUM_MIDI_CHANNELS)
-    { // this is a bit of a hack - needs sorting
-        for (int npart = 0; npart < NUM_MIDI_CHANNELS; ++ npart)
+    {
+        for (int npart = 0; npart < maxparts; ++ npart)
         {
             if (ch == synth->part[npart]->Prcvchn)
             {
