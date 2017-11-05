@@ -3404,6 +3404,7 @@ void InterChange::commandMidi(CommandBlock *getData)
             getData->data.type = 0xff; // till we know what to do!
             break;
         case 2:
+            //cout << "Midi controller ch " << to_string(int(chan)) << "  type " << to_string(int(char1)) << "  val " << to_string(value_int) << endl;
             synth->SetController(chan, char1, value_int);
             break;
 

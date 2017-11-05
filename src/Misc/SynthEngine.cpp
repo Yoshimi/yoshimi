@@ -649,6 +649,7 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
     int npart;
     if (chan < NUM_MIDI_CHANNELS)
     {
+        //cout << "npart group " << to_string(int(chan)) << endl;
         for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
         {   // Send the controller to all part assigned to the channel
             if (chan == part[npart]->Prcvchn && partonoffRead(npart))
@@ -657,6 +658,7 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
     }
     else
     {
+        //cout << "npart single " << to_string(int(chan)) << endl;
         npart = chan & 0x3f;
         if (npart < Runtime.NumAvailableParts)
             part[npart]->SetController(type, par);

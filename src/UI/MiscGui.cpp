@@ -132,8 +132,8 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         synth->getGuiMaster()->midilearnui->returns_update(getData);
         return;
     }
-    if (npart == 0xd9 && synth->getGuiMaster()->midilearnui != NULL)
-    { // catch this early
+    if (npart == 0xd9) // midi messages - catch this early
+    {
         synth->getGuiMaster()->returns_update(getData);
         return;
     }

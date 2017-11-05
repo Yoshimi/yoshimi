@@ -1130,21 +1130,37 @@ ZynAddSubFX}
     unsigned char insert = getData->data.insert;
     unsigned char par2 = getData->data.par2;
     int nval = lrint(value);
+    int chan = kititem & 0x3f;
+    bool isSingle = kititem >= 0x40;
+    int mask = NUM_MIDI_CHANNELS - 1;
+
     if (newpart == 0xd9)
     {
         float vol = (value * synth->part[npart]->ctl->volume.data) / 127;
-        for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
-        { // panel entries only
-            if(control == 2 && panellistitem[i]->partrcv->value() == kititem && panellistitem[i]->partenabled->value() != 0)
-            {
-                if (engine == 7)
-                    panellistitem[i]->partvolume->value(vol);
-                else if (engine == 10)
-                    panellistitem[i]->partpanning->value(value);
+        if (control == 2)
+        {
+            for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
+            { // panel entries only
+                if(panellistitem[i]->partenabled->value() != 0)
+                {
+                    if((isSingle && i == (chan & mask)
+                                 && panellistitem[i]->partrcv->value() == (chan & mask)
+                                 && (chan / NUM_MIDI_CHANNELS) == (panelgroup / NUM_MIDI_CHANNELS))
+                        || (!isSingle && panellistitem[i]->partrcv->value() == (chan & mask)))
+                    {
+            	        if (engine == 7)
+                            panellistitem[i]->partvolume->value(vol);
+                        else if (engine == 10)
+                            panellistitem[i]->partpanning->value(value);
+
+                    }
+                }
             }
         }
 
-        bool isForUs = (partui->midich->value() == (kititem + 1) && partui->partGroupEnable->value() != 0);
+        bool isForUs = (isSingle && chan == npart)
+             || (!isSingle &&  (partui->midich->value() == (chan & mask) + 1)
+                           && partui->partGroupEnable->value() != 0);
         switch(control)
         {
             case 0:
