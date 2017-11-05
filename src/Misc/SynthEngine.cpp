@@ -1801,34 +1801,35 @@ bool SynthEngine::vectorInit(int dHigh, unsigned char chan, int par)
 
     if (dHigh < 2)
     {
-        int parts = Runtime.NumAvailableParts;
-        if ((dHigh == 0) && (parts < NUM_MIDI_CHANNELS * 2))
+        string name = Runtime.masterCCtest(par);
+        if (name != "")
         {
-            SetSystemValue(118, NUM_MIDI_CHANNELS * 2);
+            name = "CC " + to_string(par) + " in use for " + name;
+            Runtime.Log(name);
+            return true;
+        }
+        int parts = 2* NUM_MIDI_CHANNELS * (dHigh + 1);
+        if (parts > Runtime.NumAvailableParts)
+            Runtime.NumAvailableParts = parts;
+        if (dHigh == 0)
+        {
             partonoffLock(chan, 1);
             partonoffLock(chan + NUM_MIDI_CHANNELS, 1);
         }
-        else if ((dHigh == 1) && (parts < NUM_MIDI_CHANNELS * 4))
+        else
         {
-            SetSystemValue(118, NUM_MIDI_CHANNELS * 4);
             partonoffLock(chan + NUM_MIDI_CHANNELS * 2, 1);
             partonoffLock(chan + NUM_MIDI_CHANNELS * 3, 1);
         }
-        name = Runtime.testCCvalue(par);
     }
     else if (!Runtime.vectordata.Enabled[chan])
     {
-        Runtime.Log("Vector control must be enabled first");
+        name = "Vector control must be enabled first";
         return true;
     }
-    else if (dHigh > 7)
-        name = Runtime.masterCCtest(par);
 
-    if (name > "")
-    {
-        Runtime.Log("CC " + asString(par) + " in use for " + name);
-        return true;
-    }
+    if (name != "" )
+        Runtime.Log(name);
     return false;
 }
 
@@ -1914,26 +1915,18 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             break;
 
         case 4:
-            //partonoffLock(chan, -1);
-            //writeRBP(3, chan | 0x80, par);
             part = chan;
             break;
 
         case 5:
-            //partonoffLock(chan | 0x10, -1);
-            //writeRBP(3, chan | 0x90, par);
             part = chan | 0x10;
             break;
 
         case 6:
-            //partonoffLock(chan | 0x20, -1);
-            //writeRBP(3, chan | 0xa0, par);
             part = chan | 0x20;
             break;
 
         case 7:
-            //partonoffLock(chan | 0x30, -1);
-            //writeRBP(3, chan | 0xb0, par);
             part = chan | 0x30;
             break;
 

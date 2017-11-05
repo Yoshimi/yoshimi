@@ -1,5 +1,9 @@
 yoshimi 1.5.4 M
 
+2017-11-5 Will
+* Significant re-factor of vector control.
+  Stable, but some details to be improved.
+
 2017-11-4 Will
 * Vector CLI controls fully thread-safe.
   Some GUI and MIDI ones to complete.

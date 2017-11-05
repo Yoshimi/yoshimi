@@ -17,8 +17,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-Modified September 2017
-} {in_source in_header
+Modified November 2017
+} {selected in_source in_header
 }
 
 decl {using namespace std;} {public local
@@ -42,7 +42,7 @@ decl {\#include "BankUI.h"} {public local
 decl {\#include "ParametersUI.h"} {public local
 }
 
-class VectorUI {open : {private MiscFuncs}
+class VectorUI {: {private MiscFuncs}
 } {
   Function {make_window(void)} {} {
     Fl_Window vectorwindow {
@@ -296,26 +296,19 @@ class VectorUI {open : {private MiscFuncs}
         if (tmp < 14)
         {
             send_data(96, 0, 0xf0, 192, 255, 255, BaseChan);
+            o->value(tmp);
+            return;
         }
-        else
+        string name = synth->getRuntime().masterCCtest(tmp);
+        if (name != "")
         {
-            if (!synth->vectorInit(0, BaseChan, tmp))
-                synth->vectorSet(0, BaseChan, tmp);
-            Xgroup->activate();
-            if (synth->getGuiMaster()->partmax < 32)
-                synth->getGuiMaster()->partmax = 32;
-            if (Ycc >= 14)
-            {
-            Ygroup->activate();
-            synth->getGuiMaster()->partmax = 64;
-            }
-            Ycontrol->activate();
-            Ycontrol->redraw();
+            errorlabel("In use for " + name);
+            return;
         }
+
         Xcc =  tmp;
         o->value(tmp);
-        o->redraw();
-        //send_data(16, o->value(), 0xc0);}
+        send_data(16, o->value(), 0xd0);}
         tooltip {The MIDI CC this axis reponds to} xywh {110 85 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12
         code0 {//
         o->value(Xcc);}
@@ -488,20 +481,22 @@ class VectorUI {open : {private MiscFuncs}
 
         if (tmp < 14)
         {
-            synth->getRuntime().vectordata.Yaxis[BaseChan] = 0xff;
-            Ygroup->deactivate();
+            //synth->getRuntime().vectordata.Yaxis[BaseChan] = 0xff;
+            send_data(32, 0xff, 0xd0);
+
+            //Ygroup->deactivate();
+            return;
         }
-        else
+        string name = synth->getRuntime().masterCCtest(tmp);
+        if (name != "")
         {
-            if (!synth->vectorInit(1, BaseChan, tmp))
-                synth->vectorSet(1, BaseChan, tmp);
-            Ygroup->activate();
-            synth->getGuiMaster()->partmax = 64;
+            errorlabel("In use for " + name);
+            return;
         }
+
         Ycc =  tmp;
         o->value(tmp);
-        o->redraw();
-        //send_data(32, o->value(), 0xc0);}
+        send_data(32, o->value(), 0xd0);}
         tooltip {The MIDI CC this axis reponds to} xywh {110 195 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12 deactivate
         code0 {o->value(Ycc);}
       }
@@ -529,8 +524,7 @@ class VectorUI {open : {private MiscFuncs}
     }
     collect_data(synth, value, (Fl::event_button() | type), control, part, kit, engine, insert, parameter, par2);} {}
   }
-  Function {returns_update(CommandBlock *getData)} {open
-  } {
+  Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
     //bool isGui = (getData->data.type & 0x20);
@@ -553,9 +547,18 @@ class VectorUI {open : {private MiscFuncs}
             synth->getGuiMaster()->maxparts->value(NUM_MIDI_CHANNELS * 2);
             synth->getGuiMaster()->partmax = NUM_MIDI_CHANNELS * 2;
             synth->getGuiMaster()->updatepanel();
-            Xcontrol->value(value_int);
-            Xgroup->activate();
-            Ycontrol->activate();
+            if (value_int < 14 || value_int > 119)
+            {
+                Xcontrol->value(0);
+                Xgroup->deactivate();
+                Ycontrol->deactivate();
+            }
+            else
+            {
+                Xcontrol->value(value_int);
+                Xgroup->activate();
+                Ycontrol->activate();
+            }
             break;
 
         case 19:
@@ -575,8 +578,16 @@ class VectorUI {open : {private MiscFuncs}
             synth->getGuiMaster()->maxparts->value(NUM_MIDI_CHANNELS * 4);
             synth->getGuiMaster()->partmax = NUM_MIDI_CHANNELS * 4;
             synth->getGuiMaster()->updatepanel();
-            Ycontrol->value(value_int);
-            Ygroup->activate();
+            if (value_int < 14 || value_int > 119)
+            {
+                Ycontrol->value(0);
+                Ygroup->deactivate();
+            }
+            else
+            {
+            	Ycontrol->value(value_int);
+            	Ygroup->activate();
+            }
             break;
 
         case 35:
@@ -603,8 +614,7 @@ class VectorUI {open : {private MiscFuncs}
             else
                 clearVector(insert);
             break;
-}} {selected
-    }
+}} {}
   }
   Function {VectorUI(SynthEngine *_synth, BankUI *_bankui, ParametersUI *_paramsui)} {} {
     code {//
@@ -906,6 +916,13 @@ class VectorUI {open : {private MiscFuncs}
     //    send_data(96, 255, 0xf0, 192);
         ;
     }} {}*/} {}
+  }
+  Function {errorlabel(string msg)} {} {
+    code {//
+            msg = "Error: " + msg;
+            synth->getGuiMaster()->midilearnui->words->copy_label(msg.c_str());
+            synth->getGuiMaster()->midilearnui->message->show();
+            synth->getGuiMaster()->midilearnui->message->position(Fl::event_x_root() + 16, Fl::event_y_root());} {}
   }
   decl {SynthEngine *synth;} {private local
   }

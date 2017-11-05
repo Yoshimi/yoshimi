@@ -1196,12 +1196,12 @@ int CmdInterface::commandVector()
         else
             return opp_msg;
         tmp = string2int(point);
-        if (!synth->vectorInit(axis * 2 + hand + 4, chan, tmp))
-            synth->vectorSet(axis * 2 + hand + 4, chan, tmp);
+        sendDirect(tmp, 64, 17 + hand + (axis * 16), 192, 255, 255, chan);
         return done_msg;
     }
 
-    if (!matchnMove(1, point, "control"))
+    // this disabled for now - needs a lot of work.
+    /*if (!matchnMove(1, point, "control"))
         return opp_msg;
     if(isdigit(point[0]))
     {
@@ -1219,7 +1219,7 @@ int CmdInterface::commandVector()
         }
         else
             reply = value_msg;
-    }
+    }*/
 
     return reply;
 }
