@@ -1,5 +1,8 @@
 yoshimi 1.5.4 M
 
+2017-11-6 Will
+* Vector GUI writes now thread safe :)
+
 2017-11-5 Will
 * Significant re-factor of vector control.
   Stable, but some details to be improved.

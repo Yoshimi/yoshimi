@@ -330,6 +330,11 @@ void InterChange::transfertext(CommandBlock *getData)
                 getData->data.parameter &= 0x7f;
                 break;
             case 85: // vector save
+            {
+                string oldname = synth->getRuntime().vectordata.Name[insert];
+                int pos = oldname.find("No Name");
+                if (pos >=0 && pos < 2)
+                    synth->getRuntime().vectordata.Name[insert] = findleafname(text);
                 tmp = synth->saveVector(insert, text, true);
                 if (tmp == 0xff)
                     text = "d " + text;
@@ -344,6 +349,7 @@ void InterChange::transfertext(CommandBlock *getData)
                 value = miscMsgPush(text);
                 getData->data.parameter &= 0x7f;
                 break;
+            }
             case 88: // scales load
                 if (synth->loadMicrotonal(text))
                     text = "ed " + text;
