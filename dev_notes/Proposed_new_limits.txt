@@ -1,8 +1,8 @@
 This structure is intended to enable you to traverse the controls structure testing/adjusting at each level on the tree.
 
-The function is called directly and returns a float value.
+The function will be called directly and return a float value.
 
-'type' is used to determine the operation.
+'type' will be used to determine the operation.
 
 values (& 3)
 0   return adjusted input to max and min.
@@ -18,7 +18,7 @@ bit 5   from gui
 bit 6   undefined
 bit 7   regard as integer
 
-Normal byte structure is used to determine how for down the tree go go for a value.
+Normal byte structure will be used to determine how far down the tree to go for a value.
 
 e.g.
       value  type  command  part

@@ -586,13 +586,10 @@ int CmdInterface::effects()
     Config &Runtime = synth->getRuntime();
     int reply = done_msg;
     int nFXavail;
-    int category;
-    int par;
+    int par = nFX;
     int value;
     string dest = "";
     bool flag;
-
-    nFXpreset = 0; // changing effect always sets the default preset.
 
     if (bitTest(level, part_lev))
     {
@@ -611,15 +608,21 @@ int CmdInterface::effects()
     {
         if (bitTest(level, part_lev))
         {
-            synth->SetEffects(2, 1, nFX, nFXtype, 0, 0);
+            cout << "part" << endl;
+            //synth->SetEffects(2, 1, nFX, nFXtype, 0, 0);
+            sendDirect(nFXtype, 64, 65, npart, 255, nFX);
         }
         else if (bitTest(level, ins_fx))
         {
-            synth->SetEffects(1, 1, nFX, nFXtype, 0, 0);
+            //synth->SetEffects(1, 1, nFX, nFXtype, 0, 0);
+            sendDirect(nFXtype, 64, 1, 242, 255, nFX);
+            cout << "insert" << endl;
         }
         else
         {
-            synth->SetEffects(0, 1, nFX, nFXtype, 0, 0);
+            //synth->SetEffects(0, 1, nFX, nFXtype, 0, 0);
+            sendDirect(nFXtype, 64, 1, 241, 255, nFX);
+            cout << "system" << endl;
         }
 
         if (isRead)
@@ -641,17 +644,20 @@ int CmdInterface::effects()
             if (bitTest(level, part_lev))
             {
                 nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
-                synth->SetEffects(0, 2, nFX, nFXtype, 0, 0);
+                //synth->SetEffects(0, 2, nFX, nFXtype, 0, 0);
+                sendDirect(nFXtype, 64, 65, npart, 255, nFX);
             }
             else if (bitTest(level, ins_fx))
             {
                 nFXtype = synth->insefx[nFX]->geteffect();
-                synth->SetEffects(0, 1, nFX, nFXtype, 0, 0);
+                //synth->SetEffects(0, 1, nFX, nFXtype, 0, 0);
+                sendDirect(nFXtype, 64, 1, 242, 255, nFX);
             }
             else
             {
                 nFXtype = synth->sysefx[nFX]->geteffect();
-                synth->SetEffects(0, 0, nFX, nFXtype, 0, 0);
+                //synth->SetEffects(0, 0, nFX, nFXtype, 0, 0);
+                sendDirect(nFXtype, 64, 1, 241, 255, nFX);
             }
         }
         if (point[0] == 0)
@@ -685,15 +691,15 @@ int CmdInterface::effects()
         Runtime.Log("efx type set to " + fx_list[nFXtype]);
         //Runtime.Log("Presets -" + fx_presets[nFXtype].substr(fx_presets[nFXtype].find(',') + 1));
         if (bitTest(level, part_lev))
-            category = 2;
+            sendDirect(nFXtype, 64, 65, npart, 255, nFX);
         else if (bitTest(level, ins_fx))
-            category = 1;
+            sendDirect(nFXtype, 64, 1, 242, 255, nFX);
         else
-            category = 0;
-        synth->SetEffects(category, 1, nFX, nFXtype, 0, 0);
+            sendDirect(nFXtype, 64, 1, 241, 255, nFX);
 
         return done_msg;
     }
+
     else if (matchnMove(2, point, "send"))
     {
         if (point[0] == 0)
@@ -703,56 +709,68 @@ int CmdInterface::effects()
         {
             if (matchnMove(1, point, "master"))
             {
-                par = -2;
+                value = -2;
                 dest = "master";
             }
             else if (matchnMove(1, point, "off"))
             {
-                par = -1;
+                value = -1;
                 dest = "off";
             }
             else
             {
-                par = string2int(point) - 1;
-                if (par >= Runtime.NumAvailableParts || par < 0)
+                value = string2int(point) - 1;
+                if (value >= Runtime.NumAvailableParts || value < 0)
                     return range_msg;
-                dest = "part " + asString(par + 1);
+                dest = "part " + asString(value + 1);
                 // done this way in case there is rubbish on the end
             }
-            value = 0;
         }
         else
         {
-
             par = string2int(point) - 1;
             point = skipChars(point);
             if (point[0] == 0)
                 return value_msg;
             value = string2int127(point);
         }
+
+        int control;
+        int partno;
+        int engine = nFX;
+        int insert = 0xff;
+
         if (bitTest(level, part_lev))
         {
-            category = 2;
+            partno = npart;
+            control = 40 + par;
+            engine = 0xff;
+
             dest = "part " + asString(npart + 1) + " efx sent to system "
                  + asString(par + 1) + " at " + asString(value);
         }
         else if (bitTest(level, ins_fx))
         {
-            category = 1;
+            partno = 242;
+            control = 2;
             dest = "insert efx " + asString(nFX + 1) + " sent to " + dest;
         }
         else
         {
             if (par <= nFX)
                 return range_msg;
-            category = 0;
+            partno = 241;
+            control = par;
+            engine = nFX;
+            insert = 16;
             dest = "system efx " + asString(nFX + 1) + " sent to "
                  + asString(par + 1) + " at " + asString(value);
         }
-
-        synth->SetEffects(category, 4, nFX, nFXtype, par, value);
+        sendDirect(value, 64, control, partno, 255, engine, insert);
         Runtime.Log(dest);
+        return done_msg;
     }
+
     else if (matchnMove(3, point, "preset"))
     {
         /*
@@ -762,30 +780,31 @@ int CmdInterface::effects()
          * However, all of this should really be in src/Effects
          * not here *and* in the gui code!
          */
+        int partno;
         par = string2int(fx_presets [nFXtype].substr(0, fx_presets [nFXtype].find(',')));
         if (par == 1)
             return available_msg;
         value = string2int127(point) - 1;
         if (value >= par || value < 0)
             return range_msg;
+
         if (bitTest(level, part_lev))
         {
-            category = 2;
+            partno = npart;
             dest = "part " + asString(npart + 1);
         }
         else if (bitTest(level, ins_fx))
         {
-            category = 1;
+            partno = 242;
             dest = "insert";
         }
         else
         {
-            category = 0;
+            partno = 241;
             dest = "system";
         }
-        nFXpreset = value;
-        synth->SetEffects(category, 8, nFX, nFXtype, 0, nFXpreset);
-        Runtime.Log(dest + " efx preset set to number " + asString(nFXpreset + 1));
+        sendDirect(value, 64, 16, partno, 128 + nFXtype, nFX);
+        Runtime.Log(dest + " efx preset set to number " + asString(value + 1));
     }
     return reply;
 }

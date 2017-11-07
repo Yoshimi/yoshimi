@@ -14,9 +14,7 @@ Sections currently in place and tested:
 
 Top level controls
 Config - now used by GUI for writes
-
-Vectors - to complete
-
+Vectors - now used by GUI for writes
 Microtonal (scales) - now used by GUI for writes
 Midi-learn - used for all operations
 Main part controls - now used by GUI for writes

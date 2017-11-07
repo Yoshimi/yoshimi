@@ -1,8 +1,5 @@
 Sometimes can't edit upper voice rows from panel
 
-still not fully converted:
-    vectors
-
 pasting effect doesn't update effect title.
 
 Requested: revise window states so engines etc can be made auto open.

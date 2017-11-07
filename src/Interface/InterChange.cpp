@@ -2989,6 +2989,12 @@ string InterChange::resolveEffects(CommandBlock *getData)
             contstr = " Unrecognised";
     }
 
+    if (kititem != 0x87 && control == 16)
+    {
+        contstr = " Preset " + to_string (lrint(value) + 1);
+        showValue = false;
+    }
+
     return (name + effname + contstr);
 }
 
