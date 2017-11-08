@@ -450,16 +450,6 @@ void MidiDecode::nrpnProcessData(unsigned char chan, int type, int par, bool in_
 {
     int nHigh = synth->getRuntime().nrpnH;
     int nLow = synth->getRuntime().nrpnL;
-/*    if (nLow < nHigh && (nHigh == 4 || nHigh == 8 ))
-    {
-        if (type == C_dataL)
-            synth->getRuntime().dataL = par;
-        else
-             synth->getRuntime().dataH = par;
-        synth->SetZynControls();
-        return;
-    }*/
-
     bool noHigh = (synth->getRuntime().dataH > 0x7f);
     if (type == C_dataL)
     {
@@ -531,7 +521,7 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
 {
     switch (dHigh)
     {
-        case 0: // set part number
+        case 0: // set part number to use for later calls
             if (par < synth->getRuntime().NumAvailableParts)
             {
                 synth->getRuntime().dataL = par;

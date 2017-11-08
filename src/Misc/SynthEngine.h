@@ -108,7 +108,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void NoteOff(unsigned char chan, unsigned char note);
         void SetController(unsigned char chan, int type, short int par);
         void SetZynControls();
-        void SetEffects(unsigned char category, unsigned char command, unsigned char nFX, unsigned char nType, int nPar, unsigned char value);
         int RootBank(int rootnum, int banknum);
         int SetRBP(CommandBlock *getData, bool notinplace = true);
         int ReadBankRoot(void);

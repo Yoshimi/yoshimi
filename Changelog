@@ -1,5 +1,8 @@
 yoshimi 1.5.4 M
 
+2017-11-8-Will
+* CLI effects code cleanups.
+
 2017-11-7 Will
 * All remaining CLI writes thread safe :)
   but some effect controls don't update GUI

@@ -43,7 +43,7 @@ using namespace std;
 #include <stdlib.h>
 #include <unistd.h>
 
-#define MUTEX
+//#define NOLOCKS
 
 static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
 {
@@ -585,13 +585,9 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
         {
             if (partonoffRead(npart))
             {
-#ifdef MUTEX
                 actionLock(lockType);
-#endif
                 part[npart]->NoteOn(note, velocity, keyshift);
-#ifdef MUTEX
                 actionLock(unlockType);
-#endif
             }
             else if (VUpeak.values.parts[npart] > (-velocity))
                 VUpeak.values.parts[npart] = -(0.2 + velocity); // ensure fake is always negative
@@ -621,13 +617,9 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
         // mask values 16 - 31 to still allow a note off
         if (chan == (part[npart]->Prcvchn & 0xef) && partonoffRead(npart))
         {
-#ifdef MUTEX
             actionLock(lockType);
-#endif
             part[npart]->NoteOff(note);
-#ifdef MUTEX
             actionLock(unlockType);
-#endif
         }
     }
 }
@@ -719,77 +711,6 @@ void SynthEngine::SetZynControls()
         }
         GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateEffects, data);
     }
-}
-
-
-void SynthEngine::SetEffects(unsigned char category, unsigned char command, unsigned char nFX, unsigned char nType, int nPar, unsigned char value)
-{
-    // category 0-sysFX, 1-insFX, 2-partFX
-    // command 1-set effect, 4-set param, 8-set preset
-
-    int npart = getRuntime().currentPart;
-    int data = (nFX) << 8;
-
-    switch (category)
-    {
-        case 1:
-            data |= (1 << 22);
-
-            switch (command)
-            {
-                case 1:
-                    insefx[nFX]->changeeffect(nType);
-                    data |= ((Pinsparts[nFX] + 2) << 24);
-                    break;
-
-                case 4:
-                    Pinsparts[nFX] = nPar;
-                    data |= ((nPar + 2) << 24);
-                    break;
-
-                case 8:
-                    insefx[nFX]->changepreset(value);
-                    data |= ((Pinsparts[nFX] + 2) << 24);
-                    break;
-            }
-            break;
-
-        case 2:
-            data |= (2 << 22);
-            switch (command)
-            {
-                case 1:
-                    part[npart]->partefx[nFX]->changeeffect(nType);
-                    break;
-
-                case 4:
-                    setPsysefxvol(npart, nPar, value);
-                    break;
-
-                case 8:
-                    part[npart]->partefx[nFX]->changepreset(value);
-                    break;
-            }
-            break;
-
-        default:
-            switch (command)
-            {
-                case 1:
-                    sysefx[nFX]->changeeffect(nType);
-                    break;
-
-                case 4:
-                    setPsysefxsend(nFX, nPar, value);
-                    break;
-
-                case 8:
-                    sysefx[nFX]->changepreset(value);
-                    break;
-            }
-            break;
-    }
-    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateEffects, data);
 }
 
 
@@ -2163,9 +2084,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
  */
     else
     {
-#ifdef MUTEX
         actionLock(lockType);
-#endif
         // Compute part samples and store them ->partoutl,partoutr
         for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
         {
@@ -2317,9 +2236,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                 fadeLevel -= fadeStep;
             }
         }
-#ifdef MUTEX
         actionLock(unlockType);
-#endif
         // Peak calculation for mixed outputs
         VUpeak.values.vuRmsPeakL = 1e-12f;
         VUpeak.values.vuRmsPeakR = 1e-12f;
@@ -2464,6 +2381,9 @@ void SynthEngine::allStop(unsigned int stopType)
 
 bool SynthEngine::actionLock(lockset request)
 {
+#ifdef NOLOCKS
+    return 0;
+#else
     int chk  = -1;
 
     switch (request)
@@ -2480,6 +2400,7 @@ bool SynthEngine::actionLock(lockset request)
             break;
     }
     return (chk == 0) ? true : false;
+#endif
 }
 
 
