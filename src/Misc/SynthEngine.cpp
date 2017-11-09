@@ -26,6 +26,8 @@
     Modified November 2017
 */
 
+#define NOLOCKS
+
 #include<stdio.h>
 #include <sys/time.h>
 #include <set>
@@ -42,8 +44,6 @@ using namespace std;
 #include <sys/types.h>
 #include <stdlib.h>
 #include <unistd.h>
-
-//#define NOLOCKS
 
 static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
 {
@@ -1994,6 +1994,29 @@ void SynthEngine::partonoffWrite(int npart, int what)
 char SynthEngine::partonoffRead(int npart)
 {
     return (part[npart]->Penabled == 1);
+}
+
+
+void SynthEngine::SetMuteAndWait(void)
+{
+    CommandBlock putData;
+    memset(&putData, 0xff, sizeof(putData));
+    putData.data.value = 0;
+    putData.data.type = 0xc0;
+    putData.data.control = 0xfe;
+    putData.data.part = 0xf0;
+    if (jack_ringbuffer_write_space(interchange.fromGUI) >= sizeof(putData))
+    {
+        jack_ringbuffer_write(interchange.fromGUI, (char*) putData.bytes, sizeof(putData));
+        while(isMuted() == 0)
+            usleep (1000);
+    }
+}
+
+
+bool SynthEngine::isMuted(void)
+{
+    return (muted < 1);
 }
 
 

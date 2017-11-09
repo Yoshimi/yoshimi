@@ -17,7 +17,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-# Modifed October 2017
+# Modifed November 2017
 
 project (Yoshimi)
 cmake_minimum_required (VERSION 3.0)
@@ -84,12 +84,12 @@ option (ShowGuiReports "Enable GUI control reports" OFF)
 option (ShowNoteOnTimes "Report Note-On Times" OFF)
 
 set (BuildOptions_x86_64AMD
-    "-O3 -march=athlon64 -m64 -Wall -ffast-math -fno-finite-math-only -fomit-frame-pointer"
+    "-O3 -march=athlon64 -m64 -Wall -msse -msse2 -mfpmath=sse -ffast-math -fno-finite-math-only -fomit-frame-pointer"
   CACHE STRING "X86_64 compiler options"
 )
 
 set (BuildOptions_X86_64Core2
-    "-O3 -march=core2 -m64 -Wall -ffast-math -fno-finite-math-only -fomit-frame-pointer"
+    "-O3 -march=core2 -m64 -Wall -msse -msse2 -mfpmath=sse -ffast-math -fno-finite-math-only -fomit-frame-pointer"
   CACHE STRING "X86_64 compiler options"
 )
 
@@ -99,13 +99,13 @@ set (BuildOptions_NEON
 )
 
 set (BuildOptionsThisCPU
-    "-O3 -march=native -Wall -ffast-math -fno-finite-math-only -fomit-frame-pointer"
+    "-O3 -march=native -Wall -msse -msse2 -mfpmath=sse -ffast-math -fno-finite-math-only -fomit-frame-pointer"
   CACHE STRING "Current CPU compiler options"
 )
 
 set (BuildOptionsBasic
-    "-O3 -msse -msse2 -mfpmath=sse -ffast-math -fomit-frame-pointer"
-    CACHE STRING "basic X86 compilier options"
+    "-O3 -ffast-math -fomit-frame-pointer"
+    CACHE STRING "basic compilier options"
 )
 
 set (BuildOptionsDebug
@@ -197,7 +197,7 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
     add_definitions(-DHAVE_ALSA)
     FIND_LIBRARY(LIBDL_LINUX NAMES dl)
 else()
-    
+
 endif()
 
 # Jack
@@ -288,7 +288,6 @@ set (YOSHI_INCLUDES ${FLTK_INCLUDE_DIR})
 
 if (BuildForDebug)
     set (CMAKE_BUILD_TYPE "Debug")
-    set (CMAKE_CXX_FLAGS_DEBUG ${BuildOptionsDebug})
     message (STATUS "Building for ${CMAKE_BUILD_TYPE}, flags: ${CMAKE_CXX_FLAGS_DEBUG}")
 else (BuildForDebug)
     set (CMAKE_BUILD_TYPE "Release")
@@ -301,10 +300,9 @@ else (BuildForDebug)
             if (BuildForNEON)
                 set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_NEON})
             else (BuildForNEON)
-                set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsBasic})
                 if (BuildForThisCPU)
                     set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsThisCPU})
-                else (BuildForThicCPU)
+                else (BuildForThisCPU)
                     set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsBasic})
                 endif (BuildForThisCPU)
             endif (BuildForNEON)

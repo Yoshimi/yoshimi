@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified October 2017
+    Modified November 2017
 */
 
 #ifndef SYNTHENGINE_H
@@ -145,10 +145,11 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void setPartMap(int npart);
         void setAllPartMaps(void);
 
+        void SetMuteAndWait(void);
         void Unmute(void);
         void Mute(void);
         void mutewrite(int what);
-        bool isMuted(void) { return muted < 1; }
+        bool isMuted(void);
         sem_t mutelock;
 
         void getLimits(CommandBlock *getData);

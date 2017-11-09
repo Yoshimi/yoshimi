@@ -1,5 +1,12 @@
 yoshimi 1.5.4 M
 
+2017-11-9 Will
+* GUI copy/paste now threadsafe
+  but needs much improvement.
+* Removed sse from 'BASIC' compiler build options.
+* In SynthEngine the build defaults to NOLOCK.
+  This means *all* mutex locks are disabled.
+
 2017-11-8-Will
 * CLI effects code cleanups.
 

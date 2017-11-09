@@ -4179,6 +4179,11 @@ void InterChange::commandMain(CommandBlock *getData)
             if (write)
                 synth->allStop(1);
             break;
+
+        case 254:
+            synth->Mute();
+            getData->data.type = 0xff; // stop further action);
+            break;
     }
 
     if (!write)
