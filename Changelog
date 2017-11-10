@@ -1,5 +1,8 @@
 yoshimi 1.5.4 M
 
+2017-11-10 Will
+* Code cleanups around incomming MIDI.
+
 2017-11-9 Will
 * GUI copy/paste now threadsafe
   but needs much improvement.

@@ -51,8 +51,6 @@ MidiDecode::~MidiDecode()
 
 void MidiDecode::midiProcess(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place, bool inSync)
 {
-    if (synth->isMuted())
-        return; // nobody listening!
     unsigned char channel;//, note, velocity;
     int ctrltype, par;
     channel = par0 & 0x0F;
@@ -187,7 +185,7 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
     if (synth->getRuntime().vectordata.Enabled[vecChan] && synth->getRuntime().NumAvailableParts > NUM_MIDI_CHANNELS)
     { // vector control is direct to parts
         if (nrpnRunVector(vecChan, ctrl, param, inSync))
-            return; // **** test this it may be wrong!
+            return;
     }
     // pick up a drop-through if CC doesn't match the above
     if (ctrl == C_resetallcontrollers && synth->getRuntime().ignoreResetCCs == true)
@@ -255,6 +253,13 @@ void MidiDecode::sendMidiCC(bool inSync, unsigned char chan, int type, short int
     synth->midilearn.writeMidi(&putData, sizeof(putData), true);
 }
 
+/*
+ * nrpnDecode parameters are only ever seen by other MIDI controls
+ * so don't need buffering.
+ *
+ * However nrpnProcessData is handling some 'live' data and is
+ * buffered where needed.
+ */
 
 bool MidiDecode::nrpnDecode(unsigned char ch, int ctrl, int param, bool in_place)
 {
@@ -270,6 +275,7 @@ bool MidiDecode::nrpnDecode(unsigned char ch, int ctrl, int param, bool in_place
                 unsigned char type = synth->getRuntime().nrpnH;
                 if (type >= 0x41 && type <= 0x43)
                 { // shortform
+
                     if (param > 0x77) // disable it
                     {
                         synth->getRuntime().channelSwitchType = 0;
@@ -653,7 +659,9 @@ void MidiDecode::setMidiProgram(unsigned char ch, int prg, bool in_place)
      * This is a bit slow as we send each part individually
      * but it is the simplest way to ensure partonoff doesn't
      * get out of step.
-     * Changes won't normally happen while MIDI is incomming.
+     *
+     * Changes won't normally happen while MIDI is incomming
+     * on the same channel.
      */
     if (ch < NUM_MIDI_CHANNELS)
     {

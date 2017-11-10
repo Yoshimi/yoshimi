@@ -97,25 +97,7 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
         }
         return;
     }
-
-    if (true)//inSync)
-    { // it's all jack
-        synth->mididecode.midiProcess(par0, par1, par2, in_place, inSync);
-        return;
-    }
-
-    putData.data.control = 0xd8;
-    putData.data.part = 0xd8;
-    putData.data.kit = par0;
-    putData.data.engine = par1;
-    putData.data.insert = par2;
-
-    synth->midilearn.writeMidi(&putData, putSize, false);
-    /*
-     * we use the Midilearn ring buffer, but it returns
-     * to MidiDecode. This is safe because only a midi
-     * input passing through here can write to the buffer
-     */
+    synth->mididecode.midiProcess(par0, par1, par2, in_place, inSync);
 }
 
 
