@@ -158,7 +158,7 @@ This must be set before making a parameter change.
 8 - DynFilter
 
 
-For Insert effects, if the Data MSB bit 5 is set (32) then Data LSB sets the destination part number. 127 is off and 126 is the Master Output.
+For Insert effects, if the Data MSB bit 6 is set (64) and MSB bit 5 is set (32) - (total 96) then Data LSB sets the destination part number. 127 is off and 126 is the Master Output.
 
 A complete example:
 

@@ -4,6 +4,9 @@ yoshimi 1.5.4 M
 * BugFix: GUI Insert effects failed to update.
 * NRPN effect changes now threadsafe.
   Some GUI anomalies to sort out.
+* Code cleanups.
+* Rationalised system value ranges.
+* Updated docs.
 
 2017-11-10 Will
 * Code cleanups around incomming MIDI.

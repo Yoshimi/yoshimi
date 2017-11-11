@@ -891,21 +891,20 @@ int CmdInterface::commandList()
     else if (matchnMove(2, point, "mlearn"))
     {
         if (point[0] == '@')
-            {
-                point += 1;
-                point = skipSpace(point);
-                tmp = string2int(point);
-                if (tmp > 0)
-                    synth->SetSystemValue(107, -(tmp - 1));
-                    /*
-                    * we use negative values to detail a single line
-                    * because positive ones are used for bulk line count
-                    */
-                else
-                    reply = value_msg;
-            }
+        {
+            point += 1;
+            point = skipSpace(point);
+            tmp = string2int(point);
+            if (tmp > 0)
+                synth->midilearn.listLine(tmp - 1);
+            else
+                reply = value_msg;
+        }
         else
-            synth->SetSystemValue(107, LINES);
+        {
+            synth->midilearn.listAll(msg);
+            synth->cliOutput(msg, LINES);
+        }
     }
 
     else if (matchnMove(1, point, "tuning"))

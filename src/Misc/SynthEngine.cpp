@@ -635,7 +635,7 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
     }
     if (type == Runtime.channelSwitchCC)
     {
-        SetSystemValue(128, par);
+        SetSystemValue(80, par);
         return;
     }
     int npart;
@@ -1388,7 +1388,6 @@ int SynthEngine::SetSystemValue(int type, int value)
     list<string> msg;
     string label;
     label = "";
-    int pos;
 
     switch (type)
     {
@@ -1430,218 +1429,7 @@ int SynthEngine::SetSystemValue(int type, int value)
                     SetPartShift(npart, value);
             break;
 
-        case 100: // reports destination
-            if (value > 63)
-            {
-                Runtime.toConsole = true;
-                Runtime.Log("Sending reports to console window");
-                // we need the next line in case someone is working headless
-                cout << "Sending reports to console window\n";
-            }
-            else
-            {
-                Runtime.toConsole = false;
-                Runtime.Log("Sending reports to stdout");
-            }
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 1);
-            break;
-
-        case 101:
-            if (value > 63)
-                Runtime.loadDefaultState = true;
-            else
-                Runtime.loadDefaultState = false;
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
-            break;
-
-        case 102:
-            if (value > 63)
-            {
-                Runtime.showTimes = true;
-                label = "Enabled";
-            }
-            else
-            {
-                Runtime.showTimes = false;
-                label = "Disabled";
-            }
-            Runtime.Log("Part load time " + label);
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
-            break;
-
-        case 103:
-            if (value > 63)
-                Runtime.hideErrors = true;
-            else
-                Runtime.hideErrors = false;
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
-
-        case 106:
-        {
-            pos = 0;
-            vector<string> &listtype = *getHistory(6);
-            vector<string>::iterator it = listtype.begin();
-            while (it != listtype.end() && pos != value)
-            {
-                ++ it;
-                ++ pos;
-            }
-            if (it == listtype.end())
-                return -1;
-            else
-                return miscMsgPush(*it);
-        }
-
-        case 107: // list midi learned lines
-            if (value <= 0)
-                midilearn.listLine(-value);
-            else
-            {
-                midilearn.listAll(msg);
-                cliOutput(msg, value);
-            }
-            break;
-
-        case 108: // list vector parameters
-            ListVectors(msg);
-            cliOutput(msg, 255);
-            break;
-
-        case 109: // list dynamics
-            ListSettings(msg);
-            cliOutput(msg, 255);
-            break;
-
-        case 110 : // list paths
-            ListPaths(msg);
-            cliOutput(msg, 255);
-            break;
-
-        case 111 : // list banks
-            ListBanks(value, msg);
-            cliOutput(msg, 255);
-            break;
-
-        case 112: // list instruments
-            ListInstruments(value, msg);
-            cliOutput(msg, 255);
-            break;
-
-        case 113: // root
-            if (value > 119)
-                value = 128;
-            if (value != Runtime.midi_bank_root) // don't mess about if it's the same
-            {
-                label = Runtime.testCCvalue(value);
-                if (label > "")
-                {
-                    Runtime.Log("CC" + asString(value) + " in use by " + label);
-                    value = -1;
-                }
-                else
-                {
-                    Runtime.midi_bank_root = value;
-                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
-                }
-            }
-            if (value == 128) // but still report the setting
-                Runtime.Log("MIDI Root Change disabled");
-            else if (value > -1)
-                Runtime.Log("Root CC set to " + asString(value));
-            break;
-
-        case 114: // bank
-            if (value != 0 && value != 32)
-                value = 128;
-            if (value != Runtime.midi_bank_C)
-            {
-                label = Runtime.testCCvalue(value);
-                if (label > "")
-                {
-                    Runtime.Log("CC" + asString(value) + " in use by " + label);
-                    value = -1;
-                }
-                else
-                {
-                    Runtime.midi_bank_C = value;
-                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
-                }
-            }
-            if (value == 0)
-                Runtime.Log("Bank CC set to MSB (0)");
-            else if (value == 32)
-                Runtime.Log("Bank CC set to LSB (32)");
-            else if (value > -1)
-                Runtime.Log("MIDI Bank Change disabled");
-            break;
-
-        case 115: // program change
-            value = (value > 63);
-            if (value)
-                Runtime.Log("MIDI Program Change enabled");
-            else
-                Runtime.Log("MIDI Program Change disabled");
-            if (value != Runtime.EnableProgChange)
-            {
-                Runtime.EnableProgChange = value;
-                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
-            }
-            break;
-
-        case 116: // enable on program change
-            value = (value > 63);
-            if (value)
-                Runtime.Log("MIDI Program Change will enable part");
-            else
-                Runtime.Log("MIDI Program Change doesn't enable part");
-            if (value != Runtime.enable_part_on_voice_load)
-            {
-                Runtime.enable_part_on_voice_load = value;
-                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
-            }
-            break;
-
-        case 117: // extended program change
-            if (value > 119)
-                value = 128;
-            if (value != Runtime.midi_upper_voice_C) // don't mess about if it's the same
-            {
-                label = Runtime.testCCvalue(value);
-                if (label > "")
-                {
-                    Runtime.Log("CC" + asString(value) + " in use by " + label);
-                    value = -1;
-                }
-                else
-                {
-                    Runtime.midi_upper_voice_C = value;
-                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
-                }
-            }
-            if (value == 128) // but still report the setting
-                Runtime.Log("MIDI extended Program Change disabled");
-            else if (value > -1)
-                Runtime.Log("Extended Program Change CC set to " + asString(value));
-            break;
-
-        case 118: // active parts
-            if (value == 16 || value == 32 || value == 64)
-            {
-                Runtime.NumAvailableParts = value;
-                Runtime.Log("Available parts set to " + asString(value));
-                //GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart,0);
-            }
-            else
-                Runtime.Log("Out of range");
-            break;
-
-        case 119: // obvious!
-            Runtime.saveConfig();
-            Runtime.Log("Config saved");
-            break;
-
-        case 128: // channel switch
+        case 80: // channel switch
             if (Runtime.channelSwitchType == 1 || Runtime.channelSwitchType == 3) // single row / loop
             {
                 if (Runtime.channelSwitchType == 1)
@@ -1697,6 +1485,120 @@ int SynthEngine::SetSystemValue(int type, int value)
                 return 2; // unrecognised
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart,0);
             break;
+
+        case 81: // root
+            if (value > 119)
+                value = 128;
+            if (value != Runtime.midi_bank_root) // don't mess about if it's the same
+            {
+                label = Runtime.testCCvalue(value);
+                if (label > "")
+                {
+                    Runtime.Log("CC" + asString(value) + " in use by " + label);
+                    value = -1;
+                }
+                else
+                {
+                    Runtime.midi_bank_root = value;
+                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
+                }
+            }
+            if (value == 128) // but still report the setting
+                Runtime.Log("MIDI Root Change disabled");
+            else if (value > -1)
+                Runtime.Log("Root CC set to " + asString(value));
+            break;
+
+        case 82: // bank
+            if (value != 0 && value != 32)
+                value = 128;
+            if (value != Runtime.midi_bank_C)
+            {
+                label = Runtime.testCCvalue(value);
+                if (label > "")
+                {
+                    Runtime.Log("CC" + asString(value) + " in use by " + label);
+                    value = -1;
+                }
+                else
+                {
+                    Runtime.midi_bank_C = value;
+                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
+                }
+            }
+            if (value == 0)
+                Runtime.Log("Bank CC set to MSB (0)");
+            else if (value == 32)
+                Runtime.Log("Bank CC set to LSB (32)");
+            else if (value > -1)
+                Runtime.Log("MIDI Bank Change disabled");
+            break;
+
+        case 83: // program change
+            value = (value > 63);
+            if (value)
+                Runtime.Log("MIDI Program Change enabled");
+            else
+                Runtime.Log("MIDI Program Change disabled");
+            if (value != Runtime.EnableProgChange)
+            {
+                Runtime.EnableProgChange = value;
+                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
+            }
+            break;
+
+        case 84: // enable on program change
+            value = (value > 63);
+            if (value)
+                Runtime.Log("MIDI Program Change will enable part");
+            else
+                Runtime.Log("MIDI Program Change doesn't enable part");
+            if (value != Runtime.enable_part_on_voice_load)
+            {
+                Runtime.enable_part_on_voice_load = value;
+                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
+            }
+            break;
+
+        case 85: // extended program change
+            if (value > 119)
+                value = 128;
+            if (value != Runtime.midi_upper_voice_C) // don't mess about if it's the same
+            {
+                label = Runtime.testCCvalue(value);
+                if (label > "")
+                {
+                    Runtime.Log("CC" + asString(value) + " in use by " + label);
+                    value = -1;
+                }
+                else
+                {
+                    Runtime.midi_upper_voice_C = value;
+                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
+                }
+            }
+            if (value == 128) // but still report the setting
+                Runtime.Log("MIDI extended Program Change disabled");
+            else if (value > -1)
+                Runtime.Log("Extended Program Change CC set to " + asString(value));
+            break;
+
+        case 86: // active parts
+            if (value == 16 || value == 32 || value == 64)
+            {
+                Runtime.NumAvailableParts = value;
+                Runtime.Log("Available parts set to " + asString(value));
+                //GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart,0);
+            }
+            else
+                Runtime.Log("Out of range");
+            break;
+
+        case 87: // obvious!
+            Runtime.saveConfig();
+            Runtime.Log("Config saved");
+            break;
+
     }
     return 0;
 }

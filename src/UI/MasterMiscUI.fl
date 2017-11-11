@@ -636,6 +636,8 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
         partpad->color(PAD_COLOUR);
     else
         partpad->color(BASE_COLOUR);
+    // possible colour for .xiy files
+    //partname->labelcolor(fl_rgb_color(0,0,225));
     partname->label(synth->part[npart | *plgroup]->Pname.c_str());} {}
   }
   Function {findengines(int npart)} {return_type {unsigned int}

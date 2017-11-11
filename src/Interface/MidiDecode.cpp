@@ -520,7 +520,7 @@ void MidiDecode::nrpnProcessData(unsigned char chan, int type, int par, bool in_
         nrpnSetVector(dHigh, chan, par);
 
     else if (nLow == 2) // system settings
-        synth->SetSystemValue(dHigh, par);
+        synth->SetSystemValue(dHigh, par); // *** CHANGE
 }
 
 
@@ -554,16 +554,16 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
             synth->SetController(synth->getRuntime().vectordata.Part | 0x80, synth->getRuntime().vectordata.Controller, par);
             break;
 
-        case 4: // Set part's channel number
+        case 4: // Set part's channel number *** CHANGE
             synth->SetPartChan(synth->getRuntime().vectordata.Part, par);
             break;
 
-        case 5: // Set part's audio destination
+        case 5: // Set part's audio destination *** CHANGE
             if (par > 0 and par < 4)
                 synth->SetPartDestination(synth->getRuntime().vectordata.Part, par);
             break;
 
-        case 64:
+        case 64: // *** CHANGE
             synth->SetPartShift(synth->getRuntime().vectordata.Part, par);
             break;
     }

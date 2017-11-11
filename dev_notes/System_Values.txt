@@ -13,41 +13,19 @@ Type:
 
 64-79   type = channel number (+ 64) value = keyshift
 
-100     value = reports destination
+ 80     value = part number for channel switch (dependent on switch type)
 
-101     value > 63 = enable load default state
+ 81     value = root ID to be set as 'current'
 
-102     value > 63 = enable instrument load time display
+ 82     value = bank ID to be set as 'current' (in current root)
 
-103     value > 63 = hide non-fatal error reports
+ 83     value = number for program change
 
-106     value = line number to find text of midi-learn history
+ 84     value > 63 = enable program change
 
-107     value = list size for list current midi learn list
+ 85     value > 63 = enable extended program change
 
-108     list all vector parameters
+ 86     value = number of parts to be made available (16, 32, 64)
 
-109     list current main settings
-
-110     list file paths
-
-111     value = root number who's banks this will list
-
-112     value = bank number who's instruments this will list
-
-113     value = root ID to be set as 'current'
-
-114     value = bank ID to be set as 'current' (in current root)
-
-115     value = number for program change
-
-116     value > 63 = enable program change
-
-117     value > 63 = enable extended program change
-
-118     value = number of parts to be made available (16, 32, 64)
-
-119     save current settings
-
-128     value = part number for channel switch (dependent on switch type)
+ 87     save current settings
 
