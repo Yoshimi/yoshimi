@@ -117,6 +117,8 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     unsigned char insertParam = getData->data.parameter;
     unsigned char insertPar2 = getData->data.par2;
 
+//        cout << "Con " << int(control) << "  Kit " << int(kititem) << "  Eng " << int(engine) << "  Ins " << int(insert) << endl;
+
     if (npart == 0xe8) // scales
     {
         synth->getGuiMaster()->microtonalui->returns_update(getData);

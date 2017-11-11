@@ -114,8 +114,16 @@ class InterChange : private MiscFuncs
         void commandEnvelope(CommandBlock *getData);
         void envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars);
         void commandSysIns(CommandBlock *getData);
+
+        /*
+         * this is made public specifically so that it can be
+         * reached from SynthEngine by jack freewheeling NRPNs.
+         * This avoids unnecessary (error prone) duplication.
+         */
+    public:
         void commandEffects(CommandBlock *getData);
 
+    private:
         bool commandSendReal(CommandBlock *getData);
 };
 

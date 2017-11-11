@@ -665,52 +665,63 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
 }
 
 
-void SynthEngine::SetZynControls()
+void SynthEngine::SetZynControls(bool in_place)
 {
+    /*
+     * NRPN MSB system / insertion
+     * NRPN LSB effect number
+     * Data MSB param to change
+     * if | 64 LSB sets eff type
+     * for insert effect only | 96 LSB sets destination
+     *
+     * Data LSB param value
+     */
+
+    unsigned char group = Runtime.nrpnH | 0x20;
+    unsigned char effnum = Runtime.nrpnL;
     unsigned char parnum = Runtime.dataH;
     unsigned char value = Runtime.dataL;
+    unsigned char efftype = (parnum & 0x60);
+    Runtime.dataL = 0xff; // use once then clear it out
 
-    if (parnum <= 0x7f && value <= 0x7f)
+    CommandBlock putData;
+    memset(&putData, 0xff, sizeof(putData));
+    putData.data.value = value;
+    putData.data.type = 0xd0;
+
+    if (group == 0x24) // system
     {
-        Runtime.dataL = 0xff; // use once then clear it out
-        unsigned char effnum = Runtime.nrpnL;
-        unsigned char efftype = (parnum & 0x60);
-        int data = (effnum << 8);
-        parnum &= 0x1f;
-
-        if (Runtime.nrpnH == 8)
-        {
-            data |= (1 << 22);
-            if (efftype == 0x40) // select effect
-            {
-                Mute();
-                insefx[effnum]->changeeffect(value);
-                Unmute();
-            }
-            else if (efftype == 0x20) // select part
-            {
-                if (value >= 0x7e)
-                    Pinsparts[effnum] = value - 0x80; // set for 'Off' and 'Master out'
-                else if (value < Runtime.NumAvailableParts)
-                    Pinsparts[effnum] = value;
-            }
-            else
-                insefx[effnum]->seteffectpar(parnum, value);
-            data |= ((Pinsparts[effnum] + 2) << 24); // needed for both operations
-        }
+        putData.data.part = 0xf1;
+        if (efftype == 0x40)
+            putData.data.control = 1;
+        //else if (efftype == 0x60) // not done yet
+            //putData.data.control = 2;
         else
         {
-            if (efftype == 0x40) // select effect
-                sysefx[effnum]->changeeffect(value);
-            else if (efftype == 0x20) // select output level
-            {
-                // setPsysefxvol(effnum, parnum, value); // this isn't correct!
-            }
-            else
-                sysefx[effnum]->seteffectpar(parnum, value);
+            putData.data.kit = 0x80 + sysefx[effnum]->geteffect();
+            putData.data.control = parnum;
         }
-        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateEffects, data);
     }
+    else // insertion
+    {
+        putData.data.part = 0xf2;
+        //cout << "efftype " << int(efftype) << endl;
+        if (efftype == 0x40)
+            putData.data.control = 1;
+        else if (efftype == 0x60)
+            putData.data.control = 2;
+        else
+        {
+            putData.data.kit = 0x80 + insefx[effnum]->geteffect();
+            putData.data.control = parnum;
+        }
+    }
+    putData.data.engine = effnum;
+
+    if (in_place)
+        interchange.commandEffects(&putData);
+    else
+        midilearn.writeMidi(&putData, sizeof(putData), true);
 }
 
 

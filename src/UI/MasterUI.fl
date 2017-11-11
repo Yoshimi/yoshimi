@@ -1247,11 +1247,14 @@ ZynAddSubFX}
         {
             ninseff = engine;
             setInsEff(ninseff);
+            showInsEfxUI();
         }
         else if (control == 1)
         {
+            inseffnocounter->value(engine + 1);
+            ninseff = engine;
             insefftype->value(nval);
-            inseffectui->refresh(synth->insefx[nsyseff], 0xf1, ninseff);
+            setInsEff(ninseff);
             showInsEfxUI();
         }
         else if (control == 2)
@@ -1260,7 +1263,11 @@ ZynAddSubFX}
             if (value == -1)
                 insefftype->deactivate();
             else
+            {
                 insefftype->activate();
+                setInsEff(ninseff);
+                showInsEfxUI();                
+            }
         }
         return;
     }

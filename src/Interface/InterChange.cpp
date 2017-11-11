@@ -6886,7 +6886,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
     {
         switch (control)
         {
-            case 0:
+            case 0: // only relevant to GUI
                 break;
             case 1:
                 if (write)

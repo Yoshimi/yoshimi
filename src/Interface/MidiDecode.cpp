@@ -486,7 +486,7 @@ void MidiDecode::nrpnProcessData(unsigned char chan, int type, int par, bool in_
                           + "   dataH " + asString((int)synth->getRuntime().dataH)
                           + "   dataL " + asString((int)synth->getRuntime().dataL)
                           + "   chan " + asString((int)chan)
-                          + "   type"  + asString((int)type)
+                          + "   type "  + asString((int)type)
                           + "   par " + asString((int)par));
     */
 
@@ -500,7 +500,8 @@ void MidiDecode::nrpnProcessData(unsigned char chan, int type, int par, bool in_
             synth->getRuntime().dataL = par;
         else
              synth->getRuntime().dataH = par;
-        synth->SetZynControls();
+        if (synth->getRuntime().dataL <= 0x7f && synth->getRuntime().dataL <= 0x7f)
+            synth->SetZynControls(in_place);
         return;
     }
 
