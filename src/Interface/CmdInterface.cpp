@@ -1705,16 +1705,10 @@ int CmdInterface::commandPart(bool justSet)
         if(!isRead && tmp < 1)
             return value_msg;
         tmp -= 1;
+        int type = 64;
         if (isRead)
-            tmp = synth->part[npart]->Prcvchn;
-        else
-            synth->SetPartChan(npart, tmp);
-        string name = "";
-        if (tmp >= NUM_MIDI_CHANNELS * 2)
-            name = " (no MIDI)";
-        else if (tmp >= NUM_MIDI_CHANNELS)
-            name = " (" + asString((tmp % NUM_MIDI_CHANNELS) + 1) + " note off only)";
-        Runtime.Log("Part " + asString(npart + 1) + " set to channel " + asString(tmp + 1) + name, isRead);
+            type = 0;
+        sendDirect(tmp, type, 5, npart);
         reply = done_msg;
     }
     else if (matchnMove(1, point, "destination"))

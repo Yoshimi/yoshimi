@@ -285,15 +285,15 @@ class VectorUI {selected : {private MiscFuncs}
         int tmp = o->value();
         if (Xcc < 14 && tmp < 14)
             tmp = 14;
-        else if (tmp < 14)
-            tmp = 0;
 
         if (tmp < 14)
         {
+            Xcc = 0;
             send_data(96, 0, 0xf0, 192, 255, 255, BaseChan);
-            o->value(tmp);
+            o->value(0);
             return;
         }
+
         string name = synth->getRuntime().masterCCtest(tmp);
         if (name != "")
         {
@@ -467,14 +467,15 @@ class VectorUI {selected : {private MiscFuncs}
         int tmp = o->value();
         if (Ycc < 14 && tmp < 14)
             tmp = 14;
-        else if (tmp < 14)
-            tmp = 0;
 
         if (tmp < 14)
         {
+            Ycc = 0;
             send_data(32, 0xff, 0xd0);
+            o->value(0);
             return;
         }
+
         string name = synth->getRuntime().masterCCtest(tmp);
         if (name != "")
         {
@@ -529,20 +530,27 @@ class VectorUI {selected : {private MiscFuncs}
             break;
 
         case 16:
-            synth->getGuiMaster()->maxparts->value(NUM_MIDI_CHANNELS * 2);
-            synth->getGuiMaster()->partmax = NUM_MIDI_CHANNELS * 2;
-            synth->getGuiMaster()->updatepanel();
+            if (synth->getGuiMaster()->partmax < NUM_MIDI_CHANNELS * 2)
+            {
+                synth->getGuiMaster()->maxparts->value(NUM_MIDI_CHANNELS * 2);
+                synth->getGuiMaster()->partmax = NUM_MIDI_CHANNELS * 2;
+                synth->getGuiMaster()->Panelsmallgroups->show();
+            }
             if (value_int < 14 || value_int > 119)
             {
-                Xcontrol->value(0);
-                Xgroup->deactivate();
+                Ycontrol->value(0);
+                Ycc = 0;
+                Ygroup->deactivate();
                 Ycontrol->deactivate();
+                Xgroup->deactivate();
+                Xcontrol->value(0);
+                Xcc= 0;
             }
             else
             {
-                Xcontrol->value(value_int);
                 Xgroup->activate();
                 Ycontrol->activate();
+                Xcontrol->value(value_int);
             }
             break;
 
@@ -560,18 +568,23 @@ class VectorUI {selected : {private MiscFuncs}
             break;
 
         case 32:
-            synth->getGuiMaster()->maxparts->value(NUM_MIDI_CHANNELS * 4);
-            synth->getGuiMaster()->partmax = NUM_MIDI_CHANNELS * 4;
-            synth->getGuiMaster()->updatepanel();
+            if (synth->getGuiMaster()->partmax < NUM_MIDI_CHANNELS * 4)
+            {
+                synth->getGuiMaster()->maxparts->value(NUM_MIDI_CHANNELS * 4);
+                synth->getGuiMaster()->partmax = NUM_MIDI_CHANNELS * 4;
+                synth->getGuiMaster()->Panelsmallgroups->hide();
+                synth->getGuiMaster()->Panelgroups->show();
+            }
             if (value_int < 14 || value_int > 119)
             {
-                Ycontrol->value(0);
                 Ygroup->deactivate();
+                Ycontrol->value(0);
+                Ycc = 0;
             }
             else
             {
-                Ycontrol->value(value_int);
                 Ygroup->activate();
+                Ycontrol->value(value_int);
             }
             break;
 
@@ -903,9 +916,12 @@ class VectorUI {selected : {private MiscFuncs}
      Xcc = 0;
      Xf = 0;
      Xgroup->deactivate();
+     Xcontrol->value(0);
      Ycc = 0;
      Yf = 0;
-     Ygroup->deactivate();} {}
+     Ygroup->deactivate();
+     Ycontrol->deactivate();
+     Ycontrol->value(0);} {}
   }
   Function {errorlabel(string msg)} {} {
     code {//

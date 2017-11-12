@@ -1469,7 +1469,6 @@ Offset}
 
     bool valBool = (value > 0.5f);
     int valInt = lrint(value);
-    int tmp = (valInt & 15) + 1;
 
     // these are specific to the mixer panel
     if (newpart >= *plgroup && newpart < (*plgroup + NUM_MIDI_CHANNELS))
@@ -1484,8 +1483,8 @@ Offset}
                 synth->getGuiMaster()->panellistitem[displaypart]->partpanning->value(value);
                 break;
             case 5:
-                synth->getGuiMaster()->panellistitem[displaypart]->partrcv->value(valInt);
-                if (valInt < NUM_MIDI_CHANNELS)
+                synth->getGuiMaster()->panellistitem[displaypart]->partrcv->value(valInt & 0xf);
+                if (valInt < (NUM_MIDI_CHANNELS - 1))
                     synth->getGuiMaster()->panellistitem[displaypart]->partrcv->textcolor(FL_BLACK);
                 else
                     synth->getGuiMaster()->panellistitem[displaypart]->partrcv->textcolor(FL_WHITE);
@@ -1531,11 +1530,11 @@ Offset}
             break;
 
         case 5:
-            if (int(value) < NUM_MIDI_CHANNELS)
+            midich->value(valInt + 1);
+            if (valInt < NUM_MIDI_CHANNELS)
                 midich->textcolor(FL_BLACK);
             else
                 midich->textcolor(FL_WHITE);
-            midich->value(tmp);
             break;
 
         case 6:

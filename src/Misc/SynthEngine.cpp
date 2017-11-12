@@ -927,7 +927,6 @@ void SynthEngine::SetPartChan(unsigned char npart, unsigned char nchan)
          * as will using the GUI controls.
          */
         part[npart]->Prcvchn =  nchan;
-        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
     }
 }
 

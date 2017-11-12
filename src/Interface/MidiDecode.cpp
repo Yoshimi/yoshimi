@@ -526,6 +526,9 @@ void MidiDecode::nrpnProcessData(unsigned char chan, int type, int par, bool in_
 
 void MidiDecode::nrpnDirectPart(int dHigh, int par)
 {
+    CommandBlock putData;
+    memset(&putData, 0xff, sizeof(putData));
+
     switch (dHigh)
     {
         case 0: // set part number to use for later calls
@@ -550,12 +553,14 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
             synth->getRuntime().dataL = par;
             break;
 
-        case 3: // Set controller value
+        case 3: // Set controller value *** CHANGE
             synth->SetController(synth->getRuntime().vectordata.Part | 0x80, synth->getRuntime().vectordata.Controller, par);
             break;
 
-        case 4: // Set part's channel number *** CHANGE
-            synth->SetPartChan(synth->getRuntime().vectordata.Part, par);
+        case 4: // Set part's channel number
+            putData.data.value = par;
+            putData.data.control = 5;
+            putData.data.part = synth->getRuntime().vectordata.Part;
             break;
 
         case 5: // Set part's audio destination *** CHANGE
@@ -563,10 +568,16 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
                 synth->SetPartDestination(synth->getRuntime().vectordata.Part, par);
             break;
 
-        case 64: // *** CHANGE
+        case 64: // key shift *** CHANGE
             synth->SetPartShift(synth->getRuntime().vectordata.Part, par);
             break;
     }
+    if (dHigh != 4)
+        return;
+cout << "part " << int(putData.data.part) << "  Chan " << int(par) << endl;
+    putData.data.type = 0xd0;
+
+    synth->midilearn.writeMidi(&putData, sizeof(putData), false);
 }
 
 
