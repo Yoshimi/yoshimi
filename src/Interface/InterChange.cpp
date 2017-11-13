@@ -46,6 +46,8 @@ using namespace std;
 #include "Synth/OscilGen.h"
 #include "MasterUI.h"
 
+extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
+
 InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth),
     fromCLI(NULL),
@@ -4534,6 +4536,7 @@ void InterChange::commandPart(CommandBlock *getData)
 
         case 64: // local to source
             break;
+
         case 65:
             if (write)
                 part->partefx[effNum]->changeeffect(value_int);
@@ -4568,7 +4571,14 @@ void InterChange::commandPart(CommandBlock *getData)
                 return;
             }
             else if (write)
+            { // trying this gives Xruns :(
+                //synth->part[npart]->Paudiodest = value_int;
+                //if (synth->part[npart]->Paudiodest & 2)
+                    //mainRegisterAudioPort(synth, npart);
+
+                // but this seems OK ???
                 synth->SetPartDestination(npart, int(value));
+            }
             else
                 value = part->Paudiodest;
             break;

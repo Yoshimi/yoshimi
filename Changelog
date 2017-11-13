@@ -1,5 +1,9 @@
 yoshimi 1.5.4 M
 
+2017-11-13 Will
+* NRPN direct part control now threadsafe.
+  Only NRPN system values to do :)
+
 2017-11-12 Will
 * Corrected Vector GUI anomalies.
 * Improved CLI part channel change.

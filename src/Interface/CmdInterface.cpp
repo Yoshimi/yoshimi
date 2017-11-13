@@ -1742,8 +1742,7 @@ int CmdInterface::commandPart(bool justSet)
             dest = 3;
         if (dest > 0)
         {
-            synth->partonoffWrite(npart, 1);
-            synth->SetPartDestination(npart, dest);
+            sendDirect(dest, 64, 120, npart);
             reply = done_msg;
         }
         else

@@ -957,9 +957,6 @@ void SynthEngine::SetPartDestination(unsigned char npart, unsigned char dest)
             break;
     }
     Runtime.Log("Part " +asString((int) npart) + " sent to " + name);
-
-    // next line only really needed for direct part control.
-    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
 }
 
 
