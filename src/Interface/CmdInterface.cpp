@@ -1742,7 +1742,7 @@ int CmdInterface::commandPart(bool justSet)
             dest = 3;
         if (dest > 0)
         {
-            sendDirect(dest, 64, 120, npart);
+            sendDirect(dest, 64, 120, npart, 255, 255, 255, 192);
             reply = done_msg;
         }
         else

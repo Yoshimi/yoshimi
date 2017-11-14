@@ -1,5 +1,10 @@
 yoshimi 1.5.4 M
 
+2017-11-14 Will
+* Refactored indirectTransfers.
+  Was 'transfertext' but used for much else.
+* Improved jack part destination changes.
+
 2017-11-13 Will
 * NRPN direct part control now threadsafe.
   Only NRPN system values to do :)

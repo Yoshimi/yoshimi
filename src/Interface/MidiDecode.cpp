@@ -568,6 +568,7 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
             putData.data.value = par;
             putData.data.control = 120;
             putData.data.part = synth->getRuntime().vectordata.Part;
+            putData.data.parameter = 192;
             break;
 
         case 64: // key shift
@@ -586,7 +587,7 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
     }
     if (dHigh < 4)
         return;
-    cout << "part " << int(putData.data.part) << "  Chan " << int(par) << endl;
+    //cout << "part " << int(putData.data.part) << "  Chan " << int(par) << endl;
     putData.data.type = 0xd0;
 
     synth->midilearn.writeMidi(&putData, sizeof(putData), false);

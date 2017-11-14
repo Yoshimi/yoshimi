@@ -212,7 +212,7 @@ void *InterChange::sortResultsThread(void)
             if(getData.data.part == 0xd8) // special midi-learn - needs improving
                 synth->midilearn.generalOpps(getData.data.value, getData.data.type, getData.data.control, getData.data.part, getData.data.kit, getData.data.engine, getData.data.insert, getData.data.parameter, getData.data.par2);
             else if ((getData.data.parameter & 0x80) && getData.data.parameter < 0xff)
-                transfertext(&getData);
+                indirectTransfers(&getData);
             else
                 resolveReplies(&getData);
         }
@@ -264,7 +264,7 @@ InterChange::~InterChange()
 }
 
 
-void InterChange::transfertext(CommandBlock *getData)
+void InterChange::indirectTransfers(CommandBlock *getData)
 {
     int value = lrint(getData->data.value);
     unsigned char type = getData->data.type;
@@ -285,270 +285,293 @@ void InterChange::transfertext(CommandBlock *getData)
     unsigned char tmp;
     string name;
 
-    if (npart == 192)
+    switch(npart)
     {
-        switch(control)
+        case 192:
         {
-            case 8:
-                if (write)
-                    synth->getRuntime().vectordata.Name[insert] = text;
-                else
-                    text = synth->getRuntime().vectordata.Name[insert];
-                value = miscMsgPush(text);
-                getData->data.parameter &= 0x7f;
-                break;
-        }
-    }
-    else if (npart == 240)
-    {
-        switch (control)
-        {
-            case 80:
-                if(synth->loadPatchSetAndUpdate(text))
-                    text = "ed " + text;
-                else
-                    text = " FAILED " + text;
-                value = miscMsgPush(text);
-                getData->data.parameter &= 0x7f;
-                break;
-            case 81: // patch set save
-                if(synth->savePatchesXML(text))
-                    text = "d " + text;
-                else
-                    text = " FAILED " + text;
-                value = miscMsgPush(text);
-                getData->data.parameter &= 0x7f;
-                break;
-            case 84: // vector load
-                tmp = synth->loadVectorAndUpdate(insert, text);
-                if (tmp < 0xff)
-                {
-                    getData->data.insert = tmp;
-                    text = "ed " + text + " to chan " + to_string(int(tmp + 1));
-                }
-                else
-                    text = " FAILED " + text;
-                value = miscMsgPush(text);
-                getData->data.parameter &= 0x7f;
-                break;
-            case 85: // vector save
+            switch(control)
             {
-                string oldname = synth->getRuntime().vectordata.Name[insert];
-                int pos = oldname.find("No Name");
-                if (pos >=0 && pos < 2)
-                    synth->getRuntime().vectordata.Name[insert] = findleafname(text);
-                tmp = synth->saveVector(insert, text, true);
-                if (tmp == 0xff)
-                    text = "d " + text;
-                else
-                {
-                    name = miscMsgPop(tmp);
-                    if (name != "FAIL")
-                        text = " " + name;
+                case 8:
+                    if (write)
+                        synth->getRuntime().vectordata.Name[insert] = text;
+                    else
+                        text = synth->getRuntime().vectordata.Name[insert];
+                    value = miscMsgPush(text);
+                    getData->data.parameter &= 0x7f;
+                    break;
+            }
+            break;
+        }
+        case 217: // program / bank / root
+        {
+            //cout << " interchange prog " << value << "  chan " << int(kititem) << "  bank " << int(engine) << "  root " << int(insert) << endl;
+            if (text > "!")
+                getData->data.par2 = miscMsgPush(text);
+
+            int msgID = synth->SetRBP(getData);
+            if (msgID >= 0x1000)
+            {
+                msgID &= 0xff; // may be increased sometime
+                text = "FAILED ";
+            }
+            else
+                text = "";
+            text += miscMsgPop(msgID);
+            getData->data.value = miscMsgPush(text);
+            synth->getRuntime().finishedCLI = true; // temp
+            getData->data.parameter &= 0x7f;
+            break;
+        }
+        case 232: // scales
+        {
+            switch(control)
+            {
+                case 32:
+                    text = formatScales(text);
+                    getData->data.parameter &= 0x7f;
+                    value = synth->microtonal.texttotunings(text.c_str());
+                    if (value > 0)
+                        synth->setAllPartMaps();
+                    break;
+                case 33:
+                    text = formatScales(text);
+                    getData->data.parameter &= 0x7f;
+                    value = synth->microtonal.texttomapping(text.c_str());
+                    if (value > 0)
+                        synth->setAllPartMaps();
+                    break;
+
+                case 48:
+                    value = synth->microtonal.loadscl(setExtension(text,"scl"));
+                    if(value > 0)
+                    {
+                        text = "";
+                        char *buf = new char[100];
+                        for (int i = 0; i < value; ++ i)
+                        {
+                            synth->microtonal.tuningtoline(i, buf, 100);
+                            if (i > 0)
+                                text += "\n";
+                            text += string(buf);
+                        }
+                        delete [] buf;
+                    }
+                    getData->data.parameter &= 0x7f;
+                    break;
+                case 49:
+                    value = synth->microtonal.loadkbm(setExtension(text,"kbm"));
+                    if(value > 0)
+                    {
+                        text = "";
+                        int map;
+                        for (int i = 0; i < value; ++ i)
+                        {
+                            if (i > 0)
+                                text += "\n";
+                            map = synth->microtonal.Pmapping[i];
+                            if (map == -1)
+                                text += 'x';
+                            else
+                                text += to_string(map);
+                        }
+                    }
+                    getData->data.parameter &= 0x7f;
+                    break;
+
+                case 64:
+                    synth->microtonal.Pname = text;
+                    getData->data.parameter &= 0x7f;
+                    break;
+                case 65:
+                    synth->microtonal.Pcomment = text;
+                    getData->data.parameter &= 0x7f;
+                    break;
+            }
+            break;
+        }
+        case 240: // main
+        {
+            switch (control)
+            {
+                case 80:
+                    if(synth->loadPatchSetAndUpdate(text))
+                        text = "ed " + text;
                     else
                         text = " FAILED " + text;
-                }
-                value = miscMsgPush(text);
-                getData->data.parameter &= 0x7f;
-                break;
-            }
-            case 88: // scales load
-                if (synth->loadMicrotonal(text))
-                    text = "ed " + text;
-                else
-                    text = " FAILED " + text;
-                value = miscMsgPush(text);
-                getData->data.parameter &= 0x7f;
-                break;
-            case 89: // scales save
-                if (synth->saveMicrotonal(text))
-                    text = "d " + text;
-                else
-                    text = " FAILED " + text;
-                value = miscMsgPush(text);
-                getData->data.parameter &= 0x7f;
-                break;
-            case 92: // state load
-                if (synth->loadStateAndUpdate(text))
-                    text = "ed " + text;
-                else
-                    text = " FAILED " + text;
-                value = miscMsgPush(text);
-                getData->data.parameter &= 0x7f;
-                break;
-            case 93: // state save
-                if (synth->saveState(text))
-                    text = "d " + text;
-                else
-                    text = " FAILED " + text;
-                value = miscMsgPush(text);
-                getData->data.parameter &= 0x7f;
-                break;
-            case 94:
-                synth->partonoffWrite(npart, -1);
-                setpadparams(parameter | (kititem << 8));
-                if (synth->part[parameter & 0x3f]->kit[kititem].padpars->export2wav(text))
-                    text = "d " + text;
-                else
-                    text = " FAILED some samples " + text;
-                value = miscMsgPush(text);
-                getData->data.parameter &= 0x7f;
-                break;
-            case 96: // master reset
-                synth->resetAll();
-                getData->data.parameter &= 0x7f;
-                break;
-        }
-
-    }
-    else if (npart == 232)
-    {
-        switch(control)
-        {
-            case 32:
-                text = formatScales(text);
-                getData->data.parameter &= 0x7f;
-                value = synth->microtonal.texttotunings(text.c_str());
-                if (value > 0)
-                    synth->setAllPartMaps();
-                break;
-            case 33:
-                text = formatScales(text);
-                getData->data.parameter &= 0x7f;
-                value = synth->microtonal.texttomapping(text.c_str());
-                if (value > 0)
-                    synth->setAllPartMaps();
-                break;
-
-            case 48:
-                value = synth->microtonal.loadscl(setExtension(text,"scl"));
-                if(value > 0)
-                {
-                    text = "";
-                    char *buf = new char[100];
-                    for (int i = 0; i < value; ++ i)
-                    {
-                        synth->microtonal.tuningtoline(i, buf, 100);
-                        if (i > 0)
-                            text += "\n";
-                        text += string(buf);
-                    }
-                    delete [] buf;
-                }
-                getData->data.parameter &= 0x7f;
-                break;
-            case 49:
-                value = synth->microtonal.loadkbm(setExtension(text,"kbm"));
-                if(value > 0)
-                {
-                    text = "";
-                    int map;
-                    for (int i = 0; i < value; ++ i)
-                    {
-                        if (i > 0)
-                            text += "\n";
-                        map = synth->microtonal.Pmapping[i];
-                        if (map == -1)
-                            text += 'x';
-                        else
-                            text += to_string(map);
-                    }
-                }
-                getData->data.parameter &= 0x7f;
-                break;
-
-            case 64:
-                synth->microtonal.Pname = text;
-                getData->data.parameter &= 0x7f;
-                break;
-            case 65:
-                synth->microtonal.Pcomment = text;
-                getData->data.parameter &= 0x7f;
-                break;
-        }
-    }
-    else if (npart == 248)
-    {
-        switch (control)
-        {
-            case 32:
-                if (write)
-                {
-                    synth->getRuntime().jackMidiDevice = text;
-                    synth->getRuntime().configChanged = true;
-                }
-                else
-                    text = synth->getRuntime().jackMidiDevice;
-                value = miscMsgPush(text);
-                break;
-            case 34:
-                if (write)
-                {
-                    synth->getRuntime().jackServer = text;
-                    synth->getRuntime().configChanged = true;
-                }
-                else
-                    text = synth->getRuntime().jackServer;
-                value = miscMsgPush(text);
-                break;
-            case 48:
-                if (write)
-                {
-                    synth->getRuntime().alsaMidiDevice = text;
-                    synth->getRuntime().configChanged = true;
-                }
-                else
-                    text = synth->getRuntime().alsaMidiDevice;
-                value = miscMsgPush(text);
-                break;
-            case 50:
-                if (write)
-                {
-                    synth->getRuntime().alsaAudioDevice = text;
-                    synth->getRuntime().configChanged = true;
-                }
-                else
-                    text = synth->getRuntime().alsaAudioDevice;
-                value = miscMsgPush(text);
-                break;
-            case 80: // save config
-                if (write)
-                {
-                    text = synth->getRuntime().ConfigFile;
-                    if(synth->getRuntime().saveConfig())
+                    value = miscMsgPush(text);
+                    getData->data.parameter &= 0x7f;
+                    break;
+                case 81: // patch set save
+                    if(synth->savePatchesXML(text))
                         text = "d " + text;
                     else
                         text = " FAILED " + text;
-                }
-                else
-                    text = "READ";
-                value = miscMsgPush(text);
-                getData->data.par2 = miscMsgPush(text); // slightly odd case
-                getData->data.parameter &= 0x7f;
                     value = miscMsgPush(text);
+                    getData->data.parameter &= 0x7f;
+                    break;
+                case 84: // vector load
+                    tmp = synth->loadVectorAndUpdate(insert, text);
+                    if (tmp < 0xff)
+                    {
+                        getData->data.insert = tmp;
+                        text = "ed " + text + " to chan " + to_string(int(tmp + 1));
+                    }
+                    else
+                        text = " FAILED " + text;
+                    value = miscMsgPush(text);
+                    getData->data.parameter &= 0x7f;
+                    break;
+                case 85: // vector save
+                {
+                    string oldname = synth->getRuntime().vectordata.Name[insert];
+                    int pos = oldname.find("No Name");
+                    if (pos >=0 && pos < 2)
+                        synth->getRuntime().vectordata.Name[insert] = findleafname(text);
+                    tmp = synth->saveVector(insert, text, true);
+                    if (tmp == 0xff)
+                        text = "d " + text;
+                    else
+                    {
+                        name = miscMsgPop(tmp);
+                        if (name != "FAIL")
+                            text = " " + name;
+                        else
+                            text = " FAILED " + text;
+                    }
+                    value = miscMsgPush(text);
+                    getData->data.parameter &= 0x7f;
+                    break;
+                }
+                case 88: // scales load
+                    if (synth->loadMicrotonal(text))
+                        text = "ed " + text;
+                    else
+                        text = " FAILED " + text;
+                    value = miscMsgPush(text);
+                    getData->data.parameter &= 0x7f;
                 break;
+                case 89: // scales save
+                    if (synth->saveMicrotonal(text))
+                        text = "d " + text;
+                    else
+                        text = " FAILED " + text;
+                    value = miscMsgPush(text);
+                    getData->data.parameter &= 0x7f;
+                    break;
+                case 92: // state load
+                    if (synth->loadStateAndUpdate(text))
+                        text = "ed " + text;
+                    else
+                        text = " FAILED " + text;
+                    value = miscMsgPush(text);
+                    getData->data.parameter &= 0x7f;
+                    break;
+                case 93: // state save
+                    if (synth->saveState(text))
+                        text = "d " + text;
+                    else
+                        text = " FAILED " + text;
+                    value = miscMsgPush(text);
+                    getData->data.parameter &= 0x7f;
+                    break;
+                case 94:
+                    synth->partonoffWrite(npart, -1);
+                    setpadparams(parameter | (kititem << 8));
+                    if (synth->part[parameter & 0x3f]->kit[kititem].padpars->export2wav(text))
+                        text = "d " + text;
+                    else
+                        text = " FAILED some samples " + text;
+                    value = miscMsgPush(text);
+                    getData->data.parameter &= 0x7f;
+                    break;
+                case 96: // master reset
+                    synth->resetAll();
+                    getData->data.parameter &= 0x7f;
+                    break;
+            }
+            break;
         }
-        getData->data.parameter &= 0x7f;
-    }
-
-    if (npart == 217) // program / bank / root
-    {
-        //cout << " interchange prog " << value << "  chan " << int(kititem) << "  bank " << int(engine) << "  root " << int(insert) << endl;
-        if (text > "!")
-            getData->data.par2 = miscMsgPush(text);
-
-        int msgID = synth->SetRBP(getData);
-        if (msgID >= 0x1000)
+        case 248: // config
         {
-            msgID &= 0xff; // may be increased sometime
-            text = "FAILED ";
+            switch (control)
+            {
+                case 32:
+                    if (write)
+                    {
+                        synth->getRuntime().jackMidiDevice = text;
+                        synth->getRuntime().configChanged = true;
+                    }
+                    else
+                        text = synth->getRuntime().jackMidiDevice;
+                    value = miscMsgPush(text);
+                    break;
+                case 34:
+                    if (write)
+                    {
+                        synth->getRuntime().jackServer = text;
+                        synth->getRuntime().configChanged = true;
+                    }
+                    else
+                        text = synth->getRuntime().jackServer;
+                    value = miscMsgPush(text);
+                    break;
+                case 48:
+                    if (write)
+                    {
+                        synth->getRuntime().alsaMidiDevice = text;
+                        synth->getRuntime().configChanged = true;
+                    }
+                    else
+                        text = synth->getRuntime().alsaMidiDevice;
+                    value = miscMsgPush(text);
+                    break;
+                case 50:
+                    if (write)
+                    {
+                        synth->getRuntime().alsaAudioDevice = text;
+                        synth->getRuntime().configChanged = true;
+                    }
+                    else
+                        text = synth->getRuntime().alsaAudioDevice;
+                    value = miscMsgPush(text);
+                    break;
+                case 80: // save config
+                    if (write)
+                    {
+                        text = synth->getRuntime().ConfigFile;
+                        if(synth->getRuntime().saveConfig())
+                            text = "d " + text;
+                        else
+                            text = " FAILED " + text;
+                    }
+                    else
+                        text = "READ";
+                    value = miscMsgPush(text);
+                    getData->data.par2 = miscMsgPush(text); // slightly odd case
+                    getData->data.parameter &= 0x7f;
+                        value = miscMsgPush(text);
+                    break;
+            }
+            getData->data.parameter &= 0x7f;
+            break;
         }
-        else
-            text = "";
-        text += miscMsgPop(msgID);
-        getData->data.value = miscMsgPush(text);
-        synth->getRuntime().finishedCLI = true; // temp
-        getData->data.parameter &= 0x7f;
+        default:
+        {
+            if (npart < 64) // audio destination
+            {
+                switch(control)
+                {
+                    case 120:
+                        if (npart < synth->getRuntime().NumAvailableParts)
+                        {
+                            if (value & 2)
+                                mainRegisterAudioPort(synth, npart);
+                            getData->data.parameter &= 0x7f;
+                        }
+                }
+            }
+            break;
+        }
     }
 
     if (getData->data.parameter < 0x80 && jack_ringbuffer_write_space(returnsLoopback) >= commandSize)
@@ -3201,7 +3224,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     float value = getData->data.value;
     unsigned char parameter = getData->data.parameter;
     if ((parameter & 0x80) && parameter < 0xc0)
-        return true; // text message transfer
+        return true; // indirect transfer
     if (value == FLT_MAX)
     {
         returnLimits(getData); // this can be accessed directly
@@ -4571,13 +4594,10 @@ void InterChange::commandPart(CommandBlock *getData)
                 return;
             }
             else if (write)
-            { // trying this gives Xruns :(
-                //synth->part[npart]->Paudiodest = value_int;
-                //if (synth->part[npart]->Paudiodest & 2)
-                    //mainRegisterAudioPort(synth, npart);
-
-                // but this seems OK ???
-                synth->SetPartDestination(npart, int(value));
+            {
+                if (npart < synth->getRuntime().NumAvailableParts)
+                    synth->part[npart]->Paudiodest = value_int;
+                getData->data.parameter = 0x80;
             }
             else
                 value = part->Paudiodest;

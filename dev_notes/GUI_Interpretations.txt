@@ -105,10 +105,6 @@ inserts
 
 16  System effect sends
 
-If insert has bit 7 set (0x80) the command will internally divert to low priority thread actions then loop round to update the CLI and GUI.
-
-If bit 6 is also set (0x40) it will first perform the actual command via the audio thread, then loop for updates.
-
 parameter
     type
         lfo
@@ -131,6 +127,10 @@ parameter
                 par2 for vowel number
             for control 37
                 filter sequence position
+
+If parameter has bit 7 set (0x80) the command will internally divert to low priority thread actions then loop round to update the CLI and GUI.
+
+If bit 6 is also set (0x40) it will first perform the actual command via the audio thread, then loop for updates.
 
 par2
     used for offsets to some parameters, and for text messge ID numbers

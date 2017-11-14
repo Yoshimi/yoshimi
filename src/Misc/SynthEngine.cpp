@@ -931,35 +931,6 @@ void SynthEngine::SetPartChan(unsigned char npart, unsigned char nchan)
 }
 
 
-/*
- * Send message to register jack port if jack client is active,
- * but only if the part individual destination is set.
- */
-void SynthEngine::SetPartDestination(unsigned char npart, unsigned char dest)
-{
-    part[npart]->Paudiodest = dest;
-
-    if (part[npart]->Paudiodest & 2)
-        GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart);
-    string name;
-    switch (dest)
-    {
-        case 1:
-            name = "Main";
-            break;
-
-        case 2:
-            name = "Part";
-            break;
-
-        case 3:
-            name = "Both";
-            break;
-    }
-    Runtime.Log("Part " +asString((int) npart) + " sent to " + name);
-}
-
-
 void SynthEngine::SetPartShift(unsigned char npart, unsigned char shift)
 {
     if (shift < MIN_KEY_SHIFT + 64)
