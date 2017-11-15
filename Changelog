@@ -1,5 +1,9 @@
 yoshimi 1.5.4 M
 
+2017-11-15 Will
+* Finalised jack part destination changes.
+  Vector control now sets these correctly!
+
 2017-11-14 Will
 * Refactored indirectTransfers.
   Was 'transfertext' but used for much else.

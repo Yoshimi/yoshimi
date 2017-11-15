@@ -45,6 +45,8 @@ using namespace std;
 #include <stdlib.h>
 #include <unistd.h>
 
+extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
+
 static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
 {
     static set<unsigned int> idMap;
@@ -2720,6 +2722,10 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool 
                 part[npart + actualBase]->Prcvchn = actualBase;
                 xml->exitbranch();
                 setPartMap(npart + actualBase);
+
+                partonoffWrite(npart + baseChan, 1);
+                if (part[npart + actualBase]->Paudiodest & 2)
+                    mainRegisterAudioPort(this, npart + actualBase);
             }
         }
         xml->endbranch(); // VECTOR
@@ -2814,13 +2820,6 @@ unsigned char SynthEngine::extractVectorData(unsigned char baseChan, XMLwrapper 
     Runtime.vectordata.Yfeatures[baseChan] = y_feat;
     if (Runtime.NumAvailableParts < lastPart)
         Runtime.NumAvailableParts = xml->getpar255("current_midi_parts", Runtime.NumAvailableParts);
-
-    for (int npart = 0; npart < lastPart; npart += NUM_MIDI_CHANNELS)
-    {
-        partonoffWrite(npart + baseChan, 1);
-        if (part[npart + baseChan]->Paudiodest & 2)
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart + baseChan);
-    }
     return baseChan;
 }
 
@@ -3071,7 +3070,7 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
         part[npart]->getfromXML(xml);
         xml->exitbranch();
         if (partonoffRead(npart) && (part[npart]->Paudiodest & 2))
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart);
+            mainRegisterAudioPort(this, npart);
     }
 
     if (xml->enterbranch("MICROTONAL"))

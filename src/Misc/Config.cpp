@@ -51,8 +51,6 @@ using namespace std;
 #include "MasterUI.h"
 #include "ConfBuild.cpp"
 
-extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
-
 static char prog_doc[] =
     "Yoshimi " YOSHIMI_VERSION ", a derivative of ZynAddSubFX - "
     "Copyright 2002-2009 Nasca Octavian Paul and others, "
@@ -1231,14 +1229,6 @@ void GuiThreadMsg::processGuiMessages()
     if (msg)
     {
         SynthEngine *synth = ((SynthEngine *)msg->data);
-
-        if (msg->type == RegisterAudioPort)
-        {
-            // This is unique not using guiMaster
-             mainRegisterAudioPort(synth, msg->index);
-             delete msg;
-             return;
-        }
         MasterUI *guiMaster = synth->getGuiMaster((msg->type == GuiThreadMsg::NewSynthEngine));
         if (msg->type == GuiThreadMsg::NewSynthEngine)
         {
