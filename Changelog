@@ -1,5 +1,8 @@
 yoshimi 1.5.4 M
 
+2017-11-16 Will
+* BugFix: New Vectors weren't being saved.
+
 2017-11-15 Will
 * Finalised jack part destination changes.
   Vector control now sets these correctly!

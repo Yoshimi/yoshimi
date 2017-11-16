@@ -1,3 +1,4 @@
+
 Sometimes can't edit upper voice rows from panel
 
 pasting effect doesn't update effect title.

@@ -878,13 +878,9 @@ class VectorUI {selected : {private MiscFuncs}
         return;
 
     string filename = setExtension(string(file), "xvy");
-    if (!isRegFile(filename))
-    {
-        fl_alert("Can't save to this name");
-        return;
-    }
-    if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
-        return;
+    if (isRegFile(filename))
+        if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
+            return;
     int pos = loadlabel[BaseChan].find("No Name");
     if (pos >=0 && pos < 2)
         Loaded->copy_label(findleafname(filename).c_str());
