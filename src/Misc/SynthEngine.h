@@ -106,6 +106,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         void NoteOn(unsigned char chan, unsigned char note, unsigned char velocity);
         void NoteOff(unsigned char chan, unsigned char note);
+        int RunChannelSwitch(int value);
         void SetController(unsigned char chan, int type, short int par);
         void SetZynControls(bool in_place);
         int RootBank(int rootnum, int banknum);

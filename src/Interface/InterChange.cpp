@@ -574,23 +574,27 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         }
     }
 
-    if (getData->data.parameter < 0x80 && jack_ringbuffer_write_space(returnsLoopback) >= commandSize)
+    if (getData->data.parameter < 0x80)
     {
+        if (jack_ringbuffer_write_space(returnsLoopback) >= commandSize)
+        {
+            getData->data.value = float(value);
+            if (synth->getRuntime().showGui && write && !((type & 0x20) && npart == 248))
+                getData->data.par2 = miscMsgPush(text); // pass it on to GUI
 
-        getData->data.value = float(value);
-        if (synth->getRuntime().showGui && write && !((type & 0x20) && npart == 248))
-            getData->data.par2 = miscMsgPush(text); // pass it on to GUI
-
-        jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
-        if (synth->getRuntime().showGui && npart == 232 && control == 48)
-        {   // loading a tuning includes a name!
-            getData->data.control = 64;
-            getData->data.par2 = miscMsgPush(synth->microtonal.Pname);
             jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
-            getData->data.control = 65;
-            getData->data.par2 = miscMsgPush(synth->microtonal.Pcomment);
-            jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
+            if (synth->getRuntime().showGui && npart == 232 && control == 48)
+            {   // loading a tuning includes a name!
+                getData->data.control = 64;
+                getData->data.par2 = miscMsgPush(synth->microtonal.Pname);
+                jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
+                getData->data.control = 65;
+                getData->data.par2 = miscMsgPush(synth->microtonal.Pcomment);
+                jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
+            }
         }
+        else
+            synth->getRuntime().Log("Unable to  write to returnsLoopback buffer");
     }
 }
 
@@ -3172,10 +3176,14 @@ void InterChange::returns(CommandBlock *getData)
         //cout << "writing to GUI" << endl;
         if (jack_ringbuffer_write_space(toGUI) >= commandSize)
             jack_ringbuffer_write(toGUI, (char*) getData->bytes, commandSize);
+        else
+            synth->getRuntime().Log("Unable to write to toGUI buffer");
     }
 
     if (jack_ringbuffer_write_space(toCLI) >= commandSize)
         jack_ringbuffer_write(toCLI, (char*) getData->bytes, commandSize);
+    else
+        synth->getRuntime().Log("Unable to write to toCLI buffer");
 }
 
 

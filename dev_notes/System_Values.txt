@@ -13,8 +13,6 @@ Type:
 
 64-79   type = channel number (+ 64) value = keyshift
 
- 80     value = part number for channel switch (dependent on switch type)
-
  81     value = root ID to be set as 'current'
 
  82     value = bank ID to be set as 'current' (in current root)

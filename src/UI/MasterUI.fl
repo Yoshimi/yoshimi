@@ -1138,21 +1138,20 @@ ZynAddSubFX}
     {
         float vol = (value * synth->part[npart]->ctl->volume.data) / 127;
         if (control == 2)
-        {
+        { // panel entries only
             for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
-            { // panel entries only
+            {
                 if(panellistitem[i]->partenabled->value() != 0)
                 {
                     if((isSingle && i == (chan & mask)
                                  && panellistitem[i]->partrcv->value() == (chan & mask)
                                  && (chan / NUM_MIDI_CHANNELS) == (panelgroup / NUM_MIDI_CHANNELS))
-                        || (!isSingle && panellistitem[i]->partrcv->value() == (chan & mask)))
+                         || (!isSingle && panellistitem[i]->partrcv->value() == (chan & mask)))
                     {
-            	        if (engine == 7)
+                        if (engine == 7)
                             panellistitem[i]->partvolume->value(vol);
                         else if (engine == 10)
                             panellistitem[i]->partpanning->value(value);
-
                     }
                 }
             }
@@ -1167,7 +1166,48 @@ ZynAddSubFX}
             case 1:
                 break;
             case 2:
-                if (isForUs)
+                //cout << " Value " << int(value) << "  kit " << int(kititem) << "  npart " << int(npart) << endl;
+                if(engine == synth->getRuntime().channelSwitchCC)
+                { // it's a valid channel switch
+                    int newch = partui->midich->value() - 1;
+                    switch (synth->getRuntime().channelSwitchType)
+                    {
+                        case 1: // row
+                            if (npart < NUM_MIDI_CHANNELS)
+                            {
+                                if (npart != nval)
+                                    newch = NUM_MIDI_CHANNELS;
+                                else
+                                    newch = 0;
+                            }
+                            break;
+
+                        case 2: // column
+                            if(nval == npart)
+                                newch = (nval & mask);
+                            else if((nval & mask) == (npart & mask))
+                                newch = (nval & mask) + NUM_MIDI_CHANNELS;
+                            break;
+
+                        case 3: // loop
+                            if (npart < NUM_MIDI_CHANNELS)
+                            {
+                                if (npart == synth->getRuntime().channelSwitchValue)
+                                    newch = 0;
+                                else if (nval > 0)
+                                    newch = NUM_MIDI_CHANNELS;
+                            }
+                            break;
+                    }
+                    partui->midich->value(newch + 1);
+
+                    if (newch < NUM_MIDI_CHANNELS)
+                        partui->midich->textcolor(FL_BLACK);
+                    else
+                        partui->midich->textcolor(FL_WHITE);
+                    updatepanel();
+                }
+                else if (isForUs)
                 {
                     switch(engine)
                     {
@@ -1266,7 +1306,7 @@ ZynAddSubFX}
             {
                 insefftype->activate();
                 setInsEff(ninseff);
-                showInsEfxUI();                
+                showInsEfxUI();
             }
         }
         return;

@@ -408,7 +408,6 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         }
         ctlval->do_callback();
         int ctl = midictl;
-        //synth->SetController(virkeys->midich, ctl, oldcontrol);
         virkeys->take_focus();
         send_data(2, oldcontrol, 0xc0, virkeys->midich, ctl);}
         tooltip {Controller value} xywh {628 25 18 96} type {Vert Fill} box ENGRAVED_BOX color 229 labelsize 8 align 5 maximum 127 step 1 value 64
@@ -542,7 +541,6 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
             o->value(old);
             o->damage();
         }
-        //synth->SetController(virkeys->midich, C_pitchwheel, - old);
         virkeys->take_focus();
         send_data(2, - old, 0xc0, virkeys->midich, 128)}
         xywh {6 12 18 110} labelsize 8 align 1 minimum -8192 maximum 8191 step 1

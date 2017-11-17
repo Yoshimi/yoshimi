@@ -250,7 +250,7 @@ void MidiDecode::sendMidiCC(bool inSync, unsigned char chan, int type, short int
     putData.data.part = 0xd9;
     putData.data.kit = chan;
     putData.data.engine = type;
-    synth->midilearn.writeMidi(&putData, sizeof(putData), true);
+    synth->midilearn.writeMidi(&putData, sizeof(putData), false);
 }
 
 /*
@@ -717,7 +717,7 @@ void MidiDecode::setMidiProgram(unsigned char ch, int prg, bool in_place)
             synth->SetRBP(&putData, false);
         }
         else
-            synth->midilearn.writeMidi(&putData, sizeof(putData), true);
+            synth->midilearn.writeMidi(&putData, sizeof(putData), false);
     }
 }
 

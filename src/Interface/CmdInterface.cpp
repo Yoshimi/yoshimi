@@ -2823,6 +2823,8 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
         synth->getRuntime().finishedCLI = false;
         jack_ringbuffer_write(synth->interchange.fromCLI, (char*) putData.bytes, commandSize);
     }
+    else
+        synth->getRuntime().Log("Unable to write to fromCLI buffer");
     return 0; // no function for this yet
 }
 

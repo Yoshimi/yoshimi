@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified October 2017
+    Modified November 2017
 */
 
 #include "Misc/SynthEngine.h"
@@ -86,6 +86,8 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
 //cout << "collect_data " << int(type) << " " << int(control) << " " << int(part) << " " << int(kititem) << " " << int(engine) << " " << int(parameter) << " " << int(par2) << endl;
     if (jack_ringbuffer_write_space(synth->interchange.fromGUI) >= commandSize)
         jack_ringbuffer_write(synth->interchange.fromGUI, (char*) putData.bytes, commandSize);
+    else
+        synth->getRuntime().Log("Unable to write to formGUI buffer.");
 }
 
 

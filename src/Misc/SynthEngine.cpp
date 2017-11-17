@@ -627,6 +627,65 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
 }
 
 
+int SynthEngine::RunChannelSwitch(int value)
+{
+    int unknown = 0;
+    if (Runtime.channelSwitchType == 1 || Runtime.channelSwitchType == 3) // single row / loop
+    {
+        if (Runtime.channelSwitchType == 1)
+        {
+            if (value >= NUM_MIDI_CHANNELS)
+                return 1; // out of range
+        }
+        else if (value > 0)
+            value = (Runtime.channelSwitchValue + 1) % NUM_MIDI_CHANNELS; // loop
+        else
+            return 0; // do nothing if it's a switch off
+        Runtime.channelSwitchValue = value;
+        for (int ch = 0; ch < NUM_MIDI_CHANNELS; ++ch)
+        {
+            bool isVector = Runtime.vectordata.Enabled[ch];
+            if (ch != value)
+            {
+                part[ch]->Prcvchn = NUM_MIDI_CHANNELS;
+                if (isVector)
+                {
+                    part[ch + NUM_MIDI_CHANNELS]->Prcvchn = NUM_MIDI_CHANNELS;
+                    part[ch + NUM_MIDI_CHANNELS * 2]->Prcvchn = NUM_MIDI_CHANNELS;
+                    part[ch + NUM_MIDI_CHANNELS * 3]->Prcvchn = NUM_MIDI_CHANNELS;
+                }
+            }
+            else
+            {
+                part[ch]->Prcvchn = 0;
+                if (isVector)
+                {
+                    part[ch + NUM_MIDI_CHANNELS]->Prcvchn = 0;
+                    part[ch + NUM_MIDI_CHANNELS * 2]->Prcvchn = 0;
+                    part[ch + NUM_MIDI_CHANNELS * 3]->Prcvchn = 0;
+                }
+            }
+        }
+    }
+    else if (Runtime.channelSwitchType == 2) // columns
+    {
+        if (value >= NUM_MIDI_PARTS)
+            return 1; // out of range
+        int chan = value & 0xf;
+        for (int i = chan; i < NUM_MIDI_PARTS; i += NUM_MIDI_CHANNELS)
+        {
+            if (i != value)
+                part[i]->Prcvchn = chan | NUM_MIDI_CHANNELS;
+            else
+                part[i]->Prcvchn = chan;
+        }
+    }
+    else
+        unknown = 2; // unrecognised
+    return unknown;
+}
+
+
 // Controllers
 void SynthEngine::SetController(unsigned char chan, int type, short int par)
 {
@@ -637,7 +696,7 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
     }
     if (type == Runtime.channelSwitchCC)
     {
-        SetSystemValue(80, par);
+        RunChannelSwitch(par);
         return;
     }
     int npart;
@@ -723,7 +782,7 @@ void SynthEngine::SetZynControls(bool in_place)
     if (in_place)
         interchange.commandEffects(&putData);
     else
-        midilearn.writeMidi(&putData, sizeof(putData), true);
+        midilearn.writeMidi(&putData, sizeof(putData), false);
 }
 
 
@@ -1396,63 +1455,6 @@ int SynthEngine::SetSystemValue(int type, int value)
             for (int npart = 0; npart < Runtime.NumAvailableParts; ++ npart)
                 if (partonoffRead(npart) && part[npart]->Prcvchn == (type - 64))
                     SetPartShift(npart, value);
-            break;
-
-        case 80: // channel switch
-            if (Runtime.channelSwitchType == 1 || Runtime.channelSwitchType == 3) // single row / loop
-            {
-                if (Runtime.channelSwitchType == 1)
-                {
-                    if (value >= NUM_MIDI_CHANNELS)
-                        return 1; // out of range
-                }
-                else if (value > 0)
-                    value = (Runtime.channelSwitchValue + 1) % NUM_MIDI_CHANNELS; // loop
-                else
-                    return 0; // do nothing if it's a switch off
-
-                Runtime.channelSwitchValue = value;
-                for (int ch = 0; ch < NUM_MIDI_CHANNELS; ++ch)
-                {
-                    bool isVector = Runtime.vectordata.Enabled[ch];
-                    if (ch != value)
-                    {
-                        part[ch]->Prcvchn = NUM_MIDI_CHANNELS;
-                        if (isVector)
-                        {
-                            part[ch + NUM_MIDI_CHANNELS]->Prcvchn = NUM_MIDI_CHANNELS;
-                            part[ch + NUM_MIDI_CHANNELS * 2]->Prcvchn = NUM_MIDI_CHANNELS;
-                            part[ch + NUM_MIDI_CHANNELS * 3]->Prcvchn = NUM_MIDI_CHANNELS;
-                        }
-                    }
-                    else
-                    {
-                        part[ch]->Prcvchn = 0;
-                        if (isVector)
-                        {
-                            part[ch + NUM_MIDI_CHANNELS]->Prcvchn = 0;
-                            part[ch + NUM_MIDI_CHANNELS * 2]->Prcvchn = 0;
-                            part[ch + NUM_MIDI_CHANNELS * 3]->Prcvchn = 0;
-                        }
-                    }
-                }
-            }
-            else if (Runtime.channelSwitchType == 2) // columns
-            {
-                if (value >= NUM_MIDI_PARTS)
-                    return 1; // out of range
-                int chan = value & 0xf;
-                for (int i = chan; i < NUM_MIDI_PARTS; i += NUM_MIDI_CHANNELS)
-                {
-                    if (i != value)
-                        part[i]->Prcvchn = chan | NUM_MIDI_CHANNELS;
-                    else
-                       part[i]->Prcvchn = chan;
-                }
-            }
-            else
-                return 2; // unrecognised
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart,0);
             break;
 
         case 81: // root
