@@ -987,19 +987,6 @@ void SynthEngine::SetPartChan(unsigned char npart, unsigned char nchan)
 }
 
 
-void SynthEngine::SetPartShift(unsigned char npart, unsigned char shift)
-{
-    if (shift < MIN_KEY_SHIFT + 64)
-        shift = MIN_KEY_SHIFT + 64;
-    else if(shift > MAX_KEY_SHIFT + 64)
-        shift = MAX_KEY_SHIFT + 64;
-    part[npart]->Pkeyshift = shift;
-    setPartMap(npart);
-    Runtime.Log("Part " +asString((int) npart) + "  key shift set to " + asString(shift - 64));
-    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart, 0);
-}
-
-
 void SynthEngine::SetPartPortamento(int npart, bool state)
 {
     part[npart]->ctl->portamento.portamento = state;
@@ -1403,8 +1390,9 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
 }
 
 
-/* Provides a way of setting/reading dynamic system variables
- * from sources other than the gui
+/*
+ * Provides a way of setting dynamic system variables
+ * via NRPNs
  */
 int SynthEngine::SetSystemValue(int type, int value)
 {
@@ -1431,7 +1419,7 @@ int SynthEngine::SetSystemValue(int type, int value)
             Runtime.Log("Master volume set to " + asString(value));
             break;
 
-        case 64:
+        case 64: // part key shifts
         case 65:
         case 66:
         case 67:
@@ -1449,10 +1437,19 @@ int SynthEngine::SetSystemValue(int type, int value)
         case 79:
             for (int npart = 0; npart < Runtime.NumAvailableParts; ++ npart)
                 if (partonoffRead(npart) && part[npart]->Prcvchn == (type - 64))
-                    SetPartShift(npart, value);
+                {
+                    if (value < MIN_KEY_SHIFT + 64)
+                        value = MIN_KEY_SHIFT + 64;
+                    else if(value > MAX_KEY_SHIFT + 64)
+                        value = MAX_KEY_SHIFT + 64;
+                    part[npart]->Pkeyshift = value;
+                    setPartMap(npart);
+                    Runtime.Log("Part " +asString((int) npart) + "  key shift set to " + asString(value - 64));
+                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart, 0);
+                }
             break;
 
-        case 81: // root
+        case 80: // root CC
             if (value > 119)
                 value = 128;
             if (value != Runtime.midi_bank_root) // don't mess about if it's the same
@@ -1475,7 +1472,7 @@ int SynthEngine::SetSystemValue(int type, int value)
                 Runtime.Log("Root CC set to " + asString(value));
             break;
 
-        case 82: // bank
+        case 81: // bank CC
             if (value != 0 && value != 32)
                 value = 128;
             if (value != Runtime.midi_bank_C)
@@ -1500,7 +1497,7 @@ int SynthEngine::SetSystemValue(int type, int value)
                 Runtime.Log("MIDI Bank Change disabled");
             break;
 
-        case 83: // program change
+        case 82: // enable program change
             value = (value > 63);
             if (value)
                 Runtime.Log("MIDI Program Change enabled");
@@ -1513,7 +1510,7 @@ int SynthEngine::SetSystemValue(int type, int value)
             }
             break;
 
-        case 84: // enable on program change
+        case 83: // enable part on program change
             value = (value > 63);
             if (value)
                 Runtime.Log("MIDI Program Change will enable part");
@@ -1526,7 +1523,7 @@ int SynthEngine::SetSystemValue(int type, int value)
             }
             break;
 
-        case 85: // extended program change
+        case 84: // extended program change CC
             if (value > 119)
                 value = 128;
             if (value != Runtime.midi_upper_voice_C) // don't mess about if it's the same
@@ -1549,18 +1546,18 @@ int SynthEngine::SetSystemValue(int type, int value)
                 Runtime.Log("Extended Program Change CC set to " + asString(value));
             break;
 
-        case 86: // active parts
+        case 85: // active parts
             if (value == 16 || value == 32 || value == 64)
             {
                 Runtime.NumAvailableParts = value;
                 Runtime.Log("Available parts set to " + asString(value));
-                //GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart,0);
+                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart,0);
             }
             else
                 Runtime.Log("Out of range");
             break;
 
-        case 87: // obvious!
+        case 86: // obvious!
             Runtime.saveConfig();
             Runtime.Log("Config saved");
             break;

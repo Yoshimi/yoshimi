@@ -3,6 +3,9 @@ yoshimi 1.5.4 M
 2017-11-18 Will
 * Note on/off swap now in MusicIO.
 * Resolved channel switch Gui issues.
+* Consolidated SetSystemValues as NRPN only.
+  Still not completely thread safe.
+* Updated docs.
 
 2017-11-17 Will
 * Added error reports to several I/O ring buffers.

@@ -114,7 +114,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         int ReadBankRoot(void);
         int ReadBank(void);
         void SetPartChan(unsigned char npart, unsigned char nchan);
-        void SetPartShift(unsigned char npart, unsigned char shift);
         void SetPartPortamento(int npart, bool state);
         bool ReadPartPortamento(int npart);
         void SetPartKeyMode(int npart, int mode);
