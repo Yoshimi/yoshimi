@@ -850,7 +850,13 @@ void InterChange::resolveReplies(CommandBlock *getData)
     }
     if ((isGui || isCli) && button == 3)
     {
-        synth->midilearn.setTransferBlock(getData, commandName);
+        string toSend;
+        size_t pos = commandName.find(" - ");
+        if (pos < 1 || pos >= commandName.length())
+            toSend = commandName;
+        else
+            toSend = commandName.substr(0, pos);
+        synth->midilearn.setTransferBlock(getData, toSend);
         return;
     }
 
@@ -1357,7 +1363,7 @@ string InterChange::resolveMain(CommandBlock *getData)
 
         case 48:
             showValue = false;
-            contstr = "Chan 'solo' Switch ";
+            contstr = "Chan 'solo' Switch - ";
             switch (value_int)
             {
                 case 0:
@@ -1458,6 +1464,8 @@ string InterChange::resolvePart(CommandBlock *getData)
     unsigned char effNum = engine;
 
     bool kitType = (insert == 0x20);
+    bool value_bool = value_int > 0;
+    bool yesno = false;
 
     if (control == 255)
         return "Number of parts";
@@ -1513,17 +1521,25 @@ string InterChange::resolvePart(CommandBlock *getData)
             break;
         case 5:
             showValue = false;
-            contstr = "Midi CH " + to_string(value_int + 1);
+            contstr = "Midi CH - " + to_string(value_int + 1);
             if (value_int >= NUM_MIDI_CHANNELS * 2)
                 contstr += " Midi ignored";
             else if (value_int >= NUM_MIDI_CHANNELS)
                 contstr = contstr + " Note off only on CH " + to_string(value_int + 1 - NUM_MIDI_CHANNELS);
             break;
         case 6:
-            contstr = "Mode";
+            showValue = false;
+            contstr = "Mode - ";
+            if (value_int == 0)
+                contstr += "Poly";
+            else if (value_int == 1)
+                contstr += "Mono";
+            else if (value_int == 2)
+                contstr += "Legato";
             break;
         case 7:
             contstr = "Portamento Enable";
+            yesno = true;
             break;
         case 8:
             contstr = "Enable";
@@ -1723,6 +1739,14 @@ string InterChange::resolvePart(CommandBlock *getData)
 
     }
 
+    if (yesno)
+    {
+        if (value_bool)
+            contstr += " - yes";
+        else
+            contstr += " - no";
+        showValue = false;
+    }
     return ("Part " + to_string(npart + 1) + kitnum + name + contstr);
 }
 

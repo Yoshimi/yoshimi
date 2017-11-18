@@ -6,6 +6,8 @@ yoshimi 1.5.4 M
 * Consolidated SetSystemValues as NRPN only.
   Still not completely thread safe.
 * Updated docs.
+* More refinements to CLI.
+* Tidied up some MIDI-learn messages.
 
 2017-11-17 Will
 * Added error reports to several I/O ring buffers.

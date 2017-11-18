@@ -1006,18 +1006,15 @@ void SynthEngine::SetPartKeyMode(int npart, int mode)
         case 2:
             part[npart]->Ppolymode = 0;
             part[npart]->Plegatomode = 1;
-            Runtime.Log("mode set to 'legato'");
             break;
         case 1:
             part[npart]->Ppolymode = 0;
             part[npart]->Plegatomode = 0;
-            Runtime.Log("mode set to 'mono'");
             break;
         case 0:
         default:
             part[npart]->Ppolymode = 1;
             part[npart]->Plegatomode = 0;
-            Runtime.Log("mode set to 'poly'");
             break;
     }
 }

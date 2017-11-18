@@ -1618,7 +1618,6 @@ int CmdInterface::commandPart(bool justSet)
     Config &Runtime = synth->getRuntime();
     int reply = todo_msg;
     int tmp;
-    bool partFlag = false;
     bool changed = false;
     npart = Runtime.currentPart; // belt and braces
     if (point[0] == 0)
@@ -1750,128 +1749,83 @@ int CmdInterface::commandPart(bool justSet)
     }
     else if (matchnMove(1, point, "note"))
     {
-        string name = "Note limit set to ";
-        if (isRead)
+        int type = 0;
+        int value = 0;
+        if(!isRead)
         {
-            Runtime.Log(name + asString((int)synth->part[npart]->Pkeylimit), 1);
-            return done_msg;
+            if (point[0] == 0)
+                return value_msg;
+            type = 64;
+            value = string2int(point);
+            if (value < 1 || (value > POLIPHONY - 20))
+                return range_msg;
         }
-        if (point[0] == 0)
-            return value_msg;
-        tmp = string2int(point);
-        if (tmp < 1 || (tmp > POLIPHONY - 20))
-            return range_msg;
-        else
-        {
-            synth->part[npart]->setkeylimit(tmp);
-            Runtime.Log(name + asString(tmp));
-            partFlag = true;
-        }
-        reply = done_msg;
+        sendDirect(value, type, 33, npart);
+        return done_msg;
     }
     else if (matchnMove(2, point, "min"))
     {
-        string name = "Min key set to ";
-        if (isRead)
+        int type = 0;
+        int value = 0;
+        if(!isRead)
         {
-            Runtime.Log(name + asString((int)synth->part[npart]->Pminkey));
-            return done_msg;
+            if (point[0] == 0)
+                return value_msg;
+            type = 64;
+            value = string2int127(point);
+            if (value > synth->part[npart]->Pmaxkey)
+                return high_msg;
         }
-        if (point[0] == 0)
-            return value_msg;
-        tmp = string2int127(point);
-        if (tmp > synth->part[npart]->Pmaxkey)
-            return high_msg;
-        else
-        {
-            synth->part[npart]->Pminkey = tmp;
-            Runtime.Log(name + asString(tmp));
-            partFlag = true;
-        }
-        reply = done_msg;
+        sendDirect(value, type, 16, npart);
+        return done_msg;
     }
     else if (matchnMove(2, point, "max"))
     {
-        string name = "Max key set to ";
-        if (isRead)
+        int type = 0;
+        int value = 0;
+        if(!isRead)
         {
-            Runtime.Log(name + asString((int)synth->part[npart]->Pmaxkey), 1);
-            return done_msg;
+            if (point[0] == 0)
+                return value_msg;
+            type = 64;
+            value = string2int127(point);
+            if (value < synth->part[npart]->Pminkey)
+                return low_msg;
         }
-       if (point[0] == 0)
-            return value_msg;
-        tmp = string2int127(point);
-        if (tmp < synth->part[npart]->Pminkey)
-            return low_msg;
-        else
-        {
-            synth->part[npart]->Pmaxkey = tmp;
-            Runtime.Log(name + asString(tmp));
-            partFlag = true;
-        }
-        reply = done_msg;
+        sendDirect(value, type, 17, npart);
+        return done_msg;
     }
     else if (matchnMove(1, point, "mode"))
     {
-        if (isRead)
+        int type = 0;
+        int value = 0;
+        if(!isRead)
         {
-            string name;
-            tmp = synth->ReadPartKeyMode(npart);
-            switch (tmp)
-            {
-                case 2:
-                    name = "'legato'";
-                    break;
-                case 1:
-                    name = "'mono'";
-                    break;
-                case 0:
-                default:
-                    name = "'poly'";
-                    break;
-            }
-            Runtime.Log("Key mode set to " + name, 1);
-            return done_msg;
+            type = 64;
+            if (matchnMove(1, point, "poly"))
+                value = 0;
+            else if (matchnMove(1, point, "mono"))
+                value = 1;
+            else if (matchnMove(1, point, "legato"))
+                value = 2;
+            else
+                return name_msg;
         }
-        if (point[0] == 0)
-            return value_msg;
-        if (matchnMove(1, point, "poly"))
-             synth->SetPartKeyMode(npart, 0);
-        else if (matchnMove(1, point, "mono"))
-            synth->SetPartKeyMode(npart, 1);
-        else if (matchnMove(1, point, "legato"))
-            synth->SetPartKeyMode(npart, 2);
-        else
-            return value_msg;
-        partFlag = true;
-        reply = done_msg;
+        sendDirect(value, type, 6, npart);
+        return done_msg;
     }
     else if (matchnMove(2, point, "portamento"))
     {
-        if (isRead)
+        int type = 0;
+        int value = 0;
+        if(!isRead)
         {
-            string name = "Portamento ";
-            if (synth->ReadPartPortamento(npart))
-                name += "enabled";
-            else
-                name += "disabled";
-            Runtime.Log(name, 1);
-            return done_msg;
+            type = 64;
+            if (matchnMove(1, point, "enable"))
+                value = 1;
         }
-        if (point[0] == 0)
-            return value_msg;
-        if (matchnMove(1, point, "enable"))
-        {
-           synth->SetPartPortamento(npart, 1);
-           Runtime.Log("Portamento enabled", isRead);
-        }
-        else
-        {
-           synth->SetPartPortamento(npart, 0);
-           Runtime.Log("Portamento disabled");
-        }
-        reply = done_msg;
-        partFlag = true;
+        sendDirect(value, type, 7, npart);
+        return done_msg;
     }
     else if (matchnMove(2, point, "name"))
     {
@@ -1898,8 +1852,6 @@ int CmdInterface::commandPart(bool justSet)
     }
     else
         reply = opp_msg;
-    if (partFlag)
-        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePart, 0);
     return reply;
 }
 
