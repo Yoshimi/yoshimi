@@ -100,7 +100,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {selected : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1071,14 +1071,14 @@ ZynAddSubFX}
         if (o->value() == 0)
         {
             CS_CC = 128;
-            CSspinner->value(115);
+            CSspinner->value(115); // default
             CSspinner->hide();
             CSpend->hide();
         }
         else
         {
             CSspinner->show();
-            if(CS_CC == 128)
+            if(CS_CC == 128 || CS_CC != CSspinner->value())
                 CSpend->show();
         }
         send_data(48, o->value(), 0xc0);}
@@ -1118,8 +1118,7 @@ ZynAddSubFX}
 
     collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, engine, insert, parameter, par2);} {}
   }
-  Function {returns_update(CommandBlock *getData)} {open
-  } {
+  Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
     bool wasFromHere = getData->data.type & 0x20;
@@ -1237,15 +1236,11 @@ ZynAddSubFX}
                 break;
             case 8:
                 if (insert < 255)
-                {
                     //updateBankRootDirs();
-                    bankui->rescan_for_banks(false);
-                }
                 if (engine < 255)
-                {
                     bankui->readbankcfg();
+                if (insert < 255 || engine < 255)
                     bankui->rescan_for_banks(false);
-                }
                 if (nval < 255 || par2 < 255)
                 {
                     updatelistitem(kititem);
@@ -1363,7 +1358,7 @@ ZynAddSubFX}
             else
             {
                 setMasterLabel(findleafname(name));
-                refresh_master_ui(0);
+                refresh_master_ui(1);
             }
 
             break;
@@ -1461,8 +1456,7 @@ ZynAddSubFX}
                 }
             }
             break;
-    }} {selected
-    }
+    }} {}
   }
   Function {updatesendwindow()} {} {
     code {//
@@ -1519,7 +1513,10 @@ ZynAddSubFX}
     int oldswitch = channelswitch->value();
     channelswitch->value(synth->getRuntime().channelSwitchType);
     if (full)
+    {
         oldswitch = channelswitch->value(); // disables 'pending'
+        CS_CC = synth->getRuntime().channelSwitchCC;
+    }
     if (synth->getRuntime().channelSwitchType > 0)
     {
         if (oldswitch == 0)

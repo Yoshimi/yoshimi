@@ -78,9 +78,11 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
     unsigned char channel = par0 & 0xf;
     if (event == 0x80 || event == 0x90)
     {
+        if (par2 < 1) // zero volume note on.
+            event = 0x80;
         if (inSync)
         {
-            if (event == 0x80 || par2 == 0)
+            if (event == 0x80)
                 synth->NoteOff(channel, par1);
             else
                 synth->NoteOn(channel, par1, par2);
