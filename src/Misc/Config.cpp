@@ -134,7 +134,6 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     single_row_panel(1),
     NumAvailableParts(NUM_MIDI_CHANNELS),
     currentPart(0),
-    lastPatchSet(-1),
     channelSwitchType(0),
     channelSwitchCC(128),
     channelSwitchValue(0),
@@ -413,6 +412,7 @@ bool Config::loadConfig(void)
     string homedir = string(getenv("HOME"));
     if (homedir.empty() || !isDirectory(homedir))
         homedir = string("/tmp");
+    userHome = homedir + '/';
     ConfigDir = homedir + string("/.config/") + YOSHIMI;
     if (!isDirectory(ConfigDir))
     {

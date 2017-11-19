@@ -3,6 +3,7 @@ yoshimi 1.5.4 M
 2017-11-19 Will
 * Simplified history lists.
   Last used is now always top of its list.
+* All main file loads/saves offer last used.
 
 2017-11-18 Will
 * Note on/off swap now in MusicIO.

@@ -862,8 +862,11 @@ class VectorUI {selected : {private MiscFuncs}
     code {//
     if (fname == "")
     {
+        string lastname = synth->lastItemSeen(5);
+        if (lastname == "")
+            lastname = synth->getRuntime().userHome;
         char *filename;
-        filename = fl_file_chooser("Open:", "({*.xvy})", NULL, 0);
+        filename = fl_file_chooser("Open:", "({*.xvy})", lastname.c_str(), 0);
         if (filename == NULL)
             return;
         fname = string(filename);
@@ -872,8 +875,11 @@ class VectorUI {selected : {private MiscFuncs}
   }
   Function {saveVector()} {} {
     code {//
+    string lastname = synth->lastItemSeen(5);
+    if (lastname == "")
+        lastname = synth->getRuntime().userHome;
     const char *file = NULL;
-    file = fl_file_chooser("Save:", "({*.xvy})", NULL, 0);
+    file = fl_file_chooser("Save:", "({*.xvy})", lastname.c_str(), 0);
     if (file == NULL)
         return;
 

@@ -121,8 +121,7 @@ class MasterUI {selected : {private GuiUpdates}
       configui = NULL;
       presetsui = NULL;
       paramsui = NULL;
-      yoshiLog = NULL;
-      laststatefile = synth->getRuntime().StateFile;} {}
+      yoshiLog = NULL;} {}
   }
   Function {~MasterUI()} {} {
     code {//
@@ -472,8 +471,11 @@ class MasterUI {selected : {private GuiUpdates}
           MenuItem {} {
             label {&Load...}
             callback {//
+    string lastname = synth->lastItemSeen(3);
+    if (lastname == "")
+        lastname = synth->getRuntime().userHome;
 
-    const char *filename = fl_file_chooser("Open:", "({*.xsz})", NULL, 0);
+    const char *filename = fl_file_chooser("Open:", "({*.xsz})", lastname.c_str(), 0);
     if (filename != NULL)
         do_load_scale(string(filename));}
             xywh {35 35 100 20} labelsize 12
@@ -481,8 +483,12 @@ class MasterUI {selected : {private GuiUpdates}
           MenuItem {} {
             label {&Save...}
             callback {//
+                string lastname = synth->lastItemSeen(3);
+                if (lastname == "")
+                    lastname = synth->getRuntime().userHome;
+
                 char *filename;
-                filename = fl_file_chooser("Save:", "({*.xsz})", NULL, 0);
+                filename = fl_file_chooser("Save:", "({*.xsz})", lastname.c_str(), 0);
                 if (filename == NULL)
                     return;
                 filename = fl_filename_setext(filename, ".xsz");
@@ -524,7 +530,10 @@ paramsui->Show(3);}
           MenuItem loadState {
             label {&Load...}
             callback {// for Alessandro
-            char *fle = fl_file_chooser("Load:", "({*.state})", laststatefile.c_str(), 0);
+            string lastname = synth->lastItemSeen(4);
+            if (lastname == "")
+                lastname = synth->getRuntime().userHome;
+            char *fle = fl_file_chooser("Load:", "({*.state})", lastname.c_str(), 0);
             if (fle)
             {
                 setState(fle);
@@ -537,15 +546,26 @@ paramsui->Show(3);}
           MenuItem saveState {
             label {&Save...}
             callback {// for Alessandro
+            string lastname = synth->lastItemSeen(4);
+            if (lastname == "")
+                lastname = synth->getRuntime().userHome;
             char *fle = fl_file_chooser("Save:", "({*.state})",
-                                            laststatefile.c_str(), 0);
+                                            lastname.c_str(), 0);
             if (fle)
             {
                 send_data(93, 0, 0xf0, 0xf0, 0xff, 0xff, 0x80, miscMsgPush(string(fle)));
-                laststatefile = string(fle);
                 RecentState->activate();
             }}
             tooltip {Save session state} xywh {10 10 34 21} labelsize 12
+          }
+          MenuItem {} {
+            label {Save &default}
+            callback {//
+                string name = synth->getRuntime().ConfigDir + "/yoshimi";
+                if (instance > 0)
+                    name += ("-" + to_string(instance));
+                send_data(93, 0, 0xf0, 0xf0, 0xff, 0xff, 0x80, miscMsgPush(name + ".state"));}
+            tooltip {Save as default state (if load default checked)} xywh {0 0 34 21} labelsize 12
           }
           MenuItem RecentState {
             label {&Recent States...}
@@ -1685,11 +1705,14 @@ ZynAddSubFX}
   Function {do_load_master(bool updatehistory, const char* file)} {} {
     code {//
     const char *fname;
+    string lastname = synth->lastItemSeen(2);
+    if (lastname == "")
+        lastname = synth->getRuntime().userHome;
     if (NULL != file)
         fname = file;
     else
     {
-        fname = fl_file_chooser("Open:", "({*.xmz})", NULL, 0);
+        fname = fl_file_chooser("Open:", "({*.xmz})", lastname.c_str(), 0);
         if (fname == NULL)
             return;
     }
@@ -1698,10 +1721,13 @@ ZynAddSubFX}
   Function {do_save_master(const char* file = NULL)} {} {
     code {//
     const char *fname;
+    string lastname = synth->lastItemSeen(2);
+    if (lastname == "")
+        lastname = synth->getRuntime().userHome;
     bool result = false;
     if (file == NULL)
     {
-        char *tmp = fl_file_chooser("Save:", "({*.xmz})", NULL, 0);
+        char *tmp = fl_file_chooser("Save:", "({*.xmz})", lastname.c_str(), 0);
         if (tmp == NULL)
             return;
         tmp = fl_filename_setext(tmp, ".xmz");
@@ -1716,6 +1742,7 @@ ZynAddSubFX}
     }
     else
         fname = file;
+    RecentScale->activate();
     send_data(81, 0, 0xf0, 240, 255, 255, 128, miscMsgPush(string(fname)));} {}
   }
   Function {refresh_master_ui(int type)} {} {
@@ -1750,7 +1777,7 @@ ZynAddSubFX}
     if (type & 0x80)
         setMasterLabel(miscMsgPop((type >> 8) & 0xff));
     else
-        setMasterLabel(findleafname(synth->lastPatchSetSeen()));
+        setMasterLabel(findleafname(synth->lastItemSeen(2)));
     updatesendwindow();
     updatepanel(type & 1);
     if (!(type & 2))
@@ -2303,8 +2330,6 @@ ZynAddSubFX}
   decl {Panellistitem *panellistitem[NUM_MIDI_PARTS];} {public local
   }
   decl {ConsoleUI *yoshiLog;} {public local
-  }
-  decl {string laststatefile;} {private local
   }
   decl {PresetsUI *presetsui;} {private local
   }

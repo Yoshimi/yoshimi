@@ -2323,7 +2323,11 @@ bool SynthEngine::saveState(string filename)
 {
     filename = setExtension(filename, "state");
     bool result = Runtime.saveState(filename);
-    if (result)
+    string name = Runtime.ConfigDir + "/yoshimi";
+    if (uniqueId > 0)
+        name += ("-" + to_string(uniqueId));
+    name += ".state";
+    if (result && filename != name) // never list default state
         addHistory(filename, 4);
     return result;
 }
@@ -2454,16 +2458,13 @@ void SynthEngine::addHistory(string name, int group)
 {
     if (findleafname(name) < "!")
         return;
+
     vector<string> &listType = *getHistory(group);
-    if (group == 2)
-        Runtime.lastPatchSet = 0;
-    int lineNo = 0;
-    vector<string>::iterator it = listType.begin();
-    listType.insert(it, name);
-    while(it != listType.end())
+    vector<string>::iterator itn = listType.begin();
+    listType.insert(itn, name);
+
+    for (vector<string>::iterator it = listType.begin() + 1; it < listType.end(); ++ it)
     {
-        ++it;
-        ++lineNo;
         if (*it == name)
             listType.erase(it);
     }
@@ -2497,18 +2498,10 @@ vector<string> * SynthEngine::getHistory(int group)
 }
 
 
-string SynthEngine::lastPatchSetSeen()
+string SynthEngine::lastItemSeen(int group)
 {
-    if (Runtime.lastPatchSet == -1)
-        return "";
-    int count = 0;
-    vector<string> &listType = *getHistory(2);
+    vector<string> &listType = *getHistory(group);
     vector<string>::iterator it = listType.begin();
-    while (it != listType.end() && count < Runtime.lastPatchSet)
-    {
-        ++ it;
-        ++ count;
-    }
     if (it == listType.end())
         return "";
     else

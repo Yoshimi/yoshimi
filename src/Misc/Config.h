@@ -84,6 +84,7 @@ class Config : public MiscFuncs
 
         bool isRuntimeSetupCompleted() {return bRuntimeSetupCompleted;}
 
+        string        userHome;
         string        ConfigDir;
         string        ConfigFile;
         string        paramsLoad;
@@ -150,7 +151,6 @@ class Config : public MiscFuncs
         int           single_row_panel;
         int           NumAvailableParts;
         int           currentPart;
-        int           lastPatchSet;
         unsigned char channelSwitchType;
         unsigned char channelSwitchCC;
         unsigned char channelSwitchValue;

@@ -4227,7 +4227,6 @@ void InterChange::commandMain(CommandBlock *getData)
         case 96: // master reset
             if (write && (parameter == 0xc0))
             {
-                synth->getRuntime().lastPatchSet = -1;
                 synth->allStop(2 | (type << 24));
                 getData->data.type = 0xff; // stop further action);
             }
