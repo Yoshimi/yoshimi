@@ -2441,37 +2441,32 @@ bool SynthEngine::saveBanks(int instance)
 }
 
 
+void SynthEngine::newHistory(string name, int group)
+{
+    if (findleafname(name) < "!")
+        return;
+    vector<string> &listType = *getHistory(group);
+    listType.push_back(name);
+}
+
+
 void SynthEngine::addHistory(string name, int group)
 {
     if (findleafname(name) < "!")
         return;
-    unsigned int offset = 0;
-    bool copy = false;
     vector<string> &listType = *getHistory(group);
-    if (!listType.size())
-    {
-        listType.push_back(name);
-        Runtime.lastPatchSet = 0;
-        return;
-    }
-    if (listType.size() > MAX_HISTORY)
-        offset = listType.size() - MAX_HISTORY;
-     // don't test against names that will be dropped when saving
-    int lineNo = offset;
-
-    for (vector<string>::iterator it = listType.begin() + offset; it != listType.end(); ++it)
-    {
-        if (*it == name)
-        {
-            copy = true;
-            break;
-        }
-        ++ lineNo;
-    }
-    if (!copy)
-        listType.push_back(name);
     if (group == 2)
-        Runtime.lastPatchSet = lineNo;
+        Runtime.lastPatchSet = 0;
+    int lineNo = 0;
+    vector<string>::iterator it = listType.begin();
+    listType.insert(it, name);
+    while(it != listType.end())
+    {
+        ++it;
+        ++lineNo;
+        if (*it == name)
+            listType.erase(it);
+    }
     return;
 }
 
@@ -2580,7 +2575,8 @@ bool SynthEngine::loadHistory()
                 {
                     filetype = xml->getparstr(extension);
                     if (filetype.size() && isRegFile(filetype))
-                        addHistory(filetype, count);
+                        newHistory(filetype, count);
+                        //addHistory(filetype, count);
                     xml->exitbranch();
                 }
             }
