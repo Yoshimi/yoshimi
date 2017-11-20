@@ -92,6 +92,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void addHistory(string name, int group);
         vector<string> *getHistory(int group);
         string lastItemSeen(int group);
+        void setLastfileAdded(int group, string name);
+        string getLastfileAdded(int group);
         bool loadHistory(void);
         bool saveHistory(void);
         unsigned char loadVectorAndUpdate(unsigned char baseChan, string name);

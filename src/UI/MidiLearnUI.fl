@@ -354,7 +354,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
       Fl_Button save {
         label Save
         callback {//
-        string lastname = synth->lastItemSeen(6);
+        string lastname = synth->getLastfileAdded(6);
         if (lastname == "")
             lastname = synth->getRuntime().userHome;
         char *filename;

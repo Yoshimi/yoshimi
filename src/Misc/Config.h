@@ -128,6 +128,7 @@ class Config : public MiscFuncs
         bool          loadDefaultState;
         int           Interpolation;
         string        presetsDirlist[MAX_PRESETS];
+        list<string>  lastfileseen;
         int           checksynthengines;
         int           xmlType;
         int           EnableProgChange;

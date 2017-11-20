@@ -287,7 +287,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
 
     switch(npart)
     {
-        case 192:
+        case 192: // vector
         {
             switch(control)
             {
@@ -3520,6 +3520,7 @@ void InterChange::commandVector(CommandBlock *getData)
             synth->getRuntime().vectordata.Enabled[ch] = false;
             synth->getRuntime().vectordata.Name[ch] = "No Name " + to_string(ch);
         }
+        synth->setLastfileAdded(5, "");
         return;
     }
     if (write)

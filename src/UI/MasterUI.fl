@@ -483,7 +483,7 @@ class MasterUI {selected : {private GuiUpdates}
           MenuItem {} {
             label {&Save...}
             callback {//
-                string lastname = synth->lastItemSeen(3);
+                string lastname = synth->getLastfileAdded(3);
                 if (lastname == "")
                     lastname = synth->getRuntime().userHome;
 
@@ -546,7 +546,7 @@ paramsui->Show(3);}
           MenuItem saveState {
             label {&Save...}
             callback {// for Alessandro
-            string lastname = synth->lastItemSeen(4);
+            string lastname = synth->getLastfileAdded(4);
             if (lastname == "")
                 lastname = synth->getRuntime().userHome;
             char *fle = fl_file_chooser("Save:", "({*.state})",

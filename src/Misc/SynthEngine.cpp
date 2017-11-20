@@ -75,6 +75,7 @@ static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
 }
 
 // histories
+static vector<string> InstrumentHistory;
 static vector<string> ParamsHistory;
 static vector<string> ScaleHistory;
 static vector<string> StateHistory;
@@ -549,6 +550,9 @@ void SynthEngine::defaults(void)
     //CmdInterface.defaults(); // **** need to work out how to call this
     Runtime.NumAvailableParts = NUM_MIDI_CHANNELS;
     ShutUp();
+    Runtime.lastfileseen.clear();
+    for (int i = 0; i < 7; ++i)
+        Runtime.lastfileseen.push_back(Runtime.userHome);
 }
 
 
@@ -926,7 +930,11 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
                     else
                         name += fname;
                     if (ok)
+                    {
+                        if (par2 < 0xff)
+                            addHistory(fname, 1);
                         name = name + " to Part " + to_string(npart + 1);
+                    }
                 }
             }
             if (!ok)
@@ -2468,6 +2476,7 @@ void SynthEngine::addHistory(string name, int group)
         if (*it == name)
             listType.erase(it);
     }
+    setLastfileAdded(group, name);
     return;
 }
 
@@ -2476,6 +2485,9 @@ vector<string> * SynthEngine::getHistory(int group)
 {
     switch(group)
     {
+        case 1:
+            return &InstrumentHistory;
+            break;
         case 2:
             return &ParamsHistory;
             break;
@@ -2509,6 +2521,37 @@ string SynthEngine::lastItemSeen(int group)
 }
 
 
+void SynthEngine::setLastfileAdded(int group, string name)
+{
+    if (name == "")
+        name = Runtime.userHome;
+    list<string>::iterator it = Runtime.lastfileseen.begin();
+    int count = 0;
+    while (count < group && it != miscList.end())
+    {
+        ++it;
+        ++count;
+    }
+    if (it != miscList.end())
+        *it = name;
+}
+
+
+string SynthEngine::getLastfileAdded(int group)
+{
+    list<string>::iterator it = Runtime.lastfileseen.begin();
+    int count = 0;
+    while ( count < group && it != miscList.end())
+    {
+        ++it;
+        ++count;
+    }
+    if (it == miscList.end())
+        return "";
+    return *it;
+}
+
+
 bool SynthEngine::loadHistory()
 {
     string name = Runtime.ConfigDir + '/' + YOSHIMI;
@@ -2534,10 +2577,14 @@ bool SynthEngine::loadHistory()
     string filetype;
     string type;
     string extension;
-    for (int count = 2; count < 7; ++count)
+    for (int count = 1; count < 7; ++count)
     {
         switch (count)
         {
+            case 1:
+                type = "XMZ_INSTRUMENTS";
+                extension = "xiz_file";
+                break;
             case 2:
                 type = "XMZ_PATCH_SETS";
                 extension = "xmz_file";
@@ -2569,7 +2616,6 @@ bool SynthEngine::loadHistory()
                     filetype = xml->getparstr(extension);
                     if (filetype.size() && isRegFile(filetype))
                         newHistory(filetype, count);
-                        //addHistory(filetype, count);
                     xml->exitbranch();
                 }
             }
@@ -2600,10 +2646,14 @@ bool SynthEngine::saveHistory()
         int x;
         string type;
         string extension;
-        for (int count = 2; count < 7; ++count)
+        for (int count = 1; count < 7; ++count)
         {
             switch (count)
             {
+                case 1:
+                type = "XMZ_INSTRUMENTS";
+                extension = "xiz_file";
+                break;
                 case 2:
                     type = "XMZ_PATCH_SETS";
                     extension = "xmz_file";

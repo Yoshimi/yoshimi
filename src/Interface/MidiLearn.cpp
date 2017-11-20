@@ -369,6 +369,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
     if (control == 96)
     {
         midi_list.clear();
+        synth->setLastfileAdded(6, "");
         updateGui();
         synth->getRuntime().Log("List cleared");
         return;

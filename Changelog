@@ -1,5 +1,9 @@
 yoshimi 1.5.4 M
 
+2017-11-20 Will
+* Small improvement to history lists.
+  Ready to include instruments.
+
 2017-11-19 Will
 * Simplified history lists.
   Last used is now always top of its list.
