@@ -1,6 +1,10 @@
 yoshimi 1.5.4 M
 
 2017-11-20 Will
+* Improved GUI & CLI instrument saving.
+* Updated docs.
+
+2017-11-20 Will
 * Small improvement to history lists.
   Ready to include instruments.
 

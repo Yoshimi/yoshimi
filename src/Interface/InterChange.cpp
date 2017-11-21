@@ -393,6 +393,15 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         {
             switch (control)
             {
+                case 79: // instrument save
+
+                    getData->data.parameter &= 0x7f;
+                    if (synth->part[value]->saveXML(text))
+                        text = "d " + text;
+                    else
+                        text = " FAILED " + text;
+                    value = miscMsgPush(text);
+                    break;
                 case 80:
                     if(synth->loadPatchSetAndUpdate(text))
                         text = "ed " + text;
@@ -1382,6 +1391,11 @@ string InterChange::resolveMain(CommandBlock *getData)
             break;
         case 49:
             contstr = "Chan 'solo' Switch CC";
+            break;
+
+        case 79:
+            showValue = false;
+            contstr = "Instrument Save" + miscMsgPop(value_int);
             break;
 
         case 80:

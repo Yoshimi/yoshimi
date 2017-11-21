@@ -373,18 +373,24 @@ class MasterUI {selected : {private GuiUpdates}
                     fl_alert("Nothing to save!");
                     return;
                 }
-                char *filename = fl_file_chooser("Save:", "({*.xiz})", synth->part[npart]->Pname.c_str(), 0);
+                string newname = synth->part[npart]->Pname;
+                if (newname < "!")
+                    return;
+                newname = synth->getRuntime().userHome + newname;
+                //setExtension(newname, "xiz");
+                const char *filename;
+                filename = fl_file_chooser("Save:", "({*.xiz})", newname.c_str(), 0);
                 if (filename == NULL)
                     return;
-                filename = fl_filename_setext(filename, ".xiz");
                 if (isRegFile(string(filename)))
                     if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                         return;
+                send_data(79, float(npartcounter->value() - 1), 0xd0, 240, 0xff, 0xff, 0x80, miscMsgPush(string(filename)));
+                return;
+                //bool result = synth->part[npart]->saveXML(string(filename));
 
-                bool result = synth->part[npart]->saveXML(string(filename));
-
-                if (!result)
-                    fl_alert("Failed to save instrument file");}
+                //if (!result)
+                    //fl_alert("Failed to save instrument file");}
             tooltip {Save current instrument to an .xiz file} xywh {20 20 100 20} labelsize 12
           }
           MenuItem {} {
@@ -1368,6 +1374,14 @@ ZynAddSubFX}
             updatepanel();
             break;
 
+        case 79:
+            name = miscMsgPop(par2);
+            if (name.find("FAILED") == 1)
+            {
+                if (wasFromHere)
+                    fl_alert("%s",name.c_str());
+            }
+
         case 80:
             name = miscMsgPop(par2);
             if (name.find("FAILED") == 1)
@@ -1721,7 +1735,7 @@ ZynAddSubFX}
   Function {do_save_master(const char* file = NULL)} {} {
     code {//
     const char *fname;
-    string lastname = synth->lastItemSeen(2);
+    string lastname = synth->getLastfileAdded(2);
     if (lastname == "")
         lastname = synth->getRuntime().userHome;
     bool result = false;

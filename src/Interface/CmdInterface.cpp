@@ -2618,11 +2618,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             else
             {
                 replyString = setExtension((string) point, "xiz");
-                tmp = synth->part[npart]->saveXML(replyString);
-                if (tmp)
-                    Runtime.Log("Saved part " + asString(npart + 1) + "  instrument " + (string) synth->part[npart]->Pname + "  as " +replyString);
-                else
-                    Runtime.Log("Failed to save " + replyString);
+                sendDirect(npart, 64, 79, 0xf0, 0xff, 0xff, 0xff, 0x80, miscMsgPush(string(point)));
                 reply = done_msg;
             }
         }
