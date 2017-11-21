@@ -3,6 +3,7 @@ yoshimi 1.5.4 M
 2017-11-20 Will
 * Improved GUI & CLI instrument saving.
 * Updated docs.
+* BugFix: Failed right click on bank window.
 
 2017-11-20 Will
 * Small improvement to history lists.

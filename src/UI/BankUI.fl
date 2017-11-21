@@ -806,12 +806,12 @@ class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
         string thisname =  bank->getname(slot);
         if ((what == 1 || what == 3) && mode == 1 && !bank->emptyslot(slot))
         {
-            send_data(74, *npart, 0xc8, 240, 255, 255, 255, 255, slot);
+            send_data(74, *npart, 0xf0, 240, 255, 255, 255, 255, slot);
             // Reads from slot
             if (what == 3)
                 instrumentuiwindow->hide();
-            cbwig->do_callback();
-            refreshmainwindow();
+            //cbwig->do_callback();
+            //refreshmainwindow();
             return;
         }
 
