@@ -456,7 +456,7 @@ bool CmdInterface::helpList(unsigned int local)
 void CmdInterface::historyList(int listnum)
 {
     list<string>msg;
-    int start = 2;
+    int start = 1;
     int end = 6;
     bool found = false;
 
@@ -473,6 +473,9 @@ void CmdInterface::historyList(int listnum)
             msg.push_back(" ");
             switch (type)
             {
+                case 1:
+                    msg.push_back("Recent Instruments:");
+                    break;
                 case 2:
                     msg.push_back("Recent Patch Sets:");
                     break;
@@ -917,6 +920,8 @@ int CmdInterface::commandList()
         reply = done_msg;
         if (point[0] == 0)
             historyList(0);
+        else if (matchnMove(1, point, "instruments") || matchnMove(2, point, "program") )
+            historyList(1);
         else if (matchnMove(1, point, "patchsets"))
             historyList(2);
         else if (matchnMove(2, point, "scales"))
@@ -2531,11 +2536,48 @@ bool CmdInterface::cmdIfaceProcessCommand()
         }
         else if (matchnMove(1, point, "instrument"))
         {
+            bool ok = true;
             if (point[0] == 0)
+            {
+                ok = false;
                 reply = name_msg;
+            }
             else
-                sendDirect(npart, 64, 78, 240, 255, 255, 255, 255, miscMsgPush((string) point));
-            reply = done_msg;
+            {
+                string name;
+                if (point[0] == '@')
+                {
+                    point += 1;
+                    point = skipSpace(point);
+                    tmp = string2int(point);
+                    if (tmp <= 0)
+                    {
+                        ok = false;
+                        reply = value_msg;
+                    }
+                    name = historySelect(1, tmp - 1);
+                    if (name == "")
+                    {
+                        ok = false;
+                        reply = done_msg;
+                    }
+                }
+                else
+                {
+                    name = (string)point;
+                    cout << name << endl;
+                    if (name == "")
+                    {
+                        ok = false;
+                        reply = name_msg;
+                    }
+                }
+                if (ok)
+                {
+                    sendDirect(npart, 64, 78, 240, 255, 255, 255, 255, miscMsgPush(name));
+                    reply = done_msg;
+                }
+            }
         }
         else
         {
@@ -2617,7 +2659,6 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = name_msg;
             else
             {
-                replyString = setExtension((string) point, "xiz");
                 sendDirect(npart, 64, 79, 0xf0, 0xff, 0xff, 0xff, 0x80, miscMsgPush(string(point)));
                 reply = done_msg;
             }

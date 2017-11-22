@@ -1296,6 +1296,7 @@ void Part::add2XML(XMLwrapper *xml)
 
 bool Part::saveXML(string filename)
 {
+    filename = setExtension(filename, "xiz");
     synth->getRuntime().xmlType = XML_INSTRUMENT;
     XMLwrapper *xml = new XMLwrapper(synth);
     if (!xml)
@@ -1322,7 +1323,7 @@ int Part::loadXMLinstrument(string filename)
         synth->getRuntime().Log("Part: loadXML failed to instantiate new XMLwrapper");
         return 0;
     }
-
+    filename = setExtension(filename, "xiz");
     if (!xml->loadXMLfile(filename))
     {
         synth->getRuntime().Log("Part: loadXML failed to load instrument file " + filename);

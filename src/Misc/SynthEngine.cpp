@@ -358,7 +358,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         }
         else if (Runtime.instrumentLoad.size())
         {
-            string feli = setExtension(Runtime.instrumentLoad, "xiz");
+            string feli = Runtime.instrumentLoad;
             int loadtopart = 0;
             if (part[loadtopart]->loadXMLinstrument(feli))
                 Runtime.Log("Instrument file " + feli + " loaded");
@@ -911,7 +911,6 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
                             name = name + "Bank " + to_string(originalBank) + ". ";
                     }
                 }
-
                 if (part[npart]->loadXMLinstrument(fname))
                 {
                     if (notinplace)

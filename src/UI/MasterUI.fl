@@ -383,7 +383,6 @@ class MasterUI {selected : {private GuiUpdates}
                 if (newname < "!")
                     return;
                 newname = synth->getRuntime().userHome + newname;
-                //setExtension(newname, "xiz");
                 const char *filename;
                 filename = fl_file_chooser("Save:", "({*.xiz})", newname.c_str(), 0);
                 if (filename == NULL)

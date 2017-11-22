@@ -3,6 +3,7 @@ yoshimi 1.5.4 M
 2017-11-22 Will
 * Further refinements to history lists.
   Instruments now included.
+* CLI instrument load can use '@' history.
 
 2017-11-20 Will
 * Improved GUI & CLI instrument saving.
