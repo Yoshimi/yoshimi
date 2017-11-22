@@ -346,9 +346,12 @@ class MasterUI {selected : {private GuiUpdates}
             xywh {10 10 100 20} labelsize 12
           }
         }
-        Submenu {} {
+        Submenu Instruments {
           label {&Instruments}
           xywh {0 0 100 20} labelsize 12
+          code0 {o = o; // suppress warning}
+          code1 {vector <string> listType = *synth->getHistory(1);}
+          code2 {if (listType.size() == 0) RecentInstruments->deactivate(); else RecentInstruments->activate();}
         } {
           MenuItem {} {
             label {S&how Stored...}
@@ -358,11 +361,14 @@ class MasterUI {selected : {private GuiUpdates}
           MenuItem {} {
             label {&Load External...}
             callback {//
+                string lastname = synth->lastItemSeen(1);
+                if (lastname == "")
+                    lastname = synth->getRuntime().userHome;
                 const char *filename;
-                filename = fl_file_chooser("Load:", "({*.xiz})", NULL, 0);
+                filename = fl_file_chooser("Load:", "({*.xiz})", lastname.c_str(), 0);
                 if (filename == NULL)
                     return;
-                send_data(78, npart, 0xc8, 240, 255, 255, 255, miscMsgPush(filename));}
+                do_load_instrument(filename);}
             tooltip {Load an instrument (.xiz) file} xywh {30 30 100 20} labelsize 12
           }
           MenuItem {} {
@@ -386,12 +392,15 @@ class MasterUI {selected : {private GuiUpdates}
                     if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                         return;
                 send_data(79, float(npartcounter->value() - 1), 0xd0, 240, 0xff, 0xff, 0x80, miscMsgPush(string(filename)));
-                return;
-                //bool result = synth->part[npart]->saveXML(string(filename));
-
-                //if (!result)
-                    //fl_alert("Failed to save instrument file");}
+                return;}
             tooltip {Save current instrument to an .xiz file} xywh {20 20 100 20} labelsize 12
+          }
+          MenuItem RecentInstruments {
+            label {&Recent Instruments...}
+            callback {//
+            paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
+            paramsui->Show(1);}
+            xywh {10 10 34 21} labelsize 12
           }
           MenuItem {} {
             label {&Clear}
@@ -481,7 +490,7 @@ class MasterUI {selected : {private GuiUpdates}
     if (lastname == "")
         lastname = synth->getRuntime().userHome;
 
-    const char *filename = fl_file_chooser("Open:", "({*.xsz})", lastname.c_str(), 0);
+    const char *filename = fl_file_chooser("Load:", "({*.xsz})", lastname.c_str(), 0);
     if (filename != NULL)
         do_load_scale(string(filename));}
             xywh {35 35 100 20} labelsize 12
@@ -565,7 +574,7 @@ paramsui->Show(3);}
             tooltip {Save session state} xywh {10 10 34 21} labelsize 12
           }
           MenuItem {} {
-            label {Save &default}
+            label {Save as &Default}
             callback {//
                 string name = synth->getRuntime().ConfigDir + "/yoshimi";
                 if (instance > 0)
@@ -1374,15 +1383,28 @@ ZynAddSubFX}
             updatepanel();
             break;
 
-        case 79:
+        case 78: // load instrument
+            if (name.find("FAILED") == 1)
+            {
+                if (wasFromHere)
+                    fl_alert("%s",name.c_str());
+            }
+            else
+                RecentInstruments->activate();
+            break;
+
+        case 79: // save instrument
             name = miscMsgPop(par2);
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
                     fl_alert("%s",name.c_str());
             }
+            else
+                RecentInstruments->activate();
+            break;
 
-        case 80:
+        case 80: // load patchset
             name = miscMsgPop(par2);
             if (name.find("FAILED") == 1)
             {
@@ -1391,6 +1413,7 @@ ZynAddSubFX}
             }
             else
             {
+                RecentParams->activate();
                 setMasterLabel(findleafname(name));
                 refresh_master_ui(1);
             }
@@ -1408,7 +1431,7 @@ ZynAddSubFX}
             {
                 setMasterLabel(findleafname(name));
                 RecentParams->activate();
-                updatepanel();
+                updatepanel(); // why?
             }
             break;
 
@@ -1447,6 +1470,7 @@ ZynAddSubFX}
             }
             else
             {
+                RecentScale->activate();
                 microtonalui->Hide();
                 microtonalui->make_window();
             }
@@ -1455,7 +1479,9 @@ ZynAddSubFX}
         case 89: // save scales
             name = miscMsgPop(par2);
             if (wasFromHere && name.find("FAILED") == 1)
-                    fl_alert("%s",name.c_str());
+                fl_alert("%s",name.c_str());
+            else
+                RecentScale->activate();
             break;
 
         case 92: // load state
@@ -1716,6 +1742,10 @@ ZynAddSubFX}
     code {//
     send_data(88, 0, 0xf0, 0xf0, 0xff, 0xff, 0x80, miscMsgPush(fname));} {}
   }
+  Function {do_load_instrument(string fname)} {} {
+    code {//
+    send_data(78, npart, 0xf0, 0xf0, 0xff, 0xff, 0xff, miscMsgPush(fname));} {}
+  }
   Function {do_load_master(bool updatehistory, const char* file)} {} {
     code {//
     const char *fname;
@@ -1726,7 +1756,7 @@ ZynAddSubFX}
         fname = file;
     else
     {
-        fname = fl_file_chooser("Open:", "({*.xmz})", lastname.c_str(), 0);
+        fname = fl_file_chooser("Load:", "({*.xmz})", lastname.c_str(), 0);
         if (fname == NULL)
             return;
     }
@@ -1756,7 +1786,7 @@ ZynAddSubFX}
     }
     else
         fname = file;
-    RecentScale->activate();
+    // RecentScale->activate();
     send_data(81, 0, 0xf0, 240, 255, 255, 128, miscMsgPush(string(fname)));} {}
   }
   Function {refresh_master_ui(int type)} {} {

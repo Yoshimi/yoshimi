@@ -2651,9 +2651,9 @@ bool SynthEngine::saveHistory()
             switch (count)
             {
                 case 1:
-                type = "XMZ_INSTRUMENTS";
-                extension = "xiz_file";
-                break;
+                    type = "XMZ_INSTRUMENTS";
+                    extension = "xiz_file";
+                    break;
                 case 2:
                     type = "XMZ_PATCH_SETS";
                     extension = "xmz_file";

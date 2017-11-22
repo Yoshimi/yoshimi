@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
 Modified November 2017
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <set>} {public local
@@ -37,7 +37,8 @@ decl {\#include "MasterUI.h"} {private global
 decl {\#include "Misc/SynthEngine.h"} {public global
 }
 
-class ParametersUI {} {
+class ParametersUI {selected
+} {
   Function {make_window(void)} {} {
     Fl_Window Recent {
       label {Recent Parameters}
@@ -54,6 +55,9 @@ class ParametersUI {} {
         string fle = listType.at(o->value()-1);
         switch(H_type)
         {
+            case 1:
+            	synth->getGuiMaster()->do_load_instrument(fle);
+            	break;
             case 3:
                 synth->getGuiMaster()->do_load_scale(fle);
                 break;
@@ -104,6 +108,9 @@ class ParametersUI {} {
 
     switch (H_type)
     {
+        case 1:
+            Recent->label("Recent Instruments");
+            break;
         case 3:
             Recent->label("Recent Scales");
             break;

@@ -397,7 +397,10 @@ void InterChange::indirectTransfers(CommandBlock *getData)
 
                     getData->data.parameter &= 0x7f;
                     if (synth->part[value]->saveXML(text))
+                    {
+                        synth->addHistory(text, 1);
                         text = "d " + text;
+                    }
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
