@@ -1277,11 +1277,8 @@ ZynAddSubFX}
                     bankui->rescan_for_banks(false);
                 if (nval < 255 || par2 < 255)
                 {
-                    int newpart = nval;
-                    if (nval == 255)
-                        newpart = par2;
-                    updatelistitem(newpart);
                     updatepartprogram(kititem);
+                    updatelistitem(kititem);
                     RecentInstruments->activate();
                 }
         }
