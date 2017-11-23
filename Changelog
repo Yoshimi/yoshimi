@@ -5,6 +5,7 @@ yoshimi 1.5.4 M
   Now possible to send plain non-blocking
   messages, such as warnings, to CLI & GUI.
 * Updated docs.
+* Fixed regression. Mixer not updating :(
 
 2017-11-22 Will
 * Further refinements to history lists.
