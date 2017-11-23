@@ -1,5 +1,11 @@
 yoshimi 1.5.4 M
 
+2017-11-23 Will
+* Improved internal message system.
+  Now possible to send plain non-blocking
+  messages, such as warnings, to CLI & GUI.
+* Updated docs.
+
 2017-11-22 Will
 * Further refinements to history lists.
   Instruments now included.

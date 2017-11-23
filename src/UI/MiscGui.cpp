@@ -121,6 +121,13 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 
 //        cout << "Con " << int(control) << "  Kit " << int(kititem) << "  Eng " << int(engine) << "  Ins " << int(insert) << endl;
 
+    if (control == 0xfe && insert != 9) // just show a messge
+    {
+        synth->getGuiMaster()->midilearnui->words->copy_label(miscMsgPop(insertPar2).c_str());
+        synth->getGuiMaster()->midilearnui->cancel->hide();
+        synth->getGuiMaster()->midilearnui->message->show();
+        return;
+    }
     if (npart == 0xe8) // scales
     {
         synth->getGuiMaster()->microtonalui->returns_update(getData);

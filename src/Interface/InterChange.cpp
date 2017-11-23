@@ -285,7 +285,11 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     unsigned char tmp;
     string name;
 
-    switch(npart)
+    int switchNum = npart;
+    if (control == 254 && insert !=9)
+        switchNum = 256; // this is a bit hacky :(
+
+    switch(switchNum)
     {
         case 192: // vector
         {
@@ -567,6 +571,12 @@ void InterChange::indirectTransfers(CommandBlock *getData)
             getData->data.parameter &= 0x7f;
             break;
         }
+        case 256:
+        {
+            value = miscMsgPush(text);
+            getData->data.parameter &= 0x7f;
+            break;
+        }
         default:
         {
             if (npart < 64) // audio destination
@@ -661,6 +671,15 @@ void InterChange::resolveReplies(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
+    unsigned char insertParam = getData->data.parameter;
+    unsigned char insertPar2 = getData->data.par2;
+
+    if (control == 0xfe && insertParam != 9) // special case for simple messages
+    {
+        synth->getRuntime().Log(miscMsgPop(lrint(value)));
+        synth->getRuntime().finishedCLI = true;
+        return;
+    }
 
     showValue = true;
 
@@ -676,8 +695,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     char button = type & 3;
     string isValue;
     string commandName;
-    unsigned char insertParam = getData->data.parameter;
-    unsigned char insertPar2 = getData->data.par2;
+
 #ifdef ENABLE_REPORTS
     if ((isGui && !(button & 1)) || (isCli && button == 1))
 #else
@@ -3194,9 +3212,7 @@ void InterChange::returnsDirect(int altData)
 
 void InterChange::returns(CommandBlock *getData)
 {
-//    float value = getData->data.value;
     unsigned char type = getData->data.type | 4; // back from synth
-//    unsigned char npart = getData->data.part;
 
     if (type == 0xff)
         return;

@@ -630,8 +630,16 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
      */
     if (midi_list.size() >= MIDI_LEARN_BLOCK)
     {
-        GuiThreadMsg::sendMessage(synth,GuiThreadMsg::GuiAlert,miscMsgPush("Midi Learn full!"));
-        synth->getRuntime().Log("Midi Learn full!");
+        CommandBlock putData;
+        int putSize = sizeof(putData);
+        memset(&putData, 0xff, putSize);
+        putData.data.value = 0;
+        putData.data.type = 0xc8;
+        putData.data.control = 0xfe;
+        putData.data.part = 0xd9;
+        putData.data.parameter = 0x80;
+        putData.data.par2 = miscMsgPush("Midi Learn full!");
+        writeMidi(&putData, putSize, false);
         learning = false;
         return;
     }

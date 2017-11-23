@@ -1270,15 +1270,16 @@ ZynAddSubFX}
                 break;
             case 8:
                 if (insert < 255)
-                    //updateBankRootDirs();
+                    ;//updateBankRootDirs(); // apparently not needed!
                 if (engine < 255)
                     bankui->readbankcfg();
                 if (insert < 255 || engine < 255)
                     bankui->rescan_for_banks(false);
                 if (nval < 255 || par2 < 255)
                 {
-                    updatelistitem(kititem);
+                    ;//updatepart(); // apparently not needed!
                     updatepartprogram(kititem);
+                    RecentInstruments->activate();
                 }
         }
         return;

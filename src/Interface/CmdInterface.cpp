@@ -2715,7 +2715,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                     {
                         param = string2int(point);
                         point = skipChars(point);
-                        if (((control == 80 || control == 88) && part == 240) || ((param & 0x80) && param < 0xff))
+                        if (((control == 80 || control == 88) && part == 240) || ((param & 0x80) && param < 0xff && insert != 9))
                         {
                             string name = string(point);
                             if (name > "!")
