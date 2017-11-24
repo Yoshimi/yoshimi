@@ -1200,7 +1200,7 @@ ZynAddSubFX}
                 break;
             case 2:
                 //cout << " Value " << int(value) << "  kit " << int(kititem) << "  npart " << int(npart) << endl;
-                if(engine == synth->getRuntime().channelSwitchCC)
+                if(engine <= 119 && engine == synth->getRuntime().channelSwitchCC)
                 { // it's a valid channel switch
                     int newch = partui->midich->value() - 1;
                     switch (synth->getRuntime().channelSwitchType)
@@ -1278,7 +1278,6 @@ ZynAddSubFX}
                 if (nval < 255 || par2 < 255)
                 {
                     updatepartprogram(kititem);
-                    updatelistitem(kititem);
                     RecentInstruments->activate();
                 }
         }
@@ -1660,7 +1659,10 @@ ZynAddSubFX}
     if (vectorui)
         vectorui->setInstrumentLabel(_npart);
     if (_npart != npart)
+    {
+        updatelistitem(_npart);
         return;
+    }
 
     if (partui->part->Prcvchn <  NUM_MIDI_CHANNELS)
     {

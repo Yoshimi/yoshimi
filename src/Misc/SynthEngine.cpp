@@ -693,7 +693,7 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
         //shouldn't get here. Banks are set directly via SetBank method from MusicIO class
         return;
     }
-    if (type == Runtime.channelSwitchCC)
+    if (type <= 119 && type == Runtime.channelSwitchCC)
     {
         RunChannelSwitch(par);
         return;
