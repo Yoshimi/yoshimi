@@ -128,6 +128,7 @@ class Part : private MiscFuncs, SynthHelper
 
         unsigned char Ppolymode;   // Part mode - 0 = monophonic , 1 = polyphonic
         unsigned char Plegatomode; // 0 = normal, 1 = legato
+        unsigned char Pkeymode;    // 0 = poly, 1 = mono, > 1 = legato;
         unsigned char Pkeylimit;   // how many keys can play simultaneously,
                                    // time 0 = off, the older will be released
         float         Pfrand;      // Part random frequency content

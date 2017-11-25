@@ -122,6 +122,7 @@ void Part::defaults(void)
     Pmaxkey = 127;
     Ppolymode = 1;
     Plegatomode = 0;
+    Pkeymode = 0; // poly
     setVolume(96);
     TransVolume = 128; // ensure it always gets set
     Pkeyshift = 64;

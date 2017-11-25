@@ -527,7 +527,8 @@ Offset}
           send_data(6, o->value(), 0xc0);}
           tooltip {Poly, Mono or Legato mode} xywh {83 36 68 19} down_box BORDER_BOX selection_color 49 labelsize 11 align 8 textfont 1 textsize 11
           code0 {o->add("Poly"); o->add("Mono"); o->add("Legato");}
-          code1 {o->value(synth->ReadPartKeyMode(npart));}
+          code1 {int tmp = synth->ReadPartKeyMode(npart);}
+          code2 {if (tmp > 1) o->value(2); else o->value(tmp);}
         } {}
         Fl_Button {} {
           label Controllers
@@ -1538,7 +1539,10 @@ Offset}
             break;
 
         case 6:
-            keymode->value(valInt);
+            if(valInt > 1)
+                keymode->value(2);
+            else
+                keymode->value(valInt);
             break;
 
         case 7:

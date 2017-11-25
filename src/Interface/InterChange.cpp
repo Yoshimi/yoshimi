@@ -1569,7 +1569,7 @@ string InterChange::resolvePart(CommandBlock *getData)
                 contstr += "Poly";
             else if (value_int == 1)
                 contstr += "Mono";
-            else if (value_int == 2)
+            else if (value_int >= 2)
                 contstr += "Legato";
             break;
         case 7:
@@ -4337,7 +4337,7 @@ void InterChange::commandPart(CommandBlock *getData)
             if (write)
                 synth->SetPartKeyMode(npart, value_int);
             else
-                value = synth->ReadPartKeyMode(npart);
+                value = (synth->ReadPartKeyMode(npart)) & 3; // clear out temporary legato
             break;
         case 7:
             if (write)

@@ -1174,7 +1174,7 @@ ZynAddSubFX}
         { // panel entries only
             for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
             {
-                if(panellistitem[i]->partenabled->value() != 0)
+                if(true)//panellistitem[i]->partenabled->value() != 0)
                 {
                     if((isSingle && i == (chan & mask)
                                  && panellistitem[i]->partrcv->value() == (chan & mask)
@@ -1191,8 +1191,7 @@ ZynAddSubFX}
         }
 
         bool isForUs = (isSingle && chan == npart)
-             || (!isSingle &&  (partui->midich->value() == (chan & mask) + 1)
-                           && partui->partGroupEnable->value() != 0);
+             || (!isSingle &&  (partui->midich->value() == (chan & mask) + 1));// && partui->partGroupEnable->value() != 0);
         switch(control)
         {
             case 0:
@@ -1256,6 +1255,15 @@ ZynAddSubFX}
                         case 11: // expression
                             partui->expression->value(value);
                             break;
+                        case 68: // legato switch
+                        {
+                            int mode = synth->ReadPartKeyMode(npart);
+                            if (mode > 2)
+                                partui->keymode->value(2);
+                            else
+                                partui->keymode->value(mode);
+                            break;
+                        }
                         case 71: // filter Q
                             partui->filterq->value(value);
                             break;

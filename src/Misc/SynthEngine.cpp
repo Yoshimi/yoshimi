@@ -704,7 +704,18 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
         //cout << "npart group " << to_string(int(chan)) << endl;
         for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
         {   // Send the controller to all part assigned to the channel
-            if (chan == part[npart]->Prcvchn && partonoffRead(npart))
+            if (chan == part[npart]->Prcvchn)// && partonoffRead(npart))
+            {
+                if (type == 0x44) // legato switch
+                {
+                    int mode = (ReadPartKeyMode(npart) & 3);
+                    if (par < 64)
+                        SetPartKeyMode(npart, mode & 3); // normal
+                    else
+                        SetPartKeyMode(npart, mode | 4); // temporary legato
+                }
+            }
+            else
                 part[npart]->SetController(type, par);
         }
     }
@@ -1008,6 +1019,10 @@ bool SynthEngine::ReadPartPortamento(int npart)
 
 void SynthEngine::SetPartKeyMode(int npart, int mode)
 {
+    part[npart]->Pkeymode = mode;
+
+    if (mode > 2)
+        mode = 2;
     switch(mode)
     {
         case 2:
@@ -1029,16 +1044,7 @@ void SynthEngine::SetPartKeyMode(int npart, int mode)
 
 int SynthEngine::ReadPartKeyMode(int npart)
 {
-    int result;
-    bool poly = part[npart]->Ppolymode;
-    bool legato = part[npart]->Plegatomode;
-    if (!poly && legato)
-        result = 2;
-    else if (!poly && !legato)
-        result = 1;
-    else
-        result = 0;;
-    return result;
+    return part[npart]->Pkeymode;
 }
 
 
@@ -3089,8 +3095,7 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
     setPvolume(xml->getpar127("volume", Pvolume));
     setPkeyshift(xml->getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64));
     Runtime.channelSwitchType = xml->getpar("channel_switch_type", Runtime.channelSwitchType, 0, 3);
-    Runtime.channelSwitchCC = xml->getpar127("channel_switch_CC", Runtime.channelSwitchCC);
-    Runtime.channelSwitchValue = 0;
+    Runtime.channelSwitchValue = xml->getpar("channel_switch_CC", Runtime.channelSwitchCC, 0, 128);
 
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
