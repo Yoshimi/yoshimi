@@ -714,9 +714,9 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
                     else
                         SetPartKeyMode(npart, mode | 4); // temporary legato
                 }
+                else
+                    part[npart]->SetController(type, par);
             }
-            else
-                part[npart]->SetController(type, par);
         }
     }
     else
