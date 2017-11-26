@@ -1021,7 +1021,7 @@ void SynthEngine::SetPartKeyMode(int npart, int mode)
 {
     part[npart]->Pkeymode = mode;
 
-    if (mode > 2)
+/*    if (mode > 2)
         mode = 2;
     switch(mode)
     {
@@ -1038,7 +1038,7 @@ void SynthEngine::SetPartKeyMode(int npart, int mode)
             part[npart]->Ppolymode = 1;
             part[npart]->Plegatomode = 0;
             break;
-    }
+    }*/
 }
 
 

@@ -22,7 +22,7 @@
 
     This file is a derivative of a ZynAddSubFX original
 
-    Modified March 2017
+    Modified November 2017
 */
 
 
@@ -55,7 +55,7 @@ class Controller
         void setfmamp(int value);
         void setvolume(int value);
         void setsustain(int value);
-        void setlegato(int value);
+//        void setlegato(int value);
         void setportamento(int value);
         void portamentosetup();
         void setresonancecenter(int value);

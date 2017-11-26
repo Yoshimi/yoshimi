@@ -4852,12 +4852,7 @@ void InterChange::commandPart(CommandBlock *getData)
             }
         case 224:
             if (write)
-            {
                 part->SetController(0x79,0); // C_resetallcontrollers
-                if (type & 0x20)
-                    getData->data.type = ((type & 0xcf) | 0x10);
-                    // fudge so that gui updates *after* changes
-            }
             break;
     }
 

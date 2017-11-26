@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified October 2017
+Modified November 2017
 } {in_source in_header
 }
 
@@ -794,7 +794,7 @@ Offset}
       Fl_Button {} {
         label {Reset all controllers}
         callback {//
-        send_data(224, o->value(), 0xc0);}
+        send_data(224, o->value(), 0xd0);}
         xywh {5 105 210 20} box THIN_UP_BOX
       }
       Fl_Group {} {
@@ -1959,6 +1959,7 @@ Offset}
   Function {updatecontrollers()} {} {
     code {//
     enportamento->value(0);
+    keymode->value(part->Pkeymode & 3);
     expmwh->value(part->ctl->modwheel.exponential);
     modwh->value(part->ctl->modwheel.depth);
     expbw->value(part->ctl->bandwidth.exponential);

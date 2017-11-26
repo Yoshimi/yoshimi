@@ -338,7 +338,7 @@ class MasterUI {selected : {private GuiUpdates}
             }
             pclose(fp);
             return;}
-            xywh {0 0 34 20}
+            xywh {0 0 34 20} labelsize 12
           }
           MenuItem {} {
             label {E&xit}
@@ -1649,12 +1649,13 @@ ZynAddSubFX}
     partui->maxkcounter->value(synth->part[npart]->Pmaxkey);
     partui->enportamento->value(synth->part[npart]->ctl->portamento.portamento);
 
-    if (synth->part[npart]->Ppolymode)
+    /*if (synth->part[npart]->Ppolymode)
         partui->keymode->value(0);
     else
         partui->keymode->value(1);
     if (!synth->part[npart]->Ppolymode && synth->part[npart]->Plegatomode)
-        partui->keymode->value(2);
+        partui->keymode->value(2);*/
+    partui->keymode->value(synth->part[npart]->Pkeymode & 3);
 
     maxparts->value(partmax);
     maxparts->redraw();

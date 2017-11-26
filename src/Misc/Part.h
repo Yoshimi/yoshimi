@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified August 2017
+    Modified November 2017
 */
 
 #ifndef PART_H
@@ -126,8 +126,8 @@ class Part : private MiscFuncs, SynthHelper
         bool          Pkitfade;    // enables cross fading
         unsigned char Pdrummode;   // if all keys are mapped and the system is 12tET (used for drums)
 
-        unsigned char Ppolymode;   // Part mode - 0 = monophonic , 1 = polyphonic
-        unsigned char Plegatomode; // 0 = normal, 1 = legato
+        //unsigned char Ppolymode;   // Part mode - 0 = monophonic , 1 = polyphonic
+        //unsigned char Plegatomode; // 0 = normal, 1 = legato
         unsigned char Pkeymode;    // 0 = poly, 1 = mono, > 1 = legato;
         unsigned char Pkeylimit;   // how many keys can play simultaneously,
                                    // time 0 = off, the older will be released
