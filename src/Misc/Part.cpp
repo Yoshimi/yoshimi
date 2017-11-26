@@ -247,7 +247,7 @@ Part::~Part()
 
 
 // Note On Messages
-void Part::NoteOn(int note, int velocity, int masterkeyshift, bool renote)
+void Part::NoteOn(int note, int velocity, bool renote)
 {
     if (note < Pminkey || note > Pmaxkey)
         return;
@@ -266,7 +266,6 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift, bool renote)
         if (!renote)
             monomemnotes.push_back(note);        // Add note to the list.
         monomem[note].velocity = velocity;       // Store this note's velocity.
-        monomem[note].mkeyshift = masterkeyshift;
         if (partnote[lastpos].status != KEY_PLAYING
             && partnote[lastpos].status != KEY_RELASED_AND_SUSTAINED)
         {
@@ -840,8 +839,7 @@ void Part::MonoMemRenote(void)
 {
     unsigned char mmrtempnote = monomemnotes.back(); // Last list element.
     //monomemnotes.pop_back(); // We remove it, will be added again in NoteOn(...).
-    NoteOn(mmrtempnote, monomem[mmrtempnote].velocity,
-               monomem[mmrtempnote].mkeyshift, true);
+    NoteOn(mmrtempnote, monomem[mmrtempnote].velocity, true);
 }
 
 

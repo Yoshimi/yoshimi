@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of origional ZynAddSubFX code
 
-Modified October 2017
+Modified November 2017
 } {in_source in_header
 }
 
@@ -285,7 +285,6 @@ class VirKeys {: {public Fl_Box}
     {
         vel = midivel * (127.0 - rndvelocity) / 127.0 + synth->numRandom() * rndvelocity;
     }
-    //synth->NoteOn(midich, nk + midioct * 12, vel);
     send_data(0, vel, 0xc0, midich, nk + midioct * 12);} {}
   }
   Function {relasekey(int nk,int type)} {} {
@@ -298,7 +297,6 @@ class VirKeys {: {public Fl_Box}
         return;
     pressed[nk] = 0;
     damage(1);
-    //synth->NoteOff(midich, nk + 12 * midioct);
     send_data(1, 0, 0xc0, midich, nk + midioct * 12);} {}
   }
   Function {relaseallkeys(int type)} {} {

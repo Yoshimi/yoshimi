@@ -65,7 +65,7 @@ class Part : private MiscFuncs, SynthHelper
         void cleanup(void);
 
         // Midi commands implemented
-        void NoteOn(int note, int velocity, int masterkeyshift, bool renote = false);
+        void NoteOn(int note, int velocity, bool renote = false);
         void NoteOff(int note);
         void AllNotesOff(void) { killallnotes = true; }; // panic, prepare all notes to be turned off
         void SetController(unsigned int type, int par);
@@ -193,10 +193,9 @@ class Part : private MiscFuncs, SynthHelper
         list<unsigned char> monomemnotes; // held notes.
         struct {
             unsigned char velocity;
-            int mkeyshift; // Not sure if masterkeyshift should be remembered.
         } monomem[256];    // 256 is to cover all possible note values. monomem[]
                            // is used in conjunction with the list to store the
-                           // velocity and masterkeyshift values of a given note
+                           // velocity value of a given note
                            // (the list only store note values). For example.
                            // 'monomem[note].velocity' would be the velocity
                            // value of the note 'note'.

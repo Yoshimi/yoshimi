@@ -587,7 +587,7 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
             if (partonoffRead(npart))
             {
                 actionLock(lockType);
-                part[npart]->NoteOn(note, velocity, keyshift);
+                part[npart]->NoteOn(note, velocity);
                 actionLock(unlockType);
             }
             else if (VUpeak.values.parts[npart] > (-velocity))
