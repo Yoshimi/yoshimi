@@ -1282,7 +1282,7 @@ void Part::add2XML(XMLwrapper *xml)
 
     // the following two lines maintain backward compatibility
     xml->addparbool("poly_mode", Pkeymode == 0);//Ppolymode);
-    xml->addpar("legato_mode", Pkeymode == 1);//Plegatomode);
+    xml->addpar("legato_mode", (Pkeymode & 3) == 2);//Plegatomode);
     xml->addpar("key_limit", Pkeylimit);
     xml->addpar("random_detune", Pfrand);
     xml->addpar("destination", Paudiodest);
