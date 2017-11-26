@@ -65,7 +65,7 @@ class Part : private MiscFuncs, SynthHelper
         void cleanup(void);
 
         // Midi commands implemented
-        void NoteOn(int note, int velocity, int masterkeyshift);
+        void NoteOn(int note, int velocity, int masterkeyshift, bool renote = false);
         void NoteOff(int note);
         void AllNotesOff(void) { killallnotes = true; }; // panic, prepare all notes to be turned off
         void SetController(unsigned int type, int par);
@@ -125,9 +125,6 @@ class Part : private MiscFuncs, SynthHelper
         unsigned char Pkitmode;    // if the kitmode is enabled
         bool          Pkitfade;    // enables cross fading
         unsigned char Pdrummode;   // if all keys are mapped and the system is 12tET (used for drums)
-
-        //unsigned char Ppolymode;   // Part mode - 0 = monophonic , 1 = polyphonic
-        //unsigned char Plegatomode; // 0 = normal, 1 = legato
         unsigned char Pkeymode;    // 0 = poly, 1 = mono, > 1 = legato;
         unsigned char Pkeylimit;   // how many keys can play simultaneously,
                                    // time 0 = off, the older will be released

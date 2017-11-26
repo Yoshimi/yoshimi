@@ -120,8 +120,6 @@ void Part::defaults(void)
     Penabled = 0;
     Pminkey = 0;
     Pmaxkey = 127;
-    //Ppolymode = 1;
-    //Plegatomode = 0;
     Pkeymode = 0; // poly
     setVolume(96);
     TransVolume = 128; // ensure it always gets set
@@ -249,23 +247,24 @@ Part::~Part()
 
 
 // Note On Messages
-void Part::NoteOn(int note, int velocity, int masterkeyshift)
+void Part::NoteOn(int note, int velocity, int masterkeyshift, bool renote)
 {
     if (note < Pminkey || note > Pmaxkey)
         return;
 
     // Legato and MonoMem used vars:
     int posb = POLIPHONY - 1;     // Just a dummy initial value.
-    bool legatomodevalid = false;   // true when legato mode is determined applicable.
+    bool legatomodevalid = false; // true when legato mode is determined applicable.
     bool doinglegato = false;     // true when we determined we do a legato note.
     bool ismonofirstnote = false; // (In Mono/Legato) true when we determined
-				                  // no other notes are held down or sustained.*/
+                                  // no other notes are held down or sustained.*/
     int lastnotecopy = lastnote;  // Useful after lastnote has been changed.
 
     // MonoMem stuff:
-    if (Pkeymode > 0)//!Ppolymode || ctl->legato.legato) // if Poly is off
+    if (Pkeymode > 0) // if Poly is off
     {
-        monomemnotes.push_back(note);            // Add note to the list.
+        if (!renote)
+            monomemnotes.push_back(note);        // Add note to the list.
         monomem[note].velocity = velocity;       // Store this note's velocity.
         monomem[note].mkeyshift = masterkeyshift;
         if (partnote[lastpos].status != KEY_PLAYING
@@ -276,7 +275,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
     }
     else // Poly mode is On, so just make sure the list is empty.
     {
-        if (not monomemnotes.empty())
+        if (!monomemnotes.empty())
             monomemnotes.clear();
     }
     lastnote = note;
@@ -289,56 +288,49 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
             break;
         }
     }
-    if (Pkeymode > 1 && !Pdrummode)//(Plegatomode || ctl->legato.legato) && !Pdrummode)
+    if (Pkeymode > 1 && !Pdrummode)
     {
-/*        if (Ppolymode && Plegatomode)
+        // Legato mode is on and applicable.
+        legatomodevalid = true;
+        if (!ismonofirstnote && lastlegatomodevalid)
         {
-            synth->getRuntime().Log("Warning, poly and legato modes are both on.");
-            synth->getRuntime().Log("That should not happen, so disabling legato mode");
-            Plegatomode = 0;
+            // At least one other key is held or sustained, and the
+            // previous note was played while in valid legato mode.
+            doinglegato = true; // So we'll do a legato note.
+            pos = lastpos;      // A legato note uses same pos as previous..
+            posb = lastposb;    // .. same goes for posb.
         }
-        else*/
+        else
         {
-            // Legato mode is on and applicable.
-            legatomodevalid = true;
-            if ((not ismonofirstnote) && lastlegatomodevalid)
-            {
-                // At least one other key is held or sustained, and the
-                // previous note was played while in valid legato mode.
-                doinglegato = true; // So we'll do a legato note.
-                pos = lastpos; // A legato note uses same pos as previous..
-                posb = lastposb; // .. same goes for posb.
-            }
-            else
-            {
-                // Legato mode is valid, but this is only a first note.
-                for (int i = 0; i < POLIPHONY; ++i)
-                    if (partnote[i].status == KEY_PLAYING
-                        || partnote[i].status == KEY_RELASED_AND_SUSTAINED)
-                        RelaseNotePos(i);
+            // Legato mode is valid, but this is only a first note.
+            for (int i = 0; i < POLIPHONY; ++i)
+                if (partnote[i].status == KEY_PLAYING
+                    || partnote[i].status == KEY_RELASED_AND_SUSTAINED)
+                    RelaseNotePos(i);
 
-                // Set posb
-                posb = (pos + 1) % POLIPHONY; // We really want it (if the following fails)
-                for (int i = 0; i < POLIPHONY; ++i)
+            // Set posb
+            posb = (pos + 1) % POLIPHONY; // We really want it (if the following fails)
+            for (int i = 0; i < POLIPHONY; ++i)
+            {
+                if (partnote[i].status == KEY_OFF && pos != i)
                 {
-                    if (partnote[i].status == KEY_OFF && pos != i)
-                    {
-                        posb = i;
-                        break;
-                    }
+                    posb = i;
+                    break;
                 }
             }
-            lastposb = posb;// Keep a trace of used posb
         }
+        lastposb = posb;// Keep a trace of used posb
     }
     else
     {
         // Legato mode is either off or non-applicable.
-        if (Pkeymode > 0)//Ppolymode == 0)
+        if (Pkeymode > 0)
         {   // if the mode is 'mono' turn off all other notes
             for (int i = 0; i < POLIPHONY; ++i)
+            {
                 if (partnote[i].status == KEY_PLAYING)
-                RelaseNotePos(i);
+                    RelaseNotePos(i);
+            }
             RelaseSustainedKeys();
         }
     }
@@ -387,7 +379,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
         // still held down or sustained for the Portamento to activate
         // (that's like Legato).
         int portamento = 0;
-        if (Pkeymode == 0 || !ismonofirstnote)//(Ppolymode && !ctl->legato.legato) || !ismonofirstnote)
+        if (Pkeymode == 0 || !ismonofirstnote)
         {
             // I added a third argument to the
             // ctl->initportamento(...) function to be able
@@ -590,7 +582,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
                             }
                         }
                     }
-                    else if ((item & 1) == 1 && kit[item - 1].Penabled)// crossfade upper item of pair
+                    else if ((item & 1) == 1 && kit[item - 1].Penabled) // crossfade upper item of pair
                     {
 
                         if (kit[item - 1].Pmaxkey > kit[item ].Pminkey && kit[item - 1].Pmaxkey < kit[item ].Pmaxkey)
@@ -692,7 +684,7 @@ void Part::NoteOff(int note) //relase the key
     int i;
 
     // This note is released, so we remove it from the list.
-    if (not monomemnotes.empty())
+    if (!monomemnotes.empty())
         monomemnotes.remove(note);
 
     for ( i = POLIPHONY - 1; i >= 0; i--)
@@ -701,7 +693,7 @@ void Part::NoteOff(int note) //relase the key
         {
             if (!ctl->sustain.sustain)
             {   //the sustain pedal is not pushed
-                if (Pkeymode > 0  && (!monomemnotes.empty()))//(!Ppolymode || ctl->legato.legato) && (not monomemnotes.empty()))
+                if (Pkeymode > 0  && (!monomemnotes.empty()))
                     MonoMemRenote(); // To play most recent still held note.
                 else
                     RelaseNotePos(i);
@@ -769,10 +761,6 @@ void Part::SetController(unsigned int type, int par)
                 RelaseSustainedKeys();
             break;
 
-/*        case C_legatofootswitch:
-            ctl->setlegato(par);
-            break;
-*/
         case C_allsoundsoff:
             AllNotesOff(); // Panic
             break;
@@ -822,7 +810,7 @@ void Part::SetController(unsigned int type, int par)
 void Part::RelaseSustainedKeys(void)
 {
     // Let's call MonoMemRenote() on some conditions:
-    if (Pkeymode != 1 && (!monomemnotes.empty()))//(Ppolymode == 0 || ctl->legato.legato) && (not monomemnotes.empty()))
+    if (Pkeymode != 1 && (!monomemnotes.empty()))
         if (monomemnotes.back() != lastnote)
             // Sustain controller manipulation would cause repeated same note
             // respawn without this check.
@@ -851,9 +839,9 @@ void Part::RelaseAllKeys(void)
 void Part::MonoMemRenote(void)
 {
     unsigned char mmrtempnote = monomemnotes.back(); // Last list element.
-    monomemnotes.pop_back(); // We remove it, will be added again in NoteOn(...).
+    //monomemnotes.pop_back(); // We remove it, will be added again in NoteOn(...).
     NoteOn(mmrtempnote, monomem[mmrtempnote].velocity,
-               monomem[mmrtempnote].mkeyshift);
+               monomem[mmrtempnote].mkeyshift, true);
 }
 
 
@@ -920,7 +908,7 @@ void Part::setkeylimit(unsigned char Pkeylimit_)
     int keylimit = Pkeylimit;
 
     // release old keys if the number of notes>keylimit
-    if (Pkeymode == 0)//Ppolymode && !ctl->legato.legato)
+    if (Pkeymode == 0)
     {
         int notecount = 0;
         for (int i = 0; i < POLIPHONY; ++i)
@@ -1281,8 +1269,8 @@ void Part::add2XML(XMLwrapper *xml)
     xml->addpar("velocity_offset", Pveloffs);
 
     // the following two lines maintain backward compatibility
-    xml->addparbool("poly_mode", (Pkeymode & 3) == 0);//Ppolymode);
-    xml->addpar("legato_mode", (Pkeymode & 3) == 2);//Plegatomode);
+    xml->addparbool("poly_mode", (Pkeymode & 3) == 0);
+    xml->addpar("legato_mode", (Pkeymode & 3) == 2);
     xml->addpar("key_limit", Pkeylimit);
     xml->addpar("random_detune", Pfrand);
     xml->addpar("destination", Paudiodest);

@@ -93,7 +93,6 @@ void Controller::resetall()
     setvolume(96);
     sustain.receive = 1;
     setsustain(0);
-//    setlegato(0);
     portamentosetup();
     initportamento(440.0f, 440.0f, false);
     setportamento(0);
@@ -228,13 +227,6 @@ void Controller::setsustain(int value)
 }
 
 
-/*void Controller::setlegato(int value)
-{
-    legato.data = value;
-    legato.legato = (value < 64) ? 0 : 1;
-}
-
-*/
 void Controller::setportamento(int value)
 {
     portamento.data = value;

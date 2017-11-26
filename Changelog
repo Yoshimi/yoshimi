@@ -2,6 +2,8 @@ yoshimi 1.5.4 M
 
 2017-11-26 will
 * Refined legato/keymode code.
+* Part code cleanups.
+* Minor optimisation for mon/legato renote.
 
 2017-11-25 Will
 * Improved protection for channel switch.

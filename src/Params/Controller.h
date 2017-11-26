@@ -55,7 +55,6 @@ class Controller
         void setfmamp(int value);
         void setvolume(int value);
         void setsustain(int value);
-//        void setlegato(int value);
         void setportamento(int value);
         void portamentosetup();
         void setresonancecenter(int value);
@@ -126,11 +125,6 @@ class Controller
             int data,sustain;
             unsigned char receive;
         } sustain;
-
-        struct { // Legato
-            int data;
-            int legato;
-        } legato;
 
         struct { // Portamento
             // parameters
