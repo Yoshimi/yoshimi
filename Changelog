@@ -1,9 +1,12 @@
 yoshimi 1.5.4 M
 
+2017-11-28 Will
+* GUI legato mode turns red if drum mode.
+
 2017-11-26 will
 * Refined legato/keymode code.
 * Part code cleanups.
-* Minor optimisation for mon/legato renote.
+* Minor optimisation for mono/legato renote.
 * Removed redundant code from part NoteOn
   and VirKeyboardUI.
 

@@ -1258,10 +1258,16 @@ ZynAddSubFX}
                         case 68: // legato switch
                         {
                             int mode = synth->ReadPartKeyMode(npart);
-                            if (mode > 2)
+                            partui->legatoMode->labelcolor(FL_BLACK);
+                            if (mode > 1)
+                            {
                                 partui->keymode->value(2);
+                                if (partui->drumMode->value() != 0)
+                                    partui->legatoMode->labelcolor(FL_RED);
+                            }
                             else
                                 partui->keymode->value(mode);
+                            //partui->keymode->damage(1);
                             break;
                         }
                         case 71: // filter Q

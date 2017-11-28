@@ -524,12 +524,28 @@ Offset}
         Fl_Choice keymode {
           label Mode
           callback {//
+          if (o->value() > 1 && drumMode->value() != 0)
+              legatoMode->labelcolor(FL_RED);
+          else
+              legatoMode->labelcolor(FL_BLACK);
           send_data(6, o->value(), 0xc0);}
           tooltip {Poly, Mono or Legato mode} xywh {83 36 68 19} down_box BORDER_BOX selection_color 49 labelsize 11 align 8 textfont 1 textsize 11
-          code0 {o->add("Poly"); o->add("Mono"); o->add("Legato");}
-          code1 {int tmp = synth->ReadPartKeyMode(npart);}
-          code2 {if (tmp > 1) o->value(2); else o->value(tmp);}
-        } {}
+          code0 {int tmp = synth->ReadPartKeyMode(npart);}
+          code1 {if (tmp > 1) o->value(2); else o->value(tmp);}
+        } {
+          MenuItem {} {
+            label Poly
+            xywh {0 0 34 20} labelfont 1 labelsize 11
+          }
+          MenuItem {} {
+            label Mono
+            xywh {10 10 34 20} labelfont 1 labelsize 11
+          }
+          MenuItem legatoMode {
+            label Legato
+            xywh {20 20 34 20} labelfont 1 labelsize 11
+          }
+        }
         Fl_Button {} {
           label Controllers
           callback {//
@@ -1172,7 +1188,7 @@ Offset}
       Fl_Check_Button drumMode {
         label {Drum mode}
         callback {//
-        send_data(57, o->value(), 0xc0);}
+        send_data(57, o->value(), 0xd0);}
         tooltip {Disables microtonal tuning} xywh {285 350 15 15} down_box DOWN_BOX labelsize 10
         code0 {o->value(part->Pdrummode);}
       }
@@ -1539,10 +1555,16 @@ Offset}
             break;
 
         case 6:
+            legatoMode->labelcolor(FL_BLACK);
             if(valInt > 1)
+            {
                 keymode->value(2);
+                if (drumMode->value())
+                    legatoMode->labelcolor(FL_RED);
+            }
             else
                 keymode->value(valInt);
+            keymode->damage(1);
             break;
 
         case 7:
@@ -1781,6 +1803,11 @@ Offset}
 
         case 57:
             drumMode->value(valBool);
+            if (valBool && keymode->value() > 1)
+                legatoMode->labelcolor(FL_RED);
+            else
+                legatoMode->labelcolor(FL_BLACK);
+            keymode->damage(1);
             break;
 
         case 58:

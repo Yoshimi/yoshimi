@@ -28,7 +28,6 @@
 
 #include <cstring>
 #include <cmath>
-#include <semaphore.h>
 #include <iostream>
 
 using namespace std;
@@ -251,7 +250,6 @@ void Part::NoteOn(int note, int velocity, bool renote)
 {
     if (note < Pminkey || note > Pmaxkey)
         return;
-
     // Legato and MonoMem used vars:
     int posb = POLIPHONY - 1;     // Just a dummy initial value.
     bool legatomodevalid = false; // true when legato mode is determined applicable.
@@ -323,7 +321,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
     else
     {
         // Legato mode is either off or non-applicable.
-        if (Pkeymode > 0)
+        if ((Pkeymode & 3) == 1)
         {   // if the mode is 'mono' turn off all other notes
             for (int i = 0; i < POLIPHONY; ++i)
             {
@@ -838,7 +836,6 @@ void Part::RelaseAllKeys(void)
 void Part::MonoMemRenote(void)
 {
     unsigned char mmrtempnote = monomemnotes.back(); // Last list element.
-    //monomemnotes.pop_back(); // We remove it, will be added again in NoteOn(...).
     NoteOn(mmrtempnote, monomem[mmrtempnote].velocity, true);
 }
 
