@@ -575,7 +575,7 @@ paramsui->Show(3);}
           MenuItem {} {
             label {Save as &Default}
             callback {//
-                string name = synth->getRuntime().ConfigDir + "/yoshimi";
+                string name = synth->getRuntime().defaultStateName;
                 if (instance > 0)
                     name += ("-" + to_string(instance));
                 send_data(93, 0, 0xf0, 0xf0, 0xff, 0xff, 0x80, miscMsgPush(name + ".state"));}

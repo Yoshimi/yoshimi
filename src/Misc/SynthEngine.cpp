@@ -1818,8 +1818,16 @@ void SynthEngine::ClearNRPNs(void)
 
 void SynthEngine::resetAll(void)
 {
-    defaults();
-    ClearNRPNs();
+    if (Runtime.loadDefaultState && isRegFile(Runtime.defaultStateName+ ".state"))
+    {
+        Runtime.StateFile = Runtime.defaultStateName;
+        Runtime.stateRestore();
+    }
+    else
+    {
+        defaults();
+        ClearNRPNs();
+    }
     Unmute();
 }
 

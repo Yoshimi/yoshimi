@@ -414,6 +414,7 @@ bool Config::loadConfig(void)
         homedir = string("/tmp");
     userHome = homedir + '/';
     ConfigDir = homedir + string("/.config/") + YOSHIMI;
+    defaultStateName = ConfigDir + "/yoshimi";
     if (!isDirectory(ConfigDir))
     {
         cmd = string("mkdir -p ") + ConfigDir;

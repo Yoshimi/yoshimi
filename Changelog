@@ -2,6 +2,8 @@ yoshimi 1.5.4 M
 
 2017-11-28 Will
 * GUI legato mode turns red if drum mode.
+* Master reset reloads the saved default state
+  if it exists and is set in config.
 
 2017-11-26 will
 * Refined legato/keymode code.

@@ -86,6 +86,7 @@ class Config : public MiscFuncs
 
         string        userHome;
         string        ConfigDir;
+        string        defaultStateName;
         string        ConfigFile;
         string        paramsLoad;
         string        instrumentLoad;
