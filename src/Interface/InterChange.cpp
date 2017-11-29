@@ -4190,7 +4190,10 @@ void InterChange::commandMain(CommandBlock *getData)
             {
                 synth->getRuntime().channelSwitchType = value;
                 if (value == 0)
+                {
                     synth->getRuntime().channelSwitchCC = 128;
+                    synth->getRuntime().channelSwitchValue = 0;
+                }
             }
             else
                 value = synth->getRuntime().channelSwitchType;

@@ -70,6 +70,8 @@ else (HasJackSession)
     set (JackSessionSupport OFF)
 endif (HasJackSession)
 
+option (BuildFor0ld_X86 "Build for legacy x86 system" OFF)
+
 option (BuildForAMD_X86_64 "Build for AMD x86_64 system" OFF)
 option (BuildForCore2_X86_64 "Build for Intel Core2 x86_64 system" OFF)
 option (BuildForNEON "Build for ARM Cortex A9 system" OFF)
@@ -83,7 +85,13 @@ option (LV2Plugin "Build yoshimi lv2 plugin interface" ON)
 option (ShowGuiReports "Enable GUI control reports" OFF)
 option (ShowNoteOnTimes "Report Note-On Times" OFF)
 
-set (BuildOptions_x86_64AMD
+
+set (BuildOptions_X86
+    "-O3 -msse -msse2 -mfpmath=sse -ffast-math -fomit-frame-pointer"
+    CACHE STRING "basic X86 complier options"
+)
+
+set (BuildOptions_X86_64AMD
     "-O3 -march=athlon64 -m64 -Wall -msse -msse2 -mfpmath=sse -ffast-math -fno-finite-math-only -fomit-frame-pointer"
   CACHE STRING "X86_64 compiler options"
 )
@@ -291,23 +299,27 @@ if (BuildForDebug)
     message (STATUS "Building for ${CMAKE_BUILD_TYPE}, flags: ${CMAKE_CXX_FLAGS_DEBUG}")
 else (BuildForDebug)
     set (CMAKE_BUILD_TYPE "Release")
-    if (BuildForAMD_X86_64)
-        set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_x86_64AMD})
-    else (BuildForAMD_X86_64)
-        if (BuildForCore2_X86_64)
-            set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_X86_64Core2})
-        else (BuildForCore2_X86_64)
-            if (BuildForNEON)
-                set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_NEON})
-            else (BuildForNEON)
-                if (BuildForThisCPU)
-                    set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsThisCPU})
-                else (BuildForThisCPU)
-                    set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsBasic})
-                endif (BuildForThisCPU)
-            endif (BuildForNEON)
-        endif (BuildForCore2_X86_64)
-    endif (BuildForAMD_X86_64)
+    if (BuildFor0ld_X86)
+        set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_X86})
+    else (BuildFor0ld_X86)
+        if (BuildForAMD_X86_64)
+            set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_X86_64AMD})
+        else (BuildForAMD_X86_64)
+            if (BuildForCore2_X86_64)
+                set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_X86_64Core2})
+            else (BuildForCore2_X86_64)
+                if (BuildForNEON)
+                    set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_NEON})
+                else (BuildForNEON)
+                    if (BuildForThisCPU)
+                        set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsThisCPU})
+                    else (BuildForThisCPU)
+                        set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsBasic})
+                    endif (BuildForThisCPU)
+                endif (BuildForNEON)
+            endif (BuildForCore2_X86_64)
+        endif (BuildForAMD_X86_64)
+    endif (BuildFor0ld_X86)
     message (STATUS "Building for ${CMAKE_BUILD_TYPE}, flags: ${CMAKE_CXX_FLAGS_RELEASE}")
 endif (BuildForDebug)
 

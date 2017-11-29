@@ -3103,8 +3103,8 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
     setPvolume(xml->getpar127("volume", Pvolume));
     setPkeyshift(xml->getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64));
     Runtime.channelSwitchType = xml->getpar("channel_switch_type", Runtime.channelSwitchType, 0, 3);
-    Runtime.channelSwitchValue = xml->getpar("channel_switch_CC", Runtime.channelSwitchCC, 0, 128);
-
+    Runtime.channelSwitchCC = xml->getpar("channel_switch_CC", Runtime.channelSwitchCC, 0, 128);
+    Runtime.channelSwitchValue = 0;
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
         if (!xml->enterbranch("PART", npart))
