@@ -4600,6 +4600,7 @@ void InterChange::commandPart(CommandBlock *getData)
         case 57:
             if (write)
             {
+                part->legatoFading = 0;
                 part->Pdrummode = value_bool;
                 synth->setPartMap(npart);
             }

@@ -587,8 +587,7 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
             if (partonoffRead(npart))
             {
                 actionLock(lockType);
-                if (!part[npart]->legatoFading)
-                    part[npart]->NoteOn(note, velocity);
+                part[npart]->NoteOn(note, velocity);
                 actionLock(unlockType);
             }
             else if (VUpeak.values.parts[npart] > (-velocity))
@@ -705,6 +704,7 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
         //cout << "npart group " << to_string(int(chan)) << endl;
         for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
         {   // Send the controller to all part assigned to the channel
+            part[npart]->legatoFading = 0;
             if (chan == part[npart]->Prcvchn)// && partonoffRead(npart))
             {
                 if (type == 0x44) // legato switch
@@ -724,6 +724,7 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
     {
         //cout << "npart single " << to_string(int(chan)) << endl;
         npart = chan & 0x3f;
+        part[npart]->legatoFading = 0;
         if (npart < Runtime.NumAvailableParts)
             part[npart]->SetController(type, par);
     }
@@ -891,6 +892,7 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
     }
     if (hasProgChange)
     {
+        part[npart]->legatoFading = 0;
         if (ok)
         {
             string fname;
@@ -2274,13 +2276,12 @@ void SynthEngine::setPaudiodest(int value)
 // Panic! (Clean up all parts and effects)
 void SynthEngine::ShutUp(void)
 {
-
-
     VUpeak.values.vuOutPeakL = 1e-12f;
     VUpeak.values.vuOutPeakR = 1e-12f;
 
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
+        part[npart]->legatoFading = 0;
         part[npart]->cleanup();
         VUpeak.values.parts[npart] = -0.2;
     }

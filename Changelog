@@ -3,6 +3,8 @@ yoshimi 1.5.4 M
 2017-11-30 Will
 * BugFix: long standing silent legato note :)
   This is an interim solution needs improving.
+* Further improvments to legato mode.
+  Another old bug found (not fixed yet) :(
 
 2017-11-29 Will
 * BugFix: Channel switch not loading correctly.

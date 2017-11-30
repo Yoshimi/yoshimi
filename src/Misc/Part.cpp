@@ -251,6 +251,8 @@ void Part::NoteOn(int note, int velocity, bool renote)
 {
     if (note < Pminkey || note > Pmaxkey)
         return;
+    if (legatoFading)
+        return;
     // Legato and MonoMem used vars:
     int posb = POLIPHONY - 1;     // Just a dummy initial value.
     bool legatomodevalid = false; // true when legato mode is determined applicable.
@@ -391,7 +393,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
         lastpos = pos; // Keep a trace of used pos.
         if (doinglegato)
         {
-            legatoFading = true;
+            legatoFading = 0;
             // Do Legato note
             if (!Pkitmode)
             {   // "normal mode" legato note
@@ -404,6 +406,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
                     partnote[posb].kititem[0].adnote->
                         ADlegatonote(notebasefreq, vel, portamento, note, true);
                             // 'true' is to tell it it's being called from here.
+                        legatoFading |= 1;
                 }
 
                 if ((kit[0].Psubenabled)
@@ -414,6 +417,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
                         SUBlegatonote(notebasefreq, vel, portamento, note, true);
                     partnote[posb].kititem[0].subnote->
                         SUBlegatonote(notebasefreq, vel, portamento, note, true);
+                    legatoFading |= 2;
                 }
 
                 if ((kit[0].Ppadenabled)
@@ -424,6 +428,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
                         PADlegatonote(notebasefreq, vel, portamento, note, true);
                     partnote[posb].kititem[0].padnote->
                         PADlegatonote(notebasefreq, vel, portamento, note, true);
+                    legatoFading |= 4;
                 }
 
             }
@@ -459,6 +464,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
                             ADlegatonote(notebasefreq, vel, portamento, note, true);
                         partnote[posb].kititem[ci].adnote->
                             ADlegatonote(notebasefreq, vel, portamento, note, true);
+                        legatoFading |= 1;
                     }
                     if ((kit[item].Psubenabled)
                         && (kit[item].subpars)
@@ -469,6 +475,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
                             SUBlegatonote(notebasefreq, vel, portamento, note, true);
                         partnote[posb].kititem[ci].subnote->
                             SUBlegatonote(notebasefreq, vel, portamento, note, true);
+                        legatoFading |= 2;
                     }
                     if ((kit[item].Ppadenabled)
                         && (kit[item].padpars)
@@ -479,6 +486,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
                             PADlegatonote(notebasefreq, vel, portamento, note, true);
                         partnote[posb].kititem[ci].padnote->
                             PADlegatonote(notebasefreq, vel, portamento, note, true);
+                        legatoFading |= 4;
                     }
 
                     if ((kit[item].adpars)
@@ -499,8 +507,6 @@ void Part::NoteOn(int note, int velocity, bool renote)
                     monomemnotes.pop_back(); // Remove last note from the list.
                     lastnote = lastnotecopy; // Set lastnote back to previous value.
                 }
-                else
-                    legatoFading = true;
             }
             return; // Ok, Legato note done, return.
         }
@@ -772,6 +778,7 @@ void Part::SetController(unsigned int type, int par)
             setVolume(Pvolume);
             setPan(Ppanning);
             Pkeymode &= 3; // clear temporary legato mode
+            legatoFading = 0;
 
             for (int item = 0; item < NUM_KIT_ITEMS; ++item)
             {
@@ -811,7 +818,7 @@ void Part::SetController(unsigned int type, int par)
 void Part::RelaseSustainedKeys(void)
 {
     // Let's call MonoMemRenote() on some conditions:
-    if (Pkeymode != 1 && (!monomemnotes.empty()))
+    if ((Pkeymode < 1 || Pkeymode > 2)&& (!monomemnotes.empty()))
         if (monomemnotes.back() != lastnote)
             // Sustain controller manipulation would cause repeated same note
             // respawn without this check.
