@@ -115,6 +115,7 @@ class Part : private MiscFuncs, SynthHelper
         float         TransVolume;
         float         Ppanning;
         float         TransPanning;
+        bool          legatoFading;
         char Penabled; // this *must* be signed
         unsigned char Pminkey;
         unsigned char Pmaxkey;

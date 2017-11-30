@@ -144,6 +144,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void partonoffWrite(int npart, int what);
         char partonoffRead(int npart);
         sem_t partlock;
+        unsigned char legatoPart;
         void setPartMap(int npart);
         void setAllPartMaps(void);
 

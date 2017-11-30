@@ -1,5 +1,9 @@
 yoshimi 1.5.4 M
 
+2017-11-30 Will
+* BugFix: long standing silent legato note :)
+  This is an interim solution needs improving.
+
 2017-11-29 Will
 * BugFix: Channel switch not loading correctly.
 * Added specific older X86 CMake build options.

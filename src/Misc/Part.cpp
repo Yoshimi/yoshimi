@@ -131,6 +131,7 @@ void Part::defaults(void)
     Pveloffs = 64;
     Pkeylimit = 20;
     Pfrand = 0;
+    legatoFading = false;
     setDestination(1);
     defaultsinstrument();
     ctl->resetall();
@@ -390,6 +391,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
         lastpos = pos; // Keep a trace of used pos.
         if (doinglegato)
         {
+            legatoFading = true;
             // Do Legato note
             if (!Pkitmode)
             {   // "normal mode" legato note
@@ -497,6 +499,8 @@ void Part::NoteOn(int note, int velocity, bool renote)
                     monomemnotes.pop_back(); // Remove last note from the list.
                     lastnote = lastnotecopy; // Set lastnote back to previous value.
                 }
+                else
+                    legatoFading = true;
             }
             return; // Ok, Legato note done, return.
         }

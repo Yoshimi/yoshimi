@@ -587,7 +587,8 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
             if (partonoffRead(npart))
             {
                 actionLock(lockType);
-                part[npart]->NoteOn(note, velocity);
+                if (!part[npart]->legatoFading)
+                    part[npart]->NoteOn(note, velocity);
                 actionLock(unlockType);
             }
             else if (VUpeak.values.parts[npart] > (-velocity))
@@ -2006,7 +2007,10 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
         {
             if (partLocal[npart])
+            {
+                legatoPart = npart;
                 part[npart]->ComputePartSmps();
+            }
         }
         // Insertion effects
         int nefx;
