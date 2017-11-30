@@ -5,6 +5,7 @@ yoshimi 1.5.4 M
   This is an interim solution needs improving.
 * Further improvments to legato mode.
   Another old bug found (not fixed yet) :(
+* Bugfix: Drum mode not clearing legato.
 
 2017-11-29 Will
 * BugFix: Channel switch not loading correctly.

@@ -391,9 +391,9 @@ void Part::NoteOn(int note, int velocity, bool renote)
             ctl->portamento.noteusing = pos;
         oldfreq = notebasefreq;
         lastpos = pos; // Keep a trace of used pos.
+        legatoFading = 0; // just to be sure
         if (doinglegato)
         {
-            legatoFading = 0;
             // Do Legato note
             if (!Pkitmode)
             {   // "normal mode" legato note
@@ -689,7 +689,6 @@ void Part::NoteOn(int note, int velocity, bool renote)
 void Part::NoteOff(int note) //relase the key
 {
     int i;
-
     // This note is released, so we remove it from the list.
     if (!monomemnotes.empty())
         monomemnotes.remove(note);
@@ -700,7 +699,7 @@ void Part::NoteOff(int note) //relase the key
         {
             if (!ctl->sustain.sustain)
             {   //the sustain pedal is not pushed
-                if (Pkeymode > 0  && (!monomemnotes.empty()))
+                if (Pkeymode > 0  && !Pdrummode && !monomemnotes.empty())
                     MonoMemRenote(); // To play most recent still held note.
                 else
                     RelaseNotePos(i);
