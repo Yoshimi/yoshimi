@@ -44,6 +44,11 @@ class CmdInterface : private MiscFuncs
         void cmdIfaceCommandLoop();
 
     private:
+        void *networkThread(void);
+        static void *_networkThread(void *arg);
+        pthread_t  networkThreadHandle;
+        bool startNetwork(void);
+
         bool query(string text, bool priority);
         void helpLoop(list<string>& msg, string *commands, int indent);
         bool helpList(unsigned int local);
@@ -63,6 +68,7 @@ class CmdInterface : private MiscFuncs
         int sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff);
         bool cmdIfaceProcessCommand();
         char *cCmd;
+        bool processAll(char *cCmd);
         char *point;
         SynthEngine *synth;
         char welcomeBuffer [128];
@@ -77,6 +83,7 @@ class CmdInterface : private MiscFuncs
         unsigned int level;
         string replyString;
         bool isRead;
+        bool NetRun;
 };
 
 #endif

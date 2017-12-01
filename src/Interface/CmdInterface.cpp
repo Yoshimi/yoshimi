@@ -16,8 +16,13 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified November 2017
+    Modified December 2017
 */
+
+#include <stdlib.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+
 
 #include <iostream>
 #include <fstream>
@@ -278,6 +283,85 @@ string fx_presets [] = {
     "1, not available",
     "4, wahwah, autowah, vocal morph 1, vocal morph 2"
 };
+
+
+bool CmdInterface::startNetwork()
+{
+    if (!synth->getRuntime().startThread(&networkThreadHandle, _networkThread, this, false, 0, false, "NET"))
+    {
+        synth->getRuntime().Log("Failed to start Network thread");
+        return false;
+    }
+    return true;
+}
+
+void *CmdInterface::_networkThread(void *arg)
+{
+    return static_cast<CmdInterface*>(arg)->networkThread();
+}
+
+
+void *CmdInterface::networkThread(void)
+{
+#define BUFLEN 512    //Max length of buffer
+#define PORT 8888    //The port on which to listen for incoming data
+
+    NetRun = true;
+    struct sockaddr_in serverID, clientID;
+    int sock;
+    socklen_t slen = sizeof(clientID);
+    int recv_len;
+    char buf[BUFLEN];
+
+    //create a UDP socket
+    if ((sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
+    {
+        cout << "socket error" << endl;
+        NetRun = false;
+    }
+
+    // zero out the structure
+    memset(&serverID, 0, sizeof(serverID));
+
+    serverID.sin_family = AF_INET;
+    serverID.sin_port = htons(PORT);
+    serverID.sin_addr.s_addr = htonl(INADDR_ANY);
+
+    //bind socket to port
+    if (bind(sock , (struct sockaddr*) &serverID, sizeof(serverID)) == -1)
+    {
+        cout << "bind error" << endl;
+        NetRun = false;
+    }
+
+
+    while (NetRun && synth->getRuntime().runSynth)
+    {
+        //cout << "Waiting for data..." << endl;
+
+        if ((recv_len = recvfrom(sock, buf, BUFLEN, 0, (struct sockaddr *) &clientID, &slen)) == -1)
+        {
+            cout << "receive error" << endl;
+            NetRun = false;
+        }
+        buf[recv_len] = 0;
+
+        //cout << "Received packet from " << inet_ntoa(clientID.sin_addr) << " " << (in_port_t) ntohs(clientID.sin_port) << endl;
+
+        //cout << "Data " << buf << endl;
+        if (NetRun)
+        {
+            processAll(buf);
+            if (sendto(sock, buf, recv_len, 0, (struct sockaddr*) &clientID, slen) == -1)
+            {
+                cout << "send error" << endl;
+                NetRun = false;
+            }
+        }
+    }
+    close (sock);
+    return NULL;
+}
 
 
 void CmdInterface::defaults()
@@ -2078,13 +2162,18 @@ bool CmdInterface::cmdIfaceProcessCommand()
     }
     for(int i = 0; i < currentInstance; i++, ++itSynth);
     synth = itSynth->first;
+    return processAll(cCmd);
+}
+
+
+bool CmdInterface::processAll(char *cCmd)
+{
     Config &Runtime = synth->getRuntime();
 
     replyString = "";
     npart = Runtime.currentPart;
     int reply = todo_msg;
     int tmp;
-
     point = cCmd;
     point = skipSpace(point); // just to be sure
     tmp = strlen(cCmd) - 1;
@@ -2106,8 +2195,23 @@ bool CmdInterface::cmdIfaceProcessCommand()
         {
             // this seems backwards but it *always* saves.
             // seeing configChanged makes it reload the old config first.
+            NetRun = false;
             Runtime.runSynth = false;
             return true;
+        }
+        return false;
+    }
+    if (matchnMove(4, point, "network"))
+    {
+        if (matchnMove(4, point, "start"))
+        {
+            startNetwork();
+            Runtime.Log("UDP network started using port 8888");
+        }
+        else if (matchnMove(4, point, "stop"))
+        {
+            NetRun = false;
+            Runtime.Log("UDP network stopped");
         }
         return false;
     }
