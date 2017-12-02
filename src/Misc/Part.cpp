@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified November 2017
+    Modified Decenber 2017
 */
 
 #include <cstring>
@@ -251,8 +251,23 @@ void Part::NoteOn(int note, int velocity, bool renote)
 {
     if (note < Pminkey || note > Pmaxkey)
         return;
-    if (legatoFading)
-        return;
+    /*
+     * In legato mode we only ever hear the last
+     * note played, so it is acceptable to lose
+     * intemediate ones while going through a
+     * legato fade between held and newest note.
+     */
+    if (Pkeymode > 1) // legato
+    {
+        heldnote = note; // store newest
+        heldvelocity = velocity;
+        heldrenote = renote;
+        if (legatoFading)
+            return;
+        note = heldnote; // recover newest
+        velocity = heldvelocity;
+        renote = heldrenote;
+    }
     // Legato and MonoMem used vars:
     int posb = POLIPHONY - 1;     // Just a dummy initial value.
     bool legatomodevalid = false; // true when legato mode is determined applicable.
