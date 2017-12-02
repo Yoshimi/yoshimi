@@ -2,6 +2,7 @@ yoshimi 1.5.4 M
 
 2017-12-2 Will
 * Improved legato fade behaviour.
+* BugFix: History not removing files when list full.
 
 2017-11-30 Will
 * BugFix: long standing silent legato note :)

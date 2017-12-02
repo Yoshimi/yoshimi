@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified November 2017
+    Modified December 2017
 */
 
 #define NOLOCKS
@@ -2660,8 +2660,6 @@ bool SynthEngine::saveHistory()
     }
     xmltree->beginbranch("HISTORY");
     {
-        unsigned int offset;
-        int x;
         string type;
         string extension;
         for (int count = 1; count < 7; ++count)
@@ -2696,13 +2694,13 @@ bool SynthEngine::saveHistory()
             vector<string> listType = *getHistory(count);
             if (listType.size())
             {
-                offset = 0;
-                x = 0;
+                unsigned int offset = 0;
+                int x = 0;
                 xmltree->beginbranch(type);
                     xmltree->addpar("history_size", listType.size());
                     if (listType.size() > MAX_HISTORY)
                         offset = listType.size() - MAX_HISTORY;
-                    for (vector<string>::iterator it = listType.begin() + offset; it != listType.end(); ++it)
+                    for (vector<string>::iterator it = listType.begin(); it != listType.end() - offset; ++it)
                     {
                         xmltree->beginbranch("XMZ_FILE", x);
                             xmltree->addparstr(extension, *it);
