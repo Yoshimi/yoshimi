@@ -83,7 +83,7 @@ class CmdInterface : private MiscFuncs
         unsigned int level;
         string replyString;
         bool isRead;
-        bool NetRun;
+        bool netRun;
 };
 
 #endif

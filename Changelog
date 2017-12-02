@@ -1,6 +1,11 @@
 yoshimi 1.5.4 - experimental
 
-2017-12-1 Will
+2017-12-2 Will (experimental)
+* UDP ports now user set as decimal values.
+* python client updated.
+* Updated docs in Util.
+
+2017-12-1 Will (experimental)
 * UDP server implimented.
 
 2017-12-2 Will

@@ -111,6 +111,8 @@ class Config : public MiscFuncs
         bool          finishedCLI;
         int           VirKeybLayout;
 
+        unsigned short int netPort;
+
         audio_drivers audioEngine;
         midi_drivers  midiEngine;
         string        audioDevice;

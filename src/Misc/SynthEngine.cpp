@@ -323,6 +323,8 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 
     defaults();
     ClearNRPNs();
+    Runtime.netPort =  34952; // hex 8888
+
     if (Runtime.restoreJackSession) // the following are not fatal if failed
     {
         if (!Runtime.restoreJsession())

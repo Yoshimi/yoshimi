@@ -304,9 +304,8 @@ void *CmdInterface::_networkThread(void *arg)
 void *CmdInterface::networkThread(void)
 {
 #define BUFLEN 512    //Max length of buffer
-#define PORT 8888    //The port on which to listen for incoming data
 
-    NetRun = true;
+    netRun = true;
     struct sockaddr_in serverID, clientID;
     int sock;
     socklen_t slen = sizeof(clientID);
@@ -317,45 +316,44 @@ void *CmdInterface::networkThread(void)
     if ((sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
     {
         cout << "socket error" << endl;
-        NetRun = false;
+        netRun = false;
     }
 
     // zero out the structure
     memset(&serverID, 0, sizeof(serverID));
 
     serverID.sin_family = AF_INET;
-    serverID.sin_port = htons(PORT);
+    serverID.sin_port = htons(synth->getRuntime().netPort);
     serverID.sin_addr.s_addr = htonl(INADDR_ANY);
 
     //bind socket to port
     if (bind(sock , (struct sockaddr*) &serverID, sizeof(serverID)) == -1)
     {
         cout << "bind error" << endl;
-        NetRun = false;
+        netRun = false;
     }
 
-
-    while (NetRun && synth->getRuntime().runSynth)
+    while (netRun && synth->getRuntime().runSynth)
     {
         //cout << "Waiting for data..." << endl;
 
         if ((recv_len = recvfrom(sock, buf, BUFLEN, 0, (struct sockaddr *) &clientID, &slen)) == -1)
         {
             cout << "receive error" << endl;
-            NetRun = false;
+            netRun = false;
         }
         buf[recv_len] = 0;
 
         //cout << "Received packet from " << inet_ntoa(clientID.sin_addr) << " " << (in_port_t) ntohs(clientID.sin_port) << endl;
 
         //cout << "Data " << buf << endl;
-        if (NetRun)
+        if (netRun)
         {
             processAll(buf);
             if (sendto(sock, buf, recv_len, 0, (struct sockaddr*) &clientID, slen) == -1)
             {
                 cout << "send error" << endl;
-                NetRun = false;
+                netRun = false;
             }
         }
     }
@@ -2195,7 +2193,7 @@ bool CmdInterface::processAll(char *cCmd)
         {
             // this seems backwards but it *always* saves.
             // seeing configChanged makes it reload the old config first.
-            NetRun = false;
+            netRun = false;
             Runtime.runSynth = false;
             return true;
         }
@@ -2206,16 +2204,40 @@ bool CmdInterface::processAll(char *cCmd)
         if (matchnMove(4, point, "start"))
         {
             startNetwork();
-            Runtime.Log("UDP network started using port 8888");
+            Runtime.Log("UDP network started using port " + to_string(Runtime.netPort));
         }
         else if (matchnMove(4, point, "stop"))
         {
-            NetRun = false;
+            netRun = false;
             Runtime.Log("UDP network stopped");
         }
-        return false;
+        else if (matchnMove(4, point, "port"))
+        {
+            if (netRun)
+            {
+                Runtime.Log("Network must be stopped to change ports");
+            }
+            else
+            {
+                point = skipSpace(point);
+                if (point[0] == 0)
+                    reply = value_msg;
+                else
+                {
+                    int tmp = string2int(point);
+                    if (tmp > 0xffff || tmp < 0x400)
+                        reply = range_msg;
+                    else
+                    {
+                        Runtime.netPort = tmp;
+                        Runtime.Log("UDP network set to " + to_string(tmp));
+                        reply = done_msg;
+                    }
+                }
+            }
+        }
     }
-    if (point[0] == '/')
+    else if (point[0] == '/')
     {
         ++ point;
         point = skipSpace(point);
@@ -2224,7 +2246,7 @@ bool CmdInterface::processAll(char *cCmd)
             return false;
     }
 
-    if (matchnMove(3, point, "reset"))
+    else if (matchnMove(3, point, "reset"))
     {
         if (query("Restore to basic settings", false))
             sendDirect(0, 64, 96, 240, 255, 255, 255, 192);
@@ -2248,9 +2270,9 @@ bool CmdInterface::processAll(char *cCmd)
         if (point[0] == 0)
             return false;
     }
-    if (helpList(level))
+    else if (helpList(level))
         return false;
-    if (matchnMove(2, point, "stop"))
+    else if (matchnMove(2, point, "stop"))
         sendDirect(0, 64, 128, 240);
     else if (matchnMove(1, point, "list"))
     {
@@ -2691,6 +2713,7 @@ bool CmdInterface::processAll(char *cCmd)
     }
 
     else if (matchnMove(2, point, "save"))
+    {
         if(matchnMove(2, point, "mlearn"))
         {
             if (point[0] == 0)
@@ -2772,7 +2795,7 @@ bool CmdInterface::processAll(char *cCmd)
             replyString = "save";
             reply = what_msg;
         }
-
+    }
     else if (matchnMove(6, point, "direct"))
     {
         float value;
