@@ -127,6 +127,9 @@ class Part : private MiscFuncs, SynthHelper
         bool          Pkitfade;    // enables cross fading
         unsigned char Pdrummode;   // if all keys are mapped and the system is 12tET (used for drums)
         unsigned char Pkeymode;    // 0 = poly, 1 = mono, > 1 = legato;
+        int           heldnote;
+        int           heldvelocity;
+        bool          heldrenote;
         unsigned char Pkeylimit;   // how many keys can play simultaneously,
                                    // time 0 = off, the older will be released
         float         Pfrand;      // Part random frequency content

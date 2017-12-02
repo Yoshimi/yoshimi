@@ -3,6 +3,9 @@ yoshimi 1.5.4 - experimental
 2017-12-1 Will
 * UDP server implimented.
 
+2017-12-2 Will
+* Improved legato fade behaviour.
+
 2017-11-30 Will
 * BugFix: long standing silent legato note :)
   This is an interim solution needs improving.
