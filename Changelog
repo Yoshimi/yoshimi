@@ -1,4 +1,7 @@
-yoshimi 1.5.4 M
+yoshimi 1.5.5 rc1
+
+2017-12-3 Will
+* Set version as 1.5.5 rc1.
 
 2017-12-2 Will
 * Improved legato fade behaviour.
