@@ -1,15 +1,23 @@
-yoshimi 1.5.4 - experimental
+
+yoshimi 1.5.5 rc1
+
+2017-12-4 Will
+* Bugfix: CLI program change not updating GUI.
+
+2017-12-3 Will
+* Set version as 1.5.5 rc1.
 
 2017-12-2 Will (experimental)
 * UDP ports now user set as decimal values.
 * python client updated.
 * Updated docs in Util.
 
-2017-12-1 Will (experimental)
-* UDP server implimented.
-
 2017-12-2 Will
 * Improved legato fade behaviour.
+* BugFix: History not removing files when list full.
+
+2017-12-1 Will (experimental)
+* UDP server implimented.
 
 2017-11-30 Will
 * BugFix: long standing silent legato note :)

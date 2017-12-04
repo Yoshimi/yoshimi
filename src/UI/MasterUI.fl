@@ -1655,12 +1655,6 @@ ZynAddSubFX}
     partui->maxkcounter->value(synth->part[npart]->Pmaxkey);
     partui->enportamento->value(synth->part[npart]->ctl->portamento.portamento);
 
-    /*if (synth->part[npart]->Ppolymode)
-        partui->keymode->value(0);
-    else
-        partui->keymode->value(1);
-    if (!synth->part[npart]->Ppolymode && synth->part[npart]->Plegatomode)
-        partui->keymode->value(2);*/
     partui->keymode->value(synth->part[npart]->Pkeymode & 3);
 
     maxparts->value(partmax);
@@ -1673,11 +1667,11 @@ ZynAddSubFX}
     code {//
     if (vectorui)
         vectorui->setInstrumentLabel(_npart);
-    if (_npart != npart)
+    /*if (_npart != npart) // not needed?
     {
         updatelistitem(_npart);
         return;
-    }
+    }*/
 
     if (partui->part->Prcvchn <  NUM_MIDI_CHANNELS)
     {
