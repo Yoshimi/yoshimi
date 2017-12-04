@@ -1,5 +1,8 @@
 yoshimi 1.5.5 rc1
 
+2017-12-4 Will
+* Bugfix: CLI program change not updating GUI.
+
 2017-12-3 Will
 * Set version as 1.5.5 rc1.
 
