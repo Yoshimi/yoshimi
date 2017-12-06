@@ -945,7 +945,7 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
                     if (ok)
                     {
                         if (par2 < 0xff)
-                            addHistory(fname, 1);
+                            addHistory(setExtension(fname, "xiz"), 1);
                         name = name + " to Part " + to_string(npart + 1);
                     }
                 }
@@ -2475,6 +2475,8 @@ void SynthEngine::newHistory(string name, int group)
 {
     if (findleafname(name) < "!")
         return;
+    if (group == 1 && (name.rfind(".xiy") != string::npos))
+        name = setExtension(name, "xiz");
     vector<string> &listType = *getHistory(group);
     listType.push_back(name);
 }
@@ -2484,7 +2486,8 @@ void SynthEngine::addHistory(string name, int group)
 {
     if (findleafname(name) < "!")
         return;
-
+    if (group == 1 && (name.rfind(".xiy") != string::npos))
+        name = setExtension(name, "xiz");
     vector<string> &listType = *getHistory(group);
     vector<string>::iterator itn = listType.begin();
     listType.insert(itn, name);
@@ -2632,6 +2635,11 @@ bool SynthEngine::loadHistory()
                 if (xml->enterbranch("XMZ_FILE", i))
                 {
                     filetype = xml->getparstr(extension);
+                    if (extension == "xiz_file" && !isRegFile(filetype))
+                    {
+                        if (filetype.rfind(".xiz") != string::npos)
+                            filetype = setExtension(filetype, "xiy");
+                    }
                     if (filetype.size() && isRegFile(filetype))
                         newHistory(filetype, count);
                     xml->exitbranch();

@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <iostream>
 
 #include <sys/types.h>
 #include <fcntl.h>
@@ -197,7 +198,14 @@ bool Bank::savetoslot(unsigned int ninstrument, Part *part)
             return false;
         }
     }
-    if (!part->saveXML(fullpath))
+    bool ok = true;
+    int saveType = synth->getRuntime().instrumentFormat;
+
+    if (saveType & 2) // Yoshimi format
+        ok = part->saveXML(fullpath, true);
+    if (ok && (saveType & 1)) // legacy
+        ok = part->saveXML(fullpath, false);
+    if (!ok)
         return false;
     filepath += force_bank_dir_file;
     FILE *tmpfile = fopen(filepath.c_str(), "w+");
@@ -281,9 +289,9 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
     roots [rootID].banks [banknum].instruments.clear();
 
     struct dirent *fn;
-    struct stat st;
     string chkpath;
     string candidate;
+    string lastCandidate = "";
     size_t xizpos;
     while ((fn = readdir(dir)))
     {
@@ -296,10 +304,18 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
         if (chkpath.at(chkpath.size() - 1) != '/')
             chkpath += "/";
         chkpath += candidate;
-        lstat(chkpath.c_str(), &st);
-        if (S_ISREG(st.st_mode))
+        if (isRegFile(chkpath))
         {
-            if ((xizpos = candidate.rfind(xizext)) != string::npos)
+            xizpos = candidate.rfind(".xiy");
+            if (xizpos != string::npos)
+                lastCandidate = setExtension(candidate, "xiz");
+            else if (candidate == lastCandidate)
+                continue; // don't want .xiz if there is .xiy
+
+            if (xizpos == string::npos)
+                xizpos = candidate.rfind(xizext);
+
+            if (xizpos != string::npos)
             {
                 if (xizext.size() == (candidate.size() - xizpos))
                 {
@@ -307,7 +323,6 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
                     // sa verific daca e si extensia dorita
 
                     // sorry Cal. They insisted :(
-
                     int chk = findSplitPoint(candidate);
                     if (chk > 0)
                     {

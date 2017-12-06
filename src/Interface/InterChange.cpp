@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified November 2017
+    Modified December 2017
 */
 
 #include <iostream>
@@ -398,9 +398,17 @@ void InterChange::indirectTransfers(CommandBlock *getData)
             switch (control)
             {
                 case 79: // instrument save
-
+                {
                     getData->data.parameter &= 0x7f;
-                    if (synth->part[value]->saveXML(text))
+                    bool ok = true;
+                    int saveType = synth->getRuntime().instrumentFormat;
+
+                    if (saveType & 2) // Yoshimi format
+                        ok = synth->part[value]->saveXML(text, true);
+                    if (ok && (saveType & 1)) // legacy
+                        ok = synth->part[value]->saveXML(text, false);
+
+                    if (ok)
                     {
                         synth->addHistory(text, 1);
                         text = "d " + text;
@@ -409,6 +417,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
                     break;
+                }
                 case 80:
                     if(synth->loadPatchSetAndUpdate(text))
                         text = "ed " + text;
@@ -1167,7 +1176,22 @@ string InterChange::resolveConfig(CommandBlock *getData)
                 contstr += "stdout";
             showValue = false;
             break;
-
+        case 6:
+            contstr = "Saved Instrument Format ";
+            switch (value_int)
+            {
+                case 1:
+                    contstr += "Legacy (.xiz)";
+                    break;
+                case 2:
+                    contstr += "Yoshimi (.xiy)";
+                    break;
+                case 3:
+                    contstr += "Both";
+                    break;
+            }
+            showValue = false;
+            break;
         case 16:
             contstr += "Autoload default state";
             yesno = true;
@@ -3888,6 +3912,12 @@ void InterChange::commandConfig(CommandBlock *getData)
                  synth->getRuntime().toConsole = value_bool;
             else
                 value = synth->getRuntime().toConsole;
+            break;
+        case 6:
+            if (write)
+                 synth->getRuntime().instrumentFormat = value_int;
+            else
+                value = synth->getRuntime().instrumentFormat;
             break;
 // switches
         case 16:

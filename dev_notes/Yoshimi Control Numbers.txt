@@ -27,6 +27,7 @@ Y : 0/1 : 2 : 248 : 255 : 255 : 255 : 255 : 255 : PadSynth interpolation – lin
 Y : 0 to 3 : 3 : 248 : 255 : 255 : 255 : 255 : 255 : Virtual keyboard layout – QWERTY, Dvorak, QWERTZ, AZERTY
 Y : 0 to 9 : 4 : 248 : 255 : 255 : 255 : 255 : 255 : XML compression level
 Y : 0/1 : 5 : 248 : 255 : 255 : 255 : 255 : 255 : Reports destination
+Y : 1 to 3 : 6 : 248 : 255 : 255 : 255 : 255 : 255 : Saved Instrument Format (Legacy, Yoshimi, Both)
 
 Y : 0/1 : 16 : 248 : 255 : 255 : 255 : 255 : 255 : Start with default state (~/.config/yoshimi/yoshimi.state)
 Y : 0/1 : 17 : 248 : 255 : 255 : 255 : 255 : 255 : Hide non-fatal errors

@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified Decenber 2017
+    Modified December 2017
 */
 
 #include <cstring>
@@ -1272,31 +1272,37 @@ void Part::add2XMLinstrument(XMLwrapper *xml)
 }
 
 
-void Part::add2XML(XMLwrapper *xml)
+void Part::add2XML(XMLwrapper *xml, bool subset)
 {
     // parameters
-    xml->addparbool("enabled", (Penabled == 1));
+    if (!subset)
+    {
+        xml->addparbool("enabled", (Penabled == 1));
 
-    xml->addpar("volume", Pvolume);
-    xml->addpar("panning", Ppanning);
+        xml->addpar("volume", Pvolume);
+        xml->addpar("panning", Ppanning);
 
-    xml->addpar("min_key", Pminkey);
-    xml->addpar("max_key", Pmaxkey);
-    xml->addpar("key_shift", Pkeyshift);
-    xml->addpar("rcv_chn", Prcvchn);
+        xml->addpar("min_key", Pminkey);
+        xml->addpar("max_key", Pmaxkey);
+        xml->addpar("key_shift", Pkeyshift);
+        xml->addpar("rcv_chn", Prcvchn);
 
-    xml->addpar("velocity_sensing", Pvelsns);
-    xml->addpar("velocity_offset", Pveloffs);
-
+        xml->addpar("velocity_sensing", Pvelsns);
+        xml->addpar("velocity_offset", Pveloffs);
     // the following two lines maintain backward compatibility
-    xml->addparbool("poly_mode", (Pkeymode & 3) == 0);
-    xml->addpar("legato_mode", (Pkeymode & 3) == 2);
-    xml->addpar("key_limit", Pkeylimit);
-    xml->addpar("random_detune", Pfrand);
-    xml->addpar("destination", Paudiodest);
-
+        xml->addparbool("poly_mode", (Pkeymode & 3) == 0);
+        xml->addpar("legato_mode", (Pkeymode & 3) == 2);
+        xml->addpar("key_limit", Pkeylimit);
+        xml->addpar("random_detune", Pfrand);
+        xml->addpar("destination", Paudiodest);
+    }
     xml->beginbranch("INSTRUMENT");
     add2XMLinstrument(xml);
+    if (subset)
+    {
+        xml->addpar("key_mode", Pkeymode & 3);
+        xml->addpar("random_detune", Pfrand);
+    }
     xml->endbranch();
 
     xml->beginbranch("CONTROLLER");
@@ -1305,9 +1311,8 @@ void Part::add2XML(XMLwrapper *xml)
 }
 
 
-bool Part::saveXML(string filename)
+bool Part::saveXML(string filename, bool yoshiFormat)
 {
-    filename = setExtension(filename, "xiz");
     synth->getRuntime().xmlType = XML_INSTRUMENT;
     XMLwrapper *xml = new XMLwrapper(synth);
     if (!xml)
@@ -1317,9 +1322,19 @@ bool Part::saveXML(string filename)
     }
     if (Pname < "!") // this shouldn't be possible
         Pname = "No Title";
-    xml->beginbranch("INSTRUMENT");
-    add2XMLinstrument(xml);
-    xml->endbranch();
+
+    if (yoshiFormat)
+    {
+        filename = setExtension(filename, "xiy");
+        add2XML(xml, yoshiFormat);
+    }
+    else
+    {
+        filename = setExtension(filename, "xiz");
+        xml->beginbranch("INSTRUMENT");
+        add2XMLinstrument(xml);
+        xml->endbranch();
+    }
     bool result = xml->saveXMLfile(filename);
     delete xml;
     return result;
@@ -1334,7 +1349,14 @@ int Part::loadXMLinstrument(string filename)
         synth->getRuntime().Log("Part: loadXML failed to instantiate new XMLwrapper");
         return 0;
     }
-    filename = setExtension(filename, "xiz");
+    bool hasYoshi = (synth->getRuntime().instrumentFormat > 1);
+    if (hasYoshi)
+        filename = setExtension(filename, "xiy");
+    if (!isRegFile(filename))
+    {
+        hasYoshi = false;
+        filename = setExtension(filename, "xiz");
+    }
     if (!xml->loadXMLfile(filename))
     {
         synth->getRuntime().Log("Part: loadXML failed to load instrument file " + filename);
@@ -1352,8 +1374,20 @@ int Part::loadXMLinstrument(string filename)
     if (chk > 0)
         Pname = Pname.substr(chk + 1, Pname.size() - chk - 1);
     getfromXMLinstrument(xml);
+    if (hasYoshi)
+    {
+        Pkeymode = xml->getpar("key_mode", Pkeymode, 0, 4);
+        Pfrand = xml->getpar127("random_detune", Pfrand);
+        if (Pfrand > 50)
+            Pfrand = 50;
+    }
     applyparameters();
     xml->exitbranch();
+    if (xml->enterbranch("CONTROLLER"))
+    {
+        ctl->getfromXML(xml);
+        xml->exitbranch();
+    }
     delete xml;
     return 1;
 }

@@ -1,4 +1,7 @@
-yoshimi 1.5.5 rc2
+yoshimi 1.5.5 rc3
+
+2017-12-6 Will
+* Implemented extended (.xiy) Instrument saves.
 
 2017-12-5 Will
 * Reverted change in Cmake linker for tests.

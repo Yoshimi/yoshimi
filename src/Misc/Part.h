@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified November 2017
+    Modified December 2017
 */
 
 #ifndef PART_H
@@ -73,9 +73,9 @@ class Part : private MiscFuncs, SynthHelper
         void RelaseAllKeys(void);
         void ComputePartSmps(void);
 
-        bool saveXML(string filename); // true for load ok, otherwise false
+        bool saveXML(string filename, bool yoshiFormat); // result true for load ok, otherwise false
         int loadXMLinstrument(string filename);
-        void add2XML(XMLwrapper *xml);
+        void add2XML(XMLwrapper *xml, bool subset = false);
         void add2XMLinstrument(XMLwrapper *xml);
         void getfromXML(XMLwrapper *xml);
         void getfromXMLinstrument(XMLwrapper *xml);
