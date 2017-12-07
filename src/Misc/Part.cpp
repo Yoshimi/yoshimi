@@ -1314,7 +1314,7 @@ void Part::add2XML(XMLwrapper *xml, bool subset)
 bool Part::saveXML(string filename, bool yoshiFormat)
 {
     synth->getRuntime().xmlType = XML_INSTRUMENT;
-    XMLwrapper *xml = new XMLwrapper(synth);
+    XMLwrapper *xml = new XMLwrapper(synth, yoshiFormat);
     if (!xml)
     {
         synth->getRuntime().Log("Part: saveXML failed to instantiate new XMLwrapper");
@@ -1343,12 +1343,6 @@ bool Part::saveXML(string filename, bool yoshiFormat)
 
 int Part::loadXMLinstrument(string filename)
 {
-    XMLwrapper *xml = new XMLwrapper(synth);
-    if (!xml)
-    {
-        synth->getRuntime().Log("Part: loadXML failed to instantiate new XMLwrapper");
-        return 0;
-    }
     bool hasYoshi = (synth->getRuntime().instrumentFormat > 1);
     if (hasYoshi)
         filename = setExtension(filename, "xiy");
@@ -1356,6 +1350,13 @@ int Part::loadXMLinstrument(string filename)
     {
         hasYoshi = false;
         filename = setExtension(filename, "xiz");
+    }
+
+    XMLwrapper *xml = new XMLwrapper(synth, hasYoshi);
+    if (!xml)
+    {
+        synth->getRuntime().Log("Part: loadXML failed to instantiate new XMLwrapper");
+        return 0;
     }
     if (!xml->loadXMLfile(filename))
     {
@@ -1388,6 +1389,7 @@ int Part::loadXMLinstrument(string filename)
         ctl->getfromXML(xml);
         xml->exitbranch();
     }
+    xml->exitbranch();
     delete xml;
     return 1;
 }
