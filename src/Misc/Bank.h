@@ -20,7 +20,8 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, last modified February 2015
+    This file is a derivative of a ZynAddSubFX original.
+    Modified December 2017
 */
 
 #ifndef BANK_H
@@ -47,13 +48,15 @@ typedef struct _InstrumentEntry
     bool PADsynth_used;
     bool ADDsynth_used;
     bool SUBsynth_used;
+    bool yoshiType;
     _InstrumentEntry()
         :name(""),
          filename(""),
          used(false),
          PADsynth_used(false),
          ADDsynth_used(false),
-         SUBsynth_used(false)
+         SUBsynth_used(false),
+         yoshiType(false)
     {
 
     }
@@ -65,6 +68,7 @@ typedef struct _InstrumentEntry
         PADsynth_used = false;
         ADDsynth_used = false;
         SUBsynth_used = false;
+        yoshiType = false;
     }
 } InstrumentEntry; // Contains the leafname of the instrument.
 

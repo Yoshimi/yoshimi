@@ -63,20 +63,23 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi) :
     memset(&parentstack, 0, sizeof(parentstack));
     tree = mxmlNewElement(MXML_NO_PARENT, "?xml version=\"1.0\" encoding=\"UTF-8\"?");
     mxml_node_t *doctype = mxmlNewElement(tree, "!DOCTYPE");
-    bool Xtype = (synth->getRuntime().xmlType > XML_PRESETS);
+    bool yoshiType = (synth->getRuntime().xmlType <= XML_PRESETS);
+    // cout << "yoshiType  " << yoshiType << "   isYoshi " << isYoshi << endl;
 
-    if (Xtype && isYoshi)//(synth->getRuntime().xmlType <= XML_PRESETS) && (isYoshi == false))
+    if (!yoshiType || !isYoshi)
     {
         mxmlElementSetAttr(doctype, "ZynAddSubFX-data", NULL);
         root = mxmlNewElement(tree, "ZynAddSubFX-data");
         mxmlElementSetAttr(root, "version-major", "3");
         mxmlElementSetAttr(root, "version-minor", "0");
         mxmlElementSetAttr(root, "ZynAddSubFX-author", "Nasca Octavian Paul");
+        information.yoshiType = 0;
     }
     else
     {
         mxmlElementSetAttr(doctype, "Yoshimi-data", NULL);
         root = mxmlNewElement(tree, "Yoshimi-data");
+        information.yoshiType = 1;
     }
     node = root;
     mxmlElementSetAttr(root, "Yoshimi-author", "Alan Ernest Calvert");
@@ -136,6 +139,8 @@ bool XMLwrapper::checkfileinformation(const string& filename)
     if (!xmldata)
         return -1;
 
+    char *first = strstr(xmldata, "<!DOCTYPE Yoshimi-data>");
+    information.yoshiType = (first!= NULL);
     bool bRet = false; // we're not actually using this!
     char *start = strstr(xmldata, "<INFORMATION>");
     char *end = strstr(xmldata, "</INFORMATION>");

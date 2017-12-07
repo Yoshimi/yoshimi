@@ -120,6 +120,7 @@ class XMLwrapper : private MiscFuncs
             unsigned char ADDsynth_used;
             unsigned char SUBsynth_used;
             unsigned char PADsynth_used;
+            bool yoshiType;
         } information;
 
         // opens a file and parse only the "information" data on it

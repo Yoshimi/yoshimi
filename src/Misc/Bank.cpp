@@ -22,7 +22,7 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified October 2017
+    Modified December 2017
 */
 
 #include <set>
@@ -675,6 +675,7 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
     instrRef.PADsynth_used = false;
     instrRef.ADDsynth_used = false;
     instrRef.SUBsynth_used = false;
+    instrRef.yoshiType = false;
 
     // see which engines are used
     if (synth->getRuntime().checksynthengines)
@@ -684,6 +685,7 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
         instrRef.PADsynth_used = xml->information.PADsynth_used;
         instrRef.ADDsynth_used = xml->information.ADDsynth_used;
         instrRef.SUBsynth_used = xml->information.SUBsynth_used;
+        instrRef.yoshiType = xml->information.yoshiType;
         delete xml;
     }
     return 0;
@@ -896,7 +898,8 @@ int Bank::engines_used(unsigned int ninstrument)
 {
     int tmp = getInstrumentReference(ninstrument).ADDsynth_used
             | (getInstrumentReference(ninstrument).SUBsynth_used << 1)
-            | (getInstrumentReference(ninstrument).PADsynth_used << 2);
+            | (getInstrumentReference(ninstrument).PADsynth_used << 2)
+            | (getInstrumentReference(ninstrument).yoshiType << 3);
     return tmp;
 }
 

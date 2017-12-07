@@ -109,6 +109,7 @@ class Part : private MiscFuncs, SynthHelper
 
         SynthEngine *getSynthEngine() {return synth;}
 
+        bool PyoshiType;
         int PmapOffset;
         float PnoteMap[256];
         float         Pvolume;

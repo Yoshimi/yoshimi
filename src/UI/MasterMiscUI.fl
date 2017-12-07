@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
-Modified August 2017
+Modified December 2017
 } {in_source in_header
 }
 
@@ -636,8 +636,12 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
         partpad->color(PAD_COLOUR);
     else
         partpad->color(BASE_COLOUR);
-    // possible colour for .xiy files
-    //partname->labelcolor(fl_rgb_color(0,0,225));
+    if (synth->part[npart | *plgroup]->PyoshiType)
+        //partname->labelfont(FL_TIMES_BOLD_ITALIC);
+        partname->labelcolor(YOSHI_COLOUR);
+    else
+        //partname->labelfont(FL_HELVETICA_BOLD);
+        partname->labelcolor(0);
     partname->label(synth->part[npart | *plgroup]->Pname.c_str());} {}
   }
   Function {findengines(int npart)} {return_type {unsigned int}

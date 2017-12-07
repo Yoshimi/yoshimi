@@ -3,9 +3,11 @@ yoshimi 1.5.5 rc3
 2017-12-7 Will
 * Made GUI Settings windows consistent.
 * .xiy doctype changed to Yoshimi.
-
+* GUI now shows .xiy parts with mid-blue text.
+* Set version as 1.5.5 rc4.
 2017-12-6 Will
 * Implemented extended (.xiy) Instrument saves.
+* Set version as 1.5.5 rc3.
 
 2017-12-5 Will
 * Reverted change in Cmake linker for tests.

@@ -116,6 +116,7 @@ Part::Part(Microtonal *microtonal_, FFTwrapper *fft_, SynthEngine *_synth) :
 
 void Part::defaults(void)
 {
+    PyoshiType = 0;
     Penabled = 0;
     Pminkey = 0;
     Pmaxkey = 127;
@@ -1370,6 +1371,7 @@ int Part::loadXMLinstrument(string filename)
         return 0;
     }
     defaultsinstrument();
+    PyoshiType = xml->information.yoshiType;
     Pname = findleafname(filename); // in case there's no internal
     int chk = findSplitPoint(Pname);
     if (chk > 0)

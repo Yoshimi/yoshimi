@@ -30,8 +30,11 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code.
 
-Modified October 2017
+Modified December 2017
 } {in_source in_header
+}
+
+decl {\#include <iostream>} {public local
 }
 
 decl {\#include <FL/Fl_Button.H>} {public local
@@ -116,7 +119,13 @@ class BankSlot {: {public Fl_Button, BankProcess_}
   Function {refresh()} {} {
     code {//
     string instrName = bank->getnamenumbered(nslot);
-    copy_label(instrName.c_str());} {}
+    copy_label(instrName.c_str());
+    if (bank->engines_used(nslot) & 8)
+        labelcolor(YOSHI_COLOUR);
+        //labelfont(FL_TIMES_ITALIC);
+    else
+        labelcolor(0);
+        //labelfont(FL_HELVETICA);} {}
   }
   decl {int *what, *whatslot, nslot, highlight, *nselected;} {private local
   }

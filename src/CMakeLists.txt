@@ -34,7 +34,7 @@ add_definitions(-Wall)
 add_definitions(-Werror=format-security)
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "1.5.5 rc3")
+set (YOSHIMI_VERSION "1.5.5 rc4")
 
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
@@ -428,6 +428,7 @@ add_definitions (-DADD_COLOUR=0xdfafbf00)
 add_definitions (-DBASE_COLOUR=0xbfbfbf00)
 add_definitions (-DSUB_COLOUR=0xafcfdf00)
 add_definitions (-DPAD_COLOUR=0xcfdfaf00)
+add_definitions (-DYOSHI_COLOUR=0x0000e100)
 add_definitions (-DNUM_MIDI_PARTS=64)
 add_definitions (-DNUM_MIDI_CHANNELS=16)
 add_definitions (-DMIDI_LEARN_BLOCK=128)
