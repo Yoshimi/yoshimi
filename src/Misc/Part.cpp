@@ -116,7 +116,6 @@ Part::Part(Microtonal *microtonal_, FFTwrapper *fft_, SynthEngine *_synth) :
 
 void Part::defaults(void)
 {
-    PyoshiType = 0;
     Penabled = 0;
     Pminkey = 0;
     Pmaxkey = 127;
@@ -152,7 +151,7 @@ void Part::setNoteMap(int keyshift)
 void Part::defaultsinstrument(void)
 {
     Pname = "Simple Sound";
-
+    PyoshiType = 0;
     info.Ptype = 0;
     info.Pauthor.clear();
     info.Pcomments.clear();
@@ -1344,9 +1343,8 @@ bool Part::saveXML(string filename, bool yoshiFormat)
 
 int Part::loadXMLinstrument(string filename)
 {
-    bool hasYoshi = (synth->getRuntime().instrumentFormat > 1);
-    if (hasYoshi)
-        filename = setExtension(filename, "xiy");
+    bool hasYoshi = true;
+    filename = setExtension(filename, "xiy");
     if (!isRegFile(filename))
     {
         hasYoshi = false;

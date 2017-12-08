@@ -819,8 +819,6 @@ class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
             // Reads from slot
             if (what == 3)
                 instrumentuiwindow->hide();
-            //cbwig->do_callback();
-            //refreshmainwindow();
             return;
         }
 

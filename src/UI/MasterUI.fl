@@ -1282,7 +1282,7 @@ ZynAddSubFX}
                     }
                 }
                 break;
-            case 8:
+            case 8: // load instrument
                 if (insert < 255)
                     ;//updateBankRootDirs(); // apparently not needed!
                 if (engine < 255)
@@ -1414,7 +1414,11 @@ ZynAddSubFX}
                     fl_alert("%s",name.c_str());
             }
             else
+            {
+                partui->setinstrumentlabel();
+                panellistitem[newpart % NUM_MIDI_CHANNELS]->refresh();
                 RecentInstruments->activate();
+            }
             break;
 
         case 80: // load patchset

@@ -411,6 +411,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     if (ok)
                     {
                         synth->addHistory(text, 1);
+                        synth->part[value]->PyoshiType = (saveType & 2);
                         text = "d " + text;
                     }
                     else

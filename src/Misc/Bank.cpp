@@ -156,16 +156,28 @@ bool Bank::emptyslotWithID(size_t rootID, size_t bankID, unsigned int ninstrumen
 // Removes the instrument from the bank
 bool Bank::clearslot(unsigned int ninstrument)
 {
+    int chk = 0;
+    int chk2 = 0; // to stop complaints
     if (emptyslot(ninstrument))
         return true;
-    int chk = remove(getFullPath(currentRootID, currentBankID, ninstrument).c_str());
-    if (chk < 0)
+    string tmpfile = setExtension(getFullPath(currentRootID, currentBankID, ninstrument), "xiy");
+
+    if (isRegFile(tmpfile))
     {
-        synth->getRuntime().Log(asString(ninstrument) + " Failed to remove "
-                     + getFullPath(currentRootID, currentBankID, ninstrument) + " "
-                     + string(strerror(errno)));
-        return false;
+        chk = remove(tmpfile.c_str());
+        if (chk < 0)
+            synth->getRuntime().Log(asString(ninstrument) + " Failed to remove " + tmpfile);
     }
+    tmpfile = setExtension(tmpfile, "xiz");
+    if (isRegFile(tmpfile))
+    {
+        chk2 = remove(tmpfile.c_str());
+        if (chk2 < 0)
+            synth->getRuntime().Log(asString(ninstrument) + " Failed to remove " + tmpfile);
+    }
+    if (chk < 0 || chk2 < 0)
+        return false;
+
     deletefrombank(currentRootID, currentBankID, ninstrument);
     return true;
 }
@@ -291,7 +303,6 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
     struct dirent *fn;
     string chkpath;
     string candidate;
-    string lastCandidate = "";
     size_t xizpos;
     while ((fn = readdir(dir)))
     {
@@ -306,12 +317,10 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
         chkpath += candidate;
         if (isRegFile(chkpath))
         {
-            xizpos = candidate.rfind(".xiy");
-            if (xizpos != string::npos)
-                lastCandidate = setExtension(candidate, "xiz");
-            else if (candidate == lastCandidate)
+            if (chkpath.rfind(".xiz") != string::npos && isRegFile(setExtension(chkpath, "xiy")))
                 continue; // don't want .xiz if there is .xiy
 
+            xizpos = candidate.rfind(".xiy");
             if (xizpos == string::npos)
                 xizpos = candidate.rfind(xizext);
 
@@ -680,8 +689,11 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
     // see which engines are used
     if (synth->getRuntime().checksynthengines)
     {
+        string checkfile = setExtension(getFullPath(rootID, bankID, pos), "xiy");
+        if (!isRegFile(checkfile))
+            checkfile = setExtension(getFullPath(rootID, bankID, pos), "xiz");
         XMLwrapper *xml = new XMLwrapper(synth);
-        xml->checkfileinformation(getFullPath(rootID, bankID, pos));
+        xml->checkfileinformation(checkfile);
         instrRef.PADsynth_used = xml->information.PADsynth_used;
         instrRef.ADDsynth_used = xml->information.ADDsynth_used;
         instrRef.SUBsynth_used = xml->information.SUBsynth_used;
