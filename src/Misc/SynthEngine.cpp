@@ -2471,6 +2471,12 @@ bool SynthEngine::saveBanks(int instance)
 }
 
 
+bool SynthEngine::saveToBankFullID(size_t rootID, size_t bankID, int ninstrument, int npart)
+{
+    return bank.saveWithFullID(rootID, bankID, ninstrument, npart);
+}
+
+
 void SynthEngine::newHistory(string name, int group)
 {
     if (findleafname(name) < "!")

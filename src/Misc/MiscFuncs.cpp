@@ -461,7 +461,7 @@ string MiscFuncs::miscMsgPop(int _pos)
     {
         if (idx == pos)
         {
-            //cout << "Msg Out " << int(idx) << " >" << *it << "<" << endl;
+            cout << "Msg Out " << int(idx) << " >" << *it << "<" << endl;
             break;
         }
         ++ it;

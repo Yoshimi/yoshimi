@@ -284,7 +284,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
 }
 
-class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
+class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window instrumentuiwindow {
@@ -760,8 +760,7 @@ class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
   }
   Function {send_data(int control, float value, int type, int part = 0xff, int kititem = 0xff, int engine = 0xff, int insert = 0xff, int parameter = 0xff, int par2 = 0xff)} {} {
     code {//
-    collect_data(synth, value, (Fl::event_button() | type), control, part, kititem, engine, insert, parameter, par2);} {selected
-    }
+    collect_data(synth, value, (Fl::event_button() | type), control, part, kititem, engine, insert, parameter, par2);} {}
   }
   Function {BankUI(int *npart_, SynthEngine *_synth)} {} {
     code {//
@@ -839,8 +838,9 @@ class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
                     else
                     {
                         synth->part[*npart]->Pname = newname;
-                        bank->savetoslot(slot,synth->part[*npart]);
-                        bs[slot]->refresh();
+                        send_data(75, float(*npart), 0xf0, 240, 255, 255, slot, 0x80);
+                        //bank->savetoslot(slot,synth->part[*npart]);
+                        //bs[slot]->refresh();
                     }
                 }
             }
@@ -867,9 +867,10 @@ class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
             }
             if (doit)
             {
-                if (!bank->savetoslot(slot,synth->part[*npart]))
-                    fl_alert("Could not save to this location");
-                bs[slot]->refresh();
+                send_data(75, float(*npart), 0xf0, 240, 255, 255, slot, 0x80);
+                //if (!bank->savetoslot(slot,synth->part[*npart]))
+                    //fl_alert("Could not save to this location");
+                //bs[slot]->refresh();
                 setread();
             }
         }
@@ -1083,6 +1084,10 @@ class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
         bs[i]->refresh();
     for (int i = 0; i < ROOT_SIZE; ++i)
         rs[i]->rootrefresh();} {}
+  }
+  Function {refreshbankslot(int ins)} {} {
+    code {//
+bs[ins]->refresh();} {}
   }
   Function {removeselection()} {} {
     code {if (nselected >= 0)

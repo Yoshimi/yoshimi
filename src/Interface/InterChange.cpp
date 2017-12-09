@@ -271,7 +271,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
-//    unsigned char engine = getData->data.engine;
+    unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
 //    unsigned char par2 = getData->data.par2;
@@ -397,7 +397,38 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         {
             switch (control)
             {
-                case 79: // instrument save
+                case 75: // bank instrument save
+                {
+                    getData->data.parameter = value;
+                    if (kititem == 255)
+                    {
+                        kititem = synth->ReadBankRoot();
+                        getData->data.kit = kititem;
+                    }
+
+                    if (engine == 255)
+                    {
+                        engine = synth->ReadBank();
+                        getData->data.engine = engine;
+                    }
+                    if (parameter >= 64)
+                    {
+                        parameter = synth->getRuntime().currentPart;
+                        getData->data.parameter = parameter;
+                    }
+                    text = synth->part[parameter]->Pname + " to " + to_string(int(insert));
+                    if (synth->saveToBankFullID(kititem, engine, insert, parameter))
+                    {
+                        text = "d " + text;
+                        synth->part[parameter]->PyoshiType = (synth->getRuntime().instrumentFormat > 1);
+                    }
+                    else
+                        text = "FAILED " + text;
+
+                    value = miscMsgPush(text);
+                    break;
+                }
+                case 79: // named instrument save
                 {
                     getData->data.parameter &= 0x7f;
                     bool ok = true;
@@ -683,7 +714,6 @@ void InterChange::resolveReplies(CommandBlock *getData)
     unsigned char insert = getData->data.insert;
     unsigned char insertParam = getData->data.parameter;
     unsigned char insertPar2 = getData->data.par2;
-
     if (control == 0xfe && insertParam != 9) // special case for simple messages
     {
         synth->getRuntime().Log(miscMsgPop(lrint(value)));
@@ -1437,6 +1467,11 @@ string InterChange::resolveMain(CommandBlock *getData)
             break;
         case 49:
             contstr = "Chan 'solo' Switch CC";
+            break;
+
+        case 75:
+            showValue = false;
+            contstr = "Bank Slot Save" + miscMsgPop(value_int + 1);
             break;
 
         case 79:
@@ -4192,7 +4227,7 @@ void InterChange::commandMain(CommandBlock *getData)
 
         case 14:
             if (write)
-                synth->getRuntime().currentPart = value;
+                synth->getRuntime().currentPart = value_int;
             else
                 value = synth->getRuntime().currentPart;
             break;

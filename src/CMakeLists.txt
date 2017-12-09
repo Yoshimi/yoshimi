@@ -34,7 +34,7 @@ add_definitions(-Wall)
 add_definitions(-Werror=format-security)
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "1.5.5 rc5")
+set (YOSHIMI_VERSION "1.5.5 rc6")
 
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
@@ -541,8 +541,8 @@ set(ExternLibraries
     ${CURSES_LIBRARIES}
     ${Readline_LIBRARY}
     z
-    dl
-    #${LIBDL_LINUX_LIBS}
+    #dl
+    ${LIBDL_LINUX}
 )
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")

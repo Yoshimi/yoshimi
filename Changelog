@@ -1,4 +1,12 @@
-yoshimi 1.5.5 rc5
+yoshimi 1.5.5 rc6
+
+2017-12-9 Will
+* Further refinement to legato fade.
+* Improved splash screen behaviour.
+* Revised bank slot saving.
+  Still some details to correct :(
+* Enabled CLI direct access bank slot saving.
+* Set version as 1.5.5 rc6.
 
 2017-12-8 Will
 * Resolved anomalies with new instrument type.

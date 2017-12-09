@@ -88,6 +88,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool saveMicrotonal(string fname);
         bool installBanks(int instance);
         bool saveBanks(int instance);
+        bool saveToBankFullID(size_t rootID, size_t bankID, int ninstrument, int npart);
         void newHistory(string name, int group);
         void addHistory(string name, int group);
         vector<string> *getHistory(int group);

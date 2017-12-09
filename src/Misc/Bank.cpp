@@ -191,15 +191,28 @@ bool Bank::savetoslot(unsigned int ninstrument, Part *part)
         synth->getRuntime().Log("Can't save " + asString(ninstrument) + ", slot > bank size");
         return false;
     }
+    return true;
+    //string fname = part->Pname;
+    //return saveWithFullID(currentRootID, currentBankID, ninstrument, part);
+}
+
+
+bool Bank::saveWithFullID(size_t rootID, size_t bankID, int ninstrument, int npart)
+{
+    string filepath = getBankPath(rootID, bankID);
+    string name = synth->part[npart]->Pname;
+    if (filepath.at(filepath.size() - 1) != '/')
+        filepath += "/";
     clearslot(ninstrument);
     string filename = "0000" + asString(ninstrument + 1);
     filename = filename.substr(filename.size() - 4, 4)
-               + "-" + part->Pname + xizext;
+               + "-" + name + xizext;
     legit_filename(filename);
-    string filepath = getBankPath(currentRootID, currentBankID);
-    if (filepath.at(filepath.size() - 1) != '/')
-        filepath += "/";
+
     string fullpath = filepath + filename;
+    bool ok1 = true;
+    bool ok2 = true;
+    int saveType = synth->getRuntime().instrumentFormat;
     if (isRegFile(fullpath))
     {
         int chk = remove(fullpath.c_str());
@@ -210,20 +223,31 @@ bool Bank::savetoslot(unsigned int ninstrument, Part *part)
             return false;
         }
     }
-    bool ok = true;
-    int saveType = synth->getRuntime().instrumentFormat;
+    if (saveType & 1) // legacy
+        ok2 = synth->part[npart]->saveXML(fullpath, false);
+
+    fullpath = setExtension(fullpath, "xiy");
+    if (isRegFile(fullpath))
+    {
+        int chk = remove(fullpath.c_str());
+        if (chk < 0)
+        {
+            synth->getRuntime().Log("saveToSlot failed to unlink " + fullpath
+                        + ", " + string(strerror(errno)));
+            return false;
+        }
+    }
 
     if (saveType & 2) // Yoshimi format
-        ok = part->saveXML(fullpath, true);
-    if (ok && (saveType & 1)) // legacy
-        ok = part->saveXML(fullpath, false);
-    if (!ok)
+        ok1 = synth->part[npart]->saveXML(fullpath, true);
+    if (!ok1 || !ok2)
         return false;
+
     filepath += force_bank_dir_file;
     FILE *tmpfile = fopen(filepath.c_str(), "w+");
     fputs (YOSHIMI_VERSION, tmpfile);
     fclose(tmpfile);
-    addtobank(currentRootID, currentBankID, ninstrument, filename, part->Pname);
+    addtobank(rootID, bankID, ninstrument, filename, name);
     return true;
 }
 

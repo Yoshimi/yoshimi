@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified November 2017
+Modified December 2017
 
 } {in_source in_header
 }
@@ -1161,6 +1161,7 @@ ZynAddSubFX}
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
+    unsigned char parameter = getData->data.parameter;
     unsigned char par2 = getData->data.par2;
     int nval = lrint(value);
     int chan = kititem & 0x3f;
@@ -1395,7 +1396,12 @@ ZynAddSubFX}
         case 49:
             updatepanel();
             break;
-
+        case 75: // save instrument to bank
+            name = miscMsgPop(par2);
+            updatepartprogram(parameter);
+            if (kititem == synth->ReadBankRoot() && engine == synth->ReadBank())
+                bankui->refreshbankslot(insert);
+        break;
         case 78: // load instrument
             if (name.find("FAILED") == 1)
             {
@@ -1814,7 +1820,6 @@ ZynAddSubFX}
 
     npartcounter->value((synth->getRuntime().currentPart) + 1);
     int nval = synth->getRuntime().currentPart;
-    synth->getRuntime().currentPart = nval;
     partNew(nval);
 
     nsyseff = 0;

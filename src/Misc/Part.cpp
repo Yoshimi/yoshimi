@@ -131,7 +131,7 @@ void Part::defaults(void)
     Pveloffs = 64;
     Pkeylimit = 20;
     Pfrand = 0;
-    legatoFading = false;
+    legatoFading = 0;
     setDestination(1);
     defaultsinstrument();
     ctl->resetall();
@@ -252,22 +252,13 @@ void Part::NoteOn(int note, int velocity, bool renote)
     if (note < Pminkey || note > Pmaxkey)
         return;
     /*
-     * In legato mode we only ever hear the last
+     * In legato mode we only ever hear the newest
      * note played, so it is acceptable to lose
      * intemediate ones while going through a
      * legato fade between held and newest note.
      */
-    if (Pkeymode > 1) // legato
-    {
-        heldnote = note; // store newest
-        heldvelocity = velocity;
-        heldrenote = renote;
-        if (legatoFading)
-            return;
-        note = heldnote; // recover newest
-        velocity = heldvelocity;
-        renote = heldrenote;
-    }
+    if (Pkeymode > 1 && legatoFading > 0)
+        return;
     // Legato and MonoMem used vars:
     int posb = POLIPHONY - 1;     // Just a dummy initial value.
     bool legatomodevalid = false; // true when legato mode is determined applicable.
