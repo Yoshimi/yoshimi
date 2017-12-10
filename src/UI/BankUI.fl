@@ -839,8 +839,6 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
                     {
                         synth->part[*npart]->Pname = newname;
                         send_data(75, float(*npart), 0xf0, 240, 255, 255, slot, 0x80);
-                        //bank->savetoslot(slot,synth->part[*npart]);
-                        //bs[slot]->refresh();
                     }
                 }
             }
@@ -868,9 +866,6 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
             if (doit)
             {
                 send_data(75, float(*npart), 0xf0, 240, 255, 255, slot, 0x80);
-                //if (!bank->savetoslot(slot,synth->part[*npart]))
-                    //fl_alert("Could not save to this location");
-                //bs[slot]->refresh();
                 setread();
             }
         }

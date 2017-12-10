@@ -274,8 +274,9 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
-//    unsigned char par2 = getData->data.par2;
+    unsigned char par2 = getData->data.par2;
     bool (write) = (type & 0x40);
+    bool guiTo = false;
     string text;
     if (getData->data.par2 < 0xff)
         text = miscMsgPop(getData->data.par2);
@@ -308,20 +309,17 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         }
         case 217: // program / bank / root
         {
-            //cout << " interchange prog " << value << "  chan " << int(kititem) << "  bank " << int(engine) << "  root " << int(insert) << endl;
-            if (text > "!")
+            //cout << " interchange prog " << value << "  chan " << int(kititem) << "  bank " << int(engine) << "  root " << int(insert) << "  named " << int(par2) << endl;
+            if (par2 < 0xff) // was named file not numbered
                 getData->data.par2 = miscMsgPush(text);
 
             int msgID = synth->SetRBP(getData);
             if (msgID >= 0x1000)
-            {
-                msgID &= 0xff; // may be increased sometime
                 text = "FAILED ";
-            }
             else
                 text = "";
-            text += miscMsgPop(msgID);
-            getData->data.value = miscMsgPush(text);
+            text += miscMsgPop(msgID & 0xff);
+            value = miscMsgPush(text);
             synth->getRuntime().finishedCLI = true; // temp
             getData->data.parameter &= 0x7f;
             break;
@@ -399,7 +397,6 @@ void InterChange::indirectTransfers(CommandBlock *getData)
             {
                 case 75: // bank instrument save
                 {
-                    getData->data.parameter = value;
                     if (kititem == 255)
                     {
                         kititem = synth->ReadBankRoot();
@@ -411,21 +408,22 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         engine = synth->ReadBank();
                         getData->data.engine = engine;
                     }
-                    if (parameter >= 64)
+                    if (value >= 64)
                     {
-                        parameter = synth->getRuntime().currentPart;
-                        getData->data.parameter = parameter;
+                        value = synth->getRuntime().currentPart;
                     }
-                    text = synth->part[parameter]->Pname + " to " + to_string(int(insert));
-                    if (synth->saveToBankFullID(kititem, engine, insert, parameter))
+                    //cout << "\n\nRoot " << int(kititem) << "  Bank " << int(engine) << "  Part " << int(value) << "  Slot " << int(insert) << "  Par2 " << int(par2) << " \n\n" << endl;
+                    text = synth->part[value]->Pname + " to " + to_string(int(insert));
+                    if (synth->saveToBankSlot(kititem, engine, insert, value))
                     {
                         text = "d " + text;
-                        synth->part[parameter]->PyoshiType = (synth->getRuntime().instrumentFormat > 1);
+                        synth->part[value]->PyoshiType = (synth->getRuntime().instrumentFormat > 1);
                     }
                     else
                         text = "FAILED " + text;
-
                     value = miscMsgPush(text);
+                    guiTo = true;
+                    getData->data.parameter &= 0x7f;
                     break;
                 }
                 case 79: // named instrument save
@@ -448,6 +446,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
+                    guiTo = true;
                     break;
                 }
                 case 80:
@@ -464,6 +463,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
+                    guiTo = true;
                     getData->data.parameter &= 0x7f;
                     break;
                 case 84: // vector load
@@ -609,6 +609,8 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         value = miscMsgPush(text);
                     break;
             }
+            if (!(type & 0x20))
+                guiTo = true;
             getData->data.parameter &= 0x7f;
             break;
         }
@@ -642,7 +644,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         if (jack_ringbuffer_write_space(returnsLoopback) >= commandSize)
         {
             getData->data.value = float(value);
-            if (synth->getRuntime().showGui && write && !((type & 0x20) && npart == 248))
+            if (synth->getRuntime().showGui && write && guiTo)
                 getData->data.par2 = miscMsgPush(text); // pass it on to GUI
 
             jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
@@ -1403,7 +1405,7 @@ string InterChange::resolveMain(CommandBlock *getData)
     int value_int = int(getData->data.value);
     unsigned char control = getData->data.control;
     unsigned char engine = getData->data.engine;
-    unsigned char par2 = getData->data.par2;
+//    unsigned char par2 = getData->data.par2;
     string name;
     string contstr = "";
     if (getData->data.part == 0xd9) // MIDI
@@ -1419,7 +1421,7 @@ string InterChange::resolveMain(CommandBlock *getData)
                 break;
             case 8:
                 showValue = false;
-                contstr = miscMsgPop(par2);
+                contstr = miscMsgPop(value_int);
                 break;
         }
         return contstr;
@@ -1471,7 +1473,7 @@ string InterChange::resolveMain(CommandBlock *getData)
 
         case 75:
             showValue = false;
-            contstr = "Bank Slot Save" + miscMsgPop(value_int + 1);
+            contstr = "Bank Slot Save" + miscMsgPop(value_int);
             break;
 
         case 79:

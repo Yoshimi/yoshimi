@@ -34,7 +34,7 @@ add_definitions(-Wall)
 add_definitions(-Werror=format-security)
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "1.5.5 rc6")
+set (YOSHIMI_VERSION "1.5.5 rc7")
 
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 

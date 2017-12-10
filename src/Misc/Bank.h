@@ -117,8 +117,7 @@ class Bank : private MiscFuncs
         bool emptyslotWithID(size_t rootID, size_t bankID, unsigned int ninstrument);
         bool emptyslot(unsigned int ninstrument) { return emptyslotWithID(currentRootID, currentBankID, ninstrument); }
         bool clearslot(unsigned int ninstrument);
-        bool savetoslot(unsigned int ninstrument, Part *part);
-        bool saveWithFullID(size_t rootID, size_t bankID, int ninstrument, int npart);
+        bool savetoslot(size_t rootID, size_t bankID, int ninstrument, int npart);
         bool swapslot(unsigned int n1, unsigned int n2);
         void swapbanks(unsigned int firstID, unsigned int secondID);
         string getBankName(int bankID);

@@ -116,23 +116,41 @@ bool Bank::setname(unsigned int ninstrument, string newname, int newslot)
     if (emptyslot(ninstrument))
         return false;
 
-    int slot = (newslot >= 0) ? newslot + 1 : ninstrument + 1;
-    string filename = "0000" + asString(slot);
-    filename = filename.substr(filename.size() - 4, 4) + "-" + newname + xizext;
-    legit_filename(filename);
     string newfilepath = getBankPath(currentRootID, currentBankID);
     if (newfilepath.at(newfilepath.size() - 1) != '/')
         newfilepath += "/";
+
+    int slot = (newslot >= 0) ? newslot + 1 : ninstrument + 1;
+    string filename = "0000" + asString(slot);
+
+    filename = filename.substr(filename.size() - 4, 4) + "-" + newname + xizext;
+    legit_filename(filename);
+
+    int chk = -1;
+    int chk2 = -1;
     newfilepath += filename;
-    InstrumentEntry &instrRef = getInstrumentReference(currentRootID, currentBankID, ninstrument);
-    int chk = rename(getFullPath(currentRootID, currentBankID, ninstrument).c_str(), newfilepath.c_str());
+    string oldfilepath = setExtension(getFullPath(currentRootID, currentBankID, ninstrument), "xiz");
+    chk = rename(oldfilepath.c_str(), newfilepath.c_str());
     if (chk < 0)
     {
         synth->getRuntime().Log("setName failed renaming "
-                    + getFullPath(currentRootID, currentBankID, ninstrument) + " -> "
-                    + newfilepath + ": " + string(strerror(errno)));
-        return false;
+                + oldfilepath + " -> "
+                + newfilepath + ": " + string(strerror(errno)));
     }
+
+    newfilepath = setExtension(newfilepath, "xiy");
+    oldfilepath = setExtension(oldfilepath, "xiy");
+    chk2 = rename(oldfilepath.c_str(), newfilepath.c_str());
+    if (chk2 < 0)
+    {
+        synth->getRuntime().Log("setName failed renaming "
+                + oldfilepath + " -> "
+                + newfilepath + ": " + string(strerror(errno)));
+    }
+
+    if (chk < 0 && chk2 < 0)
+        return false;
+    InstrumentEntry &instrRef = getInstrumentReference(currentRootID, currentBankID, ninstrument);
     instrRef.name = newname;
     instrRef.filename = filename;
     return true;
@@ -183,21 +201,7 @@ bool Bank::clearslot(unsigned int ninstrument)
 }
 
 
-// Save the instrument to a slot
-bool Bank::savetoslot(unsigned int ninstrument, Part *part)
-{
-    if (ninstrument >= BANK_SIZE)
-    {
-        synth->getRuntime().Log("Can't save " + asString(ninstrument) + ", slot > bank size");
-        return false;
-    }
-    return true;
-    //string fname = part->Pname;
-    //return saveWithFullID(currentRootID, currentBankID, ninstrument, part);
-}
-
-
-bool Bank::saveWithFullID(size_t rootID, size_t bankID, int ninstrument, int npart)
+bool Bank::savetoslot(size_t rootID, size_t bankID, int ninstrument, int npart)
 {
     string filepath = getBankPath(rootID, bankID);
     string name = synth->part[npart]->Pname;

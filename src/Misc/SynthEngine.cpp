@@ -2471,9 +2471,9 @@ bool SynthEngine::saveBanks(int instance)
 }
 
 
-bool SynthEngine::saveToBankFullID(size_t rootID, size_t bankID, int ninstrument, int npart)
+bool SynthEngine::saveToBankSlot(size_t rootID, size_t bankID, int ninstrument, int npart)
 {
-    return bank.saveWithFullID(rootID, bankID, ninstrument, npart);
+    return bank.savetoslot(rootID, bankID, ninstrument, npart);
 }
 
 

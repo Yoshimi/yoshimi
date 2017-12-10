@@ -1414,6 +1414,7 @@ ZynAddSubFX}
 
         case 79: // save instrument
             name = miscMsgPop(par2);
+            cout << "GUI >" << name << "<" << endl;
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)

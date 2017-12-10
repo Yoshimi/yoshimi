@@ -1,4 +1,10 @@
-yoshimi 1.5.5 rc6
+yoshimi 1.5.5 rc7
+
+2017-12-10 Will
+* Bugfix: Some loads and saves were leaking MiscMsg.
+* Banks Instrument ops now recognise new format.
+  Tested for load, save, delete, swap, rename.
+* Set version as 1.5.5 rc7.
 
 2017-12-9 Will
 * Further refinement to legato fade.
