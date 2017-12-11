@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified November 2017
+    Modified December 2017
 */
 
 #ifndef PART_H
@@ -73,9 +73,9 @@ class Part : private MiscFuncs, SynthHelper
         void RelaseAllKeys(void);
         void ComputePartSmps(void);
 
-        bool saveXML(string filename); // true for load ok, otherwise false
+        bool saveXML(string filename, bool yoshiFormat); // result true for load ok, otherwise false
         int loadXMLinstrument(string filename);
-        void add2XML(XMLwrapper *xml);
+        void add2XML(XMLwrapper *xml, bool subset = false);
         void add2XMLinstrument(XMLwrapper *xml);
         void getfromXML(XMLwrapper *xml);
         void getfromXMLinstrument(XMLwrapper *xml);
@@ -109,6 +109,7 @@ class Part : private MiscFuncs, SynthHelper
 
         SynthEngine *getSynthEngine() {return synth;}
 
+        bool PyoshiType;
         int PmapOffset;
         float PnoteMap[256];
         float         Pvolume;
@@ -127,9 +128,6 @@ class Part : private MiscFuncs, SynthHelper
         bool          Pkitfade;    // enables cross fading
         unsigned char Pdrummode;   // if all keys are mapped and the system is 12tET (used for drums)
         unsigned char Pkeymode;    // 0 = poly, 1 = mono, > 1 = legato;
-        int           heldnote;
-        int           heldvelocity;
-        bool          heldrenote;
         unsigned char Pkeylimit;   // how many keys can play simultaneously,
                                    // time 0 = off, the older will be released
         float         Pfrand;      // Part random frequency content

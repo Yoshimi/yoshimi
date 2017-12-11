@@ -1,4 +1,44 @@
-yoshimi 1.5.5 rc2
+yoshimi 1.5.5
+
+2017-12-11 Will
+* Set max MIDI-learn lines to 200.
+* Included current Advanced User Guide.
+* Added wildcard for .xiy and .xiz files in FLTK.
+* Updated docs.
+* Set release version 1.5.5
+
+2017-12-10 Will
+* Bugfix: Some loads and saves were leaking MiscMsg.
+* Banks Instrument ops now recognise new format.
+  Tested for load, save, delete, swap, rename.
+* Set version as 1.5.5 rc7.
+
+2017-12-9 Will
+* Further refinement to legato fade.
+* Improved splash screen behaviour.
+* Revised bank slot saving.
+  Still some details to correct :(
+* Enabled CLI direct access bank slot saving.
+* Set version as 1.5.5 rc6.
+
+2017-12-8 Will
+* Resolved anomalies with new instrument type.
+  GUI name colour reverts to black when cleared.
+  GUI name colour updated on saves as well as loads.
+  Bank structure identifies .xiy if either/both there.
+  Bank entry instrument colours update.
+  Loading instruments always looks for .xiy first.
+* Set version as 1.5.5 rc5.
+
+2017-12-7 Will
+* Made GUI Settings windows consistent.
+* .xiy doctype changed to Yoshimi.
+* GUI now shows .xiy parts with mid-blue text.
+* Set version as 1.5.5 rc4.
+
+2017-12-6 Will
+* Implemented extended (.xiy) Instrument saves.
+* Set version as 1.5.5 rc3.
 
 2017-12-5 Will
 * Reverted change in Cmake linker for tests.

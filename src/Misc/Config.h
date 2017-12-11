@@ -134,6 +134,7 @@ class Config : public MiscFuncs
         list<string>  lastfileseen;
         int           checksynthengines;
         int           xmlType;
+        unsigned char instrumentFormat;
         int           EnableProgChange;
         bool          toConsole;
         bool          hideErrors;

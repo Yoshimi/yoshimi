@@ -115,6 +115,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     Interpolation(0),
     checksynthengines(1),
     xmlType(0),
+    instrumentFormat(1),
     EnableProgChange(1), // default will be inverted
     toConsole(0),
     hideErrors(0),
@@ -596,6 +597,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     midi_upper_voice_C = xml->getpar("midi_upper_voice_C", midi_upper_voice_C, 0, 128);
     EnableProgChange = 1 - xml->getpar("ignore_program_change", EnableProgChange, 0, 1); // inverted for Zyn compatibility
     enable_part_on_voice_load = xml->getpar("enable_part_on_voice_load", enable_part_on_voice_load, 0, 1);
+    instrumentFormat = xml->getpar("saved_instrument_format",instrumentFormat, 1, 3);
     enable_NRPN = xml->getparbool("enable_incoming_NRPNs", enable_NRPN);
     ignoreResetCCs = xml->getpar("ignore_reset_all_CCs",ignoreResetCCs,0, 1);
     monitorCCin = xml->getparbool("monitor-incoming_CCs", monitorCCin);
@@ -675,6 +677,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("midi_upper_voice_C", midi_upper_voice_C);
     xmltree->addpar("ignore_program_change", (1 - EnableProgChange));
     xmltree->addpar("enable_part_on_voice_load", enable_part_on_voice_load);
+    xmltree->addpar("saved_instrument_format", instrumentFormat);
     xmltree->addparbool("enable_incoming_NRPNs", enable_NRPN);
     xmltree->addpar("ignore_reset_all_CCs",ignoreResetCCs);
     xmltree->addparbool("monitor-incoming_CCs", monitorCCin);

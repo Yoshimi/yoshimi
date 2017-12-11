@@ -107,6 +107,7 @@ string configlist [] = {
     "Virtual <n>",              "keyboard (0 = QWERTY, 1 = Dvorak, 2 = QWERTZ, 3 = AZERTY)",
     "Xml <n>",                  "compression (0-9)",
     "REports [s]",              "destination (Stdout, other = console)",
+    "SAved [s]",                "Saved instrument type (Legacy {.xiz}, Yoshimi {.xiy}, Both)",
 
     "STate [s]",                "* autoload default at start (Enable {other})",
     "Hide [s]",                 "non-fatal errors (Enable {other})",
@@ -1361,6 +1362,18 @@ int CmdInterface::commandConfig()
     {
         command = 5;
         value = !matchnMove(1, point, "stdout");
+    }
+    else if (matchnMove(2, point, "saved"))
+    {
+        command = 6;
+        if (matchnMove(1, point, "legacy"))
+            value = 1;
+        else if (matchnMove(1, point, "yoshimi"))
+            value = 2;
+        else if (matchnMove(1, point, "both"))
+            value = 3;
+        else if (!isRead)
+            return value_msg;
     }
 
     else if (matchnMove(2, point, "state"))

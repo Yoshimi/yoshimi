@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified November 2017
+Modified December 2017
 
 } {in_source in_header
 }
@@ -365,11 +365,11 @@ class MasterUI {selected : {private GuiUpdates}
                 if (lastname == "")
                     lastname = synth->getRuntime().userHome;
                 const char *filename;
-                filename = fl_file_chooser("Load:", "({*.xiz})", lastname.c_str(), 0);
+                filename = fl_file_chooser("Load:", "({*.xi*})", lastname.c_str(), 0);
                 if (filename == NULL)
                     return;
                 do_load_instrument(filename);}
-            tooltip {Load an instrument (.xiz) file} xywh {30 30 100 20} labelsize 12
+            tooltip {Load an instrument (.xi*) file} xywh {30 30 100 20} labelsize 12
           }
           MenuItem {} {
             label {&Save External...}
@@ -384,7 +384,7 @@ class MasterUI {selected : {private GuiUpdates}
                     return;
                 newname = synth->getRuntime().userHome + newname;
                 const char *filename;
-                filename = fl_file_chooser("Save:", "({*.xiz})", newname.c_str(), 0);
+                filename = fl_file_chooser("Save:", "({*.xi*})", newname.c_str(), 0);
                 if (filename == NULL)
                     return;
                 if (isRegFile(string(filename)))
@@ -392,7 +392,7 @@ class MasterUI {selected : {private GuiUpdates}
                         return;
                 send_data(79, float(npartcounter->value() - 1), 0xd0, 240, 0xff, 0xff, 0x80, miscMsgPush(string(filename)));
                 return;}
-            tooltip {Save current instrument to an .xiz file} xywh {20 20 100 20} labelsize 12
+            tooltip {Save current instrument to an .xi* file} xywh {20 20 100 20} labelsize 12
           }
           MenuItem RecentInstruments {
             label {&Recent Instruments...}
@@ -1161,6 +1161,7 @@ ZynAddSubFX}
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
+    unsigned char parameter = getData->data.parameter;
     unsigned char par2 = getData->data.par2;
     int nval = lrint(value);
     int chan = kititem & 0x3f;
@@ -1282,7 +1283,7 @@ ZynAddSubFX}
                     }
                 }
                 break;
-            case 8:
+            case 8: // load instrument
                 if (insert < 255)
                     ;//updateBankRootDirs(); // apparently not needed!
                 if (engine < 255)
@@ -1395,7 +1396,12 @@ ZynAddSubFX}
         case 49:
             updatepanel();
             break;
-
+        case 75: // save instrument to bank
+            name = miscMsgPop(par2);
+            updatepartprogram(parameter);
+            if (kititem == synth->ReadBankRoot() && engine == synth->ReadBank())
+                bankui->refreshbankslot(insert);
+        break;
         case 78: // load instrument
             if (name.find("FAILED") == 1)
             {
@@ -1414,7 +1420,11 @@ ZynAddSubFX}
                     fl_alert("%s",name.c_str());
             }
             else
+            {
+                partui->setinstrumentlabel();
+                panellistitem[newpart % NUM_MIDI_CHANNELS]->refresh();
                 RecentInstruments->activate();
+            }
             break;
 
         case 80: // load patchset
@@ -1810,7 +1820,6 @@ ZynAddSubFX}
 
     npartcounter->value((synth->getRuntime().currentPart) + 1);
     int nval = synth->getRuntime().currentPart;
-    synth->getRuntime().currentPart = nval;
     partNew(nval);
 
     nsyseff = 0;

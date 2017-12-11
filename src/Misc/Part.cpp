@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified Decenber 2017
+    Modified December 2017
 */
 
 #include <cstring>
@@ -131,7 +131,7 @@ void Part::defaults(void)
     Pveloffs = 64;
     Pkeylimit = 20;
     Pfrand = 0;
-    legatoFading = false;
+    legatoFading = 0;
     setDestination(1);
     defaultsinstrument();
     ctl->resetall();
@@ -151,7 +151,7 @@ void Part::setNoteMap(int keyshift)
 void Part::defaultsinstrument(void)
 {
     Pname = "Simple Sound";
-
+    PyoshiType = 0;
     info.Ptype = 0;
     info.Pauthor.clear();
     info.Pcomments.clear();
@@ -252,22 +252,13 @@ void Part::NoteOn(int note, int velocity, bool renote)
     if (note < Pminkey || note > Pmaxkey)
         return;
     /*
-     * In legato mode we only ever hear the last
+     * In legato mode we only ever hear the newest
      * note played, so it is acceptable to lose
      * intemediate ones while going through a
      * legato fade between held and newest note.
      */
-    if (Pkeymode > 1) // legato
-    {
-        heldnote = note; // store newest
-        heldvelocity = velocity;
-        heldrenote = renote;
-        if (legatoFading)
-            return;
-        note = heldnote; // recover newest
-        velocity = heldvelocity;
-        renote = heldrenote;
-    }
+    if (Pkeymode > 1 && legatoFading > 0)
+        return;
     // Legato and MonoMem used vars:
     int posb = POLIPHONY - 1;     // Just a dummy initial value.
     bool legatomodevalid = false; // true when legato mode is determined applicable.
@@ -1272,31 +1263,37 @@ void Part::add2XMLinstrument(XMLwrapper *xml)
 }
 
 
-void Part::add2XML(XMLwrapper *xml)
+void Part::add2XML(XMLwrapper *xml, bool subset)
 {
     // parameters
-    xml->addparbool("enabled", (Penabled == 1));
+    if (!subset)
+    {
+        xml->addparbool("enabled", (Penabled == 1));
 
-    xml->addpar("volume", Pvolume);
-    xml->addpar("panning", Ppanning);
+        xml->addpar("volume", Pvolume);
+        xml->addpar("panning", Ppanning);
 
-    xml->addpar("min_key", Pminkey);
-    xml->addpar("max_key", Pmaxkey);
-    xml->addpar("key_shift", Pkeyshift);
-    xml->addpar("rcv_chn", Prcvchn);
+        xml->addpar("min_key", Pminkey);
+        xml->addpar("max_key", Pmaxkey);
+        xml->addpar("key_shift", Pkeyshift);
+        xml->addpar("rcv_chn", Prcvchn);
 
-    xml->addpar("velocity_sensing", Pvelsns);
-    xml->addpar("velocity_offset", Pveloffs);
-
+        xml->addpar("velocity_sensing", Pvelsns);
+        xml->addpar("velocity_offset", Pveloffs);
     // the following two lines maintain backward compatibility
-    xml->addparbool("poly_mode", (Pkeymode & 3) == 0);
-    xml->addpar("legato_mode", (Pkeymode & 3) == 2);
-    xml->addpar("key_limit", Pkeylimit);
-    xml->addpar("random_detune", Pfrand);
-    xml->addpar("destination", Paudiodest);
-
+        xml->addparbool("poly_mode", (Pkeymode & 3) == 0);
+        xml->addpar("legato_mode", (Pkeymode & 3) == 2);
+        xml->addpar("key_limit", Pkeylimit);
+        xml->addpar("random_detune", Pfrand);
+        xml->addpar("destination", Paudiodest);
+    }
     xml->beginbranch("INSTRUMENT");
     add2XMLinstrument(xml);
+    if (subset)
+    {
+        xml->addpar("key_mode", Pkeymode & 3);
+        xml->addpar("random_detune", Pfrand);
+    }
     xml->endbranch();
 
     xml->beginbranch("CONTROLLER");
@@ -1305,11 +1302,10 @@ void Part::add2XML(XMLwrapper *xml)
 }
 
 
-bool Part::saveXML(string filename)
+bool Part::saveXML(string filename, bool yoshiFormat)
 {
-    filename = setExtension(filename, "xiz");
     synth->getRuntime().xmlType = XML_INSTRUMENT;
-    XMLwrapper *xml = new XMLwrapper(synth);
+    XMLwrapper *xml = new XMLwrapper(synth, yoshiFormat);
     if (!xml)
     {
         synth->getRuntime().Log("Part: saveXML failed to instantiate new XMLwrapper");
@@ -1317,9 +1313,19 @@ bool Part::saveXML(string filename)
     }
     if (Pname < "!") // this shouldn't be possible
         Pname = "No Title";
-    xml->beginbranch("INSTRUMENT");
-    add2XMLinstrument(xml);
-    xml->endbranch();
+
+    if (yoshiFormat)
+    {
+        filename = setExtension(filename, "xiy");
+        add2XML(xml, yoshiFormat);
+    }
+    else
+    {
+        filename = setExtension(filename, "xiz");
+        xml->beginbranch("INSTRUMENT");
+        add2XMLinstrument(xml);
+        xml->endbranch();
+    }
     bool result = xml->saveXMLfile(filename);
     delete xml;
     return result;
@@ -1328,13 +1334,20 @@ bool Part::saveXML(string filename)
 
 int Part::loadXMLinstrument(string filename)
 {
-    XMLwrapper *xml = new XMLwrapper(synth);
+    bool hasYoshi = true;
+    filename = setExtension(filename, "xiy");
+    if (!isRegFile(filename))
+    {
+        hasYoshi = false;
+        filename = setExtension(filename, "xiz");
+    }
+
+    XMLwrapper *xml = new XMLwrapper(synth, hasYoshi);
     if (!xml)
     {
         synth->getRuntime().Log("Part: loadXML failed to instantiate new XMLwrapper");
         return 0;
     }
-    filename = setExtension(filename, "xiz");
     if (!xml->loadXMLfile(filename))
     {
         synth->getRuntime().Log("Part: loadXML failed to load instrument file " + filename);
@@ -1347,12 +1360,26 @@ int Part::loadXMLinstrument(string filename)
         return 0;
     }
     defaultsinstrument();
+    PyoshiType = xml->information.yoshiType;
     Pname = findleafname(filename); // in case there's no internal
     int chk = findSplitPoint(Pname);
     if (chk > 0)
         Pname = Pname.substr(chk + 1, Pname.size() - chk - 1);
     getfromXMLinstrument(xml);
+    if (hasYoshi)
+    {
+        Pkeymode = xml->getpar("key_mode", Pkeymode, 0, 4);
+        Pfrand = xml->getpar127("random_detune", Pfrand);
+        if (Pfrand > 50)
+            Pfrand = 50;
+    }
     applyparameters();
+    xml->exitbranch();
+    if (xml->enterbranch("CONTROLLER"))
+    {
+        ctl->getfromXML(xml);
+        xml->exitbranch();
+    }
     xml->exitbranch();
     delete xml;
     return 1;

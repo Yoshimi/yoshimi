@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified June 2017
+    Modified December 2017
 */
 
 #include <zlib.h>
@@ -51,8 +51,9 @@ const char *XMLwrapper_whitespace_callback(mxml_node_t *node, int where)
 }
 
 
-XMLwrapper::XMLwrapper(SynthEngine *_synth) :
+XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi) :
     stackpos(0),
+    isYoshi(_isYoshi),
     synth(_synth)
 {
     minimal = 1 - synth->getRuntime().xmlmax;
@@ -62,21 +63,25 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth) :
     memset(&parentstack, 0, sizeof(parentstack));
     tree = mxmlNewElement(MXML_NO_PARENT, "?xml version=\"1.0\" encoding=\"UTF-8\"?");
     mxml_node_t *doctype = mxmlNewElement(tree, "!DOCTYPE");
+    bool yoshiType = (synth->getRuntime().xmlType <= XML_PRESETS);
+    // cout << "yoshiType  " << yoshiType << "   isYoshi " << isYoshi << endl;
 
-    if (synth->getRuntime().xmlType <= XML_PRESETS)
+    if (!yoshiType || !isYoshi)
     {
         mxmlElementSetAttr(doctype, "ZynAddSubFX-data", NULL);
-        node = root = mxmlNewElement(tree, "ZynAddSubFX-data");
+        root = mxmlNewElement(tree, "ZynAddSubFX-data");
         mxmlElementSetAttr(root, "version-major", "3");
         mxmlElementSetAttr(root, "version-minor", "0");
         mxmlElementSetAttr(root, "ZynAddSubFX-author", "Nasca Octavian Paul");
+        information.yoshiType = 0;
     }
     else
     {
-    mxmlElementSetAttr(doctype, "Yoshimi-data", NULL);
-    node = root = mxmlNewElement(tree, "Yoshimi-data");
+        mxmlElementSetAttr(doctype, "Yoshimi-data", NULL);
+        root = mxmlNewElement(tree, "Yoshimi-data");
+        information.yoshiType = 1;
     }
-
+    node = root;
     mxmlElementSetAttr(root, "Yoshimi-author", "Alan Ernest Calvert");
     string tmp = YOSHIMI_VERSION;
     string::size_type pos1 = tmp.find('.'); // != string::npos
@@ -134,6 +139,8 @@ bool XMLwrapper::checkfileinformation(const string& filename)
     if (!xmldata)
         return -1;
 
+    char *first = strstr(xmldata, "<!DOCTYPE Yoshimi-data>");
+    information.yoshiType = (first!= NULL);
     bool bRet = false; // we're not actually using this!
     char *start = strstr(xmldata, "<INFORMATION>");
     char *end = strstr(xmldata, "</INFORMATION>");
@@ -566,7 +573,10 @@ bool XMLwrapper::putXMLdata(const char *xmldata)
     root = tree = mxmlLoadString(NULL, xmldata, MXML_OPAQUE_CALLBACK);
     if (tree == NULL)
         return false;
-    node = root = mxmlFindElement(tree, tree, "ZynAddSubFX-data", NULL, NULL, MXML_DESCEND);
+    root = mxmlFindElement(tree, tree, "ZynAddSubFX-data", NULL, NULL, MXML_DESCEND);
+    if (!root)
+        root = mxmlFindElement(tree, tree, "Yoshimi-data", NULL, NULL, MXML_DESCEND);
+    node = root;
     if (!root)
         return false;
     push(root);

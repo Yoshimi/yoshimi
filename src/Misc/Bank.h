@@ -20,7 +20,8 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, last modified February 2015
+    This file is a derivative of a ZynAddSubFX original.
+    Modified December 2017
 */
 
 #ifndef BANK_H
@@ -47,13 +48,15 @@ typedef struct _InstrumentEntry
     bool PADsynth_used;
     bool ADDsynth_used;
     bool SUBsynth_used;
+    bool yoshiType;
     _InstrumentEntry()
         :name(""),
          filename(""),
          used(false),
          PADsynth_used(false),
          ADDsynth_used(false),
-         SUBsynth_used(false)
+         SUBsynth_used(false),
+         yoshiType(false)
     {
 
     }
@@ -65,6 +68,7 @@ typedef struct _InstrumentEntry
         PADsynth_used = false;
         ADDsynth_used = false;
         SUBsynth_used = false;
+        yoshiType = false;
     }
 } InstrumentEntry; // Contains the leafname of the instrument.
 
@@ -113,7 +117,7 @@ class Bank : private MiscFuncs
         bool emptyslotWithID(size_t rootID, size_t bankID, unsigned int ninstrument);
         bool emptyslot(unsigned int ninstrument) { return emptyslotWithID(currentRootID, currentBankID, ninstrument); }
         bool clearslot(unsigned int ninstrument);
-        bool savetoslot(unsigned int ninstrument, Part *part);
+        bool savetoslot(size_t rootID, size_t bankID, int ninstrument, int npart);
         bool swapslot(unsigned int n1, unsigned int n2);
         void swapbanks(unsigned int firstID, unsigned int secondID);
         string getBankName(int bankID);

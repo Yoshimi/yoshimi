@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified November 2017
+    Modified December 2017
 */
 
 #include <iostream>
@@ -271,11 +271,12 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
-//    unsigned char engine = getData->data.engine;
+    unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
-//    unsigned char par2 = getData->data.par2;
+    unsigned char par2 = getData->data.par2;
     bool (write) = (type & 0x40);
+    bool guiTo = false;
     string text;
     if (getData->data.par2 < 0xff)
         text = miscMsgPop(getData->data.par2);
@@ -308,20 +309,17 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         }
         case 217: // program / bank / root
         {
-            //cout << " interchange prog " << value << "  chan " << int(kititem) << "  bank " << int(engine) << "  root " << int(insert) << endl;
-            if (text > "!")
+            //cout << " interchange prog " << value << "  chan " << int(kititem) << "  bank " << int(engine) << "  root " << int(insert) << "  named " << int(par2) << endl;
+            if (par2 < 0xff) // was named file not numbered
                 getData->data.par2 = miscMsgPush(text);
 
             int msgID = synth->SetRBP(getData);
             if (msgID >= 0x1000)
-            {
-                msgID &= 0xff; // may be increased sometime
                 text = "FAILED ";
-            }
             else
                 text = "";
-            text += miscMsgPop(msgID);
-            getData->data.value = miscMsgPush(text);
+            text += miscMsgPop(msgID & 0xff);
+            value = miscMsgPush(text);
             synth->getRuntime().finishedCLI = true; // temp
             getData->data.parameter &= 0x7f;
             break;
@@ -397,18 +395,60 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         {
             switch (control)
             {
-                case 79: // instrument save
+                case 75: // bank instrument save
+                {
+                    if (kititem == 255)
+                    {
+                        kititem = synth->ReadBankRoot();
+                        getData->data.kit = kititem;
+                    }
 
+                    if (engine == 255)
+                    {
+                        engine = synth->ReadBank();
+                        getData->data.engine = engine;
+                    }
+                    if (value >= 64)
+                    {
+                        value = synth->getRuntime().currentPart;
+                    }
+                    //cout << "\n\nRoot " << int(kititem) << "  Bank " << int(engine) << "  Part " << int(value) << "  Slot " << int(insert) << "  Par2 " << int(par2) << " \n\n" << endl;
+                    text = synth->part[value]->Pname + " to " + to_string(int(insert));
+                    if (synth->saveToBankSlot(kititem, engine, insert, value))
+                    {
+                        text = "d " + text;
+                        synth->part[value]->PyoshiType = (synth->getRuntime().instrumentFormat > 1);
+                    }
+                    else
+                        text = "FAILED " + text;
+                    value = miscMsgPush(text);
+                    guiTo = true;
                     getData->data.parameter &= 0x7f;
-                    if (synth->part[value]->saveXML(text))
+                    break;
+                }
+                case 79: // named instrument save
+                {
+                    getData->data.parameter &= 0x7f;
+                    bool ok = true;
+                    int saveType = synth->getRuntime().instrumentFormat;
+
+                    if (saveType & 2) // Yoshimi format
+                        ok = synth->part[value]->saveXML(text, true);
+                    if (ok && (saveType & 1)) // legacy
+                        ok = synth->part[value]->saveXML(text, false);
+
+                    if (ok)
                     {
                         synth->addHistory(text, 1);
+                        synth->part[value]->PyoshiType = (saveType & 2);
                         text = "d " + text;
                     }
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
+                    guiTo = true;
                     break;
+                }
                 case 80:
                     if(synth->loadPatchSetAndUpdate(text))
                         text = "ed " + text;
@@ -423,6 +463,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
+                    guiTo = true;
                     getData->data.parameter &= 0x7f;
                     break;
                 case 84: // vector load
@@ -568,6 +609,8 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         value = miscMsgPush(text);
                     break;
             }
+            if (!(type & 0x20))
+                guiTo = true;
             getData->data.parameter &= 0x7f;
             break;
         }
@@ -601,7 +644,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         if (jack_ringbuffer_write_space(returnsLoopback) >= commandSize)
         {
             getData->data.value = float(value);
-            if (synth->getRuntime().showGui && write && !((type & 0x20) && npart == 248))
+            if (synth->getRuntime().showGui && write && guiTo)
                 getData->data.par2 = miscMsgPush(text); // pass it on to GUI
 
             jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
@@ -673,7 +716,6 @@ void InterChange::resolveReplies(CommandBlock *getData)
     unsigned char insert = getData->data.insert;
     unsigned char insertParam = getData->data.parameter;
     unsigned char insertPar2 = getData->data.par2;
-
     if (control == 0xfe && insertParam != 9) // special case for simple messages
     {
         synth->getRuntime().Log(miscMsgPop(lrint(value)));
@@ -1167,7 +1209,22 @@ string InterChange::resolveConfig(CommandBlock *getData)
                 contstr += "stdout";
             showValue = false;
             break;
-
+        case 6:
+            contstr = "Saved Instrument Format ";
+            switch (value_int)
+            {
+                case 1:
+                    contstr += "Legacy (.xiz)";
+                    break;
+                case 2:
+                    contstr += "Yoshimi (.xiy)";
+                    break;
+                case 3:
+                    contstr += "Both";
+                    break;
+            }
+            showValue = false;
+            break;
         case 16:
             contstr += "Autoload default state";
             yesno = true;
@@ -1348,7 +1405,7 @@ string InterChange::resolveMain(CommandBlock *getData)
     int value_int = int(getData->data.value);
     unsigned char control = getData->data.control;
     unsigned char engine = getData->data.engine;
-    unsigned char par2 = getData->data.par2;
+//    unsigned char par2 = getData->data.par2;
     string name;
     string contstr = "";
     if (getData->data.part == 0xd9) // MIDI
@@ -1364,7 +1421,7 @@ string InterChange::resolveMain(CommandBlock *getData)
                 break;
             case 8:
                 showValue = false;
-                contstr = miscMsgPop(par2);
+                contstr = miscMsgPop(value_int);
                 break;
         }
         return contstr;
@@ -1412,6 +1469,11 @@ string InterChange::resolveMain(CommandBlock *getData)
             break;
         case 49:
             contstr = "Chan 'solo' Switch CC";
+            break;
+
+        case 75:
+            showValue = false;
+            contstr = "Bank Slot Save" + miscMsgPop(value_int);
             break;
 
         case 79:
@@ -3889,6 +3951,12 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = synth->getRuntime().toConsole;
             break;
+        case 6:
+            if (write)
+                 synth->getRuntime().instrumentFormat = value_int;
+            else
+                value = synth->getRuntime().instrumentFormat;
+            break;
 // switches
         case 16:
             if (write)
@@ -4161,7 +4229,7 @@ void InterChange::commandMain(CommandBlock *getData)
 
         case 14:
             if (write)
-                synth->getRuntime().currentPart = value;
+                synth->getRuntime().currentPart = value_int;
             else
                 value = synth->getRuntime().currentPart;
             break;
