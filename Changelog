@@ -1,4 +1,11 @@
-yoshimi 1.5.5 rc7
+yoshimi 1.5.5
+
+2017-12-11 Will
+* Set max MIDI-learn lines to 200.
+* Included current Advanced User Guide.
+* Added wildcard for .xiy and .xiz files in FLTK.
+* Updated docs.
+* Set release version 1.5.5
 
 2017-12-10 Will
 * Bugfix: Some loads and saves were leaking MiscMsg.

@@ -1,0 +1,45 @@
+V 1.5.5 - Mistle Thrush
+A seasonal bird. Not particularly colourful, but tough and dependable under difficult conditions.
+
+Some users wanted a way to store the Controllers settings with an instrument. These can make quite a dramatic difference to the sound. There is now a superset of instruments that can be saved instead of, or as well as, the standard ones. On loading, Yoshimi will look for the extended version first. This applies to instruments in banks as well as externally saved ones. If you have an extended type loaded the instrument name will be a mid-blue instead of black. This is refleced in the stored instruments in bank slots.
+
+From now on any improvements we make to instrument patches will be applied in full to the extended version, and as much as is viable (in a compatible form) to the standard ones. Under no circumstances will we change standard patch format. There are many hundreds of these in the wild, and musicians may have their own reasons for preferring them (and older versions of the synth).
+
+
+There was a strange, really ancient bug in 'legato' where if you fumble and hit two keys pretty much together you end up with alternate silent notes until you lift all keys. This has now been comprehensively fixed.
+
+
+While we concentrate on larger issues we don't neglect the smaller ones.
+
+For example: You can't have legato mode and drum mode at the same time, but this hasn't been obvious. From now on, if you have drum mode set then try to set legato, you'll still see the setting, but as drum mode takes priority, the legato text will be shown in red. Cancel drum mode (making legato valid) and the text will turn black again.
+
+If you are using a legato MIDI pedal, Yoshimi's part 'mode' will show this change, and again will turn red if an instrument with drum mode is on that part.
+
+
+Load and save dialogues intelligently recognise the history lists and offer the appropriate first choice. External instrument loads and saves are now also remembered.
+
+For saves, on a fresh start you will offered your home directory regardless of where yoshimi has been launched from, but uniquely, in the case of saving external instruments you will always be offered the name of the instrument in the currently selected part - prefixed with the home directory.
+
+There is now a specific menu item in 'State' (Save as Default) for saving the current complete setup as the default. This will always be saved to Yoshimi's config directory and will not show in history lists.
+
+If "Settings...->Switches->Start With Default State" has been set, and a default state has been saved, not only will a complete restart load this, but a master 'Reset' will load this instead of doing a first-time default reset.
+
+A final detail with the history lists is that in each list type, the last used item will be placed at the top of the list. This is especially useful when you want to continually save/load an item you are currently working on.
+
+
+When first implemented MIDI-learn was limited conservatively to 128 lines. With experience of its actual performance this has now been increased to 200.
+
+
+The CLI has had attention too. A few more controls have been enabled, and the existing ones smartened up and made more consistent. As an aside, there is a new experimental branch with an interface that *only* works via the CLI - not ready for prime time yet.
+
+
+Yoshimi can now run happily with jack on BSD systems.
+
+
+Techie bits.
+There are a lot more minor optimisations throughout the code. This has resulted in an overall drop in code size, as well as some critical operations being slightly faster.
+
+The last few contentious parameter changes have now been made thread safe, and by default we run with NO mutex locks (the calls are there but return 'empty'). There is a single queue that all settings pass through so there should be no possibility of interference... Well, that's the theory :)
+
+CMakeLists.txt now has a specific option for older X86 processors. Also, if none of the build options are set then not even sse extensions will be included. How Yoshimi will handle on such an old processor is left as an exercise for the student :P
+

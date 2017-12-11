@@ -365,11 +365,11 @@ class MasterUI {selected : {private GuiUpdates}
                 if (lastname == "")
                     lastname = synth->getRuntime().userHome;
                 const char *filename;
-                filename = fl_file_chooser("Load:", "({*.xiz})", lastname.c_str(), 0);
+                filename = fl_file_chooser("Load:", "({*.xi*})", lastname.c_str(), 0);
                 if (filename == NULL)
                     return;
                 do_load_instrument(filename);}
-            tooltip {Load an instrument (.xiz) file} xywh {30 30 100 20} labelsize 12
+            tooltip {Load an instrument (.xi*) file} xywh {30 30 100 20} labelsize 12
           }
           MenuItem {} {
             label {&Save External...}
@@ -384,7 +384,7 @@ class MasterUI {selected : {private GuiUpdates}
                     return;
                 newname = synth->getRuntime().userHome + newname;
                 const char *filename;
-                filename = fl_file_chooser("Save:", "({*.xiz})", newname.c_str(), 0);
+                filename = fl_file_chooser("Save:", "({*.xi*})", newname.c_str(), 0);
                 if (filename == NULL)
                     return;
                 if (isRegFile(string(filename)))
@@ -392,7 +392,7 @@ class MasterUI {selected : {private GuiUpdates}
                         return;
                 send_data(79, float(npartcounter->value() - 1), 0xd0, 240, 0xff, 0xff, 0x80, miscMsgPush(string(filename)));
                 return;}
-            tooltip {Save current instrument to an .xiz file} xywh {20 20 100 20} labelsize 12
+            tooltip {Save current instrument to an .xi* file} xywh {20 20 100 20} labelsize 12
           }
           MenuItem RecentInstruments {
             label {&Recent Instruments...}
@@ -1414,7 +1414,6 @@ ZynAddSubFX}
 
         case 79: // save instrument
             name = miscMsgPop(par2);
-            cout << "GUI >" << name << "<" << endl;
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
