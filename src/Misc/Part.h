@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified August 2017
+    Modified December 2017
 */
 
 #ifndef PART_H
@@ -65,7 +65,7 @@ class Part : private MiscFuncs, SynthHelper
         void cleanup(void);
 
         // Midi commands implemented
-        void NoteOn(int note, int velocity, int masterkeyshift);
+        void NoteOn(int note, int velocity, bool renote = false);
         void NoteOff(int note);
         void AllNotesOff(void) { killallnotes = true; }; // panic, prepare all notes to be turned off
         void SetController(unsigned int type, int par);
@@ -73,9 +73,9 @@ class Part : private MiscFuncs, SynthHelper
         void RelaseAllKeys(void);
         void ComputePartSmps(void);
 
-        bool saveXML(string filename); // true for load ok, otherwise false
+        bool saveXML(string filename, bool yoshiFormat); // result true for load ok, otherwise false
         int loadXMLinstrument(string filename);
-        void add2XML(XMLwrapper *xml);
+        void add2XML(XMLwrapper *xml, bool subset = false);
         void add2XMLinstrument(XMLwrapper *xml);
         void getfromXML(XMLwrapper *xml);
         void getfromXMLinstrument(XMLwrapper *xml);
@@ -109,12 +109,14 @@ class Part : private MiscFuncs, SynthHelper
 
         SynthEngine *getSynthEngine() {return synth;}
 
+        bool PyoshiType;
         int PmapOffset;
         float PnoteMap[256];
         float         Pvolume;
         float         TransVolume;
         float         Ppanning;
         float         TransPanning;
+        unsigned char legatoFading;
         char Penabled; // this *must* be signed
         unsigned char Pminkey;
         unsigned char Pmaxkey;
@@ -125,9 +127,7 @@ class Part : private MiscFuncs, SynthHelper
         unsigned char Pkitmode;    // if the kitmode is enabled
         bool          Pkitfade;    // enables cross fading
         unsigned char Pdrummode;   // if all keys are mapped and the system is 12tET (used for drums)
-
-        unsigned char Ppolymode;   // Part mode - 0 = monophonic , 1 = polyphonic
-        unsigned char Plegatomode; // 0 = normal, 1 = legato
+        unsigned char Pkeymode;    // 0 = poly, 1 = mono, > 1 = legato;
         unsigned char Pkeylimit;   // how many keys can play simultaneously,
                                    // time 0 = off, the older will be released
         float         Pfrand;      // Part random frequency content
@@ -195,10 +195,9 @@ class Part : private MiscFuncs, SynthHelper
         list<unsigned char> monomemnotes; // held notes.
         struct {
             unsigned char velocity;
-            int mkeyshift; // Not sure if masterkeyshift should be remembered.
         } monomem[256];    // 256 is to cover all possible note values. monomem[]
                            // is used in conjunction with the list to store the
-                           // velocity and masterkeyshift values of a given note
+                           // velocity value of a given note
                            // (the list only store note values). For example.
                            // 'monomem[note].velocity' would be the velocity
                            // value of the note 'note'.

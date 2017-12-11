@@ -84,7 +84,9 @@ class Config : public MiscFuncs
 
         bool isRuntimeSetupCompleted() {return bRuntimeSetupCompleted;}
 
+        string        userHome;
         string        ConfigDir;
+        string        defaultStateName;
         string        ConfigFile;
         string        paramsLoad;
         string        instrumentLoad;
@@ -127,8 +129,10 @@ class Config : public MiscFuncs
         bool          loadDefaultState;
         int           Interpolation;
         string        presetsDirlist[MAX_PRESETS];
+        list<string>  lastfileseen;
         int           checksynthengines;
         int           xmlType;
+        unsigned char instrumentFormat;
         int           EnableProgChange;
         bool          toConsole;
         bool          hideErrors;
@@ -143,13 +147,13 @@ class Config : public MiscFuncs
         int           midi_bank_C;
         int           midi_upper_voice_C;
         int           enable_part_on_voice_load;
+        bool          enable_NRPN;
         bool          ignoreResetCCs;
         bool          monitorCCin;
         bool          showLearnedCC;
         int           single_row_panel;
         int           NumAvailableParts;
         int           currentPart;
-        int           lastPatchSet;
         unsigned char channelSwitchType;
         unsigned char channelSwitchCC;
         unsigned char channelSwitchValue;

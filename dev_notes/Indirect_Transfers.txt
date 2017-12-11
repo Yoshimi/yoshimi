@@ -1,0 +1,9 @@
+This is intended primarily for direct transfers of text between non-RT threads, or operations that tend to be text heavy. Although sychronised and using miscMsg, these do not normally enter the Command functions. 'par2' is used to carry the ID of the message from miscMsgPush.
+
+It is used mostly for setting names, but also for scales and keyboard mappings, which are string representations of number lists.
+
+To identify such transfers Parameter has bit 7 set (ORed with 0x80). Nowhere else does this value appear and it can be readily masked out where needed. Once recognised it is passed to a separate function that does all the decoding, bypassing the normal control system. For some operations it can loop back into the 'returns' path to update the GUI or send replies to the CLI.
+
+There are some occasions where both the CLI and the GUI need a text update at the same time. As these are in different threads and MiscMsgPop is destructive, there is no way to tell which will get the message first. For these situations a duplicate message is sent only to the CLI on the same data block using 'value' as the ID.
+
+An extension of this system is where bit 6 of Parameter is also set. This is used where changes will be made that directly affect the audio thread. For some of these controls, the audio is first faded down, then muted. The changes are then made and when complete, messages are sent and finally the system is unmuted.

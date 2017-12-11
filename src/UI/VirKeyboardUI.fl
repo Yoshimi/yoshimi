@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of origional ZynAddSubFX code
 
-Modified Septenber 2017
+Modified November 2017
 } {in_source in_header
 }
 
@@ -158,6 +158,10 @@ class VirKeys {: {public Fl_Box}
         }
     }} {}
   }
+  Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff)} {} {
+    code {//
+    collect_data(synth, value, (Fl::event_button() | 0xc0), control, 217, kititem, engine);} {}
+  }
   Function {handle(int event)} {return_type int
   } {
     code {//
@@ -281,7 +285,7 @@ class VirKeys {: {public Fl_Box}
     {
         vel = midivel * (127.0 - rndvelocity) / 127.0 + synth->numRandom() * rndvelocity;
     }
-    synth->NoteOn(midich, nk + midioct * 12, vel);} {}
+    send_data(0, vel, 0xc0, midich, nk + midioct * 12);} {}
   }
   Function {relasekey(int nk,int type)} {} {
     code {//
@@ -293,7 +297,7 @@ class VirKeys {: {public Fl_Box}
         return;
     pressed[nk] = 0;
     damage(1);
-    synth->NoteOff(midich, nk + 12 * midioct);} {}
+    send_data(1, 0, 0xc0, midich, nk + midioct * 12);} {}
   }
   Function {relaseallkeys(int type)} {} {
     code {//
@@ -402,8 +406,8 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         }
         ctlval->do_callback();
         int ctl = midictl;
-        synth->SetController(virkeys->midich, ctl, oldcontrol);
-        virkeys->take_focus();}
+        virkeys->take_focus();
+        send_data(2, oldcontrol, 0xc0, virkeys->midich, ctl);}
         tooltip {Controller value} xywh {628 25 18 96} type {Vert Fill} box ENGRAVED_BOX color 229 labelsize 8 align 5 maximum 127 step 1 value 64
         code0 {o->value(127 - oldcontrol);}
         class mwheel_slider
@@ -535,8 +539,8 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
             o->value(old);
             o->damage();
         }
-        synth->SetController(virkeys->midich, C_pitchwheel, - old);
-        virkeys->take_focus();}
+        virkeys->take_focus();
+        send_data(2, - old, 0xc0, virkeys->midich, 128)}
         xywh {6 12 18 110} labelsize 8 align 1 minimum -8192 maximum 8191 step 1
         class mwheel_slider
       }
@@ -554,6 +558,10 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
   Function {~VirKeyboard()} {} {
     code {//
     delete virkeyboardwindow;} {}
+  }
+  Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff)} {} {
+    code {//
+    collect_data(synth, value, (Fl::event_button() | 0xc0), control, 217, kititem, engine);} {}
   }
   Function {Show()} {} {
     code {//

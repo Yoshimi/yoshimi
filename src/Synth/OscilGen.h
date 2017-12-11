@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2017 Will Godfrey & others.
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of original ZynAddSubFX code, modified January 2011
+    This file is derivative of original ZynAddSubFX code.
+
+    Modified October 2017
 */
 
 #ifndef OSCIL_GEN_H
@@ -64,7 +67,7 @@ class OscilGen : public Presets, private WaveShapeSamples
 
         // Make a new random seed for Amplitude Randomness -
         //   should be called every noteon event
-        inline void newrandseed(void) { randseed = (unsigned int)random(); }
+        inline void newrandseed(void) { randseed = (unsigned int)randomOG(); }
 
         // Parameters
 
@@ -117,7 +120,7 @@ class OscilGen : public Presets, private WaveShapeSamples
         bool ADvsPAD; // if it is used by ADsynth or by PADsynth
 
         float numRandom(void);
-        unsigned int random(void);
+        unsigned int randomOG(void);
 
     private:
         float *tmpsmps;
@@ -204,36 +207,38 @@ class OscilGen : public Presets, private WaveShapeSamples
         unsigned int randseed;
 
         float random_0_1;
-        int32_t random_result;
-        struct random_data random_buf;
         char random_state[256];
 
+#if (HAVE_RANDOM_R)
+        int32_t random_result;
+        struct random_data random_buf;
+#else
+        long int random_result;
+#endif
+
         float harmonic_random_0_1;
+        char harmonic_random_state[256];
+
+#if (HAVE_RANDOM_R)
         int32_t harmonic_random_result;
         struct random_data harmonic_random_buf;
-        char harmonic_random_state[256];
+#else
+        long int harmonic_random_result;
+#endif
 };
 
 
 inline float OscilGen::numRandom(void)
 {
-    if (!random_r(&random_buf, &random_result))
-    {
-        random_0_1 = (float)random_result / (float)INT_MAX;
-        if (isgreater(random_0_1, 1.0f))
-            random_0_1 = 1.0f;
-        else if (isless(random_0_1, 0.0f))
-            random_0_1 = 0.0f;
-        return random_0_1;
-    }
-    return 0.05f;
-}
+    int ret;
+#if (HAVE_RANDOM_R)
+    ret = random_r(&random_buf, &random_result);
+#else
+    random_result = random();
+    ret = 0;
+#endif
 
-
-/**
-inline float OscilGen::numRandom(void)
-{
-    if (!random_r(&random_buf, &random_result))
+    if (!ret)
     {
         random_0_1 = (float)random_result / (float)INT_MAX;
         random_0_1 = (random_0_1 > 1.0f) ? 1.0f : random_0_1;
@@ -243,12 +248,18 @@ inline float OscilGen::numRandom(void)
     return 0.05f;
 }
 
-**/
-
 
 inline float OscilGen::harmonicRandom(void)
 {
-    if (!random_r(&harmonic_random_buf, &harmonic_random_result))
+    int ret;
+#if (HAVE_RANDOM_R)
+    ret = random_r(&harmonic_random_buf, &harmonic_random_result);
+#else
+    harmonic_random_result = random();
+    ret = 0;
+#endif
+
+    if (!ret)
     {
         harmonic_random_0_1 = (float)harmonic_random_result / (float)INT_MAX;
         harmonic_random_0_1 = (harmonic_random_0_1 > 1.0f) ? 1.0f : harmonic_random_0_1;
@@ -259,11 +270,16 @@ inline float OscilGen::harmonicRandom(void)
 }
 
 
-inline unsigned int OscilGen::random(void)
+inline unsigned int OscilGen::randomOG(void)
 {
+#if (HAVE_RANDOM_R)
     if (!random_r(&random_buf, &random_result))
         return random_result + INT_MAX / 2;
     return INT_MAX;
+#else
+    random_result = random();
+    return (unsigned int)random_result + INT_MAX / 2;
+#endif
 }
 
 #endif

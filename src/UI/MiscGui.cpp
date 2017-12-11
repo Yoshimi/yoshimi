@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified October 2017
+    Modified November 2017
 */
 
 #include "Misc/SynthEngine.h"
@@ -86,6 +86,8 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
 //cout << "collect_data " << int(type) << " " << int(control) << " " << int(part) << " " << int(kititem) << " " << int(engine) << " " << int(parameter) << " " << int(par2) << endl;
     if (jack_ringbuffer_write_space(synth->interchange.fromGUI) >= commandSize)
         jack_ringbuffer_write(synth->interchange.fromGUI, (char*) putData.bytes, commandSize);
+    else
+        synth->getRuntime().Log("Unable to write to formGUI buffer.");
 }
 
 
@@ -117,6 +119,15 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     unsigned char insertParam = getData->data.parameter;
     unsigned char insertPar2 = getData->data.par2;
 
+//        cout << "Con " << int(control) << "  Kit " << int(kititem) << "  Eng " << int(engine) << "  Ins " << int(insert) << endl;
+
+    if (control == 0xfe && insert != 9) // just show a messge
+    {
+        synth->getGuiMaster()->midilearnui->words->copy_label(miscMsgPop(insertPar2).c_str());
+        synth->getGuiMaster()->midilearnui->cancel->hide();
+        synth->getGuiMaster()->midilearnui->message->show();
+        return;
+    }
     if (npart == 0xe8) // scales
     {
         synth->getGuiMaster()->microtonalui->returns_update(getData);
@@ -130,6 +141,11 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     if (npart == 0xd8 && synth->getGuiMaster()->midilearnui != NULL)
     {
         synth->getGuiMaster()->midilearnui->returns_update(getData);
+        return;
+    }
+    if (npart == 0xd9) // midi messages - catch this early
+    {
+        synth->getGuiMaster()->returns_update(getData);
         return;
     }
 

@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified September 2017
+    Modified November 2017
 */
 
 #include <iostream>
@@ -369,6 +369,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
     if (control == 96)
     {
         midi_list.clear();
+        synth->setLastfileAdded(6, "");
         updateGui();
         synth->getRuntime().Log("List cleared");
         return;
@@ -386,14 +387,21 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
     }
     if (control == 242) // list controls
     {
-        int tmp = synth->SetSystemValue(106, par2);
-        if (tmp == -1)
+        int pos = 0;
+        vector<string> &listtype = *synth->getHistory(6);
+        vector<string>::iterator it = listtype.begin();
+        while (it != listtype.end() && pos != value)
+        {
+            ++ it;
+            ++ pos;
+        }
+        if (it == listtype.end())
         {
             synth->getRuntime().Log("No entry for number " + to_string(int(par2 + 1)));
         }
         else
         {
-            name = miscMsgPop(tmp);
+            name = *it;
             if (loadList(name))
                 synth->getRuntime().Log("Loaded " + name);
             updateGui();
@@ -622,8 +630,16 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
      */
     if (midi_list.size() >= MIDI_LEARN_BLOCK)
     {
-        GuiThreadMsg::sendMessage(synth,GuiThreadMsg::GuiAlert,miscMsgPush("Midi Learn full!"));
-        synth->getRuntime().Log("Midi Learn full!");
+        CommandBlock putData;
+        int putSize = sizeof(putData);
+        memset(&putData, 0xff, putSize);
+        putData.data.value = 0;
+        putData.data.type = 0xc8;
+        putData.data.control = 0xfe;
+        putData.data.part = 0xd9;
+        putData.data.parameter = 0x80;
+        putData.data.par2 = miscMsgPush("Midi Learn full!");
+        writeMidi(&putData, putSize, false);
         learning = false;
         return;
     }

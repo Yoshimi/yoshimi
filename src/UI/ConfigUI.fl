@@ -23,7 +23,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified July 2017
+Modified December 2017
 } {in_source in_header
 }
 
@@ -75,92 +75,92 @@ class ConfigUI {selected : {private MiscFuncs}
           } {
             MenuItem {} {
               label 256
-              xywh {35 35 100 20} labelfont 1
+              xywh {35 35 100 20} labelfont 1 labelsize 12
             }
             MenuItem {} {
               label 512
-              xywh {45 45 100 20} labelfont 1
+              xywh {45 45 100 20} labelfont 1 labelsize 12
             }
             MenuItem {} {
               label 1024
-              xywh {45 45 100 20} labelfont 1
+              xywh {45 45 100 20} labelfont 1 labelsize 12
             }
             MenuItem {} {
               label 2048
-              xywh {55 55 100 20} labelfont 1
+              xywh {55 55 100 20} labelfont 1 labelsize 12
             }
             MenuItem {} {
               label 4096
-              xywh {55 55 100 20} labelfont 1
+              xywh {55 55 100 20} labelfont 1 labelsize 12
             }
             MenuItem {} {
               label 8192
-              xywh {65 65 100 20} labelfont 1
+              xywh {65 65 100 20} labelfont 1 labelsize 12
             }
             MenuItem {} {
               label 16384
-              xywh {75 75 100 20} labelfont 1
+              xywh {75 75 100 20} labelfont 1 labelsize 12
             }
           }
           Fl_Choice buff_size {
             label {* Internal Buffer Size}
             callback {//
                         send_data(1, 16 << o->value(), 0xc0);}
-            tooltip {Number of samples} xywh {249 75 100 20} down_box BORDER_BOX labelsize 12 textsize 11
+            tooltip {Number of samples} xywh {249 75 100 20} down_box BORDER_BOX labelsize 12 textsize 12
             code0 {o->value( (int)(logf(synth->getRuntime().Buffersize / 16.0f - 1.0f) / logf(2.0f)) + 1);}
             code1 {if (synth->getUniqueId() != 0) o->hide();}
           } {
             MenuItem {} {
               label 16
-              xywh {55 55 100 20} labelfont 1
+              xywh {55 55 100 20} labelfont 1 labelsize 12
             }
             MenuItem {} {
               label 32
-              xywh {45 45 100 20} labelfont 1
+              xywh {45 45 100 20} labelfont 1 labelsize 12
             }
             MenuItem {} {
               label 64
-              xywh {35 35 100 20} labelfont 1
+              xywh {35 35 100 20} labelfont 1 labelsize 12
             }
             MenuItem {} {
               label 128
-              xywh {45 45 100 20} labelfont 1
+              xywh {45 45 100 20} labelfont 1 labelsize 12
             }
             MenuItem {} {
               label 256
-              xywh {55 55 100 20} labelfont 1
+              xywh {55 55 100 20} labelfont 1 labelsize 12
             }
             MenuItem {} {
               label 512
-              xywh {55 55 100 20} labelfont 1
+              xywh {55 55 100 20} labelfont 1 labelsize 12
             }
             MenuItem {} {
               label 1024
-              xywh {65 65 100 20} labelfont 1
+              xywh {65 65 100 20} labelfont 1 labelsize 12
             }
             MenuItem {} {
               label 2048
-              xywh {65 65 100 20} labelfont 1
+              xywh {65 65 100 20} labelfont 1 labelsize 12
             }
             MenuItem {} {
               label 4096
-              xywh {65 65 100 20} labelfont 1
+              xywh {65 65 100 20} labelfont 1 labelsize 12
             }
           }
           Fl_Choice pad_interpol {
             label {PADsynth Interpolation}
             callback {//
                         send_data(2, o->value(), 0xc0);}
-            xywh {250 105 100 20} down_box BORDER_BOX labelsize 12 textsize 12
+            xywh {250 105 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().Interpolation);}
           } {
             MenuItem {} {
               label {Linear(fast)}
-              xywh {0 0 100 20} labelfont 1 labelsize 10
+              xywh {0 0 100 20} labelfont 1 labelsize 11
             }
             MenuItem {} {
               label {Cubic(slow)}
-              xywh {10 10 100 20} labelfont 1 labelsize 10
+              xywh {10 10 100 20} labelfont 1 labelsize 11
             }
           }
           Fl_Choice v_keyboard {
@@ -172,26 +172,26 @@ class ConfigUI {selected : {private MiscFuncs}
           } {
             MenuItem {} {
               label QWERTY
-              xywh {15 15 100 20} labelfont 1 labelsize 11
+              xywh {15 15 100 20} labelfont 1 labelsize 12
             }
             MenuItem {} {
               label Dvorak
-              xywh {25 25 100 20} labelfont 1 labelsize 11
+              xywh {25 25 100 20} labelfont 1 labelsize 12
             }
             MenuItem {} {
               label QWERTZ
-              xywh {35 35 100 20} labelfont 1 labelsize 11
+              xywh {35 35 100 20} labelfont 1 labelsize 12
             }
             MenuItem {} {
               label AZERTY
-              xywh {45 45 100 20} labelfont 1 labelsize 11
+              xywh {45 45 100 20} labelfont 1 labelsize 12
             }
           }
           Fl_Counter compression {
             label {XML Compression Level}
             callback {//
                         send_data(4, o->value(), 0xc0);}
-            tooltip {gzip compression level (0 - uncompressed)} xywh {284 165 65 20} type Simple labelsize 12 align 4 minimum 0 maximum 9 step 1 textsize 12
+            tooltip {gzip compression level (0 - uncompressed)} xywh {284 165 65 20} type Simple labelsize 12 align 4 minimum 0 maximum 9 step 1 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().GzipCompression);}
             code1 {if (synth->getUniqueId() != 0) o->hide();}
           }
@@ -199,16 +199,36 @@ class ConfigUI {selected : {private MiscFuncs}
             label {Send reports to:}
             callback {//
                         send_data(5, o->value(), 0xf0);}
-            tooltip {Some system errors always go to stdout} xywh {200 195 150 20} down_box BORDER_BOX labelsize 11 textsize 13
+            tooltip {Some system errors always go to stdout} xywh {200 195 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
             code0 {o->value(synth->getRuntime().toConsole);}
           } {
             MenuItem {} {
               label stdout
-              xywh {0 0 34 20} labelsize 12
+              xywh {0 0 34 20} labelfont 1 labelsize 12
             }
             MenuItem {} {
               label {Console Window}
-              xywh {0 0 34 20} labelsize 12
+              xywh {0 0 34 20} labelfont 1 labelsize 12
+            }
+          }
+          Fl_Choice instrument {
+            label {Saved Instrument Format}
+            callback {//
+                        send_data(6, o->value() + 1, 0xc0);}
+            tooltip {Yoshimi format includes Controllers and Humanise} xywh {200 225 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
+            code0 {o->value(synth->getRuntime().instrumentFormat - 1);}
+          } {
+            MenuItem {} {
+              label {Legacy (.xiz)}
+              xywh {10 10 34 20} labelfont 1 labelsize 12
+            }
+            MenuItem {} {
+              label {Yoshimi (.xiy)}
+              xywh {10 10 34 20} labelfont 1 labelsize 12
+            }
+            MenuItem {} {
+              label {Both (.xiz + .xiy)}
+              xywh {20 20 34 20} labelfont 1 labelsize 12
             }
           }
           Fl_Box settingsNote {
@@ -301,13 +321,13 @@ class ConfigUI {selected : {private MiscFuncs}
             callback {//
                         string tmp = string(o->value());
                         send_data(32, 0, 0xc0, 0x80, miscMsgPush(tmp));}
-            tooltip {Device Jack tries to connect to for input.} xywh {195 62 120 22} labelsize 12 textsize 12
+            tooltip {Device Jack tries to connect to for input.} xywh {195 62 120 22} labelsize 12 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().jackMidiDevice.c_str());}
           }
           Fl_Check_Button jackMidi {
             label {Set as preferred MIDI}
             callback {//
-                        send_data(33, o->value(), 0xc0);}
+                        send_data(33, o->value(), 0xd0);}
             xywh {195 88 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().midiEngine == jack_midi) o->value(1);}
           }
@@ -316,13 +336,13 @@ class ConfigUI {selected : {private MiscFuncs}
             callback {//
                         string tmp = string(o->value());
                         send_data(34, 0, 0xc0, 0x80, miscMsgPush(tmp));}
-            tooltip {Name of the jack server to connect to - default, ...} xywh {195 182 120 22} labelsize 12 textsize 12
+            tooltip {Name of the jack server to connect to - default, ...} xywh {195 182 120 22} labelsize 12 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().jackServer.c_str());}
           }
           Fl_Check_Button jackAudio {
             label {Set as preferred audio}
             callback {//
-                        send_data(35, o->value(), 0xc0);}
+                        send_data(35, o->value(), 0xd0);}
             xywh {195 209 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().audioEngine == jack_audio) o->value(1);}
           }
@@ -347,13 +367,13 @@ class ConfigUI {selected : {private MiscFuncs}
             callback {//
                         string tmp = string(o->value());
                         send_data(48, 0, 0xc0, 0x80, miscMsgPush(tmp));}
-            tooltip {Device Alsa tries to connect to for input.} xywh {195 52 120 22} labelsize 12 textsize 12
+            tooltip {Device Alsa tries to connect to for input.} xywh {195 52 120 22} labelsize 12 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().alsaMidiDevice.c_str());}
           }
           Fl_Check_Button alsaMidi {
             label {Set as preferred MIDI}
             callback {//
-                        send_data(49, o->value(), 0xc0);}
+                        send_data(49, o->value(), 0xd0);}
             xywh {195 80 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().midiEngine == alsa_midi) o->value(1);}
           }
@@ -362,13 +382,13 @@ class ConfigUI {selected : {private MiscFuncs}
             callback {//
                         string tmp = string(o->value());
                         send_data(50, 0, 0xc0, 0x80, miscMsgPush(tmp));}
-            tooltip {Alsa audio device - default, hw:0, ...} xywh {195 143 120 22} labelsize 12 textsize 12
+            tooltip {Alsa audio device - default, hw:0, ...} xywh {195 143 120 22} labelsize 12 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().alsaAudioDevice.c_str());}
           }
           Fl_Check_Button alsaAudio {
             label {Set as preferred audio}
             callback {//
-                        send_data(51, o->value(), 0xc0);}
+                        send_data(51, o->value(), 0xd0);}
             xywh {195 169 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().audioEngine == alsa_audio) o->value(1);}
           }
@@ -381,7 +401,7 @@ class ConfigUI {selected : {private MiscFuncs}
                         if (chk > 4)
                             chk = 4;
                         send_data(52, chk - 1, 0xc0);}
-            xywh {195 199 121 66} labelsize 12 align 4 when 1 textsize 12
+            xywh {195 199 121 66} labelsize 12 align 4 when 1 textfont 1 textsize 12
             code0 {//
                     o->add("192000");
                     o->add("96000");
@@ -434,7 +454,7 @@ class ConfigUI {selected : {private MiscFuncs}
           Fl_Spinner BankRoot {
             label {Bank Root Change}
             callback {Rpend->show();}
-            xywh {235 50 50 18} labelsize 12 minimum 0 maximum 127 value 0 textsize 12
+            xywh {235 50 50 18} labelsize 12 minimum 0 maximum 127 value 0 textfont 1 textsize 12
             code0 {BankRootvalue = synth->getRuntime().midi_bank_root;}
             code1 {if (BankRootvalue < 128) o->value(BankRootvalue); else o->value(0);}
           }
@@ -521,21 +541,21 @@ class ConfigUI {selected : {private MiscFuncs}
                             fl_alert("In use for %s",name.c_str());
                         }
                         send_data(67, candidate, 0xc0);}
-            tooltip {CC0 = msb, CC32 = lsb} xywh {235 80 53 18} down_box BORDER_BOX labelsize 12 align 132 textsize 12
+            tooltip {CC0 = msb, CC32 = lsb} xywh {235 80 53 18} down_box BORDER_BOX labelsize 12 align 132 textfont 1 textsize 12
             code0 {if (synth->getRuntime().midi_bank_C == 32) o->value(0); else if (synth->getRuntime().midi_bank_C == 0) o->value(1); else o->value(2);}
             code1 {oldBank = o->value();}
           } {
             MenuItem banklsb {
               label LSB
-              xywh {0 0 34 20} labelsize 12
+              xywh {0 0 34 20} labelfont 1 labelsize 12
             }
             MenuItem bankusb {
               label MSB
-              xywh {0 0 34 20} labelsize 12
+              xywh {0 0 34 20} labelfont 1 labelsize 12
             }
             MenuItem bankoff {
               label Off
-              xywh {0 0 34 20} labelsize 12
+              xywh {0 0 34 20} labelfont 1 labelsize 12
             }
           }
           Fl_Check_Button progenable {
@@ -556,7 +576,7 @@ class ConfigUI {selected : {private MiscFuncs}
             label {Extended Program Change}
             callback {//
                         Epend->show();}
-            xywh {235 180 50 18} labelsize 12 minimum 0 maximum 127 value 110 textsize 12
+            xywh {235 180 50 18} labelsize 12 minimum 0 maximum 127 value 110 textfont 1 textsize 12
             code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
             code1 {if (EPCvalue < 128) o->value(EPCvalue); else o->value(110);}
           }
@@ -606,6 +626,13 @@ class ConfigUI {selected : {private MiscFuncs}
             xywh {234 160 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value((synth->getRuntime().midi_upper_voice_C < 128));}
             code1 {if (o->value() == 0) EPCspinner->deactivate();}
+          }
+          Fl_Check_Button enableNRPN {
+            label {Enable Incoming NRPNs}
+            callback {//
+                        send_data(75, o->value(), 0xc0);}
+            xywh {234 210 18 18} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().enable_NRPN);}
           }
           Fl_Check_Button ignoreReset {
             label {Ignore Reset all CCs}
@@ -760,6 +787,9 @@ class ConfigUI {selected : {private MiscFuncs}
                     reports->value(value_bool);
                     synth->getGuiMaster()->setLogging(value_bool);
                     break;
+                case 6:
+                    instrument->value(value_int - 1);
+                    break;
 
                 case 16:
                     setDefaultState->value(value_bool);
@@ -898,6 +928,9 @@ class ConfigUI {selected : {private MiscFuncs}
                     break;
                 case 74:
                     midiLearned->value(value_bool);
+                    break;
+                case 75:
+                    enableNRPN->value(value_bool);
                     break;
 
                 case 80:

@@ -7,13 +7,6 @@ yoshimi-1.3.5   {main version}
 yoshimi-1.3.5.1 {first bugfix}
 yoshimi-1.3.5.2 {second bugfix} surely not!
 
-
-
-We won't accept fixes for spelling errors in the *code*
-For a start, from bitter experience it is fatally easy to change two variables to the same name! Also, there's no point, after all they are only a mnemonic for memory addresses etc. 'volume' and 'LFO' could just as well be 'turnyfing' and 'derfingwotwiggles'.
-
-
-
 To avoid possible confusion, from now on 'master' will display the last released version number (without bugfix digits) with an 'M' suffix - unless it is a release candidate in which case the suffix will be rc{n}.
 
 e.g.
@@ -24,28 +17,28 @@ xml files created with this will have:
 Major version 1
 Minor version 3
 
+We now implement a build number. This is only bumped up when I push new commits to master (both github and sourceforge) so may represent several actual commits.
+
+
+We won't accept fixes for spelling errors in the *code*
+For a start, from bitter experience it is fatally easy to change two variables to the same name! Also, there's no point, after all they are only a mnemonic for memory addresses etc. 'volume' and 'LFO' could just as well be 'turnyfing' and 'derfingwotwiggles'.
 
 
 If using Fluid to edit GUI files, please close all windows and collapse all menus *before* the last save. I know it's tedious, but it avoids storms of spurious 'changes' that make genuine ones harder to see.
 
 
-
-Please try to avoid creating trailing whitespace.
-
-
-
-We now implement a build number. This is only bumped up when I push new commits to master (both github and sourceforge) so may represent several actual commits.
-
+Please follow the coding style throughout Yoshimi. In particular:
+    Indentation 4 spaces (no tabs)
+    Braces on their own lines.
+Also, try to avoid creating trailing whitespace.
 
 
 There seems to be no easy way to copy commit messages to the changelog, and people downloading releases won't see them, so please update this using the following as an example.
 
-2017-3-5 Will
-* Controller & Midi control limits done.
-* Complete limit definitions for main & part include type.
-  i.e. integer/float & whether midi learnable.
+2017-8-30 Will
+* BugFix: Disabling a part was resetting all controllers.
 * Doc updates.
-* Bugfix: missed a couple of 'break' statements in a switch.
-* Added a special case for enable default on part 1.
+* Sys/Ins effect controls now transferred to lock free.
+  But could be improved.
 
 Lines without '*' are continuations/extra info keeping the line length short, and I don't usually include them in commit messages.

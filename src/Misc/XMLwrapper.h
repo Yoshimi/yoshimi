@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified June 2017
+    Modified December 2017
 */
 
 #ifndef XML_WRAPPER_H
@@ -43,7 +43,7 @@ class SynthEngine;
 class XMLwrapper : private MiscFuncs
 {
     public:
-        XMLwrapper(SynthEngine *_synth);
+        XMLwrapper(SynthEngine *_synth, bool _isYoshi = false);
         ~XMLwrapper();
 
         // SAVE to XML
@@ -120,6 +120,7 @@ class XMLwrapper : private MiscFuncs
             unsigned char ADDsynth_used;
             unsigned char SUBsynth_used;
             unsigned char PADsynth_used;
+            bool yoshiType;
         } information;
 
         // opens a file and parse only the "information" data on it
@@ -166,6 +167,7 @@ class XMLwrapper : private MiscFuncs
             int y_minor;
         } xml_version;
 
+        bool isYoshi;
         SynthEngine *synth;
 };
 

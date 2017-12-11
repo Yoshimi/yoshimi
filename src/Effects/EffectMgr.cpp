@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2017, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified April 2011
+    This file is derivative of ZynAddSubFX original code.
+
+    Modified October 2017
 */
 
 #include <fftw3.h>
@@ -151,9 +154,9 @@ void EffectMgr::changepreset_nolock(unsigned char npreset)
 // Change the preset of the current effect(with thread locking)
 void EffectMgr::changepreset(unsigned char npreset)
 {
-    synth->actionLock(lock);
+    synth->actionLock(lockType);
     changepreset_nolock(npreset);
-    synth->actionLock(unlock);
+    synth->actionLock(unlockType);
 }
 
 
@@ -169,9 +172,9 @@ void EffectMgr::seteffectpar_nolock(int npar, unsigned char value)
 // Change a parameter of the current effect (with thread locking)
 void EffectMgr::seteffectpar(int npar, unsigned char value)
 {
-    synth->actionLock(lock);
+    synth->actionLock(lockType);
     seteffectpar_nolock(npar, value);
-    synth->actionLock(unlock);
+    synth->actionLock(unlockType);
 }
 
 

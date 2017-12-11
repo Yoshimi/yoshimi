@@ -1,53 +1,18 @@
-This started out as a means of exposing various controls to NRPNs but proved to be so useful it became considerably expanded and shared by all sorts of inputs.
+This is a means of exposing various controls to NRPNs.
 
-Many of the commands produce log output in a manner designed to be compatible with both the GUI reports window and with a CLI readline environment.
+All of the commands produce log output in a manner designed to be compatible with both the GUI reports window and with a CLI readline environment.
 
-There are two integer parameters passed in:
-type    obvious!
-value   the purpose (if any) dependent on the actual function called.
+To access these, set NRPN MSB (CC 99) to 64 and NRPN LSB (CC 98) to 2 (8130). After that send the following Data values. The command with LSB x doesn’t actually use Data LSB, but you still needs to send it.
 
-Type:
-   2    value = master key shift
 
-   7    value = master volume
-
-64-79   type = channel number (+ 64) value = keyshift
-
-100     value = reports destination
-
-101     value > 63 = enable load default state
-
-102     value > 63 = enable instrument load time display
-
-103     value > 63 = hide non-fatal error reports
-
-106     value = line number to find text of midi-learn history
-
-107     value = list size for list current midi learn list
-
-108     list all vector parameters
-
-109     list current main settings
-
-110     list file paths
-
-111     value = root number who's banks this will list
-
-112     value = bank number who's instruments this will list
-
-113     value = root ID to be set as 'current'
-
-114     value = bank ID to be set as 'current' (in current root)
-
-115     value = number for program change
-
-116     value > 63 = enable program change
-
-117     value > 63 = enable extended program change
-
-118     value = number of parts to be made available (16, 32, 64)
-
-119     save current settings
-
-128     value = part number for channel switch (dependent on switch type)
-
+Data MSB    Data LSB            Setting
+    2         key         Set master key shift, key-64 (-36 to +36)
+    7         volume      Set master Volume ’volume’
+ 64 to 79     key         Set channel (MSB-64) key shift, key-64 (-36 to +36)
+    80        root        Set CC to control Root path change (>119 disables)
+    81        bank        Set CC to control Bank change (>119 disables)
+    82        >63         Enable Program change otherwise disable
+    83        >63         Enable activation of part when program changed
+    84        extended    Set CC control Extended program change (>119 disables)
+    85        parts       Set number of available parts (16, 32 or 64)
+    86        x           Save all dynamic settings

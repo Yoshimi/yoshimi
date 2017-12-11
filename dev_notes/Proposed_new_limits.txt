@@ -1,0 +1,33 @@
+This structure is intended to enable you to traverse the controls structure testing/adjusting at each level on the tree.
+
+The function will be called directly and return a float value.
+
+'type' will be used to determine the operation.
+
+values (& 3)
+0   return adjusted input to max and min.
+1   return min
+2   return default
+3   return max
+
+flags
+bit 2   undefined
+bit 3   from midi
+bit 4   from cli
+bit 5   from gui
+bit 6   undefined
+bit 7   regard as integer
+
+Normal byte structure will be used to determine how far down the tree to go for a value.
+
+e.g.
+      value  type  command  part
+limit  200     0      0     240
+
+This would return 127 - the input value adusted to the maximium for master volume.
+
+
+limit  any     3     255     0
+
+No command set so it returns 64 - the maximim number of ordinary parts.
+

@@ -16,7 +16,7 @@
 
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
-    Modified September 2017
+    Modified November 2017
 */
 
 #include <errno.h>
@@ -65,25 +65,41 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
     if (synth->isMuted())
         return; // nobody listening!
 
-    if (LV2_engine || (synth->getRuntime().audioEngine == jack_audio && synth->getRuntime().midiEngine == jack_midi))
-    { // it's all jack
-        synth->mididecode.midiProcess(par0, par1, par2, in_place);
-        return;
-    }
+    bool inSync = LV2_engine || (synth->getRuntime().audioEngine == jack_audio && synth->getRuntime().midiEngine == jack_midi);
 
     CommandBlock putData;
-    putData.data.control = 0xd8;
-    putData.data.part = 0xd8;
-    putData.data.kit = par0;
-    putData.data.engine = par1;
-    putData.data.insert = par2;
     unsigned int putSize = sizeof(putData);
-    synth->midilearn.writeMidi(&putData, putSize, false);
-    /*
-     * we use the Midilearn ring buffer, but it returns
-     * to MidiDecode. This is safe because only a midi
-     * input passing through here can write to the buffer
-     */
+/*
+ * This below is a much simpler (faster) way
+ * to do note-on and note-off
+ * Tested on ALSA JACK and LV2 all combinations!
+ */
+    unsigned int event = par0 & 0xf0;
+    unsigned char channel = par0 & 0xf;
+    if (event == 0x80 || event == 0x90)
+    {
+        if (par2 < 1) // zero volume note on.
+            event = 0x80;
+        if (inSync)
+        {
+            if (event == 0x80)
+                synth->NoteOff(channel, par1);
+            else
+                synth->NoteOn(channel, par1, par2);
+        }
+        else
+        {
+            putData.data.value = float(par2);
+            putData.data.type = 8;
+            putData.data.control = (event == 0x80);
+            putData.data.part = 0xd9;
+            putData.data.kit = channel;
+            putData.data.engine = par1;
+            synth->midilearn.writeMidi(&putData, putSize, false);
+        }
+        return;
+    }
+    synth->mididecode.midiProcess(par0, par1, par2, in_place, inSync);
 }
 
 

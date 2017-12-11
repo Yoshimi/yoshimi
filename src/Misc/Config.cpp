@@ -51,8 +51,6 @@ using namespace std;
 #include "MasterUI.h"
 #include "ConfBuild.cpp"
 
-extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
-
 static char prog_doc[] =
     "Yoshimi " YOSHIMI_VERSION ", a derivative of ZynAddSubFX - "
     "Copyright 2002-2009 Nasca Octavian Paul and others, "
@@ -117,6 +115,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     Interpolation(0),
     checksynthengines(1),
     xmlType(0),
+    instrumentFormat(1),
     EnableProgChange(1), // default will be inverted
     toConsole(0),
     hideErrors(0),
@@ -129,13 +128,13 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     midi_bank_C(32),
     midi_upper_voice_C(128),
     enable_part_on_voice_load(1),
+    enable_NRPN(true),
     ignoreResetCCs(false),
     monitorCCin(false),
     showLearnedCC(true),
     single_row_panel(1),
     NumAvailableParts(NUM_MIDI_CHANNELS),
     currentPart(0),
-    lastPatchSet(-1),
     channelSwitchType(0),
     channelSwitchCC(128),
     channelSwitchValue(0),
@@ -414,7 +413,9 @@ bool Config::loadConfig(void)
     string homedir = string(getenv("HOME"));
     if (homedir.empty() || !isDirectory(homedir))
         homedir = string("/tmp");
+    userHome = homedir + '/';
     ConfigDir = homedir + string("/.config/") + YOSHIMI;
+    defaultStateName = ConfigDir + "/yoshimi";
     if (!isDirectory(ConfigDir))
     {
         cmd = string("mkdir -p ") + ConfigDir;
@@ -596,6 +597,8 @@ bool Config::extractConfigData(XMLwrapper *xml)
     midi_upper_voice_C = xml->getpar("midi_upper_voice_C", midi_upper_voice_C, 0, 128);
     EnableProgChange = 1 - xml->getpar("ignore_program_change", EnableProgChange, 0, 1); // inverted for Zyn compatibility
     enable_part_on_voice_load = xml->getpar("enable_part_on_voice_load", enable_part_on_voice_load, 0, 1);
+    instrumentFormat = xml->getpar("saved_instrument_format",instrumentFormat, 1, 3);
+    enable_NRPN = xml->getparbool("enable_incoming_NRPNs", enable_NRPN);
     ignoreResetCCs = xml->getpar("ignore_reset_all_CCs",ignoreResetCCs,0, 1);
     monitorCCin = xml->getparbool("monitor-incoming_CCs", monitorCCin);
     showLearnedCC = xml->getparbool("open_editor_on_learned_CC", showLearnedCC);
@@ -674,6 +677,8 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("midi_upper_voice_C", midi_upper_voice_C);
     xmltree->addpar("ignore_program_change", (1 - EnableProgChange));
     xmltree->addpar("enable_part_on_voice_load", enable_part_on_voice_load);
+    xmltree->addpar("saved_instrument_format", instrumentFormat);
+    xmltree->addparbool("enable_incoming_NRPNs", enable_NRPN);
     xmltree->addpar("ignore_reset_all_CCs",ignoreResetCCs);
     xmltree->addparbool("monitor-incoming_CCs", monitorCCin);
     xmltree->addparbool("open_editor_on_learned_CC",showLearnedCC);
@@ -1228,14 +1233,6 @@ void GuiThreadMsg::processGuiMessages()
     if (msg)
     {
         SynthEngine *synth = ((SynthEngine *)msg->data);
-
-        if (msg->type == RegisterAudioPort)
-        {
-            // This is unique not using guiMaster
-             mainRegisterAudioPort(synth, msg->index);
-             delete msg;
-             return;
-        }
         MasterUI *guiMaster = synth->getGuiMaster((msg->type == GuiThreadMsg::NewSynthEngine));
         if (msg->type == GuiThreadMsg::NewSynthEngine)
         {

@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified October 2017
+Modified December 2017
 } {in_source in_header
 }
 
@@ -524,11 +524,28 @@ Offset}
         Fl_Choice keymode {
           label Mode
           callback {//
+          if (o->value() > 1 && drumMode->value() != 0)
+              legatoMode->labelcolor(FL_RED);
+          else
+              legatoMode->labelcolor(FL_BLACK);
           send_data(6, o->value(), 0xc0);}
           tooltip {Poly, Mono or Legato mode} xywh {83 36 68 19} down_box BORDER_BOX selection_color 49 labelsize 11 align 8 textfont 1 textsize 11
-          code0 {o->add("Poly"); o->add("Mono"); o->add("Legato");}
-          code1 {o->value(synth->ReadPartKeyMode(npart));}
-        } {}
+          code0 {int tmp = synth->ReadPartKeyMode(npart);}
+          code1 {if (tmp > 1) o->value(2); else o->value(tmp);}
+        } {
+          MenuItem {} {
+            label Poly
+            xywh {0 0 34 20} labelfont 1 labelsize 11
+          }
+          MenuItem {} {
+            label Mono
+            xywh {10 10 34 20} labelfont 1 labelsize 11
+          }
+          MenuItem legatoMode {
+            label Legato
+            xywh {20 20 34 20} labelfont 1 labelsize 11
+          }
+        }
         Fl_Button {} {
           label Controllers
           callback {//
@@ -793,7 +810,7 @@ Offset}
       Fl_Button {} {
         label {Reset all controllers}
         callback {//
-        send_data(224, o->value(), 0xc0);}
+        send_data(224, o->value(), 0xd0);}
         xywh {5 105 210 20} box THIN_UP_BOX
       }
       Fl_Group {} {
@@ -1171,7 +1188,7 @@ Offset}
       Fl_Check_Button drumMode {
         label {Drum mode}
         callback {//
-        send_data(57, o->value(), 0xc0);}
+        send_data(57, o->value(), 0xd0);}
         tooltip {Disables microtonal tuning} xywh {285 350 15 15} down_box DOWN_BOX labelsize 10
         code0 {o->value(part->Pdrummode);}
       }
@@ -1469,7 +1486,6 @@ Offset}
 
     bool valBool = (value > 0.5f);
     int valInt = lrint(value);
-    int tmp = (valInt & 15) + 1;
 
     // these are specific to the mixer panel
     if (newpart >= *plgroup && newpart < (*plgroup + NUM_MIDI_CHANNELS))
@@ -1484,8 +1500,8 @@ Offset}
                 synth->getGuiMaster()->panellistitem[displaypart]->partpanning->value(value);
                 break;
             case 5:
-                synth->getGuiMaster()->panellistitem[displaypart]->partrcv->value(valInt);
-                if (valInt < NUM_MIDI_CHANNELS)
+                synth->getGuiMaster()->panellistitem[displaypart]->partrcv->value(valInt & 0xf);
+                if (valInt < (NUM_MIDI_CHANNELS - 1))
                     synth->getGuiMaster()->panellistitem[displaypart]->partrcv->textcolor(FL_BLACK);
                 else
                     synth->getGuiMaster()->panellistitem[displaypart]->partrcv->textcolor(FL_WHITE);
@@ -1531,15 +1547,24 @@ Offset}
             break;
 
         case 5:
-            if (int(value) < NUM_MIDI_CHANNELS)
+            midich->value(valInt + 1);
+            if (valInt < NUM_MIDI_CHANNELS)
                 midich->textcolor(FL_BLACK);
             else
                 midich->textcolor(FL_WHITE);
-            midich->value(tmp);
             break;
 
         case 6:
-            keymode->value(valInt);
+            legatoMode->labelcolor(FL_BLACK);
+            if(valInt > 1)
+            {
+                keymode->value(2);
+                if (drumMode->value())
+                    legatoMode->labelcolor(FL_RED);
+            }
+            else
+                keymode->value(valInt);
+            keymode->damage(1);
             break;
 
         case 7:
@@ -1778,6 +1803,11 @@ Offset}
 
         case 57:
             drumMode->value(valBool);
+            if (valBool && keymode->value() > 1)
+                legatoMode->labelcolor(FL_RED);
+            else
+                legatoMode->labelcolor(FL_BLACK);
+            keymode->damage(1);
             break;
 
         case 58:
@@ -1956,6 +1986,7 @@ Offset}
   Function {updatecontrollers()} {} {
     code {//
     enportamento->value(0);
+    keymode->value(part->Pkeymode & 3);
     expmwh->value(part->ctl->modwheel.exponential);
     modwh->value(part->ctl->modwheel.depth);
     expbw->value(part->ctl->bandwidth.exponential);
@@ -2198,6 +2229,12 @@ Offset}
         instrumentpadbox->color(PAD_COLOUR);
     else
         instrumentpadbox->color(BASE_COLOUR);
+    if (part->PyoshiType)
+        //instrumentlabel->labelfont(FL_TIMES_BOLD_ITALIC);
+        instrumentlabel->labelcolor(YOSHI_COLOUR);
+    else
+        //instrumentlabel->labelfont(FL_HELVETICA_BOLD);
+        instrumentlabel->labelcolor(0);
     instrumentlabel->copy_label(part->Pname.c_str());} {}
   }
   Function {seteditname()} {} {
@@ -2209,7 +2246,8 @@ Offset}
     modulation->value(part->ctl->modwheel.data);
     expression->value(part->ctl->expression.data);
     filterq->value(part->ctl->filterq.data);
-    filtercutoff->value(part->ctl->filtercutoff.data);} {}
+    filtercutoff->value(part->ctl->filtercutoff.data);
+    masterbandwidth->value(part->ctl->bandwidth.data);} {}
   }
   Function {~PartUI()} {} {
     code {//

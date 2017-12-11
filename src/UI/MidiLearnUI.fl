@@ -341,8 +341,11 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
       Fl_Button load {
         label Load
         callback {//
+        string lastname = synth->lastItemSeen(6);
+        if (lastname == "")
+            lastname = synth->getRuntime().userHome;
         char *filename;
-        filename = fl_file_chooser("Load:", "({*.xly})", NULL, 0);
+        filename = fl_file_chooser("Load:", "({*.xly})", lastname.c_str(), 0);
         if (filename == NULL)
             return;
         loadMidi(filename);}
@@ -351,8 +354,11 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
       Fl_Button save {
         label Save
         callback {//
+        string lastname = synth->getLastfileAdded(6);
+        if (lastname == "")
+            lastname = synth->getRuntime().userHome;
         char *filename;
-        filename = fl_file_chooser("Load:", "({*.xly})", NULL, 0);
+        filename = fl_file_chooser("Load:", "({*.xly})", lastname.c_str(), 0);
         if (filename == NULL)
             return;
         send_data(245, 0, 0, 0, 0, 0, 0, miscMsgPush((string) filename));

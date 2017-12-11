@@ -24,10 +24,26 @@ There is a switch for building in jack session support.
 
 Yoshimi can be used as an LV2 plugin if switched on here, otherwise the code will not be generated. Once again, there is also an editable location. The majority of installs want this located at 'lib/lv2' but if you need something different you can change it here.
 
-The next option 'ShowGuiReports' is intended as a tool for developers, and will show the command structure used when any GUI control is moved. If you scroll or hit any button other than 2 (middle), these will be the ones you need if you want to duplicate the action from the command line. However, if you hit 2 then you will get the message that MIDI-learn reports.
+The next option 'ShowGuiReports' is intended as a tool for developers, and will show the command structure used when any GUI control is moved. If you press button 2 or 3 (middle/right) this will be the line you need if you want to duplicate the action from the command line's direct access. However, if you press any other button, or use the scroll wheel then you will get the message that MIDI-learn reports.
 
 Finally, there is 'ShowNoteOnTimes'. This is an option to display the time it takes for a note to be generated and is again for the benefit of developers.
 
+
+---- Build for 32 bit ----
+
+Sometimes you want to build for a machine that has a 64 bit processor but is running in 32 bit mode. This is what you need to do.
+
+cd to yoshimi source directory and before and:
+
+mkdir build-32
+
+cd build-32
+
+CC='gcc -m32' CXX='g++ -m32' cmake ../src
+
+make
+
+Remember all lib32- dependencies should be installed prior to building.
 
 ---- Help ----
 

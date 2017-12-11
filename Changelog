@@ -1,4 +1,253 @@
-yoshimi 1.5.4.1
+yoshimi 1.5.5
+
+2017-12-11 Will
+* Set max MIDI-learn lines to 200.
+* Included current Advanced User Guide.
+* Added wildcard for .xiy and .xiz files in FLTK.
+* Updated docs.
+* Set release version 1.5.5
+
+2017-12-10 Will
+* Bugfix: Some loads and saves were leaking MiscMsg.
+* Banks Instrument ops now recognise new format.
+  Tested for load, save, delete, swap, rename.
+* Set version as 1.5.5 rc7.
+
+2017-12-9 Will
+* Further refinement to legato fade.
+* Improved splash screen behaviour.
+* Revised bank slot saving.
+  Still some details to correct :(
+* Enabled CLI direct access bank slot saving.
+* Set version as 1.5.5 rc6.
+
+2017-12-8 Will
+* Resolved anomalies with new instrument type.
+  GUI name colour reverts to black when cleared.
+  GUI name colour updated on saves as well as loads.
+  Bank structure identifies .xiy if either/both there.
+  Bank entry instrument colours update.
+  Loading instruments always looks for .xiy first.
+* Set version as 1.5.5 rc5.
+
+2017-12-7 Will
+* Made GUI Settings windows consistent.
+* .xiy doctype changed to Yoshimi.
+* GUI now shows .xiy parts with mid-blue text.
+* Set version as 1.5.5 rc4.
+
+2017-12-6 Will
+* Implemented extended (.xiy) Instrument saves.
+* Set version as 1.5.5 rc3.
+
+2017-12-5 Will
+* Reverted change in Cmake linker for tests.
+  This may affect BSD so this availability will not
+  be mentioned in notes for next release.
+* Set version as 1.5.5 rc2.
+
+2017-12-4 Will
+* Bugfix: CLI program change not updating GUI.
+
+2017-12-3 Will
+* Set version as 1.5.5 rc1.
+
+2017-12-2 Will
+* Improved legato fade behaviour.
+* BugFix: History not removing files when list full.
+
+2017-11-30 Will
+* BugFix: long standing silent legato note :)
+  This is an interim solution needs improving.
+* Further improvments to legato mode.
+  Another old bug found (not fixed yet) :(
+* Bugfix: Drum mode not clearing legato.
+
+2017-11-29 Will
+* BugFix: Channel switch not loading correctly.
+* Added specific older X86 CMake build options.
+
+2017-11-28 Will
+* GUI legato mode turns red if drum mode.
+* Master reset reloads the saved default state
+  if it exists and is set in config.
+
+2017-11-26 will
+* Refined legato/keymode code.
+* Part code cleanups.
+* Minor optimisation for mono/legato renote.
+* Removed redundant code from part NoteOn
+  and VirKeyboardUI.
+
+2017-11-25 Will
+* Improved protection for channel switch.
+* Implimented CC 68 - Legato pedal.
+* BugFix: CC 68 brace in wrong place :(
+
+2017-11-24 Will
+* Channel switcher was activated by Ardour!
+  Temporary fix in place.
+
+2017-11-23 Will
+* Improved internal message system.
+  Now possible to send plain non-blocking
+  messages, such as warnings, to CLI & GUI.
+* Updated docs.
+* Fixed regression. Mixer not updating :(
+
+2017-11-22 Will
+* Further refinements to history lists.
+  Instruments now included.
+* CLI instrument load can use '@' history.
+
+2017-11-20 Will
+* Improved GUI & CLI instrument saving.
+* Updated docs.
+* BugFix: Failed right click on bank window.
+
+2017-11-20 Will
+* Small improvement to history lists.
+  Ready to include instruments.
+
+2017-11-19 Will
+* Simplified history lists.
+  Last used is now always top of its list.
+* All main file loads/saves offer last used.
+
+2017-11-18 Will
+* Note on/off swap now in MusicIO.
+* Resolved channel switch Gui issues.
+* Consolidated SetSystemValues as NRPN only.
+  Still not completely thread safe.
+* Updated docs.
+* More refinements to CLI.
+* Tidied up some MIDI-learn messages.
+
+2017-11-17 Will
+* Added error reports to several I/O ring buffers.
+* Revised channel switcher.
+  Still some GUI anomalies to sort out :(
+
+2017-11-16 Will
+* BugFix: New Vectors weren't being saved.
+
+2017-11-15 Will
+* Finalised jack part destination changes.
+  Vector control now sets these correctly!
+
+2017-11-14 Will
+* Refactored indirectTransfers.
+  Was 'transfertext' but used for much else.
+* Improved jack part destination changes.
+
+2017-11-13 Will
+* NRPN direct part control now threadsafe.
+  Only NRPN system values to do :)
+
+2017-11-12 Will
+* Corrected Vector GUI anomalies.
+* Improved CLI part channel change.
+* Started work on NRPN direct part access.
+
+2017-11-11 Will
+* BugFix: GUI Insert effects failed to update.
+* NRPN effect changes now threadsafe.
+  Some GUI anomalies to sort out.
+* Code cleanups.
+* Rationalised system value ranges.
+* Updated docs.
+
+2017-11-10 Will
+* Code cleanups around incomming MIDI.
+
+2017-11-9 Will
+* GUI copy/paste now threadsafe
+  but needs much improvement.
+* Removed sse from 'BASIC' compiler build options.
+* In SynthEngine the build defaults to NOLOCK.
+  This means *all* mutex locks are disabled.
+
+2017-11-8-Will
+* CLI effects code cleanups.
+
+2017-11-7 Will
+* All remaining CLI writes thread safe :)
+  but some effect controls don't update GUI
+  and code tidying needed.
+* Doc updates.
+
+2017-11-6 Will
+* Vector GUI writes now thread safe :)
+
+2017-11-5 Will
+* Significant re-factor of vector control.
+  Stable, but some details to be improved.
+* Further refinements to vector control,
+  and improved error handling.
+* BugFix: MIDI zero velocity not sent to noteoff :(
+* Running vectors now correctly update GUI.
+
+2017-11-4 Will
+* Vector CLI controls fully thread-safe.
+  Some GUI and MIDI ones to complete.
+* Corrected JACK / ALSA GUI selections.
+
+2017-11-3 Will
+* Restored MIDI volume GUI action.
+* Some more Vector controls now thread safe.
+
+2017-11-2 Will
+* Major split up of midi controls from audio thread.
+* Unification of CC from any source.
+* More on unified root/bank/program.
+
+2017-10-31 Will
+* Further inprovments to unified root/bank/program.
+* Added 'Root_Bank_Program.txt' to dev_notes.
+* Corrected anomally with GUI bank list entries.
+
+2017-10-30 Will
+* MIDI controllers done for CLI  direct access
+  but disabled until rest of system done.
+
+2017-10-29 Will
+* Unified root/bank/program change complete
+  for CLI direct access.
+
+2017-10-28 Will
+* MIDI note on/off routing much simplified.
+* Further work splitting up MIDI routing.
+  NRPNs partially separated out
+* NRPNs can now be completely ignored.
+
+2017-10-26 Will
+* Corrected GUI panel anomally when changing parts.
+* Started implimenting unified root/bank/program change.
+* Applied mutex lock corrections suggested by 'blubee'.
+* Corrected implied cast in jackengine.
+
+2017-10-24 Will
+* Revised parameters for direct midi controls.
+* Virtual keyboard now uses these, so threadsafe.
+* Updated control numbers.
+
+2017-10-23 Will
+* GUI improvements to mixer panel.
+* Direct access to NoteOn, NoteOff, SetController.
+* Updated dev_notes/Yoshimi Control Numbers.ods
+
+2017-10-22 Will
+* Improved GUI behaviour on part changes.
+* More doc updates.
+
+2017-10-21 Will
+* Minor adjustments to musl patch from newbluemoon.
+* Further code cleanups.
+* Doc updates.
+
+2017-10-20 Will
+* Doc updates.
+* Added missing limits.h include to MiscFuncs.
 
 2017-10-16 Will
 * Finalised and cleaned up bugfix code.

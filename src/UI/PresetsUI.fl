@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302
+version 1.0304
 header_name {.h}
 code_name {.cc}
 comment {PresetsUI.h} {not_in_source in_header
@@ -28,7 +28,8 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
-Modified September 12017
+
+Modified November 2017
 } {in_source in_header
 }
 
@@ -160,18 +161,26 @@ class PresetsUI {selected
         label {Paste from Preset}
         callback {//
         int n = pastebrowse->value();
-        if ( n !=0 )
-            p->paste(n);
+        if (n == 0)
+        {
+            pastewin->hide();
+            return;
+        }
+        synth->SetMuteAndWait();
+        p->paste(n);
         pastewin->hide();
-        pui->refresh();}
+        pui->refresh();
+        synth->Unmute();}
         xywh {10 355 160 20} box THIN_UP_BOX
       }
       Fl_Button pastebutton {
         label {Paste from Clipboard}
         callback {//
+        synth->SetMuteAndWait();
         p->paste(0);
         pastewin->hide();
-        pui->refresh();}
+        pui->refresh();
+        synth->Unmute();}
         xywh {25 385 90 35} box THIN_UP_BOX align 192
       }
       Fl_Button {} {

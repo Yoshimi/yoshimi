@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified September 2017
+    Modified October 2017
 */
 
 #ifndef INTERCH_H
@@ -76,7 +76,7 @@ class InterChange : private MiscFuncs
         void *sortResultsThread(void);
         static void *_sortResultsThread(void *arg);
         pthread_t  sortResultsThreadHandle;
-        void transfertext(CommandBlock *getData);
+        void indirectTransfers(CommandBlock *getData);
         string formatScales(string text);
         string resolveVector(CommandBlock *getData);
         string resolveMicrotonal(CommandBlock *getData);
@@ -95,6 +95,7 @@ class InterChange : private MiscFuncs
         string resolveEffects(CommandBlock *getData);
         bool showValue;
 
+        void commandMidi(CommandBlock *getData);
         void commandVector(CommandBlock *getData);
         void commandMicrotonal(CommandBlock *getData);
         void commandConfig(CommandBlock *getData);
@@ -113,8 +114,16 @@ class InterChange : private MiscFuncs
         void commandEnvelope(CommandBlock *getData);
         void envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars);
         void commandSysIns(CommandBlock *getData);
+
+        /*
+         * this is made public specifically so that it can be
+         * reached from SynthEngine by jack freewheeling NRPNs.
+         * This avoids unnecessary (error prone) duplication.
+         */
+    public:
         void commandEffects(CommandBlock *getData);
 
+    private:
         bool commandSendReal(CommandBlock *getData);
 };
 

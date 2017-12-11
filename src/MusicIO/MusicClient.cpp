@@ -27,9 +27,18 @@
 #include <iostream>
 #include <stdlib.h>
 #include <set>
+#include <unistd.h>
 
-string audio_drivers_str [] = {"no_audio", "jack_audio", "alsa_audio"};
-string midi_drivers_str [] = {"no_midi", "jack_midi", "alsa_midi"};
+string audio_drivers_str [] = {"no_audio", "jack_audio"
+#if defined(HAVE_ALSA)
+                               , "alsa_audio"
+#endif
+                              };
+string midi_drivers_str [] = {"no_midi", "jack_midi"
+#if defined(HAVE_ALSA)
+                              , "alsa_midi"
+#endif
+                             };
 
 MusicClient *MusicClient::newMusicClient(SynthEngine *_synth)
 {
@@ -109,10 +118,11 @@ MusicClient::MusicClient(SynthEngine *_synth, audio_drivers _audioDrv, midi_driv
         case jack_audio:
             audioIO = new JackEngine(synth);
             break;
-
+#if defined(HAVE_ALSA)
         case alsa_audio:
             audioIO = new AlsaEngine(synth);
             break;
+#endif
 
         default:
             break;
@@ -124,10 +134,11 @@ MusicClient::MusicClient(SynthEngine *_synth, audio_drivers _audioDrv, midi_driv
             if (audioDrv != jack_audio)
                 midiIO = new JackEngine(synth);
             break;
-
+#if defined(HAVE_ALSA)
         case alsa_midi:
             midiIO = new AlsaEngine(synth);
             break;
+#endif
 
         default:
             break;

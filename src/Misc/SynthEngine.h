@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2016, Will Godfrey & others
+    Copyright 2014-2017, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified September 2017
+    Modified November 2017
 */
 
 #ifndef SYNTHENGINE_H
@@ -46,7 +46,7 @@ using namespace std;
 #include "Misc/Config.h"
 #include "Params/PresetsStore.h"
 
-typedef enum { init, lock, unlock, destroy } lockset;
+typedef enum { init, lockType, unlockType, destroy } lockset;
 
 class EffectMgr;
 class Part;
@@ -88,9 +88,13 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool saveMicrotonal(string fname);
         bool installBanks(int instance);
         bool saveBanks(int instance);
+        bool saveToBankSlot(size_t rootID, size_t bankID, int ninstrument, int npart);
+        void newHistory(string name, int group);
         void addHistory(string name, int group);
         vector<string> *getHistory(int group);
-        string lastPatchSetSeen(void);
+        string lastItemSeen(int group);
+        void setLastfileAdded(int group, string name);
+        string getLastfileAdded(int group);
         bool loadHistory(void);
         bool saveHistory(void);
         unsigned char loadVectorAndUpdate(unsigned char baseChan, string name);
@@ -106,18 +110,14 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         void NoteOn(unsigned char chan, unsigned char note, unsigned char velocity);
         void NoteOff(unsigned char chan, unsigned char note);
+        int RunChannelSwitch(int value);
         void SetController(unsigned char chan, int type, short int par);
-        void SetZynControls();
-        void SetEffects(unsigned char category, unsigned char command, unsigned char nFX, unsigned char nType, int nPar, unsigned char value);
-        void SetBankRoot(int rootnum);
-        void SetBank(int banknum);
+        void SetZynControls(bool in_place);
+        int RootBank(int rootnum, int banknum);
+        int SetRBP(CommandBlock *getData, bool notinplace = true);
         int ReadBankRoot(void);
         int ReadBank(void);
-        void SetProgram(unsigned char chan, unsigned short pgm);
-        bool SetProgramToPart(int npart, int pgm, string fname);
         void SetPartChan(unsigned char npart, unsigned char nchan);
-        void SetPartDestination(unsigned char npart, unsigned char dest);
-        void SetPartShift(unsigned char npart, unsigned char shift);
         void SetPartPortamento(int npart, bool state);
         bool ReadPartPortamento(int npart);
         void SetPartKeyMode(int npart, int mode);
@@ -137,7 +137,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void ClearNRPNs(void);
         void resetAll(void);
         float numRandom(void);
-        unsigned int random(void);
+        unsigned int randomSE(void);
         void ShutUp(void);
         void allStop(unsigned int stopType);
         int MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process = 0);
@@ -145,13 +145,15 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void partonoffWrite(int npart, int what);
         char partonoffRead(int npart);
         sem_t partlock;
+        unsigned char legatoPart;
         void setPartMap(int npart);
         void setAllPartMaps(void);
 
+        void SetMuteAndWait(void);
         void Unmute(void);
         void Mute(void);
         void mutewrite(int what);
-        bool isMuted(void) { return muted < 1; }
+        bool isMuted(void);
         sem_t mutelock;
 
         void getLimits(CommandBlock *getData);
@@ -269,9 +271,15 @@ class SynthEngine : private SynthHelper, MiscFuncs
         XMLwrapper *stateXMLtree;
 
         char random_state[256];
+        float random_0_1;
+
+#if (HAVE_RANDOM_R)
         struct random_data random_buf;
         int32_t random_result;
-        float random_0_1;
+#else
+        long int random_result;
+#endif
+
     public:
         MasterUI *guiMaster; // need to read this in InterChange::returns
     private:
@@ -285,7 +293,15 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
 inline float SynthEngine::numRandom(void)
 {
-    if (!random_r(&random_buf, &random_result))
+    int ret;
+#if (HAVE_RANDOM_R)
+    ret = random_r(&random_buf, &random_result);
+#else
+    random_result = random();
+    ret = 0;
+#endif
+
+    if (!ret)
     {
         random_0_1 = (float)random_result / (float)INT_MAX;
         random_0_1 = (random_0_1 > 1.0f) ? 1.0f : random_0_1;
@@ -295,11 +311,16 @@ inline float SynthEngine::numRandom(void)
     return 0.05f;
 }
 
-inline unsigned int SynthEngine::random(void)
+inline unsigned int SynthEngine::randomSE(void)
 {
+#if (HAVE_RANDOM_R)
     if (!random_r(&random_buf, &random_result))
         return random_result + INT_MAX / 2;
     return INT_MAX / 2;
+#else
+    random_result = random();
+    return (unsigned int)random_result + INT_MAX / 2;
+#endif
 }
 
 #endif

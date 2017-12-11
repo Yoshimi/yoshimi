@@ -18,7 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-Modified October 2017
+Modified November 2017
 } {in_source in_header
 }
 
@@ -52,9 +52,12 @@ class ParametersUI {selected
         CloseRecent->hide();
         Loading->show();
         vector<string> listType = *synth->getHistory(H_type);
-        string fle = listType.at(listType.size() - o->value());
+        string fle = listType.at(o->value()-1);
         switch(H_type)
         {
+            case 1:
+            	synth->getGuiMaster()->do_load_instrument(fle);
+            	break;
             case 3:
                 synth->getGuiMaster()->do_load_scale(fle);
                 break;
@@ -105,6 +108,9 @@ class ParametersUI {selected
 
     switch (H_type)
     {
+        case 1:
+            Recent->label("Recent Instruments");
+            break;
         case 3:
             Recent->label("Recent Scales");
             break;
@@ -131,9 +137,9 @@ class ParametersUI {selected
     unsigned int offset = 0;
     if (listType.size() > MAX_HISTORY)
         offset = listType.size() -MAX_HISTORY;
-    for (vector<string>::reverse_iterator itr = listType.rbegin(); itr != listType.rend() - offset; ++itr)
+    for (vector<string>::iterator it = listType.begin(); it != listType.end() - offset; ++it)
     {
-        name = *itr;
+        name = *it;
         name_start = name.rfind("/");
         name_end = name.rfind(".");
         name = name.substr(name_start + 1, name_end - name_start - 1);

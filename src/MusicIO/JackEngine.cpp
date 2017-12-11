@@ -339,7 +339,7 @@ bool JackEngine::connectJackPorts(void)
 int JackEngine::clientId(void)
 {
     if (jackClient)
-        return jack_client_thread_id(jackClient);
+        return long(jack_client_thread_id(jackClient));
     else
         return -1;
 }

@@ -8,8 +8,8 @@ unsigned char   part        (mandatory)
 unsigned char   kit
 unsigned char   engine
 unsigned char   insert
-unsigned char   insert param
-unsigned char   insert par2
+unsigned char   parameter
+unsigned char   par2
 
 string          name - handled via simple message system.
 
@@ -105,8 +105,7 @@ inserts
 
 16  System effect sends
 
-
-insert param
+parameter
     type
         lfo
             0 = Amplitude
@@ -129,5 +128,9 @@ insert param
             for control 37
                 filter sequence position
 
-insert par2
-    used for offsets to some parameters
+If parameter has bit 7 set (0x80) the command will internally divert to low priority thread actions then loop round to update the CLI and GUI.
+
+If bit 6 is also set (0x40) it will first perform the actual command via the audio thread, then loop for updates.
+
+par2
+    used for offsets to some parameters, and for text messge ID numbers

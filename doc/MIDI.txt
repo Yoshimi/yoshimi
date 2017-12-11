@@ -11,6 +11,7 @@ Yoshimi responds to the following messages.
  38: Data LSB
  64: Sustain pedal
  65: Portamento
+ 68: Legato pedal
  71: Filter Q (Sound Timbre)
  74: Filter Cutoff (Brightness)
  75: BandWidth *

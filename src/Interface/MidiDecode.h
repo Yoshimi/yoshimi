@@ -17,6 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+    Modified November 2017
 */
 
 #ifndef MIDIDECODE_H
@@ -38,21 +39,19 @@ class MidiDecode : private MiscFuncs
     public:
         MidiDecode(SynthEngine *_synth);
         ~MidiDecode();
-        void midiProcess(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place);
+        void midiProcess(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place, bool inSync = false);
         void midiReturn(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place = false);
         void setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place = false, bool setRootDir = false);
         void setMidiProgram(unsigned char ch, int prg, bool in_place = false);
 
     private:
-        void setMidiController(unsigned char ch, int ctrl, int param, bool in_place = false);
-        bool nrpnRunVector(unsigned char ch, int ctrl, int param);
+        void setMidiController(unsigned char ch, int ctrl, int param, bool in_place = false, bool inSync = false);
+        void sendMidiCC(bool inSync, unsigned char chan, int type, short int par);
+        bool nrpnDecode(unsigned char ch, int ctrl, int param, bool in_place);
+        bool nrpnRunVector(unsigned char ch, int ctrl, int param, bool inSync);
         void nrpnProcessData(unsigned char chan, int type, int par, bool in_place);
         void nrpnDirectPart(int dHigh, int par);
         void nrpnSetVector(int dHigh, unsigned char chan,  int par);
-
-        //if setBank is false then set RootDir number else current bank number
-        void setMidiNoteOff(unsigned char chan, unsigned char note);
-        void setMidiNote(unsigned char chan, unsigned char note, unsigned char velocity);
 
         SynthEngine *synth;
 };

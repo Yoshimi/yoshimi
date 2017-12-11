@@ -17,7 +17,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-# Modifed October 2017
+# Modifed December 2017
 
 project (Yoshimi)
 cmake_minimum_required (VERSION 3.0)
@@ -29,12 +29,12 @@ endif (POLICY CMP0046)
 set (CMAKE_CXX_STANDARD 11) # we seem to need both for
 add_definitions(-std=gnu++11) # various versions of cmake
 
-#add_definitions(-Wall)
-#add_definitions(-Werror=format-security)
+# vvv
+add_definitions(-Wall)
+add_definitions(-Werror=format-security)
+# ^^^ comment these out on release pushes
 
-# ^^^ comment these two out on release pushes ^^^
-
-set (YOSHIMI_VERSION "1.5.4.1")
+set (YOSHIMI_VERSION "1.5.5")
 
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
@@ -70,6 +70,8 @@ else (HasJackSession)
     set (JackSessionSupport OFF)
 endif (HasJackSession)
 
+option (BuildFor0ld_X86 "Build for legacy x86 system" OFF)
+
 option (BuildForAMD_X86_64 "Build for AMD x86_64 system" OFF)
 option (BuildForCore2_X86_64 "Build for Intel Core2 x86_64 system" OFF)
 option (BuildForNEON "Build for ARM Cortex A9 system" OFF)
@@ -83,13 +85,19 @@ option (LV2Plugin "Build yoshimi lv2 plugin interface" ON)
 option (ShowGuiReports "Enable GUI control reports" OFF)
 option (ShowNoteOnTimes "Report Note-On Times" OFF)
 
-set (BuildOptions_x86_64AMD
-    "-O3 -march=athlon64 -m64 -Wall -ffast-math -fno-finite-math-only -fomit-frame-pointer"
+
+set (BuildOptions_X86
+    "-O3 -msse -msse2 -mfpmath=sse -ffast-math -fomit-frame-pointer"
+    CACHE STRING "basic X86 complier options"
+)
+
+set (BuildOptions_X86_64AMD
+    "-O3 -march=athlon64 -m64 -Wall -msse -msse2 -mfpmath=sse -ffast-math -fno-finite-math-only -fomit-frame-pointer"
   CACHE STRING "X86_64 compiler options"
 )
 
 set (BuildOptions_X86_64Core2
-    "-O3 -march=core2 -m64 -Wall -ffast-math -fno-finite-math-only -fomit-frame-pointer"
+    "-O3 -march=core2 -m64 -Wall -msse -msse2 -mfpmath=sse -ffast-math -fno-finite-math-only -fomit-frame-pointer"
   CACHE STRING "X86_64 compiler options"
 )
 
@@ -99,13 +107,13 @@ set (BuildOptions_NEON
 )
 
 set (BuildOptionsThisCPU
-    "-O3 -march=native -Wall -ffast-math -fno-finite-math-only -fomit-frame-pointer"
+    "-O3 -march=native -Wall -msse -msse2 -mfpmath=sse -ffast-math -fno-finite-math-only -fomit-frame-pointer"
   CACHE STRING "Current CPU compiler options"
 )
 
 set (BuildOptionsBasic
-    "-O3 -msse -msse2 -mfpmath=sse -ffast-math -fomit-frame-pointer"
-    CACHE STRING "basic X86 complier options"
+    "-O3 -ffast-math -fomit-frame-pointer"
+    CACHE STRING "basic compilier options"
 )
 
 set (BuildOptionsDebug
@@ -117,6 +125,40 @@ if (PKG_CONFIG_FOUND)
 else (PKG_CONFIG_FOUND)
     message(FATAL_ERROR "pkg-config required but not found")
 endif (PKG_CONFIG_FOUND)
+
+include (CheckFunctionExists)
+# musl systems don’t have random_r() and also need argp-standalone
+check_function_exists(random_r randomR)
+
+if (randomR)
+    add_definitions(-DHAVE_RANDOM_R)
+endif(randomR)
+
+check_function_exists(exp10f EXP10F)
+
+if(EXP10F)
+    add_definitions(-DHAVE_EXP10F)
+endif(EXP10F)
+
+check_c_source_compiles (
+    "#include <argp.h>
+     int main () {
+         int argc=1;
+         char *argv[]={\"test\"};
+         argp_parse(0,argc,argv,0,0,0);
+         return 0;
+     }" LIBC_HAS_ARGP
+)
+
+if (NOT LIBC_HAS_ARGP)
+    message(STATUS "libc does not have argp")
+    find_library (ARGP_LIB argp REQUIRED)
+    if (ARGP_LIB)
+        message(STATUS "Found libargp")
+    else(ARGP_LIB)
+        message(FATAL_ERROR "libargp required but not found")
+    endif(ARGP_LIB)
+endif(NOT LIBC_HAS_ARGP)
 
 # libz
 set (CMAKE_REQUIRED_LIBRARIES z)
@@ -153,12 +195,18 @@ else (MXML_FOUND)
 endif (MXML_FOUND)
 
 # Alsa
-pkg_check_modules (ALSA REQUIRED alsa>=1.0.17)
-if (ALSA_FOUND)
-    message(STATUS "Found Alsa ${ALSA_VERSION}")
-else (ALSA_FOUND)
-    message(FATAL_ERROR "Alsa >=1.0.17 required but not found")
-endif (ALSA_FOUND)
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+    pkg_check_modules (ALSA REQUIRED alsa>=1.0.17)
+    if (ALSA_FOUND)
+	message(STATUS "Found Alsa ${ALSA_VERSION}")
+    else (ALSA_FOUND)
+	message(FATAL_ERROR "Alsa >=1.0.17 required but not found")
+    endif (ALSA_FOUND)
+    add_definitions(-DHAVE_ALSA)
+    FIND_LIBRARY(LIBDL_LINUX NAMES dl)
+else()
+
+endif()
 
 # Jack
 pkg_check_modules (JACK REQUIRED jack>=0.115.6)
@@ -248,28 +296,30 @@ set (YOSHI_INCLUDES ${FLTK_INCLUDE_DIR})
 
 if (BuildForDebug)
     set (CMAKE_BUILD_TYPE "Debug")
-    set (CMAKE_CXX_FLAGS_DEBUG ${BuildOptionsDebug})
     message (STATUS "Building for ${CMAKE_BUILD_TYPE}, flags: ${CMAKE_CXX_FLAGS_DEBUG}")
 else (BuildForDebug)
     set (CMAKE_BUILD_TYPE "Release")
-    if (BuildForAMD_X86_64)
-        set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_x86_64AMD})
-    else (BuildForAMD_X86_64)
-        if (BuildForCore2_X86_64)
-            set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_X86_64Core2})
-        else (BuildForCore2_X86_64)
-            if (BuildForNEON)
-                set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_NEON})
-            else (BuildForNEON)
-                set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsBasic})
-                if (BuildForThisCPU)
-                    set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsThisCPU})
-                else (BuildForThicCPU)
-                    set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsBasic})
-                endif (BuildForThisCPU)
-            endif (BuildForNEON)
-        endif (BuildForCore2_X86_64)
-    endif (BuildForAMD_X86_64)
+    if (BuildFor0ld_X86)
+        set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_X86})
+    else (BuildFor0ld_X86)
+        if (BuildForAMD_X86_64)
+            set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_X86_64AMD})
+        else (BuildForAMD_X86_64)
+            if (BuildForCore2_X86_64)
+                set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_X86_64Core2})
+            else (BuildForCore2_X86_64)
+                if (BuildForNEON)
+                    set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_NEON})
+                else (BuildForNEON)
+                    if (BuildForThisCPU)
+                        set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsThisCPU})
+                    else (BuildForThisCPU)
+                        set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsBasic})
+                    endif (BuildForThisCPU)
+                endif (BuildForNEON)
+            endif (BuildForCore2_X86_64)
+        endif (BuildForAMD_X86_64)
+    endif (BuildFor0ld_X86)
     message (STATUS "Building for ${CMAKE_BUILD_TYPE}, flags: ${CMAKE_CXX_FLAGS_RELEASE}")
 endif (BuildForDebug)
 
@@ -378,9 +428,10 @@ add_definitions (-DADD_COLOUR=0xdfafbf00)
 add_definitions (-DBASE_COLOUR=0xbfbfbf00)
 add_definitions (-DSUB_COLOUR=0xafcfdf00)
 add_definitions (-DPAD_COLOUR=0xcfdfaf00)
+add_definitions (-DYOSHI_COLOUR=0x0000e100)
 add_definitions (-DNUM_MIDI_PARTS=64)
 add_definitions (-DNUM_MIDI_CHANNELS=16)
-add_definitions (-DMIDI_LEARN_BLOCK=128)
+add_definitions (-DMIDI_LEARN_BLOCK=200)
 add_definitions (-DMAX_ENVELOPE_POINTS=40)
 add_definitions (-DMIN_ENVELOPE_DB=-60)
 add_definitions (-DMAX_RESONANCE_POINTS=256)
@@ -490,12 +541,23 @@ set(ExternLibraries
     ${CURSES_LIBRARIES}
     ${Readline_LIBRARY}
     z
-    dl
+    #dl
+    ${LIBDL_LINUX}
 )
+
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
+    link_directories(/usr/local/lib)
+endif()
 
 add_executable (yoshimi ${ProgSources} main.cpp)
 
 target_link_libraries (yoshimi ${ExternLibraries})
+
+
+
+if (ARGP_LIB)
+    target_link_libraries (yoshimi ${ARGP_LIB})
+endif(ARGP_LIB)
 
 install (TARGETS yoshimi RUNTIME DESTINATION bin)
 

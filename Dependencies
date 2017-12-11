@@ -1,8 +1,8 @@
-Packages known to be needed to build in debian jessie.
+Packages known to be needed to build in debian jessie and later.
 Some of these will pull in other ones.
 
     automake
-    build-essential * we now require C++11
+    build-essential  * we now require C++11
     cmake-curses-gui * 3.0 or later
     dssi-dev
     fluid
@@ -11,12 +11,12 @@ Some of these will pull in other ones.
     libfltk1.3-dev
     libglu1-mesa-dev
     libjack-jackd2-dev
-    libjpeg-dev
+    libjpeg-dev         ? may no longer be needed
     libmxml-dev
     libncurses5-dev
     libreadline-dev
     libxft-dev
-    libxinerama-dev
+    libxinerama-dev     ? may no longer be needed
     libxml2-dev
     pkg-config
     xutils-dev
@@ -29,3 +29,8 @@ Optional alterative instead of libncurses5-dev
     libncursesw5-dev * only needed for wide (unicode) character recognition. Note the 'w'!
 
 Other distros may have slightly different names or version numbers, and may even have these installed by default. If in doubt try looking for just the main part of the name, but with the -dev extension where appropriate.
+
+
+Optional alternative to glibc, part of build-essential
+    musl
+This also requires argp-standalone which is not available from debian and must be built from source.

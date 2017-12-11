@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified September 2017
+    Modified December 2017
 */
 
 #include <sys/mman.h>
@@ -43,7 +43,6 @@ using namespace std;
 
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
-#include <FL/Fl_Shared_Image.H>
 #include <FL/Fl_PNG_Image.H>
 
 #include <readline/readline.h>
@@ -63,6 +62,7 @@ static int globalArgc = 0;
 static char **globalArgv = NULL;
 bool bShowGui = true;
 bool bShowCmdLine = true;
+bool splashSet = true;
 
 
 //Andrew Deryabin: signal handling moved to main from Config Runtime
@@ -90,24 +90,24 @@ void yoshimiSigHandler(int sig)
     }
 }
 
-void splashTimeout(void *splashWin)
+/*void splashTimeout(void *splashWin)
 {
     (static_cast<Fl_Window *>(splashWin))->hide();
-}
+}*/
 
 static void *mainGuiThread(void *arg)
 {
+    Fl::lock();
+
     sem_post((sem_t *)arg);
 
     map<SynthEngine *, MusicClient *>::iterator it;
-    fl_register_images();
 
     const int textHeight = 15;
     const int textY = 10;
     const unsigned char lred = 0xd7;
     const unsigned char lgreen = 0xf7;
     const unsigned char lblue = 0xff;
-    const float timeout = 3.5f;
 
     Fl_PNG_Image pix("splash_screen_png", splashPngData, splashPngLength);
     Fl_Window winSplash(splashWidth, splashHeight, "yoshimi splash screen");
@@ -122,19 +122,14 @@ static void *mainGuiThread(void *arg)
     boxLb.labeltype(FL_NORMAL_LABEL);
     boxLb.labelcolor(fl_rgb_color(lred, lgreen, lblue));
     boxLb.labelfont(FL_HELVETICA | FL_BOLD);
-    // see later!
-    //winSplash.set_modal();
-    //winSplash.clear_border();
     winSplash.border(false);
-    bool splashSet = false;
-    if (bShowGui && firstRuntime->showSplash)
+    int splashLoop = 0;
+    if (splashSet && bShowGui && firstRuntime->showSplash)
     {
-        splashSet = true;
         winSplash.position((Fl::w() - winSplash.w()) / 2, (Fl::h() - winSplash.h()) / 2);
-        winSplash.show();
-        Fl::add_timeout(timeout, splashTimeout, &winSplash);
     }
-
+    else
+        splashSet = false;
     do
     {
             usleep(33333);
@@ -161,8 +156,7 @@ static void *mainGuiThread(void *arg)
                     size_t tmpRoot = _synth->ReadBankRoot();
                     size_t tmpBank = _synth->ReadBank();
                     _synth->getRuntime().loadConfig(); // restore old settings
-                    _synth->SetBankRoot(tmpRoot);
-                    _synth->SetBank(tmpBank); // but keep current root and bank
+                    _synth->RootBank(tmpRoot, tmpBank); // but keep current root and bank
                 }
                 _synth->getRuntime().saveConfig();
                 int tmpID =  _synth->getUniqueId();
@@ -191,15 +185,12 @@ static void *mainGuiThread(void *arg)
                     if (guiMaster)
                     {
 /*
- * this hack is necessary because 'set_non_modal' doesn't work
- * on all WMs, and 'set_modal' stops the user doing anything
- * while the splash is visible
+ * This is necessary because 'set_non_modal' doesn't work on all
+ * WMs, and 'set_modal' freezes the GUI while the splash is visible.
  */
-                        if (i == 0 && splashSet == true)
-                        {
+                        if(splashSet && firstRuntime->showSplash)
                             winSplash.show();
-                            splashSet = false;
-                        }
+
                         guiMaster->Log(_synth->getRuntime().LogList.front());
                         _synth->getRuntime().LogList.pop_front();
                     }
@@ -210,6 +201,16 @@ static void *mainGuiThread(void *arg)
         // where all the action is ...
         if (bShowGui)
         {
+            if (splashSet && firstRuntime->showSplash)
+            {
+                winSplash.show();
+                ++ splashLoop;
+                if (splashLoop > 10000)
+                { // combined with Fl::wait is effectively a timer :)
+                    splashSet = false;
+                    winSplash.hide();
+                }
+            }
             Fl::wait(0.033333);
             GuiThreadMsg::processGuiMessages();
         }
@@ -221,8 +222,7 @@ static void *mainGuiThread(void *arg)
         size_t tmpRoot = firstSynth->ReadBankRoot();
         size_t tmpBank = firstSynth->ReadBank();
         firstSynth->getRuntime().loadConfig(); // restore old settings
-        firstSynth->SetBankRoot(tmpRoot);
-        firstSynth->SetBank(tmpBank); // but keep current root and bank
+        firstSynth->RootBank(tmpRoot, tmpBank); // but keep current root and bank
     }
     firstSynth->getRuntime().saveConfig();
     firstSynth->saveHistory();
@@ -334,9 +334,6 @@ int main(int argc, char *argv[])
     int minVmajor = 1; // need to improve this idea
     int minVminor = 5;
 
-    // moved from mainGuiThread() to prevent leaking from early GuiThreadMessage
-    Fl::lock();
-
     if (!mainCreateNewInstance(0))
     {
         goto bail_out;
@@ -416,8 +413,6 @@ int main(int argc, char *argv[])
     bExitSuccess = true;
 
 bail_out:
-    if (bShowGui && !bExitSuccess) // this could be done better!
-        sleep(2);
     for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
     {
         SynthEngine *_synth = it->first;

@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified October 2017
+    Modified December 2017
 */
 
 #include <iostream>
@@ -45,6 +45,8 @@ using namespace std;
 #include "Synth/Resonance.h"
 #include "Synth/OscilGen.h"
 #include "MasterUI.h"
+
+extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
 
 InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth),
@@ -210,7 +212,7 @@ void *InterChange::sortResultsThread(void)
             if(getData.data.part == 0xd8) // special midi-learn - needs improving
                 synth->midilearn.generalOpps(getData.data.value, getData.data.type, getData.data.control, getData.data.part, getData.data.kit, getData.data.engine, getData.data.insert, getData.data.parameter, getData.data.par2);
             else if ((getData.data.parameter & 0x80) && getData.data.parameter < 0xff)
-                transfertext(&getData);
+                indirectTransfers(&getData);
             else
                 resolveReplies(&getData);
         }
@@ -262,16 +264,19 @@ InterChange::~InterChange()
 }
 
 
-void InterChange::transfertext(CommandBlock *getData)
+void InterChange::indirectTransfers(CommandBlock *getData)
 {
     int value = lrint(getData->data.value);
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
+    unsigned char par2 = getData->data.par2;
     bool (write) = (type & 0x40);
+    bool guiTo = false;
     string text;
     if (getData->data.par2 < 0xff)
         text = miscMsgPop(getData->data.par2);
@@ -281,263 +286,380 @@ void InterChange::transfertext(CommandBlock *getData)
     unsigned char tmp;
     string name;
 
-    if (npart == 192)
+    int switchNum = npart;
+    if (control == 254 && insert !=9)
+        switchNum = 256; // this is a bit hacky :(
+
+    switch(switchNum)
     {
-        switch(control)
+        case 192: // vector
         {
-            case 8:
-                if (write)
-                    synth->getRuntime().vectordata.Name[insert] = text;
-                else
-                    text = synth->getRuntime().vectordata.Name[insert];
-                value = miscMsgPush(text);
-                getData->data.parameter &= 0x7f;
-                break;
+            switch(control)
+            {
+                case 8:
+                    if (write)
+                        synth->getRuntime().vectordata.Name[insert] = text;
+                    else
+                        text = synth->getRuntime().vectordata.Name[insert];
+                    value = miscMsgPush(text);
+                    getData->data.parameter &= 0x7f;
+                    break;
+            }
+            break;
         }
-    }
-    else if (npart == 240)
-    {
-        switch (control)
+        case 217: // program / bank / root
         {
-            case 80:
-                if(synth->loadPatchSetAndUpdate(text))
-                    text = "ed " + text;
-                else
-                    text = " FAILED " + text;
-                value = miscMsgPush(text);
-                getData->data.parameter &= 0x7f;
-                break;
-            case 81: // patch set save
-                if(synth->savePatchesXML(text))
-                    text = "d " + text;
-                else
-                    text = " FAILED " + text;
-                value = miscMsgPush(text);
-                getData->data.parameter &= 0x7f;
-                break;
-            case 84: // vector load
-                tmp = synth->loadVectorAndUpdate(insert, text);
-                if (tmp < 0xff)
+            //cout << " interchange prog " << value << "  chan " << int(kititem) << "  bank " << int(engine) << "  root " << int(insert) << "  named " << int(par2) << endl;
+            if (par2 < 0xff) // was named file not numbered
+                getData->data.par2 = miscMsgPush(text);
+
+            int msgID = synth->SetRBP(getData);
+            if (msgID >= 0x1000)
+                text = "FAILED ";
+            else
+                text = "";
+            text += miscMsgPop(msgID & 0xff);
+            value = miscMsgPush(text);
+            synth->getRuntime().finishedCLI = true; // temp
+            getData->data.parameter &= 0x7f;
+            break;
+        }
+        case 232: // scales
+        {
+            switch(control)
+            {
+                case 32:
+                    text = formatScales(text);
+                    getData->data.parameter &= 0x7f;
+                    value = synth->microtonal.texttotunings(text.c_str());
+                    if (value > 0)
+                        synth->setAllPartMaps();
+                    break;
+                case 33:
+                    text = formatScales(text);
+                    getData->data.parameter &= 0x7f;
+                    value = synth->microtonal.texttomapping(text.c_str());
+                    if (value > 0)
+                        synth->setAllPartMaps();
+                    break;
+
+                case 48:
+                    value = synth->microtonal.loadscl(setExtension(text,"scl"));
+                    if(value > 0)
+                    {
+                        text = "";
+                        char *buf = new char[100];
+                        for (int i = 0; i < value; ++ i)
+                        {
+                            synth->microtonal.tuningtoline(i, buf, 100);
+                            if (i > 0)
+                                text += "\n";
+                            text += string(buf);
+                        }
+                        delete [] buf;
+                    }
+                    getData->data.parameter &= 0x7f;
+                    break;
+                case 49:
+                    value = synth->microtonal.loadkbm(setExtension(text,"kbm"));
+                    if(value > 0)
+                    {
+                        text = "";
+                        int map;
+                        for (int i = 0; i < value; ++ i)
+                        {
+                            if (i > 0)
+                                text += "\n";
+                            map = synth->microtonal.Pmapping[i];
+                            if (map == -1)
+                                text += 'x';
+                            else
+                                text += to_string(map);
+                        }
+                    }
+                    getData->data.parameter &= 0x7f;
+                    break;
+
+                case 64:
+                    synth->microtonal.Pname = text;
+                    getData->data.parameter &= 0x7f;
+                    break;
+                case 65:
+                    synth->microtonal.Pcomment = text;
+                    getData->data.parameter &= 0x7f;
+                    break;
+            }
+            break;
+        }
+        case 240: // main
+        {
+            switch (control)
+            {
+                case 75: // bank instrument save
                 {
-                    getData->data.insert = tmp;
-                    text = "ed " + text + " to chan " + to_string(int(tmp + 1));
+                    if (kititem == 255)
+                    {
+                        kititem = synth->ReadBankRoot();
+                        getData->data.kit = kititem;
+                    }
+
+                    if (engine == 255)
+                    {
+                        engine = synth->ReadBank();
+                        getData->data.engine = engine;
+                    }
+                    if (value >= 64)
+                    {
+                        value = synth->getRuntime().currentPart;
+                    }
+                    //cout << "\n\nRoot " << int(kititem) << "  Bank " << int(engine) << "  Part " << int(value) << "  Slot " << int(insert) << "  Par2 " << int(par2) << " \n\n" << endl;
+                    text = synth->part[value]->Pname + " to " + to_string(int(insert));
+                    if (synth->saveToBankSlot(kititem, engine, insert, value))
+                    {
+                        text = "d " + text;
+                        synth->part[value]->PyoshiType = (synth->getRuntime().instrumentFormat > 1);
+                    }
+                    else
+                        text = "FAILED " + text;
+                    value = miscMsgPush(text);
+                    guiTo = true;
+                    getData->data.parameter &= 0x7f;
+                    break;
                 }
-                else
-                    text = " FAILED " + text;
-                value = miscMsgPush(text);
-                getData->data.parameter &= 0x7f;
-                break;
-            case 85: // vector save
-                tmp = synth->saveVector(insert, text, true);
-                if (tmp == 0xff)
-                    text = "d " + text;
-                else
+                case 79: // named instrument save
                 {
-                    name = miscMsgPop(tmp);
-                    if (name != "FAIL")
-                        text = " " + name;
+                    getData->data.parameter &= 0x7f;
+                    bool ok = true;
+                    int saveType = synth->getRuntime().instrumentFormat;
+
+                    if (saveType & 2) // Yoshimi format
+                        ok = synth->part[value]->saveXML(text, true);
+                    if (ok && (saveType & 1)) // legacy
+                        ok = synth->part[value]->saveXML(text, false);
+
+                    if (ok)
+                    {
+                        synth->addHistory(text, 1);
+                        synth->part[value]->PyoshiType = (saveType & 2);
+                        text = "d " + text;
+                    }
                     else
                         text = " FAILED " + text;
+                    value = miscMsgPush(text);
+                    guiTo = true;
+                    break;
                 }
-                value = miscMsgPush(text);
-                getData->data.parameter &= 0x7f;
-                break;
-            case 88: // scales load
-                if (synth->loadMicrotonal(text))
-                    text = "ed " + text;
-                else
-                    text = " FAILED " + text;
-                value = miscMsgPush(text);
-                getData->data.parameter &= 0x7f;
-                break;
-            case 89: // scales save
-                if (synth->saveMicrotonal(text))
-                    text = "d " + text;
-                else
-                    text = " FAILED " + text;
-                value = miscMsgPush(text);
-                getData->data.parameter &= 0x7f;
-                break;
-            case 92: // state load
-                if (synth->loadStateAndUpdate(text))
-                    text = "ed " + text;
-                else
-                    text = " FAILED " + text;
-                value = miscMsgPush(text);
-                getData->data.parameter &= 0x7f;
-                break;
-            case 93: // state save
-                if (synth->saveState(text))
-                    text = "d " + text;
-                else
-                    text = " FAILED " + text;
-                value = miscMsgPush(text);
-                getData->data.parameter &= 0x7f;
-                break;
-            case 94:
-                synth->partonoffWrite(npart, -1);
-                setpadparams(parameter | (kititem << 8));
-                if (synth->part[parameter & 0x3f]->kit[kititem].padpars->export2wav(text))
-                    text = "d " + text;
-                else
-                    text = " FAILED some samples " + text;
-                value = miscMsgPush(text);
-                getData->data.parameter &= 0x7f;
-                break;
-            case 96: // master reset
-                synth->resetAll();
-                getData->data.parameter &= 0x7f;
-                break;
-        }
-
-    }
-    else if (npart == 232)
-    {
-        switch(control)
-        {
-            case 32:
-                text = formatScales(text);
-                getData->data.parameter &= 0x7f;
-                value = synth->microtonal.texttotunings(text.c_str());
-                if (value > 0)
-                    synth->setAllPartMaps();
-                break;
-            case 33:
-                text = formatScales(text);
-                getData->data.parameter &= 0x7f;
-                value = synth->microtonal.texttomapping(text.c_str());
-                if (value > 0)
-                    synth->setAllPartMaps();
-                break;
-
-            case 48:
-                value = synth->microtonal.loadscl(setExtension(text,"scl"));
-                if(value > 0)
-                {
-                    text = "";
-                    char *buf = new char[100];
-                    for (int i = 0; i < value; ++ i)
-                    {
-                        synth->microtonal.tuningtoline(i, buf, 100);
-                        if (i > 0)
-                            text += "\n";
-                        text += string(buf);
-                    }
-                    delete [] buf;
-                }
-                getData->data.parameter &= 0x7f;
-                break;
-            case 49:
-                value = synth->microtonal.loadkbm(setExtension(text,"kbm"));
-                if(value > 0)
-                {
-                    text = "";
-                    int map;
-                    for (int i = 0; i < value; ++ i)
-                    {
-                        if (i > 0)
-                            text += "\n";
-                        map = synth->microtonal.Pmapping[i];
-                        if (map == -1)
-                            text += 'x';
-                        else
-                            text += to_string(map);
-                    }
-                }
-                getData->data.parameter &= 0x7f;
-                break;
-
-            case 64:
-                synth->microtonal.Pname = text;
-                getData->data.parameter &= 0x7f;
-                break;
-            case 65:
-                synth->microtonal.Pcomment = text;
-                getData->data.parameter &= 0x7f;
-                break;
-        }
-    }
-    else if (npart == 248)
-    {
-        switch (control)
-        {
-            case 32:
-                if (write)
-                {
-                    synth->getRuntime().jackMidiDevice = text;
-                    synth->getRuntime().configChanged = true;
-                }
-                else
-                    text = synth->getRuntime().jackMidiDevice;
-                value = miscMsgPush(text);
-                break;
-            case 34:
-                if (write)
-                {
-                    synth->getRuntime().jackServer = text;
-                    synth->getRuntime().configChanged = true;
-                }
-                else
-                    text = synth->getRuntime().jackServer;
-                value = miscMsgPush(text);
-                break;
-            case 48:
-                if (write)
-                {
-                    synth->getRuntime().alsaMidiDevice = text;
-                    synth->getRuntime().configChanged = true;
-                }
-                else
-                    text = synth->getRuntime().alsaMidiDevice;
-                value = miscMsgPush(text);
-                break;
-            case 50:
-                if (write)
-                {
-                    synth->getRuntime().alsaAudioDevice = text;
-                    synth->getRuntime().configChanged = true;
-                }
-                else
-                    text = synth->getRuntime().alsaAudioDevice;
-                value = miscMsgPush(text);
-                break;
-            case 80: // save config
-                if (write)
-                {
-                    text = synth->getRuntime().ConfigFile;
-                    if(synth->getRuntime().saveConfig())
+                case 80:
+                    if(synth->loadPatchSetAndUpdate(text))
+                        text = "ed " + text;
+                    else
+                        text = " FAILED " + text;
+                    value = miscMsgPush(text);
+                    getData->data.parameter &= 0x7f;
+                    break;
+                case 81: // patch set save
+                    if(synth->savePatchesXML(text))
                         text = "d " + text;
                     else
                         text = " FAILED " + text;
-                }
-                else
-                    text = "READ";
-                value = miscMsgPush(text);
-                getData->data.par2 = miscMsgPush(text); // slightly odd case
-                getData->data.parameter &= 0x7f;
                     value = miscMsgPush(text);
+                    guiTo = true;
+                    getData->data.parameter &= 0x7f;
+                    break;
+                case 84: // vector load
+                    tmp = synth->loadVectorAndUpdate(insert, text);
+                    if (tmp < 0xff)
+                    {
+                        getData->data.insert = tmp;
+                        text = "ed " + text + " to chan " + to_string(int(tmp + 1));
+                    }
+                    else
+                        text = " FAILED " + text;
+                    value = miscMsgPush(text);
+                    getData->data.parameter &= 0x7f;
+                    break;
+                case 85: // vector save
+                {
+                    string oldname = synth->getRuntime().vectordata.Name[insert];
+                    int pos = oldname.find("No Name");
+                    if (pos >=0 && pos < 2)
+                        synth->getRuntime().vectordata.Name[insert] = findleafname(text);
+                    tmp = synth->saveVector(insert, text, true);
+                    if (tmp == 0xff)
+                        text = "d " + text;
+                    else
+                    {
+                        name = miscMsgPop(tmp);
+                        if (name != "FAIL")
+                            text = " " + name;
+                        else
+                            text = " FAILED " + text;
+                    }
+                    value = miscMsgPush(text);
+                    getData->data.parameter &= 0x7f;
+                    break;
+                }
+                case 88: // scales load
+                    if (synth->loadMicrotonal(text))
+                        text = "ed " + text;
+                    else
+                        text = " FAILED " + text;
+                    value = miscMsgPush(text);
+                    getData->data.parameter &= 0x7f;
                 break;
+                case 89: // scales save
+                    if (synth->saveMicrotonal(text))
+                        text = "d " + text;
+                    else
+                        text = " FAILED " + text;
+                    value = miscMsgPush(text);
+                    getData->data.parameter &= 0x7f;
+                    break;
+                case 92: // state load
+                    if (synth->loadStateAndUpdate(text))
+                        text = "ed " + text;
+                    else
+                        text = " FAILED " + text;
+                    value = miscMsgPush(text);
+                    getData->data.parameter &= 0x7f;
+                    break;
+                case 93: // state save
+                    if (synth->saveState(text))
+                        text = "d " + text;
+                    else
+                        text = " FAILED " + text;
+                    value = miscMsgPush(text);
+                    getData->data.parameter &= 0x7f;
+                    break;
+                case 94:
+                    synth->partonoffWrite(npart, -1);
+                    setpadparams(parameter | (kititem << 8));
+                    if (synth->part[parameter & 0x3f]->kit[kititem].padpars->export2wav(text))
+                        text = "d " + text;
+                    else
+                        text = " FAILED some samples " + text;
+                    value = miscMsgPush(text);
+                    getData->data.parameter &= 0x7f;
+                    break;
+                case 96: // master reset
+                    synth->resetAll();
+                    getData->data.parameter &= 0x7f;
+                    break;
+            }
+            break;
         }
-        getData->data.parameter &= 0x7f;
+        case 248: // config
+        {
+            switch (control)
+            {
+                case 32:
+                    if (write)
+                    {
+                        synth->getRuntime().jackMidiDevice = text;
+                        synth->getRuntime().configChanged = true;
+                    }
+                    else
+                        text = synth->getRuntime().jackMidiDevice;
+                    value = miscMsgPush(text);
+                    break;
+                case 34:
+                    if (write)
+                    {
+                        synth->getRuntime().jackServer = text;
+                        synth->getRuntime().configChanged = true;
+                    }
+                    else
+                        text = synth->getRuntime().jackServer;
+                    value = miscMsgPush(text);
+                    break;
+                case 48:
+                    if (write)
+                    {
+                        synth->getRuntime().alsaMidiDevice = text;
+                        synth->getRuntime().configChanged = true;
+                    }
+                    else
+                        text = synth->getRuntime().alsaMidiDevice;
+                    value = miscMsgPush(text);
+                    break;
+                case 50:
+                    if (write)
+                    {
+                        synth->getRuntime().alsaAudioDevice = text;
+                        synth->getRuntime().configChanged = true;
+                    }
+                    else
+                        text = synth->getRuntime().alsaAudioDevice;
+                    value = miscMsgPush(text);
+                    break;
+                case 80: // save config
+                    if (write)
+                    {
+                        text = synth->getRuntime().ConfigFile;
+                        if(synth->getRuntime().saveConfig())
+                            text = "d " + text;
+                        else
+                            text = " FAILED " + text;
+                    }
+                    else
+                        text = "READ";
+                    value = miscMsgPush(text);
+                    getData->data.par2 = miscMsgPush(text); // slightly odd case
+                    getData->data.parameter &= 0x7f;
+                        value = miscMsgPush(text);
+                    break;
+            }
+            if (!(type & 0x20))
+                guiTo = true;
+            getData->data.parameter &= 0x7f;
+            break;
+        }
+        case 256:
+        {
+            value = miscMsgPush(text);
+            getData->data.parameter &= 0x7f;
+            break;
+        }
+        default:
+        {
+            if (npart < 64) // audio destination
+            {
+                switch(control)
+                {
+                    case 120:
+                        if (npart < synth->getRuntime().NumAvailableParts)
+                        {
+                            if (value & 2)
+                                mainRegisterAudioPort(synth, npart);
+                            getData->data.parameter &= 0x7f;
+                        }
+                }
+            }
+            break;
+        }
     }
 
-    if (getData->data.parameter < 0x80 && jack_ringbuffer_write_space(returnsLoopback) >= commandSize)
+    if (getData->data.parameter < 0x80)
     {
+        if (jack_ringbuffer_write_space(returnsLoopback) >= commandSize)
+        {
+            getData->data.value = float(value);
+            if (synth->getRuntime().showGui && write && guiTo)
+                getData->data.par2 = miscMsgPush(text); // pass it on to GUI
 
-        getData->data.value = float(value);
-        if (synth->getRuntime().showGui && write && !((type & 0x20) && npart == 248))
-            getData->data.par2 = miscMsgPush(text); // pass it on to GUI
-
-        jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
-        if (synth->getRuntime().showGui && npart == 232 && control == 48)
-        {   // loading a tuning includes a name!
-            getData->data.control = 64;
-            getData->data.par2 = miscMsgPush(synth->microtonal.Pname);
             jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
-            getData->data.control = 65;
-            getData->data.par2 = miscMsgPush(synth->microtonal.Pcomment);
-            jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
+            if (synth->getRuntime().showGui && npart == 232 && control == 48)
+            {   // loading a tuning includes a name!
+                getData->data.control = 64;
+                getData->data.par2 = miscMsgPush(synth->microtonal.Pname);
+                jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
+                getData->data.control = 65;
+                getData->data.par2 = miscMsgPush(synth->microtonal.Pcomment);
+                jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
+            }
         }
+        else
+            synth->getRuntime().Log("Unable to  write to returnsLoopback buffer");
     }
 }
 
@@ -592,6 +714,14 @@ void InterChange::resolveReplies(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
+    unsigned char insertParam = getData->data.parameter;
+    unsigned char insertPar2 = getData->data.par2;
+    if (control == 0xfe && insertParam != 9) // special case for simple messages
+    {
+        synth->getRuntime().Log(miscMsgPop(lrint(value)));
+        synth->getRuntime().finishedCLI = true;
+        return;
+    }
 
     showValue = true;
 
@@ -607,8 +737,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     char button = type & 3;
     string isValue;
     string commandName;
-    unsigned char insertParam = getData->data.parameter;
-    unsigned char insertPar2 = getData->data.par2;
+
 #ifdef ENABLE_REPORTS
     if ((isGui && !(button & 1)) || (isCli && button == 1))
 #else
@@ -650,7 +779,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
         commandName = resolveMicrotonal(getData);
     else if (npart == 0xf8)
         commandName = resolveConfig(getData);
-    else if (npart == 0xf0)
+    else if (npart == 0xd9 || npart == 0xf0)
         commandName = resolveMain(getData);
 
     else if (npart == 0xf1 || npart == 0xf2)
@@ -793,7 +922,13 @@ void InterChange::resolveReplies(CommandBlock *getData)
     }
     if ((isGui || isCli) && button == 3)
     {
-        synth->midilearn.setTransferBlock(getData, commandName);
+        string toSend;
+        size_t pos = commandName.find(" - ");
+        if (pos < 1 || pos >= commandName.length())
+            toSend = commandName;
+        else
+            toSend = commandName.substr(0, pos);
+        synth->midilearn.setTransferBlock(getData, toSend);
         return;
     }
 
@@ -1074,7 +1209,22 @@ string InterChange::resolveConfig(CommandBlock *getData)
                 contstr += "stdout";
             showValue = false;
             break;
-
+        case 6:
+            contstr = "Saved Instrument Format ";
+            switch (value_int)
+            {
+                case 1:
+                    contstr += "Legacy (.xiz)";
+                    break;
+                case 2:
+                    contstr += "Yoshimi (.xiy)";
+                    break;
+                case 3:
+                    contstr += "Both";
+                    break;
+            }
+            showValue = false;
+            break;
         case 16:
             contstr += "Autoload default state";
             yesno = true;
@@ -1212,6 +1362,11 @@ string InterChange::resolveConfig(CommandBlock *getData)
             yesno = true;
             break;
 
+        case 75:
+            contstr += "Enable NRPN";
+            yesno = true;
+            break;
+
         case 80:
         {
             string name = miscMsgPop(value_int);
@@ -1249,8 +1404,29 @@ string InterChange::resolveMain(CommandBlock *getData)
 {
     int value_int = int(getData->data.value);
     unsigned char control = getData->data.control;
+    unsigned char engine = getData->data.engine;
+//    unsigned char par2 = getData->data.par2;
     string name;
     string contstr = "";
+    if (getData->data.part == 0xd9) // MIDI
+    {
+        switch (control)
+        {
+            case 0:
+            case 1:
+                showValue = false;
+                break;
+            case 2:
+                contstr = "CC " + to_string(int(engine)) + " ";
+                break;
+            case 8:
+                showValue = false;
+                contstr = miscMsgPop(value_int);
+                break;
+        }
+        return contstr;
+    }
+
     switch (control)
     {
         case 0:
@@ -1274,7 +1450,7 @@ string InterChange::resolveMain(CommandBlock *getData)
 
         case 48:
             showValue = false;
-            contstr = "Chan 'solo' Switch ";
+            contstr = "Chan 'solo' Switch - ";
             switch (value_int)
             {
                 case 0:
@@ -1293,6 +1469,16 @@ string InterChange::resolveMain(CommandBlock *getData)
             break;
         case 49:
             contstr = "Chan 'solo' Switch CC";
+            break;
+
+        case 75:
+            showValue = false;
+            contstr = "Bank Slot Save" + miscMsgPop(value_int);
+            break;
+
+        case 79:
+            showValue = false;
+            contstr = "Instrument Save" + miscMsgPop(value_int);
             break;
 
         case 80:
@@ -1375,6 +1561,8 @@ string InterChange::resolvePart(CommandBlock *getData)
     unsigned char effNum = engine;
 
     bool kitType = (insert == 0x20);
+    bool value_bool = value_int > 0;
+    bool yesno = false;
 
     if (control == 255)
         return "Number of parts";
@@ -1430,17 +1618,25 @@ string InterChange::resolvePart(CommandBlock *getData)
             break;
         case 5:
             showValue = false;
-            contstr = "Midi CH " + to_string(value_int + 1);
+            contstr = "Midi CH - " + to_string(value_int + 1);
             if (value_int >= NUM_MIDI_CHANNELS * 2)
                 contstr += " Midi ignored";
             else if (value_int >= NUM_MIDI_CHANNELS)
                 contstr = contstr + " Note off only on CH " + to_string(value_int + 1 - NUM_MIDI_CHANNELS);
             break;
         case 6:
-            contstr = "Mode";
+            showValue = false;
+            contstr = "Mode - ";
+            if (value_int == 0)
+                contstr += "Poly";
+            else if (value_int == 1)
+                contstr += "Mono";
+            else if (value_int >= 2)
+                contstr += "Legato";
             break;
         case 7:
             contstr = "Portamento Enable";
+            yesno = true;
             break;
         case 8:
             contstr = "Enable";
@@ -1640,6 +1836,14 @@ string InterChange::resolvePart(CommandBlock *getData)
 
     }
 
+    if (yesno)
+    {
+        if (value_bool)
+            contstr += " - yes";
+        else
+            contstr += " - no";
+        showValue = false;
+    }
     return ("Part " + to_string(npart + 1) + kitnum + name + contstr);
 }
 
@@ -2935,6 +3139,12 @@ string InterChange::resolveEffects(CommandBlock *getData)
             contstr = " Unrecognised";
     }
 
+    if (kititem != 0x87 && control == 16)
+    {
+        contstr = " Preset " + to_string (lrint(value) + 1);
+        showValue = false;
+    }
+
     return (name + effname + contstr);
 }
 
@@ -3064,9 +3274,7 @@ void InterChange::returnsDirect(int altData)
 
 void InterChange::returns(CommandBlock *getData)
 {
-//    float value = getData->data.value;
     unsigned char type = getData->data.type | 4; // back from synth
-//    unsigned char npart = getData->data.part;
 
     if (type == 0xff)
         return;
@@ -3080,17 +3288,21 @@ void InterChange::returns(CommandBlock *getData)
     bool isCliOrGuiRedraw = type & 0x10; // separated out for clarity
     bool isMidi = type & 8;
     bool write = (type & 0x40) > 0;
-
     bool isOKtoRedraw = (isCliOrGuiRedraw && write) || isMidi;
 
     if (synth->guiMaster && isOKtoRedraw)
     {
+        //cout << "writing to GUI" << endl;
         if (jack_ringbuffer_write_space(toGUI) >= commandSize)
             jack_ringbuffer_write(toGUI, (char*) getData->bytes, commandSize);
+        else
+            synth->getRuntime().Log("Unable to write to toGUI buffer");
     }
 
     if (jack_ringbuffer_write_space(toCLI) >= commandSize)
         jack_ringbuffer_write(toCLI, (char*) getData->bytes, commandSize);
+    else
+        synth->getRuntime().Log("Unable to write to toCLI buffer");
 }
 
 
@@ -3130,10 +3342,16 @@ bool InterChange::commandSend(CommandBlock *getData)
 
 bool InterChange::commandSendReal(CommandBlock *getData)
 {
+    unsigned char npart = getData->data.part;
+    if (npart == 0xD9) // music input takes priority!
+    {
+        commandMidi(getData);
+        return false;
+    }
     float value = getData->data.value;
     unsigned char parameter = getData->data.parameter;
     if ((parameter & 0x80) && parameter < 0xc0)
-        return true; // text message transfer
+        return true; // indirect transfer
     if (value == FLT_MAX)
     {
         returnLimits(getData); // this can be accessed directly
@@ -3142,7 +3360,6 @@ bool InterChange::commandSendReal(CommandBlock *getData)
 
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
@@ -3323,20 +3540,55 @@ bool InterChange::commandSendReal(CommandBlock *getData)
 }
 
 
+void InterChange::commandMidi(CommandBlock *getData)
+{
+    int value_int = lrint(getData->data.value);
+    unsigned char control = getData->data.control;
+    unsigned char chan = getData->data.kit;
+    unsigned int char1 = getData->data.engine;
+    //unsigned char char2 = getData->data.insert;
+    //unsigned char parameter = getData->data.parameter;
+    unsigned char par2 = getData->data.par2;
+
+    //cout << "value " << value_int << "  control " << int(control) << "  chan " << int(chan) << "  char1 " << char1 << "  char2 " << int(char2) << "  param " << int(parameter) << "  par2 " << int(par2) << endl;
+
+    if (control == 2 && char1 >= 0x80)
+        char1 |= 0x200; // for 'specials'
+
+    switch(control)
+    {
+        case 0:
+            synth->NoteOn(chan, char1, value_int);
+            synth->getRuntime().finishedCLI = true;
+            getData->data.type = 0xff; // till we know what to do!
+            break;
+        case 1:
+            synth->NoteOff(chan, char1);
+            synth->getRuntime().finishedCLI = true;
+            getData->data.type = 0xff; // till we know what to do!
+            break;
+        case 2:
+            //cout << "Midi controller ch " << to_string(int(chan)) << "  type " << to_string(int(char1)) << "  val " << to_string(value_int) << endl;
+            synth->SetController(chan, char1, value_int);
+            break;
+
+        case 8: // Program / Bank / Root
+            getData->data.parameter = 0x80;
+            if ((value_int < 0xff || par2 < 0xff) && chan < synth->getRuntime().NumAvailableParts)
+            {
+                synth->partonoffLock(chan & 0x3f, -1);
+                synth->getRuntime().finishedCLI = true;
+            }
+            break;
+    }
+}
+
 void InterChange::commandVector(CommandBlock *getData)
 {
-/*
- * Currently only CLI gets here apart from
- * load and save which are also handled by the GUI
- */
-
     int value = getData->data.value; // no floats here
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned int chan = getData->data.insert;
-    unsigned int bank = getData->data.kit;
-    unsigned int root = getData->data.engine;
-
     bool write = (type & 0x40) > 0;
     unsigned int features;
 
@@ -3363,18 +3615,12 @@ void InterChange::commandVector(CommandBlock *getData)
             synth->getRuntime().vectordata.Enabled[ch] = false;
             synth->getRuntime().vectordata.Name[ch] = "No Name " + to_string(ch);
         }
+        synth->setLastfileAdded(5, "");
         return;
     }
     if (write)
     {
-        if (control == 17 || control == 18 || control == 33 || control == 34)
-        {
-            if (root < 0x80)
-                synth->writeRBP(1, root, 0);
-            if (bank < 0x80)
-                synth->writeRBP(2, bank, 0);
-        }
-        else if (control >= 19 && control <= 22)
+        if (control >= 19 && control <= 22)
             features = synth->getRuntime().vectordata.Xfeatures[chan];
         else if (control >= 35 && control <= 38)
             features = synth->getRuntime().vectordata.Yfeatures[chan];
@@ -3390,11 +3636,7 @@ void InterChange::commandVector(CommandBlock *getData)
                 switch (value)
                 {
                     case 0:
-                        //synth->partonoffWrite(chan, 0);
-                        break;
                     case 1:
-                        //synth->partonoffWrite(chan, 1);
-                        break;
                     case 2:  // local to source
                         break;
                     case 3:
@@ -3410,32 +3652,35 @@ void InterChange::commandVector(CommandBlock *getData)
 
         case 8:
             break; // handled elsewhere
-        case 16:
+
+        case 16: // enable vector and set X CC
             if (write)
             {
                 if (value >= 14)
                 {
                     if (!synth->vectorInit(0, chan, value))
                         synth->vectorSet(0, chan, value);
+                    else
+                        getData->data.value = 0;
                 }
             }
             else
                 ;
             break;
-        case 17:
+        case 17: // left instrument
             if (write)
                 synth->vectorSet(4, chan, value);
             else
                 ;
             break;
-        case 18:
+        case 18: // right instrument
             if (write)
                 synth->vectorSet(5, chan, value);
             else
                 ;
             break;
         case 19:
-        case 35:
+        case 35: // volume feature
             if (write)
                 if (value == 0)
                     bitClear(features, 0);
@@ -3445,7 +3690,7 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             break;
         case 20:
-        case 36:
+        case 36: // panning feature
             if (write)
             {
                 bitClear(features, 1);
@@ -3461,7 +3706,7 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             break;
         case 21:
-        case 37:
+        case 37: // filter cutoff feature
             if (write)
             {
                 bitClear(features, 2);
@@ -3477,7 +3722,7 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             break;
         case 22:
-        case 38:
+        case 38: // modulation feature
             if (write)
             {
                 bitClear(features, 3);
@@ -3493,25 +3738,27 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             break;
 
-        case 32:
+        case 32: // enable Y and set CC
             if (write)
             {
                 if (value >= 14)
                 {
                     if (!synth->vectorInit(1, chan, value))
                         synth->vectorSet(1, chan, value);
+                    else
+                        getData->data.value = 0;
                 }
             }
             else
                 ;
             break;
-        case 33:
+        case 33: // up instrument
             if (write)
                 synth->vectorSet(6, chan, value);
             else
                 ;
             break;
-        case 34:
+        case 34: // down instrument
             if (write)
                 synth->vectorSet(7, chan, value);
             else
@@ -3703,6 +3950,12 @@ void InterChange::commandConfig(CommandBlock *getData)
                  synth->getRuntime().toConsole = value_bool;
             else
                 value = synth->getRuntime().toConsole;
+            break;
+        case 6:
+            if (write)
+                 synth->getRuntime().instrumentFormat = value_int;
+            else
+                value = synth->getRuntime().instrumentFormat;
             break;
 // switches
         case 16:
@@ -3931,6 +4184,12 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = synth->getRuntime().showLearnedCC;
             break;
+        case 75:
+            if (write)
+                synth->getRuntime().enable_NRPN = value_bool;
+            else
+                value = synth->getRuntime().enable_NRPN;
+            break;
 // save config
         case 80: //done elsewhere
             break;
@@ -3970,7 +4229,7 @@ void InterChange::commandMain(CommandBlock *getData)
 
         case 14:
             if (write)
-                synth->getRuntime().currentPart = value;
+                synth->getRuntime().currentPart = value_int;
             else
                 value = synth->getRuntime().currentPart;
             break;
@@ -3999,7 +4258,10 @@ void InterChange::commandMain(CommandBlock *getData)
             {
                 synth->getRuntime().channelSwitchType = value;
                 if (value == 0)
+                {
                     synth->getRuntime().channelSwitchCC = 128;
+                    synth->getRuntime().channelSwitchValue = 0;
+                }
             }
             else
                 value = synth->getRuntime().channelSwitchType;
@@ -4015,17 +4277,26 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
 
         case 74: // load instrument from ID
+            /*
+             * this is the lazy way to move all program changes
+             * to the new MIDI method.
+             */
             synth->partonoffLock(value_int, -1);
-            if (par2 < 128)
-                synth->writeRBP(3, value_int | 0x80, par2);
-            else
-                synth->writeRBP(4, value_int | 0x80, par2 - 128);
-            getData->data.type = 0xff; // stop further action
+            getData->data.control = 8;
+            getData->data.part = 0xd9;
+            getData->data.kit = value_int;
+            getData->data.value = par2;
+            getData->data.parameter = 0x80;
+            getData->data.par2 = 0xff;
             break;
         case 78: // load named instrument
             synth->partonoffLock(value_int & 0x3f, -1);
-            synth->writeRBP(5, value_int & 0x3f, par2);
-            getData->data.type = 0xff; // stop further action
+            // as above for named instruments :)
+            getData->data.control = 8;
+            getData->data.part = 0xd9;
+            getData->data.kit = value_int & 0x3f;
+            getData->data.value = 0xff;
+            getData->data.parameter = 0x80;
             break;
 
         case 80: // load patchset
@@ -4061,7 +4332,6 @@ void InterChange::commandMain(CommandBlock *getData)
         case 96: // master reset
             if (write && (parameter == 0xc0))
             {
-                synth->getRuntime().lastPatchSet = -1;
                 synth->allStop(2 | (type << 24));
                 getData->data.type = 0xff; // stop further action);
             }
@@ -4069,6 +4339,11 @@ void InterChange::commandMain(CommandBlock *getData)
         case 128: // just stop
             if (write)
                 synth->allStop(1);
+            break;
+
+        case 254:
+            synth->Mute();
+            getData->data.type = 0xff; // stop further action);
             break;
     }
 
@@ -4133,7 +4408,7 @@ void InterChange::commandPart(CommandBlock *getData)
             if (write)
                 synth->SetPartKeyMode(npart, value_int);
             else
-                value = synth->ReadPartKeyMode(npart);
+                value = (synth->ReadPartKeyMode(npart)) & 3; // clear out temporary legato
             break;
         case 7:
             if (write)
@@ -4393,6 +4668,7 @@ void InterChange::commandPart(CommandBlock *getData)
         case 57:
             if (write)
             {
+                part->legatoFading = 0;
                 part->Pdrummode = value_bool;
                 synth->setPartMap(npart);
             }
@@ -4420,6 +4696,7 @@ void InterChange::commandPart(CommandBlock *getData)
 
         case 64: // local to source
             break;
+
         case 65:
             if (write)
                 part->partefx[effNum]->changeeffect(value_int);
@@ -4454,7 +4731,11 @@ void InterChange::commandPart(CommandBlock *getData)
                 return;
             }
             else if (write)
-                synth->SetPartDestination(npart, int(value));
+            {
+                if (npart < synth->getRuntime().NumAvailableParts)
+                    synth->part[npart]->Paudiodest = value_int;
+                getData->data.parameter = 0x80;
+            }
             else
                 value = part->Paudiodest;
             break;
@@ -4643,12 +4924,7 @@ void InterChange::commandPart(CommandBlock *getData)
             }
         case 224:
             if (write)
-            {
                 part->SetController(0x79,0); // C_resetallcontrollers
-                if (type & 0x20)
-                    getData->data.type = ((type & 0xcf) | 0x10);
-                    // fudge so that gui updates *after* changes
-            }
             break;
     }
 
@@ -6194,10 +6470,6 @@ void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
 
 void InterChange::commandFilter(CommandBlock *getData)
 {
-//#pragma message "Gui writes changed to reads"
-//    if (getData->data.type & 0x20)
-//        getData->data.type = getData->data.type & 0xbf;
-
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
@@ -6465,10 +6737,6 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
 
 void InterChange::commandEnvelope(CommandBlock *getData)
 {
-//#pragma message "Gui writes changed to reads"
-//    if (getData->data.type & 0x20)
-//        getData->data.type = getData->data.type & 0xbf;
-
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
@@ -6780,7 +7048,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
     {
         switch (control)
         {
-            case 0:
+            case 0: // only relevant to GUI
                 break;
             case 1:
                 if (write)
@@ -6825,10 +7093,6 @@ void InterChange::commandSysIns(CommandBlock *getData)
 
 void InterChange::commandEffects(CommandBlock *getData)
 {
-//#pragma message "Gui writes changed to reads"
-//    if (getData->data.type & 0x20)
-//        getData->data.type = getData->data.type & 0xbf;
-
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;

@@ -17,8 +17,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-Modified September 2017
-} {selected in_source in_header
+Modified November 2017
+} {in_source in_header
 }
 
 decl {using namespace std;} {public local
@@ -42,7 +42,7 @@ decl {\#include "BankUI.h"} {public local
 decl {\#include "ParametersUI.h"} {public local
 }
 
-class VectorUI {: {private MiscFuncs}
+class VectorUI {selected : {private MiscFuncs}
 } {
   Function {make_window(void)} {} {
     Fl_Window vectorwindow {
@@ -122,7 +122,6 @@ class VectorUI {: {private MiscFuncs}
         MenuItem {} {
           label {Clear Chan}
           callback {//
-          clearVector(BaseChan);
           send_data(96, 0, 0xf0, 192, 255, 255, BaseChan);}
           xywh {30 30 34 20} labelsize 12
         }
@@ -186,8 +185,7 @@ class VectorUI {: {private MiscFuncs}
               bitClear(Xf, 0);
           else
               bitSet(Xf, 0);
-          synth->getRuntime().vectordata.Xfeatures[BaseChan] = Xf;
-          //send_data(19, o->value(), 0xc0);}
+          send_data(19, o->value(), 0xc0);}
           xywh {208 53 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
           MenuItem {} {
@@ -210,8 +208,7 @@ class VectorUI {: {private MiscFuncs}
               if (o->value() == 2)
                   bitSet(Xf, 4);
           }
-          synth->getRuntime().vectordata.Xfeatures[BaseChan] = Xf;
-          //send_data(20, o->value(), 0xc0);}
+          send_data(20, o->value(), 0xc0);}
           xywh {302 53 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
           MenuItem {} {
@@ -238,8 +235,7 @@ class VectorUI {: {private MiscFuncs}
               if (o->value() == 2)
                   bitSet(Xf, 5);
           }
-          synth->getRuntime().vectordata.Xfeatures[BaseChan] = Xf;
-          //send_data(21, o->value(), 0xc0);}
+          send_data(21, o->value(), 0xc0);}
           xywh {208 115 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
           MenuItem {} {
@@ -266,8 +262,7 @@ class VectorUI {: {private MiscFuncs}
               if (o->value() == 2)
                   bitSet(Xf, 6);
           }
-          synth->getRuntime().vectordata.Xfeatures[BaseChan] = Xf;
-          //send_data(22, o->value(), 0xc0);}
+          send_data(22, o->value(), 0xc0);}
           xywh {302 115 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
           MenuItem {} {
@@ -290,32 +285,25 @@ class VectorUI {: {private MiscFuncs}
         int tmp = o->value();
         if (Xcc < 14 && tmp < 14)
             tmp = 14;
-        else if (tmp < 14)
-            tmp = 0;
 
         if (tmp < 14)
         {
+            Xcc = 0;
             send_data(96, 0, 0xf0, 192, 255, 255, BaseChan);
+            o->value(0);
+            return;
         }
-        else
+
+        string name = synth->getRuntime().masterCCtest(tmp);
+        if (name != "")
         {
-            if (!synth->vectorInit(0, BaseChan, tmp))
-                synth->vectorSet(0, BaseChan, tmp);
-            Xgroup->activate();
-            if (synth->getGuiMaster()->partmax < 32)
-                synth->getGuiMaster()->partmax = 32;
-            if (Ycc >= 14)
-            {
-            Ygroup->activate();
-            synth->getGuiMaster()->partmax = 64;
-            }
-            Ycontrol->activate();
-            Ycontrol->redraw();
+            errorlabel("CC " + to_string(tmp) +" in use for " + name);
+            return;
         }
+
         Xcc =  tmp;
         o->value(tmp);
-        o->redraw();
-        //send_data(16, o->value(), 0xc0);}
+        send_data(16, o->value(), 0xd0);}
         tooltip {The MIDI CC this axis reponds to} xywh {110 85 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12
         code0 {//
         o->value(Xcc);}
@@ -379,8 +367,7 @@ class VectorUI {: {private MiscFuncs}
               bitClear(Yf, 0);
           else
               bitSet(Yf, 0);
-          synth->getRuntime().vectordata.Yfeatures[BaseChan] = Yf;
-          //send_data(35, o->value(), 0xc0);}
+          send_data(35, o->value(), 0xc0);}
           xywh {208 163 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
           MenuItem {} {
@@ -403,8 +390,7 @@ class VectorUI {: {private MiscFuncs}
               if (o->value() == 2)
                   bitSet(Yf, 4);
           }
-          synth->getRuntime().vectordata.Yfeatures[BaseChan] = Yf;
-          //send_data(36, o->value(), 0xc0);}
+          send_data(36, o->value(), 0xc0);}
           xywh {302 163 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
           MenuItem {} {
@@ -431,8 +417,7 @@ class VectorUI {: {private MiscFuncs}
               if (o->value() == 2)
                   bitSet(Yf, 5);
           }
-          synth->getRuntime().vectordata.Yfeatures[BaseChan] = Yf;
-          //send_data(37, o->value(), 0xc0);}
+          send_data(37, o->value(), 0xc0);}
           xywh {208 225 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
           MenuItem {} {
@@ -459,8 +444,7 @@ class VectorUI {: {private MiscFuncs}
               if (o->value() == 2)
                   bitSet(Yf, 6);
           }
-          synth->getRuntime().vectordata.Yfeatures[BaseChan] = Yf;
-          //send_data(38, o->value(), 0xc0);}
+          send_data(38, o->value(), 0xc0);}
           xywh {302 225 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
           MenuItem {} {
@@ -483,25 +467,25 @@ class VectorUI {: {private MiscFuncs}
         int tmp = o->value();
         if (Ycc < 14 && tmp < 14)
             tmp = 14;
-        else if (tmp < 14)
-            tmp = 0;
 
         if (tmp < 14)
         {
-            synth->getRuntime().vectordata.Yaxis[BaseChan] = 0xff;
-            Ygroup->deactivate();
+            Ycc = 0;
+            send_data(32, 0xff, 0xd0);
+            o->value(0);
+            return;
         }
-        else
+
+        string name = synth->getRuntime().masterCCtest(tmp);
+        if (name != "")
         {
-            if (!synth->vectorInit(1, BaseChan, tmp))
-                synth->vectorSet(1, BaseChan, tmp);
-            Ygroup->activate();
-            synth->getGuiMaster()->partmax = 64;
+            errorlabel("CC " + to_string(tmp) +" in use for " + name);
+            return;
         }
+
         Ycc =  tmp;
         o->value(tmp);
-        o->redraw();
-        //send_data(32, o->value(), 0xc0);}
+        send_data(32, o->value(), 0xd0);}
         tooltip {The MIDI CC this axis reponds to} xywh {110 195 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12 deactivate
         code0 {o->value(Ycc);}
       }
@@ -514,7 +498,6 @@ class VectorUI {: {private MiscFuncs}
         {
             o->copy_label(tmp);
             loadlabel[BaseChan]  = string(tmp);
-            synth->getRuntime().vectordata.Name[BaseChan] = string(tmp);
             send_data(8, 0, 0xc0, 192, 255, 255, BaseChan, 128, miscMsgPush(string(tmp)));
         }}
         tooltip {Last saved or loaded vector file - click to change} xywh {45 265 198 20} box THIN_DOWN_BOX labelfont 1 labelsize 12
@@ -531,13 +514,11 @@ class VectorUI {: {private MiscFuncs}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
-    //float value = getData->data.value;
-    //bool isGui = (getData->data.type & 0x20);
+    float value = getData->data.value;
     unsigned char control = getData->data.control;
     unsigned char insert = getData->data.insert;
     unsigned char par2 = getData->data.par2;
-    //int value_int = lrint(value);
-    //bool value_bool = (value > 0.5f);
+    int value_int = lrint(value);
     string msg;
 
     switch (control)
@@ -546,6 +527,78 @@ class VectorUI {: {private MiscFuncs}
             msg = miscMsgPop(par2);;
             loadlabel[insert] = msg;
             Loaded->copy_label(msg.c_str());
+            break;
+
+        case 16:
+            if (synth->getGuiMaster()->partmax < NUM_MIDI_CHANNELS * 2)
+            {
+                synth->getGuiMaster()->maxparts->value(NUM_MIDI_CHANNELS * 2);
+                synth->getGuiMaster()->partmax = NUM_MIDI_CHANNELS * 2;
+                synth->getGuiMaster()->Panelsmallgroups->show();
+            }
+            if (value_int < 14 || value_int > 119)
+            {
+                Ycontrol->value(0);
+                Ycc = 0;
+                Ygroup->deactivate();
+                Ycontrol->deactivate();
+                Xgroup->deactivate();
+                Xcontrol->value(0);
+                Xcc= 0;
+            }
+            else
+            {
+                Xgroup->activate();
+                Ycontrol->activate();
+                Xcontrol->value(value_int);
+            }
+            break;
+
+        case 19:
+            Xfeat1->value(value_int);
+            break;
+        case 20:
+            Xfeat2->value(value_int);
+            break;
+        case 21:
+            Xfeat3->value(value_int);
+            break;
+        case 22:
+            Xfeat4->value(value_int);
+            break;
+
+        case 32:
+            if (synth->getGuiMaster()->partmax < NUM_MIDI_CHANNELS * 4)
+            {
+                synth->getGuiMaster()->maxparts->value(NUM_MIDI_CHANNELS * 4);
+                synth->getGuiMaster()->partmax = NUM_MIDI_CHANNELS * 4;
+                synth->getGuiMaster()->Panelsmallgroups->hide();
+                synth->getGuiMaster()->Panelgroups->show();
+            }
+            if (value_int < 14 || value_int > 119)
+            {
+                Ygroup->deactivate();
+                Ycontrol->value(0);
+                Ycc = 0;
+            }
+            else
+            {
+                Ygroup->activate();
+                Ycontrol->value(value_int);
+            }
+            break;
+
+        case 35:
+            Yfeat1->value(value_int);
+            break;
+        case 36:
+            Yfeat2->value(value_int);
+            break;
+        case 37:
+            Yfeat3->value(value_int);
+            break;
+        case 38:
+            Yfeat4->value(value_int);
             break;
 
         case 96:
@@ -706,7 +759,7 @@ class VectorUI {: {private MiscFuncs}
         Yfeat4->value(1);
     else
         Yfeat4->value(0);} {}
-    }
+  }
   Function {setInstrumentLabel(int npart)} {} {
     code {//
     if ((npart & 0xf) != BaseChan)
@@ -809,8 +862,11 @@ class VectorUI {: {private MiscFuncs}
     code {//
     if (fname == "")
     {
+        string lastname = synth->lastItemSeen(5);
+        if (lastname == "")
+            lastname = synth->getRuntime().userHome;
         char *filename;
-        filename = fl_file_chooser("Open:", "({*.xvy})", NULL, 0);
+        filename = fl_file_chooser("Open:", "({*.xvy})", lastname.c_str(), 0);
         if (filename == NULL)
             return;
         fname = string(filename);
@@ -819,48 +875,61 @@ class VectorUI {: {private MiscFuncs}
   }
   Function {saveVector()} {} {
     code {//
+    string lastname = synth->getLastfileAdded(5);
+    if (lastname == "")
+        lastname = synth->getRuntime().userHome;
     const char *file = NULL;
-    file = fl_file_chooser("Save:", "({*.xvy})", NULL, 0);
+    file = fl_file_chooser("Save:", "({*.xvy})", lastname.c_str(), 0);
     if (file == NULL)
         return;
 
-    string candidate;
-    string oldname = loadlabel[BaseChan];
-    int pos = oldname.find("No Name");
     string filename = setExtension(string(file), "xvy");
     if (isRegFile(filename))
         if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
             return;
+    int pos = loadlabel[BaseChan].find("No Name");
     if (pos >=0 && pos < 2)
-    {
-        candidate = findleafname(filename);
-        loadlabel[BaseChan] = candidate;
-        Loaded->copy_label(candidate.c_str());
-        synth->getRuntime().vectordata.Name[BaseChan] = candidate;
-    }
-    send_data(85, 0, 0xf0, 240, 255, 255, BaseChan, 128, miscMsgPush(filename));} {}
+        Loaded->copy_label(findleafname(filename).c_str());
+    send_data(85, 0, 0xc0, 240, 255, 255, BaseChan, 128, miscMsgPush(filename));} {}
   }
   Function {clearVector(int BaseC)} {} {
     code {//
-    loadlabel[BaseC] = "No Name " + to_string(BaseC + 1);
-    Loaded->copy_label(loadlabel[BaseC].c_str());
-    setbuttons();
-    Xcontrol->activate();
-    Xcontrol->damage();
-    Ycontrol->deactivate();
-    Ycontrol->damage();
-    /*
+    int min = 0;
+    int max = NUM_MIDI_CHANNELS;
+    if(BaseC < NUM_MIDI_CHANNELS)
     {
-    if (BaseC < NUM_MIDI_CHANNELS)
-    {
-    //    send_data(96, BaseC, 0xf0, 192);
-        ;
+        min = BaseC;
+        max = BaseC + 1;
     }
-    else
+    for (int i = min; i < max; ++i)
     {
-    //    send_data(96, 255, 0xf0, 192);
-        ;
-    }} {}*/} {}
+        loadlabel[i] = "No Name " + to_string(i + 1);
+        Loaded->copy_label(loadlabel[i].c_str());
+     }
+     if (BaseC >= NUM_MIDI_CHANNELS)
+     {
+         BaseChan = 0;
+         setInstrumentLabel(0);
+         setInstrumentLabel(NUM_MIDI_CHANNELS);
+         setInstrumentLabel(NUM_MIDI_CHANNELS * 2);
+         setInstrumentLabel(NUM_MIDI_CHANNELS * 3);
+     }
+
+     Xcc = 0;
+     Xf = 0;
+     Xgroup->deactivate();
+     Xcontrol->value(0);
+     Ycc = 0;
+     Yf = 0;
+     Ygroup->deactivate();
+     Ycontrol->deactivate();
+     Ycontrol->value(0);} {}
+  }
+  Function {errorlabel(string msg)} {} {
+    code {//
+            synth->getGuiMaster()->midilearnui->words->copy_label(msg.c_str());
+            synth->getGuiMaster()->midilearnui->message->show();
+            synth->getGuiMaster()->midilearnui->message->position(Fl::event_x_root() + 16, Fl::event_y_root());} {}
   }
   decl {SynthEngine *synth;} {private local
   }

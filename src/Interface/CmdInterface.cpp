@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified September 2017
+    Modified December 2017
 */
 
 #include <iostream>
@@ -102,6 +102,7 @@ string configlist [] = {
     "Virtual <n>",              "keyboard (0 = QWERTY, 1 = Dvorak, 2 = QWERTZ, 3 = AZERTY)",
     "Xml <n>",                  "compression (0-9)",
     "REports [s]",              "destination (Stdout, other = console)",
+    "SAved [s]",                "Saved instrument type (Legacy {.xiz}, Yoshimi {.xiy}, Both)",
 
     "STate [s]",                "* autoload default at start (Enable {other})",
     "Hide [s]",                 "non-fatal errors (Enable {other})",
@@ -127,6 +128,7 @@ string configlist [] = {
     "ACtivate [s]",             "program change activates part (Enable {other})",
     "Extended [s]",             "extended program change (Enable {other})",
     "Quiet [s]",                "ignore 'reset all controllers' (Enable {other})",
+    "Nrpn [s]",                 "incoming NRPN (Enable {other})",
     "Log [s]",                  "incoming MIDI CCs (Enable {other})",
     "SHow [s]",                 "GUI MIDI learn editor (Enable {other})",
     "end"
@@ -455,7 +457,7 @@ bool CmdInterface::helpList(unsigned int local)
 void CmdInterface::historyList(int listnum)
 {
     list<string>msg;
-    int start = 2;
+    int start = 1;
     int end = 6;
     bool found = false;
 
@@ -472,6 +474,9 @@ void CmdInterface::historyList(int listnum)
             msg.push_back(" ");
             switch (type)
             {
+                case 1:
+                    msg.push_back("Recent Instruments:");
+                    break;
                 case 2:
                     msg.push_back("Recent Patch Sets:");
                     break;
@@ -585,46 +590,29 @@ int CmdInterface::effects()
     Config &Runtime = synth->getRuntime();
     int reply = done_msg;
     int nFXavail;
-    int category;
-    int par;
+    int par = nFX;
     int value;
     string dest = "";
     bool flag;
 
-    nFXpreset = 0; // changing effect always sets the default preset.
-
     if (bitTest(level, part_lev))
     {
         nFXavail = NUM_PART_EFX;
+        nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
     }
     else if (bitTest(level, ins_fx))
     {
         nFXavail = NUM_INS_EFX;
+        nFXtype = synth->insefx[nFX]->geteffect();
     }
     else
     {
         nFXavail = NUM_SYS_EFX;
+        nFXtype = synth->sysefx[nFX]->geteffect();
     }
 
     if (point[0] == 0)
-    {
-        if (bitTest(level, part_lev))
-        {
-            synth->SetEffects(2, 1, nFX, nFXtype, 0, 0);
-        }
-        else if (bitTest(level, ins_fx))
-        {
-            synth->SetEffects(1, 1, nFX, nFXtype, 0, 0);
-        }
-        else
-        {
-            synth->SetEffects(0, 1, nFX, nFXtype, 0, 0);
-        }
-
-        if (isRead)
-            Runtime.Log("Current efx number is " + asString(nFX + 1));
         return done_msg;
-    }
 
     value = string2int(point);
     if (value > 0)
@@ -635,22 +623,22 @@ int CmdInterface::effects()
             return range_msg;
 
         if (value != nFX)
-        { // dummy 'SetEffects' calls to update GUI
+        { // calls to update GUI
             nFX = value;
             if (bitTest(level, part_lev))
             {
                 nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
-                synth->SetEffects(0, 2, nFX, nFXtype, 0, 0);
+                sendDirect(nFXtype, 64, 65, npart, 255, nFX);
             }
             else if (bitTest(level, ins_fx))
             {
                 nFXtype = synth->insefx[nFX]->geteffect();
-                synth->SetEffects(0, 1, nFX, nFXtype, 0, 0);
+                sendDirect(nFXtype, 64, 1, 242, 255, nFX);
             }
             else
             {
                 nFXtype = synth->sysefx[nFX]->geteffect();
-                synth->SetEffects(0, 0, nFX, nFXtype, 0, 0);
+                sendDirect(nFXtype, 64, 1, 241, 255, nFX);
             }
         }
         if (point[0] == 0)
@@ -680,19 +668,18 @@ int CmdInterface::effects()
         }
         if (flag)
             return unrecognised_msg;
-
+        nFXpreset = 0; // always set this on type change
         Runtime.Log("efx type set to " + fx_list[nFXtype]);
         //Runtime.Log("Presets -" + fx_presets[nFXtype].substr(fx_presets[nFXtype].find(',') + 1));
         if (bitTest(level, part_lev))
-            category = 2;
+            sendDirect(nFXtype, 64, 65, npart, 255, nFX);
         else if (bitTest(level, ins_fx))
-            category = 1;
+            sendDirect(nFXtype, 64, 1, 242, 255, nFX);
         else
-            category = 0;
-        synth->SetEffects(category, 1, nFX, nFXtype, 0, 0);
-
+            sendDirect(nFXtype, 64, 1, 241, 255, nFX);
         return done_msg;
     }
+
     else if (matchnMove(2, point, "send"))
     {
         if (point[0] == 0)
@@ -702,56 +689,68 @@ int CmdInterface::effects()
         {
             if (matchnMove(1, point, "master"))
             {
-                par = -2;
+                value = -2;
                 dest = "master";
             }
             else if (matchnMove(1, point, "off"))
             {
-                par = -1;
+                value = -1;
                 dest = "off";
             }
             else
             {
-                par = string2int(point) - 1;
-                if (par >= Runtime.NumAvailableParts || par < 0)
+                value = string2int(point) - 1;
+                if (value >= Runtime.NumAvailableParts || value < 0)
                     return range_msg;
-                dest = "part " + asString(par + 1);
+                dest = "part " + asString(value + 1);
                 // done this way in case there is rubbish on the end
             }
-            value = 0;
         }
         else
         {
-
             par = string2int(point) - 1;
             point = skipChars(point);
             if (point[0] == 0)
                 return value_msg;
             value = string2int127(point);
         }
+
+        int control;
+        int partno;
+        int engine = nFX;
+        int insert = 0xff;
+
         if (bitTest(level, part_lev))
         {
-            category = 2;
+            partno = npart;
+            control = 40 + par;
+            engine = 0xff;
+
             dest = "part " + asString(npart + 1) + " efx sent to system "
                  + asString(par + 1) + " at " + asString(value);
         }
         else if (bitTest(level, ins_fx))
         {
-            category = 1;
+            partno = 242;
+            control = 2;
             dest = "insert efx " + asString(nFX + 1) + " sent to " + dest;
         }
         else
         {
             if (par <= nFX)
                 return range_msg;
-            category = 0;
+            partno = 241;
+            control = par;
+            engine = nFX;
+            insert = 16;
             dest = "system efx " + asString(nFX + 1) + " sent to "
                  + asString(par + 1) + " at " + asString(value);
         }
-
-        synth->SetEffects(category, 4, nFX, nFXtype, par, value);
+        sendDirect(value, 64, control, partno, 255, engine, insert);
         Runtime.Log(dest);
+        return done_msg;
     }
+
     else if (matchnMove(3, point, "preset"))
     {
         /*
@@ -761,30 +760,31 @@ int CmdInterface::effects()
          * However, all of this should really be in src/Effects
          * not here *and* in the gui code!
          */
+        int partno;
         par = string2int(fx_presets [nFXtype].substr(0, fx_presets [nFXtype].find(',')));
         if (par == 1)
             return available_msg;
         value = string2int127(point) - 1;
         if (value >= par || value < 0)
             return range_msg;
+        nFXpreset = value;
         if (bitTest(level, part_lev))
         {
-            category = 2;
+            partno = npart;
             dest = "part " + asString(npart + 1);
         }
         else if (bitTest(level, ins_fx))
         {
-            category = 1;
+            partno = 242;
             dest = "insert";
         }
         else
         {
-            category = 0;
+            partno = 241;
             dest = "system";
         }
-        nFXpreset = value;
-        synth->SetEffects(category, 8, nFX, nFXtype, 0, nFXpreset);
-        Runtime.Log(dest + " efx preset set to number " + asString(nFXpreset + 1));
+        sendDirect(nFXpreset, 64, 16, partno, 128 + nFXtype, nFX);
+        Runtime.Log(dest + " efx preset set to number " + asString(value + 1));
     }
     return reply;
 }
@@ -895,21 +895,20 @@ int CmdInterface::commandList()
     else if (matchnMove(2, point, "mlearn"))
     {
         if (point[0] == '@')
-            {
-                point += 1;
-                point = skipSpace(point);
-                tmp = string2int(point);
-                if (tmp > 0)
-                    synth->SetSystemValue(107, -(tmp - 1));
-                    /*
-                    * we use negative values to detail a single line
-                    * because positive ones are used for bulk line count
-                    */
-                else
-                    reply = value_msg;
-            }
+        {
+            point += 1;
+            point = skipSpace(point);
+            tmp = string2int(point);
+            if (tmp > 0)
+                synth->midilearn.listLine(tmp - 1);
+            else
+                reply = value_msg;
+        }
         else
-            synth->SetSystemValue(107, LINES);
+        {
+            synth->midilearn.listAll(msg);
+            synth->cliOutput(msg, LINES);
+        }
     }
 
     else if (matchnMove(1, point, "tuning"))
@@ -922,6 +921,8 @@ int CmdInterface::commandList()
         reply = done_msg;
         if (point[0] == 0)
             historyList(0);
+        else if (matchnMove(1, point, "instruments") || matchnMove(2, point, "program") )
+            historyList(1);
         else if (matchnMove(1, point, "patchsets"))
             historyList(2);
         else if (matchnMove(2, point, "scales"))
@@ -1076,6 +1077,7 @@ int CmdInterface::commandVector()
             Runtime.Log("No vector on channel " + asString(chan + 1));
         return done_msg;
     }
+
     unsigned char ch = string2int127(point);
     if (ch > 0)
     {
@@ -1094,7 +1096,7 @@ int CmdInterface::commandVector()
 
     if (matchWord(1, point, "off"))
     {
-        synth->vectorSet(127, chan, 0);
+        sendDirect(0, 64, 96, 192, 255, 255, chan);
         axis = 0;
         bitClear(level, vect_lev);
         return done_msg;
@@ -1110,6 +1112,7 @@ int CmdInterface::commandVector()
         }
         axis = 1;
     }
+
     if (point[0] == 0)
         return done_msg;
 
@@ -1119,12 +1122,19 @@ int CmdInterface::commandVector()
             return value_msg;
 
         tmp = string2int(point);
-        if (!synth->vectorInit(axis, chan, tmp))
-            synth->vectorSet(axis, chan, tmp);
-        if(Runtime.vectordata.Enabled[chan])
+        if (axis == 0)
+        {
+            sendDirect(tmp, 192, 16, 192, 255, 255, chan);
             bitSet(level, vect_lev);
-        return done_msg;
+            return done_msg;
+        }
+        if (Runtime.vectordata.Enabled[chan])
+        {
+            sendDirect(tmp, 192, 32, 192, 255, 255, chan);
+            return done_msg;
+        }
     }
+
     if (!Runtime.vectordata.Enabled[chan])
     {
         Runtime.Log("Vector X CC must be set first");
@@ -1152,45 +1162,25 @@ int CmdInterface::commandVector()
         sendDirect(0, type, 8, 0xc0, 0xff, 0xff, chan, 0x80, miscMsgPush(name));
         return done_msg;
     }
+
     if (matchnMove(1, point, "features"))
     {
-        unsigned int vecfeat;
         if (point[0] == 0)
-            reply = value_msg;
-        else
-        {
-            if (axis == 0)
-                vecfeat = Runtime.vectordata.Xfeatures[chan];
-            else
-                vecfeat = Runtime.vectordata.Yfeatures[chan];
-            tmp = string2int(point);
-            if (tmp < 1 || tmp > 4)
-                return range_msg;
-            point = skipChars(point);
-            if (matchnMove(1, point, "enable"))
-            {
-                bitSet(vecfeat, tmp - 1);
-                if (tmp > 1) // volume is not reversible
-                    bitClear(vecfeat, (tmp + 2)); // disable reverse
-            }
-            else if(matchnMove(1, point, "reverse"))
-            {
-                bitSet(vecfeat, tmp - 1);
-                if (tmp > 1)
-                    bitSet(vecfeat, (tmp + 2));
-            }
-            else
-            {
-                bitClear(vecfeat, tmp - 1);
-                if (tmp > 1)
-                    bitClear(vecfeat, (tmp + 2));
-            }
-            if (!synth->vectorInit(axis + 2, chan, vecfeat))
-                synth->vectorSet(axis + 2, chan, vecfeat);
-            reply = done_msg;
-        }
+            return value_msg;
+        int feat = string2int(point);
+        if (feat < 1 || feat > 4)
+            return range_msg;
+        point = skipChars(point);
+        int enable = 0;
+        if (matchnMove(1, point, "enable"))
+            enable = 1;
+        else if (feat > 1 && matchnMove(1, point, "reverse"))
+            enable = 2;
+        sendDirect(enable, 192, 18 + (axis * 16) + feat , 192, 255, 255, chan);
+        return done_msg;
     }
-    else if (matchnMove(2, point, "program") || matchnMove(1, point, "instrument"))
+
+    if (matchnMove(2, point, "program") || matchnMove(1, point, "instrument"))
     {
         int hand = point[0] | 32;
         point = skipChars(point); // in case they type the entire word
@@ -1206,30 +1196,31 @@ int CmdInterface::commandVector()
         else
             return opp_msg;
         tmp = string2int(point);
-        if (!synth->vectorInit(axis * 2 + hand + 4, chan, tmp))
-            synth->vectorSet(axis * 2 + hand + 4, chan, tmp);
-        reply = done_msg;
+        sendDirect(tmp, 64, 17 + hand + (axis * 16), 192, 255, 255, chan);
+        return done_msg;
     }
-    else
+
+    // this disabled for now - needs a lot of work.
+    /*if (!matchnMove(1, point, "control"))
+        return opp_msg;
+    if(isdigit(point[0]))
     {
-        if (!matchnMove(1, point, "control"))
-            return opp_msg;
-        if(isdigit(point[0]))
+        int cmd = string2int(point);
+        if (cmd < 2 || cmd > 4)
+            return range_msg;
+        point = skipChars(point);
+        if (point[0] == 0)
+            return value_msg;
+        tmp = string2int(point);
+        if (!synth->vectorInit(axis * 3 + cmd + 6, chan, tmp))
         {
-            int cmd = string2int(point);
-            if (cmd < 2 || cmd > 4)
-                return range_msg;
-            point = skipChars(point);
-            if (point[0] == 0)
-                return value_msg;
-            tmp = string2int(point);
-            if (!synth->vectorInit(axis * 3 + cmd + 6, chan, tmp))
             synth->vectorSet(axis * 3 + cmd + 6, chan, tmp);
             reply = done_msg;
         }
         else
             reply = value_msg;
-    }
+    }*/
+
     return reply;
 }
 
@@ -1289,6 +1280,18 @@ int CmdInterface::commandConfig()
     {
         command = 5;
         value = !matchnMove(1, point, "stdout");
+    }
+    else if (matchnMove(2, point, "saved"))
+    {
+        command = 6;
+        if (matchnMove(1, point, "legacy"))
+            value = 1;
+        else if (matchnMove(1, point, "yoshimi"))
+            value = 2;
+        else if (matchnMove(1, point, "both"))
+            value = 3;
+        else if (!isRead)
+            return value_msg;
     }
 
     else if (matchnMove(2, point, "state"))
@@ -1496,6 +1499,11 @@ int CmdInterface::commandConfig()
         command = 74;
         value = matchnMove(1, point, "enable");
     }
+    else if (matchnMove(1, point, "nrpn"))
+    {
+        command = 75;
+        value = matchnMove(1, point, "enable");
+    }
 
     else
         return todo_msg; // may be picked up later
@@ -1628,7 +1636,6 @@ int CmdInterface::commandPart(bool justSet)
     Config &Runtime = synth->getRuntime();
     int reply = todo_msg;
     int tmp;
-    bool partFlag = false;
     bool changed = false;
     npart = Runtime.currentPart; // belt and braces
     if (point[0] == 0)
@@ -1704,10 +1711,6 @@ int CmdInterface::commandPart(bool justSet)
             if (tmp < 0 || tmp > 159)
                 return range_msg;
             sendDirect(npart, 64, 74, 240, 255, 255, 255, 255, tmp);
-            //if (tmp < 128)
-                //synth->writeRBP(3, npart | 0x80, tmp); // lower set
-            //else
-                //synth->writeRBP(4, npart | 0x80, tmp - 128); // upper set
             reply = done_msg;
         }
         else
@@ -1719,16 +1722,10 @@ int CmdInterface::commandPart(bool justSet)
         if(!isRead && tmp < 1)
             return value_msg;
         tmp -= 1;
+        int type = 64;
         if (isRead)
-            tmp = synth->part[npart]->Prcvchn;
-        else
-            synth->SetPartChan(npart, tmp);
-        string name = "";
-        if (tmp >= NUM_MIDI_CHANNELS * 2)
-            name = " (no MIDI)";
-        else if (tmp >= NUM_MIDI_CHANNELS)
-            name = " (" + asString((tmp % NUM_MIDI_CHANNELS) + 1) + " note off only)";
-        Runtime.Log("Part " + asString(npart + 1) + " set to channel " + asString(tmp + 1) + name, isRead);
+            type = 0;
+        sendDirect(tmp, type, 5, npart);
         reply = done_msg;
     }
     else if (matchnMove(1, point, "destination"))
@@ -1762,8 +1759,7 @@ int CmdInterface::commandPart(bool justSet)
             dest = 3;
         if (dest > 0)
         {
-            synth->partonoffWrite(npart, 1);
-            synth->SetPartDestination(npart, dest);
+            sendDirect(dest, 64, 120, npart, 255, 255, 255, 192);
             reply = done_msg;
         }
         else
@@ -1771,128 +1767,83 @@ int CmdInterface::commandPart(bool justSet)
     }
     else if (matchnMove(1, point, "note"))
     {
-        string name = "Note limit set to ";
-        if (isRead)
+        int type = 0;
+        int value = 0;
+        if(!isRead)
         {
-            Runtime.Log(name + asString((int)synth->part[npart]->Pkeylimit), 1);
-            return done_msg;
+            if (point[0] == 0)
+                return value_msg;
+            type = 64;
+            value = string2int(point);
+            if (value < 1 || (value > POLIPHONY - 20))
+                return range_msg;
         }
-        if (point[0] == 0)
-            return value_msg;
-        tmp = string2int(point);
-        if (tmp < 1 || (tmp > POLIPHONY - 20))
-            return range_msg;
-        else
-        {
-            synth->part[npart]->setkeylimit(tmp);
-            Runtime.Log(name + asString(tmp));
-            partFlag = true;
-        }
-        reply = done_msg;
+        sendDirect(value, type, 33, npart);
+        return done_msg;
     }
     else if (matchnMove(2, point, "min"))
     {
-        string name = "Min key set to ";
-        if (isRead)
+        int type = 0;
+        int value = 0;
+        if(!isRead)
         {
-            Runtime.Log(name + asString((int)synth->part[npart]->Pminkey));
-            return done_msg;
+            if (point[0] == 0)
+                return value_msg;
+            type = 64;
+            value = string2int127(point);
+            if (value > synth->part[npart]->Pmaxkey)
+                return high_msg;
         }
-        if (point[0] == 0)
-            return value_msg;
-        tmp = string2int127(point);
-        if (tmp > synth->part[npart]->Pmaxkey)
-            return high_msg;
-        else
-        {
-            synth->part[npart]->Pminkey = tmp;
-            Runtime.Log(name + asString(tmp));
-            partFlag = true;
-        }
-        reply = done_msg;
+        sendDirect(value, type, 16, npart);
+        return done_msg;
     }
     else if (matchnMove(2, point, "max"))
     {
-        string name = "Max key set to ";
-        if (isRead)
+        int type = 0;
+        int value = 0;
+        if(!isRead)
         {
-            Runtime.Log(name + asString((int)synth->part[npart]->Pmaxkey), 1);
-            return done_msg;
+            if (point[0] == 0)
+                return value_msg;
+            type = 64;
+            value = string2int127(point);
+            if (value < synth->part[npart]->Pminkey)
+                return low_msg;
         }
-       if (point[0] == 0)
-            return value_msg;
-        tmp = string2int127(point);
-        if (tmp < synth->part[npart]->Pminkey)
-            return low_msg;
-        else
-        {
-            synth->part[npart]->Pmaxkey = tmp;
-            Runtime.Log(name + asString(tmp));
-            partFlag = true;
-        }
-        reply = done_msg;
+        sendDirect(value, type, 17, npart);
+        return done_msg;
     }
     else if (matchnMove(1, point, "mode"))
     {
-        if (isRead)
+        int type = 0;
+        int value = 0;
+        if(!isRead)
         {
-            string name;
-            tmp = synth->ReadPartKeyMode(npart);
-            switch (tmp)
-            {
-                case 2:
-                    name = "'legato'";
-                    break;
-                case 1:
-                    name = "'mono'";
-                    break;
-                case 0:
-                default:
-                    name = "'poly'";
-                    break;
-            }
-            Runtime.Log("Key mode set to " + name, 1);
-            return done_msg;
+            type = 64;
+            if (matchnMove(1, point, "poly"))
+                value = 0;
+            else if (matchnMove(1, point, "mono"))
+                value = 1;
+            else if (matchnMove(1, point, "legato"))
+                value = 2;
+            else
+                return name_msg;
         }
-        if (point[0] == 0)
-            return value_msg;
-        if (matchnMove(1, point, "poly"))
-             synth->SetPartKeyMode(npart, 0);
-        else if (matchnMove(1, point, "mono"))
-            synth->SetPartKeyMode(npart, 1);
-        else if (matchnMove(1, point, "legato"))
-            synth->SetPartKeyMode(npart, 2);
-        else
-            return value_msg;
-        partFlag = true;
-        reply = done_msg;
+        sendDirect(value, type, 6, npart);
+        return done_msg;
     }
     else if (matchnMove(2, point, "portamento"))
     {
-        if (isRead)
+        int type = 0;
+        int value = 0;
+        if(!isRead)
         {
-            string name = "Portamento ";
-            if (synth->ReadPartPortamento(npart))
-                name += "enabled";
-            else
-                name += "disabled";
-            Runtime.Log(name, 1);
-            return done_msg;
+            type = 64;
+            if (matchnMove(1, point, "enable"))
+                value = 1;
         }
-        if (point[0] == 0)
-            return value_msg;
-        if (matchnMove(1, point, "enable"))
-        {
-           synth->SetPartPortamento(npart, 1);
-           Runtime.Log("Portamento enabled", isRead);
-        }
-        else
-        {
-           synth->SetPartPortamento(npart, 0);
-           Runtime.Log("Portamento disabled");
-        }
-        reply = done_msg;
-        partFlag = true;
+        sendDirect(value, type, 7, npart);
+        return done_msg;
     }
     else if (matchnMove(2, point, "name"))
     {
@@ -1919,8 +1870,6 @@ int CmdInterface::commandPart(bool justSet)
     }
     else
         reply = opp_msg;
-    if (partFlag)
-        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePart, 0);
     return reply;
 }
 
@@ -2039,7 +1988,7 @@ int CmdInterface::commandReadnSet()
         }
         if (point[0] != 0)
         {
-            synth->SetBankRoot(string2int(point));
+            sendDirect(255, 64, 8, 217, 0, 255, string2int(point), 192);
             return done_msg;
         }
         else
@@ -2055,7 +2004,7 @@ int CmdInterface::commandReadnSet()
         }
         if (point[0] != 0)
         {
-            synth->SetBank(string2int(point));
+            sendDirect(255, 64, 8, 217, 0, string2int(point), 255, 192);
             return done_msg;
         }
         else
@@ -2600,12 +2549,48 @@ bool CmdInterface::cmdIfaceProcessCommand()
         }
         else if (matchnMove(1, point, "instrument"))
         {
+            bool ok = true;
             if (point[0] == 0)
+            {
+                ok = false;
                 reply = name_msg;
+            }
             else
-                sendDirect(npart, 64, 78, 240, 255, 255, 255, 255, miscMsgPush((string) point));
-                //synth->writeRBP(5, npart, miscMsgPush((string) point));
-            reply = done_msg;
+            {
+                string name;
+                if (point[0] == '@')
+                {
+                    point += 1;
+                    point = skipSpace(point);
+                    tmp = string2int(point);
+                    if (tmp <= 0)
+                    {
+                        ok = false;
+                        reply = value_msg;
+                    }
+                    name = historySelect(1, tmp - 1);
+                    if (name == "")
+                    {
+                        ok = false;
+                        reply = done_msg;
+                    }
+                }
+                else
+                {
+                    name = (string)point;
+                    cout << name << endl;
+                    if (name == "")
+                    {
+                        ok = false;
+                        reply = name_msg;
+                    }
+                }
+                if (ok)
+                {
+                    sendDirect(npart, 64, 78, 240, 255, 255, 255, 255, miscMsgPush(name));
+                    reply = done_msg;
+                }
+            }
         }
         else
         {
@@ -2687,12 +2672,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = name_msg;
             else
             {
-                replyString = setExtension((string) point, "xiz");
-                tmp = synth->part[npart]->saveXML(replyString);
-                if (tmp)
-                    Runtime.Log("Saved part " + asString(npart + 1) + "  instrument " + (string) synth->part[npart]->Pname + "  as " +replyString);
-                else
-                    Runtime.Log("Failed to save " + replyString);
+                sendDirect(npart, 64, 79, 0xf0, 0xff, 0xff, 0xff, 0x80, miscMsgPush(string(point)));
                 reply = done_msg;
             }
         }
@@ -2748,12 +2728,11 @@ bool CmdInterface::cmdIfaceProcessCommand()
                     {
                         param = string2int(point);
                         point = skipChars(point);
-                        if (((control == 80 || control == 88) && part == 240) || ((param & 0x80) && param < 0xff))
+                        if (((control == 80 || control == 88) && part == 240) || ((param & 0x80) && param < 0xff && insert != 9))
                         {
                             string name = string(point);
-                            if (name < "!")
-                                name = "no file";
-                            par2 = miscMsgPush(name);
+                            if (name > "!")
+                                par2 = miscMsgPush(name);
                             //cout << name << endl;
                         }
                         else if (point[0] != 0)
@@ -2846,6 +2825,8 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
         synth->getRuntime().finishedCLI = false;
         jack_ringbuffer_write(synth->interchange.fromCLI, (char*) putData.bytes, commandSize);
     }
+    else
+        synth->getRuntime().Log("Unable to write to fromCLI buffer");
     return 0; // no function for this yet
 }
 

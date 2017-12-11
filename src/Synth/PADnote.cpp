@@ -562,6 +562,7 @@ int PADnote::noteout(float *outl,float *outr)
                 Legato.decounter--;
                 if (Legato.decounter < 1)
                 {
+                    synth->part[synth->legatoPart]->legatoFading &= 3;
                     // Catching-up done, we can finally set
                     // the note to the actual parameters.
                     Legato.decounter = -10;
