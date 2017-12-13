@@ -1,5 +1,10 @@
 yoshimi 1.5.5 M
 
+2017-12-13 Will
+* BugFix: argp return still wrong for HURD :(
+  Tried casting the return int to error_t instead.
+* Applied better resolution of splash timeout.
+
 2017-12-12 Will
 * Bugfix: argp return type was error_t should be int
 * Bugfix: Missing #include <cmath> in WaveShapeSamples.h
