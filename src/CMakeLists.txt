@@ -34,7 +34,7 @@ add_definitions(-Wall)
 add_definitions(-Werror=format-security)
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "1.5.5")
+set (YOSHIMI_VERSION "1.5.5 M")
 
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
@@ -142,6 +142,7 @@ endif(EXP10F)
 
 check_c_source_compiles (
     "#include <argp.h>
+    #include <stdlib.h>
      int main () {
          int argc=1;
          char *argv[]={\"test\"};

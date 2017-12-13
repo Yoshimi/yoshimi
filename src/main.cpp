@@ -90,11 +90,6 @@ void yoshimiSigHandler(int sig)
     }
 }
 
-/*void splashTimeout(void *splashWin)
-{
-    (static_cast<Fl_Window *>(splashWin))->hide();
-}*/
-
 static void *mainGuiThread(void *arg)
 {
     Fl::lock();
@@ -183,15 +178,7 @@ static void *mainGuiThread(void *arg)
                 {
                     MasterUI *guiMaster = _synth->getGuiMaster(false);
                     if (guiMaster)
-                    {
-/*
- * This is necessary because 'set_non_modal' doesn't work on all
- * WMs, and 'set_modal' freezes the GUI while the splash is visible.
- */
-                        if(splashSet && firstRuntime->showSplash)
-                            winSplash.show();
-
-                        guiMaster->Log(_synth->getRuntime().LogList.front());
+                    { guiMaster->Log(_synth->getRuntime().LogList.front());
                         _synth->getRuntime().LogList.pop_front();
                     }
                 }
@@ -205,8 +192,9 @@ static void *mainGuiThread(void *arg)
             {
                 winSplash.show();
                 ++ splashLoop;
-                if (splashLoop > 10000)
-                { // combined with Fl::wait is effectively a timer :)
+                usleep(5000);
+                if (splashLoop > 200)
+                {
                     splashSet = false;
                     winSplash.hide();
                 }

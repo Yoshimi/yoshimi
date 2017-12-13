@@ -1,4 +1,10 @@
-yoshimi 1.5.5
+yoshimi 1.5.5 M
+
+2017-12-12 Will
+* Bugfix: argp return type was error_t should be int
+* Bugfix: Missing #include <cmath> in WaveShapeSamples.h
+* Bugfix: Missing #include <stdlib.h> in CmakeLists.txt
+* Possible resolution of splash screen problem.
 
 2017-12-11 Will
 * Set max MIDI-learn lines to 200.

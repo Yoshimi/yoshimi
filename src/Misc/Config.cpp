@@ -1089,7 +1089,7 @@ LinuxSampler src/common/Features.cpp, licensed thus -
 **/
 
 
-static error_t parse_cmds (int key, char *arg, struct argp_state *state)
+static int parse_cmds (int key, char *arg, struct argp_state *state)
 {
     Config *settings = (Config*)state->input;
     if (arg && arg[0] == 0x3d)
