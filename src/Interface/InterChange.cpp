@@ -357,6 +357,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                             text += string(buf);
                         }
                         delete [] buf;
+                        guiTo = true;
                     }
                     getData->data.parameter &= 0x7f;
                     break;
@@ -376,6 +377,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                             else
                                 text += to_string(map);
                         }
+                        guiTo = true;
                     }
                     getData->data.parameter &= 0x7f;
                     break;

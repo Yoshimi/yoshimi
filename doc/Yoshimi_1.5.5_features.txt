@@ -1,7 +1,7 @@
 V 1.5.5 - Mistle Thrush
 A seasonal bird. Not particularly colourful, but tough and dependable under difficult conditions.
 
-Some users wanted a way to store the Controllers settings with an instrument. These can make quite a dramatic difference to the sound. There is now a superset of instruments that can be saved instead of, or as well as, the standard ones. On loading, Yoshimi will look for the extended version first. This applies to instruments in banks as well as externally saved ones. If you have an extended type loaded the instrument name will be a mid-blue instead of black. This is refleced in the stored instruments in bank slots.
+Some users wanted a way to store the Controllers settings with an instrument. These can make quite a dramatic difference to the sound. There is now a superset of instruments that can be saved instead of, or as well as, the standard ones. On loading, Yoshimi will look for the extended version first. This applies to instruments in banks as well as externally saved ones. If you have an extended type loaded the instrument name will be a mid-blue instead of black. This is reflected in the stored instruments in bank slots.
 
 From now on any improvements we make to instrument patches will be applied in full to the extended version, and as much as is viable (in a compatible form) to the standard ones. Under no circumstances will we change standard patch format. There are many hundreds of these in the wild, and musicians may have their own reasons for preferring them (and older versions of the synth).
 
@@ -33,7 +33,7 @@ When first implemented MIDI-learn was limited conservatively to 128 lines. With 
 The CLI has had attention too. A few more controls have been enabled, and the existing ones smartened up and made more consistent. As an aside, there is a new experimental branch with an interface that *only* works via the CLI - not ready for prime time yet.
 
 
-Yoshimi can now run happily with jack on BSD systems.
+Yoshimi can now run happily with jack on some BSD systems.
 
 
 Techie bits.

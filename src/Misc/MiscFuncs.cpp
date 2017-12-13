@@ -17,8 +17,10 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>
 
-    Modifed October 2017
+    Modifed December 2017
 */
+
+//#define REPORT_MISCMSG
 
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -429,7 +431,9 @@ int MiscFuncs::miscMsgPush(string _text)
         if ( *it == "")
         {
             *it = text;
-            //cout << "Msg In " << int(idx) << " >" << text << "<" << endl;
+#ifdef REPORT_MISCMSG
+            cout << "Msg In " << int(idx) << " >" << text << "<" << endl;
+#endif
             break;
         }
         ++ it;
@@ -461,7 +465,9 @@ string MiscFuncs::miscMsgPop(int _pos)
     {
         if (idx == pos)
         {
-            //cout << "Msg Out " << int(idx) << " >" << *it << "<" << endl;
+#ifdef REPORT_MISCMSG
+            cout << "Msg Out " << int(idx) << " >" << *it << "<" << endl;
+#endif
             break;
         }
         ++ it;
