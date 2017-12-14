@@ -165,6 +165,7 @@ endif(NOT LIBC_HAS_ARGP)
 set (CMAKE_REQUIRED_LIBRARIES z)
 check_c_source_compiles (
     "#include <zlib.h>
+     #include <stdlib.h>
      int main(int argc, char **argv) {
          gzFile zzz  = gzopen(\"/dev/null\", \"rb\");
          if (NULL != zzz)
