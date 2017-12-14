@@ -1,5 +1,10 @@
 yoshimi 1.5.5 M
 
+2017-12-14 Will
+* Merged in BSD bugfixes from Tobias
+* Changed source location of user manual.
+  Separate lines in CMake no longer needed.
+
 2017-12-13 Will
 * BugFix: argp return still wrong for HURD :(
   Tried casting the return int to error_t instead.

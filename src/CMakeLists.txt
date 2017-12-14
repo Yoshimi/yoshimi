@@ -606,8 +606,6 @@ install (DIRECTORY ../doc/ DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/yoshimi
         GROUP_READ GROUP_WRITE GROUP_EXECUTE
         WORLD_READ WORLD_EXECUTE
 )
-install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../yoshimi-user-manual.pdf
-    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/yoshimi)
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/yoshimi.desktop
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications)
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.png
