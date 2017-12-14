@@ -4,6 +4,7 @@ yoshimi 1.5.5 M
 * Merged in BSD bugfixes from Tobias
 * Changed source location of user manual.
   Separate lines in CMake no longer needed.
+* MIDI-learn now has a threshold setting for switches.
 
 2017-12-13 Will
 * BugFix: argp return still wrong for HURD :(
