@@ -165,6 +165,7 @@ endif(NOT LIBC_HAS_ARGP)
 set (CMAKE_REQUIRED_LIBRARIES z)
 check_c_source_compiles (
     "#include <zlib.h>
+     #include <stdlib.h>
      int main(int argc, char **argv) {
          gzFile zzz  = gzopen(\"/dev/null\", \"rb\");
          if (NULL != zzz)
@@ -606,7 +607,7 @@ install (DIRECTORY ../doc/ DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/yoshimi
         WORLD_READ WORLD_EXECUTE
 )
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../yoshimi-user-manual.pdf
-    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/yoshimi)
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/yoshimi)
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/yoshimi.desktop
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications)
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.png
@@ -618,7 +619,7 @@ install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi_alt.svg
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/metainfo/yoshimi.appdata.xml
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/metainfo)
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.1
-    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/man/man1)
+    DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
 
 set_directory_properties (PROPERTIES
     ADDITIONAL_MAKE_CLEAN_FILES "${FltkUI_headers}"
