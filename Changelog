@@ -5,6 +5,8 @@ yoshimi 1.5.5 M
 * Changed source location of user manual.
   Separate lines in CMake no longer needed.
 * MIDI-learn now has a threshold setting for switches.
+* BugFix: More missing GUI messages found :(
+* BugFix: CLI not updating scale name or description.
 
 2017-12-13 Will
 * BugFix: argp return still wrong for HURD :(

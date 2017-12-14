@@ -303,6 +303,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = synth->getRuntime().vectordata.Name[insert];
                     value = miscMsgPush(text);
                     getData->data.parameter &= 0x7f;
+                    guiTo = true;
                     break;
             }
             break;
@@ -322,28 +323,27 @@ void InterChange::indirectTransfers(CommandBlock *getData)
             value = miscMsgPush(text);
             synth->getRuntime().finishedCLI = true; // temp
             getData->data.parameter &= 0x7f;
+            guiTo = true;
             break;
         }
         case 232: // scales
         {
             switch(control)
             {
-                case 32:
+                case 32: // tunings
                     text = formatScales(text);
-                    getData->data.parameter &= 0x7f;
                     value = synth->microtonal.texttotunings(text.c_str());
                     if (value > 0)
                         synth->setAllPartMaps();
                     break;
-                case 33:
+                case 33: // keyboard map
                     text = formatScales(text);
-                    getData->data.parameter &= 0x7f;
                     value = synth->microtonal.texttomapping(text.c_str());
                     if (value > 0)
                         synth->setAllPartMaps();
                     break;
 
-                case 48:
+                case 48: // import .scl
                     value = synth->microtonal.loadscl(setExtension(text,"scl"));
                     if(value > 0)
                     {
@@ -357,11 +357,9 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                             text += string(buf);
                         }
                         delete [] buf;
-                        guiTo = true;
                     }
-                    getData->data.parameter &= 0x7f;
                     break;
-                case 49:
+                case 49: // import .kbm
                     value = synth->microtonal.loadkbm(setExtension(text,"kbm"));
                     if(value > 0)
                     {
@@ -377,20 +375,18 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                             else
                                 text += to_string(map);
                         }
-                        guiTo = true;
                     }
-                    getData->data.parameter &= 0x7f;
                     break;
 
-                case 64:
+                case 64: // set name
                     synth->microtonal.Pname = text;
-                    getData->data.parameter &= 0x7f;
                     break;
-                case 65:
+                case 65: // set comment
                     synth->microtonal.Pcomment = text;
-                    getData->data.parameter &= 0x7f;
                     break;
             }
+            getData->data.parameter &= 0x7f;
+            guiTo = true;
             break;
         }
         case 240: // main
@@ -424,13 +420,10 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     else
                         text = "FAILED " + text;
                     value = miscMsgPush(text);
-                    guiTo = true;
-                    getData->data.parameter &= 0x7f;
                     break;
                 }
                 case 79: // named instrument save
                 {
-                    getData->data.parameter &= 0x7f;
                     bool ok = true;
                     int saveType = synth->getRuntime().instrumentFormat;
 
@@ -448,7 +441,6 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
-                    guiTo = true;
                     break;
                 }
                 case 80:
@@ -457,7 +449,6 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
-                    getData->data.parameter &= 0x7f;
                     break;
                 case 81: // patch set save
                     if(synth->savePatchesXML(text))
@@ -465,8 +456,6 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
-                    guiTo = true;
-                    getData->data.parameter &= 0x7f;
                     break;
                 case 84: // vector load
                     tmp = synth->loadVectorAndUpdate(insert, text);
@@ -478,7 +467,6 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
-                    getData->data.parameter &= 0x7f;
                     break;
                 case 85: // vector save
                 {
@@ -498,7 +486,6 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                             text = " FAILED " + text;
                     }
                     value = miscMsgPush(text);
-                    getData->data.parameter &= 0x7f;
                     break;
                 }
                 case 88: // scales load
@@ -507,7 +494,6 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
-                    getData->data.parameter &= 0x7f;
                 break;
                 case 89: // scales save
                     if (synth->saveMicrotonal(text))
@@ -515,7 +501,6 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
-                    getData->data.parameter &= 0x7f;
                     break;
                 case 92: // state load
                     if (synth->loadStateAndUpdate(text))
@@ -523,7 +508,6 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
-                    getData->data.parameter &= 0x7f;
                     break;
                 case 93: // state save
                     if (synth->saveState(text))
@@ -531,7 +515,6 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
-                    getData->data.parameter &= 0x7f;
                     break;
                 case 94:
                     synth->partonoffWrite(npart, -1);
@@ -541,13 +524,13 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     else
                         text = " FAILED some samples " + text;
                     value = miscMsgPush(text);
-                    getData->data.parameter &= 0x7f;
                     break;
                 case 96: // master reset
                     synth->resetAll();
-                    getData->data.parameter &= 0x7f;
                     break;
             }
+            getData->data.parameter &= 0x7f;
+            guiTo = true;
             break;
         }
         case 248: // config

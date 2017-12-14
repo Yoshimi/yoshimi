@@ -24,7 +24,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-Modified September 2017} {in_source in_header
+Modified December 2017} {selected in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -282,7 +282,7 @@ class MidiLearnKitItem {: {public Fl_Group}
   }
 }
 
-class MidiLearnUI {selected : {private MiscFuncs}
+class MidiLearnUI {: {private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window midilearnwindow {
@@ -388,6 +388,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
       }
     }
     Fl_Window message {
+      label Yoshimi
       xywh {4 20 290 85} type Double labelsize 12 hide
       code0 {o->copy_label(synth->makeUniqueName("").c_str());}
     } {

@@ -1550,16 +1550,16 @@ int CmdInterface::commandScale()
             Runtime.Log("Write only - use list");
             return done_msg;
         }
-        else if (command <= 0x21)
+        if (command <= 0x21)
         {
             if (matchnMove(3, point, "import"))
                 command += 0x10;
-            name = (string)point;
-            if (name == "")
-                return value_msg;
-            par = 0x80;
-            par2 = miscMsgPush(name);
         }
+        name = (string)point;
+        if (name == "")
+            return value_msg;
+        par = 0x80;
+        par2 = miscMsgPush(name);
     }
     else
     {
@@ -1625,7 +1625,7 @@ int CmdInterface::commandScale()
             }
         }
     }
-
+cout << "par " << int(par) << endl;
     sendDirect(value, type, command, 0xe8, 0xff, 0xff, 0xff, par, par2);
     return reply;
 }
