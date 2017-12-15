@@ -730,7 +730,7 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
         part[npart]->legatoFading = 0;
         if (chan == part[npart]->Prcvchn)// && partonoffRead(npart))
         {
-            if (type == 2) // breath
+            if (type == part[npart]->PbreathControl) // breath
             {
                 part[npart]->SetController(C_volume, 64 + par / 2);
                 part[npart]->SetController(C_filtercutoff, par);

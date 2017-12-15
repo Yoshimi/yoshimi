@@ -154,6 +154,7 @@ Y : 0/1 : 137 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Sustain pedal enable
 YL : -6400 to 6400 : 138 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Pitch wheel range
 YL : 0 to 127 : 139 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Q depth
 YL : 0 to 127 : 140 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter cutoff depth
+Y : 0/1 : 141 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Enable breath control
 YL : 0 to 127 : 144 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Resonance centre frequency controller depth
 YL : 0 to 127 : 145 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Resonance bandwidth controller depth
 YL : 0 to 127 : 160 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Portamento time

@@ -131,6 +131,7 @@ void Part::defaults(void)
     Pveloffs = 64;
     Pkeylimit = 20;
     Pfrand = 0;
+    PbreathControl = 2;
     legatoFading = 0;
     setDestination(1);
     defaultsinstrument();
@@ -1293,6 +1294,7 @@ void Part::add2XML(XMLwrapper *xml, bool subset)
     {
         xml->addpar("key_mode", Pkeymode & 3);
         xml->addpar("random_detune", Pfrand);
+        xml->addparbool("breath_disable", PbreathControl != 2);
     }
     xml->endbranch();
 
@@ -1372,6 +1374,11 @@ int Part::loadXMLinstrument(string filename)
         Pfrand = xml->getpar127("random_detune", Pfrand);
         if (Pfrand > 50)
             Pfrand = 50;
+        PbreathControl = xml->getparbool("breath_disable", PbreathControl);
+        if (PbreathControl)
+            PbreathControl = 255; // impossible value
+        else
+            PbreathControl = 2;
     }
     applyparameters();
     xml->exitbranch();

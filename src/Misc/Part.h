@@ -131,6 +131,7 @@ class Part : private MiscFuncs, SynthHelper
         unsigned char Pkeylimit;   // how many keys can play simultaneously,
                                    // time 0 = off, the older will be released
         float         Pfrand;      // Part random frequency content
+        unsigned char PbreathControl;
         int           Paudiodest;  // jack output routing
         string        Pname;
         struct {

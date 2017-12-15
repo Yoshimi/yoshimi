@@ -141,6 +141,7 @@ string partlist [] = {
     "Pan <n2>",                 "panning",
     "VElocity <n2>",            "velocity sensing sensitivity",
     "OFfset <n2>",              "velocity sense offset",
+    "Breath <s>",              "breath control (Enable {other})",
     "POrtamento <s>",           "portamento (Enable {other})",
     "Mode <s>",                 "key mode (Poly, Mono, Legato)",
     "Note <n2>",                "note polyphony",
@@ -1764,6 +1765,18 @@ int CmdInterface::commandPart(bool justSet)
         }
         else
             reply = range_msg;
+    }
+    else if (matchnMove(1, point, "breath"))
+    {
+        int type = 0;
+        int value = 0;
+        if(!isRead)
+        {
+            type = 64;
+            value = matchnMove(1, point, "enable");
+        }
+        sendDirect(value, type, 141, npart);
+        return done_msg;
     }
     else if (matchnMove(1, point, "note"))
     {

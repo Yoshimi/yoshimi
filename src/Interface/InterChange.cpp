@@ -1758,6 +1758,10 @@ string InterChange::resolvePart(CommandBlock *getData)
         case 140:
             contstr = "Filter Cutoff Depth";
             break;
+        case 141:
+            yesno = true;
+            contstr = "Breath Control";
+            break;
 
         case 144:
             contstr = "Res Cent Freq Depth";
@@ -4802,6 +4806,15 @@ void InterChange::commandPart(CommandBlock *getData)
                 part->ctl->filtercutoff.depth = value;
             else
                 value = part->ctl->filtercutoff.depth;
+            break;
+        case 141:
+            if (write)
+                if (value_bool)
+                    part->PbreathControl = 2;
+                else
+                    part->PbreathControl = 255;
+            else
+                value = part->PbreathControl;
             break;
 
         case 144:
