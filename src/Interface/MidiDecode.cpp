@@ -220,12 +220,6 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
         return;
     }
 
-    if (ctrl == C_breath)
-    {
-        sendMidiCC(inSync, ch, C_volume, param);
-        ctrl = C_filtercutoff;
-    }
-
     // do what's left!
     if (ctrl < 128) // don't want to pick up strays
         sendMidiCC(inSync, ch, ctrl, param);

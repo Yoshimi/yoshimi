@@ -1,5 +1,9 @@
 yoshimi 1.5.5 M
 
+2017-12-15 Will
+* Tidied up microtonal reporting.
+* Improved MIDI part/channel decoding.
+
 2017-12-14 Will
 * Merged in BSD bugfixes from Tobias
 * Changed source location of user manual.

@@ -1068,17 +1068,12 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
             contstr = "Keymap ";
             showValue = false;
             break;
-        case 34:
-            contstr = "Retune";
-            showValue = false;
-            break;
-
         case 48:
-            contstr = "Tuning Import";
+            contstr = "Tuning Import ";
             showValue = false;
             break;
         case 49:
-            contstr = "Keymap Import";
+            contstr = "Keymap Import ";
             showValue = false;
             break;
 
@@ -1090,6 +1085,11 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
             contstr = "Description: " + string(synth->microtonal.Pcomment);
             showValue = false;
             break;
+        case 80:
+            contstr = "Retune";
+            showValue = false;
+            break;
+
         case 96:
             contstr = "Clear all settings";
             showValue = false;
@@ -3845,28 +3845,28 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
             break;
 
         case 32: // Tuning
-            showValue = false; // done eslewhere
+            // done eslewhere
             break;
         case 33: // Keyboard Map
-            showValue = false; // done eslewhere
+            // done eslewhere
             break;
 
         case 48: // Import .scl File
-            showValue = false; // done eslewhere
+            // done eslewhere
             break;
         case 49: // Import .kbm File
-            showValue = false; // done eslewhere
+            // done eslewhere
             break;
 
         case 64: // Name
-            showValue = false; // done eslewhere
+            // done eslewhere
             break;
         case 65: // Comments
-            showValue = false; // done eslewhere
+            // done eslewhere
             break;
 
         case 80: // Retune
-            showValue = false; // done eslewhere
+            // done eslewhere
             break;
         case 96: // Clear scales
             synth->microtonal.defaults();

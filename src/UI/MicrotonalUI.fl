@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified June 2017
+Modified December 2017
 } {in_source in_header
 }
 
@@ -122,7 +122,7 @@ class MicrotonalUI {open selected : {private MiscFuncs}
           Fl_Button {} {
             label {Import .scl file}
             callback {//
-            const char *filename = fl_file_chooser("Open:", "(*.scl)", NULL, 0);
+            const char *filename = fl_file_chooser("Open:", "(*.scl)", synth->getRuntime().userHome.c_str(), 0);
             if (filename == NULL)
                 return;
 
@@ -216,7 +216,7 @@ class MicrotonalUI {open selected : {private MiscFuncs}
           Fl_Button {} {
             label {Import .kbm file}
             callback {//
-            const char *filename = fl_file_chooser("Open:", "(*.kbm)", NULL, 0);
+            const char *filename = fl_file_chooser("Open:", "(*.kbm)", synth->getRuntime().userHome.c_str(), 0);
             if (filename == NULL)
                 return;
 
@@ -237,9 +237,9 @@ class MicrotonalUI {open selected : {private MiscFuncs}
         Fl_Button applybutton {
           label Retune
           callback {apply();
-          send_data(32, o->value(), 0xc0);
-          send_data(33, o->value(), 0xc0);
-          send_data(80, o->value(), 0xc0);}
+          send_data(32, 1, 0xc0);
+          send_data(33, 1, 0xc0);
+          send_data(80, 1, 0xc0);}
           tooltip {Retune the synth according to the inputs from "Tunnings" and "Keyboard Mapping"} xywh {152 447 107 28} box THIN_UP_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13
         }
       }
