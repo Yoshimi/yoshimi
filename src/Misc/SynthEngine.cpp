@@ -514,6 +514,17 @@ void *SynthEngine::RBPthread(void)
 }
 
 
+string SynthEngine::manualname(void)
+{
+    string manfile = "yoshimi-user-manual-";
+    manfile += YOSHIMI_VERSION;
+    int pos = manfile.find(" rc");
+    if (pos < 1)
+        return manfile;
+    return manfile.substr(0, pos);
+}
+
+
 void SynthEngine::defaults(void)
 {
     setPvolume(90);

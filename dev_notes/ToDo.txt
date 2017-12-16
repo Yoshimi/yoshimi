@@ -1,7 +1,11 @@
 
+Add 'Import Bank'.
+
 Sometimes can't edit upper voice rows from panel
 
 pasting effect doesn't update effect title.
+
+Requested: auto 'apply' timer for padsynth.
 
 Requested: revise window states so engines etc can be made auto open.
 

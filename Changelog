@@ -1,4 +1,9 @@
-yoshimi 1.5.6 rc1
+yoshimi 1.5.6
+
+2017-12-16 Will
+* Included current manual.
+* Yoshimi now looks for specific manual version.
+* Set release version 1.5.6
 
 2017-12-15 Will
 * Tidied up microtonal reporting.
