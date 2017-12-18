@@ -1,4 +1,35 @@
-yoshimi 1.5.5
+yoshimi 1.5.6
+
+2017-12-16 Will
+* Included current manual.
+* Yoshimi now looks for specific manual version.
+* Set release version 1.5.6
+
+2017-12-15 Will
+* Tidied up microtonal reporting.
+* Improved MIDI part/channel decoding.
+* Implemented breath control enable switch.
+* Set version as 1.5.6 rc1.
+
+2017-12-14 Will
+* Merged in BSD bugfixes from Tobias
+* Changed source location of user manual.
+  Separate lines in CMake no longer needed.
+* MIDI-learn now has a threshold setting for switches.
+* BugFix: More missing GUI messages found :(
+* BugFix: CLI not updating scale name or description.
+
+2017-12-13 Will
+* BugFix: argp return still wrong for HURD :(
+  Tried casting the return int to error_t instead.
+* Applied better resolution of splash timeout.
+* Bugfix: Importing scales was not updating GUI.
+
+2017-12-12 Will
+* Bugfix: argp return type was error_t should be int
+* Bugfix: Missing #include <cmath> in WaveShapeSamples.h
+* Bugfix: Missing #include <stdlib.h> in CmakeLists.txt
+* Possible resolution of splash screen problem.
 
 2017-12-11 Will
 * Set max MIDI-learn lines to 200.

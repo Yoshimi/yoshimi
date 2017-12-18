@@ -708,7 +708,7 @@ Offset}
         label Vol
         callback {//
         send_data(129, o->value(), 0xc0);}
-        tooltip {Volume enable} xywh {175 80 45 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
+        tooltip {Volume enable} xywh {175 81 45 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->volume.receive);}
       }
       Fl_Dial panwidth {
@@ -756,22 +756,29 @@ Offset}
         label Expr
         callback {//
         send_data(135, o->value(), 0xc0);}
-        tooltip {Expression enable} xywh {175 55 45 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
+        tooltip {Expression enable} xywh {175 59 45 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->expression.receive);}
       }
       Fl_Check_Button fmamp {
         label FMamp
         callback {//
         send_data(136, o->value(), 0xc0);}
-        tooltip {FM amplitude enable} xywh {225 55 60 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
+        tooltip {FM amplitude enable} xywh {225 59 60 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->fmamp.receive);}
       }
       Fl_Check_Button sustain {
         label Sustain
         callback {//
         send_data(137, o->value(), 0xc0);}
-        tooltip {Sustain pedal enable} xywh {225 80 60 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
+        tooltip {Sustain pedal enable} xywh {225 81 60 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->sustain.receive);}
+      }
+      Fl_Check_Button breath {
+        label Breath
+        callback {//
+        send_data(141, o->value(), 0xc0);}
+        tooltip {Breath Control enable} xywh {225 38 60 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
+        code0 {o->value(part->PbreathControl == 2);}
       }
       Fl_Counter pwheelbrng {
         label {PWheel Rng (cents)}
@@ -1896,6 +1903,10 @@ Offset}
 
         case 140:
             fltcut->value(valInt);
+            break;
+
+        case 141:
+            breath->value(valBool);
             break;
 
         case 144:

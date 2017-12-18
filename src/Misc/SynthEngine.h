@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified November 2017
+    Modified December 2017
 */
 
 #ifndef SYNTHENGINE_H
@@ -77,6 +77,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         bool savePatchesXML(string filename);
         void add2XML(XMLwrapper *xml);
+        string manualname();
         void defaults(void);
 
         bool loadXML(string filename);

@@ -1,3 +1,12 @@
+V 1.5.6 - Fieldfare
+
+Our new BSD friends turned up a few issues that don't seem to affect the common Linux distros, and a couple of fairly obscure bugs surfaced. These would have prompted a bugfix release. However, at the same time two new features were requested that are quite useful and easy to implement.
+
+In MIDI-learn, if you set Max and Min to the same value this becomes a threshold and anything equal or lower behaves as if the input was 0 while anything higher behaves as if it was 127.
+
+Breath control (CC2) can now be disabled on a per-instrument basis. It seems some MIDI controllers send this on joystic movements.
+
+
 V 1.5.5 - Mistle Thrush
 
 Some users wanted a way to store the Controllers settings with an instrument. These can make quite a dramatic difference to the sound. There is now a superset of instruments that can be saved instead of, or as well as, the standard ones. On loading, Yoshimi will look for the extended version first. This applies to instruments in banks as well as externally saved ones. If you have an extended type loaded the instrument name will be a mid-blue instead of black. This is refleced in the stored instruments in bank slots.

@@ -516,6 +516,17 @@ void *SynthEngine::RBPthread(void)
 }
 
 
+string SynthEngine::manualname(void)
+{
+    string manfile = "yoshimi-user-manual-";
+    manfile += YOSHIMI_VERSION;
+    int pos = manfile.find(" rc");
+    if (pos < 1)
+        return manfile;
+    return manfile.substr(0, pos);
+}
+
+
 void SynthEngine::defaults(void)
 {
     setPvolume(90);
@@ -700,42 +711,54 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
         RunChannelSwitch(par);
         return;
     }
-    int npart;
-    if (chan < NUM_MIDI_CHANNELS)
-    {
-        //cout << "npart group " << to_string(int(chan)) << endl;
-        for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
-        {   // Send the controller to all part assigned to the channel
-            part[npart]->legatoFading = 0;
-            if (chan == part[npart]->Prcvchn)// && partonoffRead(npart))
-            {
-                if (type == 0x44) // legato switch
-                {
-                    int mode = (ReadPartKeyMode(npart) & 3);
-                    if (par < 64)
-                        SetPartKeyMode(npart, mode & 3); // normal
-                    else
-                        SetPartKeyMode(npart, mode | 4); // temporary legato
-                }
-                else
-                    part[npart]->SetController(type, par);
-            }
-        }
-    }
-    else
-    {
-        //cout << "npart single " << to_string(int(chan)) << endl;
-        npart = chan & 0x3f;
-        part[npart]->legatoFading = 0;
-        if (npart < Runtime.NumAvailableParts)
-            part[npart]->SetController(type, par);
-    }
     if (type == C_allsoundsoff)
     {   // cleanup insertion/system FX
         for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
             sysefx[nefx]->cleanup();
         for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
             insefx[nefx]->cleanup();
+        return;
+    }
+
+    int minPart, maxPart;
+
+    if (chan < NUM_MIDI_CHANNELS)
+    {
+        minPart = 0;
+        maxPart = Runtime.NumAvailableParts;
+    }
+    else
+    {
+        chan &= 0x3f;
+        if (chan >= Runtime.NumAvailableParts)
+            return; // shouldn't be possible
+        minPart = chan;
+        maxPart = chan;
+    }
+
+    int npart;
+        //cout << "npart group " << to_string(int(chan)) << endl;
+    for (npart = minPart; npart < maxPart; ++ npart)
+    {   // Send the controller to all part assigned to the channel
+        part[npart]->legatoFading = 0;
+        if (chan == part[npart]->Prcvchn)// && partonoffRead(npart))
+        {
+            if (type == part[npart]->PbreathControl) // breath
+            {
+                part[npart]->SetController(C_volume, 64 + par / 2);
+                part[npart]->SetController(C_filtercutoff, par);
+            }
+            else if (type == 0x44) // legato switch
+            {
+                int mode = (ReadPartKeyMode(npart) & 3);
+                if (par < 64)
+                    SetPartKeyMode(npart, mode & 3); // normal
+                else
+                    SetPartKeyMode(npart, mode | 4); // temporary legato
+            }
+            else
+                part[npart]->SetController(type, par);
+        }
     }
 }
 

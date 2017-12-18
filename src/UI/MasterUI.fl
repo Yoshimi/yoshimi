@@ -323,7 +323,8 @@ class MasterUI {selected : {private GuiUpdates}
           MenuItem {} {
             label {&View Manual}
             callback {//
-            string path = findfile("/", "yoshimi-user-manual", "pdf");
+            string manfile = synth->manualname();
+            string path = findfile("/", manfile.c_str(), "pdf");
             if (path == "")
             {
                 fl_alert("Can't find manual :(");

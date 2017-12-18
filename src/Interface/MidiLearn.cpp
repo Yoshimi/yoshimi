@@ -103,7 +103,14 @@ bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, un
             swap(minIn, maxIn);
         }
 
-        if (status & 2) // limit
+        if (minIn == maxIn)
+        {
+            if (value <= minIn)
+                value = 0;
+            else
+                value = 127;
+        }
+        else if (status & 2) // limit
         {
             if (value < minIn)
                 value = minIn;

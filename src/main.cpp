@@ -20,11 +20,16 @@
     Modified December 2017
 */
 
+// approx timeout in seconds.
+#define SPLASH_TIME 3
+
 #include <sys/mman.h>
 #include <iostream>
 #include <stdio.h>
 #include <sys/types.h>
 #include <termios.h>
+#include <time.h>
+
 
 using namespace std;
 
@@ -63,7 +68,7 @@ static char **globalArgv = NULL;
 bool bShowGui = true;
 bool bShowCmdLine = true;
 bool splashSet = true;
-
+time_t old_father_time, here_and_now;
 
 //Andrew Deryabin: signal handling moved to main from Config Runtime
 //It's only suitable for single instance app support
@@ -89,11 +94,6 @@ void yoshimiSigHandler(int sig)
             break;
     }
 }
-
-/*void splashTimeout(void *splashWin)
-{
-    (static_cast<Fl_Window *>(splashWin))->hide();
-}*/
 
 static void *mainGuiThread(void *arg)
 {
@@ -123,7 +123,6 @@ static void *mainGuiThread(void *arg)
     boxLb.labelcolor(fl_rgb_color(lred, lgreen, lblue));
     boxLb.labelfont(FL_HELVETICA | FL_BOLD);
     winSplash.border(false);
-    int splashLoop = 0;
     if (splashSet && bShowGui && firstRuntime->showSplash)
     {
         winSplash.position((Fl::w() - winSplash.w()) / 2, (Fl::h() - winSplash.h()) / 2);
@@ -183,15 +182,7 @@ static void *mainGuiThread(void *arg)
                 {
                     MasterUI *guiMaster = _synth->getGuiMaster(false);
                     if (guiMaster)
-                    {
-/*
- * This is necessary because 'set_non_modal' doesn't work on all
- * WMs, and 'set_modal' freezes the GUI while the splash is visible.
- */
-                        if(splashSet && firstRuntime->showSplash)
-                            winSplash.show();
-
-                        guiMaster->Log(_synth->getRuntime().LogList.front());
+                    { guiMaster->Log(_synth->getRuntime().LogList.front());
                         _synth->getRuntime().LogList.pop_front();
                     }
                 }
@@ -201,12 +192,14 @@ static void *mainGuiThread(void *arg)
         // where all the action is ...
         if (bShowGui)
         {
-            if (splashSet && firstRuntime->showSplash)
+            if (splashSet)
             {
                 winSplash.show();
-                ++ splashLoop;
-                if (splashLoop > 10000)
-                { // combined with Fl::wait is effectively a timer :)
+                usleep(1000);
+                if(time(&here_and_now) < 0) // no time?
+                    here_and_now = old_father_time + SPLASH_TIME;
+                if ((here_and_now - old_father_time) >= SPLASH_TIME)
+                {
                     splashSet = false;
                     winSplash.hide();
                 }
@@ -318,6 +311,8 @@ void *commandThread(void *arg)
 
 int main(int argc, char *argv[])
 {
+    time(&old_father_time);
+    here_and_now = old_father_time;
     struct termios  oldTerm;
     tcgetattr(0, &oldTerm);
 
