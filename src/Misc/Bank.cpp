@@ -443,8 +443,11 @@ unsigned int Bank::importBank(string importdir, size_t rootID, unsigned int bank
                             stub = findleafname(nextfile).substr(hyphen + 1);
                         else
                             stub = findleafname(nextfile);
-                        if (addtobank(rootID, bankID, pos, nextfile, stub))
-                            missing = true;
+                        if (!isDuplicate(rootID, bankID, pos, nextfile))
+                        {
+                            if (addtobank(rootID, bankID, pos, nextfile, stub))
+                                missing = true;
+                        }
                     }
                 }
                 name = importdir;
@@ -459,6 +462,22 @@ unsigned int Bank::importBank(string importdir, size_t rootID, unsigned int bank
     if (!ok)
         msgID |= 0x1000;
     return msgID;
+}
+
+
+bool Bank::isDuplicate(size_t rootID, size_t bankID, int pos, const string filename)
+{
+    cout << filename << " count " << roots [rootID].banks.count(bankID) << endl;
+    string path = getRootPath(rootID) + "/" + getBankName(bankID, rootID) + "/" + filename;
+    if (isRegFile(setExtension(path, "xiy")) && filename.rfind("xiz") < string::npos)
+        return 1;
+    if (isRegFile(setExtension(path, "xiz")) && filename.rfind("xiy") < string::npos)
+    {
+        InstrumentEntry &Ref = getInstrumentReference(rootID, bankID, pos);
+        Ref.yoshiType = true;
+        return 1;
+    }
+    return 0;
 }
 
 
@@ -748,16 +767,6 @@ void Bank::scanrootdir(int root_idx)
 
 bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filename, const string name)
 {
-    string path = getRootPath(rootID) + "/" + getBankName(bankID, rootID) + "/" + filename;
-    if (isRegFile(setExtension(path, "xiy")) && filename.rfind("xiz") != string::npos)
-        return 0;
-    if (isRegFile(setExtension(path, "xiz")) && filename.rfind("xiy") != string::npos)
-    {
-        InstrumentEntry &Ref = getInstrumentReference(rootID, bankID, pos);
-        Ref.yoshiType = true;
-        return 0;
-    }
-
     BankEntry &bank = roots [rootID].banks [bankID];
 
     if (pos >= 0 && pos < BANK_SIZE)

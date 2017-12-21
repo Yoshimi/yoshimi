@@ -126,6 +126,7 @@ class Bank : private MiscFuncs
         bool setbankname(unsigned int BankID, string newname);
         bool loadbank(size_t rootID, size_t banknum);
         unsigned int importBank(string importdir, size_t rootID, unsigned int bankID);
+        bool isDuplicate(size_t rootID, size_t bankID, int pos, const string filename);
         bool newIDbank(string newbankdir, unsigned int bankID, size_t rootID = 0xff);
         bool newbankfile(string newbankdir, size_t rootID);
         bool removebank(unsigned int bankID);
