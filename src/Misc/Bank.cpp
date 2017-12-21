@@ -257,11 +257,13 @@ bool Bank::savetoslot(size_t rootID, size_t bankID, int ninstrument, int npart)
 
 
 //Gets a bank name
-string Bank::getBankName(int bankID)
+string Bank::getBankName(int bankID, size_t rootID)
 {
-    if (roots [currentRootID].banks.count(bankID) == 0)
+    if (rootID > 0x7f)
+        rootID = currentRootID;
+    if (roots [rootID].banks.count(bankID) == 0)
         return "";
-    return string(roots [currentRootID].banks [bankID].dirname);
+    return string(roots [rootID].banks [bankID].dirname);
 }
 
 
@@ -382,11 +384,88 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
     return true;
 }
 
+// Creates a new bank and copies in the contents of the external one
+unsigned int Bank::importBank(string importdir, size_t rootID, unsigned int bankID)
+{
+    if (rootID > 0x7f)
+        rootID = currentRootID;
+    string name = "";
+    bool ok = true;
+    if (roots.count(rootID) == 0)
+    {
+        name = "Root ID " + to_string(int(rootID)) + " doesn't exist";
+        ok = false;
+    }
+
+    if (ok && roots [rootID].banks.count(bankID) != 0)
+    {
+        name = "Bank " + to_string(bankID) + " already contains " + getBankName(bankID, rootID);
+        ok = false;
+    }
+
+    if (ok)
+    {
+        DIR *dir = opendir(importdir.c_str());
+        if (dir == NULL)
+        {
+            name = "Can't find " + importdir;
+            ok = false;
+        }
+        else
+        {
+            if (!newIDbank(findleafname(importdir), bankID, rootID))
+            {
+                name = "Can't create bank " + findleafname(importdir);
+                ok = false;
+            }
+            else
+            {
+                int count = 0;
+                bool missing = false;
+                struct dirent *fn;
+                string exportfile = getRootPath(rootID) + "/" + getBankName(bankID, rootID);
+                while ((fn = readdir(dir)))
+                {
+                    string nextfile = string(fn->d_name);
+                    if (nextfile.rfind(".xiy") != string::npos || nextfile.rfind(".xiz") != string::npos)
+                    {
+                        ++count;
+                        int pos = -1; // default for un-numbered
+                        int slash = nextfile.rfind("/") + 1;
+                        int hyphen = nextfile.rfind("-");
+                        if (hyphen > slash && (hyphen - slash) <= 4)
+                            pos = stoi(nextfile.substr(slash, hyphen)) - 1;
+
+                        if (copyFile(importdir + "/" + nextfile, exportfile + "/" + nextfile))
+                            missing = true;
+                        string stub;
+                        if (pos >= -1)
+                            stub = findleafname(nextfile).substr(hyphen + 1);
+                        else
+                            stub = findleafname(nextfile);
+                        if (addtobank(rootID, bankID, pos, nextfile, stub))
+                            missing = true;
+                    }
+                }
+                name = importdir;
+                if (count == 0)
+                    name += " but no valid instruments found";
+                else if (missing)
+                    name += " but failed to copy some instruments";
+            }
+        }
+    }
+    unsigned int msgID = miscMsgPush(name);
+    if (!ok)
+        msgID |= 0x1000;
+    return msgID;
+}
+
 
 // Makes a new bank with known ID. Does *not* make it current
-bool Bank::newIDbank(string newbankdir, unsigned int bankID)
+bool Bank::newIDbank(string newbankdir, unsigned int bankID, size_t rootID)
 {
-    if (!newbankfile(newbankdir))
+    if (!newbankfile(newbankdir, rootID))
         return false;
     roots [currentRootID].banks [bankID].dirname = newbankdir;
     hints [currentRootID] [newbankdir] = bankID; // why do we need this?
@@ -395,14 +474,14 @@ bool Bank::newIDbank(string newbankdir, unsigned int bankID)
 
 
 // Performs the actual file operation for new banks
-bool Bank::newbankfile(string newbankdir)
+bool Bank::newbankfile(string newbankdir, size_t rootID)
 {
      if (getRootPath(currentRootID).empty())
     {
         synth->getRuntime().Log("Current bank root directory not set");
         return false;
     }
-    string newbankpath = getRootPath(currentRootID);
+    string newbankpath = getRootPath(rootID);
     if (newbankpath.at(newbankpath.size() - 1) != '/')
         newbankpath += "/";
     newbankpath += newbankdir;
@@ -669,6 +748,16 @@ void Bank::scanrootdir(int root_idx)
 
 bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filename, const string name)
 {
+    string path = getRootPath(rootID) + "/" + getBankName(bankID, rootID) + "/" + filename;
+    if (isRegFile(setExtension(path, "xiy")) && filename.rfind("xiz") != string::npos)
+        return 0;
+    if (isRegFile(setExtension(path, "xiz")) && filename.rfind("xiy") != string::npos)
+    {
+        InstrumentEntry &Ref = getInstrumentReference(rootID, bankID, pos);
+        Ref.yoshiType = true;
+        return 0;
+    }
+
     BankEntry &bank = roots [rootID].banks [bankID];
 
     if (pos >= 0 && pos < BANK_SIZE)

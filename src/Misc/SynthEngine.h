@@ -242,6 +242,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         Bank &getBankRef() {return bank;}
         Bank *getBankPtr() {return &bank;}
+        unsigned int importBank(string inportfile, size_t rootID, unsigned int bankID);
         string getWindowTitle() {return windowTitle;}
         void setWindowTitle(string _windowTitle = "");
         void setNeedsSaving(bool ns) { needsSaving = ns; }

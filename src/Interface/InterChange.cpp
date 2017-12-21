@@ -393,6 +393,17 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         {
             switch (control)
             {
+                case 60: // import bank
+                {
+                    unsigned int result = synth->importBank(text, kititem, value);
+                    text = miscMsgPop(result & 0xff);
+                    if (result < 0x1000)
+                        text = "ed " + text;
+                    else
+                        text = " FAILED " + text;
+                    value = miscMsgPush(text);
+                    break;
+                }
                 case 75: // bank instrument save
                 {
                     if (kititem == 255)
@@ -418,7 +429,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         synth->part[value]->PyoshiType = (synth->getRuntime().instrumentFormat > 1);
                     }
                     else
-                        text = "FAILED " + text;
+                        text = " FAILED " + text;
                     value = miscMsgPush(text);
                     break;
                 }
@@ -1456,6 +1467,10 @@ string InterChange::resolveMain(CommandBlock *getData)
             contstr = "Chan 'solo' Switch CC";
             break;
 
+        case 60:
+            showValue = false;
+            contstr = "Bank Import" + miscMsgPop(value_int);
+            break;
         case 75:
             showValue = false;
             contstr = "Bank Slot Save" + miscMsgPop(value_int);

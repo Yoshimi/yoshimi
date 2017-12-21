@@ -1,4 +1,8 @@
-yoshimi 1.5.6
+yoshimi 1.5.6 M
+
+2017-12-21 Will
+* Implemented import of complete banks.
+* Updated docs.
 
 2017-12-16 Will
 * Included current manual.

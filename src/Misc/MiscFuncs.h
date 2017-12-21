@@ -64,6 +64,7 @@ class MiscFuncs
         int findSplitPoint(string name);
         string setExtension(string fname, string ext);
         string localPath(string leaf);
+        bool copyFile(string source, string destination);
 
         char *skipSpace(char *buf);
         char *skipChars(char *buf);
@@ -95,11 +96,11 @@ T limit(T val, T min, T max)
     return val < min ? min : (val > max ? max : val);
 }
 
-inline float MiscFuncs::dB2rap(float dB) { 
-#if defined(HAVE_EXP10F) 
-    return exp10f((dB) / 20.0f); 
-#else 
-    return powf(10.0, (dB) / 20.0f); 
+inline float MiscFuncs::dB2rap(float dB) {
+#if defined(HAVE_EXP10F)
+    return exp10f((dB) / 20.0f);
+#else
+    return powf(10.0, (dB) / 20.0f);
 #endif
 }
 inline float MiscFuncs::rap2dB(float rap) { return 20.0f * log10f(rap); }

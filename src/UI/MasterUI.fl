@@ -1397,6 +1397,15 @@ ZynAddSubFX}
         case 49:
             updatepanel();
             break;
+        case 60: // import bank
+            name = miscMsgPop(par2);
+            if (name.find("FAILED") == 1)
+            {
+                if (wasFromHere)
+                    fl_alert("%s",name.c_str());
+            }
+            bankui->rescan_for_banks(false);
+            break;
         case 75: // save instrument to bank
             name = miscMsgPop(par2);
             updatepartprogram(parameter);

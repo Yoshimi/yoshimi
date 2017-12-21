@@ -120,13 +120,14 @@ class Bank : private MiscFuncs
         bool savetoslot(size_t rootID, size_t bankID, int ninstrument, int npart);
         bool swapslot(unsigned int n1, unsigned int n2);
         void swapbanks(unsigned int firstID, unsigned int secondID);
-        string getBankName(int bankID);
+        string getBankName(int bankID, size_t rootID = 0xff);
         string getBankIDname(int bankID);
         int getBankSize(int bankID);
         bool setbankname(unsigned int BankID, string newname);
         bool loadbank(size_t rootID, size_t banknum);
-        bool newIDbank(string newbankdir, unsigned int bankID);
-        bool newbankfile(string newbankdir);
+        unsigned int importBank(string importdir, size_t rootID, unsigned int bankID);
+        bool newIDbank(string newbankdir, unsigned int bankID, size_t rootID = 0xff);
+        bool newbankfile(string newbankdir, size_t rootID);
         bool removebank(unsigned int bankID);
         void rescanforbanks(void);
         void clearBankrootDirlist(void);

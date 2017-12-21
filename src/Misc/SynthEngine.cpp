@@ -821,6 +821,12 @@ void SynthEngine::SetZynControls(bool in_place)
 }
 
 
+unsigned int SynthEngine::importBank(string inportfile, size_t rootID, unsigned int bankID)
+{
+    return bank.importBank(inportfile, rootID, bankID);
+}
+
+
 int  SynthEngine::RootBank(int rootnum, int banknum)
 {
     CommandBlock getData;
