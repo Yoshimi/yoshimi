@@ -22,7 +22,7 @@
 
 #include "YoshimiLV2Plugin.h"
 #include "Misc/Config.h"
-#include "Misc/ConfBuild.cpp"
+#include "Misc/ConfBuild.h"
 #include "Misc/SynthEngine.h"
 #include "Interface/InterChange.h"
 #include "Interface/MidiDecode.h"

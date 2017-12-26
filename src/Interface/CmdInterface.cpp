@@ -65,7 +65,8 @@ string basics[] = {
 string toplist [] = {
     "ADD",                      "add paths and files",
     "  Root <s>",               "root path to list",
-    "  Bank <s>",               "bank to current root",
+    "  Bank <s>",               "make new bank in current root",
+    "IMport [s <n1>] <n2> <s>", "import named bank to slot n2 of current root, or Root n1"
     "REMove",                   "remove paths, files and entries",
     "  Root <n>",               "de-list root path ID",
     "  Bank <n>",               "delete bank ID (and all contents) from current root",
@@ -2248,6 +2249,33 @@ bool CmdInterface::cmdIfaceProcessCommand()
         {
             replyString = "add";
             reply = what_msg;
+        }
+    }
+    else if (matchnMove(2, point, "import"))
+    {
+        int root = 255;
+        if (matchnMove(1, point, "root"))
+        {
+            if (isdigit(point[0]))
+            {
+                root = string2int(point);
+                point = skipChars(point);
+            }
+            else
+                root = 200; // force invalid root error
+        }
+        int value = string2int(point);
+        point = skipChars(point);
+        string name = string(point);
+        if (root < 0 || (root > 127 && root != 255) || value < 0 || value > 127 || name <="!")
+        {
+            replyString = "import";
+            reply = value_msg;
+        }
+        else
+        {
+            sendDirect(value, 64, 60, 0xf0, root, 0xff, 0xff, 0x80, miscMsgPush(name));
+            reply = done_msg;
         }
     }
 

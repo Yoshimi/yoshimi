@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modifed February 2017
+    Modifed December 2017
 */
 
 #ifndef MISCFUNCS_H
@@ -63,7 +63,6 @@ class MiscFuncs
         string findleafname(string name);
         int findSplitPoint(string name);
         string setExtension(string fname, string ext);
-        string localPath(string leaf);
         bool copyFile(string source, string destination);
 
         char *skipSpace(char *buf);

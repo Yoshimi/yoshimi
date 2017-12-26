@@ -12,7 +12,6 @@ Requested: revise window states so engines etc can be made auto open.
 NRPN channels?
 
 Expand midi-learn to include:
-    more switches
     learn groups
     GUI view by group but CLI and running search only by CC & chan
 

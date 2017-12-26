@@ -253,7 +253,11 @@ void MiscFuncs::legit_pathname(string& fname)
     }
 }
 
-
+/*
+ * This only intended for calls on the local filesystem
+ * and to know locations, so buffer size should be adequate
+ * and avoids dependency on unreliable macros.
+ */
 string MiscFuncs::findfile(string path, string filename, string extension)
 {
     string command = "find " + path + " -name " + filename + "." + extension + " 2>/dev/null -print -quit";
@@ -261,7 +265,7 @@ string MiscFuncs::findfile(string path, string filename, string extension)
     FILE *fp = popen(command.c_str(), "r");
     if (fp == NULL)
         return "";
-    char line[1000];
+    char line[1024];
     fscanf(fp,"%[^\n]", line);
     pclose(fp);
 
@@ -339,23 +343,6 @@ string MiscFuncs::setExtension(string fname, string ext)
         }
     }
     return tmp;
-}
-
-
-// replace 'src' with a different one in the compilation directory
-string MiscFuncs::localPath(string leaf)
-{
-    char *tmpath;
-    tmpath = (char*) malloc(PATH_MAX);
-    getcwd (tmpath, PATH_MAX);
-    string path = (string) tmpath;
-    size_t found = path.rfind("/src");
-    if (found != string::npos)
-        path.replace (found,4,leaf);
-    else
-        path = "";
-    free(tmpath);
-    return path;
 }
 
 

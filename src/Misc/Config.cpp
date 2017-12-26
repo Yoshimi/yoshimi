@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified September 2017
+    Modified December 2017
 */
 
 #include <iostream>
@@ -49,7 +49,7 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
 #include "MasterUI.h"
-#include "ConfBuild.cpp"
+#include "ConfBuild.h"
 
 static char prog_doc[] =
     "Yoshimi " YOSHIMI_VERSION ", a derivative of ZynAddSubFX - "
@@ -231,21 +231,12 @@ bool Config::Setup(int argc, char **argv)
     }
     if (restoreState)
     {
-        char * fp;
-        if (! StateFile.size()) goto no_state0;
-        else fp = new char [PATH_MAX];
-
-        if (! realpath (StateFile.c_str(), fp)) goto no_state1;
-        StateFile = fp;
-        delete (fp);
-
-        if (! isRegFile(StateFile))
+        if (!StateFile.size() || !isRegFile(StateFile))
         {
-            no_state1: delete (fp);
-            no_state0: Log("Invalid state file specified for restore " + StateFile, 2);
+            Log("Invalid state file specified for restore " + StateFile, 2);
             return true;
         }
-        Log(StateFile);
+        Log("Using " + StateFile);
         restoreSessionData(StateFile, true);
         /* There is a single state file that contains both startup config
          * data that must be set early, and runtime data that must be set
@@ -490,7 +481,6 @@ void Config::defaultPresets(void)
         "/usr/share/zynaddsubfx/presets",
         "/usr/local/share/zynaddsubfx/presets",
         string(getenv("HOME")) + "/.config/yoshimi/presets",
-        localPath("/presets"),
         "end"
     };
     int i = 0;
@@ -1211,7 +1201,6 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
         default:
             return error_t(ARGP_ERR_UNKNOWN);
     }
-
     return error_t(0);
 }
 

@@ -895,7 +895,6 @@ void Bank::addDefaultRootDirs()
         addRootDir(bankdirs [i]);
         ++ i;
     }
-    addRootDir(localPath("/banks"));
 
     while ( i >= 0)
     {

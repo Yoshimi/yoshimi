@@ -324,7 +324,12 @@ class MasterUI {selected : {private GuiUpdates}
             label {&View Manual}
             callback {//
             string manfile = synth->manualname();
-            string path = findfile("/", manfile.c_str(), "pdf");
+            unsigned int pos = manfile.find(" ");
+            if (pos < string::npos)
+                manfile = manfile.substr(0, pos);
+            string path = findfile("/usr/", manfile.c_str(), "pdf");
+            if (path == "")
+            path = findfile("/home/", manfile.c_str(), "pdf");
             if (path == "")
             {
                 fl_alert("Can't find manual :(");

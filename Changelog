@@ -1,5 +1,15 @@
 yoshimi 1.5.6 M
 
+2017-12-26 Will
+* Removed dependency on PATH_MAX
+* Removed inclusion of local path in banks/presets.
+* Removed redundant localPath function from MiscFuncs.
+* Improved response time finding/displaying manual.
+* Completed CLI bank import.
+* Moved build number to ConfBuild.h
+* Corrected and added instructions to INSTALL.
+* More doc updates - I was bored!
+
 2017-12-21 Will
 * Implemented import of complete banks.
 * Updated docs.
