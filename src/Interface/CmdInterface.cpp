@@ -55,7 +55,7 @@ static int currentInstance = 0;
 string basics[] = {
     "?  Help",                  "show commands",
     "STop",                     "all sound off",
-    "RESet",                    "return to start-up conditions (if 'y')",
+    "RESet [s]",                "return to start-up conditions, 'ALL' clear MIDI-learn (if 'y')",
     "EXit",                     "tidy up and close Yoshimi (if 'y')",
     "..",                       "step back one level",
     "/",                        "step back to top level",
@@ -2149,8 +2149,11 @@ bool CmdInterface::cmdIfaceProcessCommand()
 
     if (matchnMove(3, point, "reset"))
     {
+        int control = 96;
+        if (matchnMove(3, point, "all"))
+            control = 97;
         if (query("Restore to basic settings", false))
-            sendDirect(0, 64, 96, 240, 255, 255, 255, 192);
+            sendDirect(0, 64, control, 240, 255, 255, 255, 192);
         return false;
     }
 

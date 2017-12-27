@@ -538,7 +538,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
                     break;
-                case 94:
+                case 94: // initialise PadSynth
                     synth->partonoffWrite(npart, -1);
                     setpadparams(parameter | (kititem << 8));
                     if (synth->part[parameter & 0x3f]->kit[kititem].padpars->export2wav(text))
@@ -548,7 +548,13 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     value = miscMsgPush(text);
                     break;
                 case 96: // master reset
-                    synth->resetAll();
+                case 97: // include MIDI-learn
+                    synth->resetAll(control & 1);
+                    break;
+
+                case 128: // panic stop
+                    synth->ShutUp();
+                    synth->Unmute();
                     break;
             }
             getData->data.parameter &= 0x7f;
@@ -1550,6 +1556,11 @@ string InterChange::resolveMain(CommandBlock *getData)
             showValue = false;
             contstr = "Reset All";
             break;
+        case 97:
+            showValue = false;
+            contstr = "Reset All including MIDI-learn";
+            break;
+
         case 128:
             showValue = false;
             contstr = "Sound Stopped";
@@ -3250,8 +3261,14 @@ void InterChange::returnsDirect(int altData)
     memset(&putData, 0xff, sizeof(putData));
     switch (altData & 0xff)
     {
+        case 1:
+            putData.data.control = 128;
+            putData.data.type = 0x10; // only CLI needs update
+            putData.data.part = 0xf0;
+            putData.data.parameter = 0x80;
+            break;
         case 2:
-            putData.data.control = 96; // master reset
+            putData.data.control = (altData >> 8) & 0xff; // master reset
             putData.data.type = altData >> 24;
             putData.data.part = 0xf0;
             putData.data.parameter = 0x80;
@@ -4349,15 +4366,17 @@ void InterChange::commandMain(CommandBlock *getData)
         case 93: // done elsewhere
             break;
         case 96: // master reset
+        case 97: // reset including MIDI-learn
             if (write && (parameter == 0xc0))
             {
-                synth->allStop(2 | (type << 24));
+                synth->allStop(2 | (control << 8) | (type << 24));
                 getData->data.type = 0xff; // stop further action);
             }
             break;
         case 128: // just stop
             if (write)
                 synth->allStop(1);
+            getData->data.type = 0xff; // stop further action);
             break;
 
         case 254:

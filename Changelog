@@ -4,6 +4,9 @@ yoshimi 1.5.6 M
 * Refactored bank removal code.
 * Improved bank import reporting.
 * Updated docs.
+* Master reset can now clear MIDI-learn.
+* Moved panic stop out of RBP thread.
+  This will eventually be cleared completely.
 
 2017-12-26 Will
 * Removed dependency on PATH_MAX

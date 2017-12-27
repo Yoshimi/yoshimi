@@ -136,7 +136,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool vectorInit(int dHigh, unsigned char chan, int par);
         void vectorSet(int dHigh, unsigned char chan, int par);
         void ClearNRPNs(void);
-        void resetAll(void);
+        void resetAll(bool andML);
         float numRandom(void);
         unsigned int randomSE(void);
         void ShutUp(void);

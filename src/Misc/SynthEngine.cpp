@@ -477,15 +477,6 @@ void *SynthEngine::RBPthread(void)
             {
                 switch ((unsigned char)block.data[0])
                 {
-                    case 6: // cease all sound
-                        switch(block.data[1] & 0xff)
-                        {
-                            case 1:
-                                ShutUp();
-                                Unmute();
-                                break;
-                        }
-                        break;
                     case 10: // set global fine detune
                         microtonal.Pglobalfinedetune = block.data[1];
                         setAllPartMaps();
@@ -1854,7 +1845,7 @@ void SynthEngine::ClearNRPNs(void)
 }
 
 
-void SynthEngine::resetAll(void)
+void SynthEngine::resetAll(bool andML)
 {
     if (Runtime.loadDefaultState && isRegFile(Runtime.defaultStateName+ ".state"))
     {
@@ -1866,6 +1857,8 @@ void SynthEngine::resetAll(void)
         defaults();
         ClearNRPNs();
     }
+    if (andML)
+        midilearn.generalOpps(0, 0, 96, 240, 255, 255, 255, 255, 255);
     Unmute();
 }
 
@@ -2249,10 +2242,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         {
             Mute();
             fadeLevel = 0; // just to be sure
-            if ((fadeAll & 0xff) == 1)
-                writeRBP(6, fadeAll); // stop
-            else
-                interchange.returnsDirect(fadeAll);
+            interchange.returnsDirect(fadeAll);
             fadeAll = 0;
         }
     }
