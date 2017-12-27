@@ -69,7 +69,7 @@ string toplist [] = {
     "IMport [s <n1>] <n2> <s>", "import named bank to slot n2 of current root, or Root n1"
     "REMove",                   "remove paths, files and entries",
     "  Root <n>",               "de-list root path ID",
-    "  Bank <n>",               "delete bank ID (and all contents) from current root",
+    "  Bank [s <n1>] <n2>",     "delete bank ID n2 (and all instruments) from current root or Root n1",
     "  MLearn <s> [n]",         "delete midi learned 'ALL' whole list, or '@'(n) line",
     "Set / Read",               "set or read all main parameters",
     "  Part",                   "enter context level",
@@ -2286,25 +2286,39 @@ bool CmdInterface::cmdIfaceProcessCommand()
             if (isdigit(point[0]))
             {
                 int rootID = string2int(point);
-                string rootname = synth->getBankRef().getRootPath(rootID);
-                if (rootname.empty())
-                    Runtime.Log("Can't find path " + asString(rootID));
+                if (rootID >= MAX_BANK_ROOT_DIRS)
+                    reply = range_msg;
                 else
                 {
-                    synth->getBankRef().removeRoot(rootID);
-                    GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
-                    Runtime.Log("Un-linked " + rootname);
-                    synth->saveBanks(currentInstance);
+                    string rootname = synth->getBankRef().getRootPath(rootID);
+                    if (rootname.empty())
+                        Runtime.Log("Can't find path " + asString(rootID));
+                    else
+                    {
+                        synth->getBankRef().removeRoot(rootID);
+                        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
+                        Runtime.Log("Un-linked " + rootname);
+                        synth->saveBanks(currentInstance);
+                    }
+                    reply = done_msg;
                 }
-                reply = done_msg;
             }
             else
                 reply = value_msg;
         }
         else if (matchnMove(1, point, "bank"))
         {
-            if (isdigit(point[0]))
+            int rootID = 255;
+            if (matchnMove(1, point, "root"))
             {
+                if (isdigit(point[0]))
+                    rootID = string2int(point);
+                if (rootID >= MAX_BANK_ROOT_DIRS)
+                    reply = range_msg;
+            }
+            if (reply != range_msg && isdigit(point[0]))
+            {
+                point = skipChars(point);
                 int bankID = string2int(point);
                 if (bankID >= MAX_BANKS_IN_ROOT)
                     reply = range_msg;
@@ -2326,17 +2340,13 @@ bool CmdInterface::cmdIfaceProcessCommand()
                         }
                         if (tmp == 0)
                         {
-                            if (synth->getBankRef().removebank(bankID))
-                                Runtime.Log("Removed bank " + replyString);
-                            else
-                                Runtime.Log("Deleting failed. Some files may still exist");
-                            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
+                            sendDirect(bankID, 64, 61, 240, rootID, 255, 255, 128);
                         }
                     }
 
                 }
             }
-            else
+            else if (reply != range_msg)
                 reply = value_msg;
         }
         else

@@ -1,5 +1,10 @@
 yoshimi 1.5.6 M
 
+2017-12-27 Will
+* Refactored bank removal code.
+* Improved bank import reporting.
+* Updated docs.
+
 2017-12-26 Will
 * Removed dependency on PATH_MAX
 * Removed inclusion of local path in banks/presets.

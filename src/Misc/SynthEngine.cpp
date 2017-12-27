@@ -827,6 +827,12 @@ unsigned int SynthEngine::importBank(string inportfile, size_t rootID, unsigned 
 }
 
 
+unsigned int SynthEngine::removeBank(unsigned int bankID, size_t rootID)
+{
+    return bank.removebank(bankID, rootID);
+}
+
+
 int  SynthEngine::RootBank(int rootnum, int banknum)
 {
     CommandBlock getData;

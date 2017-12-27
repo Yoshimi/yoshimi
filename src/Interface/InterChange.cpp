@@ -404,6 +404,17 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     value = miscMsgPush(text);
                     break;
                 }
+                case 61: // delete bank and contents
+                {
+                    unsigned int result = synth->removeBank(value, kititem);
+                    text = miscMsgPop(result & 0xff);
+                    if (result < 0x1000)
+                        text = "d " + text;
+                    else
+                        text = " FAILED " + text;
+                    value = miscMsgPush(text);
+                    break;
+                }
                 case 75: // bank instrument save
                 {
                     if (kititem == 255)
@@ -1470,6 +1481,10 @@ string InterChange::resolveMain(CommandBlock *getData)
         case 60:
             showValue = false;
             contstr = "Bank Import" + miscMsgPop(value_int);
+            break;
+        case 61:
+            showValue = false;
+            contstr = "Bank delete" + miscMsgPop(value_int);
             break;
         case 75:
             showValue = false;

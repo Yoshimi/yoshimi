@@ -129,7 +129,7 @@ class Bank : private MiscFuncs
         bool isDuplicate(size_t rootID, size_t bankID, int pos, const string filename);
         bool newIDbank(string newbankdir, unsigned int bankID, size_t rootID = 0xff);
         bool newbankfile(string newbankdir, size_t rootID);
-        bool removebank(unsigned int bankID);
+        unsigned int removebank(unsigned int bankID, size_t rootID = 255);
         void rescanforbanks(void);
         void clearBankrootDirlist(void);
         void removeRoot(size_t rootID);

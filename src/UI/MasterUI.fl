@@ -1404,12 +1404,31 @@ ZynAddSubFX}
             break;
         case 60: // import bank
             name = miscMsgPop(par2);
+            if (wasFromHere)
+            {
+                if (name.find("FAILED") == 1)
+                    fl_alert("%s",name.c_str());
+                else
+                {
+                    unsigned int other = name.find(" but ");
+                    if (other != string::npos)
+                    {
+                        name = name.substr(other + 5);
+                        fl_alert("%s",name.c_str());
+                    }
+                }
+            }
+            bankui->rescan_for_banks(false);
+            break;
+        case 61:
+            name = miscMsgPop(par2);
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
                     fl_alert("%s",name.c_str());
             }
             bankui->rescan_for_banks(false);
+            bankui->set_bank_slot();
             break;
         case 75: // save instrument to bank
             name = miscMsgPop(par2);

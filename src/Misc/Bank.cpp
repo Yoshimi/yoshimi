@@ -524,46 +524,72 @@ bool Bank::newbankfile(string newbankdir, size_t rootID)
 
 
 // Removes a bank and all its contents
-bool Bank::removebank(unsigned int bankID)
+unsigned int Bank::removebank(unsigned int bankID, size_t rootID)
 {
-    int chk;
+    int chk = 0;
+    if (rootID == 255)
+        rootID = currentRootID;
+    if (roots.count(rootID) == 0)
+    {
+        chk = 0x1000 | miscMsgPush("Root " + to_string(int(rootID)) + " is empty!");
+        return chk;
+    }
+    string bankName = getBankPath(rootID, bankID);
+    string IDfile = bankName + "/.bankdir";
+    FILE *tmpfile = fopen(IDfile.c_str(), "w+");
+    if (!tmpfile)
+        chk = 0x1000 | miscMsgPush("Can't delete from this location.");
+    else
+        fclose(tmpfile);
 
+    int ck1 = 0;
+    int ck2 = 0;
+    string name;
     for (int inst = 0; inst < BANK_SIZE; ++ inst)
     {
-        if (!roots [currentRootID].banks [bankID].instruments [inst].name.empty())
+        if (!roots [rootID].banks [bankID].instruments [inst].name.empty())
         {
-            chk = remove(getFullPath(currentRootID, bankID, inst).c_str());
-            if (chk < 0)
-            {
-                synth->getRuntime().Log(asString(inst) + " Failed to remove "
-                                        + getFullPath(currentRootID, bankID, inst) + " "
-                                        + string(strerror(errno)), 2);
-                return false;
-            }
-            deletefrombank(currentRootID, bankID, inst);
+            name = setExtension(getFullPath(currentRootID, bankID, inst), "xiy");
+            if (isRegFile(name))
+                ck1 = remove(name.c_str());
+            else
+                ck1 = 0;
+
+            name = setExtension(name, "xiz");
+            if (isRegFile(name))
+                ck2 = remove(name.c_str());
+            else
+                ck2 = 0;
+
+            if (ck1 == 0 && ck2 == 0)
+                deletefrombank(rootID, bankID, inst);
+            else if (chk == 0) // only want to name one entry
+                    chk = 0x1000 | miscMsgPush(findleafname(name) + ". Others may also still exist.");
         }
     }
-    string tmp = getBankPath(currentRootID, bankID)+"/.bankdir";
-    if (!access(tmp.c_str(), W_OK))
-    {
-        chk = remove(tmp.c_str());
-        if (chk < 0)
+    if (chk > 0)
+        return chk;
+
+    if (isRegFile(IDfile))
+    { // only removed when bank cleared
+        if (remove(IDfile.c_str()) != 0)
         {
-            synth->getRuntime().Log("Failed to remove bank ID file "
-                                    + string(strerror(errno)), 2);
-            return false;
+            chk = 0x1000 | miscMsgPush(findleafname(name));
+            return chk;
         }
     }
-    chk = remove(getBankPath(currentRootID, bankID).c_str());
-    if (chk < 0)
+
+    if (remove(bankName.c_str()) != 0)
     {
-        synth->getRuntime().Log("Failed to remove bank"
-                                + asString(bankID) + ": "
-                                + string(strerror(errno)), 2);
-        return false;
+        chk = 0x1000 | miscMsgPush(bankName + ". Unrecognised contents still exist.");
+        return chk;
     }
-    roots [currentRootID].banks.erase(bankID);
-    return true;
+
+    roots [rootID].banks.erase(bankID);
+    if (rootID == currentRootID && bankID == currentBankID)
+        setCurrentBankID(0);
+    chk = miscMsgPush(bankName);
+    return chk;
 }
 
 

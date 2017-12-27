@@ -1017,23 +1017,12 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
         {
             int clearit = true;
             int count = bank->getBankSize(slot);
-//            synth->getRuntime().Log("Bank size " + asString(count));
             if (count > 1)
                 clearit = fl_choice("There are %d instruments in this bank\\nThey will be permanently deleted",
                                     NULL, "STOP !", "Continue", count) > 1;
             if (clearit)
             {
-//                synth->getRuntime().Log("We're going");
-                if (bank->removebank(slot))
-                {
-                    if (slot == bank->getCurrentBankID())
-                        bank->setCurrentBankID(0,false);
-                    rescan_for_banks(false);
-                    set_bank_slot();
-                    rs[slot]->rootrefresh();
-                }
-                else
-                    fl_alert("Deleting %s failed. Some files may still exist", thisname.c_str());
+                send_data(61, slot, 0xf0, 0xf0, 0xff, 0xff, 0xff, 0x80);
             }
         }
         setrootread();
