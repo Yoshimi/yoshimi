@@ -635,11 +635,11 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         }
         default:
         {
-            if (npart < 64) // audio destination
+            if (npart < 64)
             {
                 switch(control)
                 {
-                    case 120:
+                    case 120: // audio destination
                         if (npart < synth->getRuntime().NumAvailableParts)
                         {
                             if (value & 2)

@@ -231,9 +231,19 @@ bool Config::Setup(int argc, char **argv)
     }
     if (restoreState)
     {
-        if (!StateFile.size() || !isRegFile(StateFile))
+        char *fp = NULL;
+        if (!StateFile.size())
+            goto no_state;
+
+        fp = realpath (StateFile.c_str(), NULL);
+        if (fp == NULL)
+            goto no_state;
+
+        StateFile = fp;
+        free (fp);
+        if (!isRegFile(StateFile))
         {
-            Log("Invalid state file specified for restore " + StateFile, 2);
+            no_state: Log("Invalid state file specified for restore " + StateFile, 2);
             return true;
         }
         Log("Using " + StateFile);
@@ -481,6 +491,7 @@ void Config::defaultPresets(void)
         "/usr/share/zynaddsubfx/presets",
         "/usr/local/share/zynaddsubfx/presets",
         string(getenv("HOME")) + "/.config/yoshimi/presets",
+        localPath("/presets"),
         "end"
     };
     int i = 0;

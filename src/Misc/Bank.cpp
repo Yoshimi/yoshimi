@@ -912,6 +912,7 @@ void Bank::addDefaultRootDirs()
         "/usr/share/zynaddsubfx/banks",
         "/usr/local/share/zynaddsubfx/banks",
         string(getenv("HOME")) + "/banks",
+        localPath("/banks"),
         "end"
     };
     int i = 0;

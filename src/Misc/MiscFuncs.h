@@ -64,6 +64,7 @@ class MiscFuncs
         int findSplitPoint(string name);
         string setExtension(string fname, string ext);
         bool copyFile(string source, string destination);
+        string localPath(string leaf);
 
         char *skipSpace(char *buf);
         char *skipChars(char *buf);

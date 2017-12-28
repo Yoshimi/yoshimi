@@ -363,6 +363,29 @@ bool MiscFuncs::copyFile(string source, string destination)
     return (result == 0);
 }
 
+
+// replace build directory with a different
+// one in the compilation directory
+string MiscFuncs::localPath(string leaf)
+{
+    char *tmpath = getcwd (NULL, 0);
+    if (tmpath == NULL)
+       return "";
+
+    string path = (string) tmpath;
+    free(tmpath);
+    size_t found = path.rfind("yoshimi");
+    if (found == string::npos)
+        return "";
+
+    size_t next = path.find('/', found);
+    if (next == string::npos)
+        return "";
+
+    return path.substr(0, next) + leaf;
+}
+
+
 char *MiscFuncs::skipSpace(char *buf)
 {
     while (buf[0] == 0x20)
