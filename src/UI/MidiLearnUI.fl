@@ -253,7 +253,7 @@ class MidiLearnKitItem {: {public Fl_Group}
             chan = lrint(channelchoice->value());
             break;
     }
-    if (doit)
+    if (doit && control)
         collect_data(synth, n, type, control & 0x1f, 216, CC, chan, min, max, 0);} {}
   }
   Function {MidiLearnKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
@@ -290,7 +290,7 @@ class MidiLearnUI {: {private MiscFuncs}
       tooltip {Editor for all learned controllers.
 CTRL-right click on any knob/slider to learn.
 Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {7 694 820 285} type Double hide
-      code0 {send_data(22, 0, 3);}
+      code0 {//send_data(22, 0, 3); // why were we doing this? it's wrong!}
     } {
       Fl_Scroll kitlist {
         tooltip {Editor for all learned controllers.
@@ -454,7 +454,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
             synth->getGuiMaster()->message->show();
             break;
         case 22:
-        midilearnwindow->show();
+            midilearnwindow->show();
             break;
         case 24: // flash LED
             IDold = kititem | (engine << 8);
