@@ -33,6 +33,12 @@
 #include <mutex>
 #include <limits.h>
 
+#if defined(__FreeBSD__)
+#include <copyfile.h>
+#else
+#include <sys/sendfile.h>
+#endif
+
 using namespace std;
 
 #include "Misc/MiscFuncs.h"
@@ -247,7 +253,11 @@ void MiscFuncs::legit_pathname(string& fname)
     }
 }
 
-
+/*
+ * This only intended for calls on the local filesystem
+ * and to know locations, so buffer size should be adequate
+ * and avoids dependency on unreliable macros.
+ */
 string MiscFuncs::findfile(string path, string filename, string extension)
 {
     string command = "find " + path + " -name " + filename + "." + extension + " 2>/dev/null -print -quit";
@@ -255,7 +265,7 @@ string MiscFuncs::findfile(string path, string filename, string extension)
     FILE *fp = popen(command.c_str(), "r");
     if (fp == NULL)
         return "";
-    char line[1000];
+    char line[1024];
     fscanf(fp,"%[^\n]", line);
     pclose(fp);
 
@@ -336,20 +346,43 @@ string MiscFuncs::setExtension(string fname, string ext)
 }
 
 
-// replace 'src' with a different one in the compilation directory
+bool MiscFuncs::copyFile(string source, string destination)
+{
+    int input = open(source.c_str(), O_RDONLY);
+    int output = creat(destination.c_str(), 0660);
+#if defined(__FreeBSD__)
+    int result = fcopyfile(input, output, 0, COPYFILE_ALL);
+#else
+    off_t bytesCopied = 0;
+    struct stat fileinfo = {0};
+    fstat(input, &fileinfo);
+    int result = sendfile(output, input, &bytesCopied, fileinfo.st_size);
+#endif
+    close(input);
+    close(output);
+    return (result == 0);
+}
+
+
+// replace build directory with a different
+// one in the compilation directory
 string MiscFuncs::localPath(string leaf)
 {
-    char *tmpath;
-    tmpath = (char*) malloc(PATH_MAX);
-    getcwd (tmpath, PATH_MAX);
+    char *tmpath = getcwd (NULL, 0);
+    if (tmpath == NULL)
+       return "";
+
     string path = (string) tmpath;
-    size_t found = path.rfind("/src");
-    if (found != string::npos)
-        path.replace (found,4,leaf);
-    else
-        path = "";
     free(tmpath);
-    return path;
+    size_t found = path.rfind("yoshimi");
+    if (found == string::npos)
+        return "";
+
+    size_t next = path.find('/', found);
+    if (next == string::npos)
+        return "";
+
+    return path.substr(0, next) + leaf;
 }
 
 

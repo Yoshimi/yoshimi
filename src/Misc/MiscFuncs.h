@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modifed February 2017
+    Modifed December 2017
 */
 
 #ifndef MISCFUNCS_H
@@ -63,6 +63,7 @@ class MiscFuncs
         string findleafname(string name);
         int findSplitPoint(string name);
         string setExtension(string fname, string ext);
+        bool copyFile(string source, string destination);
         string localPath(string leaf);
 
         char *skipSpace(char *buf);
@@ -95,11 +96,11 @@ T limit(T val, T min, T max)
     return val < min ? min : (val > max ? max : val);
 }
 
-inline float MiscFuncs::dB2rap(float dB) { 
-#if defined(HAVE_EXP10F) 
-    return exp10f((dB) / 20.0f); 
-#else 
-    return powf(10.0, (dB) / 20.0f); 
+inline float MiscFuncs::dB2rap(float dB) {
+#if defined(HAVE_EXP10F)
+    return exp10f((dB) / 20.0f);
+#else
+    return powf(10.0, (dB) / 20.0f);
 #endif
 }
 inline float MiscFuncs::rap2dB(float rap) { return 20.0f * log10f(rap); }

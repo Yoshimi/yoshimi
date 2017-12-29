@@ -213,7 +213,6 @@ class MasterUI {selected : {private GuiUpdates}
           setMasterLabel(synth->getRuntime().paramsLoad);
       }
       masterwindow->show();
-
       // these don't have access to synth ->
       microtonalui->microtonaluiwindow->copy_label(synth->makeUniqueName("Scales").c_str());
       yoshiLog->logConsole->copy_label(synth->makeUniqueName("Console").c_str());
@@ -249,7 +248,14 @@ class MasterUI {selected : {private GuiUpdates}
       //if (kitlistO)
           //partui->instrumentkitlist->show();
       //if (partfxO)
-          //partui->partfx->show();} {}
+          //partui->partfx->show();
+      if (synth->getRuntime().oldConfig)
+      {
+          string msg;
+          msg = "Existing config older than V " + to_string(MIN_CONFIG_MAJOR) + "." + to_string(MIN_CONFIG_MINOR) + " \\nCheck settings, save and restart.";
+          message->position(masterwindow->x() + masterwindow->w() / 2 - message->w() / 2, masterwindow->y() + masterwindow->h() / 2 - message->h() / 2);
+          words->copy_label(msg.c_str());
+          message->show();}} {}
   }
   Function {make_window()} {} {
     Fl_Window masterwindow {
@@ -324,7 +330,12 @@ class MasterUI {selected : {private GuiUpdates}
             label {&View Manual}
             callback {//
             string manfile = synth->manualname();
-            string path = findfile("/", manfile.c_str(), "pdf");
+            unsigned int pos = manfile.find(" ");
+            if (pos < string::npos)
+                manfile = manfile.substr(0, pos);
+            string path = findfile("/usr/", manfile.c_str(), "pdf");
+            if (path == "")
+            path = findfile("/home/", manfile.c_str(), "pdf");
             if (path == "")
             {
                 fl_alert("Can't find manual :(");
@@ -609,8 +620,13 @@ paramsui->Show(3);}
           label Reset
           callback {//
           if (fl_choice("Set *ALL* dynamic values to their defaults?", NULL, "No", "Yes") > 1)
-              send_data(96, 0, 0xf0, 0xf0, 0xff, 0xff, 0xc0);}
-          tooltip {Clear all dynamic settings} xywh {7 60 70 24} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
+          {
+              if(Fl::event_state(FL_CTRL) == 0)
+                  send_data(96, 0, 0xf0, 0xf0, 0xff, 0xff, 0xc0);
+              else
+                  send_data(97, 0, 0xf0, 0xf0, 0xff, 0xff, 0xc0);}}
+          tooltip {Clear all dynamic settings
+Ctrl + confirm includes MIDI-learn} xywh {7 60 70 24} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
         }
         Fl_Button {} {
           label {Stop!}
@@ -1140,6 +1156,28 @@ ZynAddSubFX}
         }
       }
     }
+    Fl_Window message {
+      label Yoshimi
+      xywh {9 25 290 85} type Double labelsize 12 hide
+      code0 {o->copy_label(synth->makeUniqueName("").c_str());}
+    } {
+      Fl_Box words {
+        label {?}
+        xywh {5 9 280 45} color 55 selection_color 55 labelfont 1 labelsize 12 align 149
+      }
+      Fl_Button {} {
+        label Close
+        callback {message->hide();}
+        xywh {211 60 70 20}
+      }
+      Fl_Button cancel {
+        label Cancel
+        callback {//
+        send_data(255, 0, 3);
+        o->hide();}
+        xywh {130 60 70 20} hide
+      }
+    }
   }
   Function {send_data(int control, float value, int type, int part = 0xff, int engine = 0xff, int insert = 0xff, int parameter = 0xff, int par2 = 0xff)} {} {
     code {//
@@ -1397,6 +1435,34 @@ ZynAddSubFX}
         case 49:
             updatepanel();
             break;
+        case 60: // import bank
+            name = miscMsgPop(par2);
+            if (wasFromHere)
+            {
+                if (name.find("FAILED") == 1)
+                    fl_alert("%s",name.c_str());
+                else
+                {
+                    unsigned int other = name.find(" but ");
+                    if (other != string::npos)
+                    {
+                        name = name.substr(other + 5);
+                        fl_alert("%s",name.c_str());
+                    }
+                }
+            }
+            bankui->rescan_for_banks(false);
+            break;
+        case 61:
+            name = miscMsgPop(par2);
+            if (name.find("FAILED") == 1)
+            {
+                if (wasFromHere)
+                    fl_alert("%s",name.c_str());
+            }
+            bankui->rescan_for_banks(false);
+            bankui->set_bank_slot();
+            break;
         case 75: // save instrument to bank
             name = miscMsgPop(par2);
             updatepartprogram(parameter);
@@ -1526,6 +1592,12 @@ ZynAddSubFX}
                 refresh_master_ui(1);
             else if (newpart < 64)
                 partNew(newpart);
+            break;
+
+        case 97:
+            refresh_master_ui(1);
+            if (midilearnui)
+                midilearnui->Hide();
             break;
 
         case 128:

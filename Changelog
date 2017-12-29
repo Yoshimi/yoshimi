@@ -1,4 +1,40 @@
-yoshimi 1.5.6
+yoshimi 1.5.6 M
+
+2017-12-29 Will
+* Revised old config warning.
+  Now centred on master window an only
+  recognises config files.
+* Moved other use of message window to master ui.
+* BugFix: MIDI-learn init was killing message window.
+
+2017-12-28 Will
+* Reinstated safe version of localpath().
+* Applied PATH_MAX patch from debian maintainer.
+
+2017-12-27 Will
+* Refactored bank removal code.
+* Improved bank import reporting.
+* Updated docs.
+* Master reset can now clear MIDI-learn.
+* Moved panic stop out of RBP thread.
+  This will eventually be cleared completely.
+
+2017-12-26 Will
+* Removed dependency on PATH_MAX
+* Removed inclusion of local path in banks/presets.
+* Removed redundant localPath function from MiscFuncs.
+* Improved response time finding/displaying manual.
+* Completed CLI bank import.
+* Moved build number to ConfBuild.h
+* Corrected and added instructions to INSTALL.
+* More doc updates - I was bored!
+
+2017-12-21 Will
+* Implemented import of complete banks.
+* Updated docs.
+* BugFix: duplicate entry test in wrong place :(
+  Wiping out paired .xiz and .xiy in exiting banks.
+* More doc updates.
 
 2017-12-16 Will
 * Included current manual.

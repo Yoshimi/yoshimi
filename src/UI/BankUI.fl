@@ -490,7 +490,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
     }
     Fl_Window bankuiwindow {
       label Root
-      xywh {55 474 775 575} type Double labelsize 12 hide
+      xywh {84 223 775 575} type Double labelsize 12 hide
       code0 {o->copy_label(bank->getRootFileTitle().c_str());}
     } {
       Fl_Button {} {
@@ -572,16 +572,8 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
         } {}
       }
       Fl_Group rootmodeselect {
-        xywh {5 528 475 42} box ENGRAVED_BOX
+        xywh {5 528 570 42} box ENGRAVED_BOX
       } {
-        Fl_Light_Button rootwritebutton {
-          label ADD
-          callback {//
-          if (o->value() > 0.5)
-              mode = 2;
-          removeselection();}
-          xywh {200 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 3 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
-        }
         Fl_Light_Button rootreadbutton {
           label SELECT
           callback {//
@@ -591,22 +583,6 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
           xywh {10 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 101 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
           code0 {o->value(1);}
         }
-        Fl_Light_Button rootclearbutton {
-          label DELETE
-          callback {//
-          if (o->value() > 0.5)
-              mode = 3;
-          removeselection();}
-          xywh {295 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 1 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
-        }
-        Fl_Light_Button rootswapbutton {
-          label SWAP
-          callback {//
-          if (o->value() > 0.5)
-              mode = 4;
-          removeselection();}
-          xywh {390 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 227 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
-        }
         Fl_Light_Button rootrenamebutton {
           label RENAME
           callback {//
@@ -614,6 +590,38 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
               mode = 5;
           removeselection();}
           xywh {105 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 5 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
+        }
+        Fl_Light_Button rootwritebutton {
+          label ADD
+          callback {//
+          if (o->value() > 0.5)
+              mode = 2;
+          removeselection();}
+          xywh {200 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 3 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
+        }
+        Fl_Light_Button rootimportbutton {
+          label IMPORT
+          callback {//
+          if (o->value() > 0.5)
+              mode = 6;
+          removeselection();}
+          xywh {295 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 3 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
+        }
+        Fl_Light_Button rootclearbutton {
+          label DELETE
+          callback {//
+          if (o->value() > 0.5)
+              mode = 3;
+          removeselection();}
+          xywh {390 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 1 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
+        }
+        Fl_Light_Button rootswapbutton {
+          label SWAP
+          callback {//
+          if (o->value() > 0.5)
+              mode = 4;
+          removeselection();}
+          xywh {485 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 227 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
         }
       }
       Fl_Button {} {
@@ -942,6 +950,15 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
         return;
     }
 
+    if (mode == 6)
+    {
+    	const char *dirname;
+        dirname = fl_dir_chooser("Import a new bank:",synth->getRuntime().userHome.c_str(), 0);
+        if (dirname)
+            send_data(60, slot, 0xf0, 0xf0, 0xff, 0xff, 0xff, 0x80, miscMsgPush(string(dirname)));
+   	setrootread();
+    }
+
     if (mode == 5 && !thisname.empty())
     {   // Rename bank
         const char *tmp = fl_input("Bank name:",thisname.c_str());
@@ -1000,23 +1017,12 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
         {
             int clearit = true;
             int count = bank->getBankSize(slot);
-//            synth->getRuntime().Log("Bank size " + asString(count));
             if (count > 1)
                 clearit = fl_choice("There are %d instruments in this bank\\nThey will be permanently deleted",
                                     NULL, "STOP !", "Continue", count) > 1;
             if (clearit)
             {
-//                synth->getRuntime().Log("We're going");
-                if (bank->removebank(slot))
-                {
-                    if (slot == bank->getCurrentBankID())
-                        bank->setCurrentBankID(0,false);
-                    rescan_for_banks(false);
-                    set_bank_slot();
-                    rs[slot]->rootrefresh();
-                }
-                else
-                    fl_alert("Deleting %s failed. Some files may still exist", thisname.c_str());
+                send_data(61, slot, 0xf0, 0xf0, 0xff, 0xff, 0xff, 0x80);
             }
         }
         setrootread();
@@ -1067,6 +1073,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
     mode = 1;
     rootreadbutton->value(1);
     rootwritebutton->value(0);
+    rootimportbutton->value(0);
     rootclearbutton->value(0);
     rootswapbutton->value(0);
     rootrenamebutton->value(0);} {}

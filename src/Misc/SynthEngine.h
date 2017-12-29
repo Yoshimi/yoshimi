@@ -136,7 +136,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool vectorInit(int dHigh, unsigned char chan, int par);
         void vectorSet(int dHigh, unsigned char chan, int par);
         void ClearNRPNs(void);
-        void resetAll(void);
+        void resetAll(bool andML);
         float numRandom(void);
         unsigned int randomSE(void);
         void ShutUp(void);
@@ -242,6 +242,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         Bank &getBankRef() {return bank;}
         Bank *getBankPtr() {return &bank;}
+        unsigned int importBank(string inportfile, size_t rootID, unsigned int bankID);
+        unsigned int removeBank(unsigned int bankID, size_t rootID);
         string getWindowTitle() {return windowTitle;}
         void setWindowTitle(string _windowTitle = "");
         void setNeedsSaving(bool ns) { needsSaving = ns; }

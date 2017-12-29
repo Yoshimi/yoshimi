@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified September 2017
+    Modified December 2017
 */
 
 #include <iostream>
@@ -49,7 +49,7 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
 #include "MasterUI.h"
-#include "ConfBuild.cpp"
+#include "ConfBuild.h"
 
 static char prog_doc[] =
     "Yoshimi " YOSHIMI_VERSION ", a derivative of ZynAddSubFX - "
@@ -98,6 +98,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     restoreState(false),
     stateChanged(false),
     restoreJackSession(false),
+    oldConfig(false),
     runSynth(true),
     finishedCLI(true),
     VirKeybLayout(0),
@@ -231,21 +232,22 @@ bool Config::Setup(int argc, char **argv)
     }
     if (restoreState)
     {
-        char * fp;
-        if (! StateFile.size()) goto no_state0;
-        else fp = new char [PATH_MAX];
+        char *fp = NULL;
+        if (!StateFile.size())
+            goto no_state;
 
-        if (! realpath (StateFile.c_str(), fp)) goto no_state1;
+        fp = realpath (StateFile.c_str(), NULL);
+        if (fp == NULL)
+            goto no_state;
+
         StateFile = fp;
-        delete (fp);
-
-        if (! isRegFile(StateFile))
+        free (fp);
+        if (!isRegFile(StateFile))
         {
-            no_state1: delete (fp);
-            no_state0: Log("Invalid state file specified for restore " + StateFile, 2);
+            no_state: Log("Invalid state file specified for restore " + StateFile, 2);
             return true;
         }
-        Log(StateFile);
+        Log("Using " + StateFile);
         restoreSessionData(StateFile, true);
         /* There is a single state file that contains both startup config
          * data that must be set early, and runtime data that must be set
@@ -476,6 +478,13 @@ bool Config::loadConfig(void)
             if (isok)
                 Oscilsize = (int)truncf(powf(2.0f, ceil(log (Oscilsize - 1.0f) / logf(2.0))));
             delete xml;
+            if (synth->getUniqueId() == 0)
+            {
+                if (lastXMLmajor < MIN_CONFIG_MAJOR || lastXMLminor < MIN_CONFIG_MINOR)
+                    oldConfig = true;
+                else
+                    oldConfig = false;
+            }
         }
     }
     return isok;
@@ -1211,7 +1220,6 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
         default:
             return error_t(ARGP_ERR_UNKNOWN);
     }
-
     return error_t(0);
 }
 

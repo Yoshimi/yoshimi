@@ -51,9 +51,9 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
                 // identifying this for button 3 as MIDI learn
                 else
                 {
-                    synth->getGuiMaster()->midilearnui->words->copy_label("Can't learn this control");
-                    synth->getGuiMaster()->midilearnui->message->show();
-                    synth->getGuiMaster()->midilearnui->message->position(Fl::event_x_root() + 16, Fl::event_y_root());
+                    synth->getGuiMaster()->words->copy_label("Can't learn this control");
+                    synth->getGuiMaster()->message->show();
+                    synth->getGuiMaster()->message->position(Fl::event_x_root() + 16, Fl::event_y_root());
                     synth->getRuntime().Log("Can't MIDI-learn this control");
                     /* can't use fl_alert here.
                      * For some reason it goes into a loop on spin boxes
@@ -123,9 +123,9 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 
     if (control == 0xfe && insert != 9) // just show a messge
     {
-        synth->getGuiMaster()->midilearnui->words->copy_label(miscMsgPop(insertPar2).c_str());
-        synth->getGuiMaster()->midilearnui->cancel->hide();
-        synth->getGuiMaster()->midilearnui->message->show();
+        synth->getGuiMaster()->words->copy_label(miscMsgPop(insertPar2).c_str());
+        synth->getGuiMaster()->cancel->hide();
+        synth->getGuiMaster()->message->show();
         return;
     }
     if (npart == 0xe8) // scales

@@ -34,7 +34,9 @@ add_definitions(-Wall)
 add_definitions(-Werror=format-security)
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "1.5.6")
+set (YOSHIMI_VERSION "1.5.6 M")
+add_definitions (-DMIN_CONFIG_MAJOR=1)
+add_definitions (-DMIN_CONFIG_MINOR=5)
 
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
@@ -343,7 +345,7 @@ set (Effects_sources
 )
 
 set (Misc_sources
-    Misc/ConfBuild.cpp  Misc/Config.cpp  Misc/SynthEngine.cpp  Misc/Bank.cpp  Misc/Splash.cpp
+    Misc/Config.cpp  Misc/SynthEngine.cpp  Misc/Bank.cpp  Misc/Splash.cpp
     Misc/Microtonal.cpp   Misc/Part.cpp  Misc/XMLwrapper.cpp  Misc/MiscFuncs.cpp   Misc/WavFile.cpp
 )
 
