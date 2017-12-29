@@ -98,6 +98,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     restoreState(false),
     stateChanged(false),
     restoreJackSession(false),
+    oldConfig(false),
     runSynth(true),
     finishedCLI(true),
     VirKeybLayout(0),
@@ -477,6 +478,13 @@ bool Config::loadConfig(void)
             if (isok)
                 Oscilsize = (int)truncf(powf(2.0f, ceil(log (Oscilsize - 1.0f) / logf(2.0))));
             delete xml;
+            if (synth->getUniqueId() == 0)
+            {
+                if (lastXMLmajor < MIN_CONFIG_MAJOR || lastXMLminor < MIN_CONFIG_MINOR)
+                    oldConfig = true;
+                else
+                    oldConfig = false;
+            }
         }
     }
     return isok;

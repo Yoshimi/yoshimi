@@ -98,6 +98,7 @@ class Config : public MiscFuncs
         string        jackSessionFile;
         int           lastXMLmajor;
         int           lastXMLminor;
+        bool          oldConfig;
 
         static unsigned int  Samplerate;
         static unsigned int  Buffersize;

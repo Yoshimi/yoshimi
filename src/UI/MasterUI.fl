@@ -213,7 +213,6 @@ class MasterUI {selected : {private GuiUpdates}
           setMasterLabel(synth->getRuntime().paramsLoad);
       }
       masterwindow->show();
-
       // these don't have access to synth ->
       microtonalui->microtonaluiwindow->copy_label(synth->makeUniqueName("Scales").c_str());
       yoshiLog->logConsole->copy_label(synth->makeUniqueName("Console").c_str());
@@ -249,7 +248,14 @@ class MasterUI {selected : {private GuiUpdates}
       //if (kitlistO)
           //partui->instrumentkitlist->show();
       //if (partfxO)
-          //partui->partfx->show();} {}
+          //partui->partfx->show();
+      if (synth->getRuntime().oldConfig)
+      {
+          string msg;
+          msg = "Existing config older than V " + to_string(MIN_CONFIG_MAJOR) + "." + to_string(MIN_CONFIG_MINOR) + " \\nCheck settings, save and restart.";
+          message->position(masterwindow->x() + masterwindow->w() / 2 - message->w() / 2, masterwindow->y() + masterwindow->h() / 2 - message->h() / 2);
+          words->copy_label(msg.c_str());
+          message->show();}} {}
   }
   Function {make_window()} {} {
     Fl_Window masterwindow {
@@ -619,7 +625,8 @@ paramsui->Show(3);}
                   send_data(96, 0, 0xf0, 0xf0, 0xff, 0xff, 0xc0);
               else
                   send_data(97, 0, 0xf0, 0xf0, 0xff, 0xff, 0xc0);}}
-          tooltip {Clear all dynamic settings\nCtrl + confirm includes MIDI-learn} xywh {7 60 70 24} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
+          tooltip {Clear all dynamic settings
+Ctrl + confirm includes MIDI-learn} xywh {7 60 70 24} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
         }
         Fl_Button {} {
           label {Stop!}
@@ -1147,6 +1154,28 @@ ZynAddSubFX}
           label Loop
           xywh {0 0 34 20} labelsize 12
         }
+      }
+    }
+    Fl_Window message {
+      label Yoshimi
+      xywh {9 25 290 85} type Double labelsize 12 hide
+      code0 {o->copy_label(synth->makeUniqueName("").c_str());}
+    } {
+      Fl_Box words {
+        label {?}
+        xywh {5 9 280 45} color 55 selection_color 55 labelfont 1 labelsize 12 align 149
+      }
+      Fl_Button {} {
+        label Close
+        callback {message->hide();}
+        xywh {211 60 70 20}
+      }
+      Fl_Button cancel {
+        label Cancel
+        callback {//
+        send_data(255, 0, 3);
+        o->hide();}
+        xywh {130 60 70 20} hide
       }
     }
   }

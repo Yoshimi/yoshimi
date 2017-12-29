@@ -1,5 +1,10 @@
 yoshimi 1.5.6 M
 
+2017-12-29 Will
+* Revised old config warning.
+  Now centred on master window an only
+  recognises config files.
+
 2017-12-28 Will
 * Reinstated safe version of localpath().
 * Applied PATH_MAX patch from debian maintainer.

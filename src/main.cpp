@@ -326,9 +326,6 @@ int main(int argc, char *argv[])
     pthread_attr_t attr;
     sem_t semGui;
 
-    int minVmajor = 1; // need to improve this idea
-    int minVminor = 5;
-
     if (!mainCreateNewInstance(0))
     {
         goto bail_out;
@@ -340,12 +337,10 @@ int main(int argc, char *argv[])
     bShowGui = firstRuntime->showGui;
     bShowCmdLine = firstRuntime->showCLI;
 
-    if (firstRuntime->lastXMLmajor < minVmajor || firstRuntime->lastXMLminor < minVminor)
+    if (firstRuntime->oldConfig)
     {
 
-        cout << "Existing config older than " << minVmajor << "." << minVminor << "\nCheck settings, save and restart."<< endl;
-        if (bShowGui)
-            fl_alert("Existing config older than V %d.%d\nCheck settings, save and restart.", minVmajor, minVminor);
+        cout << "\nExisting config older than " << MIN_CONFIG_MAJOR << "." << MIN_CONFIG_MINOR << "\nCheck settings, save and restart.\n"<< endl;
     }
     if(sem_init(&semGui, 0, 0) == 0)
     {
