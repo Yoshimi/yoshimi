@@ -17,7 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-Modified November 2017
+Modified December 2017
 } {in_source in_header
 }
 
@@ -927,9 +927,9 @@ class VectorUI {selected : {private MiscFuncs}
   }
   Function {errorlabel(string msg)} {} {
     code {//
-            synth->getGuiMaster()->midilearnui->words->copy_label(msg.c_str());
-            synth->getGuiMaster()->midilearnui->message->show();
-            synth->getGuiMaster()->midilearnui->message->position(Fl::event_x_root() + 16, Fl::event_y_root());} {}
+            synth->getGuiMaster()->words->copy_label(msg.c_str());
+            synth->getGuiMaster()->message->show();
+            synth->getGuiMaster()->message->position(Fl::event_x_root() + 16, Fl::event_y_root());} {}
   }
   decl {SynthEngine *synth;} {private local
   }

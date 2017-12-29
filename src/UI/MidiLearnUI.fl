@@ -387,29 +387,6 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         code1 {if (listType.size() == 0) o->deactivate(); else o->activate();}
       }
     }
-    Fl_Window message {
-      label Yoshimi
-      xywh {4 20 290 85} type Double labelsize 12 hide
-      code0 {o->copy_label(synth->makeUniqueName("").c_str());}
-    } {
-      Fl_Box words {
-        label {?}
-        xywh {5 9 280 45} color 55 selection_color 55 labelfont 1 labelsize 12 align 149
-      }
-      Fl_Button {} {
-        label Close
-        callback {message->hide();}
-        xywh {211 60 70 20}
-      }
-      Fl_Button cancel {
-        label Cancel
-        callback {//
-        send_data(255, 0, 3);
-        o->hide();}
-        xywh {130 60 70 20} hide
-      }
-    }
-  }
   Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff, int insert = 0xff, int parameter = 0xff, int par2 = 0xff)} {} {
     code {//
     collect_data(synth, value, type, control, 216, kititem, engine, insert, parameter, par2);} {}
@@ -471,10 +448,10 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         case 20: // not using this yet
             break;
         case 21:
-            words->copy_label(miscMsgPop(par2).c_str());
-            cancel->show();
-            message->position(Fl::event_x_root() + 16, Fl::event_y_root());
-            message->show();
+            synth->getGuiMaster()->words->copy_label(miscMsgPop(par2).c_str());
+            synth->getGuiMaster()->cancel->show();
+            synth->getGuiMaster()->message->position(Fl::event_x_root() + 16, Fl::event_y_root());
+            synth->getGuiMaster()->message->show();
             break;
         case 22:
         midilearnwindow->show();
@@ -502,9 +479,9 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
             clearAll(value == 0);
             break;
         case 255:
-            cancel->hide();
-            words->copy_label("Learn cancelled");
-            message->show();
+            synth->getGuiMaster()->cancel->hide();
+            synth->getGuiMaster()->words->copy_label("Learn cancelled");
+            synth->getGuiMaster()->message->show();
             break;
     }} {}
   }
@@ -564,8 +541,8 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         none->show();
         clear->deactivate();
         save->deactivate();
-        cancel->hide();
-        message->hide();
+        synth->getGuiMaster()->cancel->hide();
+        synth->getGuiMaster()->message->hide();
     }
     kitlist->redraw();
     kitlist->show();} {}
