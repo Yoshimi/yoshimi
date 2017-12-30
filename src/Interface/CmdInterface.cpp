@@ -806,7 +806,7 @@ int CmdInterface::keyShift(int part)
         value = MIN_KEY_SHIFT;
     else if(value > MAX_KEY_SHIFT)
         value = MAX_KEY_SHIFT;
-    sendDirect(value, cmdType, 35, part);
+    sendDirect(value, cmdType, 35, part, 0xff, 0xff, 0xff, 0x80);
     return done_msg;
 }
 
@@ -2040,7 +2040,7 @@ int CmdInterface::commandReadnSet()
     {
         if (!isRead && point[0] == 0)
             return value_msg;
-        sendDirect(string2int127(point), cmdType, 32, 240);
+        sendDirect(string2int127(point), cmdType, 32, 240, 0xff, 0xff, 0xff, 0x80);
         return done_msg;
     }
 

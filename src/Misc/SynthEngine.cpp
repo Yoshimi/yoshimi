@@ -115,7 +115,6 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     tmpmixr(NULL),
     processLock(NULL),
     vuringbuf(NULL),
-    RBPringbuf(NULL),
     stateXMLtree(NULL),
     guiMaster(NULL),
     guiClosedCallback(NULL),
@@ -144,13 +143,8 @@ SynthEngine::~SynthEngine()
 {
     closeGui();
 
-    if (RBPthreadHandle)
-        pthread_join(RBPthreadHandle, NULL);
-
     if (vuringbuf)
         jack_ringbuffer_free(vuringbuf);
-    if (RBPringbuf)
-        jack_ringbuffer_free(RBPringbuf);
 
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         if (part[npart])
@@ -268,17 +262,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         goto bail_out;
     }
 
-    if (!(RBPringbuf = jack_ringbuffer_create(512)))
-    {
-        Runtime.Log("SynthEngine failed to create RBPringbuf");
-        goto bail_out;
-    }
-    if (jack_ringbuffer_mlock(RBPringbuf))
-    {
-        Runtime.Log("Failed to lock RBPringbuf memory");
-        goto bail_out;
-    }
-
     tmpmixl = (float*)fftwf_malloc(bufferbytes);
     tmpmixr = (float*)fftwf_malloc(bufferbytes);
     if (!tmpmixl || !tmpmixr)
@@ -382,13 +365,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             cout << "Can't find path " << Runtime.rootDefine << endl;
     }
 
-
-    if (!Runtime.startThread(&RBPthreadHandle, _RBPthread, this, false, 0, false, "RBP"))
-    {
-        Runtime.Log("Failed to start RBP thread");
-        goto bail_out;
-    }
-
     // we seem to need this here only for first time startup :(
     bank.setCurrentBankID(Runtime.tempBank);
 
@@ -403,10 +379,6 @@ bail_out:
     if (vuringbuf)
         jack_ringbuffer_free(vuringbuf);
     vuringbuf = NULL;
-
-    if (RBPringbuf)
-        jack_ringbuffer_free(RBPringbuf);
-    RBPringbuf = NULL;
 
     if (tmpmixl)
         fftwf_free(tmpmixl);
@@ -437,71 +409,6 @@ bail_out:
         sysefx[nefx] = NULL;
     }
     return false;
-}
-
-
-void *SynthEngine::_RBPthread(void *arg)
-{
-    return static_cast<SynthEngine*>(arg)->RBPthread();
-}
-
-
-void *SynthEngine::RBPthread(void)
-{
-    struct RBP_data block;
-    unsigned int readsize = sizeof(RBP_data);
-    memset(block.data, 0, readsize);
-    char *point;
-    unsigned int toread;
-    unsigned int read;
-    unsigned int found;
-    unsigned int tries;
-    string name;
-    while (Runtime.runSynth)
-    {
-        if (jack_ringbuffer_read_space(RBPringbuf) >= readsize)
-        {
-            toread = readsize;
-            read = 0;
-            tries = 0;
-            point = (char*)&block;
-            while (toread && tries < 3)
-            {
-                found = jack_ringbuffer_read(RBPringbuf, point, toread);
-                read += found;
-                point += found;
-                toread -= found;
-                ++tries;
-            }
-            if (!toread)
-            {
-                switch ((unsigned char)block.data[0])
-                {
-                    case 10: // set global fine detune
-                        microtonal.Pglobalfinedetune = block.data[1];
-                        setAllPartMaps();
-                        break;
-
-                    case 11: // set global key shift
-                        setPkeyshift(block.data[1]);
-                        setAllPartMaps();
-                        break;
-
-                    case 12: // set part keyshift
-                        part[(unsigned char)block.data[1]]->Pkeyshift = block.data[2];
-                        setPartMap(block.data[1]);
-                        break;
-                }
-                // in case it was called from CLI
-                Runtime.finishedCLI = true;
-            }
-            else
-                Runtime.Log("Unable to read data from Root/Bank/Program");
-        }
-        else
-            usleep(120); // yes it's a hack but seems reliable
-    }
-    return NULL;
 }
 
 
@@ -1603,38 +1510,6 @@ int SynthEngine::SetSystemValue(int type, int value)
 
     }
     return 0;
-}
-
-
-void SynthEngine::writeRBP(char type, char data0, char data1, char data2)
-{
-    struct RBP_data block;
-    unsigned int writesize = sizeof(RBP_data);
-    block.data[0] = type;
-    block.data[1] = data0;
-    block.data[2] = data1;
-    block.data[3] = data2;
-    char *point = (char*)&block;
-    unsigned int towrite = writesize;
-    unsigned int wrote = 0;
-    unsigned int found;
-    unsigned int tries = 0;
-
-    if (jack_ringbuffer_write_space(RBPringbuf) >= writesize)
-    {
-        while (towrite && tries < 3)
-        {
-            found = jack_ringbuffer_write(RBPringbuf, point, towrite);
-            wrote += found;
-            point += found;
-            towrite -= found;
-            ++tries;
-        }
-        if (towrite)
-            Runtime.Log("Unable to write data to Root/Bank/Program");
-    }
-    else
-        Runtime.Log("Root/Bank/Program buffer full!");
 }
 
 

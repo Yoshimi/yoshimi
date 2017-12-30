@@ -393,6 +393,29 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         {
             switch (control)
             {
+                case 32: // master fine detune
+                {
+                    if (write)
+                    {
+                        synth->microtonal.Pglobalfinedetune = value;
+                        synth->setAllPartMaps();
+                    }
+                    else
+                        value = synth->microtonal.Pglobalfinedetune;
+                    break;
+                }
+                case 35: // master key shift
+                {
+                    if (write)
+                    {
+                        synth->setPkeyshift(value + 64);
+                        synth->setAllPartMaps();
+                    }
+                    else
+                        value = synth->Pkeyshift - 64;
+                    break;
+                }
+
                 case 60: // import bank
                 {
                     unsigned int result = synth->importBank(text, kititem, value);
@@ -639,6 +662,18 @@ void InterChange::indirectTransfers(CommandBlock *getData)
             {
                 switch(control)
                 {
+                    case 35:
+                    {
+                        if (write)
+                        {
+                            synth->part[npart]->Pkeyshift = value + 64;
+                            synth->setPartMap(npart);
+                        }
+                        else
+                            value = synth->part[npart]->Pkeyshift - 64;
+                        getData->data.parameter &= 0x7f;
+                    }
+                        break;
                     case 120: // audio destination
                         if (npart < synth->getRuntime().NumAvailableParts)
                         {
@@ -646,6 +681,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                                 mainRegisterAudioPort(synth, npart);
                             getData->data.parameter &= 0x7f;
                         }
+                        break;
                 }
             }
             break;
@@ -4276,17 +4312,9 @@ void InterChange::commandMain(CommandBlock *getData)
                 value = synth->getRuntime().NumAvailableParts;
             break;
 
-        case 32:
-            if (write)
-                synth->writeRBP(10, value_int, 0); // global fine detune
-            else
-                value = synth->microtonal.Pglobalfinedetune;
+        case 32: // done elsewhere
             break;
-        case 35:
-            if (write)
-                synth->writeRBP(11, value_int + 64, 0); // global keyshift
-            else
-                value = synth->Pkeyshift - 64;
+        case 35: // done elsewhere
             break;
 
         case 48:
@@ -4664,11 +4692,7 @@ void InterChange::commandPart(CommandBlock *getData)
             else
                 value = part->Pkeylimit;
             break;
-        case 35:
-            if (write)
-                synth->writeRBP(12, npart, value_int + 64); // part keyshift
-            else
-                value = part->Pkeyshift - 64;
+        case 35: // done elsewhere
             break;
 
         case 40:

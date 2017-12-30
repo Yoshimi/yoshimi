@@ -558,7 +558,7 @@ Offset}
         Fl_Spinner partkeyshift {
           label {Key Shift}
           callback {//
-          send_data(35, o->value(), 0xc0);}
+          send_data(35, o->value(), 0xc0, 0xff, 0xff, 0xff, 0x80);}
           xywh {194 111 38 20} labelsize 10 minimum -36 maximum 36 textsize 11
           code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
           code1 {o->value(part->Pkeyshift - 64);}

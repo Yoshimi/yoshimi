@@ -609,7 +609,7 @@ paramsui->Show(3);}
         Fl_Dial globalfinedetune {
           label Detune
           callback {//
-          send_data(32, o->value(), 0xc8);}
+          send_data(32, o->value(), 0xc8, 0xf0, 0xff, 0xff, 0x80);}
           tooltip {Global Fine Detune} xywh {286 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1 value 64
           code0 {o->setValueType(VC_GlobalFineDetune);}
           code1 {o->value(synth->microtonal.Pglobalfinedetune);}
@@ -876,7 +876,7 @@ Ctrl + confirm includes MIDI-learn} xywh {7 60 70 24} box PLASTIC_UP_BOX color 2
       Fl_Spinner masterkeyshift {
         label {Key Shift}
         callback {//
-        send_data(35, o->value(), 0xc0);}
+        send_data(35, o->value(), 0xc0, 0xf0, 0xff, 0xff, 0x80);}
         tooltip {Shift pitch +/- N semitones} xywh {336 88 38 20} labelsize 10 minimum -36 maximum 36 textsize 10
         code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
         code1 {o->value(synth->Pkeyshift - 64);}

@@ -4,8 +4,8 @@ Top Level
 YL : 0 to 127 : 0 : 240 : 255 : 255 : 255 : 255 : 255 : Volume
 Y : 0 to 63 : 14 : 240 : 255 : 255 : 255 : 255 : 255 : Part number
 Y : 16, 32, 64 : 15 : 240 : 255 : 255 : 255 : 255 : 255 : Number of available parts
-YL : 0 to 127 : 32 : 240 : 255 : 255 : 255 : 255 : 255 : Detune frequency
-Y : -36 to 36 : 35 : 240 : 255 : 255 : 255 : 255 : 255 : Key shift
+YL : 0 to 127 : 32 : 240 : 255 : 255 : 255 : 128 : 255 : Detune frequency
+Y : -36 to 36 : 35 : 240 : 255 : 255 : 255 : 128 : 255 : Key shift
 Y : 0 to 3 : 48 : 240 : 255 : 255 : 255 : 255 : 255 : Channel Switcher Type (Solo) - Off, Row, Column, Loop
 Y : 14 to 119 : 49 : 240 : 255 : 255 : 255 : 255 : 255 : Channel Switcher Incoming CC
 
@@ -127,7 +127,7 @@ Y : any : 19 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Maximum to last key press
 Y : any : 20 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Clear key limits
 
 Y : 1 to 60 : 33 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Max number notes
-Y : -36 to 36 : 35 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Key shift
+Y : -36 to 36 : 35 : 0 to 63 : 255 : 255 : 255 : 128 : 255 : Key shift
 
 YL : 0 to 127 : 40 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Part to system effects 0
 YL : 0 to 127 : 41 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Part to system effects 1

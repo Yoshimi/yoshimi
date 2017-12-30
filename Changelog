@@ -1,5 +1,11 @@
 yoshimi 1.5.6 M
 
+2017-12-30 Will
+* Moved all key shifts out of RBP thread.
+* Moved master fine detune out of RBP thread.
+* Removed (now redundant) RBP thread.
+* Updated docs.
+
 2017-12-29 Will
 * Revised old config warning.
   Now centred on master window an only
