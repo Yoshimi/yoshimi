@@ -3,6 +3,7 @@ yoshimi 1.5.6 M
 2017-12-31 Will
 * Removed some redundant threadmessage code.
 * Listed proposed new root & bank commands.
+* Last 2017 bugfix! MIDI-learn block didn't :(
 
 2017-12-30 Will
 * Moved all key shifts out of RBP thread.

@@ -253,7 +253,7 @@ class MidiLearnKitItem {: {public Fl_Group}
             chan = lrint(channelchoice->value());
             break;
     }
-    if (doit && control)
+    if (doit)
         collect_data(synth, n, type, control & 0x1f, 216, CC, chan, min, max, 0);} {}
   }
   Function {MidiLearnKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
