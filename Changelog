@@ -1,5 +1,9 @@
 yoshimi 1.5.6 M
 
+2018-1-4 Will
+* Corrected message for unknown MIDI event.
+  Also now as hex and obeys 'Log incomming events'
+
 2017-12-31 Will
 * Removed some redundant threadmessage code.
 * Listed proposed new root & bank commands.
