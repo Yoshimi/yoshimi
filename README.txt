@@ -9,7 +9,7 @@ Breath control (CC2) can now be disabled on a per-instrument basis. It seems som
 
 V 1.5.5 - Mistle Thrush
 
-Some users wanted a way to store the Controllers settings with an instrument. These can make quite a dramatic difference to the sound. There is now a superset of instruments that can be saved instead of, or as well as, the standard ones. On loading, Yoshimi will look for the extended version first. This applies to instruments in banks as well as externally saved ones. If you have an extended type loaded the instrument name will be a mid-blue instead of black. This is refleced in the stored instruments in bank slots.
+Some users wanted a way to store the Controllers settings with an instrument. These can make quite a dramatic difference to the sound. There is now a superset of instruments that can be saved instead of, or as well as, the standard ones. On loading, Yoshimi will look for the extended version first. This applies to instruments in banks as well as externally saved ones. If you have an extended type loaded the instrument name will be a mid-blue instead of black. This is reflected in the stored instruments in bank slots.
 
 From now on any improvements we make to instrument patches will be applied in full to the extended version, and as much as is viable (in a compatible form) to the standard ones. Under no circumstances will we change standard patch format. There are many hundreds of these in the wild, and musicians may have their own reasons for preferring them (and older versions of the synth).
 

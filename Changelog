@@ -1,5 +1,10 @@
 yoshimi 1.5.6 M
 
+2018-1-13 Will
+* Rationalised use of file extensions.
+  Especially in Banks.cpp
+* Minor doc updates.
+
 2018-1-7 Will
 * Removed redundant direct setting GUI LFO frequency.
 

@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2010, Alan Calvert
-    Copyright 2014-2015 Will Godfrey & others
+    Copyright 2014-2018 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is a derivative of a ZynAddSubFX original.
-    Modified December 2017
+    Modified January 2018
 */
 
 #ifndef BANK_H
@@ -167,6 +167,7 @@ class Bank : private MiscFuncs
         //string dirname;
         const string defaultinsname;
         const string xizext;
+        const string xiyext;
         const string force_bank_dir_file;
         SynthEngine *synth;
 

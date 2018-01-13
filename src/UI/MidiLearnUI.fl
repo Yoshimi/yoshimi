@@ -8,7 +8,7 @@ comment {MidiLearnUI.h} {not_in_source in_header
 comment {MidiLearnUI.cc} {in_source not_in_header
 }
 
-comment {Copyright (C) 2016-2017, Will Godfrey
+comment {Copyright (C) 2016-2018, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -24,7 +24,8 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-Modified December 2017} {selected in_source in_header
+Modified January 2018
+} {selected in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -197,7 +198,6 @@ class MidiLearnKitItem {: {public Fl_Group}
         }
       }
       Fl_Check_Button mutecheck {
-        label 999
         callback {//
         if (o->value())
             midilearnkititemgroup->deactivate();
@@ -387,6 +387,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         code1 {if (listType.size() == 0) o->deactivate(); else o->activate();}
       }
     }
+  }
   Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff, int insert = 0xff, int parameter = 0xff, int par2 = 0xff)} {} {
     code {//
     collect_data(synth, value, type, control, 216, kititem, engine, insert, parameter, par2);} {}
