@@ -1,7 +1,7 @@
 /*
     InterChange.cpp - General communications
 
-    Copyright 2016-2017, Will Godfrey & others
+    Copyright 2016-2018, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified December 2017
+    Modified January 2018
 */
 
 #include <iostream>
@@ -3554,6 +3554,13 @@ bool InterChange::commandSendReal(CommandBlock *getData)
 
     if (engine >= 0x80)
     {
+        if ((engine & 0x7f) > 7)
+        {
+            getData->data.type = 0xff; // block any further action
+            synth->getRuntime().Log("Invalid voice number");
+            synth->getRuntime().finishedCLI = true;
+            return false;
+        }
         switch (insert)
         {
             case 0xff:
@@ -3607,7 +3614,9 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         }
         return true;
     }
-    // just do nothing if not recognised
+    getData->data.type = 0xff; // block any further action
+    synth->getRuntime().Log("Invalid engine number");
+    synth->getRuntime().finishedCLI = true;
     return false;
 }
 
@@ -4433,6 +4442,12 @@ void InterChange::commandPart(CommandBlock *getData)
     bool write = (type & 0x40) > 0;
     bool kitType = (insert == 0x20);
 
+    if ( kitType && kititem >= NUM_KIT_ITEMS)
+    {
+        getData->data.type = 0xff; // block any further action
+        synth->getRuntime().Log("Invalid kit number");
+        return;
+    }
     int value_int = lrint(value);
     char value_bool = (value > 0.5f);
 
