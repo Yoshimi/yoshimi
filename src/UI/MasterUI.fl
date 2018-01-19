@@ -986,8 +986,8 @@ ZynAddSubFX}
     }
     Fl_Window panelwindow {
       label {Yoshimi Mixer Panel}
-      xywh {6 48 550 675} type Double labelfont 13 labelsize 13 hide
-      code0 {if (synth->getRuntime().single_row_panel) Panelbox1->hide();}
+      xywh {483 128 550 670} type Double labelfont 13 labelsize 13 hide
+      code0 {if (synth->getRuntime().single_row_panel) ;}
       code1 {o->copy_label(synth->makeUniqueName("Mixer Panel").c_str());}
     } {
       Fl_Pack Panelpack1 {
@@ -1000,9 +1000,6 @@ ZynAddSubFX}
           }}
         code1 {o->spacing(-3);}
       } {}
-      Fl_Box Panelbox1 {
-        xywh {-4 316 563 7} box THIN_DOWN_BOX deactivate
-      }
       Fl_Pack Panelpack2 {
         xywh {8 325 533 286} type HORIZONTAL
         code0 {//
@@ -1013,30 +1010,25 @@ ZynAddSubFX}
             }}
         code1 {o->spacing(-3);}
       } {}
-      Fl_Box PanelBox2 {
-        xywh {-4 632 563 7} box THIN_DOWN_BOX deactivate
-      }
       Fl_Button Panelclose {
         label Close
         callback {//
         panelwindow->hide();}
-        xywh {482 645 55 25} box THIN_UP_BOX labelsize 13
+        xywh {482 646 55 25} box THIN_UP_BOX labelsize 13
       }
       Fl_Button {} {
         label {Change to 1 x 16}
         callback {//
-        Panelbox1->hide();
         synth->getRuntime().single_row_panel = 1;
         updatepanel();}
-        xywh {356 645 116 25} box THIN_UP_BOX labelsize 13
+        xywh {354 640 118 25} box THIN_UP_BOX labelsize 13
       }
       Fl_Button {} {
         label {Change to 2 x 8}
         callback {//
         synth->getRuntime().single_row_panel = 0;
-        updatepanel();
-        Panelbox1->show();}
-        xywh {821 314 116 25} box THIN_UP_BOX labelsize 13
+        updatepanel();}
+        xywh {821 319 116 25} box THIN_UP_BOX labelsize 13
       }
       Fl_Choice Panelgroups {
         label {Part Group}
@@ -1044,23 +1036,23 @@ ZynAddSubFX}
         panelgroup = o->value() * NUM_MIDI_CHANNELS;
         Panelsmallgroups->value(o->value());
         updatepanel();}
-        xywh {12 653 86 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
+        xywh {12 650 86 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
       } {
         MenuItem {} {
           label {1 to 16}
-          xywh {0 0 34 20}
+          xywh {0 0 34 20} labelsize 12
         }
         MenuItem {} {
           label {17 to 32}
-          xywh {0 0 34 20}
+          xywh {0 0 34 20} labelsize 12
         }
         MenuItem {} {
           label {33 to 48}
-          xywh {0 0 34 20}
+          xywh {0 0 34 20} labelsize 12
         }
         MenuItem {} {
           label {49 to 64}
-          xywh {0 0 34 20}
+          xywh {0 0 34 20} labelsize 12
         }
       }
       Fl_Choice Panelsmallgroups {
@@ -1069,22 +1061,22 @@ ZynAddSubFX}
         panelgroup = o->value() * NUM_MIDI_CHANNELS;
         Panelgroups->value(o->value());
         updatepanel();}
-        xywh {12 653 86 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
+        xywh {12 650 86 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
       } {
         MenuItem {} {
           label {1 to 16}
-          xywh {10 10 34 20}
+          xywh {10 10 34 20} labelsize 12
         }
         MenuItem {} {
           label {17 to 32}
-          xywh {10 10 34 20}
+          xywh {10 10 34 20} labelsize 12
         }
       }
       Fl_Spinner CSspinner {
         label CC
         callback {//
         CSpend->show();}
-        xywh {216 653 50 18} labelsize 12 align 1 minimum 0 maximum 127 value 115 textsize 12
+        xywh {216 650 50 18} labelsize 12 align 1 minimum 0 maximum 127 value 115 textsize 12
         code0 {CS_CC = synth->getRuntime().channelSwitchCC;}
         code1 {if (CS_CC < 128) o->value(CS_CC); else o->value(115);}
       }
@@ -1133,7 +1125,7 @@ ZynAddSubFX}
                 CSpend->show();
         }
         send_data(48, o->value(), 0xc0);}
-        tooltip {Assign groups of parts to Ch 1, singly enabled by MIDI} xywh {130 653 53 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
+        tooltip {Assign groups of parts to Ch 1, singly enabled by MIDI} xywh {130 650 53 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
         code1 {o->value(synth->getRuntime().channelSwitchType);}
         code2 {if (o->value() == 0) CSspinner->hide(); else CSspinner->show();}
         code3 {CS_CC = o->value();}
@@ -1635,25 +1627,25 @@ ZynAddSubFX}
     code {//
     if (synth->getRuntime().single_row_panel)
     {
-            panelwindow->size(1085,345);
+            panelwindow->size(1085,350);
             Panelpack2->position(544,10);
-            Panelclose->position(1018,314);
-            Panelgroups->position(12,323);
-            Panelsmallgroups->position(12,323);
-            channelswitch->position(130,323);
-            CSspinner->position(216,323);
-            CSpend->position(276,321);
+            Panelclose->position(1018,319);
+            Panelgroups->position(12,327);
+            Panelsmallgroups->position(12,327);
+            channelswitch->position(130,327);
+            CSspinner->position(216,327);
+            CSpend->position(276,325);
     }
     else
     {
-            panelwindow->size(550,675);
+            panelwindow->size(550,670);
             Panelpack2->position(8,325);
-            Panelclose->position(482,645);
-            Panelgroups->position(12,653);
-            Panelsmallgroups->position(12,653);
-            channelswitch->position(130,653);
-            CSspinner->position(216,653);
-            CSpend->position(276,651);
+            Panelclose->position(482,639);
+            Panelgroups->position(12,645);
+            Panelsmallgroups->position(12,645);
+            channelswitch->position(130,645);
+            CSspinner->position(216,645);
+            CSpend->position(275,643);
     }
 
     for (int npart = 0; npart < partmax; ++npart)

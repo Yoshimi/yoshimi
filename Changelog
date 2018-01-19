@@ -1,5 +1,9 @@
 yoshimi 1.5.6 M
 
+2018-1-19 Will
+* Cosmetic changes to panel window.
+  Improves clarity and consistency.
+
 2018-1-17 Will
 * Added range checks on kits, engines and voices.
 * Started work on change current root/bank.
