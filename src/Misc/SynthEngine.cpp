@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2009, James Morris
-    Copyright 2014-2017, Will Godfrey & others
+    Copyright 2014-2018, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified December 2017
+    Modified January 2018
 */
 
 #define NOLOCKS
@@ -758,7 +758,7 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
     bool hasProgChange = (program < 0xff || par2 < 0xff);
 
     struct timeval tv1, tv2;
-    if (Runtime.showTimes && hasProgChange)
+    if (notinplace && Runtime.showTimes && hasProgChange)
         gettimeofday(&tv1, NULL);
 
     if (root < 0x80)
@@ -892,20 +892,22 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
             partonoffLock(npart, 2); // as it was
     }
 
-    if (ok && Runtime.showTimes && hasProgChange)
-    {
-        gettimeofday(&tv2, NULL);
-        if (tv1.tv_usec > tv2.tv_usec)
-        {
-            tv2.tv_sec--;
-            tv2.tv_usec += 1000000;
-        }
-        int actual = ((tv2.tv_sec - tv1.tv_sec) *1000 + (tv2.tv_usec - tv1.tv_usec)/ 1000.0f) + 0.5f;
-        name += ("  Time " + to_string(actual) + "mS");
-    }
     int msgID = 0xff;
     if (notinplace)
+    {
+        if (ok && Runtime.showTimes && hasProgChange)
+        {
+            gettimeofday(&tv2, NULL);
+            if (tv1.tv_usec > tv2.tv_usec)
+            {
+                tv2.tv_sec--;
+                tv2.tv_usec += 1000000;
+            }
+            int actual = ((tv2.tv_sec - tv1.tv_sec) *1000 + (tv2.tv_usec - tv1.tv_usec)/ 1000.0f) + 0.5f;
+            name += ("  Time " + to_string(actual) + "mS");
+        }
         msgID = miscMsgPush(name);
+    }
     if (!ok)
         msgID |= 0x1000;
     return msgID;
@@ -914,13 +916,13 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
 
 int SynthEngine::ReadBankRoot(void)
 {
-    return bank.currentRootID;
+    return bank.currentRootID; // this is private so handle with care
 }
 
 
 int SynthEngine::ReadBank(void)
 {
-    return bank.currentBankID;
+    return bank.currentBankID; // this is private so handle with care
 }
 
 
@@ -2368,12 +2370,6 @@ bool SynthEngine::saveBanks(int instance)
     delete xmltree;
 
     return true;
-}
-
-
-bool SynthEngine::saveToBankSlot(size_t rootID, size_t bankID, int ninstrument, int npart)
-{
-    return bank.savetoslot(rootID, bankID, ninstrument, npart);
 }
 
 

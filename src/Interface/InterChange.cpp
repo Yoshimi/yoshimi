@@ -457,7 +457,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     }
                     //cout << "\n\nRoot " << int(kititem) << "  Bank " << int(engine) << "  Part " << int(value) << "  Slot " << int(insert) << "  Par2 " << int(par2) << " \n\n" << endl;
                     text = synth->part[value]->Pname + " to " + to_string(int(insert));
-                    if (synth->saveToBankSlot(kititem, engine, insert, value))
+                    if (synth->getBankRef().savetoslot(kititem, engine, insert, value))
                     {
                         text = "d " + text;
                         synth->part[value]->PyoshiType = (synth->getRuntime().instrumentFormat > 1);
@@ -4291,7 +4291,8 @@ void InterChange::commandMain(CommandBlock *getData)
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
-    //unsigned char kititem = getData->data.kit;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
     unsigned char par2 = getData->data.par2;
@@ -4347,6 +4348,16 @@ void InterChange::commandMain(CommandBlock *getData)
             }
             else
                 value = synth->getRuntime().channelSwitchCC;
+            break;
+
+        case 73: // set current root and bank
+            if (write)
+            {
+                if (kititem < 0x80) // should test for success
+                    synth->getBankRef().setCurrentRootID(kititem);
+                if (engine < 0x80) // should test for success
+                    synth->getBankRef().setCurrentBankID(engine, true);
+            }
             break;
 
         case 74: // load instrument from ID
