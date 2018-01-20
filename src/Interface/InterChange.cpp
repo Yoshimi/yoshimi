@@ -752,6 +752,43 @@ string InterChange::formatScales(string text)
 }
 
 
+float InterChange::readAllData(CommandBlock *getData, unsigned char commandType)
+{
+    CommandBlock tryData;
+    if (commandType < 0xff)
+    {
+        memcpy(tryData.bytes, getData->bytes, sizeof(tryData));
+        float value = 0; // this will be the new limits testing
+        synth->getRuntime().finishedCLI = true;
+        return value;
+        /*
+         * commandtype values
+         * 0    adjusted input value
+         * 1    min
+         * 2    default
+         * 3    max
+         *
+         * tryData.data.type will be updated:
+         * bit 6 set    MIDI-learnable
+         * bit 7 set    Is an integer value
+         */
+    }
+    do
+    {
+        memcpy(tryData.bytes, getData->bytes, sizeof(tryData));
+        blockRead = false;
+        commandSendReal(&tryData);
+        if (blockRead)
+            usleep(100);
+    }
+    while (blockRead);
+    if ((tryData.data.type & 0x10))
+        resolveReplies(&tryData);
+    synth->getRuntime().finishedCLI = true; // in case it misses lines above line
+    return tryData.data.value;
+}
+
+
 void InterChange::resolveReplies(CommandBlock *getData)
 {
     float value = getData->data.value;
@@ -3398,11 +3435,9 @@ void InterChange::doClearPart(int npart)
 bool InterChange::commandSend(CommandBlock *getData)
 {
     bool isWrite = (getData->data.type & 0x40) > 0;
-    /*
-     * temporararily moved this up as some commands
-     * still write directly, so are converted to reads
-     * in the appropriate sections to stop conflicts.
-     */
+    if (isWrite)
+        blockRead = true;
+
     bool isChanged = commandSendReal(getData);
     if (isWrite && isChanged) //write command
     {

@@ -2829,6 +2829,11 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
     putData.data.insert = insert;
     putData.data.parameter = parameter;
     putData.data.par2 = par2;
+    if ((type & 0x40) == 0)
+    {
+        synth->interchange.readAllData(&putData);
+        return 0;
+    }
     if (putData.data.value == FLT_MAX)
     {
         synth->interchange.resolveReplies(&putData);

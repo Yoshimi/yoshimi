@@ -2,6 +2,7 @@ yoshimi 1.5.6 M
 
 2018-1-20 Will
 * Minor bank optimisations.
+* Started new thread safe async read.
 
 2018-1-19 Will
 * Cosmetic changes to panel window.
