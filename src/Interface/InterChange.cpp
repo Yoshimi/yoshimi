@@ -805,9 +805,10 @@ float InterChange::readAllData(CommandBlock *getData, unsigned char commandType)
     }
 
     reTry: // these are not!
+    memcpy(tryData.bytes, getData->bytes, sizeof(tryData));
     while (blockRead > 0)
         usleep(100);
-    memcpy(tryData.bytes, getData->bytes, sizeof(tryData));
+
     commandSendReal(&tryData);
     if (blockRead > 0)
         goto reTry; // it may have changed mid-process
