@@ -66,7 +66,7 @@ string toplist [] = {
     "ADD",                      "add paths and files",
     "  Root <s>",               "root path to list",
     "  Bank <s>",               "make new bank in current root",
-    "IMport [s <n1>] <n2> <s>", "import named bank to slot n2 of current root, or Root n1"
+    "IMport [s <n1>] <n2> <s>", "import named bank to slot n2 of current root, or Root n1",
     "REMove",                   "remove paths, files and entries",
     "  Root <n>",               "de-list root path ID",
     "  Bank [s <n1>] <n2>",     "delete bank ID n2 (and all instruments) from current root or Root n1",
