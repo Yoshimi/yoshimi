@@ -3,6 +3,8 @@ yoshimi 1.5.6 M
 2018-1-21 Will
 * BugFix: CLI abort if query on top list.
 * Refinements to thread safe async read.
+* Part reads in CLI no longer change GUI part.
+* Further refinements to thread safe async read.
 
 2018-1-20 Will
 * Minor bank optimisations.

@@ -95,7 +95,7 @@ class InterChange : private MiscFuncs
         string resolveEnvelope(CommandBlock *getData);
         string resolveEffects(CommandBlock *getData);
         bool showValue;
-        bool blockRead;
+        unsigned char blockRead;
 
         void commandMidi(CommandBlock *getData);
         void commandVector(CommandBlock *getData);

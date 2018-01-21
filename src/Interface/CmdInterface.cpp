@@ -1639,7 +1639,7 @@ int CmdInterface::commandPart(bool justSet)
     int reply = todo_msg;
     int tmp;
     bool changed = false;
-    npart = Runtime.currentPart; // belt and braces
+    //npart = Runtime.currentPart; // belt and braces
     if (point[0] == 0)
         return done_msg;
     if (bitTest(level, all_fx))
@@ -1659,8 +1659,11 @@ int CmdInterface::commandPart(bool justSet)
             if (npart != tmp)
             {
                 npart = tmp;
-                sendDirect(npart, 64, 14, 240);
-                changed = true;
+                if (!isRead)
+                {
+                    sendDirect(npart, 64, 14, 240);
+                    changed = true;
+                }
             }
             if (point[0] == 0)
                 return done_msg;
@@ -1732,40 +1735,24 @@ int CmdInterface::commandPart(bool justSet)
     }
     else if (matchnMove(1, point, "destination"))
     {
-        if (isRead)
-        {
-            string name;
-            switch (synth->part[npart]->Paudiodest)
-            {
-                case 2:
-                    name = "part";
-                    break;
-                case 3:
-                    name = "both";
-                    break;
-                case 1:
-                default:
-                    name = "main";
-                    break;
-            }
-            Runtime.Log("Jack audio to " + name, 1);
-            return done_msg;
-        }
+        int type;
         int dest = 0;
-
-        if (matchnMove(1, point, "main"))
-            dest = 1;
-        else if (matchnMove(1, point, "part"))
-            dest = 2;
-        else if (matchnMove(1, point, "both"))
-            dest = 3;
-        if (dest > 0)
-        {
-            sendDirect(dest, 64, 120, npart, 255, 255, 255, 192);
-            reply = done_msg;
-        }
+        if (isRead)
+            type = 0;
         else
-            reply = range_msg;
+        {
+            type = 64;
+            if (matchnMove(1, point, "main"))
+                dest = 1;
+            else if (matchnMove(1, point, "part"))
+                dest = 2;
+            else if (matchnMove(1, point, "both"))
+                dest = 3;
+            if (dest == 0)
+                reply = range_msg;
+        }
+        sendDirect(dest, type, 120, npart, 255, 255, 255, 192);
+        reply = done_msg;
     }
     else if (matchnMove(1, point, "breath"))
     {
@@ -2108,7 +2095,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
     Config &Runtime = synth->getRuntime();
 
     replyString = "";
-    npart = Runtime.currentPart;
+    //npart = Runtime.currentPart;
     int reply = todo_msg;
     int tmp;
 
