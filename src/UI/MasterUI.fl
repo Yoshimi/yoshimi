@@ -11,7 +11,7 @@ comment {MasterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2017, Will Godfrey & others
+Copyright 2014-2018, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified December 2017
+Modified January 2018
 
 } {in_source in_header
 }
@@ -609,7 +609,7 @@ paramsui->Show(3);}
         Fl_Dial globalfinedetune {
           label Detune
           callback {//
-          send_data(32, o->value(), 0xc8);}
+          send_data(32, o->value(), 0xc8, 0xf0, 0xff, 0xff, 0x80);}
           tooltip {Global Fine Detune} xywh {286 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1 value 64
           code0 {o->setValueType(VC_GlobalFineDetune);}
           code1 {o->value(synth->microtonal.Pglobalfinedetune);}
@@ -876,7 +876,7 @@ Ctrl + confirm includes MIDI-learn} xywh {7 60 70 24} box PLASTIC_UP_BOX color 2
       Fl_Spinner masterkeyshift {
         label {Key Shift}
         callback {//
-        send_data(35, o->value(), 0xc0);}
+        send_data(35, o->value(), 0xc0, 0xf0, 0xff, 0xff, 0x80);}
         tooltip {Shift pitch +/- N semitones} xywh {336 88 38 20} labelsize 10 minimum -36 maximum 36 textsize 10
         code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
         code1 {o->value(synth->Pkeyshift - 64);}
@@ -986,8 +986,8 @@ ZynAddSubFX}
     }
     Fl_Window panelwindow {
       label {Yoshimi Mixer Panel}
-      xywh {6 48 550 675} type Double labelfont 13 labelsize 13 hide
-      code0 {if (synth->getRuntime().single_row_panel) Panelbox1->hide();}
+      xywh {483 128 550 670} type Double labelfont 13 labelsize 13 hide
+      code0 {if (synth->getRuntime().single_row_panel) ;}
       code1 {o->copy_label(synth->makeUniqueName("Mixer Panel").c_str());}
     } {
       Fl_Pack Panelpack1 {
@@ -1000,9 +1000,6 @@ ZynAddSubFX}
           }}
         code1 {o->spacing(-3);}
       } {}
-      Fl_Box Panelbox1 {
-        xywh {-4 316 563 7} box THIN_DOWN_BOX deactivate
-      }
       Fl_Pack Panelpack2 {
         xywh {8 325 533 286} type HORIZONTAL
         code0 {//
@@ -1013,30 +1010,25 @@ ZynAddSubFX}
             }}
         code1 {o->spacing(-3);}
       } {}
-      Fl_Box PanelBox2 {
-        xywh {-4 632 563 7} box THIN_DOWN_BOX deactivate
-      }
       Fl_Button Panelclose {
         label Close
         callback {//
         panelwindow->hide();}
-        xywh {482 645 55 25} box THIN_UP_BOX labelsize 13
+        xywh {482 646 55 25} box THIN_UP_BOX labelsize 13
       }
       Fl_Button {} {
         label {Change to 1 x 16}
         callback {//
-        Panelbox1->hide();
         synth->getRuntime().single_row_panel = 1;
         updatepanel();}
-        xywh {356 645 116 25} box THIN_UP_BOX labelsize 13
+        xywh {354 640 118 25} box THIN_UP_BOX labelsize 13
       }
       Fl_Button {} {
         label {Change to 2 x 8}
         callback {//
         synth->getRuntime().single_row_panel = 0;
-        updatepanel();
-        Panelbox1->show();}
-        xywh {821 314 116 25} box THIN_UP_BOX labelsize 13
+        updatepanel();}
+        xywh {821 319 116 25} box THIN_UP_BOX labelsize 13
       }
       Fl_Choice Panelgroups {
         label {Part Group}
@@ -1044,23 +1036,23 @@ ZynAddSubFX}
         panelgroup = o->value() * NUM_MIDI_CHANNELS;
         Panelsmallgroups->value(o->value());
         updatepanel();}
-        xywh {12 653 86 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
+        xywh {12 650 86 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
       } {
         MenuItem {} {
           label {1 to 16}
-          xywh {0 0 34 20}
+          xywh {0 0 34 20} labelsize 12
         }
         MenuItem {} {
           label {17 to 32}
-          xywh {0 0 34 20}
+          xywh {0 0 34 20} labelsize 12
         }
         MenuItem {} {
           label {33 to 48}
-          xywh {0 0 34 20}
+          xywh {0 0 34 20} labelsize 12
         }
         MenuItem {} {
           label {49 to 64}
-          xywh {0 0 34 20}
+          xywh {0 0 34 20} labelsize 12
         }
       }
       Fl_Choice Panelsmallgroups {
@@ -1069,22 +1061,22 @@ ZynAddSubFX}
         panelgroup = o->value() * NUM_MIDI_CHANNELS;
         Panelgroups->value(o->value());
         updatepanel();}
-        xywh {12 653 86 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
+        xywh {12 650 86 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
       } {
         MenuItem {} {
           label {1 to 16}
-          xywh {10 10 34 20}
+          xywh {10 10 34 20} labelsize 12
         }
         MenuItem {} {
           label {17 to 32}
-          xywh {10 10 34 20}
+          xywh {10 10 34 20} labelsize 12
         }
       }
       Fl_Spinner CSspinner {
         label CC
         callback {//
         CSpend->show();}
-        xywh {216 653 50 18} labelsize 12 align 1 minimum 0 maximum 127 value 115 textsize 12
+        xywh {216 650 50 18} labelsize 12 align 1 minimum 0 maximum 127 value 115 textsize 12
         code0 {CS_CC = synth->getRuntime().channelSwitchCC;}
         code1 {if (CS_CC < 128) o->value(CS_CC); else o->value(115);}
       }
@@ -1133,7 +1125,7 @@ ZynAddSubFX}
                 CSpend->show();
         }
         send_data(48, o->value(), 0xc0);}
-        tooltip {Assign groups of parts to Ch 1, singly enabled by MIDI} xywh {130 653 53 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
+        tooltip {Assign groups of parts to Ch 1, singly enabled by MIDI} xywh {130 650 53 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
         code1 {o->value(synth->getRuntime().channelSwitchType);}
         code2 {if (o->value() == 0) CSspinner->hide(); else CSspinner->show();}
         code3 {CS_CC = o->value();}
@@ -1453,7 +1445,7 @@ ZynAddSubFX}
             }
             bankui->rescan_for_banks(false);
             break;
-        case 61:
+        case 61: // delete bank and contents
             name = miscMsgPop(par2);
             if (name.find("FAILED") == 1)
             {
@@ -1462,6 +1454,12 @@ ZynAddSubFX}
             }
             bankui->rescan_for_banks(false);
             bankui->set_bank_slot();
+            break;
+        case 73: // set current root and/or bank
+            if (kititem < 255)
+                ; // do both
+            else if (engine < 255)
+                ; // just bank
             break;
         case 75: // save instrument to bank
             name = miscMsgPop(par2);
@@ -1629,25 +1627,25 @@ ZynAddSubFX}
     code {//
     if (synth->getRuntime().single_row_panel)
     {
-            panelwindow->size(1085,345);
+            panelwindow->size(1085,350);
             Panelpack2->position(544,10);
-            Panelclose->position(1018,314);
-            Panelgroups->position(12,323);
-            Panelsmallgroups->position(12,323);
-            channelswitch->position(130,323);
-            CSspinner->position(216,323);
-            CSpend->position(276,321);
+            Panelclose->position(1018,319);
+            Panelgroups->position(12,327);
+            Panelsmallgroups->position(12,327);
+            channelswitch->position(130,327);
+            CSspinner->position(216,327);
+            CSpend->position(276,325);
     }
     else
     {
-            panelwindow->size(550,675);
+            panelwindow->size(550,670);
             Panelpack2->position(8,325);
-            Panelclose->position(482,645);
-            Panelgroups->position(12,653);
-            Panelsmallgroups->position(12,653);
-            channelswitch->position(130,653);
-            CSspinner->position(216,653);
-            CSpend->position(276,651);
+            Panelclose->position(482,639);
+            Panelgroups->position(12,645);
+            Panelsmallgroups->position(12,645);
+            channelswitch->position(130,645);
+            CSspinner->position(216,645);
+            CSpend->position(275,643);
     }
 
     for (int npart = 0; npart < partmax; ++npart)

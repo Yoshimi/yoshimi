@@ -1,7 +1,7 @@
 /*
     MidiDecode.cpp
 
-    Copyright 2017 Will Godfrey
+    Copyright 2017-2018 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified November 2017
+    Modified January 2018
 */
 
 #include <iostream>
@@ -102,8 +102,8 @@ void MidiDecode::midiProcess(unsigned char par0, unsigned char par1, unsigned ch
                 if (!in_place) // never want to get this when freewheeling!
                     setMidiController(channel, ctrltype, 0);
             }
-            else
-                synth->getRuntime().Log("other event: " + asString((int)ev), 1);
+            else if (synth->getRuntime().monitorCCin)
+                synth->getRuntime().Log("Unsupported event: 0x" + asHexString(int(par0)));
             break;
     }
 }

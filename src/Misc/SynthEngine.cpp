@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2009, James Morris
-    Copyright 2014-2017, Will Godfrey & others
+    Copyright 2014-2018, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified December 2017
+    Modified January 2018
 */
 
 #define NOLOCKS
@@ -115,7 +115,6 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     tmpmixr(NULL),
     processLock(NULL),
     vuringbuf(NULL),
-    RBPringbuf(NULL),
     stateXMLtree(NULL),
     guiMaster(NULL),
     guiClosedCallback(NULL),
@@ -144,13 +143,8 @@ SynthEngine::~SynthEngine()
 {
     closeGui();
 
-    if (RBPthreadHandle)
-        pthread_join(RBPthreadHandle, NULL);
-
     if (vuringbuf)
         jack_ringbuffer_free(vuringbuf);
-    if (RBPringbuf)
-        jack_ringbuffer_free(RBPringbuf);
 
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         if (part[npart])
@@ -268,17 +262,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         goto bail_out;
     }
 
-    if (!(RBPringbuf = jack_ringbuffer_create(512)))
-    {
-        Runtime.Log("SynthEngine failed to create RBPringbuf");
-        goto bail_out;
-    }
-    if (jack_ringbuffer_mlock(RBPringbuf))
-    {
-        Runtime.Log("Failed to lock RBPringbuf memory");
-        goto bail_out;
-    }
-
     tmpmixl = (float*)fftwf_malloc(bufferbytes);
     tmpmixr = (float*)fftwf_malloc(bufferbytes);
     if (!tmpmixl || !tmpmixr)
@@ -384,13 +367,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             cout << "Can't find path " << Runtime.rootDefine << endl;
     }
 
-
-    if (!Runtime.startThread(&RBPthreadHandle, _RBPthread, this, false, 0, false, "RBP"))
-    {
-        Runtime.Log("Failed to start RBP thread");
-        goto bail_out;
-    }
-
     // we seem to need this here only for first time startup :(
     bank.setCurrentBankID(Runtime.tempBank);
 
@@ -405,10 +381,6 @@ bail_out:
     if (vuringbuf)
         jack_ringbuffer_free(vuringbuf);
     vuringbuf = NULL;
-
-    if (RBPringbuf)
-        jack_ringbuffer_free(RBPringbuf);
-    RBPringbuf = NULL;
 
     if (tmpmixl)
         fftwf_free(tmpmixl);
@@ -439,71 +411,6 @@ bail_out:
         sysefx[nefx] = NULL;
     }
     return false;
-}
-
-
-void *SynthEngine::_RBPthread(void *arg)
-{
-    return static_cast<SynthEngine*>(arg)->RBPthread();
-}
-
-
-void *SynthEngine::RBPthread(void)
-{
-    struct RBP_data block;
-    unsigned int readsize = sizeof(RBP_data);
-    memset(block.data, 0, readsize);
-    char *point;
-    unsigned int toread;
-    unsigned int read;
-    unsigned int found;
-    unsigned int tries;
-    string name;
-    while (Runtime.runSynth)
-    {
-        if (jack_ringbuffer_read_space(RBPringbuf) >= readsize)
-        {
-            toread = readsize;
-            read = 0;
-            tries = 0;
-            point = (char*)&block;
-            while (toread && tries < 3)
-            {
-                found = jack_ringbuffer_read(RBPringbuf, point, toread);
-                read += found;
-                point += found;
-                toread -= found;
-                ++tries;
-            }
-            if (!toread)
-            {
-                switch ((unsigned char)block.data[0])
-                {
-                    case 10: // set global fine detune
-                        microtonal.Pglobalfinedetune = block.data[1];
-                        setAllPartMaps();
-                        break;
-
-                    case 11: // set global key shift
-                        setPkeyshift(block.data[1]);
-                        setAllPartMaps();
-                        break;
-
-                    case 12: // set part keyshift
-                        part[(unsigned char)block.data[1]]->Pkeyshift = block.data[2];
-                        setPartMap(block.data[1]);
-                        break;
-                }
-                // in case it was called from CLI
-                Runtime.finishedCLI = true;
-            }
-            else
-                Runtime.Log("Unable to read data from Root/Bank/Program");
-        }
-        else
-            usleep(120); // yes it's a hack but seems reliable
-    }
-    return NULL;
 }
 
 
@@ -853,7 +760,7 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
     bool hasProgChange = (program < 0xff || par2 < 0xff);
 
     struct timeval tv1, tv2;
-    if (Runtime.showTimes && hasProgChange)
+    if (notinplace && Runtime.showTimes && hasProgChange)
         gettimeofday(&tv1, NULL);
 
     if (root < 0x80)
@@ -987,20 +894,22 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
             partonoffLock(npart, 2); // as it was
     }
 
-    if (ok && Runtime.showTimes && hasProgChange)
-    {
-        gettimeofday(&tv2, NULL);
-        if (tv1.tv_usec > tv2.tv_usec)
-        {
-            tv2.tv_sec--;
-            tv2.tv_usec += 1000000;
-        }
-        int actual = ((tv2.tv_sec - tv1.tv_sec) *1000 + (tv2.tv_usec - tv1.tv_usec)/ 1000.0f) + 0.5f;
-        name += ("  Time " + to_string(actual) + "mS");
-    }
     int msgID = 0xff;
     if (notinplace)
+    {
+        if (ok && Runtime.showTimes && hasProgChange)
+        {
+            gettimeofday(&tv2, NULL);
+            if (tv1.tv_usec > tv2.tv_usec)
+            {
+                tv2.tv_sec--;
+                tv2.tv_usec += 1000000;
+            }
+            int actual = ((tv2.tv_sec - tv1.tv_sec) *1000 + (tv2.tv_usec - tv1.tv_usec)/ 1000.0f) + 0.5f;
+            name += ("  Time " + to_string(actual) + "mS");
+        }
         msgID = miscMsgPush(name);
+    }
     if (!ok)
         msgID |= 0x1000;
     return msgID;
@@ -1009,13 +918,13 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
 
 int SynthEngine::ReadBankRoot(void)
 {
-    return bank.currentRootID;
+    return bank.currentRootID; // this is private so handle with care
 }
 
 
 int SynthEngine::ReadBank(void)
 {
-    return bank.currentBankID;
+    return bank.currentBankID; // this is private so handle with care
 }
 
 
@@ -1605,38 +1514,6 @@ int SynthEngine::SetSystemValue(int type, int value)
 
     }
     return 0;
-}
-
-
-void SynthEngine::writeRBP(char type, char data0, char data1, char data2)
-{
-    struct RBP_data block;
-    unsigned int writesize = sizeof(RBP_data);
-    block.data[0] = type;
-    block.data[1] = data0;
-    block.data[2] = data1;
-    block.data[3] = data2;
-    char *point = (char*)&block;
-    unsigned int towrite = writesize;
-    unsigned int wrote = 0;
-    unsigned int found;
-    unsigned int tries = 0;
-
-    if (jack_ringbuffer_write_space(RBPringbuf) >= writesize)
-    {
-        while (towrite && tries < 3)
-        {
-            found = jack_ringbuffer_write(RBPringbuf, point, towrite);
-            wrote += found;
-            point += found;
-            towrite -= found;
-            ++tries;
-        }
-        if (towrite)
-            Runtime.Log("Unable to write data to Root/Bank/Program");
-    }
-    else
-        Runtime.Log("Root/Bank/Program buffer full!");
 }
 
 
@@ -2495,12 +2372,6 @@ bool SynthEngine::saveBanks(int instance)
     delete xmltree;
 
     return true;
-}
-
-
-bool SynthEngine::saveToBankSlot(size_t rootID, size_t bankID, int ninstrument, int npart)
-{
-    return bank.savetoslot(rootID, bankID, ninstrument, npart);
 }
 
 

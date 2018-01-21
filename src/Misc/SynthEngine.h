@@ -89,7 +89,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool saveMicrotonal(string fname);
         bool installBanks(int instance);
         bool saveBanks(int instance);
-        bool saveToBankSlot(size_t rootID, size_t bankID, int ninstrument, int npart);
         void newHistory(string name, int group);
         void addHistory(string name, int group);
         vector<string> *getHistory(int group);
@@ -132,7 +131,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool SingleVector(list<string>& msg_buf, int chan);
         void ListSettings(list<string>& msg_buf);
         int SetSystemValue(int type, int value);
-        void writeRBP(char type, char data0, char data1 = 0, char data2 = 0);
         bool vectorInit(int dHigh, unsigned char chan, int par);
         void vectorSet(int dHigh, unsigned char chan, int par);
         void ClearNRPNs(void);
@@ -261,15 +259,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         pthread_mutex_t *processLock;
 
         jack_ringbuffer_t *vuringbuf;
-
-        jack_ringbuffer_t *RBPringbuf;
-        void *RBPthread(void);
-        static void *_RBPthread(void *arg);
-        pthread_t  RBPthreadHandle;
-
-        struct RBP_data {
-            char data[4];
-        };
 
         XMLwrapper *stateXMLtree;
 

@@ -5,7 +5,7 @@ code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014 -2017, Will Godfrey
+Copyright 2014 -2018, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -23,7 +23,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified December 2017
+Modified January 2018
 } {in_source in_header
 }
 
@@ -642,7 +642,7 @@ class ConfigUI {selected : {private MiscFuncs}
             code0 {o->value(synth->getRuntime().ignoreResetCCs);}
           }
           Fl_Check_Button midiMon {
-            label {Log Incoming CCs}
+            label {Log Incoming Events}
             callback {//
                         send_data(73, o->value(), 0xc0);}
             xywh {234 250 18 18} down_box DOWN_BOX labelsize 12 align 4

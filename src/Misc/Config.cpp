@@ -1268,49 +1268,9 @@ void GuiThreadMsg::processGuiMessages()
                     guiMaster->updatepaths(msg->index);
                     break;
 
-                case GuiThreadMsg::UpdatePanel:
-                    guiMaster->updatepanel();
-                    break;
-
                 case GuiThreadMsg::UpdatePart:
                     guiMaster->updatepart();
                     guiMaster->updatepanel();
-                    break;
-
-                case GuiThreadMsg::UpdatePanelItem:
-                    if ( msg->data && msg->index < NUM_MIDI_PARTS)
-                    {
-                        guiMaster->updatelistitem(msg->index);
-                        guiMaster->updatepart();
-                    }
-                    break;
-
-                case GuiThreadMsg::UpdatePartProgram:
-                    if (msg->data && msg->index < NUM_MIDI_PARTS)
-                    {
-                        guiMaster->updatelistitem(msg->index);
-                        guiMaster->updatepartprogram(msg->index);
-                    }
-                    break;
-
-                case GuiThreadMsg::UpdateEffects:
-                    if (msg->data)
-                        guiMaster->updateeffects(msg->index);
-                    break;
-
-                case GuiThreadMsg::UpdateControllers:
-                    if (msg->data)
-                        guiMaster->updatecontrollers(msg->index);
-                    break;
-
-                case GuiThreadMsg::UpdateBankRootDirs:
-                    if (msg->data)
-                        guiMaster->updateBankRootDirs();
-                    break;
-
-                case GuiThreadMsg::RescanForBanks:
-                    if (msg->data && guiMaster->bankui)
-                        guiMaster->bankui->rescan_for_banks(false);
                     break;
 
                 case GuiThreadMsg::RefreshCurBank:

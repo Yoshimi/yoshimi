@@ -71,7 +71,7 @@ string toplist [] = {
     "ADD",                      "add paths and files",
     "  Root <s>",               "root path to list",
     "  Bank <s>",               "make new bank in current root",
-    "IMport [s <n1>] <n2> <s>", "import named bank to slot n2 of current root, or Root n1"
+    "IMport [s <n1>] <n2> <s>", "import named bank to slot n2 of current root, or Root n1",
     "REMove",                   "remove paths, files and entries",
     "  Root <n>",               "de-list root path ID",
     "  Bank [s <n1>] <n2>",     "delete bank ID n2 (and all instruments) from current root or Root n1",
@@ -888,7 +888,7 @@ int CmdInterface::keyShift(int part)
         value = MIN_KEY_SHIFT;
     else if(value > MAX_KEY_SHIFT)
         value = MAX_KEY_SHIFT;
-    sendDirect(value, cmdType, 35, part);
+    sendDirect(value, cmdType, 35, part, 0xff, 0xff, 0xff, 0x80);
     return done_msg;
 }
 
@@ -1721,7 +1721,7 @@ int CmdInterface::commandPart(bool justSet)
     int reply = todo_msg;
     int tmp;
     bool changed = false;
-    npart = Runtime.currentPart; // belt and braces
+    //npart = Runtime.currentPart; // belt and braces
     if (point[0] == 0)
         return done_msg;
     if (bitTest(level, all_fx))
@@ -1741,8 +1741,11 @@ int CmdInterface::commandPart(bool justSet)
             if (npart != tmp)
             {
                 npart = tmp;
-                sendDirect(npart, 64, 14, 240);
-                changed = true;
+                if (!isRead)
+                {
+                    sendDirect(npart, 64, 14, 240);
+                    changed = true;
+                }
             }
             if (point[0] == 0)
                 return done_msg;
@@ -1814,40 +1817,24 @@ int CmdInterface::commandPart(bool justSet)
     }
     else if (matchnMove(1, point, "destination"))
     {
-        if (isRead)
-        {
-            string name;
-            switch (synth->part[npart]->Paudiodest)
-            {
-                case 2:
-                    name = "part";
-                    break;
-                case 3:
-                    name = "both";
-                    break;
-                case 1:
-                default:
-                    name = "main";
-                    break;
-            }
-            Runtime.Log("Jack audio to " + name, 1);
-            return done_msg;
-        }
+        int type;
         int dest = 0;
-
-        if (matchnMove(1, point, "main"))
-            dest = 1;
-        else if (matchnMove(1, point, "part"))
-            dest = 2;
-        else if (matchnMove(1, point, "both"))
-            dest = 3;
-        if (dest > 0)
-        {
-            sendDirect(dest, 64, 120, npart, 255, 255, 255, 192);
-            reply = done_msg;
-        }
+        if (isRead)
+            type = 0;
         else
-            reply = range_msg;
+        {
+            type = 64;
+            if (matchnMove(1, point, "main"))
+                dest = 1;
+            else if (matchnMove(1, point, "part"))
+                dest = 2;
+            else if (matchnMove(1, point, "both"))
+                dest = 3;
+            if (dest == 0)
+                reply = range_msg;
+        }
+        sendDirect(dest, type, 120, npart, 255, 255, 255, 192);
+        reply = done_msg;
     }
     else if (matchnMove(1, point, "breath"))
     {
@@ -2122,7 +2109,7 @@ int CmdInterface::commandReadnSet()
     {
         if (!isRead && point[0] == 0)
             return value_msg;
-        sendDirect(string2int127(point), cmdType, 32, 240);
+        sendDirect(string2int127(point), cmdType, 32, 240, 0xff, 0xff, 0xff, 0x80);
         return done_msg;
     }
 
@@ -2196,7 +2183,7 @@ bool CmdInterface::processAll(char *cCmd)
     Config &Runtime = synth->getRuntime();
 
     replyString = "";
-    npart = Runtime.currentPart;
+    //npart = Runtime.currentPart;
     int reply = todo_msg;
     int tmp;
     point = cCmd;
@@ -2956,6 +2943,11 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
     putData.data.insert = insert;
     putData.data.parameter = parameter;
     putData.data.par2 = par2;
+    if ((type & 0x40) == 0)
+    {
+        synth->interchange.readAllData(&putData);
+        return 0;
+    }
     if (putData.data.value == FLT_MAX)
     {
         synth->interchange.resolveReplies(&putData);

@@ -62,6 +62,7 @@ class InterChange : private MiscFuncs
         void setpadparams(int point);
         void doClearPart(int npart);
         bool commandSend(CommandBlock *getData);
+        float readAllData(CommandBlock *getData, unsigned char commandType = 0xff);
         void resolveReplies(CommandBlock *getData);
         void testLimits(CommandBlock *getData);
         void returnLimits(CommandBlock *getData);
@@ -94,6 +95,7 @@ class InterChange : private MiscFuncs
         string resolveEnvelope(CommandBlock *getData);
         string resolveEffects(CommandBlock *getData);
         bool showValue;
+        unsigned char blockRead;
 
         void commandMidi(CommandBlock *getData);
         void commandVector(CommandBlock *getData);

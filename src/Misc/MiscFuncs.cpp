@@ -2,7 +2,7 @@
     MiscFuncs.cpp
 
     Copyright 2010, Alan Calvert
-    Copyright 2014-2017, Will Godfrey
+    Copyright 2014-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>
 
-    Modifed December 2017
+    Modifed January 2018
 */
 
 //#define REPORT_MISCMSG
@@ -255,12 +255,14 @@ void MiscFuncs::legit_pathname(string& fname)
 
 /*
  * This only intended for calls on the local filesystem
- * and to know locations, so buffer size should be adequate
+ * and to known locations, so buffer size should be adequate
  * and avoids dependency on unreliable macros.
  */
 string MiscFuncs::findfile(string path, string filename, string extension)
 {
-    string command = "find " + path + " -name " + filename + "." + extension + " 2>/dev/null -print -quit";
+    if (extension.at(0) != '.')
+        extension = "." + extension;
+    string command = "find " + path + " -name " + filename + extension + " 2>/dev/null -print -quit";
 #warning Using '2>/dev/null' here suppresses *all* error messages
     FILE *fp = popen(command.c_str(), "r");
     if (fp == NULL)
@@ -304,7 +306,8 @@ int MiscFuncs::findSplitPoint(string name)
 // adds or replaces wrong extension with the right one.
 string MiscFuncs::setExtension(string fname, string ext)
 {
-
+    if (ext.at(0) != '.')
+        ext = "." + ext;
     string tmp;                         // return value
     size_t ext_pos = fname.rfind('.');  // period, if any
     size_t slash_pos = fname.rfind('/'); // UNIX path-separator
@@ -319,14 +322,14 @@ string MiscFuncs::setExtension(string fname, string ext)
             // There is no period, therefore there is no extension.
             // Append the extension.
 
-            tmp = fname + "." + ext;
+            tmp = fname + ext;
         }
         else
         {
             // Replace everything after the last period.
 
             tmp = fname.substr(0, ext_pos);
-            tmp += "." + ext;
+            tmp += ext;
         }
     }
     else
@@ -335,11 +338,11 @@ string MiscFuncs::setExtension(string fname, string ext)
         // Add the whole extension.  Otherwise, replace the extension.
 
         if (slash_pos > ext_pos)
-            tmp = fname + "." + ext;
+            tmp = fname + ext;
         else
         {
             tmp = fname.substr(0, ext_pos);
-            tmp += "." + ext;
+            tmp += ext;
         }
     }
     return tmp;
