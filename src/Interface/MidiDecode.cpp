@@ -51,7 +51,7 @@ MidiDecode::~MidiDecode()
 
 void MidiDecode::midiProcess(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place, bool inSync)
 {
-    unsigned char channel;//, note, velocity;
+    unsigned char channel; // , note, velocity;
     int ctrltype, par;
     channel = par0 & 0x0F;
     unsigned int ev = par0 & 0xF0;
@@ -72,7 +72,7 @@ void MidiDecode::midiProcess(unsigned char par0, unsigned char par1, unsigned ch
             break;
 
         case 0xB0: // controller
-            ctrltype = par1; // getMidiController(par1);
+            ctrltype = par1;
             par = par2;
             setMidiController(channel, ctrltype, par, in_place);
             break;
@@ -96,13 +96,7 @@ void MidiDecode::midiProcess(unsigned char par0, unsigned char par1, unsigned ch
             break;
 
         default: // wot, more?
-            if (par0 == 0xFF)
-            {
-                ctrltype = C_reset;
-                if (!in_place) // never want to get this when freewheeling!
-                    setMidiController(channel, ctrltype, 0);
-            }
-            else if (synth->getRuntime().monitorCCin)
+            if (synth->getRuntime().monitorCCin)
                 synth->getRuntime().Log("Unsupported event: 0x" + asHexString(int(par0)));
             break;
     }
@@ -118,10 +112,6 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
         {
             case C_NULL:
                 ctltype = "Ignored";
-                break;
-
-            case C_reset:
-                ctltype = "Master Reset";
                 break;
 
             case C_programchange:
@@ -146,11 +136,7 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
         }
         synth->getRuntime().Log("Chan " + asString(((int) ch) + 1) + "   CC " + ctltype  + "   Value " + asString(param));
     }
-    if (ctrl == C_reset)
-    {
-        synth->interchange.flagsWrite(0xf0000000);
-        return;
-    }
+
     if (ctrl == synth->getRuntime().midi_bank_root)
     {
         setMidiBankOrRootDir(param, in_place, true);
@@ -502,7 +488,7 @@ void MidiDecode::nrpnProcessData(unsigned char chan, int type, int par, bool in_
     if (nHigh != 64 && nLow < 0x7f)
     {
         synth->getRuntime().Log("Go away NRPN 0x" + asHexString(nHigh) + " " + asHexString(nLow) +" We don't know you!");
-        //done this way to ensure we see both bytes even if nHigh is zero
+        // done this way to ensure we see both bytes even if nHigh is zero
         synth->getRuntime().nrpnActive = false; // we were sent a turkey!
         return;
     }

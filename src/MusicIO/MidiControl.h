@@ -27,7 +27,6 @@
 typedef enum {
     C_NULL =               1000,
     C_programchange =      1001,
-    C_reset =              2000,
     C_pitchwheel =          640, // so this can be used in midi learn
     C_channelpressure =     641,
     C_keypressure =         642,

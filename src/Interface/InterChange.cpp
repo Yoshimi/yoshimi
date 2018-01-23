@@ -222,11 +222,11 @@ void *InterChange::sortResultsThread(void)
          * The following are low priority actions initiated by,
          * but isolated from the main audio thread.
          */
-        unsigned int point = flagsReadClear();
-        if (point < 0x1fff)
-            setpadparams(point);
-        else if (point < 0x2100)
-            doClearPart(point & 0xff);
+        //unsigned int point = flagsReadClear();
+        //if (point < 0x1fff)
+            //setpadparams(point);
+        //else if (point < 0x2100)
+            //doClearPart(point & 0xff);
     }
     return NULL;
 }
@@ -699,7 +699,24 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                             value = synth->part[npart]->Pkeyshift - 64;
                         getData->data.parameter &= 0x7f;
                     }
+                    break;
+
+                    case 96: // clear part
+                        if (write)
+                        {
+                            doClearPart(npart);
+                            getData->data.parameter &= 0x7f;
+                        }
                         break;
+
+                    case 104: // set padsynth parameters
+                        if (write)
+                        {
+                            setpadparams(npart | (kititem << 8));
+                            getData->data.parameter &= 0x7f;
+                        }
+                        break;
+
                     case 120: // audio destination
                         if (npart < synth->getRuntime().NumAvailableParts)
                         {
@@ -3743,7 +3760,9 @@ void InterChange::commandMidi(CommandBlock *getData)
     //cout << "value " << value_int << "  control " << int(control) << "  chan " << int(chan) << "  char1 " << char1 << "  char2 " << int(char2) << "  param " << int(parameter) << "  par2 " << int(par2) << endl;
 
     if (control == 2 && char1 >= 0x80)
+    {
         char1 |= 0x200; // for 'specials'
+    }
 
     switch(control)
     {
@@ -4056,28 +4075,28 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
             break;
 
         case 32: // Tuning
-            // done eslewhere
+            // done elsewhere
             break;
         case 33: // Keyboard Map
-            // done eslewhere
+            // done elsewhere
             break;
 
         case 48: // Import .scl File
-            // done eslewhere
+            // done elsewhere
             break;
         case 49: // Import .kbm File
-            // done eslewhere
+            // done elsewhere
             break;
 
         case 64: // Name
-            // done eslewhere
+            // done elsewhere
             break;
         case 65: // Comments
-            // done eslewhere
+            // done elsewhere
             break;
 
         case 80: // Retune
-            // done eslewhere
+            // done elsewhere
             break;
         case 96: // Clear scales
             synth->microtonal.defaults();
@@ -4931,8 +4950,13 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
 
         case 96: // doClearPart
-            synth->partonoffWrite(npart, -1);
-            flagsWrite(npart | 0x2000); // default
+            if(write)
+            {
+                synth->partonoffWrite(npart, -1);
+                getData->data.parameter = 0x80;
+            }
+            else
+                getData->data.type = 0xff; // block any further action
             break;
 
         case 120:
@@ -6179,7 +6203,7 @@ void InterChange::commandPad(CommandBlock *getData)
             if (write)
             {
                 synth->partonoffWrite(npart, -1);
-                flagsWrite(npart | (kititem << 8));
+                getData->data.parameter = 0x80;
             }
             break;
 
@@ -7357,7 +7381,7 @@ void InterChange::commandEffects(CommandBlock *getData)
     else if (npart < NUM_MIDI_PARTS)
         eff = synth->part[npart]->partefx[effnum];
     else
-        return; //invalid part number
+        return; // invalid part number
     if (kititem > 8)
         return;
     if (kititem == 8 && getData->data.insert < 0xff)

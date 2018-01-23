@@ -1,5 +1,11 @@
 yoshimi 1.5.6 M
 
+2018-1-23 Will
+* Removed incorrect reference to MIDI event 0xff.
+* Padsynth apply no longer uses flags.
+* Part clear no longer uses flags.
+* Code tidyups.
+
 2018-1-21 Will
 * BugFix: CLI abort if query on top list.
 * Refinements to thread safe async read.
