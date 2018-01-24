@@ -1869,6 +1869,8 @@ void SynthEngine::mutewrite(int what)
 // Master audio out (the final sound)
 int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process)
 {
+    static unsigned int VUcount = 0;
+    static unsigned int VUperiod = samplerate / 20; // 50mS
     float *mainL = outl[NUM_MIDI_PARTS]; // tiny optimisation
     float *mainR = outr[NUM_MIDI_PARTS]; // makes code clearer
 
@@ -2066,8 +2068,8 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         }
         actionLock(unlockType);
         // Peak calculation for mixed outputs
-        VUpeak.values.vuRmsPeakL = 1e-12f;
-        VUpeak.values.vuRmsPeakR = 1e-12f;
+        //VUpeak.values.vuRmsPeakL = 1e-12f;
+        //VUpeak.values.vuRmsPeakR = 1e-12f;
         float absval;
         for (int idx = 0; idx < p_buffersize; ++idx)
         {
@@ -2096,13 +2098,19 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             }
         }
 
-        VUpeak.values.p_buffersize = p_buffersize;
+        //VUpeak.values.p_buffersize = p_buffersize;
 
-        if (jack_ringbuffer_write_space(vuringbuf) >= sizeof(VUtransfer))
+        //if (jack_ringbuffer_write_space(vuringbuf) >= sizeof(VUtransfer))
+        VUcount += p_buffersize;
+        if (VUcount >= VUperiod && jack_ringbuffer_write_space(vuringbuf) >= sizeof(VUtransfer))
         {
+            VUpeak.values.p_buffersize = VUcount;
+            VUcount = 0;
             jack_ringbuffer_write(vuringbuf, ( char*)VUpeak.bytes, sizeof(VUtransfer));
             VUpeak.values.vuOutPeakL = 1e-12f;
             VUpeak.values.vuOutPeakR = 1e-12f;
+            VUpeak.values.vuRmsPeakL = 1e-12f;
+            VUpeak.values.vuRmsPeakR = 1e-12f;
             for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
             {
                 if (partLocal[npart])
@@ -2129,16 +2137,42 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 
 bool SynthEngine::fetchMeterData(VUtransfer *VUdata)
 {
-    bool isOK = false;
+    VUtransfer temp;
+    float fade;
+    float root;
+    int buffsize;
     if (jack_ringbuffer_read_space(vuringbuf) >= sizeof(VUtransfer))
     {
+        jack_ringbuffer_read(vuringbuf, ( char*)temp.bytes, sizeof(VUtransfer));
+        buffsize = temp.values.p_buffersize;
 
-        jack_ringbuffer_read(vuringbuf, ( char*)VUdata->bytes, sizeof(VUtransfer));
-        VUdata->values.vuRmsPeakL = sqrt(VUdata->values.vuRmsPeakL / VUdata->values.p_buffersize);
-        VUdata->values.vuRmsPeakR = sqrt(VUdata->values.vuRmsPeakR / VUdata->values.p_buffersize);
-        isOK = true;
+        root = sqrt(temp.values.vuRmsPeakL / buffsize);
+        VUdata->values.vuRmsPeakL = ((VUdata->values.vuRmsPeakL * 7) + root) / 8;
+        root = sqrt(temp.values.vuRmsPeakR / buffsize);
+        VUdata->values.vuRmsPeakR = ((VUdata->values.vuRmsPeakR * 7) + root) / 8;
+
+        fade = VUdata->values.vuOutPeakL * 0.92f;//mult;
+        if (temp.values.vuOutPeakL > fade)
+            VUdata->values.vuOutPeakL = temp.values.vuOutPeakL;
+        else
+            VUdata->values.vuOutPeakL = fade;
+
+        fade = VUdata->values.vuOutPeakR * 0.92f;//mult;
+        if (temp.values.vuOutPeakR > fade)
+            VUdata->values.vuOutPeakR = temp.values.vuOutPeakR;
+        else
+            VUdata->values.vuOutPeakR = fade;
+
+        for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+        {
+            fade = VUdata->values.parts[npart] * 0.85f;
+            if (temp.values.parts[npart] > fade || fade <= 0.005f)
+                VUdata->values.parts[npart] = temp.values.parts[npart];
+            else
+                VUdata->values.parts[npart] = fade;
+        }
     }
-    return isOK;
+    return true;//isOK;
 }
 
 

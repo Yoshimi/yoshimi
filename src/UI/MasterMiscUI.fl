@@ -163,19 +163,8 @@ class VUMeter {
 \#          define VULENY (ly/2-3)
             dbl *= VULENX;
             dbr *= VULENX;
-
-            if (dbl >= oldpeakl)
-                oldpeakl = (int)dbl;
-            else if (oldpeakl >= 8)
-                oldpeakl -= 8;
-            else if (oldpeakl)
-                oldpeakl -= 1;
-            if (dbr >= oldpeakr)
-                oldpeakr = (int)dbr;
-            else if (oldpeakr >= 8)
-                oldpeakr -= 8;
-            else if (oldpeakr)
-                oldpeakr -= 1;
+            oldpeakl = (int)dbl;
+            oldpeakr = (int)dbr;
 
             // compute RMS - start
             rmsdbl = ((MIN_DB - rmsdbl) / MIN_DB);
@@ -188,10 +177,6 @@ class VUMeter {
                 rmsdbr = 0.0;
             else if (rmsdbr >1.0)
                 rmsdbr = 1.0;
-            rmsdbl = (rmsdbl + oldrmsdbl * 7) / 8;
-            rmsdbr = (rmsdbr + oldrmsdbr * 7) / 8;
-            oldrmsdbl = rmsdbl;
-            oldrmsdbr = rmsdbr;
             int irmsdbl = rmsdbl * VULENX;
             int irmsdbr = rmsdbr * VULENX;
             // compute RMS - end
@@ -275,13 +260,7 @@ class VUMeter {
     db = (MIN_DB - db) / MIN_DB;
     db = (db > 1.0) ? 1.0 : db;
     db = db * ly - 2;
-    if (db >= panelpart.oldpeak[npart + *plgroup])
-        panelpart.oldpeak[npart + *plgroup] = (int) db;
-    else if (panelpart.oldpeak[npart + *plgroup] >= 4)
-        panelpart.oldpeak[npart + *plgroup] -= 4;
-    else
-        panelpart.oldpeak[npart + *plgroup] = 0;
-
+    panelpart.oldpeak[npart + *plgroup] = (int) db;
     fl_rectf(ox, oy, lx, ly, 0, 0, 0);
     fl_rectf(ox, oy + ly - panelpart.oldpeak[npart + *plgroup], lx, panelpart.oldpeak[npart + *plgroup], 0, 200, 255);
 

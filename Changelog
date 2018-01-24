@@ -1,5 +1,10 @@
 yoshimi 1.5.6 M
 
+2018-1-24 Will
+* Improved VU behaviour - better attack/decay.
+  Adjustments not longer made in GUI and will be
+  easier to be made available to the CLI.
+
 2018-1-23 Will
 * Removed incorrect reference to MIDI event 0xff.
 * Padsynth apply no longer uses flags.
