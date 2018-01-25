@@ -227,6 +227,7 @@ void *InterChange::sortResultsThread(void)
             //setpadparams(point);
         //else if (point < 0x2100)
             //doClearPart(point & 0xff);
+        synth->fetchMeterData(&synth->VUdata);
     }
     return NULL;
 }
@@ -1536,8 +1537,10 @@ string InterChange::resolveConfig(CommandBlock *getData)
 
 string InterChange::resolveMain(CommandBlock *getData)
 {
-    int value_int = int(getData->data.value);
+    float value = getData->data.value;
+    int value_int = lrint(value);
     unsigned char control = getData->data.control;
+    unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
 //    unsigned char par2 = getData->data.par2;
     string name;
@@ -1685,6 +1688,30 @@ string InterChange::resolveMain(CommandBlock *getData)
         case 128:
             showValue = false;
             contstr = "Sound Stopped";
+            break;
+
+        case 200:
+            showValue = false;
+            contstr = "Part " + to_string(int(kititem));
+            if (value < 0.0f)
+                contstr += " silent ";
+            contstr += (" peak level " + to_string(value));
+            break;
+        case 201:
+            showValue = false;
+            if(kititem == 1)
+                contstr = "Right";
+            else
+                contstr = "Left";
+            contstr += (" peak level " + to_string(value));
+            break;
+        case 202:
+            showValue = false;
+            if(kititem == 1)
+                contstr = "Right";
+            else
+                contstr = "Left";
+            contstr += (" RMS level " + to_string(value));
             break;
 
         default:
@@ -4564,6 +4591,29 @@ void InterChange::commandMain(CommandBlock *getData)
             if (write)
                 synth->allStop(1);
             getData->data.type = 0xff; // stop further action);
+            break;
+
+        case 200:
+            if (!write && kititem < NUM_MIDI_PARTS)
+                value = synth->VUdata.values.parts[kititem];
+            break;
+        case 201:
+            if (!write)
+            {
+                if (kititem == 1)
+                    value = synth->VUdata.values.vuOutPeakR;
+                else
+                    value = synth->VUdata.values.vuOutPeakL;
+            }
+            break;
+        case 202:
+            if (!write)
+            {
+                if (kititem == 1)
+                    value = synth->VUdata.values.vuRmsPeakR;
+                else
+                    value = synth->VUdata.values.vuRmsPeakL;
+            }
             break;
 
         case 254:

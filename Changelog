@@ -1,5 +1,10 @@
 yoshimi 1.5.6 M
 
+2018-1-25 Will
+* Corrected VU meter update for multi-instance.
+* Enabled reading from CLI (direct).
+* Detached update system from GUI.
+
 2018-1-24 Will
 * Improved VU behaviour - better attack/decay.
   Adjustments not longer made in GUI and will be

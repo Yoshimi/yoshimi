@@ -453,6 +453,7 @@ void SynthEngine::defaults(void)
     microtonal.defaults();
     setAllPartMaps();
     Runtime.currentPart = 0;
+    Runtime.VUcount = 0;
     Runtime.channelSwitchType = 0;
     Runtime.channelSwitchCC = 128;
     Runtime.channelSwitchValue = 0;
@@ -1869,7 +1870,6 @@ void SynthEngine::mutewrite(int what)
 // Master audio out (the final sound)
 int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process)
 {
-    static unsigned int VUcount = 0;
     static unsigned int VUperiod = samplerate / 20; // 50mS
     float *mainL = outl[NUM_MIDI_PARTS]; // tiny optimisation
     float *mainR = outr[NUM_MIDI_PARTS]; // makes code clearer
@@ -2101,11 +2101,11 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         //VUpeak.values.p_buffersize = p_buffersize;
 
         //if (jack_ringbuffer_write_space(vuringbuf) >= sizeof(VUtransfer))
-        VUcount += p_buffersize;
-        if (VUcount >= VUperiod && jack_ringbuffer_write_space(vuringbuf) >= sizeof(VUtransfer))
+        Runtime.VUcount += p_buffersize;
+        if (Runtime.VUcount >= VUperiod && jack_ringbuffer_write_space(vuringbuf) >= sizeof(VUtransfer))
         {
-            VUpeak.values.p_buffersize = VUcount;
-            VUcount = 0;
+            VUpeak.values.p_buffersize = Runtime.VUcount;
+            Runtime.VUcount = 0;
             jack_ringbuffer_write(vuringbuf, ( char*)VUpeak.bytes, sizeof(VUtransfer));
             VUpeak.values.vuOutPeakL = 1e-12f;
             VUpeak.values.vuOutPeakR = 1e-12f;
@@ -2137,6 +2137,8 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 
 bool SynthEngine::fetchMeterData(VUtransfer *VUdata)
 {
+    if (!vuringbuf)
+        return false;
     VUtransfer temp;
     float fade;
     float root;
@@ -2145,7 +2147,6 @@ bool SynthEngine::fetchMeterData(VUtransfer *VUdata)
     {
         jack_ringbuffer_read(vuringbuf, ( char*)temp.bytes, sizeof(VUtransfer));
         buffsize = temp.values.p_buffersize;
-
         root = sqrt(temp.values.vuRmsPeakL / buffsize);
         VUdata->values.vuRmsPeakL = ((VUdata->values.vuRmsPeakL * 7) + root) / 8;
         root = sqrt(temp.values.vuRmsPeakR / buffsize);
@@ -2172,7 +2173,7 @@ bool SynthEngine::fetchMeterData(VUtransfer *VUdata)
                 VUdata->values.parts[npart] = fade;
         }
     }
-    return true;//isOK;
+    return false;
 }
 
 

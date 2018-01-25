@@ -136,6 +136,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     single_row_panel(1),
     NumAvailableParts(NUM_MIDI_CHANNELS),
     currentPart(0),
+    VUcount(0),
     channelSwitchType(0),
     channelSwitchCC(128),
     channelSwitchValue(0),
