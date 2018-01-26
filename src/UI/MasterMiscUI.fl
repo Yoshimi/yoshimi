@@ -131,16 +131,21 @@ class VUMeter {
         synth->VUdata.values.parts[i] = 0.0;
     }} {}
   }
+  Function {fetchData(float value, int control, int part, int kititem = 0xff, int engine = 0xff, int insert = 0xff, int parameter = 0xff, int par2 = 0xff, int commandType = 0xff)} {return_type float
+  } {
+    code {//
+        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, par2);} {}
+  }
   Function {draw_master()} {} {
     code {//
             int ox = x();
             int oy = y();
             int lx = w();
             int ly = h();
-            float dbl = rap2dB(synth->VUdata.values.vuOutPeakL);
-            float dbr = rap2dB(synth->VUdata.values.vuOutPeakR);
-            float rmsdbl = rap2dB(synth->VUdata.values.vuRmsPeakL);
-            float rmsdbr = rap2dB( synth->VUdata.values.vuRmsPeakR);
+            float dbl = rap2dB(fetchData(0, 201, 240, 0));
+            float dbr = rap2dB(fetchData(0, 201, 240, 1));
+            float rmsdbl = rap2dB(fetchData(0, 202, 240, 0));
+            float rmsdbr = rap2dB(fetchData(0, 202, 240, 1));
 
             clipped = clipped | (dbl > 0) | ((dbr > 0) << 1);
 
@@ -243,7 +248,7 @@ class VUMeter {
     int oy = y()+2;
     int lx = w()-4;
     int ly = h()-4;
-    float Vpeak = synth->VUdata.values.parts[npart + *plgroup];
+    float Vpeak = fetchData(0, 200, 240, npart + *plgroup);
     if (Vpeak < 0) // its a fake one
     {
         fl_rectf(ox, oy, lx, ly, 140, 140, 140);

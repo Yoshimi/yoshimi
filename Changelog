@@ -2,6 +2,8 @@ yoshimi 1.5.6 M
 
 2018-1-26 Will
 * Removed no longer needed VU ring buffer.
+* GUI VU meter display now fully detached :)
+* Updated docs.
 
 2018-1-25 Will
 * Corrected VU meter update for multi-instance.

@@ -56,7 +56,9 @@ InterChange::InterChange(SynthEngine *_synth) :
     toGUI(NULL),
     fromMIDI(NULL),
     returnsLoopback(NULL),
-    blockRead(0)
+    blockRead(0),
+    tick(0),
+    lockTime(0)
 {
     ;
 }
@@ -189,25 +191,38 @@ void *InterChange::_sortResultsThread(void *arg)
 
 void *InterChange::sortResultsThread(void)
 {
-    CommandBlock getData;
-    int toread;
-    char *point;
-
     while(synth->getRuntime().runSynth)
     {
-        /*unsigned int tick;
-        ++ tick;
+        /*
         if (!(tick & 8191))
         {
             if (tick & 16383)
                 cout << "Tick" << endl;
             else
                 cout << "Tock" << endl;
-        }*/
+        }
+        */
+        ++ tick;
+        if (lockTime == 0 && blockRead != 0)
+        {
+            tick |= 1; // make sure it's not zero
+            lockTime = tick;
+        }
+        else if (lockTime > 0 && blockRead == 0)
+            lockTime = 0;
+        if (lockTime > 0 && (tick - lockTime) > 32766)
+        {
+            lockTime = 0;
+            cout << "stuck read cleared" << endl;
+            blockRead = 0; // clear a stuck read
+            // about 4 seconds - may need improving
+        }
 
+        CommandBlock getData;
+        char *point;
         while (jack_ringbuffer_read_space(synth->interchange.toCLI)  >= synth->interchange.commandSize)
         {
-            toread = commandSize;
+            int toread = commandSize;
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(toCLI, point, toread);
             if(getData.data.part == 0xd8) // special midi-learn - needs improving
@@ -222,6 +237,7 @@ void *InterChange::sortResultsThread(void)
          * The following are low priority actions initiated by,
          * but isolated from the main audio thread.
          */
+
         //unsigned int point = flagsReadClear();
         //if (point < 0x1fff)
             //setpadparams(point);
@@ -4442,7 +4458,7 @@ void InterChange::commandConfig(CommandBlock *getData)
             mightChange = false;
         break;
     }
-
+    blockRead &= 2;
     if (!write)
         getData->data.value = value;
     else if (mightChange)

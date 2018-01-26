@@ -96,6 +96,8 @@ class InterChange : private MiscFuncs
         string resolveEffects(CommandBlock *getData);
         bool showValue;
         unsigned char blockRead;
+        unsigned int tick;
+        unsigned int lockTime;
 
         void commandMidi(CommandBlock *getData);
         void commandVector(CommandBlock *getData);

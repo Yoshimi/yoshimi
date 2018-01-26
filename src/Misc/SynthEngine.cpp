@@ -1853,7 +1853,11 @@ void SynthEngine::mutewrite(int what)
 // Master audio out (the final sound)
 int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process)
 {
-    static unsigned int VUperiod = samplerate / 20; // 50mS
+    static unsigned int VUperiod = samplerate / 20;
+    /*
+     * The above line gives a VU refresh of at least 50mS
+     * but it may be longer depending on the buffer size
+     */
     float *mainL = outl[NUM_MIDI_PARTS]; // tiny optimisation
     float *mainR = outr[NUM_MIDI_PARTS]; // makes code clearer
 
@@ -2081,7 +2085,8 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         }
 
         VUcount += p_buffersize;
-        if (VUcount >= VUperiod && !VUready)
+        if ((VUcount >= VUperiod && !VUready) || VUcount > (samplerate << 2))
+        // ensure this eventually clears if VUready fails
         {
             VUpeak.values.buffersize = VUcount;
             VUcount = 0;

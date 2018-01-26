@@ -34,6 +34,22 @@
 
 SynthEngine *synth;
 
+float collect_readData(SynthEngine *synth, float value, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2, unsigned char commandType)
+{
+    CommandBlock putData;
+
+    putData.data.value = value;
+    putData.data.type = 0x20; // = read from GUI
+    putData.data.control = control;
+    putData.data.part = part;
+    putData.data.kit = kititem;
+    putData.data.engine = engine;
+    putData.data.insert = insert;
+    putData.data.parameter = parameter;
+    putData.data.par2 = par2;
+    return synth->interchange.readAllData(&putData, commandType);
+}
+
 void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
     int typetop = type & 0xd0;
@@ -87,7 +103,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
     if (jack_ringbuffer_write_space(synth->interchange.fromGUI) >= commandSize)
         jack_ringbuffer_write(synth->interchange.fromGUI, (char*) putData.bytes, commandSize);
     else
-        synth->getRuntime().Log("Unable to write to formGUI buffer.");
+        synth->getRuntime().Log("Unable to write to fromGUI buffer.");
 }
 
 
