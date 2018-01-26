@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2017, Will Godfrey & others
+    Copyright 2014-2018, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified December 2017
+    Modified January 2018
 */
 
 #ifndef SYNTHENGINE_H
@@ -215,13 +215,14 @@ class SynthEngine : private SynthHelper, MiscFuncs
                 float vuRmsPeakL;
                 float vuRmsPeakR;
                 float parts[NUM_MIDI_PARTS];
-                int p_buffersize;
+                int buffersize;
             } values;
             char bytes [sizeof(values)];
         };
-        union VUtransfer VUpeak, VUdata;
-
-        bool fetchMeterData(VUtransfer *VUdata);
+        VUtransfer VUpeak, VUcopy, VUdata;
+        unsigned int VUcount;
+        bool VUready;
+        void fetchMeterData(void);
 
         inline bool getIsLV2Plugin() {return isLV2Plugin; }
         inline Config &getRuntime() {return Runtime;}
@@ -257,8 +258,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         pthread_mutex_t  processMutex;
         pthread_mutex_t *processLock;
-
-        jack_ringbuffer_t *vuringbuf;
 
         XMLwrapper *stateXMLtree;
 

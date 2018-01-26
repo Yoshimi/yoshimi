@@ -227,7 +227,7 @@ void *InterChange::sortResultsThread(void)
             //setpadparams(point);
         //else if (point < 0x2100)
             //doClearPart(point & 0xff);
-        synth->fetchMeterData(&synth->VUdata);
+        synth->fetchMeterData();
     }
     return NULL;
 }

@@ -114,7 +114,6 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     tmpmixl(NULL),
     tmpmixr(NULL),
     processLock(NULL),
-    vuringbuf(NULL),
     stateXMLtree(NULL),
     guiMaster(NULL),
     guiClosedCallback(NULL),
@@ -142,9 +141,6 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
 SynthEngine::~SynthEngine()
 {
     closeGui();
-
-    if (vuringbuf)
-        jack_ringbuffer_free(vuringbuf);
 
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         if (part[npart])
@@ -248,17 +244,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     if (!(fft = new FFTwrapper(oscilsize)))
     {
         Runtime.Log("SynthEngine failed to allocate fft");
-        goto bail_out;
-    }
-
-    if (!(vuringbuf = jack_ringbuffer_create(sizeof(VUtransfer))))
-    {
-        Runtime.Log("SynthEngine failed to create vuringbuf");
-        goto bail_out;
-    }
-    if (jack_ringbuffer_mlock(vuringbuf))
-    {
-        Runtime.Log("Failed to lock vuringbuf memory");
         goto bail_out;
     }
 
@@ -376,10 +361,6 @@ bail_out:
         delete fft;
     fft = NULL;
 
-    if (vuringbuf)
-        jack_ringbuffer_free(vuringbuf);
-    vuringbuf = NULL;
-
     if (tmpmixl)
         fftwf_free(tmpmixl);
     tmpmixl = NULL;
@@ -452,6 +433,8 @@ void SynthEngine::defaults(void)
     }
     microtonal.defaults();
     setAllPartMaps();
+    VUcount = 0;
+    VUready = false;
     Runtime.currentPart = 0;
     Runtime.VUcount = 0;
     Runtime.channelSwitchType = 0;
@@ -2067,9 +2050,8 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             }
         }
         actionLock(unlockType);
+
         // Peak calculation for mixed outputs
-        //VUpeak.values.vuRmsPeakL = 1e-12f;
-        //VUpeak.values.vuRmsPeakR = 1e-12f;
         float absval;
         for (int idx = 0; idx < p_buffersize; ++idx)
         {
@@ -2098,15 +2080,13 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             }
         }
 
-        //VUpeak.values.p_buffersize = p_buffersize;
-
-        //if (jack_ringbuffer_write_space(vuringbuf) >= sizeof(VUtransfer))
-        Runtime.VUcount += p_buffersize;
-        if (Runtime.VUcount >= VUperiod && jack_ringbuffer_write_space(vuringbuf) >= sizeof(VUtransfer))
+        VUcount += p_buffersize;
+        if (VUcount >= VUperiod && !VUready)
         {
-            VUpeak.values.p_buffersize = Runtime.VUcount;
-            Runtime.VUcount = 0;
-            jack_ringbuffer_write(vuringbuf, ( char*)VUpeak.bytes, sizeof(VUtransfer));
+            VUpeak.values.buffersize = VUcount;
+            VUcount = 0;
+            memcpy(&VUcopy, &VUpeak, sizeof(VUpeak));
+            VUready = true;
             VUpeak.values.vuOutPeakL = 1e-12f;
             VUpeak.values.vuOutPeakR = 1e-12f;
             VUpeak.values.vuRmsPeakL = 1e-12f;
@@ -2114,9 +2094,9 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
             {
                 if (partLocal[npart])
-                    VUpeak.values.parts[npart] = 1.0e-9;
-                else if (VUpeak.values.parts[npart] < -2.2) // fake peak is a negative value
-                    VUpeak.values.parts[npart]+= 2;
+                    VUpeak.values.parts[npart] = 1.0e-9f;
+                else if (VUpeak.values.parts[npart] < -2.2f) // fake peak is a negative value
+                    VUpeak.values.parts[npart]+= 2.0f;
             }
         }
 /*
@@ -2135,45 +2115,40 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 }
 
 
-bool SynthEngine::fetchMeterData(VUtransfer *VUdata)
+void SynthEngine::fetchMeterData()
 {
-    if (!vuringbuf)
-        return false;
-    VUtransfer temp;
+    if (!VUready)
+        return;
     float fade;
     float root;
     int buffsize;
-    if (jack_ringbuffer_read_space(vuringbuf) >= sizeof(VUtransfer))
+    buffsize = VUcopy.values.buffersize;
+    root = sqrt(VUcopy.values.vuRmsPeakL / buffsize);
+    VUdata.values.vuRmsPeakL = ((VUdata.values.vuRmsPeakL * 7) + root) / 8;
+    root = sqrt(VUcopy.values.vuRmsPeakR / buffsize);
+    VUdata.values.vuRmsPeakR = ((VUdata.values.vuRmsPeakR * 7) + root) / 8;
+
+    fade = VUdata.values.vuOutPeakL * 0.92f;//mult;
+    if (VUcopy.values.vuOutPeakL > fade)
+        VUdata.values.vuOutPeakL = VUcopy.values.vuOutPeakL;
+    else
+        VUdata.values.vuOutPeakL = fade;
+
+    fade = VUdata.values.vuOutPeakR * 0.92f;//mult;
+    if (VUcopy.values.vuOutPeakR > fade)
+        VUdata.values.vuOutPeakR = VUcopy.values.vuOutPeakR;
+    else
+        VUdata.values.vuOutPeakR = fade;
+
+    for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
     {
-        jack_ringbuffer_read(vuringbuf, ( char*)temp.bytes, sizeof(VUtransfer));
-        buffsize = temp.values.p_buffersize;
-        root = sqrt(temp.values.vuRmsPeakL / buffsize);
-        VUdata->values.vuRmsPeakL = ((VUdata->values.vuRmsPeakL * 7) + root) / 8;
-        root = sqrt(temp.values.vuRmsPeakR / buffsize);
-        VUdata->values.vuRmsPeakR = ((VUdata->values.vuRmsPeakR * 7) + root) / 8;
-
-        fade = VUdata->values.vuOutPeakL * 0.92f;//mult;
-        if (temp.values.vuOutPeakL > fade)
-            VUdata->values.vuOutPeakL = temp.values.vuOutPeakL;
+        fade = VUdata.values.parts[npart];
+        if (VUcopy.values.parts[npart] > fade || VUcopy.values.parts[npart] < -0.1f)
+            VUdata.values.parts[npart] = VUcopy.values.parts[npart];
         else
-            VUdata->values.vuOutPeakL = fade;
-
-        fade = VUdata->values.vuOutPeakR * 0.92f;//mult;
-        if (temp.values.vuOutPeakR > fade)
-            VUdata->values.vuOutPeakR = temp.values.vuOutPeakR;
-        else
-            VUdata->values.vuOutPeakR = fade;
-
-        for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
-        {
-            fade = VUdata->values.parts[npart] * 0.85f;
-            if (temp.values.parts[npart] > fade || fade <= 0.005f)
-                VUdata->values.parts[npart] = temp.values.parts[npart];
-            else
-                VUdata->values.parts[npart] = fade;
-        }
+            VUdata.values.parts[npart] = fade * 0.85f;
     }
-    return false;
+    VUready = false;
 }
 
 
