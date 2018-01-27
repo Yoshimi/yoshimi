@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009, James Morris
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2017, Will Godfrey
+    Copyright 2014-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified December 2017
+    Modified January 2018
 */
 
 #include <cstring>
@@ -1393,11 +1393,24 @@ int Part::loadXMLinstrument(string filename)
 }
 
 
-void Part::applyparameters(void)
+void Part::applyparameters(int item)
 {
-    for (int n = 0; n < NUM_KIT_ITEMS; ++n)
+    int start;
+    int end;
+    if (item >= NUM_KIT_ITEMS)
+    {
+        start = 0;
+        end = NUM_KIT_ITEMS;
+    }
+    else
+    {
+        start = item;
+        end = item +1;
+    }
+
+    for (int n = start; n < end; ++n)
         if (kit[n].Ppadenabled && kit[n].padpars != NULL)
-            kit[n].padpars->applyparameters(true);
+            kit[n].padpars->applyparameters();
 }
 
 

@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2017 Will Godfrey
+    Copyright 2017-2018 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified September 2017
+    Modified January 2018
 */
 
 #include <cmath>
@@ -579,7 +579,7 @@ void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
 
 
 // Applies the parameters (i.e. computes all the samples, based on parameters);
-void PADnoteParameters::applyparameters(bool islocked)
+void PADnoteParameters::applyparameters()
 {
     const int samplesize = (((int)1) << (Pquality.samplesize + 14));
     int spectrumsize = samplesize / 2;
@@ -690,8 +690,6 @@ void PADnoteParameters::setPan(char pan)
 // Ported from ZynAddSubFX V 2.4.4
 bool PADnoteParameters::export2wav(std::string basefilename)
 {
-    //synth->getRuntime().Log("Saving samples for " + basefilename);
-    //applyparameters(true);
     basefilename += "_PADsynth_";
     bool isOK = true;
     for(int k = 0; k < PAD_MAX_SAMPLES; ++k)

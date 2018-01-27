@@ -314,7 +314,9 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             string file = setExtension(Runtime.paramsLoad, "xmz");
             if (loadXML(file))
             {
-                applyparameters();
+                ShutUp();
+                for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+                    part[npart]->applyparameters();
                 addHistory(file, 2);
                 Runtime.Log("Loaded " + file + " parameters");
             }
@@ -2240,14 +2242,6 @@ bool SynthEngine::actionLock(lockset request)
     }
     return (chk == 0) ? true : false;
 #endif
-}
-
-
-void SynthEngine::applyparameters(void)
-{
-    ShutUp();
-    for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-        part[npart]->applyparameters();
 }
 
 

@@ -81,7 +81,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void defaults(void);
 
         bool loadXML(string filename);
-        void applyparameters(void);
         bool loadStateAndUpdate(string filename);
         bool saveState(string filename);
         bool loadPatchSetAndUpdate(string filename);

@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011 Alan Calvert
-    Copyright 2014-2017, Will Godfrey
+    Copyright 2014-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified December 2017
+    Modified January 2018
 */
 
 #ifndef PART_H
@@ -61,7 +61,7 @@ class Part : private MiscFuncs, SynthHelper
         void defaults(void);
         void setNoteMap(int keyshift);
         void defaultsinstrument(void);
-        void applyparameters(void);
+        void applyparameters(int item = NUM_KIT_ITEMS);
         void cleanup(void);
 
         // Midi commands implemented

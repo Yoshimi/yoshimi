@@ -239,8 +239,6 @@ void *InterChange::sortResultsThread(void)
          */
 
         //unsigned int point = flagsReadClear();
-        //if (point < 0x1fff)
-            //setpadparams(point);
         //else if (point < 0x2100)
             //doClearPart(point & 0xff);
         synth->fetchMeterData();
@@ -2613,7 +2611,7 @@ string InterChange::resolvePad(CommandBlock *getData)
         case 83:
             break;
 
-        case 104:// setpadparams(
+        case 104:// set pad parameters
             contstr = "Apply Changes";
             break;
 
@@ -3524,7 +3522,7 @@ void InterChange::setpadparams(int point)
 {
     int npart = point & 0x3f;
     int kititem = point >> 8;
-    synth->part[npart]->kit[kititem].padpars->applyparameters(false);
+    synth->part[npart]->applyparameters(kititem);
     synth->partonoffWrite(npart, 2);
 }
 
@@ -6265,7 +6263,7 @@ void InterChange::commandPad(CommandBlock *getData)
                 value = pars->Pquality.samplesize;
             break;
 
-        case 104: // setpadparams(
+        case 104: // set pad parameters
             if (write)
             {
                 synth->partonoffWrite(npart, -1);
