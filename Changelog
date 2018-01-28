@@ -1,5 +1,9 @@
 yoshimi 1.5.6 M
 
+2018-1-28 Will
+* Made VU still read if very slow part load blocks.
+  Need to improve this :(
+
 2018-1-27 Will
 * Rationalised PadSynth calls.
 

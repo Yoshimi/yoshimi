@@ -1836,6 +1836,14 @@ ZynAddSubFX}
   }
   Function {do_load_instrument(string fname)} {} {
     code {//
+    if ((npart /  NUM_MIDI_CHANNELS) == (panelgroup  /  NUM_MIDI_CHANNELS))
+    {
+        int displaypart = npart % NUM_MIDI_CHANNELS;
+        panellistitem[displaypart]->partenabled->value(0);
+        panellistitem[displaypart]->panellistitemgroup->deactivate();
+    }
+    partui->partGroupEnable->value(0);
+    partui->partgroup->deactivate();
     send_data(78, npart, 0xf0, 0xf0, 0xff, 0xff, 0xff, miscMsgPush(fname));} {}
   }
   Function {do_load_master(bool updatehistory, const char* file)} {} {

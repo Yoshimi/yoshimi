@@ -241,7 +241,6 @@ void *InterChange::sortResultsThread(void)
         //unsigned int point = flagsReadClear();
         //else if (point < 0x2100)
             //doClearPart(point & 0xff);
-        synth->fetchMeterData();
     }
     return NULL;
 }
@@ -836,7 +835,25 @@ float InterChange::readAllData(CommandBlock *getData, unsigned char commandType)
         return value;
     }
 
-    reTry: // these are not!
+    // these are not!
+
+    /*
+     * VU always responds even when loading a *huge*
+     * PadSynth instrument. This is safe because the part
+     * being changed is disabled, so won't be seen.
+     *
+     * Other reads will be blocked.
+     * This needs improving.
+     */
+    unsigned char control = getData->data.control;
+    if (getData->data.part == 0xf0 && (control >=200 && control <= 202))
+    {
+        commandSendReal(getData);
+        synth->fetchMeterData();
+        return getData->data.value;
+    }
+
+    reTry:
     memcpy(tryData.bytes, getData->bytes, sizeof(tryData));
     while (blockRead > 0)
         usleep(100);
@@ -847,6 +864,8 @@ float InterChange::readAllData(CommandBlock *getData, unsigned char commandType)
 
     if ((tryData.data.type & 0x10))
         resolveReplies(&tryData);
+
+
     synth->getRuntime().finishedCLI = true; // in case it misses lines above
     return tryData.data.value;
 }
