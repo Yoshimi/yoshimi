@@ -3541,7 +3541,9 @@ void InterChange::setpadparams(int point)
 {
     int npart = point & 0x3f;
     int kititem = point >> 8;
-    synth->part[npart]->applyparameters(kititem);
+    if (synth->part[npart]->kit[kititem].padpars != NULL)
+        synth->part[npart]->kit[kititem].padpars->applyparameters();
+    //synth->part[npart]->applyparameters(kititem);
     synth->partonoffWrite(npart, 2);
 }
 
@@ -7608,6 +7610,14 @@ void InterChange::returnLimits(CommandBlock *getData)
 
 // TODO sort this properly
     if(kititem == 0x88) // DynFilter
+    {
+        getData->limits.min = 0;
+        getData->limits.max = 127;
+        return;
+    }
+
+// TODO sort this properly
+    if (kititem >= 0x80 && kititem <= 0x86) // general effects.
     {
         getData->limits.min = 0;
         getData->limits.max = 127;

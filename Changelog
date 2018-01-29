@@ -1,5 +1,10 @@
 yoshimi 1.5.6 M
 
+2016-1-29 Will
+* BugFix: Part effects not MIDI-learned correctly :(
+  This is a quick 'n dirty fix. The whole of the
+  limits structure needs refactoring!
+
 2018-1-28 Will
 * Made VU still read if very slow part load blocks.
   Need to improve this :(
