@@ -1,0 +1,3 @@
+Reads are made by direct calls (not buffered), but if dynamic values are being read and an actual write is taking place they are temporarily blocked.
+
+If bit 2 of 'type' is set then the command is passed on to the limits tests.

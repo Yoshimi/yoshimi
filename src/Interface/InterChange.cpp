@@ -3454,11 +3454,12 @@ void InterChange::returnsDirect(int altData)
 {
     CommandBlock putData;
     memset(&putData, 0xff, sizeof(putData));
+
     switch (altData & 0xff)
     {
         case 1:
             putData.data.control = 128;
-            putData.data.type = 0x10; // only CLI needs update
+            putData.data.type = 0xf0; // Stop
             putData.data.part = 0xf0;
             putData.data.parameter = 0x80;
             break;

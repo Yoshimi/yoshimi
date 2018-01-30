@@ -1,5 +1,10 @@
 yoshimi 1.5.6 M
 
+2016-1-30 Will
+* Master Reset and Stop! now clear the VU meters.
+* MIDI buffer full reports to selected destination.
+* Some doc updates.
+
 2016-1-29 Will
 * BugFix: Part effects not MIDI-learned correctly :(
   This is a quick 'n dirty fix. The whole of the

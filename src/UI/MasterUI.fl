@@ -29,9 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified January 2018
-
-} {in_source in_header
+Modified January 2018} {in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -631,7 +629,7 @@ Ctrl + confirm includes MIDI-learn} xywh {7 60 70 24} box PLASTIC_UP_BOX color 2
         Fl_Button {} {
           label {Stop!}
           callback {//
-          send_data(128, o->value(), 0xc0);}
+          send_data(128, 0, 0xf0);}
           tooltip {Cease all sound immediately!} xywh {7 30 70 24} box PLASTIC_UP_BOX color 88 selection_color 0 labelfont 1 labelsize 11 align 16
         }
         Fl_Dial mastervolumedial {
@@ -1387,7 +1385,6 @@ ZynAddSubFX}
         return;
     }
     string name;
-
     switch(control)
     {
         case 0:
@@ -1587,13 +1584,18 @@ ZynAddSubFX}
 
         case 96:
             if (newpart == 240)
+            {
                 refresh_master_ui(1);
+                vumeter->init(-1, synth);
+                resetPartsClip();
+            }
             else if (newpart < 64)
                 partNew(newpart);
             break;
 
         case 97:
             refresh_master_ui(1);
+            resetPartsClip();
             if (midilearnui)
                 midilearnui->Hide();
             break;
@@ -1609,6 +1611,7 @@ ZynAddSubFX}
                     panellistitem[i]->partVUMeter->resetPart();
                 }
             }
+            resetPartsClip();
             break;
     }} {}
   }

@@ -195,7 +195,7 @@ bool MidiLearn::writeMidi(CommandBlock *putData, unsigned int writesize, bool in
         }
         else
         {
-            synth->getRuntime().Log("fromMidi buffer full!", 2);
+            synth->getRuntime().Log("Midi buffer full!");
             ok = false;
         }
     }
