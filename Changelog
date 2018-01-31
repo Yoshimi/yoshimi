@@ -1,5 +1,10 @@
 yoshimi 1.5.6 M
 
+2016-1-31 Will
+* Applied extra safety features when changing PadSynth.
+  Attempting to read or write to it at this time gives:
+  "Part [n] busy"
+
 2016-1-30 Will
 * Master Reset and Stop! now clear the VU meters.
 * MIDI buffer full reports to selected destination.

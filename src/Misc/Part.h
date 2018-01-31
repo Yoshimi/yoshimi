@@ -156,6 +156,7 @@ class Part : private MiscFuncs, SynthHelper
         float pangainL;
         float pangainR;
         int lastnote;
+        bool busy;
 
 
     private:

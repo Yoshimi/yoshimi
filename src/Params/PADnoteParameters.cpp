@@ -932,6 +932,7 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
 
         xml->exitbranch();
     }
+    applyparameters();
 }
 
 

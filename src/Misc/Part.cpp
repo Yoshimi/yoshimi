@@ -134,6 +134,7 @@ void Part::defaults(void)
     PbreathControl = 2;
     legatoFading = 0;
     setDestination(1);
+    busy = false;
     defaultsinstrument();
     ctl->resetall();
     setNoteMap(0);
@@ -1380,7 +1381,6 @@ int Part::loadXMLinstrument(string filename)
         else
             PbreathControl = 2;
     }
-    applyparameters();
     xml->exitbranch();
     if (xml->enterbranch("CONTROLLER"))
     {
@@ -1473,7 +1473,9 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
             kit[i].Ppadenabled = xml->getparbool("pad_enabled", kit[i].Ppadenabled);
             if (xml->enterbranch("PAD_SYNTH_PARAMETERS"))
             {
+                busy = true;
                 kit[i].padpars->getfromXML(xml);
+                busy = false;
                 xml->exitbranch();
             }
             xml->exitbranch();
@@ -1549,7 +1551,6 @@ void Part::getfromXML(XMLwrapper *xml)
         Pname = ""; // clear out any previous name
         getfromXMLinstrument(xml);
         xml->exitbranch();
-        applyparameters();
     }
     if (xml->enterbranch("CONTROLLER"))
     {

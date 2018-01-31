@@ -1603,14 +1603,6 @@ ZynAddSubFX}
         case 128:
             virkeyboard->relaseallkeys();
             vumeter->init(-1, synth);
-            for(int i = 0; i < NUM_MIDI_CHANNELS; ++i)
-            {
-                if(panelwindow)
-                {
-                    if(panellistitem[i]->partVUMeter)
-                    panellistitem[i]->partVUMeter->resetPart();
-                }
-            }
             resetPartsClip();
             break;
     }} {}

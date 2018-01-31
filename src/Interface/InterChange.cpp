@@ -852,7 +852,14 @@ float InterChange::readAllData(CommandBlock *getData, unsigned char commandType)
         synth->fetchMeterData();
         return getData->data.value;
     }
-
+    int npart = getData->data.part;
+    if (npart < NUM_MIDI_PARTS && synth->part[npart]->busy)
+    {
+        getData->data.control = 252; // part busy message
+        getData->data.kit = 255;
+        getData->data.engine = 255;
+        getData->data.insert = 255;
+    }
     reTry:
     memcpy(tryData.bytes, getData->bytes, sizeof(tryData));
     while (blockRead > 0)
@@ -2053,6 +2060,11 @@ string InterChange::resolvePart(CommandBlock *getData)
             break;
         case 224:
             contstr = "Clear controllers";
+            break;
+
+        case 252:
+            showValue = false;
+            contstr = "is busy";
             break;
 
         default:
@@ -3542,9 +3554,11 @@ void InterChange::setpadparams(int point)
 {
     int npart = point & 0x3f;
     int kititem = point >> 8;
+
+    synth->part[npart]->busy = true;
     if (synth->part[npart]->kit[kititem].padpars != NULL)
         synth->part[npart]->kit[kititem].padpars->applyparameters();
-    //synth->part[npart]->applyparameters(kititem);
+    synth->part[npart]->busy = false;
     synth->partonoffWrite(npart, 2);
 }
 
@@ -3656,9 +3670,17 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         return false; // invalid kit number
     }
 
-    Part *part;
-    part = synth->part[npart];
+    Part *part = synth->part[npart];
 
+    if (part->busy && engine == 2) // it's a PadSynth control
+    {
+        getData->data.type &= 0xbf; // turn it into a read
+        getData->data.control = 252; // part busy message
+        getData->data.kit = 255;
+        getData->data.engine = 255;
+        getData->data.insert = 255;
+        return false;
+    }
     if (kititem != 0xff && kititem != 0 && engine != 0xff && control != 8 && part->kit[kititem].Penabled == false)
     {
         blockRead &= 2;
