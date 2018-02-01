@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified January 2018
+    Modified February 2018
 */
 
 #define NOLOCKS
@@ -312,15 +312,8 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         if (Runtime.paramsLoad.size())
         {
             string file = setExtension(Runtime.paramsLoad, "xmz");
-            if (loadXML(file))
-            {
-                ShutUp();
-                for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-                    part[npart]->applyparameters();
-                addHistory(file, 2);
-                Runtime.Log("Loaded " + file + " parameters");
-            }
-            else
+            ShutUp();
+            if (!loadXML(file))
             {
                 Runtime.Log("Failed to load parameters " + file);
                 Runtime.paramsLoad = "";

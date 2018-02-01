@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified January 2018
+    Modified February 2018
 */
 
 #ifndef PART_H
@@ -61,7 +61,6 @@ class Part : private MiscFuncs, SynthHelper
         void defaults(void);
         void setNoteMap(int keyshift);
         void defaultsinstrument(void);
-        void applyparameters(int item = NUM_KIT_ITEMS);
         void cleanup(void);
 
         // Midi commands implemented

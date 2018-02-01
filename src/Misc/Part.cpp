@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified January 2018
+    Modified February 2018
 */
 
 #include <cstring>
@@ -1390,27 +1390,6 @@ int Part::loadXMLinstrument(string filename)
     xml->exitbranch();
     delete xml;
     return 1;
-}
-
-
-void Part::applyparameters(int item)
-{
-    int start;
-    int end;
-    if (item >= NUM_KIT_ITEMS)
-    {
-        start = 0;
-        end = NUM_KIT_ITEMS;
-    }
-    else
-    {
-        start = item;
-        end = item +1;
-    }
-
-    for (int n = start; n < end; ++n)
-        if (kit[n].Ppadenabled && kit[n].padpars != NULL)
-            kit[n].padpars->applyparameters();
 }
 
 

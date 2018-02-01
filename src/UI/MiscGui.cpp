@@ -1,7 +1,7 @@
 /*
     MiscGui.cpp - common link between GUI and synth
 
-    Copyright 2016-2017 Will Godfrey & others
+    Copyright 2016-2018 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified November 2017
+    Modified February 2018
 */
 
 #include "Misc/SynthEngine.h"
@@ -52,6 +52,14 @@ float collect_readData(SynthEngine *synth, float value, unsigned char control, u
 
 void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
+    if (part < NUM_MIDI_PARTS && engine == 2)
+    {
+        if (collect_readData(synth, 0, 252, part, 255, 255, 255, 255, 255, 255))
+        {
+            fl_alert("Part %d is busy", int(part));
+            return;
+        }
+    }
     int typetop = type & 0xd0;
     if ( part == 0xf1 && insert == 0x10)
         type |= 8; // this is a hack :(
@@ -165,8 +173,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         return;
     }
 
-    Part *part;
-    part = synth->part[npart];
+    Part *part = synth->part[npart];
 
     if (kititem >= 0x80 && kititem != 0xff) // effects
     {

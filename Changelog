@@ -1,5 +1,10 @@
 yoshimi 1.5.6 M
 
+2016-2-1 Will
+* PadSynth 'busy' also reported to the GUI.
+* Removed redundant 'apply' code from Part.
+* Doc updates.
+
 2016-1-31 Will
 * Applied extra safety features when changing PadSynth.
   Attempting to read or write to it at this time gives:

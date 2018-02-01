@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified January 2018
+    Modified February 2018
 */
 
 #include <iostream>
@@ -2064,7 +2064,10 @@ string InterChange::resolvePart(CommandBlock *getData)
 
         case 252:
             showValue = false;
-            contstr = "is busy";
+            if (value_bool)
+                contstr = "is busy";
+            else
+                contstr = "is free";
             break;
 
         default:
@@ -2643,7 +2646,8 @@ string InterChange::resolvePad(CommandBlock *getData)
             break;
 
         case 104:// set pad parameters
-            contstr = "Apply Changes";
+            showValue = false;
+            contstr = "Changes Applied";
             break;
 
         case 112:
@@ -3679,6 +3683,11 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         getData->data.kit = 255;
         getData->data.engine = 255;
         getData->data.insert = 255;
+        return false;
+    }
+    if (control == 252)
+    {
+        getData->data.value = part->busy;
         return false;
     }
     if (kititem != 0xff && kititem != 0 && engine != 0xff && control != 8 && part->kit[kititem].Penabled == false)
