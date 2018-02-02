@@ -1,7 +1,7 @@
 /*
     MiscGui.h - common link between GUI and synth
 
-    Copyright 2016-2017 Will Godfrey & others
+    Copyright 2016-2018 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified August 2017
+    Modified February 2018
 */
 
 #ifndef MISCGUI_H
