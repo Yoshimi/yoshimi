@@ -2736,7 +2736,9 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 request = 1;
             else if (matchnMove(3, point, "max"))
                 request = 2;
-            else request = 3;
+            else if (matchnMove(3, point, "default"))
+                request = 3;
+            else request = 255;
         }
         else
         {
@@ -2823,16 +2825,23 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
     putData.data.par2 = par2;
     if ((type & 0x40) == 0)
     {
-        value = synth->interchange.readAllData(&putData, request);
-        if (request < 4)
+        if (request < 8)
+        {
+
+            request |= 4; // set as limits read
+            type &= 0xf8;
+            putData.data.type = type | request;
+        }
+        value = synth->interchange.readAllData(&putData);
+        if (request < 8)
         {
             string name;
             switch (request)
             {
-                case 1:
+                case 5:
                     name = "Min ";
                     break;
-                case 2:
+                case 6:
                     name = "Max ";
                     break;
                 default:

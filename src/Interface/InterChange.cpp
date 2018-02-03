@@ -813,9 +813,10 @@ string InterChange::formatScales(string text)
 }
 
 
-float InterChange::readAllData(CommandBlock *getData, unsigned char commandType)
+float InterChange::readAllData(CommandBlock *getData)
 {
-    if (commandType < 4) // these are all static
+    //if (commandType < 4) // these are all static
+    if(getData->data.type & 4)
     {
         //cout << "Read Control " << (int) getData->data.control << " Part " << (int) getData->data.part << "  Kit " << (int) getData->data.kit << " Engine " << (int) getData->data.engine << "  Insert " << (int) getData->data.insert << endl;
         /*
@@ -829,10 +830,7 @@ float InterChange::readAllData(CommandBlock *getData, unsigned char commandType)
          * bit 6 set    MIDI-learnable
          * bit 7 set    Is an integer value
          */
-
-        unsigned char type = getData->data.type;
-        type &= 0xf8;
-        getData->data.type = type | commandType;
+        getData->data.type &= 0xfb; // clear the error bit
         float value = returnLimits(getData);
         synth->getRuntime().finishedCLI = true;
         return value;

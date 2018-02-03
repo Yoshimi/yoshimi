@@ -666,12 +666,15 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
 
     //cout << "SEND Control " << (int) learnTransferBlock.data.control << " Part " << (int) learnTransferBlock.data.part << "  Kit " << (int) learnTransferBlock.data.kit << " Engine " << (int) learnTransferBlock.data.engine << "  Insert " << (int) learnTransferBlock.data.insert << endl;
 
-    entry.min_out = synth->interchange.readAllData(&learnTransferBlock, 1);
-    entry.max_out = synth->interchange.readAllData(&learnTransferBlock, 2);
+    unsigned char type = learnTransferBlock.data.type & 0x80;
+    learnTransferBlock.data.type = (type &0xf8) | 5; // min
+    entry.min_out = synth->interchange.readAllData(&learnTransferBlock);
+    learnTransferBlock.data.type = (type &0xf8) | 6; // max
+    entry.max_out = synth->interchange.readAllData(&learnTransferBlock);
 
     // Should be a better way to do this!
 
-    entry.data.type = learnTransferBlock.data.type & 0x80;
+    entry.data.type = type;
     entry.data.control = learnTransferBlock.data.control;
     entry.data.part = learnTransferBlock.data.part;
     entry.data.kit = learnTransferBlock.data.kit;

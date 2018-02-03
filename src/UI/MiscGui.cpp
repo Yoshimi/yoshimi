@@ -34,7 +34,7 @@
 
 SynthEngine *synth;
 
-float collect_readData(SynthEngine *synth, float value, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2, unsigned char commandType)
+float collect_readData(SynthEngine *synth, float value, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
     CommandBlock putData;
 
@@ -47,14 +47,14 @@ float collect_readData(SynthEngine *synth, float value, unsigned char control, u
     putData.data.insert = insert;
     putData.data.parameter = parameter;
     putData.data.par2 = par2;
-    return synth->interchange.readAllData(&putData, commandType);
+    return synth->interchange.readAllData(&putData);
 }
 
 void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
     if (part < NUM_MIDI_PARTS && engine == 2)
     {
-        if (collect_readData(synth, 0, 252, part, 255, 255, 255, 255, 255, 255))
+        if (collect_readData(synth, 0, 252, part, 255, 255, 255, 255, 255))
         {
             fl_alert("Part %d is busy", int(part));
             return;

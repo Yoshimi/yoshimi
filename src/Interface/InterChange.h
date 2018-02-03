@@ -62,7 +62,7 @@ class InterChange : private MiscFuncs
         void setpadparams(int point);
         void doClearPart(int npart);
         bool commandSend(CommandBlock *getData);
-        float readAllData(CommandBlock *getData, unsigned char commandType = 0xff);
+        float readAllData(CommandBlock *getData);
         void resolveReplies(CommandBlock *getData);
         void testLimits(CommandBlock *getData);
         float returnLimits(CommandBlock *getData);
