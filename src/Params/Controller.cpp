@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2017, Will Godfrey
+    Copyright 2017-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -20,9 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code
+    This file is derivative of ZynAddSubFX original code.
 
-    Modified November 2017
+    Modified February 2018
 */
 
 #include <cmath>
@@ -393,10 +393,13 @@ void Controller::getfromXML(XMLwrapper *xml)
 }
 
 
-void Controller::getLimits(CommandBlock *getData)
+float Controller::getLimits(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    int request = int(getData->data.type & 3);
     int control = getData->data.control;
-    //cout << "ctl control " << to_string(control) << endl;
+
+    //cout << "ctl control " << control << "  Request " << request << endl;
 
     // defaults
     int type = 0x80;
@@ -496,13 +499,30 @@ void Controller::getLimits(CommandBlock *getData)
             break;
 
         default:
-            min = -1;
-            def = -10;
-            max = -1;
+            type |= 4; // error
             break;
     }
     getData->data.type = type;
-    getData->limits.min = min;
-    getData->limits.def = def;
-    getData->limits.max = max;
+    if (type & 4)
+        return 1;
+
+    switch (request)
+    {
+        case 0:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+        break;
+        case 1:
+            value = min;
+            break;
+        case 2:
+            value = max;
+            break;
+        case 3:
+            value = def / 10.0f;
+            break;
+    }
+    return value;
 }

@@ -1539,9 +1539,12 @@ void Part::getfromXML(XMLwrapper *xml)
 }
 
 
-void Part::getLimits(CommandBlock *getData)
+float Part::getLimits(CommandBlock *getData)
 {
-    unsigned int type = getData->data.type;
+    float value = getData->data.value;
+    int request = int(getData->data.type & 3);
+
+    unsigned int type = (getData->data.type & 0xfc);
     int control = getData->data.control;
     int npart = getData->data.part;
 
@@ -1549,12 +1552,10 @@ void Part::getLimits(CommandBlock *getData)
     int min = 0;
     int def = 640;
     int max = 127;
-    //cout << "part control " << to_string(control) << endl;
+    //cout << "part control " << control << "  Request " << request << endl;
+
     if ((control >= 128 && control <= 168) || control == 224)
-    {
-        ctl->getLimits(getData);
-        return;
-    }
+        return ctl->getLimits(getData);
 
     switch (control)
     {
@@ -1657,6 +1658,11 @@ void Part::getLimits(CommandBlock *getData)
             break;
 
         // the following are learnable MIDI controllers
+        case 128:
+            min = 64;
+            type |= 0x40;
+            break;
+
         case 130:
             max = 64;
             type |= 0x40;
@@ -1727,13 +1733,30 @@ void Part::getLimits(CommandBlock *getData)
             break;
 
         default:
-            min = -1;
-            def = -10;
-            max = -1;
+            type |= 4; // error
             break;
     }
     getData->data.type = type;
-    getData->limits.min = min;
-    getData->limits.def = def;
-    getData->limits.max = max;
+    if (type & 4)
+        return 1;
+
+    switch (request)
+    {
+        case 0:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+        break;
+        case 1:
+            value = min;
+            break;
+        case 2:
+            value = max;
+            break;
+        case 3:
+            value = def / 10.0f;
+            break;
+    }
+    return value;
 }

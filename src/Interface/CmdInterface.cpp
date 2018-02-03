@@ -1,7 +1,7 @@
 /*
     CmdInterface.cpp
 
-    Copyright 2015-2017, Will Godfrey & others.
+    Copyright 2015-2018, Will Godfrey & others.
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified December 2017
+    Modified February 2018
 */
 
 #include <iostream>
@@ -2725,17 +2725,22 @@ bool CmdInterface::cmdIfaceProcessCommand()
 
     else if (matchnMove(6, point, "direct"))
     {
+        unsigned char request;
         float value;
         unsigned char type = 0;
         if (matchnMove(3, point, "limits"))
-            value = FLT_MAX;
-        else if (matchnMove(3, point, "default"))
         {
-            value = FLT_MAX / 1.5f;
-            type = 0x40;
+            value = 0;
+            type = 4;
+            if (matchnMove(3, point, "min"))
+                request = 1;
+            else if (matchnMove(3, point, "max"))
+                request = 2;
+            else request = 3;
         }
         else
         {
+            request = 0xff;
             value = string2float(point);
             if (strchr(point, '.') == NULL)
                 type |= 0x80; // fix as integer
@@ -2782,7 +2787,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 }
             }
         }
-        sendDirect(value, type, control, part, kit, engine, insert, param, par2);
+        sendDirect(value, type, control, part, kit, engine, insert, param, par2, request);
         reply = done_msg;
     }
     else
@@ -2796,7 +2801,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
 }
 
 
-int CmdInterface::sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
+int CmdInterface::sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2, unsigned char request)
 {
     if (part != 0xd8) // MIDI learn
         type |= 0x10; // from command line
@@ -2818,48 +2823,26 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
     putData.data.par2 = par2;
     if ((type & 0x40) == 0)
     {
-        synth->interchange.readAllData(&putData);
+        value = synth->interchange.readAllData(&putData, request);
+        if (request < 4)
+        {
+            string name;
+            switch (request)
+            {
+                case 1:
+                    name = "Min ";
+                    break;
+                case 2:
+                    name = "Max ";
+                    break;
+                default:
+                    name = "Default ";
+                    break;
+            }
+            synth->getRuntime().Log(name + to_string(value));
+        }
         return 0;
     }
-    if (putData.data.value == FLT_MAX)
-    {
-        synth->interchange.resolveReplies(&putData);
-        string name = miscMsgPop(putData.data.par2) + "\n~ ";
-        putData.data.par2 = par2; // restore this
-        synth->interchange.returnLimits(&putData);
-        unsigned char returntype = putData.data.type;
-        short int min = putData.limits.min;
-        short int def = putData.limits.def;
-        short int max = putData.limits.max;
-        if (min > max)
-        {
-            synth->getRuntime().Log("Text: " + miscMsgPop(def));
-            return 0;
-        }
-        if (min == -1 && def == -10 && max == -1)
-        {
-            synth->getRuntime().Log("Unrecognised Control");
-            return 0;
-        }
-        string valuetype = "   Type ";
-        if (returntype & 0x80)
-            valuetype += " integer";
-        else
-            valuetype += " float";
-        if (returntype & 0x40)
-            valuetype += " learnable";
-
-        string deftype;
-        if (def >= 10 || def <= 0)
-            deftype = to_string(lrint(def / 10));
-        else
-            deftype = to_string(float(def / 10.0f) + 0.000001).substr(0,4);
-
-        synth->getRuntime().Log(name + "Min " + to_string(min)  + "   Def " + deftype + "   Max " + to_string(max) + valuetype);
-        return 0;
-    }
-    // next line screws effects :(
-    //synth->interchange.testLimits(&putData);
     if (part == 0xf8 && putData.data.par2 < 0xff && (control == 65 || control == 67 || control == 71))
     {
         synth->getRuntime().Log("In use by " + miscMsgPop(putData.data.par2) );

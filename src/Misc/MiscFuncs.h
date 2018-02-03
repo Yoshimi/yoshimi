@@ -2,7 +2,7 @@
     MiscFuncs.h
 
     Copyright 2010, Alan Calvert
-    Copyright 2014-2017, Will Godfrey
+    Copyright 2014-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modifed December 2017
+    Modifed February 2018
 */
 
 #ifndef MISCFUNCS_H
@@ -117,14 +117,6 @@ union CommandBlock{
         unsigned char parameter;
         unsigned char par2;
     } data;
-    struct{
-        float value;
-        unsigned char type;
-        unsigned char control;
-        short int min;
-        short int max;
-        short int def;
-    } limits;
     char bytes [sizeof(data)];
 };
 

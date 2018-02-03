@@ -1,7 +1,7 @@
 /*
     InterChange.h - General communications
 
-    Copyright 2016-2017 Will Godfrey
+    Copyright 2016-2018 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified October 2017
+    Modified February 2018
 */
 
 #ifndef INTERCH_H
@@ -65,7 +65,7 @@ class InterChange : private MiscFuncs
         float readAllData(CommandBlock *getData, unsigned char commandType = 0xff);
         void resolveReplies(CommandBlock *getData);
         void testLimits(CommandBlock *getData);
-        void returnLimits(CommandBlock *getData);
+        float returnLimits(CommandBlock *getData);
 
         void flagsWrite(unsigned int val){__sync_and_and_fetch(&flagsValue, val);}
 

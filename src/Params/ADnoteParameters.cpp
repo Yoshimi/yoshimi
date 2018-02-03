@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2017-2018 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,8 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified May 2017
+    This file is derivative of ZynAddSubFX original code.
+    Modified Februarly 2018
 */
 
 #include <iostream>
@@ -808,8 +810,11 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper *xml, int n)
 }
 
 
-void ADnoteParameters::getLimits(CommandBlock *getData)
+float ADnoteParameters::getLimits(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    int request = int(getData->data.type & 3);
+
     int control = getData->data.control;
     int engine = getData->data.engine;
 
@@ -902,14 +907,32 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
                 min = -1;
                 def = -10;
                 max = -1;
+                type |= 4; // error
                 break;
         }
-        getData->data.type |= type;
-        getData->limits.min = min;
-        getData->limits.def = def;
-        getData->limits.max = max;
-        return;
+        getData->data.type = type;
+        if (type & 4)
+            return 1;
     }
+        switch (request)
+        {
+            case 0:
+                if(value < min)
+                    value = min;
+                else if(value > max)
+                    value = max;
+            break;
+            case 1:
+                value = min;
+                break;
+            case 2:
+                value = max;
+                break;
+            case 3:
+                value = def / 10.0f;
+                break;
+        }
+        return value;
 
     switch (control)
     {
@@ -1105,12 +1128,32 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
             min = -1;
             def = -10;
             max = -1;
+            type |= 4; // error
             break;
     }
-    getData->data.type |= type;
-    getData->limits.min = min;
-    getData->limits.def = def;
-    getData->limits.max = max;
+    getData->data.type = type;
+    if (type & 4)
+        return 1;
+
+    switch (request)
+    {
+        case 0:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+        break;
+        case 1:
+            value = min;
+            break;
+        case 2:
+            value = max;
+            break;
+        case 3:
+            value = def / 10.0f;
+            break;
+    }
+    return value;
 }
 
 void ADnoteParameters::postrender(void)

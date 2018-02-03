@@ -11,7 +11,7 @@ comment {EffUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2016-2017, Will Godfrey & others
+Copyright 2016-2018, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -29,8 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-Modified October 2017
-} {in_source in_header
+Modified February 2018} {in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -479,7 +478,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
             o->value(eff->geteffectpar(butt));
         }
 
-        send_data(butt, o->value(), 1, 0xd0);}
+        send_data(butt, o->value(), 1, 0xd8);}
         tooltip Dampening xywh {340 40 30 30} box ROUND_UP_BOX labelsize 11 minimum 64 maximum 127 step 1
         code0 {o->init(-1);}
         code1 {o->setValueType(VC_percent64_127);}
@@ -1794,8 +1793,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
       }
       Fl_Dial dfp5 {
         label {St.df}
-        callback {
-        int butt = 5;
+        callback {int butt = 5;
         if (Fl::event_button() == 3)
             o->value(eff->geteffectpar(butt));
 
@@ -1806,8 +1804,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
       }
       Fl_Dial dfp6 {
         label LfoD
-        callback {
-        int butt = 6;
+        callback {int butt = 6;
         if (Fl::event_button() == 3)
             o->value(eff->geteffectpar(butt));
 
@@ -1841,8 +1838,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
       } {
         Fl_Dial dfp7 {
           label {A.S.}
-          callback {
-          int butt = 7;
+          callback {int butt = 7;
         if (Fl::event_button() == 3)
             o->value(eff->geteffectpar(butt));
 
@@ -1853,8 +1849,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         }
         Fl_Dial dfp9 {
           label {A.M}
-          callback {
-          int butt = 9;
+          callback {int butt = 9;
           if (Fl::event_button() == 3)
               o->value(eff->geteffectpar(butt));
 

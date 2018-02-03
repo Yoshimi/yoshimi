@@ -3192,9 +3192,12 @@ void SynthEngine::setWindowTitle(string _windowTitle)
         windowTitle = _windowTitle;
 }
 
-void SynthEngine::getLimits(CommandBlock *getData)
+float SynthEngine::getLimits(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    int request = int(getData->data.type & 3);
     int control = getData->data.control;
+
     // defaults
     int type = (getData->data.type & 0x3f) | 0x80; // set as integer
     int min = 0;
@@ -3248,22 +3251,37 @@ void SynthEngine::getLimits(CommandBlock *getData)
             max = 0;
             break;
 
-        default:
-            min = -1;
-            def = -10;
-            max = -1;
-            break;
     }
     getData->data.type = type;
-    getData->limits.min = min;
-    getData->limits.def = def;
-    getData->limits.max = max;
+
+    switch (request)
+    {
+        case 0:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+        break;
+        case 1:
+            value = min;
+            break;
+        case 2:
+            value = max;
+            break;
+        case 3:
+            value = def / 10.0f;
+            break;
+    }
+    return value;
 }
 
 
-void SynthEngine::getVectorLimits(CommandBlock *getData)
+float SynthEngine::getVectorLimits(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    int request = int(getData->data.type & 3);
     int control = getData->data.control;
+
     // defaults
     int type = (getData->data.type & 0x3f) | 0x80; // set as integer
     int min = 0;
@@ -3272,19 +3290,45 @@ void SynthEngine::getVectorLimits(CommandBlock *getData)
     //cout << "config control " << to_string(control) << endl;
     switch (control)
     {
-        default:
+        default: // TODO
+            //min = -1;
+            //def = -10;
+            //max = -1;
+            //type |= 4; // error
             break;
     }
     getData->data.type = type;
-    getData->limits.min = min;
-    getData->limits.def = def;
-    getData->limits.max = max;
+    if (type & 4)
+        return 1;
+
+    switch (request)
+    {
+        case 0:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+        break;
+        case 1:
+            value = min;
+            break;
+        case 2:
+            value = max;
+            break;
+        case 3:
+            value = def / 10.0f;
+            break;
+    }
+    return value;
 }
 
 
-void SynthEngine::getConfigLimits(CommandBlock *getData)
+float SynthEngine::getConfigLimits(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    int request = int(getData->data.type & 3);
     int control = getData->data.control;
+
     // defaults
     int type = (getData->data.type & 0x3f) | 0x80; // set as integer
     int min = 0;
@@ -3402,9 +3446,31 @@ void SynthEngine::getConfigLimits(CommandBlock *getData)
         case 80:
             break;
 
+        default:
+            type |= 4; // error
+            return 2;
+            break;
     }
     getData->data.type = type;
-    getData->limits.min = min;
-    getData->limits.def = def;
-    getData->limits.max = max;
+    if (type & 4)
+        return 1;
+    switch (request)
+    {
+        case 0:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+        break;
+        case 1:
+            value = min;
+            break;
+        case 2:
+            value = max;
+            break;
+        case 3:
+            value = def / 10.0f;
+            break;
+    }
+    return value;
 }

@@ -22,7 +22,7 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified January 2018
+    Modified February 2018
 */
 
 #include <cmath>
@@ -936,8 +936,11 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
 }
 
 
-void PADnoteParameters::getLimits(CommandBlock *getData)
+float PADnoteParameters::getLimits(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    int request = int(getData->data.type & 3);
+
     int control = getData->data.control;
 
     // defaults
@@ -1160,12 +1163,32 @@ void PADnoteParameters::getLimits(CommandBlock *getData)
             min = -1;
             def = -10;
             max = -1;
+            type |= 4; // error
             break;
     }
-    getData->data.type |= type;
-    getData->limits.min = min;
-    getData->limits.def = def;
-    getData->limits.max = max;
+    getData->data.type = type;
+    if (type & 4)
+        return 1;
+
+    switch (request)
+    {
+        case 0:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+        break;
+        case 1:
+            value = min;
+            break;
+        case 2:
+            value = max;
+            break;
+        case 3:
+            value = def / 10.0f;
+            break;
+    }
+    return value;
 }
 
 void PADnoteParameters::postrender(void)

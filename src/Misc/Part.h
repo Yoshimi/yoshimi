@@ -78,7 +78,7 @@ class Part : private MiscFuncs, SynthHelper
         void add2XMLinstrument(XMLwrapper *xml);
         void getfromXML(XMLwrapper *xml);
         void getfromXMLinstrument(XMLwrapper *xml);
-        void getLimits(CommandBlock *getData);
+        float getLimits(CommandBlock *getData);
 
         Controller *ctl;
 

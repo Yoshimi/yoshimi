@@ -1,7 +1,7 @@
 /*
     CmdInterface.h
 
-    Copyright 2015-2017, Will Godfrey & others.
+    Copyright 2015-2018, Will Godfrey & others.
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified August 2017
+    Modified February 2018
 */
 
 #ifndef CMDINTERFACE_H
@@ -60,7 +60,7 @@ class CmdInterface : private MiscFuncs
         int commandScale();
         int commandPart(bool justSet);
         int commandReadnSet();
-        int sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff);
+        int sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff, unsigned char request = 0xff);
         bool cmdIfaceProcessCommand();
         char *cCmd;
         char *point;

@@ -815,9 +815,9 @@ string InterChange::formatScales(string text)
 
 float InterChange::readAllData(CommandBlock *getData, unsigned char commandType)
 {
-    CommandBlock tryData;
-    if (commandType < 0xff) // these are all static
+    if (commandType < 4) // these are all static
     {
+        //cout << "Read Control " << (int) getData->data.control << " Part " << (int) getData->data.part << "  Kit " << (int) getData->data.kit << " Engine " << (int) getData->data.engine << "  Insert " << (int) getData->data.insert << endl;
         /*
          * commandtype values
          * 0    adjusted input value
@@ -829,8 +829,12 @@ float InterChange::readAllData(CommandBlock *getData, unsigned char commandType)
          * bit 6 set    MIDI-learnable
          * bit 7 set    Is an integer value
          */
-        memcpy(tryData.bytes, getData->bytes, sizeof(tryData));
-        float value = 0; // this will be the new limits testing
+        //memcpy(tryData.bytes, getData->bytes, sizeof(getData));
+
+        unsigned char type = getData->data.type;
+        type &= 0xf8;
+        getData->data.type = type | commandType;
+        float value = returnLimits(getData);
         synth->getRuntime().finishedCLI = true;
         return value;
     }
@@ -845,6 +849,7 @@ float InterChange::readAllData(CommandBlock *getData, unsigned char commandType)
      * Other reads will be blocked.
      * This needs improving.
      */
+    CommandBlock tryData;
     unsigned char control = getData->data.control;
     if (getData->data.part == 0xf0 && (control >=200 && control <= 202))
     {
@@ -852,6 +857,7 @@ float InterChange::readAllData(CommandBlock *getData, unsigned char commandType)
         synth->fetchMeterData();
         return getData->data.value;
     }
+
     int npart = getData->data.part;
     if (npart < NUM_MIDI_PARTS && synth->part[npart]->busy)
     {
@@ -3596,16 +3602,10 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         blockRead &= 2; // clear it now it's done
         return false;
     }
-    float value = getData->data.value;
+//    float value = getData->data.value;
     unsigned char parameter = getData->data.parameter;
     if ((parameter & 0x80) && parameter < 0xc0)
         return true; // indirect transfer
-    if (value == FLT_MAX)
-    {
-        cout << "test: seen FLT_MAX" << endl;
-        returnLimits(getData); // this can be accessed directly
-        return false;
-    }
 
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -7533,16 +7533,6 @@ void InterChange::testLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
 
-    if (value == FLT_MAX) // this one's destructive
-    {
-        returnLimits(getData);
-        return;
-    }
-
-    CommandBlock newData;
-    memcpy(newData.bytes, getData->bytes, commandSize);
-    returnLimits(&newData);
-
     int control = getData->data.control;
     /*
      * This is a special case as existing defined
@@ -7551,11 +7541,6 @@ void InterChange::testLimits(CommandBlock *getData)
      */
     if (getData->data.part == 0xf8 && (control == 65 || control == 67 || control == 71))
     {
-        if (value >= (FLT_MAX / 2)) // set default
-        {
-            value = newData.limits.def / 10;
-            getData->data.value = value;
-        }
         getData->data.par2 = 255; // just to be sure
         if (value > 119)
             return;
@@ -7581,96 +7566,144 @@ void InterChange::testLimits(CommandBlock *getData)
             getData->data.par2 = miscMsgPush(text);
         return;
     }
-
-    if (value >= (FLT_MAX / 2)) // set default
-    {
-        getData->data.value = newData.limits.def / 10;
-        return;
-    }
-
-    if (value > newData.limits.max) // adjust to limits
-        value = newData.limits.max;
-    else if (value < newData.limits.min)
-        value = newData.limits.min;
-    getData->data.value = value;
 }
 
 
 // a lot of work needed here :(
-void InterChange::returnLimits(CommandBlock *getData)
+float InterChange::returnLimits(CommandBlock *getData)
 {
-    // lower bits of type are preseved so we know the source
+    // intermediate bits of type are preserved so we know the source
     // bit 6 set is used to denote midi learnable
     // bit 7 set denotes the value is used as an integer
 
-    int control = getData->data.control;
-    int npart = getData->data.part;
-    int kititem = getData->data.kit;
-    int engine = getData->data.engine;
-    int insert = getData->data.insert;
-    int parameter = getData->data.parameter;
-    int par2 = getData->data.par2;
+    int control = (int) getData->data.control;
+    int npart = (int) getData->data.part;
+    int kititem = (int) getData->data.kit;
+    int engine = (int) getData->data.engine;
+    int insert = (int) getData->data.insert;
+    int parameter = (int) getData->data.parameter;
+    int par2 = (int) getData->data.par2;
+
+    float value = getData->data.value;
+    int request = int(getData->data.type & 3);
+
+    //cout << "Top  Control " << control << " Part " << (int) getData->data.part << "  Kit " << kititem << " Engine " << engine << "  Insert " << insert << endl;
+
+    //cout << "Top request " << request << endl;
+
     getData->data.type &= 0x3f; //  clear top bits
     getData->data.type |= 0x80; // default is integer & not learnable
 
     if (npart == 248) // config limits
-    {
-        synth->getConfigLimits(getData);
-        return;
-    }
+        return synth->getConfigLimits(getData);
 
     if (npart == 240) // main control limits
-    {
-        synth->getLimits(getData);
-        return;
-    }
+        return synth->getLimits(getData);
 
     if (npart == 192) // vector limits
-    {
-        synth->getVectorLimits(getData);
-        return;
-    }
+        return synth->getVectorLimits(getData);
+
+    float min;
+    float max;
+    float def;
 
 // TODO sort this properly
     if(kititem == 0x87) // EQ effects
     {
-        getData->limits.min = 0;
-        getData->limits.def = 64;
-        getData->limits.max = 127;
-        return;
+        min = 0;
+        def = 64;
+        max = 127;
+
+        switch (request)
+        {
+            case 0:
+                if(value < min)
+                    value = min;
+                else if(value > max)
+                    value = max;
+                break;
+            case 1:
+                value = min;
+                break;
+            case 2:
+                value = max;
+                break;
+            case 3:
+                value = def / 10.0f;
+                break;
+        }
+        return value;
     }
 
 // TODO sort this properly
     if(kititem == 0x88) // DynFilter
     {
-        getData->limits.min = 0;
-        getData->limits.max = 127;
-        return;
+        min = 0;
+        max = 127;
+
+        switch (request)
+        {
+            case 0:
+                if(value < min)
+                    value = min;
+                else if(value > max)
+                    value = max;
+                break;
+            case 1:
+                value = min;
+                break;
+            case 2:
+                value = max;
+                break;
+            case 3:
+                value = def / 10.0f;
+                break;
+        }
+        return value;
     }
 
 // TODO sort this properly
     if (kititem >= 0x80 && kititem <= 0x86) // general effects.
     {
-        getData->limits.min = 0;
-        getData->limits.max = 127;
-        return;
+        min = 0;
+        max = 127;
+
+        switch (request)
+        {
+            case 0:
+                if(value < min)
+                    value = min;
+                else if(value > max)
+                    value = max;
+                break;
+            case 1:
+                value = min;
+                break;
+            case 2:
+                value = max;
+                break;
+            case 3:
+                value = def / 10.0f;
+                break;
+        }
+        return value;
     }
 
     if (npart < NUM_MIDI_PARTS)
     {
         Part *part;
         part = synth->part[npart];
+
         if (engine == 1 && (insert == 0xff || (insert >= 5 && insert <= 7)) && parameter == 0xff)
         {
             SUBnoteParameters *subpars;
             subpars = part->kit[kititem].subpars;
-            subpars->getLimits(getData);
-            return;
+            return subpars->getLimits(getData);
         }
-        if (engine == 0xff && (kititem == 0xff || insert == 0x20)) // part level controls
-        {
-            part->getLimits(getData);
-            return;
+
+        if ((engine & 0x7f) == 0x7f && (kititem == 0xff || insert == 0x20)) // part level controls
+        { // TODO why is engine not 0xff? it used to be.
+            return part->getLimits(getData);
         }
         if ((insert == 0x20 || insert == 0xff) && parameter == 0xff && par2 == 0xff)
         {
@@ -7678,78 +7711,207 @@ void InterChange::returnLimits(CommandBlock *getData)
             {
                 ADnoteParameters *adpars;
                 adpars = part->kit[kititem].adpars;
-                adpars->getLimits(getData);
-                return;
+                return adpars->getLimits(getData);
             }
             if (engine == 1)
             {
                 SUBnoteParameters *subpars;
                 subpars = part->kit[kititem].subpars;
-                subpars->getLimits(getData);
-                return;
+                return subpars->getLimits(getData);
             }
             if (engine == 2)
             {
                 PADnoteParameters *padpars;
                 padpars = part->kit[kititem].padpars;
-                padpars->getLimits(getData);
-                return;
+                return padpars->getLimits(getData);
             }
             // there may be other stuff
-            getData->limits.min = 0;
-            getData->limits.max = 127;
-            getData->limits.def = 0;
+
+            min = 0;
+            max = 127;
+            def = 0;
+
             cout << "Using defaults" << endl;
-            return;
+            switch (request)
+            {
+                case 0:
+                    if(value < min)
+                        value = min;
+                    else if(value > max)
+                        value = max;
+                    break;
+                case 1:
+                    value = min;
+                    break;
+                case 2:
+                    value = max;
+                    break;
+                case 3:
+                    value = def / 10.0f;
+                    break;
+            }
+            return value;
         }
         if (insert >= 5 && insert <= 7)
         {
-            part->kit[0].adpars->VoicePar[0].OscilSmp->getLimits(getData);
+            return part->kit[0].adpars->VoicePar[0].OscilSmp->getLimits(getData);
             // we also use this for pad limits
             // as oscillator values identical
-            return;
         }
         if (insert == 8) // resonance
         {
             if (control == 0) // a cheat!
             {
-                getData->limits.min = 1;
-                getData->limits.max = 90;
-                getData->limits.def = 500; // default values are *10
-                return;
+                min = 1;
+                max = 90;
+                def = 500; // default values are *10
+
+                switch (request)
+                {
+                    case 0:
+                        if(value < min)
+                            value = min;
+                        else if(value > max)
+                            value = max;
+                        break;
+                    case 1:
+                        value = min;
+                        break;
+                    case 2:
+                        value = max;
+                        break;
+                    case 3:
+                        value = def / 10.0f;
+                        break;
+                }
+                return value;
             }
             // there may be other stuff
-            getData->limits.min = 0;
-            getData->limits.max = 127;
-            getData->limits.def = 0;
+            min = 0;
+            max = 127;
+            def = 0;
+
             cout << "Using defaults" << endl;
-            return;
+            switch (request)
+            {
+                case 0:
+                    if(value < min)
+                        value = min;
+                    else if(value > max)
+                        value = max;
+                    break;
+                case 1:
+                    value = min;
+                    break;
+                case 2:
+                    value = max;
+                    break;
+                case 3:
+                    value = def / 10.0f;
+                    break;
+            }
+            return value;
         }
         if (insert == 0 && parameter <= 2) // LFO
         {
             if (control == 0) // another cheat!
             {
-                getData->limits.type = 0x40;
-                getData->limits.min = 0;
-                getData->limits.max = 1;
-                getData->limits.def = 5; // default values are *10
-                return;
+                getData->data.type = 0x40;
+                min = 0;
+                max = 1;
+                def = 5; // default values are *10
+                switch (request)
+                {
+                    case 0:
+                        if(value < min)
+                            value = min;
+                        else if(value > max)
+                            value = max;
+                        break;
+                    case 1:
+                        value = min;
+                        break;
+                    case 2:
+                        value = max;
+                        break;
+                    case 3:
+                        value = def / 10.0f;
+                        break;
+                }
+                return value;
             }
-            getData->limits.min = 0;
-            getData->limits.max = 127;
-            getData->limits.def = 0;
+            min = 0;
+            max = 127;
+            def = 0;
             cout << "Using defaults" << endl;
-            return;
+
+            switch (request)
+            {
+                case 0:
+                    if(value < min)
+                        value = min;
+                    else if(value > max)
+                        value = max;
+                    break;
+                case 1:
+                    value = min;
+                    break;
+                case 2:
+                    value = max;
+                    break;
+                case 3:
+                    value = def / 10.0f;
+                    break;
+            }
+            return value;
         }
-        // there may be other stuff
-        getData->limits.min = 0;
-        getData->limits.max = 127;
-        getData->limits.def = 0;
+        min = 0;
+        max = 127;
+        def = 0;
         cout << "Using defaults" << endl;
-        return;
+
+            switch (request)
+            {
+                case 0:
+                    if(value < min)
+                        value = min;
+                    else if(value > max)
+                        value = max;
+                break;
+                case 1:
+                    value = min;
+                    break;
+                case 2:
+                    value = max;
+                    break;
+                case 3:
+                    value = def / 10.0f;
+                    break;
+            }
+            return value;
     }
-    getData->limits.min = 0;
-    getData->limits.max = 127;
-    getData->limits.def = 0;
+    min = 0;
+    max = 127;
+    def = 0;
     cout << "Using defaults" << endl;
+
+    switch (request)
+    {
+        case 0:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+        break;
+        case 1:
+            value = min;
+            break;
+        case 2:
+            value = max;
+            break;
+        case 3:
+            value = def / 10.0f;
+            break;
+    }
+    return value;
 }
