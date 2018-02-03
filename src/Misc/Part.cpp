@@ -1550,7 +1550,7 @@ float Part::getLimits(CommandBlock *getData)
 
     // defaults
     int min = 0;
-    int def = 640;
+    float def = 64;
     int max = 127;
     //cout << "part control " << control << "  Request " << request << endl;
 
@@ -1562,7 +1562,7 @@ float Part::getLimits(CommandBlock *getData)
         case 0:
             type &= 0x3f;
             type |= 0x40;
-            def = 960;
+            def = 96;
             break;
 
         case 1:
@@ -1577,7 +1577,7 @@ float Part::getLimits(CommandBlock *getData)
 
         case 5:
             min = 1;
-            def = 10;
+            def = 1;
             max = 16;
             break;
 
@@ -1595,7 +1595,7 @@ float Part::getLimits(CommandBlock *getData)
 
         case 8:
             if (npart == 0)
-                def = 10;
+                def = 1;
             else
                 def = 0;
             max = 1;
@@ -1611,7 +1611,7 @@ float Part::getLimits(CommandBlock *getData)
             break;
 
         case 17:
-            def = 1270;
+            def = 127;
             break;
 
         case 18:
@@ -1624,7 +1624,7 @@ float Part::getLimits(CommandBlock *getData)
             break;
 
         case 33:
-            def = 200;
+            def = 20;
             max = 60;
             break;
 
@@ -1653,7 +1653,7 @@ float Part::getLimits(CommandBlock *getData)
             break;
         case 120:
             min = 1;
-            def = 10;
+            def = 1;
             max = 3;
             break;
 
@@ -1669,7 +1669,7 @@ float Part::getLimits(CommandBlock *getData)
             break;
 
         case 131:
-            def = 800;
+            def = 80;
             type |= 0x40;
             break;
 
@@ -1697,12 +1697,12 @@ float Part::getLimits(CommandBlock *getData)
             break;
 
         case 162:
-            def = 800;
+            def = 80;
             type |= 0x40;
             break;
 
         case 166:
-            def = 900;
+            def = 90;
             type |= 0x40;
             break;
 
@@ -1715,7 +1715,7 @@ float Part::getLimits(CommandBlock *getData)
 
         case 194:
             type |= 0x40;
-            def = 1270;
+            def = 127;
             break;
 
         // these haven't been done
@@ -1726,9 +1726,9 @@ float Part::getLimits(CommandBlock *getData)
         case 196:
             break;
 
-        case 255: // number of parts!
+        case 255: // number of parts
             min = 16;
-            def = 160;
+            def = 16;
             max = 64;
             break;
 
@@ -1755,7 +1755,7 @@ float Part::getLimits(CommandBlock *getData)
             value = max;
             break;
         case 3:
-            value = def / 10.0f;
+            value = def;
             break;
     }
     return value;

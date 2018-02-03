@@ -1637,7 +1637,7 @@ float OscilGen::getLimits(CommandBlock *getData)
     if (insert > 5)
     { // do harmonics stuff
         if (insert == 7)
-            def = 6400;
+            def = 64;
         switch (request)
         {
             case 0:
@@ -1653,7 +1653,7 @@ float OscilGen::getLimits(CommandBlock *getData)
                 value = max;
                 break;
             case 3:
-                value = def / 10.0f;
+                value = def;
                 break;
         }
         return value;
@@ -1691,7 +1691,7 @@ float OscilGen::getLimits(CommandBlock *getData)
             value = max;
             break;
         case 3:
-            value = def / 10.0f;
+            value = def;
             break;
     }
     return value;

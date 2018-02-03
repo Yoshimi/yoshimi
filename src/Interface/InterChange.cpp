@@ -829,7 +829,6 @@ float InterChange::readAllData(CommandBlock *getData, unsigned char commandType)
          * bit 6 set    MIDI-learnable
          * bit 7 set    Is an integer value
          */
-        //memcpy(tryData.bytes, getData->bytes, sizeof(getData));
 
         unsigned char type = getData->data.type;
         type &= 0xf8;
@@ -7629,7 +7628,7 @@ float InterChange::returnLimits(CommandBlock *getData)
                 value = max;
                 break;
             case 3:
-                value = def / 10.0f;
+                value = def;
                 break;
         }
         return value;
@@ -7656,7 +7655,7 @@ float InterChange::returnLimits(CommandBlock *getData)
                 value = max;
                 break;
             case 3:
-                value = def / 10.0f;
+                value = def;
                 break;
         }
         return value;
@@ -7683,7 +7682,7 @@ float InterChange::returnLimits(CommandBlock *getData)
                 value = max;
                 break;
             case 3:
-                value = def / 10.0f;
+                value = def;
                 break;
         }
         return value;
@@ -7731,7 +7730,7 @@ float InterChange::returnLimits(CommandBlock *getData)
             max = 127;
             def = 0;
 
-            cout << "Using defaults" << endl;
+            cout << "Using engine defaults" << endl;
             switch (request)
             {
                 case 0:
@@ -7747,7 +7746,7 @@ float InterChange::returnLimits(CommandBlock *getData)
                     value = max;
                     break;
                 case 3:
-                    value = def / 10.0f;
+                    value = def;
                     break;
             }
             return value;
@@ -7764,7 +7763,7 @@ float InterChange::returnLimits(CommandBlock *getData)
             {
                 min = 1;
                 max = 90;
-                def = 500; // default values are *10
+                def = 50;
 
                 switch (request)
                 {
@@ -7781,7 +7780,7 @@ float InterChange::returnLimits(CommandBlock *getData)
                         value = max;
                         break;
                     case 3:
-                        value = def / 10.0f;
+                        value = def;
                         break;
                 }
                 return value;
@@ -7791,7 +7790,7 @@ float InterChange::returnLimits(CommandBlock *getData)
             max = 127;
             def = 0;
 
-            cout << "Using defaults" << endl;
+            cout << "Using resonance defaults" << endl;
             switch (request)
             {
                 case 0:
@@ -7807,7 +7806,7 @@ float InterChange::returnLimits(CommandBlock *getData)
                     value = max;
                     break;
                 case 3:
-                    value = def / 10.0f;
+                    value = def;
                     break;
             }
             return value;
@@ -7819,7 +7818,7 @@ float InterChange::returnLimits(CommandBlock *getData)
                 getData->data.type = 0x40;
                 min = 0;
                 max = 1;
-                def = 5; // default values are *10
+                def = 0.5f;
                 switch (request)
                 {
                     case 0:
@@ -7835,7 +7834,7 @@ float InterChange::returnLimits(CommandBlock *getData)
                         value = max;
                         break;
                     case 3:
-                        value = def / 10.0f;
+                        value = def;
                         break;
                 }
                 return value;
@@ -7843,7 +7842,7 @@ float InterChange::returnLimits(CommandBlock *getData)
             min = 0;
             max = 127;
             def = 0;
-            cout << "Using defaults" << endl;
+            cout << "Using LFO defaults" << endl;
 
             switch (request)
             {
@@ -7860,7 +7859,7 @@ float InterChange::returnLimits(CommandBlock *getData)
                     value = max;
                     break;
                 case 3:
-                    value = def / 10.0f;
+                    value = def;
                     break;
             }
             return value;
@@ -7885,7 +7884,7 @@ float InterChange::returnLimits(CommandBlock *getData)
                     value = max;
                     break;
                 case 3:
-                    value = def / 10.0f;
+                    value = def;
                     break;
             }
             return value;
@@ -7893,7 +7892,7 @@ float InterChange::returnLimits(CommandBlock *getData)
     min = 0;
     max = 127;
     def = 0;
-    cout << "Using defaults" << endl;
+    cout << "Using unknown part number defaults" << endl;
 
     switch (request)
     {
@@ -7910,7 +7909,7 @@ float InterChange::returnLimits(CommandBlock *getData)
             value = max;
             break;
         case 3:
-            value = def / 10.0f;
+            value = def;
             break;
     }
     return value;

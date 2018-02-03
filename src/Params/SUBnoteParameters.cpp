@@ -371,9 +371,9 @@ float SUBnoteParameters::getLimits(CommandBlock *getData)
     if (insert >= 6 && insert <= 7)
     { // do harmonics stuff
         if (insert == 7)
-            def = 640;
+            def = 64;
         else if (control == 0)
-            def = 1270;
+            def = 127;
         else
             def = 0;
         getData->data.type |= 0x40; // all learnable
@@ -408,17 +408,17 @@ float SUBnoteParameters::getLimits(CommandBlock *getData)
     {
         case 0:
             type = 0x40;
-            def = 960;
+            def = 96;
             break;
 
         case 1:
             type = 0x40;
-            def = 900;
+            def = 90;
             break;
 
         case 2:
             type = 0x40;
-            def = 640;
+            def = 64;
             break;
 
         case 8:
@@ -428,7 +428,7 @@ float SUBnoteParameters::getLimits(CommandBlock *getData)
 
         case 16:
             type = 0x40;
-            def = 400;
+            def = 40;
             break;
 
         case 17:
@@ -473,12 +473,12 @@ float SUBnoteParameters::getLimits(CommandBlock *getData)
 
         case 38:
             type = 0x40;
-            def = 880;
+            def = 88;
             break;
 
         case 39:
             type = 0x40;
-            def = 640;
+            def = 64;
             break;
 
         case 40:
@@ -500,7 +500,7 @@ float SUBnoteParameters::getLimits(CommandBlock *getData)
 
         case 80:
             min = 1;
-            def = 1000;
+            def = 100;
             max = 5;
             break;
 
@@ -509,7 +509,7 @@ float SUBnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case 82:
-            def = 1000;
+            def = 100;
             max = 2;
             break;
 
@@ -519,15 +519,12 @@ float SUBnoteParameters::getLimits(CommandBlock *getData)
 
         case 112:
             type = 0x40;
-            def = 10;
+            def = 1;
             max = 1;
             break;
 
 
         default:
-            min = -1;
-            def = -10;
-            max = -1;
             type |= 4; // error
             break;
     }
@@ -550,7 +547,7 @@ float SUBnoteParameters::getLimits(CommandBlock *getData)
             value = max;
             break;
         case 3:
-            value = def / 10.0f;
+            value = def;
             break;
     }
     return value;

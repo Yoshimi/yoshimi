@@ -404,17 +404,17 @@ float Controller::getLimits(CommandBlock *getData)
     // defaults
     int type = 0x80;
     int min = 0;
-    int def = 640;
+    float def = 64;
     int max = 127;
 
     switch (control)
     {
         case 128:
             min = 64;
-            def = 960;
+            def = 96;
             break;
         case 129:
-            def = 10;
+            def = 1;
             max = 1;
             break;
         case 130:
@@ -422,7 +422,7 @@ float Controller::getLimits(CommandBlock *getData)
             max = 64;
             break;
         case 131:
-            def = 800;
+            def = 80;
             break;
         case 132:
             def = 0;
@@ -436,15 +436,15 @@ float Controller::getLimits(CommandBlock *getData)
             max = 1;
             break;
         case 135:
-            def = 10;
+            def = 1;
             max = 1;
             break;
         case 136:
-            def = 10;
+            def = 1;
             max = 1;
             break;
         case 137:
-            def = 10;
+            def = 1;
             max = 1;
             break;
         case 138:
@@ -470,12 +470,12 @@ float Controller::getLimits(CommandBlock *getData)
             break;
         case 162:
             type |= 0x40;
-            def = 30;
+            def = 3;
             break;
         case 163:
             min = 0;
             max = 1;
-            def = 10;
+            def = 1;
             break;
         case 164:
             def = 0;
@@ -483,14 +483,14 @@ float Controller::getLimits(CommandBlock *getData)
             break;
         case 165:
             type |= 0x40;
-            def = 800;
+            def = 80;
             break;
         case 166:
             type |= 0x40;
-            def = 900;
+            def = 90;
             break;
         case 168:
-            def = 10;
+            def = 1;
             max = 1;
             break;
         case 224:
@@ -521,7 +521,7 @@ float Controller::getLimits(CommandBlock *getData)
             value = max;
             break;
         case 3:
-            value = def / 10.0f;
+            value = def;
             break;
     }
     return value;

@@ -946,19 +946,19 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
     // defaults
     int type = 0;
     int min = 0;
-    int def = 640;
+    int def = 64;
     int max = 127;
 
     switch (control)
     {
         case 0:
             type |= 0x40;
-            def = 900;
+            def = 90;
             break;
 
         case 1:
             type |= 0x40;
-            def = 720;
+            def = 72;
             break;
 
         case 2:
@@ -972,7 +972,7 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case 16:
-            def = 5000;
+            def = 500;
             max = 1000;
             break;
 
@@ -1023,7 +1023,7 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
 
         case 38:
             type |= 0x40;
-            def = 880;
+            def = 88;
             break;
 
         case 39:
@@ -1050,7 +1050,7 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
 
         case 64:
             type |= 0x40;
-            def = 800;
+            def = 80;
             break;
 
         case 65:
@@ -1065,12 +1065,12 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
 
         case 67:
             type |= 0x40;
-            def = 300;
+            def = 30;
             break;
 
         case 68:
             type |= 0x40;
-            def = 1270;
+            def = 127;
             break;
 
         case 69:
@@ -1085,7 +1085,7 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
 
         case 71:
             type |= 0x40;
-            def = 800;
+            def = 80;
             break;
 
         case 72:
@@ -1099,27 +1099,27 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case 75:
-            def = 10;
+            def = 1;
             max = 1;
             break;
 
         case 80:
-            def = 40;
+            def = 4;
             max = 8;
             break;
 
         case 81:
-            def = 20;
+            def = 2;
             max = 6;
             break;
 
         case 82:
-            def = 30;
+            def = 3;
             max = 7;
             break;
 
         case 83:
-            def = 30;
+            def = 3;
             max = 6;
             break;
 
@@ -1131,13 +1131,13 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
 
         case 112:
             type |= 0x40;
-            def = 10;
+            def = 1;
             max = 1;
             break;
 
         case 120:
             type |= 0x40;
-            def = FADEIN_ADJUSTMENT_SCALE * 10;
+            def = FADEIN_ADJUSTMENT_SCALE;
             break;
 
         case 121:
@@ -1147,7 +1147,7 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
 
         case 122:
             type |= 0x40;
-            def = 600;
+            def = 60;
             break;
 
         case 123:
@@ -1156,13 +1156,10 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
 
         case 124:
             type |= 0x40;
-            def = 720;
+            def = 72;
             break;
 
         default:
-            min = -1;
-            def = -10;
-            max = -1;
             type |= 4; // error
             break;
     }
@@ -1185,7 +1182,7 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
             value = max;
             break;
         case 3:
-            value = def / 10.0f;
+            value = def;
             break;
     }
     return value;

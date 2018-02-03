@@ -3201,25 +3201,25 @@ float SynthEngine::getLimits(CommandBlock *getData)
     // defaults
     int type = (getData->data.type & 0x3f) | 0x80; // set as integer
     int min = 0;
-    int def = 640;
+    float def = 64;
     int max = 127;
     //cout << "master control " << to_string(control) << endl;
     switch (control)
     {
         case 0:
-            def = 900;
+            def = 90;
             type = (type &0x3f) | 0x40; // float, learnable
             break;
 
         case 14:
             min = 1;
-            def = 10;
+            def = 1;
             max = Runtime.NumAvailableParts;;
             break;
 
         case 15:
             min = 16;
-            def = 160;
+            def = 16;
             max = 64;
             break;
 
@@ -3240,7 +3240,7 @@ float SynthEngine::getLimits(CommandBlock *getData)
 
         case 49:
             min = 14;
-            def = 1150;
+            def = 115;
             max = 119;
             break;
 
@@ -3269,7 +3269,7 @@ float SynthEngine::getLimits(CommandBlock *getData)
             value = max;
             break;
         case 3:
-            value = def / 10.0f;
+            value = def;
             break;
     }
     return value;
@@ -3285,14 +3285,14 @@ float SynthEngine::getVectorLimits(CommandBlock *getData)
     // defaults
     int type = (getData->data.type & 0x3f) | 0x80; // set as integer
     int min = 0;
-    int def = 0;
+    float def = 0;
     int max = NUM_MIDI_CHANNELS;
     //cout << "config control " << to_string(control) << endl;
     switch (control)
     {
         default: // TODO
             //min = -1;
-            //def = -10;
+            //def = -1;
             //max = -1;
             //type |= 4; // error
             break;
@@ -3316,7 +3316,7 @@ float SynthEngine::getVectorLimits(CommandBlock *getData)
             value = max;
             break;
         case 3:
-            value = def / 10.0f;
+            value = def;
             break;
     }
     return value;
@@ -3332,19 +3332,19 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
     // defaults
     int type = (getData->data.type & 0x3f) | 0x80; // set as integer
     int min = 0;
-    int def = 0;
+    float def = 0;
     int max = 1;
     //cout << "config control " << to_string(control) << endl;
     switch (control)
     {
         case 0:
             min = 256;
-            def = 10240;
+            def = 1024;
             max = 16384;
             break;
         case 1:
             min = 16;
-            def = 5120;
+            def = 512;
             max = 4096;
            break;
         case 2:
@@ -3364,7 +3364,7 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
         case 17:
             break;
         case 18:
-            def = 10;
+            def = 1;
             break;
         case 19:
             break;
@@ -3373,10 +3373,10 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
         case 21:
             break;
         case 22:
-            def = 10;
+            def = 1;
             break;
         case 23:
-            def = 10;
+            def = 1;
             break;
 
         case 32:
@@ -3384,17 +3384,17 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
             def = miscMsgPush("default");
             break;
         case 33:
-            def = 10;
+            def = 1;
             break;
         case 34:
             min = 3;
             def = miscMsgPush("default");
             break;
         case 35:
-            def = 10;
+            def = 1;
             break;
         case 36:
-            def = 10;
+            def = 1;
             break;
 
         case 48:
@@ -3402,7 +3402,7 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
             def = miscMsgPush("default");
             break;
         case 49:
-            def = 10;
+            def = 1;
             break;
         case 50:
             min = 3;
@@ -3411,7 +3411,7 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
         case 51:
             break;
         case 52:
-            def = 20;
+            def = 2;
             max = 3;
             break;
 
@@ -3421,18 +3421,18 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
             max = 119;
             break;
         case 67: // runtime midi checked elsewhere
-            def = 320;
+            def = 32;
             max = 119;
             break;
         case 68:
             break;
         case 69:
-            def = 10;
+            def = 1;
             break;
         case 70:
             break;
         case 71: // runtime midi checked elsewhere
-            def = 1100;
+            def = 110;
             max = 119;
             break;
         case 72:
@@ -3440,7 +3440,7 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
         case 73:
             break;
         case 74:
-            def = 10;
+            def = 1;
             break;
 
         case 80:
@@ -3469,7 +3469,7 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
             value = max;
             break;
         case 3:
-            value = def / 10.0f;
+            value = def;
             break;
     }
     return value;
