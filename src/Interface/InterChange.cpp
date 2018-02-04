@@ -233,14 +233,13 @@ void *InterChange::sortResultsThread(void)
                 resolveReplies(&getData);
         }
         usleep(80); // actually gives around 120 uS
+
         /*
          * The following are low priority actions initiated by,
          * but isolated from the main audio thread.
          */
 
         //unsigned int point = flagsReadClear();
-        //else if (point < 0x2100)
-            //doClearPart(point & 0xff);
     }
     return NULL;
 }

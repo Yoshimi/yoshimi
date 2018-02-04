@@ -5,6 +5,8 @@ yoshimi 1.5.6 M
 * Considerable updates to dev_notes.
 * BugFix: Importing keymap not updating GUI.
 * Further refinements to data read function.
+* Small improvements to master reset behavour.
+* More doc updates.
 
 2016-2-3 Will
 [LIMITS] First refactoring of this.

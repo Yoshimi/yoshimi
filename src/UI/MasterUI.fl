@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified January 2018} {in_source in_header
+Modified February 2018} {in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -617,14 +617,15 @@ paramsui->Show(3);}
         Fl_Button {} {
           label Reset
           callback {//
+          bool wasCtrl = (Fl::event_state(FL_CTRL) != 0);
           if (fl_choice("Set *ALL* dynamic values to their defaults?", NULL, "No", "Yes") > 1)
           {
-              if(Fl::event_state(FL_CTRL) == 0)
-                  send_data(96, 0, 0xf0, 0xf0, 0xff, 0xff, 0xc0);
+              if(wasCtrl || (Fl::event_state(FL_CTRL) != 0))
+                  send_data(97, 0, 0xf0, 0xf0, 0xff, 0xff, 0xc0);
               else
-                  send_data(97, 0, 0xf0, 0xf0, 0xff, 0xff, 0xc0);}}
+                  send_data(96, 0, 0xf0, 0xf0, 0xff, 0xff, 0xc0);}}
           tooltip {Clear all dynamic settings
-Ctrl + confirm includes MIDI-learn} xywh {7 60 70 24} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
+(+Ctrl includes MIDI-learn)} xywh {7 60 70 24} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
         }
         Fl_Button {} {
           label {Stop!}

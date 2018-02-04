@@ -66,7 +66,7 @@ class InterChange : private MiscFuncs
         void resolveReplies(CommandBlock *getData);
         void testLimits(CommandBlock *getData);
         float returnLimits(CommandBlock *getData);
-
+        unsigned char blockRead;
         void flagsWrite(unsigned int val){__sync_and_and_fetch(&flagsValue, val);}
 
     private:
@@ -95,7 +95,6 @@ class InterChange : private MiscFuncs
         string resolveEnvelope(CommandBlock *getData);
         string resolveEffects(CommandBlock *getData);
         bool showValue;
-        unsigned char blockRead;
         unsigned int tick;
         unsigned int lockTime;
 

@@ -16,6 +16,8 @@ partonoffWrite((int npart, int what)
 
   The rationale here is that if a part status is unknown to a function, but it wants to perform an operation that needs the part to be off, but then wants to restore it to its original condition, it first uses -1. If it was already off it makes no difference, but if it was on it is now turned off. Once the operation has been completed it uses 2 to restore the original state, so if it was off, it still is, but if it was on it is now on again.
 
+  The internal value will become progressively more negative as processes use -2 but will never become greater than +1 for 'on'
+
   If you want to set its state regardless of the previous setting (such as switching by a user) you use 0 and 1.
 
 
@@ -26,17 +28,19 @@ partonoffRead(int npart)
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Audio system Mute() / Unmute() / isMuted()
+Although carying no parameters, Mute and Unmute behave in exactly the inverse way as PartonoffLock with 2 / -1.
+
+mutewrite(int what) gives the full access as before, and isMuted() returns the current state.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 flagsWrite()
 flagsRead()
 flagsReadClear()
 
 These functions provide a link from the realtime thread, to a low priority one. Currently defined values are:
 
-npart | (kititem << 8)  range (0 to 0xf3f)
-  set a parts Pad parameters.
+(none)
 
-npart | 0x2000          range (0x2000 to 0x203f)
-  set a part to the default instrument.
-
-0xf0000000 {not yet implemented}
-  system reset (via MIDI)
+This has been replaced by other methods and is now being kept for temporary test purposes.
