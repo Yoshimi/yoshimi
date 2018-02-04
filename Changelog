@@ -3,6 +3,8 @@ yoshimi 1.5.6 M
 2016-2-4 Will
 * Merged in new limits code.
 * Considerable updates to dev_notes.
+* BugFix: Importing keymap not updating GUI.
+* Further refinements to data read function.
 
 2016-2-3 Will
 [LIMITS] First refactoring of this.

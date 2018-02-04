@@ -34,12 +34,17 @@
 
 SynthEngine *synth;
 
-float collect_readData(SynthEngine *synth, float value, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
+float collect_readData(SynthEngine *synth, float value, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2, unsigned char request)
 {
+    unsigned char type;
+    if (request < 4)
+        type = request | 4; // its a limit test
+    else
+        type = 0;
     CommandBlock putData;
 
     putData.data.value = value;
-    putData.data.type = 0x20; // = read from GUI
+    putData.data.type = type | 0x20; // = read from GUI
     putData.data.control = control;
     putData.data.part = part;
     putData.data.kit = kititem;

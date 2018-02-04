@@ -11,7 +11,7 @@ comment {Microtonal.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009, Alan Calvert
-Copyright 2016-2017, Will Godfrey
+Copyright 2016-2018, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -29,8 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified December 2017
-} {in_source in_header
+Modified February 2018} {in_source in_header
 }
 
 decl {\#include <FL/Fl_File_Chooser.H>} {public local
@@ -53,7 +52,7 @@ decl {\#include "UI/MiscGui.h"
     \#include "Misc/MiscFuncs.h"} {public global
 }
 
-class MicrotonalUI {open selected : {private MiscFuncs}
+class MicrotonalUI {selected : {private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window microtonaluiwindow {
@@ -319,11 +318,21 @@ class MicrotonalUI {open selected : {private MiscFuncs}
     code {//
     collect_data(synth, value, (Fl::event_button() | type), control, 0xe8, 0xff, 0xff, 0xff, par, par2);} {}
   }
+  Function {fetchData(float value, int control, int part, int kititem = 0xff, int engine = 0xff, int insert = 0xff, int parameter = 0xff, int par2 = 0xff, int commandType = 0xff, int request = 0xff)} {return_type float
+  } {
+    code {//
+        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, par2, request);} {}
+  }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
     bool isGui = (getData->data.type & 0x20);
     unsigned char control = getData->data.control;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+    unsigned char insert = getData->data.insert;
+    unsigned char parameter = getData->data.parameter;
+    
     unsigned char par2 = getData->data.par2;
     int value_int = lrint(value);
     bool value_bool = (value > 0.5f);
@@ -393,6 +402,11 @@ class MicrotonalUI {open selected : {private MiscFuncs}
             {
                 mappinginput->value(msg.c_str());
                 mapsizeoutput->value(value_int);
+                anotecounter->value(kititem);
+                firstnotecounter->value(engine);
+                middlenotecounter->value(insert);
+                lastnotecounter->value(parameter);
+                afreqinput->value(fetchData(0, 0, 232));
             }
             else if (isGui)
                 errors(value_int, true);

@@ -398,6 +398,11 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                             else
                                 text += to_string(map);
                         }
+                        getData->data.kit = synth->microtonal.PAnote;
+                        getData->data.engine = synth->microtonal.Pfirstkey;
+                        getData->data.insert = synth->microtonal.Pmiddlenote;
+                        getData->data.parameter = synth->microtonal.Plastkey;
+
                     }
                     break;
 
