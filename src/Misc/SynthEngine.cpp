@@ -1703,7 +1703,7 @@ void SynthEngine::ClearNRPNs(void)
 
 void SynthEngine::resetAll(bool andML)
 {
-    interchange.blockRead = 0;
+    __sync_and_and_fetch(&interchange.blockRead, 0);
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
         part[npart]->busy = false;
     if (Runtime.loadDefaultState && isRegFile(Runtime.defaultStateName+ ".state"))

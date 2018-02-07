@@ -1,6 +1,11 @@
 yoshimi 1.5.6 M
 
-2016-2-4 Will
+2018-2-7 Will
+* Some small improvements to 'reads'.
+* Corrected wrong dates in Changelog!
+  The dangers of copy-paste :(
+
+2018-2-4 Will
 * Merged in new limits code.
 * Considerable updates to dev_notes.
 * BugFix: Importing keymap not updating GUI.
@@ -8,7 +13,7 @@ yoshimi 1.5.6 M
 * Small improvements to master reset behavour.
 * More doc updates.
 
-2016-2-3 Will
+2018-2-3 Will
 [LIMITS] First refactoring of this.
          Quite a few ommisions.
          Seems to be correct for MIDI-learn
@@ -16,22 +21,22 @@ yoshimi 1.5.6 M
 [LIMITS] Made some corrections and optimisations.
 [LIMITS] Last? optimisations.
 
-2016-2-1 Will
+2018-2-1 Will
 * PadSynth 'busy' also reported to the GUI.
 * Removed redundant 'apply' code from Part.
 * Doc updates.
 
-2016-1-31 Will
+2018-1-31 Will
 * Applied extra safety features when changing PadSynth.
   Attempting to read or write to it at this time gives:
   "Part [n] busy"
 
-2016-1-30 Will
+2018-1-30 Will
 * Master Reset and Stop! now clear the VU meters.
 * MIDI buffer full reports to selected destination.
 * Some doc updates.
 
-2016-1-29 Will
+2018-1-29 Will
 * BugFix: Part effects not MIDI-learned correctly :(
   This is a quick 'n dirty fix. The whole of the
   limits structure needs refactoring!
