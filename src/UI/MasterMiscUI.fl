@@ -28,8 +28,8 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
-Modified January 2018
-} {in_source in_header
+Modified February 2018
+} {selected in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -102,7 +102,7 @@ decl {\#define NO_DB -68.0} {public local
 }
 
 class VUMeter {
-  comment {inherits MiscFuncs from GuiUpdates} selected : {public Fl_Box, private GuiUpdates}
+  comment {inherits MiscFuncs from GuiUpdates} : {public Fl_Box, private GuiUpdates}
 } {
   Function {VUMeter(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {npart=-1;} {}
@@ -435,12 +435,18 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
         Fl_Box partpad {
           xywh {40 20 17 40} box FLAT_BOX
         }
-        Fl_Text_Display partname {
-          label {A tripple test line here}
-          xywh {4 58 55 1} box NO_BOX labelfont 9 labelsize 10 align 225
-          code0 {setPartLabel(findengines(npart | *plgroup));}
+        Fl_Button partname {
+          label {  }
+          callback {//
+/*    if ((int)bankui->cbwig->value() != (npart + 1 + *plgroup))
+    {
+        bankui->cbwig->value(npart + 1 + *plgroup);
+        bankui->cbwig->do_callback();
+    }
+    bankui->Show();*/}
+          xywh {4 20 55 40} box THIN_DOWN_FRAME labelfont 9 labelsize 10 align 208
         }
-        Fl_Button partnam {
+        Fl_Button buttontop {
           label {  }
           callback {//
     if ((int)bankui->cbwig->value() != (npart + 1 + *plgroup))
@@ -449,7 +455,7 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
         bankui->cbwig->do_callback();
     }
     bankui->Show();}
-          xywh {4 20 55 40} box THIN_DOWN_FRAME labelfont 1 labelsize 10 align 208
+          xywh {4 20 55 40} box THIN_DOWN_FRAME labeltype NO_LABEL labelfont 9 labelsize 10 align 208
         }
         Fl_Slider partvolume {
           callback {//
@@ -584,7 +590,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     }
     else
         partrcv->textcolor(FL_WHITE);
-    partname->label(synth->part[setpart]->Pname.c_str());
+    partname->copy_label(synth->part[setpart]->Pname.c_str());
     int tmp = synth->part[setpart]->Paudiodest - 1;
     if (tmp < 0 or tmp > 3)
         tmp = 0;
@@ -620,12 +626,10 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     else
         partpad->color(BASE_COLOUR);
     if (synth->part[npart | *plgroup]->PyoshiType)
-        //partname->labelfont(FL_TIMES_BOLD_ITALIC);
         partname->labelcolor(YOSHI_COLOUR);
     else
-        //partname->labelfont(FL_HELVETICA_BOLD);
         partname->labelcolor(0);
-    partname->label(synth->part[npart | *plgroup]->Pname.c_str());} {}
+    partname->copy_label(synth->part[npart | *plgroup]->Pname.c_str());} {}
   }
   Function {findengines(int npart)} {return_type {unsigned int}
   } {

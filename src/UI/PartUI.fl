@@ -11,7 +11,7 @@ comment {PartUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2017, Will Godfrey
+Copyright 2014-2018, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -29,8 +29,8 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified December 2017
-} {in_source in_header
+Modified February 2018
+} {selected in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -386,7 +386,7 @@ class PartKitItem {: {public Fl_Group}
   }
 }
 
-class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
@@ -406,11 +406,11 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
         Fl_Box instrumentpadbox {
           xywh {262 9 63 16} box FLAT_BOX
         }
-        Fl_Text_Display instrumentlabel {
-          comment {We need this to stop the text ovewriting without the background redrawn}
-          xywh {134 24 192 1} box NO_BOX labelfont 1 labelsize 12 align 65 textsize 12
+        Fl_Button instrumentlabel {
+          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 7 192 20} box THIN_DOWN_FRAME labelfont 9 labelsize 12 align 16
+          code0 {setinstrumentlabel();}
         }
-        Fl_Button instrumentlab {
+        Fl_Button buttontop {
           callback {//
           int event = Fl::event_button();
           const char *tmp = NULL;
@@ -430,8 +430,7 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
                   }
               }
           }}
-          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 7 192 20} box THIN_DOWN_FRAME labelfont 1 labelsize 12 align 16
-          code0 {setinstrumentlabel();}
+          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 7 192 20} box THIN_DOWN_FRAME labeltype NO_LABEL labelsize 12 align 16
         }
         Fl_Button {} {
           label Edit
