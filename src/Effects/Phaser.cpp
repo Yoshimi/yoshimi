@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -20,7 +21,8 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is a derivative of a ZynAddSubFX original.
-    Last modified December 2014
+
+    Modified February 2018
 */
 
 #include "Misc/SynthEngine.h"
@@ -513,3 +515,51 @@ unsigned char Phaser::getpar(int npar)
     }
     return 0;
 }
+
+
+float Phaserlimit::getlimits(CommandBlock *getData)
+{
+    float value = getData->data.value;
+    int control = getData->data.control;
+    int request = getData->data.type & 3; // clear upper bits
+    //int npart = getData->data.part;
+
+    int min = 0;
+    int max = 127;
+    int def = 64;
+    bool canLearn = true;
+    bool isInteger = true;
+    switch (control)
+    {
+        case 0:
+            break;
+
+
+        default:
+            getData->data.type |= 4; // error
+            return 1.0f;
+            break;
+    }
+
+    switch(request)
+    {
+        case 0:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+            break;
+        case 1:
+            value = min;
+            break;
+        case 2:
+            value = max;
+            break;
+        case 3:
+            value = def;
+            break;
+    }
+    getData->data.type |= (canLearn * 64 + isInteger * 128);
+    return float(value);
+}
+

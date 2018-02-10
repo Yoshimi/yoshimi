@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2017, Will Godfrey
+    Copyright 2017-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified October 2017
+    Modified February 2018
 */
 
 #include <fftw3.h>
@@ -335,4 +335,51 @@ void EffectMgr::getfromXML(XMLwrapper *xml)
         xml->exitbranch();
     }
     cleanup();
+}
+
+
+float LimitMgr::geteffectlimits(CommandBlock *getData)
+{
+    int effType = getData->data.kit & 0x7f;
+
+    float value = 0;
+    switch (effType)
+    {
+        case 0:
+            value = 0;
+            break;
+        case 1:
+            Revlimit reverb;
+            value = reverb.getlimits(getData);
+            break;
+        case 2:
+            Echolimit echo;
+            value = echo.getlimits(getData);
+            break;
+        case 3:
+            Choruslimit chorus;
+            value = chorus.getlimits(getData);
+            break;
+        case 4:
+            Phaserlimit phaser;
+            value = phaser.getlimits(getData);
+            break;
+        case 5:
+            Alienlimit alien;
+            value = alien.getlimits(getData);
+            break;
+        case 6:
+            Distlimit dist;
+            value = dist.getlimits(getData);
+            break;
+        case 7:
+            EQlimit EQ;
+            value = EQ.getlimits(getData);
+            break;
+        case 8:
+            Dynamlimit dyn;
+            value = dyn.getlimits(getData);
+            break;
+    }
+    return value;
 }

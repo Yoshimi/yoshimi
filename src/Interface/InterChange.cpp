@@ -7492,7 +7492,7 @@ void InterChange::commandEffects(CommandBlock *getData)
         // EQ (7) does not have presets and 16 collides with
         // control value for the band 1 frequency parameter
         if (control == 16 && kititem != 7)
-            	eff->changepreset(lrint(value));
+                eff->changepreset(lrint(value));
         else if (control != 1 || kititem != 7) // EQ selector is not a parameter
              eff->seteffectpar(control, lrint(value));
     }
@@ -7585,7 +7585,7 @@ float InterChange::returnLimits(CommandBlock *getData)
 
     float min;
     float max;
-    float def;
+    float def = 0;
 
 // TODO sort this properly
     if(kititem == 0x87) // EQ effects
@@ -7645,9 +7645,14 @@ float InterChange::returnLimits(CommandBlock *getData)
 // TODO sort this properly
     if (kititem >= 0x80 && kititem <= 0x86) // general effects.
     {
+        if (kititem == 129)
+        {
+            LimitMgr limits;
+            return limits.geteffectlimits(getData);
+        }
+
         min = 0;
         max = 127;
-
         switch (request)
         {
             case 0:

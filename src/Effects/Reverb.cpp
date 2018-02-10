@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified March 2011
+    This file is derivative of ZynAddSubFX original code.
+
+    Modified February 2018
 */
 
 #include <cmath>
@@ -555,4 +558,90 @@ unsigned char Reverb::getpar(int npar)
         default: break;
     }
     return 0; // in case of bogus "parameter"
+}
+
+
+float Revlimit::getlimits(CommandBlock *getData)
+{
+    float value = getData->data.value;
+    int control = getData->data.control;
+    int request = getData->data.type & 3; // clear upper bits
+    int npart = getData->data.part;
+
+    int min = 0;
+    int max = 127;
+    int def = 64;
+    bool canLearn = true;
+    bool isInteger = true;
+
+    switch (control)
+    {
+        case 0:
+            if (npart == 0xf1) // system effects
+                def = 80;
+            else
+                def = 40;
+            break;
+        case 1:
+            break;
+        case 2:
+            break;
+        case 3:
+            def = 24;
+            break;
+        case 4:
+            def = 0;
+            break;
+        case 5:
+            def = 0;
+            break;
+        case 6:
+            break;
+        case 7:
+            def = 85;
+            break;
+        case 8:
+            def = 5;
+            break;
+        case 9:
+            min = 64;
+            def = 83;
+            break;
+        case 10:
+            max = 2;
+            def = 1;
+            canLearn = false;
+            break;
+        case 11:
+            canLearn = false;
+            break;
+        case 12:
+            def = 20;
+            break;
+        default:
+            getData->data.type |= 4; // error
+            return 1.0f;
+            break;
+    }
+
+    switch(request)
+    {
+        case 0:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+            break;
+        case 1:
+            value = min;
+            break;
+        case 2:
+            value = max;
+            break;
+        case 3:
+            value = def;
+            break;
+    }
+    getData->data.type |= (canLearn * 64 + isInteger * 128);
+    return float(value);
 }
