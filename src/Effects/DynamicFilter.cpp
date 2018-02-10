@@ -358,14 +358,14 @@ unsigned char DynamicFilter::getpar(int npar)
 
 float Dynamlimit::getlimits(CommandBlock *getData)
 {
-    float value = getData->data.value;
+    int value = getData->data.value;
     int control = getData->data.control;
     int request = getData->data.type & 3; // clear upper bits
     //int npart = getData->data.part;
 
     int min = 0;
     int max = 127;
-    int def = 64;
+    int def = 0;
     bool canLearn = true;
     bool isInteger = true;
     switch (control)
@@ -375,8 +375,8 @@ float Dynamlimit::getlimits(CommandBlock *getData)
 
 
         default:
-            getData->data.type |= 4; // error
-            return 1.0f;
+            //getData->data.type |= 4; // error
+            //return 1.0f;
             break;
     }
 

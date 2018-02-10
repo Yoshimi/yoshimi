@@ -3,6 +3,8 @@ yoshimi 1.5.6 M
 2018-2-8 Will
 * Started major upgrade to effects limits.
   Reverb completed others begun.
+* Code cleanups surrounding effects limits.
+* Echo completed.
 
 2018-2-7 Will
 * Some small improvements to 'reads'.

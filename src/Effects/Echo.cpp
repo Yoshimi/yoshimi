@@ -25,8 +25,6 @@
     Modified February 2018
 */
 
-#include <iostream>
-
 #include "Misc/SynthEngine.h"
 #include "Effects/Echo.h"
 
@@ -265,10 +263,10 @@ unsigned char Echo::getpar(int npar)
 
 float Echolimit::getlimits(CommandBlock *getData)
 {
-    float value = getData->data.value;
+    int value = getData->data.value;
     int control = getData->data.control;
     int request = getData->data.type & 3; // clear upper bits
-    //int npart = getData->data.part;
+    int npart = getData->data.part;
 
     int min = 0;
     int max = 127;
@@ -278,9 +276,27 @@ float Echolimit::getlimits(CommandBlock *getData)
     switch (control)
     {
         case 0:
+            if (npart == 0xf1)
+                def = 67;
+            else
+                def = 33;
             break;
-
-
+        case 1:
+            break;
+        case 2:
+            def = 35;
+            break;
+        case 3:
+            break;
+        case 4:
+            def = 30;
+            break;
+        case 5:
+            def = 59;
+            break;
+        case 6:
+            def = 0;
+            break;
         default:
             getData->data.type |= 4; // error
             return 1.0f;

@@ -7585,93 +7585,12 @@ float InterChange::returnLimits(CommandBlock *getData)
 
     float min;
     float max;
-    float def = 0;
+    float def;
 
-// TODO sort this properly
-    if(kititem == 0x87) // EQ effects
+    if (kititem >= 0x80 && kititem <= 0x88) // effects.
     {
-        min = 0;
-        def = 64;
-        max = 127;
-
-        switch (request)
-        {
-            case 0:
-                if(value < min)
-                    value = min;
-                else if(value > max)
-                    value = max;
-                break;
-            case 1:
-                value = min;
-                break;
-            case 2:
-                value = max;
-                break;
-            case 3:
-                value = def;
-                break;
-        }
-        return value;
-    }
-
-// TODO sort this properly
-    if(kititem == 0x88) // DynFilter
-    {
-        min = 0;
-        max = 127;
-
-        switch (request)
-        {
-            case 0:
-                if(value < min)
-                    value = min;
-                else if(value > max)
-                    value = max;
-                break;
-            case 1:
-                value = min;
-                break;
-            case 2:
-                value = max;
-                break;
-            case 3:
-                value = def;
-                break;
-        }
-        return value;
-    }
-
-// TODO sort this properly
-    if (kititem >= 0x80 && kititem <= 0x86) // general effects.
-    {
-        if (kititem == 129)
-        {
-            LimitMgr limits;
-            return limits.geteffectlimits(getData);
-        }
-
-        min = 0;
-        max = 127;
-        switch (request)
-        {
-            case 0:
-                if(value < min)
-                    value = min;
-                else if(value > max)
-                    value = max;
-                break;
-            case 1:
-                value = min;
-                break;
-            case 2:
-                value = max;
-                break;
-            case 3:
-                value = def;
-                break;
-        }
-        return value;
+        LimitMgr limits;
+        return limits.geteffectlimits(getData);
     }
 
     if (npart < NUM_MIDI_PARTS)

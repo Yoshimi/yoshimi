@@ -519,7 +519,7 @@ unsigned char Phaser::getpar(int npar)
 
 float Phaserlimit::getlimits(CommandBlock *getData)
 {
-    float value = getData->data.value;
+    int value = getData->data.value;
     int control = getData->data.control;
     int request = getData->data.type & 3; // clear upper bits
     //int npart = getData->data.part;
@@ -536,8 +536,8 @@ float Phaserlimit::getlimits(CommandBlock *getData)
 
 
         default:
-            getData->data.type |= 4; // error
-            return 1.0f;
+            //getData->data.type |= 4; // error
+            //return 1.0f;
             break;
     }
 
