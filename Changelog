@@ -5,6 +5,7 @@ yoshimi 1.5.6 M
   Reverb completed others begun.
 * Code cleanups surrounding effects limits.
 * Echo completed.
+* BugFix: Segfault on creating new bank (empty string)
 
 2018-2-7 Will
 * Some small improvements to 'reads'.

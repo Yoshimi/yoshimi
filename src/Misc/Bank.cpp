@@ -22,7 +22,7 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified January 2018
+    Modified February 2018
 */
 
 #include <set>
@@ -485,6 +485,9 @@ bool Bank::isDuplicate(size_t rootID, size_t bankID, int pos, const string filen
 // Makes a new bank with known ID. Does *not* make it current
 bool Bank::newIDbank(string newbankdir, unsigned int bankID, size_t rootID)
 {
+    if (rootID > 0x7f)
+        rootID = currentRootID; // should be needed!
+
     if (!newbankfile(newbankdir, rootID))
         return false;
     roots [currentRootID].banks [bankID].dirname = newbankdir;
