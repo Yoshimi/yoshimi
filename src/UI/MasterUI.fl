@@ -1425,6 +1425,11 @@ ZynAddSubFX}
         case 49:
             updatepanel();
             break;
+        case 59:
+            name = miscMsgPop(par2);
+            if (wasFromHere)
+                fl_alert("%s",name.c_str());
+            break;
         case 60: // import bank
             name = miscMsgPop(par2);
             if (wasFromHere)
@@ -1433,10 +1438,10 @@ ZynAddSubFX}
                     fl_alert("%s",name.c_str());
                 else
                 {
-                    unsigned int other = name.find(" but ");
-                    if (other != string::npos)
+                    unsigned int other = name.find(" : ");
+                    if (other < 1024) // a bit of a hack :(
                     {
-                        name = name.substr(other + 5);
+                        name = name.substr(other + 3);
                         fl_alert("%s",name.c_str());
                     }
                 }

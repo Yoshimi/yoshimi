@@ -9,7 +9,8 @@ Y : -36 to 36 : 35 : 240 : 255 : 255 : 255 : 128 : 255 : Key shift
 Y : 0 to 3 : 48 : 240 : 255 : 255 : 255 : 255 : 255 : Channel Switcher Type (Solo) - Off, Row, Column, Loop
 Y : 14 to 119 : 49 : 240 : 255 : 255 : 255 : 255 : 255 : Channel Switcher Incoming CC
 
-Y : 0 to 127 : 60 : 240 : 0 to 127, 255 : 255 : 255 : 128 : msg No. : Import named bank at ID of root via miscMsg
+Y : 0 to 127 : 59 : 240 : 0 to 127, 255 : 255 : 255 : 128 : msg No. : Export bank ID at root ID to named directory via miscMsg
+Y : 0 to 127 : 60 : 240 : 0 to 127, 255 : 255 : 255 : 128 : msg No. : Import named directory to bank ID at root ID via miscMsg
 Y : any : 80 : 240 : 255 : 255 : 255 : 192 : msg No. : Load named patchset via miscMsg
 Y : any : 81 : 240 : 255 : 255 : 255 : 128 : msg No. : Save named patchset via miscMsg
 Y : any : 84 : 240 : 255 : 255 : 0 to 15 : 192 : msg No. : Load named vector to chan (insert) via miscMsg

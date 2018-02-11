@@ -698,6 +698,12 @@ void SynthEngine::SetZynControls(bool in_place)
 }
 
 
+unsigned int SynthEngine::exportBank(string exportfile, size_t rootID, unsigned int bankID)
+{
+    return bank.exportBank(exportfile, rootID, bankID);
+}
+
+
 unsigned int SynthEngine::importBank(string inportfile, size_t rootID, unsigned int bankID)
 {
     return bank.importBank(inportfile, rootID, bankID);

@@ -66,10 +66,11 @@ string toplist [] = {
     "ADD",                      "add paths and files",
     "  Root <s>",               "root path to list",
     "  Bank <s>",               "make new bank in current root",
-    "IMport [s <n1>] <n2> <s>", "import named bank to slot n2 of current root, or Root n1",
+    "IMPort [s <n1>] <n2> <s>", "import named directory to slot n2 of current root, (or 'Root' n1)",
+    "EXPort [s <n1>] <n2> <s>", "export bank at slot n2 of current root, (or 'Root' n1) to named directory",
     "REMove",                   "remove paths, files and entries",
     "  Root <n>",               "de-list root path ID",
-    "  Bank [s <n1>] <n2>",     "delete bank ID n2 (and all instruments) from current root or Root n1",
+    "  Bank [s <n1>] <n2>",     "delete bank ID n2 (and all instruments) from current root (or 'Root' n1)",
     "  MLearn <s> [n]",         "delete midi learned 'ALL' whole list, or '@'(n) line",
     "Set / Read",               "set or read all main parameters",
     "  Part",                   "enter context level",
@@ -2241,8 +2242,13 @@ bool CmdInterface::cmdIfaceProcessCommand()
             reply = what_msg;
         }
     }
-    else if (matchnMove(2, point, "import"))
-    {
+    else if (matchWord(3, point, "import") || matchWord(3, point, "export") )
+    { // need the double test to find which then move along line
+        int type = 0;
+        if (matchnMove(3, point, "import"))
+            type = 60;
+        else if (matchnMove(3, point, "export"))
+            type = 59;
         int root = 255;
         if (matchnMove(1, point, "root"))
         {
@@ -2259,12 +2265,15 @@ bool CmdInterface::cmdIfaceProcessCommand()
         string name = string(point);
         if (root < 0 || (root > 127 && root != 255) || value < 0 || value > 127 || name <="!")
         {
-            replyString = "import";
+            if (type == 60)
+                replyString = "import";
+            else
+                replyString = "export";
             reply = value_msg;
         }
         else
         {
-            sendDirect(value, 64, 60, 0xf0, root, 0xff, 0xff, 0x80, miscMsgPush(name));
+            sendDirect(value, 64, type, 0xf0, root, 0xff, 0xff, 0x80, miscMsgPush(name));
             reply = done_msg;
         }
     }

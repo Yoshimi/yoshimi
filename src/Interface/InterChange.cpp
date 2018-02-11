@@ -441,6 +441,18 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     break;
                 }
 
+                case 59: // export bank
+                {
+                    unsigned int result = synth->exportBank(text, kititem, value);
+                    text = miscMsgPop(result & 0xff);
+                    if (result < 0x1000)
+                        text = " " + text; // need the space
+                    else
+                        text = " FAILED " + text;
+                    value = miscMsgPush(text);
+                    break;
+                }
+
                 case 60: // import bank
                 {
                     unsigned int result = synth->importBank(text, kititem, value);
@@ -1633,7 +1645,10 @@ string InterChange::resolveMain(CommandBlock *getData)
         case 49:
             contstr = "Chan 'solo' Switch CC";
             break;
-
+        case 59:
+            showValue = false;
+            contstr = "Bank Export" + miscMsgPop(value_int);
+            break;
         case 60:
             showValue = false;
             contstr = "Bank Import" + miscMsgPop(value_int);
