@@ -3,6 +3,7 @@ yoshimi 1.5.6 M
 2018-2-11 Will
 * Improved bank import error reporting.
 * Implemented bank export.
+* Chorus and Distortion effect limits done.
 
 2018-2-8 Will
 * Started major upgrade to effects limits.

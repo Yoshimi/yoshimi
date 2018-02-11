@@ -296,12 +296,44 @@ float Distlimit::getlimits(CommandBlock *getData)
     switch (control)
     {
         case 0:
+            def = 127;
             break;
-
-
+        case 1:
+            break;
+        case 2:
+            def = 35;
+            break;
+        case 3:
+            def = 56;
+            break;
+        case 4:
+            def = 70;
+            break;
+        case 5:
+            max = 13;
+            def = 0;
+            canLearn = false;
+            break;
+        case 6:
+            max = 1;
+            def = 0;
+            canLearn = false;
+            break;
+        case 7:
+            def = 96;
+            break;
+        case 8:
+            def = 0;
+            break;
+        case 9:
+        case 10:
+            max = 1;
+            def = 0;
+            canLearn = false;
+            break;
         default:
-            //getData->data.type |= 4; // error
-            //return 1.0f;
+            getData->data.type |= 4; // error
+            return 1.0f;
             break;
     }
 

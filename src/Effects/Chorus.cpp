@@ -301,11 +301,46 @@ float Choruslimit::getlimits(CommandBlock *getData)
     {
         case 0:
             break;
-
+        case 1:
+            break;
+        case 2:
+            def = 50;
+            break;
+        case 3:
+            def = 0;
+            break;
+        case 4:
+            max = 1;
+            def = 0;
+            canLearn = false;
+            break;
+        case 5:
+            def = 90;
+            break;
+        case 6:
+            def = 40;
+            break;
+        case 7:
+            def = 85;
+            break;
+        case 8:
+            break;
+        case 9:
+            def = 119;
+            break;
+        case 10:
+            max = 0;
+            def = 0;
+            break;
+        case 11:
+            max = 1;
+            def = 0;
+            canLearn = false;
+            break;
 
         default:
-            //getData->data.type |= 4; // error
-            //return 1.0f;
+            getData->data.type |= 4; // error
+            return 1.0f;
             break;
     }
 
