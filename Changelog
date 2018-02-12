@@ -1,5 +1,10 @@
 yoshimi 1.5.6 M
 
+2018-2-12 Will
+* Alienwah and Dynfilter effect limits done.
+  (not filter insert for dynfilter)
+* BugFix: Phaser d/y wrongly reducing default insert level.
+
 2018-2-11 Will
 * Improved bank import error reporting.
 * Implemented bank export.

@@ -269,7 +269,7 @@ float Alienlimit::getlimits(CommandBlock *getData)
     int value = getData->data.value;
     int control = getData->data.control;
     int request = getData->data.type & 3; // clear upper bits
-    //int npart = getData->data.part;
+    int npart = getData->data.part;
 
     int min = 0;
     int max = 127;
@@ -279,12 +279,52 @@ float Alienlimit::getlimits(CommandBlock *getData)
     switch (control)
     {
         case 0:
+            if (npart == 0xf1)
+                def = 127;
+            else
+                def = 63;
             break;
-
-
+        case 1:
+            break;
+        case 2:
+            def = 70;
+            break;
+        case 3:
+            def = 0;
+            break;
+        case 4:
+            max = 1;
+            def = 0;
+            canLearn = false;
+            break;
+        case 5:
+            def = 62;
+            break;
+        case 6:
+            def = 60;
+            break;
+        case 7:
+            def = 105;
+            break;
+        case 8:
+            min = 1;
+            max = 100;
+            def = 24;
+            canLearn = false;
+            break;
+        case 9:
+            def = 0;
+            break;
+        case 10:
+            break;
+        case 16:
+            max = 3;
+            def = 0;
+            canLearn = false;
+            break;
         default:
-            //getData->data.type |= 4; // error
-            //return 1.0f;
+            getData->data.type |= 4; // error
+            return 1.0f;
             break;
     }
 

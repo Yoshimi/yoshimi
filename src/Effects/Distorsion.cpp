@@ -286,7 +286,7 @@ float Distlimit::getlimits(CommandBlock *getData)
     int value = getData->data.value;
     int control = getData->data.control;
     int request = getData->data.type & 3; // clear upper bits
-    //int npart = getData->data.part;
+    int npart = getData->data.part;
 
     int min = 0;
     int max = 127;
@@ -296,7 +296,10 @@ float Distlimit::getlimits(CommandBlock *getData)
     switch (control)
     {
         case 0:
-            def = 127;
+            if (npart == 0xf1) // system effects
+                def = 127;
+            else
+                def = 63;
             break;
         case 1:
             break;
@@ -331,6 +334,10 @@ float Distlimit::getlimits(CommandBlock *getData)
             def = 0;
             canLearn = false;
             break;
+        case 16:
+            max = 5;
+            def = 0;
+            canLearn = false;
         default:
             getData->data.type |= 4; // error
             return 1.0f;

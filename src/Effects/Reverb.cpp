@@ -592,11 +592,6 @@ float Revlimit::getlimits(CommandBlock *getData)
         case 4:
             def = 0;
             break;
-        case 5:
-            def = 0;
-            break;
-        case 6:
-            break;
         case 7:
             def = 85;
             break;
@@ -618,6 +613,10 @@ float Revlimit::getlimits(CommandBlock *getData)
         case 12:
             def = 20;
             break;
+        case 16:
+            max = 12;
+            def = 0;
+            canLearn = false;
         default:
             getData->data.type |= 4; // error
             return 1.0f;

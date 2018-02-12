@@ -290,7 +290,7 @@ float Choruslimit::getlimits(CommandBlock *getData)
     int value = getData->data.value;
     int control = getData->data.control;
     int request = getData->data.type & 3; // clear upper bits
-    //int npart = getData->data.part;
+    int npart = getData->data.part;
 
     int min = 0;
     int max = 127;
@@ -300,6 +300,8 @@ float Choruslimit::getlimits(CommandBlock *getData)
     switch (control)
     {
         case 0:
+            if (npart != 0xf1)
+                def = 32;
             break;
         case 1:
             break;
@@ -328,16 +330,15 @@ float Choruslimit::getlimits(CommandBlock *getData)
         case 9:
             def = 119;
             break;
-        case 10:
-            max = 0;
-            def = 0;
-            break;
         case 11:
             max = 1;
             def = 0;
             canLearn = false;
             break;
-
+        case 16:
+            max = 9;
+            def = 0;
+            canLearn = false;
         default:
             getData->data.type |= 4; // error
             return 1.0f;

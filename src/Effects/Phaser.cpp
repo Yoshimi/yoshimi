@@ -410,8 +410,6 @@ void Phaser::setpreset(unsigned char npreset)
         if (param == 0xf)
             param = 0;
         changepar(param, presets[preset][param]);
-        if (insertion && (param == 0))
-            changepar(0, presets[preset][0] / 2);
     }
 }
 

@@ -297,6 +297,10 @@ float Echolimit::getlimits(CommandBlock *getData)
         case 6:
             def = 0;
             break;
+        case 16:
+            max = 8;
+            def = 0;
+            canLearn = false;
         default:
             getData->data.type |= 4; // error
             return 1.0f;

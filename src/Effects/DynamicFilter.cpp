@@ -361,7 +361,7 @@ float Dynamlimit::getlimits(CommandBlock *getData)
     int value = getData->data.value;
     int control = getData->data.control;
     int request = getData->data.type & 3; // clear upper bits
-    //int npart = getData->data.part;
+    int npart = getData->data.part;
 
     int min = 0;
     int max = 127;
@@ -371,6 +371,43 @@ float Dynamlimit::getlimits(CommandBlock *getData)
     switch (control)
     {
         case 0:
+            if (npart == 0xf1)
+                def = 55;
+            else
+                def = 110;
+            break;
+        case 1:
+            break;
+        case 2:
+            def = 80;
+            break;
+        case 3:
+            break;
+        case 4:
+            max = 1;
+            def = 0;
+            canLearn = false;
+            break;
+        case 5:
+            break;
+        case 6:
+            def = 0;
+            break;
+        case 7:
+            def = 90;
+            break;
+        case 8:
+            max = 1;
+            def = 0;
+            canLearn = false;
+            break;
+        case 9:
+            def = 60;
+            break;
+        case 16:
+            max = 4;
+            def = 0;
+            canLearn = false;
             break;
 
 
