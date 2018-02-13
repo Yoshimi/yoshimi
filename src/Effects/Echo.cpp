@@ -270,7 +270,7 @@ float Echolimit::getlimits(CommandBlock *getData)
 
     int min = 0;
     int max = 127;
-    int def = 64;
+    int def = 0;
     bool canLearn = true;
     bool isInteger = true;
     switch (control)
@@ -282,6 +282,7 @@ float Echolimit::getlimits(CommandBlock *getData)
                 def = 33;
             break;
         case 1:
+            def = 64;
             break;
         case 2:
             def = 35;
@@ -295,11 +296,9 @@ float Echolimit::getlimits(CommandBlock *getData)
             def = 59;
             break;
         case 6:
-            def = 0;
             break;
         case 16:
             max = 8;
-            def = 0;
             canLearn = false;
         default:
             getData->data.type |= 4; // error

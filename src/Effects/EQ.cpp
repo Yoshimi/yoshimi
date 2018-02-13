@@ -228,22 +228,38 @@ float EQlimit::getlimits(CommandBlock *getData)
     int value = getData->data.value;
     int control = getData->data.control;
     int request = getData->data.type & 3; // clear upper bits
-    //int npart = getData->data.part;
 
     int min = 0;
     int max = 127;
-    int def = 64;
+    int def = 0;
     bool canLearn = true;
     bool isInteger = true;
+
     switch (control)
     {
         case 0:
+            def = 64;
             break;
-
-
+        case 1:
+            max = 7;
+            canLearn = false;
+            break;
+        case 10:
+            max = 9;
+            canLearn = false;
+            break;
+        case 11:
+        case 12:
+        case 13:
+            def = 64;
+            break;
+        case 14:
+            max = 4;
+            canLearn = false;
+            break;
         default:
-            //getData->data.type |= 4; // error
-            //return 1.0f;
+            getData->data.type |= 4; // error
+            return 1.0f;
             break;
     }
 

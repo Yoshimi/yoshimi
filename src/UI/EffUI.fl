@@ -2135,13 +2135,15 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                 eqband = value;
                 EQbandUpdate();
             }
-            else// if(eqband == (control - 10) / 5)
+            else
             {
+                eqband = (control - 10) / 5;
+                bandcounter->value(eqband);
                 switch ((control - 10) % 5)
                 {
                 case 0:
-                    synth->getRuntime().Log("EQ ");
                     EQbandUpdate();
+                    break;
                 case 1:
                     freqdial->value(value);
                     break;
@@ -2151,6 +2153,8 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                 case 3:
                     qdial->value(value);
                     break;
+                case 4:
+                    stagescounter->value(value);
                 }
             }
             effeqwindow->redraw();

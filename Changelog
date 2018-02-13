@@ -1,5 +1,11 @@
 yoshimi 1.5.6 M
 
+2018-2-13 Will
+* BugFix: EQ GUI frequency wrongly zeroed.
+* Phaser and EQ effect limits done.
+* Some effect limits cleanups.
+  (more work needed on CLI access)
+
 2018-2-12 Will
 * Alienwah and Dynfilter effect limits done.
   (not filter insert for dynfilter)

@@ -273,7 +273,7 @@ float Alienlimit::getlimits(CommandBlock *getData)
 
     int min = 0;
     int max = 127;
-    int def = 64;
+    int def = 0;
     bool canLearn = true;
     bool isInteger = true;
     switch (control)
@@ -285,12 +285,12 @@ float Alienlimit::getlimits(CommandBlock *getData)
                 def = 63;
             break;
         case 1:
+            def = 64;
             break;
         case 2:
             def = 70;
             break;
         case 3:
-            def = 0;
             break;
         case 4:
             max = 1;
@@ -313,13 +313,11 @@ float Alienlimit::getlimits(CommandBlock *getData)
             canLearn = false;
             break;
         case 9:
-            def = 0;
             break;
         case 10:
             break;
         case 16:
             max = 3;
-            def = 0;
             canLearn = false;
             break;
         default:

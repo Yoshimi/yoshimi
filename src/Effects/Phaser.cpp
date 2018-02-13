@@ -520,22 +520,70 @@ float Phaserlimit::getlimits(CommandBlock *getData)
     int value = getData->data.value;
     int control = getData->data.control;
     int request = getData->data.type & 3; // clear upper bits
-    //int npart = getData->data.part;
 
     int min = 0;
     int max = 127;
-    int def = 64;
+    int def = 0;
     bool canLearn = true;
     bool isInteger = true;
     switch (control)
     {
         case 0:
+            def = 64;
             break;
-
-
+        case 1:
+            def = 64;
+            break;
+        case 2:
+            def = 36;
+            break;
+        case 3:
+            break;
+        case 4:
+            max = 1;
+            canLearn = false;
+            break;
+        case 5:
+            def = 64;
+            break;
+        case 6:
+            def = 110;
+            break;
+        case 7:
+            def = 64;
+            break;
+        case 8:
+            min = 1;
+            max = 12;
+            def = 1;
+            canLearn = false;
+            break;
+        case 9:
+            break;
+        case 10:
+            canLearn = false;
+            max = 1;
+            break;
+        case 11:
+            def = 20;
+            break;
+        case 12:
+            canLearn = false;
+            max = 1;
+            break;
+        case 13:
+            break;
+        case 14:
+            max = 1;
+            canLearn = false;
+            break;
+        case 16:
+            max = 11;
+            canLearn = false;
+            break;
         default:
-            //getData->data.type |= 4; // error
-            //return 1.0f;
+            getData->data.type |= 4; // error
+            return 1.0f;
             break;
     }
 

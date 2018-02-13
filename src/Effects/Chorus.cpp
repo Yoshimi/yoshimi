@@ -294,7 +294,7 @@ float Choruslimit::getlimits(CommandBlock *getData)
 
     int min = 0;
     int max = 127;
-    int def = 64;
+    int def = 0;
     bool canLearn = true;
     bool isInteger = true;
     switch (control)
@@ -302,6 +302,8 @@ float Choruslimit::getlimits(CommandBlock *getData)
         case 0:
             if (npart != 0xf1)
                 def = 32;
+            else
+                def = 64;
             break;
         case 1:
             break;
@@ -309,11 +311,9 @@ float Choruslimit::getlimits(CommandBlock *getData)
             def = 50;
             break;
         case 3:
-            def = 0;
             break;
         case 4:
             max = 1;
-            def = 0;
             canLearn = false;
             break;
         case 5:
@@ -332,12 +332,10 @@ float Choruslimit::getlimits(CommandBlock *getData)
             break;
         case 11:
             max = 1;
-            def = 0;
             canLearn = false;
             break;
         case 16:
             max = 9;
-            def = 0;
             canLearn = false;
         default:
             getData->data.type |= 4; // error

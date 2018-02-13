@@ -7508,14 +7508,19 @@ void InterChange::commandEffects(CommandBlock *getData)
         // control value for the band 1 frequency parameter
         if (control == 16 && kititem != 7)
                 eff->changepreset(lrint(value));
-        else if (control != 1 || kititem != 7) // EQ selector is not a parameter
+        else if (control != 1 || kititem != 7)
+            /* EQ selector is not a parameter but it is passed back
+             * to the sources to notify them to initialise.
+             * This needs to be changed!
+             */
              eff->seteffectpar(control, lrint(value));
+        //cout << "eff value " << value << "  control " << int(control)<< endl;
     }
     else
     {
         if (control == 16 && kititem != 7)
             value = eff->getpreset();
-        else if (control != 1 || kititem != 7) // EQ selector is not a parameter
+        else if (control != 1 || kititem != 7)
             value = eff->geteffectpar(control);
     }
 

@@ -377,6 +377,7 @@ float Dynamlimit::getlimits(CommandBlock *getData)
                 def = 110;
             break;
         case 1:
+            def = 64;
             break;
         case 2:
             def = 80;
@@ -385,20 +386,18 @@ float Dynamlimit::getlimits(CommandBlock *getData)
             break;
         case 4:
             max = 1;
-            def = 0;
             canLearn = false;
             break;
         case 5:
+            def = 64;
             break;
         case 6:
-            def = 0;
             break;
         case 7:
             def = 90;
             break;
         case 8:
             max = 1;
-            def = 0;
             canLearn = false;
             break;
         case 9:
@@ -406,14 +405,11 @@ float Dynamlimit::getlimits(CommandBlock *getData)
             break;
         case 16:
             max = 4;
-            def = 0;
             canLearn = false;
             break;
-
-
         default:
-            //getData->data.type |= 4; // error
-            //return 1.0f;
+            getData->data.type |= 4; // error
+            return 1.0f;
             break;
     }
 

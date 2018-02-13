@@ -290,7 +290,7 @@ float Distlimit::getlimits(CommandBlock *getData)
 
     int min = 0;
     int max = 127;
-    int def = 64;
+    int def = 0;
     bool canLearn = true;
     bool isInteger = true;
     switch (control)
@@ -302,6 +302,7 @@ float Distlimit::getlimits(CommandBlock *getData)
                 def = 63;
             break;
         case 1:
+            def = 64;
             break;
         case 2:
             def = 35;
@@ -314,29 +315,24 @@ float Distlimit::getlimits(CommandBlock *getData)
             break;
         case 5:
             max = 13;
-            def = 0;
             canLearn = false;
             break;
         case 6:
             max = 1;
-            def = 0;
             canLearn = false;
             break;
         case 7:
             def = 96;
             break;
         case 8:
-            def = 0;
             break;
         case 9:
         case 10:
             max = 1;
-            def = 0;
             canLearn = false;
             break;
         case 16:
             max = 5;
-            def = 0;
             canLearn = false;
         default:
             getData->data.type |= 4; // error

@@ -570,7 +570,7 @@ float Revlimit::getlimits(CommandBlock *getData)
 
     int min = 0;
     int max = 127;
-    int def = 64;
+    int def = 0;
     bool canLearn = true;
     bool isInteger = true;
 
@@ -585,12 +585,12 @@ float Revlimit::getlimits(CommandBlock *getData)
         case 1:
             break;
         case 2:
+            def = 64;
             break;
         case 3:
             def = 24;
             break;
         case 4:
-            def = 0;
             break;
         case 7:
             def = 85;
@@ -608,6 +608,7 @@ float Revlimit::getlimits(CommandBlock *getData)
             canLearn = false;
             break;
         case 11:
+            def = 64;
             canLearn = false;
             break;
         case 12:
@@ -615,7 +616,6 @@ float Revlimit::getlimits(CommandBlock *getData)
             break;
         case 16:
             max = 12;
-            def = 0;
             canLearn = false;
         default:
             getData->data.type |= 4; // error
