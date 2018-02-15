@@ -1,5 +1,8 @@
 yoshimi 1.5.6 M
 
+2018-2-15 Will
+* Minor tweaks to banks.
+
 2018-2-13 Will
 * BugFix: EQ GUI frequency wrongly zeroed.
 * Phaser and EQ effect limits done.

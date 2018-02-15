@@ -31,7 +31,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 This file is derivative of original ZynAddSubFX code.
 
 Modified February 2018
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <iostream>} {public local
@@ -284,7 +284,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
 }
 
-class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
+class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window instrumentuiwindow {
@@ -621,7 +621,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
           if (o->value() > 0.5)
               mode = 6;
           removeselection();}
-          xywh {485 533 85 15} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 3 labelfont 9 labelsize 10
+          xywh {485 533 85 15} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 78 labelfont 8 labelsize 9
         }
         Fl_Light_Button rootexportbutton {
           label EXPORT
@@ -629,7 +629,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
           if (o->value() > 0.5)
               mode = 7;
           removeselection();}
-          xywh {485 550 85 15} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 101 labelfont 9 labelsize 10
+          xywh {485 550 85 15} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 78 labelfont 8 labelsize 9
         }
       }
       Fl_Button {} {

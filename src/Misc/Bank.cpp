@@ -491,10 +491,10 @@ unsigned int Bank::importBank(string importdir, size_t rootID, unsigned int bank
             {
                 ++repeats;
                 suffix = "~" + to_string(repeats);
-                cout << ">" << suffix << endl;
+                //cout << ">" << suffix << endl;
             }
             bankname += suffix;
-            cout << bankname << endl;
+            //cout << bankname << endl;
             if (!newIDbank(bankname, bankID, rootID))
             {
                 name = "Can't create bank " + bankname;
@@ -509,8 +509,9 @@ unsigned int Bank::importBank(string importdir, size_t rootID, unsigned int bank
                 string exportfile = getRootPath(rootID) + "/" + getBankName(bankID, rootID);
                 while ((fn = readdir(dir)))
                 {
+                    string nextfile = string(fn->d_name);                    if (nextfile.rfind(".bankdir") != string::npos)
+                        continue; // new version will be generated
                     ++total;
-                    string nextfile = string(fn->d_name);
                     if (nextfile.rfind(".xiy") != string::npos || nextfile.rfind(".xiz") != string::npos)
                     {
                         ++count;
@@ -553,7 +554,7 @@ unsigned int Bank::importBank(string importdir, size_t rootID, unsigned int bank
 
 bool Bank::isDuplicate(size_t rootID, size_t bankID, int pos, const string filename)
 {
-    cout << filename << " count " << roots [rootID].banks.count(bankID) << endl;
+    //cout << filename << " count " << roots [rootID].banks.count(bankID) << endl;
     string path = getRootPath(rootID) + "/" + getBankName(bankID, rootID) + "/" + filename;
     if (isRegFile(setExtension(path, xiyext)) && filename.rfind(xizext) < string::npos)
         return 1;
