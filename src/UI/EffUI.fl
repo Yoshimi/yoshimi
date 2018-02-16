@@ -1616,9 +1616,8 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
       } {
         Fl_Dial freqdial {
           label Freq
-          callback {//
-          int np=eqband*5+11;
-          send_data(np, o->value(), 7, 0xd8);}
+          callback {//;
+          send_data(11, o->value(), 7, 0xd8);}
           xywh {250 50 25 25} box ROUND_UP_BOX labelsize 10 when 3 maximum 127
           code0 {o->init(64);}
           code1 {o->setValueType(VC_FXEQfreq);}
@@ -1627,8 +1626,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         Fl_Dial gaindial {
           label Gain
           callback {//
-          int np=eqband*5+12;
-          send_data(np, o->value(), 7, 0xd8);}
+          send_data(12, o->value(), 7, 0xd8);}
           xywh {280 50 25 25} box ROUND_UP_BOX labelsize 10 when 3 maximum 127 step 1
           code0 {o->init(64);}
           code1 {o->setValueType(VC_FXEQfilterGain);}
@@ -1637,8 +1635,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         Fl_Dial qdial {
           label Q
           callback {//
-          int np=eqband*5+13;
-          send_data(np, o->value(), 7, 0xd8);}
+          send_data(13, o->value(), 7, 0xd8);}
           tooltip {Resonance/Bandwidth} xywh {310 50 25 25} box ROUND_UP_BOX labelsize 10 when 3 maximum 127
           code0 {o->init(64);}
           code1 {o->setValueType(VC_FXEQq);}
@@ -1647,8 +1644,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         Fl_Counter stagescounter {
           label {St.}
           callback {//
-          int np=eqband*5+14;
-          send_data(np, o->value(), 7, 0xd0);}
+          send_data(14, o->value(), 7, 0xd0);}
           tooltip {Additional filter stages} xywh {340 60 30 15} type Simple labelsize 10 minimum 1 maximum 127 step 1 textfont 1 textsize 11
           code0 {o->bounds(0,MAX_FILTER_STAGES-1);}
         }
@@ -1656,8 +1652,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
       Fl_Choice typechoice {
         label {T.}
         callback {//
-        int np = (eqband * 5) + 10;
-        send_data(np, o->value(), 7, 0xd0);}
+        send_data(10, o->value(), 7, 0xd0);}
         tooltip Type xywh {323 20 40 15} down_box BORDER_BOX labelsize 11 align 1 when 6 textsize 11
       } {
         MenuItem {} {
@@ -2137,23 +2132,33 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
             }
             else
             {
-                eqband = (control - 10) / 5;
-                bandcounter->value(eqband);
-                switch ((control - 10) % 5)
+                switch (control)
                 {
-                case 0:
-                    EQbandUpdate();
+                case 10:
+                    typechoice->value(value);
+                    if (value == 0)
+                        bandgroup->deactivate();
+                    else
+                        bandgroup->activate();
+                    if (value > 2)
+                        qdial->activate();
+                    else
+                        qdial->deactivate();
+                    if (value > 6)
+                        gaindial->activate();
+                    else
+                        gaindial->deactivate();
                     break;
-                case 1:
+                case 11:
                     freqdial->value(value);
                     break;
-                case 2:
+                case 12:
                     gaindial->value(value);
                     break;
-                case 3:
+                case 13:
                     qdial->value(value);
                     break;
-                case 4:
+                case 14:
                     stagescounter->value(value);
                 }
             }

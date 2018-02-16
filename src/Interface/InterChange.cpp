@@ -3254,6 +3254,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char effnum = getData->data.engine;
     unsigned char insert = getData->data.insert;
+    unsigned char parameter = getData->data.parameter;
 
     string name;
     string actual;
@@ -3369,8 +3370,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
         case 7:
             effname = " EQ";
             if (control > 1)
-                contstr = " (Band " + to_string((control - 10)/5) +
-                ") Control " + to_string(10 + (control % 5));
+                contstr = " (Band " + to_string(int(parameter)) + ") Control " + to_string(control);
             break;
         case 8:
             effname = " DynFilter";
@@ -7504,23 +7504,39 @@ void InterChange::commandEffects(CommandBlock *getData)
 
     if (write)
     {
-        // EQ (7) does not have presets and 16 collides with
-        // control value for the band 1 frequency parameter
-        if (control == 16 && kititem != 7)
+        if (kititem == 7)
+        /*
+         * specific to EQ
+         * Control 1 is not a saved parameter, but a band index.
+         * Also, EQ does not have presets, and 16 is the control
+         * for the band 1 frequency parameter
+        */
+        {
+            if (control <= 1)
+                eff->seteffectpar(control, lrint(value));
+            else
+            {
+                eff->seteffectpar(control + (eff->geteffectpar(1) * 5), lrint(value));
+                getData->data.parameter = eff->geteffectpar(1);
+            }
+        }
+        else
+        {
+            if (control == 16)
                 eff->changepreset(lrint(value));
-        else if (control != 1 || kititem != 7)
-            /* EQ selector is not a parameter but it is passed back
-             * to the sources to notify them to initialise.
-             * This needs to be changed!
-             */
-             eff->seteffectpar(control, lrint(value));
-        //cout << "eff value " << value << "  control " << int(control)<< endl;
+            else
+                eff->seteffectpar(control, lrint(value));
+        }
+        //cout << "eff value " << value << "  control " << int(control) << "  band " << synth->getRuntime().EQband << endl;
     }
     else
     {
-        if (control == 16 && kititem != 7)
-            value = eff->getpreset();
-        else if (control != 1 || kititem != 7)
+        if (kititem == 7 && control > 1) // specific to EQ
+        {
+            value = eff->geteffectpar(control + (eff->geteffectpar(1) * 5));
+            getData->data.parameter = eff->geteffectpar(1);
+        }
+        else
             value = eff->geteffectpar(control);
     }
 
@@ -7569,7 +7585,7 @@ void InterChange::testLimits(CommandBlock *getData)
 }
 
 
-// a lot of work needed here :(
+// more work needed here :(
 float InterChange::returnLimits(CommandBlock *getData)
 {
     // intermediate bits of type are preserved so we know the source

@@ -49,6 +49,7 @@ class EQ : public Effect, private MiscFuncs
     private:
         // Parameters
         unsigned char Pvolume;
+        unsigned char Pband;
         void setvolume(unsigned char Pvolume_);
         struct {
             unsigned char Ptype, Pfreq, Pgain, Pq, Pstages; // parameters

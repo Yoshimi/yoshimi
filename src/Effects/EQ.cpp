@@ -44,6 +44,7 @@ EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     }
     // default values
     Pvolume = 50;
+    Pband = 0;
     setpreset(Ppreset);
     cleanup();
 }
@@ -114,6 +115,8 @@ void EQ::changepar(int npar, unsigned char value)
         case 0:
             setvolume(value);
             break;
+        case 1:
+            Pband = value;
     }
     if (npar < 10)
         return;
@@ -176,6 +179,8 @@ unsigned char EQ::getpar(int npar)
         case 0:
             return Pvolume;
             break;
+        case 1:
+            return Pband;
     }
     if (npar < 10)
         return 0;
