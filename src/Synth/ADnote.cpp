@@ -231,7 +231,7 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
         unison_vibratto[nvoice].position = new float[unison];
         unison_vibratto[nvoice].amplitude = (unison_real_spread - 1.0f) * unison_vibratto_a;
 
-        float increments_per_second = synth->samplerate_f / synth->p_all_buffersize_f;
+        float increments_per_second = synth->samplerate_f / synth->sent_all_buffersize_f;
         const float vib_speed = adpars->VoicePar[nvoice].Unison_vibratto_speed / 127.0f;
         float vibratto_base_period  = 0.25f * powf(2.0f, (1.0f - vib_speed) * 4.0f);
         for (int k = 0; k < unison; ++k)
@@ -458,7 +458,7 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
         firsttick[nvoice] = 1;
         NoteVoicePar[nvoice].DelayTicks =
             (int)((expf(adpars->VoicePar[nvoice].PDelay / 127.0f
-                         * logf(50.0f)) - 1.0f) / synth->p_all_buffersize_f / 10.0f
+                         * logf(50.0f)) - 1.0f) / synth->sent_all_buffersize_f / 10.0f
                          * synth->samplerate_f);
     }
 
@@ -639,7 +639,7 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
 
         NoteVoicePar[nvoice].DelayTicks =
             (int)truncf((expf(adpars->VoicePar[nvoice].PDelay / 127.0f
-                         * logf(50.0f)) - 1.0f) / synth->p_all_buffersize_f / 10.0f
+                         * logf(50.0f)) - 1.0f) / synth->sent_all_buffersize_f / 10.0f
                          * synth->samplerate_f);
     }
 

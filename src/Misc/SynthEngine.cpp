@@ -186,7 +186,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     if (buffersize_f > audiobufsize)
         buffersize_f = audiobufsize;
      // because its now *groups* of audio buffers.
-    p_all_buffersize_f = buffersize_f;
+    sent_all_buffersize_f = buffersize_f;
 
     bufferbytes = buffersize * sizeof(float);
 
