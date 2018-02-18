@@ -158,7 +158,7 @@ void SVFilter::singlefilterout(float *smp, fstage &x, parameters &par)
             break;
     }
 
-    for (int i = 0; i < synth->p_buffersize; ++i)
+    for (int i = 0; i < synth->sent_buffersize; ++i)
     {
         x.low = x.low + par.f * x.band;
         x.high = par.q_sqrt * smp[i] - x.low - par.q * x.band;
@@ -173,7 +173,7 @@ void SVFilter::filterout(float *smp)
 {
     if (needsinterpolation)
     {
-        memcpy(tmpismp, smp, synth->p_bufferbytes);
+        memcpy(tmpismp, smp, synth->sent_bufferbytes);
         for (int i = 0; i < stages + 1; ++i)
             singlefilterout(tmpismp, st[i],ipar);
     }
@@ -183,13 +183,13 @@ void SVFilter::filterout(float *smp)
 
     if (needsinterpolation)
     {
-        for (int i = 0; i < synth->p_buffersize; ++i)
+        for (int i = 0; i < synth->sent_buffersize; ++i)
         {
-            float x = (float)i / synth->p_buffersize_f;
+            float x = (float)i / synth->sent_buffersize_f;
             smp[i] = tmpismp[i] * (1.0f - x) + smp[i] * x;
         }
         needsinterpolation = 0;
     }
-    for (int i = 0; i < synth->p_buffersize; ++i)
+    for (int i = 0; i < synth->sent_buffersize; ++i)
         smp[i] *= outgain;
 }

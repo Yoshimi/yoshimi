@@ -75,7 +75,7 @@ void Chorus::out(float *smpsl, float *smpsr)
     dr2 = getdelay(lfor);
 
     float inL, inR, tmpL, tmpR, tmp;
-    for (int i = 0; i < synth->p_buffersize; ++i)
+    for (int i = 0; i < synth->sent_buffersize; ++i)
     {
         tmpL = smpsl[i];
         tmpR = smpsr[i];
@@ -86,7 +86,7 @@ void Chorus::out(float *smpsl, float *smpsr)
         // Left channel
 
         // compute the delay in samples using linear interpolation between the lfo delays
-        mdel = (dl1 * (synth->p_buffersize - i) + dl2 * i) / synth->p_buffersize_f;
+        mdel = (dl1 * (synth->sent_buffersize - i) + dl2 * i) / synth->sent_buffersize_f;
         if (++dlk >= maxdelay)
             dlk = 0;
         tmp = dlk - mdel + maxdelay * 2.0f; // where should I get the sample from
@@ -102,7 +102,7 @@ void Chorus::out(float *smpsl, float *smpsr)
         // Right channel
 
         // compute the delay in samples using linear interpolation between the lfo delays
-        mdel = (dr1 * (synth->p_buffersize - i) + dr2 * i) / synth->p_buffersize_f;
+        mdel = (dr1 * (synth->sent_buffersize - i) + dr2 * i) / synth->sent_buffersize_f;
         if (++drk >= maxdelay)
             drk = 0;
         tmp = drk * 1.0f - mdel + maxdelay * 2.0f; // where should I get the sample from
@@ -116,13 +116,13 @@ void Chorus::out(float *smpsl, float *smpsr)
     }
 
     if (Poutsub)
-        for (int i = 0; i < synth->p_buffersize; ++i)
+        for (int i = 0; i < synth->sent_buffersize; ++i)
         {
             efxoutl[i] *= -1.0f;
             efxoutr[i] *= -1.0f;
         }
 
-    for (int i = 0; i < synth->p_buffersize; ++i)
+    for (int i = 0; i < synth->sent_buffersize; ++i)
     {
         efxoutl[i] *= pangainL;
         efxoutr[i] *= pangainR;

@@ -147,7 +147,7 @@ void Phaser::AnalogPhase(float *smpsl, float *smpsr)
     oldlgain = modl;
     oldrgain = modr;
 
-   for(int i = 0; i < synth->p_buffersize; ++i)
+   for(int i = 0; i < synth->sent_buffersize; ++i)
    {
         gl += diffl; // Linear interpolation between LFO samples
         gr += diffr;
@@ -173,8 +173,8 @@ void Phaser::AnalogPhase(float *smpsl, float *smpsr)
 
     if(Poutsub)
     {
-        invSignal(efxoutl, synth->p_buffersize);
-        invSignal(efxoutr, synth->p_buffersize);
+        invSignal(efxoutl, synth->sent_buffersize);
+        invSignal(efxoutr, synth->sent_buffersize);
     }
 }
 
@@ -227,9 +227,9 @@ void Phaser::NormalPhase(float *smpsl, float *smpsr)
     rgain = 1.0f - phase * (1.0f - depth) - (1.0f - phase) * rgain * depth;
     rgain = limit(rgain,ZERO_,ONE_);//(rgain > 1.0f) ? 1.0f : rgain;
 
-    for (int i = 0; i < synth->p_buffersize; ++i)
+    for (int i = 0; i < synth->sent_buffersize; ++i)
     {
-        float x = (float)i / synth->p_buffersize_f;
+        float x = (float)i / synth->sent_buffersize_f;
         float x1 = 1.0f - x;
         float gl = lgain * x + oldlgain * x1;
         float gr = rgain * x + oldrgain * x1;
@@ -262,7 +262,7 @@ void Phaser::NormalPhase(float *smpsl, float *smpsr)
     oldlgain = lgain;
     oldrgain = rgain;
     if (Poutsub)
-        for (int i = 0; i < synth->p_buffersize; ++i)
+        for (int i = 0; i < synth->sent_buffersize; ++i)
         {
             efxoutl[i] *= -1.0f;
             efxoutr[i] *= -1.0f;

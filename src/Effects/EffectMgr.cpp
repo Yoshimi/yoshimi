@@ -201,23 +201,23 @@ void EffectMgr::out(float *smpsl, float *smpsr)
     {
         if (!insertion)
         {
-            memset(smpsl, 0, synth->p_bufferbytes);
-            memset(smpsr, 0, synth->p_bufferbytes);
-            memset(efxoutl, 0, synth->p_bufferbytes);
-            memset(efxoutr, 0, synth->p_bufferbytes);
+            memset(smpsl, 0, synth->sent_bufferbytes);
+            memset(smpsr, 0, synth->sent_bufferbytes);
+            memset(efxoutl, 0, synth->sent_bufferbytes);
+            memset(efxoutr, 0, synth->sent_bufferbytes);
         }
         return;
     }
-    memset(efxoutl, 0, synth->p_bufferbytes);
-    memset(efxoutr, 0, synth->p_bufferbytes);
+    memset(efxoutl, 0, synth->sent_bufferbytes);
+    memset(efxoutr, 0, synth->sent_bufferbytes);
     efx->out(smpsl, smpsr);
 
     float volume = efx->volume;
 
     if (nefx == 7)
     {   // this is need only for the EQ effect
-        memcpy(smpsl, efxoutl, synth->p_bufferbytes);
-        memcpy(smpsr, efxoutr, synth->p_bufferbytes);
+        memcpy(smpsl, efxoutl, synth->sent_bufferbytes);
+        memcpy(smpsr, efxoutr, synth->sent_bufferbytes);
         return;
     }
 
@@ -238,7 +238,7 @@ void EffectMgr::out(float *smpsl, float *smpsr)
 
         if (dryonly)
         {   // this is used for instrument effect only
-            for (int i = 0; i < synth->p_buffersize; ++i)
+            for (int i = 0; i < synth->sent_buffersize; ++i)
             {
                 smpsl[i] *= v1;
                 smpsr[i] *= v1;
@@ -247,14 +247,14 @@ void EffectMgr::out(float *smpsl, float *smpsr)
             }
         } else {
             // normal instrument/insertion effect
-            for (int i = 0; i < synth->p_buffersize; ++i)
+            for (int i = 0; i < synth->sent_buffersize; ++i)
             {
                 smpsl[i] = smpsl[i] * v1 + efxoutl[i] * v2;
                 smpsr[i] = smpsr[i] * v1 + efxoutr[i] * v2;
             }
         }
     } else { // System effect
-        for (int i = 0; i < synth->p_buffersize; ++i)
+        for (int i = 0; i < synth->sent_buffersize; ++i)
         {
             efxoutl[i] *= 2.0f * volume;
             efxoutr[i] *= 2.0f * volume;
