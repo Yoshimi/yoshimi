@@ -3,6 +3,7 @@ yoshimi 1.5.6 M
 2018-2-18 Will
 * BugFix: Dynfilter presets not updating GUI :(
 * Small adjustment to 'Modular Sines'.
+* Further refinements to Dynfilter limits.
 
 2018-2-16 Will
 * Added 'Modular Sines' to Companion bank.

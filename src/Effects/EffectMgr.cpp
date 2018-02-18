@@ -26,6 +26,7 @@
 */
 
 #include <fftw3.h>
+#include <iostream>
 
 #include "Misc/SynthEngine.h"
 #include "Effects/EffectMgr.h"
@@ -137,9 +138,15 @@ void EffectMgr::cleanup(void)
 unsigned char EffectMgr::getpreset(void)
 {
     if (efx)
+    {
+        //cout << "Effect preset " << int(efx->Ppreset) << endl;
         return efx->Ppreset;
+    }
     else
+    {
+        //cout << "No effect" << endl;
         return 0;
+    }
 }
 
 

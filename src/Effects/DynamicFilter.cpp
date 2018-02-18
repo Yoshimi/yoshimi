@@ -28,6 +28,21 @@
 #include "Misc/SynthEngine.h"
 #include "Effects/DynamicFilter.h"
 
+static const int PRESET_SIZE = 10;
+    static const int NUM_PRESETS = 5;
+    static const char presets[NUM_PRESETS][PRESET_SIZE] = {
+        // WahWah
+        { 110, 64, 80, 0, 0, 64, 0, 90, 0, 60 },
+        // AutoWah
+        {110, 64, 70, 0, 0, 80, 70, 0, 0, 60 },
+        // Sweep
+        {100, 64, 30, 0, 0, 50, 80, 0, 0, 60 },
+        // VocalMorph1
+        { 110, 64, 80, 0, 0, 64, 0, 64, 0, 60 },
+        // VocalMorph1
+        {127, 64, 50, 0, 0, 96, 64, 0, 0, 60 }
+    };
+
 DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, new FilterParams(0, 64, 64, 0, _synth), 0),
     lfo(_synth),
@@ -152,20 +167,7 @@ void DynamicFilter::reinitfilter(void)
 
 void DynamicFilter::setpreset(unsigned char npreset)
 {
-    const int PRESET_SIZE = 10;
-    const int NUM_PRESETS = 5;
-    unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
-        // WahWah
-        { 110, 64, 80, 0, 0, 64, 0, 90, 0, 60 },
-        // AutoWah
-        {110, 64, 70, 0, 0, 80, 70, 0, 0, 60 },
-        // Sweep
-        {100, 64, 30, 0, 0, 50, 80, 0, 0, 60 },
-        // VocalMorph1
-        { 110, 64, 80, 0, 0, 64, 0, 64, 0, 60 },
-        // VocalMorph1
-        {127, 64, 50, 0, 0, 96, 64, 0, 0, 60 }
-    };
+
 
 if (npreset < 0xf)
     {
@@ -362,25 +364,22 @@ float Dynamlimit::getlimits(CommandBlock *getData)
     int control = getData->data.control;
     int request = getData->data.type & 3; // clear upper bits
     int npart = getData->data.part;
-
+    int presetNum = getData->data.engine;
     int min = 0;
     int max = 127;
-    int def = 0;
+
+    int def = presets[presetNum][control];
     bool canLearn = true;
     bool isInteger = true;
     switch (control)
     {
         case 0:
             if (npart == 0xf1)
-                def = 55;
-            else
-                def = 110;
+                def /= 2;
             break;
         case 1:
-            def = 64;
             break;
         case 2:
-            def = 80;
             break;
         case 3:
             break;
@@ -389,19 +388,16 @@ float Dynamlimit::getlimits(CommandBlock *getData)
             canLearn = false;
             break;
         case 5:
-            def = 64;
             break;
         case 6:
             break;
         case 7:
-            def = 90;
             break;
         case 8:
             max = 1;
             canLearn = false;
             break;
         case 9:
-            def = 60;
             break;
         case 16:
             max = 4;

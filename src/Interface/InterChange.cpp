@@ -7625,6 +7625,30 @@ float InterChange::returnLimits(CommandBlock *getData)
 
     if (kititem >= 0x80 && kititem <= 0x88) // effects.
     {
+        /*if (kititem == 0x88 && engine == 0xff) // dynfilt, will become all of them
+        {
+            EffectMgr *eff;
+            eff = NULL; // to keep the compiler quiet!
+            if (npart == 0xf1)
+                eff = synth->sysefx[kititem & 0xf];
+
+            else if (npart == 0xf2)
+                eff = synth->insefx[kititem & 0xf];
+
+            else if (npart < NUM_MIDI_PARTS)
+                eff = synth->part[npart]->partefx[kititem & 0xf];
+
+            else
+            {
+                getData->data.type |= 4; // error
+                return 2; // invalid part number error
+            }
+            if (eff != NULL)
+            {
+                getData->data.engine = eff->getpreset();
+                cout << "Preset " << int(getData->data.engine) << endl;
+            }
+        }*/
         LimitMgr limits;
         return limits.geteffectlimits(getData);
     }
