@@ -1,5 +1,8 @@
 yoshimi 1.5.6 M
 
+2018-2-21 Will
+* Implemented note on/off test routines.
+
 2018-2-18 Will
 * BugFix: Dynfilter presets not updating GUI :(
 * Small adjustment to 'Modular Sines'.

@@ -73,7 +73,7 @@ static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
     idMap.insert(nextId);
     return nextId;
 }
-
+//
 // histories
 static vector<string> InstrumentHistory;
 static vector<string> ParamsHistory;
@@ -441,6 +441,14 @@ void SynthEngine::defaults(void)
     Runtime.lastfileseen.clear();
     for (int i = 0; i < 7; ++i)
         Runtime.lastfileseen.push_back(Runtime.userHome);
+
+#ifdef REPORT_NOTES_ON_OFF
+    Runtime.noteOnSent = 0; // note test
+    Runtime.noteOnSeen = 0;
+    Runtime.noteOffSent = 0;
+    Runtime.noteOffSeen = 0;
+#endif
+
 }
 
 
@@ -464,6 +472,12 @@ void SynthEngine::setAllPartMaps(void)
 // Note On Messages
 void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char velocity)
 {
+#ifdef REPORT_NOTES_ON_OFF
+    ++Runtime.noteOnSeen; // note test
+    if (Runtime.noteOnSeen != Runtime.noteOnSent)
+        Runtime.Log("Note on diff " + to_string(Runtime.noteOnSent - Runtime.noteOnSeen));
+#endif
+
 #ifdef REPORT_NOTEON
     struct timeval tv1, tv2;
     gettimeofday(&tv1, NULL);
@@ -501,6 +515,12 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
 // Note Off Messages
 void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
 {
+#ifdef REPORT_NOTES_ON_OFF
+    ++Runtime.noteOffSeen; // note test
+    if (Runtime.noteOffSeen != Runtime.noteOffSent)
+        Runtime.Log("Note off diff " + to_string(Runtime.noteOffSent - Runtime.noteOffSeen));
+#endif
+
     for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
     {
         // mask values 16 - 31 to still allow a note off

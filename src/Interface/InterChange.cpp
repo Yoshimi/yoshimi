@@ -613,6 +613,15 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     break;
 
                 case 128: // panic stop
+#ifdef REPORT_NOTES_ON_OFF
+                    // note test
+                    synth->getRuntime().Log("note on sent " + to_string(synth->getRuntime().noteOnSent));
+                    synth->getRuntime().Log("note on seen " + to_string(synth->getRuntime().noteOnSeen));
+                    synth->getRuntime().Log("note off sent " + to_string(synth->getRuntime().noteOffSent));
+                    synth->getRuntime().Log("note off seen " + to_string(synth->getRuntime().noteOffSeen));
+                    synth->getRuntime().Log("notes hanging sent " + to_string(synth->getRuntime().noteOnSent - synth->getRuntime().noteOffSent));
+                    synth->getRuntime().Log("notes hanging seen " + to_string(synth->getRuntime().noteOnSeen - synth->getRuntime().noteOffSeen));
+#endif
                     synth->ShutUp();
                     synth->Unmute();
                     break;

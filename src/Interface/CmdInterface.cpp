@@ -2111,6 +2111,18 @@ bool CmdInterface::cmdIfaceProcessCommand()
 
     list<string> msg;
 
+#ifdef REPORT_NOTES_ON_OFF
+    if (matchnMove(3, point, "report")) // note test
+    {
+        cout << "note on sent " << Runtime.noteOnSent << endl;
+        cout << "note on seen " << Runtime.noteOnSeen << endl;
+        cout << "note off sent " << Runtime.noteOffSent << endl;
+        cout << "note off seen " << Runtime.noteOffSeen << endl;
+        cout << "notes hanging sent " << Runtime.noteOnSent - Runtime.noteOffSent << endl;
+        cout << "notes hanging seen " << Runtime.noteOnSeen - Runtime.noteOffSeen << endl;
+        return false;
+    }
+#endif
     if (matchnMove(2, point, "exit"))
     {
         if (Runtime.configChanged)

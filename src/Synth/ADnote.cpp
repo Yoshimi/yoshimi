@@ -1683,10 +1683,11 @@ void ADnote::ComputeVoicePinkNoise(int nvoice)
 // Compute the ADnote samples, returns 0 if the note is finished
 int ADnote::noteout(float *outl, float *outr)
 {
-    tmpwavel = synth->getRuntime().genTmp1;
-    tmpwaver = synth->getRuntime().genTmp2;
-    bypassl = synth->getRuntime().genTmp3;
-    bypassr = synth->getRuntime().genTmp4;
+    Config &Runtime = synth->getRuntime();
+    tmpwavel = Runtime.genTmp1;
+    tmpwaver = Runtime.genTmp2;
+    bypassl = Runtime.genTmp3;
+    bypassr = Runtime.genTmp4;
     int i, nvoice;
     memset(outl, 0, synth->sent_bufferbytes);
     memset(outr, 0, synth->sent_bufferbytes);
@@ -1724,7 +1725,7 @@ int ADnote::noteout(float *outl, float *outr)
                          * cubic lost something over the years
                          * it runs but sounds horrible :(
                          */
-                        //if (synth->getRuntime().Interpolation)
+                        //if (Runtime.Interpolation)
                             //computeVoiceOscillatorCubicInterpolation(nvoice);
                         break;
                 }

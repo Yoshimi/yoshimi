@@ -155,6 +155,10 @@ class Config : public MiscFuncs
         int           single_row_panel;
         int           NumAvailableParts;
         int           currentPart;
+        int           noteOnSent; // note test
+        int           noteOnSeen;
+        int           noteOffSent;
+        int           noteOffSeen;
         unsigned int  VUcount;
         unsigned char channelSwitchType;
         unsigned char channelSwitchCC;

@@ -1,3 +1,4 @@
+Unchecking volume in controllers works correctly but still changes the GUI controls :(
 
 Requested: auto 'apply' timer for padsynth.
 

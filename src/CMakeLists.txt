@@ -86,6 +86,7 @@ option (LV2Plugin "Build yoshimi lv2 plugin interface" ON)
 # developer info
 option (ShowGuiReports "Enable GUI control reports" OFF)
 option (ShowNoteOnTimes "Report Note-On Times" OFF)
+option (ReportNotes "Report Notes On/Off" OFF)
 
 
 set (BuildOptions_X86
@@ -483,6 +484,10 @@ endif (ShowGuiReports)
 if (ShowNoteOnTimes)
     add_definitions (-DREPORT_NOTEON)
 endif (ShowNoteOnTimes)
+
+if (ReportNotes)
+    add_definitions (-DREPORT_NOTES_ON_OFF)
+endif (ReportNotes)
 
 add_definitions(-DDEFAULT_AUDIO=jack_audio)
 
