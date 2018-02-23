@@ -28,6 +28,20 @@
 #include "Misc/SynthEngine.h"
 #include "Effects/Echo.h"
 
+static const int PRESET_SIZE = 7;
+static const int NUM_PRESETS = 9;
+static unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
+        { 67, 64, 35, 64, 30, 59, 0 },     // Echo 1
+        { 67, 64, 21, 64, 30, 59, 0 },     // Echo 2
+        { 67, 75, 60, 64, 30, 59, 10 },    // Echo 3
+        { 67, 60, 44, 64, 30, 0, 0 },      // Simple Echo
+        { 67, 60, 102, 50, 30, 82, 48 },   // Canyon
+        { 67, 64, 44, 17, 0, 82, 24 },     // Panning Echo 1
+        { 81, 60, 46, 118, 100, 68, 18 },  // Panning Echo 2
+        { 81, 60, 26, 100, 127, 67, 36 },  // Panning Echo 3
+        { 62, 64, 28, 64, 100, 90, 55 }    // Feedback Echo
+    };
+
 Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
     Pvolume(50),
@@ -171,21 +185,6 @@ void Echo::sethidamp(unsigned char Phidamp_)
 
 void Echo::setpreset(unsigned char npreset)
 {
-    const int PRESET_SIZE = 7;
-    const int NUM_PRESETS = 9;
-    unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
-
-        { 67, 64, 35, 64, 30, 59, 0 },     // Echo 1
-        { 67, 64, 21, 64, 30, 59, 0 },     // Echo 2
-        { 67, 75, 60, 64, 30, 59, 10 },    // Echo 3
-        { 67, 60, 44, 64, 30, 0, 0 },      // Simple Echo
-        { 67, 60, 102, 50, 30, 82, 48 },   // Canyon
-        { 67, 64, 44, 17, 0, 82, 24 },     // Panning Echo 1
-        { 81, 60, 46, 118, 100, 68, 18 },  // Panning Echo 2
-        { 81, 60, 26, 100, 127, 67, 36 },  // Panning Echo 3
-        { 62, 64, 28, 64, 100, 90, 55 }    // Feedback Echo
-    };
-
     if (npreset < 0xf)
     {
         if (npreset >= NUM_PRESETS)
@@ -267,33 +266,28 @@ float Echolimit::getlimits(CommandBlock *getData)
     int control = getData->data.control;
     int request = getData->data.type & 3; // clear upper bits
     int npart = getData->data.part;
-
+    int presetNum = getData->data.engine;
     int min = 0;
     int max = 127;
-    int def = 0;
+
+    int def = presets[presetNum][control];
     bool canLearn = true;
     bool isInteger = true;
     switch (control)
     {
         case 0:
-            if (npart == 0xf1)
-                def = 67;
-            else
-                def = 33;
+            if (npart != 0xf1) // system effects
+                def /= 2;
             break;
         case 1:
-            def = 64;
             break;
         case 2:
-            def = 35;
             break;
         case 3:
             break;
         case 4:
-            def = 30;
             break;
         case 5:
-            def = 59;
             break;
         case 6:
             break;

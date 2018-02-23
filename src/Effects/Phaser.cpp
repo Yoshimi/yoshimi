@@ -33,6 +33,26 @@
 #define ONE_  0.99999f        // To prevent LFO ever reaching 1.0f for filter stability purposes
 #define ZERO_ 0.00001f        // Same idea as above.
 
+static const int PRESET_SIZE = 15;
+static const int NUM_PRESETS = 12;
+static unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
+        // Phaser
+        // 0   1    2    3  4   5     6   7   8    9 10   11 12  13 14
+        {64, 64, 36,  0,   0, 64,  110, 64,  1,  0,   0, 20, 0, 0,  0 },
+        {64, 64, 35,  0,   0, 88,  40,  64,  3,  0,   0, 20, 0,  0, 0 },
+        {64, 64, 31,  0,   0, 66,  68,  107, 2,  0,   0, 20, 0,  0, 0 },
+        {39, 64, 22,  0,   0, 66,  67,  10,  5,  0,   1, 20, 0,  0, 0 },
+        {64, 64, 20,  0,   1, 110, 67,  78,  10, 0,   0, 20, 0,  0, 0 },
+        {64, 64, 53,  100, 0, 58,  37,  78,  3,  0,   0, 20, 0,  0, 0 },
+        // APhaser
+        // 0   1    2   3   4   5     6   7   8    9 10   11 12  13 14
+        {64, 64, 14,  0,   1, 64,  64,  40,  4,  10,  0, 110,1,  20, 1 },
+        {64, 64, 14,  5,   1, 64,  70,  40,  6,  10,  0, 110,1,  20, 1 },
+        {64, 64, 9,   0,   0, 64,  60,  40,  8,  10,  0, 40, 0,  20, 1 },
+        {64, 64, 14,  10,  0, 64,  45,  80,  7,  10,  1, 110,1,  20, 1 },
+        {25, 64, 127, 10,  0, 64,  25,  16,  8,  100, 0, 25, 0,  20, 1 },
+        {64, 64, 1,   10,  1, 64,  70,  40,  12, 10,  0, 110,1,  20, 1 }
+};
 
 Phaser::Phaser(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
@@ -362,39 +382,6 @@ void Phaser::setphase(unsigned char Pphase_)
 
 void Phaser::setpreset(unsigned char npreset)
 {
-    const int PRESET_SIZE = 15;
-    const int NUM_PRESETS = 12;
-    unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
-        // Phaser
-        // 0   1    2    3  4   5     6   7   8    9 10   11 12  13 14
-        {64, 64, 36,  0,   0, 64,  110, 64,  1,  0,   0, 20,
-         0, 0,
-         0 },
-        {64, 64, 35,  0,   0, 88,  40,  64,  3,  0,   0, 20, 0,  0,
-         0 },
-        {64, 64, 31,  0,   0, 66,  68,  107, 2,  0,   0, 20, 0,  0,
-         0 },
-        {39, 64, 22,  0,   0, 66,  67,  10,  5,  0,   1, 20, 0,  0,
-         0 },
-        {64, 64, 20,  0,   1, 110, 67,  78,  10, 0,   0, 20, 0,  0,
-         0 },
-        {64, 64, 53,  100, 0, 58,  37,  78,  3,  0,   0, 20, 0,  0,
-         0 },
-        // APhaser
-        // 0   1    2   3   4   5     6   7   8    9 10   11 12  13 14
-        {64, 64, 14,  0,   1, 64,  64,  40,  4,  10,  0, 110,1,  20,
-         1 },
-        {64, 64, 14,  5,   1, 64,  70,  40,  6,  10,  0, 110,1,  20,
-         1 },
-        {64, 64, 9,   0,   0, 64,  60,  40,  8,  10,  0, 40, 0,  20,
-         1 },
-        {64, 64, 14,  10,  0, 64,  45,  80,  7,  10,  1, 110,1,  20,
-         1 },
-        {25, 64, 127, 10,  0, 64,  25,  16,  8,  100, 0, 25, 0,  20,
-         1 },
-        {64, 64, 1,   10,  1, 64,  70,  40,  12, 10,  0, 110,1,  20,
-         1 }
-    };
     if (npreset < 0xf)
     {
         if (npreset >= NUM_PRESETS)
@@ -520,22 +507,20 @@ float Phaserlimit::getlimits(CommandBlock *getData)
     int value = getData->data.value;
     int control = getData->data.control;
     int request = getData->data.type & 3; // clear upper bits
-
+    int presetNum = getData->data.engine;
     int min = 0;
     int max = 127;
-    int def = 0;
+
+    int def = presets[presetNum][control];
     bool canLearn = true;
     bool isInteger = true;
     switch (control)
     {
         case 0:
-            def = 64;
             break;
         case 1:
-            def = 64;
             break;
         case 2:
-            def = 36;
             break;
         case 3:
             break;
@@ -544,18 +529,14 @@ float Phaserlimit::getlimits(CommandBlock *getData)
             canLearn = false;
             break;
         case 5:
-            def = 64;
             break;
         case 6:
-            def = 110;
             break;
         case 7:
-            def = 64;
             break;
         case 8:
             min = 1;
             max = 12;
-            def = 1;
             canLearn = false;
             break;
         case 9:
@@ -565,7 +546,6 @@ float Phaserlimit::getlimits(CommandBlock *getData)
             max = 1;
             break;
         case 11:
-            def = 20;
             break;
         case 12:
             canLearn = false;

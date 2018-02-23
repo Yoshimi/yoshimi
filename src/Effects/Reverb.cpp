@@ -35,6 +35,37 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Effects/Reverb.h"
 
+static const int PRESET_SIZE = 13;
+static const int NUM_PRESETS = 13;
+static unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
+        // Cathedral1
+        {80,  64,  63,  24,  0,  0,  0, 85,  5,  83,   1,  64,  20 },
+        // Cathedral2
+        {80,  64,  69,  35,  0,  0,  0, 127, 0,  71,   0,  64,  20 },
+        // Cathedral3
+        {80,  64,  69,  24,  0,  0,  0, 127, 75, 78,   1,  85,  20 },
+        // Hall1
+        {90,  64,  51,  10,  0,  0,  0, 127, 21, 78,   1,  64,  20 },
+        // Hall2
+        {90,  64,  53,  20,  0,  0,  0, 127, 75, 71,   1,  64,  20 },
+        // Room1
+        {100, 64,  33,  0,   0,  0,  0, 127, 0,  106,  0,  30,  20 },
+        // Room2
+        {100, 64,  21,  26,  0,  0,  0, 62,  0,  77,   1,  45,  20 },
+        // Basement
+        {110, 64,  14,  0,   0,  0,  0, 127, 5,  71,   0,  25,  20 },
+        // Tunnel
+        {85,  80,  84,  20,  42, 0,  0, 51,  0,  78,   1,  105, 20 },
+        // Echoed1
+        {95,  64,  26,  60,  71, 0,  0, 114, 0,  64,   1,  64,  20 },
+        // Echoed2
+        {90,  64,  40,  88,  71, 0,  0, 114, 0,  88,   1,  64,  20 },
+        // VeryLong1
+        {90,  64,  93,  15,  0,  0,  0, 114, 0,  77,   0,  95,  20 },
+        // VeryLong2
+        {90,  64,  111, 30,  0,  0,  0, 114, 90, 74,   1,  80,  20 }
+};
+
 // todo: EarlyReflections, Prdelay, Perbalance
 
 Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
@@ -438,36 +469,6 @@ void Reverb::setbandwidth(unsigned char Pbandwidth_)
 
 void Reverb::setpreset(unsigned char npreset)
 {
-    const int PRESET_SIZE = 13;
-    const int NUM_PRESETS = 13;
-    unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
-        // Cathedral1
-        {80,  64,  63,  24,  0,  0,  0, 85,  5,  83,   1,  64,  20 },
-        // Cathedral2
-        {80,  64,  69,  35,  0,  0,  0, 127, 0,  71,   0,  64,  20 },
-        // Cathedral3
-        {80,  64,  69,  24,  0,  0,  0, 127, 75, 78,   1,  85,  20 },
-        // Hall1
-        {90,  64,  51,  10,  0,  0,  0, 127, 21, 78,   1,  64,  20 },
-        // Hall2
-        {90,  64,  53,  20,  0,  0,  0, 127, 75, 71,   1,  64,  20 },
-        // Room1
-        {100, 64,  33,  0,   0,  0,  0, 127, 0,  106,  0,  30,  20 },
-        // Room2
-        {100, 64,  21,  26,  0,  0,  0, 62,  0,  77,   1,  45,  20 },
-        // Basement
-        {110, 64,  14,  0,   0,  0,  0, 127, 5,  71,   0,  25,  20 },
-        // Tunnel
-        {85,  80,  84,  20,  42, 0,  0, 51,  0,  78,   1,  105, 20 },
-        // Echoed1
-        {95,  64,  26,  60,  71, 0,  0, 114, 0,  64,   1,  64,  20 },
-        // Echoed2
-        {90,  64,  40,  88,  71, 0,  0, 114, 0,  88,   1,  64,  20 },
-        // VeryLong1
-        {90,  64,  93,  15,  0,  0,  0, 114, 0,  77,   0,  95,  20 },
-        // VeryLong2
-        {90,  64,  111, 30,  0,  0,  0, 114, 90, 74,   1,  80,  20 }
-    };
     if (npreset < 0xf)
     {
         if (npreset >= NUM_PRESETS)
@@ -567,52 +568,43 @@ float Revlimit::getlimits(CommandBlock *getData)
     int control = getData->data.control;
     int request = getData->data.type & 3; // clear upper bits
     int npart = getData->data.part;
-
+    int presetNum = getData->data.engine;
     int min = 0;
     int max = 127;
-    int def = 0;
+
+    int def = presets[presetNum][control];
     bool canLearn = true;
     bool isInteger = true;
 
     switch (control)
     {
         case 0:
-            if (npart == 0xf1) // system effects
-                def = 80;
-            else
-                def = 40;
+            if (npart != 0xf1) // system effects
+                def /=2;
             break;
         case 1:
             break;
         case 2:
-            def = 64;
             break;
         case 3:
-            def = 24;
             break;
         case 4:
             break;
         case 7:
-            def = 85;
             break;
         case 8:
-            def = 5;
             break;
         case 9:
             min = 64;
-            def = 83;
             break;
         case 10:
             max = 2;
-            def = 1;
             canLearn = false;
             break;
         case 11:
-            def = 64;
             canLearn = false;
             break;
         case 12:
-            def = 20;
             break;
         case 16:
             max = 12;

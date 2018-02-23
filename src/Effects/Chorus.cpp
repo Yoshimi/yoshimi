@@ -30,6 +30,32 @@
 
 #define MAX_CHORUS_DELAY 250.0f // ms
 
+static const int PRESET_SIZE = 12;
+static const int NUM_PRESETS = 10;
+static unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
+        // Chorus1
+        { 64, 64, 50, 0, 0, 90, 40, 85, 64, 119, 0, 0 },
+        // Chorus2
+        {64, 64, 45, 0, 0, 98, 56, 90, 64, 19, 0, 0 },
+        // Chorus3
+        {64, 64, 29, 0, 1, 42, 97, 95, 90, 127, 0, 0 },
+        // Celeste1
+        {64, 64, 26, 0, 0, 42, 115, 18, 90, 127, 0, 0 },
+        // Celeste2
+        {64, 64, 29, 117, 0, 50, 115, 9, 31, 127, 0, 1 },
+        // Flange1
+        {64, 64, 57, 0, 0, 60, 23, 3, 62, 0, 0, 0 },
+        // Flange2
+        {64, 64, 33, 34, 1, 40, 35, 3, 109, 0, 0, 0 },
+        // Flange3
+        {64, 64, 53, 34, 1, 94, 35, 3, 54, 0, 0, 1 },
+        // Flange4
+        {64, 64, 40, 0, 1, 62, 12, 19, 97, 0, 0, 0 },
+        // Flange5
+        {64, 64, 55, 105, 0, 24, 39, 19, 17, 0, 0, 1 }
+};
+
+
 Chorus::Chorus(bool insertion_, float *const efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
     lfo(_synth),
@@ -170,31 +196,6 @@ void Chorus::setvolume(unsigned char Pvolume_)
 
 void Chorus::setpreset(unsigned char npreset)
 {
-    const int PRESET_SIZE = 12;
-    const int NUM_PRESETS = 10;
-    unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
-        // Chorus1
-        { 64, 64, 50, 0, 0, 90, 40, 85, 64, 119, 0, 0 },
-        // Chorus2
-        {64, 64, 45, 0, 0, 98, 56, 90, 64, 19, 0, 0 },
-        // Chorus3
-        {64, 64, 29, 0, 1, 42, 97, 95, 90, 127, 0, 0 },
-        // Celeste1
-        {64, 64, 26, 0, 0, 42, 115, 18, 90, 127, 0, 0 },
-        // Celeste2
-        {64, 64, 29, 117, 0, 50, 115, 9, 31, 127, 0, 1 },
-        // Flange1
-        {64, 64, 57, 0, 0, 60, 23, 3, 62, 0, 0, 0 },
-        // Flange2
-        {64, 64, 33, 34, 1, 40, 35, 3, 109, 0, 0, 0 },
-        // Flange3
-        {64, 64, 53, 34, 1, 94, 35, 3, 54, 0, 0, 1 },
-        // Flange4
-        {64, 64, 40, 0, 1, 62, 12, 19, 97, 0, 0, 0 },
-        // Flange5
-        {64, 64, 55, 105, 0, 24, 39, 19, 17, 0, 0, 1 }
-    };
-
     if (npreset < 0xf)
     {
         if (npreset >= NUM_PRESETS)
@@ -291,24 +292,22 @@ float Choruslimit::getlimits(CommandBlock *getData)
     int control = getData->data.control;
     int request = getData->data.type & 3; // clear upper bits
     int npart = getData->data.part;
-
+    int presetNum = getData->data.engine;
     int min = 0;
     int max = 127;
-    int def = 0;
+
+    int def = presets[presetNum][control];
     bool canLearn = true;
     bool isInteger = true;
     switch (control)
     {
         case 0:
-            if (npart != 0xf1)
-                def = 32;
-            else
-                def = 64;
+            if (npart != 0xf1) // system effects
+                def /= 2;
             break;
         case 1:
             break;
         case 2:
-            def = 50;
             break;
         case 3:
             break;
@@ -317,18 +316,14 @@ float Choruslimit::getlimits(CommandBlock *getData)
             canLearn = false;
             break;
         case 5:
-            def = 90;
             break;
         case 6:
-            def = 40;
             break;
         case 7:
-            def = 85;
             break;
         case 8:
             break;
         case 9:
-            def = 119;
             break;
         case 11:
             max = 1;
