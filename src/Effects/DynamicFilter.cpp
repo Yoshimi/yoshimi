@@ -29,8 +29,8 @@
 #include "Effects/DynamicFilter.h"
 
 static const int PRESET_SIZE = 10;
-    static const int NUM_PRESETS = 5;
-    static const char presets[NUM_PRESETS][PRESET_SIZE] = {
+static const int NUM_PRESETS = 5;
+static const char presets[NUM_PRESETS][PRESET_SIZE] = {
         // WahWah
         { 110, 64, 80, 0, 0, 64, 0, 90, 0, 60 },
         // AutoWah
@@ -41,7 +41,7 @@ static const int PRESET_SIZE = 10;
         { 110, 64, 80, 0, 0, 64, 0, 64, 0, 60 },
         // VocalMorph1
         {127, 64, 50, 0, 0, 96, 64, 0, 0, 60 }
-    };
+};
 
 DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, new FilterParams(0, 64, 64, 0, _synth), 0),
@@ -374,7 +374,7 @@ float Dynamlimit::getlimits(CommandBlock *getData)
     switch (control)
     {
         case 0:
-            if (npart == 0xf1)
+            if (npart != 0xf1) // system effects
                 def /= 2;
             break;
         case 1:

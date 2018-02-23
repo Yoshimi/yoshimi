@@ -30,6 +30,19 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Effects/Alienwah.h"
 
+static const int PRESET_SIZE = 11;
+static const int NUM_PRESETS = 4;
+static unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
+        // AlienWah1
+        { 127, 64, 70, 0, 0, 62, 60, 105, 25, 0, 64 },
+        // AlienWah2
+        { 127, 64, 73, 106, 0, 101, 60, 105, 17, 0, 64 },
+        // AlienWah3
+        { 127, 64, 63, 0, 1, 100, 112, 105, 31, 0, 42 },
+        // AlienWah4
+        { 93, 64, 25, 0, 1, 66, 101, 11, 47, 0, 86 }
+};
+
 Alienwah::Alienwah(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
     lfo(_synth),
@@ -162,19 +175,6 @@ void Alienwah::setdelay(unsigned char _delay)
 
 void Alienwah::setpreset(unsigned char npreset)
 {
-    const int PRESET_SIZE = 11;
-    const int NUM_PRESETS = 4;
-    unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
-        // AlienWah1
-        { 127, 64, 70, 0, 0, 62, 60, 105, 25, 0, 64 },
-        // AlienWah2
-        { 127, 64, 73, 106, 0, 101, 60, 105, 17, 0, 64 },
-        // AlienWah3
-        { 127, 64, 63, 0, 1, 100, 112, 105, 31, 0, 42 },
-        // AlienWah4
-        { 93, 64, 25, 0, 1, 66, 101, 11, 47, 0, 86 }
-    };
-
     if (npreset < 0xf)
     {
         if (npreset >= NUM_PRESETS)
@@ -270,46 +270,38 @@ float Alienlimit::getlimits(CommandBlock *getData)
     int control = getData->data.control;
     int request = getData->data.type & 3; // clear upper bits
     int npart = getData->data.part;
-
+    int presetNum = getData->data.engine;
     int min = 0;
     int max = 127;
-    int def = 0;
+
+    int def = presets[presetNum][control];
     bool canLearn = true;
     bool isInteger = true;
     switch (control)
     {
         case 0:
-            if (npart == 0xf1)
-                def = 127;
-            else
-                def = 63;
+            if (npart != 0xf1) // system effects
+                def /= 2;
             break;
         case 1:
-            def = 64;
             break;
         case 2:
-            def = 70;
             break;
         case 3:
             break;
         case 4:
             max = 1;
-            def = 0;
             canLearn = false;
             break;
         case 5:
-            def = 62;
             break;
         case 6:
-            def = 60;
             break;
         case 7:
-            def = 105;
             break;
         case 8:
             min = 1;
             max = 100;
-            def = 24;
             canLearn = false;
             break;
         case 9:

@@ -28,6 +28,23 @@
 #include "Misc/SynthEngine.h"
 #include "Effects/Distorsion.h"
 
+static const int PRESET_SIZE = 11;
+static const int NUM_PRESETS = 6;
+static int presets[NUM_PRESETS][PRESET_SIZE] = {
+        // Overdrive 1
+        { 127, 64, 35, 56, 70, 0, 0, 96, 0, 0, 0 },
+        // Overdrive 2
+        { 127, 64, 35, 29, 75, 1, 0, 127, 0, 0, 0 },
+        // A. Exciter 1
+        { 64, 64, 35, 75, 80, 5, 0, 127, 105, 1, 0 },
+        // A. Exciter 2
+        { 64, 64, 35, 85, 62, 1, 0, 127, 118, 1, 0 },
+        // Guitar Amp
+        { 127, 64, 35, 63, 75, 2, 0, 55, 0, 0, 0 },
+        // Quantisize
+        { 127, 64, 35, 88, 75, 4, 0, 127, 0, 1, 0 }
+};
+
 Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
     Pvolume(50),
@@ -162,23 +179,6 @@ void Distorsion::sethpf(unsigned char Phpf_)
 
 void Distorsion::setpreset(unsigned char npreset)
 {
-    const int PRESET_SIZE = 11;
-    const int NUM_PRESETS = 6;
-    int presets[NUM_PRESETS][PRESET_SIZE] = {
-        // Overdrive 1
-        { 127, 64, 35, 56, 70, 0, 0, 96, 0, 0, 0 },
-        // Overdrive 2
-        { 127, 64, 35, 29, 75, 1, 0, 127, 0, 0, 0 },
-        // A. Exciter 1
-        { 64, 64, 35, 75, 80, 5, 0, 127, 105, 1, 0 },
-        // A. Exciter 2
-        { 64, 64, 35, 85, 62, 1, 0, 127, 118, 1, 0 },
-        // Guitar Amp
-        { 127, 64, 35, 63, 75, 2, 0, 55, 0, 0, 0 },
-        // Quantisize
-        { 127, 64, 35, 88, 75, 4, 0, 127, 0, 1, 0 }
-    };
-
     if (npreset < 0xf)
     {
         if (npreset >= NUM_PRESETS)
@@ -287,31 +287,26 @@ float Distlimit::getlimits(CommandBlock *getData)
     int control = getData->data.control;
     int request = getData->data.type & 3; // clear upper bits
     int npart = getData->data.part;
-
+    int presetNum = getData->data.engine;
     int min = 0;
     int max = 127;
-    int def = 0;
+
+    int def = presets[presetNum][control];
     bool canLearn = true;
     bool isInteger = true;
     switch (control)
     {
         case 0:
-            if (npart == 0xf1) // system effects
-                def = 127;
-            else
-                def = 63;
+            if (npart != 0xf1) // system effects
+                def /= 2;
             break;
         case 1:
-            def = 64;
             break;
         case 2:
-            def = 35;
             break;
         case 3:
-            def = 56;
             break;
         case 4:
-            def = 70;
             break;
         case 5:
             max = 13;
@@ -322,7 +317,6 @@ float Distlimit::getlimits(CommandBlock *getData)
             canLearn = false;
             break;
         case 7:
-            def = 96;
             break;
         case 8:
             break;
