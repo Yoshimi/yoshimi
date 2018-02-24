@@ -104,6 +104,8 @@ class Reverb : public Effect
         float *idelay;
         AnalogFilter *lpf;  // filters
         AnalogFilter *hpf;
+        InterpolatedParameter lpffr;
+        InterpolatedParameter hpffr;
         float *inputbuf;
 
         SynthEngine *synth;

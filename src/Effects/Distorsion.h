@@ -63,11 +63,15 @@ class Distorsion : public Effect, private MiscFuncs, WaveShapeSamples
         void setlpf(unsigned char Plpf_);
         void sethpf(unsigned char Phpf_);
 
+        InterpolatedParameter level;
+
         // Real Parameters
         AnalogFilter *lpfl;
         AnalogFilter *lpfr;
         AnalogFilter *hpfl;
         AnalogFilter *hpfr;
+        InterpolatedParameter lpffr;
+        InterpolatedParameter hpffr;
 
         SynthEngine *synth;
 };

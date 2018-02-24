@@ -172,8 +172,8 @@ void Phaser::AnalogPhase(float *smpsl, float *smpsr)
         gl += diffl; // Linear interpolation between LFO samples
         gr += diffr;
 
-        float xnl(smpsl[i] * pangainL);
-        float xnr(smpsr[i] * pangainR);
+        float xnl(smpsl[i] * pangainL.getAndAdvanceValue());
+        float xnr(smpsr[i] * pangainR.getAndAdvanceValue());
 
         if(barber)
         {
@@ -253,8 +253,8 @@ void Phaser::NormalPhase(float *smpsl, float *smpsr)
         float x1 = 1.0f - x;
         float gl = lgain * x + oldlgain * x1;
         float gr = rgain * x + oldrgain * x1;
-        float inl = smpsl[i] * pangainL + fbl;
-        float inr = smpsr[i] * pangainR + fbr;
+        float inl = smpsl[i] * pangainL.getAndAdvanceValue() + fbl;
+        float inr = smpsr[i] * pangainR.getAndAdvanceValue() + fbr;
 
         // Phasing routine
         for (int j = 0; j < Pstages * 2; ++j)
@@ -272,8 +272,9 @@ void Phaser::NormalPhase(float *smpsl, float *smpsr)
         // Left/Right crossing
         float l = inl;
         float r = inr;
-        inl = l * (1.0f - lrcross) + r * lrcross;
-        inr = r * (1.0f - lrcross) + l * lrcross;
+        inl = l * (1.0f - lrcross.getValue()) + r * lrcross.getValue();
+        inr = r * (1.0f - lrcross.getValue()) + l * lrcross.getValue();
+        lrcross.advanceValue();
         fbl = inl * fb;
         fbr = inr * fb;
         efxoutl[i] = inl;
@@ -328,8 +329,9 @@ void Phaser::setfb(unsigned char Pfb_)
 void Phaser::setvolume(unsigned char Pvolume_)
 {
     Pvolume = Pvolume_;
-    outvolume = Pvolume / 127.0f;
-    volume = (!insertion) ? 1.0f : outvolume;
+    float tmp = Pvolume / 127.0f;
+    outvolume.setTargetValue(tmp);
+    volume.setTargetValue((!insertion) ? 1.0f : tmp);
 }
 
 

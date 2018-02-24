@@ -53,6 +53,7 @@ class EQ : public Effect, private MiscFuncs
         void setvolume(unsigned char Pvolume_);
         struct {
             unsigned char Ptype, Pfreq, Pgain, Pq, Pstages; // parameters
+            InterpolatedParameter freq, gain, q;
             AnalogFilter *l, *r; // internal values
         } filter[MAX_EQ_BANDS];
 

@@ -43,7 +43,7 @@ EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
         filter[i].r = new AnalogFilter(6, 1000.0, 1.0, 0, synth);
     }
     // default values
-    Pvolume = 50;
+    setvolume(50);
     Pband = 0;
     setpreset(Ppreset);
     cleanup();
@@ -68,13 +68,45 @@ void EQ::out(float *smpsl, float *smpsr)
     memcpy(efxoutr, smpsr, synth->sent_bufferbytes);
     for (int i = 0; i < synth->sent_buffersize; ++i)
     {
-        efxoutl[i] *= volume;
-        efxoutr[i] *= volume;
+        efxoutl[i] *= volume.getValue();
+        efxoutr[i] *= volume.getValue();
+        volume.advanceValue();
     }
     for (int i = 0; i < MAX_EQ_BANDS; ++i)
     {
         if (filter[i].Ptype == 0)
             continue;
+
+        float oldval = filter[i].freq.getValue();
+        filter[i].freq.advanceValue(synth->sent_buffersize);
+        float newval = filter[i].freq.getValue();
+        if (oldval != newval) {
+            filter[i].l->interpolatenextbuffer();
+            filter[i].l->setfreq(newval);
+            filter[i].r->interpolatenextbuffer();
+            filter[i].r->setfreq(newval);
+        }
+
+        oldval = filter[i].gain.getValue();
+        filter[i].gain.advanceValue(synth->sent_buffersize);
+        newval = filter[i].gain.getValue();
+        if (oldval != newval) {
+            filter[i].l->interpolatenextbuffer();
+            filter[i].l->setgain(newval);
+            filter[i].r->interpolatenextbuffer();
+            filter[i].r->setgain(newval);
+        }
+
+        oldval = filter[i].q.getValue();
+        filter[i].q.advanceValue(synth->sent_buffersize);
+        newval = filter[i].q.getValue();
+        if (oldval != newval) {
+            filter[i].l->interpolatenextbuffer();
+            filter[i].l->setq(newval);
+            filter[i].r->interpolatenextbuffer();
+            filter[i].r->setq(newval);
+        }
+
         filter[i].l->filterout(efxoutl);
         filter[i].r->filterout(efxoutr);
     }
@@ -86,8 +118,9 @@ void EQ::out(float *smpsl, float *smpsr)
 void EQ::setvolume(unsigned char Pvolume_)
 {
     Pvolume = Pvolume_;
-    outvolume = powf(0.005f, (1.0f - Pvolume / 127.0f)) * 10.0f;
-    volume = (!insertion) ? 1.0f : outvolume;
+    float tmp = powf(0.005f, (1.0f - Pvolume / 127.0f)) * 10.0f;
+    outvolume.setTargetValue(tmp);
+    volume.setTargetValue((!insertion) ? 1.0f : tmp);
 }
 
 
@@ -143,22 +176,19 @@ void EQ::changepar(int npar, unsigned char value)
         case 1:
             filter[nb].Pfreq = value;
             tmp = 600.0f * powf(30.0f, (value - 64.0f) / 64.0f);
-            filter[nb].l->setfreq(tmp);
-            filter[nb].r->setfreq(tmp);
+            filter[nb].freq.setTargetValue(tmp);
             break;
 
         case 2:
             filter[nb].Pgain = value;
             tmp = 30.0f * (value - 64.0f) / 64.0f;
-            filter[nb].l->setgain(tmp);
-            filter[nb].r->setgain(tmp);
+            filter[nb].gain.setTargetValue(tmp);
             break;
 
         case 3:
             filter[nb].Pq = value;
             tmp = powf(30.0f, (value - 64.0f) / 64.0f);
-            filter[nb].l->setq(tmp);
-            filter[nb].r->setq(tmp);
+            filter[nb].q.setTargetValue(tmp);
             break;
 
         case 4:
@@ -224,7 +254,8 @@ float EQ::getfreqresponse(float freq)
             continue;
         resp *= filter[i].l->H(freq);
     }
-    return rap2dB(resp * outvolume);
+    // Only for UI purposes, use target value.
+    return rap2dB(resp * outvolume.getTargetValue());
 }
 
 

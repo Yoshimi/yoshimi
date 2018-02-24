@@ -71,7 +71,7 @@ static unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
 Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
     // defaults
-    Pvolume(48),
+//    Pvolume(48),
     Ptime(64),
     Pidelay(40),
     Pidelayfb(0),
@@ -91,6 +91,7 @@ Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_
     hpf(NULL), // no filter
     synth(_synth)
 {
+    setvolume(48);
     inputbuf = (float*)fftwf_malloc(synth->bufferbytes);
     for (int i = 0; i < REV_COMBS * 2; ++i)
     {
@@ -227,15 +228,33 @@ void Reverb::out(float *smps_l, float *smps_r)
         bandwidth->process(synth->sent_buffersize, inputbuf);
 
     if (lpf)
+    {
+        float fr = lpffr.getValue();
+        lpffr.advanceValue(synth->sent_buffersize);
+        if (fr != lpffr.getValue())
+        {
+            lpf->interpolatenextbuffer();
+            lpf->setfreq(lpffr.getValue());
+        }
         lpf->filterout(inputbuf);
-    if (hpf)
-        hpf->filterout(inputbuf);
+    }
+     if (hpf)
+    {
+        float fr = hpffr.getValue();
+        hpffr.advanceValue(synth->sent_buffersize);
+        if (fr != hpffr.getValue())
+        {
+            hpf->interpolatenextbuffer();
+            hpf->setfreq(hpffr.getValue());
+        }
+         hpf->filterout(inputbuf);
+    }
 
     processmono(0, efxoutl); // left
     processmono(1, efxoutr); // right
 
-    float lvol = rs / REV_COMBS * pangainL;
-    float rvol = rs / REV_COMBS * pangainR;
+    float lvol = rs / REV_COMBS * pangainL.getAndAdvanceValue();
+    float rvol = rs / REV_COMBS * pangainR.getAndAdvanceValue();
     if (insertion != 0)
     {
         lvol *= 2.0f;
@@ -255,12 +274,14 @@ void Reverb::setvolume(unsigned char Pvolume_)
     Pvolume = Pvolume_;
     if (!insertion)
     {
-        outvolume = powf(0.01f, (1.0f - Pvolume / 127.0f)) * 4.0f;
-        volume = 1.0f;
+        outvolume.setTargetValue(powf(0.01f, (1.0f - Pvolume / 127.0f)) * 4.0f);
+        volume.setTargetValue(1.0f);
     }
     else
     {
-        volume = outvolume = Pvolume / 127.0f;
+        float tmp = Pvolume / 127.0f;
+        volume.setTargetValue(tmp);
+        outvolume.setTargetValue(tmp);
         if (Pvolume == 0.0f)
             cleanup();
     }
@@ -333,11 +354,9 @@ void Reverb::sethpf(unsigned char Phpf_)
             delete hpf;
         hpf = NULL;
     } else {
-        float fr = expf(powf(Phpf / 127.0f, 0.5f) * logf(10000.0f)) + 20.0f;
+        hpffr.setTargetValue(expf(powf(Phpf / 127.0f, 0.5f) * logf(10000.0f)) + 20.0f);
         if (hpf == NULL)
-            hpf = new AnalogFilter(3, fr, 1, 0, synth);
-        else
-            hpf->setfreq(fr);
+            hpf = new AnalogFilter(3, hpffr.getValue(), 1, 0, synth);
     }
 }
 
@@ -351,11 +370,9 @@ void Reverb::setlpf(unsigned char Plpf_)
             delete lpf;
         lpf = NULL;
     } else {
-        float fr = expf(powf(Plpf / 127.0f, 0.5f) * logf(25000.0f)) + 40.0f;
+        lpffr.setTargetValue(expf(powf(Plpf / 127.0f, 0.5f) * logf(25000.0f)) + 40.0f);
         if (!lpf)
-            lpf = new AnalogFilter(2, fr, 1, 0, synth);
-        else
-            lpf->setfreq(fr);
+            lpf = new AnalogFilter(2, lpffr.getValue(), 1, 0, synth);
     }
 }
 

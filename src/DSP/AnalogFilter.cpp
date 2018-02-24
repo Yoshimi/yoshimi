@@ -45,9 +45,9 @@ AnalogFilter::AnalogFilter(unsigned char Ftype, float Ffreq, float Fq, unsigned 
     if (stages >= MAX_FILTER_STAGES)
         stages = MAX_FILTER_STAGES;
     cleanup();
-    firsttime = 0;
+    firsttime = false;
     setfreq_and_q(Ffreq, Fq);
-    firsttime = 1;
+    firsttime = true;
     d[0] = 0; // this is not used
     outgain = 1.0f;
     tmpismp = (float*)fftwf_malloc(synth->bufferbytes);
@@ -69,7 +69,7 @@ void AnalogFilter::cleanup()
         oldx[i] = x[i];
         oldy[i] = y[i];
     }
-    needsinterpolation = 0;
+    needsinterpolation = false;
 }
 
 
@@ -317,7 +317,7 @@ void AnalogFilter::setfreq(float frequency)
 
     int nyquistthresh = (abovenq ^ oldabovenq);
 
-    if (rap > 3.0f || nyquistthresh != 0)
+    if (needsinterpolation || rap > 3.0f || nyquistthresh != 0)
     {   // if the frequency is changed fast, it needs interpolation
         // (now, filter and coeficients backup)
         for (int i = 0; i < 3; ++i)
@@ -330,12 +330,12 @@ void AnalogFilter::setfreq(float frequency)
             oldx[i] = x[i];
             oldy[i] = y[i];
         }
-        if (firsttime == 0)
-            needsinterpolation = 1;
+        if (!firsttime)
+            needsinterpolation = true;
     }
     freq = frequency;
     computefiltercoefs();
-    firsttime = 0;
+    firsttime = false;
 }
 
 
@@ -376,6 +376,11 @@ void AnalogFilter::setstages(int stages_)
     computefiltercoefs();
 }
 
+void AnalogFilter::interpolatenextbuffer()
+{
+    needsinterpolation = true;
+}
+
 
 void AnalogFilter::singlefilterout(float *smp, fstage &x, fstage &y, float *c, float *d)
 {
@@ -407,7 +412,7 @@ void AnalogFilter::singlefilterout(float *smp, fstage &x, fstage &y, float *c, f
 
 void AnalogFilter::filterout(float *smp)
 {
-    if (needsinterpolation != 0)
+    if (needsinterpolation)
     {
         memcpy(tmpismp, smp, synth->sent_bufferbytes);
         for (int i = 0; i < stages + 1; ++i)
@@ -417,14 +422,14 @@ void AnalogFilter::filterout(float *smp)
     for (int i = 0; i < stages + 1; ++i)
         singlefilterout(smp, x[i], y[i], c, d);
 
-    if (needsinterpolation != 0)
+    if (needsinterpolation)
     {
         for (int i = 0; i < synth->sent_buffersize; ++i)
         {
             float x = (float)i / synth->sent_buffersize_f;
             smp[i] = tmpismp[i] * (1.0f - x) + smp[i] * x;
         }
-        needsinterpolation = 0;
+        needsinterpolation = false;
     }
 
     for (int i = 0; i < synth->sent_buffersize; ++i)

@@ -58,6 +58,7 @@ Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_, SynthE
     Pprefiltering(0),
     synth(_synth)
 {
+    level.setTargetValue(Plevel / 127.0f);
     lpfl = new AnalogFilter(2, 22000, 1, 0, synth);
     lpfr = new AnalogFilter(2, 22000, 1, 0, synth);
     hpfl = new AnalogFilter(3, 20, 1, 0, synth);
@@ -90,9 +91,28 @@ void Distorsion::cleanup(void)
 // Apply the filters
 void Distorsion::applyfilters(float *efxoutl, float *efxoutr)
 {
+    float fr;
+
+    fr = lpffr.getValue();
+    lpffr.advanceValue(synth->sent_buffersize);
+    if (fr != lpffr.getValue()) {
+        lpfl->interpolatenextbuffer();
+        lpfl->setfreq(lpffr.getValue());
+        lpfr->interpolatenextbuffer();
+        lpfr->setfreq(lpffr.getValue());
+    }
     lpfl->filterout(efxoutl);
-    hpfl->filterout(efxoutl);
     lpfr->filterout(efxoutr);
+
+    fr = hpffr.getValue();
+    hpffr.advanceValue(synth->sent_buffersize);
+    if (fr != hpffr.getValue()) {
+        hpfl->interpolatenextbuffer();
+        hpfl->setfreq(hpffr.getValue());
+        hpfr->interpolatenextbuffer();
+        hpfr->setfreq(hpffr.getValue());
+    }
+    hpfl->filterout(efxoutl);
     hpfr->filterout(efxoutr);
 }
 
@@ -108,13 +128,15 @@ void Distorsion::out(float *smpsl, float *smpsr)
     {
         for (int i = 0; i < synth->sent_buffersize; ++i)
         {
-            efxoutl[i] = smpsl[i] * inputdrive * pangainL;
-            efxoutr[i] = smpsr[i] * inputdrive* pangainR;
+            efxoutl[i] = smpsl[i] * inputdrive * pangainL.getAndAdvanceValue();
+            efxoutr[i] = smpsr[i] * inputdrive * pangainR.getAndAdvanceValue();
         }
     }
     else // Mono
         for (int i = 0; i < synth->sent_buffersize; ++i)
-            efxoutl[i] = inputdrive * (smpsl[i]* pangainL + smpsr[i]* pangainR) * 0.7f;
+            efxoutl[i] = inputdrive * (smpsl[i] * pangainL.getAndAdvanceValue()
+                                       + smpsr[i]* pangainR.getAndAdvanceValue())
+                * 0.7f;
 
     if (Pprefiltering)
         applyfilters(efxoutl, efxoutr);
@@ -128,17 +150,18 @@ void Distorsion::out(float *smpsl, float *smpsr)
     if (!Pstereo)
         memcpy(efxoutr, efxoutl, synth->sent_bufferbytes);
 
-    float level = dB2rap(60.0f * Plevel / 127.0f - 40.0f);
     for (int i = 0; i < synth->sent_buffersize; ++i)
     {
+        float lvl = dB2rap(60.0f * level.getAndAdvanceValue() - 40.0f);
         float lout = efxoutl[i];
         float rout = efxoutr[i];
-        float l = lout * (1.0f - lrcross) + rout * lrcross;
-        float r = rout * (1.0f - lrcross) + lout * lrcross;
+        float l = lout * (1.0f - lrcross.getValue()) + rout * lrcross.getValue();
+        float r = rout * (1.0f - lrcross.getValue()) + lout * lrcross.getValue();
+        lrcross.advanceValue();
         lout = l;
         rout = r;
-        efxoutl[i] = lout * 2.0f * level;
-        efxoutr[i] = rout * 2.0f * level;
+        efxoutl[i] = lout * 2.0f * lvl;
+        efxoutr[i] = rout * 2.0f * lvl;
     }
 }
 
@@ -147,13 +170,17 @@ void Distorsion::out(float *smpsl, float *smpsr)
 void Distorsion::setvolume(unsigned char Pvolume_)
 {
     Pvolume = Pvolume_;
+    float tmp = Pvolume / 127.0f;
     if(insertion == 0)
     {
-        outvolume = powf(0.01f, (1.0f - Pvolume / 127.0f)) * 4.0f;
-        volume = 1.0f;
+        outvolume.setTargetValue(powf(0.01f, (1.0f - tmp)) * 4.0f);
+        volume.setTargetValue(1.0f);
     }
     else
-         volume = outvolume = Pvolume / 127.0f;
+    {
+         volume.setTargetValue(tmp);
+         outvolume.setTargetValue(tmp);
+    }
     if (Pvolume == 0.0f)
         cleanup();
 }
@@ -162,18 +189,14 @@ void Distorsion::setvolume(unsigned char Pvolume_)
 void Distorsion::setlpf(unsigned char Plpf_)
 {
     Plpf = Plpf_;
-    float fr = expf(powf(Plpf / 127.0f, 0.5f) * logf(25000.0f)) + 40.0f;
-    lpfl->setfreq(fr);
-    lpfr->setfreq(fr);
+    lpffr.setTargetValue(expf(powf(Plpf / 127.0f, 0.5f) * logf(25000.0f)) + 40.0f);
 }
 
 
 void Distorsion::sethpf(unsigned char Phpf_)
 {
     Phpf = Phpf_;
-    float fr = expf(powf(Phpf / 127.0f, 0.5f) * logf(25000.0f)) + 20.0f;
-    hpfl->setfreq(fr);
-    hpfr->setfreq(fr);
+    hpffr.setTargetValue(expf(powf(Phpf / 127.0f, 0.5f) * logf(25000.0f)) + 20.0f);
 }
 
 
@@ -225,6 +248,7 @@ void Distorsion::changepar(int npar, unsigned char value)
 
         case 4:
             Plevel = value;
+            level.setTargetValue(Plevel / 127.0f);
             break;
 
         case 5:

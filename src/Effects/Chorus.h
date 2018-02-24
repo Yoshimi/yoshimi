@@ -66,7 +66,7 @@ class Chorus : public Effect
         // Internal Values
         float depth;
         float delay;
-        float fb;
+        InterpolatedParameter fb;
         float dl1;
         float dl2;
         float dr1;

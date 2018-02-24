@@ -44,16 +44,16 @@ static unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
 
 Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
-    Pvolume(50),
     Pdelay(60),
     Plrdelay(100),
-    Pfb(40),
-    Phidamp(60),
     lrdelay(0),
     ldelay(NULL),
     rdelay(NULL),
     synth(_synth)
 {
+    setvolume(50);
+    setfb(40);
+    sethidamp(60);
     setpreset(Ppreset);
     changepar(4, 30); // lrcross
     cleanup();
@@ -108,20 +108,23 @@ void Echo::out(float* smpsl, float* smpsr)
     {
         ldl = ldelay[kl];
         rdl = rdelay[kr];
-        l = ldl * (1.0 - lrcross) + rdl * lrcross;
-        r = rdl * (1.0 - lrcross) + ldl * lrcross;
+        l = ldl * (1.0 - lrcross.getValue()) + rdl * lrcross.getValue();
+        r = rdl * (1.0 - lrcross.getValue()) + ldl * lrcross.getValue();
+        lrcross.advanceValue();
         ldl = l;
         rdl = r;
 
         efxoutl[i] = ldl * 2.0f - 1e-20f; // anti-denormal - a very, very, very
         efxoutr[i] = rdl * 2.0f - 1e-20f; // small dc bias
 
-        ldl = smpsl[i] * pangainL - ldl * fb;
-        rdl = smpsr[i] * pangainR - rdl * fb;
+        ldl = smpsl[i] * pangainL.getAndAdvanceValue() - ldl * fb.getValue();
+        rdl = smpsr[i] * pangainR.getAndAdvanceValue() - rdl * fb.getValue();
+        fb.advanceValue();
 
         // LowPass Filter
-        ldelay[kl] = ldl = ldl * hidamp + oldl * (1.0f - hidamp);
-        rdelay[kr] = rdl = rdl * hidamp + oldr * (1.0f - hidamp);
+        ldelay[kl] = ldl = ldl * hidamp.getValue() + oldl * (1.0f - hidamp.getValue());
+        rdelay[kr] = rdl = rdl * hidamp.getValue() + oldr * (1.0f - hidamp.getValue());
+        hidamp.advanceValue();
         oldl = ldl;
         oldr = rdl;
 
@@ -139,11 +142,15 @@ void Echo::setvolume(unsigned char Pvolume_)
     Pvolume = Pvolume_;
     if (insertion == 0)
     {
-        outvolume = powf(0.01f, (1.0f - Pvolume / 127.0f)) * 4.0f;
-        volume = 1.0f;
+        outvolume.setTargetValue(powf(0.01f, (1.0f - Pvolume / 127.0f)) * 4.0f);
+        volume.setTargetValue(1.0f);
     }
     else
-        volume = outvolume = Pvolume / 127.0f;
+    {
+        float tmp = Pvolume / 127.0f;
+        volume.setTargetValue(tmp);
+        outvolume.setTargetValue(tmp);
+    }
     if (Pvolume == 0)
         cleanup();
 }
@@ -172,14 +179,14 @@ void Echo::setlrdelay(unsigned char Plrdelay_)
 void Echo::setfb(unsigned char Pfb_)
 {
     Pfb = Pfb_;
-    fb = Pfb / 128.0f;
+    fb.setTargetValue(Pfb / 128.0f);
 }
 
 
 void Echo::sethidamp(unsigned char Phidamp_)
 {
     Phidamp = Phidamp_;
-    hidamp = 1.0 - Phidamp / 127.0f;
+    hidamp.setTargetValue(1.0 - Phidamp / 127.0f);
 }
 
 

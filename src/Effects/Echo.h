@@ -61,7 +61,7 @@ class Echo : public Effect
         void sethidamp(unsigned char Phidamp_);
 
         // Real Parameters
-        float fb, hidamp;
+        InterpolatedParameter fb, hidamp;
         int dl, dr, delay, lrdelay;
 
         void initdelays(void);

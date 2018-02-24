@@ -27,6 +27,36 @@
 
 #include "Params/FilterParams.h"
 
+class InterpolatedParameter
+{
+    public:
+        InterpolatedParameter();
+        static void setSampleRate(float sampleRate);
+        void setInterpolationLength(float msecs);
+        void setTargetValue(float value);
+        float getValue() const
+        {
+            return currentValue;
+        }
+        float getTargetValue() const
+        {
+            return targetValue;
+        }
+        // Get value and advance to the next sample.
+        float getAndAdvanceValue();
+        // Advance to next sample(s) without getting value.
+        void advanceValue();
+        void advanceValue(int samples);
+
+    private:
+        static float sampleRate;
+
+        float targetValue;
+        float currentValue;
+        float samplesLeft;
+        float samplesToInterpolate;
+};
+
 class Effect
 {
     public:
@@ -44,8 +74,8 @@ class Effect
         unsigned char Ppreset; // Currentl preset
         float *const efxoutl;
         float *const efxoutr;
-        float outvolume;
-        float volume;
+        InterpolatedParameter outvolume;
+        InterpolatedParameter volume;
         FilterParams *filterpars;
 
     protected:
@@ -54,10 +84,10 @@ class Effect
 
         bool  insertion;
         char  Ppanning;
-        float pangainL;
-        float pangainR;
+        InterpolatedParameter pangainL;
+        InterpolatedParameter pangainR;
         char  Plrcross; // L/R mix
-        float lrcross;
+        InterpolatedParameter lrcross;
 };
 
 #endif

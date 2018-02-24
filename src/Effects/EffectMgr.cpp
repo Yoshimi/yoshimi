@@ -44,6 +44,7 @@ EffectMgr::EffectMgr(const bool insertion_, SynthEngine *_synth) :
     efxoutr = (float*)fftwf_malloc(synth->bufferbytes);
     memset(efxoutl, 0, synth->bufferbytes);
     memset(efxoutr, 0, synth->bufferbytes);
+    InterpolatedParameter::setSampleRate(synth->samplerate_f);
     defaults();
 }
 
@@ -212,8 +213,6 @@ void EffectMgr::out(float *smpsl, float *smpsr)
     memset(efxoutr, 0, synth->sent_bufferbytes);
     efx->out(smpsl, smpsr);
 
-    float volume = efx->volume;
-
     if (nefx == 7)
     {   // this is need only for the EQ effect
         memcpy(smpsl, efxoutl, synth->sent_bufferbytes);
@@ -224,31 +223,30 @@ void EffectMgr::out(float *smpsl, float *smpsr)
     // Insertion effect
     if (insertion != 0)
     {
-        float v1, v2;
-        if (volume < 0.5f)
+        for (int i = 0; i < synth->sent_buffersize; ++i)
         {
-            v1 = 1.0f;
-            v2 = volume * 2.0f;
-        } else {
-            v1 = (1.0f - volume) * 2.0f;
-            v2 = 1.0f;
-        }
-        if (nefx == 1 || nefx==2)
-            v2 *= v2; // for Reverb and Echo, the wet function is not liniar
-
-        if (dryonly)
-        {   // this is used for instrument effect only
-            for (int i = 0; i < synth->sent_buffersize; ++i)
+            float volume = efx->volume.getAndAdvanceValue();
+            float v1, v2;
+            if (volume < 0.5f)
             {
+                v1 = 1.0f;
+                v2 = volume * 2.0f;
+            } else {
+                v1 = (1.0f - volume) * 2.0f;
+                v2 = 1.0f;
+            }
+            if (nefx == 1 || nefx==2)
+                v2 *= v2; // for Reverb and Echo, the wet function is not liniar
+
+            if (dryonly)
+            {
+                // this is used for instrument effect only
                 smpsl[i] *= v1;
                 smpsr[i] *= v1;
                 efxoutl[i] *= v2;
                 efxoutr[i] *= v2;
-            }
-        } else {
-            // normal instrument/insertion effect
-            for (int i = 0; i < synth->sent_buffersize; ++i)
-            {
+            } else {
+                // normal instrument/insertion effect
                 smpsl[i] = smpsl[i] * v1 + efxoutl[i] * v2;
                 smpsr[i] = smpsr[i] * v1 + efxoutr[i] * v2;
             }
@@ -256,6 +254,7 @@ void EffectMgr::out(float *smpsl, float *smpsr)
     } else { // System effect
         for (int i = 0; i < synth->sent_buffersize; ++i)
         {
+            float volume = efx->volume.getAndAdvanceValue();
             efxoutl[i] *= 2.0f * volume;
             efxoutr[i] *= 2.0f * volume;
             smpsl[i] = efxoutl[i];
@@ -268,7 +267,8 @@ void EffectMgr::out(float *smpsl, float *smpsr)
 // Get the effect volume for the system effect
 float EffectMgr::sysefxgetvolume(void)
 {
-    return (!efx) ? 1.0f : efx->outvolume;
+    // No interpolation for system effect currently (direct target value).
+    return (!efx) ? 1.0f : efx->outvolume.getTargetValue();
 }
 
 

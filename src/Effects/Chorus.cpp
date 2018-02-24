@@ -106,8 +106,9 @@ void Chorus::out(float *smpsl, float *smpsr)
         tmpL = smpsl[i];
         tmpR = smpsr[i];
         // LRcross
-        inL = tmpL * (1.0f - lrcross) + tmpR * lrcross;
-        inR = tmpR * (1.0f - lrcross) + tmpL * lrcross;
+        inL = tmpL * (1.0f - lrcross.getValue()) + tmpR * lrcross.getValue();
+        inR = tmpR * (1.0f - lrcross.getValue()) + tmpL * lrcross.getValue();
+        lrcross.advanceValue();
 
         // Left channel
 
@@ -123,7 +124,7 @@ void Chorus::out(float *smpsl, float *smpsr)
         dlhi2 = (dlhi - 1 + maxdelay) % maxdelay;
         dllo = 1.0f - fmodf(tmp, one);
         efxoutl[i] = delayl[dlhi2] * dllo + delayl[dlhi] * (1.0f - dllo);
-        delayl[dlk] = inL + efxoutl[i] * fb;
+        delayl[dlk] = inL + efxoutl[i] * fb.getValue();
 
         // Right channel
 
@@ -138,7 +139,9 @@ void Chorus::out(float *smpsl, float *smpsr)
         dlhi2 = (dlhi - 1 + maxdelay) % maxdelay;
         dllo = 1.0f - fmodf(tmp, one);
         efxoutr[i] = delayr[dlhi2] * dllo + delayr[dlhi] * (1.0f - dllo);
-        delayr[dlk] = inR + efxoutr[i] * fb;
+        delayr[dlk] = inR + efxoutr[i] * fb.getValue();
+
+        fb.advanceValue();
     }
 
     if (Poutsub)
@@ -150,8 +153,8 @@ void Chorus::out(float *smpsl, float *smpsr)
 
     for (int i = 0; i < synth->sent_buffersize; ++i)
     {
-        efxoutl[i] *= pangainL;
-        efxoutr[i] *= pangainR;
+        efxoutl[i] *= pangainL.getAndAdvanceValue();
+        efxoutr[i] *= pangainR.getAndAdvanceValue();
     }
 }
 
@@ -182,15 +185,15 @@ void Chorus::setdelay(unsigned char Pdelay_)
 void Chorus::setfb(unsigned char Pfb_)
 {
     Pfb = Pfb_;
-    fb = (Pfb - 64.0f) / 64.1f;
+    fb.setTargetValue((Pfb - 64.0f) / 64.1f);
 }
 
 
 void Chorus::setvolume(unsigned char Pvolume_)
 {
     Pvolume = Pvolume_;
-    outvolume = Pvolume / 127.0f;
-    volume = (!insertion) ? 1.0f : outvolume;
+    outvolume.setTargetValue(Pvolume / 127.0f);
+    volume.setTargetValue((!insertion) ? 1.0f : outvolume.getValue());
 }
 
 

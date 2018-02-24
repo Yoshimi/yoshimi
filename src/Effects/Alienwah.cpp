@@ -86,7 +86,7 @@ void Alienwah::out(float *smpsl, float *smpsr)
         tmp = clfol * x + oldclfol * x1;
 
         out = tmp * oldl[oldk];
-        out += (1 - abs(fb)) * smpsl[i] * pangainL;
+        out += (1 - abs(fb)) * smpsl[i] * pangainL.getAndAdvanceValue();
 
         oldl[oldk] = out;
         float l = out.real() * 10.0f * (fb + 0.1f);
@@ -95,7 +95,7 @@ void Alienwah::out(float *smpsl, float *smpsr)
         tmp = clfor * x + oldclfor * x1;
 
         out = tmp * oldr[oldk];
-        out += (1 - abs(fb)) * smpsr[i] * pangainR;
+        out += (1 - abs(fb)) * smpsr[i] * pangainR.getAndAdvanceValue();
 
         oldr[oldk] = out;
         float r = out.real() * 10.0f * (fb + 0.1f);
@@ -103,8 +103,9 @@ void Alienwah::out(float *smpsl, float *smpsr)
         if (++oldk >= Pdelay)
             oldk = 0;
         // LRcross
-        efxoutl[i] = l * (1.0f - lrcross) + r * lrcross;
-        efxoutr[i] = r * (1.0f - lrcross) + l * lrcross;
+        efxoutl[i] = l * (1.0f - lrcross.getValue()) + r * lrcross.getValue();
+        efxoutr[i] = r * (1.0f - lrcross.getValue()) + l * lrcross.getValue();
+        lrcross.advanceValue();
     }
     oldclfol = clfol;
     oldclfor = clfor;
@@ -145,11 +146,12 @@ void Alienwah::setfb(unsigned char _fb)
 void Alienwah::setvolume(unsigned char _volume)
 {
     Pvolume = _volume;
-    outvolume = Pvolume / 127.0f;
+    float tmp = Pvolume / 127.0f;
+    outvolume.setTargetValue(tmp);
     if (insertion == 0)
-        volume = 1.0f;
+        volume.setTargetValue(1.0f);
     else
-        volume = outvolume;
+        volume.setTargetValue(tmp);
 }
 
 

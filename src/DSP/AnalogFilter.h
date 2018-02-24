@@ -44,6 +44,9 @@ class AnalogFilter : public Filter_, private MiscFuncs
         void settype(int type_);
         void setgain(float dBgain);
         void setstages(int stages_);
+        // Request that the next buffer be interpolated. Should be called before
+        // changing parameters so that coefficients can be saved.
+        void interpolatenextbuffer();
         void cleanup();
 
         float H(float freq); // Obtains the response for a given frequency
@@ -72,7 +75,7 @@ class AnalogFilter : public Filter_, private MiscFuncs
         float oldc[3], oldd[3]; // old coefficients(used only if some filter paremeters changes very fast, and it needs interpolation)
 
         float xd[3], yd[3]; // used if the filter is applied more times
-        int needsinterpolation, firsttime;
+        bool needsinterpolation, firsttime;
         int abovenq;    // this is 1 if the frequency is above the nyquist
         int oldabovenq; // if the last time was above nyquist (used to see if it needs interpolation)
 

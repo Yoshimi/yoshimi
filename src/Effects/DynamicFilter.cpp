@@ -46,7 +46,6 @@ static const char presets[NUM_PRESETS][PRESET_SIZE] = {
 DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, new FilterParams(0, 64, 64, 0, _synth), 0),
     lfo(_synth),
-    Pvolume(110),
     Pdepth(0),
     Pampsns(90),
     Pampsnsinv(0),
@@ -55,6 +54,7 @@ DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_, 
     filterr(NULL),
     synth(_synth)
 {
+    setvolume(110);
     setpreset(Ppreset);
     changepar(1, 64); // pan
     cleanup();
@@ -111,8 +111,8 @@ void DynamicFilter::out(float *smpsl, float *smpsr)
     // panning
     for (int i = 0; i < synth->sent_buffersize; ++i)
     {
-        efxoutl[i] *= pangainL;
-        efxoutr[i] *= pangainR;
+        efxoutl[i] *= pangainL.getAndAdvanceValue();
+        efxoutr[i] *= pangainR.getAndAdvanceValue();
     }
 }
 
@@ -136,11 +136,12 @@ void DynamicFilter::setdepth(unsigned char Pdepth_)
 void DynamicFilter::setvolume(unsigned char Pvolume_)
 {
     Pvolume = Pvolume_;
-    outvolume = Pvolume / 127.0f;
+    float tmp = Pvolume / 127.0f;
+    outvolume.setTargetValue(tmp);
     if (!insertion)
-        volume = 1.0f;
+        volume.setTargetValue(1.0f);
     else
-        volume = outvolume;
+        volume.setTargetValue(tmp);
 }
 
 
