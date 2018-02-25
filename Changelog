@@ -1,10 +1,14 @@
 yoshimi 1.5.6 M
 
+2018-2-25
+* Merged in effects interpolations from Kristian.
+* Changed instrument name font to Helvetica (not bold).
+
 2018-2-23 Will
 * Reverted LV2 buffer size change pending investigation.
   was commit: cf7c6e746239e90069a599a966aecbd5ba4f9f6e
 * Distortion and Alienwah limits now track preset number.
-* Remaing effects linits now track preset number.
+* Remaining effects limits now track preset number.
 
 2018-2-21 Will
 * Implemented note on/off test routines.

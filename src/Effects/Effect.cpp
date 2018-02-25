@@ -26,7 +26,7 @@
 
 #define DEFAULT_PARAM_INTERPOLATION_LENGTH_MSECS 10.0f
 
-float InterpolatedParameter::sampleRate = 44100;
+float InterpolatedParameter::sampleRate = 0;
 
 InterpolatedParameter::InterpolatedParameter() :
     targetValue(0.5f),

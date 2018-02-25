@@ -317,21 +317,10 @@ void AnalogFilter::setfreq(float frequency)
 
     int nyquistthresh = (abovenq ^ oldabovenq);
 
-    if (needsinterpolation || rap > 3.0f || nyquistthresh != 0)
+    if (!firsttime && (rap > 3.0f || nyquistthresh != 0))
     {   // if the frequency is changed fast, it needs interpolation
         // (now, filter and coeficients backup)
-        for (int i = 0; i < 3; ++i)
-        {
-            oldc[i] = c[i];
-            oldd[i] = d[i];
-        }
-        for (int i = 0; i < MAX_FILTER_STAGES + 1; ++i)
-        {
-            oldx[i] = x[i];
-            oldy[i] = y[i];
-        }
-        if (!firsttime)
-            needsinterpolation = true;
+        interpolatenextbuffer();
     }
     freq = frequency;
     computefiltercoefs();
@@ -378,6 +367,22 @@ void AnalogFilter::setstages(int stages_)
 
 void AnalogFilter::interpolatenextbuffer()
 {
+    if (needsinterpolation)
+        // Don't repeat the coefficient saving, because if interpolation was
+        // requested due to multiple parameters, some values may already have
+        // changed. The oldest coefficient are the correct ones, basically.
+        return;
+
+    for (int i = 0; i < 3; ++i)
+    {
+        oldc[i] = c[i];
+        oldd[i] = d[i];
+    }
+    for (int i = 0; i < MAX_FILTER_STAGES + 1; ++i)
+    {
+        oldx[i] = x[i];
+        oldy[i] = y[i];
+    }
     needsinterpolation = true;
 }
 

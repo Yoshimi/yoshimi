@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 This file is derivative of ZynAddSubFX original code.
 
 Modified February 2018
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -386,7 +386,7 @@ class PartKitItem {: {public Fl_Group}
   }
 }
 
-class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
@@ -397,6 +397,12 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
         xywh {0 0 378 168}
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
+        Fl_Button {} {
+          label Edit
+          callback {//
+          instrumenteditwindow->show();}
+          xywh {330 6 40 22} box PLASTIC_UP_BOX color 22 labelfont 1 labelsize 12
+        }
         Fl_Box instrumentaddbox {
           xywh {136 9 63 16} box FLAT_BOX
         }
@@ -407,7 +413,7 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
           xywh {262 9 63 16} box FLAT_BOX
         }
         Fl_Button instrumentlabel {
-          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 7 192 20} box THIN_DOWN_FRAME labelfont 9 labelsize 12 align 16
+          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 7 192 20} box THIN_DOWN_FRAME labelsize 12 align 16
           code0 {setinstrumentlabel();}
         }
         Fl_Button buttontop {
@@ -431,12 +437,6 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
               }
           }}
           tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 7 192 20} box THIN_DOWN_FRAME labeltype NO_LABEL labelsize 12 align 16
-        }
-        Fl_Button {} {
-          label Edit
-          callback {//
-          instrumenteditwindow->show();}
-          xywh {330 6 40 22} box PLASTIC_UP_BOX color 22 labelfont 1 labelsize 12
         }
         Fl_Dial velocitysense {
           label {Velocity

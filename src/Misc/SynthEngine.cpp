@@ -1894,6 +1894,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         sent_buffersize = to_process;
         sent_bufferbytes = sent_buffersize * sizeof(float);
         sent_buffersize_f = sent_buffersize;
+        //Runtime.Log("Short Buffer");
     }
 
     memset(mainL, 0, sent_bufferbytes);
