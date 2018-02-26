@@ -223,8 +223,6 @@ Part::~Part()
     }
     fftwf_free(partoutl);
     fftwf_free(partoutr);
-    //fftwf_free(tmpoutl);
-    //fftwf_free(tmpoutr);
     for (int nefx = 0; nefx < NUM_PART_EFX; ++nefx)
     {
         if (partefx[nefx])

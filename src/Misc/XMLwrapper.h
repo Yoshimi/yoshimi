@@ -125,8 +125,8 @@ class XMLwrapper : private MiscFuncs
 
         // opens a file and parse only the "information" data on it
         // returns "true" if all went ok or "false" on errors
-        bool checkfileinformation(const string& filename);
-        bool slowinfosearch(char *xmldata);
+        void checkfileinformation(const string& filename);
+        void slowinfosearch(char *idx);
 
     private:
         char *doloadfile(const string& filename);

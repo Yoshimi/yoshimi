@@ -55,10 +55,6 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
 {
     if (velocity > 1.0f)
         velocity = 1.0f;
-    //tmpwavel = (float*)fftwf_malloc(synth->bufferbytes);
-    //tmpwaver = (float*)fftwf_malloc(synth->bufferbytes);
-    //bypassl = (float*)fftwf_malloc(synth->bufferbytes);
-    //bypassr = (float*)fftwf_malloc(synth->bufferbytes);
 
     // Initialise some legato-specific vars
     Legato.msg = LM_Norm;
@@ -847,10 +843,7 @@ ADnote::~ADnote()
 {
     if (NoteEnabled)
         killNote();
-    //fftwf_free(tmpwavel);
-    //fftwf_free(tmpwaver);
-    //fftwf_free(bypassl);
-    //fftwf_free(bypassr);
+
     for (int k = 0; k < max_unison; ++k)
         fftwf_free(tmpwave_unison[k]);
     delete [] tmpwave_unison;

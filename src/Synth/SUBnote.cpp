@@ -53,9 +53,6 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
 {
     ready = 0;
 
-    //tmpsmp = (float*)fftwf_malloc(synth->bufferbytes);
-    //tmprnd = (float*)fftwf_malloc(synth->bufferbytes);
-
     // Initialise some legato-specific vars
     Legato.msg = LM_Norm;
     Legato.fade.length = (int)truncf(synth->samplerate_f * 0.005f); // 0.005 seems ok.
@@ -280,8 +277,6 @@ SUBnote::~SUBnote()
 {
     if (NoteEnabled)
         KillNote();
-    //fftwf_free(tmpsmp);
-    //fftwf_free(tmprnd);
 }
 
 

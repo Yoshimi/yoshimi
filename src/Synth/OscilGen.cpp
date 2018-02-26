@@ -74,7 +74,6 @@ OscilGen::~OscilGen()
 
 void OscilGen::defaults(void)
 {
-
     oldbasefunc = 0;
     oldbasepar = 64;
     oldhmagtype = 0;

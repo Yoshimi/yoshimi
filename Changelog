@@ -5,6 +5,7 @@ yoshimi 1.5.6 M
 * Optimised part compute.
   Removed unnecessary memory clearing and made per-part
   temporary allocations general ones.
+* Minor code cleanups.
 
 2018-2-25 Will + Kristian
 * Merged in effects interpolations from Kristian.
