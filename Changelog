@@ -1,6 +1,12 @@
 yoshimi 1.5.6 M
 
-2018-2-25
+2018-2-26 Will
+* Added missing attributions to previous commit :(
+* Optimised part compute.
+  Removed unnecessary memory clearing and made per-part
+  temporary allocations general ones.
+
+2018-2-25 Will + Kristian
 * Merged in effects interpolations from Kristian.
 * Changed instrument name font to Helvetica (not bold).
 

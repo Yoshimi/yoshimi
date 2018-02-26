@@ -58,10 +58,6 @@ Part::Part(Microtonal *microtonal_, FFTwrapper *fft_, SynthEngine *_synth) :
     memset(partoutl, 0, synth->bufferbytes);
     partoutr = (float*)fftwf_malloc(synth->bufferbytes);
     memset(partoutr, 0, synth->bufferbytes);
-    tmpoutl = (float*)fftwf_malloc(synth->bufferbytes);
-    memset(tmpoutl, 0, synth->bufferbytes);
-    tmpoutr = (float*)fftwf_malloc(synth->bufferbytes);
-    memset(tmpoutr, 0, synth->bufferbytes);
 
     for (int n = 0; n < NUM_KIT_ITEMS; ++n)
     {
@@ -200,8 +196,6 @@ void Part::cleanup(void)
         KillNotePos(k);
     memset(partoutl, 0, synth->bufferbytes);
     memset(partoutr, 0, synth->bufferbytes);
-    memset(tmpoutl, 0, synth->bufferbytes);
-    memset(tmpoutr, 0, synth->bufferbytes);
 
     for (int nefx = 0; nefx < NUM_PART_EFX; ++nefx)
         partefx[nefx]->cleanup();
@@ -229,8 +223,8 @@ Part::~Part()
     }
     fftwf_free(partoutl);
     fftwf_free(partoutr);
-    fftwf_free(tmpoutl);
-    fftwf_free(tmpoutr);
+    //fftwf_free(tmpoutl);
+    //fftwf_free(tmpoutr);
     for (int nefx = 0; nefx < NUM_PART_EFX; ++nefx)
     {
         if (partefx[nefx])
@@ -955,6 +949,8 @@ void Part::ComputePartSmps(void)
 {
     int k;
     int noteplay; // 0 if there is nothing activated
+    tmpoutl = synth->getRuntime().genMixl;
+    tmpoutr = synth->getRuntime().genMixr;
     for (int nefx = 0; nefx < NUM_PART_EFX + 1; ++nefx)
     {
         memset(partfxinputl[nefx], 0, synth->sent_bufferbytes);
@@ -979,21 +975,18 @@ void Part::ComputePartSmps(void)
             {
                 noteplay++;
                 if (adnote->ready)
-                    adnote->noteout(tmpoutl, tmpoutr);
-                else
                 {
-                    memset(tmpoutl, 0, synth->sent_bufferbytes);
-                    memset(tmpoutr, 0, synth->sent_bufferbytes);
+                    adnote->noteout(tmpoutl, tmpoutr);
+                    for (int i = 0; i < synth->sent_buffersize; ++i)
+                    {   // add the ADnote to part(mix)
+                        partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
+                        partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
+                    }
                 }
                 if (adnote->finished())
                 {
                     delete partnote[k].kititem[item].adnote;
                     partnote[k].kititem[item].adnote = NULL;
-                }
-                for (int i = 0; i < synth->sent_buffersize; ++i)
-                {   // add the ADnote to part(mix)
-                    partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
-                    partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
                 }
             }
             // get from the SUBnote
@@ -1001,16 +994,13 @@ void Part::ComputePartSmps(void)
             {
                 noteplay++;
                 if (subnote->ready)
-                    subnote->noteout(tmpoutl, tmpoutr);
-                else
                 {
-                    memset(tmpoutl, 0, synth->sent_bufferbytes);
-                    memset(tmpoutr, 0, synth->sent_bufferbytes);
-                }
-                for (int i = 0; i < synth->sent_buffersize; ++i)
-                {   // add the SUBnote to part(mix)
-                    partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
-                    partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
+                    subnote->noteout(tmpoutl, tmpoutr);
+                    for (int i = 0; i < synth->sent_buffersize; ++i)
+                    {   // add the SUBnote to part(mix)
+                        partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
+                        partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
+                    }
                 }
                 if (subnote->finished())
                 {
@@ -1025,21 +1015,16 @@ void Part::ComputePartSmps(void)
                 if (padnote->ready)
                 {
                     padnote->noteout(tmpoutl, tmpoutr);
-                }
-                else
-                {
-                    memset(tmpoutl, 0, synth->sent_bufferbytes);
-                    memset(tmpoutr, 0, synth->sent_bufferbytes);
+                    for (int i = 0 ; i < synth->sent_buffersize; ++i)
+                    {   // add the PADnote to part(mix)
+                        partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
+                        partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
+                    }
                 }
                 if (padnote->finished())
                 {
                     delete partnote[k].kititem[item].padnote;
                     partnote[k].kititem[item].padnote = NULL;
-                }
-                for (int i = 0 ; i < synth->sent_buffersize; ++i)
-                {   // add the PADnote to part(mix)
-                    partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
-                    partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
                 }
             }
         }
@@ -1091,9 +1076,6 @@ void Part::ComputePartSmps(void)
             partoutl[i] *= tmp;
             partoutr[i] *= tmp;
         }
-        memset(tmpoutl, 0, synth->sent_bufferbytes);
-        memset(tmpoutr, 0, synth->sent_bufferbytes);
-
         for (int k = 0; k < POLIPHONY; ++k)
             KillNotePos(k);
         killallnotes = 0;

@@ -198,6 +198,10 @@ class Config : public MiscFuncs
         float *genTmp3;
         float *genTmp4;
 
+        // as above but for part and sys effect
+        float *genMixl;
+        float *genMixr;
+
     private:
         void loadCmdArgs(int argc, char **argv);
         void defaultPresets(void);

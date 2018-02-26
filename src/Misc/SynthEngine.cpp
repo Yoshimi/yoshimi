@@ -111,8 +111,6 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     microtonal(this),
     fft(NULL),
     muted(0),
-    tmpmixl(NULL),
-    tmpmixr(NULL),
     processLock(NULL),
     stateXMLtree(NULL),
     guiMaster(NULL),
@@ -163,10 +161,11 @@ SynthEngine::~SynthEngine()
     if (Runtime.genTmp4)
         fftwf_free(Runtime.genTmp4);
 
-    if (tmpmixl)
-        fftwf_free(tmpmixl);
-    if (tmpmixr)
-        fftwf_free(tmpmixr);
+    if (Runtime.genMixl)
+        fftwf_free(Runtime.genMixl);
+    if (Runtime.genMixr)
+        fftwf_free(Runtime.genMixr);
+
     if (fft)
         delete fft;
     pthread_mutex_destroy(&processMutex);
@@ -199,6 +198,10 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     Runtime.genTmp2 = (float*)fftwf_malloc(bufferbytes);
     Runtime.genTmp3 = (float*)fftwf_malloc(bufferbytes);
     Runtime.genTmp4 = (float*)fftwf_malloc(bufferbytes);
+
+    // similar to above but for parts
+    Runtime.genMixl = (float*)fftwf_malloc(bufferbytes);
+    Runtime.genMixr = (float*)fftwf_malloc(bufferbytes);
 
     oscilsize_f = oscilsize = Runtime.Oscilsize;
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
@@ -244,14 +247,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     if (!(fft = new FFTwrapper(oscilsize)))
     {
         Runtime.Log("SynthEngine failed to allocate fft");
-        goto bail_out;
-    }
-
-    tmpmixl = (float*)fftwf_malloc(bufferbytes);
-    tmpmixr = (float*)fftwf_malloc(bufferbytes);
-    if (!tmpmixl || !tmpmixr)
-    {
-        Runtime.Log("SynthEngine tmpmix allocations failed");
         goto bail_out;
     }
 
@@ -355,14 +350,6 @@ bail_out:
     if (fft)
         delete fft;
     fft = NULL;
-
-    if (tmpmixl)
-        fftwf_free(tmpmixl);
-    tmpmixl = NULL;
-
-    if (tmpmixr)
-        fftwf_free(tmpmixr);
-    tmpmixr = NULL;
 
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
@@ -1885,6 +1872,8 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
     float *mainL = outl[NUM_MIDI_PARTS]; // tiny optimisation
     float *mainR = outr[NUM_MIDI_PARTS]; // makes code clearer
 
+    float *tmpmixl = Runtime.genMixl;
+    float *tmpmixr = Runtime.genMixr;
     sent_buffersize = buffersize;
     sent_bufferbytes = bufferbytes;
     sent_buffersize_f = buffersize_f;
@@ -1973,7 +1962,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             if (!sysefx[nefx]->geteffect())
                 continue; // is disabled
 
-            // Clean up the samples used by the system effects
+            // Clear the samples used by the system effects
             memset(tmpmixl, 0, sent_bufferbytes);
             memset(tmpmixr, 0, sent_bufferbytes);
 
