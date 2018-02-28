@@ -3,6 +3,11 @@ yoshimi 1.5.6 M
 2018-2-28 Will
 * Implemented defaults for part author and copyright.
   Normal left button loads, Ctrl + left button saves.
+* Implmented shortcuts for add, sub, pad editors.
+  Left key - only if enabled.
+  Right key - enables and opens.
+  Individual voices not done yet.
+* Implmented shortcuts for part kit and effects.
 
 2018-2-26 Will
 * Added missing attributions to previous commit :(

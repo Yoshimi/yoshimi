@@ -400,7 +400,65 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
         Fl_Button {} {
           label Edit
           callback {//
-          instrumenteditwindow->show();}
+switch(lastkey)
+{
+    case 97: // a
+        if (Fl::event_button() == 3)
+        {
+            send_data(8, 1, 0xc8, 0xff, 0);
+            adsynenabledcheck->value(1);
+        }
+
+        lastkey = -1;
+        if (adsynenabledcheck->value() == 1)
+        {
+            showparameters(0,0);
+            checkEngines();
+            seteditname();
+        }
+        break;
+    case 115: // s
+        if (Fl::event_button() == 3)
+        {
+            send_data(8, 1, 0xc8, 0xff, 1);
+            subsynenabledcheck->value(1);
+        }
+        lastkey = -1;
+        if (subsynenabledcheck->value() == 1)
+        {
+        showparameters(0,1);
+        checkEngines();
+        seteditname();
+        }
+        break;
+    case 112: // p
+        if (Fl::event_button() == 3)
+        {
+            send_data(8, 1, 0xc8, 0xff, 2);
+            padsynenabledcheck->value(1);
+        }
+        lastkey = -1;
+        if (padsynenabledcheck->value() == 1)
+        {
+            showparameters(0,2);
+            checkEngines();
+            seteditname();
+            lastkey = -1;
+        }
+        break;
+    case 107: // k
+        lastkey = -1;
+        instrumentkitlist->show();
+        break;
+    case 101: // e
+        lastkey = -1;
+        partfx->show();
+        break;
+    default:
+        lastkey = -1;
+        instrumenteditwindow->show();
+        break;     
+}}
           xywh {330 6 40 22} box PLASTIC_UP_BOX color 22 labelfont 1 labelsize 12
         }
         Fl_Box instrumentaddbox {
@@ -1489,6 +1547,35 @@ send_data(223, 0, 0xd0, 255, 255, 255, param);}
       }
     }
   }
+  Function {handle(int event)} {return_type int
+  } {
+    code {//
+        int ret = Fl_Group::handle(event);
+        switch(event)
+        {
+            case FL_FOCUS:
+            case FL_UNFOCUS:
+                ret = 1;                break;
+            //case FL_SHORTCUT:           // incase widget that isn't ours has focus
+            case FL_KEYDOWN:            // keyboard key pushed
+            //case FL_KEYUP:              // keyboard key released
+            {
+                if (lastkey != Fl::event_key())
+                {
+                    lastkey = Fl::event_key();
+                    //cout << "Key " << lastkey << endl;
+                }
+                break;
+            }
+            case FL_KEYUP:
+            {
+                if (lastkey == Fl::event_key())
+                    lastkey = -1;
+                break;
+            }
+        }
+        return(ret);} {}
+  }
   Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff, int insert = 0xff, int parameter = 0xff, int par2 = 0xff)} {} {
     code {//
     collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, insert, parameter, par2);} {}
@@ -2065,6 +2152,7 @@ send_data(223, 0, 0xd0, 255, 255, 255, param);}
     make_window();
     partgroup->position(this->parent()->x() + 2, this->parent()->y() + 2);
     partgroup->show();
+    lastkey = -1;
     end();} {}
   }
   Function {checkEngines()} {} {
@@ -2327,5 +2415,7 @@ send_data(223, 0, 0xd0, 255, 255, 255, param);}
   decl {int engine;} {private local
   }
   decl {bool partKitOn;} {public local
+  }
+  decl {int lastkey;} {private local
   }
 }
