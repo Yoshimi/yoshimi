@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 This file is derivative of ZynAddSubFX original code.
 
 Modified February 2018
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -386,7 +386,7 @@ class PartKitItem {: {public Fl_Group}
   }
 }
 
-class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
@@ -1213,7 +1213,7 @@ Offset}
     }
     Fl_Window instrumenteditwindow {
       label {Instrument Edit}
-      xywh {950 85 395 360} type Double hide
+      xywh {208 325 395 360} type Double hide
       code0 {seteditname();}
       code1 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());}
     } {
@@ -1222,7 +1222,7 @@ Offset}
       } {
         Fl_Group ADD {
           label ADDsynth
-          xywh {5 245 100 80} box ENGRAVED_FRAME labelfont 1
+          xywh {5 246 100 79} box ENGRAVED_FRAME labelfont 1
         } {
           Fl_Check_Button adsynenabledcheck {
             label Enabled
@@ -1264,7 +1264,7 @@ Offset}
         }
         Fl_Group SUB {
           label SUBsynth
-          xywh {105 245 100 80} box ENGRAVED_FRAME labelfont 1
+          xywh {105 246 100 79} box ENGRAVED_FRAME labelfont 1
         } {
           Fl_Check_Button subsynenabledcheck {
             label Enabled
@@ -1306,7 +1306,7 @@ Offset}
         }
         Fl_Group PAD {
           label PADsynth
-          xywh {205 245 100 80} box ENGRAVED_FRAME labelfont 1
+          xywh {205 246 100 79} box ENGRAVED_FRAME labelfont 1
         } {
           Fl_Check_Button padsynenabledcheck {
             label Enabled
@@ -1366,11 +1366,23 @@ Offset}
       Fl_Group {} {
         xywh {0 5 395 215} box ENGRAVED_FRAME
       } {
-        Fl_Input {} {
+        Fl_Text_Display {} {
           label {Author and Copyright}
+          xywh {171 44 148 4} box NO_BOX labelsize 12
+        }
+        Fl_Button {} {
+          label Default
+          callback {//
+int param = 128;
+if (Fl::event_state(FL_CTRL))
+param = 129;
+send_data(223, 0, 0xd0, 255, 255, 255, param);}
+          tooltip {Load default author & copyright\\n+Ctrl: save current text as default} xywh {327 25 63 20} labelsize 12
+        }
+        Fl_Input copyright {
           callback {//
           part->info.Pauthor = string(o->value());}
-          xywh {5 60 385 50} type Multiline color 26 labelsize 10 align 5
+          xywh {5 49 385 53} type Multiline color 26 labelsize 12 align 9
           code0 {o->maximum_size(MAX_INFO_TEXT_SIZE);}
           code1 {o->value(part->info.Pauthor.c_str());}
         }
@@ -1378,7 +1390,7 @@ Offset}
           label Comments
           callback {//
           part->info.Pcomments = string(o->value());}
-          xywh {5 125 385 90} type Multiline color 26 labelsize 11 align 5
+          xywh {5 123 385 91} type Multiline color 26 labelsize 12 align 5
           code0 {o->maximum_size(MAX_INFO_TEXT_SIZE);}
           code1 {o->value(part->info.Pcomments.c_str());}
         }
@@ -1489,9 +1501,14 @@ Offset}
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
+    unsigned char parameter = getData->data.parameter;
+    unsigned char par2 = getData->data.par2;
 
     bool valBool = (value > 0.5f);
     int valInt = lrint(value);
+    string text;
+    if (par2 < 0xff)
+    	text = miscMsgPop(par2);
 
     // these are specific to the mixer panel
     if (newpart >= *plgroup && newpart < (*plgroup + NUM_MIDI_CHANNELS))
@@ -1977,6 +1994,10 @@ Offset}
         case 222:
             setinstrumentlabel();
             checkEngines();
+            break;
+        case 223:
+            if(parameter == 0)
+                copyright->value(text.c_str());
             break;
         case 224:
             updatecontrollers();

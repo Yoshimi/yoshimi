@@ -1,3 +1,16 @@
+Edit button
++A open adsynth engine
++1 to 8 open voice window
++S open subsynth engine
++P open padsynth engine
+
+Left button only open if enabled
+Right Button enable and open
+
++K open kit window
++E open effects window
+
+
 Unchecking volume in controllers works correctly but still changes the GUI controls :(
 
 Requested: auto 'apply' timer for padsynth.

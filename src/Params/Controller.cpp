@@ -457,6 +457,10 @@ float Controller::getLimits(CommandBlock *getData)
             break;
         case 140:
             break;
+        case 141:
+            max = 1;
+            def = 1;
+            break;
         case 144:
             break;
         case 145:

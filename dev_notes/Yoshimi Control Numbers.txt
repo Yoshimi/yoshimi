@@ -178,6 +178,8 @@ YL : 0 to 127 : 194 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Expression (CC 11)
 YL : 0 to 127 : 197 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Q (CC 71)
 YL : 0 to 127 : 198 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Cutoff (CC 74)
 YL : 0 to 127 : 199 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Master Bandwidth (CC 75)
+Yy : any : 222 : 0 to 63 : 255 : 255 : 255 : 255 : msg No. : Set part instrument name
+Yy : any : 222 : 0 to 63 : 255 : 255 : 255 : 128/129 : 255 : Load/Save default instrument copyright
 Y : any : 224 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Reset all controllers (for this part)
 
 Instrument edit window

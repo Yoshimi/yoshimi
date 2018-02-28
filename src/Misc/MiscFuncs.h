@@ -65,6 +65,8 @@ class MiscFuncs
         string setExtension(string fname, string ext);
         bool copyFile(string source, string destination);
         string localPath(string leaf);
+        bool saveText(string text, string filename);
+        int loadText(string filename);
 
         char *skipSpace(char *buf);
         char *skipChars(char *buf);

@@ -747,6 +747,25 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                             getData->data.parameter &= 0x7f;
                         }
                         break;
+                    case 223: // copyright info
+                        if (write)
+                        {
+                            string name = synth->getRuntime().ConfigDir + "/copyright.txt";
+                            if ((parameter & 0x7f) == 0) // load
+                            {
+                                text = miscMsgPop(loadText(name));
+                                synth->part[npart]->info.Pauthor = text;
+                                guiTo = true;
+                            }
+                            else
+                            {
+                                text = synth->part[npart]->info.Pauthor;
+                                saveText(text, name);
+                            }
+                            getData->data.parameter &= 0x7f;
+                            value = miscMsgPush(text);
+                        }
+                        break;
                 }
             }
             break;
@@ -1781,6 +1800,7 @@ string InterChange::resolvePart(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
+    unsigned char parameter = getData->data.parameter;
     unsigned char par2 = getData->data.par2;
     unsigned char effNum = engine;
 
@@ -2067,6 +2087,15 @@ string InterChange::resolvePart(CommandBlock *getData)
         case 222:
             showValue = false;
             contstr = "Name is: " + miscMsgPop(par2);
+            break;
+        case 223:
+            showValue = false;
+            contstr = "Copyright ";
+            if (parameter == 0)
+                contstr += "load:\n";
+            else
+                contstr += "save:\n";
+            contstr += miscMsgPop(value_int);
             break;
         case 224:
             contstr = "Clear controllers";
