@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of ZynAddSubFX original code.
-    Modified February 2018
+    Modified March 2018
 */
 
 #ifndef SUB_NOTE_PARAMETERS_H
@@ -100,6 +100,8 @@ class SUBnoteParameters : public Presets
 
         unsigned char Phmagtype;    // how the magnitudes are computed
                                     // 0 = linear, 1 = -60dB, 2 = -60dB
+
+        unsigned char PfilterChanged[MAX_SUB_HARMONICS]; // 0 = no, 6 = magnitude, 7 = bandwidth
 
         unsigned char Phmag[MAX_SUB_HARMONICS];   // Magnitudes
 

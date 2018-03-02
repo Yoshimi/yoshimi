@@ -73,6 +73,7 @@ void SUBnoteParameters::defaults(void)
 
     for (int n = 0; n < MAX_SUB_HARMONICS; ++n)
     {
+        PfilterChanged[n] = 0;
         Phmag[n] = 0;
         Phrelbw[n] = 64;
     }

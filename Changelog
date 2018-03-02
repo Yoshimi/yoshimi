@@ -2,6 +2,8 @@ yoshimi 1.5.6 M
 
 2018-3-2 Will
 * Small change to shortcuts.
+* Added entry point for dynamic subnote harmonic change.
+  No idea how to actually change it though :(
 
 2018-2-28 Will
 * Implemented defaults for part author and copyright.

@@ -5,7 +5,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2017, Will Godfrey & others
+    Copyright 2014-2018, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,12 +22,12 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of ZynAddSubFX original code
-    Modified August 2017
+    Modified March 2018
 */
 
 #include <cmath>
 #include <fftw3.h>
-#include <cassert>
+#include <iostream>
 
 #include "Params/SUBnoteParameters.h"
 #include "Params/Controller.h"
@@ -507,6 +507,19 @@ float SUBnote::computerolloff(float freq)
 // Compute Parameters of SUBnote for each tick
 void SUBnote::computecurrentparameters(void)
 {
+    for (int n = 0; n < MAX_SUB_HARMONICS; ++n)
+    {
+        int changed = pars->PfilterChanged[n];
+        if (changed)
+        {
+            if (changed == 6) // magnitude
+                ;
+            else if (changed == 7) // bandwidth
+                ;
+            cout << "Filter changed " << changed << endl;
+            pars->PfilterChanged[n] = 0;
+        }
+    }
     if (FreqEnvelope != NULL
         || BandWidthEnvelope != NULL
         || oldpitchwheel != ctl->pitchwheel.data

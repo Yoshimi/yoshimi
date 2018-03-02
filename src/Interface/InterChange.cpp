@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified February 2018
+    Modified March 2018
 */
 
 #include <iostream>
@@ -5889,6 +5889,8 @@ void InterChange::commandSub(CommandBlock *getData)
 
         if (!write)
             getData->data.value = value;
+        else
+            pars->PfilterChanged[control] = insert;
         return;
     }
 
