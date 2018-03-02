@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified February 2018
+Modified March 2018
 } {selected in_source in_header
 }
 
@@ -386,7 +386,7 @@ class PartKitItem {: {public Fl_Group}
   }
 }
 
-class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
@@ -400,64 +400,82 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
         Fl_Button {} {
           label Edit
           callback {//
-switch(lastkey)
-{
-    case 97: // a
-        if (Fl::event_button() == 3)
-        {
-            send_data(8, 1, 0xc8, 0xff, 0);
-            adsynenabledcheck->value(1);
-        }
-
-        lastkey = -1;
-        if (adsynenabledcheck->value() == 1)
-        {
-            showparameters(0,0);
-            checkEngines();
-            seteditname();
-        }
-        break;
-    case 115: // s
-        if (Fl::event_button() == 3)
-        {
-            send_data(8, 1, 0xc8, 0xff, 1);
-            subsynenabledcheck->value(1);
-        }
-        lastkey = -1;
-        if (subsynenabledcheck->value() == 1)
-        {
-        showparameters(0,1);
-        checkEngines();
-        seteditname();
-        }
-        break;
-    case 112: // p
-        if (Fl::event_button() == 3)
-        {
-            send_data(8, 1, 0xc8, 0xff, 2);
-            padsynenabledcheck->value(1);
-        }
-        lastkey = -1;
-        if (padsynenabledcheck->value() == 1)
-        {
-            showparameters(0,2);
-            checkEngines();
-            seteditname();
+        if (lastkey >= 49 && lastkey <= 56)
+        { // not working yet :(
+            int voiceNum = lastkey - 49;
             lastkey = -1;
+            /*if (Fl::event_button() == 3)
+            {
+                send_data(8, 1, 0xc8, 0xff, 0);
+                adsynenabledcheck->value(1);
+                send_data(129, voiceNum, 0xd8);
+                //synth->getGuiMaster()->partui->adnoteui->advoice->nvoice = voiceNum;
+                //synth->getGuiMaster()->partui->adnoteui->advoice->voiceonbutton->value(1);
+            }
+            if (adsynenabledcheck->value() == 1)
+            {
+                ;
+            }*/
         }
-        break;
-    case 107: // k
-        lastkey = -1;
-        instrumentkitlist->show();
-        break;
-    case 101: // e
-        lastkey = -1;
-        partfx->show();
-        break;
-    default:
-        lastkey = -1;
-        instrumenteditwindow->show();
-        break;     
+        switch(lastkey)
+        {
+            case 97: // a
+                if (Fl::event_button() == 3)
+                {
+                    send_data(8, 1, 0xc8, 0xff, 0);
+                    adsynenabledcheck->value(1);
+                }
+
+                lastkey = -1;
+                if (adsynenabledcheck->value() == 1)
+                {
+                    showparameters(0,0);
+                    checkEngines();
+                    seteditname();
+                }
+                break;
+            case 115: // s
+                if (Fl::event_button() == 3)
+                {
+                    send_data(8, 1, 0xc8, 0xff, 1);
+                    subsynenabledcheck->value(1);
+                }
+                lastkey = -1;
+                if (subsynenabledcheck->value() == 1)
+                {
+                showparameters(0,1);
+                checkEngines();
+                seteditname();
+                }
+                break;
+            case 100: // d
+            case 112: // p
+                if (Fl::event_button() == 3)
+                {
+                    send_data(8, 1, 0xc8, 0xff, 2);
+                    padsynenabledcheck->value(1);
+                }
+                lastkey = -1;
+                if (padsynenabledcheck->value() == 1)
+                {
+                    showparameters(0,2);
+                    checkEngines();
+                    seteditname();
+                    lastkey = -1;
+                }
+                break;
+            case 107: // k
+                lastkey = -1;
+                instrumentkitlist->show();
+                break;
+            case 101: // e
+                lastkey = -1;
+                partfx->show();
+                break;
+            default:
+                lastkey = -1;
+                instrumenteditwindow->show();
+                break;
 }}
           xywh {330 6 40 22} box PLASTIC_UP_BOX color 22 labelfont 1 labelsize 12
         }
@@ -1440,7 +1458,7 @@ send_data(223, 0, 0xd0, 255, 255, 255, param);}
         Fl_Input copyright {
           callback {//
           part->info.Pauthor = string(o->value());}
-          xywh {5 49 385 53} type Multiline color 26 labelsize 12 align 9
+          xywh {5 49 385 55} type Multiline color 26 labelsize 12 align 9
           code0 {o->maximum_size(MAX_INFO_TEXT_SIZE);}
           code1 {o->value(part->info.Pauthor.c_str());}
         }
@@ -1556,7 +1574,7 @@ send_data(223, 0, 0xd0, 255, 255, 255, param);}
             case FL_FOCUS:
             case FL_UNFOCUS:
                 ret = 1;                break;
-            //case FL_SHORTCUT:           // incase widget that isn't ours has focus
+            case FL_SHORTCUT:           // incase widget that isn't ours has focus
             case FL_KEYDOWN:            // keyboard key pushed
             //case FL_KEYUP:              // keyboard key released
             {
