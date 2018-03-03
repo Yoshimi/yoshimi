@@ -507,7 +507,8 @@ float SUBnote::computerolloff(float freq)
 // Compute Parameters of SUBnote for each tick
 void SUBnote::computecurrentparameters(void)
 {
-    for (int n = 0; n < MAX_SUB_HARMONICS; ++n)
+    // disabled till we know what we are doing!
+    /*for (int n = 0; n < MAX_SUB_HARMONICS; ++n)
     {
         int changed = pars->PfilterChanged[n];
         if (changed)
@@ -519,7 +520,7 @@ void SUBnote::computecurrentparameters(void)
             cout << "Filter changed " << changed << endl;
             pars->PfilterChanged[n] = 0;
         }
-    }
+    }*/
     if (FreqEnvelope != NULL
         || BandWidthEnvelope != NULL
         || oldpitchwheel != ctl->pitchwheel.data

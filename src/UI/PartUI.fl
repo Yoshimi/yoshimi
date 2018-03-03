@@ -402,9 +402,8 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
           callback {//
         if (lastkey >= 49 && lastkey <= 56)
         { // not working yet :(
-            int voiceNum = lastkey - 49;
-            lastkey = -1;
-            /*if (Fl::event_button() == 3)
+            /*int voiceNum = lastkey - 49;
+            if (Fl::event_button() == 3)
             {
                 send_data(8, 1, 0xc8, 0xff, 0);
                 adsynenabledcheck->value(1);
@@ -416,6 +415,7 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
             {
                 ;
             }*/
+            lastkey = -1;
         }
         switch(lastkey)
         {

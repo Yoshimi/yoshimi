@@ -14,7 +14,7 @@ There is also an 'activity' LED that flickers when the associated CC/channel is 
 
 From version 1.5.2 some check-boxes, selectors and menus are learnable. These are identified by either a pale blue surround or pale blue buttons. Note that when learning a menu you have to actually make a choice while holding down the Ctrl key.
 
-There is currently a limit of 128 lines.
+There is currently a limit of 200 lines.
 
 
 Editor settings available:
