@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified February 2018
+    Modified March 2018
 */
 
 #include <iostream>
@@ -2759,7 +2759,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 request = 2;
             else if (matchnMove(3, point, "default"))
                 request = 3;
-            else request = 255;
+            else request = 0xff;
         }
         else
         {
@@ -2854,9 +2854,10 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
             putData.data.type = type | request;
         }
         value = synth->interchange.readAllData(&putData);
+        string name = "";
         if (request < 8)
         {
-            string name;
+            //string name;
             switch (request)
             {
                 case 5:
@@ -2868,6 +2869,34 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
                 default:
                     name = "Default ";
                     break;
+            }
+            synth->getRuntime().Log(name + to_string(value));
+        }
+        else if ( part == 240)
+        {
+            switch (control)
+            {
+                case 200:
+                    name = "part " + to_string(int(kit)) + " peak ";
+                    break;
+                case 201:
+                    name = "main ";
+                    if (kit == 0)
+                        name += "L ";
+                    else
+                        name += "R ";
+                    name += "peak ";
+                    break;
+                case 202:
+                    name = "main ";
+                    if (kit == 0)
+                        name += "L ";
+                    else
+                        name += "R ";
+                    name += "RMS ";
+                    break;
+                default:
+                    return 0;
             }
             synth->getRuntime().Log(name + to_string(value));
         }

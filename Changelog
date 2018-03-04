@@ -1,5 +1,8 @@
 yoshimi 1.5.6 M
 
+2018-3-4 Will.
+* CLI direct access can now read VU levels.
+
 2018-3-3 Will
 * Quieted some unused code till it's developed.
 * Small improvements to Add and Pad GUIs.
