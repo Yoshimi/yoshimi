@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified February 2018} {in_source in_header
+Modified March 2018} {selected in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -98,7 +98,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 }
 
-class MasterUI {selected : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1506,7 +1506,7 @@ ZynAddSubFX}
             {
                 RecentParams->activate();
                 setMasterLabel(findleafname(name));
-                refresh_master_ui(1);
+                refresh_master_ui(2);
             }
 
             break;
@@ -1537,7 +1537,7 @@ ZynAddSubFX}
             {
                 vectorui->setLoadLabelRemote(insert, synth->getRuntime().vectordata.Name[insert]);
                 vectorui->recenthistory->activate();
-                refresh_master_ui(2);
+                refresh_master_ui(5);
             }
             break;
 
@@ -1578,8 +1578,12 @@ ZynAddSubFX}
         case 92: // load state
             name = miscMsgPop(par2);
             if (wasFromHere && name.find("FAILED") == 1)
+            {
                 fl_alert("%s",name.c_str());
-            refresh_master_ui(1);
+                refresh_master_ui(1);
+            }
+            else
+                refresh_master_ui(0x14);
             break;
 
         case 93: // save state
@@ -1604,6 +1608,7 @@ ZynAddSubFX}
             resetPartsClip();
             if (midilearnui)
                 midilearnui->Hide();
+            setMasterLabel("-");
             break;
 
         case 128:
@@ -1920,19 +1925,22 @@ ZynAddSubFX}
     microtonalui = new MicrotonalUI(&synth->microtonal, synth);
     if (type & 0x80)
         setMasterLabel(miscMsgPop((type >> 8) & 0xff));
-    else
-        setMasterLabel(findleafname(synth->lastItemSeen(2)));
+    else if (type > 1)
+        setMasterLabel(findleafname(synth->lastItemSeen(type & 0xf)));
     updatesendwindow();
-    updatepanel(type & 1);
-    if (!(type & 2))
+    updatepanel(type > 0);
+    if (type != 5)
         vectorui->RefreshChans();
     bankui->Hide();
     if (synth->getRuntime().toConsole == false)
         Reports->deactivate();
     else
         Reports->activate();
-    if (type & 1)
-        configui->update_config(4);} {}
+    if (type == 0x14)
+    {
+        for (int i = 1; i < 6; ++i)
+            configui->update_config(i);
+    }} {}
   }
   Function {checkmaxparts()} {return_type bool
   } {

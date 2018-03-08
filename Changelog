@@ -1,5 +1,12 @@
 yoshimi 1.5.6 M
 
+2018-308 Will
+* BugFix: Vector control not working.
+  Off by one error :(
+* Improved Vector GUI behaviour.
+* BugFix: Config GUI was getting out of date.
+  New switches and controls not updated with state.
+
 2018-3-4 Will.
 * CLI direct access can now read VU levels.
 

@@ -23,7 +23,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified February 2018
+Modified March 2018
 } {in_source in_header
 }
 
@@ -987,8 +987,14 @@ class ConfigUI {selected : {private MiscFuncs}
             int tmp;
             switch (tabnumber)
             {
-                case 1 : //Main
+                case 1 : // Main
+                    osc_size->value( (int)(logf(synth->getRuntime().Oscilsize / 256.0f - 1.0f) / logf(2.0f)) + 1);
+                    buff_size->value( (int)(logf(synth->getRuntime().Buffersize / 16.0f - 1.0f) / logf(2.0f)) + 1);
+                    pad_interpol->value(synth->getRuntime().Interpolation);
+                    v_keyboard->value(synth->getRuntime().VirKeybLayout);
+                    compression->value(synth->getRuntime().GzipCompression);
                     reports->value(synth->getRuntime().toConsole);
+                    instrument->value(synth->getRuntime().instrumentFormat - 1);
                     break;
 
                 case 2 : // Jack
@@ -1020,6 +1026,7 @@ class ConfigUI {selected : {private MiscFuncs}
                             alsaAudio->value(1);
                             jackAudio->value(0);
                         }
+                        alsaRate->check_none();
                         switch (synth->getRuntime().Samplerate)
                         {
                             case 192000:
@@ -1032,7 +1039,6 @@ class ConfigUI {selected : {private MiscFuncs}
                                 alsaRate->set_checked(4);
                                 break;
                             case 48000:
-                            default:
                                 alsaRate->set_checked(3);
                                 break;
                         }
@@ -1084,12 +1090,21 @@ class ConfigUI {selected : {private MiscFuncs}
                         Epcheck->value(1);
                     }
                     Epend->hide();
+                    enableNRPN->value(synth->getRuntime().enable_NRPN);
+                    ignoreReset->value(synth->getRuntime().ignoreResetCCs);
+                    midiMon->value(synth->getRuntime().monitorCCin);
+                    midiLearned->value(synth->getRuntime().showLearnedCC);
                     break;
 
                 case 5 : // Switches
                     setDefaultState->value(synth->getRuntime().loadDefaultState > 0);
-                    logTimes->value(synth->getRuntime().showTimes > 0);
                     nonFatal->value(synth->getRuntime().hideErrors);
+                    showSplash->value(synth->getRuntime().showSplash);
+                    logTimes->value(synth->getRuntime().showTimes);
+                    logXML->value(synth->getRuntime().logXMLheaders);
+                    saveAllXML->value(synth->getRuntime().xmlmax);
+                    enableGUI->value(synth->getRuntime().showGui);
+                    enableCLI->value(synth->getRuntime().showCLI);
                     break;
     }} {}
   }

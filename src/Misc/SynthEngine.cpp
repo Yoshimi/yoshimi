@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified February 2018
+    Modified March 2018
 */
 
 #define NOLOCKS
@@ -611,15 +611,18 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
     }
     else
     {
+        bool vector = (chan >= 0x80);
         chan &= 0x3f;
         if (chan >= Runtime.NumAvailableParts)
             return; // shouldn't be possible
         minPart = chan;
-        maxPart = chan;
+        maxPart = chan + 1;
+        if (vector)
+            chan &= 0xf;
     }
 
     int npart;
-        //cout << "npart group " << to_string(int(chan)) << endl;
+    //cout << "  min " << minPart<< "  max " << maxPart << "  Rec " << int(part[npart]->Prcvchn) << "  Chan " << int(chan) << endl;
     for (npart = minPart; npart < maxPart; ++ npart)
     {   // Send the controller to all part assigned to the channel
         part[npart]->legatoFading = 0;
@@ -639,7 +642,10 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
                     SetPartKeyMode(npart, mode | 4); // temporary legato
             }
             else
+            {
+                //cout << "type " << int(type) << "  par " << int(par) << endl;
                 part[npart]->SetController(type, par);
+            }
         }
     }
 }
