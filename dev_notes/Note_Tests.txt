@@ -1,0 +1,13 @@
+This is a new test facility for checking note on and note off behaviour. It is disabled by default and enabled at compile time in ccmake as "ReportNotes".
+
+When enabled it continually checks that all notes at their entry to Yoshimi are passed on the the actual note on/off code and reports any differences to the reports console or stdio (whichever is selected).
+
+When working entirely within jack (including LV2) there should be no messages at all, but if using ALSA for either MIDI or audio there will sometimes be a few different depending on the complexity due to the buffering action.
+
+At any time hitting the GUI stop button will report the totals, but bear in mind this report is done *before* the stop cleanup so will show any notes that were still hanging at the time stop was hit.
+
+When you stop playing or a MIDI file has finished is the best time to check. You will then see the totals and there should be none shown as hanging.
+
+The master reset will zero all of these figures.
+
+Yoshimi's virtual keyboard is not supported by this system and will actually produce negative numbers!

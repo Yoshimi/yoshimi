@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009, Alan Calvert
+    Copyright 2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,8 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original
-    Last modified December 2014
+    This file is a derivative of the ZynAddSubFX original.
+
+    Modified February 2018
 */
 
 #ifndef PHASER_H
@@ -115,6 +117,12 @@ class Phaser : public Effect
         float applyPhase(float x, float g, float *old);
 
         SynthEngine *synth;
+};
+
+class Phaserlimit
+{
+    public:
+        float getlimits(CommandBlock *getData);
 };
 
 #endif

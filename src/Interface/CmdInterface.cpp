@@ -1,7 +1,7 @@
 /*
     CmdInterface.cpp
 
-    Copyright 2015-2017, Will Godfrey & others.
+    Copyright 2015-2018, Will Godfrey & others.
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified December 2017
+    Modified March 2018
 */
 
 #include <stdlib.h>
@@ -71,10 +71,11 @@ string toplist [] = {
     "ADD",                      "add paths and files",
     "  Root <s>",               "root path to list",
     "  Bank <s>",               "make new bank in current root",
-    "IMport [s <n1>] <n2> <s>", "import named bank to slot n2 of current root, or Root n1",
+    "IMPort [s <n1>] <n2> <s>", "import named directory to slot n2 of current root, (or 'Root' n1)",
+    "EXPort [s <n1>] <n2> <s>", "export bank at slot n2 of current root, (or 'Root' n1) to named directory",
     "REMove",                   "remove paths, files and entries",
     "  Root <n>",               "de-list root path ID",
-    "  Bank [s <n1>] <n2>",     "delete bank ID n2 (and all instruments) from current root or Root n1",
+    "  Bank [s <n1>] <n2>",     "delete bank ID n2 (and all instruments) from current root (or 'Root' n1)",
     "  MLearn <s> [n]",         "delete midi learned 'ALL' whole list, or '@'(n) line",
     "Set / Read",               "set or read all main parameters",
     "  Part",                   "enter context level",
@@ -2197,6 +2198,18 @@ bool CmdInterface::processAll(char *cCmd)
 
     list<string> msg;
 
+#ifdef REPORT_NOTES_ON_OFF
+    if (matchnMove(3, point, "report")) // note test
+    {
+        cout << "note on sent " << Runtime.noteOnSent << endl;
+        cout << "note on seen " << Runtime.noteOnSeen << endl;
+        cout << "note off sent " << Runtime.noteOffSent << endl;
+        cout << "note off seen " << Runtime.noteOffSeen << endl;
+        cout << "notes hanging sent " << Runtime.noteOnSent - Runtime.noteOffSent << endl;
+        cout << "notes hanging seen " << Runtime.noteOnSeen - Runtime.noteOffSeen << endl;
+        return false;
+    }
+#endif
     if (matchnMove(2, point, "exit"))
     {
         if (Runtime.configChanged)
@@ -2367,8 +2380,13 @@ bool CmdInterface::processAll(char *cCmd)
             reply = what_msg;
         }
     }
-    else if (matchnMove(2, point, "import"))
-    {
+    else if (matchWord(3, point, "import") || matchWord(3, point, "export") )
+    { // need the double test to find which then move along line
+        int type = 0;
+        if (matchnMove(3, point, "import"))
+            type = 60;
+        else if (matchnMove(3, point, "export"))
+            type = 59;
         int root = 255;
         if (matchnMove(1, point, "root"))
         {
@@ -2385,12 +2403,15 @@ bool CmdInterface::processAll(char *cCmd)
         string name = string(point);
         if (root < 0 || (root > 127 && root != 255) || value < 0 || value > 127 || name <="!")
         {
-            replyString = "import";
+            if (type == 60)
+                replyString = "import";
+            else
+                replyString = "export";
             reply = value_msg;
         }
         else
         {
-            sendDirect(value, 64, 60, 0xf0, root, 0xff, 0xff, 0x80, miscMsgPush(name));
+            sendDirect(value, 64, type, 0xf0, root, 0xff, 0xff, 0x80, miscMsgPush(name));
             reply = done_msg;
         }
     }
@@ -2852,17 +2873,24 @@ bool CmdInterface::processAll(char *cCmd)
     }
     else if (matchnMove(6, point, "direct"))
     {
+        unsigned char request;
         float value;
         unsigned char type = 0;
         if (matchnMove(3, point, "limits"))
-            value = FLT_MAX;
-        else if (matchnMove(3, point, "default"))
         {
-            value = FLT_MAX / 1.5f;
-            type = 0x40;
+            value = 0;
+            type = 4;
+            if (matchnMove(3, point, "min"))
+                request = 1;
+            else if (matchnMove(3, point, "max"))
+                request = 2;
+            else if (matchnMove(3, point, "default"))
+                request = 3;
+            else request = 0xff;
         }
         else
         {
+            request = 0xff;
             value = string2float(point);
             if (strchr(point, '.') == NULL)
                 type |= 0x80; // fix as integer
@@ -2909,7 +2937,7 @@ bool CmdInterface::processAll(char *cCmd)
                 }
             }
         }
-        sendDirect(value, type, control, part, kit, engine, insert, param, par2);
+        sendDirect(value, type, control, part, kit, engine, insert, param, par2, request);
         reply = done_msg;
     }
     else
@@ -2923,7 +2951,7 @@ bool CmdInterface::processAll(char *cCmd)
 }
 
 
-int CmdInterface::sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
+int CmdInterface::sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2, unsigned char request)
 {
     if (part != 0xd8) // MIDI learn
         type |= 0x10; // from command line
@@ -2945,48 +2973,62 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
     putData.data.par2 = par2;
     if ((type & 0x40) == 0)
     {
-        synth->interchange.readAllData(&putData);
+        if (request < 8)
+        {
+
+            request |= 4; // set as limits read
+            type &= 0xf8;
+            putData.data.type = type | request;
+        }
+        value = synth->interchange.readAllData(&putData);
+        string name = "";
+        if (request < 8)
+        {
+            //string name;
+            switch (request)
+            {
+                case 5:
+                    name = "Min ";
+                    break;
+                case 6:
+                    name = "Max ";
+                    break;
+                default:
+                    name = "Default ";
+                    break;
+            }
+            synth->getRuntime().Log(name + to_string(value));
+        }
+        else if ( part == 240)
+        {
+            switch (control)
+            {
+                case 200:
+                    name = "part " + to_string(int(kit)) + " peak ";
+                    break;
+                case 201:
+                    name = "main ";
+                    if (kit == 0)
+                        name += "L ";
+                    else
+                        name += "R ";
+                    name += "peak ";
+                    break;
+                case 202:
+                    name = "main ";
+                    if (kit == 0)
+                        name += "L ";
+                    else
+                        name += "R ";
+                    name += "RMS ";
+                    break;
+                default:
+                    return 0;
+            }
+            synth->getRuntime().Log(name + to_string(value));
+        }
         return 0;
     }
-    if (putData.data.value == FLT_MAX)
-    {
-        synth->interchange.resolveReplies(&putData);
-        string name = miscMsgPop(putData.data.par2) + "\n~ ";
-        putData.data.par2 = par2; // restore this
-        synth->interchange.returnLimits(&putData);
-        unsigned char returntype = putData.data.type;
-        short int min = putData.limits.min;
-        short int def = putData.limits.def;
-        short int max = putData.limits.max;
-        if (min > max)
-        {
-            synth->getRuntime().Log("Text: " + miscMsgPop(def));
-            return 0;
-        }
-        if (min == -1 && def == -10 && max == -1)
-        {
-            synth->getRuntime().Log("Unrecognised Control");
-            return 0;
-        }
-        string valuetype = "   Type ";
-        if (returntype & 0x80)
-            valuetype += " integer";
-        else
-            valuetype += " float";
-        if (returntype & 0x40)
-            valuetype += " learnable";
-
-        string deftype;
-        if (def >= 10 || def <= 0)
-            deftype = to_string(lrint(def / 10));
-        else
-            deftype = to_string(float(def / 10.0f) + 0.000001).substr(0,4);
-
-        synth->getRuntime().Log(name + "Min " + to_string(min)  + "   Def " + deftype + "   Max " + to_string(max) + valuetype);
-        return 0;
-    }
-    // next line screws effects :(
-    //synth->interchange.testLimits(&putData);
     if (part == 0xf8 && putData.data.par2 < 0xff && (control == 65 || control == 67 || control == 71))
     {
         synth->getRuntime().Log("In use by " + miscMsgPop(putData.data.par2) );

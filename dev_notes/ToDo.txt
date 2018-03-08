@@ -1,7 +1,21 @@
+Realtime subnote
+
+bw & amp calculations in initfilterbank/initfilter can be copied out to new routine.
+
+In normal sync apply if changed. Later add interpolation.
+Hmmm, looks like we need to do the whole filterbank :(
+Need to find out how long it takes!
+
+Approx 4uS, but it's not as simple as that :(
+
+Edit button
++1 to 8 open addsynth voice window - could be 'interesting' :(
+
+Unchecking volume in controllers works correctly but still changes the GUI controls :(
 
 Requested: auto 'apply' timer for padsynth.
 
-Do a dual scan for banks so that IDd ones are found first, then any new ones picked up on the second scan. This stops known ones being re-ordered.
+Do a dual scan for banks so that IDd ones are found first, then any new ones picked up on the second scan. This stops known ones being re-ordered when 'foreign' entries appear from outside Yoshimi.
 
 Bug! If jack is selected for audio but there are no physical ports Yoshimi quits with CLI warning - should run with gui warning as well or better still loop back to try alsa.
 
@@ -11,11 +25,11 @@ Requested: revise window states so engines etc can be made auto open.
 
 NRPN channels?
 
-Expand midi-learn to include:
+Expand MIDI-learn to include:
     learn groups
     GUI view by group but CLI and running search only by CC & chan
 
-Make NRPN midi learn able to be re-learned.
+Make NRPN MIDI-learn able to be re-learned.
 
 LV2: internal sound banks do not appear to be exposed as LV2 presets
 
@@ -38,7 +52,7 @@ Make things like Echo delay either floats or much higher resolution.
 Consider enabling and disabling tooltips.
 
 Make attempt to start second independent instance open a new one in running yoshimi instead - saves memory and more consistent.
-Also, add command to start new instance from within running Yoshimi
+Also, add CLI command to start new instance from within running Yoshimi
 
 Possible single state file (for standalone) including all currently open instances,
 

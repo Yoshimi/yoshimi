@@ -80,6 +80,14 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
     {
         if (par2 < 1) // zero volume note on.
             event = 0x80;
+
+#ifdef REPORT_NOTES_ON_OFF
+        if (event == 0x80) // note test
+            ++synth->getRuntime().noteOffSent;
+        else
+            ++synth->getRuntime().noteOnSent;
+#endif
+
         if (inSync)
         {
             if (event == 0x80)

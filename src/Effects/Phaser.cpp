@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -20,7 +21,8 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is a derivative of a ZynAddSubFX original.
-    Last modified December 2014
+
+    Modified February 2018
 */
 
 #include "Misc/SynthEngine.h"
@@ -31,6 +33,26 @@
 #define ONE_  0.99999f        // To prevent LFO ever reaching 1.0f for filter stability purposes
 #define ZERO_ 0.00001f        // Same idea as above.
 
+static const int PRESET_SIZE = 15;
+static const int NUM_PRESETS = 12;
+static unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
+        // Phaser
+        // 0   1    2    3  4   5     6   7   8    9 10   11 12  13 14
+        {64, 64, 36,  0,   0, 64,  110, 64,  1,  0,   0, 20, 0, 0,  0 },
+        {64, 64, 35,  0,   0, 88,  40,  64,  3,  0,   0, 20, 0,  0, 0 },
+        {64, 64, 31,  0,   0, 66,  68,  107, 2,  0,   0, 20, 0,  0, 0 },
+        {39, 64, 22,  0,   0, 66,  67,  10,  5,  0,   1, 20, 0,  0, 0 },
+        {64, 64, 20,  0,   1, 110, 67,  78,  10, 0,   0, 20, 0,  0, 0 },
+        {64, 64, 53,  100, 0, 58,  37,  78,  3,  0,   0, 20, 0,  0, 0 },
+        // APhaser
+        // 0   1    2   3   4   5     6   7   8    9 10   11 12  13 14
+        {64, 64, 14,  0,   1, 64,  64,  40,  4,  10,  0, 110,1,  20, 1 },
+        {64, 64, 14,  5,   1, 64,  70,  40,  6,  10,  0, 110,1,  20, 1 },
+        {64, 64, 9,   0,   0, 64,  60,  40,  8,  10,  0, 40, 0,  20, 1 },
+        {64, 64, 14,  10,  0, 64,  45,  80,  7,  10,  1, 110,1,  20, 1 },
+        {25, 64, 127, 10,  0, 64,  25,  16,  8,  100, 0, 25, 0,  20, 1 },
+        {64, 64, 1,   10,  1, 64,  70,  40,  12, 10,  0, 110,1,  20, 1 }
+};
 
 Phaser::Phaser(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
@@ -74,7 +96,7 @@ void Phaser::analog_setup()
     Rconst    = 1.0f + Rmx; // Handle parallel resistor relationship
     C         = 0.00000005f; // 50 nF
     CFs       = 2.0f * synth->samplerate_f * C;
-    invperiod = 1.0f / synth->p_all_buffersize_f;
+    invperiod = 1.0f / synth->sent_all_buffersize_f;
 }
 
 
@@ -145,13 +167,13 @@ void Phaser::AnalogPhase(float *smpsl, float *smpsr)
     oldlgain = modl;
     oldrgain = modr;
 
-   for(int i = 0; i < synth->p_buffersize; ++i)
+   for(int i = 0; i < synth->sent_buffersize; ++i)
    {
         gl += diffl; // Linear interpolation between LFO samples
         gr += diffr;
 
-        float xnl(smpsl[i] * pangainL);
-        float xnr(smpsr[i] * pangainR);
+        float xnl(smpsl[i] * pangainL.getAndAdvanceValue());
+        float xnr(smpsr[i] * pangainR.getAndAdvanceValue());
 
         if(barber)
         {
@@ -171,8 +193,8 @@ void Phaser::AnalogPhase(float *smpsl, float *smpsr)
 
     if(Poutsub)
     {
-        invSignal(efxoutl, synth->p_buffersize);
-        invSignal(efxoutr, synth->p_buffersize);
+        invSignal(efxoutl, synth->sent_buffersize);
+        invSignal(efxoutr, synth->sent_buffersize);
     }
 }
 
@@ -225,14 +247,14 @@ void Phaser::NormalPhase(float *smpsl, float *smpsr)
     rgain = 1.0f - phase * (1.0f - depth) - (1.0f - phase) * rgain * depth;
     rgain = limit(rgain,ZERO_,ONE_);//(rgain > 1.0f) ? 1.0f : rgain;
 
-    for (int i = 0; i < synth->p_buffersize; ++i)
+    for (int i = 0; i < synth->sent_buffersize; ++i)
     {
-        float x = (float)i / synth->p_buffersize_f;
+        float x = (float)i / synth->sent_buffersize_f;
         float x1 = 1.0f - x;
         float gl = lgain * x + oldlgain * x1;
         float gr = rgain * x + oldrgain * x1;
-        float inl = smpsl[i] * pangainL + fbl;
-        float inr = smpsr[i] * pangainR + fbr;
+        float inl = smpsl[i] * pangainL.getAndAdvanceValue() + fbl;
+        float inr = smpsr[i] * pangainR.getAndAdvanceValue() + fbr;
 
         // Phasing routine
         for (int j = 0; j < Pstages * 2; ++j)
@@ -250,8 +272,9 @@ void Phaser::NormalPhase(float *smpsl, float *smpsr)
         // Left/Right crossing
         float l = inl;
         float r = inr;
-        inl = l * (1.0f - lrcross) + r * lrcross;
-        inr = r * (1.0f - lrcross) + l * lrcross;
+        inl = l * (1.0f - lrcross.getValue()) + r * lrcross.getValue();
+        inr = r * (1.0f - lrcross.getValue()) + l * lrcross.getValue();
+        lrcross.advanceValue();
         fbl = inl * fb;
         fbr = inr * fb;
         efxoutl[i] = inl;
@@ -260,7 +283,7 @@ void Phaser::NormalPhase(float *smpsl, float *smpsr)
     oldlgain = lgain;
     oldrgain = rgain;
     if (Poutsub)
-        for (int i = 0; i < synth->p_buffersize; ++i)
+        for (int i = 0; i < synth->sent_buffersize; ++i)
         {
             efxoutl[i] *= -1.0f;
             efxoutr[i] *= -1.0f;
@@ -306,8 +329,9 @@ void Phaser::setfb(unsigned char Pfb_)
 void Phaser::setvolume(unsigned char Pvolume_)
 {
     Pvolume = Pvolume_;
-    outvolume = Pvolume / 127.0f;
-    volume = (!insertion) ? 1.0f : outvolume;
+    float tmp = Pvolume / 127.0f;
+    outvolume.setTargetValue(tmp);
+    volume.setTargetValue((!insertion) ? 1.0f : tmp);
 }
 
 
@@ -360,39 +384,6 @@ void Phaser::setphase(unsigned char Pphase_)
 
 void Phaser::setpreset(unsigned char npreset)
 {
-    const int PRESET_SIZE = 15;
-    const int NUM_PRESETS = 12;
-    unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
-        // Phaser
-        // 0   1    2    3  4   5     6   7   8    9 10   11 12  13 14
-        {64, 64, 36,  0,   0, 64,  110, 64,  1,  0,   0, 20,
-         0, 0,
-         0 },
-        {64, 64, 35,  0,   0, 88,  40,  64,  3,  0,   0, 20, 0,  0,
-         0 },
-        {64, 64, 31,  0,   0, 66,  68,  107, 2,  0,   0, 20, 0,  0,
-         0 },
-        {39, 64, 22,  0,   0, 66,  67,  10,  5,  0,   1, 20, 0,  0,
-         0 },
-        {64, 64, 20,  0,   1, 110, 67,  78,  10, 0,   0, 20, 0,  0,
-         0 },
-        {64, 64, 53,  100, 0, 58,  37,  78,  3,  0,   0, 20, 0,  0,
-         0 },
-        // APhaser
-        // 0   1    2   3   4   5     6   7   8    9 10   11 12  13 14
-        {64, 64, 14,  0,   1, 64,  64,  40,  4,  10,  0, 110,1,  20,
-         1 },
-        {64, 64, 14,  5,   1, 64,  70,  40,  6,  10,  0, 110,1,  20,
-         1 },
-        {64, 64, 9,   0,   0, 64,  60,  40,  8,  10,  0, 40, 0,  20,
-         1 },
-        {64, 64, 14,  10,  0, 64,  45,  80,  7,  10,  1, 110,1,  20,
-         1 },
-        {25, 64, 127, 10,  0, 64,  25,  16,  8,  100, 0, 25, 0,  20,
-         1 },
-        {64, 64, 1,   10,  1, 64,  70,  40,  12, 10,  0, 110,1,  20,
-         1 }
-    };
     if (npreset < 0xf)
     {
         if (npreset >= NUM_PRESETS)
@@ -408,8 +399,6 @@ void Phaser::setpreset(unsigned char npreset)
         if (param == 0xf)
             param = 0;
         changepar(param, presets[preset][param]);
-        if (insertion && (param == 0))
-            changepar(0, presets[preset][0] / 2);
     }
 }
 
@@ -513,3 +502,92 @@ unsigned char Phaser::getpar(int npar)
     }
     return 0;
 }
+
+
+float Phaserlimit::getlimits(CommandBlock *getData)
+{
+    int value = getData->data.value;
+    int control = getData->data.control;
+    int request = getData->data.type & 3; // clear upper bits
+    int presetNum = getData->data.engine;
+    int min = 0;
+    int max = 127;
+
+    int def = presets[presetNum][control];
+    bool canLearn = true;
+    bool isInteger = true;
+    switch (control)
+    {
+        case 0:
+            break;
+        case 1:
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+        case 4:
+            max = 1;
+            canLearn = false;
+            break;
+        case 5:
+            break;
+        case 6:
+            break;
+        case 7:
+            break;
+        case 8:
+            min = 1;
+            max = 12;
+            canLearn = false;
+            break;
+        case 9:
+            break;
+        case 10:
+            canLearn = false;
+            max = 1;
+            break;
+        case 11:
+            break;
+        case 12:
+            canLearn = false;
+            max = 1;
+            break;
+        case 13:
+            break;
+        case 14:
+            max = 1;
+            canLearn = false;
+            break;
+        case 16:
+            max = 11;
+            canLearn = false;
+            break;
+        default:
+            getData->data.type |= 4; // error
+            return 1.0f;
+            break;
+    }
+
+    switch(request)
+    {
+        case 0:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+            break;
+        case 1:
+            value = min;
+            break;
+        case 2:
+            value = max;
+            break;
+        case 3:
+            value = def;
+            break;
+    }
+    getData->data.type |= (canLearn * 64 + isInteger * 128);
+    return float(value);
+}
+

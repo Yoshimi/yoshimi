@@ -11,7 +11,7 @@ comment {PartUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2017, Will Godfrey
+Copyright 2014-2018, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -29,8 +29,8 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified December 2017
-} {in_source in_header
+Modified March 2018
+} {selected in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -386,7 +386,7 @@ class PartKitItem {: {public Fl_Group}
   }
 }
 
-class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
@@ -397,6 +397,88 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
         xywh {0 0 378 168}
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
+        Fl_Button {} {
+          label Edit
+          callback {//
+        if (lastkey >= 49 && lastkey <= 56)
+        { // not working yet :(
+            /*int voiceNum = lastkey - 49;
+            if (Fl::event_button() == 3)
+            {
+                send_data(8, 1, 0xc8, 0xff, 0);
+                adsynenabledcheck->value(1);
+                send_data(129, voiceNum, 0xd8);
+                //synth->getGuiMaster()->partui->adnoteui->advoice->nvoice = voiceNum;
+                //synth->getGuiMaster()->partui->adnoteui->advoice->voiceonbutton->value(1);
+            }
+            if (adsynenabledcheck->value() == 1)
+            {
+                ;
+            }*/
+            lastkey = -1;
+        }
+        switch(lastkey)
+        {
+            case 97: // a
+                if (Fl::event_button() == 3)
+                {
+                    send_data(8, 1, 0xc8, 0xff, 0);
+                    adsynenabledcheck->value(1);
+                }
+
+                lastkey = -1;
+                if (adsynenabledcheck->value() == 1)
+                {
+                    showparameters(0,0);
+                    checkEngines();
+                    seteditname();
+                }
+                break;
+            case 115: // s
+                if (Fl::event_button() == 3)
+                {
+                    send_data(8, 1, 0xc8, 0xff, 1);
+                    subsynenabledcheck->value(1);
+                }
+                lastkey = -1;
+                if (subsynenabledcheck->value() == 1)
+                {
+                showparameters(0,1);
+                checkEngines();
+                seteditname();
+                }
+                break;
+            case 100: // d
+            case 112: // p
+                if (Fl::event_button() == 3)
+                {
+                    send_data(8, 1, 0xc8, 0xff, 2);
+                    padsynenabledcheck->value(1);
+                }
+                lastkey = -1;
+                if (padsynenabledcheck->value() == 1)
+                {
+                    showparameters(0,2);
+                    checkEngines();
+                    seteditname();
+                    lastkey = -1;
+                }
+                break;
+            case 107: // k
+                lastkey = -1;
+                instrumentkitlist->show();
+                break;
+            case 101: // e
+                lastkey = -1;
+                partfx->show();
+                break;
+            default:
+                lastkey = -1;
+                instrumenteditwindow->show();
+                break;
+}}
+          xywh {330 6 40 22} box PLASTIC_UP_BOX color 22 labelfont 1 labelsize 12
+        }
         Fl_Box instrumentaddbox {
           xywh {136 9 63 16} box FLAT_BOX
         }
@@ -406,11 +488,11 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
         Fl_Box instrumentpadbox {
           xywh {262 9 63 16} box FLAT_BOX
         }
-        Fl_Text_Display instrumentlabel {
-          comment {We need this to stop the text ovewriting without the background redrawn}
-          xywh {134 24 192 1} box NO_BOX labelfont 1 labelsize 12 align 65 textsize 12
+        Fl_Button instrumentlabel {
+          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 7 192 20} box THIN_DOWN_FRAME labelsize 12 align 16
+          code0 {setinstrumentlabel();}
         }
-        Fl_Button instrumentlab {
+        Fl_Button buttontop {
           callback {//
           int event = Fl::event_button();
           const char *tmp = NULL;
@@ -430,14 +512,7 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
                   }
               }
           }}
-          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 7 192 20} box THIN_DOWN_FRAME labelfont 1 labelsize 12 align 16
-          code0 {setinstrumentlabel();}
-        }
-        Fl_Button {} {
-          label Edit
-          callback {//
-          instrumenteditwindow->show();}
-          xywh {330 6 40 22} box PLASTIC_UP_BOX color 22 labelfont 1 labelsize 12
+          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 7 192 20} box THIN_DOWN_FRAME labeltype NO_LABEL labelsize 12 align 16
         }
         Fl_Dial velocitysense {
           label {Velocity
@@ -1214,7 +1289,7 @@ Offset}
     }
     Fl_Window instrumenteditwindow {
       label {Instrument Edit}
-      xywh {950 85 395 360} type Double hide
+      xywh {208 325 395 360} type Double hide
       code0 {seteditname();}
       code1 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());}
     } {
@@ -1223,7 +1298,7 @@ Offset}
       } {
         Fl_Group ADD {
           label ADDsynth
-          xywh {5 245 100 80} box ENGRAVED_FRAME labelfont 1
+          xywh {5 246 100 79} box ENGRAVED_FRAME labelfont 1
         } {
           Fl_Check_Button adsynenabledcheck {
             label Enabled
@@ -1265,7 +1340,7 @@ Offset}
         }
         Fl_Group SUB {
           label SUBsynth
-          xywh {105 245 100 80} box ENGRAVED_FRAME labelfont 1
+          xywh {105 246 100 79} box ENGRAVED_FRAME labelfont 1
         } {
           Fl_Check_Button subsynenabledcheck {
             label Enabled
@@ -1307,7 +1382,7 @@ Offset}
         }
         Fl_Group PAD {
           label PADsynth
-          xywh {205 245 100 80} box ENGRAVED_FRAME labelfont 1
+          xywh {205 246 100 79} box ENGRAVED_FRAME labelfont 1
         } {
           Fl_Check_Button padsynenabledcheck {
             label Enabled
@@ -1367,11 +1442,23 @@ Offset}
       Fl_Group {} {
         xywh {0 5 395 215} box ENGRAVED_FRAME
       } {
-        Fl_Input {} {
+        Fl_Text_Display {} {
           label {Author and Copyright}
+          xywh {171 44 148 4} box NO_BOX labelsize 12
+        }
+        Fl_Button {} {
+          label Default
+          callback {//
+int param = 128;
+if (Fl::event_state(FL_CTRL))
+param = 129;
+send_data(223, 0, 0xd0, 255, 255, 255, param);}
+          tooltip {Load default author & copyright\\n+Ctrl: save current text as default} xywh {327 25 63 20} labelsize 12
+        }
+        Fl_Input copyright {
           callback {//
           part->info.Pauthor = string(o->value());}
-          xywh {5 60 385 50} type Multiline color 26 labelsize 10 align 5
+          xywh {5 49 385 55} type Multiline color 26 labelsize 12 align 9
           code0 {o->maximum_size(MAX_INFO_TEXT_SIZE);}
           code1 {o->value(part->info.Pauthor.c_str());}
         }
@@ -1379,7 +1466,7 @@ Offset}
           label Comments
           callback {//
           part->info.Pcomments = string(o->value());}
-          xywh {5 125 385 90} type Multiline color 26 labelsize 11 align 5
+          xywh {5 123 385 91} type Multiline color 26 labelsize 12 align 5
           code0 {o->maximum_size(MAX_INFO_TEXT_SIZE);}
           code1 {o->value(part->info.Pcomments.c_str());}
         }
@@ -1478,6 +1565,35 @@ Offset}
       }
     }
   }
+  Function {handle(int event)} {return_type int
+  } {
+    code {//
+        int ret = Fl_Group::handle(event);
+        switch(event)
+        {
+            case FL_FOCUS:
+            case FL_UNFOCUS:
+                ret = 1;                break;
+            case FL_SHORTCUT:           // incase widget that isn't ours has focus
+            case FL_KEYDOWN:            // keyboard key pushed
+            //case FL_KEYUP:              // keyboard key released
+            {
+                if (lastkey != Fl::event_key())
+                {
+                    lastkey = Fl::event_key();
+                    //cout << "Key " << lastkey << endl;
+                }
+                break;
+            }
+            case FL_KEYUP:
+            {
+                if (lastkey == Fl::event_key())
+                    lastkey = -1;
+                break;
+            }
+        }
+        return(ret);} {}
+  }
   Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff, int insert = 0xff, int parameter = 0xff, int par2 = 0xff)} {} {
     code {//
     collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, insert, parameter, par2);} {}
@@ -1490,9 +1606,14 @@ Offset}
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
+    unsigned char parameter = getData->data.parameter;
+    unsigned char par2 = getData->data.par2;
 
     bool valBool = (value > 0.5f);
     int valInt = lrint(value);
+    string text;
+    if (par2 < 0xff)
+    	text = miscMsgPop(par2);
 
     // these are specific to the mixer panel
     if (newpart >= *plgroup && newpart < (*plgroup + NUM_MIDI_CHANNELS))
@@ -1979,6 +2100,10 @@ Offset}
             setinstrumentlabel();
             checkEngines();
             break;
+        case 223:
+            if(parameter == 0)
+                copyright->value(text.c_str());
+            break;
         case 224:
             updatecontrollers();
             break;
@@ -2045,6 +2170,7 @@ Offset}
     make_window();
     partgroup->position(this->parent()->x() + 2, this->parent()->y() + 2);
     partgroup->show();
+    lastkey = -1;
     end();} {}
   }
   Function {checkEngines()} {} {
@@ -2307,5 +2433,7 @@ Offset}
   decl {int engine;} {private local
   }
   decl {bool partKitOn;} {public local
+  }
+  decl {int lastkey;} {private local
   }
 }

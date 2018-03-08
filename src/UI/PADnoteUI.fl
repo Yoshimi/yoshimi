@@ -11,7 +11,7 @@ comment {PADNoteUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2015-2017, Will Godfrey
+Copyright 2015-2018, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -29,8 +29,8 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-Modified October 2017
-} {in_source in_header
+Modified March 2018
+} {selected in_source in_header
 }
 
 decl {\#include <FL/Fl_Box.H>
@@ -237,7 +237,7 @@ this->pars=pars;} {}
   }
 }
 
-class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
+class PADnoteUI {: {public PresetsUI_, private SynthHelper, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window padnotewindow {
@@ -430,13 +430,13 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper, MiscFuncs}
             code1 {osc->init(pars->oscilgen, synth);}
           } {}
           Fl_Button {} {
-            label Change
+            label Waveform
             callback {//
             if (oscui!=NULL) delete (oscui);
                 oscui = new OscilEditor(pars->oscilgen, osc, cbwidget, applybutton, synth, npart, kititem, 2);
             if ((Fl::event_button() == 3))
                 padnotewindow->hide();}
-            xywh {375 270 60 20} box THIN_UP_BOX labelfont 1 labelsize 11
+            xywh {375 270 80 20} box THIN_UP_BOX labelfont 1 labelsize 11
           }
           Fl_Box cbwidget {
             label {Harmonic Content}

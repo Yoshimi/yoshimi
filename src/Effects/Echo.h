@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified March 2011
+    This file is derivative of ZynAddSubFX original code.
+
+    Modified February 2018
 */
 
 #ifndef ECHO_H
@@ -58,7 +61,7 @@ class Echo : public Effect
         void sethidamp(unsigned char Phidamp_);
 
         // Real Parameters
-        float fb, hidamp;
+        InterpolatedParameter fb, hidamp;
         int dl, dr, delay, lrdelay;
 
         void initdelays(void);
@@ -70,6 +73,13 @@ class Echo : public Effect
 
         SynthEngine *synth;
 };
+
+class Echolimit
+{
+    public:
+        float getlimits(CommandBlock *getData);
+};
+
 
 #endif
 

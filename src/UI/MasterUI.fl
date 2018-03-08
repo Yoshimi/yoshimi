@@ -29,9 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified January 2018
-
-} {in_source in_header
+Modified February 2018} {in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -619,19 +617,20 @@ paramsui->Show(3);}
         Fl_Button {} {
           label Reset
           callback {//
+          bool wasCtrl = (Fl::event_state(FL_CTRL) != 0);
           if (fl_choice("Set *ALL* dynamic values to their defaults?", NULL, "No", "Yes") > 1)
           {
-              if(Fl::event_state(FL_CTRL) == 0)
-                  send_data(96, 0, 0xf0, 0xf0, 0xff, 0xff, 0xc0);
+              if(wasCtrl || (Fl::event_state(FL_CTRL) != 0))
+                  send_data(97, 0, 0xf0, 0xf0, 0xff, 0xff, 0xc0);
               else
-                  send_data(97, 0, 0xf0, 0xf0, 0xff, 0xff, 0xc0);}}
+                  send_data(96, 0, 0xf0, 0xf0, 0xff, 0xff, 0xc0);}}
           tooltip {Clear all dynamic settings
-Ctrl + confirm includes MIDI-learn} xywh {7 60 70 24} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
+(+Ctrl includes MIDI-learn)} xywh {7 60 70 24} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
         }
         Fl_Button {} {
           label {Stop!}
           callback {//
-          send_data(128, o->value(), 0xc0);}
+          send_data(128, 0, 0xf0);}
           tooltip {Cease all sound immediately!} xywh {7 30 70 24} box PLASTIC_UP_BOX color 88 selection_color 0 labelfont 1 labelsize 11 align 16
         }
         Fl_Dial mastervolumedial {
@@ -1387,7 +1386,6 @@ ZynAddSubFX}
         return;
     }
     string name;
-
     switch(control)
     {
         case 0:
@@ -1427,6 +1425,11 @@ ZynAddSubFX}
         case 49:
             updatepanel();
             break;
+        case 59:
+            name = miscMsgPop(par2);
+            if (wasFromHere)
+                fl_alert("%s",name.c_str());
+            break;
         case 60: // import bank
             name = miscMsgPop(par2);
             if (wasFromHere)
@@ -1435,10 +1438,10 @@ ZynAddSubFX}
                     fl_alert("%s",name.c_str());
                 else
                 {
-                    unsigned int other = name.find(" but ");
-                    if (other != string::npos)
+                    unsigned int other = name.find(" : ");
+                    if (other < 1024) // a bit of a hack :(
                     {
-                        name = name.substr(other + 5);
+                        name = name.substr(other + 3);
                         fl_alert("%s",name.c_str());
                     }
                 }
@@ -1587,13 +1590,18 @@ ZynAddSubFX}
 
         case 96:
             if (newpart == 240)
+            {
                 refresh_master_ui(1);
+                vumeter->init(-1, synth);
+                resetPartsClip();
+            }
             else if (newpart < 64)
                 partNew(newpart);
             break;
 
         case 97:
             refresh_master_ui(1);
+            resetPartsClip();
             if (midilearnui)
                 midilearnui->Hide();
             break;
@@ -1601,14 +1609,7 @@ ZynAddSubFX}
         case 128:
             virkeyboard->relaseallkeys();
             vumeter->init(-1, synth);
-            for(int i = 0; i < NUM_MIDI_CHANNELS; ++i)
-            {
-                if(panelwindow)
-                {
-                    if(panellistitem[i]->partVUMeter)
-                    panellistitem[i]->partVUMeter->resetPart();
-                }
-            }
+            resetPartsClip();
             break;
     }} {}
   }
@@ -1836,6 +1837,14 @@ ZynAddSubFX}
   }
   Function {do_load_instrument(string fname)} {} {
     code {//
+    if ((npart /  NUM_MIDI_CHANNELS) == (panelgroup  /  NUM_MIDI_CHANNELS))
+    {
+        int displaypart = npart % NUM_MIDI_CHANNELS;
+        panellistitem[displaypart]->partenabled->value(0);
+        panellistitem[displaypart]->panellistitemgroup->deactivate();
+    }
+    partui->partGroupEnable->value(0);
+    partui->partgroup->deactivate();
     send_data(78, npart, 0xf0, 0xf0, 0xff, 0xff, 0xff, miscMsgPush(fname));} {}
   }
   Function {do_load_master(bool updatehistory, const char* file)} {} {

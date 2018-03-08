@@ -367,6 +367,37 @@ bool MiscFuncs::copyFile(string source, string destination)
 }
 
 
+bool MiscFuncs::saveText(string text, string filename)
+{
+    FILE *writefile = fopen(filename.c_str(), "w");
+    if (!writefile)
+        return 0;
+
+    fputs(text.c_str(), writefile);
+    fclose (writefile);
+    return 1;
+}
+
+
+int MiscFuncs::loadText(string filename)
+{
+    FILE *readfile = fopen(filename.c_str(), "r");
+    if (!readfile)
+        return 0xffff;
+
+    string text = "";
+    char line [1024];
+    while (!feof(readfile))
+    {
+        if(fgets(line , 1024 , readfile))
+            text += string(line);
+    }
+    fclose (readfile);
+    text.erase(text.find_last_not_of(" \n\r\t")+1);
+    return miscMsgPush(text);
+}
+
+
 // replace build directory with a different
 // one in the compilation directory
 string MiscFuncs::localPath(string leaf)

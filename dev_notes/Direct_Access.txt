@@ -2,35 +2,13 @@ This is a test feature only accessible from the command line.
 
                             *** WARNING ***
 
-There are very limited error checks on this so you can easily crash Yoshimi with out of range values! However, many 'ordindary' values are now range checked and adusted. So if you try to set master volume to (say) 200 it will actually be set to 127.
+There are limited error checks on this so it may still be possible to crash Yoshimi with out of range values. However, most values are now range checked and may be ignored or adjusted.
 
 It mostly updates the GUI.
 
 Refer to "Yoshimi Control Numbers.ods" for control numbers and actions and "GUI_Interpretations.txt" for further explanations.
 
 Also, see "Effect_Inserts" for the actual effect controllers and "Envelope_Inserts" for the envelope controller ranges.
-
-Sections currently in place and tested:
-
-Top level controls
-Config - now used by GUI for writes
-Vectors - now used by GUI for writes
-Microtonal (scales) - now used by GUI for writes
-Midi-learn - used for all operations
-Main part controls - now used by GUI for writes
-Controllers Window - now used by GUI for writes
-MIDI learn editor window - used for all except incoming real MIDI
-Kit edit window - now used by GUI for writes
-AddSynth Editor - now used by GUI for writes
-AddSynth Voice Editor - now used by GUI for writes
-Subsynth Editor - now used by GUI for writes
-Padsynth Editor - now used by GUI for writes
-Oscillator - now used by GUI for writes
-Resonance - now used by GUI for writes
-Effects - now used by GUI for writes
-LFOs - now used by GUI for writes
-Filters - now used by GUI for writes
-Envelopes - now used by GUI for writes
 
 This matches the results from using the middle mouse button in the GUI (assuming it was enabled at build time with 'ShowGuiRreports'). Some commands that are purely within the GUI, e.g window changes are recognised but not acted on. It is expected that any alternative input system will store its own copies of such intermediate information so that they remain fully independent.
 
@@ -68,4 +46,11 @@ In some situations par2 is used as a miscMsg ID for passing text values between 
 If parameter has bit 7 set the command is passed to an alternative low priority function as there will be considerable text manipulation. If bit 6 is also set it will pass through a fade down and mute operation to avoid writing data to the audio engine when active. The return will go via this alternative text heavy route.
 
 
-Limits testing now has it's own entry. See Limits.txt.
+For limits testing send:
+    direct limit min
+    direct limit max
+    direct limit def (for the default value)
+
+These should be followed by values for the Control, Part, Kit etc.
+
+For further details see Limits.txt.

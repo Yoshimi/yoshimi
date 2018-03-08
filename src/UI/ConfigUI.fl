@@ -23,7 +23,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified January 2018
+Modified February 2018
 } {in_source in_header
 }
 
@@ -245,7 +245,7 @@ class ConfigUI {selected : {private MiscFuncs}
             label {* Start With Default State}
             callback {//
                         send_data(16, o->value(), 0xc0);}
-            xywh {270 60 27 25} down_box DOWN_BOX labelsize 12 align 4
+            tooltip {If you change this you must re-save the default state\nor when that loads it will revert to the previous value} xywh {270 60 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().loadDefaultState);}
           }
           Fl_Check_Button nonFatal {

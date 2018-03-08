@@ -22,7 +22,7 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified January 2018
+    Modified February 2018
 */
 
 #include <set>
@@ -385,6 +385,76 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
     return true;
 }
 
+
+// Creates an external bank and copies in the contents of the IDd one
+unsigned int Bank::exportBank(string exportdir, size_t rootID, unsigned int bankID)
+{
+    if (rootID > 0x7f)
+        rootID = currentRootID;
+    string name = "";
+    string sourcedir = "";
+    bool ok = true;
+    if (roots.count(rootID) == 0)
+    {
+        name = "Root ID " + to_string(int(rootID)) + " doesn't exist";
+        ok = false;
+    }
+    if (ok && roots [rootID].banks.count(bankID) == 0)
+    {
+        name = "Bank " + to_string(bankID) + " is empty";
+        ok = false;
+    }
+    else
+        sourcedir = getRootPath(rootID) + "/" + getBankName(bankID, rootID);
+
+    if (ok && isDirectory(exportdir))
+    {
+        ok = false;
+        name = "Can't overwrite existing directory";
+    }
+    if (ok)
+    {
+        int result = mkdir(exportdir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        if (result < 0)
+        {
+            name = "Can't create external bank " + findleafname(exportdir);
+            ok = false;
+        }
+        else
+        {
+            DIR *dir = opendir(sourcedir.c_str());
+            struct dirent *fn;
+            int count = 0;
+            int missing = 0;
+            while ((fn = readdir(dir)))
+            {
+                string nextfile = string(fn->d_name);
+                if (copyFile(sourcedir + "/" + nextfile, exportdir + "/" + nextfile))
+                    ++missing;
+                else
+                    ++count;
+            }
+            if (count > 0)
+            {
+                name = "Copied out " + to_string(count) + " files to " + exportdir + " ";
+                if (missing > 0)
+                    name +=( "but failed to transfer" + to_string(missing));
+            }
+            else
+            {
+                name = "to transfer to " + exportdir; // failed
+                ok = false;
+            }
+        }
+    }
+
+    unsigned int msgID = miscMsgPush(name);
+    if (!ok)
+        msgID |= 0x1000;
+    return msgID;
+}
+
+
 // Creates a new bank and copies in the contents of the external one
 unsigned int Bank::importBank(string importdir, size_t rootID, unsigned int bankID)
 {
@@ -414,20 +484,34 @@ unsigned int Bank::importBank(string importdir, size_t rootID, unsigned int bank
         }
         else
         {
-            if (!newIDbank(findleafname(importdir), bankID, rootID))
+            string bankname = findleafname(importdir);
+            int repeats = 0;
+            string suffix = "";
+            while (isDirectory(getRootPath(rootID) + "/" + bankname + suffix))
             {
-                name = "Can't create bank " + findleafname(importdir);
+                ++repeats;
+                suffix = "~" + to_string(repeats);
+                //cout << ">" << suffix << endl;
+            }
+            bankname += suffix;
+            //cout << bankname << endl;
+            if (!newIDbank(bankname, bankID, rootID))
+            {
+                name = "Can't create bank " + bankname;
                 ok = false;
             }
             else
             {
                 int count = 0;
+                int total = -2; // seem to get 2 phantoms :(
                 bool missing = false;
                 struct dirent *fn;
                 string exportfile = getRootPath(rootID) + "/" + getBankName(bankID, rootID);
                 while ((fn = readdir(dir)))
                 {
-                    string nextfile = string(fn->d_name);
+                    string nextfile = string(fn->d_name);                    if (nextfile.rfind(".bankdir") != string::npos)
+                        continue; // new version will be generated
+                    ++total;
                     if (nextfile.rfind(".xiy") != string::npos || nextfile.rfind(".xiz") != string::npos)
                     {
                         ++count;
@@ -453,9 +537,11 @@ unsigned int Bank::importBank(string importdir, size_t rootID, unsigned int bank
                 }
                 name = importdir;
                 if (count == 0)
-                    name += " but no valid instruments found";
+                    name += " : No valid instruments found";
                 else if (missing)
-                    name += " but failed to copy some instruments";
+                    name += " : Failed to copy some instruments";
+                else if (count < total)
+                    name = name + " : Ignored " + to_string(total - count)  + " unrecognised items";
             }
         }
     }
@@ -468,7 +554,7 @@ unsigned int Bank::importBank(string importdir, size_t rootID, unsigned int bank
 
 bool Bank::isDuplicate(size_t rootID, size_t bankID, int pos, const string filename)
 {
-    cout << filename << " count " << roots [rootID].banks.count(bankID) << endl;
+    //cout << filename << " count " << roots [rootID].banks.count(bankID) << endl;
     string path = getRootPath(rootID) + "/" + getBankName(bankID, rootID) + "/" + filename;
     if (isRegFile(setExtension(path, xiyext)) && filename.rfind(xizext) < string::npos)
         return 1;
@@ -485,6 +571,9 @@ bool Bank::isDuplicate(size_t rootID, size_t bankID, int pos, const string filen
 // Makes a new bank with known ID. Does *not* make it current
 bool Bank::newIDbank(string newbankdir, unsigned int bankID, size_t rootID)
 {
+    if (rootID > 0x7f)
+        rootID = currentRootID; // should be needed!
+
     if (!newbankfile(newbankdir, rootID))
         return false;
     roots [currentRootID].banks [bankID].dirname = newbankdir;

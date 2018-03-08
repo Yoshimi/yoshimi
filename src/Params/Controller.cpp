@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2017, Will Godfrey
+    Copyright 2017-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -20,9 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code
+    This file is derivative of ZynAddSubFX original code.
 
-    Modified November 2017
+    Modified February 2018
 */
 
 #include <cmath>
@@ -282,7 +282,7 @@ int Controller::initportamento(float oldfreq, float newfreq, bool in_progress)
         portamentotime *= powf(0.1f, (64.0f - portamento.updowntimestretch) / 64.0f);
     }
 
-    portamento.dx = synth->p_all_buffersize_f / (portamentotime * synth->samplerate_f);
+    portamento.dx = synth->sent_all_buffersize_f / (portamentotime * synth->samplerate_f);
     portamento.origfreqrap = oldfreq / newfreq;
 
     float tmprap = (portamento.origfreqrap > 1.0f)
@@ -393,25 +393,28 @@ void Controller::getfromXML(XMLwrapper *xml)
 }
 
 
-void Controller::getLimits(CommandBlock *getData)
+float Controller::getLimits(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    int request = int(getData->data.type & 3);
     int control = getData->data.control;
-    //cout << "ctl control " << to_string(control) << endl;
+
+    //cout << "ctl control " << control << "  Request " << request << endl;
 
     // defaults
     int type = 0x80;
     int min = 0;
-    int def = 640;
+    float def = 64;
     int max = 127;
 
     switch (control)
     {
         case 128:
             min = 64;
-            def = 960;
+            def = 96;
             break;
         case 129:
-            def = 10;
+            def = 1;
             max = 1;
             break;
         case 130:
@@ -419,7 +422,7 @@ void Controller::getLimits(CommandBlock *getData)
             max = 64;
             break;
         case 131:
-            def = 800;
+            def = 80;
             break;
         case 132:
             def = 0;
@@ -433,15 +436,15 @@ void Controller::getLimits(CommandBlock *getData)
             max = 1;
             break;
         case 135:
-            def = 10;
+            def = 1;
             max = 1;
             break;
         case 136:
-            def = 10;
+            def = 1;
             max = 1;
             break;
         case 137:
-            def = 10;
+            def = 1;
             max = 1;
             break;
         case 138:
@@ -453,6 +456,10 @@ void Controller::getLimits(CommandBlock *getData)
         case 139:
             break;
         case 140:
+            break;
+        case 141:
+            max = 1;
+            def = 1;
             break;
         case 144:
             break;
@@ -467,12 +474,12 @@ void Controller::getLimits(CommandBlock *getData)
             break;
         case 162:
             type |= 0x40;
-            def = 30;
+            def = 3;
             break;
         case 163:
             min = 0;
             max = 1;
-            def = 10;
+            def = 1;
             break;
         case 164:
             def = 0;
@@ -480,14 +487,14 @@ void Controller::getLimits(CommandBlock *getData)
             break;
         case 165:
             type |= 0x40;
-            def = 800;
+            def = 80;
             break;
         case 166:
             type |= 0x40;
-            def = 900;
+            def = 90;
             break;
         case 168:
-            def = 10;
+            def = 1;
             max = 1;
             break;
         case 224:
@@ -496,13 +503,30 @@ void Controller::getLimits(CommandBlock *getData)
             break;
 
         default:
-            min = -1;
-            def = -10;
-            max = -1;
+            type |= 4; // error
             break;
     }
     getData->data.type = type;
-    getData->limits.min = min;
-    getData->limits.def = def;
-    getData->limits.max = max;
+    if (type & 4)
+        return 1;
+
+    switch (request)
+    {
+        case 0:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+        break;
+        case 1:
+            value = min;
+            break;
+        case 2:
+            value = max;
+            break;
+        case 3:
+            value = def;
+            break;
+    }
+    return value;
 }

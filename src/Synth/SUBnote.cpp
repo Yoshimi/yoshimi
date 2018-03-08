@@ -5,7 +5,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2017, Will Godfrey & others
+    Copyright 2014-2018, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,12 +22,12 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of ZynAddSubFX original code
-    Modified August 2017
+    Modified March 2018
 */
 
 #include <cmath>
 #include <fftw3.h>
-#include <cassert>
+#include <iostream>
 
 #include "Params/SUBnoteParameters.h"
 #include "Params/Controller.h"
@@ -52,9 +52,6 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
     filterStep(0)
 {
     ready = 0;
-
-    //tmpsmp = (float*)fftwf_malloc(synth->bufferbytes);
-    //tmprnd = (float*)fftwf_malloc(synth->bufferbytes);
 
     // Initialise some legato-specific vars
     Legato.msg = LM_Norm;
@@ -280,8 +277,6 @@ SUBnote::~SUBnote()
 {
     if (NoteEnabled)
         KillNote();
-    //fftwf_free(tmpsmp);
-    //fftwf_free(tmprnd);
 }
 
 
@@ -392,8 +387,8 @@ void SUBnote::filter(bpfilter &filter, float *smps)
         return;
     }
 
-    int remainder = synth->p_buffersize % 8;
-    int blocksize = synth->p_buffersize - remainder;
+    int remainder = synth->sent_buffersize % 8;
+    int blocksize = synth->sent_buffersize - remainder;
     float coeff[4] = {filter.b0, filter.b2,  -filter.a1, -filter.a2};
     float work[4]  = {filter.xn1, filter.xn2, filter.yn1, filter.yn2};
 
@@ -428,7 +423,7 @@ void SUBnote::filter(bpfilter &filter, float *smps)
 void SUBnote::filterVarRun(SUBnote::bpfilter &filter, float *smps)
 {
     float tmpout;
-    int runLength = synth->p_buffersize;
+    int runLength = synth->sent_buffersize;
     int i = 0;
     if(runLength >= 8){
         float coeff[4] = {filter.b0, filter.b2,  -filter.a1, -filter.a2};
@@ -451,7 +446,7 @@ void SUBnote::filterVarRun(SUBnote::bpfilter &filter, float *smps)
         filter.yn2 = work[3];
     }
 
-    for(; i < synth->p_buffersize; ++i){
+    for(; i < synth->sent_buffersize; ++i){
         tmpout=smps[i] * filter.b0 + filter.b2 * filter.xn2
                -filter.a1 * filter.yn1 - filter.a2 * filter.yn2;
         filter.xn2=filter.xn1;
@@ -512,6 +507,20 @@ float SUBnote::computerolloff(float freq)
 // Compute Parameters of SUBnote for each tick
 void SUBnote::computecurrentparameters(void)
 {
+    // disabled till we know what we are doing!
+    /*for (int n = 0; n < MAX_SUB_HARMONICS; ++n)
+    {
+        int changed = pars->PfilterChanged[n];
+        if (changed)
+        {
+            if (changed == 6) // magnitude
+                ;
+            else if (changed == 7) // bandwidth
+                ;
+            cout << "Filter changed " << changed << endl;
+            pars->PfilterChanged[n] = 0;
+        }
+    }*/
     if (FreqEnvelope != NULL
         || BandWidthEnvelope != NULL
         || oldpitchwheel != ctl->pitchwheel.data
@@ -599,21 +608,21 @@ int SUBnote::noteout(float *outl, float *outr)
 {
     tmpsmp = synth->getRuntime().genTmp1;
     tmprnd = synth->getRuntime().genTmp2;
-    memset(outl, 0, synth->p_bufferbytes);
-    memset(outr, 0, synth->p_bufferbytes);
+    memset(outl, 0, synth->sent_bufferbytes);
+    memset(outr, 0, synth->sent_bufferbytes);
     if (!NoteEnabled)
         return 0;
 
     // left channel
-    for (int i = 0; i < synth->p_buffersize; ++i)
+    for (int i = 0; i < synth->sent_buffersize; ++i)
         tmprnd[i] = synth->numRandom() * 2.0f - 1.0f;
     for (int n = 0; n < numharmonics; ++n)
     {
         float rolloff = overtone_rolloff[n];
-        memcpy(tmpsmp, tmprnd, synth->p_bufferbytes);
+        memcpy(tmpsmp, tmprnd, synth->sent_bufferbytes);
         for (int nph = 0; nph < numstages; ++nph)
             filter(lfilter[nph + n * numstages], tmpsmp);
-        for (int i = 0; i < synth->p_buffersize; ++i)
+        for (int i = 0; i < synth->sent_buffersize; ++i)
             outl[i] += tmpsmp[i] * rolloff;
     }
 
@@ -623,28 +632,28 @@ int SUBnote::noteout(float *outl, float *outr)
     // right channel
     if (stereo)
     {
-        for (int i = 0; i < synth->p_buffersize; ++i)
+        for (int i = 0; i < synth->sent_buffersize; ++i)
             tmprnd[i] = synth->numRandom() * 2.0f - 1.0f;
         for (int n = 0; n < numharmonics; ++n)
         {
             float rolloff = overtone_rolloff[n];
-            memcpy(tmpsmp, tmprnd, synth->p_bufferbytes);
+            memcpy(tmpsmp, tmprnd, synth->sent_bufferbytes);
             for (int nph = 0; nph < numstages; ++nph)
                 filter(rfilter[nph + n * numstages], tmpsmp);
-            for (int i = 0; i < synth->p_buffersize; ++i)
+            for (int i = 0; i < synth->sent_buffersize; ++i)
                 outr[i] += tmpsmp[i] * rolloff;
         }
         if (GlobalFilterR != NULL)
             GlobalFilterR->filterout(outr);
     }
     else
-        memcpy(outr, outl, synth->p_bufferbytes);
+        memcpy(outr, outl, synth->sent_bufferbytes);
 
     if (firsttick)
     {
         int n = 10;
-        if (n > synth->p_buffersize)
-            n = synth->p_buffersize;
+        if (n > synth->sent_buffersize)
+            n = synth->sent_buffersize;
         for (int i = 0; i < n; ++i)
         {
             float ampfadein = 0.5f - 0.5f * cosf((float)i / (float)n * PI);
@@ -666,17 +675,17 @@ int SUBnote::noteout(float *outl, float *outr)
     if (aboveAmplitudeThreshold(oldamplitude, newamplitude))
     {
         // Amplitude interpolation
-        for (int i = 0; i < synth->p_buffersize; ++i)
+        for (int i = 0; i < synth->sent_buffersize; ++i)
         {
             float tmpvol = interpolateAmplitude(oldamplitude, newamplitude, i,
-                                                synth->p_buffersize);
+                                                synth->sent_buffersize);
             outl[i] *= tmpvol * pangainL;
             outr[i] *= tmpvol * pangainR;
         }
     }
     else
     {
-        for (int i = 0; i < synth->p_buffersize; ++i)
+        for (int i = 0; i < synth->sent_buffersize; ++i)
         {
             outl[i] *= newamplitude * pangainL;
             outr[i] *= newamplitude * pangainR;
@@ -690,8 +699,8 @@ int SUBnote::noteout(float *outl, float *outr)
     {   // Silencer
         if (Legato.msg != LM_FadeIn)
         {
-            memset(outl, 0, synth->p_bufferbytes);
-            memset(outr, 0, synth->p_bufferbytes);
+            memset(outl, 0, synth->sent_bufferbytes);
+            memset(outr, 0, synth->sent_bufferbytes);
         }
     }
     switch (Legato.msg)
@@ -699,7 +708,7 @@ int SUBnote::noteout(float *outl, float *outr)
         case LM_CatchUp : // Continue the catch-up...
             if (Legato.decounter == -10)
                 Legato.decounter = Legato.fade.length;
-            for (int i = 0; i < synth->p_buffersize; ++i)
+            for (int i = 0; i < synth->sent_buffersize; ++i)
             {   // Yea, could be done without the loop...
                 Legato.decounter--;
                 if (Legato.decounter < 1)
@@ -721,7 +730,7 @@ int SUBnote::noteout(float *outl, float *outr)
             if (Legato.decounter == -10)
                 Legato.decounter = Legato.fade.length;
             Legato.silent = false;
-            for (int i = 0; i < synth->p_buffersize; ++i)
+            for (int i = 0; i < synth->sent_buffersize; ++i)
             {
                 Legato.decounter--;
                 if (Legato.decounter < 1)
@@ -740,12 +749,12 @@ int SUBnote::noteout(float *outl, float *outr)
         case LM_FadeOut : // Fade-out, then set the catch-up
             if (Legato.decounter == -10)
                 Legato.decounter = Legato.fade.length;
-            for (int i = 0; i < synth->p_buffersize; ++i)
+            for (int i = 0; i < synth->sent_buffersize; ++i)
             {
                 Legato.decounter--;
                 if (Legato.decounter < 1)
                 {
-                    for (int j = i; j < synth->p_buffersize; ++j)
+                    for (int j = i; j < synth->sent_buffersize; ++j)
                         outl[j] = outr[j] = 0.0f;
                     Legato.decounter = -10;
                     Legato.silent = true;
@@ -776,9 +785,9 @@ int SUBnote::noteout(float *outl, float *outr)
     // Check if the note needs to be computed more
     if (AmpEnvelope->finished() != 0)
     {
-        for (int i = 0; i < synth->p_buffersize; ++i)
+        for (int i = 0; i < synth->sent_buffersize; ++i)
         {   // fade-out
-            float tmp = 1.0f - (float)i / synth->p_buffersize_f;
+            float tmp = 1.0f - (float)i / synth->sent_buffersize_f;
             outl[i] *= tmp;
             outr[i] *= tmp;
         }

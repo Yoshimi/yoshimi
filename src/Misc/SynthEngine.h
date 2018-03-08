@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2017, Will Godfrey & others
+    Copyright 2014-2018, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified December 2017
+    Modified February 2018
 */
 
 #ifndef SYNTHENGINE_H
@@ -81,7 +81,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void defaults(void);
 
         bool loadXML(string filename);
-        void applyparameters(void);
         bool loadStateAndUpdate(string filename);
         bool saveState(string filename);
         bool loadPatchSetAndUpdate(string filename);
@@ -155,9 +154,9 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool isMuted(void);
         sem_t mutelock;
 
-        void getLimits(CommandBlock *getData);
-        void getVectorLimits(CommandBlock *getData);
-        void getConfigLimits(CommandBlock *getData);
+        float getLimits(CommandBlock *getData);
+        float getVectorLimits(CommandBlock *getData);
+        float getConfigLimits(CommandBlock *getData);
 
         Part *part[NUM_MIDI_PARTS];
         unsigned int fadeAll;
@@ -176,10 +175,10 @@ class SynthEngine : private SynthHelper, MiscFuncs
         int halfoscilsize;
         float halfoscilsize_f;
 
-        int p_buffersize; //used for variable length runs
-        int p_bufferbytes; //used for variable length runs
-        float p_buffersize_f; //used for variable length runs
-        float p_all_buffersize_f; //used for variable length runs (mainly for lv2 - calculate envelopes and lfo)
+        int sent_buffersize; //used for variable length runs
+        int sent_bufferbytes; //used for variable length runs
+        float sent_buffersize_f; //used for variable length runs
+        float sent_all_buffersize_f; //used for variable length runs (mainly for lv2 - calculate envelopes and lfo)
         float         TransVolume;
         float         Pvolume;
         float         ControlStep;
@@ -215,13 +214,14 @@ class SynthEngine : private SynthHelper, MiscFuncs
                 float vuRmsPeakL;
                 float vuRmsPeakR;
                 float parts[NUM_MIDI_PARTS];
-                int p_buffersize;
+                int buffersize;
             } values;
             char bytes [sizeof(values)];
         };
-        union VUtransfer VUpeak, VUdata;
-
-        bool fetchMeterData(VUtransfer *VUdata);
+        VUtransfer VUpeak, VUcopy, VUdata;
+        unsigned int VUcount;
+        bool VUready;
+        void fetchMeterData(void);
 
         inline bool getIsLV2Plugin() {return isLV2Plugin; }
         inline Config &getRuntime() {return Runtime;}
@@ -240,6 +240,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         Bank &getBankRef() {return bank;}
         Bank *getBankPtr() {return &bank;}
+        unsigned int exportBank(string exportfile, size_t rootID, unsigned int bankID);
         unsigned int importBank(string inportfile, size_t rootID, unsigned int bankID);
         unsigned int removeBank(unsigned int bankID, size_t rootID);
         string getWindowTitle() {return windowTitle;}
@@ -257,8 +258,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         pthread_mutex_t  processMutex;
         pthread_mutex_t *processLock;
-
-        jack_ringbuffer_t *vuringbuf;
 
         XMLwrapper *stateXMLtree;
 

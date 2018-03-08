@@ -1,0 +1,7 @@
+Reads are made by direct calls (not buffered), but if dynamic values are being read and an actual write is taking place they are temporarily blocked.
+
+If bit 2 of 'type' is set then the command is passed on to the limits tests, but this bit is immediately cleared as it will then be used to denote error conditions.
+
+It returns a float representing the wanted element and if bit 7 of 'type' is set this should be regarded as an integer.
+
+Also, if bit 6 is set then the control is MIDI-learnable.

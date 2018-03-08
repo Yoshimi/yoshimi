@@ -105,7 +105,14 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     {
         return;
     }
-    synth->p_all_buffersize_f = min(sample_count, (uint32_t)synth->buffersize);
+    //synth->sent_all_buffersize_f = min(sample_count, (uint32_t)synth->buffersize);
+    /*
+     * The line above seems to cause problems with envelopes
+     * in Carla, and also (for one user) results in occasional
+     * clicks in the sound.
+     * It has been commented out and investigation is ongoing
+     * to ensure it's removal doesn't cause other problems.
+     */
     int real_sample_count = sample_count;//min(sample_count, _bufferSize);
     int offs = 0;
     int next_frame = 0;

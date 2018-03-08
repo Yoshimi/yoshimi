@@ -157,6 +157,11 @@ class Config : public MiscFuncs
         int           single_row_panel;
         int           NumAvailableParts;
         int           currentPart;
+        int           noteOnSent; // note test
+        int           noteOnSeen;
+        int           noteOffSent;
+        int           noteOffSeen;
+        unsigned int  VUcount;
         unsigned char channelSwitchType;
         unsigned char channelSwitchCC;
         unsigned char channelSwitchValue;
@@ -194,6 +199,10 @@ class Config : public MiscFuncs
         float *genTmp2;
         float *genTmp3;
         float *genTmp4;
+
+        // as above but for part and sys effect
+        float *genMixl;
+        float *genMixr;
 
     private:
         void loadCmdArgs(int argc, char **argv);

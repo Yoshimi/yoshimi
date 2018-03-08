@@ -103,12 +103,14 @@ Distortion
 
 EQ
 0   Gain
-1   Band number (0-7) {BN}
-10 + BN * 5   Filter type (0-9)
-11 + BN * 5   Band frequency
-12 + BN * 5   Band gain
-13 + BN * 5   Band Q
-14 + BN * 5   Band additional stages (0-4)
+1   Band number (0-7), 0 = off
+
+Band parameters.
+10  Filter type (0-9)
+11  Frequency
+12  Gain
+13  Q
+14  Additional stages (0-4)
 
 
 DynFilter

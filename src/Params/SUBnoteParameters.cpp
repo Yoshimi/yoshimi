@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009, Alan Calvert
+    Copyright 2017-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,8 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified May 2017
+    This file is a derivative of a ZynAddSubFX original.
+    Modified February 2018
 */
 
 #include "Params/SUBnoteParameters.h"
@@ -71,6 +73,7 @@ void SUBnoteParameters::defaults(void)
 
     for (int n = 0; n < MAX_SUB_HARMONICS; ++n)
     {
+        PfilterChanged[n] = 0;
         Phmag[n] = 0;
         Phrelbw[n] = 64;
     }
@@ -355,46 +358,68 @@ void SUBnoteParameters::getfromXML(XMLwrapper *xml)
 }
 
 
-void SUBnoteParameters::getLimits(CommandBlock *getData)
+float SUBnoteParameters::getLimits(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    int request = int(getData->data.type & 3);
     int control = getData->data.control;
     int insert = getData->data.insert;
+
+    int min;
+    int max;
+    int def;
 
     if (insert >= 6 && insert <= 7)
     { // do harmonics stuff
         if (insert == 7)
-            getData->limits.def = 640;
+            def = 64;
         else if (control == 0)
-            getData->limits.def = 1270;
+            def = 127;
         else
-            getData->limits.def = 0;
+            def = 0;
         getData->data.type |= 0x40; // all learnable
-        getData->limits.min = 0;
-        getData->limits.max = 127;
-        return;
+        min = 0;
+        max = 127;
+        switch (request)
+        {
+            case 0:
+                if(value < 0)
+                    value = 0;
+                else if(value > 127)
+                    value = 127;
+                break;
+            case 1:
+            case 3:
+                value = 0;
+                break;
+            case 2:
+                value = 127;
+                break;
+    }
+    return value;
     }
 
     // defaults
     int type = 0;
-    int min = 0;
-    int def = 0;
-    int max = 127;
+    min = 0;
+    def = 0;
+    max = 127;
 
     switch (control)
     {
         case 0:
             type = 0x40;
-            def = 960;
+            def = 96;
             break;
 
         case 1:
             type = 0x40;
-            def = 900;
+            def = 90;
             break;
 
         case 2:
             type = 0x40;
-            def = 640;
+            def = 64;
             break;
 
         case 8:
@@ -404,7 +429,7 @@ void SUBnoteParameters::getLimits(CommandBlock *getData)
 
         case 16:
             type = 0x40;
-            def = 400;
+            def = 40;
             break;
 
         case 17:
@@ -449,12 +474,12 @@ void SUBnoteParameters::getLimits(CommandBlock *getData)
 
         case 38:
             type = 0x40;
-            def = 880;
+            def = 88;
             break;
 
         case 39:
             type = 0x40;
-            def = 640;
+            def = 64;
             break;
 
         case 40:
@@ -476,7 +501,7 @@ void SUBnoteParameters::getLimits(CommandBlock *getData)
 
         case 80:
             min = 1;
-            def = 1000;
+            def = 100;
             max = 5;
             break;
 
@@ -485,7 +510,7 @@ void SUBnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case 82:
-            def = 1000;
+            def = 100;
             max = 2;
             break;
 
@@ -495,22 +520,38 @@ void SUBnoteParameters::getLimits(CommandBlock *getData)
 
         case 112:
             type = 0x40;
-            def = 10;
+            def = 1;
             max = 1;
             break;
 
 
         default:
-            min = -1;
-            def = -10;
-            max = -1;
+            type |= 4; // error
             break;
-
     }
-    getData->data.type |= type;
-    getData->limits.min = min;
-    getData->limits.def = def;
-    getData->limits.max = max;
+    getData->data.type = type;
+    if (type & 4)
+        return 1;
+
+    switch (request)
+    {
+        case 0:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+        break;
+        case 1:
+            value = min;
+            break;
+        case 2:
+            value = max;
+            break;
+        case 3:
+            value = def;
+            break;
+    }
+    return value;
 }
 
 void SUBnoteParameters::postrender(void)

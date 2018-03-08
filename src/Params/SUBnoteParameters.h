@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009, Alan Calvert
+    Copyright 2017-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,8 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified February 2017
+    This file is derivative of ZynAddSubFX original code.
+    Modified March 2018
 */
 
 #ifndef SUB_NOTE_PARAMETERS_H
@@ -42,7 +44,7 @@ class SUBnoteParameters : public Presets
         void add2XML(XMLwrapper *xml);
         void defaults(void);
         void getfromXML(XMLwrapper *xml);
-        void getLimits(CommandBlock *getData);
+        float getLimits(CommandBlock *getData);
         void updateFrequencyMultipliers(void);
         void postrender(void);
 
@@ -98,6 +100,8 @@ class SUBnoteParameters : public Presets
 
         unsigned char Phmagtype;    // how the magnitudes are computed
                                     // 0 = linear, 1 = -60dB, 2 = -60dB
+
+        unsigned char PfilterChanged[MAX_SUB_HARMONICS]; // 0 = no, 6 = magnitude, 7 = bandwidth
 
         unsigned char Phmag[MAX_SUB_HARMONICS];   // Magnitudes
 

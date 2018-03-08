@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is a derivative of a ZynAddSubFX original.
-    Modified January 2018
+    Modified February 2018
 */
 
 #ifndef BANK_H
@@ -125,6 +125,7 @@ class Bank : private MiscFuncs
         int getBankSize(int bankID);
         bool setbankname(unsigned int BankID, string newname);
         bool loadbank(size_t rootID, size_t banknum);
+        unsigned int exportBank(string exportdir, size_t rootID, unsigned int bankID);
         unsigned int importBank(string importdir, size_t rootID, unsigned int bankID);
         bool isDuplicate(size_t rootID, size_t bankID, int pos, const string filename);
         bool newIDbank(string newbankdir, unsigned int bankID, size_t rootID = 0xff);

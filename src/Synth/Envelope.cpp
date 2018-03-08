@@ -40,7 +40,7 @@ Envelope::Envelope(EnvelopeParams *envpars, float basefreq, SynthEngine *_synth)
     if (!envpars->Pfreemode)
         envpars->converttofree();
 
-    float bufferdt = synth->p_all_buffersize_f / synth->samplerate_f;
+    float bufferdt = synth->sent_all_buffersize_f / synth->samplerate_f;
 
     int mode = envpars->Envmode;
 

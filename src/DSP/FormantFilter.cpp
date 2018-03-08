@@ -185,32 +185,30 @@ void FormantFilter::setq(float q_)
 
 void FormantFilter::setfreq_and_q(float frequency, float q_)
 {
-/*     //Convert form real freq[Hz]
-    const float freq = (logf(frequency) / logf(2.0)) - 9.96578428f; //log2(1000)=9.95748f.*/
    Qfactor = q_;
-    setpos(frequency); // setpos(freq) // zyn code doesn't seem to do anything ???
+    setpos(frequency);
 }
 
 
 void FormantFilter::filterout(float *smp)
 {
-    memcpy(inbuffer, smp, synth->p_bufferbytes);
-    memset(smp, 0, synth->p_bufferbytes);
+    memcpy(inbuffer, smp, synth->sent_bufferbytes);
+    memset(smp, 0, synth->sent_bufferbytes);
 
     for (int j = 0; j < numformants; ++j)
     {
-        for (int k = 0; k < synth->p_buffersize; ++k)
+        for (int k = 0; k < synth->sent_buffersize; ++k)
             tmpbuf[k] = inbuffer[k] * outgain;
         formant[j]->filterout(tmpbuf);
 
         if (aboveAmplitudeThreshold(oldformantamp[j], currentformants[j].amp))
-            for (int i = 0; i < synth->p_buffersize; ++i)
+            for (int i = 0; i < synth->sent_buffersize; ++i)
                 smp[i] += tmpbuf[i]
                           * interpolateAmplitude(oldformantamp[j],
                                                   currentformants[j].amp, i,
-                                                  synth->p_buffersize);
+                                                  synth->sent_buffersize);
         else
-            for (int i = 0; i < synth->p_buffersize; ++i)
+            for (int i = 0; i < synth->sent_buffersize; ++i)
                 smp[i] += tmpbuf[i] * currentformants[j].amp;
         oldformantamp[j] = currentformants[j].amp;
     }

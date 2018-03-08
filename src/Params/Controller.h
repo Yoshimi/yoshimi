@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2010, Alan Calvert
-    Copyright 2017, Will Godfrey
+    Copyright 2017-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -20,9 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original
+    This file is a derivative of a ZynAddSubFX original.
 
-    Modified November 2017
+    Modified February 2018
 */
 
 
@@ -63,7 +63,7 @@ class Controller
         int initportamento(float oldfreq, float newfreq, bool in_progress);
         // returns 1 if the portamento's conditions are true, else return 0
         void updateportamento(void); // update portamento values
-        void getLimits(CommandBlock *getData);
+        float getLimits(CommandBlock *getData);
 
         // Controllers values
         struct { // Pitch Wheel

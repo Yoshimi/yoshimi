@@ -1,5 +1,153 @@
 yoshimi 1.5.6 M
 
+2018-3-4 Will.
+* CLI direct access can now read VU levels.
+
+2018-3-3 Will
+* Quieted some unused code till it's developed.
+* Small improvements to Add and Pad GUIs.
+
+2018-3-2 Will
+* Small change to shortcuts.
+* Added entry point for dynamic subnote harmonic change.
+  No idea how to actually change it though :(
+
+2018-2-28 Will
+* Implemented defaults for part author and copyright.
+  Normal left button loads, Ctrl + left button saves.
+* Implmented shortcuts for add, sub, pad editors.
+  Left key - only if enabled.
+  Right key - enables and opens.
+  Individual voices not done yet.
+* Implmented shortcuts for part kit and effects.
+
+2018-2-26 Will
+* Added missing attributions to previous commit :(
+* Optimised part compute.
+  Removed unnecessary memory clearing and made per-part
+  temporary allocations general ones.
+* Minor code cleanups.
+
+2018-2-25 Will + Kristian
+* Merged in effects interpolations from Kristian.
+* Changed instrument name font to Helvetica (not bold).
+
+2018-2-23 Will
+* Reverted LV2 buffer size change pending investigation.
+  was commit: cf7c6e746239e90069a599a966aecbd5ba4f9f6e
+* Distortion and Alienwah limits now track preset number.
+* Remaining effects limits now track preset number.
+
+2018-2-21 Will
+* Implemented note on/off test routines.
+
+2018-2-18 Will
+* BugFix: Dynfilter presets not updating GUI :(
+* Small adjustment to 'Modular Sines'.
+* Further refinements to Dynfilter limits.
+* Changed all occurrences of p_buffer to sent_buffer.
+  More descriptive and easier to follow in the code.
+
+2018-2-16 Will
+* Added 'Modular Sines' to Companion bank.
+* Further adjustments to EQ effect controls.
+
+2018-2-15 Will
+* Minor tweaks to banks.
+
+2018-2-13 Will
+* BugFix: EQ GUI frequency wrongly zeroed.
+* Phaser and EQ effect limits done.
+* Some effect limits cleanups.
+  (more work needed on CLI access)
+
+2018-2-12 Will
+* Alienwah and Dynfilter effect limits done.
+  (not filter insert for dynfilter)
+* BugFix: Phaser d/y wrongly reducing default insert level.
+
+2018-2-11 Will
+* Improved bank import error reporting.
+* Implemented bank export.
+* Chorus and Distortion effect limits done.
+
+2018-2-8 Will
+* Started major upgrade to effects limits.
+  Reverb completed others begun.
+* Code cleanups surrounding effects limits.
+* Echo completed.
+* BugFix: Segfault on creating new bank (empty string).
+* Some small GUI improvements.
+
+2018-2-7 Will
+* Some small improvements to 'reads'.
+* Corrected wrong dates in Changelog!
+  The dangers of copy-paste :(
+
+2018-2-4 Will
+* Merged in new limits code.
+* Considerable updates to dev_notes.
+* BugFix: Importing keymap not updating GUI.
+* Further refinements to data read function.
+* Small improvements to master reset behavour.
+* More doc updates.
+
+2018-2-3 Will
+[LIMITS] First refactoring of this.
+         Quite a few ommisions.
+         Seems to be correct for MIDI-learn
+         but may still be some errors.
+[LIMITS] Made some corrections and optimisations.
+[LIMITS] Last? optimisations.
+
+2018-2-1 Will
+* PadSynth 'busy' also reported to the GUI.
+* Removed redundant 'apply' code from Part.
+* Doc updates.
+
+2018-1-31 Will
+* Applied extra safety features when changing PadSynth.
+  Attempting to read or write to it at this time gives:
+  "Part [n] busy"
+
+2018-1-30 Will
+* Master Reset and Stop! now clear the VU meters.
+* MIDI buffer full reports to selected destination.
+* Some doc updates.
+
+2018-1-29 Will
+* BugFix: Part effects not MIDI-learned correctly :(
+  This is a quick 'n dirty fix. The whole of the
+  limits structure needs refactoring!
+
+2018-1-28 Will
+* Made VU still read if very slow part load blocks.
+  Need to improve this :(
+
+2018-1-27 Will
+* Rationalised PadSynth calls.
+
+2018-1-26 Will
+* Removed no longer needed VU ring buffer.
+* GUI VU meter display now fully detached :)
+* Updated docs.
+
+2018-1-25 Will
+* Corrected VU meter update for multi-instance.
+* Enabled reading from CLI (direct).
+* Detached update system from GUI.
+
+2018-1-24 Will
+* Improved VU behaviour - better attack/decay.
+  Adjustments no longer made in GUI and will be
+  easier to be made available to the CLI.
+
+2018-1-23 Will
+* Removed incorrect reference to MIDI event 0xff.
+* Padsynth apply no longer uses flags.
+* Part clear no longer uses flags.
+* Code tidyups.
+
 2018-1-21 Will
 * BugFix: CLI abort if query on top list.
 * Refinements to thread safe async read.
