@@ -112,7 +112,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     fft(NULL),
     muted(0),
     processLock(NULL),
-    stateXMLtree(NULL),
+    //stateXMLtree(NULL),
     guiMaster(NULL),
     guiClosedCallback(NULL),
     guiCallbackArg(NULL),

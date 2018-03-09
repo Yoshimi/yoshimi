@@ -43,7 +43,7 @@ static bool _recent;
 /* Delayed display of tooltip - callbackk*/
 static void delayedShow(void* dyntip){
     if(DynTooltip* tip = (DynTooltip*) dyntip)
-       tip->show(0);
+       tip->show();//show(0);
 }
 
 static void resetRecent(void*){
@@ -284,7 +284,7 @@ void DynTooltip::tipHandle(int event)
         Fl::remove_timeout(delayedShow);
         Fl::remove_timeout(resetRecent);
         setOnlyValue(true);
-        show(0);
+        show();//0);
         break;
     case FL_LEAVE:
     case FL_RELEASE:

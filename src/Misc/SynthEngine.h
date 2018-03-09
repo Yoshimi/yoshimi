@@ -252,14 +252,14 @@ class SynthEngine : private SynthHelper, MiscFuncs
         float volume;
         float sysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];
         float sysefxsend[NUM_SYS_EFX][NUM_SYS_EFX];
-        float *tmpmixl; // Temporary mixing samples for part samples
-        float *tmpmixr; // which are sent to system effect
+        //float *tmpmixl; // Temporary mixing samples for part samples
+        //float *tmpmixr; // which are sent to system effect
         int keyshift;
 
         pthread_mutex_t  processMutex;
         pthread_mutex_t *processLock;
 
-        XMLwrapper *stateXMLtree;
+        //XMLwrapper *stateXMLtree;
 
         char random_state[256];
         float random_0_1;
@@ -279,7 +279,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         int LFOtime; // used by Pcontinous
         string windowTitle;
-        MusicClient *musicClient;
+        //MusicClient *musicClient;
 };
 
 inline float SynthEngine::numRandom(void)
