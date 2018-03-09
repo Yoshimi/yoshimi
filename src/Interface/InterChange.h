@@ -99,6 +99,7 @@ class InterChange : private MiscFuncs
         unsigned int lockTime;
 
         void commandMidi(CommandBlock *getData);
+        void vectorClear(int Nvector);
         void commandVector(CommandBlock *getData);
         void commandMicrotonal(CommandBlock *getData);
         void commandConfig(CommandBlock *getData);

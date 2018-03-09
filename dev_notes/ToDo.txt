@@ -1,17 +1,7 @@
 Realtime subnote
 
-bw & amp calculations in initfilterbank/initfilter can be copied out to new routine.
-
-In normal sync apply if changed. Later add interpolation.
-Hmmm, looks like we need to do the whole filterbank :(
-Need to find out how long it takes!
-
-Approx 4uS, but it's not as simple as that :(
-
 Edit button
 +1 to 8 open addsynth voice window - could be 'interesting' :(
-
-Unchecking volume in controllers works correctly but still changes the GUI controls :(
 
 Requested: auto 'apply' timer for padsynth.
 
@@ -34,8 +24,6 @@ Make NRPN MIDI-learn able to be re-learned.
 LV2: internal sound banks do not appear to be exposed as LV2 presets
 
 Make add voice & add/pad oscillator and resonance windows show kit number & name.
-
-Make vector window update when main window reduces number of available parts.
 
 Consider, Pitchwheel split range in Controllers, but that one seems a bit pointless to me!
 

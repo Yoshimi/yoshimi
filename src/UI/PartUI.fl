@@ -386,7 +386,7 @@ class PartKitItem {: {public Fl_Group}
   }
 }
 
-class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {

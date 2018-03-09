@@ -290,7 +290,6 @@ class VectorUI {: {private MiscFuncs}
         {
             Xcc = 0;
             send_data(96, 0, 0xf0, 192, 255, 255, BaseChan);
-            //o->value(0);
             return;
         }
 
@@ -471,7 +470,6 @@ class VectorUI {: {private MiscFuncs}
         {
             Ycc = 0;
             send_data(32, 0xff, 0xd0);
-            //o->value(0);
             return;
         }
 
@@ -582,6 +580,7 @@ class VectorUI {: {private MiscFuncs}
             {
                 Ygroup->deactivate();
                 Ycontrol->value(0);
+                Ycontrol->damage(1);
                 Ycontrol->redraw();
                 Ycc = 0;
             }
@@ -589,6 +588,7 @@ class VectorUI {: {private MiscFuncs}
             {
                 Ygroup->activate();
                 Ycontrol->value(value_int);
+                Ycontrol->damage(1);
                 Ycontrol->redraw();
             }
             break;
@@ -929,6 +929,21 @@ class VectorUI {: {private MiscFuncs}
      Ygroup->deactivate();
      Ycontrol->deactivate();
      Ycontrol->value(0);} {}
+  }
+  Function {checkParts(int nval)} {} {
+    code {//
+for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
+{
+    if(nval > NUM_MIDI_CHANNELS * 3)
+        Ygroup->activate();
+    else
+        Ygroup->deactivate();
+
+    if(nval > NUM_MIDI_CHANNELS)
+        Xgroup->activate();
+    else
+        Xgroup->deactivate();
+}} {}
   }
   Function {errorlabel(string msg)} {} {
     code {//

@@ -1,6 +1,11 @@
 yoshimi 1.5.6 M
 
-2018-308 Will
+2018-3-9 Will
+* Refined Window title names.
+* GUI correct when MIDI volume and expression disabled.
+* Vector UI tracks changed number of available parts.
+
+2018-3-8 Will
 * BugFix: Vector control not working.
   Off by one error :(
 * Improved Vector GUI behaviour.

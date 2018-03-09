@@ -526,6 +526,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     break;
                 }
                 case 80:
+                    vectorClear(NUM_MIDI_CHANNELS);
                     if(synth->loadPatchSetAndUpdate(text))
                         text = "ed " + text;
                     else
@@ -585,6 +586,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     value = miscMsgPush(text);
                     break;
                 case 92: // state load
+                    vectorClear(NUM_MIDI_CHANNELS);
                     if (synth->loadStateAndUpdate(text))
                         text = "ed " + text;
                     else
@@ -3920,6 +3922,33 @@ void InterChange::commandMidi(CommandBlock *getData)
     }
 }
 
+
+void InterChange::vectorClear(int Nvector)
+{
+    int start;
+    int end;
+    if (Nvector >= NUM_MIDI_CHANNELS)
+    {
+        start = 0;
+        end = NUM_MIDI_CHANNELS;
+    }
+    else
+    {
+        start = Nvector;
+        end = Nvector + 1;
+    }
+    for (int ch = start; ch < end; ++ ch)
+    {
+        synth->getRuntime().vectordata.Xaxis[ch] = 0xff;
+        synth->getRuntime().vectordata.Yaxis[ch] = 0xff;
+        synth->getRuntime().vectordata.Xfeatures[ch] = 0;
+        synth->getRuntime().vectordata.Yfeatures[ch] = 0;
+        synth->getRuntime().vectordata.Enabled[ch] = false;
+        synth->getRuntime().vectordata.Name[ch] = "No Name " + to_string(ch + 1);
+    }
+}
+
+
 void InterChange::commandVector(CommandBlock *getData)
 {
     int value = getData->data.value; // no floats here
@@ -3934,27 +3963,7 @@ void InterChange::commandVector(CommandBlock *getData)
 
     if (control == 96)
     {
-        int start;
-        int end;
-        if (chan >= NUM_MIDI_CHANNELS)
-        {
-            start = 0;
-            end = NUM_MIDI_CHANNELS;
-        }
-        else
-        {
-            start = chan;
-            end = chan + 1;
-        }
-        for (int ch = start; ch < end; ++ ch)
-        {
-            synth->getRuntime().vectordata.Xaxis[ch] = 0xff;
-            synth->getRuntime().vectordata.Yaxis[ch] = 0xff;
-            synth->getRuntime().vectordata.Xfeatures[ch] = 0;
-            synth->getRuntime().vectordata.Yfeatures[ch] = 0;
-            synth->getRuntime().vectordata.Enabled[ch] = false;
-            synth->getRuntime().vectordata.Name[ch] = "No Name " + to_string(ch);
-        }
+        vectorClear(chan);
         synth->setLastfileAdded(5, "");
         return;
     }

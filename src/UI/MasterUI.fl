@@ -852,7 +852,7 @@ paramsui->Show(3);}
           class EffUI
         } {}
       }
-      Fl_Group partuigroup {
+      Fl_Group partuigroup {open
         xywh {3 255 380 170} box ENGRAVED_FRAME
       } {
         Fl_Group partui {
@@ -908,6 +908,7 @@ paramsui->Show(3);}
         updatepart();
         updatepanel();
         setinspartlist();
+        vectorui->checkParts(tmp);
         send_data(15, tmp, 0xc0);}
         tooltip {Set the number of available parts} xywh {93 264 40 20} labelsize 11 minimum 16 maximum 64 step 16 value 16 textsize 11
         code0 {o->value(partmax);}
@@ -1200,6 +1201,11 @@ ZynAddSubFX}
 
     if (newpart == 0xd9)
     {
+        if (engine == 7 && partui->part->ctl->volume.receive == 0)
+            return; // MIDI volume disabled
+        if (engine == 11 && partui->part->ctl->expression.receive == 0)
+            return; // MIDI expression disabled
+
         float vol = (value * synth->part[npart]->ctl->volume.data) / 127;
         if (control == 2)
         { // panel entries only
@@ -1411,6 +1417,7 @@ ZynAddSubFX}
             updatepart();
             updatepanel();
             setinspartlist();
+            vectorui->checkParts(nval);
             break;
 
         case 32:
@@ -1504,6 +1511,7 @@ ZynAddSubFX}
             }
             else
             {
+                vectorui->RefreshChans();
                 RecentParams->activate();
                 setMasterLabel(findleafname(name));
                 refresh_master_ui(2);
@@ -1536,6 +1544,7 @@ ZynAddSubFX}
             else
             {
                 vectorui->setLoadLabelRemote(insert, synth->getRuntime().vectordata.Name[insert]);
+                setMasterLabel(findleafname(name) + " - Vector " + to_string(int(insert) + 1));
                 vectorui->recenthistory->activate();
                 refresh_master_ui(5);
             }
@@ -1549,7 +1558,10 @@ ZynAddSubFX}
                     fl_alert("%s",name.c_str());
             }
             else
+            {
+                setMasterLabel(findleafname(name) + " - Vector " + to_string(int(insert) + 1));
                 vectorui->recenthistory->activate();
+            }
             break;
 
         case 88: // load scales
@@ -1583,13 +1595,18 @@ ZynAddSubFX}
                 refresh_master_ui(1);
             }
             else
+            {
+                setMasterLabel(findleafname(name) + " - State");
                 refresh_master_ui(0x14);
+            }
             break;
 
         case 93: // save state
             name = miscMsgPop(par2);
             if (wasFromHere && name.find("FAILED") == 1)
                 fl_alert("%s",name.c_str());
+            else
+                setMasterLabel(findleafname(name) + " - State");
             break;
 
         case 96:
@@ -1601,6 +1618,7 @@ ZynAddSubFX}
             }
             else if (newpart < 64)
                 partNew(newpart);
+            setMasterLabel("");
             break;
 
         case 97:
@@ -1608,7 +1626,7 @@ ZynAddSubFX}
             resetPartsClip();
             if (midilearnui)
                 midilearnui->Hide();
-            setMasterLabel("-");
+            setMasterLabel("");
             break;
 
         case 128:
@@ -1925,8 +1943,6 @@ ZynAddSubFX}
     microtonalui = new MicrotonalUI(&synth->microtonal, synth);
     if (type & 0x80)
         setMasterLabel(miscMsgPop((type >> 8) & 0xff));
-    else if (type > 1)
-        setMasterLabel(findleafname(synth->lastItemSeen(type & 0xf)));
     updatesendwindow();
     updatepanel(type > 0);
     if (type != 5)
