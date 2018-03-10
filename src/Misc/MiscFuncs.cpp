@@ -29,15 +29,10 @@
 #include <unistd.h>
 #include <sstream>
 #include <iostream>
+#include <fstream>
 #include <string.h>
 #include <mutex>
 #include <limits.h>
-
-#if defined(__FreeBSD__)
-#include <copyfile.h>
-#else
-#include <sys/sendfile.h>
-#endif
 
 using namespace std;
 
@@ -351,19 +346,22 @@ string MiscFuncs::setExtension(string fname, string ext)
 
 bool MiscFuncs::copyFile(string source, string destination)
 {
-    int input = open(source.c_str(), O_RDONLY);
-    int output = creat(destination.c_str(), 0660);
-#if defined(__FreeBSD__)
-    int result = fcopyfile(input, output, 0, COPYFILE_ALL);
-#else
-    off_t bytesCopied = 0;
-    struct stat fileinfo = {0};
-    fstat(input, &fileinfo);
-    int result = sendfile(output, input, &bytesCopied, fileinfo.st_size);
-#endif
-    close(input);
-    close(output);
-    return (result == 0);
+    ifstream infile (source, ios::in|ios::binary|ios::ate);
+    if (!infile.is_open())
+        return 1;
+    ofstream outfile (destination, ios::out|ios::binary);
+    if (!outfile.is_open())
+        return 1;
+
+    streampos size = infile.tellg();
+    char *memblock = new char [size];
+    infile.seekg (0, ios::beg);
+    infile.read(memblock, size);
+    infile.close();
+    outfile.write(memblock, size);
+    outfile.close();
+    delete memblock;
+    return 0;
 }
 
 

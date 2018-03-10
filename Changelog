@@ -3,6 +3,7 @@ yoshimi 1.5.6 M
 2018-3-10 Will
 * Reverted incorrect change to DynamicTooltip.cpp
 * Renamed overloaded show( to dynshow(
+* Completely revised copyFile( function.
 
 2018-3-9 Will
 * Refined Window title names.

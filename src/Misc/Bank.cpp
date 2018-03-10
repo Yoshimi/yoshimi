@@ -22,7 +22,7 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified February 2018
+    Modified March 2018
 */
 
 #include <set>
@@ -437,7 +437,7 @@ unsigned int Bank::exportBank(string exportdir, size_t rootID, unsigned int bank
             if (count > 0)
             {
                 name = "Copied out " + to_string(count) + " files to " + exportdir + " ";
-                if (missing > 0)
+                if (missing > 2) // seem to get 2 phantoms :(
                     name +=( "but failed to transfer" + to_string(missing));
             }
             else
