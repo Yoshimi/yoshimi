@@ -209,7 +209,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     ControlStep = (127.0f / samplerate) * 5.0f; // 200mS for 0 to 127
     int found = 0;
 
-    if (!interchange.Init(this))
+    if (!interchange.Init())
     {
         Runtime.LogError("interChange init failed");
         goto bail_out;

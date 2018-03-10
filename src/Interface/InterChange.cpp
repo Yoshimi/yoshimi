@@ -64,7 +64,7 @@ InterChange::InterChange(SynthEngine *_synth) :
 }
 
 
-bool InterChange::Init(SynthEngine *_synth)
+bool InterChange::Init()
 {
     flagsValue = 0xffffffff;
     if (!(fromCLI = jack_ringbuffer_create(sizeof(commandSize) * 256)))
@@ -2363,6 +2363,7 @@ string InterChange::resolveAddVoice(CommandBlock *getData)
             break;
         case 98:
             contstr = "440Hz";
+            break;
         case 99:
             contstr = "Octave";
             break;
@@ -4014,19 +4015,25 @@ void InterChange::commandVector(CommandBlock *getData)
                 }
             }
             else
+            {
                 ;
+            }
             break;
         case 17: // left instrument
             if (write)
                 synth->vectorSet(4, chan, value);
             else
+            {
                 ;
+            }
             break;
         case 18: // right instrument
             if (write)
                 synth->vectorSet(5, chan, value);
             else
+            {
                 ;
+            }
             break;
         case 19:
         case 35: // volume feature
@@ -4036,7 +4043,9 @@ void InterChange::commandVector(CommandBlock *getData)
                 else
                     bitSet(features, 0);
             else
+            {
                 ;
+            }
             break;
         case 20:
         case 36: // panning feature
@@ -4052,7 +4061,9 @@ void InterChange::commandVector(CommandBlock *getData)
                 }
             }
             else
+            {
                 ;
+            }
             break;
         case 21:
         case 37: // filter cutoff feature
@@ -4068,7 +4079,9 @@ void InterChange::commandVector(CommandBlock *getData)
                 }
             }
             else
+            {
                 ;
+            }
             break;
         case 22:
         case 38: // modulation feature
@@ -4084,7 +4097,9 @@ void InterChange::commandVector(CommandBlock *getData)
                 }
             }
             else
+            {
                 ;
+            }
             break;
 
         case 32: // enable Y and set CC
@@ -4099,19 +4114,25 @@ void InterChange::commandVector(CommandBlock *getData)
                 }
             }
             else
+            {
                 ;
+            }
             break;
         case 33: // up instrument
             if (write)
                 synth->vectorSet(6, chan, value);
             else
+            {
                 ;
+            }
             break;
         case 34: // down instrument
             if (write)
                 synth->vectorSet(7, chan, value);
             else
+            {
                 ;
+            }
             break;
     }
 
@@ -5323,8 +5344,8 @@ void InterChange::commandPart(CommandBlock *getData)
                 string name = miscMsgPop(par2);
                 synth->part[npart]->Pname = name;
                 getData->data.par2 = miscMsgPush(name);
-                break;
             }
+            break;
         case 224:
             if (write)
                 part->SetController(0x79,0); // C_resetallcontrollers
@@ -6372,7 +6393,9 @@ void InterChange::commandPad(CommandBlock *getData)
             if (write)
                 pars->PStereo = value_bool;
             else
+            {
                 ;
+            }
             break;
 
         case 120:
@@ -7131,7 +7154,9 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (write)
                 pars->changed = true;
             else
+            {
                 ;
+            }
             break;
         case 37:
             if (write)
