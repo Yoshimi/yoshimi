@@ -1442,7 +1442,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
   } {
     Fl_Window ADnoteGlobalParameters {
       label {ADsynth Global Parameters of the Instrument}
-      xywh {581 40 535 405} type Double hide
+      xywh {151 81 535 405} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
       code1 {o->position(synth->getGuiMaster()->addNoteX, synth->getGuiMaster()->addNoteY);}
     } {
@@ -1753,7 +1753,7 @@ if (Fl::event_button() == 3)
     }
     Fl_Window ADnoteVoiceList {
       label {ADsynth Voices list}
-      xywh {114 259 650 260} type Double hide
+      xywh {101 233 650 260} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice List").c_str());}
     } {
       Fl_Text_Display {} {

@@ -2265,6 +2265,7 @@ send_data(223, 0, 0xd0, 255, 255, 255, param);}
   Function {showparameters(int kititem, int engine)} {} {
     code {//
     string tname;
+    kitname = part->kit[kititem].Pname;
     if (engine == -1)
     {   // this is used if I want to clear the engine from the part
         if (kititem == lastkititem)
@@ -2301,42 +2302,20 @@ send_data(223, 0, 0xd0, 255, 255, 255, param);}
 
         if (part->kit[kititem].adpars)
             adnoteui = new ADnoteUI(part->kit[kititem].adpars, npart, lastkititem);
+            
         if (part->kit[kititem].subpars)
             subnoteui = new SUBnoteUI(part->kit[kititem].subpars, npart, lastkititem);
 
         if (part->kit[kititem].padpars)
             padnoteui = new PADnoteUI(part->kit[kititem].padpars, npart, lastkititem);
     }
+    
     if (engine == 0 && adnoteui != NULL)
-        tname = synth->getGuiMaster()->setPartWindowTitle("AddSynth");
-    else if (engine == 1 && subnoteui != NULL)
-        tname = synth->getGuiMaster()->setPartWindowTitle("SubSynth");
-    else if (engine == 2 && padnoteui != NULL)
-        tname = synth->getGuiMaster()->setPartWindowTitle("PadSynth");
-    else return;
-
-    if (part->Pkitmode)
-    {
-        tname += asString(kititem + 1);
-        if(part->kit[kititem].Pname > "")
-           tname += (" - " + part->kit[kititem].Pname);
-    }
-
-    if (engine == 0)
-    {
-        adnoteui->ADnoteGlobalParameters->copy_label(tname.c_str());
         adnoteui->ADnoteGlobalParameters->show();
-    }
-    else if (engine == 1)
-    {
-        subnoteui->SUBparameters->copy_label(tname.c_str());
+    if (engine == 1 && subnoteui != NULL)
         subnoteui->SUBparameters->show();
-    }
-    else
-    {
-        padnoteui->padnotewindow->copy_label(tname.c_str());
-        padnoteui->padnotewindow->show();
-    }} {}
+    if (engine == 2 && adnoteui != NULL)
+        padnoteui->padnotewindow->show();} {}
   }
   Function {setinstrumentlabel()} {} {
     code {//
@@ -2424,7 +2403,9 @@ send_data(223, 0, 0xd0, 255, 255, 255, param);}
   }
   decl {int lastkititem;} {public local
   }
-  decl {PartKitItem *partkititem[NUM_KIT_ITEMS];} {private local
+  decl {string kitname;} {public local
+  }
+  decl {PartKitItem *partkititem[NUM_KIT_ITEMS];} {public local
   }
   decl {SynthEngine *synth;} {private local
   }

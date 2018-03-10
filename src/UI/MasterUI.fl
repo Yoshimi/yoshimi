@@ -2071,7 +2071,15 @@ ZynAddSubFX}
     code {//
     string extension = " - Part " + asString(partui->npart + 1) + " " + partui->part->Pname;
     if (partui->part->Pkitmode)
+    {
         extension += ", Kit ";
+        if (partui->lastkititem >= 0)
+        {
+            extension += to_string(partui->lastkititem + 1);
+            if (partui->kitname > "")
+                extension += (" - " + partui->kitname);
+        }
+    }
     return synth->makeUniqueName(prefix + extension);} {}
   }
   Function {setPartActive(int _npart, bool active)} {} {
