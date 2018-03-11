@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2017, Will Godfrey
+    Copyright 2014-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified December 2017
+    Modified March 2018
 */
 
 #include <zlib.h>
@@ -63,11 +63,17 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi) :
     memset(&parentstack, 0, sizeof(parentstack));
     tree = mxmlNewElement(MXML_NO_PARENT, "?xml version=\"1.0\" encoding=\"UTF-8\"?");
     mxml_node_t *doctype = mxmlNewElement(tree, "!DOCTYPE");
-    bool yoshiType = (synth->getRuntime().xmlType <= XML_PRESETS);
-    // cout << "yoshiType  " << yoshiType << "   isYoshi " << isYoshi << endl;
 
-    if (!yoshiType || !isYoshi)
+    if (isYoshi)
     {
+        //cout << "Our doctype" << endl;
+        mxmlElementSetAttr(doctype, "Yoshimi-data", NULL);
+        root = mxmlNewElement(tree, "Yoshimi-data");
+        information.yoshiType = 1;
+    }
+    else
+    {
+        //cout << "Zyn doctype" << endl;
         mxmlElementSetAttr(doctype, "ZynAddSubFX-data", NULL);
         root = mxmlNewElement(tree, "ZynAddSubFX-data");
         mxmlElementSetAttr(root, "version-major", "3");
@@ -75,12 +81,7 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi) :
         mxmlElementSetAttr(root, "ZynAddSubFX-author", "Nasca Octavian Paul");
         information.yoshiType = 0;
     }
-    else
-    {
-        mxmlElementSetAttr(doctype, "Yoshimi-data", NULL);
-        root = mxmlNewElement(tree, "Yoshimi-data");
-        information.yoshiType = 1;
-    }
+
     node = root;
     mxmlElementSetAttr(root, "Yoshimi-author", "Alan Ernest Calvert");
     string tmp = YOSHIMI_VERSION;

@@ -934,7 +934,7 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
         string checkfile = setExtension(getFullPath(rootID, bankID, pos), xiyext);
         if (!isRegFile(checkfile))
             checkfile = setExtension(getFullPath(rootID, bankID, pos), xizext);
-        XMLwrapper *xml = new XMLwrapper(synth);
+        XMLwrapper *xml = new XMLwrapper(synth, true);
         xml->checkfileinformation(checkfile);
         instrRef.PADsynth_used = xml->information.PADsynth_used;
         instrRef.ADDsynth_used = xml->information.ADDsynth_used;

@@ -4,6 +4,8 @@ yoshimi 1.5.7 rc2
 * Fixed regression. AddVoice modulator not changing.
 * Clarified GUI voice and modulator selection.
 * Set version as 1.5.7 rc2
+* Bugfix: Sometimes setting the wrong XML doctype.
+* Added Voice/Modulator info to docs
 
 2018-3-10 Will
 * Reverted incorrect change to DynamicTooltip.cpp

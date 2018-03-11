@@ -2381,7 +2381,7 @@ bool SynthEngine::saveBanks(int instance)
     string bankname = name + ".banks";
     Runtime.xmlType = XML_BANK;
 
-    XMLwrapper *xmltree = new XMLwrapper(this);
+    XMLwrapper *xmltree = new XMLwrapper(this, true);
     if (!xmltree)
     {
         Runtime.Log("saveBanks failed xmltree allocation");
@@ -2511,7 +2511,7 @@ bool SynthEngine::loadHistory()
         Runtime.Log("Missing history file");
         return false;
     }
-    XMLwrapper *xml = new XMLwrapper(this);
+    XMLwrapper *xml = new XMLwrapper(this, true);
     if (!xml)
     {
         Runtime.Log("loadHistory failed XMLwrapper allocation");
@@ -2589,7 +2589,7 @@ bool SynthEngine::saveHistory()
     string historyname = name + ".history";
     Runtime.xmlType = XML_HISTORY;
 
-    XMLwrapper *xmltree = new XMLwrapper(this);
+    XMLwrapper *xmltree = new XMLwrapper(this, true);
     if (!xmltree)
     {
         Runtime.Log("saveHistory failed xmltree allocation");
@@ -2682,7 +2682,7 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool 
         Runtime.Log("Can't find " + file, 2);
         return actualBase;
     }
-    XMLwrapper *xml = new XMLwrapper(this);
+    XMLwrapper *xml = new XMLwrapper(this, true);
     if (!xml)
     {
         Runtime.Log("Load Vector failed XMLwrapper allocation", 2);
@@ -2822,7 +2822,7 @@ unsigned char SynthEngine::saveVector(unsigned char baseChan, string name, bool 
     legit_pathname(file);
 
     Runtime.xmlType = XML_VECTOR;
-    XMLwrapper *xml = new XMLwrapper(this);
+    XMLwrapper *xml = new XMLwrapper(this, true);
     if (!xml)
     {
         Runtime.Log("Save Vector failed xmltree allocation", 2);
@@ -2971,7 +2971,7 @@ void SynthEngine::add2XML(XMLwrapper *xml)
 
 int SynthEngine::getalldata(char **data)
 {
-    XMLwrapper *xml = new XMLwrapper(this);
+    XMLwrapper *xml = new XMLwrapper(this, true);
     add2XML(xml);
     midilearn.insertMidiListData(false, xml);
     *data = xml->getXMLdata();
@@ -2982,7 +2982,7 @@ int SynthEngine::getalldata(char **data)
 
 void SynthEngine::putalldata(const char *data, int size)
 {
-    XMLwrapper *xml = new XMLwrapper(this);
+    XMLwrapper *xml = new XMLwrapper(this, true);
     if (!xml->putXMLdata(data))
     {
         Runtime.Log("SynthEngine: putXMLdata failed");
@@ -3001,7 +3001,7 @@ bool SynthEngine::savePatchesXML(string filename)
 {
     filename = setExtension(filename, "xmz");
     Runtime.xmlType = XML_PARAMETERS;
-    XMLwrapper *xml = new XMLwrapper(this);
+    XMLwrapper *xml = new XMLwrapper(this, true);
     add2XML(xml);
     bool result = xml->saveXMLfile(filename);
     delete xml;
@@ -3013,7 +3013,7 @@ bool SynthEngine::savePatchesXML(string filename)
 
 bool SynthEngine::loadXML(string filename)
 {
-    XMLwrapper *xml = new XMLwrapper(this);
+    XMLwrapper *xml = new XMLwrapper(this, true);
     if (NULL == xml)
     {
         Runtime.Log("Failed to init xml tree", 2);

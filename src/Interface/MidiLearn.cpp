@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified February 2018
+    Modified March 2018
 */
 
 #include <iostream>
@@ -824,7 +824,7 @@ bool MidiLearn::saveList(string name)
     legit_pathname(file);
 
     synth->getRuntime().xmlType = XML_MIDILEARN;
-    XMLwrapper *xml = new XMLwrapper(synth);
+    XMLwrapper *xml = new XMLwrapper(synth, true);
     if (!xml)
     {
         synth->getRuntime().Log("Save Midi Learn failed xmltree allocation");
@@ -907,7 +907,7 @@ bool MidiLearn::loadList(string name)
         synth->getRuntime().Log("Can't find " + file);
         return false;
     }
-    XMLwrapper *xml = new XMLwrapper(synth);
+    XMLwrapper *xml = new XMLwrapper(synth, true);
     if (!xml)
     {
         synth->getRuntime().Log("Load Midi Learn failed XMLwrapper allocation");

@@ -460,7 +460,7 @@ bool Config::loadConfig(void)
     }
     else
     {
-        XMLwrapper *xml = new XMLwrapper(synth);
+        XMLwrapper *xml = new XMLwrapper(synth, true);
         if (!xml)
             Log("loadConfig failed XMLwrapper allocation");
         else
@@ -627,7 +627,7 @@ bool Config::saveConfig(void)
 {
     bool result = false;
     xmlType = XML_CONFIG;
-    XMLwrapper *xmltree = new XMLwrapper(synth);
+    XMLwrapper *xmltree = new XMLwrapper(synth, true);
     if (!xmltree)
     {
         Log("saveConfig failed xmltree allocation", 2);
@@ -703,7 +703,7 @@ bool Config::saveSessionData(string savefile)
 {
     savefile = setExtension(savefile, "state");
     synth->getRuntime().xmlType = XML_STATE;
-    XMLwrapper *xmltree = new XMLwrapper(synth);
+    XMLwrapper *xmltree = new XMLwrapper(synth, true);
     if (!xmltree)
     {
         Log("saveSessionData failed xmltree allocation", 3);
@@ -738,7 +738,7 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
         Log("Session file " + sessionfile + " not available", 2);
         goto end_game;
     }
-    if (!(xml = new XMLwrapper(synth)))
+    if (!(xml = new XMLwrapper(synth, true)))
     {
         Log("Failed to init xmltree for restoreState", 3);
         goto end_game;
