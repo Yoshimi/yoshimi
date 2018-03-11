@@ -1,4 +1,9 @@
-yoshimi 1.5.7 rc1
+yoshimi 1.5.7 rc2
+
+2013-3-11 Will
+* Fixed regression. AddVoice modulator not changing.
+* Clarified GUI voice and modulator selection.
+* Set version as 1.5.7 rc2
 
 2018-3-10 Will
 * Reverted incorrect change to DynamicTooltip.cpp

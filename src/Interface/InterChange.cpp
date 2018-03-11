@@ -3806,7 +3806,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
 
     if (engine >= 0x80)
     {
-        if ((engine & 0x7f) > 7)
+        if ((engine & 0x3f) > 7)
         {
             getData->data.type = 0xff; // block any further action
             synth->getRuntime().Log("Invalid voice number");

@@ -266,7 +266,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
       label Voice
-      xywh {585 366 770 580} type Double hide
+      xywh {9 87 770 580} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
       class Fl_Group
     } {
@@ -413,21 +413,21 @@ send_data(82, o->value(), 0xc8);}
               }
             }
             Fl_Group modoscil {
-              label {Mod Oscilator}
+              label {                       }
               xywh {535 365 220 200} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
             } {
+              Fl_Text_Display {} {
+                label {Mod. Oscillator}
+                xywh {549 385 95 2} box NO_BOX labelfont 1 labelsize 11
+              }
               Fl_Group fmoscil {
                 xywh {535 425 220 140} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179
                 code0 {oscFM = new Oscilloscope(o->x(),o->y(),o->w(),o->h(),"");}
                 code1 {int nv=nvoice; if (pars->VoicePar[nvoice].PextFMoscil>=0) nv=pars->VoicePar[nvoice].PextFMoscil;}
                 code2 {oscFM->init(pars->VoicePar[nv].FMSmp,0,pars->VoicePar[nvoice].PFMoscilphase, synth);}
               } {}
-              Fl_Box {} {
-                label {Mod.Oscillator}
-                xywh {535 365 155 20} labelfont 1 labelsize 12 align 20 hide deactivate
-              }
               Fl_Button changeFMoscilbutton {
-                label Change
+                label Waveform
                 callback {//
                     if (oscedit != NULL)
                         delete oscedit;
@@ -437,14 +437,14 @@ send_data(82, o->value(), 0xc8);}
                     oscedit = new OscilEditor(pars->VoicePar[nv].FMSmp, fmoscil, NULL, NULL, synth, npart, kititem, nvoice + 0xC0);
                     if ((Fl::event_button() == 3))
                         synth->getGuiMaster()->partui->adnoteui->ADnoteVoice->hide();}
-                xywh {704 368 43 12} box THIN_UP_BOX labelfont 1 labelsize 9
+                xywh {666 372 62 12} box THIN_UP_BOX labelfont 1 labelsize 9
                 code0 {if (pars->VoicePar[nvoice].PextFMoscil>=0) o->labelcolor(FL_BLUE);}
               }
               Fl_Slider ModPhase {
                 label Phase
                 callback {//
                     send_data(112, o->value(), 0xd8);}
-                xywh {665 396 65 12} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
+                xywh {659 401 75 12} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
                 code0 {o->value(64-pars->VoicePar[nvoice].PFMoscilphase);}
                 class mwheel_slider_rev
               }
@@ -452,19 +452,19 @@ send_data(82, o->value(), 0xc8);}
                 label Use
                 callback {//
                     send_data(113, o->value() - 1, 0xd0);}
-                xywh {560 395 75 15} down_box BORDER_BOX selection_color 49 labelsize 10 textfont 1 textsize 10
+                xywh {562 400 75 15} down_box BORDER_BOX selection_color 49 labelsize 10 align 1 textfont 1 textsize 10
                 code0 {o->add("Internal");}
-                code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "ExtM.%2d", i + 1); o->add(tmp);};}
+                code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "Mod.%2d", i + 1); o->add(tmp);};}
                 code3 {o->value(pars->VoicePar[nvoice].PextFMoscil + 1);}
               } {}
             }
             Fl_Choice ExtMod {
-              label {External Mod.}
+              label {Oscillator Source}
               callback {//
                   send_data(17, o->value() - 1, 0xd0);}
-              xywh {670 32 85 20} down_box BORDER_BOX selection_color 49 labelsize 10 align 5 textfont 1 textsize 10
-              code0 {o->add("OFF");}
-              code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "ExtMod.%2d", i + 1); o->add(tmp);};}
+              xywh {667 32 88 20} down_box BORDER_BOX selection_color 49 labelsize 10 align 5 textfont 1 textsize 10
+              code0 {o->add("Local");}
+              code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "Voice %2d", i + 1); o->add(tmp);};}
               code2 {o->value(pars->VoicePar[nvoice].PFMVoice + 1);}
               code3 {if (lrint(o->value())) {modoscil->deactivate(); modfrequency->deactivate();}}
             } {}
@@ -704,7 +704,7 @@ send_data(39, o->value(), 0xc8);}
                 send_data(137, o->value() - 1, 0xd0);}
             xywh {5 455 72 15} down_box BORDER_BOX selection_color 49 labelsize 10 align 1 textfont 1 textsize 10
             code0 {o->add("Internal");}
-            code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "Ext.%2d", i + 1); o->add(tmp);};}
+            code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "Voice %2d", i + 1); o->add(tmp);};}
             code3 {o->value(pars->VoicePar[nvoice].Pextoscil + 1);}
           } {}
           Fl_Check_Button UnisonEn {
@@ -1383,6 +1383,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
             }
             else
                 changevoiceoscilbutton->labelcolor(FL_BLUE);
+            changevoiceoscilbutton->redraw();
             osc->init(pars->VoicePar[tmp].OscilSmp, synth);
             osc->redraw();
             break;
@@ -1407,6 +1408,12 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
         nvoice = nvoice_;
         make_window();
         end();
+        if (nvoice == 0)
+        {
+            UseOsc->deactivate();
+            ExtMod->deactivate();
+            ExtModOsc->deactivate();
+        }
         ADnoteVoiceParameters->show();} {}
   }
   Function {~ADvoiceUI()} {} {
