@@ -3834,9 +3834,37 @@ bool InterChange::commandSendReal(CommandBlock *getData)
             case 6:
             case 7:
                 if (engine >= 0xc0)
-                    commandOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine & 0x1f].FMSmp);
+                {
+                    engine &= 7;
+                    if (control != 113)
+                    {
+                        int voicechange = part->kit[kititem].adpars->VoicePar[engine].PextFMoscil;
+                        //cout << "ext Mod osc " << voicechange << endl;
+                        if (voicechange != -1)
+                        {
+                            engine = voicechange;
+                            getData->data.engine = engine | 0xc0;
+                        }   // force it to external mod
+                    }
+
+                    commandOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine].FMSmp);
+                }
                 else
-                    commandOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine & 0x1f].OscilSmp);
+                {
+                    engine &= 7;
+                    if (control != 137)
+                    {
+                        int voicechange = part->kit[kititem].adpars->VoicePar[engine].Pextoscil;
+                        //cout << "ext voice osc " << voicechange << endl;
+                        if (voicechange != -1)
+                        {
+                            engine = voicechange;
+                            getData->data.engine = engine | 0x80;
+                        }   // force it to external voice
+                    }
+
+                    commandOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine].OscilSmp);
+                }
                 break;
         }
         __sync_and_and_fetch(&blockRead, 2);
@@ -5526,6 +5554,7 @@ void InterChange::commandAddVoice(CommandBlock *getData)
     pars = part->kit[kititem].adpars;
 
     int k; // temp variable for detune
+
     switch (control)
     {
         case 0:

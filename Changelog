@@ -1,4 +1,9 @@
-yoshimi 1.5.7 rc2
+yoshimi 1.5.7 rc3
+
+2013-3-12 Will
+* Bugfix: Ext voice and modulators editing wrong.
+  GUI still not completely correct - never was!
+* Set version as 1.5.7 rc3
 
 2013-3-11 Will
 * Fixed regression. AddVoice modulator not changing.

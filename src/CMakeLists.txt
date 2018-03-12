@@ -2,7 +2,7 @@
 #   CMakeLists.txt
 #
 #   Copyright 2009-2011, Alan Calvert
-#   Copyright 2014-2017, Will Godfrey & others
+#   Copyright 2014-2018, Will Godfrey & others
 #
 #   This file is part of yoshimi, which is free software: you can
 #   redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-# Modifed December 2017
+# Modifed March 2018
 
 project (Yoshimi)
 cmake_minimum_required (VERSION 3.0)
@@ -36,7 +36,7 @@ add_definitions(-Werror=format-security)
 #add_definitions(-Wextra)
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "1.5.7 rc2")
+set (YOSHIMI_VERSION "1.5.7 rc3")
 add_definitions (-DMIN_CONFIG_MAJOR=1)
 add_definitions (-DMIN_CONFIG_MINOR=5)
 
