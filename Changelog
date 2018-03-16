@@ -1,4 +1,10 @@
-yoshimi 1.5.7 rc3
+yoshimi 1.5.7 rc4
+
+2013-3-16 Will
+* Implemented Tabbed AddSynth Voices.
+* Changed layout as workround for bottom edge bug.
+  Needs sorting for contol knobs anywhere :(
+* Set version as 1.5.7 rc4
 
 2013-3-12 Will
 * Bugfix: Ext voice and modulators editing wrong.
