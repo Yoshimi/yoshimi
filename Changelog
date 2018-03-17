@@ -3,6 +3,8 @@ yoshimi 1.5.7 rc4
 2013-3-17 Will
 * Improved detection of user guide.
 * Code cleanups - Compiler warning suppression.
+* New 1.5.7 features list added to doc.
+* Remaining warnings suppressed.
 
 2013-3-16 Will
 * Implemented Tabbed AddSynth Voices.

@@ -258,7 +258,8 @@ string MiscFuncs::findfile(string path, string filename, string extension)
     if (extension.at(0) != '.')
         extension = "." + extension;
     string command = "find " + path + " -name " + filename + extension + " 2>/dev/null -print -quit";
-#warning Using '2>/dev/null' here suppresses *all* error messages
+#pragma message "Using '2>/dev/null' here suppresses *all* error messages"
+    // it's done here to suppress warnings of invalid locations
     FILE *fp = popen(command.c_str(), "r");
     if (fp == NULL)
         return "";

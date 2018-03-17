@@ -421,7 +421,22 @@ void *AlsaEngine::AudioThread(void)
         audio.pcm_state = snd_pcm_state(audio.handle);
         if (audio.pcm_state != SND_PCM_STATE_RUNNING)
         {
-            switch (audio.pcm_state)
+            bool done = false; // now done this way to suppress warnings
+            if (audio.pcm_state == SND_PCM_STATE_XRUN || audio.pcm_state == SND_PCM_STATE_SUSPENDED)
+            {
+                if (!xrunRecover())
+                    done = true;
+            }
+            if (!done || audio.pcm_state == SND_PCM_STATE_SETUP)
+            {
+                if (alsaBad(snd_pcm_prepare(audio.handle), "alsa audio pcm prepare failed"))
+                    done = true;
+            }
+            if (!done || audio.pcm_state == SND_PCM_STATE_PREPARED)
+            {
+                alsaBad(snd_pcm_start(audio.handle), "pcm start failed");
+            }
+            /*switch (audio.pcm_state)
             {
                 case SND_PCM_STATE_XRUN:
 
@@ -442,7 +457,7 @@ void *AlsaEngine::AudioThread(void)
                     synth->getRuntime().Log("Alsa AudioThread, weird SND_PCM_STATE: "
                                 + asString(audio.pcm_state));
                     break;
-            }
+            }*/
             audio.pcm_state = snd_pcm_state(audio.handle);
         }
         if (audio.pcm_state == SND_PCM_STATE_RUNNING)
