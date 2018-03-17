@@ -150,6 +150,7 @@ class VectorUI {: {private MiscFuncs}
         }
         Fl_Button XL {
           callback {//
+          Fl_Button *a = o; o = a; // suppress warning
           synth->getGuiMaster()->npart = BaseChan;
           bankui->Show();
           //send_data(17, o->value(), 0xf0);}
@@ -169,6 +170,7 @@ class VectorUI {: {private MiscFuncs}
         }
         Fl_Button XR {
           callback {//
+          Fl_Button *a = o; o = a; // suppress warning
           synth->getGuiMaster()->npart = BaseChan + NUM_MIDI_CHANNELS;
           bankui->Show();
           //send_data(18, o->value(), 0xf0);}
@@ -330,6 +332,7 @@ class VectorUI {: {private MiscFuncs}
         }
         Fl_Button YU {
           callback {//
+          Fl_Button *a = o; o = a; // suppress warning
           synth->getGuiMaster()->npart = BaseChan + NUM_MIDI_CHANNELS * 2;
           bankui->Show();
           //send_data(33, o->value(), 0xc0);}
@@ -349,6 +352,7 @@ class VectorUI {: {private MiscFuncs}
         }
         Fl_Button YD {
           callback {//
+          Fl_Button *a = o; o = a; // suppress warning
           synth->getGuiMaster()->npart = BaseChan + NUM_MIDI_CHANNELS * 3;
           bankui->Show();
           //send_data(34, o->value(), 0xc0);}
@@ -488,6 +492,7 @@ class VectorUI {: {private MiscFuncs}
       Fl_Button Loaded {
         label {No Name}
         callback {//
+        Fl_Button *a = o; o = a; // suppress warning
         const char *tmp = NULL;
         tmp = fl_input("Vector name:", loadlabel[BaseChan].c_str());
         if (tmp != NULL && !string(tmp).empty())

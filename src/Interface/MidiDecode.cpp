@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified January 2018
+    Modified March 2018
 */
 
 #include <iostream>
@@ -51,6 +51,7 @@ MidiDecode::~MidiDecode()
 
 void MidiDecode::midiProcess(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place, bool inSync)
 {
+    bool a = inSync; inSync = a; // suppress warning (may need this later)
     unsigned char channel; // , note, velocity;
     int ctrltype, par;
     channel = par0 & 0x0F;

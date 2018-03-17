@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2013, Nikita Zlobin
-    Copyright 2014-2017, Will Godfrey & others
+    Copyright 2014-2018, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified December 2017
+    Modified March 2018
 */
 
 #include <iostream>
@@ -61,29 +61,29 @@ string argline = "Yoshimi " + (string) YOSHIMI_VERSION + "\nBuild Number " + to_
 const char* argp_program_version = argline.c_str();
 
 static struct argp_option cmd_options[] = {
-    {"alsa-audio",        'A',  "<device>",   1,  "use alsa audio output" },
-    {"alsa-midi",         'a',  "<device>",   1,  "use alsa midi input" },
-    {"define-root",       'D',  "<path>",     0,  "define path to new bank root"},
-    {"buffersize",        'b',  "<size>",     0,  "set internal buffer size" },
-    {"no-gui",            'i',  NULL,         0,  "disable gui"},
-    {"gui",               'I',  NULL,         0,  "enable gui"},
-    {"no-cmdline",        'c',  NULL,         0,  "disable command line interface"},
-    {"cmdline",           'C',  NULL,         0,  "enable command line interface"},
-    {"jack-audio",        'J',  "<server>",   1,  "use jack audio output" },
-    {"jack-midi",         'j',  "<device>",   1,  "use jack midi input" },
-    {"autostart-jack",    'k',  NULL,         0,  "auto start jack server" },
-    {"auto-connect",      'K',  NULL,         0,  "auto connect jack audio" },
-    {"load",              'l',  "<file>",     0,  "load .xmz file" },
-    {"load-instrument",   'L',  "<file>",     0,  "load .xiz file" },
-    {"name-tag",          'N',  "<tag>",      0,  "add tag to clientname" },
-    {"samplerate",        'R',  "<rate>",     0,  "set alsa audio sample rate" },
-    {"oscilsize",         'o',  "<size>",     0,  "set AddSynth oscilator size" },
-    {"state",             'S',  "<file>",     1,  "load saved state, defaults to '$HOME/.config/yoshimi/yoshimi.state'" },
+    {"alsa-audio",        'A',  "<device>",   1,  "use alsa audio output", 0},
+    {"alsa-midi",         'a',  "<device>",   1,  "use alsa midi input", 0},
+    {"define-root",       'D',  "<path>",     0,  "define path to new bank root" , 0},
+    {"buffersize",        'b',  "<size>",     0,  "set internal buffer size", 0 },
+    {"no-gui",            'i',  NULL,         0,  "disable gui", 0},
+    {"gui",               'I',  NULL,         0,  "enable gui", 0},
+    {"no-cmdline",        'c',  NULL,         0,  "disable command line interface", 0},
+    {"cmdline",           'C',  NULL,         0,  "enable command line interface", 0},
+    {"jack-audio",        'J',  "<server>",   1,  "use jack audio output", 0},
+    {"jack-midi",         'j',  "<device>",   1,  "use jack midi input", 0},
+    {"autostart-jack",    'k',  NULL,         0,  "auto start jack server", 0},
+    {"auto-connect",      'K',  NULL,         0,  "auto connect jack audio", 0},
+    {"load",              'l',  "<file>",     0,  "load .xmz file", 0},
+    {"load-instrument",   'L',  "<file>",     0,  "load .xiz file", 0},
+    {"name-tag",          'N',  "<tag>",      0,  "add tag to clientname", 0},
+    {"samplerate",        'R',  "<rate>",     0,  "set alsa audio sample rate", 0},
+    {"oscilsize",         'o',  "<size>",     0,  "set AddSynth oscilator size", 0},
+    {"state",             'S',  "<file>",     1,  "load saved state, defaults to '$HOME/.config/yoshimi/yoshimi.state'", 0},
     #if defined(JACK_SESSION)
-        {"jack-session-uuid", 'U',  "<uuid>",     0,  "jack session uuid" },
-        {"jack-session-file", 'u',  "<file>",     0,  "load named jack session file" },
+        {"jack-session-uuid", 'U',  "<uuid>",     0,  "jack session uuid", 0},
+        {"jack-session-file", 'u',  "<file>",     0,  "load named jack session file", 0},
     #endif
-    { 0, }
+    { 0, 0, 0, 0, 0, 0}
 };
 
 unsigned int Config::Samplerate = 48000;
@@ -1225,7 +1225,7 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
 }
 
 
-static struct argp cmd_argp = { cmd_options, parse_cmds, prog_doc };
+static struct argp cmd_argp = { cmd_options, parse_cmds, prog_doc, 0, 0, 0, 0};
 
 
 void Config::loadCmdArgs(int argc, char **argv)

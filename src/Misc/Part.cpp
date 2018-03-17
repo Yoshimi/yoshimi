@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified February 2018
+    Modified March 2018
 */
 
 #include <cstring>
@@ -1568,7 +1568,6 @@ float Part::getLimits(CommandBlock *getData)
 
         case 7:
             type |= 0x40;
-        case 57:
             def = 0;
             max = 1;
             break;
@@ -1625,6 +1624,11 @@ float Part::getLimits(CommandBlock *getData)
         case 48:
             def = 0;
             max = 50;
+            break;
+
+        case 57:
+            def = 0;
+            max = 1;
             break;
 
         case 58:

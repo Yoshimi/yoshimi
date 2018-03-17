@@ -3,6 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -18,7 +19,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2009
+    This file is a derivative of a ZynAddSubFX original.
+
+    Modified October 2018
 */
 
 #ifndef FILTER__H
@@ -33,7 +36,7 @@ class Filter_
         virtual void setfreq(float frequency) = 0;
         virtual void setfreq_and_q(float frequency, float q_) = 0;
         virtual void setq(float q_) = 0;
-        virtual void setgain(float dBgain) { };
+        virtual void setgain(float /* dBgain */) { };
         float outgain;
 };
 

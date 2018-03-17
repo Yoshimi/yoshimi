@@ -303,7 +303,7 @@ bail_out:
     return false;
 }
 
-void *commandThread(void *arg)
+void *commandThread(void *arg = NULL) // silence warning
 {
     commandInt.cmdIfaceCommandLoop();
     return 0;

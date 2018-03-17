@@ -109,7 +109,7 @@ class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
 }
 
 class PartUI_ {} {
-  Function {showparameters(int kititem,int engine)} {return_type virtual
+  Function {showparameters(int /* kititem */,int /* engine */)} {return_type virtual
   } {
     code {;} {}
   }
@@ -2302,14 +2302,14 @@ send_data(223, 0, 0xd0, 255, 255, 255, param);}
 
         if (part->kit[kititem].adpars)
             adnoteui = new ADnoteUI(part->kit[kititem].adpars, npart, lastkititem);
-            
+
         if (part->kit[kititem].subpars)
             subnoteui = new SUBnoteUI(part->kit[kititem].subpars, npart, lastkititem);
 
         if (part->kit[kititem].padpars)
             padnoteui = new PADnoteUI(part->kit[kititem].padpars, npart, lastkititem);
     }
-    
+
     if (engine == 0 && adnoteui != NULL)
         adnoteui->ADnoteGlobalParameters->show();
     if (engine == 1 && subnoteui != NULL)

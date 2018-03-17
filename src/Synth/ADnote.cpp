@@ -1631,13 +1631,6 @@ void ADnote::computeVoiceOscillatorFrequencyModulation(int nvoice, int FMmode)
 }
 
 
-// Calculeaza Oscilatorul cu PITCH MODULATION
-void ADnote::computeVoiceOscillatorPitchModulation(int nvoice)
-{
-//TODO
-}
-
-
 // Computes the Noise
 void ADnote::computeVoiceNoise(int nvoice)
 {

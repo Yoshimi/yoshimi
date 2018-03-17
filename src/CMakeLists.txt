@@ -33,7 +33,7 @@ add_definitions(-std=gnu++11) # various versions of cmake
 add_definitions(-Wall)
 add_definitions(-Werror=format-security)
 #add_definitions(-Wpedantic)
-#add_definitions(-Wextra)
+add_definitions(-Wextra)
 # ^^^ comment these out on release pushes
 
 set (YOSHIMI_VERSION "1.5.7 rc4")

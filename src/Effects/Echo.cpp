@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified February 2018
+    Modified March 2018
 */
 
 #include "Misc/SynthEngine.h"
@@ -301,6 +301,7 @@ float Echolimit::getlimits(CommandBlock *getData)
         case 16:
             max = 8;
             canLearn = false;
+            break;
         default:
             getData->data.type |= 4; // error
             return 1.0f;

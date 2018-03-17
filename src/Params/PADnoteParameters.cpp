@@ -22,7 +22,7 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified February 2018
+    Modified March 2018
 */
 
 #include <cmath>
@@ -510,10 +510,7 @@ void PADnoteParameters::generatespectrum_bandwidthMode(float *spectrum,
 // Generates the long spectrum for non-Bandwidth modes (only amplitudes are generated; phases will be random)
 void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
                                                     int size,
-                                                    float basefreq,
-                                                    float *profile,
-                                                    int profilesize,
-                                                    float bwadjust)
+                                                    float basefreq)
 {
     //for (int i = 0; i < size; ++i)
     //    spectrum[i] = 0.0;
@@ -625,8 +622,7 @@ void PADnoteParameters::applyparameters()
                                            profilesize, bwadjust);
         else
             generatespectrum_otherModes(spectrum, spectrumsize,
-                                        basefreq * basefreqadjust, profile,
-                                        profilesize, bwadjust);
+                                        basefreq * basefreqadjust);
 
         const int extra_samples = 5; // the last samples contains the first
                                      // samples (used for linear/cubic interpolation)

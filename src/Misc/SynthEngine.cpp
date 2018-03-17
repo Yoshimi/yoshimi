@@ -379,10 +379,7 @@ string SynthEngine::manualname(void)
 {
     string manfile = "yoshimi-user-manual-";
     manfile += YOSHIMI_VERSION;
-    int pos = manfile.find(" rc");
-    if (pos < 1)
-        return manfile;
-    return manfile.substr(0, pos);
+    return manfile.substr(0, manfile.find(" "));
 }
 
 
@@ -2241,6 +2238,7 @@ void SynthEngine::allStop(unsigned int stopType)
 bool SynthEngine::actionLock(lockset request)
 {
 #ifdef NOLOCKS
+    lockset a = request; request = a; // suppress warning
     return 0;
 #else
     int chk  = -1;
@@ -2669,6 +2667,7 @@ unsigned char SynthEngine::loadVectorAndUpdate(unsigned char baseChan, string na
 
 unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
 {
+    bool a = full; full = a; // suppress warning
     unsigned char actualBase = 255; // error!
     if (name.empty())
     {
@@ -2809,6 +2808,7 @@ unsigned char SynthEngine::extractVectorData(unsigned char baseChan, XMLwrapper 
 
 unsigned char SynthEngine::saveVector(unsigned char baseChan, string name, bool full)
 {
+    bool a = full; full = a; // suppress warning
     unsigned char result = 0xff; // ok
 
     if (baseChan >= NUM_MIDI_CHANNELS)
@@ -2982,6 +2982,7 @@ int SynthEngine::getalldata(char **data)
 
 void SynthEngine::putalldata(const char *data, int size)
 {
+    int a = size; size = a; // suppress warning (may be used later)
     XMLwrapper *xml = new XMLwrapper(this, true);
     if (!xml->putXMLdata(data))
     {

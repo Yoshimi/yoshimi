@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified February 2018
+    Modified March 2018
 */
 
 #ifndef OSCIL_GEN_H
@@ -63,7 +63,7 @@ class OscilGen : public Presets, private WaveShapeSamples
         void defaults(void);
         void getfromXML(XMLwrapper *xml);
         float getLimits(CommandBlock *getData);
-        void convert2sine(int magtype);
+        void convert2sine();
 
         // Make a new random seed for Amplitude Randomness -
         //   should be called every noteon event

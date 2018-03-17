@@ -328,17 +328,27 @@ class MasterUI {: {private GuiUpdates}
             label {&View Manual}
             callback {//
             string manfile = synth->manualname();
-            unsigned int pos = manfile.find(" ");
-            if (pos < string::npos)
-                manfile = manfile.substr(0, pos);
-            string path = findfile("/usr/", manfile.c_str(), "pdf");
-            if (path == "")
-            path = findfile("/home/", manfile.c_str(), "pdf");
+            unsigned int pos = manfile.rfind(".") + 1;
+            int wanted = stoi(manfile.substr(pos, 3));
+            int count = wanted + 1;
+            manfile = manfile.substr(0, pos);
+            string path = "";
+            while (path == "" && count > 0)
+            {
+                --count;
+                path = findfile("/usr/", (manfile + to_string(count)).c_str(), "pdf");
+                if (path == "")
+                   path = findfile("/home/", (manfile + to_string(count)).c_str(), "pdf");
+            }
+
             if (path == "")
             {
                 fl_alert("Can't find manual :(");
                 return;
             }
+            else if (count < wanted)
+                fl_alert("Can't find current manual. Using older one");
+
             string command = "xdg-open " + path + "&";
             FILE *fp = popen(command.c_str(), "r");
             if (fp == NULL)
@@ -435,7 +445,7 @@ class MasterUI {: {private GuiUpdates}
           MenuItem {} {
             label {&Load External...}
             callback {//
-            do_load_master(true, NULL);}
+            do_load_master(NULL);}
             tooltip {Load a patch set (.xmz) file} xywh {0 0 34 21} labelsize 12
           }
           MenuItem Save {
@@ -852,7 +862,7 @@ paramsui->Show(3);}
           class EffUI
         } {}
       }
-      Fl_Group partuigroup {open
+      Fl_Group partuigroup {
         xywh {3 255 380 170} box ENGRAVED_FRAME
       } {
         Fl_Group partui {
@@ -987,7 +997,7 @@ ZynAddSubFX}
     Fl_Window panelwindow {
       label {Yoshimi Mixer Panel}
       xywh {483 128 550 670} type Double labelfont 13 labelsize 13 hide
-      code0 {if (synth->getRuntime().single_row_panel) ;}
+      code0 {//if (synth->getRuntime().single_row_panel) ;}
       code1 {o->copy_label(synth->makeUniqueName("Mixer Panel").c_str());}
     } {
       Fl_Pack Panelpack1 {
@@ -1321,7 +1331,9 @@ ZynAddSubFX}
                 break;
             case 8: // load instrument
                 if (insert < 255)
-                    ;//updateBankRootDirs(); // apparently not needed!
+                {
+                    ;// updateBankRootDirs() // apparently not needed!
+                }
                 if (engine < 255)
                     bankui->readbankcfg();
                 if (insert < 255 || engine < 255)
@@ -1467,9 +1479,13 @@ ZynAddSubFX}
             break;
         case 73: // set current root and/or bank
             if (kititem < 255)
+            {
                 ; // do both
+            }
             else if (engine < 255)
+            {
                 ; // just bank
+            }
             break;
         case 75: // save instrument to bank
             name = miscMsgPop(par2);
@@ -1870,7 +1886,7 @@ ZynAddSubFX}
     partui->partgroup->deactivate();
     send_data(78, npart, 0xf0, 0xf0, 0xff, 0xff, 0xff, miscMsgPush(fname));} {}
   }
-  Function {do_load_master(bool updatehistory, const char* file)} {} {
+  Function {do_load_master(const char* file)} {} {
     code {//
     const char *fname;
     string lastname = synth->lastItemSeen(2);

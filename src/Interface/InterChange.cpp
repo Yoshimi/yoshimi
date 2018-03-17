@@ -840,7 +840,6 @@ string InterChange::formatScales(string text)
 
 float InterChange::readAllData(CommandBlock *getData)
 {
-    //if (commandType < 4) // these are all static
     if(getData->data.type & 4)
     {
         //cout << "Read Control " << (int) getData->data.control << " Part " << (int) getData->data.part << "  Kit " << (int) getData->data.kit << " Engine " << (int) getData->data.engine << "  Insert " << (int) getData->data.insert << endl;
@@ -6720,7 +6719,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             break;
         case 97:
             if (write)
-                oscil->convert2sine(0);
+                oscil->convert2sine();
             break;
     }
     if (!write)

@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code.
 
-Modified February 2018
+Modified March 2018
 } {in_source in_header
 }
 
@@ -449,7 +449,9 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
                 bankuiwindow->show();
             }
             else if (instFrom == 4)
+            {
                 ; // todo open mixer panel
+            }
         }
         instFrom = 0; // to avoid later confusion!
         instrumentuiwindow->hide();}
