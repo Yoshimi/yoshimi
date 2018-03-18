@@ -1,4 +1,9 @@
-yoshimi 1.5.7 rc4
+yoshimi 1.5.7 rc5
+
+2013-3-18 Will
+* Improved scales error checking.
+* Improved instrument renaming.
+* Set version as 1.5.7 rc5
 
 2013-3-17 Will
 * Improved detection of user guide.

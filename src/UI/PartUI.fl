@@ -390,7 +390,7 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
-      xywh {272 534 380 170} type Double box NO_BOX hide
+      xywh {588 450 380 170} type Double box NO_BOX hide
       class Fl_Group
     } {
       Fl_Group partgroupui {
@@ -495,12 +495,12 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
         Fl_Button buttontop {
           callback {//
           int event = Fl::event_button();
-          const char *tmp = NULL;
+          const char *tmp =  part->Pname.c_str();
           if (event == FL_LEFT_MOUSE)
               bankui->Show();
           else if (event == FL_RIGHT_MOUSE)
           {
-              tmp = fl_input("Instrument name:", part->Pname.c_str());
+              tmp = fl_input("Instrument name:", tmp);
               if (tmp != NULL and not string(tmp).empty())
               {
                   if (string(tmp) == "Simple Sound")
@@ -508,7 +508,7 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
                   else
                   {
                       unsigned char id = miscMsgPush(string(tmp));
-                      send_data(222, 0, 0xd0, 0xff, 0xff, 0xff, 0xff, id);
+                      send_data(222, 0, 0xf0, 0xff, 0xff, 0xff, 0xff, id);
                   }
               }
           }}
