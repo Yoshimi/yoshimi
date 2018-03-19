@@ -416,8 +416,8 @@ send_data(82, o->value(), 0xc8);}
               xywh {535 365 220 200} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
             } {
               Fl_Text_Display {} {
-                label {Mod. Oscillator}
-                xywh {549 385 95 2} box NO_BOX labelfont 1 labelsize 11
+                label {Local Oscillator}
+                xywh {553 385 95 2} box NO_BOX labelfont 1 labelsize 13
               }
               Fl_Group fmoscil {
                 xywh {535 425 220 140} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179

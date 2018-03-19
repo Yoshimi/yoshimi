@@ -400,6 +400,7 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
         Fl_Button {} {
           label Edit
           callback {//
+        bool divert = true;
         if (lastkey >= 49 && lastkey <= 56)
         { // not working yet :(
             /*int voiceNum = lastkey - 49;
@@ -433,6 +434,8 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
                     checkEngines();
                     seteditname();
                 }
+                else
+                    divert = false;
                 break;
             case 115: // s
                 if (Fl::event_button() == 3)
@@ -447,6 +450,8 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
                 checkEngines();
                 seteditname();
                 }
+                else
+                    divert = false;
                 break;
             case 100: // d
             case 112: // p
@@ -463,6 +468,8 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
                     seteditname();
                     lastkey = -1;
                 }
+                else
+                    divert = false;
                 break;
             case 107: // k
                 lastkey = -1;
@@ -473,10 +480,14 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
                 partfx->show();
                 break;
             default:
-                lastkey = -1;
-                instrumenteditwindow->show();
+                divert = false;
                 break;
-}}
+        }
+        if (!divert)
+        {
+            lastkey = -1;
+            instrumenteditwindow->show();
+        }}
           xywh {330 6 40 22} box PLASTIC_UP_BOX color 22 labelfont 1 labelsize 12
         }
         Fl_Box instrumentaddbox {

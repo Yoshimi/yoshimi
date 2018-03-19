@@ -6,7 +6,7 @@ This release is mainly focussed on usability improvements.
 For example, the Master Reset can now clear MIDI-learn lists. All you have to do is hold down the Ctrl key when clicking the button. Usually you don't want to, but it's there for the times you do.
 
 
-There are rare occasions when a very large PadSynth patch can take as much as 15 seconds to initialise. If you try to do anything on that part during that time the result can be fatal. Well not any more, as now you'll get a warning message:
+There are rare occasions when a very large PadSynth patch can take as much as 15 seconds to initialise. If you try to do anything on that part that can affect PadSynth (during that time) the result can be fatal. Well not any more, as now you'll get a warning message:
 "Part {n} busy."
 
 
@@ -26,7 +26,7 @@ Going further into instruments, we now have a few useful key shortcuts.
 
 If you hold down 'K', and click on the 'Edit' button in the main window, it will directly open the kit editor window for the current part. Similarly holding down 'E' and clicking will give you the part's effects window.
 
-Most voice patches only use the first Add, Sub and Pad engines and there are similar shorcuts for these using 'A', 'S' & 'P'. If you use the left mouse button, it will only open the associated window if that engine is enabled. Using the Right button will enable the engine then open its window.
+Most voice patches only use the first Add, Sub and Pad engines and there are similar shorcuts for these using 'A', 'S' & 'P' and clciking on the 'Edit' button. If you use the left mouse button it will only open the associated window if that engine is enabled, otherwise it will open the usual Part Edit window. Using the Right button will enable the engine then open its window.
 
 For the QWERTY keyboarders 'D' can be used instead of 'P', putting these in a neat row :)
 
@@ -38,15 +38,15 @@ The first thing you notice is these are tabbed, so you can quickly jump between 
 This is all fully in sync with the Kit Edit window.
 
 
-We've changed some ambiguous wording in the Voice window too. The 'Change' buttons are now 'Waveform' ones. Also the highly confusing 'Ext' or 'Internal' entries are better worded - it was quite common for people to ask how they got the 'Ext' ones.
+We've changed some ambiguous wording in the Voice window too. The 'Change' buttons are now 'Waveform' ones. Also the highly confusing 'Ext' or 'Internal' entries are better worded - it was quite common for people to ask how they got the 'Ext' ones and where they came from.
 
 For the voice itself, the selector is now named 'Oscillator' and the text is 'Internal' or 'Voice {n}'
 
 At the top of the Modulator section, you have 'Oscillator Source' and this time it will be 'Local' or 'Voice {n}'.
 
-The lower (local) selector is titled 'Mod. Oscillator' and the text will be 'Internal' or 'Mod. {n}'.
+The lower selector is titled 'Local Oscillator' and the text will be 'Internal' or 'Mod. {n}'.
 
-An extra detail is that, as you can only select the internal oscillator or one from a lower numbered voice, these entries are greyed out for voice 1.
+An extra detail is that these entries are greyed out for voice 1, as you can only select the internal oscillator or one from a lower numbered voice.
 
 
 Returning to effects, there is now interpolation in place for the controls, which makes these crackle-free and far more useful with MIDI-learn - Remember, you can have up to 200 learned lines.
