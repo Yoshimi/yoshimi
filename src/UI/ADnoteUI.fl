@@ -894,7 +894,7 @@ send_data(4, o->value(), 0xc0);}
         }
         Fl_Group voicefiltergroup {
           label {FILTER      }
-          xywh {245 35 285 245} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
+          xywh {245 35 285 245} box UP_FRAME labelfont 1 labelsize 12 align 17
           code0 {if (pars->VoicePar[nvoice].PFilterEnabled==0) o->deactivate();}
         } {
           Fl_Group voicefilter {
