@@ -291,6 +291,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
     unsigned char par2 = getData->data.par2;
+    //cout << "Indirect" << endl;
     bool (write) = (type & 0x40);
     if (write)
         __sync_or_and_fetch(&blockRead, 2);
@@ -749,6 +750,37 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                             getData->data.parameter &= 0x7f;
                         }
                         break;
+                    case 222: // part / kit item names
+                        if (parameter == 128)
+                        {
+                            if (write)
+                            {
+                                synth->part[npart]->Pname = text;
+                                guiTo = true;
+                            }
+                            else
+                                text = synth->part[npart]->Pname;
+                        }
+                        else if (synth->part[npart]->Pkitmode == true)
+                        {
+                            if (kititem >= NUM_KIT_ITEMS)
+                                text = " FAILED out of range";
+                            else
+                            {
+                                if (write)
+                                {
+                                    synth->part[npart]->kit[kititem].Pname = text;
+                                    guiTo = true;
+                                }
+                                else
+                                    text = synth->part[npart]->kit[kititem].Pname;
+                            }
+                        }
+                        else
+                            text = " FAILED Not in kit mode";
+                        getData->data.parameter &= 0x7f;
+                        value = miscMsgPush(text);
+                        break;
                     case 223: // copyright info
                         if (write)
                         {
@@ -840,7 +872,7 @@ string InterChange::formatScales(string text)
 
 float InterChange::readAllData(CommandBlock *getData)
 {
-    if(getData->data.type & 4)
+    if(getData->data.type & 4) // these are static
     {
         //cout << "Read Control " << (int) getData->data.control << " Part " << (int) getData->data.part << "  Kit " << (int) getData->data.kit << " Engine " << (int) getData->data.engine << "  Insert " << (int) getData->data.insert << endl;
         /*
@@ -991,10 +1023,16 @@ void InterChange::resolveReplies(CommandBlock *getData)
         commandName = resolveEffects(getData);
 
     else if (npart >= NUM_MIDI_PARTS)
+    {
+        showValue = false;
         commandName = "Invalid part " + to_string(int(npart) + 1);
+    }
 
     else if (kititem >= NUM_KIT_ITEMS && kititem < 0xff)
+    {
+        showValue = false;
         commandName = "Invalid kit " + to_string(int(kititem) + 1);
+    }
 
     else if (kititem != 0 && engine != 0xff && control != 8 && part->kit[kititem].Penabled == false)
         commandName = "Part " + to_string(int(npart) + 1) + " Kit item " + to_string(int(kititem) + 1) + " not enabled";
@@ -1002,12 +1040,18 @@ void InterChange::resolveReplies(CommandBlock *getData)
     else if (kititem == 0xff || insert == 0x20)
     {
         if (control != 58 && kititem < 0xff && part->Pkitmode == 0)
+        {
+            showValue = false;
             commandName = "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
+        }
         else
             commandName = resolvePart(getData);
     }
     else if (kititem > 0 && part->Pkitmode == 0)
+    {
+        showValue = false;
         commandName = "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
+    }
 
     else if (engine == 2)
     {
@@ -1802,7 +1846,7 @@ string InterChange::resolvePart(CommandBlock *getData)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
-    unsigned char par2 = getData->data.par2;
+    //unsigned char par2 = getData->data.par2;
     unsigned char effNum = engine;
 
     bool kitType = (insert == 0x20);
@@ -2087,7 +2131,7 @@ string InterChange::resolvePart(CommandBlock *getData)
 
         case 222:
             showValue = false;
-            contstr = "Name is: " + miscMsgPop(par2);
+            contstr = "Name is: " + miscMsgPop(value_int);
             break;
         case 223:
             showValue = false;
@@ -4793,7 +4837,7 @@ void InterChange::commandPart(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-    unsigned char par2 = getData->data.par2;
+    //unsigned char par2 = getData->data.par2;
     unsigned char effNum = engine;
 
     bool write = (type & 0x40) > 0;
@@ -5365,13 +5409,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->ctl->bandwidth.data;
             break;
 
-        case 222:
-            if (write)
-            {
-                string name = miscMsgPop(par2);
-                synth->part[npart]->Pname = name;
-                getData->data.par2 = miscMsgPush(name);
-            }
+        case 222: // done elsewhere
             break;
         case 224:
             if (write)

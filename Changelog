@@ -1,6 +1,9 @@
-yoshimi 1.5.7
+yoshimi 1.5.7 M
 
-2018-3021 Will
+2018-3-25 Will
+* Direct access can now set/read part and kit names.
+
+2018-30-21 Will
 * Final Updates.
 * Manual import and update.
 * Doc updates.

@@ -2802,7 +2802,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                             string name = string(point);
                             if (name > "!")
                                 par2 = miscMsgPush(name);
-                            //cout << name << endl;
+                            //cout << "name " << name << endl;
                         }
                         else if (point[0] != 0)
                             par2 = string2int(point);
@@ -2844,7 +2844,7 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
     putData.data.insert = insert;
     putData.data.parameter = parameter;
     putData.data.par2 = par2;
-    if ((type & 0x40) == 0)
+    if ((type & 0x40) == 0 && request < 0xff) // TODO sort this properly
     {
         if (request < 8)
         {
