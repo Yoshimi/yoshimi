@@ -178,8 +178,8 @@ YL : 0 to 127 : 194 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Expression (CC 11)
 YL : 0 to 127 : 197 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Q (CC 71)
 YL : 0 to 127 : 198 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Cutoff (CC 74)
 YL : 0 to 127 : 199 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Master Bandwidth (CC 75)
-Yy : any : 222 : 0 to 63 : 255 : 255 : 255 : 255 : msg No. : Set part instrument name
-Yy : any : 222 : 0 to 63 : 255 : 255 : 255 : 128/129 : 255 : Load/Save default instrument copyright
+Yy : any : 222 : 0 to 63 : 255 : 255 : 255 : 128 : msg No. : Set/Read part's instrument name
+Yy : any : 223 : 0 to 63 : 255 : 255 : 255 : 128/129 : 255 : Load/Save default instrument copyright
 Y : any : 224 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Reset all controllers (for this part)
 
 Instrument edit window
@@ -202,6 +202,8 @@ Y : 0 to 3 : 24 : 0 to 63 : 0 to 15 : 255 : 32 : 255 : 255 : Effect number to us
 
 Y : 0/1 : 57 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Drum mode
 Y : 0 to 3 : 58 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Mode – Off, Multi, Single, Crossfade
+
+Yy : any : 222 : 0 to 63 : 0 to 15 : 255 : 32 : 129 : msg No. : Set/Read part's kit item name
 
 AddSynth main window
 YL : 0 to 127 : 0 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Volume

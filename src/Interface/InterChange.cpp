@@ -910,8 +910,9 @@ float InterChange::readAllData(CommandBlock *getData)
         synth->fetchMeterData();
         return getData->data.value;
     }
-
+    //cout << "Read Control " << (int) getData->data.control << " Type " << (int) getData->data.type << " Part " << (int) getData->data.part << "  Kit " << (int) getData->data.kit << " Engine " << (int) getData->data.engine << "  Insert " << (int) getData->data.insert << " Parameter " << (int) getData->data.parameter << " Par2 " << (int) getData->data.par2 << endl;
     int npart = getData->data.part;
+    bool indirect = ((getData->data.parameter & 0xf0) == 0x80);
     if (npart < NUM_MIDI_PARTS && synth->part[npart]->busy)
     {
         getData->data.control = 252; // part busy message
@@ -923,8 +924,17 @@ float InterChange::readAllData(CommandBlock *getData)
     memcpy(tryData.bytes, getData->bytes, sizeof(tryData));
     while (__sync_or_and_fetch(&blockRead, 0) > 0) // just reading it
         usleep(100);
-
-    commandSendReal(&tryData);
+    if (indirect)
+    {
+        /*
+         * This still isn't quite right there is a very
+         * remote chance of getting garbled text :(
+         */
+        indirectTransfers(&tryData);
+        return 0;
+    }
+    else
+        commandSendReal(&tryData);
     if (__sync_or_and_fetch(&blockRead, 0) > 0)
         goto reTry; // it may have changed mid-process
 

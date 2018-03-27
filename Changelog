@@ -1,5 +1,9 @@
 yoshimi 1.5.7 M
 
+2018-3-27 Will
+* Improved reading text values (especially for CLI).
+* Updated docs.
+
 2018-3-25 Will
 * Direct access can now set/read part and kit names.
 

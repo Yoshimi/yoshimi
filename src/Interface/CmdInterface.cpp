@@ -1850,24 +1850,27 @@ int CmdInterface::commandPart(bool justSet)
     else if (matchnMove(2, point, "name"))
     {
         string name;
+        unsigned char type = 64;
+        unsigned char par2 = 255;
         if (isRead)
-        {
-            name = "Part name set to " + synth->part[npart]->Pname;
-        }
+            type = 0;
         else
         {
             name = (string) point;
             if (name.size() < 3)
-                name = "Name too short";
-            else if ( name == "Simple Sound")
-                name = "Cant use name of default sound";
-            else
             {
-                sendDirect(0, 64, 222, npart, 255, 255, 255, 255, miscMsgPush(name));
+                Runtime.Log("Name too short");
                 return done_msg;
             }
+            else if ( name == "Simple Sound")
+            {
+                Runtime.Log("Cant use name of default sound");
+                return done_msg;
+            }
+            else
+                par2 = miscMsgPush(name);
         }
-        Runtime.Log(name);
+        sendDirect(0, type, 222, npart, 255, 255, 255, 128, par2, 255);
         reply = done_msg;
     }
     else
@@ -2844,7 +2847,7 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
     putData.data.insert = insert;
     putData.data.parameter = parameter;
     putData.data.par2 = par2;
-    if ((type & 0x40) == 0 && request < 0xff) // TODO sort this properly
+    if ((type & 0x40) == 0)
     {
         if (request < 8)
         {
