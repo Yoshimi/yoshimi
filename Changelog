@@ -1,5 +1,9 @@
 yoshimi 1.5.7 M
 
+2018-3-30 Will
+* Included 'AddSynth Morph' instrument in companion bank.
+* Added 'Note_Envelopes.txt' to docs.
+
 2018-3-27 Will
 * Improved reading text values (especially for CLI).
 * Updated docs.
