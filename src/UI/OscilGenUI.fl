@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified March 2018
+Modified April 2018
 } {selected in_source in_header
 }
 
@@ -1211,18 +1211,26 @@ class OscilEditor {: {public PresetsUI_}
 
             case 18:
                 bfmodpar1->value(value);
+                basefuncdisplaygroup->redraw();
+                redrawoscil();
                 break;
 
             case 19:
                 bfmodpar2->value(value);
+                basefuncdisplaygroup->redraw();
+                redrawoscil();
                 break;
 
             case 20:
                 bfmodpar3->value(value);
+                basefuncdisplaygroup->redraw();
+                redrawoscil();
                 break;
 
             case 21:
                 bfmodtype->value(value);
+                basefuncdisplaygroup->redraw();
+                redrawoscil();
                 break;
 
             case 33:

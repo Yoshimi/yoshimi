@@ -4,8 +4,6 @@ Zero-cross for note off.
 
 Add 'Lock AddSynth Oscillator' checkbox to settings.
 
-Oscillator window doesn't update RH waveform graph when editing BF Mod.
-
 Edit button
 +1 to 8 open addsynth voice window - could be 'interesting' :(
 
