@@ -1,5 +1,10 @@
 yoshimi 1.5.7 M
 
+2018-4-1 Will
+* BugFix: SubSynth detune type off by one error.
+  GUI only, CLI was correct.
+* Corrections to 'Note_Envelopes.txt'.
+
 2018-3-30 Will
 * Included 'AddSynth Morph' instrument in companion bank.
 * Added 'Note_Envelopes.txt' to docs.
