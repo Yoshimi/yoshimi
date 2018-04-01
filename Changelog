@@ -4,6 +4,9 @@ yoshimi 1.5.7 M
 * BugFix: SubSynth detune type off by one error.
   GUI only, CLI was correct.
 * Corrections to 'Note_Envelopes.txt'.
+* BugFix: Base Func Parameters not updating RH graph.
+  Actions were correct though.
+* Corrected a bad reset :(
 
 2018-3-30 Will
 * Included 'AddSynth Morph' instrument in companion bank.
