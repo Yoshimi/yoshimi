@@ -1,5 +1,11 @@
 yoshimi 1.5.7 M
 
+2018-4-8 Will
+* Minor code cleanups.
+* Enabling a part now always makes it current.
+  Disabling doesn't change which is current.
+* Mixer Edit button now always opens the part window.
+
 2018-4-1 Will
 * BugFix: SubSynth detune type off by one error.
   GUI only, CLI was correct.

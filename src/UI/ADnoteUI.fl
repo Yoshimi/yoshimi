@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
-Modified March 2018
+Modified April 2018
 } {selected in_source in_header
 }
 
@@ -181,19 +181,6 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
         label 1
         callback {//
     bool enab = (o->value() > 0.5);
-   /* if (enab)
-        voicelistitemgroup->activate();
-    else
-        voicelistitemgroup->deactivate();
-    o->redraw();
-    if (synth->getGuiMaster()->partui->adnoteui->advoice->nvoice == nvoice)
-    {
-        synth->getGuiMaster()->partui->adnoteui->advoice->voiceonbutton->value(enab);
-        if (enab)
-            synth->getGuiMaster()->partui->adnoteui->advoice->voiceparametersgroup->activate();
-        else
-            synth->getGuiMaster()->partui->adnoteui->advoice->voiceparametersgroup->deactivate();
-    }*/
     collect_data(synth, enab, (Fl::event_button() | 0xd8), 129, npart, kititem, 0x80 + nvoice);}
         xywh {20 3 20 20} box THIN_UP_BOX down_box DOWN_BOX color 237 labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 4
         code0 {char tmp[10]; snprintf(tmp, 10, "%d", nvoice + 1); o->label(strdup(tmp));}

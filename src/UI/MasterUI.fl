@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified March 2018} {selected in_source in_header
+Modified April 2018} {selected in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -191,7 +191,7 @@ class MasterUI {: {private GuiUpdates}
       partmax = synth->getRuntime().NumAvailableParts;
       filename += ".windows";
       microtonalui = new MicrotonalUI(&synth->microtonal, synth);
-      bankui = new BankUI(&npart, synth);
+      bankui = new BankUI(synth);
       virkeyboard = new VirKeyboard(synth);
       configui = new ConfigUI(synth);
       presetsui = new PresetsUI(synth);

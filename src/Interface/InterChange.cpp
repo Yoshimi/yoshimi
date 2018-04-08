@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified March 2018
+    Modified April 2018
 */
 
 #include <iostream>
@@ -4966,7 +4966,18 @@ void InterChange::commandPart(CommandBlock *getData)
                         break;
                     case 255:
                         if (write)
-                            synth->partonoffWrite(npart, value_bool);
+                        {
+                            if (value_bool && synth->getRuntime().currentPart != npart) // make it a part change
+                            {
+                                synth->partonoffWrite(npart, 1);
+                                synth->getRuntime().currentPart = npart;
+                                getData->data.value = npart;
+                                getData->data.control = 14;
+                                getData->data.part = 0xf0;
+                            }
+                            else
+                                synth->partonoffWrite(npart, value_int);
+                        }
                         else
                             value = synth->partonoffRead(npart);
                         break;

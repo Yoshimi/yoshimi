@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code.
 
-Modified March 2018
+Modified April 2018
 } {in_source in_header
 }
 
@@ -780,11 +780,10 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
     code {//
     collect_data(synth, value, (Fl::event_button() | type), control, part, kititem, engine, insert, parameter, par2);} {}
   }
-  Function {BankUI(int *npart_, SynthEngine *_synth)} {} {
+  Function {BankUI(SynthEngine *_synth)} {} {
     code {//
     synth = _synth;
     fnc = &BankProcess_::process;
-    npart = npart_;
     bank = synth->getBankPtr();
     what = 0;
     nselected = -1;
@@ -829,10 +828,11 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
   } {
     code {//
         int slot = this->slot;
+        int curPart = synth->getRuntime().currentPart;
         string thisname =  bank->getname(slot);
         if ((what == 1 || what == 3) && mode == 1 && !bank->emptyslot(slot))
         {
-            send_data(74, *npart, 0xf0, 240, 255, 255, 255, 255, slot);
+            send_data(74, curPart, 0xf0, 240, 255, 255, 255, 255, slot);
             // Reads from slot
             if (what == 3)
                 instrumentuiwindow->hide();
@@ -855,8 +855,8 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
                     }
                     else
                     {
-                        synth->part[*npart]->Pname = newname;
-                        send_data(75, float(*npart), 0xf0, 240, 255, 255, slot, 0x80);
+                        synth->part[curPart]->Pname = newname;
+                        send_data(75, float(curPart), 0xf0, 240, 255, 255, slot, 0x80);
                     }
                 }
             }
@@ -867,7 +867,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
         if (mode == 2)
         {   // save(write) to slot (choices reversed for 'No' priority)
             bool doit = true;
-            if (synth->part[*npart]->Pname == "Simple Sound")
+            if (synth->part[curPart]->Pname == "Simple Sound")
             {
                 fl_alert("Can't store instrument with default name");
                 setread();
@@ -883,7 +883,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
             }
             if (doit)
             {
-                send_data(75, float(*npart), 0xf0, 240, 255, 255, slot, 0x80);
+                send_data(75, float(curPart), 0xf0, 240, 255, 255, slot, 0x80);
                 setread();
             }
         }
@@ -1215,7 +1215,7 @@ bs[ins]->refresh();} {}
   }
   decl {int slot, what; // "what" = what button is pressed} {private local
   }
-  decl {int mode, *npart, nselected;} {private local
+    decl {int mode, *npart, nselected;} {private local
   }
   decl {void (BankProcess_::* fnc)(void);} {private local
   }

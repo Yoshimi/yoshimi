@@ -17,7 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-Modified March 2018
+Modified April 2018
 } {selected in_source in_header
 }
 
@@ -133,7 +133,7 @@ class VectorUI {: {private MiscFuncs}
         }
       }
       Fl_Group Xgroup {
-        label X
+        label X open
         xywh {8 42 360 104} box PLASTIC_THIN_UP_BOX color 221 labelfont 1 labelsize 16 align 0 deactivate
       } {
         Fl_Box AddBackL {
@@ -496,11 +496,7 @@ class VectorUI {: {private MiscFuncs}
         const char *tmp = NULL;
         tmp = fl_input("Vector name:", loadlabel[BaseChan].c_str());
         if (tmp != NULL && !string(tmp).empty())
-        {
-            //o->copy_label(tmp);
-            //loadlabel[BaseChan]  = string(tmp);
-            send_data(8, 0, 0xd0, 192, 255, 255, BaseChan, 128, miscMsgPush(string(tmp)));
-        }}
+            send_data(8, 0, 0xd0, 192, 255, 255, BaseChan, 128, miscMsgPush(string(tmp)));}
         tooltip {Last saved or loaded vector file - click to change} xywh {45 265 198 20} box THIN_DOWN_BOX labelfont 1 labelsize 12
       }
     }
