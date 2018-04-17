@@ -297,11 +297,11 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         __sync_or_and_fetch(&blockRead, 2);
     bool guiTo = false;
     string text;
-    if (getData->data.par2 < 0xff)
+    if (getData->data.par2 != NO_MSG)
         text = miscMsgPop(getData->data.par2);
     else
         text = "";
-    getData->data.par2 = 0xff; // this may be reset later
+    getData->data.par2 = NO_MSG; // this may be reset later
     unsigned char tmp;
     string name;
 
@@ -332,15 +332,15 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         case 217: // program / bank / root
         {
             //cout << " interchange prog " << value << "  chan " << int(kititem) << "  bank " << int(engine) << "  root " << int(insert) << "  named " << int(par2) << endl;
-            if (par2 < 0xff) // was named file not numbered
+            if (par2 != NO_MSG) // was named file not numbered
                 getData->data.par2 = miscMsgPush(text);
 
             int msgID = synth->SetRBP(getData);
-            if (msgID >= 0x1000)
+            if (msgID > NO_MSG)
                 text = "FAILED ";
             else
                 text = "";
-            text += miscMsgPop(msgID & 0xff);
+            text += miscMsgPop(msgID & NO_MSG);
             value = miscMsgPush(text);
             synth->getRuntime().finishedCLI = true; // temp
             getData->data.parameter &= 0x7f;
@@ -3267,7 +3267,7 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
         {
             return ("Freemode add/remove is write only. Current points " + to_string(int(par2)));
         }
-        if (par2 < 255)
+        if (par2 != NO_MSG)
             return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Added Freemode Point " + to_string(int((control & 0x3f) + 1)) + " X increment " + to_string(int(par2)) + " Y");
         else
         {
@@ -3995,7 +3995,7 @@ void InterChange::commandMidi(CommandBlock *getData)
 
         case 8: // Program / Bank / Root
             getData->data.parameter = 0x80;
-            if ((value_int < 0xff || par2 < 0xff) && chan < synth->getRuntime().NumAvailableParts)
+            if ((value_int < 0xff || par2 != NO_MSG) && chan < synth->getRuntime().NumAvailableParts)
             {
                 synth->partonoffLock(chan & 0x3f, -1);
                 synth->getRuntime().finishedCLI = true;

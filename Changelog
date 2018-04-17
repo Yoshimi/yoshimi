@@ -1,5 +1,11 @@
 yoshimi 1.5.7 M
 
+2018-4-18 Will
+* First trial of autoloading other instances.
+
+2018-4-9 Will
+* Started refinements to MiscMsg.
+
 2018-4-8 Will
 * Minor code cleanups.
 * Enabling a part now always makes it current.

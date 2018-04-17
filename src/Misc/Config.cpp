@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified March 2018
+    Modified April 2018
 */
 
 #include <iostream>
@@ -93,6 +93,7 @@ unsigned int Config::GzipCompression = 3;
 bool         Config::showGui = true;
 bool         Config::showSplash = true;
 bool         Config::showCLI = true;
+int          Config::activeInstance = 0;
 
 Config::Config(SynthEngine *_synth, int argc, char **argv) :
     restoreState(false),
@@ -538,6 +539,14 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
     showGui = xml->getparbool("enable_gui", showGui);
     showSplash = xml->getparbool("enable_splash", showSplash);
     showCLI = xml->getparbool("enable_CLI", showCLI);
+    activeInstance = 0;
+    for (int i = 1; i < 32; ++i)
+    {
+        bool idx = xml->getparbool("Instance_" + to_string(i), 0);
+        if (idx)
+            activeInstance |= (1 << i);
+    }
+    //cout << "Instances " << activeInstance << endl;
     xml->exitbranch(); // BaseParameters
     return true;
 }

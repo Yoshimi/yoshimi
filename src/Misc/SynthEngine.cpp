@@ -750,7 +750,7 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
     int originalRoot = bank.getCurrentRootID();
     int originalBank = bank.getCurrentBankID();
     bool ok = true;
-    bool hasProgChange = (program < 0xff || par2 < 0xff);
+    bool hasProgChange = (program < 0xff || par2 != NO_MSG);
 
     struct timeval tv1, tv2;
     if (notinplace && Runtime.showTimes && hasProgChange)
@@ -904,7 +904,7 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
         msgID = miscMsgPush(name);
     }
     if (!ok)
-        msgID |= 0x1000;
+        msgID |= 0xFF0000;
     return msgID;
 }
 

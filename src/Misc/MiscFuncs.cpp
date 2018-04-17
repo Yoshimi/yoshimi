@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>
 
-    Modifed March 2018
+    Modifed April 2018
 */
 
 //#define REPORT_MISCMSG
@@ -477,7 +477,7 @@ bool MiscFuncs::matchnMove(int num , char *&pnt, const char *word)
  */
 void MiscFuncs::miscMsgInit()
 {
-    for (int i = 0; i < 255; ++i)
+    for (int i = 0; i < NO_MSG; ++i)
         miscList.push_back("");
     // we use 255 to denote an invalid entry
 }
@@ -485,7 +485,7 @@ void MiscFuncs::miscMsgInit()
 int MiscFuncs::miscMsgPush(string _text)
 {
     if (_text.empty())
-        return 255;
+        return NO_MSG;
     sem_wait(&miscmsglock);
 
     string text = _text;
@@ -519,7 +519,7 @@ int MiscFuncs::miscMsgPush(string _text)
 
 string MiscFuncs::miscMsgPop(int _pos)
 {
-    if (_pos >= 255)
+    if (_pos >= NO_MSG)
         return "";
     sem_wait(&miscmsglock);
 

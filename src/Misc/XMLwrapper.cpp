@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified March 2018
+    Modified April 2018
 */
 
 #include <zlib.h>
@@ -115,6 +115,14 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi) :
                 addparbool("enable_gui", synth->getRuntime().showGui);
                 addparbool("enable_splash", synth->getRuntime().showSplash);
                 addparbool("enable_CLI", synth->getRuntime().showCLI);
+                for (int i = 1; i < 32; ++i)
+                { // don't want master instance
+                    if ((synth->getRuntime().activeInstance >> i) & 1)
+                    {
+                        addparbool("Instance_" +to_string(i), true);
+                        //cout << "Instance " << i << endl;
+                    }
+                }
             endbranch();
         }
     }
