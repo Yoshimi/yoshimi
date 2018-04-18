@@ -115,15 +115,7 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi) :
                 addparbool("enable_gui", synth->getRuntime().showGui);
                 addparbool("enable_splash", synth->getRuntime().showSplash);
                 addparbool("enable_CLI", synth->getRuntime().showCLI);
-                addpar("active_instances", synth->getRuntime().activeInstance);
-                /*for (int i = 1; i < 32; ++i)
-                { // don't want master instance
-                    if ((synth->getRuntime().activeInstance >> i) & 1)
-                    {
-                        addparbool("Instance_" +to_string(i), true);
-                        //cout << "Instance " << i << endl;
-                    }
-                }*/
+                addunsigned("active_instances", synth->getRuntime().activeInstance);
             endbranch();
         }
     }
@@ -379,6 +371,12 @@ char *XMLwrapper::getXMLdata()
 }
 
 
+void XMLwrapper::addunsigned(const string& name, unsigned int val)
+{
+    addparams2("parU", "name", name.c_str(), "value", asString(val));
+}
+
+
 void XMLwrapper::addpar(const string& name, int val)
 {
     addparams2("par", "name", name.c_str(), "value", asString(val));
@@ -624,7 +622,7 @@ int XMLwrapper::getbranchid(int min, int max)
 
 unsigned int XMLwrapper::getunsigned(const string& name, unsigned int defaultpar, unsigned int min, unsigned int max)
 {
-    node = mxmlFindElement(peek(), peek(), "par", "name", name.c_str(), MXML_DESCEND_FIRST);
+    node = mxmlFindElement(peek(), peek(), "parU", "name", name.c_str(), MXML_DESCEND_FIRST);
     if (!node)
         return defaultpar;
     const char *strval = mxmlElementGetAttr(node, "value");

@@ -4,11 +4,10 @@ yoshimi 1.5.7 M
 * Second attempt at autoloading :(
 * Corrected changelog.
   Previous two were one commit.
+* Still not handling user state files correctly :(
 
 2018-4-18 Will
 * First trial of autoloading other instances.
-
-2018-4-9 Will
 * Started refinements to MiscMsg.
 
 2018-4-8 Will

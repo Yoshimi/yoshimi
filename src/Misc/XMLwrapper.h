@@ -54,6 +54,8 @@ class XMLwrapper : private MiscFuncs
         char *getXMLdata(void);
 
 
+        void addunsigned(const string& name, unsigned int val); // add unsigned uinteger parameter: name, value
+
         void addpar(const string& name, int val); // add simple parameter: name, value
         void addparreal(const string& name, float val);
 
