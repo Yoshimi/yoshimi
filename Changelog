@@ -1,5 +1,10 @@
 yoshimi 1.5.7 M
 
+2018-4-19 Will
+* Second attempt at autoloading :(
+* Corrected changelog.
+  Previous two were one commit.
+
 2018-4-18 Will
 * First trial of autoloading other instances.
 

@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2017, Will Godfrey
+    Copyright 2014-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified December 2017
+    Modified April 2018
 */
 
 #ifndef XML_WRAPPER_H
@@ -98,6 +98,9 @@ class XMLwrapper : private MiscFuncs
         // it returns the parameter and limits it between min and max
         // if min==max==0, it will not limit it
         // if no parameter will be here, the defaultpar will be returned
+
+        unsigned int getunsigned(const string& name, unsigned int defaultpar, unsigned int min = 0, unsigned int max = 0xffffffff);
+
         int getpar(const string& name, int defaultpar, int min, int max);
 
         // the same as getpar, but the limits are 0 and 127

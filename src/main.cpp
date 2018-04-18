@@ -57,7 +57,7 @@ using namespace std;
 CmdInterface commandInt;
 
 void mainRegisterAudioPort(SynthEngine *s, int portnum);
-bool mainCreateNewInstance(unsigned int forceId);
+bool mainCreateNewInstance(unsigned int forceId, bool loadState);
 
 map<SynthEngine *, MusicClient *> synthInstances;
 list<string> splashMessages;
@@ -141,7 +141,7 @@ static void *mainGuiThread(void *arg)
     for (int i = 1; i < 32; ++i)
     {
         if ((firstSynth->getRuntime().activeInstance >> i) & 1)
-            mainCreateNewInstance(i);
+            mainCreateNewInstance(i, true);
     }
     while (firstSynth->getRuntime().runSynth)
     {
@@ -164,7 +164,7 @@ static void *mainGuiThread(void *arg)
                     _synth->RootBank(tmpRoot, tmpBank); // but keep current root and bank
                 }
                 _synth->getRuntime().saveConfig();
-                int tmpID =  _synth->getUniqueId();
+                int instanceID =  _synth->getUniqueId();
                 if (_client)
                 {
                     _client->Close();
@@ -173,13 +173,16 @@ static void *mainGuiThread(void *arg)
 
                 if (_synth)
                 {
-                    _synth->saveBanks(tmpID);
+                    int instancebit = (1 << instanceID);
+                    if (_synth->getRuntime().activeInstance & instancebit)
+                        _synth->getRuntime().activeInstance -= instancebit;
+                    _synth->saveBanks(instanceID);
                     _synth->getRuntime().flushLog();
                     delete _synth;
                 }
 
                 synthInstances.erase(it);
-                cout << "\nStopped " << tmpID << "\n";
+                cout << "\nStopped " << instanceID << "\n";
                 break;
             }
             if (bShowGui)
@@ -224,23 +227,16 @@ static void *mainGuiThread(void *arg)
         firstSynth->RootBank(tmpRoot, tmpBank); // but keep current root and bank
     }
 
-    firstSynth->getRuntime().activeInstance = 0;
-    for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
-    {
-        int idx = it->first->getUniqueId();
-        if (idx < 32)
-            firstSynth->getRuntime().activeInstance |= (1 << idx);
-    }
-
     firstSynth->getRuntime().saveConfig();
     firstSynth->saveHistory();
     firstSynth->saveBanks(0);
     return NULL;
 }
 
-bool mainCreateNewInstance(unsigned int forceId)
+bool mainCreateNewInstance(unsigned int forceId, bool loadState)
 {
     MusicClient *musicClient = NULL;
+    int instanceID;
     SynthEngine *synth = new SynthEngine(globalArgc, globalArgv, false, forceId);
     if (!synth->getRuntime().isRuntimeSetupCompleted())
         goto bail_out;
@@ -269,6 +265,13 @@ bool mainCreateNewInstance(unsigned int forceId)
         goto bail_out;
     }
 
+    if (loadState)
+    {
+        string name = synth->getRuntime().defaultStateName + "-" + to_string(forceId);
+            cout << name << endl;
+            synth->loadStateAndUpdate(name);
+    }
+
     if (synth->getRuntime().showGui)
     {
         synth->setWindowTitle(musicClient->midiClientName());
@@ -284,13 +287,15 @@ bool mainCreateNewInstance(unsigned int forceId)
 
     synth->getRuntime().StartupReport(musicClient);
     synth->Unmute();
-    if (synth->getUniqueId() == 0)
+    instanceID = synth->getUniqueId();
+
+    if (instanceID == 0)
         cout << "\nYay! We're up and running :-)\n";
     else
     {
-        cout << "\nStarted "<< synth->getUniqueId() << "\n";
+        cout << "\nStarted "<< instanceID << "\n";
         // following copied here for other instances
-        synth->installBanks(synth->getUniqueId());
+        synth->installBanks(instanceID);
     }
     synthInstances.insert(std::make_pair(synth, musicClient));
     //register jack ports for enabled parts
@@ -299,6 +304,7 @@ bool mainCreateNewInstance(unsigned int forceId)
         if (synth->partonoffRead(npart))
             mainRegisterAudioPort(synth, npart);
     }
+    synth->getRuntime().activeInstance |= (1 << instanceID);
     return true;
 
 bail_out:
@@ -341,7 +347,7 @@ int main(int argc, char *argv[])
     pthread_attr_t attr;
     sem_t semGui;
 
-    if (!mainCreateNewInstance(0))
+    if (!mainCreateNewInstance(0, false))
     {
         goto bail_out;
     }

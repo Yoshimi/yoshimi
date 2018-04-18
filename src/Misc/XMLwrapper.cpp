@@ -115,14 +115,15 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi) :
                 addparbool("enable_gui", synth->getRuntime().showGui);
                 addparbool("enable_splash", synth->getRuntime().showSplash);
                 addparbool("enable_CLI", synth->getRuntime().showCLI);
-                for (int i = 1; i < 32; ++i)
+                addpar("active_instances", synth->getRuntime().activeInstance);
+                /*for (int i = 1; i < 32; ++i)
                 { // don't want master instance
                     if ((synth->getRuntime().activeInstance >> i) & 1)
                     {
                         addparbool("Instance_" +to_string(i), true);
                         //cout << "Instance " << i << endl;
                     }
-                }
+                }*/
             endbranch();
         }
     }
@@ -618,6 +619,23 @@ int XMLwrapper::getbranchid(int min, int max)
     else if (id > max)
         id = max;
     return id;
+}
+
+
+unsigned int XMLwrapper::getunsigned(const string& name, unsigned int defaultpar, unsigned int min, unsigned int max)
+{
+    node = mxmlFindElement(peek(), peek(), "par", "name", name.c_str(), MXML_DESCEND_FIRST);
+    if (!node)
+        return defaultpar;
+    const char *strval = mxmlElementGetAttr(node, "value");
+    if (!strval)
+        return defaultpar;
+    unsigned int val = string2int(strval);
+    if (val < min)
+        val = min;
+    else if (val > max)
+        val = max;
+    return val;
 }
 
 
