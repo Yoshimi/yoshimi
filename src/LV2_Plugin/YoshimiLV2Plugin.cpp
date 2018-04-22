@@ -834,7 +834,7 @@ extern "C" const LV2UI_Descriptor* lv2ui_descriptor(uint32_t index)
 }
 
 
-bool mainCreateNewInstance(unsigned int) //stub
+bool mainCreateNewInstance(unsigned int, bool) //stub
 {
     return true;
 }
