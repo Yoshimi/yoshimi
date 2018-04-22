@@ -107,6 +107,7 @@ class Config : public MiscFuncs
         static bool          showGui;
         static bool          showSplash;
         static bool          showCLI;
+        static bool          autoInstance;
         static unsigned int  activeInstance;
 
         bool          runSynth;

@@ -93,6 +93,7 @@ unsigned int Config::GzipCompression = 3;
 bool         Config::showGui = true;
 bool         Config::showSplash = true;
 bool         Config::showCLI = true;
+bool         Config::autoInstance = false;
 unsigned int Config::activeInstance = 0;
 
 Config::Config(SynthEngine *_synth, int argc, char **argv) :
@@ -539,7 +540,8 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
     showGui = xml->getparbool("enable_gui", showGui);
     showSplash = xml->getparbool("enable_splash", showSplash);
     showCLI = xml->getparbool("enable_CLI", showCLI);
-    activeInstance = xml->getunsigned("active_instances", 0);
+    autoInstance = xml->getparbool("enable_auto_instance", autoInstance);
+    activeInstance = xml->getparU("active_instances", 0);
     xml->exitbranch(); // BaseParameters
     return true;
 }

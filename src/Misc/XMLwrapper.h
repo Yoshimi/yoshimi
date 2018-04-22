@@ -54,7 +54,7 @@ class XMLwrapper : private MiscFuncs
         char *getXMLdata(void);
 
 
-        void addunsigned(const string& name, unsigned int val); // add unsigned uinteger parameter: name, value
+        void addparU(const string& name, unsigned int val); // add unsigned uinteger parameter: name, value
 
         void addpar(const string& name, int val); // add simple parameter: name, value
         void addparreal(const string& name, float val);
@@ -100,8 +100,7 @@ class XMLwrapper : private MiscFuncs
         // it returns the parameter and limits it between min and max
         // if min==max==0, it will not limit it
         // if no parameter will be here, the defaultpar will be returned
-
-        unsigned int getunsigned(const string& name, unsigned int defaultpar, unsigned int min = 0, unsigned int max = 0xffffffff);
+        unsigned int getparU(const string& name, unsigned int defaultpar, unsigned int min = 0, unsigned int max = 0xffffffff);
 
         int getpar(const string& name, int defaultpar, int min, int max);
 

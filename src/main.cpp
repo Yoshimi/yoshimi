@@ -138,16 +138,19 @@ static void *mainGuiThread(void *arg)
 
     GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::NewSynthEngine, 0);
 
-    for (int i = 1; i < 32; ++i)
+    if (firstRuntime->autoInstance)
     {
-        if ((firstSynth->getRuntime().activeInstance >> i) & 1)
-            mainCreateNewInstance(i, true);
+        for (int i = 1; i < 32; ++i)
+        {
+            if ((firstRuntime->activeInstance >> i) & 1)
+                mainCreateNewInstance(i, true);
+        }
     }
-    while (firstSynth->getRuntime().runSynth)
+    while (firstRuntime->runSynth)
     {
         if (firstSynth->getUniqueId() == 0)
         {
-            firstSynth->getRuntime().signalCheck();
+            firstRuntime->signalCheck();
         }
 
         for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
@@ -219,15 +222,15 @@ static void *mainGuiThread(void *arg)
         else
             usleep(33333);
     }
-    if (firstSynth->getRuntime().configChanged && (bShowGui | bShowCmdLine)) // don't want this if no cli or gui
+    if (firstRuntime->configChanged && (bShowGui | bShowCmdLine)) // don't want this if no cli or gui
     {
         size_t tmpRoot = firstSynth->ReadBankRoot();
         size_t tmpBank = firstSynth->ReadBank();
-        firstSynth->getRuntime().loadConfig(); // restore old settings
+        firstRuntime->loadConfig(); // restore old settings
         firstSynth->RootBank(tmpRoot, tmpBank); // but keep current root and bank
     }
 
-    firstSynth->getRuntime().saveConfig();
+    firstRuntime->saveConfig();
     firstSynth->saveHistory();
     firstSynth->saveBanks(0);
     return NULL;
@@ -386,15 +389,15 @@ int main(int argc, char *argv[])
     memset(&yoshimiSigAction, 0, sizeof(yoshimiSigAction));
     yoshimiSigAction.sa_handler = yoshimiSigHandler;
     if (sigaction(SIGUSR1, &yoshimiSigAction, NULL))
-        firstSynth->getRuntime().Log("Setting SIGUSR1 handler failed");
+        firstRuntime->Log("Setting SIGUSR1 handler failed");
     if (sigaction(SIGINT, &yoshimiSigAction, NULL))
-        firstSynth->getRuntime().Log("Setting SIGINT handler failed");
+        firstRuntime->Log("Setting SIGINT handler failed");
     if (sigaction(SIGHUP, &yoshimiSigAction, NULL))
-        firstSynth->getRuntime().Log("Setting SIGHUP handler failed");
+        firstRuntime->Log("Setting SIGHUP handler failed");
     if (sigaction(SIGTERM, &yoshimiSigAction, NULL))
-        firstSynth->getRuntime().Log("Setting SIGTERM handler failed");
+        firstRuntime->Log("Setting SIGTERM handler failed");
     if (sigaction(SIGQUIT, &yoshimiSigAction, NULL))
-        firstSynth->getRuntime().Log("Setting SIGQUIT handler failed");
+        firstRuntime->Log("Setting SIGQUIT handler failed");
     // following moved here for faster first synth startup
     firstSynth->loadHistory();
     firstSynth->installBanks(0);

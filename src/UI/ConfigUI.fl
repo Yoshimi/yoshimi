@@ -23,8 +23,8 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified March 2018
-} {in_source in_header
+Modified April 2018
+} {selected in_source in_header
 }
 
 decl {\#include <cmath>} {public local
@@ -48,7 +48,7 @@ decl {\#include "Misc/Bank.h"} {private local
 decl {\#include "MasterUI.h"} {private local
 }
 
-class ConfigUI {selected : {private MiscFuncs}
+class ConfigUI {: {private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window configwindow {
@@ -245,7 +245,8 @@ class ConfigUI {selected : {private MiscFuncs}
             label {* Start With Default State}
             callback {//
                         send_data(16, o->value(), 0xc0);}
-            tooltip {If you change this you must re-save the default state\nor when that loads it will revert to the previous value} xywh {270 60 27 25} down_box DOWN_BOX labelsize 12 align 4
+            tooltip {If you change this you must re-save the default state
+or when that loads it will revert to the previous value} xywh {270 60 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().loadDefaultState);}
           }
           Fl_Check_Button nonFatal {
@@ -310,6 +311,14 @@ class ConfigUI {selected : {private MiscFuncs}
           Fl_Box {} {
             label {* Changing these settings requires a restart}
             xywh {50 276 287 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+          }
+          Fl_Check_Button enableAuto {
+            label {Enable Auto Instance}
+            callback {//
+                        send_data(24, o->value(), 0xc0);}
+            tooltip {Allow main instance to start all those open when last closed.} xywh {270 240 27 25} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().autoInstance);}
+            code1 {if (synth->getUniqueId() != 0) o->hide();}
           }
         }
         Fl_Group jackTab {
@@ -814,6 +823,9 @@ class ConfigUI {selected : {private MiscFuncs}
                     break;
                 case 23:
                     enableCLI->value(value_bool);
+                    break;
+                case 24:
+                    enableAuto->value(value_bool);
                     break;
 
                 case 32:

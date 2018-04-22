@@ -1513,6 +1513,10 @@ string InterChange::resolveConfig(CommandBlock *getData)
             contstr += "Enable CLI";
             yesno = true;
             break;
+        case 24:
+            contstr += "Enable Auto Instance";
+            yesno = true;
+            break;
 
         case 32:
             contstr += "JACK MIDI source: ";
@@ -4461,6 +4465,12 @@ void InterChange::commandConfig(CommandBlock *getData)
                 synth->getRuntime().showCLI = value_bool;
             else
                 value = synth->getRuntime().showCLI;
+            break;
+        case 24:
+            if (write)
+                synth->getRuntime().autoInstance = value_bool;
+            else
+                value = synth->getRuntime().autoInstance;
             break;
 // jack
         case 32: // done elsewhere
