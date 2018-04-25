@@ -792,7 +792,7 @@ float Microtonal::getLimits(CommandBlock *getData)
     int control = getData->data.control;
 
     // defaults
-    unsigned int type = (getData->data.type & 0x3f) | 0x80; // set as integer;
+    unsigned int type = getData->data.type| 0xc0; // set as learnable integer;
     int min = 0;
     float def = 0;
     int max = 127;
@@ -807,7 +807,6 @@ float Microtonal::getLimits(CommandBlock *getData)
             break;
         case 1:
             def = 69;
-            type |= 0x40;
             break;
         case 2:
             max = 1;
@@ -816,6 +815,8 @@ float Microtonal::getLimits(CommandBlock *getData)
             def = 60;
             break;
         case 4:
+            min = -63;
+            max = 64;
             break;
 
         case 8:
@@ -826,14 +827,11 @@ float Microtonal::getLimits(CommandBlock *getData)
             max = 1;
             break;
         case 17:
-            type |= 0x40;
             break;
         case 18:
-            type |= 0x40;
             def = 60;
             break;
         case 19:
-            type |= 0x40;
             def = 127;
             break;
 
