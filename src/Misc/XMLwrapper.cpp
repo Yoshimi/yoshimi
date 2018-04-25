@@ -678,6 +678,7 @@ int XMLwrapper::getparbool(const string& name, int defaultpar)
     char tmp = strval[0] | 0x20;
     return (tmp != '0' && tmp != 'n' && tmp != 'f') ? 1 : 0;
 }
+// case insensitive, anything other than '0', 'no', 'false' is treated as 'true'
 
 
 string XMLwrapper::getparstr(const string& name)

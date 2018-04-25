@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified March 2018
+    Modified April 2018
 */
 
 #include <cmath>
@@ -783,4 +783,86 @@ bool Microtonal::loadXML(string filename)
     xml->exitbranch();
     delete xml;
     return true;
+}
+
+float Microtonal::getLimits(CommandBlock *getData)
+{
+    float value = getData->data.value;
+    int request = int(getData->data.type & 3);
+    int control = getData->data.control;
+
+    // defaults
+    unsigned int type = (getData->data.type & 0x3f) | 0x80; // set as integer;
+    int min = 0;
+    float def = 0;
+    int max = 127;
+    //cout << "config control " << to_string(control) << endl;
+    switch (control)
+    {
+        case 0:
+            type &= 0x3f;
+            min = 1.0f;
+            def = 440.0f;
+            max = 20000.0f;
+            break;
+        case 1:
+            def = 69;
+            type |= 0x40;
+            break;
+        case 2:
+            max = 1;
+            break;
+        case 3:
+            def = 60;
+            break;
+        case 4:
+            break;
+
+        case 8:
+            max = 1;
+            break;
+
+        case 16:
+            max = 1;
+            break;
+        case 17:
+            type |= 0x40;
+            break;
+        case 18:
+            type |= 0x40;
+            def = 60;
+            break;
+        case 19:
+            type |= 0x40;
+            def = 127;
+            break;
+
+        default:
+            type |= 4; // error
+            break;
+    }
+    getData->data.type = type;
+    if (type & 4)
+        return 1;
+
+    switch (request)
+    {
+        case 0:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+        break;
+        case 1:
+            value = min;
+            break;
+        case 2:
+            value = max;
+            break;
+        case 3:
+            value = def;
+            break;
+    }
+    return value;
+
 }

@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified March 2018} {in_source in_header
+Modified April 2018} {selected in_source in_header
 }
 
 decl {\#include <FL/Fl_File_Chooser.H>} {public local
@@ -52,7 +52,7 @@ decl {\#include "UI/MiscGui.h"
     \#include "Misc/MiscFuncs.h"} {public global
 }
 
-class MicrotonalUI {selected : {private MiscFuncs}
+class MicrotonalUI {: {private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window microtonaluiwindow {
@@ -65,14 +65,14 @@ class MicrotonalUI {selected : {private MiscFuncs}
         Fl_Check_Button invertKeys {
           label {Invert keys}
           callback {//
-          send_data(2, o->value(), 0xd0);}
+          send_data(2, o->value(), 0xd8);}
           tooltip {Turn upside-down the note frequencies} xywh {254 13 55 30} down_box DOWN_BOX labelfont 1 labelsize 11 align 148
           code0 {o->value(microtonal->Pinvertupdown);}
         }
         Fl_Spinner centerinvertcounter {
           label Center
           callback {//
-          send_data(3, o->value(), 0xc0);}
+          send_data(3, o->value(), 0xc8);}
           xywh {333 19 52 20} labelfont 1 labelsize 11 align 129 minimum 0 maximum 127 value 0 textfont 1
           code0 {o->value(microtonal->Pinvertupdowncenter);}
           code1 {if (microtonal->Pinvertupdown==0) o->deactivate();}
@@ -152,7 +152,7 @@ class MicrotonalUI {selected : {private MiscFuncs}
             }
             oldFirst = tmp;
 
-            send_data(17, tmp, 0xc0);}
+            send_data(17, tmp, 0xc8);}
             tooltip {First MIDI note number} xywh {203 228 42 18} labelsize 10 align 129 minimum 0 maximum 125 textfont 1 textsize 11
             code0 {oldFirst = microtonal->Pfirstkey;}
             code1 {o->value(oldFirst);}
@@ -181,7 +181,7 @@ class MicrotonalUI {selected : {private MiscFuncs}
             }
             oldMid = tmp;
 
-            send_data(18, o->value(), 0xc0);}
+            send_data(18, o->value(), 0xc8);}
             tooltip {Midle note (where scale degree 0 is mapped to)} xywh {203 293 42 18} labelsize 10 align 129 maximum 126 value 60 textfont 1 textsize 11
             code0 {oldMid = microtonal->Pmiddlenote;}
             code1 {o->value(oldMid);}
@@ -201,7 +201,7 @@ class MicrotonalUI {selected : {private MiscFuncs}
             }
             oldLast = tmp;
 
-            send_data(19, tmp, 0xc0);}
+            send_data(19, tmp, 0xc8);}
             tooltip {Last MIDI note number} xywh {203 357 42 18} labelsize 10 align 129 minimum 2 maximum 127 value 127 textfont 1 textsize 11
             code0 {oldLast = microtonal->Plastkey;}
             code1 {o->value(oldLast);}
@@ -228,7 +228,7 @@ class MicrotonalUI {selected : {private MiscFuncs}
           callback {//
           o->show();
 
-          send_data(16, o->value(), 0xd0);}
+          send_data(16, o->value(), 0xd8);}
           tooltip {Enable the Mapping (otherwise the mapping is linear)} xywh {201 153 17 21} box FLAT_BOX down_box DOWN_BOX labelfont 1 align 40
           code0 {o->value(microtonal->Pmappingenabled);}
           code1 {if (microtonal->Pmappingenabled==0) keymappinggroup->deactivate();}
@@ -248,7 +248,7 @@ class MicrotonalUI {selected : {private MiscFuncs}
         Fl_Spinner anotecounter {
           label {"A" Note}
           callback {//
-          send_data(1, o->value(), 0xc0);}
+          send_data(1, o->value(), 0xc8);}
           xywh {192 17 47 20} labelfont 1 labelsize 10 align 1 minimum 0 maximum 127 value 69 textsize 10
           code0 {o->value(microtonal->PAnote);}
         }
@@ -303,7 +303,7 @@ class MicrotonalUI {selected : {private MiscFuncs}
       Fl_Check_Button enableMicrotonal {
         label {Enable Microtonal}
         callback {//
-        send_data(8, o->value(), 0xd0);}
+        send_data(8, o->value(), 0xd8);}
         xywh {3 4 102 40} box PLASTIC_UP_BOX down_box DOWN_BOX labelfont 1 labelsize 11 align 148
         code0 {o->value(microtonal->Penabled);}
       }

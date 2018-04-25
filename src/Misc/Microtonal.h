@@ -48,6 +48,7 @@ class Microtonal : private MiscFuncs
         void defaults(void);
         float getNoteFreq(int note, int keyshift);
         float getFixedNoteFreq(int note);
+        float getLimits(CommandBlock *getData);
 
         // Parameters
         unsigned char Pinvertupdown;

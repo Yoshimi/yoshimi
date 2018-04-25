@@ -1,5 +1,11 @@
 yoshimi 1.5.7 M
 
+2018-4-25 Will
+* Code cleanups.
+* Added error checking and limits to scales (microtonal).
+* Enabled MIDI-learn for some scales settings.
+* Doc updates and corrections.
+
 2018-4-22 Will
 * 'autoInstance' disabled by default, set in config.
 * Default state files handled correctly.

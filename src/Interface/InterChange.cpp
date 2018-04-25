@@ -4299,19 +4299,55 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
             break;
         case 17: // Keyboard First Note
             if (write)
+            {
+                if (value_int < 0)
+                {
+                    value_int = 0;
+                    getData->data.value = value_int;
+                }
+                else if (value_int >= synth->microtonal.Pmiddlenote)
+                {
+                    value_int = synth->microtonal.Pmiddlenote - 1;
+                    getData->data.value = value_int;
+                }
                 synth->microtonal.Pfirstkey = value_int;
+            }
             else
                 value = synth->microtonal.Pfirstkey;
             break;
         case 18: // Keyboard Middle Note
             if (write)
+            {
+                if (value_int <= synth->microtonal.Pfirstkey)
+                {
+                    value_int = synth->microtonal.Pfirstkey + 1;
+                    getData->data.value = value_int;
+                }
+                else if (value_int >= synth->microtonal.Plastkey)
+                {
+                    value_int = synth->microtonal.Plastkey - 1;
+                    getData->data.value = value_int;
+                }
                 synth->microtonal.Pmiddlenote = value_int;
+            }
             else
                 value = synth->microtonal.Pmiddlenote;
             break;
         case 19: // Keyboard Last Note
             if (write)
+            {
+                if (value_int <= synth->microtonal.Pmiddlenote)
+                {
+                    value_int = synth->microtonal.Pmiddlenote + 1;
+                    getData->data.value = value_int;
+                }
+                else if (value_int > 127)
+                {
+                    value_int = 127;
+                    getData->data.value = value_int;
+                }
                 synth->microtonal.Plastkey = value_int;
+            }
             else
                 value = synth->microtonal.Plastkey;
             break;
@@ -7787,6 +7823,9 @@ float InterChange::returnLimits(CommandBlock *getData)
     if (npart == 240) // main control limits
         return synth->getLimits(getData);
 
+    if (npart == 232) // microtonal limits
+        return synth->microtonal.getLimits(getData);
+
     if (npart == 192) // vector limits
         return synth->getVectorLimits(getData);
 
@@ -7796,30 +7835,6 @@ float InterChange::returnLimits(CommandBlock *getData)
 
     if (kititem >= 0x80 && kititem <= 0x88) // effects.
     {
-        /*if (kititem == 0x88 && engine == 0xff) // dynfilt, will become all of them
-        {
-            EffectMgr *eff;
-            eff = NULL; // to keep the compiler quiet!
-            if (npart == 0xf1)
-                eff = synth->sysefx[kititem & 0xf];
-
-            else if (npart == 0xf2)
-                eff = synth->insefx[kititem & 0xf];
-
-            else if (npart < NUM_MIDI_PARTS)
-                eff = synth->part[npart]->partefx[kititem & 0xf];
-
-            else
-            {
-                getData->data.type |= 4; // error
-                return 2; // invalid part number error
-            }
-            if (eff != NULL)
-            {
-                getData->data.engine = eff->getpreset();
-                cout << "Preset " << int(getData->data.engine) << endl;
-            }
-        }*/
         LimitMgr limits;
         return limits.geteffectlimits(getData);
     }
