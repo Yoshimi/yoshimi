@@ -2197,6 +2197,7 @@ send_data(223, 0, 0xd0, 255, 255, 255, param);}
     engine = 0;
     if (instrumentName == "")
         instrumentName = part->Pname;
+    partname = instrumentName; // this needs improving
     if (synth->getRuntime().checksynthengines)
     {
         if (!partKitOn)
@@ -2294,14 +2295,6 @@ send_data(223, 0, 0xd0, 255, 255, 255, param);}
             kititem = lastkititem;
     }
     checkEngines();
-    if (part->Pname == "Simple Sound")
-    {
-        string instrumentName = "No Title";
-        part->Pname = instrumentName;
-        instrumentlabel->copy_label(instrumentName.c_str());
-        if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-            synth->getGuiMaster()->panellistitem[npart % NUM_MIDI_CHANNELS]->partname->copy_label(instrumentName.c_str());
-    }
 
     if (kititem != lastkititem)
     {
@@ -2371,9 +2364,9 @@ send_data(223, 0, 0xd0, 255, 255, 255, param);}
     else
         instrumentlabel->labelcolor(0);
     if (text == "")
-        instrumentlabel->copy_label(part->Pname.c_str());
-    else
-        instrumentlabel->copy_label(text.c_str());} {}
+        text = part->Pname.c_str();
+    partname = text;
+    instrumentlabel->copy_label(text.c_str());} {}
   }
   Function {seteditname()} {} {
     code {//
@@ -2424,6 +2417,8 @@ send_data(223, 0, 0xd0, 255, 255, 255, param);}
   decl {int ninseff;} {private local
   }
   decl {int lastkititem;} {public local
+  }
+  decl {string partname;} {public local
   }
   decl {string kitname;} {public local
   }

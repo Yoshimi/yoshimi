@@ -3621,7 +3621,7 @@ void InterChange::returnsDirect(int altData)
 
 void InterChange::returns(CommandBlock *getData)
 {
-    unsigned char type = getData->data.type | 4; // back from synth
+    unsigned char type = getData->data.type;// | 4; // back from synth
 
     if (type == 0xff)
         return;
@@ -3681,6 +3681,17 @@ bool InterChange::commandSend(CommandBlock *getData)
     if (isWrite && isChanged) //write command
     {
         synth->setNeedsSaving(true);
+        unsigned char control = getData->data.control;
+        unsigned char npart = getData->data.part;
+        unsigned char insert = getData->data.insert;
+        if (npart < NUM_MIDI_PARTS && (insert < 0xff || (control != 8 && control != 222)))
+        {
+            if (synth->part[npart]->Pname == "Simple Sound")
+            {
+                synth->part[npart]->Pname ="No Title";
+                getData->data.type |= 0x10; // force GUI to update
+            }
+        }
     }
     return isChanged;
 }
@@ -4913,6 +4924,7 @@ void InterChange::commandPart(CommandBlock *getData)
 
     Part *part;
     part = synth->part[npart];
+
     switch (control)
     {
         case 0:

@@ -1,5 +1,9 @@
 yoshimi 1.5.7 M
 
+2018-4-26 Will
+* Almost all part-level changes check for "Simple Sound".
+  Just *entering* the editors doesn't now.
+
 2018-4-25 Will
 * Code cleanups.
 * Added error checking and limits to scales (microtonal).
