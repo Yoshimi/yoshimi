@@ -862,7 +862,7 @@ paramsui->Show(3);}
           class EffUI
         } {}
       }
-      Fl_Group partuigroup {
+      Fl_Group partuigroup {open
         xywh {3 255 380 170} box ENGRAVED_FRAME
       } {
         Fl_Group partui {
@@ -894,9 +894,9 @@ paramsui->Show(3);}
         label Part
         callback {//
         int nval = o->value() - 1;
-        synth->getRuntime().currentPart = nval;
-        partNew(nval);
-        send_data(14, nval, 0xc0);}
+        //synth->getRuntime().currentPart = nval;
+        //partNew(nval);
+        send_data(14, nval, 0xf0);}
         xywh {36 264 40 20} labelsize 11 when 6 minimum 0 maximum 127 textsize 11
         code0 {o->range(1.0, partmax);}
         code1 {o->value(synth->getRuntime().currentPart + 1);}
@@ -1417,7 +1417,7 @@ ZynAddSubFX}
             partuigroup->add(partui);
             partui->init(synth->part[nval], nval, bankui);
             partui->redraw();
-            newpart = nval;
+            partui->npart = nval;
             npartcounter->value(nval + 1);
             npartcounter->redraw();
             updatepanel();
@@ -1876,6 +1876,7 @@ ZynAddSubFX}
   }
   Function {do_load_instrument(string fname)} {} {
     code {//
+    int npart = partui->npart;
     if ((npart /  NUM_MIDI_CHANNELS) == (panelgroup  /  NUM_MIDI_CHANNELS))
     {
         int displaypart = npart % NUM_MIDI_CHANNELS;

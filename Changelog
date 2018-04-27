@@ -1,5 +1,8 @@
 yoshimi 1.5.7 M
 
+2018-4-27 Will
+* BugFix: External instrument load always went to part 1.
+
 2018-4-26 Will
 * Almost all part-level changes check for "Simple Sound".
   Just *entering* the editors doesn't now.
@@ -51,7 +54,7 @@ yoshimi 1.5.7 M
 2018-3-25 Will
 * Direct access can now set/read part and kit names.
 
-2018-30-21 Will
+2018-3-21 Will
 * Final Updates.
 * Manual import and update.
 * Doc updates.
