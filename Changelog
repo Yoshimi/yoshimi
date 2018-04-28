@@ -6,6 +6,8 @@ yoshimi 1.5.7 M
 * Transferred instance generation to new controls.
 * Added Instance generation to CLI.
 * Updated docs.
+* Formally implemented CLI current instance swapping.
+  Still can't yet delete them.
 
 2018-4-27 Will
 * BugFix: External instrument load always went to part 1.

@@ -65,9 +65,8 @@ string basics[] = {
 string toplist [] = {
     "ADD",                      "add paths and files",
     "  Root <s>",               "root path to list",
-
     "  Bank <s>",               "make new bank in current root",
-    "  INstance [n]",           "new instance ID",
+    "  YOshimi [n]",            "new Yoshimi instance ID",
     "IMPort [s <n1>] <n2> <s>", "import named directory to slot n2 of current root, (or 'Root' n1)",
     "EXPort [s <n1>] <n2> <s>", "export bank at slot n2 of current root, (or 'Root' n1) to named directory",
     "REMove",                   "remove paths, files and entries",
@@ -1888,23 +1887,19 @@ int CmdInterface::commandReadnSet()
     int tmp;
     string name;
 
-    if (matchnMove(4, point, "yoshimi"))
+    if (matchnMove(2, point, "yoshimi"))
     {
         if (isRead)
         {
-            Runtime.Log("Instance " + asString(currentInstance), 1);
+            //Runtime.Log("Instance " + asString(currentInstance), 1);
+            Runtime.Log("Instance " + to_string(synth->getUniqueId()));
             return done_msg;
         }
         if (point[0] == 0)
             return value_msg;
-        tmp = string2int(point);
-        if (tmp >= (int)synthInstances.size())
-            reply = range_msg;
-        else
-        {
-            currentInstance = tmp;
-            defaults();
-        }
+        currentInstance = string2int(point);
+        synth = findSynth(currentInstance);
+        defaults();
         return done_msg;
     }
 
@@ -2088,23 +2083,30 @@ int CmdInterface::commandReadnSet()
     return reply;
 }
 
+SynthEngine *CmdInterface::findSynth(unsigned int synthID)
+{
+    SynthEngine *synth;
+    for (itSynth = synthInstances.begin(); itSynth != synthInstances.end(); ++ itSynth)
+    {
+        synth = itSynth->first;
+        if (synth->getUniqueId() == synthID)
+            return synth;
+    }
+    synth = synthInstances.begin()->first;
+    currentInstance = 0;
+    defaults();
+    return synth;
+}
+
 bool CmdInterface::cmdIfaceProcessCommand()
 {
-    map<SynthEngine *, MusicClient *>::iterator itSynth = synthInstances.begin();
-    if (currentInstance >= (int)synthInstances.size())
-    {
-        currentInstance = 0;
-        defaults();
-    }
-    for(int i = 0; i < currentInstance; i++, ++itSynth);
-    synth = itSynth->first;
+    synth = findSynth(currentInstance);
+
     Config &Runtime = synth->getRuntime();
 
     replyString = "";
-    //npart = Runtime.currentPart;
     int reply = todo_msg;
     int tmp;
-
     point = cCmd;
     point = skipSpace(point); // just to be sure
     tmp = strlen(cCmd) - 1;
@@ -2130,6 +2132,11 @@ bool CmdInterface::cmdIfaceProcessCommand()
 #endif
     if (matchnMove(2, point, "exit"))
     {
+        if (currentInstance > 0)
+        {
+            Runtime.Log("Can only exit from instance 0");
+            return false;
+        }
         if (Runtime.configChanged)
             replyString = "System config has been changed. Still exit";
         else
@@ -2253,7 +2260,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             Runtime.Log("Created  new bank " + (string) point + " with ID " + asString(slot));
             GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
         }
-        else if (matchnMove(2, point, "instance"))
+        else if (matchnMove(2, point, "yoshimi"))
         {
             int forceId = string2int(point);
             if (forceId < 1 || forceId >= 32)
