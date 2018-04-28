@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified March 2018
+    Modified April 2018
 */
 
 #include <iostream>
@@ -65,7 +65,9 @@ string basics[] = {
 string toplist [] = {
     "ADD",                      "add paths and files",
     "  Root <s>",               "root path to list",
+
     "  Bank <s>",               "make new bank in current root",
+    "  INstance [n]",           "new instance ID",
     "IMPort [s <n1>] <n2> <s>", "import named directory to slot n2 of current root, (or 'Root' n1)",
     "EXPort [s <n1>] <n2> <s>", "export bank at slot n2 of current root, (or 'Root' n1) to named directory",
     "REMove",                   "remove paths, files and entries",
@@ -631,17 +633,17 @@ int CmdInterface::effects()
             if (bitTest(level, part_lev))
             {
                 nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
-                sendDirect(nFXtype, 64, 65, npart, 255, nFX);
+                sendDirect(nFXtype, 64, 65, npart, 0xff, nFX);
             }
             else if (bitTest(level, ins_fx))
             {
                 nFXtype = synth->insefx[nFX]->geteffect();
-                sendDirect(nFXtype, 64, 1, 242, 255, nFX);
+                sendDirect(nFXtype, 64, 1, 242, 0xff, nFX);
             }
             else
             {
                 nFXtype = synth->sysefx[nFX]->geteffect();
-                sendDirect(nFXtype, 64, 1, 241, 255, nFX);
+                sendDirect(nFXtype, 64, 1, 241, 0xff, nFX);
             }
         }
         if (point[0] == 0)
@@ -675,11 +677,11 @@ int CmdInterface::effects()
         Runtime.Log("efx type set to " + fx_list[nFXtype]);
         //Runtime.Log("Presets -" + fx_presets[nFXtype].substr(fx_presets[nFXtype].find(',') + 1));
         if (bitTest(level, part_lev))
-            sendDirect(nFXtype, 64, 65, npart, 255, nFX);
+            sendDirect(nFXtype, 64, 65, npart, 0xff, nFX);
         else if (bitTest(level, ins_fx))
-            sendDirect(nFXtype, 64, 1, 242, 255, nFX);
+            sendDirect(nFXtype, 64, 1, 242, 0xff, nFX);
         else
-            sendDirect(nFXtype, 64, 1, 241, 255, nFX);
+            sendDirect(nFXtype, 64, 1, 241, 0xff, nFX);
         return done_msg;
     }
 
@@ -749,7 +751,7 @@ int CmdInterface::effects()
             dest = "system efx " + asString(nFX + 1) + " sent to "
                  + asString(par + 1) + " at " + asString(value);
         }
-        sendDirect(value, 64, control, partno, 255, engine, insert);
+        sendDirect(value, 64, control, partno, 0xff, engine, insert);
         Runtime.Log(dest);
         return done_msg;
     }
@@ -786,7 +788,7 @@ int CmdInterface::effects()
             partno = 241;
             dest = "system";
         }
-        sendDirect(nFXpreset, 64, 16, partno, 128 + nFXtype, nFX);
+        sendDirect(nFXpreset, 64, 16, partno, 0x80 + nFXtype, nFX);
         Runtime.Log(dest + " efx preset set to number " + asString(value + 1));
     }
     return reply;
@@ -1099,7 +1101,7 @@ int CmdInterface::commandVector()
 
     if (matchWord(1, point, "off"))
     {
-        sendDirect(0, 64, 96, 192, 255, 255, chan);
+        sendDirect(0, 64, 96, 0xc0, 0xff, 0xff, chan);
         axis = 0;
         bitClear(level, vect_lev);
         return done_msg;
@@ -1127,13 +1129,13 @@ int CmdInterface::commandVector()
         tmp = string2int(point);
         if (axis == 0)
         {
-            sendDirect(tmp, 192, 16, 192, 255, 255, chan);
+            sendDirect(tmp, 192, 16, 0xc0, 0xff, 0xff, chan);
             bitSet(level, vect_lev);
             return done_msg;
         }
         if (Runtime.vectordata.Enabled[chan])
         {
-            sendDirect(tmp, 192, 32, 192, 255, 255, chan);
+            sendDirect(tmp, 192, 32, 0xc0, 0xff, 0xff, chan);
             return done_msg;
         }
     }
@@ -1179,7 +1181,7 @@ int CmdInterface::commandVector()
             enable = 1;
         else if (feat > 1 && matchnMove(1, point, "reverse"))
             enable = 2;
-        sendDirect(enable, 192, 18 + (axis * 16) + feat , 192, 255, 255, chan);
+        sendDirect(enable, 192, 18 + (axis * 16) + feat , 0xc0, 0xff, 0xff, chan);
         return done_msg;
     }
 
@@ -1199,7 +1201,7 @@ int CmdInterface::commandVector()
         else
             return opp_msg;
         tmp = string2int(point);
-        sendDirect(tmp, 64, 17 + hand + (axis * 16), 192, 255, 255, chan);
+        sendDirect(tmp, 64, 17 + hand + (axis * 16), 0xc0, 0xff, 0xff, chan);
         return done_msg;
     }
 
@@ -1239,8 +1241,8 @@ int CmdInterface::commandConfig()
     float value = 0;
     unsigned char type;
     unsigned char command = 0xff;
-    unsigned char par = 255;
-    unsigned char par2 = 255;
+    unsigned char par = 0xff;
+    unsigned char par2 = 0xff;
     if (isRead)
         type = 0x80;
     else
@@ -1353,7 +1355,7 @@ int CmdInterface::commandConfig()
         if (matchnMove(1, point, "midi"))
         {
             command = 32;
-            par = 128;
+            par = 0x80;
             if (isRead || point[0] != 0)
             {
                 if (!isRead)
@@ -1365,7 +1367,7 @@ int CmdInterface::commandConfig()
         else if (matchnMove(1, point, "server"))
         {
             command = 34;
-            par = 128;
+            par = 0x80;
             if (isRead || point[0] != 0)
             {
                 if (!isRead)
@@ -1388,7 +1390,7 @@ int CmdInterface::commandConfig()
         if (matchnMove(1, point, "midi"))
         {
             command = 48;
-            par = 128;
+            par = 0x80;
             if (isRead || point[0] != 0)
             {
                 if (!isRead)
@@ -1400,7 +1402,7 @@ int CmdInterface::commandConfig()
         else if (matchnMove(1, point, "audio"))
         {
             command = 50;
-            par = 128;
+            par = 0x80;
             if (isRead || point[0] != 0)
             {
                 if (!isRead)
@@ -1525,8 +1527,8 @@ int CmdInterface::commandScale()
     float value = 0;
     unsigned char type;
     unsigned char command = 0xff;
-    unsigned char par = 255;
-    unsigned char par2 = 255;
+    unsigned char par = 0xff;
+    unsigned char par2 = 0xff;
     if (isRead)
     {
         type = 0x80;
@@ -1662,7 +1664,7 @@ int CmdInterface::commandPart(bool justSet)
                 npart = tmp;
                 if (!isRead)
                 {
-                    sendDirect(npart, 64, 14, 240);
+                    sendDirect(npart, 64, 14, 0xf0);
                     changed = true;
                 }
             }
@@ -1691,7 +1693,7 @@ int CmdInterface::commandPart(bool justSet)
         else
         {
             if (!changed) // needs to be better
-                sendDirect(npart, 64, 14, 240);
+                sendDirect(npart, 64, 14, 0xf0);
             sendDirect(tmp, 64, 8, npart);
         }
         return done_msg;
@@ -1716,7 +1718,7 @@ int CmdInterface::commandPart(bool justSet)
             tmp = string2int(point) - 1;
             if (tmp < 0 || tmp > 159)
                 return range_msg;
-            sendDirect(npart, 64, 74, 240, 255, 255, 255, 255, tmp);
+            sendDirect(npart, 64, 74, 0xf0, 0xff, 0xff, 0xff, 0xff, tmp);
             reply = done_msg;
         }
         else
@@ -1752,7 +1754,7 @@ int CmdInterface::commandPart(bool justSet)
             if (dest == 0)
                 reply = range_msg;
         }
-        sendDirect(dest, type, 120, npart, 255, 255, 255, 192);
+        sendDirect(dest, type, 120, npart, 0xff, 0xff, 0xff, 0xc0);
         reply = done_msg;
     }
     else if (matchnMove(1, point, "breath"))
@@ -1851,7 +1853,7 @@ int CmdInterface::commandPart(bool justSet)
     {
         string name;
         unsigned char type = 64;
-        unsigned char par2 = 255;
+        unsigned char par2 = 0xff;
         if (isRead)
             type = 0;
         else
@@ -1870,7 +1872,7 @@ int CmdInterface::commandPart(bool justSet)
             else
                 par2 = miscMsgPush(name);
         }
-        sendDirect(0, type, 222, npart, 255, 255, 255, 128, par2, 255);
+        sendDirect(0, type, 222, npart, 0xff, 0xff, 0xff, 0x80, par2, 0xff);
         reply = done_msg;
     }
     else
@@ -1993,7 +1995,7 @@ int CmdInterface::commandReadnSet()
         }
         if (point[0] != 0)
         {
-            sendDirect(255, 64, 8, 217, 0, 255, string2int(point), 192);
+            sendDirect(255, 64, 8, 217, 0, 0xff, string2int(point), 0xc0);
             return done_msg;
         }
         else
@@ -2009,7 +2011,7 @@ int CmdInterface::commandReadnSet()
         }
         if (point[0] != 0)
         {
-            sendDirect(255, 64, 8, 217, 0, string2int(point), 255, 192);
+            sendDirect(255, 64, 8, 217, 0, string2int(point), 0xff, 0xc0);
             return done_msg;
         }
         else
@@ -2024,14 +2026,14 @@ int CmdInterface::commandReadnSet()
     {
         if (!isRead && point[0] == 0)
             return value_msg;
-        sendDirect(string2int127(point), cmdType, 0, 240);
+        sendDirect(string2int127(point), cmdType, 0, 0xf0);
         return done_msg;
     }
     if (matchnMove(2, point, "detune"))
     {
         if (!isRead && point[0] == 0)
             return value_msg;
-        sendDirect(string2int127(point), cmdType, 32, 240, 0xff, 0xff, 0xff, 0x80);
+        sendDirect(string2int127(point), cmdType, 32, 0xf0, 0xff, 0xff, 0xff, 0x80);
         return done_msg;
     }
 
@@ -2067,7 +2069,7 @@ int CmdInterface::commandReadnSet()
         else if (matchnMove(1, point, "row"))
             value = 1;
 
-        sendDirect(value, cmdType, command, 240);
+        sendDirect(value, cmdType, command, 0xf0);
         return done_msg;
     }
     else if (matchnMove(2, point, "available")) // 16, 32, 64
@@ -2077,7 +2079,7 @@ int CmdInterface::commandReadnSet()
         int value = string2int(point);
         if (value != 16 && value != 32 && value != 64)
             return range_msg;
-        sendDirect(value, cmdType, 15, 240);
+        sendDirect(value, cmdType, 15, 0xf0);
         return done_msg;
     }
 
@@ -2156,7 +2158,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         if (matchnMove(3, point, "all"))
             control = 97;
         if (query("Restore to basic settings", false))
-            sendDirect(0, 64, control, 240, 255, 255, 255, 192);
+            sendDirect(0, 64, control, 0xf0, 0xff, 0xff, 0xff, 0xc0);
         return false;
     }
 
@@ -2180,7 +2182,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
     if (helpList(level))
         return false;
     if (matchnMove(2, point, "stop"))
-        sendDirect(0, 64, 128, 240);
+        sendDirect(0, 64, 0x80, 0xf0);
     else if (matchnMove(1, point, "list"))
     {
         if (commandList() == todo_msg)
@@ -2250,6 +2252,13 @@ bool CmdInterface::cmdIfaceProcessCommand()
 
             Runtime.Log("Created  new bank " + (string) point + " with ID " + asString(slot));
             GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
+        }
+        else if (matchnMove(2, point, "instance"))
+        {
+            int forceId = string2int(point);
+            if (forceId < 1 || forceId >= 32)
+                forceId = 0;
+            sendDirect(forceId, 64, 104, 0xf0, 0xff, 0xff, 0xff, 0x80);
         }
         else
         {
@@ -2354,7 +2363,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                         }
                         if (tmp == 0)
                         {
-                            sendDirect(bankID, 64, 61, 240, rootID, 255, 255, 128);
+                            sendDirect(bankID, 64, 61, 0xf0, rootID, 0xff, 0xff, 0x80);
                         }
                     }
 
@@ -2481,7 +2490,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 }
                 if (ok)
                 {
-                    sendDirect(0, 64, 84, 240, 255, 255, ch, 192, miscMsgPush(name));
+                    sendDirect(0, 64, 84, 0xf0, 0xff, 0xff, ch, 0xc0, miscMsgPush(name));
                 }
                 reply = done_msg;
             }
@@ -2607,7 +2616,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 }
                 if (ok)
                 {
-                    sendDirect(0, 64, 80, 240, 255, 255, 255, 192, miscMsgPush(name));
+                    sendDirect(0, 64, 80, 0xf0, 0xff, 0xff, 0xff, 0xc0, miscMsgPush(name));
                     reply = done_msg;
                 }
             }
@@ -2652,7 +2661,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 }
                 if (ok)
                 {
-                    sendDirect(npart, 64, 78, 240, 255, 255, 255, 255, miscMsgPush(name));
+                    sendDirect(npart, 64, 78, 0xf0, 0xff, 0xff, 0xff, 0xff, miscMsgPush(name));
                     reply = done_msg;
                 }
             }
@@ -2800,7 +2809,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                     {
                         param = string2int(point);
                         point = skipChars(point);
-                        if (((control == 80 || control == 88) && part == 240) || ((param & 0x80) && param < 0xff && insert != 9))
+                        if (((control == 80 || control == 88) && part == 0xf0) || ((param & 0x80) && param < 0xff && insert != 9))
                         {
                             string name = string(point);
                             if (name > "!")
@@ -2875,7 +2884,7 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
             }
             synth->getRuntime().Log(name + to_string(value));
         }
-        else if ( part == 240)
+        else if ( part == 0xf0)
         {
             switch (control)
             {

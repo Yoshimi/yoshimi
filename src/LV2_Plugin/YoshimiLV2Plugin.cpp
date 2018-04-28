@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified March 2018 (just to suppress a few warnings)
+    Modified April 2018 (just to suppress a few warnings)
 */
 
 #include "YoshimiLV2Plugin.h"
@@ -834,9 +834,9 @@ extern "C" const LV2UI_Descriptor* lv2ui_descriptor(uint32_t index)
 }
 
 
-bool mainCreateNewInstance(unsigned int, bool) //stub
+int mainCreateNewInstance(unsigned int, bool) //stub
 {
-    return true;
+    return 0;
 }
 
 

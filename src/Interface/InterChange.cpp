@@ -47,6 +47,7 @@ using namespace std;
 #include "MasterUI.h"
 
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
+extern int mainCreateNewInstance(unsigned int forceId, bool loadState);
 
 InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth),
@@ -614,6 +615,12 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                 case 97: // include MIDI-learn
                     synth->resetAll(control & 1);
                     break;
+                case 104:
+                    if (value > 0 && value < 32)
+                        value = mainCreateNewInstance(value, false);
+                    else
+                        value = mainCreateNewInstance(0, false);
+                    break;
 
                 case 128: // panic stop
 #ifdef REPORT_NOTES_ON_OFF
@@ -630,7 +637,8 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     break;
             }
             getData->data.parameter &= 0x7f;
-            guiTo = true;
+            if (control != 104)
+                guiTo = true;
             break;
         }
         case 248: // config
@@ -1813,6 +1821,10 @@ string InterChange::resolveMain(CommandBlock *getData)
             contstr = "Reset All including MIDI-learn";
             break;
 
+        case 104:
+            showValue = false;
+            contstr = "Start new instance " + to_string(value_int);
+            break;
         case 128:
             showValue = false;
             contstr = "Sound Stopped";
@@ -4854,6 +4866,8 @@ void InterChange::commandMain(CommandBlock *getData)
                 synth->allStop(2 | (control << 8) | (type << 24));
                 getData->data.type = 0xff; // stop further action);
             }
+            break;
+        case 104: // done elsewhere
             break;
         case 128: // just stop
             if (write)

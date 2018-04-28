@@ -57,7 +57,7 @@ using namespace std;
 CmdInterface commandInt;
 
 void mainRegisterAudioPort(SynthEngine *s, int portnum);
-bool mainCreateNewInstance(unsigned int forceId, bool loadState);
+int mainCreateNewInstance(unsigned int forceId, bool loadState);
 
 map<SynthEngine *, MusicClient *> synthInstances;
 list<string> splashMessages;
@@ -236,7 +236,7 @@ static void *mainGuiThread(void *arg)
     return NULL;
 }
 
-bool mainCreateNewInstance(unsigned int forceId, bool loadState)
+int mainCreateNewInstance(unsigned int forceId, bool loadState)
 {
     MusicClient *musicClient = NULL;
     int instanceID;
@@ -308,7 +308,7 @@ bool mainCreateNewInstance(unsigned int forceId, bool loadState)
             mainRegisterAudioPort(synth, npart);
     }
     synth->getRuntime().activeInstance |= (1 << instanceID);
-    return true;
+    return instanceID;
 
 bail_out:
     synth->getRuntime().runSynth = false;
@@ -324,7 +324,7 @@ bail_out:
         delete synth;
     }
 
-    return false;
+    return -1;
 }
 
 void *commandThread(void *arg = NULL) // silence warning
@@ -350,7 +350,7 @@ int main(int argc, char *argv[])
     pthread_attr_t attr;
     sem_t semGui;
 
-    if (!mainCreateNewInstance(0, false))
+    if (mainCreateNewInstance(0, false) == -1)
     {
         goto bail_out;
     }

@@ -95,9 +95,6 @@ decl {\#include "Misc/MiscFuncs.h"} {public local
 decl {\#include "MidiLearnUI.h"} {public local
 }
 
-decl {extern bool mainCreateNewInstance(unsigned int forceId, bool loadState);} {private global
-}
-
 class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
@@ -312,7 +309,7 @@ class MasterUI {: {private GuiUpdates}
             unsigned int forceId = 0;
             if (sId)
                 forceId = string2uint(sId);
-            mainCreateNewInstance(forceId, false);}
+            send_data(104, forceId, 0xc0, 0xf0, 0xff, 0xff, 0x80);}
             xywh {0 0 31 21} labelsize 12
           }
           MenuItem {} {
@@ -863,7 +860,7 @@ paramsui->Show(3);}
           class EffUI
         } {}
       }
-      Fl_Group partuigroup {open
+      Fl_Group partuigroup {
         xywh {3 255 380 170} box ENGRAVED_FRAME
       } {
         Fl_Group partui {
@@ -1649,6 +1646,9 @@ ZynAddSubFX}
             if (midilearnui)
                 midilearnui->Hide();
             setMasterLabel("");
+            break;
+            
+        case 104: // new instance (do nothing here)
             break;
 
         case 128:
