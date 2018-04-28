@@ -199,6 +199,7 @@ class MasterUI {: {private GuiUpdates}
       vectorui = new VectorUI(synth, bankui, paramsui);
       midilearnui = new MidiLearnUI(synth);
       yoshiLog = new ConsoleUI();
+      openedit = false;
 
       make_window();
       loadWindowData();
@@ -1421,6 +1422,11 @@ ZynAddSubFX}
             npartcounter->value(nval + 1);
             npartcounter->redraw();
             updatepanel();
+            if (openedit)
+            {
+                partui->instrumenteditwindow->show();
+                openedit = false;
+            }
             break;
 
         case 15:
@@ -2163,11 +2169,6 @@ ZynAddSubFX}
         yoshiLog->Hide();
     }} {}
   }
-  Function {showInstrumentEditWindow(int _npart)} {} {
-    code {//
-    if (_npart == npart)
-        partui->instrumenteditwindow->show();} {}
-  }
   Function {updateBankRootDirs()} {} {
     code {bankui->readbankcfg();} {}
   }
@@ -2657,5 +2658,7 @@ ZynAddSubFX}
   decl {int addNoteO;} {public local
   }
   decl {bool NewWindows;} {private local
+  }
+  decl {bool openedit;} {public local
   }
 }

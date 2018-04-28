@@ -1,5 +1,9 @@
 yoshimi 1.5.7 M
 
+2018-4-28 Will
+* BugFix: Mixer Panel 'Edit' right click sometimes fails.
+  Should open part editing window.
+
 2018-4-27 Will
 * BugFix: External instrument load always went to part 1.
 

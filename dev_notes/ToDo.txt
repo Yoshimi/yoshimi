@@ -1,6 +1,4 @@
 
-Regression: yoshimi no longer sets ALSA buffer size :(
-
 Realtime subnote
 
 Zero-cross for note off.

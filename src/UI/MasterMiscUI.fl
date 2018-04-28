@@ -429,9 +429,19 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
         Fl_Button {} {
           label Edit
           callback {//
-              bankui->cbwig->value(npart + 1 + *plgroup);
-              bankui->cbwig->do_callback();
-              synth->getGuiMaster()->showInstrumentEditWindow(npart + *plgroup);}
+              int newpart = npart | synth->getGuiMaster()->panelgroup;
+              if (Fl::event() == FL_RELEASE && Fl::event_button() == FL_RIGHT_MOUSE)
+              {
+                  if (newpart == synth->getGuiMaster()->partui->npart)
+                      synth->getGuiMaster()->partui->instrumenteditwindow->show();
+                  else
+                      synth->getGuiMaster()->openedit = true;
+              }
+              if ((int)bankui->cbwig->value() != (newpart + 1))
+              {
+                  bankui->cbwig->value(newpart + 1);
+                  bankui->cbwig->do_callback();
+              }}
           tooltip {Left mouse button: Part select
 Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labelfont 9 labelsize 10
         }
