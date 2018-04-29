@@ -167,7 +167,7 @@ static void *mainGuiThread(void *arg)
                     _synth->RootBank(tmpRoot, tmpBank); // but keep current root and bank
                 }
                 _synth->getRuntime().saveConfig();
-                int instanceID =  _synth->getUniqueId();
+                unsigned int instanceID =  _synth->getUniqueId();
                 if (_client)
                 {
                     _client->Close();
@@ -239,7 +239,7 @@ static void *mainGuiThread(void *arg)
 int mainCreateNewInstance(unsigned int forceId, bool loadState)
 {
     MusicClient *musicClient = NULL;
-    int instanceID;
+    unsigned int instanceID;
     SynthEngine *synth = new SynthEngine(globalArgc, globalArgv, false, forceId);
     if (!synth->getRuntime().isRuntimeSetupCompleted())
         goto bail_out;

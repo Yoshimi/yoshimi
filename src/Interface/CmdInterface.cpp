@@ -49,8 +49,7 @@ using namespace std;
 
 using namespace std;
 
-
-static int currentInstance = 0;
+static unsigned int currentInstance = 0;
 
 string basics[] = {
     "?  Help",                  "show commands",
@@ -72,6 +71,7 @@ string toplist [] = {
     "REMove",                   "remove paths, files and entries",
     "  Root <n>",               "de-list root path ID",
     "  Bank [s <n1>] <n2>",     "delete bank ID n2 (and all instruments) from current root (or 'Root' n1)",
+    "  YOshimi <n>",            "close instance ID",
     "  MLearn <s> [n]",         "delete midi learned 'ALL' whole list, or '@'(n) line",
     "Set / Read",               "set or read all main parameters",
     "  Part",                   "enter context level",
@@ -1899,6 +1899,12 @@ int CmdInterface::commandReadnSet()
             return value_msg;
         currentInstance = string2int(point);
         synth = findSynth(currentInstance);
+        unsigned int newID = synth->getUniqueId();
+        if (newID != currentInstance)
+        {
+            Runtime.Log("Instance " + to_string(currentInstance) + " not found. Set to " + to_string(newID), 1);
+            currentInstance = newID;
+        }
         defaults();
         return done_msg;
     }
@@ -2083,6 +2089,7 @@ int CmdInterface::commandReadnSet()
     return reply;
 }
 
+
 SynthEngine *CmdInterface::findSynth(unsigned int synthID)
 {
     SynthEngine *synth;
@@ -2093,14 +2100,19 @@ SynthEngine *CmdInterface::findSynth(unsigned int synthID)
             return synth;
     }
     synth = synthInstances.begin()->first;
-    currentInstance = 0;
-    defaults();
     return synth;
 }
+
 
 bool CmdInterface::cmdIfaceProcessCommand()
 {
     synth = findSynth(currentInstance);
+    unsigned int newID = synth->getUniqueId();
+    if (newID != currentInstance)
+    {
+        currentInstance = newID;
+        defaults();
+    }
 
     Config &Runtime = synth->getRuntime();
 
@@ -2134,7 +2146,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
     {
         if (currentInstance > 0)
         {
-            Runtime.Log("Can only exit from instance 0");
+            Runtime.Log("Can only exit from instance 0", 1);
             return false;
         }
         if (Runtime.configChanged)
@@ -2378,6 +2390,31 @@ bool CmdInterface::cmdIfaceProcessCommand()
             }
             else if (reply != range_msg)
                 reply = value_msg;
+        }
+        else if(matchnMove(2, point, "yoshimi"))
+        {
+            if (point[0] == 0)
+            {
+                replyString = "remove";
+                reply = what_msg;
+            }
+            else
+            {
+                unsigned int synthID =string2int(point);
+                if (synthID < 1 || synthID > 31)
+                    reply = range_msg;
+                else if (synthID == currentInstance)
+                    Runtime.Log("Can't remove current instance!", 1);
+                else
+                {
+                    SynthEngine *toClose = findSynth(synthID);
+                    if (toClose == synth)
+                        Runtime.Log("Instance " + to_string(synthID) + " doesn't exist!", 1);
+                    else
+                        toClose->getRuntime().runSynth = false;
+                    reply = done_msg;
+                }
+            }
         }
         else
         {

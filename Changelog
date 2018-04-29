@@ -1,5 +1,9 @@
 yoshimi 1.5.7 M
 
+2018-4-29 Will
+* CLI can now close instances.
+* Minor improvements to CLI instance controls.
+
 2018-4-28 Will
 * BugFix: Mixer Panel 'Edit' right click sometimes fails.
   Should open part editing window.
