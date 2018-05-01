@@ -59,7 +59,7 @@ CmdInterface commandInt;
 void mainRegisterAudioPort(SynthEngine *s, int portnum);
 int mainCreateNewInstance(unsigned int forceId, bool loadState);
 
-map<SynthEngine *, MusicClient *> synthInstances;
+extern map<SynthEngine *, MusicClient *> synthInstances;
 list<string> splashMessages;
 
 SynthEngine *firstSynth = NULL;

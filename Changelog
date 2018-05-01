@@ -2,6 +2,7 @@ yoshimi 1.5.7 M
 
 2018-5-1 Will
 * Improved CLI handling of instances.
+* Fixed regression: Had killed LV2 again :(
 
 2018-4-29 Will
 * CLI can now close instances.
