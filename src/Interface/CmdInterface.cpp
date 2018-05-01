@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified April 2018
+    Modified May 2018
 */
 
 #include <iostream>
@@ -49,6 +49,7 @@ using namespace std;
 
 using namespace std;
 
+extern SynthEngine *firstSynth;
 static unsigned int currentInstance = 0;
 
 string basics[] = {
@@ -1898,7 +1899,7 @@ int CmdInterface::commandReadnSet()
         if (point[0] == 0)
             return value_msg;
         currentInstance = string2int(point);
-        synth = findSynth(currentInstance);
+        synth = firstSynth->getSynthFromId(currentInstance);
         unsigned int newID = synth->getUniqueId();
         if (newID != currentInstance)
         {
@@ -2090,23 +2091,10 @@ int CmdInterface::commandReadnSet()
 }
 
 
-SynthEngine *CmdInterface::findSynth(unsigned int synthID)
-{
-    SynthEngine *synth;
-    for (itSynth = synthInstances.begin(); itSynth != synthInstances.end(); ++ itSynth)
-    {
-        synth = itSynth->first;
-        if (synth->getUniqueId() == synthID)
-            return synth;
-    }
-    synth = synthInstances.begin()->first;
-    return synth;
-}
-
-
 bool CmdInterface::cmdIfaceProcessCommand()
 {
-    synth = findSynth(currentInstance);
+    // in case it's been changed from elsewhere
+    synth = firstSynth->getSynthFromId(currentInstance);
     unsigned int newID = synth->getUniqueId();
     if (newID != currentInstance)
     {
@@ -2407,7 +2395,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                     Runtime.Log("Can't remove current instance!", 1);
                 else
                 {
-                    SynthEngine *toClose = findSynth(synthID);
+                    SynthEngine *toClose = firstSynth->getSynthFromId(synthID);
                     if (toClose == synth)
                         Runtime.Log("Instance " + to_string(synthID) + " doesn't exist!", 1);
                     else
@@ -2995,6 +2983,7 @@ void CmdInterface::cmdIfaceCommandLoop()
     cCmd = NULL;
     bool exit = false;
     sprintf(welcomeBuffer, "yoshimi> ");
+    synth = firstSynth;
     while(!exit)
     {
         cCmd = readline(welcomeBuffer);

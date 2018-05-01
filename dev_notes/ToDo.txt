@@ -1,4 +1,7 @@
 
+Multi instances produce jack errors if open when
+main instance closd :(
+
 Realtime subnote
 
 Zero-cross for note off.

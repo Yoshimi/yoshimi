@@ -621,6 +621,9 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     else
                         value = mainCreateNewInstance(0, false);
                     break;
+                case 105:
+
+                    break;
 
                 case 128: // panic stop
 #ifdef REPORT_NOTES_ON_OFF
@@ -1825,6 +1828,10 @@ string InterChange::resolveMain(CommandBlock *getData)
             showValue = false;
             contstr = "Start new instance " + to_string(value_int);
             break;
+        case 105: // will be close instance
+            showValue = false;
+            break;
+
         case 128:
             showValue = false;
             contstr = "Sound Stopped";
@@ -4868,6 +4875,8 @@ void InterChange::commandMain(CommandBlock *getData)
             }
             break;
         case 104: // done elsewhere
+            break;
+        case 105: // done elsewhere
             break;
         case 128: // just stop
             if (write)

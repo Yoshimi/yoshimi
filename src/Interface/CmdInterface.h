@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified April 2018
+    Modified May 2018
 */
 
 #ifndef CMDINTERFACE_H
@@ -29,8 +29,6 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Interface/InterChange.h"
 #include "Effects/EffectMgr.h"
-
-extern map<SynthEngine *, MusicClient *> synthInstances;
 
 // all_fx and ins_fx MUST be the first two
 typedef enum { all_fx = 0, ins_fx, conf_lev, vect_lev, scale_lev, learn_lev, part_lev, } level_bits;
@@ -61,12 +59,10 @@ class CmdInterface : private MiscFuncs
         int commandPart(bool justSet);
         int commandReadnSet();
         int sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff, unsigned char request = 0xff);
-        SynthEngine *findSynth(unsigned int synthID);
         bool cmdIfaceProcessCommand();
         char *cCmd;
         char *point;
         SynthEngine *synth;
-        map<SynthEngine *, MusicClient *>::iterator itSynth;
         char welcomeBuffer [128];
 
         int npart;

@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified March 2018
+    Modified May 2018
 */
 
 #define NOLOCKS
@@ -46,6 +46,7 @@ using namespace std;
 #include <unistd.h>
 
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
+extern map<SynthEngine *, MusicClient *> synthInstances;
 
 static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
 {
@@ -81,7 +82,6 @@ static vector<string> ScaleHistory;
 static vector<string> StateHistory;
 static vector<string> VectorHistory;
 static vector<string> MidiLearnHistory;
-
 
 SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int forceId) :
     uniqueId(getRemoveSynthId(false, forceId)),
@@ -3174,6 +3174,19 @@ float SynthHelper::getDetune(unsigned char type, unsigned short int coarsedetune
     return det;
 }
 
+SynthEngine *SynthEngine::getSynthFromId(unsigned int uniqueId)
+{
+    map<SynthEngine *, MusicClient *>::iterator itSynth;
+    SynthEngine *synth;
+    for (itSynth = synthInstances.begin(); itSynth != synthInstances.end(); ++ itSynth)
+    {
+        synth = itSynth->first;
+        if (synth->getUniqueId() == uniqueId)
+            return synth;
+    }
+    synth = synthInstances.begin()->first;
+    return synth;
+}
 
 MasterUI *SynthEngine::getGuiMaster(bool createGui)
 {

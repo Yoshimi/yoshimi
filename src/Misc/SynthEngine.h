@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified February 2018
+    Modified May 2018
 */
 
 #ifndef SYNTHENGINE_H
@@ -227,6 +227,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         inline Config &getRuntime() {return Runtime;}
         inline PresetsStore &getPresetsStore() {return presetsstore;}
         unsigned int getUniqueId() {return uniqueId;}
+        SynthEngine *getSynthFromId(unsigned int uniqueId);
         MasterUI *getGuiMaster(bool createGui = true);
         void guiClosed(bool stopSynth);
         void setGuiClosedCallback(void( *_guiClosedCallback)(void*), void *arg)
@@ -252,14 +253,11 @@ class SynthEngine : private SynthHelper, MiscFuncs
         float volume;
         float sysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];
         float sysefxsend[NUM_SYS_EFX][NUM_SYS_EFX];
-        //float *tmpmixl; // Temporary mixing samples for part samples
-        //float *tmpmixr; // which are sent to system effect
+
         int keyshift;
 
         pthread_mutex_t  processMutex;
         pthread_mutex_t *processLock;
-
-        //XMLwrapper *stateXMLtree;
 
         char random_state[256];
         float random_0_1;

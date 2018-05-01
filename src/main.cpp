@@ -62,7 +62,7 @@ int mainCreateNewInstance(unsigned int forceId, bool loadState);
 map<SynthEngine *, MusicClient *> synthInstances;
 list<string> splashMessages;
 
-static SynthEngine *firstSynth = NULL;
+SynthEngine *firstSynth = NULL;
 static Config *firstRuntime = NULL;
 static int globalArgc = 0;
 static char **globalArgv = NULL;
@@ -405,6 +405,7 @@ int main(int argc, char *argv[])
 
     //create command line processing thread
     pthread_t cmdThr;
+//    while (firstSynth == NULL); // just wait
     if(bShowCmdLine)
     {
         if (pthread_attr_init(&attr) == 0)
