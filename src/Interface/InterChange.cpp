@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified April 2018
+    Modified May 2018
 */
 
 #include <iostream>
@@ -48,6 +48,7 @@ using namespace std;
 
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
 extern int mainCreateNewInstance(unsigned int forceId, bool loadState);
+extern SynthEngine *firstSynth;
 
 InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth),
@@ -622,7 +623,21 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         value = mainCreateNewInstance(0, false);
                     break;
                 case 105:
-
+                    text = to_string(value) + " ";
+                    if (value < 0 || value >= 32)
+                        text += "Out of range";
+                    else
+                    {
+                        SynthEngine *toClose = firstSynth->getSynthFromId(value);
+                        if (toClose == firstSynth && value > 0)
+                            text += "Can't find";
+                        else
+                        {
+                            toClose->getRuntime().runSynth = false;
+                            text += "Closed";
+                        }
+                    }
+                    value = miscMsgPush(text);
                     break;
 
                 case 128: // panic stop
@@ -640,7 +655,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     break;
             }
             getData->data.parameter &= 0x7f;
-            if (control != 104)
+            if (control != 104 && control != 105)
                 guiTo = true;
             break;
         }
@@ -1828,8 +1843,9 @@ string InterChange::resolveMain(CommandBlock *getData)
             showValue = false;
             contstr = "Start new instance " + to_string(value_int);
             break;
-        case 105: // will be close instance
+        case 105: // close instance
             showValue = false;
+            contstr = "Close instance - " + miscMsgPop(value_int);
             break;
 
         case 128:

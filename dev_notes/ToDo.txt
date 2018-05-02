@@ -1,6 +1,6 @@
 
-Multi instances produce jack errors if open when
-main instance closd :(
+Multi instances produce jack errors if have been opened when
+main instance closed - been there since V 1.4.1 :(
 
 Realtime subnote
 

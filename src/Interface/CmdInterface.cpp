@@ -2388,20 +2388,12 @@ bool CmdInterface::cmdIfaceProcessCommand()
             }
             else
             {
-                unsigned int synthID =string2int(point);
-                if (synthID < 1 || synthID > 31)
-                    reply = range_msg;
-                else if (synthID == currentInstance)
-                    Runtime.Log("Can't remove current instance!", 1);
+                int to_close = string2int(point);
+                if (to_close == 0)
+                    Runtime.Log("Use 'Exit' to close main instance");
                 else
-                {
-                    SynthEngine *toClose = firstSynth->getSynthFromId(synthID);
-                    if (toClose == synth)
-                        Runtime.Log("Instance " + to_string(synthID) + " doesn't exist!", 1);
-                    else
-                        toClose->getRuntime().runSynth = false;
-                    reply = done_msg;
-                }
+                    sendDirect(to_close, 64, 105, 0xf0, 0xff, 0xff, 0xff, 0x80);
+                reply = done_msg;
             }
         }
         else

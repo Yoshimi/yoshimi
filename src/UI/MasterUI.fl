@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified April 2018} {selected in_source in_header
+Modified May 2018} {selected in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -257,6 +257,7 @@ class MasterUI {: {private GuiUpdates}
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
+      bool close = true;
       if (synth->getRuntime().configChanged)
       {
           int r = fl_choice("Parameters Changed", "Save Changes", "Cancel", "Don't Save");
@@ -266,16 +267,15 @@ class MasterUI {: {private GuiUpdates}
                   synth->getRuntime().configChanged = false;
                   // this seems backwards but it *always* saves.
                   // seeing configChanged makes it reload the old settings first.
-                  synth->guiClosed(true);
                   break;
               case 2:
-                  synth->guiClosed(true);
                   break;
               default:
+                  close = false;
                   break;
           }
       }
-      else
+      if (close)
       {
           synth->guiClosed(true);
       }}
@@ -1647,7 +1647,7 @@ ZynAddSubFX}
                 midilearnui->Hide();
             setMasterLabel("");
             break;
-            
+
         case 104: // new instance (do nothing here)
             break;
 

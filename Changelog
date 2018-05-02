@@ -1,5 +1,11 @@
 yoshimi 1.5.7 M
 
+2018-5-2 Will
+* Further improvements to CLI handling of instances.
+* Started preparation for possible singluar set of banks.
+* Minor cosmetic update to main GUI.
+* Updated docs.
+
 2018-5-1 Will
 * Improved CLI handling of instances.
 * Fixed regression: Had killed LV2 again :(

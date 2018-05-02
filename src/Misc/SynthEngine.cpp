@@ -47,6 +47,7 @@ using namespace std;
 
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
 map<SynthEngine *, MusicClient *> synthInstances;
+SynthEngine *firstSynth = NULL;
 
 static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
 {

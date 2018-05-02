@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified April 2018 (just to suppress a few warnings)
+    Modified May 2018
 */
 
 #include "YoshimiLV2Plugin.h"
@@ -50,6 +50,8 @@
 #define YOSHIMI_LV2_OPTIONS__options         YOSHIMI_LV2_OPTIONS_PREFIX "options"
 
 #define YOSHIMI_LV2_STATE__StateChanged      "http://lv2plug.in/ns/ext/state#StateChanged"
+
+extern SynthEngine *firstSynth;
 
 typedef enum {
     LV2_OPTIONS_INSTANCE,
@@ -343,9 +345,15 @@ bool YoshimiLV2Plugin::init()
     if (!prepBuffers())
         return false;
 
-    if(!_synth->Init(_sampleRate, _bufferSize)) {
+    if(!_synth->Init(_sampleRate, _bufferSize))
+    {
         synth->getRuntime().LogError("Can't init synth engine");
 	return false;
+    }
+    if (_synth->getUniqueId() == 0)
+    {
+        firstSynth = _synth;
+        //firstSynth->getRuntime().Log("Started first");
     }
 
     _synth->getRuntime().showGui = false;
