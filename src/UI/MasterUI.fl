@@ -1133,7 +1133,7 @@ ZynAddSubFX}
                 CSpend->show();
         }
         send_data(48, o->value(), 0xc0);}
-        tooltip {Assign groups of parts to Ch 1, singly enabled by MIDI} xywh {130 650 53 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
+        tooltip {Assign groups of parts to Ch 1, singly enabled by MIDI} xywh {130 650 69 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
         code1 {o->value(synth->getRuntime().channelSwitchType);}
         code2 {if (o->value() == 0) CSspinner->hide(); else CSspinner->show();}
         code3 {CS_CC = o->value();}
@@ -1147,11 +1147,15 @@ ZynAddSubFX}
           xywh {40 40 34 20} labelsize 12
         }
         MenuItem switchcolumn {
-          label Col
+          label Column
           xywh {40 40 34 20} labelsize 12
         }
         MenuItem switchloop {
           label Loop
+          xywh {0 0 34 20} labelsize 12
+        }
+        MenuItem switchrecoil {
+          label Recoil
           xywh {0 0 34 20} labelsize 12
         }
       }
@@ -1267,6 +1271,7 @@ ZynAddSubFX}
                             break;
 
                         case 3: // loop
+                        case 4: // recoil
                             if (npart < NUM_MIDI_CHANNELS)
                             {
                                 if (npart == synth->getRuntime().channelSwitchValue)

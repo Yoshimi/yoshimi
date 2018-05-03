@@ -1753,6 +1753,9 @@ string InterChange::resolveMain(CommandBlock *getData)
                 case 3:
                     contstr += "Loop";
                     break;
+                case 4:
+                    contstr += "Recoil";
+                    break;
             }
             break;
         case 49:

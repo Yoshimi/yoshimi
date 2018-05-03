@@ -94,7 +94,7 @@ string toplist [] = {
     "  Volume <n>",             "master volume",
     "  SHift <n>",              "master key shift semitones (0 no shift)",
     "  DEtune <n>",             "master fine detune",
-    "  SOlo [s] [n]",           "channel 'solo' switcher (Row, Column, Loop, CC, {other} Disable)",
+    "  SOlo [s] [n]",           "channel 'solo' switcher (ROw, COlumn, LOop, REcoil, CC, {other} Disable)",
     "      CC <n>",             "Incoming 'solo' CC number (type must be set first)",
     "end"
 };
@@ -2045,8 +2045,7 @@ int CmdInterface::commandReadnSet()
 
     if (matchnMove(2, point, "solo"))
     {
-        int value = 0;
-        int command = 48;
+        int value = 0; // disable
 
         if (matchnMove(2, point, "cc"))
         {
@@ -2062,16 +2061,19 @@ int CmdInterface::commandReadnSet()
                     return done_msg;
                 }
             }
-            command = 49;
+            sendDirect(value, cmdType, 49, 0xf0);
+            return done_msg;
         }
-        else if (matchnMove(1, point, "loop"))
-            value = 3;
-        else if (matchnMove(1, point, "column"))
-            value = 2;
-        else if (matchnMove(1, point, "row"))
-            value = 1;
 
-        sendDirect(value, cmdType, command, 0xf0);
+        else if (matchnMove(2, point, "row"))
+            value = 1;
+        else if (matchnMove(2, point, "column"))
+            value = 2;
+        else if (matchnMove(2, point, "loop"))
+            value = 3;
+        else if (matchnMove(2, point, "recoil"))
+            value = 4;
+        sendDirect(value, cmdType, 48, 0xf0);
         return done_msg;
     }
     else if (matchnMove(2, point, "available")) // 16, 32, 64

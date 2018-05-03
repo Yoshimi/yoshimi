@@ -6,7 +6,7 @@ Y : 0 to 63 : 14 : 240 : 255 : 255 : 255 : 255 : 255 : Part number
 Y : 16, 32, 64 : 15 : 240 : 255 : 255 : 255 : 255 : 255 : Number of available parts
 YL : 0 to 127 : 32 : 240 : 255 : 255 : 255 : 128 : 255 : Detune frequency
 Y : -36 to 36 : 35 : 240 : 255 : 255 : 255 : 128 : 255 : Key shift
-Y : 0 to 3 : 48 : 240 : 255 : 255 : 255 : 255 : 255 : Channel Switcher Type (Solo) - Off, Row, Column, Loop
+Y : 0 to 4 : 48 : 240 : 255 : 255 : 255 : 255 : 255 : Channel Switcher Type (Solo) - Off, Row, Column, Loop, Recoil
 Y : 14 to 119 : 49 : 240 : 255 : 255 : 255 : 255 : 255 : Channel Switcher Incoming CC
 
 Y : 0 to 127 : 59 : 240 : 0 to 127, 255 : 255 : 255 : 128 : msg No. : Export bank ID at root ID to named directory via miscMsg

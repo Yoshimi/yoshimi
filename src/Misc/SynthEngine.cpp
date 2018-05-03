@@ -521,60 +521,69 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
 
 int SynthEngine::RunChannelSwitch(int value)
 {
-    int unknown = 0;
-    if (Runtime.channelSwitchType == 1 || Runtime.channelSwitchType == 3) // single row / loop
+    switch (Runtime.channelSwitchType)
     {
-        if (Runtime.channelSwitchType == 1)
-        {
+        case 1: // single row
             if (value >= NUM_MIDI_CHANNELS)
                 return 1; // out of range
-        }
-        else if (value > 0)
-            value = (Runtime.channelSwitchValue + 1) % NUM_MIDI_CHANNELS; // loop
-        else
-            return 0; // do nothing if it's a switch off
-        Runtime.channelSwitchValue = value;
-        for (int ch = 0; ch < NUM_MIDI_CHANNELS; ++ch)
+            break;
+        case 2: // columns
         {
-            bool isVector = Runtime.vectordata.Enabled[ch];
-            if (ch != value)
+            if (value >= NUM_MIDI_PARTS)
+                return 1; // out of range
+            int chan = value & 0xf;
+            for (int i = chan; i < NUM_MIDI_PARTS; i += NUM_MIDI_CHANNELS)
             {
-                part[ch]->Prcvchn = NUM_MIDI_CHANNELS;
-                if (isVector)
-                {
-                    part[ch + NUM_MIDI_CHANNELS]->Prcvchn = NUM_MIDI_CHANNELS;
-                    part[ch + NUM_MIDI_CHANNELS * 2]->Prcvchn = NUM_MIDI_CHANNELS;
-                    part[ch + NUM_MIDI_CHANNELS * 3]->Prcvchn = NUM_MIDI_CHANNELS;
-                }
+                if (i != value)
+                    part[i]->Prcvchn = chan | NUM_MIDI_CHANNELS;
+                else
+                    part[i]->Prcvchn = chan;
             }
-            else
-            {
-                part[ch]->Prcvchn = 0;
-                if (isVector)
-                {
-                    part[ch + NUM_MIDI_CHANNELS]->Prcvchn = 0;
-                    part[ch + NUM_MIDI_CHANNELS * 2]->Prcvchn = 0;
-                    part[ch + NUM_MIDI_CHANNELS * 3]->Prcvchn = 0;
-                }
-            }
+            return 0; // all OK
+            break;
         }
+        case 3: // loop
+            if (value == 0)
+                return 0; // do nothing - it's a switch off
+            value = (Runtime.channelSwitchValue + 1) % NUM_MIDI_CHANNELS;
+            break;
+        case 4: // recoil
+            if (value == 0)
+                return 0; // do nothing - it's a switch off
+            if (value >= 64)
+                value = (Runtime.channelSwitchValue + 1) % NUM_MIDI_CHANNELS;
+            else
+                value = (Runtime.channelSwitchValue + NUM_MIDI_CHANNELS - 1) % NUM_MIDI_CHANNELS;
+            break;
+        default:
+            return 2; // unknown
     }
-    else if (Runtime.channelSwitchType == 2) // columns
+    Runtime.channelSwitchValue = value;
+    for (int ch = 0; ch < NUM_MIDI_CHANNELS; ++ch)
     {
-        if (value >= NUM_MIDI_PARTS)
-            return 1; // out of range
-        int chan = value & 0xf;
-        for (int i = chan; i < NUM_MIDI_PARTS; i += NUM_MIDI_CHANNELS)
+        bool isVector = Runtime.vectordata.Enabled[ch];
+        if (ch != value)
         {
-            if (i != value)
-                part[i]->Prcvchn = chan | NUM_MIDI_CHANNELS;
-            else
-                part[i]->Prcvchn = chan;
+            part[ch]->Prcvchn = NUM_MIDI_CHANNELS;
+            if (isVector)
+            {
+                part[ch + NUM_MIDI_CHANNELS]->Prcvchn = NUM_MIDI_CHANNELS;
+                part[ch + NUM_MIDI_CHANNELS * 2]->Prcvchn = NUM_MIDI_CHANNELS;
+                part[ch + NUM_MIDI_CHANNELS * 3]->Prcvchn = NUM_MIDI_CHANNELS;
+            }
+        }
+        else
+        {
+            part[ch]->Prcvchn = 0;
+            if (isVector)
+            {
+                part[ch + NUM_MIDI_CHANNELS]->Prcvchn = 0;
+                part[ch + NUM_MIDI_CHANNELS * 2]->Prcvchn = 0;
+                part[ch + NUM_MIDI_CHANNELS * 3]->Prcvchn = 0;
+            }
         }
     }
-    else
-        unknown = 2; // unrecognised
-    return unknown;
+    return 0; // all OK
 }
 
 

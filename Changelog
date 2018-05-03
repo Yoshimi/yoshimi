@@ -1,5 +1,13 @@
 yoshimi 1.5.7 M
 
+2018-5-3 Will
+* Added 'recoil' mode to channel switcher (Solo).
+  Incomming CC value:
+  0         ignore
+  1 to 63   decrement active part MOD 16
+  64 to 127 increment active part MOD 16
+* Updated docs
+
 2018-5-2 Will
 * Further improvements to CLI handling of instances.
 * Started preparation for possible singluar set of banks.
