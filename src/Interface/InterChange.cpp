@@ -195,15 +195,14 @@ void *InterChange::sortResultsThread(void)
 {
     while(synth->getRuntime().runSynth)
     {
-        /*
-        if (!(tick & 8191))
+        /*if (!(tick & 8191))
         {
             if (tick & 16383)
                 cout << "Tick" << endl;
             else
                 cout << "Tock" << endl;
-        }
-        */
+        }*/
+
         ++ tick;
         unsigned char testRead = __sync_or_and_fetch(&blockRead, 0);
         if (lockTime == 0 && testRead != 0)

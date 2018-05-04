@@ -1,5 +1,8 @@
 yoshimi 1.5.7 M
 
+2018-5-4 Will
+* Added 250mS de-bounce to solo loop and recoil options.
+
 2018-5-3 Will
 * Added 'recoil' mode to channel switcher (Solo).
   Incomming CC value:

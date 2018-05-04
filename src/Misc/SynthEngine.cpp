@@ -521,6 +521,12 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
 
 int SynthEngine::RunChannelSwitch(int value)
 {
+    static unsigned int timer = 0;
+    if ((interchange.tick - timer) > 2047) // approx 250mS
+        timer = interchange.tick;
+    else if (Runtime.channelSwitchType > 2)
+        return 0; // de-bounced
+
     switch (Runtime.channelSwitchType)
     {
         case 1: // single row
