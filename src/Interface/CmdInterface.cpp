@@ -156,7 +156,7 @@ string partlist [] = {
     "  Type <s>",               "the effect type",
     "  PREset <n3>",            "set numbered effect preset to n3",
     "  Send <n3> <n4>",         "send part to system effect n3 at volume n4",
-    "PRogram <n2>",             "loads instrument ID",
+    "PRogram <[n2]/[s]>",       "loads instrument ID / CLear sets default",
     "NAme <s>",                 "sets the display name the part can be saved with",
     "Channel <n2>",             "MIDI channel (> 32 disables, > 16 note off only)",
     "Destination <s2>",         "jack audio destination (Main, Part, Both)",
@@ -1711,6 +1711,11 @@ int CmdInterface::commandPart(bool justSet)
         if (isRead)
         {
             Runtime.Log("Part name is " + synth->part[npart]->Pname);
+            return done_msg;
+        }
+        if (matchnMove(2, point, "clear"))
+        {
+            sendDirect(0, 64, 96, npart, 0xff, 0xff, 0xff, 0xff, tmp);
             return done_msg;
         }
         if (point[0] != 0) // force part not channel number

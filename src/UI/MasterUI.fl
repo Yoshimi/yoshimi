@@ -422,8 +422,8 @@ class MasterUI {: {private GuiUpdates}
           MenuItem {} {
             label {&Clear}
             callback {//
-            if(fl_choice("Clear parameters of instrument %d ?", NULL, "No", "Yes", npart + 1) > 1)
-                send_data(96, 0, 0xd0, npart);}
+            if(fl_choice("Clear parameters of instrument %d ?", NULL, "No", "Yes", partui->npart + 1) > 1)
+                send_data(96,0, 0xf0, partui->npart);}
             xywh {35 35 100 20} labelsize 12
           }
         }
@@ -892,9 +892,7 @@ paramsui->Show(3);}
         label Part
         callback {//
         int nval = o->value() - 1;
-        //synth->getRuntime().currentPart = nval;
-        //partNew(nval);
-        send_data(14, nval, 0xf0);}
+        send_data(14, nval, 0xf0, 0xf0);}
         xywh {36 264 40 20} labelsize 11 when 6 minimum 0 maximum 127 textsize 11
         code0 {o->range(1.0, partmax);}
         code1 {o->value(synth->getRuntime().currentPart + 1);}

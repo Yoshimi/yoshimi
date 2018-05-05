@@ -1,5 +1,10 @@
 yoshimi 1.5.7 M
 
+2018-5-5 Will
+* CLI can now clear a part.
+  set 'clear' instead of an instrument number.
+* Bugfix: GUI failing to clear correct part.
+
 2018-5-4 Will
 * Added 250mS de-bounce to solo loop and recoil options.
 

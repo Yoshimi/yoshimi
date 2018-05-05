@@ -31,7 +31,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 This file is derivative of original ZynAddSubFX code.
 
 Modified April 2018
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <iostream>} {public local
@@ -284,7 +284,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
 }
 
-class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
+class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window instrumentuiwindow {
@@ -1215,7 +1215,7 @@ bs[ins]->refresh();} {}
   }
   decl {int slot, what; // "what" = what button is pressed} {private local
   }
-    decl {int mode, *npart, nselected;} {private local
+  decl {int mode, *npart, nselected;} {private local
   }
   decl {void (BankProcess_::* fnc)(void);} {private local
   }
