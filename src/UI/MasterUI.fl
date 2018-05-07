@@ -300,6 +300,8 @@ class MasterUI {: {private GuiUpdates}
           MenuItem newinstanceid {
             label {&New instance...}
             callback {//
+            if(synth->getUniqueId() != 0)
+                return;
             if(synth->getIsLV2Plugin())
                 return;
 

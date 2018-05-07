@@ -23,7 +23,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified April 2018
+Modified May 2018
 } {selected in_source in_header
 }
 
@@ -108,7 +108,7 @@ class ConfigUI {: {private MiscFuncs}
                         send_data(1, 16 << o->value(), 0xc0);}
             tooltip {Number of samples} xywh {249 75 100 20} down_box BORDER_BOX labelsize 12 textsize 12
             code0 {o->value( (int)(logf(synth->getRuntime().Buffersize / 16.0f - 1.0f) / logf(2.0f)) + 1);}
-            code1 {if (synth->getUniqueId() != 0) o->hide();}
+            code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
           } {
             MenuItem {} {
               label 16
@@ -248,6 +248,7 @@ class ConfigUI {: {private MiscFuncs}
             tooltip {If you change this you must re-save the default state
 or when that loads it will revert to the previous value} xywh {270 60 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().loadDefaultState);}
+            code1 {if (synth->getIsLV2Plugin()) o->deactivate();}
           }
           Fl_Check_Button nonFatal {
             label {Hide Non Fatal Errors}
@@ -255,6 +256,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                         send_data(17, o->value(), 0xc0);}
             xywh {270 80 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().hideErrors);}
+            code1 {if (synth->getIsLV2Plugin()) o->deactivate();}
           }
           Fl_Check_Button showSplash {
             label {Show Splash Screen}
@@ -262,7 +264,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                         send_data(18, o->value(), 0xc0);}
             xywh {270 100 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showSplash);}
-            code1 {if (synth->getUniqueId() != 0) o->hide();}
+            code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
           }
           Fl_Check_Button logTimes {
             label {Log Load times}
@@ -277,6 +279,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                         send_data(20, o->value(), 0xc0);}
             xywh {270 140 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().logXMLheaders);}
+            code1 {if (synth->getIsLV2Plugin()) o->deactivate();}
           }
           Fl_Check_Button saveAllXML {
             label {Include disabled data in XML files}
@@ -298,7 +301,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                             o->value(1);}
             tooltip {Enable starting with this graphical  interface} xywh {270 200 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showGui);}
-            code1 {if (synth->getUniqueId() != 0) o->hide();}
+            code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
           }
           Fl_Check_Button enableCLI {
             label {* Enable CLI}
@@ -306,7 +309,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                         send_data(23, o->value(), 0xc0);}
             tooltip {Enable starting with interactive command line interface} xywh {270 220 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showCLI);}
-            code1 {if (synth->getUniqueId() != 0) o->hide();}
+            code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
           }
           Fl_Box {} {
             label {* Changing these settings requires a restart}
@@ -318,7 +321,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                         send_data(24, o->value(), 0xc0);}
             tooltip {Allow main instance to start all those open when last closed.} xywh {270 240 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().autoInstance);}
-            code1 {if (synth->getUniqueId() != 0) o->hide();}
+            code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
           }
         }
         Fl_Group jackTab {

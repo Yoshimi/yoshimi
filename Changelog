@@ -1,5 +1,8 @@
 yoshimi 1.5.7 M
 
+2018-5-7 Will
+* Non relevant GUI settings now deactivated for LV2.
+
 2018-5-5 Will
 * CLI can now clear a part.
   set 'clear' instead of an instrument number.
