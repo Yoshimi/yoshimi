@@ -1,9 +1,7 @@
 
-BUG! Marking bank instrument for swap, then attempting to change banks crashes - been there since V 1.4.1 :(
-
 BUG! Multi instances produce jack errors if have been opened when main instance closed - been there since V 1.4.1 :(
 
-BUG! If jack is selected for audio but there are no physical ports Yoshimi quits with CLI warning - should run with gui warning as well or better still loop back to try alsa.
+BUG! If jack is selected for audio but there are no physical ports Yoshimi quits with CLI warning - should run with gui warning as well, or better still loop back to try alsa.
 
 Realtime subnote
 

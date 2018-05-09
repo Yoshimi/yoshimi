@@ -98,6 +98,10 @@ class InterChange : private MiscFuncs
         bool showValue;
         unsigned int lockTime;
 
+        unsigned int swapRoot1;
+        unsigned int swapBank1;
+        unsigned int swapInstrument1;
+
         void commandMidi(CommandBlock *getData);
         void vectorClear(int Nvector);
         void commandVector(CommandBlock *getData);

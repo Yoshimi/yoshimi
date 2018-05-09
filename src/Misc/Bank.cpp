@@ -22,7 +22,7 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified March 2018
+    Modified May 2018
 */
 
 #include <set>
@@ -684,31 +684,38 @@ unsigned int Bank::removebank(unsigned int bankID, size_t rootID)
 
 
 // Swaps a slot with another
-bool Bank::swapslot(unsigned int n1, unsigned int n2)
+bool Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t bank2, size_t root1, size_t root2)
 {
-    if (n1 == n2)
+    if (n1 == n2 && bank1 == bank2 && root1 == root2)
         return true;
-
-    if (emptyslot(n1) && emptyslot(n2))
+    if (bank1 == 255)
+        bank1 = currentBankID;
+    if (bank2 == 255)
+        bank2 = bank1;
+    if (root1 == 255)
+        root1 = currentRootID;
+    if (root2 == 255)
+        root2 = root1;
+    if (emptyslotWithID(root1, bank1, n1) && emptyslotWithID(root2, bank2, n2))
         return true;
-    if (emptyslot(n1)) // make the empty slot the destination
+    if (emptyslotWithID(root1, bank1, n1)) // make the empty slot the destination
     {
         if (!setname(n2, getname(n2), n1))
             return false;
-        getInstrumentReference(n1) = getInstrumentReference(n2);
-        getInstrumentReference(n2).clear();
+        getInstrumentReference(root1, bank1, n1) = getInstrumentReference(root2, bank2, n2);
+        getInstrumentReference(root2, bank2, n2).clear();
     }
-    else if (emptyslot(n2)) // this is just a movement to an empty slot
+    else if (emptyslotWithID(root2, bank2, n2)) // this is just a movement to an empty slot
     {
         if (!setname(n1, getname(n1), n2))
             return false;
-        getInstrumentReference(n2) = getInstrumentReference(n1);
-        getInstrumentReference(n1).clear();
+        getInstrumentReference(root2, bank2, n2) = getInstrumentReference(root1, bank1, n1);
+        getInstrumentReference(root1, bank1, n1).clear();
     }
     else
     {   // if both slots are used
-        InstrumentEntry &instrRef1 = getInstrumentReference(n1);
-        InstrumentEntry &instrRef2 = getInstrumentReference(n2);
+        InstrumentEntry &instrRef1 = getInstrumentReference(root1, bank1, n1);
+        InstrumentEntry &instrRef2 = getInstrumentReference(root2, bank2, n2);
         if (instrRef1.name == instrRef2.name)
         {
             // change the name of the second instrument if the name are equal

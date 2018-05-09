@@ -60,7 +60,10 @@ InterChange::InterChange(SynthEngine *_synth) :
     returnsLoopback(NULL),
     blockRead(0),
     tick(0),
-    lockTime(0)
+    lockTime(0),
+    swapRoot1(0xff),
+    swapBank1(0xff),
+    swapInstrument1(0xff)
 {
     ;
 }
@@ -479,13 +482,13 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                 }
                 case 75: // bank instrument save
                 {
-                    if (kititem == 255)
+                    if (kititem == 0xff)
                     {
                         kititem = synth->ReadBankRoot();
                         getData->data.kit = kititem;
                     }
 
-                    if (engine == 255)
+                    if (engine == 0xff)
                     {
                         engine = synth->ReadBank();
                         getData->data.engine = engine;
@@ -656,6 +659,32 @@ void InterChange::indirectTransfers(CommandBlock *getData)
             getData->data.parameter &= 0x7f;
             if (control != 104 && control != 105)
                 guiTo = true;
+            break;
+        }
+        case 244: // instrument / bank
+        {
+            switch (control)
+            {
+                case 4: // swap select first
+                {
+                    cout << "swap 1 " << int(value) << endl;
+                    swapRoot1 = engine;
+                    swapBank1 = kititem;
+                    swapInstrument1 = value;
+                    break;
+                }
+                case 5: // swap select second and complete
+                {
+                    cout << "swap 2 " << int(value) << endl;
+                    //synth->swapslot(value, kititem, engine, swapInstrument1, swapBank1, swapRoot1);
+                    swapRoot1 = 0xff;
+                    swapBank1 = 0xff;
+                    swapInstrument1 = 0xff;
+                    break;
+                }
+            }
+            getData->data.parameter &= 0x7f;
+            //guiTo = true;
             break;
         }
         case 248: // config
@@ -941,9 +970,9 @@ float InterChange::readAllData(CommandBlock *getData)
     if (npart < NUM_MIDI_PARTS && synth->part[npart]->busy)
     {
         getData->data.control = 252; // part busy message
-        getData->data.kit = 255;
-        getData->data.engine = 255;
-        getData->data.insert = 255;
+        getData->data.kit = 0xff;
+        getData->data.engine = 0xff;
+        getData->data.insert = 0xff;
     }
     reTry:
     memcpy(tryData.bytes, getData->bytes, sizeof(tryData));
@@ -3821,9 +3850,9 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     {
         getData->data.type &= 0xbf; // turn it into a read
         getData->data.control = 252; // part busy message
-        getData->data.kit = 255;
-        getData->data.engine = 255;
-        getData->data.insert = 255;
+        getData->data.kit = 0xff;
+        getData->data.engine = 0xff;
+        getData->data.insert = 0xff;
         return false;
     }
     if (control == 252)
@@ -7817,7 +7846,7 @@ void InterChange::testLimits(CommandBlock *getData)
      */
     if (getData->data.part == 0xf8 && (control == 65 || control == 67 || control == 71))
     {
-        getData->data.par2 = 255; // just to be sure
+        getData->data.par2 = 0xff; // just to be sure
         if (value > 119)
             return;
         string text;
