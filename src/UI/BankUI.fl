@@ -780,6 +780,19 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
     code {//
     collect_data(synth, value, (Fl::event_button() | type), control, part, kititem, engine, insert, parameter, par2);} {}
   }
+  Function {returns_update(CommandBlock *getData)} {} {
+    code {//
+    //int value_int = getData->data.value;
+    unsigned char control = getData->data.control;
+    switch(control)
+    {
+        case 4:
+            break;
+        case 5:
+            rescan_for_banks(false);
+            break;
+    }} {}
+  }
   Function {BankUI(SynthEngine *_synth)} {} {
     code {//
     synth = _synth;
@@ -908,7 +921,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
             bool done = false;
             if (what == 1 && nselected >= 0)
             {
-                if (!bank->swapslot(nselected, slot))
+                /*if (!bank->swapslot(nselected, slot))
                     fl_alert("Could not swap these locations");
                 else
                 {
@@ -916,19 +929,21 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
                     nselected = -1;
                     bs[slot]->refresh();
                     bs[ns]->refresh();
-                }
-                //send_data(5, slot, 0xe0, 244, 255, 255, 255, 128);
+                }*/
+                send_data(5, slot, 0xf0, 244, 255, 255, 255, 128);
+                nselected = -1;
                 setread();
                 done = true;
             }
             if ((nselected < 0 || what == 2) && !done)
             {
+                /*nselected = slot;
                 int ns = nselected;
-                nselected = slot;
                 if (ns > 0)
                     bs[ns]->refresh();
-                bs[slot]->refresh();
-                //send_data(4, slot, 0xe0, 244, 255, 255, 255, 128);
+                bs[slot]->refresh();*/
+                send_data(4, slot, 0xe0, 244, 255, 255, 255, 128);
+                nselected = slot;
             }
         }
         if (mode != 4)

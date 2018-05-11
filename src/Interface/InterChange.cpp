@@ -667,24 +667,44 @@ void InterChange::indirectTransfers(CommandBlock *getData)
             {
                 case 4: // swap select first
                 {
-                    cout << "swap 1 " << int(value) << endl;
-                    swapRoot1 = engine;
-                    swapBank1 = kititem;
+                    if(kititem == 0xff)
+                    {
+                        kititem = synth->getBankRef().getCurrentBankID();
+                        getData->data.kit = kititem;
+                    }
+                    if(engine == 0xff)
+                    {
+                        engine = synth->getBankRef().getCurrentRootID();
+                        getData->data.engine = engine;
+                    }
+                    //cout << "Int swap 1 I " << int(value)  << "  B " << int(kititem) << "  R " << int(engine) << endl;
                     swapInstrument1 = value;
+                    swapBank1 = kititem;
+                    swapRoot1 = engine;
                     break;
                 }
                 case 5: // swap select second and complete
                 {
-                    cout << "swap 2 " << int(value) << endl;
-                    //synth->swapslot(value, kititem, engine, swapInstrument1, swapBank1, swapRoot1);
-                    swapRoot1 = 0xff;
-                    swapBank1 = 0xff;
+                    if(kititem == 0xff)
+                    {
+                        kititem = synth->getBankRef().getCurrentBankID();
+                        getData->data.kit = kititem;
+                    }
+                    if(engine == 0xff)
+                    {
+                        engine = synth->getBankRef().getCurrentRootID();
+                        getData->data.engine = engine;
+                    }
+                    //cout << "Int swap 2 I " << int(value) << "  B " << int(kititem) << "  R " << int(engine) << endl;
+                    synth->swapSlot(swapInstrument1, swapBank1, swapRoot1, value, kititem, engine);
                     swapInstrument1 = 0xff;
+                    swapBank1 = 0xff;
+                    swapRoot1 = 0xff;
+                    guiTo = true;
                     break;
                 }
             }
             getData->data.parameter &= 0x7f;
-            //guiTo = true;
             break;
         }
         case 248: // config
@@ -1077,6 +1097,8 @@ void InterChange::resolveReplies(CommandBlock *getData)
         commandName = resolveMicrotonal(getData);
     else if (npart == 0xf8)
         commandName = resolveConfig(getData);
+    else if (npart == 0xf4)
+        commandName = resolveBank(getData);
     else if (npart == 0xd9 || npart == 0xf0)
         commandName = resolveMain(getData);
 
@@ -1713,6 +1735,30 @@ string InterChange::resolveConfig(CommandBlock *getData)
     return ("Config " + contstr);
 }
 
+
+string InterChange::resolveBank(CommandBlock *getData)
+{
+    int value_int = lrint(getData->data.value);
+    int control = getData->data.control;
+    int kititem = getData->data.kit;
+    int engine = getData->data.engine;
+    string name;
+    string contstr = "";
+    switch(control)
+    {
+        case 4:
+            contstr = "Set Instrument ID " + to_string(value_int) + "  Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine) + " for swap";
+            break;
+        case 5:
+            contstr = "Swaped with Instrument ID " + to_string(value_int) + "  Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine);
+            break;
+        default:
+            showValue = false;
+            contstr = "Unrecognised";
+            break;
+    }
+    return ("Bank " + contstr);
+}
 
 string InterChange::resolveMain(CommandBlock *getData)
 {

@@ -107,10 +107,10 @@ class Bank : private MiscFuncs
     public:
         Bank(SynthEngine *_synth);
         ~Bank();
-        string getname(unsigned int ninstrument);
+        string getname(unsigned int ninstrument, size_t bank = 0xff, size_t root = 0xff);
         string getfilename(unsigned int ninstrument);
         string getnamenumbered(unsigned int ninstrument);
-        bool setname(unsigned int ninstrument, string newname, int newslot);
+        bool setname(unsigned int ninstrument, string newname, int newslot, size_t oldBank = 0xff, size_t newBank = 0xff, size_t oldRoot = 0xff, size_t newRoot = 0xff);
              // if newslot==-1 then this is ignored, else it will be put on that slot
 
         int engines_used(unsigned int ninstrument);

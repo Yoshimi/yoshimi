@@ -82,11 +82,15 @@ string Bank::getRootFileTitle()
 
 
 // Get the name of an instrument from the bank
-string Bank::getname(unsigned int ninstrument)
+string Bank::getname(unsigned int ninstrument, size_t bank, size_t root)
 {
-    if (emptyslot(ninstrument))
+    if (root == 0xff)
+        root = currentRootID;
+    if (bank == 0xff)
+        bank = currentBankID;
+    if (emptyslotWithID(root, bank, ninstrument))
         return defaultinsname;
-    return getInstrumentReference(ninstrument).name;
+    return getInstrumentReference(root, bank, ninstrument).name;
 }
 
 
@@ -112,12 +116,21 @@ string Bank::getnamenumbered(unsigned int ninstrument)
 
 
 // Changes the name of an instrument (and the filename)
-bool Bank::setname(unsigned int ninstrument, string newname, int newslot)
+bool Bank::setname(unsigned int ninstrument, string newname, int newslot, size_t oldBank, size_t newBank, size_t oldRoot, size_t newRoot)
 {
-    if (emptyslot(ninstrument))
+    if (oldBank == 0xff)
+        oldBank = currentBankID;
+    if (oldRoot == 0xff)
+        oldRoot = currentRootID;
+    if (newBank == 0xff)
+        newBank = oldBank;
+    if (newRoot == 0xff)
+        newRoot = oldRoot;
+
+    if (emptyslotWithID(oldRoot, oldBank, ninstrument))
         return false;
 
-    string newfilepath = getBankPath(currentRootID, currentBankID);
+    string newfilepath = getBankPath(newRoot, newBank);
     if (newfilepath.at(newfilepath.size() - 1) != '/')
         newfilepath += "/";
 
@@ -130,28 +143,31 @@ bool Bank::setname(unsigned int ninstrument, string newname, int newslot)
     int chk = -1;
     int chk2 = -1;
     newfilepath += filename;
-    string oldfilepath = setExtension(getFullPath(currentRootID, currentBankID, ninstrument), xizext);
+    string oldfilepath = setExtension(getFullPath(oldRoot, oldBank, ninstrument), xizext);
     chk = rename(oldfilepath.c_str(), newfilepath.c_str());
-    if (chk < 0)
+    /*if (chk < 0)
     {
         synth->getRuntime().Log("setName failed renaming "
                 + oldfilepath + " -> "
                 + newfilepath + ": " + string(strerror(errno)));
-    }
+    }*/
 
     newfilepath = setExtension(newfilepath, xiyext);
     oldfilepath = setExtension(oldfilepath, xiyext);
     chk2 = rename(oldfilepath.c_str(), newfilepath.c_str());
-    if (chk2 < 0)
+    /*if (chk2 < 0)
     {
         synth->getRuntime().Log("setName failed renaming "
                 + oldfilepath + " -> "
                 + newfilepath + ": " + string(strerror(errno)));
-    }
+    }*/
 
     if (chk < 0 && chk2 < 0)
+    {
+        synth->getRuntime().Log("setName failed renaming " + oldfilepath + " -> " + newfilepath + ": " + string(strerror(errno)));
         return false;
-    InstrumentEntry &instrRef = getInstrumentReference(currentRootID, currentBankID, ninstrument);
+    }
+    InstrumentEntry &instrRef = getInstrumentReference(oldRoot, oldBank, ninstrument);
     instrRef.name = newname;
     instrRef.filename = filename;
     return true;
@@ -696,19 +712,30 @@ bool Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t bank2
         root1 = currentRootID;
     if (root2 == 255)
         root2 = root1;
+
     if (emptyslotWithID(root1, bank1, n1) && emptyslotWithID(root2, bank2, n2))
         return true;
+
+    //cout << "\nswap 1 I " << int(n1) << "  B " << int(bank1) << "  R " << int(root1) << endl;
+    //cout << "swap 2 I " << int(n2) << "  B " << int(bank2) << "  R " << int(root2) << endl;
+
     if (emptyslotWithID(root1, bank1, n1)) // make the empty slot the destination
     {
-        if (!setname(n2, getname(n2), n1))
+        if (!setname(n2, getname(n2, bank2, root2), n1, bank2, bank1, root2, root1))
+        {
+            //cout << "here1 " << getname(n2, bank2, root2) << endl;
             return false;
+        }
         getInstrumentReference(root1, bank1, n1) = getInstrumentReference(root2, bank2, n2);
         getInstrumentReference(root2, bank2, n2).clear();
     }
     else if (emptyslotWithID(root2, bank2, n2)) // this is just a movement to an empty slot
     {
-        if (!setname(n1, getname(n1), n2))
+        if (!setname(n1, getname(n1, bank1, root1), n2, bank1, bank2, root1, root2))
+        {
+            //cout << "here2 " << getname(n1, bank1, root1) << endl;
             return false;
+        }
         getInstrumentReference(root2, bank2, n2) = getInstrumentReference(root1, bank1, n1);
         getInstrumentReference(root1, bank1, n1).clear();
     }
@@ -721,9 +748,9 @@ bool Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t bank2
             // change the name of the second instrument if the name are equal
             instrRef2.name += "2";
         }
-        if (!setname(n2, getname(n2), n1))
+        if (!setname(n2, getname(n2, bank2, root2), n1, bank1, bank2, root1, root2))
             return false;
-        if (!setname(n1, getname(n1), n2))
+        if (!setname(n1, getname(n1, bank1, root1), n2, bank1, bank2, root1, root2))
             return false;
         InstrumentEntry instrTmp = instrRef1;
         instrRef1 = instrRef2;

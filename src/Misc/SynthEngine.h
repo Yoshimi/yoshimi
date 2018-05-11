@@ -241,6 +241,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         Bank &getBankRef() {return bank;}
         Bank *getBankPtr() {return &bank;}
+        unsigned int swapSlot(unsigned int Inst1, size_t Bank1, size_t Root1, unsigned int Inst2, size_t Bank2, size_t Root2);
         unsigned int exportBank(string exportfile, size_t rootID, unsigned int bankID);
         unsigned int importBank(string inportfile, size_t rootID, unsigned int bankID);
         unsigned int removeBank(unsigned int bankID, size_t rootID);

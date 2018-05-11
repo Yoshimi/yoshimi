@@ -1,5 +1,9 @@
 yoshimi 1.5.7 M
 
+2018-5-11 Will
+* Completed universal instrument swaps.
+* Partially updated docs.
+
 2018-5-9 Will
 * BugFix: GUI swap instrument with bank now ignored.
   Would segfault previously.

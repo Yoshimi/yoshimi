@@ -178,6 +178,12 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         return;
     }
 
+    if (npart == 0xf4)
+    {
+        synth->getGuiMaster()->bankui->returns_update(getData);
+        return;
+    }
+
     Part *part = synth->part[npart];
 
     if (kititem >= 0x80 && kititem != 0xff) // effects

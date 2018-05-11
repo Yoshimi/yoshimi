@@ -83,6 +83,7 @@ class InterChange : private MiscFuncs
         string resolveVector(CommandBlock *getData);
         string resolveMicrotonal(CommandBlock *getData);
         string resolveConfig(CommandBlock *getData);
+        string resolveBank(CommandBlock *getData);
         string resolveMain(CommandBlock *getData);
         string resolvePart(CommandBlock *getData);
         string resolveAdd(CommandBlock *getData);
