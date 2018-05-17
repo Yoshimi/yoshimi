@@ -1764,6 +1764,7 @@ string InterChange::resolveMain(CommandBlock *getData)
 {
     float value = getData->data.value;
     int value_int = lrint(value);
+    bool write = ((getData->data.type & 0x40) != 0);
     unsigned char control = getData->data.control;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
@@ -1828,12 +1829,21 @@ string InterChange::resolveMain(CommandBlock *getData)
                     contstr += "Loop";
                     break;
                 case 4:
-                    contstr += "Recoil";
+                    contstr += "Twoway";
                     break;
             }
             break;
         case 49:
-            contstr = "Chan 'solo' Switch CC";
+            showValue = false;
+            contstr = "Chan 'solo' Switch CC ";
+            if (value_int > 127)
+            {
+                contstr += "undefined";
+                if (write)
+                    contstr += " - set mode first";
+            }
+            else
+                contstr += to_string(value_int);
             break;
         case 59:
             showValue = false;
@@ -4873,7 +4883,7 @@ void InterChange::commandMain(CommandBlock *getData)
         case 35: // done elsewhere
             break;
 
-        case 48:
+        case 48: // solo mode
             if (write)
             {
                 synth->getRuntime().channelSwitchType = value;
@@ -4886,14 +4896,14 @@ void InterChange::commandMain(CommandBlock *getData)
             else
                 value = synth->getRuntime().channelSwitchType;
             break;
-        case 49:
-            if (write)
-            {
-                if (synth->getRuntime().channelSwitchType > 0)
-                    synth->getRuntime().channelSwitchCC = value;
-            }
+        case 49: // solo ch number
+            if (write && synth->getRuntime().channelSwitchType > 0)
+                synth->getRuntime().channelSwitchCC = value;
             else
+            {
+                write = false; // for an invalid write attempt
                 value = synth->getRuntime().channelSwitchCC;
+            }
             break;
 
         case 73: // set current root and bank

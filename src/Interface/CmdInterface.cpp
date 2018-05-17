@@ -94,7 +94,7 @@ string toplist [] = {
     "  Volume <n>",             "master volume",
     "  SHift <n>",              "master key shift semitones (0 no shift)",
     "  DEtune <n>",             "master fine detune",
-    "  SOlo [s] [n]",           "channel 'solo' switcher (ROw, COlumn, LOop, REcoil, CC, {other} Disable)",
+    "  SOlo [s] [n]",           "channel 'solo' switcher (Row, Column, Loop, Twoway, CC, {other} Disable)",
     "      CC <n>",             "Incoming 'solo' CC number (type must be set first)",
     "end"
 };
@@ -2070,13 +2070,13 @@ int CmdInterface::commandReadnSet()
             return done_msg;
         }
 
-        else if (matchnMove(2, point, "row"))
+        else if (matchnMove(1, point, "row"))
             value = 1;
-        else if (matchnMove(2, point, "column"))
+        else if (matchnMove(1, point, "column"))
             value = 2;
-        else if (matchnMove(2, point, "loop"))
+        else if (matchnMove(1, point, "loop"))
             value = 3;
-        else if (matchnMove(2, point, "recoil"))
+        else if (matchnMove(1, point, "twoway"))
             value = 4;
         sendDirect(value, cmdType, 48, 0xf0);
         return done_msg;
