@@ -4,6 +4,8 @@ yoshimi 1.5.7 M
 * Changed Solo choice name 'Recoil' to 'TwoWay'.
 * Reduced debounce time to 60mS.
 * Improved CLI reporting.
+* Improved instrument swap error messages.
+* Updated docs.
 
 2018-5-11 Will
 * Completed universal instrument swaps.

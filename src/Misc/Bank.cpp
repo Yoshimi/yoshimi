@@ -700,8 +700,9 @@ unsigned int Bank::removebank(unsigned int bankID, size_t rootID)
 
 
 // Swaps a slot with another
-bool Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t bank2, size_t root1, size_t root2)
+unsigned int Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t bank2, size_t root1, size_t root2)
 {
+    unsigned int result = 0;
     if (n1 == n2 && bank1 == bank2 && root1 == root2)
         return true;
     if (bank1 == 255)
@@ -712,19 +713,19 @@ bool Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t bank2
         root1 = currentRootID;
     if (root2 == 255)
         root2 = root1;
-
+    string message = "";
     if (emptyslotWithID(root1, bank1, n1) && emptyslotWithID(root2, bank2, n2))
-        return true;
+        message = "nothing to swap";
 
     //cout << "\nswap 1 I " << int(n1) << "  B " << int(bank1) << "  R " << int(root1) << endl;
     //cout << "swap 2 I " << int(n2) << "  B " << int(bank2) << "  R " << int(root2) << endl;
 
-    if (emptyslotWithID(root1, bank1, n1)) // make the empty slot the destination
+    else if (emptyslotWithID(root1, bank1, n1)) // make the empty slot the destination
     {
         if (!setname(n2, getname(n2, bank2, root2), n1, bank2, bank1, root2, root1))
         {
             //cout << "here1 " << getname(n2, bank2, root2) << endl;
-            return false;
+            message = "can't write to " + getname(n2, bank2, root2);
         }
         getInstrumentReference(root1, bank1, n1) = getInstrumentReference(root2, bank2, n2);
         getInstrumentReference(root2, bank2, n2).clear();
@@ -734,7 +735,7 @@ bool Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t bank2
         if (!setname(n1, getname(n1, bank1, root1), n2, bank1, bank2, root1, root2))
         {
             //cout << "here2 " << getname(n1, bank1, root1) << endl;
-            return false;
+            message = "can't write to " + getname(n1, bank1, root1);
         }
         getInstrumentReference(root2, bank2, n2) = getInstrumentReference(root1, bank1, n1);
         getInstrumentReference(root1, bank1, n1).clear();
@@ -749,14 +750,16 @@ bool Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t bank2
             instrRef2.name += "2";
         }
         if (!setname(n2, getname(n2, bank2, root2), n1, bank1, bank2, root1, root2))
-            return false;
+            message = "can't write to " + getname(n2, bank2, root2);
         if (!setname(n1, getname(n1, bank1, root1), n2, bank1, bank2, root1, root2))
-            return false;
+            message = "can't write to " + getname(n1, bank1, root1);
         InstrumentEntry instrTmp = instrRef1;
         instrRef1 = instrRef2;
         instrRef2 = instrTmp;
     }
-    return true;
+    if (message > "")
+        result = miscMsgPush(message) | 0x1000;
+    return result;
 }
 
 

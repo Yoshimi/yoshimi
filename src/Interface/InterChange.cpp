@@ -306,7 +306,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     else
         text = "";
     getData->data.par2 = NO_MSG; // this may be reset later
-    unsigned char tmp;
+    unsigned int tmp;
     string name;
 
     int switchNum = npart;
@@ -678,7 +678,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         getData->data.engine = engine;
                     }
                     //cout << "Int swap 1 I " << int(value)  << "  B " << int(kititem) << "  R " << int(engine) << endl;
-                    swapInstrument1 = value;
+                    swapInstrument1 = insert;
                     swapBank1 = kititem;
                     swapRoot1 = engine;
                     break;
@@ -695,8 +695,15 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         engine = synth->getBankRef().getCurrentRootID();
                         getData->data.engine = engine;
                     }
-                    //cout << "Int swap 2 I " << int(value) << "  B " << int(kititem) << "  R " << int(engine) << endl;
-                    synth->swapSlot(swapInstrument1, swapBank1, swapRoot1, value, kititem, engine);
+                    //cout << "Int swap 2 I " << int(insert) << "  B " << int(kititem) << "  R " << int(engine) << endl;
+                    tmp = synth->swapSlot(swapInstrument1, swapBank1, swapRoot1, insert, kititem, engine);
+                    if (tmp != 0)
+                    {
+                        text = " FAILED " + miscMsgPop(tmp & 0xfff);
+                        value = miscMsgPush(text);
+                        if (text.find("nothing", 0, 7) == string::npos)
+                            synth->bank.rescanforbanks(); // might hav corrupted it
+                    }
                     swapInstrument1 = 0xff;
                     swapBank1 = 0xff;
                     swapRoot1 = 0xff;
@@ -1742,15 +1749,18 @@ string InterChange::resolveBank(CommandBlock *getData)
     int control = getData->data.control;
     int kititem = getData->data.kit;
     int engine = getData->data.engine;
-    string name;
+    int insert = getData->data.insert;
+    string name = miscMsgPop(value_int);
     string contstr = "";
     switch(control)
     {
         case 4:
-            contstr = "Set Instrument ID " + to_string(value_int) + "  Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine) + " for swap";
+            contstr = "Set Instrument ID " + to_string(insert) + "  Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine) + " for swap";
             break;
         case 5:
-            contstr = "Swaped with Instrument ID " + to_string(value_int) + "  Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine);
+            if (name == "")
+                name = "ed with Instrument ID " + to_string(insert) + "  Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine);
+            contstr = "Swap" + name;
             break;
         default:
             showValue = false;

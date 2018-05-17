@@ -61,8 +61,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         unsigned int uniqueId;
         bool isLV2Plugin;
         bool needsSaving;
-        Bank bank;
     public:
+        Bank bank;
         InterChange interchange;
         MidiLearn midilearn;
         MidiDecode mididecode;
