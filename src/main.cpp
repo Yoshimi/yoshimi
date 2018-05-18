@@ -139,14 +139,14 @@ static void *mainGuiThread(void *arg)
 
     GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::NewSynthEngine, 0);
 
-    if (firstRuntime->autoInstance)
+    /*if (firstRuntime->autoInstance)
     {
         for (int i = 1; i < 32; ++i)
         {
             if ((firstRuntime->activeInstance >> i) & 1)
                 mainCreateNewInstance(i, true);
         }
-    }
+    }*/
     while (firstRuntime->runSynth)
     {
         if (firstSynth->getUniqueId() == 0)

@@ -799,6 +799,8 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         case 20:
             break;
         case 21:
+            if (message > "")
+                fl_alert("%s",message.c_str());
             rescan_for_banks(false);
             break;
     }} {}

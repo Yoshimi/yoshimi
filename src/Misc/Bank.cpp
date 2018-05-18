@@ -801,19 +801,27 @@ unsigned int Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t
         //cout << "first " << firstBankPath << endl;
         //cout << "second " << secondBankPath << endl;
         //cout << "temp " << tempBankPath << endl;
-        if (secondBankPath == "")
+        if (secondBankPath == "") // move only
         {
             result = rename(firstBankPath.c_str(), (getRootPath(secondRoot) + "/" + firstname).c_str());
             if (result != 0)
-                cout << "sing1e 1 " << string(strerror(errno)) << endl;
+            {
+                synth->getRuntime().Log("move to " + to_string(secondRoot) + ": " + string(strerror(errno)), 2);
+                message = "Can't move from root " + to_string(firstRoot) + " to " + to_string(secondRoot);
+                result = 0x1000;
+            }
         }
-        else if(firstBankPath == "")
+        else if(firstBankPath == "") // move only
         {
             result = rename(secondBankPath.c_str(), (getRootPath(firstRoot) + "/" + secondname).c_str());
             if (result != 0)
-                cout << "sing1e 2 " << string(strerror(errno)) << endl;
+            {
+                synth->getRuntime().Log("move to " + to_string(firstRoot) + ": " + string(strerror(errno)), 2);
+                message = "Can't move from root " + to_string(secondRoot) + " to " + to_string(firstRoot);
+                result = 0x1000;
+            }
         }
-        else
+        else // actual swap
         {
             result = rename(firstBankPath.c_str(), tempBankPath.c_str());
             if (result == 0)
@@ -823,13 +831,25 @@ unsigned int Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t
                 {
                     result = rename(tempBankPath.c_str(), firstBankPath.c_str());
                     if (result != 0)
-                        cout << "third " << string(strerror(errno)) << endl;
+                    {
+                        synth->getRuntime().Log("move to " + to_string(secondRoot) + ": " + string(strerror(errno)), 2);
+                        message = "Can't move from temp dir to " + to_string(secondRoot);
+                        result = 0x1000;
+                    }
                 }
                 else
-                    cout << "second " << string(strerror(errno)) << endl;
+                {
+                    synth->getRuntime().Log("move to " + to_string(firstRoot) + ": " + string(strerror(errno)), 2);
+                    message = "Can't move from root " + to_string(secondRoot) + " to " + to_string(firstRoot);
+                    result = 0x1000;
+                }
             }
             else
-                cout << "first " << string(strerror(errno)) << endl;
+            {
+                synth->getRuntime().Log("move to temp dir: " + string(strerror(errno)), 2);
+                message = "Can't move from root " + to_string(firstRoot) + " to temp dir";
+                result = 0x1000;
+            }
         }
     }
 

@@ -1,4 +1,4 @@
-yoshimi 1.5.7 M
+yoshimi 1.5.8 rc1
 
 2018-5-18 Will
 * Implemented universal bank swaps.
@@ -6,6 +6,10 @@ yoshimi 1.5.7 M
   Too much access from Interchange needed and was
   getting silly always routing via SynthEngine!
 * Updated docs.
+* Improved banks swap error reporting.
+* Temporarily disabled auto instance loading.
+  it wasn't stable enough for release :(
+* Set version as 1.5.8 rc1
 
 2018-5-17 Will
 * Changed Solo choice name 'Recoil' to 'TwoWay'.
