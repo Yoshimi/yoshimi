@@ -665,7 +665,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         {
             switch (control)
             {
-                case 4: // swap select first
+                case 4: // instrument swap select first
                 {
                     if(kititem == 0xff)
                     {
@@ -683,7 +683,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     swapRoot1 = engine;
                     break;
                 }
-                case 5: // swap select second and complete
+                case 5: // instrument swap select second and complete
                 {
                     if(kititem == 0xff)
                     {
@@ -696,13 +696,13 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         getData->data.engine = engine;
                     }
                     //cout << "Int swap 2 I " << int(insert) << "  B " << int(kititem) << "  R " << int(engine) << endl;
-                    tmp = synth->swapSlot(swapInstrument1, swapBank1, swapRoot1, insert, kititem, engine);
+                    tmp = synth->bank.swapslot(swapInstrument1, insert, swapBank1, kititem, swapRoot1, engine);
                     if (tmp != 0)
                     {
                         text = " FAILED " + miscMsgPop(tmp & 0xfff);
                         value = miscMsgPush(text);
                         if (text.find("nothing", 0, 7) == string::npos)
-                            synth->bank.rescanforbanks(); // might hav corrupted it
+                            synth->bank.rescanforbanks(); // might have corrupted it
                     }
                     swapInstrument1 = 0xff;
                     swapBank1 = 0xff;
@@ -710,6 +710,34 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     guiTo = true;
                     break;
                 }
+
+                case 20: // bank swap select first
+                    if(engine == 0xff)
+                    {
+                        engine = synth->getBankRef().getCurrentRootID();
+                        getData->data.engine = engine;
+                    }
+                    swapBank1 = kititem;
+                    swapRoot1 = engine;
+                    break;
+                case 21: // banks swap select second and complete
+                    if(engine == 0xff)
+                    {
+                        engine = synth->getBankRef().getCurrentRootID();
+                        getData->data.engine = engine;
+                    }
+                    tmp = synth->bank.swapbanks(swapBank1, kititem, swapRoot1, engine);
+                    if (tmp >= 0x1000)
+                    {
+                        text = " FAILED " + miscMsgPop(tmp & 0xfff);
+                        value = miscMsgPush(text);
+                        if (text.find("nothing", 0, 7) == string::npos)
+                            synth->bank.rescanforbanks(); // might have corrupted it
+                    }
+                    swapBank1 = 0xff;
+                    swapRoot1 = 0xff;
+                    guiTo = true;
+                    break;
             }
             getData->data.parameter &= 0x7f;
             break;
@@ -1752,6 +1780,7 @@ string InterChange::resolveBank(CommandBlock *getData)
     int insert = getData->data.insert;
     string name = miscMsgPop(value_int);
     string contstr = "";
+    showValue = false;
     switch(control)
     {
         case 4:
@@ -1759,11 +1788,19 @@ string InterChange::resolveBank(CommandBlock *getData)
             break;
         case 5:
             if (name == "")
-                name = "ed with Instrument ID " + to_string(insert) + "  Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine);
+                name = "ped with Instrument ID " + to_string(insert) + "  Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine);
+            contstr = "Swap" + name;
+            break;
+
+        case 20:
+            contstr = "Set Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine) + " for swap";
+            break;
+        case 21:
+            if (name == "")
+                name = "ped with Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine);
             contstr = "Swap" + name;
             break;
         default:
-            showValue = false;
             contstr = "Unrecognised";
             break;
     }

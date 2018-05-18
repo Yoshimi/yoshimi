@@ -118,8 +118,8 @@ class Bank : private MiscFuncs
         bool emptyslot(unsigned int ninstrument) { return emptyslotWithID(currentRootID, currentBankID, ninstrument); }
         bool clearslot(unsigned int ninstrument);
         bool savetoslot(size_t rootID, size_t bankID, int ninstrument, int npart);
-        unsigned int swapslot(unsigned int n1, unsigned int n2, size_t bank1 = 255, size_t bank2 = 255, size_t root1 = 255, size_t root2 = 255);
-        void swapbanks(unsigned int firstID, unsigned int secondID);
+        unsigned int swapslot(unsigned int n1, unsigned int n2, size_t bank1 = 0xff, size_t bank2 = 0xff, size_t root1 = 0xff, size_t root2 = 0xff);
+        unsigned int swapbanks(unsigned int firstID, unsigned int secondID, size_t firstRoot = 0xff, size_t secondRoot= 0xff);
         string getBankName(int bankID, size_t rootID = 0xff);
         string getBankIDname(int bankID);
         int getBankSize(int bankID);
@@ -130,7 +130,7 @@ class Bank : private MiscFuncs
         bool isDuplicate(size_t rootID, size_t bankID, int pos, const string filename);
         bool newIDbank(string newbankdir, unsigned int bankID, size_t rootID = 0xff);
         bool newbankfile(string newbankdir, size_t rootID);
-        unsigned int removebank(unsigned int bankID, size_t rootID = 255);
+        unsigned int removebank(unsigned int bankID, size_t rootID = 0xff);
         void rescanforbanks(void);
         void clearBankrootDirlist(void);
         void removeRoot(size_t rootID);

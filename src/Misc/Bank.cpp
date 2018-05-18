@@ -28,6 +28,7 @@
 #include <set>
 #include <list>
 #include <stdlib.h>
+#include <stdio.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <iostream>
@@ -715,7 +716,7 @@ unsigned int Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size
         root2 = root1;
     string message = "";
     if (emptyslotWithID(root1, bank1, n1) && emptyslotWithID(root2, bank2, n2))
-        message = "nothing to swap";
+        message = "nothing to swap!";
 
     //cout << "\nswap 1 I " << int(n1) << "  B " << int(bank1) << "  R " << int(root1) << endl;
     //cout << "swap 2 I " << int(n2) << "  B " << int(bank2) << "  R " << int(root2) << endl;
@@ -764,64 +765,127 @@ unsigned int Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size
 
 
 // Intelligently moves or swaps banks preserving instrument details
-void Bank::swapbanks(unsigned int firstID, unsigned int secondID)
+unsigned int Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t firstRoot, size_t secondRoot)
 {
-    if (firstID == secondID)
-    {
-        synth->getRuntime().Log("Nothing to move!");
-        return;
-    }
+    unsigned int result = 0;
+    string message = "";
+    string firstname;
+    string secondname;
 
-    string firstname = getBankName(firstID); // this needs improving
-    string secondname = getBankName(secondID);
-    if (firstname.empty() and secondname.empty())
+    if (firstRoot > 0x7f)
+        firstRoot = currentRootID;
+    if (secondRoot > 0x7f)
+        secondRoot = firstRoot;
+
+    if (firstID == secondID && firstRoot == secondRoot)
     {
-        synth->getRuntime().Log("Nothing to move!");
-        return;
-    }
-    if (secondname.empty())
-    {
-        synth->getRuntime().Log("Moving " + firstname);
-        roots [currentRootID].banks [secondID] = roots [currentRootID].banks [firstID];
-        roots [currentRootID].banks.erase(firstID);
-    }
-    else if (firstname.empty())
-    {
-        synth->getRuntime().Log("Moving " + secondname);
-        roots [currentRootID].banks [firstID] = roots [currentRootID].banks [secondID];
-        roots [currentRootID].banks.erase(secondID);
+        message = "nothing to swap!";
+        result = 0x1000;
     }
     else
     {
-        synth->getRuntime().Log("Swapping " + firstname + " with " + secondname );
-        roots [currentRootID].banks [firstID].dirname = secondname;
-        roots [currentRootID].banks [secondID].dirname = firstname;
-        hints [currentRootID] [secondname] = firstID; // why do we need these?
-        hints [currentRootID] [firstname] = secondID;
-
-        for(int pos = 0; pos < BANK_SIZE; ++ pos)
+        firstname = getBankName(firstID, firstRoot);
+        secondname = getBankName(secondID, secondRoot);
+        if (firstname.empty() && secondname.empty())
         {
-            InstrumentEntry &instrRef_1 = getInstrumentReference(currentRootID, firstID, pos);
-            InstrumentEntry &instrRef_2 = getInstrumentReference(currentRootID, secondID, pos);
-
-            InstrumentEntry tmp = instrRef_2;
-
-            if (instrRef_1.name == "")
-                roots [currentRootID].banks [secondID].instruments.erase(pos);
-            else
-                instrRef_2 = instrRef_1;
-
-            if (tmp.name == "")
-                roots [currentRootID].banks [firstID].instruments.erase(pos);
-            else
-                instrRef_1 = tmp;
+            message = "nothing to swap!";
+            result = 0x1000;
         }
     }
 
-    if (firstID == currentBankID)
-        currentBankID = secondID;
-    else if(secondID == currentBankID)
-        currentBankID = firstID;
+    if (result == 0 && firstRoot != secondRoot) // do physical move first
+    {
+        string firstBankPath = getBankPath(firstRoot, firstID);
+        string secondBankPath = getBankPath(secondRoot, secondID);
+        string tempBankPath = getRootPath(firstRoot) + "/tmp";
+        //cout << "first " << firstBankPath << endl;
+        //cout << "second " << secondBankPath << endl;
+        //cout << "temp " << tempBankPath << endl;
+        if (secondBankPath == "")
+        {
+            result = rename(firstBankPath.c_str(), (getRootPath(secondRoot) + "/" + firstname).c_str());
+            if (result != 0)
+                cout << "sing1e 1 " << string(strerror(errno)) << endl;
+        }
+        else if(firstBankPath == "")
+        {
+            result = rename(secondBankPath.c_str(), (getRootPath(firstRoot) + "/" + secondname).c_str());
+            if (result != 0)
+                cout << "sing1e 2 " << string(strerror(errno)) << endl;
+        }
+        else
+        {
+            result = rename(firstBankPath.c_str(), tempBankPath.c_str());
+            if (result == 0)
+            {
+                result = rename(secondBankPath.c_str(),firstBankPath.c_str());
+                if (result == 0)
+                {
+                    result = rename(tempBankPath.c_str(), firstBankPath.c_str());
+                    if (result != 0)
+                        cout << "third " << string(strerror(errno)) << endl;
+                }
+                else
+                    cout << "second " << string(strerror(errno)) << endl;
+            }
+            else
+                cout << "first " << string(strerror(errno)) << endl;
+        }
+    }
+
+    if (result == 0)
+    {
+        if (secondname.empty())
+        {
+            roots [secondRoot].banks [secondID] = roots [firstRoot].banks [firstID];
+            roots [firstRoot].banks.erase(firstID);
+        }
+        else if (firstname.empty())
+        {
+            roots [firstRoot].banks [firstID] = roots [secondRoot].banks [secondID];
+            roots [secondRoot].banks.erase(secondID);
+        }
+        else
+        {
+            roots [firstRoot].banks [firstID].dirname = secondname;
+            roots [secondRoot].banks [secondID].dirname = firstname;
+            hints [secondRoot] [secondname] = firstID; // why do we need these?
+            hints [firstRoot] [firstname] = secondID;
+
+            for(int pos = 0; pos < BANK_SIZE; ++ pos)
+            {
+                InstrumentEntry &instrRef_1 = getInstrumentReference(firstRoot, firstID, pos);
+                InstrumentEntry &instrRef_2 = getInstrumentReference(secondRoot, secondID, pos);
+
+                InstrumentEntry tmp = instrRef_2;
+
+                if (instrRef_1.name == "")
+                    roots [secondRoot].banks [secondID].instruments.erase(pos);
+                else
+                    instrRef_2 = instrRef_1;
+
+                if (tmp.name == "")
+                    roots [firstRoot].banks [firstID].instruments.erase(pos);
+                else
+                    instrRef_1 = tmp;
+            }
+        }
+    }
+
+    if (result == 0)
+    {
+        if (firstRoot == currentRootID)
+            currentRootID = secondRoot;
+        else if(secondRoot == currentBankID)
+            currentBankID = firstRoot;
+        if (firstID == currentBankID)
+            currentBankID = secondID;
+        else if(secondID == currentBankID)
+            currentBankID = firstID;
+    }
+
+    result |= miscMsgPush(message);
+    return result;
 }
 
 

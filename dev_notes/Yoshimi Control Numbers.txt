@@ -30,6 +30,12 @@ Y : any : 200 : 240 : 0 to 63 : 255 : 255 : 255 : 255 : Read part peak level
 Y : any : 201 : 240 : 0/1 : 255 : 255 : 255 : 255 : Read main L/R peak level
 Y : any : 202 : 240 : 0/1 : 255 : 255 : 255 : 255 : Read main L/R RMS level
 
+Instruments/Banks
+Y : any : 4 : 244 : 0 to 127 : 0 to 127 : 0 to 159 : 128 : ret. msg No. : Select first instrument for swap
+Y : any : 5 : 244 : 0 to 127 : 0 to 127 : 0 to 159 : 128 : ret. msg No. : Select second instrument and do swap
+Y : any : 20 : 244 : 0 to 127 : 0 to 127 : 255 : 128 : ret. msg No. : Select first bank for swap
+Y : any : 21 : 244 : 0 to 127 : 0 to 127 : 255 : 128 : ret. msg No. : Select second bank and do swap
+
 Config
 Y : 256 to 16384 : 0 : 248 : 255 : 255 : 255 : 255 : 255 : Oscillator size – powers of 2
 Y : 16 to 4096 : 1 : 248 : 255 : 255 : 255 : 255 : 255 : Buffer size – powers of 2

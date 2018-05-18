@@ -724,12 +724,6 @@ void SynthEngine::SetZynControls(bool in_place)
 }
 
 
-unsigned int SynthEngine::swapSlot(unsigned int Inst1, size_t Bank1, size_t Root1, unsigned int Inst2, size_t Bank2, size_t Root2)
-{
-    return bank.swapslot(Inst1, Inst2, Bank1, Bank2, Root1, Root2);
-}
-
-
 unsigned int SynthEngine::exportBank(string exportfile, size_t rootID, unsigned int bankID)
 {
     return bank.exportBank(exportfile, rootID, bankID);

@@ -247,7 +247,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
         (rp->*fnr)();
     return tmp;} {}
   }
-  Function {init(int nslot_, int *what_, int *whatslot_, void (RootProcess_:: *fnr_)(void), RootProcess_ *rp_, Bank *root_, int *nselected_)} {} {
+  Function {init(int nslot_, int *what_, int *whatslot_, void (RootProcess_:: *fnr_)(void), RootProcess_ *rp_, Bank *root_, int *rselected_)} {} {
     code {//
 	nslot = nslot_;
         what = what_;
@@ -255,7 +255,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
         fnr = fnr_;
         rp = rp_;
         root = root_;
-        nselected = nselected_;
+        rselected = rselected_;
         box(FL_THIN_UP_BOX);
         labelfont(0);
         labelsize(13);
@@ -265,18 +265,18 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
   Function {rootrefresh()} {} {
     code {//
-    string bankName = root->getBankIDname(nslot);
-    if (bankName.empty())
-        color(46);
-    else if ((unsigned int) nslot == root->getCurrentBankID())
-    	color(252);
-    else
-        color(51);
-    if (*nselected == nslot)
-        color(6);
-    copy_label(bankName.c_str());} {}
+        string bankName = root->getBankIDname(nslot);
+        if (bankName.empty())
+            color(46);
+        else if ((unsigned int) nslot == root->getCurrentBankID())
+            color(252);
+        else
+            color(51);
+        if (*rselected == nslot)
+            color(6);
+        copy_label(bankName.c_str());} {}
   }
-  decl {int *what, *whatslot, nslot, highlight, *nselected;} {private local
+  decl {int *what, *whatslot, nslot, highlight, *nselected, *rselected;} {private local
   }
   decl {void (RootProcess_:: *fnr)(void);} {private local
   }
@@ -532,7 +532,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
             {
                 rs[i] = new RootSlot (0, 0, o->w(), 15, " ");
                 rs[i]->init(i, &what, &slot, &RootProcess_::rootprocess,
-                            (RootProcess_ *)this, bank, &nselected);
+                            (RootProcess_ *)this, bank, &rselected);
 
           }}
         } {}
@@ -544,7 +544,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
             {
                 rs[i] = new RootSlot (0, 0, o->w(), 15, " ");
                 rs[i]->init(i, &what, &slot, &RootProcess_::rootprocess,
-                            (RootProcess_ *)this, bank, &nselected);
+                            (RootProcess_ *)this, bank, &rselected);
 
           }}
         } {}
@@ -556,7 +556,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
             {
                 rs[i] = new RootSlot (0, 0, o->w(), 15, " ");
                 rs[i]->init(i, &what, &slot, &RootProcess_::rootprocess,
-                            (RootProcess_ *)this, bank, &nselected);
+                            (RootProcess_ *)this, bank, &rselected);
 
           }}
         } {}
@@ -568,7 +568,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
             {
                 rs[i] = new RootSlot (0, 0, o->w(), 15, " ");
                 rs[i]->init(i, &what, &slot, &RootProcess_::rootprocess,
-                            (RootProcess_ *)this, bank, &nselected);
+                            (RootProcess_ *)this, bank, &rselected);
 
           }}
         } {}
@@ -795,6 +795,12 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
                 fl_alert("%s",message.c_str());
             rescan_for_banks(false);
             break;
+
+        case 20:
+            break;
+        case 21:
+            rescan_for_banks(false);
+            break;
     }} {}
   }
   Function {BankUI(SynthEngine *_synth)} {} {
@@ -804,6 +810,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
     bank = synth->getBankPtr();
     what = 0;
     nselected = -1;
+    rselected = -1;
     make_window();
     mode = 1;
     r_mode = 1;
@@ -1058,32 +1065,22 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
 
     if (r_mode == 4)
     {   // Swap banks
-        bool done = false;
-        if (what == 1 && nselected >= 0)
-        {
-            bank->swapbanks(nselected, slot);
-            if ((unsigned int) nselected == bank->getCurrentBankID() or (unsigned int) slot == bank->getCurrentBankID())
-                refreshmainwindow();
-            else
+
+            bool done = false;
+            if (what == 1 && rselected >= 0)
             {
-                int ns = nselected;
-                rs[slot]->rootrefresh();
-                rs[ns]->rootrefresh();
+                send_data(21, 0, 0xf0, 244, slot, 255, 255, 128);
+                rselected = -1;
+                rescan_for_banks(false);
+                setrootread();
+                done = true;
             }
-            nselected = -1;
-            rescan_for_banks(false);
-            setrootread();
-            done = true;
-        }
-        if ((nselected < 0 || what == 2) && !done)
-        {
-            int ns = nselected;
-            nselected = slot;
-            if (rs){
-                rs[ns]->rootrefresh();
-        	rs[slot]->rootrefresh();
-    	    }
-        }
+            if ((rselected < 0 || what == 2) && !done)
+            {
+                send_data(20, 0, 0xe0, 244, slot, 255, 255, 128);
+                rselected = slot;
+                rs[slot]->rootrefresh();
+            }
     }} {}
   }
   Function {setread()} {} {
@@ -1120,11 +1117,18 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
 bs[ins]->refresh();} {}
   }
   Function {removeselection()} {} {
-    code {if (nselected >= 0)
+    code {//
+        if (nselected >= 0)
         {
             int ns = nselected;
             nselected = -1;
             bs[ns]->refresh();
+        }
+        if (rselected >= 0)
+        {
+            int rsel = rselected;
+            rselected = -1;
+            rs[rsel]->rootrefresh();
         }} {}
   }
   Function {rescan_for_banks(bool reload)} {} {
@@ -1223,7 +1227,7 @@ bs[ins]->refresh();} {}
   }
   decl {int slot, what; // "what" = what button is pressed} {private local
   }
-  decl {int mode, r_mode, *npart, nselected;} {private local
+  decl {int mode, r_mode, *npart, nselected, rselected;} {private local
   }
   decl {void (BankProcess_::* fnc)(void);} {private local
   }
