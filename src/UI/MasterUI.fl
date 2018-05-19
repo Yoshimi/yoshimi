@@ -1091,6 +1091,7 @@ ZynAddSubFX}
       Fl_Button CSpend {
         label Pending
         callback {//
+        CS_CC = synth->getRuntime().channelSwitchCC;
         int candidate = CSspinner->value();
         if (candidate == CS_CC)
         {
@@ -1098,41 +1099,27 @@ ZynAddSubFX}
             return;
         }
 
-        string name = synth->getRuntime().testCCvalue(candidate);
+        string name = synth->getRuntime().masterCCtest(candidate);
         if (!name.empty())
         {
             fl_alert("In use for %s",name.c_str());
             if (CS_CC < 128)
             {
-            CSspinner->value(CS_CC);
-            CSspinner->redraw();
+                CSspinner->value(CS_CC);
+                CSspinner->redraw();
             }
+
         }
         else
         {
-            CS_CC = candidate;
-            o->hide();
-        }
-        send_data(49, CSspinner->value(), 0xc0);}
+            send_data(49, CSspinner->value(), 0xf0);
+        }}
         tooltip {Click to set} xywh {276 651 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
       }
       Fl_Choice channelswitch {
         label Solo
         callback {//
-        if (o->value() == 0)
-        {
-            CS_CC = 128;
-            CSspinner->value(115); // default
-            CSspinner->hide();
-            CSpend->hide();
-        }
-        else
-        {
-            CSspinner->show();
-            if(CS_CC == 128 || CS_CC != CSspinner->value())
-                CSpend->show();
-        }
-        send_data(48, o->value(), 0xc0);}
+                send_data(48, o->value(), 0xf0);}
         tooltip {Assign groups of parts to Ch 1, singly enabled by MIDI} xywh {125 650 74 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
         code1 {o->value(synth->getRuntime().channelSwitchType);}
         code2 {if (o->value() == 0) CSspinner->hide(); else CSspinner->show();}
@@ -1271,7 +1258,7 @@ ZynAddSubFX}
                             break;
 
                         case 3: // loop
-                        case 4: // recoil
+                        case 4: // twoway
                             if (npart < NUM_MIDI_CHANNELS)
                             {
                                 if (npart == synth->getRuntime().channelSwitchValue)
@@ -1449,6 +1436,30 @@ ZynAddSubFX}
             break;
 
         case 48:
+            channelswitch->value(value);
+            if (value == 0)
+            {
+                CS_CC = 128;
+                CSspinner->value(115); // default
+                CSspinner->hide();
+                CSpend->hide();
+                for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
+                    setPanelPartMidiWidget(i, i);
+            }
+            else
+            {
+                if (CS_CC == 128)
+                {
+                    CS_CC = 115;
+                    CSspinner->value(115);
+                    CSpend->show();
+                }
+                CSspinner->show();
+                for (int i = 1; i < NUM_MIDI_CHANNELS; ++i)
+                    setPanelPartMidiWidget(i, 16);
+            }
+            panelwindow->changed();
+            break;
         case 49:
             updatepanel();
             break;

@@ -4933,19 +4933,32 @@ void InterChange::commandMain(CommandBlock *getData)
         case 48: // solo mode
             if (write)
             {
-                synth->getRuntime().channelSwitchType = value;
-                if (value == 0)
-                {
+                synth->getRuntime().channelSwitchType = value_int;
+                if (value_int == 0)
                     synth->getRuntime().channelSwitchCC = 128;
+                if (synth->getRuntime().channelSwitchType != 2)
+                {
+                    for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
+                    {
+                        if (value_int == 0)
+                            synth->part[i]->Prcvchn = i;
+                        else
+                            synth->part[i]->Prcvchn = 16;
+                    }
+                    synth->part[0]->Prcvchn = 0;
                     synth->getRuntime().channelSwitchValue = 0;
                 }
             }
             else
+            {
+                if (synth->getRuntime().channelSwitchCC == 128)
+                    synth->getRuntime().channelSwitchCC = 115;
                 value = synth->getRuntime().channelSwitchType;
+            }
             break;
         case 49: // solo ch number
             if (write && synth->getRuntime().channelSwitchType > 0)
-                synth->getRuntime().channelSwitchCC = value;
+                synth->getRuntime().channelSwitchCC = value_int;
             else
             {
                 write = false; // for an invalid write attempt
@@ -5126,7 +5139,16 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case 5:
             if (write)
+            {
                 part->Prcvchn = value_int;
+                /*if (synth->getRuntime().channelSwitchType > 0 && synth->getRuntime().channelSwitchType != 2)
+                {
+                    for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
+                        synth->part[i]->Prcvchn = 16;
+                    synth->getRuntime().channelSwitchValue = npart;
+                    part->Prcvchn = 0;
+                }*/
+            }
             else
                 value = part->Prcvchn;
             break;
