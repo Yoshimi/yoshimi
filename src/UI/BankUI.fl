@@ -623,13 +623,13 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
           if (o->value() > 0.5)
               r_mode = 6;
           removeselection();}
-          xywh {485 533 85 15} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 78 labelfont 8 labelsize 9
+          xywh {485 533 85 15} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 93 labelfont 8 labelsize 9
         }
         Fl_Light_Button rootexportbutton {
           label EXPORT
           callback {//
           if (o->value() > 0.5)
-              mode = 7;
+              r_mode = 7;
           removeselection();}
           xywh {485 550 85 15} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 78 labelfont 8 labelsize 9
         }

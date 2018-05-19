@@ -45,7 +45,6 @@ Make things like Echo delay either floats or much higher resolution.
 Consider enabling and disabling tooltips.
 
 Make attempt to start second independent instance open a new one in running yoshimi instead - saves memory and more consistent.
-Also, add CLI command to start new instance from within running Yoshimi
 
 RPNs (channel based)
 

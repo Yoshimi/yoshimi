@@ -1,7 +1,10 @@
-yoshimi 1.5.8 rc1
+yoshimi 1.5.8 rc2
 
 2018-5-19 Will
 * Cleaned up 'solo' interaction between CLI & GUI.
+* Fixed regression: GUI not exporting banks.
+* Code optimisations between Interface & Bank.
+* Set version as 1.5.8 rc2
 
 2018-5-18 Will
 * Implemented universal bank swaps.

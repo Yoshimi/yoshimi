@@ -448,7 +448,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
 
                 case 59: // export bank
                 {
-                    unsigned int result = synth->exportBank(text, kititem, value);
+                    unsigned int result = synth->bank.exportBank(text, kititem, value);
                     text = miscMsgPop(result & 0xff);
                     if (result < 0x1000)
                         text = " " + text; // need the space
@@ -460,7 +460,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
 
                 case 60: // import bank
                 {
-                    unsigned int result = synth->importBank(text, kititem, value);
+                    unsigned int result = synth->bank.importBank(text, kititem, value);
                     text = miscMsgPop(result & 0xff);
                     if (result < 0x1000)
                         text = "ed " + text;
@@ -471,7 +471,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                 }
                 case 61: // delete bank and contents
                 {
-                    unsigned int result = synth->removeBank(value, kititem);
+                    unsigned int result = synth->bank.removebank(value, kititem);
                     text = miscMsgPop(result & 0xff);
                     if (result < 0x1000)
                         text = "d " + text;

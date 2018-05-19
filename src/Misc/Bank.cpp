@@ -797,7 +797,7 @@ unsigned int Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t
     {
         string firstBankPath = getBankPath(firstRoot, firstID);
         string secondBankPath = getBankPath(secondRoot, secondID);
-        string tempBankPath = getRootPath(firstRoot) + "/tmp";
+        string tempBankPath = getRootPath(firstRoot) + "/TMP_" + firstname;
         //cout << "first " << firstBankPath << endl;
         //cout << "second " << secondBankPath << endl;
         //cout << "temp " << tempBankPath << endl;

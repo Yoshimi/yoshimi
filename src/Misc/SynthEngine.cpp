@@ -553,13 +553,14 @@ int SynthEngine::RunChannelSwitch(int value)
                 return 0; // do nothing - it's a switch off
             value = (Runtime.channelSwitchValue + 1) % NUM_MIDI_CHANNELS;
             break;
-        case 4: // recoil
+        case 4: // twoway
             if (value == 0)
                 return 0; // do nothing - it's a switch off
             if (value >= 64)
                 value = (Runtime.channelSwitchValue + 1) % NUM_MIDI_CHANNELS;
             else
                 value = (Runtime.channelSwitchValue + NUM_MIDI_CHANNELS - 1) % NUM_MIDI_CHANNELS;
+            // add in NUM_MIDI_CHANNELS so always positive
             break;
         default:
             return 2; // unknown
@@ -721,24 +722,6 @@ void SynthEngine::SetZynControls(bool in_place)
         interchange.commandEffects(&putData);
     else
         midilearn.writeMidi(&putData, sizeof(putData), false);
-}
-
-
-unsigned int SynthEngine::exportBank(string exportfile, size_t rootID, unsigned int bankID)
-{
-    return bank.exportBank(exportfile, rootID, bankID);
-}
-
-
-unsigned int SynthEngine::importBank(string inportfile, size_t rootID, unsigned int bankID)
-{
-    return bank.importBank(inportfile, rootID, bankID);
-}
-
-
-unsigned int SynthEngine::removeBank(unsigned int bankID, size_t rootID)
-{
-    return bank.removebank(bankID, rootID);
 }
 
 
