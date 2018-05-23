@@ -1811,7 +1811,7 @@ string InterChange::resolveMain(CommandBlock *getData)
 {
     float value = getData->data.value;
     int value_int = lrint(value);
-    bool write = ((getData->data.type & 0x40) != 0);
+//    bool write = ((getData->data.type & 0x40) != 0);
     unsigned char control = getData->data.control;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
@@ -1884,11 +1884,7 @@ string InterChange::resolveMain(CommandBlock *getData)
             showValue = false;
             contstr = "Chan 'solo' Switch CC ";
             if (value_int > 127)
-            {
-                contstr += "undefined";
-                if (write)
-                    contstr += " - set mode first";
-            }
+                contstr += "undefined - set mode first";
             else
                 contstr += to_string(value_int);
             break;
@@ -4931,28 +4927,28 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
 
         case 48: // solo mode
-            if (write)
+            if (write && value_int <= 4)
             {
                 synth->getRuntime().channelSwitchType = value_int;
-                if (value_int == 0)
-                    synth->getRuntime().channelSwitchCC = 128;
-                if (synth->getRuntime().channelSwitchType != 2)
+                synth->getRuntime().channelSwitchCC = 128;
+                synth->getRuntime().channelSwitchValue = 0;
+                if ((value_int & 5) == 0)
                 {
-                    for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
+                    for (int i = 0; i < NUM_MIDI_PARTS; ++i)
+                        synth->part[i]->Prcvchn = (i & 15);
+                }
+                else
+                {
+                    for (int i = 1; i < NUM_MIDI_CHANNELS; ++i)
                     {
-                        if (value_int == 0)
-                            synth->part[i]->Prcvchn = i;
-                        else
-                            synth->part[i]->Prcvchn = 16;
+                        synth->part[i]->Prcvchn = 16;
                     }
                     synth->part[0]->Prcvchn = 0;
-                    synth->getRuntime().channelSwitchValue = 0;
                 }
             }
             else
             {
-                if (synth->getRuntime().channelSwitchCC == 128)
-                    synth->getRuntime().channelSwitchCC = 115;
+                write = false; // for an invalid write attempt
                 value = synth->getRuntime().channelSwitchType;
             }
             break;

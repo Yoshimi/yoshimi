@@ -1193,7 +1193,7 @@ ZynAddSubFX}
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
     unsigned char par2 = getData->data.par2;
-    int nval = lrint(value);
+    int value_int = lrint(value);
     int chan = kititem & 0x3f;
     bool isSingle = kititem >= 0x40;
     int mask = NUM_MIDI_CHANNELS - 1;
@@ -1234,7 +1234,7 @@ ZynAddSubFX}
             case 1:
                 break;
             case 2:
-                //cout << " Value " << int(value) << "  kit " << int(kititem) << "  npart " << int(npart) << endl;
+                //cout << " Value " << value_int << "  kit " << int(kititem) << "  npart " << int(npart) << endl;
                 if(engine <= 119 && engine == synth->getRuntime().channelSwitchCC)
                 { // it's a valid channel switch
                     int newch = partui->midich->value() - 1;
@@ -1243,7 +1243,7 @@ ZynAddSubFX}
                         case 1: // row
                             if (npart < NUM_MIDI_CHANNELS)
                             {
-                                if (npart != nval)
+                                if (npart != value_int)
                                     newch = NUM_MIDI_CHANNELS;
                                 else
                                     newch = 0;
@@ -1251,10 +1251,10 @@ ZynAddSubFX}
                             break;
 
                         case 2: // column
-                            if(nval == npart)
-                                newch = (nval & mask);
-                            else if((nval & mask) == (npart & mask))
-                                newch = (nval & mask) + NUM_MIDI_CHANNELS;
+                            if(value_int == npart)
+                                newch = (value_int & mask);
+                            else if((value_int & mask) == (npart & mask))
+                                newch = (value_int & mask) + NUM_MIDI_CHANNELS;
                             break;
 
                         case 3: // loop
@@ -1263,7 +1263,7 @@ ZynAddSubFX}
                             {
                                 if (npart == synth->getRuntime().channelSwitchValue)
                                     newch = 0;
-                                else if (nval > 0)
+                                else if (value_int > 0)
                                     newch = NUM_MIDI_CHANNELS;
                             }
                             break;
@@ -1328,7 +1328,7 @@ ZynAddSubFX}
                     bankui->readbankcfg();
                 if (insert < 255 || engine < 255)
                     bankui->rescan_for_banks(false);
-                if (nval < 255 || par2 < 255)
+                if (value_int < 255 || par2 < 255)
                 {
                     updatepartprogram(kititem);
                     RecentInstruments->activate();
@@ -1356,7 +1356,7 @@ ZynAddSubFX}
             {
                 syseffnocounter->value(engine + 1);
                 nsyseff = engine;
-                sysefftype->value(nval);
+                sysefftype->value(value_int);
                 syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff);
                 showSysEfxUI();
             }
@@ -1375,14 +1375,14 @@ ZynAddSubFX}
         {
             inseffnocounter->value(engine + 1);
             ninseff = engine;
-            insefftype->value(nval);
+            insefftype->value(value_int);
             setInsEff(ninseff);
             showInsEfxUI();
         }
         else if (control == 2)
         {
-            inseffpart->value(nval + 2);
-            if (value == -1)
+            inseffpart->value(value_int + 2);
+            if (value_int == -1)
                 insefftype->deactivate();
             else
             {
@@ -1405,10 +1405,10 @@ ZynAddSubFX}
             delete partui;
             partui = new PartUI(0, 0, 765, 525);
             partuigroup->add(partui);
-            partui->init(synth->part[nval], nval, bankui);
+            partui->init(synth->part[value_int], value_int, bankui);
             partui->redraw();
-            partui->npart = nval;
-            npartcounter->value(nval + 1);
+            partui->npart = value_int;
+            npartcounter->value(value_int + 1);
             npartcounter->redraw();
             updatepanel();
             if (openedit)
@@ -1419,12 +1419,12 @@ ZynAddSubFX}
             break;
 
         case 15:
-            partmax = nval;
+            partmax = value_int;
             npartcounter->range(1, partmax);
             updatepart();
             updatepanel();
             setinspartlist();
-            vectorui->checkParts(nval);
+            vectorui->checkParts(value_int);
             break;
 
         case 32:
@@ -1432,12 +1432,12 @@ ZynAddSubFX}
             break;
 
         case 35:
-            masterkeyshift->value(value);
+            masterkeyshift->value(value_int);
             break;
 
         case 48:
-            channelswitch->value(value);
-            if (value == 0)
+            channelswitch->value(value_int);
+            if (value_int == 0)
             {
                 CS_CC = 128;
                 CSspinner->value(115); // default
@@ -1448,15 +1448,17 @@ ZynAddSubFX}
             }
             else
             {
-                if (CS_CC == 128)
-                {
-                    CS_CC = 115;
-                    CSspinner->value(115);
-                    CSpend->show();
-                }
+                CS_CC = 115;
+                CSspinner->value(115);
+                CSpend->show();
                 CSspinner->show();
                 for (int i = 1; i < NUM_MIDI_CHANNELS; ++i)
-                    setPanelPartMidiWidget(i, 16);
+                {
+                    if (value_int == 2)
+                        setPanelPartMidiWidget(i, i);
+                    else
+                        setPanelPartMidiWidget(i, 16);
+                }
             }
             panelwindow->changed();
             break;
@@ -1671,7 +1673,7 @@ ZynAddSubFX}
             virkeyboard->relaseallkeys();
             vumeter->init(-1, synth);
             resetPartsClip();
-            break;
+            break; // value value value
     }} {}
   }
   Function {updatesendwindow()} {} {

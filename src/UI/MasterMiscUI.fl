@@ -576,7 +576,10 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     if (tmpch < NUM_MIDI_CHANNELS)
     {
         partrcv->value(tmpch);
-        partrcv->textcolor(FL_BLACK);
+        if (synth->getRuntime().channelSwitchType & 5 && setpart < NUM_MIDI_CHANNELS)
+            partrcv->textcolor(FL_BLUE);
+        else
+            partrcv->textcolor(FL_BLACK);
     }
     else
         partrcv->textcolor(FL_WHITE);

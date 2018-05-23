@@ -545,6 +545,7 @@ int SynthEngine::RunChannelSwitch(int value)
                 else
                     part[i]->Prcvchn = chan;
             }
+            Runtime.channelSwitchValue = value;
             return 0; // all OK
             break;
         }
@@ -565,6 +566,7 @@ int SynthEngine::RunChannelSwitch(int value)
         default:
             return 2; // unknown
     }
+    // vvv column mode never gets here vvv
     Runtime.channelSwitchValue = value;
     for (int ch = 0; ch < NUM_MIDI_CHANNELS; ++ch)
     {

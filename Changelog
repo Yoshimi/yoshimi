@@ -1,4 +1,10 @@
-yoshimi 1.5.8 rc2
+yoshimi 1.5.8 rc3
+
+2018-5-23 Will
+* Corrected minor anomally in channel switcher.
+* Solo modes except column use blue for highlight.
+  This is in the mixer window and easier to identify.
+* Set version as 1.5.8 rc3
 
 2018-5-19 Will
 * Cleaned up 'solo' interaction between CLI & GUI.
