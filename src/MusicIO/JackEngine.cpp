@@ -2,7 +2,7 @@
     JackEngine.cpp
 
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2017, Will Godfrey & others
+    Copyright 2014-2018, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified April 2017
+    Modified May 2018
 */
 
 #include <errno.h>
@@ -67,7 +67,6 @@ bool JackEngine::connectServer(string server)
     else
     {
         synth->getRuntime().Log("Failed to open jack client on server " + server);
-//        splashMessages.push_back("Can't connect to jack :(");
     }
     return false;
 }

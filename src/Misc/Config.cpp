@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified April 2018
+    Modified May 2018
 */
 
 #include <iostream>
@@ -228,11 +228,7 @@ bool Config::Setup(int argc, char **argv)
     Buffersize = nearestPowerOf2(Buffersize, 16, 4096);
     //Log(asString(Oscilsize));
     //Log(asString(Buffersize));
-    if (loadDefaultState && !restoreState)
-    {
-        StateFile = ConfigDir + "/yoshimi.state";
-        restoreState = true;
-    }
+
     if (restoreState)
     {
         char *fp = NULL;
@@ -433,8 +429,10 @@ bool Config::loadConfig(void)
     string yoshimi = "/"; // for some reason it doesn't
     yoshimi += YOSHIMI; // like these as one line here
 
-    if (synth->getUniqueId() > 0)
-        yoshimi += ("-" + asString(synth->getUniqueId()));
+    string baseConfig = ConfigDir + yoshimi + ".config";
+    int thisInstance = synth->getUniqueId();
+    if (thisInstance > 0)
+        yoshimi += ("-" + asString(thisInstance));
     else
         miscMsgInit(); // sneaked it in here so it's early
     string presetDir = ConfigDir + "/presets";
@@ -444,20 +442,25 @@ bool Config::loadConfig(void)
         if ((chk = system(cmd.c_str())) < 0)
             Log("Create preset directory " + presetDir + " failed, status " + asString(chk));
     }
+
     ConfigFile = ConfigDir + yoshimi;
     StateFile = ConfigDir + yoshimi + string(".state");
-    if (synth->getUniqueId() == 0)
-        ConfigFile += ".config";
+
+    if (thisInstance == 0)
+        ConfigFile = baseConfig;
     else
         ConfigFile += ".instance";
-    string resConfigFile = ConfigFile;
 
+    if (!isRegFile(ConfigFile))
+    {
+        Log("Basic configuration " + baseConfig + " not found, will use default settings");
+        defaultPresets();
+    }
 
     bool isok = true;
-    if (!isRegFile(resConfigFile) && !isRegFile(ConfigFile))
+    if (!isRegFile(ConfigFile))
     {
-        Log("ConfigFile " + resConfigFile + " not found, will use default settings");
-        defaultPresets();
+        Log("ConfigFile " + ConfigFile + " not found, will use default settings");
         configChanged = true; // give the user the choice
     }
     else
@@ -467,21 +470,27 @@ bool Config::loadConfig(void)
             Log("loadConfig failed XMLwrapper allocation");
         else
         {
-            if (!xml->loadXMLfile(resConfigFile))
+            if (!xml->loadXMLfile(baseConfig))
             {
-                if ((synth->getUniqueId() > 0) && (!xml->loadXMLfile(ConfigFile)))
+                if (thisInstance > 0)
                 {
                     Log("loadConfig loadXMLfile failed");
                     return false;
                 }
             }
             isok = extractBaseParameters(xml);
-            if (isok)
-                isok = extractConfigData(xml);
-            if (isok)
-                Oscilsize = (int)truncf(powf(2.0f, ceil(log (Oscilsize - 1.0f) / logf(2.0))));
             delete xml;
-            if (synth->getUniqueId() == 0)
+            if (isok)
+            {
+                XMLwrapper *xml = new XMLwrapper(synth, true);
+                isok = xml->loadXMLfile(ConfigFile);
+                if (isok)
+                {
+                    isok = extractConfigData(xml);
+                    delete xml;
+                }
+            }
+            if (thisInstance == 0)
             {
                 if (lastXMLmajor < MIN_CONFIG_MAJOR || lastXMLminor < MIN_CONFIG_MINOR)
                     oldConfig = true;

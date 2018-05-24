@@ -1,4 +1,11 @@
-yoshimi 1.5.8 rc3
+yoshimi 1.5.8 rc4
+
+2018-5-24 Will
+* Revised Config.cpp so instances get base config.
+  Previously they had the system defaults.
+* Corrected anomally with loading saved states.
+  Loaded the wrong one under some circumstances :(
+* Set version as 1.5.8 rc4
 
 2018-5-23 Will
 * Corrected minor anomally in channel switcher.

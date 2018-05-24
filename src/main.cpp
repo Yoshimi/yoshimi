@@ -62,8 +62,6 @@ extern SynthEngine *firstSynth;
 void mainRegisterAudioPort(SynthEngine *s, int portnum);
 int mainCreateNewInstance(unsigned int forceId, bool loadState);
 
-list<string> splashMessages;
-
 Config *firstRuntime = NULL;
 static int globalArgc = 0;
 static char **globalArgv = NULL;
@@ -244,7 +242,7 @@ int mainCreateNewInstance(unsigned int forceId, bool loadState)
     SynthEngine *synth = new SynthEngine(globalArgc, globalArgv, false, forceId);
     if (!synth->getRuntime().isRuntimeSetupCompleted())
         goto bail_out;
-
+    instanceID = synth->getUniqueId();
     if (!synth)
     {
         std::cerr << "Failed to allocate SynthEngine" << std::endl;
@@ -268,11 +266,12 @@ int mainCreateNewInstance(unsigned int forceId, bool loadState)
         synth->getRuntime().Log("Failed to start MusicIO");
         goto bail_out;
     }
-
+    //cout << "Instance ID = " << instanceID << endl;
+    loadState = synth->getRuntime().loadDefaultState; // TODO sort this out properly!
     if (loadState)
     {
         string name = synth->getRuntime().defaultStateName + "-" + to_string(forceId);
-            cout << name << endl;
+            //cout << name << endl;
             synth->loadStateAndUpdate(name);
     }
 
@@ -291,7 +290,6 @@ int mainCreateNewInstance(unsigned int forceId, bool loadState)
 
     synth->getRuntime().StartupReport(musicClient);
     synth->Unmute();
-    instanceID = synth->getUniqueId();
 
     if (instanceID == 0)
         cout << "\nYay! We're up and running :-)\n";

@@ -1673,7 +1673,7 @@ ZynAddSubFX}
             virkeyboard->relaseallkeys();
             vumeter->init(-1, synth);
             resetPartsClip();
-            break; // value value value
+            break;
     }} {}
   }
   Function {updatesendwindow()} {} {
