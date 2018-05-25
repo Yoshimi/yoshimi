@@ -451,7 +451,7 @@ bool Config::loadConfig(void)
     else
         ConfigFile += ".instance";
 
-    if (!isRegFile(ConfigFile))
+    if (!isRegFile(baseConfig))
     {
         Log("Basic configuration " + baseConfig + " not found, will use default settings");
         defaultPresets();
@@ -460,7 +460,7 @@ bool Config::loadConfig(void)
     bool isok = true;
     if (!isRegFile(ConfigFile))
     {
-        Log("ConfigFile " + ConfigFile + " not found, will use default settings");
+        Log("Configuration " + ConfigFile + " not found, will use default settings");
         configChanged = true; // give the user the choice
     }
     else

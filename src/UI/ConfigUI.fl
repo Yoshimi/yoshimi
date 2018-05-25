@@ -319,7 +319,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             label {Enable Auto Instance}
             callback {//
                         send_data(24, o->value(), 0xc0);}
-            tooltip {Allow main instance to start all those open when last closed.} xywh {270 240 27 25} down_box DOWN_BOX labelsize 12 align 4 hide deactivate
+            tooltip {Allow main instance to start all those open when last closed.} xywh {270 240 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().autoInstance);}
             code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
           }

@@ -1,4 +1,9 @@
-yoshimi 1.5.8 rc4
+yoshimi 1.5.8 rc5
+
+2018-5-24
+* Re-implemented autoloading instances.
+  Seems completely correct now states corrected.
+* Set version as 1.5.8 rc5
 
 2018-5-24 Will
 * Revised Config.cpp so instances get base config.

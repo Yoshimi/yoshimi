@@ -137,14 +137,14 @@ static void *mainGuiThread(void *arg)
 
     GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::NewSynthEngine, 0);
 
-    /*if (firstRuntime->autoInstance)
+    if (firstRuntime->autoInstance)
     {
         for (int i = 1; i < 32; ++i)
         {
             if ((firstRuntime->activeInstance >> i) & 1)
                 mainCreateNewInstance(i, true);
         }
-    }*/
+    }
     while (firstRuntime->runSynth)
     {
         if (firstSynth->getUniqueId() == 0)
@@ -266,13 +266,15 @@ int mainCreateNewInstance(unsigned int forceId, bool loadState)
         synth->getRuntime().Log("Failed to start MusicIO");
         goto bail_out;
     }
-    //cout << "Instance ID = " << instanceID << endl;
-    loadState = synth->getRuntime().loadDefaultState; // TODO sort this out properly!
+     // TODO sort this out properly!
+     // it works, but is clunky :(
+    loadState = synth->getRuntime().loadDefaultState;
     if (loadState)
     {
-        string name = synth->getRuntime().defaultStateName + "-" + to_string(forceId);
-            //cout << name << endl;
-            synth->loadStateAndUpdate(name);
+        string name = synth->getRuntime().defaultStateName;
+        if (instanceID > 0)
+            name = name + "-" + to_string(forceId);
+        synth->loadStateAndUpdate(name);
     }
 
     if (synth->getRuntime().showGui)
