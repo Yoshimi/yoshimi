@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>
 
-    Modifed April 2018
+    Modifed May 2018
 */
 
 //#define REPORT_MISCMSG
@@ -188,7 +188,7 @@ unsigned int MiscFuncs::string2uint(string str)
 bool MiscFuncs::isRegFile(string chkpath)
 {
     struct stat st;
-    if (!lstat(chkpath.c_str(), &st))
+    if (!stat(chkpath.c_str(), &st))
         if (S_ISREG(st.st_mode))
             return true;
     return false;
@@ -198,7 +198,7 @@ bool MiscFuncs::isRegFile(string chkpath)
 bool MiscFuncs::isDirectory(string chkpath)
 {
     struct stat st;
-    if (!lstat(chkpath.c_str(), &st))
+    if (!stat(chkpath.c_str(), &st))
         if (S_ISDIR(st.st_mode))
             return true;
     return false;
@@ -208,7 +208,7 @@ bool MiscFuncs::isDirectory(string chkpath)
 bool MiscFuncs::isFifo(string chkpath)
 {
     struct stat st;
-    if (!lstat(chkpath.c_str(), &st))
+    if (!stat(chkpath.c_str(), &st))
         if (S_ISFIFO(st.st_mode))
             return true;
     return false;

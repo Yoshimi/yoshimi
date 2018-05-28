@@ -426,8 +426,7 @@ bool Config::loadConfig(void)
             return false;
         }
     }
-    string yoshimi = "/"; // for some reason it doesn't
-    yoshimi += YOSHIMI; // like these as one line here
+    string yoshimi = "/" + string(YOSHIMI);
 
     string baseConfig = ConfigDir + yoshimi + ".config";
     int thisInstance = synth->getUniqueId();

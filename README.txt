@@ -1,55 +1,19 @@
-V 1.5.7 - Nightingale
-A small, but delightful singer.
+V 1.5.8 - Kingfisher
+Bright flash of colour.
 
-This release is mainly focused on usability improvements.
+The most significant changes in this release are all usability ones.
 
-For example, the Master Reset can now clear MIDI-learn lists. All you have to do is hold down the Ctrl key when clicking the button. Usually you don't want to, but it's there for the times you do.
+At the request of one user (and agreement of several others) some of the microtonal settings are now MIDI-learnable, and appropriately highlighted.
 
+The CLI can now open and close instances, and switch between them.
 
-There are rare occasions when a very large PadSynth patch can take as much as 15 seconds to initialise. If you try to do anything on that part that can affect PadSynth (during that time) the result can be fatal. Well not any more, as now you'll get a warning message:
-"Part {n} busy."
+There is a new 'Solo' type 'TwoWay' this works in a similar way to 'Loop', but (apart from zero) values less than 64 step from right to left, instead of the other way round. The highlighting is also a bit better. Both 'Loop' and 'TwoWay' also have debounce protection of approximately 60mS.
 
+The CLI can now clear a part's instrument. A fairly obvious option that somehow got missed.
 
-In the bank selection window there are two new buttons 'Import' and 'Export'. These allow you to transfer complete banks in and out in a controlled manner.
+In the Banks windows Instruments can now be swapped between banks and bank roots. Banks can also be swapped between roots. This is an extension using exactly the same controls as those already available for in-bank swaps.
 
-There are a lot of these out in the wild, and the 'Import' process lets you copy them in to specific slots in particular roots. It only copies in what Yoshimi recognises, but informs you if there are any unrecognised files. There is sometimes really odd junk that has crept into 'wild' banks. Also, Yoshimi will never overwrite any of your precious installed banks or mess with their IDs.
+The latest feature is autoloading instances. With this enabled, any instance that was open when the main one is closed will be re-opened on the next run. If these instances were set for starting with their default state, then all those settings will be performed. Therefore, a very comprehensive and detailed session can be started with a single command!
 
-Similarly when you want to pass one of your own banks to friends, with 'Export' it is easy to identify the bank you want to copy out, and Yoshimi will not overwrite any external directories.
+A lot of the documentation supplied with Yoshimi has been updated, including the Advanced User Manual.
 
-
-Following on from this, many people don't fill in the Author and Copyright fields of their own instrument patches, making it hard to acknowledge them.  This is now partly automated in the hope that it may encourage people to do so.
-
-You can set up this default by going to the 'Instrument Edit' window and filling the field in just once, then while holding down the Ctrl key, click on the 'Default' button. From then on, just a click on this will fill the field with this text.
-
-
-Going further into instruments, we now have a few useful key shortcuts.
-
-If you hold down 'K', and click on the 'Edit' button in the main window, it will directly open the kit editor window for the current part. Similarly holding down 'E' and clicking will give you the part's effects window.
-
-Most voice patches only use the first Add, Sub and Pad engines and there are similar shortcuts for these using 'A', 'S' & 'P' and clicking on the 'Edit' button. If you use the left mouse button it will only open the associated window if that engine is enabled, otherwise it will open the usual Part Edit window. Using the Right button will enable the engine then open its window.
-
-For the QWERTY keyboarders 'D' can be used instead of 'P', putting these in a neat row :)
-
-
-Now we take a dive into the feared AddSynth Voice window!
-
-The first thing you notice is these are tabbed, so you can quickly jump between the voices. An extra detail is that non-active voices have their numbers in light grey text, while the active (or the current selected) ones have clearly visible black text.
-
-This is all fully in sync with the Voice List window.
-
-
-We've changed some ambiguous wording in the Voice window too. The 'Change' buttons are now 'Waveform' ones. Also the highly confusing 'Ext' or 'Internal' entries are better worded - it was quite common for people to ask how they got the 'Ext' ones and where they came from.
-
-For the voice itself, the selector is now named 'Oscillator' and the text is 'Internal' or 'Voice {n}'
-
-At the top of the Modulator section, you have 'Oscillator Source' and this time it will be 'Local' or 'Voice {n}'.
-
-The lower selector is titled 'Local Oscillator' and the text will be 'Internal' or 'Mod. {n}'.
-
-An extra detail is that these entries are greyed out for voice 1, as you can only select the internal oscillator or one from a lower numbered voice.
-
-
-Returning to effects, there is now interpolation in place for the controls, which makes these crackle-free and far more useful with MIDI-learn - Remember, you can have up to 200 learned lines.
-
-
-Finally, there are the usual code improvements and bug fixes.

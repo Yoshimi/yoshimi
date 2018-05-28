@@ -1,4 +1,9 @@
-yoshimi 1.5.8 rc5
+yoshimi 1.5.8
+
+2018-5-28 Will
+* Changed lstat to stat in MiscFuncs.cpp
+* Finalised code and docs.
+* Set release version as 1.5.8
 
 2018-5-24
 * Re-implemented autoloading instances.
