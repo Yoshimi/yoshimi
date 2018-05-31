@@ -2357,7 +2357,7 @@ send_data(223, 0, 0xd0, 255, 255, 255, param);}
     if (part->PyoshiType)
         instrumentlabel->labelcolor(YOSHI_COLOUR);
     else
-        instrumentlabel->labelcolor(0);
+        instrumentlabel->labelcolor(FL_BLACK);
     if (text == "")
         text = part->Pname.c_str();
     partname = text;

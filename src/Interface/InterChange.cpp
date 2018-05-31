@@ -506,6 +506,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     }
                     else
                         text = " FAILED " + text;
+                    getData->data.parameter = value;
                     value = miscMsgPush(text);
                     break;
                 }
@@ -7683,7 +7684,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
                 pars->Penvdt[i] = pars->Penvdt[i + 1];
                 pars->Penvval[i] = pars->Penvval[i + 1];
             }
-            if (point < pars->Penvsustain)
+            if (point <= pars->Penvsustain)
                 -- pars->Penvsustain;
             pars->Penvpoints = envpoints;
             getData->data.value = envpoints;

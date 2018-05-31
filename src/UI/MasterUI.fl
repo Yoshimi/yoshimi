@@ -1510,7 +1510,10 @@ ZynAddSubFX}
             break;
         case 75: // save instrument to bank
             name = miscMsgPop(par2);
-            updatepartprogram(parameter);
+            if (npart == parameter)
+                partui->setinstrumentlabel();
+            if((parameter & 0x30) == panelgroup)
+                panellistitem[parameter % NUM_MIDI_CHANNELS]->setPartLabel(parameter);
             if (kititem == synth->ReadBankRoot() && engine == synth->ReadBank())
                 bankui->refreshbankslot(insert);
         break;
@@ -2169,10 +2172,6 @@ ZynAddSubFX}
     panellistitem[_npart]->partrcv->value(_value);
     panellistitem[_npart]->partrcv->textcolor(FL_BLACK);
     panellistitem[_npart]->partrcv->redraw();} {}
-  }
-  Function {setPanelPartLabel(int _npart, int _engine)} {} {
-    code {//
-    panellistitem[_npart % NUM_MIDI_CHANNELS]->setPartLabel(_engine);} {}
   }
   Function {setLogging(bool isConsole)} {} {
     code {//

@@ -11,7 +11,7 @@ comment {Envelope.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009, Alan Calvert
-Copyright 2016-2017 Will Godfrey
+Copyright 2016-2018 Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -29,8 +29,8 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified October 2017
-} {in_source in_header
+Modified May 2018
+} {selected in_source in_header
 }
 
 decl {\#include "UI/MiscGui.h"} {public local
@@ -315,7 +315,7 @@ return(1);} {}
   }
 }
 
-class EnvelopeUI {selected : {public Fl_Group,PresetsUI_}
+class EnvelopeUI {: {public Fl_Group,PresetsUI_}
 } {
   Function {EnvelopeUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
@@ -862,6 +862,7 @@ send_data(group, curpoint, 0, 0xd0, 3);}
     unsigned char eng = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char par = getData->data.parameter;
+    unsigned char par2 = getData->data.par2;
 
     int value_int = lrint(value);
     bool value_bool = (value > 0.5);
@@ -875,7 +876,7 @@ send_data(group, curpoint, 0, 0xd0, 3);}
     {
         if (insert == 4) // adjust point
             freeedit->lastpoint = control;
-        else if (value > 255) // delete point
+        else if (par2 > 127) // delete point
             freeedit->lastpoint -= 1;
         else // add point
             freeedit->lastpoint += 1;
@@ -1051,8 +1052,7 @@ send_data(group, curpoint, 0, 0xd0, 3);}
             break;
     }
     if (change)
-        freeedit->redraw();
-    } {}
+        freeedit->redraw();} {}
   }
   Function {init(EnvelopeParams *env_, int npart_, int kititem_, int engine_, int group_)} {} {
     code {//

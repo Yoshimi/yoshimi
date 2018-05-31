@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
-Modified April 2018
+Modified May 2018
 } {selected in_source in_header
 }
 
@@ -568,7 +568,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
 
     partenabled->value(synth->partonoffRead(setpart));
 
-    setPartLabel(findengines(setpart));
+    setPartLabel(setpart);
 
     partvolume->value(synth->part[setpart]->Pvolume);
     partpanning->value(synth->part[setpart]->Ppanning);
@@ -601,11 +601,12 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     else
         panellistitemgroup->deactivate();} {}
   }
-  Function {setPartLabel(int engine)} {} {
+  Function {setPartLabel(int npart)} {} {
     code {//
     partadd->damage(1);
     partsub->damage(1);
     partpad->damage(1);
+    int engine = findengines(npart);
     if (engine & 1)
         partadd->color(ADD_COLOUR);
     else

@@ -295,6 +295,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 case 2:
                 case 3:
                 case 4:
+                case 10:
                     switch(insertParam)
                     {
                         case 0:
@@ -344,6 +345,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 case 2:
                 case 3:
                 case 4:
+                case 10:
                     switch(insertParam)
                     {
                         case 0:
@@ -408,6 +410,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                     case 2:
                     case 3:
                     case 4:
+                    case 10:
                         if (engine >= 0xC0)
                             switch(insertParam)
                             {
@@ -483,6 +486,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 case 2:
                 case 3:
                 case 4:
+                case 10:
                     switch(insertParam)
                     {
                         case 0:
