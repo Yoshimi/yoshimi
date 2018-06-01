@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified May 2018
+    Modified June 2018
 */
 
 #define NOLOCKS
@@ -380,7 +380,20 @@ string SynthEngine::manualname(void)
 {
     string manfile = "yoshimi-user-manual-";
     manfile += YOSHIMI_VERSION;
-    return manfile.substr(0, manfile.find(" "));
+    manfile = manfile.substr(0, manfile.find(" ")); // remove M suffix
+    int pos = 0;
+    int count = 0;
+    for (unsigned i = 0; i < manfile.length(); ++i)
+    {
+        if (manfile.at(i) == '.')
+        {
+            pos = i;
+            ++count;
+        }
+    }
+    if (count == 3)
+        manfile = manfile.substr(0, pos); // remove bugfix number
+    return manfile;
 }
 
 

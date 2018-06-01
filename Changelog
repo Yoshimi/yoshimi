@@ -1,9 +1,11 @@
 yoshimi 1.5.8 M
+2018-6-1 Will
+* Set as bugfix release.
 
 2018-5-31 Will
 * Corrected GUI handling of part saves.
   Also improved label colour handling.
-* Corrected Evnelope freemode delete point.
+* Corrected Envelope freemode delete point.
 
 2018-5-28 Will
 * Changed lstat to stat in MiscFuncs.cpp
