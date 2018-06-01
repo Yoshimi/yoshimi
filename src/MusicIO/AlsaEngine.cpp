@@ -2,7 +2,7 @@
     AlsaEngine.cpp
 
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2017, Will Godfrey & others
+    Copyright 2014-2018, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified February 2017
+    Modified May 2018
 */
 
 #if defined(HAVE_ALSA)
@@ -84,7 +84,6 @@ bool AlsaEngine::openAudio(void)
     return true;
 bail_out:
     Close();
-//    splashMessages.push_back("Can't connect to alsa audio :(");
     return false;
 }
 
@@ -421,7 +420,22 @@ void *AlsaEngine::AudioThread(void)
         audio.pcm_state = snd_pcm_state(audio.handle);
         if (audio.pcm_state != SND_PCM_STATE_RUNNING)
         {
-            switch (audio.pcm_state)
+            bool done = false; // now done this way to suppress warnings
+            if (audio.pcm_state == SND_PCM_STATE_XRUN || audio.pcm_state == SND_PCM_STATE_SUSPENDED)
+            {
+                if (!xrunRecover())
+                    done = true;
+            }
+            if (!done || audio.pcm_state == SND_PCM_STATE_SETUP)
+            {
+                if (alsaBad(snd_pcm_prepare(audio.handle), "alsa audio pcm prepare failed"))
+                    done = true;
+            }
+            if (!done || audio.pcm_state == SND_PCM_STATE_PREPARED)
+            {
+                alsaBad(snd_pcm_start(audio.handle), "pcm start failed");
+            }
+            /*switch (audio.pcm_state)
             {
                 case SND_PCM_STATE_XRUN:
 
@@ -442,7 +456,7 @@ void *AlsaEngine::AudioThread(void)
                     synth->getRuntime().Log("Alsa AudioThread, weird SND_PCM_STATE: "
                                 + asString(audio.pcm_state));
                     break;
-            }
+            }*/
             audio.pcm_state = snd_pcm_state(audio.handle);
         }
         if (audio.pcm_state == SND_PCM_STATE_RUNNING)

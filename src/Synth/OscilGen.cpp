@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011 Alan Calvert
     Copyright 2009 James Morris
-    Copyright 2016-2017 Will Godfrey & others
+    Copyright 2016-2018 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -23,7 +23,7 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified October 2017
+    Modified March 2018
 */
 
 #include <cmath>
@@ -74,7 +74,6 @@ OscilGen::~OscilGen()
 
 void OscilGen::defaults(void)
 {
-
     oldbasefunc = 0;
     oldbasepar = 64;
     oldhmagtype = 0;
@@ -150,7 +149,7 @@ void OscilGen::defaults(void)
 }
 
 
-void OscilGen::convert2sine(int magtype)
+void OscilGen::convert2sine()
 {
     float mag[MAX_AD_HARMONICS], phase[MAX_AD_HARMONICS];
     float oscil[synth->oscilsize];
@@ -1618,38 +1617,81 @@ void OscilGen::getfromXML(XMLwrapper *xml)
 }
 
 
-void OscilGen::getLimits(CommandBlock *getData)
+float OscilGen::getLimits(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    int request = int(getData->data.type & 3);
     int control = getData->data.control;
     int insert = getData->data.insert;
 
+    float min;
+    float max;
+    float def;
+
     // defaults
-    getData->limits.min = 0;
-    getData->limits.max = 127;
-    getData->limits.def = 0;
+    min = 0;
+    max = 127;
+    def = 0;
 
     if (insert > 5)
     { // do harmonics stuff
         if (insert == 7)
-            getData->limits.def = 6400;
-        return;
+            def = 64;
+        switch (request)
+        {
+            case 0:
+                if(value < min)
+                    value = min;
+                else if(value > max)
+                    value = max;
+            break;
+            case 1:
+                value = min;
+                break;
+            case 2:
+                value = max;
+                break;
+            case 3:
+                value = def;
+                break;
+        }
+        return value;
     }
     switch (control)
     {
         case 0:
         case 16:
         case 34:
-            getData->limits.min = -64;
-            getData->limits.max = 63;
+            min = -64;
+            max = 63;
             break;
         case 67:
-            getData->limits.max = 100;
+            max = 100;
             break;
         case 68:
-            getData->limits.max = 255;
+            max = 255;
             break;
         case 69:
-            getData->limits.max = 200;
+            max = 200;
             break;
     }
+    switch (request)
+    {
+        case 0:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+        break;
+        case 1:
+            value = min;
+            break;
+        case 2:
+            value = max;
+            break;
+        case 3:
+            value = def;
+            break;
+    }
+    return value;
 }

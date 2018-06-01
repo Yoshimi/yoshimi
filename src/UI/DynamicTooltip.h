@@ -6,6 +6,7 @@
     Copyright 2009-2010, Alan Calvert
     Copyright 2016 Will Godfrey
     Copyright 2017 Jesper Lloyd
+    Copyright 2018 Will Godfrey and others
 
     Idea originally derived from work by Greg Ercolano
     (http://seriss.com/people/erco/fltk/)
@@ -24,7 +25,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified March 2017
+    This file is a derivative of the ZynAddSubFX original.
+
+    Modified March 2018
 */
 
 #ifndef DynamicTooltip_h
@@ -49,7 +52,7 @@ class DynTooltip : private Fl_Menu_Window {
   void setOnlyValue(bool onlyval);
 
   void hide();
-  void show(float timeout=0);
+  void dynshow(float timeout=0);
 
   void setOffset(int x, int y);
   void draw();

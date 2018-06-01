@@ -5,7 +5,7 @@ code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014 -2017, Will Godfrey
+Copyright 2014 -2018, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -23,8 +23,8 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified December 2017
-} {in_source in_header
+Modified May 2018
+} {selected in_source in_header
 }
 
 decl {\#include <cmath>} {public local
@@ -48,7 +48,7 @@ decl {\#include "Misc/Bank.h"} {private local
 decl {\#include "MasterUI.h"} {private local
 }
 
-class ConfigUI {selected : {private MiscFuncs}
+class ConfigUI {: {private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window configwindow {
@@ -108,7 +108,7 @@ class ConfigUI {selected : {private MiscFuncs}
                         send_data(1, 16 << o->value(), 0xc0);}
             tooltip {Number of samples} xywh {249 75 100 20} down_box BORDER_BOX labelsize 12 textsize 12
             code0 {o->value( (int)(logf(synth->getRuntime().Buffersize / 16.0f - 1.0f) / logf(2.0f)) + 1);}
-            code1 {if (synth->getUniqueId() != 0) o->hide();}
+            code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
           } {
             MenuItem {} {
               label 16
@@ -245,8 +245,10 @@ class ConfigUI {selected : {private MiscFuncs}
             label {* Start With Default State}
             callback {//
                         send_data(16, o->value(), 0xc0);}
-            xywh {270 60 27 25} down_box DOWN_BOX labelsize 12 align 4
+            tooltip {If you change this you must re-save the default state
+or when that loads it will revert to the previous value} xywh {270 60 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().loadDefaultState);}
+            code1 {if (synth->getIsLV2Plugin()) o->deactivate();}
           }
           Fl_Check_Button nonFatal {
             label {Hide Non Fatal Errors}
@@ -254,6 +256,7 @@ class ConfigUI {selected : {private MiscFuncs}
                         send_data(17, o->value(), 0xc0);}
             xywh {270 80 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().hideErrors);}
+            code1 {if (synth->getIsLV2Plugin()) o->deactivate();}
           }
           Fl_Check_Button showSplash {
             label {Show Splash Screen}
@@ -261,7 +264,7 @@ class ConfigUI {selected : {private MiscFuncs}
                         send_data(18, o->value(), 0xc0);}
             xywh {270 100 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showSplash);}
-            code1 {if (synth->getUniqueId() != 0) o->hide();}
+            code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
           }
           Fl_Check_Button logTimes {
             label {Log Load times}
@@ -276,6 +279,7 @@ class ConfigUI {selected : {private MiscFuncs}
                         send_data(20, o->value(), 0xc0);}
             xywh {270 140 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().logXMLheaders);}
+            code1 {if (synth->getIsLV2Plugin()) o->deactivate();}
           }
           Fl_Check_Button saveAllXML {
             label {Include disabled data in XML files}
@@ -297,7 +301,7 @@ class ConfigUI {selected : {private MiscFuncs}
                             o->value(1);}
             tooltip {Enable starting with this graphical  interface} xywh {270 200 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showGui);}
-            code1 {if (synth->getUniqueId() != 0) o->hide();}
+            code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
           }
           Fl_Check_Button enableCLI {
             label {* Enable CLI}
@@ -305,11 +309,19 @@ class ConfigUI {selected : {private MiscFuncs}
                         send_data(23, o->value(), 0xc0);}
             tooltip {Enable starting with interactive command line interface} xywh {270 220 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showCLI);}
-            code1 {if (synth->getUniqueId() != 0) o->hide();}
+            code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
           }
           Fl_Box {} {
             label {* Changing these settings requires a restart}
             xywh {50 276 287 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+          }
+          Fl_Check_Button enableAuto {
+            label {Enable Auto Instance}
+            callback {//
+                        send_data(24, o->value(), 0xc0);}
+            tooltip {Allow main instance to start all those open when last closed.} xywh {270 240 27 25} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().autoInstance);}
+            code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
           }
         }
         Fl_Group jackTab {
@@ -642,7 +654,7 @@ class ConfigUI {selected : {private MiscFuncs}
             code0 {o->value(synth->getRuntime().ignoreResetCCs);}
           }
           Fl_Check_Button midiMon {
-            label {Log Incoming CCs}
+            label {Log Incoming Events}
             callback {//
                         send_data(73, o->value(), 0xc0);}
             xywh {234 250 18 18} down_box DOWN_BOX labelsize 12 align 4
@@ -814,6 +826,9 @@ class ConfigUI {selected : {private MiscFuncs}
                     break;
                 case 23:
                     enableCLI->value(value_bool);
+                    break;
+                case 24:
+                    enableAuto->value(value_bool);
                     break;
 
                 case 32:
@@ -987,8 +1002,14 @@ class ConfigUI {selected : {private MiscFuncs}
             int tmp;
             switch (tabnumber)
             {
-                case 1 : //Main
+                case 1 : // Main
+                    osc_size->value( (int)(logf(synth->getRuntime().Oscilsize / 256.0f - 1.0f) / logf(2.0f)) + 1);
+                    buff_size->value( (int)(logf(synth->getRuntime().Buffersize / 16.0f - 1.0f) / logf(2.0f)) + 1);
+                    pad_interpol->value(synth->getRuntime().Interpolation);
+                    v_keyboard->value(synth->getRuntime().VirKeybLayout);
+                    compression->value(synth->getRuntime().GzipCompression);
                     reports->value(synth->getRuntime().toConsole);
+                    instrument->value(synth->getRuntime().instrumentFormat - 1);
                     break;
 
                 case 2 : // Jack
@@ -1020,6 +1041,7 @@ class ConfigUI {selected : {private MiscFuncs}
                             alsaAudio->value(1);
                             jackAudio->value(0);
                         }
+                        alsaRate->check_none();
                         switch (synth->getRuntime().Samplerate)
                         {
                             case 192000:
@@ -1032,7 +1054,6 @@ class ConfigUI {selected : {private MiscFuncs}
                                 alsaRate->set_checked(4);
                                 break;
                             case 48000:
-                            default:
                                 alsaRate->set_checked(3);
                                 break;
                         }
@@ -1084,12 +1105,21 @@ class ConfigUI {selected : {private MiscFuncs}
                         Epcheck->value(1);
                     }
                     Epend->hide();
+                    enableNRPN->value(synth->getRuntime().enable_NRPN);
+                    ignoreReset->value(synth->getRuntime().ignoreResetCCs);
+                    midiMon->value(synth->getRuntime().monitorCCin);
+                    midiLearned->value(synth->getRuntime().showLearnedCC);
                     break;
 
                 case 5 : // Switches
                     setDefaultState->value(synth->getRuntime().loadDefaultState > 0);
-                    logTimes->value(synth->getRuntime().showTimes > 0);
                     nonFatal->value(synth->getRuntime().hideErrors);
+                    showSplash->value(synth->getRuntime().showSplash);
+                    logTimes->value(synth->getRuntime().showTimes);
+                    logXML->value(synth->getRuntime().logXMLheaders);
+                    saveAllXML->value(synth->getRuntime().xmlmax);
+                    enableGUI->value(synth->getRuntime().showGui);
+                    enableCLI->value(synth->getRuntime().showCLI);
                     break;
     }} {}
   }

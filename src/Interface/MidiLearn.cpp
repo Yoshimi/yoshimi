@@ -1,7 +1,7 @@
 /*
     MidiLearn.cpp
 
-    Copyright 2016-2017 Will Godfrey
+    Copyright 2016-2018 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified November 2017
+    Modified March 2018
 */
 
 #include <iostream>
@@ -52,7 +52,9 @@ MidiLearn::~MidiLearn()
 
 void MidiLearn::setTransferBlock(CommandBlock *getData, string name)
 {
-    learnTransferBlock = *getData;
+    //cout << "MIDI Control " << (int) getData->data.control << " Part " << (int) getData->data.part << "  Kit " << (int) getData->data.kit << " Engine " << (int) getData->data.engine << "  Insert " << (int) getData->data.insert << endl;
+
+    memcpy(learnTransferBlock.bytes, getData->bytes, sizeof(learnTransferBlock));
     learnedName = name;
     learning = true;
     synth->getRuntime().Log("Learning");
@@ -103,7 +105,14 @@ bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, un
             swap(minIn, maxIn);
         }
 
-        if (status & 2) // limit
+        if (minIn == maxIn)
+        {
+            if (value <= minIn)
+                value = 0;
+            else
+                value = 127;
+        }
+        else if (status & 2) // limit
         {
             if (value < minIn)
                 value = minIn;
@@ -188,7 +197,7 @@ bool MidiLearn::writeMidi(CommandBlock *putData, unsigned int writesize, bool in
         }
         else
         {
-            synth->getRuntime().Log("fromMidi buffer full!", 2);
+            synth->getRuntime().Log("Midi buffer full!");
             ok = false;
         }
     }
@@ -358,7 +367,8 @@ bool MidiLearn::remove(int itemNumber)
 
 void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control, unsigned char part, unsigned char _kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
-    unsigned int kit = _kit; // may need to set as an NRPN
+    unsigned int kit = part; // to silence warning
+    kit = _kit; // may need to set as an NRPN
     if (control == 22)
     {
         updateGui();
@@ -643,17 +653,29 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
         learning = false;
         return;
     }
-    list<LearnBlock>::iterator it;
-    LearnBlock entry;
+
     unsigned char stat = 0;
     if (CC > 0xff)
         stat |= 9; // mark as NRPN and set 'block'
-     /*
-      * this has to be first as the transfer block will be corrupted
-      * when we call for the limits of this control. Should be a better
-      * way to do this!
-      */
-    entry.data.type = learnTransferBlock.data.type & 0x80;
+    LearnBlock entry;
+    entry.chan = chan;
+    entry.CC = CC;
+    entry.min_in = 0;
+    entry.max_in = 200;
+    entry.status = stat;
+    entry.name = learnedName;
+
+    //cout << "SEND Control " << (int) learnTransferBlock.data.control << " Part " << (int) learnTransferBlock.data.part << "  Kit " << (int) learnTransferBlock.data.kit << " Engine " << (int) learnTransferBlock.data.engine << "  Insert " << (int) learnTransferBlock.data.insert << endl;
+
+    unsigned char type = learnTransferBlock.data.type & 0x80;
+    learnTransferBlock.data.type = (type &0xf8) | 5; // min
+    entry.min_out = synth->interchange.readAllData(&learnTransferBlock);
+    learnTransferBlock.data.type = (type &0xf8) | 6; // max
+    entry.max_out = synth->interchange.readAllData(&learnTransferBlock);
+
+    // Should be a better way to do this!
+
+    entry.data.type = type;
     entry.data.control = learnTransferBlock.data.control;
     entry.data.part = learnTransferBlock.data.part;
     entry.data.kit = learnTransferBlock.data.kit;
@@ -662,17 +684,7 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
     entry.data.parameter = learnTransferBlock.data.parameter;
     entry.data.par2 = learnTransferBlock.data.par2;
 
-    synth->interchange.returnLimits(&learnTransferBlock);
-    entry.chan = chan;
-    entry.CC = CC;
-    entry.min_in = 0;
-    entry.max_in = 200;
-    entry.status = stat;
-    entry.min_out = learnTransferBlock.limits.min;
-    entry.max_out = learnTransferBlock.limits.max;
-    entry.name = learnedName;
-
-
+    list<LearnBlock>::iterator it;
     it = midi_list.begin();
     int lineNo = 0;
     if (midi_list.size() > 0)
@@ -813,7 +825,7 @@ bool MidiLearn::saveList(string name)
     legit_pathname(file);
 
     synth->getRuntime().xmlType = XML_MIDILEARN;
-    XMLwrapper *xml = new XMLwrapper(synth);
+    XMLwrapper *xml = new XMLwrapper(synth, true);
     if (!xml)
     {
         synth->getRuntime().Log("Save Midi Learn failed xmltree allocation");
@@ -834,9 +846,10 @@ bool MidiLearn::saveList(string name)
 
 bool MidiLearn::insertMidiListData(bool full,  XMLwrapper *xml)
 {
+    int ID = full; // to silence warning
     if (midi_list.size() == 0)
         return false;
-    int ID = 0;
+    ID = 0;
     list<LearnBlock>::iterator it;
     it = midi_list.begin();
     xml->beginbranch("MIDILEARN");
@@ -896,7 +909,7 @@ bool MidiLearn::loadList(string name)
         synth->getRuntime().Log("Can't find " + file);
         return false;
     }
-    XMLwrapper *xml = new XMLwrapper(synth);
+    XMLwrapper *xml = new XMLwrapper(synth, true);
     if (!xml)
     {
         synth->getRuntime().Log("Load Midi Learn failed XMLwrapper allocation");

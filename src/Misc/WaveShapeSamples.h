@@ -25,6 +25,8 @@
 #ifndef WAVESHAPESAMPLES_H
 #define WAVESHAPESAMPLES_H
 
+#include <cmath>
+
 class WaveShapeSamples
 {
     public:

@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014, Will Godfrey
+    Copyright 2014-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -20,13 +20,41 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified September 2014
+    This file is derivative of ZynAddSubFX original code.
+
+    Modified March 2018
 */
 
 #include "Misc/SynthEngine.h"
 #include "Effects/Chorus.h"
 
 #define MAX_CHORUS_DELAY 250.0f // ms
+
+static const int PRESET_SIZE = 12;
+static const int NUM_PRESETS = 10;
+static unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
+        // Chorus1
+        { 64, 64, 50, 0, 0, 90, 40, 85, 64, 119, 0, 0 },
+        // Chorus2
+        {64, 64, 45, 0, 0, 98, 56, 90, 64, 19, 0, 0 },
+        // Chorus3
+        {64, 64, 29, 0, 1, 42, 97, 95, 90, 127, 0, 0 },
+        // Celeste1
+        {64, 64, 26, 0, 0, 42, 115, 18, 90, 127, 0, 0 },
+        // Celeste2
+        {64, 64, 29, 117, 0, 50, 115, 9, 31, 127, 0, 1 },
+        // Flange1
+        {64, 64, 57, 0, 0, 60, 23, 3, 62, 0, 0, 0 },
+        // Flange2
+        {64, 64, 33, 34, 1, 40, 35, 3, 109, 0, 0, 0 },
+        // Flange3
+        {64, 64, 53, 34, 1, 94, 35, 3, 54, 0, 0, 1 },
+        // Flange4
+        {64, 64, 40, 0, 1, 62, 12, 19, 97, 0, 0, 0 },
+        // Flange5
+        {64, 64, 55, 105, 0, 24, 39, 19, 17, 0, 0, 1 }
+};
+
 
 Chorus::Chorus(bool insertion_, float *const efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
@@ -73,18 +101,19 @@ void Chorus::out(float *smpsl, float *smpsr)
     dr2 = getdelay(lfor);
 
     float inL, inR, tmpL, tmpR, tmp;
-    for (int i = 0; i < synth->p_buffersize; ++i)
+    for (int i = 0; i < synth->sent_buffersize; ++i)
     {
         tmpL = smpsl[i];
         tmpR = smpsr[i];
         // LRcross
-        inL = tmpL * (1.0f - lrcross) + tmpR * lrcross;
-        inR = tmpR * (1.0f - lrcross) + tmpL * lrcross;
+        inL = tmpL * (1.0f - lrcross.getValue()) + tmpR * lrcross.getValue();
+        inR = tmpR * (1.0f - lrcross.getValue()) + tmpL * lrcross.getValue();
+        lrcross.advanceValue();
 
         // Left channel
 
         // compute the delay in samples using linear interpolation between the lfo delays
-        mdel = (dl1 * (synth->p_buffersize - i) + dl2 * i) / synth->p_buffersize_f;
+        mdel = (dl1 * (synth->sent_buffersize - i) + dl2 * i) / synth->sent_buffersize_f;
         if (++dlk >= maxdelay)
             dlk = 0;
         tmp = dlk - mdel + maxdelay * 2.0f; // where should I get the sample from
@@ -95,12 +124,12 @@ void Chorus::out(float *smpsl, float *smpsr)
         dlhi2 = (dlhi - 1 + maxdelay) % maxdelay;
         dllo = 1.0f - fmodf(tmp, one);
         efxoutl[i] = delayl[dlhi2] * dllo + delayl[dlhi] * (1.0f - dllo);
-        delayl[dlk] = inL + efxoutl[i] * fb;
+        delayl[dlk] = inL + efxoutl[i] * fb.getValue();
 
         // Right channel
 
         // compute the delay in samples using linear interpolation between the lfo delays
-        mdel = (dr1 * (synth->p_buffersize - i) + dr2 * i) / synth->p_buffersize_f;
+        mdel = (dr1 * (synth->sent_buffersize - i) + dr2 * i) / synth->sent_buffersize_f;
         if (++drk >= maxdelay)
             drk = 0;
         tmp = drk * 1.0f - mdel + maxdelay * 2.0f; // where should I get the sample from
@@ -110,20 +139,22 @@ void Chorus::out(float *smpsl, float *smpsr)
         dlhi2 = (dlhi - 1 + maxdelay) % maxdelay;
         dllo = 1.0f - fmodf(tmp, one);
         efxoutr[i] = delayr[dlhi2] * dllo + delayr[dlhi] * (1.0f - dllo);
-        delayr[dlk] = inR + efxoutr[i] * fb;
+        delayr[dlk] = inR + efxoutr[i] * fb.getValue();
+
+        fb.advanceValue();
     }
 
     if (Poutsub)
-        for (int i = 0; i < synth->p_buffersize; ++i)
+        for (int i = 0; i < synth->sent_buffersize; ++i)
         {
             efxoutl[i] *= -1.0f;
             efxoutr[i] *= -1.0f;
         }
 
-    for (int i = 0; i < synth->p_buffersize; ++i)
+    for (int i = 0; i < synth->sent_buffersize; ++i)
     {
-        efxoutl[i] *= pangainL;
-        efxoutr[i] *= pangainR;
+        efxoutl[i] *= pangainL.getAndAdvanceValue();
+        efxoutr[i] *= pangainR.getAndAdvanceValue();
     }
 }
 
@@ -154,45 +185,20 @@ void Chorus::setdelay(unsigned char Pdelay_)
 void Chorus::setfb(unsigned char Pfb_)
 {
     Pfb = Pfb_;
-    fb = (Pfb - 64.0f) / 64.1f;
+    fb.setTargetValue((Pfb - 64.0f) / 64.1f);
 }
 
 
 void Chorus::setvolume(unsigned char Pvolume_)
 {
     Pvolume = Pvolume_;
-    outvolume = Pvolume / 127.0f;
-    volume = (!insertion) ? 1.0f : outvolume;
+    outvolume.setTargetValue(Pvolume / 127.0f);
+    volume.setTargetValue((!insertion) ? 1.0f : outvolume.getValue());
 }
 
 
 void Chorus::setpreset(unsigned char npreset)
 {
-    const int PRESET_SIZE = 12;
-    const int NUM_PRESETS = 10;
-    unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
-        // Chorus1
-        { 64, 64, 50, 0, 0, 90, 40, 85, 64, 119, 0, 0 },
-        // Chorus2
-        {64, 64, 45, 0, 0, 98, 56, 90, 64, 19, 0, 0 },
-        // Chorus3
-        {64, 64, 29, 0, 1, 42, 97, 95, 90, 127, 0, 0 },
-        // Celeste1
-        {64, 64, 26, 0, 0, 42, 115, 18, 90, 127, 0, 0 },
-        // Celeste2
-        {64, 64, 29, 117, 0, 50, 115, 9, 31, 127, 0, 1 },
-        // Flange1
-        {64, 64, 57, 0, 0, 60, 23, 3, 62, 0, 0, 0 },
-        // Flange2
-        {64, 64, 33, 34, 1, 40, 35, 3, 109, 0, 0, 0 },
-        // Flange3
-        {64, 64, 53, 34, 1, 94, 35, 3, 54, 0, 0, 1 },
-        // Flange4
-        {64, 64, 40, 0, 1, 62, 12, 19, 97, 0, 0, 0 },
-        // Flange5
-        {64, 64, 55, 105, 0, 24, 39, 19, 17, 0, 0, 1 }
-    };
-
     if (npreset < 0xf)
     {
         if (npreset >= NUM_PRESETS)
@@ -281,3 +287,80 @@ unsigned char Chorus::getpar(int npar)
         default: return 0;
     }
 }
+
+
+float Choruslimit::getlimits(CommandBlock *getData)
+{
+    int value = getData->data.value;
+    int control = getData->data.control;
+    int request = getData->data.type & 3; // clear upper bits
+    int npart = getData->data.part;
+    int presetNum = getData->data.engine;
+    int min = 0;
+    int max = 127;
+
+    int def = presets[presetNum][control];
+    bool canLearn = true;
+    bool isInteger = true;
+    switch (control)
+    {
+        case 0:
+            if (npart != 0xf1) // system effects
+                def /= 2;
+            break;
+        case 1:
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+        case 4:
+            max = 1;
+            canLearn = false;
+            break;
+        case 5:
+            break;
+        case 6:
+            break;
+        case 7:
+            break;
+        case 8:
+            break;
+        case 9:
+            break;
+        case 11:
+            max = 1;
+            canLearn = false;
+            break;
+        case 16:
+            max = 9;
+            canLearn = false;
+            break;
+        default:
+            getData->data.type |= 4; // error
+            return 1.0f;
+            break;
+    }
+
+    switch(request)
+    {
+        case 0:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+            break;
+        case 1:
+            value = min;
+            break;
+        case 2:
+            value = max;
+            break;
+        case 3:
+            value = def;
+            break;
+    }
+    getData->data.type |= (canLearn * 64 + isInteger * 128);
+    return float(value);
+}
+

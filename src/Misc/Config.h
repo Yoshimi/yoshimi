@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2017, Will Godfrey & others
+    Copyright 2014-2018, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified September 2017
+    Modified April 2018
 */
 
 #ifndef CONFIG_H
@@ -98,6 +98,7 @@ class Config : public MiscFuncs
         string        jackSessionFile;
         int           lastXMLmajor;
         int           lastXMLminor;
+        bool          oldConfig;
 
         static unsigned int  Samplerate;
         static unsigned int  Buffersize;
@@ -106,6 +107,8 @@ class Config : public MiscFuncs
         static bool          showGui;
         static bool          showSplash;
         static bool          showCLI;
+        static bool          autoInstance;
+        static unsigned int  activeInstance;
 
         bool          runSynth;
         bool          finishedCLI;
@@ -154,6 +157,11 @@ class Config : public MiscFuncs
         int           single_row_panel;
         int           NumAvailableParts;
         int           currentPart;
+        int           noteOnSent; // note test
+        int           noteOnSeen;
+        int           noteOffSent;
+        int           noteOffSeen;
+        unsigned int  VUcount;
         unsigned char channelSwitchType;
         unsigned char channelSwitchCC;
         unsigned char channelSwitchValue;
@@ -191,6 +199,10 @@ class Config : public MiscFuncs
         float *genTmp2;
         float *genTmp3;
         float *genTmp4;
+
+        // as above but for part and sys effect
+        float *genMixl;
+        float *genMixr;
 
     private:
         void loadCmdArgs(int argc, char **argv);
@@ -236,12 +248,6 @@ public:
         UpdatePaths,
         UpdatePanel,
         UpdatePart,
-        UpdatePanelItem,
-        UpdatePartProgram,
-        UpdateEffects,
-        UpdateBankRootDirs,
-        UpdateControllers,
-        RescanForBanks,
         RefreshCurBank,
         GuiAlert,
         RegisterAudioPort,

@@ -12,7 +12,7 @@ comment {
 Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2014-2017, Will Godfrey & others
+Copyright 2014-2018, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -30,8 +30,8 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code.
 
-Modified December 2017
-} {in_source in_header
+Modified May 2018
+} {selected in_source in_header
 }
 
 decl {\#include <iostream>} {public local
@@ -247,7 +247,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
         (rp->*fnr)();
     return tmp;} {}
   }
-  Function {init(int nslot_, int *what_, int *whatslot_, void (RootProcess_:: *fnr_)(void), RootProcess_ *rp_, Bank *root_, int *nselected_)} {} {
+  Function {init(int nslot_, int *what_, int *whatslot_, void (RootProcess_:: *fnr_)(void), RootProcess_ *rp_, Bank *root_, int *rselected_)} {} {
     code {//
 	nslot = nslot_;
         what = what_;
@@ -255,7 +255,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
         fnr = fnr_;
         rp = rp_;
         root = root_;
-        nselected = nselected_;
+        rselected = rselected_;
         box(FL_THIN_UP_BOX);
         labelfont(0);
         labelsize(13);
@@ -265,18 +265,18 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
   Function {rootrefresh()} {} {
     code {//
-    string bankName = root->getBankIDname(nslot);
-    if (bankName.empty())
-        color(46);
-    else if ((unsigned int) nslot == root->getCurrentBankID())
-    	color(252);
-    else
-        color(51);
-    if (*nselected == nslot)
-        color(6);
-    copy_label(bankName.c_str());} {}
+        string bankName = root->getBankIDname(nslot);
+        if (bankName.empty())
+            color(46);
+        else if ((unsigned int) nslot == root->getCurrentBankID())
+            color(252);
+        else
+            color(51);
+        if (*rselected == nslot)
+            color(6);
+        copy_label(bankName.c_str());} {}
   }
-  decl {int *what, *whatslot, nslot, highlight, *nselected;} {private local
+  decl {int *what, *whatslot, nslot, highlight, *nselected, *rselected;} {private local
   }
   decl {void (RootProcess_:: *fnr)(void);} {private local
   }
@@ -284,7 +284,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
 }
 
-class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
+class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window instrumentuiwindow {
@@ -401,7 +401,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
           if (o->value() > 0.5)
               mode = 2;
           removeselection();}
-          xywh {190 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 3 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
+          xywh {190 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 3 labelfont 9 labelsize 12
         }
         Fl_Light_Button readbutton {
           label SELECT
@@ -409,7 +409,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
           if (o->value() > 0.5)
               mode = 1;
           removeselection();}
-          xywh {10 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 101 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
+          xywh {10 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 101 labelfont 9 labelsize 12
           code0 {o->value(1);}
         }
         Fl_Light_Button clearbutton {
@@ -418,7 +418,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
           if (o->value() > 0.5)
               mode = 3;
           removeselection();}
-          xywh {280 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 1 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
+          xywh {280 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 1 labelfont 9 labelsize 12
         }
         Fl_Light_Button swapbutton {
           label SWAP
@@ -426,7 +426,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
           if (o->value() > 0.5)
               mode = 4;
           removeselection();}
-          xywh {370 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 227 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
+          xywh {370 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 227 labelfont 9 labelsize 12
         }
         Fl_Light_Button renamebutton {
           label RENAME
@@ -434,7 +434,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
           if (o->value() > 0.5)
               mode = 5;
           removeselection();}
-          xywh {100 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 5 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
+          xywh {100 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 5 labelfont 9 labelsize 12
         }
       }
       Fl_Button {} {
@@ -449,7 +449,9 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
                 bankuiwindow->show();
             }
             else if (instFrom == 4)
+            {
                 ; // todo open mixer panel
+            }
         }
         instFrom = 0; // to avoid later confusion!
         instrumentuiwindow->hide();}
@@ -490,7 +492,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
     }
     Fl_Window bankuiwindow {
       label Root
-      xywh {55 474 775 575} type Double labelsize 12 hide
+      xywh {84 223 775 575} type Double labelsize 12 hide
       code0 {o->copy_label(bank->getRootFileTitle().c_str());}
     } {
       Fl_Button {} {
@@ -530,7 +532,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
             {
                 rs[i] = new RootSlot (0, 0, o->w(), 15, " ");
                 rs[i]->init(i, &what, &slot, &RootProcess_::rootprocess,
-                            (RootProcess_ *)this, bank, &nselected);
+                            (RootProcess_ *)this, bank, &rselected);
 
           }}
         } {}
@@ -542,7 +544,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
             {
                 rs[i] = new RootSlot (0, 0, o->w(), 15, " ");
                 rs[i]->init(i, &what, &slot, &RootProcess_::rootprocess,
-                            (RootProcess_ *)this, bank, &nselected);
+                            (RootProcess_ *)this, bank, &rselected);
 
           }}
         } {}
@@ -554,7 +556,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
             {
                 rs[i] = new RootSlot (0, 0, o->w(), 15, " ");
                 rs[i]->init(i, &what, &slot, &RootProcess_::rootprocess,
-                            (RootProcess_ *)this, bank, &nselected);
+                            (RootProcess_ *)this, bank, &rselected);
 
           }}
         } {}
@@ -566,54 +568,70 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
             {
                 rs[i] = new RootSlot (0, 0, o->w(), 15, " ");
                 rs[i]->init(i, &what, &slot, &RootProcess_::rootprocess,
-                            (RootProcess_ *)this, bank, &nselected);
+                            (RootProcess_ *)this, bank, &rselected);
 
           }}
         } {}
       }
       Fl_Group rootmodeselect {
-        xywh {5 528 475 42} box ENGRAVED_BOX
+        xywh {5 528 570 42} box ENGRAVED_BOX
       } {
-        Fl_Light_Button rootwritebutton {
-          label ADD
-          callback {//
-          if (o->value() > 0.5)
-              mode = 2;
-          removeselection();}
-          xywh {200 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 3 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
-        }
         Fl_Light_Button rootreadbutton {
           label SELECT
           callback {//
           if (o->value() > 0.5)
-              mode = 1;
+              r_mode = 1;
           removeselection();}
-          xywh {10 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 101 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
+          xywh {10 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 101 labelfont 9 labelsize 12
           code0 {o->value(1);}
-        }
-        Fl_Light_Button rootclearbutton {
-          label DELETE
-          callback {//
-          if (o->value() > 0.5)
-              mode = 3;
-          removeselection();}
-          xywh {295 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 1 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
-        }
-        Fl_Light_Button rootswapbutton {
-          label SWAP
-          callback {//
-          if (o->value() > 0.5)
-              mode = 4;
-          removeselection();}
-          xywh {390 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 227 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
         }
         Fl_Light_Button rootrenamebutton {
           label RENAME
           callback {//
           if (o->value() > 0.5)
-              mode = 5;
+              r_mode = 5;
           removeselection();}
-          xywh {105 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 5 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
+          xywh {105 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 5 labelfont 9 labelsize 12
+        }
+        Fl_Light_Button rootwritebutton {
+          label ADD
+          callback {//
+          if (o->value() > 0.5)
+              r_mode = 2;
+          removeselection();}
+          xywh {200 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 3 labelfont 9 labelsize 12
+        }
+        Fl_Light_Button rootclearbutton {
+          label DELETE
+          callback {//
+          if (o->value() > 0.5)
+              r_mode = 3;
+          removeselection();}
+          xywh {295 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 1 labelfont 9 labelsize 12
+        }
+        Fl_Light_Button rootswapbutton {
+          label SWAP
+          callback {//
+          if (o->value() > 0.5)
+              r_mode = 4;
+          removeselection();}
+          xywh {390 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 227 labelfont 9 labelsize 12
+        }
+        Fl_Light_Button rootimportbutton {
+          label IMPORT
+          callback {//
+          if (o->value() > 0.5)
+              r_mode = 6;
+          removeselection();}
+          xywh {485 533 85 15} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 93 labelfont 8 labelsize 9
+        }
+        Fl_Light_Button rootexportbutton {
+          label EXPORT
+          callback {//
+          if (o->value() > 0.5)
+              r_mode = 7;
+          removeselection();}
+          xywh {485 550 85 15} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 78 labelfont 8 labelsize 9
         }
       }
       Fl_Button {} {
@@ -762,16 +780,42 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
     code {//
     collect_data(synth, value, (Fl::event_button() | type), control, part, kititem, engine, insert, parameter, par2);} {}
   }
-  Function {BankUI(int *npart_, SynthEngine *_synth)} {} {
+  Function {returns_update(CommandBlock *getData)} {} {
+    code {//
+    //int value_int = getData->data.value;
+    unsigned char control = getData->data.control;
+    unsigned int par2 = getData->data.par2;
+    string message = miscMsgPop(par2);
+    switch(control)
+    {
+        case 4:
+            break;
+        case 5:
+            if (message > "")
+                fl_alert("%s",message.c_str());
+            rescan_for_banks(false);
+            break;
+
+        case 20:
+            break;
+        case 21:
+            if (message > "")
+                fl_alert("%s",message.c_str());
+            rescan_for_banks(false);
+            break;
+    }} {}
+  }
+  Function {BankUI(SynthEngine *_synth)} {} {
     code {//
     synth = _synth;
     fnc = &BankProcess_::process;
-    npart = npart_;
     bank = synth->getBankPtr();
     what = 0;
     nselected = -1;
+    rselected = -1;
     make_window();
     mode = 1;
+    r_mode = 1;
     fnr = &RootProcess_::rootprocess;
     root = synth->getBankPtr();
     rootFrom = 0;
@@ -811,10 +855,11 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
   } {
     code {//
         int slot = this->slot;
+        int curPart = synth->getRuntime().currentPart;
         string thisname =  bank->getname(slot);
         if ((what == 1 || what == 3) && mode == 1 && !bank->emptyslot(slot))
         {
-            send_data(74, *npart, 0xf0, 240, 255, 255, 255, 255, slot);
+            send_data(74, curPart, 0xf0, 240, 255, 255, 255, 255, slot);
             // Reads from slot
             if (what == 3)
                 instrumentuiwindow->hide();
@@ -837,8 +882,8 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
                     }
                     else
                     {
-                        synth->part[*npart]->Pname = newname;
-                        send_data(75, float(*npart), 0xf0, 240, 255, 255, slot, 0x80);
+                        synth->part[curPart]->Pname = newname;
+                        send_data(75, float(curPart), 0xf0, 240, 255, 255, slot, 0x80);
                     }
                 }
             }
@@ -849,7 +894,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
         if (mode == 2)
         {   // save(write) to slot (choices reversed for 'No' priority)
             bool doit = true;
-            if (synth->part[*npart]->Pname == "Simple Sound")
+            if (synth->part[curPart]->Pname == "Simple Sound")
             {
                 fl_alert("Can't store instrument with default name");
                 setread();
@@ -865,7 +910,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
             }
             if (doit)
             {
-                send_data(75, float(*npart), 0xf0, 240, 255, 255, slot, 0x80);
+                send_data(75, float(curPart), 0xf0, 240, 255, 255, slot, 0x80);
                 setread();
             }
         }
@@ -889,25 +934,15 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
             bool done = false;
             if (what == 1 && nselected >= 0)
             {
-                if (!bank->swapslot(nselected, slot))
-                    fl_alert("Could not swap these locations");
-                else
-                {
-                    int ns = nselected;
-                    nselected = -1;
-                    bs[slot]->refresh();
-                    bs[ns]->refresh();
-                }
+                send_data(5, 0, 0xf0, 244, 255, 255, slot, 128);
+                nselected = -1;
                 setread();
                 done = true;
             }
             if ((nselected < 0 || what == 2) && !done)
             {
-                int ns = nselected;
+                send_data(4, 0, 0xe0, 244, 255, 255, slot, 128);
                 nselected = slot;
-                if (ns > 0)
-                    bs[ns]->refresh();
-                bs[slot]->refresh();
             }
         }
         if (mode != 4)
@@ -919,7 +954,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
     unsigned int slot = this->slot;
     string thisname = bank->getBankName(slot);
 
-    if ((what == 1 || what == 3) && mode == 1 && !thisname.empty())
+    if ((what == 1 || what == 3) && r_mode == 1 && !thisname.empty())
     {
         // Selects from slot
         const BankEntry &bankEntry = bank->getBank(slot);
@@ -942,7 +977,25 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
         return;
     }
 
-    if (mode == 5 && !thisname.empty())
+    if (r_mode == 7)
+    {
+    	const char *dirname;
+        dirname = fl_dir_chooser("Export a bank:",synth->getRuntime().userHome.c_str(), 0);
+        if (dirname)
+            send_data(59, slot, 0xf0, 0xf0, 0xff, 0xff, 0xff, 0x80, miscMsgPush(string(dirname)));
+   	setrootread();
+    }
+
+    if (r_mode == 6)
+    {
+    	const char *dirname;
+        dirname = fl_dir_chooser("Import a new bank:",synth->getRuntime().userHome.c_str(), 0);
+        if (dirname)
+            send_data(60, slot, 0xf0, 0xf0, 0xff, 0xff, 0xff, 0x80, miscMsgPush(string(dirname)));
+   	setrootread();
+    }
+
+    if (r_mode == 5 && !thisname.empty())
     {   // Rename bank
         const char *tmp = fl_input("Bank name:",thisname.c_str());
         if (tmp)
@@ -964,7 +1017,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
         setrootread();
     }
 
-    if (mode == 2)
+    if (r_mode == 2)
     {   // Create new bank and save to file
         if (!thisname.empty())
         {
@@ -994,63 +1047,42 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
         refreshmainwindow();
     }
 
-    if (mode == 3 && !thisname.empty())
+    if (r_mode == 3 && !thisname.empty())
     {   // Remove bank and file contents (choices reversed for 'No' priority)
         if (fl_choice("Completely remove %s?", NULL, "No", "Yes", thisname.c_str()) > 1)
         {
             int clearit = true;
             int count = bank->getBankSize(slot);
-//            synth->getRuntime().Log("Bank size " + asString(count));
             if (count > 1)
                 clearit = fl_choice("There are %d instruments in this bank\\nThey will be permanently deleted",
                                     NULL, "STOP !", "Continue", count) > 1;
             if (clearit)
             {
-//                synth->getRuntime().Log("We're going");
-                if (bank->removebank(slot))
-                {
-                    if (slot == bank->getCurrentBankID())
-                        bank->setCurrentBankID(0,false);
-                    rescan_for_banks(false);
-                    set_bank_slot();
-                    rs[slot]->rootrefresh();
-                }
-                else
-                    fl_alert("Deleting %s failed. Some files may still exist", thisname.c_str());
+                send_data(61, slot, 0xf0, 0xf0, 0xff, 0xff, 0xff, 0x80);
             }
         }
         setrootread();
         refreshmainwindow();
     }
 
-    if (mode == 4)
+    if (r_mode == 4)
     {   // Swap banks
-        bool done = false;
-        if (what == 1 && nselected >= 0)
-        {
-            bank->swapbanks(nselected, slot);
-            if ((unsigned int) nselected == bank->getCurrentBankID() or (unsigned int) slot == bank->getCurrentBankID())
-                refreshmainwindow();
-            else
+
+            bool done = false;
+            if (what == 1 && rselected >= 0)
             {
-                int ns = nselected;
-                rs[slot]->rootrefresh();
-                rs[ns]->rootrefresh();
+                send_data(21, 0, 0xf0, 244, slot, 255, 255, 128);
+                rselected = -1;
+                rescan_for_banks(false);
+                setrootread();
+                done = true;
             }
-            nselected = -1;
-            rescan_for_banks(false);
-            setrootread();
-            done = true;
-        }
-        if ((nselected < 0 || what == 2) && !done)
-        {
-            int ns = nselected;
-            nselected = slot;
-            if (rs){
-                rs[ns]->rootrefresh();
-        	rs[slot]->rootrefresh();
-    	    }
-        }
+            if ((rselected < 0 || what == 2) && !done)
+            {
+                send_data(20, 0, 0xe0, 244, slot, 255, 255, 128);
+                rselected = slot;
+                rs[slot]->rootrefresh();
+            }
     }} {}
   }
   Function {setread()} {} {
@@ -1064,9 +1096,11 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
   }
   Function {setrootread()} {} {
     code {//
-    mode = 1;
+    r_mode = 1;
     rootreadbutton->value(1);
     rootwritebutton->value(0);
+    rootimportbutton->value(0);
+    rootexportbutton->value(0);
     rootclearbutton->value(0);
     rootswapbutton->value(0);
     rootrenamebutton->value(0);} {}
@@ -1085,11 +1119,18 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
 bs[ins]->refresh();} {}
   }
   Function {removeselection()} {} {
-    code {if (nselected >= 0)
+    code {//
+        if (nselected >= 0)
         {
             int ns = nselected;
             nselected = -1;
             bs[ns]->refresh();
+        }
+        if (rselected >= 0)
+        {
+            int rsel = rselected;
+            rselected = -1;
+            rs[rsel]->rootrefresh();
         }} {}
   }
   Function {rescan_for_banks(bool reload)} {} {
@@ -1188,7 +1229,7 @@ bs[ins]->refresh();} {}
   }
   decl {int slot, what; // "what" = what button is pressed} {private local
   }
-  decl {int mode, *npart, nselected;} {private local
+  decl {int mode, r_mode, *npart, nselected, rselected;} {private local
   }
   decl {void (BankProcess_::* fnc)(void);} {private local
   }

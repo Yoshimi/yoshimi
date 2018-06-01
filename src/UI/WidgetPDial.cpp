@@ -6,6 +6,7 @@
     Copyright 2009-2010, Alan Calvert
     Copyright 2016 Will Godfrey
     Copyright 2017 Jesper Lloyd
+    Coyright 2018, Will Godfrey and others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -21,7 +22,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified March 2017
+    This file is a derivative of the ZynAddSubFX original.
+
+    Modified March 2018
 */
 
 #include "WidgetPDial.h"
@@ -95,20 +98,23 @@ int WidgetPDial::handle(int event)
     switch (event)
     {
     case FL_PUSH:
-        Fl::belowmouse(this); /* Ensures other widgets receieve FL_RELEASE */
-        if (home > -0.5f && Fl::event_button() == 3)
+    case FL_DRAG: // done this way to suppress warnings
+        if(event == FL_PUSH)
         {
-            value(home);
-            value_damage();
-            if (this->when() != 0)
+            Fl::belowmouse(this); /* Ensures other widgets receieve FL_RELEASE */
+            if (home > -0.5f && Fl::event_button() == 3)
+            {
+                value(home);
+                value_damage();
+                if (this->when() != 0)
+                    do_callback();
+                res = 1;
+                break;
+            }
+            if (this->when() != 0 && Fl::event_button() == 3) // only effects knobs need this
                 do_callback();
-            res = 1;
-            break;
+            oldvalue = value();
         }
-        if (this->when() != 0 && Fl::event_button() == 3) // only effects knobs need this
-            do_callback();
-        oldvalue = value();
-    case FL_DRAG:
         my = -((Fl::event_y() - y()) * 2 - h());
         mx = ((Fl::event_x() - x()) * 2 - w());
         my = (my + mx);

@@ -3,7 +3,7 @@ version 1.0304
 header_name {.h}
 code_name {.cc}
 comment {Copyright 2011, Alan Calvert
-Copyright 2014 - 2017, Will Godfrey
+Copyright 2014 - 2018, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -18,7 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-Modified November 2017
+Modified March 2018
 } {in_source in_header
 }
 
@@ -73,7 +73,7 @@ class ParametersUI {selected
                 Loading->show();
                 break;
             case 2:
-                synth->getGuiMaster()->do_load_master(false, fle.c_str());
+                synth->getGuiMaster()->do_load_master(fle.c_str());
                 break;
         }
         Recent->hide();}

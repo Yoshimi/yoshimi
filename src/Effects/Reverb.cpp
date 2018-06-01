@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified March 2011
+    This file is derivative of ZynAddSubFX original code.
+
+    Modified March 2018
 */
 
 #include <cmath>
@@ -32,12 +35,43 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Effects/Reverb.h"
 
+static const int PRESET_SIZE = 13;
+static const int NUM_PRESETS = 13;
+static unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
+        // Cathedral1
+        {80,  64,  63,  24,  0,  0,  0, 85,  5,  83,   1,  64,  20 },
+        // Cathedral2
+        {80,  64,  69,  35,  0,  0,  0, 127, 0,  71,   0,  64,  20 },
+        // Cathedral3
+        {80,  64,  69,  24,  0,  0,  0, 127, 75, 78,   1,  85,  20 },
+        // Hall1
+        {90,  64,  51,  10,  0,  0,  0, 127, 21, 78,   1,  64,  20 },
+        // Hall2
+        {90,  64,  53,  20,  0,  0,  0, 127, 75, 71,   1,  64,  20 },
+        // Room1
+        {100, 64,  33,  0,   0,  0,  0, 127, 0,  106,  0,  30,  20 },
+        // Room2
+        {100, 64,  21,  26,  0,  0,  0, 62,  0,  77,   1,  45,  20 },
+        // Basement
+        {110, 64,  14,  0,   0,  0,  0, 127, 5,  71,   0,  25,  20 },
+        // Tunnel
+        {85,  80,  84,  20,  42, 0,  0, 51,  0,  78,   1,  105, 20 },
+        // Echoed1
+        {95,  64,  26,  60,  71, 0,  0, 114, 0,  64,   1,  64,  20 },
+        // Echoed2
+        {90,  64,  40,  88,  71, 0,  0, 114, 0,  88,   1,  64,  20 },
+        // VeryLong1
+        {90,  64,  93,  15,  0,  0,  0, 114, 0,  77,   0,  95,  20 },
+        // VeryLong2
+        {90,  64,  111, 30,  0,  0,  0, 114, 90, 74,   1,  80,  20 }
+};
+
 // todo: EarlyReflections, Prdelay, Perbalance
 
 Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
     // defaults
-    Pvolume(48),
+//    Pvolume(48),
     Ptime(64),
     Pidelay(40),
     Pidelayfb(0),
@@ -57,6 +91,7 @@ Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_
     hpf(NULL), // no filter
     synth(_synth)
 {
+    setvolume(48);
     inputbuf = (float*)fftwf_malloc(synth->bufferbytes);
     for (int i = 0; i < REV_COMBS * 2; ++i)
     {
@@ -134,7 +169,7 @@ void Reverb::processmono(int ch, float *output)
         int comblength = comblen[j];
         float lpcombj = lpcomb[j];
 
-        for (i = 0; i < synth->p_buffersize; ++i)
+        for (i = 0; i < synth->sent_buffersize; ++i)
         {
             fbout = comb[j][ck] * combfb[j];
             fbout = fbout * (1.0f - lohifb) + lpcombj * lohifb;
@@ -155,7 +190,7 @@ void Reverb::processmono(int ch, float *output)
     {
         int ak = apk[j];
         int aplength = aplen[j];
-        for (i = 0; i < synth->p_buffersize; ++i)
+        for (i = 0; i < synth->sent_buffersize; ++i)
         {
             tmp = ap[j][ak];
             ap[j][ak] = 0.7f * tmp + output[i];
@@ -174,7 +209,7 @@ void Reverb::out(float *smps_l, float *smps_r)
     if (!Pvolume && insertion)
         return;
     int i;
-    for (i = 0; i < synth->p_buffersize; ++i)
+    for (i = 0; i < synth->sent_buffersize; ++i)
     {
         inputbuf[i] = (smps_l[i] + smps_r[i]) / 2.0f;
         // Initial delay r
@@ -190,24 +225,42 @@ void Reverb::out(float *smps_l, float *smps_r)
     }
 
     if (bandwidth)
-        bandwidth->process(synth->p_buffersize, inputbuf);
+        bandwidth->process(synth->sent_buffersize, inputbuf);
 
     if (lpf)
+    {
+        float fr = lpffr.getValue();
+        lpffr.advanceValue(synth->sent_buffersize);
+        if (fr != lpffr.getValue())
+        {
+            lpf->interpolatenextbuffer();
+            lpf->setfreq(lpffr.getValue());
+        }
         lpf->filterout(inputbuf);
-    if (hpf)
-        hpf->filterout(inputbuf);
+    }
+     if (hpf)
+    {
+        float fr = hpffr.getValue();
+        hpffr.advanceValue(synth->sent_buffersize);
+        if (fr != hpffr.getValue())
+        {
+            hpf->interpolatenextbuffer();
+            hpf->setfreq(hpffr.getValue());
+        }
+         hpf->filterout(inputbuf);
+    }
 
     processmono(0, efxoutl); // left
     processmono(1, efxoutr); // right
 
-    float lvol = rs / REV_COMBS * pangainL;
-    float rvol = rs / REV_COMBS * pangainR;
+    float lvol = rs / REV_COMBS * pangainL.getAndAdvanceValue();
+    float rvol = rs / REV_COMBS * pangainR.getAndAdvanceValue();
     if (insertion != 0)
     {
         lvol *= 2.0f;
         rvol *= 2.0f;
     }
-    for (i = 0; i < synth->p_buffersize; ++i)
+    for (i = 0; i < synth->sent_buffersize; ++i)
     {
         efxoutl[i] *= lvol;
         efxoutr[i] *= rvol;
@@ -221,12 +274,14 @@ void Reverb::setvolume(unsigned char Pvolume_)
     Pvolume = Pvolume_;
     if (!insertion)
     {
-        outvolume = powf(0.01f, (1.0f - Pvolume / 127.0f)) * 4.0f;
-        volume = 1.0f;
+        outvolume.setTargetValue(powf(0.01f, (1.0f - Pvolume / 127.0f)) * 4.0f);
+        volume.setTargetValue(1.0f);
     }
     else
     {
-        volume = outvolume = Pvolume / 127.0f;
+        float tmp = Pvolume / 127.0f;
+        volume.setTargetValue(tmp);
+        outvolume.setTargetValue(tmp);
         if (Pvolume == 0.0f)
             cleanup();
     }
@@ -299,11 +354,9 @@ void Reverb::sethpf(unsigned char Phpf_)
             delete hpf;
         hpf = NULL;
     } else {
-        float fr = expf(powf(Phpf / 127.0f, 0.5f) * logf(10000.0f)) + 20.0f;
+        hpffr.setTargetValue(expf(powf(Phpf / 127.0f, 0.5f) * logf(10000.0f)) + 20.0f);
         if (hpf == NULL)
-            hpf = new AnalogFilter(3, fr, 1, 0, synth);
-        else
-            hpf->setfreq(fr);
+            hpf = new AnalogFilter(3, hpffr.getValue(), 1, 0, synth);
     }
 }
 
@@ -317,11 +370,9 @@ void Reverb::setlpf(unsigned char Plpf_)
             delete lpf;
         lpf = NULL;
     } else {
-        float fr = expf(powf(Plpf / 127.0f, 0.5f) * logf(25000.0f)) + 40.0f;
+        lpffr.setTargetValue(expf(powf(Plpf / 127.0f, 0.5f) * logf(25000.0f)) + 40.0f);
         if (!lpf)
-            lpf = new AnalogFilter(2, fr, 1, 0, synth);
-        else
-            lpf->setfreq(fr);
+            lpf = new AnalogFilter(2, lpffr.getValue(), 1, 0, synth);
     }
 }
 
@@ -399,7 +450,7 @@ void Reverb::settype(unsigned char Ptype_)
         bandwidth = new Unison(synth->buffersize / 4 + 1, 2.0f, synth);
         bandwidth->setSize(50);
         bandwidth->setBaseFrequency(1.0f);
-#warning sa schimb size-ul
+#pragma message "sa schimb size-ul"
         //the size of the unison buffer may be too small, though this has
         //not been verified yet.
         //As this cannot be resized in a RT context, a good upper bound should
@@ -435,36 +486,6 @@ void Reverb::setbandwidth(unsigned char Pbandwidth_)
 
 void Reverb::setpreset(unsigned char npreset)
 {
-    const int PRESET_SIZE = 13;
-    const int NUM_PRESETS = 13;
-    unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
-        // Cathedral1
-        {80,  64,  63,  24,  0,  0,  0, 85,  5,  83,   1,  64,  20 },
-        // Cathedral2
-        {80,  64,  69,  35,  0,  0,  0, 127, 0,  71,   0,  64,  20 },
-        // Cathedral3
-        {80,  64,  69,  24,  0,  0,  0, 127, 75, 78,   1,  85,  20 },
-        // Hall1
-        {90,  64,  51,  10,  0,  0,  0, 127, 21, 78,   1,  64,  20 },
-        // Hall2
-        {90,  64,  53,  20,  0,  0,  0, 127, 75, 71,   1,  64,  20 },
-        // Room1
-        {100, 64,  33,  0,   0,  0,  0, 127, 0,  106,  0,  30,  20 },
-        // Room2
-        {100, 64,  21,  26,  0,  0,  0, 62,  0,  77,   1,  45,  20 },
-        // Basement
-        {110, 64,  14,  0,   0,  0,  0, 127, 5,  71,   0,  25,  20 },
-        // Tunnel
-        {85,  80,  84,  20,  42, 0,  0, 51,  0,  78,   1,  105, 20 },
-        // Echoed1
-        {95,  64,  26,  60,  71, 0,  0, 114, 0,  64,   1,  64,  20 },
-        // Echoed2
-        {90,  64,  40,  88,  71, 0,  0, 114, 0,  88,   1,  64,  20 },
-        // VeryLong1
-        {90,  64,  93,  15,  0,  0,  0, 114, 0,  77,   0,  95,  20 },
-        // VeryLong2
-        {90,  64,  111, 30,  0,  0,  0, 114, 90, 74,   1,  80,  20 }
-    };
     if (npreset < 0xf)
     {
         if (npreset >= NUM_PRESETS)
@@ -555,4 +576,81 @@ unsigned char Reverb::getpar(int npar)
         default: break;
     }
     return 0; // in case of bogus "parameter"
+}
+
+
+float Revlimit::getlimits(CommandBlock *getData)
+{
+    int value = getData->data.value;
+    int control = getData->data.control;
+    int request = getData->data.type & 3; // clear upper bits
+    int npart = getData->data.part;
+    int presetNum = getData->data.engine;
+    int min = 0;
+    int max = 127;
+
+    int def = presets[presetNum][control];
+    bool canLearn = true;
+    bool isInteger = true;
+
+    switch (control)
+    {
+        case 0:
+            if (npart != 0xf1) // system effects
+                def /=2;
+            break;
+        case 1:
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+        case 4:
+            break;
+        case 7:
+            break;
+        case 8:
+            break;
+        case 9:
+            min = 64;
+            break;
+        case 10:
+            max = 2;
+            canLearn = false;
+            break;
+        case 11:
+            canLearn = false;
+            break;
+        case 12:
+            break;
+        case 16:
+            max = 12;
+            canLearn = false;
+            break;
+        default:
+            getData->data.type |= 4; // error
+            return 1.0f;
+            break;
+    }
+
+    switch(request)
+    {
+        case 0:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+            break;
+        case 1:
+            value = min;
+            break;
+        case 2:
+            value = max;
+            break;
+        case 3:
+            value = def;
+            break;
+    }
+    getData->data.type |= (canLearn * 64 + isInteger * 128);
+    return float(value);
 }

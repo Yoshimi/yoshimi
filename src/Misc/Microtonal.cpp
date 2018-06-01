@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2017 Will Godfrey
+    Copyright 2017-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified June 2017
+    Modified April 2018
 */
 
 #include <cmath>
@@ -197,9 +197,29 @@ string Microtonal::reformatline(string text)
 }
 
 
+bool Microtonal::validline(const char *line)
+{
+    int idx = 0;
+    bool ok = true;
+    while (ok && line[idx] > 31)
+    {
+        char chr = line[idx];
+        if (chr != ' ' && chr != '.' && chr != '/' && (chr < '0' || chr > '9'))
+        {
+            cout << "char " << int(chr) << endl;
+            ok = false;
+        }
+        ++ idx;
+    }
+    return ok;
+}
+
+
 // Convert a line to tunings; returns 0 if ok
 int Microtonal::linetotunings(unsigned int nline, const char *line)
 {
+    if (!validline(line))
+        return -2;
     int x1 = -1, x2 = -1, type = -1;
     double x = -1.0, tmp, tuning = 1.0;
 
@@ -308,8 +328,7 @@ int Microtonal::texttomapping(const char *text)
     char *lin;
     int tmpMap [128];
     lin = new char[MAX_LINE_SIZE + 1];
-    for (i = 0; i < 128; ++i)
-        tmpMap[i] = -1;
+    memset(lin, 0xff, MAX_LINE_SIZE);
     int tx = 0;
     while (k < strlen(text))
     {
@@ -319,7 +338,7 @@ int Microtonal::texttomapping(const char *text)
             if (lin[i] < 0x20)
                 break;
         }
-        lin[i] = '\0';
+        lin[i] = 0;
         if (!strlen(lin))
             continue;
 
@@ -764,4 +783,84 @@ bool Microtonal::loadXML(string filename)
     xml->exitbranch();
     delete xml;
     return true;
+}
+
+float Microtonal::getLimits(CommandBlock *getData)
+{
+    float value = getData->data.value;
+    int request = int(getData->data.type & 3);
+    int control = getData->data.control;
+
+    // defaults
+    unsigned int type = getData->data.type| 0xc0; // set as learnable integer;
+    int min = 0;
+    float def = 0;
+    int max = 127;
+    //cout << "config control " << to_string(control) << endl;
+    switch (control)
+    {
+        case 0:
+            type &= 0x3f;
+            min = 1.0f;
+            def = 440.0f;
+            max = 20000.0f;
+            break;
+        case 1:
+            def = 69;
+            break;
+        case 2:
+            max = 1;
+            break;
+        case 3:
+            def = 60;
+            break;
+        case 4:
+            min = -63;
+            max = 64;
+            break;
+
+        case 8:
+            max = 1;
+            break;
+
+        case 16:
+            max = 1;
+            break;
+        case 17:
+            break;
+        case 18:
+            def = 60;
+            break;
+        case 19:
+            def = 127;
+            break;
+
+        default:
+            type |= 4; // error
+            break;
+    }
+    getData->data.type = type;
+    if (type & 4)
+        return 1;
+
+    switch (request)
+    {
+        case 0:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+        break;
+        case 1:
+            value = min;
+            break;
+        case 2:
+            value = max;
+            break;
+        case 3:
+            value = def;
+            break;
+    }
+    return value;
+
 }

@@ -1,7 +1,7 @@
 
-The internal structure of this is changing so that you can set all three of these in a single call, always in the order; root, bank, program. However this full command is very pedantic and if either root or bank fault, program change will not be attempted. This is to protect against loading a same-name program from the wrong bank.
+The internal structure of this has changed so that you can set all three of these in a single call, always in the order; root, bank, program. However this full command is very pedantic and if either root or bank fault, program change will not be attempted. This is to protect against loading a same-name program from the wrong bank.
 
-You can set these all singly, or any logical combination. The returned message will be the first failed one.
+You can set these all singly, or any logical combination. On error, the returned message will be the first failed one.
 
 You can also load a program from a file name by pushing it to a miscMsg and giving the returned ID to par2.
 

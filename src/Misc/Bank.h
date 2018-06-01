@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2010, Alan Calvert
-    Copyright 2014-2015 Will Godfrey & others
+    Copyright 2014-2018 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is a derivative of a ZynAddSubFX original.
-    Modified December 2017
+    Modified May 2018
 */
 
 #ifndef BANK_H
@@ -107,10 +107,10 @@ class Bank : private MiscFuncs
     public:
         Bank(SynthEngine *_synth);
         ~Bank();
-        string getname(unsigned int ninstrument);
+        string getname(unsigned int ninstrument, size_t bank = 0xff, size_t root = 0xff);
         string getfilename(unsigned int ninstrument);
         string getnamenumbered(unsigned int ninstrument);
-        bool setname(unsigned int ninstrument, string newname, int newslot);
+        bool setname(unsigned int ninstrument, string newname, int newslot, size_t oldBank = 0xff, size_t newBank = 0xff, size_t oldRoot = 0xff, size_t newRoot = 0xff);
              // if newslot==-1 then this is ignored, else it will be put on that slot
 
         int engines_used(unsigned int ninstrument);
@@ -118,16 +118,19 @@ class Bank : private MiscFuncs
         bool emptyslot(unsigned int ninstrument) { return emptyslotWithID(currentRootID, currentBankID, ninstrument); }
         bool clearslot(unsigned int ninstrument);
         bool savetoslot(size_t rootID, size_t bankID, int ninstrument, int npart);
-        bool swapslot(unsigned int n1, unsigned int n2);
-        void swapbanks(unsigned int firstID, unsigned int secondID);
-        string getBankName(int bankID);
+        unsigned int swapslot(unsigned int n1, unsigned int n2, size_t bank1 = 0xff, size_t bank2 = 0xff, size_t root1 = 0xff, size_t root2 = 0xff);
+        unsigned int swapbanks(unsigned int firstID, unsigned int secondID, size_t firstRoot = 0xff, size_t secondRoot= 0xff);
+        string getBankName(int bankID, size_t rootID = 0xff);
         string getBankIDname(int bankID);
         int getBankSize(int bankID);
         bool setbankname(unsigned int BankID, string newname);
         bool loadbank(size_t rootID, size_t banknum);
-        bool newIDbank(string newbankdir, unsigned int bankID);
-        bool newbankfile(string newbankdir);
-        bool removebank(unsigned int bankID);
+        unsigned int exportBank(string exportdir, size_t rootID, unsigned int bankID);
+        unsigned int importBank(string importdir, size_t rootID, unsigned int bankID);
+        bool isDuplicate(size_t rootID, size_t bankID, int pos, const string filename);
+        bool newIDbank(string newbankdir, unsigned int bankID, size_t rootID = 0xff);
+        bool newbankfile(string newbankdir, size_t rootID);
+        unsigned int removebank(unsigned int bankID, size_t rootID = 0xff);
         void rescanforbanks(void);
         void clearBankrootDirlist(void);
         void removeRoot(size_t rootID);
@@ -165,6 +168,7 @@ class Bank : private MiscFuncs
         //string dirname;
         const string defaultinsname;
         const string xizext;
+        const string xiyext;
         const string force_bank_dir_file;
         SynthEngine *synth;
 

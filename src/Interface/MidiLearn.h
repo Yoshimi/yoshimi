@@ -42,7 +42,6 @@ class MidiLearn : private MiscFuncs
         MidiLearn(SynthEngine *_synth);
         ~MidiLearn();
         bool saveXML(string filename); // true for load ok, otherwise false
-        int loadXMLinstrument(string filename);
         void add2XML(XMLwrapper *xml);
         void getfromXML(XMLwrapper *xml);
         CommandBlock commandData;

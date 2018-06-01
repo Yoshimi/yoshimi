@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2017, Will Godfrey & others
+    Copyright 2014-2018, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified November 2017
+    Modified May 2018
 */
 
 #ifndef SYNTHENGINE_H
@@ -61,8 +61,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         unsigned int uniqueId;
         bool isLV2Plugin;
         bool needsSaving;
-        Bank bank;
     public:
+        Bank bank;
         InterChange interchange;
         MidiLearn midilearn;
         MidiDecode mididecode;
@@ -77,10 +77,10 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         bool savePatchesXML(string filename);
         void add2XML(XMLwrapper *xml);
+        string manualname();
         void defaults(void);
 
         bool loadXML(string filename);
-        void applyparameters(void);
         bool loadStateAndUpdate(string filename);
         bool saveState(string filename);
         bool loadPatchSetAndUpdate(string filename);
@@ -88,7 +88,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool saveMicrotonal(string fname);
         bool installBanks(int instance);
         bool saveBanks(int instance);
-        bool saveToBankSlot(size_t rootID, size_t bankID, int ninstrument, int npart);
         void newHistory(string name, int group);
         void addHistory(string name, int group);
         vector<string> *getHistory(int group);
@@ -131,11 +130,10 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool SingleVector(list<string>& msg_buf, int chan);
         void ListSettings(list<string>& msg_buf);
         int SetSystemValue(int type, int value);
-        void writeRBP(char type, char data0, char data1 = 0, char data2 = 0);
         bool vectorInit(int dHigh, unsigned char chan, int par);
         void vectorSet(int dHigh, unsigned char chan, int par);
         void ClearNRPNs(void);
-        void resetAll(void);
+        void resetAll(bool andML);
         float numRandom(void);
         unsigned int randomSE(void);
         void ShutUp(void);
@@ -156,9 +154,9 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool isMuted(void);
         sem_t mutelock;
 
-        void getLimits(CommandBlock *getData);
-        void getVectorLimits(CommandBlock *getData);
-        void getConfigLimits(CommandBlock *getData);
+        float getLimits(CommandBlock *getData);
+        float getVectorLimits(CommandBlock *getData);
+        float getConfigLimits(CommandBlock *getData);
 
         Part *part[NUM_MIDI_PARTS];
         unsigned int fadeAll;
@@ -177,10 +175,10 @@ class SynthEngine : private SynthHelper, MiscFuncs
         int halfoscilsize;
         float halfoscilsize_f;
 
-        int p_buffersize; //used for variable length runs
-        int p_bufferbytes; //used for variable length runs
-        float p_buffersize_f; //used for variable length runs
-        float p_all_buffersize_f; //used for variable length runs (mainly for lv2 - calculate envelopes and lfo)
+        int sent_buffersize; //used for variable length runs
+        int sent_bufferbytes; //used for variable length runs
+        float sent_buffersize_f; //used for variable length runs
+        float sent_all_buffersize_f; //used for variable length runs (mainly for lv2 - calculate envelopes and lfo)
         float         TransVolume;
         float         Pvolume;
         float         ControlStep;
@@ -216,18 +214,20 @@ class SynthEngine : private SynthHelper, MiscFuncs
                 float vuRmsPeakL;
                 float vuRmsPeakR;
                 float parts[NUM_MIDI_PARTS];
-                int p_buffersize;
+                int buffersize;
             } values;
             char bytes [sizeof(values)];
         };
-        union VUtransfer VUpeak, VUdata;
-
-        bool fetchMeterData(VUtransfer *VUdata);
+        VUtransfer VUpeak, VUcopy, VUdata;
+        unsigned int VUcount;
+        bool VUready;
+        void fetchMeterData(void);
 
         inline bool getIsLV2Plugin() {return isLV2Plugin; }
         inline Config &getRuntime() {return Runtime;}
         inline PresetsStore &getPresetsStore() {return presetsstore;}
         unsigned int getUniqueId() {return uniqueId;}
+        SynthEngine *getSynthFromId(unsigned int uniqueId);
         MasterUI *getGuiMaster(bool createGui = true);
         void guiClosed(bool stopSynth);
         void setGuiClosedCallback(void( *_guiClosedCallback)(void*), void *arg)
@@ -241,6 +241,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         Bank &getBankRef() {return bank;}
         Bank *getBankPtr() {return &bank;}
+
         string getWindowTitle() {return windowTitle;}
         void setWindowTitle(string _windowTitle = "");
         void setNeedsSaving(bool ns) { needsSaving = ns; }
@@ -250,25 +251,11 @@ class SynthEngine : private SynthHelper, MiscFuncs
         float volume;
         float sysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];
         float sysefxsend[NUM_SYS_EFX][NUM_SYS_EFX];
-        float *tmpmixl; // Temporary mixing samples for part samples
-        float *tmpmixr; // which are sent to system effect
+
         int keyshift;
 
         pthread_mutex_t  processMutex;
         pthread_mutex_t *processLock;
-
-        jack_ringbuffer_t *vuringbuf;
-
-        jack_ringbuffer_t *RBPringbuf;
-        void *RBPthread(void);
-        static void *_RBPthread(void *arg);
-        pthread_t  RBPthreadHandle;
-
-        struct RBP_data {
-            char data[4];
-        };
-
-        XMLwrapper *stateXMLtree;
 
         char random_state[256];
         float random_0_1;
@@ -288,7 +275,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         int LFOtime; // used by Pcontinous
         string windowTitle;
-        MusicClient *musicClient;
+        //MusicClient *musicClient;
 };
 
 inline float SynthEngine::numRandom(void)

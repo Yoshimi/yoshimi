@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,11 +20,30 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified April 2011
+    This file is derivative of ZynAddSubFX original code.
+
+    Modified March 2018
 */
 
 #include "Misc/SynthEngine.h"
 #include "Effects/Distorsion.h"
+
+static const int PRESET_SIZE = 11;
+static const int NUM_PRESETS = 6;
+static int presets[NUM_PRESETS][PRESET_SIZE] = {
+        // Overdrive 1
+        { 127, 64, 35, 56, 70, 0, 0, 96, 0, 0, 0 },
+        // Overdrive 2
+        { 127, 64, 35, 29, 75, 1, 0, 127, 0, 0, 0 },
+        // A. Exciter 1
+        { 64, 64, 35, 75, 80, 5, 0, 127, 105, 1, 0 },
+        // A. Exciter 2
+        { 64, 64, 35, 85, 62, 1, 0, 127, 118, 1, 0 },
+        // Guitar Amp
+        { 127, 64, 35, 63, 75, 2, 0, 55, 0, 0, 0 },
+        // Quantisize
+        { 127, 64, 35, 88, 75, 4, 0, 127, 0, 1, 0 }
+};
 
 Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
@@ -38,6 +58,7 @@ Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_, SynthE
     Pprefiltering(0),
     synth(_synth)
 {
+    level.setTargetValue(Plevel / 127.0f);
     lpfl = new AnalogFilter(2, 22000, 1, 0, synth);
     lpfr = new AnalogFilter(2, 22000, 1, 0, synth);
     hpfl = new AnalogFilter(3, 20, 1, 0, synth);
@@ -70,9 +91,28 @@ void Distorsion::cleanup(void)
 // Apply the filters
 void Distorsion::applyfilters(float *efxoutl, float *efxoutr)
 {
+    float fr;
+
+    fr = lpffr.getValue();
+    lpffr.advanceValue(synth->sent_buffersize);
+    if (fr != lpffr.getValue()) {
+        lpfl->interpolatenextbuffer();
+        lpfl->setfreq(lpffr.getValue());
+        lpfr->interpolatenextbuffer();
+        lpfr->setfreq(lpffr.getValue());
+    }
     lpfl->filterout(efxoutl);
-    hpfl->filterout(efxoutl);
     lpfr->filterout(efxoutr);
+
+    fr = hpffr.getValue();
+    hpffr.advanceValue(synth->sent_buffersize);
+    if (fr != hpffr.getValue()) {
+        hpfl->interpolatenextbuffer();
+        hpfl->setfreq(hpffr.getValue());
+        hpfr->interpolatenextbuffer();
+        hpfr->setfreq(hpffr.getValue());
+    }
+    hpfl->filterout(efxoutl);
     hpfr->filterout(efxoutr);
 }
 
@@ -86,39 +126,42 @@ void Distorsion::out(float *smpsl, float *smpsr)
 
     if (Pstereo) // Stereo
     {
-        for (int i = 0; i < synth->p_buffersize; ++i)
+        for (int i = 0; i < synth->sent_buffersize; ++i)
         {
-            efxoutl[i] = smpsl[i] * inputdrive * pangainL;
-            efxoutr[i] = smpsr[i] * inputdrive* pangainR;
+            efxoutl[i] = smpsl[i] * inputdrive * pangainL.getAndAdvanceValue();
+            efxoutr[i] = smpsr[i] * inputdrive * pangainR.getAndAdvanceValue();
         }
     }
     else // Mono
-        for (int i = 0; i < synth->p_buffersize; ++i)
-            efxoutl[i] = inputdrive * (smpsl[i]* pangainL + smpsr[i]* pangainR) * 0.7f;
+        for (int i = 0; i < synth->sent_buffersize; ++i)
+            efxoutl[i] = inputdrive * (smpsl[i] * pangainL.getAndAdvanceValue()
+                                       + smpsr[i]* pangainR.getAndAdvanceValue())
+                * 0.7f;
 
     if (Pprefiltering)
         applyfilters(efxoutl, efxoutr);
 
-    waveShapeSmps(synth->p_buffersize, efxoutl, Ptype + 1, Pdrive);
+    waveShapeSmps(synth->sent_buffersize, efxoutl, Ptype + 1, Pdrive);
     if (Pstereo)
-        waveShapeSmps(synth->p_buffersize, efxoutr, Ptype + 1, Pdrive);
+        waveShapeSmps(synth->sent_buffersize, efxoutr, Ptype + 1, Pdrive);
 
     if (!Pprefiltering)
         applyfilters(efxoutl, efxoutr);
     if (!Pstereo)
-        memcpy(efxoutr, efxoutl, synth->p_bufferbytes);
+        memcpy(efxoutr, efxoutl, synth->sent_bufferbytes);
 
-    float level = dB2rap(60.0f * Plevel / 127.0f - 40.0f);
-    for (int i = 0; i < synth->p_buffersize; ++i)
+    for (int i = 0; i < synth->sent_buffersize; ++i)
     {
+        float lvl = dB2rap(60.0f * level.getAndAdvanceValue() - 40.0f);
         float lout = efxoutl[i];
         float rout = efxoutr[i];
-        float l = lout * (1.0f - lrcross) + rout * lrcross;
-        float r = rout * (1.0f - lrcross) + lout * lrcross;
+        float l = lout * (1.0f - lrcross.getValue()) + rout * lrcross.getValue();
+        float r = rout * (1.0f - lrcross.getValue()) + lout * lrcross.getValue();
+        lrcross.advanceValue();
         lout = l;
         rout = r;
-        efxoutl[i] = lout * 2.0f * level;
-        efxoutr[i] = rout * 2.0f * level;
+        efxoutl[i] = lout * 2.0f * lvl;
+        efxoutr[i] = rout * 2.0f * lvl;
     }
 }
 
@@ -127,13 +170,17 @@ void Distorsion::out(float *smpsl, float *smpsr)
 void Distorsion::setvolume(unsigned char Pvolume_)
 {
     Pvolume = Pvolume_;
+    float tmp = Pvolume / 127.0f;
     if(insertion == 0)
     {
-        outvolume = powf(0.01f, (1.0f - Pvolume / 127.0f)) * 4.0f;
-        volume = 1.0f;
+        outvolume.setTargetValue(powf(0.01f, (1.0f - tmp)) * 4.0f);
+        volume.setTargetValue(1.0f);
     }
     else
-         volume = outvolume = Pvolume / 127.0f;
+    {
+         volume.setTargetValue(tmp);
+         outvolume.setTargetValue(tmp);
+    }
     if (Pvolume == 0.0f)
         cleanup();
 }
@@ -142,40 +189,19 @@ void Distorsion::setvolume(unsigned char Pvolume_)
 void Distorsion::setlpf(unsigned char Plpf_)
 {
     Plpf = Plpf_;
-    float fr = expf(powf(Plpf / 127.0f, 0.5f) * logf(25000.0f)) + 40.0f;
-    lpfl->setfreq(fr);
-    lpfr->setfreq(fr);
+    lpffr.setTargetValue(expf(powf(Plpf / 127.0f, 0.5f) * logf(25000.0f)) + 40.0f);
 }
 
 
 void Distorsion::sethpf(unsigned char Phpf_)
 {
     Phpf = Phpf_;
-    float fr = expf(powf(Phpf / 127.0f, 0.5f) * logf(25000.0f)) + 20.0f;
-    hpfl->setfreq(fr);
-    hpfr->setfreq(fr);
+    hpffr.setTargetValue(expf(powf(Phpf / 127.0f, 0.5f) * logf(25000.0f)) + 20.0f);
 }
 
 
 void Distorsion::setpreset(unsigned char npreset)
 {
-    const int PRESET_SIZE = 11;
-    const int NUM_PRESETS = 6;
-    int presets[NUM_PRESETS][PRESET_SIZE] = {
-        // Overdrive 1
-        { 127, 64, 35, 56, 70, 0, 0, 96, 0, 0, 0 },
-        // Overdrive 2
-        { 127, 64, 35, 29, 75, 1, 0, 127, 0, 0, 0 },
-        // A. Exciter 1
-        { 64, 64, 35, 75, 80, 5, 0, 127, 105, 1, 0 },
-        // A. Exciter 2
-        { 64, 64, 35, 85, 62, 1, 0, 127, 118, 1, 0 },
-        // Guitar Amp
-        { 127, 64, 35, 63, 75, 2, 0, 55, 0, 0, 0 },
-        // Quantisize
-        { 127, 64, 35, 88, 75, 4, 0, 127, 0, 1, 0 }
-    };
-
     if (npreset < 0xf)
     {
         if (npreset >= NUM_PRESETS)
@@ -222,6 +248,7 @@ void Distorsion::changepar(int npar, unsigned char value)
 
         case 4:
             Plevel = value;
+            level.setTargetValue(Plevel / 127.0f);
             break;
 
         case 5:
@@ -275,4 +302,81 @@ unsigned char Distorsion::getpar(int npar)
         default: break;
     }
     return 0; // in case of bogus parameter number
+}
+
+
+float Distlimit::getlimits(CommandBlock *getData)
+{
+    int value = getData->data.value;
+    int control = getData->data.control;
+    int request = getData->data.type & 3; // clear upper bits
+    int npart = getData->data.part;
+    int presetNum = getData->data.engine;
+    int min = 0;
+    int max = 127;
+
+    int def = presets[presetNum][control];
+    bool canLearn = true;
+    bool isInteger = true;
+    switch (control)
+    {
+        case 0:
+            if (npart != 0xf1) // system effects
+                def /= 2;
+            break;
+        case 1:
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+        case 4:
+            break;
+        case 5:
+            max = 13;
+            canLearn = false;
+            break;
+        case 6:
+            max = 1;
+            canLearn = false;
+            break;
+        case 7:
+            break;
+        case 8:
+            break;
+        case 9:
+        case 10:
+            max = 1;
+            canLearn = false;
+            break;
+        case 16:
+            max = 5;
+            canLearn = false;
+            break;
+        default:
+            getData->data.type |= 4; // error
+            return 1.0f;
+            break;
+    }
+
+    switch(request)
+    {
+        case 0:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+            break;
+        case 1:
+            value = min;
+            break;
+        case 2:
+            value = max;
+            break;
+        case 3:
+            value = def;
+            break;
+    }
+    getData->data.type |= (canLearn * 64 + isInteger * 128);
+    return float(value);
 }

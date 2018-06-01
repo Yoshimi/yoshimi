@@ -2,13 +2,13 @@
 
 Before doing this, check the "Dependencies" file and make sure you have all of the entries in place.
 
-It's a CMake build.  Simply cd to the src directory, then
+It's a CMake build.  For 'quick & dirty' simply cd to the src directory, then
     ccmake .
     cmake .
     make
     sudo make install
 which builds an executable called yoshimi, installed by default in
-    /usr/local/bin.
+    /usr/local/bin
 
 If you have a multi-core processor, and know how many cores there are you can speed up compiling by entering
     make -j{n}
@@ -17,29 +17,31 @@ where {n} is the number of cores.
 
 ---- Sample instructions to compile/build using ccmake on Linux, outside-source-tree -----
 
-This uses "yoshimi-1.5.1" as an example, and should work fine with other versions.
+This uses "yoshimi-1.5.1" as an example, and should work fine with other versions. It is an easy way to build/compile using ccmake, in a separate build directory.  This way, changes to source code can be readily compared without combing through the build-related files.
 
-Here is an easy way to build/compile using ccmake, in a separate build directory.  This way, changes to source code can be readily compared without combing through the build-related files.
+We will assume you have a home directory called 'user' and want Yoshimi to reside in a directory called 'software', but downloaded the archive to /home/user/download.
 
-We will assume you have a home directory called 'user' and want Yoshimi to reside in a directory called 'software'.
-
-Extract source code archive:
+Working from a terminal window, extract source code archive:
 
     mkdir /home/user/software
-    cd    /home/user/software
-    tar -jxvf /home/user/software/yoshimi-1.5.1.tar.bz2
+    cd    /home/user/download
+    tar -jxvf /home/user/download/yoshimi-1.5.1.tar.bz2 -C/home/user/software
 
 Now there should be a directory:
 
    /home/user/software/yoshimi-1.5.1
 
-If this has a build directory inside, move into this directory:
+First move into this with:
 
-    cd yoshimi-1.5.1/build
+    cd /home/user/software/yoshimi-1.5.1
 
-Otherwise create it first with:
+Now create a 'build' directory with:
 
-    mkdir yoshimi-1.5.1/build
+    mkdir build
+
+and move into it with:
+
+    cd build
 
 "/home/user/software/yoshimi-1.5.1/src" is the source code directory.
 "/home/user/software/yoshimi-1.5.1/build" is now the current working directory, and will have make-related files (when ccmake is done with configuring and generates the files).

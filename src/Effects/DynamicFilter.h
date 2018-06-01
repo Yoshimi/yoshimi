@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified March 2011
+    This file is a derivative of a ZynAddSubFX original.
+
+    Modified February 2018
 */
 
 #ifndef DYNAMICFILTER_H
@@ -65,6 +68,12 @@ class DynamicFilter : public Effect
         float ms1, ms2, ms3, ms4; // mean squares
 
         SynthEngine *synth;
+};
+
+class Dynamlimit
+{
+    public:
+        float getlimits(CommandBlock *getData);
 };
 
 #endif

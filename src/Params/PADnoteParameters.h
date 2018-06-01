@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2017-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,8 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified August 2017
+    This file is a derivative of a ZynAddSubFX original.
+    Modified March 2018
 */
 
 #ifndef PAD_NOTE_PARAMETERS_H
@@ -52,7 +54,7 @@ class PADnoteParameters : public Presets
 
         void add2XML(XMLwrapper *xml);
         void getfromXML(XMLwrapper *xml);
-        void getLimits(CommandBlock *getData);
+        float getLimits(CommandBlock *getData);
         void postrender(void);
 
         //returns a value between 0.0-1.0 that represents the estimation
@@ -151,7 +153,7 @@ class PADnoteParameters : public Presets
         float setPbandwidth(int Pbandwidth); // returns the BandWidth in cents
         float getNhr(int n); // gets the n-th overtone position relatively to N harmonic
 
-        void applyparameters(bool islocked);
+        void applyparameters(void);
         bool export2wav(std::string basefilename);
 
         OscilGen *oscilgen;
@@ -170,14 +172,11 @@ class PADnoteParameters : public Presets
                                             int profilesize,
                                             float bwadjust);
         void generatespectrum_otherModes(float *spectrum, int size,
-                                         float basefreq,
-                                         float *profile, int profilesize,
-                                         float bwadjust);
+                                         float basefreq);
         void deletesamples(void);
         void deletesample(int n);
 
         FFTwrapper *fft;
-        //pthread_mutex_t *mutex;
 };
 
 #endif

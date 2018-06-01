@@ -1,6 +1,6 @@
 There are two commands that change the way Yoshimi responds to incoming MIDI so that only one of a group of instruments will get note-on events, but all of the group will see note-off ones. These are both in the Mixer Panel.
 
-The 'Solo' drop-down list enables the feature for either 'Row', 'Column' or 'Loop' mode and also makes the CC spinbox visible.
+The 'Solo' drop-down list enables the feature for either 'Row', 'Column', 'Loop'or Recoil mode and also makes the CC spinbox visible.
 
 For these modes, if you have a programmable MIDI controller you can set it up to activate a specific part, or to increment/decrement which part in the set is active.
 
@@ -13,6 +13,8 @@ In Row mode the whole of the first 16 parts are ostensibly receiving channel 1. 
 Although this uses all of the first 16 parts, you can set the number of parts to 32, and then you can use the 17+ row for normal 1 - 16 channels. Also, if you have vector control set up, Solo intelligently recognises the fact. For each one it finds, it will switch in/out the whole vector column appropriately.
 
 Loop mode is a variation of this, and if set then sending any value except zero from the designated CC will increment the active part number up to 16 and then loop round to number 1 again. Zero is ignored so that a simple foot switch can be used. Only the press gets registered not the release.
+
+Recoil is similar to Loop, except if it sees a value between 1 and 63 it decrements the active part, looping round to number 16.
 
 
 For running Solo in Column mode you need to have 32 or (preferably) 64 parts set, like this you can have up to 4 parts switched per channel - independently of any other channel. However, this works more like vector control in that you have to switch in steps of 16. For example, to control the channel 4 column you would send 4, 20, 36, 52 to select the wanted part. This is more appropriate for post recording MIDI automation.

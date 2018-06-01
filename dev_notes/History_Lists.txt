@@ -1,6 +1,7 @@
 
 Below are the ID numbers representing which history list is to be managed.
 
+1   InstrumentHistory   Individual externally sourced instruments
 2   ParamsHistory       Full instrument patch sets
 3   ScaleHistory        Complete microtonal settings
 4   StateHistory        Entire system state

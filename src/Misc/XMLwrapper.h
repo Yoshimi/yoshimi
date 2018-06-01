@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2017, Will Godfrey
+    Copyright 2014-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified December 2017
+    Modified April 2018
 */
 
 #ifndef XML_WRAPPER_H
@@ -53,6 +53,8 @@ class XMLwrapper : private MiscFuncs
         // the string is NULL terminated
         char *getXMLdata(void);
 
+
+        void addparU(const string& name, unsigned int val); // add unsigned uinteger parameter: name, value
 
         void addpar(const string& name, int val); // add simple parameter: name, value
         void addparreal(const string& name, float val);
@@ -98,6 +100,8 @@ class XMLwrapper : private MiscFuncs
         // it returns the parameter and limits it between min and max
         // if min==max==0, it will not limit it
         // if no parameter will be here, the defaultpar will be returned
+        unsigned int getparU(const string& name, unsigned int defaultpar, unsigned int min = 0, unsigned int max = 0xffffffff);
+
         int getpar(const string& name, int defaultpar, int min, int max);
 
         // the same as getpar, but the limits are 0 and 127
@@ -125,8 +129,8 @@ class XMLwrapper : private MiscFuncs
 
         // opens a file and parse only the "information" data on it
         // returns "true" if all went ok or "false" on errors
-        bool checkfileinformation(const string& filename);
-        bool slowinfosearch(char *xmldata);
+        void checkfileinformation(const string& filename);
+        void slowinfosearch(char *idx);
 
     private:
         char *doloadfile(const string& filename);

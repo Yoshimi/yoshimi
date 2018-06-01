@@ -11,7 +11,7 @@ comment {EffUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2016-2017, Will Godfrey & others
+Copyright 2016-2018, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -29,8 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-Modified October 2017
-} {in_source in_header
+Modified April 2018} {in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -479,7 +478,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
             o->value(eff->geteffectpar(butt));
         }
 
-        send_data(butt, o->value(), 1, 0xd0);}
+        send_data(butt, o->value(), 1, 0xd8);}
         tooltip Dampening xywh {340 40 30 30} box ROUND_UP_BOX labelsize 11 minimum 64 maximum 127 step 1
         code0 {o->init(-1);}
         code1 {o->setValueType(VC_percent64_127);}
@@ -1617,9 +1616,8 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
       } {
         Fl_Dial freqdial {
           label Freq
-          callback {//
-          int np=eqband*5+11;
-          send_data(np, o->value(), 7, 0xd8);}
+          callback {//;
+          send_data(11, o->value(), 7, 0xd8);}
           xywh {250 50 25 25} box ROUND_UP_BOX labelsize 10 when 3 maximum 127
           code0 {o->init(64);}
           code1 {o->setValueType(VC_FXEQfreq);}
@@ -1628,8 +1626,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         Fl_Dial gaindial {
           label Gain
           callback {//
-          int np=eqband*5+12;
-          send_data(np, o->value(), 7, 0xd8);}
+          send_data(12, o->value(), 7, 0xd8);}
           xywh {280 50 25 25} box ROUND_UP_BOX labelsize 10 when 3 maximum 127 step 1
           code0 {o->init(64);}
           code1 {o->setValueType(VC_FXEQfilterGain);}
@@ -1638,8 +1635,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         Fl_Dial qdial {
           label Q
           callback {//
-          int np=eqband*5+13;
-          send_data(np, o->value(), 7, 0xd8);}
+          send_data(13, o->value(), 7, 0xd8);}
           tooltip {Resonance/Bandwidth} xywh {310 50 25 25} box ROUND_UP_BOX labelsize 10 when 3 maximum 127
           code0 {o->init(64);}
           code1 {o->setValueType(VC_FXEQq);}
@@ -1648,8 +1644,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         Fl_Counter stagescounter {
           label {St.}
           callback {//
-          int np=eqband*5+14;
-          send_data(np, o->value(), 7, 0xd0);}
+          send_data(14, o->value(), 7, 0xd0);}
           tooltip {Additional filter stages} xywh {340 60 30 15} type Simple labelsize 10 minimum 1 maximum 127 step 1 textfont 1 textsize 11
           code0 {o->bounds(0,MAX_FILTER_STAGES-1);}
         }
@@ -1657,8 +1652,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
       Fl_Choice typechoice {
         label {T.}
         callback {//
-        int np = (eqband * 5) + 10;
-        send_data(np, o->value(), 7, 0xd0);}
+        send_data(10, o->value(), 7, 0xd0);}
         tooltip Type xywh {323 20 40 15} down_box BORDER_BOX labelsize 11 align 1 when 6 textsize 11
       } {
         MenuItem {} {
@@ -1711,13 +1705,13 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
   }
   Function {make_dynamicfilter_window()} {} {
     Fl_Window effdynamicfilterwindow {
-      xywh {1009 883 379 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {1009 883 375 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Choice dfp {
         label Preset
         callback {//
-        send_data(16, o->value(), 8, 0xd0);} open
+        send_data(16, o->value(), 8, 0xd0);}
         xywh {132 13 90 16} down_box BORDER_BOX color 14 selection_color 0 labelsize 10 textsize 10 textcolor 7
       } {
         MenuItem {} {
@@ -1749,7 +1743,10 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         label Vol
         callback {//
         if (Fl::event_button() == 3)
+        {
+            eff->changepreset(eff->getpreset() | 0xf0);
             o->value(eff->geteffectpar(0));
+        }
 
         send_data(0, o->value(), 8, 0xd8);}
         tooltip {Effect Volume} xywh {6 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
@@ -1761,7 +1758,10 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 1;
         if (Fl::event_button() == 3)
+        {
+            eff->changepreset(eff->getpreset() | (butt << 4));
             o->value(eff->geteffectpar(butt));
+        }
 
         send_data(butt, o->value(), 8, 0xd8);}
         xywh {42 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
@@ -1773,7 +1773,10 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 2;
         if (Fl::event_button() == 3)
+        {
+            eff->changepreset(eff->getpreset() | (butt << 4));
             o->value(eff->geteffectpar(butt));
+        }
 
         send_data(butt, o->value(), 8, 0xd8);}
         tooltip {LFO Frequency} xywh {80 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
@@ -1785,7 +1788,10 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 3;
         if (Fl::event_button() == 3)
+        {
+            eff->changepreset(eff->getpreset() | (butt << 4));
             o->value(eff->geteffectpar(butt));
+        }
 
         send_data(butt, o->value(), 8, 0xd8);}
         tooltip {LFO Randomness} xywh {118 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
@@ -1794,10 +1800,12 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
       }
       Fl_Dial dfp5 {
         label {St.df}
-        callback {
-        int butt = 5;
+        callback {int butt = 5;
         if (Fl::event_button() == 3)
+        {
+            eff->changepreset(eff->getpreset() | (butt << 4));
             o->value(eff->geteffectpar(butt));
+        }
 
         send_data(butt, o->value(), 8, 0xd8);}
         tooltip {Left/Right Channel Phase Shift} xywh {205 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
@@ -1806,10 +1814,12 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
       }
       Fl_Dial dfp6 {
         label LfoD
-        callback {
-        int butt = 6;
+        callback {int butt = 6;
         if (Fl::event_button() == 3)
+        {
+            eff->changepreset(eff->getpreset() | (butt << 4));
             o->value(eff->geteffectpar(butt));
+        }
 
         send_data(butt, o->value(), 8, 0xd8);}
         tooltip {LFO Depth} xywh {240 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
@@ -1841,10 +1851,12 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
       } {
         Fl_Dial dfp7 {
           label {A.S.}
-          callback {
-          int butt = 7;
+          callback {int butt = 7;
         if (Fl::event_button() == 3)
+        {
+            eff->changepreset(eff->getpreset() | (butt << 4));
             o->value(eff->geteffectpar(butt));
+        }
 
         send_data(butt, o->value(), 8, 0xd8);}
           tooltip {Filter vs Amplitude} xywh {280 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
@@ -1853,10 +1865,12 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         }
         Fl_Dial dfp9 {
           label {A.M}
-          callback {
-          int butt = 9;
+          callback {int butt = 9;
           if (Fl::event_button() == 3)
+          {
+              eff->changepreset(eff->getpreset() | (butt << 4));
               o->value(eff->geteffectpar(butt));
+          }
 
           send_data(butt, o->value(), 8, 0xd8);}
           tooltip {rate that  amplitude changes the filter} xywh {316 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
@@ -1881,7 +1895,6 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         label {DynFilter effect  - Filter} open
         xywh {5 5 275 75} box FLAT_BOX color 50 labelsize 12 align 144
         code0 {o->init(eff->filterpars,NULL,NULL, npart, 0x88, neff);}
-        code1 {o->use_for_dynamic_filter();}
         class FilterUI
       } {}
       Fl_Button {} {
@@ -2140,22 +2153,36 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                 eqband = value;
                 EQbandUpdate();
             }
-            else// if(eqband == (control - 10) / 5)
+            else
             {
-                switch ((control - 10) % 5)
+                switch (control)
                 {
-                case 0:
-                    synth->getRuntime().Log("EQ ");
-                    EQbandUpdate();
-                case 1:
+                case 10:
+                    typechoice->value(value);
+                    if (value == 0)
+                        bandgroup->deactivate();
+                    else
+                        bandgroup->activate();
+                    if (value > 2)
+                        qdial->activate();
+                    else
+                        qdial->deactivate();
+                    if (value > 6)
+                        gaindial->activate();
+                    else
+                        gaindial->deactivate();
+                    break;
+                case 11:
                     freqdial->value(value);
                     break;
-                case 2:
+                case 12:
                     gaindial->value(value);
                     break;
-                case 3:
+                case 13:
                     qdial->value(value);
                     break;
+                case 14:
+                    stagescounter->value(value);
                 }
             }
             effeqwindow->redraw();
@@ -2195,6 +2222,9 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                     break;
                 case 9:
                     dfp9->value(value);
+                    break;
+                case 16:
+                    refresh();
                     break;
             }
             break;

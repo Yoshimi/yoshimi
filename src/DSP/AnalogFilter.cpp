@@ -45,9 +45,9 @@ AnalogFilter::AnalogFilter(unsigned char Ftype, float Ffreq, float Fq, unsigned 
     if (stages >= MAX_FILTER_STAGES)
         stages = MAX_FILTER_STAGES;
     cleanup();
-    firsttime = 0;
+    firsttime = false;
     setfreq_and_q(Ffreq, Fq);
-    firsttime = 1;
+    firsttime = true;
     d[0] = 0; // this is not used
     outgain = 1.0f;
     tmpismp = (float*)fftwf_malloc(synth->bufferbytes);
@@ -69,7 +69,7 @@ void AnalogFilter::cleanup()
         oldx[i] = x[i];
         oldy[i] = y[i];
     }
-    needsinterpolation = 0;
+    needsinterpolation = false;
 }
 
 
@@ -317,25 +317,14 @@ void AnalogFilter::setfreq(float frequency)
 
     int nyquistthresh = (abovenq ^ oldabovenq);
 
-    if (rap > 3.0f || nyquistthresh != 0)
+    if (!firsttime && (rap > 3.0f || nyquistthresh != 0))
     {   // if the frequency is changed fast, it needs interpolation
         // (now, filter and coeficients backup)
-        for (int i = 0; i < 3; ++i)
-        {
-            oldc[i] = c[i];
-            oldd[i] = d[i];
-        }
-        for (int i = 0; i < MAX_FILTER_STAGES + 1; ++i)
-        {
-            oldx[i] = x[i];
-            oldy[i] = y[i];
-        }
-        if (firsttime == 0)
-            needsinterpolation = 1;
+        interpolatenextbuffer();
     }
     freq = frequency;
     computefiltercoefs();
-    firsttime = 0;
+    firsttime = false;
 }
 
 
@@ -376,13 +365,34 @@ void AnalogFilter::setstages(int stages_)
     computefiltercoefs();
 }
 
+void AnalogFilter::interpolatenextbuffer()
+{
+    if (needsinterpolation)
+        // Don't repeat the coefficient saving, because if interpolation was
+        // requested due to multiple parameters, some values may already have
+        // changed. The oldest coefficient are the correct ones, basically.
+        return;
+
+    for (int i = 0; i < 3; ++i)
+    {
+        oldc[i] = c[i];
+        oldd[i] = d[i];
+    }
+    for (int i = 0; i < MAX_FILTER_STAGES + 1; ++i)
+    {
+        oldx[i] = x[i];
+        oldy[i] = y[i];
+    }
+    needsinterpolation = true;
+}
+
 
 void AnalogFilter::singlefilterout(float *smp, fstage &x, fstage &y, float *c, float *d)
 {
     float y0;
     if (order == 1)
     {   // First order filter
-        for (int i = 0; i < synth->p_buffersize; ++i)
+        for (int i = 0; i < synth->sent_buffersize; ++i)
         {
             y0 = smp[i] * c[0] + x.c1 * c[1] + y.c1 * d[1];
             y.c1 = y0;
@@ -392,7 +402,7 @@ void AnalogFilter::singlefilterout(float *smp, fstage &x, fstage &y, float *c, f
     }
     if (order == 2)
     { // Second order filter
-        for (int i = 0; i < synth->p_buffersize; ++i)
+        for (int i = 0; i < synth->sent_buffersize; ++i)
         {
             y0 = smp[i] * c[0] + x.c1 * c[1] + x.c2 * c[2] + y.c1 * d[1] + y.c2 * d[2];
             y.c2 = y.c1;
@@ -407,9 +417,9 @@ void AnalogFilter::singlefilterout(float *smp, fstage &x, fstage &y, float *c, f
 
 void AnalogFilter::filterout(float *smp)
 {
-    if (needsinterpolation != 0)
+    if (needsinterpolation)
     {
-        memcpy(tmpismp, smp, synth->p_bufferbytes);
+        memcpy(tmpismp, smp, synth->sent_bufferbytes);
         for (int i = 0; i < stages + 1; ++i)
             singlefilterout(tmpismp, oldx[i], oldy[i], oldc, oldd);
     }
@@ -417,17 +427,17 @@ void AnalogFilter::filterout(float *smp)
     for (int i = 0; i < stages + 1; ++i)
         singlefilterout(smp, x[i], y[i], c, d);
 
-    if (needsinterpolation != 0)
+    if (needsinterpolation)
     {
-        for (int i = 0; i < synth->p_buffersize; ++i)
+        for (int i = 0; i < synth->sent_buffersize; ++i)
         {
-            float x = (float)i / synth->p_buffersize_f;
+            float x = (float)i / synth->sent_buffersize_f;
             smp[i] = tmpismp[i] * (1.0f - x) + smp[i] * x;
         }
-        needsinterpolation = 0;
+        needsinterpolation = false;
     }
 
-    for (int i = 0; i < synth->p_buffersize; ++i)
+    for (int i = 0; i < synth->sent_buffersize; ++i)
         smp[i] *= outgain;
 }
 

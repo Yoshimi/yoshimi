@@ -1,39 +1,51 @@
-Limits test can be accessed by directly calling synth->interchange.testLimits(&<data block>) with the standard CommandBlock struct.
+This structure is intended to enable you to traverse the controls structure testing/adjusting at each level on the tree.
 
-This is filled with a normal data block as if a command was being sent, however it has several forms.
+The function is called via the new 'read' function with a command block 'value' and 'type' set appropriately - see 'Reading_Values'. It returns a float representing the wanted element.
 
-*
-We may need to rethink all of this as some situations are now apparent where it isn't a good fit.
-*
+'type' is used to determine the operation.
 
-1st form: data.value = FLT_MAX
-From the command line enter 'direct' 'lim' control part kit etc.
+values (& 3) {these will not be changed}
+0   return 'value' input adjusted between max and min.
+1   return min
+2   return max
+3   return default
 
-This will return limits.min limits.max and limits.def values.
+flags
+bit 2   clear (set on entry to 'read', cleared for this)
+bit 3   set = from midi \
+bit 4   set = from cli   >  these three are exclusive.
+bit 5   set = from gui  /
+bit 6   (returns) set = MIDI-learnable
+bit 7   (returns) set = regard as integer
 
-limits.def returns the actual default * 10. This is so that fractional values can be resolved. 0.5 comes up quite often. However the printed CLI response will be the actual value. All of these values may be negative.
+Normal byte structure is used to determine how far down the tree to go for a value.
 
-'data.type' is returned with the read/write bit (0x40) set if this control is MIDI-learnable, and the float/integer bit (0x80) is correctly identified. All the other bits are returned as sent.
+e.g.
+      value  type & 3   command    part
+limit  200     0          0         240 {remainder all 255}
 
-The data block will be corrupted as these values are short integers in place of the normal bytes.
+This would return 127 - the input value adusted to the maximium for master volume.
 
-If the routine returns min > max, it is a text entry and def will be a miscMsg ID number.
+limit  any     3         255         0 {remainder all 255}
 
-If the routine returns min and max as -1 and def as - 10 the command has not been recognised at all.
+No command set so it returns 64 - the maximum number of ordinary parts.
 
+If an out of range setting is found part way along a command chain. 'value' will be set to the byte number where the error was encountered and 'type' bit 2 will be set (otherwise it will be cleared.
 
-2nd form: data.value >= FLT_MAX / 2 but < FLT_MAX
-From the CLI enter 'direct' 'def' control part etc.
+Numbers are:
+1   Control
+2   Part
+3   Kit
+4   Engine
+5   Insert
+6   Parameter
+7   Par2
 
-This will *set* data.value to the default for that command and (if called from the CLI) then passes on to the routine that performs the action.
+e.g
+'part' was set to 70 (invalid part number)
+'value' will be returned as 2
 
-Currently text can't be directly set to the default.
+'part' set to 3 (valid) but control set to 200 (no such control at this level)
+'value' will be returned as 1
 
-
-3rd form: data.value is a normal value entry
-From the CLI this is now automatically called for all routines using the new access method.
-
-This tests the offered value against the min and max values and adjusts it to those limits if necessary before passing it on (if called from the CLI).
-
-There are no practical tests for text entries.
-
+Other numbers may be added later to give finer grading.

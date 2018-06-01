@@ -1,7 +1,7 @@
 /*
     InterChange.h - General communications
 
-    Copyright 2016-2017 Will Godfrey
+    Copyright 2016-2018 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified October 2017
+    Modified May 2018
 */
 
 #ifndef INTERCH_H
@@ -44,7 +44,7 @@ class InterChange : private MiscFuncs
     public:
         InterChange(SynthEngine *_synth);
         ~InterChange();
-        bool Init(SynthEngine *_synth);
+        bool Init();
 
         CommandBlock commandData;
         size_t commandSize = sizeof(commandData);
@@ -62,11 +62,13 @@ class InterChange : private MiscFuncs
         void setpadparams(int point);
         void doClearPart(int npart);
         bool commandSend(CommandBlock *getData);
+        float readAllData(CommandBlock *getData);
         void resolveReplies(CommandBlock *getData);
         void testLimits(CommandBlock *getData);
-        void returnLimits(CommandBlock *getData);
-
+        float returnLimits(CommandBlock *getData);
+        unsigned char blockRead;
         void flagsWrite(unsigned int val){__sync_and_and_fetch(&flagsValue, val);}
+        unsigned int tick; // needs to be read by synth
 
     private:
         unsigned int flagsValue;
@@ -81,6 +83,7 @@ class InterChange : private MiscFuncs
         string resolveVector(CommandBlock *getData);
         string resolveMicrotonal(CommandBlock *getData);
         string resolveConfig(CommandBlock *getData);
+        string resolveBank(CommandBlock *getData);
         string resolveMain(CommandBlock *getData);
         string resolvePart(CommandBlock *getData);
         string resolveAdd(CommandBlock *getData);
@@ -94,8 +97,14 @@ class InterChange : private MiscFuncs
         string resolveEnvelope(CommandBlock *getData);
         string resolveEffects(CommandBlock *getData);
         bool showValue;
+        unsigned int lockTime;
+
+        unsigned int swapRoot1;
+        unsigned int swapBank1;
+        unsigned int swapInstrument1;
 
         void commandMidi(CommandBlock *getData);
+        void vectorClear(int Nvector);
         void commandVector(CommandBlock *getData);
         void commandMicrotonal(CommandBlock *getData);
         void commandConfig(CommandBlock *getData);

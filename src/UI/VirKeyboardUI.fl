@@ -12,7 +12,7 @@ comment {
 Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2014 -2017, Will Godfrey
+Copyright 2014 -2018, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of origional ZynAddSubFX code
 
-Modified November 2017
+Modified March 2018
 } {in_source in_header
 }
 
@@ -160,7 +160,7 @@ class VirKeys {: {public Fl_Box}
   }
   Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff)} {} {
     code {//
-    collect_data(synth, value, (Fl::event_button() | 0xc0), control, 217, kititem, engine);} {}
+    collect_data(synth, value, (Fl::event_button() | type), control, 217, kititem, engine);} {}
   }
   Function {handle(int event)} {return_type int
   } {
@@ -561,7 +561,7 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
   }
   Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff)} {} {
     code {//
-    collect_data(synth, value, (Fl::event_button() | 0xc0), control, 217, kititem, engine);} {}
+    collect_data(synth, value, (Fl::event_button() | type), control, 217, kititem, engine);} {}
   }
   Function {Show()} {} {
     code {//

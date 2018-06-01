@@ -1,0 +1,14 @@
+
+The first thing to keep in mind is that amplitude envelopes (particularly release time) set the point at which a note ceases. Frequency/filter envelopes can be shorter, so their effect stops part way, but if they are longer, the last part will be ineffective.
+
+Across all three engines, and kits (if kit mode is active) it is whichever is the longest that sets the overall time of the note, and you may well hear others stop if the times are sufficiently different.
+
+Also, within AddSynth itself, it is which ever voice has the longest envelope that sets the overall voice time, and if you set voices with very different characteristics you can hear the shorter ones finish before the overall sound stops. Bear in mind, that each voice can also have a start delay set, so you can get a late sound pickup that is then the last bit you hear, even if it's quite short. However, if the start time of one voice is after all the others have finished it will never sound.
+
+This sort of idea works best with 'Forced Release' disabled.
+
+An unexpected twist to this, is that taking the combined voice envelope time against the main AddSynth envelope, although attack and decay times follow the above pattern, it is which ever has the *shortest* release that sets the AddSynth time as a whole. This can really catch you out!
+
+With regard to the Modulator amplitude envelopes. They don't change the overall time, but if they are shorter than their voice length (or any voice that the modulator is slaved to) the modulation may end a bit strangely. If they are longer, then part of their action will be missed.
+
+Finally, there is what I believe to be a bug (that goes back to Zyn 2.2.1). If an AddSynth voice is enabled, it's amplitude envelope time is active, even if the envelope is apparently deactivated and not editable. Oh, and by default all the voice times are quite long, so again you could be puzzled as to why a sound is longer than you expected. Because this has always been there I don't propose to change it. To do so would quite likely alter many existing instrument patches, but do keep it in mind.

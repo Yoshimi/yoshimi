@@ -1,7 +1,7 @@
 /*
     MiscGui.cpp - common link between GUI and synth
 
-    Copyright 2016-2017 Will Godfrey & others
+    Copyright 2016-2018 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified November 2017
+    Modified April 2018
 */
 
 #include "Misc/SynthEngine.h"
@@ -34,8 +34,37 @@
 
 SynthEngine *synth;
 
+float collect_readData(SynthEngine *synth, float value, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2, unsigned char request)
+{
+    unsigned char type;
+    if (request < 4)
+        type = request | 4; // its a limit test
+    else
+        type = 0;
+    CommandBlock putData;
+
+    putData.data.value = value;
+    putData.data.type = type | 0x20; // = read from GUI
+    putData.data.control = control;
+    putData.data.part = part;
+    putData.data.kit = kititem;
+    putData.data.engine = engine;
+    putData.data.insert = insert;
+    putData.data.parameter = parameter;
+    putData.data.par2 = par2;
+    return synth->interchange.readAllData(&putData);
+}
+
 void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
+    if (part < NUM_MIDI_PARTS && engine == 2)
+    {
+        if (collect_readData(synth, 0, 252, part, 255, 255, 255, 255, 255))
+        {
+            fl_alert("Part %d is busy", int(part));
+            return;
+        }
+    }
     int typetop = type & 0xd0;
     if ( part == 0xf1 && insert == 0x10)
         type |= 8; // this is a hack :(
@@ -51,9 +80,9 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
                 // identifying this for button 3 as MIDI learn
                 else
                 {
-                    synth->getGuiMaster()->midilearnui->words->copy_label("Can't learn this control");
-                    synth->getGuiMaster()->midilearnui->message->show();
-                    synth->getGuiMaster()->midilearnui->message->position(Fl::event_x_root() + 16, Fl::event_y_root());
+                    synth->getGuiMaster()->words->copy_label("Can't learn this control");
+                    synth->getGuiMaster()->message->show();
+                    synth->getGuiMaster()->message->position(Fl::event_x_root() + 16, Fl::event_y_root());
                     synth->getRuntime().Log("Can't MIDI-learn this control");
                     /* can't use fl_alert here.
                      * For some reason it goes into a loop on spin boxes
@@ -87,7 +116,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
     if (jack_ringbuffer_write_space(synth->interchange.fromGUI) >= commandSize)
         jack_ringbuffer_write(synth->interchange.fromGUI, (char*) putData.bytes, commandSize);
     else
-        synth->getRuntime().Log("Unable to write to formGUI buffer.");
+        synth->getRuntime().Log("Unable to write to fromGUI buffer.");
 }
 
 
@@ -123,9 +152,9 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 
     if (control == 0xfe && insert != 9) // just show a messge
     {
-        synth->getGuiMaster()->midilearnui->words->copy_label(miscMsgPop(insertPar2).c_str());
-        synth->getGuiMaster()->midilearnui->cancel->hide();
-        synth->getGuiMaster()->midilearnui->message->show();
+        synth->getGuiMaster()->words->copy_label(miscMsgPop(insertPar2).c_str());
+        synth->getGuiMaster()->cancel->hide();
+        synth->getGuiMaster()->message->show();
         return;
     }
     if (npart == 0xe8) // scales
@@ -149,8 +178,13 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         return;
     }
 
-    Part *part;
-    part = synth->part[npart];
+    if (npart == 0xf4)
+    {
+        synth->getGuiMaster()->bankui->returns_update(getData);
+        return;
+    }
+
+    Part *part = synth->part[npart];
 
     if (kititem >= 0x80 && kititem != 0xff) // effects
     {
@@ -212,6 +246,11 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     if (kititem != 0xff && kititem != 0 && engine != 0xff && control != 8 && part->kit[kititem].Penabled == false)
         return; // attempt to access non existant kititem
 
+    if (insert < 0xff || (control != 8 && control != 222))
+    {
+        if (synth->getGuiMaster()->partui->partname == "Simple Sound")
+            synth->getGuiMaster()->partui->checkEngines("No Title");
+    }
     if (kititem == 0xff || insert == 0x20) // part
     {
         if (control != 58 && kititem < 0xff && part->Pkitmode == 0)

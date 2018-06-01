@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2016 Will Godfrey
+    Copyright 2016-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified June 2017
+    Modified March 2018
 */
 
 #ifndef MICROTONAL_H
@@ -48,6 +48,7 @@ class Microtonal : private MiscFuncs
         void defaults(void);
         float getNoteFreq(int note, int keyshift);
         float getFixedNoteFreq(int note);
+        float getLimits(CommandBlock *getData);
 
         // Parameters
         unsigned char Pinvertupdown;
@@ -91,6 +92,7 @@ class Microtonal : private MiscFuncs
 
     private:
         string reformatline(string text);
+        bool validline(const char *line);
         int linetotunings(unsigned int nline, const char *line);
         int loadline(FILE *file, char *line); // loads a line from the text file,
                                               // ignoring the lines beggining with "!"

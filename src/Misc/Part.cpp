@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009, James Morris
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2017, Will Godfrey
+    Copyright 2014-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified December 2017
+    Modified March 2018
 */
 
 #include <cstring>
@@ -58,10 +58,6 @@ Part::Part(Microtonal *microtonal_, FFTwrapper *fft_, SynthEngine *_synth) :
     memset(partoutl, 0, synth->bufferbytes);
     partoutr = (float*)fftwf_malloc(synth->bufferbytes);
     memset(partoutr, 0, synth->bufferbytes);
-    tmpoutl = (float*)fftwf_malloc(synth->bufferbytes);
-    memset(tmpoutl, 0, synth->bufferbytes);
-    tmpoutr = (float*)fftwf_malloc(synth->bufferbytes);
-    memset(tmpoutr, 0, synth->bufferbytes);
 
     for (int n = 0; n < NUM_KIT_ITEMS; ++n)
     {
@@ -131,8 +127,10 @@ void Part::defaults(void)
     Pveloffs = 64;
     Pkeylimit = 20;
     Pfrand = 0;
+    PbreathControl = 2;
     legatoFading = 0;
     setDestination(1);
+    busy = false;
     defaultsinstrument();
     ctl->resetall();
     setNoteMap(0);
@@ -198,8 +196,6 @@ void Part::cleanup(void)
         KillNotePos(k);
     memset(partoutl, 0, synth->bufferbytes);
     memset(partoutr, 0, synth->bufferbytes);
-    memset(tmpoutl, 0, synth->bufferbytes);
-    memset(tmpoutr, 0, synth->bufferbytes);
 
     for (int nefx = 0; nefx < NUM_PART_EFX; ++nefx)
         partefx[nefx]->cleanup();
@@ -227,8 +223,6 @@ Part::~Part()
     }
     fftwf_free(partoutl);
     fftwf_free(partoutr);
-    fftwf_free(tmpoutl);
-    fftwf_free(tmpoutr);
     for (int nefx = 0; nefx < NUM_PART_EFX; ++nefx)
     {
         if (partefx[nefx])
@@ -953,10 +947,12 @@ void Part::ComputePartSmps(void)
 {
     int k;
     int noteplay; // 0 if there is nothing activated
+    tmpoutl = synth->getRuntime().genMixl;
+    tmpoutr = synth->getRuntime().genMixr;
     for (int nefx = 0; nefx < NUM_PART_EFX + 1; ++nefx)
     {
-        memset(partfxinputl[nefx], 0, synth->p_bufferbytes);
-        memset(partfxinputr[nefx], 0, synth->p_bufferbytes);
+        memset(partfxinputl[nefx], 0, synth->sent_bufferbytes);
+        memset(partfxinputr[nefx], 0, synth->sent_bufferbytes);
     }
 
     for (k = 0; k < POLIPHONY; ++k)
@@ -977,21 +973,18 @@ void Part::ComputePartSmps(void)
             {
                 noteplay++;
                 if (adnote->ready)
-                    adnote->noteout(tmpoutl, tmpoutr);
-                else
                 {
-                    memset(tmpoutl, 0, synth->p_bufferbytes);
-                    memset(tmpoutr, 0, synth->p_bufferbytes);
+                    adnote->noteout(tmpoutl, tmpoutr);
+                    for (int i = 0; i < synth->sent_buffersize; ++i)
+                    {   // add the ADnote to part(mix)
+                        partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
+                        partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
+                    }
                 }
                 if (adnote->finished())
                 {
                     delete partnote[k].kititem[item].adnote;
                     partnote[k].kititem[item].adnote = NULL;
-                }
-                for (int i = 0; i < synth->p_buffersize; ++i)
-                {   // add the ADnote to part(mix)
-                    partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
-                    partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
                 }
             }
             // get from the SUBnote
@@ -999,16 +992,13 @@ void Part::ComputePartSmps(void)
             {
                 noteplay++;
                 if (subnote->ready)
-                    subnote->noteout(tmpoutl, tmpoutr);
-                else
                 {
-                    memset(tmpoutl, 0, synth->p_bufferbytes);
-                    memset(tmpoutr, 0, synth->p_bufferbytes);
-                }
-                for (int i = 0; i < synth->p_buffersize; ++i)
-                {   // add the SUBnote to part(mix)
-                    partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
-                    partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
+                    subnote->noteout(tmpoutl, tmpoutr);
+                    for (int i = 0; i < synth->sent_buffersize; ++i)
+                    {   // add the SUBnote to part(mix)
+                        partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
+                        partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
+                    }
                 }
                 if (subnote->finished())
                 {
@@ -1023,21 +1013,16 @@ void Part::ComputePartSmps(void)
                 if (padnote->ready)
                 {
                     padnote->noteout(tmpoutl, tmpoutr);
-                }
-                else
-                {
-                    memset(tmpoutl, 0, synth->p_bufferbytes);
-                    memset(tmpoutr, 0, synth->p_bufferbytes);
+                    for (int i = 0 ; i < synth->sent_buffersize; ++i)
+                    {   // add the PADnote to part(mix)
+                        partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
+                        partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
+                    }
                 }
                 if (padnote->finished())
                 {
                     delete partnote[k].kititem[item].padnote;
                     partnote[k].kititem[item].padnote = NULL;
-                }
-                for (int i = 0 ; i < synth->p_buffersize; ++i)
-                {   // add the PADnote to part(mix)
-                    partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
-                    partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
                 }
             }
         }
@@ -1063,7 +1048,7 @@ void Part::ComputePartSmps(void)
             partefx[nefx]->out(partfxinputl[nefx], partfxinputr[nefx]);
             if (Pefxroute[nefx] == 2)
             {
-                for (int i = 0; i < synth->p_buffersize; ++i)
+                for (int i = 0; i < synth->sent_buffersize; ++i)
                 {
                     partfxinputl[nefx + 1][i] += partefx[nefx]->efxoutl[i];
                     partfxinputr[nefx + 1][i] += partefx[nefx]->efxoutr[i];
@@ -1071,27 +1056,24 @@ void Part::ComputePartSmps(void)
             }
         }
         int routeto = (Pefxroute[nefx] == 0) ? nefx + 1 : NUM_PART_EFX;
-        for (int i = 0; i < synth->p_buffersize; ++i)
+        for (int i = 0; i < synth->sent_buffersize; ++i)
         {
             partfxinputl[routeto][i] += partfxinputl[nefx][i];
             partfxinputr[routeto][i] += partfxinputr[nefx][i];
         }
     }
-    memcpy(partoutl, partfxinputl[NUM_PART_EFX], synth->p_bufferbytes);
-    memcpy(partoutr, partfxinputr[NUM_PART_EFX], synth->p_bufferbytes);
+    memcpy(partoutl, partfxinputl[NUM_PART_EFX], synth->sent_bufferbytes);
+    memcpy(partoutr, partfxinputr[NUM_PART_EFX], synth->sent_bufferbytes);
 
     // Kill All Notes if killallnotes true
     if (killallnotes)
     {
-        for (int i = 0; i < synth->p_buffersize; ++i)
+        for (int i = 0; i < synth->sent_buffersize; ++i)
         {
-            float tmp = (synth->p_buffersize - i) / synth->p_buffersize_f;
+            float tmp = (synth->sent_buffersize - i) / synth->sent_buffersize_f;
             partoutl[i] *= tmp;
             partoutr[i] *= tmp;
         }
-        memset(tmpoutl, 0, synth->p_bufferbytes);
-        memset(tmpoutr, 0, synth->p_bufferbytes);
-
         for (int k = 0; k < POLIPHONY; ++k)
             KillNotePos(k);
         killallnotes = 0;
@@ -1293,6 +1275,7 @@ void Part::add2XML(XMLwrapper *xml, bool subset)
     {
         xml->addpar("key_mode", Pkeymode & 3);
         xml->addpar("random_detune", Pfrand);
+        xml->addparbool("breath_disable", PbreathControl != 2);
     }
     xml->endbranch();
 
@@ -1372,8 +1355,12 @@ int Part::loadXMLinstrument(string filename)
         Pfrand = xml->getpar127("random_detune", Pfrand);
         if (Pfrand > 50)
             Pfrand = 50;
+        PbreathControl = xml->getparbool("breath_disable", PbreathControl);
+        if (PbreathControl)
+            PbreathControl = 255; // impossible value
+        else
+            PbreathControl = 2;
     }
-    applyparameters();
     xml->exitbranch();
     if (xml->enterbranch("CONTROLLER"))
     {
@@ -1383,14 +1370,6 @@ int Part::loadXMLinstrument(string filename)
     xml->exitbranch();
     delete xml;
     return 1;
-}
-
-
-void Part::applyparameters(void)
-{
-    for (int n = 0; n < NUM_KIT_ITEMS; ++n)
-        if (kit[n].Ppadenabled && kit[n].padpars != NULL)
-            kit[n].padpars->applyparameters(true);
 }
 
 
@@ -1453,7 +1432,9 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
             kit[i].Ppadenabled = xml->getparbool("pad_enabled", kit[i].Ppadenabled);
             if (xml->enterbranch("PAD_SYNTH_PARAMETERS"))
             {
+                busy = true;
                 kit[i].padpars->getfromXML(xml);
+                busy = false;
                 xml->exitbranch();
             }
             xml->exitbranch();
@@ -1529,7 +1510,6 @@ void Part::getfromXML(XMLwrapper *xml)
         Pname = ""; // clear out any previous name
         getfromXMLinstrument(xml);
         xml->exitbranch();
-        applyparameters();
     }
     if (xml->enterbranch("CONTROLLER"))
     {
@@ -1539,29 +1519,30 @@ void Part::getfromXML(XMLwrapper *xml)
 }
 
 
-void Part::getLimits(CommandBlock *getData)
+float Part::getLimits(CommandBlock *getData)
 {
-    unsigned int type = getData->data.type;
+    float value = getData->data.value;
+    int request = int(getData->data.type & 3);
+
+    unsigned int type = (getData->data.type & 0xfc);
     int control = getData->data.control;
     int npart = getData->data.part;
 
     // defaults
     int min = 0;
-    int def = 640;
+    float def = 64;
     int max = 127;
-    //cout << "part control " << to_string(control) << endl;
+    //cout << "part control " << control << "  Request " << request << endl;
+
     if ((control >= 128 && control <= 168) || control == 224)
-    {
-        ctl->getLimits(getData);
-        return;
-    }
+        return ctl->getLimits(getData);
 
     switch (control)
     {
         case 0:
             type &= 0x3f;
             type |= 0x40;
-            def = 960;
+            def = 96;
             break;
 
         case 1:
@@ -1576,7 +1557,7 @@ void Part::getLimits(CommandBlock *getData)
 
         case 5:
             min = 1;
-            def = 10;
+            def = 1;
             max = 16;
             break;
 
@@ -1587,14 +1568,13 @@ void Part::getLimits(CommandBlock *getData)
 
         case 7:
             type |= 0x40;
-        case 57:
             def = 0;
             max = 1;
             break;
 
         case 8:
             if (npart == 0)
-                def = 10;
+                def = 1;
             else
                 def = 0;
             max = 1;
@@ -1610,7 +1590,7 @@ void Part::getLimits(CommandBlock *getData)
             break;
 
         case 17:
-            def = 1270;
+            def = 127;
             break;
 
         case 18:
@@ -1623,7 +1603,7 @@ void Part::getLimits(CommandBlock *getData)
             break;
 
         case 33:
-            def = 200;
+            def = 20;
             max = 60;
             break;
 
@@ -1646,24 +1626,34 @@ void Part::getLimits(CommandBlock *getData)
             max = 50;
             break;
 
+        case 57:
+            def = 0;
+            max = 1;
+            break;
+
         case 58:
             def = 0;
             max = 3;
             break;
         case 120:
             min = 1;
-            def = 10;
+            def = 1;
             max = 3;
             break;
 
         // the following are learnable MIDI controllers
+        case 128:
+            min = 64;
+            type |= 0x40;
+            break;
+
         case 130:
             max = 64;
             type |= 0x40;
             break;
 
         case 131:
-            def = 800;
+            def = 80;
             type |= 0x40;
             break;
 
@@ -1691,12 +1681,12 @@ void Part::getLimits(CommandBlock *getData)
             break;
 
         case 162:
-            def = 800;
+            def = 80;
             type |= 0x40;
             break;
 
         case 166:
-            def = 900;
+            def = 90;
             type |= 0x40;
             break;
 
@@ -1709,7 +1699,7 @@ void Part::getLimits(CommandBlock *getData)
 
         case 194:
             type |= 0x40;
-            def = 1270;
+            def = 127;
             break;
 
         // these haven't been done
@@ -1720,20 +1710,37 @@ void Part::getLimits(CommandBlock *getData)
         case 196:
             break;
 
-        case 255: // number of parts!
+        case 255: // number of parts
             min = 16;
-            def = 160;
+            def = 16;
             max = 64;
             break;
 
         default:
-            min = -1;
-            def = -10;
-            max = -1;
+            type |= 4; // error
             break;
     }
     getData->data.type = type;
-    getData->limits.min = min;
-    getData->limits.def = def;
-    getData->limits.max = max;
+    if (type & 4)
+        return 1;
+
+    switch (request)
+    {
+        case 0:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+        break;
+        case 1:
+            value = min;
+            break;
+        case 2:
+            value = max;
+            break;
+        case 3:
+            value = def;
+            break;
+    }
+    return value;
 }

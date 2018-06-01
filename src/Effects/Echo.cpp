@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,26 +20,40 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified March 2011
-*/
+    This file is derivative of ZynAddSubFX original code.
 
-#include <iostream>
+    Modified March 2018
+*/
 
 #include "Misc/SynthEngine.h"
 #include "Effects/Echo.h"
 
+static const int PRESET_SIZE = 7;
+static const int NUM_PRESETS = 9;
+static unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
+        { 67, 64, 35, 64, 30, 59, 0 },     // Echo 1
+        { 67, 64, 21, 64, 30, 59, 0 },     // Echo 2
+        { 67, 75, 60, 64, 30, 59, 10 },    // Echo 3
+        { 67, 60, 44, 64, 30, 0, 0 },      // Simple Echo
+        { 67, 60, 102, 50, 30, 82, 48 },   // Canyon
+        { 67, 64, 44, 17, 0, 82, 24 },     // Panning Echo 1
+        { 81, 60, 46, 118, 100, 68, 18 },  // Panning Echo 2
+        { 81, 60, 26, 100, 127, 67, 36 },  // Panning Echo 3
+        { 62, 64, 28, 64, 100, 90, 55 }    // Feedback Echo
+    };
+
 Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
-    Pvolume(50),
     Pdelay(60),
     Plrdelay(100),
-    Pfb(40),
-    Phidamp(60),
     lrdelay(0),
     ldelay(NULL),
     rdelay(NULL),
     synth(_synth)
 {
+    setvolume(50);
+    setfb(40);
+    sethidamp(60);
     setpreset(Ppreset);
     changepar(4, 30); // lrcross
     cleanup();
@@ -89,24 +104,27 @@ void Echo::out(float* smpsl, float* smpsr)
     float l, r;
     float ldl = ldelay[kl];
     float rdl = rdelay[kr];
-    for (int i = 0; i < synth->p_buffersize; ++i)
+    for (int i = 0; i < synth->sent_buffersize; ++i)
     {
         ldl = ldelay[kl];
         rdl = rdelay[kr];
-        l = ldl * (1.0 - lrcross) + rdl * lrcross;
-        r = rdl * (1.0 - lrcross) + ldl * lrcross;
+        l = ldl * (1.0 - lrcross.getValue()) + rdl * lrcross.getValue();
+        r = rdl * (1.0 - lrcross.getValue()) + ldl * lrcross.getValue();
+        lrcross.advanceValue();
         ldl = l;
         rdl = r;
 
         efxoutl[i] = ldl * 2.0f - 1e-20f; // anti-denormal - a very, very, very
         efxoutr[i] = rdl * 2.0f - 1e-20f; // small dc bias
 
-        ldl = smpsl[i] * pangainL - ldl * fb;
-        rdl = smpsr[i] * pangainR - rdl * fb;
+        ldl = smpsl[i] * pangainL.getAndAdvanceValue() - ldl * fb.getValue();
+        rdl = smpsr[i] * pangainR.getAndAdvanceValue() - rdl * fb.getValue();
+        fb.advanceValue();
 
         // LowPass Filter
-        ldelay[kl] = ldl = ldl * hidamp + oldl * (1.0f - hidamp);
-        rdelay[kr] = rdl = rdl * hidamp + oldr * (1.0f - hidamp);
+        ldelay[kl] = ldl = ldl * hidamp.getValue() + oldl * (1.0f - hidamp.getValue());
+        rdelay[kr] = rdl = rdl * hidamp.getValue() + oldr * (1.0f - hidamp.getValue());
+        hidamp.advanceValue();
         oldl = ldl;
         oldr = rdl;
 
@@ -124,11 +142,15 @@ void Echo::setvolume(unsigned char Pvolume_)
     Pvolume = Pvolume_;
     if (insertion == 0)
     {
-        outvolume = powf(0.01f, (1.0f - Pvolume / 127.0f)) * 4.0f;
-        volume = 1.0f;
+        outvolume.setTargetValue(powf(0.01f, (1.0f - Pvolume / 127.0f)) * 4.0f);
+        volume.setTargetValue(1.0f);
     }
     else
-        volume = outvolume = Pvolume / 127.0f;
+    {
+        float tmp = Pvolume / 127.0f;
+        volume.setTargetValue(tmp);
+        outvolume.setTargetValue(tmp);
+    }
     if (Pvolume == 0)
         cleanup();
 }
@@ -157,34 +179,19 @@ void Echo::setlrdelay(unsigned char Plrdelay_)
 void Echo::setfb(unsigned char Pfb_)
 {
     Pfb = Pfb_;
-    fb = Pfb / 128.0f;
+    fb.setTargetValue(Pfb / 128.0f);
 }
 
 
 void Echo::sethidamp(unsigned char Phidamp_)
 {
     Phidamp = Phidamp_;
-    hidamp = 1.0 - Phidamp / 127.0f;
+    hidamp.setTargetValue(1.0 - Phidamp / 127.0f);
 }
 
 
 void Echo::setpreset(unsigned char npreset)
 {
-    const int PRESET_SIZE = 7;
-    const int NUM_PRESETS = 9;
-    unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
-
-        { 67, 64, 35, 64, 30, 59, 0 },     // Echo 1
-        { 67, 64, 21, 64, 30, 59, 0 },     // Echo 2
-        { 67, 75, 60, 64, 30, 59, 10 },    // Echo 3
-        { 67, 60, 44, 64, 30, 0, 0 },      // Simple Echo
-        { 67, 60, 102, 50, 30, 82, 48 },   // Canyon
-        { 67, 64, 44, 17, 0, 82, 24 },     // Panning Echo 1
-        { 81, 60, 46, 118, 100, 68, 18 },  // Panning Echo 2
-        { 81, 60, 26, 100, 127, 67, 36 },  // Panning Echo 3
-        { 62, 64, 28, 64, 100, 90, 55 }    // Feedback Echo
-    };
-
     if (npreset < 0xf)
     {
         if (npreset >= NUM_PRESETS)
@@ -257,4 +264,68 @@ unsigned char Echo::getpar(int npar)
         default: break;
     }
     return 0; // in case of bogus parameter number
+}
+
+
+float Echolimit::getlimits(CommandBlock *getData)
+{
+    int value = getData->data.value;
+    int control = getData->data.control;
+    int request = getData->data.type & 3; // clear upper bits
+    int npart = getData->data.part;
+    int presetNum = getData->data.engine;
+    int min = 0;
+    int max = 127;
+
+    int def = presets[presetNum][control];
+    bool canLearn = true;
+    bool isInteger = true;
+    switch (control)
+    {
+        case 0:
+            if (npart != 0xf1) // system effects
+                def /= 2;
+            break;
+        case 1:
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+        case 4:
+            break;
+        case 5:
+            break;
+        case 6:
+            break;
+        case 16:
+            max = 8;
+            canLearn = false;
+            break;
+        default:
+            getData->data.type |= 4; // error
+            return 1.0f;
+            break;
+    }
+
+    switch(request)
+    {
+        case 0:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+            break;
+        case 1:
+            value = min;
+            break;
+        case 2:
+            value = max;
+            break;
+        case 3:
+            value = def;
+            break;
+    }
+    getData->data.type |= (canLearn * 64 + isInteger * 128);
+    return float(value);
 }

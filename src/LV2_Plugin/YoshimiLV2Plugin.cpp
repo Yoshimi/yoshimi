@@ -2,7 +2,7 @@
     YoshimiLV2Plugin
 
     Copyright 2014, Andrew Deryabin <andrewderyabin@gmail.com>
-    Copyright 2016-2017, Will Godfrey & others.
+    Copyright 2016-2018, Will Godfrey & others.
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,12 +17,12 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified September 2017
+    Modified May 2018
 */
 
 #include "YoshimiLV2Plugin.h"
 #include "Misc/Config.h"
-#include "Misc/ConfBuild.cpp"
+#include "Misc/ConfBuild.h"
 #include "Misc/SynthEngine.h"
 #include "Interface/InterChange.h"
 #include "Interface/MidiDecode.h"
@@ -50,6 +50,8 @@
 #define YOSHIMI_LV2_OPTIONS__options         YOSHIMI_LV2_OPTIONS_PREFIX "options"
 
 #define YOSHIMI_LV2_STATE__StateChanged      "http://lv2plug.in/ns/ext/state#StateChanged"
+
+extern SynthEngine *firstSynth;
 
 typedef enum {
     LV2_OPTIONS_INSTANCE,
@@ -105,8 +107,17 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     {
         return;
     }
-    synth->p_all_buffersize_f = min(sample_count, (uint32_t)synth->buffersize);
-    int real_sample_count = sample_count;//min(sample_count, _bufferSize);
+    synth->sent_all_buffersize_f = min(sample_count, (uint32_t)synth->buffersize);
+    /*
+     * The line above seems to cause problems with envelopes
+     * in Carla.
+     * It has been commented out and investigation is ongoing
+     * to ensure it's removal doesn't cause other problems.
+     */
+
+    int real_sample_count = sample_count;
+    //int real_sample_count = min(sample_count, _bufferSize);
+    // not sure which of the above two is the best :(
     int offs = 0;
     int next_frame = 0;
     int processed = 0;
@@ -209,7 +220,6 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     else if(aSeq)
     {
         aSeq->atom.size = sizeof(LV2_Atom_Sequence_Body);
-
     }
 
 }
@@ -336,9 +346,15 @@ bool YoshimiLV2Plugin::init()
     if (!prepBuffers())
         return false;
 
-    if(!_synth->Init(_sampleRate, _bufferSize)) {
+    if(!_synth->Init(_sampleRate, _bufferSize))
+    {
         synth->getRuntime().LogError("Can't init synth engine");
 	return false;
+    }
+    if (_synth->getUniqueId() == 0)
+    {
+        firstSynth = _synth;
+        //firstSynth->getRuntime().Log("Started first");
     }
 
     _synth->getRuntime().showGui = false;
@@ -485,6 +501,11 @@ const void *YoshimiLV2Plugin::extension_data(const char *uri)
 
 LV2_State_Status YoshimiLV2Plugin::stateSave(LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, const LV2_Feature * const *features)
 {
+    uint32_t a = flags; flags = a;
+    const LV2_Feature * const *feat = features;
+    features = feat;
+    // suppress warnings - may use later
+
     char *data = NULL;
     int sz = _synth->getalldata(&data);
 
@@ -496,6 +517,11 @@ LV2_State_Status YoshimiLV2Plugin::stateSave(LV2_State_Store_Function store, LV2
 
 LV2_State_Status YoshimiLV2Plugin::stateRestore(LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature * const *features)
 {
+    uint32_t a = flags; flags = a;
+    const LV2_Feature * const *feat = features;
+    features = feat;
+    // lines above suppress warnings - may use later
+
     size_t sz = 0;
     LV2_URID type = 0;
     uint32_t new_flags;
@@ -674,6 +700,12 @@ bool YoshimiLV2PluginUI::init()
 
 LV2UI_Handle YoshimiLV2PluginUI::instantiate(const _LV2UI_Descriptor *descriptor, const char *plugin_uri, const char *bundle_path, LV2UI_Write_Function write_function, LV2UI_Controller controller, LV2UI_Widget *widget, const LV2_Feature * const *features)
 {
+    const _LV2UI_Descriptor *desc = descriptor;
+    descriptor = desc;
+    const char *plug = plugin_uri;
+    plugin_uri = plug;
+    // lines above suppress warnings - may use later
+
     YoshimiLV2PluginUI *uiinst = new YoshimiLV2PluginUI(bundle_path, write_function, controller, widget, features);
     if (uiinst->init())
     {
@@ -811,9 +843,9 @@ extern "C" const LV2UI_Descriptor* lv2ui_descriptor(uint32_t index)
 }
 
 
-bool mainCreateNewInstance(unsigned int) //stub
+int mainCreateNewInstance(unsigned int, bool) //stub
 {
-    return true;
+    return 0;
 }
 
 

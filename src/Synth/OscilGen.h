@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2017 Will Godfrey & others.
+    Copyright 2017-2018 Will Godfrey & others.
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified October 2017
+    Modified March 2018
 */
 
 #ifndef OSCIL_GEN_H
@@ -62,8 +62,8 @@ class OscilGen : public Presets, private WaveShapeSamples
         void add2XML(XMLwrapper *xml);
         void defaults(void);
         void getfromXML(XMLwrapper *xml);
-        void getLimits(CommandBlock *getData);
-        void convert2sine(int magtype);
+        float getLimits(CommandBlock *getData);
+        void convert2sine();
 
         // Make a new random seed for Amplitude Randomness -
         //   should be called every noteon event

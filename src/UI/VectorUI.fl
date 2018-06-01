@@ -2,7 +2,7 @@
 version 1.0304
 header_name {.h}
 code_name {.cc}
-comment {Copyright 2016-2017, Will Godfrey
+comment {Copyright 2016-2018, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -17,8 +17,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-Modified November 2017
-} {in_source in_header
+Modified April 2018
+} {selected in_source in_header
 }
 
 decl {using namespace std;} {public local
@@ -42,7 +42,7 @@ decl {\#include "BankUI.h"} {public local
 decl {\#include "ParametersUI.h"} {public local
 }
 
-class VectorUI {selected : {private MiscFuncs}
+class VectorUI {: {private MiscFuncs}
 } {
   Function {make_window(void)} {} {
     Fl_Window vectorwindow {
@@ -133,7 +133,7 @@ class VectorUI {selected : {private MiscFuncs}
         }
       }
       Fl_Group Xgroup {
-        label X
+        label X open
         xywh {8 42 360 104} box PLASTIC_THIN_UP_BOX color 221 labelfont 1 labelsize 16 align 0 deactivate
       } {
         Fl_Box AddBackL {
@@ -150,6 +150,7 @@ class VectorUI {selected : {private MiscFuncs}
         }
         Fl_Button XL {
           callback {//
+          Fl_Button *a = o; o = a; // suppress warning
           synth->getGuiMaster()->npart = BaseChan;
           bankui->Show();
           //send_data(17, o->value(), 0xf0);}
@@ -169,6 +170,7 @@ class VectorUI {selected : {private MiscFuncs}
         }
         Fl_Button XR {
           callback {//
+          Fl_Button *a = o; o = a; // suppress warning
           synth->getGuiMaster()->npart = BaseChan + NUM_MIDI_CHANNELS;
           bankui->Show();
           //send_data(18, o->value(), 0xf0);}
@@ -290,7 +292,6 @@ class VectorUI {selected : {private MiscFuncs}
         {
             Xcc = 0;
             send_data(96, 0, 0xf0, 192, 255, 255, BaseChan);
-            o->value(0);
             return;
         }
 
@@ -302,8 +303,7 @@ class VectorUI {selected : {private MiscFuncs}
         }
 
         Xcc =  tmp;
-        o->value(tmp);
-        send_data(16, o->value(), 0xd0);}
+        send_data(16, tmp, 0xd0);}
         tooltip {The MIDI CC this axis reponds to} xywh {110 85 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12
         code0 {//
         o->value(Xcc);}
@@ -332,6 +332,7 @@ class VectorUI {selected : {private MiscFuncs}
         }
         Fl_Button YU {
           callback {//
+          Fl_Button *a = o; o = a; // suppress warning
           synth->getGuiMaster()->npart = BaseChan + NUM_MIDI_CHANNELS * 2;
           bankui->Show();
           //send_data(33, o->value(), 0xc0);}
@@ -351,6 +352,7 @@ class VectorUI {selected : {private MiscFuncs}
         }
         Fl_Button YD {
           callback {//
+          Fl_Button *a = o; o = a; // suppress warning
           synth->getGuiMaster()->npart = BaseChan + NUM_MIDI_CHANNELS * 3;
           bankui->Show();
           //send_data(34, o->value(), 0xc0);}
@@ -472,7 +474,6 @@ class VectorUI {selected : {private MiscFuncs}
         {
             Ycc = 0;
             send_data(32, 0xff, 0xd0);
-            o->value(0);
             return;
         }
 
@@ -484,22 +485,18 @@ class VectorUI {selected : {private MiscFuncs}
         }
 
         Ycc =  tmp;
-        o->value(tmp);
-        send_data(32, o->value(), 0xd0);}
+        send_data(32, tmp, 0xd0);}
         tooltip {The MIDI CC this axis reponds to} xywh {110 195 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12 deactivate
         code0 {o->value(Ycc);}
       }
       Fl_Button Loaded {
         label {No Name}
         callback {//
+        Fl_Button *a = o; o = a; // suppress warning
         const char *tmp = NULL;
         tmp = fl_input("Vector name:", loadlabel[BaseChan].c_str());
         if (tmp != NULL && !string(tmp).empty())
-        {
-            o->copy_label(tmp);
-            loadlabel[BaseChan]  = string(tmp);
-            send_data(8, 0, 0xc0, 192, 255, 255, BaseChan, 128, miscMsgPush(string(tmp)));
-        }}
+            send_data(8, 0, 0xd0, 192, 255, 255, BaseChan, 128, miscMsgPush(string(tmp)));}
         tooltip {Last saved or loaded vector file - click to change} xywh {45 265 198 20} box THIN_DOWN_BOX labelfont 1 labelsize 12
       }
     }
@@ -538,19 +535,24 @@ class VectorUI {selected : {private MiscFuncs}
             }
             if (value_int < 14 || value_int > 119)
             {
-                Ycontrol->value(0);
+                Xcc = 0;
                 Ycc = 0;
-                Ygroup->deactivate();
-                Ycontrol->deactivate();
                 Xgroup->deactivate();
                 Xcontrol->value(0);
-                Xcc= 0;
+                Ycontrol->value(0);
+                Ygroup->deactivate();
+                Ycontrol->deactivate();
+                Xcontrol->redraw();
+                Ycontrol->redraw();
             }
             else
             {
                 Xgroup->activate();
-                Ycontrol->activate();
                 Xcontrol->value(value_int);
+                Xcontrol->redraw();
+                Ycontrol->activate();
+                Xcontrol->redraw();
+                Ycontrol->redraw();
             }
             break;
 
@@ -579,12 +581,16 @@ class VectorUI {selected : {private MiscFuncs}
             {
                 Ygroup->deactivate();
                 Ycontrol->value(0);
+                Ycontrol->damage(1);
+                Ycontrol->redraw();
                 Ycc = 0;
             }
             else
             {
                 Ygroup->activate();
                 Ycontrol->value(value_int);
+                Ycontrol->damage(1);
+                Ycontrol->redraw();
             }
             break;
 
@@ -925,11 +931,26 @@ class VectorUI {selected : {private MiscFuncs}
      Ycontrol->deactivate();
      Ycontrol->value(0);} {}
   }
+  Function {checkParts(int nval)} {} {
+    code {//
+for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
+{
+    if(nval > NUM_MIDI_CHANNELS * 3)
+        Ygroup->activate();
+    else
+        Ygroup->deactivate();
+
+    if(nval > NUM_MIDI_CHANNELS)
+        Xgroup->activate();
+    else
+        Xgroup->deactivate();
+}} {}
+  }
   Function {errorlabel(string msg)} {} {
     code {//
-            synth->getGuiMaster()->midilearnui->words->copy_label(msg.c_str());
-            synth->getGuiMaster()->midilearnui->message->show();
-            synth->getGuiMaster()->midilearnui->message->position(Fl::event_x_root() + 16, Fl::event_y_root());} {}
+            synth->getGuiMaster()->words->copy_label(msg.c_str());
+            synth->getGuiMaster()->message->show();
+            synth->getGuiMaster()->message->position(Fl::event_x_root() + 16, Fl::event_y_root());} {}
   }
   decl {SynthEngine *synth;} {private local
   }

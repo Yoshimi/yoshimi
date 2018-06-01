@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified January 2011
+    This file is derivative of ZynAddSubFX original code.
+
+    Modified March 2018
 */
 
 #ifndef PRESETS_H
@@ -51,12 +54,12 @@ class Presets
         void setpresettype(const char *type);
 
     private:
-        virtual void add2XML(XMLwrapper *xml) = 0;
-        virtual void getfromXML(XMLwrapper *xml) = 0;
+        virtual void add2XML(XMLwrapper * /* xml */) = 0;
+        virtual void getfromXML(XMLwrapper * /* xml */) = 0;
         virtual void defaults(void) = 0;
-        virtual void add2XMLsection(XMLwrapper *xml, int n) { }
-        virtual void getfromXMLsection(XMLwrapper *xml, int n) { }
-        virtual void defaults(int n) { }
+        virtual void add2XMLsection(XMLwrapper * /* xml */, int /* n */) { }
+        virtual void getfromXMLsection(XMLwrapper * /* xml */, int /* n */) { }
+        virtual void defaults(int /* n */) { }
         int nelement;
 
     protected:

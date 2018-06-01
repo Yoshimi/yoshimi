@@ -2,7 +2,7 @@
     AlsaEngine.h
 
     Copyright 2009-2010, Alan Calvert
-    Copyright 2014-2017, Will Godfrey & others
+    Copyright 2014-2018, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified January 2017
+    Modified May 2018
 */
 
 #if defined(HAVE_ALSA)
@@ -32,8 +32,6 @@
 using namespace std;
 
 #include "MusicIO/MusicIO.h"
-
-//extern list<string> splashMessages;
 
 class SynthEngine;
 

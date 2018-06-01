@@ -1,26 +1,34 @@
 
-Sometimes can't edit upper voice rows from panel
+BUG! Multi instances produce jack errors if have been opened when main instance closed - been there since V 1.4.1 :(
 
-pasting effect doesn't update effect title.
+BUG! If jack is selected for audio but there are no physical ports Yoshimi quits with CLI warning - should run with gui warning as well, or better still loop back to try alsa.
+
+Realtime subnote
+
+Zero-cross for note off.
+
+Add 'Lock AddSynth Oscillator' checkbox to settings.
+
+Edit button
++1 to 8 open addsynth voice window - could be 'interesting' :(
+
+Requested: auto 'apply' timer for padsynth.
+
+Do a dual scan for banks so that IDd ones are found first, then any new ones picked up on the second scan. This stops known ones being re-ordered when 'foreign' entries appear from outside Yoshimi.
+
+Pasting effect doesn't update effect title.
 
 Requested: revise window states so engines etc can be made auto open.
 
-Do a dual scan for banks so that IDd ones are found first, then any new ones picked up on the second scan. This stops known ones being re-ordered.
-
 NRPN channels?
 
-Expand midi-learn to include:
-    more switches
+Expand MIDI-learn to include:
     learn groups
     GUI view by group but CLI and running search only by CC & chan
 
-Make NRPN midi learn able to be re-learned.
+Make NRPN MIDI-learn able to be re-learned.
 
 LV2: internal sound banks do not appear to be exposed as LV2 presets
-
-Make add voice & add/pad oscillator and resonance windows show kit number & name.
-
-Make vector window update when main window reduces number of available parts.
 
 Consider, Pitchwheel split range in Controllers, but that one seems a bit pointless to me!
 
@@ -37,8 +45,6 @@ Make things like Echo delay either floats or much higher resolution.
 Consider enabling and disabling tooltips.
 
 Make attempt to start second independent instance open a new one in running yoshimi instead - saves memory and more consistent.
-
-Possible single state file (for standalone) including all currently open instances,
 
 RPNs (channel based)
 

@@ -2,7 +2,7 @@
     MiscFuncs.cpp
 
     Copyright 2010, Alan Calvert
-    Copyright 2014-2017, Will Godfrey
+    Copyright 2014-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,8 +17,10 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>
 
-    Modifed October 2017
+    Modifed May 2018
 */
+
+//#define REPORT_MISCMSG
 
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -27,6 +29,7 @@
 #include <unistd.h>
 #include <sstream>
 #include <iostream>
+#include <fstream>
 #include <string.h>
 #include <mutex>
 #include <limits.h>
@@ -185,7 +188,7 @@ unsigned int MiscFuncs::string2uint(string str)
 bool MiscFuncs::isRegFile(string chkpath)
 {
     struct stat st;
-    if (!lstat(chkpath.c_str(), &st))
+    if (!stat(chkpath.c_str(), &st))
         if (S_ISREG(st.st_mode))
             return true;
     return false;
@@ -195,7 +198,7 @@ bool MiscFuncs::isRegFile(string chkpath)
 bool MiscFuncs::isDirectory(string chkpath)
 {
     struct stat st;
-    if (!lstat(chkpath.c_str(), &st))
+    if (!stat(chkpath.c_str(), &st))
         if (S_ISDIR(st.st_mode))
             return true;
     return false;
@@ -205,7 +208,7 @@ bool MiscFuncs::isDirectory(string chkpath)
 bool MiscFuncs::isFifo(string chkpath)
 {
     struct stat st;
-    if (!lstat(chkpath.c_str(), &st))
+    if (!stat(chkpath.c_str(), &st))
         if (S_ISFIFO(st.st_mode))
             return true;
     return false;
@@ -245,15 +248,22 @@ void MiscFuncs::legit_pathname(string& fname)
     }
 }
 
-
+/*
+ * This only intended for calls on the local filesystem
+ * and to known locations, so buffer size should be adequate
+ * and avoids dependency on unreliable macros.
+ */
 string MiscFuncs::findfile(string path, string filename, string extension)
 {
-    string command = "find " + path + " -name " + filename + "." + extension + " 2>/dev/null -print -quit";
-#warning Using '2>/dev/null' here suppresses *all* error messages
+    if (extension.at(0) != '.')
+        extension = "." + extension;
+    string command = "find " + path + " -name " + filename + extension + " 2>/dev/null -print -quit";
+#pragma message "Using '2>/dev/null' here suppresses *all* error messages"
+    // it's done here to suppress warnings of invalid locations
     FILE *fp = popen(command.c_str(), "r");
     if (fp == NULL)
         return "";
-    char line[1000];
+    char line[1024];
     fscanf(fp,"%[^\n]", line);
     pclose(fp);
 
@@ -292,7 +302,8 @@ int MiscFuncs::findSplitPoint(string name)
 // adds or replaces wrong extension with the right one.
 string MiscFuncs::setExtension(string fname, string ext)
 {
-
+    if (ext.at(0) != '.')
+        ext = "." + ext;
     string tmp;                         // return value
     size_t ext_pos = fname.rfind('.');  // period, if any
     size_t slash_pos = fname.rfind('/'); // UNIX path-separator
@@ -307,14 +318,14 @@ string MiscFuncs::setExtension(string fname, string ext)
             // There is no period, therefore there is no extension.
             // Append the extension.
 
-            tmp = fname + "." + ext;
+            tmp = fname + ext;
         }
         else
         {
             // Replace everything after the last period.
 
             tmp = fname.substr(0, ext_pos);
-            tmp += "." + ext;
+            tmp += ext;
         }
     }
     else
@@ -323,31 +334,88 @@ string MiscFuncs::setExtension(string fname, string ext)
         // Add the whole extension.  Otherwise, replace the extension.
 
         if (slash_pos > ext_pos)
-            tmp = fname + "." + ext;
+            tmp = fname + ext;
         else
         {
             tmp = fname.substr(0, ext_pos);
-            tmp += "." + ext;
+            tmp += ext;
         }
     }
     return tmp;
 }
 
 
-// replace 'src' with a different one in the compilation directory
+bool MiscFuncs::copyFile(string source, string destination)
+{
+    ifstream infile (source, ios::in|ios::binary|ios::ate);
+    if (!infile.is_open())
+        return 1;
+    ofstream outfile (destination, ios::out|ios::binary);
+    if (!outfile.is_open())
+        return 1;
+
+    streampos size = infile.tellg();
+    char *memblock = new char [size];
+    infile.seekg (0, ios::beg);
+    infile.read(memblock, size);
+    infile.close();
+    outfile.write(memblock, size);
+    outfile.close();
+    delete memblock;
+    return 0;
+}
+
+
+bool MiscFuncs::saveText(string text, string filename)
+{
+    FILE *writefile = fopen(filename.c_str(), "w");
+    if (!writefile)
+        return 0;
+
+    fputs(text.c_str(), writefile);
+    fclose (writefile);
+    return 1;
+}
+
+
+int MiscFuncs::loadText(string filename)
+{
+    FILE *readfile = fopen(filename.c_str(), "r");
+    if (!readfile)
+        return 0xffff;
+
+    string text = "";
+    char line [1024];
+    while (!feof(readfile))
+    {
+        if(fgets(line , 1024 , readfile))
+            text += string(line);
+    }
+    fclose (readfile);
+    text.erase(text.find_last_not_of(" \n\r\t")+1);
+    return miscMsgPush(text);
+}
+
+
+// replace build directory with a different
+// one in the compilation directory
 string MiscFuncs::localPath(string leaf)
 {
-    char *tmpath;
-    tmpath = (char*) malloc(PATH_MAX);
-    getcwd (tmpath, PATH_MAX);
+    char *tmpath = getcwd (NULL, 0);
+    if (tmpath == NULL)
+       return "";
+
     string path = (string) tmpath;
-    size_t found = path.rfind("/src");
-    if (found != string::npos)
-        path.replace (found,4,leaf);
-    else
-        path = "";
     free(tmpath);
-    return path;
+    size_t found = path.rfind("yoshimi");
+    if (found == string::npos)
+        return "";
+
+    size_t next = path.find('/', found);
+    if (next == string::npos)
+        return "";
+
+    return path.substr(0, next) + leaf;
 }
 
 
@@ -409,7 +477,7 @@ bool MiscFuncs::matchnMove(int num , char *&pnt, const char *word)
  */
 void MiscFuncs::miscMsgInit()
 {
-    for (int i = 0; i < 255; ++i)
+    for (int i = 0; i < NO_MSG; ++i)
         miscList.push_back("");
     // we use 255 to denote an invalid entry
 }
@@ -417,7 +485,7 @@ void MiscFuncs::miscMsgInit()
 int MiscFuncs::miscMsgPush(string _text)
 {
     if (_text.empty())
-        return 255;
+        return NO_MSG;
     sem_wait(&miscmsglock);
 
     string text = _text;
@@ -429,7 +497,9 @@ int MiscFuncs::miscMsgPush(string _text)
         if ( *it == "")
         {
             *it = text;
-            //cout << "Msg In " << int(idx) << " >" << text << "<" << endl;
+#ifdef REPORT_MISCMSG
+            cout << "Msg In " << int(idx) << " >" << text << "<" << endl;
+#endif
             break;
         }
         ++ it;
@@ -449,7 +519,7 @@ int MiscFuncs::miscMsgPush(string _text)
 
 string MiscFuncs::miscMsgPop(int _pos)
 {
-    if (_pos >= 255)
+    if (_pos >= NO_MSG)
         return "";
     sem_wait(&miscmsglock);
 
@@ -461,7 +531,9 @@ string MiscFuncs::miscMsgPop(int _pos)
     {
         if (idx == pos)
         {
-            //cout << "Msg Out " << int(idx) << " >" << *it << "<" << endl;
+#ifdef REPORT_MISCMSG
+            cout << "Msg Out " << int(idx) << " >" << *it << "<" << endl;
+#endif
             break;
         }
         ++ it;

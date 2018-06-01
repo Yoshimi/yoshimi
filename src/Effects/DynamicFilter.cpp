@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014, Will Godfrey
+    Copyright 2014-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -20,16 +20,32 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified September 2014
+    This file is derivative of ZynAddSubFX original code.
+
+    Modified February 2018
 */
 
 #include "Misc/SynthEngine.h"
 #include "Effects/DynamicFilter.h"
 
+static const int PRESET_SIZE = 10;
+static const int NUM_PRESETS = 5;
+static const char presets[NUM_PRESETS][PRESET_SIZE] = {
+        // WahWah
+        { 110, 64, 80, 0, 0, 64, 0, 90, 0, 60 },
+        // AutoWah
+        {110, 64, 70, 0, 0, 80, 70, 0, 0, 60 },
+        // Sweep
+        {100, 64, 30, 0, 0, 50, 80, 0, 0, 60 },
+        // VocalMorph1
+        { 110, 64, 80, 0, 0, 64, 0, 64, 0, 60 },
+        // VocalMorph1
+        {127, 64, 50, 0, 0, 96, 64, 0, 0, 60 }
+};
+
 DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, new FilterParams(0, 64, 64, 0, _synth), 0),
     lfo(_synth),
-    Pvolume(110),
     Pdepth(0),
     Pampsns(90),
     Pampsnsinv(0),
@@ -38,6 +54,7 @@ DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_, 
     filterr(NULL),
     synth(_synth)
 {
+    setvolume(110);
     setpreset(Ppreset);
     changepar(1, 64); // pan
     cleanup();
@@ -68,10 +85,10 @@ void DynamicFilter::out(float *smpsl, float *smpsr)
     float freq = filterpars->getfreq();
     float q = filterpars->getq();
 
-    for (int i = 0; i < synth->p_buffersize; ++i)
+    for (int i = 0; i < synth->sent_buffersize; ++i)
     {
-        memcpy(efxoutl, smpsl, synth->p_bufferbytes);
-        memcpy(efxoutr, smpsr, synth->p_bufferbytes);
+        memcpy(efxoutl, smpsl, synth->sent_bufferbytes);
+        memcpy(efxoutr, smpsr, synth->sent_bufferbytes);
         float x = (fabsf(smpsl[i]) + fabsf(smpsr[i])) * 0.5f;
         ms1 = ms1 * (1.0f - ampsmooth) + x * ampsmooth + 1e-10f;
     }
@@ -92,10 +109,10 @@ void DynamicFilter::out(float *smpsl, float *smpsr)
     filterr->filterout(efxoutr);
 
     // panning
-    for (int i = 0; i < synth->p_buffersize; ++i)
+    for (int i = 0; i < synth->sent_buffersize; ++i)
     {
-        efxoutl[i] *= pangainL;
-        efxoutr[i] *= pangainR;
+        efxoutl[i] *= pangainL.getAndAdvanceValue();
+        efxoutr[i] *= pangainR.getAndAdvanceValue();
     }
 }
 
@@ -119,11 +136,12 @@ void DynamicFilter::setdepth(unsigned char Pdepth_)
 void DynamicFilter::setvolume(unsigned char Pvolume_)
 {
     Pvolume = Pvolume_;
-    outvolume = Pvolume / 127.0f;
+    float tmp = Pvolume / 127.0f;
+    outvolume.setTargetValue(tmp);
     if (!insertion)
-        volume = 1.0f;
+        volume.setTargetValue(1.0f);
     else
-        volume = outvolume;
+        volume.setTargetValue(tmp);
 }
 
 
@@ -150,20 +168,7 @@ void DynamicFilter::reinitfilter(void)
 
 void DynamicFilter::setpreset(unsigned char npreset)
 {
-    const int PRESET_SIZE = 10;
-    const int NUM_PRESETS = 5;
-    unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
-        // WahWah
-        { 110, 64, 80, 0, 0, 64, 0, 90, 0, 60 },
-        // AutoWah
-        {110, 64, 70, 0, 0, 80, 70, 0, 0, 60 },
-        // Sweep
-        {100, 64, 30, 0, 0, 50, 80, 0, 0, 60 },
-        // VocalMorph1
-        { 110, 64, 80, 0, 0, 64, 0, 64, 0, 60 },
-        // VocalMorph1
-        {127, 64, 50, 0, 0, 96, 64, 0, 0, 60 }
-    };
+
 
 if (npreset < 0xf)
     {
@@ -352,3 +357,78 @@ unsigned char DynamicFilter::getpar(int npar)
     }
     return 0;
 }
+
+
+float Dynamlimit::getlimits(CommandBlock *getData)
+{
+    int value = getData->data.value;
+    int control = getData->data.control;
+    int request = getData->data.type & 3; // clear upper bits
+    int npart = getData->data.part;
+    int presetNum = getData->data.engine;
+    int min = 0;
+    int max = 127;
+
+    int def = presets[presetNum][control];
+    bool canLearn = true;
+    bool isInteger = true;
+    switch (control)
+    {
+        case 0:
+            if (npart != 0xf1) // system effects
+                def /= 2;
+            break;
+        case 1:
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+        case 4:
+            max = 1;
+            canLearn = false;
+            break;
+        case 5:
+            break;
+        case 6:
+            break;
+        case 7:
+            break;
+        case 8:
+            max = 1;
+            canLearn = false;
+            break;
+        case 9:
+            break;
+        case 16:
+            max = 4;
+            canLearn = false;
+            break;
+        default:
+            getData->data.type |= 4; // error
+            return 1.0f;
+            break;
+    }
+
+    switch(request)
+    {
+        case 0:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+            break;
+        case 1:
+            value = min;
+            break;
+        case 2:
+            value = max;
+            break;
+        case 3:
+            value = def;
+            break;
+    }
+    getData->data.type |= (canLearn * 64 + isInteger * 128);
+    return float(value);
+}
+

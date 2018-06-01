@@ -2,7 +2,7 @@
 #   CMakeLists.txt
 #
 #   Copyright 2009-2011, Alan Calvert
-#   Copyright 2014-2017, Will Godfrey & others
+#   Copyright 2014-2018, Will Godfrey & others
 #
 #   This file is part of yoshimi, which is free software: you can
 #   redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-# Modifed December 2017
+# Modifed June 2018
 
 project (Yoshimi)
 cmake_minimum_required (VERSION 3.0)
@@ -30,11 +30,15 @@ set (CMAKE_CXX_STANDARD 11) # we seem to need both for
 add_definitions(-std=gnu++11) # various versions of cmake
 
 # vvv
-add_definitions(-Wall)
-add_definitions(-Werror=format-security)
+#add_definitions(-Wall)
+#add_definitions(-Werror=format-security)
+#add_definitions(-Wpedantic)
+#add_definitions(-Wextra)
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "1.5.5")
+set (YOSHIMI_VERSION "1.5.8.1")
+add_definitions (-DMIN_CONFIG_MAJOR=1)
+add_definitions (-DMIN_CONFIG_MINOR=5)
 
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
@@ -84,6 +88,7 @@ option (LV2Plugin "Build yoshimi lv2 plugin interface" ON)
 # developer info
 option (ShowGuiReports "Enable GUI control reports" OFF)
 option (ShowNoteOnTimes "Report Note-On Times" OFF)
+option (ReportNotes "Report Notes On/Off" OFF)
 
 
 set (BuildOptions_X86
@@ -142,6 +147,7 @@ endif(EXP10F)
 
 check_c_source_compiles (
     "#include <argp.h>
+    #include <stdlib.h>
      int main () {
          int argc=1;
          char *argv[]={\"test\"};
@@ -164,6 +170,7 @@ endif(NOT LIBC_HAS_ARGP)
 set (CMAKE_REQUIRED_LIBRARIES z)
 check_c_source_compiles (
     "#include <zlib.h>
+     #include <stdlib.h>
      int main(int argc, char **argv) {
          gzFile zzz  = gzopen(\"/dev/null\", \"rb\");
          if (NULL != zzz)
@@ -341,7 +348,7 @@ set (Effects_sources
 )
 
 set (Misc_sources
-    Misc/ConfBuild.cpp  Misc/Config.cpp  Misc/SynthEngine.cpp  Misc/Bank.cpp  Misc/Splash.cpp
+    Misc/Config.cpp  Misc/SynthEngine.cpp  Misc/Bank.cpp  Misc/Splash.cpp
     Misc/Microtonal.cpp   Misc/Part.cpp  Misc/XMLwrapper.cpp  Misc/MiscFuncs.cpp   Misc/WavFile.cpp
 )
 
@@ -455,6 +462,8 @@ add_definitions (-DXML_HISTORY=8)
 add_definitions (-DXML_VECTOR=9)
 add_definitions (-DXML_MIDILEARN=10)
 
+add_definitions (-DNO_MSG=255)
+
 # these were previously (pointlessly) user configurable
 add_definitions (-DNUM_VOICES=8)
 add_definitions (-DPOLIPHONY=80)
@@ -479,6 +488,10 @@ endif (ShowGuiReports)
 if (ShowNoteOnTimes)
     add_definitions (-DREPORT_NOTEON)
 endif (ShowNoteOnTimes)
+
+if (ReportNotes)
+    add_definitions (-DREPORT_NOTES_ON_OFF)
+endif (ReportNotes)
 
 add_definitions(-DDEFAULT_AUDIO=jack_audio)
 
@@ -604,8 +617,6 @@ install (DIRECTORY ../doc/ DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/yoshimi
         GROUP_READ GROUP_WRITE GROUP_EXECUTE
         WORLD_READ WORLD_EXECUTE
 )
-install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../yoshimi-user-manual.pdf
-    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/yoshimi)
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/yoshimi.desktop
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications)
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.png
@@ -617,7 +628,7 @@ install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi_alt.svg
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/metainfo/yoshimi.appdata.xml
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/metainfo)
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.1
-    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/man/man1)
+    DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
 
 set_directory_properties (PROPERTIES
     ADDITIONAL_MAKE_CLEAN_FILES "${FltkUI_headers}"

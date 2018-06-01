@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2017 Will Godfrey
+    Copyright 2017-2018 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified September 2017
+    Modified March 2018
 */
 
 #include <cmath>
@@ -510,10 +510,7 @@ void PADnoteParameters::generatespectrum_bandwidthMode(float *spectrum,
 // Generates the long spectrum for non-Bandwidth modes (only amplitudes are generated; phases will be random)
 void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
                                                     int size,
-                                                    float basefreq,
-                                                    float *profile,
-                                                    int profilesize,
-                                                    float bwadjust)
+                                                    float basefreq)
 {
     //for (int i = 0; i < size; ++i)
     //    spectrum[i] = 0.0;
@@ -579,7 +576,7 @@ void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
 
 
 // Applies the parameters (i.e. computes all the samples, based on parameters);
-void PADnoteParameters::applyparameters(bool islocked)
+void PADnoteParameters::applyparameters()
 {
     const int samplesize = (((int)1) << (Pquality.samplesize + 14));
     int spectrumsize = samplesize / 2;
@@ -625,8 +622,7 @@ void PADnoteParameters::applyparameters(bool islocked)
                                            profilesize, bwadjust);
         else
             generatespectrum_otherModes(spectrum, spectrumsize,
-                                        basefreq * basefreqadjust, profile,
-                                        profilesize, bwadjust);
+                                        basefreq * basefreqadjust);
 
         const int extra_samples = 5; // the last samples contains the first
                                      // samples (used for linear/cubic interpolation)
@@ -690,8 +686,6 @@ void PADnoteParameters::setPan(char pan)
 // Ported from ZynAddSubFX V 2.4.4
 bool PADnoteParameters::export2wav(std::string basefilename)
 {
-    //synth->getRuntime().Log("Saving samples for " + basefilename);
-    //applyparameters(true);
     basefilename += "_PADsynth_";
     bool isOK = true;
     for(int k = 0; k < PAD_MAX_SAMPLES; ++k)
@@ -934,29 +928,33 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
 
         xml->exitbranch();
     }
+    applyparameters();
 }
 
 
-void PADnoteParameters::getLimits(CommandBlock *getData)
+float PADnoteParameters::getLimits(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    int request = int(getData->data.type & 3);
+
     int control = getData->data.control;
 
     // defaults
     int type = 0;
     int min = 0;
-    int def = 640;
+    int def = 64;
     int max = 127;
 
     switch (control)
     {
         case 0:
             type |= 0x40;
-            def = 900;
+            def = 90;
             break;
 
         case 1:
             type |= 0x40;
-            def = 720;
+            def = 72;
             break;
 
         case 2:
@@ -970,7 +968,7 @@ void PADnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case 16:
-            def = 5000;
+            def = 500;
             max = 1000;
             break;
 
@@ -1021,7 +1019,7 @@ void PADnoteParameters::getLimits(CommandBlock *getData)
 
         case 38:
             type |= 0x40;
-            def = 880;
+            def = 88;
             break;
 
         case 39:
@@ -1048,7 +1046,7 @@ void PADnoteParameters::getLimits(CommandBlock *getData)
 
         case 64:
             type |= 0x40;
-            def = 800;
+            def = 80;
             break;
 
         case 65:
@@ -1063,12 +1061,12 @@ void PADnoteParameters::getLimits(CommandBlock *getData)
 
         case 67:
             type |= 0x40;
-            def = 300;
+            def = 30;
             break;
 
         case 68:
             type |= 0x40;
-            def = 1270;
+            def = 127;
             break;
 
         case 69:
@@ -1083,7 +1081,7 @@ void PADnoteParameters::getLimits(CommandBlock *getData)
 
         case 71:
             type |= 0x40;
-            def = 800;
+            def = 80;
             break;
 
         case 72:
@@ -1097,27 +1095,27 @@ void PADnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case 75:
-            def = 10;
+            def = 1;
             max = 1;
             break;
 
         case 80:
-            def = 40;
+            def = 4;
             max = 8;
             break;
 
         case 81:
-            def = 20;
+            def = 2;
             max = 6;
             break;
 
         case 82:
-            def = 30;
+            def = 3;
             max = 7;
             break;
 
         case 83:
-            def = 30;
+            def = 3;
             max = 6;
             break;
 
@@ -1129,13 +1127,13 @@ void PADnoteParameters::getLimits(CommandBlock *getData)
 
         case 112:
             type |= 0x40;
-            def = 10;
+            def = 1;
             max = 1;
             break;
 
         case 120:
             type |= 0x40;
-            def = FADEIN_ADJUSTMENT_SCALE * 10;
+            def = FADEIN_ADJUSTMENT_SCALE;
             break;
 
         case 121:
@@ -1145,7 +1143,7 @@ void PADnoteParameters::getLimits(CommandBlock *getData)
 
         case 122:
             type |= 0x40;
-            def = 600;
+            def = 60;
             break;
 
         case 123:
@@ -1154,19 +1152,36 @@ void PADnoteParameters::getLimits(CommandBlock *getData)
 
         case 124:
             type |= 0x40;
-            def = 720;
+            def = 72;
             break;
 
         default:
-            min = -1;
-            def = -10;
-            max = -1;
+            type |= 4; // error
             break;
     }
-    getData->data.type |= type;
-    getData->limits.min = min;
-    getData->limits.def = def;
-    getData->limits.max = max;
+    getData->data.type = type;
+    if (type & 4)
+        return 1;
+
+    switch (request)
+    {
+        case 0:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+        break;
+        case 1:
+            value = min;
+            break;
+        case 2:
+            value = max;
+            break;
+        case 3:
+            value = def;
+            break;
+    }
+    return value;
 }
 
 void PADnoteParameters::postrender(void)

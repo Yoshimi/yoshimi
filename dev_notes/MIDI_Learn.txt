@@ -10,7 +10,7 @@ Incoming CC and channel tracked (in that order).
 
 Multiple actions on the same CC/channel pair.
 
-Range limiting or compression.
+Range limiting, compression or threshhold setting.
 
 Blocking of all later actions on the same CC / channel pair.
 
@@ -48,7 +48,7 @@ par2        text message number
 
 For NRPNs, CC has bit 16 set. This is so that even one with a value less than 127 won't be mistaken for a normal CC when being matched.
 
-In the future, the gui will be restricted to 'viewing groups' of 128 lines, it solves a *lot* of problems!
+Currently there is a limit of 200 independent learned lines due to the use of miscMsg to update the GUI when loading complete learned lists. In the future, the GUI will be restricted to 'viewing groups' of 128 lines. This will allow a much greater number.
 
 
 Control numbers:

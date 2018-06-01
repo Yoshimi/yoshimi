@@ -6,6 +6,7 @@
     Copyright 2009-2010, Alan Calvert
     Copyright 2016 Will Godfrey
     Copyright 2017 Jesper Lloyd
+    Copyright 2018 Will Godfrey and others
 
     Idea originally derived from work by Greg Ercolano
     (http://seriss.com/people/erco/fltk/)
@@ -24,7 +25,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified March 2017
+    This file is a derivative of the ZynAddSubFX original.
+
+    Modified March 2018
 */
 
 #include "DynamicTooltip.h"
@@ -43,7 +46,7 @@ static bool _recent;
 /* Delayed display of tooltip - callbackk*/
 static void delayedShow(void* dyntip){
     if(DynTooltip* tip = (DynTooltip*) dyntip)
-       tip->show(0);
+       tip->dynshow(0);
 }
 
 static void resetRecent(void*){
@@ -88,7 +91,7 @@ void DynTooltip::hide()
     Fl_Menu_Window::hide();
 }
 
-void DynTooltip::show(float timeout)
+void DynTooltip::dynshow(float timeout)
 {
     if(timeout <= 0){
         Fl::remove_timeout(delayedShow, this);
@@ -276,7 +279,7 @@ void DynTooltip::tipHandle(int event)
     case FL_ENTER:
         Fl::remove_timeout(resetRecent);
         setOnlyValue(false);
-        show(_recent ? Fl_Tooltip::hoverdelay() : Fl_Tooltip::delay());
+        dynshow(_recent ? Fl_Tooltip::hoverdelay() : Fl_Tooltip::delay());
         break;
     case FL_PUSH:
     case FL_DRAG:
@@ -284,7 +287,7 @@ void DynTooltip::tipHandle(int event)
         Fl::remove_timeout(delayedShow);
         Fl::remove_timeout(resetRecent);
         setOnlyValue(true);
-        show(0);
+        dynshow(0);
         break;
     case FL_LEAVE:
     case FL_RELEASE:

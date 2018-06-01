@@ -2,7 +2,7 @@
     MiscFuncs.h
 
     Copyright 2010, Alan Calvert
-    Copyright 2014-2017, Will Godfrey
+    Copyright 2014-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modifed February 2017
+    Modifed March 2018
 */
 
 #ifndef MISCFUNCS_H
@@ -63,7 +63,10 @@ class MiscFuncs
         string findleafname(string name);
         int findSplitPoint(string name);
         string setExtension(string fname, string ext);
+        bool copyFile(string source, string destination);
         string localPath(string leaf);
+        bool saveText(string text, string filename);
+        int loadText(string filename);
 
         char *skipSpace(char *buf);
         char *skipChars(char *buf);
@@ -95,11 +98,11 @@ T limit(T val, T min, T max)
     return val < min ? min : (val > max ? max : val);
 }
 
-inline float MiscFuncs::dB2rap(float dB) { 
-#if defined(HAVE_EXP10F) 
-    return exp10f((dB) / 20.0f); 
-#else 
-    return powf(10.0, (dB) / 20.0f); 
+inline float MiscFuncs::dB2rap(float dB) {
+#if defined(HAVE_EXP10F)
+    return exp10f((dB) / 20.0f);
+#else
+    return powf(10.0, (dB) / 20.0f);
 #endif
 }
 inline float MiscFuncs::rap2dB(float rap) { return 20.0f * log10f(rap); }
@@ -116,14 +119,6 @@ union CommandBlock{
         unsigned char parameter;
         unsigned char par2;
     } data;
-    struct{
-        float value;
-        unsigned char type;
-        unsigned char control;
-        short int min;
-        short int max;
-        short int def;
-    } limits;
     char bytes [sizeof(data)];
 };
 

@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2010, Alan Calvert
+    Copyright 2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of a ZynAddSubFX original.
+
+    Modified February 2018
 */
 
 #ifndef EQ_H
@@ -46,13 +49,21 @@ class EQ : public Effect, private MiscFuncs
     private:
         // Parameters
         unsigned char Pvolume;
+        unsigned char Pband;
         void setvolume(unsigned char Pvolume_);
         struct {
             unsigned char Ptype, Pfreq, Pgain, Pq, Pstages; // parameters
+            InterpolatedParameter freq, gain, q;
             AnalogFilter *l, *r; // internal values
         } filter[MAX_EQ_BANDS];
 
         SynthEngine *synth;
+};
+
+class EQlimit
+{
+    public:
+        float getlimits(CommandBlock *getData);
 };
 
 #endif

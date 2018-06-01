@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2017, Will Godfrey
+    Copyright 2017-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,10 +22,11 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified October 2017
+    Modified February 2018
 */
 
 #include <fftw3.h>
+#include <iostream>
 
 #include "Misc/SynthEngine.h"
 #include "Effects/EffectMgr.h"
@@ -43,6 +44,7 @@ EffectMgr::EffectMgr(const bool insertion_, SynthEngine *_synth) :
     efxoutr = (float*)fftwf_malloc(synth->bufferbytes);
     memset(efxoutl, 0, synth->bufferbytes);
     memset(efxoutr, 0, synth->bufferbytes);
+    InterpolatedParameter::setSampleRate(synth->samplerate_f);
     defaults();
 }
 
@@ -137,9 +139,15 @@ void EffectMgr::cleanup(void)
 unsigned char EffectMgr::getpreset(void)
 {
     if (efx)
+    {
+        //cout << "Effect preset " << int(efx->Ppreset) << endl;
         return efx->Ppreset;
+    }
     else
+    {
+        //cout << "No effect" << endl;
         return 0;
+    }
 }
 
 
@@ -194,61 +202,59 @@ void EffectMgr::out(float *smpsl, float *smpsr)
     {
         if (!insertion)
         {
-            memset(smpsl, 0, synth->p_bufferbytes);
-            memset(smpsr, 0, synth->p_bufferbytes);
-            memset(efxoutl, 0, synth->p_bufferbytes);
-            memset(efxoutr, 0, synth->p_bufferbytes);
+            memset(smpsl, 0, synth->sent_bufferbytes);
+            memset(smpsr, 0, synth->sent_bufferbytes);
+            memset(efxoutl, 0, synth->sent_bufferbytes);
+            memset(efxoutr, 0, synth->sent_bufferbytes);
         }
         return;
     }
-    memset(efxoutl, 0, synth->p_bufferbytes);
-    memset(efxoutr, 0, synth->p_bufferbytes);
+    memset(efxoutl, 0, synth->sent_bufferbytes);
+    memset(efxoutr, 0, synth->sent_bufferbytes);
     efx->out(smpsl, smpsr);
-
-    float volume = efx->volume;
 
     if (nefx == 7)
     {   // this is need only for the EQ effect
-        memcpy(smpsl, efxoutl, synth->p_bufferbytes);
-        memcpy(smpsr, efxoutr, synth->p_bufferbytes);
+        memcpy(smpsl, efxoutl, synth->sent_bufferbytes);
+        memcpy(smpsr, efxoutr, synth->sent_bufferbytes);
         return;
     }
 
     // Insertion effect
     if (insertion != 0)
     {
-        float v1, v2;
-        if (volume < 0.5f)
+        for (int i = 0; i < synth->sent_buffersize; ++i)
         {
-            v1 = 1.0f;
-            v2 = volume * 2.0f;
-        } else {
-            v1 = (1.0f - volume) * 2.0f;
-            v2 = 1.0f;
-        }
-        if (nefx == 1 || nefx==2)
-            v2 *= v2; // for Reverb and Echo, the wet function is not liniar
-
-        if (dryonly)
-        {   // this is used for instrument effect only
-            for (int i = 0; i < synth->p_buffersize; ++i)
+            float volume = efx->volume.getAndAdvanceValue();
+            float v1, v2;
+            if (volume < 0.5f)
             {
+                v1 = 1.0f;
+                v2 = volume * 2.0f;
+            } else {
+                v1 = (1.0f - volume) * 2.0f;
+                v2 = 1.0f;
+            }
+            if (nefx == 1 || nefx==2)
+                v2 *= v2; // for Reverb and Echo, the wet function is not liniar
+
+            if (dryonly)
+            {
+                // this is used for instrument effect only
                 smpsl[i] *= v1;
                 smpsr[i] *= v1;
                 efxoutl[i] *= v2;
                 efxoutr[i] *= v2;
-            }
-        } else {
-            // normal instrument/insertion effect
-            for (int i = 0; i < synth->p_buffersize; ++i)
-            {
+            } else {
+                // normal instrument/insertion effect
                 smpsl[i] = smpsl[i] * v1 + efxoutl[i] * v2;
                 smpsr[i] = smpsr[i] * v1 + efxoutr[i] * v2;
             }
         }
     } else { // System effect
-        for (int i = 0; i < synth->p_buffersize; ++i)
+        for (int i = 0; i < synth->sent_buffersize; ++i)
         {
+            float volume = efx->volume.getAndAdvanceValue();
             efxoutl[i] *= 2.0f * volume;
             efxoutr[i] *= 2.0f * volume;
             smpsl[i] = efxoutl[i];
@@ -261,7 +267,8 @@ void EffectMgr::out(float *smpsl, float *smpsr)
 // Get the effect volume for the system effect
 float EffectMgr::sysefxgetvolume(void)
 {
-    return (!efx) ? 1.0f : efx->outvolume;
+    // No interpolation for system effect currently (direct target value).
+    return (!efx) ? 1.0f : efx->outvolume.getTargetValue();
 }
 
 
@@ -335,4 +342,51 @@ void EffectMgr::getfromXML(XMLwrapper *xml)
         xml->exitbranch();
     }
     cleanup();
+}
+
+
+float LimitMgr::geteffectlimits(CommandBlock *getData)
+{
+    int effType = getData->data.kit & 0x7f;
+
+    float value = 0;
+    switch (effType)
+    {
+        case 0:
+            value = 0;
+            break;
+        case 1:
+            Revlimit reverb;
+            value = reverb.getlimits(getData);
+            break;
+        case 2:
+            Echolimit echo;
+            value = echo.getlimits(getData);
+            break;
+        case 3:
+            Choruslimit chorus;
+            value = chorus.getlimits(getData);
+            break;
+        case 4:
+            Phaserlimit phaser;
+            value = phaser.getlimits(getData);
+            break;
+        case 5:
+            Alienlimit alien;
+            value = alien.getlimits(getData);
+            break;
+        case 6:
+            Distlimit dist;
+            value = dist.getlimits(getData);
+            break;
+        case 7:
+            EQlimit EQ;
+            value = EQ.getlimits(getData);
+            break;
+        case 8:
+            Dynamlimit dyn;
+            value = dyn.getlimits(getData);
+            break;
+    }
+    return value;
 }

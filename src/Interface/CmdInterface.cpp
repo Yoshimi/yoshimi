@@ -1,7 +1,7 @@
 /*
     CmdInterface.cpp
 
-    Copyright 2015-2017, Will Godfrey & others.
+    Copyright 2015-2018, Will Godfrey & others.
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified December 2017
+    Modified May 2018
 */
 
 #include <iostream>
@@ -49,13 +49,13 @@ using namespace std;
 
 using namespace std;
 
-
-static int currentInstance = 0;
+extern SynthEngine *firstSynth;
+static unsigned int currentInstance = 0;
 
 string basics[] = {
     "?  Help",                  "show commands",
     "STop",                     "all sound off",
-    "RESet",                    "return to start-up conditions (if 'y')",
+    "RESet [s]",                "return to start-up conditions, 'ALL' clear MIDI-learn (if 'y')",
     "EXit",                     "tidy up and close Yoshimi (if 'y')",
     "..",                       "step back one level",
     "/",                        "step back to top level",
@@ -65,10 +65,14 @@ string basics[] = {
 string toplist [] = {
     "ADD",                      "add paths and files",
     "  Root <s>",               "root path to list",
-    "  Bank <s>",               "bank to current root",
+    "  Bank <s>",               "make new bank in current root",
+    "  YOshimi [n]",            "new Yoshimi instance ID",
+    "IMPort [s <n1>] <n2> <s>", "import named directory to slot n2 of current root, (or 'Root' n1)",
+    "EXPort [s <n1>] <n2> <s>", "export bank at slot n2 of current root, (or 'Root' n1) to named directory",
     "REMove",                   "remove paths, files and entries",
     "  Root <n>",               "de-list root path ID",
-    "  Bank <n>",               "delete bank ID (and all contents) from current root",
+    "  Bank [s <n1>] <n2>",     "delete bank ID n2 (and all instruments) from current root (or 'Root' n1)",
+    "  YOshimi <n>",            "close instance ID",
     "  MLearn <s> [n]",         "delete midi learned 'ALL' whole list, or '@'(n) line",
     "Set / Read",               "set or read all main parameters",
     "  Part",                   "enter context level",
@@ -90,7 +94,7 @@ string toplist [] = {
     "  Volume <n>",             "master volume",
     "  SHift <n>",              "master key shift semitones (0 no shift)",
     "  DEtune <n>",             "master fine detune",
-    "  SOlo [s] [n]",           "channel 'solo' switcher (Row, Column, Loop, CC, {other} Disable)",
+    "  SOlo [s] [n]",           "channel 'solo' switcher (Row, Column, Loop, Twoway, CC, {other} Disable)",
     "      CC <n>",             "Incoming 'solo' CC number (type must be set first)",
     "end"
 };
@@ -141,6 +145,7 @@ string partlist [] = {
     "Pan <n2>",                 "panning",
     "VElocity <n2>",            "velocity sensing sensitivity",
     "OFfset <n2>",              "velocity sense offset",
+    "Breath <s>",              "breath control (Enable {other})",
     "POrtamento <s>",           "portamento (Enable {other})",
     "Mode <s>",                 "key mode (Poly, Mono, Legato)",
     "Note <n2>",                "note polyphony",
@@ -151,7 +156,7 @@ string partlist [] = {
     "  Type <s>",               "the effect type",
     "  PREset <n3>",            "set numbered effect preset to n3",
     "  Send <n3> <n4>",         "send part to system effect n3 at volume n4",
-    "PRogram <n2>",             "loads instrument ID",
+    "PRogram <[n2]/[s]>",       "loads instrument ID / CLear sets default",
     "NAme <s>",                 "sets the display name the part can be saved with",
     "Channel <n2>",             "MIDI channel (> 32 disables, > 16 note off only)",
     "Destination <s2>",         "jack audio destination (Main, Part, Both)",
@@ -628,17 +633,17 @@ int CmdInterface::effects()
             if (bitTest(level, part_lev))
             {
                 nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
-                sendDirect(nFXtype, 64, 65, npart, 255, nFX);
+                sendDirect(nFXtype, 64, 65, npart, 0xff, nFX);
             }
             else if (bitTest(level, ins_fx))
             {
                 nFXtype = synth->insefx[nFX]->geteffect();
-                sendDirect(nFXtype, 64, 1, 242, 255, nFX);
+                sendDirect(nFXtype, 64, 1, 242, 0xff, nFX);
             }
             else
             {
                 nFXtype = synth->sysefx[nFX]->geteffect();
-                sendDirect(nFXtype, 64, 1, 241, 255, nFX);
+                sendDirect(nFXtype, 64, 1, 241, 0xff, nFX);
             }
         }
         if (point[0] == 0)
@@ -672,11 +677,11 @@ int CmdInterface::effects()
         Runtime.Log("efx type set to " + fx_list[nFXtype]);
         //Runtime.Log("Presets -" + fx_presets[nFXtype].substr(fx_presets[nFXtype].find(',') + 1));
         if (bitTest(level, part_lev))
-            sendDirect(nFXtype, 64, 65, npart, 255, nFX);
+            sendDirect(nFXtype, 64, 65, npart, 0xff, nFX);
         else if (bitTest(level, ins_fx))
-            sendDirect(nFXtype, 64, 1, 242, 255, nFX);
+            sendDirect(nFXtype, 64, 1, 242, 0xff, nFX);
         else
-            sendDirect(nFXtype, 64, 1, 241, 255, nFX);
+            sendDirect(nFXtype, 64, 1, 241, 0xff, nFX);
         return done_msg;
     }
 
@@ -746,7 +751,7 @@ int CmdInterface::effects()
             dest = "system efx " + asString(nFX + 1) + " sent to "
                  + asString(par + 1) + " at " + asString(value);
         }
-        sendDirect(value, 64, control, partno, 255, engine, insert);
+        sendDirect(value, 64, control, partno, 0xff, engine, insert);
         Runtime.Log(dest);
         return done_msg;
     }
@@ -783,7 +788,7 @@ int CmdInterface::effects()
             partno = 241;
             dest = "system";
         }
-        sendDirect(nFXpreset, 64, 16, partno, 128 + nFXtype, nFX);
+        sendDirect(nFXpreset, 64, 16, partno, 0x80 + nFXtype, nFX);
         Runtime.Log(dest + " efx preset set to number " + asString(value + 1));
     }
     return reply;
@@ -804,7 +809,7 @@ int CmdInterface::keyShift(int part)
         value = MIN_KEY_SHIFT;
     else if(value > MAX_KEY_SHIFT)
         value = MAX_KEY_SHIFT;
-    sendDirect(value, cmdType, 35, part);
+    sendDirect(value, cmdType, 35, part, 0xff, 0xff, 0xff, 0x80);
     return done_msg;
 }
 
@@ -1096,7 +1101,7 @@ int CmdInterface::commandVector()
 
     if (matchWord(1, point, "off"))
     {
-        sendDirect(0, 64, 96, 192, 255, 255, chan);
+        sendDirect(0, 64, 96, 0xc0, 0xff, 0xff, chan);
         axis = 0;
         bitClear(level, vect_lev);
         return done_msg;
@@ -1124,13 +1129,13 @@ int CmdInterface::commandVector()
         tmp = string2int(point);
         if (axis == 0)
         {
-            sendDirect(tmp, 192, 16, 192, 255, 255, chan);
+            sendDirect(tmp, 192, 16, 0xc0, 0xff, 0xff, chan);
             bitSet(level, vect_lev);
             return done_msg;
         }
         if (Runtime.vectordata.Enabled[chan])
         {
-            sendDirect(tmp, 192, 32, 192, 255, 255, chan);
+            sendDirect(tmp, 192, 32, 0xc0, 0xff, 0xff, chan);
             return done_msg;
         }
     }
@@ -1176,7 +1181,7 @@ int CmdInterface::commandVector()
             enable = 1;
         else if (feat > 1 && matchnMove(1, point, "reverse"))
             enable = 2;
-        sendDirect(enable, 192, 18 + (axis * 16) + feat , 192, 255, 255, chan);
+        sendDirect(enable, 192, 18 + (axis * 16) + feat , 0xc0, 0xff, 0xff, chan);
         return done_msg;
     }
 
@@ -1196,7 +1201,7 @@ int CmdInterface::commandVector()
         else
             return opp_msg;
         tmp = string2int(point);
-        sendDirect(tmp, 64, 17 + hand + (axis * 16), 192, 255, 255, chan);
+        sendDirect(tmp, 64, 17 + hand + (axis * 16), 0xc0, 0xff, 0xff, chan);
         return done_msg;
     }
 
@@ -1236,8 +1241,8 @@ int CmdInterface::commandConfig()
     float value = 0;
     unsigned char type;
     unsigned char command = 0xff;
-    unsigned char par = 255;
-    unsigned char par2 = 255;
+    unsigned char par = 0xff;
+    unsigned char par2 = 0xff;
     if (isRead)
         type = 0x80;
     else
@@ -1350,7 +1355,7 @@ int CmdInterface::commandConfig()
         if (matchnMove(1, point, "midi"))
         {
             command = 32;
-            par = 128;
+            par = 0x80;
             if (isRead || point[0] != 0)
             {
                 if (!isRead)
@@ -1362,7 +1367,7 @@ int CmdInterface::commandConfig()
         else if (matchnMove(1, point, "server"))
         {
             command = 34;
-            par = 128;
+            par = 0x80;
             if (isRead || point[0] != 0)
             {
                 if (!isRead)
@@ -1385,7 +1390,7 @@ int CmdInterface::commandConfig()
         if (matchnMove(1, point, "midi"))
         {
             command = 48;
-            par = 128;
+            par = 0x80;
             if (isRead || point[0] != 0)
             {
                 if (!isRead)
@@ -1397,7 +1402,7 @@ int CmdInterface::commandConfig()
         else if (matchnMove(1, point, "audio"))
         {
             command = 50;
-            par = 128;
+            par = 0x80;
             if (isRead || point[0] != 0)
             {
                 if (!isRead)
@@ -1522,8 +1527,8 @@ int CmdInterface::commandScale()
     float value = 0;
     unsigned char type;
     unsigned char command = 0xff;
-    unsigned char par = 255;
-    unsigned char par2 = 255;
+    unsigned char par = 0xff;
+    unsigned char par2 = 0xff;
     if (isRead)
     {
         type = 0x80;
@@ -1550,16 +1555,16 @@ int CmdInterface::commandScale()
             Runtime.Log("Write only - use list");
             return done_msg;
         }
-        else if (command <= 0x21)
+        if (command <= 0x21)
         {
             if (matchnMove(3, point, "import"))
                 command += 0x10;
-            name = (string)point;
-            if (name == "")
-                return value_msg;
-            par = 0x80;
-            par2 = miscMsgPush(name);
         }
+        name = (string)point;
+        if (name == "")
+            return value_msg;
+        par = 0x80;
+        par2 = miscMsgPush(name);
     }
     else
     {
@@ -1625,7 +1630,7 @@ int CmdInterface::commandScale()
             }
         }
     }
-
+cout << "par " << int(par) << endl;
     sendDirect(value, type, command, 0xe8, 0xff, 0xff, 0xff, par, par2);
     return reply;
 }
@@ -1637,7 +1642,7 @@ int CmdInterface::commandPart(bool justSet)
     int reply = todo_msg;
     int tmp;
     bool changed = false;
-    npart = Runtime.currentPart; // belt and braces
+    //npart = Runtime.currentPart; // belt and braces
     if (point[0] == 0)
         return done_msg;
     if (bitTest(level, all_fx))
@@ -1657,8 +1662,11 @@ int CmdInterface::commandPart(bool justSet)
             if (npart != tmp)
             {
                 npart = tmp;
-                sendDirect(npart, 64, 14, 240);
-                changed = true;
+                if (!isRead)
+                {
+                    sendDirect(npart, 64, 14, 0xf0);
+                    changed = true;
+                }
             }
             if (point[0] == 0)
                 return done_msg;
@@ -1685,7 +1693,7 @@ int CmdInterface::commandPart(bool justSet)
         else
         {
             if (!changed) // needs to be better
-                sendDirect(npart, 64, 14, 240);
+                sendDirect(npart, 64, 14, 0xf0);
             sendDirect(tmp, 64, 8, npart);
         }
         return done_msg;
@@ -1705,12 +1713,17 @@ int CmdInterface::commandPart(bool justSet)
             Runtime.Log("Part name is " + synth->part[npart]->Pname);
             return done_msg;
         }
+        if (matchnMove(2, point, "clear"))
+        {
+            sendDirect(0, 64, 96, npart, 0xff, 0xff, 0xff, 0xff, tmp);
+            return done_msg;
+        }
         if (point[0] != 0) // force part not channel number
         {
             tmp = string2int(point) - 1;
             if (tmp < 0 || tmp > 159)
                 return range_msg;
-            sendDirect(npart, 64, 74, 240, 255, 255, 255, 255, tmp);
+            sendDirect(npart, 64, 74, 0xf0, 0xff, 0xff, 0xff, 0xff, tmp);
             reply = done_msg;
         }
         else
@@ -1730,40 +1743,36 @@ int CmdInterface::commandPart(bool justSet)
     }
     else if (matchnMove(1, point, "destination"))
     {
-        if (isRead)
-        {
-            string name;
-            switch (synth->part[npart]->Paudiodest)
-            {
-                case 2:
-                    name = "part";
-                    break;
-                case 3:
-                    name = "both";
-                    break;
-                case 1:
-                default:
-                    name = "main";
-                    break;
-            }
-            Runtime.Log("Jack audio to " + name, 1);
-            return done_msg;
-        }
+        int type;
         int dest = 0;
-
-        if (matchnMove(1, point, "main"))
-            dest = 1;
-        else if (matchnMove(1, point, "part"))
-            dest = 2;
-        else if (matchnMove(1, point, "both"))
-            dest = 3;
-        if (dest > 0)
-        {
-            sendDirect(dest, 64, 120, npart, 255, 255, 255, 192);
-            reply = done_msg;
-        }
+        if (isRead)
+            type = 0;
         else
-            reply = range_msg;
+        {
+            type = 64;
+            if (matchnMove(1, point, "main"))
+                dest = 1;
+            else if (matchnMove(1, point, "part"))
+                dest = 2;
+            else if (matchnMove(1, point, "both"))
+                dest = 3;
+            if (dest == 0)
+                reply = range_msg;
+        }
+        sendDirect(dest, type, 120, npart, 0xff, 0xff, 0xff, 0xc0);
+        reply = done_msg;
+    }
+    else if (matchnMove(1, point, "breath"))
+    {
+        int type = 0;
+        int value = 0;
+        if(!isRead)
+        {
+            type = 64;
+            value = matchnMove(1, point, "enable");
+        }
+        sendDirect(value, type, 141, npart);
+        return done_msg;
     }
     else if (matchnMove(1, point, "note"))
     {
@@ -1848,24 +1857,27 @@ int CmdInterface::commandPart(bool justSet)
     else if (matchnMove(2, point, "name"))
     {
         string name;
+        unsigned char type = 64;
+        unsigned char par2 = 0xff;
         if (isRead)
-        {
-            name = "Part name set to " + synth->part[npart]->Pname;
-        }
+            type = 0;
         else
         {
             name = (string) point;
             if (name.size() < 3)
-                name = "Name too short";
-            else if ( name == "Simple Sound")
-                name = "Cant use name of default sound";
-            else
             {
-                sendDirect(0, 64, 222, npart, 255, 255, 255, 255, miscMsgPush(name));
+                Runtime.Log("Name too short");
                 return done_msg;
             }
+            else if ( name == "Simple Sound")
+            {
+                Runtime.Log("Cant use name of default sound");
+                return done_msg;
+            }
+            else
+                par2 = miscMsgPush(name);
         }
-        Runtime.Log(name);
+        sendDirect(0, type, 222, npart, 0xff, 0xff, 0xff, 0x80, par2, 0xff);
         reply = done_msg;
     }
     else
@@ -1881,23 +1893,25 @@ int CmdInterface::commandReadnSet()
     int tmp;
     string name;
 
-    if (matchnMove(4, point, "yoshimi"))
+    if (matchnMove(2, point, "yoshimi"))
     {
         if (isRead)
         {
-            Runtime.Log("Instance " + asString(currentInstance), 1);
+            //Runtime.Log("Instance " + asString(currentInstance), 1);
+            Runtime.Log("Instance " + to_string(synth->getUniqueId()));
             return done_msg;
         }
         if (point[0] == 0)
             return value_msg;
-        tmp = string2int(point);
-        if (tmp >= (int)synthInstances.size())
-            reply = range_msg;
-        else
+        currentInstance = string2int(point);
+        synth = firstSynth->getSynthFromId(currentInstance);
+        unsigned int newID = synth->getUniqueId();
+        if (newID != currentInstance)
         {
-            currentInstance = tmp;
-            defaults();
+            Runtime.Log("Instance " + to_string(currentInstance) + " not found. Set to " + to_string(newID), 1);
+            currentInstance = newID;
         }
+        defaults();
         return done_msg;
     }
 
@@ -1988,7 +2002,7 @@ int CmdInterface::commandReadnSet()
         }
         if (point[0] != 0)
         {
-            sendDirect(255, 64, 8, 217, 0, 255, string2int(point), 192);
+            sendDirect(255, 64, 8, 217, 0, 0xff, string2int(point), 0xc0);
             return done_msg;
         }
         else
@@ -2004,7 +2018,7 @@ int CmdInterface::commandReadnSet()
         }
         if (point[0] != 0)
         {
-            sendDirect(255, 64, 8, 217, 0, string2int(point), 255, 192);
+            sendDirect(255, 64, 8, 217, 0, string2int(point), 0xff, 0xc0);
             return done_msg;
         }
         else
@@ -2019,14 +2033,14 @@ int CmdInterface::commandReadnSet()
     {
         if (!isRead && point[0] == 0)
             return value_msg;
-        sendDirect(string2int127(point), cmdType, 0, 240);
+        sendDirect(string2int127(point), cmdType, 0, 0xf0);
         return done_msg;
     }
     if (matchnMove(2, point, "detune"))
     {
         if (!isRead && point[0] == 0)
             return value_msg;
-        sendDirect(string2int127(point), cmdType, 32, 240);
+        sendDirect(string2int127(point), cmdType, 32, 0xf0, 0xff, 0xff, 0xff, 0x80);
         return done_msg;
     }
 
@@ -2036,8 +2050,7 @@ int CmdInterface::commandReadnSet()
 
     if (matchnMove(2, point, "solo"))
     {
-        int value = 0;
-        int command = 48;
+        int value = 0; // disable
 
         if (matchnMove(2, point, "cc"))
         {
@@ -2053,16 +2066,19 @@ int CmdInterface::commandReadnSet()
                     return done_msg;
                 }
             }
-            command = 49;
+            sendDirect(value, cmdType, 49, 0xf0);
+            return done_msg;
         }
-        else if (matchnMove(1, point, "loop"))
-            value = 3;
-        else if (matchnMove(1, point, "column"))
-            value = 2;
+
         else if (matchnMove(1, point, "row"))
             value = 1;
-
-        sendDirect(value, cmdType, command, 240);
+        else if (matchnMove(1, point, "column"))
+            value = 2;
+        else if (matchnMove(1, point, "loop"))
+            value = 3;
+        else if (matchnMove(1, point, "twoway"))
+            value = 4;
+        sendDirect(value, cmdType, 48, 0xf0);
         return done_msg;
     }
     else if (matchnMove(2, point, "available")) // 16, 32, 64
@@ -2072,7 +2088,7 @@ int CmdInterface::commandReadnSet()
         int value = string2int(point);
         if (value != 16 && value != 32 && value != 64)
             return range_msg;
-        sendDirect(value, cmdType, 15, 240);
+        sendDirect(value, cmdType, 15, 0xf0);
         return done_msg;
     }
 
@@ -2081,23 +2097,23 @@ int CmdInterface::commandReadnSet()
     return reply;
 }
 
+
 bool CmdInterface::cmdIfaceProcessCommand()
 {
-    map<SynthEngine *, MusicClient *>::iterator itSynth = synthInstances.begin();
-    if (currentInstance >= (int)synthInstances.size())
+    // in case it's been changed from elsewhere
+    synth = firstSynth->getSynthFromId(currentInstance);
+    unsigned int newID = synth->getUniqueId();
+    if (newID != currentInstance)
     {
-        currentInstance = 0;
+        currentInstance = newID;
         defaults();
     }
-    for(int i = 0; i < currentInstance; i++, ++itSynth);
-    synth = itSynth->first;
+
     Config &Runtime = synth->getRuntime();
 
     replyString = "";
-    npart = Runtime.currentPart;
     int reply = todo_msg;
     int tmp;
-
     point = cCmd;
     point = skipSpace(point); // just to be sure
     tmp = strlen(cCmd) - 1;
@@ -2109,8 +2125,25 @@ bool CmdInterface::cmdIfaceProcessCommand()
 
     list<string> msg;
 
+#ifdef REPORT_NOTES_ON_OFF
+    if (matchnMove(3, point, "report")) // note test
+    {
+        cout << "note on sent " << Runtime.noteOnSent << endl;
+        cout << "note on seen " << Runtime.noteOnSeen << endl;
+        cout << "note off sent " << Runtime.noteOffSent << endl;
+        cout << "note off seen " << Runtime.noteOffSeen << endl;
+        cout << "notes hanging sent " << Runtime.noteOnSent - Runtime.noteOffSent << endl;
+        cout << "notes hanging seen " << Runtime.noteOnSeen - Runtime.noteOffSeen << endl;
+        return false;
+    }
+#endif
     if (matchnMove(2, point, "exit"))
     {
+        if (currentInstance > 0)
+        {
+            Runtime.Log("Can only exit from instance 0", 1);
+            return false;
+        }
         if (Runtime.configChanged)
             replyString = "System config has been changed. Still exit";
         else
@@ -2135,8 +2168,11 @@ bool CmdInterface::cmdIfaceProcessCommand()
 
     if (matchnMove(3, point, "reset"))
     {
+        int control = 96;
+        if (matchnMove(3, point, "all"))
+            control = 97;
         if (query("Restore to basic settings", false))
-            sendDirect(0, 64, 96, 240, 255, 255, 255, 192);
+            sendDirect(0, 64, control, 0xf0, 0xff, 0xff, 0xff, 0xc0);
         return false;
     }
 
@@ -2160,7 +2196,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
     if (helpList(level))
         return false;
     if (matchnMove(2, point, "stop"))
-        sendDirect(0, 64, 128, 240);
+        sendDirect(0, 64, 0x80, 0xf0);
     else if (matchnMove(1, point, "list"))
     {
         if (commandList() == todo_msg)
@@ -2231,10 +2267,52 @@ bool CmdInterface::cmdIfaceProcessCommand()
             Runtime.Log("Created  new bank " + (string) point + " with ID " + asString(slot));
             GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
         }
+        else if (matchnMove(2, point, "yoshimi"))
+        {
+            int forceId = string2int(point);
+            if (forceId < 1 || forceId >= 32)
+                forceId = 0;
+            sendDirect(forceId, 64, 104, 0xf0, 0xff, 0xff, 0xff, 0x80);
+        }
         else
         {
             replyString = "add";
             reply = what_msg;
+        }
+    }
+    else if (matchWord(3, point, "import") || matchWord(3, point, "export") )
+    { // need the double test to find which then move along line
+        int type = 0;
+        if (matchnMove(3, point, "import"))
+            type = 60;
+        else if (matchnMove(3, point, "export"))
+            type = 59;
+        int root = 255;
+        if (matchnMove(1, point, "root"))
+        {
+            if (isdigit(point[0]))
+            {
+                root = string2int(point);
+                point = skipChars(point);
+            }
+            else
+                root = 200; // force invalid root error
+        }
+        int value = string2int(point);
+        point = skipChars(point);
+        string name = string(point);
+        if (root < 0 || (root > 127 && root != 255) || value < 0 || value > 127 || name <="!")
+        {
+            if (type == 60)
+                replyString = "import";
+            else
+                replyString = "export";
+            reply = value_msg;
+        }
+        else
+        {
+            sendDirect(value, 64, type, 0xf0, root, 0xff, 0xff, 0x80, miscMsgPush(name));
+            reply = done_msg;
         }
     }
 
@@ -2245,25 +2323,39 @@ bool CmdInterface::cmdIfaceProcessCommand()
             if (isdigit(point[0]))
             {
                 int rootID = string2int(point);
-                string rootname = synth->getBankRef().getRootPath(rootID);
-                if (rootname.empty())
-                    Runtime.Log("Can't find path " + asString(rootID));
+                if (rootID >= MAX_BANK_ROOT_DIRS)
+                    reply = range_msg;
                 else
                 {
-                    synth->getBankRef().removeRoot(rootID);
-                    GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
-                    Runtime.Log("Un-linked " + rootname);
-                    synth->saveBanks(currentInstance);
+                    string rootname = synth->getBankRef().getRootPath(rootID);
+                    if (rootname.empty())
+                        Runtime.Log("Can't find path " + asString(rootID));
+                    else
+                    {
+                        synth->getBankRef().removeRoot(rootID);
+                        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
+                        Runtime.Log("Un-linked " + rootname);
+                        synth->saveBanks(currentInstance);
+                    }
+                    reply = done_msg;
                 }
-                reply = done_msg;
             }
             else
                 reply = value_msg;
         }
         else if (matchnMove(1, point, "bank"))
         {
-            if (isdigit(point[0]))
+            int rootID = 255;
+            if (matchnMove(1, point, "root"))
             {
+                if (isdigit(point[0]))
+                    rootID = string2int(point);
+                if (rootID >= MAX_BANK_ROOT_DIRS)
+                    reply = range_msg;
+            }
+            if (reply != range_msg && isdigit(point[0]))
+            {
+                point = skipChars(point);
                 int bankID = string2int(point);
                 if (bankID >= MAX_BANKS_IN_ROOT)
                     reply = range_msg;
@@ -2285,18 +2377,31 @@ bool CmdInterface::cmdIfaceProcessCommand()
                         }
                         if (tmp == 0)
                         {
-                            if (synth->getBankRef().removebank(bankID))
-                                Runtime.Log("Removed bank " + replyString);
-                            else
-                                Runtime.Log("Deleting failed. Some files may still exist");
-                            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
+                            sendDirect(bankID, 64, 61, 0xf0, rootID, 0xff, 0xff, 0x80);
                         }
                     }
 
                 }
             }
-            else
+            else if (reply != range_msg)
                 reply = value_msg;
+        }
+        else if(matchnMove(2, point, "yoshimi"))
+        {
+            if (point[0] == 0)
+            {
+                replyString = "remove";
+                reply = what_msg;
+            }
+            else
+            {
+                int to_close = string2int(point);
+                if (to_close == 0)
+                    Runtime.Log("Use 'Exit' to close main instance");
+                else
+                    sendDirect(to_close, 64, 105, 0xf0, 0xff, 0xff, 0xff, 0x80);
+                reply = done_msg;
+            }
         }
         else
         {
@@ -2416,7 +2521,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 }
                 if (ok)
                 {
-                    sendDirect(0, 64, 84, 240, 255, 255, ch, 192, miscMsgPush(name));
+                    sendDirect(0, 64, 84, 0xf0, 0xff, 0xff, ch, 0xc0, miscMsgPush(name));
                 }
                 reply = done_msg;
             }
@@ -2542,7 +2647,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 }
                 if (ok)
                 {
-                    sendDirect(0, 64, 80, 240, 255, 255, 255, 192, miscMsgPush(name));
+                    sendDirect(0, 64, 80, 0xf0, 0xff, 0xff, 0xff, 0xc0, miscMsgPush(name));
                     reply = done_msg;
                 }
             }
@@ -2587,7 +2692,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 }
                 if (ok)
                 {
-                    sendDirect(npart, 64, 78, 240, 255, 255, 255, 255, miscMsgPush(name));
+                    sendDirect(npart, 64, 78, 0xf0, 0xff, 0xff, 0xff, 0xff, miscMsgPush(name));
                     reply = done_msg;
                 }
             }
@@ -2684,17 +2789,24 @@ bool CmdInterface::cmdIfaceProcessCommand()
 
     else if (matchnMove(6, point, "direct"))
     {
+        unsigned char request;
         float value;
         unsigned char type = 0;
         if (matchnMove(3, point, "limits"))
-            value = FLT_MAX;
-        else if (matchnMove(3, point, "default"))
         {
-            value = FLT_MAX / 1.5f;
-            type = 0x40;
+            value = 0;
+            type = 4;
+            if (matchnMove(3, point, "min"))
+                request = 1;
+            else if (matchnMove(3, point, "max"))
+                request = 2;
+            else if (matchnMove(3, point, "default"))
+                request = 3;
+            else request = 0xff;
         }
         else
         {
+            request = 0xff;
             value = string2float(point);
             if (strchr(point, '.') == NULL)
                 type |= 0x80; // fix as integer
@@ -2728,12 +2840,12 @@ bool CmdInterface::cmdIfaceProcessCommand()
                     {
                         param = string2int(point);
                         point = skipChars(point);
-                        if (((control == 80 || control == 88) && part == 240) || ((param & 0x80) && param < 0xff && insert != 9))
+                        if (((control == 80 || control == 88) && part == 0xf0) || ((param & 0x80) && param < 0xff && insert != 9))
                         {
                             string name = string(point);
                             if (name > "!")
                                 par2 = miscMsgPush(name);
-                            //cout << name << endl;
+                            //cout << "name " << name << endl;
                         }
                         else if (point[0] != 0)
                             par2 = string2int(point);
@@ -2741,7 +2853,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 }
             }
         }
-        sendDirect(value, type, control, part, kit, engine, insert, param, par2);
+        sendDirect(value, type, control, part, kit, engine, insert, param, par2, request);
         reply = done_msg;
     }
     else
@@ -2755,7 +2867,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
 }
 
 
-int CmdInterface::sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
+int CmdInterface::sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2, unsigned char request)
 {
     if (part != 0xd8) // MIDI learn
         type |= 0x10; // from command line
@@ -2775,45 +2887,64 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
     putData.data.insert = insert;
     putData.data.parameter = parameter;
     putData.data.par2 = par2;
-    if (putData.data.value == FLT_MAX)
+    if ((type & 0x40) == 0)
     {
-        synth->interchange.resolveReplies(&putData);
-        string name = miscMsgPop(putData.data.par2) + "\n~ ";
-        putData.data.par2 = par2; // restore this
-        synth->interchange.returnLimits(&putData);
-        unsigned char returntype = putData.data.type;
-        short int min = putData.limits.min;
-        short int def = putData.limits.def;
-        short int max = putData.limits.max;
-        if (min > max)
+        if (request < 8)
         {
-            synth->getRuntime().Log("Text: " + miscMsgPop(def));
-            return 0;
+
+            request |= 4; // set as limits read
+            type &= 0xf8;
+            putData.data.type = type | request;
         }
-        if (min == -1 && def == -10 && max == -1)
+        value = synth->interchange.readAllData(&putData);
+        string name = "";
+        if (request < 8)
         {
-            synth->getRuntime().Log("Unrecognised Control");
-            return 0;
+            //string name;
+            switch (request)
+            {
+                case 5:
+                    name = "Min ";
+                    break;
+                case 6:
+                    name = "Max ";
+                    break;
+                default:
+                    name = "Default ";
+                    break;
+            }
+            synth->getRuntime().Log(name + to_string(value));
         }
-        string valuetype = "   Type ";
-        if (returntype & 0x80)
-            valuetype += " integer";
-        else
-            valuetype += " float";
-        if (returntype & 0x40)
-            valuetype += " learnable";
-
-        string deftype;
-        if (def >= 10 || def <= 0)
-            deftype = to_string(lrint(def / 10));
-        else
-            deftype = to_string(float(def / 10.0f) + 0.000001).substr(0,4);
-
-        synth->getRuntime().Log(name + "Min " + to_string(min)  + "   Def " + deftype + "   Max " + to_string(max) + valuetype);
+        else if ( part == 0xf0)
+        {
+            switch (control)
+            {
+                case 200:
+                    name = "part " + to_string(int(kit)) + " peak ";
+                    break;
+                case 201:
+                    name = "main ";
+                    if (kit == 0)
+                        name += "L ";
+                    else
+                        name += "R ";
+                    name += "peak ";
+                    break;
+                case 202:
+                    name = "main ";
+                    if (kit == 0)
+                        name += "L ";
+                    else
+                        name += "R ";
+                    name += "RMS ";
+                    break;
+                default:
+                    return 0;
+            }
+            synth->getRuntime().Log(name + to_string(value));
+        }
         return 0;
     }
-    // next line screws effects :(
-    //synth->interchange.testLimits(&putData);
     if (part == 0xf8 && putData.data.par2 < 0xff && (control == 65 || control == 67 || control == 71))
     {
         synth->getRuntime().Log("In use by " + miscMsgPop(putData.data.par2) );
@@ -2851,6 +2982,7 @@ void CmdInterface::cmdIfaceCommandLoop()
     cCmd = NULL;
     bool exit = false;
     sprintf(welcomeBuffer, "yoshimi> ");
+    synth = firstSynth;
     while(!exit)
     {
         cCmd = readline(welcomeBuffer);
