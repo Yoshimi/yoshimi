@@ -1,6 +1,7 @@
 yoshimi 1.5.8 M
 2018-6-1 Will
 * Set as bugfix release.
+* Set manual detection to ignore bugfix numbers.
 
 2018-5-31 Will
 * Corrected GUI handling of part saves.
