@@ -1,4 +1,10 @@
 yoshimi 1.5.8 M
+
+2018-6-4 Will
+BugFix: clearing kit key ranges was doing a reset :(
+BugFix: bank renaming now working across roots.
+  swapping instruments across disabled for now.
+
 2018-6-1 Will
 * Set as bugfix release.
 * Set manual detection to ignore bugfix numbers.

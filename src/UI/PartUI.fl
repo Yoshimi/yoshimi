@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified May 2018
+Modified June 2018
 } {selected in_source in_header
 }
 
@@ -198,7 +198,7 @@ class PartKitItem {: {public Fl_Group, private MiscFuncs}
           minkcounter->value(0);
           maxkcounter->value(127);
 
-          send_data(96, o->value(), 0xc0, n, 0xff, 32);}
+          send_data(20, o->value(), 0xc0, n, 0xff, 32);}
           tooltip {reset the minimum key to 0 and maximum key to 127} xywh {300 3 15 12} box THIN_UP_BOX labelfont 1 labelsize 10
         }
         Fl_Counter maxkcounter {
