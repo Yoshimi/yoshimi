@@ -25,18 +25,21 @@ cmake_policy (VERSION 3.0)
 cmake_policy (SET CMP0004 NEW)
 if (POLICY CMP0046)
     cmake_policy (SET CMP0046 NEW)
-endif (POLICY CMP0046)
+endif (POLICY CMP0046) # opengl version
+if (POLICY CMP0072)
+    cmake_policy (SET CMP0072 OLD)
+endif (POLICY CMP0072)
 set (CMAKE_CXX_STANDARD 11) # we seem to need both for
 add_definitions(-std=gnu++11) # various versions of cmake
 
 # vvv
-#add_definitions(-Wall)
-#add_definitions(-Werror=format-security)
+add_definitions(-Wall)
+add_definitions(-Werror=format-security)
 #add_definitions(-Wpedantic)
-#add_definitions(-Wextra)
+add_definitions(-Wextra)
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "1.5.8.1")
+set (YOSHIMI_VERSION "1.5.8.2")
 add_definitions (-DMIN_CONFIG_MAJOR=1)
 add_definitions (-DMIN_CONFIG_MINOR=5)
 

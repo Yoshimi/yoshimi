@@ -5,6 +5,8 @@ BUG! If jack is selected for audio but there are no physical ports Yoshimi quits
 
 Realtime subnote
 
+Place manual search *entirely* within SynthEngine.cpp
+
 Zero-cross for note off.
 
 Add 'Lock AddSynth Oscillator' checkbox to settings.

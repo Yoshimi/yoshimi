@@ -22,7 +22,7 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified May 2018
+    Modified June 2018
 */
 
 #include <set>
@@ -293,6 +293,22 @@ string Bank::getBankIDname(int bankID)
     if (!retname.empty())
         retname = asString(bankID) + ". " + retname;
     return retname;
+}
+
+
+bool Bank::isDuplicateBankName(size_t rootID, string name)
+{
+    //if(roots.count(rootID) == 0)
+        //return false;
+    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+    {
+        string check = getBankName(i,rootID);
+        if (check > "" && check == name)
+            return true;
+        if (check > "")
+            cout << check << endl;
+    }
+    return false;
 }
 
 
@@ -714,12 +730,11 @@ unsigned int Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size
         root1 = currentRootID;
     if (root2 == 255)
         root2 = root1;
+    //cout << "\nswap 1 I " << int(n1) << "  B " << int(bank1) << "  R " << int(root1) << endl;
+    //cout << "swap 2 I " << int(n2) << "  B " << int(bank2) << "  R " << int(root2) << endl;
     string message = "";
     if (emptyslotWithID(root1, bank1, n1) && emptyslotWithID(root2, bank2, n2))
         message = "nothing to swap!";
-
-    //cout << "\nswap 1 I " << int(n1) << "  B " << int(bank1) << "  R " << int(root1) << endl;
-    //cout << "swap 2 I " << int(n2) << "  B " << int(bank2) << "  R " << int(root2) << endl;
 
     else if (emptyslotWithID(root1, bank1, n1)) // make the empty slot the destination
     {
@@ -741,6 +756,8 @@ unsigned int Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size
         getInstrumentReference(root2, bank2, n2) = getInstrumentReference(root1, bank1, n1);
         getInstrumentReference(root1, bank1, n1).clear();
     }
+    else if (bank1 != bank2 || root1 != root2)
+        message = "move only, across banks/roots";
     else
     {   // if both slots are used
         InstrumentEntry &instrRef1 = getInstrumentReference(root1, bank1, n1);
@@ -793,14 +810,27 @@ unsigned int Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t
         }
     }
 
+    if (firstRoot != secondRoot)
+    {
+        if (isDuplicateBankName(firstRoot, secondname))
+        {
+            message = secondname + " already exists in root " + to_string(firstRoot);
+            result = 0x1000;
+        }
+        else if (isDuplicateBankName(secondRoot, firstname))
+        {
+            message = firstname + " already exists in root " + to_string(secondRoot);
+            result = 0x1000;
+        }
+    }
+
     if (result == 0 && firstRoot != secondRoot) // do physical move first
     {
         string firstBankPath = getBankPath(firstRoot, firstID);
         string secondBankPath = getBankPath(secondRoot, secondID);
-        string tempBankPath = getRootPath(firstRoot) + "/TMP_" + firstname;
-        //cout << "first " << firstBankPath << endl;
-        //cout << "second " << secondBankPath << endl;
-        //cout << "temp " << tempBankPath << endl;
+        string newfirstBankPath = getRootPath(secondRoot) + "/" + firstname;
+        string newsecondBankPath = getRootPath(firstRoot) + "/" + secondname;
+        string tempBankPath = getRootPath(firstRoot) + "/tempfile";
         if (secondBankPath == "") // move only
         {
             result = rename(firstBankPath.c_str(), (getRootPath(secondRoot) + "/" + firstname).c_str());
@@ -823,13 +853,20 @@ unsigned int Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t
         }
         else // actual swap
         {
+            // due to possible identical names we need to go via a temp file
+
+            //cout << "first " << firstBankPath << endl;
+            //cout << "second " << secondBankPath << endl;
+            //cout << "newfirst " << newfirstBankPath << endl;
+            //cout << "newsecond " << newsecondBankPath << endl;
+            result = remove(tempBankPath.c_str()); // just to be sure
             result = rename(firstBankPath.c_str(), tempBankPath.c_str());
             if (result == 0)
             {
-                result = rename(secondBankPath.c_str(),firstBankPath.c_str());
+                result = rename(secondBankPath.c_str(),newsecondBankPath.c_str());
                 if (result == 0)
                 {
-                    result = rename(tempBankPath.c_str(), firstBankPath.c_str());
+                    result = rename(tempBankPath.c_str(), newfirstBankPath.c_str());
                     if (result != 0)
                     {
                         synth->getRuntime().Log("move to " + to_string(secondRoot) + ": " + string(strerror(errno)), 2);
@@ -853,7 +890,7 @@ unsigned int Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t
         }
     }
 
-    if (result == 0)
+    if (result == 0) // update banks
     {
         if (secondname.empty())
         {

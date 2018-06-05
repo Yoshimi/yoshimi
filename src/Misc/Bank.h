@@ -122,6 +122,7 @@ class Bank : private MiscFuncs
         unsigned int swapbanks(unsigned int firstID, unsigned int secondID, size_t firstRoot = 0xff, size_t secondRoot= 0xff);
         string getBankName(int bankID, size_t rootID = 0xff);
         string getBankIDname(int bankID);
+        bool isDuplicateBankName(size_t rootID, string name);
         int getBankSize(int bankID);
         bool setbankname(unsigned int BankID, string newname);
         bool loadbank(size_t rootID, size_t banknum);
