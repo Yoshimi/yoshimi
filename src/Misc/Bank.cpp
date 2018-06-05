@@ -296,6 +296,22 @@ string Bank::getBankIDname(int bankID)
 }
 
 
+bool Bank::isDuplicateBankName(size_t rootID, string name)
+{
+    //if(roots.count(rootID) == 0)
+        //return false;
+    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+    {
+        string check = getBankName(i,rootID);
+        if (check > "" && check == name)
+            return true;
+        if (check > "")
+            cout << check << endl;
+    }
+    return false;
+}
+
+
 // finds the number of instruments in a bank
 int Bank::getBankSize(int bankID)
 {
@@ -719,8 +735,6 @@ unsigned int Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size
     string message = "";
     if (emptyslotWithID(root1, bank1, n1) && emptyslotWithID(root2, bank2, n2))
         message = "nothing to swap!";
-    else if (bank1 != bank2 || root1 != root2)
-        message = "can't swap across banks or roots - yet!";
 
     else if (emptyslotWithID(root1, bank1, n1)) // make the empty slot the destination
     {
@@ -742,6 +756,8 @@ unsigned int Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size
         getInstrumentReference(root2, bank2, n2) = getInstrumentReference(root1, bank1, n1);
         getInstrumentReference(root1, bank1, n1).clear();
     }
+    else if (bank1 != bank2 || root1 != root2)
+        message = "move only, across banks/roots";
     else
     {   // if both slots are used
         InstrumentEntry &instrRef1 = getInstrumentReference(root1, bank1, n1);
@@ -794,6 +810,20 @@ unsigned int Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t
         }
     }
 
+    if (firstRoot != secondRoot)
+    {
+        if (isDuplicateBankName(firstRoot, secondname))
+        {
+            message = secondname + " already exists in root " + to_string(firstRoot);
+            result = 0x1000;
+        }
+        else if (isDuplicateBankName(secondRoot, firstname))
+        {
+            message = firstname + " already exists in root " + to_string(secondRoot);
+            result = 0x1000;
+        }
+    }
+
     if (result == 0 && firstRoot != secondRoot) // do physical move first
     {
         string firstBankPath = getBankPath(firstRoot, firstID);
@@ -824,10 +854,11 @@ unsigned int Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t
         else // actual swap
         {
             // due to possible identical names we need to go via a temp file
-            cout << "first " << firstBankPath << endl;
-            cout << "second " << secondBankPath << endl;
-            cout << "newfirst " << newfirstBankPath << endl;
-            cout << "newsecond " << newsecondBankPath << endl;
+
+            //cout << "first " << firstBankPath << endl;
+            //cout << "second " << secondBankPath << endl;
+            //cout << "newfirst " << newfirstBankPath << endl;
+            //cout << "newsecond " << newsecondBankPath << endl;
             result = remove(tempBankPath.c_str()); // just to be sure
             result = rename(firstBankPath.c_str(), tempBankPath.c_str());
             if (result == 0)

@@ -1,9 +1,13 @@
 yoshimi 1.5.8 M
 
-2018-6-4 Will
-BugFix: clearing kit key ranges was doing a reset :(
-BugFix: bank renaming now working across roots.
-  swapping instruments across disabled for now.
+2018-6-5 Will
+* BugFix: Clearing kitmode key ranges was resetting.
+* BugFix: Bank renaming now working across roots.
+  Disabled instrument swapping across these for now.
+* Improved banks swap error checks.
+* Added gzipped manual patch from Hermann.
+* Set as 2nd bugfix release :(
+
 
 2018-6-1 Will
 * Set as bugfix release.
