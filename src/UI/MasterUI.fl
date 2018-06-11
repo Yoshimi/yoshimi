@@ -327,7 +327,7 @@ class MasterUI {: {private GuiUpdates}
           MenuItem {} {
             label {&View Manual}
             callback {//
-            string manfile = synth->manualname();
+            /*string manfile = synth->manualname();
             unsigned int pos = manfile.rfind(".") + 1;
             int wanted = stoi(manfile.substr(pos, 3));
             int count = wanted + 1;
@@ -358,7 +358,8 @@ class MasterUI {: {private GuiUpdates}
                 fl_alert("Can't find PDF reader :(");
                 return;
             }
-            pclose(fp);
+            pclose(fp);*/
+            send_data(100, 0, 0xf0, 0xf0, 0xff, 0xff, 0x80);
             return;}
             xywh {0 0 34 20} labelsize 12
           }
@@ -1671,6 +1672,11 @@ ZynAddSubFX}
             setMasterLabel("");
             break;
 
+        case 100:
+            if (par2 != NO_MSG)
+                fl_alert("%s", miscMsgPop(par2).c_str());
+            break;
+            
         case 104: // new instance (do nothing here)
             break;
 

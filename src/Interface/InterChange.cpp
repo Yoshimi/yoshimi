@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified May 2018
+    Modified June 2018
 */
 
 #include <iostream>
@@ -619,6 +619,39 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                 case 97: // include MIDI-learn
                     synth->resetAll(control & 1);
                     break;
+                case 100: // display user guide
+                {
+                    string manfile = synth->manualname();
+                    unsigned int pos = manfile.rfind(".") + 1;
+                    int wanted = stoi(manfile.substr(pos, 3));
+                    int count = wanted + 1;
+                    manfile = manfile.substr(0, pos);
+                    string path = "";
+                    while (path == "" && count >= 0) // scan current then older varsions
+                    {
+                        --count;
+                        path = findfile("/usr/", (manfile + to_string(count)).c_str(), "pdf");
+                        if (path == "")
+                        path = findfile("/usr/", (manfile + to_string(count)).c_str(), "pdf.gz");
+                        if (path == "")
+                        path = findfile("/home/", (manfile + to_string(count)).c_str(), "pdf");
+                    }
+
+                    if (path == "")
+                        text = "Can't find manual :(";
+                    else if (count < wanted)
+                        text = "Can't find current manual. Using older one";
+                    if (text == "")
+                    {
+                        string command = "xdg-open " + path + "&";
+                        FILE *fp = popen(command.c_str(), "r");
+                        if (fp == NULL)
+                            text = "Can't find PDF reader :(";
+                        pclose(fp);
+                    }
+                    value = miscMsgPush(text);
+                    break;
+                }
                 case 104:
                     if (value > 0 && value < 32)
                         value = mainCreateNewInstance(value, false);
@@ -1968,6 +2001,11 @@ string InterChange::resolveMain(CommandBlock *getData)
         case 97:
             showValue = false;
             contstr = "Reset All including MIDI-learn";
+            break;
+        
+        case 100:
+            showValue = false;
+            contstr = "Open manual in PDF reader " + miscMsgPop(value_int);
             break;
 
         case 104:
