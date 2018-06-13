@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified May 2018
+    Modified June 2018
 */
 
 #include <iostream>
@@ -37,6 +37,7 @@
 #include <map>
 #include <list>
 #include <sstream>
+#include <sys/time.h>
 
 using namespace std;
 
@@ -2854,6 +2855,109 @@ bool CmdInterface::cmdIfaceProcessCommand()
             }
         }
         sendDirect(value, type, control, part, kit, engine, insert, param, par2, request);
+        reply = done_msg;
+    }
+    else if (matchnMove(2, point, "zread"))
+    {
+        /*
+         * This is a very specific test for reading values and is intended to measure
+         * the time these calls take. For that reason the return echos to the CLI and
+         * GUI are suppressed, and all results are sent to the CLI only.
+         * 
+         * It is only the selection time we are measuring, and that the correct
+         * value is returned.
+         * 
+         * The limit to the number of repeats is INT max. Using high repeat numbers
+         * reduces the effect of the processing overhead outside the call loop itself.
+         */
+
+        float value, result;
+        unsigned char control, part;
+        unsigned char kit = 255;
+        unsigned char engine = 255;
+        unsigned char insert = 255;
+        unsigned char parameter = 255;
+        unsigned char par2 = 255;
+        int repeats;
+        if (point[0] == 0)
+        {
+            reply = value_msg;
+            return false;
+        }
+        value = string2int(point);
+        point = skipChars(point);
+        if (point[0] == 0)
+        {
+            reply = value_msg;
+            return false;
+        }
+        repeats = string2int(point);
+        if (repeats < 1)
+            repeats = 1;
+        point = skipChars(point);
+        if (point[0] == 0)
+        {
+            reply = value_msg;
+            return false;
+        }
+        control = string2int(point);
+        point = skipChars(point);
+        if (point[0] == 0)
+        {
+            reply = value_msg;
+            return false;
+        }
+        part = string2int(point);
+        point = skipChars(point);
+        if (point[0] != 0)
+        {
+            kit = string2int(point);
+            point = skipChars(point);
+            if (point[0] != 0)
+            {
+                engine = string2int(point);
+                point = skipChars(point);
+                if (point[0] != 0)
+                {
+                    insert = string2int(point);
+                    point = skipChars(point);
+                    if (point[0] != 0)
+                    {
+                        parameter = string2int(point);
+                        point = skipChars(point);
+                        if (point[0] != 0)
+                            par2 = string2int(point);
+                    }
+                }
+            }
+        }
+        
+        CommandBlock putData;
+        putData.data.value = value;
+        putData.data.control = control;
+        putData.data.part = part;
+        putData.data.kit = kit;
+        putData.data.engine = engine;
+        putData.data.insert = insert;
+        putData.data.parameter = parameter;
+        putData.data.par2 = par2;
+        struct timeval tv1, tv2;
+        gettimeofday(&tv1, NULL);
+        for (int i = 0; i < repeats; ++ i)
+        {
+            putData.data.type = 0;
+            result = synth->interchange.readAllData(&putData);
+        }
+        gettimeofday(&tv2, NULL);
+
+        if (tv1.tv_usec > tv2.tv_usec)
+        {
+            tv2.tv_sec--;
+            tv2.tv_usec += 1000000;
+            }
+        float actual = (tv2.tv_sec - tv1.tv_sec) *1000000 + (tv2.tv_usec - tv1.tv_usec);
+        cout << "result " << result << endl;
+        cout << "Loops " << repeats << "  Total time " << actual << "uS" << "  average call time " << actual/repeats * 1000.0f << "nS" << endl;
         reply = done_msg;
     }
     else
