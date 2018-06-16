@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2016-2017 Yoshimi project <willgodfrey@musically.me.uk> -->
+<!-- Copyright 2016-2018 Yoshimi project <willgodfrey@musically.me.uk> -->
 <component type="desktop">
   <id>yoshimi.desktop</id>
   <metadata_license>CC0-1.0</metadata_license>
@@ -15,7 +15,7 @@
     </p>
   </description>
   <releases>
-​    <release version="1.5.3" date="2017-08-21" />
+​    <release version="1.5.8" date="2018-05-21" />
 ​  </releases>
   <provides>
     <binary>yoshimi</binary>

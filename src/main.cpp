@@ -2,7 +2,7 @@
     main.cpp
 
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2017, Will Godfrey & others
+    Copyright 2014-2018, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified December 2017
+    Modified May 2018
 */
 
 // approx timeout in seconds.
@@ -56,13 +56,13 @@ using namespace std;
 
 CmdInterface commandInt;
 
+extern map<SynthEngine *, MusicClient *> synthInstances;
+extern SynthEngine *firstSynth;
+
 void mainRegisterAudioPort(SynthEngine *s, int portnum);
+int mainCreateNewInstance(unsigned int forceId, bool loadState);
 
-map<SynthEngine *, MusicClient *> synthInstances;
-list<string> splashMessages;
-
-static SynthEngine *firstSynth = NULL;
-static Config *firstRuntime = NULL;
+Config *firstRuntime = NULL;
 static int globalArgc = 0;
 static char **globalArgv = NULL;
 bool bShowGui = true;
@@ -137,11 +137,19 @@ static void *mainGuiThread(void *arg)
 
     GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::NewSynthEngine, 0);
 
-    while (firstSynth->getRuntime().runSynth)
+    if (firstRuntime->autoInstance)
+    {
+        for (int i = 1; i < 32; ++i)
+        {
+            if ((firstRuntime->activeInstance >> i) & 1)
+                mainCreateNewInstance(i, true);
+        }
+    }
+    while (firstRuntime->runSynth)
     {
         if (firstSynth->getUniqueId() == 0)
         {
-            firstSynth->getRuntime().signalCheck();
+            firstRuntime->signalCheck();
         }
 
         for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
@@ -158,7 +166,7 @@ static void *mainGuiThread(void *arg)
                     _synth->RootBank(tmpRoot, tmpBank); // but keep current root and bank
                 }
                 _synth->getRuntime().saveConfig();
-                int tmpID =  _synth->getUniqueId();
+                unsigned int instanceID =  _synth->getUniqueId();
                 if (_client)
                 {
                     _client->Close();
@@ -167,13 +175,16 @@ static void *mainGuiThread(void *arg)
 
                 if (_synth)
                 {
-                    _synth->saveBanks(tmpID);
+                    int instancebit = (1 << instanceID);
+                    if (_synth->getRuntime().activeInstance & instancebit)
+                        _synth->getRuntime().activeInstance -= instancebit;
+                    _synth->saveBanks(instanceID);
                     _synth->getRuntime().flushLog();
                     delete _synth;
                 }
 
                 synthInstances.erase(it);
-                cout << "\nStopped " << tmpID << "\n";
+                cout << "\nStopped " << instanceID << "\n";
                 break;
             }
             if (bShowGui)
@@ -210,26 +221,28 @@ static void *mainGuiThread(void *arg)
         else
             usleep(33333);
     }
-    if (firstSynth->getRuntime().configChanged && (bShowGui | bShowCmdLine)) // don't want this if no cli or gui
+    if (firstRuntime->configChanged && (bShowGui | bShowCmdLine)) // don't want this if no cli or gui
     {
         size_t tmpRoot = firstSynth->ReadBankRoot();
         size_t tmpBank = firstSynth->ReadBank();
-        firstSynth->getRuntime().loadConfig(); // restore old settings
+        firstRuntime->loadConfig(); // restore old settings
         firstSynth->RootBank(tmpRoot, tmpBank); // but keep current root and bank
     }
-    firstSynth->getRuntime().saveConfig();
+
+    firstRuntime->saveConfig();
     firstSynth->saveHistory();
     firstSynth->saveBanks(0);
     return NULL;
 }
 
-bool mainCreateNewInstance(unsigned int forceId)
+int mainCreateNewInstance(unsigned int forceId, bool loadState)
 {
     MusicClient *musicClient = NULL;
+    unsigned int instanceID;
     SynthEngine *synth = new SynthEngine(globalArgc, globalArgv, false, forceId);
     if (!synth->getRuntime().isRuntimeSetupCompleted())
         goto bail_out;
-
+    instanceID = synth->getUniqueId();
     if (!synth)
     {
         std::cerr << "Failed to allocate SynthEngine" << std::endl;
@@ -253,6 +266,16 @@ bool mainCreateNewInstance(unsigned int forceId)
         synth->getRuntime().Log("Failed to start MusicIO");
         goto bail_out;
     }
+     // TODO sort this out properly!
+     // it works, but is clunky :(
+    loadState = synth->getRuntime().loadDefaultState;
+    if (loadState)
+    {
+        string name = synth->getRuntime().defaultStateName;
+        if (instanceID > 0)
+            name = name + "-" + to_string(forceId);
+        synth->loadStateAndUpdate(name);
+    }
 
     if (synth->getRuntime().showGui)
     {
@@ -269,13 +292,14 @@ bool mainCreateNewInstance(unsigned int forceId)
 
     synth->getRuntime().StartupReport(musicClient);
     synth->Unmute();
-    if (synth->getUniqueId() == 0)
+
+    if (instanceID == 0)
         cout << "\nYay! We're up and running :-)\n";
     else
     {
-        cout << "\nStarted "<< synth->getUniqueId() << "\n";
+        cout << "\nStarted "<< instanceID << "\n";
         // following copied here for other instances
-        synth->installBanks(synth->getUniqueId());
+        synth->installBanks(instanceID);
     }
     synthInstances.insert(std::make_pair(synth, musicClient));
     //register jack ports for enabled parts
@@ -284,7 +308,8 @@ bool mainCreateNewInstance(unsigned int forceId)
         if (synth->partonoffRead(npart))
             mainRegisterAudioPort(synth, npart);
     }
-    return true;
+    synth->getRuntime().activeInstance |= (1 << instanceID);
+    return instanceID;
 
 bail_out:
     synth->getRuntime().runSynth = false;
@@ -300,10 +325,10 @@ bail_out:
         delete synth;
     }
 
-    return false;
+    return -1;
 }
 
-void *commandThread(void *arg)
+void *commandThread(void *arg = NULL) // silence warning
 {
     commandInt.cmdIfaceCommandLoop();
     return 0;
@@ -326,7 +351,7 @@ int main(int argc, char *argv[])
     pthread_attr_t attr;
     sem_t semGui;
 
-    if (!mainCreateNewInstance(0))
+    if (mainCreateNewInstance(0, false) == -1)
     {
         goto bail_out;
     }
@@ -365,15 +390,15 @@ int main(int argc, char *argv[])
     memset(&yoshimiSigAction, 0, sizeof(yoshimiSigAction));
     yoshimiSigAction.sa_handler = yoshimiSigHandler;
     if (sigaction(SIGUSR1, &yoshimiSigAction, NULL))
-        firstSynth->getRuntime().Log("Setting SIGUSR1 handler failed");
+        firstRuntime->Log("Setting SIGUSR1 handler failed");
     if (sigaction(SIGINT, &yoshimiSigAction, NULL))
-        firstSynth->getRuntime().Log("Setting SIGINT handler failed");
+        firstRuntime->Log("Setting SIGINT handler failed");
     if (sigaction(SIGHUP, &yoshimiSigAction, NULL))
-        firstSynth->getRuntime().Log("Setting SIGHUP handler failed");
+        firstRuntime->Log("Setting SIGHUP handler failed");
     if (sigaction(SIGTERM, &yoshimiSigAction, NULL))
-        firstSynth->getRuntime().Log("Setting SIGTERM handler failed");
+        firstRuntime->Log("Setting SIGTERM handler failed");
     if (sigaction(SIGQUIT, &yoshimiSigAction, NULL))
-        firstSynth->getRuntime().Log("Setting SIGQUIT handler failed");
+        firstRuntime->Log("Setting SIGQUIT handler failed");
     // following moved here for faster first synth startup
     firstSynth->loadHistory();
     firstSynth->installBanks(0);
@@ -381,6 +406,7 @@ int main(int argc, char *argv[])
 
     //create command line processing thread
     pthread_t cmdThr;
+//    while (firstSynth == NULL); // just wait
     if(bShowCmdLine)
     {
         if (pthread_attr_init(&attr) == 0)

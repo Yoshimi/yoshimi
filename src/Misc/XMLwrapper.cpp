@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2017, Will Godfrey
+    Copyright 2014-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified December 2017
+    Modified April 2018
 */
 
 #include <zlib.h>
@@ -63,11 +63,17 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi) :
     memset(&parentstack, 0, sizeof(parentstack));
     tree = mxmlNewElement(MXML_NO_PARENT, "?xml version=\"1.0\" encoding=\"UTF-8\"?");
     mxml_node_t *doctype = mxmlNewElement(tree, "!DOCTYPE");
-    bool yoshiType = (synth->getRuntime().xmlType <= XML_PRESETS);
-    // cout << "yoshiType  " << yoshiType << "   isYoshi " << isYoshi << endl;
 
-    if (!yoshiType || !isYoshi)
+    if (isYoshi)
     {
+        //cout << "Our doctype" << endl;
+        mxmlElementSetAttr(doctype, "Yoshimi-data", NULL);
+        root = mxmlNewElement(tree, "Yoshimi-data");
+        information.yoshiType = 1;
+    }
+    else
+    {
+        //cout << "Zyn doctype" << endl;
         mxmlElementSetAttr(doctype, "ZynAddSubFX-data", NULL);
         root = mxmlNewElement(tree, "ZynAddSubFX-data");
         mxmlElementSetAttr(root, "version-major", "3");
@@ -75,12 +81,7 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi) :
         mxmlElementSetAttr(root, "ZynAddSubFX-author", "Nasca Octavian Paul");
         information.yoshiType = 0;
     }
-    else
-    {
-        mxmlElementSetAttr(doctype, "Yoshimi-data", NULL);
-        root = mxmlNewElement(tree, "Yoshimi-data");
-        information.yoshiType = 1;
-    }
+
     node = root;
     mxmlElementSetAttr(root, "Yoshimi-author", "Alan Ernest Calvert");
     string tmp = YOSHIMI_VERSION;
@@ -114,6 +115,8 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi) :
                 addparbool("enable_gui", synth->getRuntime().showGui);
                 addparbool("enable_splash", synth->getRuntime().showSplash);
                 addparbool("enable_CLI", synth->getRuntime().showCLI);
+                addparbool("enable_auto_instance", synth->getRuntime().autoInstance);
+                addparU("active_instances", synth->getRuntime().activeInstance);
             endbranch();
         }
     }
@@ -369,6 +372,12 @@ char *XMLwrapper::getXMLdata()
 }
 
 
+void XMLwrapper::addparU(const string& name, unsigned int val)
+{
+    addparams2("parU", "name", name.c_str(), "value", asString(val));
+}
+
+
 void XMLwrapper::addpar(const string& name, int val)
 {
     addparams2("par", "name", name.c_str(), "value", asString(val));
@@ -612,6 +621,23 @@ int XMLwrapper::getbranchid(int min, int max)
 }
 
 
+unsigned int XMLwrapper::getparU(const string& name, unsigned int defaultpar, unsigned int min, unsigned int max)
+{
+    node = mxmlFindElement(peek(), peek(), "parU", "name", name.c_str(), MXML_DESCEND_FIRST);
+    if (!node)
+        return defaultpar;
+    const char *strval = mxmlElementGetAttr(node, "value");
+    if (!strval)
+        return defaultpar;
+    unsigned int val = string2int(strval);
+    if (val < min)
+        val = min;
+    else if (val > max)
+        val = max;
+    return val;
+}
+
+
 int XMLwrapper::getpar(const string& name, int defaultpar, int min, int max)
 {
     node = mxmlFindElement(peek(), peek(), "par", "name", name.c_str(), MXML_DESCEND_FIRST);
@@ -652,6 +678,7 @@ int XMLwrapper::getparbool(const string& name, int defaultpar)
     char tmp = strval[0] | 0x20;
     return (tmp != '0' && tmp != 'n' && tmp != 'f') ? 1 : 0;
 }
+// case insensitive, anything other than '0', 'no', 'false' is treated as 'true'
 
 
 string XMLwrapper::getparstr(const string& name)

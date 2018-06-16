@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified February 2018
+    Modified March 2018
 */
 
 #include <cmath>
@@ -450,7 +450,7 @@ void Reverb::settype(unsigned char Ptype_)
         bandwidth = new Unison(synth->buffersize / 4 + 1, 2.0f, synth);
         bandwidth->setSize(50);
         bandwidth->setBaseFrequency(1.0f);
-#warning sa schimb size-ul
+#pragma message "sa schimb size-ul"
         //the size of the unison buffer may be too small, though this has
         //not been verified yet.
         //As this cannot be resized in a RT context, a good upper bound should
@@ -626,6 +626,7 @@ float Revlimit::getlimits(CommandBlock *getData)
         case 16:
             max = 12;
             canLearn = false;
+            break;
         default:
             getData->data.type |= 4; // error
             return 1.0f;

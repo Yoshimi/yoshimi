@@ -1,0 +1,22 @@
+/src/CMakeLists.txt
+    Ensure version number is correct.
+    Disable extra compiler tests.
+
+/desktop/yoshimi.1
+    Ensure version number and dates are correct.
+    Check for any changes in info or commands.
+
+/desktop/metainfo/yoshimi.appdata.xml
+    Ensure version number and dates are correct.
+    Check urls for images are correct.
+    Check contact details.
+
+/dev-notes
+    Ensure these notes are up-to-date - especially ToDo.txt
+
+/doc
+    Ensure these are up-to-date - especially check
+    yoshimi-user-manual has correct version number
+
+After commit
+    Update wikipedia entry

@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified February 2018
+    Modified May 2018
 */
 
 #ifndef CMDINTERFACE_H
@@ -29,8 +29,6 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Interface/InterChange.h"
 #include "Effects/EffectMgr.h"
-
-extern map<SynthEngine *, MusicClient *> synthInstances;
 
 // all_fx and ins_fx MUST be the first two
 typedef enum { all_fx = 0, ins_fx, conf_lev, vect_lev, scale_lev, learn_lev, part_lev, } level_bits;

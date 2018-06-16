@@ -23,7 +23,7 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified february 2018
+    Modified March 2018
 */
 
 #include <cmath>
@@ -149,7 +149,7 @@ void OscilGen::defaults(void)
 }
 
 
-void OscilGen::convert2sine(int magtype)
+void OscilGen::convert2sine()
 {
     float mag[MAX_AD_HARMONICS], phase[MAX_AD_HARMONICS];
     float oscil[synth->oscilsize];

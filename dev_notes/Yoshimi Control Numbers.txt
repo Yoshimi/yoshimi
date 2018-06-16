@@ -6,7 +6,7 @@ Y : 0 to 63 : 14 : 240 : 255 : 255 : 255 : 255 : 255 : Part number
 Y : 16, 32, 64 : 15 : 240 : 255 : 255 : 255 : 255 : 255 : Number of available parts
 YL : 0 to 127 : 32 : 240 : 255 : 255 : 255 : 128 : 255 : Detune frequency
 Y : -36 to 36 : 35 : 240 : 255 : 255 : 255 : 128 : 255 : Key shift
-Y : 0 to 3 : 48 : 240 : 255 : 255 : 255 : 255 : 255 : Channel Switcher Type (Solo) - Off, Row, Column, Loop
+Y : 0 to 4 : 48 : 240 : 255 : 255 : 255 : 255 : 255 : Channel Switcher Type (Solo) - Off, Row, Column, Loop, TwoWay
 Y : 14 to 119 : 49 : 240 : 255 : 255 : 255 : 255 : 255 : Channel Switcher Incoming CC
 
 Y : 0 to 127 : 59 : 240 : 0 to 127, 255 : 255 : 255 : 128 : msg No. : Export bank ID at root ID to named directory via miscMsg
@@ -22,11 +22,19 @@ Y : any : 93 : 240 : 255 : 255 : 255 : 128 : msg No. : Save named state via misc
 Y : any : 94 : 240 : 255 : 255 : 255 : 128 + 0 to 63: msg No. : Export PadSynth samples to named prefix via miscMsg
 Y : any : 96 : 240 : 255 : 255 : 255 : 192 : 255 : Reset (clear all)
 Y : any : 97 : 240 : 255 : 255 : 255 : 192 : 255 : Reset including MIDI-learn
+Y : 1 to 31 : 104 : 240 : 255 : 255 : 255 : 128 : 255 : Create new numbered instance
+n : 1 to 31 : 105 : 240 : 255 : 255 : 255 : 128 : 255 : Close numbered instance
 Y : any : 128 : 240 : 255 : 255 : 255 : 255 : 255 : Stop
 
 Y : any : 200 : 240 : 0 to 63 : 255 : 255 : 255 : 255 : Read part peak level
 Y : any : 201 : 240 : 0/1 : 255 : 255 : 255 : 255 : Read main L/R peak level
 Y : any : 202 : 240 : 0/1 : 255 : 255 : 255 : 255 : Read main L/R RMS level
+
+Instruments/Banks
+Y : any : 4 : 244 : 0 to 127 : 0 to 127 : 0 to 159 : 128 : ret. msg No. : Select first instrument for swap
+Y : any : 5 : 244 : 0 to 127 : 0 to 127 : 0 to 159 : 128 : ret. msg No. : Select second instrument and do swap
+Y : any : 20 : 244 : 0 to 127 : 0 to 127 : 255 : 128 : ret. msg No. : Select first bank for swap
+Y : any : 21 : 244 : 0 to 127 : 0 to 127 : 255 : 128 : ret. msg No. : Select second bank and do swap
 
 Config
 Y : 256 to 16384 : 0 : 248 : 255 : 255 : 255 : 255 : 255 : Oscillator size – powers of 2
@@ -71,16 +79,16 @@ Y : any : 80 : 248 : 255 : 255 : 255 : 128 : msg No. : Save current config (any 
 
 Scales (microtonal)
 Y : 1.0 to 20000.0 : 0 : 232 : 255 : 255 : 255 : 255 : 255 : 'A’ frequency
-Y : 0 to 127 : 1 : 232 : 255 : 255 : 255 : 255 : 255 : 'A’ note
-Y : 0 / 1 : 2 : 232 : 255 : 255 : 255 : 255 : 255 : Invert keys
-Y : 0 to 127 : 3 : 232 : 255 : 255 : 255 : 255 : 255 : Key centre
-Y : -63 to 64 : 4 : 232 : 255 : 255 : 255 : 255 : 255 : Scale shift
-Y : 0 / 1 : 8 : 232 : 255 : 255 : 255 : 255 : 255 : Enable Microtonal
+YL : 0 to 127 : 1 : 232 : 255 : 255 : 255 : 255 : 255 : 'A’ note
+YL : 0 / 1 : 2 : 232 : 255 : 255 : 255 : 255 : 255 : Invert keys
+YL : 0 to 127 : 3 : 232 : 255 : 255 : 255 : 255 : 255 : Key centre
+YL : -63 to 64 : 4 : 232 : 255 : 255 : 255 : 255 : 255 : Scale shift
+YL : 0 / 1 : 8 : 232 : 255 : 255 : 255 : 255 : 255 : Enable Microtonal
 
-Y : 0 / 1 : 16 : 232 : 255 : 255 : 255 : 255 : 255 : Enable keyboard mapping
-Y : 0 to 127 : 17 : 232 : 255 : 255 : 255 : 255 : 255 : Keyboard first note
-Y : 0 to 127 : 18 : 232 : 255 : 255 : 255 : 255 : 255 : Keyboard middle note
-Y : 0 to 127 : 19 : 232 : 255 : 255 : 255 : 255 : 255 : keyboard last note
+YL : 0 / 1 : 16 : 232 : 255 : 255 : 255 : 255 : 255 : Enable keyboard mapping
+YL : 0 to 127 : 17 : 232 : 255 : 255 : 255 : 255 : 255 : Keyboard first note
+YL : 0 to 127 : 18 : 232 : 255 : 255 : 255 : 255 : 255 : Keyboard middle note
+YL : 0 to 127 : 19 : 232 : 255 : 255 : 255 : 255 : 255 : keyboard last note
 
 Y : return size/err : 32 : 232 : 255 : 255 : 255 : 128 : msg No. : Tunings
 Y : return size/err : 33 : 232 : 255 : 255 : 255 : 128 : msg No. : Keyboard map
@@ -178,8 +186,8 @@ YL : 0 to 127 : 194 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Expression (CC 11)
 YL : 0 to 127 : 197 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Q (CC 71)
 YL : 0 to 127 : 198 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Cutoff (CC 74)
 YL : 0 to 127 : 199 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Master Bandwidth (CC 75)
-Yy : any : 222 : 0 to 63 : 255 : 255 : 255 : 255 : msg No. : Set part instrument name
-Yy : any : 222 : 0 to 63 : 255 : 255 : 255 : 128/129 : 255 : Load/Save default instrument copyright
+Yy : any : 222 : 0 to 63 : 255 : 255 : 255 : 128 : msg No. : Set/Read part's instrument name
+Yy : any : 223 : 0 to 63 : 255 : 255 : 255 : 128/129 : 255 : Load/Save default instrument copyright
 Y : any : 224 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Reset all controllers (for this part)
 
 Instrument edit window
@@ -202,6 +210,8 @@ Y : 0 to 3 : 24 : 0 to 63 : 0 to 15 : 255 : 32 : 255 : 255 : Effect number to us
 
 Y : 0/1 : 57 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Drum mode
 Y : 0 to 3 : 58 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Mode – Off, Multi, Single, Crossfade
+
+Yy : any : 222 : 0 to 63 : 0 to 15 : 255 : 32 : 129 : msg No. : Set/Read part's kit item name
 
 AddSynth main window
 YL : 0 to 127 : 0 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Volume

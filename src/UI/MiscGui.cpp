@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified February 2018
+    Modified April 2018
 */
 
 #include "Misc/SynthEngine.h"
@@ -178,6 +178,12 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         return;
     }
 
+    if (npart == 0xf4)
+    {
+        synth->getGuiMaster()->bankui->returns_update(getData);
+        return;
+    }
+
     Part *part = synth->part[npart];
 
     if (kititem >= 0x80 && kititem != 0xff) // effects
@@ -240,6 +246,11 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     if (kititem != 0xff && kititem != 0 && engine != 0xff && control != 8 && part->kit[kititem].Penabled == false)
         return; // attempt to access non existant kititem
 
+    if (insert < 0xff || (control != 8 && control != 222))
+    {
+        if (synth->getGuiMaster()->partui->partname == "Simple Sound")
+            synth->getGuiMaster()->partui->checkEngines("No Title");
+    }
     if (kititem == 0xff || insert == 0x20) // part
     {
         if (control != 58 && kititem < 0xff && part->Pkitmode == 0)

@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is a derivative of a ZynAddSubFX original.
-    Modified February 2018
+    Modified March 2018
 */
 
 #ifndef PAD_NOTE_PARAMETERS_H
@@ -172,9 +172,7 @@ class PADnoteParameters : public Presets
                                             int profilesize,
                                             float bwadjust);
         void generatespectrum_otherModes(float *spectrum, int size,
-                                         float basefreq,
-                                         float *profile, int profilesize,
-                                         float bwadjust);
+                                         float basefreq);
         void deletesamples(void);
         void deletesample(int n);
 

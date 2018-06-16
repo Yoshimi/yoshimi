@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified February 2018
+    Modified March 2018
 */
 
 #include <iostream>
@@ -367,7 +367,8 @@ bool MidiLearn::remove(int itemNumber)
 
 void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control, unsigned char part, unsigned char _kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
-    unsigned int kit = _kit; // may need to set as an NRPN
+    unsigned int kit = part; // to silence warning
+    kit = _kit; // may need to set as an NRPN
     if (control == 22)
     {
         updateGui();
@@ -824,7 +825,7 @@ bool MidiLearn::saveList(string name)
     legit_pathname(file);
 
     synth->getRuntime().xmlType = XML_MIDILEARN;
-    XMLwrapper *xml = new XMLwrapper(synth);
+    XMLwrapper *xml = new XMLwrapper(synth, true);
     if (!xml)
     {
         synth->getRuntime().Log("Save Midi Learn failed xmltree allocation");
@@ -845,9 +846,10 @@ bool MidiLearn::saveList(string name)
 
 bool MidiLearn::insertMidiListData(bool full,  XMLwrapper *xml)
 {
+    int ID = full; // to silence warning
     if (midi_list.size() == 0)
         return false;
-    int ID = 0;
+    ID = 0;
     list<LearnBlock>::iterator it;
     it = midi_list.begin();
     xml->beginbranch("MIDILEARN");
@@ -907,7 +909,7 @@ bool MidiLearn::loadList(string name)
         synth->getRuntime().Log("Can't find " + file);
         return false;
     }
-    XMLwrapper *xml = new XMLwrapper(synth);
+    XMLwrapper *xml = new XMLwrapper(synth, true);
     if (!xml)
     {
         synth->getRuntime().Log("Load Midi Learn failed XMLwrapper allocation");

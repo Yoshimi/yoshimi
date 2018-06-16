@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified February 2018
+    Modified June 2018
 */
 
 #define NOLOCKS
@@ -46,6 +46,8 @@ using namespace std;
 #include <unistd.h>
 
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
+map<SynthEngine *, MusicClient *> synthInstances;
+SynthEngine *firstSynth = NULL;
 
 static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
 {
@@ -82,7 +84,6 @@ static vector<string> StateHistory;
 static vector<string> VectorHistory;
 static vector<string> MidiLearnHistory;
 
-
 SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int forceId) :
     uniqueId(getRemoveSynthId(false, forceId)),
     isLV2Plugin(_isLV2Plugin),
@@ -112,7 +113,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     fft(NULL),
     muted(0),
     processLock(NULL),
-    stateXMLtree(NULL),
+    //stateXMLtree(NULL),
     guiMaster(NULL),
     guiClosedCallback(NULL),
     guiCallbackArg(NULL),
@@ -209,7 +210,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     ControlStep = (127.0f / samplerate) * 5.0f; // 200mS for 0 to 127
     int found = 0;
 
-    if (!interchange.Init(this))
+    if (!interchange.Init())
     {
         Runtime.LogError("interChange init failed");
         goto bail_out;
@@ -381,10 +382,20 @@ string SynthEngine::manualname(void)
 {
     string manfile = "yoshimi-user-manual-";
     manfile += YOSHIMI_VERSION;
-    int pos = manfile.find(" rc");
-    if (pos < 1)
-        return manfile;
-    return manfile.substr(0, pos);
+    manfile = manfile.substr(0, manfile.find(" ")); // remove M suffix
+    int pos = 0;
+    int count = 0;
+    for (unsigned i = 0; i < manfile.length(); ++i)
+    {
+        if (manfile.at(i) == '.')
+        {
+            pos = i;
+            ++count;
+        }
+    }
+    if (count == 3)
+        manfile = manfile.substr(0, pos); // remove bugfix number
+    return manfile;
 }
 
 
@@ -525,60 +536,78 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
 
 int SynthEngine::RunChannelSwitch(int value)
 {
-    int unknown = 0;
-    if (Runtime.channelSwitchType == 1 || Runtime.channelSwitchType == 3) // single row / loop
+    static unsigned int timer = 0;
+    if ((interchange.tick - timer) > 511) // approx 60mS
+        timer = interchange.tick;
+    else if (Runtime.channelSwitchType > 2)
+        return 0; // de-bounced
+
+    switch (Runtime.channelSwitchType)
     {
-        if (Runtime.channelSwitchType == 1)
-        {
+        case 1: // single row
             if (value >= NUM_MIDI_CHANNELS)
                 return 1; // out of range
-        }
-        else if (value > 0)
-            value = (Runtime.channelSwitchValue + 1) % NUM_MIDI_CHANNELS; // loop
-        else
-            return 0; // do nothing if it's a switch off
-        Runtime.channelSwitchValue = value;
-        for (int ch = 0; ch < NUM_MIDI_CHANNELS; ++ch)
+            break;
+        case 2: // columns
         {
-            bool isVector = Runtime.vectordata.Enabled[ch];
-            if (ch != value)
+            if (value >= NUM_MIDI_PARTS)
+                return 1; // out of range
+            int chan = value & 0xf;
+            for (int i = chan; i < NUM_MIDI_PARTS; i += NUM_MIDI_CHANNELS)
             {
-                part[ch]->Prcvchn = NUM_MIDI_CHANNELS;
-                if (isVector)
-                {
-                    part[ch + NUM_MIDI_CHANNELS]->Prcvchn = NUM_MIDI_CHANNELS;
-                    part[ch + NUM_MIDI_CHANNELS * 2]->Prcvchn = NUM_MIDI_CHANNELS;
-                    part[ch + NUM_MIDI_CHANNELS * 3]->Prcvchn = NUM_MIDI_CHANNELS;
-                }
+                if (i != value)
+                    part[i]->Prcvchn = chan | NUM_MIDI_CHANNELS;
+                else
+                    part[i]->Prcvchn = chan;
             }
-            else
-            {
-                part[ch]->Prcvchn = 0;
-                if (isVector)
-                {
-                    part[ch + NUM_MIDI_CHANNELS]->Prcvchn = 0;
-                    part[ch + NUM_MIDI_CHANNELS * 2]->Prcvchn = 0;
-                    part[ch + NUM_MIDI_CHANNELS * 3]->Prcvchn = 0;
-                }
-            }
+            Runtime.channelSwitchValue = value;
+            return 0; // all OK
+            break;
         }
+        case 3: // loop
+            if (value == 0)
+                return 0; // do nothing - it's a switch off
+            value = (Runtime.channelSwitchValue + 1) % NUM_MIDI_CHANNELS;
+            break;
+        case 4: // twoway
+            if (value == 0)
+                return 0; // do nothing - it's a switch off
+            if (value >= 64)
+                value = (Runtime.channelSwitchValue + 1) % NUM_MIDI_CHANNELS;
+            else
+                value = (Runtime.channelSwitchValue + NUM_MIDI_CHANNELS - 1) % NUM_MIDI_CHANNELS;
+            // add in NUM_MIDI_CHANNELS so always positive
+            break;
+        default:
+            return 2; // unknown
     }
-    else if (Runtime.channelSwitchType == 2) // columns
+    // vvv column mode never gets here vvv
+    Runtime.channelSwitchValue = value;
+    for (int ch = 0; ch < NUM_MIDI_CHANNELS; ++ch)
     {
-        if (value >= NUM_MIDI_PARTS)
-            return 1; // out of range
-        int chan = value & 0xf;
-        for (int i = chan; i < NUM_MIDI_PARTS; i += NUM_MIDI_CHANNELS)
+        bool isVector = Runtime.vectordata.Enabled[ch];
+        if (ch != value)
         {
-            if (i != value)
-                part[i]->Prcvchn = chan | NUM_MIDI_CHANNELS;
-            else
-                part[i]->Prcvchn = chan;
+            part[ch]->Prcvchn = NUM_MIDI_CHANNELS;
+            if (isVector)
+            {
+                part[ch + NUM_MIDI_CHANNELS]->Prcvchn = NUM_MIDI_CHANNELS;
+                part[ch + NUM_MIDI_CHANNELS * 2]->Prcvchn = NUM_MIDI_CHANNELS;
+                part[ch + NUM_MIDI_CHANNELS * 3]->Prcvchn = NUM_MIDI_CHANNELS;
+            }
+        }
+        else
+        {
+            part[ch]->Prcvchn = 0;
+            if (isVector)
+            {
+                part[ch + NUM_MIDI_CHANNELS]->Prcvchn = 0;
+                part[ch + NUM_MIDI_CHANNELS * 2]->Prcvchn = 0;
+                part[ch + NUM_MIDI_CHANNELS * 3]->Prcvchn = 0;
+            }
         }
     }
-    else
-        unknown = 2; // unrecognised
-    return unknown;
+    return 0; // all OK
 }
 
 
@@ -613,15 +642,18 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
     }
     else
     {
+        bool vector = (chan >= 0x80);
         chan &= 0x3f;
         if (chan >= Runtime.NumAvailableParts)
             return; // shouldn't be possible
         minPart = chan;
-        maxPart = chan;
+        maxPart = chan + 1;
+        if (vector)
+            chan &= 0xf;
     }
 
     int npart;
-        //cout << "npart group " << to_string(int(chan)) << endl;
+    //cout << "  min " << minPart<< "  max " << maxPart << "  Rec " << int(part[npart]->Prcvchn) << "  Chan " << int(chan) << endl;
     for (npart = minPart; npart < maxPart; ++ npart)
     {   // Send the controller to all part assigned to the channel
         part[npart]->legatoFading = 0;
@@ -641,7 +673,10 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
                     SetPartKeyMode(npart, mode | 4); // temporary legato
             }
             else
+            {
+                //cout << "type " << int(type) << "  par " << int(par) << endl;
                 part[npart]->SetController(type, par);
+            }
         }
     }
 }
@@ -707,24 +742,6 @@ void SynthEngine::SetZynControls(bool in_place)
 }
 
 
-unsigned int SynthEngine::exportBank(string exportfile, size_t rootID, unsigned int bankID)
-{
-    return bank.exportBank(exportfile, rootID, bankID);
-}
-
-
-unsigned int SynthEngine::importBank(string inportfile, size_t rootID, unsigned int bankID)
-{
-    return bank.importBank(inportfile, rootID, bankID);
-}
-
-
-unsigned int SynthEngine::removeBank(unsigned int bankID, size_t rootID)
-{
-    return bank.removebank(bankID, rootID);
-}
-
-
 int  SynthEngine::RootBank(int rootnum, int banknum)
 {
     CommandBlock getData;
@@ -749,7 +766,7 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
     int originalRoot = bank.getCurrentRootID();
     int originalBank = bank.getCurrentBankID();
     bool ok = true;
-    bool hasProgChange = (program < 0xff || par2 < 0xff);
+    bool hasProgChange = (program < 0xff || par2 != NO_MSG);
 
     struct timeval tv1, tv2;
     if (notinplace && Runtime.showTimes && hasProgChange)
@@ -903,7 +920,7 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
         msgID = miscMsgPush(name);
     }
     if (!ok)
-        msgID |= 0x1000;
+        msgID |= 0xFF0000;
     return msgID;
 }
 
@@ -2237,6 +2254,7 @@ void SynthEngine::allStop(unsigned int stopType)
 bool SynthEngine::actionLock(lockset request)
 {
 #ifdef NOLOCKS
+    lockset a = request; request = a; // suppress warning
     return 0;
 #else
     int chk  = -1;
@@ -2377,7 +2395,7 @@ bool SynthEngine::saveBanks(int instance)
     string bankname = name + ".banks";
     Runtime.xmlType = XML_BANK;
 
-    XMLwrapper *xmltree = new XMLwrapper(this);
+    XMLwrapper *xmltree = new XMLwrapper(this, true);
     if (!xmltree)
     {
         Runtime.Log("saveBanks failed xmltree allocation");
@@ -2507,7 +2525,7 @@ bool SynthEngine::loadHistory()
         Runtime.Log("Missing history file");
         return false;
     }
-    XMLwrapper *xml = new XMLwrapper(this);
+    XMLwrapper *xml = new XMLwrapper(this, true);
     if (!xml)
     {
         Runtime.Log("loadHistory failed XMLwrapper allocation");
@@ -2585,7 +2603,7 @@ bool SynthEngine::saveHistory()
     string historyname = name + ".history";
     Runtime.xmlType = XML_HISTORY;
 
-    XMLwrapper *xmltree = new XMLwrapper(this);
+    XMLwrapper *xmltree = new XMLwrapper(this, true);
     if (!xmltree)
     {
         Runtime.Log("saveHistory failed xmltree allocation");
@@ -2665,6 +2683,7 @@ unsigned char SynthEngine::loadVectorAndUpdate(unsigned char baseChan, string na
 
 unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
 {
+    bool a = full; full = a; // suppress warning
     unsigned char actualBase = 255; // error!
     if (name.empty())
     {
@@ -2678,7 +2697,7 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool 
         Runtime.Log("Can't find " + file, 2);
         return actualBase;
     }
-    XMLwrapper *xml = new XMLwrapper(this);
+    XMLwrapper *xml = new XMLwrapper(this, true);
     if (!xml)
     {
         Runtime.Log("Load Vector failed XMLwrapper allocation", 2);
@@ -2805,6 +2824,7 @@ unsigned char SynthEngine::extractVectorData(unsigned char baseChan, XMLwrapper 
 
 unsigned char SynthEngine::saveVector(unsigned char baseChan, string name, bool full)
 {
+    bool a = full; full = a; // suppress warning
     unsigned char result = 0xff; // ok
 
     if (baseChan >= NUM_MIDI_CHANNELS)
@@ -2818,7 +2838,7 @@ unsigned char SynthEngine::saveVector(unsigned char baseChan, string name, bool 
     legit_pathname(file);
 
     Runtime.xmlType = XML_VECTOR;
-    XMLwrapper *xml = new XMLwrapper(this);
+    XMLwrapper *xml = new XMLwrapper(this, true);
     if (!xml)
     {
         Runtime.Log("Save Vector failed xmltree allocation", 2);
@@ -2967,7 +2987,7 @@ void SynthEngine::add2XML(XMLwrapper *xml)
 
 int SynthEngine::getalldata(char **data)
 {
-    XMLwrapper *xml = new XMLwrapper(this);
+    XMLwrapper *xml = new XMLwrapper(this, true);
     add2XML(xml);
     midilearn.insertMidiListData(false, xml);
     *data = xml->getXMLdata();
@@ -2978,7 +2998,8 @@ int SynthEngine::getalldata(char **data)
 
 void SynthEngine::putalldata(const char *data, int size)
 {
-    XMLwrapper *xml = new XMLwrapper(this);
+    int a = size; size = a; // suppress warning (may be used later)
+    XMLwrapper *xml = new XMLwrapper(this, true);
     if (!xml->putXMLdata(data))
     {
         Runtime.Log("SynthEngine: putXMLdata failed");
@@ -2997,7 +3018,7 @@ bool SynthEngine::savePatchesXML(string filename)
 {
     filename = setExtension(filename, "xmz");
     Runtime.xmlType = XML_PARAMETERS;
-    XMLwrapper *xml = new XMLwrapper(this);
+    XMLwrapper *xml = new XMLwrapper(this, true);
     add2XML(xml);
     bool result = xml->saveXMLfile(filename);
     delete xml;
@@ -3009,7 +3030,7 @@ bool SynthEngine::savePatchesXML(string filename)
 
 bool SynthEngine::loadXML(string filename)
 {
-    XMLwrapper *xml = new XMLwrapper(this);
+    XMLwrapper *xml = new XMLwrapper(this, true);
     if (NULL == xml)
     {
         Runtime.Log("Failed to init xml tree", 2);
@@ -3038,7 +3059,7 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
     Runtime.NumAvailableParts = xml->getpar("current_midi_parts", NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS, NUM_MIDI_PARTS);
     setPvolume(xml->getpar127("volume", Pvolume));
     setPkeyshift(xml->getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64));
-    Runtime.channelSwitchType = xml->getpar("channel_switch_type", Runtime.channelSwitchType, 0, 3);
+    Runtime.channelSwitchType = xml->getpar("channel_switch_type", Runtime.channelSwitchType, 0, 4);
     Runtime.channelSwitchCC = xml->getpar("channel_switch_CC", Runtime.channelSwitchCC, 0, 128);
     Runtime.channelSwitchValue = 0;
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
@@ -3169,6 +3190,19 @@ float SynthHelper::getDetune(unsigned char type, unsigned short int coarsedetune
     return det;
 }
 
+SynthEngine *SynthEngine::getSynthFromId(unsigned int uniqueId)
+{
+    map<SynthEngine *, MusicClient *>::iterator itSynth;
+    SynthEngine *synth;
+    for (itSynth = synthInstances.begin(); itSynth != synthInstances.end(); ++ itSynth)
+    {
+        synth = itSynth->first;
+        if (synth->getUniqueId() == uniqueId)
+            return synth;
+    }
+    synth = synthInstances.begin()->first;
+    return synth;
+}
 
 MasterUI *SynthEngine::getGuiMaster(bool createGui)
 {

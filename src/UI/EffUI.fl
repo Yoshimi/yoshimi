@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-Modified February 2018} {in_source in_header
+Modified April 2018} {in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -1895,7 +1895,6 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         label {DynFilter effect  - Filter} open
         xywh {5 5 275 75} box FLAT_BOX color 50 labelsize 12 align 144
         code0 {o->init(eff->filterpars,NULL,NULL, npart, 0x88, neff);}
-        code1 {o->use_for_dynamic_filter();}
         class FilterUI
       } {}
       Fl_Button {} {

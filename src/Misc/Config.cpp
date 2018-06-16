@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2013, Nikita Zlobin
-    Copyright 2014-2017, Will Godfrey & others
+    Copyright 2014-2018, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified December 2017
+    Modified May 2018
 */
 
 #include <iostream>
@@ -61,29 +61,29 @@ string argline = "Yoshimi " + (string) YOSHIMI_VERSION + "\nBuild Number " + to_
 const char* argp_program_version = argline.c_str();
 
 static struct argp_option cmd_options[] = {
-    {"alsa-audio",        'A',  "<device>",   1,  "use alsa audio output" },
-    {"alsa-midi",         'a',  "<device>",   1,  "use alsa midi input" },
-    {"define-root",       'D',  "<path>",     0,  "define path to new bank root"},
-    {"buffersize",        'b',  "<size>",     0,  "set internal buffer size" },
-    {"no-gui",            'i',  NULL,         0,  "disable gui"},
-    {"gui",               'I',  NULL,         0,  "enable gui"},
-    {"no-cmdline",        'c',  NULL,         0,  "disable command line interface"},
-    {"cmdline",           'C',  NULL,         0,  "enable command line interface"},
-    {"jack-audio",        'J',  "<server>",   1,  "use jack audio output" },
-    {"jack-midi",         'j',  "<device>",   1,  "use jack midi input" },
-    {"autostart-jack",    'k',  NULL,         0,  "auto start jack server" },
-    {"auto-connect",      'K',  NULL,         0,  "auto connect jack audio" },
-    {"load",              'l',  "<file>",     0,  "load .xmz file" },
-    {"load-instrument",   'L',  "<file>",     0,  "load .xiz file" },
-    {"name-tag",          'N',  "<tag>",      0,  "add tag to clientname" },
-    {"samplerate",        'R',  "<rate>",     0,  "set alsa audio sample rate" },
-    {"oscilsize",         'o',  "<size>",     0,  "set AddSynth oscilator size" },
-    {"state",             'S',  "<file>",     1,  "load saved state, defaults to '$HOME/.config/yoshimi/yoshimi.state'" },
+    {"alsa-audio",        'A',  "<device>",   1,  "use alsa audio output", 0},
+    {"alsa-midi",         'a',  "<device>",   1,  "use alsa midi input", 0},
+    {"define-root",       'D',  "<path>",     0,  "define path to new bank root" , 0},
+    {"buffersize",        'b',  "<size>",     0,  "set internal buffer size", 0 },
+    {"no-gui",            'i',  NULL,         0,  "disable gui", 0},
+    {"gui",               'I',  NULL,         0,  "enable gui", 0},
+    {"no-cmdline",        'c',  NULL,         0,  "disable command line interface", 0},
+    {"cmdline",           'C',  NULL,         0,  "enable command line interface", 0},
+    {"jack-audio",        'J',  "<server>",   1,  "use jack audio output", 0},
+    {"jack-midi",         'j',  "<device>",   1,  "use jack midi input", 0},
+    {"autostart-jack",    'k',  NULL,         0,  "auto start jack server", 0},
+    {"auto-connect",      'K',  NULL,         0,  "auto connect jack audio", 0},
+    {"load",              'l',  "<file>",     0,  "load .xmz file", 0},
+    {"load-instrument",   'L',  "<file>",     0,  "load .xiz file", 0},
+    {"name-tag",          'N',  "<tag>",      0,  "add tag to clientname", 0},
+    {"samplerate",        'R',  "<rate>",     0,  "set alsa audio sample rate", 0},
+    {"oscilsize",         'o',  "<size>",     0,  "set AddSynth oscilator size", 0},
+    {"state",             'S',  "<file>",     1,  "load saved state, defaults to '$HOME/.config/yoshimi/yoshimi.state'", 0},
     #if defined(JACK_SESSION)
-        {"jack-session-uuid", 'U',  "<uuid>",     0,  "jack session uuid" },
-        {"jack-session-file", 'u',  "<file>",     0,  "load named jack session file" },
+        {"jack-session-uuid", 'U',  "<uuid>",     0,  "jack session uuid", 0},
+        {"jack-session-file", 'u',  "<file>",     0,  "load named jack session file", 0},
     #endif
-    { 0, }
+    { 0, 0, 0, 0, 0, 0}
 };
 
 unsigned int Config::Samplerate = 48000;
@@ -93,6 +93,8 @@ unsigned int Config::GzipCompression = 3;
 bool         Config::showGui = true;
 bool         Config::showSplash = true;
 bool         Config::showCLI = true;
+bool         Config::autoInstance = false;
+unsigned int Config::activeInstance = 0;
 
 Config::Config(SynthEngine *_synth, int argc, char **argv) :
     restoreState(false),
@@ -226,11 +228,7 @@ bool Config::Setup(int argc, char **argv)
     Buffersize = nearestPowerOf2(Buffersize, 16, 4096);
     //Log(asString(Oscilsize));
     //Log(asString(Buffersize));
-    if (loadDefaultState && !restoreState)
-    {
-        StateFile = ConfigDir + "/yoshimi.state";
-        restoreState = true;
-    }
+
     if (restoreState)
     {
         char *fp = NULL;
@@ -428,11 +426,12 @@ bool Config::loadConfig(void)
             return false;
         }
     }
-    string yoshimi = "/"; // for some reason it doesn't
-    yoshimi += YOSHIMI; // like these as one line here
+    string yoshimi = "/" + string(YOSHIMI);
 
-    if (synth->getUniqueId() > 0)
-        yoshimi += ("-" + asString(synth->getUniqueId()));
+    string baseConfig = ConfigDir + yoshimi + ".config";
+    int thisInstance = synth->getUniqueId();
+    if (thisInstance > 0)
+        yoshimi += ("-" + asString(thisInstance));
     else
         miscMsgInit(); // sneaked it in here so it's early
     string presetDir = ConfigDir + "/presets";
@@ -442,44 +441,55 @@ bool Config::loadConfig(void)
         if ((chk = system(cmd.c_str())) < 0)
             Log("Create preset directory " + presetDir + " failed, status " + asString(chk));
     }
+
     ConfigFile = ConfigDir + yoshimi;
     StateFile = ConfigDir + yoshimi + string(".state");
-    if (synth->getUniqueId() == 0)
-        ConfigFile += ".config";
+
+    if (thisInstance == 0)
+        ConfigFile = baseConfig;
     else
         ConfigFile += ".instance";
-    string resConfigFile = ConfigFile;
 
+    if (!isRegFile(baseConfig))
+    {
+        Log("Basic configuration " + baseConfig + " not found, will use default settings");
+        defaultPresets();
+    }
 
     bool isok = true;
-    if (!isRegFile(resConfigFile) && !isRegFile(ConfigFile))
+    if (!isRegFile(ConfigFile))
     {
-        Log("ConfigFile " + resConfigFile + " not found, will use default settings");
-        defaultPresets();
+        Log("Configuration " + ConfigFile + " not found, will use default settings");
         configChanged = true; // give the user the choice
     }
     else
     {
-        XMLwrapper *xml = new XMLwrapper(synth);
+        XMLwrapper *xml = new XMLwrapper(synth, true);
         if (!xml)
             Log("loadConfig failed XMLwrapper allocation");
         else
         {
-            if (!xml->loadXMLfile(resConfigFile))
+            if (!xml->loadXMLfile(baseConfig))
             {
-                if ((synth->getUniqueId() > 0) && (!xml->loadXMLfile(ConfigFile)))
+                if (thisInstance > 0)
                 {
                     Log("loadConfig loadXMLfile failed");
                     return false;
                 }
             }
             isok = extractBaseParameters(xml);
-            if (isok)
-                isok = extractConfigData(xml);
-            if (isok)
-                Oscilsize = (int)truncf(powf(2.0f, ceil(log (Oscilsize - 1.0f) / logf(2.0))));
             delete xml;
-            if (synth->getUniqueId() == 0)
+            if (isok)
+            {
+                XMLwrapper *xml = new XMLwrapper(synth, true);
+                isok = xml->loadXMLfile(ConfigFile);
+                if (isok)
+                {
+                    isok = extractConfigData(xml);
+                    delete xml;
+                }
+            }
+            if (thisInstance == 0)
             {
                 if (lastXMLmajor < MIN_CONFIG_MAJOR || lastXMLminor < MIN_CONFIG_MINOR)
                     oldConfig = true;
@@ -538,6 +548,8 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
     showGui = xml->getparbool("enable_gui", showGui);
     showSplash = xml->getparbool("enable_splash", showSplash);
     showCLI = xml->getparbool("enable_CLI", showCLI);
+    autoInstance = xml->getparbool("enable_auto_instance", autoInstance);
+    activeInstance = xml->getparU("active_instances", 0);
     xml->exitbranch(); // BaseParameters
     return true;
 }
@@ -627,7 +639,7 @@ bool Config::saveConfig(void)
 {
     bool result = false;
     xmlType = XML_CONFIG;
-    XMLwrapper *xmltree = new XMLwrapper(synth);
+    XMLwrapper *xmltree = new XMLwrapper(synth, true);
     if (!xmltree)
     {
         Log("saveConfig failed xmltree allocation", 2);
@@ -703,7 +715,7 @@ bool Config::saveSessionData(string savefile)
 {
     savefile = setExtension(savefile, "state");
     synth->getRuntime().xmlType = XML_STATE;
-    XMLwrapper *xmltree = new XMLwrapper(synth);
+    XMLwrapper *xmltree = new XMLwrapper(synth, true);
     if (!xmltree)
     {
         Log("saveSessionData failed xmltree allocation", 3);
@@ -738,7 +750,7 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
         Log("Session file " + sessionfile + " not available", 2);
         goto end_game;
     }
-    if (!(xml = new XMLwrapper(synth)))
+    if (!(xml = new XMLwrapper(synth, true)))
     {
         Log("Failed to init xmltree for restoreState", 3);
         goto end_game;
@@ -1225,7 +1237,7 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
 }
 
 
-static struct argp cmd_argp = { cmd_options, parse_cmds, prog_doc };
+static struct argp cmd_argp = { cmd_options, parse_cmds, prog_doc, 0, 0, 0, 0};
 
 
 void Config::loadCmdArgs(int argc, char **argv)

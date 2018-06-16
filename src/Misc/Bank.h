@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is a derivative of a ZynAddSubFX original.
-    Modified February 2018
+    Modified May 2018
 */
 
 #ifndef BANK_H
@@ -107,10 +107,10 @@ class Bank : private MiscFuncs
     public:
         Bank(SynthEngine *_synth);
         ~Bank();
-        string getname(unsigned int ninstrument);
+        string getname(unsigned int ninstrument, size_t bank = 0xff, size_t root = 0xff);
         string getfilename(unsigned int ninstrument);
         string getnamenumbered(unsigned int ninstrument);
-        bool setname(unsigned int ninstrument, string newname, int newslot);
+        bool setname(unsigned int ninstrument, string newname, int newslot, size_t oldBank = 0xff, size_t newBank = 0xff, size_t oldRoot = 0xff, size_t newRoot = 0xff);
              // if newslot==-1 then this is ignored, else it will be put on that slot
 
         int engines_used(unsigned int ninstrument);
@@ -118,10 +118,11 @@ class Bank : private MiscFuncs
         bool emptyslot(unsigned int ninstrument) { return emptyslotWithID(currentRootID, currentBankID, ninstrument); }
         bool clearslot(unsigned int ninstrument);
         bool savetoslot(size_t rootID, size_t bankID, int ninstrument, int npart);
-        bool swapslot(unsigned int n1, unsigned int n2);
-        void swapbanks(unsigned int firstID, unsigned int secondID);
+        unsigned int swapslot(unsigned int n1, unsigned int n2, size_t bank1 = 0xff, size_t bank2 = 0xff, size_t root1 = 0xff, size_t root2 = 0xff);
+        unsigned int swapbanks(unsigned int firstID, unsigned int secondID, size_t firstRoot = 0xff, size_t secondRoot= 0xff);
         string getBankName(int bankID, size_t rootID = 0xff);
         string getBankIDname(int bankID);
+        bool isDuplicateBankName(size_t rootID, string name);
         int getBankSize(int bankID);
         bool setbankname(unsigned int BankID, string newname);
         bool loadbank(size_t rootID, size_t banknum);
@@ -130,7 +131,7 @@ class Bank : private MiscFuncs
         bool isDuplicate(size_t rootID, size_t bankID, int pos, const string filename);
         bool newIDbank(string newbankdir, unsigned int bankID, size_t rootID = 0xff);
         bool newbankfile(string newbankdir, size_t rootID);
-        unsigned int removebank(unsigned int bankID, size_t rootID = 255);
+        unsigned int removebank(unsigned int bankID, size_t rootID = 0xff);
         void rescanforbanks(void);
         void clearBankrootDirlist(void);
         void removeRoot(size_t rootID);

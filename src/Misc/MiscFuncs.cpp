@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>
 
-    Modifed January 2018
+    Modifed May 2018
 */
 
 //#define REPORT_MISCMSG
@@ -29,15 +29,10 @@
 #include <unistd.h>
 #include <sstream>
 #include <iostream>
+#include <fstream>
 #include <string.h>
 #include <mutex>
 #include <limits.h>
-
-#if defined(__FreeBSD__)
-#include <copyfile.h>
-#else
-#include <sys/sendfile.h>
-#endif
 
 using namespace std;
 
@@ -193,7 +188,7 @@ unsigned int MiscFuncs::string2uint(string str)
 bool MiscFuncs::isRegFile(string chkpath)
 {
     struct stat st;
-    if (!lstat(chkpath.c_str(), &st))
+    if (!stat(chkpath.c_str(), &st))
         if (S_ISREG(st.st_mode))
             return true;
     return false;
@@ -203,7 +198,7 @@ bool MiscFuncs::isRegFile(string chkpath)
 bool MiscFuncs::isDirectory(string chkpath)
 {
     struct stat st;
-    if (!lstat(chkpath.c_str(), &st))
+    if (!stat(chkpath.c_str(), &st))
         if (S_ISDIR(st.st_mode))
             return true;
     return false;
@@ -213,7 +208,7 @@ bool MiscFuncs::isDirectory(string chkpath)
 bool MiscFuncs::isFifo(string chkpath)
 {
     struct stat st;
-    if (!lstat(chkpath.c_str(), &st))
+    if (!stat(chkpath.c_str(), &st))
         if (S_ISFIFO(st.st_mode))
             return true;
     return false;
@@ -263,7 +258,8 @@ string MiscFuncs::findfile(string path, string filename, string extension)
     if (extension.at(0) != '.')
         extension = "." + extension;
     string command = "find " + path + " -name " + filename + extension + " 2>/dev/null -print -quit";
-#warning Using '2>/dev/null' here suppresses *all* error messages
+#pragma message "Using '2>/dev/null' here suppresses *all* error messages"
+    // it's done here to suppress warnings of invalid locations
     FILE *fp = popen(command.c_str(), "r");
     if (fp == NULL)
         return "";
@@ -351,19 +347,22 @@ string MiscFuncs::setExtension(string fname, string ext)
 
 bool MiscFuncs::copyFile(string source, string destination)
 {
-    int input = open(source.c_str(), O_RDONLY);
-    int output = creat(destination.c_str(), 0660);
-#if defined(__FreeBSD__)
-    int result = fcopyfile(input, output, 0, COPYFILE_ALL);
-#else
-    off_t bytesCopied = 0;
-    struct stat fileinfo = {0};
-    fstat(input, &fileinfo);
-    int result = sendfile(output, input, &bytesCopied, fileinfo.st_size);
-#endif
-    close(input);
-    close(output);
-    return (result == 0);
+    ifstream infile (source, ios::in|ios::binary|ios::ate);
+    if (!infile.is_open())
+        return 1;
+    ofstream outfile (destination, ios::out|ios::binary);
+    if (!outfile.is_open())
+        return 1;
+
+    streampos size = infile.tellg();
+    char *memblock = new char [size];
+    infile.seekg (0, ios::beg);
+    infile.read(memblock, size);
+    infile.close();
+    outfile.write(memblock, size);
+    outfile.close();
+    delete memblock;
+    return 0;
 }
 
 
@@ -478,7 +477,7 @@ bool MiscFuncs::matchnMove(int num , char *&pnt, const char *word)
  */
 void MiscFuncs::miscMsgInit()
 {
-    for (int i = 0; i < 255; ++i)
+    for (int i = 0; i < NO_MSG; ++i)
         miscList.push_back("");
     // we use 255 to denote an invalid entry
 }
@@ -486,7 +485,7 @@ void MiscFuncs::miscMsgInit()
 int MiscFuncs::miscMsgPush(string _text)
 {
     if (_text.empty())
-        return 255;
+        return NO_MSG;
     sem_wait(&miscmsglock);
 
     string text = _text;
@@ -520,7 +519,7 @@ int MiscFuncs::miscMsgPush(string _text)
 
 string MiscFuncs::miscMsgPop(int _pos)
 {
-    if (_pos >= 255)
+    if (_pos >= NO_MSG)
         return "";
     sem_wait(&miscmsglock);
 

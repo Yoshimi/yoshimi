@@ -11,7 +11,7 @@ comment {FilterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2016-2017 Will Godfrey
+Copyright 2016-2018 Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-Modified October 2017} {in_source in_header
+Modified April 2018} {in_source in_header
 }
 
 decl {\#include "UI/MiscGui.h"} {public local
@@ -1023,26 +1023,6 @@ pars=NULL;
         // Adjust GUI value conversion
         cfreqdial->setValueType(getFilterFreqType(filtertype->value()));
         refresh();} {}
-  }
-  Function {use_for_dynamic_filter()} {
-    comment {Mostly disabled
-Now also deactivates frequency tracking offset}
-  } {
-    code {//
-        freqtrackoffset->deactivate();
-        freqtrdial->deactivate();
-        /*
-        gaindial->when(0);
-
-        cfknob->when(FL_WHEN_RELEASE);
-        octknob->when(FL_WHEN_RELEASE);
-
-        frsldial->when(0);
-        wvknob->when(0);
-        formant_freq_dial->when(0);
-        formant_q_dial->when(0);
-        formant_amp_dial->when(0);
-        strchdial->when(0);*/} {}
   }
   Function {updateVCforQ()} {return_type void
   } {

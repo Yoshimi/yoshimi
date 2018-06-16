@@ -12,7 +12,7 @@ However you can have up to four parts responding to just one channel, and it can
 
 You will, of course, need to load up and activate all your wanted instruments patches - either manually or via root/bank & program change commands in your MIDI file.
 
-You can only have one of these two forms at a time, which can be set in the GUI "Yoshimi->Settings->MIDI" or from both the CLI and via shortform NRPNs. You use these to assign a specific CC as the switch.
+You can only have one of these two forms at a time, which can be set in the GUI Mixer window or from both the CLI and via shortform NRPNs. You use these to assign a specific CC as the switch.
 
 NRPN setup.
 

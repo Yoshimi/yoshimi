@@ -11,7 +11,7 @@ comment {OscilgenUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2016-2017 Will Godfrey
+Copyright 2016-2018 Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -29,8 +29,8 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified October 2017
-} {in_source in_header
+Modified April 2018
+} {selected in_source in_header
 }
 
 decl {\#include "ResonanceUI.h"} {public local
@@ -460,7 +460,7 @@ class Oscilharmonic {: {public Fl_Group}
   }
 }
 
-class OscilEditor {selected : {public PresetsUI_}
+class OscilEditor {: {public PresetsUI_}
 } {
   Function {make_window()} {} {
     Fl_Window osceditUI {
@@ -1151,8 +1151,8 @@ class OscilEditor {selected : {public PresetsUI_}
     unsigned char eng = getData->data.engine;
     unsigned char insert = getData->data.insert;
 
-    if (eng != engine)
-        return;
+    //if (eng != engine)
+        //return;
 
     int tmp;
     bool set = true;
@@ -1211,18 +1211,26 @@ class OscilEditor {selected : {public PresetsUI_}
 
             case 18:
                 bfmodpar1->value(value);
+                basefuncdisplaygroup->redraw();
+                redrawoscil();
                 break;
 
             case 19:
                 bfmodpar2->value(value);
+                basefuncdisplaygroup->redraw();
+                redrawoscil();
                 break;
 
             case 20:
                 bfmodpar3->value(value);
+                basefuncdisplaygroup->redraw();
+                redrawoscil();
                 break;
 
             case 21:
                 bfmodtype->value(value);
+                basefuncdisplaygroup->redraw();
+                redrawoscil();
                 break;
 
             case 33:

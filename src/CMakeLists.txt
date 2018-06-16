@@ -2,7 +2,7 @@
 #   CMakeLists.txt
 #
 #   Copyright 2009-2011, Alan Calvert
-#   Copyright 2014-2017, Will Godfrey & others
+#   Copyright 2014-2018, Will Godfrey & others
 #
 #   This file is part of yoshimi, which is free software: you can
 #   redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-# Modifed December 2017
+# Modifed June 2018
 
 project (Yoshimi)
 cmake_minimum_required (VERSION 3.0)
@@ -25,16 +25,21 @@ cmake_policy (VERSION 3.0)
 cmake_policy (SET CMP0004 NEW)
 if (POLICY CMP0046)
     cmake_policy (SET CMP0046 NEW)
-endif (POLICY CMP0046)
+endif (POLICY CMP0046) # opengl version
+if (POLICY CMP0072)
+    cmake_policy (SET CMP0072 OLD)
+endif (POLICY CMP0072)
 set (CMAKE_CXX_STANDARD 11) # we seem to need both for
 add_definitions(-std=gnu++11) # various versions of cmake
 
 # vvv
 add_definitions(-Wall)
 add_definitions(-Werror=format-security)
+#add_definitions(-Wpedantic)
+add_definitions(-Wextra)
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "1.5.6 M")
+set (YOSHIMI_VERSION "1.5.8.2")
 add_definitions (-DMIN_CONFIG_MAJOR=1)
 add_definitions (-DMIN_CONFIG_MINOR=5)
 
@@ -459,6 +464,8 @@ add_definitions (-DXML_BANK=7)
 add_definitions (-DXML_HISTORY=8)
 add_definitions (-DXML_VECTOR=9)
 add_definitions (-DXML_MIDILEARN=10)
+
+add_definitions (-DNO_MSG=255)
 
 # these were previously (pointlessly) user configurable
 add_definitions (-DNUM_VOICES=8)

@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified March 2018
+    Modified June 2018
 */
 
 #include <stdlib.h>
@@ -42,6 +42,7 @@
 #include <map>
 #include <list>
 #include <sstream>
+#include <sys/time.h>
 
 using namespace std;
 
@@ -54,8 +55,8 @@ using namespace std;
 
 using namespace std;
 
-
-static int currentInstance = 0;
+extern SynthEngine *firstSynth;
+static unsigned int currentInstance = 0;
 
 string basics[] = {
     "?  Help",                  "show commands",
@@ -71,11 +72,13 @@ string toplist [] = {
     "ADD",                      "add paths and files",
     "  Root <s>",               "root path to list",
     "  Bank <s>",               "make new bank in current root",
+    "  YOshimi [n]",            "new Yoshimi instance ID",
     "IMPort [s <n1>] <n2> <s>", "import named directory to slot n2 of current root, (or 'Root' n1)",
     "EXPort [s <n1>] <n2> <s>", "export bank at slot n2 of current root, (or 'Root' n1) to named directory",
     "REMove",                   "remove paths, files and entries",
     "  Root <n>",               "de-list root path ID",
     "  Bank [s <n1>] <n2>",     "delete bank ID n2 (and all instruments) from current root (or 'Root' n1)",
+    "  YOshimi <n>",            "close instance ID",
     "  MLearn <s> [n]",         "delete midi learned 'ALL' whole list, or '@'(n) line",
     "Set / Read",               "set or read all main parameters",
     "  Part",                   "enter context level",
@@ -97,7 +100,7 @@ string toplist [] = {
     "  Volume <n>",             "master volume",
     "  SHift <n>",              "master key shift semitones (0 no shift)",
     "  DEtune <n>",             "master fine detune",
-    "  SOlo [s] [n]",           "channel 'solo' switcher (Row, Column, Loop, CC, {other} Disable)",
+    "  SOlo [s] [n]",           "channel 'solo' switcher (Row, Column, Loop, Twoway, CC, {other} Disable)",
     "      CC <n>",             "Incoming 'solo' CC number (type must be set first)",
     "end"
 };
@@ -159,7 +162,7 @@ string partlist [] = {
     "  Type <s>",               "the effect type",
     "  PREset <n3>",            "set numbered effect preset to n3",
     "  Send <n3> <n4>",         "send part to system effect n3 at volume n4",
-    "PRogram <n2>",             "loads instrument ID",
+    "PRogram <[n2]/[s]>",       "loads instrument ID / CLear sets default",
     "NAme <s>",                 "sets the display name the part can be saved with",
     "Channel <n2>",             "MIDI channel (> 32 disables, > 16 note off only)",
     "Destination <s2>",         "jack audio destination (Main, Part, Both)",
@@ -713,17 +716,17 @@ int CmdInterface::effects()
             if (bitTest(level, part_lev))
             {
                 nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
-                sendDirect(nFXtype, 64, 65, npart, 255, nFX);
+                sendDirect(nFXtype, 64, 65, npart, 0xff, nFX);
             }
             else if (bitTest(level, ins_fx))
             {
                 nFXtype = synth->insefx[nFX]->geteffect();
-                sendDirect(nFXtype, 64, 1, 242, 255, nFX);
+                sendDirect(nFXtype, 64, 1, 242, 0xff, nFX);
             }
             else
             {
                 nFXtype = synth->sysefx[nFX]->geteffect();
-                sendDirect(nFXtype, 64, 1, 241, 255, nFX);
+                sendDirect(nFXtype, 64, 1, 241, 0xff, nFX);
             }
         }
         if (point[0] == 0)
@@ -757,11 +760,11 @@ int CmdInterface::effects()
         Runtime.Log("efx type set to " + fx_list[nFXtype]);
         //Runtime.Log("Presets -" + fx_presets[nFXtype].substr(fx_presets[nFXtype].find(',') + 1));
         if (bitTest(level, part_lev))
-            sendDirect(nFXtype, 64, 65, npart, 255, nFX);
+            sendDirect(nFXtype, 64, 65, npart, 0xff, nFX);
         else if (bitTest(level, ins_fx))
-            sendDirect(nFXtype, 64, 1, 242, 255, nFX);
+            sendDirect(nFXtype, 64, 1, 242, 0xff, nFX);
         else
-            sendDirect(nFXtype, 64, 1, 241, 255, nFX);
+            sendDirect(nFXtype, 64, 1, 241, 0xff, nFX);
         return done_msg;
     }
 
@@ -831,7 +834,7 @@ int CmdInterface::effects()
             dest = "system efx " + asString(nFX + 1) + " sent to "
                  + asString(par + 1) + " at " + asString(value);
         }
-        sendDirect(value, 64, control, partno, 255, engine, insert);
+        sendDirect(value, 64, control, partno, 0xff, engine, insert);
         Runtime.Log(dest);
         return done_msg;
     }
@@ -868,7 +871,7 @@ int CmdInterface::effects()
             partno = 241;
             dest = "system";
         }
-        sendDirect(nFXpreset, 64, 16, partno, 128 + nFXtype, nFX);
+        sendDirect(nFXpreset, 64, 16, partno, 0x80 + nFXtype, nFX);
         Runtime.Log(dest + " efx preset set to number " + asString(value + 1));
     }
     return reply;
@@ -1181,7 +1184,7 @@ int CmdInterface::commandVector()
 
     if (matchWord(1, point, "off"))
     {
-        sendDirect(0, 64, 96, 192, 255, 255, chan);
+        sendDirect(0, 64, 96, 0xc0, 0xff, 0xff, chan);
         axis = 0;
         bitClear(level, vect_lev);
         return done_msg;
@@ -1209,13 +1212,13 @@ int CmdInterface::commandVector()
         tmp = string2int(point);
         if (axis == 0)
         {
-            sendDirect(tmp, 192, 16, 192, 255, 255, chan);
+            sendDirect(tmp, 192, 16, 0xc0, 0xff, 0xff, chan);
             bitSet(level, vect_lev);
             return done_msg;
         }
         if (Runtime.vectordata.Enabled[chan])
         {
-            sendDirect(tmp, 192, 32, 192, 255, 255, chan);
+            sendDirect(tmp, 192, 32, 0xc0, 0xff, 0xff, chan);
             return done_msg;
         }
     }
@@ -1261,7 +1264,7 @@ int CmdInterface::commandVector()
             enable = 1;
         else if (feat > 1 && matchnMove(1, point, "reverse"))
             enable = 2;
-        sendDirect(enable, 192, 18 + (axis * 16) + feat , 192, 255, 255, chan);
+        sendDirect(enable, 192, 18 + (axis * 16) + feat , 0xc0, 0xff, 0xff, chan);
         return done_msg;
     }
 
@@ -1281,7 +1284,7 @@ int CmdInterface::commandVector()
         else
             return opp_msg;
         tmp = string2int(point);
-        sendDirect(tmp, 64, 17 + hand + (axis * 16), 192, 255, 255, chan);
+        sendDirect(tmp, 64, 17 + hand + (axis * 16), 0xc0, 0xff, 0xff, chan);
         return done_msg;
     }
 
@@ -1321,8 +1324,8 @@ int CmdInterface::commandConfig()
     float value = 0;
     unsigned char type;
     unsigned char command = 0xff;
-    unsigned char par = 255;
-    unsigned char par2 = 255;
+    unsigned char par = 0xff;
+    unsigned char par2 = 0xff;
     if (isRead)
         type = 0x80;
     else
@@ -1435,7 +1438,7 @@ int CmdInterface::commandConfig()
         if (matchnMove(1, point, "midi"))
         {
             command = 32;
-            par = 128;
+            par = 0x80;
             if (isRead || point[0] != 0)
             {
                 if (!isRead)
@@ -1447,7 +1450,7 @@ int CmdInterface::commandConfig()
         else if (matchnMove(1, point, "server"))
         {
             command = 34;
-            par = 128;
+            par = 0x80;
             if (isRead || point[0] != 0)
             {
                 if (!isRead)
@@ -1470,7 +1473,7 @@ int CmdInterface::commandConfig()
         if (matchnMove(1, point, "midi"))
         {
             command = 48;
-            par = 128;
+            par = 0x80;
             if (isRead || point[0] != 0)
             {
                 if (!isRead)
@@ -1482,7 +1485,7 @@ int CmdInterface::commandConfig()
         else if (matchnMove(1, point, "audio"))
         {
             command = 50;
-            par = 128;
+            par = 0x80;
             if (isRead || point[0] != 0)
             {
                 if (!isRead)
@@ -1607,8 +1610,8 @@ int CmdInterface::commandScale()
     float value = 0;
     unsigned char type;
     unsigned char command = 0xff;
-    unsigned char par = 255;
-    unsigned char par2 = 255;
+    unsigned char par = 0xff;
+    unsigned char par2 = 0xff;
     if (isRead)
     {
         type = 0x80;
@@ -1744,7 +1747,7 @@ int CmdInterface::commandPart(bool justSet)
                 npart = tmp;
                 if (!isRead)
                 {
-                    sendDirect(npart, 64, 14, 240);
+                    sendDirect(npart, 64, 14, 0xf0);
                     changed = true;
                 }
             }
@@ -1773,7 +1776,7 @@ int CmdInterface::commandPart(bool justSet)
         else
         {
             if (!changed) // needs to be better
-                sendDirect(npart, 64, 14, 240);
+                sendDirect(npart, 64, 14, 0xf0);
             sendDirect(tmp, 64, 8, npart);
         }
         return done_msg;
@@ -1793,12 +1796,17 @@ int CmdInterface::commandPart(bool justSet)
             Runtime.Log("Part name is " + synth->part[npart]->Pname);
             return done_msg;
         }
+        if (matchnMove(2, point, "clear"))
+        {
+            sendDirect(0, 64, 96, npart, 0xff, 0xff, 0xff, 0xff, tmp);
+            return done_msg;
+        }
         if (point[0] != 0) // force part not channel number
         {
             tmp = string2int(point) - 1;
             if (tmp < 0 || tmp > 159)
                 return range_msg;
-            sendDirect(npart, 64, 74, 240, 255, 255, 255, 255, tmp);
+            sendDirect(npart, 64, 74, 0xf0, 0xff, 0xff, 0xff, 0xff, tmp);
             reply = done_msg;
         }
         else
@@ -1834,7 +1842,7 @@ int CmdInterface::commandPart(bool justSet)
             if (dest == 0)
                 reply = range_msg;
         }
-        sendDirect(dest, type, 120, npart, 255, 255, 255, 192);
+        sendDirect(dest, type, 120, npart, 0xff, 0xff, 0xff, 0xc0);
         reply = done_msg;
     }
     else if (matchnMove(1, point, "breath"))
@@ -1932,24 +1940,27 @@ int CmdInterface::commandPart(bool justSet)
     else if (matchnMove(2, point, "name"))
     {
         string name;
+        unsigned char type = 64;
+        unsigned char par2 = 0xff;
         if (isRead)
-        {
-            name = "Part name set to " + synth->part[npart]->Pname;
-        }
+            type = 0;
         else
         {
             name = (string) point;
             if (name.size() < 3)
-                name = "Name too short";
-            else if ( name == "Simple Sound")
-                name = "Cant use name of default sound";
-            else
             {
-                sendDirect(0, 64, 222, npart, 255, 255, 255, 255, miscMsgPush(name));
+                Runtime.Log("Name too short");
                 return done_msg;
             }
+            else if ( name == "Simple Sound")
+            {
+                Runtime.Log("Cant use name of default sound");
+                return done_msg;
+            }
+            else
+                par2 = miscMsgPush(name);
         }
-        Runtime.Log(name);
+        sendDirect(0, type, 222, npart, 0xff, 0xff, 0xff, 0x80, par2, 0xff);
         reply = done_msg;
     }
     else
@@ -1965,23 +1976,25 @@ int CmdInterface::commandReadnSet()
     int tmp;
     string name;
 
-    if (matchnMove(4, point, "yoshimi"))
+    if (matchnMove(2, point, "yoshimi"))
     {
         if (isRead)
         {
-            Runtime.Log("Instance " + asString(currentInstance), 1);
+            //Runtime.Log("Instance " + asString(currentInstance), 1);
+            Runtime.Log("Instance " + to_string(synth->getUniqueId()));
             return done_msg;
         }
         if (point[0] == 0)
             return value_msg;
-        tmp = string2int(point);
-        if (tmp >= (int)synthInstances.size())
-            reply = range_msg;
-        else
+        currentInstance = string2int(point);
+        synth = firstSynth->getSynthFromId(currentInstance);
+        unsigned int newID = synth->getUniqueId();
+        if (newID != currentInstance)
         {
-            currentInstance = tmp;
-            defaults();
+            Runtime.Log("Instance " + to_string(currentInstance) + " not found. Set to " + to_string(newID), 1);
+            currentInstance = newID;
         }
+        defaults();
         return done_msg;
     }
 
@@ -2072,7 +2085,7 @@ int CmdInterface::commandReadnSet()
         }
         if (point[0] != 0)
         {
-            sendDirect(255, 64, 8, 217, 0, 255, string2int(point), 192);
+            sendDirect(255, 64, 8, 217, 0, 0xff, string2int(point), 0xc0);
             return done_msg;
         }
         else
@@ -2088,7 +2101,7 @@ int CmdInterface::commandReadnSet()
         }
         if (point[0] != 0)
         {
-            sendDirect(255, 64, 8, 217, 0, string2int(point), 255, 192);
+            sendDirect(255, 64, 8, 217, 0, string2int(point), 0xff, 0xc0);
             return done_msg;
         }
         else
@@ -2103,14 +2116,14 @@ int CmdInterface::commandReadnSet()
     {
         if (!isRead && point[0] == 0)
             return value_msg;
-        sendDirect(string2int127(point), cmdType, 0, 240);
+        sendDirect(string2int127(point), cmdType, 0, 0xf0);
         return done_msg;
     }
     if (matchnMove(2, point, "detune"))
     {
         if (!isRead && point[0] == 0)
             return value_msg;
-        sendDirect(string2int127(point), cmdType, 32, 240, 0xff, 0xff, 0xff, 0x80);
+        sendDirect(string2int127(point), cmdType, 32, 0xf0, 0xff, 0xff, 0xff, 0x80);
         return done_msg;
     }
 
@@ -2120,8 +2133,7 @@ int CmdInterface::commandReadnSet()
 
     if (matchnMove(2, point, "solo"))
     {
-        int value = 0;
-        int command = 48;
+        int value = 0; // disable
 
         if (matchnMove(2, point, "cc"))
         {
@@ -2137,16 +2149,19 @@ int CmdInterface::commandReadnSet()
                     return done_msg;
                 }
             }
-            command = 49;
+            sendDirect(value, cmdType, 49, 0xf0);
+            return done_msg;
         }
-        else if (matchnMove(1, point, "loop"))
-            value = 3;
-        else if (matchnMove(1, point, "column"))
-            value = 2;
+
         else if (matchnMove(1, point, "row"))
             value = 1;
-
-        sendDirect(value, cmdType, command, 240);
+        else if (matchnMove(1, point, "column"))
+            value = 2;
+        else if (matchnMove(1, point, "loop"))
+            value = 3;
+        else if (matchnMove(1, point, "twoway"))
+            value = 4;
+        sendDirect(value, cmdType, 48, 0xf0);
         return done_msg;
     }
     else if (matchnMove(2, point, "available")) // 16, 32, 64
@@ -2156,7 +2171,7 @@ int CmdInterface::commandReadnSet()
         int value = string2int(point);
         if (value != 16 && value != 32 && value != 64)
             return range_msg;
-        sendDirect(value, cmdType, 15, 240);
+        sendDirect(value, cmdType, 15, 0xf0);
         return done_msg;
     }
 
@@ -2165,16 +2180,17 @@ int CmdInterface::commandReadnSet()
     return reply;
 }
 
+
 bool CmdInterface::cmdIfaceProcessCommand()
 {
-    map<SynthEngine *, MusicClient *>::iterator itSynth = synthInstances.begin();
-    if (currentInstance >= (int)synthInstances.size())
+    // in case it's been changed from elsewhere
+    synth = firstSynth->getSynthFromId(currentInstance);
+    unsigned int newID = synth->getUniqueId();
+    if (newID != currentInstance)
     {
-        currentInstance = 0;
+        currentInstance = newID;
         defaults();
     }
-    for(int i = 0; i < currentInstance; i++, ++itSynth);
-    synth = itSynth->first;
     return processAll(cCmd);
 }
 
@@ -2184,7 +2200,6 @@ bool CmdInterface::processAll(char *cCmd)
     Config &Runtime = synth->getRuntime();
 
     replyString = "";
-    //npart = Runtime.currentPart;
     int reply = todo_msg;
     int tmp;
     point = cCmd;
@@ -2212,6 +2227,11 @@ bool CmdInterface::processAll(char *cCmd)
 #endif
     if (matchnMove(2, point, "exit"))
     {
+        if (currentInstance > 0)
+        {
+            Runtime.Log("Can only exit from instance 0", 1);
+            return false;
+        }
         if (Runtime.configChanged)
             replyString = "System config has been changed. Still exit";
         else
@@ -2279,7 +2299,7 @@ bool CmdInterface::processAll(char *cCmd)
         if (matchnMove(3, point, "all"))
             control = 97;
         if (query("Restore to basic settings", false))
-            sendDirect(0, 64, control, 240, 255, 255, 255, 192);
+            sendDirect(0, 64, control, 0xf0, 0xff, 0xff, 0xff, 0xc0);
         return false;
     }
 
@@ -2302,8 +2322,8 @@ bool CmdInterface::processAll(char *cCmd)
     }
     else if (helpList(level))
         return false;
-    else if (matchnMove(2, point, "stop"))
-        sendDirect(0, 64, 128, 240);
+    if (matchnMove(2, point, "stop"))
+        sendDirect(0, 64, 0x80, 0xf0);
     else if (matchnMove(1, point, "list"))
     {
         if (commandList() == todo_msg)
@@ -2373,6 +2393,13 @@ bool CmdInterface::processAll(char *cCmd)
 
             Runtime.Log("Created  new bank " + (string) point + " with ID " + asString(slot));
             GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
+        }
+        else if (matchnMove(2, point, "yoshimi"))
+        {
+            int forceId = string2int(point);
+            if (forceId < 1 || forceId >= 32)
+                forceId = 0;
+            sendDirect(forceId, 64, 104, 0xf0, 0xff, 0xff, 0xff, 0x80);
         }
         else
         {
@@ -2477,7 +2504,7 @@ bool CmdInterface::processAll(char *cCmd)
                         }
                         if (tmp == 0)
                         {
-                            sendDirect(bankID, 64, 61, 240, rootID, 255, 255, 128);
+                            sendDirect(bankID, 64, 61, 0xf0, rootID, 0xff, 0xff, 0x80);
                         }
                     }
 
@@ -2485,6 +2512,23 @@ bool CmdInterface::processAll(char *cCmd)
             }
             else if (reply != range_msg)
                 reply = value_msg;
+        }
+        else if(matchnMove(2, point, "yoshimi"))
+        {
+            if (point[0] == 0)
+            {
+                replyString = "remove";
+                reply = what_msg;
+            }
+            else
+            {
+                int to_close = string2int(point);
+                if (to_close == 0)
+                    Runtime.Log("Use 'Exit' to close main instance");
+                else
+                    sendDirect(to_close, 64, 105, 0xf0, 0xff, 0xff, 0xff, 0x80);
+                reply = done_msg;
+            }
         }
         else
         {
@@ -2604,7 +2648,7 @@ bool CmdInterface::processAll(char *cCmd)
                 }
                 if (ok)
                 {
-                    sendDirect(0, 64, 84, 240, 255, 255, ch, 192, miscMsgPush(name));
+                    sendDirect(0, 64, 84, 0xf0, 0xff, 0xff, ch, 0xc0, miscMsgPush(name));
                 }
                 reply = done_msg;
             }
@@ -2730,7 +2774,7 @@ bool CmdInterface::processAll(char *cCmd)
                 }
                 if (ok)
                 {
-                    sendDirect(0, 64, 80, 240, 255, 255, 255, 192, miscMsgPush(name));
+                    sendDirect(0, 64, 80, 0xf0, 0xff, 0xff, 0xff, 0xc0, miscMsgPush(name));
                     reply = done_msg;
                 }
             }
@@ -2775,7 +2819,7 @@ bool CmdInterface::processAll(char *cCmd)
                 }
                 if (ok)
                 {
-                    sendDirect(npart, 64, 78, 240, 255, 255, 255, 255, miscMsgPush(name));
+                    sendDirect(npart, 64, 78, 0xf0, 0xff, 0xff, 0xff, 0xff, miscMsgPush(name));
                     reply = done_msg;
                 }
             }
@@ -2924,12 +2968,12 @@ bool CmdInterface::processAll(char *cCmd)
                     {
                         param = string2int(point);
                         point = skipChars(point);
-                        if (((control == 80 || control == 88) && part == 240) || ((param & 0x80) && param < 0xff && insert != 9))
+                        if (((control == 80 || control == 88) && part == 0xf0) || ((param & 0x80) && param < 0xff && insert != 9))
                         {
                             string name = string(point);
                             if (name > "!")
                                 par2 = miscMsgPush(name);
-                            //cout << name << endl;
+                            //cout << "name " << name << endl;
                         }
                         else if (point[0] != 0)
                             par2 = string2int(point);
@@ -2938,6 +2982,107 @@ bool CmdInterface::processAll(char *cCmd)
             }
         }
         sendDirect(value, type, control, part, kit, engine, insert, param, par2, request);
+        reply = done_msg;
+    }
+    else if (matchnMove(2, point, "zread"))
+    {
+        /*
+         * This is a very specific test for reading values and is intended to measure
+         * the time these calls take. For that reason the return echos to the CLI and
+         * GUI are suppressed, and all results are sent to the CLI only.
+         *
+         * It is only the selection time we are measuring, and that the correct
+         * value is returned.
+         *
+         * The limit to the number of repeats is INT max. Using high repeat numbers
+         * reduces the effect of the processing overhead outside the call loop itself.
+         */
+
+        float value, result;
+        unsigned char control, part;
+        unsigned char kit = 255;
+        unsigned char engine = 255;
+        unsigned char insert = 255;
+        unsigned char parameter = 255;
+        unsigned char par2 = 255;
+        int repeats;
+        if (point[0] == 0)
+        {
+            reply = value_msg;
+            return false;
+        }
+        value = string2int(point);
+        point = skipChars(point);
+        if (point[0] == 0)
+        {
+            reply = value_msg;
+            return false;
+        }
+        repeats = string2int(point);
+        if (repeats < 1)
+            repeats = 1;
+        point = skipChars(point);
+        if (point[0] == 0)
+        {
+            reply = value_msg;
+            return false;
+        }
+        control = string2int(point);
+        point = skipChars(point);
+        if (point[0] == 0)
+        {
+            reply = value_msg;
+            return false;
+        }
+        part = string2int(point);
+        point = skipChars(point);
+        if (point[0] != 0)
+        {
+            kit = string2int(point);
+            point = skipChars(point);
+            if (point[0] != 0)
+            {
+                engine = string2int(point);
+                point = skipChars(point);
+                if (point[0] != 0)
+                {
+                    insert = string2int(point);
+                    point = skipChars(point);
+                    if (point[0] != 0)
+                    {
+                        parameter = string2int(point);
+                        point = skipChars(point);
+                        if (point[0] != 0)
+                            par2 = string2int(point);
+                    }
+                }
+            }
+        }
+
+        CommandBlock putData;
+        putData.data.value = value;
+        putData.data.control = control;
+        putData.data.part = part;
+        putData.data.kit = kit;
+        putData.data.engine = engine;
+        putData.data.insert = insert;
+        putData.data.parameter = parameter;
+        putData.data.par2 = par2;
+        putData.data.type = 0;
+        struct timeval tv1, tv2;
+        gettimeofday(&tv1, NULL);
+        for (int i = 0; i < repeats; ++ i)
+            result = synth->interchange.readAllData(&putData);
+        gettimeofday(&tv2, NULL);
+
+        if (tv1.tv_usec > tv2.tv_usec)
+        {
+            tv2.tv_sec--;
+            tv2.tv_usec += 1000000;
+            }
+        float actual = (tv2.tv_sec - tv1.tv_sec) *1000000 + (tv2.tv_usec - tv1.tv_usec);
+        cout << "result " << result << endl;
+        cout << "Loops " << repeats << "  Total time " << actual << "uS" << "  average call time " << actual/repeats * 1000.0f << "nS" << endl;
         reply = done_msg;
     }
     else
@@ -2999,7 +3144,7 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
             }
             synth->getRuntime().Log(name + to_string(value));
         }
-        else if ( part == 240)
+        else if ( part == 0xf0)
         {
             switch (control)
             {
@@ -3066,6 +3211,7 @@ void CmdInterface::cmdIfaceCommandLoop()
     cCmd = NULL;
     bool exit = false;
     sprintf(welcomeBuffer, "yoshimi> ");
+    synth = firstSynth;
     while(!exit)
     {
         cCmd = readline(welcomeBuffer);

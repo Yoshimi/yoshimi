@@ -32,6 +32,7 @@ Please follow the coding style throughout Yoshimi. In particular:
     Braces on their own lines.
 Also, try to avoid creating trailing whitespace.
 
+Please adjust the "modified" date on all files you change.
 
 There seems to be no easy way to copy commit messages to the changelog, and people downloading releases won't see them, so please update this using the following as an example.
 

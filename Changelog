@@ -1,4 +1,248 @@
-yoshimi 1.5.6 M
+yoshimi 1.5.8 M
+
+2018-6-13 Will
+* Small optimisation in 'zread'.
+  Also shortened read loop usleep time to 10uS.
+
+2018-6-13 Will
+* implimented 'zread' CLI test for command structure.
+
+2018-6-11 Will
+* Bugfix: Wasn't reloading solo-twoway.
+  Saved OK, but reloaded as loop.
+* Formalised manual search and opening.
+  GUI now only calls via command block.
+
+
+2018-6-5 Will
+* BugFix: Clearing kitmode key ranges was resetting.
+* BugFix: Bank renaming now working across roots.
+  Disabled instrument swapping across these for now.
+* Improved banks swap error checks.
+* Added gzipped manual patch from Hermann.
+* Set as 2nd bugfix release :(
+
+
+2018-6-1 Will
+* Set as bugfix release.
+
+2018-5-31 Will
+* Corrected GUI handling of part saves.
+  Also improved label colour handling.
+* Corrected Envelope freemode delete point.
+
+2018-5-28 Will
+* Changed lstat to stat in MiscFuncs.cpp
+* Finalised code and docs.
+* Set release version as 1.5.8
+
+2018-5-24
+* Re-implemented autoloading instances.
+  Seems completely correct now states corrected.
+* Set version as 1.5.8 rc5
+
+2018-5-24 Will
+* Revised Config.cpp so instances get base config.
+  Previously they had the system defaults.
+* Corrected anomally with loading saved states.
+  Loaded the wrong one under some circumstances :(
+* Set version as 1.5.8 rc4
+
+2018-5-23 Will
+* Corrected minor anomally in channel switcher.
+* Solo modes except column use blue for highlight.
+  This is in the mixer window and easier to identify.
+* Set version as 1.5.8 rc3
+
+2018-5-19 Will
+* Cleaned up 'solo' interaction between CLI & GUI.
+* Fixed regression: GUI not exporting banks.
+* Code optimisations between Interface & Bank.
+* Set version as 1.5.8 rc2
+
+2018-5-18 Will
+* Implemented universal bank swaps.
+* Banks no longer private to SynthEngine.
+  Too much access from Interchange needed and was
+  getting silly always routing via SynthEngine!
+* Updated docs.
+* Improved banks swap error reporting.
+* Temporarily disabled auto instance loading.
+  it wasn't stable enough for release :(
+* Set version as 1.5.8 rc1
+
+2018-5-17 Will
+* Changed Solo choice name 'Recoil' to 'TwoWay'.
+* Reduced debounce time to 60mS.
+* Improved CLI reporting.
+* Improved instrument swap error messages.
+* Updated docs.
+
+2018-5-11 Will
+* Completed universal instrument swaps.
+* Partially updated docs.
+
+2018-5-9 Will
+* BugFix: GUI swap instrument with bank now ignored.
+  Would segfault previously.
+* Preparing for universal instrument swaps.
+  From any root/bank to any root/bank :)
+
+2018-5-7 Will
+* Non relevant GUI settings now deactivated for LV2.
+
+2018-5-5 Will
+* CLI can now clear a part.
+  set 'clear' instead of an instrument number.
+* Bugfix: GUI failing to clear correct part.
+
+2018-5-4 Will
+* Added 250mS de-bounce to solo loop and recoil options.
+
+2018-5-3 Will
+* Added 'recoil' mode to channel switcher (Solo).
+  Incomming CC value:
+  0         ignore
+  1 to 63   decrement active part MOD 16
+  64 to 127 increment active part MOD 16
+* Updated docs
+
+2018-5-2 Will
+* Further improvements to CLI handling of instances.
+* Started preparation for possible singluar set of banks.
+* Minor cosmetic update to main GUI.
+* Updated docs.
+
+2018-5-1 Will
+* Improved CLI handling of instances.
+* Fixed regression: Had killed LV2 again :(
+
+2018-4-29 Will
+* CLI can now close instances.
+* Minor improvements to CLI instance controls.
+
+2018-4-28 Will
+* BugFix: Mixer Panel 'Edit' right click sometimes fails.
+  Should open part editing window.
+* Transferred instance generation to new controls.
+* Added Instance generation to CLI.
+* Updated docs.
+* Formally implemented CLI current instance swapping.
+  Still can't yet delete them.
+
+2018-4-27 Will
+* BugFix: External instrument load always went to part 1.
+
+2018-4-26 Will
+* Almost all part-level changes check for "Simple Sound".
+  Just *entering* the editors doesn't now.
+
+2018-4-25 Will
+* Code cleanups.
+* Added error checking and limits to scales (microtonal).
+* Enabled MIDI-learn for some scales settings.
+* Doc updates and corrections.
+* Added highlights to learnable controls.
+
+2018-4-22 Will
+* 'autoInstance' disabled by default, set in config.
+* Default state files handled correctly.
+* BugFix: Build 1287 had broken LV2 :(
+
+2018-4-19 Will
+* Second attempt at autoloading :(
+* Corrected changelog.
+  Previous two were one commit.
+* Still not handling user state files correctly :(
+
+2018-4-18 Will
+* First trial of autoloading other instances.
+* Started refinements to MiscMsg.
+
+2018-4-8 Will
+* Minor code cleanups.
+* Enabling a part now always makes it current.
+  Disabling doesn't change which is current.
+* Mixer Edit button now always opens the part window.
+
+2018-4-1 Will
+* BugFix: SubSynth detune type off by one error.
+  GUI only, CLI was correct.
+* Corrections to 'Note_Envelopes.txt'.
+* BugFix: Base Func Parameters not updating RH graph.
+  Actions were correct though.
+* Corrected a bad reset :(
+
+2018-3-30 Will
+* Included 'AddSynth Morph' instrument in companion bank.
+* Added 'Note_Envelopes.txt' to docs.
+
+2018-3-27 Will
+* Improved reading text values (especially for CLI).
+* Updated docs.
+
+2018-3-25 Will
+* Direct access can now set/read part and kit names.
+
+2018-3-21 Will
+* Final Updates.
+* Manual import and update.
+* Doc updates.
+* Set release version as 1.5.7
+
+2018-3-19 Will
+* Corrected dates again :(
+* Improved Add, Sub, Pad click response when not enabled.
+* Changed 'Mod. Oscilator' to 'Local Oscillator'.
+* Updated docs.
+
+2018-3-18 Will
+* Improved scales error checking.
+* Improved instrument renaming.
+* Set version as 1.5.7 rc5
+
+2018-3-17 Will
+* Improved detection of user guide.
+* Code cleanups - Compiler warning suppression.
+* New 1.5.7 features list added to doc.
+* Remaining warnings suppressed.
+
+2018-3-16 Will
+* Implemented Tabbed AddSynth Voices.
+* Changed layout as workround for bottom edge bug.
+  Needs sorting for contol knobs anywhere :(
+* Set version as 1.5.7 rc4
+
+2018-3-12 Will
+* Bugfix: Ext voice and modulators editing wrong.
+  GUI still not completely correct - never was!
+* Set version as 1.5.7 rc3
+
+2018-3-11 Will
+* Fixed regression. AddVoice modulator not changing.
+* Clarified GUI voice and modulator selection.
+* Set version as 1.5.7 rc2
+* Bugfix: Sometimes setting the wrong XML doctype.
+* Added Voice/Modulator info to docs
+
+2018-3-10 Will
+* Reverted incorrect change to DynamicTooltip.cpp
+* Renamed overloaded show( to dynshow(
+* Completely revised copyFile( function.
+* All part areas now show kit status, number and names.
+* Set version as 1.5.7 rc1
+
+2018-3-9 Will
+* Refined Window title names.
+* GUI correct when MIDI volume and expression disabled.
+* Vector UI tracks changed number of available parts.
+
+2018-3-8 Will
+* BugFix: Vector control not working.
+  Off by one error :(
+* Improved Vector GUI behaviour.
+* BugFix: Config GUI was getting out of date.
+  New switches and controls not updated with state.
 
 2018-3-4 Will.
 * CLI direct access can now read VU levels.
