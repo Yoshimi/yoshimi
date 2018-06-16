@@ -1,14 +1,18 @@
 yoshimi 1.5.8 M
 
 2018-6-13 Will
-* *implimented 'zread' CLI test for command structure.
+* Small optimisation in 'zread'.
+  Also shortened read loop usleep time to 10uS.
+
+2018-6-13 Will
+* implimented 'zread' CLI test for command structure.
 
 2018-6-11 Will
 * Bugfix: Wasn't reloading solo-twoway.
   Saved OK, but reloaded as loop.
 * Formalised manual search and opening.
   GUI now only calls via command block.
-  
+
 
 2018-6-5 Will
 * BugFix: Clearing kitmode key ranges was resetting.

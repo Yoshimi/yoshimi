@@ -1066,7 +1066,7 @@ float InterChange::readAllData(CommandBlock *getData)
     reTry:
     memcpy(tryData.bytes, getData->bytes, sizeof(tryData));
     while (__sync_or_and_fetch(&blockRead, 0) > 0) // just reading it
-        usleep(100);
+        usleep(10);
     if (indirect)
     {
         /*
@@ -2002,7 +2002,7 @@ string InterChange::resolveMain(CommandBlock *getData)
             showValue = false;
             contstr = "Reset All including MIDI-learn";
             break;
-        
+
         case 100:
             showValue = false;
             contstr = "Open manual in PDF reader " + miscMsgPop(value_int);

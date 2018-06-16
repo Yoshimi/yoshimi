@@ -2863,10 +2863,10 @@ bool CmdInterface::cmdIfaceProcessCommand()
          * This is a very specific test for reading values and is intended to measure
          * the time these calls take. For that reason the return echos to the CLI and
          * GUI are suppressed, and all results are sent to the CLI only.
-         * 
+         *
          * It is only the selection time we are measuring, and that the correct
          * value is returned.
-         * 
+         *
          * The limit to the number of repeats is INT max. Using high repeat numbers
          * reduces the effect of the processing overhead outside the call loop itself.
          */
@@ -2931,7 +2931,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 }
             }
         }
-        
+
         CommandBlock putData;
         putData.data.value = value;
         putData.data.control = control;
@@ -2941,13 +2941,11 @@ bool CmdInterface::cmdIfaceProcessCommand()
         putData.data.insert = insert;
         putData.data.parameter = parameter;
         putData.data.par2 = par2;
+        putData.data.type = 0;
         struct timeval tv1, tv2;
         gettimeofday(&tv1, NULL);
         for (int i = 0; i < repeats; ++ i)
-        {
-            putData.data.type = 0;
             result = synth->interchange.readAllData(&putData);
-        }
         gettimeofday(&tv2, NULL);
 
         if (tv1.tv_usec > tv2.tv_usec)
