@@ -1818,11 +1818,11 @@ string InterChange::resolveBank(CommandBlock *getData)
     switch(control)
     {
         case 4:
-            contstr = "Set Instrument ID " + to_string(insert) + "  Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine) + " for swap";
+            contstr = "Set Instrument ID " + to_string(insert + 1) + "  Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine) + " for swap";
             break;
         case 5:
             if (name == "")
-                name = "ped with Instrument ID " + to_string(insert) + "  Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine);
+                name = "ped with Instrument ID " + to_string(insert + 1) + "  Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine);
             contstr = "Swap" + name;
             break;
 

@@ -146,22 +146,10 @@ bool Bank::setname(unsigned int ninstrument, string newname, int newslot, size_t
     newfilepath += filename;
     string oldfilepath = setExtension(getFullPath(oldRoot, oldBank, ninstrument), xizext);
     chk = rename(oldfilepath.c_str(), newfilepath.c_str());
-    /*if (chk < 0)
-    {
-        synth->getRuntime().Log("setName failed renaming "
-                + oldfilepath + " -> "
-                + newfilepath + ": " + string(strerror(errno)));
-    }*/
 
     newfilepath = setExtension(newfilepath, xiyext);
     oldfilepath = setExtension(oldfilepath, xiyext);
     chk2 = rename(oldfilepath.c_str(), newfilepath.c_str());
-    /*if (chk2 < 0)
-    {
-        synth->getRuntime().Log("setName failed renaming "
-                + oldfilepath + " -> "
-                + newfilepath + ": " + string(strerror(errno)));
-    }*/
 
     if (chk < 0 && chk2 < 0)
     {
@@ -719,7 +707,6 @@ unsigned int Bank::removebank(unsigned int bankID, size_t rootID)
 // Swaps a slot with another
 unsigned int Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t bank2, size_t root1, size_t root2)
 {
-    unsigned int result = 0;
     if (n1 == n2 && bank1 == bank2 && root1 == root2)
         return true;
     if (bank1 == 255)
@@ -730,54 +717,69 @@ unsigned int Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size
         root1 = currentRootID;
     if (root2 == 255)
         root2 = root1;
-    //cout << "\nswap 1 I " << int(n1) << "  B " << int(bank1) << "  R " << int(root1) << endl;
-    //cout << "swap 2 I " << int(n2) << "  B " << int(bank2) << "  R " << int(root2) << endl;
+
+    cout << "first " << getname(n1, bank1, root1) << "   second " << getname(n2, bank2, root2) << endl;
+    /*
+     * path entries will always have either .xiy or .xiz
+     * otherwise they would not have been seen at all
+     * however we test for, and move both if they exist
+     */
+    cout << "first ref" << getFullPath(root1, bank1, n1) << endl;
     string message = "";
+
     if (emptyslotWithID(root1, bank1, n1) && emptyslotWithID(root2, bank2, n2))
         message = "nothing to swap!";
 
-    else if (emptyslotWithID(root1, bank1, n1)) // make the empty slot the destination
-    {
-        if (!setname(n2, getname(n2, bank2, root2), n1, bank2, bank1, root2, root1))
+    else if (emptyslotWithID(root1, bank1, n1) || emptyslotWithID(root2, bank2, n2))
+    { // this is just a movement to an empty slot
+        if (emptyslotWithID(root1, bank1, n1)) // make the empty slot the destination
         {
-            //cout << "here1 " << getname(n2, bank2, root2) << endl;
-            message = "can't write to " + getname(n2, bank2, root2);
+            if (!setname(n2, getname(n2, bank2, root2), n1, bank2, bank1, root2, root1))
+            {
+                message = "can't write to " + getname(n2, bank2, root2);
+            }
+            getInstrumentReference(root1, bank1, n1) = getInstrumentReference(root2, bank2, n2);
+            getInstrumentReference(root2, bank2, n2).clear();
         }
-        getInstrumentReference(root1, bank1, n1) = getInstrumentReference(root2, bank2, n2);
-        getInstrumentReference(root2, bank2, n2).clear();
-    }
-    else if (emptyslotWithID(root2, bank2, n2)) // this is just a movement to an empty slot
-    {
-        if (!setname(n1, getname(n1, bank1, root1), n2, bank1, bank2, root1, root2))
+        else
         {
-            //cout << "here2 " << getname(n1, bank1, root1) << endl;
-            message = "can't write to " + getname(n1, bank1, root1);
+            if (!setname(n1, getname(n1, bank1, root1), n2, bank1, bank2, root1, root2))
+            {
+                message = "can't write to " + getname(n1, bank1, root1);
+            }
+            getInstrumentReference(root2, bank2, n2) = getInstrumentReference(root1, bank1, n1);
+            getInstrumentReference(root1, bank1, n1).clear();
         }
-        getInstrumentReference(root2, bank2, n2) = getInstrumentReference(root1, bank1, n1);
-        getInstrumentReference(root1, bank1, n1).clear();
+        if (message > "")
+            return miscMsgPush(message) | 0x1000;
+        else
+            return 0;
     }
-    else if (bank1 != bank2 || root1 != root2)
-        message = "move only, across banks/roots";
+
+    // if both slots are used
+    string firstName = getname(n1, bank1, root1);
+    string secondName = getname(n2, bank2, root2);
+    if (firstName == secondName)
+        message = "can't swap instruments with identical names.";
     else
-    {   // if both slots are used
+    {
         InstrumentEntry &instrRef1 = getInstrumentReference(root1, bank1, n1);
         InstrumentEntry &instrRef2 = getInstrumentReference(root2, bank2, n2);
-        if (instrRef1.name == instrRef2.name)
+
+        if (!setname(n2, secondName, n1, bank2, bank1, root2, root1))
+            message = "can't change " + secondName;
+
+        if (!setname(n1, firstName, n2, bank1, bank2, root1, root2))
+            message = "can't change " + firstName;
         {
-            // change the name of the second instrument if the name are equal
-            instrRef2.name += "2";
+            InstrumentEntry instrTmp = instrRef1;
+            instrRef1 = instrRef2;
+            instrRef2 = instrTmp;
         }
-        if (!setname(n2, getname(n2, bank2, root2), n1, bank1, bank2, root1, root2))
-            message = "can't write to " + getname(n2, bank2, root2);
-        if (!setname(n1, getname(n1, bank1, root1), n2, bank1, bank2, root1, root2))
-            message = "can't write to " + getname(n1, bank1, root1);
-        InstrumentEntry instrTmp = instrRef1;
-        instrRef1 = instrRef2;
-        instrRef2 = instrTmp;
     }
     if (message > "")
-        result = miscMsgPush(message) | 0x1000;
-    return result;
+        return miscMsgPush(message) | 0x1000;
+    return 0;
 }
 
 
