@@ -22,13 +22,14 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified April 2018
+    Modified June 2018
 */
 
 #include <cmath>
 #include <iostream>
-# include <algorithm>
+#include <algorithm>
 #include <limits.h>
+
 #include "Misc/Config.h"
 #include "Misc/XMLwrapper.h"
 #include "Misc/Microtonal.h"

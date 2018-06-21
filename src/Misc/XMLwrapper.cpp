@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified April 2018
+    Modified June 2018
 */
 
 #include <zlib.h>

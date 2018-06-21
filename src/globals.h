@@ -1,0 +1,92 @@
+/*
+    globals.h - general static definitions
+
+    Copyright 2018, Will Godfrey
+
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either version 2 of
+    the License, or (at your option) any later version.
+
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later  for more details.
+
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    Created June 2018
+*/
+
+#ifndef GLOBALS_H
+#define GLOBALS_H
+
+// math
+#define PI 3.1415926536f
+#define TWOPI 6.28318530718f
+#define HALFPI 1.57079632679f
+#define LOG_2 0.693147181f
+
+// many of the following are for convenience and consistency
+// changing them is likely to have unpredicable consequences
+
+// sizes
+#define COMMAND_SIZE 80
+#define MAX_HISTORY 25
+#define MAX_PRESETS 1000
+#define MAX_PRESET_DIRS 128
+#define MAX_BANK_ROOT_DIRS 128
+#define MAX_BANKS_IN_ROOT 128
+#define MAX_AD_HARMONICS 128
+#define MAX_SUB_HARMONICS 64
+#define PAD_MAX_SAMPLES 96
+#define NUM_MIDI_PARTS 64
+#define NUM_MIDI_CHANNELS 16
+#define MIDI_LEARN_BLOCK 200
+#define MAX_ENVELOPE_POINTS 40
+#define MIN_ENVELOPE_DB -60
+#define MAX_RESONANCE_POINTS 256
+#define MAX_KEY_SHIFT 36
+#define MIN_KEY_SHIFT -36
+
+// GUI colours
+#define ADD_COLOUR 0xdfafbf00
+#define BASE_COLOUR 0xbfbfbf00
+#define SUB_COLOUR 0xafcfdf00
+#define PAD_COLOUR 0xcfdfaf00
+#define YOSHI_COLOUR 0x0000e100
+
+// XML types
+#define XML_INSTRUMENT 1
+#define XML_PARAMETERS 2
+#define XML_MICROTONAL 3
+#define XML_PRESETS 4
+#define XML_STATE 5
+#define XML_CONFIG 6
+#define XML_BANK 7
+#define XML_HISTORY 8
+#define XML_VECTOR 9
+#define XML_MIDILEARN 10
+#define NO_MSG 255
+
+// these were previously (pointlessly) user configurable
+#define NUM_VOICES 8
+#define POLIPHONY 80
+#define NUM_SYS_EFX 4
+#define NUM_INS_EFX 8
+#define NUM_PART_EFX 3
+#define NUM_KIT_ITEMS 16
+#define VELOCITY_MAX_SCALE 8.0f
+#define FADEIN_ADJUSTMENT_SCALE 20
+#define MAX_EQ_BANDS 8  // MAX_EQ_BANDS must be less than 20
+#define MAX_FILTER_STAGES 5
+#define FF_MAX_VOWELS 6
+#define FF_MAX_FORMANTS 12
+#define FF_MAX_SEQUENCE 8
+#define MAX_PHASER_STAGES 12
+#define MAX_ALIENWAH_DELAY 100
+
+
+#endif

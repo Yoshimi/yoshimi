@@ -3,6 +3,8 @@ yoshimi 1.5.8 M
 2018-6-21 Will
 * Instruments can now be swapped between banks and roots.
 * Small doc updates.
+* Created new globals.h file.
+  Transfered definitions from CMakeLists.txt
 
 2018-6-13 Will
 * Small optimisation in 'zread'.

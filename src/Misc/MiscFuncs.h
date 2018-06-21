@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modifed March 2018
+    Modifed June 2018
 */
 
 #ifndef MISCFUNCS_H
@@ -27,6 +27,8 @@
 #include <string>
 #include <list>
 #include <semaphore.h>
+
+#include "globals.h"
 
 using namespace std;
 

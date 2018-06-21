@@ -422,67 +422,7 @@ add_definitions (
     -DYOSHI_FIFO_DIR="${FifoDirectory}"
 )
 
-# many of these are here for convenience and consistency
-# changing them is likely to have unpredicable consequences
 add_definitions (-DYOSHIMI="yoshimi")
-add_definitions (-DCOMMAND_SIZE=80)
-add_definitions (-DMAX_HISTORY=25)
-add_definitions (-DMAX_PRESETS=1000)
-add_definitions (-DMAX_PRESET_DIRS=128)
-add_definitions (-DMAX_BANK_ROOT_DIRS=128)
-add_definitions (-DMAX_BANKS_IN_ROOT=128)
-add_definitions (-DMAX_AD_HARMONICS=128)
-add_definitions (-DMAX_SUB_HARMONICS=64)
-add_definitions (-DPAD_MAX_SAMPLES=96)
-add_definitions (-DADD_COLOUR=0xdfafbf00)
-add_definitions (-DBASE_COLOUR=0xbfbfbf00)
-add_definitions (-DSUB_COLOUR=0xafcfdf00)
-add_definitions (-DPAD_COLOUR=0xcfdfaf00)
-add_definitions (-DYOSHI_COLOUR=0x0000e100)
-add_definitions (-DNUM_MIDI_PARTS=64)
-add_definitions (-DNUM_MIDI_CHANNELS=16)
-add_definitions (-DMIDI_LEARN_BLOCK=200)
-add_definitions (-DMAX_ENVELOPE_POINTS=40)
-add_definitions (-DMIN_ENVELOPE_DB=-60)
-add_definitions (-DMAX_RESONANCE_POINTS=256)
-add_definitions (-DMAX_KEY_SHIFT=36)
-add_definitions (-DMIN_KEY_SHIFT=-36)
-
-add_definitions (-DPI=3.1415926536f)
-add_definitions (-DTWOPI=6.28318530718f)
-add_definitions (-DHALFPI=1.57079632679f)
-add_definitions (-DLOG_2=0.693147181f)
-
-#probably not the best way to do this :(
-add_definitions (-DXML_INSTRUMENT=1)
-add_definitions (-DXML_PARAMETERS=2)
-add_definitions (-DXML_MICROTONAL=3)
-add_definitions (-DXML_PRESETS=4)
-add_definitions (-DXML_STATE=5)
-add_definitions (-DXML_CONFIG=6)
-add_definitions (-DXML_BANK=7)
-add_definitions (-DXML_HISTORY=8)
-add_definitions (-DXML_VECTOR=9)
-add_definitions (-DXML_MIDILEARN=10)
-
-add_definitions (-DNO_MSG=255)
-
-# these were previously (pointlessly) user configurable
-add_definitions (-DNUM_VOICES=8)
-add_definitions (-DPOLIPHONY=80)
-add_definitions (-DNUM_SYS_EFX=4)
-add_definitions (-DNUM_INS_EFX=8)
-add_definitions (-DNUM_PART_EFX=3)
-add_definitions (-DNUM_KIT_ITEMS=16)
-add_definitions (-DVELOCITY_MAX_SCALE=8.0f)
-add_definitions (-DFADEIN_ADJUSTMENT_SCALE=20)
-add_definitions (-DMAX_EQ_BANDS=8) # MAX_EQ_BANDS must be less than 20
-add_definitions (-DMAX_FILTER_STAGES=5)
-add_definitions (-DFF_MAX_VOWELS=6)
-add_definitions (-DFF_MAX_FORMANTS=12)
-add_definitions (-DFF_MAX_SEQUENCE=8)
-add_definitions (-DMAX_PHASER_STAGES=12)
-add_definitions (-DMAX_ALIENWAH_DELAY=100)
 
 if (ShowGuiReports)
     add_definitions (-DENABLE_REPORTS)
