@@ -6,6 +6,7 @@ yoshimi 1.5.8 M
   Converted actual commands in Interchange.cpp
 * Implimented small optimisation for reads.
 * Minor doc updates.
+* Completed part controls move in  Interchange.cpp
 
 2018-6-21 Will
 * Instruments can now be swapped between banks and roots.
