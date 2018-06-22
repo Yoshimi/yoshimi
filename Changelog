@@ -1,5 +1,12 @@
 yoshimi 1.5.8 M
 
+2018-6-22 Will
+* Moved CommandBlock from MiscFuncs'.h to globals.h
+* Set up part level controls enum in globals.h
+  Converted actual commands in Interchange.cpp
+* Implimented small optimisation for reads.
+* Minor doc updates.
+
 2018-6-21 Will
 * Instruments can now be swapped between banks and roots.
 * Small doc updates.

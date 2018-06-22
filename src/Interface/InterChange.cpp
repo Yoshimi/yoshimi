@@ -207,7 +207,8 @@ void *InterChange::sortResultsThread(void)
         }*/
 
         ++ tick;
-        unsigned char testRead = __sync_or_and_fetch(&blockRead, 0);
+        // a false positive here is not actually a problem.
+        unsigned char testRead = blockRead;//__sync_or_and_fetch(&blockRead, 0);
         if (lockTime == 0 && testRead != 0)
         {
             tick |= 1; // make sure it's not zero
@@ -220,7 +221,7 @@ void *InterChange::sortResultsThread(void)
         { // about 4 seconds - may need improving
 
             cout << "stuck read block cleared" << endl;
-            __sync_and_and_fetch(&blockRead, 0);
+            blockRead = 0;//__sync_and_and_fetch(&blockRead, 0);
             lockTime = 0;
         }
 
@@ -1065,7 +1066,8 @@ float InterChange::readAllData(CommandBlock *getData)
     }
     reTry:
     memcpy(tryData.bytes, getData->bytes, sizeof(tryData));
-    while (__sync_or_and_fetch(&blockRead, 0) > 0) // just reading it
+    // a false positive here is not actually a problem.
+    while (blockRead)//__sync_or_and_fetch(&blockRead, 0) > 0) // just reading it
         usleep(10);
     if (indirect)
     {
@@ -1078,7 +1080,7 @@ float InterChange::readAllData(CommandBlock *getData)
     }
     else
         commandSendReal(&tryData);
-    if (__sync_or_and_fetch(&blockRead, 0) > 0)
+    if (blockRead)//__sync_or_and_fetch(&blockRead, 0) > 0)
         goto reTry; // it may have changed mid-process
 
     if ((tryData.data.type & 0x10))
@@ -2364,7 +2366,7 @@ string InterChange::resolvePart(CommandBlock *getData)
             contstr = "Clear controllers";
             break;
 
-        case 252:
+        case partLevel::control::partBusy:
             showValue = false;
             if (value_bool)
                 contstr = "is busy";
@@ -5148,31 +5150,31 @@ void InterChange::commandPart(CommandBlock *getData)
 
     switch (control)
     {
-        case 0:
+        case partLevel::control::volume:
             if (write)
                 part->setVolume(value);
             else
                 value = part->Pvolume;
             break;
-        case 1:
+        case partLevel::control::velocitySense:
             if (write)
                 part->Pvelsns = value;
             else
                 value = part->Pvelsns;
             break;
-        case 2:
+        case partLevel::control::panning:
             if (write)
                 part->SetController(C_panning, value);
             else
                 value = part->Ppanning;
             break;
-        case 4:
+        case partLevel::control::velocityOffset:
             if (write)
                 part->Pveloffs = value;
             else
                 value = part->Pveloffs;
             break;
-        case 5:
+        case partLevel::control::midiChannel:
             if (write)
             {
                 part->Prcvchn = value_int;
@@ -5187,19 +5189,19 @@ void InterChange::commandPart(CommandBlock *getData)
             else
                 value = part->Prcvchn;
             break;
-        case 6:
+        case partLevel::control::keyMode:
             if (write)
                 synth->SetPartKeyMode(npart, value_int);
             else
                 value = (synth->ReadPartKeyMode(npart)) & 3; // clear out temporary legato
             break;
-        case 7:
+        case partLevel::control::portamento:
             if (write)
                 part->ctl->portamento.portamento = value_bool;
             else
                 value = part->ctl->portamento.portamento;
             break;
-        case 8:
+        case partLevel::control::enable:
             if (kitType)
             {
                 switch(engine)
@@ -5272,7 +5274,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 }
             }
             break;
-        case 9:
+        case partLevel::control::kitItemMute:
             if (kitType)
             {
                 if (write)
@@ -5282,7 +5284,7 @@ void InterChange::commandPart(CommandBlock *getData)
             }
             break;
 
-        case 16: // always return actual value
+        case partLevel::control::minNote: // always return actual value
             if (kitType)
             {
                 if (write)
@@ -5306,7 +5308,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->Pminkey;
             }
             break;
-        case 17: // always return actual value
+        case partLevel::control::maxNote: // always return actual value
             if (kitType)
             {
                 if (write)
@@ -5330,7 +5332,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->Pmaxkey;
             }
             break;
-        case 18: // always return actual value
+        case partLevel::control::minToLastKey: // always return actual value
             value_int = part->lastnote;
             if (kitType)
             {
@@ -5355,7 +5357,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->Pminkey;
             }
             break;
-        case 19: // always return actual value
+        case partLevel::control::maxToLastKey: // always return actual value
             value_int = part->lastnote;
             if (kitType)
             {
@@ -5380,7 +5382,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->Pmaxkey;
             }
             break;
-        case 20:
+        case partLevel::control::resetMinMaxKey:
             if (kitType)
             {
                 if (write)
@@ -5399,7 +5401,7 @@ void InterChange::commandPart(CommandBlock *getData)
             }
             break;
 
-        case 24:
+        case partLevel::control::kitEffectNum:
             if (kitType)
             {
                 if (write)
@@ -5414,48 +5416,48 @@ void InterChange::commandPart(CommandBlock *getData)
             }
             break;
 
-        case 33:
+        case partLevel::control::maxNotes:
             if (write)
                 part->setkeylimit(value_int);
             else
                 value = part->Pkeylimit;
             break;
-        case 35: // done elsewhere
+        case partLevel::control::keyShift: // done elsewhere
             break;
 
-        case 40:
+        case partLevel::control::partToSystemEffect1:
             if (write)
                 synth->setPsysefxvol(npart,0, value);
             else
                 value = synth->Psysefxvol[0][npart];
             break;
-        case 41:
+        case partLevel::control::partToSystemEffect2:
             if (write)
                 synth->setPsysefxvol(npart,1, value);
             else
                 value = synth->Psysefxvol[1][npart];
             break;
-        case 42:
+        case partLevel::control::partToSystemEffect3:
             if (write)
                 synth->setPsysefxvol(npart,2, value);
             else
                 value = synth->Psysefxvol[2][npart];
             break;
-        case 43:
+        case partLevel::control::partToSystemEffect4:
             if (write)
                 synth->setPsysefxvol(npart,3, value);
             else
                 value = synth->Psysefxvol[3][npart];
             break;
 
-        case 48:
+        case partLevel::control::humanise:
             if (write)
                 part->Pfrand = value;
             else
                 value = part->Pfrand;
             break;
 
-        case 57:
+        case partLevel::control::drumMode:
             if (write)
             {
                 part->legatoFading = 0;
@@ -5465,7 +5467,7 @@ void InterChange::commandPart(CommandBlock *getData)
             else
                 value = part->Pdrummode;
             break;
-        case 58:
+        case partLevel::control::kitMode:
             if (write)
             {
                 if (value == 3)
@@ -5484,16 +5486,16 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->Pkitmode;
             break;
 
-        case 64: // local to source
+        case partLevel::control::effectNum: // local to source
             break;
 
-        case 65:
+        case partLevel::control::effectType:
             if (write)
                 part->partefx[effNum]->changeeffect(value_int);
             else
                 value = part->partefx[effNum]->geteffect();
             break;
-        case 66:
+        case partLevel::control::effectDestination:
             if (write)
             {
                 part->Pefxroute[effNum] = value_int;
@@ -5502,14 +5504,14 @@ void InterChange::commandPart(CommandBlock *getData)
             else
                 value = part->Pefxroute[effNum];
             break;
-        case 67:
+        case partLevel::control::effectBypass:
             if (write)
                 part->Pefxbypass[effNum] = value_bool;
             else
                 value = part->Pefxbypass[effNum];
             break;
 
-        case 96: // doClearPart
+        case partLevel::control::defaultInstrument: // doClearPart
             if(write)
             {
                 synth->partonoffWrite(npart, -1);
@@ -5519,7 +5521,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 getData->data.type = 0xff; // block any further action
             break;
 
-        case 120:
+        case partLevel::control::audioDestination:
             if (synth->partonoffRead(npart) != 1)
             {
                 getData->data.value = part->Paudiodest; // specific for this control
@@ -5535,85 +5537,85 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->Paudiodest;
             break;
 
-        case 128:
+        case partLevel::control::volumeRange: // start of controllers
             if (write)
                 part->ctl->setvolume(value_int); // not the *actual* volume
             else
                 value = part->ctl->volume.data;
             break;
-        case 129:
+        case partLevel::control::volumeEnable:
             if (write)
                 part->ctl->volume.receive = value_bool;
             else
                 value = part->ctl->volume.receive;
             break;
-        case 130:
+        case partLevel::control::panningWidth:
             if (write)
                 part->ctl->setPanDepth(value_int);
             else
                 value = part->ctl->panning.depth;
             break;
-        case 131:
+        case partLevel::control::modWheelDepth:
             if (write)
                 part->ctl->modwheel.depth = value;
             else
                 value = part->ctl->modwheel.depth;
             break;
-        case 132:
+        case partLevel::control::exponentialModWheel:
             if (write)
                 part->ctl->modwheel.exponential = value_bool;
             else
                 value = part->ctl->modwheel.exponential;
             break;
-        case 133:
+        case partLevel::control::bandwidthDepth:
             if (write)
                 part->ctl->bandwidth.depth = value;
             else
                 value = part->ctl->bandwidth.depth;
             break;
-        case 134:
+        case partLevel::control::exponentialBandwidth:
             if (write)
                 part->ctl->bandwidth.exponential = value_bool;
             else
                 value = part->ctl->bandwidth.exponential;
             break;
-        case 135:
+        case partLevel::control::expressionEnable:
             if (write)
                 part->ctl->expression.receive = value_bool;
             else
                 value = part->ctl->expression.receive;
             break;
-        case 136:
+        case partLevel::control::FMamplitudeEnable:
             if (write)
                 part->ctl->fmamp.receive = value_bool;
             else
                 value = part->ctl->fmamp.receive;
             break;
-        case 137:
+        case partLevel::control::sustainPedalEnable:
             if (write)
                 part->ctl->sustain.receive = value_bool;
             else
                 value = part->ctl->sustain.receive;
             break;
-        case 138:
+        case partLevel::control::pitchWheelRange:
             if (write)
                 part->ctl->pitchwheel.bendrange = value_int;
             else
                 value = part->ctl->pitchwheel.bendrange;
             break;
-        case 139:
+        case partLevel::control::filterQdepth:
             if (write)
                 part->ctl->filterq.depth = value;
             else
                 value = part->ctl->filterq.depth;
             break;
-        case 140:
+        case partLevel::control::filterCutoffDepth:
             if (write)
                 part->ctl->filtercutoff.depth = value;
             else
                 value = part->ctl->filtercutoff.depth;
             break;
-        case 141:
+        case partLevel::control::breathControlEnable:
             if (write)
                 if (value_bool)
                     part->PbreathControl = 2;
@@ -5623,75 +5625,78 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->PbreathControl;
             break;
 
-        case 144:
+        case partLevel::control::resonanceCenterFrequencyDepth:
             if (write)
                 part->ctl->resonancecenter.depth = value;
             else
                 value = part->ctl->resonancecenter.depth;
             break;
-        case 145:
+        case partLevel::control::resonanceBandwidthDepth:
             if (write)
                 part->ctl->resonancebandwidth.depth = value;
             else
                 value = part->ctl->resonancebandwidth.depth;
             break;
 
-        case 160:
+        case partLevel::control::portamentoTime:
             if (write)
                 part->ctl->portamento.time = value;
             else
                 value = part->ctl->portamento.time;
             break;
-        case 161:
+        case partLevel::control::portamentoTimeStretch:
             if (write)
                 part->ctl->portamento.updowntimestretch = value;
             else
                 value = part->ctl->portamento.updowntimestretch;
             break;
-        case 162:
+        case partLevel::control::portamentoThreshold:
             if (write)
                 part->ctl->portamento.pitchthresh = value;
             else
                 value = part->ctl->portamento.pitchthresh;
             break;
-        case 163:
+        case partLevel::control::portamentoThresholdType:
             if (write)
                 part->ctl->portamento.pitchthreshtype = value_int;
             else
                 value = part->ctl->portamento.pitchthreshtype;
             break;
-        case 164:
+        case partLevel::control::enableProportionalPortamento:
             if (write)
                 part->ctl->portamento.proportional = value_int;
             else
                 value = part->ctl->portamento.proportional;
             break;
-        case 165:
+        case partLevel::control::proportionalPortamentoRate:
             if (write)
                 part->ctl->portamento.propRate = value;
             else
                 value = part->ctl->portamento.propRate;
             break;
-        case 166:
+        case partLevel::control::proportionalPortamentoDepth: // end of controllers
             if (write)
                 part->ctl->portamento.propDepth = value;
             else
                 value = part->ctl->portamento.propDepth;
             break;
-        case 168:
+
+        case partLevel::control::enablePortamento:
             if (write)
                 part->ctl->portamento.receive = value_bool;
             else
                 value = part->ctl->portamento.receive;
             break;
 
-        case 192:
+        case partLevel::control::midiModWheel:
             if (write)
                 part->ctl->setmodwheel(value);
             else
                 value = part->ctl->modwheel.data;
             break;
-        case 194:
+        case partLevel::control::midiBreath:
+            ; // not yet
+        case partLevel::control::midiExpression:
             if (write)
             {
                 part->SetController(C_expression, value);
@@ -5699,28 +5704,38 @@ void InterChange::commandPart(CommandBlock *getData)
             else
                 value = part->ctl->expression.data;
             break;
-        case 197:
+        case partLevel::control::midiSustain:
+            ; // not yet
+        case partLevel::control::midiPortamento:
+            ; // not yet
+        case partLevel::control::midiFilterQ:
             if (write)
                 part->ctl->setfilterq(value);
             else
                 value = part->ctl->filterq.data;
             break;
-        case 198:
+        case partLevel::control::midiFilterCutoff:
             if (write)
                 part->ctl->setfiltercutoff(value);
             else
                 value = part->ctl->filtercutoff.data;
             break;
-        case 199:
+        case partLevel::control::midiBandwidth:
             if (write)
                 part->ctl->setbandwidth(value);
             else
                 value = part->ctl->bandwidth.data;
             break;
 
-        case 222: // done elsewhere
+        case partLevel::control::instrumentCopyright:
+            ; // not yet
+        case partLevel::control::instrumentComments:
+            ; // not yet
+        case partLevel::control::instrumentName: // done elsewhere
             break;
-        case 224:
+        case partLevel::control::defaultInstrumentCopyright: // done elsewhere
+            ;
+        case partLevel::control::resetAllControllers:
             if (write)
                 part->SetController(0x79,0); // C_resetallcontrollers
             break;

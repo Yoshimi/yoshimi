@@ -88,5 +88,96 @@
 #define MAX_PHASER_STAGES 12
 #define MAX_ALIENWAH_DELAY 100
 
+namespace partLevel // usage partLevel::control::volume
+{
+    enum control : unsigned char {
+        volume = 0,
+        velocitySense,
+        panning,
+        velocityOffset = 4,
+        midiChannel,
+        keyMode,
+        portamento,
+        enable,
+        kitItemMute,
+        minNote = 16,
+        maxNote,
+        minToLastKey,
+        maxToLastKey,
+        resetMinMaxKey,
+        kitEffectNum = 24,
+        maxNotes = 33,
+        keyShift = 35,
+        partToSystemEffect1 = 40,
+        partToSystemEffect2,
+        partToSystemEffect3,
+        partToSystemEffect4,
+        humanise = 48,
+        drumMode = 57,
+        kitMode,
+        effectNum = 64,
+        effectType,
+        effectDestination,
+        effectBypass,
+        defaultInstrument = 96,
+        audioDestination = 120,
+    // start of controllers
+        volumeRange = 128,
+        volumeEnable,
+        panningWidth,
+        modWheelDepth,
+        exponentialModWheel,
+        bandwidthDepth,
+        exponentialBandwidth,
+        expressionEnable,
+        FMamplitudeEnable,
+        sustainPedalEnable,
+        pitchWheelRange,
+        filterQdepth,
+        filterCutoffDepth,
+        breathControlEnable,
+        resonanceCenterFrequencyDepth = 144,
+        resonanceBandwidthDepth,
+        portamentoTime = 160,
+        portamentoTimeStretch,
+        portamentoThreshold,
+        portamentoThresholdType,
+        enableProportionalPortamento,
+        proportionalPortamentoRate,
+        proportionalPortamentoDepth,
+    // end of controllers
+        enablePortamento = 168, // it's done at part level
+    // start of midi controls
+        midiModWheel = 192,
+        midiBreath,
+        midiExpression,
+        midiSustain,
+        midiPortamento,
+        midiFilterQ,
+        midiFilterCutoff,
+        midiBandwidth,
+    // end of midi controls
+        instrumentCopyright = 220,
+        instrumentComments,
+        instrumentName,
+        defaultInstrumentCopyright,
+        resetAllControllers,
+        partBusy = 252}; // internally generated - read only
+}
+
+union CommandBlock{
+    struct{
+        float value;
+        unsigned char type;
+        unsigned char control;
+        unsigned char part;
+        unsigned char kit;
+        unsigned char engine;
+        unsigned char insert;
+        unsigned char parameter;
+        unsigned char par2;
+    } data;
+    char bytes [sizeof(data)];
+};
 
 #endif
