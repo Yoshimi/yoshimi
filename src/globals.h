@@ -91,15 +91,15 @@
 namespace topLevel // usage topLevel::section::vector
 {
     enum section: unsigned char {
-        vector = 192,
-        midiLearn = 216,
+        vector = 192, // CO
+        midiLearn = 216, // D8
         midiIn,
-        scales = 232,
-        main = 240,
+        scales = 232, // E8
+        main = 240, // F0
         systemEffects,
         insertEffects,
-        bank = 244,
-        config = 248
+        bank = 244, // F4
+        config = 248 // F8
     };
 
     enum control : unsigned char {

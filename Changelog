@@ -1,5 +1,9 @@
 yoshimi 1.5.8 M
 
+2018-6-24 Will
+* GUI part controls converted.
+* GUI main engine controls converted.
+
 2018-6-23 Will
 * Added engines to globals.h
 * Further work on Interchange.cpp

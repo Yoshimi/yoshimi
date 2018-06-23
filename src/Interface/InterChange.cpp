@@ -1059,7 +1059,7 @@ float InterChange::readAllData(CommandBlock *getData)
     bool indirect = ((getData->data.parameter & 0xf0) == 0x80);
     if (npart < NUM_MIDI_PARTS && synth->part[npart]->busy)
     {
-        getData->data.control = 252; // part busy message
+        getData->data.control = partLevel::control::partBusy; // part busy message
         getData->data.kit = 0xff;
         getData->data.engine = 0xff;
         getData->data.insert = 0xff;
@@ -4014,13 +4014,13 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     if (part->busy && engine == partLevel::engine::padSynth) // it's a PadSynth control
     {
         getData->data.type &= 0xbf; // turn it into a read
-        getData->data.control = 252; // part busy message
+        getData->data.control = partLevel::control::partBusy; // part busy message
         getData->data.kit = 0xff;
         getData->data.engine = 0xff;
         getData->data.insert = 0xff;
         return false;
     }
-    if (control == 252)
+    if (control == partLevel::control::partBusy)
     {
         getData->data.value = part->busy;
         return false;

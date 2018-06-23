@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified April 2018
+    Modified June 2018
 */
 
 #include "Misc/SynthEngine.h"
@@ -59,7 +59,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
 {
     if (part < NUM_MIDI_PARTS && engine == 2)
     {
-        if (collect_readData(synth, 0, 252, part, 255, 255, 255, 255, 255))
+        if (collect_readData(synth, 0, partLevel::control::partBusy, part, 255, 255, 255, 255, 255))
         {
             fl_alert("Part %d is busy", int(part));
             return;
@@ -69,7 +69,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
     if ( part == 0xf1 && insert == 0x10)
         type |= 8; // this is a hack :(
 
-    if (part != 0xd8)
+    if (part != topLevel::section::midiLearn)
     {
         if ((type & 3) == 3 && Fl::event_is_click())
         {
@@ -157,28 +157,28 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         synth->getGuiMaster()->message->show();
         return;
     }
-    if (npart == 0xe8) // scales
+    if (npart == topLevel::section::scales) // scales
     {
         synth->getGuiMaster()->microtonalui->returns_update(getData);
         return;
     }
-    if (npart == 0xc0) // vector
+    if (npart == topLevel::section::vector) // vector
     {
         synth->getGuiMaster()->vectorui->returns_update(getData);
         return;
     }
-    if (npart == 0xd8 && synth->getGuiMaster()->midilearnui != NULL)
+    if (npart == topLevel::section::midiLearn && synth->getGuiMaster()->midilearnui != NULL)
     {
         synth->getGuiMaster()->midilearnui->returns_update(getData);
         return;
     }
-    if (npart == 0xd9) // midi messages - catch this early
+    if (npart == topLevel::section::midiIn) // midi messages - catch this early
     {
         synth->getGuiMaster()->returns_update(getData);
         return;
     }
 
-    if (npart == 0xf4)
+    if (npart == topLevel::section::bank)
     {
         synth->getGuiMaster()->bankui->returns_update(getData);
         return;
@@ -188,14 +188,14 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 
     if (kititem >= 0x80 && kititem != 0xff) // effects
     {
-        if (npart == 0xf1)
+        if (npart == topLevel::section::systemEffects)
         {
             if (insert == 1) // dynefilter filter insert
                 synth->getGuiMaster()->syseffectui->fwin_filterui->returns_update(getData);
             else
                 synth->getGuiMaster()->syseffectui->returns_update(getData);
         }
-        else if (npart == 0xf2)
+        else if (npart == topLevel::section::insertEffects)
         {
             if (insert == 1) // dynefilter filter insert
                 synth->getGuiMaster()->inseffectui->fwin_filterui->returns_update(getData);
@@ -212,17 +212,17 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         return;
     }
 
-    if (npart == 0xf8)
+    if (npart == topLevel::section::config)
     {
         synth->getGuiMaster()->configui->returns_update(getData);
         return;
     }
-    if (npart == 0xf0 && control == 94) // special case for pad sample save
+    if (npart == topLevel::section::main && control == 94) // special case for pad sample save
     {
         npart = insertParam & 0x3f;
         getData->data.part = npart;
     }
-    if (npart >= 0xf0) // main / sys / ins
+    if (npart >= topLevel::section::main) // main / sys / ins
     {
         //if (npart == 0xf0) &&  control == 96)
             //return; // gui in undefined state at this point
@@ -237,23 +237,23 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     if (kititem >= NUM_KIT_ITEMS && kititem < 0xff)
         return; // invalid kit number
 
-    if (kititem == 0xff && engine == 0xff && insert == 0xff && control == 96) // special case for part clear
+    if (kititem == 0xff && engine == 0xff && insert == 0xff && control == partLevel::control::defaultInstrument) // special case for part clear
     {
         synth->getGuiMaster()->returns_update(getData);
         return;
     }
 
-    if (kititem != 0xff && kititem != 0 && engine != 0xff && control != 8 && part->kit[kititem].Penabled == false)
+    if (kititem != 0xff && kititem != 0 && engine != 0xff && control != partLevel::control::enable && part->kit[kititem].Penabled == false)
         return; // attempt to access non existant kititem
 
-    if (insert < 0xff || (control != 8 && control != 222))
+    if (insert < 0xff || (control != partLevel::control::enable && control != partLevel::control::instrumentName))
     {
         if (synth->getGuiMaster()->partui->partname == "Simple Sound")
             synth->getGuiMaster()->partui->checkEngines("No Title");
     }
     if (kititem == 0xff || insert == 0x20) // part
     {
-        if (control != 58 && kititem < 0xff && part->Pkitmode == 0)
+        if (control != partLevel::control::kitMode && kititem < 0xff && part->Pkitmode == 0)
             return; // invalid access
         synth->getGuiMaster()->partui->returns_update(getData);
         return;
@@ -262,7 +262,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     if (kititem > 0 && kititem < 0xff && part->Pkitmode == 0)
         return; // invalid access
 
-    if (engine == 2) // padsynth
+    if (engine == partLevel::engine::padSynth) // padsynth
     {
         if(synth->getGuiMaster()->partui->padnoteui)
         {
@@ -332,7 +332,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         return;
     }
 
-    if (engine == 1) // subsynth
+    if (engine == partLevel::engine::subSynth) // subsynth
     {
         if (synth->getGuiMaster()->partui->subnoteui)
             switch (insert)
@@ -373,7 +373,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         return;
     }
 
-    if (engine >= 0x80) // addsynth voice / modulator
+    if (engine >= partLevel::engine::addVoice1) // addsynth voice / modulator
     {
         if (synth->getGuiMaster()->partui->adnoteui)
         {
@@ -408,7 +408,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                     case 2:
                     case 3:
                     case 4:
-                        if (engine >= 0xC0)
+                        if (engine >= partLevel::engine::addMod1)
                             switch(insertParam)
                             {
                                 case 0:
@@ -451,7 +451,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         return;
     }
 
-    if (engine == 0) // addsynth base
+    if (engine == partLevel::engine::addSynth) // addsynth base
     {
         if (synth->getGuiMaster()->partui->adnoteui)
             switch (insert)
