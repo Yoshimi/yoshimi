@@ -165,8 +165,8 @@ namespace partLevel // usage partLevel::control::volume
         enableProportionalPortamento,
         proportionalPortamentoRate,
         proportionalPortamentoDepth,
+        receivePortamento = 168,
     // end of controllers
-        enablePortamento = 168, // it's done at part level
     // start of midi controls
         midiModWheel = 192,
         midiBreath,
