@@ -3024,8 +3024,13 @@ string InterChange::resolveOscillator(CommandBlock *getData)
     }
     else
     {
-        eng_name = " Add Voice " + to_string((engine & 0x3f) + 1);
-        if (engine & 0x40)
+        int eng;
+        if (engine >= partLevel::engine::addMod1)
+            eng = engine - partLevel::engine::addMod1;
+        else
+            eng = engine - partLevel::engine::addVoice1;
+        eng_name = " Add Voice " + to_string(eng + 1);
+        if (engine >= partLevel::engine::addMod1)
             eng_name += " Modulator";
     }
 
@@ -3266,7 +3271,7 @@ string InterChange::resolveLFO(CommandBlock *getData)
         name = " PadSynth";
     else if (engine >= partLevel::engine::addVoice1)
     {
-        int nvoice = engine & 0x3f;
+        int nvoice = engine - partLevel::engine::addVoice1;
         name = " Add Voice " + to_string(nvoice + 1);
     }
 
@@ -3343,7 +3348,7 @@ string InterChange::resolveFilter(CommandBlock *getData)
     else if (engine == partLevel::engine::padSynth)
         name = " PadSynth";
     else if (engine >= partLevel::engine::addVoice1)
-        name = " Adsynth Voice " + to_string((engine & 0x3f) + 1);
+        name = " Adsynth Voice " + to_string((engine - partLevel::engine::addVoice1) + 1);
     string contstr;
     switch (control)
     {
@@ -3465,9 +3470,13 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
     else if (engine >= partLevel::engine::addVoice1)
     {
         name = " Add Voice ";
-        int nvoice = engine & 0x3f;
+        int nvoice;
+        if (engine >= partLevel::engine::addMod1)
+            nvoice = engine - partLevel::engine::addMod1;
+        else
+            nvoice = engine - partLevel::engine::addVoice1;
         name += to_string(nvoice + 1);
-        if (engine >= 0xC0)
+        if (engine >= partLevel::engine::addMod1)
             name += " Modulator";
     }
 
@@ -4096,7 +4105,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
 
     if (engine >= partLevel::engine::addVoice1)
     {
-        if ((engine & 0x3f) > 7)
+        if ((engine > partLevel::engine::addVoice8 && engine < partLevel::engine::addMod1) || engine > partLevel::engine::addMod8)
         {
             getData->data.type = 0xff; // block any further action
             synth->getRuntime().Log("Invalid voice number");
@@ -7238,7 +7247,7 @@ void InterChange::commandLFO(CommandBlock *getData)
     }
     else if (engine >= partLevel::engine::addVoice1)
     {
-        int nvoice = engine & 0x3f;
+        int nvoice = engine - partLevel::engine::addVoice1;
         switch (insertParam)
         {
             case 0:
@@ -7661,7 +7670,11 @@ void InterChange::commandEnvelope(CommandBlock *getData)
     }
     else if (engine >= partLevel::engine::addVoice1)
     {
-        int nvoice = engine & 0x3f;
+        int nvoice;
+        if (engine >= partLevel::engine::addMod1)
+            nvoice = engine - partLevel::engine::addMod1;
+        else
+            nvoice = engine - partLevel::engine::addVoice1;
         if (engine >= partLevel::engine::addMod1)
         {
             switch (insertParam)

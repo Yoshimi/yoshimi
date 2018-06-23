@@ -2971,7 +2971,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
 
 int CmdInterface::sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2, unsigned char request)
 {
-    if (part != 0xd8) // MIDI learn
+    if (part != topLevel::section::midiLearn) // MIDI learn
         type |= 0x10; // from command line
     /*
      * MIDI learn is synced by the audio thread but
@@ -3017,7 +3017,7 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
             }
             synth->getRuntime().Log(name + to_string(value));
         }
-        else if ( part == 0xf0)
+        else if ( part == topLevel::section::main)
         {
             switch (control)
             {
@@ -3047,7 +3047,7 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
         }
         return 0;
     }
-    if (part == 0xf8 && putData.data.par2 < 0xff && (control == 65 || control == 67 || control == 71))
+    if (part == topLevel::section::midiLearn && putData.data.par2 < 0xff && (control == 65 || control == 67 || control == 71))
     {
         synth->getRuntime().Log("In use by " + miscMsgPop(putData.data.par2) );
         return 0;

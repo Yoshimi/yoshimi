@@ -3,7 +3,9 @@ yoshimi 1.5.8 M
 2018-6-23 Will
 * Added engines to globals.h
 * Further work on Interchange.cpp
-* Part level mostly converted to CLI.
+* CLI Part level mostly converted.
+* Corrected multiple commit/merge failures :(
+* Further adustments to Interchange.cpp
 
 2018-6-22 Will
 * Moved CommandBlock from MiscFuncs'.h to globals.h
