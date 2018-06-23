@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of ZynAddSubFX original code.
-    Modified February 2018
+    Modified June 2018
 */
 
 #include <iostream>
@@ -824,7 +824,7 @@ float ADnoteParameters::getLimits(CommandBlock *getData)
     float def = 0;
     int max = 127;
 
-    if (engine < 0x80)
+    if (engine < partLevel::engine::addVoice1)
     {
         switch (control)
         {

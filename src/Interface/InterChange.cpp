@@ -311,12 +311,12 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     string name;
 
     int switchNum = npart;
-    if (control == 254 && insert !=9)
+    if (control == topLevel::control::errorMessage && insert !=9)
         switchNum = 256; // this is a bit hacky :(
 
     switch(switchNum)
     {
-        case 192: // vector
+        case topLevel::section::vector: // vector
         {
             switch(control)
             {
@@ -334,7 +334,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
             }
             break;
         }
-        case 217: // program / bank / root
+        case topLevel::section::midiIn: // program / bank / root
         {
             //cout << " interchange prog " << value << "  chan " << int(kititem) << "  bank " << int(engine) << "  root " << int(insert) << "  named " << int(par2) << endl;
             if (par2 != NO_MSG) // was named file not numbered
@@ -352,7 +352,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
             guiTo = true;
             break;
         }
-        case 232: // scales
+        case topLevel::section::scales: // scales
         {
             switch(control)
             {
@@ -420,7 +420,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
             guiTo = true;
             break;
         }
-        case 240: // main
+        case topLevel::section::main: // main
         {
             switch (control)
             {
@@ -584,7 +584,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
-                break;
+                    break;
                 case 89: // scales save
                     if (synth->saveMicrotonal(text))
                         text = "d " + text;
@@ -696,7 +696,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                 guiTo = true;
             break;
         }
-        case 244: // instrument / bank
+        case topLevel::section::bank: // instrument / bank
         {
             switch (control)
             {
@@ -777,7 +777,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
             getData->data.parameter &= 0x7f;
             break;
         }
-        case 248: // config
+        case topLevel::section::config: // config
         {
             switch (control)
             {
@@ -855,7 +855,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
             {
                 switch(control)
                 {
-                    case 35:
+                    case partLevel::control::keyShift:
                     {
                         if (write)
                         {
@@ -868,7 +868,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     }
                     break;
 
-                    case 96: // clear part
+                    case partLevel::control::defaultInstrument: // clear part
                         if (write)
                         {
                             doClearPart(npart);
@@ -876,7 +876,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         }
                         break;
 
-                    case 104: // set padsynth parameters
+                    case partLevel::control::padsynthParameters: // set padsynth parameters
                         if (write)
                         {
                             setpadparams(npart | (kititem << 8));
@@ -884,7 +884,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         }
                         break;
 
-                    case 120: // audio destination
+                    case partLevel::control::audioDestination: // audio destination
                         if (npart < synth->getRuntime().NumAvailableParts)
                         {
                             if (value & 2)
@@ -894,7 +894,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                             getData->data.parameter &= 0x7f;
                         }
                         break;
-                    case 222: // part / kit item names
+                    case partLevel::control::instrumentName: // part / kit item names
                         if (parameter == 128)
                         {
                             if (write)
@@ -925,7 +925,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         getData->data.parameter &= 0x7f;
                         value = miscMsgPush(text);
                         break;
-                    case 223: // copyright info
+                    case partLevel::control::defaultInstrumentCopyright: // copyright info
                         if (write)
                         {
                             string name = synth->getRuntime().ConfigDir + "/copyright.txt";
@@ -1210,7 +1210,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
         commandName = "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
     }
 
-    else if (engine == 2)
+    else if (engine == partLevel::engine::padSynth)
     {
         switch(insert)
         {
@@ -1240,7 +1240,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
         }
     }
 
-    else if (engine == 1)
+    else if (engine == partLevel::engine::subSynth)
     {
         switch (insert)
         {
@@ -1260,7 +1260,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
         }
     }
 
-    else if (engine >= 0x80)
+    else if (engine >= partLevel::engine::addVoice1)
     {
         switch (insert)
         {
@@ -1281,7 +1281,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
             case 5:
             case 6:
             case 7:
-                if (engine >= 0xC0)
+                if (engine >= partLevel::engine::addMod1)
                     commandName = resolveOscillator(getData);
                 else
                     commandName = resolveOscillator(getData);
@@ -1289,7 +1289,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
         }
     }
 
-    else if (engine == 0)
+    else if (engine == partLevel::engine::addSynth)
     {
         switch (insert)
         {
@@ -2095,13 +2095,13 @@ string InterChange::resolvePart(CommandBlock *getData)
     {
         switch (engine)
         {
-            case 0:
+            case partLevel::engine::addSynth:
                 name = "AddSynth ";
                 break;
-            case 1:
+            case partLevel::engine::subSynth:
                 name = "SubSynth ";
                 break;
-            case 2:
+            case partLevel::engine::padSynth:
                 name = "PadSynth ";
                 break;
         }
@@ -2150,13 +2150,13 @@ string InterChange::resolvePart(CommandBlock *getData)
             {
                 switch(engine)
                 {
-                    case 0:
+                    case partLevel::engine::addSynth:
                         contstr = "AddSynth " + contstr;
                         break;
-                    case 1:
+                    case partLevel::engine::subSynth:
                         contstr = "SubSynth " + contstr;
                         break;
-                    case 2:
+                    case partLevel::engine::padSynth:
                         contstr = "PadSynth " + contstr;
                         break;
                 }
@@ -2491,7 +2491,11 @@ string InterChange::resolveAddVoice(CommandBlock *getData)
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
-    int nvoice = engine & 0x1f;
+    int nvoice;
+    if (engine >= partLevel::engine::addMod1)
+        nvoice = engine - partLevel::engine::addMod1;
+    else
+        nvoice = engine - partLevel::engine::addVoice1;
 
     string name = "";
     switch (control & 0xf0)
@@ -3012,7 +3016,7 @@ string InterChange::resolveOscillator(CommandBlock *getData)
 
     string isPad = "";
     string eng_name;
-    if (engine == 2)
+    if (engine == partLevel::engine::padSynth)
     {
         eng_name = " Padsysnth";
         if (write)
@@ -3183,7 +3187,7 @@ string InterChange::resolveResonance(CommandBlock *getData)
 
     string name;
     string isPad = "";
-    if (engine == 2)
+    if (engine == partLevel::engine::padSynth)
     {
         name = " PadSynth";
         if (write)
@@ -3194,12 +3198,12 @@ string InterChange::resolveResonance(CommandBlock *getData)
 
     if (insert == 9)
     {
-        if (write == true && engine == 2)
+        if (write == true && engine == partLevel::engine::padSynth)
             isPad = " - Need to Apply";
         return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Resonance Point " + to_string(control + 1) + isPad);
     }
 
-    if (write == true && engine == 2 && control != 104)
+    if (write == true && engine == partLevel::engine::padSynth && control != 104)
         isPad = " - Need to Apply";
     string contstr;
     switch (control)
@@ -3256,11 +3260,11 @@ string InterChange::resolveLFO(CommandBlock *getData)
     string name;
     string lfo;
 
-    if (engine == 0)
+    if (engine == partLevel::engine::addSynth)
         name = " AddSynth";
-    else if (engine == 2)
+    else if (engine == partLevel::engine::padSynth)
         name = " PadSynth";
-    else if (engine >= 0x80)
+    else if (engine >= partLevel::engine::addVoice1)
     {
         int nvoice = engine & 0x3f;
         name = " Add Voice " + to_string(nvoice + 1);
@@ -3332,13 +3336,13 @@ string InterChange::resolveFilter(CommandBlock *getData)
 
     string name;
 
-    if (engine == 0)
+    if (engine == partLevel::engine::addSynth)
         name = " AddSynth";
-    else if (engine == 1)
+    else if (engine == partLevel::engine::subSynth)
         name = " SubSynth";
-    else if (engine == 2)
+    else if (engine == partLevel::engine::padSynth)
         name = " PadSynth";
-    else if (engine >= 0x80)
+    else if (engine >= partLevel::engine::addVoice1)
         name = " Adsynth Voice " + to_string((engine & 0x3f) + 1);
     string contstr;
     switch (control)
@@ -3451,14 +3455,14 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
 
     string env;
     string name;
-    if (engine == 0)
+    if (engine == partLevel::engine::addSynth)
         name = " AddSynth";
-    else if (engine == 1)
+    else if (engine == partLevel::engine::subSynth)
         name = " SubSynth";
 
-    else if (engine == 2)
+    else if (engine == partLevel::engine::padSynth)
         name = " PadSynth";
-    else if (engine >= 0x80)
+    else if (engine >= partLevel::engine::addVoice1)
     {
         name = " Add Voice ";
         int nvoice = engine & 0x3f;
@@ -3998,7 +4002,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
 
     Part *part = synth->part[npart];
 
-    if (part->busy && engine == 2) // it's a PadSynth control
+    if (part->busy && engine == partLevel::engine::padSynth) // it's a PadSynth control
     {
         getData->data.type &= 0xbf; // turn it into a read
         getData->data.control = 252; // part busy message
@@ -4036,7 +4040,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         return false;
     }
 
-    if (engine == 2)
+    if (engine == partLevel::engine::padSynth)
     {
         switch(insert)
         {
@@ -4068,7 +4072,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         return true;
     }
 
-    if (engine == 1)
+    if (engine == partLevel::engine::subSynth)
     {
         switch (insert)
         {
@@ -4090,7 +4094,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         return true;
     }
 
-    if (engine >= 0x80)
+    if (engine >= partLevel::engine::addVoice1)
     {
         if ((engine & 0x3f) > 7)
         {
@@ -4119,7 +4123,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
             case 5:
             case 6:
             case 7:
-                if (engine >= 0xc0)
+                if (engine >= partLevel::engine::addMod1)
                 {
                     engine &= 7;
                     if (control != 113)
@@ -4145,7 +4149,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                         if (voicechange != -1)
                         {
                             engine = voicechange;
-                            getData->data.engine = engine | 0x80;
+                            getData->data.engine = engine | partLevel::engine::addVoice1;
                         }   // force it to external voice
                     }
 
@@ -4157,7 +4161,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         return true;
     }
 
-    if (engine == 0)
+    if (engine == partLevel::engine::addSynth)
     {
         switch (insert)
         {
@@ -5218,19 +5222,19 @@ void InterChange::commandPart(CommandBlock *getData)
             {
                 switch(engine)
                 {
-                    case 0:
+                    case partLevel::engine::addSynth:
                         if (write)
                             part->kit[kititem].Padenabled = value_bool;
                         else
                             value = part->kit[kititem].Padenabled;
                         break;
-                    case 1:
+                    case partLevel::engine::subSynth:
                         if (write)
                             part->kit[kititem].Psubenabled = value_bool;
                         else
                             value = part->kit[kititem].Psubenabled;
                         break;
-                    case 2:
+                    case partLevel::engine::padSynth:
                         if (write)
                             part->kit[kititem].Ppadenabled = value_bool;
                         else
@@ -5246,21 +5250,21 @@ void InterChange::commandPart(CommandBlock *getData)
             }
             else
             {
-                 switch(engine)
+                switch(engine)
                 {
-                    case 0:
+                    case partLevel::engine::addSynth:
                         if (write)
                             part->kit[0].Padenabled = value_bool;
                         else
                             value = part->kit[0].Padenabled;
                         break;
-                    case 1:
+                    case partLevel::engine::subSynth:
                         if (write)
                             part->kit[0].Psubenabled = value_bool;
                         else
                             value = part->kit[0].Psubenabled;
                         break;
-                    case 2:
+                    case partLevel::engine::padSynth:
                         if (write)
                             part->kit[0].Ppadenabled = value_bool;
                         else
@@ -5917,7 +5921,11 @@ void InterChange::commandAddVoice(CommandBlock *getData)
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
-    int nvoice = engine & 0x1f;
+    int nvoice;
+    if (engine >= partLevel::engine::addMod1)
+        nvoice = engine - partLevel::engine::addMod1;
+    else
+        nvoice = engine - partLevel::engine::addVoice1;
 
     bool write = (type & 0x40) > 0;
     if (write)
@@ -7198,7 +7206,7 @@ void InterChange::commandLFO(CommandBlock *getData)
     Part *part;
     part = synth->part[npart];
 
-    if (engine == 0)
+    if (engine == partLevel::engine::addSynth)
     {
        switch (insertParam)
         {
@@ -7213,7 +7221,7 @@ void InterChange::commandLFO(CommandBlock *getData)
                 break;
         }
     }
-    else if (engine == 2)
+    else if (engine == partLevel::engine::padSynth)
     {
         switch (insertParam)
         {
@@ -7228,7 +7236,7 @@ void InterChange::commandLFO(CommandBlock *getData)
                 break;
         }
     }
-    else if (engine >= 0x80)
+    else if (engine >= partLevel::engine::addVoice1)
     {
         int nvoice = engine & 0x3f;
         switch (insertParam)
@@ -7327,29 +7335,30 @@ void InterChange::commandFilter(CommandBlock *getData)
     Part *part;
     part = synth->part[npart];
 
-    if (engine == 0)
+    if (engine == partLevel::engine::addSynth)
     {
         filterReadWrite(getData, part->kit[kititem].adpars->GlobalPar.GlobalFilter
                     , &part->kit[kititem].adpars->GlobalPar.PFilterVelocityScale
                     , &part->kit[kititem].adpars->GlobalPar.PFilterVelocityScaleFunction);
     }
-    else if (engine == 1)
+    else if (engine == partLevel::engine::subSynth)
     {
         filterReadWrite(getData, part->kit[kititem].subpars->GlobalFilter
                     , &part->kit[kititem].subpars->PGlobalFilterVelocityScale
                     , &part->kit[kititem].subpars->PGlobalFilterVelocityScaleFunction);
     }
-    else if (engine == 2)
+    else if (engine == partLevel::engine::padSynth)
     {
         filterReadWrite(getData, part->kit[kititem].padpars->GlobalFilter
                     , &part->kit[kititem].padpars->PFilterVelocityScale
                     , &part->kit[kititem].padpars->PFilterVelocityScaleFunction);
     }
-    else if (engine >= 0x80)
+    else if (engine >= partLevel::engine::addVoice1)
     {
-        filterReadWrite(getData, part->kit[kititem].adpars->VoicePar[engine & 0x1f].VoiceFilter
-                    , &part->kit[kititem].adpars->VoicePar[engine & 0x1f].PFilterVelocityScale
-                    , &part->kit[kititem].adpars->VoicePar[engine & 0x1f].PFilterVelocityScaleFunction);
+        int eng = engine - partLevel::engine::addVoice1;
+        filterReadWrite(getData, part->kit[kititem].adpars->VoicePar[eng].VoiceFilter
+                    , &part->kit[kititem].adpars->VoicePar[eng].PFilterVelocityScale
+                    , &part->kit[kititem].adpars->VoicePar[eng].PFilterVelocityScaleFunction);
     }
 }
 
@@ -7602,7 +7611,7 @@ void InterChange::commandEnvelope(CommandBlock *getData)
 
     string env;
     string name;
-    if (engine == 0)
+    if (engine == partLevel::engine::addSynth)
     {
         switch (insertParam)
         {
@@ -7617,7 +7626,7 @@ void InterChange::commandEnvelope(CommandBlock *getData)
                 break;
         }
     }
-    else if (engine == 1)
+    else if (engine == partLevel::engine::subSynth)
     {
         switch (insertParam)
         {
@@ -7635,7 +7644,7 @@ void InterChange::commandEnvelope(CommandBlock *getData)
                 break;
         }
     }
-    else if (engine == 2)
+    else if (engine == partLevel::engine::padSynth)
     {
         switch (insertParam)
         {
@@ -7650,10 +7659,10 @@ void InterChange::commandEnvelope(CommandBlock *getData)
                 break;
         }
     }
-    else if (engine >= 0x80)
+    else if (engine >= partLevel::engine::addVoice1)
     {
         int nvoice = engine & 0x3f;
-        if (engine >= 0xC0)
+        if (engine >= partLevel::engine::addMod1)
         {
             switch (insertParam)
             {
@@ -8118,7 +8127,7 @@ float InterChange::returnLimits(CommandBlock *getData)
         Part *part;
         part = synth->part[npart];
 
-        if (engine == 1 && (insert == 0xff || (insert >= 5 && insert <= 7)) && parameter == 0xff)
+        if (engine == partLevel::engine::subSynth && (insert == 0xff || (insert >= 5 && insert <= 7)) && parameter == 0xff)
         {
             SUBnoteParameters *subpars;
             subpars = part->kit[kititem].subpars;
@@ -8131,19 +8140,19 @@ float InterChange::returnLimits(CommandBlock *getData)
         }
         if ((insert == 0x20 || insert == 0xff) && parameter == 0xff && par2 == 0xff)
         {
-            if (engine == 0 || (engine >= 0x80 && engine <= 0x8f))
+            if (engine == partLevel::engine::addSynth || (engine >= partLevel::engine::addVoice1 && engine <= partLevel::engine::addVoice8))
             {
                 ADnoteParameters *adpars;
                 adpars = part->kit[kititem].adpars;
                 return adpars->getLimits(getData);
             }
-            if (engine == 1)
+            if (engine == partLevel::engine::subSynth)
             {
                 SUBnoteParameters *subpars;
                 subpars = part->kit[kititem].subpars;
                 return subpars->getLimits(getData);
             }
-            if (engine == 2)
+            if (engine == partLevel::engine::padSynth)
             {
                 PADnoteParameters *padpars;
                 padpars = part->kit[kititem].padpars;

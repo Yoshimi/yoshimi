@@ -1,5 +1,10 @@
 yoshimi 1.5.8 M
 
+2018-6-23 Will
+* Added engines to globals.h
+* Further work on Interchange.cpp
+* Part level mostly converted to CLI.
+
 2018-6-22 Will
 * Moved CommandBlock from MiscFuncs'.h to globals.h
 * Set up part level controls enum in globals.h

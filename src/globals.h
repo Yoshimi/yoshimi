@@ -88,6 +88,25 @@
 #define MAX_PHASER_STAGES 12
 #define MAX_ALIENWAH_DELAY 100
 
+namespace topLevel // usage topLevel::section::vector
+{
+    enum section: unsigned char {
+        vector = 192,
+        midiLearn = 216,
+        midiIn,
+        scales = 232,
+        main = 240,
+        systemEffects,
+        insertEffects,
+        bank = 244,
+        config = 248
+    };
+
+    enum control : unsigned char {
+        errorMessage = 254
+    };
+}
+
 namespace partLevel // usage partLevel::control::volume
 {
     enum control : unsigned char {
@@ -120,6 +139,7 @@ namespace partLevel // usage partLevel::control::volume
         effectDestination,
         effectBypass,
         defaultInstrument = 96,
+        padsynthParameters = 104,
         audioDestination = 120,
     // start of controllers
         volumeRange = 128,
@@ -163,6 +183,27 @@ namespace partLevel // usage partLevel::control::volume
         defaultInstrumentCopyright,
         resetAllControllers,
         partBusy = 252}; // internally generated - read only
+
+    enum engine : unsigned char {
+        addSynth = 0,
+        subSynth,
+        padSynth,
+        addVoice1 = 128,
+        addVoice2,
+        addVoice3,
+        addVoice4,
+        addVoice5,
+        addVoice6,
+        addVoice7,
+        addVoice8,
+        addMod1 = 192,
+        addMod2,
+        addMod3,
+        addMod4,
+        addMod5,
+        addMod6,
+        addMod7,
+        addMod8};
 }
 
 union CommandBlock{
