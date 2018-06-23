@@ -2083,14 +2083,17 @@ string InterChange::resolvePart(CommandBlock *getData)
         kitnum = " ";
 
     string name = "";
-    if (control >= partLevel::control::volumeRange && control <= partLevel::control::receivePortamento)
+    if (control >= 0x80)
     {
-        name = "Controller ";
-        if (control >= partLevel::control::portamentoTime)
-            name += "Portamento ";
+        if (control < 0xc0)
+        {
+            name = "Controller ";
+            if (control >= 0xa0)
+                name += "Portamento ";
+        }
+        else if (control < 0xdc)
+            name = "MIDI ";
     }
-    else if (control >= partLevel::control::midiModWheel && control <= partLevel::control::midiBandwidth)
-        name = "MIDI ";
     else if (kititem < 0xff)
     {
         switch (engine)
@@ -2110,19 +2113,19 @@ string InterChange::resolvePart(CommandBlock *getData)
     string contstr = "";
     switch (control)
     {
-        case partLevel::control::volume:
+        case 0:
             contstr = "Volume";
             break;
-        case partLevel::control::velocitySense:
+        case 1:
             contstr = "Vel Sens";
             break;
-        case partLevel::control::panning:
+        case 2:
             contstr = "Panning";
             break;
-        case partLevel::control::velocityOffset:
+        case 4:
             contstr = "Vel Offset";
             break;
-        case partLevel::control::midiChannel:
+        case 5:
             showValue = false;
             contstr = "Midi CH - " + to_string(value_int + 1);
             if (value_int >= NUM_MIDI_CHANNELS * 2)
@@ -2130,7 +2133,7 @@ string InterChange::resolvePart(CommandBlock *getData)
             else if (value_int >= NUM_MIDI_CHANNELS)
                 contstr = contstr + " Note off only on CH " + to_string(value_int + 1 - NUM_MIDI_CHANNELS);
             break;
-        case partLevel::control::keyMode:
+        case 6:
             showValue = false;
             contstr = "Mode - ";
             if (value_int == 0)
@@ -2140,11 +2143,11 @@ string InterChange::resolvePart(CommandBlock *getData)
             else if (value_int >= 2)
                 contstr += "Legato";
             break;
-        case partLevel::control::portamento:
+        case 7:
             contstr = "Portamento Enable";
             yesno = true;
             break;
-        case partLevel::control::enable:
+        case 8:
             contstr = "Enable";
             if (!kitType)
             {
@@ -2162,81 +2165,81 @@ string InterChange::resolvePart(CommandBlock *getData)
                 }
             }
             break;
-        case partLevel::control::kitItemMute:
+        case 9:
             if (kitType)
                 contstr = "Mute";
             break;
 
-        case partLevel::control::minNote:
+        case 16:
             contstr = "Min Note";
             break;
-        case partLevel::control::maxNote:
+        case 17:
             contstr = "Max Note";
             break;
-        case partLevel::control::minToLastKey: // always return actual value
+        case 18: // always return actual value
             contstr = "Min To Last";
             break;
-        case partLevel::control::maxToLastKey: // always return actual value
+        case 19: // always return actual value
             contstr = "Max To Last";
             break;
-        case partLevel::control::resetMinMaxKey:
+        case 20:
             contstr = "Reset Key Range";
             break;
 
-        case partLevel::control::kitEffectNum:
+        case 24:
             if (kitType)
                 contstr = "Effect Number";
             break;
 
-        case partLevel::control::maxNotes:
+        case 33:
             contstr = "Key Limit";
             break;
-        case partLevel::control::keyShift:
+        case 35:
             contstr = "Key Shift";
             break;
 
-        case partLevel::control::partToSystemEffect1:
+        case 40:
             contstr = "Effect Send 1";
             break;
-        case partLevel::control::partToSystemEffect2:
+        case 41:
             contstr = "Effect Send 2";
             break;
-        case partLevel::control::partToSystemEffect3:
+        case 42:
             contstr = "Effect Send 3";
             break;
-        case partLevel::control::partToSystemEffect4:
+        case 43:
             contstr = "Effect Send 4";
             break;
 
-        case partLevel::control::humanise:
+        case 48:
             contstr = "Humanise";
             break;
 
-        case partLevel::control::drumMode:
+        case 57:
             contstr = "Drum Mode";
             break;
-        case partLevel::control::kitMode:
+        case 58:
             contstr = "Kit Mode";
             break;
 
-        case partLevel::control::effectNum: // local to source
+        case 64: // local to source
             contstr = "Effect Number";
             break;
-        case partLevel::control::effectType:
+        case 65:
             contstr = "Effect " + to_string(effNum + 1) + " Type";
             break;
-        case partLevel::control::effectDestination:
+        case 66:
             contstr = "Effect " + to_string(effNum + 1) + " Destination";
             break;
-        case partLevel::control::effectBypass:
+        case 67:
             contstr = "Bypass Effect "+ to_string(effNum + 1);
             break;
 
-        case partLevel::control::defaultInstrument: // doClearPart
+        case 96: // doClearPart
             contstr = "Set Default Instrument";
             break;
 
-        case partLevel::control::audioDestination:
+        case 120:
             contstr = "Audio destination ";
             showValue = false;
             switch(value_int)
@@ -2254,118 +2257,103 @@ string InterChange::resolvePart(CommandBlock *getData)
             }
             break;
 
-        case partLevel::control::volumeRange:
+        case 128:
             contstr = "Vol Range"; // not the *actual* volume
             break;
-        case partLevel::control::volumeEnable:
+        case 129:
             contstr = "Vol Enable";
             break;
-        case partLevel::control::panningWidth:
+        case 130:
             contstr = "Pan Width";
             break;
-        case partLevel::control::modWheelDepth:
+        case 131:
             contstr = "Mod Wheel Depth";
             break;
-        case partLevel::control::exponentialModWheel:
+        case 132:
             contstr = "Exp Mod Wheel";
             break;
-        case partLevel::control::bandwidthDepth:
+        case 133:
             contstr = "Bandwidth depth";
             break;
-        case partLevel::control::exponentialBandwidth:
+        case 134:
             contstr = "Exp Bandwidth";
             break;
-        case partLevel::control::expressionEnable:
+        case 135:
             contstr = "Expression Enable";
             break;
-        case partLevel::control::FMamplitudeEnable:
+        case 136:
             contstr = "FM Amp Enable";
             break;
-        case partLevel::control::sustainPedalEnable:
+        case 137:
             contstr = "Sustain Ped Enable";
             break;
-        case partLevel::control::pitchWheelRange:
+        case 138:
             contstr = "Pitch Wheel Range";
             break;
-        case partLevel::control::filterQdepth:
+        case 139:
             contstr = "Filter Q Depth";
             break;
-        case partLevel::control::filterCutoffDepth:
+        case 140:
             contstr = "Filter Cutoff Depth";
             break;
-        case partLevel::control::breathControlEnable:
+        case 141:
             yesno = true;
             contstr = "Breath Control";
             break;
 
-        case partLevel::control::resonanceCenterFrequencyDepth:
+        case 144:
             contstr = "Res Cent Freq Depth";
             break;
-        case partLevel::control::resonanceBandwidthDepth:
+        case 145:
             contstr = "Res Band Depth";
             break;
 
-        case partLevel::control::portamentoTime:
+        case 160:
             contstr = "Time";
             break;
-        case partLevel::control::portamentoTimeStretch:
+        case 161:
             contstr = "Tme Stretch";
             break;
-        case partLevel::control::portamentoThreshold:
+        case 162:
             contstr = "Threshold";
             break;
-        case partLevel::control::portamentoThresholdType:
+        case 163:
             contstr = "Threshold Type";
             break;
-        case partLevel::control::enableProportionalPortamento:
+        case 164:
             contstr = "Prop Enable";
             break;
-        case partLevel::control::proportionalPortamentoRate:
+        case 165:
             contstr = "Prop Rate";
             break;
-        case partLevel::control::proportionalPortamentoDepth:
+        case 166:
             contstr = "Prop depth";
             break;
-        case partLevel::control::receivePortamento:
-            contstr = "Receive";
+        case 168:
+            contstr = "Enable";
             break;
 
-        case partLevel::control::midiModWheel:
+        case 192:
             contstr = "Modulation";
             break;
-        case partLevel::control::midiBreath:
-            ; // not yet
-            break;
-        case partLevel::control::midiExpression:
+        case 194:
             contstr = "Expression";
             break;
-        case partLevel::control::midiSustain:
-            ; // not yet
-            break;
-        case partLevel::control::midiPortamento:
-            ; // not yet
-            break;
-        case partLevel::control::midiFilterQ:
+        case 197:
             contstr = "Filter Q";
             break;
-        case partLevel::control::midiFilterCutoff:
+        case 198:
             contstr = "Filter Cutoff";
             break;
-        case partLevel::control::midiBandwidth:
+        case 199:
             contstr = "Bandwidth";
             break;
 
-        case partLevel::control::instrumentCopyright:
-            ; // not yet
-            break;
-        case partLevel::control::instrumentComments:
-            ; // not yet
-            break;
-        case partLevel::control::instrumentName:
+        case 222:
             showValue = false;
             contstr = "Name is: " + miscMsgPop(value_int);
             break;
-        case partLevel::control::defaultInstrumentCopyright:
+        case 223:
             showValue = false;
             contstr = "Copyright ";
             if (parameter == 0)
@@ -2374,7 +2362,7 @@ string InterChange::resolvePart(CommandBlock *getData)
                 contstr += "save:\n";
             contstr += miscMsgPop(value_int);
             break;
-        case partLevel::control::resetAllControllers:
+        case 224:
             contstr = "Clear controllers";
             break;
 
@@ -5690,14 +5678,14 @@ void InterChange::commandPart(CommandBlock *getData)
             else
                 value = part->ctl->portamento.propRate;
             break;
-        case partLevel::control::proportionalPortamentoDepth:
+        case partLevel::control::proportionalPortamentoDepth: // end of controllers
             if (write)
                 part->ctl->portamento.propDepth = value;
             else
                 value = part->ctl->portamento.propDepth;
             break;
 
-        case partLevel::control::receivePortamento: // end of controllers
+        case partLevel::control::enablePortamento:
             if (write)
                 part->ctl->portamento.receive = value_bool;
             else
@@ -5712,7 +5700,6 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case partLevel::control::midiBreath:
             ; // not yet
-            break;
         case partLevel::control::midiExpression:
             if (write)
             {
@@ -5723,10 +5710,8 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case partLevel::control::midiSustain:
             ; // not yet
-            break;
         case partLevel::control::midiPortamento:
             ; // not yet
-            break;
         case partLevel::control::midiFilterQ:
             if (write)
                 part->ctl->setfilterq(value);
@@ -5748,10 +5733,8 @@ void InterChange::commandPart(CommandBlock *getData)
 
         case partLevel::control::instrumentCopyright:
             ; // not yet
-            break;
         case partLevel::control::instrumentComments:
             ; // not yet
-            break;
         case partLevel::control::instrumentName: // done elsewhere
             break;
         case partLevel::control::defaultInstrumentCopyright: // done elsewhere
