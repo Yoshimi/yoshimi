@@ -188,6 +188,7 @@ namespace partLevel // usage partLevel::control::volume
         addSynth = 0,
         subSynth,
         padSynth,
+    // addVoice and addMod must be consecutive
         addVoice1 = 128,
         addVoice2,
         addVoice3,

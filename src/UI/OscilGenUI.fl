@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified April 2018
+Modified June 2018
 } {selected in_source in_header
 }
 
@@ -467,9 +467,7 @@ class OscilEditor {: {public PresetsUI_}
       label {ADsynth Oscillator Editor}
       xywh {15 221 735 595} type Double hide
       code0 {string tname;}
-      code1 {if (engine == 2) tname = "PadSynth Harmonic Content"; else {tname = "AddSynth Voice " + to_string((engine & 0x3f) + 1);}}
-      code2 {if (engine & 0x40) tname += " Modulation Oscillator"; else tname += " Oscillator";}
-      code3 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle(tname).c_str());}
+      code1 {setWindowTitle();}
     } {
       Fl_Button applybutton {
         label Apply
@@ -1450,6 +1448,22 @@ class OscilEditor {: {public PresetsUI_}
 
     basefuncdisplaygroup->redraw();
     redrawoscil();} {}
+  }
+  Function {setWindowTitle()} {} {
+    code {//
+        string tname;
+        if (engine == 2)
+            tname = "PadSynth Harmonic Content";
+        else
+        {
+            tname = "AddSynth Voice ";
+            if (engine <= partLevel::engine::addVoice8)
+                tname = tname + to_string((engine - partLevel::engine::addVoice1) + 1);
+            else
+                tname = tname + to_string((engine - partLevel::engine::addMod1) + 1) +  " Modulation";
+            tname += " Oscillator";
+        }
+        osceditUI->copy_label(synth->getGuiMaster()->setPartWindowTitle(tname).c_str());} {}
   }
   Function {redrawoscil()} {} {
     code {//

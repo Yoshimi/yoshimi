@@ -3,6 +3,8 @@ yoshimi 1.5.8 M
 2018-6-24 Will
 * GUI part controls converted.
 * GUI main engine controls converted.
+* Further work on addVoice/addMod controls.
+  These no longer need to be fixed values.
 
 2018-6-23 Will
 * Added engines to globals.h
