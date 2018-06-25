@@ -103,7 +103,55 @@ namespace topLevel // usage topLevel::section::vector
     };
 
     enum control : unsigned char {
-        errorMessage = 254
+        errorMessage = 254 // FE
+    };
+}
+
+namespace configLevel // usage configLevel::control::oscillatorSize
+{
+    enum control : unsigned char {
+        oscillatorSize = 0,
+        bufferSize,
+        padSynthInterpolation,
+        virtualKeyboardLayout,
+        XMLcompressionLevel,
+        reportsDestination,
+        savedInstrumentFormat,
+        defaultStateStart = 16,
+        hideNonFatalErrors,
+        showSplash,
+        logInstrumentLoadTimes,
+        logXMLheaders,
+        saveAllXMLdata,
+        enableGUI,
+        enableCLI,
+        enableAutoInstance,
+
+        // start of engine controls
+        jackMidiSource = 32,
+        jackPreferredMidi,
+        jackServer,
+        jackPreferredAudio,
+        jackAutoConnectAudio,
+        alsaMidiSource = 48,
+        alsaPreferredMidi,
+        alsaAudioDevice,
+        alsaPreferredAudio,
+        alsaSampleRate,
+        // end of engine controls
+
+        //enableBankRootChange = 64,
+        bankRootCC = 65,
+        bankCC = 67,
+        enableProgramChange,
+        programChangeEnablesPart,
+        //enableExtendedProgramChange,
+        extendedProgramChangeCC = 71,
+        ignoreResetAllCCs,
+        logIncomingCCs,
+        showLearnEditor,
+        enableNRPNs,
+        saveCurrentConfig = 80
     };
 }
 

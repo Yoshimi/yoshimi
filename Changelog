@@ -1,5 +1,11 @@
 yoshimi 1.5.8 M
 
+2018-6-25 Will
+* BugFix: GUI mixer controls not setting part window.
+* Forgot section changes in resolveReplies.
+* Interchange config controls converted to enum.
+* CLI config controls converted to enum.
+
 2018-6-24 Will
 * GUI part controls converted.
 * GUI main engine controls converted.

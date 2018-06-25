@@ -781,7 +781,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         {
             switch (control)
             {
-                case 32:
+                case configLevel::control::jackMidiSource:
                     if (write)
                     {
                         synth->getRuntime().jackMidiDevice = text;
@@ -791,7 +791,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = synth->getRuntime().jackMidiDevice;
                     value = miscMsgPush(text);
                     break;
-                case 34:
+                case configLevel::control::jackServer:
                     if (write)
                     {
                         synth->getRuntime().jackServer = text;
@@ -801,7 +801,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = synth->getRuntime().jackServer;
                     value = miscMsgPush(text);
                     break;
-                case 48:
+                case configLevel::control::alsaMidiSource:
                     if (write)
                     {
                         synth->getRuntime().alsaMidiDevice = text;
@@ -811,7 +811,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = synth->getRuntime().alsaMidiDevice;
                     value = miscMsgPush(text);
                     break;
-                case 50:
+                case configLevel::control::alsaAudioDevice:
                     if (write)
                     {
                         synth->getRuntime().alsaAudioDevice = text;
@@ -821,7 +821,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = synth->getRuntime().alsaAudioDevice;
                     value = miscMsgPush(text);
                     break;
-                case 80: // save config
+                case configLevel::control::saveCurrentConfig: // save config
                     if (write)
                     {
                         text = synth->getRuntime().ConfigFile;
@@ -1105,7 +1105,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     unsigned char insert = getData->data.insert;
     unsigned char insertParam = getData->data.parameter;
     unsigned char insertPar2 = getData->data.par2;
-    if (control == 0xfe && insertParam != 9) // special case for simple messages
+    if (control == topLevel::control::errorMessage && insertParam != 9) // special case for simple messages
     {
         synth->getRuntime().Log(miscMsgPop(lrint(value)));
         synth->getRuntime().finishedCLI = true;
@@ -1162,18 +1162,18 @@ void InterChange::resolveReplies(CommandBlock *getData)
         }
 
     }
-    if (npart == 0xc0)
+    if (npart == topLevel::section::vector)
         commandName = resolveVector(getData);
-    else if (npart == 0xe8)
+    else if (npart == topLevel::section::scales)
         commandName = resolveMicrotonal(getData);
-    else if (npart == 0xf8)
+    else if (npart == topLevel::section::config)
         commandName = resolveConfig(getData);
-    else if (npart == 0xf4)
+    else if (npart == topLevel::section::bank)
         commandName = resolveBank(getData);
-    else if (npart == 0xd9 || npart == 0xf0)
+    else if (npart == topLevel::section::midiIn || npart == topLevel::section::main)
         commandName = resolveMain(getData);
 
-    else if (npart == 0xf1 || npart == 0xf2)
+    else if (npart == topLevel::section::systemEffects || npart == topLevel::section::insertEffects)
         commandName = resolveEffects(getData);
 
     else if ((kititem >= 0x80 && kititem != 0xff) || (control >= 64 && control <= 67 && kititem == 0xff))
@@ -1196,7 +1196,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
 
     else if (kititem == 0xff || insert == 0x20)
     {
-        if (control != 58 && kititem < 0xff && part->Pkitmode == 0)
+        if (control != partLevel::control::kitMode && kititem < 0xff && part->Pkitmode == 0)
         {
             showValue = false;
             commandName = "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
@@ -1568,13 +1568,13 @@ string InterChange::resolveConfig(CommandBlock *getData)
     string contstr = "";
     switch (control)
     {
-        case 0:
+        case configLevel::control::oscillatorSize:
             contstr = "AddSynth oscillator size";
             break;
-        case 1:
+        case configLevel::control::bufferSize:
             contstr = "Internal buffer size";
             break;
-        case 2:
+        case configLevel::control::padSynthInterpolation:
             contstr = "PadSynth interpolation ";
             if (value_bool)
                 contstr += "cubic";
@@ -1582,7 +1582,7 @@ string InterChange::resolveConfig(CommandBlock *getData)
                 contstr += "linear";
             showValue = false;
             break;
-        case 3:
+        case configLevel::control::virtualKeyboardLayout:
             contstr = "Virtual keyboard ";
             switch (value_int)
             {
@@ -1601,10 +1601,10 @@ string InterChange::resolveConfig(CommandBlock *getData)
             }
             showValue = false;
             break;
-        case 4:
+        case configLevel::control::XMLcompressionLevel:
             contstr = "XML compression";
             break;
-        case 5:
+        case configLevel::control::reportsDestination:
             contstr = "Reports to ";
             if (value_bool)
                 contstr += "console window";
@@ -1612,7 +1612,7 @@ string InterChange::resolveConfig(CommandBlock *getData)
                 contstr += "stdout";
             showValue = false;
             break;
-        case 6:
+        case configLevel::control::savedInstrumentFormat:
             contstr = "Saved Instrument Format ";
             switch (value_int)
             {
@@ -1628,85 +1628,85 @@ string InterChange::resolveConfig(CommandBlock *getData)
             }
             showValue = false;
             break;
-        case 16:
+        case configLevel::control::defaultStateStart:
             contstr += "Autoload default state";
             yesno = true;
             break;
-        case 17:
+        case configLevel::control::hideNonFatalErrors:
             contstr += "Hide non-fatal errors";
             yesno = true;
             break;
-        case 18:
+        case configLevel::control::showSplash:
             contstr += "Show splash screen";
             yesno = true;
             break;
-        case 19:
+        case configLevel::control::logInstrumentLoadTimes:
             contstr += "Log instrument load times";
             yesno = true;
             break;
-        case 20:
+        case configLevel::control::logXMLheaders:
             contstr += "Log XML headers";
             yesno = true;
             break;
-        case 21:
+        case configLevel::control::saveAllXMLdata:
             contstr += "Save ALL XML data";
             yesno = true;
             break;
-        case 22:
+        case configLevel::control::enableGUI:
             contstr += "Enable GUI";
             yesno = true;
             break;
-        case 23:
+        case configLevel::control::enableCLI:
             contstr += "Enable CLI";
             yesno = true;
             break;
-        case 24:
+        case configLevel::control::enableAutoInstance:
             contstr += "Enable Auto Instance";
             yesno = true;
             break;
 
-        case 32:
+        case configLevel::control::jackMidiSource:
             contstr += "JACK MIDI source: ";
             contstr += miscMsgPop(value_int);
             showValue = false;
             break;
-        case 33:
+        case configLevel::control::jackPreferredMidi:
             contstr += "Start with JACK MIDI";
             yesno = true;
             break;
-        case 34:
+        case configLevel::control::jackServer:
             contstr += "JACK server: ";
             contstr += miscMsgPop(value_int);
             showValue = false;
             break;
-        case 35:
+        case configLevel::control::jackPreferredAudio:
             contstr += "Start with JACK audio";
             yesno = true;
             break;
-        case 36:
+        case configLevel::control::jackAutoConnectAudio:
             contstr += "Auto-connect to JACK server";
             yesno = true;
             break;
 
-        case 48:
+        case configLevel::control::alsaMidiSource:
             contstr += "ALSA MIDI source: ";
             contstr += miscMsgPop(value_int);
             showValue = false;
             break;
-        case 49:
+        case configLevel::control::alsaPreferredMidi:
             contstr += "Start with ALSA MIDI";
             yesno = true;
             break;
-        case 50:
+        case configLevel::control::alsaAudioDevice:
             contstr += "ALSA audio device: ";
             contstr += miscMsgPop(value_int);
             showValue = false;
             break;
-        case 51:
+        case configLevel::control::alsaPreferredAudio:
             contstr += "Start with ALSA audio";
             yesno = true;
             break;
-        case 52:
+        case configLevel::control::alsaSampleRate:
             contstr += "ALSA sample rate: ";
             switch (value_int)
             { // this is a hack :(
@@ -1730,22 +1730,22 @@ string InterChange::resolveConfig(CommandBlock *getData)
             showValue = false;
             break;
 
-        /*case 64:
+        /*case configLevel::control::enableBankRootChange:
             contstr += "Enable bank root change";
             yesno = true;
             break;*/
-        case 65:
+        case configLevel::control::bankRootCC:
             contstr += "Bank root CC";
             break;
 
-        case 67:
+        case configLevel::control::bankCC:
             contstr += "Bank CC";
             break;
-        case 68:
+        case configLevel::control::enableProgramChange:
             contstr += "Enable program change";
             yesno = true;
             break;
-        case 69:
+        case configLevel::control::programChangeEnablesPart:
             contstr += "Program change enables part";
             yesno = true;
             break;
@@ -1753,28 +1753,28 @@ string InterChange::resolveConfig(CommandBlock *getData)
             contstr += "Enable extended program change";
             yesno = true;
             break;*/
-        case 71:
+        case configLevel::control::extendedProgramChangeCC:
             contstr += "CC for extended program change";
             break;
-        case 72:
+        case configLevel::control::ignoreResetAllCCs:
             contstr += "Ignore 'reset all CCs'";
             yesno = true;
             break;
-        case 73:
+        case configLevel::control::logIncomingCCs:
             contstr += "Log incoming CCs";
             yesno = true;
             break;
-        case 74:
+        case configLevel::control::showLearnEditor:
             contstr += "Auto-open GUI MIDI-learn editor";
             yesno = true;
             break;
 
-        case 75:
+        case configLevel::control::enableNRPNs:
             contstr += "Enable NRPN";
             yesno = true;
             break;
 
-        case 80:
+        case configLevel::control::saveCurrentConfig:
         {
             string name = miscMsgPop(value_int);
             if (write)
@@ -4033,7 +4033,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
 
     if (kititem == 0xff || insert == 0x20)
     {
-        if (control != 58 && kititem < 0xff && part->Pkitmode == 0)
+        if (control != partLevel::control::kitMode && kititem < 0xff && part->Pkitmode == 0)
         {
             __sync_and_and_fetch(&blockRead, 2);
             return false;
@@ -4645,7 +4645,7 @@ void InterChange::commandConfig(CommandBlock *getData)
     switch (control)
     {
 // main
-        case 0:
+        case configLevel::control::oscillatorSize:
             if (write)
             {
                 value = nearestPowerOf2(value_int, 256, 16384);
@@ -4655,7 +4655,7 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = synth->getRuntime().Oscilsize;
             break;
-        case 1:
+        case configLevel::control::bufferSize:
             if (write)
             {
                 value = nearestPowerOf2(value_int, 16, 4096);
@@ -4665,95 +4665,95 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = synth->getRuntime().Buffersize;
             break;
-        case 2:
+        case configLevel::control::padSynthInterpolation:
             if (write)
                  synth->getRuntime().Interpolation = value_bool;
             else
                 value = synth->getRuntime().Interpolation;
             break;
-        case 3:
+        case configLevel::control::virtualKeyboardLayout:
             if (write)
                  synth->getRuntime().VirKeybLayout = value_int;
             else
                 value = synth->getRuntime().VirKeybLayout;
             break;
-        case 4:
+        case configLevel::control::XMLcompressionLevel:
             if (write)
                  synth->getRuntime().GzipCompression = value_int;
             else
                 value = synth->getRuntime().GzipCompression;
             break;
-        case 5:
+        case configLevel::control::reportsDestination:
             if (write)
                  synth->getRuntime().toConsole = value_bool;
             else
                 value = synth->getRuntime().toConsole;
             break;
-        case 6:
+        case configLevel::control::savedInstrumentFormat:
             if (write)
                  synth->getRuntime().instrumentFormat = value_int;
             else
                 value = synth->getRuntime().instrumentFormat;
             break;
 // switches
-        case 16:
+        case configLevel::control::defaultStateStart:
             if (write)
                 synth->getRuntime().loadDefaultState = value_bool;
             else
                 value = synth->getRuntime().loadDefaultState;
             break;
-        case 17:
+        case configLevel::control::hideNonFatalErrors:
             if (write)
                 synth->getRuntime().hideErrors = value_bool;
             else
                 value = synth->getRuntime().hideErrors;
             break;
-        case 18:
+        case configLevel::control::showSplash:
             if (write)
                 synth->getRuntime().showSplash = value_bool;
             else
                 value = synth->getRuntime().showSplash;
             break;
-        case 19:
+        case configLevel::control::logInstrumentLoadTimes:
             if (write)
                 synth->getRuntime().showTimes = value_bool;
             else
                 value = synth->getRuntime().showTimes;
             break;
-        case 20:
+        case configLevel::control::logXMLheaders:
             if (write)
                 synth->getRuntime().logXMLheaders = value_bool;
             else
                 value = synth->getRuntime().logXMLheaders;
             break;
-        case 21:
+        case configLevel::control::saveAllXMLdata:
             if (write)
                 synth->getRuntime().xmlmax = value_bool;
             else
                 value = synth->getRuntime().xmlmax;
             break;
-        case 22:
+        case configLevel::control::enableGUI:
             if (write)
                 synth->getRuntime().showGui = value_bool;
             else
                 value = synth->getRuntime().showGui;
             break;
-        case 23:
+        case configLevel::control::enableCLI:
             if (write)
                 synth->getRuntime().showCLI = value_bool;
             else
                 value = synth->getRuntime().showCLI;
             break;
-        case 24:
+        case configLevel::control::enableAutoInstance:
             if (write)
                 synth->getRuntime().autoInstance = value_bool;
             else
                 value = synth->getRuntime().autoInstance;
             break;
 // jack
-        case 32: // done elsewhere
+        case configLevel::control::jackMidiSource: // done elsewhere
             break;
-        case 33:
+        case configLevel::control::jackPreferredMidi:
             if (write)
             {
                 if (value_bool)
@@ -4764,9 +4764,9 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = (synth->getRuntime().midiEngine == jack_midi);
             break;
-        case 34: // done elsewhere
+        case configLevel::control::jackServer: // done elsewhere
             break;
-        case 35:
+        case configLevel::control::jackPreferredAudio:
             if (write)
             {
                 if (value_bool)
@@ -4777,7 +4777,7 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = (synth->getRuntime().audioEngine == jack_audio);
             break;
-        case 36:
+        case configLevel::control::jackAutoConnectAudio:
             if (write)
             {
                 synth->getRuntime().connectJackaudio = value_bool;
@@ -4787,9 +4787,9 @@ void InterChange::commandConfig(CommandBlock *getData)
                 value = synth->getRuntime().connectJackaudio;
             break;
 // alsa
-        case 48: // done elsewhere
+        case configLevel::control::alsaMidiSource: // done elsewhere
             break;
-        case 49:
+        case configLevel::control::alsaPreferredMidi:
             if (write)
             {
                 if (value_bool)
@@ -4800,9 +4800,9 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = (synth->getRuntime().midiEngine == alsa_midi);
             break;
-        case 50: // done elsewhere
+        case configLevel::control::alsaAudioDevice: // done elsewhere
             break;
-        case 51:
+        case configLevel::control::alsaPreferredAudio:
             if (write)
             {
                 if (value_bool)
@@ -4813,7 +4813,7 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = (synth->getRuntime().audioEngine == alsa_audio);
             break;
-        case 52:
+        case configLevel::control::alsaSampleRate:
             if (write)
             {
                 switch(value_int)
@@ -4854,9 +4854,9 @@ void InterChange::commandConfig(CommandBlock *getData)
                 }
             break;
 // midi
-        case 64:
-            break;
-        case 65:
+        //case configLevel::control::eanableBankRootChange:
+            //break;
+        case configLevel::control::bankRootCC:
             if (write)
             {
                 if (value_int > 119)
@@ -4870,7 +4870,7 @@ void InterChange::commandConfig(CommandBlock *getData)
                 value = synth->getRuntime().midi_bank_root;
             break;
 
-        case 67:
+        case configLevel::control::bankCC:
             if (write)
             {
                 if (value_int != 0 && value_int != 32)
@@ -4883,21 +4883,21 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = synth->getRuntime().midi_bank_C;
             break;
-        case 68:
+        case configLevel::control::enableProgramChange:
             if (write)
                 synth->getRuntime().EnableProgChange = value_bool;
             else
                 value = synth->getRuntime().EnableProgChange;
             break;
-        case 69:
+        case configLevel::control::programChangeEnablesPart:
             if (write)
                 synth->getRuntime().enable_part_on_voice_load = value_bool;
             else
                 value = synth->getRuntime().enable_part_on_voice_load;
             break;
-        case 70:
-            break;
-        case 71:
+        //case configLevel::control::enableExtendedProgramChange:
+            //break;
+        case configLevel::control::extendedProgramChangeCC:
             if (write)
             {
                 if (value_int > 119)
@@ -4910,32 +4910,32 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = synth->getRuntime().midi_upper_voice_C;
             break;
-        case 72:
+        case configLevel::control::ignoreResetAllCCs:
             if (write)
                 synth->getRuntime().ignoreResetCCs = value_bool;
             else
                 value = synth->getRuntime().ignoreResetCCs;
             break;
-        case 73:
+        case configLevel::control::logIncomingCCs:
             if (write)
                 synth->getRuntime().monitorCCin = value_bool;
             else
                 value = synth->getRuntime().monitorCCin;
             break;
-        case 74:
+        case configLevel::control::showLearnEditor:
             if (write)
                 synth->getRuntime().showLearnedCC = value_bool;
             else
                 value = synth->getRuntime().showLearnedCC;
             break;
-        case 75:
+        case configLevel::control::enableNRPNs:
             if (write)
                 synth->getRuntime().enable_NRPN = value_bool;
             else
                 value = synth->getRuntime().enable_NRPN;
             break;
 // save config
-        case 80: //done elsewhere
+        case configLevel::control::saveCurrentConfig: //done elsewhere
             break;
         default:
             mightChange = false;

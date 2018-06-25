@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
-Modified May 2018
+Modified June 2018
 } {selected in_source in_header
 }
 
@@ -478,7 +478,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     else
         realvalue = o->value();
     synth->getGuiMaster()->setPartVolWidget(npart + *plgroup, realvalue);
-    send_data(0, realvalue, 0x48);}
+    send_data(0, realvalue, 0xf0);}
           xywh {8 65 30 110} type {Vert Knob} box THIN_DOWN_BOX minimum 127 maximum 0 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Pvolume);}
           code1 {o->setValueType(VC_PartVolume); o->useCustomTip(true);}
@@ -489,7 +489,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     if (Fl::event_button() == 3)
         o->value(64);
     synth->getGuiMaster()->setPartPanWidget(npart + *plgroup, o->value());
-    send_data(2, o->value(), 0x48);}
+    send_data(2, o->value(), 0xf0);}
           xywh {17 180 30 30} maximum 127 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Ppanning);}
           code1 {o->setValueType(VC_PanningStd);}
@@ -502,7 +502,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
       synth->getGuiMaster()->setPartMidiWidget(npart + *plgroup, tmp + 1);
       o->textcolor(FL_BLACK);
 
-      send_data(5, tmp, 0xc0);}
+      send_data(5, tmp, 0xf0);}
           tooltip {receive from MIDI channel} xywh {8 210 50 15} down_box BORDER_BOX labelsize 10 align 5 textfont 9 textsize 10
           code0 {for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
             {

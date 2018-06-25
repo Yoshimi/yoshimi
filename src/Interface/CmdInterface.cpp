@@ -1251,45 +1251,45 @@ int CmdInterface::commandConfig()
 
     if (matchnMove(1, point, "oscillator"))
     {
-        command = 0;
+        command = configLevel::control::oscillatorSize;
         if (!isRead && point[0] == 0)
             return value_msg;
         value = string2int(point);
     }
     else if (matchnMove(2, point, "buffer"))
     {
-        command = 1;
+        command = configLevel::control::bufferSize;
         if (!isRead && point[0] == 0)
             return value_msg;
         value = string2int(point);
     }
     else if (matchnMove(2, point, "padsynth"))
     {
-        command = 2;
+        command = configLevel::control::padSynthInterpolation;
         value = !matchnMove(1, point, "linear");
     }
     else if (matchnMove(1, point, "virtual"))
     {
-        command = 3;
+        command = configLevel::control::virtualKeyboardLayout;
         if (!isRead && point[0] == 0)
             return value_msg;
         value = string2int(point);
     }
     else if (matchnMove(1, point, "xml"))
     {
-        command = 4;
+        command = configLevel::control::XMLcompressionLevel;
         if (!isRead && point[0] == 0)
             return value_msg;
         value = string2int(point);
     }
     else if (matchnMove(2, point, "reports"))
     {
-        command = 5;
+        command = configLevel::control::reportsDestination;
         value = !matchnMove(1, point, "stdout");
     }
     else if (matchnMove(2, point, "saved"))
     {
-        command = 6;
+        command = configLevel::control::savedInstrumentFormat;
         if (matchnMove(1, point, "legacy"))
             value = 1;
         else if (matchnMove(1, point, "yoshimi"))
@@ -1302,37 +1302,37 @@ int CmdInterface::commandConfig()
 
     else if (matchnMove(2, point, "state"))
     {
-        command = 16;
+        command = configLevel::control::defaultStateStart;
         value = matchnMove(1, point, "enable");
     }
     else if (matchnMove(1, point, "hide"))
     {
-        command = 17;
+        command = configLevel::control::hideNonFatalErrors;
         value = matchnMove(1, point, "enable");
     }
     else if (matchnMove(1, point, "display"))
     {
-        command = 18;
+        command = configLevel::control::showSplash;
         value = matchnMove(1, point, "enable");
     }
     else if (matchnMove(1, point, "time"))
     {
-        command = 19;
+        command = configLevel::control::logInstrumentLoadTimes;
         value = matchnMove(1, point, "enable");
     }
     else if (matchnMove(1, point, "include"))
     {
-        command = 20;
+        command = configLevel::control::logXMLheaders;
         value = matchnMove(1, point, "enable");
     }
     else if (matchnMove(1, point, "keep"))
     {
-        command = 21;
+        command = configLevel::control::saveAllXMLdata;
         value = matchnMove(1, point, "enable");
     }
     else if (matchnMove(1, point, "gui"))
     {
-        command = 22;
+        command = configLevel::control::enableGUI;
         if (matchnMove(1, point, "enable"))
             value = 1;
         else if (matchnMove(1, point, "disable"))
@@ -1342,7 +1342,7 @@ int CmdInterface::commandConfig()
     }
     else if (matchnMove(1, point, "cli"))
     {
-        command = 23;
+        command = configLevel::control::enableCLI;
         if (matchnMove(1, point, "enable"))
             value = 1;
         else if (matchnMove(1, point, "disable"))
@@ -1355,7 +1355,7 @@ int CmdInterface::commandConfig()
     {
         if (matchnMove(1, point, "midi"))
         {
-            command = 32;
+            command = configLevel::control::jackMidiSource;
             par = 0x80;
             if (isRead || point[0] != 0)
             {
@@ -1367,7 +1367,7 @@ int CmdInterface::commandConfig()
         }
         else if (matchnMove(1, point, "server"))
         {
-            command = 34;
+            command = configLevel::control::jackServer;
             par = 0x80;
             if (isRead || point[0] != 0)
             {
@@ -1379,7 +1379,7 @@ int CmdInterface::commandConfig()
         }
         else if (matchnMove(1, point, "auto"))
         {
-            command = 36;
+            command = configLevel::control::jackAutoConnectAudio;
             value = (matchnMove(1, point, "enable"));
         }
         else
@@ -1390,7 +1390,7 @@ int CmdInterface::commandConfig()
     {
         if (matchnMove(1, point, "midi"))
         {
-            command = 48;
+            command = configLevel::control::alsaMidiSource;
             par = 0x80;
             if (isRead || point[0] != 0)
             {
@@ -1402,7 +1402,7 @@ int CmdInterface::commandConfig()
         }
         else if (matchnMove(1, point, "audio"))
         {
-            command = 50;
+            command = configLevel::control::alsaAudioDevice;
             par = 0x80;
             if (isRead || point[0] != 0)
             {
@@ -1414,7 +1414,7 @@ int CmdInterface::commandConfig()
         }
         else if (matchnMove(1, point, "s"))
         {
-            command = 52;
+            command = configLevel::control::alsaSampleRate;
             if (!isRead)
             {
                 if (point[0] == 0)
@@ -1432,9 +1432,9 @@ int CmdInterface::commandConfig()
     {
         value = 1;
         if (matchnMove(1, point, "alsa"))
-            command = 49;
+            command = configLevel::control::alsaPreferredMidi;
         else if (isRead == true || matchnMove(1, point, "jack"))
-            command = 33;
+            command = configLevel::control::jackPreferredMidi;
         else
             return value_msg;
     }
@@ -1443,16 +1443,16 @@ int CmdInterface::commandConfig()
     {
         value = 1;
         if (matchnMove(1, point, "alsa"))
-            command = 51;
+            command = configLevel::control::alsaPreferredAudio;
         else if (isRead == true || matchnMove(1, point, "jack"))
-            command = 35;
+            command = configLevel::control::jackPreferredAudio;
         else
             return value_msg;
     }
 
     else if (matchnMove(2, point, "root"))
     {
-        command = 65;
+        command = configLevel::control::bankRootCC;
         if (isRead)
             value = 128; // ignored by range check
         else if (point[0] == 0)
@@ -1462,7 +1462,7 @@ int CmdInterface::commandConfig()
     }
     else if (matchnMove(2, point, "bank"))
     {
-        command = 67;
+        command = configLevel::control::bankCC;
         if (isRead)
             value = 128; // ignored by range check
         else if (point[0] == 0)
@@ -1472,17 +1472,17 @@ int CmdInterface::commandConfig()
     }
     else if (matchnMove(2, point, "program") || matchnMove(2, point, "instrument"))
     {
-        command = 68;
+        command = configLevel::control::enableProgramChange;
         value = matchnMove(1, point, "enable");
     }
     else if (matchnMove(2, point, "activate"))
     {
-        command = 69;
+        command = configLevel::control::programChangeEnablesPart;
         value = matchnMove(1, point, "enable");
     }
     else if (matchnMove(1, point, "extend"))
     {
-        command = 71;
+        command = configLevel::control::extendedProgramChangeCC;
         if (isRead)
             value = 128; // ignored by range check
         else if (point[0] == 0)
@@ -1492,22 +1492,22 @@ int CmdInterface::commandConfig()
     }
     else if (matchnMove(1, point, "Quiet"))
     {
-        command = 72;
+        command = configLevel::control::ignoreResetAllCCs;
         value = matchnMove(1, point, "enable");
     }
     else if (matchnMove(1, point, "log"))
     {
-        command = 73;
+        command = configLevel::control::logIncomingCCs;
         value = matchnMove(1, point, "enable");
     }
     else if (matchnMove(2, point, "show"))
     {
-        command = 74;
+        command = configLevel::control::showLearnEditor;
         value = matchnMove(1, point, "enable");
     }
     else if (matchnMove(1, point, "nrpn"))
     {
-        command = 75;
+        command = configLevel::control::enableNRPNs;
         value = matchnMove(1, point, "enable");
     }
 
@@ -2745,7 +2745,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             }
         else if(matchnMove(1, point, "config"))
         {
-            sendDirect(0, 64, 80, topLevel::section::config, 0xff, 0xff, 0xff, 0x80, miscMsgPush("DUMMY"));
+            sendDirect(0, 64, configLevel::control::saveCurrentConfig, topLevel::section::config, 0xff, 0xff, 0xff, 0x80, miscMsgPush("DUMMY"));
         }
 
         else if (matchnMove(2, point, "scale"))
