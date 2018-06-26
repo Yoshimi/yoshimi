@@ -61,7 +61,7 @@ void MidiDecode::midiProcess(unsigned char par0, unsigned char par1, unsigned ch
         case 0xA0: // key aftertouch
             ctrltype = MIDI::CC::channelPressure;
             /*
-             * temporarily pretend it's a chanel aftertouch
+             * temporarily pretend it's a channel aftertouch
              * need to work out how to use key numbers (par1)
              * for actual key pressure sensing.
              *
@@ -665,7 +665,7 @@ void MidiDecode::setMidiProgram(unsigned char ch, int prg, bool in_place)
      * but it is the simplest way to ensure partonoff doesn't
      * get out of step.
      *
-     * Changes won't normaly happen while MIDI is incoming
+     * Changes won't normally happen while MIDI is incoming
      * on the same channel.
      */
     if (ch < NUM_MIDI_CHANNELS)

@@ -77,7 +77,7 @@ class Microtonal : private MiscFuncs
         void tuningtoline(int n, char *line, int maxn);
         string tuningtotext(void);
         string keymaptotext(void);
-        int loadscl(string filename); // load the tunnings from a .scl file
+        int loadscl(string filename); // load the tunings from a .scl file
         int loadkbm(string filename); // load the mapping from .kbm file
         int texttotunings(const char *text);
         int texttomapping(const char *text);
@@ -102,7 +102,7 @@ class Microtonal : private MiscFuncs
             unsigned char type; // 1 for cents or 2 for division
             double tuning;       // the real tuning (eg. +1.05946 for one halftone)
                                 // or 2.0 for one octave
-            unsigned int x1; // the real tunning is x1 / x2
+            unsigned int x1; // the real tuning is x1 / x2
             unsigned int x2;
             string text;
         } octave[MAX_OCTAVE_SIZE],

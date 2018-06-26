@@ -1096,7 +1096,7 @@ void ADnote::setfreq(int nvoice, float in_freq)
 }
 
 
-// Computes the frequency of an modullator oscillator
+// Computes the frequency of an modulator oscillator
 void ADnote::setfreqFM(int nvoice, float in_freq)
 {
     for (int k = 0; k < unison_size[nvoice]; ++k)
@@ -1286,7 +1286,7 @@ void ADnote::fadein(float *smps)
  */
 
 /* As the code here is a bit odd due to optimization, here is what happens
- * First the current possition and frequency are retrieved from the running
+ * First the current position and frequency are retrieved from the running
  * state. These are broken up into high and low portions to indicate how many
  * samples are skipped in one step and how many fractional samples are skipped.
  * Outside of this method the fractional samples are just handled with floating
@@ -1378,7 +1378,7 @@ void ADnote::computeVoiceOscillatorMorph(int nvoice)
 
     if (NoteVoicePar[nvoice].FMVoice >= 0)
     {
-        // if I use VoiceOut[] as modullator
+        // if I use VoiceOut[] as modulator
         int FMVoice = NoteVoicePar[nvoice].FMVoice;
         for (int k = 0; k < unison_size[nvoice]; ++k)
         {
@@ -1436,7 +1436,7 @@ void ADnote::computeVoiceOscillatorRingModulation(int nvoice)
         FMoldamplitude[nvoice] = 1.0f;
     if (NoteVoicePar[nvoice].FMVoice >= 0)
     {
-        // if I use VoiceOut[] as modullator
+        // if I use VoiceOut[] as modulator
         for (int k = 0; k < unison_size[nvoice]; ++k)
         {
             float *tw = tmpwave_unison[k];
@@ -1854,7 +1854,7 @@ int ADnote::noteout(float *outl, float *outr)
             // the voice is killed later
         }
 
-        // Put the ADnote samples in VoiceOut (without appling Global volume,
+        // Put the ADnote samples in VoiceOut (without applying Global volume,
         // because I wish to use this voice as a modulator)
         if (NoteVoicePar[nvoice].VoiceOut)
         {
@@ -1905,7 +1905,7 @@ int ADnote::noteout(float *outl, float *outr)
                 for (i = 0; i < synth->sent_buffersize; ++i)
                     bypassl[i] += tmpwavel[i] * NoteVoicePar[nvoice].Volume; // mono
         }
-        // check if there is necessary to proces the voice longer
+        // check if there is necessary to process the voice longer
         // (if the Amplitude envelope isn't finished)
         if (NoteVoicePar[nvoice].AmpEnvelope != NULL)
             if (NoteVoicePar[nvoice].AmpEnvelope->finished())

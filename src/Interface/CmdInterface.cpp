@@ -675,7 +675,7 @@ int CmdInterface::effects(unsigned char controlType)
         /*
          * We can't do a skipChars here as we don't yet know
          * if 'selected' will be valid. For some controls we
-         * need to do an on-the-spot skip, othewise we do so
+         * need to do an on-the-spot skip, otherwise we do so
          * at the end when we know we have a valid result but
          * 'value' has not been set.
          * If it's not valid we don't block, but pass on to

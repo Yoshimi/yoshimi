@@ -162,7 +162,7 @@ void XMLwrapper::checkfileinformation(const string& filename)
     unsigned short names = 0;
 
     /* the following could be in any order. We are checking for
-     * the actual exisitence of the fields as well as their value.
+     * the actual existence of the fields as well as their value.
      */
     idx = strstr(start, "name=\"ADDsynth_used\"");
     if (idx != NULL)
