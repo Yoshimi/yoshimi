@@ -2841,7 +2841,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                     {
                         param = string2int(point);
                         point = skipChars(point);
-                        if ((part == topLevel::section::main && (control == 80 || control == 88)) || ((param & 0x80) && param < 0xff && insert != topLevel::resonanceGraphInsert))
+                        if ((part == topLevel::section::main && (control == 80 || control == 88)) || ((param & 0x80) && param < 0xff && insert != topLevel::insert::resonanceGraphInsert))
                         {
                             string name = string(point);
                             if (name > "!")

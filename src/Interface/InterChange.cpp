@@ -232,7 +232,7 @@ void *InterChange::sortResultsThread(void)
             int toread = commandSize;
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(toCLI, point, toread);
-            if(getData.data.part == 0xd8) // special midi-learn - needs improving
+            if(getData.data.part == topLevel::section::midiLearn) // special midi-learn - needs improving
                 synth->midilearn.generalOpps(getData.data.value, getData.data.type, getData.data.control, getData.data.part, getData.data.kit, getData.data.engine, getData.data.insert, getData.data.parameter, getData.data.par2);
             else if ((getData.data.parameter & 0x80) && getData.data.parameter < 0xff)
                 indirectTransfers(&getData);
@@ -1048,7 +1048,7 @@ float InterChange::readAllData(CommandBlock *getData)
      */
     CommandBlock tryData;
     unsigned char control = getData->data.control;
-    if (getData->data.part == 0xf0 && (control >=200 && control <= 202))
+    if (getData->data.part == topLevel::section::main && (control >=200 && control <= 202))
     {
         commandSendReal(getData);
         synth->fetchMeterData();
@@ -1118,7 +1118,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     part = synth->part[npart];
 
     // this is unique and placed here to avoid Xruns
-    if (npart == 0xe8 && (control <= 32 || control >= 49))
+    if (npart == topLevel::section::scales && (control <= 32 || control >= 49))
         synth->setAllPartMaps();
 
     bool isCli = ((type & 0x30) == 0x10); // elminate Gui redraw
@@ -1194,7 +1194,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     else if (kititem != 0 && engine != 0xff && control != 8 && part->kit[kititem].Penabled == false)
         commandName = "Part " + to_string(int(npart) + 1) + " Kit item " + to_string(int(kititem) + 1) + " not enabled";
 
-    else if (kititem == 0xff || insert == 0x20)
+    else if (kititem == 0xff || insert == topLevel::insert::kitGroup)
     {
         if (control != partLevel::control::kitMode && kititem < 0xff && part->Pkitmode == 0)
         {
@@ -1217,24 +1217,24 @@ void InterChange::resolveReplies(CommandBlock *getData)
             case 0xff:
                 commandName = resolvePad(getData);
                 break;
-            case 0:
+            case topLevel::insert::LFOgroup:
                 commandName = resolveLFO(getData);
                 break;
-            case 1:
+            case topLevel::insert::filterGroup:
                 commandName = resolveFilter(getData);
                 break;
-            case 2:
-            case 3:
-            case 4:
+            case topLevel::insert::envelopeGroup:
+            case topLevel::insert::envelopePoints:
+            case topLevel::insert::envelopePointChange:
                 commandName = resolveEnvelope(getData);
                 break;
-            case 5:
-            case 6:
-            case 7:
+            case topLevel::insert::oscillatorGroup:
+            case topLevel::insert::harmonicAmplitude:
+            case topLevel::insert::harmonicPhaseBandwidth:
                 commandName = resolveOscillator(getData);
                 break;
-            case 8:
-            case 9:
+            case topLevel::insert::resonanceGroup:
+            case topLevel::insert::resonanceGraphInsert:
                 commandName = resolveResonance(getData);
                 break;
         }
@@ -1245,16 +1245,16 @@ void InterChange::resolveReplies(CommandBlock *getData)
         switch (insert)
         {
             case 0xff:
-            case 6:
-            case 7:
+            case topLevel::insert::harmonicAmplitude:
+            case topLevel::insert::harmonicPhaseBandwidth:
                 commandName = resolveSub(getData);
                 break;
-            case 1:
+            case topLevel::insert::filterGroup:
                 commandName = resolveFilter(getData);
                 break;
-            case 2:
-            case 3:
-            case 4:
+            case topLevel::insert::envelopeGroup:
+            case topLevel::insert::envelopePoints:
+            case topLevel::insert::envelopePointChange:
                 commandName = resolveEnvelope(getData);
                 break;
         }
@@ -1267,20 +1267,20 @@ void InterChange::resolveReplies(CommandBlock *getData)
             case 0xff:
                 commandName = resolveAddVoice(getData);
                 break;
-            case 0:
+            case topLevel::insert::LFOgroup:
                 commandName = resolveLFO(getData);
                 break;
-            case 1:
+            case topLevel::insert::filterGroup:
                 commandName = resolveFilter(getData);
                 break;
-            case 2:
-            case 3:
-            case 4:
+            case topLevel::insert::envelopeGroup:
+            case topLevel::insert::envelopePoints:
+            case topLevel::insert::envelopePointChange:
                 commandName = resolveEnvelope(getData);
                 break;
-            case 5:
-            case 6:
-            case 7:
+            case topLevel::insert::oscillatorGroup:
+            case topLevel::insert::harmonicAmplitude:
+            case topLevel::insert::harmonicPhaseBandwidth:
                 if (engine >= partLevel::engine::addMod1)
                     commandName = resolveOscillator(getData);
                 else
@@ -1296,19 +1296,19 @@ void InterChange::resolveReplies(CommandBlock *getData)
             case 0xff:
                 commandName = resolveAdd(getData);
                 break;
-            case 0:
+            case topLevel::insert::LFOgroup:
                 commandName = resolveLFO(getData);
                 break;
-            case 1:
+            case topLevel::insert::filterGroup:
                 commandName = resolveFilter(getData);
                 break;
-            case 2:
-            case 3:
-            case 4:
+            case topLevel::insert::envelopeGroup:
+            case topLevel::insert::envelopePoints:
+            case topLevel::insert::envelopePointChange:
                 commandName = resolveEnvelope(getData);
                 break;
-            case 8:
-            case 9:
+            case topLevel::insert::resonanceGroup:
+            case topLevel::insert::resonanceGraphInsert:
                 commandName = resolveResonance(getData);
                 break;
         }
