@@ -8058,20 +8058,23 @@ void InterChange::testLimits(CommandBlock *getData)
      * midi CCs need to be checked.
      * I don't like special cases either :(
      */
-    if (getData->data.part == 0xf8 && (control == 65 || control == 67 || control == 71))
+    if (getData->data.part == topLevel::section::config
+        && (control == configLevel::control::bankRootCC
+        || control == configLevel::control::bankCC
+        || control == configLevel::control::extendedProgramChangeCC))
     {
         getData->data.par2 = 0xff; // just to be sure
         if (value > 119)
             return;
         string text;
-        if (control == 65)
+        if (control == configLevel::control::bankRootCC)
         {
             text = synth->getRuntime().masterCCtest(int(value));
             if (text != "")
                 getData->data.par2 = miscMsgPush(text);
             return;
         }
-        if(control == 67)
+        if(control == configLevel::control::bankCC)
         {
             if (value != 0 && value != 32)
                 return;

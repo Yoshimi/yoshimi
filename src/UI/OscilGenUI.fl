@@ -1138,7 +1138,7 @@ class OscilEditor {: {public PresetsUI_}
     }
     else
     {
-        insert = 5;
+        insert = topLevel::insert::oscillatorGroup;
     }
     collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, insert);} {}
   }
@@ -1154,7 +1154,7 @@ class OscilEditor {: {public PresetsUI_}
 
     int tmp;
     bool set = true;
-    if (insert == 6)
+    if (insert == topLevel::insert::harmonicAmplitude)
     {
         h[control]->mag->value(127 - value);
         if (value == 64)
@@ -1163,7 +1163,7 @@ class OscilEditor {: {public PresetsUI_}
             h[control]->mag->selection_color(222);
     }
 
-    else if (insert == 7)
+    else if (insert == topLevel::insert::harmonicPhaseBandwidth)
     {
         h[control]->phase->value(127 - value);
         if (value == 64)

@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-Modified April 2018
+Modified June 2018
 } {in_source in_header
 }
 
@@ -701,12 +701,12 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
     unsigned char control = getData->data.control;
     unsigned char insert = getData->data.insert;
     bool val_bool = (value > 0.5f);
-    if (insert == 6)
+    if (insert == topLevel::insert::harmonicAmplitude)
     {
         h[control]->mag->value(127 - (int) value);
         return;
     }
-    if (insert == 7)
+    if (insert == topLevel::insert::harmonicPhaseBandwidth)
     {
         h[control]->bw->value(127 - (int) value);
         return;

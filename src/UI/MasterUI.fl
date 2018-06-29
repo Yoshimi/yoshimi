@@ -1339,7 +1339,7 @@ ZynAddSubFX}
     }
     if (newpart == topLevel::section::systemEffects)
     {
-        if (insert == 16)
+        if (insert == topLevel::insert::systemEffectSend)
         {
             if (!wasFromHere)
                 syseffsend[engine][control]->value(value);

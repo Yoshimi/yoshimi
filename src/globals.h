@@ -105,6 +105,23 @@ namespace topLevel // usage topLevel::section::vector
     enum control : unsigned char {
         errorMessage = 254 // FE
     };
+
+    // inserts are here as they are split between many sections
+    // but must remain distinct.
+    enum insert : unsigned char {
+        LFOgroup = 0,
+        filterGroup,
+        envelopeGroup,
+        envelopePoints,
+        envelopePointChange,
+        oscillatorGroup, // 5
+        harmonicAmplitude,
+        harmonicPhaseBandwidth,
+        resonanceGroup,
+        resonanceGraphInsert,
+        systemEffectSend = 16,
+        kitGroup = 32 // 20
+    };
 }
 
 namespace configLevel // usage configLevel::control::oscillatorSize

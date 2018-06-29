@@ -748,7 +748,7 @@ int CmdInterface::effects()
             partno = topLevel::section::systemEffects;
             control = par;
             engine = nFX;
-            insert = 16;
+            insert = topLevel::insert::systemEffectSend;
             dest = "system efx " + asString(nFX + 1) + " sent to "
                  + asString(par + 1) + " at " + asString(value);
         }
@@ -2841,7 +2841,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                     {
                         param = string2int(point);
                         point = skipChars(point);
-                        if ((part == topLevel::section::main && (control == 80 || control == 88)) || ((param & 0x80) && param < 0xff && insert != 9))
+                        if ((part == topLevel::section::main && (control == 80 || control == 88)) || ((param & 0x80) && param < 0xff && insert != topLevel::resonanceGraphInsert))
                         {
                             string name = string(point);
                             if (name > "!")

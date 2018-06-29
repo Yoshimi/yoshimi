@@ -1667,7 +1667,7 @@ Offset}
         return;
 
     bool sameEff = (engine == (inseffnocounter->value() - 1));
-    bool kitType = (insert == 0x20);
+    bool kitType = (insert == topLevel::insert::kitGroup);
     switch(control)
     {
         case partLevel::control::volume:

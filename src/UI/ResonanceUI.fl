@@ -11,7 +11,7 @@ comment {ResonanceUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2015-2017, Will Godfrey
+Copyright 2015-2018, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-Modified October 2017
+Modified June 2018
 } {in_source in_header
 }
 
@@ -477,7 +477,7 @@ class ResonanceUI {selected : PresetsUI_
     if (control == 104)
         insert = 0xff;
     else
-        insert = 8;
+        insert = topLevel::insert::resonanceGroup;
 
     collect_data(synth, value, (type | Fl::event_button()), control, npart, kititem, engine, insert);} {}
   }
@@ -492,7 +492,7 @@ class ResonanceUI {selected : PresetsUI_
         return;
 
     bool set = true;
-    if (insert == 9)
+    if (insert == topLevel::insert::resonanceGraphInsert)
     {
         rg->draw();
         rg->redraw();
