@@ -3915,7 +3915,7 @@ bool InterChange::commandSend(CommandBlock *getData)
         unsigned char control = getData->data.control;
         unsigned char npart = getData->data.part;
         unsigned char insert = getData->data.insert;
-        if (npart < NUM_MIDI_PARTS && (insert < 0xff || (control != 8 && control != 222)))
+        if (npart < NUM_MIDI_PARTS && (insert < 0xff || (control != partLevel::control::enable && control != partLevel::control::instrumentName)))
         {
             if (synth->part[npart]->Pname == "Simple Sound")
             {
@@ -3931,7 +3931,7 @@ bool InterChange::commandSend(CommandBlock *getData)
 bool InterChange::commandSendReal(CommandBlock *getData)
 {
     unsigned char npart = getData->data.part;
-    if (npart == 0xD9) // music input takes priority!
+    if (npart == topLevel::section::midiIn) // music input takes priority!
     {
         commandMidi(getData);
         __sync_and_and_fetch(&blockRead, 2); // clear it now it's done
@@ -3961,30 +3961,30 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         return false;
     }
 
-    if (npart == 0xc0)
+    if (npart == topLevel::section::vector)
     {
         commandVector(getData);
         __sync_and_and_fetch(&blockRead, 2);
         return true;
     }
-    if (npart == 0xe8)
+    if (npart == topLevel::section::scales)
     {
         commandMicrotonal(getData);
         __sync_and_and_fetch(&blockRead, 2);
         return true;
     }
-    if (npart == 0xf8)
+    if (npart == topLevel::section::config)
     {
         commandConfig(getData);
         return true;
     }
-    if (npart == 0xf0)
+    if (npart == topLevel::section::main)
     {
         commandMain(getData);
         __sync_and_and_fetch(&blockRead, 2);
         return true;
     }
-    if ((npart == 0xf1 || npart == 0xf2) && kititem == 0xff)
+    if ((npart == topLevel::section::systemEffects || npart == topLevel::section::insertEffects) && kititem == 0xff)
     {
         commandSysIns(getData);
         __sync_and_and_fetch(&blockRead, 2);
@@ -4031,7 +4031,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         return false; // attempt to access not enabled kititem
     }
 
-    if (kititem == 0xff || insert == 0x20)
+    if (kititem == 0xff || insert == topLevel::insert::kitGroup)
     {
         if (control != partLevel::control::kitMode && kititem < 0xff && part->Pkitmode == 0)
         {
@@ -4056,24 +4056,24 @@ bool InterChange::commandSendReal(CommandBlock *getData)
             case 0xff:
                 commandPad(getData);
                 break;
-            case 0:
+            case topLevel::insert::LFOgroup:
                 commandLFO(getData);
                 break;
-            case 1:
+            case topLevel::insert::filterGroup:
                 commandFilter(getData);
                 break;
-            case 2:
-            case 3:
-            case 4:
+            case topLevel::insert::envelopeGroup:
+            case topLevel::insert::envelopePoints:
+            case topLevel::insert::envelopePointChange:
                 commandEnvelope(getData);
                 break;
-            case 5:
-            case 6:
-            case 7:
+            case topLevel::insert::oscillatorGroup:
+            case topLevel::insert::harmonicAmplitude:
+            case topLevel::insert::harmonicPhaseBandwidth:
                 commandOscillator(getData,  part->kit[kititem].padpars->oscilgen);
                 break;
-            case 8:
-            case 9:
+            case topLevel::insert::resonanceGroup:
+            case topLevel::insert::resonanceGraphInsert:
                 commandResonance(getData, part->kit[kititem].padpars->resonance);
                 break;
         }
@@ -4086,16 +4086,16 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         switch (insert)
         {
             case 0xff:
-            case 6:
-            case 7:
+            case topLevel::insert::harmonicAmplitude:
+            case topLevel::insert::harmonicPhaseBandwidth:
                 commandSub(getData);
                 break;
-            case 1:
+            case topLevel::insert::filterGroup:
                 commandFilter(getData);
                 break;
-            case 2:
-            case 3:
-            case 4:
+            case topLevel::insert::envelopeGroup:
+            case topLevel::insert::envelopePoints:
+            case topLevel::insert::envelopePointChange:
                 commandEnvelope(getData);
                 break;
         }
@@ -4118,23 +4118,23 @@ bool InterChange::commandSendReal(CommandBlock *getData)
             case 0xff:
                 commandAddVoice(getData);
                 break;
-            case 0:
+            case topLevel::insert::LFOgroup:
                 commandLFO(getData);
                 break;
-            case 1:
+            case topLevel::insert::filterGroup:
                 commandFilter(getData);
                 break;
-            case 2:
-            case 3:
-            case 4:
+            case topLevel::insert::envelopeGroup:
+            case topLevel::insert::envelopePoints:
+            case topLevel::insert::envelopePointChange:
                 commandEnvelope(getData);
                 break;
-            case 5:
-            case 6:
-            case 7:
+            case topLevel::insert::oscillatorGroup:
+            case topLevel::insert::harmonicAmplitude:
+            case topLevel::insert::harmonicPhaseBandwidth:
                 if (engine >= partLevel::engine::addMod1)
                 {
-                    engine &= 7;
+                    engine -= partLevel::engine::addMod1;
                     if (control != 113)
                     {
                         int voicechange = part->kit[kititem].adpars->VoicePar[engine].PextFMoscil;
@@ -4150,7 +4150,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                 }
                 else
                 {
-                    engine &= 7;
+                    engine -= partLevel::engine::addVoice1;
                     if (control != 137)
                     {
                         int voicechange = part->kit[kititem].adpars->VoicePar[engine].Pextoscil;
@@ -4177,19 +4177,19 @@ bool InterChange::commandSendReal(CommandBlock *getData)
             case 0xff:
                 commandAdd(getData);
                 break;
-            case 0:
+            case topLevel::insert::LFOgroup:
                 commandLFO(getData);
                 break;
-            case 1:
+            case topLevel::insert::filterGroup:
                 commandFilter(getData);
                 break;
-            case 2:
-            case 3:
-            case 4:
+            case topLevel::insert::envelopeGroup:
+            case topLevel::insert::envelopePoints:
+            case topLevel::insert::envelopePointChange:
                 commandEnvelope(getData);
                 break;
-            case 8:
-            case 9:
+            case topLevel::insert::resonanceGroup:
+            case topLevel::insert::resonanceGraphInsert:
                 commandResonance(getData, part->kit[kititem].adpars->GlobalPar.Reson);
                 break;
         }

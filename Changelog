@@ -1,5 +1,8 @@
 yoshimi 1.5.8 M
 
+2018-6-30 Will
+* Added some missing enum conversions in 'interchange'.
+
 2018-6-29 Will
 * GUI config controls converted to enum.
 * Defined 'insert' enums, and converted all occurrences.
