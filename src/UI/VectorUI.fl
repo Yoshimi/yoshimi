@@ -496,7 +496,7 @@ class VectorUI {: {private MiscFuncs}
         const char *tmp = NULL;
         tmp = fl_input("Vector name:", loadlabel[BaseChan].c_str());
         if (tmp != NULL && !string(tmp).empty())
-            send_data(8, 0, 0xd0, 192, 255, 255, BaseChan, 128, miscMsgPush(string(tmp)));}
+            send_data(8, 0, 0xd0, 192, 255, 255, BaseChan, topLevel::route::lowPriority, miscMsgPush(string(tmp)));}
         tooltip {Last saved or loaded vector file - click to change} xywh {45 265 198 20} box THIN_DOWN_BOX labelfont 1 labelsize 12
       }
     }
@@ -877,7 +877,7 @@ class VectorUI {: {private MiscFuncs}
             return;
         fname = string(filename);
     }
-    send_data(84, 0, 0xf0, 240, 255, 255, BaseChan, 192, miscMsgPush(fname));} {}
+    send_data(84, 0, 0xf0, 240, 255, 255, BaseChan, topLevel::route::adjustAndLoopback, miscMsgPush(fname));} {}
   }
   Function {saveVector()} {} {
     code {//
@@ -896,7 +896,7 @@ class VectorUI {: {private MiscFuncs}
     int pos = loadlabel[BaseChan].find("No Name");
     if (pos >=0 && pos < 2)
         Loaded->copy_label(findleafname(filename).c_str());
-    send_data(85, 0, 0xc0, 240, 255, 255, BaseChan, 128, miscMsgPush(filename));} {}
+    send_data(85, 0, 0xc0, 240, 255, 255, BaseChan, topLevel::route::lowPriority, miscMsgPush(filename));} {}
   }
   Function {clearVector(int BaseC)} {} {
     code {//

@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code.
 
-Modified May 2018
+Modified June 2018
 } {selected in_source in_header
 }
 
@@ -883,7 +883,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
                     else
                     {
                         synth->part[curPart]->Pname = newname;
-                        send_data(75, float(curPart), 0xf0, 240, 255, 255, slot, 0x80);
+                        send_data(75, float(curPart), 0xf0, 240, 255, 255, slot, topLevel::route::lowPriority);
                     }
                 }
             }
@@ -910,7 +910,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
             }
             if (doit)
             {
-                send_data(75, float(curPart), 0xf0, 240, 255, 255, slot, 0x80);
+                send_data(75, float(curPart), 0xf0, 240, 255, 255, slot, topLevel::route::lowPriority);
                 setread();
             }
         }
@@ -934,14 +934,14 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
             bool done = false;
             if (what == 1 && nselected >= 0)
             {
-                send_data(5, 0, 0xf0, 244, 255, 255, slot, 128);
+                send_data(5, 0, 0xf0, 244, 255, 255, slot, topLevel::route::lowPriority);
                 nselected = -1;
                 setread();
                 done = true;
             }
             if ((nselected < 0 || what == 2) && !done)
             {
-                send_data(4, 0, 0xe0, 244, 255, 255, slot, 128);
+                send_data(4, 0, 0xe0, 244, 255, 255, slot, topLevel::route::lowPriority);
                 nselected = slot;
             }
         }
@@ -982,7 +982,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
     	const char *dirname;
         dirname = fl_dir_chooser("Export a bank:",synth->getRuntime().userHome.c_str(), 0);
         if (dirname)
-            send_data(59, slot, 0xf0, 0xf0, 0xff, 0xff, 0xff, 0x80, miscMsgPush(string(dirname)));
+            send_data(59, slot, 0xf0, 0xf0, 0xff, 0xff, 0xff, topLevel::route::lowPriority, miscMsgPush(string(dirname)));
    	setrootread();
     }
 
@@ -991,7 +991,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
     	const char *dirname;
         dirname = fl_dir_chooser("Import a new bank:",synth->getRuntime().userHome.c_str(), 0);
         if (dirname)
-            send_data(60, slot, 0xf0, 0xf0, 0xff, 0xff, 0xff, 0x80, miscMsgPush(string(dirname)));
+            send_data(60, slot, 0xf0, 0xf0, 0xff, 0xff, 0xff, topLevel::route::lowPriority, miscMsgPush(string(dirname)));
    	setrootread();
     }
 
@@ -1058,7 +1058,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
                                     NULL, "STOP !", "Continue", count) > 1;
             if (clearit)
             {
-                send_data(61, slot, 0xf0, 0xf0, 0xff, 0xff, 0xff, 0x80);
+                send_data(61, slot, 0xf0, 0xf0, 0xff, 0xff, 0xff, topLevel::route::lowPriority);
             }
         }
         setrootread();
@@ -1071,7 +1071,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
             bool done = false;
             if (what == 1 && rselected >= 0)
             {
-                send_data(21, 0, 0xf0, 244, slot, 255, 255, 128);
+                send_data(21, 0, 0xf0, 244, slot, 255, 255, topLevel::route::lowPriority);
                 rselected = -1;
                 rescan_for_banks(false);
                 setrootread();
@@ -1079,7 +1079,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
             }
             if ((rselected < 0 || what == 2) && !done)
             {
-                send_data(20, 0, 0xe0, 244, slot, 255, 255, 128);
+                send_data(20, 0, 0xe0, 244, slot, 255, 255, topLevel::route::lowPriority);
                 rselected = slot;
                 rs[slot]->rootrefresh();
             }

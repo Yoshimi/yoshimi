@@ -311,7 +311,7 @@ class MasterUI {: {private GuiUpdates}
             unsigned int forceId = 0;
             if (sId)
                 forceId = string2uint(sId);
-            send_data(104, forceId, 0xc0, topLevel::section::main, 0xff, 0xff, 0x80);}
+            send_data(104, forceId, 0xc0, topLevel::section::main, 0xff, 0xff, topLevel::route::lowPriority);}
             xywh {0 0 31 21} labelsize 12
           }
           MenuItem {} {
@@ -359,7 +359,7 @@ class MasterUI {: {private GuiUpdates}
                 return;
             }
             pclose(fp);*/
-            send_data(100, 0, 0xf0, topLevel::section::main, 0xff, 0xff, 0x80);
+            send_data(100, 0, 0xf0, topLevel::section::main, 0xff, 0xff, topLevel::route::lowPriority);
             return;}
             xywh {0 0 34 20} labelsize 12
           }
@@ -413,7 +413,7 @@ class MasterUI {: {private GuiUpdates}
                 if (isRegFile(string(filename)))
                     if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                         return;
-                send_data(79, float(npartcounter->value() - 1), 0xd0, topLevel::section::main, 0xff, 0xff, 0x80, miscMsgPush(string(filename)));
+                send_data(79, float(npartcounter->value() - 1), 0xd0, topLevel::section::main, 0xff, 0xff, topLevel::route::lowPriority, miscMsgPush(string(filename)));
                 return;}
             tooltip {Save current instrument to an .xi* file} xywh {20 20 100 20} labelsize 12
           }
@@ -532,7 +532,7 @@ class MasterUI {: {private GuiUpdates}
                 if (isRegFile(string(filename)))
                     if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                         return;
-                send_data(89, 0, 0xf0, topLevel::section::main, 0xff, 0xff, 0x80, miscMsgPush(string(filename)));}
+                send_data(89, 0, 0xf0, topLevel::section::main, 0xff, 0xff, topLevel::route::lowPriority, miscMsgPush(string(filename)));}
             xywh {25 25 100 20} labelsize 12
           }
           MenuItem RecentScale {
@@ -590,7 +590,7 @@ paramsui->Show(3);}
                                             lastname.c_str(), 0);
             if (fle)
             {
-                send_data(93, 0, 0xf0, topLevel::section::main, 0xff, 0xff, 0x80, miscMsgPush(string(fle)));
+                send_data(93, 0, 0xf0, topLevel::section::main, 0xff, 0xff, topLevel::route::lowPriority, miscMsgPush(string(fle)));
                 RecentState->activate();
             }}
             tooltip {Save session state} xywh {10 10 34 21} labelsize 12
@@ -601,7 +601,7 @@ paramsui->Show(3);}
                 string name = synth->getRuntime().defaultStateName;
                 if (instance > 0)
                     name += ("-" + to_string(instance));
-                send_data(93, 0, 0xf0, topLevel::section::main, 0xff, 0xff, 0x80, miscMsgPush(name + ".state"));}
+                send_data(93, 0, 0xf0, topLevel::section::main, 0xff, 0xff, topLevel::route::lowPriority, miscMsgPush(name + ".state"));}
             tooltip {Save as default state (if load default checked)} xywh {0 0 34 21} labelsize 12
           }
           MenuItem RecentState {
@@ -620,7 +620,7 @@ paramsui->Show(3);}
         Fl_Dial globalfinedetune {
           label Detune
           callback {//
-          send_data(32, o->value(), 0xc8, topLevel::section::main, 0xff, 0xff, 0x80);}
+          send_data(32, o->value(), 0xc8, topLevel::section::main, 0xff, 0xff, topLevel::route::lowPriority);}
           tooltip {Global Fine Detune} xywh {286 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1 value 64
           code0 {o->setValueType(VC_GlobalFineDetune);}
           code1 {o->value(synth->microtonal.Pglobalfinedetune);}
@@ -634,9 +634,9 @@ paramsui->Show(3);}
           if (fl_choice("Set *ALL* dynamic values to their defaults?", NULL, "No", "Yes") > 1)
           {
               if(wasCtrl || (Fl::event_state(FL_CTRL) != 0))
-                  send_data(97, 0, 0xf0, topLevel::section::main, 0xff, 0xff, 0xc0);
+                  send_data(97, 0, 0xf0, topLevel::section::main, 0xff, 0xff, topLevel::route::adjustAndLoopback);
               else
-                  send_data(96, 0, 0xf0, topLevel::section::main, 0xff, 0xff, 0xc0);}}
+                  send_data(96, 0, 0xf0, topLevel::section::main, 0xff, 0xff, topLevel::route::adjustAndLoopback);}}
           tooltip {Clear all dynamic settings
 (+Ctrl includes MIDI-learn)} xywh {7 60 70 24} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
         }
@@ -888,7 +888,7 @@ paramsui->Show(3);}
       Fl_Spinner masterkeyshift {
         label {Key Shift}
         callback {//
-        send_data(35, o->value(), 0xc0, topLevel::section::main, 0xff, 0xff, 0x80);}
+        send_data(35, o->value(), 0xc0, topLevel::section::main, 0xff, 0xff, topLevel::route::lowPriority);}
         tooltip {Shift pitch +/- N semitones} xywh {336 88 38 20} labelsize 10 minimum -36 maximum 36 textsize 10
         code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
         code1 {o->value(synth->Pkeyshift - 64);}
@@ -1167,7 +1167,7 @@ ZynAddSubFX}
       Fl_Button cancel {
         label Cancel
         callback {//
-        send_data(255, 0, 3);
+        send_data(255, 0, 3, topLevel::section::main);
         o->hide();}
         xywh {130 60 70 20} hide
       }
@@ -1905,7 +1905,7 @@ ZynAddSubFX}
   }
   Function {do_load_scale(string fname)} {} {
     code {//
-    send_data(88, 0, 0xf0, topLevel::section::main, 0xff, 0xff, 0x80, miscMsgPush(fname));} {}
+    send_data(88, 0, 0xf0, topLevel::section::main, 0xff, 0xff, topLevel::route::lowPriority, miscMsgPush(fname));} {}
   }
   Function {do_load_instrument(string fname)} {} {
     code {//
@@ -1934,7 +1934,7 @@ ZynAddSubFX}
         if (fname == NULL)
             return;
     }
-    send_data(80, 0, 0xf0, topLevel::section::main, 255, 255, 192, miscMsgPush(fname));} {}
+    send_data(80, 0, 0xf0, topLevel::section::main, 255, 255, topLevel::route::adjustAndLoopback, miscMsgPush(fname));} {}
   }
   Function {do_save_master(const char* file = NULL)} {} {
     code {//
@@ -1961,7 +1961,7 @@ ZynAddSubFX}
     else
         fname = file;
     // RecentScale->activate();
-    send_data(81, 0, 0xf0, topLevel::section::main, 255, 255, 128, miscMsgPush(string(fname)));} {}
+    send_data(81, 0, 0xf0, topLevel::section::main, 255, 255, topLevel::route::lowPriority, miscMsgPush(string(fname)));} {}
   }
   Function {refresh_master_ui(int type)} {} {
     code {//
@@ -2114,7 +2114,7 @@ ZynAddSubFX}
   }
   Function {setState(string filename)} {} {
     code {//
-    send_data(92, 0, 0xf0, topLevel::section::main, 0xff, 0xff, 0xc0, miscMsgPush(filename));} {}
+    send_data(92, 0, 0xf0, topLevel::section::main, 0xff, 0xff, topLevel::route::adjustAndLoopback, miscMsgPush(filename));} {}
   }
   Function {setPartWindowTitle(string prefix)} {return_type string
   } {

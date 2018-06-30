@@ -234,7 +234,7 @@ void *InterChange::sortResultsThread(void)
             jack_ringbuffer_read(toCLI, point, toread);
             if(getData.data.part == topLevel::section::midiLearn) // special midi-learn - needs improving
                 synth->midilearn.generalOpps(getData.data.value, getData.data.type, getData.data.control, getData.data.part, getData.data.kit, getData.data.engine, getData.data.insert, getData.data.parameter, getData.data.par2);
-            else if ((getData.data.parameter & 0x80) && getData.data.parameter < 0xff)
+            else if ((getData.data.parameter >= topLevel::route::lowPriority) && getData.data.parameter < 0xff)
                 indirectTransfers(&getData);
             else
                 resolveReplies(&getData);
@@ -328,7 +328,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     else
                         text = synth->getRuntime().vectordata.Name[insert];
                     value = miscMsgPush(text);
-                    getData->data.parameter &= 0x7f;
+                    getData->data.parameter -= topLevel::route::lowPriority;
                     guiTo = true;
                     break;
             }
@@ -348,7 +348,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
             text += miscMsgPop(msgID & NO_MSG);
             value = miscMsgPush(text);
             synth->getRuntime().finishedCLI = true; // temp
-            getData->data.parameter &= 0x7f;
+            getData->data.parameter -= topLevel::route::lowPriority;
             guiTo = true;
             break;
         }
@@ -416,7 +416,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     synth->microtonal.Pcomment = text;
                     break;
             }
-            getData->data.parameter &= 0x7f;
+            getData->data.parameter -= topLevel::route::lowPriority;
             guiTo = true;
             break;
         }
@@ -691,7 +691,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     synth->Unmute();
                     break;
             }
-            getData->data.parameter &= 0x7f;
+            getData->data.parameter -= topLevel::route::lowPriority;
             if (control != 104 && control != 105)
                 guiTo = true;
             break;
@@ -774,7 +774,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     guiTo = true;
                     break;
             }
-            getData->data.parameter &= 0x7f;
+            getData->data.parameter -= topLevel::route::lowPriority;
             break;
         }
         case topLevel::section::config: // config
@@ -834,19 +834,19 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = "READ";
                     value = miscMsgPush(text);
                     getData->data.par2 = miscMsgPush(text); // slightly odd case
-                    getData->data.parameter &= 0x7f;
+                    getData->data.parameter -= topLevel::route::lowPriority;
                         value = miscMsgPush(text);
                     break;
             }
             if (!(type & 0x20))
                 guiTo = true;
-            getData->data.parameter &= 0x7f;
+            getData->data.parameter -= topLevel::route::lowPriority;
             break;
         }
         case 256:
         {
             value = miscMsgPush(text);
-            getData->data.parameter &= 0x7f;
+            getData->data.parameter -= topLevel::route::lowPriority;
             break;
         }
         default:
@@ -864,7 +864,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         }
                         else
                             value = synth->part[npart]->Pkeyshift - 64;
-                        getData->data.parameter &= 0x7f;
+                        getData->data.parameter -= topLevel::route::lowPriority;
                     }
                     break;
 
@@ -872,7 +872,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         if (write)
                         {
                             doClearPart(npart);
-                            getData->data.parameter &= 0x7f;
+                            getData->data.parameter -= topLevel::route::lowPriority;
                         }
                         break;
 
@@ -880,7 +880,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         if (write)
                         {
                             setpadparams(npart | (kititem << 8));
-                            getData->data.parameter &= 0x7f;
+                            getData->data.parameter -= topLevel::route::lowPriority;
                         }
                         break;
 
@@ -891,11 +891,11 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                             {
                                 mainRegisterAudioPort(synth, npart);
                             }
-                            getData->data.parameter &= 0x7f;
+                            getData->data.parameter -= topLevel::route::lowPriority;
                         }
                         break;
                     case partLevel::control::instrumentName: // part / kit item names
-                        if (parameter == 128)
+                        if (parameter == topLevel::route::lowPriority)
                         {
                             if (write)
                             {
@@ -922,7 +922,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         }
                         else
                             text = " FAILED Not in kit mode";
-                        getData->data.parameter &= 0x7f;
+                        getData->data.parameter -= topLevel::route::lowPriority;
                         value = miscMsgPush(text);
                         break;
                     case partLevel::control::defaultInstrumentCopyright: // copyright info
@@ -940,7 +940,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                                 text = synth->part[npart]->info.Pauthor;
                                 saveText(text, name);
                             }
-                            getData->data.parameter &= 0x7f;
+                            getData->data.parameter -= topLevel::route::lowPriority;
                             value = miscMsgPush(text);
                         }
                         break;
@@ -950,7 +950,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         }
     }
     __sync_and_and_fetch(&blockRead, 0xfd);
-    if (getData->data.parameter < 0x80)
+    if (getData->data.parameter < topLevel::route::lowPriority)
     {
         if (jack_ringbuffer_write_space(returnsLoopback) >= commandSize)
         {
@@ -1056,7 +1056,7 @@ float InterChange::readAllData(CommandBlock *getData)
     }
     //cout << "Read Control " << (int) getData->data.control << " Type " << (int) getData->data.type << " Part " << (int) getData->data.part << "  Kit " << (int) getData->data.kit << " Engine " << (int) getData->data.engine << "  Insert " << (int) getData->data.insert << " Parameter " << (int) getData->data.parameter << " Par2 " << (int) getData->data.par2 << endl;
     int npart = getData->data.part;
-    bool indirect = ((getData->data.parameter & 0xf0) == 0x80);
+    bool indirect = ((getData->data.parameter & 0xf0) == topLevel::route::lowPriority);
     if (npart < NUM_MIDI_PARTS && synth->part[npart]->busy)
     {
         getData->data.control = partLevel::control::partBusy; // part busy message
@@ -1854,7 +1854,7 @@ string InterChange::resolveMain(CommandBlock *getData)
 //    unsigned char par2 = getData->data.par2;
     string name;
     string contstr = "";
-    if (getData->data.part == 0xd9) // MIDI
+    if (getData->data.part == topLevel::section::midiIn) // MIDI
     {
         switch (control)
         {
@@ -2069,7 +2069,7 @@ string InterChange::resolvePart(CommandBlock *getData)
     //unsigned char par2 = getData->data.par2;
     unsigned char effNum = engine;
 
-    bool kitType = (insert == 0x20);
+    bool kitType = (insert == topLevel::insert::kitGroup);
     bool value_bool = value_int > 0;
     bool yesno = false;
 
@@ -2698,10 +2698,10 @@ string InterChange::resolveSub(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char insert = getData->data.insert;
 
-    if (insert == 6 || insert == 7)
+    if (insert == topLevel::insert::harmonicAmplitude || insert == topLevel::insert::harmonicPhaseBandwidth)
     {
         string Htype;
-        if (insert == 6)
+        if (insert == topLevel::insert::harmonicAmplitude)
             Htype = " Amplitude";
         else
             Htype = " Bandwidth";
@@ -3034,11 +3034,11 @@ string InterChange::resolveOscillator(CommandBlock *getData)
             eng_name += " Modulator";
     }
 
-    if (insert == 6)
+    if (insert == topLevel::insert::harmonicAmplitude)
     {
         return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + " Harmonic " + to_string((int)control + 1) + " Amplitude" + isPad);
     }
-    else if(insert == 7)
+    else if(insert == topLevel::insert::harmonicPhaseBandwidth)
     {
         return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + " Harmonic " + to_string((int)control + 1) + " Phase" + isPad);
     }
@@ -3496,7 +3496,7 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
             break;
     }
 
-    if (insert == 3)
+    if (insert == topLevel::insert::envelopePoints)
     {
         if (!write)
         {
@@ -3511,7 +3511,7 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
         }
     }
 
-    if (insert == 4)
+    if (insert == topLevel::insert::envelopePointChange)
     {
         return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control + 1)) + " X increment " + to_string(int(par2)) + " Y");
     }
@@ -3587,18 +3587,18 @@ string InterChange::resolveEffects(CommandBlock *getData)
 
     string name;
     string actual;
-    if (npart == 0xf1)
+    if (npart == topLevel::section::systemEffects)
         name = "System";
-    else if (npart == 0xf2)
+    else if (npart == topLevel::section::insertEffects)
         name = "Insert";
     else
         name = "Part " + to_string(npart + 1);
 
     if (kititem == 0x88 && getData->data.insert < 0xff)
     {
-        if (npart == 0xf1)
+        if (npart == topLevel::section::systemEffects)
             name = "System";
-        else if (npart == 0xf2)
+        else if (npart == topLevel::section::insertEffects)
             name = "Insert";
         else name = "Part " + to_string(npart + 1);
         name += " Effect " + to_string(effnum + 1);
@@ -3663,7 +3663,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
         }
     }
     string contstr = "";
-    if ((npart < NUM_MIDI_PARTS && control == 65) || (npart > 0xf0 && kititem == 0xff && control == 1))
+    if ((npart < NUM_MIDI_PARTS && control == 65) || (npart > topLevel::section::main && kititem == 0xff && control == 1))
     {
         name += " set to";
         kititem = value;
@@ -3739,7 +3739,7 @@ void InterChange::mediate()
             toread = commandSize;
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(fromCLI, point, toread);
-            if(getData.data.part != 0xd8) // Not special midi-learn message
+            if(getData.data.part != topLevel::section::midiLearn) // Not special midi-learn message
                 commandSend(&getData);
             returns(&getData);
         }
@@ -3753,7 +3753,7 @@ void InterChange::mediate()
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(fromGUI, point, toread);
 
-            if(getData.data.part != 0xd8) // Not special midi-learn message
+            if(getData.data.part != topLevel::section::midiLearn) // Not special midi-learn message
                 commandSend(&getData);
             returns(&getData);
         }
@@ -3766,7 +3766,7 @@ void InterChange::mediate()
             toread = commandSize;
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(fromMIDI, point, toread);
-            if(getData.data.part != 0xd8) // Not special midi-learn message
+            if(getData.data.part != topLevel::section::midiLearn) // Not special midi-learn message
             {
                 commandSend(&getData);
                 returns(&getData);
@@ -3776,7 +3776,7 @@ void InterChange::mediate()
                 if (jack_ringbuffer_write_space(toGUI) >= commandSize)
                 jack_ringbuffer_write(toGUI, (char*) getData.bytes, commandSize);
             }
-            else if (getData.data.control == 0xd8) // not part!
+            else if (getData.data.control == topLevel::section::midiLearn) // not part!
             {
                 synth->mididecode.midiProcess(getData.data.kit, getData.data.engine, getData.data.insert, false);
             }
@@ -3806,42 +3806,42 @@ void InterChange::returnsDirect(int altData)
         case 1:
             putData.data.control = 128;
             putData.data.type = 0xf0; // Stop
-            putData.data.part = 0xf0;
-            putData.data.parameter = 0x80;
+            putData.data.part = topLevel::section::main;
+            putData.data.parameter = topLevel::route::lowPriority;
             break;
         case 2:
             putData.data.control = (altData >> 8) & 0xff; // master reset
             putData.data.type = altData >> 24;
-            putData.data.part = 0xf0;
-            putData.data.parameter = 0x80;
+            putData.data.part = topLevel::section::main;
+            putData.data.parameter = topLevel::route::lowPriority;
             break;
         case 3:
             putData.data.control = 80; // patch set load
             putData.data.type = altData >> 24;
-            putData.data.part = 0xf0;
-            putData.data.parameter = 0x80;
+            putData.data.part = topLevel::section::main;
+            putData.data.parameter = topLevel::route::lowPriority;
             putData.data.par2 = (altData >> 8) & 0xff;
             break;
         case 4:
             putData.data.control = 84; // vector load
             putData.data.type = altData >> 24;
-            putData.data.part = 0xf0;
+            putData.data.part = topLevel::section::main;
             putData.data.insert = (altData >> 16) & 0xff;
-            putData.data.parameter = 0x80;
+            putData.data.parameter = topLevel::route::lowPriority;
             putData.data.par2 = (altData >> 8) & 0xff;
             break;
         case 5:
             putData.data.control = 92; // state load
             putData.data.type = altData >> 24;
-            putData.data.part = 0xf0;
-            putData.data.parameter = 0x80;
+            putData.data.part = topLevel::section::main;
+            putData.data.parameter = topLevel::route::lowPriority;
             putData.data.par2 = (altData >> 8) & 0xff;
             break;
         case 6:
             putData.data.control = 88; // scales load
             putData.data.type = altData >> 24;
-            putData.data.part = 0xf0;
-            putData.data.parameter = 0x80;
+            putData.data.part = topLevel::section::main;
+            putData.data.parameter = topLevel::route::lowPriority;
             putData.data.par2 = (altData >> 8) & 0xff;
         default:
             return;
@@ -3856,7 +3856,7 @@ void InterChange::returns(CommandBlock *getData)
 
     if (type == 0xff)
         return;
-    if ((getData->data.parameter & 0x80) && getData->data.parameter < 0xc0)
+    if (getData->data.parameter >= topLevel::route::lowPriority && getData->data.parameter < topLevel::route::adjustAndLoopback)
     {
         if (jack_ringbuffer_write_space(toCLI) >= commandSize)
         jack_ringbuffer_write(toCLI, (char*) getData->bytes, commandSize); // this will redirect where needed.
@@ -3939,7 +3939,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     }
 //    float value = getData->data.value;
     unsigned char parameter = getData->data.parameter;
-    if ((parameter & 0x80) && parameter < 0xc0)
+    if ((parameter & topLevel::route::lowPriority) && parameter < topLevel::route::adjustAndLoopback)
         return true; // indirect transfer
 
     unsigned char type = getData->data.type;
@@ -4142,7 +4142,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                         if (voicechange != -1)
                         {
                             engine = voicechange;
-                            getData->data.engine = engine | 0xc0;
+                            getData->data.engine = engine +  partLevel::addMod1;
                         }   // force it to external mod
                     }
 
@@ -4240,7 +4240,7 @@ void InterChange::commandMidi(CommandBlock *getData)
             break;
 
         case 8: // Program / Bank / Root
-            getData->data.parameter = 0x80;
+            getData->data.parameter = topLevel::route::lowPriority;
             if ((value_int < 0xff || par2 != NO_MSG) && chan < synth->getRuntime().NumAvailableParts)
             {
                 synth->partonoffLock(chan & 0x3f, -1);
@@ -5045,31 +5045,31 @@ void InterChange::commandMain(CommandBlock *getData)
              */
             synth->partonoffLock(value_int, -1);
             getData->data.control = 8;
-            getData->data.part = 0xd9;
+            getData->data.part = topLevel::section::midiIn;
             getData->data.kit = value_int;
             getData->data.value = par2;
-            getData->data.parameter = 0x80;
+            getData->data.parameter = topLevel::route::lowPriority;
             getData->data.par2 = 0xff;
             break;
         case 78: // load named instrument
             synth->partonoffLock(value_int & 0x3f, -1);
             // as above for named instruments :)
             getData->data.control = 8;
-            getData->data.part = 0xd9;
+            getData->data.part = topLevel::section::midiIn;
             getData->data.kit = value_int & 0x3f;
             getData->data.value = 0xff;
-            getData->data.parameter = 0x80;
+            getData->data.parameter = topLevel::route::lowPriority;
             break;
 
         case 80: // load patchset
-            if (write && (parameter == 0xc0))
+            if (write && (parameter == topLevel::route::adjustAndLoopback))
             {
                 synth->allStop(3 | (par2 << 8) | (type << 24));
                 getData->data.type = 0xff; // stop further action
             }
             break;
         case 84: // load vector
-            if (write && (parameter == 0xc0))
+            if (write && (parameter == topLevel::route::adjustAndLoopback))
             {
                 synth->allStop(4 | (par2 << 8) | (insert << 16) | (type << 24));
                 getData->data.type = 0xff; // stop further action
@@ -5083,7 +5083,7 @@ void InterChange::commandMain(CommandBlock *getData)
         case 89: // done elsewhere
             break;
         case 92: // load state
-            if (write && (parameter == 0xc0))
+            if (write && (parameter == topLevel::route::adjustAndLoopback))
             {
                 synth->allStop(5 | (par2 << 8) | (type << 24));
                 getData->data.type = 0xff; // stop further action
@@ -5093,7 +5093,7 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
         case 96: // master reset
         case 97: // reset including MIDI-learn
-            if (write && (parameter == 0xc0))
+            if (write && (parameter == topLevel::route::adjustAndLoopback))
             {
                 synth->allStop(2 | (control << 8) | (type << 24));
                 getData->data.type = 0xff; // stop further action);
@@ -5159,7 +5159,7 @@ void InterChange::commandPart(CommandBlock *getData)
     if (write)
         __sync_or_and_fetch(&blockRead, 1);
 
-    bool kitType = (insert == 0x20);
+    bool kitType = (insert == topLevel::insert::kitGroup);
 
     if ( kitType && kititem >= NUM_KIT_ITEMS)
     {
@@ -5288,7 +5288,7 @@ void InterChange::commandPart(CommandBlock *getData)
                                 synth->getRuntime().currentPart = npart;
                                 getData->data.value = npart;
                                 getData->data.control = 14;
-                                getData->data.part = 0xf0;
+                                getData->data.part = topLevel::section::main;
                             }
                             else
                                 synth->partonoffWrite(npart, value_int);
@@ -5540,7 +5540,7 @@ void InterChange::commandPart(CommandBlock *getData)
             if(write)
             {
                 synth->partonoffWrite(npart, -1);
-                getData->data.parameter = 0x80;
+                getData->data.parameter = topLevel::route::lowPriority;
             }
             else
                 getData->data.type = 0xff; // block any further action
@@ -5556,7 +5556,7 @@ void InterChange::commandPart(CommandBlock *getData)
             {
                 if (npart < synth->getRuntime().NumAvailableParts)
                     synth->part[npart]->Paudiodest = value_int;
-                getData->data.parameter = 0x80;
+                getData->data.parameter = topLevel::route::lowPriority;
             }
             else
                 value = part->Paudiodest;
@@ -5796,7 +5796,6 @@ void InterChange::commandAdd(CommandBlock *getData)
     ADnoteParameters *pars;
     pars = part->kit[kititem].adpars;
 
-    int k; // temp variable for detune
     switch (control)
     {
         case 0:
@@ -5826,6 +5825,8 @@ void InterChange::commandAdd(CommandBlock *getData)
             break;
 
         case 35:
+        {
+            int k;
             if (write)
             {
                 k = value;
@@ -5841,6 +5842,7 @@ void InterChange::commandAdd(CommandBlock *getData)
                 value = k;
             }
             break;
+        }
         case 36:
             if (write)
                 pars->GlobalPar.PDetuneType = value_int;
@@ -5848,6 +5850,8 @@ void InterChange::commandAdd(CommandBlock *getData)
                 value = pars->GlobalPar.PDetuneType;
             break;
         case 37:
+        {
+            int k;
             if (write)
             {
                 k = value;
@@ -5863,6 +5867,7 @@ void InterChange::commandAdd(CommandBlock *getData)
                 value = k;
             }
             break;
+        }
         case 39:
             if (write)
             {
@@ -5948,8 +5953,6 @@ void InterChange::commandAddVoice(CommandBlock *getData)
     ADnoteParameters *pars;
     pars = part->kit[kititem].adpars;
 
-    int k; // temp variable for detune
-
     switch (control)
     {
         case 0:
@@ -6021,6 +6024,8 @@ void InterChange::commandAddVoice(CommandBlock *getData)
                 value = pars->VoicePar[nvoice].Pfixedfreq;
             break;
         case 35:
+        {
+            int k;
             if (write)
             {
                 k = value;
@@ -6036,6 +6041,7 @@ void InterChange::commandAddVoice(CommandBlock *getData)
                 value = k;
             }
             break;
+        }
         case 36:
             if (write)
                 pars->VoicePar[nvoice].PDetuneType = value_int;
@@ -6043,6 +6049,8 @@ void InterChange::commandAddVoice(CommandBlock *getData)
                 value = pars->VoicePar[nvoice].PDetuneType;
             break;
         case 37:
+        {
+            int k;
             if (write)
             {
                 k = value;
@@ -6058,6 +6066,7 @@ void InterChange::commandAddVoice(CommandBlock *getData)
                 value = k;
             }
             break;
+        }
         case 38:
             if (write)
                 pars->VoicePar[nvoice].PBendAdjust = value_int;
@@ -6130,6 +6139,8 @@ void InterChange::commandAddVoice(CommandBlock *getData)
                 value = pars->VoicePar[nvoice].Unison_invert_phase;
             break;
         case 56:
+        {
+            int k;
             if (write)
             {
                 k = value_bool + 1;
@@ -6139,6 +6150,7 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             else
                 value = (pars->VoicePar[nvoice].Unison_size > 1);
             break;
+        }
 
         case 64:
             if (write)
@@ -6203,6 +6215,8 @@ void InterChange::commandAddVoice(CommandBlock *getData)
                 value = pars->VoicePar[nvoice].PFMFixedFreq;
             break;
         case 99:
+        {
+            int k;
             if (write)
             {
                 k = value_int;
@@ -6218,6 +6232,7 @@ void InterChange::commandAddVoice(CommandBlock *getData)
                 value = k;
             }
             break;
+        }
         case 100:
             if (write)
                 pars->VoicePar[nvoice].PFMDetuneType = value_int;
@@ -6225,6 +6240,8 @@ void InterChange::commandAddVoice(CommandBlock *getData)
                 value = pars->VoicePar[nvoice].PFMDetuneType;
             break;
         case 101:
+        {
+            int k;
             if (write)
             {
                 int k = value_int;
@@ -6240,6 +6257,7 @@ void InterChange::commandAddVoice(CommandBlock *getData)
                 value = k;
             }
             break;
+        }
         case 104:
             if (write)
                 pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled = value_int;
@@ -6280,7 +6298,7 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
         case 136:
             if (write)
-                pars->VoicePar[nvoice].Poscilphase =64 - value_int;
+                pars->VoicePar[nvoice].Poscilphase = 64 - value_int;
             else
                 value = 64 - pars->VoicePar[nvoice].Poscilphase;
             break;
@@ -6324,9 +6342,9 @@ void InterChange::commandSub(CommandBlock *getData)
     SUBnoteParameters *pars;
     pars = part->kit[kititem].subpars;
 
-    if (insert == 6 || insert == 7)
+    if (insert == topLevel::insert::harmonicAmplitude || insert == topLevel::insert::harmonicPhaseBandwidth)
     {
-        if (insert == 6)
+        if (insert == topLevel::insert::harmonicAmplitude)
         {
             if (write)
                 pars->Phmag[control] = value;
@@ -6348,7 +6366,7 @@ void InterChange::commandSub(CommandBlock *getData)
         return;
     }
 
-    int k; // temp variable for detune
+    //int k; // temp variable for detune
     switch (control)
     {
         case 0:
@@ -6408,6 +6426,8 @@ void InterChange::commandSub(CommandBlock *getData)
                 value = pars->Pfixedfreq;
             break;
         case 35:
+        {
+            int k;
             if (write)
             {
                 k = value;
@@ -6423,6 +6443,7 @@ void InterChange::commandSub(CommandBlock *getData)
                 value = k;
             }
             break;
+        }
         case 36:
             if (write)
                 pars->PDetuneType = value_int + 1;
@@ -6430,6 +6451,8 @@ void InterChange::commandSub(CommandBlock *getData)
                 value = pars->PDetuneType;
             break;
         case 37:
+        {
+            int k;
             if (write)
             {
                 k = value;
@@ -6445,6 +6468,7 @@ void InterChange::commandSub(CommandBlock *getData)
                 value = k;
             }
             break;
+        }
 
         case 38:
             if (write)
@@ -6809,7 +6833,7 @@ void InterChange::commandPad(CommandBlock *getData)
             if (write)
             {
                 synth->partonoffWrite(npart, -1);
-                getData->data.parameter = 0x80;
+                getData->data.parameter = topLevel::route::lowPriority;
             }
             break;
 
@@ -7135,7 +7159,7 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
     if (write)
         __sync_or_and_fetch(&blockRead, 1);
 
-    if (insert == 9)
+    if (insert == topLevel::insert::resonanceGraphInsert)
     {
         if (write)
             respar->setpoint(control, value);
@@ -7720,7 +7744,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
     int envpoints = pars->Penvpoints;
     bool isAddpoint = (Xincrement < 0xff);
 
-    if (insert == 3) // here be dragons :(
+    if (insert == topLevel::insert::envelopePoints) // here be dragons :(
     {
         if (!pars->Pfreemode)
         {
@@ -7784,7 +7808,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
         return;
     }
 
-    if (insert == 4)
+    if (insert == topLevel::insert::envelopePointChange)
     {
         if (!pars->Pfreemode || point >= envpoints)
         {
@@ -7925,7 +7949,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
 
     int value_int = lrint(value);
 
-    bool isSysEff = (npart == 0xf1);
+    bool isSysEff = (npart == topLevel::section::systemEffects);
     if (insert == 0xff)
     {
         switch (control)
@@ -7988,10 +8012,10 @@ void InterChange::commandEffects(CommandBlock *getData)
 
     EffectMgr *eff;
 
-    if (npart == 0xf1)
+    if (npart == topLevel::section::systemEffects)
         eff = synth->sysefx[effnum];
 
-    else if (npart == 0xf2)
+    else if (npart == topLevel::section::insertEffects)
         eff = synth->insefx[effnum];
     else if (npart < NUM_MIDI_PARTS)
         eff = synth->part[npart]->partefx[effnum];
@@ -8116,16 +8140,16 @@ float InterChange::returnLimits(CommandBlock *getData)
     getData->data.type &= 0x3f; //  clear top bits
     getData->data.type |= 0x80; // default is integer & not learnable
 
-    if (npart == 248) // config limits
+    if (npart == topLevel::section::config) // config limits
         return synth->getConfigLimits(getData);
 
-    if (npart == 240) // main control limits
+    if (npart == topLevel::section::main) // main control limits
         return synth->getLimits(getData);
 
-    if (npart == 232) // microtonal limits
+    if (npart == topLevel::section::scales) // microtonal limits
         return synth->microtonal.getLimits(getData);
 
-    if (npart == 192) // vector limits
+    if (npart == topLevel::section::vector) // vector limits
         return synth->getVectorLimits(getData);
 
     float min;
@@ -8150,11 +8174,11 @@ float InterChange::returnLimits(CommandBlock *getData)
             return subpars->getLimits(getData);
         }
 
-        if ((engine & 0x7f) == 0x7f && (kititem == 0xff || insert == 0x20)) // part level controls
+        if ((engine & 0x7f) == 0x7f && (kititem == 0xff || insert == topLevel::insert::kitGroup)) // part level controls
         { // TODO why is engine not 0xff? it used to be.
             return part->getLimits(getData);
         }
-        if ((insert == 0x20 || insert == 0xff) && parameter == 0xff && par2 == 0xff)
+        if ((insert == topLevel::insert::kitGroup || insert == 0xff) && parameter == 0xff && par2 == 0xff)
         {
             if (engine == partLevel::engine::addSynth || (engine >= partLevel::engine::addVoice1 && engine <= partLevel::engine::addVoice8))
             {
@@ -8207,7 +8231,7 @@ float InterChange::returnLimits(CommandBlock *getData)
             // we also use this for pad limits
             // as oscillator values identical
         }
-        if (insert == 8) // resonance
+        if (insert == topLevel::insert::resonanceGroup) // resonance
         {
             if (control == 0) // a cheat!
             {
@@ -8261,7 +8285,7 @@ float InterChange::returnLimits(CommandBlock *getData)
             }
             return value;
         }
-        if (insert == 0 && parameter <= 2) // LFO
+        if (insert == topLevel::insert::LFOgroup && parameter <= 2) // LFO
         {
             if (control == 0) // another cheat!
             {

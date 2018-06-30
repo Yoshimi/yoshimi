@@ -137,7 +137,7 @@ class PartKitItem {: {public Fl_Group, private MiscFuncs}
           const char *tmp = fl_input("Kit item name:", part->kit[n].Pname.c_str());
           if (tmp != NULL)
           {
-              send_data(partLevel::control::instrumentName, 0, 0xc0, n, 0xff, 0x20, 0x81, miscMsgPush(string(tmp)));
+              send_data(partLevel::control::instrumentName, 0, 0xc0, n, 0xff, 0x20, topLevel::route::lowPriority + 1, miscMsgPush(string(tmp)));
               //part->kit[n].Pname = string(tmp);
               o->copy_label(tmp);
           }}
@@ -523,7 +523,7 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
                       else
                       {
                           unsigned char id = miscMsgPush(string(tmp));
-                          send_data(partLevel::control::instrumentName, 0, 0xf0, 0xff, 0xff, 0xff, 0x80, id);
+                          send_data(partLevel::control::instrumentName, 0, 0xf0, 0xff, 0xff, 0xff, topLevel::route::lowPriority, id);
                       }
                   }
               }
@@ -649,7 +649,7 @@ Offset}
         Fl_Spinner partkeyshift {
           label {Key Shift}
           callback {//
-          send_data(partLevel::control::keyShift, o->value(), 0xc0, 0xff, 0xff, 0xff, 0x80);}
+          send_data(partLevel::control::keyShift, o->value(), 0xc0, 0xff, 0xff, 0xff, topLevel::route::lowPriority);}
           xywh {194 111 38 20} labelsize 10 minimum -36 maximum 36 textsize 11
           code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
           code1 {o->value(part->Pkeyshift - 64);}

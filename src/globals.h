@@ -102,6 +102,13 @@ namespace topLevel // usage topLevel::section::vector
         config = 248 // F8
     };
 
+    // the following critcally cannot be changed.
+    enum route : unsigned char {
+        adjust = 64,
+        lowPriority = 128,
+        adjustAndLoopback = 192
+    };
+
     enum control : unsigned char {
         errorMessage = 254 // FE
     };
@@ -245,8 +252,8 @@ namespace partLevel // usage partLevel::control::volume
         instrumentCopyright = 220,
         instrumentComments,
         instrumentName,
-        defaultInstrumentCopyright,
-        resetAllControllers,
+        defaultInstrumentCopyright, // this needs to be split into two for load/save
+        resetAllControllers, // this needs to bump up 1 to make space
         partBusy = 252}; // internally generated - read only
 
     enum engine : unsigned char {
