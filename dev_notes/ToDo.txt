@@ -1,6 +1,8 @@
 
-Potential Bug: Chanign part name while aplaymidi running with yoshi sometimes segfaults with:
+Potential Bug: Changing part name while aplaymidi running with yoshi sometimes segfaults with:
     The futex facility returned an unexpected error code.Aborted
+Seems to be a GUI problem, it freezes with Rosegarden but all functions still work.
+No issue at all if names changed from the CLI!
 
 Can go a long time before showing up :(
 

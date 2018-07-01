@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified June 2018
+Modified July 2018
 } {selected in_source in_header
 }
 
@@ -127,7 +127,7 @@ class PartKitItem {: {public Fl_Group, private MiscFuncs}
       } {
         Fl_Check_Button mutedcheck {
           callback {//
-          send_data(partLevel::control::kitItemMute, o->value(), 0xc8, n, 0xff, 32);}
+          send_data(partLevel::control::kitItemMute, o->value(), 0xc8, n, 0xff, topLevel::insert::kitGroup);}
           xywh {60 0 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Pmuted);}
         }
@@ -137,7 +137,7 @@ class PartKitItem {: {public Fl_Group, private MiscFuncs}
           const char *tmp = fl_input("Kit item name:", part->kit[n].Pname.c_str());
           if (tmp != NULL)
           {
-              send_data(partLevel::control::instrumentName, 0, 0xc0, n, 0xff, 0x20, topLevel::route::lowPriority + 1, miscMsgPush(string(tmp)));
+              send_data(partLevel::control::instrumentName, 0, 0xc0, n, 0xff, topLevel::insert::kitGroup, topLevel::route::lowPriority + 1, miscMsgPush(string(tmp)));
               //part->kit[n].Pname = string(tmp);
               o->copy_label(tmp);
           }}
@@ -154,7 +154,7 @@ class PartKitItem {: {public Fl_Group, private MiscFuncs}
               o->value(tmp);
           }
 
-          send_data(partLevel::control::minNote, tmp, 0xc0, n, 0xff, 32);}
+          send_data(partLevel::control::minNote, tmp, 0xc0, n, 0xff, topLevel::insert::kitGroup);}
           xywh {225 0 55 15} type Simple minimum 0 maximum 128 step 1
           code0 {o->value(part->kit[n].Pminkey);}
         }
@@ -172,7 +172,7 @@ class PartKitItem {: {public Fl_Group, private MiscFuncs}
               tmp = last;
           minkcounter->value(tmp);
 
-          send_data(partLevel::control::minToLastKey, tmp, 0xc0, n, 0xff, 32);}
+          send_data(partLevel::control::minToLastKey, tmp, 0xc0, n, 0xff, topLevel::insert::kitGroup);}
           tooltip {set the minimum key to the last pressed key} xywh {285 3 15 12} box THIN_UP_BOX labelsize 10
         }
         Fl_Button {} {
@@ -189,7 +189,7 @@ class PartKitItem {: {public Fl_Group, private MiscFuncs}
               tmp = last;
           maxkcounter->value(tmp);
 
-          send_data(partLevel::control::maxToLastKey, tmp, 0xc0, n, 0xff, 32);}
+          send_data(partLevel::control::maxToLastKey, tmp, 0xc0, n, 0xff, topLevel::insert::kitGroup);}
           tooltip {set the maximum key to the last pressed key} xywh {315 3 15 12} box THIN_UP_BOX labelsize 10
         }
         Fl_Button {} {
@@ -198,7 +198,7 @@ class PartKitItem {: {public Fl_Group, private MiscFuncs}
           minkcounter->value(0);
           maxkcounter->value(127);
 
-          send_data(partLevel::control::resetMinMaxKey, o->value(), 0xc0, n, 0xff, 32);}
+          send_data(partLevel::control::resetMinMaxKey, o->value(), 0xc0, n, 0xff, topLevel::insert::kitGroup);}
           tooltip {reset the minimum key to 0 and maximum key to 127} xywh {300 3 15 12} box THIN_UP_BOX labelfont 1 labelsize 10
         }
         Fl_Counter maxkcounter {
@@ -210,7 +210,7 @@ class PartKitItem {: {public Fl_Group, private MiscFuncs}
               tmp = other;
               o->value(tmp);
           }
-          send_data(partLevel::control::maxNote, tmp, 0xc0, n, 0xff, 32);}
+          send_data(partLevel::control::maxNote, tmp, 0xc0, n, 0xff, topLevel::insert::kitGroup);}
           xywh {335 0 55 15} type Simple minimum 0 maximum 128 step 1
           code0 {o->value(part->kit[n].Pmaxkey);}
         }
@@ -239,7 +239,7 @@ class PartKitItem {: {public Fl_Group, private MiscFuncs}
                   synth->getGuiMaster()->partui->adeditbutton->deactivate();
           }
           synth->getGuiMaster()->partui->checkEngines();
-          send_data(partLevel::control::enable, o->value(), 0xc8, n, 0, 32);}
+          send_data(partLevel::control::enable, o->value(), 0xc8, n, 0, topLevel::insert::kitGroup);}
           xywh {400 0 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Padenabled);}
         }
@@ -268,7 +268,7 @@ class PartKitItem {: {public Fl_Group, private MiscFuncs}
                   synth->getGuiMaster()->partui->subeditbutton->deactivate();
           }
           synth->getGuiMaster()->partui->checkEngines();
-          send_data(partLevel::control::enable, o->value(), 0xc8, n, 1, 32);}
+          send_data(partLevel::control::enable, o->value(), 0xc8, n, 1, topLevel::insert::kitGroup);}
           xywh {470 0 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Psubenabled);}
         }
@@ -297,13 +297,13 @@ class PartKitItem {: {public Fl_Group, private MiscFuncs}
                   synth->getGuiMaster()->partui->padeditbutton->deactivate();
           }
           synth->getGuiMaster()->partui->checkEngines();
-          send_data(partLevel::control::enable, o->value(), 0xc8, n, 2, 32);}
+          send_data(partLevel::control::enable, o->value(), 0xc8, n, 2, topLevel::insert::kitGroup);}
           xywh {540 0 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Ppadenabled);}
         }
         Fl_Choice sendtoeffect {
           callback {//
-          send_data(partLevel::control::kitEffectNum, o->value(), 0xc0, n, 0xff, 32);}
+          send_data(partLevel::control::kitEffectNum, o->value(), 0xc0, n, 0xff, topLevel::insert::kitGroup);}
           xywh {615 0 45 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {o->add("OFF"); char nrstr[10]; for(int i = 0; i < NUM_PART_EFX; i++) {sprintf(nrstr,"FX%d",i+1);o->add(nrstr);};}
           code1 {o->value(part->kit[n].Psendtoparteffect+1);if (part->kit[n].Psendtoparteffect==127) o->value(0);}
@@ -326,7 +326,7 @@ class PartKitItem {: {public Fl_Group, private MiscFuncs}
         }
         else
             o->value(1);
-        send_data(partLevel::control::enable, o->value(), 0xc0, n, 0xff, 32);}
+        send_data(partLevel::control::enable, o->value(), 0xc0, n, 0xff, topLevel::insert::kitGroup);}
         xywh {30 0 20 15} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 4
         code0 {snprintf(label,10,"%d",n+1);o->label(label);}
         code1 {o->value(part->kit[n].Penabled);}
@@ -386,7 +386,7 @@ class PartKitItem {: {public Fl_Group, private MiscFuncs}
   }
 }
 
-class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {

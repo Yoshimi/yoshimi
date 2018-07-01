@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified June 2018
+    Modified July 2018
 */
 
 #include <iostream>
@@ -311,7 +311,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     string name;
 
     int switchNum = npart;
-    if (control == topLevel::control::errorMessage && insert !=9)
+    if (control == topLevel::control::errorMessage && insert != topLevel::insert::resonanceGraphInsert)
         switchNum = 256; // this is a bit hacky :(
 
     switch(switchNum)
@@ -851,7 +851,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         }
         default:
         {
-            if (npart < 64)
+            if (npart < NUM_MIDI_PARTS)
             {
                 switch(control)
                 {
@@ -959,7 +959,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                 getData->data.par2 = miscMsgPush(text); // pass it on to GUI
 
             jack_ringbuffer_write(returnsLoopback, (char*) getData->bytes, commandSize);
-            if (synth->getRuntime().showGui && npart == 232 && control == 48)
+            if (synth->getRuntime().showGui && npart == topLevel::section::scales && control == 48)
             {   // loading a tuning includes a name!
                 getData->data.control = 64;
                 getData->data.par2 = miscMsgPush(synth->microtonal.Pname);
@@ -1105,7 +1105,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     unsigned char insert = getData->data.insert;
     unsigned char insertParam = getData->data.parameter;
     unsigned char insertPar2 = getData->data.par2;
-    if (control == topLevel::control::errorMessage && insertParam != 9) // special case for simple messages
+    if (control == topLevel::control::errorMessage && insertParam != topLevel::insert::resonanceGraphInsert) // special case for simple messages
     {
         synth->getRuntime().Log(miscMsgPop(lrint(value)));
         synth->getRuntime().finishedCLI = true;
@@ -1176,7 +1176,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     else if (npart == topLevel::section::systemEffects || npart == topLevel::section::insertEffects)
         commandName = resolveEffects(getData);
 
-    else if ((kititem >= 0x80 && kititem != 0xff) || (control >= 64 && control <= 67 && kititem == 0xff))
+    else if ((kititem >= 0x80 && kititem != 0xff) || (control >= partLevel::control::effectNum && control <= partLevel::control::effectBypass && kititem == 0xff))
         commandName = resolveEffects(getData);
 
     else if (npart >= NUM_MIDI_PARTS)
@@ -1191,7 +1191,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
         commandName = "Invalid kit " + to_string(int(kititem) + 1);
     }
 
-    else if (kititem != 0 && engine != 0xff && control != 8 && part->kit[kititem].Penabled == false)
+    else if (kititem != 0 && engine != 0xff && control != partLevel::control::enable && part->kit[kititem].Penabled == false)
         commandName = "Part " + to_string(int(npart) + 1) + " Kit item " + to_string(int(kititem) + 1) + " not enabled";
 
     else if (kititem == 0xff || insert == topLevel::insert::kitGroup)
@@ -3797,51 +3797,41 @@ void InterChange::mediate()
 
 
 void InterChange::returnsDirect(int altData)
-{
+{ // these have all gone through a master fade down and mute
     CommandBlock putData;
     memset(&putData, 0xff, sizeof(putData));
+    putData.data.part = topLevel::section::main;
+    putData.data.parameter = topLevel::route::lowPriority;
 
     switch (altData & 0xff)
     {
         case 1:
             putData.data.control = 128;
             putData.data.type = 0xf0; // Stop
-            putData.data.part = topLevel::section::main;
-            putData.data.parameter = topLevel::route::lowPriority;
             break;
         case 2:
             putData.data.control = (altData >> 8) & 0xff; // master reset
             putData.data.type = altData >> 24;
-            putData.data.part = topLevel::section::main;
-            putData.data.parameter = topLevel::route::lowPriority;
             break;
         case 3:
             putData.data.control = 80; // patch set load
             putData.data.type = altData >> 24;
-            putData.data.part = topLevel::section::main;
-            putData.data.parameter = topLevel::route::lowPriority;
             putData.data.par2 = (altData >> 8) & 0xff;
             break;
         case 4:
             putData.data.control = 84; // vector load
             putData.data.type = altData >> 24;
-            putData.data.part = topLevel::section::main;
             putData.data.insert = (altData >> 16) & 0xff;
-            putData.data.parameter = topLevel::route::lowPriority;
             putData.data.par2 = (altData >> 8) & 0xff;
             break;
         case 5:
             putData.data.control = 92; // state load
             putData.data.type = altData >> 24;
-            putData.data.part = topLevel::section::main;
-            putData.data.parameter = topLevel::route::lowPriority;
             putData.data.par2 = (altData >> 8) & 0xff;
             break;
         case 6:
             putData.data.control = 88; // scales load
             putData.data.type = altData >> 24;
-            putData.data.part = topLevel::section::main;
-            putData.data.parameter = topLevel::route::lowPriority;
             putData.data.par2 = (altData >> 8) & 0xff;
         default:
             return;
@@ -3852,31 +3842,27 @@ void InterChange::returnsDirect(int altData)
 
 void InterChange::returns(CommandBlock *getData)
 {
-    unsigned char type = getData->data.type;// | 4; // back from synth
+    unsigned char type = getData->data.type; // back from synth
 
     if (type == 0xff)
-        return;
-    if (getData->data.parameter >= topLevel::route::lowPriority && getData->data.parameter < topLevel::route::adjustAndLoopback)
+        return; // no further action
+
+    if (getData->data.parameter < topLevel::route::lowPriority || getData->data.parameter >= topLevel::route::adjustAndLoopback)
     {
-        if (jack_ringbuffer_write_space(toCLI) >= commandSize)
-        jack_ringbuffer_write(toCLI, (char*) getData->bytes, commandSize); // this will redirect where needed.
-        return;
+        bool isCliOrGuiRedraw = type & 0x10; // separated out for clarity
+        bool isMidi = type & 8;
+        bool write = (type & 0x40) > 0;
+        bool isOKtoRedraw = (isCliOrGuiRedraw && write) || isMidi;
+
+        if (synth->guiMaster && isOKtoRedraw)
+        {
+            //cout << "writing to GUI" << endl;
+            if (jack_ringbuffer_write_space(toGUI) >= commandSize)
+                jack_ringbuffer_write(toGUI, (char*) getData->bytes, commandSize);
+            else
+                synth->getRuntime().Log("Unable to write to toGUI buffer");
+        }
     }
-
-    bool isCliOrGuiRedraw = type & 0x10; // separated out for clarity
-    bool isMidi = type & 8;
-    bool write = (type & 0x40) > 0;
-    bool isOKtoRedraw = (isCliOrGuiRedraw && write) || isMidi;
-
-    if (synth->guiMaster && isOKtoRedraw)
-    {
-        //cout << "writing to GUI" << endl;
-        if (jack_ringbuffer_write_space(toGUI) >= commandSize)
-            jack_ringbuffer_write(toGUI, (char*) getData->bytes, commandSize);
-        else
-            synth->getRuntime().Log("Unable to write to toGUI buffer");
-    }
-
     if (jack_ringbuffer_write_space(toCLI) >= commandSize)
         jack_ringbuffer_write(toCLI, (char*) getData->bytes, commandSize);
     else
@@ -3939,7 +3925,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     }
 //    float value = getData->data.value;
     unsigned char parameter = getData->data.parameter;
-    if ((parameter & topLevel::route::lowPriority) && parameter < topLevel::route::adjustAndLoopback)
+    if (parameter >= topLevel::route::lowPriority && parameter < topLevel::route::adjustAndLoopback)
         return true; // indirect transfer
 
     unsigned char type = getData->data.type;

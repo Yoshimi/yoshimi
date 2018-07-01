@@ -1,5 +1,8 @@
 yoshimi 1.5.8 M
 
+2018-7-1 Will
+* Caught more missing conversions :(
+
 2018-6-30 Will
 * Added some missing enum conversions in 'interchange'.
 * Implemented control routes as enums.

@@ -103,8 +103,8 @@ namespace topLevel // usage topLevel::section::vector
     };
 
     // the following critcally cannot be changed.
+    // they rely on 'parameter' being < 64
     enum route : unsigned char {
-        adjust = 64,
         lowPriority = 128,
         adjustAndLoopback = 192
     };
