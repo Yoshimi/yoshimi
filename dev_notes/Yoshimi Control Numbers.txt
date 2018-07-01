@@ -22,6 +22,7 @@ Y : any : 93 : 240 : 255 : 255 : 255 : 128 : msg No. : Save named state via misc
 Y : any : 94 : 240 : 255 : 255 : 255 : 128 + 0 to 63: msg No. : Export PadSynth samples to named prefix via miscMsg
 Y : any : 96 : 240 : 255 : 255 : 255 : 192 : 255 : Reset (clear all)
 Y : any : 97 : 240 : 255 : 255 : 255 : 192 : 255 : Reset including MIDI-learn
+Y : any : 100 : 240 : 255 : 255 : 255 : 128 : 255 : Open user guide in PDF reader
 Y : 1 to 31 : 104 : 240 : 255 : 255 : 255 : 128 : 255 : Create new numbered instance
 n : 1 to 31 : 105 : 240 : 255 : 255 : 255 : 128 : 255 : Close numbered instance
 Y : any : 128 : 240 : 255 : 255 : 255 : 255 : 255 : Stop

@@ -127,7 +127,7 @@ namespace topLevel // usage topLevel::section::vector
         resonanceGroup,
         resonanceGraphInsert,
         systemEffectSend = 16,
-        kitGroup = 32 // 20
+        kitGroup = 32
     };
 }
 
@@ -176,6 +176,56 @@ namespace configLevel // usage configLevel::control::oscillatorSize
         showLearnEditor,
         enableNRPNs,
         saveCurrentConfig = 80
+    };
+}
+
+namespace mainLevel // usage mainLevel::control::volume
+{
+    enum control : unsigned char {
+        volume = 0,
+        partNumber = 14,
+        availableParts,
+        detune = 32,
+        keyShift = 35,
+        soloType = 48,
+        soloCC,
+
+        addNamedRoot = 56,
+        delistRootId,
+        changeRootId,
+        exportBank,
+        importBank,
+        deleteBank,
+        //addEmptyBank,
+        //renameBank,
+        //swapBanks,
+        //importInstrument,
+        //deleteInstrument,
+
+        setCurrentRootBank = 73,
+        loadInstrument,
+        saveInstrument,
+        loadNamedInstrument = 78,
+        saveNamedInstrument,
+        loadNamedPatchset,
+        saveNamedPatchset,
+        loadNamedVector = 84,
+        saveNamedVector,
+        loadNamedScale = 88,
+        saveNamedScale,
+        loadNamedState = 92,
+        saveNamedState,
+        exportPadSynthSamples,
+
+        masterReset = 96,
+        masterResetAndMlearn,
+        openManualPDF = 100,
+        startInstance = 104,
+        stopInstance,
+        stopSound = 128,
+        readPartPeak = 200,
+        readMainLRpeak,
+        readMainLRrms
     };
 }
 
