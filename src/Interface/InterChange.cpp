@@ -53,7 +53,7 @@ extern SynthEngine *firstSynth;
 InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth),
     fromCLI(NULL),
-    toCLI(NULL),
+    decodeLoopback(NULL),
     fromGUI(NULL),
     toGUI(NULL),
     fromMIDI(NULL),
@@ -84,17 +84,17 @@ bool InterChange::Init()
     }
     jack_ringbuffer_reset(fromCLI);
 
-    if (!(toCLI = jack_ringbuffer_create(sizeof(commandSize) * 512)))
+    if (!(decodeLoopback = jack_ringbuffer_create(sizeof(commandSize) * 512)))
     {
-        synth->getRuntime().Log("InterChange failed to create 'toCLI' ringbuffer");
+        synth->getRuntime().Log("InterChange failed to create 'decodeLoopback' ringbuffer");
         goto bail_out;
     }
-    if (jack_ringbuffer_mlock(toCLI))
+    if (jack_ringbuffer_mlock(decodeLoopback))
     {
-        synth->getRuntime().Log("Failed to lock toCLI memory");
+        synth->getRuntime().Log("Failed to lock decodeLoopback memory");
         goto bail_out;
     }
-    jack_ringbuffer_reset(toCLI);
+    jack_ringbuffer_reset(decodeLoopback);
 
     if (!(fromGUI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
     {
@@ -159,10 +159,10 @@ bail_out:
         jack_ringbuffer_free(fromCLI);
         fromCLI = NULL;
     }
-    if (toCLI)
+    if (decodeLoopback)
     {
-        jack_ringbuffer_free(toCLI);
-        toCLI = NULL;
+        jack_ringbuffer_free(decodeLoopback);
+        decodeLoopback = NULL;
     }
     if (fromGUI)
     {
@@ -227,11 +227,11 @@ void *InterChange::sortResultsThread(void)
 
         CommandBlock getData;
         char *point;
-        while (jack_ringbuffer_read_space(synth->interchange.toCLI)  >= synth->interchange.commandSize)
+        while (jack_ringbuffer_read_space(synth->interchange.decodeLoopback)  >= synth->interchange.commandSize)
         {
             int toread = commandSize;
             point = (char*) &getData.bytes;
-            jack_ringbuffer_read(toCLI, point, toread);
+            jack_ringbuffer_read(decodeLoopback, point, toread);
             if(getData.data.part == topLevel::section::midiLearn) // special midi-learn - needs improving
                 synth->midilearn.generalOpps(getData.data.value, getData.data.type, getData.data.control, getData.data.part, getData.data.kit, getData.data.engine, getData.data.insert, getData.data.parameter, getData.data.par2);
             else if ((getData.data.parameter >= topLevel::route::lowPriority) && getData.data.parameter < 0xff)
@@ -246,7 +246,9 @@ void *InterChange::sortResultsThread(void)
          * but isolated from the main audio thread.
          */
 
-        //unsigned int point = flagsReadClear();
+        unsigned int flag = flagsReadClear();
+        if (flag < 0xffffffff)
+            returnsDirect(flag);
     }
     return NULL;
 }
@@ -262,10 +264,10 @@ InterChange::~InterChange()
         jack_ringbuffer_free(fromCLI);
         fromCLI = NULL;
     }
-    if (toCLI)
+    if (decodeLoopback)
     {
-        jack_ringbuffer_free(toCLI);
-        toCLI = NULL;
+        jack_ringbuffer_free(decodeLoopback);
+        decodeLoopback = NULL;
     }
     if (fromGUI)
     {
@@ -3796,7 +3798,7 @@ void InterChange::mediate()
 }
 
 
-void InterChange::returnsDirect(int altData)
+void InterChange::returnsDirect(unsigned int altData)
 { // these have all gone through a master fade down and mute
     CommandBlock putData;
     memset(&putData, 0xff, sizeof(putData));
@@ -3863,10 +3865,10 @@ void InterChange::returns(CommandBlock *getData)
                 synth->getRuntime().Log("Unable to write to toGUI buffer");
         }
     }
-    if (jack_ringbuffer_write_space(toCLI) >= commandSize)
-        jack_ringbuffer_write(toCLI, (char*) getData->bytes, commandSize);
+    if (jack_ringbuffer_write_space(decodeLoopback) >= commandSize)
+        jack_ringbuffer_write(decodeLoopback, (char*) getData->bytes, commandSize);
     else
-        synth->getRuntime().Log("Unable to write to toCLI buffer");
+        synth->getRuntime().Log("Unable to write to decodeLoopback buffer");
 }
 
 

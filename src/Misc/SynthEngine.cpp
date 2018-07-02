@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified June 2018
+    Modified July 2018
 */
 
 #define NOLOCKS
@@ -2143,7 +2143,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         {
             Mute();
             fadeLevel = 0; // just to be sure
-            interchange.returnsDirect(fadeAll);
+            interchange.flagsWrite(fadeAll);
             fadeAll = 0;
         }
     }

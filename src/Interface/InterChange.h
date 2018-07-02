@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified May 2018
+    Modified July 2018
 */
 
 #ifndef INTERCH_H
@@ -50,14 +50,14 @@ class InterChange : private MiscFuncs
         size_t commandSize = sizeof(commandData);
 
         jack_ringbuffer_t *fromCLI;
-        jack_ringbuffer_t *toCLI;
+        jack_ringbuffer_t *decodeLoopback;
         jack_ringbuffer_t *fromGUI;
         jack_ringbuffer_t *toGUI;
         jack_ringbuffer_t *fromMIDI;
         jack_ringbuffer_t *returnsLoopback;
 
         void mediate(void);
-        void returnsDirect(int altData);
+        void returnsDirect(unsigned int altData);
         void returns(CommandBlock *getData);
         void setpadparams(int point);
         void doClearPart(int npart);
