@@ -88,6 +88,9 @@
 #define MAX_PHASER_STAGES 12
 #define MAX_ALIENWAH_DELAY 100
 
+
+// enums must never resolve to more than 127
+
 namespace topLevel // usage topLevel::section::vector
 {
     enum section: unsigned char {
@@ -102,11 +105,19 @@ namespace topLevel // usage topLevel::section::vector
         config = 248 // F8
     };
 
-    // the following critcally cannot be changed.
+    // the following critically cannot be changed.
     // they rely on 'parameter' being < 64
     enum route : unsigned char {
         lowPriority = 128,
         adjustAndLoopback = 192
+    };
+
+    enum muted : unsigned char {
+        stopSound = 1,
+        masterReset,
+        patchSetLoad,
+        vectorLoad,
+        stateLoad
     };
 
     enum control : unsigned char {
@@ -127,7 +138,7 @@ namespace topLevel // usage topLevel::section::vector
         resonanceGroup,
         resonanceGraphInsert,
         systemEffectSend = 16,
-        kitGroup = 32
+        kitGroup = 32 // 20
     };
 }
 
@@ -176,56 +187,6 @@ namespace configLevel // usage configLevel::control::oscillatorSize
         showLearnEditor,
         enableNRPNs,
         saveCurrentConfig = 80
-    };
-}
-
-namespace mainLevel // usage mainLevel::control::volume
-{
-    enum control : unsigned char {
-        volume = 0,
-        partNumber = 14,
-        availableParts,
-        detune = 32,
-        keyShift = 35,
-        soloType = 48,
-        soloCC,
-
-        addNamedRoot = 56,
-        delistRootId,
-        changeRootId,
-        exportBank,
-        importBank,
-        deleteBank,
-        //addEmptyBank,
-        //renameBank,
-        //swapBanks,
-        //importInstrument,
-        //deleteInstrument,
-
-        setCurrentRootBank = 73,
-        loadInstrument,
-        saveInstrument,
-        loadNamedInstrument = 78,
-        saveNamedInstrument,
-        loadNamedPatchset,
-        saveNamedPatchset,
-        loadNamedVector = 84,
-        saveNamedVector,
-        loadNamedScale = 88,
-        saveNamedScale,
-        loadNamedState = 92,
-        saveNamedState,
-        exportPadSynthSamples,
-
-        masterReset = 96,
-        masterResetAndMlearn,
-        openManualPDF = 100,
-        startInstance = 104,
-        stopInstance,
-        stopSound = 128,
-        readPartPeak = 200,
-        readMainLRpeak,
-        readMainLRrms
     };
 }
 

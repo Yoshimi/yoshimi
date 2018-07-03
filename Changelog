@@ -1,14 +1,12 @@
 yoshimi 1.5.8 M
 
-2018-7-2 Will
-* Restored fade/mute/loopback to full isolation.
-  Had forgotten about this :(
-* Changed ring buffer 'toCLI' to 'decodeLoopback'.
-  Makes it more obvious what going on.
+2018-7-3 Will
+* Improved fade/mute/loopback isolation.
+* Added 'muted' enums.
+* Changed some names to improve clarity.
 
 2018-7-1 Will
 * Caught more missing conversions :(
-* Converted main controls to enums.
 
 2018-6-30 Will
 * Added some missing enum conversions in 'interchange'.
