@@ -4,6 +4,8 @@ yoshimi 1.5.8 M
 * Improved fade/mute/loopback isolation.
 * Added 'muted' enums.
 * Changed some names to improve clarity.
+* Restored lost main control conversions :(
+  Too many local branches?
 
 2018-7-1 Will
 * Caught more missing conversions :(

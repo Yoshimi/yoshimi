@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
-Modified June 2018
+Modified July 2018
 } {selected in_source in_header
 }
 
@@ -142,10 +142,10 @@ class VUMeter {
             int oy = y();
             int lx = w();
             int ly = h();
-            float dbl = rap2dB(fetchData(0, 201, 240, 0));
-            float dbr = rap2dB(fetchData(0, 201, 240, 1));
-            float rmsdbl = rap2dB(fetchData(0, 202, 240, 0));
-            float rmsdbr = rap2dB(fetchData(0, 202, 240, 1));
+            float dbl = rap2dB(fetchData(0, mainLevel::control::readMainLRpeak, topLevel::section::main, 0));
+            float dbr = rap2dB(fetchData(0, mainLevel::control::readMainLRpeak, topLevel::section::main, 1));
+            float rmsdbl = rap2dB(fetchData(0, mainLevel::control::readMainLRrms, topLevel::section::main, 0));
+            float rmsdbr = rap2dB(fetchData(0, mainLevel::control::readMainLRrms, topLevel::section::main, 1));
 
             clipped = clipped | (dbl > 0) | ((dbr > 0) << 1);
 
@@ -248,7 +248,7 @@ class VUMeter {
     int oy = y()+2;
     int lx = w()-4;
     int ly = h()-4;
-    float Vpeak = fetchData(0, 200, 240, npart + *plgroup);
+    float Vpeak = fetchData(0, mainLevel::control::readPartPeak, topLevel::section::main, npart + *plgroup);
     if (Vpeak < 0) // its a fake one
     {
         fl_rectf(ox, oy, lx, ly, 140, 140, 140);

@@ -318,7 +318,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
 
     switch(switchNum)
     {
-        case topLevel::section::vector: // vector
+        case topLevel::section::vector:
         {
             switch(control)
             {
@@ -354,7 +354,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
             guiTo = true;
             break;
         }
-        case topLevel::section::scales: // scales
+        case topLevel::section::scales:
         {
             switch(control)
             {
@@ -422,11 +422,11 @@ void InterChange::indirectTransfers(CommandBlock *getData)
             guiTo = true;
             break;
         }
-        case topLevel::section::main: // main
+        case topLevel::section::main:
         {
             switch (control)
             {
-                case 32: // master fine detune
+                case mainLevel::control::detune:
                 {
                     if (write)
                     {
@@ -437,7 +437,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         value = synth->microtonal.Pglobalfinedetune;
                     break;
                 }
-                case 35: // master key shift
+                case mainLevel::control::keyShift:
                 {
                     if (write)
                     {
@@ -449,7 +449,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     break;
                 }
 
-                case 59: // export bank
+                case mainLevel::control::exportBank:
                 {
                     unsigned int result = synth->bank.exportBank(text, kititem, value);
                     text = miscMsgPop(result & 0xff);
@@ -461,7 +461,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     break;
                 }
 
-                case 60: // import bank
+                case mainLevel::control::importBank:
                 {
                     unsigned int result = synth->bank.importBank(text, kititem, value);
                     text = miscMsgPop(result & 0xff);
@@ -472,7 +472,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     value = miscMsgPush(text);
                     break;
                 }
-                case 61: // delete bank and contents
+                case mainLevel::control::deleteBank:
                 {
                     unsigned int result = synth->bank.removebank(value, kititem);
                     text = miscMsgPop(result & 0xff);
@@ -483,7 +483,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     value = miscMsgPush(text);
                     break;
                 }
-                case 75: // bank instrument save
+                case mainLevel::control::saveInstrument:
                 {
                     if (kititem == 0xff)
                     {
@@ -513,7 +513,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     value = miscMsgPush(text);
                     break;
                 }
-                case 79: // named instrument save
+                case mainLevel::control::saveNamedInstrument:
                 {
                     bool ok = true;
                     int saveType = synth->getRuntime().instrumentFormat;
@@ -534,7 +534,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     value = miscMsgPush(text);
                     break;
                 }
-                case 80:
+                case mainLevel::control::loadNamedPatchset:
                     vectorClear(NUM_MIDI_CHANNELS);
                     if(synth->loadPatchSetAndUpdate(text))
                         text = "ed " + text;
@@ -542,14 +542,14 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
                     break;
-                case 81: // patch set save
+                case mainLevel::control::saveNamedPatchset:
                     if(synth->savePatchesXML(text))
                         text = "d " + text;
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
                     break;
-                case 84: // vector load
+                case mainLevel::control::loadNamedVector:
                     tmp = synth->loadVectorAndUpdate(insert, text);
                     if (tmp < 0xff)
                     {
@@ -560,7 +560,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
                     break;
-                case 85: // vector save
+                case mainLevel::control::saveNamedVector:
                 {
                     string oldname = synth->getRuntime().vectordata.Name[insert];
                     int pos = oldname.find("No Name");
@@ -580,21 +580,21 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     value = miscMsgPush(text);
                     break;
                 }
-                case 88: // scales load
+                case mainLevel::control::loadNamedScale:
                     if (synth->loadMicrotonal(text))
                         text = "ed " + text;
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
                     break;
-                case 89: // scales save
+                case mainLevel::control::saveNamedScale:
                     if (synth->saveMicrotonal(text))
                         text = "d " + text;
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
                     break;
-                case 92: // state load
+                case mainLevel::control::loadNamedState:
                     vectorClear(NUM_MIDI_CHANNELS);
                     if (synth->loadStateAndUpdate(text))
                         text = "ed " + text;
@@ -602,14 +602,14 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
                     break;
-                case 93: // state save
+                case mainLevel::control::saveNamedState:
                     if (synth->saveState(text))
                         text = "d " + text;
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
                     break;
-                case 94: // initialise PadSynth
+                case mainLevel::control::exportPadSynthSamples:
                     synth->partonoffWrite(npart, -1);
                     setpadparams(parameter | (kititem << 8));
                     if (synth->part[parameter & 0x3f]->kit[kititem].padpars->export2wav(text))
@@ -618,11 +618,11 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = " FAILED some samples " + text;
                     value = miscMsgPush(text);
                     break;
-                case 96: // master reset
-                case 97: // include MIDI-learn
+                case mainLevel::control::masterReset:
+                case mainLevel::control::masterResetAndMlearn:
                     synth->resetAll(control & 1);
                     break;
-                case 100: // display user guide
+                case mainLevel::control::openManualPDF: // display user guide
                 {
                     string manfile = synth->manualname();
                     unsigned int pos = manfile.rfind(".") + 1;
@@ -655,13 +655,13 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     value = miscMsgPush(text);
                     break;
                 }
-                case 104:
+                case mainLevel::control::startInstance:
                     if (value > 0 && value < 32)
                         value = mainCreateNewInstance(value, false);
                     else
                         value = mainCreateNewInstance(0, false);
                     break;
-                case 105:
+                case mainLevel::control::stopInstance:
                     text = to_string(value) + " ";
                     if (value < 0 || value >= 32)
                         text += "Out of range";
@@ -679,7 +679,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     value = miscMsgPush(text);
                     break;
 
-                case 128: // panic stop
+                case mainLevel::control::stopSound:
 #ifdef REPORT_NOTES_ON_OFF
                     // note test
                     synth->getRuntime().Log("note on sent " + to_string(synth->getRuntime().noteOnSent));
@@ -694,7 +694,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     break;
             }
             getData->data.parameter -= topLevel::route::lowPriority;
-            if (control != 104 && control != 105)
+            if (control != mainLevel::control::startInstance && control != mainLevel::control::stopInstance)
                 guiTo = true;
             break;
         }
@@ -779,7 +779,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
             getData->data.parameter -= topLevel::route::lowPriority;
             break;
         }
-        case topLevel::section::config: // config
+        case topLevel::section::config:
         {
             switch (control)
             {
@@ -823,7 +823,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = synth->getRuntime().alsaAudioDevice;
                     value = miscMsgPush(text);
                     break;
-                case configLevel::control::saveCurrentConfig: // save config
+                case configLevel::control::saveCurrentConfig:
                     if (write)
                     {
                         text = synth->getRuntime().ConfigFile;
@@ -878,7 +878,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         }
                         break;
 
-                    case partLevel::control::padsynthParameters: // set padsynth parameters
+                    case partLevel::control::padsynthParameters:
                         if (write)
                         {
                             setpadparams(npart | (kititem << 8));
@@ -886,7 +886,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         }
                         break;
 
-                    case partLevel::control::audioDestination: // audio destination
+                    case partLevel::control::audioDestination:
                         if (npart < synth->getRuntime().NumAvailableParts)
                         {
                             if (value & 2)
@@ -896,7 +896,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                             getData->data.parameter -= topLevel::route::lowPriority;
                         }
                         break;
-                    case partLevel::control::instrumentName: // part / kit item names
+                    case partLevel::control::instrumentName: // part or kit item names
                         if (parameter == topLevel::route::lowPriority)
                         {
                             if (write)
@@ -927,7 +927,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         getData->data.parameter -= topLevel::route::lowPriority;
                         value = miscMsgPush(text);
                         break;
-                    case partLevel::control::defaultInstrumentCopyright: // copyright info
+                    case partLevel::control::defaultInstrumentCopyright:
                         if (write)
                         {
                             string name = synth->getRuntime().ConfigDir + "/copyright.txt";
@@ -1856,7 +1856,7 @@ string InterChange::resolveMain(CommandBlock *getData)
 //    unsigned char par2 = getData->data.par2;
     string name;
     string contstr = "";
-    if (getData->data.part == topLevel::section::midiIn) // MIDI
+    if (getData->data.part == topLevel::section::midiIn)
     {
         switch (control)
         {
@@ -1877,26 +1877,26 @@ string InterChange::resolveMain(CommandBlock *getData)
 
     switch (control)
     {
-        case 0:
+        case mainLevel::control::volume:
             contstr = "Volume";
             break;
 
-        case 14:
+        case mainLevel::control::partNumber:
             showValue = false;
             contstr = "Part Number " + to_string(value_int + 1);
             break;
-        case 15:
+        case mainLevel::control::availableParts:
             contstr = "Available Parts";
             break;
 
-        case 32:
+        case mainLevel::control::detune:
             contstr = "Detune";
             break;
-        case 35:
+        case mainLevel::control::keyShift:
             contstr = "Key Shift";
             break;
 
-        case 48:
+        case mainLevel::control::soloType:
             showValue = false;
             contstr = "Chan 'solo' Switch - ";
             switch (value_int)
@@ -1918,7 +1918,7 @@ string InterChange::resolveMain(CommandBlock *getData)
                     break;
             }
             break;
-        case 49:
+        case mainLevel::control::soloCC:
             showValue = false;
             contstr = "Chan 'solo' Switch CC ";
             if (value_int > 127)
@@ -1926,114 +1926,114 @@ string InterChange::resolveMain(CommandBlock *getData)
             else
                 contstr += to_string(value_int);
             break;
-        case 59:
+        case mainLevel::control::exportBank:
             showValue = false;
             contstr = "Bank Export" + miscMsgPop(value_int);
             break;
-        case 60:
+        case mainLevel::control::importBank:
             showValue = false;
             contstr = "Bank Import" + miscMsgPop(value_int);
             break;
-        case 61:
+        case mainLevel::control::deleteBank:
             showValue = false;
             contstr = "Bank delete" + miscMsgPop(value_int);
             break;
-        case 75:
+        case mainLevel::control::saveInstrument:
             showValue = false;
             contstr = "Bank Slot Save" + miscMsgPop(value_int);
             break;
 
-        case 79:
+        case mainLevel::control::saveNamedInstrument:
             showValue = false;
             contstr = "Instrument Save" + miscMsgPop(value_int);
             break;
 
-        case 80:
+        case mainLevel::control::loadNamedPatchset:
             showValue = false;
             contstr = "Patchset Load" + miscMsgPop(value_int);
             break;
 
-        case 81:
+        case mainLevel::control::saveNamedPatchset:
             showValue = false;
             contstr = "Patchset Save" + miscMsgPop(value_int);
             break;
 
-        case 84:
+        case mainLevel::control::loadNamedVector:
             showValue = false;
             name = miscMsgPop(value_int);
             contstr = "Vector Load" + name;
             break;
 
-        case 85:
+        case mainLevel::control::saveNamedVector:
             showValue = false;
             name = miscMsgPop(value_int);
             contstr = "Vector Save" + name;
             break;
 
-        case 88:
+        case mainLevel::control::loadNamedScale:
             showValue = false;
             name = miscMsgPop(value_int);
             contstr = "Scale Load" + name;
             break;
 
-        case 89:
+        case mainLevel::control::saveNamedScale:
             showValue = false;
             name = miscMsgPop(value_int);
             contstr = "Scale Save" + name;
             break;
 
-        case 92:
+        case mainLevel::control::loadNamedState:
             showValue = false;
             name = miscMsgPop(value_int);
             contstr = "State Load" + name;
             break;
 
-        case 93:
+        case mainLevel::control::saveNamedState:
             showValue = false;
             contstr = "State Save" + miscMsgPop(value_int);
             break;
 
-        case 94:
+        case mainLevel::control::exportPadSynthSamples:
             showValue = false;
             contstr = "PadSynth Samples Save" + miscMsgPop(value_int);
             break;
 
-        case 96: // doMasterReset
+        case mainLevel::control::masterReset:
             showValue = false;
             contstr = "Reset All";
             break;
-        case 97:
+        case mainLevel::control::masterResetAndMlearn:
             showValue = false;
             contstr = "Reset All including MIDI-learn";
             break;
 
-        case 100:
+        case mainLevel::control::openManualPDF:
             showValue = false;
             contstr = "Open manual in PDF reader " + miscMsgPop(value_int);
             break;
 
-        case 104:
+        case mainLevel::control::startInstance:
             showValue = false;
             contstr = "Start new instance " + to_string(value_int);
             break;
-        case 105: // close instance
+        case mainLevel::control::stopInstance:
             showValue = false;
             contstr = "Close instance - " + miscMsgPop(value_int);
             break;
 
-        case 128:
+        case mainLevel::control::stopSound:
             showValue = false;
             contstr = "Sound Stopped";
             break;
 
-        case 200:
+        case mainLevel::control::readPartPeak:
             showValue = false;
             contstr = "Part " + to_string(int(kititem));
             if (value < 0.0f)
                 contstr += " silent ";
             contstr += (" peak level " + to_string(value));
             break;
-        case 201:
+        case mainLevel::control::readMainLRpeak:
             showValue = false;
             if(kititem == 1)
                 contstr = "Right";
@@ -2041,7 +2041,7 @@ string InterChange::resolveMain(CommandBlock *getData)
                 contstr = "Left";
             contstr += (" peak level " + to_string(value));
             break;
-        case 202:
+        case mainLevel::control::readMainLRrms:
             showValue = false;
             if(kititem == 1)
                 contstr = "Right";
@@ -4298,7 +4298,7 @@ void InterChange::commandVector(CommandBlock *getData)
                 {
                     case 0:
                     case 1:
-                    case 2:  // local to source
+                    case 2: // local to source
                         break;
                     case 3:
                         synth->vectorSet(127, chan, 0);
@@ -4838,7 +4838,7 @@ void InterChange::commandConfig(CommandBlock *getData)
                 }
             break;
 // midi
-        //case configLevel::control::eanableBankRootChange:
+        //case configLevel::control::enableBankRootChange:
             //break;
         case configLevel::control::bankRootCC:
             if (write)
@@ -4951,32 +4951,32 @@ void InterChange::commandMain(CommandBlock *getData)
 
     switch (control)
     {
-        case 0:
+        case mainLevel::control::volume:
             if (write)
                 synth->setPvolume(value);
             else
                 value = synth->Pvolume;
             break;
 
-        case 14:
+        case mainLevel::control::partNumber:
             if (write)
                 synth->getRuntime().currentPart = value_int;
             else
                 value = synth->getRuntime().currentPart;
             break;
-        case 15:
+        case mainLevel::control::availableParts:
             if ((write) && (value == 16 || value == 32 || value == 64))
                 synth->getRuntime().NumAvailableParts = value;
             else
                 value = synth->getRuntime().NumAvailableParts;
             break;
 
-        case 32: // done elsewhere
+        case mainLevel::control::detune: // done elsewhere
             break;
-        case 35: // done elsewhere
+        case mainLevel::control::keyShift: // done elsewhere
             break;
 
-        case 48: // solo mode
+        case mainLevel::control::soloType: // solo mode
             if (write && value_int <= 4)
             {
                 synth->getRuntime().channelSwitchType = value_int;
@@ -5002,7 +5002,7 @@ void InterChange::commandMain(CommandBlock *getData)
                 value = synth->getRuntime().channelSwitchType;
             }
             break;
-        case 49: // solo ch number
+        case mainLevel::control::soloCC:
             if (write && synth->getRuntime().channelSwitchType > 0)
                 synth->getRuntime().channelSwitchCC = value_int;
             else
@@ -5012,7 +5012,7 @@ void InterChange::commandMain(CommandBlock *getData)
             }
             break;
 
-        case 73: // set current root and bank
+        case mainLevel::control::setCurrentRootBank: // set current root and bank
             if (write)
             {
                 if (kititem < 0x80) // should test for success
@@ -5022,7 +5022,7 @@ void InterChange::commandMain(CommandBlock *getData)
             }
             break;
 
-        case 74: // load instrument from ID
+        case mainLevel::control::loadInstrument: // load instrument from ID
             /*
              * this is the lazy way to move all program changes
              * to the new MIDI method.
@@ -5035,7 +5035,7 @@ void InterChange::commandMain(CommandBlock *getData)
             getData->data.parameter = topLevel::route::lowPriority;
             getData->data.par2 = 0xff;
             break;
-        case 78: // load named instrument
+        case mainLevel::control::loadNamedInstrument: // load named instrument
             synth->partonoffLock(value_int & 0x3f, -1);
             // as above for named instruments :)
             getData->data.control = 8;
@@ -5045,58 +5045,58 @@ void InterChange::commandMain(CommandBlock *getData)
             getData->data.parameter = topLevel::route::lowPriority;
             break;
 
-        case 80:
+        case mainLevel::control::loadNamedPatchset:
             if (write && (parameter == topLevel::route::adjustAndLoopback))
             {
                 synth->allStop(topLevel::muted::patchSetLoad | (par2 << 8) | (type << 24));
                 getData->data.type = 0xff; // stop further action
             }
             break;
-        case 84:
+        case mainLevel::control::loadNamedVector:
             if (write && (parameter == topLevel::route::adjustAndLoopback))
             {
                 synth->allStop(topLevel::muted::vectorLoad | (par2 << 8) | (insert << 16) | (type << 24));
                 getData->data.type = 0xff; // stop further action
             }
             break;
-        case 85:
-            break; // done elsewhere
-        case 88: // done elsewhere
+        case mainLevel::control::saveNamedVector: // done elsewhere
             break;
-        case 89: // done elsewhere
+        case mainLevel::control::loadNamedScale: // done elsewhere
             break;
-        case 92:
+        case mainLevel::control::saveNamedScale: // done elsewhere
+            break;
+        case mainLevel::control::loadNamedState:
             if (write && (parameter == topLevel::route::adjustAndLoopback))
             {
                 synth->allStop(topLevel::muted::stateLoad | (par2 << 8) | (type << 24));
                 getData->data.type = 0xff; // stop further action
             }
             break;
-        case 93: // done elsewhere
+        case mainLevel::control::saveNamedState: // done elsewhere
             break;
-        case 96:
-        case 97: // including MIDI-learn
+        case mainLevel::control::masterReset:
+        case mainLevel::control::masterResetAndMlearn:
             if (write && (parameter == topLevel::route::adjustAndLoopback))
             {
                 synth->allStop(topLevel::muted::masterReset | (control << 8) | (type << 24));
                 getData->data.type = 0xff; // stop further action);
             }
             break;
-        case 104: // done elsewhere
+        case mainLevel::control::startInstance: // done elsewhere
             break;
-        case 105: // done elsewhere
+        case mainLevel::control::stopInstance: // done elsewhere
             break;
-        case 128:
+        case mainLevel::control::stopSound: // just stop
             if (write)
                 synth->allStop(topLevel::muted::stopSound);
             getData->data.type = 0xff; // stop further action);
             break;
 
-        case 200:
+        case mainLevel::control::readPartPeak:
             if (!write && kititem < NUM_MIDI_PARTS)
                 value = synth->VUdata.values.parts[kititem];
             break;
-        case 201:
+        case mainLevel::control::readMainLRpeak:
             if (!write)
             {
                 if (kititem == 1)
@@ -5105,7 +5105,7 @@ void InterChange::commandMain(CommandBlock *getData)
                     value = synth->VUdata.values.vuOutPeakL;
             }
             break;
-        case 202:
+        case mainLevel::control::readMainLRrms:
             if (!write)
             {
                 if (kititem == 1)
@@ -5750,7 +5750,7 @@ void InterChange::commandPart(CommandBlock *getData)
             ;
         case partLevel::control::resetAllControllers:
             if (write)
-                part->SetController(0x79,0); // C_resetallcontrollers
+                part->SetController(0x79,0);
             break;
     }
 
@@ -6349,7 +6349,6 @@ void InterChange::commandSub(CommandBlock *getData)
         return;
     }
 
-    //int k; // temp variable for detune
     switch (control)
     {
         case 0:
@@ -8123,16 +8122,16 @@ float InterChange::returnLimits(CommandBlock *getData)
     getData->data.type &= 0x3f; //  clear top bits
     getData->data.type |= 0x80; // default is integer & not learnable
 
-    if (npart == topLevel::section::config) // config limits
+    if (npart == topLevel::section::config)
         return synth->getConfigLimits(getData);
 
-    if (npart == topLevel::section::main) // main control limits
+    if (npart == topLevel::section::main)
         return synth->getLimits(getData);
 
-    if (npart == topLevel::section::scales) // microtonal limits
+    if (npart == topLevel::section::scales)
         return synth->microtonal.getLimits(getData);
 
-    if (npart == topLevel::section::vector) // vector limits
+    if (npart == topLevel::section::vector)
         return synth->getVectorLimits(getData);
 
     float min;
@@ -8214,7 +8213,7 @@ float InterChange::returnLimits(CommandBlock *getData)
             // we also use this for pad limits
             // as oscillator values identical
         }
-        if (insert == topLevel::insert::resonanceGroup) // resonance
+        if (insert == topLevel::insert::resonanceGroup)
         {
             if (control == 0) // a cheat!
             {
@@ -8268,7 +8267,7 @@ float InterChange::returnLimits(CommandBlock *getData)
             }
             return value;
         }
-        if (insert == topLevel::insert::LFOgroup && parameter <= 2) // LFO
+        if (insert == topLevel::insert::LFOgroup && parameter <= 2)
         {
             if (control == 0) // another cheat!
             {
