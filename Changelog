@@ -1,5 +1,9 @@
 yoshimi 1.5.8 M
 
+2018-7-5 Will
+* Separated common main/part controls.
+  Makes enums properly independent.
+
 2018-7-3 Will
 * Improved fade/mute/loopback isolation.
 * Added 'muted' enums.

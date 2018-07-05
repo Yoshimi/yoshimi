@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified June 2018
+    Modified July 2018
 */
 
 #include <iostream>
@@ -796,26 +796,7 @@ int CmdInterface::effects()
 }
 
 
-int CmdInterface::keyShift(int part)
-{
-    int cmdType = 0;
-    if (!isRead)
-        cmdType = 64;
-    if (!matchnMove(2, point, "shift"))
-        return todo_msg;
-    if (!isRead && point[0] == 0)
-            return value_msg;
-    int value = string2int(point);
-    if (value < MIN_KEY_SHIFT)
-        value = MIN_KEY_SHIFT;
-    else if(value > MAX_KEY_SHIFT)
-        value = MAX_KEY_SHIFT;
-    sendDirect(value, cmdType, partLevel::control::keyShift, part, 0xff, 0xff, 0xff, topLevel::route::lowPriority);
-    return done_msg;
-}
-
-
-int CmdInterface::volPanVel()
+int CmdInterface::partVolPanVel()
 {
     int reply = todo_msg;
     int cmdType = 0;
@@ -824,24 +805,18 @@ int CmdInterface::volPanVel()
     int cmd = -1;
 
     if (matchnMove(1, point, "volume"))
-        cmd = 0;
+        cmd = partLevel::control::volume;
     else if(matchnMove(1, point, "pan"))
-        cmd = 2;
+        cmd = partLevel::control::panning;
     else if (matchnMove(2, point, "velocity"))
-        cmd = 1;
+        cmd = partLevel::control::velocitySense;
     else if (matchnMove(2, point, "offset"))
-        cmd = 4;
-    switch (cmd)
-    {
-        case 0:
-        case 1:
-        case 2:
-        case 4:
-            if (!isRead && point[0] == 0)
-                return value_msg;
-            sendDirect(string2float(point), cmdType, cmd, npart);
-            reply = done_msg;
-    }
+        cmd = partLevel::control::velocityOffset;
+
+    if (!isRead && point[0] == 0)
+        return value_msg;
+    sendDirect(string2float(point), cmdType, cmd, npart);
+    reply = done_msg;
     return reply;
 }
 
@@ -1700,10 +1675,23 @@ int CmdInterface::commandPart(bool justSet)
         return done_msg;
     }
 
-    tmp = keyShift(npart);
-    if (tmp != todo_msg)
-        return tmp;
-    tmp = volPanVel();
+    int cmdType = 64;
+    if (isRead)
+        cmdType = 0;
+    
+    
+    if (matchnMove(2, point, "shift"))
+    {
+        if (!isRead && point[0] == 0)
+            return value_msg;
+        int value = string2int(point);
+        if (value < MIN_KEY_SHIFT)
+            value = MIN_KEY_SHIFT;
+        else if(value > MAX_KEY_SHIFT)
+            value = MAX_KEY_SHIFT;
+        sendDirect(value, cmdType, partLevel::control::keyShift, npart, 0xff, 0xff, 0xff, topLevel::route::lowPriority);
+    }
+    tmp = partVolPanVel();
     if(tmp != todo_msg)
         return tmp;
 
@@ -1891,7 +1879,6 @@ int CmdInterface::commandReadnSet()
 {
     Config &Runtime = synth->getRuntime();
     int reply = todo_msg;
-    int tmp;
     string name;
 
     if (matchnMove(2, point, "yoshimi"))
@@ -2026,28 +2013,36 @@ int CmdInterface::commandReadnSet()
             return value_msg;
     }
 
-    int cmdType = 0;
-    if (!isRead)
-        cmdType = 64;
+    int cmdType = 64;
+    if (isRead)
+        cmdType = 0;
 
     if (matchnMove(1, point, "volume"))
     {
         if (!isRead && point[0] == 0)
             return value_msg;
-        sendDirect(string2int127(point), cmdType, 0, topLevel::section::main);
+        sendDirect(string2int127(point), cmdType, mainLevel::control::volume, topLevel::section::main);
         return done_msg;
     }
     if (matchnMove(2, point, "detune"))
     {
         if (!isRead && point[0] == 0)
             return value_msg;
-        sendDirect(string2int127(point), cmdType, 32, topLevel::section::main, 0xff, 0xff, 0xff, topLevel::route::lowPriority);
+        sendDirect(string2int127(point), cmdType, mainLevel::control::detune, topLevel::section::main, 0xff, 0xff, 0xff, topLevel::route::lowPriority);
         return done_msg;
     }
 
-    tmp = keyShift(240);
-    if (tmp != todo_msg)
-        return tmp;
+    if (matchnMove(2, point, "shift"))
+    {
+        if (!isRead && point[0] == 0)
+            return value_msg;
+        int value = string2int(point);
+        if (value < MIN_KEY_SHIFT)
+            value = MIN_KEY_SHIFT;
+        else if(value > MAX_KEY_SHIFT)
+            value = MAX_KEY_SHIFT;
+        sendDirect(value, cmdType, mainLevel::control::keyShift, topLevel::section::main, 0xff, 0xff, 0xff, topLevel::route::lowPriority);
+    }
 
     if (matchnMove(2, point, "solo"))
     {

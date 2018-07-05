@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified May 2018
+    Modified July 2018
 */
 
 #ifndef CMDINTERFACE_H
@@ -49,8 +49,7 @@ class CmdInterface : private MiscFuncs
         void historyList(int listnum);
         int effectsList(bool presets = false);
         int effects();
-        int volPanVel();
-        int keyShift(int part);
+        int partVolPanVel();
         int commandList();
         int commandMlearn();
         int commandVector();
