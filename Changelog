@@ -1,5 +1,8 @@
 yoshimi 1.5.8 M
 
+2018-7-9 Wiil
+* Started conversion of Vectors.
+
 2018-7-5 Will
 * Separated common main/part controls.
   Makes enums properly independent.

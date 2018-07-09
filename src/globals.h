@@ -50,6 +50,7 @@
 #define MAX_RESONANCE_POINTS 256
 #define MAX_KEY_SHIFT 36
 #define MIN_KEY_SHIFT -36
+#define NO_MSG 255
 
 // GUI colours
 #define ADD_COLOUR 0xdfafbf00
@@ -69,7 +70,6 @@
 #define XML_HISTORY 8
 #define XML_VECTOR 9
 #define XML_MIDILEARN 10
-#define NO_MSG 255
 
 // these were previously (pointlessly) user configurable
 #define NUM_VOICES 8
@@ -91,6 +91,8 @@
 namespace topLevel // usage topLevel::section::vector
 {
     enum section: unsigned char {
+        part1 = 0,
+        part64 = 63,
         vector = 192, // CO
         midiLearn = 216, // D8
         midiIn,
@@ -184,6 +186,28 @@ namespace configLevel // usage configLevel::control::oscillatorSize
         showLearnEditor,
         enableNRPNs,
         saveCurrentConfig = 80
+    };
+}
+
+namespace vectorLevel // usage vectorLevel::control::name
+{
+    enum control : unsigned char {
+        name = 8,
+        Xcontroller = 16,
+        XleftInstrument,
+        XrightInstrument,
+        Xfeature0, // volume
+        Xfeature1, // default panning
+        Xfeature2, // default filter cutoff
+        Xfeature3, // default modulation
+        Ycontroller = 32,
+        YupInstrument,
+        YdownInstrument,
+        Yfeature0, // volume
+        Yfeature1, // default panning
+        Yfeature2, // default filter cutoff
+        Yfeature3, // default modulation
+        erase = 96
     };
 }
 

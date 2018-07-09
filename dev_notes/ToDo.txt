@@ -6,7 +6,7 @@ No issue at all if names changed from the CLI!
 
 Can go a long time before showing up :(
 
-Doesn't seem to happen with other MIDI sources, nor with V1.5.3
+Doesn't seem to happen with V1.5.3
  (part number follows instrument loads after this version)
 
 BUG! Multi instances produce jack errors if have been opened when main instance closed - been there since V 1.4.1 :(

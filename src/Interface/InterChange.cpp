@@ -1050,7 +1050,7 @@ float InterChange::readAllData(CommandBlock *getData)
      */
     CommandBlock tryData;
     unsigned char control = getData->data.control;
-    if (getData->data.part == topLevel::section::main && (control >=200 && control <= 202))
+    if (getData->data.part == topLevel::section::main && (control >= mainLevel::control::readPartPeak && control <= mainLevel::control::readMainLRrms))
     {
         commandSendReal(getData);
         synth->fetchMeterData();
@@ -1359,54 +1359,54 @@ string InterChange::resolveVector(CommandBlock *getData)
     string contstr = "";
     switch (control)
     {
-        case 0:
-            contstr = "Base Channel"; // local to source
-            break;
-        case 1:
-            contstr = "Options";
-            break;
-        case 8:
+        //case 0:
+            //contstr = "Base Channel"; // local to source
+            //break;
+        //case 1:
+            //contstr = "Options";
+            //break;
+        case vectorLevel::control::name:
             showValue = false;
             contstr = "Name " + miscMsgPop(value_int);
             break;
 
-        case 16:
+        case vectorLevel::control::Xcontroller:
             contstr = "Controller";
             break;
-        case 17:
+        case vectorLevel::control::XleftInstrument:
             contstr = "Left Instrument";
             break;
-        case 18:
+        case vectorLevel::control::XrightInstrument:
             contstr = "Right Instrument";
             break;
-        case 19:
-        case 35:
+        case vectorLevel::control::Xfeature0:
+        case vectorLevel::control::Yfeature0:
             contstr = "Feature 0";
             break;
-        case 20:
-        case 36:
+        case vectorLevel::control::Xfeature1:
+        case vectorLevel::control::Yfeature1:
             contstr = "Feature 1";
             break;
-        case 21:
-        case 37:
+        case vectorLevel::control::Xfeature2:
+        case vectorLevel::control::Yfeature2:
             contstr = "Feature 2 ";
             break;
-        case 22:
-        case 38:
+        case vectorLevel::control::Xfeature3:
+        case vectorLevel::control::Yfeature3:
             contstr = "Feature 3";
             break;
 
-        case 32:
+        case vectorLevel::control::Ycontroller:
             contstr = "Controller";
             break;
-        case 33:
+        case vectorLevel::control::YupInstrument:
             contstr = "Up Instrument";
             break;
-        case 34:
+        case vectorLevel::control::YdownInstrument:
             contstr = "Down Instrument";
             break;
 
-        case 96:
+        case vectorLevel::control::erase:
             showValue = false;
             if (chan > NUM_MIDI_CHANNELS)
                 contstr = "all channels";
@@ -4273,7 +4273,7 @@ void InterChange::commandVector(CommandBlock *getData)
 
     unsigned int features;
 
-    if (control == 96)
+    if (control == vectorLevel::control::erase)
     {
         vectorClear(chan);
         synth->setLastfileAdded(5, "");
@@ -4281,9 +4281,9 @@ void InterChange::commandVector(CommandBlock *getData)
     }
     if (write)
     {
-        if (control >= 19 && control <= 22)
+        if (control >= vectorLevel::control::Xfeature0 && control <= vectorLevel::control::Xfeature3)
             features = synth->getRuntime().vectordata.Xfeatures[chan];
-        else if (control >= 35 && control <= 38)
+        else if (control >= vectorLevel::control::Yfeature0 && control <= vectorLevel::control::Yfeature3)
             features = synth->getRuntime().vectordata.Yfeatures[chan];
     }
 
@@ -4311,10 +4311,10 @@ void InterChange::commandVector(CommandBlock *getData)
             }
             break;
 
-        case 8:
+        case vectorLevel::control::name:
             break; // handled elsewhere
 
-        case 16: // enable vector and set X CC
+        case vectorLevel::control::Xcontroller: // also enable vector
             if (write)
             {
                 if (value >= 14)
@@ -4330,7 +4330,7 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             }
             break;
-        case 17: // left instrument
+        case vectorLevel::control::XleftInstrument:
             if (write)
                 synth->vectorSet(4, chan, value);
             else
@@ -4338,7 +4338,7 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             }
             break;
-        case 18: // right instrument
+        case vectorLevel::control::XrightInstrument:
             if (write)
                 synth->vectorSet(5, chan, value);
             else
@@ -4346,8 +4346,8 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             }
             break;
-        case 19:
-        case 35: // volume feature
+        case vectorLevel::control::Xfeature0:
+        case vectorLevel::control::Yfeature0: // volume
             if (write)
                 if (value == 0)
                     bitClear(features, 0);
@@ -4358,8 +4358,8 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             }
             break;
-        case 20:
-        case 36: // panning feature
+        case vectorLevel::control::Xfeature1:
+        case vectorLevel::control::Yfeature1: // panning
             if (write)
             {
                 bitClear(features, 1);
@@ -4376,8 +4376,8 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             }
             break;
-        case 21:
-        case 37: // filter cutoff feature
+        case vectorLevel::control::Xfeature2:
+        case vectorLevel::control::Yfeature2: // filter cutoff
             if (write)
             {
                 bitClear(features, 2);
@@ -4394,8 +4394,8 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             }
             break;
-        case 22:
-        case 38: // modulation feature
+        case vectorLevel::control::Xfeature3:
+        case vectorLevel::control::Yfeature3: // modulation
             if (write)
             {
                 bitClear(features, 3);
@@ -4413,7 +4413,7 @@ void InterChange::commandVector(CommandBlock *getData)
             }
             break;
 
-        case 32: // enable Y and set CC
+        case vectorLevel::control::Ycontroller: // also enable Y
             if (write)
             {
                 if (value >= 14)
@@ -4429,7 +4429,7 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             }
             break;
-        case 33: // up instrument
+        case vectorLevel::control::YupInstrument:
             if (write)
                 synth->vectorSet(6, chan, value);
             else
@@ -4437,7 +4437,7 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             }
             break;
-        case 34: // down instrument
+        case vectorLevel::control::YdownInstrument:
             if (write)
                 synth->vectorSet(7, chan, value);
             else
@@ -4449,9 +4449,9 @@ void InterChange::commandVector(CommandBlock *getData)
 
     if (write)
     {
-        if (control >= 19 && control <= 22)
+        if (control >= vectorLevel::control::Xfeature0 && control <= vectorLevel::control::Xfeature3)
             synth->getRuntime().vectordata.Xfeatures[chan] = features;
-        else if (control >= 35 && control <= 38)
+        else if (control >= vectorLevel::control::Yfeature0 && control <= vectorLevel::control::Yfeature3)
             synth->getRuntime().vectordata.Yfeatures[chan] = features;
     }
 }

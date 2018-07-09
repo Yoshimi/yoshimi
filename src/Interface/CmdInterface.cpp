@@ -1077,7 +1077,7 @@ int CmdInterface::commandVector()
 
     if (matchWord(1, point, "off"))
     {
-        sendDirect(0, 64, 96, topLevel::section::vector, 0xff, 0xff, chan);
+        sendDirect(0, 64, vectorLevel::control::erase, topLevel::section::vector, 0xff, 0xff, chan);
         axis = 0;
         bitClear(level, vect_lev);
         return done_msg;
@@ -1105,13 +1105,13 @@ int CmdInterface::commandVector()
         tmp = string2int(point);
         if (axis == 0)
         {
-            sendDirect(tmp, 192, 16, topLevel::section::vector, 0xff, 0xff, chan);
+            sendDirect(tmp, 192, vectorLevel::control::Xcontroller, topLevel::section::vector, 0xff, 0xff, chan);
             bitSet(level, vect_lev);
             return done_msg;
         }
         if (Runtime.vectordata.Enabled[chan])
         {
-            sendDirect(tmp, 192, 32, topLevel::section::vector, 0xff, 0xff, chan);
+            sendDirect(tmp, 192, vectorLevel::control::Ycontroller, topLevel::section::vector, 0xff, 0xff, chan);
             return done_msg;
         }
     }
@@ -1140,7 +1140,7 @@ int CmdInterface::commandVector()
             if (name <= "!")
                 return value_msg;
         }
-        sendDirect(0, type, 8, topLevel::section::vector, 0xff, 0xff, chan, topLevel::route::lowPriority, miscMsgPush(name));
+        sendDirect(0, type, vectorLevel::control::name, topLevel::section::vector, 0xff, 0xff, chan, topLevel::route::lowPriority, miscMsgPush(name));
         return done_msg;
     }
 
@@ -1148,8 +1148,8 @@ int CmdInterface::commandVector()
     {
         if (point[0] == 0)
             return value_msg;
-        int feat = string2int(point);
-        if (feat < 1 || feat > 4)
+        int feat = string2int(point) - 1;
+        if (feat < 0 || feat > 3)
             return range_msg;
         point = skipChars(point);
         int enable = 0;
@@ -1157,7 +1157,7 @@ int CmdInterface::commandVector()
             enable = 1;
         else if (feat > 1 && matchnMove(1, point, "reverse"))
             enable = 2;
-        sendDirect(enable, 192, 18 + (axis * 16) + feat , topLevel::section::vector, 0xff, 0xff, chan);
+        sendDirect(enable, 192, vectorLevel::control::Xfeature0 + (axis * (vectorLevel::control::Ycontroller - vectorLevel::control::Xcontroller)) + feat , topLevel::section::vector, 0xff, 0xff, chan);
         return done_msg;
     }
 
@@ -1177,7 +1177,7 @@ int CmdInterface::commandVector()
         else
             return opp_msg;
         tmp = string2int(point);
-        sendDirect(tmp, 64, 17 + hand + (axis * 16), topLevel::section::vector, 0xff, 0xff, chan);
+        sendDirect(tmp, 64, vectorLevel::control::XleftInstrument + hand + (axis * (vectorLevel::control::Ycontroller - vectorLevel::control::Xcontroller)), topLevel::section::vector, 0xff, 0xff, chan);
         return done_msg;
     }
 
