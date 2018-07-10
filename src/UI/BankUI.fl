@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code.
 
-Modified June 2018
+Modified July 2018
 } {selected in_source in_header
 }
 
@@ -859,7 +859,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         string thisname =  bank->getname(slot);
         if ((what == 1 || what == 3) && mode == 1 && !bank->emptyslot(slot))
         {
-            send_data(74, curPart, 0xf0, 240, 255, 255, 255, 255, slot);
+            send_data(74, synth->getGuiMaster()->activePart, 0xf0, 240, 255, 255, 255, 255, slot);
             // Reads from slot
             if (what == 3)
                 instrumentuiwindow->hide();

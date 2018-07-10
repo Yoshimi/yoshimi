@@ -17,7 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-Modified April 2018
+Modified July 2018
 } {selected in_source in_header
 }
 
@@ -151,7 +151,7 @@ class VectorUI {: {private MiscFuncs}
         Fl_Button XL {
           callback {//
           Fl_Button *a = o; o = a; // suppress warning
-          synth->getGuiMaster()->npart = BaseChan;
+          synth->getGuiMaster()->activePart = BaseChan;
           bankui->Show();
           //send_data(17, o->value(), 0xf0);}
           tooltip {Part corresponding to joystick 'left' position} xywh {20 53 160 20} box UP_FRAME color 51 labelsize 12 align 64
@@ -171,7 +171,7 @@ class VectorUI {: {private MiscFuncs}
         Fl_Button XR {
           callback {//
           Fl_Button *a = o; o = a; // suppress warning
-          synth->getGuiMaster()->npart = BaseChan + NUM_MIDI_CHANNELS;
+          synth->getGuiMaster()->activePart = BaseChan + NUM_MIDI_CHANNELS;
           bankui->Show();
           //send_data(18, o->value(), 0xf0);}
           tooltip {Part corresponding to joystick 'right' position} xywh {20 115 160 20} box UP_FRAME color 51 labelsize 12 align 64
@@ -333,7 +333,7 @@ class VectorUI {: {private MiscFuncs}
         Fl_Button YU {
           callback {//
           Fl_Button *a = o; o = a; // suppress warning
-          synth->getGuiMaster()->npart = BaseChan + NUM_MIDI_CHANNELS * 2;
+          synth->getGuiMaster()->activePart = BaseChan + NUM_MIDI_CHANNELS * 2;
           bankui->Show();
           //send_data(33, o->value(), 0xc0);}
           tooltip {Part corresponding to joystick 'up' position} xywh {20 163 160 20} box UP_FRAME color 51 labelsize 12 align 64
@@ -353,7 +353,7 @@ class VectorUI {: {private MiscFuncs}
         Fl_Button YD {
           callback {//
           Fl_Button *a = o; o = a; // suppress warning
-          synth->getGuiMaster()->npart = BaseChan + NUM_MIDI_CHANNELS * 3;
+          synth->getGuiMaster()->activePart = BaseChan + NUM_MIDI_CHANNELS * 3;
           bankui->Show();
           //send_data(34, o->value(), 0xc0);}
           tooltip {Part corresponding to joystick 'down'position} xywh {20 225 160 20} box UP_FRAME color 51 labelsize 12 align 64

@@ -508,7 +508,10 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
           int event = Fl::event_button();
           const char *tmp;
           if (event == FL_LEFT_MOUSE)
+          {
+              synth->getGuiMaster()->activePart = npart;
               bankui->Show();
+          }
           else if (event == FL_RIGHT_MOUSE)
           {
               string oldName =  part->Pname;

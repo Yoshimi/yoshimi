@@ -1,6 +1,10 @@
 yoshimi 1.5.8 M
 
-2018-7-9 Wiil
+2018-7-10 Will
+* Corrected GUI Vector/Part/Mixer/Bank anomaly.
+  This whole area needs a *major* refactor :(
+
+2018-7-9 Will
 * Started conversion of Vectors.
 
 2018-7-5 Will

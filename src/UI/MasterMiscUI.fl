@@ -461,6 +461,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
         Fl_Button buttontop {
           label {  }
           callback {//
+    synth->getGuiMaster()->activePart = npart + *plgroup;
     bankui->cbwig->value(npart + 1 + *plgroup);
     bankui->cbwig->do_callback();
     bankui->Show();}

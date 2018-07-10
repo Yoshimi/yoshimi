@@ -2537,6 +2537,8 @@ ZynAddSubFX}
   }
   decl {int npart;} {public local
   }
+  decl {int activePart;} {public local
+  }
   decl {int nsyseff;} {private local
   }
   decl {int partmax;} {
