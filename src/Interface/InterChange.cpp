@@ -406,8 +406,8 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         getData->data.kit = synth->microtonal.PAnote;
                         getData->data.engine = synth->microtonal.Pfirstkey;
                         getData->data.insert = synth->microtonal.Pmiddlenote;
-                        getData->data.parameter = synth->microtonal.Plastkey;
-
+                        getData->data.parameter |= synth->microtonal.Plastkey; // need to keep top bit
+                        synth->setAllPartMaps();
                     }
                     break;
 

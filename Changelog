@@ -5,6 +5,7 @@ yoshimi 1.5.8 M
 * Updated docs and images.
 * BugFix: scales CLI keymap entry wrong controls.
 * Started enum conversion of scales.
+* BugFix: scales CLI keymap not updating GUI.
 
 2018-7-10 Will
 * Corrected GUI Vector/Part/Mixer/Bank anomaly.
