@@ -153,6 +153,7 @@ class PADnoteParameters : public Presets
         float setPbandwidth(int Pbandwidth); // returns the BandWidth in cents
         float getNhr(int n); // gets the n-th overtone position relatively to N harmonic
 
+        bool Papplied;
         void applyparameters(void);
         bool export2wav(std::string basefilename);
 

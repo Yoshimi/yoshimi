@@ -147,6 +147,7 @@ void PADnoteParameters::defaults(void)
     FilterEnvelope->defaults();
     FilterLfo->defaults();
     deletesamples();
+    Papplied = false;
 }
 
 
@@ -666,6 +667,7 @@ void PADnoteParameters::applyparameters()
     // delete the additional samples that might exists and are not useful
     for (int i = samplemax; i < PAD_MAX_SAMPLES; ++i)
         deletesample(i);
+    Papplied = true;
 }
 
 

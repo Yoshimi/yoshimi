@@ -1,5 +1,5 @@
 Y/n : Range : Control : Part : Kit : Engine : Insert : Parameter : Par 2 : Function / Description
-
+Y implemented, L Midi learnable
 Top Level
 YL : 0 to 127 : 0 : 240 : 255 : 255 : 255 : 255 : 255 : Volume
 Y : 0 to 63 : 14 : 240 : 255 : 255 : 255 : 255 : 255 : Part number
@@ -100,7 +100,7 @@ Y : any : 65 : 232 : 255 : 255 : 255 : 128 : msg No. : Set comment
 
 Y : any : 96 : 232 : 255 : 255 : 255 : 255 : : Clear all settings
 
-Vector control window
+Vector control
  :  :  : Base Channel
 n : 0 to 15 : 0 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Was Base channel Now does nothing
 n : 0 to 4 : 1 : 192 : 255 : 255 : 0 to 15 : 255 : 255 : Options - Load, Save, Recent, Clear Chan, Clear All
@@ -186,17 +186,17 @@ YL : 0 to 127 : 194 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Expression (CC 11)
 YL : 0 to 127 : 197 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Q (CC 71)
 YL : 0 to 127 : 198 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Cutoff (CC 74)
 YL : 0 to 127 : 199 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Master Bandwidth (CC 75)
-Yy : any : 222 : 0 to 63 : 255 : 255 : 255 : 128 : msg No. : Set/Read part's instrument name
-Yy : any : 223 : 0 to 63 : 255 : 255 : 255 : 128/129 : 255 : Load/Save default instrument copyright
+Y : any : 222 : 0 to 63 : 255 : 255 : 255 : 128 : msg No. : Set/Read part's instrument name
+Y : any : 223 : 0 to 63 : 255 : 255 : 255 : 128/129 : 255 : Load/Save default instrument copyright
 Y : any : 224 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Reset all controllers (for this part)
 
-Instrument edit window
+Instrument edit
 Y : 0/1 : 8 : 0 to 63 : 255 : 0 : 255 : 255 : 255 : Enable Addsynth
 Y : 0/1 : 8 : 0 to 63 : 255 : 1 : 255 : 255 : 255 : Enable SubSynth
 Y : 0/1 : 8 : 0 to 63 : 255 : 2 : 255 : 255 : 255 : Enable PadSynth
 Y : 0 to 50 : 48 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Humanise
 
-Kit edit window
+Kit edit
 Y : 0/1 : 8 : 0 to 63 : 0 to 15 : 0 to 2 : 32 : 255 : 255 : Kit item engine enable - Addsynth, Subsynth, Padsynth
 Y : 0/1 : 8 : 0 to 63 : 1 to 15 : 255 : 32 : 255 : 255 : Kit item enable (can't disable kit item 0)
 Y : 0/1 : 9 : 0 to 63 : 0 to 15 : 255 : 32 : 255 : 255 : Kit item mute
@@ -211,9 +211,9 @@ Y : 0 to 3 : 24 : 0 to 63 : 0 to 15 : 255 : 32 : 255 : 255 : Effect number to us
 Y : 0/1 : 57 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Drum mode
 Y : 0 to 3 : 58 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Mode – Off, Multi, Single, Crossfade
 
-Yy : any : 222 : 0 to 63 : 0 to 15 : 255 : 32 : 129 : msg No. : Set/Read part's kit item name
+Y : any : 222 : 0 to 63 : 0 to 15 : 255 : 32 : 129 : msg No. : Set/Read part's kit item name
 
-AddSynth main window
+AddSynth main
 YL : 0 to 127 : 0 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Volume
 YL : 0 to 127 : 1 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Velocity sensitivity
 YL : 0 to 127 : 2 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Panning
@@ -233,7 +233,7 @@ YL : 0 to 127 : 122 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Punch duration
 YL : 0 to 127 : 123 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Punch Stretch
 YL : 0 to 127 : 124 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Punch velocity sensing
 
-AddSynth voice window – voice numbers 0 to 7
+AddSynth voice – voice numbers 0 to 7
 YL : 0 to 127 : 0 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Volume
 YL : 0 to 127 : 1 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Velocity sensitivity
 YL : 0 to 127 : 2 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Panning
@@ -290,7 +290,7 @@ YL : -64 to 63 : 136 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Vo
 Y : -1 to 6 : 137 : 0 to 63 : 0 to 15 : 128 + (1 to 7) : 255 : 255 : 255 : External voice oscillator (from lower numbered voices) - off = -1
 Y : 0 to 2 : 138 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Sound type – Oscillator, White noise, Pink noise
 
-SubSynth window
+SubSynth
 YL : 0 to 127 : 0 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Volume
 YL : 0 to 127 : 1 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Velocity sensitivity
 YL : 0 to 127 : 2 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Panning
@@ -326,7 +326,7 @@ Harmonics insert
 YL : 0 to 127 : 0 to 63 : 0 to 63 : 0 to 15 : 1 : 6 : 255 : 255 : Point (control) amplitude
 YL : 0 to 127 : 0 to 63 : 0 to 63 : 0 to 15 : 1 : 7 : 255 : 255 : Point (control) bandwidth
 
-PadSynth Window
+PadSynth
 YL : 0 to 127 : 0 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Volume
 YL : 0 to 127 : 1 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Velocity sensitivity
 YL : 0 to 127 : 2 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Panning
@@ -378,7 +378,7 @@ YL : 0 to 127 : 122 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Punch duration
 YL : 0 to 127 : 123 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Punch Stretch
 YL : 0 to 127 : 124 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Punch velocity sensing
 
-Oscillators window
+Add/Pad Oscillators
  :  :  :  :  : See Note > :  :  :  : Engine is 128 + (0 to 7) for AddSynth voice
  :  :  :  :  :  :  :  :  : Engine is 192 + (0 to 7) for AddSynth voice modulator
  :  :  :  :  :  :  :  :  : Engine is 2 for PadSynth
@@ -426,7 +426,7 @@ Harmonics insert
 YL : 0 to 127 : 0 to 127 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 6 : 255 : 255 : Point (control) amplitude
 YL : 0 to 127 : 0 to 127 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 7 : 255 : 255 : Point (control) phase
 
-Resonance window
+Resonance
 Y : 1 to 90 : 0 : 0 to 63 : 0 to 15 : 0 or 2 : 8 : 255 : 255 : Max dB
 YL : 0 to 127 : 1 : 0 to 63 : 0 to 15 : 0 or 2 : 8 : 255 : 255 : Centre frequency
 YL : 0 to 127 : 2 : 0 to 63 : 0 to 15 : 0 or 2 : 8 : 255 : 255 : Octave

@@ -884,6 +884,8 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                             setpadparams(npart | (kititem << 8));
                             getData->data.parameter -= topLevel::route::lowPriority;
                         }
+                        else
+                            value = synth->part[npart]->kit[kititem].padpars->Papplied;
                         break;
 
                     case partLevel::control::audioDestination:

@@ -39,8 +39,6 @@ flagsWrite()
 flagsRead()
 flagsReadClear()
 
-These functions provide a link from the realtime thread, to a low priority one. Currently defined values are:
+These functions provide a link from the realtime thread, to a low priority one.
 
-(none)
-
-This has been replaced by other methods and is now being kept for temporary test purposes.
+This is now used for all the commands that need a fade-down and system mute. The flag is set with the required command at the end of the audio thread.

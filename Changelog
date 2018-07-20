@@ -1,5 +1,9 @@
 yoshimi 1.5.8 M
 
+2018-7-20 Will
+* Completed vector GUI enum updates.
+* Updated docs and images.
+
 2018-7-10 Will
 * Corrected GUI Vector/Part/Mixer/Bank anomaly.
   This whole area needs a *major* refactor :(

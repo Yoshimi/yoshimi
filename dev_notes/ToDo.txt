@@ -19,8 +19,6 @@ Find out why reporting errors in 'Bank' is very slow.
 
 Realtime subnote
 
-Place manual search *entirely* within SynthEngine.cpp
-
 Zero-cross for note off.
 
 Add 'Lock AddSynth Oscillator' checkbox to settings.
