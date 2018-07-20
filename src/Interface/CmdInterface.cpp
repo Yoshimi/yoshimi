@@ -1516,25 +1516,25 @@ int CmdInterface::commandScale()
     string name;
 
     if (matchnMove(1, point, "tuning"))
-        command = 0x20;
+        command = scalesLevel::control::tuning;
     else if (matchnMove(1, point, "keymap"))
-        command = 0x21;
+        command = scalesLevel::control::keyboardMap;
     else if (matchnMove(2, point, "name"))
-        command = 0x40;
+        command = scalesLevel::control::name;
     else if (matchnMove(2, point, "description"))
-        command = 0x41;
+        command = scalesLevel::control::comment;
 
-    if (command >= 0x20 && command <= 0x41)
+    if (command >= scalesLevel::control::tuning && command <= scalesLevel::control::comment)
     {
-        if (isRead && command < 0x40)
+        if (isRead && command <= scalesLevel::control::importKbm)
         {
             Runtime.Log("Write only - use list");
             return done_msg;
         }
-        if (command <= 0x21)
+        if (command <= scalesLevel::control::keyboardMap)
         {
             if (matchnMove(3, point, "import"))
-                command += 0x10;
+                command += (scalesLevel::control::importKbm - scalesLevel::control::keyboardMap);
         }
         name = (string)point;
         if (name == "")
@@ -1548,46 +1548,46 @@ int CmdInterface::commandScale()
         int max = 127;
         if (matchnMove(2, point, "frequency"))
         {
-            command = 0;
+            command = scalesLevel::control::Afrequency;
             min = 1;
             max = 20000;
             type &= 0x7f; // float
         }
         else if(matchnMove(2, point, "note"))
-            command = 1;
+            command = scalesLevel::control::Anote;
         else if(matchnMove(1, point, "invert"))
         {
-            command = 2;
+            command = scalesLevel::control::invertScale;
             max = 1;
         }
         else if(matchnMove(2, point, "center"))
-            command = 3;
+            command = scalesLevel::control::keyCentre;
         else if(matchnMove(2, point, "shift"))
         {
-            command = 4;
+            command = scalesLevel::control::scaleShift;
             min = -63;
             max = 64;
         }
         else if(matchnMove(2, point, "scale"))
         {
-            command = 8;
+            command = scalesLevel::control::enableMicrotonal;
             max = 1;
         }
         else if(matchnMove(2, point, "mapping"))
         {
-            command = 16;
+            command = scalesLevel::control::enableKeyMap;
             max = 1;
         }
         else if(matchnMove(2, point, "first"))
-            command = 17;
+            command = scalesLevel::control::lowKey;
         else if(matchnMove(2, point, "middle"))
-            command = 18;
+            command = scalesLevel::control::middleKey;
         else if(matchnMove(1, point, "last"))
-            command = 19;
+            command = scalesLevel::control::highKey;
         else if(matchnMove(3, point, "CLEar"))
         {
             point -=1; // sneaky way to force a zero :)
-            command = 96;
+            command = scalesLevel::control::clearAll;
         }
         else
             return todo_msg;
@@ -1678,8 +1678,8 @@ int CmdInterface::commandPart(bool justSet)
     int cmdType = 64;
     if (isRead)
         cmdType = 0;
-    
-    
+
+
     if (matchnMove(2, point, "shift"))
     {
         if (!isRead && point[0] == 0)

@@ -211,6 +211,30 @@ namespace vectorLevel // usage vectorLevel::control::name
     };
 }
 
+namespace scalesLevel // usage scalesLevel::control::Afrequency
+{
+    enum control : unsigned char {
+        Afrequency = 0,
+        Anote,
+        invertScale,
+        keyCentre,
+        scaleShift,
+        enableMicrotonal = 8,
+        enableKeyMap = 16,
+        lowKey,
+        middleKey,
+        highKey,
+        tuning = 32,
+        keyboardMap,
+        importScl = 48,
+        importKbm,
+        name = 64,
+        comment,
+        retune = 80, // GUI only
+        clearAll = 96
+    };
+}
+
 namespace mainLevel // usage mainLevel::control::volume
 {
     enum control : unsigned char {
