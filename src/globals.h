@@ -386,7 +386,8 @@ namespace partLevel // usage partLevel::control::volume
         addMod5,
         addMod6,
         addMod7,
-        addMod8};
+        addMod8
+    };
 }
 
 namespace subSynthLevel // usage subSynthLevel::control::volume
@@ -412,7 +413,7 @@ namespace subSynthLevel // usage subSynthLevel::control::volume
 
         overtoneParameter1 = 48,
         overtoneParameter2,
-        overtoneForeceHarmonics,
+        overtoneForceHarmonics,
         overtonePosition, // Harmonic, ShiftU, ShiftL, PowerU, PowerL, Sine, Power, Shift
 
         enableFilter = 64,
@@ -421,6 +422,59 @@ namespace subSynthLevel // usage subSynthLevel::control::volume
         startPosition, // Zero, Random, Maximum
         clearHarmonics = 96,
         stereo = 112
+    };
+}
+
+namespace padSynthLevel // usage padSynthLevel::control::volume
+{
+    enum control : unsigned char {
+        volume = 0,
+        velocitySense,
+        panning,
+
+        bandwidth = 16,
+        bandwidthScale,
+        spectrumMode = 19, // Bandwidth, Discrete, Continuous
+
+        detuneFrequency = 32,
+        equalTemperVariation,
+        baseFrequencyAs440Hz,
+        octave,
+        detuneType, // L35 cents, L10 cents, E100 cents, E1200 cents
+        coarseDetune,
+        pitchBendAdjustment,
+        pitchBendOffset,
+
+        overtoneParameter1 = 48,
+        overtoneParameter2,
+        overtoneForceHarmonics,
+        overtonePosition, // Harmonic, ShiftU, ShiftL, PowerU, PowerL, Sine, Power, Shift
+
+        baseWidth = 64,
+        frequencyMultiplier,
+        modulatorStretch,
+        modulatorFrequency,
+        size,
+        baseType, // Gauss, Square, Double Exponential
+        harmonicSidebands, // Full, Upper half, Lower half
+        spectralWidth,
+        spectralAmplitude,
+        amplitudeMultiplier, // Off, Gauss, Sine, Flat
+        amplitudeMode, // Sum, Multiply, Divide 1, Divide 2
+        autoscale,
+
+        harmonicBase = 80, // C-2, G-2, C-3, G-3, C-4, G-4, C-5, G-5, G-6
+        samplesPerOctave, // 0.5, 1, 2, 3, 4, 6, 12
+        numberOfOctaves, // 1 - 8
+        sampleSize, // 16k, 32k, 64k, 128k, 256k, 512k, 1M
+        applyChanges = 104,
+        stereo = 112,
+
+        dePop = 120,
+        punchStrength,
+        punchDuration,
+        punchStretch,
+        punchVelocity
     };
 }
 

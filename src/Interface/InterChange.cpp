@@ -2790,7 +2790,7 @@ string InterChange::resolveSub(CommandBlock *getData)
         case subSynthLevel::control::overtoneParameter2:
             contstr = "Par 2";
             break;
-        case subSynthLevel::control::overtoneForeceHarmonics:
+        case subSynthLevel::control::overtoneForceHarmonics:
             contstr = "Force H";
             break;
         case subSynthLevel::control::overtonePosition:
@@ -2839,22 +2839,22 @@ string InterChange::resolvePad(CommandBlock *getData)
     string name = "";
     switch (control & 0x70)
     {
-        case 0:
+        case padSynthLevel::control::volume:
             name = " Amplitude ";
             break;
-        case 16:
+        case padSynthLevel::control::bandwidth:
             name = " Bandwidth ";
             break;
-        case 32:
+        case padSynthLevel::control::detuneFrequency:
             name = " Frequency ";
             break;
-        case 48:
+        case padSynthLevel::control::overtoneParameter1:
             name = " Overtones ";
             break;
-        case 64:
+        case padSynthLevel::control::baseWidth:
             name = " Harmonic Base ";
             break;
-        case 80:
+        case padSynthLevel::control::harmonicBase:
             name = " Harmonic Samples ";
             break;
     }
@@ -2862,136 +2862,136 @@ string InterChange::resolvePad(CommandBlock *getData)
     string contstr = "";
     switch (control)
     {
-        case 0:
+        case padSynthLevel::control::volume:
             contstr = "Volume";
             break;
-        case 1:
+        case padSynthLevel::control::velocitySense:
             contstr = "Vel Sens";
             break;
-        case 2:
+        case padSynthLevel::control::panning:
             contstr = "Panning";
             break;
 
-        case 16:
+        case padSynthLevel::control::bandwidth:
             contstr = "Bandwidth";
             break;
-        case 17:
+        case padSynthLevel::control::bandwidthScale:
             contstr = "Band Scale";
             break;
-        case 19:
+        case padSynthLevel::control::spectrumMode:
             contstr = "Spect Mode";
             break;
 
-        case 32:
+        case padSynthLevel::control::detuneFrequency:
             contstr = "Detune";
             break;
-        case 33:
+        case padSynthLevel::control::equalTemperVariation:
             contstr = "Eq T";
             break;
-        case 34:
+        case padSynthLevel::control::baseFrequencyAs440Hz:
             contstr = "440Hz";
             break;
-        case 35:
+        case padSynthLevel::control::octave:
             contstr = "Octave";
             break;
-        case 36:
+        case padSynthLevel::control::detuneType:
             contstr = "Det type";
             break;
-        case 37:
+        case padSynthLevel::control::coarseDetune:
             contstr = "Coarse Det";
             break;
 
-        case 38:
+        case padSynthLevel::control::pitchBendAdjustment:
             contstr = "Bend Adj";
             break;
-        case 39:
+        case padSynthLevel::control::pitchBendOffset:
             contstr = "Offset Hz";
             break;
 
-        case 48:
+        case padSynthLevel::control::overtoneParameter1:
             contstr = "Overt Par 1";
             break;
-        case 49:
+        case padSynthLevel::control::overtoneParameter2:
             contstr = "Overt Par 2";
             break;
-        case 50:
+        case padSynthLevel::control::overtoneForceHarmonics:
             contstr = "Force H";
             break;
-        case 51:
+        case padSynthLevel::control::overtonePosition:
             contstr = "Position";
             break;
 
-        case 64:
+        case padSynthLevel::control::baseWidth:
             contstr = "Width";
             break;
-        case 65:
+        case padSynthLevel::control::frequencyMultiplier:
             contstr = "Freq Mult";
             break;
-        case 66:
+        case padSynthLevel::control::modulatorStretch:
             contstr = "Str";
             break;
-        case 67:
-            contstr = "S freq";
+        case padSynthLevel::control::modulatorFrequency:
+            contstr = "Freq";
             break;
-        case 68:
+        case padSynthLevel::control::size:
             contstr = "Size";
             break;
-        case 69:
+        case padSynthLevel::control::baseType:
             contstr = "Type";
             break;
-        case 70:
+        case padSynthLevel::control::harmonicSidebands:
             contstr = "Halves";
             break;
-        case 71:
+        case padSynthLevel::control::spectralWidth:
             contstr = "Amp Par 1";
             break;
-        case 72:
+        case padSynthLevel::control::spectralAmplitude:
             contstr = "Amp Par 2";
             break;
-        case 73:
+        case padSynthLevel::control::amplitudeMultiplier:
             contstr = "Amp Mult";
             break;
-        case 74:
+        case padSynthLevel::control::amplitudeMode:
             contstr = "Amp Mode";
             break;
-        case 75:
+        case padSynthLevel::control::autoscale:
             contstr = "Autoscale";
             break;
 
-        case 80:
+        case padSynthLevel::control::harmonicBase:
             contstr = "Base";
             break;
-        case 81:
+        case padSynthLevel::control::samplesPerOctave:
             contstr = "samp/Oct";
             break;
-        case 82:
+        case padSynthLevel::control::numberOfOctaves:
             contstr = "Num Oct";
             break;
-        case 83:
+        case padSynthLevel::control::sampleSize:
             break;
 
-        case 104:// set pad parameters
+        case padSynthLevel::control::applyChanges:
             showValue = false;
             contstr = "Changes Applied";
             break;
 
-        case 112:
+        case padSynthLevel::control::stereo:
             contstr = "Stereo";
             break;
 
-        case 120:
+        case padSynthLevel::control::dePop:
             contstr = "De Pop";
             break;
-        case 121:
+        case padSynthLevel::control::punchStrength:
             contstr = "Punch Strngth";
             break;
-        case 122:
+        case padSynthLevel::control::punchDuration:
             contstr = "Punch Time";
             break;
-        case 123:
+        case padSynthLevel::control::punchStretch:
             contstr = "Punch Strtch";
             break;
-        case 124:
+        case padSynthLevel::control::punchVelocity:
             contstr = "Punch Vel";
             break;
 
@@ -3002,7 +3002,7 @@ string InterChange::resolvePad(CommandBlock *getData)
 
     string isPad = "";
 
-    if (write && ((control >= 16 && control <= 19) || (control >= 48 && control <= 83)))
+    if (write && ((control >= padSynthLevel::control::bandwidth && control <= padSynthLevel::control::spectrumMode) || (control >= padSynthLevel::control::overtoneParameter1 && control <= padSynthLevel::control::sampleSize)))
         isPad += " - Need to Apply";
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " PadSynth " + name + contstr + isPad);
 }
@@ -6493,7 +6493,7 @@ void InterChange::commandSub(CommandBlock *getData)
             else
                 value = pars->POvertoneSpread.par2;
             break;
-        case subSynthLevel::control::overtoneForeceHarmonics:
+        case subSynthLevel::control::overtoneForceHarmonics:
             if (write)
             {
                 pars->POvertoneSpread.par3 = value;
@@ -6581,64 +6581,63 @@ void InterChange::commandPad(CommandBlock *getData)
 
     switch (control)
     {
-        case 0:
-
+        case padSynthLevel::control::volume:
             if (write)
                 pars->PVolume = value;
             else
                 value = pars->PVolume;
             break;
-        case 1:
+        case padSynthLevel::control::velocitySense:
             if (write)
                 pars->PAmpVelocityScaleFunction = value;
             else
                 value = pars->PAmpVelocityScaleFunction;
             break;
-        case 2:
+        case padSynthLevel::control::panning:
             if (write)
                 pars->setPan(value);
             else
                 value = pars->PPanning;
             break;
 
-        case 16:
+        case padSynthLevel::control::bandwidth:
             if (write)
                 pars->setPbandwidth(value_int);
             else
                 value = pars->Pbandwidth;
             break;
-        case 17:
+        case padSynthLevel::control::bandwidthScale:
             if (write)
                 pars->Pbwscale = value_int;
             else
                 value = pars->Pbwscale;
             break;
-        case 19:
+        case padSynthLevel::control::spectrumMode:
             if (write)
                 pars->Pmode = value_int;
             else
                 value = pars->Pmode;
             break;
 
-        case 32:
+        case padSynthLevel::control::detuneFrequency:
             if (write)
                 pars->PDetune = value_int + 8192;
             else
                 value = pars->PDetune - 8192;
             break;
-        case 33:
+        case padSynthLevel::control::equalTemperVariation:
             if (write)
                 pars->PfixedfreqET = value_int;
             else
                 value = pars->PfixedfreqET;
             break;
-        case 34:
+        case padSynthLevel::control::baseFrequencyAs440Hz:
             if (write)
                 pars->Pfixedfreq = value_bool;
             else
                 value = pars->Pfixedfreq;
             break;
-        case 35:
+        case padSynthLevel::control::octave:
             if (write)
             {
                 int tmp = value;
@@ -6654,13 +6653,13 @@ void InterChange::commandPad(CommandBlock *getData)
                 value = tmp;
             }
             break;
-        case 36:
+        case padSynthLevel::control::detuneType:
             if (write)
                  pars->PDetuneType = value_int + 1;
             else
                 value =  pars->PDetuneType - 1;
             break;
-        case 37:
+        case padSynthLevel::control::coarseDetune:
             if (write)
             {
                 int tmp = value;
@@ -6677,143 +6676,143 @@ void InterChange::commandPad(CommandBlock *getData)
             }
             break;
 
-        case 38:
+        case padSynthLevel::control::pitchBendAdjustment:
             if (write)
                 pars->PBendAdjust = value_int;
             else
                 value = pars->PBendAdjust;
             break;
-        case 39:
+        case padSynthLevel::control::pitchBendOffset:
             if (write)
                 pars->POffsetHz = value_int;
             else
                 value = pars->POffsetHz;
             break;
 
-        case 48:
+        case padSynthLevel::control::overtoneParameter1:
             if (write)
                 pars->Phrpos.par1 = value_int;
             else
                 value = pars->Phrpos.par1;
             break;
-        case 49:
+        case padSynthLevel::control::overtoneParameter2:
             if (write)
                 pars->Phrpos.par2 = value_int;
             else
                 value = pars->Phrpos.par2;
             break;
-        case 50:
+        case padSynthLevel::control::overtoneForceHarmonics:
             if (write)
                 pars->Phrpos.par3 = value_int;
             else
                 value = pars->Phrpos.par3;
             break;
-        case 51:
+        case padSynthLevel::control::overtonePosition:
             if (write)
                 pars->Phrpos.type = value_int;
             else
                 value = pars->Phrpos.type;
             break;
 
-        case 64:
+        case padSynthLevel::control::baseWidth:
             if (write)
                 pars->Php.base.par1 = value_int;
             else
                 value = pars->Php.base.par1;
             break;
-        case 65:;
+        case padSynthLevel::control::frequencyMultiplier:
             if (write)
                 pars->Php.freqmult = value_int;
             else
                 value = pars->Php.freqmult;
             break;
-        case 66:
+        case padSynthLevel::control::modulatorStretch:
             if (write)
                 pars->Php.modulator.par1 = value_int;
             else
                 value = pars->Php.modulator.par1;
             break;
-        case 67:
+        case padSynthLevel::control::modulatorFrequency:
             if (write)
                 pars->Php.modulator.freq = value_int;
             else
                 value = pars->Php.modulator.freq;
             break;
-        case 68:
+        case padSynthLevel::control::size:
             if (write)
                 pars->Php.width = value_int;
             else
                 value = pars->Php.width;
             break;
-        case 69:
+        case padSynthLevel::control::baseType:
             if (write)
                 pars->Php.base.type = value;
             else
                 value = pars->Php.base.type;
             break;
-        case 70:
+        case padSynthLevel::control::harmonicSidebands:
             if (write)
                  pars->Php.onehalf = value;
             else
                 value = pars->Php.onehalf;
             break;
-        case 71:
+        case padSynthLevel::control::spectralWidth:
             if (write)
                 pars->Php.amp.par1 = value_int;
             else
                 value = pars->Php.amp.par1;
             break;
-        case 72:
+        case padSynthLevel::control::spectralAmplitude:
             if (write)
                 pars->Php.amp.par2 = value_int;
             else
                 value = pars->Php.amp.par2;
             break;
-        case 73:
+        case padSynthLevel::control::amplitudeMultiplier:
             if (write)
                 pars->Php.amp.type = value;
             else
                 value = pars->Php.amp.type;
             break;
-        case 74:
+        case padSynthLevel::control::amplitudeMode:
             if (write)
                 pars->Php.amp.mode = value;
             else
                 value = pars->Php.amp.mode;
             break;
-        case 75:
+        case padSynthLevel::control::autoscale:
             if (write)
                 pars->Php.autoscale = value_bool;
             else
                 value = pars->Php.autoscale;
             break;
 
-        case 80:
+        case padSynthLevel::control::harmonicBase:
             if (write)
                 pars->Pquality.basenote = value_int;
             else
                 value = pars->Pquality.basenote;
             break;
-        case 81:
+        case padSynthLevel::control::samplesPerOctave:
             if (write)
                 pars->Pquality.smpoct = value_int;
             else
                 value = pars->Pquality.smpoct;
             break;
-        case 82:
+        case padSynthLevel::control::numberOfOctaves:
             if (write)
                 pars->Pquality.oct = value_int;
             else
                 value = pars->Pquality.oct;
             break;
-        case 83:
+        case padSynthLevel::control::sampleSize:
             if (write)
                 pars->Pquality.samplesize = value_int;
             else
                 value = pars->Pquality.samplesize;
             break;
 
-        case 104: // set pad parameters
+        case padSynthLevel::control::applyChanges:
             if (write)
             {
                 synth->partonoffWrite(npart, -1);
@@ -6821,7 +6820,7 @@ void InterChange::commandPad(CommandBlock *getData)
             }
             break;
 
-        case 112:
+        case padSynthLevel::control::stereo:
             if (write)
                 pars->PStereo = value_bool;
             else
@@ -6830,31 +6829,31 @@ void InterChange::commandPad(CommandBlock *getData)
             }
             break;
 
-        case 120:
+        case padSynthLevel::control::dePop:
             if (write)
                 pars->Fadein_adjustment = value_int;
             else
                 value = pars->Fadein_adjustment;
             break;
-        case 121:
+        case padSynthLevel::control::punchStrength:
             if (write)
                 pars->PPunchStrength = value_int;
             else
                 value = pars->PPunchStrength;
             break;
-        case 122:
+        case padSynthLevel::control::punchDuration:
             if (write)
                 pars->PPunchTime = value_int;
             else
                 value = pars->PPunchTime;
             break;
-        case 123:
+        case padSynthLevel::control::punchStretch:
             if (write)
                 pars->PPunchStretch = value_int;
             else
                 value = pars->PPunchStretch;
             break;
-        case 124:
+        case padSynthLevel::control::punchVelocity:
             if (write)
                 pars->PPunchVelocitySensing = value_int;
             else

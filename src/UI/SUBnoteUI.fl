@@ -618,7 +618,7 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
         Fl_Dial spreadpar3 {
           label ForceH
           callback {//
-          send_data (subSynthLevel::control::overtoneForeceHarmonics, o->value(), 0xc8);}
+          send_data (subSynthLevel::control::overtoneForceHarmonics, o->value(), 0xc8);}
           tooltip {Move towards closest harmonic} xywh {680 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par3);}
           code1 {o->init(0);}
@@ -788,7 +788,7 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
             spreadpar2->value((unsigned int) value);
             break;
 
-        case subSynthLevel::control::overtoneForeceHarmonics:
+        case subSynthLevel::control::overtoneForceHarmonics:
             spreadpar3->value((unsigned int) value);
             break;
 
