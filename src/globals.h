@@ -319,6 +319,7 @@ namespace partLevel // usage partLevel::control::volume
         defaultInstrument = 96,
         padsynthParameters = 104,
         audioDestination = 120,
+
     // start of controllers
         volumeRange = 128,
         volumeEnable,
@@ -345,6 +346,7 @@ namespace partLevel // usage partLevel::control::volume
         proportionalPortamentoDepth,
         receivePortamento = 168,
     // end of controllers
+
     // start of midi controls
         midiModWheel = 192,
         midiBreath,
@@ -355,6 +357,7 @@ namespace partLevel // usage partLevel::control::volume
         midiFilterCutoff,
         midiBandwidth,
     // end of midi controls
+
         instrumentCopyright = 220,
         instrumentComments,
         instrumentName,
@@ -366,6 +369,7 @@ namespace partLevel // usage partLevel::control::volume
         addSynth = 0,
         subSynth,
         padSynth,
+
     // addVoice and addMod must be consecutive
         addVoice1 = 128,
         addVoice2,
@@ -384,6 +388,42 @@ namespace partLevel // usage partLevel::control::volume
         addMod7,
         addMod8};
 }
+
+namespace subSynthLevel // usage subSynthLevel::control::volume
+{
+    enum control : unsigned char {
+        volume = 0,
+        velocitySense,
+        panning,
+
+        bandwidth = 16,
+        bandwidthScale,
+        enableBandwidthEnvelope,
+
+        detuneFrequency = 32,
+        equalTemperVariation,
+        baseFrequencyAs440Hz,
+        octave,
+        detuneType, // L35 cents, L10 cents, E100 cents, E1200 cents
+        coarseDetune,
+        pitchBendAdjustment,
+        pitchBendOffset,
+        enableFrequencyEnvelope = 40,
+
+        overtoneParameter1 = 48,
+        overtoneParameter2,
+        overtoneForeceHarmonics,
+        overtonePosition, // Harmonic, ShiftU, ShiftL, PowerU, PowerL, Sine, Power, Shift
+
+        enableFilter = 64,
+        filterStages = 80,
+        magType, // Linear, -40dB, -60dB, -80dB, -100dB
+        startPosition, // Zero, Random, Maximum
+        clearHarmonics = 96,
+        stereo = 112
+    };
+}
+
 
 union CommandBlock{
     struct{

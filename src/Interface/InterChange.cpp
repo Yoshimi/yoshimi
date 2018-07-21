@@ -2716,19 +2716,19 @@ string InterChange::resolveSub(CommandBlock *getData)
     string name = "";
     switch (control & 0x70)
     {
-        case 0:
+        case subSynthLevel::control::volume:
             name = " Amplitude ";
             break;
-        case 16:
+        case subSynthLevel::control::bandwidth:
             name = " Bandwidth ";
             break;
-        case 32:
+        case subSynthLevel::control::detuneFrequency:
             name = " Frequency ";
             break;
-        case 48:
+        case subSynthLevel::control::overtoneParameter1:
             name = " Overtones ";
             break;
-        case 64:
+        case subSynthLevel::control::enableFilter:
             name = " Filter ";
             break;
     }
@@ -2736,86 +2736,86 @@ string InterChange::resolveSub(CommandBlock *getData)
     string contstr = "";
     switch (control)
     {
-        case 0:
+        case subSynthLevel::control::volume:
             contstr = "Volume";
             break;
-        case 1:
+        case subSynthLevel::control::velocitySense:
             contstr = "Vel Sens";
             break;
-        case 2:
+        case subSynthLevel::control::panning:
             contstr = "Panning";
             break;
 
-        case 16:
+        case subSynthLevel::control::bandwidth:
             contstr = "";
             break;
-        case 17:
+        case subSynthLevel::control::bandwidthScale:
             contstr = "Band Scale";
             break;
-        case 18:
+        case subSynthLevel::control::enableBandwidthEnvelope:
             contstr = "Env Enab";
             break;
 
-        case 32:
+        case subSynthLevel::control::detuneFrequency:
             contstr = "Detune";
             break;
-        case 33:
+        case subSynthLevel::control::equalTemperVariation:
             contstr = "Eq T";
             break;
-        case 34:
+        case subSynthLevel::control::baseFrequencyAs440Hz:
             contstr = "440Hz";
             break;
-        case 35:
+        case subSynthLevel::control::octave:
             contstr = "Octave";
             break;
-        case 36:
+        case subSynthLevel::control::detuneType:
             contstr = "Det type";
             break;
-        case 37:
+        case subSynthLevel::control::coarseDetune:
             contstr = "Coarse Det";
             break;
-        case 38:
+        case subSynthLevel::control::pitchBendAdjustment:
             contstr = "Bend Adj";
             break;
-        case 39:
+        case subSynthLevel::control::pitchBendOffset:
             contstr = "Offset Hz";
             break;
-        case 40:
+        case subSynthLevel::control::enableFrequencyEnvelope:
             contstr = "Env Enab";
             break;
 
-        case 48:
+        case subSynthLevel::control::overtoneParameter1:
             contstr = "Par 1";
             break;
-        case 49:
+        case subSynthLevel::control::overtoneParameter2:
             contstr = "Par 2";
             break;
-        case 50:
+        case subSynthLevel::control::overtoneForeceHarmonics:
             contstr = "Force H";
             break;
-        case 51:
+        case subSynthLevel::control::overtonePosition:
             contstr = "Position";
             break;
 
-        case 64:
+        case subSynthLevel::control::enableFilter:
             contstr = "Enable";
             break;
 
-        case 80:
+        case subSynthLevel::control::filterStages:
             contstr = "Filt Stages";
             break;
-        case 81:
+        case subSynthLevel::control::magType:
             contstr = "Mag Type";
             break;
-        case 82:
+        case subSynthLevel::control::startPosition:
             contstr = "Start";
             break;
 
-        case 96:
+        case subSynthLevel::control::clearHarmonics:
             contstr = "Clear Harmonics";
             break;
 
-        case 112:
+        case subSynthLevel::control::stereo:
             contstr = "Stereo";
             break;
 
@@ -6353,63 +6353,63 @@ void InterChange::commandSub(CommandBlock *getData)
 
     switch (control)
     {
-        case 0:
+        case subSynthLevel::control::volume:
             if (write)
                 pars->PVolume = value;
             else
                 value = pars->PVolume;
             break;
-        case 1:
+        case subSynthLevel::control::velocitySense:
             if (write)
                 pars->PAmpVelocityScaleFunction = value;
             else
                 value = pars->PAmpVelocityScaleFunction;
             break;
-        case 2:
+        case subSynthLevel::control::panning:
             if (write)
                 pars->setPan(value);
             else
                 value = pars->PPanning;
             break;
 
-        case 16:
+        case subSynthLevel::control::bandwidth:
             if (write)
                 pars->Pbandwidth = value;
             else
                 value = pars->Pbandwidth;
             break;
-        case 17:
+        case subSynthLevel::control::bandwidthScale:
             if (write)
                 pars->Pbwscale = value + 64;
             else
                 value = pars->Pbwscale - 64;
             break;
-        case 18:
+        case subSynthLevel::control::enableBandwidthEnvelope:
             if (write)
                 pars->PBandWidthEnvelopeEnabled = value_bool;
             else
                 value = pars->PBandWidthEnvelopeEnabled;
             break;
 
-        case 32:
+        case subSynthLevel::control::detuneFrequency:
             if (write)
                 pars->PDetune = value + 8192;
             else
                 value = pars->PDetune - 8192;
             break;
-        case 33:
+        case subSynthLevel::control::equalTemperVariation:
             if (write)
                 pars->PfixedfreqET = value;
             else
                 value = pars->PfixedfreqET;
             break;
-        case 34:
+        case subSynthLevel::control::baseFrequencyAs440Hz:
             if (write)
                 pars->Pfixedfreq = value_bool;
             else
                 value = pars->Pfixedfreq;
             break;
-        case 35:
+        case subSynthLevel::control::octave:
         {
             int k;
             if (write)
@@ -6428,13 +6428,13 @@ void InterChange::commandSub(CommandBlock *getData)
             }
             break;
         }
-        case 36:
+        case subSynthLevel::control::detuneType:
             if (write)
                 pars->PDetuneType = value_int + 1;
             else
                 value = pars->PDetuneType;
             break;
-        case 37:
+        case subSynthLevel::control::coarseDetune:
         {
             int k;
             if (write)
@@ -6454,28 +6454,28 @@ void InterChange::commandSub(CommandBlock *getData)
             break;
         }
 
-        case 38:
+        case subSynthLevel::control::pitchBendAdjustment:
             if (write)
                 pars->PBendAdjust = value;
             else
                 value = pars->PBendAdjust;
             break;
 
-        case 39:
+        case subSynthLevel::control::pitchBendOffset:
             if (write)
                 pars->POffsetHz = value;
             else
                 value = pars->POffsetHz;
             break;
 
-        case 40:
+        case subSynthLevel::control::enableFrequencyEnvelope:
             if (write)
                 pars->PFreqEnvelopeEnabled = value_bool;
             else
                 value = pars->PFreqEnvelopeEnabled;
             break;
 
-        case 48:
+        case subSynthLevel::control::overtoneParameter1:
             if (write)
             {
                 pars->POvertoneSpread.par1 = value;
@@ -6484,7 +6484,7 @@ void InterChange::commandSub(CommandBlock *getData)
             else
                 value = pars->POvertoneSpread.par1;
             break;
-        case 49:
+        case subSynthLevel::control::overtoneParameter2:
             if (write)
             {
                 pars->POvertoneSpread.par2 = value;
@@ -6493,7 +6493,7 @@ void InterChange::commandSub(CommandBlock *getData)
             else
                 value = pars->POvertoneSpread.par2;
             break;
-        case 50:
+        case subSynthLevel::control::overtoneForeceHarmonics:
             if (write)
             {
                 pars->POvertoneSpread.par3 = value;
@@ -6502,7 +6502,7 @@ void InterChange::commandSub(CommandBlock *getData)
             else
                 value = pars->POvertoneSpread.par3;
             break;
-        case 51:
+        case subSynthLevel::control::overtonePosition:
             if (write)
             {
                 pars->POvertoneSpread.type =  value_int;
@@ -6512,31 +6512,31 @@ void InterChange::commandSub(CommandBlock *getData)
                 value = pars->POvertoneSpread.type;
             break;
 
-        case 64:
+        case subSynthLevel::control::enableFilter:
             if (write)
                 pars->PGlobalFilterEnabled = value_bool;
             else
                 value = pars->PGlobalFilterEnabled;
             break;
 
-        case 80:
+        case subSynthLevel::control::filterStages:
             if (write)
                 pars->Pnumstages = value_int;
             else
                 value = pars->Pnumstages;
             break;
-        case 81:
+        case subSynthLevel::control::magType:
             if (write)
                 pars->Phmagtype = value_int;
             break;
-        case 82:
+        case subSynthLevel::control::startPosition:
             if (write)
                 pars->Pstart = value_int;
             else
                 value = pars->Pstart;
             break;
 
-        case 96:
+        case subSynthLevel::control::clearHarmonics:
             if (write)
             {
                 for (int i = 0; i < MAX_SUB_HARMONICS; i++)
@@ -6548,7 +6548,7 @@ void InterChange::commandSub(CommandBlock *getData)
             }
             break;
 
-        case 112:
+        case subSynthLevel::control::stereo:
             if (write)
                 pars->Pstereo = value_bool;
             break;
