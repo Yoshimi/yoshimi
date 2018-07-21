@@ -358,20 +358,20 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         {
             switch(control)
             {
-                case 32: // tunings
+                case scalesLevel::control::tuning:
                     text = formatScales(text);
                     value = synth->microtonal.texttotunings(text.c_str());
                     if (value > 0)
                         synth->setAllPartMaps();
                     break;
-                case 33: // keyboard map
+                case scalesLevel::control::keyboardMap:
                     text = formatScales(text);
                     value = synth->microtonal.texttomapping(text.c_str());
                     if (value > 0)
                         synth->setAllPartMaps();
                     break;
 
-                case 48: // import .scl
+                case scalesLevel::control::importScl:
                     value = synth->microtonal.loadscl(setExtension(text,"scl"));
                     if(value > 0)
                     {
@@ -387,7 +387,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         delete [] buf;
                     }
                     break;
-                case 49: // import .kbm
+                case scalesLevel::control::importKbm:
                     value = synth->microtonal.loadkbm(setExtension(text,"kbm"));
                     if(value > 0)
                     {
@@ -411,10 +411,10 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     }
                     break;
 
-                case 64: // set name
+                case scalesLevel::control::name:
                     synth->microtonal.Pname = text;
                     break;
-                case 65: // set comment
+                case scalesLevel::control::comment:
                     synth->microtonal.Pcomment = text;
                     break;
             }
@@ -1450,69 +1450,69 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
     string contstr = "";
     switch (control)
     {
-        case 0:
+        case scalesLevel::control::Afrequency:
             contstr = "'A' Frequency";
             break;
-        case 1:
+        case scalesLevel::control::Anote:
             contstr = "'A' Note";
             break;
-        case 2:
+        case scalesLevel::control::invertScale:
             contstr = "Invert Keys";
             break;
-        case 3:
+        case scalesLevel::control::invertedScaleCenter:
             contstr = "Key Center";
             break;
-        case 4:
+        case scalesLevel::control::scaleShift:
             contstr = "Scale Shift";
             break;
-        case 8:
+        case scalesLevel::control::enableMicrotonal:
             contstr = "Enable Microtonal";
             break;
 
-        case 16:
+        case scalesLevel::control::enableKeyboardMap:
             contstr = "Enable Keyboard Mapping";
             break;
-        case 17:
+        case scalesLevel::control::lowKey:
             contstr = "Keyboard First Note";
             break;
-        case 18:
+        case scalesLevel::control::middleKey:
             contstr = "Keyboard Middle Note";
             break;
-        case 19:
+        case scalesLevel::control::highKey:
             contstr = "Keyboard Last Note";
             break;
 
-        case 32:
+        case scalesLevel::control::tuning:
             contstr = "Tuning ";
             showValue = false;
             break;
-        case 33:
+        case scalesLevel::control::keyboardMap:
             contstr = "Keymap ";
             showValue = false;
             break;
-        case 48:
+        case scalesLevel::control::importScl:
             contstr = "Tuning Import ";
             showValue = false;
             break;
-        case 49:
+        case scalesLevel::control::importKbm:
             contstr = "Keymap Import ";
             showValue = false;
             break;
 
-        case 64:
+        case scalesLevel::control::name:
             contstr = "Name: " + string(synth->microtonal.Pname);
             showValue = false;
             break;
-        case 65:
+        case scalesLevel::control::comment:
             contstr = "Description: " + string(synth->microtonal.Pcomment);
             showValue = false;
             break;
-        case 80:
+        case scalesLevel::control::retune:
             contstr = "Retune";
             showValue = false;
             break;
 
-        case 96:
+        case scalesLevel::control::clearAll:
             contstr = "Clear all settings";
             showValue = false;
             break;
@@ -4474,7 +4474,7 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
 
     switch (control)
     {
-        case 0: // 'A' Frequency
+        case scalesLevel::control::Afrequency:
             if (write)
             {
                 if (value > 2000)
@@ -4487,45 +4487,45 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
                 value = synth->microtonal.PAfreq;
             break;
 
-        case 1: // 'A' Note
+        case scalesLevel::control::Anote:
             if (write)
                 synth->microtonal.PAnote = value_int;
             else
                 value = synth->microtonal.PAnote;
             break;
-        case 2: // Invert Keys
+        case scalesLevel::control::invertScale:
             if (write)
                 synth->microtonal.Pinvertupdown = value_bool;
             else
                 value = synth->microtonal.Pinvertupdown;
             break;
-        case 3: // Key Center
+        case scalesLevel::control::invertedScaleCenter:
             if (write)
                 synth->microtonal.Pinvertupdowncenter = value_int;
             else
                 value = synth->microtonal.Pinvertupdowncenter;
             break;
-        case 4: // Scale Shift
+        case scalesLevel::control::scaleShift:
             if (write)
                 synth->microtonal.Pscaleshift = value_int + 64;
             else
                 value = synth->microtonal.Pscaleshift - 64;
             break;
 
-        case 8: // Enable Microtonal
+        case scalesLevel::control::enableMicrotonal:
             if (write)
                 synth->microtonal.Penabled = value_bool;
             else
                 value = synth->microtonal.Penabled;
             break;
 
-        case 16: // Enable Keyboard Mapping
+        case scalesLevel::control::enableKeyboardMap:
             if (write)
                 synth->microtonal.Pmappingenabled = value_bool;
             else
                value = synth->microtonal.Pmappingenabled;
             break;
-        case 17: // Keyboard First Note
+        case scalesLevel::control::lowKey:
             if (write)
             {
                 if (value_int < 0)
@@ -4543,7 +4543,7 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
             else
                 value = synth->microtonal.Pfirstkey;
             break;
-        case 18: // Keyboard Middle Note
+        case scalesLevel::control::middleKey:
             if (write)
             {
                 if (value_int <= synth->microtonal.Pfirstkey)
@@ -4561,7 +4561,7 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
             else
                 value = synth->microtonal.Pmiddlenote;
             break;
-        case 19: // Keyboard Last Note
+        case scalesLevel::control::highKey:
             if (write)
             {
                 if (value_int <= synth->microtonal.Pmiddlenote)
@@ -4580,31 +4580,31 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
                 value = synth->microtonal.Plastkey;
             break;
 
-        case 32: // Tuning
+        case scalesLevel::control::tuning:
             // done elsewhere
             break;
-        case 33: // Keyboard Map
-            // done elsewhere
-            break;
-
-        case 48: // Import .scl File
-            // done elsewhere
-            break;
-        case 49: // Import .kbm File
+        case scalesLevel::control::keyboardMap:
             // done elsewhere
             break;
 
-        case 64: // Name
+        case scalesLevel::control::importScl:
             // done elsewhere
             break;
-        case 65: // Comments
+        case scalesLevel::control::importKbm:
             // done elsewhere
             break;
 
-        case 80: // Retune
+        case scalesLevel::control::name:
             // done elsewhere
             break;
-        case 96: // Clear scales
+        case scalesLevel::control::comment:
+            // done elsewhere
+            break;
+
+        case scalesLevel::control::retune:
+            // done elsewhere
+            break;
+        case scalesLevel::control::clearAll: // Clear scales
             synth->microtonal.defaults();
             break;
     }

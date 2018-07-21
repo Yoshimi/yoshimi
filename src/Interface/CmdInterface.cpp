@@ -1561,7 +1561,7 @@ int CmdInterface::commandScale()
             max = 1;
         }
         else if(matchnMove(2, point, "center"))
-            command = scalesLevel::control::keyCentre;
+            command = scalesLevel::control::invertedScaleCenter;
         else if(matchnMove(2, point, "shift"))
         {
             command = scalesLevel::control::scaleShift;
@@ -1575,7 +1575,7 @@ int CmdInterface::commandScale()
         }
         else if(matchnMove(2, point, "mapping"))
         {
-            command = scalesLevel::control::enableKeyMap;
+            command = scalesLevel::control::enableKeyboardMap;
             max = 1;
         }
         else if(matchnMove(2, point, "first"))

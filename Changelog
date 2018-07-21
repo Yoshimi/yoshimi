@@ -1,5 +1,8 @@
 yoshimi 1.5.8 M
 
+2018-7-21 Will
+* Completed scales enum conversion.
+
 2018-7-20 Will
 * Completed vector GUI enum updates.
 * Updated docs and images.
