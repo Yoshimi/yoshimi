@@ -2,6 +2,9 @@ yoshimi 1.5.8 M
 
 2018-7-22 Will
 * Converted main addSynth controls to enums.
+* Converted addVoice controls to enums.
+* BugFix: CLI not setting GUI Bypass GobalFilter.
+* Revised build dependencies.
 
 2018-7-21 Will
 * Completed scales enum conversion.

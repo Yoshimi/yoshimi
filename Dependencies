@@ -11,12 +11,10 @@ Some of these will pull in other ones.
     libfltk1.3-dev
     libglu1-mesa-dev
     libjack-jackd2-dev
-    libjpeg-dev         ? may no longer be needed
     libmxml-dev
     libncurses5-dev
     libreadline-dev
     libxft-dev
-    libxinerama-dev     ? may no longer be needed
     libxml2-dev
     pkg-config
     xutils-dev

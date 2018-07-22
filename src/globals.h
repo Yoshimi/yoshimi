@@ -88,6 +88,11 @@
 #define MAX_PHASER_STAGES 12
 #define MAX_ALIENWAH_DELAY 100
 
+/*
+ * for many of the following, where they are in groups
+ * the grouping must not change, but the acual values can
+ */
+
 namespace topLevel // usage topLevel::section::vector
 {
     enum section: unsigned char {
@@ -104,7 +109,7 @@ namespace topLevel // usage topLevel::section::vector
         config = 248 // F8
     };
 
-    // the following critcally cannot be changed.
+    // this pair critcally cannot be changed as
     // they rely on 'parameter' being < 64
     enum route : unsigned char {
         lowPriority = 128,
@@ -123,8 +128,8 @@ namespace topLevel // usage topLevel::section::vector
         stateLoad
     };
 
-    // inserts are here as they are split between many sections
-    // but must remain distinct.
+    // inserts are here as they are split between many
+    // sections but must remain distinct.
     enum insert : unsigned char {
         LFOgroup = 0,
         filterGroup,
@@ -414,6 +419,67 @@ namespace addSynthLevel // usage addSynthLevel::control::volume
     };
 }
 
+namespace addVoiceLevel // usage addVoiceLevel::control::volume
+{
+    enum control : unsigned char {
+        volume = 0,
+        velocitySense,
+        panning,
+        invertPhase = 4,
+        enableAmplitudeEnvelope = 8,
+        enableAmplitudeLFO,
+
+        modulatorType = 16, // Off, Morph, Ring, PM, FM, PWM
+        externalModulator,
+
+        detuneFrequency = 32,
+        equalTemperVariation,
+        baseFrequencyAs440Hz,
+        octave,
+        detuneType, // L35 cents, L10 cents, E100 cents, E1200 cents
+        coarseDetune,
+        pitchBendAdjustment,
+        pitchBendOffset,
+
+        enableFrequencyEnvelope = 40,
+        enableFrequencyLFO,
+
+        unisonFrequencySpread = 48,
+        unisonPhaseRandomise,
+        unisonStereoSpread,
+        unisonVibratoDepth,
+        unisonVibratoSpeed,
+        unisonSize,
+        unisonPhaseInvert, // None, Random, 50%, 33%, 25%, 20%
+        enableUnison = 56,
+
+        bypassGlobalFilter = 64, // not seen on return?
+        enableFilter = 68,
+        enableFilterEnvelope = 72,
+        enableFilterLFO,
+
+        modulatorAmplitude = 80,
+        modulatorVelocitySense,
+        modulatorHFdamping,
+        enableModulatorAmplitudeEnvelope = 88,
+        modulatorDetuneFrequency = 96,
+        modulatorFrequencyAs440Hz = 98,
+        modulatorOctave,
+        modulatorDetuneType, // L35 cents, L10 cents, E100 cents, E1200 cents
+        modulatorCoarseDetune,
+        enableModulatorFrequencyEnvelope = 104,
+        modulatorOscillatorPhase = 112,
+        modulatorOscillatorSource, // local, external
+
+        delay = 128,
+        enableVoice,
+        enableResonance, // for this voice
+        voiceOscillatorPhase = 136,
+        voiceOscillatorSource, // local, external
+        soundType // Oscillator, White noise, Pink noise
+    };
+}
+
 namespace subSynthLevel // usage subSynthLevel::control::volume
 {
     enum control : unsigned char {
@@ -433,6 +499,7 @@ namespace subSynthLevel // usage subSynthLevel::control::volume
         coarseDetune,
         pitchBendAdjustment,
         pitchBendOffset,
+
         enableFrequencyEnvelope = 40,
 
         overtoneParameter1 = 48,

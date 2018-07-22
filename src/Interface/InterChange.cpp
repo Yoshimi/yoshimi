@@ -2504,28 +2504,28 @@ string InterChange::resolveAddVoice(CommandBlock *getData)
     string name = "";
     switch (control & 0xf0)
     {
-        case 0:
+        case addVoiceLevel::control::volume:
             name = " Amplitude ";
             break;
-        case 16:
+        case addVoiceLevel::control::modulatorType:
             name = " Modulator ";
             break;
-        case 32:
+        case addVoiceLevel::control::detuneFrequency:
             name = " Frequency ";
             break;
-        case 48:
+        case addVoiceLevel::control::unisonFrequencySpread:
             name = " Unison ";
             break;
-        case 64:
+        case addVoiceLevel::control::bypassGlobalFilter:
             name = " Filter ";
             break;
-        case 80:
+        case addVoiceLevel::control::modulatorAmplitude:
             name = " Modulator Amp ";
             break;
-        case 96:
+        case addVoiceLevel::control::modulatorDetuneFrequency:
             name = " Modulator Freq ";
             break;
-        case 112:
+        case addVoiceLevel::control::modulatorOscillatorPhase:
             name = " Modulator Osc ";
             break;
     }
@@ -2534,155 +2534,155 @@ string InterChange::resolveAddVoice(CommandBlock *getData)
 
     switch (control)
     {
-        case 0:
+        case addVoiceLevel::control::volume:
             contstr = "Volume";
             break;
-        case 1:
+        case addVoiceLevel::control::velocitySense:
             contstr = "Vel Sens";
             break;
-        case 2:
+        case addVoiceLevel::control::panning:
             contstr = "Panning";
             break;
-        case 4:
+        case addVoiceLevel::control::invertPhase:
             contstr = "Minus";
             break;
-        case 8:
+        case addVoiceLevel::control::enableAmplitudeEnvelope:
             contstr = "Enable Env";
             break;
-        case 9:
+        case addVoiceLevel::control::enableAmplitudeLFO:
             contstr = "Enable LFO";
             break;
 
-        case 16:
+        case addVoiceLevel::control::modulatorType:
             contstr = "Type";
             break;
-        case 17:
+        case addVoiceLevel::control::externalModulator:
             contstr = "Extern Mod";
             break;
 
-        case 32:
+        case addVoiceLevel::control::detuneFrequency:
             contstr = "Detune";
             break;
-        case 33:
+        case addVoiceLevel::control::equalTemperVariation:
             contstr = "Eq T";
             break;
-        case 34:
+        case addVoiceLevel::control::baseFrequencyAs440Hz:
             contstr = "440Hz";
             break;
-        case 35:
+        case addVoiceLevel::control::octave:
             contstr = "Octave";
             break;
-        case 36:
+        case addVoiceLevel::control::detuneType:
             contstr = "Det type";
             break;
-        case 37:
+        case addVoiceLevel::control::coarseDetune:
             contstr = "Coarse Det";
             break;
-        case 38:
+        case addVoiceLevel::control::pitchBendAdjustment:
             contstr = "Bend Adj";
             break;
-        case 39:
+        case addVoiceLevel::control::pitchBendOffset:
             contstr = "Offset Hz";
             break;
-        case 40:
+        case addVoiceLevel::control::enableFrequencyEnvelope:
             contstr = "Enable Env";
             break;
-        case 41:
+        case addVoiceLevel::control::enableFrequencyLFO:
             contstr = "Enable LFO";
             break;
 
-        case 48:
+        case addVoiceLevel::control::unisonFrequencySpread:
             contstr = "Freq Spread";
             break;
-        case 49:
+        case addVoiceLevel::control::unisonPhaseRandomise:
             contstr = "Phase Rnd";
             break;
-        case 50:
+        case addVoiceLevel::control::unisonStereoSpread:
             contstr = "Stereo";
             break;
-        case 51:
+        case addVoiceLevel::control::unisonVibratoDepth:
             contstr = "Vibrato";
             break;
-        case 52:
+        case addVoiceLevel::control::unisonVibratoSpeed:
             contstr = "Vib Speed";
             break;
-        case 53:
+        case addVoiceLevel::control::unisonSize:
             contstr = "Size";
             break;
-        case 54:
+        case addVoiceLevel::control::unisonPhaseInvert:
             contstr = "Invert";
             break;
-        case 56:
+        case addVoiceLevel::control::enableUnison:
             contstr = "Enable";
             break;
 
-        case 64:
+        case addVoiceLevel::control::bypassGlobalFilter:
             contstr = "Bypass Global";
             break;
-        case 68:
+        case addVoiceLevel::control::enableFilter:
             contstr = "Enable";
             break;
-        case 72:
+        case addVoiceLevel::control::enableFilterEnvelope:
             contstr = "Enable Env";
             break;
-        case 73:
+        case addVoiceLevel::control::enableFilterLFO:
             contstr = "Enable LFO";
             break;
 
-        case 80:
+        case addVoiceLevel::control::modulatorAmplitude:
             contstr = "Volume";
             break;
-        case 81:
+        case addVoiceLevel::control::modulatorVelocitySense:
             contstr = "V Sense";
             break;
-        case 82:
+        case addVoiceLevel::control::modulatorHFdamping:
             contstr = "F Damp";
             break;
-        case 88:
+        case addVoiceLevel::control::enableModulatorAmplitudeEnvelope:
             contstr = "Enable Env";
             break;
 
-        case 96:
+        case addVoiceLevel::control::modulatorDetuneFrequency:
             break;
-        case 98:
+        case addVoiceLevel::control::modulatorFrequencyAs440Hz:
             contstr = "440Hz";
             break;
-        case 99:
+        case addVoiceLevel::control::modulatorOctave:
             contstr = "Octave";
             break;
-        case 100:
+        case addVoiceLevel::control::modulatorDetuneType:
             contstr = "Det type";
             break;
-        case 101:
+        case addVoiceLevel::control::modulatorCoarseDetune:
             contstr = "Coarse Det";
             break;
-        case 104:
+        case addVoiceLevel::control::enableModulatorFrequencyEnvelope: // local, external
             contstr = "Enable Env";
             break;
 
-        case 112:
+        case addVoiceLevel::control::modulatorOscillatorPhase:
             contstr = " Phase";
             break;
-        case 113:
+        case addVoiceLevel::control::modulatorOscillatorSource:
             contstr = " Source";
             break;
 
-        case 128:
+        case addVoiceLevel::control::delay:
             contstr = " Delay";
             break;
-        case 129:
+        case addVoiceLevel::control::enableVoice:
             contstr = " Enable";
             break;
-        case 130:
+        case addVoiceLevel::control::enableResonance:
             contstr = " Resonance Enable";
             break;
-        case 136:
+        case addVoiceLevel::control::voiceOscillatorPhase:
             contstr = " Osc Phase";
             break;
-        case 137:
+        case addVoiceLevel::control::voiceOscillatorSource:
             contstr = " Osc Source";
             break;
-        case 138:
+        case addVoiceLevel::control::soundType:
             contstr = " Sound type";
             break;
 
@@ -5940,75 +5940,75 @@ void InterChange::commandAddVoice(CommandBlock *getData)
 
     switch (control)
     {
-        case 0:
+        case addVoiceLevel::control::volume:
             if (write)
                 pars->VoicePar[nvoice].PVolume = value_int;
             else
                 value = pars->VoicePar[nvoice].PVolume;
             break;
-        case 1:
+        case addVoiceLevel::control::velocitySense:
             if (write)
                 pars->VoicePar[nvoice].PAmpVelocityScaleFunction = value_int;
             else
                 value = pars->VoicePar[nvoice].PAmpVelocityScaleFunction;
             break;
-        case 2:
+        case addVoiceLevel::control::panning:
             if (write)
                  pars->setVoicePan(nvoice, value_int);
             else
                 value = pars->VoicePar[nvoice].PPanning;
             break;
-        case 4:
+        case addVoiceLevel::control::invertPhase:
             if (write)
                 pars->VoicePar[nvoice].PVolumeminus = value_bool;
             else
                 value = pars->VoicePar[nvoice].PVolumeminus;
             break;
-        case 8:
+        case addVoiceLevel::control::enableAmplitudeEnvelope:
             if (write)
                 pars->VoicePar[nvoice].PAmpEnvelopeEnabled = value_bool;
             else
                 value = pars->VoicePar[nvoice].PAmpEnvelopeEnabled;
             break;
-        case 9:
+        case addVoiceLevel::control::enableAmplitudeLFO:
             if (write)
                 pars->VoicePar[nvoice].PAmpLfoEnabled = value_bool;
             else
                 value = pars->VoicePar[nvoice].PAmpLfoEnabled;
             break;
 
-        case 16:
+        case addVoiceLevel::control::modulatorType:
             if (write)
                 pars->VoicePar[nvoice].PFMEnabled = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMEnabled;
             break;
-        case 17:
+        case addVoiceLevel::control::externalModulator:
             if (write)
                 pars->VoicePar[nvoice].PFMVoice = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMVoice;
             break;
 
-        case 32:
+        case addVoiceLevel::control::detuneFrequency:
             if (write)
                 pars->VoicePar[nvoice].PDetune = value_int + 8192;
             else
                 value = pars->VoicePar[nvoice].PDetune-8192;
             break;
-        case 33:
+        case addVoiceLevel::control::equalTemperVariation:
             if (write)
                 pars->VoicePar[nvoice].PfixedfreqET = value_int;
             else
                 value = pars->VoicePar[nvoice].PfixedfreqET;
             break;
-        case 34:
+        case addVoiceLevel::control::baseFrequencyAs440Hz:
             if (write)
                  pars->VoicePar[nvoice].Pfixedfreq = value_bool;
             else
                 value = pars->VoicePar[nvoice].Pfixedfreq;
             break;
-        case 35:
+        case addVoiceLevel::control::octave:
         {
             int k;
             if (write)
@@ -6027,13 +6027,13 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             }
             break;
         }
-        case 36:
+        case addVoiceLevel::control::detuneType:
             if (write)
                 pars->VoicePar[nvoice].PDetuneType = value_int;
             else
                 value = pars->VoicePar[nvoice].PDetuneType;
             break;
-        case 37:
+        case addVoiceLevel::control::coarseDetune:
         {
             int k;
             if (write)
@@ -6052,62 +6052,62 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             }
             break;
         }
-        case 38:
+        case addVoiceLevel::control::pitchBendAdjustment:
             if (write)
                 pars->VoicePar[nvoice].PBendAdjust = value_int;
             else
                 value = pars->VoicePar[nvoice].PBendAdjust;
             break;
-        case 39:
+        case addVoiceLevel::control::pitchBendOffset:
             if (write)
                 pars->VoicePar[nvoice].POffsetHz = value_int;
             else
                 value = pars->VoicePar[nvoice].POffsetHz;
             break;
-        case 40:
+        case addVoiceLevel::control::enableFrequencyEnvelope:
             if (write)
                 pars->VoicePar[nvoice].PFreqEnvelopeEnabled = value_int;
             else
                 value = pars->VoicePar[nvoice].PFreqEnvelopeEnabled;
             break;
-        case 41:
+        case addVoiceLevel::control::enableFrequencyLFO:
             if (write)
                 pars->VoicePar[nvoice].PFreqLfoEnabled = value_int;
             else
                 value = pars->VoicePar[nvoice].PFreqLfoEnabled;
             break;
 
-        case 48:
+        case addVoiceLevel::control::unisonFrequencySpread:
             if (write)
                 pars->VoicePar[nvoice].Unison_frequency_spread = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_frequency_spread;
             break;
-        case 49:
+        case addVoiceLevel::control::unisonPhaseRandomise:
             if (write)
                 pars->VoicePar[nvoice].Unison_phase_randomness = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_phase_randomness;
             break;
-        case 50:
+        case addVoiceLevel::control::unisonStereoSpread:
             if (write)
                 pars->VoicePar[nvoice].Unison_stereo_spread = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_stereo_spread;
             break;
-        case 51:
+        case addVoiceLevel::control::unisonVibratoDepth:
             if (write)
                 pars->VoicePar[nvoice].Unison_vibratto = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_vibratto;
             break;
-        case 52:
+        case addVoiceLevel::control::unisonVibratoSpeed:
             if (write)
                 pars->VoicePar[nvoice].Unison_vibratto_speed = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_vibratto_speed;
             break;
-        case 53:
+        case addVoiceLevel::control::unisonSize:
             if (write)
             {
                 if (value < 2)
@@ -6117,13 +6117,13 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             else
                 value = pars->VoicePar[nvoice].Unison_size;
             break;
-        case 54:
+        case addVoiceLevel::control::unisonPhaseInvert:
             if (write)
                 pars->VoicePar[nvoice].Unison_invert_phase = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_invert_phase;
             break;
-        case 56:
+        case addVoiceLevel::control::enableUnison:
         {
             int k;
             if (write)
@@ -6137,69 +6137,69 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
         }
 
-        case 64:
+        case addVoiceLevel::control::bypassGlobalFilter:
             if (write)
                 pars->VoicePar[nvoice].Pfilterbypass = value_bool;
             else
                 value = pars->VoicePar[nvoice].Pfilterbypass;
             break;
-        case 68:
+        case addVoiceLevel::control::enableFilter:
             if (write)
                  pars->VoicePar[nvoice].PFilterEnabled =  value_bool;
             else
                 value = pars->VoicePar[nvoice].PFilterEnabled;
             break;
-        case 72:
+        case addVoiceLevel::control::enableFilterEnvelope:
             if (write)
                 pars->VoicePar[nvoice].PFilterEnvelopeEnabled= value_bool;
             else
                 value = pars->VoicePar[nvoice].PFilterEnvelopeEnabled;
             break;
-        case 73:
+        case addVoiceLevel::control::enableFilterLFO:
             if (write)
                 pars->VoicePar[nvoice].PFilterLfoEnabled= value_bool;
             else
                 value = pars->VoicePar[nvoice].PFilterLfoEnabled;
             break;
 
-        case 80:
+        case addVoiceLevel::control::modulatorAmplitude:
             if (write)
                 pars->VoicePar[nvoice].PFMVolume = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMVolume;
             break;
-        case 81:
+        case addVoiceLevel::control::modulatorVelocitySense:
             if (write)
                 pars->VoicePar[nvoice].PFMVelocityScaleFunction = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMVelocityScaleFunction;
             break;
-        case 82:
+        case addVoiceLevel::control::modulatorHFdamping:
             if (write)
                 pars->VoicePar[nvoice].PFMVolumeDamp = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMVolumeDamp;
             break;
-        case 88:
+        case addVoiceLevel::control::enableModulatorAmplitudeEnvelope:
             if (write)
                 pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled = value_bool;
             else
                 value =  pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled;
             break;
 
-        case 96:
+        case addVoiceLevel::control::modulatorDetuneFrequency:
             if (write)
                 pars->VoicePar[nvoice].PFMDetune = value_int + 8192;
             else
                 value = pars->VoicePar[nvoice].PFMDetune - 8192;
             break;
-        case 98:
+        case addVoiceLevel::control::modulatorFrequencyAs440Hz:
             if (write)
                 pars->VoicePar[nvoice].PFMFixedFreq = value_bool;
             else
                 value = pars->VoicePar[nvoice].PFMFixedFreq;
             break;
-        case 99:
+        case addVoiceLevel::control::modulatorOctave:
         {
             int k;
             if (write)
@@ -6218,13 +6218,13 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             }
             break;
         }
-        case 100:
+        case addVoiceLevel::control::modulatorDetuneType:
             if (write)
                 pars->VoicePar[nvoice].PFMDetuneType = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMDetuneType;
             break;
-        case 101:
+        case addVoiceLevel::control::modulatorCoarseDetune:
         {
             int k;
             if (write)
@@ -6243,57 +6243,57 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             }
             break;
         }
-        case 104:
+        case addVoiceLevel::control::enableModulatorFrequencyEnvelope:
             if (write)
                 pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled;
             break;
 
-        case 112:
+        case addVoiceLevel::control::modulatorOscillatorPhase:
             if (write)
                 pars->VoicePar[nvoice].PFMoscilphase = 64 - value_int;
             else
                 value = 64 - pars->VoicePar[nvoice].PFMoscilphase;
             break;
-        case 113:
+        case addVoiceLevel::control::modulatorOscillatorSource:
             if (write)
                 pars->VoicePar[nvoice].PextFMoscil = value_int;
             else
                 value = pars->VoicePar[nvoice].PextFMoscil;
             break;
 
-        case 128:
+        case addVoiceLevel::control::delay:
             if (write)
                 pars->VoicePar[nvoice].PDelay = value_int;
             else
                 value = pars->VoicePar[nvoice].PDelay;
             break;
-        case 129:
+        case addVoiceLevel::control::enableVoice:
             if (write)
                 pars->VoicePar[nvoice].Enabled = value_bool;
             else
                 value = pars->VoicePar[nvoice].Enabled;
             break;
-        case 130:
+        case addVoiceLevel::control::enableResonance:
             if (write)
                 pars->VoicePar[nvoice].Presonance = value_bool;
             else
                 value = pars->VoicePar[nvoice].Presonance;
             break;
-        case 136:
+        case addVoiceLevel::control::voiceOscillatorPhase:
             if (write)
                 pars->VoicePar[nvoice].Poscilphase = 64 - value_int;
             else
                 value = 64 - pars->VoicePar[nvoice].Poscilphase;
             break;
-        case 137:
+        case addVoiceLevel::control::voiceOscillatorSource:
             if (write)
                 pars->VoicePar[nvoice].Pextoscil = value_int;
             else
                 value = pars->VoicePar[nvoice].Pextoscil;
             break;
-        case 138:
+        case addVoiceLevel::control::soundType:
             if (write)
                 pars->VoicePar[nvoice].Type = value_int;
             else
