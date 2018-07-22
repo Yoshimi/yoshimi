@@ -1,5 +1,8 @@
 yoshimi 1.5.8 M
 
+2018-7-22 Will
+* Converted main addSynth controls to enums.
+
 2018-7-21 Will
 * Completed scales enum conversion.
 * Converted subSynth controls to enums.

@@ -2417,10 +2417,10 @@ string InterChange::resolveAdd(CommandBlock *getData)
     string name = "";
     switch (control & 0x70)
     {
-        case 0:
+        case addSynthLevel::control::volume:
             name = " Amplitude ";
             break;
-        case 32:
+        case addSynthLevel::control::detuneFrequency:
             name = " Frequency ";
             break;
     }
@@ -2429,54 +2429,54 @@ string InterChange::resolveAdd(CommandBlock *getData)
 
     switch (control)
     {
-        case 0:
+        case addSynthLevel::control::volume:
             contstr = "Volume";
 
             break;
-        case 1:
+        case addSynthLevel::control::velocitySense:
             contstr = "Vel Sens";
             break;
-        case 2:
+        case addSynthLevel::control::panning:
             contstr = "Panning";
             break;
 
-        case 32:
+        case addSynthLevel::control::detuneFrequency:
             contstr = "Detune";
             break;
 
-        case 35:
+        case addSynthLevel::control::octave:
             contstr = "Octave";
             break;
-        case 36:
+        case addSynthLevel::control::detuneType:
             contstr = "Det type";
             break;
-        case 37:
+        case addSynthLevel::control::coarseDetune:
             contstr = "Coarse Det";
             break;
-        case 39:
+        case addSynthLevel::control::relativeBandwidth:
             contstr = "Rel B Wdth";
             break;
 
-        case 112:
+        case addSynthLevel::control::stereo:
             contstr = "Stereo";
             break;
-        case 113:
+        case addSynthLevel::control::randomGroup:
             contstr = "Rnd Grp";
             break;
 
-        case 120:
+        case addSynthLevel::control::dePop:
             contstr = "De Pop";
             break;
-        case 121:
+        case addSynthLevel::control::punchStrength:
             contstr = "Punch Strngth";
             break;
-        case 122:
+        case addSynthLevel::control::punchDuration:
             contstr = "Punch Time";
             break;
-        case 123:
+        case addSynthLevel::control::punchStretch:
             contstr = "Punch Strtch";
             break;
-        case 124:
+        case addSynthLevel::control::punchVelocity:
             contstr = "Punch Vel";
             break;
 
@@ -5783,33 +5783,33 @@ void InterChange::commandAdd(CommandBlock *getData)
 
     switch (control)
     {
-        case 0:
+        case addSynthLevel::control::volume:
             if (write)
                 pars->GlobalPar.PVolume = value_int;
             else
                 value = pars->GlobalPar.PVolume;
             break;
-        case 1:
+        case addSynthLevel::control::velocitySense:
             if (write)
                 pars->GlobalPar.PAmpVelocityScaleFunction = value_int;
             else
                 value = pars->GlobalPar.PAmpVelocityScaleFunction;
             break;
-        case 2:
+        case addSynthLevel::control::panning:
             if (write)
                 pars->setGlobalPan(value_int);
             else
                 value = pars->GlobalPar.PPanning;
             break;
 
-        case 32:
+        case addSynthLevel::control::detuneFrequency:
             if (write)
                 pars->GlobalPar.PDetune = value_int + 8192;
             else
                 value = pars->GlobalPar.PDetune - 8192;
             break;
 
-        case 35:
+        case addSynthLevel::control::octave:
         {
             int k;
             if (write)
@@ -5828,13 +5828,13 @@ void InterChange::commandAdd(CommandBlock *getData)
             }
             break;
         }
-        case 36:
+        case addSynthLevel::control::detuneType:
             if (write)
                 pars->GlobalPar.PDetuneType = value_int;
             else
                 value = pars->GlobalPar.PDetuneType;
             break;
-        case 37:
+        case addSynthLevel::control::coarseDetune:
         {
             int k;
             if (write)
@@ -5853,7 +5853,7 @@ void InterChange::commandAdd(CommandBlock *getData)
             }
             break;
         }
-        case 39:
+        case addSynthLevel::control::relativeBandwidth:
             if (write)
             {
                 pars->GlobalPar.PBandwidth = value_int;
@@ -5863,44 +5863,44 @@ void InterChange::commandAdd(CommandBlock *getData)
                 value = pars->GlobalPar.PBandwidth;
             break;
 
-        case 112:
+        case addSynthLevel::control::stereo:
             if (write)
                 pars->GlobalPar.PStereo = value_bool;
             else
                 value = pars->GlobalPar.PStereo;
             break;
-        case 113:
+        case addSynthLevel::control::randomGroup:
             if (write)
                 pars->GlobalPar.Hrandgrouping = value_bool;
             else
                 value = pars->GlobalPar.Hrandgrouping;
             break;
 
-        case 120:
+        case addSynthLevel::control::dePop:
             if (write)
                 pars->GlobalPar.Fadein_adjustment = value_int;
             else
                 value = pars->GlobalPar.Fadein_adjustment;
             break;
-        case 121:
+        case addSynthLevel::control::punchStrength:
             if (write)
                 pars->GlobalPar.PPunchStrength = value_int;
             else
                 value = pars->GlobalPar.PPunchStrength;
             break;
-        case 122:
+        case addSynthLevel::control::punchDuration:
             if (write)
                 pars->GlobalPar.PPunchTime = value_int;
             else
                 value = pars->GlobalPar.PPunchTime;
             break;
-        case 123:
+        case addSynthLevel::control::punchStretch:
             if (write)
                 pars->GlobalPar.PPunchStretch = value_int;
             else
                 value = pars->GlobalPar.PPunchStretch;
             break;
-        case 124:
+        case addSynthLevel::control::punchVelocity:
             if (write)
                 pars->GlobalPar.PPunchVelocitySensing = value_int;
             else

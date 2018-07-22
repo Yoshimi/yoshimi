@@ -390,6 +390,30 @@ namespace partLevel // usage partLevel::control::volume
     };
 }
 
+namespace addSynthLevel // usage addSynthLevel::control::volume
+{
+    enum control : unsigned char {
+        volume = 0,
+        velocitySense,
+        panning,
+
+        detuneFrequency = 32,
+        octave = 35,
+        detuneType, // L35 cents, L10 cents, E100 cents, E1200 cents
+        coarseDetune,
+        relativeBandwidth = 39,
+
+        stereo = 112,
+        randomGroup,
+
+        dePop = 120,
+        punchStrength,
+        punchDuration,
+        punchStretch,
+        punchVelocity
+    };
+}
+
 namespace subSynthLevel // usage subSynthLevel::control::volume
 {
     enum control : unsigned char {

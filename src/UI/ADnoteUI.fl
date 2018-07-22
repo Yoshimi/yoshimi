@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
-Modified June 2018
+Modified July 2018
 } {selected in_source in_header
 }
 
@@ -1454,7 +1454,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Counter octave {
           label Octave
           callback {//
-    send_data(35, o->value(), 0xc8);}
+    send_data(addSynthLevel::control::octave, o->value(), 0xc8);}
           tooltip Octave xywh {450 275 45 15} type Simple color 237 selection_color 0 labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
           code0 {int k = pars->GlobalPar.PCoarseDetune / 1024; if (k >= 8) k -= 16;}
           code2 {o->value(k);}
@@ -1462,7 +1462,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Counter coarsedet {
           label {Coarse det.}
           callback {//
-    send_data(37, o->value(), 0xc0);}
+    send_data(addSynthLevel::control::coarseDetune, o->value(), 0xc0);}
           tooltip {Coarse Detune} xywh {455 345 60 20} labelsize 10 align 5 minimum -64 maximum 63 step 1 textfont 1 textsize 11
           code0 {int k = pars->GlobalPar.PCoarseDetune % 1024; if (k >= 512) k -= 1024;}
           code2 {o->value(k);}
@@ -1479,7 +1479,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
     if (Fl::event_button() == 3)
         o->value(0);
     detunevalueoutput->do_callback();
-    send_data(32, o->value(), 0xc8);}
+    send_data(addSynthLevel::control::detuneFrequency, o->value(), 0xc8);}
           tooltip {Fine Detune (cents)} xywh {57 275 385 15} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->GlobalPar.PDetune - 8192);}
           class mwheel_slider_rev
@@ -1494,7 +1494,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Choice detunetype {
           label {Detune Type}
           callback {//
-    send_data(36, o->value() + 1, 0xc0);}
+    send_data(addSynthLevel::control::detuneType, o->value() + 1, 0xc0);}
           xywh {450 315 75 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {//
               o->add("L35cents");
@@ -1506,7 +1506,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Dial relBwidth {
           label relBW
           callback {//
-    send_data(39, o->value(), 0xc8);}
+    send_data(addSynthLevel::control::relativeBandwidth, o->value(), 0xc8);}
           tooltip {Bandwidth - how the relative fine detune of the voice are changed} xywh {500 270 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PBandwidth);}
           code1 {o->init(64);}
@@ -1520,7 +1520,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Dial globalvolume {
           label Volume
           callback {//
-send_data(0, o->value(), 0xc8);}
+send_data(addSynthLevel::control::volume, o->value(), 0xc8);}
           tooltip Volume xywh {39 22 35 35} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_InstrumentVolume);}
           code1 {o->value(pars->GlobalPar.PVolume);}
@@ -1529,7 +1529,7 @@ send_data(0, o->value(), 0xc8);}
         }
         Fl_Dial vsns {
           label {Vel Sens}
-          callback {send_data(1, o->value(), 0xc8);}
+          callback {send_data(addSynthLevel::control::velocitySense, o->value(), 0xc8);}
           tooltip {Velocity Sensing Function - rightmost/max to disable} xywh {106 22 35 35} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PAmpVelocityScaleFunction);}
           code1 {o->init(64);}
@@ -1540,7 +1540,7 @@ send_data(0, o->value(), 0xc8);}
           label Pan
           callback {//
     globalrandompan->value(o->value() < 0.1f);
-    send_data(2, o->value(), 0xc8);}
+    send_data(addSynthLevel::control::panning, o->value(), 0xc8);}
           tooltip {Global panning - leftmost/zero gives random panning} xywh {173 22 35 35} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
           code0 {o->setValueType(VC_PanningRandom);}
           code1 {o->value(pars->GlobalPar.PPanning);}
@@ -1552,14 +1552,14 @@ send_data(0, o->value(), 0xc8);}
           callback {//
     globalpan->value(0);
     o->value(1);
-    send_data(2, 0, 0xc0);}
+    send_data(addSynthLevel::control::panning, 0, 0xc0);}
           xywh {196 57 7 13} box NO_BOX color 35 selection_color 88 labelsize 10 align 8
           code0 {o->value(pars->randomGlobalPan());}
         }
         Fl_Dial depop {
           label {D.Pop}
           callback {//
-send_data(120, o->value(), 0xc8);}
+send_data(addSynthLevel::control::dePop, o->value(), 0xc8);}
           tooltip {Pop Suppression} xywh {85 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.Fadein_adjustment);}
           code1 {o->init(20);}
@@ -1568,7 +1568,7 @@ send_data(120, o->value(), 0xc8);}
         Fl_Dial pstr {
           label {P.Str.}
           callback {//
-send_data(121, o->value(), 0xc8);}
+send_data(addSynthLevel::control::punchStrength, o->value(), 0xc8);}
           tooltip {Punch Strength} xywh {125 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchStrength);}
           code1 {o->init(0);}
@@ -1577,7 +1577,7 @@ send_data(121, o->value(), 0xc8);}
         Fl_Dial pt {
           label {P.t.}
           callback {//
-send_data(122, o->value(), 0xc8);}
+send_data(addSynthLevel::control::punchDuration, o->value(), 0xc8);}
           tooltip {Punch Time (duration)} xywh {155 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchTime);}
           code1 {o->init(60);}
@@ -1586,7 +1586,7 @@ send_data(122, o->value(), 0xc8);}
         Fl_Dial pstc {
           label {P.Stc.}
           callback {//
-send_data(123, o->value(), 0xc8);}
+send_data(addSynthLevel::control::punchStretch, o->value(), 0xc8);}
           tooltip {Punch Stretch} xywh {185 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchStretch);}
           code1 {o->init(64);}
@@ -1595,7 +1595,7 @@ send_data(123, o->value(), 0xc8);}
         Fl_Dial pvel {
           label {P.Vel.}
           callback {//
-send_data(124, o->value(), 0xc8);}
+send_data(addSynthLevel::control::punchVelocity, o->value(), 0xc8);}
           tooltip {Punch Velocity Sensing} xywh {215 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchVelocitySensing);}
           code1 {o->init(72);}
@@ -1616,7 +1616,7 @@ send_data(124, o->value(), 0xc8);}
         Fl_Check_Button rndgrp {
           label {Rnd Grp}
           callback {pars->GlobalPar.Hrandgrouping = lrint(o->value());
-send_data(113, o->value(), 0xc0);}
+send_data(addSynthLevel::control::randomGroup, o->value(), 0xc0);}
           tooltip {How the Harmonic Amplitude is applied to voices that use the same oscillator} xywh {8 234 63 18} down_box DOWN_BOX labelsize 11
           code0 {o->value(pars->GlobalPar.Hrandgrouping);}
         }
@@ -1647,7 +1647,7 @@ send_data(113, o->value(), 0xc0);}
       Fl_Check_Button stereo {
         label { Stereo}
         callback {//
-send_data(112, o->value(), 0xc8);}
+send_data(addSynthLevel::control::stereo, o->value(), 0xc8);}
         xywh {8 220 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 11
         code0 {o->value(pars->GlobalPar.PStereo);}
       }
@@ -1973,66 +1973,66 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     bool val_bool = (value > 0.5f);
     switch(control)
     {
-        case 0:
+        case addSynthLevel::control::volume:
             globalvolume->value(value);
             break;
 
-        case 1:
+        case addSynthLevel::control::velocitySense:
             vsns->value(value);
             break;
 
-        case 2:
+        case addSynthLevel::control::panning:
             globalpan->value(value);
             globalrandompan->value(value < 0.1f);
             amplitudegrp->changed();
             break;
 
-        case 32:
+        case addSynthLevel::control::detuneFrequency:
             freq->value(value);
             detunevalueoutput->do_callback();
             break;
 
-        case 35:
+        case addSynthLevel::control::octave:
             octave->value((int) value);
             break;
 
-        case 36:
+        case addSynthLevel::control::detuneType:
             detunetype->value((int) value);
             break;
 
-        case 37:
+        case addSynthLevel::control::coarseDetune:
             coarsedet->value((int) value);
             break;
 
-        case 39:
+        case addSynthLevel::control::relativeBandwidth:
             relBwidth->value(value);
             break;
 
-        case 112:
+        case addSynthLevel::control::stereo:
             stereo->value(val_bool);
             break;
 
-        case 113:
+        case addSynthLevel::control::randomGroup:
             rndgrp->value(val_bool);
             break;
 
-        case 120:
+        case addSynthLevel::control::dePop:
             depop->value(value);
             break;
 
-        case 121:
+        case addSynthLevel::control::punchStrength:
             pstr->value(value);
             break;
 
-        case 122:
+        case addSynthLevel::control::punchDuration:
             pt->value(value);
             break;
 
-        case 123:
+        case addSynthLevel::control::punchStretch:
             pstc->value(value);
             break;
 
-        case 124:
+        case addSynthLevel::control::punchVelocity:
             pvel->value(value);
             break;
 
