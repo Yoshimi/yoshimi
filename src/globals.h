@@ -89,8 +89,9 @@
 #define MAX_ALIENWAH_DELAY 100
 
 /*
- * for many of the following, where they are in groups
- * the grouping must not change, but the acual values can
+ * for many of the following, where they are in groups the
+ * group order must not change, but the actual values can
+ * and new entries can be added between the group ends
  */
 
 namespace topLevel // usage topLevel::section::vector
@@ -569,6 +570,49 @@ namespace padSynthLevel // usage padSynthLevel::control::volume
     };
 }
 
+namespace oscillatorLevel // usage oscillatorLevel::control::phaseRandomness
+{
+    enum control : unsigned char {
+        phaseRandomness = 0,
+        magType, // Linear, -40dB, -60dB, -80dB, -100dB
+        harmonicAmplitudeRandomness,
+        harmonicRandomnessType, // None, Power, Sine
+
+        baseFunctionParameter = 16,
+        baseFunctionType, // Sine, Triangle, Pulse, Saw, Power, Gauss, Diode, AbsSine,
+            // PulseSine, StrchSine, Chirp, AbsStrSine, Chebyshev, Sqr, Spike, Circle
+        baseFunctionModulationParameter1 = 18,
+        baseFunctionModulationParameter2,
+        baseFunctionModulationParameter3,
+        baseFunctionModulationType, // None, Rev, Sine, Pow
+
+        autoClear = 32, // not used
+        useAsBaseFunction, // if 'value' is 1 assume autoclear set
+        waveshapeParameter,
+        waveshapeType, //  None, Atan, Asym1, Pow, Sine Qnts, Zigzag, Lmt, LmtU, LmtL, Ilmt
+        filterParameter1,
+        filterParameter2,
+        filterBeforeWaveshape,
+        filterType, // None, LP, HP1a, HP1b, BP1, BS1, LP2, HP2, BP2, BS2, Cos, Sin, Lsh, S
+        modulationParameter1,
+        modulationParameter2,
+        modulationParameter3,
+        modulationType, // None, Rev, Sine, Pow
+        spectrumAdjustParameter,
+        spectrumAdjustType, // None, Pow, ThrsD, ThrsU
+
+        harmonicShift = 64,
+        clearHarmonicShift,
+        shiftBeforeWaveshapeAndFilter,
+        adaptiveHarmonicsParameter,
+        adaptiveHarmonicsBase,
+        adaptiveHarmonicsPower,
+        adaptiveHarmonicsType, // Off, On, Square, 2xSub, 2xAdd, 3xSub, 3xAdd, 4xSub, 4xAdd
+
+        clearHarmonics = 96,
+        convertToSine
+    };
+}
 
 union CommandBlock{
     struct{

@@ -1,5 +1,8 @@
 yoshimi 1.5.8 M
 
+2018-7-23 Will
+* Converted oscillator controls to enums.
+
 2018-7-22 Will
 * Converted main addSynth controls to enums.
 * Converted addVoice controls to enums.

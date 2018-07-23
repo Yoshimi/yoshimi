@@ -3047,131 +3047,119 @@ string InterChange::resolveOscillator(CommandBlock *getData)
         return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + " Harmonic " + to_string((int)control + 1) + " Phase" + isPad);
     }
 
-    string name = "";
-    switch (control & 0x70)
-    {
-        case 0:
-            name = " Oscillator";
-            break;
-        case 16:
-            name = " Base Funct";
-            break;
-        case 32:
-            name = " Base Mods";
-            break;
-        case 64:
-            name = " Harm Mods";
-            break;
-    }
+    string name;
+    if (control >= oscillatorLevel::control::clearHarmonics || control <= oscillatorLevel::control::harmonicRandomnessType)
+        name = " Oscillator";
+    else if (control >= oscillatorLevel::control::harmonicShift)
+        name = " Harm Mods";
+    else if (control >= oscillatorLevel::control::autoClear)
+        name = " Base Mods";
+    else
+        name = " Base Funct";
 
     string contstr;
     switch (control)
     {
-        case 0:
+        case oscillatorLevel::control::phaseRandomness:
             contstr = " Random";
             break;
-        case 1:
+        case oscillatorLevel::control::magType:
             contstr = " Mag Type";
             break;
-        case 2:
+        case oscillatorLevel::control::harmonicAmplitudeRandomness:
             contstr = " Harm Rnd";
             break;
-        case 3:
+        case oscillatorLevel::control::harmonicRandomnessType:
             contstr = " Harm Rnd Type";
             break;
 
-        case 16:
+        case oscillatorLevel::control::baseFunctionParameter:
             contstr = " Par";
             break;
-        case 17:
+        case oscillatorLevel::control::baseFunctionType:
             contstr = " Type";
             break;
-        case 18:
+        case oscillatorLevel::control::baseFunctionModulationParameter1:
             contstr = " Mod Par 1";
             break;
-        case 19:
+        case oscillatorLevel::control::baseFunctionModulationParameter2:
             contstr = " Mod Par 2";
             break;
-        case 20:
+        case oscillatorLevel::control::baseFunctionModulationParameter3:
             contstr = " Mod Par 3";
             break;
-        case 21:
+        case oscillatorLevel::control::baseFunctionModulationType:
             contstr = " Mod Type";
             break;
 
-        case 32: // this is local to the source
+        case oscillatorLevel::control::autoClear: // this is local to the GUI
             break;
-        case 33:
+        case oscillatorLevel::control::useAsBaseFunction:
             contstr = " Osc As Base";
             break;
-
-        case 34:
+        case oscillatorLevel::control::waveshapeParameter:
             contstr = " Waveshape Par";
             break;
-        case 35:
+        case oscillatorLevel::control::waveshapeType:
             contstr = " Waveshape Type";
             break;
-
-        case 36:
+        case oscillatorLevel::control::filterParameter1:
             contstr = " Osc Filt Par 1";
             break;
-        case 37:
+        case oscillatorLevel::control::filterParameter2:
             contstr = " Osc Filt Par 2";
             break;
-        case 38:
+        case oscillatorLevel::control::filterBeforeWaveshape:
             contstr = " Osc Filt B4 Waveshape";
             break;
-        case 39:
+        case oscillatorLevel::control::filterType:
             contstr = " Osc Filt Type";
             break;
-
-        case 40:
+        case oscillatorLevel::control::modulationParameter1:
             contstr = " Osc Mod Par 1";
             break;
-        case 41:
+        case oscillatorLevel::control::modulationParameter2:
             contstr = " Osc Mod Par 2";
             break;
-        case 42:
+        case oscillatorLevel::control::modulationParameter3:
             contstr = " Osc Mod Par 3";
             break;
-        case 43:
+        case oscillatorLevel::control::modulationType:
             contstr = " Osc Mod Type";
             break;
-
-        case 44:
+        case oscillatorLevel::control::spectrumAdjustParameter:
             contstr = " Osc Spect Par";
             break;
-        case 45:
+        case oscillatorLevel::control::spectrumAdjustType:
             contstr = " Osc Spect Type";
             break;
 
-        case 64:
+        case oscillatorLevel::control::harmonicShift:
             contstr = " Shift";
             break;
-        case 65:
+        case oscillatorLevel::control::clearHarmonicShift:
             contstr = " Reset";
             break;
-        case 66:
+        case oscillatorLevel::control::shiftBeforeWaveshapeAndFilter:
             contstr = " B4 Waveshape & Filt";
             break;
-
-        case 67:
+        case oscillatorLevel::control::adaptiveHarmonicsParameter:
             contstr = " Adapt Param";
             break;
-        case 68:
+        case oscillatorLevel::control::adaptiveHarmonicsBase:
             contstr = " Adapt Base Freq";
             break;
-        case 69:
+        case oscillatorLevel::control::adaptiveHarmonicsPower:
             contstr = " Adapt Power";
             break;
-        case 70:
+        case oscillatorLevel::control::adaptiveHarmonicsType:
             contstr = " Adapt Type";
             break;
 
-        case 96:
+        case oscillatorLevel::control::clearHarmonics:
             contstr = " Clear Harmonics";
             break;
-        case 97:
+        case oscillatorLevel::control::convertToSine:
             contstr = " Conv To Sine";
             break;
 
@@ -6905,71 +6893,71 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
 
     switch (control)
     {
-        case 0:
+        case oscillatorLevel::control::phaseRandomness:
             if (write)
                 oscil->Prand = value + 64;
             else
                 value = oscil->Prand - 64;
             break;
-        case 1:
+        case oscillatorLevel::control::magType:
             if (write)
                 oscil->Phmagtype = value;
             else
                 value = oscil->Phmagtype;
             break;
-        case 2:
+        case oscillatorLevel::control::harmonicAmplitudeRandomness:
             if (write)
                 oscil->Pamprandpower = value;
             else
                 value = oscil->Pamprandpower;
             break;
-        case 3:
+        case oscillatorLevel::control::harmonicRandomnessType:
             if (write)
                 oscil->Pamprandtype = value;
             else
                 value = oscil->Pamprandtype;
             break;
 
-        case 16:
+        case oscillatorLevel::control::baseFunctionParameter:
             if (write)
                 oscil->Pbasefuncpar = value + 64;
             else
                 value = oscil->Pbasefuncpar - 64;
             break;
-        case 17:
+        case oscillatorLevel::control::baseFunctionType:
             if (write)
                 oscil->Pcurrentbasefunc = value;
             else
                 value = oscil->Pcurrentbasefunc;
             break;
-        case 18:
+        case oscillatorLevel::control::baseFunctionModulationParameter1:
             if (write)
                 oscil->Pbasefuncmodulationpar1 = value;
             else
                 value = oscil->Pbasefuncmodulationpar1;
             break;
-        case 19:
+        case oscillatorLevel::control::baseFunctionModulationParameter2:
             if (write)
                 oscil->Pbasefuncmodulationpar2 = value;
             else
                 value = oscil->Pbasefuncmodulationpar2;
             break;
-        case 20:
+        case oscillatorLevel::control::baseFunctionModulationParameter3:
             if (write)
                 oscil->Pbasefuncmodulationpar3 = value;
             else
                 value = oscil->Pbasefuncmodulationpar3;
             break;
-        case 21:
+        case oscillatorLevel::control::baseFunctionModulationType:
             if (write)
                 oscil->Pbasefuncmodulation = value;
             else
                 value = oscil->Pbasefuncmodulation;
             break;
 
-        case 32: // this is local to the source
+        case oscillatorLevel::control::autoClear: // this is local to the GUI
             break;
-        case 33:
+        case oscillatorLevel::control::useAsBaseFunction:
             if (write)
             {
                 oscil->useasbase();
@@ -6990,125 +6978,122 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             }
             break;
 
-        case 34:
+        case oscillatorLevel::control::waveshapeParameter:
             if (write)
                 oscil->Pwaveshaping = value + 64;
             else
                 value = oscil->Pwaveshaping - 64;
             break;
-        case 35:
+        case oscillatorLevel::control::waveshapeType:
             if (write)
                 oscil->Pwaveshapingfunction = value;
             else
                 value = oscil->Pwaveshapingfunction;
             break;
 
-        case 36:
+        case oscillatorLevel::control::filterParameter1:
             if (write)
                 oscil->Pfilterpar1 = value;
             else
                 value = oscil->Pfilterpar1;
             break;
-        case 37:
+        case oscillatorLevel::control::filterParameter2:
             if (write)
                 oscil->Pfilterpar2 = value;
             else
                 value = oscil->Pfilterpar2;
             break;
-        case 38:
+        case oscillatorLevel::control::filterBeforeWaveshape:
             if (write)
                 oscil->Pfilterbeforews = value_bool;
             else
                 value = oscil->Pfilterbeforews;
             break;
-        case 39:
+        case oscillatorLevel::control::filterType:
             if (write)
                 oscil->Pfiltertype = value;
             else
                 value = oscil->Pfiltertype;
             break;
-
-        case 40:
+        case oscillatorLevel::control::modulationParameter1:
             if (write)
                 oscil->Pmodulationpar1 = value;
             else
                 value = oscil->Pmodulationpar1;
             break;
-        case 41:
+        case oscillatorLevel::control::modulationParameter2:
             if (write)
                 oscil->Pmodulationpar2 = value;
             else
                 value = oscil->Pmodulationpar2;
             break;
-        case 42:
+        case oscillatorLevel::control::modulationParameter3:
             if (write)
                 oscil->Pmodulationpar3 = value;
             else
                 value = oscil->Pmodulationpar3;
             break;
-        case 43:
+        case oscillatorLevel::control::modulationType:
             if (write)
                 oscil->Pmodulation = value;
             else
                 value = oscil->Pmodulation;
             break;
-
-        case 44:
+        case oscillatorLevel::control::spectrumAdjustParameter:
             if (write)
                 oscil->Psapar = value;
             else
                 value = oscil->Psapar;
             break;
-        case 45:
+        case oscillatorLevel::control::spectrumAdjustType:
             if (write)
                 oscil->Psatype = value;
             else
                 value = oscil->Psatype;
             break;
 
-        case 64:
+        case oscillatorLevel::control::harmonicShift:
             if (write)
                 oscil->Pharmonicshift = value;
             else
                 value = oscil->Pharmonicshift;
             break;
-        case 65:
+        case oscillatorLevel::control::clearHarmonicShift:
             if (write)
                 oscil->Pharmonicshift = 0;
             break;
-        case 66:
+        case oscillatorLevel::control::shiftBeforeWaveshapeAndFilter:
             if (write)
                 oscil->Pharmonicshiftfirst = value_bool;
             else
                 value = oscil->Pharmonicshiftfirst;
             break;
-
-        case 67:
+        case oscillatorLevel::control::adaptiveHarmonicsParameter:
             if (write)
                 oscil->Padaptiveharmonicspar = value;
             else
                 value = oscil->Padaptiveharmonicspar;
             break;
-        case 68:
+        case oscillatorLevel::control::adaptiveHarmonicsBase:
             if (write)
                 oscil->Padaptiveharmonicsbasefreq = value;
             else
                 value = oscil->Padaptiveharmonicsbasefreq;
             break;
-        case 69:
+        case oscillatorLevel::control::adaptiveHarmonicsPower:
             if (write)
                 oscil->Padaptiveharmonicspower = value;
             else
                 value = oscil->Padaptiveharmonicspower;
             break;
-        case 70:
+        case oscillatorLevel::control::adaptiveHarmonicsType:
             if (write)
                 oscil->Padaptiveharmonics = value;
             else
                 value = oscil->Padaptiveharmonics;
             break;
 
-        case 96:
+        case oscillatorLevel::control::clearHarmonics:
             if (write)
             {
                 for (int i = 0; i < MAX_AD_HARMONICS; ++ i)
@@ -7120,7 +7105,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
                 oscil->prepare();
             }
             break;
-        case 97:
+        case oscillatorLevel::control::convertToSine:
             if (write)
                 oscil->convert2sine();
             break;
