@@ -3193,7 +3193,7 @@ string InterChange::resolveResonance(CommandBlock *getData)
     else
         name = " AddSynth";
 
-    if (insert == 9)
+    if (insert == TOPLEVEL::insert::resonanceGraphInsert)
     {
         if (write == true && engine == PART::engine::padSynth)
             isPad = " - Need to Apply";
@@ -3205,35 +3205,35 @@ string InterChange::resolveResonance(CommandBlock *getData)
     string contstr;
     switch (control)
     {
-        case 0:
+        case RESONANCE::control::maxDb:
             contstr = "Max dB";
             break;
-        case 1:
+        case RESONANCE::control::centerFrequency:
             contstr = "Center Freq";
             break;
-        case 2:
+        case RESONANCE::control::octaves:
             contstr = "Octaves";
             break;
 
-        case 8:
+        case RESONANCE::control::enableResonance:
             contstr = "Enable";
             break;
 
-        case 10:
+        case RESONANCE::control::randomType:
             contstr = "Random";
             break;
 
-        case 20:
+        case RESONANCE::control::interpolatePeaks:
             contstr = "Interpolate Peaks";
             break;
-        case 21:
+        case RESONANCE::control::protectFundamental:
             contstr = "Protect Fundamental";
             break;
 
-        case 96:
+        case RESONANCE::control::clearGraph:
             contstr = "Clear";
             break;
-        case 97:
+        case RESONANCE::control::smoothGraph:
             contstr = "Smooth";
             break;
 
@@ -7140,54 +7140,54 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
 
     switch (control)
     {
-        case 0:
+        case RESONANCE::control::maxDb:
             if (write)
                 respar->PmaxdB = value;
             else
                 value = respar->PmaxdB;
             break;
-        case 1:
+        case RESONANCE::control::centerFrequency:
             if (write)
                 respar->Pcenterfreq = value;
             else
                 value = respar->Pcenterfreq;
             break;
-        case 2:
+        case RESONANCE::control::octaves:
             if (write)
                 respar->Poctavesfreq = value;
             else
                 value = respar->Poctavesfreq;
             break;
 
-        case 8:
+        case RESONANCE::control::enableResonance:
             if (write)
                 respar->Penabled = value_bool;
             else
                 value = respar->Penabled;
             break;
 
-        case 10:
+        case RESONANCE::control::randomType:
             if (write)
                 respar->randomize(value);
             break;
 
-        case 20:
+        case RESONANCE::control::interpolatePeaks:
             if (write)
                 respar->interpolatepeaks(value_bool);
             break;
-        case 21:
+        case RESONANCE::control::protectFundamental:
             if (write)
                 respar->Pprotectthefundamental = value_bool;
             else
                 value = respar->Pprotectthefundamental;
             break;
 
-        case 96:
+        case RESONANCE::control::clearGraph:
             if (write)
                 for (int i = 0; i < MAX_RESONANCE_POINTS; ++ i)
                     respar->setpoint(i, 64);
             break;
-        case 97:
+        case RESONANCE::control::smoothGraph:
             if (write)
                 respar->smooth();
             break;

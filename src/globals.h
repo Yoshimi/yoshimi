@@ -614,6 +614,21 @@ namespace OSCILLATOR // usage OSCILLATOR::control::phaseRandomness
     };
 }
 
+namespace RESONANCE // usage RESONANCE::control::maxDb
+{
+    enum control : unsigned char {
+        maxDb = 0,
+        centerFrequency,
+        octaves,
+        enableResonance = 8,
+        randomType = 10, // coarse, medium, fine
+        interpolatePeaks = 20, // smooth, linear
+        protectFundamental,
+        clearGraph = 96,
+        smoothGraph
+    };
+}
+
 union CommandBlock{
     struct{
         float value;
