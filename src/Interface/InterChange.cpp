@@ -3344,83 +3344,83 @@ string InterChange::resolveFilter(CommandBlock *getData)
     string contstr;
     switch (control)
     {
-        case 0:
+        case FILTERINSERT::control::centerFrequency:
             contstr = "C_Freq";
             break;
-        case 1:
+        case FILTERINSERT::control::Q:
             contstr = "Q";
             break;
-        case 2:
+        case FILTERINSERT::control::frequencyTracking:
             contstr = "FreqTrk";
             break;
-        case 3:
+        case FILTERINSERT::control::velocitySensitivity:
             contstr = "VsensA";
             break;
-        case 4:
+        case FILTERINSERT::control::velocityCurve:
             contstr = "Vsens";
             break;
-        case 5:
+        case FILTERINSERT::control::gain:
             contstr = "gain";
             break;
-        case 6:
+        case FILTERINSERT::control::stages:
             contstr = "Stages";
             break;
-        case 7:
+        case FILTERINSERT::control::baseType:
             contstr = "Filt Type";
             break;
-        case 8:
+        case FILTERINSERT::control::analogType:
             contstr = "An Type";
             break;
-        case 9:
+        case FILTERINSERT::control::stateVariableType:
             contstr = "SV Type";
             break;
-        case 10:
+        case FILTERINSERT::control::frequencyTrackingRange:
             contstr = "Fre Trk Offs";
             break;
-        case 16:
+        case FILTERINSERT::control::formantSlowness:
             contstr = "Form Fr Sl";
             break;
-        case 17:
+        case FILTERINSERT::control::formantClearness:
             contstr = "Form Vw Cl";
             break;
-        case 18:
+        case FILTERINSERT::control::formantFrequency:
             contstr = "Form Freq";
             break;
-        case 19:
+        case FILTERINSERT::control::formantQ:
             contstr = "Form Q";
             break;
-        case 20:
+        case FILTERINSERT::control::formantAmplitude:
             contstr = "Form Amp";
             break;
-        case 21:
+        case FILTERINSERT::control::formantStretch:
             contstr = "Form Stretch";
             break;
-        case 22:
+        case FILTERINSERT::control::formantCenter:
             contstr = "Form Cent Freq";
             break;
-        case 23:
+        case FILTERINSERT::control::formantOctave:
             contstr = "Form Octave";
             break;
 
-        case 32:
+        case FILTERINSERT::control::numberOfFormants:
             contstr = "Formants";
             break;
-        case 33:
+        case FILTERINSERT::control::vowelNumber:
             contstr = "Vowel Num";
             break;
-        case 34:
+        case FILTERINSERT::control::formantNumber:
             contstr = "Formant Num";
             break;
-        case 35:
+        case FILTERINSERT::control::sequenceSize:
             contstr = "Seq Size";
             break;
-        case 36:
+        case FILTERINSERT::control::sequencePosition:
             contstr = "Seq Pos";
             break;
-        case 37:
+        case FILTERINSERT::control::vowelPositionInSequence:
             contstr = "Vowel";
             break;
-        case 38:
+        case FILTERINSERT::control::negateInput:
             contstr = "Neg Input";
             break;
 
@@ -7379,25 +7379,25 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
 
     switch (getData->data.control)
     {
-        case 0:
+        case FILTERINSERT::control::centerFrequency:
             if (write)
                 pars->Pfreq = val;
             else
                 val = pars->Pfreq;
             break;
-        case 1:
+        case FILTERINSERT::control::Q:
             if (write)
                 pars->Pq = val;
             else
                 val = pars->Pq;
             break;
-        case 2:
+        case FILTERINSERT::control::frequencyTracking:
             if (write)
                 pars->Pfreqtrack = val;
             else
                 val = pars->Pfreqtrack;
             break;
-        case 3:
+        case FILTERINSERT::control::velocitySensitivity:
             if (velsnsamp != NULL)
             {
                 if (write)
@@ -7406,7 +7406,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
                     val = *velsnsamp;
             }
             break;
-        case 4:
+        case FILTERINSERT::control::velocityCurve:
             if (velsns != NULL)
             {
                 if (write)
@@ -7415,7 +7415,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
                     val = *velsns;
             }
             break;
-        case 5:
+        case FILTERINSERT::control::gain:
             if (write)
             {
                 pars->Pgain = val;
@@ -7424,7 +7424,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             else
                 val = pars->Pgain;
             break;
-        case 6:
+        case FILTERINSERT::control::stages:
             if (write)
             {
                 pars->Pstages = value_int;
@@ -7433,7 +7433,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             else
                 val = pars->Pstages;
             break;
-        case 7:
+        case FILTERINSERT::control::baseType:
             if (write)
             {
                 if (pars->Pcategory != value_int)
@@ -7447,8 +7447,8 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             else
                 val = pars->Pcategory;
             break;
-        case 8:
-        case 9:
+        case FILTERINSERT::control::analogType:
+        case FILTERINSERT::control::stateVariableType:
             if (write)
             {
                 pars->Ptype = value_int;
@@ -7457,7 +7457,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             else
                 val = pars->Ptype;
             break;
-        case 10:
+        case FILTERINSERT::control::frequencyTrackingRange:
             if (write)
             {
                 pars->Pfreqtrackoffset = (value_int != 0);
@@ -7467,7 +7467,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
                 val = pars->Pfreqtrackoffset;
             break;
 
-        case 16:
+        case FILTERINSERT::control::formantSlowness:
             if (write)
             {
                 pars->Pformantslowness = val;
@@ -7476,7 +7476,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             else
                 val = pars->Pformantslowness;
             break;
-        case 17:
+        case FILTERINSERT::control::formantClearness:
             if (write)
             {
                 pars->Pvowelclearness = val;
@@ -7485,7 +7485,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             else
                 val = pars->Pvowelclearness;
             break;
-        case 18:
+        case FILTERINSERT::control::formantFrequency:
             if (write)
             {
                 pars->Pvowels[nvowel].formants[nformant].freq = val;
@@ -7494,7 +7494,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             else
                 val = pars->Pvowels[nvowel].formants[nformant].freq;
             break;
-        case 19:
+        case FILTERINSERT::control::formantQ:
             if (write)
             {
                 pars->Pvowels[nvowel].formants[nformant].q = val;
@@ -7503,7 +7503,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             else
                 val = pars->Pvowels[nvowel].formants[nformant].q;
             break;
-        case 20:
+        case FILTERINSERT::control::formantAmplitude:
             if (write)
             {
                 pars->Pvowels[nvowel].formants[nformant].amp = val;
@@ -7512,7 +7512,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             else
                 val = pars->Pvowels[nvowel].formants[nformant].amp;
             break;
-        case 21:
+        case FILTERINSERT::control::formantStretch:
             if (write)
             {
                 pars->Psequencestretch = val;
@@ -7521,7 +7521,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             else
                 val = pars->Psequencestretch;
             break;
-        case 22:
+        case FILTERINSERT::control::formantCenter:
             if (write)
             {
                 pars->Pcenterfreq = val;
@@ -7530,7 +7530,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             else
                 val = pars->Pcenterfreq;
             break;
-        case 23:
+        case FILTERINSERT::control::formantOctave:
             if (write)
             {
                 pars->Poctavesfreq = val;
@@ -7540,7 +7540,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
                 val = pars->Poctavesfreq;
             break;
 
-        case 32:
+        case FILTERINSERT::control::numberOfFormants:
             if (write)
             {
                 pars->Pnumformants = value_int;
@@ -7549,11 +7549,11 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             else
                 val = pars->Pnumformants;
             break;
-        case 33: // this is local to the source
+        case FILTERINSERT::control::vowelNumber: // this is local to the GUI
             break;
-        case 34: // this is local to the source
+        case FILTERINSERT::control::formantNumber: // this is local to the GUI
             break;
-        case 35:
+        case FILTERINSERT::control::sequenceSize:
             if (write)
             {
                 pars->Psequencesize = value_int;
@@ -7562,7 +7562,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             else
                 val = pars->Psequencesize;
             break;
-        case 36:
+        case FILTERINSERT::control::sequencePosition:
             /*
              * this appears to be just setting the GUI
              * reference point yet sets pars changed.
@@ -7575,7 +7575,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
                 ;
             }
             break;
-        case 37:
+        case FILTERINSERT::control::vowelPositionInSequence:
             if (write)
             {
                 pars->Psequence[nseqpos].nvowel = value_int;
@@ -7584,7 +7584,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             else
                 val = pars->Psequence[nseqpos].nvowel;
             break;
-        case 38:
+        case FILTERINSERT::control::negateInput:
             if (write)
             {
                 pars->Psequencereversed = (value_int != 0);

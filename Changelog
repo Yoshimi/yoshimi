@@ -5,6 +5,7 @@ yoshimi 1.5.8 M
   No intrinsic code changes.
 * Converted resonance controls to enums.
 * Converted LFO controls to enums.
+* Converted filter controls to enums.
 
 2018-7-23 Will
 * Converted oscillator controls to enums.

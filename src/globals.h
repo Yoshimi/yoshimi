@@ -653,7 +653,32 @@ namespace LFOINSERT // usage LFOINSERT::control::speed
 namespace FILTERINSERT // usage FILTERINSERT::control::centerFrequency
 {
     enum control : unsigned char {
-        centerFrequency = 0
+        centerFrequency = 0,
+        Q,
+        frequencyTracking,
+        velocitySensitivity,
+        velocityCurve,
+        gain,
+        stages, // x1, x2, x3, x4, x5
+        baseType, // analog, formant, state variable
+        analogType, // LPF1, HPF1, LPF2, HPF2, BPF2, NF2, PkF2, LSh2, HSh2
+        stateVariableType, // LPF, HPF, BPF, NF
+        frequencyTrackingRange,
+        formantSlowness = 16,
+        formantClearness,
+        formantFrequency,
+        formantQ,
+        formantAmplitude,
+        formantStretch,
+        formantCenter,
+        formantOctave,
+        numberOfFormants = 32,
+        vowelNumber, // local to GUI
+        formantNumber, // local to GUI
+        sequenceSize,
+        sequencePosition, // local to GUI
+        vowelPositionInSequence,
+        negateInput // form LFOs, envelopes etc.
     };
 }
 
