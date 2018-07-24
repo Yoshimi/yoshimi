@@ -629,6 +629,41 @@ namespace RESONANCE // usage RESONANCE::control::maxDb
     };
 }
 
+namespace LFOINSERT // usage LFOINSERT::control::speed
+{
+    enum control : unsigned char {
+        speed = 0,
+        depth,
+        delay,
+        start,
+        amplitudeRandomness,
+        type, // Sine, Tri, Sqr, R.up, R.dn, E1dn, E2dn
+        continuous,
+        frequencyRandomness,
+        stretch
+    };
+
+    enum type : unsigned char {
+        amplitude = 0,
+        frequency,
+        filter
+    };
+}
+
+namespace FILTERINSERT // usage FILTERINSERT::control::centerFrequency
+{
+    enum control : unsigned char {
+        centerFrequency = 0
+    };
+}
+
+namespace ENVELOPEINSERT // usage ENVELOPEINSERT::control::centerFrequency
+{
+    enum control : unsigned char {
+        attackLevel = 0
+    };
+}
+
 union CommandBlock{
     struct{
         float value;

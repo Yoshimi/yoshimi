@@ -3269,13 +3269,13 @@ string InterChange::resolveLFO(CommandBlock *getData)
 
     switch (insertParam)
     {
-        case 0:
+        case LFOINSERT::type::amplitude:
             lfo = " Amp";
             break;
-        case 1:
+        case LFOINSERT::type::frequency:
             lfo = " Freq";
             break;
-        case 2:
+        case LFOINSERT::type::filter:
             lfo = " Filt";
             break;
     }
@@ -3283,31 +3283,31 @@ string InterChange::resolveLFO(CommandBlock *getData)
     string contstr;
     switch (control)
     {
-        case 0:
+        case LFOINSERT::control::speed:
             contstr = "Freq";
             break;
-        case 1:
+        case LFOINSERT::control::depth:
             contstr = "Depth";
             break;
-        case 2:
+        case LFOINSERT::control::delay:
             contstr = "Delay";
             break;
-        case 3:
+        case LFOINSERT::control::start:
             contstr = "Start";
             break;
-        case 4:
+        case LFOINSERT::control::amplitudeRandomness:
             contstr = "AmpRand";
             break;
-        case 5:
+        case LFOINSERT::control::type:
             contstr = "Type";
             break;
-        case 6:
+        case LFOINSERT::control::continuous:
             contstr = "Cont";
             break;
-        case 7:
+        case LFOINSERT::control::frequencyRandomness:
             contstr = "FreqRand";
             break;
-        case 8:
+        case LFOINSERT::control::stretch:
             contstr = "Stretch";
             break;
 
@@ -7211,13 +7211,13 @@ void InterChange::commandLFO(CommandBlock *getData)
     {
        switch (insertParam)
         {
-            case 0:
+           case LFOINSERT::type::amplitude:
                 lfoReadWrite(getData, part->kit[kititem].adpars->GlobalPar.AmpLfo);
                 break;
-            case 1:
+            case LFOINSERT::type::frequency:
                 lfoReadWrite(getData, part->kit[kititem].adpars->GlobalPar.FreqLfo);
                 break;
-            case 2:
+            case LFOINSERT::type::filter:
                 lfoReadWrite(getData, part->kit[kititem].adpars->GlobalPar.FilterLfo);
                 break;
         }
@@ -7226,13 +7226,13 @@ void InterChange::commandLFO(CommandBlock *getData)
     {
         switch (insertParam)
         {
-            case 0:
+            case LFOINSERT::type::amplitude:
                 lfoReadWrite(getData, part->kit[kititem].padpars->AmpLfo);
                 break;
-            case 1:
+            case LFOINSERT::type::frequency:
                 lfoReadWrite(getData, part->kit[kititem].padpars->FreqLfo);
                 break;
-            case 2:
+            case LFOINSERT::type::filter:
                 lfoReadWrite(getData, part->kit[kititem].padpars->FilterLfo);
                 break;
         }
@@ -7242,13 +7242,13 @@ void InterChange::commandLFO(CommandBlock *getData)
         int nvoice = engine - PART::engine::addVoice1;
         switch (insertParam)
         {
-            case 0:
+            case LFOINSERT::type::amplitude:
                 lfoReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].AmpLfo);
                 break;
-            case 1:
+            case LFOINSERT::type::frequency:
                 lfoReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FreqLfo);
                 break;
-            case 2:
+            case LFOINSERT::type::filter:
                 lfoReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FilterLfo);
                 break;
         }
@@ -7266,55 +7266,55 @@ void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
 
     switch (getData->data.control)
     {
-        case 0:
+        case LFOINSERT::control::speed:
             if (write)
                 pars->setPfreq(val);
             else
                 val = pars->Pfreq;
             break;
-        case 1:
+        case LFOINSERT::control::depth:
             if (write)
                 pars->setPintensity(val);
             else
                 val = pars->Pintensity;
             break;
-        case 2:
+        case LFOINSERT::control::delay:
             if (write)
                 pars->setPdelay(val);
             else
                 val = pars->Pdelay;
             break;
-        case 3:
+        case LFOINSERT::control::start:
             if (write)
                 pars->setPstartphase(val);
             else
                 val = pars->Pstartphase;
             break;
-        case 4:
+        case LFOINSERT::control::amplitudeRandomness:
             if (write)
                 pars->setPrandomness(val);
             else
                 val = pars->Prandomness;
             break;
-        case 5:
+        case LFOINSERT::control::type:
             if (write)
                 pars->setPLFOtype(lrint(val));
             else
                 val = pars->PLFOtype;
             break;
-        case 6:
+        case LFOINSERT::control::continuous:
             if (write)
                 pars->setPcontinous((val > 0.5f));
             else
                 val = pars->Pcontinous;
             break;
-        case 7:
+        case LFOINSERT::control::frequencyRandomness:
             if (write)
                 pars->setPfreqrand(val);
             else
                 val = pars->Pfreqrand;
             break;
-        case 8:
+        case LFOINSERT::control::stretch:
             if (write)
                 pars->setPstretch(val);
             else
