@@ -1,5 +1,9 @@
 yoshimi 1.5.8 M
 
+2018-7-24 Will
+* Revised enum namespace terminology.
+  No intrinsic code changes.
+
 2018-7-23 Will
 * Converted oscillator controls to enums.
 

@@ -232,9 +232,9 @@ void *InterChange::sortResultsThread(void)
             int toread = commandSize;
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(decodeLoopback, point, toread);
-            if(getData.data.part == topLevel::section::midiLearn) // special midi-learn - needs improving
+            if(getData.data.part == TOPLEVEL::section::midiLearn) // special midi-learn - needs improving
                 synth->midilearn.generalOpps(getData.data.value, getData.data.type, getData.data.control, getData.data.part, getData.data.kit, getData.data.engine, getData.data.insert, getData.data.parameter, getData.data.par2);
-            else if ((getData.data.parameter >= topLevel::route::lowPriority) && getData.data.parameter < 0xff)
+            else if ((getData.data.parameter >= TOPLEVEL::route::lowPriority) && getData.data.parameter < 0xff)
                 indirectTransfers(&getData);
             else
                 resolveReplies(&getData);
@@ -313,12 +313,12 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     string name;
 
     int switchNum = npart;
-    if (control == topLevel::control::errorMessage && insert != topLevel::insert::resonanceGraphInsert)
+    if (control == TOPLEVEL::control::errorMessage && insert != TOPLEVEL::insert::resonanceGraphInsert)
         switchNum = 256; // this is a bit hacky :(
 
     switch(switchNum)
     {
-        case topLevel::section::vector:
+        case TOPLEVEL::section::vector:
         {
             switch(control)
             {
@@ -330,13 +330,13 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     else
                         text = synth->getRuntime().vectordata.Name[insert];
                     value = miscMsgPush(text);
-                    getData->data.parameter -= topLevel::route::lowPriority;
+                    getData->data.parameter -= TOPLEVEL::route::lowPriority;
                     guiTo = true;
                     break;
             }
             break;
         }
-        case topLevel::section::midiIn: // program / bank / root
+        case TOPLEVEL::section::midiIn: // program / bank / root
         {
             //cout << " interchange prog " << value << "  chan " << int(kititem) << "  bank " << int(engine) << "  root " << int(insert) << "  named " << int(par2) << endl;
             if (par2 != NO_MSG) // was named file not numbered
@@ -350,28 +350,28 @@ void InterChange::indirectTransfers(CommandBlock *getData)
             text += miscMsgPop(msgID & NO_MSG);
             value = miscMsgPush(text);
             synth->getRuntime().finishedCLI = true; // temp
-            getData->data.parameter -= topLevel::route::lowPriority;
+            getData->data.parameter -= TOPLEVEL::route::lowPriority;
             guiTo = true;
             break;
         }
-        case topLevel::section::scales:
+        case TOPLEVEL::section::scales:
         {
             switch(control)
             {
-                case scalesLevel::control::tuning:
+                case SCALES::control::tuning:
                     text = formatScales(text);
                     value = synth->microtonal.texttotunings(text.c_str());
                     if (value > 0)
                         synth->setAllPartMaps();
                     break;
-                case scalesLevel::control::keyboardMap:
+                case SCALES::control::keyboardMap:
                     text = formatScales(text);
                     value = synth->microtonal.texttomapping(text.c_str());
                     if (value > 0)
                         synth->setAllPartMaps();
                     break;
 
-                case scalesLevel::control::importScl:
+                case SCALES::control::importScl:
                     value = synth->microtonal.loadscl(setExtension(text,"scl"));
                     if(value > 0)
                     {
@@ -387,7 +387,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         delete [] buf;
                     }
                     break;
-                case scalesLevel::control::importKbm:
+                case SCALES::control::importKbm:
                     value = synth->microtonal.loadkbm(setExtension(text,"kbm"));
                     if(value > 0)
                     {
@@ -411,22 +411,22 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     }
                     break;
 
-                case scalesLevel::control::name:
+                case SCALES::control::name:
                     synth->microtonal.Pname = text;
                     break;
-                case scalesLevel::control::comment:
+                case SCALES::control::comment:
                     synth->microtonal.Pcomment = text;
                     break;
             }
-            getData->data.parameter -= topLevel::route::lowPriority;
+            getData->data.parameter -= TOPLEVEL::route::lowPriority;
             guiTo = true;
             break;
         }
-        case topLevel::section::main:
+        case TOPLEVEL::section::main:
         {
             switch (control)
             {
-                case mainLevel::control::detune:
+                case MAIN::control::detune:
                 {
                     if (write)
                     {
@@ -437,7 +437,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         value = synth->microtonal.Pglobalfinedetune;
                     break;
                 }
-                case mainLevel::control::keyShift:
+                case MAIN::control::keyShift:
                 {
                     if (write)
                     {
@@ -449,7 +449,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     break;
                 }
 
-                case mainLevel::control::exportBank:
+                case MAIN::control::exportBank:
                 {
                     unsigned int result = synth->bank.exportBank(text, kititem, value);
                     text = miscMsgPop(result & 0xff);
@@ -461,7 +461,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     break;
                 }
 
-                case mainLevel::control::importBank:
+                case MAIN::control::importBank:
                 {
                     unsigned int result = synth->bank.importBank(text, kititem, value);
                     text = miscMsgPop(result & 0xff);
@@ -472,7 +472,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     value = miscMsgPush(text);
                     break;
                 }
-                case mainLevel::control::deleteBank:
+                case MAIN::control::deleteBank:
                 {
                     unsigned int result = synth->bank.removebank(value, kititem);
                     text = miscMsgPop(result & 0xff);
@@ -483,7 +483,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     value = miscMsgPush(text);
                     break;
                 }
-                case mainLevel::control::saveInstrument:
+                case MAIN::control::saveInstrument:
                 {
                     if (kititem == 0xff)
                     {
@@ -513,7 +513,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     value = miscMsgPush(text);
                     break;
                 }
-                case mainLevel::control::saveNamedInstrument:
+                case MAIN::control::saveNamedInstrument:
                 {
                     bool ok = true;
                     int saveType = synth->getRuntime().instrumentFormat;
@@ -534,7 +534,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     value = miscMsgPush(text);
                     break;
                 }
-                case mainLevel::control::loadNamedPatchset:
+                case MAIN::control::loadNamedPatchset:
                     vectorClear(NUM_MIDI_CHANNELS);
                     if(synth->loadPatchSetAndUpdate(text))
                         text = "ed " + text;
@@ -542,14 +542,14 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
                     break;
-                case mainLevel::control::saveNamedPatchset:
+                case MAIN::control::saveNamedPatchset:
                     if(synth->savePatchesXML(text))
                         text = "d " + text;
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
                     break;
-                case mainLevel::control::loadNamedVector:
+                case MAIN::control::loadNamedVector:
                     tmp = synth->loadVectorAndUpdate(insert, text);
                     if (tmp < 0xff)
                     {
@@ -560,7 +560,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
                     break;
-                case mainLevel::control::saveNamedVector:
+                case MAIN::control::saveNamedVector:
                 {
                     string oldname = synth->getRuntime().vectordata.Name[insert];
                     int pos = oldname.find("No Name");
@@ -580,21 +580,21 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     value = miscMsgPush(text);
                     break;
                 }
-                case mainLevel::control::loadNamedScale:
+                case MAIN::control::loadNamedScale:
                     if (synth->loadMicrotonal(text))
                         text = "ed " + text;
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
                     break;
-                case mainLevel::control::saveNamedScale:
+                case MAIN::control::saveNamedScale:
                     if (synth->saveMicrotonal(text))
                         text = "d " + text;
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
                     break;
-                case mainLevel::control::loadNamedState:
+                case MAIN::control::loadNamedState:
                     vectorClear(NUM_MIDI_CHANNELS);
                     if (synth->loadStateAndUpdate(text))
                         text = "ed " + text;
@@ -602,14 +602,14 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
                     break;
-                case mainLevel::control::saveNamedState:
+                case MAIN::control::saveNamedState:
                     if (synth->saveState(text))
                         text = "d " + text;
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
                     break;
-                case mainLevel::control::exportPadSynthSamples:
+                case MAIN::control::exportPadSynthSamples:
                     synth->partonoffWrite(npart, -1);
                     setpadparams(parameter | (kititem << 8));
                     if (synth->part[parameter & 0x3f]->kit[kititem].padpars->export2wav(text))
@@ -618,11 +618,11 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = " FAILED some samples " + text;
                     value = miscMsgPush(text);
                     break;
-                case mainLevel::control::masterReset:
-                case mainLevel::control::masterResetAndMlearn:
+                case MAIN::control::masterReset:
+                case MAIN::control::masterResetAndMlearn:
                     synth->resetAll(control & 1);
                     break;
-                case mainLevel::control::openManualPDF: // display user guide
+                case MAIN::control::openManualPDF: // display user guide
                 {
                     string manfile = synth->manualname();
                     unsigned int pos = manfile.rfind(".") + 1;
@@ -655,13 +655,13 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     value = miscMsgPush(text);
                     break;
                 }
-                case mainLevel::control::startInstance:
+                case MAIN::control::startInstance:
                     if (value > 0 && value < 32)
                         value = mainCreateNewInstance(value, false);
                     else
                         value = mainCreateNewInstance(0, false);
                     break;
-                case mainLevel::control::stopInstance:
+                case MAIN::control::stopInstance:
                     text = to_string(value) + " ";
                     if (value < 0 || value >= 32)
                         text += "Out of range";
@@ -679,7 +679,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     value = miscMsgPush(text);
                     break;
 
-                case mainLevel::control::stopSound:
+                case MAIN::control::stopSound:
 #ifdef REPORT_NOTES_ON_OFF
                     // note test
                     synth->getRuntime().Log("note on sent " + to_string(synth->getRuntime().noteOnSent));
@@ -693,12 +693,12 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     synth->Unmute();
                     break;
             }
-            getData->data.parameter -= topLevel::route::lowPriority;
-            if (control != mainLevel::control::startInstance && control != mainLevel::control::stopInstance)
+            getData->data.parameter -= TOPLEVEL::route::lowPriority;
+            if (control != MAIN::control::startInstance && control != MAIN::control::stopInstance)
                 guiTo = true;
             break;
         }
-        case topLevel::section::bank: // instrument / bank
+        case TOPLEVEL::section::bank: // instrument / bank
         {
             switch (control)
             {
@@ -776,14 +776,14 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     guiTo = true;
                     break;
             }
-            getData->data.parameter -= topLevel::route::lowPriority;
+            getData->data.parameter -= TOPLEVEL::route::lowPriority;
             break;
         }
-        case topLevel::section::config:
+        case TOPLEVEL::section::config:
         {
             switch (control)
             {
-                case configLevel::control::jackMidiSource:
+                case CONFIG::control::jackMidiSource:
                     if (write)
                     {
                         synth->getRuntime().jackMidiDevice = text;
@@ -793,7 +793,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = synth->getRuntime().jackMidiDevice;
                     value = miscMsgPush(text);
                     break;
-                case configLevel::control::jackServer:
+                case CONFIG::control::jackServer:
                     if (write)
                     {
                         synth->getRuntime().jackServer = text;
@@ -803,7 +803,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = synth->getRuntime().jackServer;
                     value = miscMsgPush(text);
                     break;
-                case configLevel::control::alsaMidiSource:
+                case CONFIG::control::alsaMidiSource:
                     if (write)
                     {
                         synth->getRuntime().alsaMidiDevice = text;
@@ -813,7 +813,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = synth->getRuntime().alsaMidiDevice;
                     value = miscMsgPush(text);
                     break;
-                case configLevel::control::alsaAudioDevice:
+                case CONFIG::control::alsaAudioDevice:
                     if (write)
                     {
                         synth->getRuntime().alsaAudioDevice = text;
@@ -823,7 +823,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = synth->getRuntime().alsaAudioDevice;
                     value = miscMsgPush(text);
                     break;
-                case configLevel::control::saveCurrentConfig:
+                case CONFIG::control::saveCurrentConfig:
                     if (write)
                     {
                         text = synth->getRuntime().ConfigFile;
@@ -836,19 +836,19 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = "READ";
                     value = miscMsgPush(text);
                     getData->data.par2 = miscMsgPush(text); // slightly odd case
-                    getData->data.parameter -= topLevel::route::lowPriority;
+                    getData->data.parameter -= TOPLEVEL::route::lowPriority;
                         value = miscMsgPush(text);
                     break;
             }
             if (!(type & 0x20))
                 guiTo = true;
-            getData->data.parameter -= topLevel::route::lowPriority;
+            getData->data.parameter -= TOPLEVEL::route::lowPriority;
             break;
         }
         case 256:
         {
             value = miscMsgPush(text);
-            getData->data.parameter -= topLevel::route::lowPriority;
+            getData->data.parameter -= TOPLEVEL::route::lowPriority;
             break;
         }
         default:
@@ -857,7 +857,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
             {
                 switch(control)
                 {
-                    case partLevel::control::keyShift:
+                    case PART::control::keyShift:
                     {
                         if (write)
                         {
@@ -866,40 +866,40 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         }
                         else
                             value = synth->part[npart]->Pkeyshift - 64;
-                        getData->data.parameter -= topLevel::route::lowPriority;
+                        getData->data.parameter -= TOPLEVEL::route::lowPriority;
                     }
                     break;
 
-                    case partLevel::control::defaultInstrument: // clear part
+                    case PART::control::defaultInstrument: // clear part
                         if (write)
                         {
                             doClearPart(npart);
-                            getData->data.parameter -= topLevel::route::lowPriority;
+                            getData->data.parameter -= TOPLEVEL::route::lowPriority;
                         }
                         break;
 
-                    case partLevel::control::padsynthParameters:
+                    case PART::control::padsynthParameters:
                         if (write)
                         {
                             setpadparams(npart | (kititem << 8));
-                            getData->data.parameter -= topLevel::route::lowPriority;
+                            getData->data.parameter -= TOPLEVEL::route::lowPriority;
                         }
                         else
                             value = synth->part[npart]->kit[kititem].padpars->Papplied;
                         break;
 
-                    case partLevel::control::audioDestination:
+                    case PART::control::audioDestination:
                         if (npart < synth->getRuntime().NumAvailableParts)
                         {
                             if (value & 2)
                             {
                                 mainRegisterAudioPort(synth, npart);
                             }
-                            getData->data.parameter -= topLevel::route::lowPriority;
+                            getData->data.parameter -= TOPLEVEL::route::lowPriority;
                         }
                         break;
-                    case partLevel::control::instrumentName: // part or kit item names
-                        if (parameter == topLevel::route::lowPriority)
+                    case PART::control::instrumentName: // part or kit item names
+                        if (parameter == TOPLEVEL::route::lowPriority)
                         {
                             if (write)
                             {
@@ -926,10 +926,10 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         }
                         else
                             text = " FAILED Not in kit mode";
-                        getData->data.parameter -= topLevel::route::lowPriority;
+                        getData->data.parameter -= TOPLEVEL::route::lowPriority;
                         value = miscMsgPush(text);
                         break;
-                    case partLevel::control::defaultInstrumentCopyright:
+                    case PART::control::defaultInstrumentCopyright:
                         if (write)
                         {
                             string name = synth->getRuntime().ConfigDir + "/copyright.txt";
@@ -944,7 +944,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                                 text = synth->part[npart]->info.Pauthor;
                                 saveText(text, name);
                             }
-                            getData->data.parameter -= topLevel::route::lowPriority;
+                            getData->data.parameter -= TOPLEVEL::route::lowPriority;
                             value = miscMsgPush(text);
                         }
                         break;
@@ -954,7 +954,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         }
     }
     __sync_and_and_fetch(&blockRead, 0xfd);
-    if (getData->data.parameter < topLevel::route::lowPriority)
+    if (getData->data.parameter < TOPLEVEL::route::lowPriority)
     {
         if (jack_ringbuffer_write_space(returnsBuffer) >= commandSize)
         {
@@ -963,7 +963,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                 getData->data.par2 = miscMsgPush(text); // pass it on to GUI
 
             jack_ringbuffer_write(returnsBuffer, (char*) getData->bytes, commandSize);
-            if (synth->getRuntime().showGui && npart == topLevel::section::scales && control == 48)
+            if (synth->getRuntime().showGui && npart == TOPLEVEL::section::scales && control == 48)
             {   // loading a tuning includes a name!
                 getData->data.control = 64;
                 getData->data.par2 = miscMsgPush(synth->microtonal.Pname);
@@ -1052,7 +1052,7 @@ float InterChange::readAllData(CommandBlock *getData)
      */
     CommandBlock tryData;
     unsigned char control = getData->data.control;
-    if (getData->data.part == topLevel::section::main && (control >= mainLevel::control::readPartPeak && control <= mainLevel::control::readMainLRrms))
+    if (getData->data.part == TOPLEVEL::section::main && (control >= MAIN::control::readPartPeak && control <= MAIN::control::readMainLRrms))
     {
         commandSendReal(getData);
         synth->fetchMeterData();
@@ -1060,10 +1060,10 @@ float InterChange::readAllData(CommandBlock *getData)
     }
     //cout << "Read Control " << (int) getData->data.control << " Type " << (int) getData->data.type << " Part " << (int) getData->data.part << "  Kit " << (int) getData->data.kit << " Engine " << (int) getData->data.engine << "  Insert " << (int) getData->data.insert << " Parameter " << (int) getData->data.parameter << " Par2 " << (int) getData->data.par2 << endl;
     int npart = getData->data.part;
-    bool indirect = ((getData->data.parameter & 0xf0) == topLevel::route::lowPriority);
+    bool indirect = ((getData->data.parameter & 0xf0) == TOPLEVEL::route::lowPriority);
     if (npart < NUM_MIDI_PARTS && synth->part[npart]->busy)
     {
-        getData->data.control = partLevel::control::partBusy; // part busy message
+        getData->data.control = PART::control::partBusy; // part busy message
         getData->data.kit = 0xff;
         getData->data.engine = 0xff;
         getData->data.insert = 0xff;
@@ -1109,7 +1109,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     unsigned char insert = getData->data.insert;
     unsigned char insertParam = getData->data.parameter;
     unsigned char insertPar2 = getData->data.par2;
-    if (control == topLevel::control::errorMessage && insertParam != topLevel::insert::resonanceGraphInsert) // special case for simple messages
+    if (control == TOPLEVEL::control::errorMessage && insertParam != TOPLEVEL::insert::resonanceGraphInsert) // special case for simple messages
     {
         synth->getRuntime().Log(miscMsgPop(lrint(value)));
         synth->getRuntime().finishedCLI = true;
@@ -1122,7 +1122,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     part = synth->part[npart];
 
     // this is unique and placed here to avoid Xruns
-    if (npart == topLevel::section::scales && (control <= 32 || control >= 49))
+    if (npart == TOPLEVEL::section::scales && (control <= 32 || control >= 49))
         synth->setAllPartMaps();
 
     bool isCli = ((type & 0x30) == 0x10); // elminate Gui redraw
@@ -1166,21 +1166,21 @@ void InterChange::resolveReplies(CommandBlock *getData)
         }
 
     }
-    if (npart == topLevel::section::vector)
+    if (npart == TOPLEVEL::section::vector)
         commandName = resolveVector(getData);
-    else if (npart == topLevel::section::scales)
+    else if (npart == TOPLEVEL::section::scales)
         commandName = resolveMicrotonal(getData);
-    else if (npart == topLevel::section::config)
+    else if (npart == TOPLEVEL::section::config)
         commandName = resolveConfig(getData);
-    else if (npart == topLevel::section::bank)
+    else if (npart == TOPLEVEL::section::bank)
         commandName = resolveBank(getData);
-    else if (npart == topLevel::section::midiIn || npart == topLevel::section::main)
+    else if (npart == TOPLEVEL::section::midiIn || npart == TOPLEVEL::section::main)
         commandName = resolveMain(getData);
 
-    else if (npart == topLevel::section::systemEffects || npart == topLevel::section::insertEffects)
+    else if (npart == TOPLEVEL::section::systemEffects || npart == TOPLEVEL::section::insertEffects)
         commandName = resolveEffects(getData);
 
-    else if ((kititem >= 0x80 && kititem != 0xff) || (control >= partLevel::control::effectNum && control <= partLevel::control::effectBypass && kititem == 0xff))
+    else if ((kititem >= 0x80 && kititem != 0xff) || (control >= PART::control::effectNum && control <= PART::control::effectBypass && kititem == 0xff))
         commandName = resolveEffects(getData);
 
     else if (npart >= NUM_MIDI_PARTS)
@@ -1195,12 +1195,12 @@ void InterChange::resolveReplies(CommandBlock *getData)
         commandName = "Invalid kit " + to_string(int(kititem) + 1);
     }
 
-    else if (kititem != 0 && engine != 0xff && control != partLevel::control::enable && part->kit[kititem].Penabled == false)
+    else if (kititem != 0 && engine != 0xff && control != PART::control::enable && part->kit[kititem].Penabled == false)
         commandName = "Part " + to_string(int(npart) + 1) + " Kit item " + to_string(int(kititem) + 1) + " not enabled";
 
-    else if (kititem == 0xff || insert == topLevel::insert::kitGroup)
+    else if (kititem == 0xff || insert == TOPLEVEL::insert::kitGroup)
     {
-        if (control != partLevel::control::kitMode && kititem < 0xff && part->Pkitmode == 0)
+        if (control != PART::control::kitMode && kititem < 0xff && part->Pkitmode == 0)
         {
             showValue = false;
             commandName = "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
@@ -1214,78 +1214,78 @@ void InterChange::resolveReplies(CommandBlock *getData)
         commandName = "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
     }
 
-    else if (engine == partLevel::engine::padSynth)
+    else if (engine == PART::engine::padSynth)
     {
         switch(insert)
         {
             case 0xff:
                 commandName = resolvePad(getData);
                 break;
-            case topLevel::insert::LFOgroup:
+            case TOPLEVEL::insert::LFOgroup:
                 commandName = resolveLFO(getData);
                 break;
-            case topLevel::insert::filterGroup:
+            case TOPLEVEL::insert::filterGroup:
                 commandName = resolveFilter(getData);
                 break;
-            case topLevel::insert::envelopeGroup:
-            case topLevel::insert::envelopePoints:
-            case topLevel::insert::envelopePointChange:
+            case TOPLEVEL::insert::envelopeGroup:
+            case TOPLEVEL::insert::envelopePoints:
+            case TOPLEVEL::insert::envelopePointChange:
                 commandName = resolveEnvelope(getData);
                 break;
-            case topLevel::insert::oscillatorGroup:
-            case topLevel::insert::harmonicAmplitude:
-            case topLevel::insert::harmonicPhaseBandwidth:
+            case TOPLEVEL::insert::oscillatorGroup:
+            case TOPLEVEL::insert::harmonicAmplitude:
+            case TOPLEVEL::insert::harmonicPhaseBandwidth:
                 commandName = resolveOscillator(getData);
                 break;
-            case topLevel::insert::resonanceGroup:
-            case topLevel::insert::resonanceGraphInsert:
+            case TOPLEVEL::insert::resonanceGroup:
+            case TOPLEVEL::insert::resonanceGraphInsert:
                 commandName = resolveResonance(getData);
                 break;
         }
     }
 
-    else if (engine == partLevel::engine::subSynth)
+    else if (engine == PART::engine::subSynth)
     {
         switch (insert)
         {
             case 0xff:
-            case topLevel::insert::harmonicAmplitude:
-            case topLevel::insert::harmonicPhaseBandwidth:
+            case TOPLEVEL::insert::harmonicAmplitude:
+            case TOPLEVEL::insert::harmonicPhaseBandwidth:
                 commandName = resolveSub(getData);
                 break;
-            case topLevel::insert::filterGroup:
+            case TOPLEVEL::insert::filterGroup:
                 commandName = resolveFilter(getData);
                 break;
-            case topLevel::insert::envelopeGroup:
-            case topLevel::insert::envelopePoints:
-            case topLevel::insert::envelopePointChange:
+            case TOPLEVEL::insert::envelopeGroup:
+            case TOPLEVEL::insert::envelopePoints:
+            case TOPLEVEL::insert::envelopePointChange:
                 commandName = resolveEnvelope(getData);
                 break;
         }
     }
 
-    else if (engine >= partLevel::engine::addVoice1)
+    else if (engine >= PART::engine::addVoice1)
     {
         switch (insert)
         {
             case 0xff:
                 commandName = resolveAddVoice(getData);
                 break;
-            case topLevel::insert::LFOgroup:
+            case TOPLEVEL::insert::LFOgroup:
                 commandName = resolveLFO(getData);
                 break;
-            case topLevel::insert::filterGroup:
+            case TOPLEVEL::insert::filterGroup:
                 commandName = resolveFilter(getData);
                 break;
-            case topLevel::insert::envelopeGroup:
-            case topLevel::insert::envelopePoints:
-            case topLevel::insert::envelopePointChange:
+            case TOPLEVEL::insert::envelopeGroup:
+            case TOPLEVEL::insert::envelopePoints:
+            case TOPLEVEL::insert::envelopePointChange:
                 commandName = resolveEnvelope(getData);
                 break;
-            case topLevel::insert::oscillatorGroup:
-            case topLevel::insert::harmonicAmplitude:
-            case topLevel::insert::harmonicPhaseBandwidth:
-                if (engine >= partLevel::engine::addMod1)
+            case TOPLEVEL::insert::oscillatorGroup:
+            case TOPLEVEL::insert::harmonicAmplitude:
+            case TOPLEVEL::insert::harmonicPhaseBandwidth:
+                if (engine >= PART::engine::addMod1)
                     commandName = resolveOscillator(getData);
                 else
                     commandName = resolveOscillator(getData);
@@ -1293,26 +1293,26 @@ void InterChange::resolveReplies(CommandBlock *getData)
         }
     }
 
-    else if (engine == partLevel::engine::addSynth)
+    else if (engine == PART::engine::addSynth)
     {
         switch (insert)
         {
             case 0xff:
                 commandName = resolveAdd(getData);
                 break;
-            case topLevel::insert::LFOgroup:
+            case TOPLEVEL::insert::LFOgroup:
                 commandName = resolveLFO(getData);
                 break;
-            case topLevel::insert::filterGroup:
+            case TOPLEVEL::insert::filterGroup:
                 commandName = resolveFilter(getData);
                 break;
-            case topLevel::insert::envelopeGroup:
-            case topLevel::insert::envelopePoints:
-            case topLevel::insert::envelopePointChange:
+            case TOPLEVEL::insert::envelopeGroup:
+            case TOPLEVEL::insert::envelopePoints:
+            case TOPLEVEL::insert::envelopePointChange:
                 commandName = resolveEnvelope(getData);
                 break;
-            case topLevel::insert::resonanceGroup:
-            case topLevel::insert::resonanceGraphInsert:
+            case TOPLEVEL::insert::resonanceGroup:
+            case TOPLEVEL::insert::resonanceGraphInsert:
                 commandName = resolveResonance(getData);
                 break;
         }
@@ -1367,48 +1367,48 @@ string InterChange::resolveVector(CommandBlock *getData)
         //case 1:
             //contstr = "Options";
             //break;
-        case vectorLevel::control::name:
+        case VECTOR::control::name:
             showValue = false;
             contstr = "Name " + miscMsgPop(value_int);
             break;
 
-        case vectorLevel::control::Xcontroller:
+        case VECTOR::control::Xcontroller:
             contstr = "Controller";
             break;
-        case vectorLevel::control::XleftInstrument:
+        case VECTOR::control::XleftInstrument:
             contstr = "Left Instrument";
             break;
-        case vectorLevel::control::XrightInstrument:
+        case VECTOR::control::XrightInstrument:
             contstr = "Right Instrument";
             break;
-        case vectorLevel::control::Xfeature0:
-        case vectorLevel::control::Yfeature0:
+        case VECTOR::control::Xfeature0:
+        case VECTOR::control::Yfeature0:
             contstr = "Feature 0";
             break;
-        case vectorLevel::control::Xfeature1:
-        case vectorLevel::control::Yfeature1:
+        case VECTOR::control::Xfeature1:
+        case VECTOR::control::Yfeature1:
             contstr = "Feature 1";
             break;
-        case vectorLevel::control::Xfeature2:
-        case vectorLevel::control::Yfeature2:
+        case VECTOR::control::Xfeature2:
+        case VECTOR::control::Yfeature2:
             contstr = "Feature 2 ";
             break;
-        case vectorLevel::control::Xfeature3:
-        case vectorLevel::control::Yfeature3:
+        case VECTOR::control::Xfeature3:
+        case VECTOR::control::Yfeature3:
             contstr = "Feature 3";
             break;
 
-        case vectorLevel::control::Ycontroller:
+        case VECTOR::control::Ycontroller:
             contstr = "Controller";
             break;
-        case vectorLevel::control::YupInstrument:
+        case VECTOR::control::YupInstrument:
             contstr = "Up Instrument";
             break;
-        case vectorLevel::control::YdownInstrument:
+        case VECTOR::control::YdownInstrument:
             contstr = "Down Instrument";
             break;
 
-        case vectorLevel::control::erase:
+        case VECTOR::control::erase:
             showValue = false;
             if (chan > NUM_MIDI_CHANNELS)
                 contstr = "all channels";
@@ -1450,69 +1450,69 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
     string contstr = "";
     switch (control)
     {
-        case scalesLevel::control::Afrequency:
+        case SCALES::control::Afrequency:
             contstr = "'A' Frequency";
             break;
-        case scalesLevel::control::Anote:
+        case SCALES::control::Anote:
             contstr = "'A' Note";
             break;
-        case scalesLevel::control::invertScale:
+        case SCALES::control::invertScale:
             contstr = "Invert Keys";
             break;
-        case scalesLevel::control::invertedScaleCenter:
+        case SCALES::control::invertedScaleCenter:
             contstr = "Key Center";
             break;
-        case scalesLevel::control::scaleShift:
+        case SCALES::control::scaleShift:
             contstr = "Scale Shift";
             break;
-        case scalesLevel::control::enableMicrotonal:
+        case SCALES::control::enableMicrotonal:
             contstr = "Enable Microtonal";
             break;
 
-        case scalesLevel::control::enableKeyboardMap:
+        case SCALES::control::enableKeyboardMap:
             contstr = "Enable Keyboard Mapping";
             break;
-        case scalesLevel::control::lowKey:
+        case SCALES::control::lowKey:
             contstr = "Keyboard First Note";
             break;
-        case scalesLevel::control::middleKey:
+        case SCALES::control::middleKey:
             contstr = "Keyboard Middle Note";
             break;
-        case scalesLevel::control::highKey:
+        case SCALES::control::highKey:
             contstr = "Keyboard Last Note";
             break;
 
-        case scalesLevel::control::tuning:
+        case SCALES::control::tuning:
             contstr = "Tuning ";
             showValue = false;
             break;
-        case scalesLevel::control::keyboardMap:
+        case SCALES::control::keyboardMap:
             contstr = "Keymap ";
             showValue = false;
             break;
-        case scalesLevel::control::importScl:
+        case SCALES::control::importScl:
             contstr = "Tuning Import ";
             showValue = false;
             break;
-        case scalesLevel::control::importKbm:
+        case SCALES::control::importKbm:
             contstr = "Keymap Import ";
             showValue = false;
             break;
 
-        case scalesLevel::control::name:
+        case SCALES::control::name:
             contstr = "Name: " + string(synth->microtonal.Pname);
             showValue = false;
             break;
-        case scalesLevel::control::comment:
+        case SCALES::control::comment:
             contstr = "Description: " + string(synth->microtonal.Pcomment);
             showValue = false;
             break;
-        case scalesLevel::control::retune:
+        case SCALES::control::retune:
             contstr = "Retune";
             showValue = false;
             break;
 
-        case scalesLevel::control::clearAll:
+        case SCALES::control::clearAll:
             contstr = "Clear all settings";
             showValue = false;
             break;
@@ -1572,13 +1572,13 @@ string InterChange::resolveConfig(CommandBlock *getData)
     string contstr = "";
     switch (control)
     {
-        case configLevel::control::oscillatorSize:
+        case CONFIG::control::oscillatorSize:
             contstr = "AddSynth oscillator size";
             break;
-        case configLevel::control::bufferSize:
+        case CONFIG::control::bufferSize:
             contstr = "Internal buffer size";
             break;
-        case configLevel::control::padSynthInterpolation:
+        case CONFIG::control::padSynthInterpolation:
             contstr = "PadSynth interpolation ";
             if (value_bool)
                 contstr += "cubic";
@@ -1586,7 +1586,7 @@ string InterChange::resolveConfig(CommandBlock *getData)
                 contstr += "linear";
             showValue = false;
             break;
-        case configLevel::control::virtualKeyboardLayout:
+        case CONFIG::control::virtualKeyboardLayout:
             contstr = "Virtual keyboard ";
             switch (value_int)
             {
@@ -1605,10 +1605,10 @@ string InterChange::resolveConfig(CommandBlock *getData)
             }
             showValue = false;
             break;
-        case configLevel::control::XMLcompressionLevel:
+        case CONFIG::control::XMLcompressionLevel:
             contstr = "XML compression";
             break;
-        case configLevel::control::reportsDestination:
+        case CONFIG::control::reportsDestination:
             contstr = "Reports to ";
             if (value_bool)
                 contstr += "console window";
@@ -1616,7 +1616,7 @@ string InterChange::resolveConfig(CommandBlock *getData)
                 contstr += "stdout";
             showValue = false;
             break;
-        case configLevel::control::savedInstrumentFormat:
+        case CONFIG::control::savedInstrumentFormat:
             contstr = "Saved Instrument Format ";
             switch (value_int)
             {
@@ -1632,85 +1632,85 @@ string InterChange::resolveConfig(CommandBlock *getData)
             }
             showValue = false;
             break;
-        case configLevel::control::defaultStateStart:
+        case CONFIG::control::defaultStateStart:
             contstr += "Autoload default state";
             yesno = true;
             break;
-        case configLevel::control::hideNonFatalErrors:
+        case CONFIG::control::hideNonFatalErrors:
             contstr += "Hide non-fatal errors";
             yesno = true;
             break;
-        case configLevel::control::showSplash:
+        case CONFIG::control::showSplash:
             contstr += "Show splash screen";
             yesno = true;
             break;
-        case configLevel::control::logInstrumentLoadTimes:
+        case CONFIG::control::logInstrumentLoadTimes:
             contstr += "Log instrument load times";
             yesno = true;
             break;
-        case configLevel::control::logXMLheaders:
+        case CONFIG::control::logXMLheaders:
             contstr += "Log XML headers";
             yesno = true;
             break;
-        case configLevel::control::saveAllXMLdata:
+        case CONFIG::control::saveAllXMLdata:
             contstr += "Save ALL XML data";
             yesno = true;
             break;
-        case configLevel::control::enableGUI:
+        case CONFIG::control::enableGUI:
             contstr += "Enable GUI";
             yesno = true;
             break;
-        case configLevel::control::enableCLI:
+        case CONFIG::control::enableCLI:
             contstr += "Enable CLI";
             yesno = true;
             break;
-        case configLevel::control::enableAutoInstance:
+        case CONFIG::control::enableAutoInstance:
             contstr += "Enable Auto Instance";
             yesno = true;
             break;
 
-        case configLevel::control::jackMidiSource:
+        case CONFIG::control::jackMidiSource:
             contstr += "JACK MIDI source: ";
             contstr += miscMsgPop(value_int);
             showValue = false;
             break;
-        case configLevel::control::jackPreferredMidi:
+        case CONFIG::control::jackPreferredMidi:
             contstr += "Start with JACK MIDI";
             yesno = true;
             break;
-        case configLevel::control::jackServer:
+        case CONFIG::control::jackServer:
             contstr += "JACK server: ";
             contstr += miscMsgPop(value_int);
             showValue = false;
             break;
-        case configLevel::control::jackPreferredAudio:
+        case CONFIG::control::jackPreferredAudio:
             contstr += "Start with JACK audio";
             yesno = true;
             break;
-        case configLevel::control::jackAutoConnectAudio:
+        case CONFIG::control::jackAutoConnectAudio:
             contstr += "Auto-connect to JACK server";
             yesno = true;
             break;
 
-        case configLevel::control::alsaMidiSource:
+        case CONFIG::control::alsaMidiSource:
             contstr += "ALSA MIDI source: ";
             contstr += miscMsgPop(value_int);
             showValue = false;
             break;
-        case configLevel::control::alsaPreferredMidi:
+        case CONFIG::control::alsaPreferredMidi:
             contstr += "Start with ALSA MIDI";
             yesno = true;
             break;
-        case configLevel::control::alsaAudioDevice:
+        case CONFIG::control::alsaAudioDevice:
             contstr += "ALSA audio device: ";
             contstr += miscMsgPop(value_int);
             showValue = false;
             break;
-        case configLevel::control::alsaPreferredAudio:
+        case CONFIG::control::alsaPreferredAudio:
             contstr += "Start with ALSA audio";
             yesno = true;
             break;
-        case configLevel::control::alsaSampleRate:
+        case CONFIG::control::alsaSampleRate:
             contstr += "ALSA sample rate: ";
             switch (value_int)
             { // this is a hack :(
@@ -1734,22 +1734,22 @@ string InterChange::resolveConfig(CommandBlock *getData)
             showValue = false;
             break;
 
-        /*case configLevel::control::enableBankRootChange:
+        /*case CONFIG::control::enableBankRootChange:
             contstr += "Enable bank root change";
             yesno = true;
             break;*/
-        case configLevel::control::bankRootCC:
+        case CONFIG::control::bankRootCC:
             contstr += "Bank root CC";
             break;
 
-        case configLevel::control::bankCC:
+        case CONFIG::control::bankCC:
             contstr += "Bank CC";
             break;
-        case configLevel::control::enableProgramChange:
+        case CONFIG::control::enableProgramChange:
             contstr += "Enable program change";
             yesno = true;
             break;
-        case configLevel::control::programChangeEnablesPart:
+        case CONFIG::control::programChangeEnablesPart:
             contstr += "Program change enables part";
             yesno = true;
             break;
@@ -1757,28 +1757,28 @@ string InterChange::resolveConfig(CommandBlock *getData)
             contstr += "Enable extended program change";
             yesno = true;
             break;*/
-        case configLevel::control::extendedProgramChangeCC:
+        case CONFIG::control::extendedProgramChangeCC:
             contstr += "CC for extended program change";
             break;
-        case configLevel::control::ignoreResetAllCCs:
+        case CONFIG::control::ignoreResetAllCCs:
             contstr += "Ignore 'reset all CCs'";
             yesno = true;
             break;
-        case configLevel::control::logIncomingCCs:
+        case CONFIG::control::logIncomingCCs:
             contstr += "Log incoming CCs";
             yesno = true;
             break;
-        case configLevel::control::showLearnEditor:
+        case CONFIG::control::showLearnEditor:
             contstr += "Auto-open GUI MIDI-learn editor";
             yesno = true;
             break;
 
-        case configLevel::control::enableNRPNs:
+        case CONFIG::control::enableNRPNs:
             contstr += "Enable NRPN";
             yesno = true;
             break;
 
-        case configLevel::control::saveCurrentConfig:
+        case CONFIG::control::saveCurrentConfig:
         {
             string name = miscMsgPop(value_int);
             if (write)
@@ -1858,7 +1858,7 @@ string InterChange::resolveMain(CommandBlock *getData)
 //    unsigned char par2 = getData->data.par2;
     string name;
     string contstr = "";
-    if (getData->data.part == topLevel::section::midiIn)
+    if (getData->data.part == TOPLEVEL::section::midiIn)
     {
         switch (control)
         {
@@ -1879,26 +1879,26 @@ string InterChange::resolveMain(CommandBlock *getData)
 
     switch (control)
     {
-        case mainLevel::control::volume:
+        case MAIN::control::volume:
             contstr = "Volume";
             break;
 
-        case mainLevel::control::partNumber:
+        case MAIN::control::partNumber:
             showValue = false;
             contstr = "Part Number " + to_string(value_int + 1);
             break;
-        case mainLevel::control::availableParts:
+        case MAIN::control::availableParts:
             contstr = "Available Parts";
             break;
 
-        case mainLevel::control::detune:
+        case MAIN::control::detune:
             contstr = "Detune";
             break;
-        case mainLevel::control::keyShift:
+        case MAIN::control::keyShift:
             contstr = "Key Shift";
             break;
 
-        case mainLevel::control::soloType:
+        case MAIN::control::soloType:
             showValue = false;
             contstr = "Chan 'solo' Switch - ";
             switch (value_int)
@@ -1920,7 +1920,7 @@ string InterChange::resolveMain(CommandBlock *getData)
                     break;
             }
             break;
-        case mainLevel::control::soloCC:
+        case MAIN::control::soloCC:
             showValue = false;
             contstr = "Chan 'solo' Switch CC ";
             if (value_int > 127)
@@ -1928,114 +1928,114 @@ string InterChange::resolveMain(CommandBlock *getData)
             else
                 contstr += to_string(value_int);
             break;
-        case mainLevel::control::exportBank:
+        case MAIN::control::exportBank:
             showValue = false;
             contstr = "Bank Export" + miscMsgPop(value_int);
             break;
-        case mainLevel::control::importBank:
+        case MAIN::control::importBank:
             showValue = false;
             contstr = "Bank Import" + miscMsgPop(value_int);
             break;
-        case mainLevel::control::deleteBank:
+        case MAIN::control::deleteBank:
             showValue = false;
             contstr = "Bank delete" + miscMsgPop(value_int);
             break;
-        case mainLevel::control::saveInstrument:
+        case MAIN::control::saveInstrument:
             showValue = false;
             contstr = "Bank Slot Save" + miscMsgPop(value_int);
             break;
 
-        case mainLevel::control::saveNamedInstrument:
+        case MAIN::control::saveNamedInstrument:
             showValue = false;
             contstr = "Instrument Save" + miscMsgPop(value_int);
             break;
 
-        case mainLevel::control::loadNamedPatchset:
+        case MAIN::control::loadNamedPatchset:
             showValue = false;
             contstr = "Patchset Load" + miscMsgPop(value_int);
             break;
 
-        case mainLevel::control::saveNamedPatchset:
+        case MAIN::control::saveNamedPatchset:
             showValue = false;
             contstr = "Patchset Save" + miscMsgPop(value_int);
             break;
 
-        case mainLevel::control::loadNamedVector:
+        case MAIN::control::loadNamedVector:
             showValue = false;
             name = miscMsgPop(value_int);
             contstr = "Vector Load" + name;
             break;
 
-        case mainLevel::control::saveNamedVector:
+        case MAIN::control::saveNamedVector:
             showValue = false;
             name = miscMsgPop(value_int);
             contstr = "Vector Save" + name;
             break;
 
-        case mainLevel::control::loadNamedScale:
+        case MAIN::control::loadNamedScale:
             showValue = false;
             name = miscMsgPop(value_int);
             contstr = "Scale Load" + name;
             break;
 
-        case mainLevel::control::saveNamedScale:
+        case MAIN::control::saveNamedScale:
             showValue = false;
             name = miscMsgPop(value_int);
             contstr = "Scale Save" + name;
             break;
 
-        case mainLevel::control::loadNamedState:
+        case MAIN::control::loadNamedState:
             showValue = false;
             name = miscMsgPop(value_int);
             contstr = "State Load" + name;
             break;
 
-        case mainLevel::control::saveNamedState:
+        case MAIN::control::saveNamedState:
             showValue = false;
             contstr = "State Save" + miscMsgPop(value_int);
             break;
 
-        case mainLevel::control::exportPadSynthSamples:
+        case MAIN::control::exportPadSynthSamples:
             showValue = false;
             contstr = "PadSynth Samples Save" + miscMsgPop(value_int);
             break;
 
-        case mainLevel::control::masterReset:
+        case MAIN::control::masterReset:
             showValue = false;
             contstr = "Reset All";
             break;
-        case mainLevel::control::masterResetAndMlearn:
+        case MAIN::control::masterResetAndMlearn:
             showValue = false;
             contstr = "Reset All including MIDI-learn";
             break;
 
-        case mainLevel::control::openManualPDF:
+        case MAIN::control::openManualPDF:
             showValue = false;
             contstr = "Open manual in PDF reader " + miscMsgPop(value_int);
             break;
 
-        case mainLevel::control::startInstance:
+        case MAIN::control::startInstance:
             showValue = false;
             contstr = "Start new instance " + to_string(value_int);
             break;
-        case mainLevel::control::stopInstance:
+        case MAIN::control::stopInstance:
             showValue = false;
             contstr = "Close instance - " + miscMsgPop(value_int);
             break;
 
-        case mainLevel::control::stopSound:
+        case MAIN::control::stopSound:
             showValue = false;
             contstr = "Sound Stopped";
             break;
 
-        case mainLevel::control::readPartPeak:
+        case MAIN::control::readPartPeak:
             showValue = false;
             contstr = "Part " + to_string(int(kititem));
             if (value < 0.0f)
                 contstr += " silent ";
             contstr += (" peak level " + to_string(value));
             break;
-        case mainLevel::control::readMainLRpeak:
+        case MAIN::control::readMainLRpeak:
             showValue = false;
             if(kititem == 1)
                 contstr = "Right";
@@ -2043,7 +2043,7 @@ string InterChange::resolveMain(CommandBlock *getData)
                 contstr = "Left";
             contstr += (" peak level " + to_string(value));
             break;
-        case mainLevel::control::readMainLRrms:
+        case MAIN::control::readMainLRrms:
             showValue = false;
             if(kititem == 1)
                 contstr = "Right";
@@ -2073,7 +2073,7 @@ string InterChange::resolvePart(CommandBlock *getData)
     //unsigned char par2 = getData->data.par2;
     unsigned char effNum = engine;
 
-    bool kitType = (insert == topLevel::insert::kitGroup);
+    bool kitType = (insert == TOPLEVEL::insert::kitGroup);
     bool value_bool = value_int > 0;
     bool yesno = false;
 
@@ -2087,25 +2087,25 @@ string InterChange::resolvePart(CommandBlock *getData)
         kitnum = " ";
 
     string name = "";
-    if (control >= partLevel::control::volumeRange && control <= partLevel::control::receivePortamento)
+    if (control >= PART::control::volumeRange && control <= PART::control::receivePortamento)
     {
         name = "Controller ";
-        if (control >= partLevel::control::portamentoTime)
+        if (control >= PART::control::portamentoTime)
             name += "Portamento ";
     }
-    else if (control >= partLevel::control::midiModWheel && control <= partLevel::control::midiBandwidth)
+    else if (control >= PART::control::midiModWheel && control <= PART::control::midiBandwidth)
         name = "MIDI ";
     else if (kititem < 0xff)
     {
         switch (engine)
         {
-            case partLevel::engine::addSynth:
+            case PART::engine::addSynth:
                 name = "AddSynth ";
                 break;
-            case partLevel::engine::subSynth:
+            case PART::engine::subSynth:
                 name = "SubSynth ";
                 break;
-            case partLevel::engine::padSynth:
+            case PART::engine::padSynth:
                 name = "PadSynth ";
                 break;
         }
@@ -2114,19 +2114,19 @@ string InterChange::resolvePart(CommandBlock *getData)
     string contstr = "";
     switch (control)
     {
-        case partLevel::control::volume:
+        case PART::control::volume:
             contstr = "Volume";
             break;
-        case partLevel::control::velocitySense:
+        case PART::control::velocitySense:
             contstr = "Vel Sens";
             break;
-        case partLevel::control::panning:
+        case PART::control::panning:
             contstr = "Panning";
             break;
-        case partLevel::control::velocityOffset:
+        case PART::control::velocityOffset:
             contstr = "Vel Offset";
             break;
-        case partLevel::control::midiChannel:
+        case PART::control::midiChannel:
             showValue = false;
             contstr = "Midi CH - " + to_string(value_int + 1);
             if (value_int >= NUM_MIDI_CHANNELS * 2)
@@ -2134,7 +2134,7 @@ string InterChange::resolvePart(CommandBlock *getData)
             else if (value_int >= NUM_MIDI_CHANNELS)
                 contstr = contstr + " Note off only on CH " + to_string(value_int + 1 - NUM_MIDI_CHANNELS);
             break;
-        case partLevel::control::keyMode:
+        case PART::control::keyMode:
             showValue = false;
             contstr = "Mode - ";
             if (value_int == 0)
@@ -2144,103 +2144,103 @@ string InterChange::resolvePart(CommandBlock *getData)
             else if (value_int >= 2)
                 contstr += "Legato";
             break;
-        case partLevel::control::portamento:
+        case PART::control::portamento:
             contstr = "Portamento Enable";
             yesno = true;
             break;
-        case partLevel::control::enable:
+        case PART::control::enable:
             contstr = "Enable";
             if (!kitType)
             {
                 switch(engine)
                 {
-                    case partLevel::engine::addSynth:
+                    case PART::engine::addSynth:
                         contstr = "AddSynth " + contstr;
                         break;
-                    case partLevel::engine::subSynth:
+                    case PART::engine::subSynth:
                         contstr = "SubSynth " + contstr;
                         break;
-                    case partLevel::engine::padSynth:
+                    case PART::engine::padSynth:
                         contstr = "PadSynth " + contstr;
                         break;
                 }
             }
             break;
-        case partLevel::control::kitItemMute:
+        case PART::control::kitItemMute:
             if (kitType)
                 contstr = "Mute";
             break;
 
-        case partLevel::control::minNote:
+        case PART::control::minNote:
             contstr = "Min Note";
             break;
-        case partLevel::control::maxNote:
+        case PART::control::maxNote:
             contstr = "Max Note";
             break;
-        case partLevel::control::minToLastKey: // always return actual value
+        case PART::control::minToLastKey: // always return actual value
             contstr = "Min To Last";
             break;
-        case partLevel::control::maxToLastKey: // always return actual value
+        case PART::control::maxToLastKey: // always return actual value
             contstr = "Max To Last";
             break;
-        case partLevel::control::resetMinMaxKey:
+        case PART::control::resetMinMaxKey:
             contstr = "Reset Key Range";
             break;
 
-        case partLevel::control::kitEffectNum:
+        case PART::control::kitEffectNum:
             if (kitType)
                 contstr = "Effect Number";
             break;
 
-        case partLevel::control::maxNotes:
+        case PART::control::maxNotes:
             contstr = "Key Limit";
             break;
-        case partLevel::control::keyShift:
+        case PART::control::keyShift:
             contstr = "Key Shift";
             break;
 
-        case partLevel::control::partToSystemEffect1:
+        case PART::control::partToSystemEffect1:
             contstr = "Effect Send 1";
             break;
-        case partLevel::control::partToSystemEffect2:
+        case PART::control::partToSystemEffect2:
             contstr = "Effect Send 2";
             break;
-        case partLevel::control::partToSystemEffect3:
+        case PART::control::partToSystemEffect3:
             contstr = "Effect Send 3";
             break;
-        case partLevel::control::partToSystemEffect4:
+        case PART::control::partToSystemEffect4:
             contstr = "Effect Send 4";
             break;
 
-        case partLevel::control::humanise:
+        case PART::control::humanise:
             contstr = "Humanise";
             break;
 
-        case partLevel::control::drumMode:
+        case PART::control::drumMode:
             contstr = "Drum Mode";
             break;
-        case partLevel::control::kitMode:
+        case PART::control::kitMode:
             contstr = "Kit Mode";
             break;
 
-        case partLevel::control::effectNum: // local to source
+        case PART::control::effectNum: // local to source
             contstr = "Effect Number";
             break;
-        case partLevel::control::effectType:
+        case PART::control::effectType:
             contstr = "Effect " + to_string(effNum + 1) + " Type";
             break;
-        case partLevel::control::effectDestination:
+        case PART::control::effectDestination:
             contstr = "Effect " + to_string(effNum + 1) + " Destination";
             break;
-        case partLevel::control::effectBypass:
+        case PART::control::effectBypass:
             contstr = "Bypass Effect "+ to_string(effNum + 1);
             break;
 
-        case partLevel::control::defaultInstrument: // doClearPart
+        case PART::control::defaultInstrument: // doClearPart
             contstr = "Set Default Instrument";
             break;
 
-        case partLevel::control::audioDestination:
+        case PART::control::audioDestination:
             contstr = "Audio destination ";
             showValue = false;
             switch(value_int)
@@ -2258,118 +2258,118 @@ string InterChange::resolvePart(CommandBlock *getData)
             }
             break;
 
-        case partLevel::control::volumeRange:
+        case PART::control::volumeRange:
             contstr = "Vol Range"; // not the *actual* volume
             break;
-        case partLevel::control::volumeEnable:
+        case PART::control::volumeEnable:
             contstr = "Vol Enable";
             break;
-        case partLevel::control::panningWidth:
+        case PART::control::panningWidth:
             contstr = "Pan Width";
             break;
-        case partLevel::control::modWheelDepth:
+        case PART::control::modWheelDepth:
             contstr = "Mod Wheel Depth";
             break;
-        case partLevel::control::exponentialModWheel:
+        case PART::control::exponentialModWheel:
             contstr = "Exp Mod Wheel";
             break;
-        case partLevel::control::bandwidthDepth:
+        case PART::control::bandwidthDepth:
             contstr = "Bandwidth depth";
             break;
-        case partLevel::control::exponentialBandwidth:
+        case PART::control::exponentialBandwidth:
             contstr = "Exp Bandwidth";
             break;
-        case partLevel::control::expressionEnable:
+        case PART::control::expressionEnable:
             contstr = "Expression Enable";
             break;
-        case partLevel::control::FMamplitudeEnable:
+        case PART::control::FMamplitudeEnable:
             contstr = "FM Amp Enable";
             break;
-        case partLevel::control::sustainPedalEnable:
+        case PART::control::sustainPedalEnable:
             contstr = "Sustain Ped Enable";
             break;
-        case partLevel::control::pitchWheelRange:
+        case PART::control::pitchWheelRange:
             contstr = "Pitch Wheel Range";
             break;
-        case partLevel::control::filterQdepth:
+        case PART::control::filterQdepth:
             contstr = "Filter Q Depth";
             break;
-        case partLevel::control::filterCutoffDepth:
+        case PART::control::filterCutoffDepth:
             contstr = "Filter Cutoff Depth";
             break;
-        case partLevel::control::breathControlEnable:
+        case PART::control::breathControlEnable:
             yesno = true;
             contstr = "Breath Control";
             break;
 
-        case partLevel::control::resonanceCenterFrequencyDepth:
+        case PART::control::resonanceCenterFrequencyDepth:
             contstr = "Res Cent Freq Depth";
             break;
-        case partLevel::control::resonanceBandwidthDepth:
+        case PART::control::resonanceBandwidthDepth:
             contstr = "Res Band Depth";
             break;
 
-        case partLevel::control::portamentoTime:
+        case PART::control::portamentoTime:
             contstr = "Time";
             break;
-        case partLevel::control::portamentoTimeStretch:
+        case PART::control::portamentoTimeStretch:
             contstr = "Tme Stretch";
             break;
-        case partLevel::control::portamentoThreshold:
+        case PART::control::portamentoThreshold:
             contstr = "Threshold";
             break;
-        case partLevel::control::portamentoThresholdType:
+        case PART::control::portamentoThresholdType:
             contstr = "Threshold Type";
             break;
-        case partLevel::control::enableProportionalPortamento:
+        case PART::control::enableProportionalPortamento:
             contstr = "Prop Enable";
             break;
-        case partLevel::control::proportionalPortamentoRate:
+        case PART::control::proportionalPortamentoRate:
             contstr = "Prop Rate";
             break;
-        case partLevel::control::proportionalPortamentoDepth:
+        case PART::control::proportionalPortamentoDepth:
             contstr = "Prop depth";
             break;
-        case partLevel::control::receivePortamento:
+        case PART::control::receivePortamento:
             contstr = "Receive";
             break;
 
-        case partLevel::control::midiModWheel:
+        case PART::control::midiModWheel:
             contstr = "Modulation";
             break;
-        case partLevel::control::midiBreath:
+        case PART::control::midiBreath:
             ; // not yet
             break;
-        case partLevel::control::midiExpression:
+        case PART::control::midiExpression:
             contstr = "Expression";
             break;
-        case partLevel::control::midiSustain:
+        case PART::control::midiSustain:
             ; // not yet
             break;
-        case partLevel::control::midiPortamento:
+        case PART::control::midiPortamento:
             ; // not yet
             break;
-        case partLevel::control::midiFilterQ:
+        case PART::control::midiFilterQ:
             contstr = "Filter Q";
             break;
-        case partLevel::control::midiFilterCutoff:
+        case PART::control::midiFilterCutoff:
             contstr = "Filter Cutoff";
             break;
-        case partLevel::control::midiBandwidth:
+        case PART::control::midiBandwidth:
             contstr = "Bandwidth";
             break;
 
-        case partLevel::control::instrumentCopyright:
+        case PART::control::instrumentCopyright:
             ; // not yet
             break;
-        case partLevel::control::instrumentComments:
+        case PART::control::instrumentComments:
             ; // not yet
             break;
-        case partLevel::control::instrumentName:
+        case PART::control::instrumentName:
             showValue = false;
             contstr = "Name is: " + miscMsgPop(value_int);
             break;
-        case partLevel::control::defaultInstrumentCopyright:
+        case PART::control::defaultInstrumentCopyright:
             showValue = false;
             contstr = "Copyright ";
             if (parameter == 0)
@@ -2378,11 +2378,11 @@ string InterChange::resolvePart(CommandBlock *getData)
                 contstr += "save:\n";
             contstr += miscMsgPop(value_int);
             break;
-        case partLevel::control::resetAllControllers:
+        case PART::control::resetAllControllers:
             contstr = "Clear controllers";
             break;
 
-        case partLevel::control::partBusy:
+        case PART::control::partBusy:
             showValue = false;
             if (value_bool)
                 contstr = "is busy";
@@ -2417,10 +2417,10 @@ string InterChange::resolveAdd(CommandBlock *getData)
     string name = "";
     switch (control & 0x70)
     {
-        case addSynthLevel::control::volume:
+        case ADDSYNTH::control::volume:
             name = " Amplitude ";
             break;
-        case addSynthLevel::control::detuneFrequency:
+        case ADDSYNTH::control::detuneFrequency:
             name = " Frequency ";
             break;
     }
@@ -2429,54 +2429,54 @@ string InterChange::resolveAdd(CommandBlock *getData)
 
     switch (control)
     {
-        case addSynthLevel::control::volume:
+        case ADDSYNTH::control::volume:
             contstr = "Volume";
 
             break;
-        case addSynthLevel::control::velocitySense:
+        case ADDSYNTH::control::velocitySense:
             contstr = "Vel Sens";
             break;
-        case addSynthLevel::control::panning:
+        case ADDSYNTH::control::panning:
             contstr = "Panning";
             break;
 
-        case addSynthLevel::control::detuneFrequency:
+        case ADDSYNTH::control::detuneFrequency:
             contstr = "Detune";
             break;
 
-        case addSynthLevel::control::octave:
+        case ADDSYNTH::control::octave:
             contstr = "Octave";
             break;
-        case addSynthLevel::control::detuneType:
+        case ADDSYNTH::control::detuneType:
             contstr = "Det type";
             break;
-        case addSynthLevel::control::coarseDetune:
+        case ADDSYNTH::control::coarseDetune:
             contstr = "Coarse Det";
             break;
-        case addSynthLevel::control::relativeBandwidth:
+        case ADDSYNTH::control::relativeBandwidth:
             contstr = "Rel B Wdth";
             break;
 
-        case addSynthLevel::control::stereo:
+        case ADDSYNTH::control::stereo:
             contstr = "Stereo";
             break;
-        case addSynthLevel::control::randomGroup:
+        case ADDSYNTH::control::randomGroup:
             contstr = "Rnd Grp";
             break;
 
-        case addSynthLevel::control::dePop:
+        case ADDSYNTH::control::dePop:
             contstr = "De Pop";
             break;
-        case addSynthLevel::control::punchStrength:
+        case ADDSYNTH::control::punchStrength:
             contstr = "Punch Strngth";
             break;
-        case addSynthLevel::control::punchDuration:
+        case ADDSYNTH::control::punchDuration:
             contstr = "Punch Time";
             break;
-        case addSynthLevel::control::punchStretch:
+        case ADDSYNTH::control::punchStretch:
             contstr = "Punch Strtch";
             break;
-        case addSynthLevel::control::punchVelocity:
+        case ADDSYNTH::control::punchVelocity:
             contstr = "Punch Vel";
             break;
 
@@ -2496,36 +2496,36 @@ string InterChange::resolveAddVoice(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     int nvoice;
-    if (engine >= partLevel::engine::addMod1)
-        nvoice = engine - partLevel::engine::addMod1;
+    if (engine >= PART::engine::addMod1)
+        nvoice = engine - PART::engine::addMod1;
     else
-        nvoice = engine - partLevel::engine::addVoice1;
+        nvoice = engine - PART::engine::addVoice1;
 
     string name = "";
     switch (control & 0xf0)
     {
-        case addVoiceLevel::control::volume:
+        case ADDVOICE::control::volume:
             name = " Amplitude ";
             break;
-        case addVoiceLevel::control::modulatorType:
+        case ADDVOICE::control::modulatorType:
             name = " Modulator ";
             break;
-        case addVoiceLevel::control::detuneFrequency:
+        case ADDVOICE::control::detuneFrequency:
             name = " Frequency ";
             break;
-        case addVoiceLevel::control::unisonFrequencySpread:
+        case ADDVOICE::control::unisonFrequencySpread:
             name = " Unison ";
             break;
-        case addVoiceLevel::control::bypassGlobalFilter:
+        case ADDVOICE::control::bypassGlobalFilter:
             name = " Filter ";
             break;
-        case addVoiceLevel::control::modulatorAmplitude:
+        case ADDVOICE::control::modulatorAmplitude:
             name = " Modulator Amp ";
             break;
-        case addVoiceLevel::control::modulatorDetuneFrequency:
+        case ADDVOICE::control::modulatorDetuneFrequency:
             name = " Modulator Freq ";
             break;
-        case addVoiceLevel::control::modulatorOscillatorPhase:
+        case ADDVOICE::control::modulatorOscillatorPhase:
             name = " Modulator Osc ";
             break;
     }
@@ -2534,155 +2534,155 @@ string InterChange::resolveAddVoice(CommandBlock *getData)
 
     switch (control)
     {
-        case addVoiceLevel::control::volume:
+        case ADDVOICE::control::volume:
             contstr = "Volume";
             break;
-        case addVoiceLevel::control::velocitySense:
+        case ADDVOICE::control::velocitySense:
             contstr = "Vel Sens";
             break;
-        case addVoiceLevel::control::panning:
+        case ADDVOICE::control::panning:
             contstr = "Panning";
             break;
-        case addVoiceLevel::control::invertPhase:
+        case ADDVOICE::control::invertPhase:
             contstr = "Minus";
             break;
-        case addVoiceLevel::control::enableAmplitudeEnvelope:
+        case ADDVOICE::control::enableAmplitudeEnvelope:
             contstr = "Enable Env";
             break;
-        case addVoiceLevel::control::enableAmplitudeLFO:
+        case ADDVOICE::control::enableAmplitudeLFO:
             contstr = "Enable LFO";
             break;
 
-        case addVoiceLevel::control::modulatorType:
+        case ADDVOICE::control::modulatorType:
             contstr = "Type";
             break;
-        case addVoiceLevel::control::externalModulator:
+        case ADDVOICE::control::externalModulator:
             contstr = "Extern Mod";
             break;
 
-        case addVoiceLevel::control::detuneFrequency:
+        case ADDVOICE::control::detuneFrequency:
             contstr = "Detune";
             break;
-        case addVoiceLevel::control::equalTemperVariation:
+        case ADDVOICE::control::equalTemperVariation:
             contstr = "Eq T";
             break;
-        case addVoiceLevel::control::baseFrequencyAs440Hz:
+        case ADDVOICE::control::baseFrequencyAs440Hz:
             contstr = "440Hz";
             break;
-        case addVoiceLevel::control::octave:
+        case ADDVOICE::control::octave:
             contstr = "Octave";
             break;
-        case addVoiceLevel::control::detuneType:
+        case ADDVOICE::control::detuneType:
             contstr = "Det type";
             break;
-        case addVoiceLevel::control::coarseDetune:
+        case ADDVOICE::control::coarseDetune:
             contstr = "Coarse Det";
             break;
-        case addVoiceLevel::control::pitchBendAdjustment:
+        case ADDVOICE::control::pitchBendAdjustment:
             contstr = "Bend Adj";
             break;
-        case addVoiceLevel::control::pitchBendOffset:
+        case ADDVOICE::control::pitchBendOffset:
             contstr = "Offset Hz";
             break;
-        case addVoiceLevel::control::enableFrequencyEnvelope:
+        case ADDVOICE::control::enableFrequencyEnvelope:
             contstr = "Enable Env";
             break;
-        case addVoiceLevel::control::enableFrequencyLFO:
+        case ADDVOICE::control::enableFrequencyLFO:
             contstr = "Enable LFO";
             break;
 
-        case addVoiceLevel::control::unisonFrequencySpread:
+        case ADDVOICE::control::unisonFrequencySpread:
             contstr = "Freq Spread";
             break;
-        case addVoiceLevel::control::unisonPhaseRandomise:
+        case ADDVOICE::control::unisonPhaseRandomise:
             contstr = "Phase Rnd";
             break;
-        case addVoiceLevel::control::unisonStereoSpread:
+        case ADDVOICE::control::unisonStereoSpread:
             contstr = "Stereo";
             break;
-        case addVoiceLevel::control::unisonVibratoDepth:
+        case ADDVOICE::control::unisonVibratoDepth:
             contstr = "Vibrato";
             break;
-        case addVoiceLevel::control::unisonVibratoSpeed:
+        case ADDVOICE::control::unisonVibratoSpeed:
             contstr = "Vib Speed";
             break;
-        case addVoiceLevel::control::unisonSize:
+        case ADDVOICE::control::unisonSize:
             contstr = "Size";
             break;
-        case addVoiceLevel::control::unisonPhaseInvert:
+        case ADDVOICE::control::unisonPhaseInvert:
             contstr = "Invert";
             break;
-        case addVoiceLevel::control::enableUnison:
+        case ADDVOICE::control::enableUnison:
             contstr = "Enable";
             break;
 
-        case addVoiceLevel::control::bypassGlobalFilter:
+        case ADDVOICE::control::bypassGlobalFilter:
             contstr = "Bypass Global";
             break;
-        case addVoiceLevel::control::enableFilter:
+        case ADDVOICE::control::enableFilter:
             contstr = "Enable";
             break;
-        case addVoiceLevel::control::enableFilterEnvelope:
+        case ADDVOICE::control::enableFilterEnvelope:
             contstr = "Enable Env";
             break;
-        case addVoiceLevel::control::enableFilterLFO:
+        case ADDVOICE::control::enableFilterLFO:
             contstr = "Enable LFO";
             break;
 
-        case addVoiceLevel::control::modulatorAmplitude:
+        case ADDVOICE::control::modulatorAmplitude:
             contstr = "Volume";
             break;
-        case addVoiceLevel::control::modulatorVelocitySense:
+        case ADDVOICE::control::modulatorVelocitySense:
             contstr = "V Sense";
             break;
-        case addVoiceLevel::control::modulatorHFdamping:
+        case ADDVOICE::control::modulatorHFdamping:
             contstr = "F Damp";
             break;
-        case addVoiceLevel::control::enableModulatorAmplitudeEnvelope:
+        case ADDVOICE::control::enableModulatorAmplitudeEnvelope:
             contstr = "Enable Env";
             break;
 
-        case addVoiceLevel::control::modulatorDetuneFrequency:
+        case ADDVOICE::control::modulatorDetuneFrequency:
             break;
-        case addVoiceLevel::control::modulatorFrequencyAs440Hz:
+        case ADDVOICE::control::modulatorFrequencyAs440Hz:
             contstr = "440Hz";
             break;
-        case addVoiceLevel::control::modulatorOctave:
+        case ADDVOICE::control::modulatorOctave:
             contstr = "Octave";
             break;
-        case addVoiceLevel::control::modulatorDetuneType:
+        case ADDVOICE::control::modulatorDetuneType:
             contstr = "Det type";
             break;
-        case addVoiceLevel::control::modulatorCoarseDetune:
+        case ADDVOICE::control::modulatorCoarseDetune:
             contstr = "Coarse Det";
             break;
-        case addVoiceLevel::control::enableModulatorFrequencyEnvelope: // local, external
+        case ADDVOICE::control::enableModulatorFrequencyEnvelope: // local, external
             contstr = "Enable Env";
             break;
 
-        case addVoiceLevel::control::modulatorOscillatorPhase:
+        case ADDVOICE::control::modulatorOscillatorPhase:
             contstr = " Phase";
             break;
-        case addVoiceLevel::control::modulatorOscillatorSource:
+        case ADDVOICE::control::modulatorOscillatorSource:
             contstr = " Source";
             break;
 
-        case addVoiceLevel::control::delay:
+        case ADDVOICE::control::delay:
             contstr = " Delay";
             break;
-        case addVoiceLevel::control::enableVoice:
+        case ADDVOICE::control::enableVoice:
             contstr = " Enable";
             break;
-        case addVoiceLevel::control::enableResonance:
+        case ADDVOICE::control::enableResonance:
             contstr = " Resonance Enable";
             break;
-        case addVoiceLevel::control::voiceOscillatorPhase:
+        case ADDVOICE::control::voiceOscillatorPhase:
             contstr = " Osc Phase";
             break;
-        case addVoiceLevel::control::voiceOscillatorSource:
+        case ADDVOICE::control::voiceOscillatorSource:
             contstr = " Osc Source";
             break;
-        case addVoiceLevel::control::soundType:
+        case ADDVOICE::control::soundType:
             contstr = " Sound type";
             break;
 
@@ -2702,10 +2702,10 @@ string InterChange::resolveSub(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char insert = getData->data.insert;
 
-    if (insert == topLevel::insert::harmonicAmplitude || insert == topLevel::insert::harmonicPhaseBandwidth)
+    if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     {
         string Htype;
-        if (insert == topLevel::insert::harmonicAmplitude)
+        if (insert == TOPLEVEL::insert::harmonicAmplitude)
             Htype = " Amplitude";
         else
             Htype = " Bandwidth";
@@ -2716,19 +2716,19 @@ string InterChange::resolveSub(CommandBlock *getData)
     string name = "";
     switch (control & 0x70)
     {
-        case subSynthLevel::control::volume:
+        case SUBSYNTH::control::volume:
             name = " Amplitude ";
             break;
-        case subSynthLevel::control::bandwidth:
+        case SUBSYNTH::control::bandwidth:
             name = " Bandwidth ";
             break;
-        case subSynthLevel::control::detuneFrequency:
+        case SUBSYNTH::control::detuneFrequency:
             name = " Frequency ";
             break;
-        case subSynthLevel::control::overtoneParameter1:
+        case SUBSYNTH::control::overtoneParameter1:
             name = " Overtones ";
             break;
-        case subSynthLevel::control::enableFilter:
+        case SUBSYNTH::control::enableFilter:
             name = " Filter ";
             break;
     }
@@ -2736,86 +2736,86 @@ string InterChange::resolveSub(CommandBlock *getData)
     string contstr = "";
     switch (control)
     {
-        case subSynthLevel::control::volume:
+        case SUBSYNTH::control::volume:
             contstr = "Volume";
             break;
-        case subSynthLevel::control::velocitySense:
+        case SUBSYNTH::control::velocitySense:
             contstr = "Vel Sens";
             break;
-        case subSynthLevel::control::panning:
+        case SUBSYNTH::control::panning:
             contstr = "Panning";
             break;
 
-        case subSynthLevel::control::bandwidth:
+        case SUBSYNTH::control::bandwidth:
             contstr = "";
             break;
-        case subSynthLevel::control::bandwidthScale:
+        case SUBSYNTH::control::bandwidthScale:
             contstr = "Band Scale";
             break;
-        case subSynthLevel::control::enableBandwidthEnvelope:
+        case SUBSYNTH::control::enableBandwidthEnvelope:
             contstr = "Env Enab";
             break;
 
-        case subSynthLevel::control::detuneFrequency:
+        case SUBSYNTH::control::detuneFrequency:
             contstr = "Detune";
             break;
-        case subSynthLevel::control::equalTemperVariation:
+        case SUBSYNTH::control::equalTemperVariation:
             contstr = "Eq T";
             break;
-        case subSynthLevel::control::baseFrequencyAs440Hz:
+        case SUBSYNTH::control::baseFrequencyAs440Hz:
             contstr = "440Hz";
             break;
-        case subSynthLevel::control::octave:
+        case SUBSYNTH::control::octave:
             contstr = "Octave";
             break;
-        case subSynthLevel::control::detuneType:
+        case SUBSYNTH::control::detuneType:
             contstr = "Det type";
             break;
-        case subSynthLevel::control::coarseDetune:
+        case SUBSYNTH::control::coarseDetune:
             contstr = "Coarse Det";
             break;
-        case subSynthLevel::control::pitchBendAdjustment:
+        case SUBSYNTH::control::pitchBendAdjustment:
             contstr = "Bend Adj";
             break;
-        case subSynthLevel::control::pitchBendOffset:
+        case SUBSYNTH::control::pitchBendOffset:
             contstr = "Offset Hz";
             break;
-        case subSynthLevel::control::enableFrequencyEnvelope:
+        case SUBSYNTH::control::enableFrequencyEnvelope:
             contstr = "Env Enab";
             break;
 
-        case subSynthLevel::control::overtoneParameter1:
+        case SUBSYNTH::control::overtoneParameter1:
             contstr = "Par 1";
             break;
-        case subSynthLevel::control::overtoneParameter2:
+        case SUBSYNTH::control::overtoneParameter2:
             contstr = "Par 2";
             break;
-        case subSynthLevel::control::overtoneForceHarmonics:
+        case SUBSYNTH::control::overtoneForceHarmonics:
             contstr = "Force H";
             break;
-        case subSynthLevel::control::overtonePosition:
+        case SUBSYNTH::control::overtonePosition:
             contstr = "Position";
             break;
 
-        case subSynthLevel::control::enableFilter:
+        case SUBSYNTH::control::enableFilter:
             contstr = "Enable";
             break;
 
-        case subSynthLevel::control::filterStages:
+        case SUBSYNTH::control::filterStages:
             contstr = "Filt Stages";
             break;
-        case subSynthLevel::control::magType:
+        case SUBSYNTH::control::magType:
             contstr = "Mag Type";
             break;
-        case subSynthLevel::control::startPosition:
+        case SUBSYNTH::control::startPosition:
             contstr = "Start";
             break;
 
-        case subSynthLevel::control::clearHarmonics:
+        case SUBSYNTH::control::clearHarmonics:
             contstr = "Clear Harmonics";
             break;
 
-        case subSynthLevel::control::stereo:
+        case SUBSYNTH::control::stereo:
             contstr = "Stereo";
             break;
 
@@ -2839,22 +2839,22 @@ string InterChange::resolvePad(CommandBlock *getData)
     string name = "";
     switch (control & 0x70)
     {
-        case padSynthLevel::control::volume:
+        case PADSYNTH::control::volume:
             name = " Amplitude ";
             break;
-        case padSynthLevel::control::bandwidth:
+        case PADSYNTH::control::bandwidth:
             name = " Bandwidth ";
             break;
-        case padSynthLevel::control::detuneFrequency:
+        case PADSYNTH::control::detuneFrequency:
             name = " Frequency ";
             break;
-        case padSynthLevel::control::overtoneParameter1:
+        case PADSYNTH::control::overtoneParameter1:
             name = " Overtones ";
             break;
-        case padSynthLevel::control::baseWidth:
+        case PADSYNTH::control::baseWidth:
             name = " Harmonic Base ";
             break;
-        case padSynthLevel::control::harmonicBase:
+        case PADSYNTH::control::harmonicBase:
             name = " Harmonic Samples ";
             break;
     }
@@ -2862,136 +2862,136 @@ string InterChange::resolvePad(CommandBlock *getData)
     string contstr = "";
     switch (control)
     {
-        case padSynthLevel::control::volume:
+        case PADSYNTH::control::volume:
             contstr = "Volume";
             break;
-        case padSynthLevel::control::velocitySense:
+        case PADSYNTH::control::velocitySense:
             contstr = "Vel Sens";
             break;
-        case padSynthLevel::control::panning:
+        case PADSYNTH::control::panning:
             contstr = "Panning";
             break;
 
-        case padSynthLevel::control::bandwidth:
+        case PADSYNTH::control::bandwidth:
             contstr = "Bandwidth";
             break;
-        case padSynthLevel::control::bandwidthScale:
+        case PADSYNTH::control::bandwidthScale:
             contstr = "Band Scale";
             break;
-        case padSynthLevel::control::spectrumMode:
+        case PADSYNTH::control::spectrumMode:
             contstr = "Spect Mode";
             break;
 
-        case padSynthLevel::control::detuneFrequency:
+        case PADSYNTH::control::detuneFrequency:
             contstr = "Detune";
             break;
-        case padSynthLevel::control::equalTemperVariation:
+        case PADSYNTH::control::equalTemperVariation:
             contstr = "Eq T";
             break;
-        case padSynthLevel::control::baseFrequencyAs440Hz:
+        case PADSYNTH::control::baseFrequencyAs440Hz:
             contstr = "440Hz";
             break;
-        case padSynthLevel::control::octave:
+        case PADSYNTH::control::octave:
             contstr = "Octave";
             break;
-        case padSynthLevel::control::detuneType:
+        case PADSYNTH::control::detuneType:
             contstr = "Det type";
             break;
-        case padSynthLevel::control::coarseDetune:
+        case PADSYNTH::control::coarseDetune:
             contstr = "Coarse Det";
             break;
 
-        case padSynthLevel::control::pitchBendAdjustment:
+        case PADSYNTH::control::pitchBendAdjustment:
             contstr = "Bend Adj";
             break;
-        case padSynthLevel::control::pitchBendOffset:
+        case PADSYNTH::control::pitchBendOffset:
             contstr = "Offset Hz";
             break;
 
-        case padSynthLevel::control::overtoneParameter1:
+        case PADSYNTH::control::overtoneParameter1:
             contstr = "Overt Par 1";
             break;
-        case padSynthLevel::control::overtoneParameter2:
+        case PADSYNTH::control::overtoneParameter2:
             contstr = "Overt Par 2";
             break;
-        case padSynthLevel::control::overtoneForceHarmonics:
+        case PADSYNTH::control::overtoneForceHarmonics:
             contstr = "Force H";
             break;
-        case padSynthLevel::control::overtonePosition:
+        case PADSYNTH::control::overtonePosition:
             contstr = "Position";
             break;
 
-        case padSynthLevel::control::baseWidth:
+        case PADSYNTH::control::baseWidth:
             contstr = "Width";
             break;
-        case padSynthLevel::control::frequencyMultiplier:
+        case PADSYNTH::control::frequencyMultiplier:
             contstr = "Freq Mult";
             break;
-        case padSynthLevel::control::modulatorStretch:
+        case PADSYNTH::control::modulatorStretch:
             contstr = "Str";
             break;
-        case padSynthLevel::control::modulatorFrequency:
+        case PADSYNTH::control::modulatorFrequency:
             contstr = "Freq";
             break;
-        case padSynthLevel::control::size:
+        case PADSYNTH::control::size:
             contstr = "Size";
             break;
-        case padSynthLevel::control::baseType:
+        case PADSYNTH::control::baseType:
             contstr = "Type";
             break;
-        case padSynthLevel::control::harmonicSidebands:
+        case PADSYNTH::control::harmonicSidebands:
             contstr = "Halves";
             break;
-        case padSynthLevel::control::spectralWidth:
+        case PADSYNTH::control::spectralWidth:
             contstr = "Amp Par 1";
             break;
-        case padSynthLevel::control::spectralAmplitude:
+        case PADSYNTH::control::spectralAmplitude:
             contstr = "Amp Par 2";
             break;
-        case padSynthLevel::control::amplitudeMultiplier:
+        case PADSYNTH::control::amplitudeMultiplier:
             contstr = "Amp Mult";
             break;
-        case padSynthLevel::control::amplitudeMode:
+        case PADSYNTH::control::amplitudeMode:
             contstr = "Amp Mode";
             break;
-        case padSynthLevel::control::autoscale:
+        case PADSYNTH::control::autoscale:
             contstr = "Autoscale";
             break;
 
-        case padSynthLevel::control::harmonicBase:
+        case PADSYNTH::control::harmonicBase:
             contstr = "Base";
             break;
-        case padSynthLevel::control::samplesPerOctave:
+        case PADSYNTH::control::samplesPerOctave:
             contstr = "samp/Oct";
             break;
-        case padSynthLevel::control::numberOfOctaves:
+        case PADSYNTH::control::numberOfOctaves:
             contstr = "Num Oct";
             break;
-        case padSynthLevel::control::sampleSize:
+        case PADSYNTH::control::sampleSize:
             break;
 
-        case padSynthLevel::control::applyChanges:
+        case PADSYNTH::control::applyChanges:
             showValue = false;
             contstr = "Changes Applied";
             break;
 
-        case padSynthLevel::control::stereo:
+        case PADSYNTH::control::stereo:
             contstr = "Stereo";
             break;
 
-        case padSynthLevel::control::dePop:
+        case PADSYNTH::control::dePop:
             contstr = "De Pop";
             break;
-        case padSynthLevel::control::punchStrength:
+        case PADSYNTH::control::punchStrength:
             contstr = "Punch Strngth";
             break;
-        case padSynthLevel::control::punchDuration:
+        case PADSYNTH::control::punchDuration:
             contstr = "Punch Time";
             break;
-        case padSynthLevel::control::punchStretch:
+        case PADSYNTH::control::punchStretch:
             contstr = "Punch Strtch";
             break;
-        case padSynthLevel::control::punchVelocity:
+        case PADSYNTH::control::punchVelocity:
             contstr = "Punch Vel";
             break;
 
@@ -3002,7 +3002,7 @@ string InterChange::resolvePad(CommandBlock *getData)
 
     string isPad = "";
 
-    if (write && ((control >= padSynthLevel::control::bandwidth && control <= padSynthLevel::control::spectrumMode) || (control >= padSynthLevel::control::overtoneParameter1 && control <= padSynthLevel::control::sampleSize)))
+    if (write && ((control >= PADSYNTH::control::bandwidth && control <= PADSYNTH::control::spectrumMode) || (control >= PADSYNTH::control::overtoneParameter1 && control <= PADSYNTH::control::sampleSize)))
         isPad += " - Need to Apply";
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " PadSynth " + name + contstr + isPad);
 }
@@ -3020,7 +3020,7 @@ string InterChange::resolveOscillator(CommandBlock *getData)
 
     string isPad = "";
     string eng_name;
-    if (engine == partLevel::engine::padSynth)
+    if (engine == PART::engine::padSynth)
     {
         eng_name = " Padsysnth";
         if (write)
@@ -3029,30 +3029,30 @@ string InterChange::resolveOscillator(CommandBlock *getData)
     else
     {
         int eng;
-        if (engine >= partLevel::engine::addMod1)
-            eng = engine - partLevel::engine::addMod1;
+        if (engine >= PART::engine::addMod1)
+            eng = engine - PART::engine::addMod1;
         else
-            eng = engine - partLevel::engine::addVoice1;
+            eng = engine - PART::engine::addVoice1;
         eng_name = " Add Voice " + to_string(eng + 1);
-        if (engine >= partLevel::engine::addMod1)
+        if (engine >= PART::engine::addMod1)
             eng_name += " Modulator";
     }
 
-    if (insert == topLevel::insert::harmonicAmplitude)
+    if (insert == TOPLEVEL::insert::harmonicAmplitude)
     {
         return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + " Harmonic " + to_string((int)control + 1) + " Amplitude" + isPad);
     }
-    else if(insert == topLevel::insert::harmonicPhaseBandwidth)
+    else if(insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     {
         return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + " Harmonic " + to_string((int)control + 1) + " Phase" + isPad);
     }
 
     string name;
-    if (control >= oscillatorLevel::control::clearHarmonics || control <= oscillatorLevel::control::harmonicRandomnessType)
+    if (control >= OSCILLATOR::control::clearHarmonics || control <= OSCILLATOR::control::harmonicRandomnessType)
         name = " Oscillator";
-    else if (control >= oscillatorLevel::control::harmonicShift)
+    else if (control >= OSCILLATOR::control::harmonicShift)
         name = " Harm Mods";
-    else if (control >= oscillatorLevel::control::autoClear)
+    else if (control >= OSCILLATOR::control::autoClear)
         name = " Base Mods";
     else
         name = " Base Funct";
@@ -3060,106 +3060,106 @@ string InterChange::resolveOscillator(CommandBlock *getData)
     string contstr;
     switch (control)
     {
-        case oscillatorLevel::control::phaseRandomness:
+        case OSCILLATOR::control::phaseRandomness:
             contstr = " Random";
             break;
-        case oscillatorLevel::control::magType:
+        case OSCILLATOR::control::magType:
             contstr = " Mag Type";
             break;
-        case oscillatorLevel::control::harmonicAmplitudeRandomness:
+        case OSCILLATOR::control::harmonicAmplitudeRandomness:
             contstr = " Harm Rnd";
             break;
-        case oscillatorLevel::control::harmonicRandomnessType:
+        case OSCILLATOR::control::harmonicRandomnessType:
             contstr = " Harm Rnd Type";
             break;
 
-        case oscillatorLevel::control::baseFunctionParameter:
+        case OSCILLATOR::control::baseFunctionParameter:
             contstr = " Par";
             break;
-        case oscillatorLevel::control::baseFunctionType:
+        case OSCILLATOR::control::baseFunctionType:
             contstr = " Type";
             break;
-        case oscillatorLevel::control::baseFunctionModulationParameter1:
+        case OSCILLATOR::control::baseModulationParameter1:
             contstr = " Mod Par 1";
             break;
-        case oscillatorLevel::control::baseFunctionModulationParameter2:
+        case OSCILLATOR::control::baseModulationParameter2:
             contstr = " Mod Par 2";
             break;
-        case oscillatorLevel::control::baseFunctionModulationParameter3:
+        case OSCILLATOR::control::baseModulationParameter3:
             contstr = " Mod Par 3";
             break;
-        case oscillatorLevel::control::baseFunctionModulationType:
+        case OSCILLATOR::control::baseModulationType:
             contstr = " Mod Type";
             break;
 
-        case oscillatorLevel::control::autoClear: // this is local to the GUI
+        case OSCILLATOR::control::autoClear: // this is local to the GUI
             break;
-        case oscillatorLevel::control::useAsBaseFunction:
+        case OSCILLATOR::control::useAsBaseFunction:
             contstr = " Osc As Base";
             break;
-        case oscillatorLevel::control::waveshapeParameter:
+        case OSCILLATOR::control::waveshapeParameter:
             contstr = " Waveshape Par";
             break;
-        case oscillatorLevel::control::waveshapeType:
+        case OSCILLATOR::control::waveshapeType:
             contstr = " Waveshape Type";
             break;
-        case oscillatorLevel::control::filterParameter1:
+        case OSCILLATOR::control::filterParameter1:
             contstr = " Osc Filt Par 1";
             break;
-        case oscillatorLevel::control::filterParameter2:
+        case OSCILLATOR::control::filterParameter2:
             contstr = " Osc Filt Par 2";
             break;
-        case oscillatorLevel::control::filterBeforeWaveshape:
+        case OSCILLATOR::control::filterBeforeWaveshape:
             contstr = " Osc Filt B4 Waveshape";
             break;
-        case oscillatorLevel::control::filterType:
+        case OSCILLATOR::control::filterType:
             contstr = " Osc Filt Type";
             break;
-        case oscillatorLevel::control::modulationParameter1:
+        case OSCILLATOR::control::modulationParameter1:
             contstr = " Osc Mod Par 1";
             break;
-        case oscillatorLevel::control::modulationParameter2:
+        case OSCILLATOR::control::modulationParameter2:
             contstr = " Osc Mod Par 2";
             break;
-        case oscillatorLevel::control::modulationParameter3:
+        case OSCILLATOR::control::modulationParameter3:
             contstr = " Osc Mod Par 3";
             break;
-        case oscillatorLevel::control::modulationType:
+        case OSCILLATOR::control::modulationType:
             contstr = " Osc Mod Type";
             break;
-        case oscillatorLevel::control::spectrumAdjustParameter:
+        case OSCILLATOR::control::spectrumAdjustParameter:
             contstr = " Osc Spect Par";
             break;
-        case oscillatorLevel::control::spectrumAdjustType:
+        case OSCILLATOR::control::spectrumAdjustType:
             contstr = " Osc Spect Type";
             break;
 
-        case oscillatorLevel::control::harmonicShift:
+        case OSCILLATOR::control::harmonicShift:
             contstr = " Shift";
             break;
-        case oscillatorLevel::control::clearHarmonicShift:
+        case OSCILLATOR::control::clearHarmonicShift:
             contstr = " Reset";
             break;
-        case oscillatorLevel::control::shiftBeforeWaveshapeAndFilter:
+        case OSCILLATOR::control::shiftBeforeWaveshapeAndFilter:
             contstr = " B4 Waveshape & Filt";
             break;
-        case oscillatorLevel::control::adaptiveHarmonicsParameter:
+        case OSCILLATOR::control::adaptiveHarmonicsParameter:
             contstr = " Adapt Param";
             break;
-        case oscillatorLevel::control::adaptiveHarmonicsBase:
+        case OSCILLATOR::control::adaptiveHarmonicsBase:
             contstr = " Adapt Base Freq";
             break;
-        case oscillatorLevel::control::adaptiveHarmonicsPower:
+        case OSCILLATOR::control::adaptiveHarmonicsPower:
             contstr = " Adapt Power";
             break;
-        case oscillatorLevel::control::adaptiveHarmonicsType:
+        case OSCILLATOR::control::adaptiveHarmonicsType:
             contstr = " Adapt Type";
             break;
 
-        case oscillatorLevel::control::clearHarmonics:
+        case OSCILLATOR::control::clearHarmonics:
             contstr = " Clear Harmonics";
             break;
-        case oscillatorLevel::control::convertToSine:
+        case OSCILLATOR::control::convertToSine:
             contstr = " Conv To Sine";
             break;
 
@@ -3184,7 +3184,7 @@ string InterChange::resolveResonance(CommandBlock *getData)
 
     string name;
     string isPad = "";
-    if (engine == partLevel::engine::padSynth)
+    if (engine == PART::engine::padSynth)
     {
         name = " PadSynth";
         if (write)
@@ -3195,12 +3195,12 @@ string InterChange::resolveResonance(CommandBlock *getData)
 
     if (insert == 9)
     {
-        if (write == true && engine == partLevel::engine::padSynth)
+        if (write == true && engine == PART::engine::padSynth)
             isPad = " - Need to Apply";
         return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Resonance Point " + to_string(control + 1) + isPad);
     }
 
-    if (write == true && engine == partLevel::engine::padSynth && control != 104)
+    if (write == true && engine == PART::engine::padSynth && control != 104)
         isPad = " - Need to Apply";
     string contstr;
     switch (control)
@@ -3257,13 +3257,13 @@ string InterChange::resolveLFO(CommandBlock *getData)
     string name;
     string lfo;
 
-    if (engine == partLevel::engine::addSynth)
+    if (engine == PART::engine::addSynth)
         name = " AddSynth";
-    else if (engine == partLevel::engine::padSynth)
+    else if (engine == PART::engine::padSynth)
         name = " PadSynth";
-    else if (engine >= partLevel::engine::addVoice1)
+    else if (engine >= PART::engine::addVoice1)
     {
-        int nvoice = engine - partLevel::engine::addVoice1;
+        int nvoice = engine - PART::engine::addVoice1;
         name = " Add Voice " + to_string(nvoice + 1);
     }
 
@@ -3333,14 +3333,14 @@ string InterChange::resolveFilter(CommandBlock *getData)
 
     string name;
 
-    if (engine == partLevel::engine::addSynth)
+    if (engine == PART::engine::addSynth)
         name = " AddSynth";
-    else if (engine == partLevel::engine::subSynth)
+    else if (engine == PART::engine::subSynth)
         name = " SubSynth";
-    else if (engine == partLevel::engine::padSynth)
+    else if (engine == PART::engine::padSynth)
         name = " PadSynth";
-    else if (engine >= partLevel::engine::addVoice1)
-        name = " Adsynth Voice " + to_string((engine - partLevel::engine::addVoice1) + 1);
+    else if (engine >= PART::engine::addVoice1)
+        name = " Adsynth Voice " + to_string((engine - PART::engine::addVoice1) + 1);
     string contstr;
     switch (control)
     {
@@ -3452,23 +3452,23 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
 
     string env;
     string name;
-    if (engine == partLevel::engine::addSynth)
+    if (engine == PART::engine::addSynth)
         name = " AddSynth";
-    else if (engine == partLevel::engine::subSynth)
+    else if (engine == PART::engine::subSynth)
         name = " SubSynth";
 
-    else if (engine == partLevel::engine::padSynth)
+    else if (engine == PART::engine::padSynth)
         name = " PadSynth";
-    else if (engine >= partLevel::engine::addVoice1)
+    else if (engine >= PART::engine::addVoice1)
     {
         name = " Add Voice ";
         int nvoice;
-        if (engine >= partLevel::engine::addMod1)
-            nvoice = engine - partLevel::engine::addMod1;
+        if (engine >= PART::engine::addMod1)
+            nvoice = engine - PART::engine::addMod1;
         else
-            nvoice = engine - partLevel::engine::addVoice1;
+            nvoice = engine - PART::engine::addVoice1;
         name += to_string(nvoice + 1);
-        if (engine >= partLevel::engine::addMod1)
+        if (engine >= PART::engine::addMod1)
             name += " Modulator";
     }
 
@@ -3488,7 +3488,7 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
             break;
     }
 
-    if (insert == topLevel::insert::envelopePoints)
+    if (insert == TOPLEVEL::insert::envelopePoints)
     {
         if (!write)
         {
@@ -3503,7 +3503,7 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
         }
     }
 
-    if (insert == topLevel::insert::envelopePointChange)
+    if (insert == TOPLEVEL::insert::envelopePointChange)
     {
         return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control + 1)) + " X increment " + to_string(int(par2)) + " Y");
     }
@@ -3579,18 +3579,18 @@ string InterChange::resolveEffects(CommandBlock *getData)
 
     string name;
     string actual;
-    if (npart == topLevel::section::systemEffects)
+    if (npart == TOPLEVEL::section::systemEffects)
         name = "System";
-    else if (npart == topLevel::section::insertEffects)
+    else if (npart == TOPLEVEL::section::insertEffects)
         name = "Insert";
     else
         name = "Part " + to_string(npart + 1);
 
     if (kititem == 0x88 && getData->data.insert < 0xff)
     {
-        if (npart == topLevel::section::systemEffects)
+        if (npart == TOPLEVEL::section::systemEffects)
             name = "System";
-        else if (npart == topLevel::section::insertEffects)
+        else if (npart == TOPLEVEL::section::insertEffects)
             name = "Insert";
         else name = "Part " + to_string(npart + 1);
         name += " Effect " + to_string(effnum + 1);
@@ -3655,7 +3655,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
         }
     }
     string contstr = "";
-    if ((npart < NUM_MIDI_PARTS && control == 65) || (npart > topLevel::section::main && kititem == 0xff && control == 1))
+    if ((npart < NUM_MIDI_PARTS && control == 65) || (npart > TOPLEVEL::section::main && kititem == 0xff && control == 1))
     {
         name += " set to";
         kititem = value;
@@ -3731,7 +3731,7 @@ void InterChange::mediate()
             toread = commandSize;
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(fromCLI, point, toread);
-            if(getData.data.part != topLevel::section::midiLearn) // Not special midi-learn message
+            if(getData.data.part != TOPLEVEL::section::midiLearn) // Not special midi-learn message
                 commandSend(&getData);
             returns(&getData);
         }
@@ -3745,7 +3745,7 @@ void InterChange::mediate()
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(fromGUI, point, toread);
 
-            if(getData.data.part != topLevel::section::midiLearn) // Not special midi-learn message
+            if(getData.data.part != TOPLEVEL::section::midiLearn) // Not special midi-learn message
                 commandSend(&getData);
             returns(&getData);
         }
@@ -3758,7 +3758,7 @@ void InterChange::mediate()
             toread = commandSize;
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(fromMIDI, point, toread);
-            if(getData.data.part != topLevel::section::midiLearn) // Not special midi-learn message
+            if(getData.data.part != TOPLEVEL::section::midiLearn) // Not special midi-learn message
             {
                 commandSend(&getData);
                 returns(&getData);
@@ -3768,7 +3768,7 @@ void InterChange::mediate()
                 if (jack_ringbuffer_write_space(toGUI) >= commandSize)
                 jack_ringbuffer_write(toGUI, (char*) getData.bytes, commandSize);
             }
-            else if (getData.data.control == topLevel::section::midiLearn) // not part!
+            else if (getData.data.control == TOPLEVEL::section::midiLearn) // not part!
             {
                 synth->mididecode.midiProcess(getData.data.kit, getData.data.engine, getData.data.insert, false);
             }
@@ -3792,31 +3792,31 @@ void InterChange::mutedDecode(unsigned int altData)
 { // these have all gone through a master fade down and mute
     CommandBlock putData;
     memset(&putData, 0xff, sizeof(putData));
-    putData.data.part = topLevel::section::main;
-    putData.data.parameter = topLevel::route::lowPriority;
+    putData.data.part = TOPLEVEL::section::main;
+    putData.data.parameter = TOPLEVEL::route::lowPriority;
 
     switch (altData & 0xff)
     {
-        case topLevel::muted::stopSound:
+        case TOPLEVEL::muted::stopSound:
             putData.data.control = 128;
             putData.data.type = 0xf0;
             break;
-        case topLevel::muted::masterReset:
+        case TOPLEVEL::muted::masterReset:
             putData.data.control = (altData >> 8) & 0xff;
             putData.data.type = altData >> 24;
             break;
-        case topLevel::muted::patchSetLoad:
+        case TOPLEVEL::muted::patchSetLoad:
             putData.data.control = 80;
             putData.data.type = altData >> 24;
             putData.data.par2 = (altData >> 8) & 0xff;
             break;
-        case topLevel::muted::vectorLoad:
+        case TOPLEVEL::muted::vectorLoad:
             putData.data.control = 84;
             putData.data.type = altData >> 24;
             putData.data.insert = (altData >> 16) & 0xff;
             putData.data.par2 = (altData >> 8) & 0xff;
             break;
-        case topLevel::muted::stateLoad:
+        case TOPLEVEL::muted::stateLoad:
             putData.data.control = 92;
             putData.data.type = altData >> 24;
             putData.data.par2 = (altData >> 8) & 0xff;
@@ -3835,7 +3835,7 @@ void InterChange::returns(CommandBlock *getData)
     if (type == 0xff)
         return; // no further action
 
-    if (getData->data.parameter < topLevel::route::lowPriority || getData->data.parameter >= topLevel::route::adjustAndLoopback)
+    if (getData->data.parameter < TOPLEVEL::route::lowPriority || getData->data.parameter >= TOPLEVEL::route::adjustAndLoopback)
     {
         bool isCliOrGuiRedraw = type & 0x10; // separated out for clarity
         bool isMidi = type & 8;
@@ -3889,7 +3889,7 @@ bool InterChange::commandSend(CommandBlock *getData)
         unsigned char control = getData->data.control;
         unsigned char npart = getData->data.part;
         unsigned char insert = getData->data.insert;
-        if (npart < NUM_MIDI_PARTS && (insert < 0xff || (control != partLevel::control::enable && control != partLevel::control::instrumentName)))
+        if (npart < NUM_MIDI_PARTS && (insert < 0xff || (control != PART::control::enable && control != PART::control::instrumentName)))
         {
             if (synth->part[npart]->Pname == "Simple Sound")
             {
@@ -3905,7 +3905,7 @@ bool InterChange::commandSend(CommandBlock *getData)
 bool InterChange::commandSendReal(CommandBlock *getData)
 {
     unsigned char npart = getData->data.part;
-    if (npart == topLevel::section::midiIn) // music input takes priority!
+    if (npart == TOPLEVEL::section::midiIn) // music input takes priority!
     {
         commandMidi(getData);
         __sync_and_and_fetch(&blockRead, 2); // clear it now it's done
@@ -3913,7 +3913,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     }
 //    float value = getData->data.value;
     unsigned char parameter = getData->data.parameter;
-    if (parameter >= topLevel::route::lowPriority && parameter < topLevel::route::adjustAndLoopback)
+    if (parameter >= TOPLEVEL::route::lowPriority && parameter < TOPLEVEL::route::adjustAndLoopback)
         return true; // indirect transfer
 
     unsigned char type = getData->data.type;
@@ -3935,30 +3935,30 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         return false;
     }
 
-    if (npart == topLevel::section::vector)
+    if (npart == TOPLEVEL::section::vector)
     {
         commandVector(getData);
         __sync_and_and_fetch(&blockRead, 2);
         return true;
     }
-    if (npart == topLevel::section::scales)
+    if (npart == TOPLEVEL::section::scales)
     {
         commandMicrotonal(getData);
         __sync_and_and_fetch(&blockRead, 2);
         return true;
     }
-    if (npart == topLevel::section::config)
+    if (npart == TOPLEVEL::section::config)
     {
         commandConfig(getData);
         return true;
     }
-    if (npart == topLevel::section::main)
+    if (npart == TOPLEVEL::section::main)
     {
         commandMain(getData);
         __sync_and_and_fetch(&blockRead, 2);
         return true;
     }
-    if ((npart == topLevel::section::systemEffects || npart == topLevel::section::insertEffects) && kititem == 0xff)
+    if ((npart == TOPLEVEL::section::systemEffects || npart == TOPLEVEL::section::insertEffects) && kititem == 0xff)
     {
         commandSysIns(getData);
         __sync_and_and_fetch(&blockRead, 2);
@@ -3985,16 +3985,16 @@ bool InterChange::commandSendReal(CommandBlock *getData)
 
     Part *part = synth->part[npart];
 
-    if (part->busy && engine == partLevel::engine::padSynth) // it's a PadSynth control
+    if (part->busy && engine == PART::engine::padSynth) // it's a PadSynth control
     {
         getData->data.type &= 0xbf; // turn it into a read
-        getData->data.control = partLevel::control::partBusy; // part busy message
+        getData->data.control = PART::control::partBusy; // part busy message
         getData->data.kit = 0xff;
         getData->data.engine = 0xff;
         getData->data.insert = 0xff;
         return false;
     }
-    if (control == partLevel::control::partBusy)
+    if (control == PART::control::partBusy)
     {
         getData->data.value = part->busy;
         return false;
@@ -4005,9 +4005,9 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         return false; // attempt to access not enabled kititem
     }
 
-    if (kititem == 0xff || insert == topLevel::insert::kitGroup)
+    if (kititem == 0xff || insert == TOPLEVEL::insert::kitGroup)
     {
-        if (control != partLevel::control::kitMode && kititem < 0xff && part->Pkitmode == 0)
+        if (control != PART::control::kitMode && kititem < 0xff && part->Pkitmode == 0)
         {
             __sync_and_and_fetch(&blockRead, 2);
             return false;
@@ -4023,31 +4023,31 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         return false;
     }
 
-    if (engine == partLevel::engine::padSynth)
+    if (engine == PART::engine::padSynth)
     {
         switch(insert)
         {
             case 0xff:
                 commandPad(getData);
                 break;
-            case topLevel::insert::LFOgroup:
+            case TOPLEVEL::insert::LFOgroup:
                 commandLFO(getData);
                 break;
-            case topLevel::insert::filterGroup:
+            case TOPLEVEL::insert::filterGroup:
                 commandFilter(getData);
                 break;
-            case topLevel::insert::envelopeGroup:
-            case topLevel::insert::envelopePoints:
-            case topLevel::insert::envelopePointChange:
+            case TOPLEVEL::insert::envelopeGroup:
+            case TOPLEVEL::insert::envelopePoints:
+            case TOPLEVEL::insert::envelopePointChange:
                 commandEnvelope(getData);
                 break;
-            case topLevel::insert::oscillatorGroup:
-            case topLevel::insert::harmonicAmplitude:
-            case topLevel::insert::harmonicPhaseBandwidth:
+            case TOPLEVEL::insert::oscillatorGroup:
+            case TOPLEVEL::insert::harmonicAmplitude:
+            case TOPLEVEL::insert::harmonicPhaseBandwidth:
                 commandOscillator(getData,  part->kit[kititem].padpars->oscilgen);
                 break;
-            case topLevel::insert::resonanceGroup:
-            case topLevel::insert::resonanceGraphInsert:
+            case TOPLEVEL::insert::resonanceGroup:
+            case TOPLEVEL::insert::resonanceGraphInsert:
                 commandResonance(getData, part->kit[kititem].padpars->resonance);
                 break;
         }
@@ -4055,21 +4055,21 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         return true;
     }
 
-    if (engine == partLevel::engine::subSynth)
+    if (engine == PART::engine::subSynth)
     {
         switch (insert)
         {
             case 0xff:
-            case topLevel::insert::harmonicAmplitude:
-            case topLevel::insert::harmonicPhaseBandwidth:
+            case TOPLEVEL::insert::harmonicAmplitude:
+            case TOPLEVEL::insert::harmonicPhaseBandwidth:
                 commandSub(getData);
                 break;
-            case topLevel::insert::filterGroup:
+            case TOPLEVEL::insert::filterGroup:
                 commandFilter(getData);
                 break;
-            case topLevel::insert::envelopeGroup:
-            case topLevel::insert::envelopePoints:
-            case topLevel::insert::envelopePointChange:
+            case TOPLEVEL::insert::envelopeGroup:
+            case TOPLEVEL::insert::envelopePoints:
+            case TOPLEVEL::insert::envelopePointChange:
                 commandEnvelope(getData);
                 break;
         }
@@ -4077,9 +4077,9 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         return true;
     }
 
-    if (engine >= partLevel::engine::addVoice1)
+    if (engine >= PART::engine::addVoice1)
     {
-        if ((engine > partLevel::engine::addVoice8 && engine < partLevel::engine::addMod1) || engine > partLevel::engine::addMod8)
+        if ((engine > PART::engine::addVoice8 && engine < PART::engine::addMod1) || engine > PART::engine::addMod8)
         {
             getData->data.type = 0xff; // block any further action
             synth->getRuntime().Log("Invalid voice number");
@@ -4092,23 +4092,23 @@ bool InterChange::commandSendReal(CommandBlock *getData)
             case 0xff:
                 commandAddVoice(getData);
                 break;
-            case topLevel::insert::LFOgroup:
+            case TOPLEVEL::insert::LFOgroup:
                 commandLFO(getData);
                 break;
-            case topLevel::insert::filterGroup:
+            case TOPLEVEL::insert::filterGroup:
                 commandFilter(getData);
                 break;
-            case topLevel::insert::envelopeGroup:
-            case topLevel::insert::envelopePoints:
-            case topLevel::insert::envelopePointChange:
+            case TOPLEVEL::insert::envelopeGroup:
+            case TOPLEVEL::insert::envelopePoints:
+            case TOPLEVEL::insert::envelopePointChange:
                 commandEnvelope(getData);
                 break;
-            case topLevel::insert::oscillatorGroup:
-            case topLevel::insert::harmonicAmplitude:
-            case topLevel::insert::harmonicPhaseBandwidth:
-                if (engine >= partLevel::engine::addMod1)
+            case TOPLEVEL::insert::oscillatorGroup:
+            case TOPLEVEL::insert::harmonicAmplitude:
+            case TOPLEVEL::insert::harmonicPhaseBandwidth:
+                if (engine >= PART::engine::addMod1)
                 {
-                    engine -= partLevel::engine::addMod1;
+                    engine -= PART::engine::addMod1;
                     if (control != 113)
                     {
                         int voicechange = part->kit[kititem].adpars->VoicePar[engine].PextFMoscil;
@@ -4116,7 +4116,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                         if (voicechange != -1)
                         {
                             engine = voicechange;
-                            getData->data.engine = engine +  partLevel::addMod1;
+                            getData->data.engine = engine +  PART::addMod1;
                         }   // force it to external mod
                     }
 
@@ -4124,7 +4124,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                 }
                 else
                 {
-                    engine -= partLevel::engine::addVoice1;
+                    engine -= PART::engine::addVoice1;
                     if (control != 137)
                     {
                         int voicechange = part->kit[kititem].adpars->VoicePar[engine].Pextoscil;
@@ -4132,7 +4132,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                         if (voicechange != -1)
                         {
                             engine = voicechange;
-                            getData->data.engine = engine | partLevel::engine::addVoice1;
+                            getData->data.engine = engine | PART::engine::addVoice1;
                         }   // force it to external voice
                     }
 
@@ -4144,26 +4144,26 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         return true;
     }
 
-    if (engine == partLevel::engine::addSynth)
+    if (engine == PART::engine::addSynth)
     {
         switch (insert)
         {
             case 0xff:
                 commandAdd(getData);
                 break;
-            case topLevel::insert::LFOgroup:
+            case TOPLEVEL::insert::LFOgroup:
                 commandLFO(getData);
                 break;
-            case topLevel::insert::filterGroup:
+            case TOPLEVEL::insert::filterGroup:
                 commandFilter(getData);
                 break;
-            case topLevel::insert::envelopeGroup:
-            case topLevel::insert::envelopePoints:
-            case topLevel::insert::envelopePointChange:
+            case TOPLEVEL::insert::envelopeGroup:
+            case TOPLEVEL::insert::envelopePoints:
+            case TOPLEVEL::insert::envelopePointChange:
                 commandEnvelope(getData);
                 break;
-            case topLevel::insert::resonanceGroup:
-            case topLevel::insert::resonanceGraphInsert:
+            case TOPLEVEL::insert::resonanceGroup:
+            case TOPLEVEL::insert::resonanceGraphInsert:
                 commandResonance(getData, part->kit[kititem].adpars->GlobalPar.Reson);
                 break;
         }
@@ -4214,7 +4214,7 @@ void InterChange::commandMidi(CommandBlock *getData)
             break;
 
         case 8: // Program / Bank / Root
-            getData->data.parameter = topLevel::route::lowPriority;
+            getData->data.parameter = TOPLEVEL::route::lowPriority;
             if ((value_int < 0xff || par2 != NO_MSG) && chan < synth->getRuntime().NumAvailableParts)
             {
                 synth->partonoffLock(chan & 0x3f, -1);
@@ -4263,7 +4263,7 @@ void InterChange::commandVector(CommandBlock *getData)
 
     unsigned int features;
 
-    if (control == vectorLevel::control::erase)
+    if (control == VECTOR::control::erase)
     {
         vectorClear(chan);
         synth->setLastfileAdded(5, "");
@@ -4271,9 +4271,9 @@ void InterChange::commandVector(CommandBlock *getData)
     }
     if (write)
     {
-        if (control >= vectorLevel::control::Xfeature0 && control <= vectorLevel::control::Xfeature3)
+        if (control >= VECTOR::control::Xfeature0 && control <= VECTOR::control::Xfeature3)
             features = synth->getRuntime().vectordata.Xfeatures[chan];
-        else if (control >= vectorLevel::control::Yfeature0 && control <= vectorLevel::control::Yfeature3)
+        else if (control >= VECTOR::control::Yfeature0 && control <= VECTOR::control::Yfeature3)
             features = synth->getRuntime().vectordata.Yfeatures[chan];
     }
 
@@ -4301,10 +4301,10 @@ void InterChange::commandVector(CommandBlock *getData)
             }
             break;
 
-        case vectorLevel::control::name:
+        case VECTOR::control::name:
             break; // handled elsewhere
 
-        case vectorLevel::control::Xcontroller: // also enable vector
+        case VECTOR::control::Xcontroller: // also enable vector
             if (write)
             {
                 if (value >= 14)
@@ -4320,7 +4320,7 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             }
             break;
-        case vectorLevel::control::XleftInstrument:
+        case VECTOR::control::XleftInstrument:
             if (write)
                 synth->vectorSet(4, chan, value);
             else
@@ -4328,7 +4328,7 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             }
             break;
-        case vectorLevel::control::XrightInstrument:
+        case VECTOR::control::XrightInstrument:
             if (write)
                 synth->vectorSet(5, chan, value);
             else
@@ -4336,8 +4336,8 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             }
             break;
-        case vectorLevel::control::Xfeature0:
-        case vectorLevel::control::Yfeature0: // volume
+        case VECTOR::control::Xfeature0:
+        case VECTOR::control::Yfeature0: // volume
             if (write)
                 if (value == 0)
                     bitClear(features, 0);
@@ -4348,8 +4348,8 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             }
             break;
-        case vectorLevel::control::Xfeature1:
-        case vectorLevel::control::Yfeature1: // panning
+        case VECTOR::control::Xfeature1:
+        case VECTOR::control::Yfeature1: // panning
             if (write)
             {
                 bitClear(features, 1);
@@ -4366,8 +4366,8 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             }
             break;
-        case vectorLevel::control::Xfeature2:
-        case vectorLevel::control::Yfeature2: // filter cutoff
+        case VECTOR::control::Xfeature2:
+        case VECTOR::control::Yfeature2: // filter cutoff
             if (write)
             {
                 bitClear(features, 2);
@@ -4384,8 +4384,8 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             }
             break;
-        case vectorLevel::control::Xfeature3:
-        case vectorLevel::control::Yfeature3: // modulation
+        case VECTOR::control::Xfeature3:
+        case VECTOR::control::Yfeature3: // modulation
             if (write)
             {
                 bitClear(features, 3);
@@ -4403,7 +4403,7 @@ void InterChange::commandVector(CommandBlock *getData)
             }
             break;
 
-        case vectorLevel::control::Ycontroller: // also enable Y
+        case VECTOR::control::Ycontroller: // also enable Y
             if (write)
             {
                 if (value >= 14)
@@ -4419,7 +4419,7 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             }
             break;
-        case vectorLevel::control::YupInstrument:
+        case VECTOR::control::YupInstrument:
             if (write)
                 synth->vectorSet(6, chan, value);
             else
@@ -4427,7 +4427,7 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             }
             break;
-        case vectorLevel::control::YdownInstrument:
+        case VECTOR::control::YdownInstrument:
             if (write)
                 synth->vectorSet(7, chan, value);
             else
@@ -4439,9 +4439,9 @@ void InterChange::commandVector(CommandBlock *getData)
 
     if (write)
     {
-        if (control >= vectorLevel::control::Xfeature0 && control <= vectorLevel::control::Xfeature3)
+        if (control >= VECTOR::control::Xfeature0 && control <= VECTOR::control::Xfeature3)
             synth->getRuntime().vectordata.Xfeatures[chan] = features;
-        else if (control >= vectorLevel::control::Yfeature0 && control <= vectorLevel::control::Yfeature3)
+        else if (control >= VECTOR::control::Yfeature0 && control <= VECTOR::control::Yfeature3)
             synth->getRuntime().vectordata.Yfeatures[chan] = features;
     }
 }
@@ -4462,7 +4462,7 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
 
     switch (control)
     {
-        case scalesLevel::control::Afrequency:
+        case SCALES::control::Afrequency:
             if (write)
             {
                 if (value > 2000)
@@ -4475,45 +4475,45 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
                 value = synth->microtonal.PAfreq;
             break;
 
-        case scalesLevel::control::Anote:
+        case SCALES::control::Anote:
             if (write)
                 synth->microtonal.PAnote = value_int;
             else
                 value = synth->microtonal.PAnote;
             break;
-        case scalesLevel::control::invertScale:
+        case SCALES::control::invertScale:
             if (write)
                 synth->microtonal.Pinvertupdown = value_bool;
             else
                 value = synth->microtonal.Pinvertupdown;
             break;
-        case scalesLevel::control::invertedScaleCenter:
+        case SCALES::control::invertedScaleCenter:
             if (write)
                 synth->microtonal.Pinvertupdowncenter = value_int;
             else
                 value = synth->microtonal.Pinvertupdowncenter;
             break;
-        case scalesLevel::control::scaleShift:
+        case SCALES::control::scaleShift:
             if (write)
                 synth->microtonal.Pscaleshift = value_int + 64;
             else
                 value = synth->microtonal.Pscaleshift - 64;
             break;
 
-        case scalesLevel::control::enableMicrotonal:
+        case SCALES::control::enableMicrotonal:
             if (write)
                 synth->microtonal.Penabled = value_bool;
             else
                 value = synth->microtonal.Penabled;
             break;
 
-        case scalesLevel::control::enableKeyboardMap:
+        case SCALES::control::enableKeyboardMap:
             if (write)
                 synth->microtonal.Pmappingenabled = value_bool;
             else
                value = synth->microtonal.Pmappingenabled;
             break;
-        case scalesLevel::control::lowKey:
+        case SCALES::control::lowKey:
             if (write)
             {
                 if (value_int < 0)
@@ -4531,7 +4531,7 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
             else
                 value = synth->microtonal.Pfirstkey;
             break;
-        case scalesLevel::control::middleKey:
+        case SCALES::control::middleKey:
             if (write)
             {
                 if (value_int <= synth->microtonal.Pfirstkey)
@@ -4549,7 +4549,7 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
             else
                 value = synth->microtonal.Pmiddlenote;
             break;
-        case scalesLevel::control::highKey:
+        case SCALES::control::highKey:
             if (write)
             {
                 if (value_int <= synth->microtonal.Pmiddlenote)
@@ -4568,31 +4568,31 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
                 value = synth->microtonal.Plastkey;
             break;
 
-        case scalesLevel::control::tuning:
+        case SCALES::control::tuning:
             // done elsewhere
             break;
-        case scalesLevel::control::keyboardMap:
-            // done elsewhere
-            break;
-
-        case scalesLevel::control::importScl:
-            // done elsewhere
-            break;
-        case scalesLevel::control::importKbm:
+        case SCALES::control::keyboardMap:
             // done elsewhere
             break;
 
-        case scalesLevel::control::name:
+        case SCALES::control::importScl:
             // done elsewhere
             break;
-        case scalesLevel::control::comment:
+        case SCALES::control::importKbm:
             // done elsewhere
             break;
 
-        case scalesLevel::control::retune:
+        case SCALES::control::name:
             // done elsewhere
             break;
-        case scalesLevel::control::clearAll: // Clear scales
+        case SCALES::control::comment:
+            // done elsewhere
+            break;
+
+        case SCALES::control::retune:
+            // done elsewhere
+            break;
+        case SCALES::control::clearAll: // Clear scales
             synth->microtonal.defaults();
             break;
     }
@@ -4619,7 +4619,7 @@ void InterChange::commandConfig(CommandBlock *getData)
     switch (control)
     {
 // main
-        case configLevel::control::oscillatorSize:
+        case CONFIG::control::oscillatorSize:
             if (write)
             {
                 value = nearestPowerOf2(value_int, 256, 16384);
@@ -4629,7 +4629,7 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = synth->getRuntime().Oscilsize;
             break;
-        case configLevel::control::bufferSize:
+        case CONFIG::control::bufferSize:
             if (write)
             {
                 value = nearestPowerOf2(value_int, 16, 4096);
@@ -4639,95 +4639,95 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = synth->getRuntime().Buffersize;
             break;
-        case configLevel::control::padSynthInterpolation:
+        case CONFIG::control::padSynthInterpolation:
             if (write)
                  synth->getRuntime().Interpolation = value_bool;
             else
                 value = synth->getRuntime().Interpolation;
             break;
-        case configLevel::control::virtualKeyboardLayout:
+        case CONFIG::control::virtualKeyboardLayout:
             if (write)
                  synth->getRuntime().VirKeybLayout = value_int;
             else
                 value = synth->getRuntime().VirKeybLayout;
             break;
-        case configLevel::control::XMLcompressionLevel:
+        case CONFIG::control::XMLcompressionLevel:
             if (write)
                  synth->getRuntime().GzipCompression = value_int;
             else
                 value = synth->getRuntime().GzipCompression;
             break;
-        case configLevel::control::reportsDestination:
+        case CONFIG::control::reportsDestination:
             if (write)
                  synth->getRuntime().toConsole = value_bool;
             else
                 value = synth->getRuntime().toConsole;
             break;
-        case configLevel::control::savedInstrumentFormat:
+        case CONFIG::control::savedInstrumentFormat:
             if (write)
                  synth->getRuntime().instrumentFormat = value_int;
             else
                 value = synth->getRuntime().instrumentFormat;
             break;
 // switches
-        case configLevel::control::defaultStateStart:
+        case CONFIG::control::defaultStateStart:
             if (write)
                 synth->getRuntime().loadDefaultState = value_bool;
             else
                 value = synth->getRuntime().loadDefaultState;
             break;
-        case configLevel::control::hideNonFatalErrors:
+        case CONFIG::control::hideNonFatalErrors:
             if (write)
                 synth->getRuntime().hideErrors = value_bool;
             else
                 value = synth->getRuntime().hideErrors;
             break;
-        case configLevel::control::showSplash:
+        case CONFIG::control::showSplash:
             if (write)
                 synth->getRuntime().showSplash = value_bool;
             else
                 value = synth->getRuntime().showSplash;
             break;
-        case configLevel::control::logInstrumentLoadTimes:
+        case CONFIG::control::logInstrumentLoadTimes:
             if (write)
                 synth->getRuntime().showTimes = value_bool;
             else
                 value = synth->getRuntime().showTimes;
             break;
-        case configLevel::control::logXMLheaders:
+        case CONFIG::control::logXMLheaders:
             if (write)
                 synth->getRuntime().logXMLheaders = value_bool;
             else
                 value = synth->getRuntime().logXMLheaders;
             break;
-        case configLevel::control::saveAllXMLdata:
+        case CONFIG::control::saveAllXMLdata:
             if (write)
                 synth->getRuntime().xmlmax = value_bool;
             else
                 value = synth->getRuntime().xmlmax;
             break;
-        case configLevel::control::enableGUI:
+        case CONFIG::control::enableGUI:
             if (write)
                 synth->getRuntime().showGui = value_bool;
             else
                 value = synth->getRuntime().showGui;
             break;
-        case configLevel::control::enableCLI:
+        case CONFIG::control::enableCLI:
             if (write)
                 synth->getRuntime().showCLI = value_bool;
             else
                 value = synth->getRuntime().showCLI;
             break;
-        case configLevel::control::enableAutoInstance:
+        case CONFIG::control::enableAutoInstance:
             if (write)
                 synth->getRuntime().autoInstance = value_bool;
             else
                 value = synth->getRuntime().autoInstance;
             break;
 // jack
-        case configLevel::control::jackMidiSource: // done elsewhere
+        case CONFIG::control::jackMidiSource: // done elsewhere
             break;
-        case configLevel::control::jackPreferredMidi:
+        case CONFIG::control::jackPreferredMidi:
             if (write)
             {
                 if (value_bool)
@@ -4738,9 +4738,9 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = (synth->getRuntime().midiEngine == jack_midi);
             break;
-        case configLevel::control::jackServer: // done elsewhere
+        case CONFIG::control::jackServer: // done elsewhere
             break;
-        case configLevel::control::jackPreferredAudio:
+        case CONFIG::control::jackPreferredAudio:
             if (write)
             {
                 if (value_bool)
@@ -4751,7 +4751,7 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = (synth->getRuntime().audioEngine == jack_audio);
             break;
-        case configLevel::control::jackAutoConnectAudio:
+        case CONFIG::control::jackAutoConnectAudio:
             if (write)
             {
                 synth->getRuntime().connectJackaudio = value_bool;
@@ -4761,9 +4761,9 @@ void InterChange::commandConfig(CommandBlock *getData)
                 value = synth->getRuntime().connectJackaudio;
             break;
 // alsa
-        case configLevel::control::alsaMidiSource: // done elsewhere
+        case CONFIG::control::alsaMidiSource: // done elsewhere
             break;
-        case configLevel::control::alsaPreferredMidi:
+        case CONFIG::control::alsaPreferredMidi:
             if (write)
             {
                 if (value_bool)
@@ -4774,9 +4774,9 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = (synth->getRuntime().midiEngine == alsa_midi);
             break;
-        case configLevel::control::alsaAudioDevice: // done elsewhere
+        case CONFIG::control::alsaAudioDevice: // done elsewhere
             break;
-        case configLevel::control::alsaPreferredAudio:
+        case CONFIG::control::alsaPreferredAudio:
             if (write)
             {
                 if (value_bool)
@@ -4787,7 +4787,7 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = (synth->getRuntime().audioEngine == alsa_audio);
             break;
-        case configLevel::control::alsaSampleRate:
+        case CONFIG::control::alsaSampleRate:
             if (write)
             {
                 switch(value_int)
@@ -4828,9 +4828,9 @@ void InterChange::commandConfig(CommandBlock *getData)
                 }
             break;
 // midi
-        //case configLevel::control::enableBankRootChange:
+        //case CONFIG::control::enableBankRootChange:
             //break;
-        case configLevel::control::bankRootCC:
+        case CONFIG::control::bankRootCC:
             if (write)
             {
                 if (value_int > 119)
@@ -4844,7 +4844,7 @@ void InterChange::commandConfig(CommandBlock *getData)
                 value = synth->getRuntime().midi_bank_root;
             break;
 
-        case configLevel::control::bankCC:
+        case CONFIG::control::bankCC:
             if (write)
             {
                 if (value_int != 0 && value_int != 32)
@@ -4857,21 +4857,21 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = synth->getRuntime().midi_bank_C;
             break;
-        case configLevel::control::enableProgramChange:
+        case CONFIG::control::enableProgramChange:
             if (write)
                 synth->getRuntime().EnableProgChange = value_bool;
             else
                 value = synth->getRuntime().EnableProgChange;
             break;
-        case configLevel::control::programChangeEnablesPart:
+        case CONFIG::control::programChangeEnablesPart:
             if (write)
                 synth->getRuntime().enable_part_on_voice_load = value_bool;
             else
                 value = synth->getRuntime().enable_part_on_voice_load;
             break;
-        //case configLevel::control::enableExtendedProgramChange:
+        //case CONFIG::control::enableExtendedProgramChange:
             //break;
-        case configLevel::control::extendedProgramChangeCC:
+        case CONFIG::control::extendedProgramChangeCC:
             if (write)
             {
                 if (value_int > 119)
@@ -4884,32 +4884,32 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = synth->getRuntime().midi_upper_voice_C;
             break;
-        case configLevel::control::ignoreResetAllCCs:
+        case CONFIG::control::ignoreResetAllCCs:
             if (write)
                 synth->getRuntime().ignoreResetCCs = value_bool;
             else
                 value = synth->getRuntime().ignoreResetCCs;
             break;
-        case configLevel::control::logIncomingCCs:
+        case CONFIG::control::logIncomingCCs:
             if (write)
                 synth->getRuntime().monitorCCin = value_bool;
             else
                 value = synth->getRuntime().monitorCCin;
             break;
-        case configLevel::control::showLearnEditor:
+        case CONFIG::control::showLearnEditor:
             if (write)
                 synth->getRuntime().showLearnedCC = value_bool;
             else
                 value = synth->getRuntime().showLearnedCC;
             break;
-        case configLevel::control::enableNRPNs:
+        case CONFIG::control::enableNRPNs:
             if (write)
                 synth->getRuntime().enable_NRPN = value_bool;
             else
                 value = synth->getRuntime().enable_NRPN;
             break;
 // save config
-        case configLevel::control::saveCurrentConfig: //done elsewhere
+        case CONFIG::control::saveCurrentConfig: //done elsewhere
             break;
         default:
             mightChange = false;
@@ -4941,32 +4941,32 @@ void InterChange::commandMain(CommandBlock *getData)
 
     switch (control)
     {
-        case mainLevel::control::volume:
+        case MAIN::control::volume:
             if (write)
                 synth->setPvolume(value);
             else
                 value = synth->Pvolume;
             break;
 
-        case mainLevel::control::partNumber:
+        case MAIN::control::partNumber:
             if (write)
                 synth->getRuntime().currentPart = value_int;
             else
                 value = synth->getRuntime().currentPart;
             break;
-        case mainLevel::control::availableParts:
+        case MAIN::control::availableParts:
             if ((write) && (value == 16 || value == 32 || value == 64))
                 synth->getRuntime().NumAvailableParts = value;
             else
                 value = synth->getRuntime().NumAvailableParts;
             break;
 
-        case mainLevel::control::detune: // done elsewhere
+        case MAIN::control::detune: // done elsewhere
             break;
-        case mainLevel::control::keyShift: // done elsewhere
+        case MAIN::control::keyShift: // done elsewhere
             break;
 
-        case mainLevel::control::soloType: // solo mode
+        case MAIN::control::soloType: // solo mode
             if (write && value_int <= 4)
             {
                 synth->getRuntime().channelSwitchType = value_int;
@@ -4992,7 +4992,7 @@ void InterChange::commandMain(CommandBlock *getData)
                 value = synth->getRuntime().channelSwitchType;
             }
             break;
-        case mainLevel::control::soloCC:
+        case MAIN::control::soloCC:
             if (write && synth->getRuntime().channelSwitchType > 0)
                 synth->getRuntime().channelSwitchCC = value_int;
             else
@@ -5002,7 +5002,7 @@ void InterChange::commandMain(CommandBlock *getData)
             }
             break;
 
-        case mainLevel::control::setCurrentRootBank: // set current root and bank
+        case MAIN::control::setCurrentRootBank: // set current root and bank
             if (write)
             {
                 if (kititem < 0x80) // should test for success
@@ -5012,81 +5012,81 @@ void InterChange::commandMain(CommandBlock *getData)
             }
             break;
 
-        case mainLevel::control::loadInstrument: // load instrument from ID
+        case MAIN::control::loadInstrument: // load instrument from ID
             /*
              * this is the lazy way to move all program changes
              * to the new MIDI method.
              */
             synth->partonoffLock(value_int, -1);
             getData->data.control = 8;
-            getData->data.part = topLevel::section::midiIn;
+            getData->data.part = TOPLEVEL::section::midiIn;
             getData->data.kit = value_int;
             getData->data.value = par2;
-            getData->data.parameter = topLevel::route::lowPriority;
+            getData->data.parameter = TOPLEVEL::route::lowPriority;
             getData->data.par2 = 0xff;
             break;
-        case mainLevel::control::loadNamedInstrument: // load named instrument
+        case MAIN::control::loadNamedInstrument: // load named instrument
             synth->partonoffLock(value_int & 0x3f, -1);
             // as above for named instruments :)
             getData->data.control = 8;
-            getData->data.part = topLevel::section::midiIn;
+            getData->data.part = TOPLEVEL::section::midiIn;
             getData->data.kit = value_int & 0x3f;
             getData->data.value = 0xff;
-            getData->data.parameter = topLevel::route::lowPriority;
+            getData->data.parameter = TOPLEVEL::route::lowPriority;
             break;
 
-        case mainLevel::control::loadNamedPatchset:
-            if (write && (parameter == topLevel::route::adjustAndLoopback))
+        case MAIN::control::loadNamedPatchset:
+            if (write && (parameter == TOPLEVEL::route::adjustAndLoopback))
             {
-                synth->allStop(topLevel::muted::patchSetLoad | (par2 << 8) | (type << 24));
+                synth->allStop(TOPLEVEL::muted::patchSetLoad | (par2 << 8) | (type << 24));
                 getData->data.type = 0xff; // stop further action
             }
             break;
-        case mainLevel::control::loadNamedVector:
-            if (write && (parameter == topLevel::route::adjustAndLoopback))
+        case MAIN::control::loadNamedVector:
+            if (write && (parameter == TOPLEVEL::route::adjustAndLoopback))
             {
-                synth->allStop(topLevel::muted::vectorLoad | (par2 << 8) | (insert << 16) | (type << 24));
+                synth->allStop(TOPLEVEL::muted::vectorLoad | (par2 << 8) | (insert << 16) | (type << 24));
                 getData->data.type = 0xff; // stop further action
             }
             break;
-        case mainLevel::control::saveNamedVector: // done elsewhere
+        case MAIN::control::saveNamedVector: // done elsewhere
             break;
-        case mainLevel::control::loadNamedScale: // done elsewhere
+        case MAIN::control::loadNamedScale: // done elsewhere
             break;
-        case mainLevel::control::saveNamedScale: // done elsewhere
+        case MAIN::control::saveNamedScale: // done elsewhere
             break;
-        case mainLevel::control::loadNamedState:
-            if (write && (parameter == topLevel::route::adjustAndLoopback))
+        case MAIN::control::loadNamedState:
+            if (write && (parameter == TOPLEVEL::route::adjustAndLoopback))
             {
-                synth->allStop(topLevel::muted::stateLoad | (par2 << 8) | (type << 24));
+                synth->allStop(TOPLEVEL::muted::stateLoad | (par2 << 8) | (type << 24));
                 getData->data.type = 0xff; // stop further action
             }
             break;
-        case mainLevel::control::saveNamedState: // done elsewhere
+        case MAIN::control::saveNamedState: // done elsewhere
             break;
-        case mainLevel::control::masterReset:
-        case mainLevel::control::masterResetAndMlearn:
-            if (write && (parameter == topLevel::route::adjustAndLoopback))
+        case MAIN::control::masterReset:
+        case MAIN::control::masterResetAndMlearn:
+            if (write && (parameter == TOPLEVEL::route::adjustAndLoopback))
             {
-                synth->allStop(topLevel::muted::masterReset | (control << 8) | (type << 24));
+                synth->allStop(TOPLEVEL::muted::masterReset | (control << 8) | (type << 24));
                 getData->data.type = 0xff; // stop further action);
             }
             break;
-        case mainLevel::control::startInstance: // done elsewhere
+        case MAIN::control::startInstance: // done elsewhere
             break;
-        case mainLevel::control::stopInstance: // done elsewhere
+        case MAIN::control::stopInstance: // done elsewhere
             break;
-        case mainLevel::control::stopSound: // just stop
+        case MAIN::control::stopSound: // just stop
             if (write)
-                synth->allStop(topLevel::muted::stopSound);
+                synth->allStop(TOPLEVEL::muted::stopSound);
             getData->data.type = 0xff; // stop further action);
             break;
 
-        case mainLevel::control::readPartPeak:
+        case MAIN::control::readPartPeak:
             if (!write && kititem < NUM_MIDI_PARTS)
                 value = synth->VUdata.values.parts[kititem];
             break;
-        case mainLevel::control::readMainLRpeak:
+        case MAIN::control::readMainLRpeak:
             if (!write)
             {
                 if (kititem == 1)
@@ -5095,7 +5095,7 @@ void InterChange::commandMain(CommandBlock *getData)
                     value = synth->VUdata.values.vuOutPeakL;
             }
             break;
-        case mainLevel::control::readMainLRrms:
+        case MAIN::control::readMainLRrms:
             if (!write)
             {
                 if (kititem == 1)
@@ -5132,7 +5132,7 @@ void InterChange::commandPart(CommandBlock *getData)
     if (write)
         __sync_or_and_fetch(&blockRead, 1);
 
-    bool kitType = (insert == topLevel::insert::kitGroup);
+    bool kitType = (insert == TOPLEVEL::insert::kitGroup);
 
     if ( kitType && kititem >= NUM_KIT_ITEMS)
     {
@@ -5148,31 +5148,31 @@ void InterChange::commandPart(CommandBlock *getData)
 
     switch (control)
     {
-        case partLevel::control::volume:
+        case PART::control::volume:
             if (write)
                 part->setVolume(value);
             else
                 value = part->Pvolume;
             break;
-        case partLevel::control::velocitySense:
+        case PART::control::velocitySense:
             if (write)
                 part->Pvelsns = value;
             else
                 value = part->Pvelsns;
             break;
-        case partLevel::control::panning:
+        case PART::control::panning:
             if (write)
                 part->SetController(C_panning, value);
             else
                 value = part->Ppanning;
             break;
-        case partLevel::control::velocityOffset:
+        case PART::control::velocityOffset:
             if (write)
                 part->Pveloffs = value;
             else
                 value = part->Pveloffs;
             break;
-        case partLevel::control::midiChannel:
+        case PART::control::midiChannel:
             if (write)
             {
                 part->Prcvchn = value_int;
@@ -5187,36 +5187,36 @@ void InterChange::commandPart(CommandBlock *getData)
             else
                 value = part->Prcvchn;
             break;
-        case partLevel::control::keyMode:
+        case PART::control::keyMode:
             if (write)
                 synth->SetPartKeyMode(npart, value_int);
             else
                 value = (synth->ReadPartKeyMode(npart)) & 3; // clear out temporary legato
             break;
-        case partLevel::control::portamento:
+        case PART::control::portamento:
             if (write)
                 part->ctl->portamento.portamento = value_bool;
             else
                 value = part->ctl->portamento.portamento;
             break;
-        case partLevel::control::enable:
+        case PART::control::enable:
             if (kitType)
             {
                 switch(engine)
                 {
-                    case partLevel::engine::addSynth:
+                    case PART::engine::addSynth:
                         if (write)
                             part->kit[kititem].Padenabled = value_bool;
                         else
                             value = part->kit[kititem].Padenabled;
                         break;
-                    case partLevel::engine::subSynth:
+                    case PART::engine::subSynth:
                         if (write)
                             part->kit[kititem].Psubenabled = value_bool;
                         else
                             value = part->kit[kititem].Psubenabled;
                         break;
-                    case partLevel::engine::padSynth:
+                    case PART::engine::padSynth:
                         if (write)
                             part->kit[kititem].Ppadenabled = value_bool;
                         else
@@ -5234,19 +5234,19 @@ void InterChange::commandPart(CommandBlock *getData)
             {
                 switch(engine)
                 {
-                    case partLevel::engine::addSynth:
+                    case PART::engine::addSynth:
                         if (write)
                             part->kit[0].Padenabled = value_bool;
                         else
                             value = part->kit[0].Padenabled;
                         break;
-                    case partLevel::engine::subSynth:
+                    case PART::engine::subSynth:
                         if (write)
                             part->kit[0].Psubenabled = value_bool;
                         else
                             value = part->kit[0].Psubenabled;
                         break;
-                    case partLevel::engine::padSynth:
+                    case PART::engine::padSynth:
                         if (write)
                             part->kit[0].Ppadenabled = value_bool;
                         else
@@ -5261,7 +5261,7 @@ void InterChange::commandPart(CommandBlock *getData)
                                 synth->getRuntime().currentPart = npart;
                                 getData->data.value = npart;
                                 getData->data.control = 14;
-                                getData->data.part = topLevel::section::main;
+                                getData->data.part = TOPLEVEL::section::main;
                             }
                             else
                                 synth->partonoffWrite(npart, value_int);
@@ -5272,7 +5272,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 }
             }
             break;
-        case partLevel::control::kitItemMute:
+        case PART::control::kitItemMute:
             if (kitType)
             {
                 if (write)
@@ -5282,7 +5282,7 @@ void InterChange::commandPart(CommandBlock *getData)
             }
             break;
 
-        case partLevel::control::minNote: // always return actual value
+        case PART::control::minNote: // always return actual value
             if (kitType)
             {
                 if (write)
@@ -5306,7 +5306,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->Pminkey;
             }
             break;
-        case partLevel::control::maxNote: // always return actual value
+        case PART::control::maxNote: // always return actual value
             if (kitType)
             {
                 if (write)
@@ -5330,7 +5330,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->Pmaxkey;
             }
             break;
-        case partLevel::control::minToLastKey: // always return actual value
+        case PART::control::minToLastKey: // always return actual value
             value_int = part->lastnote;
             if (kitType)
             {
@@ -5355,7 +5355,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->Pminkey;
             }
             break;
-        case partLevel::control::maxToLastKey: // always return actual value
+        case PART::control::maxToLastKey: // always return actual value
             value_int = part->lastnote;
             if (kitType)
             {
@@ -5380,7 +5380,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->Pmaxkey;
             }
             break;
-        case partLevel::control::resetMinMaxKey:
+        case PART::control::resetMinMaxKey:
             if (kitType)
             {
                 if (write)
@@ -5399,7 +5399,7 @@ void InterChange::commandPart(CommandBlock *getData)
             }
             break;
 
-        case partLevel::control::kitEffectNum:
+        case PART::control::kitEffectNum:
             if (kitType)
             {
                 if (write)
@@ -5414,48 +5414,48 @@ void InterChange::commandPart(CommandBlock *getData)
             }
             break;
 
-        case partLevel::control::maxNotes:
+        case PART::control::maxNotes:
             if (write)
                 part->setkeylimit(value_int);
             else
                 value = part->Pkeylimit;
             break;
-        case partLevel::control::keyShift: // done elsewhere
+        case PART::control::keyShift: // done elsewhere
             break;
 
-        case partLevel::control::partToSystemEffect1:
+        case PART::control::partToSystemEffect1:
             if (write)
                 synth->setPsysefxvol(npart,0, value);
             else
                 value = synth->Psysefxvol[0][npart];
             break;
-        case partLevel::control::partToSystemEffect2:
+        case PART::control::partToSystemEffect2:
             if (write)
                 synth->setPsysefxvol(npart,1, value);
             else
                 value = synth->Psysefxvol[1][npart];
             break;
-        case partLevel::control::partToSystemEffect3:
+        case PART::control::partToSystemEffect3:
             if (write)
                 synth->setPsysefxvol(npart,2, value);
             else
                 value = synth->Psysefxvol[2][npart];
             break;
-        case partLevel::control::partToSystemEffect4:
+        case PART::control::partToSystemEffect4:
             if (write)
                 synth->setPsysefxvol(npart,3, value);
             else
                 value = synth->Psysefxvol[3][npart];
             break;
 
-        case partLevel::control::humanise:
+        case PART::control::humanise:
             if (write)
                 part->Pfrand = value;
             else
                 value = part->Pfrand;
             break;
 
-        case partLevel::control::drumMode:
+        case PART::control::drumMode:
             if (write)
             {
                 part->legatoFading = 0;
@@ -5465,7 +5465,7 @@ void InterChange::commandPart(CommandBlock *getData)
             else
                 value = part->Pdrummode;
             break;
-        case partLevel::control::kitMode:
+        case PART::control::kitMode:
             if (write)
             {
                 if (value == 3)
@@ -5484,16 +5484,16 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->Pkitmode;
             break;
 
-        case partLevel::control::effectNum: // local to source
+        case PART::control::effectNum: // local to source
             break;
 
-        case partLevel::control::effectType:
+        case PART::control::effectType:
             if (write)
                 part->partefx[effNum]->changeeffect(value_int);
             else
                 value = part->partefx[effNum]->geteffect();
             break;
-        case partLevel::control::effectDestination:
+        case PART::control::effectDestination:
             if (write)
             {
                 part->Pefxroute[effNum] = value_int;
@@ -5502,24 +5502,24 @@ void InterChange::commandPart(CommandBlock *getData)
             else
                 value = part->Pefxroute[effNum];
             break;
-        case partLevel::control::effectBypass:
+        case PART::control::effectBypass:
             if (write)
                 part->Pefxbypass[effNum] = value_bool;
             else
                 value = part->Pefxbypass[effNum];
             break;
 
-        case partLevel::control::defaultInstrument: // doClearPart
+        case PART::control::defaultInstrument: // doClearPart
             if(write)
             {
                 synth->partonoffWrite(npart, -1);
-                getData->data.parameter = topLevel::route::lowPriority;
+                getData->data.parameter = TOPLEVEL::route::lowPriority;
             }
             else
                 getData->data.type = 0xff; // block any further action
             break;
 
-        case partLevel::control::audioDestination:
+        case PART::control::audioDestination:
             if (synth->partonoffRead(npart) != 1)
             {
                 getData->data.value = part->Paudiodest; // specific for this control
@@ -5529,91 +5529,91 @@ void InterChange::commandPart(CommandBlock *getData)
             {
                 if (npart < synth->getRuntime().NumAvailableParts)
                     synth->part[npart]->Paudiodest = value_int;
-                getData->data.parameter = topLevel::route::lowPriority;
+                getData->data.parameter = TOPLEVEL::route::lowPriority;
             }
             else
                 value = part->Paudiodest;
             break;
 
-        case partLevel::control::volumeRange: // start of controllers
+        case PART::control::volumeRange: // start of controllers
             if (write)
                 part->ctl->setvolume(value_int); // not the *actual* volume
             else
                 value = part->ctl->volume.data;
             break;
-        case partLevel::control::volumeEnable:
+        case PART::control::volumeEnable:
             if (write)
                 part->ctl->volume.receive = value_bool;
             else
                 value = part->ctl->volume.receive;
             break;
-        case partLevel::control::panningWidth:
+        case PART::control::panningWidth:
             if (write)
                 part->ctl->setPanDepth(value_int);
             else
                 value = part->ctl->panning.depth;
             break;
-        case partLevel::control::modWheelDepth:
+        case PART::control::modWheelDepth:
             if (write)
                 part->ctl->modwheel.depth = value;
             else
                 value = part->ctl->modwheel.depth;
             break;
-        case partLevel::control::exponentialModWheel:
+        case PART::control::exponentialModWheel:
             if (write)
                 part->ctl->modwheel.exponential = value_bool;
             else
                 value = part->ctl->modwheel.exponential;
             break;
-        case partLevel::control::bandwidthDepth:
+        case PART::control::bandwidthDepth:
             if (write)
                 part->ctl->bandwidth.depth = value;
             else
                 value = part->ctl->bandwidth.depth;
             break;
-        case partLevel::control::exponentialBandwidth:
+        case PART::control::exponentialBandwidth:
             if (write)
                 part->ctl->bandwidth.exponential = value_bool;
             else
                 value = part->ctl->bandwidth.exponential;
             break;
-        case partLevel::control::expressionEnable:
+        case PART::control::expressionEnable:
             if (write)
                 part->ctl->expression.receive = value_bool;
             else
                 value = part->ctl->expression.receive;
             break;
-        case partLevel::control::FMamplitudeEnable:
+        case PART::control::FMamplitudeEnable:
             if (write)
                 part->ctl->fmamp.receive = value_bool;
             else
                 value = part->ctl->fmamp.receive;
             break;
-        case partLevel::control::sustainPedalEnable:
+        case PART::control::sustainPedalEnable:
             if (write)
                 part->ctl->sustain.receive = value_bool;
             else
                 value = part->ctl->sustain.receive;
             break;
-        case partLevel::control::pitchWheelRange:
+        case PART::control::pitchWheelRange:
             if (write)
                 part->ctl->pitchwheel.bendrange = value_int;
             else
                 value = part->ctl->pitchwheel.bendrange;
             break;
-        case partLevel::control::filterQdepth:
+        case PART::control::filterQdepth:
             if (write)
                 part->ctl->filterq.depth = value;
             else
                 value = part->ctl->filterq.depth;
             break;
-        case partLevel::control::filterCutoffDepth:
+        case PART::control::filterCutoffDepth:
             if (write)
                 part->ctl->filtercutoff.depth = value;
             else
                 value = part->ctl->filtercutoff.depth;
             break;
-        case partLevel::control::breathControlEnable:
+        case PART::control::breathControlEnable:
             if (write)
                 if (value_bool)
                     part->PbreathControl = 2;
@@ -5623,79 +5623,79 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->PbreathControl;
             break;
 
-        case partLevel::control::resonanceCenterFrequencyDepth:
+        case PART::control::resonanceCenterFrequencyDepth:
             if (write)
                 part->ctl->resonancecenter.depth = value;
             else
                 value = part->ctl->resonancecenter.depth;
             break;
-        case partLevel::control::resonanceBandwidthDepth:
+        case PART::control::resonanceBandwidthDepth:
             if (write)
                 part->ctl->resonancebandwidth.depth = value;
             else
                 value = part->ctl->resonancebandwidth.depth;
             break;
 
-        case partLevel::control::portamentoTime:
+        case PART::control::portamentoTime:
             if (write)
                 part->ctl->portamento.time = value;
             else
                 value = part->ctl->portamento.time;
             break;
-        case partLevel::control::portamentoTimeStretch:
+        case PART::control::portamentoTimeStretch:
             if (write)
                 part->ctl->portamento.updowntimestretch = value;
             else
                 value = part->ctl->portamento.updowntimestretch;
             break;
-        case partLevel::control::portamentoThreshold:
+        case PART::control::portamentoThreshold:
             if (write)
                 part->ctl->portamento.pitchthresh = value;
             else
                 value = part->ctl->portamento.pitchthresh;
             break;
-        case partLevel::control::portamentoThresholdType:
+        case PART::control::portamentoThresholdType:
             if (write)
                 part->ctl->portamento.pitchthreshtype = value_int;
             else
                 value = part->ctl->portamento.pitchthreshtype;
             break;
-        case partLevel::control::enableProportionalPortamento:
+        case PART::control::enableProportionalPortamento:
             if (write)
                 part->ctl->portamento.proportional = value_int;
             else
                 value = part->ctl->portamento.proportional;
             break;
-        case partLevel::control::proportionalPortamentoRate:
+        case PART::control::proportionalPortamentoRate:
             if (write)
                 part->ctl->portamento.propRate = value;
             else
                 value = part->ctl->portamento.propRate;
             break;
-        case partLevel::control::proportionalPortamentoDepth:
+        case PART::control::proportionalPortamentoDepth:
             if (write)
                 part->ctl->portamento.propDepth = value;
             else
                 value = part->ctl->portamento.propDepth;
             break;
 
-        case partLevel::control::receivePortamento: // end of controllers
+        case PART::control::receivePortamento: // end of controllers
             if (write)
                 part->ctl->portamento.receive = value_bool;
             else
                 value = part->ctl->portamento.receive;
             break;
 
-        case partLevel::control::midiModWheel:
+        case PART::control::midiModWheel:
             if (write)
                 part->ctl->setmodwheel(value);
             else
                 value = part->ctl->modwheel.data;
             break;
-        case partLevel::control::midiBreath:
+        case PART::control::midiBreath:
             ; // not yet
             break;
-        case partLevel::control::midiExpression:
+        case PART::control::midiExpression:
             if (write)
             {
                 part->SetController(C_expression, value);
@@ -5703,42 +5703,42 @@ void InterChange::commandPart(CommandBlock *getData)
             else
                 value = part->ctl->expression.data;
             break;
-        case partLevel::control::midiSustain:
+        case PART::control::midiSustain:
             ; // not yet
             break;
-        case partLevel::control::midiPortamento:
+        case PART::control::midiPortamento:
             ; // not yet
             break;
-        case partLevel::control::midiFilterQ:
+        case PART::control::midiFilterQ:
             if (write)
                 part->ctl->setfilterq(value);
             else
                 value = part->ctl->filterq.data;
             break;
-        case partLevel::control::midiFilterCutoff:
+        case PART::control::midiFilterCutoff:
             if (write)
                 part->ctl->setfiltercutoff(value);
             else
                 value = part->ctl->filtercutoff.data;
             break;
-        case partLevel::control::midiBandwidth:
+        case PART::control::midiBandwidth:
             if (write)
                 part->ctl->setbandwidth(value);
             else
                 value = part->ctl->bandwidth.data;
             break;
 
-        case partLevel::control::instrumentCopyright:
+        case PART::control::instrumentCopyright:
             ; // not yet
             break;
-        case partLevel::control::instrumentComments:
+        case PART::control::instrumentComments:
             ; // not yet
             break;
-        case partLevel::control::instrumentName: // done elsewhere
+        case PART::control::instrumentName: // done elsewhere
             break;
-        case partLevel::control::defaultInstrumentCopyright: // done elsewhere
+        case PART::control::defaultInstrumentCopyright: // done elsewhere
             ;
-        case partLevel::control::resetAllControllers:
+        case PART::control::resetAllControllers:
             if (write)
                 part->SetController(0x79,0);
             break;
@@ -5771,33 +5771,33 @@ void InterChange::commandAdd(CommandBlock *getData)
 
     switch (control)
     {
-        case addSynthLevel::control::volume:
+        case ADDSYNTH::control::volume:
             if (write)
                 pars->GlobalPar.PVolume = value_int;
             else
                 value = pars->GlobalPar.PVolume;
             break;
-        case addSynthLevel::control::velocitySense:
+        case ADDSYNTH::control::velocitySense:
             if (write)
                 pars->GlobalPar.PAmpVelocityScaleFunction = value_int;
             else
                 value = pars->GlobalPar.PAmpVelocityScaleFunction;
             break;
-        case addSynthLevel::control::panning:
+        case ADDSYNTH::control::panning:
             if (write)
                 pars->setGlobalPan(value_int);
             else
                 value = pars->GlobalPar.PPanning;
             break;
 
-        case addSynthLevel::control::detuneFrequency:
+        case ADDSYNTH::control::detuneFrequency:
             if (write)
                 pars->GlobalPar.PDetune = value_int + 8192;
             else
                 value = pars->GlobalPar.PDetune - 8192;
             break;
 
-        case addSynthLevel::control::octave:
+        case ADDSYNTH::control::octave:
         {
             int k;
             if (write)
@@ -5816,13 +5816,13 @@ void InterChange::commandAdd(CommandBlock *getData)
             }
             break;
         }
-        case addSynthLevel::control::detuneType:
+        case ADDSYNTH::control::detuneType:
             if (write)
                 pars->GlobalPar.PDetuneType = value_int;
             else
                 value = pars->GlobalPar.PDetuneType;
             break;
-        case addSynthLevel::control::coarseDetune:
+        case ADDSYNTH::control::coarseDetune:
         {
             int k;
             if (write)
@@ -5841,7 +5841,7 @@ void InterChange::commandAdd(CommandBlock *getData)
             }
             break;
         }
-        case addSynthLevel::control::relativeBandwidth:
+        case ADDSYNTH::control::relativeBandwidth:
             if (write)
             {
                 pars->GlobalPar.PBandwidth = value_int;
@@ -5851,44 +5851,44 @@ void InterChange::commandAdd(CommandBlock *getData)
                 value = pars->GlobalPar.PBandwidth;
             break;
 
-        case addSynthLevel::control::stereo:
+        case ADDSYNTH::control::stereo:
             if (write)
                 pars->GlobalPar.PStereo = value_bool;
             else
                 value = pars->GlobalPar.PStereo;
             break;
-        case addSynthLevel::control::randomGroup:
+        case ADDSYNTH::control::randomGroup:
             if (write)
                 pars->GlobalPar.Hrandgrouping = value_bool;
             else
                 value = pars->GlobalPar.Hrandgrouping;
             break;
 
-        case addSynthLevel::control::dePop:
+        case ADDSYNTH::control::dePop:
             if (write)
                 pars->GlobalPar.Fadein_adjustment = value_int;
             else
                 value = pars->GlobalPar.Fadein_adjustment;
             break;
-        case addSynthLevel::control::punchStrength:
+        case ADDSYNTH::control::punchStrength:
             if (write)
                 pars->GlobalPar.PPunchStrength = value_int;
             else
                 value = pars->GlobalPar.PPunchStrength;
             break;
-        case addSynthLevel::control::punchDuration:
+        case ADDSYNTH::control::punchDuration:
             if (write)
                 pars->GlobalPar.PPunchTime = value_int;
             else
                 value = pars->GlobalPar.PPunchTime;
             break;
-        case addSynthLevel::control::punchStretch:
+        case ADDSYNTH::control::punchStretch:
             if (write)
                 pars->GlobalPar.PPunchStretch = value_int;
             else
                 value = pars->GlobalPar.PPunchStretch;
             break;
-        case addSynthLevel::control::punchVelocity:
+        case ADDSYNTH::control::punchVelocity:
             if (write)
                 pars->GlobalPar.PPunchVelocitySensing = value_int;
             else
@@ -5909,10 +5909,10 @@ void InterChange::commandAddVoice(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     int nvoice;
-    if (engine >= partLevel::engine::addMod1)
-        nvoice = engine - partLevel::engine::addMod1;
+    if (engine >= PART::engine::addMod1)
+        nvoice = engine - PART::engine::addMod1;
     else
-        nvoice = engine - partLevel::engine::addVoice1;
+        nvoice = engine - PART::engine::addVoice1;
 
     bool write = (type & 0x40) > 0;
     if (write)
@@ -5928,75 +5928,75 @@ void InterChange::commandAddVoice(CommandBlock *getData)
 
     switch (control)
     {
-        case addVoiceLevel::control::volume:
+        case ADDVOICE::control::volume:
             if (write)
                 pars->VoicePar[nvoice].PVolume = value_int;
             else
                 value = pars->VoicePar[nvoice].PVolume;
             break;
-        case addVoiceLevel::control::velocitySense:
+        case ADDVOICE::control::velocitySense:
             if (write)
                 pars->VoicePar[nvoice].PAmpVelocityScaleFunction = value_int;
             else
                 value = pars->VoicePar[nvoice].PAmpVelocityScaleFunction;
             break;
-        case addVoiceLevel::control::panning:
+        case ADDVOICE::control::panning:
             if (write)
                  pars->setVoicePan(nvoice, value_int);
             else
                 value = pars->VoicePar[nvoice].PPanning;
             break;
-        case addVoiceLevel::control::invertPhase:
+        case ADDVOICE::control::invertPhase:
             if (write)
                 pars->VoicePar[nvoice].PVolumeminus = value_bool;
             else
                 value = pars->VoicePar[nvoice].PVolumeminus;
             break;
-        case addVoiceLevel::control::enableAmplitudeEnvelope:
+        case ADDVOICE::control::enableAmplitudeEnvelope:
             if (write)
                 pars->VoicePar[nvoice].PAmpEnvelopeEnabled = value_bool;
             else
                 value = pars->VoicePar[nvoice].PAmpEnvelopeEnabled;
             break;
-        case addVoiceLevel::control::enableAmplitudeLFO:
+        case ADDVOICE::control::enableAmplitudeLFO:
             if (write)
                 pars->VoicePar[nvoice].PAmpLfoEnabled = value_bool;
             else
                 value = pars->VoicePar[nvoice].PAmpLfoEnabled;
             break;
 
-        case addVoiceLevel::control::modulatorType:
+        case ADDVOICE::control::modulatorType:
             if (write)
                 pars->VoicePar[nvoice].PFMEnabled = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMEnabled;
             break;
-        case addVoiceLevel::control::externalModulator:
+        case ADDVOICE::control::externalModulator:
             if (write)
                 pars->VoicePar[nvoice].PFMVoice = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMVoice;
             break;
 
-        case addVoiceLevel::control::detuneFrequency:
+        case ADDVOICE::control::detuneFrequency:
             if (write)
                 pars->VoicePar[nvoice].PDetune = value_int + 8192;
             else
                 value = pars->VoicePar[nvoice].PDetune-8192;
             break;
-        case addVoiceLevel::control::equalTemperVariation:
+        case ADDVOICE::control::equalTemperVariation:
             if (write)
                 pars->VoicePar[nvoice].PfixedfreqET = value_int;
             else
                 value = pars->VoicePar[nvoice].PfixedfreqET;
             break;
-        case addVoiceLevel::control::baseFrequencyAs440Hz:
+        case ADDVOICE::control::baseFrequencyAs440Hz:
             if (write)
                  pars->VoicePar[nvoice].Pfixedfreq = value_bool;
             else
                 value = pars->VoicePar[nvoice].Pfixedfreq;
             break;
-        case addVoiceLevel::control::octave:
+        case ADDVOICE::control::octave:
         {
             int k;
             if (write)
@@ -6015,13 +6015,13 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             }
             break;
         }
-        case addVoiceLevel::control::detuneType:
+        case ADDVOICE::control::detuneType:
             if (write)
                 pars->VoicePar[nvoice].PDetuneType = value_int;
             else
                 value = pars->VoicePar[nvoice].PDetuneType;
             break;
-        case addVoiceLevel::control::coarseDetune:
+        case ADDVOICE::control::coarseDetune:
         {
             int k;
             if (write)
@@ -6040,62 +6040,62 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             }
             break;
         }
-        case addVoiceLevel::control::pitchBendAdjustment:
+        case ADDVOICE::control::pitchBendAdjustment:
             if (write)
                 pars->VoicePar[nvoice].PBendAdjust = value_int;
             else
                 value = pars->VoicePar[nvoice].PBendAdjust;
             break;
-        case addVoiceLevel::control::pitchBendOffset:
+        case ADDVOICE::control::pitchBendOffset:
             if (write)
                 pars->VoicePar[nvoice].POffsetHz = value_int;
             else
                 value = pars->VoicePar[nvoice].POffsetHz;
             break;
-        case addVoiceLevel::control::enableFrequencyEnvelope:
+        case ADDVOICE::control::enableFrequencyEnvelope:
             if (write)
                 pars->VoicePar[nvoice].PFreqEnvelopeEnabled = value_int;
             else
                 value = pars->VoicePar[nvoice].PFreqEnvelopeEnabled;
             break;
-        case addVoiceLevel::control::enableFrequencyLFO:
+        case ADDVOICE::control::enableFrequencyLFO:
             if (write)
                 pars->VoicePar[nvoice].PFreqLfoEnabled = value_int;
             else
                 value = pars->VoicePar[nvoice].PFreqLfoEnabled;
             break;
 
-        case addVoiceLevel::control::unisonFrequencySpread:
+        case ADDVOICE::control::unisonFrequencySpread:
             if (write)
                 pars->VoicePar[nvoice].Unison_frequency_spread = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_frequency_spread;
             break;
-        case addVoiceLevel::control::unisonPhaseRandomise:
+        case ADDVOICE::control::unisonPhaseRandomise:
             if (write)
                 pars->VoicePar[nvoice].Unison_phase_randomness = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_phase_randomness;
             break;
-        case addVoiceLevel::control::unisonStereoSpread:
+        case ADDVOICE::control::unisonStereoSpread:
             if (write)
                 pars->VoicePar[nvoice].Unison_stereo_spread = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_stereo_spread;
             break;
-        case addVoiceLevel::control::unisonVibratoDepth:
+        case ADDVOICE::control::unisonVibratoDepth:
             if (write)
                 pars->VoicePar[nvoice].Unison_vibratto = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_vibratto;
             break;
-        case addVoiceLevel::control::unisonVibratoSpeed:
+        case ADDVOICE::control::unisonVibratoSpeed:
             if (write)
                 pars->VoicePar[nvoice].Unison_vibratto_speed = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_vibratto_speed;
             break;
-        case addVoiceLevel::control::unisonSize:
+        case ADDVOICE::control::unisonSize:
             if (write)
             {
                 if (value < 2)
@@ -6105,13 +6105,13 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             else
                 value = pars->VoicePar[nvoice].Unison_size;
             break;
-        case addVoiceLevel::control::unisonPhaseInvert:
+        case ADDVOICE::control::unisonPhaseInvert:
             if (write)
                 pars->VoicePar[nvoice].Unison_invert_phase = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_invert_phase;
             break;
-        case addVoiceLevel::control::enableUnison:
+        case ADDVOICE::control::enableUnison:
         {
             int k;
             if (write)
@@ -6125,69 +6125,69 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
         }
 
-        case addVoiceLevel::control::bypassGlobalFilter:
+        case ADDVOICE::control::bypassGlobalFilter:
             if (write)
                 pars->VoicePar[nvoice].Pfilterbypass = value_bool;
             else
                 value = pars->VoicePar[nvoice].Pfilterbypass;
             break;
-        case addVoiceLevel::control::enableFilter:
+        case ADDVOICE::control::enableFilter:
             if (write)
                  pars->VoicePar[nvoice].PFilterEnabled =  value_bool;
             else
                 value = pars->VoicePar[nvoice].PFilterEnabled;
             break;
-        case addVoiceLevel::control::enableFilterEnvelope:
+        case ADDVOICE::control::enableFilterEnvelope:
             if (write)
                 pars->VoicePar[nvoice].PFilterEnvelopeEnabled= value_bool;
             else
                 value = pars->VoicePar[nvoice].PFilterEnvelopeEnabled;
             break;
-        case addVoiceLevel::control::enableFilterLFO:
+        case ADDVOICE::control::enableFilterLFO:
             if (write)
                 pars->VoicePar[nvoice].PFilterLfoEnabled= value_bool;
             else
                 value = pars->VoicePar[nvoice].PFilterLfoEnabled;
             break;
 
-        case addVoiceLevel::control::modulatorAmplitude:
+        case ADDVOICE::control::modulatorAmplitude:
             if (write)
                 pars->VoicePar[nvoice].PFMVolume = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMVolume;
             break;
-        case addVoiceLevel::control::modulatorVelocitySense:
+        case ADDVOICE::control::modulatorVelocitySense:
             if (write)
                 pars->VoicePar[nvoice].PFMVelocityScaleFunction = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMVelocityScaleFunction;
             break;
-        case addVoiceLevel::control::modulatorHFdamping:
+        case ADDVOICE::control::modulatorHFdamping:
             if (write)
                 pars->VoicePar[nvoice].PFMVolumeDamp = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMVolumeDamp;
             break;
-        case addVoiceLevel::control::enableModulatorAmplitudeEnvelope:
+        case ADDVOICE::control::enableModulatorAmplitudeEnvelope:
             if (write)
                 pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled = value_bool;
             else
                 value =  pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled;
             break;
 
-        case addVoiceLevel::control::modulatorDetuneFrequency:
+        case ADDVOICE::control::modulatorDetuneFrequency:
             if (write)
                 pars->VoicePar[nvoice].PFMDetune = value_int + 8192;
             else
                 value = pars->VoicePar[nvoice].PFMDetune - 8192;
             break;
-        case addVoiceLevel::control::modulatorFrequencyAs440Hz:
+        case ADDVOICE::control::modulatorFrequencyAs440Hz:
             if (write)
                 pars->VoicePar[nvoice].PFMFixedFreq = value_bool;
             else
                 value = pars->VoicePar[nvoice].PFMFixedFreq;
             break;
-        case addVoiceLevel::control::modulatorOctave:
+        case ADDVOICE::control::modulatorOctave:
         {
             int k;
             if (write)
@@ -6206,13 +6206,13 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             }
             break;
         }
-        case addVoiceLevel::control::modulatorDetuneType:
+        case ADDVOICE::control::modulatorDetuneType:
             if (write)
                 pars->VoicePar[nvoice].PFMDetuneType = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMDetuneType;
             break;
-        case addVoiceLevel::control::modulatorCoarseDetune:
+        case ADDVOICE::control::modulatorCoarseDetune:
         {
             int k;
             if (write)
@@ -6231,57 +6231,57 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             }
             break;
         }
-        case addVoiceLevel::control::enableModulatorFrequencyEnvelope:
+        case ADDVOICE::control::enableModulatorFrequencyEnvelope:
             if (write)
                 pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled;
             break;
 
-        case addVoiceLevel::control::modulatorOscillatorPhase:
+        case ADDVOICE::control::modulatorOscillatorPhase:
             if (write)
                 pars->VoicePar[nvoice].PFMoscilphase = 64 - value_int;
             else
                 value = 64 - pars->VoicePar[nvoice].PFMoscilphase;
             break;
-        case addVoiceLevel::control::modulatorOscillatorSource:
+        case ADDVOICE::control::modulatorOscillatorSource:
             if (write)
                 pars->VoicePar[nvoice].PextFMoscil = value_int;
             else
                 value = pars->VoicePar[nvoice].PextFMoscil;
             break;
 
-        case addVoiceLevel::control::delay:
+        case ADDVOICE::control::delay:
             if (write)
                 pars->VoicePar[nvoice].PDelay = value_int;
             else
                 value = pars->VoicePar[nvoice].PDelay;
             break;
-        case addVoiceLevel::control::enableVoice:
+        case ADDVOICE::control::enableVoice:
             if (write)
                 pars->VoicePar[nvoice].Enabled = value_bool;
             else
                 value = pars->VoicePar[nvoice].Enabled;
             break;
-        case addVoiceLevel::control::enableResonance:
+        case ADDVOICE::control::enableResonance:
             if (write)
                 pars->VoicePar[nvoice].Presonance = value_bool;
             else
                 value = pars->VoicePar[nvoice].Presonance;
             break;
-        case addVoiceLevel::control::voiceOscillatorPhase:
+        case ADDVOICE::control::voiceOscillatorPhase:
             if (write)
                 pars->VoicePar[nvoice].Poscilphase = 64 - value_int;
             else
                 value = 64 - pars->VoicePar[nvoice].Poscilphase;
             break;
-        case addVoiceLevel::control::voiceOscillatorSource:
+        case ADDVOICE::control::voiceOscillatorSource:
             if (write)
                 pars->VoicePar[nvoice].Pextoscil = value_int;
             else
                 value = pars->VoicePar[nvoice].Pextoscil;
             break;
-        case addVoiceLevel::control::soundType:
+        case ADDVOICE::control::soundType:
             if (write)
                 pars->VoicePar[nvoice].Type = value_int;
             else
@@ -6315,9 +6315,9 @@ void InterChange::commandSub(CommandBlock *getData)
     SUBnoteParameters *pars;
     pars = part->kit[kititem].subpars;
 
-    if (insert == topLevel::insert::harmonicAmplitude || insert == topLevel::insert::harmonicPhaseBandwidth)
+    if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     {
-        if (insert == topLevel::insert::harmonicAmplitude)
+        if (insert == TOPLEVEL::insert::harmonicAmplitude)
         {
             if (write)
                 pars->Phmag[control] = value;
@@ -6341,63 +6341,63 @@ void InterChange::commandSub(CommandBlock *getData)
 
     switch (control)
     {
-        case subSynthLevel::control::volume:
+        case SUBSYNTH::control::volume:
             if (write)
                 pars->PVolume = value;
             else
                 value = pars->PVolume;
             break;
-        case subSynthLevel::control::velocitySense:
+        case SUBSYNTH::control::velocitySense:
             if (write)
                 pars->PAmpVelocityScaleFunction = value;
             else
                 value = pars->PAmpVelocityScaleFunction;
             break;
-        case subSynthLevel::control::panning:
+        case SUBSYNTH::control::panning:
             if (write)
                 pars->setPan(value);
             else
                 value = pars->PPanning;
             break;
 
-        case subSynthLevel::control::bandwidth:
+        case SUBSYNTH::control::bandwidth:
             if (write)
                 pars->Pbandwidth = value;
             else
                 value = pars->Pbandwidth;
             break;
-        case subSynthLevel::control::bandwidthScale:
+        case SUBSYNTH::control::bandwidthScale:
             if (write)
                 pars->Pbwscale = value + 64;
             else
                 value = pars->Pbwscale - 64;
             break;
-        case subSynthLevel::control::enableBandwidthEnvelope:
+        case SUBSYNTH::control::enableBandwidthEnvelope:
             if (write)
                 pars->PBandWidthEnvelopeEnabled = value_bool;
             else
                 value = pars->PBandWidthEnvelopeEnabled;
             break;
 
-        case subSynthLevel::control::detuneFrequency:
+        case SUBSYNTH::control::detuneFrequency:
             if (write)
                 pars->PDetune = value + 8192;
             else
                 value = pars->PDetune - 8192;
             break;
-        case subSynthLevel::control::equalTemperVariation:
+        case SUBSYNTH::control::equalTemperVariation:
             if (write)
                 pars->PfixedfreqET = value;
             else
                 value = pars->PfixedfreqET;
             break;
-        case subSynthLevel::control::baseFrequencyAs440Hz:
+        case SUBSYNTH::control::baseFrequencyAs440Hz:
             if (write)
                 pars->Pfixedfreq = value_bool;
             else
                 value = pars->Pfixedfreq;
             break;
-        case subSynthLevel::control::octave:
+        case SUBSYNTH::control::octave:
         {
             int k;
             if (write)
@@ -6416,13 +6416,13 @@ void InterChange::commandSub(CommandBlock *getData)
             }
             break;
         }
-        case subSynthLevel::control::detuneType:
+        case SUBSYNTH::control::detuneType:
             if (write)
                 pars->PDetuneType = value_int + 1;
             else
                 value = pars->PDetuneType;
             break;
-        case subSynthLevel::control::coarseDetune:
+        case SUBSYNTH::control::coarseDetune:
         {
             int k;
             if (write)
@@ -6442,28 +6442,28 @@ void InterChange::commandSub(CommandBlock *getData)
             break;
         }
 
-        case subSynthLevel::control::pitchBendAdjustment:
+        case SUBSYNTH::control::pitchBendAdjustment:
             if (write)
                 pars->PBendAdjust = value;
             else
                 value = pars->PBendAdjust;
             break;
 
-        case subSynthLevel::control::pitchBendOffset:
+        case SUBSYNTH::control::pitchBendOffset:
             if (write)
                 pars->POffsetHz = value;
             else
                 value = pars->POffsetHz;
             break;
 
-        case subSynthLevel::control::enableFrequencyEnvelope:
+        case SUBSYNTH::control::enableFrequencyEnvelope:
             if (write)
                 pars->PFreqEnvelopeEnabled = value_bool;
             else
                 value = pars->PFreqEnvelopeEnabled;
             break;
 
-        case subSynthLevel::control::overtoneParameter1:
+        case SUBSYNTH::control::overtoneParameter1:
             if (write)
             {
                 pars->POvertoneSpread.par1 = value;
@@ -6472,7 +6472,7 @@ void InterChange::commandSub(CommandBlock *getData)
             else
                 value = pars->POvertoneSpread.par1;
             break;
-        case subSynthLevel::control::overtoneParameter2:
+        case SUBSYNTH::control::overtoneParameter2:
             if (write)
             {
                 pars->POvertoneSpread.par2 = value;
@@ -6481,7 +6481,7 @@ void InterChange::commandSub(CommandBlock *getData)
             else
                 value = pars->POvertoneSpread.par2;
             break;
-        case subSynthLevel::control::overtoneForceHarmonics:
+        case SUBSYNTH::control::overtoneForceHarmonics:
             if (write)
             {
                 pars->POvertoneSpread.par3 = value;
@@ -6490,7 +6490,7 @@ void InterChange::commandSub(CommandBlock *getData)
             else
                 value = pars->POvertoneSpread.par3;
             break;
-        case subSynthLevel::control::overtonePosition:
+        case SUBSYNTH::control::overtonePosition:
             if (write)
             {
                 pars->POvertoneSpread.type =  value_int;
@@ -6500,31 +6500,31 @@ void InterChange::commandSub(CommandBlock *getData)
                 value = pars->POvertoneSpread.type;
             break;
 
-        case subSynthLevel::control::enableFilter:
+        case SUBSYNTH::control::enableFilter:
             if (write)
                 pars->PGlobalFilterEnabled = value_bool;
             else
                 value = pars->PGlobalFilterEnabled;
             break;
 
-        case subSynthLevel::control::filterStages:
+        case SUBSYNTH::control::filterStages:
             if (write)
                 pars->Pnumstages = value_int;
             else
                 value = pars->Pnumstages;
             break;
-        case subSynthLevel::control::magType:
+        case SUBSYNTH::control::magType:
             if (write)
                 pars->Phmagtype = value_int;
             break;
-        case subSynthLevel::control::startPosition:
+        case SUBSYNTH::control::startPosition:
             if (write)
                 pars->Pstart = value_int;
             else
                 value = pars->Pstart;
             break;
 
-        case subSynthLevel::control::clearHarmonics:
+        case SUBSYNTH::control::clearHarmonics:
             if (write)
             {
                 for (int i = 0; i < MAX_SUB_HARMONICS; i++)
@@ -6536,7 +6536,7 @@ void InterChange::commandSub(CommandBlock *getData)
             }
             break;
 
-        case subSynthLevel::control::stereo:
+        case SUBSYNTH::control::stereo:
             if (write)
                 pars->Pstereo = value_bool;
             break;
@@ -6569,63 +6569,63 @@ void InterChange::commandPad(CommandBlock *getData)
 
     switch (control)
     {
-        case padSynthLevel::control::volume:
+        case PADSYNTH::control::volume:
             if (write)
                 pars->PVolume = value;
             else
                 value = pars->PVolume;
             break;
-        case padSynthLevel::control::velocitySense:
+        case PADSYNTH::control::velocitySense:
             if (write)
                 pars->PAmpVelocityScaleFunction = value;
             else
                 value = pars->PAmpVelocityScaleFunction;
             break;
-        case padSynthLevel::control::panning:
+        case PADSYNTH::control::panning:
             if (write)
                 pars->setPan(value);
             else
                 value = pars->PPanning;
             break;
 
-        case padSynthLevel::control::bandwidth:
+        case PADSYNTH::control::bandwidth:
             if (write)
                 pars->setPbandwidth(value_int);
             else
                 value = pars->Pbandwidth;
             break;
-        case padSynthLevel::control::bandwidthScale:
+        case PADSYNTH::control::bandwidthScale:
             if (write)
                 pars->Pbwscale = value_int;
             else
                 value = pars->Pbwscale;
             break;
-        case padSynthLevel::control::spectrumMode:
+        case PADSYNTH::control::spectrumMode:
             if (write)
                 pars->Pmode = value_int;
             else
                 value = pars->Pmode;
             break;
 
-        case padSynthLevel::control::detuneFrequency:
+        case PADSYNTH::control::detuneFrequency:
             if (write)
                 pars->PDetune = value_int + 8192;
             else
                 value = pars->PDetune - 8192;
             break;
-        case padSynthLevel::control::equalTemperVariation:
+        case PADSYNTH::control::equalTemperVariation:
             if (write)
                 pars->PfixedfreqET = value_int;
             else
                 value = pars->PfixedfreqET;
             break;
-        case padSynthLevel::control::baseFrequencyAs440Hz:
+        case PADSYNTH::control::baseFrequencyAs440Hz:
             if (write)
                 pars->Pfixedfreq = value_bool;
             else
                 value = pars->Pfixedfreq;
             break;
-        case padSynthLevel::control::octave:
+        case PADSYNTH::control::octave:
             if (write)
             {
                 int tmp = value;
@@ -6641,13 +6641,13 @@ void InterChange::commandPad(CommandBlock *getData)
                 value = tmp;
             }
             break;
-        case padSynthLevel::control::detuneType:
+        case PADSYNTH::control::detuneType:
             if (write)
                  pars->PDetuneType = value_int + 1;
             else
                 value =  pars->PDetuneType - 1;
             break;
-        case padSynthLevel::control::coarseDetune:
+        case PADSYNTH::control::coarseDetune:
             if (write)
             {
                 int tmp = value;
@@ -6664,151 +6664,151 @@ void InterChange::commandPad(CommandBlock *getData)
             }
             break;
 
-        case padSynthLevel::control::pitchBendAdjustment:
+        case PADSYNTH::control::pitchBendAdjustment:
             if (write)
                 pars->PBendAdjust = value_int;
             else
                 value = pars->PBendAdjust;
             break;
-        case padSynthLevel::control::pitchBendOffset:
+        case PADSYNTH::control::pitchBendOffset:
             if (write)
                 pars->POffsetHz = value_int;
             else
                 value = pars->POffsetHz;
             break;
 
-        case padSynthLevel::control::overtoneParameter1:
+        case PADSYNTH::control::overtoneParameter1:
             if (write)
                 pars->Phrpos.par1 = value_int;
             else
                 value = pars->Phrpos.par1;
             break;
-        case padSynthLevel::control::overtoneParameter2:
+        case PADSYNTH::control::overtoneParameter2:
             if (write)
                 pars->Phrpos.par2 = value_int;
             else
                 value = pars->Phrpos.par2;
             break;
-        case padSynthLevel::control::overtoneForceHarmonics:
+        case PADSYNTH::control::overtoneForceHarmonics:
             if (write)
                 pars->Phrpos.par3 = value_int;
             else
                 value = pars->Phrpos.par3;
             break;
-        case padSynthLevel::control::overtonePosition:
+        case PADSYNTH::control::overtonePosition:
             if (write)
                 pars->Phrpos.type = value_int;
             else
                 value = pars->Phrpos.type;
             break;
 
-        case padSynthLevel::control::baseWidth:
+        case PADSYNTH::control::baseWidth:
             if (write)
                 pars->Php.base.par1 = value_int;
             else
                 value = pars->Php.base.par1;
             break;
-        case padSynthLevel::control::frequencyMultiplier:
+        case PADSYNTH::control::frequencyMultiplier:
             if (write)
                 pars->Php.freqmult = value_int;
             else
                 value = pars->Php.freqmult;
             break;
-        case padSynthLevel::control::modulatorStretch:
+        case PADSYNTH::control::modulatorStretch:
             if (write)
                 pars->Php.modulator.par1 = value_int;
             else
                 value = pars->Php.modulator.par1;
             break;
-        case padSynthLevel::control::modulatorFrequency:
+        case PADSYNTH::control::modulatorFrequency:
             if (write)
                 pars->Php.modulator.freq = value_int;
             else
                 value = pars->Php.modulator.freq;
             break;
-        case padSynthLevel::control::size:
+        case PADSYNTH::control::size:
             if (write)
                 pars->Php.width = value_int;
             else
                 value = pars->Php.width;
             break;
-        case padSynthLevel::control::baseType:
+        case PADSYNTH::control::baseType:
             if (write)
                 pars->Php.base.type = value;
             else
                 value = pars->Php.base.type;
             break;
-        case padSynthLevel::control::harmonicSidebands:
+        case PADSYNTH::control::harmonicSidebands:
             if (write)
                  pars->Php.onehalf = value;
             else
                 value = pars->Php.onehalf;
             break;
-        case padSynthLevel::control::spectralWidth:
+        case PADSYNTH::control::spectralWidth:
             if (write)
                 pars->Php.amp.par1 = value_int;
             else
                 value = pars->Php.amp.par1;
             break;
-        case padSynthLevel::control::spectralAmplitude:
+        case PADSYNTH::control::spectralAmplitude:
             if (write)
                 pars->Php.amp.par2 = value_int;
             else
                 value = pars->Php.amp.par2;
             break;
-        case padSynthLevel::control::amplitudeMultiplier:
+        case PADSYNTH::control::amplitudeMultiplier:
             if (write)
                 pars->Php.amp.type = value;
             else
                 value = pars->Php.amp.type;
             break;
-        case padSynthLevel::control::amplitudeMode:
+        case PADSYNTH::control::amplitudeMode:
             if (write)
                 pars->Php.amp.mode = value;
             else
                 value = pars->Php.amp.mode;
             break;
-        case padSynthLevel::control::autoscale:
+        case PADSYNTH::control::autoscale:
             if (write)
                 pars->Php.autoscale = value_bool;
             else
                 value = pars->Php.autoscale;
             break;
 
-        case padSynthLevel::control::harmonicBase:
+        case PADSYNTH::control::harmonicBase:
             if (write)
                 pars->Pquality.basenote = value_int;
             else
                 value = pars->Pquality.basenote;
             break;
-        case padSynthLevel::control::samplesPerOctave:
+        case PADSYNTH::control::samplesPerOctave:
             if (write)
                 pars->Pquality.smpoct = value_int;
             else
                 value = pars->Pquality.smpoct;
             break;
-        case padSynthLevel::control::numberOfOctaves:
+        case PADSYNTH::control::numberOfOctaves:
             if (write)
                 pars->Pquality.oct = value_int;
             else
                 value = pars->Pquality.oct;
             break;
-        case padSynthLevel::control::sampleSize:
+        case PADSYNTH::control::sampleSize:
             if (write)
                 pars->Pquality.samplesize = value_int;
             else
                 value = pars->Pquality.samplesize;
             break;
 
-        case padSynthLevel::control::applyChanges:
+        case PADSYNTH::control::applyChanges:
             if (write)
             {
                 synth->partonoffWrite(npart, -1);
-                getData->data.parameter = topLevel::route::lowPriority;
+                getData->data.parameter = TOPLEVEL::route::lowPriority;
             }
             break;
 
-        case padSynthLevel::control::stereo:
+        case PADSYNTH::control::stereo:
             if (write)
                 pars->PStereo = value_bool;
             else
@@ -6817,31 +6817,31 @@ void InterChange::commandPad(CommandBlock *getData)
             }
             break;
 
-        case padSynthLevel::control::dePop:
+        case PADSYNTH::control::dePop:
             if (write)
                 pars->Fadein_adjustment = value_int;
             else
                 value = pars->Fadein_adjustment;
             break;
-        case padSynthLevel::control::punchStrength:
+        case PADSYNTH::control::punchStrength:
             if (write)
                 pars->PPunchStrength = value_int;
             else
                 value = pars->PPunchStrength;
             break;
-        case padSynthLevel::control::punchDuration:
+        case PADSYNTH::control::punchDuration:
             if (write)
                 pars->PPunchTime = value_int;
             else
                 value = pars->PPunchTime;
             break;
-        case padSynthLevel::control::punchStretch:
+        case PADSYNTH::control::punchStretch:
             if (write)
                 pars->PPunchStretch = value_int;
             else
                 value = pars->PPunchStretch;
             break;
-        case padSynthLevel::control::punchVelocity:
+        case PADSYNTH::control::punchVelocity:
             if (write)
                 pars->PPunchVelocitySensing = value_int;
             else
@@ -6893,71 +6893,71 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
 
     switch (control)
     {
-        case oscillatorLevel::control::phaseRandomness:
+        case OSCILLATOR::control::phaseRandomness:
             if (write)
                 oscil->Prand = value + 64;
             else
                 value = oscil->Prand - 64;
             break;
-        case oscillatorLevel::control::magType:
+        case OSCILLATOR::control::magType:
             if (write)
                 oscil->Phmagtype = value;
             else
                 value = oscil->Phmagtype;
             break;
-        case oscillatorLevel::control::harmonicAmplitudeRandomness:
+        case OSCILLATOR::control::harmonicAmplitudeRandomness:
             if (write)
                 oscil->Pamprandpower = value;
             else
                 value = oscil->Pamprandpower;
             break;
-        case oscillatorLevel::control::harmonicRandomnessType:
+        case OSCILLATOR::control::harmonicRandomnessType:
             if (write)
                 oscil->Pamprandtype = value;
             else
                 value = oscil->Pamprandtype;
             break;
 
-        case oscillatorLevel::control::baseFunctionParameter:
+        case OSCILLATOR::control::baseFunctionParameter:
             if (write)
                 oscil->Pbasefuncpar = value + 64;
             else
                 value = oscil->Pbasefuncpar - 64;
             break;
-        case oscillatorLevel::control::baseFunctionType:
+        case OSCILLATOR::control::baseFunctionType:
             if (write)
                 oscil->Pcurrentbasefunc = value;
             else
                 value = oscil->Pcurrentbasefunc;
             break;
-        case oscillatorLevel::control::baseFunctionModulationParameter1:
+        case OSCILLATOR::control::baseModulationParameter1:
             if (write)
                 oscil->Pbasefuncmodulationpar1 = value;
             else
                 value = oscil->Pbasefuncmodulationpar1;
             break;
-        case oscillatorLevel::control::baseFunctionModulationParameter2:
+        case OSCILLATOR::control::baseModulationParameter2:
             if (write)
                 oscil->Pbasefuncmodulationpar2 = value;
             else
                 value = oscil->Pbasefuncmodulationpar2;
             break;
-        case oscillatorLevel::control::baseFunctionModulationParameter3:
+        case OSCILLATOR::control::baseModulationParameter3:
             if (write)
                 oscil->Pbasefuncmodulationpar3 = value;
             else
                 value = oscil->Pbasefuncmodulationpar3;
             break;
-        case oscillatorLevel::control::baseFunctionModulationType:
+        case OSCILLATOR::control::baseModulationType:
             if (write)
                 oscil->Pbasefuncmodulation = value;
             else
                 value = oscil->Pbasefuncmodulation;
             break;
 
-        case oscillatorLevel::control::autoClear: // this is local to the GUI
+        case OSCILLATOR::control::autoClear: // this is local to the GUI
             break;
-        case oscillatorLevel::control::useAsBaseFunction:
+        case OSCILLATOR::control::useAsBaseFunction:
             if (write)
             {
                 oscil->useasbase();
@@ -6978,122 +6978,122 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             }
             break;
 
-        case oscillatorLevel::control::waveshapeParameter:
+        case OSCILLATOR::control::waveshapeParameter:
             if (write)
                 oscil->Pwaveshaping = value + 64;
             else
                 value = oscil->Pwaveshaping - 64;
             break;
-        case oscillatorLevel::control::waveshapeType:
+        case OSCILLATOR::control::waveshapeType:
             if (write)
                 oscil->Pwaveshapingfunction = value;
             else
                 value = oscil->Pwaveshapingfunction;
             break;
 
-        case oscillatorLevel::control::filterParameter1:
+        case OSCILLATOR::control::filterParameter1:
             if (write)
                 oscil->Pfilterpar1 = value;
             else
                 value = oscil->Pfilterpar1;
             break;
-        case oscillatorLevel::control::filterParameter2:
+        case OSCILLATOR::control::filterParameter2:
             if (write)
                 oscil->Pfilterpar2 = value;
             else
                 value = oscil->Pfilterpar2;
             break;
-        case oscillatorLevel::control::filterBeforeWaveshape:
+        case OSCILLATOR::control::filterBeforeWaveshape:
             if (write)
                 oscil->Pfilterbeforews = value_bool;
             else
                 value = oscil->Pfilterbeforews;
             break;
-        case oscillatorLevel::control::filterType:
+        case OSCILLATOR::control::filterType:
             if (write)
                 oscil->Pfiltertype = value;
             else
                 value = oscil->Pfiltertype;
             break;
-        case oscillatorLevel::control::modulationParameter1:
+        case OSCILLATOR::control::modulationParameter1:
             if (write)
                 oscil->Pmodulationpar1 = value;
             else
                 value = oscil->Pmodulationpar1;
             break;
-        case oscillatorLevel::control::modulationParameter2:
+        case OSCILLATOR::control::modulationParameter2:
             if (write)
                 oscil->Pmodulationpar2 = value;
             else
                 value = oscil->Pmodulationpar2;
             break;
-        case oscillatorLevel::control::modulationParameter3:
+        case OSCILLATOR::control::modulationParameter3:
             if (write)
                 oscil->Pmodulationpar3 = value;
             else
                 value = oscil->Pmodulationpar3;
             break;
-        case oscillatorLevel::control::modulationType:
+        case OSCILLATOR::control::modulationType:
             if (write)
                 oscil->Pmodulation = value;
             else
                 value = oscil->Pmodulation;
             break;
-        case oscillatorLevel::control::spectrumAdjustParameter:
+        case OSCILLATOR::control::spectrumAdjustParameter:
             if (write)
                 oscil->Psapar = value;
             else
                 value = oscil->Psapar;
             break;
-        case oscillatorLevel::control::spectrumAdjustType:
+        case OSCILLATOR::control::spectrumAdjustType:
             if (write)
                 oscil->Psatype = value;
             else
                 value = oscil->Psatype;
             break;
 
-        case oscillatorLevel::control::harmonicShift:
+        case OSCILLATOR::control::harmonicShift:
             if (write)
                 oscil->Pharmonicshift = value;
             else
                 value = oscil->Pharmonicshift;
             break;
-        case oscillatorLevel::control::clearHarmonicShift:
+        case OSCILLATOR::control::clearHarmonicShift:
             if (write)
                 oscil->Pharmonicshift = 0;
             break;
-        case oscillatorLevel::control::shiftBeforeWaveshapeAndFilter:
+        case OSCILLATOR::control::shiftBeforeWaveshapeAndFilter:
             if (write)
                 oscil->Pharmonicshiftfirst = value_bool;
             else
                 value = oscil->Pharmonicshiftfirst;
             break;
-        case oscillatorLevel::control::adaptiveHarmonicsParameter:
+        case OSCILLATOR::control::adaptiveHarmonicsParameter:
             if (write)
                 oscil->Padaptiveharmonicspar = value;
             else
                 value = oscil->Padaptiveharmonicspar;
             break;
-        case oscillatorLevel::control::adaptiveHarmonicsBase:
+        case OSCILLATOR::control::adaptiveHarmonicsBase:
             if (write)
                 oscil->Padaptiveharmonicsbasefreq = value;
             else
                 value = oscil->Padaptiveharmonicsbasefreq;
             break;
-        case oscillatorLevel::control::adaptiveHarmonicsPower:
+        case OSCILLATOR::control::adaptiveHarmonicsPower:
             if (write)
                 oscil->Padaptiveharmonicspower = value;
             else
                 value = oscil->Padaptiveharmonicspower;
             break;
-        case oscillatorLevel::control::adaptiveHarmonicsType:
+        case OSCILLATOR::control::adaptiveHarmonicsType:
             if (write)
                 oscil->Padaptiveharmonics = value;
             else
                 value = oscil->Padaptiveharmonics;
             break;
 
-        case oscillatorLevel::control::clearHarmonics:
+        case OSCILLATOR::control::clearHarmonics:
             if (write)
             {
                 for (int i = 0; i < MAX_AD_HARMONICS; ++ i)
@@ -7105,7 +7105,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
                 oscil->prepare();
             }
             break;
-        case oscillatorLevel::control::convertToSine:
+        case OSCILLATOR::control::convertToSine:
             if (write)
                 oscil->convert2sine();
             break;
@@ -7127,7 +7127,7 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
     if (write)
         __sync_or_and_fetch(&blockRead, 1);
 
-    if (insert == topLevel::insert::resonanceGraphInsert)
+    if (insert == TOPLEVEL::insert::resonanceGraphInsert)
     {
         if (write)
             respar->setpoint(control, value);
@@ -7207,7 +7207,7 @@ void InterChange::commandLFO(CommandBlock *getData)
     Part *part;
     part = synth->part[npart];
 
-    if (engine == partLevel::engine::addSynth)
+    if (engine == PART::engine::addSynth)
     {
        switch (insertParam)
         {
@@ -7222,7 +7222,7 @@ void InterChange::commandLFO(CommandBlock *getData)
                 break;
         }
     }
-    else if (engine == partLevel::engine::padSynth)
+    else if (engine == PART::engine::padSynth)
     {
         switch (insertParam)
         {
@@ -7237,9 +7237,9 @@ void InterChange::commandLFO(CommandBlock *getData)
                 break;
         }
     }
-    else if (engine >= partLevel::engine::addVoice1)
+    else if (engine >= PART::engine::addVoice1)
     {
-        int nvoice = engine - partLevel::engine::addVoice1;
+        int nvoice = engine - PART::engine::addVoice1;
         switch (insertParam)
         {
             case 0:
@@ -7336,27 +7336,27 @@ void InterChange::commandFilter(CommandBlock *getData)
     Part *part;
     part = synth->part[npart];
 
-    if (engine == partLevel::engine::addSynth)
+    if (engine == PART::engine::addSynth)
     {
         filterReadWrite(getData, part->kit[kititem].adpars->GlobalPar.GlobalFilter
                     , &part->kit[kititem].adpars->GlobalPar.PFilterVelocityScale
                     , &part->kit[kititem].adpars->GlobalPar.PFilterVelocityScaleFunction);
     }
-    else if (engine == partLevel::engine::subSynth)
+    else if (engine == PART::engine::subSynth)
     {
         filterReadWrite(getData, part->kit[kititem].subpars->GlobalFilter
                     , &part->kit[kititem].subpars->PGlobalFilterVelocityScale
                     , &part->kit[kititem].subpars->PGlobalFilterVelocityScaleFunction);
     }
-    else if (engine == partLevel::engine::padSynth)
+    else if (engine == PART::engine::padSynth)
     {
         filterReadWrite(getData, part->kit[kititem].padpars->GlobalFilter
                     , &part->kit[kititem].padpars->PFilterVelocityScale
                     , &part->kit[kititem].padpars->PFilterVelocityScaleFunction);
     }
-    else if (engine >= partLevel::engine::addVoice1)
+    else if (engine >= PART::engine::addVoice1)
     {
-        int eng = engine - partLevel::engine::addVoice1;
+        int eng = engine - PART::engine::addVoice1;
         filterReadWrite(getData, part->kit[kititem].adpars->VoicePar[eng].VoiceFilter
                     , &part->kit[kititem].adpars->VoicePar[eng].PFilterVelocityScale
                     , &part->kit[kititem].adpars->VoicePar[eng].PFilterVelocityScaleFunction);
@@ -7612,7 +7612,7 @@ void InterChange::commandEnvelope(CommandBlock *getData)
 
     string env;
     string name;
-    if (engine == partLevel::engine::addSynth)
+    if (engine == PART::engine::addSynth)
     {
         switch (insertParam)
         {
@@ -7627,7 +7627,7 @@ void InterChange::commandEnvelope(CommandBlock *getData)
                 break;
         }
     }
-    else if (engine == partLevel::engine::subSynth)
+    else if (engine == PART::engine::subSynth)
     {
         switch (insertParam)
         {
@@ -7645,7 +7645,7 @@ void InterChange::commandEnvelope(CommandBlock *getData)
                 break;
         }
     }
-    else if (engine == partLevel::engine::padSynth)
+    else if (engine == PART::engine::padSynth)
     {
         switch (insertParam)
         {
@@ -7660,14 +7660,14 @@ void InterChange::commandEnvelope(CommandBlock *getData)
                 break;
         }
     }
-    else if (engine >= partLevel::engine::addVoice1)
+    else if (engine >= PART::engine::addVoice1)
     {
         int nvoice;
-        if (engine >= partLevel::engine::addMod1)
-            nvoice = engine - partLevel::engine::addMod1;
+        if (engine >= PART::engine::addMod1)
+            nvoice = engine - PART::engine::addMod1;
         else
-            nvoice = engine - partLevel::engine::addVoice1;
-        if (engine >= partLevel::engine::addMod1)
+            nvoice = engine - PART::engine::addVoice1;
+        if (engine >= PART::engine::addMod1)
         {
             switch (insertParam)
             {
@@ -7712,7 +7712,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
     int envpoints = pars->Penvpoints;
     bool isAddpoint = (Xincrement < 0xff);
 
-    if (insert == topLevel::insert::envelopePoints) // here be dragons :(
+    if (insert == TOPLEVEL::insert::envelopePoints) // here be dragons :(
     {
         if (!pars->Pfreemode)
         {
@@ -7776,7 +7776,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
         return;
     }
 
-    if (insert == topLevel::insert::envelopePointChange)
+    if (insert == TOPLEVEL::insert::envelopePointChange)
     {
         if (!pars->Pfreemode || point >= envpoints)
         {
@@ -7917,7 +7917,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
 
     int value_int = lrint(value);
 
-    bool isSysEff = (npart == topLevel::section::systemEffects);
+    bool isSysEff = (npart == TOPLEVEL::section::systemEffects);
     if (insert == 0xff)
     {
         switch (control)
@@ -7980,10 +7980,10 @@ void InterChange::commandEffects(CommandBlock *getData)
 
     EffectMgr *eff;
 
-    if (npart == topLevel::section::systemEffects)
+    if (npart == TOPLEVEL::section::systemEffects)
         eff = synth->sysefx[effnum];
 
-    else if (npart == topLevel::section::insertEffects)
+    else if (npart == TOPLEVEL::section::insertEffects)
         eff = synth->insefx[effnum];
     else if (npart < NUM_MIDI_PARTS)
         eff = synth->part[npart]->partefx[effnum];
@@ -8050,23 +8050,23 @@ void InterChange::testLimits(CommandBlock *getData)
      * midi CCs need to be checked.
      * I don't like special cases either :(
      */
-    if (getData->data.part == topLevel::section::config
-        && (control == configLevel::control::bankRootCC
-        || control == configLevel::control::bankCC
-        || control == configLevel::control::extendedProgramChangeCC))
+    if (getData->data.part == TOPLEVEL::section::config
+        && (control == CONFIG::control::bankRootCC
+        || control == CONFIG::control::bankCC
+        || control == CONFIG::control::extendedProgramChangeCC))
     {
         getData->data.par2 = 0xff; // just to be sure
         if (value > 119)
             return;
         string text;
-        if (control == configLevel::control::bankRootCC)
+        if (control == CONFIG::control::bankRootCC)
         {
             text = synth->getRuntime().masterCCtest(int(value));
             if (text != "")
                 getData->data.par2 = miscMsgPush(text);
             return;
         }
-        if(control == configLevel::control::bankCC)
+        if(control == CONFIG::control::bankCC)
         {
             if (value != 0 && value != 32)
                 return;
@@ -8108,16 +8108,16 @@ float InterChange::returnLimits(CommandBlock *getData)
     getData->data.type &= 0x3f; //  clear top bits
     getData->data.type |= 0x80; // default is integer & not learnable
 
-    if (npart == topLevel::section::config)
+    if (npart == TOPLEVEL::section::config)
         return synth->getConfigLimits(getData);
 
-    if (npart == topLevel::section::main)
+    if (npart == TOPLEVEL::section::main)
         return synth->getLimits(getData);
 
-    if (npart == topLevel::section::scales)
+    if (npart == TOPLEVEL::section::scales)
         return synth->microtonal.getLimits(getData);
 
-    if (npart == topLevel::section::vector)
+    if (npart == TOPLEVEL::section::vector)
         return synth->getVectorLimits(getData);
 
     float min;
@@ -8135,32 +8135,32 @@ float InterChange::returnLimits(CommandBlock *getData)
         Part *part;
         part = synth->part[npart];
 
-        if (engine == partLevel::engine::subSynth && (insert == 0xff || (insert >= 5 && insert <= 7)) && parameter == 0xff)
+        if (engine == PART::engine::subSynth && (insert == 0xff || (insert >= 5 && insert <= 7)) && parameter == 0xff)
         {
             SUBnoteParameters *subpars;
             subpars = part->kit[kititem].subpars;
             return subpars->getLimits(getData);
         }
 
-        if ((engine & 0x7f) == 0x7f && (kititem == 0xff || insert == topLevel::insert::kitGroup)) // part level controls
+        if ((engine & 0x7f) == 0x7f && (kititem == 0xff || insert == TOPLEVEL::insert::kitGroup)) // part level controls
         { // TODO why is engine not 0xff? it used to be.
             return part->getLimits(getData);
         }
-        if ((insert == topLevel::insert::kitGroup || insert == 0xff) && parameter == 0xff && par2 == 0xff)
+        if ((insert == TOPLEVEL::insert::kitGroup || insert == 0xff) && parameter == 0xff && par2 == 0xff)
         {
-            if (engine == partLevel::engine::addSynth || (engine >= partLevel::engine::addVoice1 && engine <= partLevel::engine::addVoice8))
+            if (engine == PART::engine::addSynth || (engine >= PART::engine::addVoice1 && engine <= PART::engine::addVoice8))
             {
                 ADnoteParameters *adpars;
                 adpars = part->kit[kititem].adpars;
                 return adpars->getLimits(getData);
             }
-            if (engine == partLevel::engine::subSynth)
+            if (engine == PART::engine::subSynth)
             {
                 SUBnoteParameters *subpars;
                 subpars = part->kit[kititem].subpars;
                 return subpars->getLimits(getData);
             }
-            if (engine == partLevel::engine::padSynth)
+            if (engine == PART::engine::padSynth)
             {
                 PADnoteParameters *padpars;
                 padpars = part->kit[kititem].padpars;
@@ -8199,7 +8199,7 @@ float InterChange::returnLimits(CommandBlock *getData)
             // we also use this for pad limits
             // as oscillator values identical
         }
-        if (insert == topLevel::insert::resonanceGroup)
+        if (insert == TOPLEVEL::insert::resonanceGroup)
         {
             if (control == 0) // a cheat!
             {
@@ -8253,7 +8253,7 @@ float InterChange::returnLimits(CommandBlock *getData)
             }
             return value;
         }
-        if (insert == topLevel::insert::LFOgroup && parameter <= 2)
+        if (insert == TOPLEVEL::insert::LFOgroup && parameter <= 2)
         {
             if (control == 0) // another cheat!
             {

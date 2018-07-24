@@ -89,20 +89,20 @@ pars=NULL;} {}
           send_data(group, 0, o->value(), 0x48);}
           tooltip {LFO Frequency} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 step 1e-05
           code0 {o->setValueType(VC_LFOfreq);}
-          code1 {if (engine < partLevel::engine::addVoice1){if (group == 1) o->init(0.551f); else o->init(0.63f);}}
-          code2 {if (engine >= partLevel::engine::addVoice1){if (group == 0) o->init(0.708f); else o->init(0.393f);}}
+          code1 {if (engine < PART::engine::addVoice1){if (group == 1) o->init(0.551f); else o->init(0.63f);}}
+          code2 {if (engine >= PART::engine::addVoice1){if (group == 0) o->init(0.708f); else o->init(0.393f);}}
           class WidgetPDial
         }
         Fl_Dial intensity {
           label Depth
           callback {//
           int depth = lrint(o->value());
-          if (engine >= partLevel::engine::addVoice1 && engine <= partLevel::engine::addVoice8 && group == 1) // special case to sync voice list vibrato
-              synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine - partLevel::engine::addVoice1]->voicelistvibratto->value(depth);
+          if (engine >= PART::engine::addVoice1 && engine <= PART::engine::addVoice8 && group == 1) // special case to sync voice list vibrato
+              synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine - PART::engine::addVoice1]->voicelistvibratto->value(depth);
           send_data(group, 1, depth, 0xc8);}
           tooltip {LFO Amount} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(getLFOdepthType(group));}
-          code1 {if (engine < partLevel::engine::addVoice1) o->init(0); else if (group == 0) o->init(32); else if (group == 1) o->init(40); else o->init(20);}
+          code1 {if (engine < PART::engine::addVoice1) o->init(0); else if (group == 0) o->init(32); else if (group == 1) o->init(40); else o->init(20);}
           class WidgetPDial
         }
         Fl_Dial delay {
@@ -111,7 +111,7 @@ pars=NULL;} {}
           send_data(group, 2, o->value(), 0xc8);}
           tooltip {LFO delay} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_LFOdelay);}
-          code1 {if (engine >= partLevel::engine::addVoice1 && group == 0) o->init(30); else o->init(0);}
+          code1 {if (engine >= PART::engine::addVoice1 && group == 0) o->init(30); else o->init(0);}
           class WidgetPDial
         }
         Fl_Dial startphase {
@@ -120,7 +120,7 @@ pars=NULL;} {}
           send_data(group, 3, o->value(), 0xc8);}
           tooltip {LFO Startphase (leftmost is Random)} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_LFOstartphase);}
-          code1 {if (engine >= partLevel::engine::addVoice1 && group == 1) o->init(0); else o->init(64);}
+          code1 {if (engine >= PART::engine::addVoice1 && group == 1) o->init(0); else o->init(64);}
           class WidgetPDial
         }
         Fl_Dial randomness {
@@ -234,7 +234,7 @@ pars=NULL;} {}
     unsigned char eng = getData->data.engine;
     unsigned char par = getData->data.parameter;
 
-    if (part != npart || (eng >= partLevel::engine::addVoice1 && eng != engine))
+    if (part != npart || (eng >= PART::engine::addVoice1 && eng != engine))
         return;
 
     switch(control)
@@ -245,8 +245,8 @@ pars=NULL;} {}
 
         case 1:
             intensity->value(value);
-            if (engine >= partLevel::engine::addVoice1 && engine <= partLevel::engine::addVoice8 && par == 1) // rather special to sync voice list vibrato
-                synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine - partLevel::engine::addVoice1]->voicelistvibratto->value(value);
+            if (engine >= PART::engine::addVoice1 && engine <= PART::engine::addVoice8 && par == 1) // rather special to sync voice list vibrato
+                synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine - PART::engine::addVoice1]->voicelistvibratto->value(value);
             break;
 
         case 2:

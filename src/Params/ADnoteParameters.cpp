@@ -824,7 +824,7 @@ float ADnoteParameters::getLimits(CommandBlock *getData)
     float def = 0;
     int max = 127;
 
-    if (engine < partLevel::engine::addVoice1)
+    if (engine < PART::engine::addVoice1)
     {
         switch (control)
         {

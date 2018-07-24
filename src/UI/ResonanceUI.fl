@@ -477,7 +477,7 @@ class ResonanceUI {selected : PresetsUI_
     if (control == 104)
         insert = 0xff;
     else
-        insert = topLevel::insert::resonanceGroup;
+        insert = TOPLEVEL::insert::resonanceGroup;
 
     collect_data(synth, value, (type | Fl::event_button()), control, npart, kititem, engine, insert);} {}
   }
@@ -492,7 +492,7 @@ class ResonanceUI {selected : PresetsUI_
         return;
 
     bool set = true;
-    if (insert == topLevel::insert::resonanceGraphInsert)
+    if (insert == TOPLEVEL::insert::resonanceGraphInsert)
     {
         rg->draw();
         rg->redraw();

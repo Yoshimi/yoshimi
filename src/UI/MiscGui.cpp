@@ -59,17 +59,17 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
 {
     if (part < NUM_MIDI_PARTS && engine == 2)
     {
-        if (collect_readData(synth, 0, partLevel::control::partBusy, part, 255, 255, 255, 255, 255))
+        if (collect_readData(synth, 0, PART::control::partBusy, part, 255, 255, 255, 255, 255))
         {
             fl_alert("Part %d is busy", int(part));
             return;
         }
     }
     int typetop = type & 0xd0;
-    if ( part == topLevel::section::systemEffects && insert == topLevel::insert::systemEffectSend)
+    if ( part == TOPLEVEL::section::systemEffects && insert == TOPLEVEL::insert::systemEffectSend)
         type |= 8; // this is a hack :(
 
-    if (part != topLevel::section::midiLearn)
+    if (part != TOPLEVEL::section::midiLearn)
     {
         if ((type & 3) == 3 && Fl::event_is_click())
         {
@@ -150,35 +150,35 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 
 //        cout << "Con " << int(control) << "  Kit " << int(kititem) << "  Eng " << int(engine) << "  Ins " << int(insert) << endl;
 
-    if (control == topLevel::control::errorMessage && insert != 9) // just show a messge
+    if (control == TOPLEVEL::control::errorMessage && insert != 9) // just show a messge
     {
         synth->getGuiMaster()->words->copy_label(miscMsgPop(insertPar2).c_str());
         synth->getGuiMaster()->cancel->hide();
         synth->getGuiMaster()->message->show();
         return;
     }
-    if (npart == topLevel::section::scales) // scales
+    if (npart == TOPLEVEL::section::scales) // scales
     {
         synth->getGuiMaster()->microtonalui->returns_update(getData);
         return;
     }
-    if (npart == topLevel::section::vector) // vector
+    if (npart == TOPLEVEL::section::vector) // vector
     {
         synth->getGuiMaster()->vectorui->returns_update(getData);
         return;
     }
-    if (npart == topLevel::section::midiLearn && synth->getGuiMaster()->midilearnui != NULL)
+    if (npart == TOPLEVEL::section::midiLearn && synth->getGuiMaster()->midilearnui != NULL)
     {
         synth->getGuiMaster()->midilearnui->returns_update(getData);
         return;
     }
-    if (npart == topLevel::section::midiIn) // midi messages - catch this early
+    if (npart == TOPLEVEL::section::midiIn) // midi messages - catch this early
     {
         synth->getGuiMaster()->returns_update(getData);
         return;
     }
 
-    if (npart == topLevel::section::bank)
+    if (npart == TOPLEVEL::section::bank)
     {
         synth->getGuiMaster()->bankui->returns_update(getData);
         return;
@@ -188,14 +188,14 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 
     if (kititem >= 0x80 && kititem != 0xff) // effects
     {
-        if (npart == topLevel::section::systemEffects)
+        if (npart == TOPLEVEL::section::systemEffects)
         {
             if (insert == 1) // dynefilter filter insert
                 synth->getGuiMaster()->syseffectui->fwin_filterui->returns_update(getData);
             else
                 synth->getGuiMaster()->syseffectui->returns_update(getData);
         }
-        else if (npart == topLevel::section::insertEffects)
+        else if (npart == TOPLEVEL::section::insertEffects)
         {
             if (insert == 1) // dynefilter filter insert
                 synth->getGuiMaster()->inseffectui->fwin_filterui->returns_update(getData);
@@ -212,17 +212,17 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         return;
     }
 
-    if (npart == topLevel::section::config)
+    if (npart == TOPLEVEL::section::config)
     {
         synth->getGuiMaster()->configui->returns_update(getData);
         return;
     }
-    if (npart == topLevel::section::main && control == 94) // special case for pad sample save
+    if (npart == TOPLEVEL::section::main && control == 94) // special case for pad sample save
     {
         npart = insertParam & 0x3f;
         getData->data.part = npart;
     }
-    if (npart >= topLevel::section::main) // main / sys / ins
+    if (npart >= TOPLEVEL::section::main) // main / sys / ins
     {
         //if (npart == 0xf0) &&  control == 96)
             //return; // gui in undefined state at this point
@@ -237,23 +237,23 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     if (kititem >= NUM_KIT_ITEMS && kititem < 0xff)
         return; // invalid kit number
 
-    if (kititem == 0xff && engine == 0xff && insert == 0xff && control == partLevel::control::defaultInstrument) // special case for part clear
+    if (kititem == 0xff && engine == 0xff && insert == 0xff && control == PART::control::defaultInstrument) // special case for part clear
     {
         synth->getGuiMaster()->returns_update(getData);
         return;
     }
 
-    if (kititem != 0xff && kititem != 0 && engine != 0xff && control != partLevel::control::enable && part->kit[kititem].Penabled == false)
+    if (kititem != 0xff && kititem != 0 && engine != 0xff && control != PART::control::enable && part->kit[kititem].Penabled == false)
         return; // attempt to access non existant kititem
 
-    if (insert < 0xff || (control != partLevel::control::enable && control != partLevel::control::instrumentName))
+    if (insert < 0xff || (control != PART::control::enable && control != PART::control::instrumentName))
     {
         if (synth->getGuiMaster()->partui->partname == "Simple Sound")
             synth->getGuiMaster()->partui->checkEngines("No Title");
     }
-    if (kititem == 0xff || insert == topLevel::insert::kitGroup) // part
+    if (kititem == 0xff || insert == TOPLEVEL::insert::kitGroup) // part
     {
-        if (control != partLevel::control::kitMode && kititem < 0xff && part->Pkitmode == 0)
+        if (control != PART::control::kitMode && kititem < 0xff && part->Pkitmode == 0)
             return; // invalid access
         synth->getGuiMaster()->partui->returns_update(getData);
         return;
@@ -262,7 +262,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     if (kititem > 0 && kititem < 0xff && part->Pkitmode == 0)
         return; // invalid access
 
-    if (engine == partLevel::engine::padSynth) // padsynth
+    if (engine == PART::engine::padSynth) // padsynth
     {
         if(synth->getGuiMaster()->partui->padnoteui)
         {
@@ -271,7 +271,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 case 0xff:
                     synth->getGuiMaster()->partui->padnoteui->returns_update(getData);
                     break;
-                case topLevel::insert::LFOgroup:
+                case TOPLEVEL::insert::LFOgroup:
                     switch(insertParam)
                     {
                         case 0:
@@ -288,13 +288,13 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                             break;
                     }
                     break;
-                case topLevel::insert::filterGroup:
+                case TOPLEVEL::insert::filterGroup:
                     if (synth->getGuiMaster()->partui->padnoteui->filterui)
                         synth->getGuiMaster()->partui->padnoteui->filterui->returns_update(getData);
                     break;
-                case topLevel::insert::envelopeGroup:
-                case topLevel::insert::envelopePoints:
-                case topLevel::insert::envelopePointChange:
+                case TOPLEVEL::insert::envelopeGroup:
+                case TOPLEVEL::insert::envelopePoints:
+                case TOPLEVEL::insert::envelopePointChange:
                     switch(insertParam)
                     {
                         case 0:
@@ -312,14 +312,14 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                     }
                     break;
 
-                case topLevel::insert::oscillatorGroup:
-                case topLevel::insert::harmonicAmplitude:
-                case topLevel::insert::harmonicPhaseBandwidth:
+                case TOPLEVEL::insert::oscillatorGroup:
+                case TOPLEVEL::insert::harmonicAmplitude:
+                case TOPLEVEL::insert::harmonicPhaseBandwidth:
                     if(synth->getGuiMaster()->partui->padnoteui->oscui)
                         synth->getGuiMaster()->partui->padnoteui->oscui->returns_update(getData);
                     break;
-                case topLevel::insert::resonanceGroup:
-                case topLevel::insert::resonanceGraphInsert:
+                case TOPLEVEL::insert::resonanceGroup:
+                case TOPLEVEL::insert::resonanceGraphInsert:
                     if(synth->getGuiMaster()->partui->padnoteui->resui)
                         synth->getGuiMaster()->partui->padnoteui->resui->returns_update(getData);
                     break;
@@ -332,18 +332,18 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         return;
     }
 
-    if (engine == partLevel::engine::subSynth) // subsynth
+    if (engine == PART::engine::subSynth) // subsynth
     {
         if (synth->getGuiMaster()->partui->subnoteui)
             switch (insert)
             {
-                case topLevel::insert::filterGroup:
+                case TOPLEVEL::insert::filterGroup:
                     if (synth->getGuiMaster()->partui->subnoteui->filterui)
                         synth->getGuiMaster()->partui->subnoteui->filterui->returns_update(getData);
                     break;
-                case topLevel::insert::envelopeGroup:
-                case topLevel::insert::envelopePoints:
-                case topLevel::insert::envelopePointChange:
+                case TOPLEVEL::insert::envelopeGroup:
+                case TOPLEVEL::insert::envelopePoints:
+                case TOPLEVEL::insert::envelopePointChange:
                     switch(insertParam)
                     {
                         case 0:
@@ -365,15 +365,15 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                     }
                     break;
                 case 0xff:
-                case topLevel::insert::harmonicAmplitude:
-                case topLevel::insert::harmonicPhaseBandwidth:
+                case TOPLEVEL::insert::harmonicAmplitude:
+                case TOPLEVEL::insert::harmonicPhaseBandwidth:
                     synth->getGuiMaster()->partui->subnoteui->returns_update(getData);
                     break;
             }
         return;
     }
 
-    if (engine >= partLevel::engine::addVoice1) // addsynth voice / modulator
+    if (engine >= PART::engine::addVoice1) // addsynth voice / modulator
     {
         if (synth->getGuiMaster()->partui->adnoteui)
         {
@@ -384,7 +384,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                     case 0xff:
                         synth->getGuiMaster()->partui->adnoteui->advoice->returns_update(getData);
                         break;
-                    case topLevel::insert::LFOgroup:
+                    case TOPLEVEL::insert::LFOgroup:
                         switch(insertParam)
                         {
                             case 0:
@@ -401,14 +401,14 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                                 break;
                         }
                         break;
-                    case topLevel::insert::filterGroup:
+                    case TOPLEVEL::insert::filterGroup:
                         if (synth->getGuiMaster()->partui->adnoteui->advoice->voicefilter)
                             synth->getGuiMaster()->partui->adnoteui->advoice->voicefilter->returns_update(getData);
                         break;
-                    case topLevel::insert::envelopeGroup:
-                    case topLevel::insert::envelopePoints:
-                    case topLevel::insert::envelopePointChange:
-                        if (engine >= partLevel::engine::addMod1)
+                    case TOPLEVEL::insert::envelopeGroup:
+                    case TOPLEVEL::insert::envelopePoints:
+                    case TOPLEVEL::insert::envelopePointChange:
+                        if (engine >= PART::engine::addMod1)
                             switch(insertParam)
                             {
                                 case 0:
@@ -439,9 +439,9 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                             }
                         break;
                         }
-                    case topLevel::insert::oscillatorGroup:
-                    case topLevel::insert::harmonicAmplitude:
-                    case topLevel::insert::harmonicPhaseBandwidth:
+                    case TOPLEVEL::insert::oscillatorGroup:
+                    case TOPLEVEL::insert::harmonicAmplitude:
+                    case TOPLEVEL::insert::harmonicPhaseBandwidth:
                         if (synth->getGuiMaster()->partui->adnoteui->advoice->oscedit)
                             synth->getGuiMaster()->partui->adnoteui->advoice->oscedit->returns_update(getData);
                         break;
@@ -451,7 +451,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         return;
     }
 
-    if (engine == partLevel::engine::addSynth) // addsynth base
+    if (engine == PART::engine::addSynth) // addsynth base
     {
         if (synth->getGuiMaster()->partui->adnoteui)
             switch (insert)
@@ -459,7 +459,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 case 0xff:
                     synth->getGuiMaster()->partui->adnoteui->returns_update(getData);
                     break;
-                case topLevel::insert::LFOgroup:
+                case TOPLEVEL::insert::LFOgroup:
                     switch(insertParam)
                     {
                         case 0:
@@ -476,13 +476,13 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                             break;
                     }
                     break;
-                case topLevel::insert::filterGroup:
+                case TOPLEVEL::insert::filterGroup:
                     if (synth->getGuiMaster()->partui->adnoteui->filterui)
                         synth->getGuiMaster()->partui->adnoteui->filterui->returns_update(getData);
                     break;
-                case topLevel::insert::envelopeGroup:
-                case topLevel::insert::envelopePoints:
-                case topLevel::insert::envelopePointChange:
+                case TOPLEVEL::insert::envelopeGroup:
+                case TOPLEVEL::insert::envelopePoints:
+                case TOPLEVEL::insert::envelopePointChange:
                     switch(insertParam)
                     {
                         case 0:
@@ -500,8 +500,8 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                     }
                     break;
 
-                case topLevel::insert::resonanceGroup:
-                case topLevel::insert::resonanceGraphInsert:
+                case TOPLEVEL::insert::resonanceGroup:
+                case TOPLEVEL::insert::resonanceGraphInsert:
                     if (synth->getGuiMaster()->partui->adnoteui->resui)
                         synth->getGuiMaster()->partui->adnoteui->resui->returns_update(getData);
                     break;

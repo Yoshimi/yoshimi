@@ -94,7 +94,7 @@
  * and new entries can be added between the group ends
  */
 
-namespace topLevel // usage topLevel::section::vector
+namespace TOPLEVEL // usage TOPLEVEL::section::vector
 {
     enum section: unsigned char {
         part1 = 0,
@@ -147,7 +147,7 @@ namespace topLevel // usage topLevel::section::vector
     };
 }
 
-namespace configLevel // usage configLevel::control::oscillatorSize
+namespace CONFIG // usage CONFIG::control::oscillatorSize
 {
     enum control : unsigned char {
         oscillatorSize = 0,
@@ -195,7 +195,7 @@ namespace configLevel // usage configLevel::control::oscillatorSize
     };
 }
 
-namespace vectorLevel // usage vectorLevel::control::name
+namespace VECTOR // usage VECTOR::control::name
 {
     enum control : unsigned char {
         name = 8,
@@ -217,7 +217,7 @@ namespace vectorLevel // usage vectorLevel::control::name
     };
 }
 
-namespace scalesLevel // usage scalesLevel::control::Afrequency
+namespace SCALES // usage SCALES::control::Afrequency
 {
     enum control : unsigned char {
         Afrequency = 0,
@@ -241,7 +241,7 @@ namespace scalesLevel // usage scalesLevel::control::Afrequency
     };
 }
 
-namespace mainLevel // usage mainLevel::control::volume
+namespace MAIN // usage MAIN::control::volume
 {
     enum control : unsigned char {
         volume = 0,
@@ -291,7 +291,7 @@ namespace mainLevel // usage mainLevel::control::volume
     };
 }
 
-namespace partLevel // usage partLevel::control::volume
+namespace PART // usage PART::control::volume
 {
     enum control : unsigned char {
         volume = 0,
@@ -396,7 +396,7 @@ namespace partLevel // usage partLevel::control::volume
     };
 }
 
-namespace addSynthLevel // usage addSynthLevel::control::volume
+namespace ADDSYNTH // usage ADDSYNTH::control::volume
 {
     enum control : unsigned char {
         volume = 0,
@@ -420,7 +420,7 @@ namespace addSynthLevel // usage addSynthLevel::control::volume
     };
 }
 
-namespace addVoiceLevel // usage addVoiceLevel::control::volume
+namespace ADDVOICE // usage ADDVOICE::control::volume
 {
     enum control : unsigned char {
         volume = 0,
@@ -481,7 +481,7 @@ namespace addVoiceLevel // usage addVoiceLevel::control::volume
     };
 }
 
-namespace subSynthLevel // usage subSynthLevel::control::volume
+namespace SUBSYNTH // usage SUBSYNTH::control::volume
 {
     enum control : unsigned char {
         volume = 0,
@@ -517,7 +517,7 @@ namespace subSynthLevel // usage subSynthLevel::control::volume
     };
 }
 
-namespace padSynthLevel // usage padSynthLevel::control::volume
+namespace PADSYNTH // usage PADSYNTH::control::volume
 {
     enum control : unsigned char {
         volume = 0,
@@ -570,7 +570,7 @@ namespace padSynthLevel // usage padSynthLevel::control::volume
     };
 }
 
-namespace oscillatorLevel // usage oscillatorLevel::control::phaseRandomness
+namespace OSCILLATOR // usage OSCILLATOR::control::phaseRandomness
 {
     enum control : unsigned char {
         phaseRandomness = 0,
@@ -581,10 +581,10 @@ namespace oscillatorLevel // usage oscillatorLevel::control::phaseRandomness
         baseFunctionParameter = 16,
         baseFunctionType, // Sine, Triangle, Pulse, Saw, Power, Gauss, Diode, AbsSine,
             // PulseSine, StrchSine, Chirp, AbsStrSine, Chebyshev, Sqr, Spike, Circle
-        baseFunctionModulationParameter1 = 18,
-        baseFunctionModulationParameter2,
-        baseFunctionModulationParameter3,
-        baseFunctionModulationType, // None, Rev, Sine, Pow
+        baseModulationParameter1 = 18,
+        baseModulationParameter2,
+        baseModulationParameter3,
+        baseModulationType, // None, Rev, Sine, Pow
 
         autoClear = 32, // not used
         useAsBaseFunction, // if 'value' is 1 assume autoclear set

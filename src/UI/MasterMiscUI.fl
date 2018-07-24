@@ -142,10 +142,10 @@ class VUMeter {
             int oy = y();
             int lx = w();
             int ly = h();
-            float dbl = rap2dB(fetchData(0, mainLevel::control::readMainLRpeak, topLevel::section::main, 0));
-            float dbr = rap2dB(fetchData(0, mainLevel::control::readMainLRpeak, topLevel::section::main, 1));
-            float rmsdbl = rap2dB(fetchData(0, mainLevel::control::readMainLRrms, topLevel::section::main, 0));
-            float rmsdbr = rap2dB(fetchData(0, mainLevel::control::readMainLRrms, topLevel::section::main, 1));
+            float dbl = rap2dB(fetchData(0, MAIN::control::readMainLRpeak, TOPLEVEL::section::main, 0));
+            float dbr = rap2dB(fetchData(0, MAIN::control::readMainLRpeak, TOPLEVEL::section::main, 1));
+            float rmsdbl = rap2dB(fetchData(0, MAIN::control::readMainLRrms, TOPLEVEL::section::main, 0));
+            float rmsdbr = rap2dB(fetchData(0, MAIN::control::readMainLRrms, TOPLEVEL::section::main, 1));
 
             clipped = clipped | (dbl > 0) | ((dbr > 0) << 1);
 
@@ -248,7 +248,7 @@ class VUMeter {
     int oy = y()+2;
     int lx = w()-4;
     int ly = h()-4;
-    float Vpeak = fetchData(0, mainLevel::control::readPartPeak, topLevel::section::main, npart + *plgroup);
+    float Vpeak = fetchData(0, MAIN::control::readPartPeak, TOPLEVEL::section::main, npart + *plgroup);
     if (Vpeak < 0) // its a fake one
     {
         fl_rectf(ox, oy, lx, ly, 140, 140, 140);

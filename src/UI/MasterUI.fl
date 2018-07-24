@@ -311,7 +311,7 @@ class MasterUI {: {private GuiUpdates}
             unsigned int forceId = 0;
             if (sId)
                 forceId = string2uint(sId);
-            send_data(mainLevel::control::startInstance, forceId, 0xc0, topLevel::section::main, 0xff, 0xff, topLevel::route::lowPriority);}
+            send_data(MAIN::control::startInstance, forceId, 0xc0, TOPLEVEL::section::main, 0xff, 0xff, TOPLEVEL::route::lowPriority);}
             xywh {0 0 31 21} labelsize 12
           }
           MenuItem {} {
@@ -359,7 +359,7 @@ class MasterUI {: {private GuiUpdates}
                 return;
             }
             pclose(fp);*/
-            send_data(100, 0, 0xf0, topLevel::section::main, 0xff, 0xff, topLevel::route::lowPriority);
+            send_data(100, 0, 0xf0, TOPLEVEL::section::main, 0xff, 0xff, TOPLEVEL::route::lowPriority);
             return;}
             xywh {0 0 34 20} labelsize 12
           }
@@ -413,7 +413,7 @@ class MasterUI {: {private GuiUpdates}
                 if (isRegFile(string(filename)))
                     if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                         return;
-                send_data(mainLevel::control::saveNamedInstrument, float(npartcounter->value() - 1), 0xd0, topLevel::section::main, 0xff, 0xff, topLevel::route::lowPriority, miscMsgPush(string(filename)));
+                send_data(MAIN::control::saveNamedInstrument, float(npartcounter->value() - 1), 0xd0, TOPLEVEL::section::main, 0xff, 0xff, TOPLEVEL::route::lowPriority, miscMsgPush(string(filename)));
                 return;}
             tooltip {Save current instrument to an .xi* file} xywh {20 20 100 20} labelsize 12
           }
@@ -532,7 +532,7 @@ class MasterUI {: {private GuiUpdates}
                 if (isRegFile(string(filename)))
                     if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                         return;
-                send_data(mainLevel::control::saveNamedScale, 0, 0xf0, topLevel::section::main, 0xff, 0xff, topLevel::route::lowPriority, miscMsgPush(string(filename)));}
+                send_data(MAIN::control::saveNamedScale, 0, 0xf0, TOPLEVEL::section::main, 0xff, 0xff, TOPLEVEL::route::lowPriority, miscMsgPush(string(filename)));}
             xywh {25 25 100 20} labelsize 12
           }
           MenuItem RecentScale {
@@ -552,7 +552,7 @@ paramsui->Show(3);}
                 if (NULL != microtonalui)
                     delete microtonalui;
                 microtonalui = new MicrotonalUI(&synth->microtonal, synth);
-                send_data(96, 0, 0xd0, topLevel::section::scales);
+                send_data(96, 0, 0xd0, TOPLEVEL::section::scales);
             }}
             xywh {0 0 34 20} labelsize 12
           }
@@ -590,7 +590,7 @@ paramsui->Show(3);}
                                             lastname.c_str(), 0);
             if (fle)
             {
-                send_data(mainLevel::control::saveNamedState, 0, 0xf0, topLevel::section::main, 0xff, 0xff, topLevel::route::lowPriority, miscMsgPush(string(fle)));
+                send_data(MAIN::control::saveNamedState, 0, 0xf0, TOPLEVEL::section::main, 0xff, 0xff, TOPLEVEL::route::lowPriority, miscMsgPush(string(fle)));
                 RecentState->activate();
             }}
             tooltip {Save session state} xywh {10 10 34 21} labelsize 12
@@ -601,7 +601,7 @@ paramsui->Show(3);}
                 string name = synth->getRuntime().defaultStateName;
                 if (instance > 0)
                     name += ("-" + to_string(instance));
-                send_data(mainLevel::control::saveNamedState, 0, 0xf0, topLevel::section::main, 0xff, 0xff, topLevel::route::lowPriority, miscMsgPush(name + ".state"));}
+                send_data(MAIN::control::saveNamedState, 0, 0xf0, TOPLEVEL::section::main, 0xff, 0xff, TOPLEVEL::route::lowPriority, miscMsgPush(name + ".state"));}
             tooltip {Save as default state (if load default checked)} xywh {0 0 34 21} labelsize 12
           }
           MenuItem RecentState {
@@ -620,7 +620,7 @@ paramsui->Show(3);}
         Fl_Dial globalfinedetune {
           label Detune
           callback {//
-          send_data(mainLevel::control::detune, o->value(), 0xc8, topLevel::section::main, 0xff, 0xff, topLevel::route::lowPriority);}
+          send_data(MAIN::control::detune, o->value(), 0xc8, TOPLEVEL::section::main, 0xff, 0xff, TOPLEVEL::route::lowPriority);}
           tooltip {Global Fine Detune} xywh {286 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1 value 64
           code0 {o->setValueType(VC_GlobalFineDetune);}
           code1 {o->value(synth->microtonal.Pglobalfinedetune);}
@@ -634,22 +634,22 @@ paramsui->Show(3);}
           if (fl_choice("Set *ALL* dynamic values to their defaults?", NULL, "No", "Yes") > 1)
           {
               if(wasCtrl || (Fl::event_state(FL_CTRL) != 0))
-                  send_data(mainLevel::control::masterResetAndMlearn, 0, 0xf0, topLevel::section::main, 0xff, 0xff, topLevel::route::adjustAndLoopback);
+                  send_data(MAIN::control::masterResetAndMlearn, 0, 0xf0, TOPLEVEL::section::main, 0xff, 0xff, TOPLEVEL::route::adjustAndLoopback);
               else
-                  send_data(mainLevel::control::masterReset, 0, 0xf0, topLevel::section::main, 0xff, 0xff, topLevel::route::adjustAndLoopback);}}
+                  send_data(MAIN::control::masterReset, 0, 0xf0, TOPLEVEL::section::main, 0xff, 0xff, TOPLEVEL::route::adjustAndLoopback);}}
           tooltip {Clear all dynamic settings
 (+Ctrl includes MIDI-learn)} xywh {7 60 70 24} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
         }
         Fl_Button {} {
           label {Stop!}
           callback {//
-          send_data(mainLevel::control::stopSound, 0, 0xf0, topLevel::section::main);}
+          send_data(MAIN::control::stopSound, 0, 0xf0, TOPLEVEL::section::main);}
           tooltip {Cease all sound immediately!} xywh {7 30 70 24} box PLASTIC_UP_BOX color 88 selection_color 0 labelfont 1 labelsize 11 align 16
         }
         Fl_Dial mastervolumedial {
           label Volume
           callback {//
-          send_data(mainLevel::control::volume, o->value(), 0x48, topLevel::section::main);}
+          send_data(MAIN::control::volume, o->value(), 0x48, TOPLEVEL::section::main);}
           tooltip {Master Volume} xywh {335 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_MasterVolume);}
           code1 {o->value(synth->Pvolume);}
@@ -699,7 +699,7 @@ paramsui->Show(3);}
           Fl_Spinner syseffnocounter {
             label Effect
             callback {//
-            send_data(0, o->value() - 1, 0xd0, topLevel::section::systemEffects, o->value() - 1);}
+            send_data(0, o->value() - 1, 0xd0, TOPLEVEL::section::systemEffects, o->value() - 1);}
             xywh {40 126 36 20} labeltype NO_LABEL labelsize 11 align 0 maximum 4 textfont 1 textsize 11
             code0 {o->range(1, NUM_SYS_EFX);}
             code1 {o->value(nsyseff + 1);}
@@ -707,7 +707,7 @@ paramsui->Show(3);}
           Fl_Choice sysefftype {
             label Type
             callback {//
-            send_data(1, o->value(), 0xd0, topLevel::section::systemEffects, nsyseff);}
+            send_data(1, o->value(), 0xd0, TOPLEVEL::section::systemEffects, nsyseff);}
             xywh {120 126 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 10 align 16
             code0 {o->value(synth->sysefx[nsyseff]->geteffect());}
           } {
@@ -781,7 +781,7 @@ paramsui->Show(3);}
           Fl_Choice insefftype {
             label Type
             callback {//
-            send_data(1, o->value(), 0xd0, topLevel::section::insertEffects, ninseff);}
+            send_data(1, o->value(), 0xd0, TOPLEVEL::section::insertEffects, ninseff);}
             xywh {120 126 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 0 textsize 12
             code0 {o->value(synth->insefx[ninseff]->geteffect());}
             code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
@@ -826,7 +826,7 @@ paramsui->Show(3);}
           Fl_Choice inseffpart {
             label {To }
             callback {//
-            send_data(2, o->value() - 2, 0xd0, topLevel::section::insertEffects, ninseff);}
+            send_data(2, o->value() - 2, 0xd0, TOPLEVEL::section::insertEffects, ninseff);}
             xywh {242 126 96 20} down_box BORDER_BOX labelfont 1 labelsize 10 textfont 1 textsize 11
             code0 {setinspartlist();}
             code3 {o->value(synth->Pinsparts[ninseff]+2);}
@@ -888,7 +888,7 @@ paramsui->Show(3);}
       Fl_Spinner masterkeyshift {
         label {Key Shift}
         callback {//
-        send_data(mainLevel::control::keyShift, o->value(), 0xc0, topLevel::section::main, 0xff, 0xff, topLevel::route::lowPriority);}
+        send_data(MAIN::control::keyShift, o->value(), 0xc0, TOPLEVEL::section::main, 0xff, 0xff, TOPLEVEL::route::lowPriority);}
         tooltip {Shift pitch +/- N semitones} xywh {336 88 38 20} labelsize 10 minimum -36 maximum 36 textsize 10
         code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
         code1 {o->value(synth->Pkeyshift - 64);}
@@ -897,7 +897,7 @@ paramsui->Show(3);}
         label Part
         callback {//
         int nval = o->value() - 1;
-        send_data(mainLevel::control::partNumber, nval, 0xf0, topLevel::section::main);}
+        send_data(MAIN::control::partNumber, nval, 0xf0, TOPLEVEL::section::main);}
         xywh {36 264 40 20} labelsize 11 when 6 minimum 0 maximum 127 textsize 11
         code0 {o->range(1.0, partmax);}
         code1 {o->value(synth->getRuntime().currentPart + 1);}
@@ -920,7 +920,7 @@ paramsui->Show(3);}
         updatepanel();
         setinspartlist();
         vectorui->checkParts(tmp);
-        send_data(mainLevel::control::availableParts, tmp, 0xc0, topLevel::section::main);}
+        send_data(MAIN::control::availableParts, tmp, 0xc0, TOPLEVEL::section::main);}
         tooltip {Set the number of available parts} xywh {93 264 40 20} labelsize 11 minimum 16 maximum 64 step 16 value 16 textsize 11
         code0 {o->value(partmax);}
       }
@@ -1115,14 +1115,14 @@ ZynAddSubFX}
         }
         else
         {
-            send_data(mainLevel::control::soloCC, CSspinner->value(), 0xf0, topLevel::section::main);
+            send_data(MAIN::control::soloCC, CSspinner->value(), 0xf0, TOPLEVEL::section::main);
         }}
         tooltip {Click to set} xywh {276 651 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
       }
       Fl_Choice channelswitch {
         label Solo
         callback {//
-                send_data(mainLevel::control::soloType, o->value(), 0xf0, topLevel::section::main);}
+                send_data(MAIN::control::soloType, o->value(), 0xf0, TOPLEVEL::section::main);}
         tooltip {Assign groups of parts to Ch 1, singly enabled by MIDI} xywh {125 650 74 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
         code1 {o->value(synth->getRuntime().channelSwitchType);}
         code2 {if (o->value() == 0) CSspinner->hide(); else CSspinner->show();}
@@ -1167,7 +1167,7 @@ ZynAddSubFX}
       Fl_Button cancel {
         label Cancel
         callback {//
-        send_data(255, 0, 3, topLevel::section::main);
+        send_data(255, 0, 3, TOPLEVEL::section::main);
         o->hide();}
         xywh {130 60 70 20} hide
       }
@@ -1199,7 +1199,7 @@ ZynAddSubFX}
     bool isSingle = kititem >= 0x40;
     int mask = NUM_MIDI_CHANNELS - 1;
 
-    if (newpart == topLevel::section::midiIn)
+    if (newpart == TOPLEVEL::section::midiIn)
     {
         if (engine == 7 && partui->part->ctl->volume.receive == 0)
             return; // MIDI volume disabled
@@ -1337,9 +1337,9 @@ ZynAddSubFX}
         }
         return;
     }
-    if (newpart == topLevel::section::systemEffects)
+    if (newpart == TOPLEVEL::section::systemEffects)
     {
-        if (insert == topLevel::insert::systemEffectSend)
+        if (insert == TOPLEVEL::insert::systemEffectSend)
         {
             if (!wasFromHere)
                 syseffsend[engine][control]->value(value);
@@ -1364,7 +1364,7 @@ ZynAddSubFX}
         }
         return;
     }
-    else if (newpart == topLevel::section::insertEffects)
+    else if (newpart == TOPLEVEL::section::insertEffects)
     {
         if (control == 0)
         {
@@ -1397,11 +1397,11 @@ ZynAddSubFX}
     string name;
     switch(control)
     {
-        case mainLevel::control::volume:
+        case MAIN::control::volume:
             mastervolumedial->value(value);
             break;
 
-        case mainLevel::control::partNumber:
+        case MAIN::control::partNumber:
             partuigroup->remove(partui);
             delete partui;
             partui = new PartUI(0, 0, 765, 525);
@@ -1419,7 +1419,7 @@ ZynAddSubFX}
             }
             break;
 
-        case mainLevel::control::availableParts:
+        case MAIN::control::availableParts:
             partmax = value_int;
             npartcounter->range(1, partmax);
             updatepart();
@@ -1428,15 +1428,15 @@ ZynAddSubFX}
             vectorui->checkParts(value_int);
             break;
 
-        case mainLevel::control::detune:
+        case MAIN::control::detune:
             globalfinedetune->value(value);
             break;
 
-        case mainLevel::control::keyShift:
+        case MAIN::control::keyShift:
             masterkeyshift->value(value_int);
             break;
 
-        case mainLevel::control::soloType:
+        case MAIN::control::soloType:
             channelswitch->value(value_int);
             if (value_int == 0)
             {
@@ -1463,15 +1463,15 @@ ZynAddSubFX}
             }
             panelwindow->changed();
             break;
-        case mainLevel::control::soloCC:
+        case MAIN::control::soloCC:
             updatepanel();
             break;
-        case mainLevel::control::exportBank:
+        case MAIN::control::exportBank:
             name = miscMsgPop(par2);
             if (wasFromHere)
                 fl_alert("%s",name.c_str());
             break;
-        case mainLevel::control::importBank: // import bank
+        case MAIN::control::importBank: // import bank
             name = miscMsgPop(par2);
             if (wasFromHere)
             {
@@ -1489,7 +1489,7 @@ ZynAddSubFX}
             }
             bankui->rescan_for_banks(false);
             break;
-        case mainLevel::control::deleteBank: // delete bank and contents
+        case MAIN::control::deleteBank: // delete bank and contents
             name = miscMsgPop(par2);
             if (name.find("FAILED") == 1)
             {
@@ -1499,7 +1499,7 @@ ZynAddSubFX}
             bankui->rescan_for_banks(false);
             bankui->set_bank_slot();
             break;
-        case mainLevel::control::setCurrentRootBank: // set current root and/or bank
+        case MAIN::control::setCurrentRootBank: // set current root and/or bank
             if (kititem < 255)
             {
                 ; // do both
@@ -1509,7 +1509,7 @@ ZynAddSubFX}
                 ; // just bank
             }
             break;
-        case mainLevel::control::saveInstrument: // save instrument to bank
+        case MAIN::control::saveInstrument: // save instrument to bank
             name = miscMsgPop(par2);
             if (npart == parameter)
                 partui->setinstrumentlabel();
@@ -1518,7 +1518,7 @@ ZynAddSubFX}
             if (kititem == synth->ReadBankRoot() && engine == synth->ReadBank())
                 bankui->refreshbankslot(insert);
         break;
-        case mainLevel::control::loadNamedInstrument: // load instrument
+        case MAIN::control::loadNamedInstrument: // load instrument
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
@@ -1528,7 +1528,7 @@ ZynAddSubFX}
                 RecentInstruments->activate();
             break;
 
-        case mainLevel::control::saveNamedInstrument: // save instrument
+        case MAIN::control::saveNamedInstrument: // save instrument
             name = miscMsgPop(par2);
             if (name.find("FAILED") == 1)
             {
@@ -1543,7 +1543,7 @@ ZynAddSubFX}
             }
             break;
 
-        case mainLevel::control::loadNamedPatchset: // load patchset
+        case MAIN::control::loadNamedPatchset: // load patchset
             name = miscMsgPop(par2);
             if (name.find("FAILED") == 1)
             {
@@ -1560,7 +1560,7 @@ ZynAddSubFX}
 
             break;
 
-        case mainLevel::control::saveNamedPatchset: // save patch set
+        case MAIN::control::saveNamedPatchset: // save patch set
             name = miscMsgPop(par2);
             if (name.find("FAILED") == 1)
             {
@@ -1575,7 +1575,7 @@ ZynAddSubFX}
             }
             break;
 
-        case mainLevel::control::loadNamedVector: // load vector
+        case MAIN::control::loadNamedVector: // load vector
             name = miscMsgPop(par2);
             if (name.find("FAILED") == 1)
             {
@@ -1591,7 +1591,7 @@ ZynAddSubFX}
             }
             break;
 
-        case mainLevel::control::saveNamedVector: // save vector
+        case MAIN::control::saveNamedVector: // save vector
             name = miscMsgPop(par2);
             if (name.find("FAILED") == 1)
             {
@@ -1605,7 +1605,7 @@ ZynAddSubFX}
             }
             break;
 
-        case mainLevel::control::loadNamedScale: // load scales
+        case MAIN::control::loadNamedScale: // load scales
             name = miscMsgPop(par2);
             if (name.find("FAILED") == 1)
             {
@@ -1620,7 +1620,7 @@ ZynAddSubFX}
             }
             break;
 
-        case mainLevel::control::saveNamedScale: // save scales
+        case MAIN::control::saveNamedScale: // save scales
             name = miscMsgPop(par2);
             if (wasFromHere && name.find("FAILED") == 1)
                 fl_alert("%s",name.c_str());
@@ -1628,7 +1628,7 @@ ZynAddSubFX}
                 RecentScale->activate();
             break;
 
-        case mainLevel::control::loadNamedState: // load state
+        case MAIN::control::loadNamedState: // load state
             name = miscMsgPop(par2);
             if (wasFromHere && name.find("FAILED") == 1)
             {
@@ -1642,7 +1642,7 @@ ZynAddSubFX}
             }
             break;
 
-        case mainLevel::control::saveNamedState: // save state
+        case MAIN::control::saveNamedState: // save state
             name = miscMsgPop(par2);
             if (wasFromHere && name.find("FAILED") == 1)
                 fl_alert("%s",name.c_str());
@@ -1650,8 +1650,8 @@ ZynAddSubFX}
                 setMasterLabel(findleafname(name) + " - State");
             break;
 
-        case mainLevel::control::masterReset:
-            if (newpart == topLevel::section::main)
+        case MAIN::control::masterReset:
+            if (newpart == TOPLEVEL::section::main)
             {
                 refresh_master_ui(1);
                 vumeter->init(-1, synth);
@@ -1662,7 +1662,7 @@ ZynAddSubFX}
             setMasterLabel("");
             break;
 
-        case mainLevel::control::masterResetAndMlearn:
+        case MAIN::control::masterResetAndMlearn:
             refresh_master_ui(1);
             resetPartsClip();
             if (midilearnui)
@@ -1670,15 +1670,15 @@ ZynAddSubFX}
             setMasterLabel("");
             break;
 
-        case mainLevel::control::openManualPDF:
+        case MAIN::control::openManualPDF:
             if (par2 != NO_MSG)
                 fl_alert("%s", miscMsgPop(par2).c_str());
             break;
 
-        case mainLevel::control::startInstance: // new instance (do nothing here)
+        case MAIN::control::startInstance: // new instance (do nothing here)
             break;
 
-        case mainLevel::control::stopSound:
+        case MAIN::control::stopSound:
             virkeyboard->relaseallkeys();
             vumeter->init(-1, synth);
             resetPartsClip();
@@ -1905,7 +1905,7 @@ ZynAddSubFX}
   }
   Function {do_load_scale(string fname)} {} {
     code {//
-    send_data(mainLevel::control::loadNamedScale, 0, 0xf0, topLevel::section::main, 0xff, 0xff, topLevel::route::lowPriority, miscMsgPush(fname));} {}
+    send_data(MAIN::control::loadNamedScale, 0, 0xf0, TOPLEVEL::section::main, 0xff, 0xff, TOPLEVEL::route::lowPriority, miscMsgPush(fname));} {}
   }
   Function {do_load_instrument(string fname)} {} {
     code {//
@@ -1918,7 +1918,7 @@ ZynAddSubFX}
     }
     partui->partGroupEnable->value(0);
     partui->partgroup->deactivate();
-    send_data(mainLevel::control::loadNamedInstrument, npart, 0xf0, topLevel::section::main, 0xff, 0xff, 0xff, miscMsgPush(fname));} {}
+    send_data(MAIN::control::loadNamedInstrument, npart, 0xf0, TOPLEVEL::section::main, 0xff, 0xff, 0xff, miscMsgPush(fname));} {}
   }
   Function {do_load_master(const char* file)} {} {
     code {//
@@ -1934,7 +1934,7 @@ ZynAddSubFX}
         if (fname == NULL)
             return;
     }
-    send_data(mainLevel::control::loadNamedPatchset, 0, 0xf0, topLevel::section::main, 255, 255, topLevel::route::adjustAndLoopback, miscMsgPush(fname));} {}
+    send_data(MAIN::control::loadNamedPatchset, 0, 0xf0, TOPLEVEL::section::main, 255, 255, TOPLEVEL::route::adjustAndLoopback, miscMsgPush(fname));} {}
   }
   Function {do_save_master(const char* file = NULL)} {} {
     code {//
@@ -1961,7 +1961,7 @@ ZynAddSubFX}
     else
         fname = file;
     // RecentScale->activate();
-    send_data(mainLevel::control::saveNamedPatchset, 0, 0xf0, topLevel::section::main, 255, 255, topLevel::route::lowPriority, miscMsgPush(string(fname)));} {}
+    send_data(MAIN::control::saveNamedPatchset, 0, 0xf0, TOPLEVEL::section::main, 255, 255, TOPLEVEL::route::lowPriority, miscMsgPush(string(fname)));} {}
   }
   Function {refresh_master_ui(int type)} {} {
     code {//
@@ -2114,7 +2114,7 @@ ZynAddSubFX}
   }
   Function {setState(string filename)} {} {
     code {//
-    send_data(mainLevel::control::loadNamedState, 0, 0xf0, topLevel::section::main, 0xff, 0xff, topLevel::route::adjustAndLoopback, miscMsgPush(filename));} {}
+    send_data(MAIN::control::loadNamedState, 0, 0xf0, TOPLEVEL::section::main, 0xff, 0xff, TOPLEVEL::route::adjustAndLoopback, miscMsgPush(filename));} {}
   }
   Function {setPartWindowTitle(string prefix)} {return_type string
   } {

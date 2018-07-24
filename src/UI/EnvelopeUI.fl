@@ -849,7 +849,7 @@ send_data(group, curpoint, 0, 0xd0, 3);}
       }
     }
   }
-  Function {send_data(int group, int control, float value, int type, int insert = topLevel::insert::envelopeGroup, int par2 = 255)} {} {
+  Function {send_data(int group, int control, float value, int type, int insert = TOPLEVEL::insert::envelopeGroup, int par2 = 255)} {} {
     code {//
     collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, insert, group, par2);} {}
   }
@@ -872,9 +872,9 @@ send_data(group, curpoint, 0, 0xd0, 3);}
     if (part != npart || (eng >= 128 && eng != engine))
         return;
 
-    if (insert == topLevel::insert::envelopePoints || insert == topLevel::insert::envelopePointChange)
+    if (insert == TOPLEVEL::insert::envelopePoints || insert == TOPLEVEL::insert::envelopePointChange)
     {
-        if (insert == topLevel::insert::envelopePointChange) // adjust point
+        if (insert == TOPLEVEL::insert::envelopePointChange) // adjust point
             freeedit->lastpoint = control;
         else if (par2 > 127) // delete point
             freeedit->lastpoint -= 1;

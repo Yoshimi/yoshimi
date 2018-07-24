@@ -68,7 +68,7 @@ class ConfigUI {: {private MiscFuncs}
           Fl_Choice osc_size {
             label {* AddSynth Oscillator Size}
             callback {//
-                        send_data(configLevel::control::oscillatorSize, 256 << o->value(), 0xc0);}
+                        send_data(CONFIG::control::oscillatorSize, 256 << o->value(), 0xc0);}
             tooltip {ADSynth Oscillator Size (samples)} xywh {250 45 100 20} down_box BORDER_BOX labelsize 12 textsize 11
             code0 {o->value( (int)(logf(synth->getRuntime().Oscilsize / 256.0f - 1.0f) / logf(2.0f)) + 1);}
             code1 {if (synth->getUniqueId() != 0) o->hide();}
@@ -105,7 +105,7 @@ class ConfigUI {: {private MiscFuncs}
           Fl_Choice buff_size {
             label {* Internal Buffer Size}
             callback {//
-                        send_data(configLevel::control::bufferSize, 16 << o->value(), 0xc0);}
+                        send_data(CONFIG::control::bufferSize, 16 << o->value(), 0xc0);}
             tooltip {Number of samples} xywh {249 75 100 20} down_box BORDER_BOX labelsize 12 textsize 12
             code0 {o->value( (int)(logf(synth->getRuntime().Buffersize / 16.0f - 1.0f) / logf(2.0f)) + 1);}
             code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
@@ -150,7 +150,7 @@ class ConfigUI {: {private MiscFuncs}
           Fl_Choice pad_interpol {
             label {PADsynth Interpolation}
             callback {//
-                        send_data(configLevel::control::padSynthInterpolation, o->value(), 0xc0);}
+                        send_data(CONFIG::control::padSynthInterpolation, o->value(), 0xc0);}
             xywh {250 105 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().Interpolation);}
           } {
@@ -166,7 +166,7 @@ class ConfigUI {: {private MiscFuncs}
           Fl_Choice v_keyboard {
             label {Virtual Keyboard Layout}
             callback {//
-                        send_data(configLevel::control::virtualKeyboardLayout, o->value(), 0xc0);}
+                        send_data(CONFIG::control::virtualKeyboardLayout, o->value(), 0xc0);}
             xywh {250 135 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
             code0 {o->value(synth->getRuntime().VirKeybLayout);}
           } {
@@ -190,7 +190,7 @@ class ConfigUI {: {private MiscFuncs}
           Fl_Counter compression {
             label {XML Compression Level}
             callback {//
-                        send_data(configLevel::control::XMLcompressionLevel, o->value(), 0xc0);}
+                        send_data(CONFIG::control::XMLcompressionLevel, o->value(), 0xc0);}
             tooltip {gzip compression level (0 - uncompressed)} xywh {284 165 65 20} type Simple labelsize 12 align 4 minimum 0 maximum 9 step 1 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().GzipCompression);}
             code1 {if (synth->getUniqueId() != 0) o->hide();}
@@ -198,7 +198,7 @@ class ConfigUI {: {private MiscFuncs}
           Fl_Choice reports {
             label {Send reports to:}
             callback {//
-                        send_data(configLevel::control::reportsDestination, o->value(), 0xf0);}
+                        send_data(CONFIG::control::reportsDestination, o->value(), 0xf0);}
             tooltip {Some system errors always go to stdout} xywh {200 195 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
             code0 {o->value(synth->getRuntime().toConsole);}
           } {
@@ -214,7 +214,7 @@ class ConfigUI {: {private MiscFuncs}
           Fl_Choice instrument {
             label {Saved Instrument Format}
             callback {//
-                        send_data(configLevel::control::savedInstrumentFormat, o->value() + 1, 0xc0);}
+                        send_data(CONFIG::control::savedInstrumentFormat, o->value() + 1, 0xc0);}
             tooltip {Yoshimi format includes Controllers and Humanise} xywh {200 225 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
             code0 {o->value(synth->getRuntime().instrumentFormat - 1);}
           } {
@@ -244,7 +244,7 @@ class ConfigUI {: {private MiscFuncs}
           Fl_Check_Button setDefaultState {
             label {* Start With Default State}
             callback {//
-                        send_data(configLevel::control::defaultStateStart, o->value(), 0xc0);}
+                        send_data(CONFIG::control::defaultStateStart, o->value(), 0xc0);}
             tooltip {If you change this you must re-save the default state
 or when that loads it will revert to the previous value} xywh {270 60 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().loadDefaultState);}
@@ -253,7 +253,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
           Fl_Check_Button nonFatal {
             label {Hide Non Fatal Errors}
             callback {//
-                        send_data(configLevel::control::hideNonFatalErrors, o->value(), 0xc0);}
+                        send_data(CONFIG::control::hideNonFatalErrors, o->value(), 0xc0);}
             xywh {270 80 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().hideErrors);}
             code1 {if (synth->getIsLV2Plugin()) o->deactivate();}
@@ -261,7 +261,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
           Fl_Check_Button showSplash {
             label {Show Splash Screen}
             callback {//
-                        send_data(configLevel::control::showSplash, o->value(), 0xc0);}
+                        send_data(CONFIG::control::showSplash, o->value(), 0xc0);}
             xywh {270 100 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showSplash);}
             code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
@@ -269,14 +269,14 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
           Fl_Check_Button logTimes {
             label {Log Load times}
             callback {//
-                        send_data(configLevel::control::logInstrumentLoadTimes, o->value(), 0xc0);}
+                        send_data(CONFIG::control::logInstrumentLoadTimes, o->value(), 0xc0);}
             xywh {270 120 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showTimes);}
           }
           Fl_Check_Button logXML {
             label {Log XML Headers}
             callback {//
-                        send_data(configLevel::control::logXMLheaders, o->value(), 0xc0);}
+                        send_data(CONFIG::control::logXMLheaders, o->value(), 0xc0);}
             xywh {270 140 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().logXMLheaders);}
             code1 {if (synth->getIsLV2Plugin()) o->deactivate();}
@@ -284,7 +284,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
           Fl_Check_Button saveAllXML {
             label {Include disabled data in XML files}
             callback {//
-                        send_data(configLevel::control::saveAllXMLdata, o->value(), 0xc0);}
+                        send_data(CONFIG::control::saveAllXMLdata, o->value(), 0xc0);}
             xywh {270 160 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().xmlmax);}
           }
@@ -296,7 +296,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                         if (tmp == 0)
                             doit = fl_choice("Are you sure you want to disable?\\nThis can only be restored via the command line.", NULL, "No", "Yes") > 1;
                         if (doit)
-                            send_data(configLevel::control::enableGUI, o->value(), 0xc0);
+                            send_data(CONFIG::control::enableGUI, o->value(), 0xc0);
                         else
                             o->value(1);}
             tooltip {Enable starting with this graphical  interface} xywh {270 200 27 25} down_box DOWN_BOX labelsize 12 align 4
@@ -306,7 +306,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
           Fl_Check_Button enableCLI {
             label {* Enable CLI}
             callback {//
-                        send_data(configLevel::control::enableCLI, o->value(), 0xc0);}
+                        send_data(CONFIG::control::enableCLI, o->value(), 0xc0);}
             tooltip {Enable starting with interactive command line interface} xywh {270 220 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showCLI);}
             code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
@@ -318,7 +318,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
           Fl_Check_Button enableAuto {
             label {Enable Auto Instance}
             callback {//
-                        send_data(configLevel::control::enableAutoInstance, o->value(), 0xc0);}
+                        send_data(CONFIG::control::enableAutoInstance, o->value(), 0xc0);}
             tooltip {Allow main instance to start all those open when last closed.} xywh {270 240 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().autoInstance);}
             code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
@@ -332,14 +332,14 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             label {Jack MIDI Source}
             callback {//
                         string tmp = string(o->value());
-                        send_data(configLevel::control::jackMidiSource, 0, 0xc0, topLevel::route::lowPriority, miscMsgPush(tmp));}
+                        send_data(CONFIG::control::jackMidiSource, 0, 0xc0, TOPLEVEL::route::lowPriority, miscMsgPush(tmp));}
             tooltip {Device Jack tries to connect to for input.} xywh {195 62 120 22} labelsize 12 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().jackMidiDevice.c_str());}
           }
           Fl_Check_Button jackMidi {
             label {Set as preferred MIDI}
             callback {//
-                        send_data(configLevel::control::jackPreferredMidi, o->value(), 0xd0);}
+                        send_data(CONFIG::control::jackPreferredMidi, o->value(), 0xd0);}
             xywh {195 88 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().midiEngine == jack_midi) o->value(1);}
           }
@@ -347,21 +347,21 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             label {Jack Server}
             callback {//
                         string tmp = string(o->value());
-                        send_data(configLevel::control::jackServer, 0, 0xc0, topLevel::route::lowPriority, miscMsgPush(tmp));}
+                        send_data(CONFIG::control::jackServer, 0, 0xc0, TOPLEVEL::route::lowPriority, miscMsgPush(tmp));}
             tooltip {Name of the jack server to connect to - default, ...} xywh {195 182 120 22} labelsize 12 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().jackServer.c_str());}
           }
           Fl_Check_Button jackAudio {
             label {Set as preferred audio}
             callback {//
-                        send_data(configLevel::control::jackPreferredAudio, o->value(), 0xd0);}
+                        send_data(CONFIG::control::jackPreferredAudio, o->value(), 0xd0);}
             xywh {195 209 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().audioEngine == jack_audio) o->value(1);}
           }
           Fl_Check_Button connectJackAudio {
             label {Autoconnect audio}
             callback {//
-                        send_data(configLevel::control::jackAutoConnectAudio, o->value(), 0xc0);}
+                        send_data(CONFIG::control::jackAutoConnectAudio, o->value(), 0xc0);}
             xywh {195 233 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().connectJackaudio);}
           }
@@ -378,14 +378,14 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             label {Alsa MIDI Source}
             callback {//
                         string tmp = string(o->value());
-                        send_data(configLevel::control::alsaMidiSource, 0, 0xc0, topLevel::route::lowPriority, miscMsgPush(tmp));}
+                        send_data(CONFIG::control::alsaMidiSource, 0, 0xc0, TOPLEVEL::route::lowPriority, miscMsgPush(tmp));}
             tooltip {Device Alsa tries to connect to for input.} xywh {195 52 120 22} labelsize 12 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().alsaMidiDevice.c_str());}
           }
           Fl_Check_Button alsaMidi {
             label {Set as preferred MIDI}
             callback {//
-                        send_data(configLevel::control::alsaPreferredMidi, o->value(), 0xd0);}
+                        send_data(CONFIG::control::alsaPreferredMidi, o->value(), 0xd0);}
             xywh {195 80 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().midiEngine == alsa_midi) o->value(1);}
           }
@@ -393,14 +393,14 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             label {Alsa Audio Device}
             callback {//
                         string tmp = string(o->value());
-                        send_data(configLevel::control::alsaAudioDevice, 0, 0xc0, topLevel::route::lowPriority, miscMsgPush(tmp));}
+                        send_data(CONFIG::control::alsaAudioDevice, 0, 0xc0, TOPLEVEL::route::lowPriority, miscMsgPush(tmp));}
             tooltip {Alsa audio device - default, hw:0, ...} xywh {195 143 120 22} labelsize 12 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().alsaAudioDevice.c_str());}
           }
           Fl_Check_Button alsaAudio {
             label {Set as preferred audio}
             callback {//
-                        send_data(configLevel::control::alsaPreferredAudio, o->value(), 0xd0);}
+                        send_data(CONFIG::control::alsaPreferredAudio, o->value(), 0xd0);}
             xywh {195 169 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().audioEngine == alsa_audio) o->value(1);}
           }
@@ -412,7 +412,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                         o->set_checked(chk);
                         if (chk > 4)
                             chk = 4;
-                        send_data(configLevel::control::alsaSampleRate, chk - 1, 0xc0);}
+                        send_data(CONFIG::control::alsaSampleRate, chk - 1, 0xc0);}
             xywh {195 199 121 66} labelsize 12 align 4 when 1 textfont 1 textsize 12
             code0 {//
                     o->add("192000");
@@ -479,7 +479,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                             o->hide();
                             return;
                         }
-                        string name = testCC(candidate, configLevel::control::bankRootCC);
+                        string name = testCC(candidate, CONFIG::control::bankRootCC);
                         if (!name.empty())
                         {
                             fl_alert("In use for %s",name.c_str());
@@ -492,7 +492,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                         }
                         BankRootvalue = candidate;
                         o->hide();
-                        send_data(configLevel::control::bankRootCC, BankRootvalue, 0xc0);}
+                        send_data(CONFIG::control::bankRootCC, BankRootvalue, 0xc0);}
             tooltip {Click to set} xywh {300 50 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
           }
           Fl_Check_Button rootcheck {
@@ -503,7 +503,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                             BankRoot->value(0);
                             BankRoot->deactivate();
                             Rpend->hide();
-                            send_data(configLevel::control::bankRootCC, 128, 0xc0);
+                            send_data(CONFIG::control::bankRootCC, 128, 0xc0);
                         }
                         else
                         {
@@ -533,7 +533,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                                 candidate = 128;
                                 break;
                         }
-                        string name = testCC(candidate, configLevel::control::bankCC);
+                        string name = testCC(candidate, CONFIG::control::bankCC);
                         if (!name.empty())
                         {
                             o->value(oldBank);
@@ -552,7 +552,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                             }
                             fl_alert("In use for %s",name.c_str());
                         }
-                        send_data(configLevel::control::bankCC, candidate, 0xc0);}
+                        send_data(CONFIG::control::bankCC, candidate, 0xc0);}
             tooltip {CC0 = msb, CC32 = lsb} xywh {235 80 53 18} down_box BORDER_BOX labelsize 12 align 132 textfont 1 textsize 12
             code0 {if (synth->getRuntime().midi_bank_C == 32) o->value(0); else if (synth->getRuntime().midi_bank_C == 0) o->value(1); else o->value(2);}
             code1 {oldBank = o->value();}
@@ -573,14 +573,14 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
           Fl_Check_Button progenable {
             label {Enable Program Change}
             callback {//
-                        send_data(configLevel::control::enableProgramChange, o->value(), 0xc0);}
+                        send_data(CONFIG::control::enableProgramChange, o->value(), 0xc0);}
             tooltip {MIDI program change enable/disable} xywh {234 110 18 18} down_box DOWN_BOX value 1 labelsize 12 align 4
             code0 {o->value(synth->getRuntime().EnableProgChange);}
           }
           Fl_Check_Button progpartenable {
             label {Enable Part On Program Change}
             callback {//
-                        send_data(configLevel::control::programChangeEnablesPart, o->value(), 0xc0);}
+                        send_data(CONFIG::control::programChangeEnablesPart, o->value(), 0xc0);}
             tooltip {Part enabled if MIDI program changed} xywh {234 130 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().enable_part_on_voice_load);}
           }
@@ -601,7 +601,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                             o->hide();
                             return;
                         }
-                        string name = testCC(candidate, configLevel::control::extendedProgramChangeCC);
+                        string name = testCC(candidate, CONFIG::control::extendedProgramChangeCC);
                         if (!name.empty())
                         {
                             fl_alert("In use for %s",name.c_str());
@@ -614,7 +614,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                         }
                         EPCvalue = candidate;
                         o->hide();
-                        send_data(configLevel::control::extendedProgramChangeCC, EPCvalue, 0xc0);}
+                        send_data(CONFIG::control::extendedProgramChangeCC, EPCvalue, 0xc0);}
             tooltip {Click to set} xywh {300 180 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
           }
           Fl_Check_Button Epcheck {
@@ -625,7 +625,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                             EPCspinner->value(110);
                             EPCspinner->deactivate();
                             Epend->hide();
-                            send_data(configLevel::control::extendedProgramChangeCC, 128, 0xc0);
+                            send_data(CONFIG::control::extendedProgramChangeCC, 128, 0xc0);
                         }
                         else
                         {
@@ -642,28 +642,28 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
           Fl_Check_Button enableNRPN {
             label {Enable Incoming NRPNs}
             callback {//
-                        send_data(configLevel::control::enableNRPNs, o->value(), 0xc0);}
+                        send_data(CONFIG::control::enableNRPNs, o->value(), 0xc0);}
             xywh {234 210 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().enable_NRPN);}
           }
           Fl_Check_Button ignoreReset {
             label {Ignore Reset all CCs}
             callback {//
-                        send_data(configLevel::control::ignoreResetAllCCs, o->value(), 0xc0);}
+                        send_data(CONFIG::control::ignoreResetAllCCs, o->value(), 0xc0);}
             xywh {234 230 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().ignoreResetCCs);}
           }
           Fl_Check_Button midiMon {
             label {Log Incoming Events}
             callback {//
-                        send_data(configLevel::control::logIncomingCCs, o->value(), 0xc0);}
+                        send_data(CONFIG::control::logIncomingCCs, o->value(), 0xc0);}
             xywh {234 250 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().monitorCCin);}
           }
           Fl_Check_Button midiLearned {
             label {Show Learn Editor}
             callback {//
-                        send_data(configLevel::control::showLearnEditor, o->value(), 0xc0);}
+                        send_data(CONFIG::control::showLearnEditor, o->value(), 0xc0);}
             tooltip {Open the MIDI learn window for editing when a new CC has been learned} xywh {234 270 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showLearnedCC);}
           }
@@ -678,7 +678,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
       Fl_Button {} {
         label {Save and Close}
         callback {//
-                    send_data(configLevel::control::saveCurrentConfig, o->value(), 0xf0, topLevel::route::lowPriority, miscMsgPush("DUMMY"));
+                    send_data(CONFIG::control::saveCurrentConfig, o->value(), 0xf0, TOPLEVEL::route::lowPriority, miscMsgPush("DUMMY"));
                     configwindow->do_callback();}
         xywh {155 305 105 20} box THIN_UP_BOX labelsize 12
       }
@@ -768,7 +768,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             string name;
             switch (control)
             {
-                case configLevel::control::oscillatorSize:
+                case CONFIG::control::oscillatorSize:
                     tmp = 0;
                     while (value_int > 256)
                     {
@@ -778,7 +778,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                     osc_size->value(tmp);
                     break;
                 case 1:
-                    tmp = configLevel::control::bufferSize;
+                    tmp = CONFIG::control::bufferSize;
                     while (value_int > 16)
                     {
                         value_int = value_int >> 1;
@@ -786,84 +786,84 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                     }
                     buff_size->value(tmp);
                     break;
-                case configLevel::control::padSynthInterpolation:
+                case CONFIG::control::padSynthInterpolation:
                     pad_interpol->value(value_int);
                     break;
-                case configLevel::control::virtualKeyboardLayout:
+                case CONFIG::control::virtualKeyboardLayout:
                     v_keyboard->value(value_int);
                     break;
-                case configLevel::control::XMLcompressionLevel:
+                case CONFIG::control::XMLcompressionLevel:
                     compression->value(value_int);
                     break;
-                case configLevel::control::reportsDestination:
+                case CONFIG::control::reportsDestination:
                     reports->value(value_bool);
                     synth->getGuiMaster()->setLogging(value_bool);
                     break;
-                case configLevel::control::savedInstrumentFormat:
+                case CONFIG::control::savedInstrumentFormat:
                     instrument->value(value_int - 1);
                     break;
 
-                case configLevel::control::defaultStateStart:
+                case CONFIG::control::defaultStateStart:
                     setDefaultState->value(value_bool);
                     break;
-                case configLevel::control::hideNonFatalErrors:
+                case CONFIG::control::hideNonFatalErrors:
                     nonFatal->value(value_bool);
                     break;
-                case configLevel::control::showSplash:
+                case CONFIG::control::showSplash:
                     showSplash->value(value_bool);
                     break;
-                case configLevel::control::logInstrumentLoadTimes:
+                case CONFIG::control::logInstrumentLoadTimes:
                     logTimes->value(value_bool);
                     break;
-                case configLevel::control::logXMLheaders:
+                case CONFIG::control::logXMLheaders:
                     logXML->value(value_bool);
                     break;
-                case configLevel::control::saveAllXMLdata:
+                case CONFIG::control::saveAllXMLdata:
                     saveAllXML->value(value_bool);
                     break;
-                case configLevel::control::enableGUI:
+                case CONFIG::control::enableGUI:
                     enableGUI->value(value_bool);
                     break;
-                case configLevel::control::enableCLI:
+                case CONFIG::control::enableCLI:
                     enableCLI->value(value_bool);
                     break;
-                case configLevel::control::enableAutoInstance:
+                case CONFIG::control::enableAutoInstance:
                     enableAuto->value(value_bool);
                     break;
 
-                case configLevel::control::jackMidiSource:
+                case CONFIG::control::jackMidiSource:
                     jackSource->value(miscMsgPop(par2).c_str());
                     break;
-                case configLevel::control::jackPreferredMidi:
+                case CONFIG::control::jackPreferredMidi:
                     jackMidi->value(value_bool);
                     alsaMidi->value(!value_bool);
                     break;
-                case configLevel::control::jackServer:
+                case CONFIG::control::jackServer:
                     jackServer->value(miscMsgPop(par2).c_str());
                     break;
-                case configLevel::control::jackPreferredAudio:
+                case CONFIG::control::jackPreferredAudio:
                     jackAudio->value(value_bool);
                     alsaAudio->value(!value_bool);
                     break;
-                case configLevel::control::jackAutoConnectAudio:
+                case CONFIG::control::jackAutoConnectAudio:
                     connectJackAudio->value(value_bool);
                     break;
 
-                case configLevel::control::alsaMidiSource:
+                case CONFIG::control::alsaMidiSource:
                     alsaSource->value(miscMsgPop(par2).c_str());
                     break;
-                case configLevel::control::alsaPreferredMidi:
+                case CONFIG::control::alsaPreferredMidi:
                     alsaMidi->value(value_bool);
                     jackMidi->value(!value_bool);
                     break;
-                case configLevel::control::alsaAudioDevice:
+                case CONFIG::control::alsaAudioDevice:
                     alsaDevice->value(miscMsgPop(par2).c_str());
                     break;
-                case configLevel::control::alsaPreferredAudio:
+                case CONFIG::control::alsaPreferredAudio:
                     alsaAudio->value(value_bool);
                     jackAudio->value(!value_bool);
                     break;
-                case configLevel::control::alsaSampleRate:
+                case CONFIG::control::alsaSampleRate:
                     alsaRate->check_none();
                     switch(value_int)
                     {
@@ -882,9 +882,9 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                     }
                     break;
 
-                //case configLevel::control::enableBankRootChange:
+                //case CONFIG::control::enableBankRootChange:
                     //break;
-                case configLevel::control::bankRootCC:
+                case CONFIG::control::bankRootCC:
                     if (value_int >= 119)
                     {
                         BankRoot->value(0);
@@ -899,7 +899,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                     }
                     break;
 
-                case configLevel::control::bankCC:
+                case CONFIG::control::bankCC:
                     switch (value_int)
                     {
                         case 0:
@@ -913,15 +913,15 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                             break;
                     }
                     break;
-                case configLevel::control::enableProgramChange:
+                case CONFIG::control::enableProgramChange:
                     progenable->value(value_bool);
                     break;
-                case configLevel::control::programChangeEnablesPart:
+                case CONFIG::control::programChangeEnablesPart:
                     progpartenable->value(value_bool);
                     break;
-                //case configLevel::control::enableExtendedProgramChange:
+                //case CONFIG::control::enableExtendedProgramChange:
                     //break;
-                case configLevel::control::extendedProgramChangeCC:
+                case CONFIG::control::extendedProgramChangeCC:
                     if (value_int > 119)
                     {
                         EPCspinner->value(110);
@@ -935,20 +935,20 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                         Epcheck->value(1);
                     }
                     break;
-                case configLevel::control::ignoreResetAllCCs:
+                case CONFIG::control::ignoreResetAllCCs:
                     ignoreReset->value(value_bool);
                     break;
-                case configLevel::control::logIncomingCCs:
+                case CONFIG::control::logIncomingCCs:
                     midiMon->value(value_bool);
                     break;
-                case configLevel::control::showLearnEditor:
+                case CONFIG::control::showLearnEditor:
                     midiLearned->value(value_bool);
                     break;
-                case configLevel::control::enableNRPNs:
+                case CONFIG::control::enableNRPNs:
                     enableNRPN->value(value_bool);
                     break;
 
-                case configLevel::control::saveCurrentConfig:
+                case CONFIG::control::saveCurrentConfig:
                     name = miscMsgPop(par2);
                     if (wasFromHere && name.find("FAILED") == 1)
                         fl_alert("%s",name.c_str());
