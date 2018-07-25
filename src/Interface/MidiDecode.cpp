@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified March 2018
+    Modified July 2018
 */
 
 #include <iostream>
@@ -228,7 +228,7 @@ void MidiDecode::sendMidiCC(bool inSync, unsigned char chan, int type, short int
     putData.data.value = par;
     putData.data.type = 0xc8;
     putData.data.control = 2;
-    putData.data.part = 0xd9;
+    putData.data.part = TOPLEVEL::section::midiIn;
     putData.data.kit = chan;
     putData.data.engine = type;
     synth->midilearn.writeMidi(&putData, sizeof(putData), false);
@@ -629,7 +629,7 @@ void MidiDecode::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_pla
     putData.data.value = 0xff;
     putData.data.type = 0xd0;
     putData.data.control = 8;
-    putData.data.part = 0xd9;
+    putData.data.part = TOPLEVEL::section::midiIn;
     putData.data.kit = 0;
     putData.data.parameter = 0xc0;
 
@@ -658,7 +658,7 @@ void MidiDecode::setMidiProgram(unsigned char ch, int prg, bool in_place)
     putData.data.value = prg;
     putData.data.type = 0xd0;
     putData.data.control = 8;
-    putData.data.part = 0xd9;
+    putData.data.part = TOPLEVEL::section::midiIn;
     putData.data.parameter = 0xc0;
 
     /*

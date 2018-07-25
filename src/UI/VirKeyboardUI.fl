@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of origional ZynAddSubFX code
 
-Modified March 2018
+Modified July 2018
 } {in_source in_header
 }
 
@@ -160,7 +160,7 @@ class VirKeys {: {public Fl_Box}
   }
   Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff)} {} {
     code {//
-    collect_data(synth, value, (Fl::event_button() | type), control, 217, kititem, engine);} {}
+    collect_data(synth, value, (Fl::event_button() | type), control, TOPLEVEL::section::midiIn, kititem, engine);} {}
   }
   Function {handle(int event)} {return_type int
   } {
@@ -561,7 +561,7 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
   }
   Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff)} {} {
     code {//
-    collect_data(synth, value, (Fl::event_button() | type), control, 217, kititem, engine);} {}
+    collect_data(synth, value, (Fl::event_button() | type), control, TOPLEVEL::section::midiIn, kititem, engine);} {}
   }
   Function {Show()} {} {
     code {//

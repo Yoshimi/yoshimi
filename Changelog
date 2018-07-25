@@ -1,5 +1,8 @@
 yoshimi 1.5.8 M
 
+2018-7-25 Will
+* Converted MIDIlearn controls to enums.
+
 2018-7-24 Will
 * Revised enum namespace terminology.
   No intrinsic code changes.

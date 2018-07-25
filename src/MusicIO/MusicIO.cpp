@@ -100,7 +100,7 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
             putData.data.value = float(par2);
             putData.data.type = 8;
             putData.data.control = (event == 0x80);
-            putData.data.part = 0xd9;
+            putData.data.part = TOPLEVEL::section::midiIn;
             putData.data.kit = channel;
             putData.data.engine = par1;
             synth->midilearn.writeMidi(&putData, putSize, false);

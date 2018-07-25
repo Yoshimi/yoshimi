@@ -217,6 +217,32 @@ namespace VECTOR // usage VECTOR::control::name
     };
 }
 
+namespace MIDILEARN // usage MIDILEARN::control::block
+{
+    enum control : unsigned char {
+        block = 0,
+        limit,
+        mute,
+        nrpn, // auto
+        sevenBit,
+        minimum,
+        maximum,
+        ignoreMove,
+        deleteLine,
+        nrpnDetected,
+        CCorChannel = 16,
+        findSize = 20, // not used yet
+        sendLearnMessage, // currently GUI only
+        sendRefreshRequest, // currently GUI only
+        reportActivity = 24,
+        clearAll = 96,
+        loadList = 241,
+        loadFromRecent,
+        saveList = 245,
+        cancelLearn = 255
+    };
+}
+
 namespace SCALES // usage SCALES::control::Afrequency
 {
     enum control : unsigned char {
