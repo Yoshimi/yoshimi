@@ -1,5 +1,8 @@
 yoshimi 1.5.8 M
 
+2018-7-26 Will
+* Converted envelope controls to enums.
+
 2018-7-25 Will
 * Converted MIDIlearn controls to enums.
 

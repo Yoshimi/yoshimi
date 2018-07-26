@@ -3269,13 +3269,13 @@ string InterChange::resolveLFO(CommandBlock *getData)
 
     switch (insertParam)
     {
-        case LFOINSERT::type::amplitude:
+        case TOPLEVEL::insertType::amplitude:
             lfo = " Amp";
             break;
-        case LFOINSERT::type::frequency:
+        case TOPLEVEL::insertType::frequency:
             lfo = " Freq";
             break;
-        case LFOINSERT::type::filter:
+        case TOPLEVEL::insertType::filter:
             lfo = " Filt";
             break;
     }
@@ -3474,16 +3474,16 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
 
     switch(insertParam)
     {
-        case 0:
+        case TOPLEVEL::insertType::amplitude:
             env = " Amp";
             break;
-        case 1:
+        case TOPLEVEL::insertType::frequency:
             env = " Freq";
             break;
-        case 2:
+        case TOPLEVEL::insertType::filter:
             env = " Filt";
             break;
-        case 3:
+        case TOPLEVEL::insertType::bandwidth:
             env = " B.Width";
             break;
     }
@@ -3511,50 +3511,50 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
     string contstr;
     switch (control)
     {
-        case 0:
+        case ENVELOPEINSERT::control::attackLevel:
             contstr = "A val";
             break;
-        case 1:
+        case ENVELOPEINSERT::control::attackTime:
             contstr = "A dt";
             break;
-        case 2:
+        case ENVELOPEINSERT::control::decayLevel:
             contstr = "D val";
             break;
-        case 3:
+        case ENVELOPEINSERT::control::decayTime:
             contstr = "D dt";
             break;
-        case 4:
+        case ENVELOPEINSERT::control::sustainLevel:
             contstr = "S val";
             break;
-        case 5:
+        case ENVELOPEINSERT::control::releaseTime:
             contstr = "R dt";
             break;
-        case 6:
+        case ENVELOPEINSERT::control::releaseLevel:
             contstr = "R val";
             break;
-        case 7:
+        case ENVELOPEINSERT::control::stretch:
             contstr = "Stretch";
             break;
 
-        case 16:
+        case ENVELOPEINSERT::control::forcedRelease:
             contstr = "frcR";
             break;
-        case 17:
+        case ENVELOPEINSERT::control::linearEnvelope:
             contstr = "L";
             break;
 
-        case 24:
+        case ENVELOPEINSERT::control::edit:
             contstr = "Edit";
             break;
 
-        case 32:
+        case ENVELOPEINSERT::control::enableFreeMode:
             contstr = "Freemode";
             break;
-        case 34:
+        case ENVELOPEINSERT::control::points:
             contstr = "Points";
             contstr += to_string((int) par2);
             break;
-        case 35:
+        case ENVELOPEINSERT::control::sustainPoint:
             contstr = "Sust";
             break;
 
@@ -7211,13 +7211,13 @@ void InterChange::commandLFO(CommandBlock *getData)
     {
        switch (insertParam)
         {
-           case LFOINSERT::type::amplitude:
+           case TOPLEVEL::insertType::amplitude:
                 lfoReadWrite(getData, part->kit[kititem].adpars->GlobalPar.AmpLfo);
                 break;
-            case LFOINSERT::type::frequency:
+            case TOPLEVEL::insertType::frequency:
                 lfoReadWrite(getData, part->kit[kititem].adpars->GlobalPar.FreqLfo);
                 break;
-            case LFOINSERT::type::filter:
+            case TOPLEVEL::insertType::filter:
                 lfoReadWrite(getData, part->kit[kititem].adpars->GlobalPar.FilterLfo);
                 break;
         }
@@ -7226,13 +7226,13 @@ void InterChange::commandLFO(CommandBlock *getData)
     {
         switch (insertParam)
         {
-            case LFOINSERT::type::amplitude:
+            case TOPLEVEL::insertType::amplitude:
                 lfoReadWrite(getData, part->kit[kititem].padpars->AmpLfo);
                 break;
-            case LFOINSERT::type::frequency:
+            case TOPLEVEL::insertType::frequency:
                 lfoReadWrite(getData, part->kit[kititem].padpars->FreqLfo);
                 break;
-            case LFOINSERT::type::filter:
+            case TOPLEVEL::insertType::filter:
                 lfoReadWrite(getData, part->kit[kititem].padpars->FilterLfo);
                 break;
         }
@@ -7242,13 +7242,13 @@ void InterChange::commandLFO(CommandBlock *getData)
         int nvoice = engine - PART::engine::addVoice1;
         switch (insertParam)
         {
-            case LFOINSERT::type::amplitude:
+            case TOPLEVEL::insertType::amplitude:
                 lfoReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].AmpLfo);
                 break;
-            case LFOINSERT::type::frequency:
+            case TOPLEVEL::insertType::frequency:
                 lfoReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FreqLfo);
                 break;
-            case LFOINSERT::type::filter:
+            case TOPLEVEL::insertType::filter:
                 lfoReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FilterLfo);
                 break;
         }
@@ -7616,13 +7616,13 @@ void InterChange::commandEnvelope(CommandBlock *getData)
     {
         switch (insertParam)
         {
-            case 0:
+            case TOPLEVEL::insertType::amplitude:
                 envelopeReadWrite(getData, part->kit[kititem].adpars->GlobalPar.AmpEnvelope);
                 break;
-            case 1:
+            case TOPLEVEL::insertType::frequency:
                 envelopeReadWrite(getData, part->kit[kititem].adpars->GlobalPar.FreqEnvelope);
                 break;
-            case 2:
+            case TOPLEVEL::insertType::filter:
                 envelopeReadWrite(getData, part->kit[kititem].adpars->GlobalPar.FilterEnvelope);
                 break;
         }
@@ -7631,16 +7631,16 @@ void InterChange::commandEnvelope(CommandBlock *getData)
     {
         switch (insertParam)
         {
-            case 0:
+            case TOPLEVEL::insertType::amplitude:
                 envelopeReadWrite(getData, part->kit[kititem].subpars->AmpEnvelope);
                 break;
-            case 1:
+            case TOPLEVEL::insertType::frequency:
                 envelopeReadWrite(getData, part->kit[kititem].subpars->FreqEnvelope);
                 break;
-            case 2:
+            case TOPLEVEL::insertType::filter:
                 envelopeReadWrite(getData, part->kit[kititem].subpars->GlobalFilterEnvelope);
                 break;
-            case 3:
+            case TOPLEVEL::insertType::bandwidth:
                 envelopeReadWrite(getData, part->kit[kititem].subpars->BandWidthEnvelope);
                 break;
         }
@@ -7649,50 +7649,46 @@ void InterChange::commandEnvelope(CommandBlock *getData)
     {
         switch (insertParam)
         {
-            case 0:
+            case TOPLEVEL::insertType::amplitude:
                 envelopeReadWrite(getData, part->kit[kititem].padpars->AmpEnvelope);
                 break;
-            case 1:
+            case TOPLEVEL::insertType::frequency:
                 envelopeReadWrite(getData, part->kit[kititem].padpars->FreqEnvelope);
                 break;
-            case 2:
+            case TOPLEVEL::insertType::filter:
                 envelopeReadWrite(getData, part->kit[kititem].padpars->FilterEnvelope);
                 break;
         }
     }
+
+    else if (engine >= PART::engine::addMod1)
+    {
+        int nvoice = engine - PART::engine::addMod1;
+        switch (insertParam)
+        {
+            case TOPLEVEL::insertType::amplitude:
+                envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FMAmpEnvelope);
+                break;
+            case TOPLEVEL::insertType::frequency:
+                envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FMFreqEnvelope);
+                break;
+        }
+    }
+
     else if (engine >= PART::engine::addVoice1)
     {
-        int nvoice;
-        if (engine >= PART::engine::addMod1)
-            nvoice = engine - PART::engine::addMod1;
-        else
-            nvoice = engine - PART::engine::addVoice1;
-        if (engine >= PART::engine::addMod1)
+        int nvoice = engine - PART::engine::addVoice1;
+        switch (insertParam)
         {
-            switch (insertParam)
-            {
-                case 0:
-                    envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FMAmpEnvelope);
-                    break;
-                case 1:
-                    envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FMFreqEnvelope);
-                    break;
-            }
-        }
-        else
-        {
-            switch (insertParam)
-            {
-                case 0:
-                    envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].AmpEnvelope);
-                    break;
-                case 1:
-                    envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FreqEnvelope);
-                    break;
-                case 2:
-                    envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FilterEnvelope);
-                    break;
-            }
+            case TOPLEVEL::insertType::amplitude:
+                envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].AmpEnvelope);
+                break;
+            case TOPLEVEL::insertType::frequency:
+                envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FreqEnvelope);
+                break;
+            case TOPLEVEL::insertType::filter:
+                envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FilterEnvelope);
+                break;
         }
     }
 }

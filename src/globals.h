@@ -135,7 +135,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         LFOgroup = 0,
         filterGroup,
         envelopeGroup,
-        envelopePoints,
+        envelopePoints, // this should be split in two
         envelopePointChange,
         oscillatorGroup, // 5
         harmonicAmplitude,
@@ -144,6 +144,13 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         resonanceGraphInsert,
         systemEffectSend = 16,
         kitGroup = 32
+    };
+
+    enum insertType : unsigned char {
+        amplitude = 0,
+        frequency,
+        filter,
+        bandwidth
     };
 }
 
@@ -668,12 +675,6 @@ namespace LFOINSERT // usage LFOINSERT::control::speed
         frequencyRandomness,
         stretch
     };
-
-    enum type : unsigned char {
-        amplitude = 0,
-        frequency,
-        filter
-    };
 }
 
 namespace FILTERINSERT // usage FILTERINSERT::control::centerFrequency
@@ -708,10 +709,24 @@ namespace FILTERINSERT // usage FILTERINSERT::control::centerFrequency
     };
 }
 
-namespace ENVELOPEINSERT // usage ENVELOPEINSERT::control::centerFrequency
+namespace ENVELOPEINSERT // usage ENVELOPEINSERT::control::attackLevel
 {
     enum control : unsigned char {
-        attackLevel = 0
+        attackLevel = 0,
+        attackTime,
+        decayLevel,
+        decayTime,
+        sustainLevel,
+        releaseTime,
+        releaseLevel,
+        stretch,
+        forcedRelease = 16,
+        linearEnvelope,
+        edit = 24, // local to GUI
+
+        enableFreeMode = 32,
+        points = 34, // local to GUI
+        sustainPoint,
     };
 }
 
