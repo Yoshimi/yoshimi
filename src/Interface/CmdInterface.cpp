@@ -789,7 +789,7 @@ int CmdInterface::effects()
             partno = TOPLEVEL::section::systemEffects;
             dest = "system";
         }
-        sendDirect(nFXpreset, 64, 16, partno, 0x80 + nFXtype, nFX);
+        sendDirect(nFXpreset, 64, 16, partno, nFXtype + EFFECT::type::none, nFX); // TODO shouldn't need this offset
         Runtime.Log(dest + " efx preset set to number " + asString(value + 1));
     }
     return reply;

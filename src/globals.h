@@ -726,9 +726,25 @@ namespace ENVELOPEINSERT // usage ENVELOPEINSERT::control::attackLevel
 
         enableFreeMode = 32,
         points = 34, // local to GUI
-        sustainPoint,
+        sustainPoint
     };
 }
+
+namespace EFFECT // usage EFFECT::type::none
+{
+    enum type : unsigned char {
+        none = 128, // must be higher than normal kits
+        reverb,
+        echo,
+        chorus,
+        phaser,
+        alienWah,
+        distortion,
+        eq,
+        dynFilter
+    };
+}
+
 
 union CommandBlock{
     struct{

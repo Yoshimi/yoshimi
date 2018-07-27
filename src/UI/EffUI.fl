@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-Modified April 2018} {in_source in_header
+Modified July 2018} {in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -1906,22 +1906,22 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
   }
   Function {send_data(int control, float value, int group, int type)} {} {
     code {//
-    collect_data(synth, value, (Fl::event_button() | type), control, npart, group | 0x80, neff);} {}
+    collect_data(synth, value, (Fl::event_button() | type), control, npart, group + EFFECT::type::none, neff);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
     unsigned char control = getData->data.control;
-    unsigned char efftype = getData->data.kit & 0x7f;
+    unsigned char efftype = getData->data.kit;
     bool isdynfilter = (getData->data.engine == 0x88);
 
     //cout << "cont " << (int)control << "  type " << (int)efftype << "  num " << (int)effnum << endl;
     switch(efftype)
     {
-        case 0: // no effect
+        case EFFECT::type::none:
             break;
 
-        case 1: // reverb
+        case EFFECT::type::reverb:
             switch (control)
             {
                 case 0:
@@ -1971,7 +1971,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
             }
             break;
 
-        case 2: // echo
+        case EFFECT::type::echo:
             switch (control)
             {
                 case 0:
@@ -2001,7 +2001,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
             }
             break;
 
-        case 3: // chorus
+        case EFFECT::type::chorus:
             switch (control)
             {
                 case 0:
@@ -2037,7 +2037,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
             }
             break;
 
-        case 4: // phaser
+        case EFFECT::type::phaser:
             switch (control)
             {
                 case 0:
@@ -2076,7 +2076,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
             }
             break;
 
-        case 5: // alien wah
+        case EFFECT::type::alienWah:
             switch (control)
             {
                 case 0:
@@ -2112,7 +2112,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
             }
             break;
 
-        case 6: // distortion
+        case EFFECT::type::distortion:
             switch (control)
             {
                 case 0:
@@ -2142,7 +2142,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
             }
             break;
 
-        case 7: // EQ
+        case EFFECT::type::eq:
             //synth->getRuntime().Log("EQ " + to_string(int(value)) + "  " + to_string(int(control)));
             if(control == 0)
             {
@@ -2188,7 +2188,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
             effeqwindow->redraw();
             break;
 
-        case 8:
+        case EFFECT::type::dynFilter:
             if(isdynfilter)
             {
                 //synth->getRuntime().Log("DyneFilter" );

@@ -322,7 +322,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         {
             switch(control)
             {
-                case 8:
+                case VECTOR::control::name:
                     if (write)
                     {
                         synth->getRuntime().vectordata.Name[insert] = text;
@@ -619,8 +619,10 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     value = miscMsgPush(text);
                     break;
                 case MAIN::control::masterReset:
+                    synth->resetAll(0);
+                    break;
                 case MAIN::control::masterResetAndMlearn:
-                    synth->resetAll(control & 1);
+                    synth->resetAll(1);
                     break;
                 case MAIN::control::openManualPDF: // display user guide
                 {
@@ -1180,7 +1182,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     else if (npart == TOPLEVEL::section::systemEffects || npart == TOPLEVEL::section::insertEffects)
         commandName = resolveEffects(getData);
 
-    else if ((kititem >= 0x80 && kititem != 0xff) || (control >= PART::control::effectNum && control <= PART::control::effectBypass && kititem == 0xff))
+    else if ((kititem >= EFFECT::type::none && kititem <= EFFECT::type::dynFilter) || (control >= PART::control::effectNum && control <= PART::control::effectBypass && kititem == 0xff))
         commandName = resolveEffects(getData);
 
     else if (npart >= NUM_MIDI_PARTS)
@@ -1523,7 +1525,7 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
 
     }
 
-    if (value < 1 && control >= 32 && control <= 49)
+    if (value < 1 && control >= SCALES::control::tuning && control <= SCALES::control::importKbm)
     {
         switch (value)
         {
@@ -1546,7 +1548,7 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
                 contstr += "Short or corrupted file";
                 break;
             case -6:
-                if ((control & 1) == 0)
+                if (control == SCALES::control::tuning || control == SCALES::control::importScl)
                     contstr += "Invalid octave size";
                 else
                     contstr += "Invalid keymap size";
@@ -3586,7 +3588,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
     else
         name = "Part " + to_string(npart + 1);
 
-    if (kititem == 0x88 && getData->data.insert < 0xff)
+    if (kititem == EFFECT::type::dynFilter && getData->data.insert < 0xff)
     {
         if (npart == TOPLEVEL::section::systemEffects)
             name = "System";
@@ -3625,14 +3627,14 @@ string InterChange::resolveEffects(CommandBlock *getData)
     {
         string contstr;
         string second = "";
-        if (npart == 0xf1 && insert == 16)
+        if (npart == TOPLEVEL::section::systemEffects && insert == 16)
         {
                 name = "System ";
                 contstr = "from Effect " + to_string(effnum + 1);
                 second = " to Effect " + to_string(control + 1);
                 return (name + contstr + second);
         }
-        if (npart == 0xf2 && control == 2)
+        if (npart == TOPLEVEL::section::insertEffects && control == 2)
         {
             contstr = " To ";
             if (value == -2)
@@ -3658,42 +3660,42 @@ string InterChange::resolveEffects(CommandBlock *getData)
     if ((npart < NUM_MIDI_PARTS && control == 65) || (npart > TOPLEVEL::section::main && kititem == 0xff && control == 1))
     {
         name += " set to";
-        kititem = value;
+        kititem = value | EFFECT::type::none; // TODO fix this!
         showValue = false;
     }
     else
         contstr = " Control " + to_string(control + 1);
 
-    switch (kititem & 0x7f)
+    switch (kititem)
     {
-        case 0:
+        case EFFECT::type::none:
             effname = " None";
             contstr = " ";
             break;
-        case 1:
+        case EFFECT::type::reverb:
             effname = " Reverb";
             break;
-        case 2:
+        case EFFECT::type::echo:
             effname = " Echo";
             break;
-        case 3:
+        case EFFECT::type::chorus:
             effname = " Chorus";
             break;
-        case 4:
+        case EFFECT::type::phaser:
             effname = " Phaser";
             break;
-        case 5:
+        case EFFECT::type::alienWah:
             effname = " AlienWah";
             break;
-        case 6:
+        case EFFECT::type::distortion:
             effname = " Distortion";
             break;
-        case 7:
+        case EFFECT::type::eq:
             effname = " EQ";
             if (control > 1)
                 contstr = " (Band " + to_string(int(parameter)) + ") Control " + to_string(control);
             break;
-        case 8:
+        case EFFECT::type::dynFilter:
             effname = " DynFilter";
             break;
 
@@ -3702,7 +3704,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
             contstr = " Unrecognised";
     }
 
-    if (kititem != 0x87 && control == 16)
+    if (kititem != EFFECT::type::eq && control == 16)
     {
         contstr = " Preset " + to_string (lrint(value) + 1);
         showValue = false;
@@ -7967,7 +7969,7 @@ void InterChange::commandEffects(CommandBlock *getData)
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit & 0x7f ;
+    unsigned char kititem = getData->data.kit;// & 0x7f ;
     unsigned char effnum = getData->data.engine;
 
     bool write = (type & 0x40) > 0;
@@ -7985,9 +7987,9 @@ void InterChange::commandEffects(CommandBlock *getData)
         eff = synth->part[npart]->partefx[effnum];
     else
         return; // invalid part number
-    if (kititem > 8)
+    if (kititem > EFFECT::type::dynFilter)
         return;
-    if (kititem == 8 && getData->data.insert < 0xff)
+    if (kititem == EFFECT::type::dynFilter && getData->data.insert < 0xff)
     {
         filterReadWrite(getData, eff->filterpars,NULL,NULL);
         return;
@@ -7995,7 +7997,7 @@ void InterChange::commandEffects(CommandBlock *getData)
 
     if (write)
     {
-        if (kititem == 7)
+        if (kititem == EFFECT::type::eq)
         /*
          * specific to EQ
          * Control 1 is not a saved parameter, but a band index.
@@ -8022,7 +8024,7 @@ void InterChange::commandEffects(CommandBlock *getData)
     }
     else
     {
-        if (kititem == 7 && control > 1) // specific to EQ
+        if (kititem == EFFECT::type::eq && control > 1) // specific to EQ
         {
             value = eff->geteffectpar(control + (eff->geteffectpar(1) * 5));
             getData->data.parameter = eff->geteffectpar(1);
@@ -8120,7 +8122,7 @@ float InterChange::returnLimits(CommandBlock *getData)
     float max;
     float def;
 
-    if (kititem >= 0x80 && kititem <= 0x88) // effects.
+    if (kititem >= EFFECT::type::none && kititem <= EFFECT::type::dynFilter)
     {
         LimitMgr limits;
         return limits.geteffectlimits(getData);
