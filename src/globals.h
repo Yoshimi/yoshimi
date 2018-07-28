@@ -119,6 +119,19 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         adjustAndLoopback = 192
     };
 
+    // bit-wise type and source share the same byte
+    // but will eventually be split up
+    enum type : unsigned char {
+        write = 64, // false = read
+        integer = 128 // false = float
+    };
+
+    enum source : unsigned char {
+        MIDI = 8,
+        CLI = 16,
+        GUI = 32
+    };
+
     enum control : unsigned char {
         errorMessage = 254 // FE
     };
@@ -141,7 +154,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         envelopePointChange,
         oscillatorGroup, // 5
         harmonicAmplitude,
-        harmonicPhaseBandwidth,
+        harmonicPhaseBandwidth, // this should also be split in two
         resonanceGroup,
         resonanceGraphInsert,
         systemEffectSend = 16,
@@ -264,7 +277,7 @@ namespace MIDILEARN // usage MIDILEARN::control::block
         ignoreMove,
         deleteLine,
         nrpnDetected,
-        CCorChannel = 16,
+        CCorChannel = 16, // should probably split these
         findSize = 20, // not used yet
         sendLearnMessage, // currently GUI only
         sendRefreshRequest, // currently GUI only

@@ -1124,7 +1124,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     part = synth->part[npart];
 
     // this is unique and placed here to avoid Xruns
-    if (npart == TOPLEVEL::section::scales && (control <= 32 || control >= 49))
+    if (npart == TOPLEVEL::section::scales && (control <= SCALES::control::tuning || control >= SCALES::control::retune))
         synth->setAllPartMaps();
 
     bool isCli = ((type & 0x30) == 0x10); // elminate Gui redraw
@@ -1435,9 +1435,9 @@ string InterChange::resolveVector(CommandBlock *getData)
     string name = "Vector Chan " + to_string(chan + 1) + " ";
     if (control == 127)
         name += " all ";
-    else if (control >= 32)
+    else if (control >= VECTOR::control::Ycontroller)
         name += "Y ";
-    else if(control >= 16)
+    else if(control >= VECTOR::control::Xcontroller)
         name += "X ";
 
     return (name + contstr);
@@ -1526,7 +1526,7 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
     }
 
     if (value < 1 && control >= SCALES::control::tuning && control <= SCALES::control::importKbm)
-    {
+    { // errors :@(
         switch (value)
         {
             case 0:

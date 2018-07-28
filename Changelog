@@ -7,6 +7,8 @@ yoshimi 1.5.8 M
   e.g. NO_MSG, UNUSED, NO_ACTION
 * Converted bank controls to enums.
 * More missing conversions :(
+* Started identifying types and sources.
+* Still more missing conversions!
 
 2018-7-27 Will
 * Converted effect type controls to enums.

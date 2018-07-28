@@ -1,0 +1,9 @@
+Up to now we've had huge blocks of 'magic' numbers in decision trees. Although not immediately obvious these followed a fairly logical pattern, with gaps in the sequences to allow for insertions while the whole system was being developed. Although there are a few entries still missing, the overall structure is now substantially complete.
+
+Therefore (as was always intended) in the current 'master' the vast majority of these numbers have now been replaced by meaningful identifiers, and the last few stragglers will be done eventually.
+
+The intention was then to collapse all the gaps to give more efficient switch statements. However in the intervening time several CLI users have been using the direct access method to reach controls that are not yet available formally. In view of this, I'll be leaving the actual values as they are until all of them are properly addressable.
+
+There is now a (self-descriptive) globals.h file where all these definitions are made (along with all the '#defines' that were previously in CMakeLists.txt
+
+The use of namespaces combined with typed enumerators not only gives clear compartmentalised  identifiers, but also gives isolation between sections, protecting against name clashes. It is also still compatible with integers and unsigned chars without needing typecasting. This is important, as all these are passed through ring buffers using the central CommandBlock structure - which is now also defined here.
