@@ -5,6 +5,8 @@ yoshimi 1.5.8 M
   Also corrected previous date!
 * More identification of anonymous 255s.
   e.g. NO_MSG, UNUSED, NO_ACTION
+* Converted bank controls to enums.
+* More missing conversions :(
 
 2018-7-27 Will
 * Converted effect type controls to enums.

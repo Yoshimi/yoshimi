@@ -704,7 +704,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         {
             switch (control)
             {
-                case 4: // instrument swap select first
+                case BANK::control::selectFirstInstrumentToSwap:
                 {
                     if(kititem == UNUSED)
                     {
@@ -722,7 +722,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     swapRoot1 = engine;
                     break;
                 }
-                case 5: // instrument swap select second and complete
+                case BANK::control::selectSecondInstumentAndSwap:
                 {
                     if(kititem == UNUSED)
                     {
@@ -750,7 +750,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     break;
                 }
 
-                case 20: // bank swap select first
+                case BANK::control::selectFirstBankToSwap:
                     if(engine == UNUSED)
                     {
                         engine = synth->getBankRef().getCurrentRootID();
@@ -759,7 +759,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     swapBank1 = kititem;
                     swapRoot1 = engine;
                     break;
-                case 21: // banks swap select second and complete
+                case BANK::control::selectSecondBankAndSwap:
                     if(engine == UNUSED)
                     {
                         engine = synth->getBankRef().getCurrentRootID();
@@ -1825,19 +1825,19 @@ string InterChange::resolveBank(CommandBlock *getData)
     showValue = false;
     switch(control)
     {
-        case 4:
+        case BANK::control::selectFirstInstrumentToSwap:
             contstr = "Set Instrument ID " + to_string(insert + 1) + "  Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine) + " for swap";
             break;
-        case 5:
+        case BANK::control::selectSecondInstumentAndSwap:
             if (name == "")
                 name = "ped with Instrument ID " + to_string(insert + 1) + "  Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine);
             contstr = "Swap" + name;
             break;
 
-        case 20:
+        case BANK::control::selectFirstBankToSwap:
             contstr = "Set Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine) + " for swap";
             break;
-        case 21:
+        case BANK::control::selectSecondBankAndSwap:
             if (name == "")
                 name = "ped with Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine);
             contstr = "Swap" + name;
