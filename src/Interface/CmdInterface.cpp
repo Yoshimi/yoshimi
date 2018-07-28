@@ -634,17 +634,17 @@ int CmdInterface::effects()
             if (bitTest(level, part_lev))
             {
                 nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
-                sendDirect(nFXtype, 64, 65, npart, 0xff, nFX);
+                sendDirect(nFXtype, 64, 65, npart, UNUSED, nFX);
             }
             else if (bitTest(level, ins_fx))
             {
                 nFXtype = synth->insefx[nFX]->geteffect();
-                sendDirect(nFXtype, 64, 1, TOPLEVEL::section::insertEffects, 0xff, nFX);
+                sendDirect(nFXtype, 64, 1, TOPLEVEL::section::insertEffects, UNUSED, nFX);
             }
             else
             {
                 nFXtype = synth->sysefx[nFX]->geteffect();
-                sendDirect(nFXtype, 64, 1, TOPLEVEL::section::systemEffects, 0xff, nFX);
+                sendDirect(nFXtype, 64, 1, TOPLEVEL::section::systemEffects, UNUSED, nFX);
             }
         }
         if (point[0] == 0)
@@ -678,11 +678,11 @@ int CmdInterface::effects()
         Runtime.Log("efx type set to " + fx_list[nFXtype]);
         //Runtime.Log("Presets -" + fx_presets[nFXtype].substr(fx_presets[nFXtype].find(',') + 1));
         if (bitTest(level, part_lev))
-            sendDirect(nFXtype, 64, 65, npart, 0xff, nFX);
+            sendDirect(nFXtype, 64, 65, npart, UNUSED, nFX);
         else if (bitTest(level, ins_fx))
-            sendDirect(nFXtype, 64, 1, TOPLEVEL::section::insertEffects, 0xff, nFX);
+            sendDirect(nFXtype, 64, 1, TOPLEVEL::section::insertEffects, UNUSED, nFX);
         else
-            sendDirect(nFXtype, 64, 1, TOPLEVEL::section::systemEffects, 0xff, nFX);
+            sendDirect(nFXtype, 64, 1, TOPLEVEL::section::systemEffects, UNUSED, nFX);
         return done_msg;
     }
 
@@ -724,13 +724,13 @@ int CmdInterface::effects()
         int control;
         int partno;
         int engine = nFX;
-        int insert = 0xff;
+        int insert = UNUSED;
 
         if (bitTest(level, part_lev))
         {
             partno = npart;
             control = 40 + par;
-            engine = 0xff;
+            engine = UNUSED;
 
             dest = "part " + asString(npart + 1) + " efx sent to system "
                  + asString(par + 1) + " at " + asString(value);
@@ -752,7 +752,7 @@ int CmdInterface::effects()
             dest = "system efx " + asString(nFX + 1) + " sent to "
                  + asString(par + 1) + " at " + asString(value);
         }
-        sendDirect(value, 64, control, partno, 0xff, engine, insert);
+        sendDirect(value, 64, control, partno, UNUSED, engine, insert);
         Runtime.Log(dest);
         return done_msg;
     }
@@ -979,7 +979,7 @@ int CmdInterface::commandMlearn()
             Runtime.Log("Max CC value is 129");
             return done_msg;
         }
-        sendDirect(value, 0xff, 0x10, TOPLEVEL::section::midiLearn, tmp);
+        sendDirect(value, UNUSED, 0x10, TOPLEVEL::section::midiLearn, tmp);
         Runtime.Log("Lines may be re-ordered");
         reply = done_msg;
     }
@@ -988,7 +988,7 @@ int CmdInterface::commandMlearn()
         tmp = string2int(point) - 1;
         if (tmp < 0 || tmp > 16)
             tmp = 16;
-        sendDirect(value, 0xff, 0x10, TOPLEVEL::section::midiLearn, 0xff, tmp);
+        sendDirect(value, UNUSED, 0x10, TOPLEVEL::section::midiLearn, UNUSED, tmp);
         Runtime.Log("Lines may be re-ordered");
         reply = done_msg;
     }
@@ -997,7 +997,7 @@ int CmdInterface::commandMlearn()
         int percent = int((string2float(point)* 2.0f) + 0.5f);
         if (percent < 0 || percent > 200)
             return value_msg;
-        sendDirect(value, 0xff, 5, TOPLEVEL::section::midiLearn, 0xff, 0xff, percent);
+        sendDirect(value, UNUSED, 5, TOPLEVEL::section::midiLearn, UNUSED, UNUSED, percent);
         reply = done_msg;
     }
     else if (matchnMove(2, point, "maximum"))
@@ -1005,7 +1005,7 @@ int CmdInterface::commandMlearn()
         int percent = int((string2float(point)* 2.0f) + 0.5f);
         if (percent < 0 || percent > 200)
             return value_msg;
-        sendDirect(value, 0xff, 6, TOPLEVEL::section::midiLearn, 0xff, 0xff, 0xff, percent);
+        sendDirect(value, UNUSED, 6, TOPLEVEL::section::midiLearn, UNUSED, UNUSED, UNUSED, percent);
     }
     else if (matchnMove(2, point, "mute"))
     {
@@ -1077,7 +1077,7 @@ int CmdInterface::commandVector()
 
     if (matchWord(1, point, "off"))
     {
-        sendDirect(0, 64, VECTOR::control::erase, TOPLEVEL::section::vector, 0xff, 0xff, chan);
+        sendDirect(0, 64, VECTOR::control::erase, TOPLEVEL::section::vector, UNUSED, UNUSED, chan);
         axis = 0;
         bitClear(level, vect_lev);
         return done_msg;
@@ -1105,13 +1105,13 @@ int CmdInterface::commandVector()
         tmp = string2int(point);
         if (axis == 0)
         {
-            sendDirect(tmp, 192, VECTOR::control::Xcontroller, TOPLEVEL::section::vector, 0xff, 0xff, chan);
+            sendDirect(tmp, 192, VECTOR::control::Xcontroller, TOPLEVEL::section::vector, UNUSED, UNUSED, chan);
             bitSet(level, vect_lev);
             return done_msg;
         }
         if (Runtime.vectordata.Enabled[chan])
         {
-            sendDirect(tmp, 192, VECTOR::control::Ycontroller, TOPLEVEL::section::vector, 0xff, 0xff, chan);
+            sendDirect(tmp, 192, VECTOR::control::Ycontroller, TOPLEVEL::section::vector, UNUSED, UNUSED, chan);
             return done_msg;
         }
     }
@@ -1140,7 +1140,7 @@ int CmdInterface::commandVector()
             if (name <= "!")
                 return value_msg;
         }
-        sendDirect(0, type, VECTOR::control::name, TOPLEVEL::section::vector, 0xff, 0xff, chan, TOPLEVEL::route::lowPriority, miscMsgPush(name));
+        sendDirect(0, type, VECTOR::control::name, TOPLEVEL::section::vector, UNUSED, UNUSED, chan, TOPLEVEL::route::lowPriority, miscMsgPush(name));
         return done_msg;
     }
 
@@ -1157,7 +1157,7 @@ int CmdInterface::commandVector()
             enable = 1;
         else if (feat > 1 && matchnMove(1, point, "reverse"))
             enable = 2;
-        sendDirect(enable, 192, VECTOR::control::Xfeature0 + (axis * (VECTOR::control::Ycontroller - VECTOR::control::Xcontroller)) + feat , TOPLEVEL::section::vector, 0xff, 0xff, chan);
+        sendDirect(enable, 192, VECTOR::control::Xfeature0 + (axis * (VECTOR::control::Ycontroller - VECTOR::control::Xcontroller)) + feat , TOPLEVEL::section::vector, UNUSED, UNUSED, chan);
         return done_msg;
     }
 
@@ -1177,7 +1177,7 @@ int CmdInterface::commandVector()
         else
             return opp_msg;
         tmp = string2int(point);
-        sendDirect(tmp, 64, VECTOR::control::XleftInstrument + hand + (axis * (VECTOR::control::Ycontroller - VECTOR::control::Xcontroller)), TOPLEVEL::section::vector, 0xff, 0xff, chan);
+        sendDirect(tmp, 64, VECTOR::control::XleftInstrument + hand + (axis * (VECTOR::control::Ycontroller - VECTOR::control::Xcontroller)), TOPLEVEL::section::vector, UNUSED, UNUSED, chan);
         return done_msg;
     }
 
@@ -1216,9 +1216,9 @@ int CmdInterface::commandConfig()
     }
     float value = 0;
     unsigned char type;
-    unsigned char command = 0xff;
-    unsigned char par = 0xff;
-    unsigned char par2 = 0xff;
+    unsigned char command = UNUSED;
+    unsigned char par = UNUSED;
+    unsigned char par2 = UNUSED;
     if (isRead)
         type = 0x80;
     else
@@ -1489,7 +1489,7 @@ int CmdInterface::commandConfig()
     else
         return todo_msg; // may be picked up later
 
-    sendDirect(value, type, command, TOPLEVEL::section::config, 0xff, 0xff, 0xff, par, par2);
+    sendDirect(value, type, command, TOPLEVEL::section::config, UNUSED, UNUSED, UNUSED, par, par2);
     return done_msg;
 }
 
@@ -1502,9 +1502,9 @@ int CmdInterface::commandScale()
     int reply = done_msg;
     float value = 0;
     unsigned char type;
-    unsigned char command = 0xff;
-    unsigned char par = 0xff;
-    unsigned char par2 = 0xff;
+    unsigned char command = UNUSED;
+    unsigned char par = UNUSED;
+    unsigned char par2 = UNUSED;
     if (isRead)
     {
         type = 0x80;
@@ -1607,7 +1607,7 @@ int CmdInterface::commandScale()
         }
     }
 //cout << "par " << int(par) << endl;
-    sendDirect(value, type, command, TOPLEVEL::section::scales, 0xff, 0xff, 0xff, par, par2);
+    sendDirect(value, type, command, TOPLEVEL::section::scales, UNUSED, UNUSED, UNUSED, par, par2);
     return reply;
 }
 
@@ -1689,7 +1689,7 @@ int CmdInterface::commandPart(bool justSet)
             value = MIN_KEY_SHIFT;
         else if(value > MAX_KEY_SHIFT)
             value = MAX_KEY_SHIFT;
-        sendDirect(value, cmdType, PART::control::keyShift, npart, 0xff, 0xff, 0xff, TOPLEVEL::route::lowPriority);
+        sendDirect(value, cmdType, PART::control::keyShift, npart, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
     }
     tmp = partVolPanVel();
     if(tmp != todo_msg)
@@ -1704,7 +1704,7 @@ int CmdInterface::commandPart(bool justSet)
         }
         if (matchnMove(2, point, "clear"))
         {
-            sendDirect(0, 64, 96, npart, 0xff, 0xff, 0xff, 0xff, tmp);
+            sendDirect(0, 64, 96, npart, UNUSED, UNUSED, UNUSED, UNUSED, tmp);
             return done_msg;
         }
         if (point[0] != 0) // force part not channel number
@@ -1712,7 +1712,7 @@ int CmdInterface::commandPart(bool justSet)
             tmp = string2int(point) - 1;
             if (tmp < 0 || tmp > 159)
                 return range_msg;
-            sendDirect(npart, 64, 74, TOPLEVEL::section::main, 0xff, 0xff, 0xff, 0xff, tmp);
+            sendDirect(npart, 64, 74, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, tmp);
             reply = done_msg;
         }
         else
@@ -1748,7 +1748,7 @@ int CmdInterface::commandPart(bool justSet)
             if (dest == 0)
                 reply = range_msg;
         }
-        sendDirect(dest, type, 120, npart, 0xff, 0xff, 0xff, TOPLEVEL::route::adjustAndLoopback);
+        sendDirect(dest, type, 120, npart, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::adjustAndLoopback);
         reply = done_msg;
     }
     else if (matchnMove(1, point, "breath"))
@@ -1847,7 +1847,7 @@ int CmdInterface::commandPart(bool justSet)
     {
         string name;
         unsigned char type = 64;
-        unsigned char par2 = 0xff;
+        unsigned char par2 = NO_MSG;
         if (isRead)
             type = 0;
         else
@@ -1866,7 +1866,7 @@ int CmdInterface::commandPart(bool justSet)
             else
                 par2 = miscMsgPush(name);
         }
-        sendDirect(0, type, 222, npart, 0xff, 0xff, 0xff, TOPLEVEL::route::lowPriority, par2, 0xff);
+        sendDirect(0, type, 222, npart, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, par2, UNUSED);
         reply = done_msg;
     }
     else
@@ -1990,7 +1990,7 @@ int CmdInterface::commandReadnSet()
         }
         if (point[0] != 0)
         {
-            sendDirect(255, 64, 8, TOPLEVEL::section::midiIn, 0, 0xff, string2int(point), TOPLEVEL::route::adjustAndLoopback);
+            sendDirect(255, 64, 8, TOPLEVEL::section::midiIn, 0, UNUSED, string2int(point), TOPLEVEL::route::adjustAndLoopback);
             return done_msg;
         }
         else
@@ -2006,7 +2006,7 @@ int CmdInterface::commandReadnSet()
         }
         if (point[0] != 0)
         {
-            sendDirect(255, 64, 8, TOPLEVEL::section::midiIn, 0, string2int(point), 0xff, TOPLEVEL::route::adjustAndLoopback);
+            sendDirect(255, 64, 8, TOPLEVEL::section::midiIn, 0, string2int(point), UNUSED, TOPLEVEL::route::adjustAndLoopback);
             return done_msg;
         }
         else
@@ -2028,7 +2028,7 @@ int CmdInterface::commandReadnSet()
     {
         if (!isRead && point[0] == 0)
             return value_msg;
-        sendDirect(string2int127(point), cmdType, MAIN::control::detune, TOPLEVEL::section::main, 0xff, 0xff, 0xff, TOPLEVEL::route::lowPriority);
+        sendDirect(string2int127(point), cmdType, MAIN::control::detune, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
         return done_msg;
     }
 
@@ -2041,7 +2041,7 @@ int CmdInterface::commandReadnSet()
             value = MIN_KEY_SHIFT;
         else if(value > MAX_KEY_SHIFT)
             value = MAX_KEY_SHIFT;
-        sendDirect(value, cmdType, MAIN::control::keyShift, TOPLEVEL::section::main, 0xff, 0xff, 0xff, TOPLEVEL::route::lowPriority);
+        sendDirect(value, cmdType, MAIN::control::keyShift, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
     }
 
     if (matchnMove(2, point, "solo"))
@@ -2168,7 +2168,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         if (matchnMove(3, point, "all"))
             control = 97;
         if (query("Restore to basic settings", false))
-            sendDirect(0, 64, control, TOPLEVEL::section::main, 0xff, 0xff, 0xff, TOPLEVEL::route::adjustAndLoopback);
+            sendDirect(0, 64, control, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::adjustAndLoopback);
         return false;
     }
 
@@ -2268,7 +2268,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             int forceId = string2int(point);
             if (forceId < 1 || forceId >= 32)
                 forceId = 0;
-            sendDirect(forceId, 64, 104, TOPLEVEL::section::main, 0xff, 0xff, 0xff, TOPLEVEL::route::lowPriority);
+            sendDirect(forceId, 64, 104, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
         }
         else
         {
@@ -2283,7 +2283,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             type = 60;
         else if (matchnMove(3, point, "export"))
             type = 59;
-        int root = 255;
+        int root = UNUSED;
         if (matchnMove(1, point, "root"))
         {
             if (isdigit(point[0]))
@@ -2297,7 +2297,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         int value = string2int(point);
         point = skipChars(point);
         string name = string(point);
-        if (root < 0 || (root > 127 && root != 255) || value < 0 || value > 127 || name <="!")
+        if (root < 0 || (root > 127 && root != UNUSED) || value < 0 || value > 127 || name <="!")
         {
             if (type == 60)
                 replyString = "import";
@@ -2307,7 +2307,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         }
         else
         {
-            sendDirect(value, 64, type, TOPLEVEL::section::main, root, 0xff, 0xff, TOPLEVEL::route::lowPriority, miscMsgPush(name));
+            sendDirect(value, 64, type, TOPLEVEL::section::main, root, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(name));
             reply = done_msg;
         }
     }
@@ -2341,7 +2341,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         }
         else if (matchnMove(1, point, "bank"))
         {
-            int rootID = 255;
+            int rootID = UNUSED;
             if (matchnMove(1, point, "root"))
             {
                 if (isdigit(point[0]))
@@ -2373,7 +2373,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                         }
                         if (tmp == 0)
                         {
-                            sendDirect(bankID, 64, 61, TOPLEVEL::section::main, rootID, 0xff, 0xff, TOPLEVEL::route::lowPriority);
+                            sendDirect(bankID, 64, 61, TOPLEVEL::section::main, rootID, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
                         }
                     }
 
@@ -2395,7 +2395,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 if (to_close == 0)
                     Runtime.Log("Use 'Exit' to close main instance");
                 else
-                    sendDirect(to_close, 64, 105, TOPLEVEL::section::main, 0xff, 0xff, 0xff, TOPLEVEL::route::lowPriority);
+                    sendDirect(to_close, 64, 105, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
                 reply = done_msg;
             }
         }
@@ -2478,10 +2478,10 @@ bool CmdInterface::cmdIfaceProcessCommand()
             }
             else
             {
-                ch = 255;
+                ch = UNUSED;
                 loadChan = "source channel";
             }
-            if (ch != 255 && ch >= NUM_MIDI_CHANNELS)
+            if (ch != UNUSED && ch >= NUM_MIDI_CHANNELS)
                 reply = range_msg;
             else if (point[0] == 0)
                 reply = name_msg;
@@ -2517,7 +2517,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 }
                 if (ok)
                 {
-                    sendDirect(0, 64, 84, TOPLEVEL::section::main, 0xff, 0xff, ch, TOPLEVEL::route::adjustAndLoopback, miscMsgPush(name));
+                    sendDirect(0, 64, 84, TOPLEVEL::section::main, UNUSED, UNUSED, ch, TOPLEVEL::route::adjustAndLoopback, miscMsgPush(name));
                 }
                 reply = done_msg;
             }
@@ -2558,7 +2558,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 }
                 if (ok)
                 {
-                    sendDirect(0, 64, 92, TOPLEVEL::section::main, 0xff, 0xff, 0xff, TOPLEVEL::route::adjustAndLoopback, miscMsgPush(name));
+                    sendDirect(0, 64, 92, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::adjustAndLoopback, miscMsgPush(name));
                     reply = done_msg;
                 }
             }
@@ -2599,7 +2599,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 }
                 if (ok)
                 {
-                    sendDirect(0, 64, 88, TOPLEVEL::section::main, 0xff, 0xff, 0xff, TOPLEVEL::route::lowPriority, miscMsgPush(name));
+                    sendDirect(0, 64, 88, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(name));
                     reply = done_msg;
                 }
             }
@@ -2643,7 +2643,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 }
                 if (ok)
                 {
-                    sendDirect(0, 64, 80, TOPLEVEL::section::main, 0xff, 0xff, 0xff, TOPLEVEL::route::adjustAndLoopback, miscMsgPush(name));
+                    sendDirect(0, 64, 80, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::adjustAndLoopback, miscMsgPush(name));
                     reply = done_msg;
                 }
             }
@@ -2688,7 +2688,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 }
                 if (ok)
                 {
-                    sendDirect(npart, 64, 78, TOPLEVEL::section::main, 0xff, 0xff, 0xff, 0xff, miscMsgPush(name));
+                    sendDirect(npart, 64, 78, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(name));
                     reply = done_msg;
                 }
             }
@@ -2726,7 +2726,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             else
             {
                 chan = tmp;
-                sendDirect(0, 64, 85, TOPLEVEL::section::main, 0xff, 0xff, chan, TOPLEVEL::route::lowPriority, miscMsgPush((string) point));
+                sendDirect(0, 64, 85, TOPLEVEL::section::main, UNUSED, UNUSED, chan, TOPLEVEL::route::lowPriority, miscMsgPush((string) point));
                 reply = done_msg;
             }
         }
@@ -2735,12 +2735,12 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = value_msg;
             else
             {
-                sendDirect(0, 64, 93, TOPLEVEL::section::main, 0xff, 0xff, 0xff, TOPLEVEL::route::lowPriority, miscMsgPush(string(point)));
+                sendDirect(0, 64, 93, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(point)));
                 reply = done_msg;
             }
         else if(matchnMove(1, point, "config"))
         {
-            sendDirect(0, 64, CONFIG::control::saveCurrentConfig, TOPLEVEL::section::config, 0xff, 0xff, 0xff, TOPLEVEL::route::lowPriority, miscMsgPush("DUMMY"));
+            sendDirect(0, 64, CONFIG::control::saveCurrentConfig, TOPLEVEL::section::config, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush("DUMMY"));
         }
 
         else if (matchnMove(2, point, "scale"))
@@ -2749,7 +2749,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = name_msg;
             else
             {
-                sendDirect(0, 64, 89, TOPLEVEL::section::main, 0xff, 0xff, 0xff, TOPLEVEL::route::lowPriority, miscMsgPush(string(point)));
+                sendDirect(0, 64, 89, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(point)));
                 reply = done_msg;
             }
         }else if (matchnMove(1, point, "patchset"))
@@ -2758,7 +2758,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = name_msg;
             else
             {
-                sendDirect(0, 64, 81, TOPLEVEL::section::main, 0xff, 0xff, 0xff, TOPLEVEL::route::lowPriority, miscMsgPush(string(point)));
+                sendDirect(0, 64, 81, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(point)));
                 reply = done_msg;
             }
         }
@@ -2773,7 +2773,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = name_msg;
             else
             {
-                sendDirect(npart, 64, 79, TOPLEVEL::section::main, 0xff, 0xff, 0xff, TOPLEVEL::route::lowPriority, miscMsgPush(string(point)));
+                sendDirect(npart, 64, 79, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(point)));
                 reply = done_msg;
             }
         }
@@ -2798,11 +2798,11 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 request = 2;
             else if (matchnMove(3, point, "default"))
                 request = 3;
-            else request = 0xff;
+            else request = UNUSED;
         }
         else
         {
-            request = 0xff;
+            request = UNUSED;
             value = string2float(point);
             if (strchr(point, '.') == NULL)
                 type |= 0x80; // fix as integer
@@ -2815,11 +2815,11 @@ bool CmdInterface::cmdIfaceProcessCommand()
         point = skipChars(point);
         unsigned char part = string2int(point);
         point = skipChars(point);
-        unsigned char kit = 0xff;
-        unsigned char engine = 0xff;
-        unsigned char insert = 0xff;
-        unsigned char param = 0xff;
-        unsigned char par2 = 0xff;
+        unsigned char kit = UNUSED;
+        unsigned char engine = UNUSED;
+        unsigned char insert = UNUSED;
+        unsigned char param = UNUSED;
+        unsigned char par2 = UNUSED;
         if (point[0] != 0)
         {
             kit = string2int(point);
@@ -2836,7 +2836,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                     {
                         param = string2int(point);
                         point = skipChars(point);
-                        if ((part == TOPLEVEL::section::main && (control == 80 || control == 88)) || ((param & 0x80) && param < 0xff && insert != TOPLEVEL::insert::resonanceGraphInsert))
+                        if ((part == TOPLEVEL::section::main && (control == 80 || control == 88)) || ((param & 0x80) && param != UNUSED && insert != TOPLEVEL::insert::resonanceGraphInsert))
                         {
                             string name = string(point);
                             if (name > "!")
@@ -2868,11 +2868,11 @@ bool CmdInterface::cmdIfaceProcessCommand()
 
         float value, result;
         unsigned char control, part;
-        unsigned char kit = 255;
-        unsigned char engine = 255;
-        unsigned char insert = 255;
-        unsigned char parameter = 255;
-        unsigned char par2 = 255;
+        unsigned char kit = UNUSED;
+        unsigned char engine = UNUSED;
+        unsigned char insert = UNUSED;
+        unsigned char parameter = UNUSED;
+        unsigned char par2 = UNUSED;
         int repeats;
         if (point[0] == 0)
         {
@@ -3042,7 +3042,7 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
         }
         return 0;
     }
-    if (part == TOPLEVEL::section::midiLearn && putData.data.par2 < 0xff && (control == 65 || control == 67 || control == 71))
+    if (part == TOPLEVEL::section::midiLearn && putData.data.par2 != UNUSED && (control == 65 || control == 67 || control == 71))
     {
         synth->getRuntime().Log("In use by " + miscMsgPop(putData.data.par2) );
         return 0;

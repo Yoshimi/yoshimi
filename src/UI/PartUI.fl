@@ -1099,7 +1099,7 @@ Offset}
         bypasseff->value(part->Pefxbypass[ninseff]);
         sendtochoice->value(x);
 
-        send_data(PART::control::effectNum, ninseff, 0xc0, 0xff, ninseff);}
+        send_data(PART::control::effectNumber, ninseff, 0xc0, 0xff, ninseff);}
         tooltip {Effect No.} xywh {35 8 35 22} labelsize 12 maximum 3 textsize 11
         code1 {o->value(ninseff+1);}
       }

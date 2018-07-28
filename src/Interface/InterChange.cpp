@@ -61,9 +61,9 @@ InterChange::InterChange(SynthEngine *_synth) :
     blockRead(0),
     tick(0),
     lockTime(0),
-    swapRoot1(0xff),
-    swapBank1(0xff),
-    swapInstrument1(0xff)
+    swapRoot1(UNUSED),
+    swapBank1(UNUSED),
+    swapInstrument1(UNUSED)
 {
     ;
 }
@@ -234,7 +234,7 @@ void *InterChange::sortResultsThread(void)
             jack_ringbuffer_read(decodeLoopback, point, toread);
             if(getData.data.part == TOPLEVEL::section::midiLearn) // special midi-learn - needs improving
                 synth->midilearn.generalOpps(getData.data.value, getData.data.type, getData.data.control, getData.data.part, getData.data.kit, getData.data.engine, getData.data.insert, getData.data.parameter, getData.data.par2);
-            else if ((getData.data.parameter >= TOPLEVEL::route::lowPriority) && getData.data.parameter < 0xff)
+            else if ((getData.data.parameter >= TOPLEVEL::route::lowPriority) && getData.data.parameter < UNUSED)
                 indirectTransfers(&getData);
             else
                 resolveReplies(&getData);
@@ -485,13 +485,13 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                 }
                 case MAIN::control::saveInstrument:
                 {
-                    if (kititem == 0xff)
+                    if (kititem == UNUSED)
                     {
                         kititem = synth->ReadBankRoot();
                         getData->data.kit = kititem;
                     }
 
-                    if (engine == 0xff)
+                    if (engine == UNUSED)
                     {
                         engine = synth->ReadBank();
                         getData->data.engine = engine;
@@ -551,7 +551,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     break;
                 case MAIN::control::loadNamedVector:
                     tmp = synth->loadVectorAndUpdate(insert, text);
-                    if (tmp < 0xff)
+                    if (tmp < NO_MSG)
                     {
                         getData->data.insert = tmp;
                         text = "ed " + text + " to chan " + to_string(int(tmp + 1));
@@ -567,7 +567,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     if (pos >=0 && pos < 2)
                         synth->getRuntime().vectordata.Name[insert] = findleafname(text);
                     tmp = synth->saveVector(insert, text, true);
-                    if (tmp == 0xff)
+                    if (tmp == NO_MSG)
                         text = "d " + text;
                     else
                     {
@@ -706,12 +706,12 @@ void InterChange::indirectTransfers(CommandBlock *getData)
             {
                 case 4: // instrument swap select first
                 {
-                    if(kititem == 0xff)
+                    if(kititem == UNUSED)
                     {
                         kititem = synth->getBankRef().getCurrentBankID();
                         getData->data.kit = kititem;
                     }
-                    if(engine == 0xff)
+                    if(engine == UNUSED)
                     {
                         engine = synth->getBankRef().getCurrentRootID();
                         getData->data.engine = engine;
@@ -724,12 +724,12 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                 }
                 case 5: // instrument swap select second and complete
                 {
-                    if(kititem == 0xff)
+                    if(kititem == UNUSED)
                     {
                         kititem = synth->getBankRef().getCurrentBankID();
                         getData->data.kit = kititem;
                     }
-                    if(engine == 0xff)
+                    if(engine == UNUSED)
                     {
                         engine = synth->getBankRef().getCurrentRootID();
                         getData->data.engine = engine;
@@ -743,15 +743,15 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         if (text.find("nothing", 0, 7) == string::npos)
                             synth->bank.rescanforbanks(); // might have corrupted it
                     }
-                    swapInstrument1 = 0xff;
-                    swapBank1 = 0xff;
-                    swapRoot1 = 0xff;
+                    swapInstrument1 = UNUSED;
+                    swapBank1 = UNUSED;
+                    swapRoot1 = UNUSED;
                     guiTo = true;
                     break;
                 }
 
                 case 20: // bank swap select first
-                    if(engine == 0xff)
+                    if(engine == UNUSED)
                     {
                         engine = synth->getBankRef().getCurrentRootID();
                         getData->data.engine = engine;
@@ -760,7 +760,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     swapRoot1 = engine;
                     break;
                 case 21: // banks swap select second and complete
-                    if(engine == 0xff)
+                    if(engine == UNUSED)
                     {
                         engine = synth->getBankRef().getCurrentRootID();
                         getData->data.engine = engine;
@@ -773,8 +773,8 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         if (text.find("nothing", 0, 7) == string::npos)
                             synth->bank.rescanforbanks(); // might have corrupted it
                     }
-                    swapBank1 = 0xff;
-                    swapRoot1 = 0xff;
+                    swapBank1 = UNUSED;
+                    swapRoot1 = UNUSED;
                     guiTo = true;
                     break;
             }
@@ -965,12 +965,12 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                 getData->data.par2 = miscMsgPush(text); // pass it on to GUI
 
             jack_ringbuffer_write(returnsBuffer, (char*) getData->bytes, commandSize);
-            if (synth->getRuntime().showGui && npart == TOPLEVEL::section::scales && control == 48)
-            {   // loading a tuning includes a name!
-                getData->data.control = 64;
+            if (synth->getRuntime().showGui && npart == TOPLEVEL::section::scales && control == SCALES::control::importScl)
+            {   // loading a tuning includes a name and comment!
+                getData->data.control = SCALES::control::name;
                 getData->data.par2 = miscMsgPush(synth->microtonal.Pname);
                 jack_ringbuffer_write(returnsBuffer, (char*) getData->bytes, commandSize);
-                getData->data.control = 65;
+                getData->data.control = SCALES::control::comment;
                 getData->data.par2 = miscMsgPush(synth->microtonal.Pcomment);
                 jack_ringbuffer_write(returnsBuffer, (char*) getData->bytes, commandSize);
             }
@@ -1066,9 +1066,9 @@ float InterChange::readAllData(CommandBlock *getData)
     if (npart < NUM_MIDI_PARTS && synth->part[npart]->busy)
     {
         getData->data.control = PART::control::partBusy; // part busy message
-        getData->data.kit = 0xff;
-        getData->data.engine = 0xff;
-        getData->data.insert = 0xff;
+        getData->data.kit = UNUSED;
+        getData->data.engine = UNUSED;
+        getData->data.insert = UNUSED;
     }
     reTry:
     memcpy(tryData.bytes, getData->bytes, sizeof(tryData));
@@ -1102,8 +1102,8 @@ void InterChange::resolveReplies(CommandBlock *getData)
 {
     float value = getData->data.value;
     unsigned char type = getData->data.type;
-    if (type == 0xff)
-        return; // no action required
+    if (type == NO_ACTION)
+        return; // no further action
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -1182,7 +1182,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     else if (npart == TOPLEVEL::section::systemEffects || npart == TOPLEVEL::section::insertEffects)
         commandName = resolveEffects(getData);
 
-    else if ((kititem >= EFFECT::type::none && kititem <= EFFECT::type::dynFilter) || (control >= PART::control::effectNum && control <= PART::control::effectBypass && kititem == 0xff))
+    else if ((kititem >= EFFECT::type::none && kititem <= EFFECT::type::dynFilter) || (control >= PART::control::effectNumber && control <= PART::control::effectBypass && kititem == UNUSED))
         commandName = resolveEffects(getData);
 
     else if (npart >= NUM_MIDI_PARTS)
@@ -1191,18 +1191,18 @@ void InterChange::resolveReplies(CommandBlock *getData)
         commandName = "Invalid part " + to_string(int(npart) + 1);
     }
 
-    else if (kititem >= NUM_KIT_ITEMS && kititem < 0xff)
+    else if (kititem >= NUM_KIT_ITEMS && kititem < UNUSED)
     {
         showValue = false;
         commandName = "Invalid kit " + to_string(int(kititem) + 1);
     }
 
-    else if (kititem != 0 && engine != 0xff && control != PART::control::enable && part->kit[kititem].Penabled == false)
+    else if (kititem != 0 && engine != UNUSED && control != PART::control::enable && part->kit[kititem].Penabled == false)
         commandName = "Part " + to_string(int(npart) + 1) + " Kit item " + to_string(int(kititem) + 1) + " not enabled";
 
-    else if (kititem == 0xff || insert == TOPLEVEL::insert::kitGroup)
+    else if (kititem == UNUSED || insert == TOPLEVEL::insert::kitGroup)
     {
-        if (control != PART::control::kitMode && kititem < 0xff && part->Pkitmode == 0)
+        if (control != PART::control::kitMode && kititem != UNUSED && part->Pkitmode == 0)
         {
             showValue = false;
             commandName = "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
@@ -1220,7 +1220,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     {
         switch(insert)
         {
-            case 0xff:
+            case UNUSED:
                 commandName = resolvePad(getData);
                 break;
             case TOPLEVEL::insert::LFOgroup:
@@ -1250,7 +1250,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     {
         switch (insert)
         {
-            case 0xff:
+            case UNUSED:
             case TOPLEVEL::insert::harmonicAmplitude:
             case TOPLEVEL::insert::harmonicPhaseBandwidth:
                 commandName = resolveSub(getData);
@@ -1270,7 +1270,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     {
         switch (insert)
         {
-            case 0xff:
+            case UNUSED:
                 commandName = resolveAddVoice(getData);
                 break;
             case TOPLEVEL::insert::LFOgroup:
@@ -1299,7 +1299,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     {
         switch (insert)
         {
-            case 0xff:
+            case UNUSED:
                 commandName = resolveAdd(getData);
                 break;
             case TOPLEVEL::insert::LFOgroup:
@@ -2079,7 +2079,7 @@ string InterChange::resolvePart(CommandBlock *getData)
     bool value_bool = value_int > 0;
     bool yesno = false;
 
-    if (control == 255)
+    if (control == UNUSED)
         return "Number of parts";
 
     string kitnum;
@@ -2097,7 +2097,7 @@ string InterChange::resolvePart(CommandBlock *getData)
     }
     else if (control >= PART::control::midiModWheel && control <= PART::control::midiBandwidth)
         name = "MIDI ";
-    else if (kititem < 0xff)
+    else if (kititem != UNUSED)
     {
         switch (engine)
         {
@@ -2225,7 +2225,7 @@ string InterChange::resolvePart(CommandBlock *getData)
             contstr = "Kit Mode";
             break;
 
-        case PART::control::effectNum: // local to source
+        case PART::control::effectNumber: // local to source
             contstr = "Effect Number";
             break;
         case PART::control::effectType:
@@ -3588,7 +3588,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
     else
         name = "Part " + to_string(npart + 1);
 
-    if (kititem == EFFECT::type::dynFilter && getData->data.insert < 0xff)
+    if (kititem == EFFECT::type::dynFilter && getData->data.insert != UNUSED)
     {
         if (npart == TOPLEVEL::section::systemEffects)
             name = "System";
@@ -3603,36 +3603,36 @@ string InterChange::resolveEffects(CommandBlock *getData)
     name += " Effect " + to_string(effnum + 1);
 
     string effname = "";
-    if (npart < NUM_MIDI_PARTS && (control == 64 || control == 66 || control == 67))
+    if (npart < NUM_MIDI_PARTS && (control == PART::control::effectNumber || control == PART::control::effectDestination || control == PART::control::effectBypass))
     {
-        if (control == 64)
+        if (control == PART::control::effectNumber)
             name = "Set " + name;
-        else if (control == 66)
+        else if (control == PART::control::effectDestination)
         {
             effname = " sent to ";
             if (value == 0)
                 effname += "next effect";
             else if (value == 1)
                 effname += "part out";
-            else if (value == 1)
+            else if (value == 2)
                 effname += "dry out";
         }
-        if (control == 67)
+        if (control == PART::control::effectBypass)
             effname = " bypassed";
         else
             showValue = false;
         return (name + effname);
     }
-    else if (npart > 0xf0 && kititem == 0xff)
+    else if (npart >= TOPLEVEL::section::systemEffects && kititem == UNUSED)
     {
         string contstr;
         string second = "";
-        if (npart == TOPLEVEL::section::systemEffects && insert == 16)
+        if (npart == TOPLEVEL::section::systemEffects && insert == TOPLEVEL::insert::systemEffectSend)
         {
-                name = "System ";
-                contstr = "from Effect " + to_string(effnum + 1);
-                second = " to Effect " + to_string(control + 1);
-                return (name + contstr + second);
+            name = "System ";
+            contstr = "from Effect " + to_string(effnum + 1);
+            second = " to Effect " + to_string(control + 1);
+            return (name + contstr + second);
         }
         if (npart == TOPLEVEL::section::insertEffects && control == 2)
         {
@@ -3657,7 +3657,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
         }
     }
     string contstr = "";
-    if ((npart < NUM_MIDI_PARTS && control == 65) || (npart > TOPLEVEL::section::main && kititem == 0xff && control == 1))
+    if ((npart < NUM_MIDI_PARTS && control == PART::control::effectType) || (npart > TOPLEVEL::section::main && kititem == UNUSED && control == 1))
     {
         name += " set to";
         kititem = value | EFFECT::type::none; // TODO fix this!
@@ -3834,7 +3834,7 @@ void InterChange::returns(CommandBlock *getData)
 {
     unsigned char type = getData->data.type; // back from synth
 
-    if (type == 0xff)
+    if (type == NO_ACTION)
         return; // no further action
 
     if (getData->data.parameter < TOPLEVEL::route::lowPriority || getData->data.parameter >= TOPLEVEL::route::adjustAndLoopback)
@@ -3891,7 +3891,7 @@ bool InterChange::commandSend(CommandBlock *getData)
         unsigned char control = getData->data.control;
         unsigned char npart = getData->data.part;
         unsigned char insert = getData->data.insert;
-        if (npart < NUM_MIDI_PARTS && (insert < 0xff || (control != PART::control::enable && control != PART::control::instrumentName)))
+        if (npart < NUM_MIDI_PARTS && (insert != UNUSED || (control != PART::control::enable && control != PART::control::instrumentName)))
         {
             if (synth->part[npart]->Pname == "Simple Sound")
             {
@@ -3960,13 +3960,13 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         __sync_and_and_fetch(&blockRead, 2);
         return true;
     }
-    if ((npart == TOPLEVEL::section::systemEffects || npart == TOPLEVEL::section::insertEffects) && kititem == 0xff)
+    if ((npart == TOPLEVEL::section::systemEffects || npart == TOPLEVEL::section::insertEffects) && kititem == UNUSED)
     {
         commandSysIns(getData);
         __sync_and_and_fetch(&blockRead, 2);
         return true;
     }
-    if (kititem >= 0x80 && kititem != 0xff)
+    if (kititem >= 0x80 && kititem != UNUSED)
     {
         commandEffects(getData);
         __sync_and_and_fetch(&blockRead, 2);
@@ -3979,7 +3979,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         return false; // invalid part number
     }
 
-    if (kititem >= NUM_KIT_ITEMS && kititem < 0xff)
+    if (kititem >= NUM_KIT_ITEMS && kititem != UNUSED)
     {
         __sync_and_and_fetch(&blockRead, 2);
         return false; // invalid kit number
@@ -3991,9 +3991,9 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     {
         getData->data.type &= 0xbf; // turn it into a read
         getData->data.control = PART::control::partBusy; // part busy message
-        getData->data.kit = 0xff;
-        getData->data.engine = 0xff;
-        getData->data.insert = 0xff;
+        getData->data.kit = UNUSED;
+        getData->data.engine = UNUSED;
+        getData->data.insert = UNUSED;
         return false;
     }
     if (control == PART::control::partBusy)
@@ -4001,15 +4001,15 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         getData->data.value = part->busy;
         return false;
     }
-    if (kititem != 0xff && kititem != 0 && engine != 0xff && control != 8 && part->kit[kititem].Penabled == false)
+    if (kititem != UNUSED && kititem != 0 && engine != UNUSED && control != 8 && part->kit[kititem].Penabled == false)
     {
         __sync_and_and_fetch(&blockRead, 2);
         return false; // attempt to access not enabled kititem
     }
 
-    if (kititem == 0xff || insert == TOPLEVEL::insert::kitGroup)
+    if (kititem == UNUSED || insert == TOPLEVEL::insert::kitGroup)
     {
-        if (control != PART::control::kitMode && kititem < 0xff && part->Pkitmode == 0)
+        if (control != PART::control::kitMode && kititem != UNUSED && part->Pkitmode == 0)
         {
             __sync_and_and_fetch(&blockRead, 2);
             return false;
@@ -4019,7 +4019,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         return true;
     }
 
-    if (kititem > 0 && kititem < 0xff && part->Pkitmode == 0)
+    if (kititem > 0 && kititem != UNUSED && part->Pkitmode == 0)
     {
         __sync_and_and_fetch(&blockRead, 2);
         return false;
@@ -4029,7 +4029,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     {
         switch(insert)
         {
-            case 0xff:
+            case UNUSED:
                 commandPad(getData);
                 break;
             case TOPLEVEL::insert::LFOgroup:
@@ -4061,7 +4061,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     {
         switch (insert)
         {
-            case 0xff:
+            case UNUSED:
             case TOPLEVEL::insert::harmonicAmplitude:
             case TOPLEVEL::insert::harmonicPhaseBandwidth:
                 commandSub(getData);
@@ -4083,7 +4083,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     {
         if ((engine > PART::engine::addVoice8 && engine < PART::engine::addMod1) || engine > PART::engine::addMod8)
         {
-            getData->data.type = 0xff; // block any further action
+            getData->data.type = NO_ACTION;
             synth->getRuntime().Log("Invalid voice number");
             synth->getRuntime().finishedCLI = true;
             __sync_and_and_fetch(&blockRead, 2);
@@ -4091,7 +4091,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         }
         switch (insert)
         {
-            case 0xff:
+            case UNUSED:
                 commandAddVoice(getData);
                 break;
             case TOPLEVEL::insert::LFOgroup:
@@ -4150,7 +4150,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     {
         switch (insert)
         {
-            case 0xff:
+            case UNUSED:
                 commandAdd(getData);
                 break;
             case TOPLEVEL::insert::LFOgroup:
@@ -4172,7 +4172,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         __sync_and_and_fetch(&blockRead, 2);
         return true;
     }
-    getData->data.type = 0xff; // block any further action
+    getData->data.type = NO_ACTION;
     synth->getRuntime().Log("Invalid engine number");
     synth->getRuntime().finishedCLI = true;
     __sync_and_and_fetch(&blockRead, 2);
@@ -4202,12 +4202,12 @@ void InterChange::commandMidi(CommandBlock *getData)
         case 0:
             synth->NoteOn(chan, char1, value_int);
             synth->getRuntime().finishedCLI = true;
-            getData->data.type = 0xff; // till we know what to do!
+            getData->data.type = NO_ACTION; // till we know what to do!
             break;
         case 1:
             synth->NoteOff(chan, char1);
             synth->getRuntime().finishedCLI = true;
-            getData->data.type = 0xff; // till we know what to do!
+            getData->data.type = NO_ACTION; // till we know what to do!
             break;
         case 2:
             //cout << "Midi controller ch " << to_string(int(chan)) << "  type " << to_string(int(char1)) << "  val " << to_string(value_int) << endl;
@@ -4217,7 +4217,7 @@ void InterChange::commandMidi(CommandBlock *getData)
 
         case 8: // Program / Bank / Root
             getData->data.parameter = TOPLEVEL::route::lowPriority;
-            if ((value_int < 0xff || par2 != NO_MSG) && chan < synth->getRuntime().NumAvailableParts)
+            if ((value_int != UNUSED || par2 != NO_MSG) && chan < synth->getRuntime().NumAvailableParts)
             {
                 synth->partonoffLock(chan & 0x3f, -1);
                 synth->getRuntime().finishedCLI = true;
@@ -5025,7 +5025,7 @@ void InterChange::commandMain(CommandBlock *getData)
             getData->data.kit = value_int;
             getData->data.value = par2;
             getData->data.parameter = TOPLEVEL::route::lowPriority;
-            getData->data.par2 = 0xff;
+            getData->data.par2 = UNUSED;
             break;
         case MAIN::control::loadNamedInstrument: // load named instrument
             synth->partonoffLock(value_int & 0x3f, -1);
@@ -5033,7 +5033,7 @@ void InterChange::commandMain(CommandBlock *getData)
             getData->data.control = 8;
             getData->data.part = TOPLEVEL::section::midiIn;
             getData->data.kit = value_int & 0x3f;
-            getData->data.value = 0xff;
+            getData->data.value = UNUSED;
             getData->data.parameter = TOPLEVEL::route::lowPriority;
             break;
 
@@ -5041,14 +5041,14 @@ void InterChange::commandMain(CommandBlock *getData)
             if (write && (parameter == TOPLEVEL::route::adjustAndLoopback))
             {
                 synth->allStop(TOPLEVEL::muted::patchSetLoad | (par2 << 8) | (type << 24));
-                getData->data.type = 0xff; // stop further action
+                getData->data.type = NO_ACTION;
             }
             break;
         case MAIN::control::loadNamedVector:
             if (write && (parameter == TOPLEVEL::route::adjustAndLoopback))
             {
                 synth->allStop(TOPLEVEL::muted::vectorLoad | (par2 << 8) | (insert << 16) | (type << 24));
-                getData->data.type = 0xff; // stop further action
+                getData->data.type = NO_ACTION;
             }
             break;
         case MAIN::control::saveNamedVector: // done elsewhere
@@ -5061,7 +5061,7 @@ void InterChange::commandMain(CommandBlock *getData)
             if (write && (parameter == TOPLEVEL::route::adjustAndLoopback))
             {
                 synth->allStop(TOPLEVEL::muted::stateLoad | (par2 << 8) | (type << 24));
-                getData->data.type = 0xff; // stop further action
+                getData->data.type = NO_ACTION;
             }
             break;
         case MAIN::control::saveNamedState: // done elsewhere
@@ -5071,7 +5071,7 @@ void InterChange::commandMain(CommandBlock *getData)
             if (write && (parameter == TOPLEVEL::route::adjustAndLoopback))
             {
                 synth->allStop(TOPLEVEL::muted::masterReset | (control << 8) | (type << 24));
-                getData->data.type = 0xff; // stop further action);
+                getData->data.type = NO_ACTION;
             }
             break;
         case MAIN::control::startInstance: // done elsewhere
@@ -5081,7 +5081,7 @@ void InterChange::commandMain(CommandBlock *getData)
         case MAIN::control::stopSound: // just stop
             if (write)
                 synth->allStop(TOPLEVEL::muted::stopSound);
-            getData->data.type = 0xff; // stop further action);
+            getData->data.type = NO_ACTION;
             break;
 
         case MAIN::control::readPartPeak:
@@ -5109,7 +5109,7 @@ void InterChange::commandMain(CommandBlock *getData)
 
         case 254:
             synth->Mute();
-            getData->data.type = 0xff; // stop further action);
+            getData->data.type = NO_ACTION;
             break;
     }
 
@@ -5138,7 +5138,7 @@ void InterChange::commandPart(CommandBlock *getData)
 
     if ( kitType && kititem >= NUM_KIT_ITEMS)
     {
-        getData->data.type = 0xff; // block any further action
+        getData->data.type = NO_ACTION;
         synth->getRuntime().Log("Invalid kit number");
         return;
     }
@@ -5254,7 +5254,7 @@ void InterChange::commandPart(CommandBlock *getData)
                         else
                             value = part->kit[0].Ppadenabled;
                         break;
-                    case 255:
+                    case UNUSED:
                         if (write)
                         {
                             if (value_bool && synth->getRuntime().currentPart != npart) // make it a part change
@@ -5486,7 +5486,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->Pkitmode;
             break;
 
-        case PART::control::effectNum: // local to source
+        case PART::control::effectNumber: // local to source
             break;
 
         case PART::control::effectType:
@@ -5518,7 +5518,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 getData->data.parameter = TOPLEVEL::route::lowPriority;
             }
             else
-                getData->data.type = 0xff; // block any further action
+                getData->data.type = NO_ACTION;
             break;
 
         case PART::control::audioDestination:
@@ -5620,7 +5620,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 if (value_bool)
                     part->PbreathControl = 2;
                 else
-                    part->PbreathControl = 255;
+                    part->PbreathControl = UNUSED;
             else
                 value = part->PbreathControl;
             break;
@@ -7916,7 +7916,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
     int value_int = lrint(value);
 
     bool isSysEff = (npart == TOPLEVEL::section::systemEffects);
-    if (insert == 0xff)
+    if (insert == UNUSED)
     {
         switch (control)
         {
@@ -7989,7 +7989,7 @@ void InterChange::commandEffects(CommandBlock *getData)
         return; // invalid part number
     if (kititem > EFFECT::type::dynFilter)
         return;
-    if (kititem == EFFECT::type::dynFilter && getData->data.insert < 0xff)
+    if (kititem == EFFECT::type::dynFilter && getData->data.insert != UNUSED)
     {
         filterReadWrite(getData, eff->filterpars,NULL,NULL);
         return;
@@ -8053,7 +8053,7 @@ void InterChange::testLimits(CommandBlock *getData)
         || control == CONFIG::control::bankCC
         || control == CONFIG::control::extendedProgramChangeCC))
     {
-        getData->data.par2 = 0xff; // just to be sure
+        getData->data.par2 = NO_MSG; // just to be sure
         if (value > 119)
             return;
         string text;
@@ -8133,18 +8133,18 @@ float InterChange::returnLimits(CommandBlock *getData)
         Part *part;
         part = synth->part[npart];
 
-        if (engine == PART::engine::subSynth && (insert == 0xff || (insert >= 5 && insert <= 7)) && parameter == 0xff)
+        if (engine == PART::engine::subSynth && (insert == UNUSED || (insert >= 5 && insert <= 7)) && parameter == UNUSED)
         {
             SUBnoteParameters *subpars;
             subpars = part->kit[kititem].subpars;
             return subpars->getLimits(getData);
         }
 
-        if ((engine & 0x7f) == 0x7f && (kititem == 0xff || insert == TOPLEVEL::insert::kitGroup)) // part level controls
+        if ((engine & 0x7f) == 0x7f && (kititem == UNUSED || insert == TOPLEVEL::insert::kitGroup)) // part level controls
         { // TODO why is engine not 0xff? it used to be.
             return part->getLimits(getData);
         }
-        if ((insert == TOPLEVEL::insert::kitGroup || insert == 0xff) && parameter == 0xff && par2 == 0xff)
+        if ((insert == TOPLEVEL::insert::kitGroup || insert == UNUSED) && parameter == UNUSED && par2 == UNUSED)
         {
             if (engine == PART::engine::addSynth || (engine >= PART::engine::addVoice1 && engine <= PART::engine::addVoice8))
             {

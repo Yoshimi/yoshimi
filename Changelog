@@ -1,6 +1,12 @@
 yoshimi 1.5.8 M
 
-2018-7-26 Will
+2018-7-28 Will
+* Cleaned up some missing conversions.
+  Also corrected previous date!
+* More identification of anonymous 255s.
+  e.g. NO_MSG, UNUSED, NO_ACTION
+
+2018-7-27 Will
 * Converted effect type controls to enums.
   More work needed :(
 

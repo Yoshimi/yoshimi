@@ -465,7 +465,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
                 if (midilearnkititem[i] != NULL && midilearnkititem[i]->mutecheck->value() == 0)
                 {
                     unsigned char newchan = midilearnkititem[i]->channelchoice->value();
-                    if (newchan == 16) // all of them
+                    if (newchan == NUM_MIDI_CHANNELS) // all of them
                         newchan = engine; // force it to match
                     IDnew = (unsigned int)midilearnkititem[i]->CCcounter->value() | (newchan << 8);
                     if (IDold == IDnew && (type & 0x10) == (midilearnkititem[i]->stat & 0x10))

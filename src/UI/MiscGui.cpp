@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified June 2018
+    Modified July 2018
 */
 
 #include "Misc/SynthEngine.h"
@@ -59,7 +59,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
 {
     if (part < NUM_MIDI_PARTS && engine == 2)
     {
-        if (collect_readData(synth, 0, PART::control::partBusy, part, 255, 255, 255, 255, 255))
+        if (collect_readData(synth, 0, PART::control::partBusy, part, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED))
         {
             fl_alert("Part %d is busy", int(part));
             return;
@@ -186,7 +186,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 
     Part *part = synth->part[npart];
 
-    if (kititem >= 0x80 && kititem != 0xff) // effects
+    if (kititem >= 0x80 && kititem != UNUSED) // effects
     {
         if (npart == TOPLEVEL::section::systemEffects)
         {
@@ -234,32 +234,32 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     if (npart >= NUM_MIDI_PARTS)
         return; // invalid part number
 
-    if (kititem >= NUM_KIT_ITEMS && kititem < 0xff)
+    if (kititem >= NUM_KIT_ITEMS && kititem != UNUSED)
         return; // invalid kit number
 
-    if (kititem == 0xff && engine == 0xff && insert == 0xff && control == PART::control::defaultInstrument) // special case for part clear
+    if (kititem == UNUSED && engine == UNUSED && insert == UNUSED && control == PART::control::defaultInstrument) // special case for part clear
     {
         synth->getGuiMaster()->returns_update(getData);
         return;
     }
 
-    if (kititem != 0xff && kititem != 0 && engine != 0xff && control != PART::control::enable && part->kit[kititem].Penabled == false)
+    if (kititem != UNUSED && kititem != 0 && engine != UNUSED && control != PART::control::enable && part->kit[kititem].Penabled == false)
         return; // attempt to access non existant kititem
 
-    if (insert < 0xff || (control != PART::control::enable && control != PART::control::instrumentName))
+    if (insert != UNUSED || (control != PART::control::enable && control != PART::control::instrumentName))
     {
         if (synth->getGuiMaster()->partui->partname == "Simple Sound")
             synth->getGuiMaster()->partui->checkEngines("No Title");
     }
-    if (kititem == 0xff || insert == TOPLEVEL::insert::kitGroup) // part
+    if (kititem == UNUSED || insert == TOPLEVEL::insert::kitGroup) // part
     {
-        if (control != PART::control::kitMode && kititem < 0xff && part->Pkitmode == 0)
+        if (control != PART::control::kitMode && kititem != UNUSED && part->Pkitmode == 0)
             return; // invalid access
         synth->getGuiMaster()->partui->returns_update(getData);
         return;
     }
 
-    if (kititem > 0 && kititem < 0xff && part->Pkitmode == 0)
+    if (kititem > 0 && kititem != UNUSED && part->Pkitmode == 0)
         return; // invalid access
 
     if (engine == PART::engine::padSynth) // padsynth
@@ -268,7 +268,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         {
             switch (insert)
             {
-                case 0xff:
+                case UNUSED:
                     synth->getGuiMaster()->partui->padnoteui->returns_update(getData);
                     break;
                 case TOPLEVEL::insert::LFOgroup:
@@ -325,7 +325,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                     break;
             }
         }
-        else if(insertPar2 < 0xff)
+        else if(insertPar2 != NO_MSG)
         {
             miscMsgPop(insertPar2); // clear any text out.
         }
@@ -364,7 +364,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                             break;
                     }
                     break;
-                case 0xff:
+                case UNUSED:
                 case TOPLEVEL::insert::harmonicAmplitude:
                 case TOPLEVEL::insert::harmonicPhaseBandwidth:
                     synth->getGuiMaster()->partui->subnoteui->returns_update(getData);
@@ -381,7 +381,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
             {
                 switch (insert)
                 {
-                    case 0xff:
+                    case UNUSED:
                         synth->getGuiMaster()->partui->adnoteui->advoice->returns_update(getData);
                         break;
                     case TOPLEVEL::insert::LFOgroup:
@@ -456,7 +456,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         if (synth->getGuiMaster()->partui->adnoteui)
             switch (insert)
             {
-                case 0xff:
+                case UNUSED:
                     synth->getGuiMaster()->partui->adnoteui->returns_update(getData);
                     break;
                 case TOPLEVEL::insert::LFOgroup:

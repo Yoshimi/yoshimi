@@ -50,7 +50,9 @@
 #define MAX_RESONANCE_POINTS 256
 #define MAX_KEY_SHIFT 36
 #define MIN_KEY_SHIFT -36
-#define NO_MSG 255
+#define NO_MSG 255 // these three may become different
+#define UNUSED 255
+#define NO_ACTION 255
 
 // GUI colours
 #define ADD_COLOUR 0xdfafbf00
@@ -202,6 +204,31 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
     };
 }
 
+namespace BANK // usage BANK::control::
+{
+    enum control : unsigned char {
+        selectInstrument = 0, // not yet
+        renameInstrument, // not yet
+        saveInstrument, // not yet
+        deleteInstrument, // not yet
+        selectFirstInstrumentToSwap,
+        selectSecondInstumentAndSwap,
+
+        selectBank = 16, // not yet
+        renameBank, // not yet
+        saveBank, // not yet
+        deleteBank, // not yet
+        selectFirstBankToSwap,
+        selectSecondBankAndSwap,
+        importBank, // not yet
+        exportBank, // not yet
+
+        selectRoot = 32, // not yet
+        changeRootId // not yet
+
+    };
+}
+
 namespace VECTOR // usage VECTOR::control::name
 {
     enum control : unsigned char {
@@ -285,15 +312,13 @@ namespace MAIN // usage MAIN::control::volume
         soloType = 48,
         soloCC,
 
-        addNamedRoot = 56,
+        addNamedRoot = 56, // some of these should be in 'bank'
         delistRootId,
         changeRootId,
         exportBank,
         importBank,
         deleteBank,
         //addEmptyBank,
-        //renameBank,
-        //swapBanks,
         //importInstrument,
         //deleteInstrument,
 
@@ -351,7 +376,7 @@ namespace PART // usage PART::control::volume
         humanise = 48,
         drumMode = 57,
         kitMode,
-        effectNum = 64,
+        effectNumber = 64,
         effectType,
         effectDestination,
         effectBypass,
