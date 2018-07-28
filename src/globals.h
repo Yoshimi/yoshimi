@@ -122,8 +122,16 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
     // bit-wise type and source share the same byte
     // but will eventually be split up
     enum type : unsigned char {
-        write = 64, // false = read
-        integer = 128 // false = float
+        // bits 0, 1
+        Adjust = 0,
+        Minimum,
+        Maximum,
+        Default,
+        // remaining bits
+        Error = 4, // also identifes static limits
+        Limits = 4,
+        Write = 64, // false = read
+        Integer = 128 // false = float
     };
 
     enum source : unsigned char {

@@ -9,6 +9,8 @@ yoshimi 1.5.8 M
 * More missing conversions :(
 * Started identifying types and sources.
 * Still more missing conversions!
+* Rationalised limits in Interface/CmdInterface
+* Started converting limits to enums.
 
 2018-7-27 Will
 * Converted effect type controls to enums.

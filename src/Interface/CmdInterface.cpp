@@ -2793,11 +2793,11 @@ bool CmdInterface::cmdIfaceProcessCommand()
             value = 0;
             type = 4;
             if (matchnMove(3, point, "min"))
-                request = 1;
+                request = TOPLEVEL::type::Minimum;
             else if (matchnMove(3, point, "max"))
-                request = 2;
+                request = TOPLEVEL::type::Maximum;
             else if (matchnMove(3, point, "default"))
-                request = 3;
+                request = TOPLEVEL::type::Default;
             else request = UNUSED;
         }
         else
@@ -2805,12 +2805,12 @@ bool CmdInterface::cmdIfaceProcessCommand()
             request = UNUSED;
             value = string2float(point);
             if (strchr(point, '.') == NULL)
-                type |= 0x80; // fix as integer
+                type |= TOPLEVEL::type::Integer;
             point = skipChars(point);
             type |= (string2int127(point) & 0x43); // Allow 'pretend' and MIDI learn
             point = skipChars(point);
         }
-        type |= 0x10; // Fix as from CLI
+        type |= TOPLEVEL::source::CLI;
         unsigned char control = string2int(point);
         point = skipChars(point);
         unsigned char part = string2int(point);
@@ -2984,35 +2984,33 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
     putData.data.insert = insert;
     putData.data.parameter = parameter;
     putData.data.par2 = par2;
+
+
+    if (request <= TOPLEVEL::type::Default)
+    {
+        putData.data.type = request | TOPLEVEL::type::Limits;
+        value = synth->interchange.readAllData(&putData);
+        string name;
+        cout << "request " << int(request) << endl;
+        switch (request)
+        {
+            case TOPLEVEL::type::Minimum:
+                name = "Min ";
+                break;
+            case TOPLEVEL::type::Maximum:
+                name = "Max ";
+                break;
+            default:
+                name = "Default ";
+                break;
+        }
+        synth->getRuntime().Log(name + to_string(value));
+        return 0;
+    }
     if ((type & 0x40) == 0)
     {
-        if (request < 8)
-        {
-
-            request |= 4; // set as limits read
-            type &= 0xf8;
-            putData.data.type = type | request;
-        }
-        value = synth->interchange.readAllData(&putData);
-        string name = "";
-        if (request < 8)
-        {
-            //string name;
-            switch (request)
-            {
-                case 5:
-                    name = "Min ";
-                    break;
-                case 6:
-                    name = "Max ";
-                    break;
-                default:
-                    name = "Default ";
-                    break;
-            }
-            synth->getRuntime().Log(name + to_string(value));
-        }
-        else if ( part == TOPLEVEL::section::main)
+        string name;
+        if ( part == TOPLEVEL::section::main)
         {
             switch (control)
             {

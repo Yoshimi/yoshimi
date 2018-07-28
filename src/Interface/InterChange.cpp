@@ -1022,21 +1022,21 @@ string InterChange::formatScales(string text)
 
 float InterChange::readAllData(CommandBlock *getData)
 {
-    if(getData->data.type & 4) // these are static
+    if(getData->data.type & TOPLEVEL::type::Limits) // these are static
     {
         //cout << "Read Control " << (int) getData->data.control << " Part " << (int) getData->data.part << "  Kit " << (int) getData->data.kit << " Engine " << (int) getData->data.engine << "  Insert " << (int) getData->data.insert << endl;
         /*
-         * commandtype values
+         * commandtype limits values
          * 0    adjusted input value
          * 1    min
-         * 2    default
-         * 3    max
+         * 2    max
+         * 3    default
          *
          * tryData.data.type will be updated:
          * bit 6 set    MIDI-learnable
          * bit 7 set    Is an integer value
          */
-        getData->data.type &= 0xfb; // clear the error bit
+        getData->data.type -= TOPLEVEL::type::Limits;
         float value = returnLimits(getData);
         synth->getRuntime().finishedCLI = true;
         return value;
@@ -8133,7 +8133,7 @@ float InterChange::returnLimits(CommandBlock *getData)
         Part *part;
         part = synth->part[npart];
 
-        if (engine == PART::engine::subSynth && (insert == UNUSED || (insert >= 5 && insert <= 7)) && parameter == UNUSED)
+        if (engine == PART::engine::subSynth && (insert == UNUSED || (insert >= TOPLEVEL::oscillatorGroup && insert <= TOPLEVEL::harmonicPhaseBandwidth)) && parameter == UNUSED)
         {
             SUBnoteParameters *subpars;
             subpars = part->kit[kititem].subpars;
@@ -8173,19 +8173,19 @@ float InterChange::returnLimits(CommandBlock *getData)
             cout << "Using engine defaults" << endl;
             switch (request)
             {
-                case 0:
+                case TOPLEVEL::type::Adjust:
                     if(value < min)
                         value = min;
                     else if(value > max)
                         value = max;
                     break;
-                case 1:
+                case TOPLEVEL::type::Minimum:
                     value = min;
                     break;
-                case 2:
+                case TOPLEVEL::type::Maximum:
                     value = max;
                     break;
-                case 3:
+                case TOPLEVEL::type::Default:
                     value = def;
                     break;
             }
@@ -8207,19 +8207,19 @@ float InterChange::returnLimits(CommandBlock *getData)
 
                 switch (request)
                 {
-                    case 0:
+                    case TOPLEVEL::type::Adjust:
                         if(value < min)
                             value = min;
                         else if(value > max)
                             value = max;
                         break;
-                    case 1:
+                    case TOPLEVEL::type::Minimum:
                         value = min;
                         break;
-                    case 2:
+                    case TOPLEVEL::type::Maximum:
                         value = max;
                         break;
-                    case 3:
+                    case TOPLEVEL::type::Default:
                         value = def;
                         break;
                 }
@@ -8233,19 +8233,19 @@ float InterChange::returnLimits(CommandBlock *getData)
             cout << "Using resonance defaults" << endl;
             switch (request)
             {
-                case 0:
+                case TOPLEVEL::type::Adjust:
                     if(value < min)
                         value = min;
                     else if(value > max)
                         value = max;
                     break;
-                case 1:
+                case TOPLEVEL::type::Minimum:
                     value = min;
                     break;
-                case 2:
+                case TOPLEVEL::type::Maximum:
                     value = max;
                     break;
-                case 3:
+                case TOPLEVEL::type::Default:
                     value = def;
                     break;
             }
@@ -8261,19 +8261,19 @@ float InterChange::returnLimits(CommandBlock *getData)
                 def = 0.5f;
                 switch (request)
                 {
-                    case 0:
+                    case TOPLEVEL::type::Adjust:
                         if(value < min)
                             value = min;
                         else if(value > max)
                             value = max;
                         break;
-                    case 1:
+                    case TOPLEVEL::type::Minimum:
                         value = min;
                         break;
-                    case 2:
+                    case TOPLEVEL::type::Maximum:
                         value = max;
                         break;
-                    case 3:
+                    case TOPLEVEL::type::Default:
                         value = def;
                         break;
                 }
@@ -8286,19 +8286,19 @@ float InterChange::returnLimits(CommandBlock *getData)
 
             switch (request)
             {
-                case 0:
+                case TOPLEVEL::type::Adjust:
                     if(value < min)
                         value = min;
                     else if(value > max)
                         value = max;
                     break;
-                case 1:
+                case TOPLEVEL::type::Minimum:
                     value = min;
                     break;
-                case 2:
+                case TOPLEVEL::type::Maximum:
                     value = max;
                     break;
-                case 3:
+                case TOPLEVEL::type::Default:
                     value = def;
                     break;
             }
@@ -8311,19 +8311,19 @@ float InterChange::returnLimits(CommandBlock *getData)
 
             switch (request)
             {
-                case 0:
+                case TOPLEVEL::type::Adjust:
                     if(value < min)
                         value = min;
                     else if(value > max)
                         value = max;
                 break;
-                case 1:
+                case TOPLEVEL::type::Minimum:
                     value = min;
                     break;
-                case 2:
+                case TOPLEVEL::type::Maximum:
                     value = max;
                     break;
-                case 3:
+                case TOPLEVEL::type::Default:
                     value = def;
                     break;
             }
@@ -8336,19 +8336,19 @@ float InterChange::returnLimits(CommandBlock *getData)
 
     switch (request)
     {
-        case 0:
+        case TOPLEVEL::type::Adjust:
             if(value < min)
                 value = min;
             else if(value > max)
                 value = max;
         break;
-        case 1:
+        case TOPLEVEL::type::Minimum:
             value = min;
             break;
-        case 2:
+        case TOPLEVEL::type::Maximum:
             value = max;
             break;
-        case 3:
+        case TOPLEVEL::type::Default:
             value = def;
             break;
     }
