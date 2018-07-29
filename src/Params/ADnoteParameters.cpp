@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of ZynAddSubFX original code.
-    Modified June 2018
+    Modified July 2018
 */
 
 #include <iostream>
@@ -913,19 +913,19 @@ float ADnoteParameters::getLimits(CommandBlock *getData)
 
         switch (request)
         {
-            case 0:
+            case TOPLEVEL::type::Adjust:
                 if(value < min)
                     value = min;
                 else if(value > max)
                     value = max;
             break;
-            case 1:
+            case TOPLEVEL::type::Minimum:
                 value = min;
                 break;
-            case 2:
+            case TOPLEVEL::type::Maximum:
                 value = max;
                 break;
-            case 3:
+            case TOPLEVEL::type::Default:
                 value = def;
                 break;
         }
@@ -1132,19 +1132,19 @@ float ADnoteParameters::getLimits(CommandBlock *getData)
 
     switch (request)
     {
-        case 0:
+        case TOPLEVEL::type::Adjust:
             if(value < min)
                 value = min;
             else if(value > max)
                 value = max;
         break;
-        case 1:
+        case TOPLEVEL::type::Minimum:
             value = min;
             break;
-        case 2:
+        case TOPLEVEL::type::Maximum:
             value = max;
             break;
-        case 3:
+        case TOPLEVEL::type::Default:
             value = def;
             break;
     }

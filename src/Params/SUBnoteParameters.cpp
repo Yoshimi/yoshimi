@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is a derivative of a ZynAddSubFX original.
-    Modified February 2018
+    Modified July 2018
 */
 
 #include "Params/SUBnoteParameters.h"
@@ -382,17 +382,17 @@ float SUBnoteParameters::getLimits(CommandBlock *getData)
         max = 127;
         switch (request)
         {
-            case 0:
+            case TOPLEVEL::type::Adjust:
                 if(value < 0)
                     value = 0;
                 else if(value > 127)
                     value = 127;
                 break;
-            case 1:
-            case 3:
+            case TOPLEVEL::type::Minimum:
+            case TOPLEVEL::type::Default:
                 value = 0;
                 break;
-            case 2:
+            case TOPLEVEL::type::Maximum:
                 value = 127;
                 break;
     }
@@ -535,19 +535,19 @@ float SUBnoteParameters::getLimits(CommandBlock *getData)
 
     switch (request)
     {
-        case 0:
+        case TOPLEVEL::type::Adjust:
             if(value < min)
                 value = min;
             else if(value > max)
                 value = max;
         break;
-        case 1:
+        case TOPLEVEL::type::Minimum:
             value = min;
             break;
-        case 2:
+        case TOPLEVEL::type::Maximum:
             value = max;
             break;
-        case 3:
+        case TOPLEVEL::type::Default:
             value = def;
             break;
     }

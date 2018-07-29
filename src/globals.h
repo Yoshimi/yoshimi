@@ -129,7 +129,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         Default,
         // remaining bits
         Error = 4, // also identifes static limits
-        Limits = 4,
+        Limits = 4, // yes we can pair these - who knew?
         Write = 64, // false = read
         Integer = 128 // false = float
     };
