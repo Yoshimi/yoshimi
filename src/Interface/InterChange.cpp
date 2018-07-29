@@ -8104,7 +8104,7 @@ float InterChange::returnLimits(CommandBlock *getData)
     //cout << "Top request " << request << endl;
 
     getData->data.type &= 0x3f; //  clear top bits
-    getData->data.type |= 0x80; // default is integer & not learnable
+    getData->data.type |= TOPLEVEL::type::Integer; // default is integer & not learnable
 
     if (npart == TOPLEVEL::section::config)
         return synth->getConfigLimits(getData);

@@ -837,11 +837,11 @@ float Microtonal::getLimits(CommandBlock *getData)
             break;
 
         default:
-            type |= 4; // error
+            type |= TOPLEVEL::type::Error;
             break;
     }
     getData->data.type = type;
-    if (type & 4)
+    if (type & TOPLEVEL::type::Error)
         return 1;
 
     switch (request)

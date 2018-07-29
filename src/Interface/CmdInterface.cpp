@@ -2791,7 +2791,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         if (matchnMove(3, point, "limits"))
         {
             value = 0;
-            type = 4;
+            type = TOPLEVEL::type::Limits;
             if (matchnMove(3, point, "min"))
                 request = TOPLEVEL::type::Minimum;
             else if (matchnMove(3, point, "max"))
@@ -2967,7 +2967,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
 int CmdInterface::sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2, unsigned char request)
 {
     if (part != TOPLEVEL::section::midiLearn) // MIDI learn
-        type |= 0x10; // from command line
+        type |= TOPLEVEL::source::CLI; // from command line
     /*
      * MIDI learn is synced by the audio thread but
      * not passed on to any of the normal controls.
@@ -2991,7 +2991,6 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
         putData.data.type = request | TOPLEVEL::type::Limits;
         value = synth->interchange.readAllData(&putData);
         string name;
-        cout << "request " << int(request) << endl;
         switch (request)
         {
             case TOPLEVEL::type::Minimum:
@@ -3004,6 +3003,8 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
                 name = "Default ";
                 break;
         }
+        if (putData.data.type & TOPLEVEL::type::Error)
+            name += "- error - ";
         synth->getRuntime().Log(name + to_string(value));
         return 0;
     }

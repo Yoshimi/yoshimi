@@ -628,7 +628,7 @@ float Revlimit::getlimits(CommandBlock *getData)
             canLearn = false;
             break;
         default:
-            getData->data.type |= 4; // error
+            getData->data.type |= TOPLEVEL::type::Error;
             return 1.0f;
             break;
     }

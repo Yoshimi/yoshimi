@@ -3347,11 +3347,11 @@ float SynthEngine::getVectorLimits(CommandBlock *getData)
             //min = -1;
             //def = -1;
             //max = -1;
-            //type |= 4; // error
+            //type |= TOPLEVEL::type::Error;
             break;
     }
     getData->data.type = type;
-    if (type & 4)
+    if (type & TOPLEVEL::type::Error)
         return 1;
 
     switch (request)
@@ -3500,12 +3500,11 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
             break;
 
         default:
-            type |= 4; // error
-            return 2;
+            type |= TOPLEVEL::type::Error;
             break;
     }
     getData->data.type = type;
-    if (type & 4)
+    if (type & TOPLEVEL::type::Error)
         return 1;
     switch (request)
     {
