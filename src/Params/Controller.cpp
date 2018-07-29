@@ -396,118 +396,119 @@ void Controller::getfromXML(XMLwrapper *xml)
 float Controller::getLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    int request = int(getData->data.type & 3);
+    int request = int(getData->data.type & TOPLEVEL::type::Default);
+    unsigned char learnable = TOPLEVEL::type::Write;
     int control = getData->data.control;
 
     //cout << "ctl control " << control << "  Request " << request << endl;
 
     // defaults
-    int type = 0x80;
+    int type = TOPLEVEL::type::Integer;
     int min = 0;
     float def = 64;
     int max = 127;
 
     switch (control)
     {
-        case 128:
+        case PART::control::volumeRange:
             min = 64;
             def = 96;
             break;
-        case 129:
+        case PART::control::volumeEnable:
             def = 1;
             max = 1;
             break;
-        case 130:
-            type |= 0x40;
+        case PART::control::panningWidth:
+            type |= learnable;
             max = 64;
             break;
-        case 131:
+        case PART::control::modWheelDepth:
             def = 80;
             break;
-        case 132:
+        case PART::control::exponentialModWheel:
             def = 0;
             max = 1;
             break;
-        case 133:
-            type |= 0x40;
+        case PART::control::bandwidthDepth:
+            type |= learnable;
             break;
-        case 134:
+        case PART::control::exponentialBandwidth:
             def = 0;
             max = 1;
             break;
-        case 135:
+        case PART::control::expressionEnable:
             def = 1;
             max = 1;
             break;
-        case 136:
+        case PART::control::FMamplitudeEnable:
             def = 1;
             max = 1;
             break;
-        case 137:
+        case PART::control::sustainPedalEnable:
             def = 1;
             max = 1;
             break;
-        case 138:
-            type |= 0x40;
+        case PART::control::pitchWheelRange:
+            type |= learnable;
             min = -6400;
             def = 0;
             max = 6400;
             break;
-        case 139:
+        case PART::control::filterQdepth:
             break;
-        case 140:
+        case PART::control::filterCutoffDepth:
             break;
-        case 141:
+        case PART::control::breathControlEnable:
             max = 1;
             def = 1;
             break;
-        case 144:
+        case PART::control::resonanceCenterFrequencyDepth:
             break;
-        case 145:
+        case PART::control::resonanceBandwidthDepth:
             break;
-        case 160:
-            type |= 0x40;
+        case PART::control::portamentoTime:
+            type |= learnable;
             min = 0;
             break;
-        case 161:
-            type |= 0x40;
+        case PART::control::portamentoTimeStretch:
+            type |= learnable;
             break;
-        case 162:
-            type |= 0x40;
+        case PART::control::portamentoThreshold:
+            type |= learnable;
             def = 3;
             break;
-        case 163:
+        case PART::control::portamentoThresholdType:
             min = 0;
             max = 1;
             def = 1;
             break;
-        case 164:
+        case PART::control::enableProportionalPortamento:
             def = 0;
             max = 1;
             break;
-        case 165:
-            type |= 0x40;
+        case PART::control::proportionalPortamentoRate:
+            type |= learnable;
             def = 80;
             break;
-        case 166:
-            type |= 0x40;
+        case PART::control::proportionalPortamentoDepth:
+            type |= learnable;
             def = 90;
             break;
-        case 168:
+        case PART::control::receivePortamento:
             def = 1;
             max = 1;
             break;
-        case 224:
+        case PART::control::resetAllControllers:
             def = 0;
             max = 0;
             break;
 
         default:
-            type |= 4; // error
+            type |= TOPLEVEL::type::Error; // error
             break;
     }
     getData->data.type = type;
-    if (type & 4)
+    if (type & TOPLEVEL::type::Error)
         return 1;
 
     switch (request)

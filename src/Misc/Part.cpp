@@ -1522,7 +1522,8 @@ void Part::getfromXML(XMLwrapper *xml)
 float Part::getLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    int request = int(getData->data.type & 3);
+    unsigned char learnable = TOPLEVEL::type::Write;
+    int request = int(getData->data.type & TOPLEVEL::type::Default);
 
     unsigned int type = (getData->data.type & 0xfc);
     int control = getData->data.control;
@@ -1534,45 +1535,45 @@ float Part::getLimits(CommandBlock *getData)
     int max = 127;
     //cout << "part control " << control << "  Request " << request << endl;
 
-    if ((control >= 128 && control <= 168) || control == 224)
+    if ((control >= PART::control::volumeRange && control <= PART::control::receivePortamento) || control == PART::control::resetAllControllers)
         return ctl->getLimits(getData);
 
     switch (control)
     {
-        case 0:
+        case PART::control::volume:
             type &= 0x3f;
-            type |= 0x40;
+            type |= learnable;
             def = 96;
             break;
 
-        case 1:
-        case 4:
-            type |= 0x40;
+        case PART::control::velocitySense:
+        case PART::control::velocityOffset:
+            type |= learnable;
             break;
 
-        case 2:
+        case PART::control::panning:
             type &= 0x3f;
-            type |= 0x40;
+            type |= learnable;
             break;
 
-        case 5:
+        case PART::control::midiChannel:
             min = 1;
             def = 1;
             max = 16;
             break;
 
-        case 6:
+        case PART::control::keyMode:
             def = 0;
             max = 2;
             break;
 
-        case 7:
-            type |= 0x40;
+        case PART::control::portamento:
+            type |= learnable;
             def = 0;
             max = 1;
             break;
 
-        case 8:
+        case PART::control::enable:
             if (npart == 0)
                 def = 1;
             else
@@ -1580,134 +1581,88 @@ float Part::getLimits(CommandBlock *getData)
             max = 1;
             break;
 
-        case 9:
+        case PART::control::kitItemMute:
             def = 0;
             max = 1;
             break;
 
-        case 16:
+        case PART::control::minNote:
             def = 0;
             break;
 
-        case 17:
+        case PART::control::maxNote:
             def = 127;
             break;
 
-        case 18:
-        case 19:
-        case 20:
-        case 96:
-            min = 0;
+        case PART::control::minToLastKey:
+        case PART::control::maxToLastKey:
+        case PART::control::resetMinMaxKey:
+        case PART::control::defaultInstrument:
             def = 0;
             max = 0;
             break;
+        case PART::control::kitEffectNum:
+            def = 1; // may be local to GUI
+            max = 3;
 
-        case 33:
+        case PART::control::maxNotes:
             def = 20;
             max = 60;
             break;
 
-        case 35:
+        case PART::control::keyShift:
             min = -36;
             def = 0;
             max = 36;
             break;
 
-        case 40:
-        case 41:
-        case 42:
-        case 43:
-            type |= 0x40;
+        case PART::control::partToSystemEffect1:
+        case PART::control::partToSystemEffect2:
+        case PART::control::partToSystemEffect3:
+        case PART::control::partToSystemEffect4:
+            type |= learnable;
             def = 0;
             break;
 
-        case 48:
+        case PART::control::humanise:
+            type |= learnable;
             def = 0;
             max = 50;
             break;
 
-        case 57:
+        case PART::control::drumMode:
             def = 0;
             max = 1;
             break;
 
-        case 58:
+        case PART::control::kitMode:
             def = 0;
             max = 3;
             break;
-        case 120:
+        case PART::control::audioDestination:
             min = 1;
             def = 1;
             max = 3;
             break;
 
-        // the following are learnable MIDI controllers
-        case 128:
-            min = 64;
-            type |= 0x40;
+        case PART::control::midiModWheel:
+        case PART::control::midiFilterQ:
+        case PART::control::midiFilterCutoff:
+        case PART::control::midiBandwidth:
+            type |= learnable;
             break;
 
-        case 130:
-            max = 64;
-            type |= 0x40;
-            break;
-
-        case 131:
-            def = 80;
-            type |= 0x40;
-            break;
-
-        case 133:
-            type |= 0x40;
-            break;
-
-        case 138:
-            min = -6400;
-            def = 0;
-            max = 6400;
-            type |= 0x40;
-            break;
-
-        case 139:
-        case 140:
-        case 144:
-        case 145:
-            type |= 0x40;
-            break;
-
-        case 160:
-        case 161:
-            type |= 0x40;
-            break;
-
-        case 162:
-            def = 80;
-            type |= 0x40;
-            break;
-
-        case 166:
-            def = 90;
-            type |= 0x40;
-            break;
-
-        case 192:
-        case 197:
-        case 198:
-        case 199:
-            type |= 0x40;
-            break;
-
-        case 194:
-            type |= 0x40;
+        case PART::control::midiExpression:
+            type |= learnable;
             def = 127;
             break;
 
         // these haven't been done
-        case 193:
+        case PART::control::midiBreath:
             break;
-        case 195:
+        case PART::control::midiSustain:
             break;
-        case 196:
+        case PART::control::midiPortamento:
             break;
 
         case 255: // number of parts
@@ -1717,11 +1672,11 @@ float Part::getLimits(CommandBlock *getData)
             break;
 
         default:
-            type |= 4; // error
+            type |= TOPLEVEL::type::Error; // error
             break;
     }
     getData->data.type = type;
-    if (type & 4)
+    if (type & TOPLEVEL::type::Error)
         return 1;
 
     switch (request)

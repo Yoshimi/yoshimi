@@ -37,14 +37,14 @@ SynthEngine *synth;
 float collect_readData(SynthEngine *synth, float value, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2, unsigned char request)
 {
     unsigned char type;
-    if (request < 4)
-        type = request | 4; // its a limit test
+    if (request < TOPLEVEL::type::Limits)
+        type = request | TOPLEVEL::type::Limits; // its a limit test
     else
         type = 0;
     CommandBlock putData;
 
     putData.data.value = value;
-    putData.data.type = type | 0x20; // = read from GUI
+    putData.data.type = type | TOPLEVEL::source::GUI;
     putData.data.control = control;
     putData.data.part = part;
     putData.data.kit = kititem;
@@ -57,7 +57,7 @@ float collect_readData(SynthEngine *synth, float value, unsigned char control, u
 
 void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
-    if (part < NUM_MIDI_PARTS && engine == 2)
+    if (part < NUM_MIDI_PARTS && engine == PART::engine::padSynth)
     {
         if (collect_readData(synth, 0, PART::control::partBusy, part, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED))
         {
@@ -65,10 +65,8 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
             return;
         }
     }
-    int typetop = type & 0xd0;
-    if ( part == TOPLEVEL::section::systemEffects && insert == TOPLEVEL::insert::systemEffectSend)
-        type |= 8; // this is a hack :(
 
+    unsigned char typetop = type & 0xd0; // allow for redraws *after* command
     if (part != TOPLEVEL::section::midiLearn)
     {
         if ((type & 3) == 3 && Fl::event_is_click())
@@ -99,12 +97,12 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
             type = 1;
             // change scroll wheel to button 1
     }
-    type |= (typetop & 0xd0); // allow for redraws *after* command
+    type |= typetop;
 
     CommandBlock putData;
     size_t commandSize = sizeof(putData);
     putData.data.value = value;
-    putData.data.type = type | 0x20; // = from GUI
+    putData.data.type = type | TOPLEVEL::source::GUI;
     putData.data.control = control;
     putData.data.part = part;
     putData.data.kit = kititem;
@@ -112,6 +110,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
     putData.data.insert = insert;
     putData.data.parameter = parameter;
     putData.data.par2 = par2;
+
 //cout << "collect_data " << int(type) << " " << int(control) << " " << int(part) << " " << int(kititem) << " " << int(engine) << " " << int(parameter) << " " << int(par2) << endl;
     if (jack_ringbuffer_write_space(synth->interchange.fromGUI) >= commandSize)
         jack_ringbuffer_write(synth->interchange.fromGUI, (char*) putData.bytes, commandSize);

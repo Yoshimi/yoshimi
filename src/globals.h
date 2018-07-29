@@ -253,6 +253,7 @@ namespace BANK // usage BANK::control::
 namespace VECTOR // usage VECTOR::control::name
 {
     enum control : unsigned char {
+        undefined = 0,
         name = 8,
         Xcontroller = 16,
         XleftInstrument,

@@ -299,7 +299,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     unsigned char parameter = getData->data.parameter;
     unsigned char par2 = getData->data.par2;
     //cout << "Indirect" << endl;
-    bool (write) = (type & 0x40);
+    bool (write) = (type & TOPLEVEL::type::Write);
     if (write)
         __sync_or_and_fetch(&blockRead, 2);
     bool guiTo = false;
@@ -842,7 +842,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         value = miscMsgPush(text);
                     break;
             }
-            if (!(type & 0x20))
+            if (!(type & TOPLEVEL::source::GUI))
                 guiTo = true;
             getData->data.parameter -= TOPLEVEL::route::lowPriority;
             break;
@@ -1089,7 +1089,7 @@ float InterChange::readAllData(CommandBlock *getData)
     if (blockRead)//__sync_or_and_fetch(&blockRead, 0) > 0)
         goto reTry; // it may have changed mid-process
 
-    if ((tryData.data.type & 0x10))
+    if ((tryData.data.type & TOPLEVEL::source::CLI))
         resolveReplies(&tryData);
 
 
@@ -1127,8 +1127,8 @@ void InterChange::resolveReplies(CommandBlock *getData)
     if (npart == TOPLEVEL::section::scales && (control <= SCALES::control::tuning || control >= SCALES::control::retune))
         synth->setAllPartMaps();
 
-    bool isCli = ((type & 0x30) == 0x10); // elminate Gui redraw
-    bool isGui = type & 0x20;
+    bool isCli = ((type & (TOPLEVEL::source::CLI | TOPLEVEL::source::GUI )) == TOPLEVEL::source::CLI); // elminate Gui redraw
+    bool isGui = type & TOPLEVEL::source::GUI;
     char button = type & 3;
     string isValue;
     string commandName;
@@ -1144,7 +1144,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
         else
         {
             isValue = "\n  Value      " + to_string(value);
-            if (!(type & 0x80))
+            if (!(type & TOPLEVEL::type::Integer))
                 isValue += "f";
         }
         string typemsg = "  Type       ";
@@ -1324,13 +1324,24 @@ void InterChange::resolveReplies(CommandBlock *getData)
     if (showValue)
     {
         actual = " Value ";
-        if (type & 0x80)
+        if (type & TOPLEVEL::type::Integer)
             actual += to_string(lrint(value));
         else
             actual += to_string(value);
     }
     if ((isGui || isCli) && button == 3)
     {
+/*
+ *  once all limits are correct this code block can be
+ *  used instead of testing inside the GUI
+ *
+        unsigned char patch = getData->data.type;
+        getData->data.type |= TOPLEVEL::type::Limits;
+        readAllData(getData);
+        if (getData->data.type & 64)
+            cout << "Learnable" << endl;
+        getData->data.type = patch;
+*/
         string toSend;
         size_t pos = commandName.find(" - ");
         if (pos < 1 || pos >= commandName.length())
@@ -1427,7 +1438,7 @@ string InterChange::resolveVector(CommandBlock *getData)
             contstr = "Unrecognised";
     }
 
-    if (control == 0)
+    if (control == VECTOR::control::undefined)
     {
         showValue = false;
         return("Vector " + contstr + " set to " + to_string(chan + 1));
@@ -1568,7 +1579,7 @@ string InterChange::resolveConfig(CommandBlock *getData)
 {
     int value_int = lrint(getData->data.value);
     unsigned char control = getData->data.control;
-    bool write = getData->data.type & 0x40;
+    bool write = getData->data.type & TOPLEVEL::type::Write;
     bool value_bool = value_int > 0;
     bool yesno = false;
     string contstr = "";
@@ -1853,7 +1864,7 @@ string InterChange::resolveMain(CommandBlock *getData)
 {
     float value = getData->data.value;
     int value_int = lrint(value);
-//    bool write = ((getData->data.type & 0x40) != 0);
+//    bool write = ((getData->data.type & TOPLEVEL::type::Write) != 0);
     unsigned char control = getData->data.control;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
@@ -2417,15 +2428,10 @@ string InterChange::resolveAdd(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
 
     string name = "";
-    switch (control & 0x70)
-    {
-        case ADDSYNTH::control::volume:
-            name = " Amplitude ";
-            break;
-        case ADDSYNTH::control::detuneFrequency:
-            name = " Frequency ";
-            break;
-    }
+    if (control <= ADDSYNTH::control::panning)
+        name = " Amplitude ";
+    else if (control >= ADDSYNTH::control::detuneFrequency && control <= ADDSYNTH::control::relativeBandwidth)
+        name = "Frequency";
 
     string contstr = "";
 
@@ -2836,7 +2842,7 @@ string InterChange::resolvePad(CommandBlock *getData)
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
-    bool write = (type & 0x40) > 0;
+    bool write = (type & TOPLEVEL::type::Write) > 0;
 
     string name = "";
     switch (control & 0x70)
@@ -3018,7 +3024,7 @@ string InterChange::resolveOscillator(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-    bool write = (type & 0x40) > 0;
+    bool write = (type & TOPLEVEL::type::Write) > 0;
 
     string isPad = "";
     string eng_name;
@@ -3182,7 +3188,7 @@ string InterChange::resolveResonance(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-    bool write = (type & 0x40) > 0;
+    bool write = (type & TOPLEVEL::type::Write) > 0;
 
     string name;
     string isPad = "";
@@ -3443,7 +3449,7 @@ string InterChange::resolveFilter(CommandBlock *getData)
 string InterChange::resolveEnvelope(CommandBlock *getData)
 {
     int value = lrint(getData->data.value);
-    bool write = (getData->data.type & 0x40) > 0;
+    bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -3839,9 +3845,9 @@ void InterChange::returns(CommandBlock *getData)
 
     if (getData->data.parameter < TOPLEVEL::route::lowPriority || getData->data.parameter >= TOPLEVEL::route::adjustAndLoopback)
     {
-        bool isCliOrGuiRedraw = type & 0x10; // separated out for clarity
-        bool isMidi = type & 8;
-        bool write = (type & 0x40) > 0;
+        bool isCliOrGuiRedraw = type & TOPLEVEL::source::CLI; // separated out for clarity
+        bool isMidi = type & TOPLEVEL::source::MIDI;
+        bool write = (type & TOPLEVEL::type::Write) > 0;
         bool isOKtoRedraw = (isCliOrGuiRedraw && write) || isMidi;
 
         if (synth->guiMaster && isOKtoRedraw)
@@ -3884,7 +3890,7 @@ void InterChange::doClearPart(int npart)
 bool InterChange::commandSend(CommandBlock *getData)
 {
     bool isChanged = commandSendReal(getData);
-    bool isWrite = (getData->data.type & 0x40) > 0;
+    bool isWrite = (getData->data.type & TOPLEVEL::type::Write) > 0;
     if (isWrite && isChanged) //write command
     {
         synth->setNeedsSaving(true);
@@ -3896,7 +3902,7 @@ bool InterChange::commandSend(CommandBlock *getData)
             if (synth->part[npart]->Pname == "Simple Sound")
             {
                 synth->part[npart]->Pname ="No Title";
-                getData->data.type |= 0x10; // force GUI to update
+                getData->data.type |= TOPLEVEL::source::GUI; // force GUI to update
             }
         }
     }
@@ -3923,9 +3929,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-//    unsigned char par2 = getData->data.par2;
-//    bool isCli = type & 0x10;
-    bool isGui = type & 0x20;
+    bool isGui = type & TOPLEVEL::source::GUI;
     char button = type & 3;
 
     //cout << "Type " << int(type) << "  Control " << int(control) << "  Part " << int(npart) << "  Kit " << int(kititem) << "  Engine " << int(engine) << endl;
@@ -3989,7 +3993,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
 
     if (part->busy && engine == PART::engine::padSynth) // it's a PadSynth control
     {
-        getData->data.type &= 0xbf; // turn it into a read
+        getData->data.type &= ~TOPLEVEL::type::Write; // turn it into a read
         getData->data.control = PART::control::partBusy; // part busy message
         getData->data.kit = UNUSED;
         getData->data.engine = UNUSED;
@@ -4259,7 +4263,7 @@ void InterChange::commandVector(CommandBlock *getData)
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned int chan = getData->data.insert;
-    bool write = (type & 0x40) > 0;
+    bool write = (type & TOPLEVEL::type::Write) > 0;
     if (write)
         __sync_or_and_fetch(&blockRead, 1);
 
@@ -4455,7 +4459,7 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
 
-    bool write = (type & 0x40) > 0;
+    bool write = (type & TOPLEVEL::type::Write) > 0;
     if (write)
         __sync_or_and_fetch(&blockRead, 1);
 
@@ -4610,7 +4614,7 @@ void InterChange::commandConfig(CommandBlock *getData)
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
 
-    bool write = (type & 0x40) > 0;
+    bool write = (type & TOPLEVEL::type::Write) > 0;
     if (write)
         __sync_or_and_fetch(&blockRead, 1);
 
@@ -4936,7 +4940,7 @@ void InterChange::commandMain(CommandBlock *getData)
     unsigned char parameter = getData->data.parameter;
     unsigned char par2 = getData->data.par2;
 
-    bool write = (type & 0x40) > 0;
+    bool write = (type & TOPLEVEL::type::Write) > 0;
     if (write)
         __sync_or_and_fetch(&blockRead, 1);
     int value_int = lrint(value);
@@ -5130,7 +5134,7 @@ void InterChange::commandPart(CommandBlock *getData)
     //unsigned char par2 = getData->data.par2;
     unsigned char effNum = engine;
 
-    bool write = (type & 0x40) > 0;
+    bool write = (type & TOPLEVEL::type::Write) > 0;
     if (write)
         __sync_or_and_fetch(&blockRead, 1);
 
@@ -5759,7 +5763,7 @@ void InterChange::commandAdd(CommandBlock *getData)
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
 
-    bool write = (type & 0x40) > 0;
+    bool write = (type & TOPLEVEL::type::Write) > 0;
     if (write)
         __sync_or_and_fetch(&blockRead, 1);
 
@@ -5916,7 +5920,7 @@ void InterChange::commandAddVoice(CommandBlock *getData)
     else
         nvoice = engine - PART::engine::addVoice1;
 
-    bool write = (type & 0x40) > 0;
+    bool write = (type & TOPLEVEL::type::Write) > 0;
     if (write)
         __sync_or_and_fetch(&blockRead, 1);
 
@@ -6305,7 +6309,7 @@ void InterChange::commandSub(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char insert = getData->data.insert & 0x1f; // ensure no stray filter
 
-    bool write = (type & 0x40) > 0;
+    bool write = (type & TOPLEVEL::type::Write) > 0;
     if (write)
         __sync_or_and_fetch(&blockRead, 1);
 
@@ -6557,7 +6561,7 @@ void InterChange::commandPad(CommandBlock *getData)
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
 
-    bool write = (type & 0x40) > 0;
+    bool write = (type & TOPLEVEL::type::Write) > 0;
     if (write)
         __sync_or_and_fetch(&blockRead, 1);
 
@@ -6864,11 +6868,11 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
     unsigned char control = getData->data.control;
     unsigned char insert = getData->data.insert;
 
-    bool write = (type & 0x40) > 0;
+    bool write = (type & TOPLEVEL::type::Write) > 0;
     if (write)
         __sync_or_and_fetch(&blockRead, 1);
 
-    if (insert == 6)
+    if (insert == TOPLEVEL::insert::harmonicAmplitude)
     {
         if (write)
         {
@@ -6881,7 +6885,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             getData->data.value = oscil->Phmag[control];
         return;
     }
-    else if(insert == 7)
+    else if(insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     {
         if (write)
         {
@@ -7125,7 +7129,7 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
     unsigned char control = getData->data.control;
     unsigned char insert = getData->data.insert;
 
-    bool write = (type & 0x40) > 0;
+    bool write = (type & TOPLEVEL::type::Write) > 0;
     if (write)
         __sync_or_and_fetch(&blockRead, 1);
 
@@ -7260,7 +7264,7 @@ void InterChange::commandLFO(CommandBlock *getData)
 
 void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
 {
-    bool write = (getData->data.type & 0x40) > 0;
+    bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
     if (write)
         __sync_or_and_fetch(&blockRead, 1);
 
@@ -7368,7 +7372,7 @@ void InterChange::commandFilter(CommandBlock *getData)
 
 void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, unsigned char *velsnsamp, unsigned char *velsns)
 {
-    bool write = (getData->data.type & 0x40) > 0;
+    bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
     if (write)
         __sync_or_and_fetch(&blockRead, 1);
 
@@ -7699,7 +7703,7 @@ void InterChange::commandEnvelope(CommandBlock *getData)
 void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
 {
     int val = lrint(getData->data.value); // these are all integers or bool
-    bool write = (getData->data.type & 0x40) > 0;
+    bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
     if (write)
         __sync_or_and_fetch(&blockRead, 1);
 
@@ -7909,7 +7913,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
     unsigned char effnum = getData->data.engine;
     unsigned char insert = getData->data.insert;
 
-    bool write = (type & 0x40) > 0;
+    bool write = (type & TOPLEVEL::type::Write) > 0;
     if (write)
         __sync_or_and_fetch(&blockRead, 1);
 
@@ -7972,7 +7976,7 @@ void InterChange::commandEffects(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;// & 0x7f ;
     unsigned char effnum = getData->data.engine;
 
-    bool write = (type & 0x40) > 0;
+    bool write = (type & TOPLEVEL::type::Write) > 0;
     if (write)
         __sync_or_and_fetch(&blockRead, 1);
 
@@ -8097,7 +8101,7 @@ float InterChange::returnLimits(CommandBlock *getData)
     int par2 = (int) getData->data.par2;
 
     float value = getData->data.value;
-    int request = int(getData->data.type & 3);
+    int request = int(getData->data.type & TOPLEVEL::type::Default); // catches Adj, Min, Max, Def
 
     //cout << "Top  Control " << control << " Part " << (int) getData->data.part << "  Kit " << kititem << " Engine " << engine << "  Insert " << insert << endl;
 
@@ -8191,7 +8195,7 @@ float InterChange::returnLimits(CommandBlock *getData)
             }
             return value;
         }
-        if (insert >= 5 && insert <= 7)
+        if (insert >= TOPLEVEL::insert::oscillatorGroup && insert <= TOPLEVEL::insert::harmonicPhaseBandwidth)
         {
             return part->kit[0].adpars->VoicePar[0].OscilSmp->getLimits(getData);
             // we also use this for pad limits
@@ -8199,7 +8203,7 @@ float InterChange::returnLimits(CommandBlock *getData)
         }
         if (insert == TOPLEVEL::insert::resonanceGroup)
         {
-            if (control == 0) // a cheat!
+            if (control == RESONANCE::control::maxDb) // a cheat!
             {
                 min = 1;
                 max = 90;
@@ -8253,9 +8257,9 @@ float InterChange::returnLimits(CommandBlock *getData)
         }
         if (insert == TOPLEVEL::insert::LFOgroup && parameter <= 2)
         {
-            if (control == 0) // another cheat!
+            if (control == LFOINSERT::control::speed) // another cheat!
             {
-                getData->data.type = 0x40;
+                getData->data.type = TOPLEVEL::type::Write;
                 min = 0;
                 max = 1;
                 def = 0.5f;

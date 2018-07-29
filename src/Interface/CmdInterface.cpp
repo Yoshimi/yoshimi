@@ -801,7 +801,7 @@ int CmdInterface::partVolPanVel()
     int reply = todo_msg;
     int cmdType = 0;
     if (!isRead)
-        cmdType = 64;
+        cmdType = TOPLEVEL::type::Write;
     int cmd = -1;
 
     if (matchnMove(1, point, "volume"))
@@ -1131,7 +1131,7 @@ int CmdInterface::commandVector()
     if (matchnMove(1, point, "name"))
     {
         string name = "!";
-        unsigned char type = 64;
+        unsigned char type = TOPLEVEL::type::Write;
         if (isRead)
             type = 0;
         else
@@ -1215,14 +1215,12 @@ int CmdInterface::commandConfig()
         return done_msg;
     }
     float value = 0;
-    unsigned char type;
+    unsigned char type = TOPLEVEL::type::Integer;
     unsigned char command = UNUSED;
     unsigned char par = UNUSED;
     unsigned char par2 = UNUSED;
-    if (isRead)
-        type = 0x80;
-    else
-        type = 0xc0; // write, integer
+    if (!isRead)
+        type |= TOPLEVEL::type::Write;
 
     if (matchnMove(1, point, "oscillator"))
     {
@@ -1501,17 +1499,14 @@ int CmdInterface::commandScale()
     Config &Runtime = synth->getRuntime();
     int reply = done_msg;
     float value = 0;
-    unsigned char type;
+    unsigned char type = TOPLEVEL::type::Integer;
     unsigned char command = UNUSED;
     unsigned char par = UNUSED;
     unsigned char par2 = UNUSED;
     if (isRead)
-    {
-        type = 0x80;
         reply = done_msg;
-    }
     else
-        type = 0xc0; // write, integer
+        type = TOPLEVEL::type::Write;
 
     string name;
 
@@ -1551,7 +1546,7 @@ int CmdInterface::commandScale()
             command = SCALES::control::Afrequency;
             min = 1;
             max = 20000;
-            type &= 0x7f; // float
+            type &= ~TOPLEVEL::type::Integer; // float
         }
         else if(matchnMove(2, point, "note"))
             command = SCALES::control::Anote;
@@ -1669,13 +1664,13 @@ int CmdInterface::commandPart(bool justSet)
         else
         {
             if (!changed) // needs to be better
-                sendDirect(npart, 64, 14, TOPLEVEL::section::main);
-            sendDirect(tmp, 64, 8, npart);
+                sendDirect(npart, TOPLEVEL::type::Write, 14, TOPLEVEL::section::main);
+            sendDirect(tmp, TOPLEVEL::type::Write, 8, npart);
         }
         return done_msg;
     }
 
-    int cmdType = 64;
+    int cmdType = TOPLEVEL::type::Write;
     if (isRead)
         cmdType = 0;
 
@@ -1724,7 +1719,7 @@ int CmdInterface::commandPart(bool justSet)
         if(!isRead && tmp < 1)
             return value_msg;
         tmp -= 1;
-        int type = 64;
+        int type = TOPLEVEL::type::Write;
         if (isRead)
             type = 0;
         sendDirect(tmp, type, 5, npart);
@@ -1732,13 +1727,11 @@ int CmdInterface::commandPart(bool justSet)
     }
     else if (matchnMove(1, point, "destination"))
     {
-        int type;
+        int type = 0;
         int dest = 0;
-        if (isRead)
-            type = 0;
-        else
+        if (!isRead)
         {
-            type = 64;
+            type = TOPLEVEL::type::Write;
             if (matchnMove(1, point, "main"))
                 dest = 1;
             else if (matchnMove(1, point, "part"))
@@ -1757,7 +1750,7 @@ int CmdInterface::commandPart(bool justSet)
         int value = 0;
         if(!isRead)
         {
-            type = 64;
+            type = TOPLEVEL::type::Write;
             value = matchnMove(1, point, "enable");
         }
         sendDirect(value, type, 141, npart);
@@ -1771,7 +1764,7 @@ int CmdInterface::commandPart(bool justSet)
         {
             if (point[0] == 0)
                 return value_msg;
-            type = 64;
+            type = TOPLEVEL::type::Write;
             value = string2int(point);
             if (value < 1 || (value > POLIPHONY - 20))
                 return range_msg;
@@ -1787,7 +1780,7 @@ int CmdInterface::commandPart(bool justSet)
         {
             if (point[0] == 0)
                 return value_msg;
-            type = 64;
+            type = TOPLEVEL::type::Write;
             value = string2int127(point);
             if (value > synth->part[npart]->Pmaxkey)
                 return high_msg;
@@ -1803,7 +1796,7 @@ int CmdInterface::commandPart(bool justSet)
         {
             if (point[0] == 0)
                 return value_msg;
-            type = 64;
+            type = TOPLEVEL::type::Write;
             value = string2int127(point);
             if (value < synth->part[npart]->Pminkey)
                 return low_msg;
@@ -1817,7 +1810,7 @@ int CmdInterface::commandPart(bool justSet)
         int value = 0;
         if(!isRead)
         {
-            type = 64;
+            type = TOPLEVEL::type::Write;
             if (matchnMove(1, point, "poly"))
                 value = 0;
             else if (matchnMove(1, point, "mono"))
@@ -1836,7 +1829,7 @@ int CmdInterface::commandPart(bool justSet)
         int value = 0;
         if(!isRead)
         {
-            type = 64;
+            type = TOPLEVEL::type::Write;
             if (matchnMove(1, point, "enable"))
                 value = 1;
         }
@@ -1846,7 +1839,7 @@ int CmdInterface::commandPart(bool justSet)
     else if (matchnMove(2, point, "name"))
     {
         string name;
-        unsigned char type = 64;
+        unsigned char type = TOPLEVEL::type::Write;
         unsigned char par2 = NO_MSG;
         if (isRead)
             type = 0;
@@ -2013,7 +2006,7 @@ int CmdInterface::commandReadnSet()
             return value_msg;
     }
 
-    int cmdType = 64;
+    int cmdType = TOPLEVEL::type::Write;
     if (isRead)
         cmdType = 0;
 
@@ -2307,7 +2300,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         }
         else
         {
-            sendDirect(value, 64, type, TOPLEVEL::section::main, root, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(name));
+            sendDirect(value, TOPLEVEL::type::Write, type, TOPLEVEL::section::main, root, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(name));
             reply = done_msg;
         }
     }
@@ -3008,7 +3001,7 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
         synth->getRuntime().Log(name + to_string(value));
         return 0;
     }
-    if ((type & 0x40) == 0)
+    if ((type & TOPLEVEL::type::Write) == 0)
     {
         string name;
         if ( part == TOPLEVEL::section::main)

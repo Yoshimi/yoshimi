@@ -4,6 +4,9 @@ yoshimi 1.5.8 M
 * More work on Limits.
 * Converted limits error checks.
 * Updated limits doc.
+* Improved encoding in UI/MiscGui.cpp
+* More work on limits.
+* Picked up a few more stragglers.
 
 2018-7-28 Will
 * Cleaned up some missing conversions.

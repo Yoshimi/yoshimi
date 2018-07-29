@@ -390,10 +390,7 @@ class SysEffSend {: {public WidgetPDial, private MiscFuncs}
   } {
     code {//
     if (event == FL_PUSH || event == FL_DRAG || event == FL_MOUSEWHEEL)
-    {
-        synth->setPsysefxsend(neff1,neff2,value());
-        collect_data(synth, value(), (Fl::event_button() | (1 << 7)), neff2, 0xf1, 0xff, neff1, 16);
-    }
+        collect_data(synth, value(), (Fl::event_button() | 0xc8), neff2, TOPLEVEL::section::systemEffects, 0xff, neff1, 16);
     return WidgetPDial::handle(event);} {}
   }
   decl {int neff1;} {private local

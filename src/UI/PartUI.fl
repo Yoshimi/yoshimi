@@ -68,7 +68,7 @@ class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
         callback {//
         if (Fl::event_button() == 3)
             o->value(0);
-        send_data(neff, o->value(), 0xc8);}
+        send_data(neff, o->value(), 0xf8);}
         xywh {0 0 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
         code0 {o->value(synth->Psysefxvol[neff][npart]);}
         code1 {o->copy_label(asString(neff + 1).c_str());}
@@ -80,7 +80,8 @@ class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
   Function {PartSysEffSend(int x, int y, int w, int h) :
     Fl_Group(x, y, w, h, NULL)} {} {
     code {//
-    neff = 0;npart = 0;} {}
+    neff = 0;
+    npart = 0;} {}
   }
   Function {send_data(int control, float value, int type)} {} {
     code {//
@@ -386,7 +387,7 @@ class PartKitItem {: {public Fl_Group, private MiscFuncs}
   }
 }
 
-class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
