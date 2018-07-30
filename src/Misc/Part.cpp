@@ -1672,7 +1672,7 @@ float Part::getLimits(CommandBlock *getData)
             break;
 
         default:
-            type |= TOPLEVEL::type::Error; // error
+            type |= TOPLEVEL::type::Error;
             break;
     }
     getData->data.type = type;

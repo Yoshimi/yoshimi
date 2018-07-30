@@ -8255,58 +8255,10 @@ float InterChange::returnLimits(CommandBlock *getData)
             }
             return value;
         }
-        if (insert == TOPLEVEL::insert::LFOgroup && parameter <= 2)
+        if (insert == TOPLEVEL::insert::LFOgroup && engine != PART::engine::subSynth && insert == TOPLEVEL::insert::LFOgroup && parameter <= TOPLEVEL::insertType::filter)
         {
-            if (control == LFOINSERT::control::speed) // another cheat!
-            {
-                getData->data.type = TOPLEVEL::type::Write;
-                min = 0;
-                max = 1;
-                def = 0.5f;
-                switch (request)
-                {
-                    case TOPLEVEL::type::Adjust:
-                        if(value < min)
-                            value = min;
-                        else if(value > max)
-                            value = max;
-                        break;
-                    case TOPLEVEL::type::Minimum:
-                        value = min;
-                        break;
-                    case TOPLEVEL::type::Maximum:
-                        value = max;
-                        break;
-                    case TOPLEVEL::type::Default:
-                        value = def;
-                        break;
-                }
-                return value;
-            }
-            min = 0;
-            max = 127;
-            def = 0;
-            cout << "Using LFO defaults" << endl;
-
-            switch (request)
-            {
-                case TOPLEVEL::type::Adjust:
-                    if(value < min)
-                        value = min;
-                    else if(value > max)
-                        value = max;
-                    break;
-                case TOPLEVEL::type::Minimum:
-                    value = min;
-                    break;
-                case TOPLEVEL::type::Maximum:
-                    value = max;
-                    break;
-                case TOPLEVEL::type::Default:
-                    value = def;
-                    break;
-            }
-            return value;
+            LFOlimit lfolimits;
+            return lfolimits.getLFOlimits(getData);
         }
         min = 0;
         max = 127;

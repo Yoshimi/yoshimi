@@ -1,5 +1,8 @@
 yoshimi 1.5.8 M
 
+2018-7-30 Will
+* Implemented LFO limits.
+
 2018-7-29 Will
 * More work on Limits.
 * Converted limits error checks.

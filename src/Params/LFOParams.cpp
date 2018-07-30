@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2017-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified February 2017
+    This file is derivative of ZynAddSubFX original code, modified July 2018
 */
 
 #include <cmath>
@@ -99,4 +100,119 @@ void LFOParams::getfromXML(XMLwrapper *xml)
     Pstretch = xml->getpar127("stretch", Pstretch);
     Pcontinous = xml->getparbool("continous", Pcontinous);
     updated = true;
+}
+
+float LFOlimit::getLFOlimits(CommandBlock *getData)
+{
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    int request = type & TOPLEVEL::type::Default;
+    int control = getData->data.control;
+    int engine = getData->data.engine;
+    int insertType = getData->data.parameter;
+
+    type &= 0x38; //source bits only
+
+    // defaults
+    int min = 0;
+    int max = 127;
+    float def = 0;
+    type |= TOPLEVEL::type::Integer;
+    unsigned char learnable = TOPLEVEL::type::Write;
+    type |= learnable;
+
+    switch (control)
+    {
+        case LFOINSERT::control::speed:
+            max = 1.0f;
+            switch(insertType)
+            {
+                case TOPLEVEL::insertType::amplitude:
+                    if (engine >= PART::engine::addVoice1)
+                        def = 0.708000;
+                    else
+                        def = 0.62999f;
+                    break;
+                case TOPLEVEL::insertType::frequency:
+                    if (engine >= PART::engine::addVoice1)
+                        def = 0.393000f;
+                    else
+                        def = 0.550999f;
+                    break;
+                case TOPLEVEL::insertType::filter:
+                    if (engine >= PART::engine::addVoice1)
+                        def = 0.393000f;
+                    else
+                        def = 0.62999f;
+                    break;
+            }
+            break;
+        case LFOINSERT::control::depth:
+            if (engine >= PART::engine::addVoice1)
+            {
+                switch(insertType)
+                {
+                    case TOPLEVEL::insertType::amplitude:
+                        def = 32;
+                        break;
+                    case TOPLEVEL::insertType::frequency:
+                        def = 40;
+                        break;
+                    case TOPLEVEL::insertType::filter:
+                        def = 20;
+                        break;
+                }
+            }
+            break;
+        case LFOINSERT::control::delay:
+            if (engine >= PART::engine::addVoice1 && insertType == TOPLEVEL::insertType::amplitude)
+                def = 30;
+            break;
+        case LFOINSERT::control::start:
+            if (engine < PART::engine::addVoice1 || insertType != TOPLEVEL::insertType::frequency)
+                def = 64;
+            break;
+        case LFOINSERT::control::amplitudeRandomness:
+            break;
+        case LFOINSERT::control::type:
+            max = 6;
+            type &= ~learnable;
+            break;
+        case LFOINSERT::control::continuous:
+            max = 1;
+            type &= ~learnable;
+            break;
+        case LFOINSERT::control::frequencyRandomness:
+            break;
+        case LFOINSERT::control::stretch:
+            def = 64;
+            break;
+
+        default:
+            type |= TOPLEVEL::type::Error; // error
+            break;
+    }
+    getData->data.type = type;
+    if (type & TOPLEVEL::type::Error)
+        return 1;
+
+    switch (request)
+    {
+        case TOPLEVEL::type::Adjust:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+        break;
+        case TOPLEVEL::type::Minimum:
+            value = min;
+            break;
+        case TOPLEVEL::type::Maximum:
+            value = max;
+            break;
+        case TOPLEVEL::type::Default:
+            value = def;
+            break;
+    }
+    return value;
 }
