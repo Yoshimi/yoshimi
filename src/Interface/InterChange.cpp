@@ -8255,10 +8255,15 @@ float InterChange::returnLimits(CommandBlock *getData)
             }
             return value;
         }
-        if (insert == TOPLEVEL::insert::LFOgroup && engine != PART::engine::subSynth && insert == TOPLEVEL::insert::LFOgroup && parameter <= TOPLEVEL::insertType::filter)
+        if (insert == TOPLEVEL::insert::LFOgroup && engine != PART::engine::subSynth && parameter <= TOPLEVEL::insertType::filter)
         {
             LFOlimit lfolimits;
             return lfolimits.getLFOlimits(getData);
+        }
+        if (insert == TOPLEVEL::insert::filterGroup)
+        {
+            filterLimit filterLimits;
+            return filterLimits.getFilterLimits(getData);
         }
         min = 0;
         max = 127;

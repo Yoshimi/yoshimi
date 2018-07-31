@@ -20,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified July 2018
+    This file is derivative of ZynAddSubFX original code.
+
+    Modified July 2018
 */
 
 #include <cmath>
@@ -111,9 +113,9 @@ float LFOlimit::getLFOlimits(CommandBlock *getData)
     int engine = getData->data.engine;
     int insertType = getData->data.parameter;
 
-    type &= 0x38; //source bits only
+    type &= (TOPLEVEL::source::MIDI || TOPLEVEL::source::CLI || TOPLEVEL::source::GUI); // source bits only
 
-    // defaults
+    // LFO defaults
     int min = 0;
     int max = 127;
     float def = 0;
@@ -189,7 +191,7 @@ float LFOlimit::getLFOlimits(CommandBlock *getData)
             break;
 
         default:
-            type |= TOPLEVEL::type::Error; // error
+            type |= TOPLEVEL::type::Error;
             break;
     }
     getData->data.type = type;

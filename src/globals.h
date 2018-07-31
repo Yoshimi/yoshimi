@@ -127,7 +127,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         Minimum,
         Maximum,
         Default,
-        // remaining bits
+        // remaining used bit-wise
         Error = 4, // also identifes static limits
         Limits = 4, // yes we can pair these - who knew?
         Write = 64, // false = read
@@ -135,6 +135,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
     };
 
     enum source : unsigned char {
+        // all used bit-wise
         MIDI = 8,
         CLI = 16,
         GUI = 32
@@ -752,7 +753,8 @@ namespace FILTERINSERT // usage FILTERINSERT::control::centerFrequency
         sequenceSize,
         sequencePosition, // local to GUI
         vowelPositionInSequence,
-        negateInput // form LFOs, envelopes etc.
+        negateInput, // form LFOs, envelopes etc.
+        dynFilter = 136 // this actually uses the kititem byte
     };
 }
 
