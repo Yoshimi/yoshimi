@@ -2,6 +2,7 @@ yoshimi 1.5.8 M
 
 2018-7-31 Will
 * Implemented filter limits.
+* Added MIDI-learn to filter limits.
 
 2018-7-30 Will
 * Implemented LFO limits.

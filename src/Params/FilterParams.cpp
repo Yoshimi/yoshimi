@@ -442,22 +442,27 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
             else
                 def = 0;
             max = 4;
+            type &= ~learnable;
             break;
         case FILTERINSERT::control::baseType:
             max = 2;
             def = 0;
+            type &= ~learnable;
             break;
         case FILTERINSERT::control::analogType:
             max = 8;
             def = 1;
+            type &= ~learnable;
             break;
         case FILTERINSERT::control::stateVariableType:
             max = 3;
             def = 0;
+            type &= ~learnable;
             break;
         case FILTERINSERT::control::frequencyTrackingRange:
             max = 1;
             def = 0;
+            type &= ~learnable;
             break;
         case FILTERINSERT::control::formantSlowness:
             break;
@@ -481,28 +486,35 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
         case FILTERINSERT::control::numberOfFormants:
             max = 12;
             def = 3;
+            type &= ~learnable;
             break;
         case FILTERINSERT::control::vowelNumber:
             max = 5;
             def = 0;
+            type &= ~learnable;
             break;
         case FILTERINSERT::control::formantNumber:
             max = 11;
             def = 0;
+            type &= ~learnable;
             break;
         case FILTERINSERT::control::sequenceSize:
             max = 8;
             def = 3;
+            type &= ~learnable;
             break;
         case FILTERINSERT::control::sequencePosition:
             def = 0;
+            type &= ~learnable;
             break;
         case FILTERINSERT::control::vowelPositionInSequence:
             max = 5;
+            type &= ~learnable;
             break;
         case FILTERINSERT::control::negateInput:
             max = 1;
             def = 0;
+            type &= ~learnable;
             break;
          default:
             type |= TOPLEVEL::type::Error;
