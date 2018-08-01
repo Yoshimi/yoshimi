@@ -131,6 +131,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         Error = 4, // also identifes static limits
         Limits = 4, // yes we can pair these - who knew?
         Write = 64, // false = read
+        Learnable = 64, // shared value
         Integer = 128 // false = float
     };
 

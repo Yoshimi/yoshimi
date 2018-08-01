@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified July 2018
+    Modified August 2018
 */
 
 #include "Misc/SynthEngine.h"
@@ -66,6 +66,17 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
         }
     }
 
+    CommandBlock putData;
+    size_t commandSize = sizeof(putData);
+    putData.data.value = value;
+    putData.data.control = control;
+    putData.data.part = part;
+    putData.data.kit = kititem;
+    putData.data.engine = engine;
+    putData.data.insert = insert;
+    putData.data.parameter = parameter;
+    putData.data.par2 = par2;
+
     unsigned char typetop = type & 0xd0; // allow for redraws *after* command
     if (part != TOPLEVEL::section::midiLearn)
     {
@@ -73,9 +84,11 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
         {
             if(Fl::event_state(FL_CTRL) != 0)
             {
-                if (type & 8)
+                putData.data.type = 1 | TOPLEVEL::type::Limits;
+                synth->interchange.readAllData(&putData);
+                if (putData.data.type & TOPLEVEL::type::Learnable)
                     type = 3; // previous type is now irrelevant
-                // identifying this for button 3 as MIDI learn
+                    // identifying this for button 3 as MIDI learn
                 else
                 {
                     synth->getGuiMaster()->words->copy_label("Can't learn this control");
@@ -86,12 +99,12 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
                      * For some reason it goes into a loop on spin boxes
                      * and runs menus up to their max value.
                      */
-                    return;
+                    type = TOPLEVEL::type::Write;
                 }
             }
             else
-                type = 0x40;
-                // identifying this for button 3 as set default
+                type = TOPLEVEL::type::Write;
+                // has to be write as it's 'set default'
         }
         else if((type & 7) > 2)
             type = 1;
@@ -99,17 +112,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
     }
     type |= typetop;
 
-    CommandBlock putData;
-    size_t commandSize = sizeof(putData);
-    putData.data.value = value;
     putData.data.type = type | TOPLEVEL::source::GUI;
-    putData.data.control = control;
-    putData.data.part = part;
-    putData.data.kit = kititem;
-    putData.data.engine = engine;
-    putData.data.insert = insert;
-    putData.data.parameter = parameter;
-    putData.data.par2 = par2;
 
 //cout << "collect_data " << int(type) << " " << int(control) << " " << int(part) << " " << int(kititem) << " " << int(engine) << " " << int(parameter) << " " << int(par2) << endl;
     if (jack_ringbuffer_write_space(synth->interchange.fromGUI) >= commandSize)

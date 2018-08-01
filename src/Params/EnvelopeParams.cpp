@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified January 2011
+    This file is derivative of ZynAddSubFX original code.
+
+    Modified August 2018
 */
 
 #include <cmath>
@@ -292,3 +295,99 @@ void EnvelopeParams::store2defaults(void)
     DS_val = PS_val;
     DR_val = PR_val;
 }
+
+float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
+{
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    int request = type & TOPLEVEL::type::Default;
+    int control = getData->data.control;
+    int parameter = getData->data.parameter;
+
+    type &= (TOPLEVEL::source::MIDI || TOPLEVEL::source::CLI || TOPLEVEL::source::GUI); // source bits only
+
+    // envelope defaults
+    int min = 0;
+    int max = 127;
+    float def = 64;
+    type |= TOPLEVEL::type::Integer;
+    unsigned char learnable = TOPLEVEL::type::Write;
+    type |= learnable;
+
+    switch (control)
+    {
+        case ENVELOPEINSERT::control::attackLevel:
+            break;
+        case ENVELOPEINSERT::control::attackTime:
+            break;
+        case ENVELOPEINSERT::control::decayLevel:
+            break;
+        case ENVELOPEINSERT::control::decayTime:
+            break;
+        case ENVELOPEINSERT::control::sustainLevel:
+            def = 127;
+            break;
+        case ENVELOPEINSERT::control::releaseTime:
+            break;
+        case ENVELOPEINSERT::control::releaseLevel:
+            break;
+        case ENVELOPEINSERT::control::stretch:
+            if (parameter != TOPLEVEL::insertType::amplitude)
+                def = 0;
+            else
+                def = 1;
+            break;
+        case ENVELOPEINSERT::control::forcedRelease:
+            max = 1;
+            if (parameter == TOPLEVEL::insertType::amplitude)
+                def = 1;
+            else
+                def = 0;
+            type &= ~learnable;
+            break;
+        case ENVELOPEINSERT::control::linearEnvelope:
+            max = 1;
+            def = 0;
+            type &= ~learnable;
+            break;
+        case ENVELOPEINSERT::control::edit:
+            break;
+        case ENVELOPEINSERT::control::enableFreeMode:
+            def = 0;
+            max = 1;
+            type &= ~learnable;
+            break;
+        case ENVELOPEINSERT::control::points:
+            break;
+        case ENVELOPEINSERT::control::sustainPoint:
+            break;
+        default:
+            type |= TOPLEVEL::type::Error;
+            break;
+    }
+    getData->data.type = type;
+    if (type & TOPLEVEL::type::Error)
+        return 1;
+
+    switch (request)
+    {
+        case TOPLEVEL::type::Adjust:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+        break;
+        case TOPLEVEL::type::Minimum:
+            value = min;
+            break;
+        case TOPLEVEL::type::Maximum:
+            value = max;
+            break;
+        case TOPLEVEL::type::Default:
+            value = def;
+            break;
+    }
+    return value;
+}
+
+

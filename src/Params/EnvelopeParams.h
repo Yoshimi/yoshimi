@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified January 2011
+    This file is derivative of ZynAddSubFX original code.
+
+    Modified August 2018
 */
 
 #ifndef ENVELOPE_PARAMS_H
@@ -78,6 +81,12 @@ class EnvelopeParams : public Presets
         unsigned char Dlinearenvelope;
         unsigned char DA_dt, DD_dt, DR_dt,
                       DA_val, DD_val, DS_val, DR_val;
+};
+
+class envelopeLimit
+{
+    public:
+        float getEnvelopeLimits(CommandBlock *getData);
 };
 
 #endif

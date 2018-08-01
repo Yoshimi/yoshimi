@@ -469,7 +469,8 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
         case FILTERINSERT::control::formantClearness:
             break;
         case FILTERINSERT::control::formantFrequency:
-            def = 255; // denotes random
+            max = 0;
+            def = 0; // all zero denotes random
             break;
         case FILTERINSERT::control::formantQ:
             break;

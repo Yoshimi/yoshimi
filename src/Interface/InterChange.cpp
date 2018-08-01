@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified July 2018
+    Modified August 2018
 */
 
 #include <iostream>
@@ -1331,17 +1331,6 @@ void InterChange::resolveReplies(CommandBlock *getData)
     }
     if ((isGui || isCli) && button == 3)
     {
-/*
- *  once all limits are correct this code block can be
- *  used instead of testing inside the GUI
- *
-        unsigned char patch = getData->data.type;
-        getData->data.type |= TOPLEVEL::type::Limits;
-        readAllData(getData);
-        if (getData->data.type & 64)
-            cout << "Learnable" << endl;
-        getData->data.type = patch;
-*/
         string toSend;
         size_t pos = commandName.find(" - ");
         if (pos < 1 || pos >= commandName.length())
@@ -8264,6 +8253,11 @@ float InterChange::returnLimits(CommandBlock *getData)
         {
             filterLimit filterLimits;
             return filterLimits.getFilterLimits(getData);
+        }
+        if (insert == TOPLEVEL::insert::envelopeGroup)
+        {
+            envelopeLimit envelopeLimits;
+            return envelopeLimits.getEnvelopeLimits(getData);
         }
         min = 0;
         max = 127;
