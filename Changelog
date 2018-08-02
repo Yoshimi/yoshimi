@@ -2,6 +2,8 @@ yoshimi 1.5.8 M
 
 2018-8-2 Will
 * ADnoteUI.fl converted to enums.
+* More clarifcations in MiscGui.cpp
+  Also found more missing conversions :(
 
 2018-8-1 Will
 * Partly implemented envelope limits.

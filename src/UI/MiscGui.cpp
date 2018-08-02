@@ -77,10 +77,11 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
     putData.data.parameter = parameter;
     putData.data.par2 = par2;
 
-    unsigned char typetop = type & 0xd0; // allow for redraws *after* command
+    unsigned char typetop = type & 0xd0; // pass through redraws *after* command
+    unsigned char buttons = type & 7;
     if (part != TOPLEVEL::section::midiLearn)
     {
-        if ((type & 3) == 3 && Fl::event_is_click())
+        if (buttons == 3 && Fl::event_is_click())
         {
             if(Fl::event_state(FL_CTRL) != 0)
             {
@@ -106,7 +107,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
                 type = TOPLEVEL::type::Write;
                 // has to be write as it's 'set default'
         }
-        else if((type & 7) > 2)
+        else if(buttons > 2)
             type = 1;
             // change scroll wheel to button 1
     }
@@ -152,7 +153,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 
 //        cout << "Con " << int(control) << "  Kit " << int(kititem) << "  Eng " << int(engine) << "  Ins " << int(insert) << endl;
 
-    if (control == TOPLEVEL::control::errorMessage && insert != 9) // just show a messge
+    if (control == TOPLEVEL::control::errorMessage && insert != TOPLEVEL::insert::resonanceGraphInsert) // just show a messge
     {
         synth->getGuiMaster()->words->copy_label(miscMsgPop(insertPar2).c_str());
         synth->getGuiMaster()->cancel->hide();
@@ -192,21 +193,21 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     {
         if (npart == TOPLEVEL::section::systemEffects)
         {
-            if (insert == 1) // dynefilter filter insert
+            if (insert == TOPLEVEL::insert::filterGroup) // dynefilter filter insert
                 synth->getGuiMaster()->syseffectui->fwin_filterui->returns_update(getData);
             else
                 synth->getGuiMaster()->syseffectui->returns_update(getData);
         }
         else if (npart == TOPLEVEL::section::insertEffects)
         {
-            if (insert == 1) // dynefilter filter insert
+            if (insert == TOPLEVEL::insert::filterGroup) // dynefilter filter insert
                 synth->getGuiMaster()->inseffectui->fwin_filterui->returns_update(getData);
             else
                 synth->getGuiMaster()->inseffectui->returns_update(getData);
         }
         else if (npart < NUM_MIDI_PARTS)
         {
-            if (insert == 1) // dynefilter filter insert
+            if (insert == TOPLEVEL::insert::filterGroup) // dynefilter filter insert
                 synth->getGuiMaster()->partui->inseffectui->fwin_filterui->returns_update(getData);
             else
                 synth->getGuiMaster()->partui->inseffectui->returns_update(getData);
@@ -219,7 +220,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         synth->getGuiMaster()->configui->returns_update(getData);
         return;
     }
-    if (npart == TOPLEVEL::section::main && control == 94) // special case for pad sample save
+    if (npart == TOPLEVEL::section::main && control == MAIN::control::exportPadSynthSamples) // special case
     {
         npart = insertParam & 0x3f;
         getData->data.part = npart;
@@ -276,15 +277,15 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 case TOPLEVEL::insert::LFOgroup:
                     switch(insertParam)
                     {
-                        case 0:
+                        case TOPLEVEL::insertType::amplitude:
                             if (synth->getGuiMaster()->partui->padnoteui->amplfo)
                                 synth->getGuiMaster()->partui->padnoteui->amplfo->returns_update(getData);
                             break;
-                        case 1:
+                        case TOPLEVEL::insertType::frequency:
                             if (synth->getGuiMaster()->partui->padnoteui->freqlfo)
                                 synth->getGuiMaster()->partui->padnoteui->freqlfo->returns_update(getData);
                             break;
-                        case 2:
+                        case TOPLEVEL::insertType::filter:
                             if (synth->getGuiMaster()->partui->padnoteui->filterlfo)
                                 synth->getGuiMaster()->partui->padnoteui->filterlfo->returns_update(getData);
                             break;
@@ -299,15 +300,15 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 case TOPLEVEL::insert::envelopePointChange:
                     switch(insertParam)
                     {
-                        case 0:
+                        case TOPLEVEL::insertType::amplitude:
                             if (synth->getGuiMaster()->partui->padnoteui->ampenv)
                                 synth->getGuiMaster()->partui->padnoteui->ampenv->returns_update(getData);
                             break;
-                        case 1:
+                        case TOPLEVEL::insertType::frequency:
                             if (synth->getGuiMaster()->partui->padnoteui->freqenv)
                                 synth->getGuiMaster()->partui->padnoteui->freqenv->returns_update(getData);
                             break;
-                        case 2:
+                        case TOPLEVEL::insertType::filter:
                             if (synth->getGuiMaster()->partui->padnoteui->filterenv)
                                 synth->getGuiMaster()->partui->padnoteui->filterenv->returns_update(getData);
                             break;
@@ -348,19 +349,19 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 case TOPLEVEL::insert::envelopePointChange:
                     switch(insertParam)
                     {
-                        case 0:
+                        case TOPLEVEL::insertType::amplitude:
                             if (synth->getGuiMaster()->partui->subnoteui->ampenv)
                                 synth->getGuiMaster()->partui->subnoteui->ampenv->returns_update(getData);
                             break;
-                        case 1:
+                        case TOPLEVEL::insertType::frequency:
                             if (synth->getGuiMaster()->partui->subnoteui->freqenvelopegroup)
                                 synth->getGuiMaster()->partui->subnoteui->freqenvelopegroup->returns_update(getData);
                             break;
-                        case 2:
+                        case TOPLEVEL::insertType::filter:
                             if (synth->getGuiMaster()->partui->subnoteui->filterenv)
                                 synth->getGuiMaster()->partui->subnoteui->filterenv->returns_update(getData);
                             break;
-                        case 3:
+                        case TOPLEVEL::insertType::bandwidth:
                             if (synth->getGuiMaster()->partui->subnoteui->bandwidthenvelopegroup)
                                 synth->getGuiMaster()->partui->subnoteui->bandwidthenvelopegroup->returns_update(getData);
                             break;
@@ -389,15 +390,15 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                     case TOPLEVEL::insert::LFOgroup:
                         switch(insertParam)
                         {
-                            case 0:
+                            case TOPLEVEL::insertType::amplitude:
                                 if (synth->getGuiMaster()->partui->adnoteui->advoice->voiceamplfogroup)
                                     synth->getGuiMaster()->partui->adnoteui->advoice->voiceamplfogroup->returns_update(getData);
                                 break;
-                            case 1:
+                            case TOPLEVEL::insertType::frequency:
                                 if (synth->getGuiMaster()->partui->adnoteui->advoice->voicefreqlfogroup)
                                     synth->getGuiMaster()->partui->adnoteui->advoice->voicefreqlfogroup->returns_update(getData);
                                 break;
-                            case 2:
+                            case TOPLEVEL::insertType::filter:
                                 if (synth->getGuiMaster()->partui->adnoteui->advoice->voicefilterlfogroup)
                                     synth->getGuiMaster()->partui->adnoteui->advoice->voicefilterlfogroup->returns_update(getData);
                                 break;
@@ -413,11 +414,11 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                         if (engine >= PART::engine::addMod1)
                             switch(insertParam)
                             {
-                                case 0:
+                                case TOPLEVEL::insertType::amplitude:
                                     if (synth->getGuiMaster()->partui->adnoteui->advoice->voiceFMampenvgroup)
                                         synth->getGuiMaster()->partui->adnoteui->advoice->voiceFMampenvgroup->returns_update(getData);
                                     break;
-                                case 1:
+                                case TOPLEVEL::insertType::frequency:
                                     if (synth->getGuiMaster()->partui->adnoteui->advoice->voiceFMfreqenvgroup)
                                         synth->getGuiMaster()->partui->adnoteui->advoice->voiceFMfreqenvgroup->returns_update(getData);
                                     break;
@@ -426,15 +427,15 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                         {
                             switch(insertParam)
                             {
-                                case 0:
+                                case TOPLEVEL::insertType::amplitude:
                                     if (synth->getGuiMaster()->partui->adnoteui->advoice->voiceampenvgroup)
                                         synth->getGuiMaster()->partui->adnoteui->advoice->voiceampenvgroup->returns_update(getData);
                                     break;
-                                case 1:
+                                case TOPLEVEL::insertType::frequency:
                                     if (synth->getGuiMaster()->partui->adnoteui->advoice->voicefreqenvgroup)
                                         synth->getGuiMaster()->partui->adnoteui->advoice->voicefreqenvgroup->returns_update(getData);
                                     break;
-                                case 2:
+                                case TOPLEVEL::insertType::filter:
                                     if (synth->getGuiMaster()->partui->adnoteui->advoice->voicefilterenvgroup)
                                         synth->getGuiMaster()->partui->adnoteui->advoice->voicefilterenvgroup->returns_update(getData);
                                     break;
@@ -464,15 +465,15 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 case TOPLEVEL::insert::LFOgroup:
                     switch(insertParam)
                     {
-                        case 0:
+                        case TOPLEVEL::insertType::amplitude:
                             if (synth->getGuiMaster()->partui->adnoteui->amplfo)
                                 synth->getGuiMaster()->partui->adnoteui->amplfo->returns_update(getData);
                             break;
-                        case 1:
+                        case TOPLEVEL::insertType::frequency:
                             if (synth->getGuiMaster()->partui->adnoteui->freqlfo)
                                 synth->getGuiMaster()->partui->adnoteui->freqlfo->returns_update(getData);
                             break;
-                        case 2:
+                        case TOPLEVEL::insertType::filter:
                             if (synth->getGuiMaster()->partui->adnoteui->filterlfo)
                                 synth->getGuiMaster()->partui->adnoteui->filterlfo->returns_update(getData);
                             break;
@@ -487,15 +488,15 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 case TOPLEVEL::insert::envelopePointChange:
                     switch(insertParam)
                     {
-                        case 0:
+                        case TOPLEVEL::insertType::amplitude:
                             if (synth->getGuiMaster()->partui->adnoteui->ampenv)
                                 synth->getGuiMaster()->partui->adnoteui->ampenv->returns_update(getData);
                             break;
-                        case 1:
+                        case TOPLEVEL::insertType::frequency:
                             if (synth->getGuiMaster()->partui->adnoteui->freqenv)
                                 synth->getGuiMaster()->partui->adnoteui->freqenv->returns_update(getData);
                             break;
-                        case 2:
+                        case TOPLEVEL::insertType::filter:
                             if (synth->getGuiMaster()->partui->adnoteui->filterenv)
                                 synth->getGuiMaster()->partui->adnoteui->filterenv->returns_update(getData);
                             break;
@@ -1265,9 +1266,9 @@ ValueType getLFOdepthType(int group)
 {
     switch(group)
     {
-        case 0: return(VC_LFOdepthAmp);
-        case 1: return(VC_LFOdepthFreq);
-        case 2: return(VC_LFOdepthFilter);
+        case TOPLEVEL::insertType::amplitude: return(VC_LFOdepthAmp);
+        case TOPLEVEL::insertType::frequency: return(VC_LFOdepthFreq);
+        case TOPLEVEL::insertType::filter: return(VC_LFOdepthFilter);
     }
     return(VC_plainValue);
 }
