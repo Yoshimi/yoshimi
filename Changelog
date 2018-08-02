@@ -5,6 +5,7 @@ yoshimi 1.5.8 M
 * More clarifcations in MiscGui.cpp
   Also found more missing conversions :(
 * SUBnoteUI.fl converted to enums.
+* PADnoteUI.fl converted to enums.
 
 2018-8-1 Will
 * Partly implemented envelope limits.
