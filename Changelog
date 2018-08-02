@@ -1,5 +1,8 @@
 yoshimi 1.5.8 M
 
+2018-8-2 Will
+* ADnoteUI.fl converted to enums.
+
 2018-8-1 Will
 * Partly implemented envelope limits.
   Not defaults.
