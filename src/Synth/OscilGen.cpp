@@ -1637,8 +1637,7 @@ float OscilGen::getLimits(CommandBlock *getData)
 
     if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     { // do harmonics stuff
-        if (insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
-            def = 64;
+        def = 64;
         getData->data.type = type;
         switch (request)
         {

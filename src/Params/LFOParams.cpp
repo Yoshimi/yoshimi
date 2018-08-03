@@ -120,7 +120,7 @@ float LFOlimit::getLFOlimits(CommandBlock *getData)
     int max = 127;
     float def = 0;
     type |= TOPLEVEL::type::Integer;
-    unsigned char learnable = TOPLEVEL::type::Write;
+    unsigned char learnable = TOPLEVEL::type::Learnable;
     type |= learnable;
 
     switch (control)

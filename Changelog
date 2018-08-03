@@ -3,6 +3,8 @@ yoshimi 1.5.8 M
 2018-8-3 Will
 * OscilGenUI.fl converted to enums.
 * Completed limits in Synth/OscilGen.cpp
+* PartUI.fl converted to enums.
+* Some minor cleanups.
 
 2018-8-2 Will
 * ADnoteUI.fl converted to enums.

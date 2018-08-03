@@ -405,7 +405,7 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
     int max = 127;
     float def = 64;
     type |= TOPLEVEL::type::Integer;
-    unsigned char learnable = TOPLEVEL::type::Write;
+    unsigned char learnable = TOPLEVEL::type::Learnable;
     type |= learnable;
 
     switch (control)

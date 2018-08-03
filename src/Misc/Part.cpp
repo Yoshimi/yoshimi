@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified July 2018
+    Modified August 2018
 */
 
 #include <cstring>
@@ -1522,17 +1522,20 @@ void Part::getfromXML(XMLwrapper *xml)
 float Part::getLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    unsigned char learnable = TOPLEVEL::type::Write;
+    unsigned char type = getData->data.type;
     int request = int(getData->data.type & TOPLEVEL::type::Default);
-
-    unsigned int type = (getData->data.type & 0xfc);
     int control = getData->data.control;
     int npart = getData->data.part;
 
-    // defaults
+    type &= (TOPLEVEL::source::MIDI || TOPLEVEL::source::CLI || TOPLEVEL::source::GUI); // source bits only
+
+    // part defaults
     int min = 0;
     float def = 64;
     int max = 127;
+    type |= TOPLEVEL::type::Integer;
+    unsigned char learnable = TOPLEVEL::type::Learnable;
+
     //cout << "part control " << control << "  Request " << request << endl;
 
     if ((control >= PART::control::volumeRange && control <= PART::control::receivePortamento) || control == PART::control::resetAllControllers)
@@ -1541,7 +1544,7 @@ float Part::getLimits(CommandBlock *getData)
     switch (control)
     {
         case PART::control::volume:
-            type &= 0x3f;
+            type &= ~TOPLEVEL::type::Integer;
             type |= learnable;
             def = 96;
             break;
@@ -1552,7 +1555,7 @@ float Part::getLimits(CommandBlock *getData)
             break;
 
         case PART::control::panning:
-            type &= 0x3f;
+            type &= ~TOPLEVEL::type::Integer;
             type |= learnable;
             break;
 
@@ -1582,6 +1585,7 @@ float Part::getLimits(CommandBlock *getData)
             break;
 
         case PART::control::kitItemMute:
+            type |= learnable;
             def = 0;
             max = 1;
             break;
