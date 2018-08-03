@@ -367,7 +367,7 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
           if (Fl::event_button() == 3)
               o->value(0);
 
-          send_data (SUBSYNTH::control::detuneFrequency, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::SetAfterDone);}
+          send_data (SUBSYNTH::control::detuneFrequency, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Fine Detune (cents)} xywh {491 47 234 15} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->PDetune-8192);}
           class mwheel_slider_rev
@@ -407,7 +407,7 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
           label {Detune Type}
           callback {//
 
-          send_data (SUBSYNTH::control::detuneType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::SetAfterDone);}
+          send_data (SUBSYNTH::control::detuneType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           xywh {655 78 70 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
           code1 {o->value(pars->PDetuneType-1);}

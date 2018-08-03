@@ -139,7 +139,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         // all used bit-wise
         MIDI = 8,
         CLI = 16,
-        SetAfterDone = 16, // so gui can update
+        UpdateAfterSet = 16, // so gui can update
         GUI = 32
     };
 
