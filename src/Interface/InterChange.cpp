@@ -8192,11 +8192,14 @@ float InterChange::returnLimits(CommandBlock *getData)
         }
         if (insert == TOPLEVEL::insert::resonanceGroup)
         {
+            unsigned char type = getData->data.type;
+            type &= (TOPLEVEL::source::MIDI || TOPLEVEL::source::CLI || TOPLEVEL::source::GUI); // source bits only
             if (control == RESONANCE::control::maxDb) // a cheat!
             {
                 min = 1;
                 max = 90;
                 def = 50;
+                getData->data.type |= TOPLEVEL::type::Learnable;
 
                 switch (request)
                 {

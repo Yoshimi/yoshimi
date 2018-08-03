@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified July 2018
+    Modified August 2018
 */
 
 #define NOLOCKS
@@ -3334,22 +3334,69 @@ float SynthEngine::getLimits(CommandBlock *getData)
 float SynthEngine::getVectorLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    int request = int(getData->data.type & 3);
+    unsigned char type = getData->data.type;
+    unsigned char request = getData->data.type  & TOPLEVEL::type::Default;
     int control = getData->data.control;
 
-    // defaults
-    int type = (getData->data.type & 0x3f) | TOPLEVEL::type::Integer; // set as integer
+    type &= (TOPLEVEL::source::MIDI || TOPLEVEL::source::CLI || TOPLEVEL::source::GUI); // source bits only
+
+    // vector defaults
+    type |= TOPLEVEL::type::Integer;
     int min = 0;
     float def = 0;
-    int max = NUM_MIDI_CHANNELS;
+    int max = 1;
     //cout << "config control " << to_string(control) << endl;
     switch (control)
     {
+        case VECTOR::control::undefined:
+            break;
+        case VECTOR::control::name:
+            break;
+        case VECTOR::control::Xcontroller:
+            max = 119;
+            break;
+        case VECTOR::control::XleftInstrument:
+            max = 159;
+            break;
+        case VECTOR::control::XrightInstrument:
+            max = 159;
+            break;
+        case VECTOR::control::Xfeature0:
+            break;
+        case VECTOR::control::Xfeature1:
+            max = 2;
+            break;
+        case VECTOR::control::Xfeature2:
+            max = 2;
+            break;
+        case VECTOR::control::Xfeature3:
+            max = 2;
+            break;
+        case VECTOR::control::Ycontroller:
+            max = 119;
+            break;
+        case VECTOR::control::YupInstrument:
+            max = 159;
+            break;
+        case VECTOR::control::YdownInstrument:
+            max = 159;
+            break;
+        case VECTOR::control::Yfeature0:
+            break;
+        case VECTOR::control::Yfeature1:
+            max = 2;
+            break;
+        case VECTOR::control::Yfeature2:
+            max = 2;
+            break;
+        case VECTOR::control::Yfeature3:
+            max = 2;
+            break;
+        case VECTOR::control::erase:
+            break;
+
         default: // TODO
-            //min = -1;
-            //def = -1;
-            //max = -1;
-            //type |= TOPLEVEL::type::Error;
+            type |= TOPLEVEL::type::Error;
             break;
     }
     getData->data.type = type;

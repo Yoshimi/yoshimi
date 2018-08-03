@@ -5,6 +5,10 @@ yoshimi 1.5.8 M
 * Completed limits in Synth/OscilGen.cpp
 * PartUI.fl converted to enums.
 * Some minor cleanups.
+* VectorUI.fl converted to enums.
+* Vector limits now same format as others.
+* ResonanceUI.fl converted to enums
+
 
 2018-8-2 Will
 * ADnoteUI.fl converted to enums.
