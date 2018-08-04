@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is a derivative of a ZynAddSubFX original.
-    Modified July 2018
+    Modified August 2018
 */
 
 #include "Params/SUBnoteParameters.h"
@@ -361,25 +361,30 @@ void SUBnoteParameters::getfromXML(XMLwrapper *xml)
 float SUBnoteParameters::getLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    int request = int(getData->data.type & 3);
+    unsigned char type = getData->data.type;
+    int request = type & TOPLEVEL::type::Default;
     int control = getData->data.control;
     int insert = getData->data.insert;
 
-    int min;
-    int max;
-    int def;
+    type &= (TOPLEVEL::source::MIDI || TOPLEVEL::source::CLI || TOPLEVEL::source::GUI); // source bits only
 
-    if (insert >= 6 && insert <= 7)
+    // subsynth defaults
+    int min = 0;
+    int max = 127;
+    int def = 0;
+    type |= TOPLEVEL::type::Integer;
+    unsigned char learnable = TOPLEVEL::type::Learnable;
+    type |= learnable;
+
+    if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     { // do harmonics stuff
-        if (insert == 7)
+        if (insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
             def = 64;
         else if (control == 0)
             def = 127;
-        else
-            def = 0;
-        getData->data.type |= 0x40; // all learnable
-        min = 0;
-        max = 127;
+
+        getData->data.type = type;
+
         switch (request)
         {
             case TOPLEVEL::type::Adjust:
@@ -395,142 +400,131 @@ float SUBnoteParameters::getLimits(CommandBlock *getData)
             case TOPLEVEL::type::Maximum:
                 value = 127;
                 break;
+        }
+        return value;
     }
-    return value;
-    }
-
-    // defaults
-    int type = 0;
-    min = 0;
-    def = 0;
-    max = 127;
 
     switch (control)
     {
-        case 0:
-            type = 0x40;
+        case SUBSYNTH::control::volume:
             def = 96;
             break;
 
-        case 1:
-            type = 0x40;
+        case SUBSYNTH::control::velocitySense:
             def = 90;
             break;
 
-        case 2:
-            type = 0x40;
+        case SUBSYNTH::control::panning:
             def = 64;
             break;
 
-        case 8:
-            type = 0x40;
+        case SUBSYNTH::control::enable:
             max = 1;
             break;
 
-        case 16:
-            type = 0x40;
+        case SUBSYNTH::control::bandwidth:
             def = 40;
             break;
 
-        case 17:
-            type = 0x40;
+        case SUBSYNTH::control::bandwidthScale:
             min = -64;
             max = 63;
             break;
 
-        case 18:
-            type = 0x40;
+        case SUBSYNTH::control::enableBandwidthEnvelope:
             max = 1;
             break;
 
-        case 32:
-            type = 0x40;
+        case SUBSYNTH::control::detuneFrequency:
             min = -8192;
             max = 8191;
             break;
 
-        case 33:
-            type = 0x40;
+        case SUBSYNTH::control::equalTemperVariation:
             break;
 
-        case 34:
+        case SUBSYNTH::control::baseFrequencyAs440Hz:
+            type &= ~learnable;
             max = 1;
             break;
 
-        case 35:
-            type = 0x40;
+        case SUBSYNTH::control::octave:
             min = -8;
             max = 7;
             break;
 
-        case 36:
+        case SUBSYNTH::control::detuneType:
+            type &= ~learnable;
             max = 3;
             break;
 
-        case 37:
+        case SUBSYNTH::control::coarseDetune:
+            type &= ~learnable;
             min = -64;
             max = 63;
             break;
 
-        case 38:
-            type = 0x40;
+        case SUBSYNTH::control::pitchBendAdjustment:
             def = 88;
             break;
 
-        case 39:
-            type = 0x40;
+        case SUBSYNTH::control::pitchBendOffset:
             def = 64;
             break;
 
-        case 40:
-            type = 0x40;
+        case SUBSYNTH::control::enableFrequencyEnvelope:
             max = 1;
             break;
 
-        case 48:
-        case 49:
-        case 50:
-            type = 0x40;
+        case SUBSYNTH::control::overtoneParameter1:
+        case SUBSYNTH::control::overtoneParameter2:
+        case SUBSYNTH::control::overtoneForceHarmonics:
             max = 255;
             break;
+        case SUBSYNTH::control::overtonePosition:
+            type &= ~learnable;
+            max = 7;
+            break;
 
-        case 64:
-            type = 0x40;
+        case SUBSYNTH::control::enableFilter:
             max = 1;
             break;
 
-        case 80:
+        case SUBSYNTH::control::filterStages:
+            type &= ~learnable;
             min = 1;
-            def = 100;
+            def = 1;
             max = 5;
             break;
 
-        case 81:
+        case SUBSYNTH::control::magType:
+            type &= ~learnable;
             max = 4;
             break;
 
-        case 82:
-            def = 100;
+        case SUBSYNTH::control::startPosition:
+            type &= ~learnable;
+            def = 1;
             max = 2;
             break;
 
-        case 96:
+        case SUBSYNTH::control::clearHarmonics:
+            type &= ~learnable;
             max = 0;
             break;
 
-        case 112:
-            type = 0x40;
+        case SUBSYNTH::control::stereo:
             def = 1;
             max = 1;
             break;
 
 
         default:
-            type |= 4; // error
+            type |= TOPLEVEL::type::Error;
             break;
     }
     getData->data.type = type;
-    if (type & 4)
+    if (type & TOPLEVEL::type::Error)
         return 1;
 
     switch (request)

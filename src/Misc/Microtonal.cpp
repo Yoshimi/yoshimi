@@ -793,7 +793,6 @@ float Microtonal::getLimits(CommandBlock *getData)
     int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
 
-    // defaults
     type &= (TOPLEVEL::source::MIDI || TOPLEVEL::source::CLI || TOPLEVEL::source::GUI); // source bits only
 
     // microtonal defaults
@@ -802,8 +801,6 @@ float Microtonal::getLimits(CommandBlock *getData)
     int max = 127;
     type |= TOPLEVEL::type::Integer;
     unsigned char learnable = TOPLEVEL::type::Learnable;
-
-    //cout << "config control " << to_string(control) << endl;
 
     switch (control)
     {
@@ -903,5 +900,4 @@ float Microtonal::getLimits(CommandBlock *getData)
             break;
     }
     return value;
-
 }

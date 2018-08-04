@@ -1536,8 +1536,6 @@ float Part::getLimits(CommandBlock *getData)
     type |= TOPLEVEL::type::Integer;
     unsigned char learnable = TOPLEVEL::type::Learnable;
 
-    //cout << "part control " << control << "  Request " << request << endl;
-
     if ((control >= PART::control::volumeRange && control <= PART::control::receivePortamento) || control == PART::control::resetAllControllers)
         return ctl->getLimits(getData);
 

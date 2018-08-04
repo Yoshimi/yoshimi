@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified July 2018
+    Modified August 2018
 */
 
 #include <cmath>
@@ -396,17 +396,16 @@ void Controller::getfromXML(XMLwrapper *xml)
 float Controller::getLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    int request = int(getData->data.type & TOPLEVEL::type::Default);
-    unsigned char learnable = TOPLEVEL::type::Write;
+    unsigned char type = getData->data.type;
+    int request = type & TOPLEVEL::type::Default;
     int control = getData->data.control;
 
-    //cout << "ctl control " << control << "  Request " << request << endl;
-
-    // defaults
-    int type = TOPLEVEL::type::Integer;
+    // controller defaults
     int min = 0;
     float def = 64;
     int max = 127;
+    type |= TOPLEVEL::type::Integer;
+    unsigned char learnable = TOPLEVEL::type::Learnable;
 
     switch (control)
     {
@@ -504,7 +503,7 @@ float Controller::getLimits(CommandBlock *getData)
             break;
 
         default:
-            type |= TOPLEVEL::type::Error; // error
+            type |= TOPLEVEL::type::Error;
             break;
     }
     getData->data.type = type;

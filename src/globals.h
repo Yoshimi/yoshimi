@@ -508,6 +508,8 @@ namespace ADDSYNTH // usage ADDSYNTH::control::volume
         velocitySense,
         panning,
 
+        enable = 8,
+
         detuneFrequency = 32,
         octave = 35,
         detuneType, // L35 cents, L10 cents, E100 cents, E1200 cents
@@ -559,7 +561,7 @@ namespace ADDVOICE // usage ADDVOICE::control::volume
         unisonPhaseInvert, // None, Random, 50%, 33%, 25%, 20%
         enableUnison = 56,
 
-        bypassGlobalFilter = 64, // not seen on return?
+        bypassGlobalFilter = 64, // TODO not seen on return?
         enableFilter = 68,
         enableFilterEnvelope = 72,
         enableFilterLFO,
@@ -592,6 +594,8 @@ namespace SUBSYNTH // usage SUBSYNTH::control::volume
         volume = 0,
         velocitySense,
         panning,
+
+        enable = 8,
 
         bandwidth = 16,
         bandwidthScale,
@@ -628,6 +632,8 @@ namespace PADSYNTH // usage PADSYNTH::control::volume
         volume = 0,
         velocitySense,
         panning,
+
+        enable = 8,
 
         bandwidth = 16,
         bandwidthScale,

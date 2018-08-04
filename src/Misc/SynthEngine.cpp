@@ -3254,13 +3254,13 @@ float SynthEngine::getLimits(CommandBlock *getData)
 
     type &= (TOPLEVEL::source::MIDI || TOPLEVEL::source::CLI || TOPLEVEL::source::GUI); // source bits only
 
-    // defaultsr
+    // defaults
     int min = 0;
     float def = 64;
     int max = 127;
     type |= TOPLEVEL::type::Integer;
     unsigned char learnable = TOPLEVEL::type::Learnable;
-    //cout << "master control " << to_string(control) << endl;
+
     switch (control)
     {
         case MAIN::control::volume:
@@ -3355,7 +3355,7 @@ float SynthEngine::getVectorLimits(CommandBlock *getData)
     int min = 0;
     float def = 0;
     int max = 1;
-    //cout << "config control " << to_string(control) << endl;
+
     switch (control)
     {
         case VECTOR::control::undefined:
@@ -3449,7 +3449,7 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
     float def = 0;
     int max = 1;
     type |= TOPLEVEL::type::Integer;
-    //cout << "config control " << to_string(control) << endl;
+
     switch (control)
     {
         case CONFIG::control::oscillatorSize:
