@@ -722,7 +722,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     swapRoot1 = engine;
                     break;
                 }
-                case BANK::control::selectSecondInstumentAndSwap:
+                case BANK::control::selectSecondInstrumentAndSwap:
                 {
                     if(kititem == UNUSED)
                     {
@@ -1828,7 +1828,7 @@ string InterChange::resolveBank(CommandBlock *getData)
         case BANK::control::selectFirstInstrumentToSwap:
             contstr = "Set Instrument ID " + to_string(insert + 1) + "  Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine) + " for swap";
             break;
-        case BANK::control::selectSecondInstumentAndSwap:
+        case BANK::control::selectSecondInstrumentAndSwap:
             if (name == "")
                 name = "ped with Instrument ID " + to_string(insert + 1) + "  Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine);
             contstr = "Swap" + name;
@@ -1864,14 +1864,14 @@ string InterChange::resolveMain(CommandBlock *getData)
     {
         switch (control)
         {
-            case 0:
-            case 1:
+            case MIDI::control::noteOn:
+            case MIDI::control::noteOff:
                 showValue = false;
                 break;
-            case 2:
+            case MIDI::control::controller:
                 contstr = "CC " + to_string(int(engine)) + " ";
                 break;
-            case 8:
+            case MIDI::control::programChange:
                 showValue = false;
                 contstr = miscMsgPop(value_int);
                 break;
@@ -3760,7 +3760,7 @@ void InterChange::mediate()
                 commandSend(&getData);
                 returns(&getData);
             }
-            else if (getData.data.control == 24) // activity LED
+            else if (getData.data.control == MIDILEARN::control::reportActivity)
             {
                 if (jack_ringbuffer_write_space(toGUI) >= commandSize)
                 jack_ringbuffer_write(toGUI, (char*) getData.bytes, commandSize);
@@ -3980,10 +3980,10 @@ bool InterChange::commandSendReal(CommandBlock *getData)
 
     Part *part = synth->part[npart];
 
-    if (part->busy && engine == PART::engine::padSynth) // it's a PadSynth control
+    if (part->busy && engine == PART::engine::padSynth)
     {
         getData->data.type &= ~TOPLEVEL::type::Write; // turn it into a read
-        getData->data.control = PART::control::partBusy; // part busy message
+        getData->data.control = PART::control::partBusy;
         getData->data.kit = UNUSED;
         getData->data.engine = UNUSED;
         getData->data.insert = UNUSED;
@@ -4192,23 +4192,23 @@ void InterChange::commandMidi(CommandBlock *getData)
 
     switch(control)
     {
-        case 0:
+        case MIDI::control::noteOn:
             synth->NoteOn(chan, char1, value_int);
             synth->getRuntime().finishedCLI = true;
             getData->data.type = NO_ACTION; // till we know what to do!
             break;
-        case 1:
+        case MIDI::control::noteOff:
             synth->NoteOff(chan, char1);
             synth->getRuntime().finishedCLI = true;
             getData->data.type = NO_ACTION; // till we know what to do!
             break;
-        case 2:
+        case MIDI::control::controller:
             //cout << "Midi controller ch " << to_string(int(chan)) << "  type " << to_string(int(char1)) << "  val " << to_string(value_int) << endl;
             __sync_or_and_fetch(&blockRead, 1);
             synth->SetController(chan, char1, value_int);
             break;
 
-        case 8: // Program / Bank / Root
+        case MIDI::control::programChange: // Program / Bank / Root
             getData->data.parameter = TOPLEVEL::route::lowPriority;
             if ((value_int != UNUSED || par2 != NO_MSG) && chan < synth->getRuntime().NumAvailableParts)
             {
@@ -7913,9 +7913,9 @@ void InterChange::commandSysIns(CommandBlock *getData)
     {
         switch (control)
         {
-            case 0: // only relevant to GUI
+            case EFFECT::sysIns::effectNumber: // only relevant to GUI
                 break;
-            case 1:
+            case EFFECT::sysIns::effectType:
                 if (write)
                 {
                     if (isSysEff)
@@ -7931,7 +7931,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
                         value = synth->insefx[effnum]->geteffect();
                 }
                 break;
-            case 2: // insert only
+            case EFFECT::sysIns::effectDestination: // insert only
                 if (write)
                 {
                     synth->Pinsparts[effnum] = value_int;
@@ -7962,7 +7962,7 @@ void InterChange::commandEffects(CommandBlock *getData)
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit;// & 0x7f ;
+    unsigned char kititem = getData->data.kit;
     unsigned char effnum = getData->data.engine;
 
     bool write = (type & TOPLEVEL::type::Write) > 0;

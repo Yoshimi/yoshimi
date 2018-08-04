@@ -428,7 +428,7 @@ class MasterUI {: {private GuiUpdates}
             label {&Clear}
             callback {//
             if(fl_choice("Clear parameters of instrument %d ?", NULL, "No", "Yes", partui->npart + 1) > 1)
-                send_data(96,0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, partui->npart);}
+                send_data(PART::control::defaultInstrument,0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, partui->npart);}
             xywh {35 35 100 20} labelsize 12
           }
         }
@@ -552,7 +552,7 @@ paramsui->Show(3);}
                 if (NULL != microtonalui)
                     delete microtonalui;
                 microtonalui = new MicrotonalUI(&synth->microtonal, synth);
-                send_data(96, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::scales);
+                send_data(SCALES::control::clearAll, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::scales);
             }}
             xywh {0 0 34 20} labelsize 12
           }
@@ -1202,13 +1202,13 @@ ZynAddSubFX}
 
     if (newpart == TOPLEVEL::section::midiIn)
     {
-        if (engine == 7 && partui->part->ctl->volume.receive == 0)
-            return; // MIDI volume disabled
-        if (engine == 11 && partui->part->ctl->expression.receive == 0)
-            return; // MIDI expression disabled
+        if (engine == MIDI::function::volume && partui->part->ctl->volume.receive == 0)
+            return; // disabled
+        if (engine == MIDI::function::expression && partui->part->ctl->expression.receive == 0)
+            return; // disabled
 
         float vol = (value * synth->part[npart]->ctl->volume.data) / 127;
-        if (control == 2)
+        if (control == MIDI::control::controller)
         { // panel entries only
             for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
             {
@@ -1219,9 +1219,9 @@ ZynAddSubFX}
                                  && (chan / NUM_MIDI_CHANNELS) == (panelgroup / NUM_MIDI_CHANNELS))
                          || (!isSingle && panellistitem[i]->partrcv->value() == (chan & mask)))
                     {
-                        if (engine == 7)
+                        if (engine == MIDI::function::volume)
                             panellistitem[i]->partvolume->value(vol);
-                        else if (engine == 10)
+                        else if (engine == MIDI::function::panning)
                             panellistitem[i]->partpanning->value(value);
                     }
                 }
@@ -1232,10 +1232,10 @@ ZynAddSubFX}
              || (!isSingle &&  (partui->midich->value() == (chan & mask) + 1));// && partui->partGroupEnable->value() != 0);
         switch(control)
         {
-            case 0:
-            case 1:
+            case MIDI::control::noteOn:
+            case MIDI::control::noteOff:
                 break;
-            case 2:
+            case MIDI::control::controller:
                 //cout << " Value " << value_int << "  kit " << int(kititem) << "  npart " << int(npart) << endl;
                 if(engine <= 119 && engine == synth->getRuntime().channelSwitchCC)
                 { // it's a valid channel switch
@@ -1282,19 +1282,19 @@ ZynAddSubFX}
                 {
                     switch(engine)
                     {
-                        case 1: // modulation
+                        case MIDI::function::modulation:
                             partui->modulation->value(value);
                             break;
-                        case 7: // volume
+                        case MIDI::function::volume:
                             partui->partvol->value(vol);
                             break;
-                        case 10: // panning
+                        case MIDI::function::panning:
                             partui->partpan->value(value);
                             break;
-                        case 11: // expression
+                        case MIDI::function::expression:
                             partui->expression->value(value);
                             break;
-                        case 68: // legato switch
+                        case MIDI::function::legato:
                         {
                             int mode = synth->ReadPartKeyMode(npart);
                             partui->legatoMode->labelcolor(FL_BLACK);
@@ -1309,19 +1309,19 @@ ZynAddSubFX}
                             //partui->keymode->damage(1);
                             break;
                         }
-                        case 71: // filter Q
+                        case MIDI::function::filterQ:
                             partui->filterq->value(value);
                             break;
-                        case 74: // filter cutoff
+                        case MIDI::function::filterCutoff:
                             partui->filtercutoff->value(value);
                             break;
-                        case 75: // bandwidth
+                        case MIDI::function::bandwidth:
                             partui->masterbandwidth->value(value);
                             break;
                     }
                 }
                 break;
-            case 8: // load instrument
+            case MIDI::control::programChange:
                 if (insert != UNUSED)
                 {
                     ;// updateBankRootDirs() // apparently not needed!
@@ -1347,14 +1347,14 @@ ZynAddSubFX}
         }
         else
         {
-            if (control == 0)
+            if (control == EFFECT::sysIns::effectNumber)
             {
                 syseffnocounter->value(engine + 1);
                 nsyseff = engine;
                 sysefftype->value(synth->sysefx[nsyseff]->geteffect());
                 syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
             }
-            else if (control == 1)
+            else if (control == EFFECT::sysIns::effectType)
             {
                 syseffnocounter->value(engine + 1);
                 nsyseff = engine;
@@ -1367,13 +1367,13 @@ ZynAddSubFX}
     }
     else if (newpart == TOPLEVEL::section::insertEffects)
     {
-        if (control == 0)
+        if (control == EFFECT::sysIns::effectNumber)
         {
             ninseff = engine;
             setInsEff(ninseff);
             showInsEfxUI();
         }
-        else if (control == 1)
+        else if (control == EFFECT::sysIns::effectType)
         {
             inseffnocounter->value(engine + 1);
             ninseff = engine;
@@ -1381,7 +1381,7 @@ ZynAddSubFX}
             setInsEff(ninseff);
             showInsEfxUI();
         }
-        else if (control == 2)
+        else if (control == EFFECT::sysIns::effectDestination)
         {
             inseffpart->value(value_int + 2);
             if (value_int == -1)

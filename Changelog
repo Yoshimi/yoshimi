@@ -10,6 +10,10 @@ yoshimi 1.5.8 M
 * MasterUI.fl mostly converted to enums.
   Still some control values for MIDI,
   System and Insert effects to do.
+* ConfigUI converted to enums.
+* BankUI converted to enums.
+* All MIDI controls now done.
+  Effects still not complete.
 
 2018-8-3 Will
 * OscilGenUI.fl converted to enums.

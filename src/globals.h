@@ -236,7 +236,7 @@ namespace BANK // usage BANK::control::
         saveInstrument, // not yet
         deleteInstrument, // not yet
         selectFirstInstrumentToSwap,
-        selectSecondInstumentAndSwap,
+        selectSecondInstrumentAndSwap,
 
         selectBank = 16, // not yet
         renameBank, // not yet
@@ -299,6 +299,28 @@ namespace MIDILEARN // usage MIDILEARN::control::block
         loadFromRecent,
         saveList = 245,
         cancelLearn = 255
+    };
+}
+
+// the following are actual MIDI numbers
+// not to be confused with part controls!
+namespace MIDI // usage MIDI::control::noteOn
+{
+    enum control : unsigned char {
+        noteOn = 0,
+        noteOff,
+        controller,
+        programChange = 8// also bank and root - split?
+    };
+    enum function : unsigned char {
+        modulation = 1,
+        volume = 7,
+        panning = 10,
+        expression = 11,
+        legato = 68,
+        filterQ = 71,
+        filterCutoff = 74,
+        bandwidth
     };
 }
 
@@ -793,6 +815,15 @@ namespace EFFECT // usage EFFECT::type::none
         distortion,
         eq,
         dynFilter
+    };
+
+    enum sysIns : unsigned char {
+        effectNumber = 0, // GUI only
+        effectType = 1,
+        toEffect1 = 1, // system only
+        effectDestination, // insert only
+        toEffect2 = 2, // system only
+        toEffect3 // system only
     };
 }
 
