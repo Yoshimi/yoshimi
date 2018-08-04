@@ -1,5 +1,11 @@
 yoshimi 1.5.8 M
 
+2018-8-4 Will
+* BugFix: MIDI-learn Cancel.
+  It was only pretending to :(
+* Updated Microtonal.cpp limits.
+* MicrotonalUI.flconverted to enums.
+
 2018-8-3 Will
 * OscilGenUI.fl converted to enums.
 * Completed limits in Synth/OscilGen.cpp
@@ -7,7 +13,7 @@ yoshimi 1.5.8 M
 * Some minor cleanups.
 * VectorUI.fl converted to enums.
 * Vector limits now same format as others.
-* ResonanceUI.fl converted to enums
+* ResonanceUI.fl converted to enums.
 
 
 2018-8-2 Will

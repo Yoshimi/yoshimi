@@ -1747,7 +1747,7 @@ void SynthEngine::resetAll(bool andML)
         ClearNRPNs();
     }
     if (andML)
-        midilearn.generalOpps(0, 0, 96, 240, 255, 255, 255, 255, 255);
+        midilearn.generalOpps(0, 0, MIDILEARN::control::clearAll, TOPLEVEL::section::midiLearn, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED);
     Unmute();
 }
 

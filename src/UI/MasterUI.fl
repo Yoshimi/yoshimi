@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified July 2018} {selected in_source in_header
+Modified August 2018} {selected in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -1167,7 +1167,7 @@ ZynAddSubFX}
       Fl_Button cancel {
         label Cancel
         callback {//
-        send_data(255, 0, 3, TOPLEVEL::section::main);
+        send_data(MIDILEARN::control::cancelLearn, 0, 3, TOPLEVEL::section::midiLearn);
         o->hide();}
         xywh {130 60 70 20} hide
       }
