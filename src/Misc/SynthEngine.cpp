@@ -3248,27 +3248,31 @@ void SynthEngine::setWindowTitle(string _windowTitle)
 float SynthEngine::getLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    int request = int(getData->data.type & 3);
+    unsigned char type = getData->data.type;
+    int request = type & TOPLEVEL::type::Default;
     int control = getData->data.control;
 
-    // defaults
-    int type = (getData->data.type & 0x3f) | TOPLEVEL::type::Integer; // set as integer
+    type &= (TOPLEVEL::source::MIDI || TOPLEVEL::source::CLI || TOPLEVEL::source::GUI); // source bits only
+
+    // defaultsr
     int min = 0;
     float def = 64;
     int max = 127;
-    unsigned char learnable = TOPLEVEL::type::Write; // alternative for limits
+    type |= TOPLEVEL::type::Integer;
+    unsigned char learnable = TOPLEVEL::type::Learnable;
     //cout << "master control " << to_string(control) << endl;
     switch (control)
     {
         case MAIN::control::volume:
             def = 90;
-            type = (type &0x3f) | learnable; // float
+            type &= ~TOPLEVEL::type::Integer;
+            type |= learnable;
             break;
 
         case MAIN::control::partNumber:
             min = 1;
             def = 1;
-            max = Runtime.NumAvailableParts;;
+            max = Runtime.NumAvailableParts;
             break;
 
         case MAIN::control::availableParts:
@@ -3306,8 +3310,14 @@ float SynthEngine::getLimits(CommandBlock *getData)
             max = 0;
             break;
 
+        default:
+            type |= TOPLEVEL::type::Error;
+            break;
+
     }
     getData->data.type = type;
+    if (type & TOPLEVEL::type::Error)
+        return 1;
 
     switch (request)
     {
@@ -3428,14 +3438,17 @@ float SynthEngine::getVectorLimits(CommandBlock *getData)
 float SynthEngine::getConfigLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    int request = int(getData->data.type & 3);
+    unsigned char type = getData->data.type;
+    int request = type & TOPLEVEL::type::Default;
     int control = getData->data.control;
 
-    // defaults
-    int type = (getData->data.type & 0x3f) | TOPLEVEL::type::Integer; // set as integer
+    type &= (TOPLEVEL::source::MIDI || TOPLEVEL::source::CLI || TOPLEVEL::source::GUI); // source bits only
+
+    // config defaults
     int min = 0;
     float def = 0;
     int max = 1;
+    type |= TOPLEVEL::type::Integer;
     //cout << "config control " << to_string(control) << endl;
     switch (control)
     {
@@ -3563,6 +3576,7 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
     getData->data.type = type;
     if (type & TOPLEVEL::type::Error)
         return 1;
+
     switch (request)
     {
         case TOPLEVEL::type::Adjust:

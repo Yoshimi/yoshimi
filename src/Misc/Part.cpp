@@ -1523,7 +1523,7 @@ float Part::getLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
     unsigned char type = getData->data.type;
-    int request = int(getData->data.type & TOPLEVEL::type::Default);
+    int request = type & TOPLEVEL::type::Default;
     int control = getData->data.control;
     int npart = getData->data.part;
 

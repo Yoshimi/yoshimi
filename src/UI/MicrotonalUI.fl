@@ -133,7 +133,7 @@ class MicrotonalUI {: {private MiscFuncs}
           afreqset->hide();
           o->hide();
 
-          send_data(SCALES::control::Afrequency, Afreq, 0x40);}
+          send_data(SCALES::control::Afrequency, Afreq, 0);}
           xywh {166 19 18 17} box THIN_DOWN_BOX color 45 hide
         }
         Fl_Return_Button afreqset {
@@ -151,7 +151,7 @@ class MicrotonalUI {: {private MiscFuncs}
           AsetBack->hide();
           o->hide();
 
-          send_data(SCALES::control::Afrequency, Afreq, 0x40);}
+          send_data(SCALES::control::Afrequency, Afreq, 0);}
           xywh {163 17 12 18} box NO_BOX hide
         }
       }
@@ -389,7 +389,7 @@ class MicrotonalUI {: {private MiscFuncs}
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
-    bool isGui = (getData->data.type & 0x20);
+    bool isGui = (getData->data.type & TOPLEVEL::source::GUI);
     unsigned char control = getData->data.control;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;

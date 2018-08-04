@@ -4,7 +4,12 @@ yoshimi 1.5.8 M
 * BugFix: MIDI-learn Cancel.
   It was only pretending to :(
 * Updated Microtonal.cpp limits.
-* MicrotonalUI.flconverted to enums.
+* MicrotonalUI.fl converted to enums.
+* Updated SynthEngine.cpp limits.
+* MasterMiscUI.fl converted to enums.
+* MasterUI.fl mostly converted to enums.
+  Still some control values for MIDI,
+  System and Insert effects to do.
 
 2018-8-3 Will
 * OscilGenUI.fl converted to enums.
