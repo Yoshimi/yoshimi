@@ -4,7 +4,9 @@ yoshimi 1.5.8 M
 * Updated addSynth limits.
 * Updated padsynth limits.
 * Updated subSynth limits.
-* Updated controller limits
+* Updated controller limits.
+* Completed sys/ins control change.
+  Envelope defaults still to do.
 
 2018-8-4 Will
 * BugFix: MIDI-learn Cancel.

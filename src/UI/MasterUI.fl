@@ -699,7 +699,7 @@ paramsui->Show(3);}
           Fl_Spinner syseffnocounter {
             label Effect
             callback {//
-            send_data(0, o->value() - 1, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::systemEffects, o->value() - 1);}
+            send_data(EFFECT::sysIns::effectNumber, o->value() - 1, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::systemEffects, o->value() - 1);}
             xywh {40 126 36 20} labeltype NO_LABEL labelsize 11 align 0 maximum 4 textfont 1 textsize 11
             code0 {o->range(1, NUM_SYS_EFX);}
             code1 {o->value(nsyseff + 1);}
@@ -707,7 +707,7 @@ paramsui->Show(3);}
           Fl_Choice sysefftype {
             label Type
             callback {//
-            send_data(1, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::systemEffects, nsyseff);}
+            send_data(EFFECT::sysIns::effectType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::systemEffects, nsyseff);}
             xywh {120 126 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 10 align 16
             code0 {o->value(synth->sysefx[nsyseff]->geteffect());}
           } {
@@ -773,7 +773,7 @@ paramsui->Show(3);}
           Fl_Spinner inseffnocounter {
             label Effect
             callback {//
-            send_data(0, o->value() - 1, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::insertEffects, o->value() - 1);}
+            send_data(EFFECT::sysIns::effectNumber, o->value() - 1, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::insertEffects, o->value() - 1);}
             xywh {40 126 36 20} labeltype NO_LABEL labelsize 11 align 20 maximum 8 textfont 1 textsize 11
             code0 {o->range(1, NUM_INS_EFX);}
             code1 {o->value(ninseff + 1);}
@@ -781,7 +781,7 @@ paramsui->Show(3);}
           Fl_Choice insefftype {
             label Type
             callback {//
-            send_data(1, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::insertEffects, ninseff);}
+            send_data(EFFECT::sysIns::effectType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::insertEffects, ninseff);}
             xywh {120 126 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 0 textsize 12
             code0 {o->value(synth->insefx[ninseff]->geteffect());}
             code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
@@ -826,7 +826,7 @@ paramsui->Show(3);}
           Fl_Choice inseffpart {
             label {To }
             callback {//
-            send_data(2, o->value() - 2, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::insertEffects, ninseff);}
+            send_data(EFFECT::sysIns::effectDestination, o->value() - 2, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::insertEffects, ninseff);}
             xywh {242 126 96 20} down_box BORDER_BOX labelfont 1 labelsize 10 textfont 1 textsize 11
             code0 {setinspartlist();}
             code3 {o->value(synth->Pinsparts[ninseff]+2);}
