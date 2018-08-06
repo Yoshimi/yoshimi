@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified May 2018
+    Modified August 2018
 */
 
 #ifndef SYNTHENGINE_H
@@ -110,7 +110,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void NoteOn(unsigned char chan, unsigned char note, unsigned char velocity);
         void NoteOff(unsigned char chan, unsigned char note);
         int RunChannelSwitch(int value);
-        void SetController(unsigned char chan, int type, short int par);
+        void SetController(unsigned char chan, int CCtype, short int par);
         void SetZynControls(bool in_place);
         int RootBank(int rootnum, int banknum);
         int SetRBP(CommandBlock *getData, bool notinplace = true);

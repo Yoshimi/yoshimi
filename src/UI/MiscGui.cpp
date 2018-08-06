@@ -227,9 +227,6 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     }
     if (npart >= TOPLEVEL::section::main) // main / sys / ins
     {
-        //if (npart == 0xf0) &&  control == 96)
-            //return; // gui in undefined state at this point
-        // doesn't seem to be the case now ???
         synth->getGuiMaster()->returns_update(getData);
         return;
     }

@@ -1139,7 +1139,7 @@ float ADnoteParameters::getLimits(CommandBlock *getData)
             break;
         case ADDVOICE::control::enableVoice:
             type |= learnable;
-            if (engine == 0x80)
+            if (engine == PART::engine::addVoice1)
                 def = 1;
             max = 1;
             break;

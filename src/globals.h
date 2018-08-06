@@ -150,7 +150,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
     enum muted : unsigned char {
         stopSound = 1,
         masterReset,
-        patchSetLoad,
+        patchsetLoad,
         vectorLoad,
         stateLoad
     };

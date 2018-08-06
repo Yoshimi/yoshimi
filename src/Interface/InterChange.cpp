@@ -1062,7 +1062,7 @@ float InterChange::readAllData(CommandBlock *getData)
     }
     //cout << "Read Control " << (int) getData->data.control << " Type " << (int) getData->data.type << " Part " << (int) getData->data.part << "  Kit " << (int) getData->data.kit << " Engine " << (int) getData->data.engine << "  Insert " << (int) getData->data.insert << " Parameter " << (int) getData->data.parameter << " Par2 " << (int) getData->data.par2 << endl;
     int npart = getData->data.part;
-    bool indirect = ((getData->data.parameter & 0xf0) == TOPLEVEL::route::lowPriority);
+    bool indirect = ((getData->data.parameter & 0xc0) == TOPLEVEL::route::lowPriority);
     if (npart < NUM_MIDI_PARTS && synth->part[npart]->busy)
     {
         getData->data.control = PART::control::partBusy; // part busy message
@@ -3795,26 +3795,26 @@ void InterChange::mutedDecode(unsigned int altData)
     switch (altData & 0xff)
     {
         case TOPLEVEL::muted::stopSound:
-            putData.data.control = 128;
+            putData.data.control = MAIN::control::stopSound;
             putData.data.type = 0xf0;
             break;
         case TOPLEVEL::muted::masterReset:
             putData.data.control = (altData >> 8) & 0xff;
             putData.data.type = altData >> 24;
             break;
-        case TOPLEVEL::muted::patchSetLoad:
-            putData.data.control = 80;
+        case TOPLEVEL::muted::patchsetLoad:
+            putData.data.control = TOPLEVEL::muted::patchsetLoad;
             putData.data.type = altData >> 24;
             putData.data.par2 = (altData >> 8) & 0xff;
             break;
         case TOPLEVEL::muted::vectorLoad:
-            putData.data.control = 84;
+            putData.data.control = TOPLEVEL::muted::vectorLoad;
             putData.data.type = altData >> 24;
             putData.data.insert = (altData >> 16) & 0xff;
             putData.data.par2 = (altData >> 8) & 0xff;
             break;
         case TOPLEVEL::muted::stateLoad:
-            putData.data.control = 92;
+            putData.data.control = TOPLEVEL::muted::stateLoad;
             putData.data.type = altData >> 24;
             putData.data.par2 = (altData >> 8) & 0xff;
             break;
@@ -3959,7 +3959,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         __sync_and_and_fetch(&blockRead, 2);
         return true;
     }
-    if (kititem >= 0x80 && kititem != UNUSED)
+    if (kititem >= EFFECT::type::none && kititem <= EFFECT::type::dynFilter)
     {
         commandEffects(getData);
         __sync_and_and_fetch(&blockRead, 2);
@@ -4236,8 +4236,8 @@ void InterChange::vectorClear(int Nvector)
     }
     for (int ch = start; ch < end; ++ ch)
     {
-        synth->getRuntime().vectordata.Xaxis[ch] = 0xff;
-        synth->getRuntime().vectordata.Yaxis[ch] = 0xff;
+        synth->getRuntime().vectordata.Xaxis[ch] = UNUSED;
+        synth->getRuntime().vectordata.Yaxis[ch] = UNUSED;
         synth->getRuntime().vectordata.Xfeatures[ch] = 0;
         synth->getRuntime().vectordata.Yfeatures[ch] = 0;
         synth->getRuntime().vectordata.Enabled[ch] = false;
@@ -5033,7 +5033,7 @@ void InterChange::commandMain(CommandBlock *getData)
         case MAIN::control::loadNamedPatchset:
             if (write && (parameter == TOPLEVEL::route::adjustAndLoopback))
             {
-                synth->allStop(TOPLEVEL::muted::patchSetLoad | (par2 << 8) | (type << 24));
+                synth->allStop(TOPLEVEL::muted::patchsetLoad | (par2 << 8) | (type << 24));
                 getData->data.type = NO_ACTION;
             }
             break;
@@ -7795,72 +7795,72 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
 
     switch (getData->data.control)
     {
-        case 0:
+        case ENVELOPEINSERT::control::attackLevel:
             if (write)
                 pars->PA_val = val;
             else
                 val = pars->PA_val;
             break;
-        case 1:
+        case ENVELOPEINSERT::control::attackTime:
             if (write)
                 pars->PA_dt = val;
             else
                 val = pars->PA_dt;
             break;
-        case 2:
+        case ENVELOPEINSERT::control::decayLevel:
             if (write)
                 pars->PD_val = val;
             else
                 val = pars->PD_val;
             break;
-        case 3:
+        case ENVELOPEINSERT::control::decayTime:
             if (write)
                 pars->PD_dt = val;
             else
                 val = pars->PD_dt;
             break;
-        case 4:
+        case ENVELOPEINSERT::control::sustainLevel:
             if (write)
                 pars->PS_val = val;
             else
                 val = pars->PS_val;
             break;
-        case 5:
+        case ENVELOPEINSERT::control::releaseTime:
             if (write)
                 pars->PR_dt = val;
             else
                 val = pars->PR_dt;
             break;
-        case 6:
+        case ENVELOPEINSERT::control::releaseLevel:
             if (write)
                 pars->PR_val = val;
             else
                 val = pars->PR_val;
             break;
-        case 7:
+        case ENVELOPEINSERT::control::stretch:
             if (write)
                 pars->Penvstretch = val;
             else
                 val = pars->Penvstretch;
             break;
 
-        case 16:
+        case ENVELOPEINSERT::control::forcedRelease:
             if (write)
                 pars->Pforcedrelease = (val != 0);
             else
                 val = pars->Pforcedrelease;
             break;
-        case 17:
+        case ENVELOPEINSERT::control::linearEnvelope:
             if (write)
                 pars->Plinearenvelope = (val != 0);
             else
                 val = pars->Plinearenvelope;
             break;
 
-        case 24: // this is local to the source
+        case ENVELOPEINSERT::control::edit:
             break;
 
-        case 32:
+        case ENVELOPEINSERT::control::enableFreeMode:
             if (write)
             {
                 if (val != 0)
@@ -7871,7 +7871,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
             else
                 val = pars->Pfreemode;
             break;
-        case 34:
+        case ENVELOPEINSERT::control::points:
             if (!pars->Pfreemode)
             {
                 val = 0xff;
@@ -7880,7 +7880,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
             else
                 Xincrement = envpoints;
             break;
-        case 35:
+        case ENVELOPEINSERT::control::sustainPoint:
             if (write)
                 pars->Penvsustain = val;
             else

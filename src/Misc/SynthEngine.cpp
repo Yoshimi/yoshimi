@@ -610,19 +610,19 @@ int SynthEngine::RunChannelSwitch(int value)
 
 
 // Controllers
-void SynthEngine::SetController(unsigned char chan, int type, short int par)
+void SynthEngine::SetController(unsigned char chan, int CCtype, short int par)
 {
-    if (type == Runtime.midi_bank_C)
+    if (CCtype == Runtime.midi_bank_C)
     {
         //shouldn't get here. Banks are set directly via SetBank method from MusicIO class
         return;
     }
-    if (type <= 119 && type == Runtime.channelSwitchCC)
+    if (CCtype <= 119 && CCtype == Runtime.channelSwitchCC)
     {
         RunChannelSwitch(par);
         return;
     }
-    if (type == C_allsoundsoff)
+    if (CCtype == C_allsoundsoff)
     {   // cleanup insertion/system FX
         for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
             sysefx[nefx]->cleanup();
@@ -657,12 +657,12 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
         part[npart]->legatoFading = 0;
         if (chan == part[npart]->Prcvchn)// && partonoffRead(npart))
         {
-            if (type == part[npart]->PbreathControl) // breath
+            if (CCtype == part[npart]->PbreathControl) // breath
             {
                 part[npart]->SetController(C_volume, 64 + par / 2);
                 part[npart]->SetController(C_filtercutoff, par);
             }
-            else if (type == 0x44) // legato switch
+            else if (CCtype == 0x44) // legato switch
             {
                 int mode = (ReadPartKeyMode(npart) & 3);
                 if (par < 64)
@@ -672,8 +672,8 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
             }
             else
             {
-                //cout << "type " << int(type) << "  par " << int(par) << endl;
-                part[npart]->SetController(type, par);
+                //cout << "CCtype " << int(CCtype) << "  par " << int(par) << endl;
+                part[npart]->SetController(CCtype, par);
             }
         }
     }

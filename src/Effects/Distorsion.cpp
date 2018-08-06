@@ -321,7 +321,7 @@ float Distlimit::getlimits(CommandBlock *getData)
     switch (control)
     {
         case 0:
-            if (npart != 0xf1) // system effects
+            if (npart != TOPLEVEL::section::systemEffects) // system effects
                 def /= 2;
             break;
         case 1:
