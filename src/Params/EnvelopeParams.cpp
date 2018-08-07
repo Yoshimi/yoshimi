@@ -302,6 +302,11 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
     unsigned char type = getData->data.type;
     int request = type & TOPLEVEL::type::Default;
     int control = getData->data.control;
+    int engine = getData->data.engine;
+    if (engine >= PART::engine::addMod1 && engine <= PART::engine::addMod8)
+        engine = PART::engine::addMod1;
+    else if (engine >= PART::engine::addVoice1 && engine <= PART::engine::addVoice8)
+        engine = PART::engine::addVoice1;
     int parameter = getData->data.parameter;
 
     type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
@@ -314,57 +319,200 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
     unsigned char learnable = TOPLEVEL::type::Write;
     type |= learnable;
 
-    switch (control)
+    if (control == ENVELOPEINSERT::control::enableFreeMode || control == ENVELOPEINSERT::control::forcedRelease)
     {
-        case ENVELOPEINSERT::control::attackLevel:
-            break;
-        case ENVELOPEINSERT::control::attackTime:
-            break;
-        case ENVELOPEINSERT::control::decayLevel:
-            break;
-        case ENVELOPEINSERT::control::decayTime:
-            break;
-        case ENVELOPEINSERT::control::sustainLevel:
-            def = 127;
-            break;
-        case ENVELOPEINSERT::control::releaseTime:
-            break;
-        case ENVELOPEINSERT::control::releaseLevel:
-            break;
-        case ENVELOPEINSERT::control::stretch:
-            if (parameter != TOPLEVEL::insertType::amplitude)
-                def = 0;
-            else
-                def = 1;
-            break;
-        case ENVELOPEINSERT::control::forcedRelease:
-            max = 1;
-            if (parameter == TOPLEVEL::insertType::amplitude)
-                def = 1;
-            else
-                def = 0;
-            type &= ~learnable;
-            break;
-        case ENVELOPEINSERT::control::linearEnvelope:
-            max = 1;
+        max = 1;
+        type &= ~learnable;
+        if (control == ENVELOPEINSERT::control::forcedRelease)
+            def = 1;
+        else
             def = 0;
-            type &= ~learnable;
-            break;
-        case ENVELOPEINSERT::control::edit:
-            break;
-        case ENVELOPEINSERT::control::enableFreeMode:
-            def = 0;
-            max = 1;
-            type &= ~learnable;
-            break;
-        case ENVELOPEINSERT::control::points:
-            break;
-        case ENVELOPEINSERT::control::sustainPoint:
-            break;
-        default:
-            type |= TOPLEVEL::type::Error;
-            break;
     }
+
+    switch (parameter)
+    {
+        case TOPLEVEL::insertType::amplitude:
+        {
+            switch (control)
+            {
+                case ENVELOPEINSERT::control::attackTime:
+                    def = 0;
+                    break;
+                case ENVELOPEINSERT::control::decayTime:
+                    if (engine == PART::engine::addVoice1)
+                        def = 100;
+                    else
+                        def = 40;
+                    break;
+                case ENVELOPEINSERT::control::sustainLevel:
+                    def = 127;
+                    break;
+                case ENVELOPEINSERT::control::releaseTime:
+                    if (engine == PART::engine::addVoice1)
+                        def = 100;
+                    else
+                        def = 25;
+                    break;
+                case ENVELOPEINSERT::control::stretch:
+                    break;
+                case ENVELOPEINSERT::control::forcedRelease:
+                    def = 1;
+                    break;
+                case ENVELOPEINSERT::control::linearEnvelope:
+                    max = 1;
+                    def = 0;
+                    type &= ~learnable;
+                    break;
+                case ENVELOPEINSERT::control::edit:
+                    break;
+                case ENVELOPEINSERT::control::enableFreeMode:
+                    break;
+                case ENVELOPEINSERT::control::points:
+                    break;
+                case ENVELOPEINSERT::control::sustainPoint:
+                    def = 2;
+                    break;
+                default:
+                    type |= TOPLEVEL::type::Error;
+                    break;
+            }
+        }
+
+        case TOPLEVEL::insertType::frequency:
+        {
+            switch (control)
+            {
+                case ENVELOPEINSERT::control::attackLevel:
+                    if (engine == PART::engine::addVoice1 || engine == PART::engine::subSynth)
+                        def = 30;
+                    break;
+                case ENVELOPEINSERT::control::attackTime:
+                    if (engine == PART::engine::addVoice1)
+                        def = 40;
+                    else
+                        def = 50;
+                    break;
+                case ENVELOPEINSERT::control::releaseTime:
+                    def = 60;
+                    break;
+                case ENVELOPEINSERT::control::releaseLevel:
+                    break;
+                case ENVELOPEINSERT::control::stretch:
+                    if (engine != PART::engine::subSynth)
+                        def = 0;
+                    break;
+                case ENVELOPEINSERT::control::forcedRelease:
+                    if (engine == PART::engine::padSynth)
+                        def = 0;
+                    break;
+                case ENVELOPEINSERT::control::edit:
+                    break;
+                case ENVELOPEINSERT::control::enableFreeMode:
+                    break;
+                case ENVELOPEINSERT::control::points:
+                    break;
+                case ENVELOPEINSERT::control::sustainPoint:
+                    def = 1;
+                    break;
+                default:
+                    type |= TOPLEVEL::type::Error;
+                    break;
+            }
+        }
+
+        case TOPLEVEL::insertType::filter:
+        {
+            switch (control)
+            {
+                case ENVELOPEINSERT::control::attackLevel:
+                    if (engine == PART::engine::addVoice1)
+                        def = 90;
+                    break;
+                case ENVELOPEINSERT::control::attackTime:
+                    if (engine == PART::engine::addVoice1 || engine == PART::engine::subSynth)
+                        def = 70;
+                    else
+                        def = 40;
+                    break;
+                case ENVELOPEINSERT::control::decayLevel:
+                    if (engine == PART::engine::addVoice1)
+                        def = 40;
+                    break;
+                case ENVELOPEINSERT::control::decayTime:
+                    def = 70;
+                    break;
+                case ENVELOPEINSERT::control::releaseTime:
+                    if (engine == PART::engine::addVoice1)
+                        def = 10;
+                    else
+                        def = 60;
+                    break;
+                case ENVELOPEINSERT::control::releaseLevel:
+                    if (engine == PART::engine::addVoice1)
+                        def = 40;
+                    break;
+                case ENVELOPEINSERT::control::stretch:
+                    def = 0;
+                    break;
+                case ENVELOPEINSERT::control::forcedRelease:
+                    if (engine == PART::engine::addVoice1 || engine == PART::engine::subSynth)
+                        def = 0;
+                    break;
+                case ENVELOPEINSERT::control::edit:
+                    break;
+                case ENVELOPEINSERT::control::enableFreeMode:
+                    break;
+                case ENVELOPEINSERT::control::points:
+                    break;
+                case ENVELOPEINSERT::control::sustainPoint:
+                    def = 2;
+                    break;
+                default:
+                    type |= TOPLEVEL::type::Error;
+                    break;
+            }
+        }
+        case TOPLEVEL::insertType::bandwidth:
+        {
+            if (engine != PART::engine::subSynth)
+            {
+                type |= TOPLEVEL::type::Error;
+                return 1;
+            }
+            switch (control)
+            {
+                case ENVELOPEINSERT::control::attackLevel:
+                    def = 100;
+                    break;
+                case ENVELOPEINSERT::control::attackTime:
+                        def = 70;
+                    break;
+                case ENVELOPEINSERT::control::releaseTime:
+                    def = 60;
+                    break;
+                case ENVELOPEINSERT::control::releaseLevel:
+                    break;
+                case ENVELOPEINSERT::control::stretch:
+                    break;
+                case ENVELOPEINSERT::control::forcedRelease:
+                    def = 0;
+                    break;
+                case ENVELOPEINSERT::control::edit:
+                    break;
+                case ENVELOPEINSERT::control::enableFreeMode:
+                    break;
+                case ENVELOPEINSERT::control::points:
+                    break;
+                case ENVELOPEINSERT::control::sustainPoint:
+                    def = 1;
+                    break;
+                default:
+                    type |= TOPLEVEL::type::Error;
+                    break;
+            }
+        }
+    }
+
     getData->data.type = type;
     if (type & TOPLEVEL::type::Error)
         return 1;
