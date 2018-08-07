@@ -1527,7 +1527,7 @@ float Part::getLimits(CommandBlock *getData)
     int control = getData->data.control;
     int npart = getData->data.part;
 
-    type &= (TOPLEVEL::source::MIDI || TOPLEVEL::source::CLI || TOPLEVEL::source::GUI); // source bits only
+    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
 
     // part defaults
     int min = 0;
@@ -1606,6 +1606,7 @@ float Part::getLimits(CommandBlock *getData)
         case PART::control::kitEffectNum:
             def = 1; // may be local to GUI
             max = 3;
+            break;
 
         case PART::control::maxNotes:
             def = 20;

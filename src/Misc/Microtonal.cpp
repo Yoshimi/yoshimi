@@ -793,7 +793,7 @@ float Microtonal::getLimits(CommandBlock *getData)
     int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
 
-    type &= (TOPLEVEL::source::MIDI || TOPLEVEL::source::CLI || TOPLEVEL::source::GUI); // source bits only
+    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
 
     // microtonal defaults
     int min = 0;
@@ -837,8 +837,8 @@ float Microtonal::getLimits(CommandBlock *getData)
             type |= learnable;
             break;
         case SCALES::control::lowKey:
-            break;
             type |= learnable;
+            break;
         case SCALES::control::middleKey:
             def = 60;
             type |= learnable;

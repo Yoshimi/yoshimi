@@ -113,7 +113,7 @@ float LFOlimit::getLFOlimits(CommandBlock *getData)
     int engine = getData->data.engine;
     int insertType = getData->data.parameter;
 
-    type &= (TOPLEVEL::source::MIDI || TOPLEVEL::source::CLI || TOPLEVEL::source::GUI); // source bits only
+    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
 
     // LFO defaults
     int min = 0;

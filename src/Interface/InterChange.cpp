@@ -3803,18 +3803,18 @@ void InterChange::mutedDecode(unsigned int altData)
             putData.data.type = altData >> 24;
             break;
         case TOPLEVEL::muted::patchsetLoad:
-            putData.data.control = TOPLEVEL::muted::patchsetLoad;
+            putData.data.control = MAIN::control::loadNamedPatchset;
             putData.data.type = altData >> 24;
             putData.data.par2 = (altData >> 8) & 0xff;
             break;
         case TOPLEVEL::muted::vectorLoad:
-            putData.data.control = TOPLEVEL::muted::vectorLoad;
+            putData.data.control = MAIN::control::loadNamedVector;
             putData.data.type = altData >> 24;
             putData.data.insert = (altData >> 16) & 0xff;
             putData.data.par2 = (altData >> 8) & 0xff;
             break;
         case TOPLEVEL::muted::stateLoad:
-            putData.data.control = TOPLEVEL::muted::stateLoad;
+            putData.data.control = MAIN::control::loadNamedState;
             putData.data.type = altData >> 24;
             putData.data.par2 = (altData >> 8) & 0xff;
             break;
@@ -8193,7 +8193,7 @@ float InterChange::returnLimits(CommandBlock *getData)
         if (insert == TOPLEVEL::insert::resonanceGroup)
         {
             unsigned char type = getData->data.type;
-            type &= (TOPLEVEL::source::MIDI || TOPLEVEL::source::CLI || TOPLEVEL::source::GUI); // source bits only
+            type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
             if (control == RESONANCE::control::maxDb) // a cheat!
             {
                 min = 1;

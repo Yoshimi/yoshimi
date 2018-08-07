@@ -1,5 +1,8 @@
 yoshimi 1.5.8 M
 
+* BugFix: Corrected wrong operator use.
+* Was || when it should have been |
+
 2018-8-6 Will
 * Found more missing conversions :(
 

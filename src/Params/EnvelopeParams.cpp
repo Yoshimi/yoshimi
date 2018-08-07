@@ -304,7 +304,7 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
     int control = getData->data.control;
     int parameter = getData->data.parameter;
 
-    type &= (TOPLEVEL::source::MIDI || TOPLEVEL::source::CLI || TOPLEVEL::source::GUI); // source bits only
+    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
 
     // envelope defaults
     int min = 0;

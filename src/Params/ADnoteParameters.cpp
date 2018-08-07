@@ -818,7 +818,7 @@ float ADnoteParameters::getLimits(CommandBlock *getData)
     int control = getData->data.control;
     int engine = getData->data.engine;
 
-    type &= (TOPLEVEL::source::MIDI || TOPLEVEL::source::CLI || TOPLEVEL::source::GUI); // source bits only
+    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
 
     // addnote defaults
     int min = 0;

@@ -3252,7 +3252,7 @@ float SynthEngine::getLimits(CommandBlock *getData)
     int request = type & TOPLEVEL::type::Default;
     int control = getData->data.control;
 
-    type &= (TOPLEVEL::source::MIDI || TOPLEVEL::source::CLI || TOPLEVEL::source::GUI); // source bits only
+    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
 
     // defaults
     int min = 0;
@@ -3348,7 +3348,7 @@ float SynthEngine::getVectorLimits(CommandBlock *getData)
     unsigned char request = getData->data.type  & TOPLEVEL::type::Default;
     int control = getData->data.control;
 
-    type &= (TOPLEVEL::source::MIDI || TOPLEVEL::source::CLI || TOPLEVEL::source::GUI); // source bits only
+    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
 
     // vector defaults
     type |= TOPLEVEL::type::Integer;
@@ -3442,7 +3442,7 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
     int request = type & TOPLEVEL::type::Default;
     int control = getData->data.control;
 
-    type &= (TOPLEVEL::source::MIDI || TOPLEVEL::source::CLI || TOPLEVEL::source::GUI); // source bits only
+    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
 
     // config defaults
     int min = 0;

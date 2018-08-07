@@ -398,7 +398,7 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
     int kitItem = getData->data.kit;
     int engine = getData->data.engine;
 
-    type &= (TOPLEVEL::source::MIDI || TOPLEVEL::source::CLI || TOPLEVEL::source::GUI); // source bits only
+    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
 
     // filter defaults
     int min = 0;
