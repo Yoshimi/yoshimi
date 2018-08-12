@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified July 2018
+    Modified August 2018
 */
 
 #include <iostream>
@@ -379,7 +379,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
     if (control == MIDILEARN::control::clearAll)
     {
         midi_list.clear();
-        synth->setLastfileAdded(6, "");
+        synth->setLastfileAdded(XML_MIDILEARN, "");
         updateGui();
         synth->getRuntime().Log("List cleared");
         return;
@@ -398,7 +398,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
     if (control == MIDILEARN::control::loadFromRecent)
     {
         int pos = 0;
-        vector<string> &listtype = *synth->getHistory(6);
+        vector<string> &listtype = *synth->getHistory(XML_MIDILEARN);
         vector<string>::iterator it = listtype.begin();
         while (it != listtype.end() && pos != value)
         {

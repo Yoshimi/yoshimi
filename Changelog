@@ -1,5 +1,12 @@
 yoshimi 1.5.8 M
 
+2018-8-12 Will
+* Reorganised and combined XML & history types.
+  History lists now identified by name.
+* More 'type' and 'control' conversions in CLI.
+* Small GUI updates/corrections.
+
+2018-8-7 Will
 * BugFix: Corrected wrong operator use.
   Was || when it should have been |
 * Envelope limits done.

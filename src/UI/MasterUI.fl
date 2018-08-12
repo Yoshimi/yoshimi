@@ -373,7 +373,7 @@ class MasterUI {: {private GuiUpdates}
           label {&Instruments}
           xywh {0 0 100 20} labelsize 12
           code0 {o = o; // suppress warning}
-          code1 {vector <string> listType = *synth->getHistory(1);}
+          code1 {vector <string> listType = *synth->getHistory(XML_INSTRUMENT);}
           code2 {if (listType.size() == 0) RecentInstruments->deactivate(); else RecentInstruments->activate();}
         } {
           MenuItem {} {
@@ -384,7 +384,7 @@ class MasterUI {: {private GuiUpdates}
           MenuItem {} {
             label {&Load External...}
             callback {//
-                string lastname = synth->lastItemSeen(1);
+                string lastname = synth->lastItemSeen(XML_INSTRUMENT);
                 if (lastname == "")
                     lastname = synth->getRuntime().userHome;
                 const char *filename;
@@ -421,7 +421,7 @@ class MasterUI {: {private GuiUpdates}
             label {&Recent Instruments...}
             callback {//
             paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
-            paramsui->Show(1);}
+            paramsui->Show(XML_INSTRUMENT);}
             xywh {10 10 34 21} labelsize 12
           }
           MenuItem {} {
@@ -436,7 +436,7 @@ class MasterUI {: {private GuiUpdates}
           label {&Patch Sets}
           xywh {0 0 70 20} labelsize 12
           code0 {o = o; // suppress warning}
-          code1 {vector <string> listType = *synth->getHistory(2);}
+          code1 {vector <string> listType = *synth->getHistory(XML_PARAMETERS);}
           code2 {if (listType.size() == 0) RecentParams->deactivate(); else RecentParams->activate();}
         } {
           MenuItem {} {
@@ -471,7 +471,7 @@ class MasterUI {: {private GuiUpdates}
             label {&Recent Sets...}
             callback {//
             paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
-            paramsui->Show(2);}
+            paramsui->Show(XML_PARAMETERS);}
             xywh {0 0 34 21} labelsize 12
           }
         }
@@ -496,7 +496,7 @@ class MasterUI {: {private GuiUpdates}
           label {&Scales}
           tooltip {Clear all parameters to default settings} xywh {0 0 60 20} labelsize 12
           code0 {o = o; // suppress warning}
-          code1 {vector <string> listType = *synth->getHistory(3);}
+          code1 {vector <string> listType = *synth->getHistory(XML_MICROTONAL);}
           code2 {if (listType.size() == 0) RecentScale->deactivate(); else RecentScale->activate();}
         } {
           MenuItem {} {
@@ -508,7 +508,7 @@ class MasterUI {: {private GuiUpdates}
           MenuItem {} {
             label {&Load...}
             callback {//
-    string lastname = synth->lastItemSeen(3);
+    string lastname = synth->lastItemSeen(XML_MICROTONAL);
     if (lastname == "")
         lastname = synth->getRuntime().userHome;
 
@@ -520,7 +520,7 @@ class MasterUI {: {private GuiUpdates}
           MenuItem {} {
             label {&Save...}
             callback {//
-                string lastname = synth->getLastfileAdded(3);
+                string lastname = synth->getLastfileAdded(XML_MICROTONAL);
                 if (lastname == "")
                     lastname = synth->getRuntime().userHome;
 
@@ -539,7 +539,7 @@ class MasterUI {: {private GuiUpdates}
             label {&Recent Scales...}
             callback {//
             paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
-paramsui->Show(3);}
+paramsui->Show(XML_MICROTONAL);}
             xywh {20 20 34 21} labelsize 12
           }
           MenuItem {} {
@@ -561,13 +561,13 @@ paramsui->Show(3);}
           label {S&tate}
           xywh {0 0 60 20} labelsize 12
           code0 {o = o; // suppress warning}
-          code1 {vector <string> listType = *synth->getHistory(4);}
+          code1 {vector <string> listType = *synth->getHistory(XML_STATE);}
           code2 {if (listType.size() == 0) RecentState->deactivate(); else RecentState->activate();}
         } {
           MenuItem loadState {
             label {&Load...}
             callback {// for Alessandro
-            string lastname = synth->lastItemSeen(4);
+            string lastname = synth->lastItemSeen(XML_STATE);
             if (lastname == "")
                 lastname = synth->getRuntime().userHome;
             char *fle = fl_file_chooser("Load:", "({*.state})", lastname.c_str(), 0);
@@ -583,7 +583,7 @@ paramsui->Show(3);}
           MenuItem saveState {
             label {&Save...}
             callback {// for Alessandro
-            string lastname = synth->getLastfileAdded(4);
+            string lastname = synth->getLastfileAdded(XML_STATE);
             if (lastname == "")
                 lastname = synth->getRuntime().userHome;
             char *fle = fl_file_chooser("Save:", "({*.state})",
@@ -608,7 +608,7 @@ paramsui->Show(3);}
             label {&Recent States...}
             callback {//
             paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
-            paramsui->Show(4);}
+            paramsui->Show(XML_STATE);}
             xywh {10 10 34 21} labelsize 12
           }
         }
@@ -1924,7 +1924,7 @@ ZynAddSubFX}
   Function {do_load_master(const char* file)} {} {
     code {//
     const char *fname;
-    string lastname = synth->lastItemSeen(2);
+    string lastname = synth->lastItemSeen(XML_PARAMETERS);
     if (lastname == "")
         lastname = synth->getRuntime().userHome;
     if (NULL != file)
@@ -1940,7 +1940,7 @@ ZynAddSubFX}
   Function {do_save_master(const char* file = NULL)} {} {
     code {//
     const char *fname;
-    string lastname = synth->getLastfileAdded(2);
+    string lastname = synth->getLastfileAdded(XML_PARAMETERS);
     if (lastname == "")
         lastname = synth->getRuntime().userHome;
     bool result = false;

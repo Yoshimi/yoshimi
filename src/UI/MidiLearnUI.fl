@@ -342,7 +342,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
       Fl_Button load {
         label Load
         callback {//
-        string lastname = synth->lastItemSeen(6);
+        string lastname = synth->lastItemSeen(XML_MIDILEARN);
         if (lastname == "")
             lastname = synth->getRuntime().userHome;
         char *filename;
@@ -355,7 +355,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
       Fl_Button save {
         label Save
         callback {//
-        string lastname = synth->getLastfileAdded(6);
+        string lastname = synth->getLastfileAdded(XML_MIDILEARN);
         if (lastname == "")
             lastname = synth->getRuntime().userHome;
         char *filename;
@@ -382,9 +382,9 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         label Recent
         callback {//
         synth->getGuiMaster()->paramsui->Recent->position(midilearnwindow->x() + recent->x() - 80, midilearnwindow->y() + recent->y() - 187);
-        synth->getGuiMaster()->paramsui->Show(6);}
+        synth->getGuiMaster()->paramsui->Show(XML_MIDILEARN);}
         tooltip {Load from recently seen list} xywh {230 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12
-        code0 {vector<string> &listType = *synth->getHistory(6);}
+        code0 {vector<string> &listType = *synth->getHistory(XML_MIDILEARN);}
         code1 {if (listType.size() == 0) o->deactivate(); else o->activate();}
       }
     }

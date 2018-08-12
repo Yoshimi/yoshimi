@@ -63,7 +63,7 @@ class VectorUI {: {private MiscFuncs}
         label Options
         xywh {275 12 74 20} labelsize 12 textsize 12
         code0 {o = o; // suppress warning}
-        code1 {vector <string> listType = *synth->getHistory(5);}
+        code1 {vector <string> listType = *synth->getHistory(XML_VECTOR);}
         code2 {if (listType.size() == 0) recenthistory->deactivate(); else recenthistory->activate();}
       } {
         MenuItem {} {
@@ -116,7 +116,7 @@ class VectorUI {: {private MiscFuncs}
           label Recent
           callback {//
           paramsui->Recent->position(vectorwindow->x() + vectorwindow->w() - paramsui->Recent->w(),vectorwindow->y()+20);
-          paramsui->Show(5);}
+          paramsui->Show(XML_VECTOR);}
           xywh {20 20 34 20} labelsize 12 deactivate
         }
         MenuItem {} {
@@ -865,7 +865,7 @@ class VectorUI {: {private MiscFuncs}
     code {//
     if (fname == "")
     {
-        string lastname = synth->lastItemSeen(5);
+        string lastname = synth->lastItemSeen(XML_VECTOR);
         if (lastname == "")
             lastname = synth->getRuntime().userHome;
         char *filename;
@@ -878,7 +878,7 @@ class VectorUI {: {private MiscFuncs}
   }
   Function {saveVector()} {} {
     code {//
-    string lastname = synth->getLastfileAdded(5);
+    string lastname = synth->getLastfileAdded(XML_VECTOR);
     if (lastname == "")
         lastname = synth->getRuntime().userHome;
     const char *file = NULL;

@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified June 2018
+    Modified August 2018
 */
 
 #include <zlib.h>
@@ -92,10 +92,24 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi) :
 
     info = addparams0("INFORMATION"); // specifications
 
-    if (synth->getRuntime().xmlType <= XML_CONFIG)
+    if (synth->getUniqueId() == 0 && (synth->getRuntime().xmlType == XML_STATE || synth->getRuntime().xmlType == XML_CONFIG))
     {
-        if(synth->getRuntime().xmlType != XML_STATE && synth->getRuntime().xmlType != XML_CONFIG)
-        {
+        beginbranch("BASE_PARAMETERS");
+            addpar("sample_rate", synth->getRuntime().Samplerate);
+            addpar("sound_buffer_size", synth->getRuntime().Buffersize);
+            addpar("oscil_size", synth->getRuntime().Oscilsize);
+            addpar("gzip_compression", synth->getRuntime().GzipCompression);
+            addparbool("enable_gui", synth->getRuntime().showGui);
+            addparbool("enable_splash", synth->getRuntime().showSplash);
+            addparbool("enable_CLI", synth->getRuntime().showCLI);
+            addparbool("enable_auto_instance", synth->getRuntime().autoInstance);
+            addparU("active_instances", synth->getRuntime().activeInstance);
+        endbranch();
+        return;
+    }
+
+    if (synth->getRuntime().xmlType <= XML_MICROTONAL || synth->getRuntime().xmlType == XML_PRESETS)
+    {
             beginbranch("BASE_PARAMETERS");
                 addpar("max_midi_parts", NUM_MIDI_CHANNELS);
                 addpar("max_kit_items_per_instrument", NUM_KIT_ITEMS);
@@ -104,21 +118,6 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi) :
                 addpar("max_instrument_effects", NUM_PART_EFX);
                 addpar("max_addsynth_voices", NUM_VOICES);
             endbranch();
-        }
-        else if (synth->getUniqueId() == 0)
-        {
-            beginbranch("BASE_PARAMETERS");
-                addpar("sample_rate", synth->getRuntime().Samplerate);
-                addpar("sound_buffer_size", synth->getRuntime().Buffersize);
-                addpar("oscil_size", synth->getRuntime().Oscilsize);
-                addpar("gzip_compression", synth->getRuntime().GzipCompression);
-                addparbool("enable_gui", synth->getRuntime().showGui);
-                addparbool("enable_splash", synth->getRuntime().showSplash);
-                addparbool("enable_CLI", synth->getRuntime().showCLI);
-                addparbool("enable_auto_instance", synth->getRuntime().autoInstance);
-                addparU("active_instances", synth->getRuntime().activeInstance);
-            endbranch();
-        }
     }
 }
 
@@ -334,24 +333,8 @@ char *XMLwrapper::getXMLdata()
             addparstr("XMLtype", "Scales");
             break;
 
-        case XML_PRESETS:
-            addparstr("XMLtype", "Presets");
-            break;
-
         case XML_STATE:
             addparstr("XMLtype", "Session");
-            break;
-
-        case XML_CONFIG:
-            addparstr("XMLtype", "Config");
-            break;
-
-        case XML_BANK:
-            addparstr("XMLtype", "Roots and Banks");
-            break;
-
-        case XML_HISTORY:
-            addparstr("XMLtype", "Recent Files");
             break;
 
         case XML_VECTOR:
@@ -360,6 +343,22 @@ char *XMLwrapper::getXMLdata()
 
         case XML_MIDILEARN:
             addparstr("XMLtype", "Midi Learn");
+            break;
+
+        case XML_CONFIG:
+            addparstr("XMLtype", "Config");
+            break;
+
+        case XML_PRESETS:
+            addparstr("XMLtype", "Presets");
+            break;
+
+        case XML_BANK:
+            addparstr("XMLtype", "Roots and Banks");
+            break;
+
+        case XML_HISTORY:
+            addparstr("XMLtype", "Recent Files");
             break;
 
         default:

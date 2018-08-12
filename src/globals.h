@@ -65,13 +65,13 @@
 #define XML_INSTRUMENT 1
 #define XML_PARAMETERS 2
 #define XML_MICROTONAL 3
-#define XML_PRESETS 4
-#define XML_STATE 5
-#define XML_CONFIG 6
-#define XML_BANK 7
-#define XML_HISTORY 8
-#define XML_VECTOR 9
-#define XML_MIDILEARN 10
+#define XML_STATE 4
+#define XML_VECTOR 5
+#define XML_MIDILEARN 6
+#define XML_CONFIG 7
+#define XML_PRESETS 8
+#define XML_BANK 9
+#define XML_HISTORY 10
 
 // these were previously (pointlessly) user configurable
 #define NUM_VOICES 8

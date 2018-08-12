@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified Augusy 2018
+Modified August 2018
 } {selected in_source in_header
 }
 
@@ -140,7 +140,6 @@ class PartKitItem {: {public Fl_Group, private MiscFuncs}
           if (tmp != NULL)
           {
               send_data(PART::control::instrumentName, 0, TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup, TOPLEVEL::route::lowPriority + 1, miscMsgPush(string(tmp)));
-              //part->kit[n].Pname = string(tmp);
               o->copy_label(tmp);
           }}
           xywh {90 0 130 15} box THIN_DOWN_BOX down_box FLAT_BOX color 7 labelfont 1 labelsize 10 align 20
@@ -1627,12 +1626,11 @@ Offset}
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
     unsigned char par2 = getData->data.par2;
-
     bool valBool = (value > 0.5f);
     int valInt = lrint(value);
     string text;
     if (par2 != NO_MSG)
-    	text = miscMsgPop(par2);
+        text = miscMsgPop(par2);
 
     // these are specific to the mixer panel
     if (newpart >= *plgroup && newpart < (*plgroup + NUM_MIDI_CHANNELS))
@@ -1670,9 +1668,9 @@ Offset}
                 synth->getGuiMaster()->panellistitem[displaypart]->audiosend->value(send);
         }
     }
-    if (npart != newpart && control != PART::control::enable)
-        return;
 
+    if (npart != newpart)
+        return;
     bool sameEff = (engine == (inseffnocounter->value() - 1));
     bool kitType = (insert == TOPLEVEL::insert::kitGroup);
     switch(control)
