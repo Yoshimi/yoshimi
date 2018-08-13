@@ -3629,7 +3629,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
             second = " to Effect " + to_string(control + 1);
             return (name + contstr + second);
         }
-        if (npart == TOPLEVEL::section::insertEffects && control == 2)
+        if (npart == TOPLEVEL::section::insertEffects && control == EFFECT::sysIns::effectDestination)
         {
             contstr = " To ";
             if (value == -2)
@@ -3644,7 +3644,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
             showValue = false;
             return ("Send " + name + contstr + second);
         }
-        if (control == 0)
+        if (control == EFFECT::sysIns::effectNumber)
         {
             name = "Set " + name;
             showValue = false;
@@ -3652,7 +3652,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
         }
     }
     string contstr = "";
-    if ((npart < NUM_MIDI_PARTS && control == PART::control::effectType) || (npart > TOPLEVEL::section::main && kititem == UNUSED && control == 1))
+    if ((npart < NUM_MIDI_PARTS && control == PART::control::effectType) || (npart > TOPLEVEL::section::main && kititem == UNUSED && control == EFFECT::sysIns::effectType))
     {
         name += " set to";
         kititem = value | EFFECT::type::none; // TODO fix this!

@@ -520,13 +520,13 @@ Y : any : 0 to 39 : 0 to 63 : 0 to 15 : All : 3 : 0 to 3 : 255 : Delete point - 
 Y : 0 to 127 : 0 to 39 : 0 to 63 : 0 to 15 : All : 4 : 0 to 3 : 0 to 127 : Adjust - ‘Par 2’ is X incremental value, ‘Value’ is Y value
 
 Insertion Effect Selector
-n : 0 to 7 : 0 : 242 : 255 : effect number : 255 : 255 : 255 : Was ‘Set effects number’ now does nothing.
-Y : 0 to 8 : 1 : 242 : 255 : effect number : 255 : 255 : 255 : Set effect type
-Y : -2 to 63 : 2 : 242 : 255 : effect number : 255 : 255 : 255 : set effect destination (Master out - 2, Off - 1, Part 0 to 63)
+n : 0 to 7 : 4 : 242 : 255 : effect number : 255 : 255 : 255 : Was ‘Set effects number’ now does nothing.
+Y : 0 to 8 : 5 : 242 : 255 : effect number : 255 : 255 : 255 : Set effect type
+Y : -2 to 63 : 6 : 242 : 255 : effect number : 255 : 255 : 255 : set effect destination (Master out - 2, Off - 1, Part 0 to 63)
 
 System Effect Selector
-n : 0 to 3 : 0 : 241 : 255 : effect number : 255 : 255 : 255 : Was ‘Set effects number’ now does nothing.
-Y : 0 to 8 : 1 : 241 : 255 : effect number : 255 : 255 : 255 : Set effect type
+n : 0 to 3 : 4 : 241 : 255 : effect number : 255 : 255 : 255 : Was ‘Set effects number’ now does nothing.
+Y : 0 to 8 : 5 : 241 : 255 : effect number : 255 : 255 : 255 : Set effect type
 Sends
 YL : 0 to 127 : 1 to 3 : 241 : 255 : 0 to 2 : 16 : 255 : 255 : To (control) effect, from (engine) effect
 

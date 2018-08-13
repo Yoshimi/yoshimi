@@ -824,15 +824,14 @@ namespace EFFECT // usage EFFECT::type::none
     };
 
     enum sysIns : unsigned char {
-        effectNumber = 0, // GUI only
-        effectType = 1,
         toEffect1 = 1, // system only
-        effectDestination, // insert only
-        toEffect2 = 2, // system only
-        toEffect3 // system only
+        toEffect2, // system only
+        toEffect3, // system only
+        effectNumber,
+        effectType,
+        effectDestination // insert only
     };
 }
-
 
 union CommandBlock{
     struct{

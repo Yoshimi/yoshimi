@@ -1,5 +1,9 @@
 yoshimi 1.5.8 M
 
+2018-8-13 Will
+* Separated system and insert control names.
+* Updated docs.
+
 2018-8-12 Will
 * Reorganised and combined XML & history types.
   History lists now identified by name.
