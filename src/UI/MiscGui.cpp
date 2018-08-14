@@ -79,6 +79,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
 
     unsigned char typetop = type & 0xd0; // pass through redraws *after* command
     unsigned char buttons = type & 7;
+
     if (part != TOPLEVEL::section::midiLearn)
     {
         if (buttons == 3 && Fl::event_is_click())
@@ -114,6 +115,13 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
     type |= typetop;
 
     putData.data.type = type | TOPLEVEL::source::GUI;
+    /* not yet need to remove *all* knob inits
+    if (Fl::event_button() == 3)
+    {
+        putData.data.type = putData.data.type | TOPLEVEL::type::Default | TOPLEVEL::type::Limits | TOPLEVEL::source::UpdateAfterSet;
+
+        putData.data.value = synth->interchange.readAllData(&putData);
+    }*/
 
 //cout << "collect_data " << int(type) << " " << int(control) << " " << int(part) << " " << int(kititem) << " " << int(engine) << " " << int(parameter) << " " << int(par2) << endl;
     if (jack_ringbuffer_write_space(synth->interchange.fromGUI) >= commandSize)

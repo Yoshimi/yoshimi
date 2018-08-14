@@ -4,6 +4,7 @@ yoshimi 1.5.8 M
 * Added missing conversions in FilterUI.fl
 * Added missing conversions in EnvelopeUI.fl
 * BugFix: EffUI.fl updates incomplete :(
+* Added missing conversions in LFOUI.fl
 
 2018-8-13 Will
 * Separated system and insert control names.

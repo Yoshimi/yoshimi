@@ -74,7 +74,7 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
     if (synth->getGuiMaster()->partui->adnoteui->advoice->nvoice == nvoice)
         synth->getGuiMaster()->partui->adnoteui->advoice->voicevolume->value(vol);
 
-    collect_data(synth, vol, (Fl::event_button() | 0xc8), ADDVOICE::control::volume, npart, kititem, PART::engine::addVoice1 + nvoice);}
+    collect_data(synth, vol, (Fl::event_button() | 0xc0), ADDVOICE::control::volume, npart, kititem, PART::engine::addVoice1 + nvoice);}
           tooltip Volume xywh {125 3 113 20} type {Horz Knob} box THIN_DOWN_BOX labelsize 8 align 5 maximum 127 step 1
           code0 {o->value(pars->VoicePar[nvoice].PVolume);}
           code1 {o->setValueType(VC_ADDVoiceVolume);o->useCustomTip(true);}
@@ -97,7 +97,7 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
     if (synth->getGuiMaster()->partui->adnoteui->advoice->nvoice == nvoice)
         synth->getGuiMaster()->partui->adnoteui->advoice->voicefreqlfogroup->intensity->value(lfodepth);
 
-    collect_data(synth, lfodepth, (Fl::event_button() | 0xc8), 1, npart, kititem, PART::engine::addVoice1 + nvoice, 0, 1);}
+    collect_data(synth, lfodepth, (Fl::event_button() | 0xc0), 1, npart, kititem, PART::engine::addVoice1 + nvoice, 0, 1);}
           tooltip {Frequency LFO amount} xywh {505 3 115 20} type {Horz Knob} box THIN_DOWN_BOX labelsize 8 align 5 maximum 127 step 1 deactivate
           code0 {o->value(pars->VoicePar[nvoice].FreqLfo->Pintensity);}
           code1 {o->setValueType(VC_LFOdepthFreq);o->useCustomTip(true);}
@@ -114,7 +114,7 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
         synth->getGuiMaster()->partui->adnoteui->advoice->voicerandompan->value(panning < 1);
     }
 
-    collect_data(synth, panning, (Fl::event_button() | 0xc8), ADDVOICE::control::panning, npart, kititem, PART::engine::addVoice1 + nvoice);}
+    collect_data(synth, panning, (Fl::event_button() | 0xc0), ADDVOICE::control::panning, npart, kititem, PART::engine::addVoice1 + nvoice);}
           tooltip {Voice panning - zero/leftmost is Random} xywh {244 3 20 20} box ROUND_UP_BOX labelsize 10 align 4 maximum 127 step 1
           code0 {o->setValueType(VC_PanningRandom);}
           code1 {o->value(pars->VoicePar[nvoice].PPanning);}
@@ -161,7 +161,7 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
     if (Fl::event_button() == 3)
         o->value(0);
     int detune = lrint(o->value());
-    collect_data(synth, detune, (Fl::event_button() | 0xd8), ADDVOICE::control::detuneFrequency, npart, kititem, PART::engine::addVoice1 + nvoice);}
+    collect_data(synth, detune, (Fl::event_button() | 0xd0), ADDVOICE::control::detuneFrequency, npart, kititem, PART::engine::addVoice1 + nvoice);}
           tooltip {Fine Detune (cents)} xywh {335 3 164 20} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->VoicePar[nvoice].PDetune - 8192);}
           class mwheel_slider_rev
