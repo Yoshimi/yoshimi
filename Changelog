@@ -1,5 +1,10 @@
 yoshimi 1.5.8 M
 
+2018-8-14 Will
+* Added missing conversions in FilterUI.fl
+* Added missing conversions in EnvelopeUI.fl
+* BugFix: EffUI.fl updates incomplete :(
+
 2018-8-13 Will
 * Separated system and insert control names.
 * Updated docs.

@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-Modified July 2018} {in_source in_header
+Modified August 2018} {in_source in_header
 }
 
 decl {\#include "UI/MiscGui.h"} {public local
@@ -388,7 +388,7 @@ pars=NULL;
         Fl_Choice analogfiltertypechoice {
           label FilterType
           callback {//
-          send_data(FILTERINSERT::control::analogType, o->value(), 0xd0);}
+          send_data(FILTERINSERT::control::analogType, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {The Filter type} xywh {5 43 50 15} down_box BORDER_BOX labelsize 10 align 6 textsize 10
           code1 {o->value(pars->Ptype);}
         } {
@@ -432,7 +432,7 @@ pars=NULL;
         Fl_Choice svfiltertypechoice {
           label FilterType
           callback {//
-          send_data(FILTERINSERT::control::stateVariableType, o->value(), 0xd0);}
+          send_data(FILTERINSERT::control::stateVariableType, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {The Filter type} xywh {5 43 50 15} down_box BORDER_BOX labelsize 10 align 6 textsize 10
           code1 {o->value(pars->Ptype);}
         } {
@@ -456,7 +456,7 @@ pars=NULL;
         Fl_Choice filtertype {
           label Category
           callback {//
-          send_data(FILTERINSERT::control::baseType, o->value(), 0xd0);}
+          send_data(FILTERINSERT::control::baseType, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {The Category of the Filter (Analog/Formantic/etc.)} xywh {5 10 66 15} down_box BORDER_BOX labelsize 10 align 6 textsize 10
           code0 {o->value(pars->Pcategory);}
         } {
@@ -476,7 +476,7 @@ pars=NULL;
         Fl_Dial cfreqdial {
           label {C.Freq}
           callback {//
-          send_data(FILTERINSERT::control::centerFrequency, o->value(), 0xc8);}
+          send_data(FILTERINSERT::control::centerFrequency, o->value(), TOPLEVEL::type::Write);}
           tooltip {Center Frequency of the Filter or the base position in the vowel's sequence} xywh {65 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(getFilterFreqType(filtertype->value()));}
           code1 {o->value(pars->Pfreq);}
@@ -486,7 +486,7 @@ pars=NULL;
         Fl_Dial qdial {
           label Q
           callback {//
-          send_data(FILTERINSERT::control::Q, o->value(), 0xd8);}
+          send_data(FILTERINSERT::control::Q, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Filter resonance or bandwidth} xywh {100 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->Pq);}
           code1 {if (kititem == FILTERINSERT::control::dynFilter) o->init(64); else if (engine >= 0x80) o->init(60); else o->init(40);}
@@ -496,7 +496,7 @@ pars=NULL;
         Fl_Dial freqtrdial {
           label {freq.tr.}
           callback {//
-          send_data(FILTERINSERT::control::frequencyTracking, o->value(), 0xd8);}
+          send_data(FILTERINSERT::control::frequencyTracking, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Filter frequency tracking} xywh {240 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code1 {o->value(pars->Pfreqtrack);}
           code2 {o->init(64);}
@@ -505,7 +505,7 @@ pars=NULL;
         Fl_Dial vsnsadial {
           label {V.SnsA.}
           callback {//
-          send_data(FILTERINSERT::control::velocitySensitivity, o->value(), 0xd8);}
+          send_data(FILTERINSERT::control::velocitySensitivity, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Velocity sensing amount of the Filter} xywh {135 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {if (kititem == FILTERINSERT::control::dynFilter) o->init(4127); else if (engine >= 0x80) o->init(0); else o->init(64);}
           code1 {o->setValueType(VC_FilterVelocityAmp);}
@@ -514,7 +514,7 @@ pars=NULL;
         Fl_Dial vsnsdial {
           label {V.Sns.}
           callback {//
-          send_data(FILTERINSERT::control::velocityCurve, o->value(), 0xd8);}
+          send_data(FILTERINSERT::control::velocityCurve, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Velocity Sensing Function of the Filter} xywh {170 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {if (kititem == FILTERINSERT::control::dynFilter) o->init(127); else o->init(64);}
           code1 {o->setValueType(VC_FilterVelocitySense);}
@@ -524,7 +524,7 @@ pars=NULL;
         Fl_Dial gaindial {
           label gain
           callback {//
-          send_data(FILTERINSERT::control::gain, o->value(), 0xd8);}
+          send_data(FILTERINSERT::control::gain, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Filter output gain/damp} xywh {205 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->Pgain);}
           code1 {o->init(64);}
@@ -534,7 +534,7 @@ pars=NULL;
         Fl_Choice stcounter {
           label St
           callback {//
-          send_data(FILTERINSERT::control::stages, o->value(), 0xd0);}
+          send_data(FILTERINSERT::control::stages, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Filter stages (in order to increase dB/oct. value and the order of the filter)} xywh {74 10 35 15} down_box BORDER_BOX labelsize 10 align 8 textfont 1 textsize 10
           code1 {for (int i=0;i<MAX_FILTER_STAGES;i++) {char tmp[10];snprintf(tmp,10,"%dx",i+1);o->add(tmp);};}
           code2 {o->value(pars->Pstages);}
@@ -558,7 +558,7 @@ pars=NULL;
       Fl_Check_Button freqtrackoffset {
         label {0 /+}
         callback {//
-        send_data(FILTERINSERT::control::frequencyTrackingRange, o->value(), 0xd0);}
+        send_data(FILTERINSERT::control::frequencyTrackingRange, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
         tooltip {Set frequency tracking range to 0%-200%} xywh {238 10 33 16} down_box DOWN_BOX labelsize 10 align 24
       }
     }
@@ -577,7 +577,7 @@ pars=NULL;
           nformant = (int) o->value();
           update_formant_window();
           formantfiltergraph->redraw();
-          //send_data(FILTERINSERT::control::formantNumber, o->value(), 0xd0);}
+          //send_data(FILTERINSERT::control::formantNumber, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           xywh {545 80 40 15} type Simple labelfont 1 labelsize 10 align 4 minimum 0 maximum 127 step 1 textsize 10
           code0 {o->bounds(0,FF_MAX_FORMANTS-1);}
           code1 {o->value(nformant);}
@@ -588,7 +588,7 @@ pars=NULL;
           nvowel = (int) o->value();
           update_formant_window();
           formantfiltergraph->redraw();
-          //send_data(FILTERINSERT::control::vowelNumber, o->value(), 0xd0);}
+          //send_data(FILTERINSERT::control::vowelNumber, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           xywh {545 55 40 20} type Simple labelfont 1 labelsize 10 align 4 minimum 0 maximum 127 step 1 textfont 1 textsize 11
           code0 {o->bounds(0,FF_MAX_VOWELS-1);}
           code1 {o->value(nvowel);}
@@ -599,7 +599,7 @@ pars=NULL;
           Fl_Dial formant_freq_dial {
             label freq
             callback {//
-            send_data(FILTERINSERT::control::formantFrequency, o->value(), 0xd8);}
+            send_data(FILTERINSERT::control::formantFrequency, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet, nformant, nvowel);}
             tooltip {Formant frequency} xywh {495 115 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
             code0 {o->init(-1);}
             class WidgetPDial
@@ -607,7 +607,7 @@ pars=NULL;
           Fl_Dial formant_q_dial {
             label Q
             callback {//
-            send_data(FILTERINSERT::control::formantQ, o->value(), 0xd8);}
+            send_data(FILTERINSERT::control::formantQ, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet, nformant, nvowel);}
             tooltip {Formant's Q} xywh {525 115 24 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
             code0 {o->init(64);}
             class WidgetPDial
@@ -615,7 +615,7 @@ pars=NULL;
           Fl_Dial formant_amp_dial {
             label amp
             callback {//
-            send_data(FILTERINSERT::control::formantAmplitude, o->value(), 0xd0);}
+            send_data(FILTERINSERT::control::formantAmplitude, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet, nformant, nvowel);}
             tooltip {Formant amplitude} xywh {555 115 24 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
             code0 {o->init(127);}
             class WidgetPDial
@@ -628,7 +628,7 @@ pars=NULL;
         Fl_Counter seqsize {
           label {Seq.Size}
           callback {//
-          send_data(FILTERINSERT::control::sequenceSize, o->value(), 0xd0);}
+          send_data(FILTERINSERT::control::sequenceSize, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           xywh {595 62 55 20} type Simple labelfont 1 labelsize 10 align 5 minimum 0 maximum 127 step 1 textfont 1 textsize 11
           code0 {o->bounds(1,FF_MAX_SEQUENCE);}
           code1 {o->value(pars->Psequencesize);}
@@ -638,7 +638,7 @@ pars=NULL;
           callback {//
           nseqpos = (int) o->value();
           update_formant_window();
-          send_data(FILTERINSERT::control::sequencePosition, o->value(), 0xc0);}
+          send_data(FILTERINSERT::control::sequencePosition, o->value(), TOPLEVEL::type::Write);}
           tooltip {Current position in the sequence} xywh {595 97 40 15} type Simple labelfont 1 labelsize 10 align 9 minimum 0 maximum 127 step 1 textsize 10
           code0 {o->bounds(0,FF_MAX_SEQUENCE-1);}
           code1 {o->value(nseqpos);}
@@ -646,21 +646,21 @@ pars=NULL;
         Fl_Counter vowel_counter {
           label Vowel
           callback {//
-          send_data(FILTERINSERT::control::vowelPositionInSequence, o->value(), 0xd0);}
+          send_data(FILTERINSERT::control::vowelPositionInSequence, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet, nseqpos);}
           tooltip {Vowel number at the sequence position} xywh {640 97 40 15} type Simple labelsize 10 align 1 minimum 0 maximum 127 step 1 textsize 10
           code0 {o->bounds(0,FF_MAX_VOWELS-1);}
         }
         Fl_Check_Button neginput {
           label {Neg.Input}
           callback {//
-          send_data(FILTERINSERT::control::negateInput, o->value(), 0xd0);}
+          send_data(FILTERINSERT::control::negateInput, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Negate the input from LFO/envelopes/etc.} xywh {625 132 60 20} down_box DOWN_BOX labelsize 10
           code0 {o->value(pars->Psequencereversed);}
         }
         Fl_Dial strchdial {
           label Strch
           callback {//
-          send_data(FILTERINSERT::control::formantStretch, o->value(), 0xd8);}
+          send_data(FILTERINSERT::control::formantStretch, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Sequence Stretch} xywh {595 130 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->init(40);}
           code1 {o->value(pars->Psequencestretch);}
@@ -671,7 +671,7 @@ pars=NULL;
       Fl_Counter formantcount {
         label Formants
         callback {//
-        send_data(FILTERINSERT::control::numberOfFormants, o->value(), 0xd0);}
+        send_data(FILTERINSERT::control::numberOfFormants, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
         xywh {485 15 65 20} type Simple labelfont 1 labelsize 10 align 1 minimum 0 maximum 127 step 1 textsize 12
         code0 {o->bounds(1,FF_MAX_FORMANTS);}
         code1 {o->value(pars->Pnumformants);}
@@ -679,7 +679,7 @@ pars=NULL;
       Fl_Dial frsldial {
         label {Fr.Sl.}
         callback {//
-        send_data(FILTERINSERT::control::formantSlowness, o->value(), 0xd8);}
+        send_data(FILTERINSERT::control::formantSlowness, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
         tooltip {Formant's Slowness (Morphing)} xywh {565 15 25 25} box ROUND_UP_BOX labelfont 1 labelsize 10 align 1 maximum 127 step 1
         code0 {o->init(64);}
         code1 {o->value(pars->Pformantslowness);}
@@ -704,7 +704,7 @@ pars=NULL;
         callback {//
         if (Fl::event_button() == 3)
             o->value(64);
-        send_data(FILTERINSERT::control::formantCenter, o->value(), 0xd8);}
+        send_data(FILTERINSERT::control::formantCenter, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
         xywh {547 164 89 16} type {Horz Knob} box THIN_DOWN_BOX maximum 127 step 1
         code0 {o->value(pars->Pcenterfreq);}
         class mwheel_slider_rev
@@ -713,7 +713,7 @@ pars=NULL;
         callback {//
         if (Fl::event_button() == 3)
             o->value(64);
-        send_data(FILTERINSERT::control::formantOctave, o->value(), 0xd8);}
+        send_data(FILTERINSERT::control::formantOctave, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
         xywh {547 185 90 16} type {Horz Knob} box THIN_DOWN_BOX maximum 127 step 1
         code0 {o->value(pars->Poctavesfreq);}
         class mwheel_slider_rev
@@ -721,7 +721,7 @@ pars=NULL;
       Fl_Dial wvknob {
         label {Vw.Cl.}
         callback {//
-        send_data(FILTERINSERT::control::formantClearness, o->value(), 0xd8);}
+        send_data(FILTERINSERT::control::formantClearness, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
         tooltip {Vowel "clearness" (transition between vowels)} xywh {600 15 25 25} box ROUND_UP_BOX labelfont 1 labelsize 10 align 1 maximum 127 step 1
         code0 {o->init(64);}
         code1 {o->value(pars->Pvowelclearness);}
@@ -819,18 +819,10 @@ pars=NULL;
         }
         filterparamswindow->redraw();} {}
   }
-  Function {send_data(int control, float value, int type)} {} {
+  Function {send_data(int control, float value, int type, int parameter = UNUSED, int par2 = UNUSED)} {} {
     code {//
-    int parameter = 255;
-    int par2 = 255;
-    if (control == 37)
-        parameter = nseqpos;
-    else if (control >= 18 && control <= 20)
-    {
-        parameter = nformant;
-        par2 = nvowel;
-    }
-    collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, TOPLEVEL::insert::filterGroup, parameter, par2);} {}
+        type |= TOPLEVEL::type::Write;
+        collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, TOPLEVEL::insert::filterGroup, parameter, par2);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//

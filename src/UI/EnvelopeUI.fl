@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified July 2018
+Modified August 2018
 } {selected in_source in_header
 }
 
@@ -71,7 +71,8 @@ pair=NULL;} {}
   }
   Function {send_data(int control, int par2, float value, int type)} {} {
     code {//
-    collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, TOPLEVEL::insert::envelopePointChange, group, par2);} {}
+        type |= TOPLEVEL::type::Write;
+        collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, TOPLEVEL::insert::envelopePointChange, group, par2);} {}
   }
   Function {init(EnvelopeParams *env_, int npart_, int kititem_, int engine_, int group_)} {} {
     code {//
@@ -289,7 +290,7 @@ return(nearestpoint);} {}
         if (newdt > 127)
             newdt = 127;
 
-        send_data(currentpoint, newdt, ny, 0xd0);
+        send_data(currentpoint, newdt, ny, TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);
 }
 return(1);} {}
   }
@@ -357,7 +358,7 @@ delete (freemodeeditwindow);} {}
         int value = env->Penvval[curpoint];
         int par2 = env->Penvdt[curpoint];
 
-        send_data(group, curpoint, value, 0xd0, TOPLEVEL::insert::envelopePoints, par2);}
+        send_data(group, curpoint, value, TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::insert::envelopePoints, par2);}
         xywh {115 155 80 20} box THIN_UP_BOX labelsize 11
         code0 {if (env->Pfreemode==0) o->hide();}
       }
@@ -372,7 +373,7 @@ delete (freemodeeditwindow);} {}
         if (env->Penvpoints <= 3)
             return;
 
-send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
+send_data(group, curpoint, 0, TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::insert::envelopePoints);}
         xywh {200 155 80 20} box THIN_UP_BOX labelsize 11
         code0 {if (env->Pfreemode==0) o->hide();}
       }
@@ -389,13 +390,13 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
             }
         }
 
-        send_data(group, ENVELOPEINSERT::control::enableFreeMode, o->value(), 0xd0);}
+        send_data(group, ENVELOPEINSERT::control::enableFreeMode, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
         tooltip {Enable or disable the freemode} xywh {10 154 95 22} box PLASTIC_UP_BOX labelsize 11
       }
       Fl_Check_Button forcedreleasecheck {
         label frcR
         callback {//
-        send_data(group, ENVELOPEINSERT::control::forcedRelease, o->value(), 0xd0);}
+        send_data(group, ENVELOPEINSERT::control::forcedRelease, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
         tooltip {Forced Release} xywh {410 165 40 15} down_box DOWN_BOX labelsize 10
         code0 {o->value(env->Pforcedrelease);}
         code1 {if (env->Pfreemode==0) o->hide();}
@@ -403,7 +404,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
       Fl_Dial envstretchdial {
         label {Str.}
         callback {//
-        send_data(group, ENVELOPEINSERT::control::stretch, o->value(), 0xd8);}
+        send_data(group, ENVELOPEINSERT::control::stretch, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
         tooltip {Envelope stretch (on lower notes make the envelope longer)} xywh {380 153 25 25} box ROUND_UP_BOX labelsize 10 align 4 maximum 127 step 1
         code0 {o->value(env->Penvstretch);}
         code1 {if (env->Pfreemode==0) o->hide();}
@@ -419,7 +420,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
       Fl_Check_Button linearenvelopecheck {
         label L
         callback {//
-        send_data(group, ENVELOPEINSERT::control::linearEnvelope, o->value(), 0xd0);}
+        send_data(group, ENVELOPEINSERT::control::linearEnvelope, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
         tooltip {Linear Envelope} xywh {410 151 30 15} down_box DOWN_BOX labelsize 10
         code0 {o->value(env->Plinearenvelope);}
         code1 {if ((env->Pfreemode==0)||(env->Envmode>2)) o->hide();}
@@ -427,7 +428,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
       Fl_Counter sustaincounter {
         label Sust
         callback {//
-        send_data(group, ENVELOPEINSERT::control::sustainPoint, o->value(), 0xd0);}
+        send_data(group, ENVELOPEINSERT::control::sustainPoint, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
         tooltip {Sustain (0 is disabled)} xywh {315 155 40 15} type Simple labelsize 11 align 4 minimum 0 maximum 127 step 1
         code0 {o->value(env->Penvsustain);}
         code1 {if (env->Pfreemode==0) o->hide();}
@@ -457,7 +458,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Dial e1adt {
           label {A.dt}
           callback {//
-          send_data(group, ENVELOPEINSERT::control::attackTime, o->value(), 0xd8);}
+          send_data(group, ENVELOPEINSERT::control::attackTime, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Attack time} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PA_dt);}
@@ -467,7 +468,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Dial e1ddt {
           label {D.dt}
           callback {//
-          send_data(group, ENVELOPEINSERT::control::decayTime, o->value(), 0xd8);}
+          send_data(group, ENVELOPEINSERT::control::decayTime, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Decay time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PD_dt);}
@@ -477,7 +478,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Dial e1rdt {
           label {R.dt}
           callback {//
-          send_data(group, ENVELOPEINSERT::control::releaseTime, o->value(), 0xd8);}
+          send_data(group, ENVELOPEINSERT::control::releaseTime, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Release time} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PR_dt);}
@@ -487,7 +488,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Dial e1sval {
           label {S.val}
           callback {//
-          send_data(group, ENVELOPEINSERT::control::sustainLevel, o->value(), 0xd8);}
+          send_data(group, ENVELOPEINSERT::control::sustainLevel, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Sustain value} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeAmpSusVal);}
           code1 {o->value(env->PS_val);}
@@ -497,14 +498,14 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Check_Button e1forcedrelease {
           label frcR
           callback {//
-          send_data(group, ENVELOPEINSERT::control::forcedRelease, o->value(), 0xd0);}
+          send_data(group, ENVELOPEINSERT::control::forcedRelease, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Forced Release} xywh {180 35 20 15} down_box DOWN_BOX labelsize 10 align 6
           code0 {o->value(env->Pforcedrelease);}
         }
         Fl_Dial e1envstretch {
           label Stretch
           callback {//
-          send_data(group, ENVELOPEINSERT::control::stretch, o->value(), 0xd8);}
+          send_data(group, ENVELOPEINSERT::control::stretch, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {145 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           code1 {o->init(64);}
@@ -514,13 +515,13 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Button {} {
           label E
           callback {freemodeeditwindow->show();
-          send_data(group, ENVELOPEINSERT::control::edit, o->value(), 0xc0);}
+          send_data(group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
           tooltip {Envelope window} xywh {185 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
         }
         Fl_Check_Button e1linearenvelope {
           label L
           callback {//
-          send_data(group, ENVELOPEINSERT::control::linearEnvelope, o->value(), 0xd0);}
+          send_data(group, ENVELOPEINSERT::control::linearEnvelope, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {The envelope is linear} xywh {180 20 15 15} down_box DOWN_BOX labelsize 10 align 4
           code0 {o->value(env->Plinearenvelope);}
         }
@@ -550,7 +551,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Dial e2aval {
           label {A.val}
           callback {//
-          send_data(group, ENVELOPEINSERT::control::attackLevel, o->value(), 0xd8);}
+          send_data(group, ENVELOPEINSERT::control::attackLevel, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Starting value} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeFreqVal);}
           code1 {o->value(env->PA_val);}
@@ -560,7 +561,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Dial e2adt {
           label {A.dt}
           callback {//
-          send_data(group, ENVELOPEINSERT::control::attackTime, o->value(), 0xd8);}
+          send_data(group, ENVELOPEINSERT::control::attackTime, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Attack time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PA_dt);}
@@ -570,7 +571,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Dial e2rval {
           label {R.val}
           callback {//
-          send_data(group, ENVELOPEINSERT::control::releaseLevel, o->value(), 0xd8);}
+          send_data(group, ENVELOPEINSERT::control::releaseLevel, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Release value} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeFreqVal);}
           code1 {o->value(env->PR_val);}
@@ -580,7 +581,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Dial e2rdt {
           label {R.dt}
           callback {//
-          send_data(group, ENVELOPEINSERT::control::releaseTime, o->value(), 0xd8);}
+          send_data(group, ENVELOPEINSERT::control::releaseTime, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Release time} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PR_dt);}
@@ -590,7 +591,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Dial e2envstretch {
           label Stretch
           callback {//
-          send_data(group, ENVELOPEINSERT::control::stretch, o->value(), 0xd8);}
+          send_data(group, ENVELOPEINSERT::control::stretch, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {145 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           code1 {if (engine == 1) o->init(64); else o->init(0);}
@@ -600,7 +601,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Check_Button e2forcedrelease {
           label frcR
           callback {//
-          send_data(group, ENVELOPEINSERT::control::forcedRelease, o->value(), 0xd0);}
+          send_data(group, ENVELOPEINSERT::control::forcedRelease, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Forced release} xywh {180 25 15 25} down_box DOWN_BOX labelsize 10 align 6
           code0 {o->value(env->Pforcedrelease);}
         }
@@ -618,7 +619,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
       Fl_Button {} {
         label E
         callback {freemodeeditwindow->show();
-        send_data(group, ENVELOPEINSERT::control::edit, o->value(), 0xc0);}
+        send_data(group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
         tooltip {Envelope window} xywh {190 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
       }
     }
@@ -635,7 +636,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Dial e3aval {
           label {A.val}
           callback {//
-          send_data(group, ENVELOPEINSERT::control::attackLevel, o->value(), 0xd8);}
+          send_data(group, ENVELOPEINSERT::control::attackLevel, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Starting value} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeFilterVal);}
           code1 {o->value(env->PA_val);}
@@ -645,7 +646,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Dial e3adt {
           label {A.dt}
           callback {//
-          send_data(group, ENVELOPEINSERT::control::attackTime, o->value(), 0xd8);}
+          send_data(group, ENVELOPEINSERT::control::attackTime, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Attack time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PA_dt);}
@@ -655,7 +656,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Dial e3dval {
           label {D.val}
           callback {//
-          send_data(group, ENVELOPEINSERT::control::decayLevel, o->value(), 0xd8);}
+          send_data(group, ENVELOPEINSERT::control::decayLevel, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {decay value} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeFilterVal);}
           code1 {o->value(env->PD_val);}
@@ -665,7 +666,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Dial e3ddt {
           label {D.dt}
           callback {//
-          send_data(group, ENVELOPEINSERT::control::decayTime, o->value(), 0xd8);}
+          send_data(group, ENVELOPEINSERT::control::decayTime, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {decay time} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PD_dt);}
@@ -675,7 +676,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Dial e3rdt {
           label {R.dt}
           callback {//
-          send_data(group, ENVELOPEINSERT::control::releaseTime, o->value(), 0xd8);}
+          send_data(group, ENVELOPEINSERT::control::releaseTime, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Release time} xywh {145 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PR_dt);}
@@ -685,7 +686,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Dial e3rval {
           label {R.val}
           callback {//
-          send_data(group, ENVELOPEINSERT::control::releaseLevel, o->value(), 0xd8);}
+          send_data(group, ENVELOPEINSERT::control::releaseLevel, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Release value} xywh {180 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeFilterVal);}
           code1 {o->value(env->PR_val);}
@@ -695,7 +696,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Dial e3envstretch {
           label Stretch
           callback {//
-          send_data(group, ENVELOPEINSERT::control::stretch, o->value(), 0xd8);}
+          send_data(group, ENVELOPEINSERT::control::stretch, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {215 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           code1 {o->init(0);}
@@ -705,7 +706,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Check_Button e3forcedrelease {
           label frcR
           callback {//
-          send_data(group, ENVELOPEINSERT::control::forcedRelease, o->value(), 0xd0);}
+          send_data(group, ENVELOPEINSERT::control::forcedRelease, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Forced Release} xywh {250 30 15 20} down_box DOWN_BOX labelsize 10 align 6
           code0 {o->value(env->Pforcedrelease);}
         }
@@ -713,7 +714,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
           label E
           callback {//
           freemodeeditwindow->show();
-          send_data(group, ENVELOPEINSERT::control::edit, o->value(), 0xc0);}
+          send_data(group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
           xywh {255 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
         }
         Fl_Button {} {
@@ -741,7 +742,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Dial e4aval {
           label {A.val}
           callback {//
-          send_data(group, ENVELOPEINSERT::control::attackLevel, o->value(), 0xd8);}
+          send_data(group, ENVELOPEINSERT::control::attackLevel, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Bandwidth multiplier, start} xywh {8 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_val);}
           code1 {o->init(100);}
@@ -751,7 +752,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Dial e4adt {
           label {A.dt}
           callback {//
-          send_data(group, ENVELOPEINSERT::control::attackTime, o->value(), 0xd8);}
+          send_data(group, ENVELOPEINSERT::control::attackTime, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Attack time} xywh {43 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PA_dt);}
@@ -761,7 +762,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Dial e4rval {
           label {R.val}
           callback {//
-          send_data(group, ENVELOPEINSERT::control::releaseLevel, o->value(), 0xd8);}
+          send_data(group, ENVELOPEINSERT::control::releaseLevel, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Bandwidth multiplier, release} xywh {113 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_val);}
           code1 {o->init(64);}
@@ -771,7 +772,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Dial e4rdt {
           label {R.dt}
           callback {//
-          send_data(group, ENVELOPEINSERT::control::releaseTime, o->value(), 0xd8);}
+          send_data(group, ENVELOPEINSERT::control::releaseTime, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Release time} xywh {78 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PR_dt);}
@@ -781,7 +782,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Dial e4envstretch {
           label Stretch
           callback {//
-          send_data(group, ENVELOPEINSERT::control::stretch, o->value(), 0xd8);}
+          send_data(group, ENVELOPEINSERT::control::stretch, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {148 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           code1 {o->init(64);}
@@ -791,7 +792,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Check_Button e4forcedrelease {
           label frcR
           callback {//
-          send_data(group, ENVELOPEINSERT::control::forcedRelease, o->value(), 0xd0);}
+          send_data(group, ENVELOPEINSERT::control::forcedRelease, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Forced release} xywh {185 25 15 25} down_box DOWN_BOX labelsize 10 align 6
           code0 {o->value(env->Pforcedrelease);}
         }
@@ -809,7 +810,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
       Fl_Button {} {
         label E
         callback {freemodeeditwindow->show();
-        send_data(group, ENVELOPEINSERT::control::edit, o->value(), 0xc0);}
+        send_data(group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
         xywh {190 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
       }
     }
@@ -833,7 +834,7 @@ send_data(group, curpoint, 0, 0xd0, TOPLEVEL::insert::envelopePoints);}
         Fl_Button {} {
           label E
           callback {freemodeeditwindow->show();
-          send_data(group, ENVELOPEINSERT::control::edit, o->value(), 0xc0);}
+          send_data(group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
           xywh {185 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
         }
         Fl_Button {} {

@@ -27,6 +27,7 @@
 
 #include <cmath>
 #include <stdlib.h>
+#include <iostream>
 
 #include "Misc/XMLwrapper.h"
 #include "Params/EnvelopeParams.h"
@@ -316,10 +317,10 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
     int max = 127;
     float def = 64;
     type |= TOPLEVEL::type::Integer;
-    unsigned char learnable = TOPLEVEL::type::Write;
+    unsigned char learnable = TOPLEVEL::type::Learnable;
     type |= learnable;
 
-    if (control == ENVELOPEINSERT::control::enableFreeMode || control == ENVELOPEINSERT::control::forcedRelease)
+    if (control == ENVELOPEINSERT::control::enableFreeMode || control == ENVELOPEINSERT::control::forcedRelease|| control == ENVELOPEINSERT::control::edit)
     {
         max = 1;
         type &= ~learnable;
@@ -376,6 +377,7 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
                     type |= TOPLEVEL::type::Error;
                     break;
             }
+            break;
         }
 
         case TOPLEVEL::insertType::frequency:
@@ -418,6 +420,7 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
                     type |= TOPLEVEL::type::Error;
                     break;
             }
+            break;
         }
 
         case TOPLEVEL::insertType::filter:
@@ -471,6 +474,7 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
                     type |= TOPLEVEL::type::Error;
                     break;
             }
+            break;
         }
         case TOPLEVEL::insertType::bandwidth:
         {
@@ -510,6 +514,7 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
                     type |= TOPLEVEL::type::Error;
                     break;
             }
+            break;
         }
     }
 
