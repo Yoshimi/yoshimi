@@ -480,7 +480,6 @@ pars=NULL;
           tooltip {Center Frequency of the Filter or the base position in the vowel's sequence} xywh {65 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(getFilterFreqType(filtertype->value()));}
           code1 {o->value(pars->Pfreq);}
-          code2 {if (kititem == FILTERINSERT::control::dynFilter) o->init(45); else if (engine >= 0x80) o->init(50); else if (engine == 1) o->init(80); else o->init(94);}
           class WidgetPDial
         }
         Fl_Dial qdial {
@@ -489,8 +488,7 @@ pars=NULL;
           send_data(FILTERINSERT::control::Q, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Filter resonance or bandwidth} xywh {100 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->Pq);}
-          code1 {if (kititem == FILTERINSERT::control::dynFilter) o->init(64); else if (engine >= 0x80) o->init(60); else o->init(40);}
-          code2 {updateVCforQ();}
+          code1 {updateVCforQ();}
           class WidgetPDial
         }
         Fl_Dial freqtrdial {
@@ -499,7 +497,6 @@ pars=NULL;
           send_data(FILTERINSERT::control::frequencyTracking, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Filter frequency tracking} xywh {240 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code1 {o->value(pars->Pfreqtrack);}
-          code2 {o->init(64);}
           class WidgetPDial
         }
         Fl_Dial vsnsadial {
@@ -507,8 +504,7 @@ pars=NULL;
           callback {//
           send_data(FILTERINSERT::control::velocitySensitivity, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Velocity sensing amount of the Filter} xywh {135 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {if (kititem == FILTERINSERT::control::dynFilter) o->init(4127); else if (engine >= 0x80) o->init(0); else o->init(64);}
-          code1 {o->setValueType(VC_FilterVelocityAmp);}
+          code0 {o->setValueType(VC_FilterVelocityAmp);}
           class WidgetPDial
         }
         Fl_Dial vsnsdial {
@@ -516,9 +512,8 @@ pars=NULL;
           callback {//
           send_data(FILTERINSERT::control::velocityCurve, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Velocity Sensing Function of the Filter} xywh {170 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {if (kititem == FILTERINSERT::control::dynFilter) o->init(127); else o->init(64);}
-          code1 {o->setValueType(VC_FilterVelocitySense);}
-          code2 {o->setGraphicsType(VC_FilterVelocitySense);}
+          code0 {o->setValueType(VC_FilterVelocitySense);}
+          code1 {o->setGraphicsType(VC_FilterVelocitySense);}
           class WidgetPDial
         }
         Fl_Dial gaindial {
@@ -527,8 +522,7 @@ pars=NULL;
           send_data(FILTERINSERT::control::gain, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Filter output gain/damp} xywh {205 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->Pgain);}
-          code1 {o->init(64);}
-          code2 {o->setValueType(VC_FilterGain);}
+          code1 {o->setValueType(VC_FilterGain);}
           class WidgetPDial
         }
         Fl_Choice stcounter {
@@ -601,7 +595,6 @@ pars=NULL;
             callback {//
             send_data(FILTERINSERT::control::formantFrequency, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet, nformant, nvowel);}
             tooltip {Formant frequency} xywh {495 115 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-            code0 {o->init(-1);}
             class WidgetPDial
           }
           Fl_Dial formant_q_dial {
@@ -609,7 +602,6 @@ pars=NULL;
             callback {//
             send_data(FILTERINSERT::control::formantQ, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet, nformant, nvowel);}
             tooltip {Formant's Q} xywh {525 115 24 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-            code0 {o->init(64);}
             class WidgetPDial
           }
           Fl_Dial formant_amp_dial {
@@ -617,7 +609,6 @@ pars=NULL;
             callback {//
             send_data(FILTERINSERT::control::formantAmplitude, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet, nformant, nvowel);}
             tooltip {Formant amplitude} xywh {555 115 24 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-            code0 {o->init(127);}
             class WidgetPDial
           }
         }
@@ -662,9 +653,8 @@ pars=NULL;
           callback {//
           send_data(FILTERINSERT::control::formantStretch, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Sequence Stretch} xywh {595 130 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-          code0 {o->init(40);}
-          code1 {o->value(pars->Psequencestretch);}
-          code2 {o->setValueType(VC_FormFilterStretch);}
+          code0 {o->value(pars->Psequencestretch);}
+          code1 {o->setValueType(VC_FormFilterStretch);}
           class WidgetPDial
         }
       }
@@ -681,9 +671,8 @@ pars=NULL;
         callback {//
         send_data(FILTERINSERT::control::formantSlowness, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
         tooltip {Formant's Slowness (Morphing)} xywh {565 15 25 25} box ROUND_UP_BOX labelfont 1 labelsize 10 align 1 maximum 127 step 1
-        code0 {o->init(64);}
-        code1 {o->value(pars->Pformantslowness);}
-        code2 {o->setValueType(VC_FormFilterSlowness);}
+        code0 {o->value(pars->Pformantslowness);}
+        code1 {o->setValueType(VC_FormFilterSlowness);}
         class WidgetPDial
       }
       Fl_Value_Output centerfreqvo {
@@ -723,10 +712,9 @@ pars=NULL;
         callback {//
         send_data(FILTERINSERT::control::formantClearness, o->value(), TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet);}
         tooltip {Vowel "clearness" (transition between vowels)} xywh {600 15 25 25} box ROUND_UP_BOX labelfont 1 labelsize 10 align 1 maximum 127 step 1
-        code0 {o->init(64);}
-        code1 {o->value(pars->Pvowelclearness);}
-        code2 {o->setValueType(VC_FormFilterClearness);}
-        code3 {o->setGraphicsType(VC_FormFilterClearness);}
+        code0 {o->value(pars->Pvowelclearness);}
+        code1 {o->setValueType(VC_FormFilterClearness);}
+        code2 {o->setGraphicsType(VC_FormFilterClearness);}
         class WidgetPDial
       }
       Fl_Button {} {

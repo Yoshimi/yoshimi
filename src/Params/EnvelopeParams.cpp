@@ -320,14 +320,11 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
     unsigned char learnable = TOPLEVEL::type::Learnable;
     type |= learnable;
 
-    if (control == ENVELOPEINSERT::control::enableFreeMode || control == ENVELOPEINSERT::control::forcedRelease|| control == ENVELOPEINSERT::control::edit)
+    if (control == ENVELOPEINSERT::control::enableFreeMode || control == ENVELOPEINSERT::control::edit)
     {
         max = 1;
         type &= ~learnable;
-        if (control == ENVELOPEINSERT::control::forcedRelease)
-            def = 1;
-        else
-            def = 0;
+        def = 0;
     }
 
     switch (parameter)
@@ -337,11 +334,16 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
             switch (control)
             {
                 case ENVELOPEINSERT::control::attackTime:
-                    def = 0;
+                    if (engine == PART::engine::addMod1)
+                        def = 80;
+                    else
+                        def = 0;
                     break;
                 case ENVELOPEINSERT::control::decayTime:
                     if (engine == PART::engine::addVoice1)
                         def = 100;
+                    else if (engine == PART::engine::addMod1)
+                        def = 90;
                     else
                         def = 40;
                     break;
@@ -349,7 +351,7 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
                     def = 127;
                     break;
                 case ENVELOPEINSERT::control::releaseTime:
-                    if (engine == PART::engine::addVoice1)
+                    if (engine == PART::engine::addVoice1 || engine == PART::engine::addMod1)
                         def = 100;
                     else
                         def = 25;
@@ -358,6 +360,7 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
                     break;
                 case ENVELOPEINSERT::control::forcedRelease:
                     def = 1;
+                    type &= ~learnable;
                     break;
                 case ENVELOPEINSERT::control::linearEnvelope:
                     max = 1;
@@ -385,27 +388,37 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
             switch (control)
             {
                 case ENVELOPEINSERT::control::attackLevel:
-                    if (engine == PART::engine::addVoice1 || engine == PART::engine::subSynth)
+                    if (engine == PART::engine::addMod1)
+                        def = 20;
+                    else if (engine == PART::engine::addVoice1 || engine == PART::engine::subSynth)
                         def = 30;
                     break;
                 case ENVELOPEINSERT::control::attackTime:
-                    if (engine == PART::engine::addVoice1)
+                    if (engine == PART::engine::addMod1)
+                        def = 90;
+                    else if (engine == PART::engine::addVoice1)
                         def = 40;
                     else
                         def = 50;
                     break;
                 case ENVELOPEINSERT::control::releaseTime:
-                    def = 60;
+                    if (engine == PART::engine::addMod1)
+                        def = 80;
+                    else
+                        def = 60;
                     break;
                 case ENVELOPEINSERT::control::releaseLevel:
+                    if (engine == PART::engine::addMod1)
+                        def = 40;
                     break;
                 case ENVELOPEINSERT::control::stretch:
                     if (engine != PART::engine::subSynth)
                         def = 0;
                     break;
                 case ENVELOPEINSERT::control::forcedRelease:
-                    if (engine == PART::engine::padSynth)
-                        def = 0;
+                    max = 1;
+                    def = 0;
+                    type &= ~learnable;
                     break;
                 case ENVELOPEINSERT::control::edit:
                     break;
@@ -432,7 +445,7 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
                         def = 90;
                     break;
                 case ENVELOPEINSERT::control::attackTime:
-                    if (engine == PART::engine::addVoice1 || engine == PART::engine::subSynth)
+                    if (engine == PART::engine::addVoice1)
                         def = 70;
                     else
                         def = 40;
@@ -458,8 +471,12 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
                     def = 0;
                     break;
                 case ENVELOPEINSERT::control::forcedRelease:
-                    if (engine == PART::engine::addVoice1 || engine == PART::engine::subSynth)
+                    max = 1;
+                    if (engine == PART::engine::addVoice1)
                         def = 0;
+                    else
+                        def = 1;
+                    type &= ~learnable;
                     break;
                 case ENVELOPEINSERT::control::edit:
                     break;
@@ -499,7 +516,9 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
                 case ENVELOPEINSERT::control::stretch:
                     break;
                 case ENVELOPEINSERT::control::forcedRelease:
+                    max = 1;
                     def = 0;
+                    type &= ~learnable;
                     break;
                 case ENVELOPEINSERT::control::edit:
                     break;

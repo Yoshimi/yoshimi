@@ -1535,7 +1535,7 @@ float Part::getLimits(CommandBlock *getData)
     int max = 127;
     type |= TOPLEVEL::type::Integer;
     unsigned char learnable = TOPLEVEL::type::Learnable;
-
+    //cout << "part limits" << endl;
     if ((control >= PART::control::volumeRange && control <= PART::control::receivePortamento) || control == PART::control::resetAllControllers)
         return ctl->getLimits(getData);
 
@@ -1642,6 +1642,22 @@ float Part::getLimits(CommandBlock *getData)
             def = 0;
             max = 3;
             break;
+        case PART::control::effectNumber:
+            max = 2;
+            def = 0;
+            break;
+        case PART::control::effectType:
+            def = 0;
+            break;
+        case PART::control::effectDestination:
+            max = 2;
+            def = 0;
+            break;
+        case PART::control::effectBypass:
+            max = 1;
+            def = 0;
+            break;
+
         case PART::control::audioDestination:
             min = 1;
             def = 1;

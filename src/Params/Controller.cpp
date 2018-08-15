@@ -450,7 +450,7 @@ float Controller::getLimits(CommandBlock *getData)
         case PART::control::pitchWheelRange:
             type |= learnable;
             min = -6400;
-            def = 0;
+            def = 200;
             max = 6400;
             break;
         case PART::control::filterQdepth:

@@ -1637,7 +1637,10 @@ float OscilGen::getLimits(CommandBlock *getData)
 
     if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     { // do harmonics stuff
-        def = 64;
+        if (insert == TOPLEVEL::insert::harmonicAmplitude && control == 0)
+            def = 127;
+        else
+            def = 64;
         getData->data.type = type;
         switch (request)
         {
@@ -1669,6 +1672,7 @@ float OscilGen::getLimits(CommandBlock *getData)
             type &= ~learnable;
             break;
         case OSCILLATOR::control::harmonicAmplitudeRandomness:
+            def = 64;
             break;
         case OSCILLATOR::control::harmonicRandomnessType:
             max = 2;
@@ -1689,7 +1693,7 @@ float OscilGen::getLimits(CommandBlock *getData)
             def = 64;
             break;
         case OSCILLATOR::control::baseModulationParameter3:
-            def = 64;
+            def = 32;
             break;
         case OSCILLATOR::control::baseModulationType:
             max = 3;

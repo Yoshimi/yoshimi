@@ -13,6 +13,10 @@ BUG! Multi instances produce jack errors if have been opened when main instance 
 
 BUG! If jack is selected for audio but there are no physical ports Yoshimi quits with CLI warning - should run with gui warning as well, or better still loop back to try alsa.
 
+
+
+Sort out cli part eeffect controls.
+
 Find out why reporting errors in 'Bank' is very slow.
 
 Realtime subnote

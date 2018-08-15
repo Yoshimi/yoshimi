@@ -218,7 +218,6 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
           tooltip Volume xywh {37 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_InstrumentVolume);}
           code1 {o->value(pars->PVolume);}
-          code2 {o->init(96);}
           class WidgetPDial
         }
         Fl_Dial vsns {
@@ -227,7 +226,6 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
           send_data (SUBSYNTH::control::velocitySense, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Velocity sensing} xywh {98 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->PAmpVelocityScaleFunction);}
-          code1 {o->init(90);}
           code2 {o->setValueType(VC_AmpVelocitySense);}
           class WidgetPDial
         }
@@ -239,7 +237,6 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
           tooltip {Panning - zero/leftmost is Random} xywh {157 20 29 29} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
           code0 {o->setValueType(VC_PanningRandom);}
           code1 {o->value(pars->PPanning);}
-          code2 {o->init(64);}
           class WidgetPDial
         }
         Fl_Light_Button randompan {
@@ -364,9 +361,6 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
         }
         Fl_Slider detune {
           callback {//
-          if (Fl::event_button() == 3)
-              o->value(0);
-
           send_data (SUBSYNTH::control::detuneFrequency, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Fine Detune (cents)} xywh {491 47 234 15} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->PDetune-8192);}
@@ -399,8 +393,7 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
           tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {675 21 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
           code0 {o->value(pars->PfixedfreqET);}
           code1 {if (pars->Pfixedfreq==0) o->deactivate();}
-          code2 {o->init(0);}
-          code3 {o->setValueType(VC_FixedFreqET);}
+          code2 {o->setValueType(VC_FixedFreqET);}
           class WidgetPDial
         }
         Fl_Choice detunetype {
@@ -418,8 +411,7 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
           send_data(SUBSYNTH::control::pitchBendAdjustment, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Pitch bend range scaling} xywh {500 21 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
           code0 {o->value(pars->PBendAdjust);}
-          code1 {o->init(88);}
-          code2 {o->setValueType(VC_PitchBend);}
+          code1 {o->setValueType(VC_PitchBend);}
           class WidgetPDial
         }
         Fl_Dial offset {
@@ -428,8 +420,7 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
           send_data(SUBSYNTH::control::pitchBendOffset, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Offset of the frequency in Hz.} xywh {558 21 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
           code0 {o->value(pars->POffsetHz);}
-          code1 {o->init(64);}
-          code2 {o->setValueType(VC_FreqOffsetHz);}
+          code1 {o->setValueType(VC_FreqOffsetHz);}
           class WidgetPDial
         }
       }
@@ -489,9 +480,6 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
         Fl_Value_Slider bandwidth {
           label {Band Width}
           callback {//
-          if (Fl::event_button() == 3)
-              o->value(40);
-
           send_data (SUBSYNTH::control::bandwidth, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Base bandwidth, approximate} xywh {225 40 115 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->setValueType(VC_SubBandwidth);}
@@ -502,9 +490,6 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
         Fl_Value_Slider bwidthscale {
           label {B.Width Scale}
           callback {//
-          if (Fl::event_button() == 3)
-              o->value(0);
-
           send_data (SUBSYNTH::control::bandwidthScale, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Freq-dep. bw. scaling} xywh {344 40 90 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
           code0 {o->setValueType(VC_SubBandwidthScale); o->setGraphicsType(VC_SubBandwidthScale);}
@@ -604,7 +589,6 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
           send_data (SUBSYNTH::control::overtoneParameter1, o->value(), TOPLEVEL::type::Integer);}
           xywh {570 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par1);}
-          code1 {o->init(0);}
           class WidgetPDial
         }
         Fl_Dial spreadpar2 {
@@ -613,7 +597,6 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
           send_data (SUBSYNTH::control::overtoneParameter2, o->value(), TOPLEVEL::type::Integer);}
           xywh {625 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par2);}
-          code1 {o->init(0);}
           class WidgetPDial
         }
         Fl_Dial spreadpar3 {
@@ -622,8 +605,7 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
           send_data (SUBSYNTH::control::overtoneForceHarmonics, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Move towards closest harmonic} xywh {680 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par3);}
-          code1 {o->init(0);}
-          code2 {o->setValueType(VC_percent255);}
+          code1 {o->setValueType(VC_percent255);}
           class WidgetPDial
         }
       }

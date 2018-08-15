@@ -8133,10 +8133,11 @@ float InterChange::returnLimits(CommandBlock *getData)
             return subpars->getLimits(getData);
         }
 
-        if ((engine & 0x7f) == 0x7f && (kititem == UNUSED || insert == TOPLEVEL::insert::kitGroup)) // part level controls
-        { // TODO why is engine not 0xff? it used to be.
+        //if ((engine & 0x7f) == 0x7f && (kititem == UNUSED || insert == TOPLEVEL::insert::kitGroup))
+        // TODO why is engine not 0xff? it used to be.// part level controls
+        if (insert == TOPLEVEL::insert::partEffectSelect || (engine == UNUSED && (kititem == UNUSED || insert == TOPLEVEL::insert::kitGroup)))
             return part->getLimits(getData);
-        }
+
         if ((insert == TOPLEVEL::insert::kitGroup || insert == UNUSED) && parameter == UNUSED && par2 == UNUSED)
         {
             if (engine == PART::engine::addSynth || (engine >= PART::engine::addVoice1 && engine <= PART::engine::addVoice8))
@@ -8265,7 +8266,7 @@ float InterChange::returnLimits(CommandBlock *getData)
         min = 0;
         max = 127;
         def = 0;
-        cout << "Using defaults" << endl;
+        cout << "Using insert defaults" << endl;
 
             switch (request)
             {
@@ -8287,6 +8288,89 @@ float InterChange::returnLimits(CommandBlock *getData)
             }
             return value;
     }
+     // these two should realy be in effects
+    if (npart == TOPLEVEL::section::systemEffects)
+    {
+        min = 0;
+        def = 0;
+        max = 8;
+        switch (control)
+        {
+            case EFFECT::sysIns::toEffect1:
+            case EFFECT::sysIns::toEffect2:
+            case EFFECT::sysIns::toEffect3:
+                max = 127;
+                getData->data.type |= TOPLEVEL::type::Learnable;
+                break;
+            case EFFECT::sysIns::effectNumber:
+                max = 3;
+                break;
+            case EFFECT::sysIns::effectType:
+                break;
+        }
+
+        switch (request)
+        {
+            case TOPLEVEL::type::Adjust:
+                if(value < min)
+                    value = min;
+                else if(value > max)
+                    value = max;
+            break;
+            case TOPLEVEL::type::Minimum:
+                value = min;
+                break;
+            case TOPLEVEL::type::Maximum:
+                value = max;
+                break;
+            case TOPLEVEL::type::Default:
+                value = def;
+                break;
+        }
+        return value;
+    }
+
+    if (npart == TOPLEVEL::section::insertEffects)
+    {
+        min = 0;
+        def = 0;
+        max = 8;
+        switch (control)
+        {
+            case EFFECT::sysIns::effectNumber:
+                max = 7;
+                break;
+            case EFFECT::sysIns::effectType:
+                break;
+            case EFFECT::sysIns::effectDestination:
+                min = -2;
+                def = -1;
+                max = 63;
+                break;
+        }
+
+        switch (request)
+        {
+            case TOPLEVEL::type::Adjust:
+                if(value < min)
+                    value = min;
+                else if(value > max)
+                    value = max;
+            break;
+            case TOPLEVEL::type::Minimum:
+                value = min;
+                break;
+            case TOPLEVEL::type::Maximum:
+                value = max;
+                break;
+            case TOPLEVEL::type::Default:
+                value = def;
+                break;
+        }
+        return value;
+    }
+
+
     min = 0;
     max = 127;
     def = 0;

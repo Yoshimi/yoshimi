@@ -84,10 +84,12 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
     {
         if (buttons == 3 && Fl::event_is_click())
         {
+            float newValue;
+            putData.data.type = 3 | TOPLEVEL::type::Limits;
+            newValue = synth->interchange.readAllData(&putData);
+            //cout << "Gui limits new value " << newValue << endl;
             if(Fl::event_state(FL_CTRL) != 0)
             {
-                putData.data.type = 1 | TOPLEVEL::type::Limits;
-                synth->interchange.readAllData(&putData);
                 if (putData.data.type & TOPLEVEL::type::Learnable)
                     type = 3; // previous type is now irrelevant
                     // identifying this for button 3 as MIDI learn
@@ -101,12 +103,15 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
                      * For some reason it goes into a loop on spin boxes
                      * and runs menus up to their max value.
                      */
-                    type = TOPLEVEL::type::Write;
+                    type = TOPLEVEL::type::Learnable;
                 }
             }
             else
-                type = TOPLEVEL::type::Write;
+            {
+                putData.data.value = newValue;
+                type = TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet;
                 // has to be write as it's 'set default'
+            }
         }
         else if(buttons > 2)
             type = 1;
@@ -115,15 +120,8 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
     type |= typetop;
 
     putData.data.type = type | TOPLEVEL::source::GUI;
-    /* not yet need to remove *all* knob inits
-    if (Fl::event_button() == 3)
-    {
-        putData.data.type = putData.data.type | TOPLEVEL::type::Default | TOPLEVEL::type::Limits | TOPLEVEL::source::UpdateAfterSet;
 
-        putData.data.value = synth->interchange.readAllData(&putData);
-    }*/
-
-//cout << "collect_data " << int(type) << " " << int(control) << " " << int(part) << " " << int(kititem) << " " << int(engine) << " " << int(parameter) << " " << int(par2) << endl;
+//cout << "collect_data value " << value << "  type " << int(type) << "  control " << int(control) << "  part " << int(part) << "  kit " << int(kititem) << "  engine " << int(engine) << "  insert " << int(insert)  << "  par " << int(parameter) << " par2 " << int(par2) << endl;
     if (jack_ringbuffer_write_space(synth->interchange.fromGUI) >= commandSize)
         jack_ringbuffer_write(synth->interchange.fromGUI, (char*) putData.bytes, commandSize);
     else

@@ -348,7 +348,6 @@ void EffectMgr::getfromXML(XMLwrapper *xml)
 float LimitMgr::geteffectlimits(CommandBlock *getData)
 {
     int effType = getData->data.kit;
-
     float value = 0;
     switch (effType)
     {

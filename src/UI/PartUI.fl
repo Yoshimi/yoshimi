@@ -66,8 +66,6 @@ class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
       Fl_Dial sysend {
         label 01
         callback {//
-        if (Fl::event_button() == 3)
-            o->value(0);
         send_data(neff, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         xywh {0 0 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
         code0 {o->value(synth->Psysefxvol[neff][npart]);}
@@ -539,13 +537,9 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
           label {Velocity
 Sense}
           callback {//
-          if (Fl::event_button() == 3)
-              o->value(64);
-
           send_data(PART::control::velocitySense, o->value(), TOPLEVEL::type::Integer);}
           xywh {200 40 28 28} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Pvelsns);}
-          code1 {//o->init(64);}
           code2 {o->setValueType(VC_AmpVelocitySense);}
           class WidgetPDial
         }
@@ -553,20 +547,14 @@ Sense}
           label {Velocity
 Offset}
           callback {//
-          if (Fl::event_button() == 3)
-              o->value(64);
-
           send_data(PART::control::velocityOffset, o->value(), TOPLEVEL::type::Integer);}
           xywh {244 40 28 28} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Pveloffs);}
-          code1 {//o->init(64);}
           class WidgetPDial
         }
         Fl_Dial partpan {
           label Pan
           callback {//;
-          if (Fl::event_button() == 3)
-              o->value(64);
           if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
               synth->getGuiMaster()->setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, o->value());
 
@@ -574,14 +562,11 @@ Offset}
           xywh {289 39 32 32} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_PanningStd);}
           code1 {o->value(part->Ppanning);}
-          code2 {//o->init(64);}
           class WidgetPDial
         }
         Fl_Dial partvol {
           label Volume
           callback {//;
-          if (Fl::event_button() == 3)
-              o->value(96);
           if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
           synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, o->value());
 
@@ -589,7 +574,6 @@ Offset}
           xywh {335 39 32 32} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_PartVolume);}
           code1 {o->value(part->Pvolume);}
-          code2 {//o->init(96);}
           class WidgetPDial
         }
         Fl_Check_Button enportamento {
@@ -793,7 +777,6 @@ Offset}
         send_data(PART::control::volumeRange, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Volume Range} xywh {132 55 30 30} labelsize 10 minimum 64 maximum 127 step 1
         code0 {o->value(part->ctl->volume.data);}
-        code1 {o->init(96);}
         class WidgetPDial
       }
       Fl_Check_Button vol {
@@ -809,7 +792,6 @@ Offset}
         send_data(PART::control::panningWidth, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Panning Width} xywh {10 55 30 30} labelsize 10 maximum 64 step 1
         code0 {o->value(part->ctl->panning.depth);}
-        code1 {o->init(64);}
         class WidgetPDial
       }
       Fl_Dial modwh {
@@ -818,7 +800,6 @@ Offset}
         send_data(PART::control::modWheelDepth, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Modulation Wheel depth} xywh {50 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->modwheel.depth);}
-        code1 {o->init(80);}
         class WidgetPDial
       }
       Fl_Check_Button expmwh {
@@ -834,7 +815,6 @@ Offset}
         send_data(PART::control::bandwidthDepth, o->value(), TOPLEVEL::type::Integer);}
         tooltip {BandWidth depth} xywh {132 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->bandwidth.depth);}
-        code1 {o->init(64);}
         class WidgetPDial
       }
       Fl_Check_Button expbw {
@@ -875,8 +855,6 @@ Offset}
       Fl_Counter pwheelbrng {
         label {PWheel Rng (cents)}
         callback {//
-        if (Fl::event_button() == 3)
-            o->value(200);
         send_data(PART::control::pitchWheelRange, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Pitch Wheel Bend Range (cents)} xywh {174 15 110 20} color 237 selection_color 0 labelsize 10 align 1 minimum -6400 maximum 6400 step 1
         code0 {o->value(part->ctl->pitchwheel.bendrange);}
@@ -888,7 +866,6 @@ Offset}
         send_data(PART::control::filterQdepth, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Filter Q depth} xywh {50 55 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->filterq.depth);}
-        code1 {o->init(64);}
         class WidgetPDial
       }
       Fl_Dial fltcut {
@@ -897,7 +874,6 @@ Offset}
         send_data(PART::control::filterCutoffDepth, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Filter Cutoff depth} xywh {90 55 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->filtercutoff.depth);}
-        code1 {o->init(64);}
         class WidgetPDial
       }
       Fl_Button {} {
@@ -922,7 +898,6 @@ Offset}
           send_data(PART::control::resonanceCenterFrequencyDepth, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Center Frequency controller Depth} xywh {300 20 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->resonancecenter.depth);}
-          code1 {o->init(64);}
           class WidgetPDial
         }
         Fl_Dial rbwdpth {
@@ -931,7 +906,6 @@ Offset}
           send_data(PART::control::resonanceBandwidthDepth, o->value(), TOPLEVEL::type::Integer);}
           tooltip {BandWidth controller depth} xywh {300 60 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->resonancebandwidth.depth);}
-          code1 {o->init(64);}
           class WidgetPDial
         }
       }
@@ -949,7 +923,6 @@ Offset}
           send_data(PART::control::portamentoTime, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Portamento time} xywh {345 60 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.time);}
-          code1 {o->init(64);}
           class WidgetPDial
         }
         Fl_Dial timedu {
@@ -958,7 +931,6 @@ Offset}
           send_data(PART::control::portamentoTimeStretch, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Portamento time stretch (up/down)} xywh {375 60 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.updowntimestretch);}
-          code1 {o->init(64);}
           class WidgetPDial
         }
         Fl_Counter thresh {
@@ -981,7 +953,6 @@ Offset}
           send_data(PART::control::proportionalPortamentoRate, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Distance required to double change from nonpropotinal portamento time} xywh {463 20 25 25} labelsize 9 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.propRate);}
-          code1 {o->init(80);}
           class WidgetPDial
         }
         Fl_Dial proptb {
@@ -990,7 +961,6 @@ Offset}
           send_data(PART::control::proportionalPortamentoDepth, o->value(), TOPLEVEL::type::Integer);}
           tooltip {The difference from nonproportinal portamento} xywh {463 60 25 25} labelsize 9 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.propDepth);}
-          code1 {o->init(90);}
           class WidgetPDial
         }
         Fl_Check_Button rcv {
@@ -1030,8 +1000,6 @@ Offset}
       Fl_Dial modulation {
         label Modulation
         callback {//
-        if (Fl::event_button() == 3)
-            o->value(64);
         send_data(PART::control::midiModWheel, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Modulation Wheel} xywh {20 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->modwheel.data);}
@@ -1040,8 +1008,6 @@ Offset}
       Fl_Dial expression {
         label Expression
         callback {//
-        if (Fl::event_button() == 3)
-            o->value(127);
         send_data(PART::control::midiExpression,  o->value(), TOPLEVEL::type::Integer);}
         tooltip Expression xywh {80 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->expression.data);}
@@ -1050,8 +1016,6 @@ Offset}
       Fl_Dial filterq {
         label {Filter Q}
         callback {//
-        if (Fl::event_button() == 3)
-            o->value(64);
         send_data(PART::control::midiFilterQ, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Filter Q} xywh {140 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->filterq.data);}
@@ -1060,8 +1024,6 @@ Offset}
       Fl_Dial filtercutoff {
         label {Filter Cutoff}
         callback {//
-        if (Fl::event_button() == 3)
-            o->value(64);
         send_data(PART::control::midiFilterCutoff, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Filter Cutoff} xywh {200 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->filtercutoff.data);}
@@ -1070,8 +1032,6 @@ Offset}
       Fl_Dial masterbandwidth {
         label Bandwidth
         callback {//
-        if (Fl::event_button() == 3)
-            o->value(64);
         send_data(PART::control::midiBandwidth, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Master Bandwidth} xywh {260 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->bandwidth.data);}
@@ -1101,13 +1061,13 @@ Offset}
         bypasseff->value(part->Pefxbypass[ninseff]);
         sendtochoice->value(x);
 
-        send_data(PART::control::effectNumber, ninseff, TOPLEVEL::type::Integer, UNUSED, ninseff);}
+        send_data(PART::control::effectNumber, ninseff, TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
         tooltip {Effect No.} xywh {35 8 35 22} labelsize 12 maximum 3 textsize 11
         code1 {o->value(ninseff+1);}
       }
       Fl_Choice insefftype {
         callback {//
-        send_data(PART::control::effectType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, UNUSED, ninseff);}
+        send_data(PART::control::effectType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
         tooltip {Effect Type} xywh {104 8 95 22} box UP_BOX down_box BORDER_BOX labelsize 11
         code0 {o->value(part->partefx[ninseff]->geteffect());}
       } {
@@ -1168,7 +1128,7 @@ Offset}
       Fl_Choice sendtochoice {
         label To
         callback {//
-        send_data(PART::control::effectDestination, o->value(), TOPLEVEL::type::Integer, UNUSED, ninseff);}
+        send_data(PART::control::effectDestination, o->value(), TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
         xywh {244 8 90 22} down_box BORDER_BOX labelfont 1 labelsize 11
         code0 {int x=part->Pefxroute[ninseff]; if (x==127) x=1;}
         code1 {o->value(x);}
@@ -1189,7 +1149,7 @@ Offset}
       Fl_Check_Button bypasseff {
         label Bypass
         callback {//
-        send_data(PART::control::effectBypass, o->value(), TOPLEVEL::type::Integer, UNUSED, ninseff);}
+        send_data(PART::control::effectBypass, o->value(), TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
         tooltip {if the effect is not used (is bypassed)} xywh {55 135 20 22} down_box DOWN_BOX labelsize 12 align 4
         code0 {int x=part->Pefxbypass[ninseff];o->value(x);}
       }
@@ -1567,8 +1527,6 @@ Offset}
       Fl_Value_Slider humanise {
         label Humanise
         callback {//
-        if (Fl::event_button() == 3)
-            o->value(0);
 
         send_data(PART::control::humanise, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Random detune of whole part in cents} xywh {8 337 201 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 8 maximum 50 step 1

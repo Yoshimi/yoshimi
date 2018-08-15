@@ -26,6 +26,7 @@
 */
 
 #include <cmath>
+#include <iostream>
 
 using namespace std;
 
@@ -949,7 +950,6 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
     int max = 127;
     type |= TOPLEVEL::type::Integer;
     unsigned char learnable = TOPLEVEL::type::Learnable;
-
     switch (control)
     {
         case PADSYNTH::control::volume:

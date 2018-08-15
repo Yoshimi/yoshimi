@@ -634,17 +634,17 @@ int CmdInterface::effects()
             if (bitTest(level, part_lev))
             {
                 nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
-                sendDirect(nFXtype, TOPLEVEL::type::Write,PART::control::effectType, npart, UNUSED, nFX);
+                sendDirect(nFXtype, TOPLEVEL::type::Write, PART::control::effectType, npart, UNUSED, nFX, TOPLEVEL::insert::partEffectSelect);
             }
             else if (bitTest(level, ins_fx))
             {
                 nFXtype = synth->insefx[nFX]->geteffect();
-                sendDirect(nFXtype, TOPLEVEL::type::Write,EFFECT::sysIns::effectType, TOPLEVEL::section::insertEffects, UNUSED, nFX);
+                sendDirect(nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::insertEffects, UNUSED, nFX);
             }
             else
             {
                 nFXtype = synth->sysefx[nFX]->geteffect();
-                sendDirect(nFXtype, TOPLEVEL::type::Write,EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, nFX);
+                sendDirect(nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, nFX);
             }
         }
         if (point[0] == 0)
@@ -678,11 +678,11 @@ int CmdInterface::effects()
         Runtime.Log("efx type set to " + fx_list[nFXtype]);
         //Runtime.Log("Presets -" + fx_presets[nFXtype].substr(fx_presets[nFXtype].find(',') + 1));
         if (bitTest(level, part_lev))
-            sendDirect(nFXtype, TOPLEVEL::type::Write,PART::control::effectType, npart, UNUSED, nFX);
+            sendDirect(nFXtype, TOPLEVEL::type::Write, PART::control::effectType, npart, UNUSED, nFX);
         else if (bitTest(level, ins_fx))
-            sendDirect(nFXtype, TOPLEVEL::type::Write,EFFECT::sysIns::effectType, TOPLEVEL::section::insertEffects, UNUSED, nFX);
+            sendDirect(nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::insertEffects, UNUSED, nFX);
         else
-            sendDirect(nFXtype, TOPLEVEL::type::Write,EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, nFX);
+            sendDirect(nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, nFX);
         return done_msg;
     }
 

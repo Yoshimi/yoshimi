@@ -147,10 +147,10 @@ YL : 0 to 127 : 41 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Part to system effe
 YL : 0 to 127 : 42 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Part to system effects 2
 YL : 0 to 127 : 43 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Part to system effects 3
 
-n : 0 to 2 : 64 : 0 to 63 : 255 : effect number : 255 : 255 : 255 : Was ‘Set effects number’ now does nothing.
-Y : 0 to 8 : 65 : 0 to 63 : 255 : effect number : 255 : 255 : 255 : Set effect type
-Y : 0 to 2 : 66 : 0 to 63 : 255 : effect number : 255 : 255 : 255 : Set effect destination (Next Effect, Part Out, Dry Out)
-Y : 0/1 : 67 : 0 to 63 : 255 : effect number : 255 : 255 : 255 : Bypass effect
+n : 0 to 2 : 64 : 0 to 63 : 255 : effect number : 17 : 255 : 255 : Was ‘Set effects number’ now does nothing.
+Y : 0 to 8 : 65 : 0 to 63 : 255 : effect number : 17 : 255 : 255 : Set effect type
+Y : 0 to 2 : 66 : 0 to 63 : 255 : effect number : 17 : 255 : 255 : Set effect destination (Next Effect, Part Out, Dry Out)
+Y : 0/1 : 67 : 0 to 63 : 255 : effect number : 17 : 255 : 255 : Bypass effect
 
 Y : any : 96 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Set part to default instrument (Simple Sound)
 

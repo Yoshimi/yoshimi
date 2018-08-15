@@ -394,7 +394,6 @@ float SUBnoteParameters::getLimits(CommandBlock *getData)
                     value = 127;
                 break;
             case TOPLEVEL::type::Minimum:
-            case TOPLEVEL::type::Default:
                 value = 0;
                 break;
             case TOPLEVEL::type::Maximum:

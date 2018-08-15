@@ -624,7 +624,6 @@ paramsui->Show(XML_MICROTONAL);}
           tooltip {Global Fine Detune} xywh {286 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1 value 64
           code0 {o->setValueType(VC_GlobalFineDetune);}
           code1 {o->value(synth->microtonal.Pglobalfinedetune);}
-          code2 {o->init(64);}
           class WidgetPDial
         }
         Fl_Button {} {
@@ -653,7 +652,6 @@ paramsui->Show(XML_MICROTONAL);}
           tooltip {Master Volume} xywh {335 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_MasterVolume);}
           code1 {o->value(synth->Pvolume);}
-          code2 {o->init(90);}
           class WidgetPDial
         }
         Fl_Button {} {
@@ -1342,7 +1340,7 @@ ZynAddSubFX}
     {
         if (insert == TOPLEVEL::insert::systemEffectSend)
         {
-            if (!wasFromHere)
+            if (true)//!wasFromHere) // TODO to sort this properly
                 syseffsend[engine][control]->value(value);
         }
         else

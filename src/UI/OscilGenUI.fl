@@ -532,7 +532,6 @@ class OscilEditor {: {public PresetsUI_}
             callback {//
             send_data(OSCILLATOR::control::harmonicAmplitudeRandomness, o->value(), TOPLEVEL::type::Integer);}
             tooltip {Oscillator's harmonic randomness parameter} xywh {338 280 18 18} maximum 127 step 1
-            code0 {o->init(64);}
             class WidgetPDial
           }
         }
@@ -553,7 +552,6 @@ class OscilEditor {: {public PresetsUI_}
           callback {//
           send_data(OSCILLATOR::control::baseFunctionParameter, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Base Function Parameter} xywh {520 280 20 20} minimum -64 maximum 63 step 1
-          code0 {o->init(0);}
           class WidgetPDial
         }
         Fl_Choice bftype {
@@ -678,21 +676,18 @@ class OscilEditor {: {public PresetsUI_}
             callback {//
             send_data(OSCILLATOR::control::baseModulationParameter1, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
             tooltip {Oscillator's modulation parameter 1} xywh {654 280 17 17} maximum 127 step 1
-            code0 {o->init(64);}
             class WidgetPDial
           }
           Fl_Dial bfmodpar2 {
             callback {//
             send_data(OSCILLATOR::control::baseModulationParameter2, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
             tooltip {Oscillator's modulation parameter 2} xywh {676 280 17 17} maximum 127 step 1
-            code0 {o->init(64);}
             class WidgetPDial
           }
           Fl_Dial bfmodpar3 {
             callback {//
             send_data(OSCILLATOR::control::baseModulationParameter3, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
             tooltip {Oscillator's modulation parameter 3} xywh {698 280 17 17} maximum 127 step 1
-            code0 {o->init(32);}
             class WidgetPDial
           }
         }
@@ -825,7 +820,6 @@ class OscilEditor {: {public PresetsUI_}
           callback {//
           send_data(OSCILLATOR::control::waveshapeParameter, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Waveshaping Parameter} xywh {260 313 20 20} minimum -64 maximum 63 step 1
-          code0 {o->init(0);}
           class WidgetPDial
         }
         Fl_Value_Output wsparval {
@@ -909,7 +903,6 @@ class OscilEditor {: {public PresetsUI_}
           callback {//
           send_data(OSCILLATOR::control::filterParameter1, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Oscillator's filter parameter1} xywh {367 313 20 20} maximum 127 step 1
-          code0 {o->init(64);}
           class WidgetPDial
         }
         Fl_Check_Button filterpref {
@@ -922,7 +915,6 @@ class OscilEditor {: {public PresetsUI_}
           callback {//
           send_data(OSCILLATOR::control::filterParameter2, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Oscillator's filter parameter2} xywh {392 313 20 20} maximum 127 step 1
-          code0 {o->init(64);}
           class WidgetPDial
         }
       }
@@ -956,7 +948,6 @@ class OscilEditor {: {public PresetsUI_}
           callback {//
           send_data(OSCILLATOR::control::spectrumAdjustParameter, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Oscillator's spectrum adjust parameter} xywh {699 313 20 20} maximum 127 step 1
-          code0 {o->init(64);}
           class WidgetPDial
         }
       }
@@ -1033,7 +1024,6 @@ class OscilEditor {: {public PresetsUI_}
           callback {//
           send_data(OSCILLATOR::control::adaptiveHarmonicsPower, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Adaptive harmonics power} xywh {700 460 25 25} labelsize 10 maximum 200 step 1
-          code0 {o->init(100);}
           class WidgetPDial
         }
         Fl_Dial adhrbf {
@@ -1041,7 +1031,6 @@ class OscilEditor {: {public PresetsUI_}
           callback {//
           send_data(OSCILLATOR::control::adaptiveHarmonicsBase, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Adaptive harmonics base frequency} xywh {670 460 25 25} labelsize 10 maximum 255 step 1
-          code0 {o->init(128);}
           class WidgetPDial
         }
         Fl_Slider adhrpar {
@@ -1084,21 +1073,18 @@ class OscilEditor {: {public PresetsUI_}
           callback {//
           send_data(OSCILLATOR::control::modulationParameter1, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Oscillator's modulation parameter 1} xywh {524 314 18 18} maximum 127 step 1
-          code0 {o->init(64);}
           class WidgetPDial
         }
         Fl_Dial modpar2 {
           callback {//
           send_data(OSCILLATOR::control::modulationParameter2, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Oscillator's modulation parameter 2} xywh {546 314 18 18} maximum 127 step 1
-          code0 {o->init(64);}
           class WidgetPDial
         }
         Fl_Dial modpar3 {
           callback {//
           send_data(OSCILLATOR::control::modulationParameter3, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Oscillator's modulation parameter 3} xywh {569 314 18 18} maximum 127 step 1
-          code0 {o->init(32);}
           class WidgetPDial
         }
       }

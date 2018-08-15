@@ -1,5 +1,12 @@
 yoshimi 1.5.8 M
 
+2018-8-15 Will
+* All GUI default requests now set by limits.
+  This is a major refactoring, considerably
+  reducing the duplication in the GUI and adding
+  more functionality.
+  Some switches don't yet update, but are correct.
+
 2018-8-14 Will
 * Added missing conversions in FilterUI.fl
 * Added missing conversions in EnvelopeUI.fl

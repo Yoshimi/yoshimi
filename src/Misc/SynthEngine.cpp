@@ -3270,9 +3270,9 @@ float SynthEngine::getLimits(CommandBlock *getData)
             break;
 
         case MAIN::control::partNumber:
-            min = 1;
-            def = 1;
-            max = Runtime.NumAvailableParts;
+            min = 0;
+            def = 0;
+            max = Runtime.NumAvailableParts -1;
             break;
 
         case MAIN::control::availableParts:

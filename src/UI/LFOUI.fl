@@ -89,8 +89,6 @@ pars=NULL;} {}
           send_data(group, LFOINSERT::control::speed, o->value(), 0);}
           tooltip {LFO Frequency} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 step 1e-05
           code0 {o->setValueType(VC_LFOfreq);}
-          code1 {if (engine < PART::engine::addVoice1){if (group == 1) o->init(0.551f); else o->init(0.63f);}}
-          code2 {if (engine >= PART::engine::addVoice1){if (group == 0) o->init(0.708f); else o->init(0.393f);}}
           class WidgetPDial
         }
         Fl_Dial intensity {
@@ -102,7 +100,6 @@ pars=NULL;} {}
           send_data(group, LFOINSERT::control::depth, depth, TOPLEVEL::type::Integer);}
           tooltip {LFO Amount} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(getLFOdepthType(group));}
-          code1 {if (engine < PART::engine::addVoice1) o->init(0); else if (group == 0) o->init(32); else if (group == 1) o->init(40); else o->init(20);}
           class WidgetPDial
         }
         Fl_Dial delay {
@@ -111,7 +108,6 @@ pars=NULL;} {}
           send_data(group, LFOINSERT::control::delay, o->value(), TOPLEVEL::type::Integer);}
           tooltip {LFO delay} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_LFOdelay);}
-          code1 {if (engine >= PART::engine::addVoice1 && group == 0) o->init(30); else o->init(0);}
           class WidgetPDial
         }
         Fl_Dial startphase {
@@ -120,7 +116,6 @@ pars=NULL;} {}
           send_data(group, LFOINSERT::control::start, o->value(), TOPLEVEL::type::Integer);}
           tooltip {LFO Startphase (leftmost is Random)} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_LFOstartphase);}
-          code1 {if (engine >= PART::engine::addVoice1 && group == 1) o->init(0); else o->init(64);}
           class WidgetPDial
         }
         Fl_Dial randomness {
@@ -128,7 +123,6 @@ pars=NULL;} {}
           callback {//
           send_data(group, LFOINSERT::control::amplitudeRandomness, o->value(), TOPLEVEL::type::Integer);}
           tooltip {LFO Amplitude Randomness} xywh {180 7 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {o->init(0);}
           code1 {o->setValueType(VC_percent127);}
           class WidgetPDial
         }
@@ -178,7 +172,6 @@ pars=NULL;} {}
           callback {//
           send_data(group, LFOINSERT::control::frequencyRandomness, o->value(), TOPLEVEL::type::Integer);}
           tooltip {LFO Frequency Randomness} xywh {205 7 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {o->init(0);}
           code1 {o->setValueType(VC_percent127);}
           class WidgetPDial
         }
@@ -187,7 +180,6 @@ pars=NULL;} {}
           callback {//
           send_data(group, LFOINSERT::control::stretch, o->value(), TOPLEVEL::type::Integer);}
           tooltip {LFO frequency stretch} xywh {144 30 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {o->init(64);}
           code1 {o->setValueType(VC_LFOStretch);}
           class WidgetPDial
         }

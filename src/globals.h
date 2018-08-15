@@ -169,6 +169,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         resonanceGroup,
         resonanceGraphInsert,
         systemEffectSend = 16,
+        partEffectSelect,
         kitGroup = 32
     };
 
