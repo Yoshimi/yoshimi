@@ -124,6 +124,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
     enum type : unsigned char {
         // bits 0, 1
         Adjust = 0,
+        Read = 0,
         Minimum,
         Maximum,
         Default,
