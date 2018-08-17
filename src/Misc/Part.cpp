@@ -1558,9 +1558,9 @@ float Part::getLimits(CommandBlock *getData)
             break;
 
         case PART::control::midiChannel:
-            min = 1;
-            def = 1;
-            max = 16;
+            min = 0;
+            def = 0;
+            max = 16; // disabled
             break;
 
         case PART::control::keyMode:

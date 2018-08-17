@@ -430,6 +430,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
     if (control == MIDILEARN::control::cancelLearn)
     {
         learning = false;
+        synth->getRuntime().finishedCLI = true;
         synth->getRuntime().Log("Midi Learn cancelled");
         updateGui(control);
         return;
