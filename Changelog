@@ -7,6 +7,7 @@ yoshimi 1.5.8 M
   for formally defined ones.
   Can't cancel from CLI though and non-learnable
   ones appear to learn.
+* Added CLI help info to new controls.
 
 2018-8-16 Will
 * BugFix: CLI not setting some values
