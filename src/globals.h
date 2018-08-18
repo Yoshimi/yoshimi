@@ -243,6 +243,7 @@ namespace BANK // usage BANK::control::
         selectBank = 16, // not yet
         renameBank, // not yet
         saveBank, // not yet
+        createBank, // not yet
         deleteBank, // not yet
         selectFirstBankToSwap,
         selectSecondBankAndSwap,
@@ -250,8 +251,7 @@ namespace BANK // usage BANK::control::
         exportBank, // not yet
 
         selectRoot = 32, // not yet
-        changeRootId // not yet
-
+        changeRootId, // not yet
     };
 }
 

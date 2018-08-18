@@ -886,7 +886,8 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
                     else
                     {
                         synth->part[curPart]->Pname = newname;
-                        send_data(MAIN::control::saveInstrument, float(curPart), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, slot, TOPLEVEL::route::lowPriority);
+                        //send_data(MAIN::control::saveInstrument, float(curPart), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, slot, TOPLEVEL::route::lowPriority);
+                        send_data(MAIN::control::saveInstrument, float(synth->getGuiMaster()->activePart), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, slot, TOPLEVEL::route::lowPriority);
                     }
                 }
             }

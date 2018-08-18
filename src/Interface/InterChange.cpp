@@ -509,7 +509,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     }
                     else
                         text = " FAILED " + text;
-                    getData->data.parameter = value;
+                    getData->data.parameter |= value; // retain lowPriority, will be detected later
                     value = miscMsgPush(text);
                     break;
                 }
