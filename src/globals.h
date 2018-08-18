@@ -476,7 +476,15 @@ namespace PART // usage PART::control::volume
         instrumentName,
         defaultInstrumentCopyright, // this needs to be split into two for load/save
         resetAllControllers, // this needs to bump up 1 to make space
-        partBusy = 252}; // internally generated - read only
+        partBusy = 252 // internally generated - read only
+    };
+
+    enum kitType : unsigned char {
+        Off = 0,
+        Multi,
+        Single,
+        CrossFade
+    };
 
     enum engine : unsigned char {
         addSynth = 0,

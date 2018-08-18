@@ -3282,7 +3282,6 @@ float SynthEngine::getLimits(CommandBlock *getData)
             break;
 
         case MAIN::control::detune:
-            type |= learnable;
             break;
 
         case MAIN::control::keyShift:

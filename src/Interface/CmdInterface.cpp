@@ -298,6 +298,8 @@ void CmdInterface::defaults()
     nFX = 0;
     nFXtype = 0;
     nFXpreset = 0;
+    kitmode = 0;
+    kitnumber = 0;
 }
 
 
@@ -1640,20 +1642,58 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
         return effects(controlType);
     }
 
+    if (matchnMove(2, point, "kmode"))
+    {
+        if (matchnMove(2, point, "off"))
+            kitmode = PART::kitType::Off;
+        else if(matchnMove(2, point, "multi"))
+            kitmode = PART::kitType::Multi;
+        else if(matchnMove(2, point, "single"))
+            kitmode = PART::kitType::Single;
+        else if(matchnMove(2, point, "crossfade"))
+            kitmode = PART::kitType::CrossFade;
+        else
+            return value_msg;
+        sendDirect(kitmode, controlType, PART::control::kitMode, npart);
+        return done_msg;
+    }
+    int kitInsert = UNUSED;
+    if (kitmode == PART::kitType::Off)
+        kitnumber = UNUSED; // always clear it if not kit mode
+    else
+    {
+        kitInsert = TOPLEVEL::insert::kitGroup;
+        if (matchnMove(2, point, "kitem"))
+        {
+            if (controlType == TOPLEVEL::type::Write)
+            {
+                if (point[0] == 0)
+                    return value_msg;
+                int tmp = string2int(point);
+                if (tmp < 1 || tmp > 16)
+                    return range_msg;
+                kitnumber = tmp - 1;
+                kitInsert = TOPLEVEL::insert::kitGroup;
+            }
+            Runtime.Log("Kit item number " + to_string(kitnumber + 1));
+            return done_msg;
+        }
+    }
     tmp = -1;
     if (matchnMove(2, point, "enable"))
         tmp = 1;
     else if (matchnMove(2, point, "disable"))
         tmp = 0;
+    cout << "num " << kitnumber << "  insert " << kitInsert << endl;
     if (tmp >= 0)
     {
         if (controlType != TOPLEVEL::type::Write)
-            sendDirect(tmp, controlType, PART::control::enable, npart);
+            sendDirect(tmp, controlType, PART::control::enable, npart, kitnumber, UNUSED, kitInsert);
         else
         {
-            if (!changed) // needs to be better
+            if (!changed)// && kitmode == PART::kitType::Off) // needs to be better
                 sendDirect(npart, controlType, MAIN::control::partNumber, TOPLEVEL::section::main);
-            sendDirect(tmp, controlType, PART::control::enable, npart);
+            sendDirect(tmp, controlType, PART::control::enable, npart, kitnumber, UNUSED, kitInsert);
         }
         return done_msg;
     }
@@ -2959,18 +2999,10 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
 {
     if (type >= TOPLEVEL::type::Limits && type <= TOPLEVEL::source::CLI)
         request = type & TOPLEVEL::type::Default;
-    else if (part != TOPLEVEL::section::midiLearn) // MIDI learn
-        type |= TOPLEVEL::source::CLI; // from command line
-    /*
-     * MIDI learn is synced by the audio thread but
-     * not passed on to any of the normal controls.
-     * The type field is used for a different purpose.
-     */
-
     CommandBlock putData;
     size_t commandSize = sizeof(putData);
+
     putData.data.value = value;
-    putData.data.type = type;
     putData.data.control = control;
     putData.data.part = part;
     putData.data.kit = kit;
@@ -2978,6 +3010,27 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
     putData.data.insert = insert;
     putData.data.parameter = parameter;
     putData.data.par2 = par2;
+
+    if (type == TOPLEVEL::type::Default)
+    {
+        putData.data.type |= TOPLEVEL::type::Limits;
+        synth->interchange.readAllData(&putData);
+        if ((putData.data.type & TOPLEVEL::type::Learnable) == 0)
+        {
+            synth->getRuntime().Log("Can't learn this control");
+            return 0;
+        }
+    }
+
+    if (part != TOPLEVEL::section::midiLearn)
+        type |= TOPLEVEL::source::CLI;
+    /*
+     * MIDI learn is synced by the audio thread but
+     * not passed on to any of the normal controls.
+     * The type field is used for a different purpose.
+     */
+
+    putData.data.type = type;
     if (request < TOPLEVEL::type::Limits)
     {
         putData.data.type = request | TOPLEVEL::type::Limits;
@@ -2995,13 +3048,21 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
                 name = "Default ";
                 break;
         }
-        if (putData.data.type & TOPLEVEL::type::Error)
-            name += "- error - ";
-        else if (putData.data.type & TOPLEVEL::type::Learnable)
-            name += "- learnable - ";
-        synth->getRuntime().Log(name + to_string(value));
+        type = putData.data.type;
+        if ((type & TOPLEVEL::type::Integer) == 0)
+            name += to_string(value);
+        else if (value < 0)
+            name += to_string(int(value - 0.5f));
+        else
+            name += to_string(int(value + 0.5f));
+        if (type & TOPLEVEL::type::Error)
+            name += " - error";
+        else if (type & TOPLEVEL::type::Learnable)
+            name += " - learnable";
+        synth->getRuntime().Log(name);
         return 0;
     }
+
     if (part == TOPLEVEL::section::main && (type & TOPLEVEL::type::Write) == 0 && control >= MAIN::control::readPartPeak && control <= MAIN::control::readMainLRrms)
     {
         string name;

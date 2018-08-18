@@ -1,5 +1,9 @@
 yoshimi 1.5.8 M
 
+2018-8-18 Will
+* Improved patch load behaviour crossing CLI / GUI.
+* Started work on CLI kitmode.
+
 2018-8-17 Will
 * Implemented read most CLI min, max, default
   for formally defined ones.

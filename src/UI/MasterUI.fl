@@ -1408,6 +1408,7 @@ ZynAddSubFX}
             partui->init(synth->part[value_int], value_int, bankui);
             partui->redraw();
             partui->npart = value_int;
+            activePart = value_int;
             npartcounter->value(value_int + 1);
             npartcounter->redraw();
             updatepanel();

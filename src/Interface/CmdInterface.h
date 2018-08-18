@@ -64,6 +64,8 @@ class CmdInterface : private MiscFuncs
         SynthEngine *synth;
         char welcomeBuffer [128];
 
+        int kitmode;
+        int kitnumber;
         int npart;
         int nFX;
         int nFXtype;

@@ -860,6 +860,8 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         string thisname =  bank->getname(slot);
         if ((what == 1 || what == 3) && mode == 1 && !bank->emptyslot(slot))
         {
+            if (synth->getGuiMaster()->activePart == UNUSED)
+                return;
             send_data(MAIN::control::loadInstrument, synth->getGuiMaster()->activePart, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, slot);
             // Reads from slot
             if (what == 3)
