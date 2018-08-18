@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of ZynAddSubFX original code.
-    Modified February 2018
+    Modified August 2018
 */
 
 #include <iostream>
@@ -813,119 +813,122 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper *xml, int n)
 float ADnoteParameters::getLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    int request = int(getData->data.type & 3);
-
+    unsigned char type = getData->data.type;
+    int request = type & TOPLEVEL::type::Default;
     int control = getData->data.control;
     int engine = getData->data.engine;
 
-    // defaults
-    int type = 0;
+    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
+
+    // addnote defaults
     int min = 0;
     float def = 0;
     int max = 127;
+    type |= TOPLEVEL::type::Integer;
+    unsigned char learnable = TOPLEVEL::type::Learnable;
 
-    if (engine < 0x80)
+    if (engine == PART::engine::addSynth)
     {
         switch (control)
         {
-            case 0:
-                type |= 0x40;
+            case ADDSYNTH::control::volume:
+                type |= learnable;
                 def = 90;
                 break;
 
-            case 1:
-                type |= 0x40;
+            case ADDSYNTH::control::velocitySense:
+                type |= learnable;
                 def = 64;
                 break;
 
-            case 2:
-                type |= 0x40;
+            case ADDSYNTH::control::panning:
+                type |= learnable;
                 def = 64;
                 break;
 
-            case 8:
-                type |= 0x40;
+            case ADDSYNTH::control::enable:
+                type |= learnable;
                 def = 1;
                 max = 1;
                 break;
 
-            case 32:
-                type |= 0x40;
+            case ADDSYNTH::control::detuneFrequency:
+                type |= learnable;
                 min = -8192;
                 max = 8191;
                 break;
 
-            case 35:
-                type |= 0x40;
+            case ADDSYNTH::control::octave:
+                type |= learnable;
                 min = -8;
                 max = 7;
                 break;
 
-            case 36:
+            case ADDSYNTH::control::detuneType:
                 max = 3;
                 break;
 
-            case 37:
+            case ADDSYNTH::control::coarseDetune:
                 min = -64;
                 max = 63;
                 break;
 
-            case 39:
-                type |= 0x40;
+            case ADDSYNTH::control::relativeBandwidth:
+                type |= learnable;
                 def = 64;
                 break;
 
-            case 112:
-                type |= 0x40;
+            case ADDSYNTH::control::stereo:
+                type |= learnable;
                 def = 1;
                 max = 1;
                 break;
 
-            case 113:
+            case ADDSYNTH::control::randomGroup:
                 max = 1;
                 break;
 
-            case 120:
+            case ADDSYNTH::control::dePop:
                 def = FADEIN_ADJUSTMENT_SCALE;
 
-            case 121: // just ensures it doesn't get caught by default
+            case ADDSYNTH::control::punchStrength: // just ensures it doesn't get caught by default
                 break;
 
-            case 122:
+            case ADDSYNTH::control::punchDuration:
                 def = 60;
                 break;
 
-            case 123:
+            case ADDSYNTH::control::punchStretch:
                 def = 64;
                 break;
 
-            case 124:
+            case ADDSYNTH::control::punchVelocity:
                 def = 72;
                 break;
 
             default:
-                type |= 4; // error
+                type |= TOPLEVEL::type::Error;
                 break;
         }
         getData->data.type = type;
-        if (type & 4)
+        if (type & TOPLEVEL::type::Error)
             return 1;
 
         switch (request)
         {
-            case 0:
+            case TOPLEVEL::type::Adjust:
                 if(value < min)
                     value = min;
                 else if(value > max)
                     value = max;
             break;
-            case 1:
+            case TOPLEVEL::type::Minimum:
                 value = min;
                 break;
-            case 2:
+            case TOPLEVEL::type::Maximum:
                 value = max;
                 break;
-            case 3:
+            case TOPLEVEL::type::Default:
                 value = def;
                 break;
         }
@@ -934,217 +937,255 @@ float ADnoteParameters::getLimits(CommandBlock *getData)
 
     switch (control)
     {
-        case 0:
-            type |= 0x40;
+        case ADDVOICE::control::volume:
+            type |= learnable;
             def = 100;
             break;
 
-        case 1:
-            type |= 0x40;
+        case ADDVOICE::control::velocitySense:
+            type |= learnable;
             def = 127;
             break;
 
-        case 2:
-            type |= 0x40;
+        case ADDVOICE::control::panning:
+            type |= learnable;
             def = 64;
             break;
 
-        case 4:
+        case ADDVOICE::control::invertPhase:
             max = 1;
             break;
 
-        case 8:
-        case 9:
-        case 88:
-            type |= 0x40;
+        case ADDVOICE::control::enableAmplitudeEnvelope:
+            type |= learnable;
+            max = 1;
+            break;
+        case ADDVOICE::control::enableAmplitudeLFO:
+            type |= learnable;
             max = 1;
             break;
 
-        case 16:
-            type |= 0x40;
+        case ADDVOICE::control::modulatorType:
+            type |= learnable;
             max = 5;
             break;
 
-        case 17:
+        case ADDVOICE::control::externalModulator:
             min = -1;
             def = -1;
             max = 6;
             break;
 
-        case 32:
-        case 96:
-            type |= 0x40;
+        case ADDVOICE::control::detuneFrequency:
+            type |= learnable;
             min = -8192;
             max = 8191;
             break;
 
-        case 33:
-            type |= 0x40;
+        case ADDVOICE::control::equalTemperVariation:
+            type |= learnable;
             break;
 
-        case 34:
-        case 98:
+        case ADDVOICE::control::baseFrequencyAs440Hz:
             max = 1;
             break;
 
-        case 35:
-        case 99:
-            type |= 0x40;
+        case ADDVOICE::control::octave:
+            type |= learnable;
             min = -8;
             max = 7;
             break;
 
-        case 36:
-        case 100:
+        case ADDVOICE::control::detuneType:
             max = 4;
             break;
 
-        case 37:
-        case 101:
+        case ADDVOICE::control::coarseDetune:
             min = -64;
             max = 63;
             break;
 
-        case 38:
-            type |= 0x40;
+        case ADDVOICE::control::pitchBendAdjustment:
+            type |= learnable;
             def = 88;
             break;
 
-        case 39:
-            type |= 0x40;
+        case ADDVOICE::control::pitchBendOffset:
+            type |= learnable;
             def = 64;
             break;
 
-        case 40:
-        case 41:
-        case 104:
-            type |= 0x40;
+        case ADDVOICE::control::enableFrequencyEnvelope:
+            type |= learnable;
+            max = 1;
+            break;
+        case ADDVOICE::control::enableFrequencyLFO:
+            type |= learnable;
             max = 1;
             break;
 
-        case 48:
-            type |= 0x40;
+        case ADDVOICE::control::unisonFrequencySpread:
+            type |= learnable;
             def = 60;
             break;
 
-        case 49:
-            type |= 0x40;
+        case ADDVOICE::control::unisonPhaseRandomise:
+            type |= learnable;
             def = 127;
             break;
 
-        case 50:
-            type |= 0x40;
+        case ADDVOICE::control::unisonStereoSpread:
+            type |= learnable;
             def = 64;
             break;
 
-        case 51:
-            type |= 0x40;
+        case ADDVOICE::control::unisonVibratoDepth:
+            type |= learnable;
             def = 64;
             break;
 
-        case 52:
-            type |= 0x40;
+        case ADDVOICE::control::unisonVibratoSpeed:
+            type |= learnable;
             def = 64;
             break;
 
-        case 53:
+        case ADDVOICE::control::unisonSize:
             min = 2;
             def = 2;
             max = 50;
             break;
 
-        case 54:
+        case ADDVOICE::control::unisonPhaseInvert:
             max = 5;
             break;
 
-        case 56:
+        case ADDVOICE::control::enableUnison:
             max = 1;
             break;
 
-        case 64:
+        case ADDVOICE::control::bypassGlobalFilter:
             max = 1;
             break;
 
-        case 68:
-        case 72:
-        case 73:
-            type |= 0x40;
+        case ADDVOICE::control::enableFilter:
+            type |= learnable;
+            max = 1;
+            break;
+        case ADDVOICE::control::enableFilterEnvelope:
+            type |= learnable;
+            max = 1;
+            break;
+        case ADDVOICE::control::enableFilterLFO:
+            type |= learnable;
             max = 1;
             break;
 
-        case 80:
-            type |= 0x40;
+        case ADDVOICE::control::modulatorAmplitude:
+            type |= learnable;
             def = 90;
             break;
 
-        case 81:
-            type |= 0x40;
+        case ADDVOICE::control::modulatorVelocitySense:
+            type |= learnable;
             def = 64;
             break;
 
-        case 82:
-        case 112:
-        case 136:
-            type |= 0x40;
+        case ADDVOICE::control::modulatorHFdamping:
+            type |= learnable;
             min = -64;
             max = 63;
             break;
-
-        case 113:
+        case ADDVOICE::control::enableModulatorAmplitudeEnvelope:
+            type |= learnable;
+            max = 1;
+            break;
+        case ADDVOICE::control::modulatorDetuneFrequency:
+            type |= learnable;
+            min = -8192;
+            max = 8191;
+            break;
+        case ADDVOICE::control::modulatorFrequencyAs440Hz:
+            max = 1;
+            break;
+        case ADDVOICE::control::modulatorOctave:
+            type |= learnable;
+            min = -8;
+            max = 7;
+            break;
+        case ADDVOICE::control::modulatorDetuneType:
+            max = 4;
+            break;
+        case ADDVOICE::control::modulatorCoarseDetune:
+            min = -64;
+            max = 63;
+            break;
+        case ADDVOICE::control::enableModulatorFrequencyEnvelope:
+            type |= learnable;
+            max = 1;
+            break;
+        case ADDVOICE::control::modulatorOscillatorPhase:
+            type |= learnable;
+            min = -64;
+            max = 63;
+            break;
+        case ADDVOICE::control::modulatorOscillatorSource:
             min = -1;
             def = -1;
             max = 6;
             break;
 
-        case 128:
-            type |= 0x40;
+        case ADDVOICE::control::delay:
+            type |= learnable;
             break;
-
-        case 129:
-            type |= 0x40;
-            if (engine == 0x80)
+        case ADDVOICE::control::enableVoice:
+            type |= learnable;
+            if (engine == PART::engine::addVoice1)
                 def = 1;
             max = 1;
             break;
-
-        case 130:
+        case ADDVOICE::control::enableResonance:
             def = 1;
             max = 1;
             break;
 
-        case 137:
+        case ADDVOICE::control::voiceOscillatorPhase:
+            type |= learnable;
+            min = -64;
+            max = 63;
+            break;
+        case ADDVOICE::control::voiceOscillatorSource:
             min = -1;
             def = -1;
             max = 6;
             break;
 
-        case 138:
+        case ADDVOICE::control::soundType:
             max = 2;
             break;
 
         default:
-            type |= 4; // error
+            type |= TOPLEVEL::type::Error;
             break;
     }
     getData->data.type = type;
-    if (type & 4)
+    if (type & TOPLEVEL::type::Error)
         return 1;
 
     switch (request)
     {
-        case 0:
+        case TOPLEVEL::type::Adjust:
             if(value < min)
                 value = min;
             else if(value > max)
                 value = max;
         break;
-        case 1:
+        case TOPLEVEL::type::Minimum:
             value = min;
             break;
-        case 2:
+        case TOPLEVEL::type::Maximum:
             value = max;
             break;
-        case 3:
+        case TOPLEVEL::type::Default:
             value = def;
             break;
     }

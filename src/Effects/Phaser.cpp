@@ -22,7 +22,7 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified February 2018
+    Modified July 2018
 */
 
 #include "Misc/SynthEngine.h"
@@ -564,26 +564,26 @@ float Phaserlimit::getlimits(CommandBlock *getData)
             canLearn = false;
             break;
         default:
-            getData->data.type |= 4; // error
+            getData->data.type |= TOPLEVEL::type::Error;
             return 1.0f;
             break;
     }
 
-    switch(request)
+    switch (request)
     {
-        case 0:
+        case TOPLEVEL::type::Adjust:
             if(value < min)
                 value = min;
             else if(value > max)
                 value = max;
             break;
-        case 1:
+        case TOPLEVEL::type::Minimum:
             value = min;
             break;
-        case 2:
+        case TOPLEVEL::type::Maximum:
             value = max;
             break;
-        case 3:
+        case TOPLEVEL::type::Default:
             value = def;
             break;
     }

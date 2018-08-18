@@ -1,11 +1,25 @@
 
+Potential Bug: Changing part name while aplaymidi running with yoshi sometimes segfaults with:
+    The futex facility returned an unexpected error code.Aborted
+Seems to be a GUI problem, it freezes with Rosegarden but all functions still work.
+No issue at all if names changed from the CLI!
+
+Can go a long time before showing up :(
+
+Doesn't seem to happen with V1.5.3
+ (part number follows instrument loads after this version)
+
 BUG! Multi instances produce jack errors if have been opened when main instance closed - been there since V 1.4.1 :(
 
 BUG! If jack is selected for audio but there are no physical ports Yoshimi quits with CLI warning - should run with gui warning as well, or better still loop back to try alsa.
 
-Realtime subnote
+master detune marked learnable but isn't :(
 
-Place manual search *entirely* within SynthEngine.cpp
+Sort out cli part effect controls.
+
+Find out why reporting errors in 'Bank' is very slow.
+
+Realtime subnote
 
 Zero-cross for note off.
 

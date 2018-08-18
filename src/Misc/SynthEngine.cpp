@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified June 2018
+    Modified August 2018
 */
 
 #define NOLOCKS
@@ -610,19 +610,19 @@ int SynthEngine::RunChannelSwitch(int value)
 
 
 // Controllers
-void SynthEngine::SetController(unsigned char chan, int type, short int par)
+void SynthEngine::SetController(unsigned char chan, int CCtype, short int par)
 {
-    if (type == Runtime.midi_bank_C)
+    if (CCtype == Runtime.midi_bank_C)
     {
         //shouldn't get here. Banks are set directly via SetBank method from MusicIO class
         return;
     }
-    if (type <= 119 && type == Runtime.channelSwitchCC)
+    if (CCtype <= 119 && CCtype == Runtime.channelSwitchCC)
     {
         RunChannelSwitch(par);
         return;
     }
-    if (type == C_allsoundsoff)
+    if (CCtype == C_allsoundsoff)
     {   // cleanup insertion/system FX
         for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
             sysefx[nefx]->cleanup();
@@ -657,12 +657,12 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
         part[npart]->legatoFading = 0;
         if (chan == part[npart]->Prcvchn)// && partonoffRead(npart))
         {
-            if (type == part[npart]->PbreathControl) // breath
+            if (CCtype == part[npart]->PbreathControl) // breath
             {
                 part[npart]->SetController(C_volume, 64 + par / 2);
                 part[npart]->SetController(C_filtercutoff, par);
             }
-            else if (type == 0x44) // legato switch
+            else if (CCtype == 0x44) // legato switch
             {
                 int mode = (ReadPartKeyMode(npart) & 3);
                 if (par < 64)
@@ -672,8 +672,8 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
             }
             else
             {
-                //cout << "type " << int(type) << "  par " << int(par) << endl;
-                part[npart]->SetController(type, par);
+                //cout << "CCtype " << int(CCtype) << "  par " << int(par) << endl;
+                part[npart]->SetController(CCtype, par);
             }
         }
     }
@@ -1705,9 +1705,9 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
         putData.data.value = par;
         putData.data.type = 0xd0;
         putData.data.control = 8;
-        putData.data.part = 0xd9;
+        putData.data.part = TOPLEVEL::section::midiIn;
         putData.data.kit = part;
-        putData.data.parameter = 0xc0;
+        putData.data.parameter = TOPLEVEL::route::adjustAndLoopback;
         midilearn.writeMidi(&putData, sizeof(putData), true);
     }
 }
@@ -1747,7 +1747,7 @@ void SynthEngine::resetAll(bool andML)
         ClearNRPNs();
     }
     if (andML)
-        midilearn.generalOpps(0, 0, 96, 240, 255, 255, 255, 255, 255);
+        midilearn.generalOpps(0, 0, MIDILEARN::control::clearAll, TOPLEVEL::section::midiLearn, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED);
     Unmute();
 }
 
@@ -1816,9 +1816,9 @@ void SynthEngine::SetMuteAndWait(void)
     CommandBlock putData;
     memset(&putData, 0xff, sizeof(putData));
     putData.data.value = 0;
-    putData.data.type = 0xc0;
-    putData.data.control = 0xfe;
-    putData.data.part = 0xf0;
+    putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
+    putData.data.control = TOPLEVEL::control::errorMessage;
+    putData.data.part = TOPLEVEL::section::main;
     if (jack_ringbuffer_write_space(interchange.fromGUI) >= sizeof(putData))
     {
         jack_ringbuffer_write(interchange.fromGUI, (char*) putData.bytes, sizeof(putData));
@@ -2143,7 +2143,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         {
             Mute();
             fadeLevel = 0; // just to be sure
-            interchange.returnsDirect(fadeAll);
+            interchange.flagsWrite(fadeAll);
             fadeAll = 0;
         }
     }
@@ -3057,7 +3057,7 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
     Runtime.NumAvailableParts = xml->getpar("current_midi_parts", NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS, NUM_MIDI_PARTS);
     setPvolume(xml->getpar127("volume", Pvolume));
     setPkeyshift(xml->getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64));
-    Runtime.channelSwitchType = xml->getpar("channel_switch_type", Runtime.channelSwitchType, 0, 3);
+    Runtime.channelSwitchType = xml->getpar("channel_switch_type", Runtime.channelSwitchType, 0, 4);
     Runtime.channelSwitchCC = xml->getpar("channel_switch_CC", Runtime.channelSwitchCC, 0, 128);
     Runtime.channelSwitchValue = 0;
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
@@ -3248,80 +3248,91 @@ void SynthEngine::setWindowTitle(string _windowTitle)
 float SynthEngine::getLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    int request = int(getData->data.type & 3);
+    unsigned char type = getData->data.type;
+    int request = type & TOPLEVEL::type::Default;
     int control = getData->data.control;
 
+    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
+
     // defaults
-    int type = (getData->data.type & 0x3f) | 0x80; // set as integer
     int min = 0;
     float def = 64;
     int max = 127;
-    //cout << "master control " << to_string(control) << endl;
+    type |= TOPLEVEL::type::Integer;
+    unsigned char learnable = TOPLEVEL::type::Learnable;
+
     switch (control)
     {
-        case 0:
+        case MAIN::control::volume:
             def = 90;
-            type = (type &0x3f) | 0x40; // float, learnable
+            type &= ~TOPLEVEL::type::Integer;
+            type |= learnable;
             break;
 
-        case 14:
-            min = 1;
-            def = 1;
-            max = Runtime.NumAvailableParts;;
+        case MAIN::control::partNumber:
+            min = 0;
+            def = 0;
+            max = Runtime.NumAvailableParts -1;
             break;
 
-        case 15:
+        case MAIN::control::availableParts:
             min = 16;
             def = 16;
             max = 64;
             break;
 
-        case 32:
-            type |= 0x40;
+        case MAIN::control::detune:
             break;
 
-        case 35:
+        case MAIN::control::keyShift:
             min = -36;
             def = 0;
             max = 36;
             break;
 
-        case 48:
+        case MAIN::control::soloType:
             def = 0;
             max = 3;
             break;
 
-        case 49:
+        case MAIN::control::soloCC:
             min = 14;
             def = 115;
             max = 119;
             break;
 
-        case 96:
-        case 128:
+        case MAIN::control::masterReset:
+            case MAIN::control::masterResetAndMlearn:
+        case MAIN::control::stopSound:
             min = 0;
             def = 0;
             max = 0;
             break;
 
+        default:
+            type |= TOPLEVEL::type::Error;
+            break;
+
     }
     getData->data.type = type;
+    if (type & TOPLEVEL::type::Error)
+        return 1;
 
     switch (request)
     {
-        case 0:
+        case TOPLEVEL::type::Adjust:
             if(value < min)
                 value = min;
             else if(value > max)
                 value = max;
         break;
-        case 1:
+        case TOPLEVEL::type::Minimum:
             value = min;
             break;
-        case 2:
+        case TOPLEVEL::type::Maximum:
             value = max;
             break;
-        case 3:
+        case TOPLEVEL::type::Default:
             value = def;
             break;
     }
@@ -3332,43 +3343,90 @@ float SynthEngine::getLimits(CommandBlock *getData)
 float SynthEngine::getVectorLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    int request = int(getData->data.type & 3);
+    unsigned char type = getData->data.type;
+    unsigned char request = getData->data.type  & TOPLEVEL::type::Default;
     int control = getData->data.control;
 
-    // defaults
-    int type = (getData->data.type & 0x3f) | 0x80; // set as integer
+    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
+
+    // vector defaults
+    type |= TOPLEVEL::type::Integer;
     int min = 0;
     float def = 0;
-    int max = NUM_MIDI_CHANNELS;
-    //cout << "config control " << to_string(control) << endl;
+    int max = 1;
+
     switch (control)
     {
+        case VECTOR::control::undefined:
+            break;
+        case VECTOR::control::name:
+            break;
+        case VECTOR::control::Xcontroller:
+            max = 119;
+            break;
+        case VECTOR::control::XleftInstrument:
+            max = 159;
+            break;
+        case VECTOR::control::XrightInstrument:
+            max = 159;
+            break;
+        case VECTOR::control::Xfeature0:
+            break;
+        case VECTOR::control::Xfeature1:
+            max = 2;
+            break;
+        case VECTOR::control::Xfeature2:
+            max = 2;
+            break;
+        case VECTOR::control::Xfeature3:
+            max = 2;
+            break;
+        case VECTOR::control::Ycontroller:
+            max = 119;
+            break;
+        case VECTOR::control::YupInstrument:
+            max = 159;
+            break;
+        case VECTOR::control::YdownInstrument:
+            max = 159;
+            break;
+        case VECTOR::control::Yfeature0:
+            break;
+        case VECTOR::control::Yfeature1:
+            max = 2;
+            break;
+        case VECTOR::control::Yfeature2:
+            max = 2;
+            break;
+        case VECTOR::control::Yfeature3:
+            max = 2;
+            break;
+        case VECTOR::control::erase:
+            break;
+
         default: // TODO
-            //min = -1;
-            //def = -1;
-            //max = -1;
-            //type |= 4; // error
+            type |= TOPLEVEL::type::Error;
             break;
     }
     getData->data.type = type;
-    if (type & 4)
+    if (type & TOPLEVEL::type::Error)
         return 1;
 
     switch (request)
     {
-        case 0:
+        case TOPLEVEL::type::Adjust:
             if(value < min)
                 value = min;
             else if(value > max)
                 value = max;
         break;
-        case 1:
+        case TOPLEVEL::type::Minimum:
             value = min;
             break;
-        case 2:
+        case TOPLEVEL::type::Maximum:
             value = max;
             break;
-        case 3:
+        case TOPLEVEL::type::Default:
             value = def;
             break;
     }
@@ -3379,149 +3437,160 @@ float SynthEngine::getVectorLimits(CommandBlock *getData)
 float SynthEngine::getConfigLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    int request = int(getData->data.type & 3);
+    unsigned char type = getData->data.type;
+    int request = type & TOPLEVEL::type::Default;
     int control = getData->data.control;
 
-    // defaults
-    int type = (getData->data.type & 0x3f) | 0x80; // set as integer
+    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
+
+    // config defaults
     int min = 0;
     float def = 0;
     int max = 1;
-    //cout << "config control " << to_string(control) << endl;
+    type |= TOPLEVEL::type::Integer;
+
     switch (control)
     {
-        case 0:
+        case CONFIG::control::oscillatorSize:
             min = 256;
             def = 1024;
             max = 16384;
             break;
-        case 1:
+        case CONFIG::control::bufferSize:
             min = 16;
             def = 512;
             max = 4096;
            break;
-        case 2:
+        case CONFIG::control::padSynthInterpolation:
             break;
-        case 3:
+        case CONFIG::control::virtualKeyboardLayout:
             max = 3;
             break;
-        case 4:
+        case CONFIG::control::XMLcompressionLevel:
             def = 3;
             max = 9;
             break;
-        case 5:
+        case CONFIG::control::reportsDestination:
+            break;
+        case CONFIG::control::savedInstrumentFormat:
+            max = 3;
             break;
 
-        case 16:
+        case CONFIG::control::defaultStateStart:
             break;
-        case 17:
+        case CONFIG::control::hideNonFatalErrors:
             break;
-        case 18:
+        case CONFIG::control::showSplash:
             def = 1;
             break;
-        case 19:
+        case CONFIG::control::logInstrumentLoadTimes:
             break;
-        case 20:
+        case CONFIG::control::logXMLheaders:
             break;
-        case 21:
+        case CONFIG::control::saveAllXMLdata:
             break;
-        case 22:
+        case CONFIG::control::enableGUI:
             def = 1;
             break;
-        case 23:
+        case CONFIG::control::enableCLI:
+            def = 1;
+            break;
+        case CONFIG::control::enableAutoInstance:
             def = 1;
             break;
 
-        case 32:
+        case CONFIG::control::jackMidiSource:
             min = 3; // anything greater than max
             def = miscMsgPush("default");
             break;
-        case 33:
+        case CONFIG::control::jackPreferredMidi:
             def = 1;
             break;
-        case 34:
+        case CONFIG::control::jackServer:
             min = 3;
             def = miscMsgPush("default");
             break;
-        case 35:
+        case CONFIG::control::jackPreferredAudio:
             def = 1;
             break;
-        case 36:
+        case CONFIG::control::jackAutoConnectAudio:
             def = 1;
             break;
 
-        case 48:
+        case CONFIG::control::alsaMidiSource:
             min = 3;
             def = miscMsgPush("default");
             break;
-        case 49:
+        case CONFIG::control::alsaPreferredMidi:
             def = 1;
             break;
-        case 50:
+        case CONFIG::control::alsaAudioDevice:
             min = 3;
             def = miscMsgPush("default");
             break;
-        case 51:
+        case CONFIG::control::alsaPreferredAudio:
             break;
-        case 52:
+        case CONFIG::control::alsaSampleRate:
             def = 2;
             max = 3;
             break;
 
-        case 64:
-            break;
-        case 65: // runtime midi checked elsewhere
+        //case CONFIG::control::enableBankRootChange:
+            //break;
+        case CONFIG::control::bankRootCC: // runtime midi checked elsewhere
             max = 119;
             break;
-        case 67: // runtime midi checked elsewhere
+        case CONFIG::control::bankCC: // runtime midi checked elsewhere
             def = 32;
             max = 119;
             break;
-        case 68:
+        case CONFIG::control::enableProgramChange:
             break;
-        case 69:
+        case CONFIG::control::programChangeEnablesPart:
             def = 1;
             break;
-        case 70:
-            break;
-        case 71: // runtime midi checked elsewhere
+        //case CONFIG::control::enableExtendedProgramChange:
+            //break;
+        case CONFIG::control::extendedProgramChangeCC: // runtime midi checked elsewhere
             def = 110;
             max = 119;
             break;
-        case 72:
+        case CONFIG::control::ignoreResetAllCCs:
             break;
-        case 73:
+        case CONFIG::control::logIncomingCCs:
             break;
-        case 74:
+        case CONFIG::control::showLearnEditor:
             def = 1;
             break;
+        case CONFIG::control::enableNRPNs:
+            def = 1;
 
-        case 80:
+        case CONFIG::control::saveCurrentConfig:
             break;
 
         default:
-            type |= 4; // error
-            return 2;
+            type |= TOPLEVEL::type::Error;
             break;
     }
     getData->data.type = type;
-    if (type & 4)
+    if (type & TOPLEVEL::type::Error)
         return 1;
+
     switch (request)
     {
-        case 0:
+        case TOPLEVEL::type::Adjust:
             if(value < min)
                 value = min;
             else if(value > max)
                 value = max;
         break;
-        case 1:
+        case TOPLEVEL::type::Minimum:
             value = min;
             break;
-        case 2:
+        case TOPLEVEL::type::Maximum:
             value = max;
             break;
-        case 3:
+        case TOPLEVEL::type::Default:
             value = def;
             break;
     }

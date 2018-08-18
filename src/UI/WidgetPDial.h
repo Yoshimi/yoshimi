@@ -6,6 +6,7 @@
     Copyright 2009-2010, Alan Calvert
     Copyright 2016 Will Godfrey
     Copyright 2017 Jesper Lloyd
+    Copyright 2018 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -21,7 +22,8 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified March 2017
+    This file is a derivative of the ZynAddSubFX original.
+    Modified August 2018
 */
 
 #ifndef WidgetPDial_h
@@ -42,8 +44,6 @@ class WidgetPDial : public Fl_Dial {
  public:
   WidgetPDial(int x,int y, int w, int h, const char *label=0);
   ~WidgetPDial();
-
-  void init(float home_ = -1); /*Set optional default value */
 
   void setValueType(ValueType type_);
   void setGraphicsType(ValueType type_);

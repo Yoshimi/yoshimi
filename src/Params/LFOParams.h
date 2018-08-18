@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2017-2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of original ZynAddSubFX code, modified February 2017
+    This file is derivative of original ZynAddSubFX code.
+
+    Modified July 2018
 */
 
 #ifndef LFO_PARAMS_H
@@ -76,6 +79,12 @@ class LFOParams : public Presets
         unsigned char Drandomness;
         unsigned char Ddelay;
         unsigned char Dcontinous;
+};
+
+class LFOlimit
+{
+    public:
+        float getLFOlimits(CommandBlock *getData);
 };
 
 #endif

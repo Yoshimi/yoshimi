@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified April 2018
+Modified August 2018
 } {selected in_source in_header
 }
 
@@ -352,7 +352,7 @@ class Oscilharmonic {: {public Fl_Group}
         else
             o->selection_color(222);
 
-        send_data(6, n, x, 0xd8);}
+        send_data(TOPLEVEL::insert::harmonicAmplitude, n, x, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         xywh {0 15 15 115} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 64
         code0 {o->value(127-oscil->Phmag[n]);}
         code1 {if (oscil->Phmag[n]==64) o->selection_color(0);}
@@ -371,7 +371,7 @@ class Oscilharmonic {: {public Fl_Group}
         else
             o->selection_color(222);
 
-        send_data(7, n, 127 - x, 0xd8);}
+        send_data(TOPLEVEL::insert::harmonicPhaseBandwidth, n, 127 - x, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         xywh {0 135 15 75} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 64
         code0 {o->value(oscil->Phphase[n]);}
         code1 {if (oscil->Phphase[n]==64) o->selection_color(0);}
@@ -405,7 +405,8 @@ class Oscilharmonic {: {public Fl_Group}
   }
   Function {send_data(int insert, int control, float value, int type)} {} {
     code {//
-    collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, insert);} {}
+        type |= TOPLEVEL::type::Write;
+        collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, insert);} {}
   }
   Function {init(OscilGen *oscil_,int n_,Fl_Group *display_,Fl_Widget *oldosc_,Fl_Widget *cbwidget_,Fl_Widget *applybutton_, SynthEngine *_synth, int npart_, int kititem_, int engine_)} {} {
     code {//
@@ -467,14 +468,12 @@ class OscilEditor {: {public PresetsUI_}
       label {ADsynth Oscillator Editor}
       xywh {15 221 735 595} type Double hide
       code0 {string tname;}
-      code1 {if (engine == 2) tname = "PadSynth Harmonic Content"; else {tname = "AddSynth Voice " + to_string((engine & 0x3f) + 1);}}
-      code2 {if (engine & 0x40) tname += " Modulation Oscillator"; else tname += " Oscillator";}
-      code3 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle(tname).c_str());}
+      code1 {setWindowTitle();}
     } {
       Fl_Button applybutton {
         label Apply
         callback {//
-        send_data (104, 0, 0xd0);}
+        send_data(PART::control::padsynthParameters, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         xywh {300 280 60 20} box THIN_UP_BOX labelfont 1
         code0 {if (!oscil->ADvsPAD) o->hide();}
       }
@@ -496,7 +495,7 @@ class OscilEditor {: {public PresetsUI_}
           if (Fl::event_button() == 3)
               o->value(0);
 
-          send_data (0, o->value(), 0xd8);}
+          send_data(OSCILLATOR::control::phaseRandomness, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Oscilator Phase Randomness: smaller than 0 is "group", larger than 0 is for each harmonic} xywh {140 285 100 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
           code0 {if (oscil->ADvsPAD) o->hide();}
           class mwheel_val_slider_rev
@@ -513,7 +512,7 @@ class OscilEditor {: {public PresetsUI_}
           Fl_Choice hrndtype {
             label {H.rnd}
             callback {//
-            send_data (3, o->value(), 0xc0);}
+            send_data(OSCILLATOR::control::harmonicRandomnessType, o->value(), TOPLEVEL::type::Integer);}
             tooltip {Harmonic Amplitude Randomness} xywh {281 282 50 15} down_box BORDER_BOX labelsize 10 textsize 10
           } {
             MenuItem {} {
@@ -531,9 +530,8 @@ class OscilEditor {: {public PresetsUI_}
           }
           Fl_Dial hrnddial {
             callback {//
-            send_data (2, o->value(), 0xc8);}
+            send_data(OSCILLATOR::control::harmonicAmplitudeRandomness, o->value(), TOPLEVEL::type::Integer);}
             tooltip {Oscillator's harmonic randomness parameter} xywh {338 280 18 18} maximum 127 step 1
-            code0 {o->init(64);}
             class WidgetPDial
           }
         }
@@ -552,15 +550,14 @@ class OscilEditor {: {public PresetsUI_}
         } {}
         Fl_Dial bfslider {
           callback {//
-          send_data (16, o->value(), 0xd8);}
+          send_data(OSCILLATOR::control::baseFunctionParameter, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Base Function Parameter} xywh {520 280 20 20} minimum -64 maximum 63 step 1
-          code0 {o->init(0);}
           class WidgetPDial
         }
         Fl_Choice bftype {
           label {Base.F..}
           callback {//
-          send_data (17, o->value(), 0xd0);}
+          send_data(OSCILLATOR::control::baseFunctionType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           xywh {370 285 90 15} down_box BORDER_BOX labelsize 10 align 5 textsize 11
         } {
           MenuItem {} {
@@ -655,7 +652,7 @@ class OscilEditor {: {public PresetsUI_}
           Fl_Choice bfmodtype {
             label {B.F.Mod.}
             callback {//
-            send_data (21, o->value(), 0xd0);}
+            send_data(OSCILLATOR::control::baseModulationType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
             tooltip {Base function modulation} xywh {599 281 50 15} down_box BORDER_BOX labelsize 10 textsize 10
           } {
             MenuItem {} {
@@ -677,23 +674,20 @@ class OscilEditor {: {public PresetsUI_}
           }
           Fl_Dial bfmodpar1 {
             callback {//
-            send_data (18, o->value(), 0xd8);}
+            send_data(OSCILLATOR::control::baseModulationParameter1, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
             tooltip {Oscillator's modulation parameter 1} xywh {654 280 17 17} maximum 127 step 1
-            code0 {o->init(64);}
             class WidgetPDial
           }
           Fl_Dial bfmodpar2 {
             callback {//
-            send_data (19, o->value(), 0xd8);}
+            send_data(OSCILLATOR::control::baseModulationParameter2, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
             tooltip {Oscillator's modulation parameter 2} xywh {676 280 17 17} maximum 127 step 1
-            code0 {o->init(64);}
             class WidgetPDial
           }
           Fl_Dial bfmodpar3 {
             callback {//
-            send_data (20, o->value(), 0xd8);}
+            send_data(OSCILLATOR::control::baseModulationParameter3, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
             tooltip {Oscillator's modulation parameter 3} xywh {698 280 17 17} maximum 127 step 1
-            code0 {o->init(32);}
             class WidgetPDial
           }
         }
@@ -701,7 +695,7 @@ class OscilEditor {: {public PresetsUI_}
       Fl_Choice magtype {
         label {Mag.Type}
         callback {//
-        send_data (1, o->value(), 0xd0);}
+        send_data(OSCILLATOR::control::magType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         xywh {70 280 65 20} down_box BORDER_BOX labelsize 11 textsize 11
       } {
         MenuItem {} {
@@ -728,7 +722,7 @@ class OscilEditor {: {public PresetsUI_}
       Fl_Button {} {
         label {Use as base}
         callback {//
-        send_data (33, autoclearbutton->value() > 0, 0xd0);}
+        send_data(OSCILLATOR::control::useAsBaseFunction, autoclearbutton->value() > 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         tooltip {Use this Oscillator as base function} xywh {5 313 85 20} box THIN_UP_BOX labelfont 1 labelsize 11
       }
       Fl_Button {} {
@@ -749,7 +743,7 @@ class OscilEditor {: {public PresetsUI_}
         callback {//
         if (fl_choice("Clear the harmonics settings?", NULL,"No","Yes") < 2)
             return;
-        send_data (96, o->value(), 0xd0);}
+        send_data(OSCILLATOR::control::clearHarmonics, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         xywh {670 505 55 15} box THIN_UP_BOX labelfont 1 labelsize 11
       }
       Fl_Group {} {
@@ -758,7 +752,7 @@ class OscilEditor {: {public PresetsUI_}
         Fl_Choice wshbutton {
           label {Wsh.}
           callback {//
-          send_data (35, o->value(), 0xd0);}
+          send_data(OSCILLATOR::control::waveshapeType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Waveshaping function} xywh {165 313 55 20} down_box BORDER_BOX labelsize 10 textsize 10
         } {
           MenuItem {} {
@@ -824,9 +818,8 @@ class OscilEditor {: {public PresetsUI_}
         }
         Fl_Dial wshpar {
           callback {//
-          send_data (34, o->value(), 0xd8);}
+          send_data(OSCILLATOR::control::waveshapeParameter, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Waveshaping Parameter} xywh {260 313 20 20} minimum -64 maximum 63 step 1
-          code0 {o->init(0);}
           class WidgetPDial
         }
         Fl_Value_Output wsparval {
@@ -835,8 +828,9 @@ class OscilEditor {: {public PresetsUI_}
       }
       Fl_Light_Button autoclearbutton {
         label {Clr.}
-        callback {//
-        send_data (32, o->value(), 0xd0);}
+        callback {// not used directly now
+        Fl_Light_Button *a = o; o = a; // suppress warning
+        //send_data(OSCILLATOR::control::autoClear, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         tooltip {Auto clear when using the oscillator as base function} xywh {95 313 35 20} box THIN_UP_BOX value 1 labelfont 1 labelsize 10
       }
       Fl_Group {} {
@@ -845,7 +839,7 @@ class OscilEditor {: {public PresetsUI_}
         Fl_Choice fltbutton {
           label Filter
           callback {//
-          send_data (39, o->value(), 0xd0);}
+          send_data(OSCILLATOR::control::filterType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Oscillator's filter type} xywh {315 313 50 20} down_box BORDER_BOX labelsize 10 textsize 10
         } {
           MenuItem {} {
@@ -907,22 +901,20 @@ class OscilEditor {: {public PresetsUI_}
         }
         Fl_Dial filtervalue1 {
           callback {//
-          send_data (36, o->value(), 0xd8);}
+          send_data(OSCILLATOR::control::filterParameter1, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Oscillator's filter parameter1} xywh {367 313 20 20} maximum 127 step 1
-          code0 {o->init(64);}
           class WidgetPDial
         }
         Fl_Check_Button filterpref {
           label p
           callback {//
-          send_data (38, o->value(), 0xd0);}
+          send_data(OSCILLATOR::control::filterBeforeWaveshape, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Apply the filter before the waveshaping} xywh {415 313 20 20} down_box DOWN_BOX labelsize 10 align 24
         }
         Fl_Dial filtervalue2 {
           callback {//
-          send_data (37, o->value(), 0xd8);}
+          send_data(OSCILLATOR::control::filterParameter2, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Oscillator's filter parameter2} xywh {392 313 20 20} maximum 127 step 1
-          code0 {o->init(64);}
           class WidgetPDial
         }
       }
@@ -932,7 +924,7 @@ class OscilEditor {: {public PresetsUI_}
         Fl_Choice sabutton {
           label {Sp.adj.}
           callback {//
-          send_data (45, o->value(), 0xd0);}
+          send_data(OSCILLATOR::control::spectrumAdjustType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Oscillator's spectrum adjust} xywh {634 313 60 20} down_box BORDER_BOX labelsize 10 textsize 10
         } {
           MenuItem {} {
@@ -954,9 +946,8 @@ class OscilEditor {: {public PresetsUI_}
         }
         Fl_Dial sadjpar {
           callback {//
-          send_data (44, o->value(), 0xd8);}
+          send_data(OSCILLATOR::control::spectrumAdjustParameter, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Oscillator's spectrum adjust parameter} xywh {699 313 20 20} maximum 127 step 1
-          code0 {o->init(64);}
           class WidgetPDial
         }
       }
@@ -966,19 +957,19 @@ class OscilEditor {: {public PresetsUI_}
         Fl_Counter harmonicshiftcounter {
           label {Harmonic Shift}
           callback {//
-          send_data (64, o->value(), 0xd0);}
+          send_data(OSCILLATOR::control::harmonicShift, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           xywh {670 365 55 15} type Simple labelsize 10 align 129 minimum -64 maximum 64 step 1 textfont 1 textsize 10
         }
         Fl_Check_Button harmonicshiftpre {
           label preH
           callback {//
-          send_data (66, o->value(), 0xd0);}
+          send_data(OSCILLATOR::control::shiftBeforeWaveshapeAndFilter, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Apply the harmonic shift before the waveshaping and filtering} xywh {690 383 37 20} down_box DOWN_BOX labelsize 10 align 24
         }
         Fl_Button {} {
           label R
           callback {//
-          send_data (65, o->value(), 0xd0);}
+          send_data(OSCILLATOR::control::clearHarmonicShift, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Reset harmonic shift} xywh {679 389 9 9} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labelsize 10 align 4
         }
       }
@@ -988,7 +979,7 @@ class OscilEditor {: {public PresetsUI_}
         Fl_Choice adhrtype {
           label {Adpt.Harm.}
           callback {//
-          send_data (70, o->value(), 0xd0);}
+          send_data(OSCILLATOR::control::adaptiveHarmonicsType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {The type of the addaptive harmonics} xywh {670 425 55 15} down_box BORDER_BOX labelsize 10 align 129 when 6 textsize 10
         } {
           MenuItem {} {
@@ -1031,17 +1022,15 @@ class OscilEditor {: {public PresetsUI_}
         Fl_Dial adhrpow {
           label pow
           callback {//
-          send_data (69, o->value(), 0xd8);}
+          send_data(OSCILLATOR::control::adaptiveHarmonicsPower, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Adaptive harmonics power} xywh {700 460 25 25} labelsize 10 maximum 200 step 1
-          code0 {o->init(100);}
           class WidgetPDial
         }
         Fl_Dial adhrbf {
           label baseF
           callback {//
-          send_data (68, o->value(), 0xd8);}
+          send_data(OSCILLATOR::control::adaptiveHarmonicsBase, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Adaptive harmonics base frequency} xywh {670 460 25 25} labelsize 10 maximum 255 step 1
-          code0 {o->init(128);}
           class WidgetPDial
         }
         Fl_Slider adhrpar {
@@ -1049,7 +1038,7 @@ class OscilEditor {: {public PresetsUI_}
           if (Fl::event_button() == 3)
               o->value(50);
 
-          send_data (67, o->value(), 0xd8);}
+          send_data(OSCILLATOR::control::adaptiveHarmonicsParameter, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Adaptive harmonics parameter} xywh {667 444 60 13} type {Horz Knob} box THIN_DOWN_BOX maximum 100 step 1 value 50
           class mwheel_slider_rev
         }
@@ -1060,7 +1049,7 @@ class OscilEditor {: {public PresetsUI_}
         Fl_Choice modtype {
           label {Mod.}
           callback {//
-          send_data (43, o->value(), 0xd0);}
+          send_data(OSCILLATOR::control::modulationType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip modulation xywh {470 315 50 15} down_box BORDER_BOX labelsize 10 textsize 10
         } {
           MenuItem {} {
@@ -1082,23 +1071,20 @@ class OscilEditor {: {public PresetsUI_}
         }
         Fl_Dial modpar1 {
           callback {//
-          send_data (40, o->value(), 0xd8);}
+          send_data(OSCILLATOR::control::modulationParameter1, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Oscillator's modulation parameter 1} xywh {524 314 18 18} maximum 127 step 1
-          code0 {o->init(64);}
           class WidgetPDial
         }
         Fl_Dial modpar2 {
           callback {//
-          send_data (41, o->value(), 0xd8);}
+          send_data(OSCILLATOR::control::modulationParameter2, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Oscillator's modulation parameter 2} xywh {546 314 18 18} maximum 127 step 1
-          code0 {o->init(64);}
           class WidgetPDial
         }
         Fl_Dial modpar3 {
           callback {//
-          send_data (42, o->value(), 0xd8);}
+          send_data(OSCILLATOR::control::modulationParameter3, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Oscillator's modulation parameter 3} xywh {569 314 18 18} maximum 127 step 1
-          code0 {o->init(32);}
           class WidgetPDial
         }
       }
@@ -1108,7 +1094,7 @@ class OscilEditor {: {public PresetsUI_}
         if (fl_choice("Convert to SINE?",NULL, "No","Yes") < 2)
             return;
 
-        send_data (97, o->value(), 0xd0);}
+        send_data(OSCILLATOR::control::convertToSine, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         xywh {670 525 55 15} box THIN_UP_BOX labelfont 1 labelsize 11
       }
       Fl_Button {} {
@@ -1133,16 +1119,11 @@ class OscilEditor {: {public PresetsUI_}
   }
   Function {send_data(int control, float value, int type)} {} {
     code {//
-    int insert;
-    if (control == 104)
-    {
-        insert = 0xff;
-    }
-    else
-    {
-        insert = 5;
-    }
-    collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, insert);} {}
+        int insert = TOPLEVEL::insert::oscillatorGroup;
+        if (control == PART::control::padsynthParameters)
+            insert = UNUSED;
+        type |= TOPLEVEL::type::Write;
+        collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, insert);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
@@ -1156,7 +1137,7 @@ class OscilEditor {: {public PresetsUI_}
 
     int tmp;
     bool set = true;
-    if (insert == 6)
+    if (insert == TOPLEVEL::insert::harmonicAmplitude)
     {
         h[control]->mag->value(127 - value);
         if (value == 64)
@@ -1165,7 +1146,7 @@ class OscilEditor {: {public PresetsUI_}
             h[control]->mag->selection_color(222);
     }
 
-    else if (insert == 7)
+    else if (insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     {
         h[control]->phase->value(127 - value);
         if (value == 64)
@@ -1178,29 +1159,29 @@ class OscilEditor {: {public PresetsUI_}
     {
         switch (control)
         {
-            case 0:
+            case OSCILLATOR::control::phaseRandomness:
                 rndslider->value(value);
                 break;
 
-            case 1:
+            case OSCILLATOR::control::magType:
                 magtype->value(value);;
                 break;
 
-            case 2:
+            case OSCILLATOR::control::harmonicAmplitudeRandomness:
                 hrnddial->value(value);
                 break;
 
-            case 3:
+            case OSCILLATOR::control::harmonicRandomnessType:
                 hrndtype->value(value);
                 break;
 
-            case 16:
+            case OSCILLATOR::control::baseFunctionParameter:
                 bfslider->value(value);
                 bfparval->value(value);
                 basefuncdisplaygroup->redraw();
                 break;
 
-            case 17:
+            case OSCILLATOR::control::baseFunctionType:
                 bftype->value(value);
                 if ((oscil->Pcurrentbasefunc==0)||(oscil->Pcurrentbasefunc==127))
                     basefuncmodulation->deactivate();
@@ -1209,31 +1190,31 @@ class OscilEditor {: {public PresetsUI_}
                 basefuncdisplaygroup->redraw();
                 break;
 
-            case 18:
+            case OSCILLATOR::control::baseModulationParameter1:
                 bfmodpar1->value(value);
                 basefuncdisplaygroup->redraw();
                 redrawoscil();
                 break;
 
-            case 19:
+            case OSCILLATOR::control::baseModulationParameter2:
                 bfmodpar2->value(value);
                 basefuncdisplaygroup->redraw();
                 redrawoscil();
                 break;
 
-            case 20:
+            case OSCILLATOR::control::baseModulationParameter3:
                 bfmodpar3->value(value);
                 basefuncdisplaygroup->redraw();
                 redrawoscil();
                 break;
 
-            case 21:
+            case OSCILLATOR::control::baseModulationType:
                 bfmodtype->value(value);
                 basefuncdisplaygroup->redraw();
                 redrawoscil();
                 break;
 
-            case 33:
+            case OSCILLATOR::control::useAsBaseFunction:
                 bftype->value(16);
                 tmp = (value != 0);
                 autoclearbutton->value(tmp);
@@ -1266,84 +1247,84 @@ class OscilEditor {: {public PresetsUI_}
                 basefuncdisplaygroup->redraw();
                 break;
 
-            case 34:
+            case OSCILLATOR::control::waveshapeParameter:
                 wshpar->value(value);
                 wsparval->value(value);
                 break;
 
-            case 35:
+            case OSCILLATOR::control::waveshapeType:
                 wshbutton->value(value);
                 break;
 
-            case 36:
+            case OSCILLATOR::control::filterParameter1:
                 filtervalue1->value(value);
                 break;
 
-            case 37:
+            case OSCILLATOR::control::filterParameter2:
                 filtervalue2->value(value);
                 break;
 
-            case 38:
+            case OSCILLATOR::control::filterBeforeWaveshape:
                 filterpref->value(value != 0);
                 break;
 
-            case 39:
+            case OSCILLATOR::control::filterType:
                 fltbutton->value((int)value);
                 break;
 
-            case 40:
+            case OSCILLATOR::control::modulationParameter1:
                 modpar1->value(value);
                 break;
 
-            case 41:
+            case OSCILLATOR::control::modulationParameter2:
                 modpar2->value(value);
                 break;
 
-            case 42:
+            case OSCILLATOR::control::modulationParameter3:
                 modpar3->value(value);
                 break;
 
-            case 43:
+            case OSCILLATOR::control::modulationType:
                 modtype->value((int)value);
                 break;
 
-            case 44:
+            case OSCILLATOR::control::spectrumAdjustParameter:
                 sadjpar->value(value);
                 break;
 
-            case 45:
+            case OSCILLATOR::control::spectrumAdjustType:
                 sabutton->value((int)value);
                 break;
 
-            case 64:
+            case OSCILLATOR::control::harmonicShift:
                 harmonicshiftcounter->value((int)value);
                 break;
 
-            case 65:
+            case OSCILLATOR::control::clearHarmonicShift:
                 harmonicshiftcounter->value(0);
                 break;
 
-            case 66:
+            case OSCILLATOR::control::shiftBeforeWaveshapeAndFilter:
                 harmonicshiftpre->value(value != 0);
                 break;
 
-            case 67:
+            case OSCILLATOR::control::adaptiveHarmonicsParameter:
                 adhrpar->value(value);
                 break;
 
-            case 68:
+            case OSCILLATOR::control::adaptiveHarmonicsBase:
                 adhrbf->value(value);
                 break;
 
-            case 69:
+            case OSCILLATOR::control::adaptiveHarmonicsPower:
                 adhrpow->value(value);
                 break;
 
-            case 70:
+            case OSCILLATOR::control::adaptiveHarmonicsType:
                 adhrtype->value((int)value);
                 break;
 
-            case 96:
+            case OSCILLATOR::control::clearHarmonics:
                 for (int i = 0; i < MAX_AD_HARMONICS; ++i)
                 {
                     h[i]->mag->value(64);
@@ -1355,7 +1336,7 @@ class OscilEditor {: {public PresetsUI_}
                 h[0]->mag->selection_color(222);
                 break;
 
-            case 97:
+            case OSCILLATOR::control::convertToSine:
                 basefuncdisplaygroup->redraw();
                 bftype->value(0);
                 for (int i = 0; i < MAX_AD_HARMONICS; ++i)
@@ -1450,6 +1431,22 @@ class OscilEditor {: {public PresetsUI_}
 
     basefuncdisplaygroup->redraw();
     redrawoscil();} {}
+  }
+  Function {setWindowTitle()} {} {
+    code {//
+        string tname;
+        if (engine == 2)
+            tname = "PadSynth Harmonic Content";
+        else
+        {
+            tname = "AddSynth Voice ";
+            if (engine <= PART::engine::addVoice8)
+                tname = tname + to_string((engine - PART::engine::addVoice1) + 1);
+            else
+                tname = tname + to_string((engine - PART::engine::addMod1) + 1) +  " Modulation";
+            tname += " Oscillator";
+        }
+        osceditUI->copy_label(synth->getGuiMaster()->setPartWindowTitle(tname).c_str());} {}
   }
   Function {redrawoscil()} {} {
     code {//

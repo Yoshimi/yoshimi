@@ -30,8 +30,8 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of origional ZynAddSubFX code
 
-Modified March 2018
-} {in_source in_header
+Modified August 2018
+} {selected in_source in_header
 }
 
 decl {\#include <stdlib.h>} {public local
@@ -158,9 +158,10 @@ class VirKeys {: {public Fl_Box}
         }
     }} {}
   }
-  Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff)} {} {
+  Function {send_data(int control, float value, int type, int kititem = UNUSED, int engine = UNUSED)} {} {
     code {//
-    collect_data(synth, value, (Fl::event_button() | type), control, 217, kititem, engine);} {}
+        type |= TOPLEVEL::type::Write;
+        collect_data(synth, value, (Fl::event_button() | type), control, TOPLEVEL::section::midiIn, kititem, engine);} {}
   }
   Function {handle(int event)} {return_type int
   } {
@@ -285,7 +286,7 @@ class VirKeys {: {public Fl_Box}
     {
         vel = midivel * (127.0 - rndvelocity) / 127.0 + synth->numRandom() * rndvelocity;
     }
-    send_data(0, vel, 0xc0, midich, nk + midioct * 12);} {}
+    send_data(0, vel, TOPLEVEL::type::Integer, midich, nk + midioct * 12);} {}
   }
   Function {relasekey(int nk,int type)} {} {
     code {//
@@ -297,7 +298,7 @@ class VirKeys {: {public Fl_Box}
         return;
     pressed[nk] = 0;
     damage(1);
-    send_data(1, 0, 0xc0, midich, nk + midioct * 12);} {}
+    send_data(1, 0, TOPLEVEL::type::Integer, midich, nk + midioct * 12);} {}
   }
   Function {relaseallkeys(int type)} {} {
     code {//
@@ -318,8 +319,7 @@ class VirKeys {: {public Fl_Box}
   }
 }
 
-class VirKeyboard {selected
-} {
+class VirKeyboard {} {
   Function {make_window()} {} {
     Fl_Window virkeyboardwindow {
       label {Yoshimi Virtual Keyboard}
@@ -407,7 +407,7 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         ctlval->do_callback();
         int ctl = midictl;
         virkeys->take_focus();
-        send_data(2, oldcontrol, 0xc0, virkeys->midich, ctl);}
+        send_data(2, oldcontrol, TOPLEVEL::type::Integer, virkeys->midich, ctl);}
         tooltip {Controller value} xywh {628 25 18 96} type {Vert Fill} box ENGRAVED_BOX color 229 labelsize 8 align 5 maximum 127 step 1 value 64
         code0 {o->value(127 - oldcontrol);}
         class mwheel_slider
@@ -513,11 +513,12 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
       Fl_Dial {} {
         label Vrnd
         callback {//
+        if (Fl::event_button() == 3)
+             o->value(0);
         virkeys->rndvelocity=(int) o->value();}
         tooltip {Velocity Randomness} xywh {221 106 20 21} box ROUND_UP_BOX labelsize 10 align 129 maximum 127 step 1
         code0 {o->value(virkeys->rndvelocity);}
-        code1 {o->init(0);}
-        code2 {o->setValueType(VC_percent127);}
+        code1 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
       Fl_Spinner midichannel {
@@ -540,7 +541,7 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
             o->damage();
         }
         virkeys->take_focus();
-        send_data(2, - old, 0xc0, virkeys->midich, 128)}
+        send_data(2, -old, TOPLEVEL::type::Integer, virkeys->midich, 128)}
         xywh {6 12 18 110} labelsize 8 align 1 minimum -8192 maximum 8191 step 1
         class mwheel_slider
       }
@@ -559,9 +560,10 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
     code {//
     delete virkeyboardwindow;} {}
   }
-  Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff)} {} {
+  Function {send_data(int control, float value, int type, int kititem = UNUSED, int engine = UNUSED)} {} {
     code {//
-    collect_data(synth, value, (Fl::event_button() | type), control, 217, kititem, engine);} {}
+        type |= TOPLEVEL::type::Write;
+        collect_data(synth, value, (Fl::event_button() | type), control, TOPLEVEL::section::midiIn, kititem, engine);} {}
   }
   Function {Show()} {} {
     code {//

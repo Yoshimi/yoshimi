@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified June 2018} {selected in_source in_header
+Modified August 2018} {selected in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -311,7 +311,7 @@ class MasterUI {: {private GuiUpdates}
             unsigned int forceId = 0;
             if (sId)
                 forceId = string2uint(sId);
-            send_data(104, forceId, 0xc0, 0xf0, 0xff, 0xff, 0x80);}
+            send_data(MAIN::control::startInstance, forceId, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);}
             xywh {0 0 31 21} labelsize 12
           }
           MenuItem {} {
@@ -327,7 +327,7 @@ class MasterUI {: {private GuiUpdates}
           MenuItem {} {
             label {&View Manual}
             callback {//
-            string manfile = synth->manualname();
+            /*string manfile = synth->manualname();
             unsigned int pos = manfile.rfind(".") + 1;
             int wanted = stoi(manfile.substr(pos, 3));
             int count = wanted + 1;
@@ -358,7 +358,8 @@ class MasterUI {: {private GuiUpdates}
                 fl_alert("Can't find PDF reader :(");
                 return;
             }
-            pclose(fp);
+            pclose(fp);*/
+            send_data(100, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
             return;}
             xywh {0 0 34 20} labelsize 12
           }
@@ -372,7 +373,7 @@ class MasterUI {: {private GuiUpdates}
           label {&Instruments}
           xywh {0 0 100 20} labelsize 12
           code0 {o = o; // suppress warning}
-          code1 {vector <string> listType = *synth->getHistory(1);}
+          code1 {vector <string> listType = *synth->getHistory(XML_INSTRUMENT);}
           code2 {if (listType.size() == 0) RecentInstruments->deactivate(); else RecentInstruments->activate();}
         } {
           MenuItem {} {
@@ -383,7 +384,7 @@ class MasterUI {: {private GuiUpdates}
           MenuItem {} {
             label {&Load External...}
             callback {//
-                string lastname = synth->lastItemSeen(1);
+                string lastname = synth->lastItemSeen(XML_INSTRUMENT);
                 if (lastname == "")
                     lastname = synth->getRuntime().userHome;
                 const char *filename;
@@ -412,7 +413,7 @@ class MasterUI {: {private GuiUpdates}
                 if (isRegFile(string(filename)))
                     if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                         return;
-                send_data(79, float(npartcounter->value() - 1), 0xd0, 240, 0xff, 0xff, 0x80, miscMsgPush(string(filename)));
+                send_data(MAIN::control::saveNamedInstrument, float(npartcounter->value() - 1), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(filename)));
                 return;}
             tooltip {Save current instrument to an .xi* file} xywh {20 20 100 20} labelsize 12
           }
@@ -420,14 +421,14 @@ class MasterUI {: {private GuiUpdates}
             label {&Recent Instruments...}
             callback {//
             paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
-            paramsui->Show(1);}
+            paramsui->Show(XML_INSTRUMENT);}
             xywh {10 10 34 21} labelsize 12
           }
           MenuItem {} {
             label {&Clear}
             callback {//
             if(fl_choice("Clear parameters of instrument %d ?", NULL, "No", "Yes", partui->npart + 1) > 1)
-                send_data(96,0, 0xf0, partui->npart);}
+                send_data(PART::control::defaultInstrument,0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, partui->npart);}
             xywh {35 35 100 20} labelsize 12
           }
         }
@@ -435,7 +436,7 @@ class MasterUI {: {private GuiUpdates}
           label {&Patch Sets}
           xywh {0 0 70 20} labelsize 12
           code0 {o = o; // suppress warning}
-          code1 {vector <string> listType = *synth->getHistory(2);}
+          code1 {vector <string> listType = *synth->getHistory(XML_PARAMETERS);}
           code2 {if (listType.size() == 0) RecentParams->deactivate(); else RecentParams->activate();}
         } {
           MenuItem {} {
@@ -470,7 +471,7 @@ class MasterUI {: {private GuiUpdates}
             label {&Recent Sets...}
             callback {//
             paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
-            paramsui->Show(2);}
+            paramsui->Show(XML_PARAMETERS);}
             xywh {0 0 34 21} labelsize 12
           }
         }
@@ -495,7 +496,7 @@ class MasterUI {: {private GuiUpdates}
           label {&Scales}
           tooltip {Clear all parameters to default settings} xywh {0 0 60 20} labelsize 12
           code0 {o = o; // suppress warning}
-          code1 {vector <string> listType = *synth->getHistory(3);}
+          code1 {vector <string> listType = *synth->getHistory(XML_MICROTONAL);}
           code2 {if (listType.size() == 0) RecentScale->deactivate(); else RecentScale->activate();}
         } {
           MenuItem {} {
@@ -507,7 +508,7 @@ class MasterUI {: {private GuiUpdates}
           MenuItem {} {
             label {&Load...}
             callback {//
-    string lastname = synth->lastItemSeen(3);
+    string lastname = synth->lastItemSeen(XML_MICROTONAL);
     if (lastname == "")
         lastname = synth->getRuntime().userHome;
 
@@ -519,7 +520,7 @@ class MasterUI {: {private GuiUpdates}
           MenuItem {} {
             label {&Save...}
             callback {//
-                string lastname = synth->getLastfileAdded(3);
+                string lastname = synth->getLastfileAdded(XML_MICROTONAL);
                 if (lastname == "")
                     lastname = synth->getRuntime().userHome;
 
@@ -531,14 +532,14 @@ class MasterUI {: {private GuiUpdates}
                 if (isRegFile(string(filename)))
                     if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                         return;
-                send_data(89, 0, 0xf0, 0xf0, 0xff, 0xff, 0x80, miscMsgPush(string(filename)));}
+                send_data(MAIN::control::saveNamedScale, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(filename)));}
             xywh {25 25 100 20} labelsize 12
           }
           MenuItem RecentScale {
             label {&Recent Scales...}
             callback {//
             paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
-paramsui->Show(3);}
+paramsui->Show(XML_MICROTONAL);}
             xywh {20 20 34 21} labelsize 12
           }
           MenuItem {} {
@@ -551,7 +552,7 @@ paramsui->Show(3);}
                 if (NULL != microtonalui)
                     delete microtonalui;
                 microtonalui = new MicrotonalUI(&synth->microtonal, synth);
-                send_data(96, 0, 0xd0, 0xe8);
+                send_data(SCALES::control::clearAll, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::scales);
             }}
             xywh {0 0 34 20} labelsize 12
           }
@@ -560,13 +561,13 @@ paramsui->Show(3);}
           label {S&tate}
           xywh {0 0 60 20} labelsize 12
           code0 {o = o; // suppress warning}
-          code1 {vector <string> listType = *synth->getHistory(4);}
+          code1 {vector <string> listType = *synth->getHistory(XML_STATE);}
           code2 {if (listType.size() == 0) RecentState->deactivate(); else RecentState->activate();}
         } {
           MenuItem loadState {
             label {&Load...}
             callback {// for Alessandro
-            string lastname = synth->lastItemSeen(4);
+            string lastname = synth->lastItemSeen(XML_STATE);
             if (lastname == "")
                 lastname = synth->getRuntime().userHome;
             char *fle = fl_file_chooser("Load:", "({*.state})", lastname.c_str(), 0);
@@ -582,14 +583,14 @@ paramsui->Show(3);}
           MenuItem saveState {
             label {&Save...}
             callback {// for Alessandro
-            string lastname = synth->getLastfileAdded(4);
+            string lastname = synth->getLastfileAdded(XML_STATE);
             if (lastname == "")
                 lastname = synth->getRuntime().userHome;
             char *fle = fl_file_chooser("Save:", "({*.state})",
                                             lastname.c_str(), 0);
             if (fle)
             {
-                send_data(93, 0, 0xf0, 0xf0, 0xff, 0xff, 0x80, miscMsgPush(string(fle)));
+                send_data(MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(fle)));
                 RecentState->activate();
             }}
             tooltip {Save session state} xywh {10 10 34 21} labelsize 12
@@ -600,14 +601,14 @@ paramsui->Show(3);}
                 string name = synth->getRuntime().defaultStateName;
                 if (instance > 0)
                     name += ("-" + to_string(instance));
-                send_data(93, 0, 0xf0, 0xf0, 0xff, 0xff, 0x80, miscMsgPush(name + ".state"));}
+                send_data(MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(name + ".state"));}
             tooltip {Save as default state (if load default checked)} xywh {0 0 34 21} labelsize 12
           }
           MenuItem RecentState {
             label {&Recent States...}
             callback {//
             paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
-            paramsui->Show(4);}
+            paramsui->Show(XML_STATE);}
             xywh {10 10 34 21} labelsize 12
           }
         }
@@ -619,11 +620,10 @@ paramsui->Show(3);}
         Fl_Dial globalfinedetune {
           label Detune
           callback {//
-          send_data(32, o->value(), 0xc8, 0xf0, 0xff, 0xff, 0x80);}
+          send_data(MAIN::control::detune, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);}
           tooltip {Global Fine Detune} xywh {286 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1 value 64
           code0 {o->setValueType(VC_GlobalFineDetune);}
           code1 {o->value(synth->microtonal.Pglobalfinedetune);}
-          code2 {o->init(64);}
           class WidgetPDial
         }
         Fl_Button {} {
@@ -633,26 +633,25 @@ paramsui->Show(3);}
           if (fl_choice("Set *ALL* dynamic values to their defaults?", NULL, "No", "Yes") > 1)
           {
               if(wasCtrl || (Fl::event_state(FL_CTRL) != 0))
-                  send_data(97, 0, 0xf0, 0xf0, 0xff, 0xff, 0xc0);
+                  send_data(MAIN::control::masterResetAndMlearn, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::adjustAndLoopback);
               else
-                  send_data(96, 0, 0xf0, 0xf0, 0xff, 0xff, 0xc0);}}
+                  send_data(MAIN::control::masterReset, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::adjustAndLoopback);}}
           tooltip {Clear all dynamic settings
 (+Ctrl includes MIDI-learn)} xywh {7 60 70 24} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
         }
         Fl_Button {} {
           label {Stop!}
           callback {//
-          send_data(128, 0, 0xf0);}
+          send_data(MAIN::control::stopSound, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main);}
           tooltip {Cease all sound immediately!} xywh {7 30 70 24} box PLASTIC_UP_BOX color 88 selection_color 0 labelfont 1 labelsize 11 align 16
         }
         Fl_Dial mastervolumedial {
           label Volume
           callback {//
-          send_data(0, o->value(), 0x48);}
+          send_data(MAIN::control::volume, o->value(), 0, TOPLEVEL::section::main);}
           tooltip {Master Volume} xywh {335 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_MasterVolume);}
           code1 {o->value(synth->Pvolume);}
-          code2 {o->init(90);}
           class WidgetPDial
         }
         Fl_Button {} {
@@ -698,7 +697,7 @@ paramsui->Show(3);}
           Fl_Spinner syseffnocounter {
             label Effect
             callback {//
-            send_data(0, o->value() - 1, 0xd0, 0xf1, o->value() - 1);}
+            send_data(EFFECT::sysIns::effectNumber, o->value() - 1, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::systemEffects, o->value() - 1);}
             xywh {40 126 36 20} labeltype NO_LABEL labelsize 11 align 0 maximum 4 textfont 1 textsize 11
             code0 {o->range(1, NUM_SYS_EFX);}
             code1 {o->value(nsyseff + 1);}
@@ -706,7 +705,7 @@ paramsui->Show(3);}
           Fl_Choice sysefftype {
             label Type
             callback {//
-            send_data(1, o->value(), 0xd0, 0xf1, nsyseff);}
+            send_data(EFFECT::sysIns::effectType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::systemEffects, nsyseff);}
             xywh {120 126 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 10 align 16
             code0 {o->value(synth->sysefx[nsyseff]->geteffect());}
           } {
@@ -772,7 +771,7 @@ paramsui->Show(3);}
           Fl_Spinner inseffnocounter {
             label Effect
             callback {//
-            send_data(0, o->value() - 1, 0xd0, 0xf2, o->value() - 1);}
+            send_data(EFFECT::sysIns::effectNumber, o->value() - 1, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::insertEffects, o->value() - 1);}
             xywh {40 126 36 20} labeltype NO_LABEL labelsize 11 align 20 maximum 8 textfont 1 textsize 11
             code0 {o->range(1, NUM_INS_EFX);}
             code1 {o->value(ninseff + 1);}
@@ -780,7 +779,7 @@ paramsui->Show(3);}
           Fl_Choice insefftype {
             label Type
             callback {//
-            send_data(1, o->value(), 0xd0, 0xf2, ninseff);}
+            send_data(EFFECT::sysIns::effectType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::insertEffects, ninseff);}
             xywh {120 126 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 0 textsize 12
             code0 {o->value(synth->insefx[ninseff]->geteffect());}
             code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
@@ -825,7 +824,7 @@ paramsui->Show(3);}
           Fl_Choice inseffpart {
             label {To }
             callback {//
-            send_data(2, o->value() - 2, 0xd0, 0xf2, ninseff);}
+            send_data(EFFECT::sysIns::effectDestination, o->value() - 2, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::insertEffects, ninseff);}
             xywh {242 126 96 20} down_box BORDER_BOX labelfont 1 labelsize 10 textfont 1 textsize 11
             code0 {setinspartlist();}
             code3 {o->value(synth->Pinsparts[ninseff]+2);}
@@ -849,7 +848,7 @@ paramsui->Show(3);}
       } {
         Fl_Group syseffectui {
           xywh {3 158 384 95} labeltype NO_LABEL
-          code0 {o->init(synth->sysefx[nsyseff], 0xf1, nsyseff);o->activate();o->show();}
+          code0 {o->init(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);o->activate();o->show();}
           class EffUI
         } {}
       }
@@ -859,7 +858,7 @@ paramsui->Show(3);}
       } {
         Fl_Group inseffectui {
           xywh {3 158 379 95} color 52
-          code0 {o->init(synth->insefx[ninseff], 0xf2, ninseff);o->hide();}
+          code0 {o->init(synth->insefx[ninseff], TOPLEVEL::section::insertEffects, ninseff);o->hide();}
           code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
           class EffUI
         } {}
@@ -887,7 +886,7 @@ paramsui->Show(3);}
       Fl_Spinner masterkeyshift {
         label {Key Shift}
         callback {//
-        send_data(35, o->value(), 0xc0, 0xf0, 0xff, 0xff, 0x80);}
+        send_data(MAIN::control::keyShift, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);}
         tooltip {Shift pitch +/- N semitones} xywh {336 88 38 20} labelsize 10 minimum -36 maximum 36 textsize 10
         code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
         code1 {o->value(synth->Pkeyshift - 64);}
@@ -896,7 +895,7 @@ paramsui->Show(3);}
         label Part
         callback {//
         int nval = o->value() - 1;
-        send_data(14, nval, 0xf0, 0xf0);}
+        send_data(MAIN::control::partNumber, nval, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main);}
         xywh {36 264 40 20} labelsize 11 when 6 minimum 0 maximum 127 textsize 11
         code0 {o->range(1.0, partmax);}
         code1 {o->value(synth->getRuntime().currentPart + 1);}
@@ -919,7 +918,7 @@ paramsui->Show(3);}
         updatepanel();
         setinspartlist();
         vectorui->checkParts(tmp);
-        send_data(15, tmp, 0xc0);}
+        send_data(MAIN::control::availableParts, tmp, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
         tooltip {Set the number of available parts} xywh {93 264 40 20} labelsize 11 minimum 16 maximum 64 step 16 value 16 textsize 11
         code0 {o->value(partmax);}
       }
@@ -1114,14 +1113,14 @@ ZynAddSubFX}
         }
         else
         {
-            send_data(49, CSspinner->value(), 0xf0);
+            send_data(MAIN::control::soloCC, CSspinner->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main);
         }}
         tooltip {Click to set} xywh {276 651 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
       }
       Fl_Choice channelswitch {
         label Solo
         callback {//
-                send_data(48, o->value(), 0xf0);}
+                send_data(MAIN::control::soloType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main);}
         tooltip {Assign groups of parts to Ch 1, singly enabled by MIDI} xywh {125 650 74 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
         code1 {o->value(synth->getRuntime().channelSwitchType);}
         code2 {if (o->value() == 0) CSspinner->hide(); else CSspinner->show();}
@@ -1166,28 +1165,27 @@ ZynAddSubFX}
       Fl_Button cancel {
         label Cancel
         callback {//
-        send_data(255, 0, 3);
+        send_data(MIDILEARN::control::cancelLearn, 0, 3, TOPLEVEL::section::midiLearn);
         o->hide();}
         xywh {130 60 70 20} hide
       }
     }
   }
-  Function {send_data(int control, float value, int type, int part = 0xff, int engine = 0xff, int insert = 0xff, int parameter = 0xff, int par2 = 0xff)} {} {
+  Function {send_data(int control, float value, int type, int part = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED)} {} {
     code {//
-    if (parameter == 0)
-    {
-        collect_data(synth, 0, (Fl::event_button() | type), control, part, 0xff, 0xff, 0xff, 0xff, par2);
-        return;
-    }
-    if (part == 0xff)
-        part = 0xf0;
+        type |= TOPLEVEL::type::Write;
+        if (parameter == 0)
+        {
+            collect_data(synth, 0, (Fl::event_button() | type), control, part, UNUSED, UNUSED, UNUSED, UNUSED, par2);
+            return;
+        }
 
-    collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, engine, insert, parameter, par2);} {}
+        collect_data(synth, value, (Fl::event_button() | type), control, part, UNUSED, engine, insert, parameter, par2);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
-    bool wasFromHere = getData->data.type & 0x20;
+    bool wasFromHere = getData->data.type & TOPLEVEL::source::GUI;
     unsigned char control = getData->data.control;
     unsigned char newpart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -1200,15 +1198,15 @@ ZynAddSubFX}
     bool isSingle = kititem >= 0x40;
     int mask = NUM_MIDI_CHANNELS - 1;
 
-    if (newpart == 0xd9)
+    if (newpart == TOPLEVEL::section::midiIn)
     {
-        if (engine == 7 && partui->part->ctl->volume.receive == 0)
-            return; // MIDI volume disabled
-        if (engine == 11 && partui->part->ctl->expression.receive == 0)
-            return; // MIDI expression disabled
+        if (engine == MIDI::function::volume && partui->part->ctl->volume.receive == 0)
+            return; // disabled
+        if (engine == MIDI::function::expression && partui->part->ctl->expression.receive == 0)
+            return; // disabled
 
         float vol = (value * synth->part[npart]->ctl->volume.data) / 127;
-        if (control == 2)
+        if (control == MIDI::control::controller)
         { // panel entries only
             for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
             {
@@ -1219,9 +1217,9 @@ ZynAddSubFX}
                                  && (chan / NUM_MIDI_CHANNELS) == (panelgroup / NUM_MIDI_CHANNELS))
                          || (!isSingle && panellistitem[i]->partrcv->value() == (chan & mask)))
                     {
-                        if (engine == 7)
+                        if (engine == MIDI::function::volume)
                             panellistitem[i]->partvolume->value(vol);
-                        else if (engine == 10)
+                        else if (engine == MIDI::function::panning)
                             panellistitem[i]->partpanning->value(value);
                     }
                 }
@@ -1232,10 +1230,10 @@ ZynAddSubFX}
              || (!isSingle &&  (partui->midich->value() == (chan & mask) + 1));// && partui->partGroupEnable->value() != 0);
         switch(control)
         {
-            case 0:
-            case 1:
+            case MIDI::control::noteOn:
+            case MIDI::control::noteOff:
                 break;
-            case 2:
+            case MIDI::control::controller:
                 //cout << " Value " << value_int << "  kit " << int(kititem) << "  npart " << int(npart) << endl;
                 if(engine <= 119 && engine == synth->getRuntime().channelSwitchCC)
                 { // it's a valid channel switch
@@ -1282,19 +1280,19 @@ ZynAddSubFX}
                 {
                     switch(engine)
                     {
-                        case 1: // modulation
+                        case MIDI::function::modulation:
                             partui->modulation->value(value);
                             break;
-                        case 7: // volume
+                        case MIDI::function::volume:
                             partui->partvol->value(vol);
                             break;
-                        case 10: // panning
+                        case MIDI::function::panning:
                             partui->partpan->value(value);
                             break;
-                        case 11: // expression
+                        case MIDI::function::expression:
                             partui->expression->value(value);
                             break;
-                        case 68: // legato switch
+                        case MIDI::function::legato:
                         {
                             int mode = synth->ReadPartKeyMode(npart);
                             partui->legatoMode->labelcolor(FL_BLACK);
@@ -1309,28 +1307,28 @@ ZynAddSubFX}
                             //partui->keymode->damage(1);
                             break;
                         }
-                        case 71: // filter Q
+                        case MIDI::function::filterQ:
                             partui->filterq->value(value);
                             break;
-                        case 74: // filter cutoff
+                        case MIDI::function::filterCutoff:
                             partui->filtercutoff->value(value);
                             break;
-                        case 75: // bandwidth
+                        case MIDI::function::bandwidth:
                             partui->masterbandwidth->value(value);
                             break;
                     }
                 }
                 break;
-            case 8: // load instrument
-                if (insert < 255)
+            case MIDI::control::programChange:
+                if (insert != UNUSED)
                 {
                     ;// updateBankRootDirs() // apparently not needed!
                 }
-                if (engine < 255)
+                if (engine != UNUSED)
                     bankui->readbankcfg();
-                if (insert < 255 || engine < 255)
+                if (insert != UNUSED || engine != UNUSED)
                     bankui->rescan_for_banks(false);
-                if (value_int < 255 || par2 < 255)
+                if (value_int != UNUSED || par2 != UNUSED)
                 {
                     updatepartprogram(kititem);
                     RecentInstruments->activate();
@@ -1338,42 +1336,42 @@ ZynAddSubFX}
         }
         return;
     }
-    if (newpart == 0xf1)
+    if (newpart == TOPLEVEL::section::systemEffects)
     {
-        if (insert == 16)
+        if (insert == TOPLEVEL::insert::systemEffectSend)
         {
-            if (!wasFromHere)
+            if (true)//!wasFromHere) // TODO to sort this properly
                 syseffsend[engine][control]->value(value);
         }
         else
         {
-            if (control == 0)
+            if (control == EFFECT::sysIns::effectNumber)
             {
                 syseffnocounter->value(engine + 1);
                 nsyseff = engine;
                 sysefftype->value(synth->sysefx[nsyseff]->geteffect());
-                syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff);
+                syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
             }
-            else if (control == 1)
+            else if (control == EFFECT::sysIns::effectType)
             {
                 syseffnocounter->value(engine + 1);
                 nsyseff = engine;
                 sysefftype->value(value_int);
-                syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff);
+                syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
                 showSysEfxUI();
             }
         }
         return;
     }
-    else if (newpart == 0xf2)
+    else if (newpart == TOPLEVEL::section::insertEffects)
     {
-        if (control == 0)
+        if (control == EFFECT::sysIns::effectNumber)
         {
             ninseff = engine;
             setInsEff(ninseff);
             showInsEfxUI();
         }
-        else if (control == 1)
+        else if (control == EFFECT::sysIns::effectType)
         {
             inseffnocounter->value(engine + 1);
             ninseff = engine;
@@ -1381,7 +1379,7 @@ ZynAddSubFX}
             setInsEff(ninseff);
             showInsEfxUI();
         }
-        else if (control == 2)
+        else if (control == EFFECT::sysIns::effectDestination)
         {
             inseffpart->value(value_int + 2);
             if (value_int == -1)
@@ -1398,11 +1396,11 @@ ZynAddSubFX}
     string name;
     switch(control)
     {
-        case 0:
+        case MAIN::control::volume:
             mastervolumedial->value(value);
             break;
 
-        case 14:
+        case MAIN::control::partNumber:
             partuigroup->remove(partui);
             delete partui;
             partui = new PartUI(0, 0, 765, 525);
@@ -1410,6 +1408,7 @@ ZynAddSubFX}
             partui->init(synth->part[value_int], value_int, bankui);
             partui->redraw();
             partui->npart = value_int;
+            activePart = value_int;
             npartcounter->value(value_int + 1);
             npartcounter->redraw();
             updatepanel();
@@ -1420,7 +1419,7 @@ ZynAddSubFX}
             }
             break;
 
-        case 15:
+        case MAIN::control::availableParts:
             partmax = value_int;
             npartcounter->range(1, partmax);
             updatepart();
@@ -1429,15 +1428,15 @@ ZynAddSubFX}
             vectorui->checkParts(value_int);
             break;
 
-        case 32:
+        case MAIN::control::detune:
             globalfinedetune->value(value);
             break;
 
-        case 35:
+        case MAIN::control::keyShift:
             masterkeyshift->value(value_int);
             break;
 
-        case 48:
+        case MAIN::control::soloType:
             channelswitch->value(value_int);
             if (value_int == 0)
             {
@@ -1464,15 +1463,15 @@ ZynAddSubFX}
             }
             panelwindow->changed();
             break;
-        case 49:
+        case MAIN::control::soloCC:
             updatepanel();
             break;
-        case 59:
+        case MAIN::control::exportBank:
             name = miscMsgPop(par2);
             if (wasFromHere)
                 fl_alert("%s",name.c_str());
             break;
-        case 60: // import bank
+        case MAIN::control::importBank: // import bank
             name = miscMsgPop(par2);
             if (wasFromHere)
             {
@@ -1490,7 +1489,7 @@ ZynAddSubFX}
             }
             bankui->rescan_for_banks(false);
             break;
-        case 61: // delete bank and contents
+        case MAIN::control::deleteBank: // delete bank and contents
             name = miscMsgPop(par2);
             if (name.find("FAILED") == 1)
             {
@@ -1500,17 +1499,17 @@ ZynAddSubFX}
             bankui->rescan_for_banks(false);
             bankui->set_bank_slot();
             break;
-        case 73: // set current root and/or bank
-            if (kititem < 255)
+        case MAIN::control::setCurrentRootBank: // set current root and/or bank
+            if (kititem != UNUSED)
             {
                 ; // do both
             }
-            else if (engine < 255)
+            else if (engine != UNUSED)
             {
                 ; // just bank
             }
             break;
-        case 75: // save instrument to bank
+        case MAIN::control::saveInstrument: // save instrument to bank
             name = miscMsgPop(par2);
             if (npart == parameter)
                 partui->setinstrumentlabel();
@@ -1519,7 +1518,7 @@ ZynAddSubFX}
             if (kititem == synth->ReadBankRoot() && engine == synth->ReadBank())
                 bankui->refreshbankslot(insert);
         break;
-        case 78: // load instrument
+        case MAIN::control::loadNamedInstrument: // load instrument
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
@@ -1529,7 +1528,7 @@ ZynAddSubFX}
                 RecentInstruments->activate();
             break;
 
-        case 79: // save instrument
+        case MAIN::control::saveNamedInstrument: // save instrument
             name = miscMsgPop(par2);
             if (name.find("FAILED") == 1)
             {
@@ -1544,7 +1543,7 @@ ZynAddSubFX}
             }
             break;
 
-        case 80: // load patchset
+        case MAIN::control::loadNamedPatchset: // load patchset
             name = miscMsgPop(par2);
             if (name.find("FAILED") == 1)
             {
@@ -1561,7 +1560,7 @@ ZynAddSubFX}
 
             break;
 
-        case 81: // save patch set
+        case MAIN::control::saveNamedPatchset: // save patch set
             name = miscMsgPop(par2);
             if (name.find("FAILED") == 1)
             {
@@ -1576,7 +1575,7 @@ ZynAddSubFX}
             }
             break;
 
-        case 84: // load vector
+        case MAIN::control::loadNamedVector: // load vector
             name = miscMsgPop(par2);
             if (name.find("FAILED") == 1)
             {
@@ -1592,7 +1591,7 @@ ZynAddSubFX}
             }
             break;
 
-        case 85: // save vector
+        case MAIN::control::saveNamedVector: // save vector
             name = miscMsgPop(par2);
             if (name.find("FAILED") == 1)
             {
@@ -1606,7 +1605,7 @@ ZynAddSubFX}
             }
             break;
 
-        case 88: // load scales
+        case MAIN::control::loadNamedScale: // load scales
             name = miscMsgPop(par2);
             if (name.find("FAILED") == 1)
             {
@@ -1621,7 +1620,7 @@ ZynAddSubFX}
             }
             break;
 
-        case 89: // save scales
+        case MAIN::control::saveNamedScale: // save scales
             name = miscMsgPop(par2);
             if (wasFromHere && name.find("FAILED") == 1)
                 fl_alert("%s",name.c_str());
@@ -1629,7 +1628,7 @@ ZynAddSubFX}
                 RecentScale->activate();
             break;
 
-        case 92: // load state
+        case MAIN::control::loadNamedState: // load state
             name = miscMsgPop(par2);
             if (wasFromHere && name.find("FAILED") == 1)
             {
@@ -1643,7 +1642,7 @@ ZynAddSubFX}
             }
             break;
 
-        case 93: // save state
+        case MAIN::control::saveNamedState: // save state
             name = miscMsgPop(par2);
             if (wasFromHere && name.find("FAILED") == 1)
                 fl_alert("%s",name.c_str());
@@ -1651,19 +1650,19 @@ ZynAddSubFX}
                 setMasterLabel(findleafname(name) + " - State");
             break;
 
-        case 96:
-            if (newpart == 240)
+        case MAIN::control::masterReset:
+            if (newpart == TOPLEVEL::section::main)
             {
                 refresh_master_ui(1);
                 vumeter->init(-1, synth);
                 resetPartsClip();
             }
-            else if (newpart < 64)
+            else if (newpart < NUM_MIDI_PARTS)
                 partNew(newpart);
             setMasterLabel("");
             break;
 
-        case 97:
+        case MAIN::control::masterResetAndMlearn:
             refresh_master_ui(1);
             resetPartsClip();
             if (midilearnui)
@@ -1671,10 +1670,15 @@ ZynAddSubFX}
             setMasterLabel("");
             break;
 
-        case 104: // new instance (do nothing here)
+        case MAIN::control::openManualPDF:
+            if (par2 != NO_MSG)
+                fl_alert("%s", miscMsgPop(par2).c_str());
             break;
 
-        case 128:
+        case MAIN::control::startInstance: // new instance (do nothing here)
+            break;
+
+        case MAIN::control::stopSound:
             virkeyboard->relaseallkeys();
             vumeter->init(-1, synth);
             resetPartsClip();
@@ -1863,7 +1867,7 @@ ZynAddSubFX}
             inseffectui->deactivate();
         }
         insefftype->value(synth->insefx[ninseff]->geteffect());
-        inseffectui->refresh(synth->insefx[ninseff], 0xf2, ninseff);
+        inseffectui->refresh(synth->insefx[ninseff], TOPLEVEL::section::insertEffects, ninseff);
     }
     else
     {
@@ -1871,7 +1875,7 @@ ZynAddSubFX}
         sysinsgroup->value(SystemEffectsGrp);
         syseffnocounter->value(nsyseff + 1);
         sysefftype->value(synth->sysefx[nsyseff]->geteffect());
-        syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff);
+        syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
         showSysEfxUI();
     }} {}
   }
@@ -1901,7 +1905,7 @@ ZynAddSubFX}
   }
   Function {do_load_scale(string fname)} {} {
     code {//
-    send_data(88, 0, 0xf0, 0xf0, 0xff, 0xff, 0x80, miscMsgPush(fname));} {}
+    send_data(MAIN::control::loadNamedScale, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(fname));} {}
   }
   Function {do_load_instrument(string fname)} {} {
     code {//
@@ -1914,12 +1918,12 @@ ZynAddSubFX}
     }
     partui->partGroupEnable->value(0);
     partui->partgroup->deactivate();
-    send_data(78, npart, 0xf0, 0xf0, 0xff, 0xff, 0xff, miscMsgPush(fname));} {}
+    send_data(MAIN::control::loadNamedInstrument, npart, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, miscMsgPush(fname));} {}
   }
   Function {do_load_master(const char* file)} {} {
     code {//
     const char *fname;
-    string lastname = synth->lastItemSeen(2);
+    string lastname = synth->lastItemSeen(XML_PARAMETERS);
     if (lastname == "")
         lastname = synth->getRuntime().userHome;
     if (NULL != file)
@@ -1930,12 +1934,12 @@ ZynAddSubFX}
         if (fname == NULL)
             return;
     }
-    send_data(80, 0, 0xf0, 240, 255, 255, 192, miscMsgPush(fname));} {}
+    send_data(MAIN::control::loadNamedPatchset, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::adjustAndLoopback, miscMsgPush(fname));} {}
   }
   Function {do_save_master(const char* file = NULL)} {} {
     code {//
     const char *fname;
-    string lastname = synth->getLastfileAdded(2);
+    string lastname = synth->getLastfileAdded(XML_PARAMETERS);
     if (lastname == "")
         lastname = synth->getRuntime().userHome;
     bool result = false;
@@ -1957,7 +1961,7 @@ ZynAddSubFX}
     else
         fname = file;
     // RecentScale->activate();
-    send_data(81, 0, 0xf0, 240, 255, 255, 128, miscMsgPush(string(fname)));} {}
+    send_data(MAIN::control::saveNamedPatchset, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(fname)));} {}
   }
   Function {refresh_master_ui(int type)} {} {
     code {//
@@ -1974,7 +1978,7 @@ ZynAddSubFX}
     nsyseff = 0;
     syseffnocounter->value(nsyseff + 1);
     sysefftype->value(synth->sysefx[nsyseff]->geteffect());
-    syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff);
+    syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
 
     ninseff = 0;
     inseffnocounter->value(nsyseff + 1);
@@ -1988,7 +1992,7 @@ ZynAddSubFX}
     globalfinedetune->value(synth->microtonal.Pglobalfinedetune);
     microtonalui = new MicrotonalUI(&synth->microtonal, synth);
     if (type & 0x80)
-        setMasterLabel(miscMsgPop((type >> 8) & 0xff));
+        setMasterLabel(miscMsgPop((type >> 8) & UNUSED));
     updatesendwindow();
     updatepanel(type > 0);
     if (type != 5)
@@ -2094,7 +2098,7 @@ ZynAddSubFX}
     int ninseff = effnum;
     insefftype->value(synth->insefx[ninseff]->geteffect());
     inseffpart->value(synth->Pinsparts[ninseff] + 2);
-    inseffectui->refresh(synth->insefx[ninseff], 0xf2, ninseff);
+    inseffectui->refresh(synth->insefx[ninseff], TOPLEVEL::section::insertEffects, ninseff);
     if (synth->Pinsparts[ninseff] != -1)
     {
         insefftype->activate();
@@ -2110,7 +2114,7 @@ ZynAddSubFX}
   }
   Function {setState(string filename)} {} {
     code {//
-    send_data(92, 0, 0xf0, 0xf0, 0xff, 0xff, 0xc0, miscMsgPush(filename));} {}
+    send_data(MAIN::control::loadNamedState, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::adjustAndLoopback, miscMsgPush(filename));} {}
   }
   Function {setPartWindowTitle(string prefix)} {return_type string
   } {
@@ -2532,6 +2536,8 @@ ZynAddSubFX}
   decl {int ninseff;} {public local
   }
   decl {int npart;} {public local
+  }
+  decl {int activePart;} {public local
   }
   decl {int nsyseff;} {private local
   }

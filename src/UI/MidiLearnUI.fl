@@ -24,7 +24,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-Modified January 2018
+Modified August 2018
 } {selected in_source in_header
 }
 
@@ -67,7 +67,7 @@ class MidiLearnKitItem {: {public Fl_Group}
         xywh {56 -4 745 23} box FLAT_BOX
       } {
         Fl_Spinner CCcounter {
-          callback {send_data(16);}
+          callback {send_data(MIDILEARN::control::CCorChannel);}
           tooltip {Continuous Controller to recognise} xywh {80 0 43 15} labelsize 12 minimum 0 maximum 129 value 14 textsize 12
         }
         Fl_Button {} {
@@ -79,7 +79,7 @@ class MidiLearnKitItem {: {public Fl_Group}
           tooltip {NRPN value} xywh {76 0 49 15} box THIN_DOWN_BOX down_box THIN_DOWN_BOX color 247 selection_color 7 labelsize 12 hide
         }
         Fl_Light_Button sevenbit {
-          callback {send_data(4);}
+          callback {send_data(MIDILEARN::control::sevenBit);}
           tooltip {Set for 7bit NRPN} xywh {59 0 13 15} box NO_BOX color 28 selection_color 1 hide
         }
         Fl_Choice channelchoice {
@@ -157,12 +157,12 @@ class MidiLearnKitItem {: {public Fl_Group}
         }
         Fl_Check_Button compresscheck {
           callback {//
-          send_data(1);}
+          send_data(MIDILEARN::control::limit);}
           tooltip {Limit or compress incoming value} xywh {324 0 15 15} down_box DOWN_BOX labelfont 1 align 4
         }
         Fl_Check_Button blockcheck {
           callback {//
-          send_data(0);}
+          send_data(MIDILEARN::control::block);}
           tooltip {Stop any later lines (or system controls) responding to this CC/Channel pair} xywh {360 0 20 15} down_box DOWN_BOX labelfont 1 align 4
         }
         Fl_Light_Button activity {
@@ -174,7 +174,7 @@ class MidiLearnKitItem {: {public Fl_Group}
           xywh {180 0 13 15} box NO_BOX color 15 selection_color 2
         }
         Fl_Spinner minval {
-          callback {send_data(5);}
+          callback {send_data(MIDILEARN::control::minimum);}
           tooltip {Minimum % to pass on} xywh {197 0 52 15} type Float labelsize 12 minimum 0 step 0.5 value 0 textsize 12
         }
         Fl_Button {} {
@@ -183,7 +183,7 @@ class MidiLearnKitItem {: {public Fl_Group}
         }
         Fl_Spinner maxval {
           callback {//
-          send_data(6);}
+          send_data(MIDILEARN::control::maximum);}
           tooltip {Maximim % to pass on} xywh {261 0 52 15} type Float labelsize 12 minimum 0 step 0.5 value 100 textsize 12
         }
         Fl_Button {} {
@@ -193,7 +193,7 @@ class MidiLearnKitItem {: {public Fl_Group}
         Fl_Button commandName {
           label text
           callback {//
-          send_data(8);}
+          send_data(MIDILEARN::control::deleteLine);}
           tooltip {To delete, hold CTRL and click here.} xywh {395 0 400 15} box THIN_DOWN_BOX color 247 selection_color 247 labelfont 1 labelsize 10 align 64
         }
       }
@@ -203,7 +203,7 @@ class MidiLearnKitItem {: {public Fl_Group}
             midilearnkititemgroup->deactivate();
         else
             midilearnkititemgroup->activate();
-        send_data(2);}
+        send_data(MIDILEARN::control::mute);}
         tooltip {Completely ignore this line} xywh {39 0 21 15} down_box DOWN_BOX labelfont 1 labelsize 13 align 4
         code0 {o->copy_label(to_string(n + 1).c_str());}
       }
@@ -213,48 +213,49 @@ class MidiLearnKitItem {: {public Fl_Group}
     code {//
     bool doit = true;
     int type = 0;
-    int CC = 0xff;
-    int chan = 0xff;
-    int min = 0xff;
-    int max = 0xff;
+    int CC = UNUSED;
+    int chan = UNUSED;
+    int min = UNUSED;
+    int max = UNUSED;
     switch (control)
     {
-        case 0:
+        case MIDILEARN::control::block:
             if (blockcheck->value() != 0)
                 type = 1;
             break;
-        case 1:
+        case MIDILEARN::control::limit:
             if (compresscheck->value() != 0)
                 type = 2;
             break;
-        case 2:
+        case MIDILEARN::control::mute:
             if (mutecheck->value() != 0)
                 type = 4;
             break;
-        case 4:
+        case MIDILEARN::control::sevenBit:
             if (sevenbit->value() != 0)
                type = 16;
             break;
-        case 5:
+        case MIDILEARN::control::minimum:
             min = lrint(minval->value() * 2.0f);
             break;
-        case 6:
+        case MIDILEARN::control::maximum:
             max = lrint(maxval->value() * 2.0f);
             break;
-        case 8:
+        case MIDILEARN::control::deleteLine:
             doit = (Fl::event_state(FL_CTRL) != 0);
             if (doit)
                 doit = (fl_choice("Remove line. %d %s?", NULL, "No", "Yes", n + 1, commandName->label()) > 1);
             break;
-        case 16:
+        case MIDILEARN::control::CCorChannel:
             CC = lrint(CCcounter->value());
             break;
-        case 48: // gets changed to 16
+        case 48:
             chan = lrint(channelchoice->value());
+            control = MIDILEARN::control::CCorChannel;
             break;
     }
     if (doit)
-        collect_data(synth, n, type, control & 0x1f, 216, CC, chan, min, max, 0);} {}
+        collect_data(synth, n, type, control, TOPLEVEL::section::midiLearn, CC, chan, min, max, 0);} {}
   }
   Function {MidiLearnKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {n=0;} {}
@@ -290,7 +291,7 @@ class MidiLearnUI {: {private MiscFuncs}
       tooltip {Editor for all learned controllers.
 CTRL-right click on any knob/slider to learn.
 Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {7 694 820 285} type Double hide
-      code0 {//send_data(22, 0, 3); // why were we doing this? it's wrong!}
+      code0 {//send_data(MIDILEARN::control::sendRefreshRequest, 0, 3); // why were we doing this? it's wrong!}
     } {
       Fl_Scroll kitlist {
         tooltip {Editor for all learned controllers.
@@ -341,7 +342,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
       Fl_Button load {
         label Load
         callback {//
-        string lastname = synth->lastItemSeen(6);
+        string lastname = synth->lastItemSeen(XML_MIDILEARN);
         if (lastname == "")
             lastname = synth->getRuntime().userHome;
         char *filename;
@@ -354,14 +355,14 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
       Fl_Button save {
         label Save
         callback {//
-        string lastname = synth->getLastfileAdded(6);
+        string lastname = synth->getLastfileAdded(XML_MIDILEARN);
         if (lastname == "")
             lastname = synth->getRuntime().userHome;
         char *filename;
         filename = fl_file_chooser("Load:", "({*.xly})", lastname.c_str(), 0);
         if (filename == NULL)
             return;
-        send_data(245, 0, 0, 0, 0, 0, 0, miscMsgPush((string) filename));
+        send_data(MIDILEARN::control::saveList, 0, 0, 0, 0, 0, 0, miscMsgPush((string) filename));
         recent->activate();
         setWindowTitle(findleafname(filename));}
         tooltip {Save complete learned list} xywh {130 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 deactivate
@@ -372,7 +373,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         if (fl_choice("Remove all entries", NULL, "No", "Yes") < 2)
             return;
 
-        send_data(96,0,0);
+        send_data(MIDILEARN::control::clearAll,0,0);
         o->deactivate();
         setWindowTitle();}
         tooltip {Remove all entries} xywh {330 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 deactivate
@@ -381,16 +382,16 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         label Recent
         callback {//
         synth->getGuiMaster()->paramsui->Recent->position(midilearnwindow->x() + recent->x() - 80, midilearnwindow->y() + recent->y() - 187);
-        synth->getGuiMaster()->paramsui->Show(6);}
+        synth->getGuiMaster()->paramsui->Show(XML_MIDILEARN);}
         tooltip {Load from recently seen list} xywh {230 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12
-        code0 {vector<string> &listType = *synth->getHistory(6);}
+        code0 {vector<string> &listType = *synth->getHistory(XML_MIDILEARN);}
         code1 {if (listType.size() == 0) o->deactivate(); else o->activate();}
       }
     }
   }
-  Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff, int insert = 0xff, int parameter = 0xff, int par2 = 0xff)} {} {
+  Function {send_data(int control, float value, int type, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED)} {} {
     code {//
-    collect_data(synth, value, type, control, 216, kititem, engine, insert, parameter, par2);} {}
+    collect_data(synth, value, type, control, TOPLEVEL::section::midiLearn, kititem, engine, insert, parameter, par2);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
@@ -408,10 +409,10 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
     unsigned int IDnew;
     switch(control)
     {
-        case 0:
+        case MIDILEARN::control::block:
             break;
-        case 7:
-            if(type < 255) // edit line in place
+        case MIDILEARN::control::ignoreMove:
+            if(type != UNUSED) // edit line in place
             {
                 midilearnkititem[value]->blockcheck->value((type & 1) != 0);
                 midilearnkititem[value]->compresscheck->value((type & 2) != 0);
@@ -422,16 +423,16 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
                 else
                     midilearnkititem[value]->midilearnkititemgroup->activate();
             }
-            if (kititem < 255)
+            if (kititem != UNUSED)
                 midilearnkititem[value]->CCcounter->value(kititem);
-            if (engine < 255)
+            if (engine != UNUSED)
                 midilearnkititem[value]->channelchoice->value(engine);
-            if (insert < 255)
+            if (insert != UNUSED)
                 midilearnkititem[value]->minval->value(insert / 2.0f);
-            if (parameter < 255)
+            if (parameter != UNUSED)
                 midilearnkititem[value]->maxval->value(parameter / 2.0f);
             break;
-        case 9: // set NRPN fixed value in place
+        case MIDILEARN::control::nrpnDetected: // set NRPN fixed value in place
             nrpnTot = (int(engine) << 8) + (int(kititem));
             /* These were stored 8 bit values so must be joined then
              * split as two 7 bit values to give NRPN msb and lsb
@@ -443,28 +444,28 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
             midilearnkititem[value]->nrpn->show();
             midilearnkititem[value]->sevenbit->show();
             break;
-        case 16:
+        case MIDILEARN::control::CCorChannel:
             addLine(getData);
             break;
-        case 20: // not using this yet
+        case MIDILEARN::control::findSize: // not using this yet
             break;
-        case 21:
+        case MIDILEARN::control::sendLearnMessage:
             synth->getGuiMaster()->words->copy_label(miscMsgPop(par2).c_str());
             synth->getGuiMaster()->cancel->show();
             synth->getGuiMaster()->message->position(Fl::event_x_root() + 16, Fl::event_y_root());
             synth->getGuiMaster()->message->show();
             break;
-        case 22:
+        case MIDILEARN::control::sendRefreshRequest:
             midilearnwindow->show();
             break;
-        case 24: // flash LED
+        case MIDILEARN::control::reportActivity: // flash LED
             IDold = kititem | (engine << 8);
             for(int i = 0; i < MIDI_LEARN_BLOCK; ++ i)
             {
                 if (midilearnkititem[i] != NULL && midilearnkititem[i]->mutecheck->value() == 0)
                 {
                     unsigned char newchan = midilearnkititem[i]->channelchoice->value();
-                    if (newchan == 16) // all of them
+                    if (newchan == NUM_MIDI_CHANNELS) // all of them
                         newchan = engine; // force it to match
                     IDnew = (unsigned int)midilearnkititem[i]->CCcounter->value() | (newchan << 8);
                     if (IDold == IDnew && (type & 0x10) == (midilearnkititem[i]->stat & 0x10))
@@ -476,10 +477,10 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
                 }
             }
             break;
-        case 96:
+        case MIDILEARN::control::clearAll:
             clearAll(value == 0);
             break;
-        case 255:
+        case MIDILEARN::control::cancelLearn:
             synth->getGuiMaster()->cancel->hide();
             synth->getGuiMaster()->words->copy_label("Learn cancelled");
             synth->getGuiMaster()->message->show();
@@ -550,7 +551,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
   }
   Function {loadMidi(string file)} {} {
     code {//
-    send_data(241, 0, 0, 0, 0, 0, 0, miscMsgPush((string) file));
+    send_data(MIDILEARN::control::loadList, 0, 0, 0, 0, 0, 0, miscMsgPush((string) file));
     recent->activate();
     setWindowTitle(findleafname(file));} {}
   }

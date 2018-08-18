@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified April 2018} {selected in_source in_header
+Modified August 2018} {selected in_source in_header
 }
 
 decl {\#include <FL/Fl_File_Chooser.H>} {public local
@@ -72,7 +72,7 @@ class MicrotonalUI {: {private MiscFuncs}
         }
         Fl_Check_Button invertKeys {
           callback {//
-          send_data(2, o->value(), 0xd8);}
+          send_data(SCALES::control::invertScale, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Turn upside-down the note frequencies} xywh {256 16 19 19} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 13 align 136
           code0 {o->value(microtonal->Pinvertupdown);}
         }
@@ -85,7 +85,7 @@ class MicrotonalUI {: {private MiscFuncs}
         }
         Fl_Spinner centerinvertcounter {
           callback {//
-          send_data(3, o->value(), 0xc8);}
+          send_data(SCALES::control::invertedScaleCenter, o->value(), TOPLEVEL::type::Integer);}
           xywh {339 20 47 20} labelsize 11 align 129 minimum 0 maximum 127 value 0 textfont 1 textsize 11
           code0 {o->value(microtonal->Pinvertupdowncenter);}
           code1 {if (microtonal->Pinvertupdown==0) o->deactivate();}
@@ -103,7 +103,7 @@ class MicrotonalUI {: {private MiscFuncs}
         }
         Fl_Spinner anotecounter {
           callback {//
-          send_data(1, o->value(), 0xc8);}
+          send_data(SCALES::control::Anote, o->value(), TOPLEVEL::type::Integer);}
           xywh {192 20 47 20} box FLAT_BOX labelsize 11 align 1 minimum 0 maximum 127 value 69 textfont 1 textsize 11
           code0 {o->value(microtonal->PAnote);}
         }
@@ -133,7 +133,7 @@ class MicrotonalUI {: {private MiscFuncs}
           afreqset->hide();
           o->hide();
 
-          send_data(0, Afreq, 0x40);}
+          send_data(SCALES::control::Afrequency, Afreq, 0);}
           xywh {166 19 18 17} box THIN_DOWN_BOX color 45 hide
         }
         Fl_Return_Button afreqset {
@@ -151,7 +151,7 @@ class MicrotonalUI {: {private MiscFuncs}
           AsetBack->hide();
           o->hide();
 
-          send_data(0, Afreq, 0x40);}
+          send_data(SCALES::control::Afrequency, Afreq, 0);}
           xywh {163 17 12 18} box NO_BOX hide
         }
       }
@@ -162,14 +162,14 @@ class MicrotonalUI {: {private MiscFuncs}
         Fl_Input nameinput {
           label {Name:}
           callback {//
-          send_data(64, 0, 0xd0, 0x80, miscMsgPush(string(o->value())));}
+          send_data(SCALES::control::name, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::route::lowPriority, miscMsgPush(string(o->value())));}
           xywh {10 64 285 25} labelfont 1 labelsize 11 align 5
           code0 {o->value(microtonal->Pname.c_str());}
         }
         Fl_Input commentinput {
           label {Description:}
           callback {//
-          send_data(65, 0, 0xd0, 0x80, miscMsgPush(string(o->value())));}
+          send_data(SCALES::control::comment, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::route::lowPriority, miscMsgPush(string(o->value())));}
           xywh {10 104 391 25} labelfont 1 labelsize 11 align 5
           code0 {o->value(microtonal->Pcomment.c_str());}
         }
@@ -182,7 +182,7 @@ class MicrotonalUI {: {private MiscFuncs}
         }
         Fl_Spinner scaleShift {
           callback {//
-          send_data(4, o->value(), 0xc8);}
+          send_data(SCALES::control::scaleShift, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Octave base offset} xywh {320 68 47 20} labelsize 10 align 1 minimum -63 maximum 64 value 0 textfont 1 textsize 11
           code0 {o->value(microtonal->Pscaleshift-64);}
         }
@@ -208,7 +208,7 @@ class MicrotonalUI {: {private MiscFuncs}
             if (filename == NULL)
                 return;
 
-            send_data(48, 0, 0xd0, 0x80, miscMsgPush(string(filename)));}
+            send_data(SCALES::control::importScl, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::route::lowPriority, miscMsgPush(string(filename)));}
             tooltip {Inport Scala .scl file (tunnings)} xywh {85 417 100 20} box THIN_UP_BOX labelfont 1 labelsize 10
           }
         }
@@ -245,7 +245,7 @@ class MicrotonalUI {: {private MiscFuncs}
             }
             oldFirst = tmp;
 
-            send_data(17, tmp, 0xc8);}
+            send_data(SCALES::control::lowKey, tmp, TOPLEVEL::type::Integer);}
             tooltip {First MIDI note number} xywh {203 228 42 18} labelsize 11 align 1 minimum 0 maximum 125 textfont 1 textsize 11
             code0 {oldFirst = microtonal->Pfirstkey;}
             code1 {o->value(oldFirst);}
@@ -284,8 +284,8 @@ class MicrotonalUI {: {private MiscFuncs}
             }
             oldMid = tmp;
 
-            send_data(18, o->value(), 0xc8);}
-            tooltip {Midle note (where scale degree 0 is mapped to)} xywh {203 293 42 18} labelsize 11 align 1 maximum 126 value 60 textfont 1 textsize 11
+            send_data(SCALES::control::middleKey, o->value(), TOPLEVEL::type::Integer);}
+            tooltip {Middle note (where scale degree 0 is mapped to)} xywh {203 293 42 18} labelsize 11 align 1 maximum 126 value 60 textfont 1 textsize 11
             code0 {oldMid = microtonal->Pmiddlenote;}
             code1 {o->value(oldMid);}
           }
@@ -314,7 +314,7 @@ class MicrotonalUI {: {private MiscFuncs}
             }
             oldLast = tmp;
 
-            send_data(19, tmp, 0xc8);}
+            send_data(SCALES::control::highKey, tmp, TOPLEVEL::type::Integer);}
             tooltip {Last MIDI note number} xywh {203 357 42 18} labelsize 11 align 1 minimum 2 maximum 127 value 127 textfont 1 textsize 11
             code0 {oldLast = microtonal->Plastkey;}
             code1 {o->value(oldLast);}
@@ -332,7 +332,7 @@ class MicrotonalUI {: {private MiscFuncs}
             if (filename == NULL)
                 return;
 
-            send_data(49, 0, 0xd0, 0x80, miscMsgPush(string(filename)));}
+            send_data(SCALES::control::importKbm, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::route::lowPriority, miscMsgPush(string(filename)));}
             tooltip {Inport Scala .kbm file (keyboard mapping)} xywh {285 417 104 20} box THIN_UP_BOX labelfont 1 labelsize 10
           }
         }
@@ -341,7 +341,7 @@ class MicrotonalUI {: {private MiscFuncs}
           callback {//
           o->show();
 
-          send_data(16, o->value(), 0xd8);}
+          send_data(SCALES::control::enableKeyboardMap, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Enable the Mapping (otherwise the mapping is linear)} xywh {212 166 20 21} box THIN_UP_BOX down_box DOWN_BOX color 237 align 33
           code0 {o->value(microtonal->Pmappingenabled);}
           code1 {if (microtonal->Pmappingenabled==0) keymappinggroup->deactivate();}
@@ -349,9 +349,9 @@ class MicrotonalUI {: {private MiscFuncs}
         Fl_Button applybutton {
           label Retune
           callback {apply();
-          send_data(32, 1, 0xc0);
-          send_data(33, 1, 0xc0);
-          send_data(80, 1, 0xc0);}
+          send_data(SCALES::control::tuning, 1, TOPLEVEL::type::Integer);
+          send_data(SCALES::control::keyboardMap, 1, TOPLEVEL::type::Integer);
+          send_data(SCALES::control::retune, 1, TOPLEVEL::type::Integer);}
           tooltip {Retune the synth according to the inputs from "Tunnings" and "Keyboard Mapping"} xywh {152 447 107 28} box THIN_UP_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13
         }
       }
@@ -365,7 +365,7 @@ class MicrotonalUI {: {private MiscFuncs}
       }
       Fl_Check_Button enableMicrotonal {
         callback {//
-        send_data(8, o->value(), 0xd8);}
+        send_data(SCALES::control::enableMicrotonal, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         xywh {4 13 21 22} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 align 148
         code0 {o->value(microtonal->Penabled);}
       }
@@ -376,11 +376,12 @@ class MicrotonalUI {: {private MiscFuncs}
       }
     }
   }
-  Function {send_data(int control, float value, int type, int par = 0xff, int par2 = 0xff)} {} {
+  Function {send_data(int control, float value, int type, int par = UNUSED, int par2 = UNUSED)} {} {
     code {//
-    collect_data(synth, value, (Fl::event_button() | type), control, 0xe8, 0xff, 0xff, 0xff, par, par2);} {}
+        type |= TOPLEVEL::type::Write;
+        collect_data(synth, value, (Fl::event_button() | type), control, TOPLEVEL::section::scales, UNUSED, UNUSED, UNUSED, par, par2);} {}
   }
-  Function {fetchData(float value, int control, int part, int kititem = 0xff, int engine = 0xff, int insert = 0xff, int parameter = 0xff, int par2 = 0xff, int request = 0xff)} {return_type float
+  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED, int request = UNUSED)} {return_type float
   } {
     code {//
         return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, par2, request);} {}
@@ -388,7 +389,7 @@ class MicrotonalUI {: {private MiscFuncs}
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
-    bool isGui = (getData->data.type & 0x20);
+    bool isGui = (getData->data.type & TOPLEVEL::source::GUI);
     unsigned char control = getData->data.control;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
@@ -402,24 +403,24 @@ class MicrotonalUI {: {private MiscFuncs}
 
     switch (control)
     {
-        case 0:
+        case SCALES::control::Afrequency:
             afreqinput->value(value);
             break;
-        case 1:
+        case SCALES::control::Anote:
             anotecounter->value(value_int);
             break;
-        case 2:
+        case SCALES::control::invertScale:
             invertKeys->value(value_bool);
             checkInvert();
             break;
-        case 3:
+        case SCALES::control::invertedScaleCenter:
             centerinvertcounter->value(value_int);
             break;
-        case 4:
+        case SCALES::control::scaleShift:
             scaleShift->value(value_int);
             break;
 
-        case 8:
+        case SCALES::control::enableMicrotonal:
             enableMicrotonal->value(value_bool);
             checkInvert();
             if (value_bool)
@@ -428,7 +429,7 @@ class MicrotonalUI {: {private MiscFuncs}
                 microtonalgroup->deactivate();
             break;
 
-        case 16:
+        case SCALES::control::enableKeyboardMap:
             mappingenabledbutton->value(value_bool);
             checkInvert();
             if (value_bool)
@@ -436,18 +437,18 @@ class MicrotonalUI {: {private MiscFuncs}
             else
                 keymappinggroup->deactivate();
             break;
-        case 17:
+        case SCALES::control::lowKey:
             firstnotecounter->value(value_int);
             break;
-        case 18:
+        case SCALES::control::middleKey:
             middlenotecounter->value(value_int);
             break;
-        case 19:
+        case SCALES::control::highKey:
             lastnotecounter->value(value_int);
             break;
 
-        case 32:
-        case 48:
+        case SCALES::control::tuning:
+        case SCALES::control::importScl:
             msg = (miscMsgPop(par2)); // must always fetch it
             if (value_int > 0)
             {
@@ -457,31 +458,34 @@ class MicrotonalUI {: {private MiscFuncs}
             else if (isGui)
                 errors(value_int, true);
             break;
-        case 33:
-        case 49:
+        case SCALES::control::keyboardMap:
+        case SCALES::control::importKbm:
             msg = (miscMsgPop(par2)); // must always fetch it
             if (value_int > 0)
             {
                 mappinginput->value(msg.c_str());
                 mapsizeoutput->value(value_int);
-                anotecounter->value(kititem);
-                firstnotecounter->value(engine);
-                middlenotecounter->value(insert);
-                lastnotecounter->value(parameter);
-                afreqinput->value(fetchData(0, 0, 232));
+                if (control == SCALES::control::importKbm)
+                {
+                    anotecounter->value(kititem);
+                    firstnotecounter->value(engine);
+                    middlenotecounter->value(insert);
+                    lastnotecounter->value(parameter);
+                    afreqinput->value(fetchData(0, 0, 232));
+                }
             }
             else if (isGui)
                 errors(value_int, true);
             break;
 
-        case 64:
+        case SCALES::control::name:
             nameinput->value(miscMsgPop(par2).c_str());
             break;
-        case 65:
+        case SCALES::control::comment:
             commentinput->value(miscMsgPop(par2).c_str());
             break;
 
-        case 96:
+        case SCALES::control::clearAll:
             Hide();
             make_window();
             break;

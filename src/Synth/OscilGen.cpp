@@ -23,7 +23,7 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified March 2018
+    Modified August 2018
 */
 
 #include <cmath>
@@ -1620,76 +1620,197 @@ void OscilGen::getfromXML(XMLwrapper *xml)
 float OscilGen::getLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    int request = int(getData->data.type & 3);
+    unsigned char type = getData->data.type;
+    int request = type & TOPLEVEL::type::Default;
     int control = getData->data.control;
     int insert = getData->data.insert;
 
-    float min;
-    float max;
-    float def;
+    type &= (TOPLEVEL::source::MIDI || TOPLEVEL::source::CLI || TOPLEVEL::source::GUI); // source bits only
 
-    // defaults
-    min = 0;
-    max = 127;
-    def = 0;
+    // oscillator defaults
+    int min = 0;
+    int max = 127;
+    float def = 0;
+    type |= TOPLEVEL::type::Integer;
+    unsigned char learnable = TOPLEVEL::type::Learnable;
+    type |= learnable;
 
-    if (insert > 5)
+    if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     { // do harmonics stuff
-        if (insert == 7)
+        if (insert == TOPLEVEL::insert::harmonicAmplitude && control == 0)
+            def = 127;
+        else
             def = 64;
+        getData->data.type = type;
         switch (request)
         {
-            case 0:
+            case TOPLEVEL::type::Adjust:
                 if(value < min)
                     value = min;
                 else if(value > max)
                     value = max;
             break;
-            case 1:
+            case TOPLEVEL::type::Minimum:
                 value = min;
                 break;
-            case 2:
+            case TOPLEVEL::type::Maximum:
                 value = max;
                 break;
-            case 3:
+            case TOPLEVEL::type::Default:
                 value = def;
                 break;
         }
         return value;
     }
+
     switch (control)
     {
-        case 0:
-        case 16:
-        case 34:
+        case OSCILLATOR::control::phaseRandomness:
+            break;
+        case OSCILLATOR::control::magType:
+            max = 4;
+            type &= ~learnable;
+            break;
+        case OSCILLATOR::control::harmonicAmplitudeRandomness:
+            def = 64;
+            break;
+        case OSCILLATOR::control::harmonicRandomnessType:
+            max = 2;
+            type &= ~learnable;
+            break;
+        case OSCILLATOR::control::baseFunctionParameter:
             min = -64;
             max = 63;
             break;
-        case 67:
+        case OSCILLATOR::control::baseFunctionType:
+            max = 15;
+            type &= ~learnable;
+            break;
+        case OSCILLATOR::control::baseModulationParameter1:
+            def = 64;
+            break;
+        case OSCILLATOR::control::baseModulationParameter2:
+            def = 64;
+            break;
+        case OSCILLATOR::control::baseModulationParameter3:
+            def = 32;
+            break;
+        case OSCILLATOR::control::baseModulationType:
+            max = 3;
+            type &= ~learnable;
+            break;
+        case OSCILLATOR::control::autoClear:
+            max = 1;
+            type &= ~learnable;
+            break;
+        case OSCILLATOR::control::useAsBaseFunction:
+            max = 1;
+            type &= ~learnable;
+            break;
+        case OSCILLATOR::control::waveshapeParameter:
+            min = -64;
+            max = 63;
+            break;
+        case OSCILLATOR::control::waveshapeType:
+            max = 10;
+            type &= ~learnable;
+            break;
+        case OSCILLATOR::control::filterParameter1:
+            def = 64;
+            break;
+        case OSCILLATOR::control::filterParameter2:
+            def = 64;
+            break;
+        case OSCILLATOR::control::filterBeforeWaveshape:
+            max = 1;
+            type &= ~learnable;
+            break;
+        case OSCILLATOR::control::filterType:
+            max = 13;
+            type &= ~learnable;
+            break;
+        case OSCILLATOR::control::modulationParameter1:
+            def = 64;
+            break;
+        case OSCILLATOR::control::modulationParameter2:
+            def = 64;
+            break;
+        case OSCILLATOR::control::modulationParameter3:
+            def = 32;
+            break;
+        case OSCILLATOR::control::modulationType:
+            max = 3;
+            type &= ~learnable;
+            break;
+        case OSCILLATOR::control::spectrumAdjustParameter:
+            def = 64;
+            break;
+        case OSCILLATOR::control::spectrumAdjustType:
+            max = 3;
+            type &= ~learnable;
+            break;
+        case OSCILLATOR::control::harmonicShift:
+            min = -64;
+            max = 64;
+            break;
+        case OSCILLATOR::control::clearHarmonicShift:
+            max = 1;
+            type &= ~learnable;
+            break;
+        case OSCILLATOR::control::shiftBeforeWaveshapeAndFilter:
+            max = 1;
+            type &= ~learnable;
+            break;
+
+        case OSCILLATOR::control::adaptiveHarmonicsParameter:
             max = 100;
+            def = 50;
             break;
-        case 68:
+        case OSCILLATOR::control::adaptiveHarmonicsBase:
             max = 255;
+            def = 128;
             break;
-        case 69:
+        case OSCILLATOR::control::adaptiveHarmonicsPower:
             max = 200;
+            def = 100;
+            break;
+        case OSCILLATOR::control::adaptiveHarmonicsType:
+            max = 8;
+            type &= ~learnable;
+            break;
+
+        case OSCILLATOR::control::clearHarmonics:
+            max = 1;
+            type &= ~learnable;
+            break;
+        case OSCILLATOR::control::convertToSine:
+            max = 1;
+            type &= ~learnable;
+            break;
+        default:
+            type |= TOPLEVEL::type::Error;
             break;
     }
+
+    getData->data.type = type;
+    if (type & TOPLEVEL::type::Error)
+        return 1;
+
     switch (request)
     {
-        case 0:
+        case TOPLEVEL::type::Adjust:
             if(value < min)
                 value = min;
             else if(value > max)
                 value = max;
         break;
-        case 1:
+        case TOPLEVEL::type::Minimum:
             value = min;
             break;
-        case 2:
+        case TOPLEVEL::type::Maximum:
             value = max;
             break;
-        case 3:
+        case TOPLEVEL::type::Default:
             value = def;
             break;
     }

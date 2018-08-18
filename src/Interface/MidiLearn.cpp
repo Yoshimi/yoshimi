@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified March 2018
+    Modified August 2018
 */
 
 #include <iostream>
@@ -58,7 +58,7 @@ void MidiLearn::setTransferBlock(CommandBlock *getData, string name)
     learnedName = name;
     learning = true;
     synth->getRuntime().Log("Learning");
-    updateGui(21);
+    updateGui(MIDILEARN::control::sendLearnMessage);
 }
 
 
@@ -150,8 +150,8 @@ bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, un
                 if (CC > 0xff)
                     putData.data.type |= 0x10; // mark as NRPN
                 firstLine = false;
-                putData.data.control = 24;
-                putData.data.part = 0xd8;
+                putData.data.control = MIDILEARN::control::reportActivity;
+                putData.data.part = TOPLEVEL::section::midiLearn;
                 putData.data.kit = (CC & 0xff);
                 putData.data.engine = chan;
                 writeMidi(&putData, putSize, category & 1);
@@ -298,7 +298,7 @@ void MidiLearn::listLine(int lineNo)
         {
             nrpn = "  NRPN";
             if (status & 16)
-                nrpn += " 7bit";
+                nrpn += " sevenBit";
         }
         string chan = "  Chan ";
         if ((it->chan) >= NUM_MIDI_CHANNELS)
@@ -369,24 +369,24 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
 {
     unsigned int kit = part; // to silence warning
     kit = _kit; // may need to set as an NRPN
-    if (control == 22)
+    if (control == MIDILEARN::control::sendRefreshRequest)
     {
         updateGui();
         synth->getRuntime().Log("GUI refreshed");
         return;
     }
 
-    if (control == 96)
+    if (control == MIDILEARN::control::clearAll)
     {
         midi_list.clear();
-        synth->setLastfileAdded(6, "");
+        synth->setLastfileAdded(XML_MIDILEARN, "");
         updateGui();
         synth->getRuntime().Log("List cleared");
         return;
     }
 
     string name;
-    if (control == 241)
+    if (control == MIDILEARN::control::loadList)
     {
         name = (miscMsgPop(par2));
         if (loadList(name))
@@ -395,10 +395,10 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         synth->getRuntime().finishedCLI = true;
         return;
     }
-    if (control == 242) // list controls
+    if (control == MIDILEARN::control::loadFromRecent)
     {
         int pos = 0;
-        vector<string> &listtype = *synth->getHistory(6);
+        vector<string> &listtype = *synth->getHistory(XML_MIDILEARN);
         vector<string>::iterator it = listtype.begin();
         while (it != listtype.end() && pos != value)
         {
@@ -419,7 +419,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         synth->getRuntime().finishedCLI = true;
         return;
     }
-    if (control == 245)
+    if (control == MIDILEARN::control::saveList)
     {
         name = (miscMsgPop(par2));
         if (saveList(name))
@@ -427,9 +427,10 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         synth->getRuntime().finishedCLI = true;
         return;
     }
-    if (control == 255)
+    if (control == MIDILEARN::control::cancelLearn)
     {
         learning = false;
+        synth->getRuntime().finishedCLI = true;
         synth->getRuntime().Log("Midi Learn cancelled");
         updateGui(control);
         return;
@@ -480,7 +481,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
     }
 
 
-    if (control == 16)
+    if (control == MIDILEARN::control::CCorChannel)
     {
         bool moveLine = true;
         list<LearnBlock>::iterator nextit = it;
@@ -521,10 +522,10 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         }
 
         if (!moveLine)
-            control = 7; // change this as we're not moving the line
+            control = MIDILEARN::control::ignoreMove; // change this as we're not moving the line
     }
 
-    if (control == 8)
+    if (control == MIDILEARN::control::deleteLine)
     {
         remove(value);
         updateGui();
@@ -532,9 +533,9 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         return;
     }
 
-    if (control < 8)
+    if (control < MIDILEARN::control::deleteLine)
     {
-        if (control > 4)
+        if (control > MIDILEARN::control::sevenBit)
         {
             type = it->status;
             synth->getRuntime().Log("Line " + to_string(lineNo + 1) + " " + lineName);
@@ -545,19 +546,19 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
             string name;
             switch (control)
             {
-                case 0:
+                case MIDILEARN::control::block:
                     type = (tempType & 0xfe) | (type & 1);
                     name = "Block";
                     break;
-                case 1:
+                case MIDILEARN::control::limit:
                     type = (tempType & 0xfd) | (type & 2);
                     name = "Limit";
                     break;
-                case 2:
+                case MIDILEARN::control::mute:
                     type = (tempType & 0xfb) | (type & 4);
                     name = "Mute";
                     break;
-                case 4:
+                case MIDILEARN::control::sevenBit:
                     type = (tempType & 0xef) | (type & 16);
                     name = "7bit";
                     break;
@@ -573,7 +574,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         // need to work on this more
         putData.data.value = value;
         putData.data.type = type;
-        putData.data.control = 7;
+        putData.data.control = MIDILEARN::control::ignoreMove;
         putData.data.kit = kit;
         putData.data.engine = engine;
         putData.data.insert = insert;
@@ -587,7 +588,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         return;
     }
 
-    if (control == 16)
+    if (control == MIDILEARN::control::CCorChannel)
     {
         entry.CC = kit;
         entry.chan = engine;
@@ -645,8 +646,8 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
         memset(&putData, 0xff, putSize);
         putData.data.value = 0;
         putData.data.type = 0xc8;
-        putData.data.control = 0xfe;
-        putData.data.part = 0xd9;
+        putData.data.control = 0xfe; // TODO don't understand this :(
+        putData.data.part = TOPLEVEL::section::midiIn;
         putData.data.parameter = 0x80;
         putData.data.par2 = miscMsgPush("Midi Learn full!");
         writeMidi(&putData, putSize, false);
@@ -713,7 +714,7 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
     else
         CCtype = "NRPN " + asHexString((CCh >> 7) & 0x7f) + " " + asHexString(CCh & 0x7f);
     synth->getRuntime().Log(CCtype + "  Chan " + to_string((int)entry.chan + 1) + "  " + entry.name);
-    updateGui(1);
+    updateGui(MIDILEARN::control::limit);
     learning = false;
 }
 
@@ -722,7 +723,7 @@ void MidiLearn::writeToGui(CommandBlock *putData)
 {
     if (!synth->getRuntime().showGui)
         return;
-    putData->data.part = 0xd8;
+    putData->data.part = TOPLEVEL::section::midiLearn;
     unsigned int writesize = sizeof(*putData);
     char *point = (char*)putData;
     unsigned int towrite = writesize;
@@ -754,17 +755,17 @@ void MidiLearn::updateGui(int opp)
     CommandBlock putData;
     if (opp == 21)
     {
-        putData.data.control = 21;
+        putData.data.control = MIDILEARN::control::sendLearnMessage;
         putData.data.par2 = miscMsgPush("Learning " + learnedName);
     }
     else if (opp == 255)
     {
-        putData.data.control = 255;
+        putData.data.control = MIDILEARN::control::cancelLearn;
         putData.data.par2 = 0xff;
     }
     else
     {
-        putData.data.control = 96;
+        putData.data.control = MIDILEARN::control::clearAll;
         putData.data.par2 = 0xff;
         if (opp == 2)
             putData.data.kit = 2; // close editing window
@@ -783,7 +784,7 @@ void MidiLearn::updateGui(int opp)
         unsigned int newCC = it->CC;
         putData.data.value = lineNo;
         putData.data.type = it->status;
-        putData.data.control = 16;
+        putData.data.control = MIDILEARN::control::CCorChannel;
         putData.data.kit = (newCC & 0xff);
         putData.data.engine = it->chan;
         putData.data.insert = it->min_in;
@@ -792,7 +793,7 @@ void MidiLearn::updateGui(int opp)
         writeToGui(&putData);
         if (newCC > 0xff || (it->status & 8) > 0)
         { // status now used in case NRPN is < 0x100
-            putData.data.control = 9; // it's an NRPN
+            putData.data.control = MIDILEARN::control::nrpnDetected; // it's an NRPN
             putData.data.engine = ((newCC >> 8) & 0xff);
             writeToGui(&putData);
         }
@@ -801,7 +802,7 @@ void MidiLearn::updateGui(int opp)
     }
     if (opp == 1 && synth->getRuntime().showLearnedCC == true) // open the gui editing window
     {
-        putData.data.control = 22;
+        putData.data.control = MIDILEARN::control::sendRefreshRequest;
         writeToGui(&putData);
     }
 }

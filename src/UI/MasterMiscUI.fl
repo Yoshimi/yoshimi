@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
-Modified May 2018
+Modified August 2018
 } {selected in_source in_header
 }
 
@@ -131,7 +131,7 @@ class VUMeter {
         synth->VUdata.values.parts[i] = 0.0;
     }} {}
   }
-  Function {fetchData(float value, int control, int part, int kititem = 0xff, int engine = 0xff, int insert = 0xff, int parameter = 0xff, int par2 = 0xff)} {return_type float
+  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED)} {return_type float
   } {
     code {//
         return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, par2);} {}
@@ -142,10 +142,10 @@ class VUMeter {
             int oy = y();
             int lx = w();
             int ly = h();
-            float dbl = rap2dB(fetchData(0, 201, 240, 0));
-            float dbr = rap2dB(fetchData(0, 201, 240, 1));
-            float rmsdbl = rap2dB(fetchData(0, 202, 240, 0));
-            float rmsdbr = rap2dB(fetchData(0, 202, 240, 1));
+            float dbl = rap2dB(fetchData(0, MAIN::control::readMainLRpeak, TOPLEVEL::section::main, 0));
+            float dbr = rap2dB(fetchData(0, MAIN::control::readMainLRpeak, TOPLEVEL::section::main, 1));
+            float rmsdbl = rap2dB(fetchData(0, MAIN::control::readMainLRrms, TOPLEVEL::section::main, 0));
+            float rmsdbr = rap2dB(fetchData(0, MAIN::control::readMainLRrms, TOPLEVEL::section::main, 1));
 
             clipped = clipped | (dbl > 0) | ((dbr > 0) << 1);
 
@@ -248,7 +248,7 @@ class VUMeter {
     int oy = y()+2;
     int lx = w()-4;
     int ly = h()-4;
-    float Vpeak = fetchData(0, 200, 240, npart + *plgroup);
+    float Vpeak = fetchData(0, MAIN::control::readPartPeak, TOPLEVEL::section::main, npart + *plgroup);
     if (Vpeak < 0) // its a fake one
     {
         fl_rectf(ox, oy, lx, ly, 140, 140, 140);
@@ -390,10 +390,7 @@ class SysEffSend {: {public WidgetPDial, private MiscFuncs}
   } {
     code {//
     if (event == FL_PUSH || event == FL_DRAG || event == FL_MOUSEWHEEL)
-    {
-        synth->setPsysefxsend(neff1,neff2,value());
-        collect_data(synth, value(), (Fl::event_button() | (1 << 7)), neff2, 0xf1, 0xff, neff1, 16);
-    }
+        collect_data(synth, value(), (Fl::event_button() | TOPLEVEL::type::Write | TOPLEVEL::type::Integer), neff2, TOPLEVEL::section::systemEffects, UNUSED, neff1, TOPLEVEL::insert::systemEffectSend);
     return WidgetPDial::handle(event);} {}
   }
   decl {int neff1;} {private local
@@ -430,6 +427,7 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
           label Edit
           callback {//
               int newpart = npart | synth->getGuiMaster()->panelgroup;
+              synth->getGuiMaster()->activePart = npart + *plgroup;
               if (Fl::event() == FL_RELEASE && Fl::event_button() == FL_RIGHT_MOUSE)
               {
                   if (newpart == synth->getGuiMaster()->partui->npart)
@@ -461,6 +459,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
         Fl_Button buttontop {
           label {  }
           callback {//
+    synth->getGuiMaster()->activePart = npart + *plgroup;
     bankui->cbwig->value(npart + 1 + *plgroup);
     bankui->cbwig->do_callback();
     bankui->Show();}
@@ -477,8 +476,8 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     }
     else
         realvalue = o->value();
-    synth->getGuiMaster()->setPartVolWidget(npart + *plgroup, realvalue);
-    send_data(0, realvalue, 0x48);}
+
+    send_data(PART::control::volume, realvalue, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           xywh {8 65 30 110} type {Vert Knob} box THIN_DOWN_BOX minimum 127 maximum 0 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Pvolume);}
           code1 {o->setValueType(VC_PartVolume); o->useCustomTip(true);}
@@ -488,8 +487,8 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
           callback {//
     if (Fl::event_button() == 3)
         o->value(64);
-    synth->getGuiMaster()->setPartPanWidget(npart + *plgroup, o->value());
-    send_data(2, o->value(), 0x48);}
+
+    send_data(PART::control::panning, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           xywh {17 180 30 30} maximum 127 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Ppanning);}
           code1 {o->setValueType(VC_PanningStd);}
@@ -499,10 +498,9 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
         Fl_Choice partrcv {
           callback {//
       int tmp = o->value() & 0xf;
-      synth->getGuiMaster()->setPartMidiWidget(npart + *plgroup, tmp + 1);
       o->textcolor(FL_BLACK);
 
-      send_data(5, tmp, 0xc0);}
+      send_data(PART::control::midiChannel, tmp, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {receive from MIDI channel} xywh {8 210 50 15} down_box BORDER_BOX labelsize 10 align 5 textfont 9 textsize 10
           code0 {for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
             {
@@ -515,7 +513,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
         } {}
         Fl_Choice audiosend {
           callback {//
-    send_data(120, o->value() + 1, 0xc0, 0xc0);}
+    send_data(PART::control::audioDestination, o->value() + 1, TOPLEVEL::type::Integer, TOPLEVEL::route::adjustAndLoopback);}
           tooltip {Set Audio Destination} xywh {8 229 50 15} box BORDER_BOX down_box BORDER_BOX labelsize 9 textfont 9 textsize 9
           code0 {if (synth->part[npart + *plgroup]->Paudiodest == 2) o->value(1); else if (synth->part[npart + *plgroup]->Paudiodest == 3) o->value(2); else o->value(0);}
         } {
@@ -536,15 +534,20 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
       Fl_Check_Button partenabled {
         label 01
         callback {//
-    send_data(8, o->value(), 0xf0);}
+        if (o->value() > 0.5f)
+            synth->getGuiMaster()->activePart = npart + *plgroup;
+        else
+            synth->getGuiMaster()->activePart = UNUSED;
+    send_data(PART::control::enable, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         xywh {5 0 45 20} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelsize 15 align 24
         code0 {o->value(synth->partonoffRead(npart + *plgroup));}
       }
     }
   }
-  Function {send_data(int control, float value, int type, int parameter = 255)} {} {
+  Function {send_data(int control, float value, int type, int parameter = UNUSED)} {} {
     code {//
-    collect_data(synth, value, (Fl::event_button() | type), control, npart + *plgroup, 0xff, 0xff, 0xff, parameter);} {}
+        type |= TOPLEVEL::type::Write;
+        collect_data(synth, value, (Fl::event_button() | type), control, npart + *plgroup, UNUSED, UNUSED, UNUSED, parameter);} {}
   }
   Function {Panellistitem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//

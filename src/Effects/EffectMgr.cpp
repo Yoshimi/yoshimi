@@ -347,43 +347,42 @@ void EffectMgr::getfromXML(XMLwrapper *xml)
 
 float LimitMgr::geteffectlimits(CommandBlock *getData)
 {
-    int effType = getData->data.kit & 0x7f;
-
+    int effType = getData->data.kit;
     float value = 0;
     switch (effType)
     {
-        case 0:
+        case EFFECT::type::none:
             value = 0;
             break;
-        case 1:
+        case EFFECT::type::reverb:
             Revlimit reverb;
             value = reverb.getlimits(getData);
             break;
-        case 2:
+        case EFFECT::type::echo:
             Echolimit echo;
             value = echo.getlimits(getData);
             break;
-        case 3:
+        case EFFECT::type::chorus:
             Choruslimit chorus;
             value = chorus.getlimits(getData);
             break;
-        case 4:
+        case EFFECT::type::phaser:
             Phaserlimit phaser;
             value = phaser.getlimits(getData);
             break;
-        case 5:
+        case EFFECT::type::alienWah:
             Alienlimit alien;
             value = alien.getlimits(getData);
             break;
-        case 6:
+        case EFFECT::type::distortion:
             Distlimit dist;
             value = dist.getlimits(getData);
             break;
-        case 7:
+        case EFFECT::type::eq:
             EQlimit EQ;
             value = EQ.getlimits(getData);
             break;
-        case 8:
+        case EFFECT::type::dynFilter:
             Dynamlimit dyn;
             value = dyn.getlimits(getData);
             break;

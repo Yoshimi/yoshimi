@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified January 2011
+    This file is derivative of ZynAddSubFX original code.
+
+    Modified July 2018
 */
 
 #include <cmath>
@@ -385,3 +388,161 @@ void FilterParams::getfromXML(XMLwrapper *xml)
         xml->exitbranch();
     }
 }
+
+float filterLimit::getFilterLimits(CommandBlock *getData)
+{
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    int request = type & TOPLEVEL::type::Default;
+    int control = getData->data.control;
+    int kitItem = getData->data.kit;
+    int engine = getData->data.engine;
+
+    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
+
+    // filter defaults
+    int min = 0;
+    int max = 127;
+    float def = 64;
+    type |= TOPLEVEL::type::Integer;
+    unsigned char learnable = TOPLEVEL::type::Learnable;
+    type |= learnable;
+
+    switch (control)
+    {
+        case FILTERINSERT::control::centerFrequency:
+            if (kitItem == FILTERINSERT::control::dynFilter)
+                def = 45;
+            else if (engine == PART::engine::subSynth)
+                def = 80;
+            else if (engine >= PART::engine::addVoice1)
+                def = 50;
+            else
+                def = 94;
+            break;
+        case FILTERINSERT::control::Q:
+            if (engine >= PART::engine::addVoice1)
+                def = 60;
+            else if (kitItem != FILTERINSERT::control::dynFilter)
+                def = 40;
+            break; // for dynFilter it's the default 64
+        case FILTERINSERT::control::frequencyTracking:
+            break;
+        case FILTERINSERT::control::velocitySensitivity:
+            if (engine >= PART::engine::addVoice1)
+                def = 0;
+            break;
+        case FILTERINSERT::control::velocityCurve:
+            break;
+        case FILTERINSERT::control::gain:
+            break;
+        case FILTERINSERT::control::stages:
+            if (kitItem == FILTERINSERT::control::dynFilter)
+                def = 1;
+            else
+                def = 0;
+            max = 4;
+            type &= ~learnable;
+            break;
+        case FILTERINSERT::control::baseType:
+            max = 2;
+            def = 0;
+            type &= ~learnable;
+            break;
+        case FILTERINSERT::control::analogType:
+            max = 8;
+            def = 1;
+            type &= ~learnable;
+            break;
+        case FILTERINSERT::control::stateVariableType:
+            max = 3;
+            def = 0;
+            type &= ~learnable;
+            break;
+        case FILTERINSERT::control::frequencyTrackingRange:
+            max = 1;
+            def = 0;
+            type &= ~learnable;
+            break;
+        case FILTERINSERT::control::formantSlowness:
+            break;
+        case FILTERINSERT::control::formantClearness:
+            break;
+        case FILTERINSERT::control::formantFrequency:
+            max = 0;
+            def = 0; // all zero denotes random
+            break;
+        case FILTERINSERT::control::formantQ:
+            break;
+        case FILTERINSERT::control::formantAmplitude:
+            def = 127;
+            break;
+        case FILTERINSERT::control::formantStretch:
+            def = 40;
+            break;
+        case FILTERINSERT::control::formantCenter:
+            break;
+        case FILTERINSERT::control::formantOctave:
+            break;
+        case FILTERINSERT::control::numberOfFormants:
+            max = 12;
+            def = 3;
+            type &= ~learnable;
+            break;
+        case FILTERINSERT::control::vowelNumber:
+            max = 5;
+            def = 0;
+            type &= ~learnable;
+            break;
+        case FILTERINSERT::control::formantNumber:
+            max = 11;
+            def = 0;
+            type &= ~learnable;
+            break;
+        case FILTERINSERT::control::sequenceSize:
+            max = 8;
+            def = 3;
+            type &= ~learnable;
+            break;
+        case FILTERINSERT::control::sequencePosition:
+            def = 0;
+            type &= ~learnable;
+            break;
+        case FILTERINSERT::control::vowelPositionInSequence:
+            max = 5;
+            type &= ~learnable;
+            break;
+        case FILTERINSERT::control::negateInput:
+            max = 1;
+            def = 0;
+            type &= ~learnable;
+            break;
+         default:
+            type |= TOPLEVEL::type::Error;
+            break;
+    }
+    getData->data.type = type;
+    if (type & TOPLEVEL::type::Error)
+        return 1;
+
+    switch (request)
+    {
+        case TOPLEVEL::type::Adjust:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+        break;
+        case TOPLEVEL::type::Minimum:
+            value = min;
+            break;
+        case TOPLEVEL::type::Maximum:
+            value = max;
+            break;
+        case TOPLEVEL::type::Default:
+            value = def;
+            break;
+    }
+    return value;
+}
+

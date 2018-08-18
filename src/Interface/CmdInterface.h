@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified May 2018
+    Modified August 2018
 */
 
 #ifndef CMDINTERFACE_H
@@ -48,16 +48,15 @@ class CmdInterface : private MiscFuncs
         string historySelect(int listnum, int selection);
         void historyList(int listnum);
         int effectsList(bool presets = false);
-        int effects();
-        int volPanVel();
-        int keyShift(int part);
+        int effects(unsigned char controlType);
+        int partVolPanVel(unsigned char controlType);
         int commandList();
-        int commandMlearn();
-        int commandVector();
-        int commandConfig();
-        int commandScale();
-        int commandPart(bool justSet);
-        int commandReadnSet();
+        int commandMlearn(unsigned char controlType);
+        int commandVector(unsigned char controlType);
+        int commandConfig(unsigned char controlType);
+        int commandScale(unsigned char controlType);
+        int commandPart(bool justSet, unsigned char controlType);
+        int commandReadnSet(unsigned char controlType);
         int sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff, unsigned char request = 0xff);
         bool cmdIfaceProcessCommand();
         char *cCmd;
@@ -65,6 +64,8 @@ class CmdInterface : private MiscFuncs
         SynthEngine *synth;
         char welcomeBuffer [128];
 
+        int kitmode;
+        int kitnumber;
         int npart;
         int nFX;
         int nFXtype;
@@ -74,7 +75,6 @@ class CmdInterface : private MiscFuncs
         int mline;
         unsigned int level;
         string replyString;
-        bool isRead;
 };
 
 #endif

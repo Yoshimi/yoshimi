@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modifed March 2018
+    Modifed June 2018
 */
 
 #ifndef MISCFUNCS_H
@@ -27,6 +27,8 @@
 #include <string>
 #include <list>
 #include <semaphore.h>
+
+#include "globals.h"
 
 using namespace std;
 
@@ -106,20 +108,5 @@ inline float MiscFuncs::dB2rap(float dB) {
 #endif
 }
 inline float MiscFuncs::rap2dB(float rap) { return 20.0f * log10f(rap); }
-
-union CommandBlock{
-    struct{
-        float value;
-        unsigned char type;
-        unsigned char control;
-        unsigned char part;
-        unsigned char kit;
-        unsigned char engine;
-        unsigned char insert;
-        unsigned char parameter;
-        unsigned char par2;
-    } data;
-    char bytes [sizeof(data)];
-};
 
 #endif

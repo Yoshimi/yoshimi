@@ -241,11 +241,11 @@ void JackEngine::registerAudioPort(int partnum)
 
             if(audio.ports [portnum])
             {
-                synth->getRuntime().Log("Registered jack port " + asString(partnum));
+                synth->getRuntime().Log("Registered jack port " + asString(partnum + 1));
             }
             else
             {
-                synth->getRuntime().Log("Error registering jack port " + asString(partnum));
+                synth->getRuntime().Log("Error registering jack port " + asString(partnum + 1));
             }
         }
     }

@@ -17,7 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-Modified April 2018
+Modified August 2018
 } {selected in_source in_header
 }
 
@@ -63,7 +63,7 @@ class VectorUI {: {private MiscFuncs}
         label Options
         xywh {275 12 74 20} labelsize 12 textsize 12
         code0 {o = o; // suppress warning}
-        code1 {vector <string> listType = *synth->getHistory(5);}
+        code1 {vector <string> listType = *synth->getHistory(XML_VECTOR);}
         code2 {if (listType.size() == 0) recenthistory->deactivate(); else recenthistory->activate();}
       } {
         MenuItem {} {
@@ -116,19 +116,19 @@ class VectorUI {: {private MiscFuncs}
           label Recent
           callback {//
           paramsui->Recent->position(vectorwindow->x() + vectorwindow->w() - paramsui->Recent->w(),vectorwindow->y()+20);
-          paramsui->Show(5);}
+          paramsui->Show(XML_VECTOR);}
           xywh {20 20 34 20} labelsize 12 deactivate
         }
         MenuItem {} {
           label {Clear Chan}
           callback {//
-          send_data(96, 0, 0xf0, 192, 255, 255, BaseChan);}
+          send_data(VECTOR::control::erase, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan);}
           xywh {30 30 34 20} labelsize 12
         }
         MenuItem {} {
           label {Clear All}
           callback {//
-          send_data(96, 0, 0xf0);}
+          send_data(VECTOR::control::erase, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           xywh {40 40 34 20} labelsize 12
         }
       }
@@ -151,9 +151,8 @@ class VectorUI {: {private MiscFuncs}
         Fl_Button XL {
           callback {//
           Fl_Button *a = o; o = a; // suppress warning
-          synth->getGuiMaster()->npart = BaseChan;
-          bankui->Show();
-          //send_data(17, o->value(), 0xf0);}
+          synth->getGuiMaster()->activePart = BaseChan;
+          bankui->Show();}
           tooltip {Part corresponding to joystick 'left' position} xywh {20 53 160 20} box UP_FRAME color 51 labelsize 12 align 64
         }
         Fl_Box AddBackR {
@@ -171,9 +170,8 @@ class VectorUI {: {private MiscFuncs}
         Fl_Button XR {
           callback {//
           Fl_Button *a = o; o = a; // suppress warning
-          synth->getGuiMaster()->npart = BaseChan + NUM_MIDI_CHANNELS;
-          bankui->Show();
-          //send_data(18, o->value(), 0xf0);}
+          synth->getGuiMaster()->activePart = BaseChan + NUM_MIDI_CHANNELS;
+          bankui->Show();}
           tooltip {Part corresponding to joystick 'right' position} xywh {20 115 160 20} box UP_FRAME color 51 labelsize 12 align 64
         }
         Fl_Text_Display Xfeat {
@@ -187,7 +185,7 @@ class VectorUI {: {private MiscFuncs}
               bitClear(Xf, 0);
           else
               bitSet(Xf, 0);
-          send_data(19, o->value(), 0xc0);}
+          send_data(VECTOR::control::Xfeature0, o->value(), TOPLEVEL::type::Integer);}
           xywh {208 53 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
           MenuItem {} {
@@ -210,7 +208,7 @@ class VectorUI {: {private MiscFuncs}
               if (o->value() == 2)
                   bitSet(Xf, 4);
           }
-          send_data(20, o->value(), 0xc0);}
+          send_data(VECTOR::control::Xfeature1, o->value(), TOPLEVEL::type::Integer);}
           xywh {302 53 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
           MenuItem {} {
@@ -237,7 +235,7 @@ class VectorUI {: {private MiscFuncs}
               if (o->value() == 2)
                   bitSet(Xf, 5);
           }
-          send_data(21, o->value(), 0xc0);}
+          send_data(VECTOR::control::Xfeature2, o->value(), TOPLEVEL::type::Integer);}
           xywh {208 115 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
           MenuItem {} {
@@ -264,7 +262,7 @@ class VectorUI {: {private MiscFuncs}
               if (o->value() == 2)
                   bitSet(Xf, 6);
           }
-          send_data(22, o->value(), 0xc0);}
+          send_data(VECTOR::control::Xfeature3, o->value(), TOPLEVEL::type::Integer);}
           xywh {302 115 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
           MenuItem {} {
@@ -291,7 +289,7 @@ class VectorUI {: {private MiscFuncs}
         if (tmp < 14)
         {
             Xcc = 0;
-            send_data(96, 0, 0xf0, 192, 255, 255, BaseChan);
+            send_data(VECTOR::control::erase, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan);
             return;
         }
 
@@ -303,7 +301,7 @@ class VectorUI {: {private MiscFuncs}
         }
 
         Xcc =  tmp;
-        send_data(16, tmp, 0xd0);}
+        send_data(VECTOR::control::Xcontroller, tmp, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         tooltip {The MIDI CC this axis reponds to} xywh {110 85 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12
         code0 {//
         o->value(Xcc);}
@@ -333,9 +331,8 @@ class VectorUI {: {private MiscFuncs}
         Fl_Button YU {
           callback {//
           Fl_Button *a = o; o = a; // suppress warning
-          synth->getGuiMaster()->npart = BaseChan + NUM_MIDI_CHANNELS * 2;
-          bankui->Show();
-          //send_data(33, o->value(), 0xc0);}
+          synth->getGuiMaster()->activePart = BaseChan + NUM_MIDI_CHANNELS * 2;
+          bankui->Show();}
           tooltip {Part corresponding to joystick 'up' position} xywh {20 163 160 20} box UP_FRAME color 51 labelsize 12 align 64
         }
         Fl_Box AddBackD {
@@ -353,9 +350,8 @@ class VectorUI {: {private MiscFuncs}
         Fl_Button YD {
           callback {//
           Fl_Button *a = o; o = a; // suppress warning
-          synth->getGuiMaster()->npart = BaseChan + NUM_MIDI_CHANNELS * 3;
-          bankui->Show();
-          //send_data(34, o->value(), 0xc0);}
+          synth->getGuiMaster()->activePart = BaseChan + NUM_MIDI_CHANNELS * 3;
+          bankui->Show();}
           tooltip {Part corresponding to joystick 'down'position} xywh {20 225 160 20} box UP_FRAME color 51 labelsize 12 align 64
         }
         Fl_Text_Display Yfeat {
@@ -369,7 +365,7 @@ class VectorUI {: {private MiscFuncs}
               bitClear(Yf, 0);
           else
               bitSet(Yf, 0);
-          send_data(35, o->value(), 0xc0);}
+          send_data(VECTOR::control::Yfeature0, o->value(), TOPLEVEL::type::Integer);}
           xywh {208 163 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
           MenuItem {} {
@@ -392,7 +388,7 @@ class VectorUI {: {private MiscFuncs}
               if (o->value() == 2)
                   bitSet(Yf, 4);
           }
-          send_data(36, o->value(), 0xc0);}
+          send_data(VECTOR::control::Yfeature1, o->value(), TOPLEVEL::type::Integer);}
           xywh {302 163 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
           MenuItem {} {
@@ -419,7 +415,7 @@ class VectorUI {: {private MiscFuncs}
               if (o->value() == 2)
                   bitSet(Yf, 5);
           }
-          send_data(37, o->value(), 0xc0);}
+          send_data(VECTOR::control::Yfeature2, o->value(), TOPLEVEL::type::Integer);}
           xywh {208 225 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
           MenuItem {} {
@@ -446,7 +442,7 @@ class VectorUI {: {private MiscFuncs}
               if (o->value() == 2)
                   bitSet(Yf, 6);
           }
-          send_data(38, o->value(), 0xc0);}
+          send_data(VECTOR::control::Yfeature3, o->value(), TOPLEVEL::type::Integer);}
           xywh {302 225 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
           MenuItem {} {
@@ -473,7 +469,7 @@ class VectorUI {: {private MiscFuncs}
         if (tmp < 14)
         {
             Ycc = 0;
-            send_data(32, 0xff, 0xd0);
+            send_data(VECTOR::control::Ycontroller, 0xff, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);
             return;
         }
 
@@ -485,7 +481,7 @@ class VectorUI {: {private MiscFuncs}
         }
 
         Ycc =  tmp;
-        send_data(32, tmp, 0xd0);}
+        send_data(VECTOR::control::Ycontroller, tmp, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         tooltip {The MIDI CC this axis reponds to} xywh {110 195 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12 deactivate
         code0 {o->value(Ycc);}
       }
@@ -496,18 +492,19 @@ class VectorUI {: {private MiscFuncs}
         const char *tmp = NULL;
         tmp = fl_input("Vector name:", loadlabel[BaseChan].c_str());
         if (tmp != NULL && !string(tmp).empty())
-            send_data(8, 0, 0xd0, 192, 255, 255, BaseChan, 128, miscMsgPush(string(tmp)));}
+            send_data(VECTOR::control::name, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan, TOPLEVEL::route::lowPriority, miscMsgPush(string(tmp)));}
         tooltip {Last saved or loaded vector file - click to change} xywh {45 265 198 20} box THIN_DOWN_BOX labelfont 1 labelsize 12
       }
     }
   }
-  Function {send_data(int control, float value, int type, int part = 192, int kit = 255, int engine = 255, int insert = 255, int parameter = 255, int par2 = 255)} {} {
+  Function {send_data(int control, float value, int type, int part = TOPLEVEL::section::vector, int kit = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED)} {} {
     code {//
-    if (control != 84 && control != 85 && control != 96)
-    {
-        insert = BaseChan;
-    }
-    collect_data(synth, value, (Fl::event_button() | type), control, part, kit, engine, insert, parameter, par2);} {}
+        if (control != 84 && control != 85 && control != 96)
+        {
+            insert = BaseChan;
+        }
+        type |= TOPLEVEL::type::Write;
+        collect_data(synth, value, (Fl::event_button() | type), control, part, kit, engine, insert, parameter, par2);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
@@ -520,13 +517,13 @@ class VectorUI {: {private MiscFuncs}
 
     switch (control)
     {
-        case 8:
+        case VECTOR::control::name:
             msg = miscMsgPop(par2);;
             loadlabel[insert] = msg;
             Loaded->copy_label(msg.c_str());
             break;
 
-        case 16:
+        case VECTOR::control::Xcontroller:
             if (synth->getGuiMaster()->partmax < NUM_MIDI_CHANNELS * 2)
             {
                 synth->getGuiMaster()->maxparts->value(NUM_MIDI_CHANNELS * 2);
@@ -556,20 +553,20 @@ class VectorUI {: {private MiscFuncs}
             }
             break;
 
-        case 19:
+        case VECTOR::control::Xfeature0:
             Xfeat1->value(value_int);
             break;
-        case 20:
+        case VECTOR::control::Xfeature1:
             Xfeat2->value(value_int);
             break;
-        case 21:
+        case VECTOR::control::Xfeature2:
             Xfeat3->value(value_int);
             break;
-        case 22:
+        case VECTOR::control::Xfeature3:
             Xfeat4->value(value_int);
             break;
 
-        case 32:
+        case VECTOR::control::Ycontroller:
             if (synth->getGuiMaster()->partmax < NUM_MIDI_CHANNELS * 4)
             {
                 synth->getGuiMaster()->maxparts->value(NUM_MIDI_CHANNELS * 4);
@@ -594,20 +591,20 @@ class VectorUI {: {private MiscFuncs}
             }
             break;
 
-        case 35:
+        case VECTOR::control::Yfeature0:
             Yfeat1->value(value_int);
             break;
-        case 36:
+        case VECTOR::control::Yfeature1:
             Yfeat2->value(value_int);
             break;
-        case 37:
+        case VECTOR::control::Yfeature2:
             Yfeat3->value(value_int);
             break;
-        case 38:
+        case VECTOR::control::Yfeature3:
             Yfeat4->value(value_int);
             break;
 
-        case 96:
+        case VECTOR::control::erase:
             if (insert >= NUM_MIDI_PARTS)
             {
                 for (int i = NUM_MIDI_CHANNELS - 1; i >= 0; --i)
@@ -868,7 +865,7 @@ class VectorUI {: {private MiscFuncs}
     code {//
     if (fname == "")
     {
-        string lastname = synth->lastItemSeen(5);
+        string lastname = synth->lastItemSeen(XML_VECTOR);
         if (lastname == "")
             lastname = synth->getRuntime().userHome;
         char *filename;
@@ -877,11 +874,11 @@ class VectorUI {: {private MiscFuncs}
             return;
         fname = string(filename);
     }
-    send_data(84, 0, 0xf0, 240, 255, 255, BaseChan, 192, miscMsgPush(fname));} {}
+    send_data(MAIN::loadNamedVector, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, BaseChan, TOPLEVEL::route::adjustAndLoopback, miscMsgPush(fname));} {}
   }
   Function {saveVector()} {} {
     code {//
-    string lastname = synth->getLastfileAdded(5);
+    string lastname = synth->getLastfileAdded(XML_VECTOR);
     if (lastname == "")
         lastname = synth->getRuntime().userHome;
     const char *file = NULL;
@@ -896,7 +893,7 @@ class VectorUI {: {private MiscFuncs}
     int pos = loadlabel[BaseChan].find("No Name");
     if (pos >=0 && pos < 2)
         Loaded->copy_label(findleafname(filename).c_str());
-    send_data(85, 0, 0xc0, 240, 255, 255, BaseChan, 128, miscMsgPush(filename));} {}
+    send_data(MAIN::saveNamedVector, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, BaseChan, TOPLEVEL::route::lowPriority, miscMsgPush(filename));} {}
   }
   Function {clearVector(int BaseC)} {} {
     code {//

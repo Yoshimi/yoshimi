@@ -22,13 +22,14 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified April 2018
+    Modified August 2018
 */
 
 #include <cmath>
 #include <iostream>
-# include <algorithm>
+#include <algorithm>
 #include <limits.h>
+
 #include "Misc/Config.h"
 #include "Misc/XMLwrapper.h"
 #include "Misc/Microtonal.h"
@@ -788,79 +789,115 @@ bool Microtonal::loadXML(string filename)
 float Microtonal::getLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    int request = int(getData->data.type & 3);
+    unsigned char type = getData->data.type;
+    int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
 
-    // defaults
-    unsigned int type = getData->data.type| 0xc0; // set as learnable integer;
+    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
+
+    // microtonal defaults
     int min = 0;
     float def = 0;
     int max = 127;
-    //cout << "config control " << to_string(control) << endl;
+    type |= TOPLEVEL::type::Integer;
+    unsigned char learnable = TOPLEVEL::type::Learnable;
+
     switch (control)
     {
-        case 0:
-            type &= 0x3f;
+        case SCALES::control::Afrequency:
             min = 1.0f;
             def = 440.0f;
             max = 20000.0f;
             break;
-        case 1:
+        case SCALES::control::Anote:
             def = 69;
+            type |= learnable;
             break;
-        case 2:
+        case SCALES::control::invertScale:
             max = 1;
+            type |= learnable;
             break;
-        case 3:
+        case SCALES::control::invertedScaleCenter:
             def = 60;
+            type |= learnable;
             break;
-        case 4:
+        case SCALES::control::scaleShift:
             min = -63;
             max = 64;
+            type |= learnable;
             break;
 
-        case 8:
+        case SCALES::control::enableMicrotonal:
             max = 1;
+            type |= learnable;
             break;
 
-        case 16:
+        case SCALES::control::enableKeyboardMap:
             max = 1;
+            type |= learnable;
             break;
-        case 17:
+        case SCALES::control::lowKey:
+            type |= learnable;
             break;
-        case 18:
+        case SCALES::control::middleKey:
             def = 60;
+            type |= learnable;
             break;
-        case 19:
+        case SCALES::control::highKey:
             def = 127;
+            type |= learnable;
+            break;
+
+        case SCALES::control::tuning:
+            max = 1;
+            break;
+        case SCALES::control::keyboardMap:
+            max = 1;
+            break;
+        case SCALES::control::importScl:
+            max = 1;
+            break;
+        case SCALES::control::importKbm:
+            max = 1;
+            break;
+        case SCALES::control::name:
+            max = 1;
+            break;
+        case SCALES::control::comment:
+            max = 1;
+            break;
+        case SCALES::control::retune:
+            max = 1;
+            break;
+        case SCALES::control::clearAll:
+            max = 1;
             break;
 
         default:
-            type |= 4; // error
+            type |= TOPLEVEL::type::Error;
             break;
     }
     getData->data.type = type;
-    if (type & 4)
+    if (type & TOPLEVEL::type::Error)
         return 1;
 
     switch (request)
     {
-        case 0:
+        case TOPLEVEL::type::Adjust:
             if(value < min)
                 value = min;
             else if(value > max)
                 value = max;
         break;
-        case 1:
+        case TOPLEVEL::type::Minimum:
             value = min;
             break;
-        case 2:
+        case TOPLEVEL::type::Maximum:
             value = max;
             break;
-        case 3:
+        case TOPLEVEL::type::Default:
             value = def;
             break;
     }
     return value;
-
 }

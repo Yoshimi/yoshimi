@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified February 2018
+    Modified August 2018
 */
 
 #include <cmath>
@@ -396,135 +396,135 @@ void Controller::getfromXML(XMLwrapper *xml)
 float Controller::getLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    int request = int(getData->data.type & 3);
+    unsigned char type = getData->data.type;
+    int request = type & TOPLEVEL::type::Default;
     int control = getData->data.control;
 
-    //cout << "ctl control " << control << "  Request " << request << endl;
-
-    // defaults
-    int type = 0x80;
+    // controller defaults
     int min = 0;
     float def = 64;
     int max = 127;
+    type |= TOPLEVEL::type::Integer;
+    unsigned char learnable = TOPLEVEL::type::Learnable;
 
     switch (control)
     {
-        case 128:
+        case PART::control::volumeRange:
             min = 64;
             def = 96;
             break;
-        case 129:
+        case PART::control::volumeEnable:
             def = 1;
             max = 1;
             break;
-        case 130:
-            type |= 0x40;
+        case PART::control::panningWidth:
+            type |= learnable;
             max = 64;
             break;
-        case 131:
+        case PART::control::modWheelDepth:
             def = 80;
             break;
-        case 132:
+        case PART::control::exponentialModWheel:
             def = 0;
             max = 1;
             break;
-        case 133:
-            type |= 0x40;
+        case PART::control::bandwidthDepth:
+            type |= learnable;
             break;
-        case 134:
+        case PART::control::exponentialBandwidth:
             def = 0;
             max = 1;
             break;
-        case 135:
+        case PART::control::expressionEnable:
             def = 1;
             max = 1;
             break;
-        case 136:
+        case PART::control::FMamplitudeEnable:
             def = 1;
             max = 1;
             break;
-        case 137:
+        case PART::control::sustainPedalEnable:
             def = 1;
             max = 1;
             break;
-        case 138:
-            type |= 0x40;
+        case PART::control::pitchWheelRange:
+            type |= learnable;
             min = -6400;
-            def = 0;
+            def = 200;
             max = 6400;
             break;
-        case 139:
+        case PART::control::filterQdepth:
             break;
-        case 140:
+        case PART::control::filterCutoffDepth:
             break;
-        case 141:
+        case PART::control::breathControlEnable:
             max = 1;
             def = 1;
             break;
-        case 144:
+        case PART::control::resonanceCenterFrequencyDepth:
             break;
-        case 145:
+        case PART::control::resonanceBandwidthDepth:
             break;
-        case 160:
-            type |= 0x40;
+        case PART::control::portamentoTime:
+            type |= learnable;
             min = 0;
             break;
-        case 161:
-            type |= 0x40;
+        case PART::control::portamentoTimeStretch:
+            type |= learnable;
             break;
-        case 162:
-            type |= 0x40;
+        case PART::control::portamentoThreshold:
+            type |= learnable;
             def = 3;
             break;
-        case 163:
+        case PART::control::portamentoThresholdType:
             min = 0;
             max = 1;
             def = 1;
             break;
-        case 164:
+        case PART::control::enableProportionalPortamento:
             def = 0;
             max = 1;
             break;
-        case 165:
-            type |= 0x40;
+        case PART::control::proportionalPortamentoRate:
+            type |= learnable;
             def = 80;
             break;
-        case 166:
-            type |= 0x40;
+        case PART::control::proportionalPortamentoDepth:
+            type |= learnable;
             def = 90;
             break;
-        case 168:
+        case PART::control::receivePortamento:
             def = 1;
             max = 1;
             break;
-        case 224:
+        case PART::control::resetAllControllers:
             def = 0;
             max = 0;
             break;
 
         default:
-            type |= 4; // error
+            type |= TOPLEVEL::type::Error;
             break;
     }
     getData->data.type = type;
-    if (type & 4)
+    if (type & TOPLEVEL::type::Error)
         return 1;
 
     switch (request)
     {
-        case 0:
+        case TOPLEVEL::type::Adjust:
             if(value < min)
                 value = min;
             else if(value > max)
                 value = max;
         break;
-        case 1:
+        case TOPLEVEL::type::Minimum:
             value = min;
             break;
-        case 2:
+        case TOPLEVEL::type::Maximum:
             value = max;
             break;
-        case 3:
+        case TOPLEVEL::type::Default:
             value = def;
             break;
     }

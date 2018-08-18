@@ -1,5 +1,242 @@
 yoshimi 1.5.8 M
 
+2018-8-18 Will
+* Improved patch load behaviour crossing CLI / GUI.
+* Started work on CLI kitmode.
+
+2018-8-17 Will
+* Implemented read most CLI min, max, default
+  for formally defined ones.
+* Implemented most CLI Mlearn initialisation
+  for formally defined ones.
+  Can't cancel from CLI though and non-learnable
+  ones appear to learn.
+* Added CLI help info to new controls.
+
+2018-8-16 Will
+* BugFix: CLI not setting some values
+  and not reading any :(
+* Started on CLI for reading min, max, default.
+
+2018-8-15 Will
+* All GUI default requests now set by limits.
+  This is a major refactoring, considerably
+  reducing the duplication in the GUI and adding
+  more functionality.
+  Some switches don't yet update, but are correct.
+
+2018-8-14 Will
+* Added missing conversions in FilterUI.fl
+* Added missing conversions in EnvelopeUI.fl
+* BugFix: EffUI.fl updates incomplete :(
+* Added missing conversions in LFOUI.fl
+
+2018-8-13 Will
+* Separated system and insert control names.
+* Updated docs.
+* Added missing conversions in EffUI.fl
+
+2018-8-12 Will
+* Reorganised and combined XML & history types.
+  History lists now identified by name.
+* More 'type' and 'control' conversions in CLI.
+* Small GUI updates/corrections.
+
+2018-8-7 Will
+* BugFix: Corrected wrong operator use.
+  Was || when it should have been |
+* Envelope limits done.
+
+2018-8-6 Will
+* Found more missing conversions :(
+
+2018-8-5 Will
+* Updated addSynth limits.
+* Updated padsynth limits.
+* Updated subSynth limits.
+* Updated controller limits.
+* Completed sys/ins control change.
+  Envelope defaults still to do.
+
+2018-8-4 Will
+* BugFix: MIDI-learn Cancel.
+  It was only pretending to :(
+* Updated Microtonal.cpp limits.
+* MicrotonalUI.fl converted to enums.
+* Updated SynthEngine.cpp limits.
+* MasterMiscUI.fl converted to enums.
+* MasterUI.fl mostly converted to enums.
+  Still some control values for MIDI,
+  System and Insert effects to do.
+* ConfigUI converted to enums.
+* BankUI converted to enums.
+* All MIDI controls now done.
+  Effects still not complete.
+
+2018-8-3 Will
+* OscilGenUI.fl converted to enums.
+* Completed limits in Synth/OscilGen.cpp
+* PartUI.fl converted to enums.
+* Some minor cleanups.
+* VectorUI.fl converted to enums.
+* Vector limits now same format as others.
+* ResonanceUI.fl converted to enums.
+
+
+2018-8-2 Will
+* ADnoteUI.fl converted to enums.
+* More clarifcations in MiscGui.cpp
+  Also found more missing conversions :(
+* SUBnoteUI.fl converted to enums.
+* PADnoteUI.fl converted to enums.
+
+2018-8-1 Will
+* Partly implemented envelope limits.
+  Not defaults.
+* MIDI-learn test now using limits and
+  not the GUI version.
+
+2018-7-31 Will
+* Implemented filter limits.
+* Added MIDI-learn to filter limits.
+
+2018-7-30 Will
+* Implemented LFO limits.
+
+2018-7-29 Will
+* More work on Limits.
+* Converted limits error checks.
+* Updated limits doc.
+* Improved encoding in UI/MiscGui.cpp
+* More work on limits.
+* Picked up a few more stragglers.
+
+2018-7-28 Will
+* Cleaned up some missing conversions.
+  Also corrected previous date!
+* More identification of anonymous 255s.
+  e.g. NO_MSG, UNUSED, NO_ACTION
+* Converted bank controls to enums.
+* More missing conversions :(
+* Started identifying types and sources.
+* Still more missing conversions!
+* Rationalised limits in Interface/CmdInterface
+* Started converting limits to enums.
+
+2018-7-27 Will
+* Converted effect type controls to enums.
+  More work needed :(
+
+2018-7-26 Will
+* Converted envelope controls to enums.
+
+2018-7-25 Will
+* Converted MIDIlearn controls to enums.
+
+2018-7-24 Will
+* Revised enum namespace terminology.
+  No intrinsic code changes.
+* Converted resonance controls to enums.
+* Converted LFO controls to enums.
+* Converted filter controls to enums.
+
+2018-7-23 Will
+* Converted oscillator controls to enums.
+
+2018-7-22 Will
+* Converted main addSynth controls to enums.
+* Converted addVoice controls to enums.
+* BugFix: CLI not setting GUI Bypass GobalFilter.
+* Revised build dependencies.
+
+2018-7-21 Will
+* Completed scales enum conversion.
+* Converted subSynth controls to enums.
+* Converted padSynth controls to enums.
+
+2018-7-20 Will
+* Completed vector GUI enum updates.
+* Updated docs and images.
+* BugFix: scales CLI keymap entry wrong controls.
+* Started enum conversion of scales.
+* BugFix: scales CLI keymap not updating GUI.
+
+2018-7-10 Will
+* Corrected GUI Vector/Part/Mixer/Bank anomaly.
+  This whole area needs a *major* refactor :(
+
+2018-7-9 Will
+* Started conversion of Vectors.
+
+2018-7-5 Will
+* Separated common main/part controls.
+  Makes enums properly independent.
+
+2018-7-3 Will
+* Improved fade/mute/loopback isolation.
+* Added 'muted' enums.
+* Changed some names to improve clarity.
+* Restored lost main control conversions :(
+  Too many local branches?
+
+2018-7-1 Will
+* Caught more missing conversions :(
+
+2018-6-30 Will
+* Added some missing enum conversions in 'interchange'.
+* Implemented control routes as enums.
+
+2018-6-29 Will
+* GUI config controls converted to enum.
+* Defined 'insert' enums, and converted all occurrences.
+
+2018-6-25 Will
+* BugFix: GUI mixer controls not setting part window.
+* Forgot section changes in resolveReplies.
+* Interchange config controls converted to enum.
+* CLI config controls converted to enum.
+
+2018-6-24 Will
+* GUI part controls converted.
+* GUI main engine controls converted.
+* Further work on addVoice/addMod controls.
+  These no longer need to be fixed values.
+
+2018-6-23 Will
+* Added engines to globals.h
+* Further work on Interchange.cpp
+* CLI Part level mostly converted.
+* Corrected multiple commit/merge failures :(
+* Further adustments to Interchange.cpp
+
+2018-6-22 Will
+* Moved CommandBlock from MiscFuncs'.h to globals.h
+* Set up part level controls enum in globals.h
+  Converted actual commands in Interchange.cpp
+* Implimented small optimisation for reads.
+* Minor doc updates.
+* Completed part controls move in  Interchange.cpp
+
+2018-6-21 Will
+* Instruments can now be swapped between banks and roots.
+* Small doc updates.
+* Created new globals.h file.
+  Transfered definitions from CMakeLists.txt
+
+2018-6-13 Will
+* Small optimisation in 'zread'.
+  Also shortened read loop usleep time to 10uS.
+
+2018-6-13 Will
+* implimented 'zread' CLI test for command structure.
+
+2018-6-11 Will
+* Bugfix: Wasn't reloading solo-twoway.
+  Saved OK, but reloaded as loop.
+* Formalised manual search and opening.
+  GUI now only calls via command block.
+
+
 2018-6-5 Will
 * BugFix: Clearing kitmode key ranges was resetting.
 * BugFix: Bank renaming now working across roots.

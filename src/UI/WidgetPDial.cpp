@@ -6,7 +6,7 @@
     Copyright 2009-2010, Alan Calvert
     Copyright 2016 Will Godfrey
     Copyright 2017 Jesper Lloyd
-    Coyright 2018, Will Godfrey and others
+    Coyright 2018, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -24,7 +24,7 @@
 
     This file is a derivative of the ZynAddSubFX original.
 
-    Modified March 2018
+    Modified August 2018
 */
 
 #include "WidgetPDial.h"
@@ -48,11 +48,6 @@ WidgetPDial::WidgetPDial(int x,int y, int w, int h, const char *label) : Fl_Dial
 WidgetPDial::~WidgetPDial()
 {
     delete dyntip;
-}
-
-void WidgetPDial::init(float home_ )
-{
-    home = home_;
 }
 
 void WidgetPDial::setValueType(ValueType type_)
@@ -102,7 +97,7 @@ int WidgetPDial::handle(int event)
         if(event == FL_PUSH)
         {
             Fl::belowmouse(this); /* Ensures other widgets receieve FL_RELEASE */
-            if (home > -0.5f && Fl::event_button() == 3)
+            /*if (home > -0.5f && Fl::event_button() == 3)
             {
                 value(home);
                 value_damage();
@@ -110,8 +105,8 @@ int WidgetPDial::handle(int event)
                     do_callback();
                 res = 1;
                 break;
-            }
-            if (this->when() != 0 && Fl::event_button() == 3) // only effects knobs need this
+            }*/
+            //if (this->when() != 0 && Fl::event_button() == 3) // only effects knobs need this
                 do_callback();
             oldvalue = value();
         }
