@@ -861,7 +861,10 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         if ((what == 1 || what == 3) && mode == 1 && !bank->emptyslot(slot))
         {
             if (synth->getGuiMaster()->activePart == UNUSED)
+            {
+                fl_alert("Active part disabled");
                 return;
+            }
             send_data(MAIN::control::loadInstrument, synth->getGuiMaster()->activePart, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, slot);
             // Reads from slot
             if (what == 3)
@@ -886,7 +889,6 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
                     else
                     {
                         synth->part[curPart]->Pname = newname;
-                        //send_data(MAIN::control::saveInstrument, float(curPart), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, slot, TOPLEVEL::route::lowPriority);
                         send_data(MAIN::control::saveInstrument, float(synth->getGuiMaster()->activePart), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, slot, TOPLEVEL::route::lowPriority);
                     }
                 }
