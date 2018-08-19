@@ -85,6 +85,7 @@ class MiscFuncs
         unsigned int bitFindHigh(unsigned int value);
         void bitSet(unsigned int& value, unsigned int bit);
         void bitClear(unsigned int& value, unsigned int bit);
+        void bitClearHigh(unsigned int& value);
         bool bitTest(unsigned int value, unsigned int bit);
 
         float dB2rap(float dB);

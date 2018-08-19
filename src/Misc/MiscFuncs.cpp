@@ -578,12 +578,14 @@ float MiscFuncs::limitsF(float value, float min, float max)
 
 unsigned int MiscFuncs::bitFindHigh(unsigned int value)
 {
-    unsigned int bit = 0;
-    while (value >>= 1)
+    int bit = 32;
+    while (bit >= 0)
     {
-        bit ++;
+        bit --;
+        if ((value >> bit) == 1)
+            return bit;
     }
-    return bit;
+    return 0xff;
 }
 
 
@@ -598,6 +600,12 @@ void MiscFuncs::bitClear(unsigned int& value, unsigned int bit)
     unsigned int mask = -1;
     mask ^= (1 << bit);
     value &= mask;
+}
+
+
+void MiscFuncs::bitClearHigh(unsigned int& value)
+{
+    bitClear(value, bitFindHigh(value));
 }
 
 
