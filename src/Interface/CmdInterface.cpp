@@ -290,7 +290,7 @@ string fx_presets [] = {
 
 void CmdInterface::defaults()
 {
-    level = 0;
+    context = LEVEL::Top;
     chan = 0;
     axis = 0;
     mline = 0;
@@ -382,15 +382,15 @@ bool CmdInterface::helpList(unsigned int local)
     }
     else
     {
-        if (bitTest(local, part_lev))
+        if (bitTest(local, LEVEL::Part))
             listnum = 3;
-        else if (bitTest(local, vect_lev))
+        else if (bitTest(local, LEVEL::Vector))
             listnum = 4;
-        else if (bitTest(local, scale_lev))
+        else if (bitTest(local, LEVEL::Scale))
             listnum = 5;
-        else if (bitTest(local, conf_lev))
+        else if (bitTest(local, LEVEL::Config))
             listnum = 9;
-        else if (bitTest(local, learn_lev))
+        else if (bitTest(local, LEVEL::Learn))
             listnum = 10;
     }
 
@@ -550,7 +550,7 @@ int CmdInterface::effectsList(bool presets)
     string left;
     bool all;
 
-    if (bitTest(level, all_fx) && presets == true)
+    if (bitTest(context, LEVEL::AllFX) && presets == true)
     {
          synth->getRuntime().Log("Type " + fx_list[nFXtype] + "\nPresets -" + fx_presets[nFXtype].substr(fx_presets[nFXtype].find(',') + 1));
          return done_msg;
@@ -603,12 +603,12 @@ int CmdInterface::effects(unsigned char controlType)
     string dest = "";
     bool flag;
 
-    if (bitTest(level, part_lev))
+    if (bitTest(context, LEVEL::Part))
     {
         nFXavail = NUM_PART_EFX;
         nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
     }
-    else if (bitTest(level, ins_fx))
+    else if (bitTest(context, LEVEL::InsFX))
     {
         nFXavail = NUM_INS_EFX;
         nFXtype = synth->insefx[nFX]->geteffect();
@@ -633,12 +633,12 @@ int CmdInterface::effects(unsigned char controlType)
         if (value != nFX)
         { // calls to update GUI
             nFX = value;
-            if (bitTest(level, part_lev))
+            if (bitTest(context, LEVEL::Part))
             {
                 nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
                 sendDirect(nFXtype, TOPLEVEL::type::Write, PART::control::effectType, npart, UNUSED, nFX, TOPLEVEL::insert::partEffectSelect);
             }
-            else if (bitTest(level, ins_fx))
+            else if (bitTest(context, LEVEL::InsFX))
             {
                 nFXtype = synth->insefx[nFX]->geteffect();
                 sendDirect(nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::insertEffects, UNUSED, nFX);
@@ -679,9 +679,9 @@ int CmdInterface::effects(unsigned char controlType)
         nFXpreset = 0; // always set this on type change
         Runtime.Log("efx type set to " + fx_list[nFXtype]);
         //Runtime.Log("Presets -" + fx_presets[nFXtype].substr(fx_presets[nFXtype].find(',') + 1));
-        if (bitTest(level, part_lev))
+        if (bitTest(context, LEVEL::Part))
             sendDirect(nFXtype, TOPLEVEL::type::Write, PART::control::effectType, npart, UNUSED, nFX);
-        else if (bitTest(level, ins_fx))
+        else if (bitTest(context, LEVEL::InsFX))
             sendDirect(nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::insertEffects, UNUSED, nFX);
         else
             sendDirect(nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, nFX);
@@ -693,7 +693,7 @@ int CmdInterface::effects(unsigned char controlType)
         if (point[0] == 0)
             return parameter_msg;
 
-        if (bitTest(level, ins_fx))
+        if (bitTest(context, LEVEL::InsFX))
         {
             if (matchnMove(1, point, "master"))
             {
@@ -728,7 +728,7 @@ int CmdInterface::effects(unsigned char controlType)
         int engine = nFX;
         int insert = UNUSED;
 
-        if (bitTest(level, part_lev))
+        if (bitTest(context, LEVEL::Part))
         {
             partno = npart;
             control = 40 + par;
@@ -737,7 +737,7 @@ int CmdInterface::effects(unsigned char controlType)
             dest = "part " + asString(npart + 1) + " efx sent to system "
                  + asString(par + 1) + " at " + asString(value);
         }
-        else if (bitTest(level, ins_fx))
+        else if (bitTest(context, LEVEL::InsFX))
         {
             partno = TOPLEVEL::section::insertEffects;
             control = 2;
@@ -776,12 +776,12 @@ int CmdInterface::effects(unsigned char controlType)
         if (value >= par || value < 0)
             return range_msg;
         nFXpreset = value;
-        if (bitTest(level, part_lev))
+        if (bitTest(context, LEVEL::Part))
         {
             partno = npart;
             dest = "part " + asString(npart + 1);
         }
-        else if (bitTest(level, ins_fx))
+        else if (bitTest(context, LEVEL::InsFX))
         {
             partno = TOPLEVEL::section::insertEffects;
             dest = "insert";
@@ -935,7 +935,7 @@ int CmdInterface::commandMlearn(unsigned char controlType)
     int lineNo;
     int tmp = 0;
     float value;
-    bitSet(level, learn_lev);
+    bitSet(context, LEVEL::Learn);
 
     if (controlType != TOPLEVEL::type::Write)
     {
@@ -1043,7 +1043,7 @@ int CmdInterface::commandVector(unsigned char controlType)
     list<string> msg;
     int reply = todo_msg;
     int tmp;
-    bitSet(level, vect_lev);
+    bitSet(context, LEVEL::Vector);
     if (controlType != TOPLEVEL::type::Write)
     {
         if (synth->SingleVector(msg, chan))
@@ -1079,7 +1079,7 @@ int CmdInterface::commandVector(unsigned char controlType)
     {
         sendDirect(0,controlType,VECTOR::control::erase, TOPLEVEL::section::vector, UNUSED, UNUSED, chan);
         axis = 0;
-        bitClear(level, vect_lev);
+        bitClear(context, LEVEL::Vector);
         return done_msg;
     }
     if (matchnMove(1, point, "xaxis"))
@@ -1106,7 +1106,7 @@ int CmdInterface::commandVector(unsigned char controlType)
         if (axis == 0)
         {
             sendDirect(tmp, controlType, VECTOR::control::Xcontroller, TOPLEVEL::section::vector, UNUSED, UNUSED, chan);
-            bitSet(level, vect_lev);
+            bitSet(context, LEVEL::Vector);
             return done_msg;
         }
         if (Runtime.vectordata.Enabled[chan])
@@ -1607,7 +1607,7 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
     //npart = Runtime.currentPart; // belt and braces
     if (point[0] == 0)
         return done_msg;
-    if (bitTest(level, all_fx))
+    if (bitTest(context, LEVEL::AllFX))
         return effects(controlType);
     if (justSet || isdigit(point[0]))
     {
@@ -1637,8 +1637,9 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
 
     if (matchnMove(2, point, "effects") || matchnMove(2, point, "efx"))
     {
-        level = 1; // clear out any higher levels
-        bitSet(level, part_lev);
+        context = LEVEL::Top;
+        bitSet(context, LEVEL::AllFX);
+        bitSet(context, LEVEL::Part);
         return effects(controlType);
     }
 
@@ -1899,30 +1900,30 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
         return done_msg;
     }
 
-    if (bitTest(level, conf_lev))
+    if (bitTest(context, LEVEL::Config))
         reply = commandConfig(controlType);
-    else if (bitTest(level, scale_lev))
+    else if (bitTest(context, LEVEL::Scale))
         reply = commandScale(controlType);
-    else if (bitTest(level, part_lev))
+    else if (bitTest(context, LEVEL::Part))
         reply = commandPart(false, controlType);
-    else if (bitTest(level, vect_lev))
+    else if (bitTest(context, LEVEL::Vector))
         reply = commandVector(controlType);
-    else if (bitTest(level, learn_lev))
+    else if (bitTest(context, LEVEL::Learn))
         reply = commandMlearn(controlType);
     if (reply > todo_msg)
         return reply;
 
     if (matchnMove(2, point, "config"))
     {
-        level = 0; // clear all first
-        bitSet(level, conf_lev);
+        context = LEVEL::Top;
+        bitSet(context, LEVEL::Config);
         return commandConfig(controlType);
     }
 
     if (matchnMove(1, point, "scale"))
     {
-        level = 0; // clear all first
-        bitSet(level, scale_lev);
+        context = LEVEL::Top;
+        bitSet(context, LEVEL::Scale);
         return commandScale(controlType);
     }
 
@@ -1938,43 +1939,45 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
             Runtime.Log("Current part " + asString(npart) + name, 1);
             return done_msg;
         }
-        level = 0; // clear all first
-        bitSet(level, part_lev);
+        context = LEVEL::Top;
+        bitSet(context, LEVEL::Part);
         nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
         return commandPart(true, controlType);
     }
 
     if (matchnMove(2, point, "vector"))
     {
-        level = 0; // clear all first
+        context = LEVEL::Top;
         return commandVector(controlType);
     }
 
     if (matchnMove(2, point, "mlearn"))
     {
-        level = 0; // clear all first
+        context = LEVEL::Top;
         return commandMlearn(controlType);
     }
 
-    if (level < 4 && matchnMove(3, point, "system"))
+    if ((context == LEVEL::Top || bitTest(context, LEVEL::InsFX)) && matchnMove(3, point, "system"))
     {
-        level = 1;
+        bitSet(context,LEVEL::AllFX);
+        bitClear(context, LEVEL::InsFX);
         nFX = 0; // effects number limit changed
         matchnMove(2, point, "effects"); // clear it if given
         matchnMove(2, point, "efx");
         nFXtype = synth->sysefx[nFX]->geteffect();
         return effects(controlType);
     }
-    if (level < 4 && matchnMove(3, point, "insert"))
+    if ((context == LEVEL::Top || bitTest(context, LEVEL::AllFX)) && !bitTest(context, LEVEL::Part) && matchnMove(3, point, "insert"))
     {
-        level = 3;
+        bitSet(context,LEVEL::AllFX);
+        bitSet(context,LEVEL::InsFX);
         nFX = 0; // effects number limit changed
         matchnMove(2, point, "effects"); // clear it if given
         matchnMove(2, point, "efx");
         nFXtype = synth->insefx[nFX]->geteffect();
         return effects(controlType);
     }
-    if (bitTest(level, all_fx))
+    if (bitTest(context, LEVEL::AllFX))
         return effects(controlType);
 
     if (matchnMove(1, point, "root"))
@@ -2150,7 +2153,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
     {
         ++ point;
         point = skipSpace(point);
-        level = 0;
+        context = LEVEL::Top;
         if (point[0] == 0)
             return false;
     }
@@ -2169,20 +2172,23 @@ bool CmdInterface::cmdIfaceProcessCommand()
     {
         point += 2;
         point = skipSpace(point);
-        if (bitTest(level, all_fx)) // clears any effects level
+
+        if (bitFindHigh(context) == LEVEL::AllFX || bitFindHigh(context) == LEVEL::InsFX)
+            context = LEVEL::Top;
+        else if (bitFindHigh(context) == LEVEL::Part && (bitTest(context, LEVEL::AllFX) || bitTest(context, LEVEL::InsFX)))
         {
-            bitClear(level, all_fx);
-            bitClear(level, ins_fx);
+            context = LEVEL::Top;
+            bitSet(context, LEVEL::Part); // restore part level
         }
         else
         {
-            tmp = bitFindHigh(level);
-            bitClear(level, tmp);
+            bitClearHigh(context);
         }
         if (point[0] == 0)
             return false;
     }
-    if (helpList(level))
+
+    if (helpList(context))
         return false;
     if (matchnMove(2, point, "stop"))
         sendDirect(0, TOPLEVEL::type::Write,MAIN::control::stopSound, TOPLEVEL::section::main);
@@ -3160,7 +3166,7 @@ void CmdInterface::cmdIfaceCommandLoop()
             string prompt = "yoshimi";
             if (currentInstance > 0)
                 prompt += (":" + asString(currentInstance));
-            if (bitTest(level, part_lev))
+            if (bitTest(context, LEVEL::Part))
             {
                 prompt += (" part " + asString(npart + 1));
                 nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
@@ -3169,11 +3175,11 @@ void CmdInterface::cmdIfaceCommandLoop()
                 else
                     prompt += " off";
             }
-            if (bitTest(level, all_fx))
+            if (bitTest(context, LEVEL::AllFX))
             {
-                if (!bitTest(level, part_lev))
+                if (!bitTest(context, LEVEL::Part))
                 {
-                    if (bitTest(level, ins_fx))
+                    if (bitTest(context, LEVEL::InsFX))
                     {
                         prompt += " Ins";
                         nFXtype = synth->insefx[nFX]->geteffect();
@@ -3188,11 +3194,11 @@ void CmdInterface::cmdIfaceCommandLoop()
                 if (nFXtype > 0)
                     prompt += ("-" + asString(nFXpreset + 1));
             }
-            if (bitTest(level, scale_lev))
+            if (bitTest(context, LEVEL::Scale))
                 prompt += " Scale ";
-            if (bitTest(level, conf_lev))
+            if (bitTest(context, LEVEL::Config))
                 prompt += " Config ";
-            if (bitTest(level, vect_lev))
+            if (bitTest(context, LEVEL::Vector))
             {
                 prompt += (" Vect Ch " + asString(chan + 1) + " ");
                 if (axis == 0)
@@ -3200,7 +3206,7 @@ void CmdInterface::cmdIfaceCommandLoop()
                 else
                     prompt += "Y";
             }
-            if (bitTest(level, learn_lev))
+            if (bitTest(context, LEVEL::Learn))
             {
                 prompt += (" MLearn line " + asString(mline + 1) + " ");
             }

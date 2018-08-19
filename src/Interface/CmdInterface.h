@@ -36,13 +36,28 @@ using namespace std;
  * There is a function that will clear just the highest bit that
  * is set so you can then step back up the level tree.
  * It is also possible to zero it so that you immediately go to
- * the top level.
- * Therefore, the sequence is important.
+ * the top level. Therefore, the sequence is important.
  * 12 bits are currently defines out of a possible 32.
  *
- * all_fx and ins_fx MUST be the first two
+ * AllFX, InsFX and Part MUST be the first three
  */
-typedef enum { all_fx = 0, ins_fx, conf_lev, vect_lev, scale_lev, learn_lev, part_lev, addSynth_lev, subSynth_lev, padSynth_lev, addVoice_lev, resonance_lev,} level_bits;
+namespace LEVEL{
+    enum {
+        Top = 0,
+        AllFX = 0, // bits from here on
+        InsFX,
+        Part,
+        Config,
+        Vector,
+        Scale,
+        Learn,
+        AddSynth,
+        SubSynth,
+        PadSynth,
+        AddVoice,
+        Resonance
+    };
+}
 
 typedef enum { todo_msg = 0, done_msg, value_msg, name_msg, opp_msg, what_msg, range_msg, low_msg, high_msg, unrecognised_msg, parameter_msg, level_msg, available_msg,} error_messages;
 
@@ -84,7 +99,7 @@ class CmdInterface : private MiscFuncs
         int chan;
         int axis;
         int mline;
-        unsigned int level;
+        unsigned int context;
         string replyString;
 };
 

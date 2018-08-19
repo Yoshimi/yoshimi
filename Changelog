@@ -8,6 +8,8 @@ yoshimi 1.5.8 M
 * Set up enums for further CLI control levels.
 * Improved high bit detection in MiscFuncs.cpp
 * Added high bit clearing to MiscFuncs.cpp
+* Revised CLI sys, ins, part effect settings.
+* Revised naming for CLI context levels.
 
 2018-8-18 Rob
 * Initialise and freshen MasterUI->activePart.
