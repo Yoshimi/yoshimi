@@ -116,6 +116,7 @@ class MasterUI {: {private GuiUpdates}
       configui = NULL;
       presetsui = NULL;
       paramsui = NULL;
+      activePart = 0;
       yoshiLog = NULL;} {}
   }
   Function {~MasterUI()} {} {
@@ -895,6 +896,7 @@ paramsui->Show(XML_MICROTONAL);}
         label Part
         callback {//
         int nval = o->value() - 1;
+        activePart = nval;
         send_data(MAIN::control::partNumber, nval, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main);}
         xywh {36 264 40 20} labelsize 11 when 6 minimum 0 maximum 127 textsize 11
         code0 {o->range(1.0, partmax);}
@@ -1779,6 +1781,7 @@ ZynAddSubFX}
     npartcounter->redraw();
     updatelistitem(npart);
     updatelistitem(nval);
+    activePart = nval;
     npart = nval;} {}
   }
   Function {updatepart()} {} {
@@ -1814,6 +1817,7 @@ ZynAddSubFX}
     maxparts->value(partmax);
     maxparts->redraw();
     npartcounter->value(npart + 1);
+    activePart = npart;
     npartcounter->redraw();
     partui->checkEngines();} {}
   }
@@ -1974,6 +1978,7 @@ ZynAddSubFX}
     npartcounter->value((synth->getRuntime().currentPart) + 1);
     int nval = synth->getRuntime().currentPart;
     partNew(nval);
+    activePart = nval;
 
     nsyseff = 0;
     syseffnocounter->value(nsyseff + 1);
@@ -2023,6 +2028,7 @@ ZynAddSubFX}
     if (npart >= partmax)
     {
         npartcounter->value(1);
+        activePart = 0;
         changed = true;
     }
     return changed;} {}
