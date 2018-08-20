@@ -75,7 +75,7 @@ class CmdInterface : private MiscFuncs
         void historyList(int listnum);
         int effectsList(bool presets = false);
         int effects(unsigned char controlType);
-        int partVolPanVel(unsigned char controlType);
+        int partCommonControls(unsigned char controlType);
         int commandList();
         int commandMlearn(unsigned char controlType);
         int commandVector(unsigned char controlType);

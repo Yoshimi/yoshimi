@@ -5,6 +5,10 @@ yoshimi 1.5.8 M
 * Implemented CLI placeholder function fo SubSynth.
 * Implemented CLI placeholder function fo PadSynth.
 * Implemented CLI placeholder function fo AddVoice.
+* Implemented main CLI kit mode controls.
+  Enable engines, kits and kit engines, not AddVoice.
+* Implemented CLI Volume, Pan, Velocity for engines.
+  Includes kit engines but not AddVoice.
 
 2018-8-19 Will
 * Added GUI warning when active part disabled.

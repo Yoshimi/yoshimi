@@ -798,26 +798,65 @@ int CmdInterface::effects(unsigned char controlType)
 }
 
 
-int CmdInterface::partVolPanVel(unsigned char controlType)
+int CmdInterface::partCommonControls(unsigned char controlType)
 {
-    int reply = todo_msg;
     int cmd = -1;
+    int engine;
+    int insert;
 
+    if (bitFindHigh(context) == LEVEL::AddSynth)
+        engine = 0;
+    else if (bitFindHigh(context) == LEVEL::SubSynth)
+        engine = 1;
+    else if (bitFindHigh(context) == LEVEL::PadSynth)
+        engine = 2;
+    else
+        engine = UNUSED;
     if (matchnMove(1, point, "volume"))
         cmd = PART::control::volume;
     else if(matchnMove(1, point, "pan"))
         cmd = PART::control::panning;
     else if (matchnMove(2, point, "velocity"))
         cmd = PART::control::velocitySense;
-    else if (matchnMove(2, point, "offset"))
+    else if (matchnMove(2, point, "offset") && bitFindHigh(context) == LEVEL::Part)
         cmd = PART::control::velocityOffset;
+    else if (bitFindHigh(context) != LEVEL::Part)
+    {
+        int kit;
+        if (kitmode)
+        {
+            kit = kitnumber;
+            insert = TOPLEVEL::insert::kitGroup;
+        }
+        else
+        {
+            kit = UNUSED;
+            insert = UNUSED;
+        }
+        int value = -1;
+        if (matchnMove(2, point, "enable"))
+        {
+            value = 1;
+        }
+        if (matchnMove(2, point, "disable") )
+        {
+            value = 0;
+        }
+        if (value >= 0)
+        {
+            if (kit == 0)
+                synth->getRuntime().Log("Kit item 1 always enabled.");
+            else
+                sendDirect(value, controlType, PART::control::enable, npart, kit, engine, insert);
+            return done_msg;
+        }
+    }
     if (cmd == -1)
         return todo_msg;
     if (controlType == TOPLEVEL::type::Write && point[0] == 0)
         return value_msg;
-    sendDirect(string2float(point), controlType, cmd, npart);
-    reply = done_msg;
-    return reply;
+    sendDirect(string2float(point), controlType, cmd, npart, kitnumber, engine);
+    return done_msg;
 }
 
 
@@ -1763,10 +1802,6 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
         return done_msg;
     }
 
-    tmp = partVolPanVel(controlType);
-    if(tmp != todo_msg)
-        return tmp;
-
     if (matchnMove(2, point, "program") || matchnMove(1, point, "instrument"))
     {
         if (controlType != TOPLEVEL::type::Write)
@@ -1950,6 +1985,14 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
         defaults();
         return done_msg;
     }
+
+    if (bitTest(context, LEVEL::Part))
+    {
+        int tmp = partCommonControls(controlType);
+        if(tmp != todo_msg)
+            return tmp;
+    }
+
  // these must all be highest (relevant) bit first
     if (bitTest(context, LEVEL::Config))
         reply = commandConfig(controlType);
