@@ -81,6 +81,10 @@ class CmdInterface : private MiscFuncs
         int commandVector(unsigned char controlType);
         int commandConfig(unsigned char controlType);
         int commandScale(unsigned char controlType);
+        int addSynth(unsigned char controlType);
+        int subSynth(unsigned char controlType);
+        int padSynth(unsigned char controlType);
+        int addVoice(unsigned char controlType);
         int commandPart(bool justSet, unsigned char controlType);
         int commandReadnSet(unsigned char controlType);
         int sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff, unsigned char request = 0xff);

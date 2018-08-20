@@ -1,5 +1,11 @@
 yoshimi 1.5.8 M
 
+2018-8-20 Will
+* Implemented CLI placeholder function fo AddSynth.
+* Implemented CLI placeholder function fo SubSynth.
+* Implemented CLI placeholder function fo PadSynth.
+* Implemented CLI placeholder function fo AddVoice.
+
 2018-8-19 Will
 * Added GUI warning when active part disabled.
 * Removed some redundant test code.

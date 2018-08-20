@@ -1598,15 +1598,66 @@ int CmdInterface::commandScale(unsigned char controlType)
 }
 
 
+int CmdInterface::addVoice(unsigned char controlType)
+{
+    cout << "addvoice" << endl;
+    return done_msg;
+}
+
+
+int CmdInterface::addSynth(unsigned char controlType)
+{
+    if (matchnMove(1, point, "voice"))
+    {
+        bitSet(context, LEVEL::AddVoice);
+        return addVoice(controlType);
+    }
+    cout << "addsynth" << endl;
+    return done_msg;
+}
+
+
+int CmdInterface::subSynth(unsigned char controlType)
+{
+    cout << "subsynth" << endl;
+    return done_msg;
+}
+
+
+int CmdInterface::padSynth(unsigned char controlType)
+{
+    cout << "padsynth" << endl;
+    return done_msg;
+}
+
+
 int CmdInterface::commandPart(bool justSet, unsigned char controlType)
 {
     Config &Runtime = synth->getRuntime();
     int reply = todo_msg;
     int tmp;
     bool changed = false;
-    //npart = Runtime.currentPart; // belt and braces
     if (point[0] == 0)
         return done_msg;
+
+    if (matchnMove(3, point, "addsynth"))
+    {
+        bitSet(context, LEVEL::AddSynth);
+        return addSynth(controlType);
+    }
+
+    if (matchnMove(3, point, "subsynth"))
+    {
+        bitSet(context, LEVEL::SubSynth);
+        return subSynth(controlType);
+    }
+
+    if (matchnMove(3, point, "padsynth"))
+    {
+        bitSet(context, LEVEL::PadSynth);
+        return padSynth(controlType);
+    }
+
     if (bitTest(context, LEVEL::AllFX))
         return effects(controlType);
     if (justSet || isdigit(point[0]))
@@ -1685,7 +1736,7 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
         tmp = 1;
     else if (matchnMove(2, point, "disable"))
         tmp = 0;
-    cout << "num " << kitnumber << "  insert " << kitInsert << endl;
+    // cout << "num " << kitnumber << "  insert " << kitInsert << endl;
     if (tmp >= 0)
     {
         if (controlType != TOPLEVEL::type::Write)
@@ -1899,11 +1950,19 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
         defaults();
         return done_msg;
     }
-
+ // these must all be highest (relevant) bit first
     if (bitTest(context, LEVEL::Config))
         reply = commandConfig(controlType);
     else if (bitTest(context, LEVEL::Scale))
         reply = commandScale(controlType);
+    else if (bitTest(context, LEVEL::AddVoice))
+        reply = addVoice(controlType);
+    else if (bitTest(context, LEVEL::AddSynth))
+        reply = addSynth(controlType);
+    else if (bitTest(context, LEVEL::SubSynth))
+        reply = subSynth(controlType);
+    else if (bitTest(context, LEVEL::PadSynth))
+        reply = padSynth(controlType);
     else if (bitTest(context, LEVEL::Part))
         reply = commandPart(false, controlType);
     else if (bitTest(context, LEVEL::Vector))
