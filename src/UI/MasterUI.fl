@@ -1176,13 +1176,15 @@ ZynAddSubFX}
   Function {send_data(int control, float value, int type, int part = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
+        if (control <= MAIN::control::soloType)
+            type |= Fl::event_button();
         if (parameter == 0)
         {
-            collect_data(synth, 0, (Fl::event_button() | type), control, part, UNUSED, UNUSED, UNUSED, UNUSED, par2);
+            collect_data(synth, 0, type, control, part, UNUSED, UNUSED, UNUSED, UNUSED, par2);
             return;
         }
 
-        collect_data(synth, value, (Fl::event_button() | type), control, part, UNUSED, engine, insert, parameter, par2);} {}
+        collect_data(synth, value, type, control, part, UNUSED, engine, insert, parameter, par2);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//

@@ -802,7 +802,8 @@ int CmdInterface::partCommonControls(unsigned char controlType)
 {
     int cmd = -1;
     int engine;
-    int insert;
+    int insert = UNUSED;
+    int kit = kitnumber;
 
     if (bitFindHigh(context) == LEVEL::AddSynth)
         engine = 0;
@@ -811,7 +812,10 @@ int CmdInterface::partCommonControls(unsigned char controlType)
     else if (bitFindHigh(context) == LEVEL::PadSynth)
         engine = 2;
     else
+    {
+        kit = UNUSED;
         engine = UNUSED;
+    }
     if (matchnMove(1, point, "volume"))
         cmd = PART::control::volume;
     else if(matchnMove(1, point, "pan"))
@@ -822,7 +826,6 @@ int CmdInterface::partCommonControls(unsigned char controlType)
         cmd = PART::control::velocityOffset;
     else if (bitFindHigh(context) != LEVEL::Part)
     {
-        int kit;
         if (kitmode)
         {
             kit = kitnumber;
@@ -847,15 +850,21 @@ int CmdInterface::partCommonControls(unsigned char controlType)
             if (kit == 0)
                 synth->getRuntime().Log("Kit item 1 always enabled.");
             else
+            {
+                cout << "kit cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitnumber) << "  engine " << int(engine) << "  insert " << int(insert) << endl;
                 sendDirect(value, controlType, PART::control::enable, npart, kit, engine, insert);
+            }
             return done_msg;
         }
     }
     if (cmd == -1)
         return todo_msg;
+
     if (controlType == TOPLEVEL::type::Write && point[0] == 0)
         return value_msg;
-    sendDirect(string2float(point), controlType, cmd, npart, kitnumber, engine);
+    cout << "norm cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitnumber) << "  engine " << int(engine) << "  insert " << int(insert) << endl;
+
+    sendDirect(string2float(point), controlType, cmd, npart, kit, engine);
     return done_msg;
 }
 

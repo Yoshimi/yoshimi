@@ -79,8 +79,9 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
 
     unsigned char typetop = type & 0xd0; // pass through redraws *after* command
     unsigned char buttons = type & 7;
-
-    if (part != TOPLEVEL::section::midiLearn)
+    if (part == TOPLEVEL::section::main && (control > 48 || control == 14))
+        type = 1; // TODO fix this properly!
+    else if (part != TOPLEVEL::section::midiLearn)
     {
         if (buttons == 3 && Fl::event_is_click())
         {

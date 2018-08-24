@@ -1,5 +1,10 @@
 yoshimi 1.5.8 M
 
+2018-8-24 Will
+* Temporary fix to banks selection anomally
+  The whole of bank needs review.
+* More work on CLI part level controls.
+
 2018-8-20 Will
 * Implemented CLI placeholder function fo AddSynth.
 * Implemented CLI placeholder function fo SubSynth.
