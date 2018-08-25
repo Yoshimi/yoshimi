@@ -55,7 +55,10 @@ namespace LEVEL{
         SubSynth,
         PadSynth,
         AddVoice,
-        Resonance
+        Resonance,
+        LFO,
+        Filter,
+        Envelope
     };
 }
 
@@ -77,6 +80,7 @@ class CmdInterface : private MiscFuncs
         int effects(unsigned char controlType);
         int partCommonControls(unsigned char controlType);
         int commandList();
+        int toggle(void);
         int commandMlearn(unsigned char controlType);
         int commandVector(unsigned char controlType);
         int commandConfig(unsigned char controlType);

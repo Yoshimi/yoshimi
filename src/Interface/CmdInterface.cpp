@@ -147,7 +147,7 @@ string partlist [] = {
     "Pan <n2>",                 "panning",
     "VElocity <n2>",            "velocity sensing sensitivity",
     "OFfset <n2>",              "velocity sense offset",
-    "Breath <s>",              "breath control (Enable {other})",
+    "Breath <s>",               "breath control (Enable {other})",
     "POrtamento <s>",           "portamento (Enable {other})",
     "Mode <s>",                 "key mode (Poly, Mono, Legato)",
     "Note <n2>",                "note polyphony",
@@ -158,10 +158,18 @@ string partlist [] = {
     "  Type <s>",               "the effect type",
     "  PREset <n3>",            "set numbered effect preset to n3",
     "  Send <n3> <n4>",         "send part to system effect n3 at volume n4",
+    "KMode <s>",                "set part to kit mode (Enable, Disable)",
+    "  KItem <n>",                "select kit item number (1-16)",
+    "    MUte <s>",                 "silence this item (Enable, {other})",
+    "    KEffect <n>",              "select effect for this item (0-none, 1-3)",
+    "  DRum <s>",                 "set kit to drum mode (Enable, {other})",
     "PRogram <[n2]/[s]>",       "loads instrument ID / CLear sets default",
     "NAme <s>",                 "sets the display name the part can be saved with",
     "Channel <n2>",             "MIDI channel (> 32 disables, > 16 note off only)",
     "Destination <s2>",         "jack audio destination (Main, Part, Both)",
+    "ADDsynth ...",             "Enter AddSynth context",
+    "SUBsynth ...",             "Enter SubSynth context",
+    "PADsynth ...",             "Enter PadSynth context",
     "end"
 };
 
@@ -827,11 +835,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
         if (kitmode)
             insert = TOPLEVEL::insert::kitGroup;
 
-        int value = -1;
-        if (matchnMove(2, point, "enable"))
-            value = 1;
-        if (matchnMove(2, point, "disable") )
-            value = 0;
+        int value = toggle();
         if (value >= 0)
         {
             if (kit == 0 && bitFindHigh(context) == LEVEL::Part)
@@ -993,6 +997,15 @@ int CmdInterface::commandList()
     return reply;
 }
 
+
+int CmdInterface::toggle()
+{
+    if (matchnMove(2, point, "enable") || matchnMove(2, point, "on"))
+        return 1;
+    if (matchnMove(2, point, "disable") || matchnMove(3, point, "off"))
+        return 0;
+    return -1;
+}
 
 int CmdInterface::commandMlearn(unsigned char controlType)
 {
@@ -1670,8 +1683,8 @@ int CmdInterface::addVoice(unsigned char controlType)
     cout << "addvoice" << endl;
     if (point[0] == 0)
         return done_msg;
-    partCommonControls(controlType);
-    return done_msg;
+    //partCommonControls(controlType);
+    return available_msg;
 }
 
 
@@ -1687,7 +1700,7 @@ int CmdInterface::addSynth(unsigned char controlType)
     if (point[0] == 0)
         return done_msg;
     partCommonControls(controlType);
-    return done_msg;
+    return available_msg;
 }
 
 
@@ -1697,7 +1710,7 @@ int CmdInterface::subSynth(unsigned char controlType)
     if (point[0] == 0)
         return done_msg;
     partCommonControls(controlType);
-    return done_msg;
+    return available_msg;
 }
 
 
@@ -1707,7 +1720,7 @@ int CmdInterface::padSynth(unsigned char controlType)
     if (point[0] == 0)
         return done_msg;
     partCommonControls(controlType);
-    return done_msg;
+    return available_msg;
 }
 
 
@@ -1818,17 +1831,17 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
     }
     if (kitmode)
     {
-        int value = -1;
+        int value;// = -1;
         if (matchnMove(2, point, "drum"))
         {
-            if (matchnMove(2, point, "enable"))
-                value = 1;
-            else if (matchnMove(2, point, "disable"))
-                value = 0;
+            value = toggle();
+            sendDirect((value == 1), controlType, PART::control::drumMode, npart);
+            return done_msg;
         }
-        if (value > -1)
+        if (matchnMove(2, point, "mute"))
         {
-            sendDirect(value, controlType, PART::control::drumMode, npart);
+            value = toggle();
+            sendDirect((value == 1), controlType, PART::control::kitItemMute, npart, kitnumber, UNUSED, TOPLEVEL::insert::kitGroup);
             return done_msg;
         }
         if (matchnMove(2, point,"keffect"))
@@ -1935,10 +1948,7 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
     }
     else if (matchnMove(1, point, "breath"))
     {
-        int value = 0;
-        if(controlType == TOPLEVEL::type::Write)
-            value = matchnMove(1, point, "enable");
-        sendDirect(value, controlType, PART::control::breathControlEnable, npart);
+        sendDirect((toggle() == 1), controlType, PART::control::breathControlEnable, npart);
         return done_msg;
     }
     else if (matchnMove(1, point, "note"))
@@ -1975,13 +1985,7 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
     }
     else if (matchnMove(2, point, "portamento"))
     {
-        int value = 0;
-        if(controlType == TOPLEVEL::type::Write)
-        {
-            if (matchnMove(1, point, "enable"))
-                value = 1;
-        }
-        sendDirect(value, controlType, PART::control::portamento, npart);
+        sendDirect((toggle() == 1), controlType, PART::control::portamento, npart);
         return done_msg;
     }
     else if (matchnMove(2, point, "name"))

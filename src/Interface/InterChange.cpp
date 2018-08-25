@@ -5613,7 +5613,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 if (value_bool)
                     part->PbreathControl = 2;
                 else
-                    part->PbreathControl = UNUSED;
+                    part->PbreathControl = 128; // impossible CC value
             else
                 value = part->PbreathControl;
             break;
