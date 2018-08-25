@@ -1014,7 +1014,6 @@ int CmdInterface::commandMlearn(unsigned char controlType)
     int reply = todo_msg;
     int lineNo;
     int tmp = 0;
-    float value;
     bitSet(context, LEVEL::Learn);
 
     if (controlType != TOPLEVEL::type::Write)
@@ -1023,19 +1022,14 @@ int CmdInterface::commandMlearn(unsigned char controlType)
         return done_msg; // will eventually be readable
     }
 
-    if (!isdigit(point[0]))
-        value = mline;
-    else
+    if (isdigit(point[0]) || point[0] == '-') // negative should never happen!
     {
-        lineNo = string2int(point) - 1;
+        lineNo = string2int(point);
         point = skipChars(point);
-        if (lineNo < 0)
+        if (lineNo <= 0)
             return value_msg;
         else
-        {
-            value = lineNo;
-            mline = lineNo;
-        }
+            mline = lineNo -1;
     }
     tmp = synth->midilearn.findSize();
     if (tmp == 0 || tmp <= mline)
@@ -1047,73 +1041,75 @@ int CmdInterface::commandMlearn(unsigned char controlType)
         mline = 0;
         return (done_msg);
     }
+    if (point[0] == 0)
+        return done_msg;
+    {
+        unsigned char type = 0;
+        unsigned char control = 0;
+        unsigned char kit = UNUSED;
+        unsigned char engine = UNUSED;
+        unsigned char insert = UNUSED;
+        unsigned char parameter = UNUSED;
 
-    tmp = 0;
-    if (matchnMove(2, point, "cc"))
-    {
-        if (!isdigit(point[0]))
-            return value_msg;
-        tmp = string2int(point);
-        if (tmp > 129)
+        if (matchnMove(2, point, "cc"))
         {
-            Runtime.Log("Max CC value is 129");
-            return done_msg;
+            if (!isdigit(point[0]))
+                return value_msg;
+            kit = string2int(point);
+            if (kit > 129)
+            {
+                Runtime.Log("Max CC value is 129");
+                return done_msg;
+            }
+            control =16;
+            Runtime.Log("Lines may be re-ordered");
         }
-        sendDirect(value, 0xff, MIDILEARN::control::CCorChannel, TOPLEVEL::section::midiLearn, tmp);
-        Runtime.Log("Lines may be re-ordered");
-        reply = done_msg;
+        else if (matchnMove(2, point, "channel"))
+        {
+            engine = string2int(point) - 1;
+            if (engine > 16)
+                engine = 16;
+            control = 16;
+            Runtime.Log("Lines may be re-ordered");;
+        }
+        else if (matchnMove(2, point, "minimum"))
+        {
+            insert = int((string2float(point)* 2.0f) + 0.5f);
+            if (insert > 200)
+                return value_msg;
+            control = 5;
+        }
+        else if (matchnMove(2, point, "maximum"))
+        {
+            parameter = int((string2float(point)* 2.0f) + 0.5f);
+            if (parameter > 200)
+                return value_msg;
+            control = 6;
+        }
+        else if (matchnMove(2, point, "mute"))
+        {
+            type = (toggle() == 1) * 4;
+            control = 2;
+        }
+        else if (matchnMove(2, point, "limit"))
+        {
+            type = (toggle() == 1) * 2;
+            control = 1;
+        }
+        else if (matchnMove(2, point, "block"))
+        {
+            type = (toggle() == 1);
+            control = 0;
+        }
+        else if (matchnMove(2, point, "char"))
+        {
+            type = (toggle() == 1) * 16;
+            control = 4;
+        }
+        sendNormal(mline, type, control, TOPLEVEL::section::midiLearn, kit, engine, insert, parameter);
+        return done_msg;
     }
-    else if (matchnMove(2, point, "channel"))
-    {
-        tmp = string2int(point) - 1;
-        if (tmp < 0 || tmp > 16)
-            tmp = 16;
-        sendDirect(value, 0xff, MIDILEARN::control::CCorChannel, TOPLEVEL::section::midiLearn, UNUSED, tmp);
-        Runtime.Log("Lines may be re-ordered");
-        reply = done_msg;
-    }
-    else if (matchnMove(2, point, "minimum"))
-    {
-        int percent = int((string2float(point)* 2.0f) + 0.5f);
-        if (percent < 0 || percent > 200)
-            return value_msg;
-        sendDirect(value, 0xff, 5, TOPLEVEL::section::midiLearn, UNUSED, UNUSED, percent);
-        reply = done_msg;
-    }
-    else if (matchnMove(2, point, "maximum"))
-    {
-        int percent = int((string2float(point)* 2.0f) + 0.5f);
-        if (percent < 0 || percent > 200)
-            return value_msg;
-        sendDirect(value, 0xff, 6, TOPLEVEL::section::midiLearn, UNUSED, UNUSED, UNUSED, percent);
-    }
-    else if (matchnMove(2, point, "mute"))
-    {
-        if (matchnMove(1, point, "enable"))
-            tmp = 4;
-        sendDirect(value, tmp, 2, TOPLEVEL::section::midiLearn);
-    }
-    else if (matchnMove(2, point, "limit"))
-    {
-        if (matchnMove(1, point, "enable"))
-            tmp = 2;
-        sendDirect(value, tmp, 1, TOPLEVEL::section::midiLearn);
-    }
-    else if (matchnMove(2, point, "block"))
-    {
-        if (matchnMove(1, point, "enable"))
-            tmp = 1;
-        sendDirect(value, tmp, 0, TOPLEVEL::section::midiLearn);
-    }
-    else if (matchnMove(2, point, "7bit"))
-    {
-        if (matchnMove(1, point, "enable"))
-            tmp = 16;
-        sendDirect(value, tmp, 4, TOPLEVEL::section::midiLearn);
-    }
-    else
-        reply = opp_msg;
-    return reply;
+    return opp_msg;
 }
 
 
@@ -1230,7 +1226,7 @@ int CmdInterface::commandVector(unsigned char controlType)
             return range_msg;
         point = skipChars(point);
         int enable = 0;
-        if (matchnMove(1, point, "enable"))
+        if (toggle() == 1)
             enable = 1;
         else if (feat > 1 && matchnMove(1, point, "reverse"))
             enable = 2;
@@ -1350,32 +1346,32 @@ int CmdInterface::commandConfig(unsigned char controlType)
     else if (matchnMove(2, point, "state"))
     {
         command = CONFIG::control::defaultStateStart;
-        value = matchnMove(1, point, "enable");
+        value = (toggle() == 1);
     }
     else if (matchnMove(1, point, "hide"))
     {
         command = CONFIG::control::hideNonFatalErrors;
-        value = matchnMove(1, point, "enable");
+        value = (toggle() == 1);
     }
     else if (matchnMove(1, point, "display"))
     {
         command = CONFIG::control::showSplash;
-        value = matchnMove(1, point, "enable");
+        value = (toggle() == 1);
     }
     else if (matchnMove(1, point, "time"))
     {
         command = CONFIG::control::logInstrumentLoadTimes;
-        value = matchnMove(1, point, "enable");
+        value = (toggle() == 1);
     }
     else if (matchnMove(1, point, "include"))
     {
         command = CONFIG::control::logXMLheaders;
-        value = matchnMove(1, point, "enable");
+        value = (toggle() == 1);
     }
     else if (matchnMove(1, point, "keep"))
     {
         command = CONFIG::control::saveAllXMLdata;
-        value = matchnMove(1, point, "enable");
+        value = (toggle() == 1);
     }
     else if (matchnMove(1, point, "gui"))
     {
@@ -1427,7 +1423,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
         else if (matchnMove(1, point, "auto"))
         {
             command = CONFIG::control::jackAutoConnectAudio;
-            value = (matchnMove(1, point, "enable"));
+            value = (toggle() == 1);
         }
         else
             return opp_msg;
@@ -1520,12 +1516,12 @@ int CmdInterface::commandConfig(unsigned char controlType)
     else if (matchnMove(2, point, "program") || matchnMove(2, point, "instrument"))
     {
         command = CONFIG::control::enableProgramChange;
-        value = matchnMove(1, point, "enable");
+        value = (toggle() == 1);
     }
     else if (matchnMove(2, point, "activate"))
     {
         command = CONFIG::control::programChangeEnablesPart;
-        value = matchnMove(1, point, "enable");
+        value = (toggle() == 1);
     }
     else if (matchnMove(1, point, "extend"))
     {
@@ -1540,22 +1536,22 @@ int CmdInterface::commandConfig(unsigned char controlType)
     else if (matchnMove(1, point, "Quiet"))
     {
         command = CONFIG::control::ignoreResetAllCCs;
-        value = matchnMove(1, point, "enable");
+        value = (toggle() == 1);
     }
     else if (matchnMove(1, point, "log"))
     {
         command = CONFIG::control::logIncomingCCs;
-        value = matchnMove(1, point, "enable");
+        value = (toggle() == 1);
     }
     else if (matchnMove(2, point, "show"))
     {
         command = CONFIG::control::showLearnEditor;
-        value = matchnMove(1, point, "enable");
+        value = (toggle() == 1);
     }
     else if (matchnMove(1, point, "nrpn"))
     {
         command = CONFIG::control::enableNRPNs;
-        value = matchnMove(1, point, "enable");
+        value = (toggle() == 1);
     }
 
     else
@@ -1662,7 +1658,7 @@ int CmdInterface::commandScale(unsigned char controlType)
         {
             if (point[0] == 0)
                 return value_msg;
-            if (matchnMove(1, point, "enable"))
+            if ((toggle() == 1))
                 value = 1;
             else//if (isdigit(point[0]))
             {
@@ -3152,6 +3148,32 @@ bool CmdInterface::cmdIfaceProcessCommand()
     else if (reply > done_msg)
         Runtime.Log(replies[reply]);
     return false;
+}
+
+
+void CmdInterface::sendNormal(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
+{
+    if (part != TOPLEVEL::section::midiLearn)
+        type |= TOPLEVEL::source::CLI;
+    CommandBlock putData;
+    size_t commandSize = sizeof(putData);
+
+    putData.data.value = value;
+    putData.data.type = type;
+    putData.data.control = control;
+    putData.data.part = part;
+    putData.data.kit = kit;
+    putData.data.engine = engine;
+    putData.data.insert = insert;
+    putData.data.parameter = parameter;
+    putData.data.par2 = par2;
+    if (jack_ringbuffer_write_space(synth->interchange.fromCLI) >= commandSize)
+        {
+            synth->getRuntime().finishedCLI = false;
+            jack_ringbuffer_write(synth->interchange.fromCLI, (char*) putData.bytes, commandSize);
+        }
+        else
+            synth->getRuntime().Log("Unable to write to fromCLI buffer");
 }
 
 

@@ -4,7 +4,8 @@ yoshimi 1.5.8 M
 * Identified engines and kit mode in CLI prompt.
 * All CLI kit mode controls active.
 * Extended CLI parts help to include new controls.
-* Improved some enable/disable settings.
+* Improved many enable/disable settings.
+* Revised and simplified CLI Mlearn section.
 
 2018-8-24 Will
 * Temporary fix to banks selection anomally

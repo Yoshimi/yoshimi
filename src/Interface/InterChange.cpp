@@ -3828,7 +3828,7 @@ void InterChange::mutedDecode(unsigned int altData)
 void InterChange::returns(CommandBlock *getData)
 {
     unsigned char type = getData->data.type; // back from synth
-
+    synth->getRuntime().finishedCLI = true; // belt and braces :)
     if (type == NO_ACTION)
         return; // no further action
 
