@@ -801,9 +801,9 @@ int CmdInterface::effects(unsigned char controlType)
 int CmdInterface::partCommonControls(unsigned char controlType)
 {
     int cmd = -1;
-    int engine;
+    int engine = UNUSED;
     int insert = UNUSED;
-    int kit = kitnumber;
+    int kit = UNUSED;
 
     if (bitFindHigh(context) == LEVEL::AddSynth)
         engine = 0;
@@ -811,58 +811,77 @@ int CmdInterface::partCommonControls(unsigned char controlType)
         engine = 1;
     else if (bitFindHigh(context) == LEVEL::PadSynth)
         engine = 2;
-    else
-    {
-        kit = UNUSED;
-        engine = UNUSED;
-    }
+
+    if (kitmode)
+        kit = kitnumber;
+
     if (matchnMove(1, point, "volume"))
         cmd = PART::control::volume;
     else if(matchnMove(1, point, "pan"))
         cmd = PART::control::panning;
     else if (matchnMove(2, point, "velocity"))
         cmd = PART::control::velocitySense;
-    else if (matchnMove(2, point, "offset") && bitFindHigh(context) == LEVEL::Part)
-        cmd = PART::control::velocityOffset;
-    else if (bitFindHigh(context) != LEVEL::Part)
+
+    if (cmd == -1)
     {
         if (kitmode)
-        {
-            kit = kitnumber;
             insert = TOPLEVEL::insert::kitGroup;
-        }
-        else
-        {
-            kit = UNUSED;
-            insert = UNUSED;
-        }
+
         int value = -1;
         if (matchnMove(2, point, "enable"))
-        {
             value = 1;
-        }
         if (matchnMove(2, point, "disable") )
-        {
             value = 0;
-        }
         if (value >= 0)
         {
-            if (kit == 0)
-                synth->getRuntime().Log("Kit item 1 always enabled.");
-            else
+            if (kit == 0 && bitFindHigh(context) == LEVEL::Part)
             {
-                cout << "kit cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitnumber) << "  engine " << int(engine) << "  insert " << int(insert) << endl;
-                sendDirect(value, controlType, PART::control::enable, npart, kit, engine, insert);
+                synth->getRuntime().Log("Kit item 1 always enabled.");
+                return done_msg;
             }
-            return done_msg;
+            else
+                cmd = PART::control::enable;
         }
+        if (cmd == -1 && bitFindHigh(context) != LEVEL::Part)
+            return todo_msg;
+        // the following can only be done at part/kit level
+
+        if (matchnMove(2, point, "min"))
+        {
+            if(controlType == TOPLEVEL::type::Write)
+            {
+                if (point[0] == 0)
+                    return value_msg;
+                value = string2int127(point);
+                if (value > synth->part[npart]->Pmaxkey)
+                    return high_msg;
+            }
+            cmd = PART::control::minNote;
+        }
+        else if (matchnMove(2, point, "max"))
+        {
+            if(controlType == TOPLEVEL::type::Write)
+            {
+                if (point[0] == 0)
+                    return value_msg;
+                value = string2int127(point);
+                if (value < synth->part[npart]->Pminkey)
+                    return low_msg;
+            }
+            cmd = PART::control::maxNote;
+        }
+        if (cmd == -1)
+            return todo_msg;
+        //cout << "kit cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitnumber) << "  engine " << int(engine) << "  insert " << int(insert) << endl;
+
+        sendDirect(value, controlType, cmd, npart, kit, engine, insert);
+        return done_msg;
     }
     if (cmd == -1)
         return todo_msg;
-
     if (controlType == TOPLEVEL::type::Write && point[0] == 0)
         return value_msg;
-    cout << "norm cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitnumber) << "  engine " << int(engine) << "  insert " << int(insert) << endl;
+    //cout << "norm cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitnumber) << "  engine " << int(engine) << "  insert " << int(insert) << endl;
 
     sendDirect(string2float(point), controlType, cmd, npart, kit, engine);
     return done_msg;
@@ -1649,18 +1668,25 @@ int CmdInterface::commandScale(unsigned char controlType)
 int CmdInterface::addVoice(unsigned char controlType)
 {
     cout << "addvoice" << endl;
+    if (point[0] == 0)
+        return done_msg;
+    partCommonControls(controlType);
     return done_msg;
 }
 
 
 int CmdInterface::addSynth(unsigned char controlType)
 {
+
     if (matchnMove(1, point, "voice"))
     {
         bitSet(context, LEVEL::AddVoice);
         return addVoice(controlType);
     }
     cout << "addsynth" << endl;
+    if (point[0] == 0)
+        return done_msg;
+    partCommonControls(controlType);
     return done_msg;
 }
 
@@ -1668,6 +1694,9 @@ int CmdInterface::addSynth(unsigned char controlType)
 int CmdInterface::subSynth(unsigned char controlType)
 {
     cout << "subsynth" << endl;
+    if (point[0] == 0)
+        return done_msg;
+    partCommonControls(controlType);
     return done_msg;
 }
 
@@ -1675,6 +1704,9 @@ int CmdInterface::subSynth(unsigned char controlType)
 int CmdInterface::padSynth(unsigned char controlType)
 {
     cout << "padsynth" << endl;
+    if (point[0] == 0)
+        return done_msg;
+    partCommonControls(controlType);
     return done_msg;
 }
 
@@ -1684,7 +1716,7 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
     Config &Runtime = synth->getRuntime();
     int reply = todo_msg;
     int tmp;
-    bool changed = false;
+    //bool changed = false;
     if (point[0] == 0)
         return done_msg;
 
@@ -1706,6 +1738,10 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
         return padSynth(controlType);
     }
 
+    tmp = partCommonControls(controlType);
+    if (tmp != todo_msg)
+        return tmp;
+
     if (bitTest(context, LEVEL::AllFX))
         return effects(controlType);
     if (justSet || isdigit(point[0]))
@@ -1726,7 +1762,7 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
                 if (controlType == TOPLEVEL::type::Write)
                 {
                     sendDirect(npart, TOPLEVEL::type::Write, MAIN::control::partNumber, TOPLEVEL::section::main);
-                    changed = true;
+                    //changed = true;
                 }
             }
             if (point[0] == 0)
@@ -1755,14 +1791,15 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
         else
             return value_msg;
         sendDirect(kitmode, controlType, PART::control::kitMode, npart);
+        kitnumber = 0;
         return done_msg;
     }
-    int kitInsert = UNUSED;
+    //int kitInsert = UNUSED;
     if (kitmode == PART::kitType::Off)
         kitnumber = UNUSED; // always clear it if not kit mode
     else
     {
-        kitInsert = TOPLEVEL::insert::kitGroup;
+        //kitInsert = TOPLEVEL::insert::kitGroup;
         if (matchnMove(2, point, "kitem"))
         {
             if (controlType == TOPLEVEL::type::Write)
@@ -1773,18 +1810,46 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
                 if (tmp < 1 || tmp > 16)
                     return range_msg;
                 kitnumber = tmp - 1;
-                kitInsert = TOPLEVEL::insert::kitGroup;
+                //kitInsert = TOPLEVEL::insert::kitGroup;
             }
             Runtime.Log("Kit item number " + to_string(kitnumber + 1));
             return done_msg;
         }
     }
+    if (kitmode)
+    {
+        int value = -1;
+        if (matchnMove(2, point, "drum"))
+        {
+            if (matchnMove(2, point, "enable"))
+                value = 1;
+            else if (matchnMove(2, point, "disable"))
+                value = 0;
+        }
+        if (value > -1)
+        {
+            sendDirect(value, controlType, PART::control::drumMode, npart);
+            return done_msg;
+        }
+        if (matchnMove(2, point,"keffect"))
+        {
+            if (controlType == TOPLEVEL::type::Write && point[0] == 0)
+                return value_msg;
+            value = string2int(point);
+            if (value < 0 || value > 3)
+                return range_msg;
+            sendDirect(value, controlType, PART::control::kitEffectNum, npart, kitnumber, UNUSED, TOPLEVEL::insert::kitGroup);
+            return done_msg;
+        }
+    }
+    /*
+     ***  don't think any of this is needed now ***
     tmp = -1;
     if (matchnMove(2, point, "enable"))
         tmp = 1;
     else if (matchnMove(2, point, "disable"))
         tmp = 0;
-    // cout << "num " << kitnumber << "  insert " << kitInsert << endl;
+     cout << "num " << kitnumber << "  insert " << kitInsert << endl;
     if (tmp >= 0)
     {
         if (controlType != TOPLEVEL::type::Write)
@@ -1796,7 +1861,7 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
             sendDirect(tmp, controlType, PART::control::enable, npart, kitnumber, UNUSED, kitInsert);
         }
         return done_msg;
-    }
+    }*/
 
     if (matchnMove(2, point, "shift"))
     {
@@ -1809,6 +1874,14 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
             value = MAX_KEY_SHIFT;
         sendDirect(value, controlType, PART::control::keyShift, npart, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
         return done_msg;
+    }
+
+    if (matchnMove(2, point, "offset"))
+    {
+        tmp = string2int127(point);
+        if(controlType == TOPLEVEL::type::Write && tmp < 1)
+            return value_msg;
+        sendDirect(tmp, controlType, PART::control::velocityOffset, npart);
     }
 
     if (matchnMove(2, point, "program") || matchnMove(1, point, "instrument"))
@@ -1882,34 +1955,7 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
         sendDirect(value, controlType, 33, npart);
         return done_msg;
     }
-    else if (matchnMove(2, point, "min"))
-    {
-        int value = 0;
-        if(controlType == TOPLEVEL::type::Write)
-        {
-            if (point[0] == 0)
-                return value_msg;
-            value = string2int127(point);
-            if (value > synth->part[npart]->Pmaxkey)
-                return high_msg;
-        }
-        sendDirect(value, controlType, 16, npart);
-        return done_msg;
-    }
-    else if (matchnMove(2, point, "max"))
-    {
-        int value = 0;
-        if(controlType == TOPLEVEL::type::Write)
-        {
-            if (point[0] == 0)
-                return value_msg;
-            value = string2int127(point);
-            if (value < synth->part[npart]->Pminkey)
-                return low_msg;
-        }
-        sendDirect(value, controlType, 17, npart);
-        return done_msg;
-    }
+
     else if (matchnMove(1, point, "mode"))
     {
         int value = 0;
@@ -1993,13 +2039,6 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
         }
         defaults();
         return done_msg;
-    }
-
-    if (bitTest(context, LEVEL::Part))
-    {
-        int tmp = partCommonControls(controlType);
-        if(tmp != todo_msg)
-            return tmp;
     }
 
  // these must all be highest (relevant) bit first
@@ -3285,7 +3324,39 @@ void CmdInterface::cmdIfaceCommandLoop()
                     prompt += " on";
                 else
                     prompt += " off";
+
+                int kmode = synth->part[npart]->Pkitmode;
+                if (kmode > 0)
+                {
+                    if (synth->part[npart]->Pkitfade)
+                        kmode = 3;
+                    prompt += ", kit ";
+                    prompt += to_string(kitnumber + 1);
+                    prompt += ", mode ";
+                    switch (kmode)
+                    {
+                        case 1:
+                            prompt += "multi";
+                            break;
+                        case 2:
+                            prompt += "single";
+                            break;
+                        case 3:
+                            prompt += "cross";
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                if (bitFindHigh(context) == LEVEL::AddSynth)
+                    prompt += ", Add";
+                else if (bitFindHigh(context) == LEVEL::SubSynth)
+                    prompt += ", Sub";
+                else if (bitFindHigh(context) == LEVEL::PadSynth)
+                    prompt += ", Pad";
             }
+
             if (bitTest(context, LEVEL::AllFX))
             {
                 if (!bitTest(context, LEVEL::Part))
