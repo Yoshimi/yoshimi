@@ -1765,12 +1765,41 @@ int CmdInterface::addSynth(unsigned char controlType)
 
 int CmdInterface::subSynth(unsigned char controlType)
 {
+    float value;
+    int control = -1;
+    unsigned char insert = UNUSED;
+    bool set = false;
+
     cout << "subsynth" << endl;
     if (point[0] == 0)
         return done_msg;
     int result = partCommonControls(controlType);
     if (result != todo_msg)
         return result;
+    if (matchnMove(2, point, "harmonic"))
+    {
+        if (lineEnd(controlType))
+            return parameter_msg;
+        control = string2int(point);
+        point = skipChars(point);
+        if (matchnMove(1, point, "amplitude"))
+            insert = TOPLEVEL::insert::harmonicAmplitude;
+        else if (matchnMove(1, point, "bandwidth"))
+            insert = TOPLEVEL::insert::harmonicPhaseBandwidth;
+        if (lineEnd(controlType))
+            return value_msg;
+        value = string2int(point);
+        set = true;
+    }
+
+    if (set)
+    {
+
+        //cout << "control " << int(control) << "  part " << int(npart) << "  kit " << int(kitnumber) << "  engine " << int(PART::engine::subSynth) << "  insert " << int(insert) << endl;
+
+        sendNormal(value, controlType, control, npart, kitnumber, PART::engine::subSynth, insert);
+            return done_msg;
+    }
     return available_msg;
 }
 

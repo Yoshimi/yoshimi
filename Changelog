@@ -3,6 +3,7 @@ yoshimi 1.5.8 M
 2018-8-26 Will
 * More refinments to CLI command structure.
 * Added common stereo, octave, detunes.
+* subSynth CLI harmonic anp and bandwidth done :)
 
 2018-8-25 Will
 * Identified engines and kit mode in CLI prompt.
