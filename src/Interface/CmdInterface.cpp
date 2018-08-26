@@ -308,6 +308,7 @@ void CmdInterface::defaults()
     nFXpreset = 0;
     kitmode = 0;
     kitnumber = 0;
+    voiceNumber = 0;
 }
 
 
@@ -819,6 +820,9 @@ int CmdInterface::partCommonControls(unsigned char controlType)
         engine = 1;
     else if (bitFindHigh(context) == LEVEL::PadSynth)
         engine = 2;
+    if (bitFindHigh(context) == LEVEL::AddVoice)
+        engine = PART::engine::addVoice1 + voiceNumber;
+        // voice numbers are 0 to 7
 
     if (kitmode)
         kit = kitnumber;
@@ -829,6 +833,54 @@ int CmdInterface::partCommonControls(unsigned char controlType)
         cmd = PART::control::panning;
     else if (matchnMove(2, point, "velocity"))
         cmd = PART::control::velocitySense;
+
+    if (cmd == -1 && bitFindHigh(context) != LEVEL::Part)
+    {
+        // these are all common to Add, Sub, Pad, Voice
+        int value = 0;
+
+        if (matchnMove(2, point, "detune"))
+        {
+            if (matchnMove(1, point, "fine"))
+            {
+                if (lineEnd(controlType))
+                    return value_msg;
+                value = string2int(point);
+                cmd = ADDSYNTH::control::detuneFrequency;
+            }
+            else if (matchnMove(1, point, "coarse"))
+            {
+                if (lineEnd(controlType))
+                    return value_msg;
+                value = string2int(point);
+                cmd = ADDSYNTH::control::coarseDetune;
+            }
+            else if (matchnMove(1, point, "type"))
+            {
+                if (lineEnd(controlType))
+                    return value_msg;
+                value = string2int(point);
+                cmd = ADDSYNTH::control::detuneType;
+            }
+        }
+        else if (matchnMove(3, point, "octave"))
+        {
+            if (lineEnd(controlType))
+                return value_msg;
+            value = string2int(point);
+            cmd = ADDSYNTH::control::octave;
+        }
+        else if (matchnMove(3, point, "stereo") && bitFindHigh(context) != LEVEL::AddVoice)
+        {
+            cmd = ADDSYNTH::control::stereo;
+            value = (toggle() == 1);
+        }
+        if (cmd > -1)
+        {
+            sendNormal(value, controlType, cmd, npart, kitnumber, engine);
+            return done_msg;
+        }
+    }
 
     if (cmd == -1)
     {
@@ -848,15 +900,15 @@ int CmdInterface::partCommonControls(unsigned char controlType)
         }
         if (cmd == -1 && bitFindHigh(context) != LEVEL::Part)
             return todo_msg;
-        // the following can only be done at part/kit level
 
+        // the following can only be done at part/kit level
         if (matchnMove(2, point, "min"))
         {
             if(controlType == TOPLEVEL::type::Write)
             {
-                if (point[0] == 0)
+                if (lineEnd(controlType))
                     return value_msg;
-                value = string2int127(point);
+                value = string2int(point);
                 if (value > synth->part[npart]->Pmaxkey)
                     return high_msg;
             }
@@ -866,9 +918,9 @@ int CmdInterface::partCommonControls(unsigned char controlType)
         {
             if(controlType == TOPLEVEL::type::Write)
             {
-                if (point[0] == 0)
+                if (lineEnd(controlType))
                     return value_msg;
-                value = string2int127(point);
+                value = string2int(point);
                 if (value < synth->part[npart]->Pminkey)
                     return low_msg;
             }
@@ -878,7 +930,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
             return todo_msg;
         //cout << "kit cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitnumber) << "  engine " << int(engine) << "  insert " << int(insert) << endl;
 
-        sendDirect(value, controlType, cmd, npart, kit, engine, insert);
+        sendNormal(value, controlType, cmd, npart, kit, engine, insert);
         return done_msg;
     }
     if (cmd == -1)
@@ -887,7 +939,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
         return value_msg;
     //cout << "norm cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitnumber) << "  engine " << int(engine) << "  insert " << int(insert) << endl;
 
-    sendDirect(string2float(point), controlType, cmd, npart, kit, engine);
+    sendNormal(string2float(point), controlType, cmd, npart, kit, engine);
     return done_msg;
 }
 
@@ -1000,20 +1052,27 @@ int CmdInterface::commandList()
 
 int CmdInterface::toggle()
 {
-    if (matchnMove(2, point, "enable") || matchnMove(2, point, "on"))
+    if (matchnMove(2, point, "enable") || matchnMove(2, point, "on") || matchnMove(3, point, "yes"))
         return 1;
-    if (matchnMove(2, point, "disable") || matchnMove(3, point, "off"))
+    if (matchnMove(2, point, "disable") || matchnMove(3, point, "off") || matchnMove(2, point, "no") )
         return 0;
     return -1;
+    /*
+     * this allows you to specify enable or other, disable or other or must be those specifics
+     */
 }
+
+
+bool CmdInterface::lineEnd(unsigned char controlType)
+{
+    return (point[0] == 0 && controlType == TOPLEVEL::type::Write);
+}
+
 
 int CmdInterface::commandMlearn(unsigned char controlType)
 {
     Config &Runtime = synth->getRuntime();
     list<string> msg;
-    int reply = todo_msg;
-    int lineNo;
-    int tmp = 0;
     bitSet(context, LEVEL::Learn);
 
     if (controlType != TOPLEVEL::type::Write)
@@ -1024,14 +1083,14 @@ int CmdInterface::commandMlearn(unsigned char controlType)
 
     if (isdigit(point[0]) || point[0] == '-') // negative should never happen!
     {
-        lineNo = string2int(point);
+        int lineNo = string2int(point);
         point = skipChars(point);
         if (lineNo <= 0)
             return value_msg;
         else
             mline = lineNo -1;
     }
-    tmp = synth->midilearn.findSize();
+    int tmp = synth->midilearn.findSize();
     if (tmp == 0 || tmp <= mline)
     {
         if (tmp == 0)
@@ -1679,7 +1738,9 @@ int CmdInterface::addVoice(unsigned char controlType)
     cout << "addvoice" << endl;
     if (point[0] == 0)
         return done_msg;
-    //partCommonControls(controlType);
+    int result = partCommonControls(controlType);
+    if (result != todo_msg)
+        return result;
     return available_msg;
 }
 
@@ -1695,7 +1756,9 @@ int CmdInterface::addSynth(unsigned char controlType)
     cout << "addsynth" << endl;
     if (point[0] == 0)
         return done_msg;
-    partCommonControls(controlType);
+    int result = partCommonControls(controlType);
+    if (result != todo_msg)
+        return result;
     return available_msg;
 }
 
@@ -1705,7 +1768,9 @@ int CmdInterface::subSynth(unsigned char controlType)
     cout << "subsynth" << endl;
     if (point[0] == 0)
         return done_msg;
-    partCommonControls(controlType);
+    int result = partCommonControls(controlType);
+    if (result != todo_msg)
+        return result;
     return available_msg;
 }
 
@@ -1715,7 +1780,9 @@ int CmdInterface::padSynth(unsigned char controlType)
     cout << "padsynth" << endl;
     if (point[0] == 0)
         return done_msg;
-    partCommonControls(controlType);
+    int result = partCommonControls(controlType);
+    if (result != todo_msg)
+        return result;
     return available_msg;
 }
 
@@ -1725,7 +1792,7 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
     Config &Runtime = synth->getRuntime();
     int reply = todo_msg;
     int tmp;
-    //bool changed = false;
+
     if (point[0] == 0)
         return done_msg;
 
@@ -1771,7 +1838,6 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
                 if (controlType == TOPLEVEL::type::Write)
                 {
                     sendDirect(npart, TOPLEVEL::type::Write, MAIN::control::partNumber, TOPLEVEL::section::main);
-                    //changed = true;
                 }
             }
             if (point[0] == 0)
@@ -1803,12 +1869,10 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
         kitnumber = 0;
         return done_msg;
     }
-    //int kitInsert = UNUSED;
     if (kitmode == PART::kitType::Off)
         kitnumber = UNUSED; // always clear it if not kit mode
     else
     {
-        //kitInsert = TOPLEVEL::insert::kitGroup;
         if (matchnMove(2, point, "kitem"))
         {
             if (controlType == TOPLEVEL::type::Write)
@@ -1819,7 +1883,6 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
                 if (tmp < 1 || tmp > 16)
                     return range_msg;
                 kitnumber = tmp - 1;
-                //kitInsert = TOPLEVEL::insert::kitGroup;
             }
             Runtime.Log("Kit item number " + to_string(kitnumber + 1));
             return done_msg;
@@ -1827,7 +1890,7 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
     }
     if (kitmode)
     {
-        int value;// = -1;
+        int value;
         if (matchnMove(2, point, "drum"))
         {
             value = toggle();
@@ -1851,26 +1914,6 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
             return done_msg;
         }
     }
-    /*
-     ***  don't think any of this is needed now ***
-    tmp = -1;
-    if (matchnMove(2, point, "enable"))
-        tmp = 1;
-    else if (matchnMove(2, point, "disable"))
-        tmp = 0;
-     cout << "num " << kitnumber << "  insert " << kitInsert << endl;
-    if (tmp >= 0)
-    {
-        if (controlType != TOPLEVEL::type::Write)
-            sendDirect(tmp, controlType, PART::control::enable, npart, kitnumber, UNUSED, kitInsert);
-        else
-        {
-            if (!changed)// && kitmode == PART::kitType::Off) // needs to be better
-                sendDirect(npart, controlType, MAIN::control::partNumber, TOPLEVEL::section::main);
-            sendDirect(tmp, controlType, PART::control::enable, npart, kitnumber, UNUSED, kitInsert);
-        }
-        return done_msg;
-    }*/
 
     if (matchnMove(2, point, "shift"))
     {
@@ -2409,7 +2452,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
     else if (matchnMove(2, point, "mlearn"))
     {
         if (point[0] != 0)
-            reply = commandReadnSet(TOPLEVEL::type::Default);
+            reply = commandReadnSet(TOPLEVEL::type::LearnRequest);
         else
         {
             replyString = "mlearn";
@@ -2592,7 +2635,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             {
                 if (matchnMove(3, point, "all"))
                 {
-                    sendDirect(0, 0, MIDILEARN::control::clearAll, TOPLEVEL::section::midiLearn);
+                    sendNormal(0, 0, MIDILEARN::control::clearAll, TOPLEVEL::section::midiLearn);
                     reply = done_msg;
                 }
                 else if (point[0] == '@')
@@ -2601,7 +2644,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                     point = skipSpace(point);
                     tmp = string2int(point);
                     if (tmp > 0)
-                        sendDirect(tmp - 1, 0, MIDILEARN::control::deleteLine, TOPLEVEL::section::midiLearn);
+                        sendNormal(tmp - 1, 0, MIDILEARN::control::deleteLine, TOPLEVEL::section::midiLearn);
                     else
                         reply = value_msg;
                 }
@@ -2629,7 +2672,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 tmp = string2int(point);
                 if (tmp > 0)
                 {
-                    sendDirect(0, TOPLEVEL::type::Write, MIDILEARN::control::loadFromRecent, TOPLEVEL::section::midiLearn, 0, 0, 0, 0, tmp - 1);
+                    sendNormal(0, TOPLEVEL::type::Write, MIDILEARN::control::loadFromRecent, TOPLEVEL::section::midiLearn, 0, 0, 0, 0, tmp - 1);
                     reply = done_msg;
                 }
                 else
@@ -2640,7 +2683,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             {
                 if ((string) point > "")
                 {
-                    sendDirect(0, TOPLEVEL::type::Write, MIDILEARN::control::loadList, TOPLEVEL::section::midiLearn, 0, 0, 0, 0, miscMsgPush((string) point));
+                    sendNormal(0, TOPLEVEL::type::Write, MIDILEARN::control::loadList, TOPLEVEL::section::midiLearn, 0, 0, 0, 0, miscMsgPush((string) point));
                     reply = done_msg;
                 }
                 else
@@ -2894,7 +2937,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = name_msg;
             else
             {
-                sendDirect(0, TOPLEVEL::type::Write, MIDILEARN::control::saveList, TOPLEVEL::section::midiLearn, 0, 0, 0, 0, miscMsgPush((string) point));
+                sendNormal(0, TOPLEVEL::type::Write, MIDILEARN::control::saveList, TOPLEVEL::section::midiLearn, 0, 0, 0, 0, miscMsgPush((string) point));
                 reply = done_msg;
             }
         }
@@ -3153,8 +3196,12 @@ bool CmdInterface::cmdIfaceProcessCommand()
 
 void CmdInterface::sendNormal(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
-    if (part != TOPLEVEL::section::midiLearn)
-        type |= TOPLEVEL::source::CLI;
+    if (type >= TOPLEVEL::type::Limits && type < TOPLEVEL::source::CLI)
+    {
+        readLimits(value, type, control, part, kit, engine, insert, parameter, par2);
+        return;
+    }
+
     CommandBlock putData;
     size_t commandSize = sizeof(putData);
 
@@ -3167,6 +3214,37 @@ void CmdInterface::sendNormal(float value, unsigned char type, unsigned char con
     putData.data.insert = insert;
     putData.data.parameter = parameter;
     putData.data.par2 = par2;
+
+    /*
+     * MIDI learn settings are synced by the audio thread
+     * but not passed on to any of the normal controls.
+     * The type field is used for a different purpose.
+     */
+
+    if (part != TOPLEVEL::section::midiLearn)
+    {
+        putData.data.type = TOPLEVEL::type::Limits;
+        float newValue = synth->interchange.readAllData(&putData);
+        if (type == TOPLEVEL::type::LearnRequest)
+        {
+            if ((putData.data.type & TOPLEVEL::type::Learnable) == 0)
+            {
+            synth->getRuntime().Log("Can't learn this control");
+            return;
+            }
+        }
+        else
+        {
+            if (newValue != value)
+            {
+            putData.data.value = newValue;
+            synth->getRuntime().Log("Range adjusted");
+            }
+        }
+        type |= TOPLEVEL::source::CLI;
+    }
+
+    putData.data.type = type;
     if (jack_ringbuffer_write_space(synth->interchange.fromCLI) >= commandSize)
         {
             synth->getRuntime().finishedCLI = false;
@@ -3289,6 +3367,50 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
     else
         synth->getRuntime().Log("Unable to write to fromCLI buffer");
     return 0; // no function for this yet
+}
+
+
+void CmdInterface::readLimits(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
+{
+    CommandBlock putData;
+
+    putData.data.value = value;
+    putData.data.type = type;
+    putData.data.control = control;
+    putData.data.part = part;
+    putData.data.kit = kit;
+    putData.data.engine = engine;
+    putData.data.insert = insert;
+    putData.data.parameter = parameter;
+    putData.data.par2 = par2;
+
+        //putData.data.type = request | TOPLEVEL::type::Limits;
+    value = synth->interchange.readAllData(&putData);
+    string name;
+    switch (type & 3)
+    {
+        case TOPLEVEL::type::Minimum:
+            name = "Min ";
+            break;
+        case TOPLEVEL::type::Maximum:
+            name = "Max ";
+            break;
+        default:
+            name = "Default ";
+            break;
+    }
+    type = putData.data.type;
+    if ((type & TOPLEVEL::type::Integer) == 0)
+        name += to_string(value);
+    else if (value < 0)
+        name += to_string(int(value - 0.5f));
+    else
+        name += to_string(int(value + 0.5f));
+    if (type & TOPLEVEL::type::Error)
+        name += " - error";
+    else if (type & TOPLEVEL::type::Learnable)
+        name += " - learnable";
+    synth->getRuntime().Log(name);
 }
 
 

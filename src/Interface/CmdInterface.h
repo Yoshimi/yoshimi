@@ -37,7 +37,7 @@ using namespace std;
  * is set so you can then step back up the level tree.
  * It is also possible to zero it so that you immediately go to
  * the top level. Therefore, the sequence is important.
- * 12 bits are currently defines out of a possible 32.
+ * 15 bits are currently defined out of a possible 32.
  *
  * AllFX, InsFX and Part MUST be the first three
  */
@@ -81,6 +81,7 @@ class CmdInterface : private MiscFuncs
         int partCommonControls(unsigned char controlType);
         int commandList();
         int toggle(void);
+        bool lineEnd(unsigned char controlType);
         int commandMlearn(unsigned char controlType);
         int commandVector(unsigned char controlType);
         int commandConfig(unsigned char controlType);
@@ -91,6 +92,7 @@ class CmdInterface : private MiscFuncs
         int addVoice(unsigned char controlType);
         int commandPart(bool justSet, unsigned char controlType);
         int commandReadnSet(unsigned char controlType);
+        void readLimits(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2);
         void sendNormal(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff);
         int sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff, unsigned char request = 0xff);
         bool cmdIfaceProcessCommand();
@@ -99,9 +101,11 @@ class CmdInterface : private MiscFuncs
         SynthEngine *synth;
         char welcomeBuffer [128];
 
+        int voiceNumber;
         int kitmode;
         int kitnumber;
         int npart;
+
         int nFX;
         int nFXtype;
         int nFXpreset;

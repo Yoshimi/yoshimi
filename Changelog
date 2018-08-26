@@ -1,5 +1,9 @@
 yoshimi 1.5.8 M
 
+2018-8-26 Will
+* More refinments to CLI command structure.
+* Added common stereo, octave, detunes.
+
 2018-8-25 Will
 * Identified engines and kit mode in CLI prompt.
 * All CLI kit mode controls active.

@@ -128,6 +128,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         Minimum,
         Maximum,
         Default,
+        LearnRequest = 3,
         // remaining used bit-wise
         Error = 4, // also identifes static limits
         Limits = 4, // yes we can pair these - who knew?
