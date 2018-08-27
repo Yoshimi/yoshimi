@@ -378,6 +378,12 @@ float SUBnoteParameters::getLimits(CommandBlock *getData)
 
     if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     { // do harmonics stuff
+        if (control >= MAX_SUB_HARMONICS)
+        {
+            getData->data.type = TOPLEVEL::type::Error;
+            return 1;
+        }
+
         if (insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
             def = 64;
         else if (control == 0)
