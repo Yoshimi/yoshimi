@@ -6,6 +6,8 @@ yoshimi 1.5.8 M
 * Some settings now checked on each CLI loop.
   Will be for checks against external changes.
 * Implemented new part 'common' controls list.
+* Updated ? lists to include subsynth.
+  Also more flexible for later additions.
 
 2018-8-26 Will
 * More refinments to CLI command structure.

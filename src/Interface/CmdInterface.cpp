@@ -53,6 +53,26 @@ using namespace std;
 extern SynthEngine *firstSynth;
 static unsigned int currentInstance = 0;
 
+namespace LISTS {
+    enum {
+    all = 0,
+    syseff, // not yet
+    inseff, // not yet
+    part,
+    common,
+    addsynth,
+    subsynth,
+    padsynth,
+    vector,
+    scale,
+    load,
+    save,
+    list,
+    config,
+    mlearn
+    };
+}
+
 string basics[] = {
     "?  Help",                  "show commands",
     "STop",                     "all sound off",
@@ -186,6 +206,12 @@ string commonlist [] = {
     "*",                        "Add, Sub, Pad and AddVoice controls",
     "*-pad",                    "Not PadSynth",
     "*-voice",                  "Not AddVoice",
+    "end"
+};
+
+string subsynthlist [] = {
+    "HArmonic <n1> Amp <n2>", "set harmonic {n1} to {n2} intensity",
+    "HArmonic <n1> Band <n2>", "set harmonic {n1} to {n2} width",
     "end"
 };
 
@@ -385,41 +411,45 @@ bool CmdInterface::helpList(unsigned int local)
     if (!matchnMove(1, point, "help") && !matchnMove(1, point, "?"))
         return false;
 
-    int listnum = 0;
+    int listnum = LISTS::all;
 
     if (point[0] != 0)
     { // 1 & 2 reserved for syseff & inseff
         if (matchnMove(1, point, "part"))
-            listnum = 3;
-        else if (matchnMove(1, point, "vector"))
-            listnum = 4;
-        else if (matchnMove(1, point, "scale"))
-            listnum = 5;
-        else if (matchnMove(1, point, "load"))
-            listnum = 6;
-        else if (matchnMove(1, point, "save"))
-            listnum = 7;
-        else if (matchnMove(1, point, "list"))
-            listnum = 8;
-        else if (matchnMove(1, point, "config"))
-            listnum = 9;
-        else if (matchnMove(1, point, "mlearn"))
-            listnum = 10;
+            listnum = LISTS::part;
         else if (matchnMove(3, point, "common"))
-            listnum = 11;
+            listnum = LISTS::common;
+        else if (matchnMove(3, point, "subsynth"))
+            listnum = LISTS::subsynth;
+        else if (matchnMove(1, point, "vector"))
+            listnum = LISTS::vector;
+        else if (matchnMove(1, point, "scale"))
+            listnum = LISTS::scale;
+        else if (matchnMove(1, point, "load"))
+            listnum = LISTS::load;
+        else if (matchnMove(1, point, "save"))
+            listnum = LISTS::save;
+        else if (matchnMove(1, point, "list"))
+            listnum = LISTS::list;
+        else if (matchnMove(1, point, "config"))
+            listnum = LISTS::config;
+        else if (matchnMove(1, point, "mlearn"))
+            listnum = LISTS::mlearn;
     }
     else
     {
-        if (bitTest(local, LEVEL::Part))
-            listnum = 3;
+        if (bitTest(local, LEVEL::SubSynth))
+            listnum = LISTS::subsynth;
+        else if (bitTest(local, LEVEL::Part))
+            listnum = LISTS::part;
         else if (bitTest(local, LEVEL::Vector))
-            listnum = 4;
+            listnum = LISTS::vector;
         else if (bitTest(local, LEVEL::Scale))
-            listnum = 5;
+            listnum = LISTS::scale;
         else if (bitTest(local, LEVEL::Config))
-            listnum = 9;
+            listnum = LISTS::config;
         else if (bitTest(local, LEVEL::Learn))
-            listnum = 10;
+            listnum = LISTS::mlearn;
     }
 
     list<string>msg;
@@ -440,42 +470,46 @@ bool CmdInterface::helpList(unsigned int local)
 
             msg.push_back(" ");
             break;
-        case 3:
+        case LISTS::part:
             msg.push_back("Part: [n1] = part number");
             helpLoop(msg, partlist, 2);
             break;
-        case 4:
+        case LISTS::common:
+            msg.push_back("Part Common:");
+            helpLoop(msg, commonlist, 2);
+            break;
+        case LISTS::subsynth:
+            msg.push_back("Part SubSynth:");
+            helpLoop(msg, subsynthlist, 2);
+            break;
+        case LISTS::vector:
             msg.push_back("Vector: [n1] = base channel:");
             helpLoop(msg, vectlist, 2);
             break;
-        case 5:
+        case LISTS::scale:
             msg.push_back("Scale:");
             helpLoop(msg, scalelist, 2);
             break;
-        case 6:
+        case LISTS::load:
             msg.push_back("Load:");
             helpLoop(msg, loadlist, 2);
             break;
-        case 7:
+        case LISTS::save:
             msg.push_back("Save:");
             helpLoop(msg, savelist, 2);
             break;
-        case 8:
+        case LISTS::list:
             msg.push_back("List:");
             helpLoop(msg, listlist, 2);
             break;
-        case 9:
+        case LISTS::config:
             msg.push_back("Config:");
             helpLoop(msg, configlist, 2);
             msg.push_back("'*' entries need to be saved and Yoshimi restarted to activate");
             break;
-        case 10:
+        case LISTS::mlearn:
             msg.push_back("Mlearn: [n1] = line number");
             helpLoop(msg, learnlist, 2);
-            break;
-        case 11:
-            msg.push_back("Part Common:");
-            helpLoop(msg, commonlist, 2);
             break;
     }
 
