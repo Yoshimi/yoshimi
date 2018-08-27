@@ -1053,6 +1053,85 @@ int CmdInterface::commandList()
 }
 
 
+string CmdInterface::findStatus(bool show)
+{
+    string text = " ";
+    int kit = UNUSED;
+    int insert = UNUSED;
+    if (bitTest(context, LEVEL::Part))
+    {
+        text += "part ";
+        text += to_string(int(npart) + 1);
+        if (readControl(PART::control::enable, npart))
+            text += " on";
+        kitmode = readControl(PART::control::kitMode, npart);
+        if (kitmode != PART::kitType::Off)
+        {
+            kit = kitnumber;
+            insert = TOPLEVEL::insert::kitGroup;
+            text += ", kit ";
+            text += to_string(kitnumber + 1);
+            if (readControl(PART::control::enable, npart, kitnumber, UNUSED, insert))
+                text += " on";
+            text += ", ";
+            switch (kitmode)
+            {
+                case PART::kitType::Multi:
+                    text += "multi";
+                    break;
+                case PART::kitType::Single:
+                    text += "single";
+                    break;
+                case PART::kitType::CrossFade:
+                    text += "cross";
+                    break;
+                default:
+                    break;
+            }
+        }
+        else
+            kitnumber = 0;
+        if (!show)
+            return "";
+
+        if (bitFindHigh(context) == LEVEL::AddSynth)
+        {
+            text += ", add";
+            if (readControl(PART::control::enable, npart, kit, PART::engine::addSynth, insert))
+                text += " on";
+        }
+        else if (bitFindHigh(context) == LEVEL::SubSynth)
+        {
+            text += ", sub";
+                if (readControl(PART::control::enable, npart, kit, PART::engine::subSynth, insert))
+                    text += " on";
+        }
+        else if (bitFindHigh(context) == LEVEL::PadSynth)
+        {
+            text += ", pad";
+            if (readControl(PART::control::enable, npart, kit, PART::engine::padSynth, insert))
+                text += " on";
+        }
+    }
+    else if (bitTest(context, LEVEL::Scale))
+        text += " Scale ";
+    else if (bitTest(context, LEVEL::Config))
+        text += " Config ";
+    else if (bitTest(context, LEVEL::Vector))
+    {
+        text += (" Vect Ch " + asString(chan + 1) + " ");
+        if (axis == 0)
+            text += "X";
+        else
+            text += "Y";
+    }
+    else if (bitTest(context, LEVEL::Learn))
+        text += (" MLearn line " + asString(mline + 1) + " ");
+
+    return text;
+}
+
+
 int CmdInterface::toggle()
 {
     if (matchnMove(2, point, "enable") || matchnMove(2, point, "on") || matchnMove(3, point, "yes"))
@@ -1915,7 +1994,7 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
                 if (point[0] == 0)
                     return value_msg;
                 int tmp = string2int(point);
-                if (tmp < 1 || tmp > 16)
+                if (tmp < 1 || tmp > NUM_KIT_ITEMS)
                     return range_msg;
                 kitnumber = tmp - 1;
             }
@@ -2344,6 +2423,8 @@ bool CmdInterface::cmdIfaceProcessCommand()
     }
 
     list<string> msg;
+
+    findStatus(false);
 
 #ifdef REPORT_NOTES_ON_OFF
     if (matchnMove(3, point, "report")) // note test
@@ -3411,6 +3492,28 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
 }
 
 
+float CmdInterface::readControl(unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
+{
+    float value;
+    CommandBlock putData;
+
+    putData.data.value = 0;
+    putData.data.type = 0;
+    putData.data.control = control;
+    putData.data.part = part;
+    putData.data.kit = kit;
+    putData.data.engine = engine;
+    putData.data.insert = insert;
+    putData.data.parameter = parameter;
+    putData.data.par2 = par2;
+    value = synth->interchange.readAllData(&putData);
+    if (putData.data.type & TOPLEVEL::type::Error)
+        //return 0xfffff;
+        cout << "err" << endl;
+    return value;
+}
+
+
 void CmdInterface::readLimits(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
     CommandBlock putData;
@@ -3501,50 +3604,11 @@ void CmdInterface::cmdIfaceCommandLoop()
                 }
             }
 
-
             string prompt = "yoshimi";
             if (currentInstance > 0)
                 prompt += (":" + asString(currentInstance));
-            if (bitTest(context, LEVEL::Part))
-            {
-                prompt += (" part " + asString(npart + 1));
-                nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
-                if (synth->partonoffRead(npart))
-                    prompt += " on";
-                else
-                    prompt += " off";
 
-                int kmode = synth->part[npart]->Pkitmode;
-                if (kmode > 0)
-                {
-                    if (synth->part[npart]->Pkitfade)
-                        kmode = 3;
-                    prompt += ", kit ";
-                    prompt += to_string(kitnumber + 1);
-                    prompt += ", mode ";
-                    switch (kmode)
-                    {
-                        case 1:
-                            prompt += "multi";
-                            break;
-                        case 2:
-                            prompt += "single";
-                            break;
-                        case 3:
-                            prompt += "cross";
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                if (bitFindHigh(context) == LEVEL::AddSynth)
-                    prompt += ", Add";
-                else if (bitFindHigh(context) == LEVEL::SubSynth)
-                    prompt += ", Sub";
-                else if (bitFindHigh(context) == LEVEL::PadSynth)
-                    prompt += ", Pad";
-            }
+            prompt += findStatus(true);
 
             if (bitTest(context, LEVEL::AllFX))
             {
@@ -3564,22 +3628,6 @@ void CmdInterface::cmdIfaceCommandLoop()
                 prompt += (" efx " + asString(nFX + 1) + " " + fx_list[nFXtype].substr(0, 5));
                 if (nFXtype > 0)
                     prompt += ("-" + asString(nFXpreset + 1));
-            }
-            if (bitTest(context, LEVEL::Scale))
-                prompt += " Scale ";
-            if (bitTest(context, LEVEL::Config))
-                prompt += " Config ";
-            if (bitTest(context, LEVEL::Vector))
-            {
-                prompt += (" Vect Ch " + asString(chan + 1) + " ");
-                if (axis == 0)
-                    prompt += "X";
-                else
-                    prompt += "Y";
-            }
-            if (bitTest(context, LEVEL::Learn))
-            {
-                prompt += (" MLearn line " + asString(mline + 1) + " ");
             }
 
             prompt += "> ";

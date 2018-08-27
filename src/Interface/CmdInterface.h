@@ -80,6 +80,7 @@ class CmdInterface : private MiscFuncs
         int effects(unsigned char controlType);
         int partCommonControls(unsigned char controlType);
         int commandList();
+        string findStatus(bool show);
         int toggle(void);
         bool lineEnd(unsigned char controlType);
         int commandMlearn(unsigned char controlType);
@@ -92,6 +93,7 @@ class CmdInterface : private MiscFuncs
         int addVoice(unsigned char controlType);
         int commandPart(bool justSet, unsigned char controlType);
         int commandReadnSet(unsigned char controlType);
+        float readControl(unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff);
         void readLimits(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2);
         int sendNormal(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff);
         int sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff, unsigned char request = 0xff);

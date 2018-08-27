@@ -2,6 +2,9 @@ yoshimi 1.5.8 M
 
 2018-8-27 Will
 * Improved CLI fault and context sensitivity.
+* Aded more info on CLI prompt.
+* Some settings now checked on each CLI loop.
+  Will be for checks against external changes.
 
 2018-8-26 Will
 * More refinments to CLI command structure.
