@@ -141,28 +141,21 @@ string configlist [] = {
 };
 
 string partlist [] = {
-    "ENable",                   "enables the part",
-    "DIsable",                  "disables the part",
-    "Volume <n2>",              "volume",
-    "Pan <n2>",                 "panning",
-    "VElocity <n2>",            "velocity sensing sensitivity",
     "OFfset <n2>",              "velocity sense offset",
     "Breath <s>",               "breath control (Enable {other})",
     "POrtamento <s>",           "portamento (Enable {other})",
     "Mode <s>",                 "key mode (Poly, Mono, Legato)",
     "Note <n2>",                "note polyphony",
     "SHift <n2>",               "key shift semitones (0 no shift)",
-    "MIn <n2>",                 "minimum MIDI note value",
-    "MAx <n2>",                 "maximum MIDI note value",
     "EFfects [n2]",             "enter effects context level",
     "  Type <s>",               "the effect type",
     "  PREset <n3>",            "set numbered effect preset to n3",
     "  Send <n3> <n4>",         "send part to system effect n3 at volume n4",
     "KMode <s>",                "set part to kit mode (Enable, {other})",
-    "  KItem <n>",                "select kit item number (1-16)",
-    "    MUte <s>",                 "silence this item (Enable, {other})",
-    "    KEffect <n>",              "select effect for this item (0-none, 1-3)",
-    "  DRum <s>",                 "set kit to drum mode (Enable, {other})",
+    "  KItem <n>",              "select kit item number (1-16)",
+    "    MUte <s>",             "silence this item (Enable, {other})",
+    "    KEffect <n>",          "select effect for this item (0-none, 1-3)",
+    "  DRum <s>",               "set kit to drum mode (Enable, {other})",
     "PRogram <[n2]/[s]>",       "loads instrument ID / CLear sets default",
     "NAme <s>",                 "sets the display name the part can be saved with",
     "Channel <n2>",             "MIDI channel (> 32 disables, > 16 note off only)",
@@ -170,6 +163,29 @@ string partlist [] = {
     "ADDsynth ...",             "Enter AddSynth context",
     "SUBsynth ...",             "Enter SubSynth context",
     "PADsynth ...",             "Enter PadSynth context",
+    "? COMmon",                 "List controls common to most part contexts",
+    "end"
+};
+
+string commonlist [] = {
+    "ENable @",                 "enables the part/kit/engine etc,",
+    "DIsable @",                "disables",
+    "Volume <n> @",             "volume",
+    "Pan <n2> @",               "panning",
+    "VElocity <n> @",           "velocity sensing sensitivity",
+    "MIn <n> +",                "minimum MIDI note value",
+    "MAx <n> +",                "maximum MIDI note value",
+    "DEtune Fine <n> *",        "fine frequency",
+    "DEtune Coarse <n> *",      "coarse stepped frequency",
+    "DEtune Type <n> *",        "type of coarse stepping",
+    "OCTave <n> *",             "shift ovatces up or down",
+    "STEreo <s> *-voice",       "ENable/ON/YES, {other}",
+    " "," ",
+    "@",                        "Exists in all part contexts",
+    "+",                        "Part and kit mode controls",
+    "*",                        "Add, Sub, Pad and AddVoice controls",
+    "*-pad",                    "Not PadSynth",
+    "*-voice",                  "Not AddVoice",
     "end"
 };
 
@@ -389,6 +405,8 @@ bool CmdInterface::helpList(unsigned int local)
             listnum = 9;
         else if (matchnMove(1, point, "mlearn"))
             listnum = 10;
+        else if (matchnMove(3, point, "common"))
+            listnum = 11;
     }
     else
     {
@@ -454,6 +472,10 @@ bool CmdInterface::helpList(unsigned int local)
         case 10:
             msg.push_back("Mlearn: [n1] = line number");
             helpLoop(msg, learnlist, 2);
+            break;
+        case 11:
+            msg.push_back("Part Common:");
+            helpLoop(msg, commonlist, 2);
             break;
     }
 

@@ -5,6 +5,7 @@ yoshimi 1.5.8 M
 * Aded more info on CLI prompt.
 * Some settings now checked on each CLI loop.
   Will be for checks against external changes.
+* Implemented new part 'common' controls list.
 
 2018-8-26 Will
 * More refinments to CLI command structure.
