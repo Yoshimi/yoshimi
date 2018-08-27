@@ -8,6 +8,7 @@ yoshimi 1.5.8 M
 * Implemented new part 'common' controls list.
 * Updated ? lists to include subsynth.
   Also more flexible for later additions.
+* Changed NRPN 7 bit command to remove abiguity.
 
 2018-8-26 Will
 * More refinments to CLI command structure.

@@ -217,7 +217,7 @@ string subsynthlist [] = {
 
 string learnlist [] = {
     "MUte <s>",                 "Enable/Disable this line (Enable, {other})",
-    "7Bit",                     "Set incoming NRPNs as 7 bit (Enable, {other})",
+    "SEven",                    "Set incoming NRPNs as 7 bit (Enable, {other})",
     "CC <n2>",                  "Set incoming controller value",
     "CHan <n2>",                "Set incoming channel number",
     "MIn <n2>",                 "Set minimm percentage",
@@ -1298,7 +1298,7 @@ int CmdInterface::commandMlearn(unsigned char controlType)
             type = (toggle() == 1);
             control = 0;
         }
-        else if (matchnMove(2, point, "char"))
+        else if (matchnMove(2, point, "seven"))
         {
             type = (toggle() == 1) * 16;
             control = 4;
