@@ -1,5 +1,10 @@
 yoshimi 1.5.8 M
 
+2018-8-28 Will
+* Completed CLI part common controls.
+* Moved Voice enable down to 8 for compatibility.
+* Moved Voice amplitude envelope enable down to 7.
+
 2018-8-27 Will
 * Improved CLI fault and context sensitivity.
 * Aded more info on CLI prompt.
@@ -8,7 +13,7 @@ yoshimi 1.5.8 M
 * Implemented new part 'common' controls list.
 * Updated ? lists to include subsynth.
   Also more flexible for later additions.
-* Changed NRPN 7 bit command to remove abiguity.
+* Changed NRPN 7 bit command to remove ambiguity.
 
 2018-8-26 Will
 * More refinments to CLI command structure.

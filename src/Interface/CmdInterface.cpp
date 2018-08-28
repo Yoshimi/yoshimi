@@ -195,16 +195,27 @@ string commonlist [] = {
     "VElocity <n> @",           "velocity sensing sensitivity",
     "MIn <n> +",                "minimum MIDI note value",
     "MAx <n> +",                "maximum MIDI note value",
-    "DEtune Fine <n> *",        "fine frequency",
-    "DEtune Coarse <n> *",      "coarse stepped frequency",
-    "DEtune Type <n> *",        "type of coarse stepping",
+    "DEPop <n> &",              "initial attack slope",
+    "PUnch Power <n> &",        "attack boost amplitude",
+    "PUnch Duration <n> &",     "attack boost time",
+    "PUnch Stretch <n> &",      "attack boost extend",
+    "PUnch Velocity <n> &",     "attack boost velocity sensitivity",
+    "FIxed <s> *-add",          "set base frequency to 440Hx (ENable/ON/YES, {other})",
+    "EQUal <n> *-add",          "Equal temper variation",
+    "BENd Adjust <n>  *-add",   "Pitch bend range",
+    "BENd Offset <n>  *-add",   "Pitch bend shift",
+    "DETune Fine <n> *",        "fine frequency",
+    "DETune Coarse <n> *",      "coarse stepped frequency",
+    "DETune Type <n> *",        "type of coarse stepping",
     "OCTave <n> *",             "shift ovatces up or down",
     "STEreo <s> *-voice",       "ENable/ON/YES, {other}",
     " "," ",
     "@",                        "Exists in all part contexts",
     "+",                        "Part and kit mode controls",
+    "&",                        "AddSynth & PadSynth only",
     "*",                        "Add, Sub, Pad and AddVoice controls",
-    "*-pad",                    "Not PadSynth",
+    "*-add",                    "Not AddSynth",
+    "*-sub",                    "Not SubSynth",
     "*-voice",                  "Not AddVoice",
     "end"
 };
@@ -888,8 +899,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
     {
         // these are all common to Add, Sub, Pad, Voice
         int value = 0;
-
-        if (matchnMove(2, point, "detune"))
+        if (matchnMove(3, point, "detune"))
         {
             if (matchnMove(1, point, "fine"))
             {
@@ -920,11 +930,64 @@ int CmdInterface::partCommonControls(unsigned char controlType)
             value = string2int(point);
             cmd = ADDSYNTH::control::octave;
         }
+        // not AddVoice
         else if (matchnMove(3, point, "stereo") && bitFindHigh(context) != LEVEL::AddVoice)
         {
             cmd = ADDSYNTH::control::stereo;
             value = (toggle() == 1);
         }
+        // not AddSynth
+        else if(bitFindHigh(context) != LEVEL::AddSynth)
+        {
+            int tmp_cmd = -1;
+            if (matchnMove(2, point, "fixed"))
+            {
+                value = (toggle() == 1);
+                cmd = SUBSYNTH::control::baseFrequencyAs440Hz;
+            }
+            else if (matchnMove(3, point, "equal"))
+                tmp_cmd = SUBSYNTH::control::equalTemperVariation;
+            else if (matchnMove(3, point, "bend"))
+            {
+                if (matchnMove(1, point, "adjust"))
+                    tmp_cmd = SUBSYNTH::control::pitchBendAdjustment;
+                else if (matchnMove(1, point, "offset"))
+                    tmp_cmd = SUBSYNTH::control::pitchBendOffset;
+            }
+            if (tmp_cmd > -1)
+            {
+                if (lineEnd(controlType))
+                    return value_msg;
+                value = string2int(point);
+                cmd = tmp_cmd;
+            }
+        }
+        // Add/Pad only
+        else if(bitFindHigh(context) == LEVEL::AddSynth || bitFindHigh(context) == LEVEL::PadSynth)
+        {
+            int tmp_cmd = -1;
+            if (matchnMove(3, point, "depop"))
+                tmp_cmd = ADDSYNTH::control::dePop;
+            else if (matchnMove(2, point, "punch"))
+            {
+                if (matchnMove(1, point, "power"))
+                    tmp_cmd = ADDSYNTH::control::punchStrength;
+                else if (matchnMove(1, point, "duration"))
+                    tmp_cmd = ADDSYNTH::control::punchDuration;
+                else if (matchnMove(1, point, "stretch"))
+                    tmp_cmd = ADDSYNTH::control::punchStretch;
+                else if (matchnMove(1, point, "velocity"))
+                    tmp_cmd = ADDSYNTH::control::punchVelocity;
+            }
+            if (tmp_cmd > -1)
+            {
+                if (lineEnd(controlType))
+                    return value_msg;
+                value = string2int(point);
+                cmd = tmp_cmd;
+            }
+        }
+
         if (cmd > -1)
         {
             sendNormal(value, controlType, cmd, npart, kitnumber, engine);
@@ -974,7 +1037,6 @@ int CmdInterface::partCommonControls(unsigned char controlType)
     {
         if (kitmode)
             insert = TOPLEVEL::insert::kitGroup;
-
         //cout << ">> kit cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitnumber) << "  engine " << int(engine) << "  insert " << int(insert) << endl;
         sendNormal(value, controlType, cmd, npart, kit, engine, insert);
         return done_msg;
@@ -1150,7 +1212,7 @@ string CmdInterface::findStatus(bool show)
         if (!show)
             return "";
 
-        if (bitFindHigh(context) == LEVEL::AddSynth)
+        if (bitTest(context, LEVEL::AddSynth))
         {
             text += ", add";
             if (readControl(PART::control::enable, npart, kit, PART::engine::addSynth, insert))
@@ -1162,10 +1224,17 @@ string CmdInterface::findStatus(bool show)
                 if (readControl(PART::control::enable, npart, kit, PART::engine::subSynth, insert))
                     text += " on";
         }
-        else if (bitFindHigh(context) == LEVEL::PadSynth)
+        else if (bitTest(context, LEVEL::PadSynth))
         {
             text += ", pad";
             if (readControl(PART::control::enable, npart, kit, PART::engine::padSynth, insert))
+                text += " on";
+        }
+        if (bitTest(context, LEVEL::AddVoice))
+        {
+            text += ", voice ";
+            text += to_string(voiceNumber + 1);
+            if (readControl(PART::control::enable, npart, kit, PART::engine::addVoice1 + voiceNumber, insert))
                 text += " on";
         }
     }
@@ -1873,9 +1942,20 @@ int CmdInterface::commandScale(unsigned char controlType)
 
 int CmdInterface::addVoice(unsigned char controlType)
 {
-    cout << "addvoice" << endl;
+    if (isdigit(point[0]))
+    {
+        voiceNumber = string2int(point) - 1;
+        point = skipChars(point);
+    }
     if (point[0] == 0)
         return done_msg;
+
+    int value = toggle();
+    if (value > -1)
+    {
+        sendNormal(value, controlType, ADDVOICE::control::enableVoice, npart, kitnumber, PART::engine::addVoice1 + voiceNumber);
+        return done_msg;
+    }
     int result = partCommonControls(controlType);
     if (result != todo_msg)
         return result;
@@ -1891,7 +1971,6 @@ int CmdInterface::addSynth(unsigned char controlType)
         bitSet(context, LEVEL::AddVoice);
         return addVoice(controlType);
     }
-    cout << "addsynth" << endl;
     if (point[0] == 0)
         return done_msg;
     int result = partCommonControls(controlType);
@@ -1908,7 +1987,6 @@ int CmdInterface::subSynth(unsigned char controlType)
     unsigned char insert = UNUSED;
     bool set = false;
 
-    cout << "subsynth" << endl;
     if (point[0] == 0)
         return done_msg;
     int result = partCommonControls(controlType);
@@ -1943,7 +2021,6 @@ int CmdInterface::subSynth(unsigned char controlType)
 
 int CmdInterface::padSynth(unsigned char controlType)
 {
-    cout << "padsynth" << endl;
     if (point[0] == 0)
         return done_msg;
     int result = partCommonControls(controlType);
@@ -2033,7 +2110,7 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
             kitmode = PART::kitType::Single;
         else if(matchnMove(2, point, "crossfade"))
             kitmode = PART::kitType::CrossFade;
-        else
+        else if (controlType == TOPLEVEL::type::Write)
             return value_msg;
         sendDirect(kitmode, controlType, PART::control::kitMode, npart);
         kitnumber = 0;

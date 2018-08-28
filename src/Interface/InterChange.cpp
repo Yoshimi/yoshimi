@@ -2222,7 +2222,23 @@ string InterChange::resolvePart(CommandBlock *getData)
             contstr = "Drum Mode";
             break;
         case PART::control::kitMode:
-            contstr = "Kit Mode";
+            contstr = "Kit Mode ";
+            showValue = false;
+            switch(value_int)
+            {
+                case 0:
+                    contstr += "off";
+                    break;
+                case 1:
+                    contstr += "multi";
+                    break;
+                case 2:
+                    contstr += "single";
+                    break;
+                case 3:
+                    contstr += "crossfade";
+                    break;
+            }
             break;
 
         case PART::control::effectNumber: // local to source
@@ -5476,7 +5492,11 @@ void InterChange::commandPart(CommandBlock *getData)
                 }
             }
             else
+            {
                 value = part->Pkitmode;
+                if (value == 1 && part->Pkitfade == true)
+                    value = 3;
+            }
             break;
 
         case PART::control::effectNumber: // local to source

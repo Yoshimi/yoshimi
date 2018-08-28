@@ -545,7 +545,8 @@ namespace ADDVOICE // usage ADDVOICE::control::volume
         velocitySense,
         panning,
         invertPhase = 4,
-        enableAmplitudeEnvelope = 8,
+        enableAmplitudeEnvelope = 7,
+        enableVoice,
         enableAmplitudeLFO,
 
         modulatorType = 16, // Off, Morph, Ring, PM, FM, PWM
@@ -591,8 +592,7 @@ namespace ADDVOICE // usage ADDVOICE::control::volume
         modulatorOscillatorSource, // local, external
 
         delay = 128,
-        enableVoice,
-        enableResonance, // for this voice
+        enableResonance = 130, // for this voice
         voiceOscillatorPhase = 136,
         voiceOscillatorSource, // local, external
         soundType // Oscillator, White noise, Pink noise
