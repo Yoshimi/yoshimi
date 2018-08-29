@@ -1,5 +1,12 @@
 yoshimi 1.5.8 M
 
+2018-8-29 Will
+* Made CLI help lists more consistent.
+* Added CLI overtones entries for sub and pad.
+* Added pad 'apply' control to CLI.
+* Updated query lists.
+
+
 2018-8-28 Will
 * Completed CLI part common controls.
 * Moved Voice enable down to 8 for compatibility.

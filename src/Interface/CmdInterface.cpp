@@ -130,14 +130,14 @@ string configlist [] = {
     "REports [s]",              "destination (Stdout, other = console)",
     "SAved [s]",                "Saved instrument type (Legacy {.xiz}, Yoshimi {.xiy}, Both)",
 
-    "STate [s]",                "* autoload default at start (Enable {other})",
-    "Hide [s]",                 "non-fatal errors (Enable {other})",
-    "Display [s]",              "GUI splash screen (Enable {other})",
-    "Time [s]",                 "add to instrument load message (Enable {other})",
+    "STate [s]",                "* autoload default at start (ENable/ON/YES, {other})",
+    "Hide [s]",                 "non-fatal errors (ENable/ON/YES, {other})",
+    "Display [s]",              "GUI splash screen (ENable/ON/YES, {other})",
+    "Time [s]",                 "add to instrument load message (ENable/ON/YES, {other})",
     "Include [s]",              "XML headers on file load(Enable {other})",
-    "Keep [s]",                 "include inactive data on all file saves (Enable {other})",
-    "Gui [s]",                  "* Run with GUI (Enable, Disable)",
-    "Cli [s]",                  "* Run with CLI (Enable, Disable)",
+    "Keep [s]",                 "include inactive data on all file saves (ENable/ON/YES, {other})",
+    "Gui [s]",                  "* Run with GUI (ENable/ON/YES, DIsable/OFF/NO)",
+    "Cli [s]",                  "* Run with CLI (ENable/ON/YES, DIsable/OFF/NO)",
 
     "MIdi <s>",                 "* connection type (Jack, Alsa)",
     "AUdio <s>",                "* connection type (Jack, Alsa)",
@@ -146,24 +146,24 @@ string configlist [] = {
     "ALsa Sample <n>",          "* rate (0 = 192000, 1 = 96000, 2 = 48000, 3 = 44100)",
     "Jack Midi <s>",            "* name of source",
     "Jack Server <s>",          "* name",
-    "Jack Auto <s>",            "* connect jack on start (Enable {other})",
+    "Jack Auto <s>",            "* connect jack on start (ENable/ON/YES, {other})",
 
-    "ROot [n]",                 "root CC (0 - 119, other disables)",
-    "BAnk [n]",                 "bank CC (0, 32, other disables)",
-    "PRogram [s]",              "program change (Enable {other})",
-    "ACtivate [s]",             "program change activates part (Enable {other})",
-    "Extended [s]",             "extended program change (Enable {other})",
-    "Quiet [s]",                "ignore 'reset all controllers' (Enable {other})",
-    "Nrpn [s]",                 "incoming NRPN (Enable {other})",
-    "Log [s]",                  "incoming MIDI CCs (Enable {other})",
-    "SHow [s]",                 "GUI MIDI learn editor (Enable {other})",
+    "ROot [n]",                 "root CC (0 - 119, {other} Disable)",
+    "BAnk [n]",                 "bank CC (0, 32, {other} Disable)",
+    "PRogram [s]",              "program change (ENable/ON/YES, {other})",
+    "ACtivate [s]",             "program change activates part (ENable/ON/YES, {other})",
+    "Extended [s]",             "extended program change (ENable/ON/YES, {other})",
+    "Quiet [s]",                "ignore 'reset all controllers' (ENable/ON/YES, {other})",
+    "Nrpn [s]",                 "incoming NRPN (ENable/ON/YES, {other})",
+    "Log [s]",                  "incoming MIDI CCs (ENable/ON/YES, {other})",
+    "SHow [s]",                 "GUI MIDI learn editor (ENable/ON/YES, {other})",
     "end"
 };
 
 string partlist [] = {
     "OFfset <n2>",              "velocity sense offset",
-    "Breath <s>",               "breath control (Enable {other})",
-    "POrtamento <s>",           "portamento (Enable {other})",
+    "Breath <s>",               "breath control (ENable/ON/YES, {other})",
+    "POrtamento <s>",           "portamento (ENable/ON/YES, {other})",
     "Mode <s>",                 "key mode (Poly, Mono, Legato)",
     "Note <n2>",                "note polyphony",
     "SHift <n2>",               "key shift semitones (0 no shift)",
@@ -171,11 +171,11 @@ string partlist [] = {
     "  Type <s>",               "the effect type",
     "  PREset <n3>",            "set numbered effect preset to n3",
     "  Send <n3> <n4>",         "send part to system effect n3 at volume n4",
-    "KMode <s>",                "set part to kit mode (Enable, {other})",
+    "KMode <s>",                "set part to kit mode (ENable/ON/YES, {other})",
     "  KItem <n>",              "select kit item number (1-16)",
-    "    MUte <s>",             "silence this item (Enable, {other})",
+    "    MUte <s>",             "silence this item (ENable/ON/YES, {other})",
     "    KEffect <n>",          "select effect for this item (0-none, 1-3)",
-    "  DRum <s>",               "set kit to drum mode (Enable, {other})",
+    "  DRum <s>",               "set kit to drum mode (ENable/ON/YES, {other})",
     "PRogram <[n2]/[s]>",       "loads instrument ID / CLear sets default",
     "NAme <s>",                 "sets the display name the part can be saved with",
     "Channel <n2>",             "MIDI channel (> 32 disables, > 16 note off only)",
@@ -200,6 +200,10 @@ string commonlist [] = {
     "PUnch Duration <n> &",     "attack boost time",
     "PUnch Stretch <n> &",      "attack boost extend",
     "PUnch Velocity <n> &",     "attack boost velocity sensitivity",
+    "OVertone Position <n> #",  "Relationship to fundamental",
+    "OVertone First <n> #",     "Degree of first parameter",
+    "OVertone Second <n> #",    "Degree of second parameter",
+    "OVertone Harmonic <n> #",  "Amount harmonics are forced",
     "FIxed <s> *-add",          "set base frequency to 440Hx (ENable/ON/YES, {other})",
     "EQUal <n> *-add",          "Equal temper variation",
     "BENd Adjust <n>  *-add",   "Pitch bend range",
@@ -213,10 +217,16 @@ string commonlist [] = {
     "@",                        "Exists in all part contexts",
     "+",                        "Part and kit mode controls",
     "&",                        "AddSynth & PadSynth only",
+    "#",                        "SubSynth & PadSynth only",
     "*",                        "Add, Sub, Pad and AddVoice controls",
     "*-add",                    "Not AddSynth",
     "*-sub",                    "Not SubSynth",
     "*-voice",                  "Not AddVoice",
+    "end"
+};
+
+string addsynthlist [] = {
+    "none yet",                 "Well, just the common controls",
     "end"
 };
 
@@ -226,21 +236,26 @@ string subsynthlist [] = {
     "end"
 };
 
+string padsynthlist [] = {
+    "APply",                    "Puts latest changes into the wavetable",
+    "end"
+};
+
 string learnlist [] = {
-    "MUte <s>",                 "Enable/Disable this line (Enable, {other})",
-    "SEven",                    "Set incoming NRPNs as 7 bit (Enable, {other})",
+    "MUte <s>",                 "Completely ignore this line (ENable/ON/YES, {other})",
+    "SEven",                    "Set incoming NRPNs as 7 bit (ENable/ON/YES, {other})",
     "CC <n2>",                  "Set incoming controller value",
     "CHan <n2>",                "Set incoming channel number",
     "MIn <n2>",                 "Set minimm percentage",
     "MAx <n2>",                 "set maximum percentage",
-    "LImit <s>",                "Limit instead of compress (Enable, {other})",
-    "BLock <s>",                "Inhibit others on this CC/Chan pair (Enable, {other})",
+    "LImit <s>",                "Limit instead of compress (ENable/ON/YES, {other})",
+    "BLock <s>",                "Inhibit others on this CC/Chan pair (ENable/ON/YES, {other})",
     "end"
 };
 
 string vectlist [] = {
     "[X/Y] CC <n2>",            "CC n2 is used for X or Y axis sweep",
-    "[X/Y] Features <n2> [s]",   "sets X or Y features 1-4 (Enable, Reverse, {other} Disable)",
+    "[X/Y] Features <n2> [s]",   "sets X or Y features 1-4 (ENable/ON/YES, Reverse, {other})",
     "[X] PRogram <l/r> <n2>",   "X program change ID for LEFT or RIGHT part",
     "[Y] PRogram <d/u> <n2>",   "Y program change ID for DOWN or UP part",
     "[X/Y] Control <n2> <n3>",  "sets n3 CC to use for X or Y feature n2 (2-4)",
@@ -252,11 +267,11 @@ string vectlist [] = {
 string scalelist [] = {
     "FRequency <n>",            "'A' note actual frequency",
     "NOte <n>",                 "'A' note number",
-    "Invert [s]",               "Invert entire scale (Enable, {other})",
+    "Invert [s]",               "Invert entire scale (ENable/ON/YES, {other})",
     "CEnter <n>",               "Note number of key center",
     "SHift <n>",                "Shift entire scale up or down",
-    "SCale [s]",                "Activate microtonal scale (Enable, {other})",
-    "MApping [s]",              "Activate keyboard mapping (Enable, {other})",
+    "SCale [s]",                "Activate microtonal scale (ENable/ON/YES, {other})",
+    "MApping [s]",              "Activate keyboard mapping (ENable/ON/YES, {other})",
     "FIrst <n>",                "First note number to map",
     "MIddle <n>",               "Middle note number to map",
     "Last <n>",                 "Last note number to map",
@@ -430,8 +445,12 @@ bool CmdInterface::helpList(unsigned int local)
             listnum = LISTS::part;
         else if (matchnMove(3, point, "common"))
             listnum = LISTS::common;
+        else if (matchnMove(3, point, "addsynth"))
+            listnum = LISTS::addsynth;
         else if (matchnMove(3, point, "subsynth"))
             listnum = LISTS::subsynth;
+        else if (matchnMove(3, point, "padsynth"))
+            listnum = LISTS::padsynth;
         else if (matchnMove(1, point, "vector"))
             listnum = LISTS::vector;
         else if (matchnMove(1, point, "scale"))
@@ -449,8 +468,12 @@ bool CmdInterface::helpList(unsigned int local)
     }
     else
     {
-        if (bitTest(local, LEVEL::SubSynth))
+        if (bitTest(local, LEVEL::AddSynth))
+            listnum = LISTS::addsynth;
+        else if (bitTest(local, LEVEL::SubSynth))
             listnum = LISTS::subsynth;
+        else if (bitTest(local, LEVEL::PadSynth))
+            listnum = LISTS::padsynth;
         else if (bitTest(local, LEVEL::Part))
             listnum = LISTS::part;
         else if (bitTest(local, LEVEL::Vector))
@@ -489,9 +512,17 @@ bool CmdInterface::helpList(unsigned int local)
             msg.push_back("Part Common:");
             helpLoop(msg, commonlist, 2);
             break;
+        case LISTS::addsynth:
+            msg.push_back("Part AddSynth:");
+            helpLoop(msg, addsynthlist, 2);
+            break;
         case LISTS::subsynth:
             msg.push_back("Part SubSynth:");
             helpLoop(msg, subsynthlist, 2);
+            break;
+        case LISTS::padsynth:
+            msg.push_back("Part PadSynth:");
+            helpLoop(msg, padsynthlist, 2);
             break;
         case LISTS::vector:
             msg.push_back("Vector: [n1] = base channel:");
@@ -696,7 +727,7 @@ int CmdInterface::effects(unsigned char controlType)
         nFXtype = synth->sysefx[nFX]->geteffect();
     }
 
-    if (point[0] == 0)
+    if (lineEnd(controlType))
         return done_msg;
 
     value = string2int(point);
@@ -726,7 +757,7 @@ int CmdInterface::effects(unsigned char controlType)
                 sendDirect(nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, nFX);
             }
         }
-        if (point[0] == 0)
+        if (lineEnd(controlType))
         {
             Runtime.Log("efx number set to " + asString(nFX + 1));
             return done_msg;
@@ -767,7 +798,7 @@ int CmdInterface::effects(unsigned char controlType)
 
     else if (matchnMove(2, point, "send"))
     {
-        if (point[0] == 0)
+        if (lineEnd(controlType))
             return parameter_msg;
 
         if (bitTest(context, LEVEL::InsFX))
@@ -795,7 +826,7 @@ int CmdInterface::effects(unsigned char controlType)
         {
             par = string2int(point) - 1;
             point = skipChars(point);
-            if (point[0] == 0)
+            if (lineEnd(controlType))
                 return value_msg;
             value = string2int127(point);
         }
@@ -931,13 +962,13 @@ int CmdInterface::partCommonControls(unsigned char controlType)
             cmd = ADDSYNTH::control::octave;
         }
         // not AddVoice
-        else if (matchnMove(3, point, "stereo") && bitFindHigh(context) != LEVEL::AddVoice)
+        if (cmd == -1 && (matchnMove(3, point, "stereo") && bitFindHigh(context) != LEVEL::AddVoice))
         {
             cmd = ADDSYNTH::control::stereo;
             value = (toggle() == 1);
         }
         // not AddSynth
-        else if(bitFindHigh(context) != LEVEL::AddSynth)
+        if (cmd == -1 && (bitFindHigh(context) != LEVEL::AddSynth))
         {
             int tmp_cmd = -1;
             if (matchnMove(2, point, "fixed"))
@@ -963,7 +994,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
             }
         }
         // Add/Pad only
-        else if(bitFindHigh(context) == LEVEL::AddSynth || bitFindHigh(context) == LEVEL::PadSynth)
+        if (cmd == -1 && (bitFindHigh(context) == LEVEL::AddSynth || bitFindHigh(context) == LEVEL::PadSynth))
         {
             int tmp_cmd = -1;
             if (matchnMove(3, point, "depop"))
@@ -978,6 +1009,29 @@ int CmdInterface::partCommonControls(unsigned char controlType)
                     tmp_cmd = ADDSYNTH::control::punchStretch;
                 else if (matchnMove(1, point, "velocity"))
                     tmp_cmd = ADDSYNTH::control::punchVelocity;
+            }
+            if (tmp_cmd > -1)
+            {
+                if (lineEnd(controlType))
+                    return value_msg;
+                value = string2int(point);
+                cmd = tmp_cmd;
+            }
+        }
+        // Sub/Pad only
+        if (cmd == -1 && (bitFindHigh(context) == LEVEL::SubSynth || bitFindHigh(context) == LEVEL::PadSynth))
+        {
+            int tmp_cmd = -1;
+            if (matchnMove(2, point, "overtone"))
+            {
+                if (matchnMove(1, point, "Position"))
+                    tmp_cmd = SUBSYNTH::control::overtonePosition;
+                else if (matchnMove(1, point, "First"))
+                    tmp_cmd = SUBSYNTH::control::overtoneParameter1;
+                else if (matchnMove(1, point, "Second"))
+                    tmp_cmd = SUBSYNTH::control::overtoneParameter2;
+                else if (matchnMove(1, point, "Harmonic"))
+                    tmp_cmd = SUBSYNTH::control::overtoneForceHarmonics;
             }
             if (tmp_cmd > -1)
             {
@@ -1006,6 +1060,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
         else
             cmd = PART::control::enable;
     }
+
     if (cmd == -1 && bitFindHigh(context) == LEVEL::Part)
     { // the following can only be done at part/kit level
         if (matchnMove(2, point, "min"))
@@ -1307,7 +1362,7 @@ int CmdInterface::commandMlearn(unsigned char controlType)
         mline = 0;
         return (done_msg);
     }
-    if (point[0] == 0)
+    if (lineEnd(controlType))
         return done_msg;
     {
         unsigned char type = 0;
@@ -1394,7 +1449,7 @@ int CmdInterface::commandVector(unsigned char controlType)
             Runtime.Log("No vector on channel " + asString(chan + 1));
         return done_msg;
     }
-    if (point[0] == 0)
+    if (lineEnd(controlType))
     {
         if (!Runtime.vectordata.Enabled[chan])
             Runtime.Log("No vector on channel " + asString(chan + 1));
@@ -1436,12 +1491,12 @@ int CmdInterface::commandVector(unsigned char controlType)
         axis = 1;
     }
 
-    if (point[0] == 0)
+    if (lineEnd(controlType))
         return done_msg;
 
     if (matchnMove(2, point, "cc"))
     {
-        if (point[0] == 0)
+        if (lineEnd(controlType))
             return value_msg;
 
         tmp = string2int(point);
@@ -1485,7 +1540,7 @@ int CmdInterface::commandVector(unsigned char controlType)
 
     if (matchnMove(1, point, "features"))
     {
-        if (point[0] == 0)
+        if (lineEnd(controlType))
             return value_msg;
         int feat = string2int(point) - 1;
         if (feat < 0 || feat > 3)
@@ -1529,7 +1584,7 @@ int CmdInterface::commandVector(unsigned char controlType)
         if (cmd < 2 || cmd > 4)
             return range_msg;
         point = skipChars(point);
-        if (point[0] == 0)
+        if (lineEnd(controlType))
             return value_msg;
         tmp = string2int(point);
         if (!synth->vectorInit(axis * 3 + cmd + 6, chan, tmp))
@@ -1547,7 +1602,7 @@ int CmdInterface::commandVector(unsigned char controlType)
 
 int CmdInterface::commandConfig(unsigned char controlType)
 {
-    /*if (point[0] == 0)
+    /*if (lineEnd(controlType))
     {
         if (controlType != TOPLEVEL::type::Write)
             sendDirect(0, 0, 80, TOPLEVEL::section::main); // status
@@ -1642,21 +1697,15 @@ int CmdInterface::commandConfig(unsigned char controlType)
     else if (matchnMove(1, point, "gui"))
     {
         command = CONFIG::control::enableGUI;
-        if (matchnMove(1, point, "enable"))
-            value = 1;
-        else if (matchnMove(1, point, "disable"))
-            value = 0;
-        else
+        value = toggle();
+        if (value == -1)
             return value_msg;
     }
     else if (matchnMove(1, point, "cli"))
     {
         command = CONFIG::control::enableCLI;
-        if (matchnMove(1, point, "enable"))
-            value = 1;
-        else if (matchnMove(1, point, "disable"))
-            value = 0;
-        else
+        value = toggle();
+        if (value == -1)
             return value_msg;
     }
 
@@ -1726,7 +1775,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
             command = CONFIG::control::alsaSampleRate;
             if (controlType == TOPLEVEL::type::Write)
             {
-                if (point[0] == 0)
+                if (lineEnd(controlType))
                     return value_msg;
                 value = string2int(point);
                 if (value < 0 || value > 3)
@@ -1764,7 +1813,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
         command = CONFIG::control::bankRootCC;
         if (controlType != TOPLEVEL::type::Write)
             value = 128; // ignored by range check
-        else if (point[0] == 0)
+        else if (lineEnd(controlType))
             return value_msg;
         else
             value = string2int(point);
@@ -1774,7 +1823,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
         command = CONFIG::control::bankCC;
         if (controlType != TOPLEVEL::type::Write)
             value = 128; // ignored by range check
-        else if (point[0] == 0)
+        else if (lineEnd(controlType))
             return value_msg;
         else
             value = string2int(point);
@@ -1794,7 +1843,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
         command = CONFIG::control::extendedProgramChangeCC;
         if (controlType != TOPLEVEL::type::Write)
             value = 128; // ignored by range check
-        else if (point[0] == 0)
+        else if (lineEnd(controlType))
             return value_msg;
         else
             value = string2int(point);
@@ -1830,7 +1879,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
 
 int CmdInterface::commandScale(unsigned char controlType)
 {
-    if (point[0] == 0)
+    if (lineEnd(controlType))
         return done_msg;
     Config &Runtime = synth->getRuntime();
     int reply = done_msg;
@@ -1922,7 +1971,7 @@ int CmdInterface::commandScale(unsigned char controlType)
 
         if (controlType == TOPLEVEL::type::Write)
         {
-            if (point[0] == 0)
+            if (lineEnd(controlType))
                 return value_msg;
             if ((toggle() == 1))
                 value = 1;
@@ -1947,7 +1996,7 @@ int CmdInterface::addVoice(unsigned char controlType)
         voiceNumber = string2int(point) - 1;
         point = skipChars(point);
     }
-    if (point[0] == 0)
+    if (lineEnd(controlType))
         return done_msg;
 
     int value = toggle();
@@ -1971,11 +2020,12 @@ int CmdInterface::addSynth(unsigned char controlType)
         bitSet(context, LEVEL::AddVoice);
         return addVoice(controlType);
     }
-    if (point[0] == 0)
+    if (lineEnd(controlType))
         return done_msg;
     int result = partCommonControls(controlType);
     if (result != todo_msg)
         return result;
+
     return available_msg;
 }
 
@@ -1987,11 +2037,12 @@ int CmdInterface::subSynth(unsigned char controlType)
     unsigned char insert = UNUSED;
     bool set = false;
 
-    if (point[0] == 0)
+    if (lineEnd(controlType))
         return done_msg;
     int result = partCommonControls(controlType);
     if (result != todo_msg)
         return result;
+
     if (matchnMove(2, point, "harmonic"))
     {
         if (lineEnd(controlType))
@@ -2021,11 +2072,21 @@ int CmdInterface::subSynth(unsigned char controlType)
 
 int CmdInterface::padSynth(unsigned char controlType)
 {
-    if (point[0] == 0)
+    float value = -1;
+    int cmd;
+    if (lineEnd(controlType))
         return done_msg;
     int result = partCommonControls(controlType);
     if (result != todo_msg)
         return result;
+
+    if (matchnMove(2, point, "apply"))
+    {
+        value = (toggle() == 1);
+        cmd = PADSYNTH::control::applyChanges;
+    }
+
+    return sendNormal(value, controlType, cmd, npart, kitnumber, PART::engine::padSynth);
     return available_msg;
 }
 
@@ -2036,7 +2097,7 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
     int reply = todo_msg;
     int tmp;
 
-    if (point[0] == 0)
+    if (lineEnd(controlType))
         return done_msg;
     if (justSet || isdigit(point[0]))
     {
@@ -2062,7 +2123,7 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
                     sendDirect(npart, TOPLEVEL::type::Write, MAIN::control::partNumber, TOPLEVEL::section::main);
                 }
             }
-            if (point[0] == 0)
+            if (lineEnd(controlType))
                 return done_msg;
         }
     }
@@ -2124,7 +2185,7 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
         {
             if (controlType == TOPLEVEL::type::Write)
             {
-                if (point[0] == 0)
+                if (lineEnd(controlType))
                     return value_msg;
                 int tmp = string2int(point);
                 if (tmp < 1 || tmp > NUM_KIT_ITEMS)
@@ -2242,7 +2303,7 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
         int value = 0;
         if(controlType == TOPLEVEL::type::Write)
         {
-            if (point[0] == 0)
+            if (lineEnd(controlType))
                 return value_msg;
             value = string2int(point);
             if (value < 1 || (value > POLIPHONY - 20))
@@ -2317,7 +2378,7 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
             Runtime.Log("Instance " + to_string(synth->getUniqueId()));
             return done_msg;
         }
-        if (point[0] == 0)
+        if (lineEnd(controlType))
             return value_msg;
         currentInstance = string2int(point);
         synth = firstSynth->getSynthFromId(currentInstance);
@@ -2488,7 +2549,7 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
         {
             if (controlType == TOPLEVEL::type::Write)
             {
-                if (point[0] == 0)
+                if (lineEnd(controlType))
                     return value_msg;
                 value = string2int127(point);
                 string reply = Runtime.masterCCtest(value);
