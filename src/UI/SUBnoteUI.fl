@@ -721,6 +721,11 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
 
         case SUBSYNTH::control::enableBandwidthEnvelope:
             bwee->value(val_bool);
+            if (val_bool)
+                bandwidthenvelopegroup->activate();
+            else
+                bandwidthenvelopegroup->deactivate();
+            bwee->show();
             break;
 
         case SUBSYNTH::control::detuneFrequency:
@@ -762,6 +767,11 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
 
         case SUBSYNTH::control::enableFrequencyEnvelope:
             freqee->value(value);
+            if (val_bool)
+                freqenvelopegroup->activate();
+            else
+                freqenvelopegroup->deactivate();
+            freqee->show();
             break;
 
         case SUBSYNTH::control::overtoneParameter1:

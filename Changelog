@@ -5,6 +5,8 @@ yoshimi 1.5.8 M
 * Added CLI overtones entries for sub and pad.
 * Added pad 'apply' control to CLI.
 * Updated query lists.
+* Completed CLI SubSynth main controls.
+  Not envelope/filter inserts.
 
 
 2018-8-28 Will

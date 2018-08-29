@@ -204,7 +204,7 @@ string commonlist [] = {
     "OVertone First <n> #",     "Degree of first parameter",
     "OVertone Second <n> #",    "Degree of second parameter",
     "OVertone Harmonic <n> #",  "Amount harmonics are forced",
-    "FIxed <s> *-add",          "set base frequency to 440Hx (ENable/ON/YES, {other})",
+    "FIXed <s> *-add",          "set base frequency to 440Hx (ENable/ON/YES, {other})",
     "EQUal <n> *-add",          "Equal temper variation",
     "BENd Adjust <n>  *-add",   "Pitch bend range",
     "BENd Offset <n>  *-add",   "Pitch bend shift",
@@ -231,8 +231,15 @@ string addsynthlist [] = {
 };
 
 string subsynthlist [] = {
-    "HArmonic <n1> Amp <n2>", "set harmonic {n1} to {n2} intensity",
-    "HArmonic <n1> Band <n2>", "set harmonic {n1} to {n2} width",
+    "HArmonic <n1> Amp <n2>",   "set harmonic {n1} to {n2} intensity",
+    "HArmonic <n1> Band <n2>",  "set harmonic {n1} to {n2} width",
+    "HArmonic Stages <n>",      "number of stages",
+    "HArmonic Mag <n>",         "harmonics filtering type",
+    "HArmonic Position <n>",    "start position",
+    "BAnd Width <n>",           "Common bandwidth",
+    "BAnd Scale <n>",           "bandwidth slope v frequency",
+    "FRequency Envelope <s>",   "ENable/ON/YES, {other})",
+    "FIlter <s>",               "ENable/ON/YES, {other})",
     "end"
 };
 
@@ -971,7 +978,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
         if (cmd == -1 && (bitFindHigh(context) != LEVEL::AddSynth))
         {
             int tmp_cmd = -1;
-            if (matchnMove(2, point, "fixed"))
+            if (matchnMove(3, point, "fixed"))
             {
                 value = (toggle() == 1);
                 cmd = SUBSYNTH::control::baseFrequencyAs440Hz;
@@ -2032,39 +2039,94 @@ int CmdInterface::addSynth(unsigned char controlType)
 
 int CmdInterface::subSynth(unsigned char controlType)
 {
-    float value;
-    int control = -1;
-    unsigned char insert = UNUSED;
-    bool set = false;
-
     if (lineEnd(controlType))
         return done_msg;
     int result = partCommonControls(controlType);
     if (result != todo_msg)
         return result;
 
+    int cmd = -1;
     if (matchnMove(2, point, "harmonic"))
     {
+        if (matchnMove(1, point, "stages"))
+            cmd = SUBSYNTH::control::filterStages;
+        else if (matchnMove(1, point, "mag"))
+            cmd = SUBSYNTH::control::magType;
+        else if (matchnMove(1, point, "position"))
+            cmd = SUBSYNTH::control::startPosition;
+        if (cmd != -1)
+        {
+            if (lineEnd(controlType))
+                return value_msg;
+            return sendNormal(string2int(point), controlType, cmd, npart, kitnumber, PART::engine::subSynth);
+        }
+
+        int control = -1;
+        unsigned char insert = UNUSED;
+        bool set = false;
         if (lineEnd(controlType))
             return parameter_msg;
         control = string2int(point) - 1;
         point = skipChars(point);
         if (matchnMove(1, point, "amplitude"))
+        {
             insert = TOPLEVEL::insert::harmonicAmplitude;
+            set = true;
+        }
         else if (matchnMove(1, point, "bandwidth"))
+        {
             insert = TOPLEVEL::insert::harmonicPhaseBandwidth;
-        if (lineEnd(controlType))
-            return value_msg;
-        value = string2int(point);
-        set = true;
+            set = true;
+        }
+        if (set)
+        {
+            if (lineEnd(controlType))
+                return value_msg;
+            return sendNormal(string2int(point), controlType, control, npart, kitnumber, PART::engine::subSynth, insert);
+        }
     }
 
-    if (set)
+    float value = -1;
+    if (cmd == -1)
     {
+        if (matchnMove(2, point, "band"))
+        {
+            if (matchnMove(1, point, "width"))
+                cmd = SUBSYNTH::control::bandwidth;
+            else if (matchnMove(1, point, "scale"))
+                cmd = SUBSYNTH::control::bandwidthScale;
+            else if (matchnMove(1, point, "envelope"))
+            {
+                value = (toggle() == 1);
+                cmd = SUBSYNTH::control::enableBandwidthEnvelope;
+            }
+        }
+        else if (matchnMove(2, point, "frequency"))
+        {
+            if (matchnMove(1, point, "envelope"))
+            {
+                value = (toggle() == 1);
+                cmd = SUBSYNTH::control::enableFrequencyEnvelope;
+            }
+        }
+        else if (matchnMove(2, point, "filter"))
+        {
+            value = (toggle() == 1);
+            cmd = SUBSYNTH::control::enableFilter;
+        }
 
-        //cout << "control " << int(control) << "  part " << int(npart) << "  kit " << int(kitnumber) << "  engine " << int(PART::engine::subSynth) << "  insert " << int(insert) << endl;
+    }
 
-        return sendNormal(value, controlType, control, npart, kitnumber, PART::engine::subSynth, insert);
+    if (cmd != -1)
+    {
+        cout << "control " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitnumber) << "  engine " << int(PART::engine::subSynth) << endl;
+        if (value == -1)
+        {
+            if (lineEnd(controlType))
+                return value_msg;
+            value = string2int(point);
+        }
+        return sendNormal(value, controlType, cmd, npart, kitnumber, PART::engine::subSynth);
     }
     return available_msg;
 }
