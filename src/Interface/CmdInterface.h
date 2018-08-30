@@ -37,13 +37,13 @@ using namespace std;
  * is set so you can then step back up the level tree.
  * It is also possible to zero it so that you immediately go to
  * the top level. Therefore, the sequence is important.
- * 16 bits are currently defined out of a possible 32.
+ * 17 bits are currently defined out of a possible 32.
  *
  * AllFX, InsFX and Part MUST be the first three
  */
 namespace LEVEL{
     enum {
-        Top = 0,
+        Top = 0, // set directly as an interger to clear down
         AllFX = 0, // bits from here on
         InsFX,
         Part,
@@ -56,9 +56,9 @@ namespace LEVEL{
         PadSynth,
         AddVoice,
         Resonance,
-        LFO,
-        Filter,
-        Envelope,
+        LFO, // amp/freq/filt
+        Filter, // params only (slightly confused with env)
+        Envelope, // amp/freq/filt/ Sub only band
         FreeMode
     };
 }
@@ -80,6 +80,7 @@ class CmdInterface : private MiscFuncs
         int effectsList(bool presets = false);
         int effects(unsigned char controlType);
         int partCommonControls(unsigned char controlType);
+        int envelopeSelect(unsigned char controlType);
         int commandList();
         string findStatus(bool show);
         int toggle(void);

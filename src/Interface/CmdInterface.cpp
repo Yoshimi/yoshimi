@@ -63,6 +63,7 @@ namespace LISTS {
     addsynth,
     subsynth,
     padsynth,
+    envelope,
     vector,
     scale,
     load,
@@ -226,7 +227,7 @@ string commonlist [] = {
 };
 
 string addsynthlist [] = {
-    "none yet",                 "Well, just the common controls",
+    "ENVelope ...",             "Enter AddSynth envelope context",
     "end"
 };
 
@@ -240,11 +241,32 @@ string subsynthlist [] = {
     "BAnd Scale <n>",           "bandwidth slope v frequency",
     "FRequency Envelope <s>",   "ENable/ON/YES, {other})",
     "FIlter <s>",               "ENable/ON/YES, {other})",
+    "ENVelope ...",             "Enter SubSynth envelope context",
     "end"
 };
 
 string padsynthlist [] = {
     "APply",                    "Puts latest changes into the wavetable",
+    "ENVelope ...",             "Enter PadSynth envelope context",
+    "end"
+};
+
+string envelopelist [] = {
+    "AMplitude ~",              "amplitude type",
+    "FRequency ~",              "frequency type",
+    "FIlter ~",                 "filter type",
+    "~  Attack Level <n>",      "Initial attack level",
+    "~  Attack Time <n>",       "Time before decay point",
+    "~  Decay Level <n>",       "Initial decay level",
+    "~  Decay Time <n>",        "Time before sustain point",
+    "~  SUstain <n>",           "sustain level",
+    "~  Release Time <n>",      "Time to actual release",
+    "~  Release Level <n>",     "Level at envelope end",
+    "~  STretch <n>",           "Overall Envelope time",
+    "~  Force <s>",             "force release",
+    "~  Linear <s>",            "linear slopes",
+    "e.g. S FR D T 40",         "set frequency decay time 40",
+    "Note:",                    "Some envelopes have limited controls",
     "end"
 };
 
@@ -458,6 +480,8 @@ bool CmdInterface::helpList(unsigned int local)
             listnum = LISTS::subsynth;
         else if (matchnMove(3, point, "padsynth"))
             listnum = LISTS::padsynth;
+        else if (matchnMove(3, point, "envelope"))
+            listnum = LISTS::envelope;
         else if (matchnMove(1, point, "vector"))
             listnum = LISTS::vector;
         else if (matchnMove(1, point, "scale"))
@@ -475,7 +499,9 @@ bool CmdInterface::helpList(unsigned int local)
     }
     else
     {
-        if (bitTest(local, LEVEL::AddSynth))
+        if (bitTest(local, LEVEL::Envelope))
+            listnum = LISTS::envelope;
+        else if (bitTest(local, LEVEL::AddSynth))
             listnum = LISTS::addsynth;
         else if (bitTest(local, LEVEL::SubSynth))
             listnum = LISTS::subsynth;
@@ -530,6 +556,10 @@ bool CmdInterface::helpList(unsigned int local)
         case LISTS::padsynth:
             msg.push_back("Part PadSynth:");
             helpLoop(msg, padsynthlist, 2);
+            break;
+        case LISTS::envelope:
+            msg.push_back("Engine Envelopes:");
+            helpLoop(msg, envelopelist, 2);
             break;
         case LISTS::vector:
             msg.push_back("Vector: [n1] = base channel:");
@@ -968,6 +998,16 @@ int CmdInterface::partCommonControls(unsigned char controlType)
             value = string2int(point);
             cmd = ADDSYNTH::control::octave;
         }
+        if (cmd == -1 && matchnMove(3, point, "envelope"))
+        {
+            int reply = envelopeSelect(controlType);
+            if (reply != todo_msg)
+            {
+                bitSet(context, LEVEL::Envelope);
+                return reply;
+            }
+        }
+
         // not AddVoice
         if (cmd == -1 && (matchnMove(3, point, "stereo") && bitFindHigh(context) != LEVEL::AddVoice))
         {
@@ -1127,6 +1167,96 @@ int CmdInterface::partCommonControls(unsigned char controlType)
 }
 
 
+int CmdInterface::envelopeSelect(unsigned char controlType)
+{
+    int cmd = -1;
+    float value = -1;
+    int group = -1;
+    if (point[0] == 0)
+        return done_msg;
+
+    if (matchnMove(2, point, "amplitute"))
+        group = TOPLEVEL::insertType::amplitude;
+    else if (matchnMove(2, point, "frequency"))
+        group = TOPLEVEL::insertType::frequency;
+    else if (matchnMove(2, point, "filter"))
+        group = TOPLEVEL::insertType::filter;
+    if (group == -1)
+        return opp_msg;
+
+    if (matchnMove(1, point, "attack"))
+    {
+        if (matchnMove(1, point, "level"))
+            cmd = ENVELOPEINSERT::control::attackLevel;
+        else if (matchnMove(1, point, "time"))
+            cmd = ENVELOPEINSERT::control::attackTime;
+        else
+            cmd = -2;
+    }
+    else if (matchnMove(1, point, "decay"))
+    {
+        if (matchnMove(1, point, "level"))
+            cmd = ENVELOPEINSERT::control::decayLevel;
+        else if (matchnMove(1, point, "time"))
+            cmd = ENVELOPEINSERT::control::decayTime;
+        else
+            cmd = -2;
+    }
+    else if (matchnMove(2, point, "sustain"))
+        cmd = ENVELOPEINSERT::control::sustainLevel;
+    else if (matchnMove(1, point, "release"))
+    {
+        if (matchnMove(1, point, "level"))
+            cmd = ENVELOPEINSERT::control::releaseLevel;
+        else if (matchnMove(1, point, "time"))
+            cmd = ENVELOPEINSERT::control::releaseTime;
+        else
+            cmd = -2;
+    }
+    else if (matchnMove(2, point, "stretch"))
+        cmd = ENVELOPEINSERT::control::stretch;
+    else if (matchnMove(1, point, "force"))
+    {
+        cmd = ENVELOPEINSERT::control::forcedRelease;
+        value = (toggle() == 1);
+    }
+    else if (matchnMove(2, point, "linear"))
+    {
+        cmd = ENVELOPEINSERT::control::linearEnvelope;
+        value = (toggle() == 1);
+    }
+    else
+        cmd = -2;
+
+    if (cmd == -1)
+        return opp_msg;
+    if (cmd == -2)
+        return opp_msg;
+
+    if (value == -1)
+    {
+        if (lineEnd(controlType))
+            return value_msg;
+        value = string2float(point);
+    }
+
+    int engine; // can't get this as passed parameter... yet!
+    if (bitTest(context, LEVEL::SubSynth))
+        engine = PART::engine::subSynth;
+    else if (bitTest(context, LEVEL::PadSynth))
+        engine = PART::engine::padSynth;
+    else if (bitTest(context, LEVEL::AddVoice))
+        engine = PART::engine::addVoice1 + voiceNumber;
+    else
+        engine = PART::engine::addSynth;
+
+    cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitnumber) << "  engine " << int(engine) << "  parameter " << int(group) << endl;
+
+    sendNormal(string2float(point), controlType, cmd, npart, kitnumber, engine, TOPLEVEL::insert::envelopeGroup, group);
+    return done_msg;
+}
+
+
 int CmdInterface::commandList()
 {
     Config &Runtime = synth->getRuntime();
@@ -1240,7 +1370,7 @@ string CmdInterface::findStatus(bool show)
     int insert = UNUSED;
     if (bitTest(context, LEVEL::Part))
     {
-        text += "part ";
+        text += "Part ";
         text += to_string(int(npart) + 1);
         if (readControl(PART::control::enable, npart))
             text += " on";
@@ -1276,29 +1406,31 @@ string CmdInterface::findStatus(bool show)
 
         if (bitTest(context, LEVEL::AddSynth))
         {
-            text += ", add";
+            text += ", Add";
             if (readControl(PART::control::enable, npart, kit, PART::engine::addSynth, insert))
                 text += " on";
         }
-        else if (bitFindHigh(context) == LEVEL::SubSynth)
+        else if (bitTest(context, LEVEL::SubSynth))
         {
-            text += ", sub";
+            text += ", Sub";
                 if (readControl(PART::control::enable, npart, kit, PART::engine::subSynth, insert))
                     text += " on";
         }
         else if (bitTest(context, LEVEL::PadSynth))
         {
-            text += ", pad";
+            text += ", Pad";
             if (readControl(PART::control::enable, npart, kit, PART::engine::padSynth, insert))
                 text += " on";
         }
         if (bitTest(context, LEVEL::AddVoice))
         {
-            text += ", voice ";
+            text += ", Voice ";
             text += to_string(voiceNumber + 1);
             if (readControl(PART::control::enable, npart, kit, PART::engine::addVoice1 + voiceNumber, insert))
                 text += " on";
         }
+        if (bitTest(context, LEVEL::Envelope))
+            text += ", Envel";
     }
     else if (bitTest(context, LEVEL::Scale))
         text += " Scale ";
@@ -2461,6 +2593,8 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
         reply = commandScale(controlType);
     else if (bitTest(context, LEVEL::AddVoice))
         reply = addVoice(controlType);
+    else if (bitTest(context, LEVEL::Envelope))
+        reply = envelopeSelect(controlType);
     else if (bitTest(context, LEVEL::AddSynth))
         reply = addSynth(controlType);
     else if (bitTest(context, LEVEL::SubSynth))
