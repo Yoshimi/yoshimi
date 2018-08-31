@@ -1,5 +1,9 @@
 yoshimi 1.5.8 M
 
+2018-8-31 Will
+* Added CLI SubSynth bandwidth envelope.
+* Adjusted help lists.
+
 2018-8-30 Will
 * Added common envelope controls to CLI.
   Not freemode yet.

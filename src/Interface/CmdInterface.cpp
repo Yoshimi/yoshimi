@@ -255,6 +255,7 @@ string envelopelist [] = {
     "AMplitude ~",              "amplitude type",
     "FRequency ~",              "frequency type",
     "FIlter ~",                 "filter type",
+    "BAndwidth ~",              "bandwidth type (SubSynth only)",
     "~  Attack Level <n>",      "Initial attack level",
     "~  Attack Time <n>",       "Time before decay point",
     "~  Decay Level <n>",       "Initial decay level",
@@ -263,8 +264,8 @@ string envelopelist [] = {
     "~  Release Time <n>",      "Time to actual release",
     "~  Release Level <n>",     "Level at envelope end",
     "~  STretch <n>",           "Overall Envelope time",
-    "~  Force <s>",             "force release",
-    "~  Linear <s>",            "linear slopes",
+    "~  Force <s>",             "force release (ENable/ON/YES, {other})",
+    "~  Linear <s>",            "linear slopes (ENable/ON/YES, {other})",
     "e.g. S FR D T 40",         "set frequency decay time 40",
     "Note:",                    "Some envelopes have limited controls",
     "end"
@@ -1181,6 +1182,13 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
         group = TOPLEVEL::insertType::frequency;
     else if (matchnMove(2, point, "filter"))
         group = TOPLEVEL::insertType::filter;
+    else if (matchnMove(2, point, "bandwidth"))
+    {
+        if(bitTest(context, LEVEL::SubSynth))
+            group = TOPLEVEL::insertType::bandwidth;
+        else
+            return available_msg;
+    }
     if (group == -1)
         return opp_msg;
 
@@ -1190,8 +1198,6 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
             cmd = ENVELOPEINSERT::control::attackLevel;
         else if (matchnMove(1, point, "time"))
             cmd = ENVELOPEINSERT::control::attackTime;
-        else
-            cmd = -2;
     }
     else if (matchnMove(1, point, "decay"))
     {
@@ -1199,8 +1205,6 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
             cmd = ENVELOPEINSERT::control::decayLevel;
         else if (matchnMove(1, point, "time"))
             cmd = ENVELOPEINSERT::control::decayTime;
-        else
-            cmd = -2;
     }
     else if (matchnMove(2, point, "sustain"))
         cmd = ENVELOPEINSERT::control::sustainLevel;
@@ -1210,8 +1214,6 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
             cmd = ENVELOPEINSERT::control::releaseLevel;
         else if (matchnMove(1, point, "time"))
             cmd = ENVELOPEINSERT::control::releaseTime;
-        else
-            cmd = -2;
     }
     else if (matchnMove(2, point, "stretch"))
         cmd = ENVELOPEINSERT::control::stretch;
@@ -1225,12 +1227,8 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
         cmd = ENVELOPEINSERT::control::linearEnvelope;
         value = (toggle() == 1);
     }
-    else
-        cmd = -2;
 
     if (cmd == -1)
-        return opp_msg;
-    if (cmd == -2)
         return opp_msg;
 
     if (value == -1)
@@ -1250,7 +1248,7 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
     else
         engine = PART::engine::addSynth;
 
-    cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitnumber) << "  engine " << int(engine) << "  parameter " << int(group) << endl;
+    //cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitnumber) << "  engine " << int(engine) << "  parameter " << int(group) << endl;
 
     sendNormal(string2float(point), controlType, cmd, npart, kitnumber, engine, TOPLEVEL::insert::envelopeGroup, group);
     return done_msg;
