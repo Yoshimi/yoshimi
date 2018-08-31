@@ -1163,7 +1163,9 @@ int CmdInterface::partCommonControls(unsigned char controlType)
         kit = kitnumber;
     //cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kit) << "  engine " << int(engine) << "  insert " << int(insert) << endl;
 
-    sendNormal(string2float(point), controlType, cmd, npart, kit, engine);
+    int reply = sendNormal(string2float(point), controlType, cmd, npart, kit, engine);
+    if (reply != todo_msg)
+        return reply;
     return done_msg;
 }
 
@@ -1250,7 +1252,9 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
 
     //cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitnumber) << "  engine " << int(engine) << "  parameter " << int(group) << endl;
 
-    sendNormal(string2float(point), controlType, cmd, npart, kitnumber, engine, TOPLEVEL::insert::envelopeGroup, group);
+    int reply = sendNormal(string2float(point), controlType, cmd, npart, kitnumber, engine, TOPLEVEL::insert::envelopeGroup, group);
+    if (reply != todo_msg)
+        return reply;
     return done_msg;
 }
 

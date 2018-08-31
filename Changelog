@@ -3,6 +3,7 @@ yoshimi 1.5.8 M
 2018-8-31 Will
 * Added CLI SubSynth bandwidth envelope.
 * Adjusted help lists.
+* Added more CLI error reporting.
 
 2018-8-30 Will
 * Added common envelope controls to CLI.
