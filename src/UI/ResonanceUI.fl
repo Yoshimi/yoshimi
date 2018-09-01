@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-Modified August 2018
+Modified September 2018
 } {in_source in_header
 }
 
@@ -79,6 +79,7 @@ class ResonanceGraph {: {public Fl_Box}
   }
   Function {send_data(int control, float value, int type)} {} {
     code {//
+    type |= TOPLEVEL::type::Write;
     collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, TOPLEVEL::insert::resonanceGraphInsert);} {}
   }
   Function {init(Resonance *respar_, Fl_Value_Output *khzvalue_, Fl_Value_Output *dbvalue_, int npart_, int kititem_, int engine_)} {} {
@@ -198,7 +199,7 @@ class ResonanceGraph {: {public Fl_Box}
     {
         unsigned char typeSent = TOPLEVEL::type::Integer;
         if (event != FL_DRAG)
-            typeSent = TOPLEVEL::source::UpdateAfterSet;
+            typeSent |= TOPLEVEL::source::UpdateAfterSet;
         int leftbutton = 1;
         if (Fl::event_button() == FL_RIGHT_MOUSE)
             leftbutton = 0;

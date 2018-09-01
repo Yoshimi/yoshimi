@@ -1,5 +1,8 @@
 yoshimi 1.5.8 M
 
+2018-9-1 Will
+* BugFix: GUI not setting resonance points.
+
 2018-8-31 Will
 * Added CLI SubSynth bandwidth envelope.
 * Adjusted help lists.
