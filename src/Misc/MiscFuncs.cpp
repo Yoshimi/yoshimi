@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>
 
-    Modifed May 2018
+    Modifed September 2018
 */
 
 //#define REPORT_MISCMSG
@@ -286,15 +286,18 @@ string MiscFuncs::findleafname(string name)
 
 int MiscFuncs::findSplitPoint(string name)
 {
-    int chk = 0;
+    unsigned int chk = 0;
     char ch = name.at(chk);
-    while (ch >= '0' and ch <= '9' and chk < 4)
+    unsigned int len =  name.length() - 1;
+    while (ch >= '0' and ch <= '9' and chk < len)
     {
         chk += 1;
         ch = name.at(chk);
     }
+    if (chk >= len)
+        return 0;
     if (ch != '-')
-        chk = 0;
+        return 0;
     return chk;
 }
 

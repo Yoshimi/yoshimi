@@ -1,5 +1,9 @@
 yoshimi 1.5.8 M
 
+2018-9-3 Will
+* BugFix: Crash if instrument name just 4 digits.
+  Thanks to Kristian for the hint :)
+
 2018-9-1 Will
 * BugFix: GUI not setting resonance points.
 
