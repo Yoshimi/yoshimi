@@ -1,5 +1,10 @@
 yoshimi 1.5.8 M
 
+2018-9-4 Will
+* BugFix: instances not showing correct root list.
+  GuiThreadMsg for banks in wrong place.
+  May have caused crash when opening instances.
+
 2018-9-3 Will
 * BugFix: Crash if instrument name just 4 digits.
   Thanks to Kristian for the hint :)

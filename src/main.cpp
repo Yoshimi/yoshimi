@@ -402,7 +402,7 @@ int main(int argc, char *argv[])
     // following moved here for faster first synth startup
     firstSynth->loadHistory();
     firstSynth->installBanks(0);
-    GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::RefreshCurBank, 1);
+    //GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::RefreshCurBank, 1);
 
     //create command line processing thread
     pthread_t cmdThr;

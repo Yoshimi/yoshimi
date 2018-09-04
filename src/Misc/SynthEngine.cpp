@@ -2381,6 +2381,7 @@ bool SynthEngine::installBanks(int instance)
     xml->exitbranch();
     delete xml;
     Runtime.Log(miscMsgPop(RootBank(Runtime.tempRoot, Runtime.tempBank)& 0xff));
+    GuiThreadMsg::sendMessage((this), GuiThreadMsg::RefreshCurBank, 1);
     return true;
 }
 
