@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-Modified August 2018} {in_source in_header
+Modified September 2018} {in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -309,7 +309,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
       Fl_Choice revp10 {
         label Type
         callback {//
-        send_data(10, o->value(), EFFECT::type::reverb, TOPLEVEL::type::Integer);}
+        send_data(10, o->value(), EFFECT::type::reverb, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         xywh {240 13 75 15} down_box BORDER_BOX color 14 labelsize 11 textsize 11 textcolor 7
       } {
         MenuItem {} {
@@ -1480,9 +1480,11 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
+    int value_int = int(value + 0.5f);
     unsigned char control = getData->data.control;
     unsigned char efftype = getData->data.kit;
     bool isdynfilter = (getData->data.engine == FILTERINSERT::control::dynFilter);
+    unsigned char secondary = getData->data.par2;
 
     //cout << "cont " << (int)control << "  type " << (int)efftype << "  num " << (int)effnum << endl;
     switch(efftype)
@@ -1521,9 +1523,12 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                     revp9->value(value);
                     break;
                 case 10:
-                    revp10->value(value);
-                    if (value ==2)
+                    revp10->value(value_int);
+                    if (value_int == 2)
+                    {
                         revp12->activate();
+                        revp12->value(secondary);
+                    }
                     else
                         revp12->deactivate();
                     break;
@@ -1589,7 +1594,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                     chorusp5->value(value);
                     break;
                 case 6:
-                    chorusp6->value(value);
+                    chorusp6->value(value_int);
                     break;
                 case 7:
                     chorusp7->value(value);
@@ -1599,6 +1604,9 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                     break;
                 case 9:
                     chorusp9->value(value);
+                    break;
+                case 11:
+                    chorusp11->value(value_int);
                     break;
                 case 16:
                     refresh();
@@ -1621,6 +1629,9 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                 case 3:
                     phaserp3->value(value);
                     break;
+                case 4:
+                    phaserp4->value(value_int);
+                    break;
                 case 5:
                     phaserp5->value(value);
                     break;
@@ -1630,14 +1641,26 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                 case 7:
                    phaserp7->value(value);
                     break;
+                case 8:
+                    phaserp8->value(value_int);
+                    break;
                 case 9:
                     phaserp9->value(value);
+                    break;
+                case 10:
+                    phaserp10->value(value_int);
                     break;
                 case 11:
                     phaserp11->value(value);
                     break;
+                case 12:
+                    phaserp12->value(value_int);
+                    break;
                 case 13:
                     phaserp13->value(value);
+                    break;
+                case 14:
+                    phaserp14->value(value_int);
                     break;
                 case 16:
                     refresh();
@@ -1660,6 +1683,9 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                 case 3:
                     awp3->value(value);
                     break;
+                case 4:
+                    awp4->value(value_int);
+                    break;
                 case 5:
                     awp5->value(value);
                     break;
@@ -1668,6 +1694,9 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                     break;
                 case 7:
                     awp7->value(value);
+                    break;
+                case 8:
+                    awp8->value(value_int);
                     break;
                 case 9:
                     awp9->value(value);
@@ -1699,11 +1728,23 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                 case 4:
                     distp4->value(value);
                     break;
+                case 5:
+                    distp6->value(value_int);
+                    break;
+                case 6:
+                    distp5->value(value_int);
+                    break;
                 case 7:
                     distp7->value(value);
                     break;
                 case 8:
                     distp8->value(value);
+                    break;
+                case 9:
+                    distp9->value(value_int);
+                    break;
+                case 10:
+                    distp10->value(value_int);
                     break;
                 case 16:
                     refresh();
@@ -1712,14 +1753,14 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
             break;
 
         case EFFECT::type::eq:
-            //synth->getRuntime().Log("EQ " + to_string(int(value)) + "  " + to_string(int(control)));
+            synth->getRuntime().Log("EQ " + to_string(value_int) + "  " + to_string(int(control)));
             if(control == 0)
             {
                 eqp0->value(value);
             }
             else if (control == 1)
             {
-                eqband = value;
+                eqband = value_int;
                 EQbandUpdate();
             }
             else
@@ -1727,16 +1768,16 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                 switch (control)
                 {
                 case 10:
-                    typechoice->value(value);
-                    if (value == 0)
+                    typechoice->value(value_int);
+                    if (value_int == 0)
                         bandgroup->deactivate();
                     else
                         bandgroup->activate();
-                    if (value > 2)
+                    if (value_int > 2)
                         qdial->activate();
                     else
                         qdial->deactivate();
-                    if (value > 6)
+                    if (value_int > 6)
                         gaindial->activate();
                     else
                         gaindial->deactivate();
@@ -1751,7 +1792,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                     qdial->value(value);
                     break;
                 case 14:
-                    stagescounter->value(value);
+                    stagescounter->value(value_int);
                 }
             }
             effeqwindow->redraw();
@@ -1777,6 +1818,9 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                 case 3:
                     dfp3->value(value);
                     break;
+                case 4:
+                    dfp4->value(value_int);
+                    break;
                 case 5:
                     dfp5->value(value);
                     break;
@@ -1787,7 +1831,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                     dfp7->value(value);
                     break;
                 case 8:
-                    dfp8->value(value);
+                    dfp8->value(value_int);
                     break;
                 case 9:
                     dfp9->value(value);

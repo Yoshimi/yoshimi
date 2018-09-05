@@ -1,5 +1,12 @@
 yoshimi 1.5.8 M
 
+2018-9-5 Will
+* BugFix: Reverb type not updating bandwidth control.
+  Thanks to Jesper for finding the cause.
+  Also some GUI effect 'switches' not set by CLI.
+* BugFix: (ancient) Reverb bandwidth control *value*
+  GUI not set to default when enabled.
+
 2018-9-4 Will
 * BugFix: instances not showing correct root list.
   GuiThreadMsg for banks in wrong place.

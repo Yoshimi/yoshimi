@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified August 2018
+    Modified September 2018
 */
 
 #include <iostream>
@@ -7979,6 +7979,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
 void InterChange::commandEffects(CommandBlock *getData)
 {
     float value = getData->data.value;
+    int value_int = int(value + 0.5f);
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -8019,19 +8020,25 @@ void InterChange::commandEffects(CommandBlock *getData)
         */
         {
             if (control <= 1)
-                eff->seteffectpar(control, lrint(value));
+                eff->seteffectpar(control, value_int);
             else
             {
-                eff->seteffectpar(control + (eff->geteffectpar(1) * 5), lrint(value));
+                eff->seteffectpar(control + (eff->geteffectpar(1) * 5), value_int);
                 getData->data.parameter = eff->geteffectpar(1);
             }
         }
         else
         {
             if (control == 16)
-                eff->changepreset(lrint(value));
+                eff->changepreset(value_int);
             else
-                eff->seteffectpar(control, lrint(value));
+            {
+                if (kititem == EFFECT::type::reverb && control == 10 && value_int == 2)
+                    // this needs to use the defaults
+                    // to all for future upgrades
+                    getData->data.par2 = 20;
+                eff->seteffectpar(control, value_int);
+            }
         }
         //cout << "eff value " << value << "  control " << int(control) << "  band " << synth->getRuntime().EQband << endl;
     }
