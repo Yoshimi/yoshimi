@@ -3,6 +3,8 @@ yoshimi 1.5.8 M
 2018-9-6 Will
 * Bugfix: Occasional segfaults starting new instances.
   Caused by call crossing threads :(
+* Moved currentRoot and currentBank from Bank to Config
+  Where they always should have been :@)
 
 2018-9-5 Will
 * BugFix: Reverb type not updating bandwidth control.

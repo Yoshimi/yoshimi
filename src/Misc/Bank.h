@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is a derivative of a ZynAddSubFX original.
-    Modified May 2018
+    Modified September 2018
 */
 
 #ifndef BANK_H
@@ -115,7 +115,7 @@ class Bank : private MiscFuncs
 
         int engines_used(unsigned int ninstrument);
         bool emptyslotWithID(size_t rootID, size_t bankID, unsigned int ninstrument);
-        bool emptyslot(unsigned int ninstrument) { return emptyslotWithID(currentRootID, currentBankID, ninstrument); }
+        bool emptyslot(unsigned int ninstrument);
         bool clearslot(unsigned int ninstrument);
         bool savetoslot(size_t rootID, size_t bankID, int ninstrument, int npart);
         unsigned int swapslot(unsigned int n1, unsigned int n2, size_t bank1 = 0xff, size_t bank2 = 0xff, size_t root1 = 0xff, size_t root2 = 0xff);
@@ -139,8 +139,7 @@ class Bank : private MiscFuncs
 
         bool setCurrentRootID(size_t newRootID);
         bool setCurrentBankID(size_t newBankID, bool ignoreMissing = false);
-        size_t getCurrentRootID() {return currentRootID;}
-        size_t getCurrentBankID() {return currentBankID;}
+        size_t getCurrentBankID();
         size_t addRootDir(string newRootDir);
         void parseConfigFile(XMLwrapper *xml);
         void saveToConfigFile(XMLwrapper *xml);
@@ -172,9 +171,6 @@ class Bank : private MiscFuncs
         const string xiyext;
         const string force_bank_dir_file;
         SynthEngine *synth;
-
-        size_t        currentRootID;
-        size_t        currentBankID;
 
         RootEntryMap  roots;
         BankHintsMap hints;

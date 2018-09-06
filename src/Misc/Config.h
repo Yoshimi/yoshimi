@@ -157,6 +157,8 @@ class Config : public MiscFuncs
         int           single_row_panel;
         int           NumAvailableParts;
         int           currentPart;
+        unsigned int  currentBank;
+        unsigned int  currentRoot;
         int           noteOnSent; // note test
         int           noteOnSeen;
         int           noteOffSent;

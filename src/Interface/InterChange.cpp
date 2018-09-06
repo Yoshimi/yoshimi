@@ -717,12 +717,12 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                 {
                     if(kititem == UNUSED)
                     {
-                        kititem = synth->getBankRef().getCurrentBankID();
+                        kititem = synth->getRuntime().currentBank;
                         getData->data.kit = kititem;
                     }
                     if(engine == UNUSED)
                     {
-                        engine = synth->getBankRef().getCurrentRootID();
+                        engine = synth->getRuntime().currentRoot;
                         getData->data.engine = engine;
                     }
                     //cout << "Int swap 1 I " << int(value)  << "  B " << int(kititem) << "  R " << int(engine) << endl;
@@ -735,12 +735,12 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                 {
                     if(kititem == UNUSED)
                     {
-                        kititem = synth->getBankRef().getCurrentBankID();
+                        kititem = synth->getRuntime().currentBank;
                         getData->data.kit = kititem;
                     }
                     if(engine == UNUSED)
                     {
-                        engine = synth->getBankRef().getCurrentRootID();
+                        engine = synth->getRuntime().currentRoot;
                         getData->data.engine = engine;
                     }
                     //cout << "Int swap 2 I " << int(insert) << "  B " << int(kititem) << "  R " << int(engine) << endl;
@@ -762,7 +762,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                 case BANK::control::selectFirstBankToSwap:
                     if(engine == UNUSED)
                     {
-                        engine = synth->getBankRef().getCurrentRootID();
+                        engine = synth->getRuntime().currentRoot;
                         getData->data.engine = engine;
                     }
                     swapBank1 = kititem;
@@ -771,7 +771,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                 case BANK::control::selectSecondBankAndSwap:
                     if(engine == UNUSED)
                     {
-                        engine = synth->getBankRef().getCurrentRootID();
+                        engine = synth->getRuntime().currentRoot;
                         getData->data.engine = engine;
                     }
                     tmp = synth->bank.swapbanks(swapBank1, kititem, swapRoot1, engine);

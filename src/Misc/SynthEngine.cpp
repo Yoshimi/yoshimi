@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified August 2018
+    Modified September 2018
 */
 
 #define NOLOCKS
@@ -761,8 +761,8 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
 
     string name = "";
     int foundRoot;
-    int originalRoot = bank.getCurrentRootID();
-    int originalBank = bank.getCurrentBankID();
+    int originalRoot = Runtime.currentRoot;
+    int originalBank = Runtime.currentBank;
     bool ok = true;
     bool hasProgChange = (program < 0xff || par2 != NO_MSG);
 
@@ -774,7 +774,7 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
     {
         if (bank.setCurrentRootID(root))
         {
-            foundRoot = bank.getCurrentRootID();
+            foundRoot = Runtime.currentRoot;
             if (foundRoot != root)
             { // abort and recover old settings
                 bank.setCurrentRootID(originalRoot);
@@ -783,7 +783,7 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
             else
             {
                 originalRoot = foundRoot;
-                originalBank = bank.getCurrentBankID();
+                originalBank = Runtime.currentBank;
             }
             name = asString(foundRoot) + " \"" + bank.getRootPath(originalRoot) + "\"";
             if (root != foundRoot)
@@ -925,13 +925,13 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
 
 int SynthEngine::ReadBankRoot(void)
 {
-    return bank.currentRootID; // this is private so handle with care
+    return Runtime.currentRoot;
 }
 
 
 int SynthEngine::ReadBank(void)
 {
-    return bank.currentBankID; // this is private so handle with care
+    return Runtime.currentBank;
 }
 
 
@@ -1049,7 +1049,7 @@ void SynthEngine::ListPaths(list<string>& msg_buf)
     {
         if (bank.roots.count(idx) > 0 && !bank.roots [idx].path.empty())
         {
-            if (idx == bank.getCurrentRootID())
+            if (idx == Runtime.currentRoot)
                 prefix = " *";
             else
                 prefix = "  ";
@@ -1067,7 +1067,7 @@ void SynthEngine::ListBanks(int rootNum, list<string>& msg_buf)
     string label;
     string prefix;
     if (rootNum < 0 || rootNum >= MAX_BANK_ROOT_DIRS)
-        rootNum = bank.currentRootID;
+        rootNum = Runtime.currentRoot;
     if (bank.roots.count(rootNum) > 0
                 && !bank.roots [rootNum].path.empty())
     {
@@ -1080,7 +1080,7 @@ void SynthEngine::ListBanks(int rootNum, list<string>& msg_buf)
         {
             if (bank.roots [rootNum].banks.count(idx))
             {
-                if (idx == bank.getCurrentBankID())
+                if (idx == Runtime.currentBank)
                     prefix = " *";
                 else
                     prefix = "  ";
@@ -1096,11 +1096,11 @@ void SynthEngine::ListBanks(int rootNum, list<string>& msg_buf)
 
 void SynthEngine::ListInstruments(int bankNum, list<string>& msg_buf)
 {
-    int root = bank.currentRootID;
+    int root = Runtime.currentRoot;
     string label;
 
     if (bankNum < 0 || bankNum >= MAX_BANKS_IN_ROOT)
-        bankNum = bank.currentBankID;
+        bankNum = Runtime.currentBank;
     if (bank.roots.count(root) > 0
         && !bank.roots [root].path.empty())
     {
@@ -1242,7 +1242,7 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
     msg_buf.push_back("  Master volume " + asString((int) Pvolume));
     msg_buf.push_back("  Master key shift " + asString(Pkeyshift - 64));
 
-    root = bank.currentRootID;
+    root = Runtime.currentRoot;
     if (bank.roots.count(root) > 0 && !bank.roots [root].path.empty())
     {
         label = bank.roots [root].path;
@@ -1250,8 +1250,8 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
             label = label.substr(0, label.size() - 1);
         msg_buf.push_back("  Current Root ID " + asString(root)
                         + "    " + label);
-        msg_buf.push_back("  Current Bank ID " + asString(bank.currentBankID)
-                        + "    " + bank.roots [root].banks [bank.currentBankID].dirname);
+        msg_buf.push_back("  Current Bank ID " + asString(Runtime.currentBank)
+                        + "    " + bank.roots [root].banks [Runtime.currentBank].dirname);
     }
     else
         msg_buf.push_back("  No paths set");

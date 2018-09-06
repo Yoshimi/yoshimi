@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified July 2018
+    Modified September 2018
 */
 
 #include <iostream>
@@ -617,11 +617,11 @@ void MidiDecode::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_pla
 {
     if (setRootDir)
     {
-        if (bank_or_root_num == synth->getBankRef().getCurrentRootID())
+        if (bank_or_root_num == synth->getRuntime().currentRoot)
             return; // nothing to do!
     }
     else
-        if (bank_or_root_num == synth->getBankRef().getCurrentBankID())
+        if (bank_or_root_num == synth->getRuntime().currentBank)
             return; // still nothing to do!
 
     CommandBlock putData;

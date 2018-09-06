@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code.
 
-Modified August 2018
+Modified September 2018
 } {selected in_source in_header
 }
 
@@ -1147,14 +1147,14 @@ bs[ins]->refresh();} {}
     {
         bank->rescanforbanks();
     }
-    const BankEntryMap &banks = bank->getBanks(bank->getCurrentRootID());
+    const BankEntryMap &banks = bank->getBanks(synth->getRuntime().currentRoot);
     BankEntryMap::const_iterator it;
     for (it = banks.begin(); it != banks.end(); ++it)
     {
         if (!it->second.dirname.empty())
         {
             int n = banklist->add((asString(it->first) + ". " + it->second.dirname).c_str(), (const char *)0, (Fl_Callback*)0, reinterpret_cast<void *>(it->first));
-            if(it->first == bank->getCurrentBankID())
+            if(it->first == synth->getRuntime().currentBank)
             {
                 banklist->value(n); // ensure correct bank in list
             }
@@ -1164,7 +1164,7 @@ bs[ins]->refresh();} {}
   }
   Function {set_bank_slot()} {} {
     code {//
-    size_t curID = bank->getCurrentBankID();
+    size_t curID = synth->getRuntime().currentBank;
     const Fl_Menu_Item *curItem = 0;
     for(int i = 0; i < banklist->size(); i++)
     {
@@ -1213,7 +1213,7 @@ bs[ins]->refresh();} {}
         if (!it->second.path.empty())
         {
             tmp = asString(it->first) + ". " + it->second.path;
-            if(it->first == synth->getBankRef().getCurrentRootID())
+            if(it->first == synth->getRuntime().currentRoot)
             {
                 tmp += " *";
             }

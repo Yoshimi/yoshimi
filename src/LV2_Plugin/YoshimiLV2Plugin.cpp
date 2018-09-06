@@ -540,7 +540,7 @@ const LV2_Program_Descriptor *YoshimiLV2Plugin::getProgram(uint32_t index)
     if (flatbankprgs.empty())
     {
         Bank &bankObj = synth->getBankRef();
-        const BankEntryMap &banks = bankObj.getBanks(bankObj.getCurrentRootID());
+        const BankEntryMap &banks = bankObj.getBanks(synth->getRuntime().currentRoot);
         BankEntryMap::const_iterator itB;
         InstrumentEntryMap::const_iterator itI;
         for (itB = banks.begin(); itB != banks.end(); ++itB)
