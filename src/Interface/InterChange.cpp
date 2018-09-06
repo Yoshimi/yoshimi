@@ -50,6 +50,8 @@ extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
 extern int mainCreateNewInstance(unsigned int forceId, bool loadState);
 extern SynthEngine *firstSynth;
 
+int startInstance = 0;
+
 InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth),
     fromCLI(NULL),
@@ -658,10 +660,17 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     break;
                 }
                 case MAIN::control::startInstance:
-                    if (value > 0 && value < 32)
-                        value = mainCreateNewInstance(value, false);
-                    else
-                        value = mainCreateNewInstance(0, false);
+                    if (synth == firstSynth)
+                    {
+                        if (value > 0 && value < 32)
+                            startInstance = value | 0x100;
+                        else
+                            startInstance = 0x101; // next available
+                        while (startInstance > 0xff)
+                            usleep(1000);
+                        value = startInstance; // actual instance found
+                        startInstance = 0; // just to be sure
+                    }
                     break;
                 case MAIN::control::stopInstance:
                     text = to_string(value) + " ";

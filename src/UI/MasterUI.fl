@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified August 2018} {selected in_source in_header
+Modified September 2018} {selected in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -301,10 +301,16 @@ class MasterUI {: {private GuiUpdates}
           MenuItem newinstanceid {
             label {&New instance...}
             callback {//
-            if(synth->getUniqueId() != 0)
-                return;
             if(synth->getIsLV2Plugin())
+            {
+                fl_alert("Start new instances from host");
                 return;
+            }
+            if(synth->getUniqueId() != 0)
+            {
+                fl_alert("Only main instance can start others");
+                return;
+            }
 
             const char *sId = fl_input("Accept next, or enter desired instance id...", "next");
             if (sId == NULL)

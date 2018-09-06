@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified May 2018
+    Modified September 2018
 */
 
 // approx timeout in seconds.
@@ -58,6 +58,7 @@ CmdInterface commandInt;
 
 extern map<SynthEngine *, MusicClient *> synthInstances;
 extern SynthEngine *firstSynth;
+extern int startInstance;
 
 void mainRegisterAudioPort(SynthEngine *s, int portnum);
 int mainCreateNewInstance(unsigned int forceId, bool loadState);
@@ -198,6 +199,12 @@ static void *mainGuiThread(void *arg)
                     }
                 }
             }
+            if (_synth == firstSynth)
+            {
+                int testInstance = startInstance;
+                if (testInstance > 0xff)
+                    startInstance = mainCreateNewInstance(testInstance & 0xff, false);
+            }
         }
 
         // where all the action is ...
@@ -220,6 +227,12 @@ static void *mainGuiThread(void *arg)
         }
         else
             usleep(33333);
+        /*int testInstance = startInstance;
+        if (testInstance)
+        {
+            startInstance = 0;
+            mainCreateNewInstance(testInstance, false);
+        }*/
     }
     if (firstRuntime->configChanged && (bShowGui | bShowCmdLine)) // don't want this if no cli or gui
     {

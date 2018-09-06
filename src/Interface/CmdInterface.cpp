@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified August 2018
+    Modified September 2018
 */
 
 #include <iostream>
@@ -3003,6 +3003,11 @@ bool CmdInterface::cmdIfaceProcessCommand()
         }
         else if (matchnMove(2, point, "yoshimi"))
         {
+            if (currentInstance !=0)
+            {
+                Runtime.Log("Only instance 0 can start others");
+                return done_msg;
+            }
             int forceId = string2int(point);
             if (forceId < 1 || forceId >= 32)
                 forceId = 0;
@@ -3129,11 +3134,15 @@ bool CmdInterface::cmdIfaceProcessCommand()
             }
             else
             {
-                int to_close = string2int(point);
+                unsigned int to_close = string2int(point);
                 if (to_close == 0)
                     Runtime.Log("Use 'Exit' to close main instance");
+                else if (to_close == currentInstance)
+                    Runtime.Log("Instance can't close itself");
                 else
+                {
                     sendDirect(to_close, TOPLEVEL::type::Write, MAIN::control::stopInstance, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
+                }
                 reply = done_msg;
             }
         }

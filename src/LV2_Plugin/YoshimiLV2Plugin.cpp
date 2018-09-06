@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified May 2018
+    Modified September 2018
 */
 
 #include "YoshimiLV2Plugin.h"
@@ -52,6 +52,7 @@
 #define YOSHIMI_LV2_STATE__StateChanged      "http://lv2plug.in/ns/ext/state#StateChanged"
 
 extern SynthEngine *firstSynth;
+extern int startInstance;
 
 typedef enum {
     LV2_OPTIONS_INSTANCE,
