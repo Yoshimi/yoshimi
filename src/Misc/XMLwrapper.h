@@ -43,7 +43,7 @@ class SynthEngine;
 class XMLwrapper : private MiscFuncs
 {
     public:
-        XMLwrapper(SynthEngine *_synth, bool _isYoshi = false);
+        XMLwrapper(SynthEngine *_synth, bool _isYoshi = false, bool includeBase = true);
         ~XMLwrapper();
 
         // SAVE to XML

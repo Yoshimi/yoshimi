@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified May 2018
+    Modified September 2018
 */
 
 #include <iostream>
@@ -140,6 +140,8 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     currentPart(0),
     currentBank(0),
     currentRoot(0),
+    tempBank(0),
+    tempRoot(0),
     VUcount(0),
     channelSwitchType(0),
     channelSwitchCC(128),
@@ -629,9 +631,12 @@ bool Config::extractConfigData(XMLwrapper *xml)
 
     //misc
     checksynthengines = xml->getpar("check_pad_synth", checksynthengines, 0, 1);
-    tempRoot = xml->getpar("root_current_ID", 0, 0, 127);
+    if (tempRoot == 0)
+        tempRoot = xml->getpar("root_current_ID", 0, 0, 127);
+    else
+        cout << "root? " << xml->getpar("root_current_ID", 0, 0, 127) << endl;
+    if (tempBank == 0)
     tempBank = xml->getpar("bank_current_ID", 0, 0, 127);
-
     xml->exitbranch(); // CONFIGURATION
     return true;
 }

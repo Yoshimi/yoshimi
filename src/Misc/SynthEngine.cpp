@@ -343,7 +343,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 
     // we seem to need this here only for first time startup :(
     bank.setCurrentBankID(Runtime.tempBank);
-
     return true;
 
 
@@ -2380,8 +2379,10 @@ bool SynthEngine::installBanks(int instance)
     bank.parseConfigFile(xml);
     xml->exitbranch();
     delete xml;
+    Runtime.Log("Found " + asString(bank.InstrumentsInBanks) + " instruments in " + asString(bank.BanksInRoots) + " banks");
     Runtime.Log(miscMsgPop(RootBank(Runtime.tempRoot, Runtime.tempBank)& 0xff));
     GuiThreadMsg::sendMessage((this), GuiThreadMsg::RefreshCurBank, 1);
+
     return true;
 }
 

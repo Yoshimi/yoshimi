@@ -154,6 +154,8 @@ class Bank : private MiscFuncs
 
         string getBankFileTitle();
         string getRootFileTitle();
+        int InstrumentsInBanks;
+        int BanksInRoots;
 
     private:
         bool addtobank(size_t rootID, size_t bankID, int pos, const string filename, const string name);

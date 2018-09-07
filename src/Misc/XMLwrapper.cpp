@@ -51,7 +51,7 @@ const char *XMLwrapper_whitespace_callback(mxml_node_t *node, int where)
 }
 
 
-XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi) :
+XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
     stackpos(0),
     isYoshi(_isYoshi),
     synth(_synth)
@@ -63,6 +63,9 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi) :
     memset(&parentstack, 0, sizeof(parentstack));
     tree = mxmlNewElement(MXML_NO_PARENT, "?xml version=\"1.0\" encoding=\"UTF-8\"?");
     mxml_node_t *doctype = mxmlNewElement(tree, "!DOCTYPE");
+
+    if (!includeBase)
+        return;
 
     if (isYoshi)
     {
@@ -254,7 +257,7 @@ void XMLwrapper::slowinfosearch(char *idx)
           & information.SUBsynth_used
           & information.PADsynth_used)
         {
-            break;
+            return;
         }
     }
   return;

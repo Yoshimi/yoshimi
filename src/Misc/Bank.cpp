@@ -58,6 +58,8 @@ Bank::Bank(SynthEngine *_synth) :
                                     // it doesn't contain an instrument file
     synth(_synth)
 {
+    InstrumentsInBanks = 0,
+    BanksInRoots = 0;
     roots.clear();
 }
 
@@ -956,11 +958,13 @@ unsigned int Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t
 void Bank::rescanforbanks(void)
 {
     RootEntryMap::const_iterator it;
-
+    InstrumentsInBanks = 0;
+    BanksInRoots = 0;
     for (it = roots.begin(); it != roots.end(); ++it)
     {
         scanrootdir(it->first);
     }
+    //cout << "ins " << InstrumentsInBanks << "  Ban " << BanksInRoots << endl;
 }
 
 // private affairs
@@ -1040,6 +1044,7 @@ void Bank::scanrootdir(int root_idx)
     for(it = bankDirsMap.begin(); it != bankDirsMap.end(); ++it)
     {
         add_bank(it->first, it->second, root_idx);
+        BanksInRoots += 1;
     }
     roots [root_idx].bankIdStep = 0;
 }
@@ -1098,7 +1103,7 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
         string checkfile = setExtension(getFullPath(rootID, bankID, pos), xiyext);
         if (!isRegFile(checkfile))
             checkfile = setExtension(getFullPath(rootID, bankID, pos), xizext);
-        XMLwrapper *xml = new XMLwrapper(synth, true);
+        XMLwrapper *xml = new XMLwrapper(synth, true, false);
         xml->checkfileinformation(checkfile);
         instrRef.PADsynth_used = xml->information.PADsynth_used;
         instrRef.ADDsynth_used = xml->information.ADDsynth_used;
@@ -1106,6 +1111,7 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
         instrRef.yoshiType = xml->information.yoshiType;
         delete xml;
     }
+    InstrumentsInBanks += 1;
     return 0;
 }
 
