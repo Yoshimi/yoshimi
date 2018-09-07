@@ -189,7 +189,7 @@ bool Config::Setup(int argc, char **argv)
          * a faster startup, and reduce the likelyhood of thinking
          * they failed and trying to start again.
          */
-        synth->installBanks(synth->getUniqueId());
+        synth->installBanks();
         synth->loadHistory();
         return true;
     }

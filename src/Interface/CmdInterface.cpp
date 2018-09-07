@@ -2981,7 +2981,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             {
                 GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
                 Runtime.Log("Added new root ID " + asString(found) + " as " + (string) point);
-                synth->saveBanks(currentInstance);
+                synth->saveBanks();
             }
             reply = done_msg;
         }
@@ -3074,7 +3074,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                         synth->getBankRef().removeRoot(rootID);
                         GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
                         Runtime.Log("Un-linked " + rootname);
-                        synth->saveBanks(currentInstance);
+                        synth->saveBanks();
                     }
                     reply = done_msg;
                 }

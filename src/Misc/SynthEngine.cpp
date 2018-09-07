@@ -2336,14 +2336,12 @@ bool SynthEngine::saveMicrotonal(string fname)
 }
 
 
-bool SynthEngine::installBanks(int instance)
+bool SynthEngine::installBanks()
 {
     bool banksFound = true;
     string branch;
     string name = Runtime.ConfigDir + '/' + YOSHIMI;
 
-    if (instance > 0)
-        name += ("-" + asString(instance));
     string bankname = name + ".banks";
 //    Runtime.Log(bankname);
     if (!isRegFile(bankname))
@@ -2387,11 +2385,9 @@ bool SynthEngine::installBanks(int instance)
 }
 
 
-bool SynthEngine::saveBanks(int instance)
+bool SynthEngine::saveBanks()
 {
     string name = Runtime.ConfigDir + '/' + YOSHIMI;
-    if (instance > 0)
-        name += ("-" + asString(instance));
     string bankname = name + ".banks";
     Runtime.xmlType = XML_BANK;
 

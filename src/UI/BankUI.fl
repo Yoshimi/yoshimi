@@ -684,7 +684,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         if (!dirname)
             return;
         synth->getBankRef().addRootDir(dirname);
-        synth->saveBanks(synth->getUniqueId());
+        synth->saveBanks();
         readbankcfg();
         rescan_for_banks(true);
         Pend->hide();}
@@ -696,7 +696,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         if (selectedRootID >= 0)
         {
             synth->getBankRef().removeRoot(selectedRootID);
-            synth->saveBanks(synth->getUniqueId());
+            synth->saveBanks();
             readbankcfg();
         }
         activatebutton_rootdir(false);
@@ -711,7 +711,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         if (selectedRootID >= 0)
         {
             synth->getBankRef().setCurrentRootID(selectedRootID);
-            synth->saveBanks(synth->getUniqueId());
+            synth->saveBanks();
             readbankcfg();
             rescan_for_banks(false);
             banklist->value(0);
@@ -746,7 +746,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         if (selectedRootID >= 0)
         {
             synth->getBankRef().changeRootID(selectedRootID, tmp);
-            synth->saveBanks(synth->getUniqueId());
+            synth->saveBanks();
             readbankcfg();
             rescan_for_banks(true);
         }

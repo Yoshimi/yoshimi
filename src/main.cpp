@@ -179,7 +179,7 @@ static void *mainGuiThread(void *arg)
                     int instancebit = (1 << instanceID);
                     if (_synth->getRuntime().activeInstance & instancebit)
                         _synth->getRuntime().activeInstance -= instancebit;
-                    _synth->saveBanks(instanceID);
+                    _synth->saveBanks();
                     _synth->getRuntime().flushLog();
                     delete _synth;
                 }
@@ -244,7 +244,7 @@ static void *mainGuiThread(void *arg)
 
     firstRuntime->saveConfig();
     firstSynth->saveHistory();
-    firstSynth->saveBanks(0);
+    firstSynth->saveBanks();
     return NULL;
 }
 
@@ -312,7 +312,7 @@ int mainCreateNewInstance(unsigned int forceId, bool loadState)
     {
         cout << "\nStarted "<< instanceID << "\n";
         // following copied here for other instances
-        synth->installBanks(instanceID);
+        synth->installBanks();
     }
     synthInstances.insert(std::make_pair(synth, musicClient));
     //register jack ports for enabled parts
@@ -414,7 +414,7 @@ int main(int argc, char *argv[])
         firstRuntime->Log("Setting SIGQUIT handler failed");
     // following moved here for faster first synth startup
     firstSynth->loadHistory();
-    firstSynth->installBanks(0);
+    firstSynth->installBanks();
     //GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::RefreshCurBank, 1);
 
     //create command line processing thread

@@ -4,6 +4,9 @@ yoshimi 1.5.8 M
 * Found and mitigated cause of major memory leak.
   In XML - needs more work to resolve completely.
 * Startup now counts banks and instruments seen.
+* All instances now use a single bank file.
+  They can still get out of sync per session but
+  there is no longer a risk of bank corruption.
 
 2018-9-6 Will
 * Bugfix: Occasional segfaults starting new instances.

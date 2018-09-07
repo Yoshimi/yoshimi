@@ -86,8 +86,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool loadPatchSetAndUpdate(string filename);
         bool loadMicrotonal(string fname);
         bool saveMicrotonal(string fname);
-        bool installBanks(int instance);
-        bool saveBanks(int instance);
+        bool installBanks(void);
+        bool saveBanks(void);
         void newHistory(string name, int group);
         void addHistory(string name, int group);
         vector<string> *getHistory(int group);
