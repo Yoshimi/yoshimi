@@ -203,33 +203,33 @@ string commonlist [] = {
     "PUnch Duration <n> &",     "attack boost time",
     "PUnch Stretch <n> &",      "attack boost extend",
     "PUnch Velocity <n> &",     "attack boost velocity sensitivity",
-    "OVertone Position <n> #",  "Relationship to fundamental",
-    "OVertone First <n> #",     "Degree of first parameter",
-    "OVertone Second <n> #",    "Degree of second parameter",
-    "OVertone Harmonic <n> #",  "Amount harmonics are forced",
+    "OVertone Position <n> #",  "relationship to fundamental",
+    "OVertone First <n> #",     "degree of first parameter",
+    "OVertone Second <n> #",    "degree of second parameter",
+    "OVertone Harmonic <n> #",  "amount harmonics are forced",
     "FIXed <s> *-add",          "set base frequency to 440Hx (ENable/ON/YES, {other})",
-    "EQUal <n> *-add",          "Equal temper variation",
-    "BENd Adjust <n>  *-add",   "Pitch bend range",
-    "BENd Offset <n>  *-add",   "Pitch bend shift",
+    "EQUal <n> *-add",          "equal temper variation",
+    "BENd Adjust <n>  *-add",   "pitch bend range",
+    "BENd Offset <n>  *-add",   "pitch bend shift",
     "DETune Fine <n> *",        "fine frequency",
     "DETune Coarse <n> *",      "coarse stepped frequency",
     "DETune Type <n> *",        "type of coarse stepping",
     "OCTave <n> *",             "shift ovatces up or down",
     "STEreo <s> *-voice",       "ENable/ON/YES, {other}",
     " "," ",
-    "@",                        "Exists in all part contexts",
-    "+",                        "Part and kit mode controls",
+    "@",                        "exists in all part contexts",
+    "+",                        "part and kit mode controls",
     "&",                        "AddSynth & PadSynth only",
     "#",                        "SubSynth & PadSynth only",
     "*",                        "Add, Sub, Pad and AddVoice controls",
-    "*-add",                    "Not AddSynth",
-    "*-sub",                    "Not SubSynth",
-    "*-voice",                  "Not AddVoice",
+    "*-add",                    "not AddSynth",
+    "*-sub",                    "not SubSynth",
+    "*-voice",                  "not AddVoice",
     "end"
 };
 
 string addsynthlist [] = {
-    "ENVelope ...",             "Enter AddSynth envelope context",
+    "ENVelope ...",             "nnter AddSynth envelope context",
     "end"
 };
 
@@ -239,26 +239,47 @@ string subsynthlist [] = {
     "HArmonic Stages <n>",      "number of stages",
     "HArmonic Mag <n>",         "harmonics filtering type",
     "HArmonic Position <n>",    "start position",
-    "BAnd Width <n>",           "Common bandwidth",
+    "BAnd Width <n>",           "common bandwidth",
     "BAnd Scale <n>",           "bandwidth slope v frequency",
     "FRequency Envelope <s>",   "ENable/ON/YES, {other})",
     "FIlter <s>",               "ENable/ON/YES, {other})",
-    "ENVelope ...",             "Enter SubSynth envelope context",
+    "ENVelope ...",             "enter SubSynth envelope context",
     "end"
 };
 
 string padsynthlist [] = {
-    "APply",                    "Puts latest changes into the wavetable",
-    "ENVelope ...",             "Enter PadSynth envelope context",
+    "APply",                    "puts latest changes into the wavetable",
+    "ENVelope ...",             "enter PadSynth envelope context",
     "end"
 };
 
 string LFOlist [] = {
-    "none",                     "LFOs yet",
+    "AMplitude ~",              "amplitude type",
+    "FRequency ~",              "frequency type",
+    "FIlter ~",                 "filter type",
+    "~  Rate <n>",              "frequency",
+    "~  Start <n>",             "start position in cycle",
+    "~  Delay <n>",             "time before effect",
+    "~  Expand <n>",            "overall LFO time",
+    "~  Continuous <s>",        "(ENable/ON/YES, {other})",
+    "~  Type <s>",              "oscillator shape",
+    "   ",                      "  SIne",
+    "   ",                      "  Triangle",
+    "   ",                      "  SQuare",
+    "   ",                      "  RUp (ramp up)",
+    "   ",                      "  RDown (ramp down)",
+    "   ",                      "  E1dn",
+    "   ",                      "  E2dn",
+    "~  AR <n>",                "amplitude randomness",
+    "~  FR <n>",                "frequency randomness",
+    "e.g. S FI T RU",           "set filter type ramp up",
     "end"
 };
 
 string filterlist [] = {
+    "AMplitude ~",              "amplitude type",
+    "FRequency ~",              "frequency type",
+    "FIlter ~",                 "filter type",
     "none",                     "filters yet",
     "end"
 };
@@ -268,31 +289,31 @@ string envelopelist [] = {
     "FRequency ~",              "frequency type",
     "FIlter ~",                 "filter type",
     "BAndwidth ~",              "bandwidth type (SubSynth only)",
-    "~  Attack Level <n>",      "Initial attack level",
-    "~  Attack Time <n>",       "Time before decay point",
-    "~  Decay Level <n>",       "Initial decay level",
-    "~  Decay Time <n>",        "Time before sustain point",
-    "~  SUstain <n>",           "sustain level",
-    "~  Release Time <n>",      "Time to actual release",
-    "~  Release Level <n>",     "Level at envelope end",
-    "~  STretch <n>",           "Overall Envelope time",
+    "~  Attack Level <n>",      "initial attack level",
+    "~  Attack Time <n>",       "time before decay point",
+    "~  Decay Level <n>",       "initial decay level",
+    "~  Decay Time <n>",        "time before sustain point",
+    "~  Sustain <n>",           "sustain level",
+    "~  Release Time <n>",      "time to actual release",
+    "~  Release Level <n>",     "level at envelope end",
+    "~  Expand <n>",            "overall envelope time",
     "~  Force <s>",             "force release (ENable/ON/YES, {other})",
     "~  Linear <s>",            "linear slopes (ENable/ON/YES, {other})",
     "e.g. S FR D T 40",         "set frequency decay time 40",
-    "Note:",                    "Some envelopes have limited controls",
+    "Note:",                    "some envelopes have limited controls",
     "end"
 };
 
 
 string learnlist [] = {
-    "MUte <s>",                 "Completely ignore this line (ENable/ON/YES, {other})",
-    "SEven",                    "Set incoming NRPNs as 7 bit (ENable/ON/YES, {other})",
-    "CC <n2>",                  "Set incoming controller value",
-    "CHan <n2>",                "Set incoming channel number",
-    "MIn <n2>",                 "Set minimm percentage",
+    "MUte <s>",                 "completely ignore this line (ENable/ON/YES, {other})",
+    "SEven",                    "set incoming NRPNs as 7 bit (ENable/ON/YES, {other})",
+    "CC <n2>",                  "set incoming controller value",
+    "CHan <n2>",                "set incoming channel number",
+    "MIn <n2>",                 "set minimm percentage",
     "MAx <n2>",                 "set maximum percentage",
-    "LImit <s>",                "Limit instead of compress (ENable/ON/YES, {other})",
-    "BLock <s>",                "Inhibit others on this CC/Chan pair (ENable/ON/YES, {other})",
+    "LImit <s>",                "limit instead of compress (ENable/ON/YES, {other})",
+    "BLock <s>",                "inhibit others on this CC/Chan pair (ENable/ON/YES, {other})",
     "end"
 };
 
@@ -310,21 +331,21 @@ string vectlist [] = {
 string scalelist [] = {
     "FRequency <n>",            "'A' note actual frequency",
     "NOte <n>",                 "'A' note number",
-    "Invert [s]",               "Invert entire scale (ENable/ON/YES, {other})",
-    "CEnter <n>",               "Note number of key center",
-    "SHift <n>",                "Shift entire scale up or down",
-    "SCale [s]",                "Activate microtonal scale (ENable/ON/YES, {other})",
-    "MApping [s]",              "Activate keyboard mapping (ENable/ON/YES, {other})",
-    "FIrst <n>",                "First note number to map",
-    "MIddle <n>",               "Middle note number to map",
-    "Last <n>",                 "Last note number to map",
+    "Invert [s]",               "invert entire scale (ENable/ON/YES, {other})",
+    "CEnter <n>",               "note number of key center",
+    "SHift <n>",                "shift entire scale up or down",
+    "SCale [s]",                "activate microtonal scale (ENable/ON/YES, {other})",
+    "MApping [s]",              "activate keyboard mapping (ENable/ON/YES, {other})",
+    "FIrst <n>",                "first note number to map",
+    "MIddle <n>",               "middle note number to map",
+    "Last <n>",                 "last note number to map",
     "Tuning <s> [s2]",          "CSV tuning values (n1.n1 or n1/n1 ,  n2.n2 or n2/n2 , etc.)",
     " ",                        "s2 = 'IMPort' from named file",
     "Keymap <s> [s2]",          "CSV keymap (n1, n2, n3, etc.)",
     " ",                        "s2 = 'IMPort' from named file",
-    "NAme <s>",                 "Internal name for this scale",
-    "DEscription <s>",          "Description of this scale",
-    "CLEar",                    "Clear all settings and revert to standard scale",
+    "NAme <s>",                 "internal name for this scale",
+    "DEscription <s>",          "description of this scale",
+    "CLEar",                    "clear all settings and revert to standard scale",
     "end"
 };
 
@@ -355,8 +376,8 @@ string listlist [] = {
     "Instruments [n]",          "instruments in bank ID or current",
     "Parts",                    "parts with instruments installed",
     "Vectors",                  "settings for all enabled vectors",
-    "Tuning",                   "Microtonal scale tunings",
-    "Keymap",                   "Microtonal scale keyboard map",
+    "Tuning",                   "microtonal scale tunings",
+    "Keymap",                   "microtonal scale keyboard map",
     "Config",                   "current configuration",
     "MLearn [s <n>]",           "midi learned controls ('@' n for full details on one line)",
     "History [s]",              "recent files (Patchsets, SCales, STates, Vectors, MLearn)",
@@ -1033,6 +1054,9 @@ int CmdInterface::partCommonControls(unsigned char controlType)
 
         if (cmd == -1 && matchnMove(3, point, "lfo"))
         {
+            if(bitTest(context, LEVEL::SubSynth))
+                return available_msg;
+
             int reply = LFOselect(controlType);
             if (reply != todo_msg)
             {
@@ -1222,12 +1246,80 @@ int CmdInterface::partCommonControls(unsigned char controlType)
 
 int CmdInterface::LFOselect(unsigned char controlType)
 {
-    cout << "empty LFO" << endl;
     int cmd = -1;
     float value = -1;
+    int group = -1;
     if (point[0] == 0)
         return done_msg;
-    return todo_msg;
+
+    if (matchnMove(2, point, "amplitute"))
+        group = TOPLEVEL::insertType::amplitude;
+    else if (matchnMove(2, point, "frequency"))
+        group = TOPLEVEL::insertType::frequency;
+    else if (matchnMove(2, point, "filter"))
+        group = TOPLEVEL::insertType::filter;
+    else
+        return opp_msg;
+
+    if (matchnMove(1, point, "rate"))
+        cmd = LFOINSERT::control::speed;
+    else if (matchnMove(1, point, "intensity"))
+        cmd = LFOINSERT::control::depth;
+    else if (matchnMove(1, point, "start"))
+        cmd = LFOINSERT::control::start;
+    else if (matchnMove(1, point, "delay"))
+        cmd = LFOINSERT::control::delay;
+    else if (matchnMove(1, point, "expand"))
+        cmd = LFOINSERT::control::stretch;
+    else if (matchnMove(1, point, "continuous"))
+    {
+        value = (toggle() == 1);
+        cmd = LFOINSERT::control::continuous;
+    }
+    else if (matchnMove(1, point, "type"))
+    {
+        if (point[0] == 0)
+            return what_msg;
+        if (matchnMove(2, point, "sine"))
+            value = 0;
+        else if (matchnMove(1, point, "triangle"))
+            value = 1;
+        else if (matchnMove(2, point, "square"))
+            value = 2;
+        else if (matchnMove(2, point, "rup"))
+            value = 3;
+        else if (matchnMove(2, point, "rdown"))
+            value = 4;
+        else if (matchnMove(1, point, "e1dn"))
+            value = 5;
+        else if (matchnMove(1, point, "e2dn"))
+            value = 6;
+        cmd = LFOINSERT::control::type;
+    }
+    else if (matchnMove(2, point, "ar"))
+        cmd = LFOINSERT::control::amplitudeRandomness;
+    else if (matchnMove(2, point, "fr"))
+        cmd = LFOINSERT::control::frequencyRandomness;
+
+
+    int engine; // can't get this as passed parameter... yet!
+    if (bitTest(context, LEVEL::SubSynth))
+        engine = PART::engine::subSynth;
+    else if (bitTest(context, LEVEL::PadSynth))
+        engine = PART::engine::padSynth;
+    else if (bitTest(context, LEVEL::AddVoice))
+        engine = PART::engine::addVoice1 + voiceNumber;
+    else
+        engine = PART::engine::addSynth;
+
+    //cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitnumber) << "  engine " << int(engine) << "  parameter " << int(group) << endl;
+
+    if (value == -1)
+        value = string2float(point);
+    int reply = sendNormal(value, controlType, cmd, npart, kitnumber, engine, TOPLEVEL::insert::LFOgroup, group);
+    if (reply != todo_msg)
+        return reply;
+    return done_msg;
 }
 
 
@@ -1236,8 +1328,16 @@ int CmdInterface::filterSelect(unsigned char controlType)
     cout << "empty filter" << endl;
     int cmd = -1;
     float value = -1;
+    int group = -1;
     if (point[0] == 0)
         return done_msg;
+
+    if (matchnMove(2, point, "amplitute"))
+        group = TOPLEVEL::insertType::amplitude;
+    else if (matchnMove(2, point, "frequency"))
+        group = TOPLEVEL::insertType::frequency;
+    else if (matchnMove(2, point, "filter"))
+        group = TOPLEVEL::insertType::filter;
     return todo_msg;
 }
 
@@ -1280,7 +1380,7 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
         else if (matchnMove(1, point, "time"))
             cmd = ENVELOPEINSERT::control::decayTime;
     }
-    else if (matchnMove(2, point, "sustain"))
+    else if (matchnMove(1, point, "sustain"))
         cmd = ENVELOPEINSERT::control::sustainLevel;
     else if (matchnMove(1, point, "release"))
     {
@@ -1289,7 +1389,7 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
         else if (matchnMove(1, point, "time"))
             cmd = ENVELOPEINSERT::control::releaseTime;
     }
-    else if (matchnMove(2, point, "stretch"))
+    else if (matchnMove(1, point, "expand"))
         cmd = ENVELOPEINSERT::control::stretch;
     else if (matchnMove(1, point, "force"))
     {
