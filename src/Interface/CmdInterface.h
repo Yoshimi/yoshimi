@@ -37,7 +37,7 @@ using namespace std;
  * is set so you can then step back up the level tree.
  * It is also possible to zero it so that you immediately go to
  * the top level. Therefore, the sequence is important.
- * 17 bits are currently defined out of a possible 32.
+ * 16 bits are currently defined out of a possible 32.
  *
  * AllFX, InsFX and Part MUST be the first three
  */
@@ -80,6 +80,8 @@ class CmdInterface : private MiscFuncs
         int effectsList(bool presets = false);
         int effects(unsigned char controlType);
         int partCommonControls(unsigned char controlType);
+        int LFOselect(unsigned char controlType);
+        int filterSelect(unsigned char controlType);
         int envelopeSelect(unsigned char controlType);
         int commandList();
         string findStatus(bool show);

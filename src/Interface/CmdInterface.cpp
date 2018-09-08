@@ -63,6 +63,8 @@ namespace LISTS {
     addsynth,
     subsynth,
     padsynth,
+    lfo,
+    filter,
     envelope,
     vector,
     scale,
@@ -251,6 +253,16 @@ string padsynthlist [] = {
     "end"
 };
 
+string LFOlist [] = {
+    "none",                     "LFOs yet",
+    "end"
+};
+
+string filterlist [] = {
+    "none",                     "filters yet",
+    "end"
+};
+
 string envelopelist [] = {
     "AMplitude ~",              "amplitude type",
     "FRequency ~",              "frequency type",
@@ -270,6 +282,7 @@ string envelopelist [] = {
     "Note:",                    "Some envelopes have limited controls",
     "end"
 };
+
 
 string learnlist [] = {
     "MUte <s>",                 "Completely ignore this line (ENable/ON/YES, {other})",
@@ -481,6 +494,10 @@ bool CmdInterface::helpList(unsigned int local)
             listnum = LISTS::subsynth;
         else if (matchnMove(3, point, "padsynth"))
             listnum = LISTS::padsynth;
+        else if (matchnMove(3, point, "lfo"))
+            listnum = LISTS::lfo;
+        else if (matchnMove(3, point, "filter"))
+            listnum = LISTS::filter;
         else if (matchnMove(3, point, "envelope"))
             listnum = LISTS::envelope;
         else if (matchnMove(1, point, "vector"))
@@ -502,6 +519,10 @@ bool CmdInterface::helpList(unsigned int local)
     {
         if (bitTest(local, LEVEL::Envelope))
             listnum = LISTS::envelope;
+        else if (bitTest(local, LEVEL::LFO))
+            listnum = LISTS::lfo;
+        else if (bitTest(local, LEVEL::Filter))
+            listnum = LISTS::filter;
         else if (bitTest(local, LEVEL::AddSynth))
             listnum = LISTS::addsynth;
         else if (bitTest(local, LEVEL::SubSynth))
@@ -558,10 +579,20 @@ bool CmdInterface::helpList(unsigned int local)
             msg.push_back("Part PadSynth:");
             helpLoop(msg, padsynthlist, 2);
             break;
+
+        case LISTS::lfo:
+            msg.push_back("Engine LFOs:");
+            helpLoop(msg, LFOlist, 2);
+            break;
+        case LISTS::filter:
+            msg.push_back("Engine Filters:");
+            helpLoop(msg, filterlist, 2);
+            break;
         case LISTS::envelope:
             msg.push_back("Engine Envelopes:");
             helpLoop(msg, envelopelist, 2);
             break;
+
         case LISTS::vector:
             msg.push_back("Vector: [n1] = base channel:");
             helpLoop(msg, vectlist, 2);
@@ -999,6 +1030,25 @@ int CmdInterface::partCommonControls(unsigned char controlType)
             value = string2int(point);
             cmd = ADDSYNTH::control::octave;
         }
+
+        if (cmd == -1 && matchnMove(3, point, "lfo"))
+        {
+            int reply = LFOselect(controlType);
+            if (reply != todo_msg)
+            {
+                bitSet(context, LEVEL::LFO);
+                return reply;
+            }
+        }
+        if (cmd == -1 && matchnMove(3, point, "filter"))
+        {
+            int reply = filterSelect(controlType);
+            if (reply != todo_msg)
+            {
+                bitSet(context, LEVEL::Filter);
+                return reply;
+            }
+        }
         if (cmd == -1 && matchnMove(3, point, "envelope"))
         {
             int reply = envelopeSelect(controlType);
@@ -1167,6 +1217,28 @@ int CmdInterface::partCommonControls(unsigned char controlType)
     if (reply != todo_msg)
         return reply;
     return done_msg;
+}
+
+
+int CmdInterface::LFOselect(unsigned char controlType)
+{
+    cout << "empty LFO" << endl;
+    int cmd = -1;
+    float value = -1;
+    if (point[0] == 0)
+        return done_msg;
+    return todo_msg;
+}
+
+
+int CmdInterface::filterSelect(unsigned char controlType)
+{
+    cout << "empty filter" << endl;
+    int cmd = -1;
+    float value = -1;
+    if (point[0] == 0)
+        return done_msg;
+    return todo_msg;
 }
 
 
@@ -1431,7 +1503,11 @@ string CmdInterface::findStatus(bool show)
             if (readControl(PART::control::enable, npart, kit, PART::engine::addVoice1 + voiceNumber, insert))
                 text += " on";
         }
-        if (bitTest(context, LEVEL::Envelope))
+        if (bitTest(context, LEVEL::LFO))
+            text += ", LFO";
+        else if (bitTest(context, LEVEL::Filter))
+            text += ", Filter";
+        else if (bitTest(context, LEVEL::Envelope))
             text += ", Envel";
     }
     else if (bitTest(context, LEVEL::Scale))
@@ -2593,10 +2669,14 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
         reply = commandConfig(controlType);
     else if (bitTest(context, LEVEL::Scale))
         reply = commandScale(controlType);
-    else if (bitTest(context, LEVEL::AddVoice))
-        reply = addVoice(controlType);
     else if (bitTest(context, LEVEL::Envelope))
         reply = envelopeSelect(controlType);
+    else if (bitTest(context, LEVEL::Filter))
+        reply = filterSelect(controlType);
+    else if (bitTest(context, LEVEL::LFO))
+        reply = LFOselect(controlType);
+    else if (bitTest(context, LEVEL::AddVoice))
+        reply = addVoice(controlType);
     else if (bitTest(context, LEVEL::AddSynth))
         reply = addSynth(controlType);
     else if (bitTest(context, LEVEL::SubSynth))

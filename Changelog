@@ -1,5 +1,8 @@
 yoshimi 1.5.8 M
 
+2018-9-8 Will
+* Added CLI placeholders for LFOs and filters.
+
 2018-9-7 Will
 * Found and mitigated cause of major memory leak.
   In XML - needs more work to resolve completely.
