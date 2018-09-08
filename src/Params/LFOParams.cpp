@@ -127,6 +127,7 @@ float LFOlimit::getLFOlimits(CommandBlock *getData)
     {
         case LFOINSERT::control::speed:
             max = 1.0f;
+            type &= ~TOPLEVEL::type::Integer;
             switch(insertType)
             {
                 case TOPLEVEL::insertType::amplitude:

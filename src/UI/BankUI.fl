@@ -440,7 +440,6 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
       Fl_Button {} {
         label Close
         callback {//
-        synth->getRuntime().Log("Inst " + to_string(int(instFrom )));
         if (Fl::event_button() == 3)
         {
             if (instFrom == 2)

@@ -277,10 +277,32 @@ string LFOlist [] = {
 };
 
 string filterlist [] = {
-    "AMplitude ~",              "amplitude type",
-    "FRequency ~",              "frequency type",
-    "FIlter ~",                 "filter type",
-    "none",                     "filters yet",
+    "CEnter <n>",           "center frequency",
+    "Q <n>",                "Q factor",
+    "Velocity <n>",         "velocity sensitivity",
+    "SLope <n>",            "velocity curve",
+    "Gain <n>",             "gain",
+    "TRacking <n>",         "frequency tracking",
+    "Range <s>",            "extended tracking (ENable/ON/YES, {other})",
+    "CAtegory <s>",         "Analog, Formant, State variable",
+    "STages <n>",           "filter stages (1 to 5)",
+    "TYpe <s>",             "category dependent",
+    "",                     "  analog",
+    "  l1",                 "one stage low pass",
+    "  h1",                 "one stage high pass",
+    "  l2",                 "two stage low pass",
+    "  h2",                 "two stage high pass",
+    "  band",               "two stage band pass",
+    "  stop",               "two stage band stop",
+    "  peak",               "two stage peak",
+    "  lshelf",             "two stage low shelf",
+    "  hshelf",             "two stage high shelf",
+    "",                     "  state variable",
+    "  low",                "low pass",
+    "  high",               "high pass",
+    "  band",               "band pass",
+    "  stop",               "band stop",
+
     "end"
 };
 
@@ -1278,7 +1300,7 @@ int CmdInterface::LFOselect(unsigned char controlType)
     }
     else if (matchnMove(1, point, "type"))
     {
-        if (point[0] == 0)
+        if (lineEnd(controlType))
             return what_msg;
         if (matchnMove(2, point, "sine"))
             value = 0;
@@ -1325,20 +1347,128 @@ int CmdInterface::LFOselect(unsigned char controlType)
 
 int CmdInterface::filterSelect(unsigned char controlType)
 {
-    cout << "empty filter" << endl;
     int cmd = -1;
     float value = -1;
-    int group = -1;
+    int param = UNUSED;
     if (point[0] == 0)
         return done_msg;
 
-    if (matchnMove(2, point, "amplitute"))
-        group = TOPLEVEL::insertType::amplitude;
-    else if (matchnMove(2, point, "frequency"))
-        group = TOPLEVEL::insertType::frequency;
-    else if (matchnMove(2, point, "filter"))
-        group = TOPLEVEL::insertType::filter;
-    return todo_msg;
+    int engine; // can't get this as passed parameter... yet!
+    if (bitTest(context, LEVEL::SubSynth))
+        engine = PART::engine::subSynth;
+    else if (bitTest(context, LEVEL::PadSynth))
+        engine = PART::engine::padSynth;
+    else if (bitTest(context, LEVEL::AddVoice))
+        engine = PART::engine::addVoice1 + voiceNumber;
+    else
+        engine = PART::engine::addSynth;
+    if (engine == PART::engine::subSynth || engine >= PART::engine::addVoice1)
+    {
+        value = toggle();
+        if (value > -1)
+        {
+            if (engine == PART::engine::subSynth)
+                cmd = SUBSYNTH::control::enableFilter;
+            else
+                cmd = ADDVOICE::control::enableFilter;
+            readControl(FILTERINSERT::control::baseType, npart, kitnumber, engine, TOPLEVEL::insert::filterGroup);
+
+            int reply = sendNormal(value, controlType, cmd, npart, kitnumber, engine);
+            if (reply != todo_msg)
+                return reply;
+        }
+        value = -1; // return it as not set
+    }
+
+    if (matchnMove(2, point, "center"))
+        cmd = FILTERINSERT::control::centerFrequency;
+    else if (matchnMove(1, point, "q"))
+        cmd = FILTERINSERT::control::Q;
+    else if (matchnMove(1, point, "velocity"))
+        cmd = FILTERINSERT::control::velocitySensitivity;
+    else if (matchnMove(2, point, "slope"))
+        cmd = FILTERINSERT::control::velocityCurve;
+    else if (matchnMove(1, point, "gain"))
+        cmd = FILTERINSERT::control::gain;
+    else if (matchnMove(2, point, "tracking"))
+        cmd = FILTERINSERT::control::frequencyTracking;
+    else if (matchnMove(1, point, "range"))
+    {
+        value = (toggle() == 1);
+        cmd = FILTERINSERT::control::frequencyTrackingRange;
+    }
+    else if (matchnMove(2, point, "category"))
+    {
+        if (matchnMove(1, point, "analog"))
+            value = 0;
+        else if(matchnMove(1, point, "formant"))
+            value = 1;
+        else if(matchnMove(1, point, "state"))
+            value = 2;
+        else
+            return range_msg;
+        cmd = FILTERINSERT::control::baseType;
+    }
+    else if (matchnMove(2, point, "stages"))
+    {
+        if (lineEnd(controlType))
+            return value_msg;
+        value = string2int(point) - 1;
+        cmd = FILTERINSERT::control::stages;
+    }
+    else if (matchnMove(2, point, "type"))
+    {
+        int baseType = readControl(FILTERINSERT::control::baseType, npart, kitnumber, engine, TOPLEVEL::insert::filterGroup);
+        if (baseType == 0)
+        {
+            if (matchnMove(2, point, "l1"))
+                value = 0;
+            else if (matchnMove(2, point, "h1"))
+                value = 1;
+            if (matchnMove(2, point, "l2"))
+                value = 2;
+            else if (matchnMove(2, point, "h2"))
+                value = 3;
+            else if (matchnMove(2, point, "bpass"))
+                value = 4;
+            else if (matchnMove(2, point, "stop"))
+                value = 5;
+            else if (matchnMove(2, point, "peak"))
+                value = 6;
+            else if (matchnMove(2, point, "lshelf"))
+                value = 7;
+            else if (matchnMove(2, point, "hshelf"))
+                value = 8;
+            else
+                return range_msg;
+            cmd = FILTERINSERT::control::analogType;
+        }
+        else if (baseType == 2)
+        {
+            if (matchnMove(1, point, "low"))
+                value = 0;
+            else if (matchnMove(1, point, "high"))
+                value = 1;
+            else if (matchnMove(1, point, "band"))
+                value = 2;
+            else if (matchnMove(1, point, "stop"))
+                value = 3;
+            else
+                return range_msg;
+            cmd = FILTERINSERT::control::stateVariableType;
+        }
+        else
+            return available_msg;
+    }
+
+    //cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitnumber) << "  engine " << int(engine) << "  parameter " << int(param) << endl;
+
+    if (value == -1)
+        value = string2float(point);
+    int reply = sendNormal(value, controlType, cmd, npart, kitnumber, engine, TOPLEVEL::insert::filterGroup, param);
+    if (reply != todo_msg)
+        return reply;
+    return done_msg;
 }
 
 

@@ -3344,6 +3344,7 @@ string InterChange::resolveLFO(CommandBlock *getData)
 
 string InterChange::resolveFilter(CommandBlock *getData)
 {
+    int value_int = int(getData->data.value);
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -3385,7 +3386,8 @@ string InterChange::resolveFilter(CommandBlock *getData)
             contstr = "gain";
             break;
         case FILTERINSERT::control::stages:
-            contstr = "Stages";
+            showValue = false;
+            contstr = "Stages " + to_string(value_int + 1);
             break;
         case FILTERINSERT::control::baseType:
             contstr = "Filt Type";
