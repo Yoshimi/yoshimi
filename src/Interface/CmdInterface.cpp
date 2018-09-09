@@ -1274,6 +1274,10 @@ int CmdInterface::LFOselect(unsigned char controlType)
     if (point[0] == 0)
         return done_msg;
 
+    int engine = contextToEngines();
+    if (engine == PART::engine::addVoice1)
+        engine += voiceNumber;
+
     if (matchnMove(2, point, "amplitute"))
         group = TOPLEVEL::insertType::amplitude;
     else if (matchnMove(2, point, "frequency"))
@@ -1323,17 +1327,6 @@ int CmdInterface::LFOselect(unsigned char controlType)
     else if (matchnMove(2, point, "fr"))
         cmd = LFOINSERT::control::frequencyRandomness;
 
-
-    int engine; // can't get this as passed parameter... yet!
-    if (bitTest(context, LEVEL::SubSynth))
-        engine = PART::engine::subSynth;
-    else if (bitTest(context, LEVEL::PadSynth))
-        engine = PART::engine::padSynth;
-    else if (bitTest(context, LEVEL::AddVoice))
-        engine = PART::engine::addVoice1 + voiceNumber;
-    else
-        engine = PART::engine::addSynth;
-
     //cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitnumber) << "  engine " << int(engine) << "  parameter " << int(group) << endl;
 
     if (value == -1)
@@ -1353,16 +1346,11 @@ int CmdInterface::filterSelect(unsigned char controlType)
     if (point[0] == 0)
         return done_msg;
 
-    int engine; // can't get this as passed parameter... yet!
-    if (bitTest(context, LEVEL::SubSynth))
-        engine = PART::engine::subSynth;
-    else if (bitTest(context, LEVEL::PadSynth))
-        engine = PART::engine::padSynth;
-    else if (bitTest(context, LEVEL::AddVoice))
-        engine = PART::engine::addVoice1 + voiceNumber;
-    else
-        engine = PART::engine::addSynth;
-    if (engine == PART::engine::subSynth || engine >= PART::engine::addVoice1)
+    int engine = contextToEngines();
+    if (engine == PART::engine::addVoice1)
+        engine += voiceNumber;
+
+    if (engine == PART::engine::subSynth || engine == PART::engine::addVoice1 + voiceNumber)
     {
         value = toggle();
         if (value > -1)
@@ -1480,6 +1468,10 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
     if (point[0] == 0)
         return done_msg;
 
+    int engine = contextToEngines();
+    if (engine == PART::engine::addVoice1)
+        engine += voiceNumber;
+
     if (matchnMove(2, point, "amplitute"))
         group = TOPLEVEL::insertType::amplitude;
     else if (matchnMove(2, point, "frequency"))
@@ -1541,16 +1533,6 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
             return value_msg;
         value = string2float(point);
     }
-
-    int engine; // can't get this as passed parameter... yet!
-    if (bitTest(context, LEVEL::SubSynth))
-        engine = PART::engine::subSynth;
-    else if (bitTest(context, LEVEL::PadSynth))
-        engine = PART::engine::padSynth;
-    else if (bitTest(context, LEVEL::AddVoice))
-        engine = PART::engine::addVoice1 + voiceNumber;
-    else
-        engine = PART::engine::addSynth;
 
     //cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitnumber) << "  engine " << int(engine) << "  parameter " << int(group) << endl;
 
@@ -1708,37 +1690,56 @@ string CmdInterface::findStatus(bool show)
         if (!show)
             return "";
 
-        if (bitTest(context, LEVEL::AddSynth))
+        int engine = contextToEngines();
+        switch (engine)
         {
-            text += ", Add";
-            if (readControl(PART::control::enable, npart, kit, PART::engine::addSynth, insert))
-                text += " on";
-        }
-        else if (bitTest(context, LEVEL::SubSynth))
-        {
-            text += ", Sub";
-                if (readControl(PART::control::enable, npart, kit, PART::engine::subSynth, insert))
+            case PART::engine::addSynth:
+                text += ", Add";
+                if (readControl(ADDSYNTH::control::enable, npart, kit, PART::engine::addSynth, insert))
                     text += " on";
+                break;
+            case PART::engine::subSynth:
+                text += ", Sub";
+                if (readControl(SUBSYNTH::control::enable, npart, kit, PART::engine::subSynth, insert))
+                    text += " on";
+                break;
+            case PART::engine::padSynth:
+                text += ", Pad";
+                if (readControl(PADSYNTH::control::enable, npart, kit, PART::engine::padSynth, insert))
+                    text += " on";
+                break;
+            case PART::engine::addVoice1:
+                text += ", Addvoice ";
+                text += to_string(voiceNumber + 1);
+                if (readControl(ADDVOICE::control::enableVoice, npart, kitnumber, PART::engine::addVoice1 + voiceNumber))
+                    text += " on";
+                break;
         }
-        else if (bitTest(context, LEVEL::PadSynth))
-        {
-            text += ", Pad";
-            if (readControl(PART::control::enable, npart, kit, PART::engine::padSynth, insert))
-                text += " on";
-        }
-        if (bitTest(context, LEVEL::AddVoice))
-        {
-            text += ", Voice ";
-            text += to_string(voiceNumber + 1);
-            if (readControl(PART::control::enable, npart, kit, PART::engine::addVoice1 + voiceNumber, insert))
-                text += " on";
-        }
+
         if (bitTest(context, LEVEL::LFO))
+        {
             text += ", LFO";
+        }
         else if (bitTest(context, LEVEL::Filter))
+        {
             text += ", Filter";
+            if (engine == PART::engine::subSynth)
+            {
+                if (readControl(SUBSYNTH::control::enableFilter, npart, kitnumber, engine))
+                    text += " on";
+            }
+            else if (engine == PART::engine::addVoice1)
+            {
+                if (readControl(ADDVOICE::control::enableFilter, npart, kitnumber, engine + voiceNumber))
+                    text += " on";
+            }
+            else
+                text += " on";
+        }
         else if (bitTest(context, LEVEL::Envelope))
+        {
             text += ", Envel";
+        }
     }
     else if (bitTest(context, LEVEL::Scale))
         text += " Scale ";
@@ -1756,6 +1757,21 @@ string CmdInterface::findStatus(bool show)
         text += (" MLearn line " + asString(mline + 1) + " ");
 
     return text;
+}
+
+
+int CmdInterface::contextToEngines()
+{
+    int engine = UNUSED;
+    if (bitTest(context, LEVEL::SubSynth))
+        engine = PART::engine::subSynth;
+    else if (bitTest(context, LEVEL::PadSynth))
+        engine = PART::engine::padSynth;
+    else if (bitTest(context, LEVEL::AddVoice))
+        engine = PART::engine::addVoice1;
+    else if (bitTest(context, LEVEL::AddSynth))
+        engine = PART::engine::addSynth;
+    return engine;
 }
 
 
@@ -2677,6 +2693,7 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
             return value_msg;
         sendDirect(kitmode, controlType, PART::control::kitMode, npart);
         kitnumber = 0;
+        voiceNumber = 0; // must clear this too!
         return done_msg;
     }
     if (kitmode == PART::kitType::Off)
@@ -2693,6 +2710,7 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
                 if (tmp < 1 || tmp > NUM_KIT_ITEMS)
                     return range_msg;
                 kitnumber = tmp - 1;
+                voiceNumber = 0;// to avoid confusion
             }
             Runtime.Log("Kit item number " + to_string(kitnumber + 1));
             return done_msg;

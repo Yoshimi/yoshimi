@@ -85,6 +85,7 @@ class CmdInterface : private MiscFuncs
         int envelopeSelect(unsigned char controlType);
         int commandList();
         string findStatus(bool show);
+        int contextToEngines(void);
         int toggle(void);
         bool lineEnd(unsigned char controlType);
         int commandMlearn(unsigned char controlType);

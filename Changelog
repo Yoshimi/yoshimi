@@ -1,5 +1,9 @@
 yoshimi 1.5.8 M
 
+2018-9-9 Will
+* Optimised some CLI selection routines.
+* Improved CLI prompt information.
+
 2018-9-8 Will
 * Added CLI placeholders for LFOs and filters.
 * Completed CLI controls for LFOs.
