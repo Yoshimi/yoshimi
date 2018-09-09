@@ -119,7 +119,7 @@ string toplist [] = {
     "  Volume <n>",             "master volume",
     "  SHift <n>",              "master key shift semitones (0 no shift)",
     "  DEtune <n>",             "master fine detune",
-    "  SOlo [s] [n]",           "channel 'solo' switcher (Row, Column, Loop, Twoway, CC, {other} Disable)",
+    "  SOlo [s] [n]",           "channel 'solo' switcher (Row, Column, Loop, Twoway, CC, {other} off)",
     "      CC <n>",             "Incoming 'solo' CC number (type must be set first)",
     "end"
 };
@@ -133,14 +133,14 @@ string configlist [] = {
     "REports [s]",              "destination (Stdout, other = console)",
     "SAved [s]",                "Saved instrument type (Legacy {.xiz}, Yoshimi {.xiy}, Both)",
 
-    "STate [s]",                "* autoload default at start (ENable/ON/YES, {other})",
-    "Hide [s]",                 "non-fatal errors (ENable/ON/YES, {other})",
-    "Display [s]",              "GUI splash screen (ENable/ON/YES, {other})",
-    "Time [s]",                 "add to instrument load message (ENable/ON/YES, {other})",
+    "STate [s]",                "* autoload default at start (ON, {other})",
+    "Hide [s]",                 "non-fatal errors (ON, {other})",
+    "Display [s]",              "GUI splash screen (ON, {other})",
+    "Time [s]",                 "add to instrument load message (ON, {other})",
     "Include [s]",              "XML headers on file load(Enable {other})",
-    "Keep [s]",                 "include inactive data on all file saves (ENable/ON/YES, {other})",
-    "Gui [s]",                  "* Run with GUI (ENable/ON/YES, DIsable/OFF/NO)",
-    "Cli [s]",                  "* Run with CLI (ENable/ON/YES, DIsable/OFF/NO)",
+    "Keep [s]",                 "include inactive data on all file saves (ON, {other})",
+    "Gui [s]",                  "* Run with GUI (ON, OFf)",
+    "Cli [s]",                  "* Run with CLI (ON, OFf)",
 
     "MIdi <s>",                 "* connection type (Jack, Alsa)",
     "AUdio <s>",                "* connection type (Jack, Alsa)",
@@ -149,24 +149,24 @@ string configlist [] = {
     "ALsa Sample <n>",          "* rate (0 = 192000, 1 = 96000, 2 = 48000, 3 = 44100)",
     "Jack Midi <s>",            "* name of source",
     "Jack Server <s>",          "* name",
-    "Jack Auto <s>",            "* connect jack on start (ENable/ON/YES, {other})",
+    "Jack Auto <s>",            "* connect jack on start (ON, {other})",
 
-    "ROot [n]",                 "root CC (0 - 119, {other} Disable)",
-    "BAnk [n]",                 "bank CC (0, 32, {other} Disable)",
-    "PRogram [s]",              "program change (ENable/ON/YES, {other})",
-    "ACtivate [s]",             "program change activates part (ENable/ON/YES, {other})",
-    "Extended [s]",             "extended program change (ENable/ON/YES, {other})",
-    "Quiet [s]",                "ignore 'reset all controllers' (ENable/ON/YES, {other})",
-    "Nrpn [s]",                 "incoming NRPN (ENable/ON/YES, {other})",
-    "Log [s]",                  "incoming MIDI CCs (ENable/ON/YES, {other})",
-    "SHow [s]",                 "GUI MIDI learn editor (ENable/ON/YES, {other})",
+    "ROot [n]",                 "root CC (0 - 119, {other} off)",
+    "BAnk [n]",                 "bank CC (0, 32, {other} off)",
+    "PRogram [s]",              "program change (ON, {other})",
+    "ACtivate [s]",             "program change activates part (ON, {other})",
+    "Extended [s]",             "extended program change (ON, {other})",
+    "Quiet [s]",                "ignore 'reset all controllers' (ON, {other})",
+    "Nrpn [s]",                 "incoming NRPN (ON, {other})",
+    "Log [s]",                  "incoming MIDI CCs (ON, {other})",
+    "SHow [s]",                 "GUI MIDI learn editor (ON, {other})",
     "end"
 };
 
 string partlist [] = {
     "OFfset <n2>",              "velocity sense offset",
-    "Breath <s>",               "breath control (ENable/ON/YES, {other})",
-    "POrtamento <s>",           "portamento (ENable/ON/YES, {other})",
+    "Breath <s>",               "breath control (ON, {other})",
+    "POrtamento <s>",           "portamento (ON, {other})",
     "Mode <s>",                 "key mode (Poly, Mono, Legato)",
     "Note <n2>",                "note polyphony",
     "SHift <n2>",               "key shift semitones (0 no shift)",
@@ -174,11 +174,11 @@ string partlist [] = {
     "  Type <s>",               "the effect type",
     "  PREset <n3>",            "set numbered effect preset to n3",
     "  Send <n3> <n4>",         "send part to system effect n3 at volume n4",
-    "KMode <s>",                "set part to kit mode (ENable/ON/YES, {other})",
+    "KMode <s>",                "set part to kit mode (ON, {other})",
     "  KItem <n>",              "select kit item number (1-16)",
-    "    MUte <s>",             "silence this item (ENable/ON/YES, {other})",
+    "    MUte <s>",             "silence this item (ON, {other})",
     "    KEffect <n>",          "select effect for this item (0-none, 1-3)",
-    "  DRum <s>",               "set kit to drum mode (ENable/ON/YES, {other})",
+    "  DRum <s>",               "set kit to drum mode (ON, {other})",
     "PRogram <[n2]/[s]>",       "loads instrument ID / CLear sets default",
     "NAme <s>",                 "sets the display name the part can be saved with",
     "Channel <n2>",             "MIDI channel (> 32 disables, > 16 note off only)",
@@ -191,8 +191,8 @@ string partlist [] = {
 };
 
 string commonlist [] = {
-    "ENable @",                 "enables the part/kit/engine/insert etc,",
-    "DIsable @",                "disables as above",
+    "ON @",                     "enables the part/kit/engine/insert etc,",
+    "OFf @",                    "disables as above",
     "Volume <n> @",             "volume",
     "Pan <n2> @",               "panning",
     "VElocity <n> @",           "velocity sensing sensitivity",
@@ -207,7 +207,7 @@ string commonlist [] = {
     "OVertone First <n> #",     "degree of first parameter",
     "OVertone Second <n> #",    "degree of second parameter",
     "OVertone Harmonic <n> #",  "amount harmonics are forced",
-    "FIXed <s> *-add",          "set base frequency to 440Hx (ENable/ON/YES, {other})",
+    "FIXed <s> *-add",          "set base frequency to 440Hx (ON, {other})",
     "EQUal <n> *-add",          "equal temper variation",
     "BENd Adjust <n>  *-add",   "pitch bend range",
     "BENd Offset <n>  *-add",   "pitch bend shift",
@@ -215,7 +215,7 @@ string commonlist [] = {
     "DETune Coarse <n> *",      "coarse stepped frequency",
     "DETune Type <n> *",        "type of coarse stepping",
     "OCTave <n> *",             "shift ovatces up or down",
-    "STEreo <s> *-voice",       "ENable/ON/YES, {other}",
+    "STEreo <s> *-voice",       "ON, {other}",
     "LFO ... *-sub",            "enter LFO insert context",
     "FILter ... *",             "enter Filter insert context",
     "ENVelope ... *",           "enter Envelope insert context",
@@ -248,7 +248,6 @@ string subsynthlist [] = {
 
 string padsynthlist [] = {
     "APply",                    "puts latest changes into the wavetable",
-    "ENVelope ...",             "enter PadSynth envelope context",
     "end"
 };
 
@@ -260,7 +259,7 @@ string LFOlist [] = {
     "~  Start <n>",             "start position in cycle",
     "~  Delay <n>",             "time before effect",
     "~  Expand <n>",            "overall LFO time",
-    "~  Continuous <s>",        "(ENable/ON/YES, {other})",
+    "~  Continuous <s>",        "(ON, {other})",
     "~  Type <s>",              "LFO oscillator shape",
     "   ",                      "  SIne",
     "   ",                      "  Triangle",
@@ -282,7 +281,7 @@ string filterlist [] = {
     "SLope <n>",            "velocity curve",
     "Gain <n>",             "gain",
     "TRacking <n>",         "frequency tracking",
-    "Range <s>",            "extended tracking (ENable/ON/YES, {other})",
+    "Range <s>",            "extended tracking (ON, {other})",
     "CAtegory <s>",         "Analog, Formant, State variable",
     "STages <n>",           "filter stages (1 to 5)",
     "TYpe <s>",             "category dependent",
@@ -317,8 +316,8 @@ string envelopelist [] = {
     "~  Release Time <n>",      "time to actual release",
     "~  Release Level <n>",     "level at envelope end",
     "~  Expand <n>",            "overall envelope time",
-    "~  Force <s>",             "force release (ENable/ON/YES, {other})",
-    "~  Linear <s>",            "linear slopes (ENable/ON/YES, {other})",
+    "~  Force <s>",             "force release (ON, {other})",
+    "~  Linear <s>",            "linear slopes (ON, {other})",
     "e.g. S FR D T 40",         "set frequency decay time 40",
     "Note:",                    "some envelopes have limited controls",
     "end"
@@ -326,20 +325,20 @@ string envelopelist [] = {
 
 
 string learnlist [] = {
-    "MUte <s>",                 "completely ignore this line (ENable/ON/YES, {other})",
-    "SEven",                    "set incoming NRPNs as 7 bit (ENable/ON/YES, {other})",
+    "MUte <s>",                 "completely ignore this line (ON, {other})",
+    "SEven",                    "set incoming NRPNs as 7 bit (ON, {other})",
     "CC <n2>",                  "set incoming controller value",
     "CHan <n2>",                "set incoming channel number",
     "MIn <n2>",                 "set minimm percentage",
     "MAx <n2>",                 "set maximum percentage",
-    "LImit <s>",                "limit instead of compress (ENable/ON/YES, {other})",
-    "BLock <s>",                "inhibit others on this CC/Chan pair (ENable/ON/YES, {other})",
+    "LImit <s>",                "limit instead of compress (ON, {other})",
+    "BLock <s>",                "inhibit others on this CC/Chan pair (ON, {other})",
     "end"
 };
 
 string vectlist [] = {
     "[X/Y] CC <n2>",            "CC n2 is used for X or Y axis sweep",
-    "[X/Y] Features <n2> [s]",   "sets X or Y features 1-4 (ENable/ON/YES, Reverse, {other})",
+    "[X/Y] Features <n2> [s]",  "sets X or Y features 1-4 (ON, Reverse, {other})",
     "[X] PRogram <l/r> <n2>",   "X program change ID for LEFT or RIGHT part",
     "[Y] PRogram <d/u> <n2>",   "Y program change ID for DOWN or UP part",
     "[X/Y] Control <n2> <n3>",  "sets n3 CC to use for X or Y feature n2 (2-4)",
@@ -351,11 +350,11 @@ string vectlist [] = {
 string scalelist [] = {
     "FRequency <n>",            "'A' note actual frequency",
     "NOte <n>",                 "'A' note number",
-    "Invert [s]",               "invert entire scale (ENable/ON/YES, {other})",
+    "Invert [s]",               "invert entire scale (ON, {other})",
     "CEnter <n>",               "note number of key center",
     "SHift <n>",                "shift entire scale up or down",
-    "SCale [s]",                "activate microtonal scale (ENable/ON/YES, {other})",
-    "MApping [s]",              "activate keyboard mapping (ENable/ON/YES, {other})",
+    "SCale [s]",                "activate microtonal scale (ON, {other})",
+    "MApping [s]",              "activate keyboard mapping (ON, {other})",
     "FIrst <n>",                "first note number to map",
     "MIddle <n>",               "middle note number to map",
     "Last <n>",                 "last note number to map",
@@ -1192,7 +1191,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
     {
         if (kit == 0 && bitFindHigh(context) == LEVEL::Part)
         {
-            synth->getRuntime().Log("Kit item 1 always enabled.");
+            synth->getRuntime().Log("Kit item 1 always on.");
             return done_msg;
         }
         else

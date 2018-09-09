@@ -5,6 +5,9 @@ yoshimi 1.5.8 M
 * Improved CLI prompt information.
 * Further refinements to CLI controls and messages.
 * CLI LFO & Envelope enables inplemented.
+* Simplifed ON/OFF controls in CLI lists.
+  Can still actually use any of:
+  ENable, ON, YEs or DIsable, OFf, NO
 
 2018-9-8 Will
 * Added CLI placeholders for LFOs and filters.
