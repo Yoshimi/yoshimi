@@ -109,8 +109,8 @@ class CmdInterface : private MiscFuncs
         char welcomeBuffer [128];
 
         int voiceNumber;
-        int kitmode;
-        int kitnumber;
+        int kitMode;
+        int kitNumber;
         int npart;
 
         int nFX;
