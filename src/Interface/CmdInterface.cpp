@@ -174,7 +174,7 @@ string partlist [] = {
     "  Type <s>",               "the effect type",
     "  PREset <n3>",            "set numbered effect preset to n3",
     "  Send <n3> <n4>",         "send part to system effect n3 at volume n4",
-    "KMode <s>",                "set part to kit mode (ON, {other})",
+    "KMode <s>",                "set part to kit mode (MUlti, SIngle, CRoss, OFf)",
     "  KItem <n>",              "select kit item number (1-16)",
     "    MUte <s>",             "silence this item (ON, {other})",
     "    KEffect <n>",          "select effect for this item (0-none, 1-3)",
