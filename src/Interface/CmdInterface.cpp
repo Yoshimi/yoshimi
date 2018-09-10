@@ -461,6 +461,7 @@ void CmdInterface::defaults()
     kitMode = 0;
     kitNumber = 0;
     voiceNumber = 0;
+    insertType = 0;
 }
 
 
@@ -1261,10 +1262,10 @@ int CmdInterface::partCommonControls(unsigned char controlType)
 
 int CmdInterface::LFOselect(unsigned char controlType)
 {
-    int cmd;
-    float value;
+    int cmd = -1;
+    float value = -1;
     int group = -1;
-    if (point[0] == 0)
+    if (lineEnd(controlType))
         return done_msg;
 
     int engine = contextToEngines();
@@ -1272,22 +1273,27 @@ int CmdInterface::LFOselect(unsigned char controlType)
         engine += voiceNumber;
 
     if (matchnMove(2, point, "amplitude"))
-    {
         group = TOPLEVEL::insertType::amplitude;
-        cmd = ADDVOICE::control::enableAmplitudeLFO;
-    }
     else if (matchnMove(2, point, "frequency"))
-    {
         group = TOPLEVEL::insertType::frequency;
-        cmd = ADDVOICE::control::enableFrequencyLFO;
-    }
     else if (matchnMove(2, point, "filter"))
-    {
         group = TOPLEVEL::insertType::filter;
-        cmd = ADDVOICE::control::enableFilterLFO;
-    }
+    if (group > -1)
+        insertType = group;
     else
-        return opp_msg;
+        group = insertType;
+    switch (group)
+    {
+        case TOPLEVEL::insertType::amplitude:
+            cmd = ADDVOICE::control::enableAmplitudeLFO;
+            break;
+        case TOPLEVEL::insertType::frequency:
+            cmd = ADDVOICE::control::enableFrequencyLFO;
+            break;
+        case TOPLEVEL::insertType::filter:
+            cmd = ADDVOICE::control::enableFilterLFO;
+            break;
+    }
 
     value = toggle();
     if (value > -1)
@@ -1301,6 +1307,8 @@ int CmdInterface::LFOselect(unsigned char controlType)
                 return reply;
         }
     }
+    if (lineEnd(controlType))
+        return done_msg;
 
     value = -1;
     cmd = -1;
@@ -1361,7 +1369,7 @@ int CmdInterface::filterSelect(unsigned char controlType)
     int cmd = -1;
     float value = -1;
     int param = UNUSED;
-    if (point[0] == 0)
+    if (lineEnd(controlType))
         return done_msg;
 
     int engine = contextToEngines();
@@ -1480,10 +1488,10 @@ int CmdInterface::filterSelect(unsigned char controlType)
 
 int CmdInterface::envelopeSelect(unsigned char controlType)
 {
-    int cmd;
-    float value;
+    int cmd = -1;
+    float value = -1;
     int group = -1;
-    if (point[0] == 0)
+    if (lineEnd(controlType))
         return done_msg;
 
     int engine = contextToEngines();
@@ -1491,33 +1499,41 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
         engine += voiceNumber;
 
     if (matchnMove(2, point, "amplitute"))
-    {
         group = TOPLEVEL::insertType::amplitude;
-        cmd = ADDVOICE::control::enableAmplitudeEnvelope;
-    }
     else if (matchnMove(2, point, "frequency"))
-    {
         group = TOPLEVEL::insertType::frequency;
-        cmd = ADDVOICE::control::enableFrequencyEnvelope;
-    }
     else if (matchnMove(2, point, "filter"))
-    {
         group = TOPLEVEL::insertType::filter;
-        cmd = ADDVOICE::control::enableFilterEnvelope;
-    }
     else if (matchnMove(2, point, "bandwidth"))
     {
         if(bitTest(context, LEVEL::SubSynth))
-        {
             group = TOPLEVEL::insertType::bandwidth;
-            cmd = SUBSYNTH::control::enableBandwidthEnvelope;
-        }
         else
             return available_msg;
     }
-    else
-        return opp_msg;
 
+    if (group > -1)
+        insertType = group;
+    else
+        group = insertType;
+
+    switch (group)
+    {
+        case TOPLEVEL::insertType::amplitude:
+            cmd = ADDVOICE::control::enableAmplitudeEnvelope;
+            break;
+        case TOPLEVEL::insertType::frequency:
+            cmd = ADDVOICE::control::enableFrequencyEnvelope;
+            break;
+        case TOPLEVEL::insertType::filter:
+            cmd = ADDVOICE::control::enableFilterEnvelope;
+            break;
+        case TOPLEVEL::insertType::bandwidth:
+            cmd = SUBSYNTH::control::enableBandwidthEnvelope;
+            break;
+    }
+    if (lineEnd(controlType))
+        return done_msg;
 
     value = toggle();
     if (value > -1)
@@ -1764,7 +1780,30 @@ string CmdInterface::findStatus(bool show)
 
         if (bitTest(context, LEVEL::LFO))
         {
-            text += ", LFO";
+            int cmd = -1;
+            switch (insertType)
+            {
+                case TOPLEVEL::insertType::amplitude:
+                    cmd = ADDVOICE::control::enableAmplitudeLFO;
+                    text += ", amp";
+                    break;
+                case TOPLEVEL::insertType::frequency:
+                    cmd = ADDVOICE::control::enableFrequencyLFO;
+                    text += ", freq";
+                    break;
+                case TOPLEVEL::insertType::filter:
+                    cmd = ADDVOICE::control::enableFilterLFO;
+                    text += ", filt";
+                    break;
+            }
+            text += " LFO";
+            if (engine == PART::engine::addVoice1)
+            {
+                if (readControl(cmd, npart, kitNumber, engine + voiceNumber))
+                    text += " on";
+            }
+            else
+                text += " on";
         }
         else if (bitTest(context, LEVEL::Filter))
         {
@@ -1784,7 +1823,34 @@ string CmdInterface::findStatus(bool show)
         }
         else if (bitTest(context, LEVEL::Envelope))
         {
-            text += ", Envel";
+            int cmd = -1;
+            switch (insertType)
+            {
+                case TOPLEVEL::insertType::amplitude:
+                    cmd = ADDVOICE::control::enableAmplitudeEnvelope;
+                    text += ", amp";
+                    break;
+                case TOPLEVEL::insertType::frequency:
+                    cmd = ADDVOICE::control::enableFrequencyEnvelope;
+                    text += ", freq";
+                    break;
+                case TOPLEVEL::insertType::filter:
+                    cmd = ADDVOICE::control::enableFilterEnvelope;
+                    text += ", filt";
+                    break;
+                case TOPLEVEL::insertType::bandwidth:
+                    cmd = SUBSYNTH::control::enableBandwidthEnvelope;
+                    text += ", band";
+                    break;
+            }
+            text += " Envel";
+            if (engine == PART::engine::addVoice1 || (engine == PART::engine::subSynth && cmd != ADDVOICE::control::enableAmplitudeEnvelope && cmd != ADDVOICE::control::enableFilterEnvelope))
+            {
+                if (readControl(cmd, npart, kitNumber, engine + voiceNumber))
+                    text += " on";
+            }
+            else
+                text += " on";
         }
     }
     else if (bitTest(context, LEVEL::Scale))
@@ -2698,18 +2764,21 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
     if (matchnMove(3, point, "addsynth"))
     {
         bitSet(context, LEVEL::AddSynth);
+        insertType = TOPLEVEL::insertType::amplitude;
         return addSynth(controlType);
     }
 
     if (matchnMove(3, point, "subsynth"))
     {
         bitSet(context, LEVEL::SubSynth);
+        insertType = TOPLEVEL::insertType::amplitude;
         return subSynth(controlType);
     }
 
     if (matchnMove(3, point, "padsynth"))
     {
         bitSet(context, LEVEL::PadSynth);
+        insertType = TOPLEVEL::insertType::amplitude;
         return padSynth(controlType);
     }
 

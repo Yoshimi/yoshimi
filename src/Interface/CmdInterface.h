@@ -107,7 +107,7 @@ class CmdInterface : private MiscFuncs
         char *point;
         SynthEngine *synth;
         char welcomeBuffer [128];
-
+        int insertType;
         int voiceNumber;
         int kitMode;
         int kitNumber;

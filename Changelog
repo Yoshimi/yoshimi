@@ -1,5 +1,10 @@
 yoshimi 1.5.8 M
 
+2018-9-10
+* CLI lfos & envelopes remember last type used.
+  amplitude, frequency, filter bandwidth
+* CLI prompt now shows type and status of these.
+
 2018-9-9 Will
 * Optimised some CLI selection routines.
 * Improved CLI prompt information.
