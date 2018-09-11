@@ -1517,7 +1517,7 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
     else
         group = insertType;
 
-    switch (group)
+    switch (insertType)
     {
         case TOPLEVEL::insertType::amplitude:
             cmd = ADDVOICE::control::enableAmplitudeEnvelope;
@@ -1548,32 +1548,15 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
             return available_msg;
     }
 
+    if (matchnMove(2, point, "freemode"))
+    {
+        return sendNormal((toggle() == 1), controlType, ENVELOPEINSERT::control::enableFreeMode, npart, kitNumber, engine, TOPLEVEL::insert::envelopeGroup, insertType);
+    }
+
+    // common controls
     value = -1;
     cmd = -1;
-    if (matchnMove(1, point, "attack"))
-    {
-        if (matchnMove(1, point, "level"))
-            cmd = ENVELOPEINSERT::control::attackLevel;
-        else if (matchnMove(1, point, "time"))
-            cmd = ENVELOPEINSERT::control::attackTime;
-    }
-    else if (matchnMove(1, point, "decay"))
-    {
-        if (matchnMove(1, point, "level"))
-            cmd = ENVELOPEINSERT::control::decayLevel;
-        else if (matchnMove(1, point, "time"))
-            cmd = ENVELOPEINSERT::control::decayTime;
-    }
-    else if (matchnMove(1, point, "sustain"))
-        cmd = ENVELOPEINSERT::control::sustainLevel;
-    else if (matchnMove(1, point, "release"))
-    {
-        if (matchnMove(1, point, "level"))
-            cmd = ENVELOPEINSERT::control::releaseLevel;
-        else if (matchnMove(1, point, "time"))
-            cmd = ENVELOPEINSERT::control::releaseTime;
-    }
-    else if (matchnMove(1, point, "expand"))
+    if (matchnMove(2, point, "expand"))
         cmd = ENVELOPEINSERT::control::stretch;
     else if (matchnMove(1, point, "force"))
     {
@@ -1586,6 +1569,40 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
         value = (toggle() == 1);
     }
 
+    bool freeMode = readControl(ENVELOPEINSERT::control::enableFreeMode, npart, kitNumber, engine, TOPLEVEL::insert::envelopeGroup, insertType);
+
+    if (freeMode && cmd == -1)
+    {
+        synth->getRuntime().Log("no freemode controls yet");
+        return done_msg;
+    }
+    else if (cmd == -1)
+    {
+        if (matchnMove(1, point, "attack"))
+        {
+            if (matchnMove(1, point, "level"))
+                cmd = ENVELOPEINSERT::control::attackLevel;
+            else if (matchnMove(1, point, "time"))
+                cmd = ENVELOPEINSERT::control::attackTime;
+        }
+        else if (matchnMove(1, point, "decay"))
+        {
+            if (matchnMove(1, point, "level"))
+                cmd = ENVELOPEINSERT::control::decayLevel;
+            else if (matchnMove(1, point, "time"))
+                cmd = ENVELOPEINSERT::control::decayTime;
+        }
+        else if (matchnMove(1, point, "sustain"))
+            cmd = ENVELOPEINSERT::control::sustainLevel;
+        else if (matchnMove(1, point, "release"))
+        {
+            if (matchnMove(1, point, "level"))
+                cmd = ENVELOPEINSERT::control::releaseLevel;
+            else if (matchnMove(1, point, "time"))
+                cmd = ENVELOPEINSERT::control::releaseTime;
+        }
+    }
+
     if (cmd == -1)
         return opp_msg;
 
@@ -1596,9 +1613,9 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
         value = string2float(point);
     }
 
-    //cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  parameter " << int(group) << endl;
+    //cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  parameter " << int(insertType) << endl;
 
-    int reply = sendNormal(string2float(point), controlType, cmd, npart, kitNumber, engine, TOPLEVEL::insert::envelopeGroup, group);
+    int reply = sendNormal(string2float(point), controlType, cmd, npart, kitNumber, engine, TOPLEVEL::insert::envelopeGroup, insertType);
     if (reply != todo_msg)
         return reply;
     return done_msg;
@@ -1844,6 +1861,8 @@ string CmdInterface::findStatus(bool show)
                     break;
             }
             text += " Envel";
+            if (readControl(ENVELOPEINSERT::control::enableFreeMode, npart, kitNumber, engine, TOPLEVEL::insert::envelopeGroup, insertType))
+                text += " free";
             if (engine == PART::engine::addVoice1 || (engine == PART::engine::subSynth && cmd != ADDVOICE::control::enableAmplitudeEnvelope && cmd != ADDVOICE::control::enableFilterEnvelope))
             {
                 if (readControl(cmd, npart, kitNumber, engine + voiceNumber))

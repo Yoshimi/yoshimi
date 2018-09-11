@@ -1,5 +1,9 @@
 yoshimi 1.5.8 M
 
+2018-9-11 Will
+* Added CLI placeholder for freemode envelopes.
+* Added freemode status to prompt.
+
 2018-9-10
 * CLI lfos & envelopes remember last type used.
   amplitude, frequency, filter bandwidth
