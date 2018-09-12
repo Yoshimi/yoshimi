@@ -1430,49 +1430,63 @@ int CmdInterface::filterSelect(unsigned char controlType)
         value = string2int(point) - 1;
         cmd = FILTERINSERT::control::stages;
     }
-    else if (matchnMove(2, point, "type"))
+    if (cmd == -1)
     {
         int baseType = readControl(FILTERINSERT::control::baseType, npart, kitNumber, engine, TOPLEVEL::insert::filterGroup);
-        if (baseType == 0)
+        if (baseType == 1) // formant
         {
-            if (matchnMove(2, point, "l1"))
-                value = 0;
-            else if (matchnMove(2, point, "h1"))
-                value = 1;
-            if (matchnMove(2, point, "l2"))
-                value = 2;
-            else if (matchnMove(2, point, "h2"))
-                value = 3;
-            else if (matchnMove(2, point, "bpass"))
-                value = 4;
-            else if (matchnMove(2, point, "stop"))
-                value = 5;
-            else if (matchnMove(2, point, "peak"))
-                value = 6;
-            else if (matchnMove(2, point, "lshelf"))
-                value = 7;
-            else if (matchnMove(2, point, "hshelf"))
-                value = 8;
-            else
-                return range_msg;
-            cmd = FILTERINSERT::control::analogType;
+            synth->getRuntime().Log("Formant editor not done yet");
+            return done_msg;
         }
-        else if (baseType == 2)
+        else if (matchnMove(2, point, "type"))
         {
-            if (matchnMove(1, point, "low"))
-                value = 0;
-            else if (matchnMove(1, point, "high"))
-                value = 1;
-            else if (matchnMove(1, point, "band"))
-                value = 2;
-            else if (matchnMove(1, point, "stop"))
-                value = 3;
-            else
-                return range_msg;
-            cmd = FILTERINSERT::control::stateVariableType;
+            switch (baseType)
+            {
+                case 0: // analog
+                {
+                    if (matchnMove(2, point, "l1"))
+                        value = 0;
+                    else if (matchnMove(2, point, "h1"))
+                        value = 1;
+                    if (matchnMove(2, point, "l2"))
+                        value = 2;
+                    else if (matchnMove(2, point, "h2"))
+                        value = 3;
+                    else if (matchnMove(2, point, "bpass"))
+                        value = 4;
+                    else if (matchnMove(2, point, "stop"))
+                        value = 5;
+                    else if (matchnMove(2, point, "peak"))
+                        value = 6;
+                    else if (matchnMove(2, point, "lshelf"))
+                        value = 7;
+                    else if (matchnMove(2, point, "hshelf"))
+                        value = 8;
+                    else
+                        return range_msg;
+                    cmd = FILTERINSERT::control::analogType;
+                    break;
+                }
+                case 2: // state variable
+                {
+                    if (matchnMove(1, point, "low"))
+                        value = 0;
+                    else if (matchnMove(1, point, "high"))
+                        value = 1;
+                    else if (matchnMove(1, point, "band"))
+                        value = 2;
+                    else if (matchnMove(1, point, "stop"))
+                        value = 3;
+                    else
+                        return range_msg;
+                    cmd = FILTERINSERT::control::stateVariableType;
+                    break;
+                }
+                default:
+                    return available_msg;
+                    break;
+            }
         }
-        else
-            return available_msg;
     }
 
     //cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  parameter " << int(param) << endl;
@@ -1824,7 +1838,21 @@ string CmdInterface::findStatus(bool show)
         }
         else if (bitTest(context, LEVEL::Filter))
         {
-            text += ", Filter";
+            int baseType = readControl(FILTERINSERT::control::baseType, npart, kitNumber, engine, TOPLEVEL::insert::filterGroup);
+            text += ", ";
+            switch (baseType)
+            {
+                case 0:
+                    text += "analog";
+                    break;
+                case 1:
+                    text += "formant";
+                    break;
+                case 2:
+                    text += "state var";
+                    break;
+            }
+            text += " Filter";
             if (engine == PART::engine::subSynth)
             {
                 if (readControl(SUBSYNTH::control::enableFilter, npart, kitNumber, engine))
@@ -2612,6 +2640,7 @@ int CmdInterface::addSynth(unsigned char controlType)
     if (matchnMove(1, point, "voice"))
     {
         bitSet(context, LEVEL::AddVoice);
+        insertType = TOPLEVEL::insertType::amplitude;
         return addVoice(controlType);
     }
     if (lineEnd(controlType))

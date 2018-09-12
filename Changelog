@@ -1,5 +1,9 @@
 yoshimi 1.5.8 M
 
+2018-9-12 Will
+* Added CLI placeholder for formant editor.
+* Added filter category to prompt.
+
 2018-9-11 Will
 * Added CLI placeholder for freemode envelopes.
 * Added freemode status to prompt.
