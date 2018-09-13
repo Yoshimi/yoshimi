@@ -1,5 +1,9 @@
 yoshimi 1.5.8 M
 
+2018-9-13 Will
+* Set up CLI list entries for formant filter.
+  Not implemented yet.
+
 2018-9-12 Will
 * Added CLI placeholder for formant editor.
 * Added filter category to prompt.

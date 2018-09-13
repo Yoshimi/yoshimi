@@ -55,11 +55,11 @@ namespace LEVEL{
         SubSynth,
         PadSynth,
         AddVoice,
+        Oscillator,
         Resonance,
         LFO, // amp/freq/filt
         Filter, // params only (slightly confused with env)
         Envelope, // amp/freq/filt/ Sub only band
-        FreeMode
     };
 }
 
