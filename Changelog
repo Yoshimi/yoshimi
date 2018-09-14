@@ -1,6 +1,10 @@
 yoshimi 1.5.8 M
 
 2018-9-13 Will
+* Refactored CLI internal messaging.
+* Implimented CLI scripts.
+
+2018-9-13 Will
 * Set up CLI list entries for formant filter.
   Not implemented yet.
 

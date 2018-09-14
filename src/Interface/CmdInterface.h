@@ -63,7 +63,7 @@ namespace LEVEL{
     };
 }
 
-typedef enum {todo_msg = 0, done_msg, value_msg, name_msg, opp_msg, what_msg, range_msg, low_msg, high_msg, unrecognised_msg, parameter_msg, level_msg, available_msg, failed_msg,} error_messages;
+typedef enum {exit_msg = -1, todo_msg = 0, done_msg, value_msg, name_msg, opp_msg, what_msg, range_msg, low_msg, high_msg, unrecognised_msg, parameter_msg, level_msg, available_msg, failed_msg,} error_messages;
 
 class CmdInterface : private MiscFuncs
 {
@@ -102,11 +102,13 @@ class CmdInterface : private MiscFuncs
         void readLimits(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2);
         int sendNormal(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff);
         int sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff, unsigned char request = 0xff);
-        bool cmdIfaceProcessCommand();
+        int cmdIfaceProcessCommand(char *cCmd);
         char *cCmd;
         char *point;
         SynthEngine *synth;
         char welcomeBuffer [128];
+        int reply;
+        string replyString;
         int insertType;
         int voiceNumber;
         int kitMode;
@@ -120,7 +122,6 @@ class CmdInterface : private MiscFuncs
         int axis;
         int mline;
         unsigned int context;
-        string replyString;
 };
 
 #endif

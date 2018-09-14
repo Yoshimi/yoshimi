@@ -1753,7 +1753,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
             break;
 
         case EFFECT::type::eq:
-            synth->getRuntime().Log("EQ " + to_string(value_int) + "  " + to_string(int(control)));
+            //synth->getRuntime().Log("EQ " + to_string(value_int) + "  " + to_string(int(control)));
             if(control == 0)
             {
                 eqp0->value(value);

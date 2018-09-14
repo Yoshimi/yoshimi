@@ -633,8 +633,8 @@ bool Config::extractConfigData(XMLwrapper *xml)
     checksynthengines = xml->getpar("check_pad_synth", checksynthengines, 0, 1);
     if (tempRoot == 0)
         tempRoot = xml->getpar("root_current_ID", 0, 0, 127);
-    else
-        cout << "root? " << xml->getpar("root_current_ID", 0, 0, 127) << endl;
+    //else
+        //cout << "root? " << xml->getpar("root_current_ID", 0, 0, 127) << endl;
     if (tempBank == 0)
     tempBank = xml->getpar("bank_current_ID", 0, 0, 127);
     xml->exitbranch(); // CONFIGURATION
