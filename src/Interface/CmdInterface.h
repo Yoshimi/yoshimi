@@ -109,6 +109,8 @@ class CmdInterface : private MiscFuncs
         char welcomeBuffer [128];
         int reply;
         string replyString;
+        int filterVowelNumber;
+        int filterFormantNumber;
         int insertType;
         int voiceNumber;
         int kitMode;

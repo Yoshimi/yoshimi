@@ -3472,9 +3472,9 @@ string InterChange::resolveFilter(CommandBlock *getData)
             contstr = "Unrecognised";
     }
     string extra = "";
-    if (control >= 18 && control <= 20)
+    if (control >= FILTERINSERT::control::formantFrequency && control <= FILTERINSERT::control::formantAmplitude)
         extra ="Vowel " + to_string(nvowel) + " Formant " + to_string(nformant) + " ";
-    else if (control == 37)
+    else if (control == FILTERINSERT::control::vowelPositionInSequence)
         extra = "Seq Pos " + to_string(nseqpos) + " ";
 
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Filter " + extra + contstr);

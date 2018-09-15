@@ -469,8 +469,9 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
         case FILTERINSERT::control::formantClearness:
             break;
         case FILTERINSERT::control::formantFrequency:
-            max = 0;
-            def = 0; // all zero denotes random
+            if (request == TOPLEVEL::type::Default)
+                type |= TOPLEVEL::type::Error;
+            // it's random so inhibit default
             break;
         case FILTERINSERT::control::formantQ:
             break;
@@ -485,6 +486,7 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
         case FILTERINSERT::control::formantOctave:
             break;
         case FILTERINSERT::control::numberOfFormants:
+            min = 1;
             max = 12;
             def = 3;
             type &= ~learnable;
@@ -500,6 +502,7 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
             type &= ~learnable;
             break;
         case FILTERINSERT::control::sequenceSize:
+            min = 1;
             max = 8;
             def = 3;
             type &= ~learnable;

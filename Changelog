@@ -4,6 +4,8 @@ yoshimi 1.5.8 M
 * Completed CLI scripts.
 * Implemented CLI context report control.
 * Further CLI clean-ups.
+* Implemented CLI formant filter controls
+  but needs more testing.
 
 2018-9-14 Will
 * Refactored CLI internal messaging.

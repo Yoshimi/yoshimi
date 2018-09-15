@@ -305,20 +305,20 @@ string filterlist [] = {
     "","",
     "formant editor","",
     "Direct <n>",           "bypass LFOs, envelopes",
-    "Center <n>",           "center frequency of sequence",
-    "Range <n>",            "octave range of formants",
+    "FCenter <n>",          "center frequency of sequence",
+    "FRange <n>",           "octave range of formants",
     "Expand <n>",           "stretch overal sequence time",
     "Lucidity <n>",         "clarity of vowels",
     "Morph <n>",            "speed of change between formants",
-    "Size <n>",             "number of vowels in sequence",
-    "Count <n>",            "number of formants in vowels",
-    "Vowel <n>",            "vowel being processed",
+    "SIze <n>",             "number of vowels in sequence",
+    "COunt <n>",            "number of formants in vowels",
+    "VOwel <n>",            "vowel being processed",
     "Point <n1> <n2>",      "vowel n1 at sequence position n2",
     "Item",                 "formant being processed",
     "per formant","",
-    "  Frequency <n>",      "Center of formant frequency",
-    "  Q <n>",              "bandwidth of formant",
-    "  Gain <n>",           "amplitude of formant",
+    "  FFrequency <n>",     "Center of formant frequency",
+    "  FQ <n>",             "bandwidth of formant",
+    "  FGain <n>",          "amplitude of formant",
     "end"
 };
 
@@ -481,6 +481,8 @@ void CmdInterface::defaults()
     kitNumber = 0;
     voiceNumber = 0;
     insertType = 0;
+    filterVowelNumber = 0;
+    filterFormantNumber = 0;
 }
 
 
@@ -1427,8 +1429,77 @@ int CmdInterface::filterSelect(unsigned char controlType)
         int baseType = readControl(FILTERINSERT::control::baseType, npart, kitNumber, engine, TOPLEVEL::insert::filterGroup);
         if (baseType == 1) // formant
         {
-            synth->getRuntime().Log("Formant editor not done yet");
-            return done_msg;
+            if (matchnMove(1, point, "direct"))
+            {
+                if (lineEnd(controlType))
+                    return value_msg;
+                value = (toggle() == 1);
+                cmd = FILTERINSERT::control::negateInput;
+            }
+            else if (matchnMove(2, point, "fcenter"))
+                cmd = FILTERINSERT::control::formantCenter;
+            else if (matchnMove(2, point, "frange"))
+                cmd = FILTERINSERT::control::formantOctave;
+            else if (matchnMove(1, point, "expand"))
+                cmd = FILTERINSERT::control::formantStretch;
+            else if (matchnMove(1, point, "lucidity"))
+                cmd = FILTERINSERT::control::formantClearness;
+            else if (matchnMove(1, point, "morph"))
+                cmd = FILTERINSERT::control::formantSlowness;
+            else if (matchnMove(2, point, "size"))
+            {
+                if (lineEnd(controlType))
+                    return value_msg;
+                value = string2int(point);
+                cmd = FILTERINSERT::control::sequenceSize;
+            }
+            else if (matchnMove(2, point, "count"))
+            {
+                if (lineEnd(controlType))
+                    return value_msg;
+                value = string2int(point);
+                cmd = FILTERINSERT::control::numberOfFormants;
+            }
+            else if (matchnMove(2, point, "vowel"))
+            {
+                if (lineEnd(controlType))
+                    return value_msg;
+                value = string2int(point);
+                filterVowelNumber = string2int(point);
+                return done_msg;
+            }
+            else if (matchnMove(1, point, "point"))
+            {
+                if (lineEnd(controlType))
+                    return value_msg;
+                value = string2int(point);
+                if (lineEnd(controlType))
+                    return value_msg;
+                point = skipChars(point);
+                int position = string2int(point);
+                cout << "val " << value << "  pos " << position << endl;
+                return sendNormal(value, controlType, FILTERINSERT::control::vowelPositionInSequence, npart, kitNumber, engine, TOPLEVEL::insert::filterGroup, position);
+            }
+            else if (matchnMove(1, point, "item"))
+            {
+                if (lineEnd(controlType))
+                    return value_msg;
+                filterFormantNumber = string2int(point);
+                return done_msg;
+            }
+            else
+            {
+                if (matchnMove(2, point, "ffrequency"))
+                    cmd = FILTERINSERT::control::formantFrequency;
+                else if (matchnMove(2, point, "fq"))
+                    cmd = FILTERINSERT::control::formantQ;
+                else if (matchnMove(2, point, "fgain"))
+                    cmd = FILTERINSERT::control::formantAmplitude;
+                if (cmd == -1)
+                    return range_msg;
+                value = string2int(point);
+                return sendNormal(value, controlType, cmd, npart, kitNumber, engine, TOPLEVEL::insert::filterGroup, filterFormantNumber, filterVowelNumber);
+            }
         }
         else if (matchnMove(2, point, "type"))
         {
@@ -1769,7 +1840,7 @@ string CmdInterface::findStatus(bool show)
 
     if (bitTest(context, LEVEL::Part))
     {
-        text += "Part ";
+        text += " Part ";
         text += to_string(int(npart) + 1);
         if (readControl(PART::control::enable, npart))
             text += " on";
@@ -4398,23 +4469,19 @@ void CmdInterface::cmdIfaceCommandLoop()
             {
                 reply = todo_msg;
                 replyString = "";
-                int next = cmdIfaceProcessCommand(cCmd);
-                //cout << "reply " << replies[reply] << endl;
-                //cout << "next " << replies[next] << endl;
-                if (next > done_msg)
-                    reply = next;
+                int reply = cmdIfaceProcessCommand(cCmd);
+                exit = (reply == exit_msg);
 
                 if (reply == what_msg)
                     synth->getRuntime().Log(replyString + replies[what_msg]);
                 else if (reply > done_msg)
                     synth->getRuntime().Log(replies[reply]);
-
                 add_history(cCmd);
             }
             free(cCmd);
             cCmd = NULL;
 
-            if (reply != exit_msg)
+            if (!exit)
             {
                 do
                 { // create enough delay for most ops to complete
@@ -4422,19 +4489,21 @@ void CmdInterface::cmdIfaceCommandLoop()
                 }
                 while (synth->getRuntime().runSynth && !synth->getRuntime().finishedCLI);
             }
-
-            string prompt = "yoshimi";
-            if (currentInstance > 0)
-                prompt += (":" + asString(currentInstance));
-            int expose = readControl(CONFIG::control::exposeStatus, TOPLEVEL::section::config);
-            if (expose == 1)
-                synth->getRuntime().Log(findStatus(true));
-            else if (expose == 2)
-                prompt += findStatus(true);
-            prompt += "> ";
-            sprintf(welcomeBuffer,"%s",prompt.c_str());
+            if (synth->getRuntime().runSynth)
+            {
+                string prompt = "yoshimi";
+                if (currentInstance > 0)
+                    prompt += (":" + asString(currentInstance));
+                int expose = readControl(CONFIG::control::exposeStatus, TOPLEVEL::section::config);
+                if (expose == 1)
+                    synth->getRuntime().Log("@" + findStatus(true));
+                else if (expose == 2)
+                    prompt += findStatus(true);
+                prompt += "> ";
+                sprintf(welcomeBuffer,"%s",prompt.c_str());
+            }
         }
-        if (!exit)
+        if (!exit && synth->getRuntime().runSynth)
             usleep(20000);
     }
 
