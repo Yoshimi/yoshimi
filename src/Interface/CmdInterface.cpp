@@ -98,6 +98,7 @@ string toplist [] = {
     "  Bank [s <n1>] <n2>",     "delete bank ID n2 (and all instruments) from current root (or 'Root' n1)",
     "  YOshimi <n>",            "close instance ID",
     "  MLearn <s> [n]",         "delete midi learned 'ALL' whole list, or '@'(n) line",
+    "RUN <s>",                  "Execute named command script",
     "Set/Read/MLearn",          "manage all main parameters",
     "MINimum/MAXimum/DEFault",  "find ranges",
     "  Part",                   "enter context level",
@@ -132,6 +133,7 @@ string configlist [] = {
     "Xml <n>",                  "compression (0-9)",
     "REports [s]",              "destination (Stdout, other = console)",
     "SAved [s]",                "Saved instrument type (Legacy {.xiz}, Yoshimi {.xiy}, Both)",
+    "Expose <s>",               "Show current context level (ON, OFf, PRompt)",
 
     "STate [s]",                "* autoload default at start (ON, {other})",
     "Hide [s]",                 "non-fatal errors (ON, {other})",
@@ -1736,9 +1738,35 @@ int CmdInterface::commandList()
 
 string CmdInterface::findStatus(bool show)
 {
-    string text = " ";
+    string text = "";
     int kit = UNUSED;
     int insert = UNUSED;
+
+    // effects block needs cleaning up
+    // to remove direct reads
+    if (bitTest(context, LEVEL::AllFX))
+    {
+        if (bitTest(context, LEVEL::Part))
+        {
+            text += " Part ";
+            text += to_string(int(npart) + 1);
+        }
+        else if (bitTest(context, LEVEL::InsFX))
+        {
+            text += " Ins";
+            nFXtype = synth->insefx[nFX]->geteffect();
+        }
+        else
+        {
+            text += " Sys";
+            nFXtype = synth->sysefx[nFX]->geteffect();
+        }
+        text += (" efx " + asString(nFX + 1) + " " + fx_list[nFXtype].substr(0, 5));
+        if (nFXtype > 0)
+            text += ("-" + asString(nFXpreset + 1));
+        return text;
+    }
+
     if (bitTest(context, LEVEL::Part))
     {
         text += "Part ";
@@ -2320,6 +2348,16 @@ int CmdInterface::commandConfig(unsigned char controlType)
         value = toggle();
         if (value == -1)
             return value_msg;
+    }
+
+    else if (matchnMove(1, point, "expose"))
+    {
+        value = toggle();
+        if (value == -1 && matchnMove(2, point, "prompt"))
+            value = 2;
+        if (value == -1)
+            return value_msg;
+        command = CONFIG::control::exposeStatus;
     }
 
     else if (matchnMove(1, point, "jack"))
@@ -3373,7 +3411,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
     if (matchnMove(1, point, "list"))
         return commandList();
 
-    if (matchnMove(3, point, "execute"))
+    if (matchnMove(3, point, "run"))
     {
         string filename = string(point);
         if (filename > "!")
@@ -3386,6 +3424,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
             FILE *readfile = fopen(filename.c_str(), "r");
             if (readfile)
             {
+                context = LEVEL::Top; // start from top level
                 while (!feof(readfile) && isok)
                 {
                     if(fgets(to_send , 0xff , readfile))
@@ -3400,12 +3439,12 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                     }
                 }
                 fclose (readfile);
-                findStatus(false);
             }
             else
                 synth->getRuntime().Log("Can't read file " + filename);
             free (to_send);
             to_send = NULL;
+            context = LEVEL::Top; // leave it tidy
             return done_msg;
         }
         replyString = "Exec";
@@ -3722,234 +3761,145 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
             }
             if (ch != UNUSED && ch >= NUM_MIDI_CHANNELS)
                 return range_msg;
-            else if (point[0] == 0)
+            if (point[0] == 0)
                 return name_msg;
+            string name;
+            if (point[0] == '@')
+            {
+                point += 1;
+                point = skipSpace(point);
+                tmp = string2int(point);
+                if (tmp <= 0)
+                    return value_msg;
+                name = historySelect(5, tmp - 1);
+                if (name == "")
+                    return done_msg;
+            }
             else
             {
-                bool ok = true;
-                string name;
-                if (point[0] == '@')
-                {
-                    point += 1;
-                    point = skipSpace(point);
-                    tmp = string2int(point);
-                    if (tmp <= 0)
-                    {
-                        ok = false;
-                        return value_msg;
-                    }
-                    name = historySelect(5, tmp - 1);
-                    if (name == "")
-                    {
-                        ok = false;
-                        return done_msg;
-                    }
-                }
-                else
-                {
-                    name = (string)point;
-                    if (name == "")
-                    {
-                        ok = false;
-                        return name_msg;
-                    }
-                }
-                if (ok)
-                {
-                    sendDirect(0, TOPLEVEL::type::Write, MAIN::control::loadNamedVector, TOPLEVEL::section::main, UNUSED, UNUSED, ch, TOPLEVEL::route::adjustAndLoopback, miscMsgPush(name));
-                }
-                return done_msg;
+                name = (string)point;
+                if (name == "")
+                    return name_msg;
             }
+            sendDirect(0, TOPLEVEL::type::Write, MAIN::control::loadNamedVector, TOPLEVEL::section::main, UNUSED, UNUSED, ch, TOPLEVEL::route::adjustAndLoopback, miscMsgPush(name));
+            return done_msg;
         }
-        else if(matchnMove(2, point, "state"))
+        if(matchnMove(2, point, "state"))
         {
             if (point[0] == 0)
                 return name_msg;
+            string name;
+            if (point[0] == '@')
+            {
+                point += 1;
+                point = skipSpace(point);
+                tmp = string2int(point);
+                if (tmp <= 0)
+                    return value_msg;
+                name = historySelect(4, tmp - 1);
+                if (name == "")
+                    return done_msg;
+            }
             else
             {
-                bool ok = true;
-                string name;
-                if (point[0] == '@')
-                {
-                    point += 1;
-                    point = skipSpace(point);
-                    tmp = string2int(point);
-                    if (tmp <= 0)
-                    {
-                        ok = false;
-                        return value_msg;
-                    }
-                    name = historySelect(4, tmp - 1);
-                    if (name == "")
-                    {
-                        ok = false;
-                        return done_msg;
-                    }
-                }
-                else
-                {
-                    name = (string)point;
-                    if (name == "")
-                    {
-                        ok = false;
+                name = (string)point;
+                if (name == "")
                         return name_msg;
-                    }
-                }
-                if (ok)
-                {
-                    sendDirect(0, TOPLEVEL::type::Write, MAIN::control::loadNamedState, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::adjustAndLoopback, miscMsgPush(name));
-                    return done_msg;
-                }
             }
+            sendDirect(0, TOPLEVEL::type::Write, MAIN::control::loadNamedState, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::adjustAndLoopback, miscMsgPush(name));
+            return done_msg;
         }
-        else if (matchnMove(2, point, "scale"))
+        if (matchnMove(2, point, "scale"))
         {
             if (point[0] == 0)
                 return name_msg;
+            string name;
+            if (point[0] == '@')
+            {
+                point += 1;
+                point = skipSpace(point);
+                tmp = string2int(point);
+                if (tmp <= 0)
+                    return value_msg;
+                name = historySelect(3, tmp - 1);
+                if (name == "")
+                    return done_msg;
+            }
             else
             {
-                bool ok = true;
-                string name;
-                if (point[0] == '@')
-                {
-                    point += 1;
-                    point = skipSpace(point);
-                    tmp = string2int(point);
-                    if (tmp <= 0)
-                    {
-                        ok = false;
-                        return value_msg;
-                    }
-                    name = historySelect(3, tmp - 1);
-                    if (name == "")
-                    {
-                        ok = false;
-                        return done_msg;
-                    }
-                }
-                else
-                {
-                    name = (string)point;
-                    if (name == "")
-                    {
-                        ok = false;
-                        return name_msg;
-                    }
-                }
-                if (ok)
-                {
-                    sendDirect(0, TOPLEVEL::type::Write, MAIN::control::loadNamedScale, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(name));
-                    return done_msg;
-                }
+                name = (string)point;
+                if (name == "")
+                    return name_msg;
             }
+            sendDirect(0, TOPLEVEL::type::Write, MAIN::control::loadNamedScale, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(name));
+            return done_msg;
         }
-        else if (matchnMove(1, point, "patchset"))
+        if (matchnMove(1, point, "patchset"))
         {
-            bool ok = true;
             if (point[0] == 0)
-            {
-                ok = false;
                 return name_msg;
+            string name;
+            if (point[0] == '@')
+            {
+                point += 1;
+                point = skipSpace(point);
+                tmp = string2int(point);
+                if (tmp <= 0)
+                    return value_msg;
+                name = historySelect(2, tmp - 1);
+                if (name == "")
+                    return done_msg;
             }
             else
             {
-                string name;
-                if (point[0] == '@')
-                {
-                    point += 1;
-                    point = skipSpace(point);
-                    tmp = string2int(point);
-                    if (tmp <= 0)
-                    {
-                        ok = false;
-                        return value_msg;
-                    }
-                    name = historySelect(2, tmp - 1);
-                    if (name == "")
-                    {
-                        ok = false;
-                        return done_msg;
-                    }
-                }
-                else
-                {
-                    name = (string)point;
-                    if (name == "")
-                    {
-                        ok = false;
-                        return name_msg;
-                    }
-                }
-                if (ok)
-                {
-                    sendDirect(0, TOPLEVEL::type::Write, MAIN::control::loadNamedPatchset, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::adjustAndLoopback, miscMsgPush(name));
-                    return done_msg;
-                }
+                name = (string)point;
+                if (name == "")
+                    return name_msg;
             }
+            sendDirect(0, TOPLEVEL::type::Write, MAIN::control::loadNamedPatchset, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::adjustAndLoopback, miscMsgPush(name));
+            return done_msg;
         }
-        else if (matchnMove(1, point, "instrument"))
+        if (matchnMove(1, point, "instrument"))
         {
-            bool ok = true;
             if (point[0] == 0)
-            {
-                ok = false;
                 return name_msg;
+            string name;
+            if (point[0] == '@')
+            {
+                point += 1;
+                point = skipSpace(point);
+                tmp = string2int(point);
+                if (tmp <= 0)
+                    return value_msg;
+                name = historySelect(1, tmp - 1);
+                if (name == "")
+                    return done_msg;
             }
             else
             {
-                string name;
-                if (point[0] == '@')
-                {
-                    point += 1;
-                    point = skipSpace(point);
-                    tmp = string2int(point);
-                    if (tmp <= 0)
-                    {
-                        ok = false;
-                        return value_msg;
-                    }
-                    name = historySelect(1, tmp - 1);
-                    if (name == "")
-                    {
-                        ok = false;
-                        return done_msg;
-                    }
-                }
-                else
-                {
-                    name = (string)point;
-                    if (name == "")
-                    {
-                        ok = false;
-                        return name_msg;
-                    }
-                }
-                if (ok)
-                {
-                    sendDirect(npart, TOPLEVEL::type::Write, MAIN::control::loadNamedInstrument, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(name));
-                    return done_msg;
-                }
+                name = (string)point;
+                if (name == "")
+                    return name_msg;
             }
+
+            sendDirect(npart, TOPLEVEL::type::Write, MAIN::control::loadNamedInstrument, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(name));
+            return done_msg;
         }
-        else
-        {
-            replyString = "load";
-            return what_msg;
-        }
+        replyString = "load";
+        return what_msg;
     }
 
-    else if (matchnMove(2, point, "save"))
+    if (matchnMove(2, point, "save"))
+    {
         if(matchnMove(2, point, "mlearn"))
         {
             if (point[0] == 0)
                 return name_msg;
-            else
-            {
-                sendNormal(0, TOPLEVEL::type::Write, MIDILEARN::control::saveList, TOPLEVEL::section::midiLearn, 0, 0, 0, 0, miscMsgPush((string) point));
-                return done_msg;
-            }
+
+            sendNormal(0, TOPLEVEL::type::Write, MIDILEARN::control::saveList, TOPLEVEL::section::midiLearn, 0, 0, 0, 0, miscMsgPush((string) point));
+            return done_msg;
         }
-        else if(matchnMove(2, point, "vector"))
+        if(matchnMove(2, point, "vector"))
         {
             tmp = chan;
             if(matchnMove(1, point, "channel"))
@@ -3959,69 +3909,56 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
             }
             if (tmp >= NUM_MIDI_CHANNELS || tmp < 0)
                 return range_msg;
-            else if (point[0] == 0)
+            if (point[0] == 0)
                 return name_msg;
-            else
-            {
-                chan = tmp;
-                sendDirect(0, TOPLEVEL::type::Write, MAIN::control::saveNamedVector, TOPLEVEL::section::main, UNUSED, UNUSED, chan, TOPLEVEL::route::lowPriority, miscMsgPush((string) point));
-                return done_msg;
-            }
+            chan = tmp;
+            sendDirect(0, TOPLEVEL::type::Write, MAIN::control::saveNamedVector, TOPLEVEL::section::main, UNUSED, UNUSED, chan, TOPLEVEL::route::lowPriority, miscMsgPush((string) point));
+            return done_msg;
         }
-        else if(matchnMove(2, point, "state"))
+        if(matchnMove(2, point, "state"))
+        {
             if (point[0] == 0)
                 return value_msg;
-            else
-            {
-                sendDirect(0, TOPLEVEL::type::Write, MAIN::control::saveNamedState, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(point)));
-                return done_msg;
-            }
-        else if(matchnMove(1, point, "config"))
+            sendDirect(0, TOPLEVEL::type::Write, MAIN::control::saveNamedState, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(point)));
+            return done_msg;
+        }
+        if(matchnMove(1, point, "config"))
         {
             sendDirect(0, TOPLEVEL::type::Write, CONFIG::control::saveCurrentConfig, TOPLEVEL::section::config, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush("DUMMY"));
+            return done_msg;
         }
 
-        else if (matchnMove(2, point, "scale"))
+        if (matchnMove(2, point, "scale"))
         {
             if (point[0] == 0)
                 return name_msg;
-            else
-            {
-                sendDirect(0, TOPLEVEL::type::Write, MAIN::control::saveNamedScale, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(point)));
-                return done_msg;
-            }
-        }else if (matchnMove(1, point, "patchset"))
-        {
-            if (point[0] == 0)
-                return name_msg;
-            else
-            {
-                sendDirect(0, TOPLEVEL::type::Write, MAIN::control::saveNamedPatchset, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(point)));
-                return done_msg;
-            }
+            sendDirect(0, TOPLEVEL::type::Write, MAIN::control::saveNamedScale, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(point)));
+            return done_msg;
         }
-        else if (matchnMove(1, point, "instrument"))
+        else if (matchnMove(1, point, "patchset"))
+        {
+            if (point[0] == 0)
+                return name_msg;
+            sendDirect(0, TOPLEVEL::type::Write, MAIN::control::saveNamedPatchset, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(point)));
+            return done_msg;
+        }
+        if (matchnMove(1, point, "instrument"))
         {
             if (synth->part[npart]->Pname == "Simple Sound")
             {
                 Runtime.Log("Nothing to save!");
                 return done_msg;
             }
-            else if (point[0] == 0)
+            if (point[0] == 0)
                 return name_msg;
-            else
-            {
-                sendDirect(npart, TOPLEVEL::type::Write, MAIN::control::saveNamedInstrument, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(point)));
-                return done_msg;
-            }
+            sendDirect(npart, TOPLEVEL::type::Write, MAIN::control::saveNamedInstrument, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(point)));
+            return done_msg;
         }
-        else
-        {
-            replyString = "save";
-            return what_msg;
-        }
+        replyString = "save";
+        return what_msg;
+    }
 
-    else if (matchnMove(6, point, "direct"))
+    if (matchnMove(6, point, "direct"))
     {
         unsigned char request;
         float value;
@@ -4489,29 +4426,11 @@ void CmdInterface::cmdIfaceCommandLoop()
             string prompt = "yoshimi";
             if (currentInstance > 0)
                 prompt += (":" + asString(currentInstance));
-
-            prompt += findStatus(true);
-
-            if (bitTest(context, LEVEL::AllFX))
-            {
-                if (!bitTest(context, LEVEL::Part))
-                {
-                    if (bitTest(context, LEVEL::InsFX))
-                    {
-                        prompt += " Ins";
-                        nFXtype = synth->insefx[nFX]->geteffect();
-                    }
-                    else
-                    {
-                        prompt += " Sys";
-                        nFXtype = synth->sysefx[nFX]->geteffect();
-                    }
-                }
-                prompt += (" efx " + asString(nFX + 1) + " " + fx_list[nFXtype].substr(0, 5));
-                if (nFXtype > 0)
-                    prompt += ("-" + asString(nFXpreset + 1));
-            }
-
+            int expose = readControl(CONFIG::control::exposeStatus, TOPLEVEL::section::config);
+            if (expose == 1)
+                synth->getRuntime().Log(findStatus(true));
+            else if (expose == 2)
+                prompt += findStatus(true);
             prompt += "> ";
             sprintf(welcomeBuffer,"%s",prompt.c_str());
         }

@@ -95,6 +95,7 @@ bool         Config::showSplash = true;
 bool         Config::showCLI = true;
 bool         Config::autoInstance = false;
 unsigned int Config::activeInstance = 0;
+int          Config::showCLIcontext = 1;
 
 Config::Config(SynthEngine *_synth, int argc, char **argv) :
     restoreState(false),
@@ -554,6 +555,7 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
     showCLI = xml->getparbool("enable_CLI", showCLI);
     autoInstance = xml->getparbool("enable_auto_instance", autoInstance);
     activeInstance = xml->getparU("active_instances", 0);
+    showCLIcontext = xml->getpar("show_CLI_context", 1, 0, 2);
     xml->exitbranch(); // BaseParameters
     return true;
 }

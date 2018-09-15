@@ -1679,6 +1679,25 @@ string InterChange::resolveConfig(CommandBlock *getData)
             contstr += "Enable Auto Instance";
             yesno = true;
             break;
+        case CONFIG::control::exposeStatus:
+            showValue = false;
+            contstr += "Show CLI context ";
+            switch (value_int)
+            {
+                case 0:
+                    contstr += "off";
+                    break;
+                case 1:
+                    contstr += "on";
+                    break;
+                case 2:
+                    contstr += "prompt";
+                    break;
+                default:
+                    contstr += "unrecognised";
+                    break;
+            }
+            break;
 
         case CONFIG::control::jackMidiSource:
             contstr += "JACK MIDI source: ";
@@ -4745,6 +4764,12 @@ void InterChange::commandConfig(CommandBlock *getData)
                 synth->getRuntime().autoInstance = value_bool;
             else
                 value = synth->getRuntime().autoInstance;
+            break;
+        case CONFIG::control::exposeStatus:
+            if (write)
+                firstSynth->getRuntime().showCLIcontext = value_int;
+            else
+                value = firstSynth->getRuntime().showCLIcontext;
             break;
 // jack
         case CONFIG::control::jackMidiSource: // done elsewhere

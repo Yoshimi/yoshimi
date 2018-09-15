@@ -107,6 +107,7 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
             addparbool("enable_CLI", synth->getRuntime().showCLI);
             addparbool("enable_auto_instance", synth->getRuntime().autoInstance);
             addparU("active_instances", synth->getRuntime().activeInstance);
+            addpar("show_CLI_context", synth->getRuntime().showCLIcontext);
         endbranch();
         return;
     }

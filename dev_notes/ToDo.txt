@@ -7,7 +7,7 @@ Maybe BUG crash when loading files from banks - cured by clearing an recreating 
 
 Sort out bank properly.
 
-Sort out cli part effect controls.
+Sort out cli part effect controls. Also sys/ins updates wrong.
 
 Find out why reporting errors in 'Bank' is very slow.
 

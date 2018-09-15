@@ -3496,6 +3496,10 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
         case CONFIG::control::enableAutoInstance:
             def = 1;
             break;
+        case CONFIG::control::exposeStatus:
+            def = 1;
+            max = 2;
+            break;
 
         case CONFIG::control::jackMidiSource:
             min = 3; // anything greater than max

@@ -202,6 +202,7 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         enableGUI,
         enableCLI,
         enableAutoInstance,
+        exposeStatus,
 
         // start of engine controls
         jackMidiSource = 32,

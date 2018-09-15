@@ -1,6 +1,11 @@
 yoshimi 1.5.8 M
 
-2018-9-13 Will
+2018-9-15 Will
+* Completed CLI scripts.
+* Implemented CLI context report control.
+* Further CLI clean-ups.
+
+2018-9-14 Will
 * Refactored CLI internal messaging.
 * Implimented CLI scripts.
 

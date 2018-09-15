@@ -109,6 +109,7 @@ class Config : public MiscFuncs
         static bool          showCLI;
         static bool          autoInstance;
         static unsigned int  activeInstance;
+        static int           showCLIcontext;
 
         bool          runSynth;
         bool          finishedCLI;
