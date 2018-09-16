@@ -4,6 +4,9 @@ yoshimi 1.5.8 M
 * Added contributors list to About window.
 * Made some startup entries stdout only.
 * Removed some instance startup dublication.
+* CLI envelope freemode done.
+  Some reporting errors and missing checks.
+* Improved CLI filter help list.
 
 2018-9-15 Will
 * Completed CLI scripts.

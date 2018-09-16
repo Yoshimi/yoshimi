@@ -323,22 +323,36 @@ string filterlist [] = {
 };
 
 string envelopelist [] = {
-    "AMplitude ~",              "amplitude type",
-    "FRequency ~",              "frequency type",
-    "FIlter ~",                 "filter type",
-    "BAndwidth ~",              "bandwidth type (SubSynth only)",
-    "~  Attack Level <n>",      "initial attack level",
-    "~  Attack Time <n>",       "time before decay point",
-    "~  Decay Level <n>",       "initial decay level",
-    "~  Decay Time <n>",        "time before sustain point",
-    "~  Sustain <n>",           "sustain level",
-    "~  Release Time <n>",      "time to actual release",
-    "~  Release Level <n>",     "level at envelope end",
-    "~  Expand <n>",            "overall envelope time",
-    "~  Force <s>",             "force release (ON, {other})",
-    "~  Linear <s>",            "linear slopes (ON, {other})",
-    "e.g. S FR D T 40",         "set frequency decay time 40",
-    "Note:",                    "some envelopes have limited controls",
+    "types","",
+    "AMplitude",              "amplitude type",
+    "FRequency",              "frequency type",
+    "FIlter",                 "filter type",
+    "BAndwidth",              "bandwidth type (SubSynth only)",
+    "","",
+    "controls","",
+    "Expand <n>",            "overall envelope time",
+    "Force <s>",             "force release (ON, {other})",
+    "Linear <s>",            "linear slopes (ON, {other})",
+    "FMode <s>",             "set as freemode (ON, {other})",
+    "","",
+    "fixed","",
+    "Attack Level <n>",      "initial attack level",
+    "Attack Time <n>",       "time before decay point",
+    "Decay Level <n>",       "initial decay level",
+    "Decay Time <n>",        "time before sustain point",
+    "Sustain <n>",           "sustain level",
+    "Release Time <n>",      "time to actual release",
+    "Release Level <n>",     "level at envelope end",
+
+    "e.g. S FR D T 40",      "set frequency decay time 40",
+    "Note:",                 "some envelopes have limited controls",
+    "","",
+    "freemode","",
+    "Points",                "Number of defined points (read only)",
+    "Sustain <n>",           "point number where sustain starts",
+    "New <n1> <n2> <n3>",    "add point 'n1' at X increment 'n1', Y value 'n2'",
+    "Delete <n>",            "remove point 'n'",
+    "Change <n1> <n2> <n3>", "change point 'n1' to X increment 'n1', Y value 'n2'",
     "end"
 };
 
@@ -1565,6 +1579,8 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
     int cmd = -1;
     float value = -1;
     int group = -1;
+    unsigned char insert = TOPLEVEL::insert::envelopeGroup;
+    unsigned char par2 = UNUSED;
     if (lineEnd(controlType))
         return done_msg;
 
@@ -1618,7 +1634,7 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
             return available_msg;
     }
 
-    if (matchnMove(2, point, "freemode"))
+    if (matchnMove(2, point, "fmode"))
     {
         return sendNormal((toggle() == 1), controlType, ENVELOPEINSERT::control::enableFreeMode, npart, kitNumber, engine, TOPLEVEL::insert::envelopeGroup, insertType);
     }
@@ -1643,8 +1659,63 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
 
     if (freeMode && cmd == -1)
     {
-        synth->getRuntime().Log("no freemode controls yet");
-        return done_msg;
+        if (matchnMove(1, point, "Points"))
+            cmd = ENVELOPEINSERT::control::points;
+        else if (matchnMove(1, point, "Sustain"))
+        {
+            if (lineEnd(controlType))
+                return value_msg;
+            cmd = ENVELOPEINSERT::control::sustainPoint;
+            value = string2int(point);
+        }
+        else
+        {
+            if (matchnMove(1, point, "new"))
+            {
+                if (lineEnd(controlType))
+                return value_msg;
+
+                cmd = string2int(point); // point number
+                point = skipChars(point);
+                if (lineEnd(controlType))
+                return value_msg;
+
+                par2 = string2int(point); // X
+                point = skipChars(point);
+                if (lineEnd(controlType))
+                return value_msg;
+
+                value = string2int(point); // Y
+                insert = TOPLEVEL::insert::envelopePoints;
+
+            }
+            else if (matchnMove(1, point, "delete"))
+            {
+                if (lineEnd(controlType))
+                return value_msg;
+
+                cmd = string2int(point); // point number
+                insert = TOPLEVEL::insert::envelopePoints;
+            }
+            else if (matchnMove(1, point, "change"))
+            {
+                if (lineEnd(controlType))
+                return value_msg;
+
+                cmd = string2int(point); // point number
+                point = skipChars(point);
+                if (lineEnd(controlType))
+                return value_msg;
+
+                par2 = string2int(point); // X
+                point = skipChars(point);
+                if (lineEnd(controlType))
+                return value_msg;
+
+                value = string2int(point); // Y
+                insert = TOPLEVEL::insert::envelopePointChange;
+            }
+        }
     }
     else if (cmd == -1)
     {
@@ -1685,7 +1756,7 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
 
     //cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  parameter " << int(insertType) << endl;
 
-    return sendNormal(string2float(point), controlType, cmd, npart, kitNumber, engine, TOPLEVEL::insert::envelopeGroup, insertType);
+    return sendNormal(string2float(point), controlType, cmd, npart, kitNumber, engine, insert, insertType, par2);
 }
 
 
