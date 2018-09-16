@@ -2,7 +2,7 @@
     MusicClient.h
 
     Copyright 2009-2011, Alan Calvert
-    Copyright 2016, Will Godfrey & others
+    Copyright 2016-2018, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified December 2016
+    Modified September 2018
 */
 
 #include "MusicIO/MusicClient.h"
@@ -70,7 +70,7 @@ MusicClient *MusicClient::newMusicClient(SynthEngine *_synth)
                 _synth->getRuntime().runSynth = true; //reset to true
                 _synth->getRuntime().audioEngine = it->audioDrv;
                 _synth->getRuntime().midiEngine = it->midiDrv;
-                _synth->getRuntime().Log("Using " + audio_drivers_str [it->audioDrv] + " for audio and " + midi_drivers_str [it->midiDrv] + " for midi");
+                _synth->getRuntime().Log("Using " + audio_drivers_str [it->audioDrv] + " for audio and " + midi_drivers_str [it->midiDrv] + " for midi", 1);
                 return client;
             }
             delete client;

@@ -2377,7 +2377,7 @@ bool SynthEngine::installBanks()
     bank.parseConfigFile(xml);
     xml->exitbranch();
     delete xml;
-    Runtime.Log("Found " + asString(bank.InstrumentsInBanks) + " instruments in " + asString(bank.BanksInRoots) + " banks");
+    Runtime.Log("\nFound " + asString(bank.InstrumentsInBanks) + " instruments in " + asString(bank.BanksInRoots) + " banks");
     Runtime.Log(miscMsgPop(RootBank(Runtime.tempRoot, Runtime.tempBank)& 0xff));
     GuiThreadMsg::sendMessage((this), GuiThreadMsg::RefreshCurBank, 1);
 

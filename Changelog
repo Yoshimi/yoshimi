@@ -1,5 +1,10 @@
 yoshimi 1.5.8 M
 
+2018-9-16 Will
+* Added contributors list to About window.
+* Made some startup entries stdout only.
+* Removed some instance startup dublication.
+
 2018-9-15 Will
 * Completed CLI scripts.
 * Implemented CLI context report control.

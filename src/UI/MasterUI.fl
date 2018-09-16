@@ -295,7 +295,10 @@ class MasterUI {: {private GuiUpdates}
         } {
           MenuItem {} {
             label {&About...}
-            callback {aboutwindow->show();}
+            callback {//
+                    Contributors->hide();
+                    aboutwindow->show();
+                    aboutFirst->show();}
             tooltip {Copyright and version info} xywh {15 15 100 20} labelsize 12
           }
           MenuItem newinstanceid {
@@ -933,38 +936,91 @@ paramsui->Show(XML_MICROTONAL);}
     }
     Fl_Window aboutwindow {
       label {About Yoshimi}
-      xywh {4 20 365 290} type Double color 54 labelfont 13 labelsize 13 when 0 hide
+      xywh {46 64 365 290} type Double color 54 labelfont 13 labelsize 13 when 0 hide
     } {
-      Fl_Box {} {
-        label {Yoshimi
+      Fl_Group aboutFirst {
+        xywh {0 0 365 290} hide
+      } {
+        Fl_Box {} {
+          label {Yoshimi
 meets
 ZynAddSubFX}
-        xywh {10 17 345 70} labeltype EMBOSSED_LABEL labelfont 13 labelsize 18 labelcolor 216 align 16 when 0
-      }
-      Fl_Box {} {
-        label {copyright notice}
-        xywh {25 93 315 91} color 51 selection_color 30 labelfont 13 labelsize 11 align 208 when 0
-        code0 {o->copy_label(string("Copyright (c) 2002-2009 Nasca O. PAUL and others"
-                               "\\nCopyright 2009-2011, Alan Calvert"
-                               "\\nCopyright 2012-2013, Jeremy Jongepier and others"
-                               "\\nCopyright 2014-2017, Will Godfrey and others"
-                               "\\nLV2 plugin Copyright 2014, Andrew Deryabin"
-                               "\\nSplash Image Copyright 2017, Jesper Lloyd").c_str());}
-      }
-      Fl_Box {} {
-        label {copy terms}
-        xywh {10 198 340 53} labelsize 11 align 144 when 0
-        code0 {//
-            o->copy_label(string("This is free software, and comes with ABSOLUTELY NO WARRANTY; "
-                                 "you may redistribute it and/or modify it under the terms of "
-                                 "GPL version 2, or (at your option) any later version.\\n\\n").c_str());}
-      }
-      Fl_Box {} {
-        label { version}
-        xywh {55 254 240 20} labelfont 1 labelsize 12 labelcolor 145
-        code0 {//
+          xywh {10 15 345 70} labelfont 9 labelsize 18 labelcolor 216 align 16 when 0
+        }
+        Fl_Box {} {
+          label {Copyright 2002-2009, Nasca O. Paul and others
+Copyright 2009-2011, Alan Calvert
+Copyright 2012-2013, Jeremy Jongepier and others
+Copyright 2014-2018, Will Godfrey and others
+LV2 plugin Copyright 2014, Andrew Deryabin
+Splash Image Copyright 2017, Jesper Lloyd}
+          xywh {25 90 315 91} color 51 selection_color 30 labelfont 13 labelsize 11
+        }
+        Fl_Box {} {
+          label {This is free software, and comes with ABSOLUTELY NO
+WARRANTY; you may redistribute it and/or modify it
+under the terms of GPL version 2, or (at your option)
+any later version.}
+          xywh {10 190 340 53} labelsize 11
+        }
+        Fl_Box {} {
+          label { version}
+          xywh {61 254 240 20} labelfont 1 labelsize 12 labelcolor 145
+          code0 {//
             o->copy_label((string("Yoshimi version ")
                            + string( YOSHIMI_VERSION )).c_str());}
+        }
+        Fl_Button {} {
+          label more
+          callback {//
+                 Contributors->show();
+                 aboutFirst->hide();}
+          tooltip {Yoshimi's little band of helpers} xywh {15 253 43 22} labelsize 11
+        }
+      }
+      Fl_Group Contributors {
+        xywh {5 5 355 280} box FLAT_BOX color 7 labelcolor 7 hide
+      } {
+        Fl_Box {} {
+          label {Some people who have helped Yoshimi
+ in various ways since
+Alan Calvert started the project}
+          xywh {12 8 340 57} color 7 labelfont 9 labelsize 15 labelcolor 4
+        }
+        Fl_Box {} {
+          label {Chris Ahlstrom
+Kristian Amlie
+Jonathan Brickman
+Jeanette Claassen
+Rob Couto
+Andrew Deryabin
+Jörn Eichler
+Csaba Erdei
+James Fraser
+Will Godfrey
+Alexander Hirsch
+Jeremy Jongepier
+Tobias Kortkamp
+Tito Latini}
+          xywh {25 70 155 200} labelsize 12
+        }
+        Fl_Box {} {
+          label {Jesper Lloyd
+Lars Luthman
+Holger Marzen
+Lieven Moors
+Harry Nakos
+Iurie Nistor
+Stephen Parry
+Lorenzo Sutton
+Hermann Voßeler
+Nikita Zlobin
+
+
+
+ }
+          xywh {194 70 155 200} labelsize 12
+        }
       }
       Fl_Button {} {
         label Close
