@@ -3537,18 +3537,18 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
         {
             return ("Freemode add/remove is write only. Current points " + to_string(int(par2)));
         }
-        if (par2 != NO_MSG)
-            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Added Freemode Point " + to_string(int((control & 0x3f) + 1)) + " X increment " + to_string(int(par2)) + " Y");
+        if (par2 != UNUSED)
+            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Added Freemode Point " + to_string(int(control & 0x3f)) + " X increment " + to_string(int(par2)) + " Y");
         else
         {
             showValue = false;
-            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Removed Freemode Point " +  to_string(int(control + 1)) + "  Remaining " +  to_string(value));
+            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Removed Freemode Point " +  to_string(int(control)) + "  Remaining " +  to_string(value));
         }
     }
 
     if (insert == TOPLEVEL::insert::envelopePointChange)
     {
-        return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control + 1)) + " X increment " + to_string(int(par2)) + " Y");
+        return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control)) + " X increment " + to_string(int(par2)) + " Y");
     }
 
     string contstr;
@@ -3595,7 +3595,7 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
             break;
         case ENVELOPEINSERT::control::points:
             contstr = "Points";
-            contstr += to_string((int) par2);
+            //contstr += to_string((int) par2);
             break;
         case ENVELOPEINSERT::control::sustainPoint:
             contstr = "Sust";
@@ -7934,7 +7934,10 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
                 Xincrement = 0xff;
             }
             else
-                Xincrement = envpoints;
+            {
+                val = envpoints;
+                Xincrement = envpoints; // don't really need this now
+            }
             break;
         case ENVELOPEINSERT::control::sustainPoint:
             if (write)
@@ -8326,6 +8329,8 @@ float InterChange::returnLimits(CommandBlock *getData)
             envelopeLimit envelopeLimits;
             return envelopeLimits.getEnvelopeLimits(getData);
         }
+        if (insert == TOPLEVEL::insert::envelopePoints || insert == TOPLEVEL::insert::envelopePointChange)
+            return 1; // temporary solution :(
         min = 0;
         max = 127;
         def = 0;

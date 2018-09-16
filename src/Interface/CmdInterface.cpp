@@ -350,7 +350,7 @@ string envelopelist [] = {
     "freemode","",
     "Points",                "Number of defined points (read only)",
     "Sustain <n>",           "point number where sustain starts",
-    "New <n1> <n2> <n3>",    "add point 'n1' at X increment 'n1', Y value 'n2'",
+    "Insert <n1> <n2> <n3>", "insert point at 'n1' with X increment 'n1', Y value 'n2'",
     "Delete <n>",            "remove point 'n'",
     "Change <n1> <n2> <n3>", "change point 'n1' to X increment 'n1', Y value 'n2'",
     "end"
@@ -1659,31 +1659,60 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
 
     if (freeMode && cmd == -1)
     {
+        int pointCount = readControl(ENVELOPEINSERT::control::points, npart, kitNumber, engine, insert, insertType);
         if (matchnMove(1, point, "Points"))
+        {
+            value = 0; // dummy value
             cmd = ENVELOPEINSERT::control::points;
+            // not using already fetched value to get normal reporting
+        }
         else if (matchnMove(1, point, "Sustain"))
         {
             if (lineEnd(controlType))
                 return value_msg;
-            cmd = ENVELOPEINSERT::control::sustainPoint;
             value = string2int(point);
+            if (value == 0)
+            {
+                    synth->getRuntime().Log("Sustain can't be at first point");
+                    return done_msg;
+            }
+            else if (value >= (pointCount - 1))
+            {
+                    synth->getRuntime().Log("Sustain can't be at last point");
+                    return done_msg;
+            }
+            else if (value < 0)
+                return range_msg;
+            cmd = ENVELOPEINSERT::control::sustainPoint;
         }
         else
         {
-            if (matchnMove(1, point, "new"))
+            if (matchnMove(1, point, "insert"))
             {
+                if ((MAX_ENVELOPE_POINTS - pointCount) < 2)
+                {
+                    synth->getRuntime().Log("Max points already defined");
+                    return done_msg;
+                }
                 if (lineEnd(controlType))
-                return value_msg;
+                    return value_msg;
 
                 cmd = string2int(point); // point number
+                if (cmd == 0)
+                {
+                    synth->getRuntime().Log("Can't add at first point");
+                    return done_msg;
+                }
+                if (cmd < 0 || cmd >= pointCount)
+                    return range_msg;
                 point = skipChars(point);
                 if (lineEnd(controlType))
-                return value_msg;
+                    return value_msg;
 
                 par2 = string2int(point); // X
                 point = skipChars(point);
                 if (lineEnd(controlType))
-                return value_msg;
+                    return value_msg;
 
                 value = string2int(point); // Y
                 insert = TOPLEVEL::insert::envelopePoints;
@@ -1691,10 +1720,27 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
             }
             else if (matchnMove(1, point, "delete"))
             {
+                if (pointCount <= 3)
+                {
+                    synth->getRuntime().Log("Can't have less than three points");
+                    return done_msg;
+                }
                 if (lineEnd(controlType))
-                return value_msg;
+                    return value_msg;
 
                 cmd = string2int(point); // point number
+                if (cmd == 0)
+                {
+                    synth->getRuntime().Log("Can't delete first point");
+                    return done_msg;
+                }
+                if (cmd >= (pointCount - 1))
+                {
+                    synth->getRuntime().Log("Can't delete last point");
+                    return done_msg;
+                }
+                if (cmd < 0 || cmd >= (MAX_ENVELOPE_POINTS - 1))
+                    return range_msg;
                 insert = TOPLEVEL::insert::envelopePoints;
             }
             else if (matchnMove(1, point, "change"))
@@ -1703,6 +1749,8 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
                 return value_msg;
 
                 cmd = string2int(point); // point number
+                if (cmd < 0 || cmd >= (pointCount - 1))
+                    return range_msg;
                 point = skipChars(point);
                 if (lineEnd(controlType))
                 return value_msg;
@@ -4567,7 +4615,12 @@ void CmdInterface::cmdIfaceCommandLoop()
                     prompt += (":" + asString(currentInstance));
                 int expose = readControl(CONFIG::control::exposeStatus, TOPLEVEL::section::config);
                 if (expose == 1)
-                    synth->getRuntime().Log("@" + findStatus(true));
+                {
+                    string status = findStatus(true);
+                    if (status == "" )
+                        status = " Top";
+                    synth->getRuntime().Log("@" + status);
+                }
                 else if (expose == 2)
                     prompt += findStatus(true);
                 prompt += "> ";

@@ -7,6 +7,9 @@ yoshimi 1.5.8 M
 * CLI envelope freemode done.
   Some reporting errors and missing checks.
 * Improved CLI filter help list.
+* Corrected CLI freemode reporting.
+* Added CLI freemode error checks.
+* Improved CLI envelope help list.
 
 2018-9-15 Will
 * Completed CLI scripts.
