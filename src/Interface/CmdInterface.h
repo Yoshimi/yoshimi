@@ -96,6 +96,7 @@ class CmdInterface : private MiscFuncs
         int subSynth(unsigned char controlType);
         int padSynth(unsigned char controlType);
         int addVoice(unsigned char controlType);
+        int waveform(unsigned char controlType);
         int commandPart(bool justSet, unsigned char controlType);
         int commandReadnSet(unsigned char controlType);
         float readControl(unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff);

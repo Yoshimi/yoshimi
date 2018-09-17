@@ -63,6 +63,8 @@ namespace LISTS {
     addsynth,
     subsynth,
     padsynth,
+    addvoice,
+    waveform,
     lfo,
     filter,
     envelope,
@@ -234,6 +236,12 @@ string commonlist [] = {
 };
 
 string addsynthlist [] = {
+    "VOice ...",                    "enter Addsynth voice contect",
+    "end"
+};
+
+string addvoicelist [] = {
+    "WAveform",                 "enter the oscillator waveform context",
     "end"
 };
 
@@ -250,6 +258,16 @@ string subsynthlist [] = {
 
 string padsynthlist [] = {
     "APply",                    "puts latest changes into the wavetable",
+    "WAveform",                 "enter the oscillator waveform context",
+    "end"
+};
+
+string waveformlist [] = {
+    "HArmonic <n1> Amp <n2>",   "set harmonic {n1} to {n2} intensity",
+    "HArmonic <n1> Phase <n2>", "set harmonic {n1} to {n2} phase",
+    "WAveshape <s>",            "set the shape for the basic wave",
+    "","SIne,TRiangle,PUlse,SAw,POwer,GAuss,DIode,ABsine,PSine",
+    "","SSine,CHIrp,ASine,CHEbyshev,SQuare,SPike,Circle",
     "end"
 };
 
@@ -573,6 +591,10 @@ bool CmdInterface::helpList(unsigned int local)
             listnum = LISTS::subsynth;
         else if (matchnMove(3, point, "padsynth"))
             listnum = LISTS::padsynth;
+        else if (matchnMove(3, point, "voice"))
+            listnum = LISTS::addvoice;
+        else if (matchnMove(3, point, "waveform"))
+            listnum = LISTS::waveform;
         else if (matchnMove(3, point, "lfo"))
             listnum = LISTS::lfo;
         else if (matchnMove(3, point, "filter"))
@@ -602,6 +624,10 @@ bool CmdInterface::helpList(unsigned int local)
             listnum = LISTS::lfo;
         else if (bitTest(local, LEVEL::Filter))
             listnum = LISTS::filter;
+        else if (bitTest(local, LEVEL::Oscillator))
+            listnum = LISTS::waveform;
+        else if (bitTest(local, LEVEL::AddVoice))
+            listnum = LISTS::addvoice;
         else if (bitTest(local, LEVEL::AddSynth))
             listnum = LISTS::addsynth;
         else if (bitTest(local, LEVEL::SubSynth))
@@ -657,6 +683,14 @@ bool CmdInterface::helpList(unsigned int local)
         case LISTS::padsynth:
             msg.push_back("Part PadSynth:");
             helpLoop(msg, padsynthlist, 2);
+            break;
+        case LISTS::addvoice:
+            msg.push_back("Part AddVoice:");
+            helpLoop(msg, addvoicelist, 2);
+            break;
+        case LISTS::waveform:
+            msg.push_back("Part Waveform:");
+            helpLoop(msg, waveformlist, 2);
             break;
 
         case LISTS::lfo:
@@ -2019,6 +2053,9 @@ string CmdInterface::findStatus(bool show)
                 break;
         }
 
+        if (bitTest(context, LEVEL::Oscillator))
+            text += " wave";
+
         if (bitTest(context, LEVEL::LFO))
         {
             int cmd = -1;
@@ -2831,6 +2868,11 @@ int CmdInterface::commandScale(unsigned char controlType)
 
 int CmdInterface::addVoice(unsigned char controlType)
 {
+    if (matchnMove(2, point, "waveform"))
+    {
+        bitSet(context, LEVEL::Oscillator);
+        return waveform(controlType);
+    }
     if (isdigit(point[0]))
     {
         voiceNumber = string2int(point) - 1;
@@ -2968,6 +3010,11 @@ int CmdInterface::subSynth(unsigned char controlType)
 
 int CmdInterface::padSynth(unsigned char controlType)
 {
+    if (matchnMove(2, point, "waveform"))
+    {
+        bitSet(context, LEVEL::Oscillator);
+        return waveform(controlType);
+    }
     float value = -1;
     int cmd;
     if (lineEnd(controlType))
@@ -2984,6 +3031,81 @@ int CmdInterface::padSynth(unsigned char controlType)
 
     return sendNormal(value, controlType, cmd, npart, kitNumber, PART::engine::padSynth);
     return available_msg;
+}
+
+
+
+int CmdInterface::waveform(unsigned char controlType)
+{
+    if (lineEnd(controlType))
+        return done_msg;
+    float value = -1;
+    int cmd = -1;
+    int engine = contextToEngines();
+    unsigned char insert;
+
+    if (matchnMove(2, point, "harmonic"))
+    {
+        if (lineEnd(controlType))
+            return value_msg;
+        cmd = string2int(point);
+        if (cmd < 1 || cmd > MAX_AD_HARMONICS)
+            return range_msg;
+        point = skipChars(point);
+
+        if (matchnMove(1, point, "amp"))
+            insert = TOPLEVEL::insert::harmonicAmplitude;
+        else if (matchnMove(1, point, "phase"))
+            insert = TOPLEVEL::insert::harmonicPhaseBandwidth;
+        else
+            return opp_msg;
+
+        if (lineEnd(controlType))
+            return value_msg;
+        return sendNormal(string2int(point), controlType, cmd - 1, npart, kitNumber, engine, insert);
+    }
+
+    insert = TOPLEVEL::insert::oscillatorGroup;
+    if (matchnMove(2, point, "waveshape"))
+    {
+        if (matchnMove(2, point, "sine"))
+            value = 0;
+        else if (matchnMove(2, point, "triange"))
+            value = 1;
+        else if (matchnMove(2, point, "pulse"))
+            value = 2;
+        else if (matchnMove(2, point, "saw"))
+            value = 3;
+        else if (matchnMove(2, point, "power"))
+            value = 4;
+        else if (matchnMove(2, point, "gauss"))
+            value = 5;
+        else if (matchnMove(2, point, "diode"))
+            value = 6;
+        else if (matchnMove(2, point, "absine"))
+            value = 7;
+        else if (matchnMove(2, point, "psine"))
+            value = 8;
+        else if (matchnMove(2, point, "ssine"))
+            value = 9;
+        else if (matchnMove(3, point, "chirp"))
+            value = 10;
+        else if (matchnMove(2, point, "asine"))
+            value = 11;
+        else if (matchnMove(3, point, "chebyshev"))
+            value = 12;
+        else if (matchnMove(2, point, "square"))
+            value = 13;
+        else if (matchnMove(2, point, "spike"))
+            value = 14;
+        else if (matchnMove(2, point, "circle"))
+            value = 15;
+        if (value > -1)
+            cmd = OSCILLATOR::control::baseFunctionType;
+    }
+    if (cmd == -1)
+        return available_msg;
+    return sendNormal(value, controlType, cmd, npart, kitNumber, engine, insert);
 }
 
 
@@ -3299,6 +3421,8 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
         return filterSelect(controlType);
     if (bitTest(context, LEVEL::LFO))
         return LFOselect(controlType);
+    if (bitTest(context, LEVEL::Oscillator))
+        return waveform(controlType);
     if (bitTest(context, LEVEL::AddVoice))
         return addVoice(controlType);
     if (bitTest(context, LEVEL::AddSynth))
@@ -4619,7 +4743,7 @@ void CmdInterface::cmdIfaceCommandLoop()
                     string status = findStatus(true);
                     if (status == "" )
                         status = " Top";
-                    synth->getRuntime().Log("@" + status);
+                    synth->getRuntime().Log("@" + status, 1);
                 }
                 else if (expose == 2)
                     prompt += findStatus(true);

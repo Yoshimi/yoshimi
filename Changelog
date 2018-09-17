@@ -1,5 +1,8 @@
 yoshimi 1.5.8 M
 
+2018-9-17 Will
+* Started work on CLI waveform controls.
+
 2018-9-16 Will
 * Added contributors list to About window.
 * Made some startup entries stdout only.
