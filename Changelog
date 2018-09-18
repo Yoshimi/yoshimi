@@ -1,6 +1,10 @@
 yoshimi 1.5.8 M
 
 2018-9-17 Will
+* Most important parts of CLI waveform done.
+* Set version as 1.5.9 rc1
+
+2018-9-17 Will
 * Started work on CLI waveform controls.
 
 2018-9-16 Will

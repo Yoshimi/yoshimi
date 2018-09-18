@@ -207,7 +207,8 @@ string commonlist [] = {
     "PUnch Duration <n> &",     "attack boost time",
     "PUnch Stretch <n> &",      "attack boost extend",
     "PUnch Velocity <n> &",     "attack boost velocity sensitivity",
-    "OVertone Position <n> #",  "relationship to fundamental",
+    "OVertone Position <s> #",  "relationship to fundamental",
+    "","HArmonic,SIne,POwer,SHift,UShift,LSshift,UPower,LPower",
     "OVertone First <n> #",     "degree of first parameter",
     "OVertone Second <n> #",    "degree of second parameter",
     "OVertone Harmonic <n> #",  "amount harmonics are forced",
@@ -265,9 +266,11 @@ string padsynthlist [] = {
 string waveformlist [] = {
     "HArmonic <n1> Amp <n2>",   "set harmonic {n1} to {n2} intensity",
     "HArmonic <n1> Phase <n2>", "set harmonic {n1} to {n2} phase",
-    "WAveshape <s>",            "set the shape for the basic wave",
+    "CLear",                    "clear harmonic settings",
+    "SHape <s>",                "set the shape of the basic waveform",
     "","SIne,TRiangle,PUlse,SAw,POwer,GAuss,DIode,ABsine,PSine",
     "","SSine,CHIrp,ASine,CHEbyshev,SQuare,SPike,Circle",
+    "APply",                    "Fix settings (only for PadSynth)",
     "end"
 };
 
@@ -1214,24 +1217,46 @@ int CmdInterface::partCommonControls(unsigned char controlType)
         // Sub/Pad only
         if (cmd == -1 && (bitFindHigh(context) == LEVEL::SubSynth || bitFindHigh(context) == LEVEL::PadSynth))
         {
-            int tmp_cmd = -1;
+            value = -1;
             if (matchnMove(2, point, "overtone"))
             {
                 if (matchnMove(1, point, "Position"))
-                    tmp_cmd = SUBSYNTH::control::overtonePosition;
-                else if (matchnMove(1, point, "First"))
-                    tmp_cmd = SUBSYNTH::control::overtoneParameter1;
-                else if (matchnMove(1, point, "Second"))
-                    tmp_cmd = SUBSYNTH::control::overtoneParameter2;
-                else if (matchnMove(1, point, "Harmonic"))
-                    tmp_cmd = SUBSYNTH::control::overtoneForceHarmonics;
-            }
-            if (tmp_cmd > -1)
-            {
-                if (lineEnd(controlType))
-                    return value_msg;
-                value = string2int(point);
-                cmd = tmp_cmd;
+                {
+                    if (matchnMove(2, point, "harmonic"))
+                        value = 0;
+                    else if(matchnMove(2, point, "usine"))
+                        value = 1;
+                    else if(matchnMove(2, point, "lsine"))
+                        value = 2;
+                    else if(matchnMove(2, point, "upower"))
+                        value = 3;
+                    else if(matchnMove(2, point, "lpower"))
+                        value = 4;
+                    else if(matchnMove(2, point, "sine"))
+                        value = 5;
+                    else if(matchnMove(2, point, "power"))
+                        value = 6;
+                    else if(matchnMove(2, point, "shift"))
+                        value = 6;
+                    else
+                        return range_msg;
+                    cmd = SUBSYNTH::control::overtonePosition;
+                }
+                else
+                {
+                    if (matchnMove(1, point, "First"))
+                        cmd = SUBSYNTH::control::overtoneParameter1;
+                    else if (matchnMove(1, point, "Second"))
+                        cmd = SUBSYNTH::control::overtoneParameter2;
+                    else if (matchnMove(1, point, "Harmonic"))
+                        cmd = SUBSYNTH::control::overtoneForceHarmonics;
+                    if (cmd > -1)
+                    {
+                        if (lineEnd(controlType))
+                            return value_msg;
+                        value = string2int(point);
+                    }
+                }
             }
         }
 
@@ -3025,14 +3050,13 @@ int CmdInterface::padSynth(unsigned char controlType)
 
     if (matchnMove(2, point, "apply"))
     {
-        value = (toggle() == 1);
+        value = 0; // dummy
         cmd = PADSYNTH::control::applyChanges;
     }
 
     return sendNormal(value, controlType, cmd, npart, kitNumber, PART::engine::padSynth);
     return available_msg;
 }
-
 
 
 int CmdInterface::waveform(unsigned char controlType)
@@ -3066,7 +3090,7 @@ int CmdInterface::waveform(unsigned char controlType)
     }
 
     insert = TOPLEVEL::insert::oscillatorGroup;
-    if (matchnMove(2, point, "waveshape"))
+    if (matchnMove(2, point, "shape"))
     {
         if (matchnMove(2, point, "sine"))
             value = 0;
@@ -3102,6 +3126,19 @@ int CmdInterface::waveform(unsigned char controlType)
             value = 15;
         if (value > -1)
             cmd = OSCILLATOR::control::baseFunctionType;
+    }
+    else if (matchnMove(2, point, "clear"))
+    {
+        value = 0; // dummy
+        cmd = OSCILLATOR::control::clearHarmonics;
+    }
+    else if (matchnMove(2, point, "apply"))
+    {
+        if (engine != PART::engine::padSynth)
+            return available_msg;
+        value = 0; // dummy
+        insert = UNUSED;
+        cmd = PADSYNTH::control::applyChanges;
     }
     if (cmd == -1)
         return available_msg;
