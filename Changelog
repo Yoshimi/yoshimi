@@ -1,6 +1,11 @@
 yoshimi 1.5.8 M
 
-2018-9-17 Will
+2018-9-19 Will
+* BugFix: Failed older manual if current missing.
+* Revised CLI status to compress line length.
+* Set version as 1.5.9 rc2
+
+2018-9-18 Will
 * Most important parts of CLI waveform done.
 * Set version as 1.5.9 rc1
 

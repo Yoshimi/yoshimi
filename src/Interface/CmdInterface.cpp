@@ -208,7 +208,7 @@ string commonlist [] = {
     "PUnch Stretch <n> &",      "attack boost extend",
     "PUnch Velocity <n> &",     "attack boost velocity sensitivity",
     "OVertone Position <s> #",  "relationship to fundamental",
-    "","HArmonic,SIne,POwer,SHift,UShift,LSshift,UPower,LPower",
+    "","HArmonic,SIne,POwer,SHift,UShift,LShift,UPower,LPower",
     "OVertone First <n> #",     "degree of first parameter",
     "OVertone Second <n> #",    "degree of second parameter",
     "OVertone Harmonic <n> #",  "amount harmonics are forced",
@@ -2018,30 +2018,48 @@ string CmdInterface::findStatus(bool show)
 
     if (bitTest(context, LEVEL::Part))
     {
-        text += " Part ";
+        bool justPart = false;
+        if (bitFindHigh(context) == LEVEL::Part)
+        {
+            text += " Part ";
+            justPart = true;
+        }
+        else text = " P";
         text += to_string(int(npart) + 1);
         if (readControl(PART::control::enable, npart))
-            text += " on";
+            text += "+";
         kitMode = readControl(PART::control::kitMode, npart);
         if (kitMode != PART::kitType::Off)
         {
             kit = kitNumber;
             insert = TOPLEVEL::insert::kitGroup;
-            text += ", kit ";
+            if (justPart)
+                text += ", kit ";
+            else
+                text += ", K";
             text += to_string(kitNumber + 1);
             if (readControl(PART::control::enable, npart, kitNumber, UNUSED, insert))
-                text += " on";
+                text += "+";
             text += ", ";
             switch (kitMode)
             {
                 case PART::kitType::Multi:
-                    text += "multi";
+                    if (justPart)
+                        text += "multi";
+                    else
+                        text += "M";
                     break;
                 case PART::kitType::Single:
-                    text += "single";
+                    if (justPart)
+                        text += "single";
+                    else
+                        text += "S";
                     break;
                 case PART::kitType::CrossFade:
-                    text += "cross";
+                    if (justPart)
+                        text += "cross";
+                    else
+                        text += "C";
                     break;
                 default:
                     break;
@@ -2056,30 +2074,56 @@ string CmdInterface::findStatus(bool show)
         switch (engine)
         {
             case PART::engine::addSynth:
-                text += ", Add";
+                if (bitFindHigh(context) == LEVEL::AddSynth)
+                    text += ", Add";
+                else
+                    text += ", A";
                 if (readControl(ADDSYNTH::control::enable, npart, kit, PART::engine::addSynth, insert))
-                    text += " on";
+                    text += "+";
                 break;
             case PART::engine::subSynth:
-                text += ", Sub";
+                if (bitFindHigh(context) == LEVEL::SubSynth)
+                    text += ", Sub";
+                else
+                    text += ", S";
                 if (readControl(SUBSYNTH::control::enable, npart, kit, PART::engine::subSynth, insert))
-                    text += " on";
+                    text += "+";
                 break;
             case PART::engine::padSynth:
-                text += ", Pad";
+                if (bitFindHigh(context) == LEVEL::PadSynth)
+                    text += ", Pad";
+                else
+                    text += ", P";
                 if (readControl(PADSYNTH::control::enable, npart, kit, PART::engine::padSynth, insert))
-                    text += " on";
+                    text += "+";
                 break;
             case PART::engine::addVoice1:
-                text += ", Addvoice ";
+                text += ", A";
+                if (readControl(ADDSYNTH::control::enable, npart, kit, PART::engine::addSynth, insert))
+                    text += "+";
+                if (bitFindHigh(context) == LEVEL::AddVoice)
+                    text += ", Voice ";
+                else
+                    text += ", V";
                 text += to_string(voiceNumber + 1);
                 if (readControl(ADDVOICE::control::enableVoice, npart, kitNumber, PART::engine::addVoice1 + voiceNumber))
-                    text += " on";
+                    text += "+";
                 break;
         }
 
         if (bitTest(context, LEVEL::Oscillator))
-            text += " wave";
+        {
+            text += " Wave ";
+            /*
+             * TODO not yet!
+            int source = readControl(ADDVOICE::control::voiceOscillatorSource, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
+            if (source > -1)
+            {
+                text += "V" + to_string(source + 1);
+                if (readControl(ADDVOICE::control::enableVoice, npart, kitNumber, PART::engine::addVoice1 + source))
+                    text += "+";
+            }*/
+        }
 
         if (bitTest(context, LEVEL::LFO))
         {
@@ -2103,10 +2147,10 @@ string CmdInterface::findStatus(bool show)
             if (engine == PART::engine::addVoice1)
             {
                 if (readControl(cmd, npart, kitNumber, engine + voiceNumber))
-                    text += " on";
+                    text += "+";
             }
             else
-                text += " on";
+                text += "+";
         }
         else if (bitTest(context, LEVEL::Filter))
         {
@@ -2128,15 +2172,15 @@ string CmdInterface::findStatus(bool show)
             if (engine == PART::engine::subSynth)
             {
                 if (readControl(SUBSYNTH::control::enableFilter, npart, kitNumber, engine))
-                    text += " on";
+                    text += "+";
             }
             else if (engine == PART::engine::addVoice1)
             {
                 if (readControl(ADDVOICE::control::enableFilter, npart, kitNumber, engine + voiceNumber))
-                    text += " on";
+                    text += "+";
             }
             else
-                text += " on";
+                text += "+";
         }
         else if (bitTest(context, LEVEL::Envelope))
         {
@@ -2166,10 +2210,10 @@ string CmdInterface::findStatus(bool show)
             if (engine == PART::engine::addVoice1 || (engine == PART::engine::subSynth && cmd != ADDVOICE::control::enableAmplitudeEnvelope && cmd != ADDVOICE::control::enableFilterEnvelope))
             {
                 if (readControl(cmd, npart, kitNumber, engine + voiceNumber))
-                    text += " on";
+                    text += "+";
             }
             else
-                text += " on";
+                text += "+";
         }
     }
     else if (bitTest(context, LEVEL::Scale))

@@ -590,12 +590,12 @@ namespace ADDVOICE // usage ADDVOICE::control::volume
         modulatorCoarseDetune,
         enableModulatorFrequencyEnvelope = 104,
         modulatorOscillatorPhase = 112,
-        modulatorOscillatorSource, // local, external
+        modulatorOscillatorSource, // -1 local, 'n' external
 
         delay = 128,
         enableResonance = 130, // for this voice
         voiceOscillatorPhase = 136,
-        voiceOscillatorSource, // local, external
+        voiceOscillatorSource, // - 1 local, 'n' external
         soundType // Oscillator, White noise, Pink noise
     };
 }

@@ -648,7 +648,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = "Can't find manual :(";
                     else if (count < wanted)
                         text = "Can't find current manual. Using older one";
-                    if (text == "")
+                    if (path != "")
                     {
                         string command = "xdg-open " + path + "&";
                         FILE *fp = popen(command.c_str(), "r");
