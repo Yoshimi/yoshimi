@@ -227,12 +227,6 @@ static void *mainGuiThread(void *arg)
         }
         else
             usleep(33333);
-        /*int testInstance = startInstance;
-        if (testInstance)
-        {
-            startInstance = 0;
-            mainCreateNewInstance(testInstance, false);
-        }*/
     }
     if (firstRuntime->configChanged && (bShowGui | bShowCmdLine)) // don't want this if no cli or gui
     {
@@ -415,11 +409,10 @@ int main(int argc, char *argv[])
     // following moved here for faster first synth startup
     firstSynth->loadHistory();
     firstSynth->installBanks();
-    //GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::RefreshCurBank, 1);
 
     //create command line processing thread
     pthread_t cmdThr;
-//    while (firstSynth == NULL); // just wait
+
     if(bShowCmdLine)
     {
         if (pthread_attr_init(&attr) == 0)

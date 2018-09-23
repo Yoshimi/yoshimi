@@ -24,7 +24,7 @@ Status bits:
 3   mark as an NRPN
 4   mark as 7 bit
 
-When sending internal control messages to the GUI (instead of passing on MIDI actions) the part number will be 216 (0xd8) - a value that is never used in the rest of the system( but is in the same region as Vectors,  Scales and other 'accessory' parts).
+When sending internal control messages to the GUI (instead of passing on MIDI actions) the part number will be 216 (0xd8) - a value that is never used in the rest of the system.
 
 This is used for updating the list and filling in/altering line entries. The gui never does these directly, but requests them using the same part number.
 
@@ -46,9 +46,9 @@ insert      min_in
 parameter   max_in
 par2        text message number
 
-For NRPNs, CC has bit 16 set. This is so that even one with a value less than 127 won't be mistaken for a normal CC when being matched.
+For NRPNs, CC has bit 16 set. This is so that even one with a current value less than 127 won't be mistaken for a normal CC when being matched.
 
-Currently there is a limit of 200 independent learned lines due to the use of miscMsg to update the GUI when loading complete learned lists. In the future, the GUI will be restricted to 'viewing groups' of 128 lines. This will allow a much greater number.
+Currently there is a limit of 200 independent learned lines due to the use of miscMsg to update the GUI when loading complete learned lists. In the future, the GUI may be restricted to 'viewing groups' of 128 lines. This would allow a much greater number.
 
 
 Control numbers:

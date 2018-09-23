@@ -12,4 +12,6 @@ Pushing a message will return the first available ID and Popping a message makes
 
 There is a maximum of 254 possible entries at any one time, but it's unlikely that limit will ever be reached.
 
-The ID 255 is a 'do nothing' reserved for calls that might want to send a message... but then again might not :)
+The ID 255 (which has the global ID of NO_MSG) is a 'do nothing' reserved for calls that might want to send a message... but then again might not :)
+
+If you push an empty string you'll get back NO_MSG, and popping NO_MSG will of course return an empty string.

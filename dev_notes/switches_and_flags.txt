@@ -42,3 +42,7 @@ flagsReadClear()
 These functions provide a link from the realtime thread, to a low priority one.
 
 This is now used for all the commands that need a fade-down and system mute. The flag is set with the required command at the end of the audio thread.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+There is an integer written by the low priority 'indirect' thread and read only by main. This is only invoked when a new instance is started.

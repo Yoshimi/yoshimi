@@ -106,7 +106,7 @@ string toplist [] = {
     "  Part",                   "enter context level",
     "  VEctor",                 "enter context level",
     "  SCale",                  "enter context level",
-    "  MLearn",                 "enter context level",
+    "  MLearn",                 "enter editor context level",
     "  COnfig",                 "enter context level",
     "  Root <n>",               "current root path to ID",
     "  Bank <n>",               "current bank to ID",
@@ -195,13 +195,22 @@ string partlist [] = {
 };
 
 string commonlist [] = {
-    "ON @",                     "enables the part/kit/engine/insert etc,",
+    "ON @",                     "enables the part/kit item/engine/insert etc,",
     "OFf @",                    "disables as above",
     "Volume <n> @",             "volume",
     "Pan <n2> @",               "panning",
     "VElocity <n> @",           "velocity sensing sensitivity",
     "MIn <n> +",                "minimum MIDI note value",
     "MAx <n> +",                "maximum MIDI note value",
+    "DETune Fine <n> *",        "fine frequency",
+    "DETune Coarse <n> *",      "coarse stepped frequency",
+    "DETune Type <n> *",        "type of coarse stepping",
+    "OCTave <n> *",             "shift octaves up or down",
+    "FIXed <s> *-add",          "set base frequency to 440Hz (ON, {other})",
+    "EQUal <n> *-add",          "equal temper variation",
+    "BENd Adjust <n>  *-add",   "pitch bend range",
+    "BENd Offset <n>  *-add",   "pitch bend shift",
+    "STEreo <s> *-voice",       "ON, {other}",
     "DEPop <n> &",              "initial attack slope",
     "PUnch Power <n> &",        "attack boost amplitude",
     "PUnch Duration <n> &",     "attack boost time",
@@ -212,37 +221,28 @@ string commonlist [] = {
     "OVertone First <n> #",     "degree of first parameter",
     "OVertone Second <n> #",    "degree of second parameter",
     "OVertone Harmonic <n> #",  "amount harmonics are forced",
-    "FIXed <s> *-add",          "set base frequency to 440Hx (ON, {other})",
-    "EQUal <n> *-add",          "equal temper variation",
-    "BENd Adjust <n>  *-add",   "pitch bend range",
-    "BENd Offset <n>  *-add",   "pitch bend shift",
-    "DETune Fine <n> *",        "fine frequency",
-    "DETune Coarse <n> *",      "coarse stepped frequency",
-    "DETune Type <n> *",        "type of coarse stepping",
-    "OCTave <n> *",             "shift ovatces up or down",
-    "STEreo <s> *-voice",       "ON, {other}",
     "LFO ... *-sub",            "enter LFO insert context",
     "FILter ... *",             "enter Filter insert context",
     "ENVelope ... *",           "enter Envelope insert context",
     "","",
     "@",                        "exists in all part contexts",
     "+",                        "part and kit mode controls",
-    "&",                        "AddSynth & PadSynth only",
-    "#",                        "SubSynth & PadSynth only",
     "*",                        "Add, Sub, Pad and AddVoice controls",
     "*-add",                    "not AddSynth",
     "*-sub",                    "not SubSynth",
     "*-voice",                  "not AddVoice",
+    "&",                        "AddSynth & PadSynth only",
+    "#",                        "SubSynth & PadSynth only",
     "end"
 };
 
 string addsynthlist [] = {
-    "VOice ...",                    "enter Addsynth voice contect",
+    "VOice ...",                "enter Addsynth voice context",
     "end"
 };
 
 string addvoicelist [] = {
-    "WAveform",                 "enter the oscillator waveform context",
+    "WAveform ...",              "enter the oscillator waveform context",
     "end"
 };
 
@@ -259,7 +259,7 @@ string subsynthlist [] = {
 
 string padsynthlist [] = {
     "APply",                    "puts latest changes into the wavetable",
-    "WAveform",                 "enter the oscillator waveform context",
+    "WAveform ...",             "enter the oscillator waveform context",
     "end"
 };
 
@@ -281,7 +281,7 @@ string LFOlist [] = {
     "~  Rate <n>",              "frequency",
     "~  Start <n>",             "start position in cycle",
     "~  Delay <n>",             "time before effect",
-    "~  Expand <n>",            "overall LFO time",
+    "~  Expand <n>",            "rate / note pitch",
     "~  Continuous <s>",        "(ON, {other})",
     "~  Type <s>",              "LFO oscillator shape",
     "   ",                      "  SIne",
@@ -351,7 +351,7 @@ string envelopelist [] = {
     "BAndwidth",              "bandwidth type (SubSynth only)",
     "","",
     "controls","",
-    "Expand <n>",            "overall envelope time",
+    "Expand <n>",            "envelope time on lower notes",
     "Force <s>",             "force release (ON, {other})",
     "Linear <s>",            "linear slopes (ON, {other})",
     "FMode <s>",             "set as freemode (ON, {other})",
@@ -2320,7 +2320,7 @@ int CmdInterface::commandMlearn(unsigned char controlType)
                 Runtime.Log("Max CC value is 129");
                 return done_msg;
             }
-            control =16;
+            control = MIDILEARN::control::CCorChannel;
             Runtime.Log("Lines may be re-ordered");
         }
         else if (matchnMove(2, point, "channel"))
@@ -2328,7 +2328,7 @@ int CmdInterface::commandMlearn(unsigned char controlType)
             engine = string2int(point) - 1;
             if (engine > 16)
                 engine = 16;
-            control = 16;
+            control = MIDILEARN::control::CCorChannel;
             Runtime.Log("Lines may be re-ordered");;
         }
         else if (matchnMove(2, point, "minimum"))
@@ -2336,34 +2336,34 @@ int CmdInterface::commandMlearn(unsigned char controlType)
             insert = int((string2float(point)* 2.0f) + 0.5f);
             if (insert > 200)
                 return value_msg;
-            control = 5;
+            control = MIDILEARN::control::minimum;
         }
         else if (matchnMove(2, point, "maximum"))
         {
             parameter = int((string2float(point)* 2.0f) + 0.5f);
             if (parameter > 200)
                 return value_msg;
-            control = 6;
+            control = MIDILEARN::control::maximum;
         }
         else if (matchnMove(2, point, "mute"))
         {
             type = (toggle() == 1) * 4;
-            control = 2;
+            control = MIDILEARN::control::mute;
         }
         else if (matchnMove(2, point, "limit"))
         {
             type = (toggle() == 1) * 2;
-            control = 1;
+            control = MIDILEARN::control::limit;
         }
         else if (matchnMove(2, point, "block"))
         {
             type = (toggle() == 1);
-            control = 0;
+            control = MIDILEARN::control::block;
         }
         else if (matchnMove(2, point, "seven"))
         {
             type = (toggle() == 1) * 16;
-            control = 4;
+            control = MIDILEARN::control::sevenBit;
         }
         sendNormal(mline, type, control, TOPLEVEL::section::midiLearn, kit, engine, insert, parameter);
         return done_msg;
@@ -3812,6 +3812,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         if (filename > "!")
         {
             char *to_send;
+            char *mark;
             to_send = (char*) malloc(0xff);;
             int count = 0;
             bool isok = true;
@@ -3825,14 +3826,24 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                     if(fgets(to_send , 0xff , readfile))
                     {
                         ++ count;
-                        reply = cmdIfaceProcessCommand(to_send);
+                        mark = skipSpace(to_send);
+                        if ( mark[0] < ' ' || mark [0] == '#')
+                            continue;
+                        if (matchnMove(3, mark, "run"))
+                        {
+                            isok = false;
+                            synth->getRuntime().Log("*** Error: scripts are not recursive @ line " + to_string(count) + " ***");
+                            continue;
+                        }
+                        reply = cmdIfaceProcessCommand(mark);
                         if (reply > done_msg)
                         {
                             isok = false;
-                            synth->getRuntime().Log("Error: " + replies[reply] + " in line " + to_string(count));
+                            synth->getRuntime().Log("*** Error: " + replies[reply] + " @ line " + to_string(count) + " ***");
                         }
                     }
                 }
+                cout << "here" << endl;
                 fclose (readfile);
             }
             else
@@ -4517,7 +4528,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
 
 int CmdInterface::sendNormal(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
-    if (type >= TOPLEVEL::type::Limits && type < TOPLEVEL::source::CLI)
+    if (type >= TOPLEVEL::type::Limits && type < TOPLEVEL::source::CLI && part != TOPLEVEL::section::midiLearn)
     {
         readLimits(value, type, control, part, kit, engine, insert, parameter, par2);
         return done_msg;

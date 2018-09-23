@@ -1,0 +1,64 @@
+
+Yoshimi very heavily uses switch statements, some of which are truly massive. This might raise some alarm when viewed but is quite deliberate. In order to make all of this accessible to developers a spreadsheet was built up at the same time. This is "dev_notes/Yoshimi Control Numbers.ods" and has details of every command currently implemented (and a few still being considered).
+
+The development has been very much an incremental process, initially with numerical entries and large gaps to create grouping, allow for changes, and give a clearer idea of the various structures.
+
+
+Modern compilers are very smart when they see these large switches. The traditonal impression is they perform a lot of if-then tests but this is only true of small case groups, after that they make lookup tables which are considerably faster.
+
+But that isn't the end of it. If the structure is big enough and dense enough the compiler will instead fill the spaces with NOPs and turn the whole thing into a jump table. This is magic, because the code for any case can then be reached in exactly three machine instructions (two in the case of an ARM processor)
+
+A left shift to turn incoming switch values into pointer sized steps.
+
+An offset fetch from the jump table.
+
+A branch to the required code.
+
+ARM processors combine the first two into a single instruction.
+
+"Util/switch_time.cpp" is a copy of the source file for a program originally used to test the above hypothesis. The timing as slightly longer than it should be because various minimal calulations had to be put in to prevent the compiler optimising everything out in the 'packed' function :)
+
+
+Currently most of Yoshimi's data elements can be read in less than 20nS on a processor running at 3.1G - and many of the switches aren't dense enough for conversion to jump tables.
+
+However, now that command structure is pretty much settled, the numbers have been changed to global, yet isolated and meaningful names.
+
+ e.g.
+ namespace OSCILLATOR // usage OSCILLATOR::control::phaseRandomness
+{
+    enum control : unsigned char {
+        phaseRandomness = 0,
+        magType, // Linear, -40dB, -60dB, -80dB, -100dB
+        harmonicAmplitudeRandomness,
+        harmonicRandomnessType, // None, Power, Sine
+...
+...
+
+and this translates to:
+switch (control)
+    {
+        case OSCILLATOR::control::phaseRandomness:
+...
+...
+
+ The gaps are in the process of being removed. This will ensure that all switches become jump tables, and selection of any entry will take exactly the same (very short) time. Under these circumstances, the more cases you can pack into a single switch, the more efficient the entire process gets.
+
+
+Another point worth mentioniong is that Yoshimi has different priorities for access to the structure based on the following reasoning:
+
+1/
+Don't handle data that's not actually wanted.
+
+2/
+Limits and defaults are static so can be read directly at any time with a cut-down version of the overall structure.
+e.g. all part level volume controls have the same max, min, and default, so no need to test part and kit numbers.
+
+
+Other reads may be wanted in bulk from time to time (such as updating a GUI when a new patch set is loaded) so should be as fast as possible, but at the same time must wait briefly if a parameter is being changed. The downside is that the checks for this nearly double the access time, but it is still pretty slick. I think the oscillator window has the most controls - just under 200, so that means currently the whole lot can be fetched in less that 8uS, and that will improve.
+
+Writes are the only thing that can make dynamic reads wait. This ensures these reads will *always* be seeing valid data.
+
+Writes are also much more complicated. In the first place, we have made them all serial and synchronous with the audio thread (if they were not already) so how do you realistically time something going through a ring buffer, interleaved with other 'somethings'?
+
+The final wrinkle with writes is that they don't always do what they seem to. Loading an instrument patch for example, just sets a flag to mute the part, then passes the data to a low priority thread. This can take its time updating (as nothing can now read it) and when complete, clear the flag again.
+

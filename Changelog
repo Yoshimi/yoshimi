@@ -1,5 +1,15 @@
 yoshimi 1.5.8 M
 
+2018-9-23 Will
+* BugFix: CLI not setting midilearn mute.
+* Enabled comments in CLI script.
+  Also added more error checks.
+* Typo corrections:(
+* Corrected CLI 'expand' info.
+* Updated docs.
+* Added Sub Choir to Will_Godfrey_Companion.
+* Set version as 1.5.9 rc3
+
 2018-9-19 Will
 * BugFix: Failed older manual if current missing.
 * Revised CLI status to compress line length.
