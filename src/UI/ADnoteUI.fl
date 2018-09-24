@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
-Modified August 2018
+Modified September 2018
 } {selected in_source in_header
 }
 
@@ -996,8 +996,8 @@ o->show();}
     int tmp;
     bool val_bool = (value > 0.5f);
     //cout << "adnote return" << endl;
-    if (voice != nvoice && control != ADDVOICE::control::enableVoice)
-        return;
+    //if (voice != nvoice && control != ADDVOICE::control::enableVoice)
+        //return;
 
     switch(control)
     {
@@ -1061,7 +1061,8 @@ o->show();}
             break;
 
         case ADDVOICE::control::detuneFrequency:
-            Detune->value(value);
+            if (voice == nvoice)
+                Detune->value(value);
             detunevalueoutput->do_callback();
             synth->getGuiMaster()->partui->adnoteui->voicelistitem[voice]->voicedetune->value(value);
             synth->getGuiMaster()->partui->adnoteui->voicelistitem[voice]->detunevalueoutput->do_callback();
@@ -1307,6 +1308,7 @@ o->show();}
             synth->getGuiMaster()->partui->adnoteui->setTabColour(voice);
             if (tmp)
             {
+                nvoice = voice;
                 voiceparametersgroup->activate();
                 synth->getGuiMaster()->partui->adnoteui->voicelistitem[voice]->voicelistitemgroup->activate();
             }
@@ -1320,7 +1322,8 @@ o->show();}
 
         case ADDVOICE::control::enableResonance:
             tmp = (val_bool);
-            ResonanceEn->value(tmp);
+            if (voice == nvoice)
+                ResonanceEn->value(tmp);
             synth->getGuiMaster()->partui->adnoteui->voicelistitem[voice]->voiceresonanceenabled->value(tmp);
             break;
 

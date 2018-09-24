@@ -1,5 +1,11 @@
 yoshimi 1.5.8 M
 
+2018-9-24 Will
+* Bugfix voice list out of sync with voice editor.
+* Copied in new user guide.
+* set new README.txt
+* Set version as 1.5.9 release
+
 2018-9-23 Will
 * BugFix: CLI not setting midilearn mute.
 * Enabled comments in CLI script.

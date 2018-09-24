@@ -34,12 +34,12 @@ add_definitions(-std=gnu++11) # various versions of cmake
 
 # vvv
 add_definitions(-Wall)
-add_definitions(-Werror=format-security)
 #add_definitions(-Wpedantic)
-add_definitions(-Wextra)
+#add_definitions(-Werror=format-security)
+#add_definitions(-Wextra)
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "1.5.9 rc3")
+set (YOSHIMI_VERSION "1.5.9")
 add_definitions (-DMIN_CONFIG_MAJOR=1)
 add_definitions (-DMIN_CONFIG_MINOR=5)
 

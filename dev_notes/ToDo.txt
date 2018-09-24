@@ -5,6 +5,8 @@ BUG! If jack is selected for audio but there are no physical ports Yoshimi quits
 
 Maybe BUG crash when loading files from banks - cured by clearing an recreating config files.
 
+Revise GUI voice list related to voice editor.
+
 Sort out bank properly.
 
 Sort out cli part effect controls. Also sys/ins updates wrong.

@@ -325,7 +325,7 @@ string filterlist [] = {
     "  stop",               "band stop",
     "","",
     "formant editor","",
-    "Direct <n>",           "bypass LFOs, envelopes",
+    "Invert <s>",           "invert effect of LFOs, envelopes (ON, OFf)",
     "FCenter <n>",          "center frequency of sequence",
     "FRange <n>",           "octave range of formants",
     "Expand <n>",           "stretch overal sequence time",
@@ -1502,7 +1502,7 @@ int CmdInterface::filterSelect(unsigned char controlType)
         int baseType = readControl(FILTERINSERT::control::baseType, npart, kitNumber, engine, TOPLEVEL::insert::filterGroup);
         if (baseType == 1) // formant
         {
-            if (matchnMove(1, point, "direct"))
+            if (matchnMove(1, point, "invert"))
             {
                 if (lineEnd(controlType))
                     return value_msg;
