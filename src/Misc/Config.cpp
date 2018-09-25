@@ -187,7 +187,7 @@ bool Config::Setup(int argc, char **argv)
         /*
          * These are needed here now, as for stand-alone they have
          * been moved to main to give the users the impression of
-         * a faster startup, and reduce the likelyhood of thinking
+         * a faster startup, and reduce the likelihood of thinking
          * they failed and trying to start again.
          */
         synth->installBanks();
