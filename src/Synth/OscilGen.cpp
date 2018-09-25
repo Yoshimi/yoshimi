@@ -99,7 +99,7 @@ void OscilGen::defaults(void)
     Phmag[0] = 127;
     Phmagtype = 0;
     if (ADvsPAD)
-        Prand = 127; // max phase randomness (usefull if the oscil will be
+        Prand = 127; // max phase randomness (useful if the oscil will be
                      // imported to a ADsynth from a PADsynth
     else
         Prand = 64; // no randomness
