@@ -96,7 +96,7 @@ int WidgetPDial::handle(int event)
     case FL_DRAG: // done this way to suppress warnings
         if(event == FL_PUSH)
         {
-            Fl::belowmouse(this); /* Ensures other widgets receieve FL_RELEASE */
+            Fl::belowmouse(this); /* Ensures other widgets receive FL_RELEASE */
             /*if (home > -0.5f && Fl::event_button() == 3)
             {
                 value(home);
@@ -190,7 +190,7 @@ void WidgetPDial::draw()
          Fl_Window::current()->h());
     cr = cairo_create (Xsurface);
     cairo_translate(cr,cx+dh,cy+dh);
-    //relative lenghts of the various parts:
+    //relative lengths of the various parts:
     double rCint = 10.5/35;
     double rCout = 13.0/35;
     double rHand = 8.0/35;
