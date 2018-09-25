@@ -813,7 +813,7 @@ void Part::SetController(unsigned int type, int par)
 }
 
 
-// Relase the sustained keys
+// Release the sustained keys
 void Part::RelaseSustainedKeys(void)
 {
     // Let's call MonoMemRenote() on some conditions:
@@ -829,7 +829,7 @@ void Part::RelaseSustainedKeys(void)
 }
 
 
-// Relase all keys
+// Release all keys
 void Part::RelaseAllKeys(void)
 {
     for (int i = 0; i < POLIPHONY; ++i)
