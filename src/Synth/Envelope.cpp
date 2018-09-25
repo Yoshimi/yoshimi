@@ -95,7 +95,7 @@ Envelope::Envelope(EnvelopeParams *envpars, float basefreq, SynthEngine *_synth)
 }
 
 
-// Relase the key (note envelope)
+// Release the key (note envelope)
 void Envelope::relasekey(void)
 {
     if (keyreleased == 1)

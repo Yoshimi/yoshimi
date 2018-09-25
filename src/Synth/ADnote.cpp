@@ -351,7 +351,7 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
                                                getVoiceBaseFreq(nvoice),
                                                adpars->VoicePar[nvoice].Presonance);
 
-        // I store the first elments to the last position for speedups
+        // I store the first elements to the last position for speedups
         for (int i = 0; i < OSCIL_SMP_EXTRA_SAMPLES; ++i)
             NoteVoicePar[nvoice].OscilSmp[synth->oscilsize + i] = NoteVoicePar[nvoice].OscilSmp[i];
 
@@ -583,7 +583,7 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
                                            getVoiceBaseFreq(nvoice),
                                            adpars->VoicePar[nvoice].Presonance);                                                       //(gf)Modif of the above line.
 
-        // I store the first elments to the last position for speedups
+        // I store the first elements to the last position for speedups
         for (int i = 0; i < OSCIL_SMP_EXTRA_SAMPLES; ++i)
             NoteVoicePar[nvoice].OscilSmp[synth->oscilsize + i] =
                 NoteVoicePar[nvoice].OscilSmp[i];
@@ -1904,7 +1904,7 @@ int ADnote::noteout(float *outl, float *outr)
                 for (i = 0; i < synth->sent_buffersize; ++i)
                     bypassl[i] += tmpwavel[i] * NoteVoicePar[nvoice].Volume; // mono
         }
-        // check if there is necesary to proces the voice longer
+        // check if there is necessary to proces the voice longer
         // (if the Amplitude envelope isn't finished)
         if (NoteVoicePar[nvoice].AmpEnvelope != NULL)
             if (NoteVoicePar[nvoice].AmpEnvelope->finished())
@@ -2077,7 +2077,7 @@ int ADnote::noteout(float *outl, float *outr)
 }
 
 
-// Relase the key (NoteOff)
+// Release the key (NoteOff)
 void ADnote::relasekey(void)
 {
     int nvoice;

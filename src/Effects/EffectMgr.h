@@ -1,5 +1,5 @@
 /*
-    EffectMgr.h - Effect manager, an interface betwen the program and effects
+    EffectMgr.h - Effect manager, an interface between the program and effects
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul

@@ -259,7 +259,7 @@ public:
     };
     void *data; //custom data, must be static or handled by called, does nod freed by receiver
     unsigned long length; //length of data member (determined by type member, can be set to 0, if data is known struct/class)
-    unsigned int index; // if there is integer data, it can be passed through index (to remove aditional receiver logic)
+    unsigned int index; // if there is integer data, it can be passed through index (to remove additional receiver logic)
     unsigned int type; // type of gui message (see enum above)
     static void sendMessage(void *_data, unsigned int _type, unsigned int _index)
     {

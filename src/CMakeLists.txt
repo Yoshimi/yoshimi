@@ -17,7 +17,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-# Modifed September 2018
+# Modified September 2018
 
 project (Yoshimi)
 cmake_minimum_required (VERSION 3.0)
@@ -96,7 +96,7 @@ option (ReportNotes "Report Notes On/Off" OFF)
 
 set (BuildOptions_X86
     "-O3 -msse -msse2 -mfpmath=sse -ffast-math -fomit-frame-pointer"
-    CACHE STRING "basic X86 complier options"
+    CACHE STRING "basic X86 compiler options"
 )
 
 set (BuildOptions_X86_64AMD

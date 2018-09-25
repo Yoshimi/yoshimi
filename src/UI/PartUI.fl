@@ -1549,7 +1549,7 @@ Offset}
             case FL_FOCUS:
             case FL_UNFOCUS:
                 ret = 1;                break;
-            case FL_SHORTCUT:           // incase widget that isn't ours has focus
+            case FL_SHORTCUT:           // in case widget that isn't ours has focus
             case FL_KEYDOWN:            // keyboard key pushed
             //case FL_KEYUP:              // keyboard key released
             {
@@ -1857,7 +1857,7 @@ Offset}
             partkititem[kititem]->mutedcheck->value(valBool);
             break;
         case PART::control::minNote:
-        case PART::control::minToLastKey: // this will have been modifed for last key press
+        case PART::control::minToLastKey: // this will have been modified for last key press
             if (kitType)
                partkititem[kititem]->minkcounter->value(valInt);
             else
@@ -1865,7 +1865,7 @@ Offset}
             break;
 
         case PART::control::maxNote:
-        case PART::control::maxToLastKey: // this will have been modifed for last key press
+        case PART::control::maxToLastKey: // this will have been modified for last key press
             if (kitType)
                 partkititem[kititem]->maxkcounter->value(valInt);
             else

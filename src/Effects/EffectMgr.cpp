@@ -1,5 +1,5 @@
 /*
-    EffectMgr.cpp - Effect manager, an interface betwen the program and effects
+    EffectMgr.cpp - Effect manager, an interface between the program and effects
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul

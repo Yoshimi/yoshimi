@@ -1136,7 +1136,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     if (npart == TOPLEVEL::section::scales && (control <= SCALES::control::tuning || control >= SCALES::control::retune))
         synth->setAllPartMaps();
 
-    bool isCli = ((type & (TOPLEVEL::source::CLI | TOPLEVEL::source::GUI )) == TOPLEVEL::source::CLI); // elminate Gui redraw
+    bool isCli = ((type & (TOPLEVEL::source::CLI | TOPLEVEL::source::GUI )) == TOPLEVEL::source::CLI); // eliminate Gui redraw
     bool isGui = type & TOPLEVEL::source::GUI;
     char button = type & 3;
     string isValue;

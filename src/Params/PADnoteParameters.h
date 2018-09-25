@@ -88,7 +88,7 @@ class PADnoteParameters : public Presets
                 unsigned char par2;
             } amp;
             bool autoscale;        //  if the scale of the harmonic profile is
-                                   // computed automaticaly
+                                   // computed automatically
             unsigned char onehalf; // what part of the base function is used to
                                    // make the distribution
         } Php;
