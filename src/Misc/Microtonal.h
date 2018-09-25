@@ -95,7 +95,7 @@ class Microtonal : private MiscFuncs
         bool validline(const char *line);
         int linetotunings(unsigned int nline, const char *line);
         int loadline(FILE *file, char *line); // loads a line from the text file,
-                                              // ignoring the lines beggining with "!"
+                                              // ignoring the lines beginning with "!"
         int octavesize;
 
         struct {
