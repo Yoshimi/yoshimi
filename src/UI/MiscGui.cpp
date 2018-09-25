@@ -251,7 +251,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     }
 
     if (kititem != UNUSED && kititem != 0 && engine != UNUSED && control != PART::control::enable && part->kit[kititem].Penabled == false)
-        return; // attempt to access non existant kititem
+        return; // attempt to access non existent kititem
 
     if (insert != UNUSED || (control != PART::control::enable && control != PART::control::instrumentName))
     {
