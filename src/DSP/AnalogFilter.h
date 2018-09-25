@@ -72,7 +72,7 @@ class AnalogFilter : public Filter_, private MiscFuncs
 
         float c[3], d[3]; // coefficients
 
-        float oldc[3], oldd[3]; // old coefficients(used only if some filter paremeters changes very fast, and it needs interpolation)
+        float oldc[3], oldd[3]; // old coefficients(used only if some filter parameters changes very fast, and it needs interpolation)
 
         float xd[3], yd[3]; // used if the filter is applied more times
         bool needsinterpolation, firsttime;
