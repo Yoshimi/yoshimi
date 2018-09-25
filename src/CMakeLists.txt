@@ -96,7 +96,7 @@ option (ReportNotes "Report Notes On/Off" OFF)
 
 set (BuildOptions_X86
     "-O3 -msse -msse2 -mfpmath=sse -ffast-math -fomit-frame-pointer"
-    CACHE STRING "basic X86 complier options"
+    CACHE STRING "basic X86 compiler options"
 )
 
 set (BuildOptions_X86_64AMD
