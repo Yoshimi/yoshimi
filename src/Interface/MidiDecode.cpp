@@ -666,7 +666,7 @@ void MidiDecode::setMidiProgram(unsigned char ch, int prg, bool in_place)
      * but it is the simplest way to ensure partonoff doesn't
      * get out of step.
      *
-     * Changes won't normally happen while MIDI is incomming
+     * Changes won't normaly happen while MIDI is incoming
      * on the same channel.
      */
     if (ch < NUM_MIDI_CHANNELS)
