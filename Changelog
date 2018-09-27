@@ -1,4 +1,7 @@
-yoshimi 1.5.8 M
+yoshimi 1.5.9 M
+2018-9-27 Will
+* Accepted typo checks from debian.
+* Some doc corrections.
 
 2018-9-24 Will
 * Bugfix voice list out of sync with voice editor.

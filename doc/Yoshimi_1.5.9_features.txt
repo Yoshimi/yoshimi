@@ -16,7 +16,7 @@ Here is a simple working example:
     set part on
         # These two lines are spaced in a bit
         set add on
-    set add voice on
+    set voice on
     set volume 45
 
 This will make sure the part is on, then make sure the relative addsynth and voice are on, and finally set the voice volume to 45.

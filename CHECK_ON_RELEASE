@@ -18,5 +18,10 @@
     Ensure these are up-to-date - especially check
     yoshimi-user-manual has correct version number
 
+Changelog
+    Make sure top line is current release, not rc!
+
+set tag to release version
+
 After commit
     Update wikipedia entry

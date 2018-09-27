@@ -16,7 +16,7 @@ A branch to the required code.
 
 ARM processors combine the first two into a single instruction.
 
-"Util/switch_time.cpp" is a copy of the source file for a program originally used to test the above hypothesis. The timing as slightly longer than it should be because various minimal calulations had to be put in to prevent the compiler optimising everything out in the 'packed' function :)
+"Util/switch_time.cpp" is a copy of the source file for a program originally used to test the above hypothesis. The timing is slightly longer than it should be because various minimal calulations had to be put in to prevent the compiler optimising everything out in the 'packed' function :)
 
 
 Currently most of Yoshimi's data elements can be read in less than 20nS on a processor running at 3.1G - and many of the switches aren't dense enough for conversion to jump tables.
@@ -44,7 +44,7 @@ switch (control)
  The gaps are in the process of being removed. This will ensure that all switches become jump tables, and selection of any entry will take exactly the same (very short) time. Under these circumstances, the more cases you can pack into a single switch, the more efficient the entire process gets.
 
 
-Another point worth mentioniong is that Yoshimi has different priorities for access to the structure based on the following reasoning:
+Another point worth mentioning is that Yoshimi has different priorities for access to the structure based on the following reasoning:
 
 1/
 Don't handle data that's not actually wanted.
