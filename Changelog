@@ -1,4 +1,10 @@
 yoshimi 1.5.9 M
+
+2018-9-30 Will
+* BugFix: AddSynth FM mod was cogging notes.
+  Only that mod and at notes close to sample rate.
+* Improved note/mod oscillator frequency calculations.
+
 2018-9-27 Will
 * Accepted typo checks from debian.
 * Some doc corrections.

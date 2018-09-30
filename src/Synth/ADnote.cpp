@@ -20,7 +20,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of original ZynAddSubFX code
+    This file is derivative of original ZynAddSubFX code.
     Modified September 2017
 */
 
@@ -1085,9 +1085,9 @@ void ADnote::setfreq(int nvoice, float in_freq)
         float speed = freq * synth->oscilsize_f / synth->samplerate_f;
         if (isgreater(speed, synth->oscilsize_f))
             speed = synth->oscilsize_f;
-        //F2I(speed, oscfreqhi[nvoice][k]);
-        oscfreqhi[nvoice][k] = float2int(speed);
-        oscfreqlo[nvoice][k] = speed - floor(speed);
+        int tmp = int(speed);
+        oscfreqhi[nvoice][k] = tmp;
+        oscfreqlo[nvoice][k] = speed - tmp;
     }
 }
 
@@ -1101,9 +1101,9 @@ void ADnote::setfreqFM(int nvoice, float in_freq)
         float speed = freq * synth->oscilsize_f / synth->samplerate_f;
         if (isgreater(speed, synth->oscilsize_f))
             speed = synth->oscilsize_f;
-        //F2I(speed, oscfreqhiFM[nvoice][k]);
-        oscfreqhiFM[nvoice][k] = float2int(speed);
-        oscfreqloFM[nvoice][k] = speed - floor(speed);
+        int tmp = int(speed);
+        oscfreqhiFM[nvoice][k] = tmp;
+        oscfreqloFM[nvoice][k] = speed - tmp;
     }
 }
 
@@ -1262,7 +1262,7 @@ void ADnote::fadein(float *smps)
         tmp = 8.0f;
     tmp *= NoteGlobalPar.Fadein_adjustment;
 
-    int fadein = float2int((tmp < 8.0f) ? 8.0f : tmp); // how many samples is the fade-in
+    int fadein = int((tmp < 8.0f) ? 8.0f : tmp); // how many samples is the fade-in
     if (fadein > synth->sent_buffersize)
         fadein = synth->sent_buffersize;
     for (int i = 0; i < fadein; ++i) // fade-in
@@ -1347,9 +1347,9 @@ inline void ADnote::computeVoiceOscillatorCubicInterpolation(int nvoice)
             c = (x1 - xm1) * 0.5;
             tw[i] = (((a * poslo) + b) * poslo + c) * poslo + x0;
             poslo += freqlo;
-            if (poslo >= 1.0)
+            if (poslo >= 1.0f)
             {
-                poslo -= 1.0;
+                poslo -= 1.0f;
                 ++poshi;
             }
             poshi += freqhi;
@@ -1404,7 +1404,7 @@ void ADnote::computeVoiceOscillatorMorph(int nvoice)
                           * (1 - posloFM) + NoteVoicePar[nvoice].FMSmp[poshiFM + 1]
                           * posloFM);
                 posloFM += freqloFM;
-                if (isgreaterequal(posloFM, 1.0f))
+                if (posloFM >= 1.0f)
                 {
                     posloFM -= 1.0f;
                     poshiFM++;
@@ -1463,7 +1463,7 @@ void ADnote::computeVoiceOscillatorRingModulation(int nvoice)
                           + NoteVoicePar[nvoice].FMSmp[poshiFM + 1] * posloFM)
                           * amp + (1.0 - amp);
                 posloFM += freqloFM;
-                if (isgreaterequal(posloFM, 1.0f))
+                if (posloFM >= 1.0f)
                 {
                     posloFM -= 1.0f;
                     poshiFM++;
@@ -1481,11 +1481,6 @@ void ADnote::computeVoiceOscillatorRingModulation(int nvoice)
 // Computes the Oscillator (Phase Modulation or Frequency Modulation)
 void ADnote::computeVoiceOscillatorFrequencyModulation(int nvoice, int FMmode)
 {
-    int carposhi = 0;
-    int i, FMmodfreqhi = 0;
-    float FMmodfreqlo = 0.0f;
-    float carposlo = 0.0f;
-
     if (NoteVoicePar[nvoice].FMVoice >= 0)
     {
         // if I use VoiceOut[] as modulator
@@ -1512,15 +1507,15 @@ void ADnote::computeVoiceOscillatorFrequencyModulation(int nvoice, int FMmode)
             float *tw = tmpwave_unison[k];
             const float *smps = NoteVoicePar[nvoice].FMSmp;
 
-            for (i = 0; i < synth->sent_buffersize; ++i)
+            for (int i = 0; i < synth->sent_buffersize; ++i)
             {
-                tw[i] = (smps[poshiFM] * ((1<<24) - posloFM)
-                         + smps[poshiFM + 1] * posloFM) / (1.0f*(1<<24));
+                tw[i] = (smps[poshiFM] * (1 - posloFM)
+                         + smps[poshiFM + 1] * posloFM) / (1.0f);
                 if (FMmode == PW_MOD && (k & 1))
                     tw[i] = -tw[i];
 
                 posloFM += freqloFM;
-                if (isgreaterequal(posloFM, 1.0f))
+                if (posloFM >= 1.0f)
                 {
                     posloFM -= 1.0f;
                     poshiFM++;
@@ -1538,7 +1533,7 @@ void ADnote::computeVoiceOscillatorFrequencyModulation(int nvoice, int FMmode)
         for (int k = 0; k < unison_size[nvoice]; ++k)
         {
             float *tw = tmpwave_unison[k];
-            for (i = 0; i < synth->sent_buffersize; ++i)
+            for (int i = 0; i < synth->sent_buffersize; ++i)
                 tw[i] *= interpolateAmplitude(FMoldamplitude[nvoice],
                                               FMnewamplitude[nvoice], i,
                                               synth->sent_buffersize);
@@ -1549,7 +1544,7 @@ void ADnote::computeVoiceOscillatorFrequencyModulation(int nvoice, int FMmode)
         for (int k = 0; k < unison_size[nvoice]; ++k)
         {
             float *tw = tmpwave_unison[k];
-            for (i = 0; i < synth->sent_buffersize; ++i)
+            for (int i = 0; i < synth->sent_buffersize; ++i)
                 tw[i] *= FMnewamplitude[nvoice];
         }
     }
@@ -1563,7 +1558,7 @@ void ADnote::computeVoiceOscillatorFrequencyModulation(int nvoice, int FMmode)
         {
             float *tw = tmpwave_unison[k];
             float  fmold = FMoldsmp[nvoice][k];
-            for (i = 0; i < synth->sent_buffersize; ++i)
+            for (int i = 0; i < synth->sent_buffersize; ++i)
             {
                 fmold = fmodf(fmold + tw[i] * normalize, synth->oscilsize_f);
                 tw[i] = fmold;
@@ -1577,7 +1572,7 @@ void ADnote::computeVoiceOscillatorFrequencyModulation(int nvoice, int FMmode)
         for (int k = 0; k < unison_size[nvoice]; ++k)
         {
             float *tw = tmpwave_unison[k];
-            for (i = 0; i < synth->sent_buffersize; ++i)
+            for (int i = 0; i < synth->sent_buffersize; ++i)
                 tw[i] *= normalize;
         }
     }
@@ -1591,22 +1586,22 @@ void ADnote::computeVoiceOscillatorFrequencyModulation(int nvoice, int FMmode)
         int freqhi = oscfreqhi[nvoice][k];
         float freqlo = oscfreqlo[nvoice][k];
 
-        for (i = 0; i < synth->sent_buffersize; ++i)
+        for (int i = 0; i < synth->sent_buffersize; ++i)
         {
             //F2I(tw[i], FMmodfreqhi);
-            FMmodfreqhi = float2int(tw[i]);
-            FMmodfreqlo = fmodf(tw[i] + 0.0000000001f, 1.0f);
+            int FMmodfreqhi = float2int(tw[i]);
+            float FMmodfreqlo = tw[i]-FMmodfreqhi;//fmodf(tw[i] + 0.0000000001f, 1.0f);
             if (FMmodfreqhi < 0)
                 FMmodfreqlo++;
 
             // carrier
-            carposhi = poshi + FMmodfreqhi;
-            carposlo = poslo + FMmodfreqlo;
+            int carposhi = poshi + FMmodfreqhi;
+            float carposlo = poslo + FMmodfreqlo;
 
             if (FMmode == PW_MOD && (k & 1))
                 carposhi += NoteVoicePar[nvoice].phase_offset;
 
-            if(isgreaterequal(carposlo, 1.0f))
+            if(carposlo >= 1.0f)
             {
                 carposhi++;
                 carposlo -= 1.0f;
@@ -1616,9 +1611,9 @@ void ADnote::computeVoiceOscillatorFrequencyModulation(int nvoice, int FMmode)
             tw[i] = NoteVoicePar[nvoice].OscilSmp[carposhi] * (1.0f - carposlo)
                     + NoteVoicePar[nvoice].OscilSmp[carposhi + 1] * carposlo;
             poslo += freqlo;
-            if (isgreaterequal(poslo, 1.0f))
+            if (poslo >= 1.0f)
             {
-                poslo = fmodf(poslo, 1.0f);
+                poslo -= 1.0f;
                 poshi++;
             }
 
