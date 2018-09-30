@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified August 2018
+    Modified September 2018
 */
 
 #include "Misc/SynthEngine.h"
@@ -117,8 +117,7 @@ void Chorus::out(float *smpsl, float *smpsr)
         if (++dlk >= maxdelay)
             dlk = 0;
         tmp = dlk - mdel + maxdelay * 2.0f; // where should I get the sample from
-        // F2I(tmp, dlhi);
-        dlhi = (tmp > 0.0f) ? (int)truncf(tmp) : (int)truncf(tmp - 1.0f);
+         F2I(tmp, dlhi);
         dlhi %= maxdelay;
 
         dlhi2 = (dlhi - 1 + maxdelay) % maxdelay;
@@ -133,8 +132,7 @@ void Chorus::out(float *smpsl, float *smpsr)
         if (++drk >= maxdelay)
             drk = 0;
         tmp = drk * 1.0f - mdel + maxdelay * 2.0f; // where should I get the sample from
-        // F2I(tmp, dlhi);
-        dlhi = (tmp > 0.0f) ? (int)truncf(tmp) : (int)truncf(tmp - 1.0f);
+        F2I(tmp, dlhi);
         dlhi %= maxdelay;
         dlhi2 = (dlhi - 1 + maxdelay) % maxdelay;
         dllo = 1.0f - fmodf(tmp, one);

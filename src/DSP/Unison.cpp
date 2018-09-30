@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2018, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified January 2011
+    This file is a derivative of a ZynAddSubFX original
+
+    Modified September 2018
 */
 
 #include <cmath>
@@ -156,8 +159,8 @@ void Unison::process(int bufsize, float *inbuf, float *outbuf)
         {
             float vpos = uv[k].realpos1 * (1.0f - xpos) + uv[k].realpos2 * xpos;
             float pos  = (float)(delay_k + max_delay) - vpos - 1.0f;
-            // F2I(pos, posi);
-            int posi = (pos > 0.0f) ? (int)truncf(pos) : (int)truncf(pos - 1.0f);
+            int posi;
+            F2I(pos, posi);
             int posi_next = posi + 1;
             if (posi >= max_delay)
                 posi -= max_delay;

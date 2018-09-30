@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011 Alan Calvert
-    Copyright 2017 Will Godfrey & others
+    Copyright 2017-2018 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of ZynAddSubFX original code
-    Modified March 2017
+    Modified September 2018
 */
 #include <cmath>
 
@@ -332,8 +332,8 @@ inline void PADnote::fadein(float *smps)
         tmp = 8.0;
     tmp *= NoteGlobalPar.Fadein_adjustment;
 
-    // F2I(tmp, n); // how many samples is the fade-in
-    int n = (tmp > 0.0f) ? (int)truncf(tmp) : (int)truncf(tmp - 1.0f);
+    int n; // how many samples is the fade-in
+    F2I(tmp, n);
     if (n > synth->sent_buffersize)
         n = synth->sent_buffersize;
     for (int i = 0; i < n; ++i)

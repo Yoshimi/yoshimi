@@ -29,6 +29,18 @@
 #define HALFPI 1.57079632679f
 #define LOG_2 0.693147181f
 
+
+//is like i=(int)(floor(f))
+#ifdef ASM_F2I_YES
+#define F2I(f, \
+            i) __asm__ __volatile__ ("fistpl %0" : "=m" (i) : "t" (f \
+                                                                   - \
+                                                                   0.49999999f) \
+                                     : "st");
+#else
+#define F2I(f, i) (i) = ((f > 0) ? ((int)trunc(f)) : ((int)trunc(f - 1.0f)));
+#endif
+
 // many of the following are for convenience and consistency
 // changing them is likely to have unpredicable consequences
 

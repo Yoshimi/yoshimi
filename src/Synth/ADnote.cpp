@@ -639,8 +639,6 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
                          * synth->samplerate_f);
     }
 
-    ///    initParameters();
-
     ///////////////
     // Altered content of initParameters():
 
@@ -1085,7 +1083,8 @@ void ADnote::setfreq(int nvoice, float in_freq)
         float speed = freq * synth->oscilsize_f / synth->samplerate_f;
         if (isgreater(speed, synth->oscilsize_f))
             speed = synth->oscilsize_f;
-        int tmp = int(speed);
+        int tmp;
+        F2I (speed, tmp);
         oscfreqhi[nvoice][k] = tmp;
         oscfreqlo[nvoice][k] = speed - tmp;
     }
@@ -1101,7 +1100,8 @@ void ADnote::setfreqFM(int nvoice, float in_freq)
         float speed = freq * synth->oscilsize_f / synth->samplerate_f;
         if (isgreater(speed, synth->oscilsize_f))
             speed = synth->oscilsize_f;
-        int tmp = int(speed);
+        int tmp;
+        F2I (speed, tmp);
         oscfreqhiFM[nvoice][k] = tmp;
         oscfreqloFM[nvoice][k] = speed - tmp;
     }
@@ -1262,7 +1262,8 @@ void ADnote::fadein(float *smps)
         tmp = 8.0f;
     tmp *= NoteGlobalPar.Fadein_adjustment;
 
-    int fadein = int((tmp < 8.0f) ? 8.0f : tmp); // how many samples is the fade-in
+    int fadein; // how many samples is the fade-in
+    F2I(((tmp < 8.0f) ? 8.0f : tmp), fadein)
     if (fadein > synth->sent_buffersize)
         fadein = synth->sent_buffersize;
     for (int i = 0; i < fadein; ++i) // fade-in
@@ -1588,9 +1589,9 @@ void ADnote::computeVoiceOscillatorFrequencyModulation(int nvoice, int FMmode)
 
         for (int i = 0; i < synth->sent_buffersize; ++i)
         {
-            //F2I(tw[i], FMmodfreqhi);
-            int FMmodfreqhi = float2int(tw[i]);
-            float FMmodfreqlo = tw[i]-FMmodfreqhi;//fmodf(tw[i] + 0.0000000001f, 1.0f);
+            int FMmodfreqhi;
+            F2I(tw[i], FMmodfreqhi);
+            float FMmodfreqlo = tw[i]-FMmodfreqhi;
             if (FMmodfreqhi < 0)
                 FMmodfreqlo++;
 
