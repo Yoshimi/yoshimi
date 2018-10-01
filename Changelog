@@ -1,5 +1,9 @@
 yoshimi 1.5.9 M
 
+2018-10-1 Will
+* Completed F2I adjustments.
+* Started populating with new F2I.
+
 2018-9-30 Will
 * BugFix: AddSynth FM mod was cogging notes.
   Only that mod and at notes close to sample rate.

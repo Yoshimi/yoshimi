@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified September 2018
+    Modified October 2018
 */
 
 // approx timeout in seconds.
@@ -301,7 +301,11 @@ int mainCreateNewInstance(unsigned int forceId, bool loadState)
     synth->Unmute();
 
     if (instanceID == 0)
+    {
         cout << "\nYay! We're up and running :-)\n";
+        if (ASM_F2I)
+            cout << "Fast float 2 int" << endl;
+    }
     else
     {
         cout << "\nStarted "<< instanceID << "\n";

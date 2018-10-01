@@ -17,7 +17,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-# Modified September 2018
+# Modified October 2018
 
 project (Yoshimi)
 cmake_minimum_required (VERSION 3.0)
@@ -168,6 +168,14 @@ if (NOT LIBC_HAS_ARGP)
         message(FATAL_ERROR "libargp required but not found")
     endif(ARGP_LIB)
 endif(NOT LIBC_HAS_ARGP)
+
+execute_process(COMMAND echo fistpl 0
+                COMMAND as -
+                ERROR_VARIABLE NO_ASM)
+if(NOT NO_ASM)
+    message(STATUS "Compiling with x86 opcode support")
+    add_definitions(-DASM_F2I)
+endif()
 
 # libz
 set (CMAKE_REQUIRED_LIBRARIES z)

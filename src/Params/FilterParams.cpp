@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified September 2018
+    Modified October 2018
 */
 
 #include <cmath>
@@ -80,7 +80,7 @@ void FilterParams::defaults(int n)
     int j = n;
     for (int i = 0; i < FF_MAX_FORMANTS; ++i)
     {
-        Pvowels[j].formants[i].freq = (int)truncf(synth->numRandom() * 127.0f); // some random freqs
+        F2I(synth->numRandom() * 127.0f, Pvowels[j].formants[i].freq); // some random freqs
         Pvowels[j].formants[i].q = 64;
         Pvowels[j].formants[i].amp = 127;
     }

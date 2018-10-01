@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified July 2018
+    Modified October 2018
 */
 
 #include <cmath>
@@ -95,7 +95,9 @@ Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_
     inputbuf = (float*)fftwf_malloc(synth->bufferbytes);
     for (int i = 0; i < REV_COMBS * 2; ++i)
     {
-        comblen[i] = 800 + (int)truncf(synth->numRandom() * 1400.0f);
+
+        F2I(synth->numRandom() * 1400.0f, comblen[i]);
+        comblen[i] += 800;
         combk[i] = 0;
         lpcomb[i] = 0;
         combfb[i] = -0.97f;
@@ -104,7 +106,8 @@ Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_
 
     for (int i = 0; i < REV_APS * 2; ++i)
     {
-        aplen[i] = 500 + (int)truncf(synth->numRandom() * 500.0f);
+        F2I(synth->numRandom() * 500.0f, aplen[i]);
+        aplen[i] += 500;
         apk[i] = 0;
         ap[i] = NULL;
     }
@@ -414,7 +417,7 @@ void Reverb::settype(unsigned char Ptype_)
         tmp *= samplerate_adjust; // adjust the combs according to the samplerate
         if (tmp < 10.0f)
             tmp = 10.0f;
-        comblen[i] = (int)truncf(tmp);
+        F2I(tmp, comblen[i]);
         combk[i] = 0;
         lpcomb[i] = 0;
         if (comb[i])
@@ -426,7 +429,10 @@ void Reverb::settype(unsigned char Ptype_)
     for (int i = 0; i < REV_APS * 2; ++i)
     {
         if (Ptype == 0)
-            tmp = 500 + (int)truncf(synth->numRandom() * 500.0f);
+        {
+            F2I(synth->numRandom() * 500.0f, tmp);
+            tmp += 500;
+        }
         else
             tmp = aptunings[Ptype][i % REV_APS];
         tmp *= roomsize;
@@ -435,7 +441,7 @@ void Reverb::settype(unsigned char Ptype_)
         tmp *= samplerate_adjust; // adjust the combs according to the samplerate
         if (tmp < 10)
             tmp = 10;
-        aplen[i] = (int)truncf(tmp);
+        F2I(tmp, aplen[i]);
         apk[i] = 0;
         if (ap[i])
             delete [] ap[i];
