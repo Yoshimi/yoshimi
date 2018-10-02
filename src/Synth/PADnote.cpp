@@ -333,7 +333,7 @@ inline void PADnote::fadein(float *smps)
     tmp *= NoteGlobalPar.Fadein_adjustment;
 
     int n; // how many samples is the fade-in
-    F2I(tmp, n);
+    FR2Z2I(tmp, n);
     if (n > synth->sent_buffersize)
         n = synth->sent_buffersize;
     for (int i = 0; i < n; ++i)

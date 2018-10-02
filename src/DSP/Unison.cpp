@@ -160,7 +160,7 @@ void Unison::process(int bufsize, float *inbuf, float *outbuf)
             float vpos = uv[k].realpos1 * (1.0f - xpos) + uv[k].realpos2 * xpos;
             float pos  = (float)(delay_k + max_delay) - vpos - 1.0f;
             int posi;
-            F2I(pos, posi);
+            FR2Z2I(pos, posi);
             int posi_next = posi + 1;
             if (posi >= max_delay)
                 posi -= max_delay;

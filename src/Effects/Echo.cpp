@@ -159,7 +159,7 @@ void Echo::setvolume(unsigned char Pvolume_)
 void Echo::setdelay(const unsigned char Pdelay_)
 {
     Pdelay = Pdelay_;
-    F2I(Pdelay / 127.0f * synth->samplerate_f * 1.5f, delay);
+    FR2Z2I(Pdelay / 127.0f * synth->samplerate_f * 1.5f, delay);
     delay += 1; // 0 .. 1.5 sec
     initdelays();
 }

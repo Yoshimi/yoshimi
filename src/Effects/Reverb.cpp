@@ -96,7 +96,7 @@ Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_
     for (int i = 0; i < REV_COMBS * 2; ++i)
     {
 
-        F2I(synth->numRandom() * 1400.0f, comblen[i]);
+        FR2Z2I(synth->numRandom() * 1400.0f, comblen[i]);
         comblen[i] += 800;
         combk[i] = 0;
         lpcomb[i] = 0;
@@ -106,7 +106,7 @@ Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_
 
     for (int i = 0; i < REV_APS * 2; ++i)
     {
-        F2I(synth->numRandom() * 500.0f, aplen[i]);
+        FR2Z2I(synth->numRandom() * 500.0f, aplen[i]);
         aplen[i] += 500;
         apk[i] = 0;
         ap[i] = NULL;
@@ -417,7 +417,7 @@ void Reverb::settype(unsigned char Ptype_)
         tmp *= samplerate_adjust; // adjust the combs according to the samplerate
         if (tmp < 10.0f)
             tmp = 10.0f;
-        F2I(tmp, comblen[i]);
+        FR2Z2I(tmp, comblen[i]);
         combk[i] = 0;
         lpcomb[i] = 0;
         if (comb[i])
@@ -430,7 +430,7 @@ void Reverb::settype(unsigned char Ptype_)
     {
         if (Ptype == 0)
         {
-            F2I(synth->numRandom() * 500.0f, tmp);
+            FR2Z2I(synth->numRandom() * 500.0f, tmp);
             tmp += 500;
         }
         else
@@ -441,7 +441,7 @@ void Reverb::settype(unsigned char Ptype_)
         tmp *= samplerate_adjust; // adjust the combs according to the samplerate
         if (tmp < 10)
             tmp = 10;
-        F2I(tmp, aplen[i]);
+        FR2Z2I(tmp, aplen[i]);
         apk[i] = 0;
         if (ap[i])
             delete [] ap[i];

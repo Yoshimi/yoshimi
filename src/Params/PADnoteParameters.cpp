@@ -346,7 +346,7 @@ float PADnoteParameters::getNhr(int n)
     switch (Phrpos.type)
     {
     case 1:
-        F2I(par2 * par2 * 100.0f, thresh);
+        FR2Z2I(par2 * par2 * 100.0f, thresh);
         thresh += 1;
         /*
          * leaving many of the old versions here
@@ -361,7 +361,7 @@ float PADnoteParameters::getNhr(int n)
         break;
 
     case 2:
-        F2I(par2 * par2 * 100.0f, thresh);
+        FR2Z2I(par2 * par2 * 100.0f, thresh);
         thresh += 1;
         //thresh = (int)truncf(par2 * par2 * 100.0f) + 1;
         if (n < thresh)
@@ -478,7 +478,7 @@ void PADnoteParameters::generatespectrum_bandwidthMode(float *spectrum,
         }
         bw = bw * powf(realfreq / basefreq, power);
         int ibw;
-        F2I(bw / (synth->samplerate_f * 0.5f) * size, ibw);
+        FR2Z2I(bw / (synth->samplerate_f * 0.5f) * size, ibw);
         ibw += 1;
         //int ibw = (int)truncf((bw / (synth->samplerate_f * 0.5f) * size)) + 1;
         float amp = harmonics[nh - 1];
@@ -488,13 +488,13 @@ void PADnoteParameters::generatespectrum_bandwidthMode(float *spectrum,
         {   // if the bandwidth is larger than the profilesize
             float rap = sqrtf((float)profilesize / (float)ibw);
             int cfreq;
-            F2I(realfreq / (synth->halfsamplerate_f) * size, cfreq);
+            FR2Z2I(realfreq / (synth->halfsamplerate_f) * size, cfreq);
             cfreq -= (ibw / 2);
             //int cfreq = (int)truncf(realfreq / (synth->halfsamplerate_f) * size) - ibw / 2;
             for (int i = 0; i < ibw; ++i)
             {
                 int src;
-                F2I(i * rap * rap, src);
+                FR2Z2I(i * rap * rap, src);
                 //int src = (int)truncf(i * rap * rap);
                 int spfreq = i + cfreq;
                 if (spfreq < 0)
@@ -568,7 +568,7 @@ void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
         if (resonance->Penabled)
             amp *= resonance->getfreqresponse(realfreq);
         int cfreq;
-        F2I(realfreq / (synth->halfsamplerate_f) * size, cfreq);
+        FR2Z2I(realfreq / (synth->halfsamplerate_f) * size, cfreq);
         //int cfreq = (int)truncf(realfreq / (synth->halfsamplerate_f) * size);
         spectrum[cfreq] = amp + 1e-9f;
     }

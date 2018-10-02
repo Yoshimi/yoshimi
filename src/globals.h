@@ -29,12 +29,12 @@
 #define HALFPI 1.57079632679f
 #define LOG_2 0.693147181f
 
-
-#ifdef ASM_F2I
-    #define F2I(in, out)  \
+// float round to zero to integer
+#ifdef ASM_FR2Z2I
+    #define FR2Z2I(in, out)  \
         __asm__ __volatile__ ("fistpl %0" : "=m" (out) : "t" (in) : "st") ;
 #else
-    #define F2I(f, i) (i) = ((f > 0) ? ((int)trunc(f)) : ((int)trunc(f - 1.0f)));
+    #define FR2Z2I(f, i) (i) = ((f > 0) ? ((int)trunc(f)) : ((int)trunc(f - 1.0f)));
 #endif
 
 // many of the following are for convenience and consistency

@@ -174,7 +174,7 @@ execute_process(COMMAND echo fistpl 0
                 ERROR_VARIABLE NO_ASM)
 if(NOT NO_ASM)
     message(STATUS "Compiling with x86 opcode support")
-    add_definitions(-DASM_F2I)
+    add_definitions(-DASM_FR2Z2I)
 endif()
 
 # libz

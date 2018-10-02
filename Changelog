@@ -1,5 +1,9 @@
 yoshimi 1.5.9 M
 
+2018-10-2 Will
+* Changed F2I to FR2Z2I to clarify behaviour.
+  i.e. float round to zero to integer.
+
 2018-10-1 Will
 * Completed F2I adjustments.
 * Started populating with new F2I.
