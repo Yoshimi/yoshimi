@@ -804,7 +804,6 @@ namespace FILTERINSERT // usage FILTERINSERT::control::centerFrequency
         sequencePosition, // local to GUI
         vowelPositionInSequence,
         negateInput, // bypass LFOs, envelopes etc.
-        dynFilter = 136 // this actually uses the kititem byte
     };
 }
 

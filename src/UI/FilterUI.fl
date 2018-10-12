@@ -821,7 +821,7 @@ pars=NULL;
     unsigned char eng = getData->data.engine;
     int value_int = lrint(value);
 
-    if (part != npart || (kititem != FILTERINSERT::control::dynFilter && eng != engine))
+    if (part != npart || (kititem != EFFECT::type::dynFilter && eng != engine))
         return;
 
     switch(control)

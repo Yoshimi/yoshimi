@@ -411,7 +411,7 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
     switch (control)
     {
         case FILTERINSERT::control::centerFrequency:
-            if (kitItem == FILTERINSERT::control::dynFilter)
+            if (kitItem == EFFECT::type::dynFilter)
                 def = 45;
             else if (engine == PART::engine::subSynth)
                 def = 80;
@@ -423,7 +423,7 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
         case FILTERINSERT::control::Q:
             if (engine >= PART::engine::addVoice1)
                 def = 60;
-            else if (kitItem != FILTERINSERT::control::dynFilter)
+            else if (kitItem != EFFECT::type::dynFilter)
                 def = 40;
             break; // for dynFilter it's the default 64
         case FILTERINSERT::control::frequencyTracking:
@@ -437,7 +437,7 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
         case FILTERINSERT::control::gain:
             break;
         case FILTERINSERT::control::stages:
-            if (kitItem == FILTERINSERT::control::dynFilter)
+            if (kitItem == EFFECT::type::dynFilter)
                 def = 1;
             else
                 def = 0;

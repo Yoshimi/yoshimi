@@ -1462,7 +1462,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
       Fl_Group fwin_filterui {
         label {DynFilter effect  - Filter} open
         xywh {5 5 275 75} box FLAT_BOX color 50 labelsize 12 align 144
-        code0 {o->init(eff->filterpars,NULL,NULL, npart, FILTERINSERT::control::dynFilter, neff);}
+        code0 {o->init(eff->filterpars,NULL,NULL, npart, EFFECT::type::dynFilter, neff);}
         class FilterUI
       } {}
       Fl_Button {} {
@@ -1483,7 +1483,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
     int value_int = int(value + 0.5f);
     unsigned char control = getData->data.control;
     unsigned char efftype = getData->data.kit;
-    bool isdynfilter = (getData->data.engine == FILTERINSERT::control::dynFilter);
+    bool isdynfilter = (getData->data.engine == EFFECT::type::dynFilter);
     unsigned char secondary = getData->data.par2;
 
     //cout << "cont " << (int)control << "  type " << (int)efftype << "  num " << (int)effnum << endl;

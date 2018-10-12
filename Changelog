@@ -5,6 +5,7 @@ yoshimi 1.5.9 M
   Behaviour is now entirely consistent.
 * Temporarily disabled assembler FR2Z2I code.
   It screws up in LV2 :(
+* Unified DynFilter Filter/Effect controls.
 
 2018-10-2 Will
 * Changed F2I to FR2Z2I to clarify behaviour.
