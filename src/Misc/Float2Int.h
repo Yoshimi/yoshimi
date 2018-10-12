@@ -20,6 +20,10 @@
     Modified March 2018
 */
 
+/*
+ * This is now all completely unused
+ */
+
 #ifndef FLOAT2INT_H
 #define FLOAT2INT_H
 

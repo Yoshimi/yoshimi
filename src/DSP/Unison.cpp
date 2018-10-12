@@ -22,7 +22,7 @@
 
     This file is a derivative of a ZynAddSubFX original
 
-    Modified September 2018
+    Modified October 2018
 */
 
 #include <cmath>
@@ -40,7 +40,7 @@ Unison::Unison(int update_period_samples_, float max_delay_sec_, SynthEngine *_s
     uv(NULL),
     update_period_samples(update_period_samples_),
     update_period_sample_k(0),
-    max_delay((int)truncf(_synth->samplerate_f * max_delay_sec_) + 1),
+//    max_delay((int)truncf(_synth->samplerate_f * max_delay_sec_) + 1),
     delay_k(0),
     first_time(false),
     delay_buffer(NULL),
@@ -48,6 +48,8 @@ Unison::Unison(int update_period_samples_, float max_delay_sec_, SynthEngine *_s
     unison_bandwidth_cents(10.0f),
     synth(_synth)
 {
+    FR2Z2I(_synth->samplerate_f * max_delay_sec_, max_delay);
+    max_delay += 1;
     if(max_delay < 10)
         max_delay = 10;
     delay_buffer = new float[max_delay];

@@ -1,5 +1,9 @@
 yoshimi 1.5.9 M
 
+2018-10-12 Will
+* Converted remaining truncf calls to FR2Z2I.
+  Behaviour is now entirely consistent.
+
 2018-10-2 Will
 * Changed F2I to FR2Z2I to clarify behaviour.
   i.e. float round to zero to integer.

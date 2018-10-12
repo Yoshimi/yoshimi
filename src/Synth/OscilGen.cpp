@@ -23,7 +23,7 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified August 2018
+    Modified October 2018
 */
 
 #include <cmath>
@@ -543,7 +543,7 @@ void OscilGen::oscilfilter(void)
     float par = 1.0f - Pfilterpar1 / 128.0f;
     float par2 = Pfilterpar2 / 127.0f;
     float max = 0.0f;
-    float tmp = 0.0f;
+    //float tmp = 0.0f;
     float p2;
     float x;
 
@@ -553,101 +553,116 @@ void OscilGen::oscilfilter(void)
         switch (Pfiltertype)
         {
             case 1:
+            {
                 gain = powf((1.0f - par * par * par * 0.99f), i); // lp
-                tmp = par2 * par2 * par2 * par2 * 0.5f + 0.0001f;
+                float tmp = par2 * par2 * par2 * par2 * 0.5f + 0.0001f;
                 if (gain < tmp)
                     gain = powf(gain, 10.0f) / powf(tmp, 9.0f);
                 break;
-
+            }
             case 2:
+            {
                 gain = 1.0f - powf((1.0f - par * par), (float)(i + 1)); // hp1
                 gain = powf(gain, (par2 * 2.0f + 0.1f));
                 break;
-
+            }
             case 3:
+            {
                 if (par < 0.2f)
                     par = par * 0.25f + 0.15f;
                 gain = 1.0f - powf(1.0f - par * par * 0.999f + 0.001f,
                                  i * 0.05f * i + 1.0f); // hp1b
-                tmp = powf(5.0f, (par2 * 2.0f));
+                float tmp = powf(5.0f, (par2 * 2.0f));
                 gain = powf(gain, tmp);
                 break;
-
+            }
             case 4:
+            {
                 gain = (i + 1) - powf(2.0f, ((1.0f - par) * 7.5f)); // bp1
                 gain = 1.0f / (1.0f + gain * gain / (i + 1.0f));
-                tmp = powf(5.0f, (par2 * 2.0f));
+                float tmp = powf(5.0f, (par2 * 2.0f));
                 gain = powf(gain, tmp);
                 if (gain < 1e-5f)
                     gain = 1e-5f;
                 break;
-
+            }
             case 5:
+            {
                 gain = i + 1 - powf(2.0f, (1.0f - par) * 7.5f); // bs1
                 gain = powf(atanf(gain / (i / 10.0f + 1.0f)) / 1.57f, 6.0f);
                 gain = powf(gain, (par2 * par2 * 3.9f + 0.1f));
                 break;
-
+            }
             case 6:
-                tmp = powf(par2, 0.33f);
+            {
+                //float tmp = powf(par2, 0.33f);
                 gain = (i + 1 > powf(2.0f, (1.0f - par) * 10.0f) ? 0.0f : 1.0f)
                             * par2 + (1.0f - par2); // lp2
                 break;
-
+            }
             case 7:
-                tmp = powf(par2, 0.33f);
+            {
+                //float tmp = powf(par2, 0.33f);
                 // tmp=1.0-(1.0-par2)*(1.0-par2);
                 gain = (i + 1 > powf(2.0f, (1.0f - par) * 7.0f) ? 1.0f : 0.0f)
                         * par2 + (1.0f - par2); // hp2
                 if (Pfilterpar1 == 0)
                     gain = 1.0f;
                 break;
-
+            }
             case 8:
-                tmp = powf(par2, 0.33f);
+            {
+                //float tmp = powf(par2, 0.33f);
                 // tmp=1.0-(1.0-par2)*(1.0-par2);
                 gain = (fabsf(powf(2.0f, (1.0f - par) * 7.0f) - i) > i / 2 + 1 ? 0.0f : 1.0f)
                         * par2 + (1.0f - par2); // bp2
                 break;
-
+            }
             case 9:
-                tmp = powf(par2, 0.33f);
+            {
+                //float tmp = powf(par2, 0.33f);
                 gain = (fabsf(powf(2.0f, (1.0f - par) * 7.0f) - i) < i / 2 + 1 ? 0.0f : 1.0f)
                         * par2 + (1.0f - par2); // bs2
                 break;
-
+            }
             case 10:
-                tmp = powf(5.0f, par2 * 2.0f - 1.0f);
+            {
+                float tmp = powf(5.0f, par2 * 2.0f - 1.0f);
                 tmp = powf((i / 32.0f), tmp) * 32.0f;
                 if (Pfilterpar2 == 64)
                     tmp = i;
                 gain = cosf(par * par * HALFPI * tmp); // cos
                 gain *= gain;
                 break;
-
+            }
             case 11:
-                tmp = powf(5.0f, par2 * 2.0f - 1.0f);
+            {
+                float tmp = powf(5.0f, par2 * 2.0f - 1.0f);
                 tmp = powf((i / 32.0f), tmp) * 32.0f;
                 if (Pfilterpar2 == 64)
                     tmp = i;
                 gain = sinf(par * par * HALFPI * tmp); // sin
                 gain *= gain;
                 break;
-
+            }
             case 12:
+            {
                 p2 = 1.0f - par + 0.2f;
                 x = i / (64.0f * p2 * p2);
                 x = (x > 1.0f) ? 1.0f : x;
-                tmp = powf(1.0f - par2, 2.0f);
+                float tmp = powf(1.0f - par2, 2.0f);
                 gain = cosf(x * PI) * (1.0f - tmp) + 1.01f + tmp; // low shelf
                 break;
-
+            }
             case 13:
-                tmp = (int)truncf(powf(2.0f, ((1.0f - par) * 7.2f)));
+            {
+                int tmp;// = (int)truncf(powf(2.0f, ((1.0f - par) * 7.2f)));
+                FR2Z2I(powf(2.0f, ((1.0f - par) * 7.2f)), tmp);
                 gain = 1.0f;
                 if (i == tmp)
                     gain = powf(2.0f, par2 * par2 * 8.0f);
                 break;
+            }
         }
 
         oscilFFTfreqs.s[i] *= gain;
@@ -822,7 +837,8 @@ void OscilGen::modulation(void)
 
         t = (t - floorf(t)) * synth->oscilsize_f;
 
-        int poshi = (int)truncf(t);
+        int poshi;// = (int)truncf(t);
+        FR2Z2I(t, poshi);
         float poslo = t - floorf(t);
 
         tmpsmps[i] = in[poshi] * (1.0f - poslo) + in[poshi + 1] * poslo;
@@ -1101,7 +1117,8 @@ void OscilGen::adaptiveharmonic(FFTFREQS f, float freq)
     for (int i = 0; i < synth->halfoscilsize - 2; ++i)
     {
         float h = i * rap;
-        int high = (int)truncf(i * rap);
+        int high;// = (int)truncf(i * rap);
+        FR2Z2I(i * rap, high);
         float low = fmodf(h, 1.0f);
 
         if (high >= synth->halfoscilsize - 2)
@@ -1240,14 +1257,15 @@ int OscilGen::get(float *smps, float freqHz, int resonance)
 
     if (oscilprepared != 1)
         prepare();
-
-    outpos = (int)truncf((numRandom() * 2.0f - 1.0f) * synth->oscilsize_f * (Prand - 64.0f) / 64.0f);
+      FR2Z2I((numRandom() * 2.0f - 1.0f) * synth->oscilsize_f * (Prand - 64.0f) / 64.0f, outpos);
+//    outpos = (int)truncf((numRandom() * 2.0f - 1.0f) * synth->oscilsize_f * (Prand - 64.0f) / 64.0f);
     outpos = (outpos + 2 * synth->oscilsize) % synth->oscilsize;
 
     memset(outoscilFFTfreqs.c, 0, synth->halfoscilsize * sizeof(float));
     memset(outoscilFFTfreqs.s, 0, synth->halfoscilsize * sizeof(float));
-
-    nyquist = (int)truncf(0.5f * synth->samplerate_f / fabsf(freqHz)) + 2;
+    FR2Z2I(0.5f * synth->samplerate_f / fabsf(freqHz), nyquist);
+    nyquist += 2;
+//    nyquist = (int)truncf(0.5f * synth->samplerate_f / fabsf(freqHz)) + 2;
     if (ADvsPAD)
         nyquist = synth->halfoscilsize;
     if (nyquist > synth->halfoscilsize)

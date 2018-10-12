@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2017, Will Godfrey & others
+    Copyright 2014-2018, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of original ZynAddSubFX code.
-    Modified September 2017
+    Modified October 2018
 */
 
 #include <cmath>
@@ -38,6 +38,8 @@ using namespace std;
 #include "Params/Controller.h"
 #include "Misc/SynthEngine.h"
 #include "Synth/ADnote.h"
+
+#include "globals.h"
 
 ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
                float velocity_, int portamento_, int midinote_, bool besilent, SynthEngine *_synth) :
@@ -58,7 +60,8 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
 
     // Initialise some legato-specific vars
     Legato.msg = LM_Norm;
-    Legato.fade.length = (int)truncf(synth->samplerate_f * 0.005f); // 0.005 seems ok.
+    FR2Z2I(synth->samplerate_f * 0.005f, Legato.fade.length); // 0.005 seems ok.
+    //Legato.fade.length = (int)truncf(synth->samplerate_f * 0.005f); // 0.005 seems ok.
     if (Legato.fade.length < 1)  // (if something's fishy)
         Legato.fade.length = 1;
     Legato.fade.step = (1.0f / Legato.fade.length);
@@ -633,10 +636,14 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
         NoteVoicePar[nvoice].FMVolume *=
             velF(velocity, adpars->VoicePar[nvoice].PFMVelocityScaleFunction);
 
-        NoteVoicePar[nvoice].DelayTicks =
+        float tmp = (expf(adpars->VoicePar[nvoice].PDelay / 127.0f
+                         * logf(50.0f)) - 1.0f) / synth->sent_all_buffersize_f / 10.0f
+                         * synth->samplerate_f; // done for clarity
+        FR2Z2I(tmp, NoteVoicePar[nvoice].DelayTicks);
+        /*NoteVoicePar[nvoice].DelayTicks =
             (int)truncf((expf(adpars->VoicePar[nvoice].PDelay / 127.0f
                          * logf(50.0f)) - 1.0f) / synth->sent_all_buffersize_f / 10.0f
-                         * synth->samplerate_f);
+                         * synth->samplerate_f);*/
     }
 
     ///////////////

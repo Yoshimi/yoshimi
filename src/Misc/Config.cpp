@@ -169,6 +169,12 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     //as all calls to lrintf() are replaced with (int)truncf()
     //which befaves exactly the same when flag FE_TOWARDZERO is set
 
+    /*
+     * The above is now all completely redundant as we use
+     * in-line either fast assembly (where available) or the
+     * original Zyn float - int conversion rounding to zero
+     */
+
     cerr.precision(4);
     bRuntimeSetupCompleted = Setup(argc, argv);
 }

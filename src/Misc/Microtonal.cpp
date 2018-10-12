@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified August 2018
+    Modified October 2018
 */
 
 #include <cmath>
@@ -258,7 +258,8 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
         case 1:
             x1 = (int) floor(x);
             tmp = fmod(x, 1.0);
-            x2 = (int)truncf(floor(tmp * 1e6));
+            FR2Z2I(floor(tmp * 1e6), x2);
+            //x2 = (int)truncf(floor(tmp * 1e6));
             tuning = pow(2.0, x / 1200.0);
             break;
         case 2:
