@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified August 2018
+Modified October 2018
 } {selected in_source in_header
 }
 
@@ -1584,7 +1584,7 @@ Offset}
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
     unsigned char par2 = getData->data.par2;
-    bool valBool = (value > 0.5f);
+    bool valBool = YOSH::F2B(value);
     int valInt = lrint(value);
     string text;
     if (par2 != NO_MSG)

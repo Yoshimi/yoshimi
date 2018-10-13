@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
-Modified September 2018
+Modified October 2018
 } {selected in_source in_header
 }
 
@@ -994,7 +994,7 @@ o->show();}
     unsigned char control = getData->data.control;
     unsigned char voice = getData->data.engine - PART::engine::addVoice1;
     int tmp;
-    bool val_bool = (value > 0.5f);
+    bool val_bool = YOSH::F2B(value);
     //cout << "adnote return" << endl;
     //if (voice != nvoice && control != ADDVOICE::control::enableVoice)
         //return;
@@ -1936,7 +1936,7 @@ switch (num)
     code {//
     float value = getData->data.value;
     unsigned char control = getData->data.control;
-    bool val_bool = (value > 0.5f);
+    bool val_bool = YOSH::F2B(value);
     switch(control)
     {
         case ADDSYNTH::control::volume:

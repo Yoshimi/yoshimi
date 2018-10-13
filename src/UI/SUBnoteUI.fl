@@ -29,8 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-Modified August 2018
-} {in_source in_header
+Modified October 2018} {selected in_source in_header
 }
 
 decl {\#include "UI/MiscGui.h"} {public local
@@ -49,6 +48,9 @@ decl {\#include "FilterUI.h"} {public local
 }
 
 decl {\#include "PresetsUI.h"} {public local
+}
+
+decl {\#include "Misc/MiscFuncs.h"} {public local
 }
 
 decl {\#include "Misc/SynthHelper.h"} {public local
@@ -173,7 +175,7 @@ class SUBnoteharmonic {: {public Fl_Group}
   }
 }
 
-class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
+class SUBnoteUI {: {public PresetsUI_, SynthHelper}
 } {
   Function {make_window()} {} {
     Fl_Window SUBparameters {
@@ -684,7 +686,7 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
     float value = getData->data.value;
     unsigned char control = getData->data.control;
     unsigned char insert = getData->data.insert;
-    bool val_bool = (value > 0.5f);
+    bool val_bool = YOSH::F2B(value);
     if (insert == TOPLEVEL::insert::harmonicAmplitude)
     {
         h[control]->mag->value(127 - (int) value);
@@ -738,7 +740,7 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
             break;
 
         case SUBSYNTH::control::baseFrequencyAs440Hz:
-            hz440->value(value > 0.5f);
+            hz440->value(YOSH::F2B(value));
             if (value == 0)
                 fixedfreqetdial->deactivate();
             else

@@ -3,10 +3,12 @@ Yoshimi very heavily uses switch statements, some of which are truly massive. Th
 
 The development has been very much an incremental process, initially with numerical entries and large gaps to create grouping, allow for changes, and give a clearer idea of the various structures.
 
+The intention was then to collapse all the gaps to give more efficient switch statements. However in the intervening time several CLI users have been using the direct access method to reach controls that are not yet available formally. In view of this, I'll be leaving the actual values as they are until all of them are properly addressable.
+
 
 Modern compilers are very smart when they see these large switches. The traditonal impression is they perform a lot of if-then tests but this is only true of small case groups, after that they make lookup tables which are considerably faster.
 
-But that isn't the end of it. If the structure is big enough and dense enough the compiler will instead fill the spaces with NOPs and turn the whole thing into a jump table. This is magic, because the code for any case can then be reached in exactly three machine instructions (two in the case of an ARM processor)
+If the structure is big enough and dense enough the compiler will instead fill the spaces with NOPs and turn the whole thing into a jump table. This is means the code for any case can then be reached in exactly three machine instructions (two in the case of an ARM processor)
 
 A left shift to turn incoming switch values into pointer sized steps.
 
@@ -41,7 +43,9 @@ switch (control)
 ...
 ...
 
- The gaps are in the process of being removed. This will ensure that all switches become jump tables, and selection of any entry will take exactly the same (very short) time. Under these circumstances, the more cases you can pack into a single switch, the more efficient the entire process gets.
+Once we can remove the gaps all switches will become jump tables, and selection of any entry will take exactly the same (very short) time. Under these circumstances, the more cases you can pack into a single switch, the more efficient the entire process gets.
+
+The use of namespaces combined with typed enumerators not only gives clear compartmentalised  identifiers, but also gives isolation between sections, protecting against name clashes. It is also still compatible with integers and unsigned chars without needing typecasting. This is important, as all these are passed through ring buffers using the central CommandBlock structure - which is now also defined here.
 
 
 Another point worth mentioning is that Yoshimi has different priorities for access to the structure based on the following reasoning:

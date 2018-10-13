@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified September 2018
+    Modified October 2018
 */
 
 #include "YoshimiLV2Plugin.h"
@@ -108,7 +108,7 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     {
         return;
     }
-    synth->sent_all_buffersize_f = min(sample_count, (uint32_t)synth->buffersize);
+    //synth->sent_all_buffersize_f = min(sample_count, (uint32_t)synth->buffersize);
     /*
      * The line above seems to cause problems with envelopes
      * in Carla.
@@ -116,8 +116,8 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
      * to ensure it's removal doesn't cause other problems.
      */
 
-    int real_sample_count = sample_count;
-    //int real_sample_count = min(sample_count, _bufferSize);
+    //int real_sample_count = sample_count;
+    int real_sample_count = min(sample_count, _bufferSize);
     // not sure which of the above two is the best :(
     int offs = 0;
     int next_frame = 0;

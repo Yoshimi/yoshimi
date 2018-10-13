@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified June 2018
+    Modified October 2018
 */
 
 #ifndef MISCFUNCS_H

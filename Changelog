@@ -1,5 +1,10 @@
 yoshimi 1.5.9 M
 
+2018-10-13 Will.
+* Created gobal YOSH namespace.
+* Implemented common F2B (float to bool) function.
+* Updated docs.
+
 2018-10-12 Will
 * Converted remaining truncf calls to FR2Z2I.
   Behaviour is now entirely consistent.

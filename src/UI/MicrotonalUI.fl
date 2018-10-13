@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified August 2018} {selected in_source in_header
+Modified October 2018} {selected in_source in_header
 }
 
 decl {\#include <FL/Fl_File_Chooser.H>} {public local
@@ -398,7 +398,7 @@ class MicrotonalUI {: {private MiscFuncs}
 
     unsigned char par2 = getData->data.par2;
     int value_int = lrint(value);
-    bool value_bool = (value > 0.5f);
+    bool value_bool = YOSH::F2B(value);
     string msg;
 
     switch (control)

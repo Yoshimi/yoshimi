@@ -98,6 +98,11 @@
 #define MAX_PHASER_STAGES 12
 #define MAX_ALIENWAH_DELAY 100
 
+namespace YOSH
+{
+    inline bool F2B(float value) {return value > 0.5f;}
+}
+
 /*
  * for many of the following, where they are in groups the
  * group order must not change, but the actual values can

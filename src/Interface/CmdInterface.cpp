@@ -48,7 +48,6 @@ using namespace std;
 #include "Interface/InterChange.h"
 #include "Interface/CmdInterface.h"
 
-using namespace std;
 
 extern SynthEngine *firstSynth;
 static unsigned int currentInstance = 0;

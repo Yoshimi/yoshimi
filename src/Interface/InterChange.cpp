@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified September 2018
+    Modified October 2018
 */
 
 #include <iostream>
@@ -1575,10 +1575,11 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
 
 string InterChange::resolveConfig(CommandBlock *getData)
 {
-    int value_int = lrint(getData->data.value);
+    float value = getData->data.value;
     unsigned char control = getData->data.control;
     bool write = getData->data.type & TOPLEVEL::type::Write;
-    bool value_bool = value_int > 0;
+    int value_int = lrint(value);
+    bool value_bool = YOSH::F2B(value);
     bool yesno = false;
     string contstr = "";
     switch (control)
@@ -2093,7 +2094,7 @@ string InterChange::resolveMain(CommandBlock *getData)
 
 string InterChange::resolvePart(CommandBlock *getData)
 {
-    int value_int = lrint(getData->data.value);
+    float value = getData->data.value;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -2104,7 +2105,8 @@ string InterChange::resolvePart(CommandBlock *getData)
     unsigned char effNum = engine;
 
     bool kitType = (insert == TOPLEVEL::insert::kitGroup);
-    bool value_bool = value_int > 0;
+    int value_int = lrint(value);
+    bool value_bool = YOSH::F2B(value);
     bool yesno = false;
 
     if (control == UNUSED)
@@ -4499,7 +4501,7 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
         __sync_or_and_fetch(&blockRead, 1);
 
     int value_int = lrint(value);
-    char value_bool = (value > 0.5f);
+    bool value_bool = YOSH::F2B(value);
 
     switch (control)
     {
@@ -4655,7 +4657,7 @@ void InterChange::commandConfig(CommandBlock *getData)
 
     bool mightChange = true;
     int value_int = lrint(value);
-    bool value_bool = value_int > 0;
+    bool value_bool = YOSH::F2B(value);
 
     switch (control)
     {
@@ -5188,7 +5190,7 @@ void InterChange::commandPart(CommandBlock *getData)
         return;
     }
     int value_int = lrint(value);
-    char value_bool = (value > 0.5f);
+    char value_bool = YOSH::F2B(value);
 
     Part *part;
     part = synth->part[npart];
@@ -5813,7 +5815,7 @@ void InterChange::commandAdd(CommandBlock *getData)
         __sync_or_and_fetch(&blockRead, 1);
 
     int value_int = lrint(value);
-    char value_bool = (value > 0.5f);
+    char value_bool = YOSH::F2B(value);
 
     Part *part;
     part = synth->part[npart];
@@ -5970,7 +5972,7 @@ void InterChange::commandAddVoice(CommandBlock *getData)
         __sync_or_and_fetch(&blockRead, 1);
 
     int value_int = lrint(value);
-    char value_bool = (value > 0.5f);
+    char value_bool = YOSH::F2B(value);
 
     Part *part;
     part = synth->part[npart];
@@ -6359,7 +6361,7 @@ void InterChange::commandSub(CommandBlock *getData)
         __sync_or_and_fetch(&blockRead, 1);
 
     int value_int = lrint(value);
-    char value_bool = (value > 0.5f);
+    char value_bool = YOSH::F2B(value);
 
     Part *part;
     part = synth->part[npart];
@@ -6611,7 +6613,7 @@ void InterChange::commandPad(CommandBlock *getData)
         __sync_or_and_fetch(&blockRead, 1);
 
     int value_int = lrint(value);
-    char value_bool = (value > 0.5f);
+    char value_bool = YOSH::F2B(value);
 
     Part *part;
     part = synth->part[npart];
@@ -6907,12 +6909,13 @@ void InterChange::commandPad(CommandBlock *getData)
 
 void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
 {
-    int value = lrint(getData->data.value); // no floats here!
-    char value_bool = (getData->data.value > 0.5f);
+    float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char insert = getData->data.insert;
 
+    int value_int = lrint(value);
+    bool value_bool = YOSH::F2B(value);
     bool write = (type & TOPLEVEL::type::Write) > 0;
     if (write)
         __sync_or_and_fetch(&blockRead, 1);
@@ -6921,8 +6924,8 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
     {
         if (write)
         {
-            oscil->Phmag[control] = value;
-            if (value == 64)
+            oscil->Phmag[control] = value_int;
+            if (value_int == 64)
                 oscil->Phphase[control] = 64;
             oscil->prepare();
         }
@@ -6934,7 +6937,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
     {
         if (write)
         {
-            oscil->Phphase[control] = value;
+            oscil->Phphase[control] = value_int;
             oscil->prepare();
         }
         else
@@ -6946,62 +6949,62 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
     {
         case OSCILLATOR::control::phaseRandomness:
             if (write)
-                oscil->Prand = value + 64;
+                oscil->Prand = value_int + 64;
             else
                 value = oscil->Prand - 64;
             break;
         case OSCILLATOR::control::magType:
             if (write)
-                oscil->Phmagtype = value;
+                oscil->Phmagtype = value_int;
             else
                 value = oscil->Phmagtype;
             break;
         case OSCILLATOR::control::harmonicAmplitudeRandomness:
             if (write)
-                oscil->Pamprandpower = value;
+                oscil->Pamprandpower = value_int;
             else
                 value = oscil->Pamprandpower;
             break;
         case OSCILLATOR::control::harmonicRandomnessType:
             if (write)
-                oscil->Pamprandtype = value;
+                oscil->Pamprandtype = value_int;
             else
                 value = oscil->Pamprandtype;
             break;
 
         case OSCILLATOR::control::baseFunctionParameter:
             if (write)
-                oscil->Pbasefuncpar = value + 64;
+                oscil->Pbasefuncpar = value_int + 64;
             else
                 value = oscil->Pbasefuncpar - 64;
             break;
         case OSCILLATOR::control::baseFunctionType:
             if (write)
-                oscil->Pcurrentbasefunc = value;
+                oscil->Pcurrentbasefunc = value_int;
             else
                 value = oscil->Pcurrentbasefunc;
             break;
         case OSCILLATOR::control::baseModulationParameter1:
             if (write)
-                oscil->Pbasefuncmodulationpar1 = value;
+                oscil->Pbasefuncmodulationpar1 = value_int;
             else
                 value = oscil->Pbasefuncmodulationpar1;
             break;
         case OSCILLATOR::control::baseModulationParameter2:
             if (write)
-                oscil->Pbasefuncmodulationpar2 = value;
+                oscil->Pbasefuncmodulationpar2 = value_int;
             else
                 value = oscil->Pbasefuncmodulationpar2;
             break;
         case OSCILLATOR::control::baseModulationParameter3:
             if (write)
-                oscil->Pbasefuncmodulationpar3 = value;
+                oscil->Pbasefuncmodulationpar3 = value_int;
             else
                 value = oscil->Pbasefuncmodulationpar3;
             break;
         case OSCILLATOR::control::baseModulationType:
             if (write)
-                oscil->Pbasefuncmodulation = value;
+                oscil->Pbasefuncmodulation = value_int;
             else
                 value = oscil->Pbasefuncmodulation;
             break;
@@ -7031,26 +7034,26 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
 
         case OSCILLATOR::control::waveshapeParameter:
             if (write)
-                oscil->Pwaveshaping = value + 64;
+                oscil->Pwaveshaping = value_int + 64;
             else
                 value = oscil->Pwaveshaping - 64;
             break;
         case OSCILLATOR::control::waveshapeType:
             if (write)
-                oscil->Pwaveshapingfunction = value;
+                oscil->Pwaveshapingfunction = value_int;
             else
                 value = oscil->Pwaveshapingfunction;
             break;
 
         case OSCILLATOR::control::filterParameter1:
             if (write)
-                oscil->Pfilterpar1 = value;
+                oscil->Pfilterpar1 = value_int;
             else
                 value = oscil->Pfilterpar1;
             break;
         case OSCILLATOR::control::filterParameter2:
             if (write)
-                oscil->Pfilterpar2 = value;
+                oscil->Pfilterpar2 = value_int;
             else
                 value = oscil->Pfilterpar2;
             break;
@@ -7062,50 +7065,50 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             break;
         case OSCILLATOR::control::filterType:
             if (write)
-                oscil->Pfiltertype = value;
+                oscil->Pfiltertype = value_int;
             else
                 value = oscil->Pfiltertype;
             break;
         case OSCILLATOR::control::modulationParameter1:
             if (write)
-                oscil->Pmodulationpar1 = value;
+                oscil->Pmodulationpar1 = value_int;
             else
                 value = oscil->Pmodulationpar1;
             break;
         case OSCILLATOR::control::modulationParameter2:
             if (write)
-                oscil->Pmodulationpar2 = value;
+                oscil->Pmodulationpar2 = value_int;
             else
                 value = oscil->Pmodulationpar2;
             break;
         case OSCILLATOR::control::modulationParameter3:
             if (write)
-                oscil->Pmodulationpar3 = value;
+                oscil->Pmodulationpar3 = value_int;
             else
                 value = oscil->Pmodulationpar3;
             break;
         case OSCILLATOR::control::modulationType:
             if (write)
-                oscil->Pmodulation = value;
+                oscil->Pmodulation = value_int;
             else
                 value = oscil->Pmodulation;
             break;
         case OSCILLATOR::control::spectrumAdjustParameter:
             if (write)
-                oscil->Psapar = value;
+                oscil->Psapar = value_int;
             else
                 value = oscil->Psapar;
             break;
         case OSCILLATOR::control::spectrumAdjustType:
             if (write)
-                oscil->Psatype = value;
+                oscil->Psatype = value_int;
             else
                 value = oscil->Psatype;
             break;
 
         case OSCILLATOR::control::harmonicShift:
             if (write)
-                oscil->Pharmonicshift = value;
+                oscil->Pharmonicshift = value_int;
             else
                 value = oscil->Pharmonicshift;
             break;
@@ -7121,25 +7124,25 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             break;
         case OSCILLATOR::control::adaptiveHarmonicsParameter:
             if (write)
-                oscil->Padaptiveharmonicspar = value;
+                oscil->Padaptiveharmonicspar = value_int;
             else
                 value = oscil->Padaptiveharmonicspar;
             break;
         case OSCILLATOR::control::adaptiveHarmonicsBase:
             if (write)
-                oscil->Padaptiveharmonicsbasefreq = value;
+                oscil->Padaptiveharmonicsbasefreq = value_int;
             else
                 value = oscil->Padaptiveharmonicsbasefreq;
             break;
         case OSCILLATOR::control::adaptiveHarmonicsPower:
             if (write)
-                oscil->Padaptiveharmonicspower = value;
+                oscil->Padaptiveharmonicspower = value_int;
             else
                 value = oscil->Padaptiveharmonicspower;
             break;
         case OSCILLATOR::control::adaptiveHarmonicsType:
             if (write)
-                oscil->Padaptiveharmonics = value;
+                oscil->Padaptiveharmonics = value_int;
             else
                 value = oscil->Padaptiveharmonics;
             break;
@@ -7168,12 +7171,12 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
 
 void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
 {
-    int value = lrint(getData->data.value); // no floats here
-    char value_bool = (getData->data.value > 0.5);
+    float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char insert = getData->data.insert;
-
+    int value_int = lrint(value);
+    bool value_bool = YOSH::F2B(value);
     bool write = (type & TOPLEVEL::type::Write) > 0;
     if (write)
         __sync_or_and_fetch(&blockRead, 1);
@@ -7181,11 +7184,11 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
     if (insert == TOPLEVEL::insert::resonanceGraphInsert)
     {
         if (write)
-            respar->setpoint(control, value);
+            respar->setpoint(control, value_int);
         else
             value = respar->Prespoints[control];
         if (!write)
-            getData->data.value = value;
+            getData->data.value = value_int;
         return;
     }
 
@@ -7193,19 +7196,19 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
     {
         case RESONANCE::control::maxDb:
             if (write)
-                respar->PmaxdB = value;
+                respar->PmaxdB = value_int;
             else
                 value = respar->PmaxdB;
             break;
         case RESONANCE::control::centerFrequency:
             if (write)
-                respar->Pcenterfreq = value;
+                respar->Pcenterfreq = value_int;
             else
                 value = respar->Pcenterfreq;
             break;
         case RESONANCE::control::octaves:
             if (write)
-                respar->Poctavesfreq = value;
+                respar->Poctavesfreq = value_int;
             else
                 value = respar->Poctavesfreq;
             break;
@@ -7219,7 +7222,7 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
 
         case RESONANCE::control::randomType:
             if (write)
-                respar->randomize(value);
+                respar->randomize(value_int);
             break;
 
         case RESONANCE::control::interpolatePeaks:
