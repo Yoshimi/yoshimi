@@ -1,7 +1,10 @@
 yoshimi 1.5.9 M
 
-2018-10-13 Will.
-* Created gobal YOSH namespace.
+2018-10-14 Will
+* BugFix: wrong defaults for resonance.
+
+2018-10-13 Will
+* Created global YOSH namespace.
 * Implemented common F2B (float to bool) function.
 * Updated docs.
 
