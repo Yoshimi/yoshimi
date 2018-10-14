@@ -4,6 +4,8 @@ yoshimi 1.5.9 M
 * BugFix: wrong defaults for resonance.
 * Resolved more magic numbers.
 * Set max buffersize to 8192.
+* Revised and unified MIDI controllers.
+* Moved CC definitions to globals.h
 
 2018-10-13 Will
 * Created global YOSH namespace.

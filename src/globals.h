@@ -333,15 +333,39 @@ namespace MIDI // usage MIDI::control::noteOn
         controller,
         programChange = 8// also bank and root - split?
     };
-    enum function : unsigned char {
-        modulation = 1,
-        volume = 7,
+    enum CC : unsigned short int {
+        bankSelectMSB = 0,
+        modulation,
+        breath,
+        dataMSB = 6,
+        volume,
         panning = 10,
-        expression = 11,
+        expression,
+        bankSelectLSB = 32,
+        dataLSB = 38,
+        sustain = 64,
+        portamento,
         legato = 68,
         filterQ = 71,
         filterCutoff = 74,
-        bandwidth
+        bandwidth,
+        fmamp,
+        resonanceCenter,
+        resonanceBandwidth,
+        dataINC = 96,
+        dataDEC,
+        nrpnLSB,
+        nrpnMSB,
+        allSoundOff = 120,
+        resetAllControllers,
+        allNotesOff = 123,
+
+        pitchWheel = 640,
+        channelPressure,
+        keyPressure,
+
+        programchange = 999,
+        null
     };
 }
 

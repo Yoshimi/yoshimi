@@ -1234,9 +1234,9 @@ Nikita Zlobin
 
     if (newpart == TOPLEVEL::section::midiIn)
     {
-        if (engine == MIDI::function::volume && partui->part->ctl->volume.receive == 0)
+        if (engine == MIDI::CC::volume && partui->part->ctl->volume.receive == 0)
             return; // disabled
-        if (engine == MIDI::function::expression && partui->part->ctl->expression.receive == 0)
+        if (engine == MIDI::CC::expression && partui->part->ctl->expression.receive == 0)
             return; // disabled
 
         float vol = (value * synth->part[npart]->ctl->volume.data) / 127;
@@ -1251,9 +1251,9 @@ Nikita Zlobin
                                  && (chan / NUM_MIDI_CHANNELS) == (panelgroup / NUM_MIDI_CHANNELS))
                          || (!isSingle && panellistitem[i]->partrcv->value() == (chan & mask)))
                     {
-                        if (engine == MIDI::function::volume)
+                        if (engine == MIDI::CC::volume)
                             panellistitem[i]->partvolume->value(vol);
-                        else if (engine == MIDI::function::panning)
+                        else if (engine == MIDI::CC::panning)
                             panellistitem[i]->partpanning->value(value);
                     }
                 }
@@ -1314,19 +1314,19 @@ Nikita Zlobin
                 {
                     switch(engine)
                     {
-                        case MIDI::function::modulation:
+                        case MIDI::CC::modulation:
                             partui->modulation->value(value);
                             break;
-                        case MIDI::function::volume:
+                        case MIDI::CC::volume:
                             partui->partvol->value(vol);
                             break;
-                        case MIDI::function::panning:
+                        case MIDI::CC::panning:
                             partui->partpan->value(value);
                             break;
-                        case MIDI::function::expression:
+                        case MIDI::CC::expression:
                             partui->expression->value(value);
                             break;
-                        case MIDI::function::legato:
+                        case MIDI::CC::legato:
                         {
                             int mode = synth->ReadPartKeyMode(npart);
                             partui->legatoMode->labelcolor(FL_BLACK);
@@ -1341,13 +1341,13 @@ Nikita Zlobin
                             //partui->keymode->damage(1);
                             break;
                         }
-                        case MIDI::function::filterQ:
+                        case MIDI::CC::filterQ:
                             partui->filterq->value(value);
                             break;
-                        case MIDI::function::filterCutoff:
+                        case MIDI::CC::filterCutoff:
                             partui->filtercutoff->value(value);
                             break;
-                        case MIDI::function::bandwidth:
+                        case MIDI::CC::bandwidth:
                             partui->masterbandwidth->value(value);
                             break;
                     }

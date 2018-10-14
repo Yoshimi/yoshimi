@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of original ZynAddSubFX code
 
-Modified August 2018
+Modified October 2018
 } {selected in_source in_header
 }
 
@@ -47,9 +47,6 @@ decl {\#include "Misc/Config.h"} {public local
 }
 
 decl {\#include "Misc/SynthEngine.h"} {public local
-}
-
-decl {\#include "MusicIO/MidiControl.h"} {public local
 }
 
 decl {\#include "UI/WidgetPDial.h"} {public local
@@ -418,48 +415,48 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         switch((int) o->value() + 1)
         {
             case 1:
-                midictl = C_modwheel;
+                midictl = MIDI::CC::modulation;
                 break;
             case 2:
-                midictl = C_volume;
+                midictl = MIDI::CC::volume;
                 break;
             case 3:
-                midictl = C_panning;
+                midictl = MIDI::CC::panning;
                 break;
             case 4:
-                midictl = C_expression;
+                midictl = MIDI::CC::expression;
                 break;
             case 5:
-                midictl = C_sustain;
+                midictl = MIDI::CC::sustain;
                 break;
             case 6:
-                midictl = C_portamento;
+                midictl = MIDI::CC::portamento;
                 break;
             case 7:
-                midictl = C_filterq;
+                midictl = MIDI::CC::filterQ;
                 break;
             case 8:
-                midictl = C_filtercutoff;
+                midictl = MIDI::CC::filterCutoff;
                 break;
             case 9:
-                midictl = C_bandwidth;
+                midictl = MIDI::CC::bandwidth;
                 break;
             case 10:
-                midictl = C_fmamp;
+                midictl = MIDI::CC::fmamp;
                 break;
             case 11:
-                midictl = C_resonance_center;
+                midictl = MIDI::CC::resonanceCenter;
                 break;
             case 12:
-                midictl = C_resonance_bandwidth;
+                midictl = MIDI::CC::resonanceBandwidth;
                 break;
             default:
-                midictl = C_NULL;
+                midictl = MIDI::CC::null;
                 break;
         }
         virkeys->take_focus();}
         xywh {524 105 100 15} down_box BORDER_BOX labelsize 10 align 1 when 6 textfont 1 textsize 10
-        code0 {midictl=C_filtercutoff;o->value(7);}
+        code0 {midictl=MIDI::CC::filterCutoff;o->value(7);}
       } {
         MenuItem {} {
           label {01: Mod.Wheel}

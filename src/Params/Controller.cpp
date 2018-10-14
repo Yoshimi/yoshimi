@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified August 2018
+    Modified October 2018
 */
 
 #include <cmath>
@@ -32,7 +32,6 @@ using namespace std;
 
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
-#include "MusicIO/MidiControl.h"
 #include "Params/Controller.h"
 
 Controller::Controller(SynthEngine *_synth):

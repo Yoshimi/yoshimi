@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2010, Alan Calvert
+    Copyright 2018 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of a ZynAddSubFX original, modified October 2018
 */
 
 #include <cmath>
@@ -222,9 +223,9 @@ float Resonance::getoctavesfreq(void)
 }
 
 
-void Resonance::sendcontroller(MidiControllers ctl, float par)
+void Resonance::sendcontroller(unsigned short int ctl, float par)
 {
-    if (ctl == C_resonance_center)
+    if (ctl == MIDI::CC::resonanceCenter)
         ctlcenter = par;
     else
         ctlbw = par;

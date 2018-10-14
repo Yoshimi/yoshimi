@@ -621,7 +621,7 @@ void SynthEngine::SetController(unsigned char chan, int CCtype, short int par)
         RunChannelSwitch(par);
         return;
     }
-    if (CCtype == C_allsoundsoff)
+    if (CCtype == MIDI::CC::allSoundOff)
     {   // cleanup insertion/system FX
         for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
             sysefx[nefx]->cleanup();
@@ -658,8 +658,8 @@ void SynthEngine::SetController(unsigned char chan, int CCtype, short int par)
         {
             if (CCtype == part[npart]->PbreathControl) // breath
             {
-                part[npart]->SetController(C_volume, 64 + par / 2);
-                part[npart]->SetController(C_filtercutoff, par);
+                part[npart]->SetController(MIDI::CC::volume, 64 + par / 2);
+                part[npart]->SetController(MIDI::CC::filterCutoff, par);
             }
             else if (CCtype == 0x44) // legato switch
             {
@@ -1608,9 +1608,9 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             }
             SetPartChan(chan, chan);
             SetPartChan(chan | 16, chan);
-            Runtime.vectordata.Xcc2[chan] = C_panning;
-            Runtime.vectordata.Xcc4[chan] = C_filtercutoff;
-            Runtime.vectordata.Xcc8[chan] = C_modwheel;
+            Runtime.vectordata.Xcc2[chan] = MIDI::CC::panning;
+            Runtime.vectordata.Xcc4[chan] = MIDI::CC::filterCutoff;
+            Runtime.vectordata.Xcc8[chan] = MIDI::CC::modulation;
             //Runtime.Log("Vector " + asString((int) chan) + " X CC set to " + asString(par));
             break;
 
@@ -1622,9 +1622,9 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
                 SetPartChan(chan | 32, chan);
                 SetPartChan(chan | 48, chan);
                 Runtime.vectordata.Yaxis[chan] = par;
-                Runtime.vectordata.Ycc2[chan] = C_panning;
-                Runtime.vectordata.Ycc4[chan] = C_filtercutoff;
-                Runtime.vectordata.Ycc8[chan] = C_modwheel;
+                Runtime.vectordata.Ycc2[chan] = MIDI::CC::panning;
+                Runtime.vectordata.Ycc4[chan] = MIDI::CC::filterCutoff;
+                Runtime.vectordata.Ycc8[chan] = MIDI::CC::modulation;
                 //Runtime.Log("Vector " + asString(int(chan) + 1) + " Y CC set to " + asString(par));
             }
             break;

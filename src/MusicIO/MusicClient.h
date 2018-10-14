@@ -18,7 +18,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified June 2018
+    Modified October 2018
 */
 
 #ifndef MUSIC_CLIENT_H
@@ -30,7 +30,6 @@
 using namespace std;
 
 #include "globals.h"
-#include "MusicIO/MidiControl.h"
 
 enum audio_drivers { no_audio = 0, jack_audio, alsa_audio};
 enum midi_drivers { no_midi = 0, jack_midi, alsa_midi};

@@ -5211,7 +5211,7 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case PART::control::panning:
             if (write)
-                part->SetController(C_panning, value);
+                part->SetController(MIDI::CC::panning, value);
             else
                 value = part->Ppanning;
             break;
@@ -5751,7 +5751,7 @@ void InterChange::commandPart(CommandBlock *getData)
         case PART::control::midiExpression:
             if (write)
             {
-                part->SetController(C_expression, value);
+                part->SetController(MIDI::CC::expression, value);
             }
             else
                 value = part->ctl->expression.data;
