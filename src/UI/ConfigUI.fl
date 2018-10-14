@@ -23,7 +23,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified August 2018
+Modified October 2018
 } {selected in_source in_header
 }
 
@@ -144,6 +144,10 @@ class ConfigUI {: {private MiscFuncs}
             }
             MenuItem {} {
               label 4096
+              xywh {65 65 100 20} labelfont 1 labelsize 12
+            }
+            MenuItem {} {
+              label 8192
               xywh {65 65 100 20} labelfont 1 labelsize 12
             }
           }

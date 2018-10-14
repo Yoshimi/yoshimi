@@ -2,6 +2,8 @@ yoshimi 1.5.9 M
 
 2018-10-14 Will
 * BugFix: wrong defaults for resonance.
+* Resolved more magic numbers.
+* Set max buffersize to 8192.
 
 2018-10-13 Will
 * Created global YOSH namespace.

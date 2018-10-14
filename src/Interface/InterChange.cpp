@@ -4665,7 +4665,7 @@ void InterChange::commandConfig(CommandBlock *getData)
         case CONFIG::control::oscillatorSize:
             if (write)
             {
-                value = nearestPowerOf2(value_int, 256, 16384);
+                value = nearestPowerOf2(value_int, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
                 getData->data.value = value;
                 synth->getRuntime().Oscilsize = value;
             }
@@ -4675,7 +4675,7 @@ void InterChange::commandConfig(CommandBlock *getData)
         case CONFIG::control::bufferSize:
             if (write)
             {
-                value = nearestPowerOf2(value_int, 16, 4096);
+                value = nearestPowerOf2(value_int, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
                 getData->data.value = value;
                 synth->getRuntime().Buffersize = value;
             }

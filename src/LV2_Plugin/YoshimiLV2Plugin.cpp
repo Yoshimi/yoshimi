@@ -320,7 +320,7 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
     }
 
     if (_bufferSize == 0)
-        _bufferSize = 8192;
+        _bufferSize = MAX_BUFFER_SIZE;
 }
 
 

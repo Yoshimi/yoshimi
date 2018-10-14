@@ -58,6 +58,10 @@
 #define MAX_RESONANCE_POINTS 256
 #define MAX_KEY_SHIFT 36
 #define MIN_KEY_SHIFT -36
+#define MIN_OSCIL_SIZE 256 // MAX_AD_HARMONICS * 2
+#define MAX_OSCIL_SIZE 16384
+#define MIN_BUFFER_SIZE 16
+#define MAX_BUFFER_SIZE 8192
 #define NO_MSG 255 // these three may become different
 #define UNUSED 255
 #define NO_ACTION 255

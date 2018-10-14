@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified September 2018
+    Modified October 2018
 */
 
 #define NOLOCKS
@@ -3450,14 +3450,14 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
     switch (control)
     {
         case CONFIG::control::oscillatorSize:
-            min = 256;
+            min = MIN_OSCIL_SIZE;
             def = 1024;
-            max = 16384;
+            max = MAX_OSCIL_SIZE;
             break;
         case CONFIG::control::bufferSize:
-            min = 16;
+            min = MIN_BUFFER_SIZE;
             def = 512;
-            max = 4096;
+            max = MAX_BUFFER_SIZE;
            break;
         case CONFIG::control::padSynthInterpolation:
             break;
