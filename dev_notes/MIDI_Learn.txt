@@ -1,4 +1,4 @@
-The learn process comes after NRPNs and vectors, but before all other controllers.
+The learn process comes after *recognised* NRPNs and vectors, but before all other controllers.
 
 To learn, hold CTRL while right-clicking on any GUI control then operate a physical control.
 
@@ -22,7 +22,7 @@ Status bits:
 2   mute
 
 3   mark as an NRPN
-4   mark as 7 bit
+4   mark as 7 bit NRPN
 
 When sending internal control messages to the GUI (instead of passing on MIDI actions) the part number will be 216 (0xd8) - a value that is never used in the rest of the system.
 

@@ -192,8 +192,8 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
      * later calls, but are passed as 128+ for this call.
      * Pitch wheel is 640 and is 14 bit. It sets bit 1 of 'category'
      */
-    if (synth->midilearn.runMidiLearn(param, ctrl & 255, ch, in_place | ((ctrl == 640) << 1)))
-        return;
+    if (synth->midilearn.runMidiLearn(param, ctrl & 0xff, ch, in_place | ((ctrl == 640) << 1)))
+        return; // blocking while learning
 
     /*
     * This is done here instead of in 'setMidi' so MidiLearn
@@ -207,7 +207,7 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
     }
 
     // do what's left!
-    if (ctrl < 128) // don't want to pick up strays
+    if (ctrl < 0x80) // don't want to pick up strays
         sendMidiCC(inSync, ch, ctrl, param);
 }
 
@@ -357,7 +357,7 @@ bool MidiDecode::nrpnRunVector(unsigned char ch, int ctrl, int param, bool inSyn
 {
     int Xopps = synth->getRuntime().vectordata.Xfeatures[ch];
     int Yopps = synth->getRuntime().vectordata.Yfeatures[ch];
-    int p_rev = 127 - param;
+    int p_rev = 0x7f - param;
     int swap1;
     int swap2;
     unsigned char type;
@@ -366,8 +366,8 @@ bool MidiDecode::nrpnRunVector(unsigned char ch, int ctrl, int param, bool inSyn
     {
         if (Xopps & 1) // fixed as volume
         {
-            sendMidiCC(inSync, ch | 0x80, MIDI::CC::volume, 127 - (p_rev * p_rev / 127));
-            sendMidiCC(inSync, ch | 0x90, MIDI::CC::volume, 127 - (param * param / 127));
+            sendMidiCC(inSync, ch | 0x80, MIDI::CC::volume, 0x7f - (p_rev * p_rev / 0x7f));
+            sendMidiCC(inSync, ch | 0x90, MIDI::CC::volume, 0x7f - (param * param / 0x7f));
         }
         if (Xopps & 2) // default is pan
         {
@@ -399,8 +399,8 @@ bool MidiDecode::nrpnRunVector(unsigned char ch, int ctrl, int param, bool inSyn
     { // if Y hasn't been set these commands will be ignored
         if (Yopps & 1) // fixed as volume
         {
-            sendMidiCC(inSync, ch | 0xa0, MIDI::CC::volume, 127 - (p_rev * p_rev / 127));
-            sendMidiCC(inSync, ch | 0xb0, MIDI::CC::volume, 127 - (param * param / 127));
+            sendMidiCC(inSync, ch | 0xa0, MIDI::CC::volume, 0x7f - (p_rev * p_rev / 0x7f));
+            sendMidiCC(inSync, ch | 0xb0, MIDI::CC::volume, 0x7f - (param * param / 0x7f));
         }
         if (Yopps & 2) // default is pan
         {
@@ -472,7 +472,7 @@ void MidiDecode::nrpnProcessData(unsigned char chan, int type, int par, bool in_
 
     // For NRPNs midi learn must come before everything else
     if (synth->midilearn.runMidiLearn(dHigh << 7 | par, 0x10000 | (nHigh << 7) | nLow , chan, in_place | 2))
-        return;
+        return; // blocking while learning
 
     if (nLow < nHigh && (nHigh == 4 || nHigh == 8 ))
     {
@@ -519,8 +519,8 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
             }
             else // It's bad. Kill it
             {
-                synth->getRuntime().dataL = 128;
-                synth->getRuntime().dataH = 128;
+                synth->getRuntime().dataL = 0x80;
+                synth->getRuntime().dataH = 0x80;
             }
             break;
 

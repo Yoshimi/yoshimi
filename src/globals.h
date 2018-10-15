@@ -360,6 +360,10 @@ namespace MIDI // usage MIDI::control::noteOn
         resetAllControllers,
         allNotesOff = 123,
 
+        pitchWheelInner = 128,
+        channelPressureInner,
+        keyPressureInner,
+
         pitchWheel = 640,
         channelPressure,
         keyPressure,

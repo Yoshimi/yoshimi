@@ -1,5 +1,9 @@
 yoshimi 1.5.9 M
 
+2018-10-15 Will
+* Minor code cleanups.
+* Doc updates.
+
 2018-10-14 Will
 * BugFix: wrong defaults for resonance.
 * Resolved more magic numbers.

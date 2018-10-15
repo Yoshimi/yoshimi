@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified August 2018
+    Modified October 2018
 */
 
 #include <iostream>
@@ -35,6 +35,8 @@ using namespace std;
 #include "Misc/MiscFuncs.h"
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
+
+enum scan : int { noList = -3, listEnd, listBlocked};
 
 MidiLearn::MidiLearn(SynthEngine *_synth) :
     learning(false),
@@ -70,13 +72,13 @@ bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, un
         return true; // block while learning
     }
 
-    int lastpos = -1;
+    int lastpos = scan::listBlocked;
     LearnBlock foundEntry;
     bool firstLine = true;
-    while (lastpos != -2)
+    while (lastpos != scan::listEnd)
     {
         lastpos = findEntry(midi_list, lastpos, CC, chan, &foundEntry, false);
-        if (lastpos == -3)
+        if (lastpos == scan::noList)
             return false;
         int status = foundEntry.status;
         if (status & 4) // it's muted
@@ -157,7 +159,7 @@ bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, un
                 writeMidi(&putData, putSize, category & 1);
             }
         }
-        if (lastpos == -1) // blocking all of this CC/chan pair
+        if (lastpos == scan::listBlocked) // blocking all of this CC/chan pair
             return true;
     }
     return false;
@@ -211,7 +213,7 @@ bool MidiLearn::writeMidi(CommandBlock *putData, unsigned int writesize, bool in
  */
 int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned int CC, unsigned char chan, LearnBlock *block, bool show)
 {
-    int newpos = 0; // 'last' comes in at -1 for the first call
+    int newpos = 0; // 'last' comes in at listBlocked for the first call
     list<LearnBlock>::iterator it = midi_list.begin();
 
     while (newpos <= lastpos && it != midi_list.end())
@@ -220,7 +222,7 @@ int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned int 
         ++ newpos;
     }
     if (it == midi_list.end())
-        return -3;
+        return scan::noList;
 
     while ((CC != it->CC || (it->chan != 16 && chan != it->chan)) &&  it != midi_list.end())
     {
@@ -228,7 +230,7 @@ int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned int 
         ++ newpos;
     }
     if (it == midi_list.end())
-        return -3;
+        return scan::noList;
 
     while (CC == it->CC && it != midi_list.end())
     {
@@ -245,13 +247,13 @@ int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned int 
             block->max_out = it->max_out;
             block->data = it->data;
             if ((it->status & 5) == 1) // blocked, not muted
-                return -1; // don't allow any more of this CC and channel;
+                return scan::listBlocked; // don't allow any more of this CC and channel;
             return newpos;
         }
         ++ it;
         ++ newpos;
     }
-    return -2;
+    return scan::listEnd;
 }
 
 

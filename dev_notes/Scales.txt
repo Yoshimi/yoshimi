@@ -1,6 +1,6 @@
 Microtonal uses part number 232 (0xe8)
 
-For direct access, tunings and keyboard maps are both handled as strings of comma separated numbers. All spaces will be removed.
+Tunings and keyboard maps are both handled as strings of comma separated numbers. All spaces will be removed.
 
 For scales, ratios or floating point numbers can be entered.
 
