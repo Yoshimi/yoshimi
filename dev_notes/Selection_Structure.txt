@@ -64,5 +64,5 @@ Writes are the only thing that can make dynamic reads wait. This ensures these r
 
 Writes are also much more complicated. In the first place, we have made them all serial and synchronous with the audio thread (if they were not already) so how do you realistically time something going through a ring buffer, interleaved with other 'somethings'?
 
-The final wrinkle with writes is that they don't always do what they seem to. Loading an instrument patch for example, just sets a flag to mute the part, then passes the data to a low priority thread. This can take its time updating (as nothing can now read it) and when complete, clear the flag again.
+The final wrinkle with writes is that they don't always do what they seem to. Loading an instrument patch for example, just sets a flag to mute the part, then passes the data to a low priority thread. This can take its time updating the part (as nothing can now read it) and when complete, clear the flag again.
 

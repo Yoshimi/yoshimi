@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified August 2018
+    Modified October 2018
 */
 
 #ifndef SYNTHENGINE_H
@@ -73,7 +73,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         SynthEngine(int argc, char **argv, bool _isLV2Plugin = false, unsigned int forceId = 0);
         ~SynthEngine();
         bool Init(unsigned int audiosrate, int audiobufsize);
-        bool actionLock(lockset request);
+        //bool actionLock(lockset request);
 
         bool savePatchesXML(string filename);
         void add2XML(XMLwrapper *xml);
