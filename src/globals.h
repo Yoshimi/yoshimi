@@ -104,6 +104,7 @@
 
 namespace YOSH
 {
+    // float to bool done this way to ensure consistency
     inline bool F2B(float value) {return value > 0.5f;}
 }
 

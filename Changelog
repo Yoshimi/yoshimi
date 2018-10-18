@@ -1,5 +1,8 @@
 yoshimi 1.5.9 M
 
+2018-10-18 Will
+* Some cleanups to Resonance GUI.
+
 2018-10-17 Will
 * Deactivate resonance GUI if not enabled.
 * All mutex code now commented out.

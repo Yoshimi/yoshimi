@@ -303,8 +303,8 @@ int mainCreateNewInstance(unsigned int forceId, bool loadState)
     if (instanceID == 0)
     {
         cout << "\nYay! We're up and running :-)\n";
-        if (ASM_FR2Z2I)
-            cout << "Fast float 2 int" << endl;
+        //if (ASM_FR2Z2I)
+            //cout << "Fast float 2 int" << endl;
     }
     else
     {

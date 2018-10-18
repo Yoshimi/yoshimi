@@ -216,7 +216,7 @@ class ResonanceGraph {: {public Fl_Box}
         {
             int sn = (int)(x_ * 1.0 / w() * MAX_RESONANCE_POINTS);
             int sp=127 - (int)(y_ * 1.0 / h() * 127);
-            if (leftbutton != 0)
+            if (YOSH::F2B(leftbutton))
             {
                 send_data(sn, sp, typeSent);
             }
@@ -367,7 +367,7 @@ class ResonanceUI {: PresetsUI_
               o->value(20);
 
           send_data(RESONANCE::control::maxDb, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
-          xywh {77 282 98 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 minimum 1 maximum 90 step 1 value 20
+          xywh {77 282 98 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 minimum 1 maximum 90 step 1 value 30
           code0 {o->value(respar->PmaxdB);}
           class mwheel_slider_rev
         }
@@ -523,11 +523,16 @@ class ResonanceUI {: PresetsUI_
                 break;
 
             case 8:
-                enabled->value(value != 0);
-                if (value != 0)
+                if (YOSH::F2B(value))
+                {
+                    enabled->value(1);
                     editor->activate();
+                }
                 else
+                {
+                    enabled->value(0);
                     editor->deactivate();
+                }
                 break;
 
             case 10:
@@ -539,7 +544,7 @@ class ResonanceUI {: PresetsUI_
                 break;
 
             case 21:
-                p1st->value(value != 0);
+                p1st->value(YOSH::F2B(value));
                 break;
 
             case 96:
@@ -572,11 +577,7 @@ class ResonanceUI {: PresetsUI_
     cbapplywidget = NULL;
     make_window();
     applybutton->hide();
-    enabled->value(respar->Penabled);
-    if (enabled->value() != 0)
-        editor->activate();
-    else
-        editor->deactivate();} {}
+    refresh();} {}
   }
   Function {~ResonanceUI()} {return_type virtual
   } {
@@ -599,11 +600,16 @@ class ResonanceUI {: PresetsUI_
   Function {refresh()} {} {
     code {//
     redrawPADnoteApply();
-    enabled->value(respar->Penabled);
-    if (enabled->value() != 0)
+    if (YOSH::F2B(respar->Penabled))
+    {
+        enabled->value(1);
         editor->activate();
+    }
     else
+    {
+        enabled->value(0);
         editor->deactivate();
+    }
     maxdb->value(respar->PmaxdB);
     maxdbvo->value(respar->PmaxdB);
     centerfreqvo->value(respar->getcenterfreq()/1000.0);
