@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified September 2018
+    Modified October 2018
 */
 
 #include <iostream>
@@ -62,6 +62,7 @@ namespace LISTS {
     addsynth,
     subsynth,
     padsynth,
+    resonance,
     addvoice,
     waveform,
     lfo,
@@ -237,6 +238,7 @@ string commonlist [] = {
 
 string addsynthlist [] = {
     "VOice ...",                "enter Addsynth voice context",
+    "REsonance ...",            "enter Resonance context",
     "end"
 };
 
@@ -259,9 +261,23 @@ string subsynthlist [] = {
 string padsynthlist [] = {
     "APply",                    "puts latest changes into the wavetable",
     "WAveform ...",             "enter the oscillator waveform context",
+    "REsonance ...",            "enter Resonance context",
     "end"
 };
 
+
+string  resonancelist [] = {
+    "PRotect <s>",              "leave fundamental unchanged (ON, {other})",
+    "Maxdb <s>",                "maximum attenuation of points",
+    "Random <s>",               "set a random distribution (Coarse, Medium, Fine)",
+    "CEnter <n>",               "center frequency of range",
+    "Octaves <n>",              "number of octaves covered",
+    "Interpolate <s>",          "turn isolated peaks to lines or curves (Linear, Smooth)",
+    "Smooth",                   "Reduce range and sharpness of peaks",
+    "CLear",                    "set all points to mid level",
+    "POints [<n1> <n2>]",       "show all or set/read {n1} to {n2}",
+    "end"
+};
 string waveformlist [] = {
     "HArmonic <n1> Amp <n2>",   "set harmonic {n1} to {n2} intensity",
     "HArmonic <n1> Phase <n2>", "set harmonic {n1} to {n2} phase",
@@ -593,6 +609,8 @@ bool CmdInterface::helpList(unsigned int local)
             listnum = LISTS::subsynth;
         else if (matchnMove(3, point, "padsynth"))
             listnum = LISTS::padsynth;
+        else if (matchnMove(3, point, "resonance"))
+            listnum = LISTS::resonance;
         else if (matchnMove(3, point, "voice"))
             listnum = LISTS::addvoice;
         else if (matchnMove(3, point, "waveform"))
@@ -630,12 +648,16 @@ bool CmdInterface::helpList(unsigned int local)
             listnum = LISTS::waveform;
         else if (bitTest(local, LEVEL::AddVoice))
             listnum = LISTS::addvoice;
+        else if(bitTest(local, LEVEL::Resonance))
+            listnum = LISTS::resonance;
         else if (bitTest(local, LEVEL::AddSynth))
             listnum = LISTS::addsynth;
         else if (bitTest(local, LEVEL::SubSynth))
             listnum = LISTS::subsynth;
         else if (bitTest(local, LEVEL::PadSynth))
             listnum = LISTS::padsynth;
+        else if(bitTest(local, LEVEL::Resonance))
+            listnum = LISTS::resonance;
         else if (bitTest(local, LEVEL::Part))
             listnum = LISTS::part;
         else if (bitTest(local, LEVEL::Vector))
@@ -685,6 +707,10 @@ bool CmdInterface::helpList(unsigned int local)
         case LISTS::padsynth:
             msg.push_back("Part PadSynth:");
             helpLoop(msg, padsynthlist, 2);
+            break;
+        case LISTS::resonance:
+            msg.push_back("Resonance:");
+            helpLoop(msg, resonancelist, 2);
             break;
         case LISTS::addvoice:
             msg.push_back("Part AddVoice:");
@@ -2101,7 +2127,7 @@ string CmdInterface::findStatus(bool show)
                 if (readControl(ADDSYNTH::control::enable, npart, kit, PART::engine::addSynth, insert))
                     text += "+";
                 if (bitFindHigh(context) == LEVEL::AddVoice)
-                    text += ", Voice ";
+                    text += ", Voice";
                 else
                     text += ", V";
                 text += to_string(voiceNumber + 1);
@@ -2109,10 +2135,15 @@ string CmdInterface::findStatus(bool show)
                     text += "+";
                 break;
         }
-
-        if (bitTest(context, LEVEL::Oscillator))
+        if (bitFindHigh(context) == LEVEL::Resonance)
         {
-            text += " Wave ";
+            text += ", Resonance";
+            if (readControl(RESONANCE::control::enableResonance, npart, kitNumber, engine, TOPLEVEL::insert::resonanceGroup))
+            text += "+";
+        }
+        else if (bitTest(context, LEVEL::Oscillator))
+        {
+            text += " Wave";
             /*
              * TODO not yet!
             int source = readControl(ADDVOICE::control::voiceOscillatorSource, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
@@ -2964,7 +2995,11 @@ int CmdInterface::addVoice(unsigned char controlType)
 
 int CmdInterface::addSynth(unsigned char controlType)
 {
-
+    if (matchnMove(2, point, "resonance"))
+    {
+        bitSet(context, LEVEL::Resonance);
+        return resonance(controlType);
+    }
     if (matchnMove(1, point, "voice"))
     {
         bitSet(context, LEVEL::AddVoice);
@@ -3078,6 +3113,11 @@ int CmdInterface::subSynth(unsigned char controlType)
 
 int CmdInterface::padSynth(unsigned char controlType)
 {
+    if (matchnMove(2, point, "resonance"))
+    {
+        bitSet(context, LEVEL::Resonance);
+        return resonance(controlType);
+    }
     if (matchnMove(2, point, "waveform"))
     {
         bitSet(context, LEVEL::Oscillator);
@@ -3098,6 +3138,99 @@ int CmdInterface::padSynth(unsigned char controlType)
     }
 
     return sendNormal(value, controlType, cmd, npart, kitNumber, PART::engine::padSynth);
+    return available_msg;
+}
+
+
+int CmdInterface::resonance(unsigned char controlType)
+{
+    int value = toggle();
+    int cmd = -1;
+    int engine = contextToEngines();
+    int insert = TOPLEVEL::insert::resonanceGroup;
+    if (value > -1)
+    {
+        sendNormal(value, controlType, RESONANCE::control::enableResonance, npart, kitNumber, engine, insert);
+        return done_msg;
+    }
+    if (lineEnd(controlType))
+        return done_msg;
+
+    if (matchnMove(1, point, "random"))
+    {
+        if (matchnMove(1, point, "coarse"))
+            value = 0;
+        else if (matchnMove(1, point, "medium"))
+            value = 1;
+        else if (matchnMove(1, point, "fine"))
+            value = 2;
+        else
+            return value_msg;
+        cmd = RESONANCE::control::randomType;
+    }
+    else if (matchnMove(2, point, "protect"))
+    {
+        value = (toggle() == 1);
+        cmd = RESONANCE::control::protectFundamental;
+    }
+    else if (matchnMove(1, point, "maxdb"))
+    {
+        if (lineEnd(controlType))
+            return value_msg;
+        cmd = RESONANCE::control::maxDb;
+        value = string2int(point);
+    }
+    else if (matchnMove(2, point, "center"))
+    {
+        value = string2int(point);
+        cmd = RESONANCE::control::centerFrequency;
+    }
+    else if (matchnMove(1, point, "octaves"))
+    {
+        value = string2int(point);
+        cmd = RESONANCE::control::octaves;
+    }
+    else if (matchnMove(1, point, "interpolate"))
+    {
+        if (matchnMove(1, point, "linear"))
+            value = 1;
+        else if (matchnMove(1, point, "smooth"))
+            value = 0;
+        else return value_msg;
+        cmd = RESONANCE::control::interpolatePeaks;
+    }
+    else if (matchnMove(1, point, "smooth"))
+        cmd = RESONANCE::control::smoothGraph;
+    else if (matchnMove(1, point, "clear"))
+        cmd = RESONANCE::control::clearGraph;
+
+    else if (matchnMove(2, point, "points"))
+    {
+        insert = TOPLEVEL::insert::resonanceGraphInsert;
+        if (point[0] == 0) // need to catch reading as well
+        {
+            for (int i = 0; i < MAX_RESONANCE_POINTS; i += 8)
+            {
+                string line = asAlignedString(i + 1, 4) + ">";
+                for (int j = 0; j < (MAX_RESONANCE_POINTS / 32); ++ j)
+                {
+                    line += asAlignedString(readControl(i + j, npart, kitNumber, engine, insert), 4);
+                }
+                synth->getRuntime().Log(line);
+            }
+            return done_msg;
+        }
+
+        cmd = string2int(point) - 1;
+        if (cmd < 1 || cmd >= MAX_RESONANCE_POINTS)
+            return range_msg;
+        point = skipChars(point);
+        if (lineEnd(controlType))
+            return value_msg;
+        value = string2int(point);
+    }
+    if (cmd > -1)
+        return sendNormal(value, controlType, cmd, npart, kitNumber, engine, insert);
     return available_msg;
 }
 
@@ -3501,6 +3634,8 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
         return filterSelect(controlType);
     if (bitTest(context, LEVEL::LFO))
         return LFOselect(controlType);
+    if (bitTest(context, LEVEL::Resonance))
+        return resonance(controlType);
     if (bitTest(context, LEVEL::Oscillator))
         return waveform(controlType);
     if (bitTest(context, LEVEL::AddVoice))

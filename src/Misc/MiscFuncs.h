@@ -49,6 +49,7 @@ class MiscFuncs
         string asLongString(float n);
         string asHexString(int x);
         string asHexString(unsigned int x);
+        string asAlignedString(int n, int len);
 
         static float string2float(string str);
         static double string2double(string str);

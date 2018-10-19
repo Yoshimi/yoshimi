@@ -135,6 +135,19 @@ string MiscFuncs::asHexString(unsigned int x)
 }
 
 
+string MiscFuncs::asAlignedString(int n, int len)
+{
+    string res = to_string(n);
+    int size = res.length();
+    if (size < len)
+    {
+        for (int i = size; i < len; ++ i)
+            res = " " + res;
+    }
+    return res;
+}
+
+
 float MiscFuncs::string2float(string str)
 {
     istringstream machine(str);

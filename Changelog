@@ -2,6 +2,8 @@ yoshimi 1.5.9 M
 
 2018-10-19 Will
 * Most #defines in globals.h changed to const.
+* BugFix: CLI not reading resonance points.
+* Completed initial trial of CLI resonance entry.
 
 2018-10-18 Will
 * Some cleanups to Resonance GUI.

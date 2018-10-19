@@ -7186,9 +7186,7 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
         if (write)
             respar->setpoint(control, value_int);
         else
-            value = respar->Prespoints[control];
-        if (!write)
-            getData->data.value = value_int;
+            getData->data.value = respar->Prespoints[control];
         return;
     }
 
