@@ -1,5 +1,8 @@
 yoshimi 1.5.9 M
 
+2018-10-19 Will
+* Most #defines in globals.h changed to const.
+
 2018-10-18 Will
 * Some cleanups to Resonance GUI.
 
