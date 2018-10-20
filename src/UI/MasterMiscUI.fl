@@ -288,7 +288,8 @@ class VUMeter {
         draw_part();
     else
         draw_master();
-    read_updates(synth);} {}
+        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::GuiAlert, 0);
+//    read_updates(synth);} {}
   }
   Function {tickdraw(VUMeter *o)} {return_type {static void}
   } {

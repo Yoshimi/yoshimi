@@ -1324,8 +1324,9 @@ void GuiThreadMsg::processGuiMessages()
                     break;
 
                 case GuiThreadMsg::GuiAlert:
-                    if (msg->data)
-                        guiMaster->ShowAlert(msg->index);
+                    //if (msg->data)
+                        //guiMaster->ShowAlert(msg->index);
+                    guiMaster->checkBuffer();
                     break;
 
                 default:

@@ -30,7 +30,7 @@
 #define LOG_2 0.693147181f
 
 // float round to zero to integer
-#ifdef ASM_FR2Z2I // currently disabled in CMakeLists.txt
+#ifdef FAILEDASM // ASM_FR2Z2I // currently disabled
     #define FR2Z2I(in, out)  \
         __asm__ __volatile__ ("fistpl %0" : "=m" (out) : "t" (in) : "st") ;
 #else

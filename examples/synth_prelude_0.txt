@@ -1,0 +1,13 @@
+Courtesy Lorenzo Sutton
+
+Licensed Creative Commons BY-NC-SA
+
+The .rg and .state file pair when loaded into Rosegarden and Yoshini respectively produce a very pleasant classical stle pice of music.
+
+The simplest way to run this is to start Yoshimi first, then Rosegarden.
+
+Next load the .rg file into Rosegarden, and finally the .state file into Yoshimi.
+
+This should work for either Jack or Alsa.
+
+If Rosegarden fails to link to Yoshimi for some reason, enter Manage Midi Devices" and make the link manually.
