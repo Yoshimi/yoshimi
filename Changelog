@@ -3,6 +3,7 @@ yoshimi 1.5.9 M
 2018-10-20 Will
 * Added Lorenzo's synth_prelude to examples.
 * Possibly cured occasional GUI corruption.
+* Completed CLI AddSynth base controls.
 
 2018-10-19 Will
 * Most #defines in globals.h changed to const.

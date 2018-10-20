@@ -237,6 +237,9 @@ string commonlist [] = {
 };
 
 string addsynthlist [] = {
+    "BAndwidth <n>",            "modifes relative fine detune of voices",
+    "GRoup <n>",                "disables harmonic amplitude randomness of voices with",
+    "","a common oscllator (ON, {other})",
     "VOice ...",                "enter Addsynth voice context",
     "REsonance ...",            "enter Resonance context",
     "end"
@@ -3008,11 +3011,33 @@ int CmdInterface::addSynth(unsigned char controlType)
     }
     if (lineEnd(controlType))
         return done_msg;
+
     int result = partCommonControls(controlType);
     if (result != todo_msg)
         return result;
 
-    return available_msg;
+    int cmd = -1;
+    int value;
+    if (matchnMove(2, point, "bandwidth"))
+    {
+        if (lineEnd(controlType))
+            return value_msg;
+        value = string2int(point);
+        cmd = ADDSYNTH::control::relativeBandwidth;
+    }
+    else if (matchnMove(2, point, "group"))
+    {
+        if (lineEnd(controlType))
+            return value_msg;
+        value = (toggle() == 1);
+        cmd = ADDSYNTH::control::randomGroup;
+    }
+    if (cmd == -1)
+        return available_msg;
+
+    sendNormal(value, controlType, cmd, npart, kitNumber, PART::engine::addSynth);
+
+    return done_msg;;
 }
 
 

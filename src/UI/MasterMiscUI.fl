@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
-Modified August 2018
+Modified October 2018
 } {selected in_source in_header
 }
 
@@ -288,7 +288,7 @@ class VUMeter {
         draw_part();
     else
         draw_master();
-        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::GuiAlert, 0);
+    GuiThreadMsg::sendMessage(synth, GuiThreadMsg::GuiAlert, 0);
 //    read_updates(synth);} {}
   }
   Function {tickdraw(VUMeter *o)} {return_type {static void}

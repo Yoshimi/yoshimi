@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified September 2018} {in_source in_header
+Modified October 2018} {selected in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -95,7 +95,7 @@ decl {\#include "Misc/MiscFuncs.h"} {public local
 decl {\#include "MidiLearnUI.h"} {public local
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -2396,8 +2396,7 @@ Nikita Zlobin
     partui->instrumentkitlist->position(kitlistX, kitlistY);
     partui->partfx->position(partfxX, partfxY);} {}
   }
-  Function {saveWindowData()} {selected
-  } {
+  Function {saveWindowData()} {} {
     code {//
     windows = fopen(filename.c_str(), "w");
 
