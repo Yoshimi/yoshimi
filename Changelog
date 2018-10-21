@@ -1,5 +1,9 @@
 yoshimi 1.5.9 M
 
+2018-10-21 Will
+* Implemented proper resonance limits.
+* Corrected 2 AddSynth tooltips.
+
 2018-10-20 Will
 * Added Lorenzo's synth_prelude to examples.
 * Possibly cured occasional GUI corruption.

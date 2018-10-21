@@ -20,10 +20,15 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2018
+    This file is a derivative of a ZynAddSubFX original
+
+    Modified October 2018
 */
 
 #include <cmath>
+#include <iostream>
+
+using namespace std;
 
 #include "Misc/SynthEngine.h"
 #include "Synth/Resonance.h"
@@ -266,4 +271,109 @@ void Resonance::getfromXML(XMLwrapper *xml)
         Prespoints[i]=xml->getpar127("val",Prespoints[i]);
         xml->exitbranch();
     }
+}
+
+
+float ResonanceLimits::getLimits(CommandBlock *getData)
+{
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    int request = type & TOPLEVEL::type::Default;
+    int control = getData->data.control;
+    int insert = getData->data.insert;
+
+    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
+
+    // resonance defaults
+    int min = 0;
+    int max = 1;
+    int def = 0;
+    type |= TOPLEVEL::type::Integer;
+
+    if (insert == TOPLEVEL::insert::resonanceGraphInsert)
+    {
+        min = 1;
+        max = 127;
+        def = 64;
+
+        getData->data.type = type;
+
+        switch (request)
+        {
+        case TOPLEVEL::type::Adjust:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+        break;
+        case TOPLEVEL::type::Minimum:
+            value = min;
+            break;
+        case TOPLEVEL::type::Maximum:
+            value = max;
+            break;
+        case TOPLEVEL::type::Default:
+            value = def;
+            break;
+        }
+        return value;
+    }
+
+    switch (control)
+    {
+        case RESONANCE::control::maxDb:
+            min = 1;
+            max = 90;
+            def = 20;
+            break;
+        case RESONANCE::control::centerFrequency:
+            max = 127;
+            def = 64;
+            break;
+        case RESONANCE::control::octaves:
+            max = 127;
+            def = 64;
+            break;
+        case RESONANCE::control::enableResonance:
+            break;
+        case RESONANCE::control::randomType:
+            max = 2;
+            break;
+        case RESONANCE::control::interpolatePeaks:
+            break;
+        case RESONANCE::control::protectFundamental:
+            break;
+        case RESONANCE::control::clearGraph:
+            max = 0;
+            break;
+        case RESONANCE::control::smoothGraph:
+            max = 0;
+            break;
+        default:
+            type |= TOPLEVEL::type::Error;
+            break;
+    }
+    getData->data.type = type;
+    if (type & TOPLEVEL::type::Error)
+        return 1;
+
+    switch (request)
+    {
+        case TOPLEVEL::type::Adjust:
+            if(value < min)
+                value = min;
+            else if(value > max)
+                value = max;
+        break;
+        case TOPLEVEL::type::Minimum:
+            value = min;
+            break;
+        case TOPLEVEL::type::Maximum:
+            value = max;
+            break;
+        case TOPLEVEL::type::Default:
+            value = def;
+            break;
+    }
+    return value;
 }

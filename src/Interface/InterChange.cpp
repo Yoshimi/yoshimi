@@ -8259,49 +8259,9 @@ float InterChange::returnLimits(CommandBlock *getData)
             // as oscillator values identical
         }
         if (insert == TOPLEVEL::insert::resonanceGroup || insert == TOPLEVEL::insert::resonanceGraphInsert)
-        {  // TODO create proper resonance limits
-            min = 0;
-            unsigned char type = getData->data.type;
-            type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
-            if (control == RESONANCE::control::maxDb)
-            {
-                min = 1;
-                max = 90;
-                def = 20;
-                getData->data.type |= TOPLEVEL::type::Learnable;
-            }
-            else
-            {
-                if (control == RESONANCE::control::enableResonance || control == RESONANCE::control::protectFundamental)
-                {
-                    max = 1;
-                    def = 0;
-                }
-                else
-                {
-                    max = 127;
-                    def = 64;
-                }
-            }
-            switch (request)
-            {
-                case TOPLEVEL::type::Adjust:
-                    if(value < min)
-                        value = min;
-                    else if(value > max)
-                        value = max;
-                    break;
-                case TOPLEVEL::type::Minimum:
-                    value = min;
-                    break;
-                case TOPLEVEL::type::Maximum:
-                    value = max;
-                    break;
-                case TOPLEVEL::type::Default:
-                    value = def;
-                    break;
-            }
-            return value;
+        {
+            ResonanceLimits resonancelimits;
+            return resonancelimits.getLimits(getData);
         }
         if (insert == TOPLEVEL::insert::LFOgroup && engine != PART::engine::subSynth && parameter <= TOPLEVEL::insertType::filter)
         {

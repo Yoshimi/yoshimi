@@ -1478,7 +1478,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
           label relBW
           callback {//
     send_data(ADDSYNTH::control::relativeBandwidth, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Bandwidth - how the relative fine detune of the voice are changed} xywh {500 270 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+          tooltip {Bandwidth - modify the relative fine detune of the voices} xywh {500 270 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PBandwidth);}
           class WidgetPDial
         }
@@ -1579,7 +1579,7 @@ send_data(ADDSYNTH::control::punchVelocity, o->value(), TOPLEVEL::type::Integer)
           label {Rnd Grp}
           callback {pars->GlobalPar.Hrandgrouping = lrint(o->value());
 send_data(ADDSYNTH::control::randomGroup, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {How the Harmonic Amplitude is applied to voices that use the same oscillator} xywh {8 234 63 18} down_box DOWN_BOX labelsize 11
+          tooltip {Disable individual Harmonic Amplitude randomisation for voices that use the same oscillator} xywh {8 234 63 18} down_box DOWN_BOX labelsize 11
           code0 {o->value(pars->GlobalPar.Hrandgrouping);}
         }
       }

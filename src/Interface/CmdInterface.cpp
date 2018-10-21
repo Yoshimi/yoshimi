@@ -238,7 +238,7 @@ string commonlist [] = {
 
 string addsynthlist [] = {
     "BAndwidth <n>",            "modifes relative fine detune of voices",
-    "GRoup <n>",                "disables harmonic amplitude randomness of voices with",
+    "GRoup <s>",                "disables harmonic amplitude randomness of voices with",
     "","a common oscllator (ON, {other})",
     "VOice ...",                "enter Addsynth voice context",
     "REsonance ...",            "enter Resonance context",
@@ -271,14 +271,14 @@ string padsynthlist [] = {
 
 string  resonancelist [] = {
     "PRotect <s>",              "leave fundamental unchanged (ON, {other})",
-    "Maxdb <s>",                "maximum attenuation of points",
+    "Maxdb <n>",                "maximum attenuation of points",
     "Random <s>",               "set a random distribution (Coarse, Medium, Fine)",
     "CEnter <n>",               "center frequency of range",
     "Octaves <n>",              "number of octaves covered",
-    "Interpolate <s>",          "turn isolated peaks to lines or curves (Linear, Smooth)",
-    "Smooth",                   "Reduce range and sharpness of peaks",
+    "Interpolate <s>",          "turn isolated peaks into lines or curves (Linear, Smooth)",
+    "Smooth",                   "reduce range and sharpness of peaks",
     "CLear",                    "set all points to mid level",
-    "POints [<n1> <n2>]",       "show all or set/read {n1} to {n2}",
+    "POints [<n1> [n2]]",       "show all or set/read {n1} to {n2}",
     "end"
 };
 string waveformlist [] = {
@@ -3234,14 +3234,19 @@ int CmdInterface::resonance(unsigned char controlType)
         insert = TOPLEVEL::insert::resonanceGraphInsert;
         if (point[0] == 0) // need to catch reading as well
         {
-            for (int i = 0; i < MAX_RESONANCE_POINTS; i += 8)
+            if (controlType & TOPLEVEL::type::Limits)
+                return sendNormal(0, controlType, 1, npart, kitNumber, engine, insert);
+            else
             {
-                string line = asAlignedString(i + 1, 4) + ">";
-                for (int j = 0; j < (MAX_RESONANCE_POINTS / 32); ++ j)
+                for (int i = 0; i < MAX_RESONANCE_POINTS; i += 8)
                 {
-                    line += asAlignedString(readControl(i + j, npart, kitNumber, engine, insert), 4);
+                    string line = asAlignedString(i + 1, 4) + ">";
+                    for (int j = 0; j < (MAX_RESONANCE_POINTS / 32); ++ j)
+                    {
+                        line += asAlignedString(readControl(i + j, npart, kitNumber, engine, insert), 4);
+                    }
+                    synth->getRuntime().Log(line);
                 }
-                synth->getRuntime().Log(line);
             }
             return done_msg;
         }
