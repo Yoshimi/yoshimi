@@ -1,5 +1,8 @@
 yoshimi 1.5.9 M
 
+2018-10-23 Will
+* Started defining CLI PadSynth Controls.
+
 2018-10-21 Will
 * Implemented proper resonance limits.
 * Corrected 2 AddSynth tooltips.

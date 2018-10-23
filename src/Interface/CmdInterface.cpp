@@ -262,6 +262,26 @@ string subsynthlist [] = {
 };
 
 string padsynthlist [] = {
+    "Profile <s>",              "shape of harmonic profile (Gauss, Square Double exponent)",
+    "WIdth <n>",                "width of harmonic profile",
+    "MUltiplier <n>",           "number of profile repetitions",
+    "STretch <n>",              "",
+    "FRequency <n>",            "",
+    "SIze <n>",                 "",
+
+    "Cross <s>",                "Cross section of profile (Full, Upper, Lower)",
+    "SPread <s>",               "amplitude multiplier (Off, Gauss, Sine, Flat)",
+    "MOde <s>",                 "amplitude mode (Sum, Mult, D1, D2)",
+
+    "HP1 <n>",                  "changes the central harmonic component width",
+    "HP2 <n>",                  "changes central component relative amplitude",
+    "AUto <s>",                 "(ON {other))",
+
+    "Base <s>",                 "profile distribution (C2, G2, C3, G3, C4, G4, C5, G5, G6)",
+    "SAmples <s>",              "samples/octave (0.5, 1, 2, 3, 4, 6, 12)",
+    "Octaves <n>",              "number of octaves 1 -  8",
+    "SSize <n>",                "size of one sample in k (16, 32, 64, 128, 256, 512, 1024)",
+
     "APply",                    "puts latest changes into the wavetable",
     "WAveform ...",             "enter the oscillator waveform context",
     "REsonance ...",            "enter Resonance context",
