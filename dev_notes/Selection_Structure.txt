@@ -6,7 +6,7 @@ The development has been very much an incremental process, initially with numeri
 The intention was then to collapse all the gaps to give more efficient switch statements. However in the intervening time several CLI users have been using the direct access method to reach controls that are not yet available formally. In view of this, I'll be leaving the actual values as they are until all of them are properly addressable.
 
 
-Modern compilers are very smart when they see these large switches. The traditonal impression is they perform a lot of if-then tests but this is only true of small case groups, after that they make lookup tables which are considerably faster.
+The traditonal impression of these switches is that they perform a lot of if-then tests, but with modern compilers this is only true of small case groups, after that they make lookup tables which are considerably faster.
 
 If the structure is big enough and dense enough the compiler will instead fill the spaces with NOPs and turn the whole thing into a jump table. This is means the code for any case can then be reached in exactly three machine instructions (two in the case of an ARM processor)
 

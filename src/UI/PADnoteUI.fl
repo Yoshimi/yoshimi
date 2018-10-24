@@ -314,33 +314,9 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper, MiscFuncs}
               code0 {o->value(pars->Php.modulator.freq);}
               class WidgetPDial
             }
-            Fl_Group {} {
+            Fl_Group ampgroup {
               xywh {10 160 80 105} box BORDER_BOX
             } {
-              Fl_Choice hpamptype {
-                label AmpMultiplier
-                callback {//
-                send_data(PADSYNTH::control::amplitudeMultiplier, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
-                xywh {15 175 70 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
-                code0 {o->value(pars->Php.amp.type);}
-              } {
-                MenuItem {} {
-                  label OFF
-                  xywh {45 45 100 20} labelfont 1 labelsize 10
-                }
-                MenuItem {} {
-                  label Gauss
-                  xywh {55 55 100 20} labelfont 1 labelsize 10
-                }
-                MenuItem {} {
-                  label Sine
-                  xywh {65 65 100 20} labelfont 1 labelsize 10
-                }
-                MenuItem {} {
-                  label Flat
-                  xywh {75 75 100 20} labelfont 1 labelsize 10
-                }
-              }
               Fl_Choice hpampmode {
                 label AmpMode
                 callback {//
@@ -380,6 +356,31 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper, MiscFuncs}
                 xywh {55 235 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
                 code0 {o->value(pars->Php.amp.par2);}
                 class WidgetPDial
+              }
+            }
+            Fl_Choice hpamptype {
+              label AmpMultiplier
+              callback {//
+                send_data(PADSYNTH::control::amplitudeMultiplier, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+              xywh {15 175 70 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
+              code0 {o->value(pars->Php.amp.type);}
+              code1 {if (o->value() > 0) ampgroup->activate(); else ampgroup->deactivate();}
+            } {
+              MenuItem {} {
+                label OFF
+                xywh {55 55 100 20} labelfont 1 labelsize 10
+              }
+              MenuItem {} {
+                label Gauss
+                xywh {65 65 100 20} labelfont 1 labelsize 10
+              }
+              MenuItem {} {
+                label Sine
+                xywh {75 75 100 20} labelfont 1 labelsize 10
+              }
+              MenuItem {} {
+                label Flat
+                xywh {85 85 100 20} labelfont 1 labelsize 10
               }
             }
             Fl_Check_Button hpautoscale {
@@ -1046,6 +1047,7 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper, MiscFuncs}
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
+    bool value_bool = YOSH::F2B(value);
     bool wasFromHere = getData->data.type & TOPLEVEL::source::GUI;
     unsigned char control = getData->data.control;
     unsigned char par2 = getData->data.par2;
@@ -1113,11 +1115,11 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper, MiscFuncs}
             break;
 
         case PADSYNTH::control::baseFrequencyAs440Hz:
-            hz440->value(YOSH::F2B(value));
-            if (value <= 0.5f)
-                fixedfreqetdial->deactivate();
-            else
+            hz440->value(value_bool);
+            if (value_bool)
                 fixedfreqetdial->activate();
+            else
+                fixedfreqetdial->deactivate();
             break;
 
         case PADSYNTH::control::octave:
@@ -1220,6 +1222,10 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper, MiscFuncs}
 
         case PADSYNTH::control::amplitudeMultiplier:
             hpamptype->value(lrint(value));
+            if (value_bool)
+                ampgroup->activate();
+            else
+                ampgroup->deactivate();
             hprofile->redraw();
             cbwidget->do_callback();
             break;
@@ -1281,7 +1287,7 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper, MiscFuncs}
             break;
 
         case PADSYNTH::control::stereo:
-            stereo->value(YOSH::F2B(value));
+            stereo->value(value_bool);
             break;
 
         case PADSYNTH::control::dePop:
