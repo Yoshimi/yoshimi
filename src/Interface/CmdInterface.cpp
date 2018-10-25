@@ -264,23 +264,27 @@ string subsynthlist [] = {
 string padsynthlist [] = {
     "Profile <s>",              "shape of harmonic profile (Gauss, Square Double exponent)",
     "WIdth <n>",                "width of harmonic profile",
-    "MUltiplier <n>",           "number of profile repetitions",
-    "STretch <n>",              "",
-    "FRequency <n>",            "",
-    "SIze <n>",                 "",
+    "COunt <n>",                "number of profile repetitions",
+    "STretch <n>",              "adds harmonics and changes distribution",
+    "FRequency <n>",            "further modifies distribution (dependent on stretch)",
+    "SIze <n>",                 "increase harmonic width retaining shape",
 
-    "Cross <s>",                "Cross section of profile (Full, Upper, Lower)",
-    "SPread <s>",               "amplitude multiplier (Off, Gauss, Sine, Flat)",
+    "CRoss <s>",                "cross section of profile (Full, Upper, Lower)",
+    "MUltiplier <s>",           "amplitude multiplier (Off, Gauss, Sine, Flat)",
     "MOde <s>",                 "amplitude mode (Sum, Mult, D1, D2)",
 
-    "HP1 <n>",                  "changes the central harmonic component width",
-    "HP2 <n>",                  "changes central component relative amplitude",
+    "CEnter <n>",               "changes the central harmonic component width",
+    "Relative <n>",             "changes central component relative amplitude",
     "AUto <s>",                 "(ON {other))",
 
-    "Base <s>",                 "profile distribution (C2, G2, C3, G3, C4, G4, C5, G5, G6)",
+    "Distribution <s>",         "profile distribution (C2, G2, C3, G3, C4, G4, C5, G5, G6)",
     "SAmples <s>",              "samples/octave (0.5, 1, 2, 3, 4, 6, 12)",
     "Octaves <n>",              "number of octaves 1 -  8",
-    "SSize <n>",                "size of one sample in k (16, 32, 64, 128, 256, 512, 1024)",
+    "Length <n>",               "length of one sample in k (16, 32, 64, 128, 256, 512, 1024)",
+
+    "Bandwidth <n>",            "overall bandwidth",
+    "SCale <s>",                "bandwidth scale (Normal, Equalhz, Quarter, Half, Threequart, Oneandhalf, Double, Inversehalf)",
+    "SPectrum <s>",             "spectrum mode (Bandwidth, Discrete, Continuous)",
 
     "APply",                    "puts latest changes into the wavetable",
     "WAveform ...",             "enter the oscillator waveform context",
@@ -366,7 +370,7 @@ string filterlist [] = {
     "Invert <s>",           "invert effect of LFOs, envelopes (ON, OFf)",
     "FCenter <n>",          "center frequency of sequence",
     "FRange <n>",           "octave range of formants",
-    "Expand <n>",           "stretch overal sequence time",
+    "Expand <n>",           "stretch overall sequence time",
     "Lucidity <n>",         "clarity of vowels",
     "Morph <n>",            "speed of change between formants",
     "SIze <n>",             "number of vowels in sequence",
@@ -1285,7 +1289,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
                     else if(matchnMove(2, point, "power"))
                         value = 6;
                     else if(matchnMove(2, point, "shift"))
-                        value = 6;
+                        value = 7;
                     else
                         return range_msg;
                     cmd = SUBSYNTH::control::overtonePosition;

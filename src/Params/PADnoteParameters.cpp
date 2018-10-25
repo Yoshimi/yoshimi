@@ -388,6 +388,10 @@ float PADnoteParameters::getNhr(int n)
         result = n0 * powf(1.0f + par1 * powf(n0 * 0.8f, tmp), tmp) + 1.0f;
         break;
 
+        case 7:
+            result = (n + Phrpos.par1 / 255.0f) / (Phrpos.par1 / 255.0f + 1);
+            break;
+
     default:
         result=n;
         break;
@@ -1069,7 +1073,7 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
 
         case PADSYNTH::control::overtonePosition:
             def = 0;
-            max = 6;
+            max = 7;
             break;
 
         case PADSYNTH::control::baseWidth:

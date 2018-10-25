@@ -1,5 +1,11 @@
 yoshimi 1.5.9 M
 
+2018-10-25 Will
+* Found missing PadSynth overtones option.
+* Deactivate PadSynth overtones if set as harmonic.
+* Small revision to PadSynth GUI.
+* Deactivate SubSynth overtones if set as harmonic.
+
 2018-10-24 Will
 * Deactivate PadSynth amp group if Multiplier off.
 

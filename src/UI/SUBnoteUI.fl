@@ -541,54 +541,14 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
         callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this);}
         xywh {576 449 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
-      Fl_Group {} {
+      Fl_Group spreadGroup {
         label OVERTONES
         xywh {440 140 290 81} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
       } {
-        Fl_Choice spreadtype {
-          label {Overtone Positions}
-          callback {//
-          send_data (SUBSYNTH::control::overtonePosition, o->value(), TOPLEVEL::type::Integer);}
-          xywh {460 171 87 20} down_box BORDER_BOX labelsize 10 align 2 textsize 10
-          code0 {o->value(pars->POvertoneSpread.type);}
-        } {
-          MenuItem {} {
-            label Harmonic
-            xywh {5 5 34 20} labelfont 1 labelsize 11
-          }
-          MenuItem {} {
-            label ShiftU
-            xywh {15 15 34 20} labelfont 1 labelsize 11
-          }
-          MenuItem {} {
-            label ShiftL
-            xywh {25 25 34 20} labelfont 1 labelsize 11
-          }
-          MenuItem {} {
-            label PowerU
-            xywh {25 25 34 20} labelfont 1 labelsize 11
-          }
-          MenuItem {} {
-            label PowerL
-            xywh {35 35 34 20} labelfont 1 labelsize 11
-          }
-          MenuItem {} {
-            label Sine
-            xywh {45 45 34 20} labelfont 1 labelsize 11
-          }
-          MenuItem {} {
-            label Power
-            xywh {55 55 34 20} labelfont 1 labelsize 11
-          }
-          MenuItem {} {
-            label Shift
-            xywh {25 25 34 20} labelfont 1 labelsize 11
-          }
-        }
         Fl_Dial spreadpar1 {
           label Par1
           callback {//
-          send_data (SUBSYNTH::control::overtoneParameter1, o->value(), TOPLEVEL::type::Integer);}
+          send_data (SUBSYNTH::control::overtoneParameter1, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           xywh {570 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par1);}
           class WidgetPDial
@@ -609,6 +569,47 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
           code0 {o->value(pars->POvertoneSpread.par3);}
           code1 {o->setValueType(VC_percent255);}
           class WidgetPDial
+        }
+      }
+      Fl_Choice spreadtype {
+        label {Overtone Positions}
+        callback {//
+          send_data (SUBSYNTH::control::overtonePosition, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        xywh {460 171 87 20} down_box BORDER_BOX labelsize 10 align 2 textsize 10
+        code0 {o->value(pars->POvertoneSpread.type);}
+        code1 {if (o->value() > 0) spreadGroup->activate(); else spreadGroup->deactivate();}
+      } {
+        MenuItem {} {
+          label Harmonic
+          xywh {15 15 34 20} labelfont 1 labelsize 11
+        }
+        MenuItem {} {
+          label ShiftU
+          xywh {25 25 34 20} labelfont 1 labelsize 11
+        }
+        MenuItem {} {
+          label ShiftL
+          xywh {35 35 34 20} labelfont 1 labelsize 11
+        }
+        MenuItem {} {
+          label PowerU
+          xywh {35 35 34 20} labelfont 1 labelsize 11
+        }
+        MenuItem {} {
+          label PowerL
+          xywh {45 45 34 20} labelfont 1 labelsize 11
+        }
+        MenuItem {} {
+          label Sine
+          xywh {55 55 34 20} labelfont 1 labelsize 11
+        }
+        MenuItem {} {
+          label Power
+          xywh {65 65 34 20} labelfont 1 labelsize 11
+        }
+        MenuItem {} {
+          label Shift
+          xywh {35 35 34 20} labelfont 1 labelsize 11
         }
       }
     }
@@ -790,6 +791,10 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
 
         case SUBSYNTH::control::overtonePosition:
             spreadtype->value((int) value);
+            if (spreadtype->value() > 0)
+                spreadGroup->activate();
+            else
+                spreadGroup->deactivate();
             break;
 
         case SUBSYNTH::control::enableFilter:

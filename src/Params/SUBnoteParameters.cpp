@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is a derivative of a ZynAddSubFX original.
-    Modified August 2018
+    Modified October 2018
 */
 
 #include "Params/SUBnoteParameters.h"
@@ -254,8 +254,10 @@ void SUBnoteParameters::updateFrequencyMultipliers(void)
             case 7:
                 result = (n1 + par1) / (par1 + 1);
                 break;
+
             default:
                 result = n1;
+                break;
         }
         float iresult = floor(result + 0.5f);
         POvertoneFreqMult[n] = iresult + par3 * (result - iresult);
