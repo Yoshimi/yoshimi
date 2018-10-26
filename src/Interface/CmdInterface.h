@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified August 2018
+    Modified October 2018
 */
 
 #ifndef CMDINTERFACE_H
@@ -63,7 +63,7 @@ namespace LEVEL{
     };
 }
 
-typedef enum {exit_msg = -1, todo_msg = 0, done_msg, value_msg, name_msg, opp_msg, what_msg, range_msg, low_msg, high_msg, unrecognised_msg, parameter_msg, level_msg, available_msg, failed_msg,} error_messages;
+typedef enum {exit_msg = -1, todo_msg = 0, done_msg, value_msg, name_msg, opp_msg, what_msg, range_msg, low_msg, high_msg, unrecognised_msg, parameter_msg, level_msg, available_msg, failed_msg, writeOnly_msg, readOnly_msg} error_messages;
 
 class CmdInterface : private MiscFuncs
 {

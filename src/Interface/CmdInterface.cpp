@@ -262,10 +262,10 @@ string subsynthlist [] = {
 };
 
 string padsynthlist [] = {
-    "Profile <s>",              "shape of harmonic profile (Gauss, Square Double exponent)",
+    "PRofile <s>",              "shape of harmonic profile (Gauss, Square Double exponent)",
     "WIdth <n>",                "width of harmonic profile",
     "COunt <n>",                "number of profile repetitions",
-    "STretch <n>",              "adds harmonics and changes distribution",
+    "EXpand <n>",              "adds harmonics and changes distribution",
     "FRequency <n>",            "further modifies distribution (dependent on stretch)",
     "SIze <n>",                 "increase harmonic width retaining shape",
 
@@ -274,21 +274,22 @@ string padsynthlist [] = {
     "MOde <s>",                 "amplitude mode (Sum, Mult, D1, D2)",
 
     "CEnter <n>",               "changes the central harmonic component width",
-    "Relative <n>",             "changes central component relative amplitude",
+    "RELative <n>",             "changes central component relative amplitude",
     "AUto <s>",                 "(ON {other))",
 
-    "Distribution <s>",         "profile distribution (C2, G2, C3, G3, C4, G4, C5, G5, G6)",
+    "BASe <s>",                 "base profile distribution (C2, G2, C3, G3, C4, G4, C5, G5, G6)",
     "SAmples <s>",              "samples/octave (0.5, 1, 2, 3, 4, 6, 12)",
-    "Octaves <n>",              "number of octaves 1 -  8",
-    "Length <n>",               "length of one sample in k (16, 32, 64, 128, 256, 512, 1024)",
+    "RAnge <n>",                "number of octaves 1 -  8",
+    "LEngth <n>",               "length of one sample in k (16, 32, 64, 128, 256, 512, 1024)",
 
-    "Bandwidth <n>",            "overall bandwidth",
+    "BAndwidth <n>",            "overall bandwidth",
     "SCale <s>",                "bandwidth scale (Normal, Equalhz, Quarter, Half, Threequart, Oneandhalf, Double, Inversehalf)",
     "SPectrum <s>",             "spectrum mode (Bandwidth, Discrete, Continuous)",
 
     "APply",                    "puts latest changes into the wavetable",
+    "XPort <s>",                "export current sample set to named file",
     "WAveform ...",             "enter the oscillator waveform context",
-    "REsonance ...",            "enter Resonance context",
+    "RESonance ...",            "enter Resonance context",
     "end"
 };
 
@@ -515,7 +516,9 @@ string replies [] = {
     "Parameter?",
     "Not at this level",
     "Not available",
-    "Unable to complete"
+    "Unable to complete",
+    "write only",
+    "read only"
 };
 
 string fx_list [] = {
@@ -3172,13 +3175,198 @@ int CmdInterface::padSynth(unsigned char controlType)
         bitSet(context, LEVEL::Oscillator);
         return waveform(controlType);
     }
-    float value = -1;
-    int cmd;
     if (lineEnd(controlType))
         return done_msg;
     int result = partCommonControls(controlType);
     if (result != todo_msg)
         return result;
+
+    if (matchnMove(2, point, "xport"))
+    {
+        if (controlType != TOPLEVEL::type::Write)
+            return writeOnly_msg;
+        if (point[0] == 0)
+            return value_msg;
+        string name = point;
+        sendDirect(0, controlType, MAIN::control::exportPadSynthSamples, TOPLEVEL::section::main, kitNumber, 2, UNUSED, TOPLEVEL::route::lowPriority + npart, miscMsgPush(name));
+        return done_msg;
+    }
+
+    int cmd = -1;
+    float value = -1;
+    if (matchnMove(2, point, "profile"))
+    {
+        if (matchnMove(1, point, "gauss"))
+            value = 0;
+        else if (matchnMove(1, point, "square"))
+            value = 1;
+        else if (matchnMove(1, point, "double"))
+            value = 2;
+        else
+            return value_msg;
+
+        cmd = PADSYNTH::control::baseType;
+    }
+    else if (matchnMove(2, point, "width"))
+    {
+        cmd = PADSYNTH::control::baseWidth;
+    }
+    else if (matchnMove(2, point, "count"))
+    {
+        cmd = PADSYNTH::control::frequencyMultiplier;
+    }
+    else if (matchnMove(2, point, "expand"))
+    {
+        cmd = PADSYNTH::control::modulatorStretch;
+    }
+    else if (matchnMove(2, point, "frequency"))
+    {
+        cmd = PADSYNTH::control::modulatorFrequency;
+    }
+    else if (matchnMove(2, point, "size"))
+    {
+        cmd = PADSYNTH::control::size;
+    }
+    else if (matchnMove(2, point, "cross"))
+    {
+        if (matchnMove(1, point, "full"))
+            value = 0;
+        else if (matchnMove(1, point, "upper"))
+            value = 1;
+        else if (matchnMove(1, point, "lower"))
+            value = 2;
+        else
+            return value_msg;
+
+        cmd = PADSYNTH::control::harmonicSidebands;
+    }
+    else if (matchnMove(2, point, "multiplier"))
+    {
+        if (matchnMove(1, point, "off"))
+            value = 0;
+        else if (matchnMove(1, point, "gauss"))
+            value = 1;
+        else if (matchnMove(1, point, "sine"))
+            value = 2;
+        else if (matchnMove(1, point, "double"))
+            value = 3;
+        else
+            return value_msg;
+
+        cmd = PADSYNTH::control::amplitudeMultiplier;
+    }
+    else if (matchnMove(2, point, "mode"))
+    {
+        if (matchnMove(1, point, "Sum"))
+            value = 0;
+        else if (matchnMove(1, point, "mult"))
+            value = 1;
+        else if (matchnMove(1, point, "d1"))
+            value = 2;
+        else if (matchnMove(1, point, "d2"))
+            value = 3;
+        else
+            return value_msg;
+
+        cmd = PADSYNTH::control::amplitudeMode;
+    }
+    else if (matchnMove(2, point, "center"))
+    {
+        cmd = PADSYNTH::control::spectralWidth;
+    }
+    else if (matchnMove(3, point, "relative"))
+    {
+        cmd = PADSYNTH::control::spectralAmplitude;
+    }
+    else if (matchnMove(2, point, "auto"))
+    {
+        value = (toggle() > 0);
+        cmd = PADSYNTH::control::autoscale;
+    }
+    else if (matchnMove(3, point, "base"))
+    {
+        string types [] {"c2", "g2", "c3", "g3", "c4", "g4", "c5", "g5", "g6"};
+        string found = point;
+        for (int i = 0; i < 9; ++ i)
+        {
+            if (found == types[i])
+            {
+                value = i;
+                cmd = PADSYNTH::control::harmonicBase;
+                break;
+            }
+        }
+        if (cmd == -1)
+            return range_msg;
+    }
+    else if (matchnMove(2, point, "samples"))
+    {
+        unsigned char sizes[] {1, 2, 4, 6, 8, 12, 24};
+        value = string2float(point);
+        int tmp = value * 2;
+        for (int i = 0; i < 7; ++i)
+        {
+            if (tmp == sizes[i])
+            {
+                value = i;
+                cmd = PADSYNTH::control::samplesPerOctave;
+                break;
+            }
+        }
+        if (cmd == -1)
+            return range_msg;
+    }
+    else if (matchnMove(2, point, "range"))
+    {
+        cmd = PADSYNTH::control::numberOfOctaves;
+    }
+    else if (matchnMove(2, point, "length"))
+    {
+        value = bitFindHigh(string2int(point)) - 4;
+        if (value > 6)
+            return range_msg;
+        cmd = PADSYNTH::control::sampleSize;
+    }
+    else if (matchnMove(2, point, "bandwidth"))
+    {
+        cmd = PADSYNTH::control::bandwidth;
+    }
+    else if (matchnMove(2, point, "scale"))
+    {
+        if (matchnMove(1, point, "normal"))
+            value = 0;
+        else if (matchnMove(1, point, "equalhz"))
+            value = 1;
+        else if (matchnMove(1, point, "quarter"))
+            value = 2;
+        else if (matchnMove(1, point, "half"))
+            value = 3;
+        else if (matchnMove(1, point, "threequart"))
+            value = 4;
+        else if (matchnMove(1, point, "oneandhalf"))
+            value = 5;
+        else if (matchnMove(1, point, "double"))
+            value = 6;
+        else if (matchnMove(1, point, "inversehalf"))
+            value = 7;
+        else
+            return range_msg;
+
+        cmd = PADSYNTH::control::bandwidthScale;
+    }
+    else if (matchnMove(2, point, "spectrum"))
+    {
+        if (matchnMove(1, point, "bandwidth"))
+            value = 0;
+        else if (matchnMove(1, point, "discrete"))
+            value = 1;
+        else if (matchnMove(1, point, "continuous"))
+            value = 2;
+        else
+            return range_msg;
+
+        cmd = PADSYNTH::control::spectrumMode;
+    }
 
     if (matchnMove(2, point, "apply"))
     {
@@ -3186,7 +3374,12 @@ int CmdInterface::padSynth(unsigned char controlType)
         cmd = PADSYNTH::control::applyChanges;
     }
 
-    return sendNormal(value, controlType, cmd, npart, kitNumber, PART::engine::padSynth);
+    if (cmd > -1)
+    {
+        if (value == -1)
+            value = string2int(point);
+        return sendNormal(value, controlType, cmd, npart, kitNumber, PART::engine::padSynth);
+    }
     return available_msg;
 }
 
@@ -4031,7 +4224,6 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                         }
                     }
                 }
-                cout << "here" << endl;
                 fclose (readfile);
             }
             else

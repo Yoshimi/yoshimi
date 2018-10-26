@@ -1,5 +1,8 @@
 yoshimi 1.5.9 M
 
+2018-10-26 Will
+* Implemented CLI PadSynth Controls.
+
 2018-10-25 Will
 * Found missing PadSynth overtones option.
 * Deactivate PadSynth overtones if set as harmonic.

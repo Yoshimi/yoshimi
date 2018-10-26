@@ -612,14 +612,17 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     value = miscMsgPush(text);
                     break;
                 case MAIN::control::exportPadSynthSamples:
-                    synth->partonoffWrite(npart, -1);
+                {
+                    unsigned char partnum = parameter & 0x3f;
+                    synth->partonoffWrite(partnum, -1);
                     setpadparams(parameter | (kititem << 8));
-                    if (synth->part[parameter & 0x3f]->kit[kititem].padpars->export2wav(text))
+                    if (synth->part[partnum]->kit[kititem].padpars->export2wav(text))
                         text = "d " + text;
                     else
                         text = " FAILED some samples " + text;
                     value = miscMsgPush(text);
                     break;
+                }
                 case MAIN::control::masterReset:
                     synth->resetAll(0);
                     break;
