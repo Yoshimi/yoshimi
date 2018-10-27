@@ -250,6 +250,10 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         return;
     }
 
+    // TODO find out why this is needed so stop segfault!
+    if (control == MAIN::control::exportPadSynthSamples && npart < NUM_MIDI_PARTS && kititem < UNUSED && engine == PART::engine::padSynth && insert == UNUSED)
+        kititem = 0;
+
     if (kititem != UNUSED && kititem != 0 && engine != UNUSED && control != PART::control::enable && part->kit[kititem].Penabled == false)
         return; // attempt to access non existent kititem
 

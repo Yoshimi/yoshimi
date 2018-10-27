@@ -1,5 +1,9 @@
 yoshimi 1.5.9 M
 
+2018-10-27 Will
+* BugFix: GUI segfault exporting padsyth samples.
+  Only on kit items > 0 and fix is temporary hack :(
+
 2018-10-26 Will
 * Implemented CLI PadSynth Controls.
 
