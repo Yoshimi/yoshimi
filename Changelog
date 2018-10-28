@@ -1,5 +1,12 @@
 yoshimi 1.5.9 M
 
+2018-10-28 Will
+* PadSynth GUI 'apply' button updates when exporting.
+* Added 'wait' command to CLI scripts.
+* Added read/write part kit item name to CLI.
+* Properly resolved PadSynth segfault.
+  Due to invalid error check!
+
 2018-10-27 Will
 * BugFix: GUI segfault exporting padsyth samples.
   Only on kit items > 0 and fix is temporary hack :(

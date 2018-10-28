@@ -1278,7 +1278,7 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper, MiscFuncs}
                 if (wasFromHere)
                     fl_alert("Some samples have failed.");
             }
-            break;
+            // break; drop-through intended!
 
         case PADSYNTH::control::applyChanges:
             applybutton->color(FL_GRAY);

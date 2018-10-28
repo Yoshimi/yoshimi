@@ -167,12 +167,12 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         synth->getGuiMaster()->message->show();
         return;
     }
-    if (npart == TOPLEVEL::section::scales) // scales
+    if (npart == TOPLEVEL::section::scales)
     {
         synth->getGuiMaster()->microtonalui->returns_update(getData);
         return;
     }
-    if (npart == TOPLEVEL::section::vector) // vector
+    if (npart == TOPLEVEL::section::vector)
     {
         synth->getGuiMaster()->vectorui->returns_update(getData);
         return;
@@ -182,7 +182,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         synth->getGuiMaster()->midilearnui->returns_update(getData);
         return;
     }
-    if (npart == TOPLEVEL::section::midiIn) // midi messages - catch this early
+    if (npart == TOPLEVEL::section::midiIn) //  catch this early
     {
         synth->getGuiMaster()->returns_update(getData);
         return;
@@ -250,13 +250,6 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         return;
     }
 
-    // TODO find out why this is needed so stop segfault!
-    if (control == MAIN::control::exportPadSynthSamples && npart < NUM_MIDI_PARTS && kititem < UNUSED && engine == PART::engine::padSynth && insert == UNUSED)
-        kititem = 0;
-
-    if (kititem != UNUSED && kititem != 0 && engine != UNUSED && control != PART::control::enable && part->kit[kititem].Penabled == false)
-        return; // attempt to access non existent kititem
-
     if (insert != UNUSED || (control != PART::control::enable && control != PART::control::instrumentName))
     {
         if (synth->getGuiMaster()->partui->partname == "Simple Sound")
@@ -269,9 +262,6 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         synth->getGuiMaster()->partui->returns_update(getData);
         return;
     }
-
-    if (kititem > 0 && kititem != UNUSED && part->Pkitmode == 0)
-        return; // invalid access
 
     if (engine == PART::engine::padSynth) // padsynth
     {

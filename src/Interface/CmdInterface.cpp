@@ -83,6 +83,8 @@ string basics[] = {
     "STop",                     "all sound off",
     "RESet [s]",                "return to start-up conditions, 'ALL' clear MIDI-learn (if 'y')",
     "EXit",                     "tidy up and close Yoshimi (if 'y')",
+    "RUN <s>",                  "Execute named command script",
+    "  WAIT <n>",               "1 to 1000 mS delay, within script only",
     "..",                       "step back one level",
     "/",                        "step back to top level",
     "end"
@@ -100,7 +102,6 @@ string toplist [] = {
     "  Bank [s <n1>] <n2>",     "delete bank ID n2 (and all instruments) from current root (or 'Root' n1)",
     "  YOshimi <n>",            "close instance ID",
     "  MLearn <s> [n]",         "delete midi learned 'ALL' whole list, or '@'(n) line",
-    "RUN <s>",                  "Execute named command script",
     "Set/Read/MLearn",          "manage all main parameters",
     "MINimum/MAXimum/DEFault",  "find ranges",
     "  Part",                   "enter context level",
@@ -182,6 +183,7 @@ string partlist [] = {
     "  KItem <n>",              "select kit item number (1-16)",
     "    MUte <s>",             "silence this item (ON, {other})",
     "    KEffect <n>",          "select effect for this item (0-none, 1-3)",
+    "    KName <s>",            "set the name for this item",
     "  DRum <s>",               "set kit to drum mode (ON, {other})",
     "PRogram <[n2]/[s]>",       "loads instrument ID / CLear sets default",
     "NAme <s>",                 "sets the display name the part can be saved with",
@@ -3703,6 +3705,16 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
             sendDirect(value, controlType, PART::control::kitEffectNum, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup);
             return done_msg;
         }
+        if (matchnMove(2, point,"kname"))
+        {
+            if (lineEnd(controlType))
+                return value_msg;
+            int par2 = NO_MSG;
+            if (controlType == TOPLEVEL::type::Write)
+                par2 = miscMsgPush(point);
+            sendDirect(0, controlType, PART::control::instrumentName, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup, TOPLEVEL::route::adjustAndLoopback, par2);
+            return done_msg;
+        }
     }
 
     if (matchnMove(2, point, "shift"))
@@ -4213,24 +4225,37 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                         if (matchnMove(3, mark, "run"))
                         {
                             isok = false;
-                            synth->getRuntime().Log("*** Error: scripts are not recursive @ line " + to_string(count) + " ***");
+                            Runtime.Log("*** Error: scripts are not recursive @ line " + to_string(count) + " ***");
                             continue;
                         }
-                        reply = cmdIfaceProcessCommand(mark);
+                        if (matchnMove(4, mark, "wait"))
+                        {
+                            int tmp = string2int(mark);
+                            if (tmp < 1)
+                                tmp = 1;
+                            else if (tmp > 1000)
+                                tmp = 1000;
+                            Runtime.Log("Waiting " + to_string(tmp) + "mS");
+                            usleep((tmp - 1) * 1000);
+                            // total processing may add up to another 1 mS
+                        }
+                        else
+                            reply = cmdIfaceProcessCommand(mark);
                         if (reply > done_msg)
                         {
                             isok = false;
-                            synth->getRuntime().Log("*** Error: " + replies[reply] + " @ line " + to_string(count) + " ***");
+                            Runtime.Log("*** Error: " + replies[reply] + " @ line " + to_string(count) + " ***");
                         }
                     }
                 }
                 fclose (readfile);
             }
             else
-                synth->getRuntime().Log("Can't read file " + filename);
+                Runtime.Log("Can't read file " + filename);
             free (to_send);
             to_send = NULL;
-            context = LEVEL::Top; // leave it tidy
+            // decided against this!
+            //context = LEVEL::Top; // leave it tidy
             return done_msg;
         }
         replyString = "Exec";
