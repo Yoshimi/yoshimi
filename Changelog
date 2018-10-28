@@ -6,6 +6,8 @@ yoshimi 1.5.9 M
 * Added read/write part kit item name to CLI.
 * Properly resolved PadSynth segfault.
   Due to invalid error check!
+* Minor adjustments to CLI PadSynth text.
+* Added ID for context level for AddSynth Voice Modulator.
 
 2018-10-27 Will
 * BugFix: GUI segfault exporting padsyth samples.

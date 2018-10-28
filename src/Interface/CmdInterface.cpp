@@ -269,7 +269,7 @@ string padsynthlist [] = {
     "COunt <n>",                "number of profile repetitions",
     "EXpand <n>",              "adds harmonics and changes distribution",
     "FRequency <n>",            "further modifies distribution (dependent on stretch)",
-    "SIze <n>",                 "increase harmonic width retaining shape",
+    "SIze <n>",                 "change harmonic width retaining shape",
 
     "CRoss <s>",                "cross section of profile (Full, Upper, Lower)",
     "MUltiplier <s>",           "amplitude multiplier (Off, Gauss, Sine, Flat)",
@@ -277,11 +277,11 @@ string padsynthlist [] = {
 
     "CEnter <n>",               "changes the central harmonic component width",
     "RELative <n>",             "changes central component relative amplitude",
-    "AUto <s>",                 "(ON {other))",
+    "AUto <s>",                 "(ON {other})",
 
     "BASe <s>",                 "base profile distribution (C2, G2, C3, G3, C4, G4, C5, G5, G6)",
-    "SAmples <s>",              "samples/octave (0.5, 1, 2, 3, 4, 6, 12)",
-    "RAnge <n>",                "number of octaves 1 -  8",
+    "SAmples <n>",              "samples/octave (0.5, 1, 2, 3, 4, 6, 12)",
+    "RAnge <n>",                "number of octaves (1 to 8)",
     "LEngth <n>",               "length of one sample in k (16, 32, 64, 128, 256, 512, 1024)",
 
     "BAndwidth <n>",            "overall bandwidth",

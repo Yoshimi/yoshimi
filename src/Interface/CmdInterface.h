@@ -37,7 +37,7 @@ using namespace std;
  * is set so you can then step back up the level tree.
  * It is also possible to zero it so that you immediately go to
  * the top level. Therefore, the sequence is important.
- * 16 bits are currently defined out of a possible 32.
+ * 17 bits are currently defined out of a possible 32.
  *
  * AllFX, InsFX and Part MUST be the first three
  */
@@ -55,6 +55,7 @@ namespace LEVEL{
         SubSynth,
         PadSynth,
         AddVoice,
+        AddMod,
         Oscillator,
         Resonance,
         LFO, // amp/freq/filt
