@@ -83,7 +83,7 @@ option (BuildForAMD_X86_64 "Build for AMD x86_64 system" OFF)
 option (BuildForCore2_X86_64 "Build for Intel Core2 x86_64 system" OFF)
 option (BuildForNEON "Build for ARM Cortex A9 system" OFF)
 option (BuildForThisCPU "Build for presently running system" OFF)
-option (BuildForDebug "Include gdb debugging support" OFF)
+option (BuildForDebug "Debug build without optimisation. Enable gdb debugging support" OFF)
 
 #option to build lv2 plugin
 option (LV2Plugin "Build yoshimi lv2 plugin interface" ON)
@@ -95,37 +95,39 @@ option (ReportNotes "Report Notes On/Off" OFF)
 
 
 set (BuildOptions_X86
-    "-O3 -msse -msse2 -mfpmath=sse -ffast-math -fomit-frame-pointer"
+    "-msse -msse2 -mfpmath=sse -ffast-math -fomit-frame-pointer"
     CACHE STRING "basic X86 compiler options"
 )
 
 set (BuildOptions_X86_64AMD
-    "-O3 -march=athlon64 -m64 -Wall -msse -msse2 -mfpmath=sse -ffast-math -fno-finite-math-only -fomit-frame-pointer"
+    "-march=athlon64 -m64 -Wall -msse -msse2 -mfpmath=sse -ffast-math -fno-finite-math-only -fomit-frame-pointer"
   CACHE STRING "X86_64 compiler options"
 )
 
 set (BuildOptions_X86_64Core2
-    "-O3 -march=core2 -m64 -Wall -msse -msse2 -mfpmath=sse -ffast-math -fno-finite-math-only -fomit-frame-pointer"
+    "-march=core2 -m64 -Wall -msse -msse2 -mfpmath=sse -ffast-math -fno-finite-math-only -fomit-frame-pointer"
   CACHE STRING "X86_64 compiler options"
 )
 
 set (BuildOptions_NEON
-"-O3 -march=armv7-a -mfloat-abi=hard -mfpu=neon -mcpu=cortex-a9 -mtune=cortex-a9 -pipe -mvectorize-with-neon-quad -funsafe-loop-optimizations"
+    "-march=armv7-a -mfloat-abi=hard -mfpu=neon -mcpu=cortex-a9 -mtune=cortex-a9 -pipe -mvectorize-with-neon-quad -funsafe-loop-optimizations"
   CACHE STRING "Cortex_a9 compiler options"
 )
 
 set (BuildOptionsThisCPU
-    "-O3 -march=native -Wall -msse -msse2 -mfpmath=sse -ffast-math -fno-finite-math-only -fomit-frame-pointer"
+    "-march=native -Wall -msse -msse2 -mfpmath=sse -ffast-math -fno-finite-math-only -fomit-frame-pointer"
   CACHE STRING "Current CPU compiler options"
 )
 
 set (BuildOptionsBasic
-    "-O3 -ffast-math -fomit-frame-pointer"
+    "-ffast-math -fomit-frame-pointer"
     CACHE STRING "basic compilier options"
 )
 
 set (BuildOptionsDebug
-    "-O0 -g3 -ggdb -Wall -Wpointer-arith" CACHE STRING "Debug build flags")
+    "-O0 -g3 -ggdb -Wpointer-arith -Wpedantic -Wextra" CACHE STRING "Compile without optimisation and with debug information")
+set (BuildOptionsRelease
+    "-O3" CACHE STRING "Compile with optimisation for Release builds")
 
 find_package (PkgConfig REQUIRED)
 if (PKG_CONFIG_FOUND)
@@ -312,33 +314,37 @@ endif(READLINE_FOUND)
 
 set (YOSHI_INCLUDES ${FLTK_INCLUDE_DIR})
 
+# set platform specific compiler flags
+if (BuildFor0ld_X86)
+    set (CMAKE_CXX_FLAGS ${BuildOptions_X86})
+else (BuildFor0ld_X86)
+    if (BuildForAMD_X86_64)
+        set (CMAKE_CXX_FLAGS ${BuildOptions_X86_64AMD})
+    else (BuildForAMD_X86_64)
+        if (BuildForCore2_X86_64)
+            set (CMAKE_CXX_FLAGS ${BuildOptions_X86_64Core2})
+        else (BuildForCore2_X86_64)
+            if (BuildForNEON)
+                set (CMAKE_CXX_FLAGS ${BuildOptions_NEON})
+            else (BuildForNEON)
+                if (BuildForThisCPU)
+                    set (CMAKE_CXX_FLAGS ${BuildOptionsThisCPU})
+                else (BuildForThisCPU)
+                    set (CMAKE_CXX_FLAGS ${BuildOptionsBasic})
+                endif (BuildForThisCPU)
+            endif (BuildForNEON)
+        endif (BuildForCore2_X86_64)
+    endif (BuildForAMD_X86_64)
+endif (BuildFor0ld_X86)
+
 if (BuildForDebug)
     set (CMAKE_BUILD_TYPE "Debug")
-    message (STATUS "Building for ${CMAKE_BUILD_TYPE}, flags: ${CMAKE_CXX_FLAGS_DEBUG}")
+    set (CMAKE_CXX_FLAGS_DEBUG ${BuildOptionsDebug})
+    message (STATUS "DEBUG Build, flags: ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG}")
 else (BuildForDebug)
     set (CMAKE_BUILD_TYPE "Release")
-    if (BuildFor0ld_X86)
-        set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_X86})
-    else (BuildFor0ld_X86)
-        if (BuildForAMD_X86_64)
-            set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_X86_64AMD})
-        else (BuildForAMD_X86_64)
-            if (BuildForCore2_X86_64)
-                set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_X86_64Core2})
-            else (BuildForCore2_X86_64)
-                if (BuildForNEON)
-                    set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_NEON})
-                else (BuildForNEON)
-                    if (BuildForThisCPU)
-                        set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsThisCPU})
-                    else (BuildForThisCPU)
-                        set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsBasic})
-                    endif (BuildForThisCPU)
-                endif (BuildForNEON)
-            endif (BuildForCore2_X86_64)
-        endif (BuildForAMD_X86_64)
-    endif (BuildFor0ld_X86)
-    message (STATUS "Building for ${CMAKE_BUILD_TYPE}, flags: ${CMAKE_CXX_FLAGS_RELEASE}")
+    set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsRelease})
+    message (STATUS "RELEASE Build, flags: ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
 endif (BuildForDebug)
 
 configure_file(
