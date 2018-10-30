@@ -508,7 +508,6 @@ class OscilEditor {: {public PresetsUI_}
         Fl_Group {} {
           xywh {246 277 115 25} box ENGRAVED_BOX
           code0 {if (oscil->ADvsPAD) o->hide();}
-          code1 {if (hrndtype->value() == 0) hrnddial->deactivate(); else hrnddial->activate();}
         } {
           Fl_Choice hrndtype {
             label {H.rnd}
@@ -560,7 +559,6 @@ class OscilEditor {: {public PresetsUI_}
           callback {//
           send_data(OSCILLATOR::control::baseFunctionType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           xywh {370 285 90 15} down_box BORDER_BOX labelsize 10 align 1 textsize 11
-          code0 {if (o->value() == 0) bfslider->deactivate(); else bfslider->activate();}
         } {
           MenuItem {} {
             label Sine
@@ -678,7 +676,6 @@ class OscilEditor {: {public PresetsUI_}
             callback {//
             send_data(OSCILLATOR::control::baseModulationType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
             tooltip {Base function modulation} xywh {599 281 50 15} down_box BORDER_BOX labelsize 10 textsize 10
-            code0 {if (o->value() == 0) baseFuncPars->deactivate(); else baseFuncPars->activate();}
           } {
             MenuItem {} {
               label None
@@ -755,7 +752,6 @@ class OscilEditor {: {public PresetsUI_}
       }
       Fl_Group {} {
         xywh {135 308 150 30} box ENGRAVED_BOX
-        code0 {if (wshbutton->value() == 0) wshpar->deactivate(); else wshpar->activate();}
       } {
         Fl_Choice wshbutton {
           label {Wsh.}
@@ -868,7 +864,6 @@ class OscilEditor {: {public PresetsUI_}
         callback {//
           send_data(OSCILLATOR::control::filterType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         tooltip {Oscillator's filter type} xywh {315 313 50 20} down_box BORDER_BOX labelsize 10 textsize 10
-        code0 {if (o->value() == 0) filterGroup->deactivate(); else filterGroup->activate();}
       } {
         MenuItem {} {
           label None
@@ -929,7 +924,6 @@ class OscilEditor {: {public PresetsUI_}
       }
       Fl_Group {} {
         xywh {594 308 136 30} box ENGRAVED_BOX
-        code0 {if (sabutton->value() == 0) sadjpar->deactivate(); else sadjpar->activate();}
       } {
         Fl_Choice sabutton {
           label {Sp.adj.}
@@ -1015,7 +1009,6 @@ class OscilEditor {: {public PresetsUI_}
         callback {//
           send_data(OSCILLATOR::control::adaptiveHarmonicsType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         tooltip {The type of the addaptive harmonics} xywh {670 425 55 15} down_box BORDER_BOX labelsize 10 align 129 when 6 textsize 10
-        code0 {if (o->value() == 0) adaptiveGroup->deactivate(); else adaptiveGroup->activate();}
       } {
         MenuItem {} {
           label OFF
@@ -1081,7 +1074,6 @@ class OscilEditor {: {public PresetsUI_}
         callback {//
           send_data(OSCILLATOR::control::modulationType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         tooltip modulation xywh {470 315 50 15} down_box BORDER_BOX labelsize 10 textsize 10
-        code0 {if (o->value() == 0) modulationGroup->deactivate(); else modulationGroup->activate();}
       } {
         MenuItem {} {
           label None
@@ -1423,45 +1415,78 @@ class OscilEditor {: {public PresetsUI_}
     delete (osceditUI);} {}
   }
   Function {refresh()} {} {
-    code {magtype->value(oscil->Phmagtype);
+    code {//
+    magtype->value(oscil->Phmagtype);
     rndslider->value(oscil->Prand-64);
 
     hrndtype->value(oscil->Pamprandtype);
+    if (hrndtype->value() == 0)
+        hrnddial->deactivate();
+    else
+        hrnddial->activate();
     hrnddial->value(oscil->Pamprandpower);
 
     if (oscil->Pcurrentbasefunc == 127)
         bftype->value(16);
     else
         bftype->value(oscil->Pcurrentbasefunc);
+    if (bftype->value() == 0)
+        bfslider->deactivate();
+    else
+        bfslider->activate();
     bfparval->value(oscil->Pbasefuncpar-64);
     bfslider->value(oscil->Pbasefuncpar-64);
 
     bfmodtype->value(oscil->Pbasefuncmodulation);
+    if (bfmodtype->value() == 0)
+        baseFuncPars->deactivate();
+    else
+        baseFuncPars->activate();
     bfmodpar1->value(oscil->Pbasefuncmodulationpar1);
     bfmodpar2->value(oscil->Pbasefuncmodulationpar2);
     bfmodpar3->value(oscil->Pbasefuncmodulationpar3);
 
     wshbutton->value(oscil->Pwaveshapingfunction);
+    if (wshbutton->value() == 0)
+        wshpar->deactivate();
+    else
+        wshpar->activate();
     wsparval->value(oscil->Pwaveshaping-64);
     wshpar->value(oscil->Pwaveshaping-64);
 
     fltbutton->value(oscil->Pfiltertype);
+    if (fltbutton->value() == 0)
+        filterGroup->deactivate();
+    else
+        filterGroup->activate();
     filtervalue1->value(oscil->Pfilterpar1);
     filtervalue2->value(oscil->Pfilterpar2);
     filterpref->value(oscil->Pfilterbeforews);
 
     modtype->value(oscil->Pmodulation);
+    if (modtype->value() == 0)
+        modulationGroup->deactivate();
+    else
+        modulationGroup->activate();
     modpar1->value(oscil->Pmodulationpar1);
     modpar2->value(oscil->Pmodulationpar2);
     modpar3->value(oscil->Pmodulationpar3);
 
     sabutton->value(oscil->Psatype);
+    if (sabutton->value() == 0)
+        sadjpar->deactivate();
+    else
+        sadjpar->activate();
     sadjpar->value(oscil->Psapar);
 
     harmonicshiftcounter->value(oscil->Pharmonicshift);
     harmonicshiftpre->value(oscil->Pharmonicshiftfirst);
 
     adhrtype->value(oscil->Padaptiveharmonics);
+    if (adhrtype->value() == 0)
+        adaptiveGroup->deactivate();
+    else
+        adaptiveGroup->activate();
     adhrbf->value(oscil->Padaptiveharmonicsbasefreq);
     adhrpow->value(oscil->Padaptiveharmonicspower);
     adhrtype->value(oscil->Padaptiveharmonicspar);

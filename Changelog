@@ -11,6 +11,7 @@ yoshimi 1.5.9 M
   adaptive harmonics.
   base type parameter.
   base modulation parameters.
+* Further adjustments to GUI waveform deactivation.
 
 2018-10-28 Will
 * PadSynth GUI 'apply' button updates when exporting.
