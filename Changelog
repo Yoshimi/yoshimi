@@ -1,5 +1,17 @@
 yoshimi 1.5.9 M
 
+2018-10-30 Will
+* CMakeLists.txt improvement from Hermann.
+* GUI waveform deactivation adjustments:
+  harmonic randomness.
+  waveshape.
+  spectrum adjust.
+  filter.
+  modulation.
+  adaptive harmonics.
+  base type parameter.
+  base modulation parameters.
+
 2018-10-28 Will
 * PadSynth GUI 'apply' button updates when exporting.
 * Added 'wait' command to CLI scripts.
