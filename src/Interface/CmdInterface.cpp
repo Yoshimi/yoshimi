@@ -248,6 +248,14 @@ string addsynthlist [] = {
 };
 
 string addvoicelist [] = {
+    "Unison <s>",                "(ON, OFF)",
+    "Unison Size <n>",           "number of unison elements",
+    "Unison Frequency <n>",      "frequency spread of elements",
+    "Unison Phase <n>",          "phase randomness of elements",
+    "Unison Width <n>",          "stereo width",
+    "Unison Vibrato <n>",        "vibrato",
+    "Unison Rate <n>",           "vibrato speed",
+    "Unison Invert <s>",         "phase inversion type (None, Random, Half, Third, Quarter, Fifth)",
     "WAveform ...",              "enter the oscillator waveform context",
     "end"
 };
@@ -3014,9 +3022,63 @@ int CmdInterface::addVoice(unsigned char controlType)
         return done_msg;
 
     int value = toggle();
+    int cmd = -1;
+
+    if (value > -1)
+        cmd = ADDVOICE::control::enableVoice;
+    else
+    {
+        if (matchnMove(1, point, "unison"))
+        {
+            value = toggle();
+            if (value > -1)
+                cmd = ADDVOICE::control::enableUnison;
+            else
+            {
+                if (matchnMove(1, point, "size"))
+                    cmd = ADDVOICE::control::unisonSize;
+                else if(matchnMove(1, point, "frequency"))
+                    cmd = ADDVOICE::control::unisonFrequencySpread;
+                else if(matchnMove(1, point, "phase"))
+                    cmd = ADDVOICE::control::unisonPhaseRandomise;
+                else if(matchnMove(1, point, "width"))
+                    cmd = ADDVOICE::control::unisonStereoSpread;
+                else if(matchnMove(1, point, "vibrato"))
+                    cmd = ADDVOICE::control::unisonVibratoDepth;
+                else if(matchnMove(1, point, "rate"))
+                    cmd = ADDVOICE::control::unisonVibratoSpeed;
+                else if(matchnMove(1, point, "invert"))
+                {
+                    if (matchnMove(1, point, "none"))
+                        value = 0;
+                    else if (matchnMove(1, point, "random"))
+                        value = 1;
+                    else if (matchnMove(1, point, "half"))
+                        value = 2;
+                    else if (matchnMove(1, point, "third"))
+                        value = 3;
+                    else if (matchnMove(1, point, "quarter"))
+                        value = 4;
+                    else if (matchnMove(1, point, "fifth"))
+                        value = 5;
+                    else
+                        return value_msg;
+                    cmd = ADDVOICE::control::unisonPhaseInvert;
+                }
+
+            }
+            if (cmd == -1)
+                return opp_msg;
+            if (value == -1)
+                value = string2int(point);
+        }
+        else
+            return opp_msg;
+    }
+
     if (value > -1)
     {
-        sendNormal(value, controlType, ADDVOICE::control::enableVoice, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
+        sendNormal(value, controlType, cmd, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
         return done_msg;
     }
     int result = partCommonControls(controlType);
@@ -3492,7 +3554,7 @@ int CmdInterface::waveform(unsigned char controlType)
     float value = -1;
     int cmd = -1;
     int engine = contextToEngines();
-    unsigned char insert;
+    unsigned char insert = UNUSED;
 
     if (matchnMove(2, point, "harmonic"))
     {
@@ -3507,12 +3569,10 @@ int CmdInterface::waveform(unsigned char controlType)
             insert = TOPLEVEL::insert::harmonicAmplitude;
         else if (matchnMove(1, point, "phase"))
             insert = TOPLEVEL::insert::harmonicPhaseBandwidth;
-        else
-            return opp_msg;
 
         if (lineEnd(controlType))
             return value_msg;
-        return sendNormal(string2int(point), controlType, cmd - 1, npart, kitNumber, engine, insert);
+        return sendNormal(string2int(point), controlType, cmd - 1, npart, kitNumber, engine + voiceNumber, insert);
     }
 
     insert = TOPLEVEL::insert::oscillatorGroup;

@@ -2,6 +2,10 @@ yoshimi 1.5.9 M
 
 2018-10-31 Will
 * Fixed regression - disappearing waveform Mag Type.
+* Removed Harmonic Shift Reset.
+  It's function is performed by a right click on the
+  Harmonic Shift up or down button.
+* Implemented CLI voice unison controls.
 
 2018-10-30 Will
 * CMakeLists.txt improvement from Hermann.

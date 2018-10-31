@@ -965,16 +965,10 @@ class OscilEditor {: {public PresetsUI_}
           xywh {670 365 55 15} type Simple labelsize 10 align 129 minimum -64 maximum 64 step 1 textfont 1 textsize 10
         }
         Fl_Check_Button harmonicshiftpre {
-          label preH
+          label {Shift 1st}
           callback {//
           send_data(OSCILLATOR::control::shiftBeforeWaveshapeAndFilter, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
-          tooltip {Apply the harmonic shift before the waveshaping and filtering} xywh {690 383 37 20} down_box DOWN_BOX labelsize 10 align 24
-        }
-        Fl_Button {} {
-          label R
-          callback {//
-          send_data(OSCILLATOR::control::clearHarmonicShift, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
-          tooltip {Reset harmonic shift} xywh {679 389 9 9} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labelsize 10 align 4
+          tooltip {Apply the harmonic shift before the waveshaping and filtering} xywh {668 383 56 20} down_box DOWN_BOX labelsize 10 align 24
         }
       }
       Fl_Group adaptiveGroup {
