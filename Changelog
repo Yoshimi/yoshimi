@@ -1,5 +1,8 @@
 yoshimi 1.5.9 M
 
+2018-10-31 Will
+* Fixed regression - disappearing waveform Mag Type.
+
 2018-10-30 Will
 * CMakeLists.txt improvement from Hermann.
 * GUI waveform deactivation adjustments:

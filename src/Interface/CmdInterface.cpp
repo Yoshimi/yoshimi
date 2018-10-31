@@ -518,6 +518,7 @@ string replies [] = {
     "Parameter?",
     "Not at this level",
     "Not available",
+    "Control or section inactive",
     "Unable to complete",
     "write only",
     "read only"

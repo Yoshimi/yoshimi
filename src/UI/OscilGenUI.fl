@@ -478,7 +478,7 @@ class OscilEditor {: {public PresetsUI_}
         code0 {if (!oscil->ADvsPAD) o->hide();}
       }
       Fl_Group oscildisplaygroup {
-        xywh {5 5 360 300} box ENGRAVED_BOX
+        xywh {5 5 360 300} box ENGRAVED_FRAME
       } {
         Fl_Group {} {
           xywh {10 85 350 190} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179
@@ -495,7 +495,7 @@ class OscilEditor {: {public PresetsUI_}
           if (Fl::event_button() == 3)
               o->value(0);
 
-          send_data(OSCILLATOR::control::phaseRandomness, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data(OSCILLATOR::control::phaseRandomness, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Oscilator Phase Randomness: smaller than 0 is "group", larger than 0 is for each harmonic} xywh {140 285 100 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
           code0 {if (oscil->ADvsPAD) o->hide();}
           class mwheel_val_slider_rev
@@ -541,7 +541,7 @@ class OscilEditor {: {public PresetsUI_}
         xywh {495 15 110 20} box FLAT_BOX labelfont 1
       }
       Fl_Group basefuncdisplaygroup {
-        xywh {365 5 360 300} box ENGRAVED_BOX
+        xywh {365 5 360 300} box ENGRAVED_FRAME
       } {
         Fl_Group {} {
           xywh {370 85 350 190} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179

@@ -64,7 +64,7 @@ namespace LEVEL{
     };
 }
 
-typedef enum {exit_msg = -1, todo_msg = 0, done_msg, value_msg, name_msg, opp_msg, what_msg, range_msg, low_msg, high_msg, unrecognised_msg, parameter_msg, level_msg, available_msg, failed_msg, writeOnly_msg, readOnly_msg} error_messages;
+typedef enum {exit_msg = -1, todo_msg = 0, done_msg, value_msg, name_msg, opp_msg, what_msg, range_msg, low_msg, high_msg, unrecognised_msg, parameter_msg, level_msg, available_msg,inactive_msg, failed_msg, writeOnly_msg, readOnly_msg} error_messages;
 
 class CmdInterface : private MiscFuncs
 {
