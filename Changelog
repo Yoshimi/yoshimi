@@ -6,6 +6,8 @@ yoshimi 1.5.9 M
   It's function is performed by a right click on the
   Harmonic Shift up or down button.
 * Implemented CLI voice unison controls.
+* Implemented CLI remaining voice controls.
+  Not modulator ones.
 
 2018-10-30 Will
 * CMakeLists.txt improvement from Hermann.

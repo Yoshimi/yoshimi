@@ -248,6 +248,13 @@ string addsynthlist [] = {
 };
 
 string addvoicelist [] = {
+    "Type <s>",                  "sound type (oscillator, White noise, Pink noise)",
+    "Source <n>",                 "oscillator voice number (-1 for self)",
+    "Phase <n>",                 "relative voice phase",
+    "Minus <s>",                 "Invert entire voice (ON, {other})",
+    "DELay <n>",                 "delay before this voice starts",
+    "Resonance <s>",             "enable resonance for this voice (ON, {other})",
+    "Bypass",                    "bypass global filter for this voice (ON, {other})",
     "Unison <s>",                "(ON, OFF)",
     "Unison Size <n>",           "number of unison elements",
     "Unison Frequency <n>",      "frequency spread of elements",
@@ -1376,7 +1383,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
     {
         if (kitMode)
             insert = TOPLEVEL::insert::kitGroup;
-        //cout << ">> kit cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  insert " << int(insert) << endl;
+        //cout << ">> value " << value << "  type " << controlType << "  cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  insert " << int(insert) << endl;
         sendNormal(value, controlType, cmd, npart, kit, engine, insert);
         return done_msg;
     }
@@ -2168,7 +2175,7 @@ string CmdInterface::findStatus(bool show)
                 if (readControl(ADDSYNTH::control::enable, npart, kit, PART::engine::addSynth, insert))
                     text += "+";
                 if (bitFindHigh(context) == LEVEL::AddVoice)
-                    text += ", Voice";
+                    text += ", Voice ";
                 else
                     text += ", V";
                 text += to_string(voiceNumber + 1);
@@ -3023,12 +3030,58 @@ int CmdInterface::addVoice(unsigned char controlType)
 
     int value = toggle();
     int cmd = -1;
-
     if (value > -1)
         cmd = ADDVOICE::control::enableVoice;
     else
     {
-        if (matchnMove(1, point, "unison"))
+        int result = partCommonControls(controlType);
+        if (result != todo_msg)
+            return result;
+    }
+
+    if (cmd == -1)
+    {
+        if (matchnMove(1, point, "type"))
+        {
+            if (matchnMove(1, point, "oscillator"))
+                value = 0;
+            else if (matchnMove(1, point, "white"))
+                value = 1;
+            else if (matchnMove(1, point, "pink"))
+                value = 2;
+            else
+                return range_msg;
+            cmd = ADDVOICE::control::soundType;
+        }
+        else if (matchnMove(1, point, "source"))
+        {
+            value = string2int(point) -1;
+            if (value >= voiceNumber)
+                return range_msg;
+            if (value <= -1)
+                value = 0xff;
+            cmd = ADDVOICE::control::voiceOscillatorSource;
+        }
+        else if (matchnMove(1, point, "phase"))
+            cmd = ADDVOICE::control::voiceOscillatorPhase;
+        else if (matchnMove(1, point, "minus"))
+        {
+            value = (toggle() == 1);
+            cmd = ADDVOICE::control::invertPhase;
+        }
+        else if (matchnMove(3, point, "delay"))
+            cmd = ADDVOICE::control::delay;
+        else if (matchnMove(1, point, "resonance"))
+        {
+            value = (toggle() == 1);
+            cmd = ADDVOICE::control::enableResonance;
+        }
+        else if (matchnMove(1, point, "bypass"))
+        {
+            value = (toggle() == 1);
+            cmd = ADDVOICE::control::bypassGlobalFilter;
+        }
+        else if (matchnMove(1, point, "unison"))
         {
             value = toggle();
             if (value > -1)
@@ -3069,22 +3122,17 @@ int CmdInterface::addVoice(unsigned char controlType)
             }
             if (cmd == -1)
                 return opp_msg;
-            if (value == -1)
-                value = string2int(point);
         }
         else
             return opp_msg;
     }
 
-    if (value > -1)
-    {
-        sendNormal(value, controlType, cmd, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
-        return done_msg;
-    }
-    int result = partCommonControls(controlType);
-    if (result != todo_msg)
-        return result;
-    return available_msg;
+    if (value == -1)
+        value = string2int(point);
+    else if (value == 0xff)
+            value = -1; // special case for osc source
+    sendNormal(value, controlType, cmd, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
+    return done_msg;
 }
 
 
