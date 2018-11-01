@@ -1,5 +1,9 @@
 yoshimi 1.5.9 M
 
+2018-11-1 Will
+* Enabled formal CLI access to AddVoice Modulator.
+  Envelope inserts and common controls not done.
+
 2018-10-31 Will
 * Fixed regression - disappearing waveform Mag Type.
 * Removed Harmonic Shift Reset.

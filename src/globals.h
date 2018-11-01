@@ -588,7 +588,7 @@ namespace ADDVOICE // usage ADDVOICE::control::volume
         enableAmplitudeLFO,
 
         modulatorType = 16, // Off, Morph, Ring, PM, FM, PWM
-        externalModulator,
+        externalModulator, // -1 local,  'n' voice
 
         detuneFrequency = 32,
         equalTemperVariation,
@@ -627,12 +627,12 @@ namespace ADDVOICE // usage ADDVOICE::control::volume
         modulatorCoarseDetune,
         enableModulatorFrequencyEnvelope = 104,
         modulatorOscillatorPhase = 112,
-        modulatorOscillatorSource, // -1 local, 'n' external
+        modulatorOscillatorSource, // -1 internal, 'n' external modulator
 
         delay = 128,
         enableResonance = 130, // for this voice
         voiceOscillatorPhase = 136,
-        voiceOscillatorSource, // - 1 local, 'n' external
+        voiceOscillatorSource, // - 1 internal, 'n' external voice
         soundType // Oscillator, White noise, Pink noise
     };
 }

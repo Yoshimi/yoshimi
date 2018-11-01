@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified October 2018
+    Modified November 2018
 */
 
 #include <iostream>
@@ -64,6 +64,7 @@ namespace LISTS {
     padsynth,
     resonance,
     addvoice,
+    addmod,
     waveform,
     lfo,
     filter,
@@ -248,22 +249,33 @@ string addsynthlist [] = {
 };
 
 string addvoicelist [] = {
-    "Type <s>",                  "sound type (oscillator, White noise, Pink noise)",
-    "Source <n>",                 "oscillator voice number (-1 for self)",
-    "Phase <n>",                 "relative voice phase",
-    "Minus <s>",                 "Invert entire voice (ON, {other})",
-    "DELay <n>",                 "delay before this voice starts",
-    "Resonance <s>",             "enable resonance for this voice (ON, {other})",
-    "Bypass",                    "bypass global filter for this voice (ON, {other})",
-    "Unison <s>",                "(ON, OFF)",
-    "Unison Size <n>",           "number of unison elements",
-    "Unison Frequency <n>",      "frequency spread of elements",
-    "Unison Phase <n>",          "phase randomness of elements",
-    "Unison Width <n>",          "stereo width",
-    "Unison Vibrato <n>",        "vibrato",
-    "Unison Rate <n>",           "vibrato speed",
-    "Unison Invert <s>",         "phase inversion type (None, Random, Half, Third, Quarter, Fifth)",
-    "WAveform ...",              "enter the oscillator waveform context",
+
+    "Type <s>",             "sound type (oscillator, White noise, Pink noise)",
+    "Source <n>",           "oscillator voice number (-1 for self)",
+    "Phase <n>",            "relative voice phase",
+    "Minus <s>",            "Invert entire voice (ON, {other})",
+    "DELay <n>",            "delay before this voice starts",
+    "Resonance <s>",        "enable resonance for this voice (ON, {other})",
+    "Bypass",               "bypass global filter for this voice (ON, {other})",
+    "Unison <s>",           "(ON, OFF)",
+    "Unison Size <n>",      "number of unison elements",
+    "Unison Frequency <n>", "frequency spread of elements",
+    "Unison Phase <n>",     "phase randomness of elements",
+    "Unison Width <n>",     "stereo width",
+    "Unison Vibrato <n>",   "vibrato",
+    "Unison Rate <n>",      "vibrato speed",
+    "Unison Invert <s>",    "phase inversion type (None, Random, Half, Third, Quarter, Fifth)",
+    "MOdulator ..."         "enter modulator context",
+    "WAveform ...",         "enter the oscillator waveform context",
+    "end"
+};
+
+string addmodlist [] = {
+    "Type <s>",             "modulator type (OFF, Morph, Ring, Phase, Frequency, Pulse width)",
+    "Source <[s]/[n]>",     "oscillator source (Local, {voice number})",
+    "Damping <n>",          "higher frequency damping",
+    "Local <[s]/[n]>",      "modulation oscillator(Internal, {modulator number})",
+    "PHase <n>",            "Oscilator relative phase",
     "end"
 };
 
@@ -661,6 +673,8 @@ bool CmdInterface::helpList(unsigned int local)
             listnum = LISTS::resonance;
         else if (matchnMove(3, point, "voice"))
             listnum = LISTS::addvoice;
+        else if (matchnMove(3, point, "modulator"))
+            listnum = LISTS::addmod;
         else if (matchnMove(3, point, "waveform"))
             listnum = LISTS::waveform;
         else if (matchnMove(3, point, "lfo"))
@@ -694,6 +708,8 @@ bool CmdInterface::helpList(unsigned int local)
             listnum = LISTS::filter;
         else if (bitTest(local, LEVEL::Oscillator))
             listnum = LISTS::waveform;
+        else if (bitTest(local, LEVEL::AddMod))
+            listnum = LISTS::addmod;
         else if (bitTest(local, LEVEL::AddVoice))
             listnum = LISTS::addvoice;
         else if(bitTest(local, LEVEL::Resonance))
@@ -763,6 +779,10 @@ bool CmdInterface::helpList(unsigned int local)
         case LISTS::addvoice:
             msg.push_back("Part AddVoice:");
             helpLoop(msg, addvoicelist, 2);
+            break;
+        case LISTS::addmod:
+            msg.push_back("AddVoice Modulator:");
+            helpLoop(msg, addmodlist, 2);
             break;
         case LISTS::waveform:
             msg.push_back("Part Waveform:");
@@ -2170,7 +2190,9 @@ string CmdInterface::findStatus(bool show)
                 if (readControl(PADSYNTH::control::enable, npart, kit, PART::engine::padSynth, insert))
                     text += "+";
                 break;
-            case PART::engine::addVoice1:
+            case PART::engine::addVoice1: // intentional drop through
+            case PART::engine::addMod1:
+            {
                 text += ", A";
                 if (readControl(ADDSYNTH::control::enable, npart, kit, PART::engine::addSynth, insert))
                     text += "+";
@@ -2179,9 +2201,56 @@ string CmdInterface::findStatus(bool show)
                 else
                     text += ", V";
                 text += to_string(voiceNumber + 1);
+                voiceFromNumber = readControl(ADDVOICE::control::voiceOscillatorSource, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
+                if (voiceFromNumber > -1)
+                    text += (">" +to_string(voiceFromNumber + 1));
                 if (readControl(ADDVOICE::control::enableVoice, npart, kitNumber, PART::engine::addVoice1 + voiceNumber))
                     text += "+";
+                if (bitTest(context, LEVEL::AddMod))
+                {
+                    text += ", ";
+                    int tmp = readControl(ADDVOICE::control::modulatorType, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
+                    if (tmp > 0)
+                    {
+                        string word = "";
+                        switch (tmp)
+                        {
+                            case 1:
+                                word = "Morph";
+                                break;
+                            case 2:
+                                word = "Ring";
+                                break;
+                            case 3:
+                                word = "Phase";
+                                break;
+                            case 4:
+                                word = "Freq";
+                                break;
+                            case 5:
+                                word = "Pulse";
+                                break;
+                        }
+                        if (bitFindHigh(context) == LEVEL::AddMod)
+                            text += (word + " Mod ");
+                        else
+                            text += word.substr(0, 2);
+
+                        modulatorFromVoiceNumber = readControl(ADDVOICE::control::externalModulator, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
+                        if (modulatorFromVoiceNumber > -1)
+                            text += (">V" + to_string(modulatorFromVoiceNumber + 1));
+                        else
+                        {
+                            modulatorFromNumber = readControl(ADDVOICE::control::modulatorOscillatorSource, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
+                            if (modulatorFromNumber > -1)
+                                text += (">" + to_string(modulatorFromNumber + 1));
+                        }
+                    }
+                    else
+                        text += "Modulator";
+                }
                 break;
+            }
         }
         if (bitFindHigh(context) == LEVEL::Resonance)
         {
@@ -2192,15 +2261,6 @@ string CmdInterface::findStatus(bool show)
         else if (bitTest(context, LEVEL::Oscillator))
         {
             text += " Wave";
-            /*
-             * TODO not yet!
-            int source = readControl(ADDVOICE::control::voiceOscillatorSource, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
-            if (source > -1)
-            {
-                text += "V" + to_string(source + 1);
-                if (readControl(ADDVOICE::control::enableVoice, npart, kitNumber, PART::engine::addVoice1 + source))
-                    text += "+";
-            }*/
         }
 
         if (bitTest(context, LEVEL::LFO))
@@ -2320,6 +2380,8 @@ int CmdInterface::contextToEngines()
         engine = PART::engine::subSynth;
     else if (bitTest(context, LEVEL::PadSynth))
         engine = PART::engine::padSynth;
+    else if (bitTest(context, LEVEL::AddMod))
+        engine = PART::engine::addMod1;
     else if (bitTest(context, LEVEL::AddVoice))
         engine = PART::engine::addVoice1;
     else if (bitTest(context, LEVEL::AddSynth))
@@ -3013,9 +3075,106 @@ int CmdInterface::commandScale(unsigned char controlType)
 }
 
 
+int CmdInterface::modulator(unsigned char controlType)
+{
+    if (lineEnd(controlType))
+        return done_msg;
+    int value = -1;
+    int cmd = -1;
+    if (matchnMove(1, point, "type"))
+    {
+        if (matchnMove(3, point, "off"))
+            value = 0;
+        else if (matchnMove(1, point, "morph"))
+            value = 1;
+        else if (matchnMove(1, point, "ring"))
+            value = 2;
+        else if (matchnMove(1, point, "phase"))
+            value = 3;
+        else if (matchnMove(1, point, "frequency"))
+            value = 4;
+        else if (matchnMove(1, point, "pulse"))
+            value = 5;
+        else
+            return value_msg;
+        cmd = ADDVOICE::control::modulatorType;
+    }
+    if (cmd == -1)
+    {
+        if (readControl(ADDVOICE::control::modulatorType, npart, kitNumber, PART::engine::addVoice1 + voiceNumber) == 0)
+            return inactive_msg;
+        if (matchnMove(1, point, "source"))
+        {
+            if (matchnMove(1, point, "local"))
+                value = 0;
+            else
+            {
+                int tmp = point[0] - char('0');
+                if (tmp >= 1 && tmp <= 8)
+                    value = tmp;
+            }
+            if (value == -1)
+                return value_msg;
+            if (value == 0)
+                value = 0xff;
+            else
+                value -= 1;
+            cmd = ADDVOICE::control::externalModulator;
+        }
+        if (matchnMove(1, point, "volume"))
+            cmd = ADDVOICE::control::modulatorAmplitude;
+        else if(matchnMove(2, point, "velocity"))
+            cmd = ADDVOICE::control::modulatorVelocitySense;
+        else if(matchnMove(2, point, "damping"))
+            cmd = ADDVOICE::control::modulatorHFdamping;
+    }
+    if (cmd == -1)
+    {
+        if (readControl(ADDVOICE::control::externalModulator, npart, kitNumber, PART::engine::addVoice1 + voiceNumber) != -1)
+            return  inactive_msg;
+
+        if (matchnMove(1, point, "local"))
+        {
+            if (matchnMove(1, point, "internal"))
+                value = 0;
+            else
+            {
+                int tmp = point[0] - char('0');
+                if (tmp >= 1 && tmp <= 8)
+                    value = tmp;
+            }
+            if (value == -1)
+                return value_msg;
+            if (value == 0)
+                value = 0xff;
+            else
+                value -= 1;
+            cmd = ADDVOICE::control::modulatorOscillatorSource;
+        }
+        if (matchnMove(2, point, "phase"))
+            cmd = ADDVOICE::control::modulatorOscillatorPhase;
+    }
+
+    if (cmd > -1)
+    {
+        if (value == -1)
+            value = string2int(point);
+        else if (value == 0xff)
+            value = -1; // special case for modulator sources
+        return sendNormal(value, controlType, cmd, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
+    }
+    return available_msg;
+}
+
+
 int CmdInterface::addVoice(unsigned char controlType)
 {
-    if (matchnMove(2, point, "waveform"))
+    if (matchnMove(2, point, "modulator"))
+    {
+        bitSet(context, LEVEL::AddMod);
+        return modulator(controlType);
+    }
+    else if (matchnMove(2, point, "waveform"))
     {
         bitSet(context, LEVEL::Oscillator);
         return waveform(controlType);
@@ -4006,6 +4165,8 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
         return resonance(controlType);
     if (bitTest(context, LEVEL::Oscillator))
         return waveform(controlType);
+    if (bitTest(context, LEVEL::AddMod))
+        return modulator(controlType);
     if (bitTest(context, LEVEL::AddVoice))
         return addVoice(controlType);
     if (bitTest(context, LEVEL::AddSynth))

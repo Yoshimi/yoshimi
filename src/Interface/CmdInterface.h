@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified October 2018
+    Modified November 2018
 */
 
 #ifndef CMDINTERFACE_H
@@ -98,6 +98,7 @@ class CmdInterface : private MiscFuncs
         int padSynth(unsigned char controlType);
         int resonance(unsigned char controlType);
         int addVoice(unsigned char controlType);
+        int modulator(unsigned char controlType);
         int waveform(unsigned char controlType);
         int commandPart(bool justSet, unsigned char controlType);
         int commandReadnSet(unsigned char controlType);
@@ -116,6 +117,9 @@ class CmdInterface : private MiscFuncs
         int filterFormantNumber;
         int insertType;
         int voiceNumber;
+        int voiceFromNumber;
+        int modulatorFromNumber;
+        int modulatorFromVoiceNumber;
         int kitMode;
         int kitNumber;
         int npart;
