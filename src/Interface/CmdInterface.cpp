@@ -1737,7 +1737,7 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
         return done_msg;
 
     int engine = contextToEngines();
-    if (engine == PART::engine::addVoice1)
+    if (engine == PART::engine::addVoice1 || engine == PART::engine::addMod1)
         engine += voiceNumber;
 
     if (matchnMove(2, point, "amplitute"))
@@ -1762,10 +1762,16 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
     switch (insertType)
     {
         case TOPLEVEL::insertType::amplitude:
-            cmd = ADDVOICE::control::enableAmplitudeEnvelope;
+            if (engine < PART::engine::addMod1)
+                cmd = ADDVOICE::control::enableAmplitudeEnvelope;
+            else
+                cmd = ADDVOICE::control::enableModulatorAmplitudeEnvelope;
             break;
         case TOPLEVEL::insertType::frequency:
-            cmd = ADDVOICE::control::enableFrequencyEnvelope;
+            if (engine < PART::engine::addMod1)
+                cmd = ADDVOICE::control::enableFrequencyEnvelope;
+            else
+                cmd = ADDVOICE::control::enableModulatorFrequencyEnvelope;
             break;
         case TOPLEVEL::insertType::filter:
             cmd = ADDVOICE::control::enableFilterEnvelope;
@@ -1780,7 +1786,7 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
     value = toggle();
     if (value > -1)
     {
-        if (engine == PART::engine::addVoice1 + voiceNumber || engine == PART::engine::subSynth )
+        if (engine != PART::engine::addSynth && engine != PART::engine::padSynth)
             return sendNormal(value, controlType, cmd, npart, kitNumber, engine);
         else
             return available_msg;
@@ -3128,6 +3134,7 @@ int CmdInterface::modulator(unsigned char controlType)
         else if(matchnMove(2, point, "damping"))
             cmd = ADDVOICE::control::modulatorHFdamping;
     }
+
     if (cmd == -1)
     {
         if (readControl(ADDVOICE::control::externalModulator, npart, kitNumber, PART::engine::addVoice1 + voiceNumber) != -1)
@@ -3163,7 +3170,57 @@ int CmdInterface::modulator(unsigned char controlType)
             value = -1; // special case for modulator sources
         return sendNormal(value, controlType, cmd, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
     }
-    return available_msg;
+
+/*
+ * The following controls need to be integrated with
+ * partCommonControls(), but this needs checking for
+ * possible clashes. The envelope enable controls can
+ * then also be more fully integrated.
+ */
+    if (matchnMove(3, point, "detune"))
+    {
+        if (matchnMove(1, point, "fine"))
+        {
+            if (lineEnd(controlType))
+                return value_msg;
+            value = string2int(point);
+            cmd = ADDVOICE::control::modulatorDetuneFrequency;
+        }
+        else if (matchnMove(1, point, "coarse"))
+        {
+            if (lineEnd(controlType))
+                return value_msg;
+            value = string2int(point);
+            cmd = ADDVOICE::control::modulatorCoarseDetune;
+        }
+        else if (matchnMove(1, point, "type"))
+        {
+            if (lineEnd(controlType))
+                return value_msg;
+            value = string2int(point);
+            cmd = ADDVOICE::control::modulatorDetuneType;
+        }
+    }
+    else if (matchnMove(3, point, "octave"))
+    {
+        if (lineEnd(controlType))
+            return value_msg;
+        value = string2int(point);
+        cmd = ADDVOICE::control::modulatorOctave;
+    }
+
+
+    if (matchnMove(3, point, "envelope"))
+    {
+        bitSet(context, LEVEL::Envelope);
+        return envelopeSelect(controlType);
+    }
+
+    if (cmd == -1)
+        return available_msg;
+
+    return sendNormal(value, controlType, cmd, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
+
 }
 
 

@@ -1,5 +1,8 @@
 yoshimi 1.5.9 M
 
+2018-11-2 Will
+* Completed CLI AddVoice controls :)
+
 2018-11-1 Will
 * Enabled formal CLI access to AddVoice Modulator.
   Envelope inserts and common controls not done.
