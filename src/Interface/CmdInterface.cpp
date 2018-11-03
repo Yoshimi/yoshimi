@@ -256,13 +256,13 @@ string addvoicelist [] = {
     "Minus <s>",            "Invert entire voice (ON, {other})",
     "DELay <n>",            "delay before this voice starts",
     "Resonance <s>",        "enable resonance for this voice (ON, {other})",
-    "Bypass",               "bypass global filter for this voice (ON, {other})",
+    "Bypass <s>",           "bypass global filter for this voice (ON, {other})",
     "Unison <s>",           "(ON, OFF)",
     "Unison Size <n>",      "number of unison elements",
     "Unison Frequency <n>", "frequency spread of elements",
     "Unison Phase <n>",     "phase randomness of elements",
     "Unison Width <n>",     "stereo width",
-    "Unison Vibrato <n>",   "vibrato",
+    "Unison Vibrato <n>",   "vibrato depth",
     "Unison Rate <n>",      "vibrato speed",
     "Unison Invert <s>",    "phase inversion type (None, Random, Half, Third, Quarter, Fifth)",
     "MOdulator ..."         "enter modulator context",
@@ -271,11 +271,12 @@ string addvoicelist [] = {
 };
 
 string addmodlist [] = {
-    "Type <s>",             "modulator type (OFF, Morph, Ring, Phase, Frequency, Pulse width)",
+    "Type <s>",             "modulator type (OFF, Morph, Ring, Phase, Frequency, PUlse width)",
     "Source <[s]/[n]>",     "oscillator source (Local, {voice number})",
-    "Damping <n>",          "higher frequency damping",
+    "Damping <n>",          "higher frequency relative damping",
     "Local <[s]/[n]>",      "modulation oscillator(Internal, {modulator number})",
-    "PHase <n>",            "Oscilator relative phase",
+    "PHase <n>",            "oscillator relative phase",
+    "WAveform ...",         "enter the oscillator waveform context",
     "end"
 };
 
@@ -3099,7 +3100,7 @@ int CmdInterface::modulator(unsigned char controlType)
             value = 3;
         else if (matchnMove(1, point, "frequency"))
             value = 4;
-        else if (matchnMove(1, point, "pulse"))
+        else if (matchnMove(2, point, "pulse"))
             value = 5;
         else
             return value_msg;
@@ -3109,6 +3110,12 @@ int CmdInterface::modulator(unsigned char controlType)
     {
         if (readControl(ADDVOICE::control::modulatorType, npart, kitNumber, PART::engine::addVoice1 + voiceNumber) == 0)
             return inactive_msg;
+        if (matchnMove(2, point, "waveform"))
+        {
+            bitSet(context, LEVEL::Oscillator);
+            return waveform(controlType);
+        }
+
         if (matchnMove(1, point, "source"))
         {
             if (matchnMove(1, point, "local"))

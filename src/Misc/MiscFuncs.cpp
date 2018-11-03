@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>
 
-    Modifed September 2018
+    Modifed November 2018
 */
 
 //#define REPORT_MISCMSG
@@ -624,6 +624,12 @@ void MiscFuncs::bitClearHigh(unsigned int& value)
     bitClear(value, bitFindHigh(value));
 }
 
+
+void MiscFuncs::bitClearAbove(unsigned int& value, int bitLevel)
+{
+    unsigned int mask = (0xffffffff << bitLevel);
+    value = (value & ~mask);
+}
 
 bool MiscFuncs::bitTest(unsigned int value, unsigned int bit)
 {

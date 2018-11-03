@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified October 2018
+    Modified November 2018
 */
 
 #ifndef MISCFUNCS_H
@@ -87,6 +87,7 @@ class MiscFuncs
         void bitSet(unsigned int& value, unsigned int bit);
         void bitClear(unsigned int& value, unsigned int bit);
         void bitClearHigh(unsigned int& value);
+        void bitClearAbove(unsigned int& value, int bitLevel);
         bool bitTest(unsigned int value, unsigned int bit);
 
         float dB2rap(float dB);
