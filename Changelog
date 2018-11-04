@@ -3,6 +3,7 @@ yoshimi 1.5.9 M
 2018-11-4 Will
 * Completed all CLI waveform controls.
  I think!
+* Adjustments to CLI minimum abbreviations.
 
 2018-11-3 Will
 * Added CLI waveform access for modulators.

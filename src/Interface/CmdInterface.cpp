@@ -137,7 +137,7 @@ string configlist [] = {
     "Xml <n>",                  "compression (0-9)",
     "REports [s]",              "destination (Stdout, other = console)",
     "SAved [s]",                "Saved instrument type (Legacy {.xiz}, Yoshimi {.xiy}, Both)",
-    "Expose <s>",               "Show current context level (ON, OFf, PRompt)",
+    "EXPose <s>",               "Show current context level (ON, OFF, PRompt)",
 
     "STate [s]",                "* autoload default at start (ON, {other})",
     "Hide [s]",                 "non-fatal errors (ON, {other})",
@@ -145,8 +145,8 @@ string configlist [] = {
     "Time [s]",                 "add to instrument load message (ON, {other})",
     "Include [s]",              "XML headers on file load(Enable {other})",
     "Keep [s]",                 "include inactive data on all file saves (ON, {other})",
-    "Gui [s]",                  "* Run with GUI (ON, OFf)",
-    "Cli [s]",                  "* Run with CLI (ON, OFf)",
+    "Gui [s]",                  "* Run with GUI (ON, OFF)",
+    "Cli [s]",                  "* Run with CLI (ON, OFF)",
 
     "MIdi <s>",                 "* connection type (Jack, Alsa)",
     "AUdio <s>",                "* connection type (Jack, Alsa)",
@@ -161,7 +161,7 @@ string configlist [] = {
     "BAnk [n]",                 "bank CC (0, 32, {other} off)",
     "PRogram [s]",              "program change (ON, {other})",
     "ACtivate [s]",             "program change activates part (ON, {other})",
-    "Extended [s]",             "extended program change (ON, {other})",
+    "EXTended [s]",             "extended program change (ON, {other})",
     "Quiet [s]",                "ignore 'reset all controllers' (ON, {other})",
     "Nrpn [s]",                 "incoming NRPN (ON, {other})",
     "Log [s]",                  "incoming MIDI CCs (ON, {other})",
@@ -180,7 +180,7 @@ string partlist [] = {
     "  Type <s>",               "the effect type",
     "  PREset <n3>",            "set numbered effect preset to n3",
     "  Send <n3> <n4>",         "send part to system effect n3 at volume n4",
-    "KMode <s>",                "set part to kit mode (MUlti, SIngle, CRoss, OFf)",
+    "KMode <s>",                "set part to kit mode (MUlti, SIngle, CRoss, OFF)",
     "  KItem <n>",              "select kit item number (1-16)",
     "    MUte <s>",             "silence this item (ON, {other})",
     "    KEffect <n>",          "select effect for this item (0-none, 1-3)",
@@ -199,7 +199,7 @@ string partlist [] = {
 
 string commonlist [] = {
     "ON @",                     "enables the part/kit item/engine/insert etc,",
-    "OFf @",                    "disables as above",
+    "OFF @",                    "disables as above",
     "Volume <n> @",             "volume",
     "Pan <n2> @",               "panning",
     "VElocity <n> @",           "velocity sensing sensitivity",
@@ -251,12 +251,12 @@ string addsynthlist [] = {
 string addvoicelist [] = {
 
     "Type <s>",             "sound type (oscillator, White noise, Pink noise)",
-    "Source <n>",           "oscillator voice number (-1 for self)",
+    "SOurce <n>",           "oscillator voice number (-1 for self)",
     "Phase <n>",            "relative voice phase",
     "Minus <s>",            "Invert entire voice (ON, {other})",
     "DELay <n>",            "delay before this voice starts",
     "Resonance <s>",        "enable resonance for this voice (ON, {other})",
-    "Bypass <s>",           "bypass global filter for this voice (ON, {other})",
+    "BYpass <s>",           "bypass global filter for this voice (ON, {other})",
     "Unison <s>",           "(ON, OFF)",
     "Unison Size <n>",      "number of unison elements",
     "Unison Frequency <n>", "frequency spread of elements",
@@ -272,9 +272,9 @@ string addvoicelist [] = {
 
 string addmodlist [] = {
     "Type <s>",             "modulator type (OFF, Morph, Ring, Phase, Frequency, PUlse width)",
-    "Source <[s]/[n]>",     "oscillator source (Local, {voice number})",
+    "SOurce <[s]/[n]>",     "oscillator source (Local, {voice number})",
     "Damping <n>",          "higher frequency relative damping",
-    "Local <[s]/[n]>",      "modulation oscillator(Internal, {modulator number})",
+    "LOcal <[s]/[n]>",      "modulation oscillator(Internal, {modulator number})",
     "PHase <n>",            "oscillator relative phase",
     "WAveform ...",         "enter the oscillator waveform context",
     "end"
@@ -300,7 +300,7 @@ string padsynthlist [] = {
     "SIze <n>",                 "change harmonic width retaining shape",
 
     "CRoss <s>",                "cross section of profile (Full, Upper, Lower)",
-    "MUltiplier <s>",           "amplitude multiplier (Off, Gauss, Sine, Flat)",
+    "MUltiplier <s>",           "amplitude multiplier (OFF, Gauss, Sine, Flat)",
     "MOde <s>",                 "amplitude mode (Sum, Mult, D1, D2)",
 
     "CEnter <n>",               "changes the central harmonic component width",
@@ -420,7 +420,7 @@ string filterlist [] = {
     "  stop",               "band stop",
     "","",
     "formant editor","",
-    "Invert <s>",           "invert effect of LFOs, envelopes (ON, OFf)",
+    "Invert <s>",           "invert effect of LFOs, envelopes (ON, OFF)",
     "FCenter <n>",          "center frequency of sequence",
     "FRange <n>",           "octave range of formants",
     "Expand <n>",           "stretch overall sequence time",
@@ -491,7 +491,7 @@ string vectlist [] = {
     "[X] PRogram <l/r> <n2>",   "X program change ID for LEFT or RIGHT part",
     "[Y] PRogram <d/u> <n2>",   "Y program change ID for DOWN or UP part",
     "[X/Y] Control <n2> <n3>",  "sets n3 CC to use for X or Y feature n2 (2-4)",
-    "Off",                      "disable vector for this channel",
+    "OFF",                      "disable vector for this channel",
     "Name <s>",                 "Text name for this complete vector",
     "end"
 };
@@ -575,7 +575,7 @@ string replies [] = {
 };
 
 string fx_list [] = {
-    "OFf",
+    "OFF",
     "REverb",
     "ECho",
     "CHorus",
@@ -2815,7 +2815,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
             return value_msg;
     }
 
-    else if (matchnMove(1, point, "expose"))
+    else if (matchnMove(3, point, "expose"))
     {
         value = toggle();
         if (value == -1 && matchnMove(2, point, "prompt"))
@@ -2954,7 +2954,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
         command = CONFIG::control::programChangeEnablesPart;
         value = (toggle() == 1);
     }
-    else if (matchnMove(1, point, "extend"))
+    else if (matchnMove(3, point, "extend"))
     {
         command = CONFIG::control::extendedProgramChangeCC;
         if (controlType != TOPLEVEL::type::Write)
@@ -3138,7 +3138,7 @@ int CmdInterface::modulator(unsigned char controlType)
             return waveform(controlType);
         }
 
-        if (matchnMove(1, point, "source"))
+        if (matchnMove(2, point, "source"))
         {
             if (matchnMove(1, point, "local"))
                 value = 0;
@@ -3169,7 +3169,7 @@ int CmdInterface::modulator(unsigned char controlType)
         if (readControl(ADDVOICE::control::externalModulator, npart, kitNumber, PART::engine::addVoice1 + voiceNumber) != -1)
             return  inactive_msg;
 
-        if (matchnMove(1, point, "local"))
+        if (matchnMove(2, point, "local"))
         {
             if (matchnMove(1, point, "internal"))
                 value = 0;
@@ -3298,7 +3298,7 @@ int CmdInterface::addVoice(unsigned char controlType)
                 return range_msg;
             cmd = ADDVOICE::control::soundType;
         }
-        else if (matchnMove(1, point, "source"))
+        else if (matchnMove(2, point, "source"))
         {
             value = string2int(point) -1;
             if (value >= voiceNumber)
@@ -3321,7 +3321,7 @@ int CmdInterface::addVoice(unsigned char controlType)
             value = (toggle() == 1);
             cmd = ADDVOICE::control::enableResonance;
         }
-        else if (matchnMove(1, point, "bypass"))
+        else if (matchnMove(2, point, "bypass"))
         {
             value = (toggle() == 1);
             cmd = ADDVOICE::control::bypassGlobalFilter;
