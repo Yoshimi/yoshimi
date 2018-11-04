@@ -749,11 +749,11 @@ namespace OSCILLATOR // usage OSCILLATOR::control::phaseRandomness
         autoClear = 32, // not used
         useAsBaseFunction, // if 'value' is 1 assume autoclear set
         waveshapeParameter,
-        waveshapeType, //  None, Atan, Asym1, Pow, Sine Qnts, Zigzag, Lmt, LmtU, LmtL, Ilmt
+        waveshapeType, //  None, Atan, Asym1, Pow, Sine Qnts, Zigzag, Lmt, LmtU, LmtL, Ilmt, Clip, Asym2, Pow2, Sgm
         filterParameter1,
         filterParameter2,
         filterBeforeWaveshape,
-        filterType, // None, LP, HP1a, HP1b, BP1, BS1, LP2, HP2, BP2, BS2, Cos, Sin, Lsh, S
+        filterType, // None, LP, HP1a, HP1b, BP1, BS1, LP2, HP2, BP2, BS2, Cos, Sin, Lsh, Sgm
         modulationParameter1,
         modulationParameter2,
         modulationParameter3,

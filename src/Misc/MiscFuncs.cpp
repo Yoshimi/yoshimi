@@ -198,6 +198,40 @@ unsigned int MiscFuncs::string2uint(string str)
 }
 
 
+int MiscFuncs::stringNumInList(string toFind, string *listname, int convert)
+{
+    string copy = "";
+    switch (convert)
+    {
+        case -1:
+            for (string::size_type i = 0; i < toFind.length(); ++i)
+                copy += (char) tolower(toFind[i]);
+            break;
+        case 1:
+            for (string::size_type i = 0; i < toFind.length(); ++i)
+                copy+= (char) toupper(toFind[i]);
+            break;
+        default:
+            copy = toFind;
+            break; // change nothing
+    }
+    int count = -1;
+    string name;
+    bool found = false;
+    do
+    {
+        ++ count;
+        name = listname[count];
+        if (copy == name)
+            found = true;
+    }
+    while (!found && name != "end");
+    if (name == "end")
+        return -1;
+    return count;
+}
+
+
 bool MiscFuncs::isRegFile(string chkpath)
 {
     struct stat st;

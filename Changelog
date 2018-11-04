@@ -1,7 +1,11 @@
 yoshimi 1.5.9 M
 
+2018-11-4 Will
+* Completed all CLI waveform controls.
+ I think!
+
 2018-11-3 Will
-* Added CLI waveform access from modulators.
+* Added CLI waveform access for modulators.
 
 2018-11-2 Will
 * Completed CLI AddVoice controls :)

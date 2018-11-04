@@ -281,8 +281,8 @@ string addmodlist [] = {
 };
 
 string subsynthlist [] = {
-    "HArmonic <n1> Amp <n2>",   "set harmonic {n1} to {n2} intensity",
-    "HArmonic <n1> Band <n2>",  "set harmonic {n1} to {n2} width",
+    "HArmonic <n1> Amp <n2>",   "set harmonic n1 to n2 intensity",
+    "HArmonic <n1> Band <n2>",  "set harmonic n1 to n2 width",
     "HArmonic Stages <n>",      "number of stages",
     "HArmonic Mag <n>",         "harmonics filtering type",
     "HArmonic Position <n>",    "start position",
@@ -333,16 +333,38 @@ string  resonancelist [] = {
     "Interpolate <s>",          "turn isolated peaks into lines or curves (Linear, Smooth)",
     "Smooth",                   "reduce range and sharpness of peaks",
     "CLear",                    "set all points to mid level",
-    "POints [<n1> [n2]]",       "show all or set/read {n1} to {n2}",
+    "POints [<n1> [n2]]",       "show all or set/read n1 to n2",
     "end"
 };
 string waveformlist [] = {
-    "HArmonic <n1> Amp <n2>",   "set harmonic {n1} to {n2} intensity",
-    "HArmonic <n1> Phase <n2>", "set harmonic {n1} to {n2} phase",
+    "Harmonic <n1> Amp <n2>",   "harmonic n1 to n2 intensity",
+    "Harmonic <n1> Phase <n2>", "harmonic n1 to n2 phase",
+    "Harmonic Shift <n>",       "amount harmonics are moved",
+    "Harmonic Before <s>",      "shift before waveshaping and filtering (ON {other})",
+    "COnvert",                  "change resultant wave to groups of sine waves",
     "CLear",                    "clear harmonic settings",
-    "SHape <s>",                "set the shape of the basic waveform",
-    "","SIne,TRiangle,PUlse,SAw,POwer,GAuss,DIode,ABsine,PSine",
-    "","SSine,CHIrp,ASine,CHEbyshev,SQuare,SPike,Circle",
+    "WAve <s>",                 "the shape of the basic waveform",
+    "","SINe,TRIangle,PULse,SAW,POWer,GAUss,DIOde,ABSine,PSIne",
+    "","SSIne,CHIrp,ASIne,CHEbyshev,SQUare,SPIke,CIRcle",
+    "Base Par <n>",             "basic wave parameter",
+    "Base Mod Type <s>",        "basic modulation type (OFF, Rev, Sine Power)",
+    "Base Mod Par <n1> <n2>",   "parameter number n1 (1 - 3), n2 value",
+    "Base Convert [s]",         "use resultant basic wave as base shape",
+    "","also clear modifers and harmonics (OFF {other})",
+    "SHape Type <s>",           "wave shape modifer type",
+    "","(OFF, ATAn, ASYm1, POWer, SINe QNTs, ZIGzag, LMT, ULMt, LLMt, ILMt, CLIp, AS2, PO2, SGM)",
+    "SHape Par <n>",            "wave shape modifier amount",
+    "Filter Type <s>","",
+    "","OFF, LP1, HPA1, HPB1, BP1, BS1, LP2, HP2, BP2, BS2, COS, SIN, LSH, SGM",
+    "Filter Par <n1 <n2>",      "filter parameters  n1 (1/2), n2 value",
+    "Filter Before <s>",        "do filtering before waveshaping (ON {other})",
+    "Modulation Par <n1 <n2>",  "Overall modulation n1 (1 - 3), n2 value",
+    "SPectrum Type <s>",        "spectrum adjust type (OFF, Power, Down/Up threshold)",
+    "SPectrum Par <n>",         "spectrum adjust amount",
+    "ADdaptive Type <s>",       "adaptive harmonics (OFF, ON, SQUare, 2XSub, 2XAdd, 3XSub, 3XAdd, 4XSub, 4XAdd)",
+    "ADdaptive Base <n>",       "adaptive base frequency",
+    "ADdaptive Level <n>",      "adaptive power",
+    "ADdaptive Par <n>",        "adaptive paramter",
     "APply",                    "Fix settings (only for PadSynth)",
     "end"
 };
@@ -444,9 +466,9 @@ string envelopelist [] = {
     "freemode","",
     "Points",                "Number of defined points (read only)",
     "Sustain <n>",           "point number where sustain starts",
-    "Insert <n1> <n2> <n3>", "insert point at 'n1' with X increment 'n1', Y value 'n2'",
-    "Delete <n>",            "remove point 'n'",
-    "Change <n1> <n2> <n3>", "change point 'n1' to X increment 'n1', Y value 'n2'",
+    "Insert <n1> <n2> <n3>", "insert point at n1 with X increment n2, Y value n3",
+    "Delete <n>",            "remove point n",
+    "Change <n1> <n2> <n3>", "change point n1 to X increment n2, Y value n3",
     "end"
 };
 
@@ -3825,70 +3847,204 @@ int CmdInterface::waveform(unsigned char controlType)
     float value = -1;
     int cmd = -1;
     int engine = contextToEngines();
-    unsigned char insert = UNUSED;
+    unsigned char insert = TOPLEVEL::insert::oscillatorGroup;
+    string wavebase[] = {"SIN", "TRI", "PUL", "SAW", "POW", "GAU", "DIO", "ABS", "PSI", "SSI", "CHI", "ASI", "CHE", "SQU", "SPI", "CIR", "end"};
+    string waveshapes[] = {"OFF" ,"ATA", "ASY", "POW", "SIN", "QNT", "ZIG", "LMT", "ULM", "LLM", "ILM", "CLI", "CLI", "AS2", "PO2", "SGM", "end"};
+    string filtertype[] = {"OFF", "LP1", "HPA", "HPB", "BP1", "BS1", "LP2", "HP2", "BP2", "BS2", "COS", "SIN", "LSH", "SGM", "end"};
+    string adaptive[] = {"OFF", "ON", "SQU", "2XS", "2XA", "3XS", "3XA", "4XS", "4XA"};
 
-    if (matchnMove(2, point, "harmonic"))
+    if (matchnMove(1, point, "harmonic"))
     {
         if (lineEnd(controlType))
             return value_msg;
-        cmd = string2int(point);
-        if (cmd < 1 || cmd > MAX_AD_HARMONICS)
-            return range_msg;
-        point = skipChars(point);
 
-        if (matchnMove(1, point, "amp"))
-            insert = TOPLEVEL::insert::harmonicAmplitude;
-        else if (matchnMove(1, point, "phase"))
-            insert = TOPLEVEL::insert::harmonicPhaseBandwidth;
+        if (matchnMove(1, point, "shift"))
+            cmd = OSCILLATOR::control::harmonicShift;
+        else if (matchnMove(1, point, "before"))
+        {
+            value = (toggle() == 1);
+            cmd = OSCILLATOR::control::shiftBeforeWaveshapeAndFilter;
+        }
+        else
+        {
+            cmd = string2int(point) - 1;
+            if (cmd < 0 || cmd >= MAX_AD_HARMONICS)
+                return range_msg;
+            point = skipChars(point);
 
-        if (lineEnd(controlType))
-            return value_msg;
-        return sendNormal(string2int(point), controlType, cmd - 1, npart, kitNumber, engine + voiceNumber, insert);
+            if (matchnMove(1, point, "amp"))
+                insert = TOPLEVEL::insert::harmonicAmplitude;
+            else if (matchnMove(1, point, "phase"))
+                insert = TOPLEVEL::insert::harmonicPhaseBandwidth;
+
+            if (lineEnd(controlType))
+                return value_msg;
+        }
+        if (value == -1)
+            value = string2int(point);
+        return sendNormal(value, controlType, cmd, npart, kitNumber, engine + voiceNumber, insert);
     }
 
-    insert = TOPLEVEL::insert::oscillatorGroup;
-    if (matchnMove(2, point, "shape"))
+    if (matchnMove(2, point, "wave"))
     {
-        if (matchnMove(2, point, "sine"))
-            value = 0;
-        else if (matchnMove(2, point, "triange"))
-            value = 1;
-        else if (matchnMove(2, point, "pulse"))
-            value = 2;
-        else if (matchnMove(2, point, "saw"))
-            value = 3;
-        else if (matchnMove(2, point, "power"))
-            value = 4;
-        else if (matchnMove(2, point, "gauss"))
-            value = 5;
-        else if (matchnMove(2, point, "diode"))
-            value = 6;
-        else if (matchnMove(2, point, "absine"))
-            value = 7;
-        else if (matchnMove(2, point, "psine"))
-            value = 8;
-        else if (matchnMove(2, point, "ssine"))
-            value = 9;
-        else if (matchnMove(3, point, "chirp"))
-            value = 10;
-        else if (matchnMove(2, point, "asine"))
-            value = 11;
-        else if (matchnMove(3, point, "chebyshev"))
-            value = 12;
-        else if (matchnMove(2, point, "square"))
-            value = 13;
-        else if (matchnMove(2, point, "spike"))
-            value = 14;
-        else if (matchnMove(2, point, "circle"))
-            value = 15;
-        if (value > -1)
-            cmd = OSCILLATOR::control::baseFunctionType;
+        string name = string(point).substr(0,3);
+        value = stringNumInList(name, wavebase, 1);
+        if (value == -1)
+            return value_msg;
+        cmd = OSCILLATOR::control::baseFunctionType;
     }
+
+    else if (matchnMove(2, point, "convert"))
+    {
+        value = 0; // dummy
+        cmd = OSCILLATOR::control::convertToSine;
+    }
+
     else if (matchnMove(2, point, "clear"))
     {
         value = 0; // dummy
         cmd = OSCILLATOR::control::clearHarmonics;
     }
+
+    else if (matchnMove(2, point, "shape"))
+    {
+        if (matchnMove(1, point, "type"))
+        {
+            string name = string(point).substr(0,3);
+            value = stringNumInList(name, waveshapes, 1);
+            if (value == -1)
+                return value_msg;
+            cmd = OSCILLATOR::control::waveshapeType;
+        }
+        else if (matchnMove(1, point, "par"))
+            cmd = OSCILLATOR::control::waveshapeParameter;
+        else return opp_msg;
+    }
+
+    else if (matchnMove(1, point, "filter"))
+    {
+        if (matchnMove(1, point, "type"))
+        {
+            string name = string(point).substr(0,3);
+            value = stringNumInList(name, filtertype, 1);
+            if (value == -1)
+                return value_msg;
+            cmd = OSCILLATOR::control::filterType;
+        }
+        else if (matchnMove(1, point, "par"))
+        {
+            switch (point[0])
+            {
+                case char('1'):
+                    cmd = OSCILLATOR::control::filterParameter1;
+                    break;
+                case char('2'):
+                    cmd = OSCILLATOR::control::filterParameter2;
+                    break;
+                default:
+                    return opp_msg;
+            }
+            point = skipChars(point);
+        }
+        else if (matchnMove(1, point, "before"))
+        {
+            value = (toggle() == 1);
+            cmd = OSCILLATOR::control::filterBeforeWaveshape;
+        }
+        else return opp_msg;
+    }
+
+    else if (matchnMove(1, point, "base"))
+    {
+        if(matchnMove(1, point, "par"))
+            cmd = OSCILLATOR::control::baseFunctionParameter;
+        else if (matchnMove(1, point, "convert"))
+        {
+            value = (toggle() != 0);
+            cmd = OSCILLATOR::control::useAsBaseFunction;
+        }
+        else if (matchnMove(1, point, "mod"))
+        {
+            if(matchnMove(1, point, "type"))
+            {
+                if(matchnMove(3, point, "off"))
+                    value = 0;
+                else if(matchnMove(1, point, "Rev"))
+                    value = 1;
+                else if(matchnMove(1, point, "Sine"))
+                    value = 2;
+                else if(matchnMove(1, point, "Power"))
+                    value = 3;
+                else
+                    return value_msg;
+                cmd = OSCILLATOR::control::baseModulationType;
+            }
+            else if(matchnMove(1, point, "par"))
+            {
+                switch (point[0])
+                {
+                    case char('1'):
+                        cmd = OSCILLATOR::control::baseModulationParameter1;
+                        break;
+                    case char('2'):
+                        cmd = OSCILLATOR::control::baseModulationParameter2;
+                        break;
+                    case char('3'):
+                        cmd = OSCILLATOR::control::baseModulationParameter3;
+                        break;
+                    default:
+                        return range_msg;
+                }
+                point = skipChars(point);
+            }
+            else
+                return opp_msg;
+        }
+        else
+            return opp_msg;
+    }
+
+    else if (matchnMove(2, point, "spectrum"))
+    {
+        if (matchnMove(1, point, "type"))
+        {
+            if (matchnMove(3, point, "OFF"))
+                value = 0;
+            else if (matchnMove(3, point, "Power"))
+                value = 1;
+            else if (matchnMove(1, point, "Down"))
+                value = 2;
+            else if (matchnMove(1, point, "Up"))
+                value = 3;
+            else
+                return value_msg;
+            cmd = OSCILLATOR::control::spectrumAdjustType;
+        }
+        else if (matchnMove(1, point, "par"))
+            cmd = OSCILLATOR::control::spectrumAdjustParameter;
+        else return opp_msg;
+    }
+
+    else if (matchnMove(2, point, "adaptive"))
+    {
+        if (matchnMove(1, point, "type"))
+        {
+            string name = string(point).substr(0,3);
+            value = stringNumInList(name, adaptive, 1);
+            if (value == -1)
+                return value_msg;
+            cmd = OSCILLATOR::control::adaptiveHarmonicsType;
+        }
+        else if (matchnMove(1, point, "base"))
+            cmd = OSCILLATOR::control::adaptiveHarmonicsBase;
+        else if (matchnMove(1, point, "level"))
+            cmd = OSCILLATOR::control::adaptiveHarmonicsPower;
+        else if (matchnMove(1, point, "par"))
+            cmd = OSCILLATOR::control::adaptiveHarmonicsParameter;
+        else
+            return opp_msg;
+    }
+
     else if (matchnMove(2, point, "apply"))
     {
         if (engine != PART::engine::padSynth)
@@ -3899,6 +4055,8 @@ int CmdInterface::waveform(unsigned char controlType)
     }
     if (cmd == -1)
         return available_msg;
+    if (value == -1)
+        value = string2float(point);
     return sendNormal(value, controlType, cmd, npart, kitNumber, engine, insert);
 }
 

@@ -57,6 +57,8 @@ class MiscFuncs
         static int string2int127(string str);
         static unsigned int string2uint(string str);
 
+        int stringNumInList(string toFind, string *listname, int convert = 0);
+
         bool isRegFile(string chkpath);
         bool isDirectory(string chkpath);
         bool isFifo(string chkpath);
