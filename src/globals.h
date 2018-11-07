@@ -594,7 +594,7 @@ namespace ADDVOICE // usage ADDVOICE::control::volume
         equalTemperVariation,
         baseFrequencyAs440Hz,
         octave,
-        detuneType, // L35 cents, L10 cents, E100 cents, E1200 cents
+        detuneType, // Default, L35 cents, L10 cents, E100 cents, E1200 cents
         coarseDetune,
         pitchBendAdjustment,
         pitchBendOffset,
@@ -623,7 +623,7 @@ namespace ADDVOICE // usage ADDVOICE::control::volume
         modulatorDetuneFrequency = 96,
         modulatorFrequencyAs440Hz = 98,
         modulatorOctave,
-        modulatorDetuneType, // L35 cents, L10 cents, E100 cents, E1200 cents
+        modulatorDetuneType, // Default, L35 cents, L10 cents, E100 cents, E1200 cents
         modulatorCoarseDetune,
         enableModulatorFrequencyEnvelope = 104,
         modulatorOscillatorPhase = 112,

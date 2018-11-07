@@ -207,7 +207,7 @@ string commonlist [] = {
     "MAx <n> +",                "maximum MIDI note value",
     "DETune Fine <n> *",        "fine frequency",
     "DETune Coarse <n> *",      "coarse stepped frequency",
-    "DETune Type <n> *",        "type of coarse stepping",
+    "DETune Type <s> *",        "type of coarse stepping (DEFault, L35, L10, E100, E1200)",
     "OCTave <n> *",             "shift octaves up or down",
     "FIXed <s> *-add",          "set base frequency to 440Hz (ON, {other})",
     "EQUal <n> *-add",          "equal temper variation",
@@ -271,11 +271,16 @@ string addvoicelist [] = {
 };
 
 string addmodlist [] = {
-    "Type <s>",             "modulator type (OFF, Morph, Ring, Phase, Frequency, PUlse width)",
+    "OFF",                  "disable modulator",
+    "   MOrph",             "types",
+    "   RIng","",
+    "   PHase","",
+    "   FRequency","",
+    "   PUlse",             "pulse width",
     "SOurce <[s]/[n]>",     "oscillator source (Local, {voice number})",
     "Damping <n>",          "higher frequency relative damping",
     "LOcal <[s]/[n]>",      "modulation oscillator(Internal, {modulator number})",
-    "PHase <n>",            "oscillator relative phase",
+    "SHift <n>",            "oscillator relative phase",
     "WAveform ...",         "enter the oscillator waveform context",
     "end"
 };
@@ -1208,12 +1213,13 @@ int CmdInterface::effects(unsigned char controlType)
 
 int CmdInterface::partCommonControls(unsigned char controlType)
 {
+    // TODO integrate modulator controls properly
     int cmd = -1;
     int engine = contextToEngines();
     int insert = UNUSED;
     int kit = UNUSED;
-
-    if (engine == PART::engine::addVoice1)
+    string detuneType[] = {"DEF", "L35", "L10", "E10", "E12", "end"};
+    if (engine == PART::engine::addVoice1 || engine == PART::engine::addMod1)
         engine += voiceNumber; // voice numbers are 0 to 7
 
     if (kitMode)
@@ -1230,21 +1236,35 @@ int CmdInterface::partCommonControls(unsigned char controlType)
                 if (lineEnd(controlType))
                     return value_msg;
                 value = string2int(point);
-                cmd = ADDSYNTH::control::detuneFrequency;
+                if (engine >= PART::engine::addMod1)
+                    cmd = ADDVOICE::control::modulatorDetuneFrequency;
+                else
+                    cmd = ADDSYNTH::control::detuneFrequency;
             }
             else if (matchnMove(1, point, "coarse"))
             {
                 if (lineEnd(controlType))
                     return value_msg;
                 value = string2int(point);
-                cmd = ADDSYNTH::control::coarseDetune;
+                if (engine >= PART::engine::addMod1)
+                    cmd = ADDVOICE::control::modulatorCoarseDetune;
+                else
+                    cmd = ADDSYNTH::control::coarseDetune;
             }
             else if (matchnMove(1, point, "type"))
             {
                 if (lineEnd(controlType))
                     return value_msg;
-                value = string2int(point);
-                cmd = ADDSYNTH::control::detuneType;
+                string name = string(point).substr(0,3);
+                value = stringNumInList(name, detuneType, 1);
+                if (value > -1 && engine < PART::engine::addVoice1)
+                    value -= 1;
+                if (value == -1)
+                    return range_msg;
+                if (engine >= PART::engine::addMod1)
+                    cmd = ADDVOICE::control::modulatorDetuneType;
+                else
+                    cmd = ADDSYNTH::control::detuneType;
             }
         }
         else if (matchnMove(3, point, "octave"))
@@ -1252,7 +1272,10 @@ int CmdInterface::partCommonControls(unsigned char controlType)
             if (lineEnd(controlType))
                 return value_msg;
             value = string2int(point);
-            cmd = ADDSYNTH::control::octave;
+            if (engine >= PART::engine::addMod1)
+                cmd = ADDVOICE::control::modulatorOctave;
+            else
+                cmd = ADDSYNTH::control::octave;
         }
 
         if (cmd == -1 && matchnMove(3, point, "lfo"))
@@ -2155,37 +2178,33 @@ string CmdInterface::findStatus(bool show)
         {
             kit = kitNumber;
             insert = TOPLEVEL::insert::kitGroup;
-            if (justPart)
-                text += ", kit ";
-            else
-                text += ", K";
-            text += to_string(kitNumber + 1);
-            if (readControl(PART::control::enable, npart, kitNumber, UNUSED, insert))
-                text += "+";
             text += ", ";
             switch (kitMode)
             {
                 case PART::kitType::Multi:
                     if (justPart)
-                        text += "multi";
+                        text += "Multi ";
                     else
                         text += "M";
                     break;
                 case PART::kitType::Single:
                     if (justPart)
-                        text += "single";
+                        text += "Single ";
                     else
                         text += "S";
                     break;
                 case PART::kitType::CrossFade:
                     if (justPart)
-                        text += "cross";
+                        text += "Crossfade ";
                     else
                         text += "C";
                     break;
                 default:
                     break;
             }
+            text += to_string(kitNumber + 1);
+            if (readControl(PART::control::enable, npart, kitNumber, UNUSED, insert))
+                text += "+";
         }
         else
             kitNumber = 0;
@@ -2294,23 +2313,24 @@ string CmdInterface::findStatus(bool show)
 
         if (bitTest(context, LEVEL::LFO))
         {
+            text += ", LFO ";
             int cmd = -1;
             switch (insertType)
             {
                 case TOPLEVEL::insertType::amplitude:
                     cmd = ADDVOICE::control::enableAmplitudeLFO;
-                    text += ", amp";
+                    text += "amp";
                     break;
                 case TOPLEVEL::insertType::frequency:
                     cmd = ADDVOICE::control::enableFrequencyLFO;
-                    text += ", freq";
+                    text += "freq";
                     break;
                 case TOPLEVEL::insertType::filter:
                     cmd = ADDVOICE::control::enableFilterLFO;
-                    text += ", filt";
+                    text += "filt";
                     break;
             }
-            text += " LFO";
+
             if (engine == PART::engine::addVoice1)
             {
                 if (readControl(cmd, npart, kitNumber, engine + voiceNumber))
@@ -2322,7 +2342,7 @@ string CmdInterface::findStatus(bool show)
         else if (bitTest(context, LEVEL::Filter))
         {
             int baseType = readControl(FILTERINSERT::control::baseType, npart, kitNumber, engine, TOPLEVEL::insert::filterGroup);
-            text += ", ";
+            text += ", Filter ";
             switch (baseType)
             {
                 case 0:
@@ -2335,7 +2355,6 @@ string CmdInterface::findStatus(bool show)
                     text += "state var";
                     break;
             }
-            text += " Filter";
             if (engine == PART::engine::subSynth)
             {
                 if (readControl(SUBSYNTH::control::enableFilter, npart, kitNumber, engine))
@@ -2351,30 +2370,37 @@ string CmdInterface::findStatus(bool show)
         }
         else if (bitTest(context, LEVEL::Envelope))
         {
+            text += ", Envel ";
             int cmd = -1;
             switch (insertType)
             {
                 case TOPLEVEL::insertType::amplitude:
-                    cmd = ADDVOICE::control::enableAmplitudeEnvelope;
-                    text += ", amp";
+                    if(engine == PART::engine::addMod1)
+                        cmd = ADDVOICE::control::enableModulatorAmplitudeEnvelope;
+                    else
+                        cmd = ADDVOICE::control::enableAmplitudeEnvelope;
+                    text += "amp";
                     break;
                 case TOPLEVEL::insertType::frequency:
-                    cmd = ADDVOICE::control::enableFrequencyEnvelope;
-                    text += ", freq";
+                    if(engine == PART::engine::addMod1)
+                        cmd = ADDVOICE::control::enableModulatorFrequencyEnvelope;
+                    else
+                        cmd = ADDVOICE::control::enableFrequencyEnvelope;
+                    text += "freq";
                     break;
                 case TOPLEVEL::insertType::filter:
                     cmd = ADDVOICE::control::enableFilterEnvelope;
-                    text += ", filt";
+                    text += "filt";
                     break;
                 case TOPLEVEL::insertType::bandwidth:
                     cmd = SUBSYNTH::control::enableBandwidthEnvelope;
-                    text += ", band";
+                    text += "band";
                     break;
             }
-            text += " Envel";
+
             if (readControl(ENVELOPEINSERT::control::enableFreeMode, npart, kitNumber, engine, TOPLEVEL::insert::envelopeGroup, insertType))
                 text += " free";
-            if (engine == PART::engine::addVoice1 || (engine == PART::engine::subSynth && cmd != ADDVOICE::control::enableAmplitudeEnvelope && cmd != ADDVOICE::control::enableFilterEnvelope))
+            if (engine == PART::engine::addVoice1  || engine == PART::engine::addMod1 || (engine == PART::engine::subSynth && cmd != ADDVOICE::control::enableAmplitudeEnvelope && cmd != ADDVOICE::control::enableFilterEnvelope))
             {
                 if (readControl(cmd, npart, kitNumber, engine + voiceNumber))
                     text += "+";
@@ -3110,24 +3136,20 @@ int CmdInterface::modulator(unsigned char controlType)
         return done_msg;
     int value = -1;
     int cmd = -1;
-    if (matchnMove(1, point, "type"))
-    {
-        if (matchnMove(3, point, "off"))
+    if (matchnMove(3, point, "off"))
             value = 0;
-        else if (matchnMove(1, point, "morph"))
+        else if (matchnMove(2, point, "morph"))
             value = 1;
-        else if (matchnMove(1, point, "ring"))
+        else if (matchnMove(2, point, "ring"))
             value = 2;
-        else if (matchnMove(1, point, "phase"))
+        else if (matchnMove(2, point, "phase"))
             value = 3;
-        else if (matchnMove(1, point, "frequency"))
+        else if (matchnMove(2, point, "frequency"))
             value = 4;
         else if (matchnMove(2, point, "pulse"))
             value = 5;
-        else
-            return value_msg;
-        cmd = ADDVOICE::control::modulatorType;
-    }
+        if (value != -1)
+            cmd = ADDVOICE::control::modulatorType;
     if (cmd == -1)
     {
         if (readControl(ADDVOICE::control::modulatorType, npart, kitNumber, PART::engine::addVoice1 + voiceNumber) == 0)
@@ -3187,7 +3209,7 @@ int CmdInterface::modulator(unsigned char controlType)
                 value -= 1;
             cmd = ADDVOICE::control::modulatorOscillatorSource;
         }
-        if (matchnMove(2, point, "phase"))
+        if (matchnMove(2, point, "shift"))
             cmd = ADDVOICE::control::modulatorOscillatorPhase;
     }
 
@@ -3201,43 +3223,11 @@ int CmdInterface::modulator(unsigned char controlType)
     }
 
 /*
- * The following controls need to be integrated with
+ * The following control need to be integrated with
  * partCommonControls(), but this needs checking for
  * possible clashes. The envelope enable controls can
  * then also be more fully integrated.
  */
-    if (matchnMove(3, point, "detune"))
-    {
-        if (matchnMove(1, point, "fine"))
-        {
-            if (lineEnd(controlType))
-                return value_msg;
-            value = string2int(point);
-            cmd = ADDVOICE::control::modulatorDetuneFrequency;
-        }
-        else if (matchnMove(1, point, "coarse"))
-        {
-            if (lineEnd(controlType))
-                return value_msg;
-            value = string2int(point);
-            cmd = ADDVOICE::control::modulatorCoarseDetune;
-        }
-        else if (matchnMove(1, point, "type"))
-        {
-            if (lineEnd(controlType))
-                return value_msg;
-            value = string2int(point);
-            cmd = ADDVOICE::control::modulatorDetuneType;
-        }
-    }
-    else if (matchnMove(3, point, "octave"))
-    {
-        if (lineEnd(controlType))
-            return value_msg;
-        value = string2int(point);
-        cmd = ADDVOICE::control::modulatorOctave;
-    }
-
 
     if (matchnMove(3, point, "envelope"))
     {
@@ -3246,7 +3236,7 @@ int CmdInterface::modulator(unsigned char controlType)
     }
 
     if (cmd == -1)
-        return available_msg;
+        return partCommonControls(controlType);//available_msg;
 
     return sendNormal(value, controlType, cmd, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
 

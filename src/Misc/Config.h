@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified September 2018
+    Modified November 2018
 */
 
 #ifndef CONFIG_H
@@ -249,11 +249,9 @@ public:
         UpdateMaster = 0,
         UpdateConfig,
         UpdatePaths,
-        UpdatePanel,
         UpdatePart,
         RefreshCurBank,
-        GuiAlert,
-        RegisterAudioPort,
+        GuiCheck,
         NewSynthEngine,
         UNDEFINED = 9999
     };

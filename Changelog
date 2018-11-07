@@ -1,5 +1,12 @@
 yoshimi 1.5.9 M
 
+2018-11-7 Will
+* Added missing controls to CLI voice modulator.
+* Simplified CLI voice modulator type setting.
+* Revised CLI common controls.
+  Detune types now names, not numbers.
+* BugFix: limits test not seeing AddSynth Modulator.
+
 2018-11-4 Will
 * Completed all CLI waveform controls.
  I think!

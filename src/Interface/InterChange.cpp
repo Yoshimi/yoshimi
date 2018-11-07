@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified October 2018
+    Modified November 2018
 */
 
 #include <iostream>
@@ -8210,7 +8210,7 @@ float InterChange::returnLimits(CommandBlock *getData)
 
         if ((insert == TOPLEVEL::insert::kitGroup || insert == UNUSED) && parameter == UNUSED && par2 == UNUSED)
         {
-            if (engine == PART::engine::addSynth || (engine >= PART::engine::addVoice1 && engine <= PART::engine::addVoice8))
+            if (engine == PART::engine::addSynth || (engine >= PART::engine::addVoice1 && engine <= PART::engine::addMod8))
             {
                 ADnoteParameters *adpars;
                 adpars = part->kit[kititem].adpars;

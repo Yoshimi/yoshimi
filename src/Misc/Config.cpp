@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified October 2018
+    Modified November 2018
 */
 
 #include <iostream>
@@ -1323,9 +1323,7 @@ void GuiThreadMsg::processGuiMessages()
                     }
                     break;
 
-                case GuiThreadMsg::GuiAlert:
-                    //if (msg->data)
-                        //guiMaster->ShowAlert(msg->index);
+                case GuiThreadMsg::GuiCheck:
                     guiMaster->checkBuffer();
                     break;
 
