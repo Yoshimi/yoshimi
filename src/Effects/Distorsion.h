@@ -26,7 +26,6 @@
 
 #include "DSP/AnalogFilter.h"
 #include "Effects/Effect.h"
-#include "Effects/Fader.h"
 
 // Waveshaping(called by Distorsion effect and waveshape from OscilGen)
 void waveshapesmps(int n, float *smps, unsigned char type, unsigned char drive);
@@ -70,7 +69,6 @@ class Distorsion : public Effect
         AnalogFilter *lpfr;
         AnalogFilter *hpfl;
         AnalogFilter *hpfr;
-        Fader *fader6db;
 };
 
 #endif

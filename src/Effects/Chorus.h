@@ -27,7 +27,6 @@
 #include "globals.h"
 #include "Effects/Effect.h"
 #include "Effects/EffectLFO.h"
-#include "Effects/Fader.h"
 
 #define MAX_CHORUS_DELAY 250.0 // ms
 
@@ -87,7 +86,6 @@ class Chorus : public Effect
         int dlhi2;
         float dllo;
         float mdel;
-        Fader *fader0db;
 };
 
 #endif

@@ -27,8 +27,8 @@
 
 #include "globals.h"
 #include "DSP/AnalogFilter.h"
+#include "DSP/Unison.h"
 #include "Effects/Effect.h"
-#include "Effects/Fader.h"
 
 #define REV_COMBS 8
 #define REV_APS 4
@@ -60,18 +60,20 @@ class Reverb : public Effect
         unsigned char Plohidamp;
         unsigned char Ptype;
         unsigned char Proomsize;
+        unsigned char Pbandwidth;
 
         // parameter control
-        void setVolume(unsigned char &Pvolume);
-        void setPan(unsigned char &Ppan);
-        void setTime(unsigned char &Ptime);
-        void setLoHiDamp(unsigned char Plohidamp);
-        void setIdelay(unsigned char &Pidelay);
-        void setIdelayFb(unsigned char &Pidelayfb);
-        void setHpf(unsigned char &Phpf);
-        void setLpf(unsigned char &Plpf);
-        void setType( unsigned char Ptype);
-        void setRoomsize(unsigned char &Proomsize);
+        void setVolume(unsigned char Pvolume_);
+        void setPan(unsigned char Ppan_);
+        void setTime(unsigned char Ptime_);
+        void setLoHiDamp(unsigned char Plohidamp_);
+        void setIdelay(unsigned char Pidelay_);
+        void setIdelayFb(unsigned char Pidelayfb_);
+        void setHpf(unsigned char Phpf_);
+        void setLpf(unsigned char Plpf_);
+        void setType( unsigned char Ptype_);
+        void setRoomsize(unsigned char Proomsize_);
+        void setBandwidth(unsigned char Pbandwidth_);
     
         float pan, erbalance;
         // Parametrii 2
@@ -84,7 +86,8 @@ class Reverb : public Effect
         float rs; // rs is used to "normalise" the volume according to the roomsize
         int comblen[REV_COMBS * 2];
         int aplen[REV_APS * 2];
-    
+        Unison *bandwidth;
+
         // Internal Variables
         float *comb[REV_COMBS * 2];
         int combk[REV_COMBS * 2];
@@ -102,7 +105,6 @@ class Reverb : public Effect
         void processMono(int ch, float *output);
 
         int buffersize;
-        Fader *fader6db;
 };
 
 #endif

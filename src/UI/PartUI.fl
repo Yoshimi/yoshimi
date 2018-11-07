@@ -475,7 +475,8 @@ if (part->Pminkey>part->Pmaxkey) o->textcolor(FL_RED);
       }
       Fl_Check_Button {} {
         label Enabled
-        callback {zynMaster->actionLock(lockmute);
+        callback {
+            zynMaster->actionLock(lockmute);
             zynMaster->partOnOff(npart, (int)o->value());
             zynMaster->actionLock(unlock);
             if (part->Penabled == 0)
@@ -646,8 +647,8 @@ if (part->Pminkey>part->Pmaxkey) o->textcolor(FL_RED);
       }
     }
     Fl_Window partfx {
-      label {Part's Insert Effects}
-      private xywh {122 450 390 145} type Double hide
+      label {Part's Insert Effects} open
+      private xywh {123 476 390 145} type Double hide
     } {
       Fl_Counter inseffnocounter {
         label {FX No.}
@@ -665,12 +666,12 @@ if (part->Pminkey>part->Pmaxkey) o->textcolor(FL_RED);
         code1 {o->value(ninseff+1);}
       }
       Fl_Choice insefftype {
-        label EffType
+        label {Effect Type}
         callback {zynMaster->actionLock(lockmute);
             part->partefx[ninseff]->changeEffect((int) o->value());
             zynMaster->actionLock(unlock);
             inseffectui->refresh(part->partefx[ninseff]);}
-        xywh {155 110 70 15} down_box BORDER_BOX labelsize 10 align 6
+        xywh {225 110 84 15} down_box BORDER_BOX labelsize 10
         code0 {o->value(part->partefx[ninseff]->getEffect());}
       } {
         MenuItem {} {
@@ -721,18 +722,18 @@ if (part->Pminkey>part->Pmaxkey) o->textcolor(FL_RED);
       }
       Fl_Button {} {
         label Close
-        callback {partfx->hide();}
+        callback {partfx->hide();} selected
         xywh {325 115 60 20} box THIN_UP_BOX
       }
       Fl_Choice sendtochoice {
-        label {Send To.}
+        label {Send To}
         callback {int x = (int) o->value();
             part->Pefxroute[ninseff] = x;
             if (x == 2)
                 part->partefx[ninseff]->setDryOnly(true);
             else
                 part->partefx[ninseff]->setDryOnly(false);}
-        xywh {235 110 80 15} down_box BORDER_BOX labelsize 10 align 6
+        xywh {225 127 84 15} down_box BORDER_BOX labelsize 10
         code0 {int x=part->Pefxroute[ninseff]; if (x==127) x=1;}
         code1 {o->value(x);}
       } {

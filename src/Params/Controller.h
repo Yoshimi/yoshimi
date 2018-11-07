@@ -26,7 +26,6 @@
 #define CONTROLLER_H
 
 #include "Misc/XMLwrapper.h"
-#include "Effects/Fader.h"
 
 class Controller
 {
@@ -119,7 +118,6 @@ class Controller
         struct { // Volume
             int data;
             float volume;
-            Fader *volControl;
             unsigned char receive;
         } volume;
 

@@ -99,7 +99,14 @@
 // The random generator (0.0..1.0)
 #define RND (rand()/(RAND_MAX+1.0))
 
-#define ZERO(data,size) {char *data_=(char *) data;for (int i=0;i<size;++i) data_[i]=0;};
+//#define ZERO(data,size) {char *data_=(char *) data;for (int i=0;i<size;++i) data_[i]=0;};
+#define ZERO(data, size) (memset((void*)data, 0, size))
+
+#define ZERO_REALTYPE(data, size) (memset((void*)data, 0, size * sizeof(float)))
+/*    {REALTYPE *data_=(REALTYPE *) data; \
+    for (int i = 0; i < size; ++i) data_[i] = 0.0; \
+    };
+*/
 
 enum ONOFFTYPE {
     OFF = 0,

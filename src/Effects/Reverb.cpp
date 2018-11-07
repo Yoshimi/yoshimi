@@ -34,25 +34,26 @@ using namespace std;
 Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
     // defaults
-    Pvolume     (48),
-    Ppan        (64),
-    Ptime       (64),
-    Pidelay     (40),
-    Pidelayfb   (0),
-    Prdelay     (0),
-    Perbalance  (64),
-    Plpf        (127),
-    Phpf        (0),
-    Plohidamp   (80),
-    Ptype       (1),
-    Proomsize   (64),
-    roomsize    (1.0),
-    rs          (1.0),
-    idelay      (NULL),
-    lpf         (NULL),
-    hpf         (NULL), // no filter
-    buffersize(zynMaster->getBuffersize()),
-    fader6db(new Fader(2.0)) // 0 .. +6db
+    Pvolume(48),
+    Ppan(64),
+    Ptime(64),
+    Pidelay(40),
+    Pidelayfb(0),
+    Prdelay(0),
+    Perbalance(64),
+    Plpf(127),
+    Phpf(0),
+    Plohidamp(80),
+    Ptype(1),
+    Proomsize(64),
+    Pbandwidth(30),
+    roomsize(1.0),
+    rs(1.0),
+    bandwidth(NULL),
+    idelay(NULL),
+    lpf(NULL),
+    hpf(NULL), // no filter
+    buffersize(zynMaster->getBuffersize())
 {
     inputbuf = new float[buffersize];
     for (int i = 0; i < REV_COMBS * 2; ++i)
@@ -154,7 +155,7 @@ void Reverb::processMono(int ch, float *output)
         {
             tmp = ap[j][ak];
             ap[j][ak] = 0.7 * tmp + output[i];
-            output[i] = tmp - 0.7 * ap[j][ak] - 1e-20f; // anti-denormal -
+            output[i] = tmp - 0.7 * ap[j][ak] + 1e-20f; // anti-denormal -
                                                         // a very, very, very
                                                         // small dc bias
             if ((++ak) >= aplength)
@@ -185,6 +186,9 @@ void Reverb::out(float *smps_l, float *smps_r)
         }
     }
 
+    if (bandwidth)
+        bandwidth->process(buffersize, inputbuf);
+
     if (lpf != NULL)
         lpf->filterOut(inputbuf);
     if (hpf != NULL)
@@ -210,15 +214,12 @@ void Reverb::out(float *smps_l, float *smps_r)
 
 // Parameter control
 
-void Reverb::setVolume(unsigned char &Pvolume)
+void Reverb::setVolume(unsigned char Pvolume_)
 {
-    this->Pvolume = Pvolume;
+    Pvolume = Pvolume_;
     if (insertion == 0)
     {
-        if (NULL != fader6db)
-            outvolume = fader6db->Level(Pvolume);
-        else
-            outvolume = 1.0;
+        outvolume = pow(0.01, (1.0 - Pvolume / 127.0)) * 4.0;
         volume = 1.0;
     }
     else
@@ -230,15 +231,15 @@ void Reverb::setVolume(unsigned char &Pvolume)
 }
 
 
-void Reverb::setPan(unsigned char &Ppan)
+void Reverb::setPan(unsigned char Ppan_)
 {
-    this->Ppan = Ppan;
+    Ppan = Ppan_;
     pan = (float)Ppan / 127.0f;
 }
 
-void Reverb::setTime(unsigned char &Ptime)
+void Reverb::setTime(unsigned char Ptime_)
 {
-    this->Ptime = Ptime;
+    Ptime = Ptime_;
     float t = powf(60.0, Ptime / 127.0) - 0.97;
     float samplerate_f = zynMaster->getSamplerate();
     for (int i = 0; i < REV_COMBS * 2; ++i)
@@ -246,9 +247,9 @@ void Reverb::setTime(unsigned char &Ptime)
         // the feedback is negative because it removes the DC
 }
 
-void Reverb::setLoHiDamp(unsigned char Plohidamp)
+void Reverb::setLoHiDamp(unsigned char Plohidamp_)
 {
-    this->Plohidamp = (Plohidamp < 64) ? 64 : Plohidamp;
+    Plohidamp = (Plohidamp_ < 64) ? 64 : Plohidamp_;
                        // remove this when the high part from lohidamp is added
     if (Plohidamp == 64)             
     {
@@ -266,9 +267,9 @@ void Reverb::setLoHiDamp(unsigned char Plohidamp)
     }
 }
 
-void Reverb::setIdelay(unsigned char &Pidelay)
+void Reverb::setIdelay(unsigned char Pidelay_)
 {
-    this->Pidelay = Pidelay;
+    Pidelay = Pidelay_;
     float delay = powf(50 * Pidelay / 127.0, 2) - 1.0;
 
     if (idelay != NULL)
@@ -284,15 +285,15 @@ void Reverb::setIdelay(unsigned char &Pidelay)
     }
 }
 
-void Reverb::setIdelayFb(unsigned char &Pidelayfb)
+void Reverb::setIdelayFb(unsigned char Pidelayfb_)
 {
-    this->Pidelayfb = Pidelayfb;
+    Pidelayfb = Pidelayfb_;
     idelayfb = Pidelayfb / 128.0;
 }
 
-void Reverb::setHpf(unsigned char &Phpf)
+void Reverb::setHpf(unsigned char Phpf_)
 {
-    this->Phpf = Phpf;
+    Phpf = Phpf_;
     if (Phpf == 0)
     {   // No HighPass
         if (hpf != NULL)
@@ -307,9 +308,9 @@ void Reverb::setHpf(unsigned char &Phpf)
     }
 }
 
-void Reverb::setLpf(unsigned char &Plpf)
+void Reverb::setLpf(unsigned char Plpf_)
 {
-    this->Plpf = Plpf;
+    Plpf = Plpf_;
     if (Plpf == 127)
     {   // No LowPass
         if (lpf != NULL)
@@ -324,20 +325,27 @@ void Reverb::setLpf(unsigned char &Plpf)
     }
 }
 
-void Reverb::setType(unsigned char Ptype)
+void Reverb::setType(unsigned char Ptype_)
 {
-    const int NUM_TYPES = 2;
-    int combtunings[NUM_TYPES][REV_COMBS] = {
-        { 0, 0, 0, 0, 0, 0, 0, 0 },                         // this is unused (for random)
-        { 1116, 1188, 1277, 1356, 1422, 1491, 1557, 1617 } // Freeverb by Jezar at Dreampoint
-    };
-    int aptunings[NUM_TYPES][REV_APS] = {
-        { 0, 0, 0, 0 },      // this is unused (for random)
-        { 225, 341, 441, 556 } // Freeverb by Jezar at Dreampoint
-    };
+    Ptype = Ptype_;
+    const int NUM_TYPES = 3;
+    if (Ptype >= NUM_TYPES)
+        Ptype = NUM_TYPES - 1;
 
-    Ptype = (Ptype >= NUM_TYPES) ? NUM_TYPES - 1 : Ptype;
-    this->Ptype = Ptype;
+    int combtunings[NUM_TYPES][REV_COMBS] = {
+        { 0, 0, 0, 0, 0, 0, 0, 0 }, // this is unused (for random)
+        
+        // Freeverb by Jezar at Dreampoint
+        { 1116, 1188, 1277, 1356, 1422, 1491, 1557, 1617 },
+        // duplicate of Freeverb by Jezar at Dreampoint
+        { 1116, 1188, 1277, 1356, 1422, 1491, 1557, 1617 }
+    };
+    
+    int aptunings[NUM_TYPES][REV_APS] = {
+        { 0, 0, 0, 0 },         // this is unused (for random)
+        { 225, 341, 441, 556 }, // Freeverb by Jezar at Dreampoint
+        { 225, 341, 441, 556 }  // duplicate of Freeverb by Jezar at Dreampoint
+    };
 
     float samplerate_adjust = zynMaster->getSamplerate() / 44100.0f;
     // adjust the combs according to the samplerate
@@ -382,13 +390,23 @@ void Reverb::setType(unsigned char Ptype)
         ap[i] = new float[aplen[i]];
         memset(ap[i], 0, aplen[i] * sizeof(float));
     }
+    if (NULL != bandwidth)
+        delete bandwidth;
+    bandwidth = NULL;
+    if (Ptype == 2)
+    { // bandwidth
+        bandwidth = new Unison(zynMaster->getSamplerate(), buffersize / 4 + 1, 2.0);
+        bandwidth->set_size(50);
+        bandwidth->set_base_frequency(1.0);
+#warning sa schimb size-ul
+    }
     setTime(Ptime);
     Cleanup();
 }
 
-void Reverb::setRoomsize(unsigned char &Proomsize)
+void Reverb::setRoomsize(unsigned char Proomsize_)
 {
-    this->Proomsize = Proomsize;
+    Proomsize = Proomsize_;
     if (Proomsize == 0)
         this->Proomsize = 64; // this is because the older versions consider roomsize=0
     roomsize = (this->Proomsize - 64.0) / 64.0;
@@ -399,37 +417,47 @@ void Reverb::setRoomsize(unsigned char &Proomsize)
     setType(Ptype);
 }
 
+
+void Reverb::setBandwidth(unsigned char Pbandwidth_)
+{
+    Pbandwidth = Pbandwidth_;
+    float v = Pbandwidth / 127.0;
+    if (NULL != bandwidth)
+        bandwidth->set_bandwidth(powf(v, 2.0) * 200.0);
+}
+
+
 void Reverb::setPreset(unsigned char npreset)
 {
-    const int PRESET_SIZE = 12;
+    const int PRESET_SIZE = 13;
     const int NUM_PRESETS = 13;
     unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
         // Cathedral1
-        { 80, 64, 63, 24, 0, 0, 0, 85, 5, 83, 1, 64 },
+        {80,  64,  63,  24,  0,  0,  0, 85,  5,  83,   1,  64,  20 },
         // Cathedral2
-        { 80, 64, 69, 35, 0, 0, 0, 127, 0, 71, 0, 64 },
+        {80,  64,  69,  35,  0,  0,  0, 127, 0,  71,   0,  64,  20 },
         // Cathedral3
-        { 80, 64, 69, 24, 0, 0, 0, 127, 75, 78, 1, 85 },
+        {80,  64,  69,  24,  0,  0,  0, 127, 75, 78,   1,  85,  20 },
         // Hall1
-        { 90, 64, 51, 10, 0, 0, 0, 127, 21, 78, 1, 64 },
+        {90,  64,  51,  10,  0,  0,  0, 127, 21, 78,   1,  64,  20 },
         // Hall2
-        { 90, 64, 53, 20, 0, 0, 0, 127, 75, 71, 1, 64 },
+        {90,  64,  53,  20,  0,  0,  0, 127, 75, 71,   1,  64,  20 },
         // Room1
-        { 100, 64, 33, 0, 0, 0, 0, 127, 0, 106, 0, 30 },
+        {100, 64,  33,  0,   0,  0,  0, 127, 0,  106,  0,  30,  20 },
         // Room2
-        { 100, 64, 21, 26, 0, 0, 0, 62, 0, 77, 1, 45 },
+        {100, 64,  21,  26,  0,  0,  0, 62,  0,  77,   1,  45,  20 },
         // Basement
-        { 110, 64, 14, 0, 0, 0, 0, 127, 5, 71, 0, 25 },
+        {110, 64,  14,  0,   0,  0,  0, 127, 5,  71,   0,  25,  20 },
         // Tunnel
-        { 85, 80, 84, 20, 42, 0, 0, 51, 0, 78, 1, 105 },
+        {85,  80,  84,  20,  42, 0,  0, 51,  0,  78,   1,  105, 20 },
         // Echoed1
-        { 95, 64, 26, 60, 71, 0, 0, 114, 0, 64, 1, 64 },
+        {95,  64,  26,  60,  71, 0,  0, 114, 0,  64,   1,  64,  20 },
         // Echoed2
-        { 90, 64, 40, 88, 71, 0, 0, 114, 0, 88, 1, 64 },
+        {90,  64,  40,  88,  71, 0,  0, 114, 0,  88,   1,  64,  20 },
         // VeryLong1
-        { 90, 64, 93, 15, 0, 0, 0, 114, 0, 77, 0, 95 },
+        {90,  64,  93,  15,  0,  0,  0, 114, 0,  77,   0,  95,  20 },
         // VeryLong2
-        { 90, 64, 111, 30, 0, 0, 0, 114, 90, 74, 1, 80 }
+        {90,  64,  111, 30,  0,  0,  0, 114, 90, 74,   1,  80,  20 }
     };
 
     if (npreset >= NUM_PRESETS)
@@ -480,6 +508,9 @@ void Reverb::changePar(int npar, unsigned char value)
         case 11:
             setRoomsize(value);
             break;
+        case 12:
+            setBandwidth(value);
+            break;
     }
 }
 
@@ -501,8 +532,8 @@ unsigned char Reverb::getPar(int npar) const
         case 9:  return Plohidamp;
         case 10: return Ptype;
         case 11: return Proomsize;
-        default:
-            break;
+        case 12: return Pbandwidth;
+        default: break;
     }
     return 0; // in case of bogus "parameter"
 }

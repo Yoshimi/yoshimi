@@ -139,7 +139,6 @@ void JackEngine::Stop(void)
 void JackEngine::Close(void)
 {
     Stop();
-    MusicIO::Close();
     int chk;
     if (NULL != jackClient)
     {
@@ -170,7 +169,7 @@ void JackEngine::Close(void)
     if (!midi.semName.empty() && (chk = sem_unlink(midi.semName.c_str())))
         cerr << "Error, failed to unlink jack midi semaphore "
              << midi.semName << strerror(errno) << endl;
-
+    MusicIO::Close();
 }
 
 
@@ -275,7 +274,7 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
 {
     if (NULL != audio.ports[0] && NULL != audio.ports[1])
     {
-        if (NULL != zynMaster && !muted)
+        if (NULL != zynMaster)
         {
             for (int port = 0; port < 2; ++port)
             {
@@ -332,7 +331,7 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
     {
         if(!jack_midi_event_get(&jEvent, portBuf, idx))
         {
-            if (jEvent.size > 0 && jEvent.size <= midi.maxdata && !muted)
+            if (jEvent.size > 0 && jEvent.size <= midi.maxdata)
             {   // no interest in 0 size or long events
                 for (byt = 0; byt < jEvent.size; ++byt)
                     midi.data[byt] = jEvent.buffer[byt];

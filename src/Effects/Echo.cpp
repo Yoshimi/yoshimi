@@ -36,8 +36,7 @@ Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_) :
     Phidamp(60),
     lrdelay(0),
     ldelay(NULL),
-    rdelay(NULL),
-    fader6db(new Fader(2.0))
+    rdelay(NULL)
 {
     setPreset(Ppreset);
     Cleanup();
@@ -121,10 +120,7 @@ void Echo::setVolume(unsigned char value)
     Pvolume = value;
     if (insertion == 0)
     {
-        if (NULL != fader6db)
-            outvolume = fader6db->Level(Pvolume);
-        else
-            outvolume = powf(0.01, (1.0 - Pvolume / 127.0)) * 4.0;
+        outvolume = powf(0.01, (1.0 - Pvolume / 127.0)) * 4.0;
         volume = 1.0;
     }
     else

@@ -27,8 +27,7 @@ using namespace std;
 MusicIO::MusicIO() :
     zynLeft(NULL),
     zynRight(NULL),
-    interleavedShorts(NULL),
-    muted(false)
+    interleavedShorts(NULL)
 { }
 
 

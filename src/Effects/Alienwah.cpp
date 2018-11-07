@@ -30,8 +30,7 @@ using namespace std;
 Alienwah::Alienwah(bool insertion_, float *efxoutl_, float *efxoutr_) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
     oldl(NULL),
-    oldr(NULL),
-    fader0db(new Fader(1.0)) // 0 .. +0db
+    oldr(NULL)
 {
     setPreset(Ppreset);
     Cleanup();
@@ -129,10 +128,7 @@ void Alienwah::setFb(unsigned char _fb)
 void Alienwah::setVolume(unsigned char _volume)
 {
     Pvolume = _volume;
-    if (NULL != fader0db)
-        outvolume = fader0db->Level(Pvolume);
-    else
-        outvolume = Pvolume / 127.0;
+    outvolume = Pvolume / 127.0;
     if (insertion == 0)
         volume = 1.0;
     else

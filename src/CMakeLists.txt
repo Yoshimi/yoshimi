@@ -20,7 +20,7 @@ project(Yoshimi)
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(VERSION 2.6)
 cmake_policy(SET CMP0004 OLD)
-set(YOSHIMI_VERSION "0.045")
+set(YOSHIMI_VERSION "0.047")
 FILE(WRITE version.txt "${YOSHIMI_VERSION}")
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -186,14 +186,14 @@ endif(X86_64_BUILD)
 
 set (DSP_sources
     DSP/FFTwrapper.cpp  DSP/AnalogFilter.cpp  DSP/FormantFilter.cpp 
-    DSP/SVFilter.cpp  DSP/Filter.cpp
+    DSP/SVFilter.cpp  DSP/Filter.cpp DSP/Unison.cpp
 )
 
 set(Effects_sources 
     Effects/Alienwah.cpp  Effects/Chorus.cpp  Effects/Echo.cpp
     Effects/Effect.cpp  Effects/EffectLFO.cpp  Effects/EffectMgr.cpp
     Effects/Phaser.cpp  Effects/Reverb.cpp  Effects/EQ.cpp
-    Effects/Distorsion.cpp  Effects/DynamicFilter.cpp  Effects/Fader.cpp
+    Effects/Distorsion.cpp  Effects/DynamicFilter.cpp
 )
 
 set(Misc_sources

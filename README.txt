@@ -6,6 +6,8 @@ See INSTALL for instructions.
 Bon apetite.
 ------------
 Changes
+0.047 tidy a couple of minor issues on record and control change muting
+0.046 re that subtly disturbing but oh so subtle difference in sound.
 0.045 use pthread for managing SCHED_FIFO on threads
 0.044 add alsa period size & samplerate control, and auto-record
 0.039 - 0.043 dismissed as unfortunate medical outcomes

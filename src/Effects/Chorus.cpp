@@ -30,8 +30,7 @@ using namespace std;
 #include "Effects/Chorus.h"
 
 Chorus::Chorus(bool insertion_, float *const efxoutl_, float *efxoutr_) :
-    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
-    fader0db(new Fader(1.0))
+    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0)
 {
     dlk = drk = 0;
     maxdelay = (int)(MAX_CHORUS_DELAY / 1000.0 * zynMaster->getSamplerate());
@@ -163,11 +162,11 @@ void Chorus::setFb(unsigned char Pfb)
 void Chorus::setVolume(unsigned char Pvolume)
 {
     this->Pvolume = Pvolume;
-    if (NULL != fader0db)
-        outvolume = fader0db->Level(Pvolume);
+    outvolume = Pvolume / 127.0;
+    if (insertion == 0)
+        volume = 1.0;
     else
-        outvolume = Pvolume / 127.0;
-    volume = (!insertion) ? 1.0 : outvolume;
+        volume = outvolume;
 }
 
 

@@ -25,7 +25,6 @@
 #define ECHO_H
 
 #include "Effects/Effect.h"
-#include "Effects/Fader.h"
 
 class Echo : public Effect
 {
@@ -69,7 +68,6 @@ class Echo : public Effect
         float  oldl, oldr; // pt. lpf
 
         int kl, kr;
-        Fader *fader6db;
 };
 
 #endif

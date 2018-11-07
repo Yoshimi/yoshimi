@@ -101,7 +101,6 @@ bail_out:
 void AlsaEngine::Close(void)
 {
     Stop();
-    MusicIO::Close();
     if (audio.handle != NULL)
         alsaBad(snd_pcm_close(audio.handle), "close pcm failed");
     audio.handle = NULL;
@@ -109,6 +108,7 @@ void AlsaEngine::Close(void)
         if (snd_seq_close(midi.handle) < 0)
             cerr << "Error closing Alsa midi connection" << endl;
     midi.handle = NULL;
+    MusicIO::Close();
 }
 
 

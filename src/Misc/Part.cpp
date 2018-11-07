@@ -36,8 +36,7 @@ Part::Part(Microtonal *microtonal_, FFTwrapper *fft_) :
     killallnotes(false),
     microtonal(microtonal_),
     fft(fft_),
-    buffersize(zynMaster->getBuffersize()),
-    volControl(new Fader(2.0))
+    buffersize(zynMaster->getBuffersize())
 {
     partoutl = new float [buffersize];
     memset(partoutl, 0, buffersize * sizeof(float));
@@ -1013,10 +1012,7 @@ void Part::ComputePartSmps(void)
 void Part::setPvolume(char value)
 {
     Pvolume = value;
-    if (NULL != volControl)
-        volume = volControl->Level(value) * ctl.expression.relvolume;
-    else
-        cerr << "Error, null Fader!" << endl;
+    volume  = dB2rap((Pvolume - 96.0) / 96.0 * 40.0) * ctl.expression.relvolume;
 }
 
 

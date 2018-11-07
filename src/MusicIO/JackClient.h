@@ -55,8 +55,6 @@ class JackClient : public MusicClient
         bool setRecordOverwrite(string& errmsg)
             { return jackEngine.SetWavOverwrite(errmsg); };
         string wavFilename(void) { return jackEngine.WavFilename(); };
-        void Mute(void) { jackEngine.Mute(); };
-        void unMute(void) { jackEngine.unMute(); };
 
     private:
         JackEngine jackEngine;

@@ -37,8 +37,6 @@ class MusicIO
         virtual bool Start(void) = 0;
         virtual void Stop(void) = 0;
         virtual void Close(void);
-        void Mute(void) { muted = true; };
-        void unMute(void) { muted = false; };
 
         inline void StartRecord(void) { Recorder.Start(); };
         void StopRecord(void);
@@ -62,7 +60,6 @@ class MusicIO
         jsample_t *zynLeft;
         jsample_t *zynRight;
         short int *interleavedShorts;
-        bool muted;
 
     private:
         WavRecord Recorder;

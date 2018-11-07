@@ -247,12 +247,12 @@ class WidgetPDial {: {public Fl_Dial}
 
         // draws the max and min points
         pdialcolor(0, 100, 200);
-        int xp = (int)(cx + sx / 2.0 + sx / 2.0 * sinf(angle1() / 180.0 * 3.141592));
-        int yp = (int)(cy + sy / 2.0 + sy / 2.0 * cosf(angle1() / 180.0 * 3.141592));
+        int xp = (int)(cx + sx / 2.0 + sx / 2.0 * sinf(angle1() / 180.0 * PI));
+        int yp = (int)(cy + sy / 2.0 + sy / 2.0 * cosf(angle1() / 180.0 * PI));
         fl_pie(xp - 2, yp - 2, 4, 4, 0, 360);
 
-        xp = (int)(cx + sx / 2.0 + sx / 2.0 * sinf(angle2() / 180.0 * 3.141592));
-        yp = (int)(cy + sy / 2.0 + sy / 2.0 * cosf(angle2() / 180.0 * 3.141592));
+        xp = (int)(cx + sx / 2.0 + sx / 2.0 * sinf(angle2() / 180.0 * PI));
+        yp = (int)(cy + sy / 2.0 + sy / 2.0 * cosf(angle2() / 180.0 * PI));
         fl_pie(xp - 2, yp - 2, 4, 4, 0, 360);
 
         fl_push_matrix();

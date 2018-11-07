@@ -30,13 +30,11 @@
 typedef jack_default_audio_sample_t jsample_t;
 
 #include "Effects/EffectMgr.h"
-#include "Effects/Fader.h"
 #include "Misc/Part.h"
 #include "Misc/Microtonal.h"
 #include "Misc/Bank.h"
 #include "Misc/XMLwrapper.h"
 #include "Misc/Util.h"
-//#include "MusicIO/MusicIO.h"
 
 typedef enum { init, trylock, lock, unlock, lockmute, destroy } lockset;
 
@@ -52,6 +50,8 @@ class Master {
         bool Init(unsigned int sample_rate, int buffer_size, int oscil_size,
                   string params_file, string instrument_file);
         bool actionLock(lockset request);
+        inline void Mute(void) { muted = true; };
+        inline void unMute(void) { muted = false; };
         bool vupeakLock(lockset request);
 
         bool saveXML(string filename);
@@ -130,6 +130,7 @@ class Master {
         unsigned int samplerate;
         int buffersize;
         int oscilsize;
+        bool muted;
 
         pthread_mutex_t  processMutex;
         pthread_mutex_t *processLock;
@@ -142,8 +143,6 @@ class Master {
         float *tmpmixl; // Temporary mixing samples for part samples
         float *tmpmixr; // which are sent to system effect
         int keyshift;
-
-        Fader *volControl;
 
         float vuoutpeakl;
         float vuoutpeakr;

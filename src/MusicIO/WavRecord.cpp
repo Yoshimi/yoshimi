@@ -138,7 +138,7 @@ bail_out:
     if (NULL != tferBuf)
         delete [] tferBuf;
     tferBuf = NULL;
-    if (!recordFifo.empty() && isFifo(recordFifo))
+    if (!recordFifo.empty())
         unlink(recordFifo.c_str());
     recordFifo.clear();
     return false;
@@ -195,6 +195,24 @@ void WavRecord::Close(void)
         interleavedFloats = NULL;
     }
     recordState = nada;
+    if (NULL != toFifo)
+    {
+        if (fclose(toFifo))
+            cerr << "Error closing fifo feed: " << string(strerror(errno)) << endl;
+        toFifo = NULL;
+    }
+    if (NULL != fromFifoSndfle)
+    {
+        if (sf_close(fromFifoSndfle))
+            cerr << "Error closing fifo read sndfle: "
+                 << string(sf_strerror(fromFifoSndfle)) << endl;
+        fromFifoSndfle = NULL;
+    }
+    if (!recordFifo.empty())
+        unlink(recordFifo.c_str());
+    else
+        cerr << "Ooops, recordFifo is empty at unlink time" << endl;
+    recordFifo.clear();
 }
 
 
@@ -366,6 +384,7 @@ void *WavRecord::recorderThread(void)
                 cerr << "Error, dodgy read from recordFifo, read "
                      << samplesRead << " of " << tferSamples << " frames" << endl;
             }
+            pthread_testcancel();
             if (samplesRead > 0)
             {
                 wroteSamples = sf_write_float(wavOutsnd, tferBuf, samplesRead);
@@ -388,20 +407,6 @@ void WavRecord::_cleanup(void *arg)
 
 void WavRecord::cleanup(void)
 {
-    recordState = nada;
-    if (NULL != toFifo)
-    {
-        if (fclose(toFifo))
-            cerr << "Error closing fifo feed: " << string(strerror(errno)) << endl;
-        toFifo = NULL;
-    }
-    if (NULL != fromFifoSndfle)
-    {
-        if (sf_close(fromFifoSndfle))
-            cerr << "Error closing fifo read sndfle: "
-                 << string(sf_strerror(fromFifoSndfle)) << endl;
-        fromFifoSndfle = NULL;
-    }
     if (NULL != wavOutsnd)
     {
         if (sf_close(wavOutsnd))
@@ -411,9 +416,6 @@ void WavRecord::cleanup(void)
             recordLog("Close");
         wavOutsnd = NULL;
     }
-    if (!recordFifo.empty() && isFifo(recordFifo))
-        unlink(recordFifo.c_str());
-    recordFifo.clear();
 }
 
 

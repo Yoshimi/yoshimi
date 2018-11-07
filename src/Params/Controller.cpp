@@ -32,7 +32,6 @@ using namespace std;
 
 Controller::Controller()
 {
-    volume.volControl = new Fader(1.0); // 0 .. 1.0
     setDefaults();
     resetAll();
 }
@@ -180,15 +179,10 @@ void Controller::setFmAmp(int value)
 void Controller::setVolume(int value)
 {
     volume.data = value;
-    if (NULL != volume.volControl)
-    {
-        if (volume.receive != 0 && value >= 0 && value < 128)
-            volume.volume = volume.volControl->Level(value);
-        else
-            volume.volume = 1.0;
-    }
+    if (volume.receive != 0)
+        volume.volume = powf(0.1, (127 - value) / 127.0 * 2.0);
     else
-        cerr << "Error, null Controller Fader" << endl;
+        volume.volume = 1.0;
 }
 
 void Controller::setSustain(int value)

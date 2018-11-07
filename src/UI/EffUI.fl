@@ -357,10 +357,11 @@ refresh(eff);}
         tooltip {Initial Delay Feedback} xywh {155 40 30 30} box ROUND_UP_BOX labelfont 1 labelsize 11 maximum 127
         class WidgetPDial
       }
-      Fl_Dial revp5 {
-        label {R.delay}
-        callback {eff->setEffectPar(5,(int) o->value());}
+      Fl_Dial revp12 {
+        label bw
+        callback {eff->setEffectPar(12,(int) o->value());}
         xywh {200 40 30 30} box ROUND_UP_BOX labelfont 1 labelsize 11 when 4 maximum 127 deactivate
+        code0 {if (eff->getEffectPar(10) == 2) o->activate();}
         class WidgetPDial
       }
       Fl_Dial revp6 {
@@ -1350,13 +1351,14 @@ refresh(eff);} {}
                 revp2->value(eff->getEffectPar(2));
                 revp3->value(eff->getEffectPar(3));
                 revp4->value(eff->getEffectPar(4));
-                revp5->value(eff->getEffectPar(5));
+                //revp5->value(eff->getEffectPar(5));
                 revp6->value(eff->getEffectPar(6));
                 revp7->value(eff->getEffectPar(7));
                 revp8->value(eff->getEffectPar(8));
                 revp9->value(eff->getEffectPar(9));
                 revp10->value(eff->getEffectPar(10));
                 revp11->value(eff->getEffectPar(11));
+                revp12->value(eff->getEffectPar(12));
                 effreverbwindow->show();
                 break;
              case 2:
@@ -1448,6 +1450,12 @@ refresh(eff);} {}
                 bandcounter->do_callback();
                 typechoice->value(eff->getEffectPar(10));
                 eqgraph->redraw();
+                freqdial->value(eff->getEffectPar(11));
+                gaindial->value(eff->getEffectPar(12));
+                if (eff->getEffectPar(10) < 6)
+                    gaindial->deactivate();
+                qdial->value(eff->getEffectPar(13));
+                stagescounter->value(eff->getEffectPar(14));
                 freqdial->value(eff->getEffectPar(11));
                 gaindial->value(eff->getEffectPar(12));
                 if (eff->getEffectPar(10) < 6)

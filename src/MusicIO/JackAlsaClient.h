@@ -61,8 +61,6 @@ class JackAlsaClient : public MusicClient
             { return jackEngine.SetWavOverwrite(errmsg); };
         string wavFilename(void)
             { return jackEngine.WavFilename(); };
-        void Mute(void) { jackEngine.Mute(); alsaEngine.Mute(); };
-        void unMute(void) { jackEngine.unMute(); alsaEngine.Mute(); };
 
     private:
         JackEngine jackEngine;

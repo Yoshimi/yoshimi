@@ -39,7 +39,6 @@ using namespace std;
 #include "DSP/FFTwrapper.h"
 #include "Effects/EffectMgr.h"
 #include "Misc/XMLwrapper.h"
-#include "Effects/Fader.h"
 
 #define MAX_INFO_TEXT_SIZE 1000
 
@@ -200,7 +199,6 @@ class Part
         Microtonal *microtonal;
         FFTwrapper *fft;
         int buffersize;
-        Fader *volControl;
 };
 
 #endif

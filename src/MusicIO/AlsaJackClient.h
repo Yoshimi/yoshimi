@@ -55,8 +55,6 @@ class AlsaJackClient : public MusicClient
         bool setRecordOverwrite(string& errmsg)
             { return alsaEngine.SetWavOverwrite(errmsg); };
         string wavFilename(void) { return alsaEngine.WavFilename(); };
-        void Mute(void) { alsaEngine.Mute(); jackEngine.Mute(); };
-        void unMute(void) { alsaEngine.unMute(); jackEngine.unMute(); };
 
     private:
         AlsaEngine alsaEngine;

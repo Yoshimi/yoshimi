@@ -39,10 +39,10 @@ Master::Master() :
     samplerate(0),
     buffersize(0),
     oscilsize(0),
+    muted(false),
     processLock(NULL),
     tmpmixl(NULL),
-    tmpmixr(NULL),
-    volControl(new Fader(2.0)) // 2.0 => 0 .. +6db gain)
+    tmpmixr(NULL)
 {
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         part[npart] = NULL;
@@ -147,11 +147,6 @@ bool Master::Init(unsigned int sample_rate, int buffer_size, int oscil_size,
             goto bail_out;
         }
     }
-    if (NULL == volControl)
-    {
-        cerr << "Failed to allocate new VolumeControl" << endl;
-        goto bail_out;
-    }
     setDefaults();
 
     if (!params_file.empty())
@@ -243,11 +238,11 @@ bool Master::actionLock(lockset request)
 
             case unlock:
                 chk = pthread_mutex_unlock(processLock);
-                musicClient->unMute();
+                muted = false;
                 break;
 
             case lockmute:
-                musicClient->Mute();
+                muted = true;
                 chk = pthread_mutex_lock(processLock);
                 break;
 
@@ -294,7 +289,6 @@ bool Master::vupeakLock(lockset request)
                 break;
 
             case lockmute:
-                musicClient->Mute();
                 chk = pthread_mutex_lock(processLock);
                 break;
 
@@ -356,7 +350,7 @@ void Master::NoteOn(unsigned char chan, unsigned char note,
 {
     if (!velocity)
         this->NoteOff(chan, note);
-    else
+    else if (!muted)
     {
         if (Runtime.settings.showGui)
         {
@@ -472,10 +466,13 @@ void Master::MasterAudio(jsample_t *outl, jsample_t *outr)
     // Clean up the output samples
     memset(outl, 0, buffersize * sizeof(jsample_t));
     memset(outr, 0, buffersize * sizeof(jsample_t));
-    actionLock(lock);
+
+    if (muted)
+        return;
 
     // Compute part samples and store them npart]->partoutl,partoutr
     int npart;
+    actionLock(lock);
     for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         if (part[npart]->Penabled)
             part[npart]->ComputePartSmps();
@@ -702,7 +699,7 @@ void Master::MasterAudio(jsample_t *outl, jsample_t *outr)
 void Master::setPvolume(char control_value)
 {
     Pvolume = control_value;
-    volume = volControl->Level(Pvolume);
+    volume  = dB2rap((Pvolume - 96.0) / 96.0 * 40.0);
 }
 
 
@@ -716,16 +713,14 @@ void Master::setPkeyshift(char Pkeyshift_)
 void Master::setPsysefxvol(int Ppart, int Pefx, char Pvol)
 {
     Psysefxvol[Pefx][Ppart] = Pvol;
-    //sysefxvol[Pefx][Ppart] = powf(0.1, (1.0 - Pvol / 96.0) * 2.0);
-    sysefxvol[Pefx][Ppart] = volControl->Level(Pvol);
+    sysefxvol[Pefx][Ppart]  = powf(0.1, (1.0 - Pvol / 96.0) * 2.0);
 }
 
 
 void Master::setPsysefxsend(int Pefxfrom, int Pefxto, char Pvol)
 {
     Psysefxsend[Pefxfrom][Pefxto] = Pvol;
-    //sysefxsend[Pefxfrom][Pefxto] = powf(0.1, (1.0 - Pvol / 96.0) * 2.0);
-    sysefxsend[Pefxfrom][Pefxto] = volControl->Level(Pvol);
+    sysefxsend[Pefxfrom][Pefxto]  = powf(0.1, (1.0 - Pvol / 96.0) * 2.0);
 }
 
 

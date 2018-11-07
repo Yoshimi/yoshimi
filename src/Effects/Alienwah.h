@@ -30,7 +30,6 @@ using namespace std;
 
 #include "Effects/Effect.h"
 #include "Effects/EffectLFO.h"
-#include "Effects/Fader.h"
 
 #define MAX_ALIENWAH_DELAY 100
 
@@ -72,7 +71,6 @@ class Alienwah : public Effect
         complex<float> *oldl, *oldr;
         complex<float> oldclfol, oldclfor;
         int oldk;
-        Fader *fader0db;
 
 };
 
