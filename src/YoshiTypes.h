@@ -1,5 +1,5 @@
 /*
-    AlsaClient.cpp - Alsa audio / Alsa midi
+    YoshiTypes.h
 
     Copyright 2009, Alan Calvert
 
@@ -17,29 +17,12 @@
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
+#ifndef YOSHI_TYPES_H
+#define YOSHI_TYPES_H
 
-using namespace std;
+typedef enum { no_audio = 0, jack_audio, alsa_audio, } audio_drivers;
+typedef enum { no_midi = 0, jack_midi, alsa_midi, } midi_drivers;
 
-#include "Misc/Config.h"
-#include "MusicIO/AlsaClient.h"
+typedef enum { nada = 0, ready, recording, } record_state;
 
-bool AlsaClient::openAudio(void)
-{
-    if (alsaEngine.openAudio())
-    {
-        Runtime.settings.Samplerate = getSamplerate();
-        Runtime.settings.Buffersize = getBuffersize();
-        return true;
-    }
-    cerr << "Error, AlsaClient audio open failed" << endl;
-    return false;
-}
-
-bool AlsaClient::openMidi(void)
-{
-    if (alsaEngine.openMidi())
-        return true;
-    cerr << "Error, AlsaClient midi open failed" << endl;
-    return false;
-}
+#endif

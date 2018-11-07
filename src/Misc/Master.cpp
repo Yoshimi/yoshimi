@@ -78,8 +78,8 @@ Master::~Master()
 bool Master::Init(unsigned int sample_rate, int buffer_size, int oscil_size,
                   string params_file, string instrument_file)
 {
-    samplerate = runtime.settings.Samplerate = sample_rate;
-    buffersize = runtime.settings.Buffersize = buffer_size;
+    samplerate = Runtime.settings.Samplerate = sample_rate;
+    buffersize = Runtime.settings.Buffersize = buffer_size;
     if (oscil_size < (buffersize / 2))
     {
         cerr << "Enforcing oscilsize adjustment to half buffersize, "
@@ -96,14 +96,7 @@ bool Master::Init(unsigned int sample_rate, int buffer_size, int oscil_size,
         cerr << "Error, actionLock init failed" << endl;
         goto bail_out;
     }
-
-    if (!muteLock(init))
-    {
-        cerr << "Error, muteLock init failed" << endl;
-        goto bail_out;
-    }
-
-    if (runtime.settings.showGui && !vupeakLock(init))
+    if (Runtime.settings.showGui && !vupeakLock(init))
     {
         cerr << "Error, meterLock init failed" << endl;
         goto bail_out;
@@ -171,7 +164,7 @@ bool Master::Init(unsigned int sample_rate, int buffer_size, int oscil_size,
         else
         {
             zynMaster->applyParameters();
-            if (runtime.settings.verbose)
+            if (Runtime.settings.verbose)
                 cerr << "Master file " << params_file << " loaded" << endl;
         }
     }
@@ -186,7 +179,7 @@ bool Master::Init(unsigned int sample_rate, int buffer_size, int oscil_size,
         else
         {
             zynMaster->part[loadtopart]->applyParameters();
-            if (runtime.settings.verbose)
+            if (Runtime.settings.verbose)
                 cerr << "Instrument file " << instrument_file << " loaded" << endl;
         }
     }
@@ -225,10 +218,10 @@ bail_out:
 
 bool Master::actionLock(lockset request)
 {
-    bool ok = false;
+    int chk  = -1;
     if (request == init)
     {
-        if ((ok = !pthread_mutex_init(&processMutex, NULL)))
+        if (!(chk = pthread_mutex_init(&processMutex, NULL)))
             processLock = &processMutex;
         else
         {
@@ -236,41 +229,47 @@ bool Master::actionLock(lockset request)
             processLock = NULL;
         }
     }
-    else // if (NULL != processLock)
+    else if (NULL != processLock)
     {
         switch (request)
         {
             case trylock:
-                ok = !pthread_mutex_trylock(processLock);
+                chk = pthread_mutex_trylock(processLock);
                 break;
 
             case lock:
-                ok = !pthread_mutex_lock(processLock);
+                chk = pthread_mutex_lock(processLock);
                 break;
 
             case unlock:
-                ok = !pthread_mutex_unlock(processLock);
+                chk = pthread_mutex_unlock(processLock);
+                musicClient->unMute();
+                break;
+
+            case lockmute:
+                musicClient->Mute();
+                chk = pthread_mutex_lock(processLock);
                 break;
 
             case destroy:
                 pthread_mutex_destroy(&processMutex);
-                ok = true;
+                chk = 0;
                 break;
 
             default:
                 break;
         }
     }
-    return ok;
+    return (chk == 0) ? true : false;
 }
 
 
 bool Master::vupeakLock(lockset request)
 {
-    bool ok = false;
+    int chk  = -1;
     if (request == init)
     {
-        if ((ok = !pthread_mutex_init(&meterMutex, NULL)))
+        if (!(chk = pthread_mutex_init(&meterMutex, NULL)))
             meterLock = &meterMutex;
         else
         {
@@ -278,80 +277,37 @@ bool Master::vupeakLock(lockset request)
             meterLock = NULL;
         }
     }
-    else // if (NULL != meterLock)
+    else if (NULL != meterLock)
     {
         switch (request)
         {
             case trylock:
-                ok = !pthread_mutex_trylock(meterLock);
+                chk = pthread_mutex_trylock(meterLock);
                 break;
 
             case lock:
-                ok = !pthread_mutex_lock(meterLock);
+                chk = pthread_mutex_lock(meterLock);
                 break;
 
             case unlock:
-                ok = !pthread_mutex_unlock(meterLock);
+                chk = pthread_mutex_unlock(meterLock);
+                break;
+
+            case lockmute:
+                musicClient->Mute();
+                chk = pthread_mutex_lock(processLock);
                 break;
 
             case destroy:
                 pthread_mutex_destroy(&meterMutex);
-                ok = true;
+                chk = 0;
                 break;
 
             default:
                 break;
         }
     }
-    return ok;
-}
-
-
-bool Master::muteLock(lockset request)
-{
-    bool ok = false;
-    if (request == init)
-    {
-        if (pthread_rwlockattr_init(&mute_attr))
-            cerr << "Error, failed to initialise mute rwlock attr" << endl;
-        else if (pthread_rwlockattr_setpshared(&mute_attr, PTHREAD_PROCESS_SHARED))
-            cerr << "Error, failed to set mute rwlock PTHREAD_PROCESS_SHARED" << endl;
-        else if (pthread_rwlock_init(&mute, &mute_attr))
-            cerr << "Error, failed to initialise mute rwlock" << endl;
-        else
-        {
-            muteRWLock = &mute;
-            ok = true;
-        }
-    }
-    else // if (NULL != muteRWLock)
-    {
-        switch (request)
-        {
-            case tryreadlock:
-                ok = !pthread_rwlock_tryrdlock(muteRWLock);
-                break;
-
-            case lock:
-                if (!pthread_rwlock_wrlock(muteRWLock))
-                    ok = actionLock(lock);
-                break;
-
-            case unlock:
-                if (!pthread_rwlock_unlock(muteRWLock))
-                    ok = actionLock(unlock);
-                break;
-
-            case destroy:
-                pthread_rwlock_destroy(&mute);
-                ok = true;
-                break;
-
-            default:
-                break;
-        }
-    }
-    return ok;
+    return (chk == 0) ? true : false;
 }
 
 
@@ -402,10 +358,13 @@ void Master::NoteOn(unsigned char chan, unsigned char note,
         this->NoteOff(chan, note);
     else
     {
-        if (runtime.settings.showGui)
+        if (Runtime.settings.showGui)
         {
             if (record_trigger && guiMaster->autorecordbutton->value())
             {
+
+                cerr << "auto start record" << endl;
+
                 zynMaster->actionLock(lock);
                 musicClient->startRecord();
                 zynMaster->actionLock(unlock);
@@ -590,13 +549,11 @@ void Master::MasterAudio(jsample_t *outl, jsample_t *outr)
                 continue;
 
             // the output volume of each part to system effect
-            //float vol = sysefxvol[nefx][npart];
+            float vol = sysefxvol[nefx][npart];
             for (int i = 0; i < buffersize; ++i)
             {
-            //    tmpmixl[i] += part[npart]->partoutl[i] * vol;
-            //    tmpmixr[i] += part[npart]->partoutr[i] * vol;
-                tmpmixl[i] += part[npart]->partoutl[i] * sysefxvol[nefx][npart];
-                tmpmixr[i] += part[npart]->partoutr[i] * sysefxvol[nefx][npart];
+                tmpmixl[i] += part[npart]->partoutl[i] * vol;
+                tmpmixr[i] += part[npart]->partoutr[i] * vol;
             }
         }
 
@@ -605,13 +562,11 @@ void Master::MasterAudio(jsample_t *outl, jsample_t *outr)
         {
             if (Psysefxsend[nefxfrom][nefx])
             {
-                //float v = sysefxsend[nefxfrom][nefx];
+                float v = sysefxsend[nefxfrom][nefx];
                 for (int i = 0; i < buffersize; ++i)
                 {
-                    tmpmixl[i] += sysefx[nefxfrom]->efxoutl[i]
-                                  * sysefxsend[nefxfrom][nefx];
-                    tmpmixr[i] += sysefx[nefxfrom]->efxoutr[i]
-                                  * sysefxsend[nefxfrom][nefx];
+                    tmpmixl[i] += sysefx[nefxfrom]->efxoutl[i] * v;
+                    tmpmixr[i] += sysefx[nefxfrom]->efxoutr[i] * v;
                 }
             }
         }
@@ -646,7 +601,7 @@ void Master::MasterAudio(jsample_t *outl, jsample_t *outr)
     LFOParams::time++; // update the LFO's time
     actionLock(unlock);
 
-    if (runtime.settings.showGui)
+    if (Runtime.settings.showGui)
     {
         zynMaster->vupeakLock(lock);
         vuoutpeakl = 1e-9;
@@ -661,7 +616,7 @@ void Master::MasterAudio(jsample_t *outl, jsample_t *outr)
     {
         // left
         sample = outl[idx] * volume; // Master Volume
-        if (runtime.settings.showGui)
+        if (Runtime.settings.showGui)
         {
             absval = fabsf(sample);
             if (absval > vuoutpeakl) // Peak computation (for vumeters)
@@ -677,7 +632,7 @@ void Master::MasterAudio(jsample_t *outl, jsample_t *outr)
 
         // right
         sample = outr[idx] * volume;
-        if (runtime.settings.showGui)
+        if (Runtime.settings.showGui)
         {
             absval = fabsf(sample);
             if (absval > vuoutpeakr)  // Peak computation (for vumeters)
@@ -702,7 +657,7 @@ void Master::MasterAudio(jsample_t *outl, jsample_t *outr)
     if (shutup)
         ShutUp();
 
-    if (runtime.settings.showGui)
+    if (Runtime.settings.showGui)
     {
         zynMaster->vupeakLock(lock);
         if (vumaxoutpeakl < vuoutpeakl)  vumaxoutpeakl = vuoutpeakl;

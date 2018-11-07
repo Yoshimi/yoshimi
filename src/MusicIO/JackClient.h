@@ -35,37 +35,28 @@ class JackClient : public MusicClient
 
         bool openAudio(void);
         bool openMidi(void);
-        bool Start(void)
-            { return jackEngine.Start(); };
+        bool Start(void) { return jackEngine.Start(); };
         void Stop(void) { };
-        void Close(void)
-            { jackEngine.Close(); };
+        void Close(void) { jackEngine.Close(); };
 
-        unsigned int getSamplerate(void)
-            { return jackEngine.getSamplerate(); };
-        int getBuffersize(void)
-            { return jackEngine.getBuffersize(); };
+        unsigned int getSamplerate(void) { return jackEngine.getSamplerate(); };
+        int getBuffersize(void) { return jackEngine.getBuffersize(); };
 
-        string audioClientName(void)
-            { return jackEngine.clientName(); };
-        string midiClientName(void)
-            { return jackEngine.clientName(); };
-        int audioClientId(void)
-            { return jackEngine.clientId(); };
-        int midiClientId(void)
-            { return jackEngine.clientId(); };
+        string audioClientName(void) { return jackEngine.clientName(); };
+        string midiClientName(void) { return jackEngine.clientName(); };
+        int audioClientId(void) { return jackEngine.clientId(); };
+        int midiClientId(void) { return jackEngine.clientId(); };
 
-        void startRecord(void)
-            { jackEngine.StartRecord(); };
-        void stopRecord(void)
-            { jackEngine.StopRecord(); };
+        void startRecord(void) { jackEngine.StartRecord(); };
+        void stopRecord(void) { jackEngine.StopRecord(); };
 
         bool setRecordFile(const char* fpath, string& errmsg)
             { return jackEngine.SetWavFile(fpath, errmsg); };
         bool setRecordOverwrite(string& errmsg)
             { return jackEngine.SetWavOverwrite(errmsg); };
-        string wavFilename(void)
-            { return jackEngine.WavFilename(); };
+        string wavFilename(void) { return jackEngine.WavFilename(); };
+        void Mute(void) { jackEngine.Mute(); };
+        void unMute(void) { jackEngine.unMute(); };
 
     private:
         JackEngine jackEngine;

@@ -23,12 +23,12 @@
 
 bool JackAlsaClient::openAudio(void)
 {
-    if (jackEngine.connectServer(runtime.settings.audioDevice))
+    if (jackEngine.connectServer(Runtime.settings.audioDevice))
     {
         if (jackEngine.openAudio())
         {
-            runtime.settings.Samplerate = getSamplerate();
-            runtime.settings.Buffersize = getBuffersize();
+            Runtime.settings.Samplerate = getSamplerate();
+            Runtime.settings.Buffersize = getBuffersize();
             return true;
         }
         else

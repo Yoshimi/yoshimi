@@ -39,10 +39,10 @@ MusicClient::MusicClient() :
 MusicClient *MusicClient::newMusicClient(void)
 {
     MusicClient *musicObj = NULL;
-    switch (runtime.settings.audioEngine)
+    switch (Runtime.settings.audioEngine)
     {
         case jack_audio:
-            switch (runtime.settings.midiEngine)
+            switch (Runtime.settings.midiEngine)
             {
                 case jack_midi:
                     if (NULL == (musicObj = new JackClient()))
@@ -61,7 +61,7 @@ MusicClient *MusicClient::newMusicClient(void)
             break;
 
         case alsa_audio:
-            switch (runtime.settings.midiEngine)
+            switch (Runtime.settings.midiEngine)
             {
                 case alsa_midi:
                     if (NULL == (musicObj = new AlsaClient()))

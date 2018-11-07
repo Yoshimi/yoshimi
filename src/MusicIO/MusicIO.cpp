@@ -27,11 +27,14 @@ using namespace std;
 MusicIO::MusicIO() :
     zynLeft(NULL),
     zynRight(NULL),
-    interleavedShorts(NULL)
+    interleavedShorts(NULL),
+    muted(false)
 { }
+
 
 MusicIO::~MusicIO()
 { }
+
 
 void MusicIO::Close(void)
 {
@@ -75,6 +78,29 @@ bool MusicIO::SetWavOverwrite(string& errmsg)
 bool MusicIO::WavIsFloat(void)
 {
     return Recorder.IsFloat();
+}
+
+
+ void MusicIO::getAudio(void)
+{
+    zynMaster->MasterAudio(zynLeft, zynRight);
+    if (Recorder.Running())
+        Recorder.Feed(zynLeft, zynRight);
+}
+
+
+void MusicIO::InterleaveShorts(void)
+{
+    int buffersize = getBuffersize();
+    int idx = 0;
+    double scaled;
+    for (int frame = 0; frame < buffersize; ++frame)
+    {   // with a grateful nod to libsamplerate ...
+        scaled = zynLeft[frame] * (8.0 * 0x10000000);
+        interleavedShorts[idx++] = (short int)(lrint(scaled) >> 16);
+        scaled = zynRight[frame] * (8.0 * 0x10000000);
+        interleavedShorts[idx++] = (short int)(lrint(scaled) >> 16);
+    }
 }
 
 
@@ -169,29 +195,6 @@ void MusicIO::setMidiNote(unsigned char channel, unsigned char note)
 }
 
 
-void MusicIO::getAudio(void)
-{
-    zynMaster->MasterAudio(zynLeft, zynRight);
-    if (Recorder.Running())
-        Recorder.Feed(zynLeft, zynRight);
-}
-
-
-void MusicIO::InterleaveShorts(void)
-{
-    int buffersize = getBuffersize();
-    int idx = 0;
-    double scaled;
-    for (int frame = 0; frame < buffersize; ++frame)
-    {   // with a grateful nod to libsamplerate ...
-        scaled = zynLeft[frame] * (8.0 * 0x10000000);
-        interleavedShorts[idx++] = (short int)(lrint(scaled) >> 16);
-        scaled = zynRight[frame] * (8.0 * 0x10000000);
-        interleavedShorts[idx++] = (short int)(lrint(scaled) >> 16);
-    }
-}
-
-
 bool MusicIO::prepBuffers(bool with_interleaved)
 {
     int buffersize = getBuffersize();
@@ -231,4 +234,50 @@ bail_out:
 bool MusicIO::prepRecord(void)
 {
     return Recorder.Prep(getSamplerate(), getBuffersize());
+}
+
+
+void MusicIO::setThreadAttribute(pthread_attr_t *attr)
+{
+    int chk;
+    sched_param prio;
+    prio.sched_priority = 50;
+    chk = pthread_attr_init(attr);
+    if (chk)
+    {
+        Runtime.settings.verbose
+            && cerr << "Error, failed to initialise audio thread attributes: "
+                    << chk << endl;
+    }
+    else
+    {
+        chk = pthread_attr_setdetachstate(attr, PTHREAD_CREATE_DETACHED);
+        if (chk)
+        {
+            Runtime.settings.verbose
+                && cerr << "Error, failed to set audio thread detach state: "
+                        << chk << endl;
+        }
+        else if (!(chk = pthread_attr_setschedpolicy(attr, SCHED_FIFO)))
+        {
+            if (!(chk = pthread_attr_setinheritsched(attr, PTHREAD_EXPLICIT_SCHED)))
+            {
+                chk = pthread_attr_setschedparam(attr, &prio);
+                if (chk)
+                {
+                    Runtime.settings.verbose
+                        && cerr << "Error, audio thread failed to set priority, "
+                                << strerror(errno) << " (" << chk << ")" << endl;
+                }
+            }
+            else
+                Runtime.settings.verbose
+                    && cerr << "Error, audio thread failed to set inherit scheduler: "
+                            << strerror(errno) << " (" << chk << ")" << endl;
+        }
+        else
+            Runtime.settings.verbose
+                && cerr << "Error, failed to set audio thread SCHED_FIFO: "
+                        << strerror(errno) << " (" << chk << ")" << endl;
+    }
 }

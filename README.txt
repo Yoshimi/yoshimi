@@ -6,7 +6,9 @@ See INSTALL for instructions.
 Bon apetite.
 ------------
 Changes
-0.039 record autostart added, xruns disciplined 2009-11-15
+0.045 use pthread for managing SCHED_FIFO on threads
+0.044 add alsa period size & samplerate control, and auto-record
+0.039 - 0.043 dismissed as unfortunate medical outcomes
 0.038 re-fix load parameters, flush record buffer at appropriate times, and
       attempt to reduce xrun impact of private moments (patch changes etc) 2009-11-12
 0.037 Yoshimi records 2009-011-11

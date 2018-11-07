@@ -21,6 +21,8 @@
 #ifndef MUSIC_IO_H
 #define MUSIC_IO_H
 
+#include <pthread.h>
+
 #include "Misc/Master.h"
 #include "MusicIO/WavRecord.h"
 
@@ -35,6 +37,8 @@ class MusicIO
         virtual bool Start(void) = 0;
         virtual void Stop(void) = 0;
         virtual void Close(void);
+        void Mute(void) { muted = true; };
+        void unMute(void) { muted = false; };
 
         inline void StartRecord(void) { Recorder.Start(); };
         void StopRecord(void);
@@ -49,11 +53,12 @@ class MusicIO
         void getAudio(void);
         void InterleaveShorts(void);
 
+        void setThreadAttribute(pthread_attr_t *attr);
+
         int getMidiController(unsigned char b);
         void setMidiController(unsigned char ch, unsigned int ctrl, int param);
         void setMidiNote(unsigned char chan, unsigned char note);
         void setMidiNote(unsigned char chan, unsigned char note, unsigned char velocity);
-
         jsample_t *zynLeft;
         jsample_t *zynRight;
         short int *interleavedShorts;

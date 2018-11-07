@@ -130,15 +130,6 @@ bool isFifo(string chkpath)
 }
 
 
-// try to get dreamtime priority
-void set_realtime(void)
-{
-    sched_param sc;
-    sc.sched_priority = 50;
-    sched_setscheduler(0, SCHED_FIFO, &sc);
-}
-
-
 string asString(const float& number)
 {
    ostringstream oss;

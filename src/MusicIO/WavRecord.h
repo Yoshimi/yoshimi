@@ -26,19 +26,22 @@
 
 using namespace std;
 
-typedef enum { nada = 0, ready, recording, } record_state;
+typedef enum { nada = 0, ready, recording } record_state;
 
 class WavRecord {
     public:
         WavRecord();
         ~WavRecord();
+
         bool Prep(unsigned int sample_rate, int buffer_size);
         void Start(void);
         void Stop(void);
         void Close(void);
+
         bool SetFile(string fpath, string& errmsg);
         bool SetOverwrite(string& errmsg);
         string Filename(void) { return wavFile; };
+
         bool IsFloat(void) { return float32bit; };
         void Feed(float* samples_left, float *samples_right);
         inline bool Running(void) { return (recordState == recording); };
@@ -51,6 +54,7 @@ class WavRecord {
         void cleanup(void);
         void recordLog(string tag);
 
+        record_state  recordState;
         unsigned int  samplerate;
         unsigned int  buffersize;
         float        *interleavedFloats;
@@ -69,7 +73,6 @@ class WavRecord {
 
         bool         runRecordThread;
         pthread_t    pThread;
-        record_state recordState;
 };
 
 #endif

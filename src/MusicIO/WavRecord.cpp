@@ -29,6 +29,7 @@
 #include "MusicIO/WavRecord.h"
 
 WavRecord::WavRecord() :
+    recordState(nada),
     samplerate(0),
     buffersize(0),
     interleavedFloats(NULL),
@@ -36,11 +37,12 @@ WavRecord::WavRecord() :
     recordFifo(string()),
     toFifo(NULL),
     fromFifoSndfle(NULL),
+    tferSamples(0),
+    tferBuf(NULL),
     wavFile(string()),
     wavOutsnd(NULL),
     runRecordThread(false),
-    pThread(0),
-    recordState(nada)
+    pThread(0)
 {
     setlocale( LC_TIME, "" ); // use compiler's native locale
 }
@@ -257,7 +259,7 @@ bool WavRecord::SetFile(string fpath, string& errmsg)
         wavOutInfo.samplerate = samplerate;
         wavOutInfo.channels = 2;
         wavOutInfo.format = SF_FORMAT_WAV;
-        if (runtime.settings.Float32bitWavs)
+        if (Runtime.settings.Float32bitWavs)
         {
             wavOutInfo.format |= SF_FORMAT_FLOAT;
             float32bit = true;
@@ -418,7 +420,7 @@ void WavRecord::cleanup(void)
 void WavRecord::recordLog(string tag)
 {
     static char stamp[12];
-    if (runtime.settings.verbose)
+    if (Runtime.settings.verbose)
     {
         time_t ts = time(0);
         strftime(stamp, 12, "%H:%M:%S ", localtime(&ts));

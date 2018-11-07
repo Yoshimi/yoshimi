@@ -46,8 +46,6 @@ bool isFifo(string chkpath);
 extern float getdetune(unsigned char type, unsigned short int coarsedetune,
                        unsigned short int finedetune);
 
-void set_realtime(void);
-
 string asString(const float& number);
 string asString(const int& number);
 string asString(const unsigned int& number);

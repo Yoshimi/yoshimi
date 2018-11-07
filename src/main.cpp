@@ -53,6 +53,8 @@ int main(int argc, char *argv[])
         {"jack-audio",      2, NULL, 'J'},
         {"autostart-jack",  0, NULL, 'k'},
         {"alsa-audio",      2, NULL, 'A'},
+        {"samplerate",      1, NULL, 'r'},
+        {"buffersize",      1, NULL, 'b'},
         {"quiet",           0, NULL, 'q'},
         {"help",            2, NULL, 'h'},
         { 0, 0, 0, 0 }
@@ -72,7 +74,7 @@ int main(int argc, char *argv[])
     unsigned int utmp = 0;
     while (true)
     {
-        opt = getopt_long(argc, argv, "a::A::j::J::N:l:L:o:hkqU", opts,
+        opt = getopt_long(argc, argv, "a::A::j::J::b:N:l:L:o:r:hkqU", opts,
                           &option_index);
         char *optarguments = optarg;
         if (opt == -1)
@@ -80,39 +82,41 @@ int main(int argc, char *argv[])
         switch (opt)
         {
             case 'a':
-                runtime.settings.midiEngine = alsa_midi;
+                Runtime.settings.midiEngine = alsa_midi;
                 if (optarguments != NULL)
-                    runtime.settings.midiDevice = string(optarguments);
+                    Runtime.settings.midiDevice = string(optarguments);
                 break;
 
             case 'A':
-                runtime.settings.audioEngine = alsa_audio;
+                Runtime.settings.audioEngine = alsa_audio;
                 if (optarguments != NULL)
-                    runtime.settings.audioDevice = string(optarguments);
-                runtime.settings.audioDevice = (optarguments == NULL)
-                               ? string(runtime.settings.LinuxALSAaudioDev)
+                    Runtime.settings.audioDevice = string(optarguments);
+                Runtime.settings.audioDevice = (optarguments == NULL)
+                               ? string(Runtime.settings.LinuxALSAaudioDev)
                                : string(optarguments);
-                if (!runtime.settings.audioDevice.size())
-                    runtime.settings.audioDevice = "default";
+                if (!Runtime.settings.audioDevice.size())
+                    Runtime.settings.audioDevice = "default";
                 break;
 
             case 'b':
                 utmp = 0;
                 if (optarguments != NULL)
                     utmp = atoi(optarguments);
-                if (utmp >= 32 && utmp <= 8192)
-                    runtime.settings.Buffersize = tmp;
-                else
+                unsigned int x;
+                for (x = 64; x <= 4096; x *= 2)
                 {
-                    cerr << "Error, invalid buffer size specified: "
-                            << optarguments << endl;
-                    exit(1);
+                    if (utmp <= x)
+                    {
+                        utmp = x;
+                        break;
+                    }
                 }
+                Runtime.settings.Buffersize = (utmp > 4096) ? 1024 : utmp;
                 break;
 
             case 'N':
                 if (optarguments != NULL)
-                    runtime.settings.nameTag = string(optarguments);
+                    Runtime.settings.nameTag = string(optarguments);
                 break;
 
             case 'h':
@@ -120,23 +124,23 @@ int main(int argc, char *argv[])
                 break;
 
             case 'j':
-                runtime.settings.midiEngine = jack_midi;
+                Runtime.settings.midiEngine = jack_midi;
                 if (optarguments != NULL)
-                    runtime.settings.midiDevice = string(optarguments);
+                    Runtime.settings.midiDevice = string(optarguments);
                 break;
 
             case 'J':
-                runtime.settings.audioEngine = jack_audio;
+                Runtime.settings.audioEngine = jack_audio;
                 if (optarguments != NULL)
-                    runtime.settings.audioDevice = string(optarguments);
+                    Runtime.settings.audioDevice = string(optarguments);
                 else
-                    runtime.settings.audioDevice = string(runtime.settings.LinuxJACKserver);
-                if (!runtime.settings.audioDevice.size())
+                    Runtime.settings.audioDevice = string(Runtime.settings.LinuxJACKserver);
+                if (!Runtime.settings.audioDevice.size())
                 {
                     if (getenv("JACK_DEFAULT_SERVER"))
-                        runtime.settings.audioDevice = string(getenv("JACK_DEFAULT_SERVER"));
+                        Runtime.settings.audioDevice = string(getenv("JACK_DEFAULT_SERVER"));
                     else
-                        runtime.settings.audioDevice = "default";
+                        Runtime.settings.audioDevice = "default";
                 }
                 break;
 
@@ -173,7 +177,7 @@ int main(int argc, char *argv[])
                              << " is wrong, too small or not power of 2\n";
                         cerr << "ie, 2^n.  Forcing it to " << oscil_size
                              << " instead" << endl;
-                        runtime.settings.Oscilsize = oscil_size;
+                        Runtime.settings.Oscilsize = oscil_size;
                     }
                 }
                 break;
@@ -182,22 +186,31 @@ int main(int argc, char *argv[])
                 tmp = 0;
                 if (optarguments != NULL)
                     tmp = atoi(optarguments);
-                if (tmp >= 32000 && tmp <= 128000)
-                    runtime.settings.Samplerate = tmp;
-                else
+                switch (tmp)
                 {
-                    cerr << "Error, invalid samplerate specified: "
-                         << optarguments << ", valid range 32000 -> 128000" << endl;
-                    exit(1);
+                    case 44100:
+                    case 48000:
+                    case 96000:
+                        Runtime.settings.Samplerate = tmp;
+                        break;
+                    default:
+                        Runtime.settings.Samplerate = 0;
+                        break;
                 }
-                break;
+                if (!Runtime.settings.Samplerate)
+                {
+                    cerr << "Error, invalid samplerate specified, ";
+                    cerr << "valid rates are 44100, 48000, 96000" << endl;
+                    exitwithhelp = true;
+                 }
+                 break;
 
             case 'U':
-                runtime.settings.showGui = false;
+                Runtime.settings.showGui = false;
                 break;
 
             case 'q':
-                runtime.settings.verbose = false;
+                Runtime.settings.verbose = false;
                 break;
 
             case '?':
@@ -206,15 +219,15 @@ int main(int argc, char *argv[])
                 break;
         }
     }
-    if (runtime.settings.audioEngine == no_audio
-        && runtime.settings.midiEngine == no_midi)
+    if (Runtime.settings.audioEngine == no_audio
+        && Runtime.settings.midiEngine == no_midi)
     {
         cerr << "Error, no audio & no midi engines nominated!" << endl;
         exitwithhelp = true;
     }
     if (exitwithhelp)
     {
-        runtime.Usage();
+        Runtime.Usage();
         exit(0);
     }
     srand(time(NULL));
@@ -242,7 +255,7 @@ int main(int argc, char *argv[])
 
     if (!zynMaster->Init(musicClient->getSamplerate(),
                          musicClient->getBuffersize(),
-                         runtime.settings.Oscilsize,
+                         Runtime.settings.Oscilsize,
                          load_params, load_instrument))
     {
         cerr << "Error, Master init failed" << endl;
@@ -259,7 +272,7 @@ int main(int argc, char *argv[])
 #   endif
 
 #   if !defined(DISABLE_GUI)
-        if (runtime.settings.showGui)
+        if (Runtime.settings.showGui)
             if (!startGuiThread())
             {
                 cerr << "Error, failed to start gui thread" << endl;
@@ -269,7 +282,7 @@ int main(int argc, char *argv[])
 
     if (musicClient->Start())
     {
-        runtime.StartupReport(musicClient->getSamplerate(), musicClient->getBuffersize());
+        Runtime.StartupReport(musicClient->getSamplerate(), musicClient->getBuffersize());
         while (!Pexitprogram)
             usleep(33000); // where all the action is ...
         musicClient->Close();

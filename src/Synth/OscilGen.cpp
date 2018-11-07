@@ -29,7 +29,7 @@ using namespace std;
 
 #include "Effects/Distorsion.h"
 #include "Misc/Util.h"
-//#include "Misc/Runtime.h"
+#include "Misc/Config.h"
 #include "Misc/Master.h"
 #include "Synth/OscilGen.h"
 

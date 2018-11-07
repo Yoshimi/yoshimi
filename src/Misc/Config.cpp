@@ -33,14 +33,14 @@ using namespace std;
 
 bool autostart_jack = false;
 
-Config runtime;
+Config Runtime;
 
 Config::Config()
 {
     // defaults
     settings.Oscilsize = 2048;
-    settings.Samplerate = 48000; // for Alsa audio, just a hint
-    settings.Buffersize = 256;   // for Alsa audio, just a hint
+    settings.Samplerate = 48000;
+    settings.Buffersize = 512;
 #   if defined(DISABLE_GUI)
         settings.showGui = false;
 #   else
@@ -151,9 +151,10 @@ void Config::readConfig(void)
         return;
     if (xmlcfg->enterbranch("CONFIGURATION"))
     {
-        xmlcfg->getpar("sample_rate", settings.Samplerate,      // deprecated
-                                             32000, 96000);
-        xmlcfg->getpar("sound_buffer_size", 256, 128, 4096);    //deprecated
+        settings.Samplerate = xmlcfg->getpar("sample_rate", settings.Samplerate,
+                                             44100, 96000);
+        settings.Buffersize = xmlcfg->getpar("sound_buffer_size",
+                                             settings.Buffersize, 64, 4096);
         settings.Oscilsize = xmlcfg->getpar("oscil_size", settings.Oscilsize,
                                             MAX_AD_HARMONICS * 2, 131072);
         xmlcfg->getpar("swap_stereo", 0, 0, 1);                 // deprecated
@@ -312,7 +313,7 @@ void Config::StartupReport(unsigned int samplerate, int buffersize)
 {
     if (settings.verbose)
     {
-        cout << "ADsynth Oscilsize: " << runtime.settings.Oscilsize << endl;
+        cout << "ADsynth Oscilsize: " << Runtime.settings.Oscilsize << endl;
         cout << "Sample Rate: " << samplerate << endl;
         cout << "Sound Buffer Size: " << buffersize << endl;
         cout << "Internal latency: " << buffersize * 1000.0 / samplerate << " ms" << endl;
@@ -338,11 +339,14 @@ void Config::Usage(void)
     cerr << "  -o<OS>, --oscil-size=<OS>          set the ADsynth oscil. size" << endl;
     cerr << "  -U , --no-gui                      run without user interface" << endl;
     cerr << "  -a[dev], --alsa-midi[=dev]         use ALSA midi on optional device dev" << endl;
+    cerr << "  -b<size>, --buffersize=<size>      set buffersize (range 64 - 4096)" << endl;
+    cerr << "  -r<srate>, --samplerate=<srate>    set samplerate (44100, 48000, or 96000)" << endl;
     cerr << "  -A[dev], --alsa-audio[=dev]        use ALSA audio on optional device dev" << endl;
     cerr << "  -j[server], --jack-midi[=server]   use jack midi on optional server" << endl;
     cerr << "  -J[server], --jack-audio[=server]  use jack audio on optional server" << endl;
     cerr << "  -k , --autostart-jack              autostart jack server" << endl;
     cerr << "  -N<tag>, --name-tag=<tag>          add <tag> to client name" << endl;
     cerr << "  -q, --quiet                        less verbose messages" << endl;
+    cerr << "Buffersize and samplerate settings apply to Alsa audio only." << endl;
     cerr << endl << endl;
 }

@@ -605,7 +605,7 @@ bool Microtonal::loadXML(string filename)
     XMLwrapper *xml = new XMLwrapper();
     if (NULL == xml)
     {
-        runtime.settings.verbose && cerr << "Microtonal::loadXML fails to instantiate new XMLwrapper" << endl;
+        Runtime.settings.verbose && cerr << "Microtonal::loadXML fails to instantiate new XMLwrapper" << endl;
         return false;
     }
     if (!xml->loadXMLfile(filename))
@@ -615,7 +615,7 @@ bool Microtonal::loadXML(string filename)
     }
     if (!xml->enterbranch("MICROTONAL"))
     {
-        runtime.settings.verbose && cerr << "Error, " << filename << " is not a scale file" << endl;
+        Runtime.settings.verbose && cerr << "Error, " << filename << " is not a scale file" << endl;
         return false;
     }
     getfromXML(xml);

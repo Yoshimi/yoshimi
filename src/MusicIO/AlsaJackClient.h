@@ -32,41 +32,31 @@ class AlsaJackClient : public MusicClient
 {
     public:
         AlsaJackClient() : MusicClient() { };
-        ~AlsaJackClient()
-            { Stop(); Close(); };
+        ~AlsaJackClient() { Stop(); Close(); };
 
         bool openAudio(void);
         bool openMidi(void);
         bool Start(void);
-        void Stop(void)
-            { alsaEngine.Stop(); jackEngine.Stop(); };
-        void Close(void)
-            { alsaEngine.Close(); jackEngine.Close(); };
+        void Stop(void) { alsaEngine.Stop(); jackEngine.Stop(); };
+        void Close(void) { alsaEngine.Close(); jackEngine.Close(); };
 
-        unsigned int getSamplerate(void)
-            { return alsaEngine.getSamplerate(); };
-        int getBuffersize(void)
-            { return alsaEngine.getBuffersize(); };
+        unsigned int getSamplerate(void) { return alsaEngine.getSamplerate(); };
+        int getBuffersize(void) { return alsaEngine.getBuffersize(); };
 
-        string audioClientName(void)
-            { return alsaEngine.audioClientName(); };
-        string midiClientName(void)
-            { return jackEngine.clientName(); };
-        int audioClientId(void)
-            { return alsaEngine.audioClientId(); };
-        int midiClientId(void)
-            { return jackEngine.clientId(); };
+        string audioClientName(void) { return alsaEngine.audioClientName(); };
+        string midiClientName(void) { return jackEngine.clientName(); };
+        int audioClientId(void) { return alsaEngine.audioClientId(); };
+        int midiClientId(void) { return jackEngine.clientId(); };
 
-        void startRecord(void)
-            { alsaEngine.StartRecord(); };
-        void stopRecord(void)
-            { alsaEngine.StopRecord(); };
+        void startRecord(void) { alsaEngine.StartRecord(); };
+        void stopRecord(void) { alsaEngine.StopRecord(); };
         bool setRecordFile(const char* fpath, string& errmsg)
             { return alsaEngine.SetWavFile(fpath, errmsg); };
         bool setRecordOverwrite(string& errmsg)
             { return alsaEngine.SetWavOverwrite(errmsg); };
-        string wavFilename(void)
-            { return alsaEngine.WavFilename(); };
+        string wavFilename(void) { return alsaEngine.WavFilename(); };
+        void Mute(void) { alsaEngine.Mute(); jackEngine.Mute(); };
+        void unMute(void) { alsaEngine.unMute(); jackEngine.unMute(); };
 
     private:
         AlsaEngine alsaEngine;

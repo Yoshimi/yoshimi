@@ -168,7 +168,7 @@ bool XMLwrapper::saveXMLfile(string filename)
         cerr << "Error, getXMLdata() == NULL" << endl;
         return -2;
     }
-    int compression = runtime.settings.GzipCompression;
+    int compression = Runtime.settings.GzipCompression;
     bool result = dosavefile(filename, compression, xmldata);
     free(xmldata);
     return result;
@@ -286,20 +286,20 @@ bool XMLwrapper::loadXMLfile(string filename)
     const char *xmldata = doloadfile(filename);
     if (xmldata == NULL)
     {
-        runtime.settings.verbose && cerr << "Error, xml file " << filename << " could not be loaded or uncompressed" << endl;
+        Runtime.settings.verbose && cerr << "Error, xml file " << filename << " could not be loaded or uncompressed" << endl;
          return false;
     }
     root = tree = mxmlLoadString(NULL, xmldata, MXML_OPAQUE_CALLBACK);
     delete [] xmldata;
     if (tree == NULL)
     {
-        runtime.settings.verbose && cerr << "Error, xml file " << filename << " is not XML" << endl;
+        Runtime.settings.verbose && cerr << "Error, xml file " << filename << " is not XML" << endl;
         return false;
     }
     node = root = mxmlFindElement(tree, tree, "ZynAddSubFX-data", NULL, NULL, MXML_DESCEND);
     if (root == NULL)
     {
-        runtime.settings.verbose && cerr << "Error, xml file " << filename << " doesnt embbed zynaddsubfx data" << endl;
+        Runtime.settings.verbose && cerr << "Error, xml file " << filename << " doesnt embbed zynaddsubfx data" << endl;
         return false;
     }
     push(root);

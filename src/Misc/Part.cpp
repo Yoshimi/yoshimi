@@ -310,7 +310,7 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
     if (pos == -1)
     {
         // test
-        if (runtime.settings.verbose)
+        if (Runtime.settings.verbose)
             cerr << "Too may notes - notes > poliphony, PartNoteOn()" << endl;
     }
     else
@@ -893,7 +893,6 @@ void Part::ComputePartSmps(void)
             {
                 noteplay++;
                 if (adnote->ready != 0)
-                    //adnote->noteout(&tmpoutl[0], &tmpoutr[0]);
                     adnote->noteout(tmpoutl, tmpoutr);
                 else
                 {
@@ -916,7 +915,6 @@ void Part::ComputePartSmps(void)
             {
                 noteplay++;
                 if (subnote->ready != 0)
-                    //subnote->noteout(&tmpoutl[0], &tmpoutr[0]);
                     subnote->noteout(tmpoutl, tmpoutr);
                 else
                 {
@@ -940,7 +938,6 @@ void Part::ComputePartSmps(void)
                 noteplay++;
                 if (padnote->ready != 0)
                 {
-                    //padnote->noteout(&tmpoutl[0], &tmpoutr[0]);
                     padnote->noteout(tmpoutl, tmpoutr);
                 }
                 else

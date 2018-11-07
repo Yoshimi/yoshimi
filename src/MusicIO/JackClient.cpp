@@ -26,12 +26,12 @@ using namespace std;
 
 bool JackClient::openAudio(void)
 {
-    if (jackEngine.connectServer(runtime.settings.audioDevice))
+    if (jackEngine.connectServer(Runtime.settings.audioDevice))
     {
         if (jackEngine.openAudio())
         {
-            runtime.settings.Samplerate = getSamplerate();
-            runtime.settings.Buffersize = getBuffersize();
+            Runtime.settings.Samplerate = getSamplerate();
+            Runtime.settings.Buffersize = getBuffersize();
             return true;
         }
         else
@@ -44,7 +44,7 @@ bool JackClient::openAudio(void)
 
 bool JackClient::openMidi(void)
 {
-    if (jackEngine.connectServer(runtime.settings.midiDevice))
+    if (jackEngine.connectServer(Runtime.settings.midiDevice))
         if (jackEngine.openMidi())
             return true;
     cerr << "Error, JackClient failed to open midi" << endl;
