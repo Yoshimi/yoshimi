@@ -28,8 +28,8 @@ bool AlsaClient::openAudio(void)
 {
     if (alsaEngine.openAudio())
     {
-        Runtime.settings.Samplerate = getSamplerate();
-        Runtime.settings.Buffersize = getBuffersize();
+        runtime.settings.Samplerate = getSamplerate();
+        runtime.settings.Buffersize = getBuffersize();
         return true;
     }
     cerr << "Error, AlsaClient audio open failed" << endl;

@@ -29,7 +29,7 @@ using namespace std;
 
 #include "Effects/Distorsion.h"
 #include "Misc/Util.h"
-#include "Misc/Config.h"
+//#include "Misc/Runtime.h"
 #include "Misc/Master.h"
 #include "Synth/OscilGen.h"
 
@@ -53,8 +53,6 @@ OscilGen::OscilGen(FFTwrapper *fft_, Resonance *res_) : Presets()
         {
             memset(tmpsmps, 0, sizeof(float) * oscilsize);
             ++active_count;
-            //if (Runtime.settings.verbose)
-            //    cerr << "OscilGens active: " << active_count << endl;
         }
     }
 
@@ -81,9 +79,6 @@ OscilGen::~OscilGen()
             delete [] tmpsmps;
             tmpsmps = NULL;
             FFTwrapper::deleteFFTFREQS(outoscilFFTfreqs);
-            //if (Runtime.settings.verbose)
-            //    cerr << "delete OscilGen tmpsmps, active_count: "
-            //         << active_count << endl;
         }
     }
 }

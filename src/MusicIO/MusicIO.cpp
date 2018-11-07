@@ -27,14 +27,15 @@ using namespace std;
 MusicIO::MusicIO() :
     zynLeft(NULL),
     zynRight(NULL),
-    interleavedShorts(NULL),
-    muted(false)
+    interleavedShorts(NULL)
 { }
 
+MusicIO::~MusicIO()
+{ }
 
 void MusicIO::Close(void)
 {
-    RecordClose();
+    Recorder.Close();
     if (NULL != zynLeft)
         delete [] zynLeft;
     if (NULL != zynRight)
@@ -47,40 +48,33 @@ void MusicIO::Close(void)
 }
 
 
-bool MusicIO::prepMusicIO(bool with_interleaved)
+void MusicIO::StopRecord(void)
 {
-        return prepBuffers(with_interleaved) && PrepWav();
+    Recorder.Stop();
 }
 
 
-void MusicIO::getAudio(void)
+bool MusicIO::SetWavFile(string fpath, string& errmsg)
 {
-    zynMaster->MasterAudio(zynLeft, zynRight);
-    if (recordRunning)
-    feedRecord(zynLeft, zynRight);
+    return Recorder.SetFile(fpath, errmsg);
 }
 
 
-void MusicIO::InterleaveShorts(void)
+string MusicIO::WavFilename(void)
 {
-    int buffersize = getBuffersize();
-    int idx = 0;
-    double scaled;
-    for (int frame = 0; frame < buffersize; ++frame)
-    {   // with a grateful nod to libsamplerate ...
-        scaled = zynLeft[frame] * (8.0 * 0x10000000);
-        interleavedShorts[idx++] = (short int)(lrint(scaled) >> 16);
-        scaled = zynRight[frame] * (8.0 * 0x10000000);
-        interleavedShorts[idx++] = (short int)(lrint(scaled) >> 16);
-    }
+    return Recorder.Filename();
 }
 
 
-void MusicIO::silenceBuffers(void)
+bool MusicIO::SetWavOverwrite(string& errmsg)
 {
-    int buffersize = getBuffersize();
-    memset(zynLeft, 0, buffersize * sizeof(jsample_t));
-    memset(zynRight, 0, buffersize * sizeof(jsample_t));
+    return Recorder.SetOverwrite(errmsg);
+}
+
+
+bool MusicIO::WavIsFloat(void)
+{
+    return Recorder.IsFloat();
 }
 
 
@@ -165,13 +159,36 @@ void MusicIO::setMidiController(unsigned char ch, unsigned int ctrl,
 void MusicIO::setMidiNote(unsigned char channel, unsigned char note,
                            unsigned char velocity)
 {
-    zynMaster->NoteOn(channel, note, velocity);
+    zynMaster->NoteOn(channel, note, velocity, Recorder.Trigger());
 }
 
 
 void MusicIO::setMidiNote(unsigned char channel, unsigned char note)
 {
     zynMaster->NoteOff(channel, note);
+}
+
+
+void MusicIO::getAudio(void)
+{
+    zynMaster->MasterAudio(zynLeft, zynRight);
+    if (Recorder.Running())
+        Recorder.Feed(zynLeft, zynRight);
+}
+
+
+void MusicIO::InterleaveShorts(void)
+{
+    int buffersize = getBuffersize();
+    int idx = 0;
+    double scaled;
+    for (int frame = 0; frame < buffersize; ++frame)
+    {   // with a grateful nod to libsamplerate ...
+        scaled = zynLeft[frame] * (8.0 * 0x10000000);
+        interleavedShorts[idx++] = (short int)(lrint(scaled) >> 16);
+        scaled = zynRight[frame] * (8.0 * 0x10000000);
+        interleavedShorts[idx++] = (short int)(lrint(scaled) >> 16);
+    }
 }
 
 
@@ -211,3 +228,7 @@ bail_out:
 }
 
 
+bool MusicIO::prepRecord(void)
+{
+    return Recorder.Prep(getSamplerate(), getBuffersize());
+}

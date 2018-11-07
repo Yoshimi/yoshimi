@@ -56,8 +56,6 @@ class MusicClient
         virtual bool setRecordFile(const char* fpath, string& errmsg) = 0;
         virtual bool setRecordOverwrite(string& errmsg) = 0;
         virtual string wavFilename(void) = 0;
-        virtual void Mute(void) = 0;
-        virtual void unMute(void) = 0;
 
         string      audiodevice;
         string      mididevice;

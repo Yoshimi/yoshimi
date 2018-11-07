@@ -34,7 +34,7 @@ using namespace std;
 
 extern bool autostart_jack; // default false
 
-class Config; extern Config Runtime;
+class Config; extern Config runtime;
 
 class Config
 {

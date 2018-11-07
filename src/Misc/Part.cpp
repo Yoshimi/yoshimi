@@ -310,7 +310,7 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
     if (pos == -1)
     {
         // test
-        if (Runtime.settings.verbose)
+        if (runtime.settings.verbose)
             cerr << "Too may notes - notes > poliphony, PartNoteOn()" << endl;
     }
     else

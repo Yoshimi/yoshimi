@@ -36,9 +36,8 @@ typedef jack_default_audio_sample_t jsample_t;
 #include "Misc/Bank.h"
 #include "Misc/XMLwrapper.h"
 #include "Misc/Util.h"
-//#include "MusicIO/MusicIO.h"
 
-typedef enum { init, trylock, lock, unlock, lockmute, destroy } lockset;
+typedef enum { init, trylock, lock, tryreadlock, readlock, unlock, destroy } lockset;
 
 extern bool Pexitprogram;  // if the UI sets this true, the program will exit
 
@@ -52,6 +51,7 @@ class Master {
         bool Init(unsigned int sample_rate, int buffer_size, int oscil_size,
                   string params_file, string instrument_file);
         bool actionLock(lockset request);
+        bool muteLock(lockset request);
         bool vupeakLock(lockset request);
 
         bool saveXML(string filename);
@@ -67,7 +67,8 @@ class Master {
         void putAllData(char *data, int size);
 
         // midi in
-        void NoteOn(unsigned char chan, unsigned char note, unsigned char velocity);
+        void NoteOn(unsigned char chan, unsigned char note,
+                    unsigned char velocity, bool record_trigger);
         void NoteOff(unsigned char chan, unsigned char note);
         void SetController(unsigned char chan, unsigned int type, short int par);
         // void NRPN...
@@ -134,6 +135,9 @@ class Master {
         pthread_mutex_t *processLock;
         pthread_mutex_t  meterMutex;
         pthread_mutex_t *meterLock;
+        pthread_rwlock_t mute;
+        pthread_rwlock_t *muteRWLock;
+        pthread_rwlockattr_t mute_attr;
 
         float volume;
         float sysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];

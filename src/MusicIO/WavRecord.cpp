@@ -29,19 +29,18 @@
 #include "MusicIO/WavRecord.h"
 
 WavRecord::WavRecord() :
-    recordRunning(false),
     samplerate(0),
     buffersize(0),
+    interleavedFloats(NULL),
+    float32bit(true),
     recordFifo(string()),
     toFifo(NULL),
     fromFifoSndfle(NULL),
     wavFile(string()),
     wavOutsnd(NULL),
-    interleavedFloats(NULL),
-    float32bit(true),
-    recordState(nada),
     runRecordThread(false),
-    pThread(0)
+    pThread(0),
+    recordState(nada)
 {
     setlocale( LC_TIME, "" ); // use compiler's native locale
 }
@@ -49,7 +48,7 @@ WavRecord::WavRecord() :
 
 WavRecord::~WavRecord()
 {
-    RecordStop();
+    Stop();
     if (NULL != fromFifoSndfle)
         sf_close(fromFifoSndfle);
     if (NULL != wavOutsnd)
@@ -58,10 +57,10 @@ WavRecord::~WavRecord()
         unlink(recordFifo.c_str());
 }
 
-bool WavRecord::PrepWav(void)
+bool WavRecord::Prep(unsigned int sample_rate, int buffer_size)
 {
-    samplerate = this->getSamplerate() ;
-    buffersize = this->getBuffersize();
+    samplerate = sample_rate;
+    buffersize = buffer_size;
     int chk;
     char fifoname[] = { YOSHI_FIFO_DIR "/record.yoshimi.XXXXXX" };
 
@@ -110,7 +109,7 @@ bool WavRecord::PrepWav(void)
     }
 
     runRecordThread = true;
-    chk = pthread_create(&pThread, &attr, _recordThread, this);
+    chk = pthread_create(&pThread, &attr, _recorderThread, this);
     if (chk)
     {
         cerr << "Error, failed to start record thread: " << chk << endl;
@@ -133,7 +132,7 @@ bool WavRecord::PrepWav(void)
     return true;
 
 bail_out:
-    RecordClose();
+    Close();
     if (NULL != tferBuf)
         delete [] tferBuf;
     tferBuf = NULL;
@@ -144,49 +143,60 @@ bail_out:
 }
 
 
-void WavRecord::recordLog(string tag)
+void WavRecord::Start(void)
 {
-    static char stamp[12];
-    if (Runtime.settings.verbose)
+    switch (recordState)
     {
-        time_t ts = time(0);
-        strftime(stamp, 12, "%H:%M:%S ", localtime(&ts));
-        cout << stamp << tag << " " << wavFile << endl;
+        case ready:
+            __fpurge(toFifo);
+            recordState = recording;
+            recordLog("Record start");
+            break;
+
+        case nada:
+        case recording:
+        default:
+            break;
     }
 }
 
 
-void WavRecord::RecordStart(void)
+void WavRecord::Stop(void)
 {
-    __fpurge(toFifo);
-    recordRunning = true;
-    recordLog("Record start");
+    switch (recordState)
+    {
+        case recording:
+            sf_command(wavOutsnd, SFC_UPDATE_HEADER_NOW, NULL, 0);
+            sf_write_sync(wavOutsnd);
+            __fpurge(toFifo);
+            recordState = ready;
+            recordLog("Record stop");
+            break;
+
+        case nada:
+        case ready:
+        default:
+            break;
+    }
 }
 
 
-void WavRecord::RecordStop(void)
+void WavRecord::Close(void)
 {
-    recordRunning = false;
-    sf_command(wavOutsnd, SFC_UPDATE_HEADER_NOW, NULL, 0);
-    sf_write_sync(wavOutsnd);
-    __fpurge(toFifo);
-    recordLog("Record stop");
-}
-
-
-void WavRecord::RecordClose(void)
-{
-    recordRunning = false;
     runRecordThread = false;
-    if (pThread && pthread_cancel(pThread))
-        cerr << "Error, failed to cancel record thread" << endl;
-    if (NULL != interleavedFloats)
-        delete [] interleavedFloats;
-    interleavedFloats = NULL;
+    if (recordState != nada)
+    {
+        if (pThread && pthread_cancel(pThread))
+            cerr << "Error, failed to cancel record thread" << endl;
+        if (NULL != interleavedFloats)
+            delete [] interleavedFloats;
+        interleavedFloats = NULL;
+    }
+    recordState = nada;
 }
 
 
-bool WavRecord::SetWavFile(string fpath, string& errmsg)
+bool WavRecord::SetFile(string fpath, string& errmsg)
 {
     int chk;
     string xfile = string(fpath);
@@ -247,7 +257,7 @@ bool WavRecord::SetWavFile(string fpath, string& errmsg)
         wavOutInfo.samplerate = samplerate;
         wavOutInfo.channels = 2;
         wavOutInfo.format = SF_FORMAT_WAV;
-        if (Runtime.settings.Float32bitWavs)
+        if (runtime.settings.Float32bitWavs)
         {
             wavOutInfo.format |= SF_FORMAT_FLOAT;
             float32bit = true;
@@ -266,9 +276,11 @@ bool WavRecord::SetWavFile(string fpath, string& errmsg)
         }
         recordLog("Open new");
     }
+    recordState = ready;
     return true;
 
 bail_out:
+    recordState = nada;
     wavFile.clear();
     if (NULL != wavOutsnd)
         sf_close(wavOutsnd);
@@ -277,8 +289,10 @@ bail_out:
 }
 
 
-bool WavRecord::SetWavOverwrite(string& errmsg)
+bool WavRecord::SetOverwrite(string& errmsg)
 {
+    if (recordState != ready)
+        return false;
     if (NULL != wavOutsnd)
     {
         sf_close(wavOutsnd);
@@ -295,32 +309,84 @@ bool WavRecord::SetWavOverwrite(string& errmsg)
 }
 
 
-void WavRecord::feedRecord(float* samples_left, float *samples_right)
+void WavRecord::Feed(float* samples_left, float *samples_right)
 {
     int idx = 0;
-    unsigned int buffersize = getBuffersize();
-    for (unsigned int frame = 0; frame < buffersize; ++frame)
+    unsigned int bufferframes = buffersize;
+    for (unsigned int frame = 0; frame < bufferframes; ++frame)
     {   // interleave floats
         interleavedFloats[idx++] = samples_left[frame];
         interleavedFloats[idx++] = samples_right[frame];
     }
     size_t wrote = fwrite_unlocked(interleavedFloats, sizeof(float) * 2,
-                                   buffersize, toFifo);
-    if (wrote != buffersize)
+                                   bufferframes, toFifo);
+    if (wrote != bufferframes)
         cerr << "Error,  short write in feedRecord, " << wrote << " / "
-             << buffersize << endl;
+             << bufferframes << endl;
 }
 
 
-void WavRecord::_wavCleanup(void *arg)
+void *WavRecord::_recorderThread(void *arg)
 {
-    static_cast<WavRecord*>(arg)->wavCleanup();
+    return static_cast<WavRecord*>(arg)->recorderThread();
 }
 
 
-void WavRecord::wavCleanup(void)
+void *WavRecord::recorderThread(void)
 {
-    recordRunning = false;
+    if (NULL == tferBuf)
+    {
+        cerr << "Error, record thread transfer buffer unavailable" << endl;
+        pthread_exit(NULL);
+    }
+
+    fromFifoInfo.samplerate = samplerate;
+    fromFifoInfo.channels = 2;
+    fromFifoInfo.format = SF_FORMAT_RAW | SF_FORMAT_FLOAT;
+    fromFifoSndfle = sf_open(recordFifo.c_str(), SFM_READ, &fromFifoInfo);
+    if (NULL == fromFifoSndfle)
+    {
+        cerr << "Error opening fifo for input: "
+             << string(sf_strerror(fromFifoSndfle)) << endl;
+        pthread_exit(NULL);
+    }
+    sf_count_t samplesRead;
+    sf_count_t wroteSamples;
+    pthread_cleanup_push(_cleanup, this);
+    while (runRecordThread == true)
+    {
+        pthread_testcancel();
+        samplesRead = sf_read_float(fromFifoSndfle, tferBuf, tferSamples);
+        if (recordState == recording)
+        {
+            if (tferSamples != samplesRead)
+            {
+                cerr << "Error, dodgy read from recordFifo, read "
+                     << samplesRead << " of " << tferSamples << " frames" << endl;
+            }
+            if (samplesRead > 0)
+            {
+                wroteSamples = sf_write_float(wavOutsnd, tferBuf, samplesRead);
+                if (wroteSamples != samplesRead)
+                    cerr << "Error, dodgy write to wav file"
+                         << wroteSamples << " / " << samplesRead << " frames" << endl;
+            }
+        }
+    }
+    pthread_cleanup_pop(1);
+    return NULL;
+}
+
+
+void WavRecord::_cleanup(void *arg)
+{
+    static_cast<WavRecord*>(arg)->cleanup();
+}
+
+
+void WavRecord::cleanup(void)
+{
+    recordState = nada;
     if (NULL != toFifo)
     {
         if (fclose(toFifo))
@@ -349,53 +415,13 @@ void WavRecord::wavCleanup(void)
 }
 
 
-void *WavRecord::_recordThread(void *arg)
+void WavRecord::recordLog(string tag)
 {
-    return static_cast<WavRecord*>(arg)->recordThread();
-}
-
-
-void *WavRecord::recordThread(void)
-{
-    if (NULL == tferBuf)
+    static char stamp[12];
+    if (runtime.settings.verbose)
     {
-        cerr << "Error, record thread transfer buffer unavailable" << endl;
-        pthread_exit(NULL);
+        time_t ts = time(0);
+        strftime(stamp, 12, "%H:%M:%S ", localtime(&ts));
+        cout << stamp << tag << " " << wavFile << endl;
     }
-
-    fromFifoInfo.samplerate = samplerate;
-    fromFifoInfo.channels = 2;
-    fromFifoInfo.format = SF_FORMAT_RAW | SF_FORMAT_FLOAT;
-    fromFifoSndfle = sf_open(recordFifo.c_str(), SFM_READ, &fromFifoInfo);
-    if (NULL == fromFifoSndfle)
-    {
-        cerr << "Error opening fifo for input: "
-             << string(sf_strerror(fromFifoSndfle)) << endl;
-        pthread_exit(NULL);
-    }
-    sf_count_t samplesRead;
-    sf_count_t wroteSamples;
-    pthread_cleanup_push(_wavCleanup, this);
-    while (runRecordThread == true)
-    {
-        pthread_testcancel();
-        samplesRead = sf_read_float(fromFifoSndfle, tferBuf, tferSamples);
-        if (recordRunning)
-        {
-            if (tferSamples != samplesRead)
-            {
-                cerr << "Error, dodgy read from recordFifo, read "
-                     << samplesRead << " of " << tferSamples << " frames" << endl;
-            }
-            if (samplesRead > 0)
-            {
-                wroteSamples = sf_write_float(wavOutsnd, tferBuf, samplesRead);
-                if (wroteSamples != samplesRead)
-                    cerr << "Error, dodgy write to wav file"
-                         << wroteSamples << " / " << samplesRead << " frames" << endl;
-            }
-        }
-    }
-    pthread_cleanup_pop(1);
-    return NULL;
 }

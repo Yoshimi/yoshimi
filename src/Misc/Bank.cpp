@@ -69,7 +69,7 @@ Bank::Bank() :
         banks[i].name.clear();
     }
     bankfiletitle = string(dirname);
-    loadBank(Runtime.settings.currentBankDir);
+    loadBank(runtime.settings.currentBankDir);
 }
 
 Bank::~Bank()
@@ -197,7 +197,7 @@ bool Bank::loadBank(string bankdirname)
     DIR *dir = opendir(bankdirname.c_str());
     if (dir == NULL)
     {
-        if (Runtime.settings.verbose)
+        if (runtime.settings.verbose)
             cerr << "Error, failed to open bank directory " << bankdirname << endl;
         return false;
     }
@@ -248,19 +248,19 @@ bool Bank::loadBank(string bankdirname)
         }
     }
     closedir(dir);
-    Runtime.settings.currentBankDir = dirname;
+    runtime.settings.currentBankDir = dirname;
     return true;
 }
 
 // Makes a new bank, put it on a file and makes it current bank
 bool Bank::newBank(string newbankdir)
 {
-    if (Runtime.settings.bankRootDirlist[0].empty())
+    if (runtime.settings.bankRootDirlist[0].empty())
     {
         cerr << "Error, default bank root directory not set" << endl;
         return false;
     }
-    string newbankpath = Runtime.settings.bankRootDirlist[0];
+    string newbankpath = runtime.settings.bankRootDirlist[0];
     if (newbankpath.at(newbankpath.size() - 1) != '/')
         newbankpath += "/";
     newbankpath += newbankdir;
@@ -270,7 +270,7 @@ bool Bank::newBank(string newbankdir)
         cerr << "Error, failed to mkdir " << newbankpath << endl;
         return false;
     }
-    else if (Runtime.settings.verbose)
+    else if (runtime.settings.verbose)
         cerr << "mkdir " << newbankpath << " succeeded" << endl;
     string forcefile = newbankpath;
     if (forcefile.at(forcefile.size() - 1) != '/')
@@ -331,8 +331,8 @@ void Bank::rescanBanks()
 {
     set<string, less<string> > bankroots;
     for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-        if (!Runtime.settings.bankRootDirlist[i].empty())
-            bankroots.insert(Runtime.settings.bankRootDirlist[i]);
+        if (!runtime.settings.bankRootDirlist[i].empty())
+            bankroots.insert(runtime.settings.bankRootDirlist[i]);
     banklist.clear();
     set<string, less<string> >::iterator dxr;
     for (dxr = bankroots.begin(); dxr != bankroots.end(); ++dxr)
@@ -360,7 +360,7 @@ void Bank::scanRootdir(string rootdir)
     DIR *dir = opendir(rootdir.c_str());
     if (dir == NULL)
     {
-        if (Runtime.settings.verbose)
+        if (runtime.settings.verbose)
             cerr << "No such directory, root bank entry: " << rootdir << endl;
         return;
     }
@@ -383,7 +383,7 @@ void Bank::scanRootdir(string rootdir)
         DIR *d = opendir(chkdir.c_str());
         if (d == NULL)
         {
-            if (Runtime.settings.verbose)
+            if (runtime.settings.verbose)
                 cerr << "Error, failed to open bank directory candidate: "
                      << chkdir << endl;
             continue;
@@ -478,7 +478,7 @@ bool Bank::addToBank(int pos, const string filename, string name)
     bank_instrument[pos].filename = filepath;
 
     // see if PADsynth is used
-    if (Runtime.settings.CheckPADsynth)
+    if (runtime.settings.CheckPADsynth)
     {
         XMLwrapper *xml = new XMLwrapper();
         xml->checkfileinformation(bank_instrument[pos].filename.c_str());
@@ -492,7 +492,7 @@ bool Bank::addToBank(int pos, const string filename, string name)
 
 bool Bank::isPADsynth_used(unsigned int ninstrument)
 {
-    if (Runtime.settings.CheckPADsynth == 0)
+    if (runtime.settings.CheckPADsynth == 0)
         return 0;
     else
         return bank_instrument[ninstrument].PADsynth_used;

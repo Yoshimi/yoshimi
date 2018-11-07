@@ -104,9 +104,9 @@ void PresetsStore::rescanPresets(string type)
 
     for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
     {
-        if (Runtime.settings.presetsDirlist[i].empty())
+        if (runtime.settings.presetsDirlist[i].empty())
             continue;
-        string dirname = Runtime.settings.presetsDirlist[i];
+        string dirname = runtime.settings.presetsDirlist[i];
         DIR *dir = opendir(dirname.c_str());
         if (dir == NULL)
             continue;
@@ -154,12 +154,12 @@ void PresetsStore::rescanPresets(string type)
 
 void PresetsStore::copyPreset(XMLwrapper *xml, string type, string name)
 {
-    if (Runtime.settings.presetsDirlist[0].empty())
+    if (runtime.settings.presetsDirlist[0].empty())
         return;
     string filename;
     string tmpfilename = name;
     legit_filename(tmpfilename);
-    string dirname = Runtime.settings.presetsDirlist[0];
+    string dirname = runtime.settings.presetsDirlist[0];
     if (dirname.find_last_of("/") != (dirname.size() - 1))
         dirname += "/";
     filename = dirname + "." + type + preset_extension;

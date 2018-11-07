@@ -24,36 +24,43 @@
 #include "Misc/Master.h"
 #include "MusicIO/WavRecord.h"
 
-class MusicIO : public WavRecord
+class MusicIO
 {
     public:
         MusicIO();
-        ~MusicIO() { };
+        ~MusicIO();
 
         virtual unsigned int getSamplerate(void) = 0;
         virtual int getBuffersize(void) = 0;
         virtual bool Start(void) = 0;
         virtual void Stop(void) = 0;
         virtual void Close(void);
-        void Mute(void) { muted = true; };
-        void unMute(void) { muted = false; };
+
+        inline void StartRecord(void) { Recorder.Start(); };
+        void StopRecord(void);
+        bool SetWavFile(string fpath, string& errmsg);
+        string WavFilename(void);
+        bool SetWavOverwrite(string& errmsg);
+        bool WavIsFloat(void);
 
     protected:
-        bool prepMusicIO(bool with_interleaved);
+        bool prepBuffers(bool with_interleaved);
+        bool prepRecord(void);
         void getAudio(void);
         void InterleaveShorts(void);
-        void silenceBuffers(void);
+
         int getMidiController(unsigned char b);
         void setMidiController(unsigned char ch, unsigned int ctrl, int param);
         void setMidiNote(unsigned char chan, unsigned char note);
         void setMidiNote(unsigned char chan, unsigned char note, unsigned char velocity);
+
         jsample_t *zynLeft;
         jsample_t *zynRight;
         short int *interleavedShorts;
         bool muted;
 
     private:
-        bool prepBuffers(bool with_interleaved);
+        WavRecord Recorder;
 };
 
 #endif

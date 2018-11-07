@@ -26,8 +26,8 @@ bool AlsaJackClient::openAudio(void)
 {
     if (alsaEngine.openAudio())
     {
-        Runtime.settings.Samplerate = getSamplerate();
-        Runtime.settings.Buffersize = getBuffersize();
+        runtime.settings.Samplerate = getSamplerate();
+        runtime.settings.Buffersize = getBuffersize();
         return true;
     }
     else
@@ -38,7 +38,7 @@ bool AlsaJackClient::openAudio(void)
 
 bool AlsaJackClient::openMidi(void)
 {
-    if (jackEngine.connectServer(Runtime.settings.midiDevice))
+    if (jackEngine.connectServer(runtime.settings.midiDevice))
     {
         if (jackEngine.openMidi())
         {

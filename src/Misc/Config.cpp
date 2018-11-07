@@ -33,7 +33,7 @@ using namespace std;
 
 bool autostart_jack = false;
 
-Config Runtime;
+Config runtime;
 
 Config::Config()
 {
@@ -312,7 +312,7 @@ void Config::StartupReport(unsigned int samplerate, int buffersize)
 {
     if (settings.verbose)
     {
-        cout << "ADsynth Oscilsize: " << Runtime.settings.Oscilsize << endl;
+        cout << "ADsynth Oscilsize: " << runtime.settings.Oscilsize << endl;
         cout << "Sample Rate: " << samplerate << endl;
         cout << "Sound Buffer Size: " << buffersize << endl;
         cout << "Internal latency: " << buffersize * 1000.0 / samplerate << " ms" << endl;

@@ -189,12 +189,12 @@ class VirKeys {: {public Fl_Box}
         const int *keysoct1 = keysoct1qwerty;
         const int *keysoct2 = keysoct2qwerty;
 
-        if (Runtime.settings.VirKeybLayout == 2)
+        if (runtime.settings.VirKeybLayout == 2)
         {
             keysoct1 = keysoct1dw;
             keysoct2 = keysoct2dw;
         }
-        else if (Runtime.settings.VirKeybLayout == 3)
+        else if (runtime.settings.VirKeybLayout == 3)
         {
             keysoct1 = keysoct1qwertz;
             keysoct2 = keysoct2qwertz;
@@ -247,7 +247,8 @@ class VirKeys {: {public Fl_Box}
         {
             vel = midivel * (127.0 - rndvelocity) / 127.0 + RND * rndvelocity;
         }
-        zynMaster->NoteOn(midich, nk + midioct * 12, (int)vel);} {}
+        zynMaster->NoteOn(midich, nk + midioct * 12, (int)vel, false);
+    } {}
   }
   Function {relasekey(int nk,int type)} {} {
     code {if (nk < 0 || nk >= N_OCT * 12)

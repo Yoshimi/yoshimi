@@ -80,20 +80,20 @@ int main(int argc, char *argv[])
         switch (opt)
         {
             case 'a':
-                Runtime.settings.midiEngine = alsa_midi;
+                runtime.settings.midiEngine = alsa_midi;
                 if (optarguments != NULL)
-                    Runtime.settings.midiDevice = string(optarguments);
+                    runtime.settings.midiDevice = string(optarguments);
                 break;
 
             case 'A':
-                Runtime.settings.audioEngine = alsa_audio;
+                runtime.settings.audioEngine = alsa_audio;
                 if (optarguments != NULL)
-                    Runtime.settings.audioDevice = string(optarguments);
-                Runtime.settings.audioDevice = (optarguments == NULL)
-                               ? string(Runtime.settings.LinuxALSAaudioDev)
+                    runtime.settings.audioDevice = string(optarguments);
+                runtime.settings.audioDevice = (optarguments == NULL)
+                               ? string(runtime.settings.LinuxALSAaudioDev)
                                : string(optarguments);
-                if (!Runtime.settings.audioDevice.size())
-                    Runtime.settings.audioDevice = "default";
+                if (!runtime.settings.audioDevice.size())
+                    runtime.settings.audioDevice = "default";
                 break;
 
             case 'b':
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
                 if (optarguments != NULL)
                     utmp = atoi(optarguments);
                 if (utmp >= 32 && utmp <= 8192)
-                    Runtime.settings.Buffersize = tmp;
+                    runtime.settings.Buffersize = tmp;
                 else
                 {
                     cerr << "Error, invalid buffer size specified: "
@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
 
             case 'N':
                 if (optarguments != NULL)
-                    Runtime.settings.nameTag = string(optarguments);
+                    runtime.settings.nameTag = string(optarguments);
                 break;
 
             case 'h':
@@ -120,23 +120,23 @@ int main(int argc, char *argv[])
                 break;
 
             case 'j':
-                Runtime.settings.midiEngine = jack_midi;
+                runtime.settings.midiEngine = jack_midi;
                 if (optarguments != NULL)
-                    Runtime.settings.midiDevice = string(optarguments);
+                    runtime.settings.midiDevice = string(optarguments);
                 break;
 
             case 'J':
-                Runtime.settings.audioEngine = jack_audio;
+                runtime.settings.audioEngine = jack_audio;
                 if (optarguments != NULL)
-                    Runtime.settings.audioDevice = string(optarguments);
+                    runtime.settings.audioDevice = string(optarguments);
                 else
-                    Runtime.settings.audioDevice = string(Runtime.settings.LinuxJACKserver);
-                if (!Runtime.settings.audioDevice.size())
+                    runtime.settings.audioDevice = string(runtime.settings.LinuxJACKserver);
+                if (!runtime.settings.audioDevice.size())
                 {
                     if (getenv("JACK_DEFAULT_SERVER"))
-                        Runtime.settings.audioDevice = string(getenv("JACK_DEFAULT_SERVER"));
+                        runtime.settings.audioDevice = string(getenv("JACK_DEFAULT_SERVER"));
                     else
-                        Runtime.settings.audioDevice = "default";
+                        runtime.settings.audioDevice = "default";
                 }
                 break;
 
@@ -173,7 +173,7 @@ int main(int argc, char *argv[])
                              << " is wrong, too small or not power of 2\n";
                         cerr << "ie, 2^n.  Forcing it to " << oscil_size
                              << " instead" << endl;
-                        Runtime.settings.Oscilsize = oscil_size;
+                        runtime.settings.Oscilsize = oscil_size;
                     }
                 }
                 break;
@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
                 if (optarguments != NULL)
                     tmp = atoi(optarguments);
                 if (tmp >= 32000 && tmp <= 128000)
-                    Runtime.settings.Samplerate = tmp;
+                    runtime.settings.Samplerate = tmp;
                 else
                 {
                     cerr << "Error, invalid samplerate specified: "
@@ -193,11 +193,11 @@ int main(int argc, char *argv[])
                 break;
 
             case 'U':
-                Runtime.settings.showGui = false;
+                runtime.settings.showGui = false;
                 break;
 
             case 'q':
-                Runtime.settings.verbose = false;
+                runtime.settings.verbose = false;
                 break;
 
             case '?':
@@ -206,15 +206,15 @@ int main(int argc, char *argv[])
                 break;
         }
     }
-    if (Runtime.settings.audioEngine == no_audio
-        && Runtime.settings.midiEngine == no_midi)
+    if (runtime.settings.audioEngine == no_audio
+        && runtime.settings.midiEngine == no_midi)
     {
         cerr << "Error, no audio & no midi engines nominated!" << endl;
         exitwithhelp = true;
     }
     if (exitwithhelp)
     {
-        Runtime.Usage();
+        runtime.Usage();
         exit(0);
     }
     srand(time(NULL));
@@ -242,7 +242,7 @@ int main(int argc, char *argv[])
 
     if (!zynMaster->Init(musicClient->getSamplerate(),
                          musicClient->getBuffersize(),
-                         Runtime.settings.Oscilsize,
+                         runtime.settings.Oscilsize,
                          load_params, load_instrument))
     {
         cerr << "Error, Master init failed" << endl;
@@ -259,7 +259,7 @@ int main(int argc, char *argv[])
 #   endif
 
 #   if !defined(DISABLE_GUI)
-        if (Runtime.settings.showGui)
+        if (runtime.settings.showGui)
             if (!startGuiThread())
             {
                 cerr << "Error, failed to start gui thread" << endl;
@@ -269,7 +269,7 @@ int main(int argc, char *argv[])
 
     if (musicClient->Start())
     {
-        Runtime.StartupReport(musicClient->getSamplerate(), musicClient->getBuffersize());
+        runtime.StartupReport(musicClient->getSamplerate(), musicClient->getBuffersize());
         while (!Pexitprogram)
             usleep(33000); // where all the action is ...
         musicClient->Close();

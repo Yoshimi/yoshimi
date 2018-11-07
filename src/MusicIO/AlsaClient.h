@@ -31,27 +31,37 @@ class AlsaClient : public MusicClient
 
         bool openAudio(void);
         bool openMidi(void);
-        bool Start(void) { return alsaEngine.Start(); };
-        void Stop(void) { alsaEngine.Stop(); };
-        void Close(void) { alsaEngine.Close(); };
+        bool Start(void)
+            { return alsaEngine.Start(); };
+        void Stop(void)
+            { alsaEngine.Stop(); };
+        void Close(void)
+            { alsaEngine.Close(); };
 
-        unsigned int getSamplerate(void) { return alsaEngine.getSamplerate(); };
-        int getBuffersize(void) { return alsaEngine.getBuffersize(); };
+        unsigned int getSamplerate(void)
+            { return alsaEngine.getSamplerate(); };
+        int getBuffersize(void)
+            { return alsaEngine.getBuffersize(); };
 
-        string audioClientName(void) { return alsaEngine.audioClientName(); };
-        string midiClientName(void) { return alsaEngine.midiClientName(); };
-        int audioClientId(void) { return alsaEngine.audioClientId(); };
-        int midiClientId(void) { return alsaEngine.midiClientId(); };
+        string audioClientName(void)
+            { return alsaEngine.audioClientName(); };
+        string midiClientName(void)
+            { return alsaEngine.midiClientName(); };
+        int audioClientId(void)
+            { return alsaEngine.audioClientId(); };
+        int midiClientId(void)
+            { return alsaEngine.midiClientId(); };
 
-        void startRecord(void) { alsaEngine.RecordStart(); };
-        void stopRecord(void) { alsaEngine.RecordStop(); };
+        void startRecord(void)
+            { alsaEngine.StartRecord(); };
+        void stopRecord(void)
+            { alsaEngine.StopRecord(); };
         bool setRecordFile(const char* fpath, string& errmsg)
             { return alsaEngine.SetWavFile(fpath, errmsg); };
         bool setRecordOverwrite(string& errmsg)
             { return alsaEngine.SetWavOverwrite(errmsg); };
-        string wavFilename(void) { return alsaEngine.WavFilename(); };
-        void Mute(void) { alsaEngine.Mute(); };
-        void unMute(void) { alsaEngine.unMute(); };
+        string wavFilename(void)
+            { return alsaEngine.WavFilename(); };
 
     protected:
         AlsaEngine alsaEngine;

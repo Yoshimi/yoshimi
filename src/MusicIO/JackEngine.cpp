@@ -55,8 +55,8 @@ bool JackEngine::connectServer(string server)
     if (NULL == jackClient) // ie, not already connected
     {
         string clientname = "yoshimi";
-        if (!Runtime.settings.nameTag.empty())
-            clientname += ("-" + Runtime.settings.nameTag);
+        if (!runtime.settings.nameTag.empty())
+            clientname += ("-" + runtime.settings.nameTag);
         jack_status_t jackstatus;
         bool use_server_name = server.size() && server.compare("default") != 0;
         jack_options_t jopts = (jack_options_t)
@@ -168,7 +168,7 @@ void JackEngine::Close(void)
             midi.port = NULL;
         }
         chk = jack_client_close(jackClient);
-        if (chk && Runtime.settings.verbose)
+        if (chk && runtime.settings.verbose)
             cerr << "Error, failed to close jack client, status: " << chk << endl;
         if (NULL != midi.ringBuf)
         {
@@ -200,8 +200,7 @@ bool JackEngine::openAudio(void)
     {
         audio.jackSamplerate = jack_get_sample_rate(jackClient);
         audio.jackNframes = jack_get_buffer_size(jackClient);
-        if (prepMusicIO(false))
-            return true;
+        return (prepBuffers(false) && prepRecord());
     }
     else
         cerr << "Error, failed to register jack audio ports" << endl;
@@ -288,27 +287,32 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
 {
     if (NULL != audio.ports[0] && NULL != audio.ports[1])
     {
-        if (NULL != zynMaster && !muted)
+        for (int port = 0; port < 2; ++port)
         {
-            for (int port = 0; port < 2; ++port)
+            audio.portBuffs[port] =
+                (jsample_t*)jack_port_get_buffer(audio.ports[port], nframes);
+            if (NULL == audio.portBuffs[port])
             {
-                audio.portBuffs[port] =
-                    (jsample_t*)jack_port_get_buffer(audio.ports[port], nframes);
-                if (NULL == audio.portBuffs[port])
-                {
-                    cerr << "Error, failed to get jack audio port buffer: "
-                         << port << endl;
-                    return false;
-                }
+                cerr << "Error, failed to get jack audio port buffer: "
+                     << port << endl;
+                return false;
             }
-            memcpy(audio.portBuffs[0], zynLeft, sizeof(jsample_t) * nframes);
-            memcpy(audio.portBuffs[1], zynRight, sizeof(jsample_t) * nframes);
+        }
+        if (NULL != zynMaster && zynMaster->muteLock(tryreadlock))
+        {
             getAudio();
+            zynMaster->muteLock(unlock);
+            for (unsigned int frame = 0; frame < nframes; ++frame)
+            {   // jsample_t may not be a float!
+                audio.portBuffs[0][frame] = (jsample_t)zynLeft[frame];
+                audio.portBuffs[1][frame] = (jsample_t)zynRight[frame];
+            }
         }
         else
-            silenceBuffers();
-        memcpy(audio.portBuffs[0], zynLeft, sizeof(jsample_t) * nframes);
-        memcpy(audio.portBuffs[1], zynRight, sizeof(jsample_t) * nframes);
+        {
+            memset(audio.portBuffs[0], 0, sizeof(jsample_t) * nframes);
+            memset(audio.portBuffs[1], 0, sizeof(jsample_t) * nframes);
+        }
         return true;
     }
     else
@@ -322,20 +326,25 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
     if (NULL != midi.port)
     {
         void *portBuf = jack_port_get_buffer(midi.port, nframes);
-        if (NULL != portBuf)
+        if (NULL == portBuf)
         {
-            jack_midi_event_t jEvent;
-            jack_nframes_t eventCount = jack_midi_get_event_count(portBuf);
-            unsigned int byt;
-            unsigned int idx;
-            unsigned int act_write;
-            char *data;
-            unsigned int wrote = 0;
-            unsigned int tries = 0;
-            int chk;
-            for(idx = 0; idx < eventCount; ++idx)
+            cerr << "Error, bad get jack midi port buffer" << endl;
+            return  false;
+        }
+        jack_midi_event_t jEvent;
+        jack_nframes_t eventCount = jack_midi_get_event_count(portBuf);
+        unsigned int byt;
+        unsigned int idx;
+        unsigned int act_write;
+        char *data;
+        unsigned int wrote = 0;
+        unsigned int tries = 0;
+        int chk;
+        for(idx = 0; idx < eventCount; ++idx)
+        {
+            if(!jack_midi_event_get(&jEvent, portBuf, idx))
             {
-                if(!jack_midi_event_get(&jEvent, portBuf, idx))
+                if (NULL != zynMaster && zynMaster->muteLock(tryreadlock))
                 {
                     if (jEvent.size > 0 && jEvent.size <= midi.maxdata && !muted)
                     {   // no interest in 0 size or long events
@@ -368,18 +377,14 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
                             return false;
                         }
                     }
+                    zynMaster->muteLock(unlock);
                 }
-                else
-                    cerr << "Warn, jack midi read failed" << endl;
             }
-            return true;
+            else
+                cerr << "Warn, jack midi read failed" << endl;
         }
-        else
-            cerr << "Error, bad get jack midi port buffer" << endl;
     }
-    else
-        cerr << "Error, NULL midiPort through JackEngine::processMidi" << endl;
-    return false;
+    return true;
 }
 
 
@@ -434,11 +439,26 @@ void *JackEngine::midiThread(void)
                 break;
 
             case 0x0C: // program change ... but how?
-                if (Runtime.settings.verbose)
+                if (runtime.settings.verbose)
                 {
                     cerr << "How to change to program " << par << " on channel "
                          << channel << "?" << endl;
                     par = midi.data[2];
+                }
+                break;
+
+            case 0x42: // Sostenuto On/Off
+                par = midi.data[2]; // < 63 off, > 64 on
+                if (runtime.settings.verbose)
+                {
+                    string errstr = string("Sostenuto ");
+                    if (par < 63)
+                        errstr += "off";
+                    else if (par > 64)
+                        errstr += "on";
+                    else
+                        errstr += "?";
+                    cerr << errstr << endl;
                 }
                 break;
 
@@ -487,7 +507,7 @@ void *JackEngine::midiThread(void)
                 break;
 
             default: // wot, more?
-                if (Runtime.settings.verbose)
+                if (runtime.settings.verbose)
                     cerr << "other event: " << (int)ev << endl;
                 break;
         }
@@ -498,16 +518,16 @@ void *JackEngine::midiThread(void)
 
 int JackEngine::_xrunCallback(void *arg)
 {
-    Runtime.settings.verbose && cerr << "Jack reports xrun" << endl;
+    runtime.settings.verbose && cerr << "Jack reports xrun" << endl;
     return 0;
 }
 
 void JackEngine::_errorCallback(const char *msg)
 {
-    Runtime.settings.verbose && cerr << "Jack reports error: " << msg << endl;
+    runtime.settings.verbose && cerr << "Jack reports error: " << msg << endl;
 }
 
 void JackEngine::_infoCallback(const char *msg)
 {
-    Runtime.settings.verbose && cerr << "Jack info message: " << msg << endl;
+    runtime.settings.verbose && cerr << "Jack info message: " << msg << endl;
 }

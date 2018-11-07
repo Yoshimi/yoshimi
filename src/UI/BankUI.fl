@@ -237,9 +237,9 @@ class BankUI {open : {public BankProcess_}
       }
       Fl_Check_Button {} {
         label {auto close}
-        callback {Runtime.settings.BankUIAutoClose = (int) o->value();}
+        callback {runtime.settings.BankUIAutoClose = (int) o->value();}
         tooltip {automatically close the bank window if the instrument is loaded} xywh {705 529 60 15} down_box DOWN_BOX labelsize 10
-        code0 {o->value(Runtime.settings.BankUIAutoClose);}
+        code0 {o->value(runtime.settings.BankUIAutoClose);}
       }
       Fl_Choice banklist {
         callback {int n = o->value();
@@ -261,10 +261,10 @@ class BankUI {open : {public BankProcess_}
       }
       Fl_Check_Button {} {
         label {Show PADsynth status}
-        callback {Runtime.settings.CheckPADsynth = (int) o->value();
+        callback {runtime.settings.CheckPADsynth = (int) o->value();
             refreshmainwindow();}
         xywh {435 530 150 15} down_box DOWN_BOX labelsize 11
-        code0 {o->value(Runtime.settings.CheckPADsynth);}
+        code0 {o->value(runtime.settings.CheckPADsynth);}
       }
     }
   }
@@ -285,7 +285,7 @@ class BankUI {open : {public BankProcess_}
   Function {show()} {open
   } {
     code {bankuiwindow->show();
-simplesetmode(Runtime.settings.UserInterfaceMode == 2);} {}
+simplesetmode(runtime.settings.UserInterfaceMode == 2);} {}
   }
   Function {hide()} {} {
     code {bankuiwindow->hide();} {}
@@ -305,9 +305,9 @@ rescan_for_banks();} {}
                 bank->setName(slot, string(tmp), -1);
             bs[slot]->refresh();
             // Re-read from slot
-            zynMaster->actionLock(lockmute);
+            zynMaster->muteLock(lock);
             bank->loadFromSlot(slot, zynMaster->part[*npart]);
-            zynMaster->actionLock(unlock);
+            zynMaster->muteLock(unlock);
             zynMaster->part[*npart]->applyParameters();
             zynMaster->part[*npart]->Pname = bank->getName(slot);
             cbwig->do_callback();
@@ -315,16 +315,16 @@ rescan_for_banks();} {}
 
         if (what == 1 && mode == 1 && !bank->emptySlot(slot))
         {   // Reads from slot
-            zynMaster->actionLock(lockmute);
+            zynMaster->muteLock(lock);
             bank->loadFromSlot(slot, zynMaster->part[*npart]);
-            zynMaster->actionLock(unlock);
+            zynMaster->muteLock(unlock);
             zynMaster->part[*npart]->applyParameters();
             // original comment
             // snprintf((char *)zynMaster->part[*npart]->Pname,PART_MAX_NAME_LEN,"%s",bank->getName(slot));
             zynMaster->part[*npart]->Pname = bank->getName(slot);
             cbwig->do_callback();
      
-            if (Runtime.settings.BankUIAutoClose != 0)
+            if (runtime.settings.BankUIAutoClose != 0)
                 bankuiwindow->hide();
         }
 
@@ -336,9 +336,9 @@ rescan_for_banks();} {}
                     doit = false;
             if (doit)
             {
-                zynMaster->actionLock(lockmute);
+                zynMaster->muteLock(lock);
                 bank->saveToSlot(slot,zynMaster->part[*npart]);
-                zynMaster->actionLock(unlock);
+                zynMaster->muteLock(unlock);
                 bs[slot]->refresh();
                 mode = 1;
                 readbutton->value(1);

@@ -220,9 +220,9 @@ if (part->kit[n].Ppadenabled!=0) padeditbutton->activate();
                 answer = fl_choice("Delete the item?","No","Yes",NULL);
             if (answer != 0)
             {
-                zynMaster->actionLock(lockmute);
+                zynMaster->muteLock(lock);
                 part->setKitItemStatus(n,(int) o->value());
-                zynMaster->actionLock(unlock);
+                zynMaster->muteLock(unlock);
 
                 if (o->value() == 0)
                     partkititemgroup->deactivate();
@@ -265,9 +265,9 @@ this->redraw();} {
       callback {int answer=1;
 if (o->value()==0) answer=fl_choice("Delete the item?","No","Yes",NULL);
 if (answer!=0){
-zynMaster->actionLock(lockmute);
+zynMaster->muteLock(lock);
  part->setKitItemStatus(n,(int) o->value());
-zynMaster->actionLock(unlock);
+zynMaster->muteLock(unlock);
 
 if (o->value()==0) partkititemgroup->deactivate();
 else partkititemgroup->activate();
@@ -475,9 +475,9 @@ if (part->Pminkey>part->Pmaxkey) o->textcolor(FL_RED);
       }
       Fl_Check_Button {} {
         label Enabled
-        callback {zynMaster->actionLock(lockmute);
+        callback {zynMaster->muteLock(lock);
             zynMaster->partOnOff(npart, (int)o->value());
-            zynMaster->actionLock(unlock);
+            zynMaster->muteLock(unlock);
             if (part->Penabled == 0)
                 partgroupui->deactivate();
             else
@@ -666,9 +666,9 @@ if (part->Pminkey>part->Pmaxkey) o->textcolor(FL_RED);
       }
       Fl_Choice insefftype {
         label EffType
-        callback {zynMaster->actionLock(lockmute);
+        callback {zynMaster->muteLock(lock);
             part->partefx[ninseff]->changeEffect((int) o->value());
-            zynMaster->actionLock(unlock);
+            zynMaster->muteLock(unlock);
             inseffectui->refresh(part->partefx[ninseff]);}
         xywh {155 110 70 15} down_box BORDER_BOX labelsize 10 align 6
         code0 {o->value(part->partefx[ninseff]->getEffect());}
@@ -762,9 +762,9 @@ if (part->Pminkey>part->Pmaxkey) o->textcolor(FL_RED);
       }
       Fl_Button {} {
         label P
-        callback {zynMaster->actionLock(lockmute);
+        callback {zynMaster->muteLock(lock);
             presetsui->Paste(part->partefx[ninseff], inseffectui);
-            zynMaster->actionLock(unlock);}
+            zynMaster->muteLock(unlock);}
         xywh {120 127 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
     }

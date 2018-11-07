@@ -58,9 +58,9 @@ class ConfigUI {open
         } {
           Fl_Choice {} {
             label OscilSize
-            callback {Runtime.settings.Oscilsize = 128 << o->value();}
+            callback {runtime.settings.Oscilsize = 128 << o->value();}
             tooltip {ADSynth Oscillator Size (samples)} xywh {211 55 100 20} down_box BORDER_BOX labelsize 12 textsize 11
-            code0 {o->value( (int)(logf(Runtime.settings.Oscilsize / 128.0 - 1.0) / logf(2.0)) + 1);}
+            code0 {o->value( (int)(logf(runtime.settings.Oscilsize / 128.0 - 1.0) / logf(2.0)) + 1);}
           } {
             MenuItem {} {
               label 128
@@ -101,15 +101,15 @@ class ConfigUI {open
           }
           Fl_Counter {} {
             label {XML compression level}
-            callback {Runtime.settings.GzipCompression=(int) o->value();}
+            callback {runtime.settings.GzipCompression=(int) o->value();}
             tooltip {gzip compression level (0 - uncompressed)} xywh {265 198 65 20} type Simple labelsize 12 align 4 minimum 0 maximum 9 step 1 textsize 11
-            code0 {o->value(Runtime.settings.GzipCompression);}
+            code0 {o->value(runtime.settings.GzipCompression);}
           }
           Fl_Choice {} {
             label {PADsynth Interpolation}
-            callback {Runtime.settings.Interpolation=(int) o->value();}
+            callback {runtime.settings.Interpolation=(int) o->value();}
             xywh {253 100 100 20} down_box BORDER_BOX labelsize 12 textsize 12
-            code0 {o->value(Runtime.settings.Interpolation);}
+            code0 {o->value(runtime.settings.Interpolation);}
           } {
             MenuItem {} {
               label {Linear(fast)}
@@ -122,9 +122,9 @@ class ConfigUI {open
           }
           Fl_Choice {} {
             label {Virtual Keyboard Layout}
-            callback {Runtime.settings.VirKeybLayout=(int) o->value();;}
+            callback {runtime.settings.VirKeybLayout=(int) o->value();;}
             xywh {256 150 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
-            code0 {o->value(Runtime.settings.VirKeybLayout);}
+            code0 {o->value(runtime.settings.VirKeybLayout);}
           } {
             MenuItem {} {
               label { }
@@ -232,21 +232,21 @@ class ConfigUI {open
         } {
           Fl_Input {} {
             label {Jack Server}
-            callback {Runtime.settings.LinuxJACKserver = string(o->value());}
+            callback {runtime.settings.LinuxJACKserver = string(o->value());}
             tooltip {Name of the jack server to connect to - default, ...} xywh {185 52 240 22} labelsize 12 textsize 12
-            code0 {o->insert(Runtime.settings.LinuxJACKserver.c_str());}
+            code0 {o->insert(runtime.settings.LinuxJACKserver.c_str());}
           }
           Fl_Input {} {
             label {Alsa Midi Device}
-            callback {Runtime.settings.LinuxALSAmidiDev = string(o->value());}
+            callback {runtime.settings.LinuxALSAmidiDev = string(o->value());}
             tooltip {Alsa midi device - default, hw:0, ...} xywh {185 94 240 22} labelsize 12 textsize 12
-            code0 {o->insert(Runtime.settings.LinuxALSAmidiDev.c_str());}
+            code0 {o->insert(runtime.settings.LinuxALSAmidiDev.c_str());}
           }
           Fl_Input {} {
             label {Alsa Audio Device}
-            callback {Runtime.settings.LinuxALSAaudioDev = string(o->value());}
+            callback {runtime.settings.LinuxALSAaudioDev = string(o->value());}
             tooltip {Alsa audio device - default, hw:0, front:CARD=Live,DEV=0, ...} xywh {185 141 240 22} labelsize 12 textsize 12
-            code0 {o->insert(Runtime.settings.LinuxALSAaudioDev.c_str());}
+            code0 {o->insert(runtime.settings.LinuxALSAaudioDev.c_str());}
           }
           Fl_Input {} {
             label {Default Record Directory}
@@ -254,16 +254,16 @@ class ConfigUI {open
                 if (NULL == o || !isDirectory(string(o->value())))
                     fl_alert("Invalid directory");
                 else
-                    Runtime.settings.DefaultRecordDirectory = string(o->value());
+                    runtime.settings.DefaultRecordDirectory = string(o->value());
             }
             tooltip {Default directory for recordings} xywh {185 186 242 22} labelsize 12 textsize 12
-            code0 {o->insert(Runtime.settings.DefaultRecordDirectory.c_str());}
+            code0 {o->insert(runtime.settings.DefaultRecordDirectory.c_str());}
           }
           Fl_Check_Button {} {
             label {32 bit float wavs}
-            callback {Runtime.settings.Float32bitWavs = o->value();} selected
+            callback {runtime.settings.Float32bitWavs = o->value();} selected
             tooltip {Record in 32 bit float format} xywh {185 228 18 22} down_box DOWN_BOX labelsize 12 align 4
-            code0 {o->value(Runtime.settings.Float32bitWavs);}
+            code0 {o->value(runtime.settings.Float32bitWavs);}
           }
         }
       }
@@ -311,25 +311,25 @@ class ConfigUI {open
     code {rootsbrowse->clear();
         for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
         {
-            if (Runtime.settings.bankRootDirlist[i].size())
-                rootsbrowse->add(Runtime.settings.bankRootDirlist[i].c_str());
+            if (runtime.settings.bankRootDirlist[i].size())
+                rootsbrowse->add(runtime.settings.bankRootDirlist[i].c_str());
         }} {}
   }
   Function {writebankcfg()} {} {
-    code {Runtime.clearBankrootDirlist();
+    code {runtime.clearBankrootDirlist();
         for (int n = 0; n < rootsbrowse->size(); ++n)
-            Runtime.settings.bankRootDirlist[n] = string(rootsbrowse->text(n + 1));} {}
+            runtime.settings.bankRootDirlist[n] = string(rootsbrowse->text(n + 1));} {}
   }
   Function {readpresetcfg()} {} {
     code {presetbrowse->clear();
         for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-            if (Runtime.settings.presetsDirlist[i].size())
-                presetbrowse->add(Runtime.settings.presetsDirlist[i].c_str());} {}
+            if (runtime.settings.presetsDirlist[i].size())
+                presetbrowse->add(runtime.settings.presetsDirlist[i].c_str());} {}
   }
   Function {writepresetcfg()} {} {
-    code {Runtime.clearPresetsDirlist();
+    code {runtime.clearPresetsDirlist();
         for (int n = 0; n < presetbrowse->size(); ++n)
-            Runtime.settings.presetsDirlist[n] = string(presetbrowse->text(n + 1));} {}
+            runtime.settings.presetsDirlist[n] = string(presetbrowse->text(n + 1));} {}
   }
   Function {show()} {} {
     code {configwindow->show();} {}

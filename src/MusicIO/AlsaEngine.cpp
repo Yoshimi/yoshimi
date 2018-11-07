@@ -48,9 +48,9 @@ AlsaEngine::AlsaEngine() :
 
 bool AlsaEngine::openAudio(void)
 {
-    audio.device = Runtime.settings.audioDevice;
-    audio.samplerate = Runtime.settings.Samplerate;
-    audio.period_size = Runtime.settings.Buffersize;
+    audio.device = runtime.settings.audioDevice;
+    audio.samplerate = runtime.settings.Samplerate;
+    audio.period_size = runtime.settings.Buffersize;
     audio.period_time =  audio.period_size * 1000000.0f / audio.samplerate;
     alsaBad(snd_config_update_free_global(), "failed to update snd config");
     if (alsaBad(snd_pcm_open(&audio.handle, audio.device.c_str(),
@@ -60,8 +60,7 @@ bool AlsaEngine::openAudio(void)
         if (!alsaBad(snd_pcm_nonblock(audio.handle, 0), "set blocking failed"))
             if (prepHwparams())
                 if (prepSwparams())
-                    if (prepMusicIO(true))
-                        return true;
+                    return (prepBuffers(true) && prepRecord());
 bail_out:
     Close();
     return false;
@@ -70,7 +69,7 @@ bail_out:
 
 bool AlsaEngine::openMidi(void)
 {
-    midi.device = Runtime.settings.midiDevice;
+    midi.device = runtime.settings.midiDevice;
     if (!midi.device.size())
         midi.device = "default";
     string port_name = "input";
@@ -117,16 +116,16 @@ void AlsaEngine::Close(void)
 string AlsaEngine::audioClientName(void)
 {
     string name = "yoshimi";
-    if (!Runtime.settings.nameTag.empty())
-        name += ("-" + Runtime.settings.nameTag);
+    if (!runtime.settings.nameTag.empty())
+        name += ("-" + runtime.settings.nameTag);
     return name;
 }
 
 string AlsaEngine::midiClientName(void)
 {
     string name = "yoshimi";
-    if (!Runtime.settings.nameTag.empty())
-        name += ("-" + Runtime.settings.nameTag);
+    if (!runtime.settings.nameTag.empty())
+        name += ("-" + runtime.settings.nameTag);
     return name;
 }
 
@@ -282,12 +281,16 @@ void *AlsaEngine::AudioThread(void)
         }
         if (audio.pcm_state == SND_PCM_STATE_RUNNING)
         {
-            getAudio();
-            InterleaveShorts();
-            Write();
+            if (NULL != zynMaster && zynMaster->muteLock(tryreadlock))
+            {
+                getAudio();
+                zynMaster->muteLock(unlock);
+                InterleaveShorts();
+                Write();
+            }
         }
         else
-            Runtime.settings.verbose
+            runtime.settings.verbose
                 && cerr << "Error, audio pcm still not RUNNING" << endl;
     }
     return NULL;
@@ -370,7 +373,7 @@ bool AlsaEngine::xrunRecover(void)
         if (!alsaBad(snd_pcm_drop(audio.handle), "pcm drop failed"))
             if (!alsaBad(snd_pcm_prepare(audio.handle), "pcm prepare failed"))
                 isgood = true;
-        Runtime.settings.verbose
+        runtime.settings.verbose
             && cout << "Info, xrun recovery " << ((isgood) ? "good" : "not good")
                     << endl;
     }
@@ -476,70 +479,74 @@ void *AlsaEngine::MidiThread(void)
         {
             if (!event)
                 continue;
-            par = event->data.control.param;
-            switch (event->type)
+            if (NULL != zynMaster && zynMaster->muteLock(tryreadlock))
             {
-                case SND_SEQ_EVENT_NOTEON:
-                     if (event->data.note.note)
-                    {
+                par = event->data.control.param;
+                switch (event->type)
+                {
+                    case SND_SEQ_EVENT_NOTEON:
+                         if (event->data.note.note)
+                        {
+                            channel = event->data.note.channel;
+                            note = event->data.note.note;
+                            velocity = event->data.note.velocity;
+                            setMidiNote(channel, note, velocity);
+                        }
+                        break;
+
+                    case SND_SEQ_EVENT_NOTEOFF:
                         channel = event->data.note.channel;
                         note = event->data.note.note;
-                        velocity = event->data.note.velocity;
-                        setMidiNote(channel, note, velocity);
-                    }
-                    break;
+                        setMidiNote(channel, note);
+                        break;
 
-                case SND_SEQ_EVENT_NOTEOFF:
-                    channel = event->data.note.channel;
-                    note = event->data.note.note;
-                    setMidiNote(channel, note);
-                    break;
+                    case SND_SEQ_EVENT_PITCHBEND:
+                        channel = event->data.control.channel;
+                        ctrltype = C_pitchwheel;
+                        par = event->data.control.value;
+                        setMidiController(channel, ctrltype, par);
+                        break;
 
-                case SND_SEQ_EVENT_PITCHBEND:
-                    channel = event->data.control.channel;
-                    ctrltype = C_pitchwheel;
-                    par = event->data.control.value;
-                    setMidiController(channel, ctrltype, par);
-                    break;
+                    case SND_SEQ_EVENT_CONTROLLER:
+                        channel = event->data.control.channel;
+                        ctrltype = event->data.control.param;
+                        par = event->data.control.value;
+                        setMidiController(channel, ctrltype, par);
+                        break;
 
-                case SND_SEQ_EVENT_CONTROLLER:
-                    channel = event->data.control.channel;
-                    ctrltype = event->data.control.param;
-                    par = event->data.control.value;
-                    setMidiController(channel, ctrltype, par);
-                    break;
+                    case SND_SEQ_EVENT_RESET: // reset to power-on state
+                        channel = event->data.control.channel;
+                        ctrltype = C_resetallcontrollers;
+                        setMidiController(channel, ctrltype, 0);
+                        break;
 
-                case SND_SEQ_EVENT_RESET: // reset to power-on state
-                    channel = event->data.control.channel;
-                    ctrltype = C_resetallcontrollers;
-                    setMidiController(channel, ctrltype, 0);
-                    break;
+                    case SND_SEQ_EVENT_PORT_SUBSCRIBED: // ports connected
+                        if (runtime.settings.verbose)
+                            cout << "Info, alsa midi port connected" << endl;
+                        break;
 
-                case SND_SEQ_EVENT_PORT_SUBSCRIBED: // ports connected
-                    if (Runtime.settings.verbose)
-                        cout << "Info, alsa midi port connected" << endl;
-                    break;
+                    case SND_SEQ_EVENT_PORT_UNSUBSCRIBED: // ports disconnected
+                        if (runtime.settings.verbose)
+                            cout << "Info, alsa midi port disconnected" << endl;
+                        break;
 
-                case SND_SEQ_EVENT_PORT_UNSUBSCRIBED: // ports disconnected
-                    if (Runtime.settings.verbose)
-                        cout << "Info, alsa midi port disconnected" << endl;
-                    break;
+                    case SND_SEQ_EVENT_SYSEX:   // system exclusive
+                    case SND_SEQ_EVENT_SENSING: // midi device still there
+                        break;
 
-                case SND_SEQ_EVENT_SYSEX:   // system exclusive
-                case SND_SEQ_EVENT_SENSING: // midi device still there
-                    break;
-
-                default:
-                    if (Runtime.settings.verbose)
-                        cout << "Info, other non-handled midi event, type: "
-                             << (int)event->type << endl;
-                    break;
+                    default:
+                        if (runtime.settings.verbose)
+                            cout << "Info, other non-handled midi event, type: "
+                                 << (int)event->type << endl;
+                        break;
+                }
+                zynMaster->muteLock(unlock);
             }
             snd_seq_free_event(event);
         }
         if (chk < 0)
         {
-            if (Runtime.settings.verbose)
+            if (runtime.settings.verbose)
                 cerr << "Error, ALSA midi input read failed: " << chk << endl;
             return NULL;
         }

@@ -26,37 +26,35 @@
 
 using namespace std;
 
-typedef enum { nada = 0, stopped, recording } record_state;
+typedef enum { nada = 0, ready, recording, } record_state;
 
 class WavRecord {
     public:
         WavRecord();
         ~WavRecord();
-        bool PrepWav(void);
-        void RecordStart(void);
-        void RecordFeed(void);
-        void RecordStop(void);
-        void RecordClose(void);
-        bool SetWavFile(string fpath, string& errmsg);
-        bool SetWavOverwrite(string& errmsg);
-        string WavFilename(void) { return wavFile; };
-        bool WavIsFloat(void) { return float32bit; };
-
-    protected:
-        virtual unsigned int getSamplerate(void) { return 0; };
-        virtual int getBuffersize(void) { return 0; };
-        void feedRecord(float* samples_left, float *samples_right);
-        bool recordRunning;
+        bool Prep(unsigned int sample_rate, int buffer_size);
+        void Start(void);
+        void Stop(void);
+        void Close(void);
+        bool SetFile(string fpath, string& errmsg);
+        bool SetOverwrite(string& errmsg);
+        string Filename(void) { return wavFile; };
+        bool IsFloat(void) { return float32bit; };
+        void Feed(float* samples_left, float *samples_right);
+        inline bool Running(void) { return (recordState == recording); };
+        inline bool Trigger(void) { return (recordState == ready); };
 
     private:
-        void *recordThread(void);
-        static void *_recordThread(void *arg);
-        static void _wavCleanup(void *arg);
-        void wavCleanup(void);
+        void *recorderThread(void);
+        static void *_recorderThread(void *arg);
+        static void _cleanup(void *arg);
+        void cleanup(void);
         void recordLog(string tag);
 
         unsigned int  samplerate;
         unsigned int  buffersize;
+        float        *interleavedFloats;
+        bool          float32bit;
 
         string      recordFifo;
         FILE       *toFifo;
@@ -69,11 +67,9 @@ class WavRecord {
         SF_INFO  wavOutInfo;
         SNDFILE *wavOutsnd;
 
-        float        *interleavedFloats;
-        bool          float32bit;
-        record_state  recordState;
-        bool          runRecordThread;
-        pthread_t     pThread;
+        bool         runRecordThread;
+        pthread_t    pThread;
+        record_state recordState;
 };
 
 #endif
