@@ -3,6 +3,8 @@ yoshimi 1.5.9 M
 2018-11-8 Will
 * Further revision to CLI AddVoice controls.
 * BugFix: CLI waveform change only setting voice 1.
+* Improved CLI waveform selection.
+* CLI checks part enabled before other controls.
 
 2018-11-7 Will
 * Added missing controls to CLI voice modulator.

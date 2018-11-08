@@ -360,9 +360,9 @@ string waveformlist [] = {
     "POWer","",
     "GAUss","",
     "DIOde","",
-    "ABSine","",
-    "PSIne","",
-    "SSIne","",
+    "ABSsine","",
+    "PULsesine","",
+    "STRetchsine","",
     "CHIrp","",
     "ASIne","",
     "CHEbyshev","",
@@ -2332,7 +2332,8 @@ string CmdInterface::findStatus(bool show)
         }
         else if (bitTest(context, LEVEL::Oscillator))
         {
-            text += " Wave";
+            string waveform[] = {"Sine", "Triangle", "Pulse", "Saw", "Power", "Gauss", "Diode", "AbsSine", "PulseSine", "StretchSine", "Chirp", "AbsStretchSine", "Chebyshev", "Square", "Spike", "Circle"};
+            text += (" " + waveform[(int)readControl(OSCILLATOR::control::baseFunctionType, npart, kitNumber, engine, TOPLEVEL::insert::oscillatorGroup)]);
         }
 
         if (bitTest(context, LEVEL::LFO))
@@ -4115,7 +4116,15 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
                 return done_msg;
         }
     }
-
+    int enable = toggle();
+    if (enable != -1)
+    {
+        sendNormal(enable, controlType, PART::control::enable, npart);
+        if (lineEnd(controlType))
+            return done_msg;
+    }
+    if (!readControl(PART::control::enable, npart))
+        return inactive_msg;
     if (bitTest(context, LEVEL::AllFX))
         return effects(controlType);
 
