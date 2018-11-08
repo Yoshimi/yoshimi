@@ -49,6 +49,17 @@ using namespace std;
 #include "Interface/CmdInterface.h"
 
 
+/*
+ * There are two routes that commands can take.
+ * sendDirect() and sendNormal()
+ *
+ * sendDirect() is the older form and is now mostly used for
+ * numerical entry by test calls. It always returns zero.
+ *
+ * sendNormal() performs 'value' range adjustment and also
+ * performs some error checks, returning a response.
+ */
+
 extern SynthEngine *firstSynth;
 static unsigned int currentInstance = 0;
 
@@ -251,7 +262,7 @@ string addsynthlist [] = {
 string addvoicelist [] = {
 
     "Type <s>",             "sound type (oscillator, White noise, Pink noise)",
-    "SOurce <n>",           "oscillator voice number (-1 for self)",
+    "SOurce <[s]/[n]>",     "oscillator source (Internal, {voice number})",
     "Phase <n>",            "relative voice phase",
     "Minus <s>",            "Invert entire voice (ON, {other})",
     "DELay <n>",            "delay before this voice starts",
@@ -342,15 +353,28 @@ string  resonancelist [] = {
     "end"
 };
 string waveformlist [] = {
+    "SINe",                     "basic waveforms",
+    "TRIangle","",
+    "PULse","",
+    "SAW","",
+    "POWer","",
+    "GAUss","",
+    "DIOde","",
+    "ABSine","",
+    "PSIne","",
+    "SSIne","",
+    "CHIrp","",
+    "ASIne","",
+    "CHEbyshev","",
+    "SQUare","",
+    "SPIke","",
+    "CIRcle","",
     "Harmonic <n1> Amp <n2>",   "harmonic n1 to n2 intensity",
     "Harmonic <n1> Phase <n2>", "harmonic n1 to n2 phase",
     "Harmonic Shift <n>",       "amount harmonics are moved",
     "Harmonic Before <s>",      "shift before waveshaping and filtering (ON {other})",
     "COnvert",                  "change resultant wave to groups of sine waves",
     "CLear",                    "clear harmonic settings",
-    "WAve <s>",                 "the shape of the basic waveform",
-    "","SINe,TRIangle,PULse,SAW,POWer,GAUss,DIOde,ABSine,PSIne",
-    "","SSIne,CHIrp,ASIne,CHEbyshev,SQUare,SPIke,CIRcle",
     "Base Par <n>",             "basic wave parameter",
     "Base Mod Type <s>",        "basic modulation type (OFF, Rev, Sine Power)",
     "Base Mod Par <n1> <n2>",   "parameter number n1 (1 - 3), n2 value",
@@ -3167,11 +3191,11 @@ int CmdInterface::modulator(unsigned char controlType)
             else
             {
                 int tmp = point[0] - char('0');
-                if (tmp >= 1 && tmp <= 8)
+                if (tmp > 0)
                     value = tmp;
             }
-            if (value == -1)
-                return value_msg;
+            if (value == -1 || value > voiceNumber)
+                return range_msg;
             if (value == 0)
                 value = 0xff;
             else
@@ -3198,11 +3222,11 @@ int CmdInterface::modulator(unsigned char controlType)
             else
             {
                 int tmp = point[0] - char('0');
-                if (tmp >= 1 && tmp <= 8)
+                if (tmp > 0)
                     value = tmp;
             }
-            if (value == -1)
-                return value_msg;
+            if (value == -1 || value > voiceNumber)
+                return range_msg;
             if (value == 0)
                 value = 0xff;
             else
@@ -3290,11 +3314,20 @@ int CmdInterface::addVoice(unsigned char controlType)
         }
         else if (matchnMove(2, point, "source"))
         {
-            value = string2int(point) -1;
-            if (value >= voiceNumber)
+            if (matchnMove(1, point, "internal"))
+                value = 0;
+            else
+            {
+                int tmp = point[0] - char('0');
+                if (tmp > 0)
+                    value = tmp;
+            }
+            if (value == -1 || value > voiceNumber)
                 return range_msg;
-            if (value <= -1)
+            if (value == 0)
                 value = 0xff;
+            else
+                value -= 1;
             cmd = ADDVOICE::control::voiceOscillatorSource;
         }
         else if (matchnMove(1, point, "phase"))
@@ -3843,7 +3876,12 @@ int CmdInterface::waveform(unsigned char controlType)
     string filtertype[] = {"OFF", "LP1", "HPA", "HPB", "BP1", "BS1", "LP2", "HP2", "BP2", "BS2", "COS", "SIN", "LSH", "SGM", "end"};
     string adaptive[] = {"OFF", "ON", "SQU", "2XS", "2XA", "3XS", "3XA", "4XS", "4XA"};
 
-    if (matchnMove(1, point, "harmonic"))
+
+    string name = string(point).substr(0,3);
+    value = stringNumInList(name, wavebase, 1);
+    if (value != -1)
+        cmd = OSCILLATOR::control::baseFunctionType;
+    else if (matchnMove(1, point, "harmonic"))
     {
         if (lineEnd(controlType))
             return value_msg;
@@ -3873,15 +3911,6 @@ int CmdInterface::waveform(unsigned char controlType)
         if (value == -1)
             value = string2int(point);
         return sendNormal(value, controlType, cmd, npart, kitNumber, engine + voiceNumber, insert);
-    }
-
-    if (matchnMove(2, point, "wave"))
-    {
-        string name = string(point).substr(0,3);
-        value = stringNumInList(name, wavebase, 1);
-        if (value == -1)
-            return value_msg;
-        cmd = OSCILLATOR::control::baseFunctionType;
     }
 
     else if (matchnMove(2, point, "convert"))
@@ -4047,7 +4076,7 @@ int CmdInterface::waveform(unsigned char controlType)
         return available_msg;
     if (value == -1)
         value = string2float(point);
-    return sendNormal(value, controlType, cmd, npart, kitNumber, engine, insert);
+    return sendNormal(value, controlType, cmd, npart, kitNumber, engine + voiceNumber, insert);
 }
 
 

@@ -13,6 +13,8 @@ Sort out cli part effect controls. Also sys/ins updates wrong.
 
 Some CLI addvoice kit mode controls don't update the GUI.
 
+CLI waveform (in voice) changes don't update GUI unless waveform window is open too.
+
 Find out why reporting errors in 'Bank' is very slow.
 
 Realtime subnote
