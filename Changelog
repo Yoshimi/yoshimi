@@ -2,6 +2,10 @@ yoshimi 1.5.9 M
 
 2018-11-9 Will
 * All CLI part contexts checked for enable.
+* Substantially revised CLI part level controls.
+  No need for KMode, KItem as names unique and
+  numbers assumed to be kit items in this mode.
+  Effect and Name no longer need 'K' prefix.
 
 2018-11-8 Will
 * Further revision to CLI AddVoice controls.

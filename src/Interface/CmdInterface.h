@@ -100,7 +100,7 @@ class CmdInterface : private MiscFuncs
         int addVoice(unsigned char controlType);
         int modulator(unsigned char controlType);
         int waveform(unsigned char controlType);
-        int commandPart(bool justSet, unsigned char controlType);
+        int commandPart(unsigned char controlType);
         int commandReadnSet(unsigned char controlType);
         float readControl(unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff);
         void readLimits(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2);

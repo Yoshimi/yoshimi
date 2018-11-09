@@ -181,6 +181,7 @@ string configlist [] = {
 };
 
 string partlist [] = {
+    "<n>",                      "select part number (1-currently available)",
     "OFfset <n2>",              "velocity sense offset",
     "Breath <s>",               "breath control (ON, {other})",
     "POrtamento <s>",           "portamento (ON, {other})",
@@ -191,16 +192,20 @@ string partlist [] = {
     "  Type <s>",               "the effect type",
     "  PREset <n3>",            "set numbered effect preset to n3",
     "  Send <n3> <n4>",         "send part to system effect n3 at volume n4",
-    "KMode <s>",                "set part to kit mode (MUlti, SIngle, CRoss, OFF)",
-    "  KItem <n>",              "select kit item number (1-16)",
-    "    MUte <s>",             "silence this item (ON, {other})",
-    "    KEffect <n>",          "select effect for this item (0-none, 1-3)",
-    "    KName <s>",            "set the name for this item",
-    "  DRum <s>",               "set kit to drum mode (ON, {other})",
     "PRogram <[n2]/[s]>",       "loads instrument ID / CLear sets default",
     "NAme <s>",                 "sets the display name the part can be saved with",
     "Channel <n2>",             "MIDI channel (> 32 disables, > 16 note off only)",
     "Destination <s2>",         "jack audio destination (Main, Part, Both)",
+    "kit mode entries","",
+    "   <n>",                   "select kit item number (1-16)",
+    "   DIsable",               "Disable kit mode",
+    "   MUlti",                 "alow item overlaps",
+    "   SIngle",                "lowest numbered item in key range",
+    "   CRoss",                 "cross fade pairs",
+    "   QUiet <s>",             "silence this item (ON, {other})",
+    "   EFfect <n>",            "select effect for this item (0-none, 1-3)",
+    "   NAme <s>",              "set the name for this item",
+    "   DRum <s>",              "set kit to drum mode (ON, {other})",
     "ADDsynth ...",             "Enter AddSynth context",
     "SUBsynth ...",             "Enter SubSynth context",
     "PADsynth ...",             "Enter PadSynth context",
@@ -3262,10 +3267,10 @@ int CmdInterface::addVoice(unsigned char controlType)
     int enable = (toggle());
     if (enable > -1)
     {
-        sendNormal(enable, controlType, ADDVOICE::control::enableVoice, npart, UNUSED, PART::engine::addVoice1 + voiceNumber);
+        sendNormal(enable, controlType, ADDVOICE::control::enableVoice, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
         return done_msg;
     }
-    if (!lineEnd(controlType) && !readControl(ADDVOICE::control::enableVoice, npart, UNUSED, PART::engine::addVoice1 + voiceNumber))
+    if (!lineEnd(controlType) && !readControl(ADDVOICE::control::enableVoice, npart, kitNumber, PART::engine::addVoice1 + voiceNumber))
         return inactive_msg;
 
     if (matchnMove(2, point, "modulator"))
@@ -4122,41 +4127,61 @@ int CmdInterface::waveform(unsigned char controlType)
 }
 
 
-int CmdInterface::commandPart(bool justSet, unsigned char controlType)
+int CmdInterface::commandPart(unsigned char controlType)
 {
     Config &Runtime = synth->getRuntime();
     int tmp;
 
     if (lineEnd(controlType))
         return done_msg;
-    if (justSet || isdigit(point[0]))
+    if (kitMode == PART::kitType::Off)
+        kitNumber = UNUSED; // always clear it if not kit mode
+    if (isdigit(point[0]))
     {
         tmp = string2int127(point);
+        point = skipChars(point);
         if (tmp > 0)
         {
             tmp -= 1;
-            if (tmp >= Runtime.NumAvailableParts)
+            if (kitMode == PART::kitType::Off)
             {
-                Runtime.Log("Part number too high");
-                return done_msg;
+                if (tmp >= Runtime.NumAvailableParts)
+                {
+                    Runtime.Log("Part number too high");
+                    return done_msg;
+                }
+
+                if (npart != tmp)
+                {
+                    npart = tmp;
+                    if (controlType == TOPLEVEL::type::Write)
+                    {
+                        context = LEVEL::Top;
+                        bitSet(context, LEVEL::Part);
+                        kitMode = PART::kitType::Off;
+                        kitNumber = 0;
+                        voiceNumber = 0; // must clear this too!
+                        sendDirect(npart, TOPLEVEL::type::Write, MAIN::control::partNumber, TOPLEVEL::section::main);
+                    }
+                }
+                if (lineEnd(controlType))
+                    return done_msg;
             }
-            point = skipChars(point);
-            if (npart != tmp)
+            else
             {
-                npart = tmp;
                 if (controlType == TOPLEVEL::type::Write)
                 {
-                    context = LEVEL::Top;
-                    bitSet(context, LEVEL::Part);
-                    kitMode = PART::kitType::Off;
-                    kitNumber = 0;
-                    sendDirect(npart, TOPLEVEL::type::Write, MAIN::control::partNumber, TOPLEVEL::section::main);
+                    if (tmp >= NUM_KIT_ITEMS)
+                        return range_msg;
+                    kitNumber = tmp;
+                    voiceNumber = 0;// to avoid confusion
                 }
-            }
-            if (lineEnd(controlType))
+                Runtime.Log("Kit item number " + to_string(kitNumber + 1));
                 return done_msg;
+            }
         }
     }
+
     if (kitMode == PART::kitType::Off)
     {
         int enable = toggle();
@@ -4167,6 +4192,38 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
                 return done_msg;
         }
         if (!readControl(PART::control::enable, npart))
+            return inactive_msg;
+    }
+
+    tmp = -1;
+    if (matchnMove(2, point, "disable"))
+        tmp = PART::kitType::Off;
+    else if(matchnMove(2, point, "multi"))
+        tmp = PART::kitType::Multi;
+    else if(matchnMove(2, point, "single"))
+        tmp = PART::kitType::Single;
+    else if(matchnMove(2, point, "crossfade"))
+        tmp = PART::kitType::CrossFade;
+    if (tmp != -1)
+    {
+        kitNumber = 0;
+        voiceNumber = 0; // must clear this too!
+        kitMode = tmp;
+        return sendNormal(kitMode, controlType, PART::control::kitMode, npart);
+    }
+    if (kitMode != PART::kitType::Off)
+    {
+        int value = toggle();
+        if (value >= 0)
+        {
+            if (kitNumber == 0 && bitFindHigh(context) == LEVEL::Part)
+            {
+                synth->getRuntime().Log("Kit item 1 always on.");
+                return done_msg;
+            }
+            sendDirect(value, controlType, PART::control::enable, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup);
+        }
+        if (!readControl(PART::control::enable, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup))
             return inactive_msg;
     }
 
@@ -4194,6 +4251,44 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
         return padSynth(controlType);
     }
 
+    if (kitMode)
+    {
+        int value;
+        if (matchnMove(2, point, "drum"))
+        {
+            value = toggle();
+            sendDirect((value == 1), controlType, PART::control::drumMode, npart);
+            return done_msg;
+        }
+        if (matchnMove(2, point, "quiet"))
+        {
+            value = toggle();
+            sendDirect((value == 1), controlType, PART::control::kitItemMute, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup);
+            return done_msg;
+        }
+        if (matchnMove(2, point,"effect"))
+        {
+            if (controlType == TOPLEVEL::type::Write && point[0] == 0)
+                return value_msg;
+            value = string2int(point);
+            if (value < 0 || value > 3)
+                return range_msg;
+            sendDirect(value, controlType, PART::control::kitEffectNum, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup);
+            return done_msg;
+        }
+        if (matchnMove(2, point,"name"))
+        {
+            if (lineEnd(controlType))
+                return value_msg;
+            int par2 = NO_MSG;
+            if (controlType == TOPLEVEL::type::Write)
+                par2 = miscMsgPush(point);
+            sendDirect(0, controlType, PART::control::instrumentName, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup, TOPLEVEL::route::adjustAndLoopback, par2);
+            return done_msg;
+        }
+    }
+
+
     tmp = partCommonControls(controlType);
     if (tmp != todo_msg)
         return tmp;
@@ -4204,93 +4299,6 @@ int CmdInterface::commandPart(bool justSet, unsigned char controlType)
         bitSet(context, LEVEL::AllFX);
         bitSet(context, LEVEL::Part);
         return effects(controlType);
-    }
-
-    if (matchnMove(2, point, "kmode"))
-    {
-        if (matchnMove(2, point, "off"))
-            kitMode = PART::kitType::Off;
-        else if(matchnMove(2, point, "multi"))
-            kitMode = PART::kitType::Multi;
-        else if(matchnMove(2, point, "single"))
-            kitMode = PART::kitType::Single;
-        else if(matchnMove(2, point, "crossfade"))
-            kitMode = PART::kitType::CrossFade;
-        else if (controlType == TOPLEVEL::type::Write)
-            return value_msg;
-        sendDirect(kitMode, controlType, PART::control::kitMode, npart);
-        kitNumber = 0;
-        voiceNumber = 0; // must clear this too!
-        return done_msg;
-    }
-    if (kitMode == PART::kitType::Off)
-        kitNumber = UNUSED; // always clear it if not kit mode
-    else
-    {
-
-        if (matchnMove(2, point, "kitem"))
-        {
-            if (controlType == TOPLEVEL::type::Write)
-            {
-                if (lineEnd(controlType))
-                    return value_msg;
-                int tmp = string2int(point);
-                if (tmp < 1 || tmp > NUM_KIT_ITEMS)
-                    return range_msg;
-                kitNumber = tmp - 1;
-                voiceNumber = 0;// to avoid confusion
-            }
-            Runtime.Log("Kit item number " + to_string(kitNumber + 1));
-            return done_msg;
-        }
-    }
-    if (kitMode)
-    {
-        int value;
-        if (matchnMove(2, point, "drum"))
-        {
-            value = toggle();
-            sendDirect((value == 1), controlType, PART::control::drumMode, npart);
-            return done_msg;
-        }
-        if (matchnMove(2, point, "mute"))
-        {
-            value = toggle();
-            sendDirect((value == 1), controlType, PART::control::kitItemMute, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup);
-            return done_msg;
-        }
-
-        value = toggle();
-        if (value >= 0)
-        {
-            if (kitNumber == 0 && bitFindHigh(context) == LEVEL::Part)
-            {
-                synth->getRuntime().Log("Kit item 1 always on.");
-                return done_msg;
-            }
-            sendDirect(value, controlType, PART::control::enable, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup);
-        }
-
-        if (matchnMove(2, point,"keffect"))
-        {
-            if (controlType == TOPLEVEL::type::Write && point[0] == 0)
-                return value_msg;
-            value = string2int(point);
-            if (value < 0 || value > 3)
-                return range_msg;
-            sendDirect(value, controlType, PART::control::kitEffectNum, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup);
-            return done_msg;
-        }
-        if (matchnMove(2, point,"kname"))
-        {
-            if (lineEnd(controlType))
-                return value_msg;
-            int par2 = NO_MSG;
-            if (controlType == TOPLEVEL::type::Write)
-                par2 = miscMsgPush(point);
-            sendDirect(0, controlType, PART::control::instrumentName, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup, TOPLEVEL::route::adjustAndLoopback, par2);
-            return done_msg;
-        }
     }
 
     if (matchnMove(2, point, "shift"))
@@ -4484,7 +4492,7 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
     if (bitTest(context, LEVEL::PadSynth))
         return padSynth(controlType);
     if (bitTest(context, LEVEL::Part))
-        return commandPart(false, controlType);
+        return commandPart(controlType);
     if (bitTest(context, LEVEL::Vector))
         return commandVector(controlType);
     if (bitTest(context, LEVEL::Learn))
@@ -4519,7 +4527,7 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
         context = LEVEL::Top;
         bitSet(context, LEVEL::Part);
         nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
-        return commandPart(true, controlType);
+        return commandPart(controlType);
     }
 
     if (matchnMove(2, point, "vector"))
@@ -4729,7 +4737,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
     {
         ++ point;
         point = skipSpace(point);
-        context = LEVEL::Top;
+        defaults();
         if (point[0] == 0)
             return done_msg;
     }
@@ -4742,7 +4750,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         if (query("Restore to basic settings", false))
         {
             sendDirect(0, TOPLEVEL::type::Write, control, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::adjustAndLoopback);
-            context = LEVEL::Top;
+            defaults();
         }
         return done_msg;
     }
@@ -4752,11 +4760,16 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         point = skipSpace(point);
 
         if (bitFindHigh(context) == LEVEL::AllFX || bitFindHigh(context) == LEVEL::InsFX)
-            context = LEVEL::Top;
-        else if (bitFindHigh(context) == LEVEL::Part && (bitTest(context, LEVEL::AllFX) || bitTest(context, LEVEL::InsFX)))
+            defaults();
+        else if (bitFindHigh(context) == LEVEL::Part)
         {
-            context = LEVEL::Top;
-            bitSet(context, LEVEL::Part); // restore part level
+            if (bitTest(context, LEVEL::AllFX) || bitTest(context, LEVEL::InsFX))
+            {
+                defaults();
+                bitSet(context, LEVEL::Part); // restore part level
+            }
+            else
+                defaults();
         }
         else
         {
