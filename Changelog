@@ -8,6 +8,8 @@ yoshimi 1.5.9 M
   This prevents a clash with ON/OFF commands.
 * More CLI adjustments and conversion to sendNormal().
   This provides better error checking and reporting.
+* Corrected CLI Voice Modulator type message.
+* BugFix: CLI Voice number blocked if current disabled.
 
 2018-11-9 Will
 * All CLI part contexts checked for enable.

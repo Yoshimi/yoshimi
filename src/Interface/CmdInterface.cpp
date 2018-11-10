@@ -2328,7 +2328,7 @@ string CmdInterface::findStatus(bool show)
         else if (bitTest(context, LEVEL::Oscillator))
         {
             string waveform[] = {"Sine", "Triangle", "Pulse", "Saw", "Power", "Gauss", "Diode", "AbsSine", "PulseSine", "StretchSine", "Chirp", "AbsStretchSine", "Chebyshev", "Square", "Spike", "Circle"};
-            text += (" " + waveform[(int)readControl(OSCILLATOR::control::baseFunctionType, npart, kitNumber, engine, TOPLEVEL::insert::oscillatorGroup)]);
+            text += (" " + waveform[(int)readControl(OSCILLATOR::control::baseFunctionType, npart, kitNumber, engine + voiceNumber, TOPLEVEL::insert::oscillatorGroup)]);
         }
 
         if (bitTest(context, LEVEL::LFO))
@@ -3265,6 +3265,17 @@ int CmdInterface::modulator(unsigned char controlType)
 
 int CmdInterface::addVoice(unsigned char controlType)
 {
+    if (isdigit(point[0]))
+    {
+        int tmp = string2int(point) - 1;
+        if (tmp < 0 || tmp >= NUM_VOICES)
+            return range_msg;
+        voiceNumber = tmp;
+        point = skipChars(point);
+    }
+    if (lineEnd(controlType))
+        return done_msg;
+
     int enable = (toggle());
     if (enable > -1)
     {
@@ -3284,16 +3295,6 @@ int CmdInterface::addVoice(unsigned char controlType)
         bitSet(context, LEVEL::Oscillator);
         return waveform(controlType);
     }
-    if (isdigit(point[0]))
-    {
-        int tmp = string2int(point) - 1;
-        if (tmp < 0 || tmp >= NUM_VOICES)
-            return range_msg;
-        voiceNumber = tmp;
-        point = skipChars(point);
-    }
-    if (lineEnd(controlType))
-        return done_msg;
 
     int value = -1;
     int cmd = -1;
