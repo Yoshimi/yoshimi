@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified October 2018
+    Modified November 2018
 */
 
 #include <cstring>
@@ -1665,23 +1665,37 @@ float Part::getLimits(CommandBlock *getData)
             break;
 
         case PART::control::midiModWheel:
-        case PART::control::midiFilterQ:
-        case PART::control::midiFilterCutoff:
-        case PART::control::midiBandwidth:
             type |= learnable;
             break;
-
+        case PART::control::midiBreath: // not done yet
+            break;
         case PART::control::midiExpression:
             type |= learnable;
             def = 127;
             break;
+        case PART::control::midiSustain: // not done yet
+            break;
+        case PART::control::midiPortamento: // not done yet
+            break;
+        case PART::control::midiFilterQ:
+            type |= learnable;
+            break;
+        case PART::control::midiFilterCutoff:
+            type |= learnable;
+            break;
+        case PART::control::midiBandwidth:
+            type |= learnable;
+            break;
 
-        // these haven't been done
-        case PART::control::midiBreath:
+// the following have no limits but are here so they don't
+// create errors when tested.
+        case PART::control::instrumentCopyright:
             break;
-        case PART::control::midiSustain:
+        case PART::control::instrumentComments:
             break;
-        case PART::control::midiPortamento:
+        case PART::control::instrumentName:
+            break;
+        case PART::control::defaultInstrumentCopyright:
             break;
 
         case 255: // number of parts

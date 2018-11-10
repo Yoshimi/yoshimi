@@ -495,7 +495,7 @@ int MiscFuncs::matchWord(int numChars, char *buf, const char *word)
 {
     int newp = 0;
     int size = strlen(word);
-    while (buf[newp] > 0x20 && buf[newp] < 0x7f && newp < size && (buf[newp] | 0x20) == (word[newp] | 0x20))
+    while (buf[newp] > 0x20 && buf[newp] < 0x7f && newp < size && (tolower(buf[newp])) == (tolower(word[newp])))
             ++ newp;
     if (newp >= numChars && (buf[newp] <= 0x20 || buf[newp] >= 0x7f))
         return newp;

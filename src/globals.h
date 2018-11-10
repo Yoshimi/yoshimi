@@ -47,6 +47,7 @@ const int MAX_PRESETS = 1000;
 const unsigned char MAX_PRESET_DIRS = 128;
 const unsigned char MAX_BANK_ROOT_DIRS = 128;
 const unsigned char MAX_BANKS_IN_ROOT = 128;
+const unsigned char MAX_INSTRUMENTS_IN_BANK = 160;
 const unsigned char MAX_AD_HARMONICS = 128;
 const unsigned char MAX_SUB_HARMONICS = 64;
 const unsigned char PAD_MAX_SAMPLES = 96;

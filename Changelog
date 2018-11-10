@@ -1,5 +1,10 @@
 yoshimi 1.5.9 M
 
+2018-11-10 Will
+* CLI fine tuning.
+* Added dummy Part entries in limits for text entries
+  that have no 'value' to prevent errors when tested.
+
 2018-11-9 Will
 * All CLI part contexts checked for enable.
 * Substantially revised CLI part level controls.
