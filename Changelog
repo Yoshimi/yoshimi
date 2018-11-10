@@ -4,6 +4,10 @@ yoshimi 1.5.9 M
 * CLI fine tuning.
 * Added dummy Part entries in limits for text entries
   that have no 'value' to prevent errors when tested.
+* Changed CLI Velocity 'Offset' to 'Level'.
+  This prevents a clash with ON/OFF commands.
+* More CLI adjustments and conversion to sendNormal().
+  This provides better error checking and reporting.
 
 2018-11-9 Will
 * All CLI part contexts checked for enable.

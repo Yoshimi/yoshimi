@@ -182,7 +182,7 @@ string configlist [] = {
 
 string partlist [] = {
     "<n>",                      "select part number (1-currently available)",
-    "OFfset <n2>",              "velocity sense offset",
+    "LEvel <n2>",               "velocity sense offset level",
     "Breath <s>",               "breath control (ON, {other})",
     "POrtamento <s>",           "portamento (ON, {other})",
     "Mode <s>",                 "key mode (Poly, Mono, Legato)",
@@ -2188,9 +2188,8 @@ string CmdInterface::findStatus(bool show)
         {
             justPart = true;
             if (kitMode == PART::kitType::Off)
-                text += " Part ";
+                text = " Part ";
         }
-        else text = " P";
         text += to_string(int(npart) + 1);
         if (readControl(PART::control::enable, npart))
             text += "+";
@@ -4305,16 +4304,15 @@ int CmdInterface::commandPart(unsigned char controlType)
             value = MIN_KEY_SHIFT;
         else if(value > MAX_KEY_SHIFT)
             value = MAX_KEY_SHIFT;
-        sendDirect(value, controlType, PART::control::keyShift, npart, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
-        return done_msg;
+        return sendNormal(value, controlType, PART::control::keyShift, npart, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
     }
 
-    if (matchnMove(2, point, "offset"))
+    if (matchnMove(2, point, "LE"))
     {
         tmp = string2int127(point);
         if(controlType == TOPLEVEL::type::Write && tmp < 1)
             return value_msg;
-        sendDirect(tmp, controlType, PART::control::velocityOffset, npart);
+        return sendNormal(tmp, controlType, PART::control::velocityOffset, npart);
     }
 
     if (matchnMove(2, point, "program") || matchnMove(1, point, "instrument"))
@@ -4362,14 +4360,10 @@ int CmdInterface::commandPart(unsigned char controlType)
             if (dest == 0)
                 return range_msg;
         }
-        sendDirect(dest, controlType, PART::control::audioDestination, npart, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::adjustAndLoopback);
-        return done_msg;
+        return sendNormal(dest, controlType, PART::control::audioDestination, npart, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::adjustAndLoopback);
     }
     if (matchnMove(1, point, "breath"))
-    {
-        sendDirect((toggle() == 1), controlType, PART::control::breathControlEnable, npart);
-        return done_msg;
-    }
+        return sendNormal((toggle() == 1), controlType, PART::control::breathControlEnable, npart);
     if (matchnMove(1, point, "note"))
     {
         int value = 0;
@@ -4381,8 +4375,7 @@ int CmdInterface::commandPart(unsigned char controlType)
             if (value < 1 || (value > POLIPHONY - 20))
                 return range_msg;
         }
-        sendDirect(value, controlType, PART::control::maxNotes, npart);
-        return done_msg;
+        return sendNormal(value, controlType, PART::control::maxNotes, npart);
     }
 
     if (matchnMove(1, point, "mode"))
@@ -4399,14 +4392,10 @@ int CmdInterface::commandPart(unsigned char controlType)
             else
                 return name_msg;
         }
-        sendDirect(value, controlType, 6, npart);
-        return done_msg;
+        return sendNormal(value, controlType, 6, npart);
     }
     if (matchnMove(2, point, "portamento"))
-    {
-        sendDirect((toggle() == 1), controlType, PART::control::portamento, npart);
-        return done_msg;
-    }
+        return sendNormal((toggle() == 1), controlType, PART::control::portamento, npart);
     if (matchnMove(2, point, "name"))
     {
         string name;
@@ -4592,30 +4581,23 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
 
     if (matchnMove(1, point, "volume"))
     {
-        if (controlType == TOPLEVEL::type::Write && point[0] == 0)
+        if (lineEnd(controlType))
             return value_msg;
-        sendDirect(string2int127(point), controlType, MAIN::control::volume, TOPLEVEL::section::main);
-        return done_msg;
+        return sendNormal(string2int127(point), controlType, MAIN::control::volume, TOPLEVEL::section::main);
     }
     if (matchnMove(2, point, "detune"))
     {
-        if (controlType == TOPLEVEL::type::Write && point[0] == 0)
+        if (lineEnd(controlType))
             return value_msg;
-        sendDirect(string2int127(point), controlType, MAIN::control::detune, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
-        return done_msg;
+        return sendNormal(string2int127(point), controlType, MAIN::control::detune, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
     }
 
     if (matchnMove(2, point, "shift"))
     {
-        if (controlType == TOPLEVEL::type::Write && point[0] == 0)
+        if (lineEnd(controlType))
             return value_msg;
         int value = string2int(point);
-        if (value < MIN_KEY_SHIFT)
-            value = MIN_KEY_SHIFT;
-        else if(value > MAX_KEY_SHIFT)
-            value = MAX_KEY_SHIFT;
-        sendDirect(value, controlType, MAIN::control::keyShift, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
-        return done_msg;
+        return sendNormal(value, controlType, MAIN::control::keyShift, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
     }
 
     if (matchnMove(2, point, "solo"))
@@ -4636,8 +4618,7 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
                     return done_msg;
                 }
             }
-            sendDirect(value, controlType, MAIN::control::soloCC, TOPLEVEL::section::main);
-            return done_msg;
+            return sendNormal(value, controlType, MAIN::control::soloCC, TOPLEVEL::section::main);
         }
 
         else if (matchnMove(1, point, "row"))
@@ -4648,21 +4629,19 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
             value = 3;
         else if (matchnMove(1, point, "twoway"))
             value = 4;
-        sendDirect(value, controlType, MAIN::control::soloType, TOPLEVEL::section::main);
-        return done_msg;
+        return sendNormal(value, controlType, MAIN::control::soloType, TOPLEVEL::section::main);
     }
     if (matchnMove(2, point, "available")) // 16, 32, 64
     {
-        if (controlType == TOPLEVEL::type::Write && point[0] == 0)
+        if (lineEnd(controlType))
             return value_msg;
         int value = string2int(point);
-        if (value != 16 && value != 32 && value != 64)
+        if (controlType == TOPLEVEL::type::Write && value != 16 && value != 32 && value != 64)
             return range_msg;
-        sendDirect(value, controlType, MAIN::control::availableParts, TOPLEVEL::section::main);
-        return done_msg;
+        return sendNormal(value, controlType, MAIN::control::availableParts, TOPLEVEL::section::main);
     }
 
-        return opp_msg;
+    return opp_msg;
 }
 
 
