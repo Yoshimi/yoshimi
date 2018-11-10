@@ -4731,6 +4731,29 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
     {
         point += 2;
         point = skipSpace(point);
+        /*
+         * kit mode is a psuedo context level so the code
+         * below emulates normal 'back' actions
+         */
+        if (bitFindHigh(context) == LEVEL::Part && kitMode != PART::kitType::Off)
+        {
+            char *oldPoint = point;
+            if (matchnMove(1, point, "set"))
+            {
+                if (!isdigit(point[0]))
+                    point = oldPoint;
+                else
+                {
+                    tmp = string2int(point);
+                    if (tmp < 1 || tmp > Runtime.NumAvailableParts)
+                        return range_msg;
+                    defaults();
+                    npart = tmp -1;
+                    bitSet(context, LEVEL::Part);
+                    return done_msg;
+                }
+            }
+        }
 
         if (bitFindHigh(context) == LEVEL::AllFX || bitFindHigh(context) == LEVEL::InsFX)
             defaults();

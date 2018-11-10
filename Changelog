@@ -10,6 +10,8 @@ yoshimi 1.5.9 M
   This provides better error checking and reporting.
 * Corrected CLI Voice Modulator type message.
 * BugFix: CLI Voice number blocked if current disabled.
+* CLI kitmode is now a pseudo context level.
+  It emulates normal 'back' actions.
 
 2018-11-9 Will
 * All CLI part contexts checked for enable.
