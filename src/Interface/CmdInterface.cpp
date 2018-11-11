@@ -197,8 +197,8 @@ string partlist [] = {
     "Channel <n2>",             "MIDI channel (> 32 disables, > 16 note off only)",
     "Destination <s2>",         "jack audio destination (Main, Part, Both)",
     "kit mode entries","",
+    "KIT",                      "access controls but don't change type",
     "   <n>",                   "select kit item number (1-16)",
-    "   DIsable",               "Disable kit mode",
     "   MUlti",                 "alow item overlaps",
     "   SIngle",                "lowest numbered item in key range",
     "   CRoss",                 "cross fade pairs",
@@ -206,6 +206,7 @@ string partlist [] = {
     "   EFfect <n>",            "select effect for this item (0-none, 1-3)",
     "   NAme <s>",              "set the name for this item",
     "   DRum <s>",              "set kit to drum mode (OFF, {other})",
+    "   DIsable",               "Disable kit mode",
     "ADDsynth ...",             "Enter AddSynth context",
     "SUBsynth ...",             "Enter SubSynth context",
     "PADsynth ...",             "Enter PadSynth context",
@@ -646,6 +647,7 @@ void CmdInterface::defaults()
     nFXpreset = 0;
     kitMode = 0;
     kitNumber = 0;
+    inKitEditor = false;
     voiceNumber = 0;
     insertType = 0;
     filterVowelNumber = 0;
@@ -1465,10 +1467,12 @@ int CmdInterface::partCommonControls(unsigned char controlType)
     }
     if (cmd != -1)
     {
-        if (kitMode)
+        if (inKitEditor)
             insert = TOPLEVEL::insert::kitGroup;
+        else
+            kit = UNUSED;
         //cout << ">> value " << value << "  type " << controlType << "  cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  insert " << int(insert) << endl;
-        sendNormal(value, controlType, cmd, npart, kit, engine, insert);
+        sendNormal(value, controlType, cmd, npart, kit, UNUSED, insert);
         return done_msg;
     }
 
@@ -2198,32 +2202,42 @@ string CmdInterface::findStatus(bool show)
             kit = kitNumber;
             insert = TOPLEVEL::insert::kitGroup;
             text += ", ";
+            string front = "";
+            string back = " ";
+            if (!inKitEditor)
+            {
+                front = "(";
+                back = ")";
+            }
             switch (kitMode)
             {
                 case PART::kitType::Multi:
                     if (justPart)
-                        text += "Multi ";
+                        text += (front + "Multi" + back);
                     else
                         text += "M";
                     break;
                 case PART::kitType::Single:
                     if (justPart)
-                        text += "Single ";
+                        text += (front + "Single" + back);
                     else
                         text += "S";
                     break;
                 case PART::kitType::CrossFade:
                     if (justPart)
-                        text += "Crossfade ";
+                        text += (front + "Crossfade" + back);
                     else
                         text += "C";
                     break;
                 default:
                     break;
             }
-            text += to_string(kitNumber + 1);
-            if (readControl(PART::control::enable, npart, kitNumber, UNUSED, insert))
-                text += "+";
+            if (inKitEditor)
+            {
+                text += to_string(kitNumber + 1);
+                if (readControl(PART::control::enable, npart, kitNumber, UNUSED, insert))
+                    text += "+";
+            }
         }
         else
             kitNumber = 0;
@@ -4148,7 +4162,7 @@ int CmdInterface::commandPart(unsigned char controlType)
         if (tmp > 0)
         {
             tmp -= 1;
-            if (kitMode == PART::kitType::Off)
+            if (!inKitEditor)
             {
                 if (tmp >= Runtime.NumAvailableParts)
                 {
@@ -4187,7 +4201,7 @@ int CmdInterface::commandPart(unsigned char controlType)
         }
     }
 
-    if (kitMode == PART::kitType::Off)
+    if (!inKitEditor)
     {
         int enable = toggle();
         if (enable != -1)
@@ -4209,14 +4223,23 @@ int CmdInterface::commandPart(unsigned char controlType)
         tmp = PART::kitType::Single;
     else if(matchnMove(2, point, "crossfade"))
         tmp = PART::kitType::CrossFade;
+    else if(matchnMove(3, point, "kit"))
+    {
+        if (kitMode == PART::kitType::Off)
+            return inactive_msg;
+        inKitEditor = true;
+        return done_msg;
+    }
+
     if (tmp != -1)
     {
         kitNumber = 0;
         voiceNumber = 0; // must clear this too!
         kitMode = tmp;
+        inKitEditor = (kitMode != PART::kitType::Off);
         return sendNormal(kitMode, controlType, PART::control::kitMode, npart);
     }
-    if (kitMode != PART::kitType::Off)
+    if (inKitEditor)
     {
         int value = toggle();
         if (value >= 0)
@@ -4732,12 +4755,16 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         point += 2;
         point = skipSpace(point);
         /*
-         * kit mode is a psuedo context level so the code
+         * kit mode is a pseudo context level so the code
          * below emulates normal 'back' actions
          */
         if (bitFindHigh(context) == LEVEL::Part && kitMode != PART::kitType::Off)
         {
+            int newPart = npart;
             char *oldPoint = point;
+            defaults();
+            npart = newPart;
+            bitSet(context, LEVEL::Part);
             if (matchnMove(1, point, "set"))
             {
                 if (!isdigit(point[0]))
@@ -4747,12 +4774,13 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                     tmp = string2int(point);
                     if (tmp < 1 || tmp > Runtime.NumAvailableParts)
                         return range_msg;
-                    defaults();
+
                     npart = tmp -1;
-                    bitSet(context, LEVEL::Part);
                     return done_msg;
                 }
             }
+            else
+                return done_msg;
         }
 
         if (bitFindHigh(context) == LEVEL::AllFX || bitFindHigh(context) == LEVEL::InsFX)

@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified October 2018
+    Modified November 2018
 */
 
 //#define NOLOCKS
@@ -1159,7 +1159,9 @@ void SynthEngine::ListCurrentParts(list<string>& msg_buf)
                 name += " P";
             else
                 name += " B";
-            name +=  " " + part[npart]->Pname;
+            name +=  (" " + part[npart]->Pname);
+            if (part[npart]->Pkitmode > 0)
+                name += " kit mode";
             msg_buf.push_back(name);
         }
     }

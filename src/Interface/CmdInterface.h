@@ -122,6 +122,7 @@ class CmdInterface : private MiscFuncs
         int modulatorFromVoiceNumber;
         int kitMode;
         int kitNumber;
+        bool inKitEditor;
         int npart;
 
         int nFX;

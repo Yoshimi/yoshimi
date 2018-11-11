@@ -1,5 +1,8 @@
 yoshimi 1.5.9 M
 
+2018-11-11 Will
+* Improved CLI kit mode controls.
+
 2018-11-10 Will
 * CLI fine tuning.
 * Added dummy Part entries in limits for text entries
