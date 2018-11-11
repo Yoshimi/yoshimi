@@ -220,8 +220,8 @@ string commonlist [] = {
     "Volume <n> @",             "volume",
     "Pan <n2> @",               "panning",
     "VElocity <n> @",           "velocity sensing sensitivity",
-    "MIn <n> +",                "minimum MIDI note value",
-    "MAx <n> +",                "maximum MIDI note value",
+    "MIn <[s][n]> +",           "minimum MIDI note value (Last seen or 0-127)",
+    "MAx <[s][n]> +",           "maximum MIDI note value (Last seen or 0-127)",
     "DETune Fine <n> *",        "fine frequency",
     "DETune Coarse <n> *",      "coarse stepped frequency",
     "DETune Type <s> *",        "type of coarse stepping (DEFault, L35, L10, E100, E1200)",
@@ -1253,7 +1253,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
     if (engine == PART::engine::addVoice1 || engine == PART::engine::addMod1)
         engine += voiceNumber; // voice numbers are 0 to 7
 
-    if (kitMode)
+    if (inKitEditor)
         kit = kitNumber;
 
     if (bitFindHigh(context) != LEVEL::Part)
@@ -1437,45 +1437,6 @@ int CmdInterface::partCommonControls(unsigned char controlType)
         }
     }
 
-    int value = -1;
-    if (cmd == -1 && bitFindHigh(context) == LEVEL::Part)
-    { // the following can only be done at part/kit level
-        if (matchnMove(2, point, "min"))
-        {
-            if(controlType == TOPLEVEL::type::Write)
-            {
-                if (lineEnd(controlType))
-                    return value_msg;
-                value = string2int(point);
-                if (value > synth->part[npart]->Pmaxkey)
-                    return high_msg;
-            }
-            cmd = PART::control::minNote;
-        }
-        else if (matchnMove(2, point, "max"))
-        {
-            if(controlType == TOPLEVEL::type::Write)
-            {
-                if (lineEnd(controlType))
-                    return value_msg;
-                value = string2int(point);
-                if (value < synth->part[npart]->Pminkey)
-                    return low_msg;
-            }
-            cmd = PART::control::maxNote;
-        }
-    }
-    if (cmd != -1)
-    {
-        if (inKitEditor)
-            insert = TOPLEVEL::insert::kitGroup;
-        else
-            kit = UNUSED;
-        //cout << ">> value " << value << "  type " << controlType << "  cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  insert " << int(insert) << endl;
-        sendNormal(value, controlType, cmd, npart, kit, UNUSED, insert);
-        return done_msg;
-    }
-
     if (matchnMove(1, point, "volume"))
         cmd = PART::control::volume;
     else if(matchnMove(1, point, "pan"))
@@ -1483,18 +1444,73 @@ int CmdInterface::partCommonControls(unsigned char controlType)
     else if (matchnMove(2, point, "velocity"))
         cmd = PART::control::velocitySense;
 
-    if (cmd == -1)
-        return todo_msg;
-    if (lineEnd(controlType))
-        return value_msg;
+    if (cmd != -1)
+    {
+        if (lineEnd(controlType))
+            return value_msg;
 
-    if (bitFindHigh(context) == LEVEL::Part)
-        kit = UNUSED;
-    else
-        kit = kitNumber;
-    //cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kit) << "  engine " << int(engine) << "  insert " << int(insert) << endl;
+        if (bitFindHigh(context) == LEVEL::Part)
+            kit = UNUSED;
+        else
+            kit = kitNumber;
 
-    return sendNormal(string2float(point), controlType, cmd, npart, kit, engine);
+        return sendNormal(string2float(point), controlType, cmd, npart, kit, engine);
+    }
+
+    if (cmd == -1 && bitFindHigh(context) == LEVEL::Part)
+    { // the following can only be done at part/kit level
+        int value = 0;
+        if (matchnMove(2, point, "min"))
+        {
+            cmd = PART::control::minNote;
+            if(controlType == TOPLEVEL::type::Write)
+            {
+                if (lineEnd(controlType))
+                    return value_msg;
+                if (matchnMove(1, point, "last"))
+                {
+                    cmd = PART::control::minToLastKey;
+                }
+                else
+                {
+                    value = string2int(point);
+                    if (value > synth->part[npart]->Pmaxkey)
+                        return high_msg;
+                }
+            }
+
+        }
+        else if (matchnMove(2, point, "max"))
+        {
+            cmd = PART::control::maxNote;
+            if(controlType == TOPLEVEL::type::Write)
+            {
+                if (lineEnd(controlType))
+                    return value_msg;
+                if (matchnMove(1, point, "last"))
+                {
+                    cmd = PART::control::maxToLastKey;
+                }
+                else
+                {
+                    value = string2int(point);
+                    if (value < synth->part[npart]->Pminkey)
+                        return low_msg;
+                }
+            }
+
+        }
+        if (cmd > -1)
+        {
+            if (inKitEditor)
+                insert = TOPLEVEL::insert::kitGroup;
+            else
+                kit = UNUSED;
+            return sendNormal(value, controlType, cmd, npart, kit, UNUSED, insert);
+        }
+    }
+    //cout << ">> value " << value << "  type " << controlType << "  cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  insert " << int(insert) << endl;
+    return todo_msg;
 }
 
 
@@ -4279,7 +4295,7 @@ int CmdInterface::commandPart(unsigned char controlType)
         return padSynth(controlType);
     }
 
-    if (kitMode)
+    if (inKitEditor)
     {
         int value;
         if (matchnMove(2, point, "drum"))
@@ -4305,7 +4321,6 @@ int CmdInterface::commandPart(unsigned char controlType)
             return sendNormal(0, controlType, PART::control::instrumentName, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup, TOPLEVEL::route::adjustAndLoopback, par2);
         }
     }
-
 
     tmp = partCommonControls(controlType);
     if (tmp != todo_msg)

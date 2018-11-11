@@ -2,6 +2,7 @@ yoshimi 1.5.9 M
 
 2018-11-11 Will
 * Improved CLI kit mode controls.
+* Added CLI min to last note and max to last note.
 
 2018-11-10 Will
 * CLI fine tuning.
