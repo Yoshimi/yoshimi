@@ -391,7 +391,7 @@ string waveformlist [] = {
     "SHape Par <n>",            "wave shape modifier amount",
     "Filter Type <s>","",
     "","OFF, LP1, HPA1, HPB1, BP1, BS1, LP2, HP2, BP2, BS2, COS, SIN, LSH, SGM",
-    "Filter Par <n1 <n2>",      "filter parameters  n1 (1/2), n2 value",
+    "Filter Par <n1> <n2>",     "filter parameters  n1 (1/2), n2 value",
     "Filter Before <s>",        "do filtering before waveshaping (ON {other})",
     "Modulation Par <n1 <n2>",  "Overall modulation n1 (1 - 3), n2 value",
     "SPectrum Type <s>",        "spectrum adjust type (OFF, Power, Down/Up threshold)",
@@ -399,7 +399,7 @@ string waveformlist [] = {
     "ADdaptive Type <s>",       "adaptive harmonics (OFF, ON, SQUare, 2XSub, 2XAdd, 3XSub, 3XAdd, 4XSub, 4XAdd)",
     "ADdaptive Base <n>",       "adaptive base frequency",
     "ADdaptive Level <n>",      "adaptive power",
-    "ADdaptive Par <n>",        "adaptive paramter",
+    "ADdaptive Par <n>",        "adaptive parameter",
     "APply",                    "Fix settings (only for PadSynth)",
     "end"
 };
@@ -454,7 +454,7 @@ string filterlist [] = {
     "  band",               "band pass",
     "  stop",               "band stop",
     "","",
-    "formant editor","",
+    "formant editor",       "(shows V current vowel, F current formant)",
     "Invert <s>",           "invert effect of LFOs, envelopes (ON, OFF)",
     "FCenter <n>",          "center frequency of sequence",
     "FRange <n>",           "octave range of formants",
@@ -465,9 +465,9 @@ string filterlist [] = {
     "COunt <n>",            "number of formants in vowels",
     "VOwel <n>",            "vowel being processed",
     "Point <n1> <n2>",      "vowel n1 at sequence position n2",
-    "Item",                 "formant being processed",
+    "FOrmant <n>",          "formant being processed",
     "per formant","",
-    "  FFrequency <n>",     "Center of formant frequency",
+    "  FFrequency <n>",     "center frequency of formant",
     "  FQ <n>",             "bandwidth of formant",
     "  FGain <n>",          "amplitude of formant",
     "end"
@@ -1660,7 +1660,11 @@ int CmdInterface::filterSelect(unsigned char controlType)
         if (matchnMove(1, point, "analog"))
             value = 0;
         else if(matchnMove(1, point, "formant"))
+        {
             value = 1;
+            filterVowelNumber = 0;
+            filterFormantNumber = 0;
+        }
         else if(matchnMove(1, point, "state"))
             value = 2;
         else
@@ -1716,6 +1720,7 @@ int CmdInterface::filterSelect(unsigned char controlType)
                     return value_msg;
                 value = string2int(point);
                 filterVowelNumber = string2int(point);
+                filterFormantNumber = 0;
                 return done_msg;
             }
             else if (matchnMove(1, point, "point"))
@@ -1730,7 +1735,7 @@ int CmdInterface::filterSelect(unsigned char controlType)
                 cout << "val " << value << "  pos " << position << endl;
                 return sendNormal(value, controlType, FILTERINSERT::control::vowelPositionInSequence, npart, kitNumber, engine, TOPLEVEL::insert::filterGroup, position);
             }
-            else if (matchnMove(1, point, "item"))
+            else if (matchnMove(2, point, "formant"))
             {
                 if (lineEnd(controlType))
                     return value_msg;
@@ -2399,7 +2404,10 @@ string CmdInterface::findStatus(bool show)
                     text += "analog";
                     break;
                 case 1:
-                    text += "formant";
+                    text += "formant V";
+                    text += to_string(filterVowelNumber);
+                    text += " F";
+                    text += to_string(filterFormantNumber);
                     break;
                 case 2:
                     text += "state var";
