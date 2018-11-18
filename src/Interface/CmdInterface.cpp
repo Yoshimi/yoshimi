@@ -4473,6 +4473,8 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
 {
     Config &Runtime = synth->getRuntime();
     string name;
+    //CommandBlock getData;
+    //cout << synth->unifiedpresets.findSectionName(&getData) << endl;
     if (matchnMove(2, point, "yoshimi"))
     {
         if (controlType != TOPLEVEL::type::Write)

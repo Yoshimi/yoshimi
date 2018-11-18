@@ -111,6 +111,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
     enum section: unsigned char {
         part1 = 0,
         part64 = 63,
+        copyPaste = 72, // 48 (not yet!)
         vector = 192, // CO
         midiLearn = 216, // D8
         midiIn,

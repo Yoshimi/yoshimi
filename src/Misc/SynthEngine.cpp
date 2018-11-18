@@ -92,6 +92,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     interchange(this),
     midilearn(this),
     mididecode(this),
+    //unifiedpresets(this),
     Runtime(this, argc, argv),
     presetsstore(this),
     fadeAll(0),

@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified October 2018
+    Modified November 2018
 */
 
 #ifndef SYNTHENGINE_H
@@ -45,6 +45,7 @@ using namespace std;
 #include "Interface/MidiDecode.h"
 #include "Misc/Config.h"
 #include "Params/PresetsStore.h"
+#include "Params/UnifiedPresets.h"
 
 typedef enum { init, lockType, unlockType, destroy } lockset;
 
@@ -66,6 +67,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         InterChange interchange;
         MidiLearn midilearn;
         MidiDecode mididecode;
+        UnifiedPresets unifiedpresets;
     private:
         Config Runtime;
         PresetsStore presetsstore;

@@ -1,5 +1,8 @@
 yoshimi 1.5.9 M
 
+2018-11-18 Will
+* Created placeholders for unified presets system.
+
 2018-11-17 Will
 * Changed CLI formant filter formant number for clarity.
 * Improved CLI filter help list.

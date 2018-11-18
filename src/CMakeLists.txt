@@ -17,7 +17,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-# Modified October 2018
+# Modified November 2018
 
 project (Yoshimi)
 cmake_minimum_required (VERSION 3.0)
@@ -381,7 +381,8 @@ set (Params_sources
     Params/ADnoteParameters.cpp  Params/EnvelopeParams.cpp
     Params/FilterParams.cpp  Params/LFOParams.cpp
     Params/SUBnoteParameters.cpp  Params/PADnoteParameters.cpp
-    Params/Controller.cpp  Params/Presets.cpp Params/PresetsStore.cpp
+    Params/Controller.cpp  Params/Presets.cpp
+    Params/PresetsStore.cpp  Params/UnifiedPresets.cpp
 )
 
 set (Synth_sources
