@@ -26,8 +26,27 @@
 
 string UnifiedPresets::findSectionName(CommandBlock *getData)
 {
-    string name = "test run";
+    unsigned char value = int (getData->data.value + 0.5f);
+    int engine = getData->data.engine;
+    int insert = getData->data.insert;
+    string name = "unrecognised";
+    if (getData->data.part != TOPLEVEL::section::copyPaste || value >= NUM_MIDI_PARTS)
+        return name;
 
+    if (insert != UNUSED)
+        return name;
+    switch (engine)
+    {
+        case PART::engine::addSynth:
+            return "ADD_SYNTH_PARAMETERS";
+            break;
+        case PART::engine::subSynth:
+            return "SUB_SYNTH_PARAMETERS";
+            break;
+        case PART::engine::padSynth:
+            return "PAD_SYNTH_PARAMETERS";
+            break;
+    }
 
     return name;
 }

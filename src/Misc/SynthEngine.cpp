@@ -702,24 +702,27 @@ void SynthEngine::SetZynControls(bool in_place)
     CommandBlock putData;
     memset(&putData, 0xff, sizeof(putData));
     putData.data.value = value;
-    putData.data.type = 0xd0;
+    putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
+    // TODO the next line is wrong, it should really be
+    // handled by MIDI
+    putData.data.type |= TOPLEVEL::source::CLI;
 
-    if (group == 0x24) // system
+    if (group == 0x24)
     {
-        putData.data.part = 0xf1;
+        putData.data.part = TOPLEVEL::section::systemEffects;
         if (efftype == 0x40)
             putData.data.control = 1;
         //else if (efftype == 0x60) // not done yet
             //putData.data.control = 2;
         else
         {
-            putData.data.kit = 0x80 + sysefx[effnum]->geteffect();
+            putData.data.kit = EFFECT::type::none + sysefx[effnum]->geteffect();
             putData.data.control = parnum;
         }
     }
-    else // insertion
+    else
     {
-        putData.data.part = 0xf2;
+        putData.data.part = TOPLEVEL::section::insertEffects;
         //cout << "efftype " << int(efftype) << endl;
         if (efftype == 0x40)
             putData.data.control = 1;
@@ -727,7 +730,7 @@ void SynthEngine::SetZynControls(bool in_place)
             putData.data.control = 2;
         else
         {
-            putData.data.kit = 0x80 + insefx[effnum]->geteffect();
+            putData.data.kit = EFFECT::type::none + insefx[effnum]->geteffect();
             putData.data.control = parnum;
         }
     }
@@ -735,7 +738,7 @@ void SynthEngine::SetZynControls(bool in_place)
 
     if (in_place)
         interchange.commandEffects(&putData);
-    else
+    else // TODO next line is a hack!
         midilearn.writeMidi(&putData, sizeof(putData), false);
 }
 

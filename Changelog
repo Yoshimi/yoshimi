@@ -1,5 +1,9 @@
 yoshimi 1.5.9 M
 
+2018-11-20 Will
+* Small adjustments to NRPN effects in synthEngine.
+* Started defining CLI effect controls.
+
 2018-11-18 Will
 * Created placeholders for unified presets system.
 

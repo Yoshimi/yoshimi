@@ -1040,6 +1040,14 @@ int CmdInterface::effectsList(bool presets)
 
 int CmdInterface::effects(unsigned char controlType)
 {
+    string reverb[] = {"LEV", "PAN", "TIM", "DEL", "FEE", "none5", "none6", "LOW", "HIG", "DAM", "TYP", "ROO", "BAN"};
+    string echo[] = {"LEV", "PAN", "DEL", "LRD", "CRO", "FEE", "DAM"};
+    string chorus[] = {"LEV", "PAN", "FRE", "RAN", "LFO", "STE", "DEP", "DEL", "FEE", "CRO", "FLA", "SUB"};
+    string phaser[] = {"LEV", "PAN", "FRE", "RAN", "LFO", "STE", "DEP", "FEE", "STA", "CRO", "SUB", "PHA", "HYP", "DIS", "ANA"};
+    string alienwah[] = {"LEV", "PAN", "FRE", "TYP", "STE", "DEP", "FEE", "DEL", "CRO", "PHA"};
+    string distortion[] = {"LEV", "PAN", "CRO", "DRI", "OUT", "TYP", "INV", "LOW", "HIG", "STE", "PRE"};
+    string eq[] = {"LEV", "BAN", "TYP", "FRE", "GAI", "Q", "STA"};
+    string dynanicfilter[] = {"LEV", "PAN", "FRE", "RAN", "LFO", "STE", "DEP", "SEN", "INV", "SMO"};
     Config &Runtime = synth->getRuntime();
     int nFXavail;
     int par = nFX;
@@ -1235,7 +1243,7 @@ int CmdInterface::effects(unsigned char controlType)
             partno = TOPLEVEL::section::systemEffects;
             dest = "system";
         }
-        sendDirect(nFXpreset, TOPLEVEL::type::Write,16, partno, nFXtype + EFFECT::type::none, nFX); // TODO shouldn't need this offset
+        sendDirect(nFXpreset, TOPLEVEL::type::Write,16, partno,  EFFECT::type::none + nFXtype, nFX);
         Runtime.Log(dest + " efx preset set to number " + asString(value + 1));
     }
     return done_msg;
