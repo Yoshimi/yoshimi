@@ -68,6 +68,7 @@ namespace LISTS {
     all = 0,
     syseff, // not yet
     inseff, // not yet
+    eff, // effect types
     part,
     common,
     addsynth,
@@ -80,6 +81,8 @@ namespace LISTS {
     lfo,
     filter,
     envelope,
+    reverb,
+    echo,
     vector,
     scale,
     load,
@@ -508,6 +511,32 @@ string envelopelist [] = {
 };
 
 
+string reverblist [] = {
+    "LEVel <n>",        "reverb intensity",
+    "PANning <n>",      "L/R panning",
+    "TIMe <n>",         "reverb time",
+    "DELay <n>",        "initial delay",
+    "FEEdback <n>",     "delay feedback",
+    "LOW <n>",          "low pass filter",
+    "HIGh <n>",         "high pass filter",
+    "DAMp <n>",         "feedback damping",
+    "TYPe <s>",         "reverb type (Random, Freeverb, Bandwidth)",
+    "ROOm <n>",         "room size",
+    "BANdwidth <n>",    "actual bandwidth (only for bandwidth type)",
+    "end"
+};
+
+string echolist [] = {
+    "LEVel <n>",        "echo intensity",
+    "PANning <n>",      "L/R panning",
+    "DELay <n>",        "initial delay",
+    "LRDelay <n>",      "left-right delay",
+    "CROssover <n>",    "left-right crossover",
+    "FEEdback <n>",     "echo feedback",
+    "DAMp <n>",         "feedback damping",
+    "end"
+};
+
 string learnlist [] = {
     "MUte <s>",                 "completely ignore this line (ON, {other})",
     "SEven",                    "set incoming NRPNs as 7 bit (ON, {other})",
@@ -618,7 +647,8 @@ string fx_list [] = {
     "ALienwah",
     "DIstortion",
     "EQ",
-    "DYnfilter"
+    "DYnfilter",
+    "end"
 };
 
 
@@ -688,23 +718,24 @@ bool CmdInterface::query(string text, bool priority)
 }
 
 
-void CmdInterface::helpLoop(list<string>& msg, string *commands, int indent)
+void CmdInterface::helpLoop(list<string>& msg, string *commands, int indent, bool single)
 {
     int word = 0;
     int spaces = 30 - indent;
-    string left;
-    string right;
+    string left = "";
+    string right = "";
     string dent;
     string blanks;
 
     while (commands[word] != "end")
     {
         left = commands[word];
-        right = commands[word + 1];
+        if (!single)
+            right = commands[word + 1];
         if (right > "")
             left = left +(blanks.assign(spaces - left.length(), ' ') + right);
         msg.push_back(dent.assign(indent, ' ') + left);
-        word += 2;
+        word += (2 - single);
     }
 }
 
@@ -718,7 +749,12 @@ bool CmdInterface::helpList(unsigned int local)
 
     if (point[0] != 0)
     { // 1 & 2 reserved for syseff & inseff
-        if (matchnMove(1, point, "part"))
+        if (matchnMove(3, point, "reverb"))
+            listnum = LISTS::reverb;
+        else if (matchnMove(3, point, "echo"))
+            listnum = LISTS::echo;
+
+        else if (matchnMove(1, point, "part"))
             listnum = LISTS::part;
         else if (matchnMove(3, point, "common"))
             listnum = LISTS::common;
@@ -742,6 +778,7 @@ bool CmdInterface::helpList(unsigned int local)
             listnum = LISTS::filter;
         else if (matchnMove(3, point, "envelope"))
             listnum = LISTS::envelope;
+
         else if (matchnMove(1, point, "vector"))
             listnum = LISTS::vector;
         else if (matchnMove(1, point, "scale"))
@@ -759,7 +796,22 @@ bool CmdInterface::helpList(unsigned int local)
     }
     else
     {
-        if (bitTest(local, LEVEL::Envelope))
+        if(bitTest(local, LEVEL::AllFX))
+        {
+            switch (nFXtype)
+            {
+                case 0:
+                    listnum = LISTS::eff;
+                    break;
+                case 1:
+                    listnum = LISTS::reverb;
+                    break;
+                case 2:
+                    listnum = LISTS::echo;
+                    break;
+            }
+        }
+        else if (bitTest(local, LEVEL::Envelope))
             listnum = LISTS::envelope;
         else if (bitTest(local, LEVEL::LFO))
             listnum = LISTS::lfo;
@@ -781,6 +833,7 @@ bool CmdInterface::helpList(unsigned int local)
             listnum = LISTS::padsynth;
         else if(bitTest(local, LEVEL::Resonance))
             listnum = LISTS::resonance;
+
         else if (bitTest(local, LEVEL::Part))
             listnum = LISTS::part;
         else if (bitTest(local, LEVEL::Vector))
@@ -859,6 +912,19 @@ bool CmdInterface::helpList(unsigned int local)
         case LISTS::envelope:
             msg.push_back("Engine Envelopes:");
             helpLoop(msg, envelopelist, 2);
+            break;
+
+        case LISTS::eff:
+            msg.push_back("Effects:");
+            helpLoop(msg, fx_list, 2, true);
+            break;
+        case LISTS::reverb:
+            msg.push_back("Reverb:");
+            helpLoop(msg, reverblist, 2);
+            break;
+        case LISTS::echo:
+            msg.push_back("Echo:");
+            helpLoop(msg, echolist, 2);
             break;
 
         case LISTS::vector:
@@ -1040,20 +1106,19 @@ int CmdInterface::effectsList(bool presets)
 
 int CmdInterface::effects(unsigned char controlType)
 {
-    string reverb[] = {"LEV", "PAN", "TIM", "DEL", "FEE", "none5", "none6", "LOW", "HIG", "DAM", "TYP", "ROO", "BAN"};
-    string echo[] = {"LEV", "PAN", "DEL", "LRD", "CRO", "FEE", "DAM"};
-    string chorus[] = {"LEV", "PAN", "FRE", "RAN", "LFO", "STE", "DEP", "DEL", "FEE", "CRO", "FLA", "SUB"};
-    string phaser[] = {"LEV", "PAN", "FRE", "RAN", "LFO", "STE", "DEP", "FEE", "STA", "CRO", "SUB", "PHA", "HYP", "DIS", "ANA"};
-    string alienwah[] = {"LEV", "PAN", "FRE", "TYP", "STE", "DEP", "FEE", "DEL", "CRO", "PHA"};
-    string distortion[] = {"LEV", "PAN", "CRO", "DRI", "OUT", "TYP", "INV", "LOW", "HIG", "STE", "PRE"};
+    string reverb[] = {"LEV", "PAN", "TIM", "DEL", "FEE", "none1", "none2", "LOW", "HIG", "DAM", "TYP", "ROO", "BAN", "end"};
+    string echo[] = {"LEV", "PAN", "DEL", "LRD", "CRO", "FEE", "DAM",  "end"};
+    string chorus[] = {"LEV", "PAN", "FRE", "RAN", "LFO", "SHI", "DEP", "DEL", "FEE", "CRO", "FLA", "SUB", "end"};
+    string phaser[] = {"LEV", "PAN", "FRE", "RAN", "LFO", "SHI", "DEP", "FEE", "STA", "CRO", "SUB", "REL", "HYP", "OVE", "ANA", "end"};
+    string alienwah[] = {"LEV", "PAN", "FRE", "TYP", "SHI", "DEP", "FEE", "DEL", "CRO", "REL", "end"};
+    string distortion[] = {"LEV", "PAN", "CRO", "DRI", "OUT", "TYP", "INV", "LOW", "HIG", "STE", "PRE", "end"};
     string eq[] = {"LEV", "BAN", "TYP", "FRE", "GAI", "Q", "STA"};
-    string dynanicfilter[] = {"LEV", "PAN", "FRE", "RAN", "LFO", "STE", "DEP", "SEN", "INV", "SMO"};
+    string dynanicfilter[] = {"LEV", "PAN", "FRE", "RAN", "LFO", "SHI", "DEP", "SEN", "INV", "SMO", "end"};
     Config &Runtime = synth->getRuntime();
     int nFXavail;
     int par = nFX;
     int value;
     string dest = "";
-    bool flag;
 
     if (bitTest(context, LEVEL::Part))
     {
@@ -1108,37 +1173,144 @@ int CmdInterface::effects(unsigned char controlType)
         }
     }
 
-    if (matchnMove(1, point, "type"))
+    bool effType = false;
+    for (int i = 0; i < 9; ++ i)
     {
-        if (controlType != TOPLEVEL::type::Write)
+        //Runtime.Log("command " + (string) point + "  list " + fx_list[i]);
+        if (matchnMove(2, point, fx_list[i].c_str()))
         {
-            Runtime.Log("Current efx type is " + fx_list[nFXtype]);
-            return done_msg;
+            nFXtype = i;
+            effType = true;
+            break;
         }
-        flag = true;
-        for (int i = 0; i < 9; ++ i)
-        {
-            //Runtime.Log("command " + (string) point + "  list " + fx_list[i]);
-            if (matchnMove(2, point, fx_list[i].c_str()))
-            {
-                nFXtype = i;
-                flag = false;
-                break;
-            }
-        }
-        if (flag)
-            return unrecognised_msg;
+    }
+    if (effType)
+    {
         nFXpreset = 0; // always set this on type change
         Runtime.Log("efx type set to " + fx_list[nFXtype]);
         //Runtime.Log("Presets -" + fx_presets[nFXtype].substr(fx_presets[nFXtype].find(',') + 1));
         if (bitTest(context, LEVEL::Part))
+        {
             sendDirect(nFXtype, TOPLEVEL::type::Write, PART::control::effectType, npart, UNUSED, nFX);
+            return done_msg; // TODO find out why not sendNormal
+        }
         else if (bitTest(context, LEVEL::InsFX))
-            sendDirect(nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::insertEffects, UNUSED, nFX);
+            return sendNormal(nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::insertEffects, UNUSED, nFX);
         else
-            sendDirect(nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, nFX);
-        return done_msg;
+            return sendNormal(nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, nFX);
     }
+
+
+
+    if (nFXtype > 0)
+    {
+        int selected = -1;
+        int value = -1;
+        string name = string(point).substr(0,3);
+        switch (nFXtype)
+        {
+            case 1:
+            {
+                selected = stringNumInList(name, reverb, 1);
+                if (selected == 10) // type
+                {
+                    point = skipChars(point);
+                    if (matchnMove(1, point, "random"))
+                        value = 0;
+                    else if (matchnMove(1, point, "freeverb"))
+                        value = 1;
+                    else if (matchnMove(1, point, "bandwidth"))
+                        value = 2;
+                    else
+                        return value_msg;
+                }
+                break;
+            }
+            case 2:
+                selected = stringNumInList(name, echo, 1);
+                break;
+            case 3:
+            {
+                selected = stringNumInList(name, chorus, 1);
+                if (selected == 4) // LFO type
+                {
+                    point = skipChars(point);
+                    if (matchnMove(1, point, "sine"))
+                        value = 0;
+                    else if (matchnMove(1, point, "triangle"))
+                        value = 1;
+                    else return value_msg;
+                }
+                else if (selected == 11) // subtract
+                {
+                    point = skipChars(point);
+                    value = (toggle() == 1);
+                }
+                break;
+            }
+            case 4:
+            {
+                selected = stringNumInList(name, phaser, 1);
+                if (selected == 4) // LFO type
+                {
+                    point = skipChars(point);
+                    if (matchnMove(1, point, "sine"))
+                        value = 0;
+                    else if (matchnMove(1, point, "triangle"))
+                        value = 1;
+                    else return value_msg;
+                }
+                else if (selected == 10 || selected == 12 || selected == 14) // LFO, SUB, ANA
+                {
+                    point = skipChars(point);
+                    value = (toggle() == 1);
+                }
+                break;
+            }
+            case 5:
+            {
+                selected = stringNumInList(name, alienwah, 1);
+                if (selected == 3) // LFO type
+                {
+                    point = skipChars(point);
+                    if (matchnMove(1, point, "sine"))
+                        value = 0;
+                    else if (matchnMove(1, point, "triangle"))
+                        value = 1;
+                    else return value_msg;
+                }
+                break;
+            }
+            case 6:
+            {
+                selected = stringNumInList(name, distortion, 1);
+                break;
+            }
+
+
+        }
+
+        if (selected > -1)
+        {
+            if (value == -1)
+            {
+                point = skipChars(point);
+                value = string2int(point);
+            }
+            //cout << "Val " << value << "  type " << controlType << "  cont " << selected << "  part " << context << "  efftype " << int(nFXtype) << "  num " << int(nFX) << endl;
+            if (bitTest(context, LEVEL::Part))
+                return sendNormal(value, controlType, selected, npart, EFFECT::type::none + nFXtype, nFX);
+            else if (bitTest(context, LEVEL::InsFX))
+                return sendNormal(value, controlType, selected, TOPLEVEL::section::insertEffects, EFFECT::type::none + nFXtype, nFX);
+            else
+                return sendNormal(value, controlType, selected, TOPLEVEL::section::systemEffects, EFFECT::type::none + nFXtype, nFX);
+        }
+        // continue cos it's not us.
+    }
+
+
+
+
 
     if (matchnMove(2, point, "send"))
     {

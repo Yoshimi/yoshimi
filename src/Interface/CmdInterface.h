@@ -74,7 +74,7 @@ class CmdInterface : private MiscFuncs
 
     private:
         bool query(string text, bool priority);
-        void helpLoop(list<string>& msg, string *commands, int indent);
+        void helpLoop(list<string>& msg, string *commands, int indent, bool single = false);
         bool helpList(unsigned int local);
         string historySelect(int listnum, int selection);
         void historyList(int listnum);

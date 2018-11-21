@@ -1,5 +1,10 @@
 yoshimi 1.5.9 M
 
+2018-11-21 Will
+* CLI Reverb and Echo controls completed.
+  and created new help lists for these.
+* Added help list of all effects (by name).
+
 2018-11-20 Will
 * Small adjustments to NRPN effects in synthEngine.
 * Started defining CLI effect controls.
