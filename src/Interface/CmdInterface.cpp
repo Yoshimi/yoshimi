@@ -83,6 +83,12 @@ namespace LISTS {
     envelope,
     reverb,
     echo,
+    chorus,
+    phaser,
+    alienwah,
+    distortion,
+    eq,
+    dynfilter,
     vector,
     scale,
     load,
@@ -93,7 +99,7 @@ namespace LISTS {
     };
 }
 
-string basics[] = {
+static string basics[] = {
     "?  Help",                  "show commands",
     "STop",                     "all sound off",
     "RESet [s]",                "return to start-up conditions, 'ALL' clear MIDI-learn (if 'y')",
@@ -105,7 +111,7 @@ string basics[] = {
     "end"
 };
 
-string toplist [] = {
+static string toplist [] = {
     "ADD",                      "add paths and files",
     "  Root <s>",               "root path to list",
     "  Bank <s>",               "make new bank in current root",
@@ -143,7 +149,7 @@ string toplist [] = {
     "end"
 };
 
-string configlist [] = {
+static string configlist [] = {
     "Oscillator <n>",           "* Add/Pad size (power 2 256-16384)",
     "BUffer <n>",               "* internal size (power 2 16-4096)",
     "PAdsynth [s]",             "interpolation type (Linear, other = cubic)",
@@ -183,7 +189,7 @@ string configlist [] = {
     "end"
 };
 
-string partlist [] = {
+static string partlist [] = {
     "<n>",                      "select part number (1-currently available)",
     "LEvel <n2>",               "velocity sense offset level",
     "Breath <s>",               "breath control (ON, {other})",
@@ -217,7 +223,7 @@ string partlist [] = {
     "end"
 };
 
-string commonlist [] = {
+static string commonlist [] = {
     "ON @",                     "enables the part/kit item/engine/insert etc,",
     "OFF @",                    "disables as above",
     "Volume <n> @",             "volume",
@@ -259,7 +265,7 @@ string commonlist [] = {
     "end"
 };
 
-string addsynthlist [] = {
+static string addsynthlist [] = {
     "BAndwidth <n>",            "modifes relative fine detune of voices",
     "GRoup <s>",                "disables harmonic amplitude randomness of voices with",
     "","a common oscllator (ON, {other})",
@@ -268,7 +274,7 @@ string addsynthlist [] = {
     "end"
 };
 
-string addvoicelist [] = {
+static string addvoicelist [] = {
 
     "Type <s>",             "sound type (oscillator, White noise, Pink noise)",
     "SOurce <[s]/[n]>",     "oscillator source (Internal, {voice number})",
@@ -290,7 +296,7 @@ string addvoicelist [] = {
     "end"
 };
 
-string addmodlist [] = {
+static string addmodlist [] = {
     "OFF",                  "disable modulator",
     "   MOrph",             "types",
     "   RIng","",
@@ -305,7 +311,7 @@ string addmodlist [] = {
     "end"
 };
 
-string subsynthlist [] = {
+static string subsynthlist [] = {
     "HArmonic <n1> Amp <n2>",   "set harmonic n1 to n2 intensity",
     "HArmonic <n1> Band <n2>",  "set harmonic n1 to n2 width",
     "HArmonic Stages <n>",      "number of stages",
@@ -316,7 +322,7 @@ string subsynthlist [] = {
     "end"
 };
 
-string padsynthlist [] = {
+static string padsynthlist [] = {
     "PRofile <s>",              "shape of harmonic profile (Gauss, Square Double exponent)",
     "WIdth <n>",                "width of harmonic profile",
     "COunt <n>",                "number of profile repetitions",
@@ -349,7 +355,7 @@ string padsynthlist [] = {
 };
 
 
-string  resonancelist [] = {
+static string  resonancelist [] = {
     "PRotect <s>",              "leave fundamental unchanged (ON, {other})",
     "Maxdb <n>",                "maximum attenuation of points",
     "Random <s>",               "set a random distribution (Coarse, Medium, Fine)",
@@ -361,7 +367,7 @@ string  resonancelist [] = {
     "POints [<n1> [n2]]",       "show all or set/read n1 to n2",
     "end"
 };
-string waveformlist [] = {
+static string waveformlist [] = {
     "SINe",                     "basic waveforms",
     "TRIangle","",
     "PULse","",
@@ -407,7 +413,7 @@ string waveformlist [] = {
     "end"
 };
 
-string LFOlist [] = {
+static string LFOlist [] = {
     "AMplitude ~",              "amplitude type",
     "FRequency ~",              "frequency type",
     "FIlter ~",                 "filter type",
@@ -430,7 +436,7 @@ string LFOlist [] = {
     "end"
 };
 
-string filterlist [] = {
+static string filterlist [] = {
     "CEnter <n>",           "center frequency",
     "Q <n>",                "Q factor",
     "Velocity <n>",         "velocity sensitivity",
@@ -476,7 +482,7 @@ string filterlist [] = {
     "end"
 };
 
-string envelopelist [] = {
+static string envelopelist [] = {
     "types","",
     "AMplitude",              "amplitude type",
     "FRequency",              "frequency type",
@@ -511,8 +517,8 @@ string envelopelist [] = {
 };
 
 
-string reverblist [] = {
-    "LEVel <n>",        "reverb intensity",
+static string reverblist [] = {
+    "LEVel <n>",        "intensity",
     "PANning <n>",      "L/R panning",
     "TIMe <n>",         "reverb time",
     "DELay <n>",        "initial delay",
@@ -526,8 +532,8 @@ string reverblist [] = {
     "end"
 };
 
-string echolist [] = {
-    "LEVel <n>",        "echo intensity",
+static string echolist [] = {
+    "LEVel <n>",        "intensity",
     "PANning <n>",      "L/R panning",
     "DELay <n>",        "initial delay",
     "LRDelay <n>",      "left-right delay",
@@ -537,7 +543,69 @@ string echolist [] = {
     "end"
 };
 
-string learnlist [] = {
+static string choruslist [] = {
+    "LEVel <n>",        "intensity",
+    "PANning <n>",      "L/R panning",
+    "FREquency <n>",    "LFO frequency",
+    "RANdom <n>",       "LFO randomness",
+    "LFO <s>",          "LFO type (sine, triangle)",
+    "SHIft <n>",        "L/R phase shift",
+    "DEPTH <n>",        "LFO depth",
+    "DELay <n>",        "LFO delay",
+    "FEEdback <n>",     "chorus feedback",
+    "CROssover <n>",    "L/R routing",
+    "SUBtract <s>",     "invert output (ON {other})",
+    "end"
+};
+
+static string phaserlist [] = {
+    "LEVel <n>",        "intensity",
+    "PANning <n>",      "L/R panning",
+    "FREquency <n>",    "LFO frequency",
+    "RANdom <n>",       "LFO randomness",
+    "LFO <s>",          "LFO type (sine, triangle)",
+    "SHIft <n>",        "L/R phase shift",
+    "DEPTH <n>",        "LFO depth",
+    "FEEdback <n>",     "phaser feedback",
+    "STAges <n>",       "filter stages",
+    "CROssover <n>",    "L/R routing",
+    "SUBtract <s>",     "invert output (ON {other})",
+    "HYPer <s>",        "hyper ?  (ON {other})",
+    "OVErdrive <n>",    "distortion",
+    "ANAlog <s>",       "analog emulation (ON {other})",
+    "end"
+};
+
+static string alienwahlist [] = {
+    "LEVel <n>",        "intensity",
+    "PANning <n>",      "L/R panning",
+    "FREquency <n>",    "LFO frequency",
+    "LFO <s>",          "LFO type (sine, triangle)",
+    "SHIft <n>",        "L/R phase shift",
+    "DEPTH <n>",        "LFO depth",
+    "FEEdback <n>",     "filter feedback",
+    "DELay <n>",        "LFO delay",
+    "CROssover <n>",    "L/R routing",
+    "RELative <n>",     "relatove phase",
+    "end"
+};
+
+static string distortionlist [] = {
+    "LEVel <n>",        "intensity",
+    "PANning <n>",      "L/R panning",
+    "MIX <n>",          "L/R mix",
+    "DRIve <n>",        "input level",
+    "OUTput <n>",       "output balance",
+    "TYPe <s>",         "type ? (list)",
+    "INvert <s>",       "invert ?  (ON {other})",
+    "LOW <n>",          "low pass filter",
+    "HIGh <n>",         "high pass filter",
+    "STEreo <s>",       "Stereo (ON {other})",
+    "PREfilter <s>",    "filter before distortion",
+    "end"
+};
+
+static string learnlist [] = {
     "MUte <s>",                 "completely ignore this line (ON, {other})",
     "SEven",                    "set incoming NRPNs as 7 bit (ON, {other})",
     "CC <n2>",                  "set incoming controller value",
@@ -549,7 +617,7 @@ string learnlist [] = {
     "end"
 };
 
-string vectlist [] = {
+static string vectlist [] = {
     "[X/Y] CC <n2>",            "CC n2 is used for X or Y axis sweep",
     "[X/Y] Features <n2> [s]",  "sets X or Y features 1-4 (ON, Reverse, {other})",
     "[X] PRogram <l/r> <n2>",   "X program change ID for LEFT or RIGHT part",
@@ -560,7 +628,7 @@ string vectlist [] = {
     "end"
 };
 
-string scalelist [] = {
+static string scalelist [] = {
     "FRequency <n>",            "'A' note actual frequency",
     "NOte <n>",                 "'A' note number",
     "Invert [s]",               "invert entire scale (ON, {other})",
@@ -581,7 +649,7 @@ string scalelist [] = {
     "end"
 };
 
-string loadlist [] = {
+static string loadlist [] = {
     "Instrument <s>",           "instrument to current part from named file",
     "SCale <s>",                "scale settings from named file",
     "VEctor [n] <s>",           "vector to channel n (or saved) from named file",
@@ -591,7 +659,7 @@ string loadlist [] = {
     "end"
 };
 
-string savelist [] = {
+static string savelist [] = {
     "Instrument <s>",           "current part to named file",
     "SCale <s>",                "current scale settings to named file",
     "VEctor <n> <s>",           "vector on channel n to named file",
@@ -602,7 +670,7 @@ string savelist [] = {
     "end",
 };
 
-string listlist [] = {
+static string listlist [] = {
     "Roots",                    "all available root paths",
     "Banks [n]",                "banks in root ID or current",
     "Instruments [n]",          "instruments in bank ID or current",
@@ -618,7 +686,7 @@ string listlist [] = {
     "end"
 };
 
-string replies [] = {
+static string replies [] = {
     "OK",
     "Done",
     "Value?",
@@ -638,7 +706,7 @@ string replies [] = {
     "read only"
 };
 
-string fx_list [] = {
+static string fx_list [] = {
     "OFF",
     "REverb",
     "ECho",
@@ -652,7 +720,7 @@ string fx_list [] = {
 };
 
 
-string fx_presets [] = {
+static string fx_presets [] = {
     "1, off",
     "13, cathedral 1, cathedral 2, cathedral 3, hall 1, hall 2, room 1, room 2, basement, tunnel, echoed 1, echoed 2, very long 1, very long 2",
     "8, echo 1, echo 2, simple echo, canyon, panning echo 1, panning echo 2, panning echo 3, feedback echo",
@@ -745,14 +813,25 @@ bool CmdInterface::helpList(unsigned int local)
     if (!matchnMove(1, point, "help") && !matchnMove(1, point, "?"))
         return todo_msg;
 
-    int listnum = LISTS::all;
+    int listnum = -1;
+    bool named = false;
 
     if (point[0] != 0)
     { // 1 & 2 reserved for syseff & inseff
-        if (matchnMove(3, point, "reverb"))
+        if (matchnMove(3, point, "effects"))
+            listnum = LISTS::eff;
+        else if (matchnMove(3, point, "reverb"))
             listnum = LISTS::reverb;
         else if (matchnMove(3, point, "echo"))
             listnum = LISTS::echo;
+        else if (matchnMove(3, point, "chorus"))
+            listnum = LISTS::chorus;
+        else if (matchnMove(3, point, "phaser"))
+            listnum = LISTS::phaser;
+        else if (matchnMove(3, point, "alienwah"))
+            listnum = LISTS::alienwah;
+        else if (matchnMove(3, point, "distortion"))
+            listnum = LISTS::distortion;
 
         else if (matchnMove(1, point, "part"))
             listnum = LISTS::part;
@@ -793,6 +872,8 @@ bool CmdInterface::helpList(unsigned int local)
             listnum = LISTS::config;
         else if (matchnMove(1, point, "mlearn"))
             listnum = LISTS::mlearn;
+        if (listnum != -1)
+            named = true;
     }
     else
     {
@@ -808,6 +889,18 @@ bool CmdInterface::helpList(unsigned int local)
                     break;
                 case 2:
                     listnum = LISTS::echo;
+                    break;
+                case 3:
+                    listnum = LISTS::chorus;
+                    break;
+                case 4:
+                    listnum = LISTS::phaser;
+                    break;
+                case 5:
+                    listnum = LISTS::alienwah;
+                    break;
+                case 6:
+                    listnum = LISTS::distortion;
                     break;
             }
         }
@@ -845,10 +938,14 @@ bool CmdInterface::helpList(unsigned int local)
         else if (bitTest(local, LEVEL::Learn))
             listnum = LISTS::mlearn;
     }
-
+    if (listnum == -1)
+        listnum = LISTS::all;
     list<string>msg;
-    msg.push_back("Commands:");
-    helpLoop(msg, basics, 2);
+    if (!named)
+    {
+        msg.push_back("Commands:");
+        helpLoop(msg, basics, 2);
+    }
     switch(listnum)
     {
         case 0:
@@ -926,6 +1023,22 @@ bool CmdInterface::helpList(unsigned int local)
             msg.push_back("Echo:");
             helpLoop(msg, echolist, 2);
             break;
+        case LISTS::chorus:
+            msg.push_back("Chorus:");
+            helpLoop(msg, choruslist, 2);
+            break;
+        case LISTS::phaser:
+            msg.push_back("Phaser:");
+            helpLoop(msg, phaserlist, 2);
+            break;
+        case LISTS::alienwah:
+            msg.push_back("Alienwah:");
+            helpLoop(msg, alienwahlist, 2);
+            break;
+        case LISTS::distortion:
+            msg.push_back("Distortion:");
+            helpLoop(msg, distortionlist, 2);
+            break;
 
         case LISTS::vector:
             msg.push_back("Vector: [n1] = base channel:");
@@ -958,10 +1071,10 @@ bool CmdInterface::helpList(unsigned int local)
             break;
     }
 
-    if (listnum == 0)
+    if (listnum == LISTS::all)
     {
         helpLoop(msg, toplist, 2);
-        msg.push_back("'...' help sub-menu");
+        msg.push_back("'...' is a help sub-menu");
     }
 
     if (synth->getRuntime().toConsole)
@@ -1106,12 +1219,12 @@ int CmdInterface::effectsList(bool presets)
 
 int CmdInterface::effects(unsigned char controlType)
 {
-    string reverb[] = {"LEV", "PAN", "TIM", "DEL", "FEE", "none1", "none2", "LOW", "HIG", "DAM", "TYP", "ROO", "BAN", "end"};
+    string reverb[] = {"LEV", "PAN", "TIM", "DEL", "FEE", "none5", "none6", "LOW", "HIG", "DAM", "TYP", "ROO", "BAN", "end"};
     string echo[] = {"LEV", "PAN", "DEL", "LRD", "CRO", "FEE", "DAM",  "end"};
-    string chorus[] = {"LEV", "PAN", "FRE", "RAN", "LFO", "SHI", "DEP", "DEL", "FEE", "CRO", "FLA", "SUB", "end"};
+    string chorus[] = {"LEV", "PAN", "FRE", "RAN", "LFO", "SHI", "DEP", "DEL", "FEE", "CRO", "none11", "SUB", "end"};
     string phaser[] = {"LEV", "PAN", "FRE", "RAN", "LFO", "SHI", "DEP", "FEE", "STA", "CRO", "SUB", "REL", "HYP", "OVE", "ANA", "end"};
-    string alienwah[] = {"LEV", "PAN", "FRE", "TYP", "SHI", "DEP", "FEE", "DEL", "CRO", "REL", "end"};
-    string distortion[] = {"LEV", "PAN", "CRO", "DRI", "OUT", "TYP", "INV", "LOW", "HIG", "STE", "PRE", "end"};
+    string alienwah[] = {"LEV", "PAN", "FRE", "LFO", "SHI", "DEP", "FEE", "DEL", "CRO", "REL", "end"};
+    string distortion[] = {"LEV", "PAN", "MIX", "DRI", "OUT", "TYP", "INV", "LOW", "HIG", "STE", "PRE", "end"};
     string eq[] = {"LEV", "BAN", "TYP", "FRE", "GAI", "Q", "STA"};
     string dynanicfilter[] = {"LEV", "PAN", "FRE", "RAN", "LFO", "SHI", "DEP", "SEN", "INV", "SMO", "end"};
     Config &Runtime = synth->getRuntime();
@@ -1308,10 +1421,6 @@ int CmdInterface::effects(unsigned char controlType)
         // continue cos it's not us.
     }
 
-
-
-
-
     if (matchnMove(2, point, "send"))
     {
         if (lineEnd(controlType))
@@ -1320,22 +1429,14 @@ int CmdInterface::effects(unsigned char controlType)
         if (bitTest(context, LEVEL::InsFX))
         {
             if (matchnMove(1, point, "master"))
-            {
                 value = -2;
-                dest = "master";
-            }
             else if (matchnMove(1, point, "off"))
-            {
                 value = -1;
-                dest = "off";
-            }
             else
             {
                 value = string2int(point) - 1;
                 if (value >= Runtime.NumAvailableParts || value < 0)
                     return range_msg;
-                dest = "part " + asString(value + 1);
-                // done this way in case there is rubbish on the end
             }
         }
         else
@@ -1355,32 +1456,24 @@ int CmdInterface::effects(unsigned char controlType)
         if (bitTest(context, LEVEL::Part))
         {
             partno = npart;
-            control = 40 + par;
+            control = PART::control::partToSystemEffect1 + par;
             engine = UNUSED;
-
-            dest = "part " + asString(npart + 1) + " efx sent to system "
-                 + asString(par + 1) + " at " + asString(value);
         }
         else if (bitTest(context, LEVEL::InsFX))
         {
             partno = TOPLEVEL::section::insertEffects;
-            control = 2;
-            dest = "insert efx " + asString(nFX + 1) + " sent to " + dest;
+            control = EFFECT::sysIns::effectDestination;
         }
         else
         {
-            if (par <= nFX)
+            if (par <= nFX || par >= NUM_SYS_EFX)
                 return range_msg;
             partno = TOPLEVEL::section::systemEffects;
-            control = par;
+            control = EFFECT::sysIns::toEffect1 + par - 1; // TODO this needs sorting
             engine = nFX;
             insert = TOPLEVEL::insert::systemEffectSend;
-            dest = "system efx " + asString(nFX + 1) + " sent to "
-                 + asString(par + 1) + " at " + asString(value);
         }
-        sendDirect(value, TOPLEVEL::type::Write,control, partno, UNUSED, engine, insert);
-        Runtime.Log(dest);
-        return done_msg;
+        return sendNormal(value, TOPLEVEL::type::Write, control, partno, UNUSED, engine, insert);
     }
 
     if (matchnMove(3, point, "preset"))
@@ -1393,30 +1486,14 @@ int CmdInterface::effects(unsigned char controlType)
          * not here *and* in the gui code!
          */
         int partno;
-        par = string2int(fx_presets [nFXtype].substr(0, fx_presets [nFXtype].find(',')));
-        if (par == 1)
-            return available_msg;
-        value = string2int127(point) - 1;
-        if (value >= par || value < 0)
-            return range_msg;
-        nFXpreset = value;
+        nFXpreset = string2int127(point) - 1;
         if (bitTest(context, LEVEL::Part))
-        {
             partno = npart;
-            dest = "part " + asString(npart + 1);
-        }
         else if (bitTest(context, LEVEL::InsFX))
-        {
             partno = TOPLEVEL::section::insertEffects;
-            dest = "insert";
-        }
         else
-        {
             partno = TOPLEVEL::section::systemEffects;
-            dest = "system";
-        }
-        sendDirect(nFXpreset, TOPLEVEL::type::Write,16, partno,  EFFECT::type::none + nFXtype, nFX);
-        Runtime.Log(dest + " efx preset set to number " + asString(value + 1));
+        return sendNormal(nFXpreset, TOPLEVEL::type::Write, 16, partno,  EFFECT::type::none + nFXtype, nFX);
     }
     return done_msg;
 }
@@ -2359,26 +2436,29 @@ string CmdInterface::findStatus(bool show)
     int kit = UNUSED;
     int insert = UNUSED;
 
-    // effects block needs cleaning up
-    // to remove direct reads
     if (bitTest(context, LEVEL::AllFX))
     {
         if (bitTest(context, LEVEL::Part))
         {
-            text += " Part ";
-            text += to_string(int(npart) + 1);
+            text = " p" + to_string(int(npart) + 1);
+            if (readControl(PART::control::enable, npart))
+                text += "+";
+            nFXtype = readControl(PART::control::effectType, npart, UNUSED, nFX);
+            nFXpreset = readControl(16, npart,  EFFECT::type::none + nFXtype, nFX);
         }
         else if (bitTest(context, LEVEL::InsFX))
         {
             text += " Ins";
-            nFXtype = synth->insefx[nFX]->geteffect();
+            nFXtype = readControl(EFFECT::sysIns::effectType, TOPLEVEL::section::insertEffects, UNUSED, nFX);
+            nFXpreset = readControl(16, TOPLEVEL::section::insertEffects,  EFFECT::type::none + nFXtype, nFX);
         }
         else
         {
             text += " Sys";
-            nFXtype = synth->sysefx[nFX]->geteffect();
+            nFXtype = readControl(EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, nFX);
+            nFXpreset = readControl(16, TOPLEVEL::section::systemEffects,  EFFECT::type::none + nFXtype, nFX);
         }
-        text += (" efx " + asString(nFX + 1) + " " + fx_list[nFXtype].substr(0, 5));
+        text += (" eff " + asString(nFX + 1) + " " + fx_list[nFXtype].substr(0, 6));
         if (nFXtype > 0)
             text += ("-" + asString(nFXpreset + 1));
         return text;
@@ -4354,11 +4434,20 @@ int CmdInterface::commandPart(unsigned char controlType)
 {
     Config &Runtime = synth->getRuntime();
     int tmp;
-
+    if (bitTest(context, LEVEL::AllFX))
+        return effects(controlType);
     if (lineEnd(controlType))
         return done_msg;
     if (kitMode == PART::kitType::Off)
         kitNumber = UNUSED; // always clear it if not kit mode
+    if (matchnMove(2, point, "effects") || matchnMove(2, point, "efx"))
+    {
+        context = LEVEL::Top;
+        bitSet(context, LEVEL::AllFX);
+        bitSet(context, LEVEL::Part);
+        return effects(controlType);
+    }
+
     if (isdigit(point[0]))
     {
         tmp = string2int127(point);
@@ -4513,14 +4602,6 @@ int CmdInterface::commandPart(unsigned char controlType)
     tmp = partCommonControls(controlType);
     if (tmp != todo_msg)
         return tmp;
-
-    if (matchnMove(2, point, "effects") || matchnMove(2, point, "efx"))
-    {
-        context = LEVEL::Top;
-        bitSet(context, LEVEL::AllFX);
-        bitSet(context, LEVEL::Part);
-        return effects(controlType);
-    }
 
     if (matchnMove(2, point, "shift"))
     {
@@ -5205,9 +5286,16 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
     { // need the double test to find which then move along line
         int type = 0;
         if (matchnMove(3, point, "import"))
+        {
             type = MAIN::control::importBank;
+            replyString = "import";
+        }
         else if (matchnMove(3, point, "export"))
+        {
             type = MAIN::control::exportBank;
+            replyString = "export";
+        }
+
         int root = UNUSED;
         if (matchnMove(1, point, "root"))
         {
@@ -5223,13 +5311,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         point = skipChars(point);
         string name = string(point);
         if (root < 0 || (root > 127 && root != UNUSED) || value < 0 || value > 127 || name <="!")
-        {
-            if (type == MAIN::control::importBank)
-                replyString = "import";
-            else
-                replyString = "export";
-            return value_msg;
-        }
+            return what_msg;
         else
         {
             sendDirect(value, TOPLEVEL::type::Write, type, TOPLEVEL::section::main, root, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(name));

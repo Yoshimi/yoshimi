@@ -1,5 +1,11 @@
 yoshimi 1.5.9 M
 
+2018-11-22 Will
+* Revised CLI effects code.
+* BugFix: SysEff 'send' returned wrong value.
+* CLI help effect lists complete to distortion.
+* No top level CLI help data when calling by name.
+
 2018-11-21 Will
 * CLI Reverb and Echo controls completed.
   and created new help lists for these.

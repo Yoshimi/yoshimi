@@ -8093,7 +8093,12 @@ void InterChange::commandEffects(CommandBlock *getData)
             getData->data.parameter = eff->geteffectpar(1);
         }
         else
-            value = eff->geteffectpar(control);
+        {
+            if (control == 16)
+                value = eff->getpreset();
+            else
+                value = eff->geteffectpar(control);
+        }
     }
 
     if (!write)

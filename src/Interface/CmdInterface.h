@@ -43,8 +43,8 @@ using namespace std;
  */
 namespace LEVEL{
     enum {
-        Top = 0, // set directly as an interger to clear down
-        AllFX = 0, // bits from here on
+        Top = 0, // set directly as an integer to clear down
+        AllFX = 1, // bits from here on
         InsFX,
         Part,
         Config,
