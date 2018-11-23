@@ -128,6 +128,7 @@ class CmdInterface : private MiscFuncs
         int nFX;
         int nFXtype;
         int nFXpreset;
+        int nFXeqBand;
         int chan;
         int axis;
         int mline;

@@ -233,7 +233,7 @@ static string commonlist [] = {
     "MAx <[s][n]> +",           "maximum MIDI note value (Last seen or 0-127)",
     "DETune Fine <n> *",        "fine frequency",
     "DETune Coarse <n> *",      "coarse stepped frequency",
-    "DETune Type <s> *",        "type of coarse stepping (DEFault, L35, L10, E100, E1200)",
+    "DETune Type <s> *",        "type of coarse stepping", "","(DEFault, L35, L10, E100, E1200)",
     "OCTave <n> *",             "shift octaves up or down",
     "FIXed <s> *-add",          "set base frequency to 440Hz (ON, {other})",
     "EQUal <n> *-add",          "equal temper variation",
@@ -246,7 +246,7 @@ static string commonlist [] = {
     "PUnch Stretch <n> &",      "attack boost extend",
     "PUnch Velocity <n> &",     "attack boost velocity sensitivity",
     "OVertone Position <s> #",  "relationship to fundamental",
-    "","HArmonic,SIne,POwer,SHift,UShift,LShift,UPower,LPower",
+    "","(HArmonic,SIne,POwer,SHift,UShift,LShift,UPower,LPower)",
     "OVertone First <n> #",     "degree of first parameter",
     "OVertone Second <n> #",    "degree of second parameter",
     "OVertone Harmonic <n> #",  "amount harmonics are forced",
@@ -399,7 +399,7 @@ static string waveformlist [] = {
     "","(OFF, ATAn, ASYm1, POWer, SINe QNTs, ZIGzag, LMT, ULMt, LLMt, ILMt, CLIp, AS2, PO2, SGM)",
     "SHape Par <n>",            "wave shape modifier amount",
     "Filter Type <s>","",
-    "","OFF, LP1, HPA1, HPB1, BP1, BS1, LP2, HP2, BP2, BS2, COS, SIN, LSH, SGM",
+    "","(OFF, LP1, HPA1, HPB1, BP1, BS1, LP2, HP2, BP2, BS2, COS, SIN, LSH, SGM)",
     "Filter Par <n1> <n2>",     "filter parameters  n1 (1/2), n2 value",
     "Filter Before <s>",        "do filtering before waveshaping (ON {other})",
     "Modulation Par <n1 <n2>",  "Overall modulation n1 (1 - 3), n2 value",
@@ -414,71 +414,71 @@ static string waveformlist [] = {
 };
 
 static string LFOlist [] = {
-    "AMplitude ~",              "amplitude type",
-    "FRequency ~",              "frequency type",
-    "FIlter ~",                 "filter type",
-    "~  Rate <n>",              "frequency",
-    "~  Start <n>",             "start position in cycle",
-    "~  Delay <n>",             "time before effect",
-    "~  Expand <n>",            "rate / note pitch",
-    "~  Continuous <s>",        "(ON, {other})",
-    "~  Type <s>",              "LFO oscillator shape",
-    "   ",                      "  SIne",
-    "   ",                      "  Triangle",
-    "   ",                      "  SQuare",
-    "   ",                      "  RUp (ramp up)",
-    "   ",                      "  RDown (ramp down)",
-    "   ",                      "  E1dn",
-    "   ",                      "  E2dn",
-    "~  AR <n>",                "amplitude randomness",
-    "~  FR <n>",                "frequency randomness",
-    "e.g. S FI T RU",           "set filter type ramp up",
+    "AMplitude ~",          "amplitude type",
+    "FRequency ~",          "frequency type",
+    "FIlter ~",             "filter type",
+    "~  Rate <n>",          "frequency",
+    "~  Start <n>",         "start position in cycle",
+    "~  Delay <n>",         "time before effect",
+    "~  Expand <n>",        "rate / note pitch",
+    "~  Continuous <s>",    "(ON, {other})",
+    "~  Type <s>",          "LFO oscillator shape",
+    "   ",                  "  SIne",
+    "   ",                  "  Triangle",
+    "   ",                  "  SQuare",
+    "   ",                  "  RUp (ramp up)",
+    "   ",                  "  RDown (ramp down)",
+    "   ",                  "  E1dn",
+    "   ",                  "  E2dn",
+    "~  AR <n>",            "amplitude randomness",
+    "~  FR <n>",            "frequency randomness",
+    "e.g. S FI T RU",       "set filter type ramp up",
     "end"
 };
 
 static string filterlist [] = {
-    "CEnter <n>",           "center frequency",
-    "Q <n>",                "Q factor",
-    "Velocity <n>",         "velocity sensitivity",
-    "SLope <n>",            "velocity curve",
-    "Gain <n>",             "overall amplitude",
-    "TRacking <n>",         "frequency tracking",
-    "Range <s>",            "extended tracking (ON, {other})",
-    "CAtegory <s>",         "Analog, Formant, State variable",
-    "STages <n>",           "filter stages (1 to 5)",
-    "TYpe <s>",             "category dependent - not formant",
+    "CEnter <n>",       "center frequency",
+    "Q <n>",            "Q factor",
+    "Velocity <n>",     "velocity sensitivity",
+    "SLope <n>",        "velocity curve",
+    "Gain <n>",         "overall amplitude",
+    "TRacking <n>",     "frequency tracking",
+    "Range <s>",        "extended tracking (ON, {other})",
+    "CAtegory <s>",     "Analog, Formant, State variable",
+    "STages <n>",       "filter stages (1 to 5)",
+    "TYpe <s>",         "category dependent - not formant",
     "-  analog","",
-    "  l1",                 "one stage low pass",
-    "  h1",                 "one stage high pass",
-    "  l2",                 "two stage low pass",
-    "  h2",                 "two stage high pass",
-    "  band",               "two stage band pass",
-    "  stop",               "two stage band stop",
-    "  peak",               "two stage peak",
-    "  lshelf",             "two stage low shelf",
-    "  hshelf",             "two stage high shelf",
+    "  l1",             "one stage low pass",
+    "  h1",             "one stage high pass",
+    "  l2",             "two stage low pass",
+    "  h2",             "two stage high pass",
+    "  band",           "two stage band pass",
+    "  stop",           "two stage band stop",
+    "  peak",           "two stage peak",
+    "  lshelf",         "two stage low shelf",
+    "  hshelf",         "two stage high shelf",
     "-  state variable","",
-    "  low",                "low pass",
-    "  high",               "high pass",
-    "  band",               "band pass",
-    "  stop",               "band stop",
+    "  low",            "low pass",
+    "  high",           "high pass",
+    "  band",           "band pass",
+    "  stop",           "band stop",
     "","",
-    "formant editor",       "(shows V current vowel, F current formant)",
-    "Invert <s>",           "invert effect of LFOs, envelopes (ON, OFF)",
-    "FCenter <n>",          "center frequency of sequence",
-    "FRange <n>",           "octave range of formants",
-    "Expand <n>",           "stretch overall sequence time",
-    "Lucidity <n>",         "clarity of vowels",
-    "Morph <n>",            "speed of change between formants",
-    "SIze <n>",             "number of vowels in sequence",
-    "COunt <n>",            "number of formants in vowels",
-    "VOwel <n>",            "vowel being processed",
-    "Point <n1> <n2>",      "vowel n1 at sequence position n2",
-    "FOrmant <n>",          "formant being processed",
+    "formant editor",   "(shows V current vowel, F current formant)",
+    "Invert <s>",       "invert effect of LFOs, envelopes (ON, OFF)",
+    "FCenter <n>",      "center frequency of sequence",
+    "FRange <n>",       "octave range of formants",
+    "Expand <n>",       "stretch overall sequence time",
+    "Lucidity <n>",     "clarity of vowels",
+    "Morph <n>",        "speed of change between formants",
+    "SIze <n>",         "number of vowels in sequence",
+    "COunt <n>",        "number of formants in vowels",
+    "VOwel <n>",        "vowel being processed",
+    "Point <n1> <n2>",  "vowel n1 at sequence position n2",
+    "FOrmant <n>",      "formant being processed",
     "per formant","",
-    "  FFrequency <n>",     "center frequency of formant",
-    "  FQ <n>",             "bandwidth of formant",
-    "  FGain <n>",          "amplitude of formant",
+    "  FFrequency <n>", "center frequency of formant",
+    "  FQ <n>",         "bandwidth of formant",
+    "  FGain <n>",      "amplitude of formant",
     "end"
 };
 
@@ -548,7 +548,7 @@ static string choruslist [] = {
     "PANning <n>",      "L/R panning",
     "FREquency <n>",    "LFO frequency",
     "RANdom <n>",       "LFO randomness",
-    "LFO <s>",          "LFO type (sine, triangle)",
+    "WAVe <s>",         "LFO waveshape (sine, triangle)",
     "SHIft <n>",        "L/R phase shift",
     "DEPTH <n>",        "LFO depth",
     "DELay <n>",        "LFO delay",
@@ -563,7 +563,7 @@ static string phaserlist [] = {
     "PANning <n>",      "L/R panning",
     "FREquency <n>",    "LFO frequency",
     "RANdom <n>",       "LFO randomness",
-    "LFO <s>",          "LFO type (sine, triangle)",
+    "WAVe <s>",         "LFO waveshape (sine, triangle)",
     "SHIft <n>",        "L/R phase shift",
     "DEPTH <n>",        "LFO depth",
     "FEEdback <n>",     "phaser feedback",
@@ -580,7 +580,7 @@ static string alienwahlist [] = {
     "LEVel <n>",        "intensity",
     "PANning <n>",      "L/R panning",
     "FREquency <n>",    "LFO frequency",
-    "LFO <s>",          "LFO type (sine, triangle)",
+    "WAVe <s>",         "LFO waveshape (sine, triangle)",
     "SHIft <n>",        "L/R phase shift",
     "DEPTH <n>",        "LFO depth",
     "FEEdback <n>",     "filter feedback",
@@ -596,7 +596,8 @@ static string distortionlist [] = {
     "MIX <n>",          "L/R mix",
     "DRIve <n>",        "input level",
     "OUTput <n>",       "output balance",
-    "TYPe <s>",         "type ? (list)",
+    "WAVe <s>",         "function waveshape",
+    "","(ATAn, ASYm1, POWer, SINe QNTs, ZIGzag, LMT, ULMt, LLMt, ILMt, CLIp, AS2, PO2, SGM)",
     "INvert <s>",       "invert ?  (ON {other})",
     "LOW <n>",          "low pass filter",
     "HIGh <n>",         "high pass filter",
@@ -605,15 +606,43 @@ static string distortionlist [] = {
     "end"
 };
 
+static string eqlist [] = {
+    "LEVel <n>",        "intensity",
+    "BANd <b>",         "EQ band number for following controls",
+    "FILter <s>",       "filter type",
+    "","(LP1, HP1, LP2, HP2, NOT, PEA, LOW, HIG)",
+    "  FREquency <n>",  "cutoff/band frequency",
+    "  GAIn <n>",       "makeup gain",
+    "  Q <n>",          "filter Q",
+    "  STAges <n>",     "filter stages",
+    "end"
+};
+
+static string dynfilterlist [] = {
+    "LEVel <n>",        "intensity",
+    "PANning <n>",      "L/R panning",
+    "FREquency <n>",    "LFO frequency",
+    "RANdom <n>",       "LFO randomness",
+    "WAVe <s>",         "LFO waveshape (sine, triangle)",
+    "SHIft <n>",        "L/R phase shift",
+    "DEPTH <n>",        "LFO depth",
+    "SENsitivity <n>",  "Amount amplitude changes filter",
+    "INVert <s>",       "Reverse effect of sensitivity (ON {other})",
+    "RATe <n>",         "speed of filter change with amplitude",
+    "end"
+};
+
+static string waveshapes[] = {"OFF" ,"ATA", "ASY", "POW", "SIN", "QNT", "ZIG", "LMT", "ULM", "LLM", "ILM", "CLI", "CLI", "AS2", "PO2", "SGM", "end"};
+
 static string learnlist [] = {
-    "MUte <s>",                 "completely ignore this line (ON, {other})",
-    "SEven",                    "set incoming NRPNs as 7 bit (ON, {other})",
-    "CC <n2>",                  "set incoming controller value",
-    "CHan <n2>",                "set incoming channel number",
-    "MIn <n2>",                 "set minimm percentage",
-    "MAx <n2>",                 "set maximum percentage",
-    "LImit <s>",                "limit instead of compress (ON, {other})",
-    "BLock <s>",                "inhibit others on this CC/Chan pair (ON, {other})",
+    "MUte <s>",         "completely ignore this line (ON, {other})",
+    "SEven",            "set incoming NRPNs as 7 bit (ON, {other})",
+    "CC <n2>",          "set incoming controller value",
+    "CHan <n2>",        "set incoming channel number",
+    "MIn <n2>",         "set minimm percentage",
+    "MAx <n2>",         "set maximum percentage",
+    "LImit <s>",        "limit instead of compress (ON, {other})",
+    "BLock <s>",        "inhibit others on this CC/Chan pair (ON, {other})",
     "end"
 };
 
@@ -743,6 +772,7 @@ void CmdInterface::defaults()
     nFX = 0;
     nFXtype = 0;
     nFXpreset = 0;
+    nFXeqBand = 0;
     kitMode = 0;
     kitNumber = 0;
     inKitEditor = false;
@@ -800,6 +830,11 @@ void CmdInterface::helpLoop(list<string>& msg, string *commands, int indent, boo
         left = commands[word];
         if (!single)
             right = commands[word + 1];
+        if (left == "")
+        {
+            left = "  " + right;
+            right = "";
+        }
         if (right > "")
             left = left +(blanks.assign(spaces - left.length(), ' ') + right);
         msg.push_back(dent.assign(indent, ' ') + left);
@@ -832,6 +867,10 @@ bool CmdInterface::helpList(unsigned int local)
             listnum = LISTS::alienwah;
         else if (matchnMove(3, point, "distortion"))
             listnum = LISTS::distortion;
+        else if (matchnMove(2, point, "eq"))
+            listnum = LISTS::eq;
+        else if (matchnMove(3, point, "dynfilter"))
+            listnum = LISTS::dynfilter;
 
         else if (matchnMove(1, point, "part"))
             listnum = LISTS::part;
@@ -901,6 +940,12 @@ bool CmdInterface::helpList(unsigned int local)
                     break;
                 case 6:
                     listnum = LISTS::distortion;
+                    break;
+                case 7:
+                    listnum = LISTS::eq;
+                    break;
+                case 8:
+                    listnum = LISTS::dynfilter;
                     break;
             }
         }
@@ -1038,6 +1083,14 @@ bool CmdInterface::helpList(unsigned int local)
         case LISTS::distortion:
             msg.push_back("Distortion:");
             helpLoop(msg, distortionlist, 2);
+            break;
+        case LISTS::eq:
+            msg.push_back("EQ:");
+            helpLoop(msg, eqlist, 2);
+            break;
+        case LISTS::dynfilter:
+            msg.push_back("Dynfilter:");
+            helpLoop(msg, dynfilterlist, 2);
             break;
 
         case LISTS::vector:
@@ -1221,12 +1274,13 @@ int CmdInterface::effects(unsigned char controlType)
 {
     string reverb[] = {"LEV", "PAN", "TIM", "DEL", "FEE", "none5", "none6", "LOW", "HIG", "DAM", "TYP", "ROO", "BAN", "end"};
     string echo[] = {"LEV", "PAN", "DEL", "LRD", "CRO", "FEE", "DAM",  "end"};
-    string chorus[] = {"LEV", "PAN", "FRE", "RAN", "LFO", "SHI", "DEP", "DEL", "FEE", "CRO", "none11", "SUB", "end"};
-    string phaser[] = {"LEV", "PAN", "FRE", "RAN", "LFO", "SHI", "DEP", "FEE", "STA", "CRO", "SUB", "REL", "HYP", "OVE", "ANA", "end"};
-    string alienwah[] = {"LEV", "PAN", "FRE", "LFO", "SHI", "DEP", "FEE", "DEL", "CRO", "REL", "end"};
-    string distortion[] = {"LEV", "PAN", "MIX", "DRI", "OUT", "TYP", "INV", "LOW", "HIG", "STE", "PRE", "end"};
+    string chorus[] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "DEL", "FEE", "CRO", "none11", "SUB", "end"};
+    string phaser[] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "FEE", "STA", "CRO", "SUB", "REL", "HYP", "OVE", "ANA", "end"};
+    string alienwah[] = {"LEV", "PAN", "FRE", "WAV", "SHI", "DEP", "FEE", "DEL", "CRO", "REL", "end"};
+    string distortion[] = {"LEV", "PAN", "MIX", "DRI", "OUT", "WAV", "INV", "LOW", "HIG", "STE", "PRE", "end"};
     string eq[] = {"LEV", "BAN", "TYP", "FRE", "GAI", "Q", "STA"};
-    string dynanicfilter[] = {"LEV", "PAN", "FRE", "RAN", "LFO", "SHI", "DEP", "SEN", "INV", "SMO", "end"};
+    string eqtypes[] = {"LP1", "HP1", "LP2", "HP2", "BP2", "NOT", "PEA", "LOW", "HIG", "end"};
+    string dynanicfilter[] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "SEN", "INV", "RAT", "end"};
     Config &Runtime = synth->getRuntime();
     int nFXavail;
     int par = nFX;
@@ -1313,18 +1367,27 @@ int CmdInterface::effects(unsigned char controlType)
             return sendNormal(nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, nFX);
     }
 
-
-
     if (nFXtype > 0)
     {
         int selected = -1;
         int value = -1;
         string name = string(point).substr(0,3);
+        /*
+         * We can't do a skipChars here as we don't yet know
+         * if 'selected' will be valid. For some controls we
+         * need to do an on-the-spot skip, othewise we do so
+         * at the end when we know we have a valid result but
+         * 'value' has not been set.
+         * If it's not valid we don't block, but pass on to
+         * other command tests routines.
+         */
         switch (nFXtype)
         {
             case 1:
             {
                 selected = stringNumInList(name, reverb, 1);
+                if (selected != 7) // EQ
+                    nFXeqBand = 0;
                 if (selected == 10) // type
                 {
                     point = skipChars(point);
@@ -1397,12 +1460,54 @@ int CmdInterface::effects(unsigned char controlType)
             case 6:
             {
                 selected = stringNumInList(name, distortion, 1);
+                if (selected == 5) // waveshape
+                {
+                    point = skipChars(point);
+                    string name = string(point).substr(0,3);
+                    value = stringNumInList(name, waveshapes, 1) - 1;
+                    if (value < 0)
+                        return value_msg;
+                }
+                else if (selected == 6 || selected == 9 || selected == 10) // invert, stereo, prefilter
+                {
+                    point = skipChars(point);
+                    value = (toggle() == 1);
+                }
+                break;
+            }
+            case 7: // TODO band and type no GUI update
+            {
+                selected = stringNumInList(name, eq, 1);
+                if (selected == 1) // band
+                {
+                    if (controlType == TOPLEVEL::type::Write)
+                    {
+                        point = skipChars(point);
+                        value = string2int(point);
+                        if (value < 0 || value >= MAX_EQ_BANDS)
+                            return range_msg;
+                        nFXeqBand = value;
+                    }
+                }
+                else if (selected == 2) // type
+                {
+                    point = skipChars(point);
+                    string name = string(point).substr(0,3);
+                    value = stringNumInList(name, eqtypes, 1);
+                    if (value < 0)
+                        return value_msg;
+                }
+
+                if (selected > 1)
+                {
+                    selected += 8; // dunno yet!
+                }
                 break;
             }
 
 
-        }
 
+        }
         if (selected > -1)
         {
             if (value == -1)
@@ -1418,7 +1523,7 @@ int CmdInterface::effects(unsigned char controlType)
             else
                 return sendNormal(value, controlType, selected, TOPLEVEL::section::systemEffects, EFFECT::type::none + nFXtype, nFX);
         }
-        // continue cos it's not us.
+        // Continue cos it's not for us.
     }
 
     if (matchnMove(2, point, "send"))
@@ -4222,7 +4327,6 @@ int CmdInterface::waveform(unsigned char controlType)
     int engine = contextToEngines();
     unsigned char insert = TOPLEVEL::insert::oscillatorGroup;
     string wavebase[] = {"SIN", "TRI", "PUL", "SAW", "POW", "GAU", "DIO", "ABS", "PSI", "SSI", "CHI", "ASI", "CHE", "SQU", "SPI", "CIR", "end"};
-    string waveshapes[] = {"OFF" ,"ATA", "ASY", "POW", "SIN", "QNT", "ZIG", "LMT", "ULM", "LLM", "ILM", "CLI", "CLI", "AS2", "PO2", "SGM", "end"};
     string filtertype[] = {"OFF", "LP1", "HPA", "HPB", "BP1", "BS1", "LP2", "HP2", "BP2", "BS2", "COS", "SIN", "LSH", "SGM", "end"};
     string adaptive[] = {"OFF", "ON", "SQU", "2XS", "2XA", "3XS", "3XA", "4XS", "4XA"};
 

@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified July 2018
+    Modified November 2018
 */
 
 #include "Misc/SynthEngine.h"
@@ -317,7 +317,6 @@ float Distlimit::getlimits(CommandBlock *getData)
 
     int def = presets[presetNum][control];
     bool canLearn = true;
-    bool isInteger = true;
     switch (control)
     {
         case 0:
@@ -377,6 +376,7 @@ float Distlimit::getlimits(CommandBlock *getData)
             value = def;
             break;
     }
-    getData->data.type |= (canLearn * 64 + isInteger * 128);
+    if (canLearn)
+        getData->data.type |= TOPLEVEL::type::Learnable;
     return float(value);
 }

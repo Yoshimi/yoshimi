@@ -1093,7 +1093,7 @@ void ADnote::setfreq(int nvoice, float in_freq)
         int tmp;
         FR2Z2I (speed, tmp);
         oscfreqhi[nvoice][k] = tmp;
-        oscfreqlo[nvoice][k] = speed - tmp;
+        oscfreqlo[nvoice][k] = speed - float(tmp);
     }
 }
 
@@ -1110,7 +1110,7 @@ void ADnote::setfreqFM(int nvoice, float in_freq)
         int tmp;
         FR2Z2I (speed, tmp);
         oscfreqhiFM[nvoice][k] = tmp;
-        oscfreqloFM[nvoice][k] = speed - tmp;
+        oscfreqloFM[nvoice][k] = speed - float(tmp);
     }
 }
 

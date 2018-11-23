@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-Modified September 2018} {in_source in_header
+Modified November 2018} {in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -1729,10 +1729,10 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                     distp4->value(value);
                     break;
                 case 5:
-                    distp6->value(value_int);
+                    distp5->value(value_int);
                     break;
                 case 6:
-                    distp5->value(value_int);
+                    distp6->value(value_int);
                     break;
                 case 7:
                     distp7->value(value);

@@ -1,5 +1,11 @@
 yoshimi 1.5.9 M
 
+2018-11-23 Will
+* All CLI effects help lists done.
+* CLI EQ controls done.
+  (band and stages don't update GUI yet)
+* Some code cleanups.
+
 2018-11-22 Will
 * Revised CLI effects code.
 * BugFix: SysEff 'send' returned wrong value.
