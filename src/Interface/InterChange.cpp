@@ -8167,7 +8167,7 @@ float InterChange::returnLimits(CommandBlock *getData)
     float value = getData->data.value;
     int request = int(getData->data.type & TOPLEVEL::type::Default); // catches Adj, Min, Max, Def
 
-    //cout << "Top  Control " << control << " Part " << (int) getData->data.part << "  Kit " << kititem << " Engine " << engine << "  Insert " << insert << endl;
+    //cout << "Limits Control " << control << " Part " << npart << "  Kit " << kititem << " Engine " << engine << "  Insert " << insert << "  Parameter " << parameter << endl;
 
     //cout << "Top request " << request << endl;
 
@@ -8189,6 +8189,13 @@ float InterChange::returnLimits(CommandBlock *getData)
     float min;
     float max;
     float def;
+
+    if (insert == TOPLEVEL::insert::filterGroup)
+    {
+        filterLimit filterLimits;
+        return filterLimits.getFilterLimits(getData);
+    }
+    // should prolly move other inserts up here
 
     if (kititem >= EFFECT::type::none && kititem <= EFFECT::type::dynFilter)
     {
@@ -8276,11 +8283,6 @@ float InterChange::returnLimits(CommandBlock *getData)
             LFOlimit lfolimits;
             return lfolimits.getLFOlimits(getData);
         }
-        if (insert == TOPLEVEL::insert::filterGroup)
-        {
-            filterLimit filterLimits;
-            return filterLimits.getFilterLimits(getData);
-        }
         if (insert == TOPLEVEL::insert::envelopeGroup)
         {
             envelopeLimit envelopeLimits;
@@ -8313,7 +8315,8 @@ float InterChange::returnLimits(CommandBlock *getData)
             }
             return value;
     }
-     // these two should realy be in effects
+
+    // these two should realy be in effects
     if (npart == TOPLEVEL::section::systemEffects)
     {
         min = 0;

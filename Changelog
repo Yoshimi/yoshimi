@@ -1,5 +1,9 @@
 yoshimi 1.5.9 M
 
+2018-11-24 Will
+* BugFix: Limits tests not finding dynfilter-filter.
+* Completed CLI access to dynfilter. Phew!
+
 2018-11-23 Will
 * All CLI effects help lists done.
 * CLI EQ controls done.

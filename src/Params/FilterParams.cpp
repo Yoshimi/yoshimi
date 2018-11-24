@@ -22,10 +22,11 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified October 2018
+    Modified November 2018
 */
 
 #include <cmath>
+#include <iostream>
 
 using namespace std;
 

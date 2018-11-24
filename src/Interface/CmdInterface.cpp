@@ -1367,7 +1367,7 @@ int CmdInterface::effects(unsigned char controlType)
         else
             return sendNormal(nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, nFX);
     }
-    bool extended = false;
+
     if (nFXtype > 0)
     {
         int selected = -1;
@@ -1524,10 +1524,9 @@ int CmdInterface::effects(unsigned char controlType)
                 }
                 else if (selected == 10) // filter entry
                 {
-                    extended = true; // dunno
-                    //bitSet(context, LEVEL::Filter);
+                    bitSet(context, LEVEL::Filter);
                     //return filterSelect(controlType);
-                    return available_msg;
+                    return done_msg;
                 }
             }
         }
@@ -1999,6 +1998,7 @@ int CmdInterface::filterSelect(unsigned char controlType)
 {
     int cmd = -1;
     float value = -1;
+    int thisPart = npart;
     int kit = kitNumber;
     int param = UNUSED;
     if (lineEnd(controlType))
@@ -2007,11 +2007,23 @@ int CmdInterface::filterSelect(unsigned char controlType)
     int engine = contextToEngines();
     if (engine == PART::engine::addVoice1)
         engine += voiceNumber;
-
+    bool isDyn = false;
     if (bitTest(context, LEVEL::AllFX) && nFXtype == 8)
+    {
         kit = EFFECT::type::dynFilter;
+        engine = 0;
+        if (bitTest(context, LEVEL::InsFX))
+        {
+            thisPart = TOPLEVEL::section::insertEffects;
+        }
+        else if (!bitTest(context, LEVEL::Part))
+        {
+            thisPart = TOPLEVEL::section::systemEffects;
+        }
+        isDyn = true;
+    }
 
-    if (kit == kitNumber && (engine == PART::engine::subSynth || engine == PART::engine::addVoice1 + voiceNumber))
+    if (!isDyn && (engine == PART::engine::subSynth || engine == PART::engine::addVoice1 + voiceNumber))
     {
         value = toggle();
         if (value > -1)
@@ -2020,11 +2032,11 @@ int CmdInterface::filterSelect(unsigned char controlType)
                 cmd = SUBSYNTH::control::enableFilter;
             else
                 cmd = ADDVOICE::control::enableFilter;
-            readControl(FILTERINSERT::control::baseType, npart, kitNumber, engine, TOPLEVEL::insert::filterGroup);
+            readControl(FILTERINSERT::control::baseType, thisPart, kitNumber, engine, TOPLEVEL::insert::filterGroup);
 
-            return sendNormal(value, controlType, cmd, npart, kit, engine);
+            return sendNormal(value, controlType, cmd, thisPart, kit, engine);
         }
-        value = -1; // return it as not set
+        value = -1; // leave it as if not set
     }
 
     if (matchnMove(2, point, "center"))
@@ -2067,9 +2079,11 @@ int CmdInterface::filterSelect(unsigned char controlType)
         value = string2int(point) - 1;
         cmd = FILTERINSERT::control::stages;
     }
+
     if (cmd == -1)
     {
-        int baseType = readControl(FILTERINSERT::control::baseType, npart, kit, engine, TOPLEVEL::insert::filterGroup);
+        int baseType = readControl(FILTERINSERT::control::baseType, thisPart, kit, engine, TOPLEVEL::insert::filterGroup);
+        //cout << "baseType " << baseType << endl;
         if (baseType == 1) // formant
         {
             if (matchnMove(1, point, "invert"))
@@ -2121,8 +2135,8 @@ int CmdInterface::filterSelect(unsigned char controlType)
                     return value_msg;
                 point = skipChars(point);
                 int position = string2int(point);
-                cout << "val " << value << "  pos " << position << endl;
-                return sendNormal(value, controlType, FILTERINSERT::control::vowelPositionInSequence, npart, kit, engine, TOPLEVEL::insert::filterGroup, position);
+                //cout << "val " << value << "  pos " << position << endl;
+                return sendNormal(value, controlType, FILTERINSERT::control::vowelPositionInSequence, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, position);
             }
             else if (matchnMove(2, point, "formant"))
             {
@@ -2142,7 +2156,7 @@ int CmdInterface::filterSelect(unsigned char controlType)
                 if (cmd == -1)
                     return range_msg;
                 value = string2int(point);
-                return sendNormal(value, controlType, cmd, npart, kit, engine, TOPLEVEL::insert::filterGroup, filterFormantNumber, filterVowelNumber);
+                return sendNormal(value, controlType, cmd, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, filterFormantNumber, filterVowelNumber);
             }
         }
         else if (matchnMove(2, point, "type"))
@@ -2196,11 +2210,12 @@ int CmdInterface::filterSelect(unsigned char controlType)
         }
     }
 
-    //cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  parameter " << int(param) << endl;
+    //cout << ">> base cmd " << int(cmd) << "  part " << int(thisPart) << "  kit " << int(kit) << "  engine " << int(engine) << "  parameter " << int(param) << endl;
 
     if (value == -1)
         value = string2float(point);
-    return sendNormal(value, controlType, cmd, npart, kit, engine, TOPLEVEL::insert::filterGroup, param);
+
+    return sendNormal(value, controlType, cmd, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, param);
 }
 
 
