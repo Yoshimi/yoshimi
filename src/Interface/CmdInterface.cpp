@@ -629,6 +629,7 @@ static string dynfilterlist [] = {
     "SENsitivity <n>",  "Amount amplitude changes filter",
     "INVert <s>",       "Reverse effect of sensitivity (ON {other})",
     "RATe <n>",         "speed of filter change with amplitude",
+    "FILter ...",       "enter dynamic filter context",
     "end"
 };
 
@@ -1278,9 +1279,9 @@ int CmdInterface::effects(unsigned char controlType)
     string phaser[] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "FEE", "STA", "CRO", "SUB", "REL", "HYP", "OVE", "ANA", "end"};
     string alienwah[] = {"LEV", "PAN", "FRE", "WAV", "SHI", "DEP", "FEE", "DEL", "CRO", "REL", "end"};
     string distortion[] = {"LEV", "PAN", "MIX", "DRI", "OUT", "WAV", "INV", "LOW", "HIG", "STE", "PRE", "end"};
-    string eq[] = {"LEV", "BAN", "TYP", "FRE", "GAI", "Q", "STA"};
+    string eqcontrols[] = {"LEV", "BAN", "TYP", "FRE", "GAI", "Q", "STA"};
     string eqtypes[] = {"LP1", "HP1", "LP2", "HP2", "BP2", "NOT", "PEA", "LOW", "HIG", "end"};
-    string dynanicfilter[] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "SEN", "INV", "RAT", "end"};
+    string dynamicfilter[] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "SEN", "INV", "RAT", "FIL", "end"};
     Config &Runtime = synth->getRuntime();
     int nFXavail;
     int par = nFX;
@@ -1366,7 +1367,7 @@ int CmdInterface::effects(unsigned char controlType)
         else
             return sendNormal(nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, nFX);
     }
-
+    bool extended = false;
     if (nFXtype > 0)
     {
         int selected = -1;
@@ -1408,7 +1409,7 @@ int CmdInterface::effects(unsigned char controlType)
             case 3:
             {
                 selected = stringNumInList(name, chorus, 1);
-                if (selected == 4) // LFO type
+                if (selected == 4) // waveshape
                 {
                     point = skipChars(point);
                     if (matchnMove(1, point, "sine"))
@@ -1427,7 +1428,7 @@ int CmdInterface::effects(unsigned char controlType)
             case 4:
             {
                 selected = stringNumInList(name, phaser, 1);
-                if (selected == 4) // LFO type
+                if (selected == 4) // waveshape
                 {
                     point = skipChars(point);
                     if (matchnMove(1, point, "sine"))
@@ -1446,7 +1447,7 @@ int CmdInterface::effects(unsigned char controlType)
             case 5:
             {
                 selected = stringNumInList(name, alienwah, 1);
-                if (selected == 3) // LFO type
+                if (selected == 3) // waveshape
                 {
                     point = skipChars(point);
                     if (matchnMove(1, point, "sine"))
@@ -1477,7 +1478,7 @@ int CmdInterface::effects(unsigned char controlType)
             }
             case 7: // TODO band and type no GUI update
             {
-                selected = stringNumInList(name, eq, 1);
+                selected = stringNumInList(name, eqcontrols, 1);
                 if (selected == 1) // band
                 {
                     if (controlType == TOPLEVEL::type::Write)
@@ -1500,13 +1501,35 @@ int CmdInterface::effects(unsigned char controlType)
 
                 if (selected > 1)
                 {
-                    selected += 8; // dunno yet!
+                    selected += 8;
                 }
                 break;
             }
-
-
-
+            case 8:
+            {
+                selected = stringNumInList(name, dynamicfilter, 1);
+                if (selected == 4) // waveshape
+                {
+                    point = skipChars(point);
+                    if (matchnMove(1, point, "sine"))
+                        value = 0;
+                    else if (matchnMove(1, point, "triangle"))
+                        value = 1;
+                    else return value_msg;
+                }
+                else if (selected == 8) // invert
+                {
+                    point = skipChars(point);
+                    value = (toggle() == 1);
+                }
+                else if (selected == 10) // filter entry
+                {
+                    extended = true; // dunno
+                    //bitSet(context, LEVEL::Filter);
+                    //return filterSelect(controlType);
+                    return available_msg;
+                }
+            }
         }
         if (selected > -1)
         {
@@ -1976,6 +1999,7 @@ int CmdInterface::filterSelect(unsigned char controlType)
 {
     int cmd = -1;
     float value = -1;
+    int kit = kitNumber;
     int param = UNUSED;
     if (lineEnd(controlType))
         return done_msg;
@@ -1984,7 +2008,10 @@ int CmdInterface::filterSelect(unsigned char controlType)
     if (engine == PART::engine::addVoice1)
         engine += voiceNumber;
 
-    if (engine == PART::engine::subSynth || engine == PART::engine::addVoice1 + voiceNumber)
+    if (bitTest(context, LEVEL::AllFX) && nFXtype == 8)
+        kit = EFFECT::type::dynFilter;
+
+    if (kit == kitNumber && (engine == PART::engine::subSynth || engine == PART::engine::addVoice1 + voiceNumber))
     {
         value = toggle();
         if (value > -1)
@@ -1995,7 +2022,7 @@ int CmdInterface::filterSelect(unsigned char controlType)
                 cmd = ADDVOICE::control::enableFilter;
             readControl(FILTERINSERT::control::baseType, npart, kitNumber, engine, TOPLEVEL::insert::filterGroup);
 
-            return sendNormal(value, controlType, cmd, npart, kitNumber, engine);;
+            return sendNormal(value, controlType, cmd, npart, kit, engine);
         }
         value = -1; // return it as not set
     }
@@ -2042,7 +2069,7 @@ int CmdInterface::filterSelect(unsigned char controlType)
     }
     if (cmd == -1)
     {
-        int baseType = readControl(FILTERINSERT::control::baseType, npart, kitNumber, engine, TOPLEVEL::insert::filterGroup);
+        int baseType = readControl(FILTERINSERT::control::baseType, npart, kit, engine, TOPLEVEL::insert::filterGroup);
         if (baseType == 1) // formant
         {
             if (matchnMove(1, point, "invert"))
@@ -2095,7 +2122,7 @@ int CmdInterface::filterSelect(unsigned char controlType)
                 point = skipChars(point);
                 int position = string2int(point);
                 cout << "val " << value << "  pos " << position << endl;
-                return sendNormal(value, controlType, FILTERINSERT::control::vowelPositionInSequence, npart, kitNumber, engine, TOPLEVEL::insert::filterGroup, position);
+                return sendNormal(value, controlType, FILTERINSERT::control::vowelPositionInSequence, npart, kit, engine, TOPLEVEL::insert::filterGroup, position);
             }
             else if (matchnMove(2, point, "formant"))
             {
@@ -2115,7 +2142,7 @@ int CmdInterface::filterSelect(unsigned char controlType)
                 if (cmd == -1)
                     return range_msg;
                 value = string2int(point);
-                return sendNormal(value, controlType, cmd, npart, kitNumber, engine, TOPLEVEL::insert::filterGroup, filterFormantNumber, filterVowelNumber);
+                return sendNormal(value, controlType, cmd, npart, kit, engine, TOPLEVEL::insert::filterGroup, filterFormantNumber, filterVowelNumber);
             }
         }
         else if (matchnMove(2, point, "type"))
@@ -2173,7 +2200,7 @@ int CmdInterface::filterSelect(unsigned char controlType)
 
     if (value == -1)
         value = string2float(point);
-    return sendNormal(value, controlType, cmd, npart, kitNumber, engine, TOPLEVEL::insert::filterGroup, param);
+    return sendNormal(value, controlType, cmd, npart, kit, engine, TOPLEVEL::insert::filterGroup, param);
 }
 
 

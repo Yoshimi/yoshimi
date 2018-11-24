@@ -5,6 +5,8 @@ yoshimi 1.5.9 M
 * CLI EQ controls done.
   (band and stages don't update GUI yet)
 * Some code cleanups.
+* CLI dynfilter mostly done.
+  Not the actual filter editor.
 
 2018-11-22 Will
 * Revised CLI effects code.
