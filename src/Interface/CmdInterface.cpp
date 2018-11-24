@@ -66,8 +66,8 @@ static unsigned int currentInstance = 0;
 namespace LISTS {
     enum {
     all = 0,
-    syseff, // not yet
-    inseff, // not yet
+    syseff,
+    inseff,
     eff, // effect types
     part,
     common,
@@ -1355,8 +1355,6 @@ int CmdInterface::effects(unsigned char controlType)
     if (effType)
     {
         nFXpreset = 0; // always set this on type change
-        Runtime.Log("efx type set to " + fx_list[nFXtype]);
-        //Runtime.Log("Presets -" + fx_presets[nFXtype].substr(fx_presets[nFXtype].find(',') + 1));
         if (bitTest(context, LEVEL::Part))
         {
             sendDirect(nFXtype, TOPLEVEL::type::Write, PART::control::effectType, npart, UNUSED, nFX);
@@ -2606,7 +2604,7 @@ string CmdInterface::findStatus(bool show)
             nFXpreset = readControl(16, TOPLEVEL::section::systemEffects,  EFFECT::type::none + nFXtype, nFX);
         }
         text += (" eff " + asString(nFX + 1) + " " + fx_list[nFXtype].substr(0, 6));
-        if (nFXtype > 0)
+        if (nFXtype > 0 && nFXtype != 7)
             text += ("-" + asString(nFXpreset + 1));
         return text;
     }
@@ -5239,10 +5237,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         return done_msg;
 
     if (matchnMove(2, point, "stop"))
-    {
-        sendDirect(0, TOPLEVEL::type::Write,MAIN::control::stopSound, TOPLEVEL::section::main);
-        return done_msg;
-    }
+        return sendNormal(0, TOPLEVEL::type::Write,MAIN::control::stopSound, TOPLEVEL::section::main);
     if (matchnMove(1, point, "list"))
         return commandList();
 
