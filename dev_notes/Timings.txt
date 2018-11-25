@@ -1,0 +1,17 @@
+There is a CLI only command that enables you to find out how long any unbuffered read takes. This has no error checks at all so you need to be sure you have it exactly right! It follows a similar pattern to direct access. Refer to the 'Yoshimi Control Numbers.ods' spreadsheet for values.
+
+'zread repeats control part kit engine insert parameter par2'
+
+Where:
+'repeats' is the number of loops - more give a better average.
+'control' is the normal control.
+'part' is the part/section number.
+
+All the following are optional, but must be included if a later one is needed.
+'kit'
+'engine'
+'insert'
+'parameter'
+'par2'
+
+The returned 'result' value is the one that would obtained with a normal read and can be used to ensure you are actually reading the control you think by changing that control normally and checking that another zread call gives the new figure.
