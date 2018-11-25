@@ -39,8 +39,52 @@ using namespace std;
  * the top level. Therefore, the sequence is important.
  * 18 bits are currently defined out of a possible 32.
  *
- * AllFX, InsFX and Part MUST be the first three
+ * Top, AllFX and InsFX MUST be the first three
  */
+
+namespace LEVEL{
+    enum {
+        Top = 0, // always set directly to zero as an integer to clear down
+        AllFX = 1, // bits from here on
+        InsFX,
+        Part,
+        Config,
+        Vector,
+        Scale,
+        Learn,
+        AddSynth,
+        SubSynth,
+        PadSynth,
+        AddVoice,
+        AddMod,
+        Oscillator,
+        Resonance,
+        LFO, // amp/freq/filt
+        Filter, // params only (slightly confused with env)
+        Envelope, // amp/freq/filt/ Sub only band
+    };
+}
+
+typedef enum {
+    exit_msg = -1,
+    todo_msg = 0,
+    done_msg,
+    value_msg,
+    name_msg,
+    opp_msg,
+    what_msg,
+    range_msg,
+    low_msg,
+    high_msg,
+    unrecognised_msg,
+    parameter_msg,
+    level_msg,
+    available_msg,
+    inactive_msg,
+    failed_msg,
+    writeOnly_msg,
+    readOnly_msg
+} responses;
 
 namespace LISTS {
     enum {
@@ -78,32 +122,7 @@ namespace LISTS {
     };
 }
 
-namespace LEVEL{
-    enum {
-        Top = 0, // always set directly to zero as an integer to clear down
-        AllFX = 1, // bits from here on
-        InsFX,
-        Part,
-        Config,
-        Vector,
-        Scale,
-        Learn,
-        AddSynth,
-        SubSynth,
-        PadSynth,
-        AddVoice,
-        AddMod,
-        Oscillator,
-        Resonance,
-        LFO, // amp/freq/filt
-        Filter, // params only (slightly confused with env)
-        Envelope, // amp/freq/filt/ Sub only band
-    };
-}
-
-typedef enum {exit_msg = -1, todo_msg = 0, done_msg, value_msg, name_msg, opp_msg, what_msg, range_msg, low_msg, high_msg, unrecognised_msg, parameter_msg, level_msg, available_msg,inactive_msg, failed_msg, writeOnly_msg, readOnly_msg} error_messages;
-
-static string basics[] = {
+static string basics [] = {
     "?  Help",                  "show commands",
     "STop",                     "all sound off",
     "RESet [s]",                "return to start-up conditions, 'ALL' clear MIDI-learn (if 'y')",
@@ -637,7 +656,7 @@ static string dynfilterlist [] = {
     "end"
 };
 
-static string waveshapes[] = {"OFF" ,"ATA", "ASY", "POW", "SIN", "QNT", "ZIG", "LMT", "ULM", "LLM", "ILM", "CLI", "CLI", "AS2", "PO2", "SGM", "end"};
+static string filtershapes [] = {"OFF" ,"ATA", "ASY", "POW", "SIN", "QNT", "ZIG", "LMT", "ULM", "LLM", "ILM", "CLI", "CLI", "AS2", "PO2", "SGM", "end"};
 
 static string learnlist [] = {
     "MUte <s>",         "completely ignore this line (ON, {other})",
@@ -767,25 +786,25 @@ static string fx_presets [] = {
 };
 
 // effect controls
-static string effreverb[] = {"LEV", "PAN", "TIM", "DEL", "FEE", "none5", "none6", "LOW", "HIG", "DAM", "TYP", "ROO", "BAN", "end"};
-static string effecho[] = {"LEV", "PAN", "DEL", "LRD", "CRO", "FEE", "DAM",  "end"};
-static string effchorus[] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "DEL", "FEE", "CRO", "none11", "SUB", "end"};
-static string effphaser[] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "FEE", "STA", "CRO", "SUB", "REL", "HYP", "OVE", "ANA", "end"};
-static string effalienwah[] = {"LEV", "PAN", "FRE", "WAV", "SHI", "DEP", "FEE", "DEL", "CRO", "REL", "end"};
-static string effdistortion[] = {"LEV", "PAN", "MIX", "DRI", "OUT", "WAV", "INV", "LOW", "HIG", "STE", "PRE", "end"};
-static string effeq[] = {"LEV", "BAN", "FIL", "FRE", "GAI", "Q", "STA"};
-static string eqtypes[] = {"OFF", "LP1", "HP1", "LP2", "HP2", "BP2", "NOT", "PEA", "LOW", "HIG", "end"};
-static string effdynamicfilter[] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "SEN", "INV", "RAT", "FIL", "end"};
+static string effreverb [] = {"LEV", "PAN", "TIM", "DEL", "FEE", "none5", "none6", "LOW", "HIG", "DAM", "TYP", "ROO", "BAN", "end"};
+static string effecho [] = {"LEV", "PAN", "DEL", "LRD", "CRO", "FEE", "DAM",  "end"};
+static string effchorus [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "DEL", "FEE", "CRO", "none11", "SUB", "end"};
+static string effphaser [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "FEE", "STA", "CRO", "SUB", "REL", "HYP", "OVE", "ANA", "end"};
+static string effalienwah [] = {"LEV", "PAN", "FRE", "WAV", "SHI", "DEP", "FEE", "DEL", "CRO", "REL", "end"};
+static string effdistortion [] = {"LEV", "PAN", "MIX", "DRI", "OUT", "WAV", "INV", "LOW", "HIG", "STE", "PRE", "end"};
+static string effeq [] = {"LEV", "BAN", "FIL", "FRE", "GAI", "Q", "STA"};
+static string eqtypes [] = {"OFF", "LP1", "HP1", "LP2", "HP2", "BP2", "NOT", "PEA", "LOW", "HIG", "end"};
+static string effdynamicfilter [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "SEN", "INV", "RAT", "FIL", "end"};
 
 // common controls
-static string detuneType[] = {"DEF", "L35", "L10", "E10", "E12", "end"};
+static string detuneType [] = {"DEF", "L35", "L10", "E10", "E12", "end"};
 
 // waveform controls
-static string waveshape[] = {"Sine", "Triangle", "Pulse", "Saw", "Power", "Gauss", "Diode", "AbsSine", "PulseSine", "StretchSine", "Chirp", "AbsStretchSine", "Chebyshev", "Square", "Spike", "Circle"};
-static string basetypes[] = {"c2", "g2", "c3", "g3", "c4", "g4", "c5", "g5", "g6"};
-static string wavebase[] = {"SIN", "TRI", "PUL", "SAW", "POW", "GAU", "DIO", "ABS", "PSI", "SSI", "CHI", "ASI", "CHE", "SQU", "SPI", "CIR", "end"};
-static string filtertype[] = {"OFF", "LP1", "HPA", "HPB", "BP1", "BS1", "LP2", "HP2", "BP2", "BS2", "COS", "SIN", "LSH", "SGM", "end"};
-static string adaptive[] = {"OFF", "ON", "SQU", "2XS", "2XA", "3XS", "3XA", "4XS", "4XA"};
+static string waveshape [] = {"Sine", "Triangle", "Pulse", "Saw", "Power", "Gauss", "Diode", "AbsSine", "PulseSine", "StretchSine", "Chirp", "AbsStretchSine", "Chebyshev", "Square", "Spike", "Circle"};
+static string wavebase [] = {"SIN", "TRI", "PUL", "SAW", "POW", "GAU", "DIO", "ABS", "PSI", "SSI", "CHI", "ASI", "CHE", "SQU", "SPI", "CIR", "end"};
+static string basetypes [] = {"c2", "g2", "c3", "g3", "c4", "g4", "c5", "g5", "g6"};
+static string filtertype [] = {"OFF", "LP1", "HPA", "HPB", "BP1", "BS1", "LP2", "HP2", "BP2", "BS2", "COS", "SIN", "LSH", "SGM", "end"};
+static string adaptive [] = {"OFF", "ON", "SQU", "2XS", "2XA", "3XS", "3XA", "4XS", "4XA"};
 
 
 class CmdInterface : private MiscFuncs

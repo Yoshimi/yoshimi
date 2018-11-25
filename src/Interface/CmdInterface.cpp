@@ -705,7 +705,7 @@ int CmdInterface::effects(unsigned char controlType)
             case 3:
             {
                 selected = stringNumInList(name, effchorus, 1);
-                if (selected == 4) // waveshape
+                if (selected == 4) // filtershape
                 {
                     point = skipChars(point);
                     if (matchnMove(1, point, "sine"))
@@ -724,7 +724,7 @@ int CmdInterface::effects(unsigned char controlType)
             case 4:
             {
                 selected = stringNumInList(name, effphaser, 1);
-                if (selected == 4) // waveshape
+                if (selected == 4) // filtershape
                 {
                     point = skipChars(point);
                     if (matchnMove(1, point, "sine"))
@@ -743,7 +743,7 @@ int CmdInterface::effects(unsigned char controlType)
             case 5:
             {
                 selected = stringNumInList(name, effalienwah, 1);
-                if (selected == 3) // waveshape
+                if (selected == 3) // filtershape
                 {
                     point = skipChars(point);
                     if (matchnMove(1, point, "sine"))
@@ -757,11 +757,11 @@ int CmdInterface::effects(unsigned char controlType)
             case 6:
             {
                 selected = stringNumInList(name, effdistortion, 1);
-                if (selected == 5) // waveshape
+                if (selected == 5) // filtershape
                 {
                     point = skipChars(point);
                     string name = string(point).substr(0,3);
-                    value = stringNumInList(name, waveshapes, 1) - 1;
+                    value = stringNumInList(name, filtershapes, 1) - 1;
                     if (value < 0)
                         return value_msg;
                 }
@@ -804,7 +804,7 @@ int CmdInterface::effects(unsigned char controlType)
             case 8:
             {
                 selected = stringNumInList(name, effdynamicfilter, 1);
-                if (selected == 4) // waveshape
+                if (selected == 4) // filtershape
                 {
                     point = skipChars(point);
                     if (matchnMove(1, point, "sine"))
@@ -3713,7 +3713,7 @@ int CmdInterface::waveform(unsigned char controlType)
         if (matchnMove(1, point, "type"))
         {
             string name = string(point).substr(0,3);
-            value = stringNumInList(name, waveshapes, 1);
+            value = stringNumInList(name, filtershapes, 1);
             if (value == -1)
                 return value_msg;
             cmd = OSCILLATOR::control::waveshapeType;
