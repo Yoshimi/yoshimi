@@ -30,11 +30,18 @@ string UnifiedPresets::findSectionName(CommandBlock *getData)
     int engine = getData->data.engine;
     int insert = getData->data.insert;
     string name = "unrecognised";
+
     if (getData->data.part != TOPLEVEL::section::copyPaste || value >= NUM_MIDI_PARTS)
         return name;
 
-    if (insert != UNUSED)
+    if (insert != UNUSED) // temp!
         return name;
+
+    if (engine >= PART::engine::addVoice1 && engine <= PART::engine::addVoice8)
+    {
+        string name = "VOICE id=\"" + to_string(int(engine - PART::engine::addVoice1)) + "\"";
+        return name; // do individual voices
+    }
     switch (engine)
     {
         case PART::engine::addSynth:
@@ -46,7 +53,36 @@ string UnifiedPresets::findSectionName(CommandBlock *getData)
         case PART::engine::padSynth:
             return "PAD_SYNTH_PARAMETERS";
             break;
-    }
 
+    }
     return name;
 }
+
+
+string UnifiedPresets::findleafExtension(CommandBlock *getData)
+{
+    int engine = getData->data.engine;
+    int insert = getData->data.insert;
+    string name = "unrecognised";
+
+    if (insert != UNUSED) // temp!
+        return name;
+
+    if (engine >= PART::engine::addVoice1 && engine <= PART::engine::addVoice8)
+        return "addsynthn"; // all voices have the same extension
+    switch (engine)
+    {
+        case PART::engine::addSynth:
+            return "addsynth";
+            break;
+        case PART::engine::subSynth:
+            return "subsynth";
+            break;
+        case PART::engine::padSynth:
+            return "padsynth";
+            break;
+    }
+    return name;
+}
+
+

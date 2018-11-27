@@ -1,5 +1,11 @@
 yoshimi 1.5.9 M
 
+2018-11-27 Will
+* Randomness can now be disabled for test purposes.
+  Enabe #define NORANDOM in globals.h
+  This makes subSynth and padSynth sound strange :o
+* A bit more work on unified presets placeholders.
+
 2018-11-25 Will
 * Moved all static CmdInterface strings from .cpp to .h
 * Corrected some CLI EQ text.

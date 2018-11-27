@@ -301,11 +301,7 @@ int mainCreateNewInstance(unsigned int forceId, bool loadState)
     synth->Unmute();
 
     if (instanceID == 0)
-    {
         cout << "\nYay! We're up and running :-)\n";
-        //if (ASM_FR2Z2I)
-            //cout << "Fast float 2 int" << endl;
-    }
     else
     {
         cout << "\nStarted "<< instanceID << "\n";

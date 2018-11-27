@@ -243,9 +243,11 @@ inline float OscilGen::numRandom(void)
         random_0_1 = (float)random_result / (float)INT_MAX;
         random_0_1 = (random_0_1 > 1.0f) ? 1.0f : random_0_1;
         random_0_1 = (random_0_1 < 0.0f) ? 0.0f : random_0_1;
+#ifndef NORANDOM
         return random_0_1;
+#endif
     }
-    return 0.05f;
+    return 0.5f;
 }
 
 
@@ -264,9 +266,11 @@ inline float OscilGen::harmonicRandom(void)
         harmonic_random_0_1 = (float)harmonic_random_result / (float)INT_MAX;
         harmonic_random_0_1 = (harmonic_random_0_1 > 1.0f) ? 1.0f : harmonic_random_0_1;
         harmonic_random_0_1 = (harmonic_random_0_1 < 0.0f) ? 0.0f : harmonic_random_0_1;
+#ifndef NORANDOM
         return harmonic_random_0_1;
+#endif
     }
-    return 0.05f;
+    return 0.5f;
 }
 
 
@@ -274,10 +278,17 @@ inline unsigned int OscilGen::randomOG(void)
 {
 #if (HAVE_RANDOM_R)
     if (!random_r(&random_buf, &random_result))
+#ifndef NORANDOM
         return random_result + INT_MAX / 2;
+#endif
     return INT_MAX;
 #else
+
+#ifndef NORANDOM
     random_result = random();
+#else
+    random_result = 0;
+#endif
     return (unsigned int)random_result + INT_MAX / 2;
 #endif
 }

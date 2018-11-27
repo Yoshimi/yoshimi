@@ -4167,8 +4167,17 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
 {
     Config &Runtime = synth->getRuntime();
     string name;
-    //CommandBlock getData;
-    //cout << synth->unifiedpresets.findSectionName(&getData) << endl;
+
+
+    /*CommandBlock getData;
+    getData.data.value = 0;
+    getData.data.part = TOPLEVEL::section::copyPaste;
+    getData.data.kit = 0;
+    getData.data.engine = 135;
+    getData.data.insert = UNUSED;
+    cout << synth->unifiedpresets.findSectionName(&getData) << endl;*/
+
+
     if (matchnMove(2, point, "yoshimi"))
     {
         if (controlType != TOPLEVEL::type::Write)

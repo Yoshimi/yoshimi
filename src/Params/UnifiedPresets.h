@@ -23,6 +23,7 @@
 #ifndef U_PRESETS_H
 #define U_PRESETS_H
 
+#include "globals.h"
 #include "Misc/XMLwrapper.h"
 
 class SynthEngine;
@@ -31,6 +32,7 @@ class UnifiedPresets
 {
     public:
         string findSectionName(CommandBlock *getData);
+        string findleafExtension(CommandBlock *getData);
 };
 
 #endif

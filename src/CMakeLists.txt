@@ -171,14 +171,6 @@ if (NOT LIBC_HAS_ARGP)
     endif(ARGP_LIB)
 endif(NOT LIBC_HAS_ARGP)
 
-execute_process(COMMAND echo fistpl 0
-                COMMAND as -
-                ERROR_VARIABLE NO_ASM)
-if(NOT NO_ASM)
-    message(STATUS "Compiling with x86 opcode support")
-    add_definitions(-DASM_FR2Z2I)
-endif()
-
 # libz
 set (CMAKE_REQUIRED_LIBRARIES z)
 check_c_source_compiles (

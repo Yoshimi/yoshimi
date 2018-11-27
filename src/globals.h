@@ -23,6 +23,14 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
+/*
+ * for test purposes where you want guaranteed identical results, enable the
+ * #define below.
+ * Be aware this does strange things to both subSynth and padSynth as they
+ * require rendomness to produce normal sounds.
+ */
+//#define NORANDOM ON
+
 // math
 #define PI 3.1415926536f
 #define TWOPI 6.28318530718f
@@ -30,12 +38,12 @@
 #define LOG_2 0.693147181f
 
 // float round to zero to integer
-#ifdef FAILEDASM // ASM_FR2Z2I // currently disabled
-    #define FR2Z2I(in, out)  \
-        __asm__ __volatile__ ("fistpl %0" : "=m" (out) : "t" (in) : "st") ;
-#else
-    #define FR2Z2I(f, i) (i) = ((f > 0) ? (int(trunc(f))) : (int(trunc(f - 1.0f))));
-#endif
+// the second version is faster but for positive values only
+// and not fully confirmed as correct
+
+#define FR2Z2I(f, i) (i) = ((f > 0) ? (int(trunc(f))) : (int(trunc(f - 1.0f))));
+//#define FR2Z2I(f, i) (i) = (int (f));
+
 
 // many of the following are for convenience and consistency
 // changing them is likely to have unpredicable consequences
@@ -288,6 +296,16 @@ namespace VECTOR // usage VECTOR::control::name
         Yfeature2, // default filter cutoff
         Yfeature3, // default modulation
         erase = 96
+    };
+}
+
+namespace COPYPASTE // usage COPYPASTE::control::toClipboard
+{
+    enum control : unsigned char {
+        toClipboard = 0,
+        toFile,
+        fromClipboard,
+        fromFile
     };
 }
 
