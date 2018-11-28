@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of original ZynAddSubFX code.
-    Modified October 2018
+    Modified November 2018
 */
 
 #include <cmath>
@@ -107,12 +107,18 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
     else
         NoteGlobalPar.Punch.Enabled = 0;
 
+
     for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
     {
         for (int i = 0; i < 14; i++)
             pinking[nvoice][i] = 0.0;
 
-        adpars->VoicePar[nvoice].OscilSmp->newrandseed(); // so it really will be random
+        adpars->VoicePar[nvoice].OscilSmp->prnginit(basefreq);
+        /*
+        * Rationale
+        * with the new prng we have 128 terabytes of calls before a repeat, so one
+        * re-seed per voice is more than enough!
+        */
         NoteVoicePar[nvoice].OscilSmp = NULL;
         NoteVoicePar[nvoice].FMSmp = NULL;
         NoteVoicePar[nvoice].VoiceOut = NULL;
@@ -347,8 +353,6 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
         int vc = nvoice;
         if (adpars->VoicePar[nvoice].Pextoscil != -1)
             vc = adpars->VoicePar[nvoice].Pextoscil;
-        if (!adpars->GlobalPar.Hrandgrouping)
-            adpars->VoicePar[vc].OscilSmp->newrandseed();
         int oscposhi_start =
             adpars->VoicePar[vc].OscilSmp->get(NoteVoicePar[nvoice].OscilSmp,
                                                getVoiceBaseFreq(nvoice),
@@ -579,8 +583,6 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
         int vc = nvoice;
         if (adpars->VoicePar[nvoice].Pextoscil != -1)
             vc = adpars->VoicePar[nvoice].Pextoscil;
-        if (!adpars->GlobalPar.Hrandgrouping)
-            adpars->VoicePar[vc].OscilSmp->newrandseed();
 
         adpars->VoicePar[vc].OscilSmp->get(NoteVoicePar[nvoice].OscilSmp,
                                            getVoiceBaseFreq(nvoice),
@@ -706,17 +708,7 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
         if (NoteVoicePar[nvoice].FMEnabled != NONE
             && NoteVoicePar[nvoice].FMVoice < 0)
         {
-            adpars->VoicePar[nvoice].FMSmp->newrandseed();
-
             //Perform Anti-aliasing only on MORPH or RING MODULATION
-
-            int vc = nvoice;
-            if (adpars->VoicePar[nvoice].PextFMoscil != -1)
-                vc = adpars->VoicePar[nvoice].PextFMoscil;
-
-            if (!adpars->GlobalPar.Hrandgrouping)
-                adpars->VoicePar[vc].FMSmp->newrandseed();
-
             for (int i = 0; i < OSCIL_SMP_EXTRA_SAMPLES; ++i)
                 NoteVoicePar[nvoice].FMSmp[synth->oscilsize + i] =
                     NoteVoicePar[nvoice].FMSmp[i];
@@ -963,7 +955,6 @@ void ADnote::initParameters(void)
         if (NoteVoicePar[nvoice].FMEnabled != NONE
            && NoteVoicePar[nvoice].FMVoice < 0)
         {
-            adpars->VoicePar[nvoice].FMSmp->newrandseed();
             NoteVoicePar[nvoice].FMSmp =
                 (float*)fftwf_malloc((synth->oscilsize + OSCIL_SMP_EXTRA_SAMPLES) * sizeof(float));
 
@@ -978,9 +969,6 @@ void ADnote::initParameters(void)
                || (NoteVoicePar[nvoice].FMEnabled == MORPH)
                || (NoteVoicePar[nvoice].FMEnabled == RING_MOD))
                freqtmp = getFMVoiceBaseFreq(nvoice);
-
-            if (!adpars->GlobalPar.Hrandgrouping)
-                adpars->VoicePar[vc].FMSmp->newrandseed();
 
             for (int k = 0; k < unison_size[nvoice]; ++k)
                 oscposhiFM[nvoice][k] =

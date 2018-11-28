@@ -226,18 +226,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         goto bail_out;
     }*/
 
-    memset(random_state, 0, sizeof(random_state));
-#if (HAVE_RANDOM_R)
-    memset(&random_buf, 0, sizeof(random_buf));
-
-    if (initstate_r(samplerate + buffersize + oscilsize, random_state,
-                    sizeof(random_state), &random_buf))
-        Runtime.Log("SynthEngine Init failed on general randomness");
-#else
-    if (!initstate(samplerate + buffersize + oscilsize, random_state, sizeof(random_state)))
-        Runtime.Log("SynthEngine Init failed on general randomness");
-#endif
-
     if (oscilsize < (buffersize / 2))
     {
         Runtime.Log("Enforcing oscilsize to half buffersize, "
@@ -439,6 +427,7 @@ void SynthEngine::defaults(void)
     Runtime.lastfileseen.clear();
     for (int i = 0; i < 7; ++i)
         Runtime.lastfileseen.push_back(Runtime.userHome);
+    prnginit(time(NULL));
 
 #ifdef REPORT_NOTES_ON_OFF
     Runtime.noteOnSent = 0; // note test

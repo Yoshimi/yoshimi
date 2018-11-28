@@ -1,5 +1,10 @@
 yoshimi 1.5.9 M
 
+2018-11-28 Will
+* Inplemented a new prng with no external libraries
+  based on "A small noncryptographic PRNG"
+  by Bob Jenkins
+
 2018-11-27 Will
 * Randomness can now be disabled for test purposes.
   Enabe #define NORANDOM in globals.h

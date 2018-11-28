@@ -137,12 +137,6 @@ else (PKG_CONFIG_FOUND)
 endif (PKG_CONFIG_FOUND)
 
 include (CheckFunctionExists)
-# musl systems don’t have random_r() and also need argp-standalone
-check_function_exists(random_r randomR)
-
-if (randomR)
-    add_definitions(-DHAVE_RANDOM_R)
-endif(randomR)
 
 check_function_exists(exp10f EXP10F)
 

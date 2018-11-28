@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified March 2018
+    Modified November 2018
 */
 
 #ifndef OSCIL_GEN_H
@@ -64,10 +64,6 @@ class OscilGen : public Presets, private WaveShapeSamples
         void getfromXML(XMLwrapper *xml);
         float getLimits(CommandBlock *getData);
         void convert2sine();
-
-        // Make a new random seed for Amplitude Randomness -
-        //   should be called every noteon event
-        inline void newrandseed(void) { randseed = (unsigned int)randomOG(); }
 
         // Parameters
 
@@ -171,8 +167,6 @@ class OscilGen : public Presets, private WaveShapeSamples
         float basefunc_spike(float x, float a);
         float basefunc_circle(float x, float a);
 
-        float harmonicRandom(void);
-
         // Internal Data
         unsigned char oldbasefunc,
                       oldbasepar,
@@ -204,92 +198,54 @@ class OscilGen : public Presets, private WaveShapeSamples
 
         Resonance *res;
 
-        unsigned int randseed;
-
-        float random_0_1;
         char random_state[256];
 
-#if (HAVE_RANDOM_R)
-        int32_t random_result;
-        struct random_data random_buf;
-#else
-        long int random_result;
-#endif
+        /*
+         * The following prng is based on
+         * "A small noncryptographic PRNG"
+         *              by
+         *          Bob Jenkins
+         */
 
-        float harmonic_random_0_1;
-        char harmonic_random_state[256];
+        unsigned int rnga;
+        unsigned int rngb;
+        unsigned int rngc;
+        unsigned int rngd;
+        inline unsigned int prngval()
+        {
+            unsigned int e = rnga - ((rngb << 27) | (rngb >> 5));
+            rnga = rngb ^ ((rngc << 17) | (rngc >> 15));
+            rngb = rngc + rngd;
+            rngc = rngd + e;
+            rngd = e + rnga;
+            return rngd;
+        }
 
-#if (HAVE_RANDOM_R)
-        int32_t harmonic_random_result;
-        struct random_data harmonic_random_buf;
-#else
-        long int harmonic_random_result;
-#endif
+    public:
+        inline void prnginit(unsigned seed)
+        {
+            rnga = 0xf1ea5eed, rngb = rngc = rngd = seed;
+            for (int i = 0; i < 20; ++i)
+            (   void)prngval();
+        }
 };
 
 
 inline float OscilGen::numRandom(void)
 {
-    int ret;
-#if (HAVE_RANDOM_R)
-    ret = random_r(&random_buf, &random_result);
-#else
-    random_result = random();
-    ret = 0;
-#endif
-
-    if (!ret)
-    {
-        random_0_1 = (float)random_result / (float)INT_MAX;
-        random_0_1 = (random_0_1 > 1.0f) ? 1.0f : random_0_1;
-        random_0_1 = (random_0_1 < 0.0f) ? 0.0f : random_0_1;
 #ifndef NORANDOM
-        return random_0_1;
-#endif
-    }
-    return 0.5f;
-}
-
-
-inline float OscilGen::harmonicRandom(void)
-{
-    int ret;
-#if (HAVE_RANDOM_R)
-    ret = random_r(&harmonic_random_buf, &harmonic_random_result);
+    return prngval() * 2.328306435454494e-10;
 #else
-    harmonic_random_result = random();
-    ret = 0;
-#endif
-
-    if (!ret)
-    {
-        harmonic_random_0_1 = (float)harmonic_random_result / (float)INT_MAX;
-        harmonic_random_0_1 = (harmonic_random_0_1 > 1.0f) ? 1.0f : harmonic_random_0_1;
-        harmonic_random_0_1 = (harmonic_random_0_1 < 0.0f) ? 0.0f : harmonic_random_0_1;
-#ifndef NORANDOM
-        return harmonic_random_0_1;
-#endif
-    }
     return 0.5f;
+#endif
 }
-
 
 inline unsigned int OscilGen::randomOG(void)
 {
-#if (HAVE_RANDOM_R)
-    if (!random_r(&random_buf, &random_result))
 #ifndef NORANDOM
-        return random_result + INT_MAX / 2;
-#endif
-    return INT_MAX;
+    return prngval() >> 1;
 #else
-
-#ifndef NORANDOM
-    random_result = random();
-#else
-    random_result = 0;
-#endif
-    return (unsigned int)random_result + INT_MAX / 2;
+    return INT_MAX / 2;
 #endif
 }
 
