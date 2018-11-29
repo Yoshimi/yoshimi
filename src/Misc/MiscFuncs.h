@@ -95,34 +95,6 @@ class MiscFuncs
         float dB2rap(float dB);
         float rap2dB(float rap);
         sem_t miscmsglock;
-
-        /*
-         * The following prng is based on
-         * "A small noncryptographic PRNG"
-         *              by
-         *          Bob Jenkins
-         */
-        unsigned int rnga;
-        unsigned int rngb;
-        unsigned int rngc;
-        unsigned int rngd;
-        inline unsigned int prngval()
-        {
-            unsigned int e = rnga - ((rngb << 27) | (rngb >> 5));
-            rnga = rngb ^ ((rngc << 17) | (rngc >> 15));
-            rngb = rngc + rngd;
-            rngc = rngd + e;
-            rngd = e + rnga;
-            return rngd;
-        }
-
-        void prnginit(unsigned seed)
-        {
-            rnga = 0xf1ea5eed, rngb = rngc = rngd = seed;
-            for (int i = 0; i < 20; ++i)
-            (   void)prngval();
-        }
-
 };
 
 void invSignal(float *sig, size_t len);

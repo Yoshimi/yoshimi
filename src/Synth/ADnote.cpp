@@ -113,12 +113,6 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
         for (int i = 0; i < 14; i++)
             pinking[nvoice][i] = 0.0;
 
-        adpars->VoicePar[nvoice].OscilSmp->prnginit(basefreq);
-        /*
-        * Rationale
-        * with the new prng we have 128 terabytes of calls before a repeat, so one
-        * re-seed per voice is more than enough!
-        */
         NoteVoicePar[nvoice].OscilSmp = NULL;
         NoteVoicePar[nvoice].FMSmp = NULL;
         NoteVoicePar[nvoice].VoiceOut = NULL;
@@ -131,6 +125,13 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
             NoteVoicePar[nvoice].Enabled = false;
             continue; // the voice is disabled
         }
+        /*
+        * Rationale
+        * with the new prng we have 128 terabytes of calls before a repeat
+        * so one re-seed per voice is more than enough!
+        * Also moved here - only set by sounding voices!
+        */
+        adpars->VoicePar[nvoice].OscilSmp->prnginit(nvoice + velocity * 150);
 
         int BendAdj = adpars->VoicePar[nvoice].PBendAdjust - 64;
         if (BendAdj % 24 == 0)
