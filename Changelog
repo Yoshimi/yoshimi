@@ -5,6 +5,8 @@ yoshimi 1.5.9 M
 * Further refinements to prng.
   In some cases we were converting to float then
   converting back to integer!
+* Final tweaks to prng - I think!
+* Rationalised some float to int conversions.
 
 2018-11-28 Will
 * Inplemented a new prng with no external libraries

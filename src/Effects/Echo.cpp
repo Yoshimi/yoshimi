@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified October 2018
+    Modified Novenber 2018
 */
 
 #include "Misc/SynthEngine.h"
@@ -159,7 +159,7 @@ void Echo::setvolume(unsigned char Pvolume_)
 void Echo::setdelay(const unsigned char Pdelay_)
 {
     Pdelay = Pdelay_;
-    FR2Z2I(Pdelay / 127.0f * synth->samplerate_f * 1.5f, delay);
+    delay = int(Pdelay / 127.0f * synth->samplerate_f * 1.5f);
     delay += 1; // 0 .. 1.5 sec
     initdelays();
 }

@@ -115,9 +115,6 @@ class OscilGen : public Presets, private WaveShapeSamples
 
         bool ADvsPAD; // if it is used by ADsynth or by PADsynth
 
-        float numRandom(void);
-        unsigned int randomOG(void);
-
     private:
         float *tmpsmps;
         FFTFREQS outoscilFFTfreqs;
@@ -223,35 +220,32 @@ class OscilGen : public Presets, private WaveShapeSamples
         }
 
     public:
-        inline void prngreseed() // this needs improving
-        { // possibly get seed from integer occasionally
-          // updated by time, then no longer reseed per
-          // voice note-on.
+        inline void prngreseed(unsigned int seed) // this needs improving
+        { // possibly no longer reseed per voice note-on.
             rnga = 0xf1ea5eed;
-            rngb = rngd;
-            rngc = rngd;
+            rngb = seed;
+            rngc = seed;
+            rngd = seed;
             for (int i = 0; i < 20; ++i)
                 (void)prngval();
         }
+
+        float numRandom(void)
+        {
+#ifndef NORANDOM
+            return prngval() * 2.328306435454494e-10;
+#else
+            return 0.5f;
+#endif
+        }
+
+        unsigned int randomOG(void){
+#ifndef NORANDOM
+            return prngval() >> 1;
+#else
+            return INT_MAX / 2;
+#endif
+        }
 };
-
-
-inline float OscilGen::numRandom(void)
-{
-#ifndef NORANDOM
-    return prngval() * 2.328306435454494e-10;
-#else
-    return 0.5f;
-#endif
-}
-
-inline unsigned int OscilGen::randomOG(void)
-{
-#ifndef NORANDOM
-    return prngval() >> 1;
-#else
-    return INT_MAX / 2;
-#endif
-}
 
 #endif

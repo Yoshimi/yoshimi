@@ -136,8 +136,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void vectorSet(int dHigh, unsigned char chan, int par);
         void ClearNRPNs(void);
         void resetAll(bool andML);
-        //float numRandom(void);
-        //unsigned int randomSE(void);
         void ShutUp(void);
         void allStop(unsigned int stopType);
         int MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process = 0);

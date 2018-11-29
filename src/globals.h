@@ -24,10 +24,10 @@
 #define GLOBALS_H
 
 /*
- * for test purposes where you want guaranteed identical results, enable the
+ * For test purposes where you want guaranteed identical results, enable the
  * #define below.
  * Be aware this does strange things to both subSynth and padSynth as they
- * require rendomness to produce normal sounds.
+ * require randomness to produce normal sounds.
  */
 //#define NORANDOM ON
 

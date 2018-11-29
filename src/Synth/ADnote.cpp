@@ -60,8 +60,7 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
 
     // Initialise some legato-specific vars
     Legato.msg = LM_Norm;
-    FR2Z2I(synth->samplerate_f * 0.005f, Legato.fade.length); // 0.005 seems ok.
-    //Legato.fade.length = (int)truncf(synth->samplerate_f * 0.005f); // 0.005 seems ok.
+    Legato.fade.length = int(synth->samplerate_f * 0.005f); // 0.005 seems ok.
     if (Legato.fade.length < 1)  // (if something's fishy)
         Legato.fade.length = 1;
     Legato.fade.step = (1.0f / Legato.fade.length);
@@ -127,11 +126,14 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
         }
         /*
         * Rationale
-        * with the new prng we have 128 terabytes of calls before a repeat
+        * There actually are separate prngs per voice per kititem per part!
+        * With the new prng we have 128 terabytes of calls before a repeat
         * so one re-seed per voice is more than enough!
-        * Also moved here - only set by sounding voices!
+        * Adding the voice number in the seed ensures they're all different.
+        * Also moved here so only set by sounding voices!
         */
-        adpars->VoicePar[nvoice].OscilSmp->prngreseed();
+        adpars->VoicePar[nvoice].OscilSmp->prngreseed(nvoice + synth->interchange.tick);
+        //cout << "1st V" << nvoice << " call " << adpars->VoicePar[nvoice].OscilSmp->numRandom() << endl;
 
         int BendAdj = adpars->VoicePar[nvoice].PBendAdjust - 64;
         if (BendAdj % 24 == 0)
@@ -639,14 +641,10 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
         NoteVoicePar[nvoice].FMVolume *=
             velF(velocity, adpars->VoicePar[nvoice].PFMVelocityScaleFunction);
 
-        float tmp = (expf(adpars->VoicePar[nvoice].PDelay / 127.0f
+        NoteVoicePar[nvoice].DelayTicks =
+            int((expf(adpars->VoicePar[nvoice].PDelay / 127.0f
                          * logf(50.0f)) - 1.0f) / synth->sent_all_buffersize_f / 10.0f
-                         * synth->samplerate_f; // done for clarity
-        FR2Z2I(tmp, NoteVoicePar[nvoice].DelayTicks);
-        /*NoteVoicePar[nvoice].DelayTicks =
-            (int)truncf((expf(adpars->VoicePar[nvoice].PDelay / 127.0f
-                         * logf(50.0f)) - 1.0f) / synth->sent_all_buffersize_f / 10.0f
-                         * synth->samplerate_f);*/
+                         * synth->samplerate_f);
     }
 
     ///////////////
@@ -1079,8 +1077,7 @@ void ADnote::setfreq(int nvoice, float in_freq)
         float speed = freq * synth->oscilsize_f / synth->samplerate_f;
         if (isgreater(speed, synth->oscilsize_f))
             speed = synth->oscilsize_f;
-        int tmp;
-        FR2Z2I (speed, tmp);
+        int tmp = int(speed);
         oscfreqhi[nvoice][k] = tmp;
         oscfreqlo[nvoice][k] = speed - float(tmp);
     }
@@ -1096,8 +1093,7 @@ void ADnote::setfreqFM(int nvoice, float in_freq)
         float speed = freq * synth->oscilsize_f / synth->samplerate_f;
         if (isgreater(speed, synth->oscilsize_f))
             speed = synth->oscilsize_f;
-        int tmp;
-        FR2Z2I (speed, tmp);
+        int tmp = int(speed);
         oscfreqhiFM[nvoice][k] = tmp;
         oscfreqloFM[nvoice][k] = speed - float(tmp);
     }
@@ -1258,8 +1254,9 @@ void ADnote::fadein(float *smps)
         tmp = 8.0f;
     tmp *= NoteGlobalPar.Fadein_adjustment;
 
-    int fadein; // how many samples is the fade-in
-    FR2Z2I(((tmp < 8.0f) ? 8.0f : tmp), fadein)
+    int fadein = int(tmp); // how many samples is the fade-in
+    if (fadein < 8)
+        fadein = 8;
     if (fadein > synth->sent_buffersize)
         fadein = synth->sent_buffersize;
     for (int i = 0; i < fadein; ++i) // fade-in
