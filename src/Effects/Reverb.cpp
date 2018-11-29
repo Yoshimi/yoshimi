@@ -414,9 +414,9 @@ void Reverb::settype(unsigned char Ptype_)
         if (i > REV_COMBS)
             tmp += 23.0f;
         tmp *= samplerate_adjust; // adjust the combs according to the samplerate
-        if (tmp < 10.0f)
-            tmp = 10.0f;
-        FR2Z2I(tmp, comblen[i]);
+        comblen[i] = int(tmp);
+        if (comblen[i] < 10)
+            comblen[i] = 10;
         combk[i] = 0;
         lpcomb[i] = 0;
         if (comb[i])
@@ -438,9 +438,9 @@ void Reverb::settype(unsigned char Ptype_)
         if (i > REV_APS)
             tmp += 23.0f;
         tmp *= samplerate_adjust; // adjust the combs according to the samplerate
-        if (tmp < 10)
-            tmp = 10;
-        FR2Z2I(tmp, aplen[i]);
+        aplen[i] = int(tmp);
+        if (aplen[i] < 10)
+            aplen[i] = 10;
         apk[i] = 0;
         if (ap[i])
             delete [] ap[i];
