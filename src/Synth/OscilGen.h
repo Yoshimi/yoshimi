@@ -207,10 +207,11 @@ class OscilGen : public Presets, private WaveShapeSamples
          *          Bob Jenkins
          */
 
-        unsigned int rnga;
-        unsigned int rngb;
-        unsigned int rngc;
-        unsigned int rngd;
+        unsigned int rnga = 458324646; // preseeded values
+        unsigned int rngb = 222123427;
+        unsigned int rngc = 1154911559;
+        unsigned int rngd = 2051558345;
+
         inline unsigned int prngval()
         {
             unsigned int e = rnga - ((rngb << 27) | (rngb >> 5));
@@ -222,11 +223,15 @@ class OscilGen : public Presets, private WaveShapeSamples
         }
 
     public:
-        inline void prnginit(unsigned seed)
-        {
-            rnga = 0xf1ea5eed, rngb = rngc = rngd = seed;
+        inline void prngreseed() // this needs improving
+        { // possibly get seed from integer occasionally
+          // updated by time, then no longer reseed per
+          // voice note-on.
+            rnga = 0xf1ea5eed;
+            rngb = rngd;
+            rngc = rngd;
             for (int i = 0; i < 20; ++i)
-            (   void)prngval();
+                (void)prngval();
         }
 };
 

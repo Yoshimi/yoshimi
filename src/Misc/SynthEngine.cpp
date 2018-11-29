@@ -3253,7 +3253,7 @@ inline void SynthEngine::prnginit(unsigned seed)
 {
     rnga = 0xf1ea5eed, rngb = rngc = rngd = seed;
     for (int i = 0; i < 20; ++i)
-    (void)prngval();
+        (void)prngval();
 }
 
 float SynthEngine::numRandom(void)

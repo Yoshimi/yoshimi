@@ -131,7 +131,7 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
         * so one re-seed per voice is more than enough!
         * Also moved here - only set by sounding voices!
         */
-        adpars->VoicePar[nvoice].OscilSmp->prnginit(nvoice + velocity * 150);
+        adpars->VoicePar[nvoice].OscilSmp->prngreseed();
 
         int BendAdj = adpars->VoicePar[nvoice].PBendAdjust - 64;
         if (BendAdj % 24 == 0)

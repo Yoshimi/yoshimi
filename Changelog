@@ -2,6 +2,9 @@ yoshimi 1.5.9 M
 
 2018-11-29 Will
 * Some corrections and improvements to new prng.
+* Further refinements to prng.
+  In some cases we were converting to float then
+  converting back to integer!
 
 2018-11-28 Will
 * Inplemented a new prng with no external libraries
