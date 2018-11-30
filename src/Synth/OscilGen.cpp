@@ -144,6 +144,7 @@ void OscilGen::defaults(void)
     oscilprepared = 0;
     oldfilterpars = 0;
     oldsapars = 0;
+    prngreseed(synth->randomSE());
     prepare();
 }
 
@@ -964,16 +965,6 @@ void OscilGen::shiftharmonics(void)
 void OscilGen::prepare(void)
 {
     float a, b, c, d, hmagnew;
-/*    memset(random_state, 0, sizeof(random_state));
-#if (HAVE_RANDOM_R)
-    memset(&random_buf, 0, sizeof(random_buf));
-    if (initstate_r(synth->randomSE(), random_state,
-                    sizeof(random_state), &random_buf))
-        synth->getRuntime().Log("OscilGen failed to init general randomness");
-#else
-    if (!initstate(synth->randomSE(), random_state, sizeof(random_state)))
-        synth->getRuntime().Log("OscilGen failed to init general randomness");
-#endif*/
 
     if (oldbasepar != Pbasefuncpar
         || oldbasefunc != Pcurrentbasefunc

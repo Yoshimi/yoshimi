@@ -25,6 +25,10 @@
     Modified November 2018
 */
 
+#include <iostream>
+
+using namespace std;
+
 #ifndef OSCIL_GEN_H
 #define OSCIL_GEN_H
 
@@ -197,6 +201,8 @@ class OscilGen : public Presets, private WaveShapeSamples
 
         char random_state[256];
 
+        //int rngcount;
+
         /*
          * The following prng is based on
          * "A small noncryptographic PRNG"
@@ -216,18 +222,21 @@ class OscilGen : public Presets, private WaveShapeSamples
             rngb = rngc + rngd;
             rngc = rngd + e;
             rngd = e + rnga;
+            //++rngcount;
+            //cout << rngcount << endl;
             return rngd;
         }
 
     public:
-        inline void prngreseed(unsigned int seed) // this needs improving
-        { // possibly no longer reseed per voice note-on.
+        inline void prngreseed(unsigned int seed)
+        {
             rnga = 0xf1ea5eed;
-            rngb = seed;
-            rngc = seed;
-            rngd = seed;
+            rngb = rngd + seed;
+            rngc = rngb;
+            rngd = rngc;
             for (int i = 0; i < 20; ++i)
                 (void)prngval();
+            //rngcount = 0;
         }
 
         float numRandom(void)
@@ -243,7 +252,7 @@ class OscilGen : public Presets, private WaveShapeSamples
 #ifndef NORANDOM
             return prngval() >> 1;
 #else
-            return INT_MAX / 2;
+            return 0x3fffffff;
 #endif
         }
 };

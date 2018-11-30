@@ -1,5 +1,10 @@
 yoshimi 1.5.9 M
 
+2018-11-30 Will
+* Prng behaviour now confirmed and reseeds removed.
+  Quite unnecessary. Needs many hours of continuous
+  playing to begin to get anywhere near pattern repeat.
+
 2018-11-29 Will
 * Some corrections and improvements to new prng.
 * Further refinements to prng.

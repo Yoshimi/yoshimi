@@ -3270,7 +3270,7 @@ unsigned int SynthEngine::randomSE(void)
 #ifndef NORANDOM
     return prngval() >> 1;
 #else
-    return INT_MAX / 2;
+    return 0x3fffffff;
 #endif
 }
 

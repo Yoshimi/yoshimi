@@ -124,16 +124,19 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
             NoteVoicePar[nvoice].Enabled = false;
             continue; // the voice is disabled
         }
-        /*
-        * Rationale
+       /*
+        *
+        * ***Rationale Now removed as unnecessary! ***
+        *
         * There actually are separate prngs per voice per kititem per part!
         * With the new prng we have 128 terabytes of calls before a repeat
         * so one re-seed per voice is more than enough!
         * Adding the voice number in the seed ensures they're all different.
         * Also moved here so only set by sounding voices!
+        *
+        adpars->VoicePar[nvoice].OscilSmp->prngreseed(synth->interchange.tick);
+        cout << "1st V" << nvoice << " call " << adpars->VoicePar[nvoice].OscilSmp->numRandom() << endl;
         */
-        adpars->VoicePar[nvoice].OscilSmp->prngreseed(nvoice + synth->interchange.tick);
-        //cout << "1st V" << nvoice << " call " << adpars->VoicePar[nvoice].OscilSmp->numRandom() << endl;
 
         int BendAdj = adpars->VoicePar[nvoice].PBendAdjust - 64;
         if (BendAdj % 24 == 0)

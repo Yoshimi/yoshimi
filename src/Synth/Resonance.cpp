@@ -159,16 +159,16 @@ void Resonance::smooth()
 // Randomize the resonance function
 void Resonance::randomize(int type)
 {
-    int r = synth->randomSE() & 0x7f;
+    int r = synth->randomSE() >> 24;
     for (int i = 0; i < MAX_RESONANCE_POINTS; ++i)
     {
         Prespoints[i] = r;
         if (synth->numRandom() < 0.1f && type == 0)
-            r = synth->randomSE() & 0x7f;
+            r = synth->randomSE() >> 24;
         if (synth->numRandom() < 0.3f && type == 1)
-            r = synth->randomSE() & 0x7f;
+            r = synth->randomSE() >> 24;
         if (type == 2)
-            r = synth->randomSE() & 0x7f;
+            r = synth->randomSE() >> 24;
     }
     smooth();
 }
