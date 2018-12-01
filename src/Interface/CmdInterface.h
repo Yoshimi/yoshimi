@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified November 2018
+    Modified December 2018
 */
 
 #ifndef CMDINTERFACE_H
@@ -61,7 +61,7 @@ namespace LEVEL{
         Resonance,
         LFO, // amp/freq/filt
         Filter, // params only (slightly confused with env)
-        Envelope, // amp/freq/filt/ Sub only band
+        Envelope, // amp/freq/filt/ (Sub only) band
     };
 }
 
@@ -156,13 +156,15 @@ static string toplist [] = {
     "  Root <n>",               "current root path to ID",
     "  Bank <n>",               "current bank to ID",
     "  SYStem effects [n]",     "enter effects context level",
-    "    Type <s>",             "the effect type",
-    "    PREset <n2>",          "set numbered effect preset to n2",
     "    SEnd <n2> <n3>",       "send system effect to effect n2 at volume n3",
-    "  INSert effects [n1]",    "enter effects context level",
-    "    Type <s>",             "the effect type",
+    "    (effect) <s>",         "the effect type",
     "    PREset <n2>",          "set numbered effect preset to n2",
+    "    -- ",                  "effect dependedent controls",
+    "  INSert effects [n1]",    "enter effects context level",
     "    SEnd <s>/<n2>",        "set where (Master, Off or part number)",
+    "    (effect) <s>",          "the effect type",
+    "    PREset <n2>",          "set numbered effect preset to n2",
+    "    -- ",                  "effect dependedent controls",
     "  AVailable <n>",          "available parts (16, 32, 64)",
     "  Volume <n>",             "master volume",
     "  SHift <n>",              "master key shift semitones (0 no shift)",
@@ -213,7 +215,7 @@ static string configlist [] = {
 };
 
 static string partlist [] = {
-    "<n>",                      "select part number (1-currently available)",
+    "<n>",                      "select part number",
     "LEvel <n2>",               "velocity sense offset level",
     "Breath <s>",               "breath control (ON, {other})",
     "POrtamento <s>",           "portamento (ON, {other})",
@@ -221,9 +223,10 @@ static string partlist [] = {
     "Note <n2>",                "note polyphony",
     "SHift <n2>",               "key shift semitones (0 no shift)",
     "EFfects [n2]",             "enter effects context level",
-    "  Type <s>",               "the effect type",
-    "  PREset <n3>",            "set numbered effect preset to n3",
     "  Send <n3> <n4>",         "send part to system effect n3 at volume n4",
+    "  (effect) <s>",               "the effect type",
+    "  PREset <n3>",            "set numbered effect preset to n3",
+    "    -- ",                  "effect dependedent controls",
     "PRogram <[n2]/[s]>",       "loads instrument ID / CLear sets default",
     "NAme <s>",                 "sets the display name the part can be saved with",
     "Channel <n2>",             "MIDI channel (> 32 disables, > 16 note off only)",
@@ -379,6 +382,7 @@ static string padsynthlist [] = {
 
 
 static string  resonancelist [] = {
+    "(enable) <s>",             "activate resonance (ON, {other})",
     "PRotect <s>",              "leave fundamental unchanged (ON, {other})",
     "Maxdb <n>",                "maximum attenuation of points",
     "Random <s>",               "set a random distribution (Coarse, Medium, Fine)",
@@ -819,6 +823,7 @@ class CmdInterface : private MiscFuncs
         bool helpList(unsigned int local);
         string historySelect(int listnum, int selection);
         void historyList(int listnum);
+        void ListCurrentParts(list<string>& msg_buf);
         int effectsList(bool presets = false);
         int effects(unsigned char controlType);
         int partCommonControls(unsigned char controlType);
@@ -844,6 +849,7 @@ class CmdInterface : private MiscFuncs
         int commandPart(unsigned char controlType);
         int commandReadnSet(unsigned char controlType);
         float readControl(unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff);
+        string readControlText(unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff);
         void readLimits(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2);
         int sendNormal(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff);
         int sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff, unsigned char request = 0xff);

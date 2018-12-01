@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified November 2018
+    Modified December 2018
 */
 
 #include <iostream>
@@ -928,7 +928,10 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                                 guiTo = true;
                             }
                             else
+                            {
                                 text = synth->part[npart]->Pname;
+                                getData->data.value = miscMsgPush(text);
+                            }
                         }
                         else if (synth->part[npart]->Pkitmode == true)
                         {

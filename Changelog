@@ -1,5 +1,9 @@
 yoshimi 1.5.9 M
 
+2018-12-1 Will
+* CLI List part gives detailed current status.
+  It gives further details if in part context.
+
 2018-11-30 Will
 * Prng behaviour now confirmed and reseeds removed.
   Quite unnecessary. Needs many hours of continuous

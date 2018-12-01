@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified November 2018
+    Modified December 2018
 */
 
 #include <iostream>
@@ -61,7 +61,7 @@ using namespace std;
  *
  *
  * readControl() provides a non-buffered way to find the
- * value on any control. It may be temporarily blocked if
+ * value of any control. It may be temporarily blocked if
  * there is a write command in progress.
  */
 
@@ -1799,7 +1799,7 @@ int CmdInterface::commandList()
 
     if (matchnMove(1, point, "parts"))
     {
-        synth->ListCurrentParts(msg);
+        ListCurrentParts(msg);
         synth->cliOutput(msg, LINES);
         return done_msg;
     }
@@ -1869,6 +1869,102 @@ int CmdInterface::commandList()
         return effectsList(true);
     replyString = "list";
     return what_msg;
+}
+
+
+void CmdInterface::ListCurrentParts(list<string>& msg_buf)
+{
+    int dest;
+    string name = "";
+    int avail = readControl(MAIN::control::availableParts, TOPLEVEL::section::main);
+
+    if (bitFindHigh(context) == LEVEL::Part)
+    {
+        if (!readControl(PART::control::kitMode, TOPLEVEL::section::part1 + npart))
+        {
+            if (readControl(PART::control::enable, TOPLEVEL::section::part1 + npart, UNUSED, 0))
+                name += " AddSynth";
+            if (readControl(PART::control::enable, TOPLEVEL::section::part1 + npart, UNUSED, 1))
+                name += " SubSynth";
+            if (readControl(PART::control::enable, TOPLEVEL::section::part1 + npart, UNUSED, 2))
+                name += " PadSynth";
+            if (name == "")
+                name = "no engines active!";
+            msg_buf.push_back(name);
+            return;
+        }
+        msg_buf.push_back("kit items");
+        for(int item = 0; item < NUM_KIT_ITEMS; ++item)
+        {
+            name = "";
+            if (readControl(PART::control::enable, TOPLEVEL::section::part1 + npart, item, UNUSED, TOPLEVEL::insert::kitGroup))
+            {
+                name = "  " + to_string(item) + " ";
+                {
+                if (readControl(PART::control::kitItemMute, TOPLEVEL::section::part1 + npart, item, UNUSED, TOPLEVEL::insert::kitGroup))
+                    name += "Quiet";
+                else
+                {
+                    if (readControl(PART::control::enable, TOPLEVEL::section::part1 + npart, item, 0, TOPLEVEL::insert::kitGroup))
+                        name += "AddSynth";
+                    if (readControl(PART::control::enable, TOPLEVEL::section::part1 + npart, item, 1, TOPLEVEL::insert::kitGroup))
+                        name += "SubSynth";
+                    if (readControl(PART::control::enable, TOPLEVEL::section::part1 + npart, item, 2, TOPLEVEL::insert::kitGroup))
+                        name += "PadSynth";
+                    if (name == "")
+                        name = "no engines active!";
+                }
+            }
+            if (name > "")
+                msg_buf.push_back(name);
+            }
+        }
+        return;
+    }
+    msg_buf.push_back(asString(avail) + " parts available");
+    for (int partno = 0; partno < NUM_MIDI_PARTS; ++partno)
+    {
+        string text = readControlText(PART::control::instrumentName, TOPLEVEL::section::part1 + partno, UNUSED, UNUSED, UNUSED, 128);
+        bool enabled = readControl(PART::control::enable, TOPLEVEL::section::part1 + partno);
+        if (text != "Simple Sound" || enabled)
+        {
+            if (enabled && partno < avail)
+                name = " +";
+            else
+                name = "  ";
+            name += to_string(partno + 1);
+            dest = readControl(PART::control::audioDestination, TOPLEVEL::section::part1 + partno);
+            if (partno >= avail)
+                name += " - " + text;
+            else
+            {
+                if(dest == 1)
+                    name += " M";
+                else if(dest == 2)
+                    name += " P";
+                else
+                    name += " B";
+                name += " Ch " + to_string(int(readControl(PART::control::midiChannel, TOPLEVEL::section::part1 + partno) + 1));
+                name +=  (" " + text);
+                int mode = readControl(PART::control::kitMode, TOPLEVEL::section::part1 + partno);
+                if (mode != PART::kitType::Off)
+                    name += " > ";
+                switch (mode)
+                {
+                    case PART::kitType::Multi:
+                        name += "Multi";
+                        break;
+                    case PART::kitType::Single:
+                        name += "Single";
+                        break;
+                    case PART::kitType::CrossFade:
+                        name += "Crossfade";
+                        break;
+                }
+            }
+            msg_buf.push_back(name);
+        }
+    }
 }
 
 
@@ -5471,6 +5567,25 @@ float CmdInterface::readControl(unsigned char control, unsigned char part, unsig
         //return 0xfffff;
         //cout << "err" << endl;
     return value;
+}
+
+
+string CmdInterface::readControlText(unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter)
+{
+    float value;
+    CommandBlock putData;
+
+    putData.data.value = 0;
+    putData.data.type = 0;
+    putData.data.control = control;
+    putData.data.part = part;
+    putData.data.kit = kit;
+    putData.data.engine = engine;
+    putData.data.insert = insert;
+    putData.data.parameter = parameter;
+    putData.data.par2 = UNUSED;
+    value = synth->interchange.readAllData(&putData);
+    return miscMsgPop(value);
 }
 
 

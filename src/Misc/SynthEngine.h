@@ -127,7 +127,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void ListPaths(list<string>& msg_buf);
         void ListBanks(int rootNum, list<string>& msg_buf);
         void ListInstruments(int bankNum, list<string>& msg_buf);
-        void ListCurrentParts(list<string>& msg_buf);
         void ListVectors(list<string>& msg_buf);
         bool SingleVector(list<string>& msg_buf, int chan);
         void ListSettings(list<string>& msg_buf);

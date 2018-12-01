@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified November 2018
+    Modified December 2018
 */
 
 //#define NOLOCKS
@@ -1129,36 +1129,6 @@ void SynthEngine::ListInstruments(int bankNum, list<string>& msg_buf)
     }
     else
                 msg_buf.push_back("No Root ID " + asString(root));
-}
-
-
-void SynthEngine::ListCurrentParts(list<string>& msg_buf)
-{
-    int dest;
-    string name;
-    int avail = Runtime.NumAvailableParts;
-
-    msg_buf.push_back(asString(avail) + " parts available");
-    for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-    {
-        if ((part[npart]->Pname) != "Simple Sound" || (partonoffRead(npart)))
-        {
-            name = "  " + asString(npart + 1);
-            dest = part[npart]->Paudiodest;
-            if (!partonoffRead(npart) || npart >= avail)
-                name += " -";
-            else if(dest == 1)
-                name += " M";
-            else if(dest == 2)
-                name += " P";
-            else
-                name += " B";
-            name +=  (" " + part[npart]->Pname);
-            if (part[npart]->Pkitmode > 0)
-                name += " kit mode";
-            msg_buf.push_back(name);
-        }
-    }
 }
 
 
