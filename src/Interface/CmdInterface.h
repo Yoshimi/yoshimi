@@ -731,7 +731,7 @@ static string listlist [] = {
     "Roots",                    "all available root paths",
     "Banks [n]",                "banks in root ID or current",
     "Instruments [n]",          "instruments in bank ID or current",
-    "Parts",                    "parts with instruments installed",
+    "Parts [s]",                "parts with instruments installed ('More' for extra details)",
     "Vectors",                  "settings for all enabled vectors",
     "Tuning",                   "microtonal scale tunings",
     "Keymap",                   "microtonal scale keyboard map",
@@ -823,7 +823,7 @@ class CmdInterface : private MiscFuncs
         bool helpList(unsigned int local);
         string historySelect(int listnum, int selection);
         void historyList(int listnum);
-        void ListCurrentParts(list<string>& msg_buf);
+        void listCurrentParts(list<string>& msg_buf);
         int effectsList(bool presets = false);
         int effects(unsigned char controlType);
         int partCommonControls(unsigned char controlType);

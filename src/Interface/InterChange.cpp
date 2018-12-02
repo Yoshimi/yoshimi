@@ -324,7 +324,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     int switchNum = npart;
     if (control == TOPLEVEL::control::errorMessage && insert != TOPLEVEL::insert::resonanceGraphInsert)
         switchNum = 256; // this is a bit hacky :(
-
+    bool testThing = false;
     switch(switchNum)
     {
         case TOPLEVEL::section::vector:
@@ -920,7 +920,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         }
                         break;
                     case PART::control::instrumentName: // part or kit item names
-                        if (parameter == TOPLEVEL::route::lowPriority)
+                        if (kititem == UNUSED)
                         {
                             if (write)
                             {
@@ -930,11 +930,11 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                             else
                             {
                                 text = synth->part[npart]->Pname;
-                                getData->data.value = miscMsgPush(text);
                             }
                         }
-                        else if (synth->part[npart]->Pkitmode == true)
+                        else if (synth->part[npart]->Pkitmode)
                         {
+                            cout << "here" << endl;
                             if (kititem >= NUM_KIT_ITEMS)
                                 text = " FAILED out of range";
                             else
@@ -945,7 +945,9 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                                     guiTo = true;
                                 }
                                 else
+                                {
                                     text = synth->part[npart]->kit[kititem].Pname;
+                                }
                             }
                         }
                         else
@@ -980,6 +982,8 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     __sync_and_and_fetch(&blockRead, 0xfd);
     if (getData->data.parameter < TOPLEVEL::route::lowPriority)
     {
+        if (testThing)
+            cout << "test " << value << endl;
         if (jack_ringbuffer_write_space(returnsBuffer) >= commandSize)
         {
             getData->data.value = float(value);
@@ -1104,7 +1108,8 @@ float InterChange::readAllData(CommandBlock *getData)
          * remote chance of getting garbled text :(
          */
         indirectTransfers(&tryData);
-        return 0;
+        synth->getRuntime().finishedCLI = true;
+        return tryData.data.value;
     }
     else
         commandSendReal(&tryData);

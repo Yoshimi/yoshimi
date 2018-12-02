@@ -1,5 +1,9 @@
 yoshimi 1.5.9 M
 
+2018-12-2 Will
+* BugFix: readAllData() not returning indirect value.
+* More details available in CLI list part.
+
 2018-12-1 Will
 * CLI List part gives detailed current status.
   It gives further details if in part context.

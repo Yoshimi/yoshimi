@@ -63,6 +63,9 @@ using namespace std;
  * readControl() provides a non-buffered way to find the
  * value of any control. It may be temporarily blocked if
  * there is a write command in progress.
+ *
+ * readControlText() provides a non-buffered way to fetch
+ * some text items. It is not error checked.
  */
 
 extern SynthEngine *firstSynth;
@@ -1799,7 +1802,7 @@ int CmdInterface::commandList()
 
     if (matchnMove(1, point, "parts"))
     {
-        ListCurrentParts(msg);
+        listCurrentParts(msg);
         synth->cliOutput(msg, LINES);
         return done_msg;
     }
@@ -1872,22 +1875,35 @@ int CmdInterface::commandList()
 }
 
 
-void CmdInterface::ListCurrentParts(list<string>& msg_buf)
+void CmdInterface::listCurrentParts(list<string>& msg_buf)
 {
     int dest;
     string name = "";
     int avail = readControl(MAIN::control::availableParts, TOPLEVEL::section::main);
-
+    bool full = matchnMove(1, point, "more");
     if (bitFindHigh(context) == LEVEL::Part)
     {
         if (!readControl(PART::control::kitMode, TOPLEVEL::section::part1 + npart))
         {
-            if (readControl(PART::control::enable, TOPLEVEL::section::part1 + npart, UNUSED, 0))
-                name += " AddSynth";
-            if (readControl(PART::control::enable, TOPLEVEL::section::part1 + npart, UNUSED, 1))
-                name += " SubSynth";
-            if (readControl(PART::control::enable, TOPLEVEL::section::part1 + npart, UNUSED, 2))
-                name += " PadSynth";
+            if (readControl(PART::control::enable, TOPLEVEL::section::part1 + npart, UNUSED, PART::engine::addSynth))
+            {
+                name += " AddSynth ";
+                if (full)
+                {
+                    string found = "";
+                    for(int voice = 0; voice < NUM_VOICES; ++voice)
+                    {
+                        if (readControl(ADDSYNTH::control::enable, TOPLEVEL::section::part1 + npart, 0, PART::engine::addVoice1 + voice))
+                            found += (" " + to_string(voice + 1));
+                    }
+                    if (found > "")
+                        name += ("Voices" + found + " ");
+                }
+            }
+            if (readControl(PART::control::enable, TOPLEVEL::section::part1 + npart, UNUSED, PART::engine::subSynth))
+                name += " SubSynth ";
+            if (readControl(PART::control::enable, TOPLEVEL::section::part1 + npart, UNUSED, PART::engine::padSynth))
+                name += " PadSynth ";
             if (name == "")
                 name = "no engines active!";
             msg_buf.push_back(name);
@@ -1905,12 +1921,48 @@ void CmdInterface::ListCurrentParts(list<string>& msg_buf)
                     name += "Quiet";
                 else
                 {
-                    if (readControl(PART::control::enable, TOPLEVEL::section::part1 + npart, item, 0, TOPLEVEL::insert::kitGroup))
-                        name += "AddSynth";
-                    if (readControl(PART::control::enable, TOPLEVEL::section::part1 + npart, item, 1, TOPLEVEL::insert::kitGroup))
-                        name += "SubSynth";
-                    if (readControl(PART::control::enable, TOPLEVEL::section::part1 + npart, item, 2, TOPLEVEL::insert::kitGroup))
-                        name += "PadSynth";
+                    if (full)
+                    {
+                        name += "  key Min ";
+                        int min = int(readControl(PART::control::minNote, TOPLEVEL::section::part1 + npart, item, UNUSED, TOPLEVEL::insert::kitGroup));
+                        if (min < 10)
+                            name += "  ";
+                        else if (min < 100)
+                            name += " ";
+                        name += to_string(min);
+                        name += "  Max ";
+                        int max = int(readControl(PART::control::maxNote, TOPLEVEL::section::part1 + npart, item, UNUSED, TOPLEVEL::insert::kitGroup));
+                        if (max < 10)
+                            name += "  ";
+                        else if (max < 100)
+                            name += " ";
+
+                        name += (to_string(max) + "  ");
+                        string text = readControlText(PART::control::instrumentName, TOPLEVEL::section::part1 + npart, item, UNUSED, TOPLEVEL::insert::kitGroup, TOPLEVEL::route::lowPriority);
+                        if (text > "")
+                            name += text;
+                        msg_buf.push_back(name);
+                        name = "    ";
+                    }
+                    if (readControl(PART::control::enable, TOPLEVEL::section::part1 + npart, item, PART::engine::addSynth, TOPLEVEL::insert::kitGroup))
+                    {
+                        name += "AddSynth ";
+                        if (full)
+                        {
+                            string found = "";
+                            for(int voice = 0; voice < NUM_VOICES; ++voice)
+                            {
+                                if (readControl(ADDSYNTH::control::enable, TOPLEVEL::section::part1 + npart, item, PART::engine::addVoice1 + voice))
+                                found += (" " + to_string(voice + 1));
+                            }
+                            if (found > "")
+                                name += ("Voices" + found + " ");
+                        }
+                    }
+                    if (readControl(PART::control::enable, TOPLEVEL::section::part1 + npart, item, PART::engine::subSynth, TOPLEVEL::insert::kitGroup))
+                        name += "SubSynth ";
+                    if (readControl(PART::control::enable, TOPLEVEL::section::part1 + npart, item, PART::engine::padSynth, TOPLEVEL::insert::kitGroup))
+                        name += "PadSynth ";
                     if (name == "")
                         name = "no engines active!";
                 }
@@ -1924,14 +1976,18 @@ void CmdInterface::ListCurrentParts(list<string>& msg_buf)
     msg_buf.push_back(asString(avail) + " parts available");
     for (int partno = 0; partno < NUM_MIDI_PARTS; ++partno)
     {
-        string text = readControlText(PART::control::instrumentName, TOPLEVEL::section::part1 + partno, UNUSED, UNUSED, UNUSED, 128);
+        string text = readControlText(PART::control::instrumentName, TOPLEVEL::section::part1 + partno, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
         bool enabled = readControl(PART::control::enable, TOPLEVEL::section::part1 + partno);
         if (text != "Simple Sound" || enabled)
         {
-            if (enabled && partno < avail)
-                name = " +";
+            if (partno < 9)
+                name = " ";
             else
-                name = "  ";
+                name = "";
+            if (enabled && partno < avail)
+                name += "+";
+            else
+                name += " ";
             name += to_string(partno + 1);
             dest = readControl(PART::control::audioDestination, TOPLEVEL::section::part1 + partno);
             if (partno >= avail)
@@ -1939,13 +1995,44 @@ void CmdInterface::ListCurrentParts(list<string>& msg_buf)
             else
             {
                 if(dest == 1)
-                    name += " M";
+                    name += " Main";
                 else if(dest == 2)
-                    name += " P";
+                    name += " Part";
                 else
-                    name += " B";
-                name += " Ch " + to_string(int(readControl(PART::control::midiChannel, TOPLEVEL::section::part1 + partno) + 1));
-                name +=  (" " + text);
+                    name += " Both";
+                name += "  Chan ";
+                int ch = int(readControl(PART::control::midiChannel, TOPLEVEL::section::part1 + partno) + 1);
+                if (ch < 10)
+                    name += " ";
+                name += to_string(ch);
+                if (full)
+                {
+                    name += "  key Min ";
+                    int min = int(readControl(PART::control::minNote, TOPLEVEL::section::part1 + partno));
+                    if (min < 10)
+                        name += "  ";
+                    else if (min < 100)
+                        name += " ";
+                    name += to_string(min);
+                    name += "  Max ";
+                    int max = int(readControl(PART::control::maxNote, TOPLEVEL::section::part1 + partno));
+                    if (max < 10)
+                        name += "  ";
+                    else if (max < 100)
+                        name += " ";
+                    name += to_string(max);
+                    name += "  Shift ";
+                    int shift = int(readControl(PART::control::keyShift, TOPLEVEL::section::part1 + partno, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority));
+                    if (shift >= 10)
+                        name += " ";
+                    else if (shift >= 0)
+                        name += "  ";
+                    else if (shift >= -10)
+                        name += " ";
+                    name += to_string(shift);
+
+                }
+                name +=  ("  " + text);
                 int mode = readControl(PART::control::kitMode, TOPLEVEL::section::part1 + partno);
                 if (mode != PART::kitType::Off)
                     name += " > ";
@@ -1963,6 +2050,35 @@ void CmdInterface::ListCurrentParts(list<string>& msg_buf)
                 }
             }
             msg_buf.push_back(name);
+            if (full)
+            {
+                name = "    Drum ";
+                int drum = readControl(PART::control::drumMode, TOPLEVEL::section::part1 + partno);
+                if (drum)
+                    name += " on";
+                else
+                    name += "off";
+                name += " Portamento ";
+                if (readControl(PART::control::portamento, TOPLEVEL::section::part1 + partno))
+                    name += " on";
+                else name += "off";
+                int key = readControl(PART::control::keyMode, TOPLEVEL::section::part1 + partno);
+                switch (key)
+                {
+                    case 0:
+                        name += "  Polphonic";
+                        break;
+                    case 1:
+                        name += "  Monophonic";
+                        break;
+                    case 2:
+                        name += "  Legato";
+                        if (drum)
+                            name += " (drum blocked)";
+                        break;
+                }
+                msg_buf.push_back(name);
+            }
         }
     }
 }
@@ -4119,9 +4235,9 @@ int CmdInterface::commandPart(unsigned char controlType)
         }
         if (matchnMove(2, point,"name"))
         {
+            int par2 = NO_MSG;
             if (lineEnd(controlType))
                 return value_msg;
-            int par2 = NO_MSG;
             if (controlType == TOPLEVEL::type::Write)
                 par2 = miscMsgPush(point);
             return sendNormal(0, controlType, PART::control::instrumentName, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup, TOPLEVEL::route::adjustAndLoopback, par2);
