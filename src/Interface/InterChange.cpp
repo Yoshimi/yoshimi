@@ -934,7 +934,6 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         }
                         else if (synth->part[npart]->Pkitmode)
                         {
-                            cout << "here" << endl;
                             if (kititem >= NUM_KIT_ITEMS)
                                 text = " FAILED out of range";
                             else

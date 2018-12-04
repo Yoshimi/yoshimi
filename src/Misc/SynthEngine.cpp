@@ -3298,8 +3298,8 @@ float SynthEngine::getLimits(CommandBlock *getData)
             break;
 
         case MAIN::control::soloType:
-            def = 0;
-            max = 3;
+            def = 0; // Off
+            max = 4;
             break;
 
         case MAIN::control::soloCC:

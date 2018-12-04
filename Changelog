@@ -1,5 +1,9 @@
 yoshimi 1.5.9 M
 
+2018-12-3 Will
+* BugFix: CLI Solo not accessing twoWay mode.
+* Doc updates.
+
 2018-12-2 Will
 * BugFix: readAllData() not returning indirect value.
 * More details available in CLI list part.

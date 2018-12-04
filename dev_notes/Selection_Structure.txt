@@ -3,7 +3,7 @@ Yoshimi very heavily uses switch statements, some of which are truly massive. Th
 
 The development has been very much an incremental process, initially with numerical entries and large gaps to create grouping, allow for changes, and give a clearer idea of the various structures.
 
-The intention was then to collapse all the gaps to give more efficient switch statements. However in the intervening time several CLI users have been using the direct access method to reach controls that are not yet available formally. In view of this, I'll be leaving the actual values as they are until all of them are properly addressable.
+The intention was then to collapse all the gaps to give more efficient switch statements. However in the intervening time several CLI users have been using the direct access method to reach controls that were not yet available formally. Although this is now done, the actual values are being left as they are until (at least) the next release.
 
 
 The traditonal impression of these switches is that they perform a lot of if-then tests, but with modern compilers this is only true of small case groups, after that they make lookup tables which are considerably faster.
