@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified October 2018
+Modified December 2018
 } {selected in_source in_header
 }
 
@@ -847,7 +847,7 @@ class OscilEditor {: {public PresetsUI_}
           class WidgetPDial
         }
         Fl_Check_Button filterpref {
-          label p
+          label F
           callback {//
           send_data(OSCILLATOR::control::filterBeforeWaveshape, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Apply the filter before the waveshaping} xywh {415 313 20 20} down_box DOWN_BOX labelsize 10 align 24

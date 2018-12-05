@@ -161,7 +161,7 @@ static string toplist [] = {
     "    PREset <n2>",          "set numbered effect preset to n2",
     "    -- ",                  "effect dependedent controls",
     "  INSert effects [n1]",    "enter effects context level",
-    "    SEnd <s>/<n2>",        "set where (Master, Off or part number)",
+    "    SEnd <s>/<n2>",        "set where (Master, OFF or part number)",
     "    (effect) <s>",          "the effect type",
     "    PREset <n2>",          "set numbered effect preset to n2",
     "    -- ",                  "effect dependedent controls",
@@ -302,7 +302,7 @@ static string addsynthlist [] = {
 
 static string addvoicelist [] = {
 
-    "Type <s>",             "sound type (oscillator, White noise, Pink noise)",
+    "Type <s>",             "sound type (Oscillator, White noise, Pink noise)",
     "SOurce <[s]/[n]>",     "oscillator source (Internal, {voice number})",
     "Phase <n>",            "relative voice phase",
     "Minus <s>",            "Invert entire voice (ON, {other})",

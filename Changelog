@@ -1,5 +1,10 @@
 yoshimi 1.5.9 M
 
+2018-12-5 Will
+* Added CLI warning when insEffect is unrouted.
+* Fixed CLI regression. Set part program blocked
+  if part was not enabled - should auto-enable.
+
 2018-12-3 Will
 * BugFix: CLI Solo not accessing twoWay mode.
 * Doc updates.

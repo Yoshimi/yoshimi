@@ -2113,7 +2113,9 @@ string CmdInterface::findStatus(bool show)
             nFXpreset = readControl(16, TOPLEVEL::section::systemEffects,  EFFECT::type::none + nFXtype, nFX);
         }
         text += (" eff " + asString(nFX + 1) + " " + fx_list[nFXtype].substr(0, 6));
-        if (nFXtype > 0 && nFXtype != 7)
+        if (bitTest(context, LEVEL::InsFX) && readControl(EFFECT::sysIns::effectDestination, TOPLEVEL::section::systemEffects, UNUSED, nFX) == -1)
+            text += " Unrouted";
+        else if (nFXtype > 0 && nFXtype != 7)
             text += ("-" + asString(nFXpreset + 1));
         return text;
     }
@@ -4078,7 +4080,7 @@ int CmdInterface::waveform(unsigned char controlType)
 int CmdInterface::commandPart(unsigned char controlType)
 {
     Config &Runtime = synth->getRuntime();
-    int tmp;
+    int tmp = -1;
     if (bitTest(context, LEVEL::AllFX))
         return effects(controlType);
     if (lineEnd(controlType))
@@ -4149,6 +4151,32 @@ int CmdInterface::commandPart(unsigned char controlType)
                 return result;
         }
     }
+
+        if (matchnMove(2, point, "program") || matchnMove(1, point, "instrument"))
+    {
+        if (controlType != TOPLEVEL::type::Write)
+        {
+            Runtime.Log("Part name is " + synth->part[npart]->Pname);
+            return done_msg;
+        }
+        if (matchnMove(2, point, "clear"))
+        {
+            sendDirect(0, controlType, PART::control::defaultInstrument, npart, UNUSED, UNUSED, UNUSED, UNUSED, tmp);
+            return done_msg;
+        }
+        if (point[0] != 0) // force part not channel number
+        {
+            tmp = string2int(point) - 1;
+            if (tmp < 0 || tmp >= MAX_INSTRUMENTS_IN_BANK)
+                return range_msg;
+            sendDirect(npart, controlType, MAIN::control::loadInstrument, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, tmp);
+            return done_msg;
+        }
+        else
+            return value_msg;
+    }
+
+
     if (!readControl(PART::control::enable, npart))
         return inactive_msg;
 
@@ -4260,7 +4288,7 @@ int CmdInterface::commandPart(unsigned char controlType)
         return sendNormal(value, controlType, PART::control::keyShift, npart, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
     }
 
-    if (matchnMove(2, point, "LE"))
+    if (matchnMove(2, point, "LEvel"))
     {
         tmp = string2int127(point);
         if(controlType == TOPLEVEL::type::Write && tmp < 1)
@@ -4268,29 +4296,6 @@ int CmdInterface::commandPart(unsigned char controlType)
         return sendNormal(tmp, controlType, PART::control::velocityOffset, npart);
     }
 
-    if (matchnMove(2, point, "program") || matchnMove(1, point, "instrument"))
-    {
-        if (controlType != TOPLEVEL::type::Write)
-        {
-            Runtime.Log("Part name is " + synth->part[npart]->Pname);
-            return done_msg;
-        }
-        if (matchnMove(2, point, "clear"))
-        {
-            sendDirect(0, controlType, PART::control::defaultInstrument, npart, UNUSED, UNUSED, UNUSED, UNUSED, tmp);
-            return done_msg;
-        }
-        if (point[0] != 0) // force part not channel number
-        {
-            tmp = string2int(point) - 1;
-            if (tmp < 0 || tmp >= MAX_INSTRUMENTS_IN_BANK)
-                return range_msg;
-            sendDirect(npart, controlType, MAIN::control::loadInstrument, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, tmp);
-            return done_msg;
-        }
-        else
-            return value_msg;
-    }
     if (matchnMove(1, point, "channel"))
     {
         tmp = string2int127(point);
@@ -4727,6 +4732,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
             defaults();
         else if (bitFindHigh(context) == LEVEL::Part)
         {
+            int temPart = npart;
             if (bitTest(context, LEVEL::AllFX) || bitTest(context, LEVEL::InsFX))
             {
                 defaults();
@@ -4734,6 +4740,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
             }
             else
                 defaults();
+            npart = temPart;
         }
         else
         {
