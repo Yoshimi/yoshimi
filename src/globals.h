@@ -147,7 +147,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         Minimum,
         Maximum,
         Default,
-        LearnRequest = 3,
+        LearnRequest = 3, // shared value
         // remaining used bit-wise
         Error = 4, // also identifes static limits
         Limits = 4, // yes we can pair these - who knew?
@@ -160,8 +160,8 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         // all used bit-wise
         MIDI = 8,
         CLI = 16,
-        UpdateAfterSet = 16, // so gui can update
-        GUI = 32
+        GUI = 32,
+        UpdateAfterSet = 48 // so gui can update
     };
 
     enum control : unsigned char {

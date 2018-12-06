@@ -1155,6 +1155,8 @@ void InterChange::resolveReplies(CommandBlock *getData)
 
     bool isCli = ((type & (TOPLEVEL::source::CLI | TOPLEVEL::source::GUI )) == TOPLEVEL::source::CLI); // eliminate Gui redraw
     bool isGui = type & TOPLEVEL::source::GUI;
+    //cout << "Is CLI " << isCli << endl;
+    //cout << "Is GUI " << isGui << endl;
     char button = type & 3;
     string isValue;
     string commandName;

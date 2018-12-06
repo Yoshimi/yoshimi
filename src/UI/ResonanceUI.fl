@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-Modified October 2018
+Modified December 2018
 } {selected in_source in_header
 }
 
@@ -458,12 +458,6 @@ class ResonanceUI {: PresetsUI_
           callback {synth->getGuiMaster()->getPresetsUi()->paste(respar,this);}
           xywh {665 275 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
         }
-        Fl_Button applybutton {
-          label Apply
-          callback {//
-              send_data(PART::control::padsynthParameters, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
-          xywh {700 265 74 17} box THIN_UP_BOX down_box THIN_DOWN_BOX labelfont 1 labelsize 11
-        }
       }
       Fl_Check_Button enabled {
         label Enable
@@ -471,6 +465,12 @@ class ResonanceUI {: PresetsUI_
         send_data(RESONANCE::control::enableResonance, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         xywh {6 265 78 15} down_box DOWN_BOX labelfont 1 labelsize 12
         code0 {o->value(respar->Penabled);}
+      }
+      Fl_Button applybutton {
+        label Apply
+        callback {//
+              send_data(PART::control::padsynthParameters, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        xywh {700 265 74 17} box THIN_UP_BOX down_box THIN_DOWN_BOX labelfont 1 labelsize 11
       }
     }
   }

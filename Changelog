@@ -1,5 +1,11 @@
 yoshimi 1.5.9 M
 
+2018-12-6 Will
+* Fixed GUI regression Resonance Apply button
+  inoperable when resonance disabled!
+* Added 'Echo Multimod' to Will_Godfrey_Companion.
+* Also added 'Cathedral Pipe organ'.
+
 2018-12-5 Will
 * Added CLI warning when insEffect is unrouted.
 * Fixed CLI regression. Set part program blocked
