@@ -1726,7 +1726,7 @@ void SynthEngine::partonoffLock(int npart, int what)
 }
 
 /*
- * Intellegent switch for unknown part status that always
+ * Intelligent switch for unknown part status that always
  * switches off and later returns original unknown state
  */
 void SynthEngine::partonoffWrite(int npart, int what)
@@ -1814,7 +1814,7 @@ void SynthEngine::Mute()
 }
 
 /*
- * Intellegent switch for unknown mute status that always
+ * Intelligent switch for unknown mute status that always
  * switches off and later returns original unknown state
  */
 void SynthEngine::mutewrite(int what)

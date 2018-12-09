@@ -1,4 +1,9 @@
-yoshimi 1.5.9 M
+yoshimi 1.5.10 rc1
+
+2018-12-9 Will
+* Some minor code cleanups.
+* Doc updates.
+* Set version as 1.5.10 rc1
 
 2018-12-6 Will
 * Fixed GUI regression Resonance Apply button

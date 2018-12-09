@@ -23,7 +23,7 @@ Incoming CC (not NRPNs).
 
 Incoming channel number.
 
-Minimum & Maximum incoming percentage values (if Min is greater than Max it reverses the control direction).
+Minimum & Maximum incoming percentage values (if Min is greater than Max it reverses the control direction). If they are the same, then it becomes a threshold setting, and any incoming value below this will be regarded as 0, and an other value will be seen as 127.
 
 The range can either be in the style of a limiter or as compression.
 

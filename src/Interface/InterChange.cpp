@@ -5242,16 +5242,7 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case PART::control::midiChannel:
             if (write)
-            {
                 part->Prcvchn = value_int;
-                /*if (synth->getRuntime().channelSwitchType > 0 && synth->getRuntime().channelSwitchType != 2)
-                {
-                    for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
-                        synth->part[i]->Prcvchn = 16;
-                    synth->getRuntime().channelSwitchValue = npart;
-                    part->Prcvchn = 0;
-                }*/
-            }
             else
                 value = part->Prcvchn;
             break;

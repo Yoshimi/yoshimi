@@ -19,4 +19,4 @@ There is now a new mode called 'Crossfade' described in detail in:
 /doc/Part_Kit_Crossfade.txt
 
 Drum mode:
-If this is set then microtonal tuning is ignored for this kit, otherwise it could make drum sounds very unpredictable!
+If this is set then microtonal tuning is ignored for this kit, otherwise it could make drum sounds very unpredictable! Also, Legato mode is disabled.

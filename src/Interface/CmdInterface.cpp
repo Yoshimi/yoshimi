@@ -824,7 +824,6 @@ int CmdInterface::effects(unsigned char controlType)
                 else if (selected == 10) // filter entry
                 {
                     bitSet(context, LEVEL::Filter);
-                    //return filterSelect(controlType);
                     return done_msg;
                 }
             }
@@ -921,7 +920,7 @@ int CmdInterface::effects(unsigned char controlType)
             partno = TOPLEVEL::section::systemEffects;
         return sendNormal(nFXpreset, TOPLEVEL::type::Write, 16, partno,  EFFECT::type::none + nFXtype, nFX);
     }
-    return done_msg;
+    return opp_msg;
 }
 
 
@@ -2705,12 +2704,6 @@ int CmdInterface::commandVector(unsigned char controlType)
 
 int CmdInterface::commandConfig(unsigned char controlType)
 {
-    /*if (lineEnd(controlType))
-    {
-        if (controlType != TOPLEVEL::type::Write)
-            sendDirect(0, 0, 80, TOPLEVEL::section::main); // status
-        return done_msg;
-    }*/
     float value = 0;
     unsigned char command = UNUSED;
     unsigned char par = UNUSED;
@@ -3210,7 +3203,6 @@ int CmdInterface::modulator(unsigned char controlType)
         return partCommonControls(controlType);//available_msg;
 
     return sendNormal(value, controlType, cmd, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
-
 }
 
 
@@ -3354,8 +3346,7 @@ int CmdInterface::addVoice(unsigned char controlType)
         value = string2int(point);
     else if (value == 0xff)
             value = -1; // special case for osc source
-    sendNormal(value, controlType, cmd, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
-    return done_msg;
+    return sendNormal(value, controlType, cmd, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
 }
 
 
@@ -3414,9 +3405,7 @@ int CmdInterface::addSynth(unsigned char controlType)
     if (cmd == -1)
         return available_msg;
 
-    sendNormal(value, controlType, cmd, npart, kitNumber, PART::engine::addSynth);
-
-    return done_msg;;
+    return sendNormal(value, controlType, cmd, npart, kitNumber, PART::engine::addSynth);
 }
 
 
@@ -4609,7 +4598,6 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
             return range_msg;
         return sendNormal(value, controlType, MAIN::control::availableParts, TOPLEVEL::section::main);
     }
-
     return opp_msg;
 }
 
@@ -4813,8 +4801,6 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                 Runtime.Log("Can't read file " + filename);
             free (to_send);
             to_send = NULL;
-            // decided against this!
-            //context = LEVEL::Top; // leave it tidy
             return done_msg;
         }
         replyString = "Exec";
@@ -5387,7 +5373,6 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                             string name = string(point);
                             if (name > "!")
                                 par2 = miscMsgPush(name);
-                            //cout << "name " << name << endl;
                         }
                         else if (point[0] != 0)
                             par2 = string2int(point);
@@ -5726,7 +5711,6 @@ void CmdInterface::readLimits(float value, unsigned char type, unsigned char con
     putData.data.parameter = parameter;
     putData.data.par2 = par2;
 
-        //putData.data.type = request | TOPLEVEL::type::Limits;
     value = synth->interchange.readAllData(&putData);
     string name;
     switch (type & 3)

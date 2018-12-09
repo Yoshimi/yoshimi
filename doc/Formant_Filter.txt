@@ -14,3 +14,5 @@ If your mouse has the extra buttons on the sides (mine hasn't) you can also use 
 While making these changes you'll see the respective knobs/sliders moving too, and these are still full functional.
 
 A detail that some people haven't noticed is that, uniquely, there is no 'default' value for formant frequency. This will be set quite randomly, but once saved, will be fixed like all the other controls.
+
+Finally, remember that for the formant filter to take effect you must set an envelope too, as it is that that traveses the vowels and their formants.
