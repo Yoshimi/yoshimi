@@ -16,10 +16,15 @@
 
 /doc
     Ensure these are up-to-date - especially check
-    yoshimi-user-manual has correct version number
+    yoshimi-user-manual has correct version number.
+    Move Yoshimi_1.n.x_features.txt into Histories and
+    replace with new one for the current version.
 
 Changelog
     Make sure top line is current release, not rc!
+
+README.txt
+    Update!
 
 set tag to release version
 

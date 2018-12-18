@@ -3235,7 +3235,7 @@ float SynthEngine::numRandom(void)
 #endif
 }
 
-unsigned int SynthEngine::randomSE(void)
+uint32_t SynthEngine::randomSE(void)
 {
 #ifndef NORANDOM
     return prngval() >> 1;

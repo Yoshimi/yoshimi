@@ -268,14 +268,14 @@ class SynthEngine : private SynthHelper, MiscFuncs
         string windowTitle;
         //MusicClient *musicClient;
     public:
-        unsigned int rnga;
-        unsigned int rngb;
-        unsigned int rngc;
-        unsigned int rngd;
-        unsigned int prngval();
-        void prnginit(unsigned seed);
+        uint32_t rnga;
+        uint32_t rngb;
+        uint32_t rngc;
+        uint32_t rngd;
+        uint32_t prngval();
+        void prnginit(uint32_t seed);
         float numRandom(void);
-        unsigned int randomSE(void);
+        uint32_t randomSE(void);
 };
 
 #endif

@@ -32,14 +32,15 @@ endif (POLICY CMP0072)
 set (CMAKE_CXX_STANDARD 11) # we seem to need both for
 add_definitions(-std=gnu++11) # various versions of cmake
 
-# vvv
 add_definitions(-Wall)
+
+# vvv
 #add_definitions(-Wpedantic)
 add_definitions(-Werror=format-security)
 add_definitions(-Wextra)
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "1.5.10 rc1")
+set (YOSHIMI_VERSION "1.5.10 rc2")
 add_definitions (-DMIN_CONFIG_MAJOR=1)
 add_definitions (-DMIN_CONFIG_MINOR=5)
 

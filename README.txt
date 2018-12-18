@@ -1,11 +1,28 @@
-V 1.5.9 Yet Another Sparrow
+V 1.5.10 Redwing
 
-Apart from the new list of helpers, there is little visible change for most users, but the command line has now been greatly extended.
+Command Line access is now virtually complete.
 
-Full details are in doc/Yoshimi_1.5.9_features.txt
+The graphic interface has had a minor makeover.
+Very occasional corruption of this now resolved.
 
-Also, there have been significant changes in the underlying code. These were always planned, but maybe not reported and explained as well as they could have been.
+All inactive controls are now shown as such -
+there were a number that previously weren't, thus
+causing considerable confusion for new users.
 
-More info is in dev_notes/Selection_Structure.txt
+There is an improved pseudo-random number system.
 
-As usual, there still is much to do, but progress is steady.
+
+By default, Yoshimi is supplied with 709 instruments
+spread across 23 banks.
+
+Yoshimi source code is available from either:
+https://sourceforge.net/projects/yoshimi
+Or:
+https://github.com/Yoshimi/yoshimi
+
+Full build instructions are in 'INSTALL'.
+
+Our list archive is at:
+https://www.freelists.org/archive/yoshimi
+To post, email to:
+yoshimi@freelists.org

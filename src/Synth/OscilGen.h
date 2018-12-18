@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified November 2018
+    Modified December 2018
 */
 
 #include <iostream>
@@ -210,14 +210,14 @@ class OscilGen : public Presets, private WaveShapeSamples
          *          Bob Jenkins
          */
 
-        unsigned int rnga = 458324646; // preseeded values
-        unsigned int rngb = 222123427;
-        unsigned int rngc = 1154911559;
-        unsigned int rngd = 2051558345;
+        uint32_t rnga = 458324646; // preseeded values
+        uint32_t rngb = 222123427;
+        uint32_t rngc = 1154911559;
+        uint32_t rngd = 2051558345;
 
-        inline unsigned int prngval()
+        inline uint32_t prngval()
         {
-            unsigned int e = rnga - ((rngb << 27) | (rngb >> 5));
+            uint32_t e = rnga - ((rngb << 27) | (rngb >> 5));
             rnga = rngb ^ ((rngc << 17) | (rngc >> 15));
             rngb = rngc + rngd;
             rngc = rngd + e;
@@ -228,7 +228,7 @@ class OscilGen : public Presets, private WaveShapeSamples
         }
 
     public:
-        inline void prngreseed(unsigned int seed)
+        inline void prngreseed(uint32_t seed)
         {
             rnga = 0xf1ea5eed;
             rngb = rngd + seed;
@@ -248,7 +248,7 @@ class OscilGen : public Presets, private WaveShapeSamples
 #endif
         }
 
-        unsigned int randomOG(void){
+        uint32_t randomOG(void){ // never used... so far
 #ifndef NORANDOM
             return prngval() >> 1;
 #else

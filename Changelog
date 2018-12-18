@@ -1,4 +1,9 @@
-yoshimi 1.5.10 rc1
+yoshimi 1.5.10 rc2
+
+2-18-12-18 Will
+* Changed PRNGs to specifically use uint32_t
+* Updated most docs for release.
+* Set version as 1.5.10 rc2
 
 2018-12-9 Will
 * Some minor code cleanups.
