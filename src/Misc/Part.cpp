@@ -364,13 +364,11 @@ void Part::NoteOn(int note, int velocity, bool renote)
 
         // Humanise
         // cout << "\n" << notebasefreq << endl;
-#ifndef NORANDOM
         if (!Pdrummode && Pfrand >= 1) // otherwise 'off'
             // this is an approximation to keep the math simple and is
             // about 1 cent out at 50 cents
             notebasefreq *= (1.0f + ((synth->numRandom() - 0.5f) * Pfrand * 0.00115f));
         // cout << notebasefreq << endl;
-#endif
 
         // Portamento
         if (oldfreq < 1.0f)

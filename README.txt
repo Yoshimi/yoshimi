@@ -9,7 +9,6 @@ All inactive controls are now shown as such -
 there were a number that previously weren't, thus
 causing considerable confusion for new users.
 
-There is an improved pseudo-random number system.
 
 
 By default, Yoshimi is supplied with 709 instruments

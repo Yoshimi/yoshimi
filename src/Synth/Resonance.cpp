@@ -22,7 +22,7 @@
 
     This file is a derivative of a ZynAddSubFX original
 
-    Modified Novenber 2018
+    Modified October 2018
 */
 
 #include <cmath>
@@ -159,16 +159,16 @@ void Resonance::smooth()
 // Randomize the resonance function
 void Resonance::randomize(int type)
 {
-    int r = synth->randomSE() >> 24;
+    int r = (int)(synth->numRandom() * 127.0f);
     for (int i = 0; i < MAX_RESONANCE_POINTS; ++i)
     {
         Prespoints[i] = r;
         if (synth->numRandom() < 0.1f && type == 0)
-            r = synth->randomSE() >> 24;
+            r = (synth->numRandom() * 127.0f);
         if (synth->numRandom() < 0.3f && type == 1)
-            r = synth->randomSE() >> 24;
+            r = (synth->numRandom() * 127.0f);
         if (type == 2)
-            r = synth->randomSE() >> 24;
+            r = (synth->numRandom() * 127.0f);
     }
     smooth();
 }

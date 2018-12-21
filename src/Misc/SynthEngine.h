@@ -135,6 +135,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void vectorSet(int dHigh, unsigned char chan, int par);
         void ClearNRPNs(void);
         void resetAll(bool andML);
+        float numRandom(void);
+        unsigned int randomSE(void);
         void ShutUp(void);
         void allStop(unsigned int stopType);
         int MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process = 0);
@@ -257,6 +259,14 @@ class SynthEngine : private SynthHelper, MiscFuncs
         pthread_mutex_t *processLock;
 
         char random_state[256];
+        float random_0_1;
+
+#if (HAVE_RANDOM_R)
+        struct random_data random_buf;
+        int32_t random_result;
+#else
+        long int random_result;
+#endif
 
     public:
         MasterUI *guiMaster; // need to read this in InterChange::returns
@@ -267,15 +277,47 @@ class SynthEngine : private SynthHelper, MiscFuncs
         int LFOtime; // used by Pcontinous
         string windowTitle;
         //MusicClient *musicClient;
-    public:
-        uint32_t rnga;
-        uint32_t rngb;
-        uint32_t rngc;
-        uint32_t rngd;
-        uint32_t prngval();
-        void prnginit(uint32_t seed);
-        float numRandom(void);
-        uint32_t randomSE(void);
 };
+
+inline float SynthEngine::numRandom(void)
+{
+    int ret;
+#if (HAVE_RANDOM_R)
+    ret = random_r(&random_buf, &random_result);
+#else
+    random_result = random();
+    ret = 0;
+#endif
+
+    if (!ret)
+    {
+        random_0_1 = (float)random_result / (float)INT_MAX;
+        random_0_1 = (random_0_1 > 1.0f) ? 1.0f : random_0_1;
+        random_0_1 = (random_0_1 < 0.0f) ? 0.0f : random_0_1;
+#ifndef NORANDOM
+        return random_0_1;
+#endif
+    }
+    return 0.5f;
+}
+
+inline unsigned int SynthEngine::randomSE(void)
+{
+#if (HAVE_RANDOM_R)
+    if (!random_r(&random_buf, &random_result))
+#ifndef NORANDOM
+        return random_result + INT_MAX / 2;
+#endif
+    return INT_MAX / 2;
+#else
+
+#ifndef NORANDOM
+    random_result = random();
+#else
+    random_result = 0;
+#endif
+    return (unsigned int)random_result + INT_MAX / 2;
+#endif
+}
 
 #endif

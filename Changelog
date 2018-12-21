@@ -37,24 +37,6 @@ yoshimi 1.5.10 rc3
 * CLI List part gives detailed current status.
   It gives further details if in part context.
 
-2018-11-30 Will
-* Prng behaviour now confirmed and reseeds removed.
-  Quite unnecessary. Needs many hours of continuous
-  playing to begin to get anywhere near pattern repeat.
-
-2018-11-29 Will
-* Some corrections and improvements to new prng.
-* Further refinements to prng.
-  In some cases we were converting to float then
-  converting back to integer!
-* Final tweaks to prng - I think!
-* Rationalised some float to int conversions.
-
-2018-11-28 Will
-* Inplemented a new prng with no external libraries
-  based on "A small noncryptographic PRNG"
-  by Bob Jenkins
-
 2018-11-27 Will
 * Randomness can now be disabled for test purposes.
   Enabe #define NORANDOM in globals.h

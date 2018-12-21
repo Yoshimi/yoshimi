@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of original ZynAddSubFX code.
-    Modified November 2018
+    Modified October 2018
 */
 
 #include <cmath>
@@ -60,7 +60,8 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
 
     // Initialise some legato-specific vars
     Legato.msg = LM_Norm;
-    Legato.fade.length = int(synth->samplerate_f * 0.005f); // 0.005 seems ok.
+    FR2Z2I(synth->samplerate_f * 0.005f, Legato.fade.length); // 0.005 seems ok.
+    //Legato.fade.length = (int)truncf(synth->samplerate_f * 0.005f); // 0.005 seems ok.
     if (Legato.fade.length < 1)  // (if something's fishy)
         Legato.fade.length = 1;
     Legato.fade.step = (1.0f / Legato.fade.length);
@@ -106,12 +107,12 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
     else
         NoteGlobalPar.Punch.Enabled = 0;
 
-
     for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
     {
         for (int i = 0; i < 14; i++)
             pinking[nvoice][i] = 0.0;
 
+        adpars->VoicePar[nvoice].OscilSmp->newrandseed(); // so it really will be random
         NoteVoicePar[nvoice].OscilSmp = NULL;
         NoteVoicePar[nvoice].FMSmp = NULL;
         NoteVoicePar[nvoice].VoiceOut = NULL;
@@ -124,19 +125,6 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
             NoteVoicePar[nvoice].Enabled = false;
             continue; // the voice is disabled
         }
-       /*
-        *
-        * ***Rationale Now removed as unnecessary! ***
-        *
-        * There actually are separate prngs per voice per kititem per part!
-        * With the new prng we have 128 terabytes of calls before a repeat
-        * so one re-seed per voice is more than enough!
-        * Adding the voice number in the seed ensures they're all different.
-        * Also moved here so only set by sounding voices!
-        *
-        adpars->VoicePar[nvoice].OscilSmp->prngreseed(synth->interchange.tick);
-        cout << "1st V" << nvoice << " call " << adpars->VoicePar[nvoice].OscilSmp->numRandom() << endl;
-        */
 
         int BendAdj = adpars->VoicePar[nvoice].PBendAdjust - 64;
         if (BendAdj % 24 == 0)
@@ -359,6 +347,8 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
         int vc = nvoice;
         if (adpars->VoicePar[nvoice].Pextoscil != -1)
             vc = adpars->VoicePar[nvoice].Pextoscil;
+        if (!adpars->GlobalPar.Hrandgrouping)
+            adpars->VoicePar[vc].OscilSmp->newrandseed();
         int oscposhi_start =
             adpars->VoicePar[vc].OscilSmp->get(NoteVoicePar[nvoice].OscilSmp,
                                                getVoiceBaseFreq(nvoice),
@@ -589,6 +579,8 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
         int vc = nvoice;
         if (adpars->VoicePar[nvoice].Pextoscil != -1)
             vc = adpars->VoicePar[nvoice].Pextoscil;
+        if (!adpars->GlobalPar.Hrandgrouping)
+            adpars->VoicePar[vc].OscilSmp->newrandseed();
 
         adpars->VoicePar[vc].OscilSmp->get(NoteVoicePar[nvoice].OscilSmp,
                                            getVoiceBaseFreq(nvoice),
@@ -644,10 +636,14 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
         NoteVoicePar[nvoice].FMVolume *=
             velF(velocity, adpars->VoicePar[nvoice].PFMVelocityScaleFunction);
 
-        NoteVoicePar[nvoice].DelayTicks =
-            int((expf(adpars->VoicePar[nvoice].PDelay / 127.0f
+        float tmp = (expf(adpars->VoicePar[nvoice].PDelay / 127.0f
                          * logf(50.0f)) - 1.0f) / synth->sent_all_buffersize_f / 10.0f
-                         * synth->samplerate_f);
+                         * synth->samplerate_f; // done for clarity
+        FR2Z2I(tmp, NoteVoicePar[nvoice].DelayTicks);
+        /*NoteVoicePar[nvoice].DelayTicks =
+            (int)truncf((expf(adpars->VoicePar[nvoice].PDelay / 127.0f
+                         * logf(50.0f)) - 1.0f) / synth->sent_all_buffersize_f / 10.0f
+                         * synth->samplerate_f);*/
     }
 
     ///////////////
@@ -710,7 +706,17 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
         if (NoteVoicePar[nvoice].FMEnabled != NONE
             && NoteVoicePar[nvoice].FMVoice < 0)
         {
+            adpars->VoicePar[nvoice].FMSmp->newrandseed();
+
             //Perform Anti-aliasing only on MORPH or RING MODULATION
+
+            int vc = nvoice;
+            if (adpars->VoicePar[nvoice].PextFMoscil != -1)
+                vc = adpars->VoicePar[nvoice].PextFMoscil;
+
+            if (!adpars->GlobalPar.Hrandgrouping)
+                adpars->VoicePar[vc].FMSmp->newrandseed();
+
             for (int i = 0; i < OSCIL_SMP_EXTRA_SAMPLES; ++i)
                 NoteVoicePar[nvoice].FMSmp[synth->oscilsize + i] =
                     NoteVoicePar[nvoice].FMSmp[i];
@@ -957,6 +963,7 @@ void ADnote::initParameters(void)
         if (NoteVoicePar[nvoice].FMEnabled != NONE
            && NoteVoicePar[nvoice].FMVoice < 0)
         {
+            adpars->VoicePar[nvoice].FMSmp->newrandseed();
             NoteVoicePar[nvoice].FMSmp =
                 (float*)fftwf_malloc((synth->oscilsize + OSCIL_SMP_EXTRA_SAMPLES) * sizeof(float));
 
@@ -971,6 +978,9 @@ void ADnote::initParameters(void)
                || (NoteVoicePar[nvoice].FMEnabled == MORPH)
                || (NoteVoicePar[nvoice].FMEnabled == RING_MOD))
                freqtmp = getFMVoiceBaseFreq(nvoice);
+
+            if (!adpars->GlobalPar.Hrandgrouping)
+                adpars->VoicePar[vc].FMSmp->newrandseed();
 
             for (int k = 0; k < unison_size[nvoice]; ++k)
                 oscposhiFM[nvoice][k] =
@@ -1080,7 +1090,8 @@ void ADnote::setfreq(int nvoice, float in_freq)
         float speed = freq * synth->oscilsize_f / synth->samplerate_f;
         if (isgreater(speed, synth->oscilsize_f))
             speed = synth->oscilsize_f;
-        int tmp = int(speed);
+        int tmp;
+        FR2Z2I (speed, tmp);
         oscfreqhi[nvoice][k] = tmp;
         oscfreqlo[nvoice][k] = speed - float(tmp);
     }
@@ -1096,7 +1107,8 @@ void ADnote::setfreqFM(int nvoice, float in_freq)
         float speed = freq * synth->oscilsize_f / synth->samplerate_f;
         if (isgreater(speed, synth->oscilsize_f))
             speed = synth->oscilsize_f;
-        int tmp = int(speed);
+        int tmp;
+        FR2Z2I (speed, tmp);
         oscfreqhiFM[nvoice][k] = tmp;
         oscfreqloFM[nvoice][k] = speed - float(tmp);
     }
@@ -1257,9 +1269,8 @@ void ADnote::fadein(float *smps)
         tmp = 8.0f;
     tmp *= NoteGlobalPar.Fadein_adjustment;
 
-    int fadein = int(tmp); // how many samples is the fade-in
-    if (fadein < 8)
-        fadein = 8;
+    int fadein; // how many samples is the fade-in
+    FR2Z2I(((tmp < 8.0f) ? 8.0f : tmp), fadein)
     if (fadein > synth->sent_buffersize)
         fadein = synth->sent_buffersize;
     for (int i = 0; i < fadein; ++i) // fade-in
