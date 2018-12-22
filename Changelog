@@ -1,6 +1,10 @@
-yoshimi 1.5.10 rc2
+yoshimi 1.5.10 rc3
 
-2-18-12-18 Will
+2018-12-22 Will
+* Frequency LFO regresion fix from Rob.
+* Set version as 1.5.10 rc3
+
+2018-12-18 Will
 * Changed PRNGs to specifically use uint32_t
 * Updated most docs for release.
 * Set version as 1.5.10 rc2
