@@ -30,6 +30,7 @@
 
 #include <limits.h>
 
+#include "Misc/RandomGen.h"
 #include "Misc/WaveShapeSamples.h"
 #include "Misc/XMLwrapper.h"
 #include "DSP/FFTwrapper.h"
@@ -67,7 +68,7 @@ class OscilGen : public Presets, private WaveShapeSamples
 
         // Make a new random seed for Amplitude Randomness -
         //   should be called every noteon event
-        inline void newrandseed(void) { randseed = (unsigned int)randomOG(); }
+        inline void newrandseed(void) { randseed = prng.randomINT(); }
 
         // Parameters
 
@@ -206,91 +207,8 @@ class OscilGen : public Presets, private WaveShapeSamples
 
         unsigned int randseed;
 
-        float random_0_1;
-        char random_state[256];
-
-#if (HAVE_RANDOM_R)
-        int32_t random_result;
-        struct random_data random_buf;
-#else
-        long int random_result;
-#endif
-
-        float harmonic_random_0_1;
-        char harmonic_random_state[256];
-
-#if (HAVE_RANDOM_R)
-        int32_t harmonic_random_result;
-        struct random_data harmonic_random_buf;
-#else
-        long int harmonic_random_result;
-#endif
+        RandomGen prng;
+        RandomGen harmonicPrng;
 };
-
-
-inline float OscilGen::numRandom(void)
-{
-    int ret;
-#if (HAVE_RANDOM_R)
-    ret = random_r(&random_buf, &random_result);
-#else
-    random_result = random();
-    ret = 0;
-#endif
-
-    if (!ret)
-    {
-        random_0_1 = (float)random_result / (float)INT_MAX;
-        random_0_1 = (random_0_1 > 1.0f) ? 1.0f : random_0_1;
-        random_0_1 = (random_0_1 < 0.0f) ? 0.0f : random_0_1;
-#ifndef NORANDOM
-        return random_0_1;
-#endif
-    }
-    return 0.5f;
-}
-
-
-inline float OscilGen::harmonicRandom(void)
-{
-    int ret;
-#if (HAVE_RANDOM_R)
-    ret = random_r(&harmonic_random_buf, &harmonic_random_result);
-#else
-    harmonic_random_result = random();
-    ret = 0;
-#endif
-
-    if (!ret)
-    {
-        harmonic_random_0_1 = (float)harmonic_random_result / (float)INT_MAX;
-        harmonic_random_0_1 = (harmonic_random_0_1 > 1.0f) ? 1.0f : harmonic_random_0_1;
-        harmonic_random_0_1 = (harmonic_random_0_1 < 0.0f) ? 0.0f : harmonic_random_0_1;
-#ifndef NORANDOM
-        return harmonic_random_0_1;
-#endif
-    }
-    return 0.5f;
-}
-
-
-inline unsigned int OscilGen::randomOG(void)
-{
-#if (HAVE_RANDOM_R)
-    if (!random_r(&random_buf, &random_result))
-#ifndef NORANDOM
-        return random_result + INT_MAX / 2;
-#endif
-    return INT_MAX;
-#else
-
-#ifndef NORANDOM
-    random_result = random();
-#else
-    random_result = 0;
-#endif
-    return (unsigned int)random_result + INT_MAX / 2;
-#endif
-}
 
 #endif

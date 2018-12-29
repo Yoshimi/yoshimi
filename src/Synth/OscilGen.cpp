@@ -965,16 +965,8 @@ void OscilGen::shiftharmonics(void)
 void OscilGen::prepare(void)
 {
     float a, b, c, d, hmagnew;
-    memset(random_state, 0, sizeof(random_state));
-#if (HAVE_RANDOM_R)
-    memset(&random_buf, 0, sizeof(random_buf));
-    if (initstate_r(synth->randomSE(), random_state,
-                    sizeof(random_state), &random_buf))
+    if (!prng.init(synth->randomINT()))
         synth->getRuntime().Log("OscilGen failed to init general randomness");
-#else
-    if (!initstate(synth->randomSE(), random_state, sizeof(random_state)))
-        synth->getRuntime().Log("OscilGen failed to init general randomness");
-#endif
 
     if (oldbasepar != Pbasefuncpar
         || oldbasefunc != Pcurrentbasefunc
@@ -1257,7 +1249,8 @@ int OscilGen::get(float *smps, float freqHz, int resonance)
 
     if (oscilprepared != 1)
         prepare();
-      FR2Z2I((numRandom() * 2.0f - 1.0f) * synth->oscilsize_f * (Prand - 64.0f) / 64.0f, outpos);
+
+    FR2Z2I((prng.numRandom() * 2.0f - 1.0f) * synth->oscilsize_f * (Prand - 64.0f) / 64.0f, outpos);
 //    outpos = (int)truncf((numRandom() * 2.0f - 1.0f) * synth->oscilsize_f * (Prand - 64.0f) / 64.0f);
     outpos = (outpos + 2 * synth->oscilsize) % synth->oscilsize;
 
@@ -1300,7 +1293,7 @@ int OscilGen::get(float *smps, float freqHz, int resonance)
         rnd = PI * powf((Prand - 64.0f) / 64.0f, 2.0f);
         for (int i = 1; i < nyquist - 1; ++i)
         {   // to Nyquist only for AntiAliasing
-            angle = rnd * i * numRandom();
+            angle = rnd * i * prng.numRandom();
             a = outoscilFFTfreqs.c[i];
             b = outoscilFFTfreqs.s[i];
             c = cosf(angle);
@@ -1313,16 +1306,8 @@ int OscilGen::get(float *smps, float freqHz, int resonance)
     // Harmonic Amplitude Randomness
     if (freqHz > 0.1 && !ADvsPAD)
     {
-        memset(harmonic_random_state, 0, sizeof(harmonic_random_state));
-#if (HAVE_RANDOM_R)
-        memset(&harmonic_random_buf, 0, sizeof(harmonic_random_buf));
-        if (initstate_r(randseed, harmonic_random_state,
-                    sizeof(harmonic_random_state), &harmonic_random_buf))
+        if (!harmonicPrng.init(randseed))
             synth->getRuntime().Log("OscilGen failed to init harmonic amplitude amplitude randomness");
-#else
-	if (!initstate(randseed, harmonic_random_state, sizeof(harmonic_random_state)))
-            synth->getRuntime().Log("OscilGen failed to init harmonic amplitude amplitude randomness");
-#endif
 
         float power = Pamprandpower / 127.0f;
         float normalize = 1.0f / (1.2f - power);
@@ -1333,7 +1318,7 @@ int OscilGen::get(float *smps, float freqHz, int resonance)
                 power = powf(15.0f, power);
                 for (int i = 1; i < nyquist - 1; ++i)
                 {
-                    float amp = powf(harmonicRandom(), power) * normalize;
+                    float amp = powf(harmonicPrng.numRandom(), power) * normalize;
                     outoscilFFTfreqs.c[i] *= amp;
                     outoscilFFTfreqs.s[i] *= amp;
                 }
@@ -1342,7 +1327,7 @@ int OscilGen::get(float *smps, float freqHz, int resonance)
             case 2:
                 power = power * 2.0f - 0.5f;
                 power = powf(15.0f, power) * 2.0f;
-                float rndfreq = TWOPI * harmonicRandom();
+                float rndfreq = TWOPI * harmonicPrng.numRandom();
                 for (int i = 1 ; i < nyquist - 1; ++i)
                 {
                     float amp = powf(fabsf(sinf(i * rndfreq)), power) * normalize;
