@@ -110,41 +110,24 @@ class StdlibPRNG
 
 class TrinomialPRNG
 {
-        struct random_data
-          {
-            int32_t *fptr;      /* Front pointer.  */
-            int32_t *rptr;      /* Rear pointer.  */
-            int32_t *state;     /* Array of state values.  */
-            int rand_type;      /* Type of random number generator.  */
-            int rand_deg;       /* Degree of random number generator.  */
-            int rand_sep;       /* Distance between front and rear.  */
-            int32_t *end_ptr;   /* Pointer behind state table.  */
-          };
-
-        char state[256];
-        struct random_data buf;
+        int32_t state[63];
+        int32_t *fptr;      /* Front pointer.  */
+        int32_t *rptr;      /* Rear pointer.  */
 
     private: ///////TODO code copied literally from Glibc; to be simplified and inlined
 
 void
 inl_srandom_r (unsigned int seed)
 {
-  int32_t *state;
-  long int i;
-  int32_t word;
-  int32_t *dst;
-  int kc;
-
-  state = buf.state;
   /* We must make sure the seed is not 0.  Take arbitrarily 1 in this case.  */
   if (seed == 0)
     seed = 1;
   state[0] = seed;
 
-  dst = state;
-  word = seed;
-  kc = buf.rand_deg;
-  for (i = 1; i < kc; ++i)
+  int32_t *dst = state;
+  int32_t word = seed;
+  int kc = 63; /* random generation uses this trinomial: x**63 + x + 1.  */
+  for (int i = 1; i < kc; ++i)
     {
       /* This does:
        state[i] = (16807 * state[i - 1]) % 2147483647;
@@ -157,8 +140,8 @@ inl_srandom_r (unsigned int seed)
       *++dst = word;
     }
 
-  buf.fptr = &state[buf.rand_sep];
-  buf.rptr = &state[0];
+  fptr = &state[1];
+  rptr = &state[0];
   kc *= 10;
   while (--kc >= 0)
     inl_random_r();
@@ -167,41 +150,20 @@ inl_srandom_r (unsigned int seed)
 void
 inl_initstate_r (unsigned int seed)
 {
-    //////////////////////////////////WIP : inlined arguments
-    char *arg_state = state;
-    //////////////////////////////////WIP : inlined arguments
-
-  buf.rand_type = 4;
-  buf.rand_sep = 1;
-  buf.rand_deg = 63; /* random generation uses this trinomial: x**63 + x + 1.  */
-
-  int32_t *stateA = &((int32_t *) arg_state)[1]; /* First location.  */
-  /* Must set END_PTR before srandom.  */
-  buf.end_ptr = &stateA[63];
-
-  buf.state = stateA;
-
+  fptr = NULL;
+  rptr = NULL;
   inl_srandom_r (seed);
 }
 
 int32_t
 inl_random_r ()
 {
-  int32_t result;
-  int32_t *state;
+  uint32_t val = *fptr += (uint32_t) *rptr;
+  int32_t result = val >> 1;  // Chucking least random bit.
 
-  state = buf.state;
-
-  int32_t *fptr = buf.fptr;
-  int32_t *rptr = buf.rptr;
-  int32_t *end_ptr = buf.end_ptr;
-  uint32_t val;
-
-  val = *fptr += (uint32_t) *rptr;
-  /* Chucking least random bit.  */
-  result = val >> 1;
+  int32_t *end = &state[63];
   ++fptr;
-  if (fptr >= end_ptr)
+  if (fptr >= end)
     {
       fptr = state;
       ++rptr;
@@ -209,17 +171,15 @@ inl_random_r ()
   else
     {
       ++rptr;
-      if (rptr >= end_ptr)
+      if (rptr >= end)
         rptr = state;
     }
-  buf.fptr = fptr;
-  buf.rptr = rptr;
 
   return result;
 }
 
     public:
-        TrinomialPRNG()
+        TrinomialPRNG() : fptr(NULL), rptr(NULL)
         {
             memset(&state, 0, sizeof(state));
         }
@@ -227,7 +187,6 @@ inl_random_r ()
         bool init(uint32_t seed)
         {
             memset(state, 0, sizeof(state));
-            memset(&buf, 0, sizeof(buf));
             inl_initstate_r(seed);
             return true;
         }
