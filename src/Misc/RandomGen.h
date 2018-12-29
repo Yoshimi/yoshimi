@@ -31,6 +31,7 @@
 #include <cstring>
 
 using std::int32_t;
+using std::int64_t;
 using std::uint32_t;
 using std::memset;
 
@@ -114,70 +115,6 @@ class TrinomialPRNG
         int32_t *fptr;      /* Front pointer.  */
         int32_t *rptr;      /* Rear pointer.  */
 
-    private: ///////TODO code copied literally from Glibc; to be simplified and inlined
-
-void
-inl_srandom_r (unsigned int seed)
-{
-  /* We must make sure the seed is not 0.  Take arbitrarily 1 in this case.  */
-  if (seed == 0)
-    seed = 1;
-  state[0] = seed;
-
-  int32_t *dst = state;
-  int32_t word = seed;
-  int kc = 63; /* random generation uses this trinomial: x**63 + x + 1.  */
-  for (int i = 1; i < kc; ++i)
-    {
-      /* This does:
-       state[i] = (16807 * state[i - 1]) % 2147483647;
-     but avoids overflowing 31 bits.  */
-      long int hi = word / 127773;
-      long int lo = word % 127773;
-      word = 16807 * lo - 2836 * hi;
-      if (word < 0)
-    word += 2147483647;
-      *++dst = word;
-    }
-
-  fptr = &state[1];
-  rptr = &state[0];
-  kc *= 10;
-  while (--kc >= 0)
-    inl_random_r();
-}
-
-void
-inl_initstate_r (unsigned int seed)
-{
-  fptr = NULL;
-  rptr = NULL;
-  inl_srandom_r (seed);
-}
-
-int32_t
-inl_random_r ()
-{
-  uint32_t val = *fptr += (uint32_t) *rptr;
-  int32_t result = val >> 1;  // Chucking least random bit.
-
-  int32_t *end = &state[63];
-  ++fptr;
-  if (fptr >= end)
-    {
-      fptr = state;
-      ++rptr;
-    }
-  else
-    {
-      ++rptr;
-      if (rptr >= end)
-        rptr = state;
-    }
-
-  return result;
-}
-
     public:
         TrinomialPRNG() : fptr(NULL), rptr(NULL)
         {
@@ -187,15 +124,61 @@ inl_random_r ()
         bool init(uint32_t seed)
         {
             memset(state, 0, sizeof(state));
-            inl_initstate_r(seed);
+            fptr = NULL;
+            rptr = NULL;
+
+            /* We must make sure the seed is not 0.  Take arbitrarily 1 in this case.  */
+            if (seed == 0)
+              seed = 1;
+            state[0] = seed;
+
+            int32_t *dst = state;
+            int32_t word = seed;
+            int kc = 63; /* random generation uses this trinomial: x**63 + x + 1.  */
+            for (int i = 1; i < kc; ++i)
+            {
+                /* This does:
+                   state[i] = (16807 * state[i - 1]) % 2147483647;
+                   but avoids overflowing 31 bits. */
+                int64_t hi = word / 127773;
+                int64_t lo = word % 127773;
+                word = 16807 * lo - 2836 * hi;
+                if (word < 0)
+                    word += 2147483647;
+                *++dst = word;
+            }
+
+            fptr = &state[1];
+            rptr = &state[0];
+            kc *= 10;
+            while (--kc >= 0)
+                prngval();
             return true;
         }
 
+
         uint32_t prngval()
         {
+            uint32_t val = *fptr += (uint32_t) *rptr;
+            int32_t result = val >> 1;  // Chucking least random bit.
+
+            int32_t *end = &state[63];
+            ++fptr;
+            if (fptr >= end)
+              {
+                fptr = state;
+                ++rptr;
+              }
+            else
+              {
+                ++rptr;
+                if (rptr >= end)
+                  rptr = state;
+              }
             // random_result holds number 0...INT_MAX
-            return uint32_t(inl_random_r());
+            return uint32_t(result);
         }
+
 
         float numRandom()
         {
