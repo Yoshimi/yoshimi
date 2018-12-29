@@ -269,8 +269,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         RandomGen prng;
     public:
-        float numRandom()       { return prng.numRandom(); }
-        unsigned int randomINT(){ return prng.randomINT(); }
+        float numRandom()   { return prng.numRandom(); }
+        uint32_t randomINT(){ return prng.randomINT(); }   // random number in the range 0...INT_MAX
 };
 
 #endif

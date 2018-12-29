@@ -965,7 +965,7 @@ void OscilGen::shiftharmonics(void)
 void OscilGen::prepare(void)
 {
     float a, b, c, d, hmagnew;
-    if (!prng.init(synth->randomINT()))
+    if (!prng.init(synth->randomINT() + INT_MAX/2))
         synth->getRuntime().Log("OscilGen failed to init general randomness");
 
     if (oldbasepar != Pbasefuncpar

@@ -31,6 +31,7 @@
 #include <cstring>
 
 using std::int32_t;
+using std::uint32_t;
 using std::memset;
 
 
@@ -39,32 +40,27 @@ class RandomGen
     public:
         RandomGen();
 
-        bool init(unsigned int seed);
-        float numRandom(void);
-        unsigned int randomINT(void);
+        bool init(uint32_t seed);
+        uint32_t prngval();
+        float numRandom();
+        uint32_t randomINT();
     private:
         char random_state[256];
-        float random_0_1;
 
 #if (HAVE_RANDOM_R)
         struct random_data random_buf;
-        int32_t random_result;
-#else
-        long int random_result;
 #endif /*HAVE_RANDOM_R*/
 
 };
 
 
-inline RandomGen::RandomGen() :
-     random_0_1(0.0),
-     random_result(0)
+inline RandomGen::RandomGen()
 {
      memset(&random_state, 0, sizeof(random_state));
 }
 
 
-inline bool RandomGen::init(unsigned int seed)
+inline bool RandomGen::init(uint32_t seed)
 {
     memset(random_state, 0, sizeof(random_state));
 #if (HAVE_RANDOM_R)
@@ -77,48 +73,43 @@ inline bool RandomGen::init(unsigned int seed)
 }
 
 
-inline float RandomGen::numRandom(void)
+inline uint32_t RandomGen::prngval()
 {
-    int ret;
-#if (HAVE_RANDOM_R)
-    ret = random_r(&random_buf, &random_result);
+#ifdef NORANDOM
+    return INT_MAX / 2;
 #else
-    random_result = random();
-    ret = 0;
+
+#if (HAVE_RANDOM_R)
+    int32_t random_result;
+    random_r(&random_buf, &random_result);
+    // can not fail, since &random_buf can not be NULL
+    // random_result holds number 0...INT_MAX
+    return random_result;
+#else
+    return uint32_t(random());
 #endif /*HAVE_RANDOM_R*/
 
-    if (!ret)
-    {
-        random_0_1 = (float)random_result / (float)INT_MAX;
-        random_0_1 = (random_0_1 > 1.0f) ? 1.0f : random_0_1;
-        random_0_1 = (random_0_1 < 0.0f) ? 0.0f : random_0_1;
-#ifndef NORANDOM
-        return random_0_1;
-#endif
-    }
-    return 0.5f;
+#endif /*NORANDOM*/
 }
 
 
-inline unsigned int RandomGen::randomINT(void)
+inline float RandomGen::numRandom()
 {
-#if (HAVE_RANDOM_R)
-    if (!random_r(&random_buf, &random_result))
 #ifndef NORANDOM
-        return random_result + INT_MAX / 2;
-#endif
-    return INT_MAX / 2;
-//  return INT_MAX;          ///NOTE(Ichthyo)   : OscilGen.h used to return INT_MAX as a fallback
-                             ///WARNING(Ichthyo): the syntax generated when #defined NORANDOM is broken. If random_r returns zero, the function leaves without return value!!!!
+    float random_0_1 = float(prngval()) / (float)INT_MAX;
+    random_0_1 = (random_0_1 > 1.0f) ? 1.0f : random_0_1;
+    random_0_1 = (random_0_1 < 0.0f) ? 0.0f : random_0_1;
+    return random_0_1;
 #else
+    return 0.5f;
+#endif
+}
 
-#ifndef NORANDOM
-    random_result = random();
-#else
-    random_result = 0;
-#endif
-    return (unsigned int)random_result + INT_MAX / 2;
-#endif /*HAVE_RANDOM_R*/
+
+// random number in the range 0...INT_MAX
+inline uint32_t RandomGen::randomINT()
+{
+    return prngval();
 }
 
 #endif /*RANDOMGEN_H*/

@@ -68,7 +68,7 @@ class OscilGen : public Presets, private WaveShapeSamples
 
         // Make a new random seed for Amplitude Randomness -
         //   should be called every noteon event
-        inline void newrandseed(void) { randseed = prng.randomINT(); }
+        void newrandseed() { randseed = prng.randomINT() + INT_MAX/2; }
 
         // Parameters
 
@@ -205,7 +205,7 @@ class OscilGen : public Presets, private WaveShapeSamples
 
         Resonance *res;
 
-        unsigned int randseed;
+        uint32_t randseed;
 
         RandomGen prng;
         RandomGen harmonicPrng;
