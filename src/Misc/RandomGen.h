@@ -108,58 +108,6 @@ class StdlibPRNG
 // It was reworked for the GNU C Library by Roland McGrath.
 // Rewritten to be reentrant by Ulrich Drepper, 1995
 
-namespace { ////////TODO: these values are copied literally from Glibc. They can be simplified and inlined
-
-    /* Linear congruential.  */
-    #define TYPE_0      0
-    #define BREAK_0     8
-    #define DEG_0       0
-    #define SEP_0       0
-
-    /* x**7 + x**3 + 1.  */
-    #define TYPE_1      1
-    #define BREAK_1     32
-    #define DEG_1       7
-    #define SEP_1       3
-
-    /* x**15 + x + 1.  */
-    #define TYPE_2      2
-    #define BREAK_2     64
-    #define DEG_2       15
-    #define SEP_2       1
-
-    /* x**31 + x**3 + 1.  */
-    #define TYPE_3      3
-    #define BREAK_3     128
-    #define DEG_3       31
-    #define SEP_3       3
-
-    /* x**63 + x + 1.  */
-    #define TYPE_4      4
-    #define BREAK_4     256
-    #define DEG_4       63
-    #define SEP_4       1
-
-
-    /* Array versions of the above information to make code run faster.
-       Relies on fact that TYPE_i == i.  */
-
-    #define MAX_TYPES   5   /* Max number of types above.  */
-
-    struct random_poly_info
-    {
-      int seps[MAX_TYPES];
-      int degrees[MAX_TYPES];
-    };
-
-    static const struct random_poly_info random_poly_info =
-    {
-      { SEP_0, SEP_1, SEP_2, SEP_3, SEP_4 },
-      { DEG_0, DEG_1, DEG_2, DEG_3, DEG_4 }
-    };
-
-}//(End)implementation namespace
-
 class TrinomialPRNG
 {
         struct random_data
@@ -173,38 +121,29 @@ class TrinomialPRNG
             int32_t *end_ptr;   /* Pointer behind state table.  */
           };
 
-        char random_state[256];
-        struct random_data random_buf;
+        char state[256];
+        struct random_data buf;
 
     private: ///////TODO code copied literally from Glibc; to be simplified and inlined
 
-int
-inl_srandom_r (unsigned int seed, struct random_data *buf)
+void
+inl_srandom_r (unsigned int seed)
 {
-  int type;
   int32_t *state;
   long int i;
   int32_t word;
   int32_t *dst;
   int kc;
 
-  if (buf == NULL)
-    goto fail1;
-  type = buf->rand_type;
-  if ((unsigned int) type >= MAX_TYPES)
-    goto fail1;
-
-  state = buf->state;
+  state = buf.state;
   /* We must make sure the seed is not 0.  Take arbitrarily 1 in this case.  */
   if (seed == 0)
     seed = 1;
   state[0] = seed;
-  if (type == TYPE_0)
-    goto done;
 
   dst = state;
   word = seed;
-  kc = buf->rand_deg;
+  kc = buf.rand_deg;
   for (i = 1; i < kc; ++i)
     {
       /* This does:
@@ -218,114 +157,85 @@ inl_srandom_r (unsigned int seed, struct random_data *buf)
       *++dst = word;
     }
 
-  buf->fptr = &state[buf->rand_sep];
-  buf->rptr = &state[0];
+  buf.fptr = &state[buf.rand_sep];
+  buf.rptr = &state[0];
   kc *= 10;
   while (--kc >= 0)
-    {
-      int32_t discard;
-      (void) inl_random_r (buf, &discard);
-    }
-
- done:
-  return 0;
-
- fail1:
-  return -1;
+    inl_random_r();
 }
 
-int
+void
 inl_initstate_r (unsigned int seed)
 {
     //////////////////////////////////WIP : inlined arguments
-    char *arg_state = random_state;
-    size_t n = 256;
-    struct random_data *buf = &random_buf;
+    char *arg_state = state;
     //////////////////////////////////WIP : inlined arguments
 
-  buf->rand_type = TYPE_4;
-  buf->rand_sep = SEP_4;
-  buf->rand_deg = DEG_4;
-  int32_t *state = &((int32_t *) arg_state)[1]; /* First location.  */
+  buf.rand_type = 4;
+  buf.rand_sep = 1;
+  buf.rand_deg = 63; /* random generation uses this trinomial: x**63 + x + 1.  */
+
+  int32_t *stateA = &((int32_t *) arg_state)[1]; /* First location.  */
   /* Must set END_PTR before srandom.  */
-  buf->end_ptr = &state[DEG_4];
+  buf.end_ptr = &stateA[63];
 
-  buf->state = state;
+  buf.state = stateA;
 
-  inl_srandom_r (seed, buf);
-
-  return 0;
-
+  inl_srandom_r (seed);
 }
 
-int
-inl_random_r (struct random_data *buf, int32_t *result)
+int32_t
+inl_random_r ()
 {
+  int32_t result;
   int32_t *state;
 
-  if (buf == NULL || result == NULL)
-    goto fail3;
+  state = buf.state;
 
-  state = buf->state;
+  int32_t *fptr = buf.fptr;
+  int32_t *rptr = buf.rptr;
+  int32_t *end_ptr = buf.end_ptr;
+  uint32_t val;
 
-  if (buf->rand_type == TYPE_0)
-    {
-      int32_t val = ((state[0] * 1103515245U) + 12345U) & 0x7fffffff;
-      state[0] = val;
-      *result = val;
-    }
-  else
-    {
-      int32_t *fptr = buf->fptr;
-      int32_t *rptr = buf->rptr;
-      int32_t *end_ptr = buf->end_ptr;
-      uint32_t val;
-
-      val = *fptr += (uint32_t) *rptr;
-      /* Chucking least random bit.  */
-      *result = val >> 1;
-      ++fptr;
-      if (fptr >= end_ptr)
+  val = *fptr += (uint32_t) *rptr;
+  /* Chucking least random bit.  */
+  result = val >> 1;
+  ++fptr;
+  if (fptr >= end_ptr)
     {
       fptr = state;
       ++rptr;
     }
-      else
+  else
     {
       ++rptr;
       if (rptr >= end_ptr)
         rptr = state;
     }
-      buf->fptr = fptr;
-      buf->rptr = rptr;
-    }
-  return 0;
+  buf.fptr = fptr;
+  buf.rptr = rptr;
 
- fail3:
-//__set_errno (EINVAL);
-  return -1;
+  return result;
 }
 
     public:
         TrinomialPRNG()
         {
-            memset(&random_state, 0, sizeof(random_state));
+            memset(&state, 0, sizeof(state));
         }
 
         bool init(uint32_t seed)
         {
-            memset(random_state, 0, sizeof(random_state));
-            memset(&random_buf, 0, sizeof(random_buf));
-            return 0 == inl_initstate_r(seed);
+            memset(state, 0, sizeof(state));
+            memset(&buf, 0, sizeof(buf));
+            inl_initstate_r(seed);
+            return true;
         }
 
         uint32_t prngval()
         {
-            int32_t random_result;
-            inl_random_r(&random_buf, &random_result);
-            // can not fail, since &random_buf can not be NULL
             // random_result holds number 0...INT_MAX
-            return random_result;
+            return uint32_t(inl_random_r());
         }
 
         float numRandom()
@@ -342,34 +252,6 @@ inl_random_r (struct random_data *buf, int32_t *result)
             return prngval();
         }
 };
-////////////////////////TODO: can be inlined and resolved
-#undef TYPE_0
-#undef BREAK_0
-#undef DEG_0
-#undef SEP_0
-
-#undef TYPE_1
-#undef BREAK_1
-#undef DEG_1
-#undef SEP_1
-
-#undef TYPE_2
-#undef BREAK_2
-#undef DEG_2
-#undef SEP_2
-
-#undef TYPE_3
-#undef BREAK_3
-#undef DEG_3
-#undef SEP_3
-
-#undef TYPE_4
-#undef BREAK_4
-#undef DEG_4
-#undef SEP_4
-
-#undef MAX_TYPES
-////////////////////////TODO: can be inlined and resolved
 
 
 
