@@ -133,6 +133,52 @@ class LegacyPRNG
 
 
 
+// Pseudo Random Number generator based on jsf32
+// by Bob Jenkins "A small noncryptographic PRNG", October 2007
+// http://burtleburtle.net/bob/rand/smallprng.html
+// Runs fast and generates 32bit random numbers of high quality; although there is no guaranteed
+// minimum cycle length, practical tests yielded 2^47 numbers (128 TiB) until repetition.
+class JenkinsPRNG
+{
+        // 128 bit state
+        uint32_t a, b, c, d;
+
+    public:
+        JenkinsPRNG() : a(0),b(0),c(0),d(0) { }
+
+        bool init(uint32_t seed)
+        {
+            a = 0xf1ea5eed;
+            b = c = d = seed;
+            for (int i = 0; i < 20; ++i)
+                (void)prngval();
+            return true;
+        }
+
+        uint32_t prngval()
+        {
+            uint32_t e = a - ((b << 27) | (b >> 5));
+            a = b ^ ((c << 17) | (c >> 15));
+            b = c + d;
+            c = d + e;
+            d = e + a;
+            return d;
+        }
+
+        float numRandom()
+        {
+            return float(prngval() >> 1) / float(INT_MAX);
+        }
+
+        // random number in the range 0...INT_MAX
+        uint32_t randomINT()
+        {
+            return prngval() >> 1;
+        }
+};
+
+
+
 
 
 /* ===== Configure the actual PRNG to use ===== */
@@ -142,11 +188,13 @@ class LegacyPRNG
     typedef NorandomPRNG  RandomGen;
 #else
 
-#if (HAVE_RANDOM_R)
-    typedef StdlibPRNG  RandomGen;
-#else
-    typedef LegacyPRNG  RandomGen;
-#endif /*HAVE_RANDOM_R*/
+//#if (HAVE_RANDOM_R)
+//    typedef StdlibPRNG  RandomGen;
+//#else
+//    typedef LegacyPRNG  RandomGen;
+//#endif /*HAVE_RANDOM_R*/
+
+      typedef JenkinsPRNG RandomGen;
 
 #endif /*NORANDOM*/
 
