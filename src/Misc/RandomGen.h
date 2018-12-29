@@ -35,67 +35,55 @@ using std::uint32_t;
 using std::memset;
 
 
-class RandomGen
+// stub implementation for test code : always returns fixed values
+class NorandomPRNG
+{
+    public:
+        bool init(uint32_t) { return true; }
+        uint32_t prngval()  { return INT_MAX / 2; }
+        float numRandom()   { return 0.5f; }
+        uint32_t randomINT(){ return INT_MAX / 2; }  // 0 < randomINT() < INT_MAX
+};
+
+
+// Standard implementation for Yoshimi until 1.5.10
+// Relies on the random_r() family of functions from the C standard library, which generates 31 bit random numbers.
+// Using 256 bytes of random state, which (according to the formula given in the comment in random_r.c of Glibc)
+// gives a period length of at least deg*(2^deg - 1); with deg=63 this is > 5.8e20
+class StdlibPRNG
 {
         char random_state[256];
-
-#if (HAVE_RANDOM_R)
         struct random_data random_buf;
-#endif /*HAVE_RANDOM_R*/
-
 
     public:
-        RandomGen()
+        StdlibPRNG()
         {
             memset(&random_state, 0, sizeof(random_state));
         }
 
-
         bool init(uint32_t seed)
         {
             memset(random_state, 0, sizeof(random_state));
-#if (HAVE_RANDOM_R)
             memset(&random_buf, 0, sizeof(random_buf));
-
             return 0 == initstate_r(seed, random_state, sizeof(random_state), &random_buf);
-#else
-            return NULL != initstate(seed, random_state, sizeof(random_state));
-#endif /*HAVE_RANDOM_R*/
         }
-
 
         uint32_t prngval()
         {
-#ifdef NORANDOM
-            return INT_MAX / 2;
-#else
-
-#if (HAVE_RANDOM_R)
             int32_t random_result;
             random_r(&random_buf, &random_result);
             // can not fail, since &random_buf can not be NULL
             // random_result holds number 0...INT_MAX
             return random_result;
-#else
-            return uint32_t(random());
-#endif /*HAVE_RANDOM_R*/
-
-#endif /*NORANDOM*/
         }
-
 
         float numRandom()
         {
-#ifndef NORANDOM
             float random_0_1 = float(prngval()) / (float)INT_MAX;
             random_0_1 = (random_0_1 > 1.0f) ? 1.0f : random_0_1;
             random_0_1 = (random_0_1 < 0.0f) ? 0.0f : random_0_1;
             return random_0_1;
-#else
-            return 0.5f;
-#endif
         }
-
 
         // random number in the range 0...INT_MAX
         uint32_t randomINT()
@@ -103,5 +91,65 @@ class RandomGen
             return prngval();
         }
 };
+
+
+// Fallback implementation for systems without a random_r() implementation
+// uses the legacy random() / srandom() functions
+class LegacyPRNG
+{
+        char random_state[256];
+
+    public:
+        LegacyPRNG()
+        {
+            memset(&random_state, 0, sizeof(random_state));
+        }
+
+        bool init(uint32_t seed)
+        {
+            memset(random_state, 0, sizeof(random_state));
+            return NULL != initstate(seed, random_state, sizeof(random_state));
+        }
+
+        uint32_t prngval()
+        {
+            return uint32_t(random());
+        }
+
+        float numRandom()
+        {
+            float random_0_1 = float(prngval()) / (float)INT_MAX;
+            random_0_1 = (random_0_1 > 1.0f) ? 1.0f : random_0_1;
+            random_0_1 = (random_0_1 < 0.0f) ? 0.0f : random_0_1;
+            return random_0_1;
+        }
+
+        // random number in the range 0...INT_MAX
+        uint32_t randomINT()
+        {
+            return prngval();
+        }
+};
+
+
+
+
+
+/* ===== Configure the actual PRNG to use ===== */
+
+
+#ifdef NORANDOM
+    typedef NorandomPRNG  RandomGen;
+#else
+
+#if (HAVE_RANDOM_R)
+    typedef StdlibPRNG  RandomGen;
+#else
+    typedef LegacyPRNG  RandomGen;
+#endif /*HAVE_RANDOM_R*/
+
+#endif /*NORANDOM*/
+
+
 
 #endif /*RANDOMGEN_H*/
