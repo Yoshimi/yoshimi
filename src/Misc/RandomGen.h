@@ -116,14 +116,10 @@ class TrinomialPRNG
         int32_t *rptr;      /* Rear pointer.  */
 
     public:
-        TrinomialPRNG() : fptr(NULL), rptr(NULL)
-        {
-            memset(&state, 0, sizeof(state));
-        }
+        TrinomialPRNG() : fptr(NULL), rptr(NULL) { }
 
         bool init(uint32_t seed)
         {
-            memset(state, 0, sizeof(state));
             fptr = NULL;
             rptr = NULL;
 
