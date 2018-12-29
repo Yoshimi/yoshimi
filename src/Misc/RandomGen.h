@@ -235,57 +235,27 @@ inl_srandom_r (unsigned int seed, struct random_data *buf)
 }
 
 int
-inl_initstate_r (unsigned int seed, char *arg_state, size_t n, struct random_data *buf)
+inl_initstate_r (unsigned int seed)
 {
-  if (buf == NULL)
-    return -1;
+    //////////////////////////////////WIP : inlined arguments
+    char *arg_state = random_state;
+    size_t n = 256;
+    struct random_data *buf = &random_buf;
+    //////////////////////////////////WIP : inlined arguments
 
-  int32_t *old_state = buf->state;
-  if (old_state != NULL)
-    {
-      int old_type = buf->rand_type;
-      if (old_type == TYPE_0)
-    old_state[-1] = TYPE_0;
-      else
-    old_state[-1] = (MAX_TYPES * (buf->rptr - old_state)) + old_type;
-    }
-
-  int type;
-  if (n >= BREAK_3)
-    type = n < BREAK_4 ? TYPE_3 : TYPE_4;
-  else if (n < BREAK_1)
-    {
-      if (n < BREAK_0)
-        return -1;
-
-      type = TYPE_0;
-    }
-  else
-    type = n < BREAK_2 ? TYPE_1 : TYPE_2;
-
-  int degree = random_poly_info.degrees[type];
-  int separation = random_poly_info.seps[type];
-
-  buf->rand_type = type;
-  buf->rand_sep = separation;
-  buf->rand_deg = degree;
+  buf->rand_type = TYPE_4;
+  buf->rand_sep = SEP_4;
+  buf->rand_deg = DEG_4;
   int32_t *state = &((int32_t *) arg_state)[1]; /* First location.  */
   /* Must set END_PTR before srandom.  */
-  buf->end_ptr = &state[degree];
+  buf->end_ptr = &state[DEG_4];
 
   buf->state = state;
 
   inl_srandom_r (seed, buf);
 
-  state[-1] = TYPE_0;
-  if (type != TYPE_0)
-    state[-1] = (buf->rptr - state) * MAX_TYPES + type;
-
   return 0;
 
-// fail2:
-//  __set_errno (EINVAL);
-//  return -1;
 }
 
 int
@@ -346,7 +316,7 @@ inl_random_r (struct random_data *buf, int32_t *result)
         {
             memset(random_state, 0, sizeof(random_state));
             memset(&random_buf, 0, sizeof(random_buf));
-            return 0 == inl_initstate_r(seed, random_state, sizeof(random_state), &random_buf);
+            return 0 == inl_initstate_r(seed);
         }
 
         uint32_t prngval()
