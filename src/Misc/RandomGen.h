@@ -110,26 +110,24 @@ class StdlibPRNG
 
 class TrinomialPRNG
 {
-        int32_t state[63];
-        int32_t *fptr;      /* Front pointer.  */
-        int32_t *rptr;      /* Rear pointer.  */
+        uint32_t state[63];
+        uint32_t *fptr;      /* Front pointer.  */
+        uint32_t *rptr;      /* Rear pointer.  */
 
     public:
         TrinomialPRNG() : fptr(NULL), rptr(NULL) { }
 
         bool init(uint32_t seed)
         {
-            fptr = NULL;
-            rptr = NULL;
+            int kc = 63; /* random generation uses this trinomial: x**63 + x + 1.  */
 
             /* We must make sure the seed is not 0.  Take arbitrarily 1 in this case.  */
             if (seed == 0)
               seed = 1;
             state[0] = seed;
 
-            int32_t *dst = state;
-            int32_t word = seed;
-            int kc = 63; /* random generation uses this trinomial: x**63 + x + 1.  */
+            uint32_t *dst = state;
+            int32_t word = seed;  // must be signed, see below
             for (int i = 1; i < kc; ++i)
             {
                 /* This does:
@@ -159,10 +157,10 @@ class TrinomialPRNG
 
         uint32_t prngval()
         {
-            uint32_t val = *fptr += (uint32_t) *rptr;
-            int32_t result = val >> 1;  // Chucking least random bit.
-
-            int32_t *end = &state[63];
+            uint32_t val = *fptr += *rptr;
+            uint32_t result = val >> 1;  // Chucking least random bit.
+                                         // Rationale: it has a less-then optimal repetition cycle.
+            uint32_t *end = &state[63];
             ++fptr;
             if (fptr >= end)
               {
@@ -176,7 +174,7 @@ class TrinomialPRNG
                   rptr = state;
               }
             // random_result holds number 0...INT_MAX
-            return uint32_t(result);
+            return result;
         }
 
 
