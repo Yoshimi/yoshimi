@@ -26,12 +26,10 @@
 #ifndef RANDOMGEN_H
 #define RANDOMGEN_H
 
-#include <cstdint>
+#include <stdint.h>
 #include <cstdlib>
 #include <cstring>
 
-using std::int32_t;
-using std::uint32_t;
 using std::memset;
 
 
@@ -40,9 +38,9 @@ class NorandomPRNG
 {
     public:
         bool init(uint32_t) { return true; }
-        uint32_t prngval()  { return INT_MAX / 2; }
+        uint32_t prngval()  { return INT32_MAX / 2; }
         float numRandom()   { return 0.5f; }
-        uint32_t randomINT(){ return INT_MAX / 2; }  // 0 < randomINT() < INT_MAX
+        uint32_t randomINT(){ return INT32_MAX / 2; }  // 0 < randomINT() < INT_MAX
 };
 
 
@@ -79,10 +77,7 @@ class StdlibPRNG
 
         float numRandom()
         {
-            float random_0_1 = float(prngval()) / (float)INT_MAX;
-            random_0_1 = (random_0_1 > 1.0f) ? 1.0f : random_0_1;
-            random_0_1 = (random_0_1 < 0.0f) ? 0.0f : random_0_1;
-            return random_0_1;
+            return prngval() / float(INT32_MAX);
         }
 
         // random number in the range 0...INT_MAX
@@ -180,10 +175,7 @@ class TrinomialPRNG
 
         float numRandom()
         {
-            float random_0_1 = float(prngval()) / (float)INT_MAX;
-            random_0_1 = (random_0_1 > 1.0f) ? 1.0f : random_0_1;
-            random_0_1 = (random_0_1 < 0.0f) ? 0.0f : random_0_1;
-            return random_0_1;
+            return prngval() / float(INT32_MAX);
         }
 
         // random number in the range 0...INT_MAX
@@ -220,7 +212,7 @@ class LegacyPRNG
 
         float numRandom()
         {
-            float random_0_1 = float(prngval()) / (float)INT_MAX;
+            float random_0_1 = prngval() / float(INT32_MAX);
             random_0_1 = (random_0_1 > 1.0f) ? 1.0f : random_0_1;
             random_0_1 = (random_0_1 < 0.0f) ? 0.0f : random_0_1;
             return random_0_1;
@@ -269,7 +261,7 @@ class JenkinsPRNG
 
         float numRandom()
         {
-            return float(prngval() >> 1) / float(INT_MAX);
+            return float(prngval() >> 1) / float(INT32_MAX);
         }
 
         // random number in the range 0...INT_MAX
