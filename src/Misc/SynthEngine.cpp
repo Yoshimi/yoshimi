@@ -225,8 +225,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         goto bail_out;
     }*/
 
-    if (!prng.init(samplerate + buffersize + oscilsize))
-        Runtime.Log("SynthEngine Init failed on general randomness");
+    prng.init(samplerate + buffersize + oscilsize);
 
     if (oscilsize < (buffersize / 2))
     {

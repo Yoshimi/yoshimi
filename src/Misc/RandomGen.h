@@ -37,11 +37,12 @@ using std::memset;
 class NorandomPRNG
 {
     public:
-        bool init(uint32_t) { return true; }
+        void init(uint32_t) { }
         uint32_t prngval()  { return INT32_MAX / 2; }
         float numRandom()   { return 0.5f; }
         uint32_t randomINT(){ return INT32_MAX / 2; }  // 0 < randomINT() < INT_MAX
 };
+
 
 
 // Standard implementation for Yoshimi until 1.5.10
@@ -59,11 +60,11 @@ class StdlibPRNG
             memset(&random_state, 0, sizeof(random_state));
         }
 
-        bool init(uint32_t seed)
+        void init(uint32_t seed)
         {
             memset(random_state, 0, sizeof(random_state));
             memset(&random_buf, 0, sizeof(random_buf));
-            return 0 == initstate_r(seed, random_state, sizeof(random_state), &random_buf);
+            initstate_r(seed, random_state, sizeof(random_state), &random_buf);
         }
 
         uint32_t prngval()
@@ -112,7 +113,7 @@ class TrinomialPRNG
     public:
         TrinomialPRNG() : fptr(NULL), rptr(NULL) { }
 
-        bool init(uint32_t seed)
+        void init(uint32_t seed)
         {
             int kc = 63; /* random generation uses this trinomial: x**63 + x + 1.  */
 
@@ -146,7 +147,6 @@ class TrinomialPRNG
             kc *= 10;
             while (--kc >= 0)
                 prngval();
-            return true;
         }
 
 
@@ -199,10 +199,10 @@ class LegacyPRNG
             memset(&random_state, 0, sizeof(random_state));
         }
 
-        bool init(uint32_t seed)
+        void init(uint32_t seed)
         {
             memset(random_state, 0, sizeof(random_state));
-            return NULL != initstate(seed, random_state, sizeof(random_state));
+            initstate(seed, random_state, sizeof(random_state));
         }
 
         uint32_t prngval()
@@ -232,6 +232,7 @@ class LegacyPRNG
 // http://burtleburtle.net/bob/rand/smallprng.html
 // Runs fast and generates 32bit random numbers of high quality; although there is no guaranteed
 // minimum cycle length, practical tests yielded 2^47 numbers (128 TiB) until repetition.
+// We literally use the original Implementation, released by Jenkins 10/2007 into public domain.
 class JenkinsPRNG
 {
         // 128 bit state
@@ -240,19 +241,18 @@ class JenkinsPRNG
     public:
         JenkinsPRNG() : a(0),b(0),c(0),d(0) { }
 
-        bool init(uint32_t seed)
+        void init(uint32_t seed)
         {
             a = 0xf1ea5eed;
             b = c = d = seed;
             for (int i = 0; i < 20; ++i)
-                (void)prngval();
-            return true;
+                prngval();
         }
 
         uint32_t prngval()
         {
-            uint32_t e = a - ((b << 27) | (b >> 5));
-            a = b ^ ((c << 17) | (c >> 15));
+            uint32_t e = a - rot(b, 27);
+            a = b ^ rot(c, 17);
             b = c + d;
             c = d + e;
             d = e + a;
@@ -269,6 +269,9 @@ class JenkinsPRNG
         {
             return prngval() >> 1;
         }
+
+    private:
+        uint32_t rot(uint32_t x, uint k) { return (x << k)|(x >> (32-k)); }
 };
 
 

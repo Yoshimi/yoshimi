@@ -965,8 +965,7 @@ void OscilGen::shiftharmonics(void)
 void OscilGen::prepare(void)
 {
     float a, b, c, d, hmagnew;
-    if (!prng.init(synth->randomINT() + INT_MAX/2))
-        synth->getRuntime().Log("OscilGen failed to init general randomness");
+    prng.init(synth->randomINT() + INT_MAX/2);
 
     if (oldbasepar != Pbasefuncpar
         || oldbasefunc != Pcurrentbasefunc
@@ -1306,8 +1305,7 @@ int OscilGen::get(float *smps, float freqHz, int resonance)
     // Harmonic Amplitude Randomness
     if (freqHz > 0.1 && !ADvsPAD)
     {
-        if (!harmonicPrng.init(randseed))
-            synth->getRuntime().Log("OscilGen failed to init harmonic amplitude amplitude randomness");
+        harmonicPrng.init(randseed);
 
         float power = Pamprandpower / 127.0f;
         float normalize = 1.0f / (1.2f - power);
