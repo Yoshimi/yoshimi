@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified March 2018
+    Modified December 2018
 */
 
 #ifndef OSCIL_GEN_H
@@ -120,9 +120,6 @@ class OscilGen : public Presets, private WaveShapeSamples
 
         bool ADvsPAD; // if it is used by ADsynth or by PADsynth
 
-        float numRandom(void);
-        unsigned int randomOG(void);
-
     private:
         float *tmpsmps;
         FFTFREQS outoscilFFTfreqs;
@@ -171,8 +168,6 @@ class OscilGen : public Presets, private WaveShapeSamples
         float basefunc_sqr(float x, float a);
         float basefunc_spike(float x, float a);
         float basefunc_circle(float x, float a);
-
-        float harmonicRandom(void);
 
         // Internal Data
         unsigned char oldbasefunc,

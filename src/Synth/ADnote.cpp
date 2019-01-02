@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of original ZynAddSubFX code.
-    Modified October 2018
+    Modified December 2018
 */
 
 #include <cmath>
@@ -107,12 +107,12 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
     else
         NoteGlobalPar.Punch.Enabled = 0;
 
+
     for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
     {
         for (int i = 0; i < 14; i++)
             pinking[nvoice][i] = 0.0;
 
-        adpars->VoicePar[nvoice].OscilSmp->newrandseed(); // so it really will be random
         NoteVoicePar[nvoice].OscilSmp = NULL;
         NoteVoicePar[nvoice].FMSmp = NULL;
         NoteVoicePar[nvoice].VoiceOut = NULL;
@@ -125,6 +125,10 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
             NoteVoicePar[nvoice].Enabled = false;
             continue; // the voice is disabled
         }
+
+        // Draw new seed for randomisation of harmonics
+        // Since NoteON happens at random times, this actually injects entropy
+        adpars->VoicePar[nvoice].OscilSmp->newrandseed();
 
         int BendAdj = adpars->VoicePar[nvoice].PBendAdjust - 64;
         if (BendAdj % 24 == 0)
@@ -144,7 +148,7 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
 
         bool is_pwm = adpars->VoicePar[nvoice].PFMEnabled == PW_MOD;
 
-	if (adpars->VoicePar[nvoice].Type != 0)
+        if (adpars->VoicePar[nvoice].Type != 0)
         {
             // Since noise unison of greater than two is touch goofy...
             if (unison > 2)

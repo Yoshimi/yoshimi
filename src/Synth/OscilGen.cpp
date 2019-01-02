@@ -964,7 +964,9 @@ void OscilGen::shiftharmonics(void)
 // Prepare the Oscillator
 void OscilGen::prepare(void)
 {
-    float a, b, c, d, hmagnew;
+    // with each NoteON, reseed local rand gen from global PRNG
+    // Since NoteON happens at random times, this actually injects entropy,
+    // because it is essentially random at which cycle position the global PRNG is just now
     prng.init(synth->randomINT() + INT_MAX/2);
 
     if (oldbasepar != Pbasefuncpar
@@ -980,7 +982,7 @@ void OscilGen::prepare(void)
 
     for (int i = 0; i < MAX_AD_HARMONICS; ++i)
     {
-        hmagnew = 1.0f - fabsf(Phmag[i] / 64.0f - 1.0f);
+        float hmagnew = 1.0f - fabsf(Phmag[i] / 64.0f - 1.0f);
         switch (Phmagtype)
         {
             case 1:
@@ -1034,10 +1036,10 @@ void OscilGen::prepare(void)
                 int k = i * (j + 1);
                 if (k >= synth->halfoscilsize)
                     break;
-                a = basefuncFFTfreqs.c[i];
-                b = basefuncFFTfreqs.s[i];
-                c = hmag[j] * cosf(hphase[j] * k);
-                d = hmag[j] * sinf(hphase[j] * k);
+                float a = basefuncFFTfreqs.c[i];
+                float b = basefuncFFTfreqs.s[i];
+                float c = hmag[j] * cosf(hphase[j] * k);
+                float d = hmag[j] * sinf(hphase[j] * k);
                 oscilFFTfreqs.c[k] += a * c - b * d;
                 oscilFFTfreqs.s[k] += a * d + b * c;
             }
@@ -1305,6 +1307,8 @@ int OscilGen::get(float *smps, float freqHz, int resonance)
     // Harmonic Amplitude Randomness
     if (freqHz > 0.1 && !ADvsPAD)
     {
+        // randseed was drawn in ADnote::ADnote()
+        // see also comment at top of OscilGen::prepare()
         harmonicPrng.init(randseed);
 
         float power = Pamprandpower / 127.0f;

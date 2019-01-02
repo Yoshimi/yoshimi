@@ -200,7 +200,15 @@ void *InterChange::sortResultsThread(void)
 {
     while(synth->getRuntime().runSynth)
     {
-        /*if (!(tick & 8191))
+        /*
+         * To maitain portability we synthesise a very simple low accuracy
+         * timer based on the loop time of this function. As it makes no system
+         * calls apart from usleep() it is lightweight and should have no thread
+         * safety issues. It is used mostly for timeouts.
+         */
+        ++ tick;
+        /*
+        if (!(tick & 8191))
         {
             if (tick & 16383)
                 cout << "Tick" << endl;
@@ -208,7 +216,6 @@ void *InterChange::sortResultsThread(void)
                 cout << "Tock" << endl;
         }*/
 
-        ++ tick;
         // a false positive here is not actually a problem.
         unsigned char testRead = blockRead;//__sync_or_and_fetch(&blockRead, 0);
         if (lockTime == 0 && testRead != 0)

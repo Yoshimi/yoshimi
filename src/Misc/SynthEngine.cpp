@@ -134,6 +134,9 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
         sysefx[nefx] = NULL;
     fadeAll = 0;
+
+    // seed the shared master random number generator
+    prng.init(time(NULL));
 }
 
 
@@ -225,7 +228,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         goto bail_out;
     }*/
 
-    prng.init(samplerate + buffersize + oscilsize);
 
     if (oscilsize < (buffersize / 2))
     {
