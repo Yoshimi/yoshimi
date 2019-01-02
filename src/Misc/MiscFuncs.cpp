@@ -314,7 +314,12 @@ string MiscFuncs::findfile(string path, string filename, string extension)
     fscanf(fp,"%[^\n]", line);
     pclose(fp);
 
-    if (findleafname(line) == filename)
+    string fullName(line);
+    unsigned int name_start = fullName.rfind("/") + 1;
+    // Extension might contain a dot, like e.g. '.pdf.gz'
+    unsigned int name_end = fullName.length() - extension.length();
+    fullName = fullName.substr(name_start, name_end - name_start);
+    if (fullName == filename)
         return line;
     return "";
 }
