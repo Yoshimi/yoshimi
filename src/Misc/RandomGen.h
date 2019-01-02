@@ -45,52 +45,8 @@ class NorandomPRNG
 
 
 
-// Standard implementation for Yoshimi until 1.5.10
-// Relies on the random_r() family of functions from the C standard library, which generates 31 bit random numbers.
-// Using 256 bytes of random state, which (according to the formula given in the comment in random_r.c of Glibc)
-// gives a period length of at least deg*(2^deg - 1); with deg=63 this is > 5.8e20
-class StdlibPRNG
-{
-        char random_state[256];
-        struct random_data random_buf;
-
-    public:
-        StdlibPRNG()
-        {
-            memset(&random_state, 0, sizeof(random_state));
-        }
-
-        void init(uint32_t seed)
-        {
-            memset(random_state, 0, sizeof(random_state));
-            memset(&random_buf, 0, sizeof(random_buf));
-            initstate_r(seed, random_state, sizeof(random_state), &random_buf);
-        }
-
-        uint32_t prngval()
-        {
-            int32_t random_result;
-            random_r(&random_buf, &random_result);
-            // can not fail, since &random_buf can not be NULL
-            // random_result holds number 0...INT_MAX
-            return random_result;
-        }
-
-        float numRandom()
-        {
-            return prngval() / float(INT32_MAX);
-        }
-
-        // random number in the range 0...INT_MAX
-        uint32_t randomINT()
-        {
-            return prngval();
-        }
-};
-
-
 // Inlined copy of the Glibc 2.28 implementation of random_r()
-// This code should be equivalent to prior Yoshimi versions linked against GNU Glibc.
+// This code behaves equivalent to Yoshimi versions (< 1.5.10) linked against GNU Glibc-2.24.
 // Generates 31bit random numbers based on a linear feedback shift register approach, employing trinomials.
 // Using 256 bytes of random state, which (according to the formula given in the comment in random_r.c of Glibc)
 // gives a period length of at least deg*(2^deg - 1); with deg=63 this is > 5.8e20
@@ -130,7 +86,7 @@ class TrinomialPRNG
                    state[i] = (16807 * state[i - 1]) % 2147483647;
                    but avoids overflowing 31 bits. */
                 // Ichthyo 12/2018 : the above comment is only true for seed <= INT_MAX
-                //                   for INT_MAX < seed <= UINT_MAX the calculation diverges from correct
+                //                   For INT_MAX < seed <= UINT_MAX the calculation diverges from correct
                 //                   modulus result, however, its values show a similar distribution pattern.
                 //                   Moreover the original code used long int for 'hi' and 'lo'.
                 //                   It behaves identical when using uint32_t, but not with int32_t
@@ -187,48 +143,8 @@ class TrinomialPRNG
 
 
 
-// Fallback implementation for systems without a random_r() implementation
-// uses the legacy random() / srandom() functions
-class LegacyPRNG
-{
-        char random_state[256];
-
-    public:
-        LegacyPRNG()
-        {
-            memset(&random_state, 0, sizeof(random_state));
-        }
-
-        void init(uint32_t seed)
-        {
-            memset(random_state, 0, sizeof(random_state));
-            initstate(seed, random_state, sizeof(random_state));
-        }
-
-        uint32_t prngval()
-        {
-            return uint32_t(random());
-        }
-
-        float numRandom()
-        {
-            float random_0_1 = prngval() / float(INT32_MAX);
-            random_0_1 = (random_0_1 > 1.0f) ? 1.0f : random_0_1;
-            random_0_1 = (random_0_1 < 0.0f) ? 0.0f : random_0_1;
-            return random_0_1;
-        }
-
-        // random number in the range 0...INT_MAX
-        uint32_t randomINT()
-        {
-            return prngval();
-        }
-};
-
-
-
-// Pseudo Random Number generator based on jsf32
-// by Bob Jenkins "A small noncryptographic PRNG", October 2007
+// Pseudo Random Number generator based on jsf32 by Bob Jenkins
+// "A small noncryptographic PRNG", October 2007
 // http://burtleburtle.net/bob/rand/smallprng.html
 // Runs fast and generates 32bit random numbers of high quality; although there is no guaranteed
 // minimum cycle length, practical tests yielded 2^47 numbers (128 TiB) until repetition.
@@ -285,18 +201,13 @@ class JenkinsPRNG
     typedef NorandomPRNG  RandomGen;
 #else
 
-//#if (HAVE_RANDOM_R)
-//    typedef StdlibPRNG  RandomGen;
-//#else
-//    typedef LegacyPRNG  RandomGen;
-//#endif /*HAVE_RANDOM_R*/
+//  typedef JenkinsPRNG RandomGen;
 
-//    typedef JenkinsPRNG RandomGen;
-
-      typedef TrinomialPRNG RandomGen;
+    typedef TrinomialPRNG RandomGen;
 
 #endif /*NORANDOM*/
 
 
 
 #endif /*RANDOMGEN_H*/
+
