@@ -36,6 +36,7 @@
 using namespace std;
 
 #include "Misc/MiscFuncs.h"
+#include "Misc/RandomGen.h"
 #include "Misc/SynthHelper.h"
 #include "Misc/Microtonal.h"
 #include "Misc/Bank.h"
@@ -256,8 +257,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         pthread_mutex_t  processMutex;
         pthread_mutex_t *processLock;
 
-        char random_state[256];
-
     public:
         MasterUI *guiMaster; // need to read this in InterChange::returns
     private:
@@ -267,15 +266,11 @@ class SynthEngine : private SynthHelper, MiscFuncs
         int LFOtime; // used by Pcontinous
         string windowTitle;
         //MusicClient *musicClient;
+
+        RandomGen prng;
     public:
-        uint32_t rnga;
-        uint32_t rngb;
-        uint32_t rngc;
-        uint32_t rngd;
-        uint32_t prngval();
-        void prnginit(uint32_t seed);
-        float numRandom(void);
-        uint32_t randomSE(void);
+        float numRandom()   { return prng.numRandom(); }
+        uint32_t randomINT(){ return prng.randomINT(); }   // random number in the range 0...INT_MAX
 };
 
 #endif

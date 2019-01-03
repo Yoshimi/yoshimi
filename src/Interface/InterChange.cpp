@@ -204,11 +204,11 @@ void *InterChange::sortResultsThread(void)
          * To maitain portability we synthesise a very simple low accuracy
          * timer based on the loop time of this function. As it makes no system
          * calls apart from usleep() it is lightweight and should have no thread
-         * safety issues.
-         * It is used mostly for timeouts, but also as a seed value for the prng.
+         * safety issues. It is used mostly for timeouts.
          */
         ++ tick;
-        /*if (!(tick & 8191))
+        /*
+        if (!(tick & 8191))
         {
             if (tick & 16383)
                 cout << "Tick" << endl;

@@ -25,15 +25,12 @@
     Modified December 2018
 */
 
-#include <iostream>
-
-using namespace std;
-
 #ifndef OSCIL_GEN_H
 #define OSCIL_GEN_H
 
 #include <limits.h>
 
+#include "Misc/RandomGen.h"
 #include "Misc/WaveShapeSamples.h"
 #include "Misc/XMLwrapper.h"
 #include "DSP/FFTwrapper.h"
@@ -68,6 +65,10 @@ class OscilGen : public Presets, private WaveShapeSamples
         void getfromXML(XMLwrapper *xml);
         float getLimits(CommandBlock *getData);
         void convert2sine();
+
+        // Make a new random seed for Amplitude Randomness -
+        //   should be called every noteon event
+        void newrandseed() { randseed = prng.randomINT() + INT_MAX/2; }
 
         // Parameters
 
@@ -199,62 +200,10 @@ class OscilGen : public Presets, private WaveShapeSamples
 
         Resonance *res;
 
-        char random_state[256];
+        uint32_t randseed;
 
-        //int rngcount;
-
-        /*
-         * The following prng is based on
-         * "A small noncryptographic PRNG"
-         *              by
-         *          Bob Jenkins
-         */
-
-        uint32_t rnga = 458324646; // preseeded values
-        uint32_t rngb = 222123427;
-        uint32_t rngc = 1154911559;
-        uint32_t rngd = 2051558345;
-
-        inline uint32_t prngval()
-        {
-            uint32_t e = rnga - ((rngb << 27) | (rngb >> 5));
-            rnga = rngb ^ ((rngc << 17) | (rngc >> 15));
-            rngb = rngc + rngd;
-            rngc = rngd + e;
-            rngd = e + rnga;
-            //++rngcount;
-            //cout << rngcount << endl;
-            return rngd;
-        }
-
-    public:
-        inline void prngreseed(uint32_t seed)
-        {
-            rnga = 0xf1ea5eed;
-            rngb = rngd + seed;
-            rngc = rngb;
-            rngd = rngc;
-            for (int i = 0; i < 20; ++i)
-                (void)prngval();
-            //rngcount = 0;
-        }
-
-        float numRandom(void)
-        {
-#ifndef NORANDOM
-            return prngval() * 2.328306435454494e-10;
-#else
-            return 0.5f;
-#endif
-        }
-
-        uint32_t randomOG(void){ // never used... so far
-#ifndef NORANDOM
-            return prngval() >> 1;
-#else
-            return 0x3fffffff;
-#endif
-        }
+        RandomGen prng;
+        RandomGen harmonicPrng;
 };
 
 #endif

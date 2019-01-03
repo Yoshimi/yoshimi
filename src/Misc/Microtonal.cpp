@@ -133,7 +133,7 @@ float Microtonal::getNoteFreq(int note, int keyshift)
         if (minus)
             rap_anote_middlenote = 1.0f / rap_anote_middlenote;
 
-        // Convert from note (midi) to degree (note from the tunning)
+        // Convert from note (midi) to degree (note from the tuning)
         int degoct = (note - Pmiddlenote + Pmapsize * 200)
                       / Pmapsize - 200;
         int degkey = (note - Pmiddlenote + Pmapsize * 100) % Pmapsize;
@@ -278,7 +278,7 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
 }
 
 
-// Convert the text to tunnings
+// Convert the text to tunings
 int Microtonal::texttotunings(const char *text)
 {
     int i;
@@ -382,7 +382,7 @@ string Microtonal::keymaptotext(void)
     return text;
 }
 
-// Convert tunning to text line
+// Convert tuning to text line
 void Microtonal::tuningtoline(int n, char *line, int maxn)
 {
     if (n > octavesize || n > MAX_OCTAVE_SIZE)
@@ -429,7 +429,7 @@ int Microtonal::loadline(FILE *file, char *line)
 }
 
 
-// Loads the tunnings from a scl file
+// Loads the tunings from a scl file
 int Microtonal::loadscl(string filename)
 {
     FILE *file = fopen(filename.c_str(), "r");
@@ -463,7 +463,7 @@ int Microtonal::loadscl(string filename)
     }
     if (err == 0)
     {
-    // load the tunnings
+    // load the tunings
         for (int nline = 0; nline < nnotes; ++nline)
         {
             err = loadline(file, &tmp[0]);
@@ -571,7 +571,7 @@ int Microtonal::loadkbm(string filename)
     }
 
     // the scale degree(which is the octave) is not loaded
-    // it is obtained by the tunnings with getoctavesize() method
+    // it is obtained by the tunings with getoctavesize() method
     if (loadline(file, &tmp[0]))
         err = -6;
 

@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified Novenber 2018
+    Modified November 2018
 */
 
 #include "Misc/SynthEngine.h"

@@ -81,7 +81,7 @@ void FilterParams::defaults(int n)
     int j = n;
     for (int i = 0; i < FF_MAX_FORMANTS; ++i)
     {
-        Pvowels[j].formants[i].freq = synth->randomSE() >> 24; // some random freqs
+        Pvowels[j].formants[i].freq = synth->randomINT() >> 24; // some random freqs
         Pvowels[j].formants[i].q = 64;
         Pvowels[j].formants[i].amp = 127;
     }

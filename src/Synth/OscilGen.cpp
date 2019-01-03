@@ -46,7 +46,8 @@ OscilGen::OscilGen(FFTwrapper *fft_, Resonance *res_, SynthEngine *_synth) :
     ADvsPAD(false),
     tmpsmps((float*)fftwf_malloc(_synth->oscilsize * sizeof(float))),
     fft(fft_),
-    res(res_)
+    res(res_),
+    randseed(1)
 {
     setpresettype("Poscilgen");
     FFTwrapper::newFFTFREQS(&outoscilFFTfreqs, synth->halfoscilsize);
@@ -144,7 +145,6 @@ void OscilGen::defaults(void)
     oscilprepared = 0;
     oldfilterpars = 0;
     oldsapars = 0;
-    prngreseed(synth->randomSE());
     prepare();
 }
 
@@ -964,7 +964,10 @@ void OscilGen::shiftharmonics(void)
 // Prepare the Oscillator
 void OscilGen::prepare(void)
 {
-    float a, b, c, d, hmagnew;
+    // with each NoteON, reseed local rand gen from global PRNG
+    // Since NoteON happens at random times, this actually injects entropy,
+    // because it is essentially random at which cycle position the global PRNG is just now
+    prng.init(synth->randomINT() + INT_MAX/2);
 
     if (oldbasepar != Pbasefuncpar
         || oldbasefunc != Pcurrentbasefunc
@@ -979,7 +982,7 @@ void OscilGen::prepare(void)
 
     for (int i = 0; i < MAX_AD_HARMONICS; ++i)
     {
-        hmagnew = 1.0f - fabsf(Phmag[i] / 64.0f - 1.0f);
+        float hmagnew = 1.0f - fabsf(Phmag[i] / 64.0f - 1.0f);
         switch (Phmagtype)
         {
             case 1:
@@ -1033,10 +1036,10 @@ void OscilGen::prepare(void)
                 int k = i * (j + 1);
                 if (k >= synth->halfoscilsize)
                     break;
-                a = basefuncFFTfreqs.c[i];
-                b = basefuncFFTfreqs.s[i];
-                c = hmag[j] * cosf(hphase[j] * k);
-                d = hmag[j] * sinf(hphase[j] * k);
+                float a = basefuncFFTfreqs.c[i];
+                float b = basefuncFFTfreqs.s[i];
+                float c = hmag[j] * cosf(hphase[j] * k);
+                float d = hmag[j] * sinf(hphase[j] * k);
                 oscilFFTfreqs.c[k] += a * c - b * d;
                 oscilFFTfreqs.s[k] += a * d + b * c;
             }
@@ -1247,7 +1250,8 @@ int OscilGen::get(float *smps, float freqHz, int resonance)
 
     if (oscilprepared != 1)
         prepare();
-      FR2Z2I((numRandom() * 2.0f - 1.0f) * synth->oscilsize_f * (Prand - 64.0f) / 64.0f, outpos);
+
+    FR2Z2I((prng.numRandom() * 2.0f - 1.0f) * synth->oscilsize_f * (Prand - 64.0f) / 64.0f, outpos);
 //    outpos = (int)truncf((numRandom() * 2.0f - 1.0f) * synth->oscilsize_f * (Prand - 64.0f) / 64.0f);
     outpos = (outpos + 2 * synth->oscilsize) % synth->oscilsize;
 
@@ -1290,7 +1294,7 @@ int OscilGen::get(float *smps, float freqHz, int resonance)
         rnd = PI * powf((Prand - 64.0f) / 64.0f, 2.0f);
         for (int i = 1; i < nyquist - 1; ++i)
         {   // to Nyquist only for AntiAliasing
-            angle = rnd * i * numRandom();
+            angle = rnd * i * prng.numRandom();
             a = outoscilFFTfreqs.c[i];
             b = outoscilFFTfreqs.s[i];
             c = cosf(angle);
@@ -1303,6 +1307,10 @@ int OscilGen::get(float *smps, float freqHz, int resonance)
     // Harmonic Amplitude Randomness
     if (freqHz > 0.1 && !ADvsPAD)
     {
+        // randseed was drawn in ADnote::ADnote()
+        // see also comment at top of OscilGen::prepare()
+        harmonicPrng.init(randseed);
+
         float power = Pamprandpower / 127.0f;
         float normalize = 1.0f / (1.2f - power);
         switch (Pamprandtype)
@@ -1312,7 +1320,7 @@ int OscilGen::get(float *smps, float freqHz, int resonance)
                 power = powf(15.0f, power);
                 for (int i = 1; i < nyquist - 1; ++i)
                 {
-                    float amp = powf(numRandom(), power) * normalize;
+                    float amp = powf(harmonicPrng.numRandom(), power) * normalize;
                     outoscilFFTfreqs.c[i] *= amp;
                     outoscilFFTfreqs.s[i] *= amp;
                 }
@@ -1321,7 +1329,7 @@ int OscilGen::get(float *smps, float freqHz, int resonance)
             case 2:
                 power = power * 2.0f - 0.5f;
                 power = powf(15.0f, power) * 2.0f;
-                float rndfreq = TWOPI * numRandom();
+                float rndfreq = TWOPI * harmonicPrng.numRandom();
                 for (int i = 1 ; i < nyquist - 1; ++i)
                 {
                     float amp = powf(fabsf(sinf(i * rndfreq)), power) * normalize;

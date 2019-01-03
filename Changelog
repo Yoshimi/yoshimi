@@ -1,8 +1,24 @@
 yoshimi 1.5.10 rc3
 
+2019-1-2 Hermann
+* Refactored the PRNG code into a class.
+* Extracted the source code of the random_r() function
+  from C standard lib, which Yoshimi relied on previously.
+* Simplified and adapted this code to our usage, verified
+  it produces exactly the same random numbers as Glibc 2.24
+* re-integrated all further float->int optimisations done
+  by Will while reworking the PRNGs.
+
 2018-12-22 Will
 * Frequency LFO regresion fix from Rob.
 * Set version as 1.5.10 rc3
+
+2018-12-21 Hermann
+* While RC testing, spotted subtle sonic changes
+  to some complex layered instruments.
+* Investigation indicates a different fluctuation patterning
+  of the Jenkins PRNG algo as reason, while, on average,
+  both the new and the old PRNG algos perform similar.
 
 2018-12-18 Will
 * Changed PRNGs to specifically use uint32_t
@@ -41,14 +57,6 @@ yoshimi 1.5.10 rc3
 * Prng behaviour now confirmed and reseeds removed.
   Quite unnecessary. Needs many hours of continuous
   playing to begin to get anywhere near pattern repeat.
-
-2018-11-29 Will
-* Some corrections and improvements to new prng.
-* Further refinements to prng.
-  In some cases we were converting to float then
-  converting back to integer!
-* Final tweaks to prng - I think!
-* Rationalised some float to int conversions.
 
 2018-11-28 Will
 * Inplemented a new prng with no external libraries
