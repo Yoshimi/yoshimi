@@ -22,7 +22,7 @@
 
     This file is a derivative of a ZynAddSubFX original
 
-    Modified November 2018
+    Modified December 2018
 */
 
 #include <cmath>

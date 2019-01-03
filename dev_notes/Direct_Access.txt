@@ -4,7 +4,7 @@ This is a test feature only accessible from the command line.
 
 There are limited error checks on this so it may still be possible to crash Yoshimi with out of range values. However, most values are now range checked and may be ignored or adjusted.
 
-It mostly updates the GUI.
+Almost all relevant commands update the GUI.
 
 Refer to "Yoshimi Control Numbers.ods" for control numbers and actions and "GUI_Interpretations.txt" for further explanations.
 

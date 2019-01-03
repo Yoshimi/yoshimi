@@ -1,4 +1,4 @@
-These files are loosely organised info that will eventually be turned into proper documentation.
+These files are loosely organised info.  Much of this is being turned into proper documentation.
 
 Any additional notes are more than welcome. If you like, you can send them to me at:
 

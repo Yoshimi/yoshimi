@@ -1,4 +1,11 @@
-yoshimi 1.5.10 rc3
+yoshimi 1.5.10
+
+2019-1-3 Will
+* Fixed regression - Resonance deactivated 'Close' button.
+* Added 'Multi Rushes' instrument to 'Will Godfrey Collection'.
+* Corrected some file dates.
+* Final updates to docs.
+* Set release version as 1.5.10
 
 2019-1-2 Hermann
 * Refactored the PRNG code into a class.

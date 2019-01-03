@@ -2,19 +2,15 @@ V 1.5.10 Redwing
 
 Command Line access is now virtually complete.
 
-The graphic interface has had a minor makeover.
-Very occasional corruption of this now resolved.
+The graphic interface has had a minor makeover. Also, very occasional corruption of this is now resolved.
 
-All inactive controls are now shown as such -
-there were a number that previously weren't, thus
-causing considerable confusion for new users.
+All inactive controls are now shown as such - there were a number that previously weren't, thus causing considerable confusion for new users.
 
-There is an improved pseudo-random number system,
-which does not rely on external libraries anymore.
+There is an improved pseudo-random number system, which does not rely on external libraries anymore.
 
+Further details can be found in /doc/Yoshimi_1.5.10_features.txt
 
-By default, Yoshimi is supplied with 709 instruments
-spread across 23 banks.
+By default, Yoshimi is supplied with 710 instruments spread across 23 banks.
 
 Yoshimi source code is available from either:
 https://sourceforge.net/projects/yoshimi
