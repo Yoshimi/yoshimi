@@ -52,7 +52,7 @@ class SynthEngine;
 class Part : private MiscFuncs, SynthHelper
 {
     public:
-        enum NoteStatus { KEY_OFF, KEY_PLAYING, KEY_RELASED_AND_SUSTAINED, KEY_RELASED };
+        enum NoteStatus { KEY_OFF, KEY_PLAYING, KEY_RELEASED_AND_SUSTAINED, KEY_RELEASED };
 
         Part(Microtonal *microtonal_, FFTwrapper *fft_, SynthEngine *_synth);
         ~Part();
@@ -68,8 +68,8 @@ class Part : private MiscFuncs, SynthHelper
         void NoteOff(int note);
         void AllNotesOff(void) { killallnotes = true; }; // panic, prepare all notes to be turned off
         void SetController(unsigned int type, int par);
-        void RelaseSustainedKeys(void);
-        void RelaseAllKeys(void);
+        void ReleaseSustainedKeys(void);
+        void ReleaseAllKeys(void);
         void ComputePartSmps(void);
 
         bool saveXML(string filename, bool yoshiFormat); // result true for load ok, otherwise false
@@ -160,7 +160,7 @@ class Part : private MiscFuncs, SynthHelper
 
     private:
         void KillNotePos(int pos);
-        void RelaseNotePos(int pos);
+        void ReleaseNotePos(int pos);
         void MonoMemRenote(void); // MonoMem stuff.
         void setPan(float value);
 
