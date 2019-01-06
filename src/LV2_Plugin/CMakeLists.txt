@@ -62,7 +62,7 @@ file (GLOB yoshimi_synth_files
     ../Synth/SUBnote.h  ../Synth/Resonance.h  ../Synth/PADnote.h
     ../Synth/BodyDisposal.h)
 file (GLOB yoshimi_musicio_files
-    ../MusicIO/MusicIO.cpp ../MusicIO/MusicIO.h ../MusicIO/Runtime.h)
+    ../MusicIO/MusicIO.cpp ../MusicIO/MusicIO.h)
 file (GLOB yoshimi_manifest_ttl
     manifest.ttl)
 file (GLOB yoshimi_plugin_ttl

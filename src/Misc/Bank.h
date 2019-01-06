@@ -100,9 +100,9 @@ class SynthEngine;
 
 class Bank : private MiscFuncs
 {
-#ifdef YOSHIMI_LV2_PLUGIN
+//#ifdef YOSHIMI_LV2_PLUGIN
     friend class YoshimiLV2Plugin;
-#endif
+//#endif
     friend class SynthEngine;
     public:
         Bank(SynthEngine *_synth);

@@ -823,8 +823,8 @@ void Config::LogError(const string &msg)
     Log("[ERROR] " + msg, 1);
 }
 
-#ifndef YOSHIMI_LV2_PLUGIN
-void Config::StartupReport(MusicClient *musicClient)
+//#ifndef YOSHIMI_LV2_PLUGIN
+void Config::StartupReport(string clientName)
 {
     bool fullInfo = (synth->getUniqueId() == 0);
     if (fullInfo)
@@ -832,7 +832,7 @@ void Config::StartupReport(MusicClient *musicClient)
         Log(argline);
         Log("Build Number " + to_string(BUILD_NUMBER), 1);
     }
-    Log("Clientname: " + musicClient->midiClientName());
+    Log("Clientname: " + clientName);
     string report = "Audio: ";
     switch (audioEngine)
     {
@@ -874,7 +874,7 @@ void Config::StartupReport(MusicClient *musicClient)
         Log("Period size: " + asString(synth->buffersize), 2);
     }
 }
-#endif
+//#endif
 
 
 void Config::setRtprio(int prio)

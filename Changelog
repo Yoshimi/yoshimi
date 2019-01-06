@@ -1,4 +1,9 @@
-yoshimi 1.5.10
+yoshimi 1.5.10 M
+
+2019-1-6 Will
+* Modified 'main' to remove stand-alone/LV2 build contention.
+* Bank.h, Config.h, Config.cpp no longer different builds.
+* Added warning about XML names in dev_notes.
 
 2019-1-3 Will
 * Fixed regression - Resonance deactivated 'Close' button.
