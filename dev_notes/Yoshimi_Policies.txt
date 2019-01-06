@@ -20,7 +20,7 @@ Minor version 3
 We now implement a build number. This is only bumped up when I push new commits to master (both github and sourceforge) so may represent several actual commits.
 
 
-We won't nromally accept fixes for spelling errors in the *code*
+We won't normally accept fixes for spelling errors in the *code*
 For a start, from bitter experience it is fatally easy to change two variables to the same name! Also, there's no point, after all they are only a mnemonic for memory addresses etc. 'volume' and 'LFO' could just as well be 'turnyfing' and 'derfingwotwiggles'.
 
 
@@ -42,4 +42,4 @@ There seems to be no easy way to copy commit messages to the changelog, and peop
 * Sys/Ins effect controls now transferred to lock free.
   But could be improved.
 
-Lines without '*' are continuations/extra info keeping the line length short, and I don't usually include them in commit messages.
+Lines without '*' are continuations/extra info keeping the line length short, and are not usually included in commit messages.

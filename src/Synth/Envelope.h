@@ -39,7 +39,7 @@ class Envelope : private MiscFuncs
 
         Envelope(EnvelopeParams *envpars, float basefreq, SynthEngine *_synth);
         ~Envelope() { };
-        void relasekey(void);
+        void releasekey(void);
         float envout(void);
         float envout_dB(void);
         int finished(void) { return envfinish; };

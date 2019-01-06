@@ -51,7 +51,7 @@ class PADnote : private SynthHelper
 
         int noteout(float *outl,float *outr);
         bool finished(void) { return finished_; };
-        void relasekey(void);
+        void releasekey(void);
 
         bool ready;
 

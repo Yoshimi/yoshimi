@@ -799,15 +799,15 @@ int SUBnote::noteout(float *outl, float *outr)
 
 
 // Release Key (Note Off)
-void SUBnote::relasekey(void)
+void SUBnote::releasekey(void)
 {
-    AmpEnvelope->relasekey();
+    AmpEnvelope->releasekey();
     if (FreqEnvelope != NULL)
-        FreqEnvelope->relasekey();
+        FreqEnvelope->releasekey();
     if (BandWidthEnvelope != NULL)
-        BandWidthEnvelope->relasekey();
+        BandWidthEnvelope->releasekey();
     if (GlobalFilterEnvelope != NULL)
-        GlobalFilterEnvelope->relasekey();
+        GlobalFilterEnvelope->releasekey();
 }
 
 void SUBnote::initfilterbank(void)

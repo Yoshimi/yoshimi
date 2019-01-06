@@ -50,7 +50,7 @@ class SUBnote : private SynthHelper
 
         int noteout(float *outl,float *outr); // note output, return 0 if the
                                               // note is finished
-        void relasekey(void);
+        void releasekey(void);
         bool finished(void) { return !NoteEnabled; }
 
         bool ready; // if I can get the sampledata

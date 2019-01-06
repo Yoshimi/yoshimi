@@ -650,9 +650,9 @@ int PADnote::noteout(float *outl,float *outr)
 }
 
 
-void PADnote::relasekey()
+void PADnote::releasekey()
 {
-    NoteGlobalPar.FreqEnvelope->relasekey();
-    NoteGlobalPar.FilterEnvelope->relasekey();
-    NoteGlobalPar.AmpEnvelope->relasekey();
+    NoteGlobalPar.FreqEnvelope->releasekey();
+    NoteGlobalPar.FilterEnvelope->releasekey();
+    NoteGlobalPar.AmpEnvelope->releasekey();
 }

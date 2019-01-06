@@ -210,7 +210,7 @@ class VirKeys {: {public Fl_Box}
             if (pressed[kpos] == 0)
                 presskey(kpos, 0, 1);
             else
-                relasekey(kpos, 1);
+                releasekey(kpos, 1);
         }
         if (event == FL_RELEASE && Fl::event_shift() == 0)
             relaseallkeys(1);
@@ -254,7 +254,7 @@ class VirKeys {: {public Fl_Box}
         if (event == FL_KEYDOWN)
             presskey(kpos, 0, 2);
         else
-            relasekey(kpos, 2);
+            releasekey(kpos, 2);
     }
     return 1;} {}
   }
@@ -285,7 +285,7 @@ class VirKeys {: {public Fl_Box}
     }
     send_data(0, vel, TOPLEVEL::type::Integer, midich, nk + midioct * 12);} {}
   }
-  Function {relasekey(int nk,int type)} {} {
+  Function {releasekey(int nk,int type)} {} {
     code {//
     if (nk < 0 || nk >= N_OCT * 12)
         return;
@@ -300,7 +300,7 @@ class VirKeys {: {public Fl_Box}
   Function {relaseallkeys(int type)} {} {
     code {//
     for (int i = 0; i < N_OCT * 12; ++i)
-        relasekey(i, type);} {}
+        releasekey(i, type);} {}
   }
   decl {int pressed[N_OCT * 12 + 1];} {private local
   }

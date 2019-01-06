@@ -2079,7 +2079,7 @@ int ADnote::noteout(float *outl, float *outr)
 
 
 // Release the key (NoteOff)
-void ADnote::relasekey(void)
+void ADnote::releasekey(void)
 {
     int nvoice;
     for (nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
@@ -2087,19 +2087,19 @@ void ADnote::relasekey(void)
         if (!NoteVoicePar[nvoice].Enabled)
             continue;
         if (NoteVoicePar[nvoice].AmpEnvelope != NULL)
-            NoteVoicePar[nvoice].AmpEnvelope->relasekey();
+            NoteVoicePar[nvoice].AmpEnvelope->releasekey();
         if (NoteVoicePar[nvoice].FreqEnvelope != NULL)
-            NoteVoicePar[nvoice].FreqEnvelope->relasekey();
+            NoteVoicePar[nvoice].FreqEnvelope->releasekey();
         if (NoteVoicePar[nvoice].FilterEnvelope != NULL)
-            NoteVoicePar[nvoice].FilterEnvelope->relasekey();
+            NoteVoicePar[nvoice].FilterEnvelope->releasekey();
         if (NoteVoicePar[nvoice].FMFreqEnvelope != NULL)
-            NoteVoicePar[nvoice].FMFreqEnvelope->relasekey();
+            NoteVoicePar[nvoice].FMFreqEnvelope->releasekey();
         if (NoteVoicePar[nvoice].FMAmpEnvelope != NULL)
-            NoteVoicePar[nvoice].FMAmpEnvelope->relasekey();
+            NoteVoicePar[nvoice].FMAmpEnvelope->releasekey();
     }
-    NoteGlobalPar.FreqEnvelope->relasekey();
-    NoteGlobalPar.FilterEnvelope->relasekey();
-    NoteGlobalPar.AmpEnvelope->relasekey();
+    NoteGlobalPar.FreqEnvelope->releasekey();
+    NoteGlobalPar.FilterEnvelope->releasekey();
+    NoteGlobalPar.AmpEnvelope->releasekey();
 }
 
 // for future reference ... re replacing pow(x, y) by exp(y * log(x))

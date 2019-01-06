@@ -53,7 +53,7 @@ class ADnote : private SynthHelper, private Float2Int
         ~ADnote();
 
         int noteout(float *outl, float *outr);
-        void relasekey();
+        void releasekey();
         int finished() const;
         void ADlegatonote(float freq_, float velocity_, int portamento_,
                           int midinote_, bool externcall);
