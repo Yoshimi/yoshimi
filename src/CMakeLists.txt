@@ -2,7 +2,7 @@
 #   CMakeLists.txt
 #
 #   Copyright 2009-2011, Alan Calvert
-#   Copyright 2014-2018, Will Godfrey & others
+#   Copyright 2014-2019, Will Godfrey & others
 #
 #   This file is part of yoshimi, which is free software: you can
 #   redistribute it and/or modify it under the terms of the GNU General
@@ -40,7 +40,7 @@ add_definitions(-Werror=format-security)
 add_definitions(-Wextra)
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "1.5.10 M")
+set (YOSHIMI_VERSION "1.5.10.1 rc1")
 add_definitions (-DMIN_CONFIG_MAJOR=1)
 add_definitions (-DMIN_CONFIG_MINOR=5)
 
@@ -303,26 +303,27 @@ set (YOSHI_INCLUDES ${FLTK_INCLUDE_DIR})
 
 # set platform specific compiler flags
 if (BuildFor0ld_X86)
-    set (CMAKE_CXX_FLAGS ${BuildOptions_X86})
+    set (OurCxxFlags ${BuildOptions_X86})
 else (BuildFor0ld_X86)
     if (BuildForAMD_X86_64)
-        set (CMAKE_CXX_FLAGS ${BuildOptions_X86_64AMD})
+        set (OurCxxFlags ${BuildOptions_X86_64AMD})
     else (BuildForAMD_X86_64)
         if (BuildForCore2_X86_64)
-            set (CMAKE_CXX_FLAGS ${BuildOptions_X86_64Core2})
+            set (OurCxxFlags ${BuildOptions_X86_64Core2})
         else (BuildForCore2_X86_64)
             if (BuildForNEON)
-                set (CMAKE_CXX_FLAGS ${BuildOptions_NEON})
+                set (OurCxxFlags ${BuildOptions_NEON})
             else (BuildForNEON)
                 if (BuildForThisCPU)
-                    set (CMAKE_CXX_FLAGS ${BuildOptionsThisCPU})
+                    set (OurCxxFlags ${BuildOptionsThisCPU})
                 else (BuildForThisCPU)
-                    set (CMAKE_CXX_FLAGS ${BuildOptionsBasic})
+                    set (OurCxxFlags ${BuildOptionsBasic})
                 endif (BuildForThisCPU)
             endif (BuildForNEON)
         endif (BuildForCore2_X86_64)
     endif (BuildForAMD_X86_64)
 endif (BuildFor0ld_X86)
+set (CMAKE_CXX_FLAGS "${OurCxxFlags} ${CMAKE_CXX_FLAGS}")
 
 if (BuildForDebug)
     set (CMAKE_BUILD_TYPE "Debug")

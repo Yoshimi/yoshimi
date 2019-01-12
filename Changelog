@@ -1,4 +1,15 @@
-yoshimi 1.5.10 M
+yoshimi 1.5.10.1 rc1
+
+2019-1-12 Rob, Will, Hermann
+* BugFix: Changes to CMakeLists.txt failed fedora build.
+  Directly setting CMAKE_CXX_FLAGS overwrote previously
+  defined flags the distro package required. We now add
+  our settings as a prefix to existing CMAKE_CXX_FLAGS
+  so the distro values take priority.
+* Changed Examples/synth_prelude files to link to original.
+  Done to avoid possible licensing issues.
+* Added new warning file to dev_notes about spelling errors.
+* Set bugfix release as 1.5.10.1 rc1
 
 2019-1-6 Will
 * Modified 'main' to remove stand-alone/LV2 build contention.
