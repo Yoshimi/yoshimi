@@ -1,5 +1,7 @@
 V 1.5.10 Redwing
 
+Unfortunately a bug has been found that seems to affect only official fedora builds. To ensure complete compatibility we now have V 1.5.10.1 as a bugfix release.
+
 Command Line access is now virtually complete.
 
 The graphic interface has had a minor makeover. Also, very occasional corruption of this is now resolved.

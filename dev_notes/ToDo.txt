@@ -31,6 +31,7 @@ Do a dual scan for banks so that IDd ones are found first, then any new ones pic
 Pasting effect doesn't update effect title.
 
 Requested: revise window states so engines etc can be made auto open.
+May not be practical as engines will depend on parts loated.
 
 Expand MIDI-learn to include:
     learn groups
