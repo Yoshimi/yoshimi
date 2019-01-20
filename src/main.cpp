@@ -351,7 +351,7 @@ int main(int argc, char *argv[])
     char pidline[256];
     memset(&pidline, 0, 255);
     FILE *fp = popen("pgrep yoshimi", "r");
-    fgets(pidline,1024,fp);
+    fgets(pidline,255,fp);
     //cout << "> " << pidline << " <" << endl;
     pclose(fp);
     int firstpid = stoi(pidline);
