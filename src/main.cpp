@@ -91,6 +91,12 @@ void yoshimiSigHandler(int sig)
             sigaction(SIGUSR1, &yoshimiSigAction, NULL);
             break;
 
+        case SIGUSR2: // kill -s SIGUSR2 {process number} use pgrep yoshimi
+            cout << "Got sig" << endl;
+            mainCreateNewInstance(0, true);
+            sigaction(SIGUSR2, &yoshimiSigAction, NULL);
+            break;
+
         default:
             break;
     }
@@ -398,6 +404,8 @@ int main(int argc, char *argv[])
     yoshimiSigAction.sa_handler = yoshimiSigHandler;
     if (sigaction(SIGUSR1, &yoshimiSigAction, NULL))
         firstRuntime->Log("Setting SIGUSR1 handler failed");
+    if (sigaction(SIGUSR2, &yoshimiSigAction, NULL))
+        firstRuntime->Log("Setting SIGUSR2 handler failed");
     if (sigaction(SIGINT, &yoshimiSigAction, NULL))
         firstRuntime->Log("Setting SIGINT handler failed");
     if (sigaction(SIGHUP, &yoshimiSigAction, NULL))

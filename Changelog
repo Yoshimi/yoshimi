@@ -1,6 +1,9 @@
-yoshimi 1.5.10.1
+yoshimi 1.5.10 M
 
-2019-1-13 Will.
+2019-1-20 Will
+* Sending SIGUSR2 to running Yoshimi starts new instance.
+
+2019-1-13 Will
 * Confirmed previous fix and set release as 1.5.10.1
 
 2019-1-12 Rob, Will, Hermann
