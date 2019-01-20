@@ -2,7 +2,7 @@
     main.cpp
 
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2018, Will Godfrey & others
+    Copyright 2014-2019, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified October 2018
+    Modified January 2019
 */
 
 // approx timeout in seconds.
@@ -91,8 +91,7 @@ void yoshimiSigHandler(int sig)
             sigaction(SIGUSR1, &yoshimiSigAction, NULL);
             break;
 
-        case SIGUSR2: // kill -s SIGUSR2 {process number} use pgrep yoshimi
-            cout << "Got sig" << endl;
+        case SIGUSR2: // start next instance
             mainCreateNewInstance(0, true);
             sigaction(SIGUSR2, &yoshimiSigAction, NULL);
             break;
@@ -349,6 +348,20 @@ void *commandThread(void *arg = NULL) // silence warning
 
 int main(int argc, char *argv[])
 {
+    char pidline[256];
+    memset(&pidline, 0, 255);
+    FILE *fp = popen("pgrep yoshimi", "r");
+    fgets(pidline,1024,fp);
+    //cout << "> " << pidline << " <" << endl;
+    pclose(fp);
+    int firstpid = stoi(pidline);
+    if (firstpid != getpid())
+    {
+        //cout << "got it" << endl;
+        kill(firstpid, SIGUSR2);
+        return 0;
+    }
+
     time(&old_father_time);
     here_and_now = old_father_time;
     struct termios  oldTerm;

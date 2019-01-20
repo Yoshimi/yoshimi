@@ -53,8 +53,6 @@ Make things like Echo delay either floats or much higher resolution.
 
 Consider enabling and disabling tooltips.
 
-Make attempt to start second independent instance open a new one in running yoshimi instead - saves memory and more consistent.
-
 RPNs (channel based)
 
 101,0 (MSB)
