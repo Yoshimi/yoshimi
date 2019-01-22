@@ -1,7 +1,7 @@
 /*
     CmdInterface.cpp
 
-    Copyright 2015-2018, Will Godfrey & others.
+    Copyright 2015-2019, Will Godfrey & others.
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified December 2018
+    Modified January 2019
 */
 
 #include <iostream>
@@ -1466,7 +1466,7 @@ int CmdInterface::filterSelect(unsigned char controlType)
                         value = 0;
                     else if (matchnMove(2, point, "h1"))
                         value = 1;
-                    if (matchnMove(2, point, "l2"))
+                    else if (matchnMove(2, point, "l2"))
                         value = 2;
                     else if (matchnMove(2, point, "h2"))
                         value = 3;

@@ -350,12 +350,14 @@ int main(int argc, char *argv[])
 {
     char pidline[256];
     memset(&pidline, 0, 255);
-    FILE *fp = popen("pgrep yoshimi", "r");
+    // test for *exact* name and only the oldest occurrance
+    FILE *fp = popen("pgrep -o -x yoshimi", "r");
     fgets(pidline,255,fp);
     //cout << "> " << pidline << " <" << endl;
     pclose(fp);
     int firstpid = stoi(pidline);
-    if (firstpid != getpid())
+    // we try to failsafe if no valid PID is returned
+    if (firstpid > 1 && firstpid != getpid())
     {
         //cout << "got it" << endl;
         kill(firstpid, SIGUSR2);

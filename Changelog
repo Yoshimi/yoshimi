@@ -1,5 +1,13 @@
 yoshimi 1.5.10 M
 
+2019-1-22 Will
+* BugFix: missing 'else' so CLI filter not seeing L1/H1.
+* Implemented loading MIDI learn fro CLI.
+  Currently it seems you can only set one command line
+  argument. Observed priority is .state .xmz .xiz .xly
+  Need to see if this can be made recursive.
+* Minor adustments to startup handover.
+
 2019-1-20 Will
 * Sending SIGUSR2 to running Yoshimi starts new instance.
 * Yoshimi hands over startup if there's a running instance.

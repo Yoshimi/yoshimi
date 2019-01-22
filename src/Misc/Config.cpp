@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2013, Nikita Zlobin
-    Copyright 2014-2018, Will Godfrey & others
+    Copyright 2014-2019, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified November 2018
+    Modified January 2019
 */
 
 #include <iostream>
@@ -75,6 +75,7 @@ static struct argp_option cmd_options[] = {
     {"auto-connect",      'K',  NULL,         0,  "auto connect jack audio", 0},
     {"load",              'l',  "<file>",     0,  "load .xmz file", 0},
     {"load-instrument",   'L',  "<file>",     0,  "load .xiz file", 0},
+    {"load-midilearn",    'M',  "<file>",     0,  "load .xly file", 0},
     {"name-tag",          'N',  "<tag>",      0,  "add tag to clientname", 0},
     {"samplerate",        'R',  "<rate>",     0,  "set alsa audio sample rate", 0},
     {"oscilsize",         'o',  "<size>",     0,  "set AddSynth oscilator size", 0},
@@ -1148,6 +1149,8 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
         case 'l': settings->paramsLoad = string(arg); break;
 
         case 'L': settings->instrumentLoad = string(arg); break;
+
+        case 'M':settings->midiLearnLoad = string(arg);break;
 
         case 'A':
             settings->configChanged = true;
