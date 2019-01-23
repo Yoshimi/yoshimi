@@ -11,7 +11,7 @@ comment {PADNoteUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2015-2018, Will Godfrey
+Copyright 2015-2019, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-Modified October 2018
+Modified January 2019
 } {selected in_source in_header
 }
 
@@ -167,9 +167,7 @@ this->pars=pars;} {}
         float spc[n];
         for (int i = 0; i < n; i++)
             spc[i] = 0.0;
-        //synth->actionLock(lockType);
         pars->oscilgen->getspectrum(n, spc, 0);
-        //synth->actionLock(unlockType);
 
         //normalize
         float max = 0;

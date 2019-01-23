@@ -26,8 +26,6 @@
     Modified January 2019
 */
 
-//#define NOLOCKS
-
 #include<stdio.h>
 #include <sys/time.h>
 #include <set>
@@ -113,7 +111,6 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     microtonal(this),
     fft(NULL),
     muted(0),
-    processLock(NULL),
     //stateXMLtree(NULL),
     guiMaster(NULL),
     guiClosedCallback(NULL),
@@ -172,7 +169,7 @@ SynthEngine::~SynthEngine()
 
     if (fft)
         delete fft;
-    pthread_mutex_destroy(&processMutex);
+
     sem_destroy(&partlock);
     sem_destroy(&mutelock);
     if (ctl)
@@ -218,16 +215,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         Runtime.LogError("interChange init failed");
         goto bail_out;
     }
-
-    /*if (!pthread_mutex_init(&processMutex, NULL))
-        processLock = &processMutex;
-    else
-    {
-        Runtime.Log("SynthEngine actionLock init fails :-(");
-        processLock = NULL;
-        goto bail_out;
-    }*/
-
 
     if (oscilsize < (buffersize / 2))
     {
@@ -490,11 +477,7 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
         if (chan == part[npart]->Prcvchn)
         {
             if (partonoffRead(npart))
-            {
-                //actionLock(lockType);
                 part[npart]->NoteOn(note, velocity);
-                //actionLock(unlockType);
-            }
             else if (VUpeak.values.parts[npart] > (-velocity))
                 VUpeak.values.parts[npart] = -(0.2 + velocity); // ensure fake is always negative
         }
@@ -528,11 +511,7 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
     {
         // mask values 16 - 31 to still allow a note off
         if (chan == (part[npart]->Prcvchn & 0xef) && partonoffRead(npart))
-        {
-            //actionLock(lockType);
             part[npart]->NoteOff(note);
-            //actionLock(unlockType);
-        }
     }
 }
 
@@ -1909,7 +1888,6 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
  */
     else
     {
-        //actionLock(lockType);
         // Compute part samples and store them ->partoutl,partoutr
         for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
         {
@@ -2064,7 +2042,6 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                 fadeLevel -= fadeStep;
             }
         }
-        //actionLock(unlockType);
 
         // Peak calculation for mixed outputs
         float absval;
@@ -2227,32 +2204,6 @@ void SynthEngine::allStop(unsigned int stopType)
         fadeLevel = 1.0f;
     // don't reset if it's already fading.
 }
-
-
-/*bool SynthEngine::actionLock(lockset request)
-{
-#ifdef NOLOCKS
-    lockset a = request; request = a; // suppress warning
-    return 0;
-#else
-    int chk  = -1;
-
-    switch (request)
-    {
-        case lockType:
-            chk = pthread_mutex_lock(processLock);
-            break;
-
-        case unlockType:
-            chk = pthread_mutex_unlock(processLock);
-            break;
-
-        default:
-            break;
-    }
-    return (chk == 0) ? true : false;
-#endif
-}*/
 
 
 bool SynthEngine::loadStateAndUpdate(string filename)

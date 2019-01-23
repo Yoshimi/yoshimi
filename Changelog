@@ -1,5 +1,9 @@
 yoshimi 1.5.10 M
 
+2019-1-23 Will
+* Removed all remaining mutex references.
+  Already almost entirely commented out.
+
 2019-1-22 Will
 * BugFix: missing 'else' so CLI filter not seeing L1/H1.
 * Implemented loading MIDI learn fro CLI.

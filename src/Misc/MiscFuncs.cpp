@@ -2,7 +2,7 @@
     MiscFuncs.cpp
 
     Copyright 2010, Alan Calvert
-    Copyright 2014-2018, Will Godfrey
+    Copyright 2014-2019, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>
 
-    Modifed November 2018
+    Modifed January 2019
 */
 
 //#define REPORT_MISCMSG
@@ -31,7 +31,6 @@
 #include <iostream>
 #include <fstream>
 #include <string.h>
-#include <mutex>
 #include <limits.h>
 
 using namespace std;
