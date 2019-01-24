@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011 Alan Calvert
-    Copyright 2017-2018 Will Godfrey & others
+    Copyright 2017-2019 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of ZynAddSubFX original code
-    Modified October 2018
+    Modified January 2019
 */
 #include <cmath>
 
@@ -52,8 +52,7 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
 {
     // Initialise some legato-specific vars
     Legato.msg = LM_Norm;
-    FR2Z2I(synth->samplerate_f * 0.005f, Legato.fade.length); // 0.005 seems ok.
-    //Legato.fade.length = (int)truncf(synth->samplerate_f * 0.005f); // 0.005 seems ok.
+    Legato.fade.length = int(synth->samplerate_f * 0.005f); // 0.005 seems ok.
     if (Legato.fade.length < 1)
         Legato.fade.length = 1; // (if something's fishy)
     Legato.fade.step = (1.0 / Legato.fade.length);
@@ -115,8 +114,7 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
     if (size == 0)
         size = 1;
 
-    FR2Z2I(synth->numRandom() * (size - 1), poshi_l);
-    //poshi_l = (int)truncf(synth->numRandom() * (size - 1));
+    poshi_l = int(synth->numRandom() * (size - 1));
     if (pars->PStereo != 0)
         poshi_r = (poshi_l + size / 2) % size;
     else
@@ -334,8 +332,7 @@ inline void PADnote::fadein(float *smps)
         tmp = 8.0;
     tmp *= NoteGlobalPar.Fadein_adjustment;
 
-    int n; // how many samples is the fade-in
-    FR2Z2I(tmp, n);
+    int n = int(tmp); // how many samples is the fade-in
     if (n > synth->sent_buffersize)
         n = synth->sent_buffersize;
     for (int i = 0; i < n; ++i)

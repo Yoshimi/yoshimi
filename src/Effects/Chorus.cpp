@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2018, Will Godfrey
+    Copyright 2014-2019, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified September 2018
+    Modified January 2019
 */
 
 #include "Misc/SynthEngine.h"
@@ -117,7 +117,7 @@ void Chorus::out(float *smpsl, float *smpsr)
         if (++dlk >= maxdelay)
             dlk = 0;
         tmp = dlk - mdel + maxdelay * 2.0f; // where should I get the sample from
-         FR2Z2I(tmp, dlhi);
+        dlhi = int(tmp);
         dlhi %= maxdelay;
 
         dlhi2 = (dlhi - 1 + maxdelay) % maxdelay;
@@ -132,7 +132,7 @@ void Chorus::out(float *smpsl, float *smpsr)
         if (++drk >= maxdelay)
             drk = 0;
         tmp = drk * 1.0f - mdel + maxdelay * 2.0f; // where should I get the sample from
-        FR2Z2I(tmp, dlhi);
+        dlhi = int(tmp);
         dlhi %= maxdelay;
         dlhi2 = (dlhi - 1 + maxdelay) % maxdelay;
         dllo = 1.0f - fmodf(tmp, one);

@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2017-2018, Will Godfrey
+    Copyright 2017-2019, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified October 2018
+    Modified January 2019
 */
 
 #include <cmath>
@@ -258,8 +258,7 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
         case 1:
             x1 = (int) floor(x);
             tmp = fmod(x, 1.0);
-            FR2Z2I(floor(tmp * 1e6), x2);
-            //x2 = (int)truncf(floor(tmp * 1e6));
+            x2 = int(floor(tmp * 1e6));
             tuning = pow(2.0, x / 1200.0);
             break;
         case 2:

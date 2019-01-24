@@ -1,5 +1,14 @@
 yoshimi 1.5.10 M
 
+2019-1-24 Will
+* Complex float rounding towards zero now just int(n).
+  Rationale: This in most cases restores the original
+  Zyn 2.2.1 method. Also, the assembler hack used to get
+  faster performance is not portable across CPU types.
+  These conversion were all for positive only values so
+  there is no +- zero issue and the int+truncf combination
+  is *much* slower than just int, yet does exacly the same.
+
 2019-1-23 Will
 * Removed all remaining mutex references.
   Already almost entirely commented out.

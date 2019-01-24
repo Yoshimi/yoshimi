@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011 Alan Calvert
     Copyright 2009 James Morris
-    Copyright 2016-2018 Will Godfrey & others
+    Copyright 2016-2019 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -23,7 +23,7 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified December 2018
+    Modified January 2019
 */
 
 #include <cmath>
@@ -656,8 +656,7 @@ void OscilGen::oscilfilter(void)
             }
             case 13:
             {
-                int tmp;// = (int)truncf(powf(2.0f, ((1.0f - par) * 7.2f)));
-                FR2Z2I(powf(2.0f, ((1.0f - par) * 7.2f)), tmp);
+                int tmp = (int)powf(2.0f, ((1.0f - par) * 7.2f));
                 gain = 1.0f;
                 if (i == tmp)
                     gain = powf(2.0f, par2 * par2 * 8.0f);
@@ -837,9 +836,8 @@ void OscilGen::modulation(void)
 
         t = (t - floorf(t)) * synth->oscilsize_f;
 
-        int poshi;// = (int)truncf(t);
-        FR2Z2I(t, poshi);
-        float poslo = t - floorf(t);
+        int poshi = int(t);
+        float poslo = t - poshi;
 
         tmpsmps[i] = in[poshi] * (1.0f - poslo) + in[poshi + 1] * poslo;
     }
@@ -1110,8 +1108,7 @@ void OscilGen::adaptiveharmonic(FFTFREQS f, float freq)
     for (int i = 0; i < synth->halfoscilsize - 2; ++i)
     {
         float h = i * rap;
-        int high;// = (int)truncf(i * rap);
-        FR2Z2I(i * rap, high);
+        int high = int(h);
         float low = fmodf(h, 1.0f);
 
         if (high >= synth->halfoscilsize - 2)
@@ -1251,15 +1248,12 @@ int OscilGen::get(float *smps, float freqHz, int resonance)
     if (oscilprepared != 1)
         prepare();
 
-    FR2Z2I((prng.numRandom() * 2.0f - 1.0f) * synth->oscilsize_f * (Prand - 64.0f) / 64.0f, outpos);
-//    outpos = (int)truncf((numRandom() * 2.0f - 1.0f) * synth->oscilsize_f * (Prand - 64.0f) / 64.0f);
+    outpos = (int)(prng.numRandom() * 2.0f - 1.0f) * synth->oscilsize_f * (Prand - 64.0f) / 64.0f;
     outpos = (outpos + 2 * synth->oscilsize) % synth->oscilsize;
 
     memset(outoscilFFTfreqs.c, 0, synth->halfoscilsize * sizeof(float));
     memset(outoscilFFTfreqs.s, 0, synth->halfoscilsize * sizeof(float));
-    FR2Z2I(0.5f * synth->samplerate_f / fabsf(freqHz), nyquist);
-    nyquist += 2;
-//    nyquist = (int)truncf(0.5f * synth->samplerate_f / fabsf(freqHz)) + 2;
+    nyquist = int(0.5f * synth->samplerate_f / fabsf(freqHz)) + 2;
     if (ADvsPAD)
         nyquist = synth->halfoscilsize;
     if (nyquist > synth->halfoscilsize)

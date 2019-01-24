@@ -232,7 +232,6 @@ bool MusicClient::Start()
     {
         bMidi = midiIO->Start();
     }
-
     return bAudio && bMidi;
 }
 

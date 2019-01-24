@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2017-2018 Will Godfrey
+    Copyright 2017-2019 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified October 2018
+    Modified January 2019
 */
 
 #include <cmath>
@@ -346,14 +346,7 @@ float PADnoteParameters::getNhr(int n)
     switch (Phrpos.type)
     {
     case 1:
-        FR2Z2I(par2 * par2 * 100.0f, thresh);
-        thresh += 1;
-        /*
-         * leaving many of the old versions here
-         * as there may be subtle effects of adding
-         * or subtracting after the conversion
-         */
-        //thresh = (int)truncf(par2 * par2 * 100.0f) + 1;
+        thresh = int(par2 * par2 * 100.0f) + 1;
         if (n < thresh)
             result = n;
         else
@@ -361,9 +354,7 @@ float PADnoteParameters::getNhr(int n)
         break;
 
     case 2:
-        FR2Z2I(par2 * par2 * 100.0f, thresh);
-        thresh += 1;
-        //thresh = (int)truncf(par2 * par2 * 100.0f) + 1;
+        thresh = int(par2 * par2 * 100.0f) + 1;
         if (n < thresh)
             result = n;
         else
@@ -481,25 +472,17 @@ void PADnoteParameters::generatespectrum_bandwidthMode(float *spectrum,
             break;
         }
         bw = bw * powf(realfreq / basefreq, power);
-        int ibw;
-        FR2Z2I(bw / (synth->samplerate_f * 0.5f) * size, ibw);
-        ibw += 1;
-        //int ibw = (int)truncf((bw / (synth->samplerate_f * 0.5f) * size)) + 1;
+        int ibw = int((bw / (synth->samplerate_f * 0.5f) * size)) + 1;
         float amp = harmonics[nh - 1];
         if (resonance->Penabled)
             amp *= resonance->getfreqresponse(realfreq);
         if (ibw > profilesize)
         {   // if the bandwidth is larger than the profilesize
             float rap = sqrtf((float)profilesize / (float)ibw);
-            int cfreq;
-            FR2Z2I(realfreq / (synth->halfsamplerate_f) * size, cfreq);
-            cfreq -= (ibw / 2);
-            //int cfreq = (int)truncf(realfreq / (synth->halfsamplerate_f) * size) - ibw / 2;
+            int cfreq = int(realfreq / (synth->halfsamplerate_f) * size) - ibw / 2;
             for (int i = 0; i < ibw; ++i)
             {
-                int src;
-                FR2Z2I(i * rap * rap, src);
-                //int src = (int)truncf(i * rap * rap);
+                int src = int(i * rap * rap);
                 int spfreq = i + cfreq;
                 if (spfreq < 0)
                     continue;
@@ -571,9 +554,7 @@ void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
         float amp = harmonics[nh - 1];
         if (resonance->Penabled)
             amp *= resonance->getfreqresponse(realfreq);
-        int cfreq;
-        FR2Z2I(realfreq / (synth->halfsamplerate_f) * size, cfreq);
-        //int cfreq = (int)truncf(realfreq / (synth->halfsamplerate_f) * size);
+        int cfreq = int(realfreq / (synth->halfsamplerate_f) * size);
         spectrum[cfreq] = amp + 1e-9f;
     }
 

@@ -162,8 +162,8 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     {
         rtprio = 4; // To force internal threads below LV2 host
     }
-    else
-        fesetround(FE_TOWARDZERO); // Special thanks to Lars Luthman for conquering
+    //else
+        //fesetround(FE_TOWARDZERO); // Special thanks to Lars Luthman for conquering
                                // the heffalump. We need lrintf() to round
                                // toward zero.
     //^^^^^^^^^^^^^^^ This call is not needed aymore (at least for lv2 plugin)
@@ -172,8 +172,8 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
 
     /*
      * The above is now all completely redundant as we use
-     * in-line either fast assembly (where available) or the
-     * original Zyn float - int conversion rounding to zero
+     * a simple int(n). The values are all positive so there
+     * is no issue with +- zero.
      */
 
     cerr.precision(4);
