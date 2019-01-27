@@ -1,5 +1,9 @@
 yoshimi 1.5.10 M
 
+2019-1-27 Will
+* Enabled full CLI start sequence .state .xmz .xiz .xly
+  but can be either jack session or state not both.
+
 2019-1-24 Will
 * Complex float rounding towards zero now just int(n).
   Rationale: This in most cases restores the original

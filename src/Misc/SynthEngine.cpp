@@ -282,43 +282,41 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
              defaults();
          }
     }
-    else
+
+    if (Runtime.paramsLoad.size())
     {
-        if (Runtime.paramsLoad.size())
+        string file = setExtension(Runtime.paramsLoad, "xmz");
+        ShutUp();
+        if (!loadXML(file))
         {
-            string file = setExtension(Runtime.paramsLoad, "xmz");
-            ShutUp();
-            if (!loadXML(file))
-            {
-                Runtime.Log("Failed to load parameters " + file);
-                Runtime.paramsLoad = "";
-            }
+            Runtime.Log("Failed to load parameters " + file);
+            Runtime.paramsLoad = "";
         }
-        else if (Runtime.instrumentLoad.size())
+    }
+    if (Runtime.instrumentLoad.size())
+    {
+        string feli = Runtime.instrumentLoad;
+        int loadtopart = 0;
+        if (part[loadtopart]->loadXMLinstrument(feli))
+            Runtime.Log("Instrument file " + feli + " loaded");
+        else
         {
-            string feli = Runtime.instrumentLoad;
-            int loadtopart = 0;
-            if (part[loadtopart]->loadXMLinstrument(feli))
-                Runtime.Log("Instrument file " + feli + " loaded");
-            else
-            {
-                Runtime.Log("Failed to load instrument file " + feli);
-                Runtime.instrumentLoad = "";
-            }
+            Runtime.Log("Failed to load instrument file " + feli);
+            Runtime.instrumentLoad = "";
         }
-        else if (Runtime.midiLearnLoad.size())
+    }
+    if (Runtime.midiLearnLoad.size())
+    {
+        string feml = Runtime.midiLearnLoad;
+        if (midilearn.loadList(feml))
         {
-            string feml = Runtime.midiLearnLoad;
-            if (midilearn.loadList(feml))
-            {
-                midilearn.updateGui();
-                Runtime.Log("midiLearn file " + feml + " loaded");
-            }
-            else
-            {
-                Runtime.Log("Failed to load midiLearn file " + feml);
-                Runtime.midiLearnLoad = "";
-            }
+            midilearn.updateGui();
+            Runtime.Log("midiLearn file " + feml + " loaded");
+        }
+        else
+        {
+            Runtime.Log("Failed to load midiLearn file " + feml);
+            Runtime.midiLearnLoad = "";
         }
     }
 
