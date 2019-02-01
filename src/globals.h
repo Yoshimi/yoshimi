@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modifed January 2019
+    Modifed February 2019
 */
 
 #ifndef GLOBALS_H
@@ -30,6 +30,8 @@
  * require randomness to produce normal sounds.
  */
 //#define NORANDOM ON
+
+//#define GUI_FLTK
 
 // math
 #define PI 3.1415926536f

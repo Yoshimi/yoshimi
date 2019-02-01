@@ -1,5 +1,9 @@
 yoshimi 1.5.10 M
 
+2019-2-1 Will
+* Enabled headless build (Not LV2).
+  Not fully tested.
+
 2019-1-27 Will
 * Enabled full CLI start sequence .state .xmz .xiz .xly
   but can be either jack session or state not both.

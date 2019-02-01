@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified January 2019
+    Modified February 2019
 */
 
 // approx timeout in seconds.
@@ -103,12 +103,15 @@ void yoshimiSigHandler(int sig)
 
 static void *mainGuiThread(void *arg)
 {
+#ifdef GUI_FLTK
     Fl::lock();
+#endif
 
     sem_post((sem_t *)arg);
 
     map<SynthEngine *, MusicClient *>::iterator it;
 
+#ifdef GUI_FLTK
     const int textHeight = 15;
     const int textY = 10;
     const unsigned char lred = 0xd7;
@@ -139,10 +142,12 @@ static void *mainGuiThread(void *arg)
     {
             usleep(33333);
     }
+#endif
     while (firstSynth == NULL); // just wait
 
+#ifdef GUI_FLTK
     GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::NewSynthEngine, 0);
-
+#endif
     if (firstRuntime->autoInstance)
     {
         for (int i = 1; i < 32; ++i)
@@ -193,6 +198,7 @@ static void *mainGuiThread(void *arg)
                 cout << "\nStopped " << instanceID << "\n";
                 break;
             }
+#ifdef GUI_FLTK
             if (bShowGui)
             {
                 for (int i = 0; !_synth->getRuntime().LogList.empty() && i < 5; ++i)
@@ -204,6 +210,7 @@ static void *mainGuiThread(void *arg)
                     }
                 }
             }
+#endif
             if (_synth == firstSynth)
             {
                 int testInstance = startInstance;
@@ -213,6 +220,7 @@ static void *mainGuiThread(void *arg)
         }
 
         // where all the action is ...
+#ifdef GUI_FLTK
         if (bShowGui)
         {
             if (splashSet)
@@ -231,6 +239,7 @@ static void *mainGuiThread(void *arg)
             GuiThreadMsg::processGuiMessages();
         }
         else
+#endif
             usleep(33333);
     }
     if (firstRuntime->configChanged && (bShowGui | bShowCmdLine)) // don't want this if no cli or gui
@@ -288,7 +297,7 @@ int mainCreateNewInstance(unsigned int forceId, bool loadState)
             name = name + "-" + to_string(forceId);
         synth->loadStateAndUpdate(name);
     }
-
+#ifdef GUI_FLTK
     if (synth->getRuntime().showGui)
     {
         synth->setWindowTitle(musicClient->midiClientName());
@@ -301,7 +310,7 @@ int mainCreateNewInstance(unsigned int forceId, bool loadState)
         if (synth->getRuntime().midiEngine < 1)
             fl_alert("Yoshimi can't find an input system. Running with no MIDI");
     }
-
+#endif
     synth->getRuntime().StartupReport(musicClient->midiClientName());
     synth->Unmute();
 
@@ -374,7 +383,9 @@ int main(int argc, char *argv[])
     globalArgv = argv;
     bool bExitSuccess = false;
     map<SynthEngine *, MusicClient *>::iterator it;
+#ifdef GUI_FLTK
     bool guiStarted = false;
+#endif
     pthread_t thr;
     pthread_attr_t attr;
     sem_t semGui;
@@ -401,12 +412,14 @@ int main(int argc, char *argv[])
         {
             if (pthread_create(&thr, &attr, mainGuiThread, (void *)&semGui) == 0)
             {
+#ifdef GUI_FLTK
                 guiStarted = true;
+#endif
             }
             pthread_attr_destroy(&attr);
         }
     }
-
+#ifdef GUI_FLTK
     if (!guiStarted)
     {
         cout << "Yoshimi can't start main gui loop!" << endl;
@@ -414,7 +427,7 @@ int main(int argc, char *argv[])
     }
     sem_wait(&semGui);
     sem_destroy(&semGui);
-
+#endif
     memset(&yoshimiSigAction, 0, sizeof(yoshimiSigAction));
     yoshimiSigAction.sa_handler = yoshimiSigHandler;
     if (sigaction(SIGUSR1, &yoshimiSigAction, NULL))

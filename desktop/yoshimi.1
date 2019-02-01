@@ -15,6 +15,8 @@ e.g. Within the 'part' context '? config' will show the commands for configurati
 \fBYoshimi\fP has a very extensive MIDI learn capability, exposing the majority of controls. The same MIDI CC and Channel pair can be linked to multiple independent controls. There is also considerable post-learn editing capability.
 .PP
 Other recent extensions are the ability to import and export entire instrument banks in a safe and obvious manner. It is now also possible to swap any instrument or bank with any other, in any bank root without disrupting the rest of the structure.
+.PP
+One of the latest additions is the ability to load a list of MIDI-learned settings from the command line at startup.
 .SH COMMANDS
 .TP
 .BR \-? ", " \-\-help " Shows command syntax."
@@ -49,6 +51,8 @@ Attempting 'c' and 'i' will produce a warning, and although it is possible to ru
 .TP
 .BR \-L ", " \-\-load-instrument=<file> " Load .xiz instrument file."
 .TP
+.BR \-M ", " \-\-load-midilearn=<file> " Load .xly learned list file."
+.TP
 .BR \-N ", " \-\-name-tag=<tag> " Add a tag to the client name."
 .TP
 .BR \-o ", " \-\-oscilsize=<size> " Set the AddSynth oscillater size."
@@ -61,6 +65,8 @@ Defaults to "HOME/.config/yoshimi/yoshimi.state"
 .BR \-u ", " \-\-jack-session-file=<file> " Load named JACK session file."
 .TP
 .BR \-U ", " \-\-jack-session-uuid=<uuid> " Use JACK session uuid."
+.TP
+Regardless of their position on the command line file loads will always be in the order: session (or state), patch set, instrument, midi-learn
 .TP
 .BR \-V ", " \-\-version " Print Yoshimi version."
 .TP

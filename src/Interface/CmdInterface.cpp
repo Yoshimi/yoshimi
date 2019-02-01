@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified January 2019
+    Modified February 2019
 */
 
 #include <iostream>
@@ -4882,12 +4882,14 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
             {
                 Runtime.Log("Can't find path " + (string) point);
             }
+#ifdef GUI_FLTK
             else
             {
                 GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
                 Runtime.Log("Added new root ID " + asString(found) + " as " + (string) point);
                 synth->saveBanks();
             }
+#endif
             return done_msg;
         }
         if (matchnMove(1, point, "bank"))
@@ -4904,7 +4906,9 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
             }
 
             Runtime.Log("Created  new bank " + (string) point + " with ID " + asString(slot));
+#ifdef GUI_FLTK
             GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
+#endif
             return done_msg;
         }
         if (matchnMove(2, point, "yoshimi"))
@@ -4980,7 +4984,9 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                     else
                     {
                         synth->getBankRef().removeRoot(rootID);
+#ifdef GUI_FLTK
                         GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
+#endif
                         Runtime.Log("Un-linked " + rootname);
                         synth->saveBanks();
                     }

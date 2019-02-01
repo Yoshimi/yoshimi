@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified January 2019
+    Modified February 2019
 */
 
 #include<stdio.h>
@@ -112,9 +112,11 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     fft(NULL),
     muted(0),
     //stateXMLtree(NULL),
+#ifdef GUI_FLTK
     guiMaster(NULL),
     guiClosedCallback(NULL),
     guiCallbackArg(NULL),
+#endif
     LFOtime(0),
     windowTitle("Yoshimi" + asString(uniqueId))
 {
@@ -139,7 +141,9 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
 
 SynthEngine::~SynthEngine()
 {
+#ifdef GUI_FLTK
     closeGui();
+#endif
 
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         if (part[npart])
@@ -310,7 +314,9 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         string feml = Runtime.midiLearnLoad;
         if (midilearn.loadList(feml))
         {
+#ifdef GUI_FLTK
             midilearn.updateGui();
+#endif
             Runtime.Log("midiLearn file " + feml + " loaded");
         }
         else
@@ -1323,13 +1329,17 @@ int SynthEngine::SetSystemValue(int type, int value)
                 value = MIN_KEY_SHIFT + 64;
             setPkeyshift(value);
             setAllPartMaps();
+#ifdef GUI_FLTK
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
+#endif
             Runtime.Log("Master key shift set to " + asString(value - 64));
             break;
 
         case 7: // master volume
             setPvolume(value);
+#ifdef GUI_FLTK
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
+#endif
             Runtime.Log("Master volume set to " + asString(value));
             break;
 
@@ -1359,7 +1369,9 @@ int SynthEngine::SetSystemValue(int type, int value)
                     part[npart]->Pkeyshift = value;
                     setPartMap(npart);
                     Runtime.Log("Part " +asString((int) npart) + "  key shift set to " + asString(value - 64));
+#ifdef GUI_FLTK
                     GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart, 0);
+#endif
                 }
             break;
 
@@ -1377,7 +1389,9 @@ int SynthEngine::SetSystemValue(int type, int value)
                 else
                 {
                     Runtime.midi_bank_root = value;
+#ifdef GUI_FLTK
                     GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
+#endif
                 }
             }
             if (value == 128) // but still report the setting
@@ -1400,7 +1414,9 @@ int SynthEngine::SetSystemValue(int type, int value)
                 else
                 {
                     Runtime.midi_bank_C = value;
+#ifdef GUI_FLTK
                     GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
+#endif
                 }
             }
             if (value == 0)
@@ -1420,7 +1436,9 @@ int SynthEngine::SetSystemValue(int type, int value)
             if (value != Runtime.EnableProgChange)
             {
                 Runtime.EnableProgChange = value;
+#ifdef GUI_FLTK
                 GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
+#endif
             }
             break;
 
@@ -1433,7 +1451,9 @@ int SynthEngine::SetSystemValue(int type, int value)
             if (value != Runtime.enable_part_on_voice_load)
             {
                 Runtime.enable_part_on_voice_load = value;
+#ifdef GUI_FLTK
                 GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
+#endif
             }
             break;
 
@@ -1451,7 +1471,9 @@ int SynthEngine::SetSystemValue(int type, int value)
                 else
                 {
                     Runtime.midi_upper_voice_C = value;
+#ifdef GUI_FLTK
                     GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
+#endif
                 }
             }
             if (value == 128) // but still report the setting
@@ -1465,7 +1487,9 @@ int SynthEngine::SetSystemValue(int type, int value)
             {
                 Runtime.NumAvailableParts = value;
                 Runtime.Log("Available parts set to " + asString(value));
+#ifdef GUI_FLTK
                 GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart,0);
+#endif
             }
             else
                 Runtime.Log("Out of range");
@@ -2309,8 +2333,9 @@ bool SynthEngine::installBanks()
     delete xml;
     Runtime.Log("\nFound " + asString(bank.InstrumentsInBanks) + " instruments in " + asString(bank.BanksInRoots) + " banks");
     Runtime.Log(miscMsgPop(RootBank(Runtime.tempRoot, Runtime.tempBank)& 0xff));
+#ifdef GUI_FLTK
     GuiThreadMsg::sendMessage((this), GuiThreadMsg::RefreshCurBank, 1);
-
+#endif
     return true;
 }
 
@@ -3129,7 +3154,7 @@ SynthEngine *SynthEngine::getSynthFromId(unsigned int uniqueId)
     synth = synthInstances.begin()->first;
     return synth;
 }
-
+#ifdef GUI_FLTK
 MasterUI *SynthEngine::getGuiMaster(bool createGui)
 {
     if (guiMaster == NULL && createGui)
@@ -3155,7 +3180,7 @@ void SynthEngine::closeGui()
         guiMaster = NULL;
     }
 }
-
+#endif
 
 string SynthEngine::makeUniqueName(string name)
 {

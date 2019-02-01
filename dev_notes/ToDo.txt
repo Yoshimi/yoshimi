@@ -47,8 +47,6 @@ Make loading effect presets update the 'top' line.
 
 Startup state load doesn't set buffersize correctly - partially resolved. Size is ignored if loaded when already running (which is reasonable).
 
-Allow headless compilation.
-
 Make stored values of things like Echo delay 32 bit unsigned integers.
 
 Consider enabling and disabling tooltips.

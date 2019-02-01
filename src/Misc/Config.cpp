@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified January 2019
+    Modified February 2019
 */
 
 #include <iostream>
@@ -55,9 +55,9 @@ static char prog_doc[] =
     "Yoshimi " YOSHIMI_VERSION ", a derivative of ZynAddSubFX - "
     "Copyright 2002-2009 Nasca Octavian Paul and others, "
     "Copyright 2009-2011 Alan Calvert, "
-    "Copyright 20012-2013 Jeremy Jongepier and others, "
-    "Copyright 20014-2017 Will Godfrey and others";
-string argline = "Yoshimi " + (string) YOSHIMI_VERSION;// + "\nBuild Number " + to_string(BUILD_NUMBER);
+    "Copyright 2012-2013 Jeremy Jongepier and others, "
+    "Copyright 2014-2019 Will Godfrey and others";
+string argline = "Yoshimi " + (string) YOSHIMI_VERSION;
 const char* argp_program_version = argline.c_str();
 
 static struct argp_option cmd_options[] = {
@@ -1273,7 +1273,7 @@ void Config::loadCmdArgs(int argc, char **argv)
         restoreJackSession = true;
 }
 
-
+#ifdef GUI_FLTK
 void GuiThreadMsg::processGuiMessages()
 {
     GuiThreadMsg *msg = (GuiThreadMsg *)Fl::thread_message();
@@ -1337,3 +1337,4 @@ void GuiThreadMsg::processGuiMessages()
         delete msg;
     }
 }
+#endif
