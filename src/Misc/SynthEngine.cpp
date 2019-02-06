@@ -26,17 +26,22 @@
     Modified February 2019
 */
 
-#include<stdio.h>
+#include <stdio.h>
 #include <sys/time.h>
 #include <set>
 
 using namespace std;
 
-//#ifdef GUI_FLTK
+#ifdef GUI_FLTK
     #include "MasterUI.h"
-//#endif
+#endif
+
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
+#include "Params/Controller.h"
+#include "Misc/Part.h"
+#include "Effects/EffectMgr.h"
+#include "Misc/XMLwrapper.h"
 
 #include <iostream>
 #include <fstream>

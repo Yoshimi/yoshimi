@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified January 2019
+    Modified February 2019
 */
 
 #ifndef SYNTHENGINE_H
@@ -55,7 +55,9 @@ class Part;
 class XMLwrapper;
 class Controller;
 
+#ifdef GUI_FLTK
 class MasterUI;
+#endif
 
 class SynthEngine : private SynthHelper, MiscFuncs
 {
@@ -227,7 +229,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         inline PresetsStore &getPresetsStore() {return presetsstore;}
         unsigned int getUniqueId() {return uniqueId;}
         SynthEngine *getSynthFromId(unsigned int uniqueId);
-        MasterUI *getGuiMaster(bool createGui = true);
         void guiClosed(bool stopSynth);
         void setGuiClosedCallback(void( *_guiClosedCallback)(void*), void *arg)
         {
@@ -254,7 +255,10 @@ class SynthEngine : private SynthHelper, MiscFuncs
         int keyshift;
 
     public:
+#ifdef GUI_FLTK
         MasterUI *guiMaster; // need to read this in InterChange::returns
+        MasterUI *getGuiMaster(bool createGui = true);
+#endif
     private:
         void( *guiClosedCallback)(void*);
         void *guiCallbackArg;
