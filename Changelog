@@ -1,5 +1,8 @@
 yoshimi 1.5.10 M
 
+2019-2-6 Will
+* Almost completed GUI detachement for headless.
+
 2019-2-1 Will
 * Enabled headless build (Not LV2).
   Not fully tested.

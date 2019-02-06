@@ -44,7 +44,9 @@ using namespace std;
 #include "Effects/EffectMgr.h"
 #include "Synth/Resonance.h"
 #include "Synth/OscilGen.h"
-#include "MasterUI.h"
+#ifdef GUI_FLTK
+    #include "MasterUI.h"
+#endif
 
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
 extern int mainCreateNewInstance(unsigned int forceId, bool loadState);
@@ -56,8 +58,10 @@ InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth),
     fromCLI(NULL),
     decodeLoopback(NULL),
+#ifdef GUI_FLTK
     fromGUI(NULL),
     toGUI(NULL),
+#endif
     fromMIDI(NULL),
     returnsBuffer(NULL),
     blockRead(0),
@@ -97,7 +101,7 @@ bool InterChange::Init()
         goto bail_out;
     }
     jack_ringbuffer_reset(decodeLoopback);
-
+#ifdef GUI_FLTK
     if (!(fromGUI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
     {
         synth->getRuntime().Log("InterChange failed to create 'fromGUI' ringbuffer");
@@ -109,19 +113,20 @@ bool InterChange::Init()
         goto bail_out;
     }
     jack_ringbuffer_reset(fromGUI);
-
+#ifdef GUI_FLTK
     if (!(toGUI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
     {
         synth->getRuntime().Log("InterChange failed to create 'toGUI' ringbuffer");
         goto bail_out;
     }
+#endif
     if (jack_ringbuffer_mlock(toGUI))
     {
         synth->getRuntime().Log("Failed to lock toGUI memory");
         goto bail_out;
     }
     jack_ringbuffer_reset(toGUI);
-
+#endif
     if (!(fromMIDI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
     {
         synth->getRuntime().Log("InterChange failed to create 'fromMIDI' ringbuffer");
@@ -166,6 +171,7 @@ bail_out:
         jack_ringbuffer_free(decodeLoopback);
         decodeLoopback = NULL;
     }
+#ifdef GUI_FLTK
     if (fromGUI)
     {
         jack_ringbuffer_free(fromGUI);
@@ -176,15 +182,16 @@ bail_out:
         jack_ringbuffer_free(toGUI);
         toGUI = NULL;
     }
+#endif
     if (fromMIDI)
     {
         jack_ringbuffer_free(fromMIDI);
-        fromGUI = NULL;
+        fromMIDI = NULL;
     }
     if (returnsBuffer)
     {
         jack_ringbuffer_free(returnsBuffer);
-        fromGUI = NULL;
+        returnsBuffer = NULL;
     }
     return false;
 }
@@ -278,6 +285,7 @@ InterChange::~InterChange()
         jack_ringbuffer_free(decodeLoopback);
         decodeLoopback = NULL;
     }
+#ifdef GUI_FLTK
     if (fromGUI)
     {
         jack_ringbuffer_free(fromGUI);
@@ -288,10 +296,11 @@ InterChange::~InterChange()
         jack_ringbuffer_free(toGUI);
         toGUI = NULL;
     }
+#endif
     if (fromMIDI)
     {
         jack_ringbuffer_free(fromMIDI);
-        fromGUI = NULL;
+        fromMIDI = NULL;
     }
 }
 
@@ -312,6 +321,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     if (write)
         __sync_or_and_fetch(&blockRead, 2);
     bool guiTo = false;
+    guiTo = guiTo; // suppress warning when headless build
     string text;
     if (getData->data.par2 != NO_MSG)
         text = miscMsgPop(getData->data.par2);
@@ -857,12 +867,14 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = "READ";
                     value = miscMsgPush(text);
                     getData->data.par2 = miscMsgPush(text); // slightly odd case
-                    getData->data.parameter -= TOPLEVEL::route::lowPriority;
-                        value = miscMsgPush(text);
+                    //getData->data.parameter -= TOPLEVEL::route::lowPriority;
+                    //    value = miscMsgPush(text);
                     break;
             }
+#ifdef GUI_FLTK
             if (!(type & TOPLEVEL::source::GUI))
                 guiTo = true;
+#endif
             getData->data.parameter -= TOPLEVEL::route::lowPriority;
             break;
         }
@@ -986,10 +998,12 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         if (jack_ringbuffer_write_space(returnsBuffer) >= commandSize)
         {
             getData->data.value = float(value);
+#ifdef GUI_FLTK
             if (synth->getRuntime().showGui && write && guiTo)
                 getData->data.par2 = miscMsgPush(text); // pass it on to GUI
-
+#endif
             jack_ringbuffer_write(returnsBuffer, (char*) getData->bytes, commandSize);
+#ifdef GUI_FLTK
             if (synth->getRuntime().showGui && npart == TOPLEVEL::section::scales && control == SCALES::control::importScl)
             {   // loading a tuning includes a name and comment!
                 getData->data.control = SCALES::control::name;
@@ -999,6 +1013,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                 getData->data.par2 = miscMsgPush(synth->microtonal.Pcomment);
                 jack_ringbuffer_write(returnsBuffer, (char*) getData->bytes, commandSize);
             }
+#endif
         }
         else
             synth->getRuntime().Log("Unable to  write to returnsBuffer buffer");
@@ -3799,7 +3814,7 @@ void InterChange::mediate()
                 commandSend(&getData);
             returns(&getData);
         }
-
+#ifdef GUI_FLTK
         size = jack_ringbuffer_read_space(fromGUI);
         if (size >= commandSize)
         {
@@ -3813,7 +3828,7 @@ void InterChange::mediate()
                 commandSend(&getData);
             returns(&getData);
         }
-
+#endif
         size = jack_ringbuffer_read_space(fromMIDI);
         if (size >= commandSize)
         {
@@ -3827,11 +3842,13 @@ void InterChange::mediate()
                 commandSend(&getData);
                 returns(&getData);
             }
+#ifdef GUI_FLTK
             else if (getData.data.control == MIDILEARN::control::reportActivity)
             {
                 if (jack_ringbuffer_write_space(toGUI) >= commandSize)
                 jack_ringbuffer_write(toGUI, (char*) getData.bytes, commandSize);
             }
+#endif
             else if (getData.data.control == TOPLEVEL::section::midiLearn) // not part!
             {
                 synth->mididecode.midiProcess(getData.data.kit, getData.data.engine, getData.data.insert, false);
@@ -3901,9 +3918,10 @@ void InterChange::returns(CommandBlock *getData)
 
     if (getData->data.parameter < TOPLEVEL::route::lowPriority || getData->data.parameter >= TOPLEVEL::route::adjustAndLoopback)
     {
-        bool isCliOrGuiRedraw = type & TOPLEVEL::source::CLI; // separated out for clarity
+#ifdef GUI_FLTK
         bool isMidi = type & TOPLEVEL::source::MIDI;
         bool write = (type & TOPLEVEL::type::Write) > 0;
+        bool isCliOrGuiRedraw = type & TOPLEVEL::source::CLI; // separated out for clarity
         bool isOKtoRedraw = (isCliOrGuiRedraw && write) || isMidi;
 
         if (synth->guiMaster && isOKtoRedraw)
@@ -3914,6 +3932,7 @@ void InterChange::returns(CommandBlock *getData)
             else
                 synth->getRuntime().Log("Unable to write to toGUI buffer");
         }
+#endif
     }
     if (jack_ringbuffer_write_space(decodeLoopback) >= commandSize)
         jack_ringbuffer_write(decodeLoopback, (char*) getData->bytes, commandSize);

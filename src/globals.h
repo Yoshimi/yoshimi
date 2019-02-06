@@ -31,8 +31,6 @@
  */
 //#define NORANDOM ON
 
-//#define GUI_FLTK
-
 // math
 #define PI 3.1415926536f
 #define TWOPI 6.28318530718f

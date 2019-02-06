@@ -48,7 +48,9 @@ using namespace std;
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
-#include "MasterUI.h"
+#ifdef GUI_FLTK
+    #include "MasterUI.h"
+#endif
 #include "ConfBuild.h"
 
 static char prog_doc[] =

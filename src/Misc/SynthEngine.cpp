@@ -32,7 +32,9 @@
 
 using namespace std;
 
-#include "MasterUI.h"
+//#ifdef GUI_FLTK
+    #include "MasterUI.h"
+//#endif
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
 
@@ -1800,12 +1802,14 @@ void SynthEngine::SetMuteAndWait(void)
     putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
     putData.data.control = TOPLEVEL::control::errorMessage;
     putData.data.part = TOPLEVEL::section::main;
+#ifdef GUI_FLTK
     if (jack_ringbuffer_write_space(interchange.fromGUI) >= sizeof(putData))
     {
         jack_ringbuffer_write(interchange.fromGUI, (char*) putData.bytes, sizeof(putData));
         while(isMuted() == 0)
             usleep (1000);
     }
+#endif
 }
 
 
@@ -3161,17 +3165,19 @@ MasterUI *SynthEngine::getGuiMaster(bool createGui)
         guiMaster = new MasterUI(this);
     return guiMaster;
 }
-
+#endif
 
 void SynthEngine::guiClosed(bool stopSynth)
 {
     if (stopSynth && !isLV2Plugin)
         Runtime.runSynth = false;
+#ifdef GUI_FLTK
     if (guiClosedCallback != NULL)
         guiClosedCallback(guiCallbackArg);
+#endif
 }
 
-
+#ifdef GUI_FLTK
 void SynthEngine::closeGui()
 {
     if (guiMaster != NULL)
@@ -3181,6 +3187,7 @@ void SynthEngine::closeGui()
     }
 }
 #endif
+
 
 string SynthEngine::makeUniqueName(string name)
 {

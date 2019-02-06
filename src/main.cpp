@@ -34,11 +34,8 @@
 using namespace std;
 
 #include "Misc/Config.h"
-#include "Misc/Splash.h"
 #include "Misc/SynthEngine.h"
 #include "MusicIO/MusicClient.h"
-#include "MasterUI.h"
-#include "UI/MiscGui.h"
 #include <map>
 #include <list>
 #include <pthread.h>
@@ -46,9 +43,14 @@ using namespace std;
 #include <cstdio>
 #include <unistd.h>
 
-#include <FL/Fl.H>
-#include <FL/Fl_Window.H>
-#include <FL/Fl_PNG_Image.H>
+#ifdef GUI_FLTK
+    #include "MasterUI.h"
+    #include "UI/MiscGui.h"
+    #include <FL/Fl.H>
+    #include <FL/Fl_Window.H>
+    #include <FL/Fl_PNG_Image.H>
+    #include "Misc/Splash.h"
+#endif
 
 #include <readline/readline.h>
 #include <readline/history.h>

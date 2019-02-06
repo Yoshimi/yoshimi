@@ -306,10 +306,6 @@ else(READLINE_FOUND)
     message( FATAL_ERROR "Readline library not found! Please install development components (libreadline-dev)" )
 endif(READLINE_FOUND)
 
-if (BuildWithFLTK)
-    set (YOSHI_INCLUDES ${FLTK_INCLUDE_DIR})
-endif (BuildWithFLTK)
-
 # set platform specific compiler flags
 if (BuildFor0ld_X86)
     set (OurCxxFlags ${BuildOptions_X86})
@@ -372,11 +368,6 @@ set (Interface_Sources
     Interface/MidiLearn.cpp
     Interface/MidiDecode.cpp
 )
-#if (BuildWithFLTK)
-#    set (Interface_Sources
-#        {Interface_Sources} {UI/MiscGui.cpp}
-#    )
-#endif (BuildWithFLTK)
 
 set (Params_sources
     Params/ADnoteParameters.cpp  Params/EnvelopeParams.cpp
@@ -431,6 +422,7 @@ if (BuildWithFLTK)
         UI/WidgetMWSlider.cpp
         UI/MiscGui.cpp
     )
+    set (YOSHI_INCLUDES ${FLTK_INCLUDE_DIR})
 endif(BuildWithFLTK)
 
 add_definitions (
