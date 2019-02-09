@@ -482,6 +482,7 @@ set (ProgSources
     ${DSP_sources}
     ${Effects_sources}
     ${MusicIO_sources}
+    ${FltkUI_sources}
 )
 
 include_directories (AFTER
@@ -497,6 +498,7 @@ include_directories (AFTER
 
 set(ExternLibraries
     ${FONTCONFIG_LIBRARIES}
+    ${FLTK_LIBRARIES}
     ${MXML_LIBRARIES}
     ${ALSA_LIBRARIES}
     ${JACK_LIBRARIES}
@@ -509,14 +511,6 @@ set(ExternLibraries
     #dl
     ${LIBDL_LINUX}
 )
-if (BuildWithFLTK)
-    set(ProgSources
-        ${ProgSources} ${FltkUI_sources}
-    )
-    set(ExternLibraries
-        ${ExternLibraries} ${FLTK_LIBRARIES}
-    )
-endif (BuildWithFLTK)
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
     link_directories(/usr/local/lib)
