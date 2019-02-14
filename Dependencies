@@ -5,10 +5,10 @@ Some of these will pull in other ones.
     build-essential  * we now require C++11
     cmake-curses-gui * 3.0 or later
     dssi-dev
-    fluid
+    fluid           not needed if compiling headless
     libcairo2-dev
     libfftw3-dev
-    libfltk1.3-dev
+    libfltk1.3-dev  not needed if compiling headless
     libglu1-mesa-dev
     libjack-jackd2-dev
     libmxml-dev

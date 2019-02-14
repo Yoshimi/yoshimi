@@ -12,7 +12,7 @@ comment {
 Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2014-2018, Will Godfrey & others
+Copyright 2014-2019, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code.
 
-Modified September 2018
+Modified February 2019
 } {selected in_source in_header
 }
 
@@ -289,7 +289,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
   Function {make_window()} {} {
     Fl_Window instrumentuiwindow {
       label Bank
-      xywh {203 349 780 575} type Double hide
+      xywh {84 346 780 575} type Double hide
     } {
       Fl_Choice banklist {
         callback {//
@@ -393,7 +393,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         } {}
       }
       Fl_Group modeselect {
-        xywh {5 528 458 42} box ENGRAVED_BOX
+        xywh {5 528 458 42} box ENGRAVED_BOX hide
       } {
         Fl_Light_Button writebutton {
           label SAVE
@@ -493,6 +493,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
       label Root
       xywh {84 223 775 575} type Double labelsize 12 hide
       code0 {o->copy_label(bank->getRootFileTitle().c_str());}
+      code1 {if (synth->getUniqueId() == 0) rootmodeselect->show();}
     } {
       Fl_Button {} {
         label Roots
@@ -573,7 +574,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         } {}
       }
       Fl_Group rootmodeselect {
-        xywh {5 528 570 42} box ENGRAVED_BOX
+        xywh {5 528 570 42} box ENGRAVED_BOX hide
       } {
         Fl_Light_Button rootreadbutton {
           label SELECT
@@ -661,6 +662,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
       xywh {30 70 465 295} type Double hide
       code0 {readbankcfg();}
       code1 {o->copy_label(synth->makeUniqueName("Bank Root Paths").c_str());}
+      code2 {if (synth->getUniqueId() == 0) {addrootdirbutton->show();  removerootdirbutton->show();  changeIDbutton->show();}}
     } {
       Fl_Browser rootsbrowse {
         callback {int tmp = o->value();
@@ -675,7 +677,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         Pend->hide();}
         xywh {10 10 445 200} type Hold labelsize 12 textsize 13
       }
-      Fl_Button {} {
+      Fl_Button addrootdirbutton {
         label {Add root directory...}
         callback {//
         const char *dirname;
@@ -687,7 +689,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         readbankcfg();
         rescan_for_banks(true);
         Pend->hide();}
-        xywh {10 225 75 35} box THIN_UP_BOX labelsize 12 align 128
+        xywh {10 225 75 35} box THIN_UP_BOX labelsize 12 align 128 hide
       }
       Fl_Button removerootdirbutton {
         label {Remove root dir...}
@@ -701,7 +703,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         activatebutton_rootdir(false);
         rescan_for_banks(false);
         Pend->hide();}
-        xywh {95 225 75 35} box THIN_UP_BOX labelsize 12 align 128 deactivate
+        xywh {95 225 75 35} box THIN_UP_BOX labelsize 12 align 128 hide deactivate
         code0 {o->deactivate();}
       }
       Fl_Button makedefaultrootdirbutton {
@@ -757,7 +759,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
       Fl_Spinner changeIDbutton {
         label {Change ID}
         callback {Pend->show();}
-        xywh {348 238 45 19} labelsize 12 align 5 minimum 0 maximum 126 textsize 12 deactivate
+        xywh {348 238 45 19} labelsize 12 align 5 minimum 0 maximum 126 textsize 12 hide deactivate
         code0 {oldrootID = o->value();}
       }
       Fl_Button {} {
@@ -840,7 +842,16 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
     readbutton->value(1);
     mode = 1;
     removeselection();
-    modeselect->show();
+    if (synth->getUniqueId() == 0)
+    {
+        modeselect->show();
+        rootmodeselect->show();
+    }
+    else
+    {
+        modeselect->hide();
+        rootmodeselect->hide();
+    }
     refreshmainwindow();} {}
   }
   Function {Hide()} {} {

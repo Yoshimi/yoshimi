@@ -327,8 +327,6 @@ namespace MIDILEARN // usage MIDILEARN::control::block
     };
 }
 
-// the following are actual MIDI numbers
-// not to be confused with part controls!
 namespace MIDI // usage MIDI::control::noteOn
 {
     enum control : unsigned char {
@@ -337,6 +335,8 @@ namespace MIDI // usage MIDI::control::noteOn
         controller,
         programChange = 8// also bank and root - split?
     };
+// the following are actual MIDI numbers
+// not to be confused with part controls!
     enum CC : unsigned short int {
         bankSelectMSB = 0,
         modulation,

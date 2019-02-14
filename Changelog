@@ -1,5 +1,10 @@
 yoshimi 1.5.10 M
 
+2019-2-14 Will
+* Now only the main instance can change bank structure.
+  Others can read/change their current selected ones.
+* Updated dependencies.
+
 2019-2-6 Will
 * Almost completed GUI detachment for headless.
 * Applied patch from Rob - completes headless builds.
