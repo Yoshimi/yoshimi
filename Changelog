@@ -1,5 +1,8 @@
 yoshimi 1.5.10 M
 
+2019-2-20 Will.
+* Added missing LFO intensity control description to CLI.
+
 2019-2-14 Will
 * Now only the main instance can change bank structure.
   Others can read/change their current selected ones.

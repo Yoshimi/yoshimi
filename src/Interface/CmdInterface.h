@@ -445,6 +445,7 @@ static string LFOlist [] = {
     "FRequency ~",          "frequency type",
     "FIlter ~",             "filter type",
     "~  Rate <n>",          "frequency",
+    "~  Intensity <n>",     "depth",
     "~  Start <n>",         "start position in cycle",
     "~  Delay <n>",         "time before effect",
     "~  Expand <n>",        "rate / note pitch",
