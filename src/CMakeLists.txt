@@ -36,8 +36,8 @@ add_definitions(-Wall)
 
 # vvv
 #add_definitions(-Wpedantic)
-#add_definitions(-Werror=format-security)
-#add_definitions(-Wextra)
+add_definitions(-Werror=format-security)
+add_definitions(-Wextra)
 # ^^^ comment these out on release pushes
 
 set (YOSHIMI_VERSION "1.5.10 M")
@@ -118,7 +118,7 @@ set (BuildOptions_NEON
 )
 
 set (BuildOptionsThisCPU
-    "-march=native -Wall -msse -msse2 -mfpmath=sse -ffast-math -fno-finite-math-only -fomit-frame-pointer"
+    "-march=native -mtune=native -Wall"
   CACHE STRING "Current CPU compiler options"
 )
 
@@ -239,16 +239,16 @@ else(FONTCONFIG_FOUND)
 endif(FONTCONFIG_FOUND)
 
 
+if (BuildWithFLTK)
 # libcairo
-pkg_check_modules (LIBCAIRO REQUIRED cairo)
-if (LIBCAIRO_FOUND)
-    message (STATUS "Found libcairo ${LIBCAIRO_VERSION}")
-else (LIBCAIRO_FOUND)
-    message (FATAL_ERROR "libcairo required but not found")
-endif (LIBCAIRO_FOUND)
+    pkg_check_modules (LIBCAIRO REQUIRED cairo)
+    if (LIBCAIRO_FOUND)
+        message (STATUS "Found libcairo ${LIBCAIRO_VERSION}")
+    else (LIBCAIRO_FOUND)
+        message (FATAL_ERROR "libcairo required but not found")
+    endif (LIBCAIRO_FOUND)
 
 # fltk
-if (BuildWithFLTK)
     find_package (FLTK REQUIRED)
     if (FLTK_FOUND)
         message (STATUS "Found FLTK")
@@ -482,6 +482,7 @@ set (ProgSources
     ${DSP_sources}
     ${Effects_sources}
     ${MusicIO_sources}
+    ${FltkUI_sources}
 )
 
 include_directories (AFTER
@@ -497,6 +498,7 @@ include_directories (AFTER
 
 set(ExternLibraries
     ${FONTCONFIG_LIBRARIES}
+    ${FLTK_LIBRARIES}
     ${MXML_LIBRARIES}
     ${ALSA_LIBRARIES}
     ${JACK_LIBRARIES}
@@ -509,14 +511,7 @@ set(ExternLibraries
     #dl
     ${LIBDL_LINUX}
 )
-if (BuildWithFLTK)
-    set(ProgSources
-        ${ProgSources} ${FltkUI_sources}
-    )
-    set(ExternLibraries
-        ${ExternLibraries} ${FLTK_LIBRARIES}
-    )
-endif (BuildWithFLTK)
+
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
     link_directories(/usr/local/lib)
@@ -525,7 +520,6 @@ endif()
 add_executable (yoshimi ${ProgSources} main.cpp)
 
 target_link_libraries (yoshimi ${ExternLibraries})
-
 
 
 if (ARGP_LIB)

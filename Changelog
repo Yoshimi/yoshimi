@@ -2,11 +2,19 @@ yoshimi 1.5.10 M
 
 2019-2-20 Will.
 * Added missing LFO intensity control description to CLI.
+* Adjusted CMakeLists.txt for better 'native' recognition.
+* Copied in Rob's FLTK fix.
+* Moved cairo tests inside fltk build option.
 
 2019-2-14 Will
 * Now only the main instance can change bank structure.
   Others can read/change their current selected ones.
 * Updated dependencies.
+
+2019-02-10 Rob
+* put FLTK sources & libs back in old places in CMakeLists -- tacking
+  the libs on at end of the list sometimes broke linker command line.
+  It's an empty string when GUI_FLTK=0, anyway.
 
 2019-2-6 Will
 * Almost completed GUI detachment for headless.
