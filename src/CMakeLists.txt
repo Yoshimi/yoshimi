@@ -367,6 +367,7 @@ set (Interface_Sources
     Interface/InterChange.cpp
     Interface/MidiLearn.cpp
     Interface/MidiDecode.cpp
+    Interface/FileMgr.cpp
 )
 
 set (Params_sources

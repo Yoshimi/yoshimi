@@ -1,5 +1,10 @@
 yoshimi 1.5.10 M
 
+2019-2-23 Will
+* Installed placeholder FileMgr in /src/Interface
+  This will eventually handle all actual file operations
+  for consistency and simlifying porting to other systems.
+
 2019-2-20 Will.
 * Added missing LFO intensity control description to CLI.
 * Adjusted CMakeLists.txt for better 'native' recognition.

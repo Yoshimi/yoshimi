@@ -6,7 +6,7 @@ Some of these will pull in other ones.
     cmake-curses-gui * 3.0 or later
     dssi-dev
     fluid           not needed if compiling headless
-    libcairo2-dev
+    libcairo2-dev   not needed if compiling headless
     libfftw3-dev
     libfltk1.3-dev  not needed if compiling headless
     libglu1-mesa-dev

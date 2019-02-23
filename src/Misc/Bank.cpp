@@ -22,7 +22,7 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified September 2018
+    Modified February 2019
 */
 
 #include <set>
@@ -46,7 +46,6 @@ using namespace std;
 #include "Misc/XMLwrapper.h"
 #include "Misc/Config.h"
 #include "Misc/Bank.h"
-#include "Misc/MiscFuncs.h"
 #include "Misc/SynthEngine.h"
 
 Bank::Bank(SynthEngine *_synth) :
@@ -61,6 +60,8 @@ Bank::Bank(SynthEngine *_synth) :
     InstrumentsInBanks = 0,
     BanksInRoots = 0;
     roots.clear();
+
+    //TestFunc(456); // just for testing
 }
 
 

@@ -44,11 +44,10 @@ using namespace std;
 #include "Interface/InterChange.h"
 #include "Interface/MidiLearn.h"
 #include "Interface/MidiDecode.h"
+#include "Interface/FileMgr.h"
 #include "Misc/Config.h"
 #include "Params/PresetsStore.h"
 #include "Params/UnifiedPresets.h"
-
-typedef enum { init, lockType, unlockType, destroy } lockset;
 
 class EffectMgr;
 class Part;
@@ -59,7 +58,7 @@ class Controller;
 class MasterUI;
 #endif
 
-class SynthEngine : private SynthHelper, MiscFuncs
+class SynthEngine : private SynthHelper, MiscFuncs, FileMgr
 {
     private:
         unsigned int uniqueId;

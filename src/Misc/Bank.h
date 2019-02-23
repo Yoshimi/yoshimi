@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2010, Alan Calvert
-    Copyright 2014-2018 Will Godfrey & others
+    Copyright 2014-2019 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is a derivative of a ZynAddSubFX original.
-    Modified September 2018
+    Modified February 2019
 */
 
 #ifndef BANK_H
@@ -32,6 +32,7 @@
 using namespace std;
 
 #include "Misc/MiscFuncs.h"
+#include "Interface/FileMgr.h"
 #include "Misc/Part.h"
 #include <map>
 #include <vector>
@@ -98,11 +99,13 @@ typedef map<size_t, map<string, size_t> > BankHintsMap;
 
 class SynthEngine;
 
-class Bank : private MiscFuncs
+class Bank : private MiscFuncs, FileMgr
 {
-//#ifdef YOSHIMI_LV2_PLUGIN
+/* this doesn't seem necessary
+#ifdef YOSHIMI_LV2_PLUGIN
     friend class YoshimiLV2Plugin;
-//#endif
+#endif
+*/
     friend class SynthEngine;
     public:
         Bank(SynthEngine *_synth);
