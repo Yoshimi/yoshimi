@@ -1,5 +1,5 @@
 /*
-    MidiDecode.cpp
+    FileMgr.cpp
 
     Copyright 2019 Will Godfrey
 
@@ -21,6 +21,10 @@
 */
 
 #include <iostream>
+#include <fstream>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <string>
 #include <unistd.h>
@@ -28,6 +32,7 @@
 using namespace std;
 
 #include "Interface/FileMgr.h"
+#include "Misc/MiscFuncs.h"
 
 bool FileMgr::TestFunc(int result)
 {
@@ -68,6 +73,27 @@ void FileMgr::legit_pathname(string& fname)
             fname.at(i) = '_';
     }
 }
+
+
+bool FileMgr::isRegFile(string chkpath)
+{
+    struct stat st;
+    if (!stat(chkpath.c_str(), &st))
+        if (S_ISREG(st.st_mode))
+            return true;
+    return false;
+}
+
+
+bool FileMgr::isDirectory(string chkpath)
+{
+    struct stat st;
+    if (!stat(chkpath.c_str(), &st))
+        if (S_ISDIR(st.st_mode))
+            return true;
+    return false;
+}
+
 
 /*
  * This is only intended for calls on the local filesystem
@@ -153,5 +179,79 @@ string FileMgr::setExtension(string fname, string ext)
         }
     }
     return tmp;
+}
+
+
+bool FileMgr::copyFile(string source, string destination)
+{
+    ifstream infile (source, ios::in|ios::binary|ios::ate);
+    if (!infile.is_open())
+        return 1;
+    ofstream outfile (destination, ios::out|ios::binary);
+    if (!outfile.is_open())
+        return 1;
+
+    streampos size = infile.tellg();
+    char *memblock = new char [size];
+    infile.seekg (0, ios::beg);
+    infile.read(memblock, size);
+    infile.close();
+    outfile.write(memblock, size);
+    outfile.close();
+    delete memblock;
+    return 0;
+}
+
+
+bool FileMgr::saveText(string text, string filename)
+{
+    FILE *writefile = fopen(filename.c_str(), "w");
+    if (!writefile)
+        return 0;
+
+    fputs(text.c_str(), writefile);
+    fclose (writefile);
+    return 1;
+}
+
+
+string FileMgr::loadText(string filename)
+{
+    FILE *readfile = fopen(filename.c_str(), "r");
+    if (!readfile)
+        return "";
+
+    string text = "";
+    char line [1024];
+    while (!feof(readfile))
+    {
+        if(fgets(line , 1024 , readfile))
+            text += string(line);
+    }
+    fclose (readfile);
+    text.erase(text.find_last_not_of(" \n\r\t")+1);
+    return text;
+}
+
+
+// replace build directory with a different
+// one in the compilation directory
+string FileMgr::localPath(string leaf)
+{
+    char *tmpath = getcwd (NULL, 0);
+    if (tmpath == NULL)
+       return "";
+
+    string path = (string) tmpath;
+    free(tmpath);
+    size_t found = path.rfind("yoshimi");
+    if (found == string::npos)
+        return "";
+
+    size_t next = path.find('/', found);
+    if (next == string::npos)
+        return "";
+
+    return path.substr(0, next) + leaf;
 }
 

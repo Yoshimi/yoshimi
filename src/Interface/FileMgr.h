@@ -36,12 +36,18 @@ class FileMgr
         FileMgr(){ }
         ~FileMgr(){ };
         bool TestFunc(int result);
+
         void legit_filename(string& fname);
         void legit_pathname(string& fname);
+        bool isRegFile(string chkpath);
+        bool isDirectory(string chkpath);
         string findfile(string path, string filename, string extension);
         string findleafname(string name);
         string setExtension(string fname, string ext);
-
+        bool copyFile(string source, string destination);
+        string localPath(string leaf);
+        bool saveText(string text, string filename);
+        string loadText(string filename);
 };
 
 #endif

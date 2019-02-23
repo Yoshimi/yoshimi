@@ -44,6 +44,7 @@ file (GLOB yoshimi_misc_files
 file (GLOB yoshimi_interface_files
     ../Interface/MidiDecode.cpp ../Interface/MidiDecode.h
     ../Interface/InterChange.cpp ../Interface/InterChange.h
+    ../Interface/FileMgr.cpp
     ../Interface/MidiLearn.cpp ../Interface/MidiLearn.h
     ../UI/MiscGui.cpp ../UI/MiscGui.h)
 file (GLOB yoshimi_params_files

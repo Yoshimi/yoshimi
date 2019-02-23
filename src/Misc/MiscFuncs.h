@@ -59,14 +59,8 @@ class MiscFuncs
 
         int stringNumInList(string toFind, string *listname, int convert = 0);
 
-        bool isRegFile(string chkpath);
-        bool isDirectory(string chkpath);
         bool isFifo(string chkpath);
         int findSplitPoint(string name);
-        bool copyFile(string source, string destination);
-        string localPath(string leaf);
-        bool saveText(string text, string filename);
-        int loadText(string filename);
 
         char *skipSpace(char *buf);
         char *skipChars(char *buf);

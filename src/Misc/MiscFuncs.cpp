@@ -23,13 +23,10 @@
 //#define REPORT_MISCMSG
 
 #include <sys/stat.h>
-#include <fcntl.h>
 #include <stdlib.h>
-#include <dirent.h>
 #include <unistd.h>
 #include <sstream>
 #include <iostream>
-#include <fstream>
 #include <string.h>
 #include <limits.h>
 
@@ -231,26 +228,7 @@ int MiscFuncs::stringNumInList(string toFind, string *listname, int convert)
 }
 
 
-bool MiscFuncs::isRegFile(string chkpath)
-{
-    struct stat st;
-    if (!stat(chkpath.c_str(), &st))
-        if (S_ISREG(st.st_mode))
-            return true;
-    return false;
-}
-
-
-bool MiscFuncs::isDirectory(string chkpath)
-{
-    struct stat st;
-    if (!stat(chkpath.c_str(), &st))
-        if (S_ISDIR(st.st_mode))
-            return true;
-    return false;
-}
-
-
+// This is never called !
 bool MiscFuncs::isFifo(string chkpath)
 {
     struct stat st;
@@ -261,6 +239,7 @@ bool MiscFuncs::isFifo(string chkpath)
 }
 
 
+// this is not actualy a file operation so stays here
 int MiscFuncs::findSplitPoint(string name)
 {
     unsigned int chk = 0;
@@ -276,80 +255,6 @@ int MiscFuncs::findSplitPoint(string name)
     if (ch != '-')
         return 0;
     return chk;
-}
-
-
-bool MiscFuncs::copyFile(string source, string destination)
-{
-    ifstream infile (source, ios::in|ios::binary|ios::ate);
-    if (!infile.is_open())
-        return 1;
-    ofstream outfile (destination, ios::out|ios::binary);
-    if (!outfile.is_open())
-        return 1;
-
-    streampos size = infile.tellg();
-    char *memblock = new char [size];
-    infile.seekg (0, ios::beg);
-    infile.read(memblock, size);
-    infile.close();
-    outfile.write(memblock, size);
-    outfile.close();
-    delete memblock;
-    return 0;
-}
-
-
-bool MiscFuncs::saveText(string text, string filename)
-{
-    FILE *writefile = fopen(filename.c_str(), "w");
-    if (!writefile)
-        return 0;
-
-    fputs(text.c_str(), writefile);
-    fclose (writefile);
-    return 1;
-}
-
-
-int MiscFuncs::loadText(string filename)
-{
-    FILE *readfile = fopen(filename.c_str(), "r");
-    if (!readfile)
-        return 0xffff;
-
-    string text = "";
-    char line [1024];
-    while (!feof(readfile))
-    {
-        if(fgets(line , 1024 , readfile))
-            text += string(line);
-    }
-    fclose (readfile);
-    text.erase(text.find_last_not_of(" \n\r\t")+1);
-    return miscMsgPush(text);
-}
-
-
-// replace build directory with a different
-// one in the compilation directory
-string MiscFuncs::localPath(string leaf)
-{
-    char *tmpath = getcwd (NULL, 0);
-    if (tmpath == NULL)
-       return "";
-
-    string path = (string) tmpath;
-    free(tmpath);
-    size_t found = path.rfind("yoshimi");
-    if (found == string::npos)
-        return "";
-
-    size_t next = path.find('/', found);
-    if (next == string::npos)
-        return "";
-
-    return path.substr(0, next) + leaf;
 }
 
 

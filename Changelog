@@ -5,6 +5,8 @@ yoshimi 1.5.10 M
   This will eventually handle all actual file operations
   for consistency and simlifying porting to other systems.
 * Started moving file functions from MiscFuncs to FileMgr.
+* Completed transfers from MiscFuncs to FileMgr.
+  Other calls to find in other files :(
 
 2019-2-20 Will.
 * Added missing LFO intensity control description to CLI.
