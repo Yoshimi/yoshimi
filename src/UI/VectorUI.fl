@@ -2,7 +2,7 @@
 version 1.0304
 header_name {.h}
 code_name {.cc}
-comment {Copyright 2016-2018, Will Godfrey
+comment {Copyright 2016-2019, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-Modified August 2018
+Modified February 2019
 } {selected in_source in_header
 }
 
@@ -33,6 +33,9 @@ decl {\#include "Misc/SynthEngine.h"} {public global
 decl {\#include "Misc/MiscFuncs.h"} {private global
 }
 
+decl {\#include "Interface/FileMgr.h"} {private global
+}
+
 decl {\#include "UI/MiscGui.h"} {public local
 }
 
@@ -42,7 +45,7 @@ decl {\#include "BankUI.h"} {public local
 decl {\#include "ParametersUI.h"} {public local
 }
 
-class VectorUI {: {private MiscFuncs}
+class VectorUI {: {private MiscFuncs, FileMgr}
 } {
   Function {make_window(void)} {} {
     Fl_Window vectorwindow {

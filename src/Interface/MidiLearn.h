@@ -30,13 +30,14 @@
 using namespace std;
 
 #include "Misc/MiscFuncs.h"
+#include "Interface/FileMgr.h"
 #include "Interface/InterChange.h"
 
 class XMLwrapper;
 
 class SynthEngine;
 
-class MidiLearn : private MiscFuncs
+class MidiLearn : private MiscFuncs, FileMgr
 {
     public:
         MidiLearn(SynthEngine *_synth);

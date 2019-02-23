@@ -2,7 +2,7 @@
     MiscFuncs.h
 
     Copyright 2010, Alan Calvert
-    Copyright 2014-2018, Will Godfrey
+    Copyright 2014-2019, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified November 2018
+    Modified February 2019
 */
 
 #ifndef MISCFUNCS_H
@@ -62,12 +62,7 @@ class MiscFuncs
         bool isRegFile(string chkpath);
         bool isDirectory(string chkpath);
         bool isFifo(string chkpath);
-        void legit_filename(string& fname);
-        void legit_pathname(string& fname);
-        string findfile(string path, string filename, string extension);
-        string findleafname(string name);
         int findSplitPoint(string name);
-        string setExtension(string fname, string ext);
         bool copyFile(string source, string destination);
         string localPath(string leaf);
         bool saveText(string text, string filename);

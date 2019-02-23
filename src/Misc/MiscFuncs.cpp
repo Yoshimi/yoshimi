@@ -261,80 +261,6 @@ bool MiscFuncs::isFifo(string chkpath)
 }
 
 
-// make a filename legal
-void MiscFuncs::legit_filename(string& fname)
-{
-    for (unsigned int i = 0; i < fname.size(); ++i)
-    {
-        char c = fname.at(i);
-        if (!((c >= '0' && c <= '9')
-              || (c >= 'A' && c <= 'Z')
-              || (c >= 'a' && c <= 'z')
-              || c == '-'
-              || c == ' '
-              || c == '.'))
-            fname.at(i) = '_';
-    }
-}
-
-
-// make a complete path extra legal
-void MiscFuncs::legit_pathname(string& fname)
-{
-    for (unsigned int i = 0; i < fname.size(); ++i)
-    {
-        char c = fname.at(i);
-        if (!((c >= '0' && c <= '9')
-              || (c >= 'A' && c <= 'Z')
-              || (c >= 'a' && c <= 'z')
-              || c == '-'
-              || c == '/'
-              || c == '.'))
-            fname.at(i) = '_';
-    }
-}
-
-/*
- * This only intended for calls on the local filesystem
- * and to known locations, so buffer size should be adequate
- * and avoids dependency on unreliable macros.
- */
-string MiscFuncs::findfile(string path, string filename, string extension)
-{
-    if (extension.at(0) != '.')
-        extension = "." + extension;
-    string command = "find " + path + " -name " + filename + extension + " 2>/dev/null -print -quit";
-#pragma message "Using '2>/dev/null' here suppresses *all* error messages"
-    // it's done here to suppress warnings of invalid locations
-    FILE *fp = popen(command.c_str(), "r");
-    if (fp == NULL)
-        return "";
-    char line[1024];
-    fscanf(fp,"%[^\n]", line);
-    pclose(fp);
-
-    string fullName(line);
-    unsigned int name_start = fullName.rfind("/") + 1;
-    // Extension might contain a dot, like e.g. '.pdf.gz'
-    unsigned int name_end = fullName.length() - extension.length();
-    fullName = fullName.substr(name_start, name_end - name_start);
-    if (fullName == filename)
-        return line;
-    return "";
-}
-
-
-string MiscFuncs::findleafname(string name)
-{
-    unsigned int name_start;
-    unsigned int name_end;
-
-    name_start = name.rfind("/");
-    name_end = name.rfind(".");
-    return name.substr(name_start + 1, name_end - name_start - 1);
-}
-
-
 int MiscFuncs::findSplitPoint(string name)
 {
     unsigned int chk = 0;
@@ -350,52 +276,6 @@ int MiscFuncs::findSplitPoint(string name)
     if (ch != '-')
         return 0;
     return chk;
-}
-
-
-// adds or replaces wrong extension with the right one.
-string MiscFuncs::setExtension(string fname, string ext)
-{
-    if (ext.at(0) != '.')
-        ext = "." + ext;
-    string tmp;                         // return value
-    size_t ext_pos = fname.rfind('.');  // period, if any
-    size_t slash_pos = fname.rfind('/'); // UNIX path-separator
-    if (slash_pos == string::npos)
-    {
-        // There are no slashes in the string, therefore the last period, if
-        // any, must be at the position of the extension period.
-
-        ext_pos = fname.rfind('.');
-        if (ext_pos == string::npos || ext_pos == 0)
-        {
-            // There is no period, therefore there is no extension.
-            // Append the extension.
-
-            tmp = fname + ext;
-        }
-        else
-        {
-            // Replace everything after the last period.
-
-            tmp = fname.substr(0, ext_pos);
-            tmp += ext;
-        }
-    }
-    else
-    {
-        // If the period precedes the slash, then it is not the extension.
-        // Add the whole extension.  Otherwise, replace the extension.
-
-        if (slash_pos > ext_pos)
-            tmp = fname + ext;
-        else
-        {
-            tmp = fname.substr(0, ext_pos);
-            tmp += ext;
-        }
-    }
-    return tmp;
 }
 
 

@@ -4,6 +4,7 @@ yoshimi 1.5.10 M
 * Installed placeholder FileMgr in /src/Interface
   This will eventually handle all actual file operations
   for consistency and simlifying porting to other systems.
+* Started moving file functions from MiscFuncs to FileMgr.
 
 2019-2-20 Will.
 * Added missing LFO intensity control description to CLI.

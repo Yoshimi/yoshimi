@@ -1,7 +1,7 @@
 /*
     InterChange.h - General communications
 
-    Copyright 2016-2018 Will Godfrey
+    Copyright 2016-2019 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified July 2018
+    Modified February 2019
 */
 
 #ifndef INTERCH_H
@@ -28,6 +28,7 @@
 using namespace std;
 
 #include "Misc/MiscFuncs.h"
+#include "Interface/FileMgr.h"
 #include "Params/LFOParams.h"
 #include "Params/FilterParams.h"
 #include "Params/EnvelopeParams.h"
@@ -36,7 +37,7 @@ using namespace std;
 
 class SynthEngine;
 
-class InterChange : private MiscFuncs
+class InterChange : private MiscFuncs, FileMgr
 {
     private:
         SynthEngine *synth;

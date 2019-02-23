@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011 Alan Calvert
-    Copyright 2014-2018, Will Godfrey
+    Copyright 2014-2019, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified February 2018
+    Modified February 2019
 */
 
 #ifndef PART_H
@@ -33,6 +33,7 @@
 using namespace std;
 
 #include "Misc/MiscFuncs.h"
+#include "Interface/FileMgr.h"
 #include "Misc/SynthHelper.h"
 
 class ADnoteParameters;
@@ -49,7 +50,7 @@ class FFTwrapper;
 
 class SynthEngine;
 
-class Part : private MiscFuncs, SynthHelper
+class Part : private MiscFuncs, SynthHelper, FileMgr
 {
     public:
         enum NoteStatus { KEY_OFF, KEY_PLAYING, KEY_RELEASED_AND_SUSTAINED, KEY_RELEASED };

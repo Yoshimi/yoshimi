@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified January 2019
+    Modified February 2019
 */
 
 #ifndef CONFIG_H
@@ -37,13 +37,14 @@ using namespace std;
 
 #include "MusicIO/MusicClient.h"
 #include "Misc/MiscFuncs.h"
+#include "Interface/FileMgr.h"
 #include "FL/Fl.H"
 
 class XMLwrapper;
 
 class SynthEngine;
 
-class Config : public MiscFuncs
+class Config : public MiscFuncs, FileMgr
 {
     public:
         Config(SynthEngine *_synth, int argc, char **argv);
