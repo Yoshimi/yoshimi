@@ -1,5 +1,9 @@
 yoshimi 1.5.10 M
 
+2019-2-24 Will
+* All direct file access removed from 'Bank'
+  except two directory scans.
+
 2019-2-23 Will
 * Installed placeholder FileMgr in /src/Interface
   This will eventually handle all actual file operations

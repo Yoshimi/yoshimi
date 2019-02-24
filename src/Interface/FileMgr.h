@@ -23,7 +23,6 @@
 #ifndef FILEMGR_H
 #define FILEMGR_H
 
-#include <cmath>
 #include <string>
 
 using namespace std;
@@ -48,6 +47,10 @@ class FileMgr
         string localPath(string leaf);
         bool saveText(string text, string filename);
         string loadText(string filename);
+        bool deleteFile(string filename);
+        bool deleteDir(string filename);
+        bool renameFile(string oldname, string newname);
+        bool renameDir(string oldname, string newname);
 };
 
 #endif

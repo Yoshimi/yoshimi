@@ -22,7 +22,7 @@
 
 #include <iostream>
 #include <fstream>
-#include <fcntl.h>
+#include <fcntl.h> // why? we don't make any calls
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -233,6 +233,43 @@ string FileMgr::loadText(string filename)
     return text;
 }
 
+
+/*
+ * The following two functions are currently identical for
+ * linux but that may not always be true nor possibly other
+ * OSs/filers, so you should always use the correct one.
+ */
+bool FileMgr::deleteFile(string filename)
+{
+    bool isOk = remove(filename.c_str()) == 0;
+    return isOk;
+}
+
+
+bool FileMgr::deleteDir(string filename)
+{
+    bool isOk = remove(filename.c_str()) == 0;
+    return isOk;
+}
+
+
+/*
+ * The following two functions are currently identical for
+ * linux but that may not always be true nor possibly other
+ * OSs/filers, so you should always use the correct one.
+ */
+bool FileMgr::renameFile(string oldname, string newname)
+{
+    bool isOk = rename(oldname.c_str(), newname.c_str()) == 0;
+    return isOk;
+}
+
+
+bool FileMgr::renameDir(string oldname, string newname)
+{
+    bool isOk = rename(oldname.c_str(), newname.c_str()) == 0;
+    return isOk;
+}
 
 // replace build directory with a different
 // one in the compilation directory
