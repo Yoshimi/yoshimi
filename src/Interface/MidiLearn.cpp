@@ -1,7 +1,7 @@
 /*
     MidiLearn.cpp
 
-    Copyright 2016-2018 Will Godfrey
+    Copyright 2016-2019 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified October 2018
+    Modified February 2019
 */
 
 #include <iostream>
@@ -824,7 +824,7 @@ bool MidiLearn::saveList(string name)
         return false;
     }
 
-    string file = setExtension(name, "xly");
+    string file = setExtension(name, EXTEN::mlearn);
     legit_pathname(file);
 
     synth->getRuntime().xmlType = XML_MIDILEARN;
@@ -905,7 +905,7 @@ bool MidiLearn::loadList(string name)
         synth->getRuntime().Log("No filename");
         return false;
     }
-    string file = setExtension(name, "xly");
+    string file = setExtension(name, EXTEN::mlearn);
     legit_pathname(file);
     if (!isRegFile(file))
     {

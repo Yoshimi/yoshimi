@@ -29,6 +29,24 @@ using namespace std;
 
 #include "globals.h"
 
+namespace EXTEN
+{
+    const string config =        ".config";
+    const string instance =      ".instance";
+    const string banks =         ".banks";
+    const string history =       ".history";
+    const string zynInst =       ".xiz";
+    const string yoshInst =      ".xiy";
+    const string patchset =      ".xmz";
+    const string state =         ".state";
+    const string scale =         ".xsz";
+    const string scalaTuning =   ".scl";
+    const string scalaKeymap =   ".kbm";
+    const string vector =        ".xvy";
+    const string mlearn =        ".xly";
+    const string window =        ".window";
+}
+
 class FileMgr
 {
     public:

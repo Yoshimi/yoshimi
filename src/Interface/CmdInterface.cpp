@@ -4751,9 +4751,8 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         string filename = string(point);
         if (filename > "!")
         {
-            char *to_send;
+            char to_send[100];
             char *mark;
-            to_send = (char*) malloc(0xff);
             int count = 0;
             bool isok = true;
 
@@ -4764,9 +4763,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                 context = LEVEL::Top; // start from top level
                 while (linePoint < text.length() && isok)
                 {
-                    string newline = lineInText(text, linePoint);
-                    strcpy(to_send, newline.c_str());
-
+                    C_lineInText(text, linePoint, to_send);
                     ++ count;
                     mark = skipSpace(to_send);
                     if ( mark[0] < ' ' || mark [0] == '#')
@@ -4790,7 +4787,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                     }
                     else
                     {
-                        usleep(1000); // the loop is too fast otherwise!
+                        usleep(2000); // the loop is too fast otherwise!
                         reply = cmdIfaceProcessCommand(mark);
                     }
                     if (reply > done_msg)
@@ -4802,8 +4799,6 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
             }
             else
                 Runtime.Log("Can't read file " + filename);
-            free (to_send);
-            to_send = NULL;
             return done_msg;
         }
         replyString = "Exec";

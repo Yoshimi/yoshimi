@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009, James Morris
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2018, Will Godfrey
+    Copyright 2014-2019, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified November 2018
+    Modified February 2019
 */
 
 #include <cstring>
@@ -1299,12 +1299,12 @@ bool Part::saveXML(string filename, bool yoshiFormat)
 
     if (yoshiFormat)
     {
-        filename = setExtension(filename, "xiy");
+        filename = setExtension(filename, EXTEN::yoshInst);
         add2XML(xml, yoshiFormat);
     }
     else
     {
-        filename = setExtension(filename, "xiz");
+        filename = setExtension(filename, EXTEN::zynInst);
         xml->beginbranch("INSTRUMENT");
         add2XMLinstrument(xml);
         xml->endbranch();
@@ -1318,11 +1318,11 @@ bool Part::saveXML(string filename, bool yoshiFormat)
 int Part::loadXMLinstrument(string filename)
 {
     bool hasYoshi = true;
-    filename = setExtension(filename, "xiy");
+    filename = setExtension(filename, EXTEN::yoshInst);
     if (!isRegFile(filename))
     {
         hasYoshi = false;
-        filename = setExtension(filename, "xiz");
+        filename = setExtension(filename, EXTEN::zynInst);
     }
 
     XMLwrapper *xml = new XMLwrapper(synth, hasYoshi);

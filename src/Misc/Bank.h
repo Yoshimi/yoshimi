@@ -172,8 +172,6 @@ class Bank : private MiscFuncs, FileMgr
 
         //string dirname;
         const string defaultinsname;
-        const string xizext;
-        const string xiyext;
         const string force_bank_dir_file;
         SynthEngine *synth;
 

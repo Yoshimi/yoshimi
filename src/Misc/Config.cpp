@@ -731,7 +731,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
 
 bool Config::saveSessionData(string savefile)
 {
-    savefile = setExtension(savefile, "state");
+    savefile = setExtension(savefile, EXTEN::state);
     synth->getRuntime().xmlType = XML_STATE;
     XMLwrapper *xmltree = new XMLwrapper(synth, true);
     if (!xmltree)
@@ -762,7 +762,7 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
     bool ok = false;
 
     if (sessionfile.size() && !isRegFile(sessionfile))
-        sessionfile = setExtension(sessionfile, "state");
+        sessionfile = setExtension(sessionfile, EXTEN::state);
     if (!sessionfile.size() || !isRegFile(sessionfile))
     {
         Log("Session file " + sessionfile + " not available", 2);

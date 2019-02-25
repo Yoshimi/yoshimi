@@ -4,6 +4,9 @@ yoshimi 1.5.10 M
 * No more direct file access in 'Cmdinterface'.
 * New string parser in 'MiscFuncs'.
 * Improved 'XMLwrapper'.
+* Most file extension definitions now standardised
+  but fltk filer calls still fixed strings :(
+* No more direct file access in 'Microtonal'.
 
 2019-2-24 Will
 * All direct file access removed from 'Bank'

@@ -391,7 +391,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     break;
 
                 case SCALES::control::importScl:
-                    value = synth->microtonal.loadscl(setExtension(text,"scl"));
+                    value = synth->microtonal.loadscl(setExtension(text,EXTEN::scalaTuning));
                     if(value > 0)
                     {
                         text = "";
@@ -407,7 +407,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     }
                     break;
                 case SCALES::control::importKbm:
-                    value = synth->microtonal.loadkbm(setExtension(text,"kbm"));
+                    value = synth->microtonal.loadkbm(setExtension(text,EXTEN::scalaKeymap));
                     if(value > 0)
                     {
                         text = "";

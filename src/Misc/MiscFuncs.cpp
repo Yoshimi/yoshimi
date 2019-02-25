@@ -315,6 +315,16 @@ string MiscFuncs::lineInText(string text, size_t &point)
 }
 
 
+void MiscFuncs::C_lineInText(string text, size_t &point, char *line)
+{
+    string found = lineInText(text, point);
+    if (found == "")
+        line[0] = 0;
+    else
+        strcpy(line, found.c_str());
+}
+
+
 /*
  * These functions provide a transparent text messaging system.
  * Calling functions only need to recognise integers and strings.

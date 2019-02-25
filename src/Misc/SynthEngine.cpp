@@ -298,7 +298,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 
     if (Runtime.paramsLoad.size())
     {
-        string file = setExtension(Runtime.paramsLoad, "xmz");
+        string file = setExtension(Runtime.paramsLoad, EXTEN::patchset);
         ShutUp();
         if (!loadXML(file))
         {
@@ -887,7 +887,7 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
                     if (ok)
                     {
                         if (par2 < 0xff)
-                            addHistory(setExtension(fname, "xiz"), 1);
+                            addHistory(setExtension(fname, EXTEN::zynInst), 1);
                         name = name + " to Part " + to_string(npart + 1);
                     }
                 }
@@ -2252,7 +2252,7 @@ bool SynthEngine::loadStateAndUpdate(string filename)
 
 bool SynthEngine::saveState(string filename)
 {
-    filename = setExtension(filename, "state");
+    filename = setExtension(filename, EXTEN::state);
     bool result = Runtime.saveState(filename);
     string name = Runtime.ConfigDir + "/yoshimi";
     if (uniqueId > 0)
@@ -2267,7 +2267,7 @@ bool SynthEngine::saveState(string filename)
 bool SynthEngine::loadPatchSetAndUpdate(string fname)
 {
     bool result;
-    fname = setExtension(fname, "xmz");
+    fname = setExtension(fname, EXTEN::patchset);
     result = loadXML(fname); // load the data
     Unmute();
     if (result)
@@ -2283,7 +2283,7 @@ bool SynthEngine::loadMicrotonal(string fname)
 {
     bool ok = true;
     microtonal.defaults();
-    if (microtonal.loadXML(setExtension(fname, "xsz")))
+    if (microtonal.loadXML(setExtension(fname, EXTEN::scale)))
         addHistory(fname, 3);
     else
         ok = false;
@@ -2293,7 +2293,7 @@ bool SynthEngine::loadMicrotonal(string fname)
 bool SynthEngine::saveMicrotonal(string fname)
 {
     bool ok = true;
-    if (microtonal.saveXML(setExtension(fname, "xsz")))
+    if (microtonal.saveXML(setExtension(fname, EXTEN::scale)))
         addHistory(fname, 3);
     else
         ok = false;
@@ -2380,8 +2380,8 @@ void SynthEngine::newHistory(string name, int group)
 {
     if (findleafname(name) < "!")
         return;
-    if (group == 1 && (name.rfind(".xiy") != string::npos))
-        name = setExtension(name, "xiz");
+    if (group == 1 && (name.rfind(EXTEN::yoshInst) != string::npos))
+        name = setExtension(name, EXTEN::zynInst);
     vector<string> &listType = *getHistory(group);
     listType.push_back(name);
 }
@@ -2391,8 +2391,8 @@ void SynthEngine::addHistory(string name, int group)
 {
     if (findleafname(name) < "!")
         return;
-    if (group == 1 && (name.rfind(".xiy") != string::npos))
-        name = setExtension(name, "xiz");
+    if (group == 1 && (name.rfind(EXTEN::yoshInst) != string::npos))
+        name = setExtension(name, EXTEN::zynInst);
     vector<string> &listType = *getHistory(group);
     vector<string>::iterator itn = listType.begin();
     listType.insert(itn, name);
@@ -2542,8 +2542,8 @@ bool SynthEngine::loadHistory()
                     filetype = xml->getparstr(extension);
                     if (extension == "xiz_file" && !isRegFile(filetype))
                     {
-                        if (filetype.rfind(".xiz") != string::npos)
-                            filetype = setExtension(filetype, "xiy");
+                        if (filetype.rfind(EXTEN::zynInst) != string::npos)
+                            filetype = setExtension(filetype, EXTEN::yoshInst);
                     }
                     if (filetype.size() && isRegFile(filetype))
                         newHistory(filetype, count);
@@ -2652,7 +2652,7 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool 
         Runtime.Log("No filename", 2);
         return actualBase;
     }
-    string file = setExtension(name, "xvy");
+    string file = setExtension(name, EXTEN::vector);
     legit_pathname(file);
     if (!isRegFile(file))
     {
@@ -2796,7 +2796,7 @@ unsigned char SynthEngine::saveVector(unsigned char baseChan, string name, bool 
     if (Runtime.vectordata.Enabled[baseChan] == false)
         return miscMsgPush("No vector data on this channel");
 
-    string file = setExtension(name, "xvy");
+    string file = setExtension(name, EXTEN::vector);
     legit_pathname(file);
 
     Runtime.xmlType = XML_VECTOR;
@@ -2978,7 +2978,7 @@ void SynthEngine::putalldata(const char *data, int size)
 
 bool SynthEngine::savePatchesXML(string filename)
 {
-    filename = setExtension(filename, "xmz");
+    filename = setExtension(filename, EXTEN::patchset);
     Runtime.xmlType = XML_PARAMETERS;
     XMLwrapper *xml = new XMLwrapper(this, true);
     add2XML(xml);
