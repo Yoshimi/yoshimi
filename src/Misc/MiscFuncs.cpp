@@ -301,6 +301,20 @@ bool MiscFuncs::matchnMove(int num , char *&pnt, const char *word)
 }
 
 
+string MiscFuncs::lineInText(string text, size_t &point)
+{
+    size_t len = text.length();
+    if (point >= len - 1)
+        return "";
+    size_t it = 0;
+    while (it < len - point && text.at(point + it) >= ' ')
+        ++it;
+    string line = text.substr(point, it);
+    point += (it + 1);
+    return line;
+}
+
+
 /*
  * These functions provide a transparent text messaging system.
  * Calling functions only need to recognise integers and strings.

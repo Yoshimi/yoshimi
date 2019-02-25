@@ -26,6 +26,7 @@
 using namespace std;
 
 #include "Misc/MiscFuncs.h"
+#include "Interface/FileMgr.h"
 #include "Misc/SynthEngine.h"
 #include "Interface/InterChange.h"
 #include "Effects/EffectMgr.h"
@@ -812,7 +813,7 @@ static string filtertype [] = {"OFF", "LP1", "HPA", "HPB", "BP1", "BS1", "LP2", 
 static string adaptive [] = {"OFF", "ON", "SQU", "2XS", "2XA", "3XS", "3XA", "4XS", "4XA"};
 
 
-class CmdInterface : private MiscFuncs
+class CmdInterface : private MiscFuncs, FileMgr
 {
     public:
         void defaults();

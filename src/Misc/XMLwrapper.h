@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2018, Will Godfrey
+    Copyright 2014-2019, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified April 2018
+    Modified February 2019
 */
 
 #ifndef XML_WRAPPER_H
@@ -34,13 +34,14 @@
 using namespace std;
 
 #include "Misc/MiscFuncs.h"
+#include "Interface/FileMgr.h"
 
 // max tree depth
 #define STACKSIZE 128
 
 class SynthEngine;
 
-class XMLwrapper : private MiscFuncs
+class XMLwrapper : private MiscFuncs, FileMgr
 {
     public:
         XMLwrapper(SynthEngine *_synth, bool _isYoshi = false, bool includeBase = true);

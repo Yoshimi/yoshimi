@@ -1,5 +1,10 @@
 yoshimi 1.5.10 M
 
+2019-2-25 Will
+* No more direct file access in 'Cmdinterface'.
+* New string parser in 'MiscFuncs'.
+* Improved 'XMLwrapper'.
+
 2019-2-24 Will
 * All direct file access removed from 'Bank'
   except two directory scans.

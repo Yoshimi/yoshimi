@@ -80,6 +80,7 @@ class MiscFuncs
         void bitClearHigh(unsigned int& value);
         void bitClearAbove(unsigned int& value, int bitLevel);
         bool bitTest(unsigned int value, unsigned int bit);
+        string lineInText(string text, size_t &point);
 
         float dB2rap(float dB);
         float rap2dB(float rap);

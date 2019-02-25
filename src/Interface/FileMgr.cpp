@@ -223,6 +223,7 @@ string FileMgr::loadText(string filename)
 
     string text = "";
     char line [1024];
+    // no Yoshimi text lines should get anywhere near this!
     while (!feof(readfile))
     {
         if(fgets(line , 1024 , readfile))

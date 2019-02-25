@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2018, Will Godfrey
+    Copyright 2014-2019, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified August 2018
+    Modified February 2019
 */
 
 #include <zlib.h>
@@ -279,14 +279,12 @@ bool XMLwrapper::saveXMLfile(const string& filename)
     unsigned int compression = synth->getRuntime().GzipCompression;
     if (compression == 0)
     {
-        FILE *xmlfile = fopen(filename.c_str(), "w");
-        if (!xmlfile)
+        if (!saveText(xmldata, filename))
         {
             synth->getRuntime().Log("XML: Failed to open xml file " + filename + " for save", 2);
             return false;
         }
-        fputs(xmldata, xmlfile);
-        fclose(xmlfile);
+        saveText(xmldata, filename);
     }
     else
     {

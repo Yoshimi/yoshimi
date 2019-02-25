@@ -4753,49 +4753,52 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         {
             char *to_send;
             char *mark;
-            to_send = (char*) malloc(0xff);;
+            to_send = (char*) malloc(0xff);
             int count = 0;
             bool isok = true;
 
-            FILE *readfile = fopen(filename.c_str(), "r");
-            if (readfile)
+            string text = loadText(filename);
+            if (text != "")
             {
+                size_t linePoint = 0;
                 context = LEVEL::Top; // start from top level
-                while (!feof(readfile) && isok)
+                while (linePoint < text.length() && isok)
                 {
-                    if(fgets(to_send , 0xff , readfile))
+                    string newline = lineInText(text, linePoint);
+                    strcpy(to_send, newline.c_str());
+
+                    ++ count;
+                    mark = skipSpace(to_send);
+                    if ( mark[0] < ' ' || mark [0] == '#')
+                        continue;
+                    if (matchnMove(3, mark, "run"))
                     {
-                        ++ count;
-                        mark = skipSpace(to_send);
-                        if ( mark[0] < ' ' || mark [0] == '#')
-                            continue;
-                        if (matchnMove(3, mark, "run"))
-                        {
-                            isok = false;
-                            Runtime.Log("*** Error: scripts are not recursive @ line " + to_string(count) + " ***");
-                            continue;
-                        }
-                        if (matchnMove(4, mark, "wait"))
-                        {
-                            int tmp = string2int(mark);
-                            if (tmp < 1)
-                                tmp = 1;
-                            else if (tmp > 1000)
-                                tmp = 1000;
-                            Runtime.Log("Waiting " + to_string(tmp) + "mS");
-                            usleep((tmp - 1) * 1000);
-                            // total processing may add up to another 1 mS
-                        }
-                        else
-                            reply = cmdIfaceProcessCommand(mark);
-                        if (reply > done_msg)
-                        {
-                            isok = false;
-                            Runtime.Log("*** Error: " + replies[reply] + " @ line " + to_string(count) + " ***");
-                        }
+                        isok = false;
+                        Runtime.Log("*** Error: scripts are not recursive @ line " + to_string(count) + " ***");
+                        continue;
+                    }
+                    if (matchnMove(4, mark, "wait"))
+                    {
+                        int tmp = string2int(mark);
+                        if (tmp < 1)
+                            tmp = 1;
+                        else if (tmp > 1000)
+                            tmp = 1000;
+                        Runtime.Log("Waiting " + to_string(tmp) + "mS");
+                        usleep((tmp - 1) * 1000);
+                        // total processing may add up to another 1 mS
+                    }
+                    else
+                    {
+                        usleep(1000); // the loop is too fast otherwise!
+                        reply = cmdIfaceProcessCommand(mark);
+                    }
+                    if (reply > done_msg)
+                    {
+                        isok = false;
+                        Runtime.Log("*** Error: " + replies[reply] + " @ line " + to_string(count) + " ***");
                     }
                 }
-                fclose (readfile);
             }
             else
                 Runtime.Log("Can't read file " + filename);
