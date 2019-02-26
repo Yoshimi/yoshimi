@@ -2,6 +2,9 @@ yoshimi 1.5.10 M
 
 2019-2-26 Will
 * MasterUI now only references files in widow code.
+* Removed file extension references in MicrotonalUI.
+* Removed file extension references in MidiLearnUI.
+* Removed file extension references in VectorUI.
 
 2019-2-25 Will
 * No more direct file access in 'Cmdinterface'.

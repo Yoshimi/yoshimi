@@ -204,7 +204,8 @@ class MicrotonalUI {: {private MiscFuncs}
           Fl_Button {} {
             label {Import .scl file}
             callback {//
-            const char *filename = fl_file_chooser("Open:", "(*.scl)", synth->getRuntime().userHome.c_str(), 0);
+            string exten = "({*" + EXTEN::scalaTuning + "})";
+            const char *filename = fl_file_chooser("Open:", exten.c_str(), synth->getRuntime().userHome.c_str(), 0);
             if (filename == NULL)
                 return;
 
@@ -328,7 +329,8 @@ class MicrotonalUI {: {private MiscFuncs}
           Fl_Button {} {
             label {Import .kbm file}
             callback {//
-            const char *filename = fl_file_chooser("Open:", "(*.kbm)", synth->getRuntime().userHome.c_str(), 0);
+            string exten = "({*" + EXTEN::scalaKeymap + "})";
+            const char *filename = fl_file_chooser("Open:", exten.c_str(), synth->getRuntime().userHome.c_str(), 0);
             if (filename == NULL)
                 return;
 

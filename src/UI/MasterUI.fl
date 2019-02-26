@@ -554,7 +554,8 @@ paramsui->Show(XML_MICROTONAL);}
             string lastname = synth->lastItemSeen(XML_STATE);
             if (lastname == "")
                 lastname = synth->getRuntime().userHome;
-            char *fle = fl_file_chooser("Load:", "({*.state})", lastname.c_str(), 0);
+            string exten = "({*" + EXTEN::state + "})";
+            char *fle = fl_file_chooser("Load:", exten.c_str(), lastname.c_str(), 0);
             if (fle)
             {
                 setState(fle);
@@ -570,8 +571,8 @@ paramsui->Show(XML_MICROTONAL);}
             string lastname = synth->getLastfileAdded(XML_STATE);
             if (lastname == "")
                 lastname = synth->getRuntime().userHome;
-            char *fle = fl_file_chooser("Save:", "({*.state})",
-                                            lastname.c_str(), 0);
+            string exten = "({*" + EXTEN::state + "})";
+            char *fle = fl_file_chooser("Save:", exten.c_str(), lastname.c_str(), 0);
             if (fle)
             {
                 send_data(MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(fle)));

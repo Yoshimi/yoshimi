@@ -872,7 +872,8 @@ class VectorUI {: {private MiscFuncs, FileMgr}
         if (lastname == "")
             lastname = synth->getRuntime().userHome;
         char *filename;
-        filename = fl_file_chooser("Open:", "({*.xvy})", lastname.c_str(), 0);
+        string exten = "({*" + EXTEN::vector + "})";
+        filename = fl_file_chooser("Open:", exten.c_str(), lastname.c_str(), 0);
         if (filename == NULL)
             return;
         fname = string(filename);
@@ -885,7 +886,8 @@ class VectorUI {: {private MiscFuncs, FileMgr}
     if (lastname == "")
         lastname = synth->getRuntime().userHome;
     const char *file = NULL;
-    file = fl_file_chooser("Save:", "({*.xvy})", lastname.c_str(), 0);
+    string exten = "({*" + EXTEN::vector + "})";
+    file = fl_file_chooser("Save:", exten.c_str(), lastname.c_str(), 0);
     if (file == NULL)
         return;
 
