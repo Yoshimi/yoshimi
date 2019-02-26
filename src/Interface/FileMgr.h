@@ -33,10 +33,11 @@ namespace EXTEN
 {
     const string config =        ".config";
     const string instance =      ".instance";
-    const string banks =         ".banks";
+    const string bank =          ".banks";
     const string history =       ".history";
     const string zynInst =       ".xiz";
     const string yoshInst =      ".xiy";
+    const string anyInst =       ".xi*";
     const string patchset =      ".xmz";
     const string state =         ".state";
     const string scale =         ".xsz";
@@ -44,7 +45,7 @@ namespace EXTEN
     const string scalaKeymap =   ".kbm";
     const string vector =        ".xvy";
     const string mlearn =        ".xly";
-    const string window =        ".window";
+    const string window =        ".windows";
 }
 
 class FileMgr

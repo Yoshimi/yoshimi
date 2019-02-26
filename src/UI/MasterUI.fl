@@ -190,7 +190,7 @@ class MasterUI {: {private GuiUpdates, FileMgr}
           filename += ("-" + asString(instance));
       }
       partmax = synth->getRuntime().NumAvailableParts;
-      filename += ".windows";
+      filename += EXTEN::window;
       microtonalui = new MicrotonalUI(&synth->microtonal, synth);
       bankui = new BankUI(synth);
       virkeyboard = new VirKeyboard(synth);
@@ -369,7 +369,8 @@ class MasterUI {: {private GuiUpdates, FileMgr}
                 if (lastname == "")
                     lastname = synth->getRuntime().userHome;
                 const char *filename;
-                filename = fl_file_chooser("Load:", "({*.xi*})", lastname.c_str(), 0);
+                string exten = "({*" + EXTEN::anyInst + "})";
+                filename = fl_file_chooser("Load:", exten.c_str(), lastname.c_str(), 0);
                 if (filename == NULL)
                     return;
                 do_load_instrument(filename);}
@@ -388,7 +389,8 @@ class MasterUI {: {private GuiUpdates, FileMgr}
                     return;
                 newname = synth->getRuntime().userHome + newname;
                 const char *filename;
-                filename = fl_file_chooser("Save:", "({*.xi*})", newname.c_str(), 0);
+                string exten = "({*" + EXTEN::anyInst + "})";
+                filename = fl_file_chooser("Save:", exten.c_str(), newname.c_str(), 0);
                 if (filename == NULL)
                     return;
                 if (isRegFile(string(filename)))
@@ -492,8 +494,8 @@ class MasterUI {: {private GuiUpdates, FileMgr}
     string lastname = synth->lastItemSeen(XML_MICROTONAL);
     if (lastname == "")
         lastname = synth->getRuntime().userHome;
-
-    const char *filename = fl_file_chooser("Load:", "({*.xsz})", lastname.c_str(), 0);
+    string exten = "({*" + EXTEN::scale + "})";
+    const char *filename = fl_file_chooser("Load:", exten.c_str(), lastname.c_str(), 0);
     if (filename != NULL)
         do_load_scale(string(filename));}
             xywh {35 35 100 20} labelsize 12
@@ -506,10 +508,11 @@ class MasterUI {: {private GuiUpdates, FileMgr}
                     lastname = synth->getRuntime().userHome;
 
                 char *filename;
-                filename = fl_file_chooser("Save:", "({*.xsz})", lastname.c_str(), 0);
+                string exten = "({*" + EXTEN::scale + "})";
+                filename = fl_file_chooser("Save:", exten.c_str(), lastname.c_str(), 0);
                 if (filename == NULL)
                     return;
-                filename = fl_filename_setext(filename, ".xsz");
+                filename = fl_filename_setext(filename, EXTEN::scale.c_str());
                 if (isRegFile(string(filename)))
                     if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                         return;
@@ -1969,7 +1972,8 @@ Nikita Zlobin
         fname = file;
     else
     {
-        fname = fl_file_chooser("Load:", "({*.xmz})", lastname.c_str(), 0);
+        string exten = "({*" + EXTEN::patchset + "})";
+        fname = fl_file_chooser("Load:", exten.c_str(), lastname.c_str(), 0);
         if (fname == NULL)
             return;
     }
@@ -1984,10 +1988,11 @@ Nikita Zlobin
     bool result = false;
     if (file == NULL)
     {
-        char *tmp = fl_file_chooser("Save:", "({*.xmz})", lastname.c_str(), 0);
+        string exten = "({*" + EXTEN::patchset + "})";
+        char *tmp = fl_file_chooser("Save:", exten.c_str(), lastname.c_str(), 0);
         if (tmp == NULL)
             return;
-        tmp = fl_filename_setext(tmp, ".xmz");
+        tmp = fl_filename_setext(tmp, EXTEN::patchset.c_str());
         fname = tmp;
         result = isRegFile(tmp);
         if (result)

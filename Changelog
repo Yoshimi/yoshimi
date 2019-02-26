@@ -1,5 +1,8 @@
 yoshimi 1.5.10 M
 
+2019-2-26 Will
+* MasterUI now only references files in widow code.
+
 2019-2-25 Will
 * No more direct file access in 'Cmdinterface'.
 * New string parser in 'MiscFuncs'.
