@@ -5,6 +5,7 @@ yoshimi 1.5.10 M
 * Removed file extension references in MicrotonalUI.
 * Removed file extension references in MidiLearnUI.
 * Removed file extension references in VectorUI.
+* Removed file extension references in config.cpp
 
 2019-2-25 Will
 * No more direct file access in 'Cmdinterface'.

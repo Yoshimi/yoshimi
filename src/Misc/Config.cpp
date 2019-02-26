@@ -62,6 +62,8 @@ static char prog_doc[] =
 string argline = "Yoshimi " + (string) YOSHIMI_VERSION;
 const char* argp_program_version = argline.c_str();
 
+string stateText = "load saved state, defaults to '$HOME/" + EXTEN::config + "/yoshimi/yoshimi.state'";
+
 static struct argp_option cmd_options[] = {
     {"alsa-audio",        'A',  "<device>",   1,  "use alsa audio output", 0},
     {"alsa-midi",         'a',  "<device>",   1,  "use alsa midi input", 0},
@@ -81,7 +83,7 @@ static struct argp_option cmd_options[] = {
     {"name-tag",          'N',  "<tag>",      0,  "add tag to clientname", 0},
     {"samplerate",        'R',  "<rate>",     0,  "set alsa audio sample rate", 0},
     {"oscilsize",         'o',  "<size>",     0,  "set AddSynth oscilator size", 0},
-    {"state",             'S',  "<file>",     1,  "load saved state, defaults to '$HOME/.config/yoshimi/yoshimi.state'", 0},
+    {"state",             'S',  "<file>",     1,  stateText.c_str(), 0},
     #if defined(JACK_SESSION)
         {"jack-session-uuid", 'U',  "<uuid>",     0,  "jack session uuid", 0},
         {"jack-session-file", 'u',  "<file>",     0,  "load named jack session file", 0},
@@ -429,7 +431,7 @@ bool Config::loadConfig(void)
     if (homedir.empty() || !isDirectory(homedir))
         homedir = string("/tmp");
     userHome = homedir + '/';
-    ConfigDir = homedir + string("/.config/") + YOSHIMI;
+    ConfigDir = homedir + "/" + string(EXTEN::config) + "/" + YOSHIMI;
     defaultStateName = ConfigDir + "/yoshimi";
     if (!isDirectory(ConfigDir))
     {
@@ -442,7 +444,7 @@ bool Config::loadConfig(void)
     }
     string yoshimi = "/" + string(YOSHIMI);
 
-    string baseConfig = ConfigDir + yoshimi + ".config";
+    string baseConfig = ConfigDir + yoshimi + string(EXTEN::config);
     int thisInstance = synth->getUniqueId();
     if (thisInstance > 0)
         yoshimi += ("-" + asString(thisInstance));
@@ -462,7 +464,7 @@ bool Config::loadConfig(void)
     if (thisInstance == 0)
         ConfigFile = baseConfig;
     else
-        ConfigFile += ".instance";
+        ConfigFile += EXTEN::instance;
 
     if (!isRegFile(baseConfig))
     {
@@ -523,7 +525,7 @@ void Config::defaultPresets(void)
         "/usr/local/share/yoshimi/presets",
         "/usr/share/zynaddsubfx/presets",
         "/usr/local/share/zynaddsubfx/presets",
-        string(getenv("HOME")) + "/.config/yoshimi/presets",
+        string(getenv("HOME")) + "/" + string(EXTEN::config) + "/yoshimi/presets",
         localPath("/presets"),
         "end"
     };
