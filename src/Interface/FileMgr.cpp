@@ -20,14 +20,15 @@
     Created February 2019
 */
 
+#include <cerrno>
 #include <iostream>
 #include <fstream>
-#include <fcntl.h> // why? we don't make any calls
+#include <fcntl.h> // this affects error reporting
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <string>
-#include <unistd.h>
+#include <cstring>
 
 using namespace std;
 
@@ -200,6 +201,22 @@ bool FileMgr::copyFile(string source, string destination)
     outfile.close();
     delete memblock;
     return 0;
+}
+
+
+ssize_t FileMgr::saveData(char *buff, size_t bytes, string filename)
+{
+    //cout << "filename " << filename << endl;
+    int writefile = open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC,
+    S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    if (writefile < 0)
+    {
+        //cout << std::strerror(errno) << endl;
+        return 0;
+    }
+    ssize_t written = write(writefile, buff, bytes);
+    close (writefile);
+    return written;
 }
 
 

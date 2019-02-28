@@ -22,7 +22,7 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified January 2019
+    Modified February 2019
 */
 
 #include <cmath>
@@ -690,7 +690,6 @@ void PADnoteParameters::setPan(char pan)
 }
 
 
-// Ported from ZynAddSubFX V 2.4.4
 bool PADnoteParameters::export2wav(std::string basefilename)
 {
     basefilename += "_PADsynth_";
@@ -701,18 +700,48 @@ bool PADnoteParameters::export2wav(std::string basefilename)
             continue;
         char tmpstr[20];
         snprintf(tmpstr, 20, "_%02d", k + 1);
-        std::string filename = basefilename + std::string(tmpstr) + ".wav";
-        WavFile     wav(filename, synth->samplerate, 1);
-        if(wav.good())
+        string filename = basefilename + string(tmpstr) + EXTEN::MSwave;
+        int nsmps = sample[k].size;
+        unsigned int block;
+        unsigned short int sBlock;
+        unsigned int buffSize = 44 + sizeof(short int) * nsmps; // total size
+        char *buffer = (char*) malloc (buffSize);
+        string temp = "RIFF"; // for bigendian use RIFX
+        strcpy(buffer, temp.c_str());
+        block = nsmps * 4 + 36; // 2 channel shorts + part header
+        buffer[4] = block & 0xff;
+        buffer[5] = (block >> 8) & 0xff;
+        buffer[6] = (block >> 16) & 0xff;
+        buffer[7] = (block >> 24) & 0xff;
+        temp = "WAVEfmt ";
+        strcpy(buffer + 8, temp.c_str());
+        block = 16; // subchunk size
+        memcpy(buffer + 16, &block, 4);
+        sBlock = 1; // AudioFormat uncompressed
+        memcpy(buffer + 20, &sBlock, 2);
+        sBlock = 1; // NumChannels mono
+        memcpy(buffer + 22, &sBlock, 2);
+        block = synth->samplerate;
+        memcpy(buffer + 24, &block, 4);
+        block = synth->samplerate * 2; // ByteRate (SampleRate * NumChannels * BitsPerSample) / 8
+        memcpy(buffer + 28, &block, 4);
+        sBlock = 2; // BlockAlign (bitsPerSample * channels) / 2
+        memcpy(buffer + 32, &sBlock, 2);
+        sBlock = 16; // BitsPerSample
+        memcpy(buffer + 34, &sBlock, 2);
+        temp = "data";
+        strcpy(buffer + 36, temp.c_str());
+        block = nsmps * 2; // data size
+        memcpy(buffer + 40, &block, 4);
+        for(int i = 0; i < nsmps; ++i)
         {
-            int nsmps = sample[k].size;
-            short int *smps = new short int[nsmps];
-            for(int i = 0; i < nsmps; ++i)
-                smps[i] = (short int)(sample[k].smp[i] * 32767.0f);
-            wav.writeMonoSamples(nsmps, smps);
+            sBlock = (sample[k].smp[i] * 32767.0f);
+            buffer [44 + i * 2] = sBlock & 0xff;
+            buffer [45 + i * 2] = (sBlock >> 8) & 0xff;
         }
-        else
-            isOK = false;
+        isOK = (saveData(buffer, buffSize, filename) == buffSize);
+        free (buffer);
+
     }
     return isOK;
 }

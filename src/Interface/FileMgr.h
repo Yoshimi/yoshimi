@@ -45,6 +45,7 @@ namespace EXTEN
     const string scalaKeymap =   ".kbm";
     const string vector =        ".xvy";
     const string mlearn =        ".xly";
+    const string MSwave=         ".wav";
     const string window =        ".windows";
 }
 
@@ -64,6 +65,7 @@ class FileMgr
         string setExtension(string fname, string ext);
         bool copyFile(string source, string destination);
         string localPath(string leaf);
+        ssize_t saveData(char *buff, size_t bytes, string filename);
         bool saveText(string text, string filename);
         string loadText(string filename);
         bool deleteFile(string filename);

@@ -1,5 +1,10 @@
 yoshimi 1.5.10 M
 
+2019-2-28 Will
+* Added data block saving to Filemanager
+* Revised PadSynth export.
+  WaveFile.cpp is now redundant.
+
 2019-2-26 Will
 * MasterUI now only references files in widow code.
 * Removed file extension references in MicrotonalUI.

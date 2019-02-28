@@ -31,6 +31,7 @@ using namespace std;
 
 #include "Params/Presets.h"
 #include "Misc/MiscFuncs.h"
+#include "Interface/FileMgr.h"
 
 class XMLwrapper;
 class FFTwrapper;
@@ -42,7 +43,7 @@ class FilterParams;
 
 class SynthEngine;
 
-class PADnoteParameters : public Presets
+class PADnoteParameters : public Presets, FileMgr
 {
     public:
         PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth);
