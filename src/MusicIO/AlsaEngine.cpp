@@ -2,7 +2,7 @@
     AlsaEngine.cpp
 
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2018, Will Godfrey & others
+    Copyright 2014-2019, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,12 +17,10 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified May 2018
+    Modified March 2019
 */
 
 #if defined(HAVE_ALSA)
-
-//#include <endian.h>
 
 using namespace std;
 
@@ -44,11 +42,18 @@ AlsaEngine::AlsaEngine(SynthEngine *_synth) :MusicIO(_synth)
     midi.handle = NULL;
     midi.alsaId = -1;
     midi.pThread = 0;
-#if __BYTE_ORDER  == __LITTLE_ENDIAN
+
+    string type;
+    union {
+        uint32_t u32 = 0x11223344;
+        uint8_t arr[4];
+    } x;
+    //cout << "byte " << int(x.arr[0]) << endl;
+
+    if (x.arr[0] == 0x44)
         little_endian = true;
-#else
+    else
         little_endian = false;
-#endif
 }
 
 
@@ -273,17 +278,22 @@ bool AlsaEngine::prepHwparams(void)
     card_endian = card_formats[formidx].card_endian;
     card_signed = card_formats[formidx].card_signed;
 
-    synth->getRuntime().Log("March little endian = " + asString(little_endian), 2);
-
-    if (card_signed) // not currently used, may be later
-        formattxt = "Signed";
+    if (little_endian)
+        formattxt += "Little";
     else
-        formattxt = "Unsigned";
+        formattxt += "Big";
+
+    synth->getRuntime().Log("March is " + formattxt + " Endian", 2);
+
+    if (card_signed)
+        formattxt = "Signed ";
+    else
+        formattxt = "Unsigned ";
 
     if (card_endian)
-        formattxt += " Little";
+        formattxt += "Little";
     else
-        formattxt += " Big";
+        formattxt += "Big";
 
 
     alsaBad(snd_pcm_hw_params_set_rate_resample(audio.handle, hwparams, 1),
@@ -312,7 +322,7 @@ bool AlsaEngine::prepHwparams(void)
                 NULL), "failed to get period size"))
         goto bail_out;
 
-    synth->getRuntime().Log("Format = " + formattxt + " Endian " + asString(card_bits) +" Bit " + asString(card_chans) + " Channel" , 2);
+    synth->getRuntime().Log("Card Format is " + formattxt + " Endian " + asString(card_bits) +" Bit " + asString(card_chans) + " Channel" , 2);
     if (ask_buffersize != audio.period_size)
     {
         synth->getRuntime().Log("Asked for buffersize " + asString(ask_buffersize, 2)

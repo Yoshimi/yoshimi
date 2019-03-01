@@ -22,7 +22,7 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified February 2019
+    Modified March 2019
 */
 
 #include <cmath>
@@ -692,6 +692,18 @@ void PADnoteParameters::setPan(char pan)
 
 bool PADnoteParameters::export2wav(std::string basefilename)
 {
+    string type;
+    union {
+        uint32_t u32 = 0x11223344;
+        uint8_t arr[4];
+    } x;
+    //cout << "byte " << int(x.arr[0]) << endl;
+
+    if (x.arr[0] == 0x44) // little endian
+        type = "RIFF"; // default wave format
+    else
+        type = "RIFX";
+
     basefilename += "_PADsynth_";
     bool isOK = true;
     for(int k = 0; k < PAD_MAX_SAMPLES; ++k)
@@ -706,14 +718,13 @@ bool PADnoteParameters::export2wav(std::string basefilename)
         unsigned short int sBlock;
         unsigned int buffSize = 44 + sizeof(short int) * nsmps; // total size
         char *buffer = (char*) malloc (buffSize);
-        string temp = "RIFF"; // for bigendian use RIFX
-        strcpy(buffer, temp.c_str());
+        strcpy(buffer, type.c_str());
         block = nsmps * 4 + 36; // 2 channel shorts + part header
         buffer[4] = block & 0xff;
         buffer[5] = (block >> 8) & 0xff;
         buffer[6] = (block >> 16) & 0xff;
         buffer[7] = (block >> 24) & 0xff;
-        temp = "WAVEfmt ";
+        string temp = "WAVEfmt ";
         strcpy(buffer + 8, temp.c_str());
         block = 16; // subchunk size
         memcpy(buffer + 16, &block, 4);
