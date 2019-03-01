@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified February 2019
+    Modified March 2019
 */
 
 #include <zlib.h>
@@ -267,8 +267,9 @@ void XMLwrapper::slowinfosearch(char *idx)
 
 // SAVE XML members
 
-bool XMLwrapper::saveXMLfile(const string& filename)
+bool XMLwrapper::saveXMLfile(string _filename)
 {
+    string filename = _filename;
     char *xmldata = getXMLdata();
 
     if (!xmldata)
@@ -276,35 +277,25 @@ bool XMLwrapper::saveXMLfile(const string& filename)
         synth->getRuntime().Log("XML: Failed to allocate xml data space");
         return false;
     }
+
+    bool isOK = true;
     unsigned int compression = synth->getRuntime().GzipCompression;
-    if (compression == 0)
+    if (compression <= 0)
     {
         if (!saveText(xmldata, filename))
         {
-            synth->getRuntime().Log("XML: Failed to open xml file " + filename + " for save", 2);
+            synth->getRuntime().Log("XML: Failed to save xml file " + filename + " for save", 2);
             return false;
         }
-        saveText(xmldata, filename);
     }
     else
     {
         if (compression > 9)
             compression = 9;
-        char options[10];
-        snprintf(options, 10, "wb%d", compression);
-
-        gzFile gzfile;
-        gzfile = gzopen(filename.c_str(), options);
-        if (gzfile == NULL)
-        {
-            synth->getRuntime().Log("XML: gzopen() == NULL");
-            return false;
-        }
-        gzputs(gzfile, xmldata);
-        gzclose(gzfile);
+        isOK = saveGzipped(synth, xmldata, filename, compression);
     }
     free(xmldata);
-    return true;
+    return isOK;
 }
 
 

@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified February 2019
+    Modified March 2019
 */
 
 #ifndef XML_WRAPPER_H
@@ -48,7 +48,7 @@ class XMLwrapper : private MiscFuncs, FileMgr
         ~XMLwrapper();
 
         // SAVE to XML
-        bool saveXMLfile(const string& filename); // return true if ok, false otherwise
+        bool saveXMLfile(string _filename); // return true if ok, false otherwise
 
         // returns the new allocated string that contains the XML data (used for clipboard)
         // the string is NULL terminated

@@ -22,6 +22,7 @@
 
 #include <cerrno>
 #include <iostream>
+#include <zlib.h>
 #include <fstream>
 #include <fcntl.h> // this affects error reporting
 #include <stdlib.h>
@@ -34,6 +35,7 @@ using namespace std;
 
 #include "Interface/FileMgr.h"
 #include "Misc/MiscFuncs.h"
+#include "Misc/SynthEngine.h"
 
 bool FileMgr::TestFunc(int result)
 {
@@ -201,6 +203,25 @@ bool FileMgr::copyFile(string source, string destination)
     outfile.close();
     delete memblock;
     return 0;
+}
+
+
+bool FileMgr::saveGzipped(SynthEngine *_synth, char *xmldata, string filename, int compression)
+{
+    SynthEngine *synth = _synth;
+    char options[10];
+    snprintf(options, 10, "wb%d", compression);
+
+    gzFile gzfile;
+    gzfile = gzopen(filename.c_str(), options);
+    if (gzfile == NULL)
+    {
+        synth->getRuntime().Log("XML: gzopen() == NULL");
+        return false;
+    }
+    gzputs(gzfile, xmldata);
+    gzclose(gzfile);
+    return true;
 }
 
 

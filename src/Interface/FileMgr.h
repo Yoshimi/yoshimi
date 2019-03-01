@@ -49,6 +49,8 @@ namespace EXTEN
     const string window =        ".windows";
 }
 
+class SynthEngine;
+
 class FileMgr
 {
     public:
@@ -65,6 +67,7 @@ class FileMgr
         string setExtension(string fname, string ext);
         bool copyFile(string source, string destination);
         string localPath(string leaf);
+        bool saveGzipped(SynthEngine *_synth, char *xmldata, string filename, int compression);
         ssize_t saveData(char *buff, size_t bytes, string filename);
         bool saveText(string text, string filename);
         string loadText(string filename);

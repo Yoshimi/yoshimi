@@ -730,7 +730,7 @@ bool PADnoteParameters::export2wav(std::string basefilename)
         memcpy(buffer + 24, &block, 4);
         block = synth->samplerate * 2; // ByteRate (SampleRate * NumChannels * BitsPerSample) / 8
         memcpy(buffer + 28, &block, 4);
-        sBlock = 2; // BlockAlign (bitsPerSample * channels) / 2
+        sBlock = 2; // BlockAlign (bitsPerSample * channels) / 8
         memcpy(buffer + 32, &sBlock, 2);
         sBlock = 16; // BitsPerSample
         memcpy(buffer + 34, &sBlock, 2);
