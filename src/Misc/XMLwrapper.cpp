@@ -502,8 +502,9 @@ bool XMLwrapper::loadXMLfile(const string& filename)
 }
 
 
-char *XMLwrapper::doloadfile(const string& filename)
+char *XMLwrapper::doloadfile(string _filename)
 {
+    string filename = _filename;
     char *xmldata = NULL;
     gzFile gzf  = gzopen(filename.c_str(), "rb");
     if (!gzf)

@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified February 2019
+    Modified March 2019
 */
 
 #include <stdio.h>
@@ -2504,6 +2504,7 @@ bool SynthEngine::loadHistory()
     if (!xml->enterbranch("HISTORY"))
     {
         Runtime. Log("extractHistoryData, no HISTORY branch");
+        delete xml;
         return false;
     }
     int hist_size;
@@ -2674,7 +2675,10 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool 
     }
     xml->loadXMLfile(file);
     if (!xml->enterbranch("VECTOR"))
+    {
             Runtime. Log("Extract Data, no VECTOR branch", 2);
+            delete xml;
+    }
     else
     {
         actualBase = extractVectorData(baseChan, xml, findleafname(name));

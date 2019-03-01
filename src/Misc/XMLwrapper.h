@@ -134,7 +134,7 @@ class XMLwrapper : private MiscFuncs, FileMgr
         void slowinfosearch(char *idx);
 
     private:
-        char *doloadfile(const string& filename);
+        char *doloadfile(string filename);
 
         mxml_node_t *tree;
         mxml_node_t *root;

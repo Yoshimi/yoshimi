@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2017 Will Godfrey
+    Copyright 2017-2019 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of ZynAddSubFX original code.
-    Modified September 2017
+    Modified March 2019
 */
 #include <cstring>
 
@@ -115,6 +115,7 @@ void Presets::paste(int npreset)
     if (xml->enterbranch(type) == 0)
     {
         nelement = -1;
+        delete(xml);
         return;
     }
     synth->Mute();

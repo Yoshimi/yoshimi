@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified February 2019
+    Modified March 2019
 */
 
 #include <cstring>
@@ -1340,6 +1340,7 @@ int Part::loadXMLinstrument(string filename)
     if (xml->enterbranch("INSTRUMENT") == 0)
     {
         synth->getRuntime().Log(filename + " is not an instrument file");
+        delete xml;
         return 0;
     }
     defaultsinstrument();

@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified January 2019
+    Modified March 2019
 */
 
 #include <cmath>
@@ -777,6 +777,7 @@ bool Microtonal::loadXML(string filename)
     if (!xml->enterbranch("MICROTONAL"))
     {
         synth->getRuntime().Log(filename + " is not a scale file", 1);
+        delete xml;
         return false;
     }
     getfromXML(xml);

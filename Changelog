@@ -6,6 +6,8 @@ yoshimi 1.5.10 M
 * Made (obvious) improvement to endian detection.
 * Moved gzipped saving from XMLwrapper to FileMgr.
   This also fixed memory leak if saving failed.
+* Found several memory leaks in XML code
+  all triggered by file errors.
 
 2019-2-28 Will
 * Added data block saving to Filemanager
