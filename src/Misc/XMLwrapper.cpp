@@ -278,7 +278,6 @@ bool XMLwrapper::saveXMLfile(string _filename)
         return false;
     }
 
-    bool isOK = true;
     unsigned int compression = synth->getRuntime().GzipCompression;
     if (compression <= 0)
     {
@@ -292,10 +291,15 @@ bool XMLwrapper::saveXMLfile(string _filename)
     {
         if (compression > 9)
             compression = 9;
-        isOK = saveGzipped(synth, xmldata, filename, compression);
+        string result = saveGzipped(xmldata, filename, compression);
+        if (result > "")
+        {
+            synth->getRuntime().Log(result,2);
+            return false;
+        }
     }
     free(xmldata);
-    return isOK;
+    return true;
 }
 
 

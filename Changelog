@@ -8,6 +8,7 @@ yoshimi 1.5.10 M
   This also fixed memory leak if saving failed.
 * Found several memory leaks in XML code
   all triggered by file errors.
+* Improved gzipped saving.
 
 2019-2-28 Will
 * Added data block saving to Filemanager

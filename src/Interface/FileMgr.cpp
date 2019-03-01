@@ -206,22 +206,18 @@ bool FileMgr::copyFile(string source, string destination)
 }
 
 
-bool FileMgr::saveGzipped(SynthEngine *_synth, char *xmldata, string filename, int compression)
+string FileMgr::saveGzipped(char *data, string filename, int compression)
 {
-    SynthEngine *synth = _synth;
     char options[10];
     snprintf(options, 10, "wb%d", compression);
 
     gzFile gzfile;
     gzfile = gzopen(filename.c_str(), options);
     if (gzfile == NULL)
-    {
-        synth->getRuntime().Log("XML: gzopen() == NULL");
-        return false;
-    }
-    gzputs(gzfile, xmldata);
+        return "XML: gzopen() == NULL";
+    gzputs(gzfile, data);
     gzclose(gzfile);
-    return true;
+    return "";
 }
 
 
