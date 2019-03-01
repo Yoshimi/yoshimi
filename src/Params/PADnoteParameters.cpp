@@ -693,13 +693,7 @@ void PADnoteParameters::setPan(char pan)
 bool PADnoteParameters::export2wav(std::string basefilename)
 {
     string type;
-    union {
-        uint32_t u32 = 0x11223344;
-        uint8_t arr[4];
-    } x;
-    //cout << "byte " << int(x.arr[0]) << endl;
-
-    if (x.arr[0] == 0x44) // little endian
+    if (synth->getRuntime().isLittleEndian)
         type = "RIFF"; // default wave format
     else
         type = "RIFX";

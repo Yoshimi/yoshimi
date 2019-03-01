@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified February 2019
+    Modified March 2019
 */
 
 #ifndef CONFIG_H
@@ -114,6 +114,7 @@ class Config : public MiscFuncs, FileMgr
         static int           showCLIcontext;
 
         bool          runSynth;
+        bool          isLittleEndian;
         bool          finishedCLI;
         int           VirKeybLayout;
 

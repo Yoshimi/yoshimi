@@ -3,6 +3,7 @@ yoshimi 1.5.10 M
 2019-3-1 Will
 * Added endian check for PadSynth export.
 * Revised ALSA endian check.
+* Made (obvious) improvement to endian detection.
 
 2019-2-28 Will
 * Added data block saving to Filemanager

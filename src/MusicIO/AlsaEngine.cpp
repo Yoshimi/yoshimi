@@ -42,18 +42,7 @@ AlsaEngine::AlsaEngine(SynthEngine *_synth) :MusicIO(_synth)
     midi.handle = NULL;
     midi.alsaId = -1;
     midi.pThread = 0;
-
-    string type;
-    union {
-        uint32_t u32 = 0x11223344;
-        uint8_t arr[4];
-    } x;
-    //cout << "byte " << int(x.arr[0]) << endl;
-
-    if (x.arr[0] == 0x44)
-        little_endian = true;
-    else
-        little_endian = false;
+    little_endian = synth->getRuntime().isLittleEndian;
 }
 
 

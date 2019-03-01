@@ -127,6 +127,13 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     LFOtime(0),
     windowTitle("Yoshimi" + asString(uniqueId))
 {
+    union {
+        uint32_t u32 = 0x11223344;
+        uint8_t arr[4];
+    } x;
+    //cout << "byte " << int(x.arr[0]) << endl;
+    Runtime.isLittleEndian = (x.arr[0] == 0x44);
+
     if (bank.roots.empty())
         bank.addDefaultRootDirs();
 
