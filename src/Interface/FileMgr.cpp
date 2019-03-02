@@ -23,6 +23,7 @@
 #include <cerrno>
 #include <iostream>
 #include <zlib.h>
+#include <sstream>
 #include <fstream>
 #include <fcntl.h> // this affects error reporting
 #include <stdlib.h>
@@ -214,7 +215,7 @@ string FileMgr::saveGzipped(char *data, string filename, int compression)
     gzFile gzfile;
     gzfile = gzopen(filename.c_str(), options);
     if (gzfile == NULL)
-        return "XML: gzopen() == NULL";
+        return "gzopen() == NULL";
     gzputs(gzfile, data);
     gzclose(gzfile);
     return "";
@@ -246,6 +247,55 @@ bool FileMgr::saveText(string text, string filename)
     fputs(text.c_str(), writefile);
     fclose (writefile);
     return 1;
+}
+
+
+char *FileMgr::loadGzipped(string _filename, string *report)
+{
+    string filename = _filename;
+    char *data = NULL;
+    gzFile gzf  = gzopen(filename.c_str(), "rb");
+    if (!gzf)
+    {
+        *report = ("Failed to open file " + filename + " for load: " + string(strerror(errno)));
+        return NULL;
+    }
+    const int bufSize = 4096;
+    char fetchBuf[4097];
+    int this_read;
+    int total_bytes = 0;
+    stringstream readStream;
+    for (bool quit = false; !quit;)
+    {
+        memset(fetchBuf, 0, sizeof(fetchBuf) * sizeof(char));
+        this_read = gzread(gzf, fetchBuf, bufSize);
+        if (this_read > 0)
+        {
+            readStream << fetchBuf;
+            total_bytes += this_read;
+        }
+        else if (this_read < 0)
+        {
+            int errnum;
+            *report = ("Read error in zlib: " + string(gzerror(gzf, &errnum)));
+            if (errnum == Z_ERRNO)
+                *report = ("Filesystem error: " + string(strerror(errno)));
+            quit = true;
+        }
+        else if (total_bytes > 0)
+        {
+            data = new char[total_bytes + 1];
+            if (data)
+            {
+                memset(data, 0, total_bytes + 1);
+                memcpy(data, readStream.str().c_str(), total_bytes);
+            }
+            quit = true;
+        }
+    }
+    gzclose(gzf);
+    //*report = "it looks like we sucessfully loaded" + filename;
+    return data;
 }
 
 

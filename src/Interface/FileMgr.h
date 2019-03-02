@@ -70,6 +70,7 @@ class FileMgr
         string saveGzipped(char *data, string filename, int compression);
         ssize_t saveData(char *buff, size_t bytes, string filename);
         bool saveText(string text, string filename);
+        char *loadGzipped(string _filename, string *report);
         string loadText(string filename);
         bool deleteFile(string filename);
         bool deleteDir(string filename);

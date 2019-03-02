@@ -141,7 +141,10 @@ void XMLwrapper::checkfileinformation(const string& filename)
     if (tree)
         mxmlDelete(tree);
     tree = NULL;
-    char *xmldata = doloadfile(filename);
+    string report = "";
+    char *xmldata = loadGzipped(filename, &report);
+    if (report != "")
+        synth->getRuntime().Log(report, 2);
     if (!xmldata)
         return;
 
@@ -444,7 +447,10 @@ bool XMLwrapper::loadXMLfile(const string& filename)
     tree = NULL;
     memset(&parentstack, 0, sizeof(parentstack));
     stackpos = 0;
-    const char *xmldata = doloadfile(filename);
+    string report = "";
+    char *xmldata = loadGzipped(filename, &report);
+    if (report != "")
+        synth->getRuntime().Log(report, 2);
     if (xmldata == NULL)
     {
         synth->getRuntime().Log("XML: Could not load xml file: " + filename, 2);
@@ -503,55 +509,6 @@ bool XMLwrapper::loadXMLfile(const string& filename)
             synth->getRuntime().Log("Yoshimi version major " + asString(xml_version.y_major) + "   minor " + asString(xml_version.y_minor));
     }
     return true;
-}
-
-
-char *XMLwrapper::doloadfile(string _filename)
-{
-    string filename = _filename;
-    char *xmldata = NULL;
-    gzFile gzf  = gzopen(filename.c_str(), "rb");
-    if (!gzf)
-    {
-        synth->getRuntime().Log("XML: Failed to open xml file " + filename + " for load, errno: "
-                    + asString(errno) + "  " + string(strerror(errno)), 2);
-        return NULL;
-    }
-    const int bufSize = 4096;
-    char fetchBuf[4097];
-    int this_read;
-    int total_bytes = 0;
-    stringstream readStream;
-    for (bool quit = false; !quit;)
-    {
-        memset(fetchBuf, 0, sizeof(fetchBuf) * sizeof(char));
-        this_read = gzread(gzf, fetchBuf, bufSize);
-        if (this_read > 0)
-        {
-            readStream << fetchBuf;
-            total_bytes += this_read;
-        }
-        else if (this_read < 0)
-        {
-            int errnum;
-            synth->getRuntime().Log("XML: Read error in zlib: " + string(gzerror(gzf, &errnum)), 2);
-            if (errnum == Z_ERRNO)
-                synth->getRuntime().Log("XML: Filesystem error: " + string(strerror(errno)), 2);
-            quit = true;
-        }
-        else if (total_bytes > 0)
-        {
-            xmldata = new char[total_bytes + 1];
-            if (xmldata)
-            {
-                memset(xmldata, 0, total_bytes + 1);
-                memcpy(xmldata, readStream.str().c_str(), total_bytes);
-            }
-            quit = true;
-        }
-    }
-    gzclose(gzf);
-    return xmldata;
 }
 
 

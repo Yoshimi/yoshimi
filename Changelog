@@ -1,5 +1,9 @@
 yoshimi 1.5.10 M
 
+2019-3-2 Will
+* Moved gzipped loading from XMLwrapper to FileMgr.
+  Used pointer to string to return error reports.
+
 2019-3-1 Will
 * Added endian check for PadSynth export.
 * Revised ALSA endian check.
