@@ -20,6 +20,11 @@
     Modified February 2019
 */
 
+
+//#define AUTOSINGLE
+// this is still slighty experimental
+
+
 // approx timeout in seconds.
 #define SPLASH_TIME 3
 
@@ -92,12 +97,12 @@ void yoshimiSigHandler(int sig)
             firstRuntime->setLadi1Active();
             sigaction(SIGUSR1, &yoshimiSigAction, NULL);
             break;
-
+#ifdef AUTOSINGLE
         case SIGUSR2: // start next instance
             mainCreateNewInstance(0, true);
             sigaction(SIGUSR2, &yoshimiSigAction, NULL);
             break;
-
+#endif
         default:
             break;
     }
@@ -359,6 +364,7 @@ void *commandThread(void *arg = NULL) // silence warning
 
 int main(int argc, char *argv[])
 {
+#ifdef AUTOSINGLE
     char pidline[256];
     memset(&pidline, 0, 255);
     // test for *exact* name and only the oldest occurrance
@@ -374,7 +380,7 @@ int main(int argc, char *argv[])
         kill(firstpid, SIGUSR2);
         return 0;
     }
-
+#endif
     time(&old_father_time);
     here_and_now = old_father_time;
     struct termios  oldTerm;

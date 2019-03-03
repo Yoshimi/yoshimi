@@ -38,7 +38,7 @@ char tabs[STACKSIZE + 2];
 
 const char *XMLwrapper_whitespace_callback(mxml_node_t *node, int where)
 {
-    const char *name = node->value.element.name;
+    const char *name = mxmlGetElement(node);
 
     if (where == MXML_WS_BEFORE_OPEN && !strcmp(name, "?xml"))
         return NULL;
@@ -640,11 +640,12 @@ string XMLwrapper::getparstr(const string& name)
     node = mxmlFindElement(peek(), peek(), "string", "name", name.c_str(), MXML_DESCEND_FIRST);
     if (!node)
         return string();
-    if (!node->child)
+    mxml_node_t *child = mxmlGetFirstChild(node);
+    if (!child)
         return string();
-    if (node->child->type != MXML_OPAQUE)
+    if (mxmlGetType(child) != MXML_OPAQUE)
         return string();
-    return string(node->child->value.element.name);
+    return string(mxmlGetOpaque(child));
 }
 
 

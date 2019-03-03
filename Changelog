@@ -1,5 +1,10 @@
 yoshimi 1.5.10 M
 
+2019-3-3 Will
+* Applied mxml patch from Adam.
+* Temporarily disabled startup instance control
+  for bugfix release.
+
 2019-3-2 Will
 * Moved gzipped loading from XMLwrapper to FileMgr.
   Used pointer to string to return error reports.
