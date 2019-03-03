@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code.
 
-Modified February 2019
+Modified March 2019
 } {selected in_source in_header
 }
 
@@ -516,6 +516,17 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         label Instruments
         callback {//
         instFrom = 2;
+        if (synth->getUniqueId() == 0)
+        {
+            modeselect->show();
+            rootmodeselect->show();
+        }
+        else
+        {
+            modeselect->hide();
+            rootmodeselect->hide();
+        }
+
         instrumentuiwindow->show();
         if (Fl::event_button() == 3)
             bankuiwindow->hide();}
@@ -988,6 +999,16 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
             bankuiwindow->hide();
 
         cbwig->do_callback();
+        if (synth->getUniqueId() == 0)
+        {
+            modeselect->show();
+            rootmodeselect->show();
+        }
+        else
+        {
+            modeselect->hide();
+            rootmodeselect->hide();
+        }
         instrumentuiwindow->show();
         set_bank_slot(); // needed by 'old' menu selector
         refreshmainwindow();

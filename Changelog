@@ -4,6 +4,8 @@ yoshimi 1.5.10 M
 * Applied mxml patch from Adam.
 * Temporarily disabled startup instance control
   for bugfix release.
+* BugFix: Instrument window not showing controls
+  only first instance and called from bank window.
 
 2019-3-2 Will
 * Moved gzipped loading from XMLwrapper to FileMgr.
