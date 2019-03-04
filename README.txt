@@ -1,18 +1,7 @@
-V 1.5.10 Redwing
+V 1.5.10.2
 
-Unfortunately a bug has been found that seems to affect only official fedora builds. To ensure complete compatibility we now have V 1.5.10.1 as a bugfix release.
+One of the libraries Yoshimi depends on is in the process of upgrading, and will lose some - now deprecated - access points. In view of this we've decided to make a pre-emptive bugfix release. At the same time, we've prevented some memory leaks that might have occurred when handling corrupted files.
 
-Command Line access is now virtually complete.
-
-The graphic interface has had a minor makeover. Also, very occasional corruption of this is now resolved.
-
-All inactive controls are now shown as such - there were a number that previously weren't, thus causing considerable confusion for new users.
-
-There is an improved pseudo-random number system, which does not rely on external libraries anymore.
-
-Further details can be found in /doc/Yoshimi_1.5.10_features.txt
-
-By default, Yoshimi is supplied with 710 instruments spread across 23 banks.
 
 Yoshimi source code is available from either:
 https://sourceforge.net/projects/yoshimi

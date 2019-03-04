@@ -1,4 +1,8 @@
-yoshimi 1.5.10 M
+yoshimi 1.5.10.2
+
+2019-3-4 Will.
+* Updated docs.
+* Set release as 1.5.10.2
 
 2019-3-3 Will
 * Applied mxml patch from Adam.
