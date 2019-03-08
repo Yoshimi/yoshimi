@@ -17,10 +17,11 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>
 
-    Modifed January 2019
+    Modifed March 2019
 */
 
 //#define REPORT_MISCMSG
+// for testing message list leaks
 
 #include <sys/stat.h>
 #include <stdlib.h>

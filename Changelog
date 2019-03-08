@@ -1,4 +1,7 @@
-yoshimi 1.5.10.2
+yoshimi 1.5.M
+
+2019-2-8 Will
+* Small improvement to CLI 'list' command.
 
 2019-3-4 Will.
 * Updated docs.

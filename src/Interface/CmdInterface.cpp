@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified February 2019
+    Modified March 2019
 */
 
 #include <iostream>
@@ -443,7 +443,7 @@ bool CmdInterface::helpList(unsigned int local)
 
     if (synth->getRuntime().toConsole)
         // we need this in case someone is working headless
-        cout << "\nSet CONfig REPorts [s] - set report destination (gui/stderr)\n\n";
+        cout << "\nSet CONfig REPorts [s] - set report destination (gui/stderr)\n";
 
     synth->cliOutput(msg, LINES);
     return exit_msg;
@@ -1869,8 +1869,14 @@ int CmdInterface::commandList()
         return effectsList();
     if (matchnMove(3, point, "presets"))
         return effectsList(true);
-    replyString = "list";
-    return what_msg;
+
+    msg.push_back("Lists:");
+    helpLoop(msg, listlist, 2);
+    if (synth->getRuntime().toConsole)
+        // we need this in case someone is working headless
+        cout << "\nSet CONfig REPorts [s] - set report destination (gui/stderr)\n";
+    synth->cliOutput(msg, LINES);
+    return done_msg;
 }
 
 

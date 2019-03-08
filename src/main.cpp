@@ -17,11 +17,11 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified February 2019
+    Modified March 2019
 */
 
 
-//#define AUTOSINGLE
+#define AUTOSINGLE
 // this is still slighty experimental
 
 

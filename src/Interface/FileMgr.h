@@ -1,5 +1,5 @@
 /*
-    fileMgr.h
+    FileMgr.h - all file operations
 
     Copyright 2019 Will Godfrey
 

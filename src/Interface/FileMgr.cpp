@@ -1,5 +1,5 @@
 /*
-    FileMgr.cpp
+    FileMgr.cpp - all file operations
 
     Copyright 2019 Will Godfrey
 
