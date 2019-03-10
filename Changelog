@@ -1,5 +1,11 @@
 yoshimi 1.5.M
 
+2019-2-10 Will
+* BugFix: Limits default wrong on DynFilter.
+  System/Insert volumes reversed.
+* Set up label for lower voice oscillator warning.
+  Not yet in use. Need to work out how.
+
 2019-2-8 Will
 * Small improvement to CLI 'list' command.
 

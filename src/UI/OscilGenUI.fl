@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified January 2019
+Modified March 2019
 } {selected in_source in_header
 }
 
@@ -536,10 +536,6 @@ class OscilEditor {: {public PresetsUI_}
           }
         }
       }
-      Fl_Box {} {
-        label {Base Func.}
-        xywh {495 15 110 20} box FLAT_BOX labelfont 1
-      }
       Fl_Group basefuncdisplaygroup {
         xywh {365 5 360 300} box ENGRAVED_FRAME
       } {
@@ -630,7 +626,7 @@ class OscilEditor {: {public PresetsUI_}
           }
         }
         Fl_Box {} {
-          label {Base Func.}
+          label {Base Function}
           xywh {480 10 110 20} box FLAT_BOX labelfont 1 labelsize 12
         }
         Fl_Group {} {
@@ -695,6 +691,10 @@ class OscilEditor {: {public PresetsUI_}
             }
           }
         }
+      }
+      Fl_Box Warning {
+        label {Warning Editing Lower Voice}
+        xywh {241 8 231 20} box FLAT_BOX labelfont 1 labelcolor 1
       }
       Fl_Choice magtype {
         label {Mag.Type}
@@ -1497,7 +1497,10 @@ class OscilEditor {: {public PresetsUI_}
     code {//
         string tname;
         if (engine == 2)
+        {
             tname = "PadSynth Harmonic Content";
+            Warning->hide();
+        }
         else
         {
             tname = "AddSynth Voice ";
@@ -1506,6 +1509,7 @@ class OscilEditor {: {public PresetsUI_}
             else
                 tname = tname + to_string((engine - PART::engine::addMod1) + 1) +  " Modulation";
             tname += " Oscillator";
+            Warning->hide();// will be changed to show when ready!
         }
         osceditUI->copy_label(synth->getGuiMaster()->setPartWindowTitle(tname).c_str());} {}
   }
