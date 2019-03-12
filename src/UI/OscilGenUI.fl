@@ -692,9 +692,8 @@ class OscilEditor {: {public PresetsUI_}
           }
         }
       }
-      Fl_Box Warning {
-        label {Warning Editing Lower Voice}
-        xywh {241 8 231 20} box FLAT_BOX labelfont 1 labelcolor 1
+      Fl_Output Warning {
+        xywh {234 8 238 20} box FLAT_BOX color 29 align 32 textfont 1 textcolor 1
       }
       Fl_Choice magtype {
         label {Mag.Type}
@@ -1501,6 +1500,7 @@ class OscilEditor {: {public PresetsUI_}
   Function {setWindowTitle()} {} {
     code {//
         string tname;
+        string warnType = "";
         if (engine == 2)
         {
             tname = "PadSynth Harmonic Content";
@@ -1514,17 +1514,25 @@ class OscilEditor {: {public PresetsUI_}
             {
                 tname = tname + to_string((engine - PART::engine::addVoice1) + 1);
                 sourceEngine = fetchData(0, ADDVOICE::control::voiceOscillatorSource,npart,kititem, engine);
+                warnType = "Voice " + to_string(sourceEngine + 1);
             }
             else
             {
                 tname = tname + to_string((engine - PART::engine::addMod1) + 1) +  " Modulation";
-                if (fetchData(0, ADDVOICE::control::externalModulator,npart,kititem, engine) == -1) 
+                if (fetchData(0, ADDVOICE::control::externalModulator,npart,kititem, engine) == -1)
+                {
                     sourceEngine = fetchData(0, ADDVOICE::control::modulatorOscillatorSource,npart,kititem, engine);
+                    warnType = "Modulator " + to_string(sourceEngine + 1);
+                }
             }
 
             tname += " Oscillator";
             if (sourceEngine > -1)
+            {
                 Warning->show();
+                warnType = "WARNING: Editing " + warnType;
+                Warning->value(warnType.c_str());
+            }
             else
                 Warning->hide();
         }

@@ -3,6 +3,7 @@ yoshimi 1.5.M
 2019-3-12 Will
 * Waveform window now warns of lower voice edit.
   Doesn't yet say which one!
+* Voice and Modulator warnings done.
 
 2019-3-10 Will
 * BugFix: Limits default wrong on DynFilter.
