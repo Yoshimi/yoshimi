@@ -1389,6 +1389,11 @@ class OscilEditor {: {public PresetsUI_}
         }
     }} {}
   }
+  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED, int request = UNUSED)} {return_type float
+  } {
+    code {//
+        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, par2, request);} {}
+  }
   Function {OscilEditor(OscilGen *oscil_, Fl_Widget *oldosc_, Fl_Widget *cbwidget_, Fl_Widget *cbapplywidget_, SynthEngine *_synth, int npart_, int kititem_, int engine_)} {} {
     code {//
     synth = _synth;
@@ -1504,12 +1509,24 @@ class OscilEditor {: {public PresetsUI_}
         else
         {
             tname = "AddSynth Voice ";
+            int sourceEngine = -1;
             if (engine <= PART::engine::addVoice8)
+            {
                 tname = tname + to_string((engine - PART::engine::addVoice1) + 1);
+                sourceEngine = fetchData(0, ADDVOICE::control::voiceOscillatorSource,npart,kititem, engine);
+            }
             else
+            {
                 tname = tname + to_string((engine - PART::engine::addMod1) + 1) +  " Modulation";
+                if (fetchData(0, ADDVOICE::control::externalModulator,npart,kititem, engine) == -1) 
+                    sourceEngine = fetchData(0, ADDVOICE::control::modulatorOscillatorSource,npart,kititem, engine);
+            }
+
             tname += " Oscillator";
-            Warning->hide();// will be changed to show when ready!
+            if (sourceEngine > -1)
+                Warning->show();
+            else
+                Warning->hide();
         }
         osceditUI->copy_label(synth->getGuiMaster()->setPartWindowTitle(tname).c_str());} {}
   }

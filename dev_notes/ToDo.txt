@@ -5,6 +5,9 @@ Minor bug Multi instances produce jack error reports when main instance closed, 
 
 Master UI windows makes direct calls to FileMgr :(
 
+Discover the purpose of /misc/FileListItem.h
+Seems to be unused.
+
 Revise GUI voice list related to voice editor.
 
 Sort out bank properly.
