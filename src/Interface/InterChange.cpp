@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified February 2019
+    Modified March 2019
 */
 
 #include <iostream>
@@ -7349,9 +7349,9 @@ void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
     {
         case LFOINSERT::control::speed:
             if (write)
-                pars->setPfreq(val);
+                pars->setPfreq(val * Fmul2I);
             else
-                val = pars->Pfreq;
+                val = pars->Pfreq / Fmul2I;
             break;
         case LFOINSERT::control::depth:
             if (write)

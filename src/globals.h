@@ -37,6 +37,9 @@
 #define HALFPI 1.57079632679f
 #define LOG_2 0.693147181f
 
+#define Fmul2I 2147483647
+#define Cshift2I 24
+
 // many of the following are for convenience and consistency
 // changing them is likely to have unpredicable consequences
 
