@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified January 2019
+    Modified March 2019
 */
 
 #include "Misc/SynthEngine.h"
@@ -215,6 +215,7 @@ void Chorus::setpreset(unsigned char npreset)
         if (insertion && (param == 0))
             changepar(0, presets[preset][0] / 2);
     }
+    Pchanged = false;
 }
 
 
@@ -263,6 +264,7 @@ void Chorus::changepar(int npar, unsigned char value)
             Poutsub = (value > 1) ? 1 : value;
             break;
     }
+    Pchanged = true;
 }
 
 
@@ -270,6 +272,7 @@ unsigned char Chorus::getpar(int npar)
 {
     switch (npar)
     {
+        case -1: return Pchanged;
         case 0:  return Pvolume;
         case 1:  return Ppanning;
         case 2:  return lfo.Pfreq;

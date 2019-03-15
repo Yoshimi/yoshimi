@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2018, Will Godfrey
+    Copyright 2018-2019, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified July 2018
+    Modified March 2019
 */
 
 #include "Misc/SynthEngine.h"
@@ -400,6 +400,7 @@ void Phaser::setpreset(unsigned char npreset)
             param = 0;
         changepar(param, presets[preset][param]);
     }
+    Pchanged = false;
 }
 
 
@@ -474,6 +475,7 @@ void Phaser::changepar(int npar, unsigned char value)
             Panalog = value;
             break;
     }
+    Pchanged = true;
 }
 
 
@@ -481,6 +483,7 @@ unsigned char Phaser::getpar(int npar)
 {
     switch (npar)
     {
+        case -1: return Pchanged;
         case 0:  return Pvolume;
         case 1:  return Ppanning;
         case 2:  return lfo.Pfreq;

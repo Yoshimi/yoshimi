@@ -44,6 +44,11 @@
 #define Fmul2I 1073741823
 #define Cshift2I 23
 
+// mult for LFO freq 12595212
+// turns 85.25 into 0x3fffffff
+
+
+
 // many of the following are for convenience and consistency
 // changing them is likely to have unpredicable consequences
 

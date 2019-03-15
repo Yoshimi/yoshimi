@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2010, Alan Calvert
-    Copyright 2018, Will Godfrey
+    Copyright 2018-2019, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified July 2018
+    Modified March 2019
 */
 
 #include "Misc/SynthEngine.h"
@@ -138,6 +138,7 @@ void EQ::setpreset(unsigned char npreset)
     for (int n = 0; n < PRESET_SIZE; ++n)
         changepar(n, presets[npreset][n]);
     Ppreset = npreset;
+    Pchanged = true;
 }
 
 
@@ -199,6 +200,7 @@ void EQ::changepar(int npar, unsigned char value)
             filter[nb].r->setstages(value);
             break;
     }
+    Pchanged = true;
 }
 
 
@@ -206,6 +208,7 @@ unsigned char EQ::getpar(int npar)
 {
     switch (npar)
     {
+        case -1: return Pchanged;
         case 0:
             return Pvolume;
             break;

@@ -29,6 +29,7 @@
 
 #include "Params/LFOParams.h"
 
+//#include <iostream>
 //int LFOParams::time = 0;
 
 LFOParams::LFOParams(float Pfreq_, unsigned char Pintensity_,
@@ -64,7 +65,6 @@ LFOParams::LFOParams(float Pfreq_, unsigned char Pintensity_,
 
 void LFOParams::defaults(void)
 {
-    Pfreq = Dfreq / 127.0f;
     setPfreq(Dfreq << Cshift2I);
     Pintensity = Dintensity;
     Pstartphase = Dstartphase;

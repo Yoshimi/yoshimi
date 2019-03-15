@@ -7351,7 +7351,7 @@ void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
             if (write)
                 pars->setPfreq(val * Fmul2I);
             else
-                val = pars->Pfreq / Fmul2I;
+                val = float(pars->PfreqI) / float(Fmul2I);
             break;
         case LFOINSERT::control::depth:
             if (write)
@@ -8129,6 +8129,8 @@ void InterChange::commandEffects(CommandBlock *getData)
 
     if (!write)
         getData->data.value = value;
+    else
+        cout << "Changed " << int(eff->geteffectpar(-1)) << endl;
 }
 
 // tests and returns corrected values

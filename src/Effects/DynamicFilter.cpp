@@ -283,6 +283,7 @@ if (npreset < 0xf)
         if ((insertion == 0) && (param == 0))
             changepar(0, presets[preset][0] * 0.5f);
     }
+    Pchanged = false;
 }
 
 
@@ -336,6 +337,7 @@ void DynamicFilter::changepar(int npar, unsigned char value)
             setampsns(Pampsns);
             break;
     }
+    Pchanged = true;
 }
 
 
@@ -343,6 +345,7 @@ unsigned char DynamicFilter::getpar(int npar)
 {
     switch (npar)
     {
+        case -1: return Pchanged;
         case 0:  return Pvolume;
         case 1:  return Ppanning;
         case 2:  return lfo.Pfreq;
