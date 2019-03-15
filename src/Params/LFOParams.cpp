@@ -26,7 +26,6 @@
 */
 
 #include <cmath>
-#include <iostream>
 
 #include "Params/LFOParams.h"
 
@@ -66,7 +65,7 @@ LFOParams::LFOParams(float Pfreq_, unsigned char Pintensity_,
 void LFOParams::defaults(void)
 {
     Pfreq = Dfreq / 127.0f;
-    PfreqI = Dfreq << Cshift2I;
+    setPfreq(Dfreq << Cshift2I);
     Pintensity = Dintensity;
     Pstartphase = Dstartphase;
     PLFOtype = DLFOtype;
@@ -78,10 +77,19 @@ void LFOParams::defaults(void)
 }
 
 
+void LFOParams::setPfreq(int32_t n)
+{
+
+    PfreqI = n;
+    Pfreq = (powf(2.0f, (float(n) / float(Fmul2I)) * 10.0f) - 1.0f) / 12.0f;
+    updated = true;
+}
+
+
 void LFOParams::add2XML(XMLwrapper *xml)
 {
     xml->addpar("freqI", PfreqI);
-    xml->addparreal("freq", Pfreq);
+    xml->addparreal("freq", float(PfreqI) / Fmul2I);
     xml->addpar("intensity", Pintensity);
     xml->addpar("start_phase", Pstartphase);
     xml->addpar("lfo_type", PLFOtype);
@@ -95,13 +103,11 @@ void LFOParams::add2XML(XMLwrapper *xml)
 
 void LFOParams::getfromXML(XMLwrapper *xml)
 {
-    int32_t PfreqI = xml->getpar("freqI", -1, 0, Fmul2I);
-    if (PfreqI > -1)
-        Pfreq = float(PfreqI) / Fmul2I;
-    else
+    PfreqI = xml->getpar("freqI", -1, 0, Fmul2I);
+    if (PfreqI == -1)
         PfreqI = xml->getparreal("freq", Pfreq, 0.0, 1.0) * Fmul2I;
+    setPfreq(PfreqI);
 
-    Pfreq = xml->getparreal("freq", Pfreq, 0.0, 1.0);
     Pintensity = xml->getpar127("intensity", Pintensity);
     Pstartphase = xml->getpar127("start_phase", Pstartphase);
     PLFOtype = xml->getpar127("lfo_type", PLFOtype);

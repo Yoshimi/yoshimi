@@ -1,6 +1,10 @@
 yoshimi 1.5.M
 
 2019-3-14 Will
+* LFO conversion done
+  but CLI/GUI entries need improvenment.
+
+2019-3-14 Will
 * Initial conversion of LFO speed toint32_t.
 
 2019-3-12 Will

@@ -43,9 +43,8 @@ class LFOParams : public Presets
 
         void add2XML(XMLwrapper *xml);
         void defaults(void);
+        void setPfreq(int32_t n);
         void getfromXML(XMLwrapper *xml);
-
-        void setPfreq(int32_t n) { Pfreq = float(n) / Fmul2I; PfreqI = n; updated = true; }
         void setPintensity(unsigned char n) { Pintensity = n; updated = true; }
         void setPstartphase(unsigned char n) { Pstartphase = n; }
         void setPLFOtype(unsigned char n) { PLFOtype = n; updated = true; }

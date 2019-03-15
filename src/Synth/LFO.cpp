@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2017, Will Godfrey & others
+    Copyright 2017-2019, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of ZynAddSubFX original code
-    Modified December 2018
+    Modified March 2019
 */
 
 #include <cmath>
@@ -103,7 +103,7 @@ inline void LFO::RecomputeFreq(void)
     float lfostretch =
         powf(basefreq / 440.0f, (float)((int)lfopars->Pstretch - 64) / 63.0f); // max 2x/octave
 
-    float lfofreq = (powf(2.0f, lfopars->Pfreq * 10.0f) - 1.0f) / 12.0f * lfostretch;
+    float lfofreq = lfopars->Pfreq * lfostretch;
     incx = fabsf(lfofreq) * synth->buffersize_f / synth->samplerate_f;
 
     // Limit the Frequency (or else...)

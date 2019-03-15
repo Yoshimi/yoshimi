@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modifed February 2019
+    Modifed March 2019
 */
 
 #ifndef GLOBALS_H
@@ -37,8 +37,12 @@
 #define HALFPI 1.57079632679f
 #define LOG_2 0.693147181f
 
-#define Fmul2I 2147483647
-#define Cshift2I 24
+/*
+ * we only use 23 bits as with 24 there is risk of
+ * an overflow when making float/int conversions
+ */
+#define Fmul2I 1073741823
+#define Cshift2I 23
 
 // many of the following are for convenience and consistency
 // changing them is likely to have unpredicable consequences
