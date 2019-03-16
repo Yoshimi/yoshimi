@@ -203,6 +203,11 @@ void Alienwah::setpreset(unsigned char npreset)
 
 void Alienwah::changepar(int npar, unsigned char value)
 {
+    if (npar == -1)
+    {
+        Pchanged = (value != 0);
+        return;
+    }
     switch (npar)
     {
         case 0:

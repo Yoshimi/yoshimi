@@ -517,6 +517,11 @@ void Reverb::setpreset(unsigned char npreset)
 
 void Reverb::changepar(int npar, unsigned char value)
 {
+    if (npar == -1)
+    {
+        Pchanged = (value != 0);
+        return;
+    }
     switch (npar)
     {
         case 0:

@@ -221,6 +221,11 @@ void Chorus::setpreset(unsigned char npreset)
 
 void Chorus::changepar(int npar, unsigned char value)
 {
+    if (npar == -1)
+    {
+        Pchanged = (value != 0);
+        return;
+    }
     switch (npar)
     {
         case 0:
