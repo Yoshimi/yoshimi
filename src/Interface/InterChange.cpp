@@ -8057,7 +8057,10 @@ void InterChange::commandEffects(CommandBlock *getData)
 
     bool write = (type & TOPLEVEL::type::Write) > 0;
     if (write)
+    {
         __sync_or_and_fetch(&blockRead, 1);
+        getData->data.type |= 16;
+    }
 
     EffectMgr *eff;
 
@@ -8077,7 +8080,15 @@ void InterChange::commandEffects(CommandBlock *getData)
         filterReadWrite(getData, eff->filterpars,NULL,NULL);
         return;
     }
-
+    if (control > 128)
+    {
+        if (!write)
+        {
+            value = eff->geteffectpar(-1);
+            getData->data.value = value;
+        }
+        return; // specific for reading change status
+    }
     if (write)
     {
         if (kititem == EFFECT::type::eq)

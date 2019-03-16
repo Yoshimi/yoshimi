@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified February 2019
+    Modified March 2019
 */
 
 #ifndef CMDINTERFACE_H
@@ -631,7 +631,7 @@ static string distortionlist [] = {
     "LOW <n>",          "low pass filter",
     "HIGh <n>",         "high pass filter",
     "STEreo <s>",       "stereo (ON {other})",
-    "PREfilter <s>",    "filter before distortion",
+    "FILter <s>",       "filter before distortion",
     "end"
 };
 
@@ -797,7 +797,7 @@ static string effecho [] = {"LEV", "PAN", "DEL", "LRD", "CRO", "FEE", "DAM",  "e
 static string effchorus [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "DEL", "FEE", "CRO", "none11", "SUB", "end"};
 static string effphaser [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "FEE", "STA", "CRO", "SUB", "REL", "HYP", "OVE", "ANA", "end"};
 static string effalienwah [] = {"LEV", "PAN", "FRE", "WAV", "SHI", "DEP", "FEE", "DEL", "CRO", "REL", "end"};
-static string effdistortion [] = {"LEV", "PAN", "MIX", "DRI", "OUT", "WAV", "INV", "LOW", "HIG", "STE", "PRE", "end"};
+static string effdistortion [] = {"LEV", "PAN", "MIX", "DRI", "OUT", "WAV", "INV", "LOW", "HIG", "STE", "FIL", "end"};
 static string effeq [] = {"LEV", "BAN", "FIL", "FRE", "GAI", "Q", "STA"};
 static string eqtypes [] = {"OFF", "LP1", "HP1", "LP2", "HP2", "BP2", "NOT", "PEA", "LOW", "HIG", "end"};
 static string effdynamicfilter [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "SEN", "INV", "RAT", "FIL", "end"};

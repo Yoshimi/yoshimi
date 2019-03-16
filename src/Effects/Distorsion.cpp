@@ -325,6 +325,7 @@ float Distlimit::getlimits(CommandBlock *getData)
 
     int def = presets[presetNum][control];
     bool canLearn = true;
+    bool isInteger = true;
     switch (control)
     {
         case 0:
@@ -384,7 +385,6 @@ float Distlimit::getlimits(CommandBlock *getData)
             value = def;
             break;
     }
-    if (canLearn)
-        getData->data.type |= TOPLEVEL::type::Learnable;
+    getData->data.type |= (canLearn * 64 + isInteger * 128);
     return float(value);
 }

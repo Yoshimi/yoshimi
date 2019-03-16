@@ -2,7 +2,10 @@ yoshimi 1.5.M
 
 
 2019-3-16 Will
-* Effect change recognaises intstrument loads.
+* Effect change recognises intstrument loads.
+* BugFix: CLI distortion not seing preset change.
+* Effect change sets now sets colour of field.
+  Still some corner cases to correct.
 
 2019-3-15 Will
 * LFO conversion done
