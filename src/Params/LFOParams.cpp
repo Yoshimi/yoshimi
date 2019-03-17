@@ -103,9 +103,9 @@ void LFOParams::add2XML(XMLwrapper *xml)
 
 void LFOParams::getfromXML(XMLwrapper *xml)
 {
-    PfreqI = xml->getpar("freqI", -1, 0, Fmul2I);
-    if (PfreqI == -1)
-        PfreqI = xml->getparreal("freq", Pfreq, 0.0, 1.0) * Fmul2I;
+    //PfreqI = xml->getpar("freqI", -1, 0, Fmul2I);
+    //if (PfreqI == -1)
+    PfreqI = xml->getparreal("freq", Pfreq, 0.0, 1.0) * Fmul2I;
     setPfreq(PfreqI);
 
     Pintensity = xml->getpar127("intensity", Pintensity);

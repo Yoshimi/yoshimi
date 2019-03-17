@@ -1,5 +1,9 @@
 yoshimi 1.5.M
 
+2019-3-17 Will
+
+* Temporarily disalbled Hi Res LFO.
+  It will change!
 
 2019-3-16 Will
 * Effect change recognises intstrument loads.
