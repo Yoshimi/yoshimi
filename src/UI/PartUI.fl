@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 This file is derivative of ZynAddSubFX original code.
 
 Modified October 2018
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -386,9 +386,10 @@ class PartKitItem {: {public Fl_Group, private MiscFuncs}
   }
 }
 
-class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window partgroup {
       xywh {588 361 380 170} type Double box NO_BOX hide
       class Fl_Group
@@ -1045,7 +1046,7 @@ Offset}
       }
     }
     Fl_Window partfx {
-      label {Part's Insert Effects}
+      label {Part's Insert Effects} open
       xywh {134 114 385 160} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Insert Effects").c_str());}
     } {
@@ -1108,7 +1109,7 @@ Offset}
           xywh {110 110 100 20} labelfont 1 labelsize 10
         }
       }
-      Fl_Group inseffectuigroup {
+      Fl_Group inseffectuigroup {open
         xywh {5 37 380 96} box FLAT_BOX color 48
       } {
         Fl_Group inseffectui {
@@ -1574,7 +1575,8 @@ Offset}
         type |= TOPLEVEL::type::Write;
         collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, insert, parameter, par2);} {}
   }
-  Function {returns_update(CommandBlock *getData)} {} {
+  Function {returns_update(CommandBlock *getData)} {open
+  } {
     code {//
     float value = getData->data.value;
     unsigned char control = getData->data.control;
@@ -1925,6 +1927,14 @@ Offset}
             else
                 kitlist->deactivate();
             break;
+            
+        case PART::control::effectNumber:
+            if (sameEff)
+            {
+                cout << "Pchange " << int(getData->data.par2) << endl;
+                inseffectui->UpdatePresetColour(getData->data.par2, insefftype->value());
+            }
+            break;
 
         case PART::control::effectType:
             if (sameEff)
@@ -2086,7 +2096,8 @@ Offset}
             break;
         default:
             break;
-    }} {}
+    }} {selected
+    }
   }
   Function {PartUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//

@@ -110,6 +110,7 @@ Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_
         ap[i] = NULL;
     }
     setpreset(Ppreset);
+    Pchanged = false;
     cleanup(); // do not call this before the comb initialisation
 }
 

@@ -67,6 +67,7 @@ Phaser::Phaser(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_
 {
     analog_setup();
     setpreset(Ppreset);
+    Pchanged = false;
     cleanup();
 }
 

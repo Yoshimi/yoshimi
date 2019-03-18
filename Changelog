@@ -1,7 +1,11 @@
 yoshimi 1.5.M
 
-2019-3-17 Will
+2019-3-18 Will
+* More work on effect warnings.
+  Still more to do
+  CLI test messages in place
 
+2019-3-17 Will
 * Temporarily disalbled Hi Res LFO.
   It will change!
 

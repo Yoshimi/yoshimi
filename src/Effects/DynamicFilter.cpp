@@ -57,6 +57,7 @@ DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_, 
     setvolume(110);
     setpreset(Ppreset);
     changepar(1, 64); // pan
+    Pchanged = false;
     cleanup();
 }
 

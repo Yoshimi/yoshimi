@@ -27,6 +27,7 @@
 
 #include "Misc/SynthEngine.h"
 #include "Effects/Echo.h"
+#include <iostream>
 
 static const int PRESET_SIZE = 7;
 static const int NUM_PRESETS = 9;
@@ -56,6 +57,7 @@ Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_, SynthEngine *_synt
     sethidamp(60);
     setpreset(Ppreset);
     changepar(4, 30); // lrcross
+    Pchanged = false;
     cleanup();
 }
 
@@ -224,6 +226,7 @@ void Echo::changepar(int npar, unsigned char value)
         Pchanged = (value != 0);
         return;
     }
+    Pchanged = true;
     switch (npar)
     {
         case 0:
@@ -253,8 +256,9 @@ void Echo::changepar(int npar, unsigned char value)
         case 6:
             sethidamp(value);
             break;
+        default:
+            Pchanged = false;
     }
-    Pchanged = true;
 }
 
 

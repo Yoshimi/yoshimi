@@ -46,6 +46,7 @@ EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     setvolume(50);
     Pband = 0;
     setpreset(Ppreset);
+    Pchanged = false;
     cleanup();
 }
 

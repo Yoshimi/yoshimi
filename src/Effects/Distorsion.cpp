@@ -65,6 +65,7 @@ Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_, SynthE
     hpfr = new AnalogFilter(3, 20, 1, 0, synth);
     setpreset(Ppreset);
     changepar(2, 35);
+    Pchanged = false;
     cleanup();
 }
 

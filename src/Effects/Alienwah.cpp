@@ -54,6 +54,7 @@ Alienwah::Alienwah(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngin
     cleanup();
     oldclfol = complex<float>(fb, 0.0);
     oldclfor = complex<float>(fb, 0.0);
+    Pchanged = false;
 }
 
 

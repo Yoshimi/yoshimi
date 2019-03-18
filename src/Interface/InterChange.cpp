@@ -232,7 +232,7 @@ void *InterChange::sortResultsThread(void)
         }
         else if (lockTime > 0 && testRead == 0)
             lockTime = 0;
-
+ // local to source
         else if (lockTime > 0 && (tick - lockTime) > 32766)
         { // about 4 seconds - may need improving
 
@@ -5566,7 +5566,9 @@ void InterChange::commandPart(CommandBlock *getData)
             }
             break;
 
-        case PART::control::effectNumber: // local to source
+        case PART::control::effectNumber:
+            getData->data.par2 = (part->partefx[effNum]->geteffectpar(-1) != 0);
+            getData->data.type |= TOPLEVEL::source::CLI;
             break;
 
         case PART::control::effectType:
@@ -8059,7 +8061,7 @@ void InterChange::commandEffects(CommandBlock *getData)
     if (write)
     {
         __sync_or_and_fetch(&blockRead, 1);
-        getData->data.type |= 16;
+        getData->data.type |= TOPLEVEL::source::CLI;
     }
 
     EffectMgr *eff;
@@ -8086,6 +8088,7 @@ void InterChange::commandEffects(CommandBlock *getData)
         {
             value = eff->geteffectpar(-1);
             getData->data.value = value;
+            //cout << "Eff Changed " << int(value) << endl;
         }
         return; // specific for reading change status
     }

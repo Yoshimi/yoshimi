@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-Modified March 2019} {in_source in_header
+Modified March 2019} {selected in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -1482,8 +1482,7 @@ class EffUI {open : {public Fl_Group,public PresetsUI_}
     code {//
         return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, par2, request);} {}
   }
-  Function {returns_update(CommandBlock *getData)} {open
-  } {
+  Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
     int value_int = int(value + 0.5f);
@@ -1865,8 +1864,7 @@ class EffUI {open : {public Fl_Group,public PresetsUI_}
             dfp->color(textCol);
             dfp->redraw();
             break;
-    }} {selected
-    }
+    }} {}
   }
   Function {init(EffectMgr *eff_, int npart_, int neff_)} {} {
     code {//
@@ -2083,6 +2081,47 @@ class EffUI {open : {public Fl_Group,public PresetsUI_}
   }
   Function {refresh()} {} {
     code {refresh(eff, npart, neff);} {}
+  }
+  Function {UpdatePresetColour(int changed, int efftype)} {} {
+    code {//
+    int textCol = 14;
+    if (changed)
+         textCol = FL_BLUE;
+
+    switch (efftype + 128)
+    {
+        case EFFECT::type::reverb:
+            revp->color(textCol);
+            revp->redraw();
+            break;
+        case EFFECT::type::echo:
+            echop->color(textCol);
+            echop->redraw();
+            break;
+        case EFFECT::type::chorus:
+            chorusp->color(textCol);
+            chorusp->redraw();
+            break;
+        case EFFECT::type::phaser:
+            phaserp->color(textCol);
+            phaserp->redraw();
+            break;
+        case EFFECT::type::alienWah:
+            awp->color(textCol);
+            awp->redraw();
+            break;
+        case EFFECT::type::distortion:
+            distp->color(textCol);
+            distp->redraw();
+            break;
+        case EFFECT::type::eq:
+            break;
+        case EFFECT::type::dynFilter:
+            dfp->color(textCol);
+            dfp->redraw();
+            break;
+    }
+    cout << "Col " << textCol << "  eff " << efftype << endl;} {}
   }
   Function {EQbandUpdate()} {} {
     code {//

@@ -609,6 +609,14 @@ int CmdInterface::effects(unsigned char controlType)
         return done_msg;
 
     value = string2int(point);
+
+    if (value > 128)
+    {
+        cout << "Eff status " << int(readControl(value, npart,EFFECT::type::none + nFXtype, nFX)) << endl;
+        return done_msg;
+    }
+
+
     if (value > 0)
     {
         value -= 1;
