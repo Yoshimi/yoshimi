@@ -1495,7 +1495,7 @@ class EffUI {open : {public Fl_Group,public PresetsUI_}
     int textCol = 14;
     if (fetchData(0, 200, getData->data.part, efftype, effnum) != 0)
         textCol = FL_BLUE;
-    cout << "colour " << textCol << endl;
+    //cout << "colour " << textCol << endl;
     //cout << "cont " << (int)control << "  type " << (int)efftype << "  num " << (int)effnum << endl;
     switch(efftype)
     {
@@ -2089,7 +2089,7 @@ class EffUI {open : {public Fl_Group,public PresetsUI_}
     if (changed)
          textCol = FL_BLUE;
 
-    switch (efftype + 128)
+    switch (efftype + EFFECT::type::none)
     {
         case EFFECT::type::reverb:
             revp->color(textCol);
@@ -2122,7 +2122,7 @@ class EffUI {open : {public Fl_Group,public PresetsUI_}
             dfp->redraw();
             break;
     }
-    cout << "Col " << textCol << "  eff " << efftype << endl;} {}
+    //cout << "Col " << textCol << "  eff " << efftype << endl;} {}
   }
   Function {EQbandUpdate()} {} {
     code {//

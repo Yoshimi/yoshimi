@@ -8154,8 +8154,8 @@ void InterChange::commandEffects(CommandBlock *getData)
 
     if (!write)
         getData->data.value = value;
-    else
-        cout << "Changed " << int(eff->geteffectpar(-1)) << endl;
+    //else
+        //cout << "Changed " << int(eff->geteffectpar(-1)) << endl;
 }
 
 // tests and returns corrected values

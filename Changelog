@@ -3,6 +3,7 @@ yoshimi 1.5.M
 2019-3-19 Will
 * Most effect wanings now correct.
   Still incorrect when loading :(
+* All part warnings correct.
 
 2019-3-18 Will
 * More work on effect warnings.
