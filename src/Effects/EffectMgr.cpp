@@ -322,7 +322,7 @@ void EffectMgr::getfromXML(XMLwrapper *xml)
             if (par != geteffectpar(n))
             {
                 isChanged = true;
-                cout << "changed par " << n << endl;
+                //cout << "changed par " << n << endl;
                 //may use this later to ID
             }
             xml->exitbranch();
@@ -337,8 +337,8 @@ void EffectMgr::getfromXML(XMLwrapper *xml)
             }
         }
         xml->exitbranch();
-        if(geteffectpar(-1))
-            cout << "Some pars changed" << endl;
+        //if(geteffectpar(-1))
+            //cout << "Some pars changed" << endl;
     }
     cleanup();
 }

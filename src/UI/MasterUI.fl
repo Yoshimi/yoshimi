@@ -1223,6 +1223,11 @@ Nikita Zlobin
 
         collect_data(synth, value, type, control, part, UNUSED, engine, insert, parameter, par2);} {}
   }
+  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED, int request = UNUSED)} {return_type float
+  } {
+    code {//
+        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, par2, request);} {}
+  }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
@@ -2037,6 +2042,27 @@ Nikita Zlobin
     setInsEff(ninseff);
 
     sysinsgroup->value(SystemEffectsGrp);
+    
+    
+    
+    
+    bool status;
+    int efftype = fetchData(0, EFFECT::sysIns::effectType, 241, UNUSED, 0);
+    if (efftype > 0)
+    {
+        status = fetchData(0, 200, TOPLEVEL::section::systemEffects, efftype + EFFECT::type::none, ninseff);
+        syseffectui->UpdatePresetColour(status, sysefftype->value());
+    }
+    efftype = fetchData(0,EFFECT::sysIns::effectType, 242, UNUSED, 0);
+    if (efftype > 0)
+    {
+        status = fetchData(0, 200, TOPLEVEL::section::insertEffects, efftype + EFFECT::type::none, ninseff);
+        inseffectui->UpdatePresetColour(status, insefftype->value());
+    }
+
+    
+    
+    
     showSysEfxUI();
 
     masterkeyshift->value(synth->Pkeyshift - 64);

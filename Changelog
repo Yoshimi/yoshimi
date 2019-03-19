@@ -4,6 +4,8 @@ yoshimi 1.5.M
 * Most effect wanings now correct.
   Still incorrect when loading :(
 * All part warnings correct.
+* Sys/Ins warnings done too.
+  CLI not done though!
 
 2019-3-18 Will
 * More work on effect warnings.
