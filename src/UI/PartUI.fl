@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 This file is derivative of ZynAddSubFX original code.
 
 Modified October 2018
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -386,10 +386,9 @@ class PartKitItem {: {public Fl_Group, private MiscFuncs}
   }
 }
 
-class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
 } {
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window partgroup {
       xywh {588 361 380 170} type Double box NO_BOX hide
       class Fl_Group
@@ -1046,7 +1045,7 @@ Offset}
       }
     }
     Fl_Window partfx {
-      label {Part's Insert Effects} open
+      label {Part's Insert Effects}
       xywh {134 114 385 160} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Insert Effects").c_str());}
     } {
@@ -1575,8 +1574,7 @@ Offset}
         type |= TOPLEVEL::type::Write;
         collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, insert, parameter, par2);} {}
   }
-  Function {returns_update(CommandBlock *getData)} {open
-  } {
+  Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
     unsigned char control = getData->data.control;
@@ -1927,12 +1925,12 @@ Offset}
             else
                 kitlist->deactivate();
             break;
-            
+
         case PART::control::effectNumber:
             if (sameEff)
             {
-                cout << "Pchange " << int(getData->data.par2) << endl;
-                inseffectui->UpdatePresetColour(getData->data.par2, insefftype->value());
+                cout << "Pchange " << int(parameter) << endl;
+                inseffectui->UpdatePresetColour(parameter, insefftype->value());
             }
             break;
 
@@ -1941,6 +1939,7 @@ Offset}
             {
                 insefftype->value(valInt);
                 part->partefx[engine]->geteffect();
+                inseffectui->UpdatePresetColour(parameter, insefftype->value());
                 inseffectui->refresh(part->partefx[engine], npart, engine);
             }
             break;
@@ -2096,8 +2095,7 @@ Offset}
             break;
         default:
             break;
-    }} {selected
-    }
+    }} {}
   }
   Function {PartUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//

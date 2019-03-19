@@ -283,7 +283,7 @@ class MasterUI {: {private GuiUpdates, FileMgr}
       {
           synth->guiClosed(true);
       }}
-      xywh {300 438 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
+      xywh {231 433 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Box {} {
         xywh {279 28 103 85} box ENGRAVED_FRAME
@@ -837,7 +837,7 @@ paramsui->Show(XML_MICROTONAL);}
           class EffUI
         } {}
       }
-      Fl_Group inseffectuigroup {
+      Fl_Group inseffectuigroup {open
         xywh {3 158 384 95} box FLAT_BOX color 48
         code0 {o->hide();}
       } {
@@ -1392,6 +1392,8 @@ Nikita Zlobin
                 nsyseff = engine;
                 sysefftype->value(synth->sysefx[nsyseff]->geteffect());
                 syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
+                syseffectui->UpdatePresetColour(parameter, sysefftype->value());
+                
             }
             else if (control == EFFECT::sysIns::effectType)
             {
@@ -1399,6 +1401,7 @@ Nikita Zlobin
                 nsyseff = engine;
                 sysefftype->value(value_int);
                 syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
+                syseffectui->UpdatePresetColour(parameter, sysefftype->value());
                 showSysEfxUI();
             }
         }
@@ -1411,6 +1414,8 @@ Nikita Zlobin
             ninseff = engine;
             setInsEff(ninseff);
             showInsEfxUI();
+            inseffectui->UpdatePresetColour(parameter, insefftype->value());
+
         }
         else if (control == EFFECT::sysIns::effectType)
         {
@@ -1418,6 +1423,7 @@ Nikita Zlobin
             ninseff = engine;
             insefftype->value(value_int);
             setInsEff(ninseff);
+            inseffectui->UpdatePresetColour(parameter, insefftype->value());
             showInsEfxUI();
         }
         else if (control == EFFECT::sysIns::effectDestination)
@@ -2566,8 +2572,7 @@ Nikita Zlobin
                   + asString(O) + "\\n";
     fputs(tosend.c_str(), windows);} {}
   }
-  Function {checkBuffer(void)} {open
-  } {
+  Function {checkBuffer(void)} {} {
     code {//
 read_updates(synth);} {}
   }

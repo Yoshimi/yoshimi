@@ -61,7 +61,6 @@ Chorus::Chorus(bool insertion_, float *const efxoutl_, float *efxoutr_, SynthEng
     lfo(_synth),
     synth(_synth)
 {
-    Pchanged = false;
     dlk = drk = 0;
     maxdelay = (int)(MAX_CHORUS_DELAY / 1000.0f * synth->samplerate_f);
     delayl = new float[maxdelay];
@@ -72,6 +71,7 @@ Chorus::Chorus(bool insertion_, float *const efxoutl_, float *efxoutr_, SynthEng
     lfo.effectlfoout(&lfol, &lfor);
     dl2 = getdelay(lfol);
     dr2 = getdelay(lfor);
+    Pchanged = false;
     cleanup();
 }
 

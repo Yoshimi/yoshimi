@@ -5567,7 +5567,7 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
 
         case PART::control::effectNumber:
-            getData->data.par2 = (part->partefx[effNum]->geteffectpar(-1) != 0);
+            getData->data.parameter = (part->partefx[effNum]->geteffectpar(-1) != 0);
             getData->data.type |= TOPLEVEL::source::CLI;
             break;
 
@@ -5576,6 +5576,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 part->partefx[effNum]->changeeffect(value_int);
             else
                 value = part->partefx[effNum]->geteffect();
+            getData->data.parameter = (part->partefx[effNum]->geteffectpar(-1) != 0);
             break;
         case PART::control::effectDestination:
             if (write)
@@ -8004,15 +8005,25 @@ void InterChange::commandSysIns(CommandBlock *getData)
     {
         switch (control)
         {
-            case EFFECT::sysIns::effectNumber: // only relevant to GUI
+            case EFFECT::sysIns::effectNumber:
+                if (isSysEff)
+                    getData->data.parameter = (synth->sysefx[effnum]->geteffectpar(-1) != 0);
+                else
+                    getData->data.parameter = (synth->insefx[effnum]->geteffectpar(-1) != 0);
                 break;
             case EFFECT::sysIns::effectType:
                 if (write)
                 {
                     if (isSysEff)
+                    {
                         synth->sysefx[effnum]->changeeffect(value_int);
+                        getData->data.parameter = (synth->sysefx[effnum]->geteffectpar(-1) != 0);
+                    }
                     else
+                    {
                         synth->insefx[effnum]->changeeffect(value_int);
+                        getData->data.parameter = (synth->insefx[effnum]->geteffectpar(-1) != 0);
+                    }
                 }
                 else
                 {
