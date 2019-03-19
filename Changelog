@@ -1,11 +1,13 @@
 yoshimi 1.5.M
 
 2019-3-19 Will
-* Most effect wanings now correct.
+* Most effect warnings now correct.
   Still incorrect when loading :(
 * All part warnings correct.
 * Sys/Ins warnings done too.
   CLI not done though!
+* BugFix: Error loading instrument effects.
+  Preset and parameter in wrong order.
 
 2019-3-18 Will
 * More work on effect warnings.

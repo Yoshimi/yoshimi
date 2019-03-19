@@ -152,17 +152,10 @@ unsigned char EffectMgr::getpreset(void)
 
 
 // Change the preset of the current effect
-void EffectMgr::changepreset_nolock(unsigned char npreset)
+void EffectMgr::changepreset(unsigned char npreset)
 {
     if (efx)
         efx->setpreset(npreset);
-}
-
-
-// Change the preset of the current effect(with thread locking)
-void EffectMgr::changepreset(unsigned char npreset)
-{
-    changepreset_nolock(npreset);
 }
 
 
@@ -307,17 +300,17 @@ void EffectMgr::getfromXML(XMLwrapper *xml)
     changeeffect(xml->getpar127("type", geteffect()));
     if (!efx || !geteffect())
         return;
-    changepreset_nolock(xml->getpar127("preset", efx->Ppreset));
+    changepreset(xml->getpar127("preset", efx->Ppreset));
 
     bool isChanged = false;
     if (xml->enterbranch("EFFECT_PARAMETERS"))
     {
         for (int n = 0; n < 128; ++n)
         {
-            //seteffectpar(n, 0); // erase effect parameter
+            int par = geteffectpar(n); // find default
+            seteffectpar(n, 0); // erase effect parameter
             if (xml->enterbranch("par_no", n) == 0)
                 continue;
-            int par = geteffectpar(n);
             seteffectpar(n, xml->getpar127("par", par));
             if (par != geteffectpar(n))
             {
