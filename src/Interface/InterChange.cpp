@@ -8090,6 +8090,8 @@ void InterChange::commandEffects(CommandBlock *getData)
         return;
     if (kititem == EFFECT::type::dynFilter && getData->data.insert != UNUSED)
     {
+        if (write)
+            eff->seteffectpar(-1, true); // effect changed
         filterReadWrite(getData, eff->filterpars,NULL,NULL);
         return;
     }
