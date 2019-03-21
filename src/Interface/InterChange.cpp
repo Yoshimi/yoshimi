@@ -317,7 +317,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     unsigned char parameter = getData->data.parameter;
     unsigned char par2 = getData->data.par2;
     //cout << "Indirect" << endl;
-    bool (write) = (type & TOPLEVEL::type::Write);
+    bool write = (type & TOPLEVEL::type::Write);
     if (write)
         __sync_or_and_fetch(&blockRead, 2);
     bool guiTo = false;

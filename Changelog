@@ -2,6 +2,7 @@ yoshimi 1.5.M
 
 2019-3-21 Will
 * Bugfix: Insert effect part list out of step.
+* Sorted out potential GCC7 build warnings.
 
 2019-3-20 Will
 * Dynfilter insert done for local changes.

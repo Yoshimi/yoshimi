@@ -11,7 +11,7 @@ comment {PartUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2018, Will Godfrey
+Copyright 2014-2019, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified October 2018
+Modified March 2019
 } {selected in_source in_header
 }
 
@@ -327,7 +327,7 @@ class PartKitItem {: {public Fl_Group, private MiscFuncs}
             o->value(1);
         send_data(PART::control::enable, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
         xywh {30 0 20 15} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 4
-        code0 {snprintf(label,10,"%d",n+1);o->label(label);}
+        code0 {snprintf(label,12,"%d",n+1);o->label(label);}
         code1 {o->value(part->kit[n].Penabled);}
         code2 {if (n==0) o->hide();}
         code3 {if (o->value() == 0) labelbutton->color(FL_WHITE);}
