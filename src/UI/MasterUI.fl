@@ -848,7 +848,7 @@ paramsui->Show(XML_MICROTONAL);}
           class EffUI
         } {}
       }
-      Fl_Group partuigroup {
+      Fl_Group partuigroup {open
         xywh {3 255 380 170} box ENGRAVED_FRAME
       } {
         Fl_Group partui {
@@ -897,14 +897,8 @@ paramsui->Show(XML_MICROTONAL);}
                 tmp = 64;
             else
                 tmp = 32;
-            o->value(tmp);
         }
-        partmax = tmp;
-        updatepart();
-        updatepanel();
-        setinspartlist();
-        vectorui->checkParts(tmp);
-        send_data(MAIN::control::availableParts, tmp, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
+        send_data(MAIN::control::availableParts, tmp, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main);}
         tooltip {Set the number of available parts} xywh {93 264 40 20} labelsize 11 minimum 16 maximum 64 step 16 value 16 textsize 11
         code0 {o->value(partmax);}
       }

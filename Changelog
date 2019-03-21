@@ -1,5 +1,8 @@
 yoshimi 1.5.M
 
+2019-3-21 Will
+* Bugfix: Insert effect part list out of step.
+
 2019-3-20 Will
 * Dynfilter insert done for local changes.
   No idea how to set for patch loads :(
