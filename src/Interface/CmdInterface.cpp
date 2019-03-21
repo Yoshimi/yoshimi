@@ -5577,7 +5577,7 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
 
     if (type == TOPLEVEL::type::Default)
     {
-        putData.data.type |= TOPLEVEL::type::Limits;
+        putData.data.type = TOPLEVEL::type::Limits;
         synth->interchange.readAllData(&putData);
         if ((putData.data.type & TOPLEVEL::type::Learnable) == 0)
         {
