@@ -144,28 +144,28 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
 
     // bit-wise type and source share the same byte
     // but will eventually be split up
-    enum type : unsigned char {
+    namespace type {
         // bits 0, 1
-        Adjust = 0,
-        Read = 0,
-        Minimum,
-        Maximum,
-        Default,
-        LearnRequest = 3, // shared value
+        const unsigned char Adjust = 0;
+        const unsigned char Read = 0;
+        const unsigned char Minimum = 1;
+        const unsigned char Maximum = 2;
+        const unsigned char Default = 3;
+        const unsigned char LearnRequest = 3; // shared value
         // remaining used bit-wise
-        Error = 4, // also identifes static limits
-        Limits = 4, // yes we can pair these - who knew?
-        Write = 64, // false = read
-        Learnable = 64, // shared value
-        Integer = 128 // false = float
+        const unsigned char Error = 4; // also identifes static limits
+        const unsigned char Limits = 4; // yes we can pair these - who knew?
+        const unsigned char Write = 64; // false = read
+        const unsigned char Learnable = 64; // shared value
+        const unsigned char Integer = 128; // false = float
     };
 
-    enum source : unsigned char {
+    namespace source {
         // all used bit-wise
-        MIDI = 8,
-        CLI = 16,
-        GUI = 32,
-        UpdateAfterSet = 48 // so gui can update
+        const unsigned char MIDI = 8;
+        const unsigned char CLI = 16;
+        const unsigned char GUI = 32;
+        const unsigned char UpdateAfterSet = 48; // so gui can update
     };
 
     enum control : unsigned char {

@@ -154,7 +154,7 @@ void CmdInterface::helpLoop(list<string>& msg, string *commands, int indent, boo
 }
 
 
-bool CmdInterface::helpList(unsigned int local)
+char CmdInterface::helpList(unsigned int local)
 {
     if (!matchnMove(1, point, "help") && !matchnMove(1, point, "?"))
         return todo_msg;

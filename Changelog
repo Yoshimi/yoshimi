@@ -1,5 +1,10 @@
 yoshimi 1.5.M
 
+2019-3-22 will
+* Further adustments to suppress GCC7 warnings.
+  Some global enums changed to cnast unsigned char.
+  CmdInterface/helplist() changed to char.
+
 2019-3-21 Will
 * Bugfix: Insert effect part list out of step.
 * Sorted out potential GCC7 build warnings.

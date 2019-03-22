@@ -67,7 +67,6 @@ namespace LEVEL{
 }
 
 typedef enum {
-    exit_msg = -1,
     todo_msg = 0,
     done_msg,
     value_msg,
@@ -84,7 +83,8 @@ typedef enum {
     inactive_msg,
     failed_msg,
     writeOnly_msg,
-    readOnly_msg
+    readOnly_msg,
+    exit_msg
 } responses;
 
 namespace LISTS {
@@ -822,7 +822,7 @@ class CmdInterface : private MiscFuncs, FileMgr
     private:
         bool query(string text, bool priority);
         void helpLoop(list<string>& msg, string *commands, int indent, bool single = false);
-        bool helpList(unsigned int local);
+        char helpList(unsigned int local);
         string historySelect(int listnum, int selection);
         void historyList(int listnum);
         void listCurrentParts(list<string>& msg_buf);
