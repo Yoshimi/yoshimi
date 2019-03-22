@@ -35,7 +35,7 @@ add_definitions(-std=gnu++11) # various versions of cmake
 add_definitions(-Wall)
 
 # vvv
-add_definitions(-Werror)
+#add_definitions(-Werror)
 add_definitions(-Wfatal-errors)
 #add_definitions(-Wpedantic)
 add_definitions(-Werror=format-security)
