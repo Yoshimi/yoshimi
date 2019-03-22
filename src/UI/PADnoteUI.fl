@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-Modified January 2019
+Modified March 2019
 } {selected in_source in_header
 }
 
@@ -1276,7 +1276,19 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper, MiscFuncs}
                 if (wasFromHere)
                     fl_alert("Some samples have failed.");
             }
-            // break; drop-through intended!
+            applybutton->color(FL_GRAY);
+            applybutton->redraw();
+            if (oscui)
+            {
+                oscui->applybutton->color(FL_GRAY);
+                oscui->applybutton->redraw();
+            }
+            if (resui)
+            {
+                resui->applybutton->color(FL_GRAY);
+                resui->applybutton->redraw();
+            }
+            break; // TODO drop-through intended?
 
         case PADSYNTH::control::applyChanges:
             applybutton->color(FL_GRAY);

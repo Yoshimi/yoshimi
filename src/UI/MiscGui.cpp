@@ -148,6 +148,43 @@ void GuiUpdates::read_updates(SynthEngine *synth)
 }
 
 
+void GuiUpdates::decode_envelope(SynthEngine *synth, CommandBlock *getData)
+{
+    unsigned char engine = getData->data.engine;
+    unsigned char insertParam = getData->data.parameter;
+    if (engine >= PART::engine::addMod1)
+                        switch(insertParam)
+                        {
+                            case TOPLEVEL::insertType::amplitude:
+                                if (synth->getGuiMaster()->partui->adnoteui->advoice->voiceFMampenvgroup)
+                                    synth->getGuiMaster()->partui->adnoteui->advoice->voiceFMampenvgroup->returns_update(getData);
+                                break;
+                            case TOPLEVEL::insertType::frequency:
+                                if (synth->getGuiMaster()->partui->adnoteui->advoice->voiceFMfreqenvgroup)
+                                    synth->getGuiMaster()->partui->adnoteui->advoice->voiceFMfreqenvgroup->returns_update(getData);
+                                break;
+                        }
+                        else
+                        {
+                            switch(insertParam)
+                            {
+                                case TOPLEVEL::insertType::amplitude:
+                                    if (synth->getGuiMaster()->partui->adnoteui->advoice->voiceampenvgroup)
+                                        synth->getGuiMaster()->partui->adnoteui->advoice->voiceampenvgroup->returns_update(getData);
+                                    break;
+                                case TOPLEVEL::insertType::frequency:
+                                    if (synth->getGuiMaster()->partui->adnoteui->advoice->voicefreqenvgroup)
+                                        synth->getGuiMaster()->partui->adnoteui->advoice->voicefreqenvgroup->returns_update(getData);
+                                    break;
+                                case TOPLEVEL::insertType::filter:
+                                    if (synth->getGuiMaster()->partui->adnoteui->advoice->voicefilterenvgroup)
+                                        synth->getGuiMaster()->partui->adnoteui->advoice->voicefilterenvgroup->returns_update(getData);
+                                    break;
+                            }
+                        }
+}
+
+
 void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 {
     unsigned char control = getData->data.control;
@@ -407,9 +444,14 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                             synth->getGuiMaster()->partui->adnoteui->advoice->voicefilter->returns_update(getData);
                         break;
                     case TOPLEVEL::insert::envelopeGroup:
+                        decode_envelope(synth, getData);
+                        break;
                     case TOPLEVEL::insert::envelopePoints:
+                        decode_envelope(synth, getData);
+                        break;
                     case TOPLEVEL::insert::envelopePointChange:
-                        if (engine >= PART::engine::addMod1)
+                        decode_envelope(synth, getData);
+                        /*if (engine >= PART::engine::addMod1)
                             switch(insertParam)
                             {
                                 case TOPLEVEL::insertType::amplitude:
@@ -437,9 +479,8 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                                     if (synth->getGuiMaster()->partui->adnoteui->advoice->voicefilterenvgroup)
                                         synth->getGuiMaster()->partui->adnoteui->advoice->voicefilterenvgroup->returns_update(getData);
                                     break;
-                            }
+                            }*/
                         break;
-                        }
                     case TOPLEVEL::insert::oscillatorGroup:
                     case TOPLEVEL::insert::harmonicAmplitude:
                     case TOPLEVEL::insert::harmonicPhaseBandwidth:
