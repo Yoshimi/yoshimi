@@ -158,7 +158,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         const unsigned char Write = 64; // false = read
         const unsigned char Learnable = 64; // shared value
         const unsigned char Integer = 128; // false = float
-    };
+    }
 
     namespace source {
         // all used bit-wise
@@ -166,7 +166,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         const unsigned char CLI = 16;
         const unsigned char GUI = 32;
         const unsigned char UpdateAfterSet = 48; // so gui can update
-    };
+    }
 
     enum control : unsigned char {
         errorMessage = 254 // FE

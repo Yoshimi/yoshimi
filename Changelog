@@ -4,6 +4,8 @@ yoshimi 1.5.M
 * Further adustments to suppress GCC7 warnings.
   Some global enums changed to cnast unsigned char.
   CmdInterface/helplist() changed to char.
+* Added nore warning/error traps to CMakeLists.
+* Removed some switch case dropthroughs.
 
 2019-3-21 Will
 * Bugfix: Insert effect part list out of step.

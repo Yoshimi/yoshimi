@@ -1273,16 +1273,26 @@ void InterChange::resolveReplies(CommandBlock *getData)
                 commandName = resolveFilter(getData);
                 break;
             case TOPLEVEL::insert::envelopeGroup:
+                commandName = resolveEnvelope(getData);
+                break;
             case TOPLEVEL::insert::envelopePoints:
+                commandName = resolveEnvelope(getData);
+                break;
             case TOPLEVEL::insert::envelopePointChange:
                 commandName = resolveEnvelope(getData);
                 break;
             case TOPLEVEL::insert::oscillatorGroup:
+                commandName = resolveOscillator(getData);
+                break;
             case TOPLEVEL::insert::harmonicAmplitude:
+                commandName = resolveOscillator(getData);
+                break;
             case TOPLEVEL::insert::harmonicPhaseBandwidth:
                 commandName = resolveOscillator(getData);
                 break;
             case TOPLEVEL::insert::resonanceGroup:
+                commandName = resolveResonance(getData);
+                break;
             case TOPLEVEL::insert::resonanceGraphInsert:
                 commandName = resolveResonance(getData);
                 break;
@@ -1294,7 +1304,11 @@ void InterChange::resolveReplies(CommandBlock *getData)
         switch (insert)
         {
             case UNUSED:
+                commandName = resolveSub(getData);
+                break;
             case TOPLEVEL::insert::harmonicAmplitude:
+                commandName = resolveSub(getData);
+                break;
             case TOPLEVEL::insert::harmonicPhaseBandwidth:
                 commandName = resolveSub(getData);
                 break;
@@ -1302,7 +1316,11 @@ void InterChange::resolveReplies(CommandBlock *getData)
                 commandName = resolveFilter(getData);
                 break;
             case TOPLEVEL::insert::envelopeGroup:
+                commandName = resolveEnvelope(getData);
+                break;
             case TOPLEVEL::insert::envelopePoints:
+                commandName = resolveEnvelope(getData);
+                break;
             case TOPLEVEL::insert::envelopePointChange:
                 commandName = resolveEnvelope(getData);
                 break;
@@ -1323,17 +1341,22 @@ void InterChange::resolveReplies(CommandBlock *getData)
                 commandName = resolveFilter(getData);
                 break;
             case TOPLEVEL::insert::envelopeGroup:
+                commandName = resolveEnvelope(getData);
+                break;
             case TOPLEVEL::insert::envelopePoints:
+                commandName = resolveEnvelope(getData);
+                break;
             case TOPLEVEL::insert::envelopePointChange:
                 commandName = resolveEnvelope(getData);
                 break;
             case TOPLEVEL::insert::oscillatorGroup:
+                commandName = resolveOscillator(getData);
+                break;
             case TOPLEVEL::insert::harmonicAmplitude:
+                commandName = resolveOscillator(getData);
+                break;
             case TOPLEVEL::insert::harmonicPhaseBandwidth:
-                if (engine >= PART::engine::addMod1)
-                    commandName = resolveOscillator(getData);
-                else
-                    commandName = resolveOscillator(getData);
+                commandName = resolveOscillator(getData);
                 break;
         }
     }
@@ -1352,11 +1375,17 @@ void InterChange::resolveReplies(CommandBlock *getData)
                 commandName = resolveFilter(getData);
                 break;
             case TOPLEVEL::insert::envelopeGroup:
+                commandName = resolveEnvelope(getData);
+                break;
             case TOPLEVEL::insert::envelopePoints:
+                commandName = resolveEnvelope(getData);
+                break;
             case TOPLEVEL::insert::envelopePointChange:
                 commandName = resolveEnvelope(getData);
                 break;
             case TOPLEVEL::insert::resonanceGroup:
+                commandName = resolveResonance(getData);
+                break;
             case TOPLEVEL::insert::resonanceGraphInsert:
                 commandName = resolveResonance(getData);
                 break;
@@ -1928,6 +1957,8 @@ string InterChange::resolveMain(CommandBlock *getData)
         switch (control)
         {
             case MIDI::control::noteOn:
+                showValue = false;
+                break;
             case MIDI::control::noteOff:
                 showValue = false;
                 break;
@@ -2334,6 +2365,8 @@ string InterChange::resolvePart(CommandBlock *getData)
                     contstr += "part";
                     break;
                 case 1:
+                    contstr += "main";
+                    break;
                 default:
                     contstr += "main";
                     break;
@@ -4118,16 +4151,26 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                 commandFilter(getData);
                 break;
             case TOPLEVEL::insert::envelopeGroup:
+                commandEnvelope(getData);
+                break;
             case TOPLEVEL::insert::envelopePoints:
+                commandEnvelope(getData);
+                break;
             case TOPLEVEL::insert::envelopePointChange:
                 commandEnvelope(getData);
                 break;
             case TOPLEVEL::insert::oscillatorGroup:
+                commandOscillator(getData,  part->kit[kititem].padpars->oscilgen);
+                break;
             case TOPLEVEL::insert::harmonicAmplitude:
+                commandOscillator(getData,  part->kit[kititem].padpars->oscilgen);
+                break;
             case TOPLEVEL::insert::harmonicPhaseBandwidth:
                 commandOscillator(getData,  part->kit[kititem].padpars->oscilgen);
                 break;
             case TOPLEVEL::insert::resonanceGroup:
+                commandResonance(getData, part->kit[kititem].padpars->resonance);
+                break;
             case TOPLEVEL::insert::resonanceGraphInsert:
                 commandResonance(getData, part->kit[kititem].padpars->resonance);
                 break;
@@ -4141,7 +4184,11 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         switch (insert)
         {
             case UNUSED:
+                commandSub(getData);
+                break;
             case TOPLEVEL::insert::harmonicAmplitude:
+                commandSub(getData);
+                break;
             case TOPLEVEL::insert::harmonicPhaseBandwidth:
                 commandSub(getData);
                 break;
@@ -4149,7 +4196,11 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                 commandFilter(getData);
                 break;
             case TOPLEVEL::insert::envelopeGroup:
+                commandEnvelope(getData);
+                break;
             case TOPLEVEL::insert::envelopePoints:
+                commandEnvelope(getData);
+                break;
             case TOPLEVEL::insert::envelopePointChange:
                 commandEnvelope(getData);
                 break;
@@ -4889,6 +4940,8 @@ void InterChange::commandConfig(CommandBlock *getData)
                         value = 48000;
                         break;
                     case 3:
+                        value = 44100;
+                        break;
                     default:
                         value = 44100;
                         break;
@@ -4909,6 +4962,8 @@ void InterChange::commandConfig(CommandBlock *getData)
                         value = 2;
                         break;
                     case 44100:
+                        value = 3;
+                        break;
                     default:
                         value = 3;
                         break;
