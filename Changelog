@@ -1,5 +1,9 @@
 yoshimi 1.5.M
 
+2019-3-23 Will
+* Corrected code indentation and missing bracket
+  in UI/MiscGui.cpp
+
 2019-3-22 will
 * Further adjustments to suppress GCC7 warnings.
   Some global enums changed to const unsigned char.

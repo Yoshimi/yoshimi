@@ -17,7 +17,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-# Modified February 2019
+# Modified March 2019
 
 project (Yoshimi)
 cmake_minimum_required (VERSION 3.0)
@@ -35,9 +35,9 @@ add_definitions(-std=gnu++11) # various versions of cmake
 add_definitions(-Wall)
 
 # vvv
-#add_definitions(-Werror)
-add_definitions(-Wfatal-errors)
-#add_definitions(-Wpedantic)
+#add_definitions(-Wpedantic) # full ISO spec
+#add_definitions(-Werror) # warnings as errors
+add_definitions(-Wfatal-errors) # stop on first
 add_definitions(-Werror=format-security)
 add_definitions(-Wextra)
 # ^^^ comment these out on release pushes

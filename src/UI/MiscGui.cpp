@@ -165,23 +165,23 @@ void GuiUpdates::decode_envelope(SynthEngine *synth, CommandBlock *getData)
                     synth->getGuiMaster()->partui->adnoteui->advoice->voiceFMfreqenvgroup->returns_update(getData);
                 break;
         }
-        else
+    }
+    else
+    {
+        switch(insertParam)
         {
-            switch(insertParam)
-            {
-                case TOPLEVEL::insertType::amplitude:
-                    if (synth->getGuiMaster()->partui->adnoteui->advoice->voiceampenvgroup)
-                        synth->getGuiMaster()->partui->adnoteui->advoice->voiceampenvgroup->returns_update(getData);
-                    break;
-                case TOPLEVEL::insertType::frequency:
-                    if (synth->getGuiMaster()->partui->adnoteui->advoice->voicefreqenvgroup)
-                        synth->getGuiMaster()->partui->adnoteui->advoice->voicefreqenvgroup->returns_update(getData);
-                    break;
-                case TOPLEVEL::insertType::filter:
-                    if (synth->getGuiMaster()->partui->adnoteui->advoice->voicefilterenvgroup)
-                        synth->getGuiMaster()->partui->adnoteui->advoice->voicefilterenvgroup->returns_update(getData);
-                    break;
-            }
+            case TOPLEVEL::insertType::amplitude:
+                if (synth->getGuiMaster()->partui->adnoteui->advoice->voiceampenvgroup)
+                    synth->getGuiMaster()->partui->adnoteui->advoice->voiceampenvgroup->returns_update(getData);
+                break;
+            case TOPLEVEL::insertType::frequency:
+                if (synth->getGuiMaster()->partui->adnoteui->advoice->voicefreqenvgroup)
+                    synth->getGuiMaster()->partui->adnoteui->advoice->voicefreqenvgroup->returns_update(getData);
+                break;
+            case TOPLEVEL::insertType::filter:
+                if (synth->getGuiMaster()->partui->adnoteui->advoice->voicefilterenvgroup)
+                    synth->getGuiMaster()->partui->adnoteui->advoice->voicefilterenvgroup->returns_update(getData);
+                break;
         }
     }
 }
