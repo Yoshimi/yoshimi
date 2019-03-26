@@ -81,7 +81,7 @@ void Alienwah::out(float *smpsl, float *smpsr)
 
     for (int i = 0; i < synth->sent_buffersize; ++i)
     {
-        float x = (float)i / synth->sent_buffersize_f;
+        float x = (float)i / synth->sent_buffersize;
         float x1 = 1.0f - x;
         // left
         tmp = clfol * x + oldclfol * x1;

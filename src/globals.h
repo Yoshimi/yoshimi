@@ -95,6 +95,7 @@ const unsigned int MIN_OSCIL_SIZE = 256; // MAX_AD_HARMONICS * 2
 const unsigned int MAX_OSCIL_SIZE = 16384;
 const unsigned int MIN_BUFFER_SIZE = 16;
 const unsigned int MAX_BUFFER_SIZE = 8192;
+const int ActualBufferSize = 128;
 const unsigned char NO_MSG = 255; // these two may become different
 const unsigned char UNUSED = 255;
 

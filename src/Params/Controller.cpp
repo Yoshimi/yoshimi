@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2017-2018, Will Godfrey
+    Copyright 2017-2019, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified October 2018
+    Modified March 2019
 */
 
 #include <cmath>
@@ -281,7 +281,7 @@ int Controller::initportamento(float oldfreq, float newfreq, bool in_progress)
         portamentotime *= powf(0.1f, (64.0f - portamento.updowntimestretch) / 64.0f);
     }
 
-    portamento.dx = synth->sent_all_buffersize_f / (portamentotime * synth->samplerate_f);
+    portamento.dx = synth->sent_buffersize_f / (portamentotime * synth->samplerate_f);
     portamento.origfreqrap = oldfreq / newfreq;
 
     float tmprap = (portamento.origfreqrap > 1.0f)

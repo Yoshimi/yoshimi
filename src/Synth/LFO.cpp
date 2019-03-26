@@ -104,7 +104,7 @@ inline void LFO::RecomputeFreq(void)
         powf(basefreq / 440.0f, (float)((int)lfopars->Pstretch - 64) / 63.0f); // max 2x/octave
 
     float lfofreq = lfopars->Pfreq * lfostretch;
-    incx = fabsf(lfofreq) * synth->buffersize_f / synth->samplerate_f;
+    incx = fabsf(lfofreq) * synth->sent_buffersize_f / synth->samplerate_f;
 
     // Limit the Frequency (or else...)
     if (incx > 0.49999999f)
@@ -178,7 +178,7 @@ float LFO::lfoout(void)
             computenextincrnd();
         }
     } else
-        lfodelay -= synth->sent_all_buffersize_f / synth->samplerate_f;
+        lfodelay -= synth->buffersize / synth->samplerate_f;
 
     return out;
 }

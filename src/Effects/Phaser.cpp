@@ -97,7 +97,7 @@ void Phaser::analog_setup()
     Rconst    = 1.0f + Rmx; // Handle parallel resistor relationship
     C         = 0.00000005f; // 50 nF
     CFs       = 2.0f * synth->samplerate_f * C;
-    invperiod = 1.0f / synth->sent_all_buffersize_f;
+    invperiod = 1.0f / synth->sent_buffersize_f;
 }
 
 

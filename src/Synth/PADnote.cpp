@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of ZynAddSubFX original code
-    Modified January 2019
+    Modified March 2019
 */
 #include <cmath>
 
@@ -327,14 +327,14 @@ inline void PADnote::fadein(float *smps)
         if (smps[i - 1] < 0.0 && smps[i] > 0.0)
             zerocrossings++; // this is only the positive crossings
 
-    float tmp = (synth->sent_buffersize_f - 1.0) / (zerocrossings + 1) / 3.0;
+    float tmp = (synth->buffersize - 1.0) / (zerocrossings + 1) / 3.0;
     if (tmp < 8.0)
         tmp = 8.0;
     tmp *= NoteGlobalPar.Fadein_adjustment;
 
     int n = int(tmp); // how many samples is the fade-in
-    if (n > synth->sent_buffersize)
-        n = synth->sent_buffersize;
+    if (n > synth->buffersize)
+        n = synth->buffersize;
     for (int i = 0; i < n; ++i)
     {   // fade-in
         float tmp = 0.5 - cosf((float)i / (float) n * PI) * 0.5f;
@@ -528,7 +528,7 @@ int PADnote::noteout(float *outl,float *outr)
         {
             float tmpvol = interpolateAmplitude(globaloldamplitude,
                                                 globalnewamplitude, i,
-                                                synth->sent_buffersize);
+                                                synth->buffersize);
             outl[i] *= tmpvol * pangainL;
             outr[i] *= tmpvol * pangainR;
         }
@@ -637,7 +637,7 @@ int PADnote::noteout(float *outl,float *outr)
     {
         for (int i = 0 ; i < synth->sent_buffersize; ++i)
         {   // fade-out
-            float tmp = 1.0f - (float)i / synth->sent_buffersize_f;
+            float tmp = 1.0f - (float)i / synth->buffersize;
             outl[i] *= tmp;
             outr[i] *= tmp;
         }

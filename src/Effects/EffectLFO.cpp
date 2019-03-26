@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2019 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,8 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified March 2011
+    This file is derivative of ZynAddSubFX original code.
+    Modified March 2019
 */
 
 #include <cstdlib>
@@ -55,7 +57,7 @@ EffectLFO::~EffectLFO()
 void EffectLFO::updateparams(void)
 {
     float lfofreq = (powf(2.0f, Pfreq / 127.0f * 10.0f) - 1.0f) * 0.03f;
-    incx = fabsf(lfofreq) * synth->sent_all_buffersize_f / synth->samplerate_f;
+    incx = fabsf(lfofreq) * synth->sent_buffersize_f / synth->samplerate_f;
     if (incx > 0.49999999f)
         incx = 0.499999999f; // Limit the Frequency
 

@@ -232,7 +232,7 @@ void Reverb::out(float *smps_l, float *smps_r)
     if (lpf)
     {
         float fr = lpffr.getValue();
-        lpffr.advanceValue(synth->sent_buffersize);
+        lpffr.advanceValue(synth->buffersize);
         if (fr != lpffr.getValue())
         {
             lpf->interpolatenextbuffer();
@@ -243,7 +243,7 @@ void Reverb::out(float *smps_l, float *smps_r)
      if (hpf)
     {
         float fr = hpffr.getValue();
-        hpffr.advanceValue(synth->sent_buffersize);
+        hpffr.advanceValue(synth->buffersize);
         if (fr != hpffr.getValue())
         {
             hpf->interpolatenextbuffer();

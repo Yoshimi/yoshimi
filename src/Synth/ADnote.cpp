@@ -274,7 +274,7 @@ void ADnote::construct()
         unison_vibratto[nvoice].position = new float[unison];
         unison_vibratto[nvoice].amplitude = (unison_real_spread - 1.0f) * unison_vibratto_a;
 
-        float increments_per_second = synth->samplerate_f / synth->sent_all_buffersize_f;
+        float increments_per_second = synth->samplerate_f / synth->sent_buffersize_f;
         const float vib_speed = adpars->VoicePar[nvoice].Unison_vibratto_speed / 127.0f;
         float vibratto_base_period  = 0.25f * powf(2.0f, (1.0f - vib_speed) * 4.0f);
         for (int k = 0; k < unison; ++k)
@@ -521,7 +521,7 @@ void ADnote::construct()
         firsttick[nvoice] = 1;
         NoteVoicePar[nvoice].DelayTicks =
             (int)((expf(adpars->VoicePar[nvoice].PDelay / 127.0f
-                         * logf(50.0f)) - 1.0f) / synth->sent_all_buffersize_f / 10.0f
+                         * logf(50.0f)) - 1.0f) / synth->buffersize_f / 10.0f
                          * synth->samplerate_f);
 
         if (parentFMmod != NULL && NoteVoicePar[nvoice].FMEnabled == FREQ_MOD) {
@@ -819,7 +819,7 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
 
         NoteVoicePar[nvoice].DelayTicks =
             int((expf(adpars->VoicePar[nvoice].PDelay / 127.0f
-                         * logf(50.0f)) - 1.0f) / synth->sent_all_buffersize_f / 10.0f
+                         * logf(50.0f)) - 1.0f) / synth->buffersize / 10.0f
                          * synth->samplerate_f);
     }
 
@@ -1544,7 +1544,7 @@ void ADnote::computeCurrentParameters(void)
             }
         }
     }
-    time += synth->sent_buffersize_f / synth->samplerate_f;
+    time += synth->buffersize / synth->samplerate_f;
 }
 
 
@@ -1552,11 +1552,11 @@ void ADnote::computeCurrentParameters(void)
 void ADnote::fadein(float *smps)
 {
     int zerocrossings = 0;
-    for (int i = 1; i < synth->sent_buffersize; ++i)
+    for (int i = 1; i < synth->buffersize; ++i)
         if (smps[i - 1] < 0.0f && smps[i] > 0.0f)
             zerocrossings++; // this is only the positive crossings
 
-    float tmp = (synth->sent_buffersize - 1.0f) / (zerocrossings + 1) / 3.0f;
+    float tmp = (synth->buffersize - 1.0f) / (zerocrossings + 1) / 3.0f;
     if (tmp < 8.0f)
         tmp = 8.0f;
     tmp *= NoteGlobalPar.Fadein_adjustment;
@@ -1564,8 +1564,8 @@ void ADnote::fadein(float *smps)
     int fadein = int(tmp); // how many samples is the fade-in
     if (fadein < 8)
         fadein = 8;
-    if (fadein > synth->sent_buffersize)
-        fadein = synth->sent_buffersize;
+    if (fadein > synth->buffersize)
+        fadein = synth->buffersize;
     for (int i = 0; i < fadein; ++i) // fade-in
     {
         float tmp = 0.5f - cosf((float)i / (float) fadein * PI) * 0.5f;
@@ -1636,7 +1636,7 @@ void ADnote::applyVoiceOscillatorMorph(int nvoice)
         {
             float amp = interpolateAmplitude(FMoldamplitude[nvoice],
                                        FMnewamplitude[nvoice], i,
-                                       synth->sent_buffersize);
+                                       synth->buffersize);
             tw[i] = (tw[i] * (1.0f - amp)) + amp * mod[i];
         }
     }
@@ -1660,7 +1660,7 @@ void ADnote::applyVoiceOscillatorRingModulation(int nvoice)
         {
             amp = interpolateAmplitude(FMoldamplitude[nvoice],
                                        FMnewamplitude[nvoice], i,
-                                       synth->sent_buffersize);
+                                       synth->buffersize);
             tw[i] *= mod[i] * amp + (1.0 - amp);
         }
     }
@@ -1686,7 +1686,7 @@ void ADnote::computeVoiceModulator(int nvoice, int FMmode)
             const float *smps = NoteVoicePar[NoteVoicePar[nvoice].FMVoice].VoiceOut;
             // For historical/compatibility reasons we do not reduce volume here
             // if are using stereo. See same section in computeVoiceOscillator.
-            memcpy(tmpmod_unison[k], smps, synth->bufferbytes);
+            memcpy(tmpmod_unison[k], smps, synth->sent_bufferbytes);
         }
     }
     else if (parentFMmod != NULL) {
@@ -1708,7 +1708,7 @@ void ADnote::computeVoiceModulator(int nvoice, int FMmode)
             for (int i = 0; i < synth->sent_buffersize; ++i)
                 tw[i] *= interpolateAmplitude(FMoldamplitude[nvoice],
                                               FMnewamplitude[nvoice], i,
-                                              synth->sent_buffersize);
+                                              synth->buffersize);
         }
     }
     else
@@ -2446,10 +2446,10 @@ int ADnote::noteout(float *outl, float *outr)
             if (NoteVoicePar[nvoice].AmpEnvelope->finished())
             {
                 for (i = 0; i < synth->sent_buffersize; ++i)
-                    tmpwavel[i] *= 1.0f - (float)i / synth->sent_buffersize_f;
+                    tmpwavel[i] *= 1.0f - float(i) / synth->sent_buffersize_f;
                 if (stereo)
                     for (i = 0; i < synth->sent_buffersize; ++i)
-                        tmpwaver[i] *= 1.0f - (float)i / synth->sent_buffersize_f;
+                        tmpwaver[i] *= 1.0f - float(i) / synth->sent_buffersize_f;
             }
             // the voice is killed later
         }
@@ -2677,7 +2677,7 @@ int ADnote::noteout(float *outl, float *outr)
         if (outl != NULL) {
             for (i = 0; i < synth->sent_buffersize; ++i) // fade-out
             {
-                float tmp = 1.0f - (float)i / synth->sent_buffersize_f;
+                float tmp = 1.0f - float(i) / synth->sent_buffersize_f;
                 outl[i] *= tmp;
                 outr[i] *= tmp;
             }

@@ -107,23 +107,11 @@ LV2_Descriptor yoshimi_lv2_multi_desc =
 void YoshimiLV2Plugin::process(uint32_t sample_count)
 {
     if (sample_count == 0)
-    {
         return;
-    }
-    //synth->sent_all_buffersize_f = min(sample_count, (uint32_t)synth->buffersize);
-    /*
-     * The line above seems to cause problems with envelopes
-     * in Carla.
-     * It has been commented out and investigation is ongoing
-     * to ensure it's removal doesn't cause other problems.
-     */
 
-    //int real_sample_count = sample_count;
-    int real_sample_count = min(sample_count, _bufferSize);
-    // not sure which of the above two is the best :(
     int offs = 0;
-    int next_frame = 0;
-    int processed = 0;
+    uint32_t next_frame = 0;
+    uint32_t processed = 0;
     float *tmpLeft [NUM_MIDI_PARTS + 1];
     float *tmpRight [NUM_MIDI_PARTS + 1];
     struct midi_event intMidiEvent;
@@ -146,18 +134,18 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         if (event->body.type == _midi_event_id)
         {
             next_frame = event->time.frames;
-            if (next_frame >= real_sample_count)
+            if (next_frame >= sample_count)
                 continue;
-            /*if (next_frame == _bufferSize - 1
+            if (next_frame == _bufferSize - 1
                && processed == 0)
             {
                 next_frame = 0;
-            }*/
-            int to_process = next_frame - offs;
+            }
+            uint32_t to_process = next_frame - offs;
 
             if ((to_process > 0)
-               && (processed < real_sample_count)
-               && (to_process <= (real_sample_count - processed)))
+               && (processed < sample_count)
+               && (to_process <= (sample_count - processed)))
             {
                 int mastered = 0;
                 offs = next_frame;
@@ -169,7 +157,6 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
                         tmpLeft [i] += mastered_chunk;
                         tmpRight [i] += mastered_chunk;
                     }
-
                     mastered += mastered_chunk;
                 }
                 processed += to_process;
@@ -181,9 +168,9 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         }
     }
 
-    if (processed < real_sample_count)
+    if (processed < sample_count)
     {
-        uint32_t to_process = real_sample_count - processed;
+        uint32_t to_process = sample_count - processed;
         int mastered = 0;
         offs = next_frame;
         while (to_process - mastered > 0)
@@ -197,7 +184,6 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
             mastered += mastered_chunk;
         }
         processed += to_process;
-
     }
 
     LV2_Atom_Sequence *aSeq = static_cast<LV2_Atom_Sequence *>(_notifyDataPortOut);
@@ -224,7 +210,6 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     {
         aSeq->atom.size = sizeof(LV2_Atom_Sequence_Body);
     }
-
 }
 
 

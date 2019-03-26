@@ -182,7 +182,6 @@ class SynthEngine : private SynthHelper, MiscFuncs, FileMgr
         int sent_buffersize; //used for variable length runs
         int sent_bufferbytes; //used for variable length runs
         float sent_buffersize_f; //used for variable length runs
-        float sent_all_buffersize_f; //used for variable length runs (mainly for lv2 - calculate envelopes and lfo)
         float         TransVolume;
         float         Pvolume;
         float         ControlStep;

@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011 Alan Calvert
+    Copyright 2019 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,8 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified January 2011
+    This file is a derivative of a ZynAddSubFX original.
+    Modified March 2019
 */
 
 #include "Misc/SynthEngine.h"
@@ -40,7 +42,7 @@ Envelope::Envelope(EnvelopeParams *envpars, float basefreq, SynthEngine *_synth)
     if (!envpars->Pfreemode)
         envpars->converttofree();
 
-    float bufferdt = synth->sent_all_buffersize_f / synth->samplerate_f;
+    float bufferdt = synth->sent_buffersize_f / synth->samplerate_f;
 
     int mode = envpars->Envmode;
 

@@ -25,6 +25,7 @@
 #include "Misc/Config.h"
 #include "Misc/SynthEngine.h"
 #include "MusicIO/AlsaEngine.h"
+#include <iostream>
 
 AlsaEngine::AlsaEngine(SynthEngine *_synth) :MusicIO(_synth)
 {
@@ -314,7 +315,7 @@ bool AlsaEngine::prepHwparams(void)
     {
         synth->getRuntime().Log("Asked for buffersize " + asString(ask_buffersize, 2)
                     + ", Alsa dictates " + asString((unsigned int)audio.period_size), 2);
-        synth->getRuntime().Buffersize = audio.period_size; // we shouldn't need to do this :(
+        //synth->getRuntime().Buffersize = audio.period_size; // we shouldn't need to do this :(
     }
     return true;
 
@@ -354,9 +355,9 @@ bail_out:
 }
 
 
-void AlsaEngine::Interleave(int buffersize)
+void AlsaEngine::Interleave(int offset, int buffersize)
 {
-    int idx = 0;
+    int idx = offset;
     bool byte_swap = (little_endian != card_endian);
     unsigned short int tmp16a, tmp16b;
     int chans;
@@ -458,9 +459,12 @@ void *AlsaEngine::AudioThread(void)
         }
         if (audio.pcm_state == SND_PCM_STATE_RUNNING)
         {
-            getAudio();
-            int alsa_buff = getBuffersize();
-            Interleave(alsa_buff);
+            int alsa_buff = ActualBufferSize;//getBuffersize();
+            for (int offset = 0; offset < alsa_buff; offset += ActualBufferSize)
+            {
+                synth->MasterAudio(zynLeft, zynRight, ActualBufferSize);//getAudio();
+                Interleave(offset, ActualBufferSize);
+            }
             Write(alsa_buff);
         }
         else

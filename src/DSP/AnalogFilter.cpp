@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2019 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,8 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified April 2011
+    This file is a derivative of a ZynAddSubFX original.
+    Modified March 2019
 */
 
 #include <cstring>
@@ -431,7 +433,7 @@ void AnalogFilter::filterout(float *smp)
     {
         for (int i = 0; i < synth->sent_buffersize; ++i)
         {
-            float x = (float)i / synth->sent_buffersize_f;
+            float x = (float)i / float(synth->buffersize_f);
             smp[i] = tmpismp[i] * (1.0f - x) + smp[i] * x;
         }
         needsinterpolation = false;

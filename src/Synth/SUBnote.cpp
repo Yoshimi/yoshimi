@@ -787,7 +787,7 @@ int SUBnote::noteout(float *outl, float *outr)
     {
         for (int i = 0; i < synth->sent_buffersize; ++i)
         {   // fade-out
-            float tmp = 1.0f - (float)i / synth->sent_buffersize_f;
+            float tmp = 1.0f - (float)i / synth->sent_buffersize;
             outl[i] *= tmp;
             outr[i] *= tmp;
         }

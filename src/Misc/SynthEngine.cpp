@@ -204,12 +204,9 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 {
     samplerate_f = samplerate = audiosrate;
     halfsamplerate_f = samplerate_f / 2;
-    buffersize_f = buffersize = Runtime.Buffersize;
-    if (buffersize_f > audiobufsize)
-        buffersize_f = audiobufsize;
-     // because its now *groups* of audio buffers.
-    sent_all_buffersize_f = buffersize_f;
-
+    //buffersize = Runtime.Buffersize;
+    buffersize = ActualBufferSize;
+    buffersize_f = buffersize;
     bufferbytes = buffersize * sizeof(float);
 
     oscilsize_f = oscilsize = Runtime.Oscilsize;
@@ -1909,8 +1906,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
     sent_buffersize = buffersize;
     sent_bufferbytes = bufferbytes;
     sent_buffersize_f = buffersize_f;
-
-    if ((to_process > 0) && (to_process < buffersize))
+    if (to_process < buffersize)
     {
         sent_buffersize = to_process;
         sent_bufferbytes = sent_buffersize * sizeof(float);

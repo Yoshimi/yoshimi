@@ -95,7 +95,7 @@ void Distorsion::applyfilters(float *efxoutl, float *efxoutr)
     float fr;
 
     fr = lpffr.getValue();
-    lpffr.advanceValue(synth->sent_buffersize);
+    lpffr.advanceValue(synth->buffersize);
     if (fr != lpffr.getValue()) {
         lpfl->interpolatenextbuffer();
         lpfl->setfreq(lpffr.getValue());
@@ -106,7 +106,7 @@ void Distorsion::applyfilters(float *efxoutl, float *efxoutr)
     lpfr->filterout(efxoutr);
 
     fr = hpffr.getValue();
-    hpffr.advanceValue(synth->sent_buffersize);
+    hpffr.advanceValue(synth->buffersize);
     if (fr != hpffr.getValue()) {
         hpfl->interpolatenextbuffer();
         hpfl->setfreq(hpffr.getValue());
@@ -142,9 +142,9 @@ void Distorsion::out(float *smpsl, float *smpsr)
     if (Pprefiltering)
         applyfilters(efxoutl, efxoutr);
 
-    waveShapeSmps(synth->sent_buffersize, efxoutl, Ptype + 1, Pdrive);
+    waveShapeSmps(synth->buffersize, efxoutl, Ptype + 1, Pdrive);
     if (Pstereo)
-        waveShapeSmps(synth->sent_buffersize, efxoutr, Ptype + 1, Pdrive);
+        waveShapeSmps(synth->buffersize, efxoutr, Ptype + 1, Pdrive);
 
     if (!Pprefiltering)
         applyfilters(efxoutl, efxoutr);

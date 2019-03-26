@@ -405,20 +405,19 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
         return false;
     }
 
-    int framesize;
-    if (nframes < internalbuff)
+    int framesize = sizeof(float) * ActualBufferSize;
+    for (unsigned int pos = 0; pos < nframes; pos += ActualBufferSize)
     {
-        framesize = sizeof(float) * nframes;
-        synth->MasterAudio(zynLeft, zynRight, nframes);
-        sendAudio(framesize, 0);
-    }
-    else
-    {
-        framesize = sizeof(float) * internalbuff;
-        for (unsigned int pos = 0; pos < nframes; pos += internalbuff)
+        if (nframes < ActualBufferSize)
         {
-        synth->MasterAudio(zynLeft, zynRight, internalbuff);
-        sendAudio(framesize, pos);
+            synth->MasterAudio(zynLeft, zynRight, nframes);
+            sendAudio(sizeof(float) * nframes, 0);
+            break;
+        }
+        else
+        {
+            synth->MasterAudio(zynLeft, zynRight, ActualBufferSize);
+            sendAudio(framesize, pos);
         }
     }
     return true;
