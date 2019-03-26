@@ -421,6 +421,7 @@ void SynthEngine::defaults(void)
     }
 
     partonoffLock(0, 1); // enable the first part
+    inseffnum = 0;
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
     {
         insefx[nefx]->defaults();
@@ -428,6 +429,7 @@ void SynthEngine::defaults(void)
     }
 
     // System Effects init
+    syseffnum = 0;
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
     {
         sysefx[nefx]->defaults();

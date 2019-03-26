@@ -128,6 +128,7 @@ void Part::defaults(void)
     Pkeylimit = 20;
     Pfrand = 0;
     PbreathControl = 2;
+    Peffnum = 0;
     legatoFading = 0;
     setDestination(1);
     busy = false;

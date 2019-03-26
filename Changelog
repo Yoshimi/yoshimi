@@ -1,5 +1,9 @@
 yoshimi 1.5.M
 
+2019-3-26 Will
+* BugFix: MIDI-learn not learning correct effect numbers
+  GUI still not updated correctly yet.
+
 2019-3-23 Will
 * Corrected code indentation and missing bracket
   in UI/MiscGui.cpp

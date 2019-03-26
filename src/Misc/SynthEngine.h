@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified February 2019
+    Modified March 2019
 */
 
 #ifndef SYNTHENGINE_H
@@ -195,6 +195,8 @@ class SynthEngine : private SynthHelper, MiscFuncs, FileMgr
         void setPaudiodest(int value);
 
         // effects
+        unsigned char  syseffnum;
+        unsigned char  inseffnum;
         EffectMgr *sysefx[NUM_SYS_EFX]; // system
         EffectMgr *insefx[NUM_INS_EFX]; // insertion
 

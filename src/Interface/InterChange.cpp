@@ -2336,7 +2336,7 @@ string InterChange::resolvePart(CommandBlock *getData)
             }
             break;
 
-        case PART::control::effectNumber: // local to source
+        case PART::control::effectNumber:
             contstr = "Effect Number";
             break;
         case PART::control::effectType:
@@ -5268,7 +5268,7 @@ void InterChange::commandPart(CommandBlock *getData)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     //unsigned char par2 = getData->data.par2;
-    unsigned char effNum = engine;
+    //unsigned char effNum = engine;
 
     bool write = (type & TOPLEVEL::type::Write) > 0;
     if (write)
@@ -5287,7 +5287,7 @@ void InterChange::commandPart(CommandBlock *getData)
 
     Part *part;
     part = synth->part[npart];
-
+    unsigned char effNum = part->Peffnum;
     switch (control)
     {
         case PART::control::volume:
@@ -5622,8 +5622,14 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
 
         case PART::control::effectNumber:
-            getData->data.parameter = (part->partefx[effNum]->geteffectpar(-1) != 0);
-            getData->data.type |= TOPLEVEL::source::CLI;
+            if (write)
+            {
+                part->Peffnum = value_int;
+                getData->data.parameter = (part->partefx[effNum]->geteffectpar(-1) != 0);
+                getData->data.type |= TOPLEVEL::source::CLI;
+            }
+            else
+                value = part->Peffnum;
             break;
 
         case PART::control::effectType:
@@ -8056,15 +8062,37 @@ void InterChange::commandSysIns(CommandBlock *getData)
     int value_int = lrint(value);
 
     bool isSysEff = (npart == TOPLEVEL::section::systemEffects);
+    if (isSysEff)
+        effnum = synth->syseffnum;
+    else
+        effnum = synth->inseffnum;
+
     if (insert == UNUSED)
     {
         switch (control)
         {
             case EFFECT::sysIns::effectNumber:
-                if (isSysEff)
-                    getData->data.parameter = (synth->sysefx[effnum]->geteffectpar(-1) != 0);
+                if (write)
+                {
+                    if (isSysEff)
+                    {
+                        synth->syseffnum = value_int;
+                        getData->data.parameter = (synth->sysefx[value_int]->geteffectpar(-1) != 0);
+                    }
+                    else
+                    {
+                        synth->inseffnum = value_int;
+                        getData->data.parameter = (synth->insefx[value_int]->geteffectpar(-1) != 0);
+                    }
+                    getData->data.type |= TOPLEVEL::source::CLI;
+                }
                 else
-                    getData->data.parameter = (synth->insefx[effnum]->geteffectpar(-1) != 0);
+                {
+                    if (isSysEff)
+                        value = synth->syseffnum;
+                    else
+                        value = synth->inseffnum;
+                }
                 break;
             case EFFECT::sysIns::effectType:
                 if (write)
