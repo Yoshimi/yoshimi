@@ -114,7 +114,7 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     uint32_t processed = 0;
     float *tmpLeft [NUM_MIDI_PARTS + 1];
     float *tmpRight [NUM_MIDI_PARTS + 1];
-    struct midi_event intMidiEvent;
+
     for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
     {
         tmpLeft [i] = lv2Left [i];
@@ -126,21 +126,8 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     }
     LV2_ATOM_SEQUENCE_FOREACH(_midiDataPort, event)
     {
-        if (event == NULL)
-            continue;
-        if (event->body.size > sizeof(intMidiEvent.data))
-            continue;
-
         if (event->body.type == _midi_event_id)
         {
-            next_frame = event->time.frames;
-            if (next_frame >= sample_count)
-                continue;
-            if (next_frame == _bufferSize - 1
-               && processed == 0)
-            {
-                next_frame = 0;
-            }
             uint32_t to_process = next_frame - offs;
 
             if ((to_process > 0)
@@ -168,23 +155,20 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         }
     }
 
-    if (processed < sample_count)
+    uint32_t to_process = sample_count;
+    int mastered = 0;
+    offs = next_frame;
+    while (to_process - mastered > 0)
     {
-        uint32_t to_process = sample_count - processed;
-        int mastered = 0;
-        offs = next_frame;
-        while (to_process - mastered > 0)
+        int mastered_chunk = _synth->MasterAudio(tmpLeft, tmpRight, to_process - mastered);
+        for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
         {
-            int mastered_chunk = _synth->MasterAudio(tmpLeft, tmpRight, to_process - mastered);
-            for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
-            {
-                tmpLeft [i] += mastered_chunk;
-                tmpRight [i] += mastered_chunk;
-            }
-            mastered += mastered_chunk;
+            tmpLeft [i] += mastered_chunk;
+            tmpRight [i] += mastered_chunk;
         }
-        processed += to_process;
+        mastered += mastered_chunk;
     }
+    //processed += to_process;
 
     LV2_Atom_Sequence *aSeq = static_cast<LV2_Atom_Sequence *>(_notifyDataPortOut);
     size_t neededAtomSize = sizeof(LV2_Atom_Event) + sizeof(LV2_Atom_Object_Body);
