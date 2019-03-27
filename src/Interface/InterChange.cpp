@@ -5625,7 +5625,8 @@ void InterChange::commandPart(CommandBlock *getData)
             if (write)
             {
                 part->Peffnum = value_int;
-                getData->data.parameter = (part->partefx[effNum]->geteffectpar(-1) != 0);
+                getData->data.parameter = (part->partefx[value_int]->geteffectpar(-1) != 0);
+                getData->data.engine = value_int;
                 getData->data.type |= TOPLEVEL::source::CLI;
             }
             else
@@ -8085,6 +8086,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
                         getData->data.parameter = (synth->insefx[value_int]->geteffectpar(-1) != 0);
                     }
                     getData->data.type |= TOPLEVEL::source::CLI;
+                    getData->data.engine = value_int;
                 }
                 else
                 {

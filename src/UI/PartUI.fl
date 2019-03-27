@@ -1634,7 +1634,7 @@ Offset}
 
     if (npart != newpart)
         return;
-    bool sameEff = (engine == (inseffnocounter->value() - 1));
+    bool sameEff = (engine == ninseff);
     bool kitType = (insert == TOPLEVEL::insert::kitGroup);
     switch(control)
     {
@@ -1933,10 +1933,7 @@ Offset}
 
         case PART::control::effectNumber:
             if (sameEff)
-            {
-                //cout << "Pchange " << int(parameter) << endl;
                 inseffectui->UpdatePresetColour(parameter, insefftype->value());
-            }
             break;
 
         case PART::control::effectType:
@@ -2392,7 +2389,7 @@ Offset}
   }
   decl {int npart;} {public local
   }
-  decl {int ninseff;} {private local
+  decl {int ninseff;} {public local
   }
   decl {int lastkititem;} {public local
   }
