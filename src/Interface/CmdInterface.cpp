@@ -4452,6 +4452,11 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
     if (bitTest(context, LEVEL::Learn))
         return commandMlearn(controlType);
 
+    if (matchnMove(3, point, "mono"))
+    {
+        return sendNormal((toggle() == 1), controlType, MAIN::control::mono, TOPLEVEL::section::main);
+    }
+
     if (matchnMove(2, point, "config"))
     {
         context = LEVEL::Top;

@@ -421,6 +421,7 @@ namespace MAIN // usage MAIN::control::volume
         availableParts,
         detune = 32,
         keyShift = 35,
+        mono,
         soloType = 48,
         soloCC,
 

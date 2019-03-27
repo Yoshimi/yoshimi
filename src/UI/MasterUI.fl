@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified March 2019} {selected in_source in_header
+Modified March 2019} {in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -837,7 +837,7 @@ paramsui->Show(XML_MICROTONAL);}
           class EffUI
         } {}
       }
-      Fl_Group inseffectuigroup {open
+      Fl_Group inseffectuigroup {
         xywh {3 158 384 95} box FLAT_BOX color 48
         code0 {o->hide();}
       } {
@@ -848,7 +848,7 @@ paramsui->Show(XML_MICROTONAL);}
           class EffUI
         } {}
       }
-      Fl_Group partuigroup {open
+      Fl_Group partuigroup {
         xywh {3 255 380 170} box ENGRAVED_FRAME
       } {
         Fl_Group partui {
@@ -868,8 +868,21 @@ paramsui->Show(XML_MICROTONAL);}
           class VUMeter
         }
       }
+      Fl_Button mastermono {
+        label S
+        callback {//
+        int tmp = 1 -  o->value();
+	o->value(tmp);
+	if (tmp == 0)
+	    o->label("S");
+	else
+	    o->label("M");
+        send_data(MAIN::control::mono,  tmp, TOPLEVEL::type::Integer, TOPLEVEL::section::main);} selected
+        tooltip {Master Mono/Stereo switch} xywh {285 88 23 20} box PLASTIC_UP_BOX color 228 selection_color 130 labelfont 1 labelsize 11
+        code0 {o->value(synth->masterMono);}
+      }
       Fl_Spinner masterkeyshift {
-        label {Key Shift}
+        label Shift
         callback {//
         send_data(MAIN::control::keyShift, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);}
         tooltip {Shift pitch +/- N semitones} xywh {336 88 38 20} labelsize 10 minimum -36 maximum 36 textsize 10
@@ -1392,7 +1405,7 @@ Nikita Zlobin
                 sysefftype->value(synth->sysefx[nsyseff]->geteffect());
                 syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
                 syseffectui->UpdatePresetColour(parameter, sysefftype->value());
-                
+
             }
             else if (control == EFFECT::sysIns::effectType)
             {
@@ -1481,6 +1494,15 @@ Nikita Zlobin
         case MAIN::control::keyShift:
             masterkeyshift->value(value_int);
             break;
+
+        case MAIN::control::mono:
+            mastermono->value(value_int);
+            if (value_int)
+                mastermono->label("M");
+            else
+                mastermono->label("S");
+            break;
+
 
         case MAIN::control::soloType:
             channelswitch->value(value_int);
@@ -2036,10 +2058,10 @@ Nikita Zlobin
     setInsEff(ninseff);
 
     sysinsgroup->value(SystemEffectsGrp);
-    
-    
-    
-    
+
+
+
+
     bool status;
     int efftype = fetchData(0, EFFECT::sysIns::effectType, 241, UNUSED, 0);
     if (efftype > 0)
@@ -2054,9 +2076,9 @@ Nikita Zlobin
         inseffectui->UpdatePresetColour(status, insefftype->value());
     }
 
-    
-    
-    
+
+
+
     showSysEfxUI();
 
     masterkeyshift->value(synth->Pkeyshift - 64);

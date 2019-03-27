@@ -335,6 +335,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     if (control == TOPLEVEL::control::errorMessage && insert != TOPLEVEL::insert::resonanceGraphInsert)
         switchNum = 256; // this is a bit hacky :(
     bool testThing = false;
+
     switch(switchNum)
     {
         case TOPLEVEL::section::vector:
@@ -1992,6 +1993,14 @@ string InterChange::resolveMain(CommandBlock *getData)
             break;
         case MAIN::control::keyShift:
             contstr = "Key Shift";
+            break;
+        case MAIN::control::mono:
+            contstr = "Master Mono/Stereo ";
+            showValue = false;
+            if (value_int)
+                contstr += "Mono";
+            else
+                contstr += "Stereo";
             break;
 
         case MAIN::control::soloType:
@@ -5108,6 +5117,12 @@ void InterChange::commandMain(CommandBlock *getData)
         case MAIN::control::keyShift: // done elsewhere
             break;
 
+        case MAIN::control::mono:
+            if (write)
+                synth->masterMono = value;
+            else
+                value = synth->masterMono;
+            break;
         case MAIN::control::soloType: // solo mode
             if (write && value_int <= 4)
             {

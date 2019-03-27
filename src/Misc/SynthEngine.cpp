@@ -427,6 +427,7 @@ void SynthEngine::defaults(void)
         insefx[nefx]->defaults();
         Pinsparts[nefx] = -1;
     }
+    masterMono = false;
 
     // System Effects init
     syseffnum = 0;
@@ -2083,6 +2084,8 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                 mainR[idx] *= fadeLevel;
                 fadeLevel -= fadeStep;
             }
+            if (masterMono)
+                mainL[idx] = mainR[idx] = (mainL[idx] + mainR[idx]) / 2.0;
         }
 
         // Peak calculation for mixed outputs
@@ -3250,7 +3253,6 @@ float SynthEngine::getLimits(CommandBlock *getData)
             break;
 
         case MAIN::control::partNumber:
-            min = 0;
             def = 0;
             max = Runtime.NumAvailableParts -1;
             break;
@@ -3270,6 +3272,11 @@ float SynthEngine::getLimits(CommandBlock *getData)
             max = 36;
             break;
 
+        case MAIN::control::mono:
+            def = 0; // off
+            max = 1;
+            break;
+
         case MAIN::control::soloType:
             def = 0; // Off
             max = 4;
@@ -3282,9 +3289,8 @@ float SynthEngine::getLimits(CommandBlock *getData)
             break;
 
         case MAIN::control::masterReset:
-            case MAIN::control::masterResetAndMlearn:
+        case MAIN::control::masterResetAndMlearn:
         case MAIN::control::stopSound:
-            min = 0;
             def = 0;
             max = 0;
             break;

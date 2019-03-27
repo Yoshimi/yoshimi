@@ -154,6 +154,7 @@ static string toplist [] = {
     "  SCale",                  "enter context level",
     "  MLearn",                 "enter editor context level",
     "  COnfig",                 "enter context level",
+    "  MONo",                   "main output mono/stereo (ON, {other})",
     "  Root <n>",               "current root path to ID",
     "  Bank <n>",               "current bank to ID",
     "  SYStem effects [n]",     "enter effects context level",

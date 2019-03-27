@@ -153,6 +153,7 @@ class SynthEngine : private SynthHelper, MiscFuncs, FileMgr
         void mutewrite(int what);
         bool isMuted(void);
         sem_t mutelock;
+        bool masterMono;
 
         float getLimits(CommandBlock *getData);
         float getVectorLimits(CommandBlock *getData);
