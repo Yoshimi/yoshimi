@@ -98,7 +98,7 @@ decl {\#include "Interface/FileMgr.h"} {public local
 decl {\#include "MidiLearnUI.h"} {public local
 }
 
-class MasterUI {: {private GuiUpdates, FileMgr}
+class MasterUI {selected : {private GuiUpdates, FileMgr}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -877,7 +877,7 @@ paramsui->Show(XML_MICROTONAL);}
 	    o->label("S");
 	else
 	    o->label("M");
-        send_data(MAIN::control::mono,  tmp, TOPLEVEL::type::Integer, TOPLEVEL::section::main);} selected
+        send_data(MAIN::control::mono,  tmp, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
         tooltip {Master Mono/Stereo switch} xywh {285 88 23 20} box PLASTIC_UP_BOX color 228 selection_color 130 labelfont 1 labelsize 11
         code0 {o->value(synth->masterMono);}
       }
@@ -1357,7 +1357,6 @@ Nikita Zlobin
                             }
                             else
                                 partui->keymode->value(mode);
-                            //partui->keymode->damage(1);
                             break;
                         }
                         case MIDI::CC::filterQ:
@@ -1620,6 +1619,8 @@ Nikita Zlobin
             }
             else
             {
+                //mastermono->value(0);
+                //mastermono->label("S");
                 vectorui->RefreshChans();
                 RecentParams->activate();
                 setMasterLabel(findleafname(name));
@@ -2096,6 +2097,8 @@ Nikita Zlobin
         Reports->deactivate();
     else
         Reports->activate();
+    mastermono->value(0);
+    mastermono->label("S");
     if (type == 0x14)
     {
         for (int i = 1; i < 6; ++i)

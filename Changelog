@@ -3,9 +3,10 @@ yoshimi 1.5.M
 2019-3-27 Will
 * Completed GUi updates for effect controls.
 * Implemented master mono/stero switch.
+* Resets and state/patch loads clear mono/stero switch.
 
 2019-3-26 Will
-* BugFix: MIDI-learn not learning correct effect numbers
+* BugFix: MIDI-learn now learn correct effect numbers.
   GUI still not updated correctly yet.
 
 2019-3-23 Will

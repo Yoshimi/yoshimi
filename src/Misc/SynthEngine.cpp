@@ -1736,15 +1736,12 @@ void SynthEngine::resetAll(bool andML)
     __sync_and_and_fetch(&interchange.blockRead, 0);
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
         part[npart]->busy = false;
+    defaults();
+    ClearNRPNs();
     if (Runtime.loadDefaultState && isRegFile(Runtime.defaultStateName+ ".state"))
     {
         Runtime.StateFile = Runtime.defaultStateName;
         Runtime.stateRestore();
-    }
-    else
-    {
-        defaults();
-        ClearNRPNs();
     }
     if (andML)
         midilearn.generalOpps(0, 0, MIDILEARN::control::clearAll, TOPLEVEL::section::midiLearn, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED);
@@ -2253,6 +2250,7 @@ void SynthEngine::allStop(unsigned int stopType)
 
 bool SynthEngine::loadStateAndUpdate(string filename)
 {
+    defaults();
     bool result = Runtime.loadState(filename);
     if (result)
         addHistory(filename, 4);

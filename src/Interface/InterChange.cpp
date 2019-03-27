@@ -5123,6 +5123,7 @@ void InterChange::commandMain(CommandBlock *getData)
             else
                 value = synth->masterMono;
             break;
+
         case MAIN::control::soloType: // solo mode
             if (write && value_int <= 4)
             {
