@@ -134,7 +134,6 @@ bool JackEngine::openJackClient(std::string server)
 bool JackEngine::Start(void)
 {
     bool jackPortsRegistered = true;
-    internalbuff = synth->getRuntime().Buffersize;
     jack_set_xrun_callback(jackClient, _xrunCallback, this);
     #if defined(JACK_SESSION)
         if (jack_set_session_callback

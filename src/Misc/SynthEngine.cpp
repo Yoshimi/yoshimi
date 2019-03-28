@@ -107,9 +107,9 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     samplerate(48000),
     samplerate_f(samplerate),
     halfsamplerate_f(samplerate / 2),
-    buffersize(512),
+    buffersize(128),
     buffersize_f(buffersize),
-    oscilsize(1024),
+    oscilsize(512),
     oscilsize_f(oscilsize),
     halfoscilsize(oscilsize / 2),
     halfoscilsize_f(halfoscilsize),
@@ -200,13 +200,12 @@ SynthEngine::~SynthEngine()
 }
 
 
-bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
+bool SynthEngine::Init(unsigned int audiosrate)
 {
     samplerate_f = samplerate = audiosrate;
     halfsamplerate_f = samplerate_f / 2;
-    //buffersize = Runtime.Buffersize;
     buffersize = ActualBufferSize;
-    buffersize_f = buffersize;
+    buffersize_f = float(buffersize);
     bufferbytes = buffersize * sizeof(float);
 
     oscilsize_f = oscilsize = Runtime.Oscilsize;

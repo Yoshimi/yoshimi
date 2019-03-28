@@ -132,10 +132,10 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     }
 
     uint32_t to_process = sample_count;
-    int mastered = 0;
-    while (to_process - mastered > 0)
+
+    if (to_process > 0)
     {
-        while (to_process - mastered > ActualBufferSize)
+        while (to_process > ActualBufferSize)
         {
             _synth->MasterAudio(tmpLeft, tmpRight, ActualBufferSize);
             for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
@@ -143,15 +143,9 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
                 tmpLeft [i] += ActualBufferSize;
                 tmpRight [i] += ActualBufferSize;
             }
-            mastered += ActualBufferSize;
+            to_process -= ActualBufferSize;
         }
-        int mastered_chunk = _synth->MasterAudio(tmpLeft, tmpRight, to_process - mastered);
-        for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
-        {
-            tmpLeft [i] += mastered_chunk;
-            tmpRight [i] += mastered_chunk;
-        }
-        mastered += mastered_chunk;
+        _synth->MasterAudio(tmpLeft, tmpRight, to_process);
     }
 
     LV2_Atom_Sequence *aSeq = static_cast<LV2_Atom_Sequence *>(_notifyDataPortOut);
@@ -302,7 +296,7 @@ bool YoshimiLV2Plugin::init()
     if (!prepBuffers())
         return false;
 
-    if(!_synth->Init(_sampleRate, _bufferSize))
+    if(!_synth->Init(_sampleRate))
     {
         synth->getRuntime().LogError("Can't init synth engine");
 	return false;

@@ -880,7 +880,10 @@ void Config::StartupReport(string clientName)
     {
         Log("Oscilsize: " + asString(synth->oscilsize), 2);
         Log("Samplerate: " + asString(synth->samplerate), 2);
-        Log("Period size: " + asString(synth->buffersize), 2);
+        if (audioEngine == alsa_audio)
+            Log("Period size: " + asString(Buffersize), 2);
+        //else
+            //Log("Period size: " + asString(synth->buffersize), 2);
     }
 }
 //#endif
