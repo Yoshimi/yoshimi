@@ -109,9 +109,6 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     if (sample_count == 0)
         return;
 
-    int offs = 0;
-    uint32_t next_frame = 0;
-    uint32_t processed = 0;
     float *tmpLeft [NUM_MIDI_PARTS + 1];
     float *tmpRight [NUM_MIDI_PARTS + 1];
 
@@ -128,38 +125,26 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     {
         if (event->body.type == _midi_event_id)
         {
-            uint32_t to_process = next_frame - offs;
-
-            if ((to_process > 0)
-               && (processed < sample_count)
-               && (to_process <= (sample_count - processed)))
-            {
-                int mastered = 0;
-                offs = next_frame;
-                while (to_process - mastered > 0)
-                {
-                    int mastered_chunk = _synth->MasterAudio(tmpLeft, tmpRight, to_process - mastered);
-                    for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
-                    {
-                        tmpLeft [i] += mastered_chunk;
-                        tmpRight [i] += mastered_chunk;
-                    }
-                    mastered += mastered_chunk;
-                }
-                processed += to_process;
-            }
             //process this midi event
             const uint8_t *msg = (const uint8_t*)(event + 1);
-            if (_bFreeWheel != NULL)
-                processMidiMessage(msg);
+            processMidiMessage(msg);
         }
     }
 
     uint32_t to_process = sample_count;
     int mastered = 0;
-    offs = next_frame;
     while (to_process - mastered > 0)
     {
+        while (to_process - mastered > ActualBufferSize)
+        {
+            _synth->MasterAudio(tmpLeft, tmpRight, ActualBufferSize);
+            for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
+            {
+                tmpLeft [i] += ActualBufferSize;
+                tmpRight [i] += ActualBufferSize;
+            }
+            mastered += ActualBufferSize;
+        }
         int mastered_chunk = _synth->MasterAudio(tmpLeft, tmpRight, to_process - mastered);
         for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
         {
@@ -168,7 +153,6 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         }
         mastered += mastered_chunk;
     }
-    //processed += to_process;
 
     LV2_Atom_Sequence *aSeq = static_cast<LV2_Atom_Sequence *>(_notifyDataPortOut);
     size_t neededAtomSize = sizeof(LV2_Atom_Event) + sizeof(LV2_Atom_Object_Body);
