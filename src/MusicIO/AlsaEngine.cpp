@@ -25,6 +25,7 @@
 #include "Misc/Config.h"
 #include "Misc/SynthEngine.h"
 #include "MusicIO/AlsaEngine.h"
+#include <iostream>
 
 AlsaEngine::AlsaEngine(SynthEngine *_synth) :MusicIO(_synth)
 {
@@ -64,15 +65,15 @@ bool AlsaEngine::openAudio(void)
             {
                 if (prepBuffers())
                 {
-                    int buffersize = audio.period_size;
                     interleaved = new int[audio.buffer_size * card_chans];
                     if (NULL == interleaved)
                         goto bail_out;
-                    memset(interleaved, 0, sizeof(int) * buffersize * card_chans);
+                    memset(interleaved, 0, sizeof(int) * audio.buffer_size * card_chans);
                 }
             }
         }
     }
+    cout << "period " << audio.period_size << "   buff " << audio.buffer_size << "   inter " << audio.buffer_size * card_chans << "   chans " << card_chans << endl;
     return true;
 bail_out:
     Close();
@@ -356,27 +357,20 @@ bail_out:
 
 void AlsaEngine::Interleave(int offset, int buffersize)
 {
-    //int idx = offset;
     bool byte_swap = (little_endian != card_endian);
-    unsigned short int tmp16a, tmp16b;
-    int chans;
-    unsigned int tmp32a, tmp32b;
-    unsigned int shift = 0x78000000;
-    if (card_bits == 24)
-        shift = 0x780000;
 
     if (card_bits == 16)
     {
         int idx = offset;
-        chans = card_chans / 2; // because we're pairing them on a single integer
+        int chans = card_chans / 2; // because we're pairing them on a single integer
         for (int frame = 0; frame < buffersize; ++frame)
         {
-            tmp16a = (unsigned short int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * 0x7800));
-            tmp16b = (unsigned short int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * 0x7800));
+            uint16_t tmp16a = uint16_t(zynLeft[NUM_MIDI_PARTS][frame] * float(0x7800));
+            uint16_t tmp16b = uint16_t(zynRight[NUM_MIDI_PARTS][frame] * float(0x7800));
             if (byte_swap)
             {
-                tmp16a = (short int) ((tmp16a >> 8) | (tmp16a << 8));
-                tmp16b = ((tmp16b >> 8) | (tmp16b << 8));
+                tmp16a = uint16_t((tmp16a >> 8) | (tmp16a << 8));
+                tmp16b = uint16_t((tmp16b >> 8) | (tmp16b << 8));
             }
             interleaved[idx] = tmp16a | (int) (tmp16b << 16);
             idx += chans;
@@ -385,11 +379,15 @@ void AlsaEngine::Interleave(int offset, int buffersize)
     else
     {
         int idx = offset << 1;
-        chans = card_chans;
+        float shift;
+        if (card_bits == 32)
+            shift = float(0x78000000);
+        else
+            shift = float(0x780000);
         for (int frame = 0; frame < buffersize; ++frame)
         {
-            tmp32a = (unsigned int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * shift));
-            tmp32b = (unsigned int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * shift));
+            uint32_t tmp32a = uint32_t((zynLeft[NUM_MIDI_PARTS][frame] * shift));
+            uint32_t tmp32b = uint32_t((zynRight[NUM_MIDI_PARTS][frame] * shift));
             // how should we do an endian swap for 24 bit, 3 byte?
             // is it really the same, just swapping the 'unused' byte?
             if (byte_swap)
@@ -397,9 +395,9 @@ void AlsaEngine::Interleave(int offset, int buffersize)
                 tmp32a = (tmp32a >> 24) | ((tmp32a << 8) & 0x00FF0000) | ((tmp32a >> 8) & 0x0000FF00) | (tmp32a << 24);
                 tmp32b = (tmp32b >> 24) | ((tmp32b << 8) & 0x00FF0000) | ((tmp32b >> 8) & 0x0000FF00) | (tmp32b << 24);
             }
-            interleaved[idx] = (int) tmp32a;
-            interleaved[idx + 1] = (int) tmp32b;
-            idx += chans;
+            interleaved[idx] = int32_t(tmp32a);
+            interleaved[idx + card_chans] = int32_t(tmp32b);
+            idx += card_chans;
         }
     }
 }
@@ -463,13 +461,11 @@ void *AlsaEngine::AudioThread(void)
         {
             int alsa_buff = audio.buffer_size;
             int offset = 0;
-            int loops = 0;
-            while ((offset + ActualBufferSize) < alsa_buff)
+            while ((offset + ActualBufferSize) <= alsa_buff)
             {
                 synth->MasterAudio(zynLeft, zynRight, ActualBufferSize);
                 Interleave(offset, ActualBufferSize);
                 offset += ActualBufferSize;
-                ++ loops;
             }
             int remainder = alsa_buff - offset;
             if ( remainder > 0)
