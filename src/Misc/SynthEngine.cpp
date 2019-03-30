@@ -1902,17 +1902,16 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 
     float *tmpmixl = Runtime.genMixl;
     float *tmpmixr = Runtime.genMixr;
-    sent_buffersize = buffersize;
+    sent_buffersize = ActualBufferSize;
     sent_bufferbytes = bufferbytes;
     sent_buffersize_f = buffersize_f;
-    if (to_process < buffersize)
+    if (to_process < ActualBufferSize)
     {
         sent_buffersize = to_process;
         sent_bufferbytes = sent_buffersize * sizeof(float);
         sent_buffersize_f = sent_buffersize;
-        //Runtime.Log("Short Buffer");
+        //cout << "Short Buffer" << endl;;
     }
-
     memset(mainL, 0, sent_bufferbytes);
     memset(mainR, 0, sent_bufferbytes);
 

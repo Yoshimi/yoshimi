@@ -32,7 +32,7 @@ AlsaEngine::AlsaEngine(SynthEngine *_synth) :MusicIO(_synth)
     audio.handle = NULL;
     audio.period_count = 0; // re-used as number of periods
     audio.samplerate = 0;
-    audio.buffer_size = 0;
+    audio.period_size = 0;
     audio.period_size = 0;
     audio.buffer_size = 0;
     audio.alsaId = -1;
@@ -396,7 +396,7 @@ void AlsaEngine::Interleave(int offset, int buffersize)
                 tmp32b = (tmp32b >> 24) | ((tmp32b << 8) & 0x00FF0000) | ((tmp32b >> 8) & 0x0000FF00) | (tmp32b << 24);
             }
             interleaved[idx] = int32_t(tmp32a);
-            interleaved[idx + card_chans] = int32_t(tmp32b);
+            interleaved[idx + 1] = int32_t(tmp32b);
             idx += card_chans;
         }
     }
@@ -459,9 +459,9 @@ void *AlsaEngine::AudioThread(void)
 
         if (audio.pcm_state == SND_PCM_STATE_RUNNING)
         {
-            int alsa_buff = audio.buffer_size;
+            int alsa_buff = audio.period_size;//audio.buffer_size;
             int offset = 0;
-            while ((offset + ActualBufferSize) <= alsa_buff)
+            while (alsa_buff - offset >= ActualBufferSize)
             {
                 synth->MasterAudio(zynLeft, zynRight, ActualBufferSize);
                 Interleave(offset, ActualBufferSize);
