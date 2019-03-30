@@ -361,8 +361,8 @@ void AlsaEngine::Interleave(int offset, int buffersize)
 
     if (card_bits == 16)
     {
-        int idx = offset;
         int chans = card_chans / 2; // because we're pairing them on a single integer
+        int idx = offset * chans;
         for (int frame = 0; frame < buffersize; ++frame)
         {
             uint16_t tmp16a = uint16_t(zynLeft[NUM_MIDI_PARTS][frame] * float(0x7800));
@@ -378,7 +378,7 @@ void AlsaEngine::Interleave(int offset, int buffersize)
     }
     else
     {
-        int idx = offset << 1;
+        int idx = offset * card_chans;
         float shift;
         if (card_bits == 32)
             shift = float(0x78000000);
