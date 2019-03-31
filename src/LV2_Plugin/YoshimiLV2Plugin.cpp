@@ -111,6 +111,7 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
 
     float *tmpLeft [NUM_MIDI_PARTS + 1];
     float *tmpRight [NUM_MIDI_PARTS + 1];
+    struct midi_event intMidiEvent;
 
     for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
     {
@@ -121,21 +122,81 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         if (tmpRight [i] == NULL)
             tmpRight [i] = zynRight [i];
     }
+    uint32_t next_frame = 0;
+    uint32_t to_process = sample_count;
     LV2_ATOM_SEQUENCE_FOREACH(_midiDataPort, event)
     {
-        if (event->body.type == _midi_event_id)
+        if (event != NULL)
         {
-            //process this midi event
-            const uint8_t *msg = (const uint8_t*)(event + 1);
-            processMidiMessage(msg);
+            if (event->body.size <= sizeof(intMidiEvent.data))
+            {
+                if (event->body.type == _midi_event_id)
+                {
+                    next_frame = event->time.frames;
+                    //process this midi event
+
+                    if (next_frame >= sample_count)
+                    {
+                        if (to_process > 0)
+                        {
+                            while (to_process >= ActualBufferSize)
+                            {
+                                _synth->MasterAudio(tmpLeft, tmpRight, ActualBufferSize);
+                                for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
+                                {
+                                    tmpLeft [i] += ActualBufferSize;
+                                    tmpRight [i] += ActualBufferSize;
+                                }
+                                to_process -= ActualBufferSize;
+                            }
+                            if (to_process > 0)
+                            {
+                                _synth->MasterAudio(tmpLeft, tmpRight, to_process);
+                                for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
+                                {
+                                    tmpLeft [i] += to_process;
+                                    tmpRight [i] += to_process;
+                                }
+                                to_process = 0;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        const uint8_t *msg = (const uint8_t*)(event + 1);
+                        if (_bFreeWheel != NULL)
+                            processMidiMessage(msg);
+                        uint32_t processed = 0;
+                        while (processed < next_frame && to_process >= ActualBufferSize)
+                        {
+                            _synth->MasterAudio(tmpLeft, tmpRight, ActualBufferSize);
+                            for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
+                            {
+                                tmpLeft [i] += ActualBufferSize;
+                                tmpRight [i] += ActualBufferSize;
+                            }
+                            processed += ActualBufferSize;
+                            to_process -= ActualBufferSize;
+                        }
+                        if (to_process > 0)
+                        {
+                            _synth->MasterAudio(tmpLeft, tmpRight, to_process);
+                            for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
+                            {
+                                tmpLeft [i] += to_process;
+                                tmpRight [i] += to_process;
+                            }
+                            to_process = 0;
+                        }
+                    }
+                }
+            }
         }
     }
 
-    uint32_t to_process = sample_count;
-
     if (to_process > 0)
     {
-        while (to_process > ActualBufferSize)
+        while (to_process >= ActualBufferSize)
         {
             _synth->MasterAudio(tmpLeft, tmpRight, ActualBufferSize);
             for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
@@ -145,7 +206,16 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
             }
             to_process -= ActualBufferSize;
         }
-        _synth->MasterAudio(tmpLeft, tmpRight, to_process);
+        if (to_process > 0)
+        {
+            _synth->MasterAudio(tmpLeft, tmpRight, to_process);
+            for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
+            {
+                tmpLeft [i] += to_process;
+                tmpRight [i] += to_process;
+            }
+            to_process = 0;
+        }
     }
 
     LV2_Atom_Sequence *aSeq = static_cast<LV2_Atom_Sequence *>(_notifyDataPortOut);

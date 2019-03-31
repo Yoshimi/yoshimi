@@ -1552,7 +1552,7 @@ void ADnote::computeCurrentParameters(void)
 void ADnote::fadein(float *smps)
 {
     int zerocrossings = 0;
-    for (int i = 1; i < synth->buffersize; ++i)
+    for (int i = 1; i < synth->sent_buffersize; ++i)
         if (smps[i - 1] < 0.0f && smps[i] > 0.0f)
             zerocrossings++; // this is only the positive crossings
 
