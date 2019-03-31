@@ -178,7 +178,7 @@ float LFO::lfoout(void)
             computenextincrnd();
         }
     } else
-        lfodelay -= synth->buffersize / synth->samplerate_f;
+        lfodelay -= synth->sent_buffersize / synth->samplerate_f;
 
     return out;
 }
