@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified March 2019
+Modified April 2019
 } {selected in_source in_header
 }
 
@@ -1108,7 +1108,7 @@ Offset}
           xywh {110 110 100 20} labelfont 1 labelsize 10
         }
       }
-      Fl_Group inseffectuigroup {open
+      Fl_Group inseffectuigroup {
         xywh {5 37 380 96} box FLAT_BOX color 48
       } {
         Fl_Group inseffectui {
@@ -1123,7 +1123,7 @@ Offset}
         partfx->hide();
         if ((Fl::event_button() == 3))
             synth->getGuiMaster()->partui->instrumenteditwindow->show();}
-        xywh {314 136 60 20} box THIN_UP_BOX
+        tooltip {Right click: also reopen previous} xywh {314 136 60 20} box THIN_UP_BOX
       }
       Fl_Choice sendtochoice {
         label To
@@ -1177,7 +1177,7 @@ Offset}
         instrumentkitlist->hide();
         if ((Fl::event_button() == 3))
         synth->getGuiMaster()->partui->instrumenteditwindow->show();}
-        xywh {569 348 63 20} box THIN_UP_BOX
+        tooltip {Right click: also reopen previous} xywh {569 348 63 20} box THIN_UP_BOX
       }
       Fl_Scroll kitlist {
         xywh {0 15 670 330} type VERTICAL box THIN_UP_BOX
@@ -1311,7 +1311,7 @@ Offset}
             seteditname();
             if ((Fl::event_button() == 3))
                 instrumenteditwindow->hide();}
-            xywh {15 281 80 34} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
+            tooltip {Right click: also close this} xywh {15 281 80 34} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
             code0 {if (part->kit[0].Padenabled==0) o->deactivate();}
           }
         }
@@ -1353,7 +1353,7 @@ Offset}
             seteditname();
             if ((Fl::event_button() == 3))
                 instrumenteditwindow->hide();}
-            xywh {115 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
+            tooltip {Right click: also close this} xywh {115 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
             code0 {if (part->kit[0].Psubenabled==0) o->deactivate();}
           }
         }
@@ -1395,7 +1395,7 @@ Offset}
             seteditname();
             if ((Fl::event_button() == 3))
                 instrumenteditwindow->hide();}
-            xywh {215 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
+            tooltip {Right click: also close this} xywh {215 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
             code0 {if (part->kit[0].Ppadenabled==0) o->deactivate();}
           }
         }
@@ -1405,7 +1405,7 @@ Offset}
           instrumentkitlist->show();
           if ((Fl::event_button() == 3))
               instrumenteditwindow->hide();}
-          xywh {310 245 80 35} box PLASTIC_UP_BOX color 238 selection_color 220 labelfont 1 align 128
+          tooltip {Right click: also close this} xywh {310 245 80 35} box PLASTIC_UP_BOX color 238 selection_color 220 labelfont 1 align 128
         }
         Fl_Button {} {
           label Effects
@@ -1413,7 +1413,7 @@ Offset}
           partfx->show();
           if ((Fl::event_button() == 3))
               instrumenteditwindow->hide();}
-          xywh {310 290 80 35} box PLASTIC_UP_BOX color 230 labelfont 1 labelsize 13
+          tooltip {Right click: also close this} xywh {310 290 80 35} box PLASTIC_UP_BOX color 230 labelfont 1 labelsize 13
         }
       }
       Fl_Group {} {

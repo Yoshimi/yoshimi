@@ -24,7 +24,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-Modified February 2019
+Modified April 2019
 } {selected in_source in_header
 }
 
@@ -287,15 +287,15 @@ class MidiLearnUI {: {private MiscFuncs, FileMgr}
 } {
   Function {make_window()} {} {
     Fl_Window midilearnwindow {
-      label {Midi Learn}
+      label {Midi Learn} open
       tooltip {Editor for all learned controllers.
-CTRL-right click on any knob/slider to learn.
+CTRL-right click on any knob/slider/button to learn.
 Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {7 694 820 285} type Double hide
       code0 {//send_data(MIDILEARN::control::sendRefreshRequest, 0, 3); // why were we doing this? it's wrong!}
     } {
       Fl_Scroll kitlist {
         tooltip {Editor for all learned controllers.
-CTRL-Right click on knobs/sliders to learn.
+CTRL-Right click on any knob/slider/button to learn.
 Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {0 15 818 245} type VERTICAL box DOWN_FRAME
       } {}
       Fl_Box none {

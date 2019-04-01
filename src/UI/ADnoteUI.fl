@@ -11,7 +11,7 @@ comment {ADNoteUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2018, Will Godfrey
+Copyright 2014-2019, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
-Modified October 2018
+Modified April 2019
 } {selected in_source in_header
 }
 
@@ -73,10 +73,10 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
                 synth->getGuiMaster()->partui->adnoteui->advoice->voicevolume->value(vol);
 
             collect_data(synth, vol, (Fl::event_button() | 0xc0), ADDVOICE::control::volume, npart, kititem, PART::engine::addVoice1 + nvoice);}
-                tooltip Volume xywh {125 3 113 20} type {Horz Knob} box THIN_DOWN_BOX labelsize 8 align 5 maximum 127 step 1
-                code0 {o->value(pars->VoicePar[nvoice].PVolume);}
-                code1 {o->setValueType(VC_ADDVoiceVolume);o->useCustomTip(true);}
-                class mwheel_val_slider_rev
+          tooltip Volume xywh {125 3 113 20} type {Horz Knob} box THIN_DOWN_BOX labelsize 8 align 5 maximum 127 step 1
+          code0 {o->value(pars->VoicePar[nvoice].PVolume);}
+          code1 {o->setValueType(VC_ADDVoiceVolume);o->useCustomTip(true);}
+          class mwheel_val_slider_rev
         }
         Fl_Check_Button voiceresonanceenabled {
           callback {//
@@ -84,8 +84,8 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
     synth->getGuiMaster()->partui->adnoteui->advoice->ResonanceEn->value(enab);
 
     collect_data(synth, enab, (Fl::event_button() | 0xc0), ADDVOICE::control::enableResonance, npart, kititem, PART::engine::addVoice1 + nvoice);}
-    tooltip {Resonance On/Off} xywh {269 5 15 17} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 11 align 4
-    code0 {o->value(pars->VoicePar[nvoice].Presonance);}
+          tooltip {Resonance On/Off} xywh {269 5 15 17} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 11 align 4
+          code0 {o->value(pars->VoicePar[nvoice].Presonance);}
         }
         Fl_Value_Slider voicelistvibratto {
           callback {//
@@ -94,7 +94,7 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
                 synth->getGuiMaster()->partui->adnoteui->advoice->voicefreqlfogroup->intensity->value(lfodepth);
 
             collect_data(synth, lfodepth, (Fl::event_button() | 0xc0), 1, npart, kititem, PART::engine::addVoice1 + nvoice, 0, 1);}
-        tooltip {Frequency LFO amount} xywh {505 3 115 20} type {Horz Knob} box THIN_DOWN_BOX labelsize 8 align 5 maximum 127 step 1 deactivate
+          tooltip {Frequency LFO amount} xywh {505 3 115 20} type {Horz Knob} box THIN_DOWN_BOX labelsize 8 align 5 maximum 127 step 1 deactivate
           code0 {o->value(pars->VoicePar[nvoice].FreqLfo->Pintensity);}
           code1 {o->setValueType(VC_LFOdepthFreq);o->useCustomTip(true);}
           class mwheel_val_slider_rev
@@ -166,7 +166,7 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
               if((Fl::event_button() == 3)){
                 synth->getGuiMaster()->partui->adnoteui->ADnoteVoiceList->hide();
               }}
-          xywh {41 4 40 19} box THIN_UP_BOX labelfont 1 labelsize 12
+          tooltip {Right click: also close this} xywh {41 4 40 19} box THIN_UP_BOX labelfont 1 labelsize 12
         }
       }
       Fl_Check_Button voiceenabled {
@@ -1621,7 +1621,7 @@ send_data(ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
             ADnoteVoiceList->show();
             if (Fl::event_button() == 3)
                 ADnoteGlobalParameters->hide();}
-        xywh {191 375 121 25} labelfont 1 labelsize 12
+        tooltip {Right click: also close this} xywh {191 375 121 25} labelfont 1 labelsize 12
       }
       Fl_Button {} {
         label {Show Voice Parameters}
@@ -1632,7 +1632,7 @@ send_data(ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
     synth->getGuiMaster()->partui->adnoteui->fromVoiceList = false;
     if ((Fl::event_button() == 3))
         ADnoteGlobalParameters->hide();}
-        xywh {5 375 180 25} labelfont 1 labelsize 12
+        tooltip {Right click: also close this} xywh {5 375 180 25} labelfont 1 labelsize 12
       }
       Fl_Button {} {
         label Close
@@ -1647,7 +1647,7 @@ send_data(ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
                 else
                     synth->getGuiMaster()->partui->instrumenteditwindow->show();
             }}
-        xywh {476 375 54 25} box THIN_UP_BOX labelfont 1 labelsize 12
+        tooltip {Right click: also reopen previous} xywh {476 375 54 25} box THIN_UP_BOX labelfont 1 labelsize 12
       }
       Fl_Button {} {
         label Resonance
@@ -1656,7 +1656,7 @@ send_data(ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
     resui->Show(true);
     if ((Fl::event_button() == 3))
         ADnoteGlobalParameters->hide();}
-        tooltip Resonance xywh {318 375 90 25} labelfont 1 labelsize 12
+        tooltip {Resonance. Right click: also close this} xywh {318 375 90 25} labelfont 1 labelsize 12
       }
       Fl_Button {} {
         label C
@@ -1778,7 +1778,7 @@ else if(voiceTabs->value() == g8)
                 else
                     ADnoteGlobalParameters->show();
             }}
-        xywh {650 575 90 25} box THIN_UP_BOX labelfont 1 labelsize 12
+        tooltip {Right click: also reopen previous} xywh {650 575 90 25} box THIN_UP_BOX labelfont 1 labelsize 12
       }
       Fl_Button {} {
         label C
@@ -1826,7 +1826,7 @@ else if(voiceTabs->value() == g8)
             ADnoteVoiceList->hide();
             if (Fl::event_button() == 3)
                 ADnoteGlobalParameters->show();}
-        xywh {582 235 62 20} labelfont 1 labelsize 12
+        tooltip {Right click: also reopen previous} xywh {582 235 62 20} labelfont 1 labelsize 12
       }
       Fl_Scroll {} {open
         xywh {5 15 640 214} type VERTICAL box THIN_UP_BOX
