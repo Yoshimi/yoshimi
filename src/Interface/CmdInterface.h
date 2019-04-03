@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified March 2019
+    Modified April 2019
 */
 
 #ifndef CMDINTERFACE_H
@@ -154,7 +154,7 @@ static string toplist [] = {
     "  SCale",                  "enter context level",
     "  MLearn",                 "enter editor context level",
     "  COnfig",                 "enter context level",
-    "  MONo",                   "main output mono/stereo (ON, {other})",
+    "  MONo <s>",               "main output mono/stereo (ON = mono, {other})",
     "  Root <n>",               "current root path to ID",
     "  Bank <n>",               "current bank to ID",
     "  SYStem effects [n]",     "enter effects context level",
@@ -204,8 +204,8 @@ static string configlist [] = {
     "Jack Server <s>",          "* name",
     "Jack Auto <s>",            "* connect jack on start (ON, {other})",
 
-    "ROot [n]",                 "root CC (0 - 119, {other} off)",
-    "BAnk [n]",                 "bank CC (0, 32, {other} off)",
+    "ROot [s]",                 "root CC (Msb, Lsb, Off)",
+    "BAnk [s]",                 "bank CC (Msb, Lsb, Off)",
     "PRogram [s]",              "program change (ON, {other})",
     "ACtivate [s]",             "program change activates part (ON, {other})",
     "EXTended [s]",             "extended program change (ON, {other})",

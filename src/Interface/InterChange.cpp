@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified March 2019
+    Modified April 2019
 */
 
 #include <iostream>
@@ -1829,16 +1829,36 @@ string InterChange::resolveConfig(CommandBlock *getData)
             showValue = false;
             break;
 
-        /*case CONFIG::control::enableBankRootChange:
-            contstr += "Enable bank root change";
-            yesno = true;
-            break;*/
         case CONFIG::control::bankRootCC:
-            contstr += "Bank root CC";
+            contstr += "Bank root CC ";
+            switch (value_int)
+            {
+                case 0:
+                    contstr += "MSB";
+                    break;
+                case 32:
+                    contstr += "LSB";
+                    break;
+                default:
+                    contstr += "OFF";
+            }
+            showValue = false;
             break;
 
         case CONFIG::control::bankCC:
-            contstr += "Bank CC";
+            contstr += "Bank CC ";
+            switch (value_int)
+            {
+                case 0:
+                    contstr += "MSB";
+                    break;
+                case 32:
+                    contstr += "LSB";
+                    break;
+                default:
+                    contstr += "OFF";
+            }
+            showValue = false;
             break;
         case CONFIG::control::enableProgramChange:
             contstr += "Enable program change";
@@ -4979,12 +4999,10 @@ void InterChange::commandConfig(CommandBlock *getData)
                 }
             break;
 // midi
-        //case CONFIG::control::enableBankRootChange:
-            //break;
         case CONFIG::control::bankRootCC:
             if (write)
             {
-                if (value_int > 119)
+                if (value_int != 0 && value_int != 32)
                 {
                     value_int = 128;
                     getData->data.value = value_int;

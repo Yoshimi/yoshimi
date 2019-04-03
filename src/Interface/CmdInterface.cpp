@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified March 2019
+    Modified April 2019
 */
 
 #include <iostream>
@@ -2931,22 +2931,26 @@ int CmdInterface::commandConfig(unsigned char controlType)
     else if (matchnMove(2, point, "root"))
     {
         command = CONFIG::control::bankRootCC;
-        if (controlType != TOPLEVEL::type::Write)
+        //if (controlType != TOPLEVEL::type::Write)
             value = 128; // ignored by range check
-        else if (lineEnd(controlType))
+        if (lineEnd(controlType))
             return value_msg;
-        else
-            value = string2int(point);
+        if (matchnMove(1, point, "msb"))
+            value = 0;
+        else if (matchnMove(1, point, "lsb"))
+            value = 32;
     }
     else if (matchnMove(2, point, "bank"))
     {
         command = CONFIG::control::bankCC;
-        if (controlType != TOPLEVEL::type::Write)
+        //if (controlType != TOPLEVEL::type::Write)
             value = 128; // ignored by range check
-        else if (lineEnd(controlType))
+        if (lineEnd(controlType))
             return value_msg;
-        else
-            value = string2int(point);
+        if (matchnMove(1, point, "msb"))
+            value = 0;
+        else if (matchnMove(1, point, "lsb"))
+            value = 32;
     }
     else if (matchnMove(2, point, "program") || matchnMove(2, point, "instrument"))
     {
@@ -2968,7 +2972,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
         else
             value = string2int(point);
     }
-    else if (matchnMove(1, point, "Quiet"))
+    else if (matchnMove(1, point, "quiet"))
     {
         command = CONFIG::control::ignoreResetAllCCs;
         value = (toggle() == 1);
@@ -2990,7 +2994,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
     }
 
     else
-        return todo_msg; // may be picked up later
+        return  opp_msg;
 
     sendDirect(value, controlType, command, TOPLEVEL::section::config, UNUSED, UNUSED, UNUSED, par, par2);
     return done_msg;

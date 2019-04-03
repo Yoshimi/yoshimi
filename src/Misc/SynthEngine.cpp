@@ -3523,9 +3523,8 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
             max = 3;
             break;
 
-        //case CONFIG::control::enableBankRootChange:
-            //break;
         case CONFIG::control::bankRootCC: // runtime midi checked elsewhere
+            def = 0;
             max = 119;
             break;
         case CONFIG::control::bankCC: // runtime midi checked elsewhere

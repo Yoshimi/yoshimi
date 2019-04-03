@@ -240,7 +240,6 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         alsaSampleRate,
         // end of engine controls
 
-        //enableBankRootChange = 64,
         bankRootCC = 65,
         bankCC = 67,
         enableProgramChange,
