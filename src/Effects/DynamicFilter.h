@@ -24,6 +24,8 @@
 #ifndef DYNAMICFILTER_H
 #define DYNAMICFILTER_H
 
+#include <boost/shared_ptr.hpp>
+
 #include "DSP/Filter.h"
 #include "Effects/EffectLFO.h"
 #include "Effects/Effect.h"
@@ -62,7 +64,8 @@ class DynamicFilter : public Effect
         // Internal Values
         float panning, depth, ampsns, ampsmooth;
 
-        Filter *filterl, *filterr;
+        boost::shared_ptr<Filter> filterL;
+        boost::shared_ptr<Filter> filterR;
         float ms1, ms2, ms3, ms4; // mean squares
 };
 

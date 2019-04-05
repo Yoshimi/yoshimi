@@ -1,5 +1,0 @@
-#!/bin/bash
-
-echo "In: [""$@""]"
-echo "Base: "$(basename "$@" .gz)
-mv "$@" "$(basename "$@" .gz)"

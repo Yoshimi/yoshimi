@@ -26,7 +26,7 @@
 #include "Effects/Echo.h"
 
 Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_) :
-    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
+    Effect(insertion_, efxoutl_, efxoutr_),
     Pvolume(50),
     Ppanning(64),
     Pdelay(60),
@@ -44,17 +44,17 @@ Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_) :
 
 Echo::~Echo()
 {
-    delete [] ldelay;
-    delete [] rdelay;
+    Runtime.dead_floats.push_back(ldelay);
+    Runtime.dead_floats.push_back(rdelay);
 }
 
 
 // Cleanup the effect
 void Echo::cleanup(void)
 {
-    memset(ldelay, 0, dl * sizeof(float));
-    memset(rdelay, 0, dr * sizeof(float));
-    oldl = oldr = 0.0;
+    memset(ldelay.get(), 0, dl * sizeof(float));
+    memset(rdelay.get(), 0, dr * sizeof(float));
+    oldl = oldr = 0.0f;
 }
 
 
@@ -70,12 +70,12 @@ void Echo::initdelays(void)
     if (dr < 1)
         dr = 1;
 
-    if (ldelay != NULL)
-        delete [] ldelay;
-    if (rdelay != NULL)
-        delete [] rdelay;
-    ldelay = new float[dl];
-    rdelay = new float[dr];
+    if (ldelay)
+        Runtime.dead_floats.push_back(ldelay);
+    ldelay.reset(new float[dl]);
+    if (rdelay)
+        Runtime.dead_floats.push_back(rdelay);
+    rdelay.reset(new float[dr]);
     cleanup();
 }
 
@@ -95,10 +95,10 @@ void Echo::out(float* smpsl, float* smpsr)
         ldl = l;
         rdl = r;
 
-        efxoutl[i] = ldl * 2.0 - 1e-20f; // anti-denormal - a very, very, very
-        efxoutr[i] = rdl * 2.0 - 1e-20f; // small dc bias
+        efxoutl[i] = ldl * 2.0f - 1e-20f; // anti-denormal - a very, very, very
+        efxoutr[i] = rdl * 2.0f - 1e-20f; // small dc bias
 
-        ldl = smpsl[i] * (1.0 - panning) - ldl * fb;
+        ldl = smpsl[i] * (1.0f - panning) - ldl * fb;
         rdl = smpsr[i] * panning - rdl * fb;
 
         // LowPass Filter
@@ -120,25 +120,25 @@ void Echo::setvolume(unsigned char Pvolume_)
     Pvolume = Pvolume_;
     if (insertion == 0)
     {
-        outvolume = powf(0.01, (1.0 - Pvolume / 127.0)) * 4.0;
+        outvolume = powf(0.01f, (1.0f - Pvolume / 127.0f)) * 4.0f;
         volume = 1.0;
     }
     else
-        volume = outvolume = Pvolume / 127.0;
-    if (Pvolume == 0)
+        volume = outvolume = Pvolume / 127.0f;
+    if (!Pvolume)
         cleanup();
 }
 
 void Echo::setpanning(unsigned char Ppanning_)
 {
     Ppanning = Ppanning_;
-    panning = (Ppanning + 0.5) / 127.0;
+    panning = (Ppanning + 0.5f) / 127.0f;
 }
 
 void Echo::setdelay(const unsigned char Pdelay_)
 {
     Pdelay = Pdelay_;
-    delay = 1 + (int)(Pdelay / 127.0 * zynMaster->getSamplerate() * 1.5); // 0 .. 1.5 sec
+    delay = 1 + lrintf(Pdelay / 127.0f * zynMaster->getSamplerate() * 1.5f); // 0 .. 1.5 sec
     initdelays();
 }
 
@@ -146,23 +146,23 @@ void Echo::setlrdelay(unsigned char Plrdelay_)
 {
     float tmp;
     Plrdelay = Plrdelay_;
-    tmp = (powf(2, fabsf(Plrdelay - 64.0) / 64.0 * 9) -1.0) / 1000.0 * zynMaster->getSamplerate();
-    if (Plrdelay < 64.0)
+    tmp = (powf(2.0f, fabsf(Plrdelay - 64.0f) / 64.0f * 9.0f) -1.0f) / 1000.0f * zynMaster->getSamplerate();
+    if (Plrdelay < 64.0f)
         tmp = -tmp;
-    lrdelay = (int)tmp;
+    lrdelay = lrintf(tmp);
     initdelays();
 }
 
 void Echo::setlrcross(unsigned char Plrcross_)
 {
     Plrcross = Plrcross_;
-    lrcross = Plrcross / 127.0 * 1.0;
+    lrcross = Plrcross / 127.0f * 1.0f;
 }
 
 void Echo::setfb(unsigned char Pfb_)
 {
     Pfb = Pfb_;
-    fb = Pfb / 128.0;
+    fb = Pfb / 128.0f;
 }
 
 void Echo::sethidamp(unsigned char Phidamp_)

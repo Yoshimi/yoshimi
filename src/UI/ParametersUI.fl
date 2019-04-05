@@ -22,9 +22,6 @@ along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 decl {\#include <set>} {public
 } 
 
-decl {\#include <iostream>} {public
-} 
-
 decl {using namespace std;} {public
 } 
 

@@ -26,7 +26,7 @@
 #include "Effects/EQ.h"
 
 EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_) :
-    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0)
+    Effect(insertion_, efxoutl_, efxoutr_)
 {
     for (int i = 0; i < MAX_EQ_BANDS; ++i)
     {

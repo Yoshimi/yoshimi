@@ -23,7 +23,6 @@
 
 #include <zlib.h>
 #include <sstream>
-#include <iostream>
 
 #include "Misc/XMLwrapper.h"
 #include "Misc/Util.h"
@@ -135,22 +134,25 @@ bool XMLwrapper::checkfileinformation(const string& filename)
 
 bool XMLwrapper::saveXMLfile(const string& filename)
 {
-    char *xmldata = getXMLdata();
-    if (!xmldata)
+    char *data = getXMLdata();
+    if (!data)
     {
         Runtime.Log("Error, failed to allocate xml data space");
         return false;
     }
-    FILE *xmlfile = fopen(filename.c_str(), "w");
-    if (!xmlfile)
+    gzFile ofile = gzopen(filename.c_str(), "wb4");
+    if (!ofile)
     {
-        Runtime.Log("Error, failed to open xml file " + filename + " for save");
+        Runtime.Log("Failed to open xml file " + filename + " for save");
         return false;
     }
-    fputs(xmldata, xmlfile);
-    fclose(xmlfile);
-    free(xmldata);
-    return true;
+    int len = strlen(data);
+    bool ok = len == gzwrite(ofile, data, len);
+    if (!ok)
+        Runtime.Log("Write to xml file " + filename + " failed");
+    gzclose(ofile);
+    free(data);
+    return ok;
 }
 
 
@@ -158,7 +160,7 @@ char *XMLwrapper::getXMLdata()
 {
     xml_k = 0;
     memset(tabs, 0, STACKSIZE + 2);
-    mxml_node_t *oldnode=node;
+    mxml_node_t *oldnode = node;
     node = info;
     addpar("PADsynth_used", information.PADsynth_used);
     node = oldnode;
@@ -261,15 +263,14 @@ char *XMLwrapper::doloadfile(const string& filename)
                     + asString(errno) + "  " + string(strerror(errno)));
         return NULL;
     }
-    const int bufSize = 4096;
-    char fetchBuf[4097];
-    int this_read;
+    const int bufSize = 1024;
+    char fetchBuf[bufSize + 1];
     int total_bytes = 0;
     stringstream readStream;
-    for (bool quit = false; !quit && !Pexitprogram;)
+    for (bool quit = false; !(quit || Pexitprogram);)
     {
         memset(fetchBuf, 0, sizeof(fetchBuf) * sizeof(char));
-        this_read = gzread(gzf, fetchBuf, bufSize);
+        int this_read = gzread(gzf, fetchBuf, bufSize);
         if (this_read > 0)
         {
             readStream << fetchBuf;
@@ -293,7 +294,6 @@ char *XMLwrapper::doloadfile(const string& filename)
             }
             quit = true;
         }
-        Runtime.signalCheck();
     }
     gzclose(gzf);
     return xmldata;
@@ -323,7 +323,7 @@ bool XMLwrapper::putXMLdata(char *xmldata)
 bool XMLwrapper::enterbranch(const string& name)
 {
     node = mxmlFindElement(peek(), peek(), name.c_str(), NULL, NULL,
-                           MXML_DESCEND_FIRST);
+                           MXML_DESCEND);
     if (!node)
         return false;
     push(node);
@@ -334,7 +334,7 @@ bool XMLwrapper::enterbranch(const string& name)
 bool XMLwrapper::enterbranch(const string& name, int id)
 {
     node = mxmlFindElement(peek(), peek(), name.c_str(), "id",
-                           asString(id).c_str(), MXML_DESCEND_FIRST);
+                           asString(id).c_str(), MXML_DESCEND);
     if (!node)
         return false;
     push(node);
@@ -357,7 +357,7 @@ int XMLwrapper::getbranchid(int min, int max)
 
 int XMLwrapper::getpar(const string& name, int defaultpar, int min, int max)
 {
-    node = mxmlFindElement(peek(), peek(), "par", "name", name.c_str(), MXML_DESCEND_FIRST);
+    node = mxmlFindElement(peek(), peek(), "par", "name", name.c_str(), MXML_DESCEND);
     if (!node)
         return defaultpar;
     const char *strval = mxmlElementGetAttr(node, "value");
@@ -380,7 +380,7 @@ int XMLwrapper::getpar127(const string& name, int defaultpar)
 
 int XMLwrapper::getparbool(const string& name, int defaultpar)
 {
-    node = mxmlFindElement(peek(), peek(), "par_bool", "name", name.c_str(), MXML_DESCEND_FIRST);
+    node = mxmlFindElement(peek(), peek(), "par_bool", "name", name.c_str(), MXML_DESCEND);
     if (!node)
         return defaultpar;
     const char *strval = mxmlElementGetAttr(node, "value");
@@ -392,7 +392,7 @@ int XMLwrapper::getparbool(const string& name, int defaultpar)
 
 string XMLwrapper::getparstr(const string& name)
 {
-    node = mxmlFindElement(peek(), peek(), "string", "name", name.c_str(), MXML_DESCEND_FIRST);
+    node = mxmlFindElement(peek(), peek(), "string", "name", name.c_str(), MXML_DESCEND);
     if (!node)
         return string();
     if (!node->child)
@@ -406,7 +406,7 @@ string XMLwrapper::getparstr(const string& name)
 float XMLwrapper::getparreal(const string& name, float defaultpar)
 {
     node = mxmlFindElement(peek(), peek(), "par_real", "name", name.c_str(),
-                           MXML_DESCEND_FIRST);
+                           MXML_DESCEND);
     if (!node)
         return defaultpar;
     const char *strval = mxmlElementGetAttr(node, "value");

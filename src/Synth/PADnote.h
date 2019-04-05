@@ -51,7 +51,7 @@ class PADnote
         void fadein(float *smps);
         void computecurrentparameters();
         bool finished_;
-        PADnoteParameters *pars;
+        PADnoteParameters *padnotepars;
 
         int poshi_l;
         int poshi_r;
@@ -61,7 +61,8 @@ class PADnote
         bool firsttime;
         bool released;
 
-        int nsample, portamento;
+        int nsample;
+        int portamento;
 
         int Compute_Linear(float *outl, float *outr, int freqhi,
                            float freqlo);
@@ -98,8 +99,8 @@ class PADnote
             //*************************
             // FILTER GLOBAL PARAMETERS
             //*************************
-            Filter *GlobalFilterL;
-            Filter *GlobalFilterR;
+            boost::shared_ptr<Filter> GlobalFilterL;
+            boost::shared_ptr<Filter> GlobalFilterR;
 
             float FilterCenterPitch;//octaves
             float FilterQ;

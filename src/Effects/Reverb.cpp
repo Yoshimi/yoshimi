@@ -30,7 +30,7 @@
 // todo: EarlyReflections, Prdelay, Perbalance
 
 Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_) :
-    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
+    Effect(insertion_, efxoutl_, efxoutr_),
     // defaults
     Pvolume     (48),
     Ppan        (64),
@@ -46,26 +46,23 @@ Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_) :
     Proomsize   (64),
     roomsize    (1.0),
     rs          (1.0),
-    idelay      (NULL),
-    lpf         (NULL),
-    hpf         (NULL), // no filter
     buffersize(zynMaster->getBuffersize())
 {
-    inputbuf = new float[buffersize];
+    inputbuf = boost::shared_array<float>(new float[buffersize]);
     for (int i = 0; i < REV_COMBS * 2; ++i)
     {
-        comblen[i] = 800 + (int)(zynMaster->numRandom() * 1400.0f);
+        comblen[i] = 800 + lrintf(zynMaster->numRandom() * 1400.0f);
         combk[i] = 0;
         lpcomb[i] = 0;
-        combfb[i] = -0.97;
-        comb[i] = NULL;
+        combfb[i] = -0.97f;
+        comb[i].reset();
     }
 
     for (int i = 0; i < REV_APS * 2; ++i)
     {
-        aplen[i] = 500 + (int)(zynMaster->numRandom() * 500.0f);
+        aplen[i] = 500 + lrintf(zynMaster->numRandom() * 500.0f);
         apk[i] = 0;
-        ap[i] = NULL;
+        ap[i].reset();
     }
     setpreset(Ppreset);
     cleanup(); // do not call this before the comb initialisation
@@ -74,20 +71,17 @@ Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_) :
 
 Reverb::~Reverb()
 {
-    int i;
-    if (idelay != NULL)
-        delete []idelay;
-    if (hpf != NULL)
-        delete hpf;
-    if (lpf != NULL)
-        delete lpf;
-
-    for (i = 0; i < REV_APS * 2; ++i)
-        delete [] ap[i];
-    for (i = 0; i < REV_COMBS * 2; ++i)
-        delete [] comb[i];
-
-    delete [] inputbuf;
+    if (idelay)
+        Runtime.dead_floats.push_back(idelay);
+    if (hpf)
+        Runtime.dead_ptrs.push_back(hpf);
+    if (lpf)
+        Runtime.dead_ptrs.push_back(lpf);
+    for (int i = 0; i < REV_APS * 2; ++i)
+        Runtime.dead_floats.push_back(ap[i]);
+    for (int i = 0; i < REV_COMBS * 2; ++i)
+        Runtime.dead_floats.push_back(comb[i]);
+    Runtime.dead_floats.push_back(inputbuf);
 }
 
 // Cleanup the effect
@@ -96,20 +90,20 @@ void Reverb::cleanup(void)
     int i, j;
     for (i = 0; i < REV_COMBS * 2; ++i)
     {
-        lpcomb[i] = 0.0;
+        lpcomb[i] = 0.0f;
         for (j = 0; j < comblen[i]; ++j)
-            comb[i][j] = 0.0;
+            comb[i][j] = 0.0f;
     }
     for (i = 0; i < REV_APS * 2; ++i)
         for (j = 0; j < aplen[i]; ++j)
-            ap[i][j] = 0.0;
+            ap[i][j] = 0.0f;
 
-    if (idelay != NULL)
+    if (idelay)
         for (i = 0; i < idelaylen; ++i)
-            idelay[i] = 0.0;
-    if (hpf != NULL)
+            idelay[i] = 0.0f;
+    if (hpf)
         hpf->cleanup();
-    if (lpf != NULL)
+    if (lpf)
         lpf->cleanup();
 }
 
@@ -150,8 +144,8 @@ void Reverb::processmono(int ch, float *output)
         for (i = 0; i < buffersize; ++i)
         {
             tmp = ap[j][ak];
-            ap[j][ak] = 0.7 * tmp + output[i];
-            output[i] = tmp - 0.7 * ap[j][ak] + 1e-20f; // anti-denormal -
+            ap[j][ak] = 0.7f * tmp + output[i];
+            output[i] = tmp - 0.7f * ap[j][ak] + 1e-20f; // anti-denormal -
                                                         // a very, very, very
                                                         // small dc bias
             if ((++ak) >= aplength)
@@ -164,14 +158,14 @@ void Reverb::processmono(int ch, float *output)
 // Effect output
 void Reverb::out(float *smps_l, float *smps_r)
 {
-    if (Pvolume == 0 && insertion != 0)
+    if (!Pvolume && insertion)
         return;
     int i;
     for (i = 0; i < buffersize; ++i)
     {
-        inputbuf[i] = (smps_l[i] + smps_r[i]) / 2.0;
+        inputbuf[i] = (smps_l[i] + smps_r[i]) / 2.0f;
         // Initial delay r
-        if (idelay != NULL)
+        if (idelay)
         {
             float tmp = inputbuf[i] + idelay[idelayk] * idelayfb;
             inputbuf[i] = idelay[idelayk];
@@ -182,10 +176,10 @@ void Reverb::out(float *smps_l, float *smps_r)
         }
     }
 
-    if (lpf != NULL)
-        lpf->filterout(inputbuf);
-    if (hpf != NULL)
-        hpf->filterout(inputbuf);
+    if (lpf)
+        lpf->filterout(inputbuf.get());
+    if (hpf)
+        hpf->filterout(inputbuf.get());
 
     processmono(0, efxoutl); // left
     processmono(1, efxoutr); // right
@@ -194,8 +188,8 @@ void Reverb::out(float *smps_l, float *smps_r)
     float rvol = rs / REV_COMBS * pan;
     if (insertion != 0)
     {
-        lvol *= 2.0;
-        rvol *= 2.0;
+        lvol *= 2.0f;
+        rvol *= 2.0f;
     }
     for (i = 0; i < buffersize; ++i)
     {
@@ -210,15 +204,15 @@ void Reverb::out(float *smps_l, float *smps_r)
 void Reverb::setvolume(unsigned char Pvolume_)
 {
     Pvolume = Pvolume_;
-    if (insertion == 0)
+    if (!insertion)
     {
-        outvolume = pow(0.01f, (1.0f - Pvolume / 127.0f)) * 4.0;
-        volume = 1.0;
+        outvolume = pow(0.01f, (1.0f - Pvolume / 127.0f)) * 4.0f;
+        volume = 1.0f;
     }
     else
     {
-        volume = outvolume = Pvolume / 127.0;
-        if (Pvolume == 0.0)
+        volume = outvolume = Pvolume / 127.0f;
+        if (Pvolume == 0.0f)
             cleanup();
     }
 }
@@ -236,7 +230,7 @@ void Reverb::settime(unsigned char Ptime_)
     float t = powf(60.0f, Ptime / 127.0f) - 0.97f;
     float samplerate_f = zynMaster->getSamplerate();
     for (int i = 0; i < REV_COMBS * 2; ++i)
-        combfb[i] = -expf((float)comblen[i] / samplerate_f * logf(0.001) / t);
+        combfb[i] = -expf((float)comblen[i] / samplerate_f * logf(0.001f) / t);
         // the feedback is negative because it removes the DC
 }
 
@@ -247,7 +241,7 @@ void Reverb::setlohidamp(unsigned char Plohidamp_)
     if (Plohidamp == 64)             
     {
         lohidamptype = 0;
-        lohifb = 0.0;
+        lohifb = 0.0f;
     }
     else
     {
@@ -263,39 +257,44 @@ void Reverb::setlohidamp(unsigned char Plohidamp_)
 void Reverb::setidelay(unsigned char Pidelay_)
 {
     Pidelay = Pidelay_;
-    float delay = powf(50.0f * Pidelay / 127.0f, 2.0f) - 1.0;
+    float delay = powf(50.0f * Pidelay / 127.0f, 2.0f) - 1.0f;
 
-    if (idelay != NULL)
-        delete [] idelay;
-    idelay = NULL;
-
-    idelaylen = (int)(zynMaster->getSamplerate() * delay / 1000);
+    if (idelay)
+    {
+       Runtime.dead_floats.push_back(idelay);
+       idelay.reset();
+    }
+    idelaylen = lrintf(zynMaster->getSamplerate() * delay / 1000.0f);
     if (idelaylen > 1)
     {
         idelayk = 0;
-        idelay = new float[idelaylen];
-        memset(idelay, 0, idelaylen * sizeof(float));
+        idelay = boost::shared_array<float>(new float[idelaylen]);
+        memset(idelay.get(), 0, idelaylen * sizeof(float));
     }
 }
 
 void Reverb::setidelayfb(unsigned char Pidelayfb_)
 {
     Pidelayfb = Pidelayfb_;
-    idelayfb = Pidelayfb / 128.0;
+    idelayfb = Pidelayfb / 128.0f;
 }
 
 void Reverb::sethpf(unsigned char Phpf_)
 {
     Phpf = Phpf_;
-    if (Phpf == 0)
+    if (!Phpf)
     {   // No HighPass
-        if (hpf != NULL)
-            delete hpf;
-        hpf = NULL;
-    } else {
-        float fr = expf(powf(Phpf / 127.0f, 0.5f) * logf(10000.0f)) + 20.0;
-        if (hpf == NULL)
-            hpf = new AnalogFilter(3, fr, 1, 0);
+        if (hpf)
+        {
+            Runtime.dead_ptrs.push_back(hpf);
+            hpf.reset();
+        }
+    }
+    else
+    {
+        float fr = expf(powf(Phpf / 127.0f, 0.5f) * logf(10000.0f)) + 20.0f;
+        if (!hpf)
+            hpf = boost::shared_ptr<AnalogFilter>(new AnalogFilter(3, fr, 1, 0));
         else
             hpf->setfreq(fr);
     }
@@ -304,15 +303,17 @@ void Reverb::sethpf(unsigned char Phpf_)
 void Reverb::setlpf(unsigned char Plpf_)
 {
     Plpf = Plpf_;
-    if (Plpf == 127)
-    {   // No LowPass
-        if (lpf != NULL)
-            delete lpf;
-        lpf = NULL;
+    if (Plpf == 127) // No LowPass
+    {
+        if (lpf)
+        {
+            Runtime.dead_ptrs.push_back(lpf);
+            lpf.reset();
+        }
     } else {
-        float fr = expf(powf(Plpf / 127.0f, 0.5f) * logf(25000.0f)) + 40.0;
-        if (lpf == NULL)
-            lpf = new AnalogFilter(2, fr, 1, 0);
+        float fr = expf(powf(Plpf / 127.0f, 0.5f) * logf(25000.0f)) + 40.0f;
+        if (!lpf)
+            lpf = boost::shared_ptr<AnalogFilter>(new AnalogFilter(2, fr, 1, 0));
         else
             lpf->setfreq(fr);
     }
@@ -338,7 +339,7 @@ void Reverb::settype(unsigned char Ptype_)
     for (int i = 0; i < REV_COMBS * 2; ++i)
     {
         if (Ptype == 0)
-            tmp = 800.0 + (int)(zynMaster->numRandom() * 1400.0);
+            tmp = 800.0f + (int)(zynMaster->numRandom() * 1400.0f);
         else
             tmp = combtunings[Ptype][i % REV_COMBS];
         tmp *= roomsize;
@@ -350,30 +351,30 @@ void Reverb::settype(unsigned char Ptype_)
         comblen[i] = (int)tmp;
         combk[i] = 0;
         lpcomb[i] = 0;
-        if (comb[i] != NULL)
-            delete [] comb[i];
-        comb[i] = new float[comblen[i]];
-        memset(comb[i], 0, comblen[i] * sizeof(float));
+        if (comb[i])
+            Runtime.dead_floats.push_back(comb[i]);
+        comb[i].reset(new float[comblen[i]]);
+        memset(comb[i].get(), 0, comblen[i] * sizeof(float));
     }
 
     for (int i = 0; i < REV_APS * 2; ++i)
     {
         if (Ptype == 0)
-            tmp = 500.0 + zynMaster->numRandom() * 500.0;
+            tmp = 500.0f + zynMaster->numRandom() * 500.0;
         else
             tmp = aptunings[Ptype][i % REV_APS];
         tmp *= roomsize;
         if (i > REV_APS)
-            tmp += 23.0;
+            tmp += 23.0f;
         tmp *= samplerate_adjust; // adjust the combs according to the samplerate
         if (tmp < 10)
             tmp = 10;
-        aplen[i] = (int) tmp;
+        aplen[i] = tmp;
         apk[i] = 0;
-        if (ap[i] != NULL)
-            delete [] ap[i];
-        ap[i] = new float[aplen[i]];
-        memset(ap[i], 0, aplen[i] * sizeof(float));
+        if (ap[i])
+            Runtime.dead_floats.push_back(ap[i]);
+        ap[i].reset(new float[aplen[i]]);
+        memset(ap[i].get(), 0, aplen[i] * sizeof(float));
     }
     settime(Ptime);
     cleanup();
@@ -381,10 +382,10 @@ void Reverb::settype(unsigned char Ptype_)
 
 void Reverb::setroomsize(unsigned char Proomsize_)
 {
-    Proomsize = (Proomsize_ == 0) ? 64 : Proomsize_; // older versions consider roomsize=0
-    roomsize = ((float)Proomsize - 64.0) / 64.0;
-    if (roomsize > 0.0)
-        roomsize *= 2.0;
+    Proomsize = (!Proomsize_) ? 64 : Proomsize_; // older versions consider roomsize=0
+    roomsize = ((float)Proomsize - 64.0f) / 64.0f;
+    if (roomsize > 0.0f)
+        roomsize *= 2.0f;
     roomsize = powf(10.0f, roomsize);
     rs = sqrtf(roomsize);
     settype(Ptype);

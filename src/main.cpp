@@ -32,20 +32,22 @@ int main(int argc, char *argv[])
     Runtime.loadCmdArgs(argc, argv);
     if (Runtime.showGui)
     {
-        guiMaster = new MasterUI();
-        if (NULL == guiMaster)
+        Fl::visual(FL_SINGLE);
+        Fl_Tooltip::size(11);
+        fl_open_display();
+        if (!(guiMaster = new MasterUI()))
         {
             Runtime.Log("Failed to instantiate guiMaster");
             goto bail_out;
         }
     }
-    if (NULL == (zynMaster = new Master()))
+    if (!(zynMaster = new Master()))
     {
         Runtime.Log("Failed to allocate Master");
         goto bail_out;
     }
 
-    if (NULL == (musicClient = MusicClient::newMusicClient()))
+    if (!(musicClient = MusicClient::newMusicClient()))
     {
         Runtime.Log("Failed to instantiate MusicClient");
         goto bail_out;
@@ -75,13 +77,14 @@ int main(int argc, char *argv[])
                                   musicClient->getBuffersize());
         while (!Pexitprogram)
         {
-            usleep(16666); // where all the action is ...
+            Runtime.bringOutYerDead();
             Runtime.signalCheck();
+            usleep(10000); // where all the action is ...
         }
         musicClient->Close();
         if (Runtime.showGui)
         {
-            if (NULL != guiMaster)
+            if (guiMaster)
             {
                 delete guiMaster;
                 guiMaster = NULL;
@@ -94,14 +97,16 @@ int main(int argc, char *argv[])
         goto bail_out;
     }
     Runtime.flushLog();
+    Runtime.bringOutYerDead();
     return 0;
 
 bail_out:
     Runtime.Log("Yoshimi stages a strategic retreat :-(");
-    if (NULL != guiMaster)
+    if (guiMaster)
     {
         guiMaster->strategicRetreat();
     }
     Runtime.flushLog();
+    Runtime.bringOutYerDead();
     return 1;
 }

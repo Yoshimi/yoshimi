@@ -24,6 +24,8 @@
 #ifndef CHORUS_H
 #define CHORUS_H
 
+#include <boost/shared_array.hpp>
+
 #include "Effects/Effect.h"
 #include "Effects/EffectLFO.h"
 
@@ -31,7 +33,7 @@ class Chorus : public Effect
 {
     public:
         Chorus(bool insertion_, float *efxoutl_, float *efxoutr_);
-        ~Chorus() { };
+        ~Chorus();
 
         void out(float *smpsl, float *smpsr);
         void setpreset(unsigned char npreset);
@@ -74,8 +76,8 @@ class Chorus : public Effect
         float lfol;
         float lfor;
 
-        float *delayl;
-        float *delayr;
+        boost::shared_array<float> delayL;
+        boost::shared_array<float> delayR;
         int maxdelay;
         int dlk;
         int drk;

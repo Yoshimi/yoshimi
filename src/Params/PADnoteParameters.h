@@ -154,6 +154,10 @@ class PADnoteParameters : public Presets
             float *smp;
         } sample[PAD_MAX_SAMPLES], newsample;
 
+        boost::object_pool<Envelope> *envPool;
+        boost::object_pool<LFO> *lfoPool;
+        boost::pool<> *buffPool;
+
     private:
         void generatespectrum_bandwidthMode(float *spectrum, int size,
                                             float basefreq,
@@ -168,7 +172,7 @@ class PADnoteParameters : public Presets
         void deletesample(int n);
 
         FFTwrapper *fft;
-        pthread_mutex_t *mutex;
+        //pthread_mutex_t *mutex;
 };
 
 #endif

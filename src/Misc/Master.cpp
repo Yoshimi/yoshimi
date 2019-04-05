@@ -22,8 +22,6 @@
     This file is a derivative of the ZynAddSubFX original, modified January 2010
 */
 
-//#include <iostream>
-
 using namespace std;
 
 #include "GuiThreadUI.h"
@@ -122,15 +120,6 @@ bool Master::Init(void)
         goto bail_out;
     }
 
-    if (Runtime.restoreState)
-    {
-        if (NULL == (stateXMLtree = Runtime.RestoreRuntimeState()))
-        {
-            Runtime.Log("Restore runtime state failed");
-            goto bail_out;
-        }
-    }
-
     tmpmixl = new float[buffersize];
     tmpmixr = new float[buffersize];
     if (tmpmixl == NULL || tmpmixr == NULL)
@@ -174,23 +163,24 @@ bool Master::Init(void)
     }
     defaults();
 
-    if (Runtime.restoreState)
+    if (Runtime.doRestoreState && !Runtime.restoreState(this))
     {
-        if (!getfromXML(stateXMLtree))
-        {
-            delete stateXMLtree;
-            goto bail_out;
-        }
-        delete stateXMLtree;
+        Runtime.Log("Restore state failed");
+        goto bail_out;
+    }
+    else if (Runtime.doRestoreJackSession && !Runtime.restoreJackSession(this))
+    {
+        Runtime.Log("Restore jack session failed");
+        goto bail_out;
     }
     else
     {
         if (Runtime.paramsLoad.size())
         {
-            if (zynMaster->loadXML(Runtime.paramsLoad) >= 0)
+            if (loadXML(Runtime.paramsLoad) >= 0)
             {
-                zynMaster->applyparameters();
-                Runtime.paramsLoad = Runtime.AddParamHistory(Runtime.paramsLoad);
+                applyparameters();
+                Runtime.paramsLoad = Runtime.addParamHistory(Runtime.paramsLoad);
                 Runtime.Log("Loaded " + Runtime.paramsLoad + " parameters");
             }
             else
@@ -202,14 +192,16 @@ bool Master::Init(void)
         if (!Runtime.instrumentLoad.empty())
         {
             int loadtopart = 0;
-            if (!zynMaster->part[loadtopart]->loadXMLinstrument(Runtime.instrumentLoad))
+            if (!part[loadtopart]->loadXMLinstrument(Runtime.instrumentLoad))
             {
                 Runtime.Log("Failed to load instrument file " + Runtime.instrumentLoad);
                 goto bail_out;
             }
             else
             {
-                zynMaster->part[loadtopart]->applyparameters(true);
+                actionLock(lockmute);
+                part[loadtopart]->applyparameters(true);
+                actionLock(unlock);
                 Runtime.Log("Instrument file " + Runtime.instrumentLoad + " loaded");
             }
         }
@@ -217,30 +209,30 @@ bool Master::Init(void)
     return true;
 
 bail_out:
-    if (fft != NULL)
+    if (fft)
         delete fft;
     fft = NULL;
-    if (tmpmixl != NULL)
+    if (tmpmixl)
         delete tmpmixl;
     tmpmixl = NULL;
-    if (tmpmixr != NULL)
+    if (tmpmixr)
         delete tmpmixr;
     tmpmixr = NULL;
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
-        if (NULL != part[npart])
+        if (part[npart])
             delete part[npart];
         part[npart] = NULL;
     }
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
     {
-        if (NULL != insefx[nefx])
+        if (insefx[nefx])
             delete insefx[nefx];
         insefx[nefx] = NULL;
     }
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
     {
-        if (NULL != sysefx[nefx])
+        if (sysefx[nefx])
             delete sysefx[nefx];
         sysefx[nefx] = NULL;
     }
@@ -299,9 +291,9 @@ void Master::NoteOn(unsigned char chan, unsigned char note,
                 fakepeakpart[npart] = velocity * 2;
                 if (part[npart]->Penabled)
                 {
-                    zynMaster->actionLock(lock);
+                    actionLock(lock);
                     part[npart]->NoteOn(note, velocity, keyshift);
-                    zynMaster->actionLock(unlock);
+                    actionLock(unlock);
                 }
             }
         }
@@ -316,9 +308,9 @@ void Master::NoteOff(unsigned char chan, unsigned char note)
     {
         if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
         {
-            zynMaster->actionLock(lock);
+            actionLock(lock);
             part[npart]->NoteOff(note);
-            zynMaster->actionLock(unlock);
+            actionLock(unlock);
         }
     }
 }
@@ -548,12 +540,12 @@ void Master::MasterAudio(jsample_t *outl, jsample_t *outr)
 
     LFOParams::time++; // update the LFO's time
 
-    zynMaster->vupeakLock(lock);
+    vupeakLock(lock);
     vuoutpeakl = 1e-12;
     vuoutpeakr = 1e-12;
     vurmspeakl = 1e-12;
     vurmspeakr = 1e-12;
-    zynMaster->vupeakLock(unlock);
+    vupeakLock(unlock);
 
     float absval;
     for (int idx = 0; idx < buffersize; ++idx)
@@ -600,7 +592,7 @@ void Master::MasterAudio(jsample_t *outl, jsample_t *outr)
     if (shutup)
         ShutUp();
 
-    zynMaster->vupeakLock(lock);
+    vupeakLock(lock);
     if (vumaxoutpeakl < vuoutpeakl)  vumaxoutpeakl = vuoutpeakl;
     if (vumaxoutpeakr < vuoutpeakr)  vumaxoutpeakr = vuoutpeakr;
 
@@ -634,7 +626,7 @@ void Master::MasterAudio(jsample_t *outl, jsample_t *outr)
     vuRmsPeakR =    vurmspeakr;
     vuClippedL =    clippedL;
     vuClippedR =    clippedR;
-    zynMaster->vupeakLock(unlock);
+    vupeakLock(unlock);
 }
 
 
@@ -738,7 +730,7 @@ bool Master::vupeakLock(lockset request)
 // Reset peaks and clear the "clipped" flag (for VU-meter)
 void Master::vuresetpeaks(void)
 {
-    zynMaster->vupeakLock(lock);
+    vupeakLock(lock);
     vuOutPeakL = vuoutpeakl = 1e-12;
     vuOutPeakR = vuoutpeakr =  1e-12;
     vuMaxOutPeakL = vumaxoutpeakl = 1e-12;
@@ -746,7 +738,7 @@ void Master::vuresetpeaks(void)
     vuRmsPeakL = vurmspeakl = 1e-12;
     vuRmsPeakR = vurmspeakr = 1e-12;
     vuClippedL = vuClippedL = clippedL = clippedR = false;
-    zynMaster->vupeakLock(unlock);
+    vupeakLock(unlock);
 }
 
 
@@ -864,7 +856,7 @@ bool Master::saveXML(string filename)
 bool Master::loadXML(string filename)
 {
     XMLwrapper *xml = new XMLwrapper();
-    if (NULL == xml)
+    if (!xml)
     {
         Runtime.Log("failed to init xml tree");
         return false;

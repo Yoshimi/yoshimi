@@ -24,15 +24,23 @@
 #ifndef AD_NOTE_PARAMETERS_H
 #define AD_NOTE_PARAMETERS_H
 
+#include <boost/pool/object_pool.hpp>
+#include <boost/pool/pool.hpp>
+
 #include "Params/EnvelopeParams.h"
 #include "Params/LFOParams.h"
 #include "Params/FilterParams.h"
+#include "Synth/Envelope.h"
+#include "Synth/LFO.h"
 #include "Synth/OscilGen.h"
 #include "Synth/Resonance.h"
+#include "DSP/Filter.h"
 #include "Misc/Util.h"
 #include "Misc/XMLwrapper.h"
 #include "DSP/FFTwrapper.h"
 #include "Params/Presets.h"
+
+#define OSCIL_SMP_EXTRA_SAMPLES 5
 
 enum FMTYPE {
     NONE, MORPH, RING_MOD, PHASE_MOD, FREQ_MOD, PITCH_MOD
@@ -219,6 +227,11 @@ class ADnoteParameters : public Presets
         void getfromXML(XMLwrapper *xml);
 
         float getBandwidthDetuneMultiplier();
+        boost::object_pool<Envelope> *envelopePool;
+        boost::object_pool<LFO> *lfoPool;
+        //boost::object_pool<Filter> *filterPool;
+        boost::pool<> *smpPool;
+        boost::pool<> *buffPool;
 
     private:
         void defaults(int nvoice);

@@ -27,10 +27,11 @@
 #include "Misc/Master.h"
 #include "Params/PADnoteParameters.h"
 
-PADnoteParameters::PADnoteParameters(FFTwrapper *fft_) : Presets()
+PADnoteParameters::PADnoteParameters(FFTwrapper *fft_) :
+    Presets(),
+    fft(fft_)    
 {
     setpresettype("Ppadsyth");
-    fft = fft_;
 
     resonance = new Resonance();
     oscilgen = new OscilGen(fft_, resonance);
@@ -52,6 +53,10 @@ PADnoteParameters::PADnoteParameters(FFTwrapper *fft_) : Presets()
     for (int i = 0; i < PAD_MAX_SAMPLES; ++i)
         sample[i].smp = NULL;
     newsample.smp = NULL;
+
+    envPool = new boost::object_pool<Envelope>();
+    lfoPool = new boost::object_pool<LFO>();
+    buffPool = new boost::pool<>(Runtime.Buffersize * sizeof(float));
     defaults();
 }
 

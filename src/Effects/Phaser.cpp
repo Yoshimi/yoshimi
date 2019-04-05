@@ -28,7 +28,7 @@
 #define PHASER_LFO_SHAPE 2
 
 Phaser::Phaser(bool insertion_, float *efxoutl_, float *efxoutr_) :
-    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
+    Effect(insertion_, efxoutl_, efxoutr_),
     oldl(NULL),
     oldr(NULL)
 {
@@ -39,10 +39,10 @@ Phaser::Phaser(bool insertion_, float *efxoutl_, float *efxoutr_) :
 
 Phaser::~Phaser()
 {
-    if (oldl != NULL)
-        delete [] oldl;
-    if (oldr != NULL)
-        delete [] oldr;
+    if (oldl)
+        Runtime.dead_floats.push_back(oldl);
+    if (oldr)
+        Runtime.dead_floats.push_back(oldr);
 }
 
 
@@ -56,24 +56,24 @@ void Phaser::out(float *smpsl, float *smpsr)
     lgain = lfol;
     rgain = lfor;
     lgain = (expf(lgain * PHASER_LFO_SHAPE) - 1)
-            / (expf(PHASER_LFO_SHAPE) - 1.0);
+            / (expf(PHASER_LFO_SHAPE) - 1.0f);
     rgain = (expf(rgain * PHASER_LFO_SHAPE) - 1)
-            / (expf(PHASER_LFO_SHAPE) - 1.0);
+            / (expf(PHASER_LFO_SHAPE) - 1.0f);
 
-    lgain = 1.0 - phase * (1.0 - depth) - (1.0 - phase) * lgain * depth;
-    lgain = (lgain > 1.0) ? 1.0 : lgain;
-    rgain = 1.0 - phase * (1.0 - depth) - (1.0 - phase) * rgain * depth;
-    rgain = (rgain > 1.0) ? 1.0 : rgain;
+    lgain = 1.0f - phase * (1.0f - depth) - (1.0f - phase) * lgain * depth;
+    lgain = (lgain > 1.0f) ? 1.0f : lgain;
+    rgain = 1.0f - phase * (1.0f - depth) - (1.0f - phase) * rgain * depth;
+    rgain = (rgain > 1.0f) ? 1.0f : rgain;
 
     int buffersize = zynMaster->getBuffersize();
     float bufsize_f = buffersize;
     for (int i = 0; i < buffersize; ++i)
     {
         float x = (float)i / bufsize_f;
-        float x1 = 1.0 - x;
+        float x1 = 1.0f - x;
         float gl = lgain * x + oldlgain * x1;
         float gr = rgain * x + oldrgain * x1;
-        float inl = smpsl[i] * (1.0 - panning) + fbl;
+        float inl = smpsl[i] * (1.0f - panning) + fbl;
         float inr = smpsr[i] * panning + fbr;
 
         // Phasing routine
@@ -92,8 +92,8 @@ void Phaser::out(float *smpsl, float *smpsr)
         // Left/Right crossing
         float l = inl;
         float r = inr;
-        inl = l * (1.0 - lrcross) + r * lrcross;
-        inr = r * (1.0 - lrcross) + l * lrcross;
+        inl = l * (1.0f - lrcross) + r * lrcross;
+        inr = r * (1.0f - lrcross) + l * lrcross;
         fbl = inl * fb;
         fbr = inr * fb;
         efxoutl[i] = inl;
@@ -104,8 +104,8 @@ void Phaser::out(float *smpsl, float *smpsr)
     if (Poutsub)
         for (int i = 0; i < buffersize; ++i)
         {
-            efxoutl[i] *= -1.0;
-            efxoutr[i] *= -1.0;
+            efxoutl[i] *= -1.0f;
+            efxoutr[i] *= -1.0f;
         }
 }
 
@@ -113,9 +113,11 @@ void Phaser::out(float *smpsl, float *smpsr)
 // Cleanup the effect
 void Phaser::cleanup(void)
 {
-    fbl = fbr = oldlgain = oldrgain = 0.0;
-    for (int i = 0; i < Pstages * 2; ++i)
-        oldl[i] = oldr[i] = 0.0;
+    fbl = fbr = oldlgain = oldrgain = 0.0f;
+    //for (int i = 0; i < Pstages * 2; ++i)
+    //    oldl[i] = oldr[i] = 0.0f;
+    memset(oldl.get(), 0, Pstages * 2 * sizeof(float));
+    memset(oldr.get(), 0, Pstages * 2 * sizeof(float));
 }
 
 
@@ -123,47 +125,47 @@ void Phaser::cleanup(void)
 void Phaser::setdepth(unsigned char Pdepth_)
 {
     Pdepth = Pdepth_;
-    depth = Pdepth / 127.0;
+    depth = Pdepth / 127.0f;
 }
 
 
 void Phaser::setfb(unsigned char Pfb_)
 {
     Pfb = Pfb_;
-    fb = (Pfb - 64.0) / 64.1;
+    fb = (Pfb - 64.0f) / 64.1f;
 }
 
 
 void Phaser::setvolume(unsigned char Pvolume_)
 {
     Pvolume = Pvolume_;
-    outvolume = Pvolume / 127.0;
-    volume = (!insertion) ? 1.0 : outvolume;
+    outvolume = Pvolume / 127.0f;
+    volume = (!insertion) ? 1.0f : outvolume;
 }
 
 
 void Phaser::setpanning(unsigned char Ppanning_)
 {
     Ppanning = Ppanning_;
-    panning = Ppanning / 127.0;
+    panning = Ppanning / 127.0f;
 }
 
 void Phaser::setlrcross(unsigned char Plrcross_)
 {
     Plrcross = Plrcross_;
-    lrcross = Plrcross / 127.0;
+    lrcross = Plrcross / 127.0f;
 }
 
 
 void Phaser::setstages(unsigned char Pstages_)
 {
-    if (oldl != NULL)
-        delete [] oldl;
-    if (oldr != NULL)
-        delete [] oldr;
+    if (oldl)
+        Runtime.dead_floats.push_back(oldl);
+    if (oldr)
+        Runtime.dead_floats.push_back(oldr);
     Pstages = (Pstages_ >= MAX_PHASER_STAGES) ? MAX_PHASER_STAGES - 1 : Pstages_;
-    oldl = new float[Pstages * 2];
-    oldr = new float[Pstages * 2];
+    oldl.reset(new float[Pstages * 2]);
+    oldr.reset(new float[Pstages * 2]);
     cleanup();
 }
 

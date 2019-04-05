@@ -47,8 +47,6 @@ class Master {
         ~Master();
         bool Init(void);
         bool actionLock(lockset request);
-        inline void Mute(void) { muted = true; };
-        inline void unMute(void) { muted = false; };
         bool vupeakLock(lockset request);
 
         bool saveXML(string filename);

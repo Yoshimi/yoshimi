@@ -24,6 +24,9 @@
 #ifndef EFFECTMGR_H
 #define EFFECTMGR_H
 
+#include <boost/shared_array.hpp>
+#include <boost/shared_ptr.hpp>
+
 #include "Effects/Effect.h"
 #include "Effects/Reverb.h"
 #include "Effects/Echo.h"
@@ -64,7 +67,8 @@ class EffectMgr : public Presets
         void seteffectpar_nolock(int npar, unsigned char value);
         unsigned char geteffectpar(int npar);
 
-        float *efxoutl, *efxoutr;
+        boost::shared_array<float> efxoutl;
+        boost::shared_array<float> efxoutr;
         bool insertion; // the effect is connected as insertion effect (or not)
 
         // used by UI

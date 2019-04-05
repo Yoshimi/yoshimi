@@ -28,6 +28,9 @@
 #include <cstring>
 #include <deque>
 #include <list>
+#include <vector>
+#include <boost/shared_ptr.hpp>
+#include <boost/shared_array.hpp>
 
 using namespace std;
 
@@ -36,6 +39,11 @@ using namespace std;
 #include "Misc/HistoryListItem.h"
 
 #define MAX_BANK_ROOT_DIRS 100
+
+class Config;
+class Master;
+
+extern Config Runtime;
 
 class Config
 {
@@ -49,26 +57,36 @@ class Config
         void Usage(void);
         void clearBankrootDirlist(void);
         void clearPresetsDirlist(void);
-        void SaveConfig(void);
-        void SaveState(void);
-        XMLwrapper *RestoreRuntimeState(void);
-        string AddParamHistory(string file);
-        string HistoryFilename(int index);
+        void saveConfig(void);
+        void saveState(void);
+        bool restoreState(Master *synth);
+        bool restoreJackSession(Master *synth);
+
+        string addParamHistory(string file);
+        string historyFilename(int index);
 
         static void sigHandler(int sig);
         void setInterruptActive(int sig);
         void setLadi1Active(int sig);
         void signalCheck(void);
 
+        void setJackSessionDetail(const char *session_dir, const char *client_uuid);
+        void saveJackSession(void);
+        void setJackSessionSave(void);
+        void setJackSessionSaveAndQuit(void);
+        void setJackSessionSaveTemplate(void);
+
+
         void Log(string msg);
         void flushLog(void);
 
         string        ConfigFile;
-        bool          restoreState;
         string        StateFile;
         string        CurrentXMZ;
         string        paramsLoad;
         string        instrumentLoad;
+        bool          doRestoreState;
+        bool          doRestoreJackSession;
 
         unsigned int  Samplerate;
         unsigned int  Buffersize;
@@ -78,50 +96,66 @@ class Config
         bool          showConsole;
         int           VirKeybLayout;
 
-        audio_drivers audioEngine;
-        string        alsaAudioDevice;
-        string        jackServer;
-        bool          startJack;  // default false
-        bool          connectJackaudio; // default false
         string        audioDevice;
-
-        midi_drivers  midiEngine;
-        string        alsaMidiDevice;
+        audio_drivers audioEngine;
         string        midiDevice;
+        midi_drivers  midiEngine;
         string        nameTag;
+
+        string        jackServer;
+        bool          startJack;        // default false
+        bool          connectJackaudio; // default false
+        string        baseCmdLine;      // for jack session
+        string        jacksessionDir;
+        string        jacksessionUuid;
+
+        string        alsaMidiDevice;
+        string        alsaAudioDevice;
 
         bool          Float32bitWavs;
         string        DefaultRecordDirectory;
         string        CurrentRecordDirectory;
 
-        int           BankUIAutoClose;
         int           Interpolation;
+        int           CheckPADsynth;
+        int           BankUIAutoClose;
         string        bankRootDirlist[MAX_BANK_ROOT_DIRS];
         string        currentBankDir;
         string        presetsDirlist[MAX_BANK_ROOT_DIRS];
-        int           CheckPADsynth;
 
         deque<HistoryListItem> ParamsHistory;
         deque<HistoryListItem>::iterator itx;
         static const unsigned short MaxParamsHistory;
         list<string> LogList;
+        vector <boost::shared_ptr<void> > dead_ptrs;
+        vector <boost::shared_array<float> > dead_floats;
+        void bringOutYerDead(void);
 
     private:
         bool loadConfig(void);
-        bool loadConfigData(XMLwrapper *xml);
-        bool loadRuntimeData(XMLwrapper *xml);
+        bool extractConfigData(XMLwrapper *xml);
+        bool extractRuntimeData(XMLwrapper *xml);
         void addConfigXML(XMLwrapper *xml);
         void addRuntimeXML(XMLwrapper *xml);
+        void saveSessionData(string tag, string savefile);
+        bool restoreSessionData(Master *synth, string sessionfile);
         int SSEcapability(void);
         void AntiDenormals(bool set_daz_ftz);
+        void saveJackSessionTemplate() { };
 
-        static unsigned short nextHistoryIndex;
+        string homeDir;
+        string yoshimiHome;
+
         static struct sigaction sigAction;
         static int sigIntActive;
         static int ladi1IntActive;
         int sse_level;
-};
 
-extern Config Runtime;
+        static unsigned short nextHistoryIndex;
+
+        static int jsessionSave;
+        static int jsessionSaveAndQuit;
+        static int jsessionSaveTemplate;
+};
 
 #endif

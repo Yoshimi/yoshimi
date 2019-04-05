@@ -21,6 +21,8 @@
     This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
+#include <boost/shared_array.hpp>
+
 #include "Misc/Util.h"
 #include "Misc/Master.h"
 #include "DSP/AnalogFilter.h"
@@ -404,28 +406,28 @@ void AnalogFilter::singlefilterout(float *smp, fstage &x, fstage &y,
 }
 void AnalogFilter::filterout(float *smp)
 {
-    float *ismp = NULL;      // used if it needs interpolation
-    if (needsinterpolation != 0)
+    boost::shared_array<float> ismp; // used if it needs interpolation
+    if (needsinterpolation)
     {
-        ismp = new float[buffersize];
+        ismp = boost::shared_array<float>(new float[buffersize]);
         //for (int i = 0; i < buffersize; ++i)
         //    ismp[i] = smp[i];
-        memcpy(ismp, smp, buffersize * sizeof(float));
+        memcpy(ismp.get(), smp, buffersize * sizeof(float));
         for (int i = 0; i < stages + 1; ++i)
-            singlefilterout(ismp, oldx[i], oldy[i], oldc, oldd);
+            singlefilterout(ismp.get(), oldx[i], oldy[i], oldc, oldd);
     }
 
     for (int i = 0; i < stages + 1; ++i)
         singlefilterout(smp, x[i], y[i], c, d);
 
-    if (needsinterpolation != 0)
+    if (needsinterpolation)
     {
         for (int i = 0; i < buffersize; ++i)
         {
             float x = (float)i / (float)buffersize;
             smp[i] = ismp[i] * (1.0 - x) + smp[i] * x;
         }
-        delete [] ismp;
+        Runtime.dead_floats.push_back(ismp);
         needsinterpolation = 0;
     }
 

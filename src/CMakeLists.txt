@@ -20,7 +20,7 @@ project(Yoshimi)
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(VERSION 2.6)
 cmake_policy(SET CMP0004 OLD)
-set(YOSHIMI_VERSION "0.058.1")
+set(YOSHIMI_VERSION "0.059-rc1")
 file(WRITE version.txt "${YOSHIMI_VERSION}")
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -30,106 +30,37 @@ set(CMAKE_SKIP_RULE_DEPENDENCY OFF)
     # Rebuild objects if rules have changed, even if source hasn't.
 
 # User options
-set(DEFAULT_AUDIO jack CACHE STRING "Default audio driver - alsa or jack")
-set(DEFAULT_MIDI jack CACHE STRING "Default midi driver - alsa or jack")
-option(BUILD_X86_64 "Build for x86_64 system" OFF)
-option(USE_ASM_F21 "Use assembler FLOAT to INT conversions" ON)
-option(DEBUG_BUILD "Include gdb debug support" OFF)
-set(YOSHI_FIFO_DIR /dev/shm CACHE STRING "Directory for fifos")
+set(DefaultAudio jack CACHE STRING "Default audio driver - alsa or jack")
+set(DefaultMidi jack CACHE STRING "Default midi driver - alsa or jack")
+option(JackSessionSupport "Jack session support - requires jack>=0.118.3" OFF)
+option (BuildFor64bitAmd "Build for AMD x86_64 system" ON)
+option (BuildFor64bitCore2 "Build for Core2 x86_64 system" OFF)
+option (BuildForDebug "Include gdb debugging support" OFF)
 
-set(BUILD_X86_64_OPTS
-    # "-march=native
+option(UseAsmFloat2Int "Use assembler FLOAT to INT conversions" ON)
+set(FifoDirectory /dev/shm CACHE STRING "Directory for fifos")
+
+set(BuildOptions64bitAmd
     "-O3 -march=athlon64 -m64 -Wall -ffast-math -fno-finite-math-only -fomit-frame-pointer"
-    CACHE STRING "X86_64 complier options"
+    CACHE STRING "AMD X86_64 complier options"
 )
-set(BUILD_OPTS
-    "-O3 -march=native -msse -msse2 -mfpmath=sse -ffast-math -fomit-frame-pointer"
+
+set (BuildOptions64bitCore2
+    "-O3 -march=core2 -m64 -Wall -ffast-math -fno-finite-math-only -fomit-frame-pointer"
+  CACHE STRING "Intel Core2 X86_64 compiler options"
+)
+
+set(BuildOptions32bit
+    "-O3 -march=pentium4 -m32 -msse -msse2 -mfpmath=sse -ffast-math -fomit-frame-pointer"
     CACHE STRING "X86 complier options"
 )
 
-set(BUILD_DEBUG_OPTS "-O0 -g3 -ggdb -Wall -Wpointer-arith"
-    CACHE STRING "Debug build flags")
-
-# Zyn parameters
-set(ZynMaxAdHarmonics 128 CACHE STRING
-    "number of harmonics of additive synth - must be less than half Oscilsize" FORCE)
-add_definitions(-DMAX_AD_HARMONICS=${ZynMaxAdHarmonics})
-
-set(ZynMaxSubHarmonics 64 CACHE STRING "number of harmonics of substractive" FORCE)
-add_definitions(-DMAX_SUB_HARMONICS=${ZynMaxSubHarmonics})
-
-set(ZynMaxPadSamples 64 CACHE STRING "maximum samples per PADsynth instrument (or item)" FORCE)
-add_definitions(-DPAD_MAX_SAMPLES=${ZynMaxPadSamples})
-
-set(ZynMidiParts 16 CACHE STRING "maximum number of midi parts" FORCE)
-add_definitions(-DNUM_MIDI_PARTS=${ZynMidiParts})
-
-set(ZynMidiChannels 16 CACHE STRING "maximum number of midi channels" FORCE)
-add_definitions(-DNUM_MIDI_CHANNELS=${ZynMidiChannels})
-
-set(ZynNumVoices 8 CACHE STRING "number of voices of additive synth for a single note" FORCE)
-add_definitions(-DNUM_VOICES=${ZynNumVoices})
-
-set(ZynPoliphony 60 CACHE STRING "The poliphony (notes)" FORCE)
-add_definitions(-DPOLIPHONY=${ZynPoliphony})
-
-set(ZynNumSysEfx 4 CACHE STRING "Number of system effects" FORCE)
-add_definitions(-DNUM_SYS_EFX=${ZynNumSysEfx})
-
-set(ZynNumInsertionEfx 8 CACHE STRING "Number of insertion effects" FORCE)
-add_definitions(-DNUM_INS_EFX=${ZynNumInsertionEfx})
-
-set(ZynNumPartEfx 3 CACHE STRING "Number of part effects" FORCE)
-add_definitions(-DNUM_PART_EFX=${ZynNumPartEfx})
-
-set(ZynNumKitItems 16 CACHE STRING "Maximum number of instruments per part" FORCE)
-add_definitions(-DNUM_KIT_ITEMS=${ZynNumKitItems})
-
-set(ZynVelocityMaxScale 8.0 CACHE STRING "How is applied the velocity sensing" FORCE)
-add_definitions(-DVELOCITY_MAX_SCALE=${ZynVelocityMaxScale})
-
-set(ZynMaxEqBands 8 CACHE STRING "maximum number of bands of the equaliser" FORCE)
-if (${ZynMaxEqBands} GREATER 19)
-    message(FATAL_ERROR "ZynMaxEqBands too high, must be less than 20")
-endif (${ZynMaxEqBands} GREATER 19)
-add_definitions(-DMAX_EQ_BANDS=${ZynMaxEqBands})
-
-set(ZynMaxFilterStages 5 CACHE STRING "Maximum filter stages" FORCE)
-add_definitions(-DMAX_FILTER_STAGES=${ZynMaxFilterStages})
-
-set(ZynMaxVowels 6 CACHE STRING "Maximum formant filter vowels" FORCE)
-add_definitions(-DFF_MAX_VOWELS=${ZynMaxVowels})
-
-set(ZynMaxFormants 12 CACHE STRING "Maximum formant filter formants" FORCE)
-add_definitions(-DFF_MAX_FORMANTS=${ZynMaxFormants})
-
-set(ZynMaxSequence 8 CACHE STRING "Maximum formant filter sequence" FORCE)
-add_definitions(-DFF_MAX_SEQUENCE=${ZynMaxSequence})
-add_definitions(-DPI=3.1415926536f -DLOG_2=0.693147181f)
-
+set(BuildOptionsDebug "-O0 -g3 -ggdb -Wall -Wpointer-arith" CACHE STRING "Debug build flags")
 
 mark_as_advanced(EXECUTABLE_OUTPUT_PATH)
 mark_as_advanced(LIBRARY_OUTPUT_PATH)
 mark_as_advanced(CMAKE_BUILD_TYPE)
 mark_as_advanced(CMAKE_INSTALL_PREFIX)
-
-set(PRELUDE "Building Yoshimi version ${YOSHIMI_VERSION} for ${CMAKE_SYSTEM_NAME}")
-
-if(DEBUG_BUILD)
-    set(CMAKE_BUILD_TYPE "Debug")
-    set(CMAKE_CXX_FLAGS_DEBUG ${BUILD_DEBUG_OPTS})
-    message(STATUS "${PRELUDE} with gdb debug information")
-    message(STATUS "Debug build flags: ${CMAKE_CXX_FLAGS_DEBUG}")
-else(DEBUG_BUILD)
-    set(CMAKE_BUILD_TYPE "Release")
-    if(BUILD_X86_64)
-        set(CMAKE_CXX_FLAGS_RELEASE ${BUILD_X86_64_OPTS})
-    else(BUILD_X86_64)
-        set(CMAKE_CXX_FLAGS_RELEASE ${BUILD_OPTS})
-    endif(BUILD_X86_64)
-    message(STATUS "${PRELUDE} without debug information")
-    message(STATUS "Build flags: ${CMAKE_CXX_FLAGS_RELEASE}")
-endif(DEBUG_BUILD)
 
 # library dependency checks
 # PKG-CONFIG
@@ -158,6 +89,70 @@ if(HAS_LIBZ)
 else(HAS_LIBZ)
     message(FATAL_ERROR "libz required but not found: ${HAS_LIBZ}")
 endif(HAS_LIBZ)
+
+# fftw3
+pkg_check_modules(FFTW3 REQUIRED fftw3>=0.22)
+if(FFTW3_FOUND)
+    set(FFTW3_LIBRARIES "${FFTW3_LIBRARIES};fftw3_threads;pthread")
+    message(STATUS "Found fftw3 ${FFTW3_VERSION}")
+else(FFTW3_FOUND)
+    message(FATAL_ERROR "fftw3 >=0.22 required but not found")
+endif(FFTW3_FOUND)
+
+# mxml
+pkg_check_modules(MXML REQUIRED mxml>=2.5)
+if(MXML_FOUND)
+    message(STATUS "Found mxml ${MXML_VERSION}")
+else(MXML_FOUND)
+    message(FATAL_ERROR "mxml >=2.5 required but not found")
+endif(MXML_FOUND)
+
+# Alsa
+pkg_check_modules(ALSA REQUIRED alsa>=1.0.17)
+if(ALSA_FOUND)
+    message(STATUS "Found Alsa ${ALSA_VERSION}")
+else(ALSA_FOUND)
+    message(FATAL_ERROR "Alsa >=1.0.17 required but not found")
+endif(ALSA_FOUND)
+
+# Jack
+if (JackSessionSupport)
+  pkg_check_modules(JACK REQUIRED jack>=0.118.3)
+else (JackSessionSupport)
+  pkg_check_modules(JACK REQUIRED jack>=0.115.6)
+endif(JackSessionSupport)
+
+if(JACK_FOUND)
+  message(STATUS "Found jack ${JACK_VERSION}")
+  if (JackSessionSupport)
+    check_c_source_compiles(
+      "#include <jack/session.h>
+     int main(int argc, char **argv) { return 0; }" HasJackSession)
+     if (HasJackSession)
+       message(STATUS "Found jack ${JACK_VERSION}, with Jack Session support")
+       add_definitions(-DJACK_SESSION)
+     else (HasJackSession)
+       message(FATAL_ERROR "Jack Session support requested, but <jack/session.h> not found!\nYou'll need jack1 >=0.118.3 or git tschack to play")
+     endif (HasJackSession)
+  else (JackSessionSupport)
+    message(STATUS "Found jack ${JACK_VERSION}")
+  endif (JackSessionSupport)
+else(JACK_FOUND)
+  if (JackSessionSupport)
+    message(FATAL_ERROR "The required jack >=0.118.3 with session support was not found.")
+  else (JackSessionSupport)
+    message(FATAL_ERROR "Jack >=0.115.6 required but not found")
+  endif (JackSessionSupport)
+endif(JACK_FOUND)
+
+# boost
+#find_package (Boost REQUIRED COMPONENTS regex )
+find_package (Boost REQUIRED)
+if (Boost_FOUND)
+  message (STATUS "Found boost version ${Boost_VERSION}")
+else (Boost_FOUND)
+  message (FATAL_ERROR "boost headers required, but not found")
+endif(Boost_FOUND)
 
 # fontconfig
 pkg_check_modules(FONTCONFIG REQUIRED fontconfig>=0.22)
@@ -193,39 +188,6 @@ set(YOSHI_INCLUDES ${FLTK_INCLUDE_DIR})
 set(YOSHI_SOURCES ${yoshimi_FLTK_UI_SRCS})
 set(YOSHI_LIBRARIES ${YOSHI_LIBRARIES} ${FLTK_LIBRARIES})
 
-# fftw3
-pkg_check_modules(FFTW3 REQUIRED fftw3>=0.22)
-if(FFTW3_FOUND)
-    set(FFTW3_LIBRARIES "${FFTW3_LIBRARIES};fftw3_threads;pthread")
-    message(STATUS "Found fftw3 ${FFTW3_VERSION}")
-else(FFTW3_FOUND)
-    message(FATAL_ERROR "fftw3 >=0.22 required but not found")
-endif(FFTW3_FOUND)
-
-# mxml
-pkg_check_modules(MXML REQUIRED mxml>=2.5)
-if(MXML_FOUND)
-    message(STATUS "Found mxml ${MXML_VERSION}")
-else(MXML_FOUND)
-    message(FATAL_ERROR "mxml >=2.5 required but not found")
-endif(MXML_FOUND)
-
-# Alsa
-pkg_check_modules(ALSA REQUIRED alsa>=1.0.17)
-if(ALSA_FOUND)
-    message(STATUS "Found Alsa ${ALSA_VERSION}")
-else(ALSA_FOUND)
-    message(FATAL_ERROR "Alsa >=1.0.17 required but not found")
-endif(ALSA_FOUND)
-
-# Jack
-pkg_check_modules(JACK REQUIRED jack>=0.115.6)
-if(JACK_FOUND)
-    message(STATUS "Found jack ${JACK_VERSION}")
-else(JACK_FOUND)
-    message(FATAL_ERROR "Jack >=0.115.6 required but not found")
-endif(JACK_FOUND)
-
 # libsndfile
 pkg_check_modules(LIBSNDFILE REQUIRED sndfile)
 if(LIBSNDFILE_FOUND)
@@ -233,6 +195,26 @@ if(LIBSNDFILE_FOUND)
 else(LIBSNDFILE_FOUND)
     message(FATAL_ERROR "libsndfile required but not found")
 endif(LIBSNDFILE_FOUND)
+
+set(PRELUDE "Building Yoshimi version ${YOSHIMI_VERSION} for ${CMAKE_SYSTEM_NAME}")
+
+if (BuildForDebug)
+  set (CMAKE_BUILD_TYPE "Debug")
+  set (CMAKE_CXX_FLAGS_DEBUG ${BuildOptionsDebug})
+  message (STATUS "Building for ${CMAKE_BUILD_TYPE}, flags: ${CMAKE_CXX_FLAGS_DEBUG}")
+else (BuildForDebug)
+  set (CMAKE_BUILD_TYPE "Release")
+  if (BuildFor64bitAmd)
+    set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions64bitAmd})
+  else (BuildFor64bitAmd)
+    if (BuildFor64bitCore2)
+      set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions64bitCore2})
+    else (BuildFor64bitCore2)
+      set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions32bit})
+    endif (BuildFor64bitCore2)
+  endif (BuildFor64bitAmd)
+  message (STATUS "Building for ${CMAKE_BUILD_TYPE}, flags: ${CMAKE_CXX_FLAGS_RELEASE}")
+endif (BuildForDebug)
 
 set (DSP_sources
     DSP/FFTwrapper.cpp  DSP/AnalogFilter.cpp  DSP/FormantFilter.cpp
@@ -274,32 +256,56 @@ add_definitions(
     -D'YOSHIMI_VERSION="${YOSHIMI_VERSION}"'
     ${ALSA_LDFLAGS}
     ${JACK_LDFLAGS}
-    -DYOSHI_FIFO_DIR="${YOSHI_FIFO_DIR}"
+    -DYOSHI_FIFO_DIR="${FifoDirectory}"
 )
 
-if(${DEFAULT_AUDIO} STREQUAL "jack")
+# Zyn params - no real justification for them to be tweakable
+# Note! MAX_EQ_BANDS must be less than 20.
+add_definitions(
+  -DMAX_AD_HARMONICS=128
+  -DMAX_SUB_HARMONICS=64
+  -DPAD_MAX_SAMPLES=64
+  -DNUM_MIDI_PARTS=16
+  -DNUM_MIDI_CHANNELS=16
+  -DNUM_VOICES=8
+  -DPOLIPHONY=60
+  -DNUM_SYS_EFX=4
+  -DNUM_INS_EFX=8
+  -DNUM_PART_EFX=3
+  -DNUM_KIT_ITEMS=16
+  -DVELOCITY_MAX_SCALE=8.0f
+  -DMAX_EQ_BANDS=8
+  -DMAX_FILTER_STAGES=5
+  -DFF_MAX_VOWELS=6
+  -DFF_MAX_FORMANTS=12
+  -DFF_MAX_SEQUENCE=8
+  -DPI=3.1415926536f
+  -DLOG_2=0.693147181f
+)
+
+if(${DefaultAudio} STREQUAL "jack")
     message(STATUS "Default audio driver is Jack")
     add_definitions(-DDEFAULT_AUDIO=jack_audio)
-elseif(${DEFAULT_AUDIO} STREQUAL "alsa")
+elseif(${DefaultAudio} STREQUAL "alsa")
     message(STATUS "Default audio driver is Alsa")
     add_definitions(-DDEFAULT_AUDIO=alsa_audio)
-else(${DEFAULT_AUDIO} STREQUAL "alsa")
-    message(FATAL_ERROR "Invalid DEFAULT_AUDIO selection: " ${DEFAULT_AUDIO})
-endif(${DEFAULT_AUDIO} STREQUAL "jack")
+else(${DefaultAudio} STREQUAL "alsa")
+    message(FATAL_ERROR "Invalid DefaultAudio selection: " ${DefaultAudio})
+endif(${DefaultAudio} STREQUAL "jack")
 
-if(${DEFAULT_MIDI} STREQUAL "jack")
+if(${DefaultMidi} STREQUAL "jack")
     message(STATUS "Default midi driver is Jack")
     add_definitions(-DDEFAULT_MIDI=jack_midi)
-elseif(${DEFAULT_MIDI} STREQUAL "alsa")
+elseif(${DefaultMidi} STREQUAL "alsa")
     message(STATUS "Default midi driver is Alsa")
     add_definitions(-DDEFAULT_MIDI=alsa_midi)
-else(${DEFAULT_MIDI} STREQUAL "alsa")
-    message(FATAL_ERROR "Invalid DEFAULT_MIDI selection: " ${DEFAULT_MIDI})
-endif(${DEFAULT_MIDI} STREQUAL "jack")
+else(${DefaultMidi} STREQUAL "alsa")
+    message(FATAL_ERROR "Invalid DefaultMidi selection: " ${DefaultMidi})
+endif(${DefaultMidi} STREQUAL "jack")
 
-if(USE_ASM_F21)
+if(UseAsmFloat2Int)
     add_definitions(-DASM_F2I)
-endif(USE_ASM_F21)
+endif(UseAsmFloat2Int)
 
 set(YOSHI_INCLUDES
     ${YOSHI_INCLUDES}
@@ -339,15 +345,15 @@ target_link_libraries(yoshimi ${YOSHI_LIBRARIES})
 
 install(TARGETS yoshimi RUNTIME DESTINATION bin)
 
-install(DIRECTORY ../banks DESTINATION share/yoshimi
-    FILE_PERMISSIONS
-        OWNER_READ OWNER_WRITE
-        GROUP_READ GROUP_WRITE
-        WORLD_READ
-    DIRECTORY_PERMISSIONS
-        OWNER_READ OWNER_WRITE OWNER_EXECUTE
-        GROUP_READ GROUP_WRITE GROUP_EXECUTE
-        WORLD_READ WORLD_EXECUTE)
+#install(DIRECTORY ../banks DESTINATION share/yoshimi
+#    FILE_PERMISSIONS
+#        OWNER_READ OWNER_WRITE
+#        GROUP_READ GROUP_WRITE
+#        WORLD_READ
+#    DIRECTORY_PERMISSIONS
+#        OWNER_READ OWNER_WRITE OWNER_EXECUTE
+#        GROUP_READ GROUP_WRITE GROUP_EXECUTE
+#        WORLD_READ WORLD_EXECUTE)
 
 set_directory_properties(PROPERTIES
     ADDITIONAL_MAKE_CLEAN_FILES "${CMAKE_SOURCE_DIR}/*UI.c* ${CMAKE_SOURCE_DIR}/src/*UI.h"

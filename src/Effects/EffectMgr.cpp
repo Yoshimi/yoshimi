@@ -32,10 +32,10 @@ EffectMgr::EffectMgr(const bool insertion_) :
     dryonly(false)
 {
     setpresettype("Peffect");
-    efxoutl = new float [buffersize];
-    efxoutr = new float [buffersize];
-    memset(efxoutl, 0, buffersize * sizeof(float));
-    memset(efxoutr, 0, buffersize * sizeof(float));
+    efxoutl = boost::shared_array<float>(new float [buffersize]);
+    efxoutr = boost::shared_array<float>(new float [buffersize]);
+    memset(efxoutl.get(), 0, buffersize * sizeof(float));
+    memset(efxoutr.get(), 0, buffersize * sizeof(float));
     defaults();
 }
 
@@ -44,8 +44,8 @@ EffectMgr::~EffectMgr()
 {
     if (efx)
         delete efx;
-    delete [] efxoutl;
-    delete [] efxoutr;
+    Runtime.dead_floats.push_back(efxoutl);
+    Runtime.dead_floats.push_back(efxoutr);
 }
 
 void EffectMgr::defaults(void)
@@ -61,35 +61,35 @@ void EffectMgr::changeeffect(int _nefx)
     if (nefx == _nefx)
         return;
     nefx = _nefx;
-    memset(efxoutl, 0, buffersize * sizeof(float));
-    memset(efxoutr, 0, buffersize * sizeof(float));
+    memset(efxoutl.get(), 0, buffersize * sizeof(float));
+    memset(efxoutr.get(), 0, buffersize * sizeof(float));
     if (efx)
         delete efx;
     switch (nefx)
     {
         case 1:
-            efx = new Reverb(insertion, efxoutl, efxoutr);
+            efx = new Reverb(insertion, efxoutl.get(), efxoutr.get());
             break;
         case 2:
-            efx = new Echo(insertion, efxoutl, efxoutr);
+            efx = new Echo(insertion, efxoutl.get(), efxoutr.get());
             break;
         case 3:
-            efx = new Chorus(insertion, efxoutl, efxoutr);
+            efx = new Chorus(insertion, efxoutl.get(), efxoutr.get());
             break;
         case 4:
-            efx = new Phaser(insertion, efxoutl, efxoutr);
+            efx = new Phaser(insertion, efxoutl.get(), efxoutr.get());
             break;
         case 5:
-            efx = new Alienwah(insertion, efxoutl, efxoutr);
+            efx = new Alienwah(insertion, efxoutl.get(), efxoutr.get());
             break;
         case 6:
-            efx = new Distorsion(insertion, efxoutl, efxoutr);
+            efx = new Distorsion(insertion, efxoutl.get(), efxoutr.get());
             break;
         case 7:
-            efx = new EQ(insertion, efxoutl, efxoutr);
+            efx = new EQ(insertion, efxoutl.get(), efxoutr.get());
             break;
         case 8:
-            efx = new DynamicFilter(insertion, efxoutl, efxoutr);
+            efx = new DynamicFilter(insertion, efxoutl.get(), efxoutr.get());
             break;
             // put more effect here
         default:
@@ -173,41 +173,37 @@ void EffectMgr::out(float *smpsl, float *smpsr)
         {
             memset(smpsl, 0, buffersize * sizeof(float));
             memset(smpsr, 0, buffersize * sizeof(float));
-            memset(efxoutl, 0, buffersize * sizeof(float));
-            memset(efxoutr, 0, buffersize * sizeof(float));
+            memset(efxoutl.get(), 0, buffersize * sizeof(float));
+            memset(efxoutr.get(), 0, buffersize * sizeof(float));
         }
         return;
     }
-    memset(efxoutl, 0, buffersize * sizeof(float));
-    memset(efxoutr, 0, buffersize * sizeof(float));
+    memset(efxoutl.get(), 0, buffersize * sizeof(float));
+    memset(efxoutr.get(), 0, buffersize * sizeof(float));
     efx->out(smpsl, smpsr);
 
     float volume = efx->volume;
 
     if (nefx == 7)
     {   // this is need only for the EQ effect
-        // aca: another memcpy() candidate
-        for (int i = 0; i < buffersize; ++i)
-        {
-            smpsl[i] = efxoutl[i];
-            smpsr[i] = efxoutr[i];
-        }
+        memcpy(smpsl, efxoutl.get(), buffersize * sizeof(float));
+        memcpy(smpsr, efxoutr.get(), buffersize * sizeof(float));
         return;
     }
 
     // Insertion effect
-    if (insertion != 0)
+    if (insertion)
     {
         float v1, v2;
-        if (volume < 0.5)
+        if (volume < 0.5f)
         {
-            v1 = 1.0;
-            v2 = volume * 2.0;
+            v1 = 1.0f;
+            v2 = volume * 2.0f;
         } else {
-            v1 = (1.0 - volume) * 2.0;
-            v2 = 1.0;
+            v1 = (1.0f - volume) * 2.0f;
+            v2 = 1.0f;
         }
-        if (nefx == 1 || nefx==2)
+        if (nefx == 1 || nefx == 2)
             v2 *= v2; // for Reverb and Echo, the wet function is not liniar
 
         if (dryonly)
@@ -219,7 +215,9 @@ void EffectMgr::out(float *smpsl, float *smpsr)
                 efxoutl[i] *= v2;
                 efxoutr[i] *= v2;
             }
-        } else {
+        }
+        else
+        {
             // normal instrument/insertion effect
             for (int i = 0; i < buffersize; ++i)
             {
@@ -227,28 +225,32 @@ void EffectMgr::out(float *smpsl, float *smpsr)
                 smpsr[i] = smpsr[i] * v1 + efxoutr[i] * v2;
             }
         }
-    } else { // System effect
+    }
+    else
+    { // System effect
         for (int i = 0; i < buffersize; ++i)
         {
-            efxoutl[i] *= 2.0 * volume;
-            efxoutr[i] *= 2.0 * volume;
-            smpsl[i] = efxoutl[i];
-            smpsr[i] = efxoutr[i];
+            efxoutl[i] *= 2.0f * volume;
+            efxoutr[i] *= 2.0f * volume;
+            //smpsl[i] = efxoutl[i];
+            //smpsr[i] = efxoutr[i];
         }
+        memcpy(smpsl, efxoutl.get(), buffersize * sizeof(float));
+        memcpy(smpsr, efxoutr.get(), buffersize * sizeof(float));
     }
 }
 
 // Get the effect volume for the system effect
 float EffectMgr::sysefxgetvolume(void)
 {
-    return (!efx) ? 1.0 : efx->outvolume;
+    return (!efx) ? 1.0f : efx->outvolume;
 }
 
 
 // Get the EQ response
 float EffectMgr::getEQfreqresponse(float freq)
 {
-    return  (nefx == 7) ? efx->getfreqresponse(freq) : 0.0;
+    return  (nefx == 7) ? efx->getfreqresponse(freq) : 0.0f;
 }
 
 

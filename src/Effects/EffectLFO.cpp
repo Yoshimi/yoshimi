@@ -42,7 +42,6 @@ EffectLFO::EffectLFO()
     ampr2 = (1 - lfornd) + lfornd * zynMaster->numRandom();
 }
 
-EffectLFO::~EffectLFO() { }
 
 // Update the changed parameters
 void EffectLFO::updateparams(void)
@@ -50,11 +49,11 @@ void EffectLFO::updateparams(void)
     float lfofreq = (powf(2.0f, Pfreq / 127.0 * 10.0) - 1.0) * 0.03;
     incx = fabsf(lfofreq) * (float)zynMaster->getBuffersize()
                 / (float)zynMaster->getSamplerate();
-    if (incx > 0.49999999)
-        incx = 0.499999999; // Limit the Frequency
+    if (incx > 0.49999999f)
+        incx = 0.499999999f; // Limit the Frequency
 
-    lfornd = Prandomness / 127.0;
-    lfornd = (lfornd > 1.0) ? 1.0 : lfornd;
+    lfornd = Prandomness / 127.0f;
+    lfornd = (lfornd > 1.0f) ? 1.0f : lfornd;
 
     if (PLFOtype > 1)
         PLFOtype = 1; // this has to be updated if more lfo's are added
@@ -70,12 +69,12 @@ float EffectLFO::getlfoshape(float x)
     switch (lfotype)
     {
         case 1: // EffectLFO_TRIANGLE
-            if (x > 0.0 && x < 0.25)
-                out = 4.0 * x;
-            else if (x > 0.25 && x < 0.75)
-                out = 2 - 4 * x;
+            if (x > 0.0f && x < 0.25f)
+                out = 4.0f * x;
+            else if (x > 0.25f && x < 0.75f)
+                out = 2.0f - 4.0f * x;
             else
-                out = 4.0 * x - 4.0;
+                out = 4.0f * x - 4.0f;
             break;
             // \todo more to be added here; also ::updateParams() need to be
             // updated (to allow more lfotypes)
@@ -91,26 +90,26 @@ void EffectLFO::effectlfoout(float *outl, float *outr)
     float out;
 
     out = getlfoshape(xl);
-    if (lfotype == 0 || lfotype == 1)
+    if (!lfotype || lfotype == 1)
         out *= (ampl1 + xl * (ampl2 - ampl1));
     xl += incx;
-    if (xl > 1.0)
+    if (xl > 1.0f)
     {
-        xl -= 1.0;
+        xl -= 1.0f;
         ampl1 = ampl2;
-        ampl2 = (1.0 - lfornd) + lfornd * zynMaster->numRandom();
+        ampl2 = (1.0f - lfornd) + lfornd * zynMaster->numRandom();
     }
-    *outl = (out + 1.0) * 0.5;
+    *outl = (out + 1.0f) * 0.5f;
 
     out = getlfoshape(xr);
-    if (lfotype == 0 || lfotype == 1)
+    if (!lfotype || lfotype == 1)
         out *= (ampr1 + xr * (ampr2 - ampr1));
     xr += incx;
-    if (xr > 1.0)
+    if (xr > 1.0f)
     {
-        xr -= 1.0;
+        xr -= 1.0f;
         ampr1 = ampr2;
-        ampr2 = (1.0 - lfornd) + lfornd * zynMaster->numRandom();
+        ampr2 = (1.0f - lfornd) + lfornd * zynMaster->numRandom();
     }
-    *outr = (out + 1.0) * 0.5;
+    *outr = (out + 1.0f) * 0.5f;
 }

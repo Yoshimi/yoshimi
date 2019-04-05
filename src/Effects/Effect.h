@@ -24,6 +24,8 @@
 #ifndef EFFECT_H
 #define EFFECT_H
 
+#include <boost/shared_ptr.hpp>
+
 #include "Misc/Util.h"
 #include "Params/FilterParams.h"
 
@@ -32,6 +34,7 @@ class Effect
     public:
         Effect(bool insertion_, float *efxoutl_, float *efxoutr_,
                FilterParams *filterpars_, unsigned char Ppreset_);
+        Effect(bool insertion_, float *efxoutl_, float *efxoutr_);
         virtual ~Effect() { };
 
         virtual void setpreset(unsigned char npreset) = 0;
@@ -42,8 +45,8 @@ class Effect
         virtual float getfreqresponse(float freq) { return (0); };
 
         unsigned char Ppreset; // Currentl preset
-        float *const efxoutl;
-        float *const efxoutr;
+        float *efxoutl;
+        float *efxoutr;
         float outvolume;
         float volume;
         FilterParams *filterpars;

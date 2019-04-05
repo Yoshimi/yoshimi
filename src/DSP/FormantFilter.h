@@ -23,6 +23,9 @@
 #ifndef FORMANT_FILTER_H
 #define FORMANT_FILTER_H
 
+#include <boost/shared_array.hpp>
+#include <boost/shared_ptr.hpp>
+
 #include "DSP/Filter_.h"
 #include "DSP/AnalogFilter.h"
 #include "Params/FilterParams.h"
@@ -43,11 +46,14 @@ class FormantFilter : public Filter_
         void setpos(float input);
 
 
-        AnalogFilter *formant[FF_MAX_FORMANTS];
-        float *inbuffer, *tmpbuf;
+        boost::shared_ptr<AnalogFilter> formant[FF_MAX_FORMANTS];
+        boost::shared_array<float> inbuffer;
+        boost::shared_array<float> tmpbuf;
 
         struct {
-            float freq, amp, q; // frequency,amplitude,Q
+            float freq;
+            float amp;
+            float q; // frequency,amplitude,Q
         } formantpar[FF_MAX_VOWELS][FF_MAX_FORMANTS],
           currentformants[FF_MAX_FORMANTS];
 
@@ -57,10 +63,16 @@ class FormantFilter : public Filter_
 
         float oldformantamp[FF_MAX_FORMANTS];
 
-        int sequencesize, numformants, firsttime;
-        float oldinput, slowinput;
-        float Qfactor, formantslowness, oldQfactor;
-        float vowelclearness, sequencestretch;
+        int sequencesize;
+        int numformants;
+        int firsttime;
+        float oldinput;
+        float slowinput;
+        float Qfactor;
+        float formantslowness;
+        float oldQfactor;
+        float vowelclearness;
+        float sequencestretch;
 };
 
 

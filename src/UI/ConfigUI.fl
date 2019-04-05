@@ -23,9 +23,6 @@ This file is a derivative of the ZynAddSubFX original, modified January 2010
 } {in_source in_header
 } 
 
-decl {\#include <iostream>} {public
-} 
-
 decl {\#include <cmath>} {public
 } 
 
@@ -46,14 +43,14 @@ class ConfigUI {open
       label {Yoshimi Settings}
       callback {writebankcfg();
           o->hide();} open
-      xywh {1047 165 465 335} type Double hide
+      xywh {1048 191 465 335} type Double visible
     } {
       Fl_Tabs {} {open
         xywh {5 5 520 325}
       } {
         Fl_Group {} {
           label {Main settings} open
-          xywh {5 25 460 260} labelsize 12
+          xywh {5 25 460 260} labelsize 12 hide
         } {
           Fl_Choice {} {
             label OscilSize
@@ -97,7 +94,7 @@ class ConfigUI {open
           Fl_Choice {} {
             label {PADsynth Interpolation}
             callback {Runtime.Interpolation=(int) o->value();}
-            xywh {255 162 100 20} down_box BORDER_BOX labelsize 12 textsize 12
+            xywh {255 162 100 20} down_box BORDER_BOX labelsize 12 textsize 11
             code0 {o->value(Runtime.Interpolation);}
           } {
             MenuItem {} {
@@ -112,7 +109,7 @@ class ConfigUI {open
           Fl_Choice {} {
             label {Virtual Keyboard Layout}
             callback {Runtime.VirKeybLayout=(int) o->value();;}
-            xywh {255 108 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
+            xywh {255 108 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 11
             code0 {o->value(Runtime.VirKeybLayout);}
           } {
             MenuItem {} {
@@ -134,11 +131,9 @@ class ConfigUI {open
           }
           Fl_Input SessionStateFile {
             label {Session state save file}
-            callback {
-              Runtime.StateFile = string(o->value());
-              SessionStateFile->changed();
-            }
-            xywh {159 216 235 25} labelsize 12 when 1 textsize 12
+            callback {Runtime.StateFile = string(o->value());
+              SessionStateFile->changed();}
+            xywh {159 216 235 25} labelsize 12 when 1 textsize 11
             code0 {o->value(Runtime.StateFile.c_str());}
           }
           Fl_Button StateFileButton {
@@ -240,13 +235,19 @@ class ConfigUI {open
         }
         Fl_Group {} {
           label Jack open
-          xywh {5 25 460 260} labelsize 12 hide
+          xywh {5 25 460 260} labelsize 12
         } {
-          Fl_Input {} {
+          Fl_Input BaseCmdLine {
             label {Jack Server}
-            callback {Runtime.jackServer = string(o->value());}
-            tooltip {Name of the jack server to connect to - default, ...} xywh {218 149 100 22} labelsize 12 textsize 12
+            callback {Runtime.jackServer = string(o->value());} selected
+            tooltip {Name of the jack server to connect to - default, ...} xywh {150 120 100 22} labelsize 12 textsize 11
             code0 {o->insert(Runtime.jackServer.c_str());}
+          }
+          Fl_Input {} {
+            label {Base command line}
+            callback {Runtime.baseCmdLine = string(o->value());}
+            tooltip {Base command line for Jack Session manager to restart yoshimi (with any special command line paramaters)} xywh {150 159 297 22} labelsize 12 textsize 11
+            code0 {o->insert(Runtime.baseCmdLine.c_str());}
           }
         }
         Fl_Group {} {
@@ -382,7 +383,7 @@ class ConfigUI {open
       }
       Fl_Button {} {
         label {Save Settings}
-        callback {Runtime.SaveConfig();
+        callback {Runtime.saveConfig();
             writebankcfg();
             writepresetcfg();}
         xywh {352 308 105 20} box THIN_UP_BOX labelsize 12

@@ -6,8 +6,11 @@ See INSTALL for instructions.
 Bon apetite.
 ------------
 Changes
-0.058.1 switch fftw planner flag from FFTW_MEASURE back to FFTW_ESTIMATE,
-        enabling plinky-plank to load in realistic time
+0.059-rc1 boost memory pool & smart pointers usage, first cut; switch fftw to fftwf.
+0.059-pre2 switch fftw planner flag from FFTW_MEASURE back to FFTW_ESTIMATE,
+           enabling plinky-plank to load in realistic time.
+0.059-pre1 tweaking jack session support.
+0.059-pre0 first cut jack session support.
 0.058 all the rc5 fixes but lose the debug code;welcome Jeremy Jongepier's Dubstep bass.
 0.057.2-rc5 fix a deadlock on loading instruments using PADsynth.
 0.057.2-rc4 more testing of issues.

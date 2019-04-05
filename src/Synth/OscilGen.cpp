@@ -41,25 +41,24 @@ struct random_data OscilGen::random_buf;
 char OscilGen::harmonic_random_state[256];
 struct random_data OscilGen::harmonic_random_buf;
 
-OscilGen::OscilGen(FFTwrapper *fft_, Resonance *res_) : Presets()
+OscilGen::OscilGen(FFTwrapper *fft_, Resonance *res_) :
+    Presets(),
+    ADvsPAD(false),
+    fft(fft_),
+    res(res_),
+    randseed(1)
 {
-    if (NULL == tmpsmps)
+    setpresettype("Poscilgen");
+    if (!tmpsmps)
     {
         FFTwrapper::newFFTFREQS(OscilGen::outoscilFFTfreqs, half_oscilsize);
-        if (NULL == (tmpsmps = new float[oscilsize]))
+        if (!(tmpsmps = new float[oscilsize]))
             Runtime.Log("Very bad error, failed to allocate OscilGen::tmpsmps");
         else
             memset(tmpsmps, 0, sizeof(float) * oscilsize);
     }
-
-    setpresettype("Poscilgen");
-    fft = fft_;
-    res = res_;
     FFTwrapper::newFFTFREQS(oscilFFTfreqs, half_oscilsize);
     FFTwrapper::newFFTFREQS(basefuncFFTfreqs, half_oscilsize);
-
-    randseed = 1;
-    ADvsPAD = false;
     defaults();
 }
 
@@ -67,7 +66,7 @@ OscilGen::~OscilGen()
 {
     FFTwrapper::deleteFFTFREQS(basefuncFFTfreqs);
     FFTwrapper::deleteFFTFREQS(oscilFFTfreqs);
-    if (NULL != tmpsmps)
+    if (tmpsmps)
     {
         delete [] tmpsmps;
         tmpsmps = NULL;
@@ -692,7 +691,7 @@ void OscilGen::modulation(void)
         oscilFFTfreqs.s[oscilsize / 2 - i] *= tmp;
         oscilFFTfreqs.c[oscilsize / 2 - i] *= tmp;
     }
-    fft->freqs2smps(oscilFFTfreqs,tmpsmps);
+    fft->freqs2smps(oscilFFTfreqs, tmpsmps);
     int extra_points=2;
     float *in = new float[oscilsize + extra_points];
 

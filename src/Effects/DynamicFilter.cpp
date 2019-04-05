@@ -32,9 +32,7 @@ DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_) 
     Pdepth(0),
     Pampsns(90),
     Pampsnsinv(0),
-    Pampsmooth(60),
-    filterl(NULL),
-    filterr(NULL)
+    Pampsmooth(60)
 {
     setpreset(Ppreset);
     cleanup();
@@ -43,8 +41,8 @@ DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_) 
 DynamicFilter::~DynamicFilter()
 {
     delete filterpars;
-    delete filterl;
-    delete filterr;
+    Runtime.dead_ptrs.push_back(filterL);
+    Runtime.dead_ptrs.push_back(filterR);
 }
 
 
@@ -59,8 +57,8 @@ void DynamicFilter::out(float *smpsl, float *smpsr)
 
     float lfol, lfor;
     lfo.effectlfoout(&lfol, &lfor);
-    lfol *= depth * 5.0;
-    lfor *= depth * 5.0;
+    lfol *= depth * 5.0f;
+    lfor *= depth * 5.0f;
     float freq = filterpars->getfreq();
     float q = filterpars->getq();
 
@@ -69,29 +67,29 @@ void DynamicFilter::out(float *smpsl, float *smpsr)
     {
         memcpy(efxoutl, smpsl, buffersize * sizeof(float));
         memcpy(efxoutr, smpsr, buffersize * sizeof(float));
-        float x = (fabsf(smpsl[i]) + fabsf(smpsr[i])) * 0.5;
-        ms1 = ms1 * (1.0 - ampsmooth) + x * ampsmooth + 1e-10;
+        float x = (fabsf(smpsl[i]) + fabsf(smpsr[i])) * 0.5f;
+        ms1 = ms1 * (1.0f - ampsmooth) + x * ampsmooth + 1e-10f;
     }
 
-    float ampsmooth2 = powf(ampsmooth, 0.2) * 0.3;
-    ms2 = ms2 * (1.0 - ampsmooth2) + ms1 * ampsmooth2;
-    ms3 = ms3 * (1.0 - ampsmooth2) + ms2 * ampsmooth2;
-    ms4=ms4 * (1.0 - ampsmooth2) + ms3 * ampsmooth2;
+    float ampsmooth2 = powf(ampsmooth, 0.2f) * 0.3f;
+    ms2 = ms2 * (1.0f - ampsmooth2) + ms1 * ampsmooth2;
+    ms3 = ms3 * (1.0f - ampsmooth2) + ms2 * ampsmooth2;
+    ms4=ms4 * (1.0f - ampsmooth2) + ms3 * ampsmooth2;
     float rms = (sqrtf(ms4)) * ampsns;
 
-    float frl = filterl->getrealfreq(freq + lfol + rms);
-    float frr = filterr->getrealfreq(freq + lfor + rms);
+    float frl = filterL->getrealfreq(freq + lfol + rms);
+    float frr = filterR->getrealfreq(freq + lfor + rms);
 
-    filterl->setfreq_and_q(frl, q);
-    filterr->setfreq_and_q(frr, q);
+    filterL->setfreq_and_q(frl, q);
+    filterR->setfreq_and_q(frr, q);
 
-    filterl->filterout(efxoutl);
-    filterr->filterout(efxoutr);
+    filterL->filterout(efxoutl);
+    filterR->filterout(efxoutr);
 
     // panning
     for (int i = 0; i < buffersize; ++i)
     {
-        efxoutl[i] *= (1.0 - panning);
+        efxoutl[i] *= (1.0f - panning);
         efxoutr[i] *= panning;
     }
 }
@@ -100,7 +98,7 @@ void DynamicFilter::out(float *smpsl, float *smpsr)
 void DynamicFilter::cleanup(void)
 {
     reinitfilter();
-    ms1 = ms2 = ms3 = ms4 = 0.0;
+    ms1 = ms2 = ms3 = ms4 = 0.0f;
 }
 
 
@@ -108,16 +106,16 @@ void DynamicFilter::cleanup(void)
 void DynamicFilter::setdepth(unsigned char Pdepth_)
 {
     Pdepth = Pdepth_;
-    depth = powf(Pdepth / 127.0, 2.0f);
+    depth = powf(Pdepth / 127.0f, 2.0f);
 }
 
 
 void DynamicFilter::setvolume(unsigned char Pvolume_)
 {
     Pvolume = Pvolume_;
-    outvolume = Pvolume / 127.0;
+    outvolume = Pvolume / 127.0f;
     if (!insertion)
-        volume = 1.0;
+        volume = 1.0f;
     else
         volume = outvolume;
 }
@@ -125,27 +123,31 @@ void DynamicFilter::setvolume(unsigned char Pvolume_)
 void DynamicFilter::setpanning(unsigned char Ppanning_)
 {
     Ppanning = Ppanning_;
-    panning = Ppanning / 127.0;
+    panning = Ppanning / 127.0f;
 }
 
 
 void DynamicFilter::setampsns(unsigned char Pampsns_)
 {
     Pampsns = Pampsns_;
-    ampsns = powf(Pampsns / 127.0, 2.5f) * 10.0;
+    ampsns = powf(Pampsns / 127.0, 2.5f) * 10.0f;
     if (Pampsnsinv)
         ampsns = -ampsns;
-    ampsmooth = expf(-Pampsmooth / 127.0 * 10.0) * 0.99;
+    ampsmooth = expf(-Pampsmooth / 127.0f * 10.0f) * 0.99f;
 }
 
 void DynamicFilter::reinitfilter(void)
 {
-    if (filterl != NULL)
-        delete filterl;
-    if (filterr != NULL)
-        delete filterr;
-    filterl = new Filter(filterpars);
-    filterr = new Filter(filterpars);
+    if (filterL)
+    {
+        Runtime.dead_ptrs.push_back(filterL);
+        filterL.reset(new Filter(filterpars));
+    }
+    if (filterR)
+    {
+        Runtime.dead_ptrs.push_back(filterR);
+        filterR.reset(new Filter(filterpars));
+    }
 }
 
 void DynamicFilter::setpreset(unsigned char npreset)

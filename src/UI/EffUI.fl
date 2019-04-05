@@ -1274,7 +1274,7 @@ refresh(eff);}
       Fl_Group {} {
         label {DynFilter effect  - Filter}
         xywh {5 5 275 75} box FLAT_BOX color 50 labelsize 12 align 144
-        code0 {o->init(eff->filterpars,NULL,NULL);}
+        code0 {o->init(eff->filterpars, NULL, NULL);}
         code1 {o->use_for_dynamic_filter();}
         class FilterUI
       } {}

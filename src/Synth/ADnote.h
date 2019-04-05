@@ -24,18 +24,16 @@
 #ifndef AD_NOTE_H
 #define AD_NOTE_H
 
+#include <boost/shared_ptr.hpp>
+#include <boost/shared_array.hpp>
+
 #include "Synth/LegatoTypes.h"
-#include "Synth/Envelope.h"
-#include "Synth/LFO.h"
-#include "DSP/Filter.h"
 #include "Params/ADnoteParameters.h"
 #include "Params/Controller.h"
 
 // Globals
 
 #define FM_AMP_MULTIPLIER 14.71280603
-
-#define OSCIL_SMP_EXTRA_SAMPLES 5
 
 class ADnote // ADDitive note
 {
@@ -75,7 +73,7 @@ class ADnote // ADDitive note
         void fadein(float *smps);
 
         // GLOBALS
-        ADnoteParameters *partparams;
+        ADnoteParameters *adnotepars;
         bool stereo; // allows note Panning
         int midinote;
         float velocity;
@@ -115,8 +113,8 @@ class ADnote // ADDitive note
             //*************************
             // FILTER GLOBAL PARAMETERS
             //*************************
-            Filter *GlobalFilterL;
-            Filter *GlobalFilterR;
+            boost::shared_ptr<Filter> GlobalFilterL;
+            boost::shared_ptr<Filter> GlobalFilterR;
 
             float FilterCenterPitch; // octaves
             float FilterQ;
@@ -165,7 +163,7 @@ class ADnote // ADDitive note
             // FILTER PARAMETERS
             //******************
 
-            Filter *VoiceFilter;
+            boost::shared_ptr<Filter> VoiceFilter;
 
             float FilterCenterPitch;
             float FilterFreqTracking;

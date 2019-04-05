@@ -24,10 +24,29 @@
 #ifndef SUB_NOTE_PARAMETERS_H
 #define SUB_NOTE_PARAMETERS_H
 
+#include <boost/pool/object_pool.hpp>
+#include <boost/pool/pool.hpp>
+
 #include "Misc/XMLwrapper.h"
 #include "Params/EnvelopeParams.h"
 #include "Params/FilterParams.h"
 #include "Params/Presets.h"
+#include "Synth/Envelope.h"
+
+struct bpfilter {
+    float freq;
+    float bw;
+    float amp;   // filter parameters
+    float a1;
+    float a2;
+    float b0;
+    float b2;    // filter coefs. b1=0
+    float xn1;
+    float xn2;
+    float yn1;
+    float yn2;   // filter internal values
+};
+
 
 class SUBnoteParameters : public Presets
 {
@@ -92,6 +111,10 @@ class SUBnoteParameters : public Presets
 
         // how the harmonics start("0"=0,"1"=random,"2"=1)
         unsigned char Pstart;
+
+        boost::pool<> *bpfilterPool;
+        boost::pool<> *buffPool;
+        boost::object_pool<Envelope> *envPool;
 };
 
 #endif

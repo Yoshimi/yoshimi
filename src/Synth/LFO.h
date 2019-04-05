@@ -37,7 +37,8 @@ class LFO
         void computenextincrnd(void);
         float x;
         float incx, incrnd, nextincrnd;
-        float amp1, amp2; // used for randomness
+        float amp1;
+        float amp2; // used for randomness
         float lfointensity;
         float lfornd, lfofreqrnd;
         float lfodelay;

@@ -24,6 +24,8 @@
 #ifndef ECHO_H
 #define ECHO_H
 
+#include <boost/shared_array.hpp>
+
 #include "Effects/Effect.h"
 
 class Echo : public Effect
@@ -63,8 +65,8 @@ class Echo : public Effect
         int dl, dr, delay, lrdelay;
 
         void initdelays(void);
-        float *ldelay;
-        float *rdelay;
+        boost::shared_array<float> ldelay;
+        boost::shared_array<float> rdelay;
         float  oldl, oldr; // pt. lpf
 
         int kl, kr;

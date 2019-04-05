@@ -24,6 +24,8 @@
 #ifndef DISTORSION_H
 #define DISTORSION_H
 
+#include <boost/shared_ptr.hpp>
+
 #include "DSP/AnalogFilter.h"
 #include "Effects/Effect.h"
 
@@ -65,10 +67,10 @@ class Distorsion : public Effect
         // Real Parameters
         float panning;
         float lrcross;
-        AnalogFilter *lpfl;
-        AnalogFilter *lpfr;
-        AnalogFilter *hpfl;
-        AnalogFilter *hpfr;
+        boost::shared_ptr<AnalogFilter> lpfl;
+        boost::shared_ptr<AnalogFilter> lpfr;
+        boost::shared_ptr<AnalogFilter> hpfl;
+        boost::shared_ptr<AnalogFilter> hpfr;
 };
 
 #endif

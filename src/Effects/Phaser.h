@@ -24,6 +24,8 @@
 #ifndef PHASER_H
 #define PHASER_H
 
+#include <boost/shared_array.hpp>
+
 #include "Effects/Effect.h"
 #include "Effects/EffectLFO.h"
 
@@ -72,8 +74,8 @@ class Phaser : public Effect
         float   fbr;
         float   phase;
 
-        float  *oldl;
-        float  *oldr;
+        boost::shared_array<float> oldl;
+        boost::shared_array<float> oldr;
         float   oldlgain;
         float   oldrgain;
 };

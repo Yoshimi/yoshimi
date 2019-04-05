@@ -26,21 +26,20 @@
 
 #include "Params/SUBnoteParameters.h"
 #include "Params/Controller.h"
-#include "Synth/Envelope.h"
 #include "DSP/Filter.h"
 
 class SUBnote
 {
     public:
-        SUBnote(SUBnoteParameters *parameters, Controller *ctl_,
-                float freq, float velocity, int portamento_,
-                int midinote, bool besilent);
+        SUBnote(SUBnoteParameters *pars_, Controller *ctl_,
+                float freq_, float velocity_, int portamento_,
+                int midinote_, bool besilent);
         ~SUBnote();
 
         void SUBlegatonote(float freq, float velocity,
                            int portamento_, int midinote, bool externcall);
 
-        int noteout(float *outl,float *outr); // note output, return 0 if the
+        int noteout(float *outl, float *outr); // note output, return 0 if the
                                               // note is finished
         void relasekey(void);
         bool finished(void) { return !NoteEnabled; };
@@ -52,7 +51,7 @@ class SUBnote
         void initparameters(float freq);
         void KillNote(void);
 
-        SUBnoteParameters *pars;
+        SUBnoteParameters *subnotepars;
 
         bool stereo;
         int numstages; // number of stages of filters
@@ -79,20 +78,6 @@ class SUBnote
 
         float GlobalFilterCenterPitch; // octaves
         float GlobalFilterFreqTracking;
-
-        struct bpfilter {
-            float freq;
-            float bw;
-            float amp;   // filter parameters
-            float a1;
-            float a2;
-            float b0;
-            float b2;    // filter coefs. b1=0
-            float xn1;
-            float xn2;
-            float yn1;
-            float yn2;   // filter internal values
-        };
 
         void initfilter(bpfilter &filter, float freq, float bw, float amp, float mag);
         void computefiltercoefs(bpfilter &filter, float freq, float bw, float gain);

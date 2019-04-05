@@ -168,9 +168,9 @@ class MasterUI {open
         switch (r)
         {
             case 1:
-                Runtime.SaveState();
+                Runtime.saveState();
             case 2:
-                Runtime.SaveConfig();
+                Runtime.saveConfig();
                 Pexitprogram = true;
                 break;
             default:
@@ -197,7 +197,7 @@ class MasterUI {open
           }
           MenuItem SaveState {
             label {Sa&ve State}
-            callback {Runtime.SaveState();}
+            callback {Runtime.saveState();}
             tooltip {Save session state} xywh {0 0 34 21} labelsize 12
           }
           MenuItem {} {
@@ -924,7 +924,7 @@ ZynAddSubFX}
         if (result >= 0)
         {
             if (updatehistory)
-                setMasterLabel(Runtime.AddParamHistory(string(fname)));
+                setMasterLabel(Runtime.addParamHistory(string(fname)));
             RecentParams->activate();
         }
         else
@@ -965,7 +965,7 @@ ZynAddSubFX}
             fl_alert("Could not save the file.");
         else
         {
-            setMasterLabel(Runtime.AddParamHistory(fname));
+            setMasterLabel(Runtime.addParamHistory(fname));
             RecentParams->activate();
         }
         updatepanel();} {}

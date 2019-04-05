@@ -28,7 +28,7 @@ class EffectLFO
 {
     public:
         EffectLFO();
-        ~EffectLFO();
+        ~EffectLFO() { }
         void effectlfoout(float *outl, float *outr);
         void updateparams(void);
         unsigned char Pfreq;

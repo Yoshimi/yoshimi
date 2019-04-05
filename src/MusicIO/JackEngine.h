@@ -26,6 +26,10 @@
 #include <jack/jack.h>
 #include <jack/ringbuffer.h>
 
+#if defined(JACK_SESSION)
+#   include <jack/session.h>
+#endif
+
 using namespace std;
 
 #include "MusicIO/MusicIO.h"
@@ -50,6 +54,7 @@ class JackEngine : public MusicIO
         int clientId(void);
 
     private:
+        bool openJackClient(void);
         bool connectJackPorts(void);
         bool processAudio(jack_nframes_t nframes);
         bool processMidi(jack_nframes_t nframes);
@@ -63,7 +68,13 @@ class JackEngine : public MusicIO
         static void _infoCallback(const char *msg);
         static int _xrunCallback(void *arg);
 
+#       if defined(JACK_SESSION)
+        static void _jsessionCallback(jack_session_event_t *event, void *arg);
+        void jsessionCallback(jack_session_event_t *event);
+#       endif
+
         jack_client_t      *jackClient;
+        
         struct {
             unsigned int  jackSamplerate;
             unsigned int  jackNframes;
@@ -72,7 +83,7 @@ class JackEngine : public MusicIO
         } audio;
 
         struct {
-            jack_port_t*       port;
+            jack_port_t       *port;
             jack_ringbuffer_t *ringBuf;
             pthread_t          pThread;
             string             semName;

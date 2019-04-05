@@ -33,3 +33,10 @@ Effect::Effect(bool insertion_, float *efxoutl_, float *efxoutr_,
     insertion(insertion_)
 { }
 
+Effect::Effect(bool insertion_, float *efxoutl_, float *efxoutr_) :
+    Ppreset(0),
+    efxoutl(efxoutl_),
+    efxoutr(efxoutr_),
+    filterpars(NULL),
+    insertion(insertion_)
+{ }

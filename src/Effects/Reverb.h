@@ -71,7 +71,8 @@ class Reverb : public Effect
         unsigned char Ptype;
         unsigned char Proomsize;
 
-        float pan, erbalance;
+        float pan;
+        float erbalance;
 
         // Parametrii 2
         int   lohidamptype; // <0=disable,1=highdamp(lowpass),2=lowdamp(highpass)
@@ -85,19 +86,19 @@ class Reverb : public Effect
         int   aplen[REV_APS * 2];
     
         // Internal Variables
-        float *comb[REV_COMBS * 2];
+        boost::shared_array<float> comb[REV_COMBS * 2];
         int    combk[REV_COMBS * 2];
         float  combfb[REV_COMBS * 2];// <feedback-ul fiecarui filtru "comb"
         float  lpcomb[REV_COMBS * 2];  // <pentru Filtrul LowPass
     
-        float *ap[REV_APS * 2];
+        boost::shared_array<float> ap[REV_APS * 2];
     
         int apk[REV_APS * 2];
     
-        float *idelay;
-        float *inputbuf;
-        AnalogFilter *lpf; // filters
-        AnalogFilter *hpf;
+        boost::shared_array<float> idelay;
+        boost::shared_array<float> inputbuf;
+        boost::shared_ptr<AnalogFilter> lpf; // filters
+        boost::shared_ptr<AnalogFilter> hpf;
     
         int buffersize;
 };
