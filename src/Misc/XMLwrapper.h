@@ -39,43 +39,42 @@ class XMLwrapper
         ~XMLwrapper();
 
         // SAVE to XML
-        bool saveXMLfile(string filename); // return true if ok, false otherwise
+        bool saveXMLfile(const string& filename); // return true if ok, false otherwise
 
         // returns the new allocated string that contains the XML data (used for clipboard)
         // the string is NULL terminated
         char *getXMLdata(void);
 
         
-        void addpar(string name, int val); // add simple parameter: name, value
-        void addparreal(string name, float val);
+        void addpar(const string& name, int val); // add simple parameter: name, value
+        void addparreal(const string& name, float val);
 
-        void addparbool(string name, int val); // 0 => "yes", else "no"
-        void addparbool(string name, bool val);
+        void addparbool(const string& name, int val); // 1 => "yes", else "no"
 
 
         // add string parameter (name and string)
-        void addparstr(string name, string val);
+        void addparstr(const string& name, const string& val);
 
         // add a branch
-        void beginbranch(string name);
-        void beginbranch(string name, int id);
+        void beginbranch(const string& name);
+        void beginbranch(const string& name, int id);
 
         // this must be called after each branch (nodes that contains child nodes)
         void endbranch(void);
 
         // LOAD from XML
-        bool loadXMLfile(string filename); // true if loaded ok
+        bool loadXMLfile(const string& filename); // true if loaded ok
 
         // used by the clipboard
         bool putXMLdata(char *xmldata);
 
         // enter into the branch
         // returns 1 if is ok, or 0 otherwise
-        bool enterbranch(string name);
+        bool enterbranch(const string& name);
 
         // enter into the branch with id
         // returns 1 if is ok, or 0 otherwise
-        bool enterbranch(string name, int id);
+        bool enterbranch(const string& name, int id);
 
         // exits from a branch
         void exitbranch(void) { pop(); };
@@ -89,18 +88,17 @@ class XMLwrapper
         // it returns the parameter and limits it between min and max
         // if min==max==0, it will not limit it
         // if no parameter will be here, the defaultpar will be returned
-        int getpar(string name, int defaultpar, int min, int max);
+        int getpar(const string& name, int defaultpar, int min, int max);
 
         // the same as getpar, but the limits are 0 and 127
-        int getpar127(string name, int defaultpar);
+        int getpar127(const string& name, int defaultpar);
 
-        int getparbool(string name, int defaultpar);
-        bool getparbool(string name, bool defaultpar);
+        int getparbool(const string& name, int defaultpar);
 
-         string getparstr(string name);
+         string getparstr(const string& name);
 
-        float getparreal(string name, float defaultpar);
-        float getparreal(string name, float defaultpar,
+        float getparreal(const string& name, float defaultpar);
+        float getparreal(const string& name, float defaultpar,
                          float min, float max);
 
         bool minimal; // false if all parameters will be stored (used only for clipboard)
@@ -111,10 +109,10 @@ class XMLwrapper
 
         // opens a file and parse only the "information" data on it
         // returns "true" if all went ok or "false" on errors
-        bool checkfileinformation(string filename);
+        bool checkfileinformation(const string& filename);
 
     private:
-        char *doloadfile(string filename);
+        char *doloadfile(const string& filename);
 
         mxml_node_t *tree;
         mxml_node_t *root;
@@ -125,14 +123,14 @@ class XMLwrapper
         // <name>
         // returns the node
         //mxml_node_t *addparams0(const char *name);
-        mxml_node_t *addparams0(string  name);
+        mxml_node_t *addparams0(const string&  name);
 
         // adds params like this: <name par1="val1">, returns the node
-        mxml_node_t *addparams1(string name, string par1, string val1);
+        mxml_node_t *addparams1(const string& name, const string& par1, const string& val1);
 
         // adds params like this: <name par1="val1" par2="val2">, returns the node
-        mxml_node_t *addparams2(string name, string par1, string val1,
-                                string par2, string val2);
+        mxml_node_t *addparams2(const string& name, const string& par1, const string& val1,
+                                const string& par2, const string& val2);
 
         // this is used to store the parents
         mxml_node_t *parentstack[STACKSIZE];

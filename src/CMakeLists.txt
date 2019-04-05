@@ -20,7 +20,7 @@ project(Yoshimi)
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(VERSION 2.6)
 cmake_policy(SET CMP0004 OLD)
-set(YOSHIMI_VERSION "0.055.3")
+set(YOSHIMI_VERSION "0.056")
 file(WRITE version.txt "${YOSHIMI_VERSION}")
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -235,11 +235,11 @@ else(LIBSNDFILE_FOUND)
 endif(LIBSNDFILE_FOUND)
 
 set (DSP_sources
-    DSP/FFTwrapper.cpp  DSP/AnalogFilter.cpp  DSP/FormantFilter.cpp 
+    DSP/FFTwrapper.cpp  DSP/AnalogFilter.cpp  DSP/FormantFilter.cpp
     DSP/SVFilter.cpp  DSP/Filter.cpp
 )
 
-set(Effects_sources 
+set(Effects_sources
     Effects/Alienwah.cpp  Effects/Chorus.cpp  Effects/Echo.cpp
     Effects/Effect.cpp  Effects/EffectLFO.cpp  Effects/EffectMgr.cpp
     Effects/Phaser.cpp  Effects/Reverb.cpp  Effects/EQ.cpp
@@ -260,12 +260,12 @@ set(Params_sources
 )
 
 set(Synth_sources
-    Synth/ADnote.cpp  Synth/Envelope.cpp  Synth/LFO.cpp  Synth/OscilGen.cpp 
+    Synth/ADnote.cpp  Synth/Envelope.cpp  Synth/LFO.cpp  Synth/OscilGen.cpp
     Synth/SUBnote.cpp  Synth/Resonance.cpp  Synth/PADnote.cpp
 )
 
 set(MusicIO_sources
-    MusicIO/MusicClient.cpp  MusicIO/MusicIO.cpp  MusicIO/JackEngine.cpp 
+    MusicIO/MusicClient.cpp  MusicIO/MusicIO.cpp  MusicIO/JackEngine.cpp
     MusicIO/AlsaEngine.cpp  MusicIO/JackClient.cpp  MusicIO/AlsaClient.cpp
     MusicIO/JackAlsaClient.cpp  MusicIO/AlsaJackClient.cpp MusicIO/WavRecord.cpp
 )
@@ -339,7 +339,7 @@ target_link_libraries(yoshimi ${YOSHI_LIBRARIES})
 
 install(TARGETS yoshimi RUNTIME DESTINATION bin)
 
-install(DIRECTORY ../banks DESTINATION share/yoshimi 
+install(DIRECTORY ../banks DESTINATION share/yoshimi
     FILE_PERMISSIONS
         OWNER_READ OWNER_WRITE
         GROUP_READ GROUP_WRITE

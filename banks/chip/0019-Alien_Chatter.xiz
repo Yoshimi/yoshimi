@@ -1,0 +1,5524 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ZynAddSubFX-data>
+<ZynAddSubFX-data version-major="1" version-minor="1"
+ZynAddSubFX-author="Nasca Octavian Paul">
+<INFORMATION>
+<par_bool name="PADsynth_used" value="no" />
+</INFORMATION>
+<BASE_PARAMETERS>
+<par name="max_midi_parts" value="16" />
+<par name="max_kit_items_per_instrument" value="16" />
+<par name="max_system_effects" value="4" />
+<par name="max_insertion_effects" value="8" />
+<par name="max_instrument_effects" value="3" />
+<par name="max_addsynth_voices" value="8" />
+</BASE_PARAMETERS>
+<INSTRUMENT>
+<INFO>
+<string name="name">Alien Chatter</string>
+<string name="author">Christopher &quot;Chip&quot; (a.k.a. Airlynx) Van Dan</string>
+<string name="comments"></string>
+<par name="type" value="0" />
+</INFO>
+<INSTRUMENT_KIT>
+<par name="kit_mode" value="0" />
+<par_bool name="drum_mode" value="no" />
+<INSTRUMENT_KIT_ITEM id="0">
+<par_bool name="enabled" value="yes" />
+<string name="name"></string>
+<par_bool name="muted" value="no" />
+<par name="min_key" value="0" />
+<par name="max_key" value="127" />
+<par name="send_to_instrument_effect" value="0" />
+<par_bool name="add_enabled" value="yes" />
+<ADD_SYNTH_PARAMETERS>
+<par_bool name="stereo" value="yes" />
+<AMPLITUDE_PARAMETERS>
+<par name="volume" value="90" />
+<par name="panning" value="64" />
+<par name="velocity_sensing" value="64" />
+<par name="punch_strength" value="0" />
+<par name="punch_time" value="60" />
+<par name="punch_stretch" value="64" />
+<par name="punch_velocity_sensing" value="72" />
+<par name="harmonic_randomness_grouping" value="0" />
+<AMPLITUDE_ENVELOPE>
+<par_bool name="free_mode" value="no" />
+<par name="env_points" value="4" />
+<par name="env_sustain" value="2" />
+<par name="env_stretch" value="64" />
+<par_bool name="forced_release" value="yes" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="0" />
+<par name="D_dt" value="40" />
+<par name="R_dt" value="25" />
+<par name="A_val" value="64" />
+<par name="D_val" value="64" />
+<par name="S_val" value="127" />
+<par name="R_val" value="64" />
+</AMPLITUDE_ENVELOPE>
+<AMPLITUDE_LFO>
+<par_real name="freq" value="0.629921" />
+<par name="intensity" value="0" />
+<par name="start_phase" value="64" />
+<par name="lfo_type" value="0" />
+<par name="randomness_amplitude" value="0" />
+<par name="randomness_frequency" value="0" />
+<par name="delay" value="0" />
+<par name="stretch" value="64" />
+<par_bool name="continous" value="no" />
+</AMPLITUDE_LFO>
+</AMPLITUDE_PARAMETERS>
+<FREQUENCY_PARAMETERS>
+<par name="detune" value="3909" />
+<par name="coarse_detune" value="0" />
+<par name="detune_type" value="1" />
+<par name="bandwidth" value="64" />
+<FREQUENCY_ENVELOPE>
+<par_bool name="free_mode" value="no" />
+<par name="env_points" value="3" />
+<par name="env_sustain" value="1" />
+<par name="env_stretch" value="0" />
+<par_bool name="forced_release" value="no" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="62" />
+<par name="D_dt" value="10" />
+<par name="R_dt" value="62" />
+<par name="A_val" value="62" />
+<par name="D_val" value="64" />
+<par name="S_val" value="64" />
+<par name="R_val" value="60" />
+</FREQUENCY_ENVELOPE>
+<FREQUENCY_LFO>
+<par_real name="freq" value="0.551181" />
+<par name="intensity" value="0" />
+<par name="start_phase" value="64" />
+<par name="lfo_type" value="0" />
+<par name="randomness_amplitude" value="0" />
+<par name="randomness_frequency" value="0" />
+<par name="delay" value="0" />
+<par name="stretch" value="64" />
+<par_bool name="continous" value="no" />
+</FREQUENCY_LFO>
+</FREQUENCY_PARAMETERS>
+<FILTER_PARAMETERS>
+<par name="velocity_sensing_amplitude" value="64" />
+<par name="velocity_sensing" value="64" />
+<FILTER>
+<par name="category" value="0" />
+<par name="type" value="5" />
+<par name="freq" value="102" />
+<par name="q" value="40" />
+<par name="stages" value="0" />
+<par name="freq_track" value="64" />
+<par name="gain" value="64" />
+</FILTER>
+<FILTER_ENVELOPE>
+<par_bool name="free_mode" value="no" />
+<par name="env_points" value="4" />
+<par name="env_sustain" value="2" />
+<par name="env_stretch" value="0" />
+<par_bool name="forced_release" value="yes" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="40" />
+<par name="D_dt" value="70" />
+<par name="R_dt" value="60" />
+<par name="A_val" value="64" />
+<par name="D_val" value="64" />
+<par name="S_val" value="64" />
+<par name="R_val" value="64" />
+</FILTER_ENVELOPE>
+<FILTER_LFO>
+<par_real name="freq" value="0.629921" />
+<par name="intensity" value="0" />
+<par name="start_phase" value="64" />
+<par name="lfo_type" value="0" />
+<par name="randomness_amplitude" value="0" />
+<par name="randomness_frequency" value="0" />
+<par name="delay" value="0" />
+<par name="stretch" value="64" />
+<par_bool name="continous" value="no" />
+</FILTER_LFO>
+</FILTER_PARAMETERS>
+<RESONANCE>
+<par_bool name="enabled" value="no" />
+</RESONANCE>
+<VOICE id="0">
+<par_bool name="enabled" value="yes" />
+<par name="type" value="0" />
+<par name="delay" value="0" />
+<par_bool name="resonance" value="yes" />
+<par name="ext_oscil" value="-1" />
+<par name="ext_fm_oscil" value="-1" />
+<par name="oscil_phase" value="64" />
+<par name="oscil_fm_phase" value="64" />
+<par_bool name="filter_enabled" value="yes" />
+<par_bool name="filter_bypass" value="no" />
+<par name="fm_enabled" value="0" />
+<OSCIL>
+<par name="harmonic_mag_type" value="0" />
+<par name="base_function" value="12" />
+<par name="base_function_par" value="64" />
+<par name="base_function_modulation" value="0" />
+<par name="base_function_modulation_par1" value="64" />
+<par name="base_function_modulation_par2" value="64" />
+<par name="base_function_modulation_par3" value="32" />
+<par name="modulation" value="0" />
+<par name="modulation_par1" value="64" />
+<par name="modulation_par2" value="64" />
+<par name="modulation_par3" value="32" />
+<par name="wave_shaping" value="64" />
+<par name="wave_shaping_function" value="0" />
+<par name="filter_type" value="0" />
+<par name="filter_par1" value="64" />
+<par name="filter_par2" value="64" />
+<par name="filter_before_wave_shaping" value="0" />
+<par name="spectrum_adjust_type" value="0" />
+<par name="spectrum_adjust_par" value="64" />
+<par name="rand" value="64" />
+<par name="amp_rand_type" value="0" />
+<par name="amp_rand_power" value="64" />
+<par name="harmonic_shift" value="0" />
+<par_bool name="harmonic_shift_first" value="no" />
+<par name="adaptive_harmonics" value="0" />
+<par name="adaptive_harmonics_base_frequency" value="128" />
+<par name="adaptive_harmonics_power" value="100" />
+<HARMONICS>
+<HARMONIC id="1">
+<par name="mag" value="127" />
+<par name="phase" value="64" />
+</HARMONIC>
+<HARMONIC id="2">
+<par name="mag" value="104" />
+<par name="phase" value="64" />
+</HARMONIC>
+<HARMONIC id="3">
+<par name="mag" value="81" />
+<par name="phase" value="64" />
+</HARMONIC>
+<HARMONIC id="4">
+<par name="mag" value="57" />
+<par name="phase" value="64" />
+</HARMONIC>
+</HARMONICS>
+</OSCIL>
+<AMPLITUDE_PARAMETERS>
+<par name="panning" value="64" />
+<par name="volume" value="100" />
+<par_bool name="volume_minus" value="no" />
+<par name="velocity_sensing" value="127" />
+<par_bool name="amp_envelope_enabled" value="yes" />
+<AMPLITUDE_ENVELOPE>
+<par_bool name="free_mode" value="yes" />
+<par name="env_points" value="6" />
+<par name="env_sustain" value="3" />
+<par name="env_stretch" value="0" />
+<par_bool name="forced_release" value="yes" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="0" />
+<par name="D_dt" value="100" />
+<par name="R_dt" value="100" />
+<par name="A_val" value="64" />
+<par name="D_val" value="64" />
+<par name="S_val" value="127" />
+<par name="R_val" value="64" />
+<POINT id="0">
+<par name="val" value="0" />
+</POINT>
+<POINT id="1">
+<par name="dt" value="0" />
+<par name="val" value="127" />
+</POINT>
+<POINT id="2">
+<par name="dt" value="33" />
+<par name="val" value="106" />
+</POINT>
+<POINT id="3">
+<par name="dt" value="5" />
+<par name="val" value="0" />
+</POINT>
+<POINT id="4">
+<par name="dt" value="91" />
+<par name="val" value="0" />
+</POINT>
+<POINT id="5">
+<par name="dt" value="100" />
+<par name="val" value="0" />
+</POINT>
+</AMPLITUDE_ENVELOPE>
+<par_bool name="amp_lfo_enabled" value="no" />
+</AMPLITUDE_PARAMETERS>
+<FREQUENCY_PARAMETERS>
+<par_bool name="fixed_freq" value="no" />
+<par name="fixed_freq_et" value="0" />
+<par name="detune" value="8729" />
+<par name="coarse_detune" value="0" />
+<par name="detune_type" value="0" />
+<par_bool name="freq_envelope_enabled" value="no" />
+<par_bool name="freq_lfo_enabled" value="no" />
+</FREQUENCY_PARAMETERS>
+<FILTER_PARAMETERS>
+<FILTER>
+<par name="category" value="1" />
+<par name="type" value="0" />
+<par name="freq" value="42" />
+<par name="q" value="45" />
+<par name="stages" value="0" />
+<par name="freq_track" value="64" />
+<par name="gain" value="64" />
+<FORMANT_FILTER>
+<par name="num_formants" value="3" />
+<par name="formant_slowness" value="64" />
+<par name="vowel_clearness" value="64" />
+<par name="center_freq" value="77" />
+<par name="octaves_freq" value="40" />
+<VOWEL id="0">
+<FORMANT id="0">
+<par name="freq" value="15" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="23" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="122" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="44" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="115" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="3" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="91" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="70" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="90" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="5" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="95" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="64" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="1">
+<FORMANT id="0">
+<par name="freq" value="72" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="7" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="123" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="117" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="107" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="61" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="44" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="58" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="17" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="3" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="123" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="106" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="2">
+<FORMANT id="0">
+<par name="freq" value="25" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="7" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="95" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="107" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="60" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="75" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="98" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="24" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="99" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="93" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="68" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="88" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="3">
+<FORMANT id="0">
+<par name="freq" value="96" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="33" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="31" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="60" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="39" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="0" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="124" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="25" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="8" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="121" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="15" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="116" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="4">
+<FORMANT id="0">
+<par name="freq" value="56" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="60" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="47" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="73" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="64" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="44" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="52" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="90" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="51" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="21" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="71" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="112" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="5">
+<FORMANT id="0">
+<par name="freq" value="96" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="42" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="9" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="69" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="8" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="78" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="30" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="105" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="112" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="62" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="39" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="24" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<par name="sequence_size" value="3" />
+<par name="sequence_stretch" value="40" />
+<par_bool name="sequence_reversed" value="no" />
+<SEQUENCE_POS id="0">
+<par name="vowel_id" value="0" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="1">
+<par name="vowel_id" value="1" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="2">
+<par name="vowel_id" value="2" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="3">
+<par name="vowel_id" value="3" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="4">
+<par name="vowel_id" value="4" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="5">
+<par name="vowel_id" value="5" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="6">
+<par name="vowel_id" value="0" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="7">
+<par name="vowel_id" value="1" />
+</SEQUENCE_POS>
+</FORMANT_FILTER>
+</FILTER>
+<par_bool name="filter_envelope_enabled" value="no" />
+<par_bool name="filter_lfo_enabled" value="no" />
+</FILTER_PARAMETERS>
+</VOICE>
+<VOICE id="1">
+<par_bool name="enabled" value="yes" />
+<par name="type" value="0" />
+<par name="delay" value="0" />
+<par_bool name="resonance" value="yes" />
+<par name="ext_oscil" value="0" />
+<par name="ext_fm_oscil" value="-1" />
+<par name="oscil_phase" value="64" />
+<par name="oscil_fm_phase" value="64" />
+<par_bool name="filter_enabled" value="yes" />
+<par_bool name="filter_bypass" value="no" />
+<par name="fm_enabled" value="0" />
+<OSCIL>
+<par name="harmonic_mag_type" value="0" />
+<par name="base_function" value="127" />
+<par name="base_function_par" value="64" />
+<par name="base_function_modulation" value="0" />
+<par name="base_function_modulation_par1" value="64" />
+<par name="base_function_modulation_par2" value="64" />
+<par name="base_function_modulation_par3" value="32" />
+<par name="modulation" value="0" />
+<par name="modulation_par1" value="64" />
+<par name="modulation_par2" value="64" />
+<par name="modulation_par3" value="32" />
+<par name="wave_shaping" value="64" />
+<par name="wave_shaping_function" value="0" />
+<par name="filter_type" value="0" />
+<par name="filter_par1" value="64" />
+<par name="filter_par2" value="64" />
+<par name="filter_before_wave_shaping" value="0" />
+<par name="spectrum_adjust_type" value="0" />
+<par name="spectrum_adjust_par" value="64" />
+<par name="rand" value="64" />
+<par name="amp_rand_type" value="0" />
+<par name="amp_rand_power" value="64" />
+<par name="harmonic_shift" value="0" />
+<par_bool name="harmonic_shift_first" value="no" />
+<par name="adaptive_harmonics" value="1" />
+<par name="adaptive_harmonics_base_frequency" value="128" />
+<par name="adaptive_harmonics_power" value="100" />
+<HARMONICS>
+<HARMONIC id="1">
+<par name="mag" value="127" />
+<par name="phase" value="64" />
+</HARMONIC>
+</HARMONICS>
+<BASE_FUNCTION>
+<BF_HARMONIC id="1">
+<par_real name="cos" value="-0.220165" />
+<par_real name="sin" value="0.513574" />
+</BF_HARMONIC>
+<BF_HARMONIC id="2">
+<par_real name="cos" value="0.378651" />
+<par_real name="sin" value="-0.925667" />
+</BF_HARMONIC>
+<BF_HARMONIC id="3">
+<par_real name="cos" value="0.115391" />
+<par_real name="sin" value="-0.276209" />
+</BF_HARMONIC>
+<BF_HARMONIC id="4">
+<par_real name="cos" value="0.419304" />
+<par_real name="sin" value="-1" />
+</BF_HARMONIC>
+<BF_HARMONIC id="5">
+<par_real name="cos" value="0.0240683" />
+<par_real name="sin" value="-0.046475" />
+</BF_HARMONIC>
+<BF_HARMONIC id="6">
+<par_real name="cos" value="0.256666" />
+<par_real name="sin" value="-0.603154" />
+</BF_HARMONIC>
+<BF_HARMONIC id="7">
+<par_real name="cos" value="-0.00302298" />
+<par_real name="sin" value="0.0190696" />
+</BF_HARMONIC>
+<BF_HARMONIC id="8">
+<par_real name="cos" value="-0.0234125" />
+<par_real name="sin" value="0.0744608" />
+</BF_HARMONIC>
+<BF_HARMONIC id="9">
+<par_real name="cos" value="0.0373269" />
+<par_real name="sin" value="-0.0773995" />
+</BF_HARMONIC>
+<BF_HARMONIC id="10">
+<par_real name="cos" value="0.00423722" />
+<par_real name="sin" value="0.00728928" />
+</BF_HARMONIC>
+<BF_HARMONIC id="11">
+<par_real name="cos" value="-0.0116225" />
+<par_real name="sin" value="0.0375329" />
+</BF_HARMONIC>
+<BF_HARMONIC id="12">
+<par_real name="cos" value="-0.00987414" />
+<par_real name="sin" value="0.0422315" />
+</BF_HARMONIC>
+<BF_HARMONIC id="13">
+<par_real name="cos" value="-0.0118667" />
+<par_real name="sin" value="0.0368076" />
+</BF_HARMONIC>
+<BF_HARMONIC id="14">
+<par_real name="cos" value="-0.0136884" />
+<par_real name="sin" value="0.0480463" />
+</BF_HARMONIC>
+<BF_HARMONIC id="15">
+<par_real name="cos" value="-0.0051101" />
+<par_real name="sin" value="0.0223905" />
+</BF_HARMONIC>
+<BF_HARMONIC id="16">
+<par_real name="cos" value="-0.0234672" />
+<par_real name="sin" value="0.0690304" />
+</BF_HARMONIC>
+<BF_HARMONIC id="17">
+<par_real name="cos" value="-0.0111868" />
+<par_real name="sin" value="0.0327768" />
+</BF_HARMONIC>
+<BF_HARMONIC id="18">
+<par_real name="cos" value="-0.015651" />
+<par_real name="sin" value="0.0530805" />
+</BF_HARMONIC>
+<BF_HARMONIC id="19">
+<par_real name="cos" value="-0.0107414" />
+<par_real name="sin" value="0.0306568" />
+</BF_HARMONIC>
+<BF_HARMONIC id="20">
+<par_real name="cos" value="-0.0202112" />
+<par_real name="sin" value="0.0581748" />
+</BF_HARMONIC>
+<BF_HARMONIC id="21">
+<par_real name="cos" value="-0.0111319" />
+<par_real name="sin" value="0.0338259" />
+</BF_HARMONIC>
+<BF_HARMONIC id="22">
+<par_real name="cos" value="-0.0174961" />
+<par_real name="sin" value="0.0515868" />
+</BF_HARMONIC>
+<BF_HARMONIC id="23">
+<par_real name="cos" value="-0.00992718" />
+<par_real name="sin" value="0.0268767" />
+</BF_HARMONIC>
+<BF_HARMONIC id="24">
+<par_real name="cos" value="-0.0199375" />
+<par_real name="sin" value="0.057967" />
+</BF_HARMONIC>
+<BF_HARMONIC id="25">
+<par_real name="cos" value="-0.0095778" />
+<par_real name="sin" value="0.0252453" />
+</BF_HARMONIC>
+<BF_HARMONIC id="26">
+<par_real name="cos" value="-0.0169519" />
+<par_real name="sin" value="0.0478601" />
+</BF_HARMONIC>
+<BF_HARMONIC id="27">
+<par_real name="cos" value="-0.011922" />
+<par_real name="sin" value="0.0330902" />
+</BF_HARMONIC>
+<BF_HARMONIC id="28">
+<par_real name="cos" value="-0.0162602" />
+<par_real name="sin" value="0.0437906" />
+</BF_HARMONIC>
+<BF_HARMONIC id="29">
+<par_real name="cos" value="-0.0089892" />
+<par_real name="sin" value="0.0224432" />
+</BF_HARMONIC>
+<BF_HARMONIC id="30">
+<par_real name="cos" value="-0.0192105" />
+<par_real name="sin" value="0.0539347" />
+</BF_HARMONIC>
+<BF_HARMONIC id="31">
+<par_real name="cos" value="-0.00874251" />
+<par_real name="sin" value="0.0212397" />
+</BF_HARMONIC>
+<BF_HARMONIC id="32">
+<par_real name="cos" value="-0.0150362" />
+<par_real name="sin" value="0.038907" />
+</BF_HARMONIC>
+<BF_HARMONIC id="33">
+<par_real name="cos" value="-0.0116587" />
+<par_real name="sin" value="0.0302751" />
+</BF_HARMONIC>
+<BF_HARMONIC id="34">
+<par_real name="cos" value="-0.0155241" />
+<par_real name="sin" value="0.0404489" />
+</BF_HARMONIC>
+<BF_HARMONIC id="35">
+<par_real name="cos" value="-0.00832563" />
+<par_real name="sin" value="0.0191522" />
+</BF_HARMONIC>
+<BF_HARMONIC id="36">
+<par_real name="cos" value="-0.0172991" />
+<par_real name="sin" value="0.0450749" />
+</BF_HARMONIC>
+<BF_HARMONIC id="37">
+<par_real name="cos" value="-0.00814899" />
+<par_real name="sin" value="0.0182429" />
+</BF_HARMONIC>
+<BF_HARMONIC id="38">
+<par_real name="cos" value="-0.0148873" />
+<par_real name="sin" value="0.0372817" />
+</BF_HARMONIC>
+<BF_HARMONIC id="39">
+<par_real name="cos" value="-0.0111921" />
+<par_real name="sin" value="0.0273413" />
+</BF_HARMONIC>
+<BF_HARMONIC id="40">
+<par_real name="cos" value="-0.0133716" />
+<par_real name="sin" value="0.031753" />
+</BF_HARMONIC>
+<BF_HARMONIC id="41">
+<par_real name="cos" value="-0.00784626" />
+<par_real name="sin" value="0.016642" />
+</BF_HARMONIC>
+<BF_HARMONIC id="42">
+<par_real name="cos" value="-0.0175053" />
+<par_real name="sin" value="0.0441884" />
+</BF_HARMONIC>
+<BF_HARMONIC id="43">
+<par_real name="cos" value="-0.00771602" />
+<par_real name="sin" value="0.015934" />
+</BF_HARMONIC>
+<BF_HARMONIC id="44">
+<par_real name="cos" value="-0.0127874" />
+<par_real name="sin" value="0.029053" />
+</BF_HARMONIC>
+<BF_HARMONIC id="45">
+<par_real name="cos" value="-0.010729" />
+<par_real name="sin" value="0.0247046" />
+</BF_HARMONIC>
+<BF_HARMONIC id="46">
+<par_real name="cos" value="-0.0138453" />
+<par_real name="sin" value="0.0320335" />
+</BF_HARMONIC>
+<BF_HARMONIC id="47">
+<par_real name="cos" value="-0.00748959" />
+<par_real name="sin" value="0.0146702" />
+</BF_HARMONIC>
+<BF_HARMONIC id="48">
+<par_real name="cos" value="-0.0153891" />
+<par_real name="sin" value="0.0358961" />
+</BF_HARMONIC>
+<BF_HARMONIC id="49">
+<par_real name="cos" value="-0.00739079" />
+<par_real name="sin" value="0.0141038" />
+</BF_HARMONIC>
+<BF_HARMONIC id="50">
+<par_real name="cos" value="-0.0134257" />
+<par_real name="sin" value="0.0298637" />
+</BF_HARMONIC>
+<BF_HARMONIC id="51">
+<par_real name="cos" value="-0.0103188" />
+<par_real name="sin" value="0.0224196" />
+</BF_HARMONIC>
+<BF_HARMONIC id="52">
+<par_real name="cos" value="-0.0119185" />
+<par_real name="sin" value="0.0247833" />
+</BF_HARMONIC>
+<BF_HARMONIC id="53">
+<par_real name="cos" value="-0.00721681" />
+<par_real name="sin" value="0.0130804" />
+</BF_HARMONIC>
+<BF_HARMONIC id="54">
+<par_real name="cos" value="-0.0160194" />
+<par_real name="sin" value="0.0364935" />
+</BF_HARMONIC>
+<BF_HARMONIC id="55">
+<par_real name="cos" value="-0.00713996" />
+<par_real name="sin" value="0.0126165" />
+</BF_HARMONIC>
+<BF_HARMONIC id="56">
+<par_real name="cos" value="-0.0115889" />
+<par_real name="sin" value="0.0230631" />
+</BF_HARMONIC>
+<BF_HARMONIC id="57">
+<par_real name="cos" value="-0.0099674" />
+<par_real name="sin" value="0.0204529" />
+</BF_HARMONIC>
+<BF_HARMONIC id="58">
+<par_real name="cos" value="-0.0127429" />
+<par_real name="sin" value="0.0262217" />
+</BF_HARMONIC>
+<BF_HARMONIC id="59">
+<par_real name="cos" value="-0.00700315" />
+<par_real name="sin" value="0.0117698" />
+</BF_HARMONIC>
+<BF_HARMONIC id="60">
+<par_real name="cos" value="-0.0141495" />
+<par_real name="sin" value="0.0295503" />
+</BF_HARMONIC>
+<BF_HARMONIC id="61">
+<par_real name="cos" value="-0.00694208" />
+<par_real name="sin" value="0.0113822" />
+</BF_HARMONIC>
+<BF_HARMONIC id="62">
+<par_real name="cos" value="-0.012464" />
+<par_real name="sin" value="0.024682" />
+</BF_HARMONIC>
+<BF_HARMONIC id="63">
+<par_real name="cos" value="-0.009669" />
+<par_real name="sin" value="0.0187549" />
+</BF_HARMONIC>
+<BF_HARMONIC id="64">
+<par_real name="cos" value="-0.0110702" />
+<par_real name="sin" value="0.0202079" />
+</BF_HARMONIC>
+<BF_HARMONIC id="65">
+<par_real name="cos" value="-0.00683234" />
+<par_real name="sin" value="0.0106687" />
+</BF_HARMONIC>
+<BF_HARMONIC id="66">
+<par_real name="cos" value="-0.0149482" />
+<par_real name="sin" value="0.0307836" />
+</BF_HARMONIC>
+<BF_HARMONIC id="67">
+<par_real name="cos" value="-0.00678291" />
+<par_real name="sin" value="0.0103394" />
+</BF_HARMONIC>
+<BF_HARMONIC id="68">
+<par_real name="cos" value="-0.0108633" />
+<par_real name="sin" value="0.0190079" />
+</BF_HARMONIC>
+<BF_HARMONIC id="69">
+<par_real name="cos" value="-0.00941545" />
+<par_real name="sin" value="0.017279" />
+</BF_HARMONIC>
+<BF_HARMONIC id="70">
+<par_real name="cos" value="-0.0120008" />
+<par_real name="sin" value="0.0220359" />
+</BF_HARMONIC>
+<BF_HARMONIC id="71">
+<par_real name="cos" value="-0.00669339" />
+<par_real name="sin" value="0.00972866" />
+</BF_HARMONIC>
+<BF_HARMONIC id="72">
+<par_real name="cos" value="-0.0133134" />
+<par_real name="sin" value="0.0249543" />
+</BF_HARMONIC>
+<BF_HARMONIC id="73">
+<par_real name="cos" value="-0.00665276" />
+<par_real name="sin" value="0.00944478" />
+</BF_HARMONIC>
+<BF_HARMONIC id="74">
+<par_real name="cos" value="-0.0118074" />
+<par_real name="sin" value="0.0208905" />
+</BF_HARMONIC>
+<BF_HARMONIC id="75">
+<par_real name="cos" value="-0.00919908" />
+<par_real name="sin" value="0.015986" />
+</BF_HARMONIC>
+<BF_HARMONIC id="76">
+<par_real name="cos" value="-0.0105251" />
+<par_real name="sin" value="0.016949" />
+</BF_HARMONIC>
+<BF_HARMONIC id="77">
+<par_real name="cos" value="-0.00657868" />
+<par_real name="sin" value="0.00891483" />
+</BF_HARMONIC>
+<BF_HARMONIC id="78">
+<par_real name="cos" value="-0.0141757" />
+<par_real name="sin" value="0.0264514" />
+</BF_HARMONIC>
+<BF_HARMONIC id="79">
+<par_real name="cos" value="-0.00654484" />
+<par_real name="sin" value="0.00866698" />
+</BF_HARMONIC>
+<BF_HARMONIC id="80">
+<par_real name="cos" value="-0.0103855" />
+<par_real name="sin" value="0.0160577" />
+</BF_HARMONIC>
+<BF_HARMONIC id="81">
+<par_real name="cos" value="-0.00901335" />
+<par_real name="sin" value="0.0148444" />
+</BF_HARMONIC>
+<BF_HARMONIC id="82">
+<par_real name="cos" value="-0.0114794" />
+<par_real name="sin" value="0.0188808" />
+</BF_HARMONIC>
+<BF_HARMONIC id="83">
+<par_real name="cos" value="-0.00648276" />
+<par_real name="sin" value="0.00820169" />
+</BF_HARMONIC>
+<BF_HARMONIC id="84">
+<par_real name="cos" value="-0.0127234" />
+<par_real name="sin" value="0.0214727" />
+</BF_HARMONIC>
+<BF_HARMONIC id="85">
+<par_real name="cos" value="-0.00645424" />
+<par_real name="sin" value="0.0079829" />
+</BF_HARMONIC>
+<BF_HARMONIC id="86">
+<par_real name="cos" value="-0.0113396" />
+<par_real name="sin" value="0.0179936" />
+</BF_HARMONIC>
+<BF_HARMONIC id="87">
+<par_real name="cos" value="-0.00885291" />
+<par_real name="sin" value="0.0138286" />
+</BF_HARMONIC>
+<BF_HARMONIC id="88">
+<par_real name="cos" value="-0.0101508" />
+<par_real name="sin" value="0.0144912" />
+</BF_HARMONIC>
+<BF_HARMONIC id="89">
+<par_real name="cos" value="-0.00640167" />
+<par_real name="sin" value="0.00757009" />
+</BF_HARMONIC>
+<BF_HARMONIC id="90">
+<par_real name="cos" value="-0.0136047" />
+<par_real name="sin" value="0.0230621" />
+</BF_HARMONIC>
+<BF_HARMONIC id="91">
+<par_real name="cos" value="-0.0063774" />
+<par_real name="sin" value="0.00737504" />
+</BF_HARMONIC>
+<BF_HARMONIC id="92">
+<par_real name="cos" value="-0.0100515" />
+<par_real name="sin" value="0.0137979" />
+</BF_HARMONIC>
+<BF_HARMONIC id="93">
+<par_real name="cos" value="-0.00871345" />
+<par_real name="sin" value="0.0129183" />
+</BF_HARMONIC>
+<BF_HARMONIC id="94">
+<par_real name="cos" value="-0.0110986" />
+<par_real name="sin" value="0.0164098" />
+</BF_HARMONIC>
+<BF_HARMONIC id="95">
+<par_real name="cos" value="-0.00633245" />
+<par_real name="sin" value="0.00700539" />
+</BF_HARMONIC>
+<BF_HARMONIC id="96">
+<par_real name="cos" value="-0.0122906" />
+<par_real name="sin" value="0.0187355" />
+</BF_HARMONIC>
+<BF_HARMONIC id="97">
+<par_real name="cos" value="-0.00631161" />
+<par_real name="sin" value="0.00682998" />
+</BF_HARMONIC>
+<BF_HARMONIC id="98">
+<par_real name="cos" value="-0.0109941" />
+<par_real name="sin" value="0.0156993" />
+</BF_HARMONIC>
+<BF_HARMONIC id="99">
+<par_real name="cos" value="-0.00859149" />
+<par_real name="sin" value="0.0120969" />
+</BF_HARMONIC>
+<BF_HARMONIC id="100">
+<par_real name="cos" value="-0.0098812" />
+<par_real name="sin" value="0.0125567" />
+</BF_HARMONIC>
+<BF_HARMONIC id="101">
+<par_real name="cos" value="-0.00627288" />
+<par_real name="sin" value="0.00649621" />
+</BF_HARMONIC>
+<BF_HARMONIC id="102">
+<par_real name="cos" value="-0.0131712" />
+<par_real name="sin" value="0.0203344" />
+</BF_HARMONIC>
+<BF_HARMONIC id="103">
+<par_real name="cos" value="-0.00625486" />
+<par_real name="sin" value="0.00633722" />
+</BF_HARMONIC>
+<BF_HARMONIC id="104">
+<par_real name="cos" value="-0.00980779" />
+<par_real name="sin" value="0.0119979" />
+</BF_HARMONIC>
+<BF_HARMONIC id="105">
+<par_real name="cos" value="-0.00848426" />
+<par_real name="sin" value="0.0113511" />
+</BF_HARMONIC>
+<BF_HARMONIC id="106">
+<par_real name="cos" value="-0.0108115" />
+<par_real name="sin" value="0.0144128" />
+</BF_HARMONIC>
+<BF_HARMONIC id="107">
+<par_real name="cos" value="-0.00622123" />
+<par_real name="sin" value="0.00603358" />
+</BF_HARMONIC>
+<BF_HARMONIC id="108">
+<par_real name="cos" value="-0.0119631" />
+<par_real name="sin" value="0.0165171" />
+</BF_HARMONIC>
+<BF_HARMONIC id="109">
+<par_real name="cos" value="-0.00620554" />
+<par_real name="sin" value="0.00588843" />
+</BF_HARMONIC>
+<BF_HARMONIC id="110">
+<par_real name="cos" value="-0.0107313" />
+<par_real name="sin" value="0.0138279" />
+</BF_HARMONIC>
+<BF_HARMONIC id="111">
+<par_real name="cos" value="-0.00838947" />
+<par_real name="sin" value="0.0106701" />
+</BF_HARMONIC>
+<BF_HARMONIC id="112">
+<par_real name="cos" value="-0.00967986" />
+<par_real name="sin" value="0.0109826" />
+</BF_HARMONIC>
+<BF_HARMONIC id="113">
+<par_real name="cos" value="-0.00617618" />
+<par_real name="sin" value="0.00561031" />
+</BF_HARMONIC>
+<BF_HARMONIC id="114">
+<par_real name="cos" value="-0.0128344" />
+<par_real name="sin" value="0.0180846" />
+</BF_HARMONIC>
+<BF_HARMONIC id="115">
+<par_real name="cos" value="-0.00616244" />
+<par_real name="sin" value="0.00547693" />
+</BF_HARMONIC>
+<BF_HARMONIC id="116">
+<par_real name="cos" value="-0.00962393" />
+<par_real name="sin" value="0.0105192" />
+</BF_HARMONIC>
+<BF_HARMONIC id="117">
+<par_real name="cos" value="-0.00830529" />
+<par_real name="sin" value="0.0100448" />
+</BF_HARMONIC>
+<BF_HARMONIC id="118">
+<par_real name="cos" value="-0.0105893" />
+<par_real name="sin" value="0.0127563" />
+</BF_HARMONIC>
+<BF_HARMONIC id="119">
+<par_real name="cos" value="-0.00613666" />
+<par_real name="sin" value="0.00522061" />
+</BF_HARMONIC>
+<BF_HARMONIC id="120">
+<par_real name="cos" value="-0.0117087" />
+<par_real name="sin" value="0.0146736" />
+</BF_HARMONIC>
+<BF_HARMONIC id="121">
+<par_real name="cos" value="-0.00612457" />
+<par_real name="sin" value="0.00509731" />
+</BF_HARMONIC>
+<BF_HARMONIC id="122">
+<par_real name="cos" value="-0.0105264" />
+<par_real name="sin" value="0.0122636" />
+</BF_HARMONIC>
+<BF_HARMONIC id="123">
+<par_real name="cos" value="-0.00823021" />
+<par_real name="sin" value="0.00946776" />
+</BF_HARMONIC>
+<BF_HARMONIC id="124">
+<par_real name="cos" value="-0.00952527" />
+<par_real name="sin" value="0.00966694" />
+</BF_HARMONIC>
+<BF_HARMONIC id="125">
+<par_real name="cos" value="-0.00610184" />
+<par_real name="sin" value="0.0048597" />
+</BF_HARMONIC>
+<BF_HARMONIC id="126">
+<par_real name="cos" value="-0.0125673" />
+<par_real name="sin" value="0.0161895" />
+</BF_HARMONIC>
+<BF_HARMONIC id="127">
+<par_real name="cos" value="-0.00609115" />
+<par_real name="sin" value="0.00474509" />
+</BF_HARMONIC>
+<BF_HARMONIC id="128">
+<par_real name="cos" value="-0.00948165" />
+<par_real name="sin" value="0.00927346" />
+</BF_HARMONIC>
+<BF_HARMONIC id="129">
+<par_real name="cos" value="-0.00816298" />
+<par_real name="sin" value="0.00893278" />
+</BF_HARMONIC>
+<BF_HARMONIC id="130">
+<par_real name="cos" value="-0.0104139" />
+<par_real name="sin" value="0.0113519" />
+</BF_HARMONIC>
+<BF_HARMONIC id="131">
+<par_real name="cos" value="-0.00607102" />
+<par_real name="sin" value="0.00452365" />
+</BF_HARMONIC>
+<BF_HARMONIC id="132">
+<par_real name="cos" value="-0.0115071" />
+<par_real name="sin" value="0.0131087" />
+</BF_HARMONIC>
+<BF_HARMONIC id="133">
+<par_real name="cos" value="-0.00606154" />
+<par_real name="sin" value="0.00441658" />
+</BF_HARMONIC>
+<BF_HARMONIC id="134">
+<par_real name="cos" value="-0.0103635" />
+<par_real name="sin" value="0.0109286" />
+</BF_HARMONIC>
+<BF_HARMONIC id="135">
+<par_real name="cos" value="-0.00810257" />
+<par_real name="sin" value="0.00843461" />
+</BF_HARMONIC>
+<BF_HARMONIC id="136">
+<par_real name="cos" value="-0.00940399" />
+<par_real name="sin" value="0.00854232" />
+</BF_HARMONIC>
+<BF_HARMONIC id="137">
+<par_real name="cos" value="-0.00604366" />
+<par_real name="sin" value="0.00420919" />
+</BF_HARMONIC>
+<BF_HARMONIC id="138">
+<par_real name="cos" value="-0.0123519" />
+<par_real name="sin" value="0.0145639" />
+</BF_HARMONIC>
+<BF_HARMONIC id="139">
+<par_real name="cos" value="-0.00603523" />
+<par_real name="sin" value="0.00410868" />
+</BF_HARMONIC>
+<BF_HARMONIC id="140">
+<par_real name="cos" value="-0.00936936" />
+<par_real name="sin" value="0.00820148" />
+</BF_HARMONIC>
+<BF_HARMONIC id="141">
+<par_real name="cos" value="-0.00804811" />
+<par_real name="sin" value="0.00796879" />
+</BF_HARMONIC>
+<BF_HARMONIC id="142">
+<par_real name="cos" value="-0.0102729" />
+<par_real name="sin" value="0.0101385" />
+</BF_HARMONIC>
+<BF_HARMONIC id="143">
+<par_real name="cos" value="-0.0060193" />
+<par_real name="sin" value="0.00391355" />
+</BF_HARMONIC>
+<BF_HARMONIC id="144">
+<par_real name="cos" value="-0.0113446" />
+<par_real name="sin" value="0.0117562" />
+</BF_HARMONIC>
+<BF_HARMONIC id="145">
+<par_real name="cos" value="-0.00601178" />
+<par_real name="sin" value="0.00381876" />
+</BF_HARMONIC>
+<BF_HARMONIC id="146">
+<par_real name="cos" value="-0.0102321" />
+<par_real name="sin" value="0.00976871" />
+</BF_HARMONIC>
+<BF_HARMONIC id="147">
+<par_real name="cos" value="-0.00799888" />
+<par_real name="sin" value="0.00753151" />
+</BF_HARMONIC>
+<BF_HARMONIC id="148">
+<par_real name="cos" value="-0.00930725" />
+<par_real name="sin" value="0.00756253" />
+</BF_HARMONIC>
+<BF_HARMONIC id="149">
+<par_real name="cos" value="-0.00599757" />
+<par_real name="sin" value="0.00363436" />
+</BF_HARMONIC>
+<BF_HARMONIC id="150">
+<par_real name="cos" value="-0.0121758" />
+<par_real name="sin" value="0.0131472" />
+</BF_HARMONIC>
+<BF_HARMONIC id="151">
+<par_real name="cos" value="-0.00599085" />
+<par_real name="sin" value="0.00354461" />
+</BF_HARMONIC>
+<BF_HARMONIC id="152">
+<par_real name="cos" value="-0.00927937" />
+<par_real name="sin" value="0.00726214" />
+</BF_HARMONIC>
+<BF_HARMONIC id="153">
+<par_real name="cos" value="-0.00795426" />
+<par_real name="sin" value="0.00711951" />
+</BF_HARMONIC>
+<BF_HARMONIC id="154">
+<par_real name="cos" value="-0.0101582" />
+<par_real name="sin" value="0.00907304" />
+</BF_HARMONIC>
+<BF_HARMONIC id="155">
+<par_real name="cos" value="-0.00597814" />
+<par_real name="sin" value="0.00336963" />
+</BF_HARMONIC>
+<BF_HARMONIC id="156">
+<par_real name="cos" value="-0.0112118" />
+<par_real name="sin" value="0.0105684" />
+</BF_HARMONIC>
+<BF_HARMONIC id="157">
+<par_real name="cos" value="-0.00597214" />
+<par_real name="sin" value="0.0032843" />
+</BF_HARMONIC>
+<BF_HARMONIC id="158">
+<par_real name="cos" value="-0.0101247" />
+<par_real name="sin" value="0.00874499" />
+</BF_HARMONIC>
+<BF_HARMONIC id="159">
+<par_real name="cos" value="-0.00791374" />
+<par_real name="sin" value="0.00672995" />
+</BF_HARMONIC>
+<BF_HARMONIC id="160">
+<par_real name="cos" value="-0.00922912" />
+<par_real name="sin" value="0.00669462" />
+</BF_HARMONIC>
+<BF_HARMONIC id="161">
+<par_real name="cos" value="-0.00596077" />
+<par_real name="sin" value="0.00311763" />
+</BF_HARMONIC>
+<BF_HARMONIC id="162">
+<par_real name="cos" value="-0.0120301" />
+<par_real name="sin" value="0.0118949" />
+</BF_HARMONIC>
+<BF_HARMONIC id="163">
+<par_real name="cos" value="-0.00595539" />
+<par_real name="sin" value="0.00303619" />
+</BF_HARMONIC>
+<BF_HARMONIC id="164">
+<par_real name="cos" value="-0.00920645" />
+<par_real name="sin" value="0.00642581" />
+</BF_HARMONIC>
+<BF_HARMONIC id="165">
+<par_real name="cos" value="-0.00787687" />
+<par_real name="sin" value="0.00636039" />
+</BF_HARMONIC>
+<BF_HARMONIC id="166">
+<par_real name="cos" value="-0.0100637" />
+<par_real name="sin" value="0.00812367" />
+</BF_HARMONIC>
+<BF_HARMONIC id="167">
+<par_real name="cos" value="-0.00594522" />
+<par_real name="sin" value="0.00287684" />
+</BF_HARMONIC>
+<BF_HARMONIC id="168">
+<par_real name="cos" value="-0.0111022" />
+<par_real name="sin" value="0.00951069" />
+</BF_HARMONIC>
+<BF_HARMONIC id="169">
+<par_real name="cos" value="-0.00594041" />
+<par_real name="sin" value="0.00279883" />
+</BF_HARMONIC>
+<BF_HARMONIC id="170">
+<par_real name="cos" value="-0.010036" />
+<par_real name="sin" value="0.00782873" />
+</BF_HARMONIC>
+<BF_HARMONIC id="171">
+<par_real name="cos" value="-0.00784327" />
+<par_real name="sin" value="0.00600867" />
+</BF_HARMONIC>
+<BF_HARMONIC id="172">
+<par_real name="cos" value="-0.00916544" />
+<par_real name="sin" value="0.00591442" />
+</BF_HARMONIC>
+<BF_HARMONIC id="173">
+<par_real name="cos" value="-0.00593132" />
+<par_real name="sin" value="0.00264594" />
+</BF_HARMONIC>
+<BF_HARMONIC id="174">
+<par_real name="cos" value="-0.0119084" />
+<par_real name="sin" value="0.0107738" />
+</BF_HARMONIC>
+<BF_HARMONIC id="175">
+<par_real name="cos" value="-0.00592702" />
+<par_real name="sin" value="0.00257096" />
+</BF_HARMONIC>
+<BF_HARMONIC id="176">
+<par_real name="cos" value="-0.00914689" />
+<par_real name="sin" value="0.00567055" />
+</BF_HARMONIC>
+<BF_HARMONIC id="177">
+<par_real name="cos" value="-0.00781262" />
+<par_real name="sin" value="0.0056729" />
+</BF_HARMONIC>
+<BF_HARMONIC id="178">
+<par_real name="cos" value="-0.00998542" />
+<par_real name="sin" value="0.00726665" />
+</BF_HARMONIC>
+<BF_HARMONIC id="179">
+<par_real name="cos" value="-0.0059189" />
+<par_real name="sin" value="0.00242377" />
+</BF_HARMONIC>
+<BF_HARMONIC id="180">
+<par_real name="cos" value="-0.0110109" />
+<par_real name="sin" value="0.00855675" />
+</BF_HARMONIC>
+<BF_HARMONIC id="181">
+<par_real name="cos" value="-0.00591506" />
+<par_real name="sin" value="0.00235148" />
+</BF_HARMONIC>
+<BF_HARMONIC id="182">
+<par_real name="cos" value="-0.00996234" />
+<par_real name="sin" value="0.00699821" />
+</BF_HARMONIC>
+<BF_HARMONIC id="183">
+<par_real name="cos" value="-0.00778463" />
+<par_real name="sin" value="0.0053514" />
+</BF_HARMONIC>
+<BF_HARMONIC id="184">
+<par_real name="cos" value="-0.00911327" />
+<par_real name="sin" value="0.00520368" />
+</BF_HARMONIC>
+<BF_HARMONIC id="185">
+<par_real name="cos" value="-0.00590783" />
+<par_real name="sin" value="0.00220932" />
+</BF_HARMONIC>
+<BF_HARMONIC id="186">
+<par_real name="cos" value="-0.0118061" />
+<par_real name="sin" value="0.00975868" />
+</BF_HARMONIC>
+<BF_HARMONIC id="187">
+<par_real name="cos" value="-0.00590442" />
+<par_real name="sin" value="0.00213939" />
+</BF_HARMONIC>
+<BF_HARMONIC id="188">
+<par_real name="cos" value="-0.00909805" />
+<par_real name="sin" value="0.00497967" />
+</BF_HARMONIC>
+<BF_HARMONIC id="189">
+<par_real name="cos" value="-0.00775907" />
+<par_real name="sin" value="0.00504269" />
+</BF_HARMONIC>
+<BF_HARMONIC id="190">
+<par_real name="cos" value="-0.00992015" />
+<par_real name="sin" value="0.00648369" />
+</BF_HARMONIC>
+<BF_HARMONIC id="191">
+<par_real name="cos" value="-0.00589799" />
+<par_real name="sin" value="0.00200166" />
+</BF_HARMONIC>
+<BF_HARMONIC id="192">
+<par_real name="cos" value="-0.0109345" />
+<par_real name="sin" value="0.00768641" />
+</BF_HARMONIC>
+<BF_HARMONIC id="193">
+<par_real name="cos" value="-0.00589497" />
+<par_real name="sin" value="0.00193379" />
+</BF_HARMONIC>
+<BF_HARMONIC id="194">
+<par_real name="cos" value="-0.00990088" />
+<par_real name="sin" value="0.0062366" />
+</BF_HARMONIC>
+<BF_HARMONIC id="195">
+<par_real name="cos" value="-0.00773571" />
+<par_real name="sin" value="0.00474543" />
+</BF_HARMONIC>
+<BF_HARMONIC id="196">
+<par_real name="cos" value="-0.00907046" />
+<par_real name="sin" value="0.0045483" />
+</BF_HARMONIC>
+<BF_HARMONIC id="197">
+<par_real name="cos" value="-0.00588929" />
+<par_real name="sin" value="0.00179995" />
+</BF_HARMONIC>
+<BF_HARMONIC id="198">
+<par_real name="cos" value="-0.0117196" />
+<par_real name="sin" value="0.00882951" />
+</BF_HARMONIC>
+<BF_HARMONIC id="199">
+<par_real name="cos" value="-0.00588663" />
+<par_real name="sin" value="0.0017339" />
+</BF_HARMONIC>
+<BF_HARMONIC id="200">
+<par_real name="cos" value="-0.00905798" />
+<par_real name="sin" value="0.00434014" />
+</BF_HARMONIC>
+<BF_HARMONIC id="201">
+<par_real name="cos" value="-0.00771439" />
+<par_real name="sin" value="0.00445841" />
+</BF_HARMONIC>
+<BF_HARMONIC id="202">
+<par_real name="cos" value="-0.00986563" />
+<par_real name="sin" value="0.00576044" />
+</BF_HARMONIC>
+<BF_HARMONIC id="203">
+<par_real name="cos" value="-0.00588164" />
+<par_real name="sin" value="0.00160345" />
+</BF_HARMONIC>
+<BF_HARMONIC id="204">
+<par_real name="cos" value="-0.0108703" />
+<par_real name="sin" value="0.00688377" />
+</BF_HARMONIC>
+<BF_HARMONIC id="205">
+<par_real name="cos" value="-0.00587931" />
+<par_real name="sin" value="0.00153898" />
+</BF_HARMONIC>
+<BF_HARMONIC id="206">
+<par_real name="cos" value="-0.00984953" />
+<par_real name="sin" value="0.00553056" />
+</BF_HARMONIC>
+<BF_HARMONIC id="207">
+<par_real name="cos" value="-0.00769493" />
+<par_real name="sin" value="0.00418057" />
+</BF_HARMONIC>
+<BF_HARMONIC id="208">
+<par_real name="cos" value="-0.00903543" />
+<par_real name="sin" value="0.00393709" />
+</BF_HARMONIC>
+<BF_HARMONIC id="209">
+<par_real name="cos" value="-0.00587497" />
+<par_real name="sin" value="0.00141148" />
+</BF_HARMONIC>
+<BF_HARMONIC id="210">
+<par_real name="cos" value="-0.0116463" />
+<par_real name="sin" value="0.00797053" />
+</BF_HARMONIC>
+<BF_HARMONIC id="211">
+<par_real name="cos" value="-0.00587296" />
+<par_real name="sin" value="0.00134838" />
+</BF_HARMONIC>
+<BF_HARMONIC id="212">
+<par_real name="cos" value="-0.00902527" />
+<par_real name="sin" value="0.00374156" />
+</BF_HARMONIC>
+<BF_HARMONIC id="213">
+<par_real name="cos" value="-0.0076772" />
+<par_real name="sin" value="0.00391089" />
+</BF_HARMONIC>
+<BF_HARMONIC id="214">
+<par_real name="cos" value="-0.00982012" />
+<par_real name="sin" value="0.00508534" />
+</BF_HARMONIC>
+<BF_HARMONIC id="215">
+<par_real name="cos" value="-0.00586924" />
+<par_real name="sin" value="0.0012234" />
+</BF_HARMONIC>
+<BF_HARMONIC id="216">
+<par_real name="cos" value="-0.0108164" />
+<par_real name="sin" value="0.00613605" />
+</BF_HARMONIC>
+<BF_HARMONIC id="217">
+<par_real name="cos" value="-0.00586752" />
+<par_real name="sin" value="0.00116147" />
+</BF_HARMONIC>
+<BF_HARMONIC id="218">
+<par_real name="cos" value="-0.00980672" />
+<par_real name="sin" value="0.00486932" />
+</BF_HARMONIC>
+<BF_HARMONIC id="219">
+<par_real name="cos" value="-0.00766109" />
+<par_real name="sin" value="0.00364848" />
+</BF_HARMONIC>
+<BF_HARMONIC id="220">
+<par_real name="cos" value="-0.009007" />
+<par_real name="sin" value="0.00336098" />
+</BF_HARMONIC>
+<BF_HARMONIC id="221">
+<par_real name="cos" value="-0.00586437" />
+<par_real name="sin" value="0.00103863" />
+</BF_HARMONIC>
+<BF_HARMONIC id="222">
+<par_real name="cos" value="-0.0115841" />
+<par_real name="sin" value="0.00716888" />
+</BF_HARMONIC>
+<BF_HARMONIC id="223">
+<par_real name="cos" value="-0.00586293" />
+<par_real name="sin" value="0.000977682" />
+</BF_HARMONIC>
+<BF_HARMONIC id="224">
+<par_real name="cos" value="-0.00899883" />
+<par_real name="sin" value="0.0031754" />
+</BF_HARMONIC>
+<BF_HARMONIC id="225">
+<par_real name="cos" value="-0.00764648" />
+<par_real name="sin" value="0.00339249" />
+</BF_HARMONIC>
+<BF_HARMONIC id="226">
+<par_real name="cos" value="-0.00978234" />
+<par_real name="sin" value="0.0044489" />
+</BF_HARMONIC>
+<BF_HARMONIC id="227">
+<par_real name="cos" value="-0.00586033" />
+<par_real name="sin" value="0.000856631" />
+</BF_HARMONIC>
+<BF_HARMONIC id="228">
+<par_real name="cos" value="-0.0107713" />
+<par_real name="sin" value="0.00543276" />
+</BF_HARMONIC>
+<BF_HARMONIC id="229">
+<par_real name="cos" value="-0.00585917" />
+<par_real name="sin" value="0.000796485" />
+</BF_HARMONIC>
+<BF_HARMONIC id="230">
+<par_real name="cos" value="-0.00977127" />
+<par_real name="sin" value="0.00424392" />
+</BF_HARMONIC>
+<BF_HARMONIC id="231">
+<par_real name="cos" value="-0.00763329" />
+<par_real name="sin" value="0.00314217" />
+</BF_HARMONIC>
+<BF_HARMONIC id="232">
+<par_real name="cos" value="-0.00898431" />
+<par_real name="sin" value="0.00281239" />
+</BF_HARMONIC>
+<BF_HARMONIC id="233">
+<par_real name="cos" value="-0.0058571" />
+<par_real name="sin" value="0.000676877" />
+</BF_HARMONIC>
+<BF_HARMONIC id="234">
+<par_real name="cos" value="-0.0115315" />
+<par_real name="sin" value="0.00641387" />
+</BF_HARMONIC>
+<BF_HARMONIC id="235">
+<par_real name="cos" value="-0.00585619" />
+<par_real name="sin" value="0.000617373" />
+</BF_HARMONIC>
+<BF_HARMONIC id="236">
+<par_real name="cos" value="-0.0089779" />
+<par_real name="sin" value="0.0026345" />
+</BF_HARMONIC>
+<BF_HARMONIC id="237">
+<par_real name="cos" value="-0.00762144" />
+<par_real name="sin" value="0.00289676" />
+</BF_HARMONIC>
+<BF_HARMONIC id="238">
+<par_real name="cos" value="-0.00975129" />
+<par_real name="sin" value="0.00384311" />
+</BF_HARMONIC>
+<BF_HARMONIC id="239">
+<par_real name="cos" value="-0.00585463" />
+<par_real name="sin" value="0.00049888" />
+</BF_HARMONIC>
+<BF_HARMONIC id="240">
+<par_real name="cos" value="-0.0107337" />
+<par_real name="sin" value="0.00476505" />
+</BF_HARMONIC>
+<BF_HARMONIC id="241">
+<par_real name="cos" value="-0.00585398" />
+<par_real name="sin" value="0.000439854" />
+</BF_HARMONIC>
+<BF_HARMONIC id="242">
+<par_real name="cos" value="-0.0097423" />
+<par_real name="sin" value="0.00364678" />
+</BF_HARMONIC>
+<BF_HARMONIC id="243">
+<par_real name="cos" value="-0.00761086" />
+<par_real name="sin" value="0.00265558" />
+</BF_HARMONIC>
+<BF_HARMONIC id="244">
+<par_real name="cos" value="-0.00896671" />
+<par_real name="sin" value="0.00228483" />
+</BF_HARMONIC>
+<BF_HARMONIC id="245">
+<par_real name="cos" value="-0.00585292" />
+<par_real name="sin" value="0.000322163" />
+</BF_HARMONIC>
+<BF_HARMONIC id="246">
+<par_real name="cos" value="-0.0114873" />
+<par_real name="sin" value="0.00569642" />
+</BF_HARMONIC>
+<BF_HARMONIC id="247">
+<par_real name="cos" value="-0.00585251" />
+<par_real name="sin" value="0.000263467" />
+</BF_HARMONIC>
+<BF_HARMONIC id="248">
+<par_real name="cos" value="-0.00896189" />
+<par_real name="sin" value="0.00211265" />
+</BF_HARMONIC>
+<BF_HARMONIC id="249">
+<par_real name="cos" value="-0.00760151" />
+<par_real name="sin" value="0.00241799" />
+</BF_HARMONIC>
+<BF_HARMONIC id="250">
+<par_real name="cos" value="-0.00972624" />
+<par_real name="sin" value="0.00326107" />
+</BF_HARMONIC>
+<BF_HARMONIC id="251">
+<par_real name="cos" value="-0.00585195" />
+<par_real name="sin" value="0.000146275" />
+</BF_HARMONIC>
+<BF_HARMONIC id="252">
+<par_real name="cos" value="-0.010703" />
+<par_real name="sin" value="0.00412529" />
+</BF_HARMONIC>
+<BF_HARMONIC id="253">
+<par_real name="cos" value="-0.00585178" />
+<par_real name="sin" value="8.77478e-05" />
+</BF_HARMONIC>
+<BF_HARMONIC id="254">
+<par_real name="cos" value="-0.00971913" />
+<par_real name="sin" value="0.00307125" />
+</BF_HARMONIC>
+<BF_HARMONIC id="255">
+<par_real name="cos" value="-0.00759332" />
+<par_real name="sin" value="0.00218336" />
+</BF_HARMONIC>
+</BASE_FUNCTION>
+</OSCIL>
+<AMPLITUDE_PARAMETERS>
+<par name="panning" value="64" />
+<par name="volume" value="100" />
+<par_bool name="volume_minus" value="no" />
+<par name="velocity_sensing" value="127" />
+<par_bool name="amp_envelope_enabled" value="yes" />
+<AMPLITUDE_ENVELOPE>
+<par_bool name="free_mode" value="yes" />
+<par name="env_points" value="7" />
+<par name="env_sustain" value="4" />
+<par name="env_stretch" value="0" />
+<par_bool name="forced_release" value="yes" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="0" />
+<par name="D_dt" value="100" />
+<par name="R_dt" value="100" />
+<par name="A_val" value="64" />
+<par name="D_val" value="64" />
+<par name="S_val" value="127" />
+<par name="R_val" value="64" />
+<POINT id="0">
+<par name="val" value="0" />
+</POINT>
+<POINT id="1">
+<par name="dt" value="36" />
+<par name="val" value="0" />
+</POINT>
+<POINT id="2">
+<par name="dt" value="16" />
+<par name="val" value="127" />
+</POINT>
+<POINT id="3">
+<par name="dt" value="42" />
+<par name="val" value="127" />
+</POINT>
+<POINT id="4">
+<par name="dt" value="5" />
+<par name="val" value="0" />
+</POINT>
+<POINT id="5">
+<par name="dt" value="91" />
+<par name="val" value="0" />
+</POINT>
+<POINT id="6">
+<par name="dt" value="100" />
+<par name="val" value="0" />
+</POINT>
+</AMPLITUDE_ENVELOPE>
+<par_bool name="amp_lfo_enabled" value="no" />
+</AMPLITUDE_PARAMETERS>
+<FREQUENCY_PARAMETERS>
+<par_bool name="fixed_freq" value="no" />
+<par name="fixed_freq_et" value="0" />
+<par name="detune" value="8288" />
+<par name="coarse_detune" value="0" />
+<par name="detune_type" value="0" />
+<par_bool name="freq_envelope_enabled" value="no" />
+<par_bool name="freq_lfo_enabled" value="no" />
+</FREQUENCY_PARAMETERS>
+<FILTER_PARAMETERS>
+<FILTER>
+<par name="category" value="1" />
+<par name="type" value="0" />
+<par name="freq" value="42" />
+<par name="q" value="45" />
+<par name="stages" value="0" />
+<par name="freq_track" value="64" />
+<par name="gain" value="64" />
+<FORMANT_FILTER>
+<par name="num_formants" value="3" />
+<par name="formant_slowness" value="64" />
+<par name="vowel_clearness" value="64" />
+<par name="center_freq" value="77" />
+<par name="octaves_freq" value="40" />
+<VOWEL id="0">
+<FORMANT id="0">
+<par name="freq" value="15" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="23" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="122" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="44" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="115" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="3" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="91" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="70" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="90" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="5" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="95" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="64" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="1">
+<FORMANT id="0">
+<par name="freq" value="72" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="7" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="123" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="117" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="107" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="61" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="44" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="58" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="17" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="3" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="123" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="106" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="2">
+<FORMANT id="0">
+<par name="freq" value="25" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="7" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="95" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="107" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="60" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="75" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="98" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="24" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="99" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="93" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="68" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="88" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="3">
+<FORMANT id="0">
+<par name="freq" value="96" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="33" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="31" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="60" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="39" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="0" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="124" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="25" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="8" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="121" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="15" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="116" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="4">
+<FORMANT id="0">
+<par name="freq" value="56" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="60" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="47" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="73" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="64" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="44" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="52" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="90" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="51" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="21" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="71" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="112" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="5">
+<FORMANT id="0">
+<par name="freq" value="96" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="42" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="9" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="69" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="8" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="78" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="30" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="105" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="112" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="62" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="39" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="24" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<par name="sequence_size" value="3" />
+<par name="sequence_stretch" value="40" />
+<par_bool name="sequence_reversed" value="no" />
+<SEQUENCE_POS id="0">
+<par name="vowel_id" value="0" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="1">
+<par name="vowel_id" value="1" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="2">
+<par name="vowel_id" value="2" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="3">
+<par name="vowel_id" value="3" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="4">
+<par name="vowel_id" value="4" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="5">
+<par name="vowel_id" value="5" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="6">
+<par name="vowel_id" value="0" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="7">
+<par name="vowel_id" value="1" />
+</SEQUENCE_POS>
+</FORMANT_FILTER>
+</FILTER>
+<par_bool name="filter_envelope_enabled" value="no" />
+<par_bool name="filter_lfo_enabled" value="no" />
+</FILTER_PARAMETERS>
+</VOICE>
+<VOICE id="2">
+<par_bool name="enabled" value="yes" />
+<par name="type" value="0" />
+<par name="delay" value="0" />
+<par_bool name="resonance" value="yes" />
+<par name="ext_oscil" value="0" />
+<par name="ext_fm_oscil" value="-1" />
+<par name="oscil_phase" value="64" />
+<par name="oscil_fm_phase" value="64" />
+<par_bool name="filter_enabled" value="yes" />
+<par_bool name="filter_bypass" value="no" />
+<par name="fm_enabled" value="0" />
+<OSCIL>
+<par name="harmonic_mag_type" value="0" />
+<par name="base_function" value="12" />
+<par name="base_function_par" value="64" />
+<par name="base_function_modulation" value="0" />
+<par name="base_function_modulation_par1" value="64" />
+<par name="base_function_modulation_par2" value="64" />
+<par name="base_function_modulation_par3" value="32" />
+<par name="modulation" value="0" />
+<par name="modulation_par1" value="64" />
+<par name="modulation_par2" value="64" />
+<par name="modulation_par3" value="32" />
+<par name="wave_shaping" value="64" />
+<par name="wave_shaping_function" value="0" />
+<par name="filter_type" value="0" />
+<par name="filter_par1" value="64" />
+<par name="filter_par2" value="64" />
+<par name="filter_before_wave_shaping" value="0" />
+<par name="spectrum_adjust_type" value="0" />
+<par name="spectrum_adjust_par" value="64" />
+<par name="rand" value="64" />
+<par name="amp_rand_type" value="0" />
+<par name="amp_rand_power" value="64" />
+<par name="harmonic_shift" value="0" />
+<par_bool name="harmonic_shift_first" value="no" />
+<par name="adaptive_harmonics" value="0" />
+<par name="adaptive_harmonics_base_frequency" value="128" />
+<par name="adaptive_harmonics_power" value="100" />
+<HARMONICS>
+<HARMONIC id="1">
+<par name="mag" value="127" />
+<par name="phase" value="64" />
+</HARMONIC>
+<HARMONIC id="2">
+<par name="mag" value="104" />
+<par name="phase" value="64" />
+</HARMONIC>
+<HARMONIC id="3">
+<par name="mag" value="81" />
+<par name="phase" value="64" />
+</HARMONIC>
+<HARMONIC id="4">
+<par name="mag" value="57" />
+<par name="phase" value="64" />
+</HARMONIC>
+</HARMONICS>
+</OSCIL>
+<AMPLITUDE_PARAMETERS>
+<par name="panning" value="64" />
+<par name="volume" value="100" />
+<par_bool name="volume_minus" value="no" />
+<par name="velocity_sensing" value="127" />
+<par_bool name="amp_envelope_enabled" value="yes" />
+<AMPLITUDE_ENVELOPE>
+<par_bool name="free_mode" value="yes" />
+<par name="env_points" value="7" />
+<par name="env_sustain" value="5" />
+<par name="env_stretch" value="0" />
+<par_bool name="forced_release" value="yes" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="0" />
+<par name="D_dt" value="100" />
+<par name="R_dt" value="100" />
+<par name="A_val" value="64" />
+<par name="D_val" value="64" />
+<par name="S_val" value="127" />
+<par name="R_val" value="64" />
+<POINT id="0">
+<par name="val" value="0" />
+</POINT>
+<POINT id="1">
+<par name="dt" value="49" />
+<par name="val" value="0" />
+</POINT>
+<POINT id="2">
+<par name="dt" value="2" />
+<par name="val" value="127" />
+</POINT>
+<POINT id="3">
+<par name="dt" value="44" />
+<par name="val" value="113" />
+</POINT>
+<POINT id="4">
+<par name="dt" value="0" />
+<par name="val" value="0" />
+</POINT>
+<POINT id="5">
+<par name="dt" value="89" />
+<par name="val" value="0" />
+</POINT>
+<POINT id="6">
+<par name="dt" value="100" />
+<par name="val" value="0" />
+</POINT>
+</AMPLITUDE_ENVELOPE>
+<par_bool name="amp_lfo_enabled" value="no" />
+</AMPLITUDE_PARAMETERS>
+<FREQUENCY_PARAMETERS>
+<par_bool name="fixed_freq" value="no" />
+<par name="fixed_freq_et" value="0" />
+<par name="detune" value="8192" />
+<par name="coarse_detune" value="0" />
+<par name="detune_type" value="0" />
+<par_bool name="freq_envelope_enabled" value="no" />
+<par_bool name="freq_lfo_enabled" value="no" />
+</FREQUENCY_PARAMETERS>
+<FILTER_PARAMETERS>
+<FILTER>
+<par name="category" value="1" />
+<par name="type" value="0" />
+<par name="freq" value="42" />
+<par name="q" value="45" />
+<par name="stages" value="0" />
+<par name="freq_track" value="64" />
+<par name="gain" value="64" />
+<FORMANT_FILTER>
+<par name="num_formants" value="3" />
+<par name="formant_slowness" value="64" />
+<par name="vowel_clearness" value="64" />
+<par name="center_freq" value="77" />
+<par name="octaves_freq" value="40" />
+<VOWEL id="0">
+<FORMANT id="0">
+<par name="freq" value="15" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="23" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="122" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="44" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="115" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="3" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="91" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="70" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="90" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="5" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="95" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="64" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="1">
+<FORMANT id="0">
+<par name="freq" value="72" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="7" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="123" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="117" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="107" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="61" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="44" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="58" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="17" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="3" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="123" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="106" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="2">
+<FORMANT id="0">
+<par name="freq" value="25" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="7" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="95" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="107" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="60" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="75" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="98" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="24" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="99" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="93" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="68" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="88" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="3">
+<FORMANT id="0">
+<par name="freq" value="96" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="33" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="31" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="60" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="39" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="0" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="124" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="25" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="8" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="121" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="15" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="116" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="4">
+<FORMANT id="0">
+<par name="freq" value="56" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="60" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="47" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="73" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="64" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="44" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="52" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="90" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="51" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="21" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="71" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="112" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="5">
+<FORMANT id="0">
+<par name="freq" value="96" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="42" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="9" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="69" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="8" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="78" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="30" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="105" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="112" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="62" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="39" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="24" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<par name="sequence_size" value="3" />
+<par name="sequence_stretch" value="40" />
+<par_bool name="sequence_reversed" value="no" />
+<SEQUENCE_POS id="0">
+<par name="vowel_id" value="0" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="1">
+<par name="vowel_id" value="1" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="2">
+<par name="vowel_id" value="2" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="3">
+<par name="vowel_id" value="3" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="4">
+<par name="vowel_id" value="4" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="5">
+<par name="vowel_id" value="5" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="6">
+<par name="vowel_id" value="0" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="7">
+<par name="vowel_id" value="1" />
+</SEQUENCE_POS>
+</FORMANT_FILTER>
+</FILTER>
+<par_bool name="filter_envelope_enabled" value="no" />
+<par_bool name="filter_lfo_enabled" value="no" />
+</FILTER_PARAMETERS>
+</VOICE>
+<VOICE id="3">
+<par_bool name="enabled" value="yes" />
+<par name="type" value="0" />
+<par name="delay" value="0" />
+<par_bool name="resonance" value="yes" />
+<par name="ext_oscil" value="0" />
+<par name="ext_fm_oscil" value="-1" />
+<par name="oscil_phase" value="64" />
+<par name="oscil_fm_phase" value="64" />
+<par_bool name="filter_enabled" value="yes" />
+<par_bool name="filter_bypass" value="no" />
+<par name="fm_enabled" value="0" />
+<OSCIL>
+<par name="harmonic_mag_type" value="0" />
+<par name="base_function" value="12" />
+<par name="base_function_par" value="64" />
+<par name="base_function_modulation" value="0" />
+<par name="base_function_modulation_par1" value="64" />
+<par name="base_function_modulation_par2" value="64" />
+<par name="base_function_modulation_par3" value="32" />
+<par name="modulation" value="0" />
+<par name="modulation_par1" value="64" />
+<par name="modulation_par2" value="64" />
+<par name="modulation_par3" value="32" />
+<par name="wave_shaping" value="64" />
+<par name="wave_shaping_function" value="0" />
+<par name="filter_type" value="0" />
+<par name="filter_par1" value="64" />
+<par name="filter_par2" value="64" />
+<par name="filter_before_wave_shaping" value="0" />
+<par name="spectrum_adjust_type" value="0" />
+<par name="spectrum_adjust_par" value="64" />
+<par name="rand" value="64" />
+<par name="amp_rand_type" value="0" />
+<par name="amp_rand_power" value="64" />
+<par name="harmonic_shift" value="0" />
+<par_bool name="harmonic_shift_first" value="no" />
+<par name="adaptive_harmonics" value="0" />
+<par name="adaptive_harmonics_base_frequency" value="128" />
+<par name="adaptive_harmonics_power" value="100" />
+<HARMONICS>
+<HARMONIC id="1">
+<par name="mag" value="127" />
+<par name="phase" value="64" />
+</HARMONIC>
+<HARMONIC id="2">
+<par name="mag" value="104" />
+<par name="phase" value="64" />
+</HARMONIC>
+<HARMONIC id="3">
+<par name="mag" value="81" />
+<par name="phase" value="64" />
+</HARMONIC>
+<HARMONIC id="4">
+<par name="mag" value="57" />
+<par name="phase" value="64" />
+</HARMONIC>
+</HARMONICS>
+</OSCIL>
+<AMPLITUDE_PARAMETERS>
+<par name="panning" value="64" />
+<par name="volume" value="100" />
+<par_bool name="volume_minus" value="no" />
+<par name="velocity_sensing" value="127" />
+<par_bool name="amp_envelope_enabled" value="yes" />
+<AMPLITUDE_ENVELOPE>
+<par_bool name="free_mode" value="yes" />
+<par name="env_points" value="6" />
+<par name="env_sustain" value="3" />
+<par name="env_stretch" value="0" />
+<par_bool name="forced_release" value="yes" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="0" />
+<par name="D_dt" value="100" />
+<par name="R_dt" value="100" />
+<par name="A_val" value="64" />
+<par name="D_val" value="64" />
+<par name="S_val" value="127" />
+<par name="R_val" value="64" />
+<POINT id="0">
+<par name="val" value="0" />
+</POINT>
+<POINT id="1">
+<par name="dt" value="0" />
+<par name="val" value="127" />
+</POINT>
+<POINT id="2">
+<par name="dt" value="33" />
+<par name="val" value="106" />
+</POINT>
+<POINT id="3">
+<par name="dt" value="5" />
+<par name="val" value="0" />
+</POINT>
+<POINT id="4">
+<par name="dt" value="91" />
+<par name="val" value="0" />
+</POINT>
+<POINT id="5">
+<par name="dt" value="100" />
+<par name="val" value="0" />
+</POINT>
+</AMPLITUDE_ENVELOPE>
+<par_bool name="amp_lfo_enabled" value="no" />
+</AMPLITUDE_PARAMETERS>
+<FREQUENCY_PARAMETERS>
+<par_bool name="fixed_freq" value="no" />
+<par name="fixed_freq_et" value="0" />
+<par name="detune" value="10215" />
+<par name="coarse_detune" value="0" />
+<par name="detune_type" value="0" />
+<par_bool name="freq_envelope_enabled" value="no" />
+<par_bool name="freq_lfo_enabled" value="no" />
+</FREQUENCY_PARAMETERS>
+<FILTER_PARAMETERS>
+<FILTER>
+<par name="category" value="1" />
+<par name="type" value="0" />
+<par name="freq" value="42" />
+<par name="q" value="45" />
+<par name="stages" value="0" />
+<par name="freq_track" value="64" />
+<par name="gain" value="64" />
+<FORMANT_FILTER>
+<par name="num_formants" value="3" />
+<par name="formant_slowness" value="64" />
+<par name="vowel_clearness" value="64" />
+<par name="center_freq" value="77" />
+<par name="octaves_freq" value="40" />
+<VOWEL id="0">
+<FORMANT id="0">
+<par name="freq" value="15" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="23" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="122" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="44" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="115" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="3" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="91" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="70" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="90" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="5" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="95" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="64" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="1">
+<FORMANT id="0">
+<par name="freq" value="72" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="7" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="123" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="117" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="107" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="61" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="44" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="58" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="17" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="3" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="123" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="106" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="2">
+<FORMANT id="0">
+<par name="freq" value="25" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="7" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="95" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="107" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="60" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="75" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="98" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="24" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="99" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="93" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="68" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="88" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="3">
+<FORMANT id="0">
+<par name="freq" value="96" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="33" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="31" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="60" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="39" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="0" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="124" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="25" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="8" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="121" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="15" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="116" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="4">
+<FORMANT id="0">
+<par name="freq" value="56" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="60" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="47" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="73" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="64" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="44" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="52" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="90" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="51" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="21" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="71" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="112" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="5">
+<FORMANT id="0">
+<par name="freq" value="96" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="42" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="9" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="69" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="8" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="78" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="30" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="105" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="112" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="62" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="39" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="24" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<par name="sequence_size" value="3" />
+<par name="sequence_stretch" value="40" />
+<par_bool name="sequence_reversed" value="no" />
+<SEQUENCE_POS id="0">
+<par name="vowel_id" value="0" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="1">
+<par name="vowel_id" value="1" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="2">
+<par name="vowel_id" value="2" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="3">
+<par name="vowel_id" value="3" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="4">
+<par name="vowel_id" value="4" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="5">
+<par name="vowel_id" value="5" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="6">
+<par name="vowel_id" value="0" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="7">
+<par name="vowel_id" value="1" />
+</SEQUENCE_POS>
+</FORMANT_FILTER>
+</FILTER>
+<par_bool name="filter_envelope_enabled" value="no" />
+<par_bool name="filter_lfo_enabled" value="no" />
+</FILTER_PARAMETERS>
+</VOICE>
+<VOICE id="4">
+<par_bool name="enabled" value="yes" />
+<par name="type" value="0" />
+<par name="delay" value="0" />
+<par_bool name="resonance" value="yes" />
+<par name="ext_oscil" value="0" />
+<par name="ext_fm_oscil" value="-1" />
+<par name="oscil_phase" value="64" />
+<par name="oscil_fm_phase" value="64" />
+<par_bool name="filter_enabled" value="yes" />
+<par_bool name="filter_bypass" value="no" />
+<par name="fm_enabled" value="0" />
+<OSCIL>
+<par name="harmonic_mag_type" value="0" />
+<par name="base_function" value="127" />
+<par name="base_function_par" value="64" />
+<par name="base_function_modulation" value="0" />
+<par name="base_function_modulation_par1" value="64" />
+<par name="base_function_modulation_par2" value="64" />
+<par name="base_function_modulation_par3" value="32" />
+<par name="modulation" value="0" />
+<par name="modulation_par1" value="64" />
+<par name="modulation_par2" value="64" />
+<par name="modulation_par3" value="32" />
+<par name="wave_shaping" value="64" />
+<par name="wave_shaping_function" value="0" />
+<par name="filter_type" value="0" />
+<par name="filter_par1" value="64" />
+<par name="filter_par2" value="64" />
+<par name="filter_before_wave_shaping" value="0" />
+<par name="spectrum_adjust_type" value="0" />
+<par name="spectrum_adjust_par" value="64" />
+<par name="rand" value="64" />
+<par name="amp_rand_type" value="0" />
+<par name="amp_rand_power" value="64" />
+<par name="harmonic_shift" value="0" />
+<par_bool name="harmonic_shift_first" value="no" />
+<par name="adaptive_harmonics" value="1" />
+<par name="adaptive_harmonics_base_frequency" value="128" />
+<par name="adaptive_harmonics_power" value="100" />
+<HARMONICS>
+<HARMONIC id="1">
+<par name="mag" value="127" />
+<par name="phase" value="64" />
+</HARMONIC>
+</HARMONICS>
+<BASE_FUNCTION>
+<BF_HARMONIC id="1">
+<par_real name="cos" value="-0.220165" />
+<par_real name="sin" value="0.513574" />
+</BF_HARMONIC>
+<BF_HARMONIC id="2">
+<par_real name="cos" value="0.378651" />
+<par_real name="sin" value="-0.925667" />
+</BF_HARMONIC>
+<BF_HARMONIC id="3">
+<par_real name="cos" value="0.115391" />
+<par_real name="sin" value="-0.276209" />
+</BF_HARMONIC>
+<BF_HARMONIC id="4">
+<par_real name="cos" value="0.419304" />
+<par_real name="sin" value="-1" />
+</BF_HARMONIC>
+<BF_HARMONIC id="5">
+<par_real name="cos" value="0.0240683" />
+<par_real name="sin" value="-0.046475" />
+</BF_HARMONIC>
+<BF_HARMONIC id="6">
+<par_real name="cos" value="0.256666" />
+<par_real name="sin" value="-0.603154" />
+</BF_HARMONIC>
+<BF_HARMONIC id="7">
+<par_real name="cos" value="-0.00302298" />
+<par_real name="sin" value="0.0190696" />
+</BF_HARMONIC>
+<BF_HARMONIC id="8">
+<par_real name="cos" value="-0.0234125" />
+<par_real name="sin" value="0.0744608" />
+</BF_HARMONIC>
+<BF_HARMONIC id="9">
+<par_real name="cos" value="0.0373269" />
+<par_real name="sin" value="-0.0773995" />
+</BF_HARMONIC>
+<BF_HARMONIC id="10">
+<par_real name="cos" value="0.00423722" />
+<par_real name="sin" value="0.00728928" />
+</BF_HARMONIC>
+<BF_HARMONIC id="11">
+<par_real name="cos" value="-0.0116225" />
+<par_real name="sin" value="0.0375329" />
+</BF_HARMONIC>
+<BF_HARMONIC id="12">
+<par_real name="cos" value="-0.00987414" />
+<par_real name="sin" value="0.0422315" />
+</BF_HARMONIC>
+<BF_HARMONIC id="13">
+<par_real name="cos" value="-0.0118667" />
+<par_real name="sin" value="0.0368076" />
+</BF_HARMONIC>
+<BF_HARMONIC id="14">
+<par_real name="cos" value="-0.0136884" />
+<par_real name="sin" value="0.0480463" />
+</BF_HARMONIC>
+<BF_HARMONIC id="15">
+<par_real name="cos" value="-0.0051101" />
+<par_real name="sin" value="0.0223905" />
+</BF_HARMONIC>
+<BF_HARMONIC id="16">
+<par_real name="cos" value="-0.0234672" />
+<par_real name="sin" value="0.0690304" />
+</BF_HARMONIC>
+<BF_HARMONIC id="17">
+<par_real name="cos" value="-0.0111868" />
+<par_real name="sin" value="0.0327768" />
+</BF_HARMONIC>
+<BF_HARMONIC id="18">
+<par_real name="cos" value="-0.015651" />
+<par_real name="sin" value="0.0530805" />
+</BF_HARMONIC>
+<BF_HARMONIC id="19">
+<par_real name="cos" value="-0.0107414" />
+<par_real name="sin" value="0.0306568" />
+</BF_HARMONIC>
+<BF_HARMONIC id="20">
+<par_real name="cos" value="-0.0202112" />
+<par_real name="sin" value="0.0581748" />
+</BF_HARMONIC>
+<BF_HARMONIC id="21">
+<par_real name="cos" value="-0.0111319" />
+<par_real name="sin" value="0.0338259" />
+</BF_HARMONIC>
+<BF_HARMONIC id="22">
+<par_real name="cos" value="-0.0174961" />
+<par_real name="sin" value="0.0515868" />
+</BF_HARMONIC>
+<BF_HARMONIC id="23">
+<par_real name="cos" value="-0.00992718" />
+<par_real name="sin" value="0.0268767" />
+</BF_HARMONIC>
+<BF_HARMONIC id="24">
+<par_real name="cos" value="-0.0199375" />
+<par_real name="sin" value="0.057967" />
+</BF_HARMONIC>
+<BF_HARMONIC id="25">
+<par_real name="cos" value="-0.0095778" />
+<par_real name="sin" value="0.0252453" />
+</BF_HARMONIC>
+<BF_HARMONIC id="26">
+<par_real name="cos" value="-0.0169519" />
+<par_real name="sin" value="0.0478601" />
+</BF_HARMONIC>
+<BF_HARMONIC id="27">
+<par_real name="cos" value="-0.011922" />
+<par_real name="sin" value="0.0330902" />
+</BF_HARMONIC>
+<BF_HARMONIC id="28">
+<par_real name="cos" value="-0.0162602" />
+<par_real name="sin" value="0.0437906" />
+</BF_HARMONIC>
+<BF_HARMONIC id="29">
+<par_real name="cos" value="-0.0089892" />
+<par_real name="sin" value="0.0224432" />
+</BF_HARMONIC>
+<BF_HARMONIC id="30">
+<par_real name="cos" value="-0.0192105" />
+<par_real name="sin" value="0.0539347" />
+</BF_HARMONIC>
+<BF_HARMONIC id="31">
+<par_real name="cos" value="-0.00874251" />
+<par_real name="sin" value="0.0212397" />
+</BF_HARMONIC>
+<BF_HARMONIC id="32">
+<par_real name="cos" value="-0.0150362" />
+<par_real name="sin" value="0.038907" />
+</BF_HARMONIC>
+<BF_HARMONIC id="33">
+<par_real name="cos" value="-0.0116587" />
+<par_real name="sin" value="0.0302751" />
+</BF_HARMONIC>
+<BF_HARMONIC id="34">
+<par_real name="cos" value="-0.0155241" />
+<par_real name="sin" value="0.0404489" />
+</BF_HARMONIC>
+<BF_HARMONIC id="35">
+<par_real name="cos" value="-0.00832563" />
+<par_real name="sin" value="0.0191522" />
+</BF_HARMONIC>
+<BF_HARMONIC id="36">
+<par_real name="cos" value="-0.0172991" />
+<par_real name="sin" value="0.0450749" />
+</BF_HARMONIC>
+<BF_HARMONIC id="37">
+<par_real name="cos" value="-0.00814899" />
+<par_real name="sin" value="0.0182429" />
+</BF_HARMONIC>
+<BF_HARMONIC id="38">
+<par_real name="cos" value="-0.0148873" />
+<par_real name="sin" value="0.0372817" />
+</BF_HARMONIC>
+<BF_HARMONIC id="39">
+<par_real name="cos" value="-0.0111921" />
+<par_real name="sin" value="0.0273413" />
+</BF_HARMONIC>
+<BF_HARMONIC id="40">
+<par_real name="cos" value="-0.0133716" />
+<par_real name="sin" value="0.031753" />
+</BF_HARMONIC>
+<BF_HARMONIC id="41">
+<par_real name="cos" value="-0.00784626" />
+<par_real name="sin" value="0.016642" />
+</BF_HARMONIC>
+<BF_HARMONIC id="42">
+<par_real name="cos" value="-0.0175053" />
+<par_real name="sin" value="0.0441884" />
+</BF_HARMONIC>
+<BF_HARMONIC id="43">
+<par_real name="cos" value="-0.00771602" />
+<par_real name="sin" value="0.015934" />
+</BF_HARMONIC>
+<BF_HARMONIC id="44">
+<par_real name="cos" value="-0.0127874" />
+<par_real name="sin" value="0.029053" />
+</BF_HARMONIC>
+<BF_HARMONIC id="45">
+<par_real name="cos" value="-0.010729" />
+<par_real name="sin" value="0.0247046" />
+</BF_HARMONIC>
+<BF_HARMONIC id="46">
+<par_real name="cos" value="-0.0138453" />
+<par_real name="sin" value="0.0320335" />
+</BF_HARMONIC>
+<BF_HARMONIC id="47">
+<par_real name="cos" value="-0.00748959" />
+<par_real name="sin" value="0.0146702" />
+</BF_HARMONIC>
+<BF_HARMONIC id="48">
+<par_real name="cos" value="-0.0153891" />
+<par_real name="sin" value="0.0358961" />
+</BF_HARMONIC>
+<BF_HARMONIC id="49">
+<par_real name="cos" value="-0.00739079" />
+<par_real name="sin" value="0.0141038" />
+</BF_HARMONIC>
+<BF_HARMONIC id="50">
+<par_real name="cos" value="-0.0134257" />
+<par_real name="sin" value="0.0298637" />
+</BF_HARMONIC>
+<BF_HARMONIC id="51">
+<par_real name="cos" value="-0.0103188" />
+<par_real name="sin" value="0.0224196" />
+</BF_HARMONIC>
+<BF_HARMONIC id="52">
+<par_real name="cos" value="-0.0119185" />
+<par_real name="sin" value="0.0247833" />
+</BF_HARMONIC>
+<BF_HARMONIC id="53">
+<par_real name="cos" value="-0.00721681" />
+<par_real name="sin" value="0.0130804" />
+</BF_HARMONIC>
+<BF_HARMONIC id="54">
+<par_real name="cos" value="-0.0160194" />
+<par_real name="sin" value="0.0364935" />
+</BF_HARMONIC>
+<BF_HARMONIC id="55">
+<par_real name="cos" value="-0.00713996" />
+<par_real name="sin" value="0.0126165" />
+</BF_HARMONIC>
+<BF_HARMONIC id="56">
+<par_real name="cos" value="-0.0115889" />
+<par_real name="sin" value="0.0230631" />
+</BF_HARMONIC>
+<BF_HARMONIC id="57">
+<par_real name="cos" value="-0.0099674" />
+<par_real name="sin" value="0.0204529" />
+</BF_HARMONIC>
+<BF_HARMONIC id="58">
+<par_real name="cos" value="-0.0127429" />
+<par_real name="sin" value="0.0262217" />
+</BF_HARMONIC>
+<BF_HARMONIC id="59">
+<par_real name="cos" value="-0.00700315" />
+<par_real name="sin" value="0.0117698" />
+</BF_HARMONIC>
+<BF_HARMONIC id="60">
+<par_real name="cos" value="-0.0141495" />
+<par_real name="sin" value="0.0295503" />
+</BF_HARMONIC>
+<BF_HARMONIC id="61">
+<par_real name="cos" value="-0.00694208" />
+<par_real name="sin" value="0.0113822" />
+</BF_HARMONIC>
+<BF_HARMONIC id="62">
+<par_real name="cos" value="-0.012464" />
+<par_real name="sin" value="0.024682" />
+</BF_HARMONIC>
+<BF_HARMONIC id="63">
+<par_real name="cos" value="-0.009669" />
+<par_real name="sin" value="0.0187549" />
+</BF_HARMONIC>
+<BF_HARMONIC id="64">
+<par_real name="cos" value="-0.0110702" />
+<par_real name="sin" value="0.0202079" />
+</BF_HARMONIC>
+<BF_HARMONIC id="65">
+<par_real name="cos" value="-0.00683234" />
+<par_real name="sin" value="0.0106687" />
+</BF_HARMONIC>
+<BF_HARMONIC id="66">
+<par_real name="cos" value="-0.0149482" />
+<par_real name="sin" value="0.0307836" />
+</BF_HARMONIC>
+<BF_HARMONIC id="67">
+<par_real name="cos" value="-0.00678291" />
+<par_real name="sin" value="0.0103394" />
+</BF_HARMONIC>
+<BF_HARMONIC id="68">
+<par_real name="cos" value="-0.0108633" />
+<par_real name="sin" value="0.0190079" />
+</BF_HARMONIC>
+<BF_HARMONIC id="69">
+<par_real name="cos" value="-0.00941545" />
+<par_real name="sin" value="0.017279" />
+</BF_HARMONIC>
+<BF_HARMONIC id="70">
+<par_real name="cos" value="-0.0120008" />
+<par_real name="sin" value="0.0220359" />
+</BF_HARMONIC>
+<BF_HARMONIC id="71">
+<par_real name="cos" value="-0.00669339" />
+<par_real name="sin" value="0.00972866" />
+</BF_HARMONIC>
+<BF_HARMONIC id="72">
+<par_real name="cos" value="-0.0133134" />
+<par_real name="sin" value="0.0249543" />
+</BF_HARMONIC>
+<BF_HARMONIC id="73">
+<par_real name="cos" value="-0.00665276" />
+<par_real name="sin" value="0.00944478" />
+</BF_HARMONIC>
+<BF_HARMONIC id="74">
+<par_real name="cos" value="-0.0118074" />
+<par_real name="sin" value="0.0208905" />
+</BF_HARMONIC>
+<BF_HARMONIC id="75">
+<par_real name="cos" value="-0.00919908" />
+<par_real name="sin" value="0.015986" />
+</BF_HARMONIC>
+<BF_HARMONIC id="76">
+<par_real name="cos" value="-0.0105251" />
+<par_real name="sin" value="0.016949" />
+</BF_HARMONIC>
+<BF_HARMONIC id="77">
+<par_real name="cos" value="-0.00657868" />
+<par_real name="sin" value="0.00891483" />
+</BF_HARMONIC>
+<BF_HARMONIC id="78">
+<par_real name="cos" value="-0.0141757" />
+<par_real name="sin" value="0.0264514" />
+</BF_HARMONIC>
+<BF_HARMONIC id="79">
+<par_real name="cos" value="-0.00654484" />
+<par_real name="sin" value="0.00866698" />
+</BF_HARMONIC>
+<BF_HARMONIC id="80">
+<par_real name="cos" value="-0.0103855" />
+<par_real name="sin" value="0.0160577" />
+</BF_HARMONIC>
+<BF_HARMONIC id="81">
+<par_real name="cos" value="-0.00901335" />
+<par_real name="sin" value="0.0148444" />
+</BF_HARMONIC>
+<BF_HARMONIC id="82">
+<par_real name="cos" value="-0.0114794" />
+<par_real name="sin" value="0.0188808" />
+</BF_HARMONIC>
+<BF_HARMONIC id="83">
+<par_real name="cos" value="-0.00648276" />
+<par_real name="sin" value="0.00820169" />
+</BF_HARMONIC>
+<BF_HARMONIC id="84">
+<par_real name="cos" value="-0.0127234" />
+<par_real name="sin" value="0.0214727" />
+</BF_HARMONIC>
+<BF_HARMONIC id="85">
+<par_real name="cos" value="-0.00645424" />
+<par_real name="sin" value="0.0079829" />
+</BF_HARMONIC>
+<BF_HARMONIC id="86">
+<par_real name="cos" value="-0.0113396" />
+<par_real name="sin" value="0.0179936" />
+</BF_HARMONIC>
+<BF_HARMONIC id="87">
+<par_real name="cos" value="-0.00885291" />
+<par_real name="sin" value="0.0138286" />
+</BF_HARMONIC>
+<BF_HARMONIC id="88">
+<par_real name="cos" value="-0.0101508" />
+<par_real name="sin" value="0.0144912" />
+</BF_HARMONIC>
+<BF_HARMONIC id="89">
+<par_real name="cos" value="-0.00640167" />
+<par_real name="sin" value="0.00757009" />
+</BF_HARMONIC>
+<BF_HARMONIC id="90">
+<par_real name="cos" value="-0.0136047" />
+<par_real name="sin" value="0.0230621" />
+</BF_HARMONIC>
+<BF_HARMONIC id="91">
+<par_real name="cos" value="-0.0063774" />
+<par_real name="sin" value="0.00737504" />
+</BF_HARMONIC>
+<BF_HARMONIC id="92">
+<par_real name="cos" value="-0.0100515" />
+<par_real name="sin" value="0.0137979" />
+</BF_HARMONIC>
+<BF_HARMONIC id="93">
+<par_real name="cos" value="-0.00871345" />
+<par_real name="sin" value="0.0129183" />
+</BF_HARMONIC>
+<BF_HARMONIC id="94">
+<par_real name="cos" value="-0.0110986" />
+<par_real name="sin" value="0.0164098" />
+</BF_HARMONIC>
+<BF_HARMONIC id="95">
+<par_real name="cos" value="-0.00633245" />
+<par_real name="sin" value="0.00700539" />
+</BF_HARMONIC>
+<BF_HARMONIC id="96">
+<par_real name="cos" value="-0.0122906" />
+<par_real name="sin" value="0.0187355" />
+</BF_HARMONIC>
+<BF_HARMONIC id="97">
+<par_real name="cos" value="-0.00631161" />
+<par_real name="sin" value="0.00682998" />
+</BF_HARMONIC>
+<BF_HARMONIC id="98">
+<par_real name="cos" value="-0.0109941" />
+<par_real name="sin" value="0.0156993" />
+</BF_HARMONIC>
+<BF_HARMONIC id="99">
+<par_real name="cos" value="-0.00859149" />
+<par_real name="sin" value="0.0120969" />
+</BF_HARMONIC>
+<BF_HARMONIC id="100">
+<par_real name="cos" value="-0.0098812" />
+<par_real name="sin" value="0.0125567" />
+</BF_HARMONIC>
+<BF_HARMONIC id="101">
+<par_real name="cos" value="-0.00627288" />
+<par_real name="sin" value="0.00649621" />
+</BF_HARMONIC>
+<BF_HARMONIC id="102">
+<par_real name="cos" value="-0.0131712" />
+<par_real name="sin" value="0.0203344" />
+</BF_HARMONIC>
+<BF_HARMONIC id="103">
+<par_real name="cos" value="-0.00625486" />
+<par_real name="sin" value="0.00633722" />
+</BF_HARMONIC>
+<BF_HARMONIC id="104">
+<par_real name="cos" value="-0.00980779" />
+<par_real name="sin" value="0.0119979" />
+</BF_HARMONIC>
+<BF_HARMONIC id="105">
+<par_real name="cos" value="-0.00848426" />
+<par_real name="sin" value="0.0113511" />
+</BF_HARMONIC>
+<BF_HARMONIC id="106">
+<par_real name="cos" value="-0.0108115" />
+<par_real name="sin" value="0.0144128" />
+</BF_HARMONIC>
+<BF_HARMONIC id="107">
+<par_real name="cos" value="-0.00622123" />
+<par_real name="sin" value="0.00603358" />
+</BF_HARMONIC>
+<BF_HARMONIC id="108">
+<par_real name="cos" value="-0.0119631" />
+<par_real name="sin" value="0.0165171" />
+</BF_HARMONIC>
+<BF_HARMONIC id="109">
+<par_real name="cos" value="-0.00620554" />
+<par_real name="sin" value="0.00588843" />
+</BF_HARMONIC>
+<BF_HARMONIC id="110">
+<par_real name="cos" value="-0.0107313" />
+<par_real name="sin" value="0.0138279" />
+</BF_HARMONIC>
+<BF_HARMONIC id="111">
+<par_real name="cos" value="-0.00838947" />
+<par_real name="sin" value="0.0106701" />
+</BF_HARMONIC>
+<BF_HARMONIC id="112">
+<par_real name="cos" value="-0.00967986" />
+<par_real name="sin" value="0.0109826" />
+</BF_HARMONIC>
+<BF_HARMONIC id="113">
+<par_real name="cos" value="-0.00617618" />
+<par_real name="sin" value="0.00561031" />
+</BF_HARMONIC>
+<BF_HARMONIC id="114">
+<par_real name="cos" value="-0.0128344" />
+<par_real name="sin" value="0.0180846" />
+</BF_HARMONIC>
+<BF_HARMONIC id="115">
+<par_real name="cos" value="-0.00616244" />
+<par_real name="sin" value="0.00547693" />
+</BF_HARMONIC>
+<BF_HARMONIC id="116">
+<par_real name="cos" value="-0.00962393" />
+<par_real name="sin" value="0.0105192" />
+</BF_HARMONIC>
+<BF_HARMONIC id="117">
+<par_real name="cos" value="-0.00830529" />
+<par_real name="sin" value="0.0100448" />
+</BF_HARMONIC>
+<BF_HARMONIC id="118">
+<par_real name="cos" value="-0.0105893" />
+<par_real name="sin" value="0.0127563" />
+</BF_HARMONIC>
+<BF_HARMONIC id="119">
+<par_real name="cos" value="-0.00613666" />
+<par_real name="sin" value="0.00522061" />
+</BF_HARMONIC>
+<BF_HARMONIC id="120">
+<par_real name="cos" value="-0.0117087" />
+<par_real name="sin" value="0.0146736" />
+</BF_HARMONIC>
+<BF_HARMONIC id="121">
+<par_real name="cos" value="-0.00612457" />
+<par_real name="sin" value="0.00509731" />
+</BF_HARMONIC>
+<BF_HARMONIC id="122">
+<par_real name="cos" value="-0.0105264" />
+<par_real name="sin" value="0.0122636" />
+</BF_HARMONIC>
+<BF_HARMONIC id="123">
+<par_real name="cos" value="-0.00823021" />
+<par_real name="sin" value="0.00946776" />
+</BF_HARMONIC>
+<BF_HARMONIC id="124">
+<par_real name="cos" value="-0.00952527" />
+<par_real name="sin" value="0.00966694" />
+</BF_HARMONIC>
+<BF_HARMONIC id="125">
+<par_real name="cos" value="-0.00610184" />
+<par_real name="sin" value="0.0048597" />
+</BF_HARMONIC>
+<BF_HARMONIC id="126">
+<par_real name="cos" value="-0.0125673" />
+<par_real name="sin" value="0.0161895" />
+</BF_HARMONIC>
+<BF_HARMONIC id="127">
+<par_real name="cos" value="-0.00609115" />
+<par_real name="sin" value="0.00474509" />
+</BF_HARMONIC>
+<BF_HARMONIC id="128">
+<par_real name="cos" value="-0.00948165" />
+<par_real name="sin" value="0.00927346" />
+</BF_HARMONIC>
+<BF_HARMONIC id="129">
+<par_real name="cos" value="-0.00816298" />
+<par_real name="sin" value="0.00893278" />
+</BF_HARMONIC>
+<BF_HARMONIC id="130">
+<par_real name="cos" value="-0.0104139" />
+<par_real name="sin" value="0.0113519" />
+</BF_HARMONIC>
+<BF_HARMONIC id="131">
+<par_real name="cos" value="-0.00607102" />
+<par_real name="sin" value="0.00452365" />
+</BF_HARMONIC>
+<BF_HARMONIC id="132">
+<par_real name="cos" value="-0.0115071" />
+<par_real name="sin" value="0.0131087" />
+</BF_HARMONIC>
+<BF_HARMONIC id="133">
+<par_real name="cos" value="-0.00606154" />
+<par_real name="sin" value="0.00441658" />
+</BF_HARMONIC>
+<BF_HARMONIC id="134">
+<par_real name="cos" value="-0.0103635" />
+<par_real name="sin" value="0.0109286" />
+</BF_HARMONIC>
+<BF_HARMONIC id="135">
+<par_real name="cos" value="-0.00810257" />
+<par_real name="sin" value="0.00843461" />
+</BF_HARMONIC>
+<BF_HARMONIC id="136">
+<par_real name="cos" value="-0.00940399" />
+<par_real name="sin" value="0.00854232" />
+</BF_HARMONIC>
+<BF_HARMONIC id="137">
+<par_real name="cos" value="-0.00604366" />
+<par_real name="sin" value="0.00420919" />
+</BF_HARMONIC>
+<BF_HARMONIC id="138">
+<par_real name="cos" value="-0.0123519" />
+<par_real name="sin" value="0.0145639" />
+</BF_HARMONIC>
+<BF_HARMONIC id="139">
+<par_real name="cos" value="-0.00603523" />
+<par_real name="sin" value="0.00410868" />
+</BF_HARMONIC>
+<BF_HARMONIC id="140">
+<par_real name="cos" value="-0.00936936" />
+<par_real name="sin" value="0.00820148" />
+</BF_HARMONIC>
+<BF_HARMONIC id="141">
+<par_real name="cos" value="-0.00804811" />
+<par_real name="sin" value="0.00796879" />
+</BF_HARMONIC>
+<BF_HARMONIC id="142">
+<par_real name="cos" value="-0.0102729" />
+<par_real name="sin" value="0.0101385" />
+</BF_HARMONIC>
+<BF_HARMONIC id="143">
+<par_real name="cos" value="-0.0060193" />
+<par_real name="sin" value="0.00391355" />
+</BF_HARMONIC>
+<BF_HARMONIC id="144">
+<par_real name="cos" value="-0.0113446" />
+<par_real name="sin" value="0.0117562" />
+</BF_HARMONIC>
+<BF_HARMONIC id="145">
+<par_real name="cos" value="-0.00601178" />
+<par_real name="sin" value="0.00381876" />
+</BF_HARMONIC>
+<BF_HARMONIC id="146">
+<par_real name="cos" value="-0.0102321" />
+<par_real name="sin" value="0.00976871" />
+</BF_HARMONIC>
+<BF_HARMONIC id="147">
+<par_real name="cos" value="-0.00799888" />
+<par_real name="sin" value="0.00753151" />
+</BF_HARMONIC>
+<BF_HARMONIC id="148">
+<par_real name="cos" value="-0.00930725" />
+<par_real name="sin" value="0.00756253" />
+</BF_HARMONIC>
+<BF_HARMONIC id="149">
+<par_real name="cos" value="-0.00599757" />
+<par_real name="sin" value="0.00363436" />
+</BF_HARMONIC>
+<BF_HARMONIC id="150">
+<par_real name="cos" value="-0.0121758" />
+<par_real name="sin" value="0.0131472" />
+</BF_HARMONIC>
+<BF_HARMONIC id="151">
+<par_real name="cos" value="-0.00599085" />
+<par_real name="sin" value="0.00354461" />
+</BF_HARMONIC>
+<BF_HARMONIC id="152">
+<par_real name="cos" value="-0.00927937" />
+<par_real name="sin" value="0.00726214" />
+</BF_HARMONIC>
+<BF_HARMONIC id="153">
+<par_real name="cos" value="-0.00795426" />
+<par_real name="sin" value="0.00711951" />
+</BF_HARMONIC>
+<BF_HARMONIC id="154">
+<par_real name="cos" value="-0.0101582" />
+<par_real name="sin" value="0.00907304" />
+</BF_HARMONIC>
+<BF_HARMONIC id="155">
+<par_real name="cos" value="-0.00597814" />
+<par_real name="sin" value="0.00336963" />
+</BF_HARMONIC>
+<BF_HARMONIC id="156">
+<par_real name="cos" value="-0.0112118" />
+<par_real name="sin" value="0.0105684" />
+</BF_HARMONIC>
+<BF_HARMONIC id="157">
+<par_real name="cos" value="-0.00597214" />
+<par_real name="sin" value="0.0032843" />
+</BF_HARMONIC>
+<BF_HARMONIC id="158">
+<par_real name="cos" value="-0.0101247" />
+<par_real name="sin" value="0.00874499" />
+</BF_HARMONIC>
+<BF_HARMONIC id="159">
+<par_real name="cos" value="-0.00791374" />
+<par_real name="sin" value="0.00672995" />
+</BF_HARMONIC>
+<BF_HARMONIC id="160">
+<par_real name="cos" value="-0.00922912" />
+<par_real name="sin" value="0.00669462" />
+</BF_HARMONIC>
+<BF_HARMONIC id="161">
+<par_real name="cos" value="-0.00596077" />
+<par_real name="sin" value="0.00311763" />
+</BF_HARMONIC>
+<BF_HARMONIC id="162">
+<par_real name="cos" value="-0.0120301" />
+<par_real name="sin" value="0.0118949" />
+</BF_HARMONIC>
+<BF_HARMONIC id="163">
+<par_real name="cos" value="-0.00595539" />
+<par_real name="sin" value="0.00303619" />
+</BF_HARMONIC>
+<BF_HARMONIC id="164">
+<par_real name="cos" value="-0.00920645" />
+<par_real name="sin" value="0.00642581" />
+</BF_HARMONIC>
+<BF_HARMONIC id="165">
+<par_real name="cos" value="-0.00787687" />
+<par_real name="sin" value="0.00636039" />
+</BF_HARMONIC>
+<BF_HARMONIC id="166">
+<par_real name="cos" value="-0.0100637" />
+<par_real name="sin" value="0.00812367" />
+</BF_HARMONIC>
+<BF_HARMONIC id="167">
+<par_real name="cos" value="-0.00594522" />
+<par_real name="sin" value="0.00287684" />
+</BF_HARMONIC>
+<BF_HARMONIC id="168">
+<par_real name="cos" value="-0.0111022" />
+<par_real name="sin" value="0.00951069" />
+</BF_HARMONIC>
+<BF_HARMONIC id="169">
+<par_real name="cos" value="-0.00594041" />
+<par_real name="sin" value="0.00279883" />
+</BF_HARMONIC>
+<BF_HARMONIC id="170">
+<par_real name="cos" value="-0.010036" />
+<par_real name="sin" value="0.00782873" />
+</BF_HARMONIC>
+<BF_HARMONIC id="171">
+<par_real name="cos" value="-0.00784327" />
+<par_real name="sin" value="0.00600867" />
+</BF_HARMONIC>
+<BF_HARMONIC id="172">
+<par_real name="cos" value="-0.00916544" />
+<par_real name="sin" value="0.00591442" />
+</BF_HARMONIC>
+<BF_HARMONIC id="173">
+<par_real name="cos" value="-0.00593132" />
+<par_real name="sin" value="0.00264594" />
+</BF_HARMONIC>
+<BF_HARMONIC id="174">
+<par_real name="cos" value="-0.0119084" />
+<par_real name="sin" value="0.0107738" />
+</BF_HARMONIC>
+<BF_HARMONIC id="175">
+<par_real name="cos" value="-0.00592702" />
+<par_real name="sin" value="0.00257096" />
+</BF_HARMONIC>
+<BF_HARMONIC id="176">
+<par_real name="cos" value="-0.00914689" />
+<par_real name="sin" value="0.00567055" />
+</BF_HARMONIC>
+<BF_HARMONIC id="177">
+<par_real name="cos" value="-0.00781262" />
+<par_real name="sin" value="0.0056729" />
+</BF_HARMONIC>
+<BF_HARMONIC id="178">
+<par_real name="cos" value="-0.00998542" />
+<par_real name="sin" value="0.00726665" />
+</BF_HARMONIC>
+<BF_HARMONIC id="179">
+<par_real name="cos" value="-0.0059189" />
+<par_real name="sin" value="0.00242377" />
+</BF_HARMONIC>
+<BF_HARMONIC id="180">
+<par_real name="cos" value="-0.0110109" />
+<par_real name="sin" value="0.00855675" />
+</BF_HARMONIC>
+<BF_HARMONIC id="181">
+<par_real name="cos" value="-0.00591506" />
+<par_real name="sin" value="0.00235148" />
+</BF_HARMONIC>
+<BF_HARMONIC id="182">
+<par_real name="cos" value="-0.00996234" />
+<par_real name="sin" value="0.00699821" />
+</BF_HARMONIC>
+<BF_HARMONIC id="183">
+<par_real name="cos" value="-0.00778463" />
+<par_real name="sin" value="0.0053514" />
+</BF_HARMONIC>
+<BF_HARMONIC id="184">
+<par_real name="cos" value="-0.00911327" />
+<par_real name="sin" value="0.00520368" />
+</BF_HARMONIC>
+<BF_HARMONIC id="185">
+<par_real name="cos" value="-0.00590783" />
+<par_real name="sin" value="0.00220932" />
+</BF_HARMONIC>
+<BF_HARMONIC id="186">
+<par_real name="cos" value="-0.0118061" />
+<par_real name="sin" value="0.00975868" />
+</BF_HARMONIC>
+<BF_HARMONIC id="187">
+<par_real name="cos" value="-0.00590442" />
+<par_real name="sin" value="0.00213939" />
+</BF_HARMONIC>
+<BF_HARMONIC id="188">
+<par_real name="cos" value="-0.00909805" />
+<par_real name="sin" value="0.00497967" />
+</BF_HARMONIC>
+<BF_HARMONIC id="189">
+<par_real name="cos" value="-0.00775907" />
+<par_real name="sin" value="0.00504269" />
+</BF_HARMONIC>
+<BF_HARMONIC id="190">
+<par_real name="cos" value="-0.00992015" />
+<par_real name="sin" value="0.00648369" />
+</BF_HARMONIC>
+<BF_HARMONIC id="191">
+<par_real name="cos" value="-0.00589799" />
+<par_real name="sin" value="0.00200166" />
+</BF_HARMONIC>
+<BF_HARMONIC id="192">
+<par_real name="cos" value="-0.0109345" />
+<par_real name="sin" value="0.00768641" />
+</BF_HARMONIC>
+<BF_HARMONIC id="193">
+<par_real name="cos" value="-0.00589497" />
+<par_real name="sin" value="0.00193379" />
+</BF_HARMONIC>
+<BF_HARMONIC id="194">
+<par_real name="cos" value="-0.00990088" />
+<par_real name="sin" value="0.0062366" />
+</BF_HARMONIC>
+<BF_HARMONIC id="195">
+<par_real name="cos" value="-0.00773571" />
+<par_real name="sin" value="0.00474543" />
+</BF_HARMONIC>
+<BF_HARMONIC id="196">
+<par_real name="cos" value="-0.00907046" />
+<par_real name="sin" value="0.0045483" />
+</BF_HARMONIC>
+<BF_HARMONIC id="197">
+<par_real name="cos" value="-0.00588929" />
+<par_real name="sin" value="0.00179995" />
+</BF_HARMONIC>
+<BF_HARMONIC id="198">
+<par_real name="cos" value="-0.0117196" />
+<par_real name="sin" value="0.00882951" />
+</BF_HARMONIC>
+<BF_HARMONIC id="199">
+<par_real name="cos" value="-0.00588663" />
+<par_real name="sin" value="0.0017339" />
+</BF_HARMONIC>
+<BF_HARMONIC id="200">
+<par_real name="cos" value="-0.00905798" />
+<par_real name="sin" value="0.00434014" />
+</BF_HARMONIC>
+<BF_HARMONIC id="201">
+<par_real name="cos" value="-0.00771439" />
+<par_real name="sin" value="0.00445841" />
+</BF_HARMONIC>
+<BF_HARMONIC id="202">
+<par_real name="cos" value="-0.00986563" />
+<par_real name="sin" value="0.00576044" />
+</BF_HARMONIC>
+<BF_HARMONIC id="203">
+<par_real name="cos" value="-0.00588164" />
+<par_real name="sin" value="0.00160345" />
+</BF_HARMONIC>
+<BF_HARMONIC id="204">
+<par_real name="cos" value="-0.0108703" />
+<par_real name="sin" value="0.00688377" />
+</BF_HARMONIC>
+<BF_HARMONIC id="205">
+<par_real name="cos" value="-0.00587931" />
+<par_real name="sin" value="0.00153898" />
+</BF_HARMONIC>
+<BF_HARMONIC id="206">
+<par_real name="cos" value="-0.00984953" />
+<par_real name="sin" value="0.00553056" />
+</BF_HARMONIC>
+<BF_HARMONIC id="207">
+<par_real name="cos" value="-0.00769493" />
+<par_real name="sin" value="0.00418057" />
+</BF_HARMONIC>
+<BF_HARMONIC id="208">
+<par_real name="cos" value="-0.00903543" />
+<par_real name="sin" value="0.00393709" />
+</BF_HARMONIC>
+<BF_HARMONIC id="209">
+<par_real name="cos" value="-0.00587497" />
+<par_real name="sin" value="0.00141148" />
+</BF_HARMONIC>
+<BF_HARMONIC id="210">
+<par_real name="cos" value="-0.0116463" />
+<par_real name="sin" value="0.00797053" />
+</BF_HARMONIC>
+<BF_HARMONIC id="211">
+<par_real name="cos" value="-0.00587296" />
+<par_real name="sin" value="0.00134838" />
+</BF_HARMONIC>
+<BF_HARMONIC id="212">
+<par_real name="cos" value="-0.00902527" />
+<par_real name="sin" value="0.00374156" />
+</BF_HARMONIC>
+<BF_HARMONIC id="213">
+<par_real name="cos" value="-0.0076772" />
+<par_real name="sin" value="0.00391089" />
+</BF_HARMONIC>
+<BF_HARMONIC id="214">
+<par_real name="cos" value="-0.00982012" />
+<par_real name="sin" value="0.00508534" />
+</BF_HARMONIC>
+<BF_HARMONIC id="215">
+<par_real name="cos" value="-0.00586924" />
+<par_real name="sin" value="0.0012234" />
+</BF_HARMONIC>
+<BF_HARMONIC id="216">
+<par_real name="cos" value="-0.0108164" />
+<par_real name="sin" value="0.00613605" />
+</BF_HARMONIC>
+<BF_HARMONIC id="217">
+<par_real name="cos" value="-0.00586752" />
+<par_real name="sin" value="0.00116147" />
+</BF_HARMONIC>
+<BF_HARMONIC id="218">
+<par_real name="cos" value="-0.00980672" />
+<par_real name="sin" value="0.00486932" />
+</BF_HARMONIC>
+<BF_HARMONIC id="219">
+<par_real name="cos" value="-0.00766109" />
+<par_real name="sin" value="0.00364848" />
+</BF_HARMONIC>
+<BF_HARMONIC id="220">
+<par_real name="cos" value="-0.009007" />
+<par_real name="sin" value="0.00336098" />
+</BF_HARMONIC>
+<BF_HARMONIC id="221">
+<par_real name="cos" value="-0.00586437" />
+<par_real name="sin" value="0.00103863" />
+</BF_HARMONIC>
+<BF_HARMONIC id="222">
+<par_real name="cos" value="-0.0115841" />
+<par_real name="sin" value="0.00716888" />
+</BF_HARMONIC>
+<BF_HARMONIC id="223">
+<par_real name="cos" value="-0.00586293" />
+<par_real name="sin" value="0.000977682" />
+</BF_HARMONIC>
+<BF_HARMONIC id="224">
+<par_real name="cos" value="-0.00899883" />
+<par_real name="sin" value="0.0031754" />
+</BF_HARMONIC>
+<BF_HARMONIC id="225">
+<par_real name="cos" value="-0.00764648" />
+<par_real name="sin" value="0.00339249" />
+</BF_HARMONIC>
+<BF_HARMONIC id="226">
+<par_real name="cos" value="-0.00978234" />
+<par_real name="sin" value="0.0044489" />
+</BF_HARMONIC>
+<BF_HARMONIC id="227">
+<par_real name="cos" value="-0.00586033" />
+<par_real name="sin" value="0.000856631" />
+</BF_HARMONIC>
+<BF_HARMONIC id="228">
+<par_real name="cos" value="-0.0107713" />
+<par_real name="sin" value="0.00543276" />
+</BF_HARMONIC>
+<BF_HARMONIC id="229">
+<par_real name="cos" value="-0.00585917" />
+<par_real name="sin" value="0.000796485" />
+</BF_HARMONIC>
+<BF_HARMONIC id="230">
+<par_real name="cos" value="-0.00977127" />
+<par_real name="sin" value="0.00424392" />
+</BF_HARMONIC>
+<BF_HARMONIC id="231">
+<par_real name="cos" value="-0.00763329" />
+<par_real name="sin" value="0.00314217" />
+</BF_HARMONIC>
+<BF_HARMONIC id="232">
+<par_real name="cos" value="-0.00898431" />
+<par_real name="sin" value="0.00281239" />
+</BF_HARMONIC>
+<BF_HARMONIC id="233">
+<par_real name="cos" value="-0.0058571" />
+<par_real name="sin" value="0.000676877" />
+</BF_HARMONIC>
+<BF_HARMONIC id="234">
+<par_real name="cos" value="-0.0115315" />
+<par_real name="sin" value="0.00641387" />
+</BF_HARMONIC>
+<BF_HARMONIC id="235">
+<par_real name="cos" value="-0.00585619" />
+<par_real name="sin" value="0.000617373" />
+</BF_HARMONIC>
+<BF_HARMONIC id="236">
+<par_real name="cos" value="-0.0089779" />
+<par_real name="sin" value="0.0026345" />
+</BF_HARMONIC>
+<BF_HARMONIC id="237">
+<par_real name="cos" value="-0.00762144" />
+<par_real name="sin" value="0.00289676" />
+</BF_HARMONIC>
+<BF_HARMONIC id="238">
+<par_real name="cos" value="-0.00975129" />
+<par_real name="sin" value="0.00384311" />
+</BF_HARMONIC>
+<BF_HARMONIC id="239">
+<par_real name="cos" value="-0.00585463" />
+<par_real name="sin" value="0.00049888" />
+</BF_HARMONIC>
+<BF_HARMONIC id="240">
+<par_real name="cos" value="-0.0107337" />
+<par_real name="sin" value="0.00476505" />
+</BF_HARMONIC>
+<BF_HARMONIC id="241">
+<par_real name="cos" value="-0.00585398" />
+<par_real name="sin" value="0.000439854" />
+</BF_HARMONIC>
+<BF_HARMONIC id="242">
+<par_real name="cos" value="-0.0097423" />
+<par_real name="sin" value="0.00364678" />
+</BF_HARMONIC>
+<BF_HARMONIC id="243">
+<par_real name="cos" value="-0.00761086" />
+<par_real name="sin" value="0.00265558" />
+</BF_HARMONIC>
+<BF_HARMONIC id="244">
+<par_real name="cos" value="-0.00896671" />
+<par_real name="sin" value="0.00228483" />
+</BF_HARMONIC>
+<BF_HARMONIC id="245">
+<par_real name="cos" value="-0.00585292" />
+<par_real name="sin" value="0.000322163" />
+</BF_HARMONIC>
+<BF_HARMONIC id="246">
+<par_real name="cos" value="-0.0114873" />
+<par_real name="sin" value="0.00569642" />
+</BF_HARMONIC>
+<BF_HARMONIC id="247">
+<par_real name="cos" value="-0.00585251" />
+<par_real name="sin" value="0.000263467" />
+</BF_HARMONIC>
+<BF_HARMONIC id="248">
+<par_real name="cos" value="-0.00896189" />
+<par_real name="sin" value="0.00211265" />
+</BF_HARMONIC>
+<BF_HARMONIC id="249">
+<par_real name="cos" value="-0.00760151" />
+<par_real name="sin" value="0.00241799" />
+</BF_HARMONIC>
+<BF_HARMONIC id="250">
+<par_real name="cos" value="-0.00972624" />
+<par_real name="sin" value="0.00326107" />
+</BF_HARMONIC>
+<BF_HARMONIC id="251">
+<par_real name="cos" value="-0.00585195" />
+<par_real name="sin" value="0.000146275" />
+</BF_HARMONIC>
+<BF_HARMONIC id="252">
+<par_real name="cos" value="-0.010703" />
+<par_real name="sin" value="0.00412529" />
+</BF_HARMONIC>
+<BF_HARMONIC id="253">
+<par_real name="cos" value="-0.00585178" />
+<par_real name="sin" value="8.77478e-05" />
+</BF_HARMONIC>
+<BF_HARMONIC id="254">
+<par_real name="cos" value="-0.00971913" />
+<par_real name="sin" value="0.00307125" />
+</BF_HARMONIC>
+<BF_HARMONIC id="255">
+<par_real name="cos" value="-0.00759332" />
+<par_real name="sin" value="0.00218336" />
+</BF_HARMONIC>
+</BASE_FUNCTION>
+</OSCIL>
+<AMPLITUDE_PARAMETERS>
+<par name="panning" value="64" />
+<par name="volume" value="100" />
+<par_bool name="volume_minus" value="no" />
+<par name="velocity_sensing" value="127" />
+<par_bool name="amp_envelope_enabled" value="yes" />
+<AMPLITUDE_ENVELOPE>
+<par_bool name="free_mode" value="yes" />
+<par name="env_points" value="7" />
+<par name="env_sustain" value="4" />
+<par name="env_stretch" value="0" />
+<par_bool name="forced_release" value="yes" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="0" />
+<par name="D_dt" value="100" />
+<par name="R_dt" value="100" />
+<par name="A_val" value="64" />
+<par name="D_val" value="64" />
+<par name="S_val" value="127" />
+<par name="R_val" value="64" />
+<POINT id="0">
+<par name="val" value="0" />
+</POINT>
+<POINT id="1">
+<par name="dt" value="36" />
+<par name="val" value="0" />
+</POINT>
+<POINT id="2">
+<par name="dt" value="16" />
+<par name="val" value="127" />
+</POINT>
+<POINT id="3">
+<par name="dt" value="42" />
+<par name="val" value="127" />
+</POINT>
+<POINT id="4">
+<par name="dt" value="5" />
+<par name="val" value="0" />
+</POINT>
+<POINT id="5">
+<par name="dt" value="91" />
+<par name="val" value="0" />
+</POINT>
+<POINT id="6">
+<par name="dt" value="100" />
+<par name="val" value="0" />
+</POINT>
+</AMPLITUDE_ENVELOPE>
+<par_bool name="amp_lfo_enabled" value="no" />
+</AMPLITUDE_PARAMETERS>
+<FREQUENCY_PARAMETERS>
+<par_bool name="fixed_freq" value="no" />
+<par name="fixed_freq_et" value="0" />
+<par name="detune" value="10023" />
+<par name="coarse_detune" value="0" />
+<par name="detune_type" value="0" />
+<par_bool name="freq_envelope_enabled" value="no" />
+<par_bool name="freq_lfo_enabled" value="no" />
+</FREQUENCY_PARAMETERS>
+<FILTER_PARAMETERS>
+<FILTER>
+<par name="category" value="1" />
+<par name="type" value="0" />
+<par name="freq" value="42" />
+<par name="q" value="45" />
+<par name="stages" value="0" />
+<par name="freq_track" value="64" />
+<par name="gain" value="64" />
+<FORMANT_FILTER>
+<par name="num_formants" value="3" />
+<par name="formant_slowness" value="64" />
+<par name="vowel_clearness" value="64" />
+<par name="center_freq" value="77" />
+<par name="octaves_freq" value="40" />
+<VOWEL id="0">
+<FORMANT id="0">
+<par name="freq" value="15" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="23" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="122" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="44" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="115" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="3" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="91" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="70" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="90" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="5" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="95" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="64" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="1">
+<FORMANT id="0">
+<par name="freq" value="72" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="7" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="123" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="117" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="107" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="61" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="44" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="58" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="17" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="3" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="123" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="106" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="2">
+<FORMANT id="0">
+<par name="freq" value="25" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="7" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="95" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="107" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="60" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="75" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="98" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="24" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="99" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="93" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="68" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="88" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="3">
+<FORMANT id="0">
+<par name="freq" value="96" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="33" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="31" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="60" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="39" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="0" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="124" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="25" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="8" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="121" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="15" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="116" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="4">
+<FORMANT id="0">
+<par name="freq" value="56" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="60" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="47" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="73" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="64" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="44" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="52" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="90" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="51" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="21" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="71" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="112" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="5">
+<FORMANT id="0">
+<par name="freq" value="96" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="42" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="9" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="69" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="8" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="78" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="30" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="105" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="112" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="62" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="39" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="24" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<par name="sequence_size" value="3" />
+<par name="sequence_stretch" value="40" />
+<par_bool name="sequence_reversed" value="no" />
+<SEQUENCE_POS id="0">
+<par name="vowel_id" value="0" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="1">
+<par name="vowel_id" value="1" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="2">
+<par name="vowel_id" value="2" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="3">
+<par name="vowel_id" value="3" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="4">
+<par name="vowel_id" value="4" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="5">
+<par name="vowel_id" value="5" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="6">
+<par name="vowel_id" value="0" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="7">
+<par name="vowel_id" value="1" />
+</SEQUENCE_POS>
+</FORMANT_FILTER>
+</FILTER>
+<par_bool name="filter_envelope_enabled" value="no" />
+<par_bool name="filter_lfo_enabled" value="no" />
+</FILTER_PARAMETERS>
+</VOICE>
+<VOICE id="5">
+<par_bool name="enabled" value="yes" />
+<par name="type" value="0" />
+<par name="delay" value="0" />
+<par_bool name="resonance" value="yes" />
+<par name="ext_oscil" value="0" />
+<par name="ext_fm_oscil" value="-1" />
+<par name="oscil_phase" value="64" />
+<par name="oscil_fm_phase" value="64" />
+<par_bool name="filter_enabled" value="yes" />
+<par_bool name="filter_bypass" value="no" />
+<par name="fm_enabled" value="0" />
+<OSCIL>
+<par name="harmonic_mag_type" value="0" />
+<par name="base_function" value="12" />
+<par name="base_function_par" value="64" />
+<par name="base_function_modulation" value="0" />
+<par name="base_function_modulation_par1" value="64" />
+<par name="base_function_modulation_par2" value="64" />
+<par name="base_function_modulation_par3" value="32" />
+<par name="modulation" value="0" />
+<par name="modulation_par1" value="64" />
+<par name="modulation_par2" value="64" />
+<par name="modulation_par3" value="32" />
+<par name="wave_shaping" value="64" />
+<par name="wave_shaping_function" value="0" />
+<par name="filter_type" value="0" />
+<par name="filter_par1" value="64" />
+<par name="filter_par2" value="64" />
+<par name="filter_before_wave_shaping" value="0" />
+<par name="spectrum_adjust_type" value="0" />
+<par name="spectrum_adjust_par" value="64" />
+<par name="rand" value="64" />
+<par name="amp_rand_type" value="0" />
+<par name="amp_rand_power" value="64" />
+<par name="harmonic_shift" value="0" />
+<par_bool name="harmonic_shift_first" value="no" />
+<par name="adaptive_harmonics" value="0" />
+<par name="adaptive_harmonics_base_frequency" value="128" />
+<par name="adaptive_harmonics_power" value="100" />
+<HARMONICS>
+<HARMONIC id="1">
+<par name="mag" value="127" />
+<par name="phase" value="64" />
+</HARMONIC>
+<HARMONIC id="2">
+<par name="mag" value="104" />
+<par name="phase" value="64" />
+</HARMONIC>
+<HARMONIC id="3">
+<par name="mag" value="81" />
+<par name="phase" value="64" />
+</HARMONIC>
+<HARMONIC id="4">
+<par name="mag" value="57" />
+<par name="phase" value="64" />
+</HARMONIC>
+</HARMONICS>
+</OSCIL>
+<AMPLITUDE_PARAMETERS>
+<par name="panning" value="64" />
+<par name="volume" value="100" />
+<par_bool name="volume_minus" value="no" />
+<par name="velocity_sensing" value="127" />
+<par_bool name="amp_envelope_enabled" value="yes" />
+<AMPLITUDE_ENVELOPE>
+<par_bool name="free_mode" value="yes" />
+<par name="env_points" value="7" />
+<par name="env_sustain" value="5" />
+<par name="env_stretch" value="0" />
+<par_bool name="forced_release" value="yes" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="0" />
+<par name="D_dt" value="100" />
+<par name="R_dt" value="100" />
+<par name="A_val" value="64" />
+<par name="D_val" value="64" />
+<par name="S_val" value="127" />
+<par name="R_val" value="64" />
+<POINT id="0">
+<par name="val" value="0" />
+</POINT>
+<POINT id="1">
+<par name="dt" value="49" />
+<par name="val" value="0" />
+</POINT>
+<POINT id="2">
+<par name="dt" value="2" />
+<par name="val" value="127" />
+</POINT>
+<POINT id="3">
+<par name="dt" value="44" />
+<par name="val" value="113" />
+</POINT>
+<POINT id="4">
+<par name="dt" value="0" />
+<par name="val" value="0" />
+</POINT>
+<POINT id="5">
+<par name="dt" value="89" />
+<par name="val" value="0" />
+</POINT>
+<POINT id="6">
+<par name="dt" value="100" />
+<par name="val" value="0" />
+</POINT>
+</AMPLITUDE_ENVELOPE>
+<par_bool name="amp_lfo_enabled" value="no" />
+</AMPLITUDE_PARAMETERS>
+<FREQUENCY_PARAMETERS>
+<par_bool name="fixed_freq" value="no" />
+<par name="fixed_freq_et" value="0" />
+<par name="detune" value="9444" />
+<par name="coarse_detune" value="0" />
+<par name="detune_type" value="0" />
+<par_bool name="freq_envelope_enabled" value="no" />
+<par_bool name="freq_lfo_enabled" value="no" />
+</FREQUENCY_PARAMETERS>
+<FILTER_PARAMETERS>
+<FILTER>
+<par name="category" value="1" />
+<par name="type" value="0" />
+<par name="freq" value="42" />
+<par name="q" value="45" />
+<par name="stages" value="0" />
+<par name="freq_track" value="64" />
+<par name="gain" value="64" />
+<FORMANT_FILTER>
+<par name="num_formants" value="3" />
+<par name="formant_slowness" value="64" />
+<par name="vowel_clearness" value="64" />
+<par name="center_freq" value="77" />
+<par name="octaves_freq" value="40" />
+<VOWEL id="0">
+<FORMANT id="0">
+<par name="freq" value="15" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="23" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="122" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="44" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="115" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="3" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="91" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="70" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="90" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="5" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="95" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="64" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="1">
+<FORMANT id="0">
+<par name="freq" value="72" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="7" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="123" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="117" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="107" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="61" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="44" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="58" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="17" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="3" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="123" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="106" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="2">
+<FORMANT id="0">
+<par name="freq" value="25" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="7" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="95" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="107" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="60" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="75" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="98" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="24" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="99" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="93" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="68" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="88" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="3">
+<FORMANT id="0">
+<par name="freq" value="96" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="33" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="31" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="60" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="39" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="0" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="124" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="25" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="8" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="121" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="15" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="116" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="4">
+<FORMANT id="0">
+<par name="freq" value="56" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="60" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="47" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="73" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="64" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="44" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="52" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="90" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="51" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="21" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="71" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="112" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="5">
+<FORMANT id="0">
+<par name="freq" value="96" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="42" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="9" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="69" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="8" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="78" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="30" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="105" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="112" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="62" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="39" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="24" />
+<par name="amp" value="127" />
+<par name="q" value="64" />
+</FORMANT>
+</VOWEL>
+<par name="sequence_size" value="3" />
+<par name="sequence_stretch" value="40" />
+<par_bool name="sequence_reversed" value="no" />
+<SEQUENCE_POS id="0">
+<par name="vowel_id" value="0" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="1">
+<par name="vowel_id" value="1" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="2">
+<par name="vowel_id" value="2" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="3">
+<par name="vowel_id" value="3" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="4">
+<par name="vowel_id" value="4" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="5">
+<par name="vowel_id" value="5" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="6">
+<par name="vowel_id" value="0" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="7">
+<par name="vowel_id" value="1" />
+</SEQUENCE_POS>
+</FORMANT_FILTER>
+</FILTER>
+<par_bool name="filter_envelope_enabled" value="no" />
+<par_bool name="filter_lfo_enabled" value="no" />
+</FILTER_PARAMETERS>
+</VOICE>
+<VOICE id="6">
+<par_bool name="enabled" value="no" />
+</VOICE>
+<VOICE id="7">
+<par_bool name="enabled" value="no" />
+</VOICE>
+</ADD_SYNTH_PARAMETERS>
+<par_bool name="sub_enabled" value="no" />
+<par_bool name="pad_enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="1">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="2">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="3">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="4">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="5">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="6">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="7">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="8">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="9">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="10">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="11">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="12">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="13">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="14">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="15">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+</INSTRUMENT_KIT>
+<INSTRUMENT_EFFECTS>
+<INSTRUMENT_EFFECT id="0">
+<EFFECT>
+<par name="type" value="5" />
+<par name="preset" value="0" />
+<EFFECT_PARAMETERS>
+<par_no id="0">
+<par name="par" value="127" />
+</par_no>
+<par_no id="1">
+<par name="par" value="64" />
+</par_no>
+<par_no id="2">
+<par name="par" value="70" />
+</par_no>
+<par_no id="5">
+<par name="par" value="62" />
+</par_no>
+<par_no id="6">
+<par name="par" value="60" />
+</par_no>
+<par_no id="7">
+<par name="par" value="105" />
+</par_no>
+<par_no id="8">
+<par name="par" value="25" />
+</par_no>
+<par_no id="10">
+<par name="par" value="64" />
+</par_no>
+</EFFECT_PARAMETERS>
+</EFFECT>
+<par name="route" value="0" />
+<par_bool name="bypass" value="no" />
+</INSTRUMENT_EFFECT>
+<INSTRUMENT_EFFECT id="1">
+<EFFECT>
+<par name="type" value="8" />
+<par name="preset" value="0" />
+<EFFECT_PARAMETERS>
+<par_no id="0">
+<par name="par" value="110" />
+</par_no>
+<par_no id="1">
+<par name="par" value="64" />
+</par_no>
+<par_no id="2">
+<par name="par" value="80" />
+</par_no>
+<par_no id="5">
+<par name="par" value="64" />
+</par_no>
+<par_no id="7">
+<par name="par" value="90" />
+</par_no>
+<par_no id="9">
+<par name="par" value="60" />
+</par_no>
+<FILTER>
+<par name="category" value="0" />
+<par name="type" value="2" />
+<par name="freq" value="45" />
+<par name="q" value="64" />
+<par name="stages" value="1" />
+<par name="freq_track" value="64" />
+<par name="gain" value="64" />
+</FILTER>
+</EFFECT_PARAMETERS>
+</EFFECT>
+<par name="route" value="0" />
+<par_bool name="bypass" value="no" />
+</INSTRUMENT_EFFECT>
+<INSTRUMENT_EFFECT id="2">
+<EFFECT>
+<par name="type" value="0" />
+</EFFECT>
+<par name="route" value="0" />
+<par_bool name="bypass" value="no" />
+</INSTRUMENT_EFFECT>
+</INSTRUMENT_EFFECTS>
+</INSTRUMENT>
+</ZynAddSubFX-data>

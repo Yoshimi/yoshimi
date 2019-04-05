@@ -24,20 +24,22 @@ using namespace std;
 #include "MusicIO/MusicClient.h"
 #include "GuiThreadUI.h"
 
-int main(int argc, char *argv[])   
+int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cerr.precision(2);
     set_DAZ_and_FTZ(1);
 
-    guiMaster = new MasterUI();
-    if (NULL == guiMaster)
-    {
-        Runtime.Log("Failed to instantiate guiMaster");
-        goto bail_out;
-    }
-
     Runtime.loadCmdArgs(argc, argv);
+    if (Runtime.showGui)
+    {
+        guiMaster = new MasterUI();
+        if (NULL == guiMaster)
+        {
+            Runtime.Log("Failed to instantiate guiMaster");
+            goto bail_out;
+        }
+    }
     if (NULL == (zynMaster = new Master()))
     {
         Runtime.Log("Failed to allocate Master");
@@ -62,24 +64,30 @@ int main(int argc, char *argv[])
         goto bail_out;
     }
 
-    if (!startGuiThread())
+    if (!startGuiThread(Runtime.showGui))
     {
         Runtime.Log("Failed to start gui thread");
         goto bail_out;
     }
-
     if (musicClient->Start())
     {
-        Runtime.StartupReport(musicClient->getSamplerate(), musicClient->getBuffersize());
+        if (Runtime.showGui)
+            Runtime.StartupReport(musicClient->getSamplerate(),
+                                  musicClient->getBuffersize());
         while (!Pexitprogram)
             usleep(16666); // where all the action is ...
         musicClient->Close();
-        if (NULL != guiMaster)
+        if (Runtime.showGui)
         {
-            stopGuiThread();
-            delete guiMaster;
-            guiMaster = NULL;
+            if (NULL != guiMaster)
+            {
+                stopGuiThread();
+                delete guiMaster;
+                guiMaster = NULL;
+            }
         }
+        else
+            stopGuiThread();
     }
     else
     {

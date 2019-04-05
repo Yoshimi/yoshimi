@@ -95,4 +95,9 @@ class Bank
         const string force_bank_dir_file;
 };
 
+inline bool Bank::isPADsynth_used(unsigned int ninstrument)
+{
+    return Runtime.CheckPADsynth && bank_instrument[ninstrument].PADsynth_used;
+}
+
 #endif

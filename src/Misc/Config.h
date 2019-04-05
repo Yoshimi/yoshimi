@@ -78,8 +78,9 @@ class Config
         unsigned int  Buffersize;
         unsigned int  Oscilsize;
 
-        int           VirKeybLayout;
+        bool          showGui;
         bool          showConsole;
+        int           VirKeybLayout;
 
         audio_drivers audioEngine;
         string        alsaAudioDevice;
@@ -108,7 +109,7 @@ class Config
         deque<HistoryListItem>::iterator itx;
         static const unsigned short MaxParamsHistory;
         list<string> LogList;
-        
+
     private:
         bool loadConfig(void);
         bool loadConfigData(XMLwrapper *xml);
@@ -117,7 +118,7 @@ class Config
         void addRuntimeXML(XMLwrapper *xml);
 
         static unsigned short nextHistoryIndex;
-        static struct sigaction sigAction; 
+        static struct sigaction sigAction;
         static int sigIntActive;
         static int ladi1IntActive;
 };

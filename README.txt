@@ -6,6 +6,10 @@ See INSTALL for instructions.
 Bon apetite.
 ------------
 Changes
+0.056 reinstates PADsynth functionality - a stuff up in XMLwrapper::getparbool(). 
+0.055.6 possibly fixes loading compressed xml. 
+0.055.5 Add airlynx/chip instruments.
+0.055.4 Drop double buffer fltk init; add --no-gui
 0.055.3 use the correct #include <FL/x.H> and move it from MasterUI.fl to GuiThreadUI.fl
 0.055.2 add param file loaded from command line to params history.
 0.055.1 check for (and require) alsa >= 1.0.17.

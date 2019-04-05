@@ -56,6 +56,7 @@ static struct argp_option cmd_options[] = {
     {"buffersize",      'b',  "<size>",     0,  "set buffer size (alsa audio)" },
     {"oscilsize",       'o',  "<size>",     0,  "set ADsynth oscilsize" },
     {"alsa-audio",      'A',  "<device>", 0x1,  "use alsa audio output" },
+    {"no-gui",          'i',  NULL,         0,  "no gui"},
     {"alsa-midi",       'a',  "<device>", 0x1,  "use alsa midi input" },
     {"jack-audio",      'J',  "<server>", 0x1,  "use jack audio output" },
     {"jack-midi",       'j',  "<device>", 0x1,  "use jack midi input" },
@@ -67,7 +68,7 @@ static struct argp_option cmd_options[] = {
 };
 
 
-        
+
 Config::Config() :
     ConfigFile(string(getenv("HOME")) + string("/.yoshimiXML.cfg")),
     restoreState(false),
@@ -75,8 +76,9 @@ Config::Config() :
     Samplerate(48000),
     Buffersize(128),
     Oscilsize(1024),
-    VirKeybLayout(1),
+    showGui(true),
     showConsole(false),
+    VirKeybLayout(1),
     audioEngine(DEFAULT_AUDIO),
     alsaAudioDevice("default"),
     jackServer("default"),
@@ -103,7 +105,7 @@ Config::Config() :
         Log("Setting SIGTERM handler failed");
     if (sigaction(SIGQUIT, &sigAction, NULL))
         Log("Setting SIGQUIT handler failed");
-    
+
     clearBankrootDirlist();
     clearPresetsDirlist();
     loadConfig();
@@ -359,7 +361,7 @@ bool Config::loadConfigData(XMLwrapper *xml)
     // alsa settings
     alsaAudioDevice = xml->getparstr("linux_alsa_audio_dev");
     alsaMidiDevice = xml->getparstr("linux_alsa_midi_dev");
-    
+
     // jack settings
     jackServer = xml->getparstr("linux_jack_server");
 
@@ -381,7 +383,7 @@ bool Config::loadConfigData(XMLwrapper *xml)
                 xml->exitbranch();
             }
         }
-        xml->exitbranch(); 
+        xml->exitbranch();
     }
 
     xml->exitbranch(); // CONFIGURATION
@@ -505,7 +507,7 @@ void Config::checkInterrupted(void)
         musicClient->Close();
         stopGuiThread();
         __sync_sub_and_fetch (&sigIntActive, 1);
-        
+
     }
     else if (ladi1IntActive)
     {
@@ -562,14 +564,18 @@ void Config::addRuntimeXML(XMLwrapper *xml)
 
 void Config::Log(string msg)
 {
-    LogList.push_back(msg);
+    if (showGui)
+        LogList.push_back(msg);
 }
 
 
 void Config::StartupReport(unsigned int samplerate, int buffersize)
 {
+    if (!showGui)
+        return;
+
     Log(string(argp_program_version));
-    //Log("fftw3 to use " + asString(FFTwrapper::fftw_threads) + " thread(s)"); 
+    //Log("fftw3 to use " + asString(FFTwrapper::fftw_threads) + " thread(s)");
     Log("Clientname: " + musicClient->midiClientName());
     string report = "Audio: ";
     switch (audioEngine)
@@ -599,13 +605,13 @@ void Config::StartupReport(unsigned int samplerate, int buffersize)
     }
     report += (" -> '" + midiDevice + "'");
     Log(report);
-    Log("Oscilsize: " + asString(Runtime.Oscilsize)); 
-    Log("Samplerate: " + asString(samplerate)); 
-    Log("Buffersize: " + asString(buffersize)); 
+    Log("Oscilsize: " + asString(Runtime.Oscilsize));
+    Log("Samplerate: " + asString(samplerate));
+    Log("Buffersize: " + asString(buffersize));
     Log("Alleged latency: " + asString(buffersize) + " frames, "
-        + asString(buffersize * 1000.0f / samplerate) + " ms"); 
+        + asString(buffersize * 1000.0f / samplerate) + " ms");
     Log("Gross latency: " + asString(musicClient->grossLatency()) + " frames, "
-         + asString(musicClient->grossLatency() * 1000.0f / samplerate) + " ms"); 
+         + asString(musicClient->grossLatency() * 1000.0f / samplerate) + " ms");
 }
 
 
@@ -632,6 +638,10 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             if (arg)
                 settings->midiDevice = string(arg);
                   break;
+        case 'i':
+            settings->showGui = false;
+            settings->showConsole = false;
+            break;
         case 'J':
             settings->audioEngine = jack_audio;
             if (arg)
@@ -648,7 +658,7 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             settings->restoreState = true;
             if (arg)
                 settings->StateFile = string(arg);
-            break;    
+            break;
         case ARGP_KEY_ARG:
         case ARGP_KEY_END:
             break;

@@ -490,15 +490,6 @@ bool Bank::addtobank(int pos, const string filename, string name)
 }
 
 
-bool Bank::isPADsynth_used(unsigned int ninstrument)
-{
-    if (Runtime.CheckPADsynth == 0)
-        return 0;
-    else
-        return bank_instrument[ninstrument].PADsynth_used;
-}
-
-
 void Bank::deletefrombank(unsigned int pos)
 {
     if (pos >= BANK_SIZE)

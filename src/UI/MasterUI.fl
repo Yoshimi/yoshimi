@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110 
-header_name {.h} 
+version 1.0110
+header_name {.h}
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
-} 
+}
 
 comment {MasterUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -27,58 +27,58 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified January 2010
 } {in_source in_header
-} 
+}
 
 decl {\#include <string>} {public
-} 
+}
 
 decl {using namespace std;} {public
-} 
+}
 
 decl {\#include "ADnoteUI.h"} {public
-} 
+}
 
 decl {\#include "SUBnoteUI.h"} {public
-} 
+}
 
 decl {\#include "EffUI.h"} {public
-} 
+}
 
 decl {\#include "VirKeyboardUI.h"} {public
-} 
+}
 
 decl {\#include "ConfigUI.h"} {public
-} 
+}
 
 decl {\#include "BankUI.h"} {public
-} 
+}
 
 decl {\#include "PartUI.h"} {public
-} 
+}
 
 decl {\#include "MicrotonalUI.h"} {public
-} 
+}
 
 decl {\#include "PresetsUI.h"} {public
-} 
+}
 
 decl {\#include "ParametersUI.h"} {public
-} 
+}
 
 decl {\#include "ConsoleUI.h"} {public
-} 
+}
 
 decl {\#include "MasterMiscUI.h"} {public
-} 
+}
 
 decl {\#include "Misc/Master.h"} {public
-} 
+}
 
 decl {class MasterUI;} {public
-} 
+}
 
 decl {MasterUI *guiMaster;} {public
-} 
+}
 
 class MasterUI {open
 } {
@@ -231,7 +231,7 @@ class MasterUI {open
           MenuItem {} {
             label {&Open Instrument...}
             callback {const char *filename;
-                filename = fl_file_chooser("Load:", "({*.xiz})", NULL, 0);  
+                filename = fl_file_chooser("Load:", "({*.xiz})", NULL, 0);
                 if (filename == NULL)
                     return;
                 zynMaster->actionLock(lockmute);
@@ -631,7 +631,7 @@ class MasterUI {open
                 inseffectui->activate();
                 inseffectuigroup->activate();
               }
-              else 
+              else
               {
                 insefftype->deactivate();
                 inseffectui->deactivate();
@@ -1049,4 +1049,4 @@ ZynAddSubFX}
   decl {const char *start_record_tip;} {}
   decl {const char *stop_record_tip;} {}
   decl {ConsoleUI *yoshiLog;} {}
-} 
+}

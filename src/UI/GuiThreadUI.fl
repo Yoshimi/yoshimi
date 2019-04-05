@@ -1,6 +1,6 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110 
-header_name {.h} 
+version 1.0110
+header_name {.h}
 code_name {.cc}
 comment {//
 // Copyright 2009, Alan Calvert
@@ -17,33 +17,32 @@ comment {//
 //
 // You should have received a copy of the GNU General Public License
 // along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.} {in_source in_header
-} 
+}
 
 decl {\#include <FL/x.H>} {public
-} 
+}
 
 decl {\#include <string>} {public
-} 
-
-#decl {\#include <iostream>} {public
-#} 
+}
 
 decl {using namespace std;} {public
-} 
+}
 
 decl {\#include "Misc/Master.h"} {public
-} 
+}
+
+decl {\#include "Misc/Config.h"} {public
+}
 
 decl {\#include "MasterUI.h"} {public
-} 
+}
 
 decl {pthread_t pthreadGui = 0;} {global
-} 
+}
 
-Function {guiThread(void* arg)} {private return_type {void*}
+Function {guiThread(void* arg)} {private return_type {static void*}
 } {
-  code {
-    while (!Pexitprogram)
+  code {while (!Pexitprogram)
     {
       Runtime.checkInterrupted();
       if (!Runtime.LogList.empty())
@@ -52,21 +51,35 @@ Function {guiThread(void* arg)} {private return_type {void*}
           guiMaster->Log(Runtime.LogList.front());
         Runtime.LogList.pop_front();
       }
-      if (Fl::ready())
+      //if (Fl::ready())
         Fl::wait();
-      else
+      //else
         usleep(1666);
+    }
+    return NULL;} {}
+}
+
+Function {noguiThread(void* arg)} {private return_type {static void*}
+} {
+  code {
+    while (!Pexitprogram)
+    {
+      Runtime.checkInterrupted();
+      usleep(66666);;
     }
     return NULL;
   } {}
-} 
+}
 
-Function {startGuiThread(void)} {return_type bool
+Function {startGuiThread(bool show_gui)} {return_type bool
 } {
   code {
-    fl_open_display();
-    Fl::visual(FL_DOUBLE);
-    guiMaster->Init();
+    if (show_gui)
+    {
+      //Fl::visual(FL_INDEX|FL_RGB8);
+      //fl_open_display();
+      guiMaster->Init();
+    }
     int chk;
     pthread_attr_t attr;
     if ((chk = pthread_attr_init(&attr)))
@@ -79,16 +92,33 @@ Function {startGuiThread(void)} {return_type bool
         Runtime.Log("Failed to set gui thread detach state: " + asString(chk));
         return false;
     }
-    if ((chk = pthread_create(&pthreadGui, &attr, guiThread, NULL)))
+    if (show_gui)
     {
+      if ((chk = pthread_create(&pthreadGui, &attr, guiThread, NULL)))
+      {
         Runtime.Log("Failed to start gui thread: " + asString(chk));
         return false;
+      }
+    }
+    else if ((chk = pthread_create(&pthreadGui, &attr, noguiThread, NULL)))
+    {
+      Runtime.Log("Failed to start gui thread: " + asString(chk));
+      return false;
     }
     return true;
   } {}
-} 
+}
+
+Function {interruptedCheck(void* arg)} {private return_type {static void}
+} {
+  code {
+    Runtime.checkInterrupted();
+    Fl::repeat_timeout (1.0, interruptedCheck);
+  } {}
+}
 
 Function {stopGuiThread(void)} {return_type void
 } {
-  code {Pexitprogram = true; pthread_cancel(pthreadGui);} {}
-} 
+  code {Pexitprogram = true;
+    pthread_cancel(pthreadGui);} {}
+}
