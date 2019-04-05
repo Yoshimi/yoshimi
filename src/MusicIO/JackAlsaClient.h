@@ -1,7 +1,7 @@
 /*
     JackAlsaClient.h - Jack audio + Alsa midi
     
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -37,30 +37,23 @@ class JackAlsaClient : public MusicClient
 {
     public:
         JackAlsaClient() : MusicClient() { };
-        ~JackAlsaClient() { Stop(); Close(); };
+        ~JackAlsaClient() { Close(); };
 
-        bool openAudio(void);
-        bool openMidi(void) { return alsaEngine.openMidi(); };
-        bool Start(void) { return jackEngine.Start() && alsaEngine.Start(); };
-        void Stop(void) { alsaEngine.Stop(); };
-        void Close(void) { jackEngine.Close(); alsaEngine.Close(); };
+        bool openAudio(WavRecord *recorder);
+        bool openMidi(WavRecord *recorder);
+        bool Start(void);
+        void Close(void);
 
         unsigned int getSamplerate(void) { return jackEngine.getSamplerate(); };
         int getBuffersize(void) { return jackEngine.getBuffersize(); };
+        int grossLatency(void)
+            { return jackEngine.grossLatency() + alsaEngine.grossLatency(); };
 
         string audioClientName(void) { return jackEngine.clientName(); };
         string midiClientName(void) { return alsaEngine.midiClientName(); };
         int audioClientId(void) { return jackEngine.clientId(); };
         int midiClientId(void) { return alsaEngine.midiClientId(); };
 
-        void startRecord(void) { jackEngine.StartRecord(); };
-        void stopRecord(void) { jackEngine.StopRecord(); };
-        bool setRecordFile(const char* fpath, string& errmsg)
-            { return jackEngine.SetWavFile(fpath, errmsg); };
-        bool setRecordOverwrite(string& errmsg)
-            { return jackEngine.SetWavOverwrite(errmsg); };
-        string wavFilename(void)
-            { return jackEngine.WavFilename(); };
 
     private:
         JackEngine jackEngine;

@@ -24,8 +24,6 @@
 #ifndef FFT_WRAPPER_H
 #define FFT_WRAPPER_H
 
-#include "globals.h"
-
 #include <fftw3.h>
 
 typedef struct {
@@ -43,6 +41,7 @@ class FFTwrapper
         void freqs2smps(FFTFREQS freqs, float *smps);
         static void newFFTFREQS(FFTFREQS &f, int size);
         static void deleteFFTFREQS(FFTFREQS &f);
+        static int fftw_threads;
 
     private:
         int fftsize;

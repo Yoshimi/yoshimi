@@ -1,7 +1,7 @@
 /*
     MusicClient.h
 
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,10 +17,6 @@
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
-
-using namespace std;
-
 #include "Misc/Util.h"
 #include "MusicIO/MusicClient.h"
 #include "MusicIO/JackClient.h"
@@ -32,56 +28,66 @@ MusicClient *musicClient = NULL;
 
 MusicClient::MusicClient() :
     audiodevice(string()),
-    mididevice(string())
-{ }
+    mididevice(string()),
+    Recorder(NULL)
+{ Recorder = new WavRecord(); }
 
 
 MusicClient *MusicClient::newMusicClient(void)
 {
     MusicClient *musicObj = NULL;
-    switch (Runtime.settings.audioEngine)
+    switch (Runtime.audioEngine)
     {
         case jack_audio:
-            switch (Runtime.settings.midiEngine)
+            switch (Runtime.midiEngine)
             {
                 case jack_midi:
                     if (NULL == (musicObj = new JackClient()))
-                        cerr << "Error, failed to instantiate JackClient" << endl;
+                        Runtime.Log("Failed to instantiate JackClient");
                     break;
 
                     case alsa_midi:
                         if (NULL == (musicObj = new JackAlsaClient()))
-                            cerr << "Error, failed to instantiate JackAlsaClient" << endl;
+                            Runtime.Log("Failed to instantiate JackAlsaClient");
                         break;
 
                 default:
-                    cerr << "Ooops, no midi!" << endl;
+                    Runtime.Log("Ooops, no midi!");
                     break;
             }
             break;
 
         case alsa_audio:
-            switch (Runtime.settings.midiEngine)
+            switch (Runtime.midiEngine)
             {
                 case alsa_midi:
                     if (NULL == (musicObj = new AlsaClient()))
-                        cerr << "Error, failed to instantiate AlsaClient" << endl;
+                        Runtime.Log("Failed to instantiate AlsaClient");
                     break;
 
                     case jack_midi:
                         if (NULL == (musicObj = new AlsaJackClient()))
-                            cerr << "Error, failed to instantiate AlsaJackClient" << endl;
+                            Runtime.Log("Failed to instantiate AlsaJackClient");
                         break;
 
                 default:
-                    cerr << "Oops, alsa audio, no midi!" << endl;
+                    Runtime.Log("Oops, alsa audio, no midi!");
                     break;
             }
             break;
 
         default:
-            cerr << "Oops, no audio, no midi!" << endl;
+            Runtime.Log("Oops, no audio, no midi!");
             break;
     }
     return musicObj;
 }
+
+
+bool MusicClient::Open(void)
+{
+    if (openAudio(Recorder) && openMidi(Recorder))
+        return Recorder->Prep(getSamplerate(), getBuffersize());
+    return false;
+}
+

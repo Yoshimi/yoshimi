@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010 Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,13 +18,12 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified October 2009
+    This file is a derivative of the ZynAddSubFX original, modified January 2010
 */
 
 #ifndef PAD_NOTE_H
 #define PAD_NOTE_H
 
-#include "globals.h"
 #include "Params/PADnoteParameters.h"
 #include "Params/Controller.h"
 #include "Synth/Envelope.h"
@@ -43,8 +42,8 @@ class PADnote
                            int portamento_, int midinote, bool externcall);
 
         int noteout(float *outl,float *outr);
-        int finished();
-        void relasekey();
+        bool finished(void) { return finished_; };
+        void relasekey(void);
 
         bool ready;
 
@@ -71,17 +70,17 @@ class PADnote
 
 
         struct {
-            /******************************************
-            *     FREQUENCY GLOBAL PARAMETERS        *
-            ******************************************/
+            //****************************
+            // FREQUENCY GLOBAL PARAMETERS
+            //****************************
             float Detune;//cents
 
             Envelope *FreqEnvelope;
             LFO *FreqLfo;
 
-            /********************************************
-             *     AMPLITUDE GLOBAL PARAMETERS          *
-             ********************************************/
+            //****************************
+            // AMPLITUDE GLOBAL PARAMETERS
+            //****************************
             float Volume; // [ 0 .. 1 ]
 
             float Panning; // [ 0 .. 1 ]
@@ -96,9 +95,9 @@ class PADnote
                 float t;
             } Punch;
 
-            /******************************************
-            *        FILTER GLOBAL PARAMETERS        *
-            ******************************************/
+            //*************************
+            // FILTER GLOBAL PARAMETERS
+            //*************************
             Filter *GlobalFilterL;
             Filter *GlobalFilterR;
 

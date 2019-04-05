@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified October 2009
+    This file is a derivative of the ZynAddSubFX original, modified January 2010
 */
 
 #ifndef XML_WRAPPER_H
@@ -29,10 +29,8 @@
 
 using namespace std;
 
-#include "globals.h"
-
-// the maxim tree depth
-#define STACKSIZE 100
+// max tree depth
+#define STACKSIZE 128
 
 class XMLwrapper
 {
@@ -40,55 +38,47 @@ class XMLwrapper
         XMLwrapper();
         ~XMLwrapper();
 
-        /********************************/
-        /*         SAVE to XML          */
-        /********************************/
-
-        // returns true if ok, false if the file cannot be saved
-        bool saveXMLfile(string filename);
+        // SAVE to XML
+        bool saveXMLfile(string filename); // return true if ok, false otherwise
 
         // returns the new allocated string that contains the XML data (used for clipboard)
         // the string is NULL terminated
-        char *getXMLdata();
+        char *getXMLdata(void);
 
-        // add simple parameter (name and value)
-        void addpar(const string &name, int val);
-        void addparreal(const string &name, float val);
+        
+        void addpar(string name, int val); // add simple parameter: name, value
+        void addparreal(string name, float val);
 
-        // add boolean parameter (name and boolean value)
-        // if the value is 0 => "yes", else "no"
-        void addparbool(const string &name, int val);
+        void addparbool(string name, int val); // 0 => "yes", else "no"
+        void addparbool(string name, bool val);
+
 
         // add string parameter (name and string)
-        void addparstr(const string &name, const string &val);
+        void addparstr(string name, string val);
 
         // add a branch
-        void beginbranch(const string &name);
-        void beginbranch(const string &name, int id);
+        void beginbranch(string name);
+        void beginbranch(string name, int id);
 
         // this must be called after each branch (nodes that contains child nodes)
-        void endbranch();
+        void endbranch(void);
 
-        /********************************/
-        /*        LOAD from XML         */
-        /********************************/
-
+        // LOAD from XML
         bool loadXMLfile(string filename); // true if loaded ok
 
         // used by the clipboard
-        bool putXMLdata(const char *xmldata);
+        bool putXMLdata(char *xmldata);
 
         // enter into the branch
         // returns 1 if is ok, or 0 otherwise
         bool enterbranch(string name);
-
 
         // enter into the branch with id
         // returns 1 if is ok, or 0 otherwise
         bool enterbranch(string name, int id);
 
         // exits from a branch
-        void exitbranch(void);
+        void exitbranch(void) { pop(); };
 
         // get the the branch_id and limits it between the min and max
         // if min==max==0, it will not limit it
@@ -105,6 +95,7 @@ class XMLwrapper
         int getpar127(string name, int defaultpar);
 
         int getparbool(string name, int defaultpar);
+        bool getparbool(string name, bool defaultpar);
 
          string getparstr(string name);
 
@@ -123,13 +114,12 @@ class XMLwrapper
         bool checkfileinformation(string filename);
 
     private:
-        bool dosavefile(string filename, int compression, const char *xmldata);
         char *doloadfile(string filename);
 
-        mxml_node_t *tree; // all xml data
-        mxml_node_t *root; // xml data used by zynaddsubfx
-        mxml_node_t *node; // current node
-        mxml_node_t *info; // this node is used to store the information about the data
+        mxml_node_t *tree;
+        mxml_node_t *root;
+        mxml_node_t *node;
+        mxml_node_t *info;
 
         // adds params like this:
         // <name>
@@ -137,18 +127,10 @@ class XMLwrapper
         //mxml_node_t *addparams0(const char *name);
         mxml_node_t *addparams0(string  name);
 
-        // adds params like this:
-        // <name par1="val1">
-        // returns the node
-        //mxml_node_t *addparams1(const char *name, const char *par1, const char *val1);
+        // adds params like this: <name par1="val1">, returns the node
         mxml_node_t *addparams1(string name, string par1, string val1);
 
-        // adds params like this:
-        // <name par1="val1" par2="val2">
-        // returns the node
-        //mxml_node_t *addparams2(const char *name, const char *par1,
-        //                        const char *val1, const char *par2,
-        //                        const char *val2);
+        // adds params like this: <name par1="val1" par2="val2">, returns the node
         mxml_node_t *addparams2(string name, string par1, string val1,
                                 string par2, string val2);
 
@@ -157,15 +139,12 @@ class XMLwrapper
         int stackpos;
 
         void push(mxml_node_t *node);
-        mxml_node_t *pop();
-        mxml_node_t *peek();
-
-        // these are used to store the values
+        mxml_node_t *pop(void);
+        mxml_node_t *peek(void);
         struct {
-            struct {
-                int major, minor;
-            } xml_version;
-        } values;
+            int major; // settings format version
+            int minor;
+        } xml_version;
 };
 
 #endif

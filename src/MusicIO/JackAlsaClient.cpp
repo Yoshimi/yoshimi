@@ -1,7 +1,7 @@
 /*
     JackAlsaClient.cpp - Jack audio / Alsa midi
     
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,24 +17,41 @@
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
-
 #include "MusicIO/JackAlsaClient.h"
 
-bool JackAlsaClient::openAudio(void)
+bool JackAlsaClient::openAudio(WavRecord *recorder)
 {
-    if (jackEngine.connectServer(Runtime.settings.audioDevice))
+    if (jackEngine.connectServer(Runtime.audioDevice))
     {
-        if (jackEngine.openAudio())
+        if (jackEngine.openAudio(recorder))
         {
-            Runtime.settings.Samplerate = getSamplerate();
-            Runtime.settings.Buffersize = getBuffersize();
+            Runtime.Samplerate = getSamplerate();
+            Runtime.Buffersize = getBuffersize();
             return true;
         }
         else
-            cerr << "Error, failed to register audio" << endl;
+            Runtime.Log("Error, failed to register audio");
     }
     else
-        cerr << "Error, failed to connect to jack server" << endl;
+        Runtime.Log("Error, failed to connect to jack server");
     return false;
+}
+
+
+bool JackAlsaClient::openMidi(WavRecord *recorder)
+{
+    return alsaEngine.openMidi(recorder);
+}
+
+
+bool JackAlsaClient::Start(void)
+{
+    return jackEngine.Start() && alsaEngine.Start();
+}
+
+
+void JackAlsaClient::Close(void)
+{
+    jackEngine.Close();
+    alsaEngine.Close();
 }

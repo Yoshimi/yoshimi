@@ -36,11 +36,11 @@ class Distorsion : public Effect
         Distorsion(bool insertion, float *efxoutl_, float *efxoutr_);
         ~Distorsion();
         void out(float *smpsl, float *smpr);
-        void setPreset(unsigned char npreset);
-        void changePar(int npar, unsigned char value);
-        unsigned char getPar(int npar) const;
-        void Cleanup(void);
-        void applyFilters(float *efxoutl, float *efxoutr);
+        void setpreset(unsigned char npreset);
+        void changepar(int npar, unsigned char value);
+        unsigned char getpar(int npar);
+        void cleanup(void);
+        void applyfilters(float *efxoutl, float *efxoutr);
 
     private:
         // Parametrii
@@ -56,11 +56,11 @@ class Distorsion : public Effect
         unsigned char Pstereo;       // 0=mono,1=stereo
         unsigned char Pprefiltering; // if you want to do the filtering before the distorsion
 
-        void setVolume(unsigned char _volume);
-        void setPanning(unsigned char _panning);
-        void setLrCross(unsigned char _lrcross);
-        void setLpf(unsigned char _lpf);
-        void setHpf(unsigned char _hpf);
+        void setvolume(unsigned char Pvolume_);
+        void setpanning(unsigned char Ppanning_);
+        void setlrcross(unsigned char Plrcross_);
+        void setlpf(unsigned char Plpf_);
+        void sethpf(unsigned char Phpf_);
 
         // Real Parameters
         float panning;

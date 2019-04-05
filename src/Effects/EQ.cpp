@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified October 2009
+    This file is a derivative of the ZynAddSubFX original, modified January 2010
 */
 
 #include "Misc/Util.h"
@@ -40,57 +40,55 @@ EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_) :
     }
     // default values
     Pvolume = 50;
-    setPreset(Ppreset);
-    Cleanup();
+    setpreset(Ppreset);
+    cleanup();
 }
 
 
-/*
- * Cleanup the effect
- */
-void EQ::Cleanup(void)
+// Cleanup the effect
+void EQ::cleanup(void)
 {
     for (int i = 0; i < MAX_EQ_BANDS; ++i)
     {
-        filter[i].l->Cleanup();
-        filter[i].r->Cleanup();
+        filter[i].l->cleanup();
+        filter[i].r->cleanup();
     }
 }
 
-/*
- * Effect output
- */
+// Effect output
 void EQ::out(float *smpsl, float *smpsr)
 {
-    int i;
     int buffersize = zynMaster->getBuffersize();
-    for (i = 0; i < buffersize; ++i)
+    memcpy(efxoutl, smpsl, buffersize * sizeof(float));
+    memcpy(efxoutr, smpsr, buffersize * sizeof(float));
+    for (int i = 0; i < buffersize; ++i)
     {
-        efxoutl[i] = smpsl[i] * volume;
-        efxoutr[i] = smpsr[i] * volume;
+        efxoutl[i] *= volume;
+        efxoutr[i] *= volume;
+        //efxoutl[i] = smpsl[i] * volume;
+        //efxoutr[i] = smpsr[i] * volume;
     }
-    for (i = 0; i < MAX_EQ_BANDS; ++i)
+    for (int i = 0; i < MAX_EQ_BANDS; ++i)
     {
         if (filter[i].Ptype == 0)
             continue;
-        filter[i].l->filterOut(efxoutl);
-        filter[i].r->filterOut(efxoutr);
+        filter[i].l->filterout(efxoutl);
+        filter[i].r->filterout(efxoutr);
     }
 }
 
 
-/*
- * Parameter control
- */
-void EQ::setVolume(unsigned char _volume)
+// Parameter control
+
+void EQ::setvolume(unsigned char Pvolume_)
 {
-    Pvolume = _volume;
-    outvolume = powf(0.005, (1.0 - Pvolume / 127.0)) * 10.0;
+    Pvolume = Pvolume_;
+    outvolume = powf(0.005f, (1.0 - Pvolume / 127.0)) * 10.0;
     volume = (!insertion) ? 1.0 : outvolume;
 }
 
 
-void EQ::setPreset(unsigned char npreset)
+void EQ::setpreset(unsigned char npreset)
 {
     const int PRESET_SIZE = 1;
     const int NUM_PRESETS = 2;
@@ -104,17 +102,17 @@ void EQ::setPreset(unsigned char npreset)
     if (npreset >= NUM_PRESETS)
         npreset = NUM_PRESETS - 1;
     for (int n = 0; n < PRESET_SIZE; ++n)
-        changePar(n, presets[npreset][n]);
+        changepar(n, presets[npreset][n]);
     Ppreset = npreset;
 }
 
 
-void EQ::changePar(int npar, unsigned char value)
+void EQ::changepar(int npar, unsigned char value)
 {
     switch (npar)
     {
         case 0:
-            setVolume(value);
+            setvolume(value);
             break;
     }
     if (npar < 10)
@@ -134,39 +132,39 @@ void EQ::changePar(int npar, unsigned char value)
                 filter[nb].Ptype = 0; // has to be changed if more filters will be added
             if (filter[nb].Ptype != 0)
             {
-                filter[nb].l->setType(value - 1);
-                filter[nb].r->setType(value - 1);
+                filter[nb].l->settype(value - 1);
+                filter[nb].r->settype(value - 1);
             }
             break;
         case 1:
             filter[nb].Pfreq = value;
-            tmp = 600.0 * powf(30.0, (value - 64.0) / 64.0);
-            filter[nb].l->setFreq(tmp);
-            filter[nb].r->setFreq(tmp);
+            tmp = 600.0 * powf(30.0f, (value - 64.0) / 64.0);
+            filter[nb].l->setfreq(tmp);
+            filter[nb].r->setfreq(tmp);
             break;
         case 2:
             filter[nb].Pgain = value;
             tmp = 30.0 * (value - 64.0) / 64.0;
-            filter[nb].l->setGain(tmp);
-            filter[nb].r->setGain(tmp);
+            filter[nb].l->setgain(tmp);
+            filter[nb].r->setgain(tmp);
             break;
         case 3:
             filter[nb].Pq = value;
-            tmp = powf(30.0, (value - 64.0) / 64.0);
-            filter[nb].l->setQ(tmp);
-            filter[nb].r->setQ(tmp);
+            tmp = powf(30.0f, (value - 64.0) / 64.0);
+            filter[nb].l->setq(tmp);
+            filter[nb].r->setq(tmp);
             break;
         case 4:
             filter[nb].Pstages = value;
             if (value >= MAX_FILTER_STAGES)
                 filter[nb].Pstages = MAX_FILTER_STAGES - 1;
-            filter[nb].l->setStages(value);
-            filter[nb].r->setStages(value);
+            filter[nb].l->setstages(value);
+            filter[nb].r->setstages(value);
             break;
     }
 }
 
-unsigned char EQ::getPar(int npar) const
+unsigned char EQ::getpar(int npar)
 {
     switch (npar)
     {
@@ -203,7 +201,7 @@ unsigned char EQ::getPar(int npar) const
 }
 
 
-float EQ::getFreqResponse(float freq)
+float EQ::getfreqresponse(float freq)
 {
     float resp = 1.0;
     for (int i = 0; i < MAX_EQ_BANDS; ++i)

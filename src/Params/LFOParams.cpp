@@ -23,7 +23,6 @@
 
 #include <cmath>
 
-#include "globals.h"
 #include "Params/LFOParams.h"
 
 int LFOParams::time;
@@ -36,13 +35,13 @@ LFOParams::LFOParams(char Pfreq_, char Pintensity_, char Pstartphase_,
     switch (fel_)
     {
     case 0:
-        setPresetType("Plfofrequency");
+        setpresettype("Plfofrequency");
         break;
     case 1:
-        setPresetType("Plfoamplitude");
+        setpresettype("Plfoamplitude");
         break;
     case 2:
-        setPresetType("Plfofilter");
+        setpresettype("Plfofilter");
         break;
     };
     Dfreq = Pfreq_;
@@ -55,10 +54,10 @@ LFOParams::LFOParams(char Pfreq_, char Pintensity_, char Pstartphase_,
     fel = fel_;
     time = 0;
 
-    setDefaults();
+    defaults();
 };
 
-void LFOParams::defaults()
+void LFOParams::defaults(void)
 {
     Pfreq = Dfreq / 127.0;
     Pintensity = Dintensity;

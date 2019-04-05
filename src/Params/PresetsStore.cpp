@@ -48,11 +48,12 @@ PresetsStore::~PresetsStore()
 {
     if (clipboard.data != NULL)
         free(clipboard.data);
+    clearpresets();
 }
 
 // Clipboard management
 
-void PresetsStore::copyClipboard(XMLwrapper *xml, string type)
+void PresetsStore::copyclipboard(XMLwrapper *xml, string type)
 {
     clipboard.type = type;
     if (clipboard.data != NULL)
@@ -60,7 +61,7 @@ void PresetsStore::copyClipboard(XMLwrapper *xml, string type)
     clipboard.data = xml->getXMLdata();
 }
 
-bool PresetsStore::pasteClipboard(XMLwrapper *xml)
+bool PresetsStore::pasteclipboard(XMLwrapper *xml)
 {
     if (clipboard.data != NULL)
     {
@@ -70,29 +71,26 @@ bool PresetsStore::pasteClipboard(XMLwrapper *xml)
     return false;
 }
 
-bool PresetsStore::checkClipboardType(string type)
+bool PresetsStore::checkclipboardtype(string type)
 {
-    //makes LFO's compatible
+    // makes LFO's compatible
     if (type.find("Plfo") != string::npos
         && clipboard.type.find("Plfo") != string::npos)
         return true;
     return (!type.compare(clipboard.type));
 }
 
-
-/**
-// a helper function that compares 2 presets[]
-int Presets_compar(const void *a, const void *b)
+void PresetsStore::clearpresets(void)
 {
-    struct PresetsStore::presetstruct *p1 = (PresetsStore::presetstruct *)a;
-    struct PresetsStore::presetstruct *p2 = (PresetsStore::presetstruct *)b;
-    if (p1->name.empty() || p2->name.empty())
-        return 0;
-    return (strcasecmp(p1->name.c_str(), p2->name.c_str()) < 0);
+    for (int i = 0; i < MAX_PRESETS; ++i)
+    {
+        presets[i].file.clear();
+        presets[i].name.clear();
+    }
 }
-**/
 
-void PresetsStore::rescanPresets(string type)
+
+void PresetsStore::rescanforpresets(string type)
 {
     for (int i = 0; i < MAX_PRESETS; ++i)
     {
@@ -104,9 +102,9 @@ void PresetsStore::rescanPresets(string type)
 
     for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
     {
-        if (Runtime.settings.presetsDirlist[i].empty())
+        if (Runtime.presetsDirlist[i].empty())
             continue;
-        string dirname = Runtime.settings.presetsDirlist[i];
+        string dirname = Runtime.presetsDirlist[i];
         DIR *dir = opendir(dirname.c_str());
         if (dir == NULL)
             continue;
@@ -152,21 +150,21 @@ void PresetsStore::rescanPresets(string type)
     }
 }
 
-void PresetsStore::copyPreset(XMLwrapper *xml, string type, string name)
+void PresetsStore::copypreset(XMLwrapper *xml, string type, string name)
 {
-    if (Runtime.settings.presetsDirlist[0].empty())
+    if (Runtime.presetsDirlist[0].empty())
         return;
     string filename;
     string tmpfilename = name;
     legit_filename(tmpfilename);
-    string dirname = Runtime.settings.presetsDirlist[0];
+    string dirname = Runtime.presetsDirlist[0];
     if (dirname.find_last_of("/") != (dirname.size() - 1))
         dirname += "/";
     filename = dirname + "." + type + preset_extension;
     xml->saveXMLfile(filename);
 }
 
-bool PresetsStore::pastePreset(XMLwrapper *xml, int npreset)
+bool PresetsStore::pastepreset(XMLwrapper *xml, int npreset)
 {
     if (npreset >= MAX_PRESETS || npreset < 1)
         return false;
@@ -176,7 +174,7 @@ bool PresetsStore::pastePreset(XMLwrapper *xml, int npreset)
     return xml->loadXMLfile(presets[npreset].file);
 }
 
-void PresetsStore::deletePreset(int npreset)
+void PresetsStore::deletepreset(int npreset)
 {
     if (npreset >= MAX_PRESETS || npreset < 1)
         return;

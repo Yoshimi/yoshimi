@@ -1,6 +1,6 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0109
-header_name {.h}
+version 1.0110 
+header_name {.h} 
 code_name {.cc}
 comment {//
 // Copyright 2009, Alan Calvert
@@ -17,56 +17,78 @@ comment {//
 //
 // You should have received a copy of the GNU General Public License
 // along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.} {in_source in_header
-}
+} 
+
+decl {\#include <FL/x.H>} {public
+} 
 
 decl {\#include <string>} {public
-}
+} 
+
+#decl {\#include <iostream>} {public
+#} 
 
 decl {using namespace std;} {public
-}
+} 
 
 decl {\#include "Misc/Master.h"} {public
-}
+} 
 
 decl {\#include "MasterUI.h"} {public
-}
-
-decl {MasterUI* guiMaster;} {public
-}
+} 
 
 decl {pthread_t pthreadGui = 0;} {global
-}
+} 
 
 Function {guiThread(void* arg)} {private return_type {void*}
 } {
   code {
-    guiMaster->showUI();
     while (!Pexitprogram)
     {
+      Runtime.checkInterrupted();
+      if (!Runtime.LogList.empty())
+      {
+        if (Runtime.LogList.front().size())
+          guiMaster->Log(Runtime.LogList.front());
+        Runtime.LogList.pop_front();
+      }
+      if (Fl::ready())
         Fl::wait();
+      else
+        usleep(1666);
     }
-    return 0;
+    return NULL;
   } {}
-}
+} 
 
-Function {startGuiThread(void)} {return_type bool}
-{
+Function {startGuiThread(void)} {return_type bool
+} {
   code {
+    fl_open_display();
+    Fl::visual(FL_DOUBLE);
+    guiMaster->Init();
     int chk;
     pthread_attr_t attr;
-    if (!(chk = pthread_attr_init(&attr)))
-        if (!(chk = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED)))
-            if (!(chk = pthread_create(&pthreadGui, &attr, guiThread, NULL)))
-                return true;
-    return false;
-  } {selected}
-}
+    if ((chk = pthread_attr_init(&attr)))
+    {
+        Runtime.Log("Failed to initialise gui thread attributes: " + asString(chk));
+        return false;
+    }
+    if ((chk = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED)))
+    {
+        Runtime.Log("Failed to set gui thread detach state: " + asString(chk));
+        return false;
+    }
+    if ((chk = pthread_create(&pthreadGui, &attr, guiThread, NULL)))
+    {
+        Runtime.Log("Failed to start gui thread: " + asString(chk));
+        return false;
+    }
+    return true;
+  } {}
+} 
 
-Function {stopGuiThread(void)} {return_type void}
-{
-  code {
-    Pexitprogram = true;
-    if (pthreadGui)
-        pthread_cancel(pthreadGui);
-  } {selected}
-}
+Function {stopGuiThread(void)} {return_type void
+} {
+  code {Pexitprogram = true; pthread_cancel(pthreadGui);} {}
+} 

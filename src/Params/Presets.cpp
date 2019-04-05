@@ -35,14 +35,14 @@ Presets::Presets() :
     type[0] = 0;
 }
 
-Presets::~Presets() { }
 
-void Presets::setPresetType(const char *type)
+void Presets::setpresettype(const char *type)
 {
     strcpy(this->type, type);
 }
 
-void Presets::Copy(const char *name)
+
+void Presets::copy(const char *name)
 {
     XMLwrapper *xml = new XMLwrapper();
 
@@ -68,15 +68,16 @@ void Presets::Copy(const char *name)
     xml->endbranch();
 
     if (name == NULL)
-        presetsstore.copyClipboard(xml, type);
+        presetsstore.copyclipboard(xml, type);
     else
-        presetsstore.copyPreset(xml, type,name);
+        presetsstore.copypreset(xml, type,name);
 
     delete(xml);
     nelement = -1;
 }
 
-void Presets::Paste(int npreset)
+
+void Presets::paste(int npreset)
 {
     char type[MAX_PRESETTYPE_SIZE];
     strcpy(type, this->type);
@@ -91,20 +92,20 @@ void Presets::Paste(int npreset)
     XMLwrapper *xml = new XMLwrapper();
     if (npreset == 0)
     {
-        if (!checkClipboardType())
+        if (!checkclipboardtype())
         {
             nelement = -1;
             delete(xml);
             return;
         }
-        if (!presetsstore.pasteClipboard(xml))
+        if (!presetsstore.pasteclipboard(xml))
         {
             delete(xml);
             nelement = -1;
             return;
         }
     } else {
-        if (!presetsstore.pastePreset(xml, npreset))
+        if (!presetsstore.pastepreset(xml, npreset))
         {
             delete(xml);
             nelement = -1;
@@ -119,7 +120,7 @@ void Presets::Paste(int npreset)
     }
     if (nelement == -1)
     {
-        setDefaults();
+        defaults();
         getfromXML(xml);
     } else {
         defaults(nelement);
@@ -131,28 +132,31 @@ void Presets::Paste(int npreset)
     nelement = -1;
 }
 
-bool Presets::checkClipboardType()
+
+bool Presets::checkclipboardtype(void)
 {
     char type[MAX_PRESETTYPE_SIZE];
     strcpy(type, this->type);
     if (nelement != -1)
         strcat(type, "n");
 
-    return presetsstore.checkClipboardType(type);
+    return presetsstore.checkclipboardtype(type);
 }
 
-void Presets::setElement(int n)
+
+void Presets::setelement(int n)
 {
     nelement = n;
 }
 
-void Presets::rescanPresets()
+
+void Presets::rescanforpresets(void)
 {
-    presetsstore.rescanPresets(type);
+    presetsstore.rescanforpresets(type);
 }
 
 
-void Presets::deletePreset(int npreset)
+void Presets::deletepreset(int npreset)
 {
-    presetsstore.deletePreset(npreset);
+    presetsstore.deletepreset(npreset);
 }

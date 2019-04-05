@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,73 +18,110 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified October 2009
+    This file is a derivative of the ZynAddSubFX original, modified January 2010
 */
 
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <csignal>
 #include <cstring>
+#include <deque>
+#include <list>
 
 using namespace std;
 
+#include "Misc/XMLwrapper.h"
 #include "MusicIO/MusicClient.h"
+#include "Misc/HistoryListItem.h"
 
 #define MAX_BANK_ROOT_DIRS 100
 
-extern bool autostart_jack; // default false
-
-class Config; extern Config Runtime;
-
 class Config
 {
+    private:
+
     public:
         Config();
         ~Config() { };
 
-        struct {
-            unsigned int  Samplerate;
-            unsigned int  Buffersize;
-            unsigned int  Oscilsize;
-            bool          showGui;
-            bool          verbose;
-            int           UserInterfaceMode;
-            int           VirKeybLayout;
-
-            string        LinuxALSAaudioDev;
-            string        LinuxALSAmidiDev;
-            string        LinuxJACKserver;
-
-            audio_drivers audioEngine;
-            midi_drivers  midiEngine;
-            string        audioDevice;
-            string        midiDevice;
-            string        nameTag;
-
-            int           Float32bitWavs;
-            string        DefaultRecordDirectory;
-            string        CurrentRecordDirectory;
-
-            int           BankUIAutoClose;
-            int           GzipCompression;
-            int           Interpolation;
-            string        bankRootDirlist[MAX_BANK_ROOT_DIRS];
-            string        currentBankDir;
-            string        presetsDirlist[MAX_BANK_ROOT_DIRS];
-            int           CheckPADsynth;
-        } settings;
-
+        void loadCmdArgs(int argc, char **argv);
+        void StartupReport(unsigned int samplerate, int buffersize);
+        void Announce(void);
+        void Usage(void);
         void clearBankrootDirlist(void);
         void clearPresetsDirlist(void);
-        void Save(void) { saveConfig(); };
-        void Announce(void);
-        void StartupReport(unsigned int samplerate, int buffersize);
-        void Usage(void);
+        void SaveConfig(void);
+        void SaveState(void);
+        XMLwrapper *RestoreRuntimeState(void);
+        string AddParamHistory(string file);
+        string HistoryFilename(int index);
 
+        static void sigHandler(int sig);
+        void checkInterrupted(void);
+        void SetInterruptActive(int sig);
+
+        int CheckLadi1Active(void);
+        void SetLadi1Active(int sig);
+
+        void Log(string msg);
+        void flushLog(void);
+
+        string        ConfigFile;
+        bool          restoreState;
+        string        StateFile;
+        string        CurrentXMZ;
+        string        paramsLoad;
+        string        instrumentLoad;
+
+        unsigned int  Samplerate;
+        unsigned int  Buffersize;
+        unsigned int  Oscilsize;
+
+        int           VirKeybLayout;
+        bool          showConsole;
+
+        audio_drivers audioEngine;
+        string        alsaAudioDevice;
+        string        jackServer;
+        bool          startJack;  // default false
+        bool          connectJackaudio; // default false
+        string        audioDevice;
+
+        midi_drivers  midiEngine;
+        string        alsaMidiDevice;
+        string        midiDevice;
+        string        nameTag;
+
+        bool          Float32bitWavs;
+        string        DefaultRecordDirectory;
+        string        CurrentRecordDirectory;
+
+        int           BankUIAutoClose;
+        int           Interpolation;
+        string        bankRootDirlist[MAX_BANK_ROOT_DIRS];
+        string        currentBankDir;
+        string        presetsDirlist[MAX_BANK_ROOT_DIRS];
+        int           CheckPADsynth;
+
+        deque<HistoryListItem> ParamsHistory;
+        deque<HistoryListItem>::iterator itx;
+        static const unsigned short MaxParamsHistory;
+        list<string> LogList;
+        
     private:
-        void readConfig(void);
-        void saveConfig(void);
-        string getConfigFilename(bool for_save);
+        bool loadConfig(void);
+        bool loadConfigData(XMLwrapper *xml);
+        bool loadRuntimeData(XMLwrapper *xml);
+        void addConfigXML(XMLwrapper *xml);
+        void addRuntimeXML(XMLwrapper *xml);
+
+        static unsigned short nextHistoryIndex;
+        static struct sigaction sigAction; 
+        static int sigIntActive;
+        static int ladi1IntActive;
 };
+
+extern Config Runtime;
 
 #endif

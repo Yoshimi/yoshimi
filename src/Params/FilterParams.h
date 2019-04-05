@@ -35,17 +35,28 @@ class FilterParams : public Presets
 
         void add2XML(XMLwrapper *xml);
         void add2XMLsection(XMLwrapper *xml, int n);
-        void setDefaults(void);
+        void defaults(void);
         void getfromXML(XMLwrapper *xml);
         void getfromXMLsection(XMLwrapper *xml, int n);
 
 
         void getfromFilterParams(FilterParams *pars);
 
-        float getFreq(void);
-        float getQ(void);
-        float getFreqTracking(float notefreq);
-        float getGain(void);
+        float getfreq(void);
+        float getq(void);
+        float getfreqtracking(float notefreq);
+        float getgain(void);
+
+        float getcenterfreq(void);
+        float getoctavesfreq(void);
+        float getfreqpos(float freq);
+        float getfreqx(float x);
+
+        void formantfilterH(int nvowel, int nfreqs, float *freqs); // used by UI
+
+        float getformantfreq(unsigned char freq);
+        float getformantamp(unsigned char amp);
+        float getformantq(unsigned char q);
 
         unsigned char Pcategory;  // Filter category (Analog/Formant/StVar)
         unsigned char Ptype;      // Filter type  (for analog lpf,hpf,bpf..)
@@ -78,17 +89,6 @@ class FilterParams : public Presets
         struct {
             unsigned char nvowel; // the vowel from the position
         } Psequence[FF_MAX_SEQUENCE];
-
-        float getCenterFreq(void);
-        float getOctavesFreq(void);
-        float getFreqPos(float freq);
-        float getFreqX(float x);
-
-        void formantFilterH(int nvowel, int nfreqs, float *freqs); // used by UI
-
-        float getFormantFreq(unsigned char freq);
-        float getFormantAmp(unsigned char amp);
-        float getFormantQ(unsigned char q);
 
         bool changed;
 

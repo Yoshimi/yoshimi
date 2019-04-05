@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0109
+version 1.0110 
 header_name {.h} 
 code_name {.cc}
 comment {BankUI.h} {not_in_source in_header
-}
+} 
 
 comment {BankUI.cc} {in_source not_in_header
-}
+} 
 
 comment {//
 // Original ZynAddSubFX author Nasca Octavian Paul
@@ -28,12 +28,15 @@ comment {//
 //
 // This file is a derivative of the ZynAddSubFX original, modified October 2009
 //} {in_source in_header
-}
+} 
 
 decl {\#include <FL/Fl_Button.H>} {public
 } 
 
 decl {\#include <FL/Fl_File_Chooser.H>} {public
+} 
+
+decl {\#include <FL/Fl_Spinner.H>} {public
 } 
 
 decl {\#include "Misc/Bank.h"} {public
@@ -43,7 +46,7 @@ decl {\#include "Misc/Config.h"} {public
 } 
 
 decl {\#include "Misc/Master.h"} {public
-}
+} 
 
 class BankProcess_ {open
 } {
@@ -100,7 +103,7 @@ class BankSlot {open : {public Fl_Button, BankProcess_}
         refresh();} {}
   }
   Function {refresh()} {} {
-    code {if (bank->emptySlot(nslot))
+    code {if (bank->emptyslot(nslot))
         {
             color(46);
         } else {
@@ -111,7 +114,7 @@ class BankSlot {open : {public Fl_Button, BankProcess_}
         }
         if (*nselected == nslot)
             color(6);
-        label(bank->getNameNumbered(nslot).c_str());} {}
+        label(bank->getnamenumbered(nslot).c_str());} {}
   }
   decl {int *what, *whatslot, nslot, highlight, *nselected;} {}
   decl {void (BankProcess_:: *fnc)(void);} {}
@@ -124,15 +127,15 @@ class BankUI {open : {public BankProcess_}
   } {
     Fl_Window bankuiwindow {
       label Bank open
-      xywh {775 238 785 575} type Double hide
+      xywh {688 549 785 575} type Double
       code0 {o->label(bank->bankfiletitle.c_str());}
       code1 {if (!bank->bankfiletitle.size())
-            o->label ("Choose a bank from the bank list on the left (or go to settings if to configure the bank location) or choose 'New Bank...' to make a new bank.");}
+            o->label ("Choose a bank from the bank list on the left (or go to settings if to configure the bank location) or choose 'New Bank...' to make a new bank.");} visible
     } {
       Fl_Button {} {
         label Close
         callback {bankuiwindow->hide();}
-        xywh {705 546 70 24} box THIN_UP_BOX
+        xywh {705 546 70 24} box THIN_UP_BOX labelsize 12
       }
       Fl_Group {} {
         xywh {5 34 772 491} box ENGRAVED_FRAME
@@ -188,7 +191,7 @@ class BankUI {open : {public BankProcess_}
             }}
         } {}
       }
-      Fl_Group modeselect {open
+      Fl_Group modeselect {
         xywh {5 528 425 42} box ENGRAVED_BOX
       } {
         Fl_Light_Button writebutton {
@@ -196,7 +199,7 @@ class BankUI {open : {public BankProcess_}
           callback {if (o->value() > 0.5)
                   mode = 2;
               removeselection();}
-          xywh {116 534 99 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 1 labeltype ENGRAVED_LABEL labelfont 1 labelsize 13
+          xywh {116 534 99 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 1 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
           code0 {if (bank->locked()) o->deactivate();}
         }
         Fl_Light_Button readbutton {
@@ -204,7 +207,7 @@ class BankUI {open : {public BankProcess_}
           callback {if (o->value() > 0.5)
                   mode = 1;
               removeselection();}
-          xywh {11 534 99 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 101 labeltype ENGRAVED_LABEL labelfont 1 labelsize 13
+          xywh {11 534 99 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 101 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
           code0 {o->value(1);}
         }
         Fl_Light_Button clearbutton {
@@ -212,7 +215,7 @@ class BankUI {open : {public BankProcess_}
           callback {if (o->value() > 0.5)
                   mode = 3;
               removeselection();}
-          xywh {221 534 99 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 0 labeltype ENGRAVED_LABEL labelfont 1 labelsize 13
+          xywh {221 534 99 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 0 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
           code0 {if (bank->locked()) o->deactivate();}
         }
         Fl_Light_Button swapbutton {
@@ -220,7 +223,7 @@ class BankUI {open : {public BankProcess_}
           callback {if (o->value() > 0.5)
                   mode = 4;
               removeselection();}
-          xywh {325 534 99 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 227 labeltype ENGRAVED_LABEL labelfont 1 labelsize 13
+          xywh {325 534 99 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 227 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
           code0 {if (bank->locked()) o->deactivate();}
         }
       }
@@ -230,28 +233,28 @@ class BankUI {open : {public BankProcess_}
             dirname = fl_input("New empty Bank:");
             if (dirname == NULL)
                 return;
-            if (!bank->newBank(string(dirname)))
+            if (!bank->newbank(string(dirname)))
                 fl_alert("Error, could not make a new bank directory... is the default bank root dir set?");
             refreshmainwindow();}
         xywh {685 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
       Fl_Check_Button {} {
         label {auto close}
-        callback {Runtime.settings.BankUIAutoClose = (int) o->value();}
+        callback {Runtime.BankUIAutoClose = (int) o->value();}
         tooltip {automatically close the bank window if the instrument is loaded} xywh {705 529 60 15} down_box DOWN_BOX labelsize 10
-        code0 {o->value(Runtime.settings.BankUIAutoClose);}
+        code0 {o->value(Runtime.BankUIAutoClose);}
       }
       Fl_Choice banklist {
         callback {int n = o->value();
             if (bank->banks[n].dir.empty())
                 return;
-            if (!bank->loadBank(bank->banks[n].dir))
+            if (!bank->loadbank(bank->banks[n].dir))
                 fl_alert("Error: Could not load the bank from the directory\\n%s.",
                          bank->banks[n].dir.c_str());
                 for (int i = 0; i < BANK_SIZE; ++i)
                     bs[i]->refresh();
-                refreshmainwindow();} open selected
-        xywh {5 8 220 20} down_box BORDER_BOX labelfont 1 align 0 textfont 1 textsize 11
+                refreshmainwindow();} open
+        xywh {5 8 220 20} down_box BORDER_BOX labelfont 1 labelsize 12 align 0 textsize 12
       } {}
       Fl_Button {} {
         label {Refresh bank list}
@@ -261,10 +264,10 @@ class BankUI {open : {public BankProcess_}
       }
       Fl_Check_Button {} {
         label {Show PADsynth status}
-        callback {Runtime.settings.CheckPADsynth = (int) o->value();
+        callback {Runtime.CheckPADsynth = (int) o->value();
             refreshmainwindow();}
         xywh {435 530 150 15} down_box DOWN_BOX labelsize 11
-        code0 {o->value(Runtime.settings.CheckPADsynth);}
+        code0 {o->value(Runtime.CheckPADsynth);}
       }
     }
   }
@@ -282,62 +285,62 @@ class BankUI {open : {public BankProcess_}
   } {
     code {bankuiwindow->hide(); delete(bankuiwindow);} {}
   }
-  Function {show()} {open
+  Function {Show()} {open
   } {
     code {bankuiwindow->show();
-simplesetmode(Runtime.settings.UserInterfaceMode == 2);} {}
+        readbutton->value(1);
+        mode = 1;
+        removeselection();
+        modeselect->show();} {}
   }
-  Function {hide()} {} {
+  Function {Hide()} {} {
     code {bankuiwindow->hide();} {}
   }
-  Function {init(Fl_Valuator *cbwig_)} {open
+  Function {init(Fl_Spinner *cbwig_)} {open
   } {
-    code {cbwig = cbwig_;
-rescan_for_banks();} {}
+    code {cbwig = cbwig_;rescan_for_banks();} {}
   }
   Function {process()} {open return_type void
   } {
     code {int slot = this->slot;
-        if (what == 2 && bank->emptySlot(slot) == 0 && mode != 4)
+        if (what == 2 && !bank->emptyslot(slot) && mode != 4)
         {   // Rename slot
-            const char *tmp = fl_input("Slot (instrument) name:", bank->getName(slot).c_str());
+            const char *tmp = fl_input("Slot (instrument) name:", bank->getname(slot).c_str());
             if (tmp != NULL)
-                bank->setName(slot, string(tmp), -1);
+                bank->setname(slot, string(tmp), -1);
             bs[slot]->refresh();
             // Re-read from slot
             zynMaster->actionLock(lockmute);
-            bank->loadFromSlot(slot, zynMaster->part[*npart]);
+            bank->loadfromslot(slot, zynMaster->part[*npart]);
             zynMaster->actionLock(unlock);
-            zynMaster->part[*npart]->applyParameters();
-            zynMaster->part[*npart]->Pname = bank->getName(slot);
+            zynMaster->part[*npart]->applyparameters();
+            zynMaster->part[*npart]->Pname = bank->getname(slot);
             cbwig->do_callback();
         }
 
-        if (what == 1 && mode == 1 && !bank->emptySlot(slot))
+        if (what == 1 && mode == 1 && !bank->emptyslot(slot))
         {   // Reads from slot
             zynMaster->actionLock(lockmute);
-            bank->loadFromSlot(slot, zynMaster->part[*npart]);
+            bank->loadfromslot(slot, zynMaster->part[*npart]);
             zynMaster->actionLock(unlock);
-            zynMaster->part[*npart]->applyParameters();
-            // original comment
-            // snprintf((char *)zynMaster->part[*npart]->Pname,PART_MAX_NAME_LEN,"%s",bank->getName(slot));
-            zynMaster->part[*npart]->Pname = bank->getName(slot);
+            zynMaster->part[*npart]->applyparameters();
+            zynMaster->part[*npart]->Pname = bank->getname(slot);
             cbwig->do_callback();
      
-            if (Runtime.settings.BankUIAutoClose != 0)
+            if (Runtime.BankUIAutoClose != 0)
                 bankuiwindow->hide();
         }
 
         if (what == 1 && mode == 2)
         {   // save(write) to slot
             bool doit = true;
-            if (!bank->emptySlot(slot))
+            if (!bank->emptyslot(slot))
                 if (!fl_choice("Overwrite the slot no. %d ?", "No", "Yes", NULL, slot + 1))
                     doit = false;
             if (doit)
             {
                 zynMaster->actionLock(lockmute);
-                bank->saveToSlot(slot,zynMaster->part[*npart]);
+                bank->savetoslot(slot,zynMaster->part[*npart]);
                 zynMaster->actionLock(unlock);
                 bs[slot]->refresh();
                 mode = 1;
@@ -346,11 +349,11 @@ rescan_for_banks();} {}
             }
         }
 
-        if (what == 1 && mode == 3 && !bank->emptySlot(slot))
+        if (what == 1 && mode == 3 && !bank->emptyslot(slot))
         {   // Clears the slot
             if (fl_choice("Clear the slot no. %d ?", "No", "Yes", NULL, slot + 1))
             {
-                bank->clearSlot(slot);
+                bank->clearslot(slot);
                 bs[slot]->refresh();
             }
         }
@@ -360,7 +363,7 @@ rescan_for_banks();} {}
             bool done = false;
             if (what == 1 && nselected >= 0)
             {
-                bank->swapSlot(nselected, slot);
+                bank->swapslot(nselected, slot);
                 int ns = nselected;
                 nselected = -1;
                 bs[slot]->refresh();
@@ -377,8 +380,7 @@ rescan_for_banks();} {}
             }
         }
         if (mode != 4)
-            refreshmainwindow();
-    } {}
+            refreshmainwindow();} {}
   }
   Function {refreshmainwindow()} {open
   } {
@@ -414,24 +416,15 @@ rescan_for_banks();} {}
   } {
     code {banklist->clear();
         banklist->add(" ");
-        bank->rescanBanks();
+        bank->rescanforbanks();
         for (int i = 1; i < MAX_NUM_BANKS; ++i)
-            if (!bank->banks[i].name.empty())
-                banklist->add(bank->banks[i].name.c_str());} {}
-  }
-  Function {simplesetmode(bool beginnerui)} {} {
-    code {readbutton->value(1);
-        mode = 1;
-        removeselection();
-        if (beginnerui)
-            modeselect->hide();
-	    else
-            modeselect->show();} {}
+            if (!bank->banks[i].name.empty() && !bank->banks[i].alias.empty())
+                banklist->add(bank->banks[i].alias.c_str());} {}
   }
   decl {BankSlot *bs[BANK_SIZE];} {}
   decl {int slot, what; // "what" = what button is pressed} {}
   decl {int mode, *npart, nselected;} {}
   decl {void (BankProcess_::* fnc)(void);} {}
-  decl {Fl_Valuator *cbwig;} {public
+  decl {Fl_Spinner *cbwig;} {public
   }
 } 

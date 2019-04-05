@@ -1,7 +1,7 @@
 /*
     AlsaClient.h
 
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -29,27 +29,20 @@ class AlsaClient : public MusicClient
         AlsaClient() : MusicClient() { };
         ~AlsaClient() { };
 
-        bool openAudio(void);
-        bool openMidi(void);
+        bool openAudio(WavRecord *recorder);
+        bool openMidi(WavRecord *recorder);
         bool Start(void) { return alsaEngine.Start(); };
-        void Stop(void) { alsaEngine.Stop(); };
-        void Close(void) { alsaEngine.Close(); };
+        void Stop(void);
+        void Close(void);
 
         unsigned int getSamplerate(void) { return alsaEngine.getSamplerate(); };
         int getBuffersize(void) { return alsaEngine.getBuffersize(); };
+        int grossLatency(void) { return alsaEngine.grossLatency(); };
 
         string audioClientName(void) { return alsaEngine.audioClientName(); };
         string midiClientName(void) { return alsaEngine.midiClientName(); };
         int audioClientId(void) { return alsaEngine.audioClientId(); };
         int midiClientId(void) { return alsaEngine.midiClientId(); };
-
-        void startRecord(void) { alsaEngine.StartRecord(); };
-        void stopRecord(void) { alsaEngine.StopRecord(); };
-        bool setRecordFile(const char* fpath, string& errmsg)
-            { return alsaEngine.SetWavFile(fpath, errmsg); };
-        bool setRecordOverwrite(string& errmsg)
-            { return alsaEngine.SetWavOverwrite(errmsg); };
-        string wavFilename(void) { return alsaEngine.WavFilename(); };
 
     protected:
         AlsaEngine alsaEngine;

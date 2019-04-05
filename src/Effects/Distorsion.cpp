@@ -35,7 +35,7 @@ void waveshapesmps(int n, float *smps, unsigned char type, unsigned char drive)
     switch (type)
     {
         case 1:
-            ws = powf( 10.0, ws * ws * 3.0) - 1.0 + 0.001; // Arctangent
+            ws = powf( 10.0f, ws * ws * 3.0f) - 1.0 + 0.001; // Arctangent
             for (i = 0; i < n; ++i)
                 smps[i] = atanf(smps[i] * ws) / atanf(ws);
             break;
@@ -90,7 +90,7 @@ void waveshapesmps(int n, float *smps, unsigned char type, unsigned char drive)
             }
             break;
         case 8:
-            ws = powf(2.0, -ws * ws * 8.0); // Upper Limiter
+            ws = powf(2.0f, -ws * ws * 8.0); // Upper Limiter
             for (i = 0; i < n; ++i)
             {
                 float tmp = smps[i];
@@ -100,7 +100,7 @@ void waveshapesmps(int n, float *smps, unsigned char type, unsigned char drive)
             }
             break;
         case 9:
-            ws = powf(2.0, -ws * ws * 8.0); // Lower Limiter
+            ws = powf(2.0f, -ws * ws * 8.0); // Lower Limiter
             for (i = 0; i < n; ++i)
             {
                 float tmp = smps[i];
@@ -110,7 +110,7 @@ void waveshapesmps(int n, float *smps, unsigned char type, unsigned char drive)
             }
             break;
         case 10:
-            ws = (powf(2.0, ws * 6.0) - 1.0) / powf(2.0, 6.0); // Inverse Limiter
+            ws = (powf(2.0f, ws * 6.0) - 1.0) / powf(2.0, 6.0); // Inverse Limiter
             for (i = 0; i < n; ++i)
             {
                 float tmp = smps[i];
@@ -123,9 +123,9 @@ void waveshapesmps(int n, float *smps, unsigned char type, unsigned char drive)
             }
             break;
         case 11:
-            ws = powf(5, ws * ws * 1.0) - 1.0; // Clip
+            ws = powf(5.0f, ws * ws * 1.0) - 1.0; // Clip
             for (i = 0; i < n; ++i)
-                smps[i] = smps[i] * (ws + 0.5) * 0.9999 - floorf(0.5 + smps[i] * (ws + 0.5) * 0.9999);
+                smps[i] = smps[i] * (ws + 0.5) * 0.9999 - floorf(0.5f + smps[i] * (ws + 0.5) * 0.9999);
             break;
         case 12:
             ws = ws * ws * ws * 30 + 0.001; // Asym2
@@ -154,7 +154,7 @@ void waveshapesmps(int n, float *smps, unsigned char type, unsigned char drive)
             }
             break;
         case 14:
-            ws = powf(ws, 5.0) * 80.0 + 0.0001; // sigmoid
+            ws = powf(ws, 5.0f) * 80.0 + 0.0001; // sigmoid
             tmpv = (ws > 10.0) ? 0.5 : 0.5-1.0 / (expf(ws) + 1.0);
             for (i = 0; i < n; ++i)
             {
@@ -193,8 +193,8 @@ Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_) :
     Pstereo = 0;
     Pprefiltering = 0;
 
-    setPreset(Ppreset);
-    Cleanup();
+    setpreset(Ppreset);
+    cleanup();
 }
 
 Distorsion::~Distorsion()
@@ -207,24 +207,24 @@ Distorsion::~Distorsion()
 }
 
 // Cleanup the effect
-void Distorsion::Cleanup()
+void Distorsion::cleanup()
 {
-    lpfl->Cleanup();
-    hpfl->Cleanup();
-    lpfr->Cleanup();
-    hpfr->Cleanup();
+    lpfl->cleanup();
+    hpfl->cleanup();
+    lpfr->cleanup();
+    hpfr->cleanup();
 }
 
 
 // Apply the filters
-void Distorsion::applyFilters(float *efxoutl, float *efxoutr)
+void Distorsion::applyfilters(float *efxoutl, float *efxoutr)
 {
-    lpfl->filterOut(efxoutl);
-    hpfl->filterOut(efxoutl);
+    lpfl->filterout(efxoutl);
+    hpfl->filterout(efxoutl);
     if (Pstereo != 0)
     {   // stereo
-        lpfr->filterOut(efxoutr);
-        hpfr->filterOut(efxoutr);
+        lpfr->filterout(efxoutr);
+        hpfr->filterout(efxoutr);
     }
 }
 
@@ -243,8 +243,8 @@ void Distorsion::out(float *smpsl, float *smpsr)
     {   //Stereo
         for (int i = 0; i < buffersize; ++i)
         {
-            efxoutl[i] = smpsl[i] * inputvol * panning;
-            efxoutr[i] = smpsr[i] * inputvol * (1.0 - panning);
+            efxoutl[i] = smpsl[i] * inputvol * (1.0 - panning);
+            efxoutr[i] = smpsr[i] * inputvol * panning;
         }
     } else {
         for (int i = 0; i < buffersize; ++i)
@@ -254,7 +254,7 @@ void Distorsion::out(float *smpsl, float *smpsr)
     }
 
     if (Pprefiltering != 0)
-        applyFilters(efxoutl, efxoutr);
+        applyfilters(efxoutl, efxoutr);
 
     // no optimised, yet (no look table)
     waveshapesmps(buffersize, efxoutl, Ptype + 1, Pdrive);
@@ -262,7 +262,7 @@ void Distorsion::out(float *smpsl, float *smpsr)
         waveshapesmps(buffersize, efxoutr, Ptype + 1, Pdrive);
 
     if (Pprefiltering == 0)
-        applyFilters(efxoutl, efxoutr);
+        applyfilters(efxoutl, efxoutr);
 
     if (Pstereo == 0)
         memcpy(efxoutr, efxoutl, buffersize * sizeof(float));
@@ -285,54 +285,54 @@ void Distorsion::out(float *smpsl, float *smpsr)
 
 
 // Parameter control
-void Distorsion::setVolume(unsigned char _volume)
+void Distorsion::setvolume(unsigned char Pvolume_)
 {
-    Pvolume = _volume;
+    Pvolume = Pvolume_;
     if(insertion == 0)
     {
-        outvolume = pow(0.01, (1.0 - Pvolume / 127.0)) * 4.0;
+        outvolume = pow(0.01f, (1.0 - Pvolume / 127.0)) * 4.0;
         volume = 1.0;
     }
     else
          volume = outvolume = Pvolume / 127.0;
     if (Pvolume == 0.0)
-        Cleanup();
+        cleanup();
 }
 
 
-void Distorsion::setPanning(unsigned char _panning)
+void Distorsion::setpanning(unsigned char Ppanning_)
 {
-    Ppanning = _panning;
+    Ppanning = Ppanning_;
     panning = (Ppanning + 0.5) / 127.0;
 }
 
 
-void Distorsion::setLrCross(unsigned char _lrcross)
+void Distorsion::setlrcross(unsigned char Plrcross_)
 {
-    Plrcross = _lrcross;
+    Plrcross = Plrcross_;
     lrcross = Plrcross / 127.0;
 }
 
 
-void Distorsion::setLpf(unsigned char _lpf)
+void Distorsion::setlpf(unsigned char Plpf_)
 {
-    Plpf = _lpf;
-    float fr = expf(powf(Plpf / 127.0, 0.5) * logf(25000.0)) + 40;
-    lpfl->setFreq(fr);
-    lpfr->setFreq(fr);
+    Plpf = Plpf_;
+    float fr = expf(powf(Plpf / 127.0, 0.5f) * logf(25000.0f)) + 40;
+    lpfl->setfreq(fr);
+    lpfr->setfreq(fr);
 }
 
 
-void Distorsion::setHpf(unsigned char _hpf)
+void Distorsion::sethpf(unsigned char Phpf_)
 {
-    Phpf = _hpf;
-    float fr = expf(powf(Phpf / 127.0, 0.5) * logf(25000.0)) + 20.0;
-    hpfl->setFreq(fr);
-    hpfr->setFreq(fr);
+    Phpf = Phpf_;
+    float fr = expf(powf(Phpf / 127.0, 0.5f) * logf(25000.0f)) + 20.0;
+    hpfl->setfreq(fr);
+    hpfr->setfreq(fr);
 }
 
 
-void Distorsion::setPreset(unsigned char npreset)
+void Distorsion::setpreset(unsigned char npreset)
 {
     const int PRESET_SIZE = 11;
     const int NUM_PRESETS = 6;
@@ -354,26 +354,26 @@ void Distorsion::setPreset(unsigned char npreset)
     if (npreset >= NUM_PRESETS)
         npreset = NUM_PRESETS - 1;
     for (int n = 0; n < PRESET_SIZE; ++n)
-        changePar(n, presets[npreset][n]);
-    if (insertion == 0)
-        changePar(0, (int)(presets[npreset][0] / 1.5)); // lower the volume if this is system effect
+        changepar(n, presets[npreset][n]);
+    if (!insertion)
+        changepar(0, (int)(presets[npreset][0] / 1.5)); // lower the volume if this is system effect
     Ppreset = npreset;
-    Cleanup();
+    cleanup();
 }
 
 
-void Distorsion::changePar(int npar, unsigned char value)
+void Distorsion::changepar(int npar, unsigned char value)
 {
     switch (npar)
     {
         case 0:
-            setVolume(value);
+            setvolume(value);
             break;
         case 1:
-            setPanning(value);
+            setpanning(value);
             break;
         case 2:
-            setLrCross(value);
+            setlrcross(value);
             break;
         case 3:
             Pdrive = value;
@@ -394,10 +394,10 @@ void Distorsion::changePar(int npar, unsigned char value)
                 Pnegate = value;
             break;
         case 7:
-            setLpf(value);
+            setlpf(value);
             break;
         case 8:
-            setHpf(value);
+            sethpf(value);
             break;
         case 9:
             if (value > 1)
@@ -412,7 +412,7 @@ void Distorsion::changePar(int npar, unsigned char value)
 }
 
 
-unsigned char Distorsion::getPar(int npar) const
+unsigned char Distorsion::getpar(int npar)
 {
     switch (npar)
     {

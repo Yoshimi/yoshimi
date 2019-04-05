@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010 Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified October 2009
+    This file is a derivative of the ZynAddSubFX original, modified January 2010
 */
 
 #ifndef SUB_NOTE_H
@@ -40,12 +40,12 @@ class SUBnote
         void SUBlegatonote(float freq, float velocity,
                            int portamento_, int midinote, bool externcall);
 
-        int noteout(float *outl,float *outr);
-            // note output, return 0 if the note is finished
+        int noteout(float *outl,float *outr); // note output, return 0 if the
+                                              // note is finished
         void relasekey(void);
-        int finished(void);
+        bool finished(void) { return !NoteEnabled; };
 
-        int ready; // if I can get the sampledata
+        bool ready; // if I can get the sampledata
 
     private:
         void computecurrentparameters(void);
@@ -54,8 +54,7 @@ class SUBnote
 
         SUBnoteParameters *pars;
 
-        // parameters
-        int stereo;
+        bool stereo;
         int numstages; // number of stages of filters
         int numharmonics; // number of harmonics (after the too higher hamonics are removed)
         int firstnumharmonics; // To keep track of the first note's numharmonics value, useful in legato mode.
@@ -71,7 +70,7 @@ class SUBnote
         Envelope *GlobalFilterEnvelope;
 
         // internal values
-        ONOFFTYPE NoteEnabled;
+        bool NoteEnabled;
         int firsttick;
         int portamento;
         float volume;
@@ -95,10 +94,8 @@ class SUBnote
             float yn2;   // filter internal values
         };
 
-        void initfilter(bpfilter &filter, float freq, float bw,
-                        float amp, float mag);
-        void computefiltercoefs(bpfilter &filter, float freq,
-                                float bw, float gain);
+        void initfilter(bpfilter &filter, float freq, float bw, float amp, float mag);
+        void computefiltercoefs(bpfilter &filter, float freq, float bw, float gain);
         void filter(bpfilter &filter, float *smps);
 
         bpfilter *lfilter;
@@ -134,10 +131,10 @@ class SUBnote
             } param;
         } Legato;
 
-        const float log_0_01;    // = logf(0.01);
-        const float log_0_001;   // = logf(0.001);
-        const float log_0_0001;  // = logf(0.0001);
-        const float log_0_00001; // = logf(0.00001);
+        const float log_0_01;    // logf(0.01);
+        const float log_0_001;   // logf(0.001);
+        const float log_0_0001;  // logf(0.0001);
+        const float log_0_00001; // logf(0.00001);
 
         unsigned int samplerate;
         int buffersize;

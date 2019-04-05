@@ -1,0 +1,110 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0110 
+header_name {.h} 
+code_name {.cc}
+comment {Copyright 2010, Alan Calvert
+
+This file is part of yoshimi, which is free software: you can
+redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation, either
+version 3 of the License, or (at your option) any later version.
+
+yoshimi is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+} {in_source in_header
+} 
+
+decl {\#include <set>} {public
+} 
+
+decl {\#include <iostream>} {public
+} 
+
+decl {using namespace std;} {public
+} 
+
+decl {\#include "Misc/Config.h"} {global
+} 
+
+decl {\#include "MasterUI.h"} {global
+} 
+
+class ParametersUI {open
+} {
+  Function {make_window(void)} {open
+  } {
+    Fl_Window Recent {
+      label {Recent Parameters}
+      callback {o->hide()} open
+      xywh {917 745 220 180} type Double labeltype NORMAL_LABEL labelfont 13 labelsize 12 align 0 visible
+    } {
+      Fl_Browser BrowseRecent {
+        callback {if (o->value() > 0)
+          {
+              deque<HistoryListItem>::iterator ix = Runtime.ParamsHistory.begin();
+              string fle;
+              switch (Fl::event_button())
+              {
+                case FL_LEFT_MOUSE:
+                    {
+                        fle = Runtime.ParamsHistory.at(o->value() - 1).file;
+                        guiMaster->do_load_master(false, fle.c_str());
+                        guiMaster->setMasterLabel(Runtime.ParamsHistory.at(o->value() - 1).name);
+                    }
+                    break;
+    
+                default:
+                    break;
+              }
+          }}
+        xywh {0 0 220 157} type Select color 55 labeltype NO_LABEL labelfont 13 labelsize 12 align 0 textsize 12
+        code0 {const int colwidths[] = { 150, 330, 0 };
+          o->column_widths(colwidths);
+          o->column_char('	');}
+      }
+      Fl_Button CloseRecent {
+        label Close
+        callback {Recent->hide()}
+        xywh {88 159 46 20} labelfont 13 labelsize 12
+      }
+    }
+  }
+  Function {ParametersUI()} {open
+  } {
+    code {make_window();} {}
+  }
+  Function {loadRecent()} {} {
+    code {BrowseRecent->clear();
+        const int colwidths[] = { 64, 128, 0 };
+        BrowseRecent->column_widths(colwidths);
+        BrowseRecent->column_char('	');
+        Runtime.itx = Runtime.ParamsHistory.begin();
+        for (; Runtime.itx != Runtime.ParamsHistory.end(); ++Runtime.itx)
+        {
+            string tag = Runtime.itx->name;
+                // + "\\t" + Runtime.itx->file.substr(0, Runtime.itx->file.rfind("/") + 1);
+            BrowseRecent->add(tag.c_str());
+        }
+        BrowseRecent->set_changed();} {}
+  }
+  Function {Show()} {open
+  } {
+    code {
+      loadRecent();
+      Recent->show();} {selected
+    }
+  }
+  Function {Hide()} {open
+  } {
+    code {Recent->hide();} {selected
+    }
+  }
+  Function {~ParametersUI()} {} {
+    code {Recent->hide();} {}
+  }
+} 

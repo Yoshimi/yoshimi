@@ -40,13 +40,13 @@ class PADnoteParameters : public Presets
         PADnoteParameters(FFTwrapper *fft_);
         ~PADnoteParameters();
 
-        void setDefaults(void) { defaults(); };
+        void defaults(void);
         void add2XML(XMLwrapper *xml);
         void getfromXML(XMLwrapper *xml);
 
         //returns a value between 0.0-1.0 that represents the estimation
         // perceived bandwidth
-        float getProfile(float *smp, int size);
+        float getprofile(float *smp, int size);
 
         //parameters
 
@@ -143,7 +143,7 @@ class PADnoteParameters : public Presets
         float setPbandwidth(int Pbandwidth); // returns the BandWidth in cents
         float getNhr(int n); // gets the n-th overtone position relatively to N harmonic
 
-        void applyParameters(bool lockmutex);
+        void applyparameters(bool lockmutex);
         // void export2wav(string basefilename);
 
         OscilGen *oscilgen;
@@ -156,18 +156,17 @@ class PADnoteParameters : public Presets
         } sample[PAD_MAX_SAMPLES], newsample;
 
     private:
-        void generateSpectrumBandwidthMode(float *spectrum, int size,
-                                           float basefreq,
-                                           float *profile,
-                                           int profilesize,
-                                           float bwadjust);
-        void generateSpectrumOtherModes(float *spectrum, int size,
-                                        float basefreq,
-                                        float *profile, int profilesize,
-                                        float bwadjust);
-        void deleteSamples(void);
-        void deleteSample(int n);
-        void defaults(void);
+        void generatespectrum_bandwidthMode(float *spectrum, int size,
+                                            float basefreq,
+                                            float *profile,
+                                            int profilesize,
+                                            float bwadjust);
+        void generatespectrum_otherModes(float *spectrum, int size,
+                                         float basefreq,
+                                         float *profile, int profilesize,
+                                         float bwadjust);
+        void deletesamples(void);
+        void deletesample(int n);
 
         FFTwrapper *fft;
         pthread_mutex_t *mutex;

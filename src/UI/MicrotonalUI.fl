@@ -1,36 +1,33 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0106 
+version 1.0110 
 header_name {.h} 
 code_name {.cc}
 comment {MicrotonalUI.h} {not_in_source in_header
-}
+} 
+
 comment {Microtonal.cc} {in_source not_in_header
-}
+} 
 
-comment {//
-// Original ZynAddSubFX author Nasca Octavian Paul
-// Copyright (C) 2002-2005 Nasca Octavian Paul
-// Copyright 2009, Alan Calvert
-//
-// This file is part of yoshimi, which is free software: you can redistribute
-// it and/or modify it under the terms of version 2 of the GNU General Public
-// License as published by the Free Software Foundation.
-//
-// yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
-// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-// FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
-// later) for more details.
-//
-// You should have received a copy of the GNU General Public License along with
-// yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
-// Street, Fifth Floor, Boston, MA  02110-1301, USA.
-//
-// This file is a derivative of the ZynAddSubFX original, modified October 2009
-//} {in_source in_header
-}
+comment {Original ZynAddSubFX author Nasca Octavian Paul
+Copyright (C) 2002-2005 Nasca Octavian Paul
+Copyright 2009, Alan Calvert
 
-#decl {\#include <cstring>} {public
-#}
+This file is part of yoshimi, which is free software: you can redistribute
+it and/or modify it under the terms of version 2 of the GNU General Public
+License as published by the Free Software Foundation.
+
+yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+later) for more details.
+
+You should have received a copy of the GNU General Public License along with
+yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+This file is a derivative of the ZynAddSubFX original, modified October 2009
+} {selected in_source in_header
+} 
 
 decl {\#include <FL/Fl_File_Chooser.H>} {public
 } 
@@ -52,13 +49,11 @@ class MicrotonalUI {} {
       } {
         Fl_Check_Button {} {
           label {Invert keys}
-          callback {
-              microtonal->Pinvertupdown = (int) o->value();
+          callback {microtonal->Pinvertupdown = (int) o->value();
               if (microtonal->Pinvertupdown == 0)
                   centerinvertcounter->deactivate();
               else
-                  centerinvertcounter->activate();
-          }
+                  centerinvertcounter->activate();}
           tooltip {Turn upside-down the note frequencies} xywh {254 13 55 30} down_box DOWN_BOX labelfont 1 labelsize 11 align 148
           code0 {o->value(microtonal->Pinvertupdown);}
         }
@@ -66,12 +61,12 @@ class MicrotonalUI {} {
           label Center
           callback {microtonal->Pinvertupdowncenter=(int) o->value();}
           xywh {319 13 80 20} labelfont 1 labelsize 11 align 130 minimum 0 maximum 127 step 1 textfont 1
-          code0 {o->lstep(microtonal->getOctaveSize());}
+          code0 {o->lstep(microtonal->getoctavesize());}
           code1 {o->value(microtonal->Pinvertupdowncenter);}
           code2 {if (microtonal->Pinvertupdown==0) o->deactivate();}
         }
       }
-      Fl_Group microtonalgroup {selected
+      Fl_Group microtonalgroup {
         xywh {3 49 402 398} box ENGRAVED_FRAME
         code0 {if (microtonal->Penabled==0) o->deactivate();}
       } {
@@ -82,15 +77,13 @@ class MicrotonalUI {} {
         }
         Fl_Value_Output octavesizeoutput {
           label {nts./oct.}
-          callback {o->value(microtonal->getOctaveSize());}
+          callback {o->value(microtonal->getoctavesize());}
           tooltip {Notes/Octave} xywh {150 423 35 17} labelsize 10 align 5 maximum 500 step 1 value 12 textfont 1
-          code0 {o->value(microtonal->getOctaveSize());}
+          code0 {o->value(microtonal->getoctavesize());}
         }
         Fl_Input nameinput {
           label {Name:}
-          callback {
-            microtonal->Pname = string(o->value());
-          }
+          callback {microtonal->Pname = string(o->value());}
           xywh {8 64 285 25} labelfont 1 labelsize 11 align 5
           code0 {o->insert(microtonal->Pname.c_str());}
         }
@@ -101,9 +94,7 @@ class MicrotonalUI {} {
         }
         Fl_Input commentinput {
           label {Comment:}
-          callback {
-            microtonal->Pcomment = string(o->value());
-          }
+          callback {microtonal->Pcomment = string(o->value());}
           xywh {8 104 391 25} labelfont 1 labelsize 11 align 5
           code0 {o->insert(microtonal->Pcomment.c_str());}
         }
@@ -115,12 +106,11 @@ class MicrotonalUI {} {
         }
         Fl_Button {} {
           label {Import .SCL file}
-          callback {
-              const char *filename;
+          callback {const char *filename;
               filename = fl_file_chooser("Open:", "(*.scl)", NULL, 0);
               if (filename == NULL)
                   return;
-              int result = microtonal->loadScl(string(filename));
+              int result = microtonal->loadscl(string(filename));
               if (result == 0)
               {
                    updateTuningsInput();
@@ -134,8 +124,7 @@ class MicrotonalUI {} {
                    octavesizeoutput->do_callback();
               }
               else
-                fl_alert("Error: Could not load the file.");
-          }
+                fl_alert("Error: Could not load the file.");}
           tooltip {Inport Scala .scl file (tunnings)} xywh {243 411 84 15} box THIN_UP_BOX labelfont 1 labelsize 10
         }
         Fl_Group keymappinggroup {
@@ -173,27 +162,24 @@ class MicrotonalUI {} {
         }
         Fl_Check_Button mappingenabledbutton {
           label ON
-          callback {
-              int x = (int) o->value();
+          callback {int x = (int) o->value();
               microtonal->Pmappingenabled = x;
               if (x == 0)
                   keymappinggroup->deactivate();
               else
                   keymappinggroup->activate();
-              o->show();
-          }
+              o->show();}
           tooltip {Enable the Mapping (otherwise the mapping is linear)} xywh {198 150 48 21} box FLAT_BOX down_box DOWN_BOX labelfont 1
           code0 {o->value(microtonal->Pmappingenabled);}
           code1 {if (microtonal->Pmappingenabled==0) keymappinggroup->deactivate();}
         }
         Fl_Button {} {
           label {Import .kbm file}
-          callback {
-              const char *filename;
+          callback {const char *filename;
               filename = fl_file_chooser("Open:", "(*.kbm)", NULL, 0);
               if (filename == NULL)
                   return;
-              int result = microtonal->loadKbm(string(filename));
+              int result = microtonal->loadkbm(string(filename));
               if (result == 0)
               {
                   updateMappingInput();
@@ -210,8 +196,7 @@ class MicrotonalUI {} {
                   anotecounter->do_callback();
               }
               else
-                  fl_alert("Error: Could not load the file.");
-          }
+                  fl_alert("Error: Could not load the file.");}
           tooltip {Inport Scala .kbm file (keyboard mapping)} xywh {243 428 84 16} box THIN_UP_BOX labelfont 1 labelsize 10
         }
       }
@@ -220,14 +205,12 @@ class MicrotonalUI {} {
       } {
         Fl_Counter anotecounter {
           label {"A" Note}
-          callback {
-              microtonal->PAnote=(int) o->value();
-              if (microtonal->getNoteFreq(microtonal->PAnote,0) < 0.0)
+          callback {microtonal->PAnote=(int) o->value();
+              if (microtonal->getnotefreq(microtonal->PAnote,0) < 0.0)
                   o->textcolor(FL_RED);
               else
                   o->textcolor(FL_BLACK);
-              o->redraw();
-          }
+              o->redraw();}
           tooltip {The "A" note (the reference note for which freq. ("A" freq) is given)} xywh {173 17 65 20} labelfont 1 labelsize 10 align 129 minimum 0 maximum 127 step 1 value 69 textfont 1 textsize 10
           code0 {o->lstep(12);}
           code1 {o->value(microtonal->PAnote);}
@@ -246,35 +229,30 @@ class MicrotonalUI {} {
       }
       Fl_Check_Button {} {
         label {Enable Microtonal}
-        callback {
-            microtonal->Penabled = (int) o->value();
+        callback {microtonal->Penabled = (int) o->value();
             if (microtonal->Penabled == 0)
                 microtonalgroup->deactivate();
             else
-                microtonalgroup->activate();
-        }
+                microtonalgroup->activate();}
         xywh {3 3 102 45} box PLASTIC_UP_BOX down_box DOWN_BOX labelfont 1 labelsize 11 align 148
         code0 {o->value(microtonal->Penabled);}
       }
     }
   }
   Function {updateTuningsInput()} {} {
-    code {
-        char *tmpbuf = new char[100];
+    code {char *tmpbuf = new char[100];
         tuningsinput->cut(0, tuningsinput->maximum_size());
-        for (int i = 0; i < microtonal->getOctaveSize(); ++i)
+        for (int i = 0; i < microtonal->getoctavesize(); ++i)
         {
             if (i != 0)
                 tuningsinput->insert("\\n");
-            microtonal->tuningToLine(i, tmpbuf, 100);
+            microtonal->tuningtoline(i, tmpbuf, 100);
             tuningsinput->insert(tmpbuf);
         }
-        delete [] tmpbuf;
-    } {}
+        delete [] tmpbuf;} {}
   }
   Function {updateMappingInput()} {} {
-    code {
-        char *tmpbuf = new char[100];
+    code {char *tmpbuf = new char[100];
         mappinginput->cut(0, tuningsinput->maximum_size());
         for (int i = 0; i < microtonal->Pmapsize; ++i)
         {
@@ -286,38 +264,35 @@ class MicrotonalUI {} {
                 snprintf(tmpbuf, 100, "%d", microtonal->Pmapping[i]);
             mappinginput->insert(tmpbuf);
         }
-        delete [] tmpbuf;
-    } {}
+        delete [] tmpbuf;} {}
   }
   Function {MicrotonalUI(Microtonal *microtonal_)} {} {
-    code {
-        microtonal=microtonal_;
-        make_window();
-    } {}
+    code {microtonal=microtonal_;
+        make_window();} {}
   }
   Function {~MicrotonalUI()} {} {
-    code {
-        microtonaluiwindow->hide();
-        delete(microtonaluiwindow);
-    } {}
+    code {microtonaluiwindow->hide();
+        delete(microtonaluiwindow);} {}
   }
-  Function {show()} {} {
+  Function {Show()} {} {
     code {microtonaluiwindow->show();} {}
   }
+  Function {Hide()} {} {
+    code {microtonaluiwindow->hide();} {}
+  }
   Function {apply()} {} {
-    code {
-        int err = microtonal->textToTunings(tuningsinput->value());
+    code {int err = microtonal->texttotunings(tuningsinput->value());
         if (err >= 0)
             fl_alert("Parse Error: The input may contain only numbers (like 232.59)\\n or divisions (like 121/64).");
         if (err == -2)
             fl_alert("Parse Error: The input is empty.");
         octavesizeoutput->do_callback();
 
-        microtonal->textToMapping(mappinginput->value());
+        microtonal->texttomapping(mappinginput->value());
         mapsizeoutput->do_callback();
         anotecounter->do_callback();
 
         //applybutton->color(FL_GRAY);} {}
-    }
-    decl {Microtonal *microtonal;} {}
   }
+  decl {Microtonal *microtonal;} {}
+} 

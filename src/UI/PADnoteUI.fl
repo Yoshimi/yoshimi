@@ -7,26 +7,25 @@ comment {PADNoteUI.h} {not_in_source in_header
 comment {PADNoteUI.cc} {in_source not_in_header
 }
 
-comment {//
-// Original ZynAddSubFX author Nasca Octavian Paul
-// Copyright (C) 2002-2005 Nasca Octavian Paul
-// Copyright 2009, Alan Calvert
-//
-// This file is part of yoshimi, which is free software: you can redistribute
-// it and/or modify it under the terms of version 2 of the GNU General Public
-// License as published by the Free Software Foundation.
-//
-// yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
-// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-// FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
-// later) for more details.
-//
-// You should have received a copy of the GNU General Public License along with
-// yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
-// Street, Fifth Floor, Boston, MA  02110-1301, USA.
-//
-// This file is a derivative of the ZynAddSubFX original, modified October 2009
-//} {in_source in_header
+comment {Original ZynAddSubFX author Nasca Octavian Paul
+Copyright (C) 2002-2005 Nasca Octavian Paul
+Copyright 2009-2010, Alan Calvert
+
+This file is part of yoshimi, which is free software: you can redistribute
+it and/or modify it under the terms of version 2 of the GNU General Public
+License as published by the Free Software Foundation.
+
+yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+later) for more details.
+
+You should have received a copy of the GNU General Public License along with
+yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+This file is a derivative of the ZynAddSubFX original, modified January 2010
+} {in_source in_header
 }
 
 decl {\#include <FL/Fl_Box.H>} {public
@@ -83,7 +82,7 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
 if (!visible()) return;
 float smps[lx];
 
-float realbw=pars->getProfile(smps,lx);
+float realbw=pars->getprofile(smps,lx);
 bool active=active_r();
 
 //draw the equivalent bandwidth
@@ -931,8 +930,10 @@ if (x==0) fixedfreqetdial->deactivate();
             } {}
             Fl_Check_Button stereo {
               label Stereo
-              callback {pars->PStereo=(int) o->value();
-hprofile->redraw();}
+              callback {
+                  pars->PStereo =(o->value()) ? true : false;
+                  hprofile->redraw();
+              }
               xywh {15 245 70 25} down_box DOWN_BOX
               code0 {o->value(pars->PStereo);}
             }
@@ -964,7 +965,7 @@ hprofile->redraw();}
       }
       Fl_Button applybutton {
         label {Apply Changes}
-        callback {pars->applyParameters(true);
+        callback {pars->applyparameters(true);
 o->color(FL_GRAY);
 if (oscui!=NULL) {
 	oscui->applybutton->color(FL_GRAY);
@@ -984,119 +985,109 @@ if (resui!=NULL) {
       }
       Fl_Button {} {
         label C
-        callback {presetsui->Copy(pars);}
+        callback {presetsui->copy(pars);}
         xywh {240 430 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Button {} {
         label P
-        callback {presetsui->Paste(pars,this);}
+        callback {presetsui->paste(pars,this);}
         xywh {270 430 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
-      #Fl_Button {} {
-      #  label export
-      #  callback {
-      #      char *filename;
-      #      filename=fl_file_chooser("Export samples:","(*.wav)",NULL,0);
-      #      if (filename==NULL) return;
-      #      fl_filename_setext(filename,"");
-      #      pars->export2wav(filename);
-      #  } selected
-      #  tooltip {export samples as wav file} xywh {240 405 55 15} box THIN_UP_BOX color 255 labelsize 11 align 128
-      #}
     }
   }
   Function {refresh()} {} {
-    code {volume->value(pars->PVolume);
-vsns->value(pars->PAmpVelocityScaleFunction);
-pan->value(pars->PPanning);
-
-stereo->value(pars->PStereo);
-
-
-pstr->value(pars->PPunchStrength);
-pt->value(pars->PPunchTime);
-pstc->value(pars->PPunchStretch);
-pvel->value(pars->PPunchVelocitySensing);
-
-detunevalueoutput->value(getdetune(pars->PDetuneType,0,pars->PDetune));
-detune->value(pars->PDetune-8192);
-
-int k=pars->PCoarseDetune/1024;if (k>=8) k-=16;
-octave->value(k);
-
-detunetype->value(pars->PDetuneType-1);
-k=pars->PCoarseDetune%1024;if (k>=512) k-=1024;
-coarsedet->value(k);
-
-hz440->value(pars->Pfixedfreq);
-fixedfreqetdial->value(pars->PfixedfreqET);
-
-amplfo->refresh();
-freqlfo->refresh();
-filterlfo->refresh();
-
-ampenv->refresh();
-freqenv->refresh();
-filterenv->refresh();
-filterui->refresh();
-
-
-/* harmonic structure parametrs */
-
-resui->refresh();
-if (oscui!=NULL) oscui->refresh();
-
-hpbasetype->value(pars->Php.base.type);
-hpbasepar1->value(pars->Php.base.par1);
-hpfreqmult->value(pars->Php.freqmult);
-
-hpmpar1->value(pars->Php.modulator.par1);
-hpmfreq->value(pars->Php.modulator.freq);
-hpwidth->value(pars->Php.width);
-
-hponehalf->value(pars->Php.onehalf);
-hpamptype->value(pars->Php.amp.type);
-hpampmode->value(pars->Php.amp.mode);
-hpamppar1->value(pars->Php.amp.par1);
-hpamppar2->value(pars->Php.amp.par2);
-hpautoscale->value(pars->Php.autoscale);
-
-bwdial->value(pars->Pbandwidth);
-if (pars->Pmode==0){
-   bwprofilegroup->activate();
-   bwdial->activate();
-   bwcents->activate();
-   hprofile->activate();
-   hprofile->color(54);
-   bwscale->activate();
-} else {
-   bwprofilegroup->deactivate();
-   bwdial->deactivate();
-   bwcents->deactivate();
-   hprofile->deactivate();
-   hprofile->color(48);
-   bwscale->activate();
-};
-
-spectrummode->value(pars->Pmode);
-
-qbasenote->value(pars->Pquality.basenote);
-qsmpoct->value(pars->Pquality.smpoct);
-qoct->value(pars->Pquality.oct);
-qsamplesize->value(pars->Pquality.samplesize);
-
-hrpostype->value(pars->Phrpos.type);
-hrpospar1->value(pars->Phrpos.par1);
-hrpospar2->value(pars->Phrpos.par2);
-hrpospar3->value(pars->Phrpos.par3);
-
-hprofile->redraw();
-overtonepos->redraw();
-
-osc->redraw();
-pars->applyParameters(true);
-applybutton->color(FL_GRAY);
-applybutton->parent()->redraw();} {}
+    code {
+        volume->value(pars->PVolume);
+        vsns->value(pars->PAmpVelocityScaleFunction);
+        pan->value(pars->PPanning);
+        
+        stereo->value((pars->PStereo) ? 1 : 0);
+        
+        
+        pstr->value(pars->PPunchStrength);
+        pt->value(pars->PPunchTime);
+        pstc->value(pars->PPunchStretch);
+        pvel->value(pars->PPunchVelocitySensing);
+        
+        detunevalueoutput->value(getdetune(pars->PDetuneType,0,pars->PDetune));
+        detune->value(pars->PDetune-8192);
+        
+        int k=pars->PCoarseDetune/1024;if (k>=8) k-=16;
+        octave->value(k);
+        
+        detunetype->value(pars->PDetuneType-1);
+        k=pars->PCoarseDetune%1024;if (k>=512) k-=1024;
+        coarsedet->value(k);
+        
+        hz440->value(pars->Pfixedfreq);
+        fixedfreqetdial->value(pars->PfixedfreqET);
+        
+        amplfo->refresh();
+        freqlfo->refresh();
+        filterlfo->refresh();
+        
+        ampenv->refresh();
+        freqenv->refresh();
+        filterenv->refresh();
+        filterui->refresh();
+        
+        /* harmonic structure parametrs */
+        
+        resui->refresh();
+        if (oscui!=NULL) oscui->refresh();
+        
+        hpbasetype->value(pars->Php.base.type);
+        hpbasepar1->value(pars->Php.base.par1);
+        hpfreqmult->value(pars->Php.freqmult);
+        
+        hpmpar1->value(pars->Php.modulator.par1);
+        hpmfreq->value(pars->Php.modulator.freq);
+        hpwidth->value(pars->Php.width);
+        
+        hponehalf->value(pars->Php.onehalf);
+        hpamptype->value(pars->Php.amp.type);
+        hpampmode->value(pars->Php.amp.mode);
+        hpamppar1->value(pars->Php.amp.par1);
+        hpamppar2->value(pars->Php.amp.par2);
+        hpautoscale->value(pars->Php.autoscale);
+        
+        bwdial->value(pars->Pbandwidth);
+        if (pars->Pmode==0){
+           bwprofilegroup->activate();
+           bwdial->activate();
+           bwcents->activate();
+           hprofile->activate();
+           hprofile->color(54);
+           bwscale->activate();
+        } else {
+           bwprofilegroup->deactivate();
+           bwdial->deactivate();
+           bwcents->deactivate();
+           hprofile->deactivate();
+           hprofile->color(48);
+           bwscale->activate();
+        };
+        
+        spectrummode->value(pars->Pmode);
+        
+        qbasenote->value(pars->Pquality.basenote);
+        qsmpoct->value(pars->Pquality.smpoct);
+        qoct->value(pars->Pquality.oct);
+        qsamplesize->value(pars->Pquality.samplesize);
+        
+        hrpostype->value(pars->Phrpos.type);
+        hrpospar1->value(pars->Phrpos.par1);
+        hrpospar2->value(pars->Phrpos.par2);
+        hrpospar3->value(pars->Phrpos.par3);
+        
+        hprofile->redraw();
+        overtonepos->redraw();
+        
+        osc->redraw();
+        pars->applyparameters(true);
+        applybutton->color(FL_GRAY);
+        applybutton->parent()->redraw();
+    } {}
   }
   Function {~PADnoteUI()} {} {
     code {delete(oscui);

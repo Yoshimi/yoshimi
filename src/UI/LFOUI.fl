@@ -50,10 +50,6 @@ decl {\#include "PresetsUI.h"} {public
 decl {\#include "Params/LFOParams.h"} {public
 }
 
-decl {\#include "globals.h"} {public
-}
-
-
 class LFOUI {: {public Fl_Group, PresetsUI_}
 } {
   Function {LFOUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
@@ -156,12 +152,12 @@ hide();
         }
         Fl_Button {} {
           label C
-          callback {presetsui->Copy(pars);} selected
+          callback {presetsui->copy(pars);} selected
           xywh {145 10 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
         Fl_Button {} {
           label P
-          callback {presetsui->Paste(pars,this);} selected
+          callback {presetsui->paste(pars,this);} selected
           xywh {162 10 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
       }

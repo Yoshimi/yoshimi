@@ -44,9 +44,6 @@ decl {\#include <FL/fl_draw.H>} {public
 decl {\#include <FL/fl_ask.H>} {public
 } 
 
-decl {\#include "globals.h"} {public
-}
-
 decl {\#include "Params/EnvelopeParams.h"} {public
 }
 
@@ -75,10 +72,10 @@ lastpoint=-1;} {}
 int npoints=env->Penvpoints;
 
 float  sum=0;
-for (int i=1;i<npoints;i++) sum+=env->getDt(i)+1;
+for (int i=1;i<npoints;i++) sum+=env->getdt(i)+1;
 
 float sumbefore=0;//the sum of all points before the computed point
-for (int i=1;i<=n;i++) sumbefore+=env->getDt(i)+1;
+for (int i=1;i<=n;i++) sumbefore+=env->getdt(i)+1;
 
 return((int) (sumbefore/(float) sum*lx));} {}
   }
@@ -106,7 +103,7 @@ return(nearestpoint);} {}
   Function {draw()} {private
   } {
     code {int ox=x(),oy=y(),lx=w(),ly=h();
-if (env->Pfreemode==0) env->convertToFree();
+if (env->Pfreemode==0) env->converttofree();
 int npoints=env->Penvpoints;
 
 if (active_r()) fl_color(FL_BLACK);
@@ -156,10 +153,10 @@ fl_font(FL_HELVETICA|FL_BOLD,10);
 float time=0.0;
 if (currentpoint<=0){
    fl_color(alb);
-   for (int i=1;i<npoints;i++) time+=env->getDt(i);
+   for (int i=1;i<npoints;i++) time+=env->getdt(i);
 } else {
    fl_color(255,0,0);
-   time=env->getDt(currentpoint);
+   time=env->getdt(currentpoint);
 };
 char tmpstr[20];
 if (time<1000.0) snprintf((char *)&tmpstr,20,"%.1fms",time);
@@ -341,12 +338,12 @@ envfree->redraw();}
       }
       Fl_Button {} {
         label C
-        callback {presetsui->Copy(env);}
+        callback {presetsui->copy(env);}
         xywh {465 160 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
       }
       Fl_Button {} {
         label P
-        callback {presetsui->Paste(env,this);}
+        callback {presetsui->paste(env,this);}
         xywh {482 160 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
       }
     }
@@ -418,12 +415,12 @@ freeedit->redraw();}
         }
         Fl_Button {} {
           label C
-          callback {presetsui->Copy(env);}
+          callback {presetsui->copy(env);}
           xywh {150 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
         Fl_Button {} {
           label P
-          callback {presetsui->Paste(env,this);}
+          callback {presetsui->paste(env,this);}
           xywh {167 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
       }
@@ -485,12 +482,12 @@ freeedit->redraw();}
         }
         Fl_Button {} {
           label C
-          callback {presetsui->Copy(env);}
+          callback {presetsui->copy(env);}
           xywh {155 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
         Fl_Button {} {
           label P
-          callback {presetsui->Paste(env,this);}
+          callback {presetsui->paste(env,this);}
           xywh {172 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
       }
@@ -578,12 +575,12 @@ freeedit->redraw();}
         }
         Fl_Button {} {
           label C
-          callback {presetsui->Copy(env);}
+          callback {presetsui->copy(env);}
           xywh {220 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
         Fl_Button {} {
           label P
-          callback {presetsui->Paste(env,this);}
+          callback {presetsui->paste(env,this);}
           xywh {237 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
       }
@@ -645,12 +642,12 @@ freeedit->redraw();}
         }
         Fl_Button {} {
           label C
-          callback {presetsui->Copy(env);}
+          callback {presetsui->copy(env);}
           xywh {155 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
         Fl_Button {} {
           label P
-          callback {presetsui->Paste(env,this);}
+          callback {presetsui->paste(env,this);}
           xywh {172 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
       }
@@ -684,12 +681,12 @@ freeedit->redraw();}
         }
         Fl_Button {} {
           label C
-          callback {presetsui->Copy(env);}
+          callback {presetsui->copy(env);}
           xywh {150 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
         Fl_Button {} {
           label P
-          callback {presetsui->Paste(env,this);}
+          callback {presetsui->paste(env,this);}
           xywh {167 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
       }

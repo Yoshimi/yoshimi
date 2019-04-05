@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010 Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified October 2009
+    This file is a derivative of the ZynAddSubFX original, modified January 2010
 */
 
 #include "Misc/Util.h"
@@ -27,17 +27,16 @@
 
 Envelope::Envelope(EnvelopeParams *envpars, float basefreq)
 {
-    int i;
     envpoints = envpars->Penvpoints;
     if (envpoints > MAX_ENVELOPE_POINTS)
         envpoints = MAX_ENVELOPE_POINTS;
     envsustain = (envpars->Penvsustain == 0) ? -1 : envpars->Penvsustain;
     forcedrelase = envpars->Pforcedrelease;
-    envstretch = powf(440.0 / basefreq, envpars->Penvstretch / 64.0);
+    envstretch = powf(440.0f / basefreq, envpars->Penvstretch / 64.0f);
     linearenvelope = envpars->Plinearenvelope;
 
-    if (envpars->Pfreemode == 0)
-        envpars->convertToFree();
+    if (!envpars->Pfreemode)
+        envpars->converttofree();
 
     float bufferdt = (float)zynMaster->getBuffersize()
                       / (float)zynMaster->getSamplerate();
@@ -50,9 +49,9 @@ Envelope::Envelope(EnvelopeParams *envpars, float basefreq)
     if (mode == 2 && linearenvelope != 0)
         mode = 1; // change to linear
 
-    for (i = 0; i < MAX_ENVELOPE_POINTS; ++i)
+    for (int i = 0; i < MAX_ENVELOPE_POINTS; ++i)
     {
-        float tmp = envpars->getDt(i) / 1000.0 * envstretch;
+        float tmp = envpars->getdt(i) / 1000.0 * envstretch;
         if (tmp > bufferdt)
             envdt[i] = bufferdt / tmp;
         else
@@ -107,18 +106,18 @@ float Envelope::envout(void)
     float out;
 
     if (envfinish != 0)
-    {   //if the envelope is finished
+    {   // if the envelope is finished
         envoutval = envval[envpoints - 1];
         return envoutval;
     }
-    if (currentpoint == envsustain + 1 && keyreleased == 0)
+    if (currentpoint == envsustain + 1 && !keyreleased)
     {   // if it is sustaining now
         envoutval = envval[envsustain];
         return envoutval;
     }
 
-    if (keyreleased != 0 && forcedrelase != 0)
-    {   //do the forced release
+    if (keyreleased && forcedrelase)
+    {   // do the forced release
         int tmp = (envsustain < 0) ? (envpoints - 1) : (envsustain + 1);
         // if there is no sustain point, use the last point for release
 

@@ -24,11 +24,8 @@
 #ifndef CHORUS_H
 #define CHORUS_H
 
-#include "globals.h"
 #include "Effects/Effect.h"
 #include "Effects/EffectLFO.h"
-
-#define MAX_CHORUS_DELAY 250.0 // ms
 
 class Chorus : public Effect
 {
@@ -37,10 +34,10 @@ class Chorus : public Effect
         ~Chorus() { };
 
         void out(float *smpsl, float *smpsr);
-        void setPreset(unsigned char npreset);
-        void changePar(int npar, unsigned char value);
-        unsigned char getPar(int npar) const;
-        void Cleanup();
+        void setpreset(unsigned char npreset);
+        void changepar(int npar, unsigned char value);
+        unsigned char getpar(int npar);
+        void cleanup();
 
     private:
         // Chorus Parameters
@@ -56,13 +53,13 @@ class Chorus : public Effect
 
 
         // Parameter Controls
-        void setVolume(unsigned char Pvolume);
-        void setPanning(unsigned char Ppanning);
-        void setDepth(unsigned char Pdepth);
-        void setDelay(unsigned char Pdelay);
-        void setFb(unsigned char Pfb);
-        void setLrCross(unsigned char Plrcross);
-        float getDelay(float xlfo);
+        void setvolume(unsigned char Pvolume_);
+        void setpanning(unsigned char Ppanning_);
+        void setdepth(unsigned char Pdepth_);
+        void setdelay(unsigned char Pdelay_);
+        void setfb(unsigned char Pfb_);
+        void setlrcross(unsigned char Plrcross_);
+        float getdelay(float xlfo);
 
         // Internal Values
         float depth;

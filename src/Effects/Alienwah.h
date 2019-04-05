@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified October 2009
+    This file is a derivative of the ZynAddSubFX original, modified January 2010
 */
 
 #ifndef ALIENWAH_H
@@ -40,10 +40,10 @@ class Alienwah : public Effect
         ~Alienwah();
         void out(float *smpsl, float *smpsr);
 
-        void setPreset(unsigned char npreset);
-        void changePar(int npar, unsigned char value);
-        unsigned char getPar(int npar) const;
-        void Cleanup(void);
+        void setpreset(unsigned char npreset);
+        void changepar(int npar, unsigned char value);
+        unsigned char getpar(int npar);
+        void cleanup(void);
 
     private:
         // Alienwah Parameters
@@ -58,13 +58,13 @@ class Alienwah : public Effect
 
 
         // Control Parameters
-        void setVolume(unsigned char _volume);
-        void setPanning(unsigned char _panning);
-        void setDepth(unsigned char _depth);
-        void setFb(unsigned char _fb);
-        void setLrCross(unsigned char _lrcross);
-        void setDelay(unsigned char _delay);
-        void setPhase(unsigned char _phase);
+        void setvolume(unsigned char Pvolume_);
+        void setpanning(unsigned char Ppanning_);
+        void setdepth(unsigned char Pdepth_);
+        void setfb(unsigned char Pfb_);
+        void setlrcross(unsigned char Plrcross_);
+        void setdelay(unsigned char Pdelay_);
+        void setphase(unsigned char Pphase_);
 
         // Internal Values
         float panning, fb, depth, lrcross, phase;

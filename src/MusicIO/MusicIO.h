@@ -1,7 +1,7 @@
 /*
     MusicIO.h
 
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
     Copyright 2009, James Morris
 
     This file is part of yoshimi, which is free software: you can
@@ -35,15 +35,8 @@ class MusicIO
         virtual unsigned int getSamplerate(void) = 0;
         virtual int getBuffersize(void) = 0;
         virtual bool Start(void) = 0;
-        virtual void Stop(void) = 0;
         virtual void Close(void);
-
-        inline void StartRecord(void) { Recorder.Start(); };
-        void StopRecord(void);
-        bool SetWavFile(string fpath, string& errmsg);
-        string WavFilename(void);
-        bool SetWavOverwrite(string& errmsg);
-        bool WavIsFloat(void);
+        int grossLatency(void) { return audioLatency + midiLatency; };
 
     protected:
         bool prepBuffers(bool with_interleaved);
@@ -51,7 +44,7 @@ class MusicIO
         void getAudio(void);
         void InterleaveShorts(void);
 
-        void setThreadAttribute(pthread_attr_t *attr);
+        bool setThreadAttributes(pthread_attr_t *attr, bool schedfifo, bool midi = false);
 
         int getMidiController(unsigned char b);
         void setMidiController(unsigned char ch, unsigned int ctrl, int param);
@@ -61,8 +54,10 @@ class MusicIO
         jsample_t *zynRight;
         short int *interleavedShorts;
 
-    private:
-        WavRecord Recorder;
+        WavRecord *wavRecorder;
+        int rtprio;
+        jack_nframes_t audioLatency; // frames
+        jack_nframes_t midiLatency;  // ""
 };
 
 #endif

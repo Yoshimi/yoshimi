@@ -31,16 +31,16 @@ FormantFilter::FormantFilter(FilterParams *pars)
     numformants = pars->Pnumformants;
     for (int i = 0; i < numformants; ++i)
         formant[i] = new AnalogFilter(4/*BPF*/, 1000.0, 10.0, pars->Pstages);
-    Cleanup();
+    cleanup();
     inbuffer = new float [zynMaster->getBuffersize()];
     tmpbuf = new float [zynMaster->getBuffersize()];
 
     for (int j = 0; j < FF_MAX_VOWELS; ++j)
         for (int i = 0; i < numformants; ++i)
         {
-            formantpar[j][i].freq = pars->getFormantFreq(pars->Pvowels[j].formants[i].freq);
-            formantpar[j][i].amp = pars->getFormantAmp(pars->Pvowels[j].formants[i].amp);
-            formantpar[j][i].q = pars->getFormantQ(pars->Pvowels[j].formants[i].q);
+            formantpar[j][i].freq = pars->getformantfreq(pars->Pvowels[j].formants[i].freq);
+            formantpar[j][i].amp = pars->getformantamp(pars->Pvowels[j].formants[i].amp);
+            formantpar[j][i].q = pars->getformantq(pars->Pvowels[j].formants[i].q);
         }
     for (int i = 0; i < FF_MAX_FORMANTS; ++i)
         oldformantamp[i] = 1.0;
@@ -65,7 +65,7 @@ FormantFilter::FormantFilter(FilterParams *pars)
     if (pars->Psequencereversed)
         sequencestretch *= -1.0;
 
-    outgain = dB2rap(pars->getGain());
+    outgain = dB2rap(pars->getgain());
 
     oldinput = -1.0;
     Qfactor = 1.0;
@@ -82,13 +82,13 @@ FormantFilter::~FormantFilter()
 }
 
 
-void FormantFilter::Cleanup()
+void FormantFilter::cleanup()
 {
     for (int i = 0; i < numformants; ++i)
-        formant[i]->Cleanup();
+        formant[i]->cleanup();
 }
 
-void FormantFilter::setPos(float input)
+void FormantFilter::setpos(float input)
 {
     int p1, p2;
 
@@ -134,7 +134,7 @@ void FormantFilter::setPos(float input)
                 formantpar[p1][i].amp * (1.0 - pos) + formantpar[p2][i].amp * pos;
             currentformants[i].q =
                 formantpar[p1][i].q * (1.0 - pos) + formantpar[p2][i].q * pos;
-            formant[i]->setFreq_and_Q(currentformants[i].freq,
+            formant[i]->setfreq_and_q(currentformants[i].freq,
                                       currentformants[i].q * Qfactor);
             oldformantamp[i] = currentformants[i].amp;
         }
@@ -158,32 +158,32 @@ void FormantFilter::setPos(float input)
                     + (formantpar[p1][i].q * (1.0 - pos)
                         + formantpar[p2][i].q * pos) * formantslowness;
 
-            formant[i]->setFreq_and_Q(currentformants[i].freq,
+            formant[i]->setfreq_and_q(currentformants[i].freq,
                                       currentformants[i].q * Qfactor);
         }
     }
     oldQfactor = Qfactor;
 }
 
-void FormantFilter::setFreq(float frequency)
+void FormantFilter::setfreq(float frequency)
 {
-    setPos(frequency);
+    setpos(frequency);
 }
 
-void FormantFilter::setQ(float q_)
+void FormantFilter::setq(float q_)
 {
     Qfactor = q_;
     for (int i = 0; i <numformants; ++i)
-        formant[i]->setQ(Qfactor * currentformants[i].q);
+        formant[i]->setq(Qfactor * currentformants[i].q);
 }
 
-void FormantFilter::setFreq_and_Q(float frequency, float q_)
+void FormantFilter::setfreq_and_q(float frequency, float q_)
 {
     Qfactor = q_;
-    setPos(frequency);
+    setpos(frequency);
 }
 
-void FormantFilter::filterOut(float *smp)
+void FormantFilter::filterout(float *smp)
 {
     int buffersize = zynMaster->getBuffersize();
     memcpy(inbuffer, smp, buffersize * sizeof(float));
@@ -193,12 +193,12 @@ void FormantFilter::filterOut(float *smp)
     {
         for (int k = 0; k < buffersize; ++k)
             tmpbuf[k] = inbuffer[k] * outgain;
-        formant[j]->filterOut(tmpbuf);
+        formant[j]->filterout(tmpbuf);
 
-        if (ABOVE_AMPLITUDE_THRESHOLD(oldformantamp[j], currentformants[j].amp))
+        if (AboveAmplitudeThreshold(oldformantamp[j], currentformants[j].amp))
             for (int i = 0; i < buffersize; ++i)
                 smp[i] += tmpbuf[i]
-                          * INTERPOLATE_AMPLITUDE(oldformantamp[j],
+                          * InterpolateAmplitude(oldformantamp[j],
                                                   currentformants[j].amp, i,
                                                   buffersize);
         else

@@ -33,12 +33,12 @@ class Echo : public Effect
         ~Echo();
 
         void out(float *smpsl, float *smpr);
-        void setPreset(unsigned char npreset);
-        void changePar(int npar, unsigned char value);
-        unsigned char getPar(int npar) const;
-        int getNumParams(void);
-        void Cleanup(void);
-        void setDryonly(void);
+        void setpreset(unsigned char npreset);
+        void changepar(int npar, unsigned char value);
+        unsigned char getpar(int npar);
+        int getnumparams(void);
+        void cleanup(void);
+        void setdryonly(void);
 
     private:
         // Parameters
@@ -50,19 +50,19 @@ class Echo : public Effect
         unsigned char Pfb;      // <#6 Feedback
         unsigned char Phidamp;  // <#7 Dampening of the Echo
 
-        void setVolume(unsigned char value);
-        void setPanning(unsigned char _panning);
-        void setDelay(unsigned char _delay);
-        void setLrDelay(unsigned char _lrdelay);
-        void setLrCross(unsigned char _lrcross);
-        void setFb(unsigned char _fb);
-        void setHiDamp(unsigned char _hidamp);
+        void setvolume(unsigned char Pvolume_);
+        void setpanning(unsigned char Ppanning_);
+        void setdelay(unsigned char Pdelay_);
+        void setlrdelay(unsigned char Plrdelay_);
+        void setlrcross(unsigned char Plrcross_);
+        void setfb(unsigned char Pfb_);
+        void sethidamp(unsigned char Phidamp_);
 
         // Real Parameters
         float panning, lrcross, fb, hidamp;
         int dl, dr, delay, lrdelay;
 
-        void initDelays(void);
+        void initdelays(void);
         float *ldelay;
         float *rdelay;
         float  oldl, oldr; // pt. lpf

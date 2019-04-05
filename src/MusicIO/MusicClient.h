@@ -1,8 +1,8 @@
 /*
     MusicClient.h
 
-    Copyright 2009, Alan Calvert
-    Copyright 2009, James Morris
+    Copyright 2009-2010 Alan Calvert
+    Copyright 2009 James Morris
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -37,32 +37,38 @@ class MusicClient
         MusicClient();
         ~MusicClient() { };
 
-        bool Open(void) { return (openAudio() && openMidi()); };
+        bool Open(void);
         virtual bool Start(void) = 0;
-        virtual void Stop(void) = 0;
         virtual void Close(void) = 0;
-        static MusicClient *newMusicClient(void);
-
         virtual unsigned int getSamplerate(void) = 0;
         virtual int getBuffersize(void) = 0;
-
+        virtual int grossLatency(void) = 0;
         virtual string audioClientName(void) = 0;
         virtual string midiClientName(void) = 0;
         virtual int audioClientId(void) = 0;
         virtual int midiClientId(void) = 0;
 
-        virtual void startRecord(void) = 0;
-        virtual void stopRecord(void) = 0;
-        virtual bool setRecordFile(const char* fpath, string& errmsg) = 0;
-        virtual bool setRecordOverwrite(string& errmsg) = 0;
-        virtual string wavFilename(void) = 0;
+        static MusicClient *newMusicClient(void);
+
+        void startRecord(void)  { Recorder->Start(); };
+        void stopRecord(void) { Recorder->Stop(); };
+
+        bool setRecordFile(const char* fpath, string& errmsg)
+            { return Recorder->SetFile(string(fpath), errmsg); };
+
+        bool setRecordOverwrite(string& errmsg)
+            { return Recorder->SetOverwrite(errmsg); };
+
+        string wavFilename(void) { return Recorder->Filename(); };
 
         string      audiodevice;
         string      mididevice;
 
     protected:
-        virtual bool openAudio(void) = 0;
-        virtual bool openMidi(void) = 0;
+        virtual bool openAudio(WavRecord *recorder) = 0;
+        virtual bool openMidi(WavRecord *recorder) = 0;
+
+        WavRecord *Recorder;
 };
 
 extern MusicClient *musicClient;

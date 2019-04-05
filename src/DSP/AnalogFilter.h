@@ -24,7 +24,6 @@
 #ifndef ANALOG_FILTER_H
 #define ANALOG_FILTER_H
 
-#include "globals.h"
 #include "DSP/Filter_.h"
 
 class AnalogFilter : public Filter_
@@ -33,15 +32,15 @@ class AnalogFilter : public Filter_
         AnalogFilter(unsigned char Ftype, float Ffreq, float Fq,
                      unsigned char Fstages);
         ~AnalogFilter();
-        void filterOut(float *smp);
-        void setFreq(float frequency);
-        void setFreq_and_Q(float frequency, float q_);
-        void setQ(float q_);
+        void filterout(float *smp);
+        void setfreq(float frequency);
+        void setfreq_and_q(float frequency, float q_);
+        void setq(float q_);
 
-        void setType(int type_);
-        void setGain(float dBgain);
-        void setStages(int stages_);
-        void Cleanup();
+        void settype(int type_);
+        void setgain(float dBgain);
+        void setstages(int stages_);
+        void cleanup();
 
         float H(float freq); // Obtains the response for a given frequency
 
@@ -53,9 +52,9 @@ class AnalogFilter : public Filter_
           oldx[MAX_FILTER_STAGES + 1],
           oldy[MAX_FILTER_STAGES + 1];
 
-        void singleFilterOut(float *smp, fstage &x, fstage &y, float *c,
+        void singlefilterout(float *smp, fstage &x, fstage &y, float *c,
                              float *d);
-        void computeFilterCoefs();
+        void computefiltercoefs(void);
         int type;   // The type of the filter (LPF1,HPF1,LPF2,HPF2...)
         int stages; // how many times the filter is applied (0->1,1->2,etc.)
         float freq; // Frequency given in Hz

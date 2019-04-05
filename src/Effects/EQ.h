@@ -24,7 +24,6 @@
 #ifndef EQ_H
 #define EQ_H
 
-#include "globals.h"
 #include "DSP/AnalogFilter.h"
 #include "Effects/Effect.h"
 
@@ -34,16 +33,16 @@ class EQ : public Effect
         EQ(bool insertion_, float *efxoutl_, float *efxoutr_);
         ~EQ() { };
         void out(float *smpsl, float *smpr);
-        void setPreset(unsigned char npreset);
-        void changePar(int npar, unsigned char value);
-        unsigned char getPar(int npar) const;
-        void Cleanup(void);
-        float getFreqResponse(float freq);
+        void setpreset(unsigned char npreset);
+        void changepar(int npar, unsigned char value);
+        unsigned char getpar(int npar);
+        void cleanup(void);
+        float getfreqresponse(float freq);
 
     private:
         // Parameters
         unsigned char Pvolume;
-        void setVolume(unsigned char _volume);
+        void setvolume(unsigned char Pvolume_);
         struct {
             unsigned char Ptype, Pfreq, Pgain, Pq, Pstages; // parameters
             AnalogFilter *l, *r; // internal values

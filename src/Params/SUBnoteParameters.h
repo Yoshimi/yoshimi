@@ -36,12 +36,11 @@ class SUBnoteParameters : public Presets
         ~SUBnoteParameters();
 
         void add2XML(XMLwrapper *xml);
-        void setDefaults(void) { defaults(); };
+        void defaults(void);
         void getfromXML(XMLwrapper *xml);
 
-        // Parameters
-        // AMPLITUDE PARAMETRERS
-        unsigned char Pstereo;// 0 for mono,1 for stereo
+        // Amplitude Parametrers
+        bool Pstereo; // streo = true, mono = false
         unsigned char PVolume;
         unsigned char PPanning;
         unsigned char PAmpVelocityScaleFunction;
@@ -63,7 +62,6 @@ class SUBnoteParameters : public Presets
         unsigned char PGlobalFilterVelocityScaleFunction;
         EnvelopeParams *GlobalFilterEnvelope;
 
-
         // Other Parameters
 
         // If the base frequency is fixed to 440 Hz
@@ -73,7 +71,6 @@ class SUBnoteParameters : public Presets
            If this parameter is 0, the frequency is fixed (to 440 Hz);
            if this parameter is 64, 1 MIDI halftone -> 1 frequency halftone */
         unsigned char PfixedfreqET;
-
 
         // how many times the filters are applied
         unsigned char Pnumstages;
@@ -95,9 +92,6 @@ class SUBnoteParameters : public Presets
 
         // how the harmonics start("0"=0,"1"=random,"2"=1)
         unsigned char Pstart;
-
-    private:
-        void defaults(void);
 };
 
 #endif

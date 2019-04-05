@@ -24,8 +24,6 @@
 #ifndef EFFECTMGR_H
 #define EFFECTMGR_H
 
-#include <pthread.h>
-
 #include "Effects/Effect.h"
 #include "Effects/Reverb.h"
 #include "Effects/Echo.h"
@@ -46,25 +44,25 @@ class EffectMgr : public Presets
         ~EffectMgr();
 
         void add2XML(XMLwrapper *xml);
-        void setDefaults(void);
+        void defaults(void);
         void getfromXML(XMLwrapper *xml);
 
         void out(float *smpsl, float *smpsr);
 
-        void setDryOnly(bool value);
+        void setdryonly(bool value);
 
-        float sysefxGetVolume(void);
+        float sysefxgetvolume(void);
 
-        void Cleanup(void);
+        void cleanup(void);
 
-        void changeEffect(int nefx_);
-        int getEffect(void);
-        void changePreset(unsigned char npreset);
-        void changePreset_nolock(unsigned char npreset);
-        unsigned char getPreset(void);
-        void setEffectPar(int npar, unsigned char value);
-        void setEffectPar_nolock(int npar, unsigned char value);
-        unsigned char getEffectPar(int npar);
+        void changeeffect(int nefx_);
+        int geteffect(void);
+        void changepreset(unsigned char npreset);
+        void changepreset_nolock(unsigned char npreset);
+        unsigned char getpreset(void);
+        void seteffectpar(int npar, unsigned char value);
+        void seteffectpar_nolock(int npar, unsigned char value);
+        unsigned char geteffectpar(int npar);
 
         float *efxoutl, *efxoutr;
         bool insertion; // the effect is connected as insertion effect (or not)
@@ -75,7 +73,6 @@ class EffectMgr : public Presets
         FilterParams *filterpars;
 
     private:
-        void defaults(void) { setDefaults(); };
         int nefx;
         Effect *efx;
         bool dryonly;

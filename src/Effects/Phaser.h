@@ -35,11 +35,11 @@ class Phaser : public Effect
         Phaser(bool insertion_, float *efxoutl_, float *efxoutr_);
         ~Phaser();
         void out(float *smpsl, float *smpsr);
-        void setPreset(unsigned char npreset);
-        void changePar(int npar, unsigned char value);
-        unsigned char getPar(int npar) const;
-        void Cleanup(void);
-        void setDryonly(void);
+        void setpreset(unsigned char npreset);
+        void changepar(int npar, unsigned char value);
+        unsigned char getpar(int npar);
+        void cleanup(void);
+        void setdryonly(void);
     
     private:
         // Parametrii Phaser
@@ -54,13 +54,13 @@ class Phaser : public Effect
         unsigned char Pphase;
     
         // Control Parametrii
-        void setVolume(unsigned char _volume);
-        void setPanning(unsigned char _panning);
-        void setDepth(unsigned char _depth);
-        void setFb(unsigned char _fb);
-        void setLrCross(unsigned char _lrcross);
-        void setStages(unsigned char _stages);
-        void setPhase(unsigned char _phase);
+        void setvolume(unsigned char Pvolume_);
+        void setpanning(unsigned char Ppanning_);
+        void setdepth(unsigned char Pdepth_);
+        void setfb(unsigned char Pfb_);
+        void setlrcross(unsigned char Plrcross_);
+        void setstages(unsigned char Pstages_);
+        void setphase(unsigned char Pphase_);
     
         // Internal Values
         // int insertion; // inherited from Effect

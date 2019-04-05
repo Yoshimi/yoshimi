@@ -1,7 +1,7 @@
 /*
     AlsaJackClient.cpp - Jack audio / Alsa midi
     
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,35 +17,33 @@
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
-
 #include "Misc/Config.h"
 #include "MusicIO/AlsaJackClient.h"
 
-bool AlsaJackClient::openAudio(void)
+bool AlsaJackClient::openAudio(WavRecord *recorder)
 {
-    if (alsaEngine.openAudio())
+    if (alsaEngine.openAudio(Recorder))
     {
-        Runtime.settings.Samplerate = getSamplerate();
-        Runtime.settings.Buffersize = getBuffersize();
+        Runtime.Samplerate = getSamplerate();
+        Runtime.Buffersize = getBuffersize();
         return true;
     }
     else
-        cerr << "Error, failed to register audio" << endl;
+        Runtime.Log("Failed to register audio");
     return false;
 }
 
 
-bool AlsaJackClient::openMidi(void)
+bool AlsaJackClient::openMidi(WavRecord *recorder)
 {
-    if (jackEngine.connectServer(Runtime.settings.midiDevice))
+    if (jackEngine.connectServer(Runtime.midiDevice))
     {
-        if (jackEngine.openMidi())
+        if (jackEngine.openMidi(Recorder))
         {
             return true;
         }
         else
-            cerr << "Error, AlsaJackClient failed to open midi" << endl;
+            Runtime.Log("AlsaJackClient failed to open midi");
     }
     return false;
 }
@@ -59,9 +57,16 @@ bool AlsaJackClient::Start(void)
             return true;
         }
         else
-            cerr << "jackEngine.Start() failed" << endl;
+            Runtime.Log("jackEngine.Start() failed");
     }
     else
-        cerr << "alsaEngine.Start() failed" << endl;
+        Runtime.Log("alsaEngine.Start() failed");
     return false;
+}
+
+
+void AlsaJackClient::Close(void)
+{
+    alsaEngine.Close();
+    jackEngine.Close();
 }

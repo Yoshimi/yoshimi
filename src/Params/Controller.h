@@ -32,36 +32,36 @@ class Controller
     public:
         Controller();
         ~Controller() { };
-        void resetAll();
+        void resetall(void);
 
         void add2XML(XMLwrapper *xml);
-        void setDefaults();
+        void defaults(void);
         void getfromXML(XMLwrapper *xml);
 
         // Controllers functions
-        void setPitchwheel(int value);
-        void setPitchwheelBendrange(unsigned short int value);
-        void setExpression(int value);
-        void setPanning(int value);
-        void setFilterCutoff(int value);
-        void setFilterQ(int value);
-        void setBandwidth(int value);
-        void setModwheel(int value);
-        void setFmAmp(int value);
-        void setVolume(int value);
-        void setSustain(int value);
-        void setPortamento(int value);
-        void setResonanceCenter(int value);
-        void setResonanceBw(int value);
+        void setpitchwheel(int value);
+        void setpitchwheelbendrange(unsigned short int value);
+        void setexpression(int value);
+        void setpanning(int value);
+        void setfiltercutoff(int value);
+        void setfilterq(int value);
+        void setbandwidth(int value);
+        void setmodwheel(int value);
+        void setfmamp(int value);
+        void setvolume(int value);
+        void setsustain(int value);
+        void setportamento(int value);
+        void setresonancecenter(int value);
+        void setresonancebw(int value);
 
 
-        void setParameterNumber(unsigned int type, int value); // used for RPN and NRPN's
-        int getNrpn(int *parhi, int *parlo, int *valhi, int *vallo);
+        void setparameternumber(unsigned int type, int value); // used for rpn and nrpn's
+        int getnrpn(int *parhi, int *parlo, int *valhi, int *vallo);
 
-        int initPortamento(float oldfreq, float newfreq, bool legatoflag);
+        int initportamento(float oldfreq, float newfreq, bool in_progress);
         // returns 1 if the portamento's conditions are true, else return 0
 
-        void updatePortamento(); //update portamento values
+        void updateportamento(void); // update portamento values
 
         // Controllers values
         struct { // Pitch Wheel
@@ -126,12 +126,13 @@ class Controller
             unsigned char receive;
         } sustain;
 
-        struct {
+        struct { // Portamento
             // parameters
             int data;
             unsigned char portamento;
 
-            unsigned char receive, time;
+            unsigned char receive;
+            unsigned char time;
             unsigned char pitchthresh;
             unsigned char pitchthreshtype;
 
@@ -141,10 +142,9 @@ class Controller
             int noteusing;
             int used;
             // internal data
-            float x,dx; // x is from 0.0 (start portamento) to 1.0
-                              // (finished portamento), dx is x increment
-            float origfreqrap; // this is used for computing oldfreq value
-                                     // from x
+            float x;  // x is from 0.0 (start portamento) to 1.0 (finished portamento),
+            float dx; // dx is x increment
+            float origfreqrap; // this is used for computing oldfreq value from x
         } portamento;
 
         struct { // Resonance Center Frequency
@@ -160,8 +160,10 @@ class Controller
         } resonancebandwidth;
 
         struct { // nrpn
-            int parhi,parlo;
-            int valhi,vallo;
+            int parhi;
+            int parlo;
+            int valhi;
+            int vallo;
             unsigned char receive; // this is saved to disk by Master
         } NRPN;
 };

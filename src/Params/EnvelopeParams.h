@@ -40,13 +40,13 @@ class EnvelopeParams : public Presets
         void ADSRinit_filter(char A_val, char A_dt, char D_val, char D_dt,
                              char R_dt, char R_val);
         void ASRinit_bw(char A_val, char A_dt, char R_val, char R_dt);
-        void convertToFree();
+        void converttofree();
 
         void add2XML(XMLwrapper *xml);
-        void setDefaults(void) { defaults(); };
+        void defaults(void);
         void getfromXML(XMLwrapper *xml);
 
-        float getDt(char i);
+        float getdt(char i);
 
         // MIDI Parameters
         unsigned char Pfreemode; // 1 daca este in modul free sau 0 daca este in mod ADSR,ASR,...
@@ -68,7 +68,6 @@ class EnvelopeParams : public Presets
                      // 5 for ASR_bw parameters (bandwidth parameters)
 
     private:
-        void defaults(void);
         void store2defaults();
 
         // Default parameters

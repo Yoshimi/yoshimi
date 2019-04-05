@@ -21,10 +21,6 @@
     This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
-#include <iostream>
-
-using namespace std;
-
 #include "Misc/Util.h"
 #include "Misc/Master.h"
 #include "DSP/AnalogFilter.h"
@@ -46,9 +42,9 @@ AnalogFilter::AnalogFilter(unsigned char Ftype, float Ffreq,
         oldc[i] = oldd[i] = c[i] = d[i] = 0.0;
     if (stages >= MAX_FILTER_STAGES)
         stages = MAX_FILTER_STAGES;
-    Cleanup();
+    cleanup();
     firsttime = 0;
-    setFreq_and_Q(Ffreq, Fq);
+    setfreq_and_q(Ffreq, Fq);
     firsttime = 1;
     d[0] = 0; // this is not used
     outgain = 1.0;
@@ -56,7 +52,7 @@ AnalogFilter::AnalogFilter(unsigned char Ftype, float Ffreq,
 
 AnalogFilter::~AnalogFilter() { }
 
-void AnalogFilter::Cleanup()
+void AnalogFilter::cleanup()
 {
     for (int i = 0; i < MAX_FILTER_STAGES + 1; ++i)
     {
@@ -67,7 +63,7 @@ void AnalogFilter::Cleanup()
     needsinterpolation = 0;
 }
 
-void AnalogFilter::computeFilterCoefs()
+void AnalogFilter::computefiltercoefs(void)
 {
     float tmp;
     float omega, sn, cs, alpha, beta;
@@ -307,13 +303,13 @@ void AnalogFilter::computeFilterCoefs()
             break;
         default: // wrong type
             type = 0;
-            computeFilterCoefs();
+            computefiltercoefs();
             break;
     }
 }
 
 
-void AnalogFilter::setFreq(float frequency)
+void AnalogFilter::setfreq(float frequency)
 {
     if (frequency < 0.1)
         frequency = 0.1;
@@ -342,44 +338,44 @@ void AnalogFilter::setFreq(float frequency)
             needsinterpolation = 1;
     }
     freq = frequency;
-    computeFilterCoefs();
+    computefiltercoefs();
     firsttime = 0;
 }
 
-void AnalogFilter::setFreq_and_Q(float frequency, float q_)
+void AnalogFilter::setfreq_and_q(float frequency, float q_)
 {
     q = q_;
-    setFreq(frequency);
+    setfreq(frequency);
 }
 
-void AnalogFilter::setQ(float q_)
+void AnalogFilter::setq(float q_)
 {
     q = q_;
-    computeFilterCoefs();
+    computefiltercoefs();
 }
 
-void AnalogFilter::setType(int type_)
+void AnalogFilter::settype(int type_)
 {
     type = type_;
-    computeFilterCoefs();
+    computefiltercoefs();
 }
 
-void AnalogFilter::setGain(float dBgain)
+void AnalogFilter::setgain(float dBgain)
 {
     gain = dB2rap(dBgain);
-    computeFilterCoefs();
+    computefiltercoefs();
 }
 
-void AnalogFilter::setStages(int stages_)
+void AnalogFilter::setstages(int stages_)
 {
     if (stages_ >= MAX_FILTER_STAGES)
         stages_ = MAX_FILTER_STAGES - 1;
     stages = stages_;
-    Cleanup();
-    computeFilterCoefs();
+    cleanup();
+    computefiltercoefs();
 }
 
-void AnalogFilter::singleFilterOut(float *smp, fstage &x, fstage &y,
+void AnalogFilter::singlefilterout(float *smp, fstage &x, fstage &y,
                                    float *c, float *d)
 {
     //unsigned int u;
@@ -406,7 +402,7 @@ void AnalogFilter::singleFilterOut(float *smp, fstage &x, fstage &y,
         }
     }
 }
-void AnalogFilter::filterOut(float *smp)
+void AnalogFilter::filterout(float *smp)
 {
     float *ismp = NULL;      // used if it needs interpolation
     if (needsinterpolation != 0)
@@ -416,11 +412,11 @@ void AnalogFilter::filterOut(float *smp)
         //    ismp[i] = smp[i];
         memcpy(ismp, smp, buffersize * sizeof(float));
         for (int i = 0; i < stages + 1; ++i)
-            singleFilterOut(ismp, oldx[i], oldy[i], oldc, oldd);
+            singlefilterout(ismp, oldx[i], oldy[i], oldc, oldd);
     }
 
     for (int i = 0; i < stages + 1; ++i)
-        singleFilterOut(smp, x[i], y[i], c, d);
+        singlefilterout(smp, x[i], y[i], c, d);
 
     if (needsinterpolation != 0)
     {

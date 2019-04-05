@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified October 2009
+    This file is a derivative of the ZynAddSubFX original, modified January 2010
 */
 
 #include <cmath>
@@ -29,7 +29,7 @@
 
 ADnoteParameters::ADnoteParameters(FFTwrapper *fft_) : Presets()
 {
-    setPresetType("Padsyth");
+    setpresettype("Padsyth");
     fft = fft_;
 
     GlobalPar.FreqEnvelope = new EnvelopeParams(0, 0);
@@ -48,27 +48,27 @@ ADnoteParameters::ADnoteParameters(FFTwrapper *fft_) : Presets()
 
     for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
         EnableVoice(nvoice);
-    setDefaults();
+    defaults();
 }
 
 void ADnoteParameters::defaults(void)
 {
     // Default Parameters
     // Frequency Global Parameters
-    GlobalPar.PStereo = 1; // stereo
-    GlobalPar.PDetune = 8192; // zero
+    GlobalPar.PStereo = true;
+    GlobalPar.PDetune = 8192; // == zero point
     GlobalPar.PCoarseDetune = 0;
     GlobalPar.PDetuneType = 1;
-    GlobalPar.FreqEnvelope->setDefaults();
-    GlobalPar.FreqLfo->setDefaults();
+    GlobalPar.FreqEnvelope->defaults();
+    GlobalPar.FreqLfo->defaults();
     GlobalPar.PBandwidth = 64;
 
     // Amplitude Global Parameters
     GlobalPar.PVolume = 90;
     GlobalPar.PPanning = 64; // center
     GlobalPar.PAmpVelocityScaleFunction = 64;
-    GlobalPar.AmpEnvelope->setDefaults();
-    GlobalPar.AmpLfo->setDefaults();
+    GlobalPar.AmpEnvelope->defaults();
+    GlobalPar.AmpLfo->defaults();
     GlobalPar.PPunchStrength = 0;
     GlobalPar.PPunchTime = 60;
     GlobalPar.PPunchStretch = 64;
@@ -78,10 +78,10 @@ void ADnoteParameters::defaults(void)
     // Filter Global Parameters
     GlobalPar.PFilterVelocityScale = 64;
     GlobalPar.PFilterVelocityScaleFunction = 64;
-    GlobalPar.GlobalFilter->setDefaults();
-    GlobalPar.FilterEnvelope->setDefaults();
-    GlobalPar.FilterLfo->setDefaults();
-    GlobalPar.Reson->setDefaults();
+    GlobalPar.GlobalFilter->defaults();
+    GlobalPar.FilterEnvelope->defaults();
+    GlobalPar.FilterLfo->defaults();
+    GlobalPar.Reson->defaults();
 
     for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
         defaults(nvoice);
@@ -89,9 +89,8 @@ void ADnoteParameters::defaults(void)
 }
 
 // Defaults a voice
-void ADnoteParameters::defaults(int n)
+void ADnoteParameters::defaults(int nvoice)
 {
-    int nvoice = n;
     VoicePar[nvoice].Enabled = 0;
     VoicePar[nvoice].Type = 0;
     VoicePar[nvoice].Pfixedfreq = 0;
@@ -131,21 +130,21 @@ void ADnoteParameters::defaults(int n)
     VoicePar[nvoice].PFMAmpEnvelopeEnabled = 0;
     VoicePar[nvoice].PFMVelocityScaleFunction = 64;
 
-    VoicePar[nvoice].OscilSmp->setDefaults();
-    VoicePar[nvoice].FMSmp->setDefaults();
+    VoicePar[nvoice].OscilSmp->defaults();
+    VoicePar[nvoice].FMSmp->defaults();
 
-    VoicePar[nvoice].AmpEnvelope->setDefaults();
-    VoicePar[nvoice].AmpLfo->setDefaults();
+    VoicePar[nvoice].AmpEnvelope->defaults();
+    VoicePar[nvoice].AmpLfo->defaults();
 
-    VoicePar[nvoice].FreqEnvelope->setDefaults();
-    VoicePar[nvoice].FreqLfo->setDefaults();
+    VoicePar[nvoice].FreqEnvelope->defaults();
+    VoicePar[nvoice].FreqLfo->defaults();
 
-    VoicePar[nvoice].VoiceFilter->setDefaults();
-    VoicePar[nvoice].FilterEnvelope->setDefaults();
-    VoicePar[nvoice].FilterLfo->setDefaults();
+    VoicePar[nvoice].VoiceFilter->defaults();
+    VoicePar[nvoice].FilterEnvelope->defaults();
+    VoicePar[nvoice].FilterLfo->defaults();
 
-    VoicePar[nvoice].FMFreqEnvelope->setDefaults();
-    VoicePar[nvoice].FMAmpEnvelope->setDefaults();
+    VoicePar[nvoice].FMFreqEnvelope->defaults();
+    VoicePar[nvoice].FMAmpEnvelope->defaults();
 }
 
 // Init the voice parameters
@@ -177,7 +176,7 @@ void ADnoteParameters::EnableVoice(int nvoice)
 float ADnoteParameters::getBandwidthDetuneMultiplier(void)
 {
     float bw = (GlobalPar.PBandwidth - 64.0) / 64.0;
-    bw = powf(2.0, bw * powf(fabsf(bw), 0.2) * 5.0);
+    bw = powf(2.0f, bw * powf(fabsf(bw), 0.2f) * 5.0);
     return bw;
 }
 
@@ -234,8 +233,8 @@ void ADnoteParameters::add2XMLsection(XMLwrapper *xml, int n)
     }
 
     xml->addparbool("enabled", VoicePar[nvoice].Enabled);
-    if (((VoicePar[nvoice].Enabled == 0) && (oscilused==0)&&(fmoscilused==0))&&(xml->minimal)) return;
-
+    if (!VoicePar[nvoice].Enabled && !oscilused && !fmoscilused && xml->minimal)
+        return;
     xml->addpar("type",VoicePar[nvoice].Type);
     xml->addpar("delay",VoicePar[nvoice].PDelay);
     xml->addparbool("resonance",VoicePar[nvoice].Presonance);
@@ -356,7 +355,7 @@ void ADnoteParameters::add2XMLsection(XMLwrapper *xml, int n)
 
 void ADnoteParameters::add2XML(XMLwrapper *xml)
 {
-    xml->addparbool("stereo",GlobalPar.PStereo);
+    xml->addparbool("stereo", (GlobalPar.PStereo) ? 1 : 0);
 
     xml->beginbranch("AMPLITUDE_PARAMETERS");
     xml->addpar("volume",GlobalPar.PVolume);
@@ -425,7 +424,8 @@ void ADnoteParameters::add2XML(XMLwrapper *xml)
 
 void ADnoteParameters::getfromXML(XMLwrapper *xml)
 {
-    GlobalPar.PStereo=xml->getparbool("stereo",GlobalPar.PStereo);
+    int xpar =  xml->getparbool("stereo",GlobalPar.PStereo);
+    GlobalPar.PStereo = (xpar != 0) ? true : false;
 
     if (xml->enterbranch("AMPLITUDE_PARAMETERS")) {
         GlobalPar.PVolume=xml->getpar127("volume",GlobalPar.PVolume);

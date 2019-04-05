@@ -21,13 +21,11 @@
     This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
-#include <iostream>
-
-using namespace std;
-
 #include "Misc/Util.h"
 #include "Misc/Master.h"
 #include "Effects/Chorus.h"
+
+#define MAX_CHORUS_DELAY 250.0 // ms
 
 Chorus::Chorus(bool insertion_, float *const efxoutl_, float *efxoutr_) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0)
@@ -37,24 +35,24 @@ Chorus::Chorus(bool insertion_, float *const efxoutl_, float *efxoutr_) :
     delayl = new float[maxdelay];
     delayr = new float[maxdelay];
 
-    setPreset(Ppreset);
+    setpreset(Ppreset);
 
-    lfo.effectLfoOut(&lfol, &lfor);
-    dl2 = getDelay(lfol);
-    dr2 = getDelay(lfor);
-    Cleanup();
+    lfo.effectlfoout(&lfol, &lfor);
+    dl2 = getdelay(lfol);
+    dr2 = getdelay(lfor);
+    cleanup();
 }
 
 
 // get the delay value in samples; xlfo is the current lfo value
-float Chorus::getDelay(float xlfo)
+float Chorus::getdelay(float xlfo)
 {
     float result = (Pflangemode) ? 0 : (delay + xlfo * depth) * zynMaster->getSamplerate();
 
     //check if it is too big delay (caused bu erroneous setDelay() and setDepth()
     if ((result + 0.5) >= maxdelay)
     {
-        cerr << "WARNING: Chorus.C::getDelay(..) too big delay (see setdelay and setdepth funcs.)\n";
+        Runtime.Log("WARNING: Chorus.C::getDelay(..) too big delay (see setdelay and setdepth funcs.)");
         result = maxdelay - 1.0;
     }
     return result;
@@ -67,10 +65,10 @@ void Chorus::out(float *smpsl, float *smpsr)
     const float one = 1.0;
     dl1 = dl2;
     dr1 = dr2;
-    lfo.effectLfoOut(&lfol, &lfor);
+    lfo.effectlfoout(&lfol, &lfor);
 
-    dl2 = getDelay(lfol);
-    dr2 = getDelay(lfor);
+    dl2 = getdelay(lfol);
+    dr2 = getdelay(lfor);
 
     float inL, inR, tmpL, tmpR, tmp;
     int buffersize = zynMaster->getBuffersize();
@@ -124,13 +122,13 @@ void Chorus::out(float *smpsl, float *smpsr)
 
     for (int i = 0; i < buffersize; ++i)
     {
-        efxoutl[i] *= panning;
-        efxoutr[i] *= (1.0 - panning);
+        efxoutl[i] *= (1.0 - panning);
+        efxoutr[i] *= panning;
     }
 }
 
 // Cleanup the effect
-void Chorus::Cleanup(void)
+void Chorus::cleanup(void)
 {
     for (int i = 0; i < maxdelay; ++i)
         delayl[i] = delayr[i] = 0.0;
@@ -138,53 +136,50 @@ void Chorus::Cleanup(void)
 
 
 // Parameter control
-void Chorus::setDepth(unsigned char Pdepth)
+void Chorus::setdepth(unsigned char Pdepth_)
 {
-    this->Pdepth = Pdepth;
-    depth = (powf(8.0, (Pdepth / 127.0) * 2.0) - 1.0) / 1000.0; // seconds
+    Pdepth = Pdepth_;
+    depth = (powf(8.0f, (Pdepth / 127.0f) * 2.0f) - 1.0f) / 1000.0; // seconds
 }
 
 
-void Chorus::setDelay(unsigned char Pdelay)
+void Chorus::setdelay(unsigned char Pdelay_)
 {
-    this->Pdelay=Pdelay;
-    delay = (powf(10.0, (Pdelay / 127.0) * 2.0) - 1.0) / 1000.0; // seconds
+    Pdelay = Pdelay_;
+    delay = (powf(10.0f, (Pdelay / 127.0f) * 2.0f) - 1.0f) / 1000.0; // seconds
 }
 
 
-void Chorus::setFb(unsigned char Pfb)
+void Chorus::setfb(unsigned char Pfb_)
 {
-    this->Pfb = Pfb;
+    Pfb = Pfb_;
     fb = (Pfb - 64.0) / 64.1;
 }
 
 
-void Chorus::setVolume(unsigned char Pvolume)
+void Chorus::setvolume(unsigned char Pvolume_)
 {
-    this->Pvolume = Pvolume;
+    Pvolume = Pvolume_;
     outvolume = Pvolume / 127.0;
-    if (insertion == 0)
-        volume = 1.0;
-    else
-        volume = outvolume;
+    volume = (!insertion) ? 1.0 : outvolume;
 }
 
 
-void Chorus::setPanning(unsigned char Ppanning)
+void Chorus::setpanning(unsigned char Ppanning_)
 {
-    this->Ppanning = Ppanning;
+    Ppanning = Ppanning_;
     panning = Ppanning / 127.0;
 }
 
 
-void Chorus::setLrCross(unsigned char Plrcross)
+void Chorus::setlrcross(unsigned char Plrcross_)
 {
-    this->Plrcross = Plrcross;
+    Plrcross = Plrcross_;
     lrcross = Plrcross / 127.0;
 }
 
 
-void Chorus::setPreset(unsigned char npreset)
+void Chorus::setpreset(unsigned char npreset)
 {
     const int PRESET_SIZE = 12;
     const int NUM_PRESETS = 10;
@@ -214,48 +209,48 @@ void Chorus::setPreset(unsigned char npreset)
     if (npreset >= NUM_PRESETS)
         npreset = NUM_PRESETS - 1;
     for (int n = 0; n < PRESET_SIZE; ++n)
-        changePar(n, presets[npreset][n]);
+        changepar(n, presets[npreset][n]);
     Ppreset = npreset;
 }
 
 
-void Chorus::changePar(int npar, unsigned char value)
+void Chorus::changepar(int npar, unsigned char value)
 {
     switch (npar)
     {
         case 0:
-            setVolume(value);
+            setvolume(value);
             break;
         case 1:
-            setPanning(value);
+            setpanning(value);
             break;
         case 2:
             lfo.Pfreq = value;
-            lfo.updateParams();
+            lfo.updateparams();
             break;
         case 3:
             lfo.Prandomness = value;
-            lfo.updateParams();
+            lfo.updateparams();
             break;
         case 4:
             lfo.PLFOtype = value;
-            lfo.updateParams();
+            lfo.updateparams();
             break;
         case 5:
             lfo.Pstereo = value;
-            lfo.updateParams();
+            lfo.updateparams();
             break;
         case 6:
-            setDepth(value);
+            setdepth(value);
             break;
         case 7:
-            setDelay(value);
+            setdelay(value);
             break;
         case 8:
-            setFb(value);
+            setfb(value);
             break;
         case 9:
-            setLrCross(value);
+            setlrcross(value);
             break;
         case 10:
             Pflangemode = (value > 1) ? 1 : value;
@@ -267,7 +262,7 @@ void Chorus::changePar(int npar, unsigned char value)
 }
 
 
-unsigned char Chorus::getPar(int npar) const
+unsigned char Chorus::getpar(int npar)
 {
     switch (npar)
     {

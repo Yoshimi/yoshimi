@@ -28,11 +28,11 @@ class Filter_
     public:
         Filter_() { };
         virtual ~Filter_() { };
-        virtual void filterOut(float *smp) = 0;
-        virtual void setFreq(float frequency) = 0;
-        virtual void setFreq_and_Q(float frequency, float q_) = 0;
-        virtual void setQ(float q_) = 0;
-        virtual void setGain(float dBgain) { };
+        virtual void filterout(float *smp) = 0;
+        virtual void setfreq(float frequency) = 0;
+        virtual void setfreq_and_q(float frequency, float q_) = 0;
+        virtual void setq(float q_) = 0;
+        virtual void setgain(float dBgain) { };
         float outgain;
 };
 

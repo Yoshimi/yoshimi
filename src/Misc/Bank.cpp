@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,10 +18,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified October 2009
+    This file is a derivative of the ZynAddSubFX original, modified January 2010
 */
 
-#include <iostream>
 #include <set>
 #include <list>
 #include <stdlib.h>
@@ -39,13 +38,6 @@ using namespace std;
 #include "Misc/Master.h"
 #include "Misc/Bank.h"
 
-// compare function for sorting banks
-static bool bankCmp(const bankstruct_t& lhs, const bankstruct_t& rhs)
-{
-   return lhs.name < rhs.name;
-}
-
-
 Bank::Bank() :
     defaultinsname(string(" ")),
     bank_size(160),
@@ -61,44 +53,49 @@ Bank::Bank() :
         bank_instrument[i].PADsynth_used = false;
     }
     dirname.clear();
-    clearBank();
+    clearbank();
 
     for (int i = 0; i < MAX_NUM_BANKS; ++i)
     {
-        banks[i].dir.clear();
         banks[i].name.clear();
+        banks[i].alias.clear();
+        banks[i].dir.clear();
     }
     bankfiletitle = string(dirname);
-    loadBank(Runtime.settings.currentBankDir);
+    loadbank(Runtime.currentBankDir);
 }
+
 
 Bank::~Bank()
 {
-    clearBank();
+    clearbank();
 }
 
+
 // Get the name of an instrument from the bank
-string Bank::getName (unsigned int ninstrument)
+string Bank::getname(unsigned int ninstrument)
 {
-    if (emptySlot(ninstrument))
+    if (emptyslot(ninstrument))
         return defaultinsname;
     return bank_instrument[ninstrument].name;
 }
 
+
 // Get the numbered name of an instrument from the bank
-string Bank::getNameNumbered (unsigned int ninstrument)
+string Bank::getnamenumbered(unsigned int ninstrument)
 {
-    if (emptySlot(ninstrument))
+    if (emptyslot(ninstrument))
         return defaultinsname;
     tmpinsname[ninstrument] = asString(ninstrument + 1) + ". "
-                              + string(getName(ninstrument));
+                              + string(getname(ninstrument));
     return tmpinsname[ninstrument];
 }
 
+
 // Changes the name of an instrument (and the filename)
-void Bank::setName(unsigned int ninstrument, string newname, int newslot)
+void Bank::setname(unsigned int ninstrument, string newname, int newslot)
 {
-    if (emptySlot(ninstrument))
+    if (emptyslot(ninstrument))
         return;
     
     int slot = (newslot >= 0) ? newslot + 1 : ninstrument + 1;
@@ -113,16 +110,17 @@ void Bank::setName(unsigned int ninstrument, string newname, int newslot)
                      newfilepath.c_str());
     if (chk < 0)
     {
-        cerr << "Error, Bank::setName failed renaming :"
-             << bank_instrument[ninstrument].filename << " -> "
-             << newfilepath << " : " << strerror(errno) << endl;
+        Runtime.Log("Error, bank setName failed renaming "
+                    + bank_instrument[ninstrument].filename + " -> "
+                    + newfilepath + " : " + string(strerror(errno)));
     }
     bank_instrument[ninstrument].filename = newfilepath;
     bank_instrument[ninstrument].name = newname;
 }
 
+
 // Check if there is no instrument on a slot from the bank
-bool Bank::emptySlot(unsigned int ninstrument)
+bool Bank::emptyslot(unsigned int ninstrument)
 {
     if (ninstrument >= BANK_SIZE)
         return false;
@@ -133,30 +131,32 @@ bool Bank::emptySlot(unsigned int ninstrument)
     return true;
 }
 
+
 // Removes the instrument from the bank
-void Bank::clearSlot(unsigned int ninstrument)
+void Bank::clearslot(unsigned int ninstrument)
 {
-    if (emptySlot(ninstrument))
+    if (emptyslot(ninstrument))
         return;
     int chk = remove(bank_instrument[ninstrument].filename.c_str());
     if (chk < 0)
     {
-        cerr << "clearSlot " << ninstrument << ", failed to remove "
-             << bank_instrument[ninstrument].filename << " "
-             << strerror(errno) << endl;
+        Runtime.Log("clearSlot " + asString(ninstrument) + " failed to remove "
+                     + bank_instrument[ninstrument].filename + " "
+                     + string(strerror(errno)));
     }
-    deleteFromBank(ninstrument);
+    deletefrombank(ninstrument);
 }
 
+
 // Save the instrument to a slot
-void Bank::saveToSlot(unsigned int ninstrument, Part *part)
+void Bank::savetoslot(unsigned int ninstrument, Part *part)
 {
     if (ninstrument >= BANK_SIZE)
     {
-        cerr << "Error, savetoslot " << ninstrument << "slot > BANK_SIZE" << endl;
+        Runtime.Log("savetoslot " + asString(ninstrument) + ", slot > BANK_SIZE");
         return;
     }
-    clearSlot(ninstrument);
+    clearslot(ninstrument);
     string filename = "0000" + asString(ninstrument + 1);
     filename = filename.substr(filename.size() - 4, 4)
                + "-" + part->Pname + xizext;
@@ -169,39 +169,39 @@ void Bank::saveToSlot(unsigned int ninstrument, Part *part)
     {
         int chk = remove(filepath.c_str());
         if (chk < 0)
-            cerr << "Error, Bank::saveToSlot failed to unlink " << filepath
-                 << ", " << strerror(errno) << endl;
+            Runtime.Log("Bank saveToSlot failed to unlink " + filepath
+                        + ", " + string(strerror(errno)));
     }
     part->saveXML(filepath);
-    addToBank(ninstrument, filename, part->Pname);
+    addtobank(ninstrument, filename, part->Pname);
 }
 
+
 // Loads the instrument from the bank
-void Bank::loadFromSlot(unsigned int ninstrument, Part *part)
+void Bank::loadfromslot(unsigned int ninstrument, Part *part)
 {
     if (ninstrument >= BANK_SIZE)
     {
-        cerr << "Error, loadfromslot " << ninstrument << "slot > BANK_SIZE" << endl;
+        Runtime.Log("loadfromslot " + asString(ninstrument) + ", slot > BANK_SIZE");
         return;
     }
-    if (emptySlot(ninstrument))
+    if (emptyslot(ninstrument))
         return;
-    part->defaultsInstrument();
+    part->defaultsinstrument();
     part->loadXMLinstrument(bank_instrument[ninstrument].filename);
 }
 
 
 // Makes current a bank directory
-bool Bank::loadBank(string bankdirname)
+bool Bank::loadbank(string bankdirname)
 {
     DIR *dir = opendir(bankdirname.c_str());
     if (dir == NULL)
     {
-        if (Runtime.settings.verbose)
-            cerr << "Error, failed to open bank directory " << bankdirname << endl;
+        Runtime.Log("Failed to open bank directory " + bankdirname);
         return false;
     }
-    clearBank();
+    clearbank();
     dirname = string(bankdirname);
     bankfiletitle = dirname;
     struct dirent *fn;
@@ -240,7 +240,7 @@ bool Bank::loadBank(string bankdirname)
                             int instnum = string2int(candidate.substr(0, 4));
                             // remove "NNNN-" and .xiz extension for instrument name
                             string instname = candidate.substr(5, candidate.size() - xizext.size() - 5);
-                            addToBank(instnum - 1, candidate, instname);
+                            addtobank(instnum - 1, candidate, instname);
                         }
                     }
                 }
@@ -248,60 +248,62 @@ bool Bank::loadBank(string bankdirname)
         }
     }
     closedir(dir);
-    Runtime.settings.currentBankDir = dirname;
+    Runtime.currentBankDir = dirname;
     return true;
 }
 
+
 // Makes a new bank, put it on a file and makes it current bank
-bool Bank::newBank(string newbankdir)
+bool Bank::newbank(string newbankdir)
 {
-    if (Runtime.settings.bankRootDirlist[0].empty())
+    if (Runtime.bankRootDirlist[0].empty())
     {
-        cerr << "Error, default bank root directory not set" << endl;
+        Runtime.Log("Default bank root directory not set");
         return false;
     }
-    string newbankpath = Runtime.settings.bankRootDirlist[0];
+    string newbankpath = Runtime.bankRootDirlist[0];
     if (newbankpath.at(newbankpath.size() - 1) != '/')
         newbankpath += "/";
     newbankpath += newbankdir;
     int result = mkdir(newbankpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     if (result < 0)
     {
-        cerr << "Error, failed to mkdir " << newbankpath << endl;
+        Runtime.Log("Error, failed to mkdir " + newbankpath);
         return false;
     }
-    else if (Runtime.settings.verbose)
-        cerr << "mkdir " << newbankpath << " succeeded" << endl;
+    else
+        Runtime.Log("mkdir " + newbankpath + " succeeded");
     string forcefile = newbankpath;
     if (forcefile.at(forcefile.size() - 1) != '/')
         forcefile += "/";
     forcefile += force_bank_dir_file;
     FILE *tmpfile = fopen(forcefile.c_str(), "w+");
     fclose(tmpfile);
-    return loadBank(newbankpath);
+    return loadbank(newbankpath);
 }
 
+
 // Swaps a slot with another
-void Bank::swapSlot(unsigned int n1, unsigned int n2)
+void Bank::swapslot(unsigned int n1, unsigned int n2)
 {
     if (n1 == n2)
         return;
     if (locked())
     {
-        cerr << "Error, swapslot requested, but is locked" << endl;
+        Runtime.Log("swapslot requested, but is locked");
         return;
     }
-    if (emptySlot(n1) && emptySlot(n2))
+    if (emptyslot(n1) && emptyslot(n2))
         return;
-    if (emptySlot(n1)) // make the empty slot the destination
+    if (emptyslot(n1)) // make the empty slot the destination
     {   
         int tmp = n2;
         n2 = n1;
         n1 = tmp;
     }
-    if (emptySlot(n2)) // this is just a movement to an empty slot
+    if (emptyslot(n2)) // this is just a movement to an empty slot
     {
-        setName(n1, getName(n1), n2);
+        setname(n1, getname(n1), n2);
         bank_instrument[n2] = bank_instrument[n1];
         bank_instrument[n1].used = false;
         bank_instrument[n1].name.clear();
@@ -313,8 +315,8 @@ void Bank::swapSlot(unsigned int n1, unsigned int n2)
         if (bank_instrument[n1].name == bank_instrument[n2].name)
             // change the name of the second instrument if the name are equal
             bank_instrument[n2].name += "2";
-        setName(n2, getName(n2), n1);
-        setName(n1, getName(n1), n2);
+        setname(n2, getname(n2), n1);
+        setname(n1, getname(n1), n2);
         bank_instrument[n1].name.swap(bank_instrument[n2].name);
         bank_instrument[n1].filename.swap(bank_instrument[n2].filename);
         bool in_use = bank_instrument[n1].used;
@@ -326,42 +328,43 @@ void Bank::swapSlot(unsigned int n1, unsigned int n2)
     }
 }
 
+
 // Re-scan for directories containing instrument banks
-void Bank::rescanBanks()
+void Bank::rescanforbanks(void)
 {
     set<string, less<string> > bankroots;
     for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-        if (!Runtime.settings.bankRootDirlist[i].empty())
-            bankroots.insert(Runtime.settings.bankRootDirlist[i]);
-    banklist.clear();
+        if (!Runtime.bankRootDirlist[i].empty())
+            bankroots.insert(Runtime.bankRootDirlist[i]);
+    bank_dir_list.clear();
     set<string, less<string> >::iterator dxr;
     for (dxr = bankroots.begin(); dxr != bankroots.end(); ++dxr)
-        scanRootdir(*dxr);
+            scanrootdir(*dxr);
     for (int i = 0; i < MAX_NUM_BANKS; ++i)
     {
-        banks[i].dir.clear();
         banks[i].name.clear();
+        banks[i].alias.clear();
+        banks[i].dir.clear();
     }
-    banklist.sort(bankCmp);
+    bank_dir_list.sort(bankCmp);
     list<bankstruct_t>::iterator x;
     int idx = 1;
-    for(x = banklist.begin(); x != banklist.end() && idx < MAX_NUM_BANKS; ++x)
+    for(x = bank_dir_list.begin(); x != bank_dir_list.end() && idx < MAX_NUM_BANKS; ++x)
         banks[idx++] = *x;
-    banklist.clear();
+    bank_dir_list.clear();
 }
 
 
 // private affairs
 
-void Bank::scanRootdir(string rootdir)
+void Bank::scanrootdir(string rootdir)
 {
-    if (rootdir.empty())
+    if (rootdir.empty() || !isDirectory(rootdir))
         return;
     DIR *dir = opendir(rootdir.c_str());
     if (dir == NULL)
     {
-        if (Runtime.settings.verbose)
-            cerr << "No such directory, root bank entry: " << rootdir << endl;
+        Runtime.Log("No such directory, root bank entry: " + rootdir);
         return;
     }
     struct dirent *fn;
@@ -383,9 +386,7 @@ void Bank::scanRootdir(string rootdir)
         DIR *d = opendir(chkdir.c_str());
         if (d == NULL)
         {
-            if (Runtime.settings.verbose)
-                cerr << "Error, failed to open bank directory candidate: "
-                     << chkdir << endl;
+            Runtime.Log("Failed to open bank directory candidate: " + chkdir);
             continue;
         }
         struct dirent *fname;
@@ -398,8 +399,7 @@ void Bank::scanRootdir(string rootdir)
                 continue;
             if (possible == force_bank_dir_file)
             {   // .bankdir file exists, so add the bank
-                bankstruct_t newbk = { candidate, chkdir };
-                banklist.push_back(newbk);
+                add_bank(candidate, chkdir);
                 break;
             }
             if (possible.size() <= (xizext.size() + 5))
@@ -423,8 +423,7 @@ void Bank::scanRootdir(string rootdir)
                     {
                         if (xizext.size() == (possible.size() - xizpos))
                         {   // is an instrument, so add the bank
-                            bankstruct_t newbk = { candidate, chkdir };
-                            banklist.push_back(newbk);
+                            add_bank(candidate, chkdir);
                             break;
                         }
                     }
@@ -437,15 +436,15 @@ void Bank::scanRootdir(string rootdir)
 }
 
 
-void Bank::clearBank(void)
+void Bank::clearbank(void)
 {
     for (int i = 0; i < BANK_SIZE; ++i)
-        deleteFromBank(i);
+        deletefrombank(i);
     dirname.clear();
     bankfiletitle.clear();
 }
 
-bool Bank::addToBank(int pos, const string filename, string name)
+bool Bank::addtobank(int pos, const string filename, string name)
 {
     if (pos >= 0 && pos < BANK_SIZE)
     {
@@ -467,7 +466,7 @@ bool Bank::addToBank(int pos, const string filename, string name)
     if (pos < 0)
         return -1; // the bank is full
 
-    deleteFromBank(pos);
+    deletefrombank(pos);
     bank_instrument[pos].used = true;
     bank_instrument[pos].name = name;
     tmpinsname[pos] = " ";
@@ -478,7 +477,7 @@ bool Bank::addToBank(int pos, const string filename, string name)
     bank_instrument[pos].filename = filepath;
 
     // see if PADsynth is used
-    if (Runtime.settings.CheckPADsynth)
+    if (Runtime.CheckPADsynth)
     {
         XMLwrapper *xml = new XMLwrapper();
         xml->checkfileinformation(bank_instrument[pos].filename.c_str());
@@ -490,24 +489,46 @@ bool Bank::addToBank(int pos, const string filename, string name)
     return 0;
 }
 
+
 bool Bank::isPADsynth_used(unsigned int ninstrument)
 {
-    if (Runtime.settings.CheckPADsynth == 0)
+    if (Runtime.CheckPADsynth == 0)
         return 0;
     else
         return bank_instrument[ninstrument].PADsynth_used;
 }
 
 
-void Bank::deleteFromBank(unsigned int pos)
+void Bank::deletefrombank(unsigned int pos)
 {
     if (pos >= BANK_SIZE)
     {
-        cerr << "Error, deletefrombank pos " << pos << " > BANK_SIZE"
-             << BANK_SIZE << endl;
+        Runtime.Log("Error, deletefrombank pos " + asString(pos) + " > BANK_SIZE"
+                    + asString(BANK_SIZE));
         return;
     }
     bank_instrument[pos].used = false;
     bank_instrument[pos].filename.clear();
     tmpinsname[pos].clear();
 }
+
+
+void Bank::add_bank(string name, string dir)
+{
+    bankstruct_t newbank = { name, name, dir };
+    while (check_bank_duplicate(newbank.alias))
+        newbank.alias += " *";
+    bank_dir_list.push_back(newbank);
+}
+
+
+bool Bank::check_bank_duplicate(string alias)
+{
+    list<bankstruct_t>::iterator x;
+    for(x = bank_dir_list.begin(); x != bank_dir_list.end(); ++x)
+    {
+        if (alias == (*x).alias)
+            return true;
+    }
+    return false;
+}    

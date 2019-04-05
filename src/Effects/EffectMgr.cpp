@@ -21,10 +21,6 @@
     This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
-#include <iostream>
-
-using namespace std;
-
 #include "Misc/Master.h"
 #include "Effects/EffectMgr.h"
 
@@ -35,12 +31,12 @@ EffectMgr::EffectMgr(const bool insertion_) :
     efx(NULL),
     dryonly(false)
 {
-    setPresetType("Peffect");
+    setpresettype("Peffect");
     efxoutl = new float [buffersize];
     efxoutr = new float [buffersize];
     memset(efxoutl, 0, buffersize * sizeof(float));
     memset(efxoutr, 0, buffersize * sizeof(float));
-    setDefaults();
+    defaults();
 }
 
 
@@ -52,16 +48,16 @@ EffectMgr::~EffectMgr()
     delete [] efxoutr;
 }
 
-void EffectMgr::setDefaults(void)
+void EffectMgr::defaults(void)
 {
-    changeEffect(0);
-    setDryOnly(false);
+    changeeffect(0);
+    setdryonly(false);
 }
 
 // Change the effect
-void EffectMgr::changeEffect(int _nefx)
+void EffectMgr::changeeffect(int _nefx)
 {
-    Cleanup();
+    cleanup();
     if (nefx == _nefx)
         return;
     nefx = _nefx;
@@ -105,21 +101,21 @@ void EffectMgr::changeEffect(int _nefx)
 }
 
 // Obtain the effect number
-int EffectMgr::getEffect(void)
+int EffectMgr::geteffect(void)
 {
     return (nefx);
 }
 
 // Cleanup the current effect
-void EffectMgr::Cleanup(void)
+void EffectMgr::cleanup(void)
 {
     if (efx != NULL)
-        efx->Cleanup();
+        efx->cleanup();
 }
 
 
 // Get the preset of the current effect
-unsigned char EffectMgr::getPreset(void)
+unsigned char EffectMgr::getpreset(void)
 {
     if (efx != NULL)
         return efx->Ppreset;
@@ -128,43 +124,43 @@ unsigned char EffectMgr::getPreset(void)
 }
 
 // Change the preset of the current effect
-void EffectMgr::changePreset_nolock(unsigned char npreset)
+void EffectMgr::changepreset_nolock(unsigned char npreset)
 {
     if (efx != NULL)
-        efx->setPreset(npreset);
+        efx->setpreset(npreset);
 }
 
 // Change the preset of the current effect(with thread locking)
-void EffectMgr::changePreset(unsigned char npreset)
+void EffectMgr::changepreset(unsigned char npreset)
 {
     zynMaster->actionLock(lock);
-    changePreset_nolock(npreset);
+    changepreset_nolock(npreset);
     zynMaster->actionLock(unlock);
 }
 
 
 // Change a parameter of the current effect
-void EffectMgr::setEffectPar_nolock(int npar, unsigned char value)
+void EffectMgr::seteffectpar_nolock(int npar, unsigned char value)
 {
     if (efx == NULL)
         return;
-    efx->changePar(npar, value);
+    efx->changepar(npar, value);
 }
 
 // Change a parameter of the current effect (with thread locking)
-void EffectMgr::setEffectPar(int npar, unsigned char value)
+void EffectMgr::seteffectpar(int npar, unsigned char value)
 {
     zynMaster->actionLock(lock);
-    setEffectPar_nolock(npar, value);
+    seteffectpar_nolock(npar, value);
     zynMaster->actionLock(unlock);
 }
 
 // Get a parameter of the current effect
-unsigned char EffectMgr::getEffectPar(int npar)
+unsigned char EffectMgr::geteffectpar(int npar)
 {
     if (efx == NULL)
         return 0;
-    return efx->getPar(npar);
+    return efx->getpar(npar);
 }
 
 
@@ -173,7 +169,7 @@ void EffectMgr::out(float *smpsl, float *smpsr)
 {
     if (efx == NULL)
     {
-        if (insertion == 0)
+        if (!insertion)
         {
             memset(smpsl, 0, buffersize * sizeof(float));
             memset(smpsr, 0, buffersize * sizeof(float));
@@ -243,7 +239,7 @@ void EffectMgr::out(float *smpsl, float *smpsr)
 }
 
 // Get the effect volume for the system effect
-float EffectMgr::sysefxGetVolume(void)
+float EffectMgr::sysefxgetvolume(void)
 {
     return (efx == NULL) ? 1.0 : efx->outvolume;
 }
@@ -252,27 +248,27 @@ float EffectMgr::sysefxGetVolume(void)
 // Get the EQ response
 float EffectMgr::getEQfreqresponse(float freq)
 {
-    return  (nefx == 7) ? efx->getFreqResponse(freq) : 0.0;
+    return  (nefx == 7) ? efx->getfreqresponse(freq) : 0.0;
 }
 
 
-void EffectMgr::setDryOnly(bool value)
+void EffectMgr::setdryonly(bool value)
 {
     dryonly = value;
 }
 
 void EffectMgr::add2XML(XMLwrapper *xml)
 {
-    xml->addpar("type", getEffect());
+    xml->addpar("type", geteffect());
 
-    if (efx == NULL || getEffect() == 0)
+    if (efx == NULL || geteffect() == 0)
         return;
     xml->addpar("preset", efx->Ppreset);
 
     xml->beginbranch("EFFECT_PARAMETERS");
     for (int n = 0; n < 128; ++n)
     {   // \todo evaluate who should oversee saving and loading of parameters
-        int par = getEffectPar(n);
+        int par = geteffectpar(n);
         if (par == 0)
             continue;
         xml->beginbranch("par_no", n);
@@ -290,8 +286,8 @@ void EffectMgr::add2XML(XMLwrapper *xml)
 
 void EffectMgr::getfromXML(XMLwrapper *xml)
 {
-    changeEffect(xml->getpar127("type",getEffect()));
-    if (efx == NULL || getEffect() == 0)
+    changeeffect(xml->getpar127("type", geteffect()));
+    if (efx == NULL || geteffect() == 0)
         return;
     efx->Ppreset = xml->getpar127("preset", efx->Ppreset);
 
@@ -299,11 +295,11 @@ void EffectMgr::getfromXML(XMLwrapper *xml)
     {
         for (int n = 0; n < 128; ++n)
         {
-            setEffectPar_nolock(n, 0); // erase effect parameter
+            seteffectpar_nolock(n, 0); // erase effect parameter
             if (xml->enterbranch("par_no", n) == 0)
                 continue;
-            int par = getEffectPar(n);
-            setEffectPar_nolock(n, xml->getpar127("par", par));
+            int par = geteffectpar(n);
+            seteffectpar_nolock(n, xml->getpar127("par", par));
             xml->exitbranch();
         }
         if (filterpars != NULL)
@@ -316,5 +312,5 @@ void EffectMgr::getfromXML(XMLwrapper *xml)
         }
         xml->exitbranch();
     }
-    Cleanup();
+    cleanup();
 }

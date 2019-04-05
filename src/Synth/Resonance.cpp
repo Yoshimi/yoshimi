@@ -24,15 +24,16 @@
 #include <cmath>
 
 #include "Misc/Util.h"
+#include "Misc/Master.h"
 #include "Synth/Resonance.h"
 
 Resonance::Resonance() : Presets()
 {
-    setPresetType("Presonance");
-    setDefaults();
+    setpresettype("Presonance");
+    defaults();
 }
 
-void Resonance::defaults()
+void Resonance::defaults(void)
 {
     Penabled = 0;
     PmaxdB = 20;
@@ -46,7 +47,7 @@ void Resonance::defaults()
 }
 
 // Set a point of resonance function with a value
-void Resonance::setPoint(int n, unsigned char p)
+void Resonance::setpoint(int n, unsigned char p)
 {
     if (n < 0 || n >= N_RES_POINTS)
         return;
@@ -54,13 +55,13 @@ void Resonance::setPoint(int n, unsigned char p)
 }
 
 // Apply the resonance to FFT data
-void Resonance::applyRes(int n, FFTFREQS fftdata, float freq)
+void Resonance::applyres(int n, FFTFREQS fftdata, float freq)
 {
     if (Penabled == 0)
         return; // if the resonance is disabled
     float sum = 0.0;
-    float l1 = logf(getFreqX(0.0) * ctlcenter);
-    float l2 = logf(2.0) * getOctavesFreq() * ctlbw;
+    float l1 = logf(getfreqx(0.0) * ctlcenter);
+    float l2 = logf(2.0f) * getoctavesfreq() * ctlbw;
 
     for (int i = 0; i < N_RES_POINTS; ++i)
         if (sum < Prespoints[i])
@@ -85,7 +86,7 @@ void Resonance::applyRes(int n, FFTFREQS fftdata, float freq)
         if (kx2 >= N_RES_POINTS)
             kx2 = N_RES_POINTS - 1;
         float y = (Prespoints[kx1] * (1.0 - dx) + Prespoints[kx2] * dx) / 127.0 - sum / 127.0;
-        y = powf(10.0, y * PmaxdB / 20.0);
+        y = powf(10.0f, y * PmaxdB / 20.0);
         if (Pprotectthefundamental != 0 && i == 1)
             y = 1.0;
         fftdata.c[i] *= y;
@@ -94,10 +95,10 @@ void Resonance::applyRes(int n, FFTFREQS fftdata, float freq)
 }
 
 // Gets the response at the frequency "freq"
-float Resonance::getFreqResponse(float freq)
+float Resonance::getfreqresponse(float freq)
 {
-    float l1 = logf(getFreqX(0.0) * ctlcenter);
-    float l2 = logf(2.0) * getOctavesFreq() * ctlbw, sum = 0.0;
+    float l1 = logf(getfreqx(0.0) * ctlcenter);
+    float l2 = logf(2.0f) * getoctavesfreq() * ctlbw, sum = 0.0;
 
     for (int i = 0; i < N_RES_POINTS; ++i)
         if (sum < Prespoints[i])
@@ -120,7 +121,7 @@ float Resonance::getFreqResponse(float freq)
         kx2 = N_RES_POINTS - 1;
     float result = (Prespoints[kx1] * (1.0 - dx) + Prespoints[kx2] * dx)
                          / 127.0 - sum / 127.0;
-    result = powf(10.0, result * PmaxdB / 20.0);
+    result = powf(10.0f, result * PmaxdB / 20.0);
     return result;
 }
 
@@ -146,22 +147,22 @@ void Resonance::smooth()
 // Randomize the resonance function
 void Resonance::randomize(int type)
 {
-    int r = (int)(RND * 127.0);
+    int r = (int)(zynMaster->numRandom() * 127.0f);
     for (int i = 0; i < N_RES_POINTS; ++i)
     {
         Prespoints[i] = r;
-        if (RND < 0.1 && type == 0)
-            r = (int)(RND * 127.0);
-        if (RND < 0.3 && type == 1)
-            r = (int)(RND * 127.0);
+        if (zynMaster->numRandom() < 0.1f && type == 0)
+            r = (zynMaster->numRandom() * 127.0f);
+        if (zynMaster->numRandom() < 0.3f && type == 1)
+            r = (zynMaster->numRandom() * 127.0f);
         if (type == 2)
-            r = (int)(RND * 127.0);
+            r = (zynMaster->numRandom() * 127.0f);
     }
     smooth();
 }
 
 // Interpolate the peaks
-void Resonance::interpolatePeaks(int type)
+void Resonance::interpolatepeaks(int type)
 {
     int x1 = 0, y1 = Prespoints[0];
     for (int i = 1; i < N_RES_POINTS; ++i)
@@ -183,33 +184,33 @@ void Resonance::interpolatePeaks(int type)
 }
 
 // Get the frequency from x, where x is [0..1]; x is the x coordinate
-float Resonance::getFreqX(float x)
+float Resonance::getfreqx(float x)
 {
     if (x > 1.0)
         x = 1.0;
-    float octf = powf(2.0, getOctavesFreq());
-    return (getCenterFreq() / sqrtf(octf) * powf(octf, x));
+    float octf = powf(2.0f, getoctavesfreq());
+    return (getcenterfreq() / sqrtf(octf) * powf(octf, x));
 }
 
 // Get the x coordinate from frequency (used by the UI)
-float Resonance::getFreqPos(float freq)
+float Resonance::getfreqpos(float freq)
 {
-    return (logf(freq) - logf(getFreqX(0.0))) / logf(2.0) / getOctavesFreq();
+    return (logf(freq) - logf(getfreqx(0.0))) / logf(2.0f) / getoctavesfreq();
 }
 
 // Get the center frequency of the resonance graph
-float Resonance::getCenterFreq()
+float Resonance::getcenterfreq(void)
 {
-    return 10000.0 * powf(10, -(1.0 - Pcenterfreq / 127.0) * 2.0);
+    return 10000.0 * powf(10.0f, -(1.0f - Pcenterfreq / 127.0f) * 2.0f);
 }
 
 // Get the number of octave that the resonance functions applies to
-float Resonance::getOctavesFreq()
+float Resonance::getoctavesfreq(void)
 {
     return 0.25 + 10.0 * Poctavesfreq / 127.0;
 }
 
-void Resonance::sendController(MidiControllers ctl, float par)
+void Resonance::sendcontroller(MidiControllers ctl, float par)
 {
     if (ctl == C_resonance_center)
         ctlcenter = par;

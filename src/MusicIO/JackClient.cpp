@@ -1,7 +1,7 @@
 /*
     JackClient.cpp
 
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,36 +17,45 @@
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
-
-using namespace std;
-
 #include "Misc/Config.h"
 #include "MusicIO/JackClient.h"
 
-bool JackClient::openAudio(void)
+bool JackClient::openAudio(WavRecord *recorder)
 {
-    if (jackEngine.connectServer(Runtime.settings.audioDevice))
+    if (!jackEngine.isConnected()
+        && !jackEngine.connectServer(Runtime.audioDevice))
     {
-        if (jackEngine.openAudio())
-        {
-            Runtime.settings.Samplerate = getSamplerate();
-            Runtime.settings.Buffersize = getBuffersize();
-            return true;
-        }
-        else
-            cerr << "Error, failed to register audio" << endl;
+        Runtime.Log("Failed to connect to jack server");
+        return false;  
+    }
+    if (jackEngine.openAudio(recorder))
+    {
+        Runtime.Samplerate = getSamplerate();
+        Runtime.Buffersize = getBuffersize();
+        return true;
     }
     else
-        cerr << "Error, failed to connect to jack server" << endl;
+        Runtime.Log("Failed to register audio");
     return false;
 }
 
-bool JackClient::openMidi(void)
+bool JackClient::openMidi(WavRecord *recorder)
 {
-    if (jackEngine.connectServer(Runtime.settings.midiDevice))
-        if (jackEngine.openMidi())
-            return true;
-    cerr << "Error, JackClient failed to open midi" << endl;
+    if (!jackEngine.isConnected()
+        && !jackEngine.connectServer(Runtime.midiDevice))
+    {
+        Runtime.Log("Failed to connect to jack server");
+        return false;  
+    }
+    if (jackEngine.openMidi(recorder))
+        return true;
+    else
+        Runtime.Log("JackClient failed to open midi");
     return false;
+}
+
+
+void JackClient::Close(void)
+{
+    jackEngine.Close();
 }

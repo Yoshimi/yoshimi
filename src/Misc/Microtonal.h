@@ -37,8 +37,8 @@ class Microtonal
     public:
         Microtonal() { };
         ~Microtonal() { };
-        void setDefaults();
-        float getNoteFreq(int note, int keyshift);
+        void defaults(void);
+        float getnotefreq(int note, int keyshift);
 
         // Parameters
         unsigned char Pinvertupdown;
@@ -66,12 +66,12 @@ class Microtonal
         unsigned char Pglobalfinedetune;
 
         // Functions
-        unsigned char getOctaveSize();
-        void tuningToLine(int n, char *line, int maxn);
-        int loadScl(string filename); // load the tunnings from a .scl file
-        int loadKbm(string filename); // load the mapping from .kbm file
-        int textToTunings(const char *text);
-        void textToMapping(const char *text);
+        unsigned char getoctavesize(void);
+        void tuningtoline(int n, char *line, int maxn);
+        int loadscl(string filename); // load the tunnings from a .scl file
+        int loadkbm(string filename); // load the mapping from .kbm file
+        int texttotunings(const char *text);
+        void texttomapping(const char *text);
         string Pname;
         string Pcomment;
 
@@ -81,8 +81,8 @@ class Microtonal
         bool loadXML(string filename);
 
     private:
-        int lineToTunings(unsigned int nline, const char *line);
-        int loadLine(FILE *file, char *line);
+        int linetotunings(unsigned int nline, const char *line);
+        int loadline(FILE *file, char *line);
             // loads a line from the text file,
             // ignoring the lines beggining with "!"
         unsigned char octavesize;

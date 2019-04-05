@@ -2,8 +2,8 @@
     Reverb.h - Reverberation effect
 
     Original ZynAddSubFX author Nasca Octavian Paul
-    Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009, Alan Calvert
+    Copyright (C) 2002-2009 Nasca Octavian Paul
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,16 +18,13 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified October 2009
+    This file is a derivative of the ZynAddSubFX original, modified January 2010
 */
 
 #ifndef REVERB_H
 #define REVERB_H
 
-
-#include "globals.h"
 #include "DSP/AnalogFilter.h"
-#include "DSP/Unison.h"
 #include "Effects/Effect.h"
 
 #define REV_COMBS 8
@@ -39,13 +36,26 @@ class Reverb : public Effect
         Reverb(bool insertion_, float *efxoutl_, float *efxoutr_);
         ~Reverb();
         void out(float *smps_l, float *smps_r);
-        void Cleanup(void);
+        void cleanup(void);
     
-        void setPreset(unsigned char npreset);
-        void changePar(int npar, unsigned char value);
-        unsigned char getPar(int npar) const;
+        void setpreset(unsigned char npreset);
+        void changepar(int npar, unsigned char value);
+        unsigned char getpar(int npar);
     
     private:
+        void setvolume(unsigned char Pvolume_);
+        void setpan(unsigned char Ppan_);
+        void settime(unsigned char Ptime_);
+        void setlohidamp(unsigned char Plohidamp_);
+        void setidelay(unsigned char Pidelay_);
+        void setidelayfb(unsigned char Pidelayfb_);
+        void sethpf(unsigned char Phpf_);
+        void setlpf(unsigned char Plpf_);
+        void settype( unsigned char Ptype_);
+        void setroomsize(unsigned char Proomsize_);
+
+        void processmono(int ch, float *output);
+
         // Parametrii
         unsigned char Pvolume;
         unsigned char Ppan;
@@ -56,54 +66,39 @@ class Reverb : public Effect
         unsigned char Perbalance;
         unsigned char Plpf;
         unsigned char Phpf;
-              // todo 0..63 lpf,64=off,65..127=hpf(TODO)
+            // todo 0..63 lpf,64=off,65..127=hpf(TODO)
         unsigned char Plohidamp;
         unsigned char Ptype;
         unsigned char Proomsize;
-        unsigned char Pbandwidth;
 
-        // parameter control
-        void setVolume(unsigned char Pvolume_);
-        void setPan(unsigned char Ppan_);
-        void setTime(unsigned char Ptime_);
-        void setLoHiDamp(unsigned char Plohidamp_);
-        void setIdelay(unsigned char Pidelay_);
-        void setIdelayFb(unsigned char Pidelayfb_);
-        void setHpf(unsigned char Phpf_);
-        void setLpf(unsigned char Plpf_);
-        void setType( unsigned char Ptype_);
-        void setRoomsize(unsigned char Proomsize_);
-        void setBandwidth(unsigned char Pbandwidth_);
-    
         float pan, erbalance;
+
         // Parametrii 2
-        int lohidamptype; // <0=disable,1=highdamp(lowpass),2=lowdamp(highpass)
-        int idelaylen, rdelaylen;
-        int idelayk;
+        int   lohidamptype; // <0=disable,1=highdamp(lowpass),2=lowdamp(highpass)
+        int   idelaylen, rdelaylen;
+        int   idelayk;
         float lohifb;
         float idelayfb;
         float roomsize;
         float rs; // rs is used to "normalise" the volume according to the roomsize
-        int comblen[REV_COMBS * 2];
-        int aplen[REV_APS * 2];
-        Unison *bandwidth;
-
+        int   comblen[REV_COMBS * 2];
+        int   aplen[REV_APS * 2];
+    
         // Internal Variables
         float *comb[REV_COMBS * 2];
-        int combk[REV_COMBS * 2];
-        float combfb[REV_COMBS * 2];// <feedback-ul fiecarui filtru "comb"
-        float lpcomb[REV_COMBS * 2];  // <pentru Filtrul LowPass
+        int    combk[REV_COMBS * 2];
+        float  combfb[REV_COMBS * 2];// <feedback-ul fiecarui filtru "comb"
+        float  lpcomb[REV_COMBS * 2];  // <pentru Filtrul LowPass
     
         float *ap[REV_APS * 2];
     
         int apk[REV_APS * 2];
     
         float *idelay;
-        AnalogFilter *lpf, *hpf; // filters
         float *inputbuf;
+        AnalogFilter *lpf; // filters
+        AnalogFilter *hpf;
     
-        void processMono(int ch, float *output);
-
         int buffersize;
 };
 

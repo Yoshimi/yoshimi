@@ -35,7 +35,7 @@ class LFOParams : public Presets
         ~LFOParams() { };
 
         void add2XML(XMLwrapper *xml);
-        void setDefaults(void) { defaults(); };
+        void defaults(void);
         void getfromXML(XMLwrapper *xml);
 
         // MIDI Parameters
@@ -54,7 +54,6 @@ class LFOParams : public Presets
         static int time; // is used by Pcontinous parameter
 
     private:
-        void defaults(void);
         // Default parameters
         unsigned char Dfreq;
         unsigned char Dintensity;

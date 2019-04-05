@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified October 2009
+    This file is a derivative of the ZynAddSubFX original, modified January 2010
 */
 
 #include "Misc/Util.h"
@@ -32,9 +32,9 @@ Phaser::Phaser(bool insertion_, float *efxoutl_, float *efxoutr_) :
     oldl(NULL),
     oldr(NULL)
 {
-    setPreset(Ppreset);
-    Cleanup();
-};
+    setpreset(Ppreset);
+    cleanup();
+}
 
 
 Phaser::~Phaser()
@@ -52,7 +52,7 @@ void Phaser::out(float *smpsl, float *smpsr)
     //int j;
     float lfol, lfor, lgain, rgain, tmp;
 
-    lfo.effectLfoOut(&lfol, &lfor);
+    lfo.effectlfoout(&lfol, &lfor);
     lgain = lfol;
     rgain = lfor;
     lgain = (expf(lgain * PHASER_LFO_SHAPE) - 1)
@@ -73,8 +73,8 @@ void Phaser::out(float *smpsl, float *smpsr)
         float x1 = 1.0 - x;
         float gl = lgain * x + oldlgain * x1;
         float gr = rgain * x + oldrgain * x1;
-        float inl = smpsl[i] * panning + fbl;
-        float inr = smpsr[i] * (1.0 - panning) + fbr;
+        float inl = smpsl[i] * (1.0 - panning) + fbl;
+        float inr = smpsr[i] * panning + fbr;
 
         // Phasing routine
         for (int j = 0; j < Pstages * 2; ++j)
@@ -111,7 +111,7 @@ void Phaser::out(float *smpsl, float *smpsr)
 
 
 // Cleanup the effect
-void Phaser::Cleanup(void)
+void Phaser::cleanup(void)
 {
     fbl = fbr = oldlgain = oldrgain = 0.0;
     for (int i = 0; i < Pstages * 2; ++i)
@@ -120,62 +120,62 @@ void Phaser::Cleanup(void)
 
 
 // Parameter control
-void Phaser::setDepth(unsigned char _depth)
+void Phaser::setdepth(unsigned char Pdepth_)
 {
-    Pdepth = _depth;
+    Pdepth = Pdepth_;
     depth = Pdepth / 127.0;
 }
 
 
-void Phaser::setFb(unsigned char _fb)
+void Phaser::setfb(unsigned char Pfb_)
 {
-    Pfb = _fb;
+    Pfb = Pfb_;
     fb = (Pfb - 64.0) / 64.1;
 }
 
 
-void Phaser::setVolume(unsigned char _volume)
+void Phaser::setvolume(unsigned char Pvolume_)
 {
-    Pvolume = _volume;
+    Pvolume = Pvolume_;
     outvolume = Pvolume / 127.0;
     volume = (!insertion) ? 1.0 : outvolume;
 }
 
 
-void Phaser::setPanning(unsigned char _panning)
+void Phaser::setpanning(unsigned char Ppanning_)
 {
-    Ppanning = _panning;
+    Ppanning = Ppanning_;
     panning = Ppanning / 127.0;
 }
 
-void Phaser::setLrCross(unsigned char _lrcross)
+void Phaser::setlrcross(unsigned char Plrcross_)
 {
-    Plrcross = _lrcross;
+    Plrcross = Plrcross_;
     lrcross = Plrcross / 127.0;
 }
 
 
-void Phaser::setStages(unsigned char _stages)
+void Phaser::setstages(unsigned char Pstages_)
 {
     if (oldl != NULL)
         delete [] oldl;
     if (oldr != NULL)
         delete [] oldr;
-    Pstages = (_stages >= MAX_PHASER_STAGES) ? MAX_PHASER_STAGES - 1 : _stages;
+    Pstages = (Pstages_ >= MAX_PHASER_STAGES) ? MAX_PHASER_STAGES - 1 : Pstages_;
     oldl = new float[Pstages * 2];
     oldr = new float[Pstages * 2];
-    Cleanup();
+    cleanup();
 }
 
 
-void Phaser::setPhase(unsigned char _phase)
+void Phaser::setphase(unsigned char Pphase_)
 {
-    Pphase = _phase;
+    Pphase = Pphase_;
     phase = Pphase / 127.0;
 }
 
 
-void Phaser::setPreset(unsigned char npreset)
+void Phaser::setpreset(unsigned char npreset)
 {
     const int PRESET_SIZE = 12;
     const int NUM_PRESETS = 6;
@@ -196,60 +196,60 @@ void Phaser::setPreset(unsigned char npreset)
     if (npreset >= NUM_PRESETS)
         npreset = NUM_PRESETS - 1;
     for (int n = 0; n < PRESET_SIZE; ++n)
-        changePar(n, presets[npreset][n]);
+        changepar(n, presets[npreset][n]);
     Ppreset = npreset;
 }
 
 
-void Phaser::changePar(int npar, unsigned char value)
+void Phaser::changepar(int npar, unsigned char value)
 {
     switch (npar)
     {
         case 0:
-            setVolume(value);
+            setvolume(value);
             break;
         case 1:
-            setPanning(value);
+            setpanning(value);
             break;
         case 2:
             lfo.Pfreq = value;
-            lfo.updateParams();
+            lfo.updateparams();
             break;
         case 3:
             lfo.Prandomness = value;
-            lfo.updateParams();
+            lfo.updateparams();
             break;
         case 4:
             lfo.PLFOtype = value;
-            lfo.updateParams();
+            lfo.updateparams();
             break;
         case 5:
             lfo.Pstereo = value;
-            lfo.updateParams();
+            lfo.updateparams();
             break;
         case 6:
-            setDepth(value);
+            setdepth(value);
             break;
         case 7:
-            setFb(value);
+            setfb(value);
             break;
         case 8:
-            setStages(value);
+            setstages(value);
             break;
         case 9:
-            setLrCross(value);
+            setlrcross(value);
             break;
         case 10:
             Poutsub = (value > 1) ? 1 : value;
             break;
         case 11:
-            setPhase(value);
+            setphase(value);
             break;
     }
 }
 
 
-unsigned char Phaser::getPar(int npar) const
+unsigned char Phaser::getpar(int npar)
 {
     switch (npar)
     {

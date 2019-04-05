@@ -37,17 +37,17 @@ Filter::Filter(FilterParams *pars)
             filter = new FormantFilter(pars);
             break;
         case 2:
-            filter = new SVFilter(Ftype, 1000.0, pars->getQ(), Fstages);
-            filter->outgain = dB2rap(pars->getGain());
+            filter = new SVFilter(Ftype, 1000.0, pars->getq(), Fstages);
+            filter->outgain = dB2rap(pars->getgain());
             if (filter->outgain > 1.0)
                 filter->outgain = sqrtf(filter->outgain);
             break;
         default:
-            filter = new AnalogFilter(Ftype, 1000.0, pars->getQ(), Fstages);
+            filter = new AnalogFilter(Ftype, 1000.0, pars->getq(), Fstages);
             if (Ftype >= 6 && Ftype <= 8)
-                filter->setGain(pars->getGain());
+                filter->setgain(pars->getgain());
             else
-                filter->outgain = dB2rap(pars->getGain());
+                filter->outgain = dB2rap(pars->getgain());
             break;
     }
 }
@@ -57,27 +57,27 @@ Filter::~Filter()
     delete (filter);
 }
 
-void Filter::filterOut(float *smp)
+void Filter::filterout(float *smp)
 {
-    filter->filterOut(smp);
+    filter->filterout(smp);
 }
 
-void Filter::setFreq(float frequency)
+void Filter::setfreq(float frequency)
 {
-    filter->setFreq(frequency);
+    filter->setfreq(frequency);
 }
 
-void Filter::setFreq_and_Q(float frequency, float q_)
+void Filter::setfreq_and_q(float frequency, float q_)
 {
-    filter->setFreq_and_Q(frequency, q_);
+    filter->setfreq_and_q(frequency, q_);
 }
 
-void Filter::setQ(float q_)
+void Filter::setq(float q_)
 {
-    filter->setQ(q_);
+    filter->setq(q_);
 }
 
-float Filter::getRealFreq(float freqpitch)
+float Filter::getrealfreq(float freqpitch)
 {
     if (category == 0 || category == 2)
         return powf(2.0, freqpitch + 9.96578428); // log2(1000)=9.95748

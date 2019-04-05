@@ -31,21 +31,22 @@ class Presets
 {
     public:
         Presets();
-        virtual ~Presets();
-        void Copy(const char *name); // <if name==NULL, the clipboard is used
-        void Paste(int npreset);     // npreset==0 for clipboard
-        bool checkClipboardType();
-        void deletePreset(int npreset);
+        virtual ~Presets() { };
+
+        void copy(const char *name); // <if name==NULL, the clipboard is used
+        void paste(int npreset);     // npreset==0 for clipboard
+        bool checkclipboardtype();
+        void deletepreset(int npreset);
 
         char type[MAX_PRESETTYPE_SIZE];
-        void setElement(int n);
-        void rescanPresets();
+        void setelement(int n);
+        void rescanforpresets(void);
         unsigned int getSamplerate(void) { return samplerate; };
         int getBuffersize(void) { return buffersize; };
         int getOscilsize(void) { return oscilsize; };
 
     protected:
-        void setPresetType(const char *type);
+        void setpresettype(const char *type);
         unsigned int samplerate;
         int buffersize;
         int oscilsize;
@@ -54,7 +55,7 @@ class Presets
     private:
         virtual void add2XML(XMLwrapper *xml) = 0;
         virtual void getfromXML(XMLwrapper *xml) = 0;
-        virtual void setDefaults(void) = 0;
+        virtual void defaults(void) = 0;
         virtual void add2XMLsection(XMLwrapper *xml, int n) { };
         virtual void getfromXMLsection(XMLwrapper *xml, int n) { };
         virtual void defaults(int n) { };

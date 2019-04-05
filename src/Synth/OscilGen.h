@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,13 +18,14 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified October 2009
+    This file is a derivative of the ZynAddSubFX original, modified January 2010
 */
 
 #ifndef OSCIL_GEN_H
 #define OSCIL_GEN_H
 
-#include "globals.h"
+#include <limits.h>
+
 #include "Misc/XMLwrapper.h"
 #include "DSP/FFTwrapper.h"
 #include "Params/Presets.h"
@@ -52,10 +53,14 @@ class OscilGen : public Presets
         void useasbase(void);
 
         void add2XML(XMLwrapper *xml);
-        void setDefaults(void) { defaults(); };
+        void defaults(void);
         void getfromXML(XMLwrapper *xml);
 
         void convert2sine(int magtype);
+
+        // Make a new random seed for Amplitude Randomness -
+        //   should be called every noteon event
+        inline void newrandseed(void) { randseed = (unsigned int)random(); };
 
         // Parameters
 
@@ -66,15 +71,8 @@ class OscilGen : public Presets
         unsigned char Phmag[MAX_AD_HARMONICS], Phphase[MAX_AD_HARMONICS];
         // the MIDI parameters for mag. and phases
 
-
-        /**The Type of magnitude:
-         *   0 - Linear
-         *   1 - dB scale (-40)
-         *   2 - dB scale (-60)
-         *   3 - dB scale (-80)
-         *   4 - dB scale (-100)*/
-        unsigned char Phmagtype;
-
+        unsigned char Phmagtype; // 0 - Linear, 1 - dB scale (-40), 2 - dB scale (-60)
+                                 // 3 - dB scale (-80), 4 - dB scale (-100)
         unsigned char Pcurrentbasefunc; // The base function used - 0=sin, 1=...
         unsigned char Pbasefuncpar; // the parameter of the base function
 
@@ -85,11 +83,9 @@ class OscilGen : public Presets
                       Pbasefuncmodulationpar3; // the parameter of the base
                                                // function modulation
 
-        // the Randomness:
-        //  64 = no randomness
-        //  63..0 - block type randomness - 0 is maximum
-        //  65..127 - each harmonic randomness - 127 is maximum
-        unsigned char Prand;
+        unsigned char Prand; // 64 = no randomness
+                             // 63..0 - block type randomness - 0 is maximum
+                             // 65..127 - each harmonic randomness - 127 is maximum
         unsigned char Pwaveshaping, Pwaveshapingfunction;
         unsigned char Pfiltertype, Pfilterpar1, Pfilterpar2;
         unsigned char Pfilterbeforews;
@@ -114,19 +110,16 @@ class OscilGen : public Presets
                       Pmodulationpar2,
                       Pmodulationpar3; // the parameter of the parameters
 
-        // makes a new random seed for Amplitude Randomness
-        // this should be called every note on event
-        void newrandseed(unsigned int randseed);
-
         bool ADvsPAD; // if it is used by ADsynth or by PADsynth
 
         static float *tmpsmps; // this array stores some temporary data
                                      // and it has SOUND_BUFFER_SIZE elements
         static FFTFREQS outoscilFFTfreqs;
 
+        float numRandom(void);
+        unsigned int random(void);
+        
     private:
-        void defaults(void);
-
         float hmag[MAX_AD_HARMONICS], hphase[MAX_AD_HARMONICS];
         // the magnituides and the phases of the sine/nonsine harmonics
 
@@ -171,6 +164,8 @@ class OscilGen : public Presets
         float basefunc_chebyshev(float x, float a);
         float basefunc_sqr(float x, float a);
 
+        float harmonicRandom(void);
+
         // Internal Data
         unsigned char oldbasefunc,
                       oldbasepar,
@@ -203,7 +198,49 @@ class OscilGen : public Presets
         Resonance *res;
 
         unsigned int randseed;
-        static int active_count;
+
+        float random_0_1;
+        int32_t random_result;
+        static struct random_data random_buf;
+        static char random_state[];
+
+        float harmonic_random_0_1;
+        int32_t harmonic_random_result;
+        static struct random_data harmonic_random_buf;
+        static char harmonic_random_state[];
 };
+
+
+inline float OscilGen::numRandom(void)
+{
+    if (!random_r(&random_buf, &random_result))
+    {
+        random_0_1 = (float)random_result / (float)INT_MAX;
+        random_0_1 = (random_0_1 > 1.0f) ? 1.0f : random_0_1;
+        random_0_1 = (random_0_1 < 0.0f) ? 0.0f : random_0_1;
+        return random_0_1;
+    }
+    return 0.05f;
+}
+
+
+inline float OscilGen::harmonicRandom(void)
+{
+    if (!random_r(&harmonic_random_buf, &harmonic_random_result))
+    {
+        harmonic_random_0_1 = (float)harmonic_random_result / (float)INT_MAX;
+        harmonic_random_0_1 = (harmonic_random_0_1 > 1.0f) ? 1.0f : harmonic_random_0_1;
+        harmonic_random_0_1 = (harmonic_random_0_1 < 0.0f) ? 0.0f : harmonic_random_0_1;
+        return harmonic_random_0_1;
+    }
+    return 0.05f;
+}
+
+inline unsigned int OscilGen::random(void)
+{
+    if (!random_r(&random_buf, &random_result))
+        return random_result + INT_MAX / 2;
+    return INT_MAX;
+}
 
 #endif

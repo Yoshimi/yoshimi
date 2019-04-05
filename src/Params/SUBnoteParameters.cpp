@@ -21,12 +21,11 @@
     This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
-#include "globals.h"
 #include "Params/SUBnoteParameters.h"
 
 SUBnoteParameters::SUBnoteParameters() : Presets()
 {
-    setPresetType("Psubsyth");
+    setpresettype("Psubsyth");
     AmpEnvelope = new EnvelopeParams(64, 1);
     AmpEnvelope->ADSRinit_dB(0, 40, 127, 25);
     FreqEnvelope = new EnvelopeParams(64, 0);
@@ -37,7 +36,7 @@ SUBnoteParameters::SUBnoteParameters() : Presets()
     GlobalFilter = new FilterParams(2, 80, 40);
     GlobalFilterEnvelope = new EnvelopeParams(0, 1);
     GlobalFilterEnvelope->ADSRinit_filter(64, 40, 64, 70, 60, 64);
-    setDefaults();
+    defaults();
 }
 
 void SUBnoteParameters::defaults(void)
@@ -52,7 +51,7 @@ void SUBnoteParameters::defaults(void)
     Pbandwidth = 40;
     Phmagtype = 0;
     Pbwscale = 64;
-    Pstereo = 1;
+    Pstereo = true;
     Pstart = 1;
 
     PDetune = 8192;
@@ -72,11 +71,11 @@ void SUBnoteParameters::defaults(void)
     PGlobalFilterVelocityScale = 64;
     PGlobalFilterVelocityScaleFunction = 64;
 
-    AmpEnvelope->setDefaults();
-    FreqEnvelope->setDefaults();
-    BandWidthEnvelope->setDefaults();
-    GlobalFilter->setDefaults();
-    GlobalFilterEnvelope->setDefaults();
+    AmpEnvelope->defaults();
+    FreqEnvelope->defaults();
+    BandWidthEnvelope->defaults();
+    GlobalFilter->defaults();
+    GlobalFilterEnvelope->defaults();
 }
 
 SUBnoteParameters::~SUBnoteParameters()
@@ -105,7 +104,7 @@ void SUBnoteParameters::add2XML(XMLwrapper *xml)
     xml->endbranch();
 
     xml->beginbranch("AMPLITUDE_PARAMETERS");
-    xml->addparbool("stereo",Pstereo);
+    xml->addparbool("stereo", (Pstereo) ? 1 : 0);
     xml->addpar("volume",PVolume);
     xml->addpar("panning",PPanning);
     xml->addpar("velocity_sensing",PAmpVelocityScaleFunction);
@@ -174,8 +173,10 @@ void SUBnoteParameters::getfromXML(XMLwrapper *xml)
         xml->exitbranch();
     }
 
-    if (xml->enterbranch("AMPLITUDE_PARAMETERS")) {
-        Pstereo=xml->getparbool("stereo",Pstereo);
+    if (xml->enterbranch("AMPLITUDE_PARAMETERS"))
+    {
+        int xpar = xml->getparbool("stereo", (Pstereo) ? 1 : 0);
+        Pstereo = (xpar != 0) ? true : false;
         PVolume=xml->getpar127("volume",PVolume);
         PPanning=xml->getpar127("panning",PPanning);
         PAmpVelocityScaleFunction=xml->getpar127("velocity_sensing",PAmpVelocityScaleFunction);

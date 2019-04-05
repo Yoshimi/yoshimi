@@ -36,22 +36,22 @@ class Resonance : public Presets
     public:
         Resonance();
         ~Resonance() { };
-        void setPoint(int n, unsigned char p);
-        void applyRes(int n, FFTFREQS fftdata, float freq);
+        void setpoint(int n, unsigned char p);
+        void applyres(int n, FFTFREQS fftdata, float freq);
         void smooth(void);
-        void interpolatePeaks(int type);
+        void interpolatepeaks(int type);
         void randomize(int type);
 
         void add2XML(XMLwrapper *xml);
-        void setDefaults(void) { defaults(); };
+        void defaults(void);
         void getfromXML(XMLwrapper *xml);
 
-        float getFreqPos(float freq);
-        float getFreqX(float x);
-        float getFreqResponse(float freq);
-        float getCenterFreq(void);
-        float getOctavesFreq(void);
-        void sendController(MidiControllers ctl, float par);
+        float getfreqpos(float freq);
+        float getfreqx(float x);
+        float getfreqresponse(float freq);
+        float getcenterfreq(void);
+        float getoctavesfreq(void);
+        void sendcontroller(MidiControllers ctl, float par);
 
         // parameters
         unsigned char Penabled;                 //if the ressonance is enabled
@@ -63,9 +63,6 @@ class Resonance : public Presets
         // controllers
         float ctlcenter; // center frequency(relative)
         float ctlbw;     // bandwidth(relative)
-
-    private:
-        void defaults(void);
 };
 
 #endif

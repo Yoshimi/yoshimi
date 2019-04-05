@@ -34,12 +34,12 @@ class Effect
                FilterParams *filterpars_, unsigned char Ppreset_);
         virtual ~Effect() { };
 
-        virtual void setPreset(unsigned char npreset) = 0;
-        virtual void changePar(int npar, unsigned char value) = 0;
-        virtual unsigned char getPar(int npar) const = 0;
+        virtual void setpreset(unsigned char npreset) = 0;
+        virtual void changepar(int npar, unsigned char value) = 0;
+        virtual unsigned char getpar(int npar) = 0;
         virtual void out(float *smpsl, float *smpsr) = 0;
-        virtual void Cleanup() { };
-        virtual float getFreqResponse(float freq) { return (0); };
+        virtual void cleanup() { };
+        virtual float getfreqresponse(float freq) { return (0); };
 
         unsigned char Ppreset; // Currentl preset
         float *const efxoutl;

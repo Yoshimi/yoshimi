@@ -24,7 +24,6 @@
 #ifndef DYNAMICFILTER_H
 #define DYNAMICFILTER_H
 
-#include "globals.h"
 #include "DSP/Filter.h"
 #include "Effects/EffectLFO.h"
 #include "Effects/Effect.h"
@@ -36,10 +35,10 @@ class DynamicFilter : public Effect
         ~DynamicFilter();
         void out(float *smpsl, float *smpsr);
 
-        void setPreset(unsigned char npreset);
-        void changePar(int npar, unsigned char value);
-        unsigned char getPar(int npar) const;
-        void Cleanup(void);
+        void setpreset(unsigned char npreset);
+        void changepar(int npar, unsigned char value);
+        unsigned char getpar(int npar);
+        void cleanup(void);
 
     //	void setdryonly();
 
@@ -54,11 +53,11 @@ class DynamicFilter : public Effect
         unsigned char Pampsmooth; // how smooth the input amplitude changes the filter
 
         // Parameter Control
-        void setVolume(unsigned char _volume);
-        void setPanning(unsigned char _panning);
-        void setDepth(unsigned char _depth);
-        void setAmpsns(unsigned char _ampsns);
-        void reinitFilter(void);
+        void setvolume(unsigned char Pvolume_);
+        void setpanning(unsigned char Ppanning_);
+        void setdepth(unsigned char Pdepth_);
+        void setampsns(unsigned char Pampsns_);
+        void reinitfilter(void);
 
         // Internal Values
         float panning, depth, ampsns, ampsmooth;

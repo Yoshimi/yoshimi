@@ -34,11 +34,11 @@ class Filter
     public:
         Filter(FilterParams *pars);
         ~Filter();
-        void filterOut(float *smp);
-        void setFreq(float frequency);
-        void setFreq_and_Q(float frequency, float q_);
-        void setQ(float q_);
-        float getRealFreq(float freqpitch);
+        void filterout(float *smp);
+        void setfreq(float frequency);
+        void setfreq_and_q(float frequency, float q_);
+        void setq(float q_);
+        float getrealfreq(float freqpitch);
 
     private:
         Filter_ *filter;

@@ -29,7 +29,7 @@
 
 PADnoteParameters::PADnoteParameters(FFTwrapper *fft_) : Presets()
 {
-    setPresetType("Ppadsyth");
+    setpresettype("Ppadsyth");
     fft = fft_;
 
     resonance = new Resonance();
@@ -52,12 +52,12 @@ PADnoteParameters::PADnoteParameters(FFTwrapper *fft_) : Presets()
     for (int i = 0; i < PAD_MAX_SAMPLES; ++i)
         sample[i].smp = NULL;
     newsample.smp = NULL;
-    setDefaults();
+    defaults();
 }
 
 PADnoteParameters::~PADnoteParameters()
 {
-    deleteSamples();
+    deletesamples();
     delete(oscilgen);
     delete(resonance);
     delete(FreqEnvelope);
@@ -70,7 +70,7 @@ PADnoteParameters::~PADnoteParameters()
 
 }
 
-void PADnoteParameters::defaults()
+void PADnoteParameters::defaults(void)
 {
     Pmode = 0;
     Php.base.type = 0;
@@ -89,8 +89,8 @@ void PADnoteParameters::defaults()
     setPbandwidth(500);
     Pbwscale = 0;
 
-    resonance->setDefaults();
-    oscilgen->setDefaults();
+    resonance->defaults();
+    oscilgen->defaults();
 
     Phrpos.type = 0;
     Phrpos.par1 = 64;
@@ -109,15 +109,15 @@ void PADnoteParameters::defaults()
     PDetune = 8192; // zero
     PCoarseDetune = 0;
     PDetuneType = 1;
-    FreqEnvelope->setDefaults();
-    FreqLfo->setDefaults();
+    FreqEnvelope->defaults();
+    FreqLfo->defaults();
 
     // Amplitude Global Parameters
     PVolume = 90;
     PPanning = 64; // center
     PAmpVelocityScaleFunction = 64;
-    AmpEnvelope->setDefaults();
-    AmpLfo->setDefaults();
+    AmpEnvelope->defaults();
+    AmpLfo->defaults();
     PPunchStrength = 0;
     PPunchTime = 60;
     PPunchStretch = 64;
@@ -126,13 +126,13 @@ void PADnoteParameters::defaults()
     // Filter Global Parameters
     PFilterVelocityScale = 64;
     PFilterVelocityScaleFunction = 64;
-    GlobalFilter->setDefaults();
-    FilterEnvelope->setDefaults();
-    FilterLfo->setDefaults();
-    deleteSamples();
+    GlobalFilter->defaults();
+    FilterEnvelope->defaults();
+    FilterLfo->defaults();
+    deletesamples();
 }
 
-void PADnoteParameters::deleteSample(int n)
+void PADnoteParameters::deletesample(int n)
 {
     if (n < 0 || n >= PAD_MAX_SAMPLES)
         return;
@@ -145,27 +145,27 @@ void PADnoteParameters::deleteSample(int n)
     sample[n].basefreq = 440.0;
 }
 
-void PADnoteParameters::deleteSamples(void)
+void PADnoteParameters::deletesamples(void)
 {
     for (int i = 0; i < PAD_MAX_SAMPLES; ++i)
-        deleteSample(i);
+        deletesample(i);
 }
 
 // Get the harmonic profile (i.e. the frequency distributio of a single harmonic)
-float PADnoteParameters::getProfile(float *smp, int size)
+float PADnoteParameters::getprofile(float *smp, int size)
 {
     for (int i = 0; i < size; ++i)
         smp[i] = 0.0;
 
     const int supersample = 16;
-    float basepar = powf(2.0, ((1.0 - Php.base.par1 / 127.0) * 12.0));
-    float freqmult = floorf(powf(2.0, (Php.freqmult / 127.0 * 5.0)) + 0.000001);
+    float basepar = powf(2.0f, ((1.0f - Php.base.par1 / 127.0f) * 12.0));
+    float freqmult = floorf(powf(2.0f, (Php.freqmult / 127.0f * 5.0f)) + 0.000001);
 
-    float modfreq = floorf(powf(2.0,(Php.modulator.freq / 127.0 * 5.0)) + 0.000001);
-    float modpar1 = powf((Php.modulator.par1 / 127.0), 4.0) * 5.0 / sqrtf(modfreq);
-    float amppar1 = powf(2.0, powf((Php.amp.par1 / 127.0), 2.0) * 10.0) - 0.999;
+    float modfreq = floorf(powf(2.0f, (Php.modulator.freq / 127.0f * 5.0f)) + 0.000001);
+    float modpar1 = powf((Php.modulator.par1 / 127.0f), 4.0f) * 5.0 / sqrtf(modfreq);
+    float amppar1 = powf(2.0, powf((Php.amp.par1 / 127.0f), 2.0f) * 10.0f) - 0.999;
     float amppar2 = (1.0 - Php.amp.par2 / 127.0) * 0.998 + 0.001;
-    float width = powf((150.0 / (Php.width + 22.0)), 2.0);
+    float width = powf((150.0f / (Php.width + 22.0f)), 2.0f);
 
     for (int i = 0; i < size * supersample; ++i)
     {
@@ -231,10 +231,10 @@ float PADnoteParameters::getProfile(float *smp, int size)
             amp = expf(-(origx * origx) * 10.0 * amppar1);
             break;
         case 2:
-            amp = 0.5 * (1.0 + cosf(3.1415926 * origx * sqrtf(amppar1 * 4.0 + 1.0)));
+            amp = 0.5 * (1.0 + cosf(PI * origx * sqrtf(amppar1 * 4.0 + 1.0)));
             break;
         case 3:
-            amp = 1.0 / (powf(origx * (amppar1 * 2.0 + 0.8), 14.0) + 1.0);
+            amp = 1.0 / (powf(origx * (amppar1 * 2.0f + 0.8f), 14.0f) + 1.0);
             break;
         }
         // apply the amplitude multiplier
@@ -251,11 +251,11 @@ float PADnoteParameters::getProfile(float *smp, int size)
                 break;
             case 2:
                 finalsmp =
-                    finalsmp / (amp + powf(amppar2, 4.0) * 20.0 + 0.0001);
+                    finalsmp / (amp + powf(amppar2, 4.0f) * 20.0 + 0.0001);
                 break;
             case 3:
                 finalsmp =
-                    amp / (finalsmp + powf(amppar2, 4.0) * 20.0 + 0.0001);
+                    amp / (finalsmp + powf(amppar2, 4.0f) * 20.0 + 0.0001);
                 break;
             }
         }
@@ -303,7 +303,7 @@ float PADnoteParameters::setPbandwidth(int Pbandwidth)
 float PADnoteParameters::getNhr(int n)
 {
     float result = 1.0;
-    float par1 = powf(10.0, -(1.0 - Phrpos.par1 / 255.0) * 3.0);
+    float par1 = powf(10.0f, -(1.0f - Phrpos.par1 / 255.0f) * 3.0);
     float par2 = Phrpos.par2 / 255.0;
 
     float n0 = n - 1.0;
@@ -327,24 +327,24 @@ float PADnoteParameters::getNhr(int n)
         break;
     case 3:
         tmp = par1 * 100.0 + 1.0;
-        result = powf(n0 / tmp, (1.0 - par2 * 0.8)) * tmp + 1.0;
+        result = powf(n0 / tmp, (1.0f - par2 * 0.8f)) * tmp + 1.0;
         break;
     case 4:
-        result = n0 * (1.0 - par1) + powf(n0 * 0.1, par2 * 3.0 + 1.0) * par1 * 10.0 + 1.0;
+        result = n0 * (1.0 - par1) + powf(n0 * 0.1f, par2 * 3.0f + 1.0f) * par1 * 10.0 + 1.0;
         break;
     case 5:
         result = n0 + sinf(n0 * par2 * par2 * PI * 0.999) * sqrtf(par1) * 2.0 + 1.0;
         break;
     case 6:
         tmp = powf((par2 * 2.0), 2.0) + 0.1;
-        result = n0 * powf(1.0 + par1 * powf(n0 * 0.8, tmp), tmp) + 1.0;
+        result = n0 * powf(1.0f + par1 * powf(n0 * 0.8f, tmp), tmp) + 1.0;
         break;
     default:
         result=n;
         break;
     }
     float par3 = Phrpos.par3 / 255.0;
-    float iresult = floorf(result + 0.5);
+    float iresult = floorf(result + 0.5f);
     float dresult = result-iresult;
     result = iresult + (1.0 - par3) * dresult;
     return result;
@@ -352,12 +352,12 @@ float PADnoteParameters::getNhr(int n)
 
 // Generates the long spectrum for Bandwidth mode (only amplitudes are generated;
 // phases will be random)
-void PADnoteParameters::generateSpectrumBandwidthMode(float *spectrum,
-                                                      int size,
-                                                      float basefreq,
-                                                      float *profile,
-                                                      int profilesize,
-                                                      float bwadjust)
+void PADnoteParameters::generatespectrum_bandwidthMode(float *spectrum,
+                                                       int size,
+                                                       float basefreq,
+                                                       float *profile,
+                                                       int profilesize,
+                                                       float bwadjust)
 {
     //for (int i = 0; i < size; ++i)
     //    spectrum[i] = 0.0;
@@ -390,7 +390,7 @@ void PADnoteParameters::generateSpectrumBandwidthMode(float *spectrum,
             continue;
         //compute the bandwidth of each harmonic
         float bandwidthcents = setPbandwidth(Pbandwidth);
-        float bw = (powf(2.0, bandwidthcents / 1200.0) - 1.0) * basefreq / bwadjust;
+        float bw = (powf(2.0f, bandwidthcents / 1200.0f) - 1.0f) * basefreq / bwadjust;
         float power = 1.0;
         switch (Pbwscale)
         {
@@ -423,7 +423,7 @@ void PADnoteParameters::generateSpectrumBandwidthMode(float *spectrum,
         int ibw = (int)((bw / (samplerate * 0.5) * size)) + 1;
         float amp = harmonics[nh - 1];
         if (resonance->Penabled)
-            amp *= resonance->getFreqResponse(realfreq);
+            amp *= resonance->getfreqresponse(realfreq);
         if (ibw > profilesize)
         {   // if the bandwidth is larger than the profilesize
             float rap = sqrtf((float)profilesize / (float)ibw);
@@ -461,12 +461,12 @@ void PADnoteParameters::generateSpectrumBandwidthMode(float *spectrum,
 }
 
 // Generates the long spectrum for non-Bandwidth modes (only amplitudes are generated; phases will be random)
-void PADnoteParameters::generateSpectrumOtherModes(float *spectrum,
-                                                   int size,
-                                                   float basefreq,
-                                                   float *profile,
-                                                   int profilesize,
-                                                   float bwadjust)
+void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
+                                                    int size,
+                                                    float basefreq,
+                                                    float *profile,
+                                                    int profilesize,
+                                                    float bwadjust)
 {
     //for (int i = 0; i < size; ++i)
     //    spectrum[i] = 0.0;
@@ -503,7 +503,7 @@ void PADnoteParameters::generateSpectrumOtherModes(float *spectrum,
 
         float amp = harmonics[nh - 1];
         if (resonance->Penabled)
-            amp *= resonance->getFreqResponse(realfreq);
+            amp *= resonance->getfreqresponse(realfreq);
         int cfreq = (int)(realfreq / (samplerate * 0.5) * size);
         spectrum[cfreq] = amp + 1e-9;
     }
@@ -531,7 +531,7 @@ void PADnoteParameters::generateSpectrumOtherModes(float *spectrum,
 }
 
 // Applies the parameters (i.e. computes all the samples, based on parameters);
-void PADnoteParameters::applyParameters(bool lockmutex)
+void PADnoteParameters::applyparameters(bool lockmutex)
 {
     const int samplesize = (((int)1) << (Pquality.samplesize + 14));
     int spectrumsize = samplesize / 2;
@@ -539,9 +539,9 @@ void PADnoteParameters::applyParameters(bool lockmutex)
     int profilesize = 512;
     float profile[profilesize];
 
-    float bwadjust = getProfile(profile, profilesize);
+    float bwadjust = getprofile(profile, profilesize);
 //    for (int i=0;i<profilesize;i++) profile[i]*=profile[i];
-    float basefreq = 65.406 * powf(2.0, Pquality.basenote / 2);
+    float basefreq = 65.406 * powf(2.0f, Pquality.basenote / 2);
     if (Pquality.basenote %2 == 1)
         basefreq *= 1.5;
 
@@ -569,16 +569,16 @@ void PADnoteParameters::applyParameters(bool lockmutex)
     for (int nsample = 0; nsample < samplemax; ++nsample)
     {
         float tmp = adj[nsample] - adj[samplemax - 1] * 0.5;
-        float basefreqadjust = powf(2.0, tmp);
+        float basefreqadjust = powf(2.0f, tmp);
 
         if (Pmode == 0)
-            generateSpectrumBandwidthMode(spectrum, spectrumsize,
-                                          basefreq * basefreqadjust, profile,
-                                          profilesize, bwadjust);
+            generatespectrum_bandwidthMode(spectrum, spectrumsize,
+                                           basefreq * basefreqadjust, profile,
+                                           profilesize, bwadjust);
         else
-            generateSpectrumOtherModes(spectrum, spectrumsize,
-                                       basefreq * basefreqadjust, profile,
-                                       profilesize, bwadjust);
+            generatespectrum_otherModes(spectrum, spectrumsize,
+                                        basefreq * basefreqadjust, profile,
+                                        profilesize, bwadjust);
 
         const int extra_samples = 5; // the last samples contains the first
                                      // samples (used for linear/cubic interpolation)
@@ -587,7 +587,7 @@ void PADnoteParameters::applyParameters(bool lockmutex)
         newsample.smp[0] = 0.0;
         for (int i = 1; i < spectrumsize; ++i)
         {   // randomize the phases
-            float phase = RND * 6.29;
+            float phase = zynMaster->numRandom() * 6.29;
             fftfreqs.c[i] = spectrum[i] * cosf(phase);
             fftfreqs.s[i] = spectrum[i] * sinf(phase);
         }
@@ -601,7 +601,7 @@ void PADnoteParameters::applyParameters(bool lockmutex)
         rms = sqrtf(rms);
         if (rms < 0.000001)
             rms = 1.0;
-        rms *= sqrtf(262144.0 / samplesize);
+        rms *= sqrtf(262144.0f / samplesize);
         for (int i = 0; i < samplesize; ++i)
             newsample.smp[i] *= 1.0 / rms * 50.0;
 
@@ -612,7 +612,7 @@ void PADnoteParameters::applyParameters(bool lockmutex)
         // replace the current sample with the new computed sample
         if (lockmutex)
             zynMaster->actionLock(lock);
-        deleteSample(nsample);
+        deletesample(nsample);
         sample[nsample].smp = newsample.smp;
         sample[nsample].size = samplesize;
         sample[nsample].basefreq = basefreq * basefreqadjust;
@@ -627,7 +627,7 @@ void PADnoteParameters::applyParameters(bool lockmutex)
     if (lockmutex)
         zynMaster->actionLock(lock);
     for (int i = samplemax; i < PAD_MAX_SAMPLES; ++i)
-        deleteSample(i);
+        deletesample(i);
     if (lockmutex)
         zynMaster->actionLock(unlock);
 }

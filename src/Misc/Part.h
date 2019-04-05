@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010 Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified October 2009
+    This file is a derivative of the ZynAddSubFX original, modified January 2010
 */
 
 #ifndef PART_H
@@ -40,8 +40,6 @@ using namespace std;
 #include "Effects/EffectMgr.h"
 #include "Misc/XMLwrapper.h"
 
-#define MAX_INFO_TEXT_SIZE 1000
-
 class Part
 {
     public:
@@ -60,31 +58,25 @@ class Part
         void RelaseAllKeys(void);
              // this is called on AllNotesOff controller
 
-        /* The synthesizer part output */
         void ComputePartSmps(void); // Part output
 
         // instrumentonly: 0 - save all, 1 - save only instrumnet,
         //                 2 - save only instrument without the name(used in bank)
-
-        // saves the instrument settings to a XML file
         bool saveXML(string filename); // true for load ok, otherwise false
         bool loadXMLinstrument(string filename);
 
         void add2XML(XMLwrapper *xml);
         void add2XMLinstrument(XMLwrapper *xml);
 
-        void setDefaults(void);
-        void defaultsInstrument(void);
+        void defaults(void);
+        void defaultsinstrument(void);
 
-        void applyParameters(void);
+        void applyparameters(void);
 
         void getfromXML(XMLwrapper *xml);
         void getfromXMLinstrument(XMLwrapper *xml);
 
-        void Cleanup(void);
-
-    //      ADnoteParameters *ADPartParameters;
-    //      SUBnoteParameters *SUBPartParameters;
+        void cleanup(void);
 
         // the part's kit
         struct {
@@ -98,18 +90,18 @@ class Part
         } kit[NUM_KIT_ITEMS];
 
         // Part parameters
-        void setKeyLimit(unsigned char Pkeylimit);
-        void setKitItemStatus(int kititem,int Penabled_);
+        void setkeylimit(unsigned char Pkeylimit);
+        void setkititemstatus(int kititem, int Penabled_);
+        void setPvolume(char Pvolume);
+        void setPpanning(char Ppanning);
 
         unsigned char Penabled;
         unsigned char Pvolume;
         unsigned char Pminkey;
         unsigned char Pmaxkey;     // the maximum key that the part receives noteon messages
-        void setPvolume(char Pvolume);
         unsigned char Pkeyshift;   // Part keyshift
         unsigned char Prcvchn;     // from what midi channel it receive commnads
         unsigned char Ppanning;    // part panning
-        void setPpanning(char Ppanning);
         unsigned char Pvelsns;     // velocity sensing (amplitude velocity scale)
         unsigned char Pveloffs;    // velocity offset
         unsigned char Pnoteon;     // if the part receives NoteOn messages
@@ -192,10 +184,10 @@ class Part
 
         PartNotes partnote[POLIPHONY];
 
-        float *tmpoutl; // used to get the note
+        float *tmpoutl;
         float *tmpoutr;
 
-        float oldfreq; // this is used for portamento
+        float oldfreq; // for portamento
         Microtonal *microtonal;
         FFTwrapper *fft;
         int buffersize;

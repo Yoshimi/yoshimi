@@ -1,7 +1,7 @@
 /*
     AlsaEngine.h
 
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -34,10 +34,9 @@ class AlsaEngine : public MusicIO
         AlsaEngine();
         ~AlsaEngine() { };
         
-        bool openAudio(void);
-        bool openMidi(void);
+        bool openAudio(WavRecord *recorder);
+        bool openMidi(WavRecord *recorder);
         bool Start(void);
-        void Stop(void);
         void Close(void);
         
         unsigned int getSamplerate(void) { return audio.samplerate; };
@@ -48,12 +47,6 @@ class AlsaEngine : public MusicIO
         int audioClientId(void) { return audio.alsaId; };
         int midiClientId(void) { return midi.alsaId; };
 
-    protected:
-        void *AudioThread(void);
-        static void *_AudioThread(void *arg);
-        void *MidiThread(void);
-        static void *_MidiThread(void *arg);
-
     private:
         bool prepHwparams(void);
         bool prepSwparams(void);
@@ -63,6 +56,13 @@ class AlsaEngine : public MusicIO
         bool alsaBad(int op_result, string err_msg);
         void closeAudio(void);
         void closeMidi(void);
+        
+        void *AudioThread(void);
+        static void *_AudioThread(void *arg);
+        void *MidiThread(void);
+        static void *_MidiThread(void *arg);
+        static void _audioCleanup(void *arg) { };
+        static void _midiCleanup(void *arg) { };
 
         snd_pcm_sframes_t (*pcmWrite)(snd_pcm_t *handle, const void *data,
                                       snd_pcm_uframes_t nframes);

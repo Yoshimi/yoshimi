@@ -1,7 +1,7 @@
 /*
     MusicIO.cpp
 
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,8 +17,8 @@
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
 #include <cstring>
+#include <iostream>
 
 using namespace std;   
 
@@ -27,7 +27,11 @@ using namespace std;
 MusicIO::MusicIO() :
     zynLeft(NULL),
     zynRight(NULL),
-    interleavedShorts(NULL)
+    interleavedShorts(NULL),
+    wavRecorder(NULL),
+    rtprio(25),
+    audioLatency(0),
+    midiLatency(0)
 { }
 
 
@@ -37,7 +41,6 @@ MusicIO::~MusicIO()
 
 void MusicIO::Close(void)
 {
-    Recorder.Close();
     if (NULL != zynLeft)
         delete [] zynLeft;
     if (NULL != zynRight)
@@ -50,41 +53,12 @@ void MusicIO::Close(void)
 }
 
 
-void MusicIO::StopRecord(void)
-{
-    Recorder.Stop();
-}
-
-
-bool MusicIO::SetWavFile(string fpath, string& errmsg)
-{
-    return Recorder.SetFile(fpath, errmsg);
-}
-
-
-string MusicIO::WavFilename(void)
-{
-    return Recorder.Filename();
-}
-
-
-bool MusicIO::SetWavOverwrite(string& errmsg)
-{
-    return Recorder.SetOverwrite(errmsg);
-}
-
-
-bool MusicIO::WavIsFloat(void)
-{
-    return Recorder.IsFloat();
-}
-
 
  void MusicIO::getAudio(void)
 {
     zynMaster->MasterAudio(zynLeft, zynRight);
-    if (Recorder.Running())
-        Recorder.Feed(zynLeft, zynRight);
+    if (wavRecorder->Running())
+        wavRecorder->Feed(zynLeft, zynRight);
 }
 
 
@@ -184,7 +158,7 @@ void MusicIO::setMidiController(unsigned char ch, unsigned int ctrl,
 void MusicIO::setMidiNote(unsigned char channel, unsigned char note,
                            unsigned char velocity)
 {
-    zynMaster->NoteOn(channel, note, velocity, Recorder.Trigger());
+    zynMaster->NoteOn(channel, note, velocity, wavRecorder->Trigger());
 }
 
 
@@ -216,7 +190,7 @@ bool MusicIO::prepBuffers(bool with_interleaved)
     }
 
 bail_out:
-    cerr << "Error, failed to allocate audio buffers, size " << buffersize << endl;
+    Runtime.Log("Failed to allocate audio buffers, size " + asString(buffersize));
     if (NULL != zynLeft)
         delete [] zynLeft;
     if (NULL != zynRight)
@@ -232,51 +206,49 @@ bail_out:
 
 bool MusicIO::prepRecord(void)
 {
-    return Recorder.Prep(getSamplerate(), getBuffersize());
+    return wavRecorder->Prep(getSamplerate(), getBuffersize());
 }
 
 
-void MusicIO::setThreadAttribute(pthread_attr_t *attr)
+bool MusicIO::setThreadAttributes(pthread_attr_t *attr, bool schedfifo, bool midi)
 {
     int chk;
-    sched_param prio;
-    prio.sched_priority = 50;
-    chk = pthread_attr_init(attr);
-    if (chk)
+    if ((chk = pthread_attr_init(attr)))
     {
-        Runtime.settings.verbose
-            && cerr << "Error, failed to initialise audio thread attributes: "
-                    << chk << endl;
+        Runtime.Log("Failed to initialise audio thread attributes: " + asString(chk));
+        return false;
     }
-    else
+
+    if ((chk = pthread_attr_setdetachstate(attr, PTHREAD_CREATE_DETACHED)))
     {
-        chk = pthread_attr_setdetachstate(attr, PTHREAD_CREATE_DETACHED);
-        if (chk)
-        {
-            Runtime.settings.verbose
-                && cerr << "Error, failed to set audio thread detach state: "
-                        << chk << endl;
-        }
-        else if (!(chk = pthread_attr_setschedpolicy(attr, SCHED_FIFO)))
-        {
-            if (!(chk = pthread_attr_setinheritsched(attr, PTHREAD_EXPLICIT_SCHED)))
-            {
-                chk = pthread_attr_setschedparam(attr, &prio);
-                if (chk)
-                {
-                    Runtime.settings.verbose
-                        && cerr << "Error, audio thread failed to set priority, "
-                                << strerror(errno) << " (" << chk << ")" << endl;
-                }
-            }
-            else
-                Runtime.settings.verbose
-                    && cerr << "Error, audio thread failed to set inherit scheduler: "
-                            << strerror(errno) << " (" << chk << ")" << endl;
-        }
-        else
-            Runtime.settings.verbose
-                && cerr << "Error, failed to set audio thread SCHED_FIFO: "
-                        << strerror(errno) << " (" << chk << ")" << endl;
+        Runtime.Log("Failed to set audio thread detach state: " + asString(chk));
+        return false;
     }
+    if (schedfifo)
+    {
+        if ((chk = pthread_attr_setschedpolicy(attr, SCHED_FIFO)))
+        {
+            Runtime.Log("Failed to set SCHED_FIFO policy in audio thread attribute: "
+                        + string(strerror(errno)) + " (" + asString(chk) + ")");
+            return false;
+        }
+        if ((chk = pthread_attr_setinheritsched(attr, PTHREAD_EXPLICIT_SCHED)))
+        {
+            Runtime.Log("Failed to set inherit scheduler audio thread attribute: "
+                        + string(strerror(errno)) + " (" + asString(chk) + ")");
+            return false;
+        }
+        sched_param prio_params;
+        int prio = rtprio;
+        if (midi)
+            prio--;
+        prio_params.sched_priority = (prio > 0) ? prio : 0;
+        if ((chk = pthread_attr_setschedparam(attr, &prio_params)))
+        {
+            Runtime.Log("Failed to set audio thread priority attribute: ("
+                        + asString(chk) + ")  " + string(strerror(errno)));
+            return false;
+        }
+    }
+    return true;
 }

@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,335 +18,649 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified October 2009
+    This file is a derivative of the ZynAddSubFX original, modified January 2010
 */
 
 #include <cmath>
 #include <string>
-#include <iostream>
+#include <argp.h>
 
 using namespace std;
 
-#include "Misc/Util.h"
+#include "GuiThreadUI.h"
+#include "Misc/Master.h"
 #include "Misc/Config.h"
-#include "Misc/XMLwrapper.h"
-
-bool autostart_jack = false;
 
 Config Runtime;
 
-Config::Config()
+int Config::sigIntActive = 0;
+int Config::ladi1IntActive = 0;
+struct sigaction Config::sigAction;
+
+const unsigned short Config::MaxParamsHistory = 25;
+unsigned short Config::nextHistoryIndex = numeric_limits<unsigned int>::max();
+
+static char prog_doc[] =
+    "Yoshimi " YOSHIMI_VERSION ", a derivative of ZynAddSubFX - "
+    "Copyright 2002-2009 Nasca Octavian Paul and others, "
+    "Copyright 2009-2010 Alan Calvert";
+
+const char* argp_program_version = "Yoshimi " YOSHIMI_VERSION;
+
+static struct argp_option cmd_options[] = {
+    {"show-console",    'c',  NULL,         0,  "show console on startup" },
+    {"name-tag",        'N',  "<tag>",      0,  "add tag to clientname" },
+    {"load",            'l',  "<file>",     0,  "load .xmz file" },
+    {"load-instrument", 'L',  "<file>",     0,  "load .xiz file" },
+    {"samplerate",      'R',  "<rate>",     0,  "set sample rate (alsa audio)" },
+    {"buffersize",      'b',  "<size>",     0,  "set buffer size (alsa audio)" },
+    {"oscilsize",       'o',  "<size>",     0,  "set ADsynth oscilsize" },
+    {"alsa-audio",      'A',  "<device>", 0x1,  "use alsa audio output" },
+    {"alsa-midi",       'a',  "<device>", 0x1,  "use alsa midi input" },
+    {"jack-audio",      'J',  "<server>", 0x1,  "use jack audio output" },
+    {"jack-midi",       'j',  "<device>", 0x1,  "use jack midi input" },
+    {"autostart-jack",  'k',  NULL,         0,  "auto start jack server" },
+    {"auto-connect",    'K',  NULL,         0,  "auto connect jack audio" },
+    {"state",           'S',  "<file>",   0x1,
+        "load state from <file>, defaults to '$HOME/.yoshimi/yoshimi.state'" },
+    { 0, }
+};
+
+
+        
+Config::Config() :
+    ConfigFile(string(getenv("HOME")) + string("/.yoshimiXML.cfg")),
+    restoreState(false),
+    StateFile(string(getenv("HOME")) + string("/.yoshimi/yoshimi.state")),
+    Samplerate(48000),
+    Buffersize(128),
+    Oscilsize(1024),
+    VirKeybLayout(1),
+    showConsole(false),
+    audioEngine(DEFAULT_AUDIO),
+    alsaAudioDevice("default"),
+    jackServer("default"),
+    startJack(false),
+    connectJackaudio(false),
+    audioDevice("default"),
+    midiEngine(DEFAULT_MIDI),
+    alsaMidiDevice("default"),
+    Float32bitWavs(false),
+    DefaultRecordDirectory("/tmp"),
+    BankUIAutoClose(0),
+    Interpolation(0),
+    CheckPADsynth(1)
 {
-    // defaults
-    settings.Oscilsize = 2048;
-    settings.Samplerate = 48000;
-    settings.Buffersize = 512;
-#   if defined(DISABLE_GUI)
-        settings.showGui = false;
-#   else
-        settings.showGui = true;
-#   endif
-    settings.verbose = true;
-    settings.LinuxALSAaudioDev = "default";
-    settings.LinuxALSAmidiDev = "default";
-    settings.LinuxJACKserver = "default";
-    settings.nameTag = string();
-    settings.BankUIAutoClose = 0;
-    settings.GzipCompression = 3;
-    settings.Interpolation = 0;
-    settings.CheckPADsynth = 1;
-    settings.UserInterfaceMode = 0;
-    settings.VirKeybLayout = 1;
-    settings.audioEngine = DEFAULT_AUDIO;
-    settings.midiEngine  = DEFAULT_MIDI;
+    memset(&sigAction, 0, sizeof(sigAction));
+    sigAction.sa_handler = sigHandler;
+    if (sigaction(SIGUSR1, &sigAction, NULL))
+        Log("Setting SIGUSR1 handler failed");
+    if (sigaction(SIGINT, &sigAction, NULL))
+        Log("Setting SIGINT handler failed");
+    if (sigaction(SIGHUP, &sigAction, NULL))
+        Log("Setting SIGHUP handler failed");
+    if (sigaction(SIGTERM, &sigAction, NULL))
+        Log("Setting SIGTERM handler failed");
+    if (sigaction(SIGQUIT, &sigAction, NULL))
+        Log("Setting SIGQUIT handler failed");
+    
+    clearBankrootDirlist();
+    clearPresetsDirlist();
+    loadConfig();
 
-    settings.DefaultRecordDirectory = "/tmp";
-    settings.Float32bitWavs  = 1;
-
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-        settings.bankRootDirlist[i] = string();
-    settings.currentBankDir = string("./testbnk");
-
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-        settings.presetsDirlist[i] = string();
-
-    readConfig();
-    switch (settings.audioEngine)
+    switch (audioEngine)
     {
         case alsa_audio:
-            settings.audioDevice = string(settings.LinuxALSAaudioDev);
+            audioDevice = string(alsaAudioDevice);
             break;
 
         case jack_audio:
-            settings.audioDevice = string(settings.LinuxJACKserver);
+            audioDevice = string(jackServer);
             break;
 
         case no_audio:
         default:
-            settings.audioDevice.clear(); // = string();
+            audioDevice.clear();
             break;
     }
-    if (!settings.audioDevice.size())
-        settings.audioDevice = "default";
+    if (!audioDevice.size())
+        audioDevice = "default";
 
-    switch (settings.midiEngine)
+    switch (midiEngine)
     {
         case jack_midi:
-            settings.midiDevice = string(settings.LinuxJACKserver);
+            midiDevice = string(jackServer);
             break;
 
         case alsa_midi:
-            settings.midiDevice = string(settings.LinuxALSAmidiDev);
+            midiDevice = string(alsaMidiDevice);
             break;
 
         case no_midi:
         default:
-            settings.midiDevice.clear();
+            midiDevice.clear();
             break;
     }
-    if (!settings.midiDevice.size())
-        settings.midiDevice = "default";
+    if (!midiDevice.size())
+        midiDevice = "default";
+}
 
-    if (!settings.bankRootDirlist[0].size())
-    {
-        // banks
-        settings.bankRootDirlist[0] = "~/banks";
-        settings.bankRootDirlist[1] = "./";
-        settings.bankRootDirlist[2] = "/usr/share/zynaddsubfx/banks";
-        settings.bankRootDirlist[3] = "/usr/local/share/zynaddsubfx/banks";
-        settings.bankRootDirlist[4] = "../banks";
-        settings.bankRootDirlist[5] = "banks";
-    }
 
-    if (!settings.presetsDirlist[0].size())
+void Config::flushLog(void)
+{
+    if (LogList.size())
     {
-        // presets
-        settings.presetsDirlist[0] = "./";
-        settings.presetsDirlist[1] = "../presets";
-        settings.presetsDirlist[2] = "presets";
-        settings.presetsDirlist[3] = "/usr/share/zynaddsubfx/presets";
-        settings.presetsDirlist[4] = "/usr/local/share/zynaddsubfx/presets";
+        cerr << "Flushing log:" << endl;
+        while (LogList.size())
+        {
+            cerr << LogList.front() << endl;
+            LogList.pop_front();
+        }
     }
+}
+
+
+void Config::sigHandler(int sig)
+{
+    switch (sig)
+    {
+        case SIGINT:
+        case SIGHUP:
+        case SIGTERM:
+        case SIGQUIT:
+            Runtime.SetInterruptActive(sig);
+            break;
+
+        case SIGUSR1:
+            Runtime.SetLadi1Active(sig);
+            sigaction(SIGUSR1, &sigAction, NULL);
+            break;
+
+        default:
+            Runtime.Log("Unexpected signal: " + asString(sig));
+            break;
+    }
+}
+
+
+string Config::AddParamHistory(string file)
+{
+    if (!file.empty())
+    {
+        unsigned int name_start = file.rfind("/");
+        unsigned int name_end = file.rfind(".xmz");
+        if (name_start != string::npos && name_end != string::npos
+            && (name_start - 1) < name_end)
+        {
+            HistoryListItem item;
+            item.name = file.substr(name_start + 1, name_end - name_start - 1);
+            item.file = file;
+            item.index = nextHistoryIndex--;
+            itx = ParamsHistory.begin();
+            for (unsigned int i = 0; i < ParamsHistory.size(); ++i, ++itx)
+            {
+                if (ParamsHistory.at(i).sameFile(file))
+                    ParamsHistory.erase(itx);
+            }
+            ParamsHistory.insert(ParamsHistory.begin(), item);
+            if (ParamsHistory.size() > MaxParamsHistory)
+            {
+                itx = ParamsHistory.end();
+                ParamsHistory.erase(--itx);
+            }
+            return (CurrentXMZ = item.name);
+        }
+        else
+            Log("Invalid param file proffered to history:" + file);
+    }
+    return string();
+}
+
+
+string Config::HistoryFilename(int index)
+{
+    if (index > 0 && index <= (int)ParamsHistory.size())
+    {
+        itx = ParamsHistory.begin();
+        for (int i = index; i > 0; ++itx, --i) ;
+        return itx->file;
+    }
+    return string();
 }
 
 
 void Config::clearBankrootDirlist(void)
 {
     for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-        settings.bankRootDirlist[i].clear();
+        bankRootDirlist[i].clear();
 }
 
 
 void Config::clearPresetsDirlist(void)
 {
     for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-        settings.presetsDirlist[i].clear();
+        presetsDirlist[i].clear();
 }
 
-
-void Config::readConfig(void)
+bool Config::loadConfig(void)
 {
-    XMLwrapper *xmlcfg = new XMLwrapper();
-    if (xmlcfg->loadXMLfile(getConfigFilename(false)) < 0)
-        return;
-    if (xmlcfg->enterbranch("CONFIGURATION"))
+    XMLwrapper *xml = new XMLwrapper();
+    if (!ConfigFile.size() || !isRegFile(ConfigFile))
     {
-        settings.Samplerate = xmlcfg->getpar("sample_rate", settings.Samplerate,
-                                             44100, 96000);
-        settings.Buffersize = xmlcfg->getpar("sound_buffer_size",
-                                             settings.Buffersize, 64, 4096);
-        settings.Oscilsize = xmlcfg->getpar("oscil_size", settings.Oscilsize,
-                                            MAX_AD_HARMONICS * 2, 131072);
-        xmlcfg->getpar("swap_stereo", 0, 0, 1);                 // deprecated
-        settings.BankUIAutoClose = xmlcfg->getpar("bank_window_auto_close",
-                                                   settings.BankUIAutoClose, 0, 1);
-        // Dump deprecated in yoshi
-        xmlcfg->getpar("dump_notes_to_file", 0, 0, 1);
-        xmlcfg->getpar("dump_append", 0, 0, 1);
-        xmlcfg->getparstr("dump_file");
-
-        settings.GzipCompression =
-            xmlcfg->getpar("gzip_compression", settings.GzipCompression, 0, 9);
-        settings.currentBankDir = xmlcfg->getparstr("bank_current");
-        settings.Interpolation =
-            xmlcfg->getpar("interpolation", settings.Interpolation, 0, 1);
-        settings.CheckPADsynth =
-            xmlcfg->getpar("check_pad_synth", settings.CheckPADsynth, 0, 1);
-        settings.UserInterfaceMode =
-            xmlcfg->getpar("user_interface_mode", settings.UserInterfaceMode, 0, 2);
-        settings.VirKeybLayout =
-            xmlcfg->getpar("virtual_keyboard_layout", settings.VirKeybLayout, 0, 10);
-
-        // get bankroot dirs
-        for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-        {
-            if (xmlcfg->enterbranch("BANKROOT", i))
-            {
-                settings.bankRootDirlist[i] = xmlcfg->getparstr("bank_root");
-                xmlcfg->exitbranch();
-            }
-        }
-
-        // get preset root dirs
-        for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-        {
-            if (xmlcfg->enterbranch("PRESETSROOT", i))
-            {
-                settings.presetsDirlist[i] = xmlcfg->getparstr("presets_root");
-                xmlcfg->exitbranch();
-            }
-        }
-
-        xmlcfg->getparstr("linux_oss_wave_out_dev"); // deprecated in yoshi
-        xmlcfg->getparstr("linux_oss_seq_in_dev");   // deprecated in yoshi
-
-        // windows stuff, deprecated in yoshi
-        xmlcfg->getpar("windows_wave_out_id", 0, 0, 0);
-        xmlcfg->getpar("windows_midi_in_id", 0, 0, 0);
-
-        // yoshi only settings
-        settings.LinuxALSAaudioDev = xmlcfg->getparstr("linux_alsa_audio_dev");
-        settings.LinuxALSAmidiDev = xmlcfg->getparstr("linux_alsa_midi_dev");
-        settings.LinuxJACKserver = xmlcfg->getparstr("linux_jack_server");
-
-        settings.DefaultRecordDirectory = xmlcfg->getparstr("DefaultRecordDirectory");
-        if (settings.DefaultRecordDirectory.empty())
-            settings.DefaultRecordDirectory = string("/tmp/");
-        if (settings.DefaultRecordDirectory.at(settings.DefaultRecordDirectory.size() - 1) != '/')
-                settings.DefaultRecordDirectory += "/";
-        if (settings.CurrentRecordDirectory.empty())
-            settings.CurrentRecordDirectory = settings.DefaultRecordDirectory;
-        settings.Float32bitWavs = xmlcfg->getpar("Float32bitWavs", 0, 0, 1);
-
-        xmlcfg->exitbranch(); // CONFIGURATION
+        Log("Config file " + ConfigFile + " not available");
+        return false;
     }
-    delete(xmlcfg);
-    settings.Oscilsize = (int) powf(2, ceil(log (settings.Oscilsize - 1.0) / logf(2.0)));
+    if (xml->loadXMLfile(ConfigFile) < 0)
+        return false;
+
+    bool isok = loadConfigData(xml);
+    if (isok)
+    {
+        Oscilsize = (int) powf(2.0f, ceil(log (Oscilsize - 1.0f) / logf(2.0)));
+        if (DefaultRecordDirectory.empty())
+            DefaultRecordDirectory = string("/tmp/");
+        if (DefaultRecordDirectory.at(DefaultRecordDirectory.size() - 1) != '/')
+            DefaultRecordDirectory += "/";
+        if (CurrentRecordDirectory.empty())
+            CurrentRecordDirectory = DefaultRecordDirectory;
+    }
+    delete xml;
+    return isok;
 }
 
-void Config::saveConfig(void)
+bool Config::loadConfigData(XMLwrapper *xml)
 {
-    XMLwrapper *xmlcfg = new XMLwrapper();
+    if (NULL == xml)
+    {
+        Log("loadConfigData on NULL");
+        return false;
+    }
+    if (!xml->enterbranch("CONFIGURATION"))
+    {
+        Log("loadConfigData, no CONFIGURATION branch");
+        return false;
+    }
+    Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 96000);
+    Buffersize = xml->getpar("sound_buffer_size", Buffersize, 64, 4096);
+    Oscilsize = xml->getpar("oscil_size", Oscilsize,
+                                        MAX_AD_HARMONICS * 2, 131072);
+    BankUIAutoClose = xml->getpar("bank_window_auto_close",
+                                               BankUIAutoClose, 0, 1);
+    currentBankDir = xml->getparstr("bank_current");
+    Interpolation =
+        xml->getpar("interpolation", Interpolation, 0, 1);
+    CheckPADsynth =
+        xml->getpar("check_pad_synth", CheckPADsynth, 0, 1);
+    VirKeybLayout =
+        xml->getpar("virtual_keyboard_layout", VirKeybLayout, 0, 10);
 
-    xmlcfg->beginbranch("CONFIGURATION");
+    // get bank dirs
+    int count = 0;
+    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+    {
+        if (xml->enterbranch("BANKROOT", i))
+        {
+            string dir = xml->getparstr("bank_root");
+            if (isDirectory(dir))
+                bankRootDirlist[count++] = dir;
+            xml->exitbranch();
+        }
+    }
+    if (!count)
+    {
+        string bankdirs[] = {
+            "/usr/share/yoshimi/banks",
+            "/usr/local/share/yoshimi/banks",
+            "/usr/share/zynaddsubfx/banks",
+            "/usr/local/share/zynaddsubfx/banks",
+            string(getenv("HOME")) + "/banks",
+            "../banks",
+            "banks"
+        };
+        const int defaultsCount = 7; // as per bankdirs[] size above
+        for (int i = 0; i < defaultsCount; ++i)
+        {
+            if (bankdirs[i].size() && isDirectory(bankdirs[i]))
+                bankRootDirlist[count++] = bankdirs[i];
+        }
+    }
+    if (!currentBankDir.size())
+        currentBankDir = bankRootDirlist[0];
 
-    xmlcfg->addpar("sample_rate", settings.Samplerate);
-    xmlcfg->addpar("sound_buffer_size", settings.Buffersize);
-    xmlcfg->addpar("oscil_size", settings.Oscilsize);
-    xmlcfg->addpar("swap_stereo", 0);
-    xmlcfg->addpar("bank_window_auto_close", settings.BankUIAutoClose);
+    // get preset dirs
+    count = 0;
+    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+    {
+        if (xml->enterbranch("PRESETSROOT", i))
+        {
+            string dir = xml->getparstr("presets_root");
+            if (isDirectory(dir))
+                presetsDirlist[count++] = dir;
+            xml->exitbranch();
+        }
+    }
+    if (!count)
+    {
+        string presetdirs[]  = {
+            "/usr/share/yoshimi/presets",
+            "/usr/local/share/yoshimi/presets",
+            "/usr/share/zynaddsubfx/presets",
+            "/usr/local/share/zynaddsubfx/presets",
+            string(getenv("HOME")) + "/presets",
+            "../presets",
+            "presets"
+        };
+        const int defaultsCount = 7; // as per presetdirs[] above
+        for (int i = 0; i < defaultsCount; ++i)
+            if (presetdirs[i].size() && isDirectory(presetdirs[i]))
+                presetsDirlist[count++] = presetdirs[i];
+    }
 
-    xmlcfg->addpar("dump_notes_to_file", 0);
-    xmlcfg->addpar("dump_append", 0);
-    xmlcfg->addparstr("dump_file", "");
+    // alsa settings
+    alsaAudioDevice = xml->getparstr("linux_alsa_audio_dev");
+    alsaMidiDevice = xml->getparstr("linux_alsa_midi_dev");
+    
+    // jack settings
+    jackServer = xml->getparstr("linux_jack_server");
 
-    xmlcfg->addpar("gzip_compression", settings.GzipCompression);
-    xmlcfg->addpar("check_pad_synth", settings.CheckPADsynth);
-    xmlcfg->addparstr("bank_current", settings.currentBankDir);
-    xmlcfg->addpar("user_interface_mode", settings.UserInterfaceMode);
-    xmlcfg->addpar("virtual_keyboard_layout", settings.VirKeybLayout);
+    // recorder settings
+    DefaultRecordDirectory = xml->getparstr("DefaultRecordDirectory");
+    Float32bitWavs = xml->getparbool("Float32bitWavs", false);
+
+    if (xml->enterbranch("XMZ_HISTORY"))
+    {
+        int hist_size = xml->getpar("history_size", 0, 0, MaxParamsHistory);
+        string xmz;
+        for (int i = 0; i < hist_size; ++i)
+        {
+            if (xml->enterbranch("XMZ_FILE", i))
+            {
+                xmz = xml->getparstr("xmz_file");
+                if (xmz.size() && isRegFile(xmz))
+                    AddParamHistory(xmz);
+                xml->exitbranch();
+            }
+        }
+        xml->exitbranch(); 
+    }
+
+    xml->exitbranch(); // CONFIGURATION
+    return true;
+}
+
+
+void Config::SaveConfig(void)
+{
+    XMLwrapper *xmltree = new XMLwrapper();
+    addConfigXML(xmltree);
+    xmltree->saveXMLfile(ConfigFile);
+    delete xmltree;
+    return;
+}
+
+
+void Config::addConfigXML(XMLwrapper *xmltree)
+{
+    xmltree->beginbranch("CONFIGURATION");
+
+    xmltree->addparstr("state_file", StateFile);
+    xmltree->addpar("sample_rate", Samplerate);
+    xmltree->addpar("sound_buffer_size", Buffersize);
+    xmltree->addpar("oscil_size", Oscilsize);
+    xmltree->addpar("bank_window_auto_close", BankUIAutoClose);
+
+    xmltree->addpar("check_pad_synth", CheckPADsynth);
+    xmltree->addparstr("bank_current", currentBankDir);
+    xmltree->addpar("virtual_keyboard_layout", VirKeybLayout);
 
     for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-        if (settings.bankRootDirlist[i].size())
+        if (bankRootDirlist[i].size())
         {
-            xmlcfg->beginbranch("BANKROOT",i);
-            xmlcfg->addparstr("bank_root", settings.bankRootDirlist[i]);
-            xmlcfg->endbranch();
+            xmltree->beginbranch("BANKROOT",i);
+            xmltree->addparstr("bank_root", bankRootDirlist[i]);
+            xmltree->endbranch();
         }
 
     for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-        if (settings.presetsDirlist[i].size())
+        if (presetsDirlist[i].size())
         {
-            xmlcfg->beginbranch("PRESETSROOT",i);
-            xmlcfg->addparstr("presets_root", settings.presetsDirlist[i]);
-            xmlcfg->endbranch();
+            xmltree->beginbranch("PRESETSROOT",i);
+            xmltree->addparstr("presets_root", presetsDirlist[i]);
+            xmltree->endbranch();
         }
-    xmlcfg->addpar("interpolation", settings.Interpolation);
+    xmltree->addpar("interpolation", Interpolation);
 
-    // linux stuff - deprecated in yoshi
-    xmlcfg->addparstr("linux_oss_wave_out_dev", "/dev/dsp");
-    xmlcfg->addparstr("linux_oss_seq_in_dev", "/dev/sequencer");
+    xmltree->addparstr("linux_alsa_audio_dev", alsaAudioDevice);
+    xmltree->addparstr("linux_alsa_midi_dev", alsaMidiDevice);
+    xmltree->addparstr("linux_jack_server", jackServer);
+    xmltree->addparstr("DefaultRecordDirectory", DefaultRecordDirectory);
+    xmltree->addpar("Float32bitWavs", Float32bitWavs);
 
-    // windows stuff - deprecated in yoshi
-    xmlcfg->addpar("windows_wave_out_id", 0);
-    xmlcfg->addpar("windows_midi_in_id", 0);
-
-    // yoshi specific
-    xmlcfg->addparstr("linux_alsa_audio_dev", settings.LinuxALSAaudioDev);
-    xmlcfg->addparstr("linux_alsa_midi_dev", settings.LinuxALSAmidiDev);
-    xmlcfg->addparstr("linux_jack_server", settings.LinuxJACKserver);
-    xmlcfg->addparstr("DefaultRecordDirectory", settings.DefaultRecordDirectory);
-    xmlcfg->addpar("Float32bitWavs", settings.Float32bitWavs);
-
-    xmlcfg->endbranch(); // CONFIGURATION
-
-    int tmp = settings.GzipCompression;
-    settings.GzipCompression = 0;
-    xmlcfg->saveXMLfile(getConfigFilename(true));
-    settings.GzipCompression = tmp;
-    delete xmlcfg;
+    // Parameters history
+    if (ParamsHistory.size())
+    {
+        xmltree->beginbranch("XMZ_HISTORY");
+        xmltree->addpar("history_size", ParamsHistory.size());
+        deque<HistoryListItem>::reverse_iterator rx = ParamsHistory.rbegin();
+        unsigned int count = 0;
+        for (int x = 0; rx != ParamsHistory.rend() && count <= MaxParamsHistory; ++rx, ++x)
+        {
+            xmltree->beginbranch("XMZ_FILE", x);
+            xmltree->addparstr("xmz_file", rx->file);
+            xmltree->endbranch();
+        }
+        xmltree->endbranch();
+    }
+    xmltree->endbranch(); // CONFIGURATION
 }
 
 
-string Config::getConfigFilename(bool for_save)
+void Config::SaveState(void)
 {
-    // Try to prevent any perversion of ~/.zynaddsubfxXML.cfg.  For read,
-    // use ~/.yoshimiXML.cfg if it exists, otherwise ~/.zynaddsubfxXML.cfg
-    // For save, use ~/.yoshimiXML.cfg
-    string yoshiCfg = string(getenv("HOME")) + "/.yoshimiXML.cfg";
-    if (for_save || isRegFile(yoshiCfg))
-        return yoshiCfg;
-    else if (isRegFile(yoshiCfg))
-        return yoshiCfg;
-    else
-        return string(getenv("HOME")) + "/.zynaddsubfxXML.cfg";
+    XMLwrapper *xmltree = new XMLwrapper();
+    xmltree->beginbranch("SESSION_STATE");
+    addConfigXML(xmltree);
+    addRuntimeXML(xmltree);
+    zynMaster->add2XML(xmltree);
+    xmltree->saveXMLfile(StateFile);
+    xmltree->endbranch();
+    Log("State saved to " + StateFile);
 }
 
 
-void Config::Announce(void)
+XMLwrapper *Config::RestoreRuntimeState(void)
 {
-    settings.verbose && cout << "Yoshimi " << YOSHIMI_VERSION << endl;
+    if (!StateFile.size() || !isRegFile(StateFile))
+    {
+        Log("State file " + StateFile + " not available");
+        return NULL;
+    }
+    XMLwrapper *xml = new XMLwrapper();
+    if (NULL == xml)
+    {
+        Log("Failed to init xmltree, Config RestoreRuntimeState");
+        return NULL;
+    }
+    if (xml->loadXMLfile(StateFile) < 0)
+    {
+        Log("Failed to load xml file " + StateFile + ", Master RestoreState");
+        delete xml;
+        return NULL;
+    }
+    if (xml->enterbranch("SESSION_STATE"))
+    {
+        if (loadConfigData(xml) && loadRuntimeData(xml))
+            return xml;
+    }
+    if (NULL != xml)
+        delete xml;
+    return NULL;
+}
+
+
+void Config::checkInterrupted(void)
+{
+    if (sigIntActive)
+    {
+        musicClient->Close();
+        stopGuiThread();
+        __sync_sub_and_fetch (&sigIntActive, 1);
+        
+    }
+    else if (ladi1IntActive)
+    {
+        Runtime.SaveState();
+        __sync_sub_and_fetch (&ladi1IntActive, 1);
+    }
+}
+
+
+void Config::SetInterruptActive(int sig)
+{
+    Log("Interrupt received, closing down");
+    __sync_add_and_fetch(&Config::sigIntActive, 1);
+}
+
+
+void Config::SetLadi1Active(int sig)
+{
+    __sync_add_and_fetch(&ladi1IntActive, 1);
+}
+
+
+bool Config::loadRuntimeData(XMLwrapper *xml)
+{
+    if (!xml->enterbranch("RUNTIME"))
+    {
+        Log("Config loadRuntimeData, no RUNTIME branch");
+        return false;
+    }
+    audioEngine = (audio_drivers)xml->getpar("audio_engine", DEFAULT_AUDIO, no_audio, alsa_audio);
+    audioDevice = xml->getparstr("audio_device");
+    midiEngine = (midi_drivers)xml->getpar("midi_engine", DEFAULT_MIDI, no_midi, alsa_midi);
+    midiDevice = xml->getparstr("midi_device");
+    nameTag = xml->getparstr("name_tag");
+    CurrentXMZ = xml->getparstr("current_xmz");
+    xml->exitbranch();
+    return true;
+}
+
+
+void Config::addRuntimeXML(XMLwrapper *xml)
+{
+    xml->beginbranch("RUNTIME");
+
+    xml->addpar("audio_engine", audioEngine);
+    xml->addparstr("audio_device", audioDevice);
+    xml->addpar("midi_engine", midiEngine);
+    xml->addparstr("midi_device", midiDevice);
+    xml->addparstr("name_tag", nameTag);
+    xml->addparstr("current_xmz", CurrentXMZ);
+    xml->endbranch();
+}
+
+
+void Config::Log(string msg)
+{
+    LogList.push_back(msg);
 }
 
 
 void Config::StartupReport(unsigned int samplerate, int buffersize)
 {
-    if (settings.verbose)
+    Log(string(argp_program_version));
+    //Log("fftw3 to use " + asString(FFTwrapper::fftw_threads) + " thread(s)"); 
+    Log("Clientname: " + musicClient->midiClientName());
+    string report = "Audio: ";
+    switch (audioEngine)
     {
-        cout << "ADsynth Oscilsize: " << Runtime.settings.Oscilsize << endl;
-        cout << "Sample Rate: " << samplerate << endl;
-        cout << "Sound Buffer Size: " << buffersize << endl;
-        cout << "Internal latency: " << buffersize * 1000.0 / samplerate << " ms" << endl;
+        case jack_audio:
+            report += "jack";
+            break;
+        case alsa_audio:
+            report += "alsa";
+            break;
+        default:
+            report += "nada";
     }
+    report += (" -> '" + audioDevice + "'");
+    Log(report);
+    report = "Midi: ";
+    switch (midiEngine)
+    {
+        case jack_midi:
+            report += "jack";
+            break;
+        case alsa_midi:
+            report += "alsa";
+            break;
+        default:
+            report += "nada";
+    }
+    report += (" -> '" + midiDevice + "'");
+    Log(report);
+    Log("Oscilsize: " + asString(Runtime.Oscilsize)); 
+    Log("Samplerate: " + asString(samplerate)); 
+    Log("Buffersize: " + asString(buffersize)); 
+    Log("Alleged latency: " + asString(buffersize) + " frames, "
+        + asString(buffersize * 1000.0f / samplerate) + " ms"); 
+    Log("Gross latency: " + asString(musicClient->grossLatency()) + " frames, "
+         + asString(musicClient->grossLatency() * 1000.0f / samplerate) + " ms"); 
 }
 
 
-void Config::Usage(void)
+static error_t parse_cmds (int key, char *arg, struct argp_state *state)
 {
-    cerr << "This is NOT ZynAddSubFX - ";
-    cerr << "Copyright (c) 2002-2009 Nasca Octavian Paul and others," << endl;
-    cerr << "this is instead a derivative of ZynAddSubFX known as " << endl;
-    cerr << "Yoshimi Copyright (C) 2009, Alan Calvert" << endl;
-    cerr << "This is version " << YOSHIMI_VERSION << endl;
-    cerr << "Yoshimi comes with high hopes that it might be useful," << endl;
-    cerr << "but ABSOLUTELY NO WARRANTY.  This is free software, and" << endl;
-    cerr << "you are welcome to redistribute it under certain conditions;" << endl;
-    cerr << "See file COPYING for details." << endl;
-    cerr << "Usage: yoshimi [option(s) ...]" << endl;
-    cerr << "  -h, --help                         display command-line help and exit" << endl;
-    cerr << "  -l<file>, --load=<file>            load an .xmz file" << endl;
-    cerr << "  -L<file>, --load-instrument=<file> load an .xiz file" << endl;
-    cerr << "  -o<OS>, --oscil-size=<OS>          set the ADsynth oscil. size" << endl;
-    cerr << "  -U , --no-gui                      run without user interface" << endl;
-    cerr << "  -a[dev], --alsa-midi[=dev]         use ALSA midi on optional device dev" << endl;
-    cerr << "  -b<size>, --buffersize=<size>      set buffersize (range 64 - 4096)" << endl;
-    cerr << "  -r<srate>, --samplerate=<srate>    set samplerate (44100, 48000, or 96000)" << endl;
-    cerr << "  -A[dev], --alsa-audio[=dev]        use ALSA audio on optional device dev" << endl;
-    cerr << "  -j[server], --jack-midi[=server]   use jack midi on optional server" << endl;
-    cerr << "  -J[server], --jack-audio[=server]  use jack audio on optional server" << endl;
-    cerr << "  -k , --autostart-jack              autostart jack server" << endl;
-    cerr << "  -N<tag>, --name-tag=<tag>          add <tag> to client name" << endl;
-    cerr << "  -q, --quiet                        less verbose messages" << endl;
-    cerr << "Buffersize and samplerate settings apply to Alsa audio only." << endl;
-    cerr << endl << endl;
+    Config *settings = (Config*)state->input;
+
+    switch (key)
+    {
+        case 'c': settings->showConsole = true; break;
+        case 'N': settings->nameTag = string(arg); break;
+        case 'l': settings->paramsLoad = string(arg); break;
+        case 'L': settings->instrumentLoad = string(arg); break;
+        case 'R': settings->Samplerate = string2int(string(arg)); break;
+        case 'b': settings->Buffersize = string2int(string(arg)); break;
+        case 'o': settings->Oscilsize = string2int(string(arg)); break;
+        case 'A':
+            settings->audioEngine = alsa_audio;
+            if (arg)
+                settings->audioDevice = string(arg);
+            break;
+        case 'a':
+            settings->midiEngine = alsa_midi;
+            if (arg)
+                settings->midiDevice = string(arg);
+                  break;
+        case 'J':
+            settings->audioEngine = jack_audio;
+            if (arg)
+                settings->audioDevice = string(arg);
+            break;
+        case 'j':
+            settings->midiEngine = jack_midi;
+            if (arg)
+                settings->midiDevice = string(arg);
+            break;
+        case 'k': settings->startJack = true; break;
+        case 'K': settings->connectJackaudio = true; break;
+        case 'S':
+            settings->restoreState = true;
+            if (arg)
+                settings->StateFile = string(arg);
+            break;    
+        case ARGP_KEY_ARG:
+        case ARGP_KEY_END:
+            break;
+        default: return ARGP_ERR_UNKNOWN;
+    }
+    return 0;
+}
+
+static struct argp cmd_argp = { cmd_options, parse_cmds, prog_doc };
+
+
+void Config::loadCmdArgs(int argc, char **argv)
+{
+    argp_parse(&cmd_argp, argc, argv, 0, 0, this);
 }

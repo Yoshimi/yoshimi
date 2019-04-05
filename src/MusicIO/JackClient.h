@@ -1,7 +1,7 @@
 /*
     JackClient.h
 
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -31,30 +31,22 @@ class JackClient : public MusicClient
 {
     public:
         JackClient() : MusicClient() { };
-        ~JackClient() { Stop(); Close(); };
+        ~JackClient() { Close(); };
 
-        bool openAudio(void);
-        bool openMidi(void);
+        bool openAudio(WavRecord *recorder);
+        bool openMidi(WavRecord *recorder);
         bool Start(void) { return jackEngine.Start(); };
-        void Stop(void) { };
-        void Close(void) { jackEngine.Close(); };
+        void Close(void);
 
         unsigned int getSamplerate(void) { return jackEngine.getSamplerate(); };
         int getBuffersize(void) { return jackEngine.getBuffersize(); };
+        int grossLatency(void) { return jackEngine.grossLatency(); };
 
         string audioClientName(void) { return jackEngine.clientName(); };
         string midiClientName(void) { return jackEngine.clientName(); };
         int audioClientId(void) { return jackEngine.clientId(); };
         int midiClientId(void) { return jackEngine.clientId(); };
 
-        void startRecord(void) { jackEngine.StartRecord(); };
-        void stopRecord(void) { jackEngine.StopRecord(); };
-
-        bool setRecordFile(const char* fpath, string& errmsg)
-            { return jackEngine.SetWavFile(fpath, errmsg); };
-        bool setRecordOverwrite(string& errmsg)
-            { return jackEngine.SetWavOverwrite(errmsg); };
-        string wavFilename(void) { return jackEngine.WavFilename(); };
 
     private:
         JackEngine jackEngine;

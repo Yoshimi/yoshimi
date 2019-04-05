@@ -24,21 +24,19 @@
 #ifndef EFFECT_LFO_H
 #define EFFECT_LFO_H
 
-#include "globals.h"
-
 class EffectLFO
 {
     public:
         EffectLFO();
         ~EffectLFO();
-        void effectLfoOut(float *outl, float *outr);
-        void updateParams(void);
+        void effectlfoout(float *outl, float *outr);
+        void updateparams(void);
         unsigned char Pfreq;
         unsigned char Prandomness;
         unsigned char PLFOtype;
         unsigned char Pstereo; // "64"=0
     private:
-        float getLfoShape(float x);
+        float getlfoshape(float x);
 
         float xl,xr;
         float incx;

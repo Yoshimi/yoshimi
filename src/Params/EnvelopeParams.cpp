@@ -56,56 +56,56 @@ EnvelopeParams::EnvelopeParams(unsigned char Penvstretch_,
     store2defaults();
 }
 
-float EnvelopeParams::getDt(char i)
+float EnvelopeParams::getdt(char i)
 {
-    float result = (powf(2.0, Penvdt[(int)i] / 127.0 * 12.0) - 1.0) * 10.0; // miliseconds
+    float result = (powf(2.0f, Penvdt[(int)i] / 127.0f * 12.0f) - 1.0f) * 10.0; // miliseconds
     return result;
 }
 
 // ADSR/ASR... initialisations
 void EnvelopeParams::ADSRinit(char A_dt, char D_dt, char S_val, char R_dt)
 {
-    setPresetType("Penvamplitude");
+    setpresettype("Penvamplitude");
     Envmode = 1;
     PA_dt = A_dt;
     PD_dt = D_dt;
     PS_val = S_val;
     PR_dt = R_dt;
     Pfreemode = 0;
-    convertToFree();
+    converttofree();
     store2defaults();
 }
 
 void EnvelopeParams::ADSRinit_dB(char A_dt, char D_dt, char S_val, char R_dt)
 {
-    setPresetType("Penvamplitude");
+    setpresettype("Penvamplitude");
     Envmode = 2;
     PA_dt = A_dt;
     PD_dt = D_dt;
     PS_val = S_val;
     PR_dt = R_dt;
     Pfreemode = 0;
-    convertToFree();
+    converttofree();
     store2defaults();
 }
 
 void EnvelopeParams::ASRinit(char A_val, char A_dt, char R_val, char R_dt)
 {
-    setPresetType("Penvfrequency");
+    setpresettype("Penvfrequency");
     Envmode = 3;
     PA_val = A_val;
     PA_dt = A_dt;
     PR_val = R_val;
     PR_dt = R_dt;
     Pfreemode = 0;
-    convertToFree();
+    converttofree();
     store2defaults();
 }
 
 void EnvelopeParams::ADSRinit_filter(char A_val, char A_dt, char D_val,
                                      char D_dt, char R_dt, char R_val)
 {
-    setPresetType("Penvfilter");
+    setpresettype("Penvfilter");
     Envmode = 4;
     PA_val = A_val;
     PA_dt = A_dt;
@@ -114,25 +114,25 @@ void EnvelopeParams::ADSRinit_filter(char A_val, char A_dt, char D_val,
     PR_dt = R_dt;
     PR_val = R_val;
     Pfreemode = 0;
-    convertToFree();
+    converttofree();
     store2defaults();
 }
 
 void EnvelopeParams::ASRinit_bw(char A_val, char A_dt, char R_val, char R_dt)
 {
-    setPresetType("Penvbandwidth");
+    setpresettype("Penvbandwidth");
     Envmode = 5;
     PA_val = A_val;
     PA_dt = A_dt;
     PR_val = R_val;
     PR_dt = R_dt;
     Pfreemode = 0;
-    convertToFree();
+    converttofree();
     store2defaults();
 }
 
 // Convert the Envelope to freemode
-void EnvelopeParams::convertToFree(void)
+void EnvelopeParams::converttofree(void)
 {
     switch (Envmode) {
     case 1:
@@ -239,7 +239,8 @@ void EnvelopeParams::getfromXML(XMLwrapper *xml)
         xml->exitbranch();
     }
 
-    if (!Pfreemode) convertToFree();
+    if (!Pfreemode)
+        converttofree();
 }
 
 void EnvelopeParams::defaults(void)
@@ -255,7 +256,7 @@ void EnvelopeParams::defaults(void)
     PS_val = DS_val;
     PR_val = DR_val;
     Pfreemode = 0;
-    convertToFree();
+    converttofree();
 }
 
 void EnvelopeParams::store2defaults(void)

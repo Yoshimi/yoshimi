@@ -22,23 +22,23 @@
 
 #include <cmath>
 #include <cstring>
-#include <iostream>
 #include <sys/sysinfo.h>
 
 using namespace std;
 
+#include "Misc/Util.h"
 #include "Misc/Config.h"
 #include "DSP/FFTwrapper.h"
 
 FFTwrapper::FFTwrapper(int fftsize_)
 {
     fftsize = fftsize_;
-    data1 = new double[fftsize];
-    data2 = new double[fftsize];
+    data1 = (double*)fftw_malloc(sizeof(double) * fftsize);
+    data2 = (double*)fftw_malloc(sizeof(double) * fftsize);
     planBasic = fftw_plan_r2r_1d(fftsize, data1, data1, FFTW_R2HC,
-                                 FFTW_ESTIMATE);
+                                 FFTW_MEASURE | FFTW_PRESERVE_INPUT);
     planInv = fftw_plan_r2r_1d(fftsize, data2, data2, FFTW_HC2R,
-                               FFTW_ESTIMATE);
+                               FFTW_MEASURE | FFTW_PRESERVE_INPUT);
 }
 
 
@@ -46,8 +46,8 @@ FFTwrapper::~FFTwrapper()
 {
     fftw_destroy_plan(planBasic);
     fftw_destroy_plan(planInv);
-    delete [] data1;
-    delete [] data2;
+    fftw_free(data1);
+    fftw_free(data2);
 }
 
 

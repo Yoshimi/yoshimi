@@ -37,14 +37,14 @@ public:
     ~PresetsStore();
 
     // Clipboard stuff
-    void copyClipboard(XMLwrapper *xml, string type);
-    bool pasteClipboard(XMLwrapper *xml);
-    bool checkClipboardType(string type);
+    void copyclipboard(XMLwrapper *xml, string type);
+    bool pasteclipboard(XMLwrapper *xml);
+    bool checkclipboardtype(string type);
 
     // presets stuff
-    void copyPreset(XMLwrapper *xml, string type, string name);
-    bool pastePreset(XMLwrapper *xml, int npreset);
-    void deletePreset(int npreset);
+    void copypreset(XMLwrapper *xml, string type, string name);
+    bool pastepreset(XMLwrapper *xml, int npreset);
+    void deletepreset(int npreset);
 
     struct presetstruct {
         string file;
@@ -52,9 +52,11 @@ public:
     };
     presetstruct presets[MAX_PRESETS];
 
-    void rescanPresets(string type);
+    void rescanforpresets(string type);
 
 private:
+    void clearpresets(void);
+
     struct {
         char *data;
         string type;

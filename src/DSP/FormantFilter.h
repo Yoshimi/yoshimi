@@ -33,14 +33,14 @@ class FormantFilter : public Filter_
     public:
         FormantFilter(FilterParams *pars);
         ~FormantFilter();
-        void filterOut(float *smp);
-        void setFreq(float frequency);
-        void setFreq_and_Q(float frequency, float q_);
-        void setQ(float q_);
+        void filterout(float *smp);
+        void setfreq(float frequency);
+        void setfreq_and_q(float frequency, float q_);
+        void setq(float q_);
+        void cleanup(void);
 
-        void Cleanup();
     private:
-        void setPos(float input);
+        void setpos(float input);
 
 
         AnalogFilter *formant[FF_MAX_FORMANTS];

@@ -37,11 +37,11 @@ SVFilter::SVFilter(unsigned char Ftype, float Ffreq, float Fq,
     if (stages >= MAX_FILTER_STAGES)
         stages = MAX_FILTER_STAGES;
     outgain = 1.0;
-    Cleanup();
-    setFreq_and_Q(Ffreq, Fq);
+    cleanup();
+    setfreq_and_q(Ffreq, Fq);
 }
 
-void SVFilter::Cleanup()
+void SVFilter::cleanup()
 {
     for (int i = 0; i < MAX_FILTER_STAGES + 1; ++i)
         st[i].low = st[i].high = st[i].band = st[i].notch = 0.0;
@@ -49,7 +49,7 @@ void SVFilter::Cleanup()
     abovenq = 0;
 }
 
-void SVFilter::computeFilterCoefs()
+void SVFilter::computefiltercoefs(void)
 {
     par.f = freq / zynMaster->getSamplerate() * 4.0;
     if (par.f > 0.99999)
@@ -60,7 +60,7 @@ void SVFilter::computeFilterCoefs()
 }
 
 
-void SVFilter::setFreq(float frequency)
+void SVFilter::setfreq(float frequency)
 {
     if (frequency < 0.1)
         frequency = 0.1;
@@ -81,44 +81,44 @@ void SVFilter::setFreq(float frequency)
         ipar = par;
     }
     freq = frequency;
-    computeFilterCoefs();
+    computefiltercoefs();
     firsttime = 0;
 }
 
-void SVFilter::setFreq_and_Q(float frequency, float q_)
+void SVFilter::setfreq_and_q(float frequency, float q_)
 {
     q = q_;
-    setFreq(frequency);
+    setfreq(frequency);
 }
 
-void SVFilter::setQ(float q_)
+void SVFilter::setq(float q_)
 {
     q = q_;
-    computeFilterCoefs();
+    computefiltercoefs();
 }
 
-void SVFilter::setType(int type_)
+void SVFilter::settype(int type_)
 {
     type = type_;
-    computeFilterCoefs();
+    computefiltercoefs();
 }
 
-void SVFilter::setGain(float dBgain)
+void SVFilter::setgain(float dBgain)
 {
     gain = dB2rap(dBgain);
-    computeFilterCoefs();
+    computefiltercoefs();
 }
 
-void SVFilter::setStages(int stages_)
+void SVFilter::setstages(int stages_)
 {
     if (stages_ >= MAX_FILTER_STAGES)
         stages_ = MAX_FILTER_STAGES - 1;
     stages = stages_;
-    Cleanup();
-    computeFilterCoefs();
+    cleanup();
+    computefiltercoefs();
 }
 
-void SVFilter::singleFilterOut(float *smp, fstage &x, parameters &par)
+void SVFilter::singlefilterout(float *smp, fstage &x, parameters &par)
 {
     float *out = NULL;
     switch (type)
@@ -148,7 +148,7 @@ void SVFilter::singleFilterOut(float *smp, fstage &x, parameters &par)
     }
 }
 
-void SVFilter::filterOut(float *smp)
+void SVFilter::filterout(float *smp)
 {
     float *ismp = NULL;
     int buffersize = zynMaster->getBuffersize();
@@ -162,11 +162,11 @@ void SVFilter::filterOut(float *smp)
         memcpy(ismp, smp, buffersize * sizeof(float));
 
         for (int i = 0; i < stages + 1; ++i)
-            singleFilterOut(ismp, st[i],ipar);
+            singlefilterout(ismp, st[i],ipar);
     }
 
     for (int i = 0; i < stages + 1; ++i)
-        singleFilterOut(smp, st[i],par);
+        singlefilterout(smp, st[i],par);
 
     if (needsinterpolation != 0)
     {

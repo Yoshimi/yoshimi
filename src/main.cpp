@@ -1,374 +1,102 @@
 /*
     main.cpp
 
-    Original ZynAddSubFX author Nasca Octavian Paul
-    Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can redistribute
-    it and/or modify it under the terms of version 2 of the GNU General Public
-    License as published by the Free Software Foundation.
+    This file is part of yoshimi, which is free software: you can
+    redistribute it and/or modify it under the terms of the GNU General
+    Public License as published by the Free Software Foundation, either
+    version 3 of the License, or (at your option) any later version.
 
-    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
-    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
-    later) for more details.
+    yoshimi is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License along with
-    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
-    Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-    This file is a derivative of the ZynAddSubFX original, modified October 2009
+    You should have received a copy of the GNU General Public License
+    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-#include <string>
-#include <iostream>
-#include <getopt.h>
-#include <fftw3.h>
 
 using namespace std;
 
 #include "Misc/Util.h"
 #include "Misc/Master.h"
 #include "MusicIO/MusicClient.h"
-
-#if !defined(DISABLE_GUI)
-#   include "GuiThreadUI.h"
-#endif
-
-static int set_DAZ_and_FTZ(int on /*bool*/);
+#include "GuiThreadUI.h"
 
 int main(int argc, char *argv[])   
 {
-    struct option opts[] = { // Command line options
-        // no argument: 0, required: 1:, optional: 2::
-        {"name-tag",        1, NULL, 'N'},
-        {"load",            1, NULL, 'l'},
-        {"load-instrument", 1, NULL, 'L'},
-        {"oscilsize",       1, NULL, 'o'},
-        {"no-gui",          0, NULL, 'U'},
-        {"alsa-midi",       2, NULL, 'a'},
-        {"jack-midi",       2, NULL, 'j'},
-        {"no-audio",        0, NULL, 'z'},
-        {"jack-audio",      2, NULL, 'J'},
-        {"autostart-jack",  0, NULL, 'k'},
-        {"alsa-audio",      2, NULL, 'A'},
-        {"samplerate",      1, NULL, 'r'},
-        {"buffersize",      1, NULL, 'b'},
-        {"quiet",           0, NULL, 'q'},
-        {"help",            2, NULL, 'h'},
-        { 0, 0, 0, 0 }
-    };
-
-    set_DAZ_and_FTZ(1);
-    int exit_status = 0;
     std::ios::sync_with_stdio(false);
-    cerr.precision(3);
-    string load_params = string();
-    string load_instrument = string();
-    int option_index = 0;
-    int opt;
-    bool exitwithhelp = false;
-    opterr = 0;
-    int tmp = 0;
-    unsigned int utmp = 0;
-    while (true)
+    cerr.precision(2);
+    set_DAZ_and_FTZ(1);
+
+    guiMaster = new MasterUI();
+    if (NULL == guiMaster)
     {
-        opt = getopt_long(argc, argv, "a::A::j::J::b:N:l:L:o:r:hkqU", opts,
-                          &option_index);
-        char *optarguments = optarg;
-        if (opt == -1)
-            break;
-        switch (opt)
-        {
-            case 'a':
-                Runtime.settings.midiEngine = alsa_midi;
-                if (optarguments != NULL)
-                    Runtime.settings.midiDevice = string(optarguments);
-                break;
-
-            case 'A':
-                Runtime.settings.audioEngine = alsa_audio;
-                if (optarguments != NULL)
-                    Runtime.settings.audioDevice = string(optarguments);
-                Runtime.settings.audioDevice = (optarguments == NULL)
-                               ? string(Runtime.settings.LinuxALSAaudioDev)
-                               : string(optarguments);
-                if (!Runtime.settings.audioDevice.size())
-                    Runtime.settings.audioDevice = "default";
-                break;
-
-            case 'b':
-                utmp = 0;
-                if (optarguments != NULL)
-                    utmp = atoi(optarguments);
-                unsigned int x;
-                for (x = 64; x <= 4096; x *= 2)
-                {
-                    if (utmp <= x)
-                    {
-                        utmp = x;
-                        break;
-                    }
-                }
-                Runtime.settings.Buffersize = (utmp > 4096) ? 1024 : utmp;
-                break;
-
-            case 'N':
-                if (optarguments != NULL)
-                    Runtime.settings.nameTag = string(optarguments);
-                break;
-
-            case 'h':
-                exitwithhelp = true;
-                break;
-
-            case 'j':
-                Runtime.settings.midiEngine = jack_midi;
-                if (optarguments != NULL)
-                    Runtime.settings.midiDevice = string(optarguments);
-                break;
-
-            case 'J':
-                Runtime.settings.audioEngine = jack_audio;
-                if (optarguments != NULL)
-                    Runtime.settings.audioDevice = string(optarguments);
-                else
-                    Runtime.settings.audioDevice = string(Runtime.settings.LinuxJACKserver);
-                if (!Runtime.settings.audioDevice.size())
-                {
-                    if (getenv("JACK_DEFAULT_SERVER"))
-                        Runtime.settings.audioDevice = string(getenv("JACK_DEFAULT_SERVER"));
-                    else
-                        Runtime.settings.audioDevice = "default";
-                }
-                break;
-
-            case 'k':
-                if (getenv("JACK_NO_START_SERVER"))
-                    cerr << "Note, jack autostart specified, but JACK_NO_START_SERVER is set"
-                         << endl;
-                else
-                    autostart_jack = true;
-                break;
-
-            case 'l':
-                if (optarguments != NULL)
-                    load_params = string(optarguments);
-                break;
-
-            case 'L':
-                if (optarguments != NULL)
-                    load_instrument = string(optarguments);
-                break;
-
-            case 'o':
-                {
-                    utmp = 0;
-                    if (optarguments != NULL)
-                        utmp = atoi(optarguments);
-                    unsigned int oscil_size = utmp;
-                    if (oscil_size < MAX_AD_HARMONICS * 2)
-                        oscil_size = MAX_AD_HARMONICS * 2;
-                    oscil_size = (int)powf(2, ceil(logf(oscil_size - 1.0) / logf(2.0)));
-                    if (utmp != oscil_size)
-                    {
-                        cerr << "Oscilsize parameter " << utmp
-                             << " is wrong, too small or not power of 2\n";
-                        cerr << "ie, 2^n.  Forcing it to " << oscil_size
-                             << " instead" << endl;
-                        Runtime.settings.Oscilsize = oscil_size;
-                    }
-                }
-                break;
-
-            case 'r':
-                tmp = 0;
-                if (optarguments != NULL)
-                    tmp = atoi(optarguments);
-                switch (tmp)
-                {
-                    case 44100:
-                    case 48000:
-                    case 96000:
-                        Runtime.settings.Samplerate = tmp;
-                        break;
-                    default:
-                        Runtime.settings.Samplerate = 0;
-                        break;
-                }
-                if (!Runtime.settings.Samplerate)
-                {
-                    cerr << "Error, invalid samplerate specified, ";
-                    cerr << "valid rates are 44100, 48000, 96000" << endl;
-                    exitwithhelp = true;
-                 }
-                 break;
-
-            case 'U':
-                Runtime.settings.showGui = false;
-                break;
-
-            case 'q':
-                Runtime.settings.verbose = false;
-                break;
-
-            case '?':
-                cerr << "Error, invalid command line option" << endl;
-                exitwithhelp = true;
-                break;
-        }
+        Runtime.Log("Failed to instantiate guiMaster");
+        goto bail_out;
     }
-    if (Runtime.settings.audioEngine == no_audio
-        && Runtime.settings.midiEngine == no_midi)
-    {
-        cerr << "Error, no audio & no midi engines nominated!" << endl;
-        exitwithhelp = true;
-    }
-    if (exitwithhelp)
-    {
-        Runtime.Usage();
-        exit(0);
-    }
-    srand(time(NULL));
 
+    Runtime.loadCmdArgs(argc, argv);
     if (NULL == (zynMaster = new Master()))
     {
-        cerr << "Error, failed to allocate Master" << endl;
-        exit_status = 1;
+        Runtime.Log("Failed to allocate Master");
         goto bail_out;
     }
 
     if (NULL == (musicClient = MusicClient::newMusicClient()))
     {
-        cerr << "Error, failed to instantiate MusicClient" << endl;
-        exit_status = 1;
+        Runtime.Log("Failed to instantiate MusicClient");
         goto bail_out;
     }
 
     if (!(musicClient->Open()))
     {
-        cerr << "Error, failed to open MusicClient" << endl;
-        exit_status = 1;
+        Runtime.Log("Failed to open MusicClient");
         goto bail_out;
     }
 
-    if (!zynMaster->Init(musicClient->getSamplerate(),
-                         musicClient->getBuffersize(),
-                         Runtime.settings.Oscilsize,
-                         load_params, load_instrument))
+    if (!zynMaster->Init())
     {
-        cerr << "Error, Master init failed" << endl;
-        exit_status = 1;
+        Runtime.Log("Master init failed");
         goto bail_out;
     }
 
-#   if !defined(DISABLE_GUI)
-        if (NULL == (guiMaster = new MasterUI()))
-        {
-            cerr << "Error, failed to instantiate guiMaster" << endl;
-            goto bail_out;
-        }
-#   endif
-
-#   if !defined(DISABLE_GUI)
-        if (Runtime.settings.showGui)
-            if (!startGuiThread())
-            {
-                cerr << "Error, failed to start gui thread" << endl;
-                goto bail_out;
-            }
-#   endif
+    if (!startGuiThread())
+    {
+        Runtime.Log("Failed to start gui thread");
+        goto bail_out;
+    }
 
     if (musicClient->Start())
     {
         Runtime.StartupReport(musicClient->getSamplerate(), musicClient->getBuffersize());
         while (!Pexitprogram)
-            usleep(33000); // where all the action is ...
+            usleep(16666); // where all the action is ...
         musicClient->Close();
-#       if !defined(DISABLE_GUI)
-            if (NULL != guiMaster)
-            {
-                stopGuiThread();
-                delete guiMaster;
-                guiMaster = NULL;
-            }
-#       endif
+        if (NULL != guiMaster)
+        {
+            stopGuiThread();
+            delete guiMaster;
+            guiMaster = NULL;
+        }
     }
     else
     {
-        cerr << "So sad, failed to start MusicIO" << endl;
-        exit_status = 1;
+        Runtime.Log("So sad, failed to start MusicIO");
         goto bail_out;
     }
-    fftw_cleanup_threads();
+    Runtime.flushLog();
     set_DAZ_and_FTZ(0);
-    return exit_status;
+    return 0;
 
 bail_out:
-    cerr << "Yoshimi stages a strategic retreat :-(" << endl;
-
-#   if !defined(DISABLE_GUI)
-        if (NULL != guiMaster)
-        {
-            guiMaster->strategicRetreat();
-            delete guiMaster;
-        }
-#   endif
-
-    fftw_cleanup_threads();
+    Runtime.Log("Yoshimi stages a strategic retreat :-(");
+    if (NULL != guiMaster)
+    {
+        guiMaster->strategicRetreat();
+    }
+    Runtime.flushLog();
     set_DAZ_and_FTZ(0);
-    exit(exit_status);
+    return 1;
 }
-
-
-// Denormal protection
-// Reference <http://lists.linuxaudio.org/pipermail/linux-audio-dev/2009-August/024707.html>
-
-#include <xmmintrin.h>
-
-#define CPUID(f,ax,bx,cx,dx) __asm__ __volatile__ \
-("cpuid": "=a" (ax), "=b" (bx), "=c" (cx), "=d" (dx) : "a" (f))
-
-static int set_DAZ_and_FTZ(int on /*bool*/)
-{
-   int sse_level = 0;
-
-   if(on)
-   {
-      unsigned long ax, bx, cx, dx;
-
-      CPUID(0x00,ax,bx,cx,dx);
-      CPUID(0x01,ax,bx,cx,dx);
-
-      if (dx & 0x02000000)
-      {
-	 sse_level = 1;
-	 // set FLUSH_TO_ZERO to ON and
-	 // set round towards zero (RZ)
-	 _mm_setcsr(_mm_getcsr() | 0x8000|0x6000);
-
-	 if (dx & 0x04000000)
-	 {
-	    sse_level = 2;
-
-	    if (cx & 0x00000001)
-	    {
-	       sse_level = 3;
-	       // set DENORMALS_ARE_ZERO to ON
-	       _mm_setcsr(_mm_getcsr() | 0x0040);
-	    }
-	    // we should have checked for AMD K8 without SSE3 here:
-	    // if(AMD_K8_NO_SSE3)
-            // .. but I can't recall how to that :-/
-	 }
-      }
-   } else
-      // clear underflow and precision flags
-      // and set DAZ and FTZ to OFF
-      // and restore round to nearest (RN)
-      _mm_setcsr(_mm_getcsr() & ~(0x0030|0x8000|0x0040|0x6000));
-
-   return sse_level;
-}
-#undef CPUID
