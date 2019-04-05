@@ -42,30 +42,30 @@ decl {pthread_t pthreadGui = 0;} {global
 
 Function {guiThread(void* arg)} {private return_type {static void*}
 } {
-  code {while (!Pexitprogram)
+  code {\\
+    while (!Pexitprogram)
     {
-      Runtime.checkInterrupted();
       if (!Runtime.LogList.empty())
-      {
+      { 
         if (Runtime.LogList.front().size())
           guiMaster->Log(Runtime.LogList.front());
         Runtime.LogList.pop_front();
       }
-      //if (Fl::ready())
-        Fl::wait();
-      //else
-        usleep(1666);
+      Runtime.signalCheck();
+      if (!Pexitprogram)
+        Fl::wait(0.066);
     }
     return NULL;} {}
 }
 
 Function {noguiThread(void* arg)} {private return_type {static void*}
 } {
-  code {
+  code {\\
     while (!Pexitprogram)
     {
-      Runtime.checkInterrupted();
-      usleep(66666);;
+      Runtime.signalCheck();
+      if (!Pexitprogram)
+          usleep(66666);;
     }
     return NULL;
   } {}
@@ -73,13 +73,9 @@ Function {noguiThread(void* arg)} {private return_type {static void*}
 
 Function {startGuiThread(bool show_gui)} {return_type bool
 } {
-  code {
+  code {\\
     if (show_gui)
-    {
-      //Fl::visual(FL_INDEX|FL_RGB8);
-      //fl_open_display();
       guiMaster->Init();
-    }
     int chk;
     pthread_attr_t attr;
     if ((chk = pthread_attr_init(&attr)))
@@ -109,16 +105,10 @@ Function {startGuiThread(bool show_gui)} {return_type bool
   } {}
 }
 
-Function {interruptedCheck(void* arg)} {private return_type {static void}
-} {
-  code {
-    Runtime.checkInterrupted();
-    Fl::repeat_timeout (1.0, interruptedCheck);
-  } {}
-}
-
-Function {stopGuiThread(void)} {return_type void
-} {
-  code {Pexitprogram = true;
-    pthread_cancel(pthreadGui);} {}
-}
+#Function {stopGuiThread(void)} {return_type void
+#} {
+#  code {\\
+#    Pexitprogram = true;
+#    pthread_cancel(pthreadGui);
+#  } {}
+#}

@@ -43,7 +43,7 @@ class Config
 
     public:
         Config();
-        ~Config() { };
+        ~Config();
 
         void loadCmdArgs(int argc, char **argv);
         void StartupReport(unsigned int samplerate, int buffersize);
@@ -58,11 +58,9 @@ class Config
         string HistoryFilename(int index);
 
         static void sigHandler(int sig);
-        void checkInterrupted(void);
-        void SetInterruptActive(int sig);
-
-        int CheckLadi1Active(void);
-        void SetLadi1Active(int sig);
+        void setInterruptActive(int sig);
+        void setLadi1Active(int sig);
+        void signalCheck(void);
 
         void Log(string msg);
         void flushLog(void);
@@ -116,11 +114,14 @@ class Config
         bool loadRuntimeData(XMLwrapper *xml);
         void addConfigXML(XMLwrapper *xml);
         void addRuntimeXML(XMLwrapper *xml);
+        int SSEcapability(void);
+        void AntiDenormals(bool set_daz_ftz);
 
         static unsigned short nextHistoryIndex;
         static struct sigaction sigAction;
         static int sigIntActive;
         static int ladi1IntActive;
+        int sse_level;
 };
 
 extern Config Runtime;

@@ -28,7 +28,6 @@ int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cerr.precision(2);
-    set_DAZ_and_FTZ(1);
 
     Runtime.loadCmdArgs(argc, argv);
     if (Runtime.showGui)
@@ -81,13 +80,10 @@ int main(int argc, char *argv[])
         {
             if (NULL != guiMaster)
             {
-                stopGuiThread();
                 delete guiMaster;
                 guiMaster = NULL;
             }
         }
-        else
-            stopGuiThread();
     }
     else
     {
@@ -95,7 +91,6 @@ int main(int argc, char *argv[])
         goto bail_out;
     }
     Runtime.flushLog();
-    set_DAZ_and_FTZ(0);
     return 0;
 
 bail_out:
@@ -105,6 +100,5 @@ bail_out:
         guiMaster->strategicRetreat();
     }
     Runtime.flushLog();
-    set_DAZ_and_FTZ(0);
     return 1;
 }

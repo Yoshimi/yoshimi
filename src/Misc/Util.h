@@ -37,8 +37,6 @@ using namespace std;
 
 extern bool Pexitprogram;  // if the UI sets this true, the program will exit
 
-int set_DAZ_and_FTZ(int on); // bool on/off
-
 string asString(const float& number);
 string asString(const int& number);
 string asString(const unsigned int& number);

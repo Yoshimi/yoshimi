@@ -25,6 +25,10 @@
 #include <string>
 #include <argp.h>
 
+#if defined(__SSE__)
+#include <xmmintrin.h>
+#endif
+
 using namespace std;
 
 #include "GuiThreadUI.h"
@@ -91,7 +95,8 @@ Config::Config() :
     DefaultRecordDirectory("/tmp"),
     BankUIAutoClose(0),
     Interpolation(0),
-    CheckPADsynth(1)
+    CheckPADsynth(1),
+    sse_level(0)
 {
     memset(&sigAction, 0, sizeof(sigAction));
     sigAction.sa_handler = sigHandler;
@@ -105,6 +110,7 @@ Config::Config() :
         Log("Setting SIGTERM handler failed");
     if (sigaction(SIGQUIT, &sigAction, NULL))
         Log("Setting SIGQUIT handler failed");
+    AntiDenormals(true);       
 
     clearBankrootDirlist();
     clearPresetsDirlist();
@@ -148,6 +154,12 @@ Config::Config() :
 }
 
 
+Config::~Config()
+{
+    AntiDenormals(false);       
+}
+
+
 void Config::flushLog(void)
 {
     if (LogList.size())
@@ -158,29 +170,6 @@ void Config::flushLog(void)
             cerr << LogList.front() << endl;
             LogList.pop_front();
         }
-    }
-}
-
-
-void Config::sigHandler(int sig)
-{
-    switch (sig)
-    {
-        case SIGINT:
-        case SIGHUP:
-        case SIGTERM:
-        case SIGQUIT:
-            Runtime.SetInterruptActive(sig);
-            break;
-
-        case SIGUSR1:
-            Runtime.SetLadi1Active(sig);
-            sigaction(SIGUSR1, &sigAction, NULL);
-            break;
-
-        default:
-            Runtime.Log("Unexpected signal: " + asString(sig));
-            break;
     }
 }
 
@@ -500,34 +489,140 @@ XMLwrapper *Config::RestoreRuntimeState(void)
 }
 
 
-void Config::checkInterrupted(void)
+void Config::sigHandler(int sig)
 {
-    if (sigIntActive)
+    switch (sig)
     {
-        musicClient->Close();
-        stopGuiThread();
-        __sync_sub_and_fetch (&sigIntActive, 1);
+        case SIGINT:
+        case SIGHUP:
+        case SIGTERM:
+        case SIGQUIT:
+            Runtime.setInterruptActive(sig);
+            break;
 
+        case SIGUSR1:
+            Runtime.setLadi1Active(sig);
+            sigaction(SIGUSR1, &sigAction, NULL);
+            break;
+
+        default:
+            Runtime.Log("Unexpected signal: " + asString(sig));
+            break;
     }
-    else if (ladi1IntActive)
+}
+
+
+void Config::signalCheck(void)
+{
+    if (ladi1IntActive)
     {
         Runtime.SaveState();
         __sync_sub_and_fetch (&ladi1IntActive, 1);
     }
+
+    if (sigIntActive)
+        Pexitprogram = true;
 }
 
+//        musicClient->Close();
+//        stopGuiThread();
+//        __sync_sub_and_fetch (&sigIntActive, 1);
 
-void Config::SetInterruptActive(int sig)
+
+void Config::setInterruptActive(int sig)
 {
-    Log("Interrupt received, closing down");
+    Log("Interrupt received");
     __sync_add_and_fetch(&Config::sigIntActive, 1);
 }
 
 
-void Config::SetLadi1Active(int sig)
+void Config::setLadi1Active(int sig)
 {
     __sync_add_and_fetch(&ladi1IntActive, 1);
 }
+
+
+int Config::SSEcapability(void)
+{
+#if !defined(__SSE__)
+    return 0;
+#else
+#   if defined(__x86_64__)
+        int64_t edx;
+        __asm__ __volatile__ (
+            "mov %%rbx,%%rdi\n\t" // save PIC register
+            "movl $1,%%eax\n\t"
+            "cpuid\n\t"
+            "mov %%rdi,%%rbx\n\t" // restore PIC register
+            : "=d" (edx)
+            : : "%rax", "%rcx", "%rdi"
+        );
+#   else
+        int32_t edx;
+        __asm__ __volatile__ (
+            "movl %%ebx,%%edi\n\t" // save PIC register
+            "movl $1,%%eax\n\t"
+            "cpuid\n\t"
+            "movl %%edi,%%ebx\n\t" // restore PIC register
+            : "=d" (edx)
+            : : "%eax", "%ecx", "%edi"
+        );
+#   endif
+    return ((edx & 0x02000000 /*SSE*/) | (edx & 0x04000000 /*SSE2*/)) >> 25;
+#endif
+}
+
+
+void Config::AntiDenormals(bool set_daz_ftz)
+{
+#if defined(__SSE__)
+    if (set_daz_ftz)
+    {
+        sse_level = SSEcapability();
+        if (sse_level & 0x01)
+            // SSE, turn on flush to zero (FTZ) and round towards zero (RZ)
+            _mm_setcsr(_mm_getcsr() | 0x8000|0x6000);
+        if (sse_level & 0x02)
+            // SSE2, turn on denormals are zero (DAZ)
+	       _mm_setcsr(_mm_getcsr() | 0x0040);
+    }
+    else if (sse_level)
+    {
+        // Clear underflow and precision flags,
+        // turn DAZ, FTZ off, restore round to nearest (RN)
+        _mm_setcsr(_mm_getcsr() & ~(0x0030|0x8000|0x0040|0x6000));
+    }
+#endif        
+}
+
+/**
+SSEcapability() and AntiDenormals() draw gratefully on the work of others,
+including:
+
+Jens M Andreasen, LAD, <http://lists.linuxaudio.org/pipermail/linux-audio-dev/2009-August/024707.html>). 
+
+LinuxSampler src/common/Features.cpp, licensed thus -
+
+ *   LinuxSampler - modular, streaming capable sampler                     *
+ *                                                                         *
+ *   Copyright (C) 2003, 2004 by Benno Senoner and Christian Schoenebeck   *
+ *   Copyright (C) 2005 - 2008 Christian Schoenebeck                       *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the Free Software           *
+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston,                 *
+ *   MA  02111-1307  USA                                                   *
+**/
 
 
 bool Config::loadRuntimeData(XMLwrapper *xml)

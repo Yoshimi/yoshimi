@@ -6,6 +6,9 @@ See INSTALL for instructions.
 Bon apetite.
 ------------
 Changes
+0.057 reinstate jack midi pitchbend fix (from circa 0.022???); incorporate
+      Nedko's lazy signal response fix; check for sse availability, and step
+      over things accordingly. 
 0.056 reinstates PADsynth functionality - a stuff up in XMLwrapper::getparbool(). 
 0.055.6 possibly fixes loading compressed xml. 
 0.055.5 Add airlynx/chip instruments.

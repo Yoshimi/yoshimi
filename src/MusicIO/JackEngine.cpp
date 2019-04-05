@@ -540,7 +540,7 @@ void *JackEngine::midiThread(void)
 
             case 0xE0: // pitch bend
                 ctrltype = C_pitchwheel;
-                par = ((midiEvent.data[2] << 7) | midiEvent.data[1]) - 4096;
+                par = ((midiEvent.data[2] << 7) | midiEvent.data[1]) - 8192;
                 setMidiController(channel, ctrltype, par);
                 break;
 
