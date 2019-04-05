@@ -531,7 +531,7 @@ void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
 }
 
 // Applies the parameters (i.e. computes all the samples, based on parameters);
-void PADnoteParameters::applyparameters(bool lockmutex)
+void PADnoteParameters::applyparameters(bool islocked)
 {
     const int samplesize = (((int)1) << (Pquality.samplesize + 14));
     int spectrumsize = samplesize / 2;
@@ -610,13 +610,13 @@ void PADnoteParameters::applyparameters(bool lockmutex)
             newsample.smp[i + samplesize] = newsample.smp[i];
 
         // replace the current sample with the new computed sample
-        if (lockmutex)
-            zynMaster->actionLock(lock);
+        if (!islocked)
+            zynMaster->actionLock(lockmute);
         deletesample(nsample);
         sample[nsample].smp = newsample.smp;
         sample[nsample].size = samplesize;
         sample[nsample].basefreq = basefreq * basefreqadjust;
-        if (lockmutex)
+        if (!islocked)
             zynMaster->actionLock(unlock);
         newsample.smp = NULL;
     }
@@ -624,20 +624,20 @@ void PADnoteParameters::applyparameters(bool lockmutex)
     FFTwrapper::deleteFFTFREQS(fftfreqs);
 
     // delete the additional samples that might exists and are not useful
-    if (lockmutex)
-        zynMaster->actionLock(lock);
+    if (!islocked)
+        zynMaster->actionLock(lockmute);
     for (int i = samplemax; i < PAD_MAX_SAMPLES; ++i)
         deletesample(i);
-    if (lockmutex)
+    if (!islocked)
         zynMaster->actionLock(unlock);
 }
 
 
 void PADnoteParameters::add2XML(XMLwrapper *xml)
 {
-    xml->information.PADsynth_used=true;
+    xml->information.PADsynth_used = 1;
 
-    xml->addparbool("stereo",PStereo);
+    xml->addparbool("stereo", PStereo);
     xml->addpar("mode",Pmode);
     xml->addpar("bandwidth",Pbandwidth);
     xml->addpar("bandwidth_scale",Pbwscale);

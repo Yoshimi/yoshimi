@@ -35,10 +35,8 @@ FFTwrapper::FFTwrapper(int fftsize_)
     fftsize = fftsize_;
     data1 = (double*)fftw_malloc(sizeof(double) * fftsize);
     data2 = (double*)fftw_malloc(sizeof(double) * fftsize);
-    planBasic = fftw_plan_r2r_1d(fftsize, data1, data1, FFTW_R2HC,
-                                 FFTW_MEASURE | FFTW_PRESERVE_INPUT);
-    planInv = fftw_plan_r2r_1d(fftsize, data2, data2, FFTW_HC2R,
-                               FFTW_MEASURE | FFTW_PRESERVE_INPUT);
+    planBasic = fftw_plan_r2r_1d(fftsize, data1, data1, FFTW_R2HC, FFTW_ESTIMATE);
+    planInv = fftw_plan_r2r_1d(fftsize, data2, data2, FFTW_HC2R, FFTW_ESTIMATE);
 }
 
 

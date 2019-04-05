@@ -209,7 +209,7 @@ bool Master::Init(void)
             }
             else
             {
-                zynMaster->part[loadtopart]->applyparameters();
+                zynMaster->part[loadtopart]->applyparameters(true);
                 Runtime.Log("Instrument file " + Runtime.instrumentLoad + " loaded");
             }
         }
@@ -754,7 +754,7 @@ void Master::applyparameters(void)
 {
     ShutUp();
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-        part[npart]->applyparameters();
+        part[npart]->applyparameters(true);
 }
 
 

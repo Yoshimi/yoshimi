@@ -104,7 +104,7 @@ class XMLwrapper
         bool minimal; // false if all parameters will be stored (used only for clipboard)
 
         struct {
-            bool PADsynth_used;
+            unsigned char PADsynth_used;
         } information;
 
         // opens a file and parse only the "information" data on it

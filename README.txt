@@ -6,6 +6,15 @@ See INSTALL for instructions.
 Bon apetite.
 ------------
 Changes
+0.058.1 switch fftw planner flag from FFTW_MEASURE back to FFTW_ESTIMATE,
+        enabling plinky-plank to load in realistic time
+0.058 all the rc5 fixes but lose the debug code;welcome Jeremy Jongepier's Dubstep bass.
+0.057.2-rc5 fix a deadlock on loading instruments using PADsynth.
+0.057.2-rc4 more testing of issues.
+0.057.2-rc3 Further adjustment to xml file reads.
+0.057.2-chk2 Reinstate 0.057 interrupt fix.
+0.057.2-chk1 Possible fix for intermittent instrument load failures.
+0.057.1 Fix inverted reverb panning.
 0.057 reinstate jack midi pitchbend fix (from circa 0.022???); incorporate
       Nedko's lazy signal response fix; check for sse availability, and step
       over things accordingly. 

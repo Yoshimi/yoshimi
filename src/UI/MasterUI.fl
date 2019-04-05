@@ -239,7 +239,7 @@ class MasterUI {open
                 // load the instr. parameters
                 bool result =
                     zynMaster->part[npart]->loadXMLinstrument(string(filename));
-                zynMaster->part[npart]->applyparameters();
+                zynMaster->part[npart]->applyparameters(true);
                 zynMaster->actionLock(unlock);
                 npartcounter->do_callback();
                 updatepanel();

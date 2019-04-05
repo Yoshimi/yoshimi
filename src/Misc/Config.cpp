@@ -505,6 +505,7 @@ void Config::sigHandler(int sig)
             sigaction(SIGUSR1, &sigAction, NULL);
             break;
 
+        case SIGUSR2:
         default:
             Runtime.Log("Unexpected signal: " + asString(sig));
             break;

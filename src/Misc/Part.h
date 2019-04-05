@@ -71,7 +71,7 @@ class Part
         void defaults(void);
         void defaultsinstrument(void);
 
-        void applyparameters(void);
+        void applyparameters(bool islocked);
 
         void getfromXML(XMLwrapper *xml);
         void getfromXMLinstrument(XMLwrapper *xml);

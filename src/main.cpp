@@ -74,7 +74,10 @@ int main(int argc, char *argv[])
             Runtime.StartupReport(musicClient->getSamplerate(),
                                   musicClient->getBuffersize());
         while (!Pexitprogram)
+        {
             usleep(16666); // where all the action is ...
+            Runtime.signalCheck();
+        }
         musicClient->Close();
         if (Runtime.showGui)
         {

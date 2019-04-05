@@ -183,11 +183,11 @@ Part::~Part()
     cleanup();
     for (int n = 0; n < NUM_KIT_ITEMS; ++n)
     {
-        if (kit[n].adpars != NULL)
+        if (kit[n].adpars)
             delete (kit[n].adpars);
-        if (kit[n].subpars != NULL)
+        if (kit[n].subpars)
             delete (kit[n].subpars);
-        if (kit[n].padpars != NULL)
+        if (kit[n].padpars )
             delete (kit[n].padpars);
         kit[n].adpars = NULL;
         kit[n].subpars = NULL;
@@ -367,8 +367,8 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
             if (Pkitmode == 0)
             {   // "normal mode" legato note
                 if ((kit[0].Padenabled)
-                    && (partnote[pos].kititem[0].adnote != NULL)
-                    && (partnote[posb].kititem[0].adnote != NULL))
+                    && (partnote[pos].kititem[0].adnote)
+                    && (partnote[posb].kititem[0].adnote))
                 {
                     partnote[pos].kititem[0].adnote->
                         ADlegatonote(notebasefreq, vel, portamento, note, true);
@@ -378,8 +378,8 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
                 }
 
                 if ((kit[0].Psubenabled)
-                    && (partnote[pos].kititem[0].subnote != NULL)
-                    && (partnote[posb].kititem[0].subnote != NULL))
+                    && (partnote[pos].kititem[0].subnote)
+                    && (partnote[posb].kititem[0].subnote))
                 {
                     partnote[pos].kititem[0].subnote->
                         SUBlegatonote(notebasefreq, vel, portamento, note, true);
@@ -388,8 +388,8 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
                 }
 
                 if ((kit[0].Ppadenabled)
-                    && (partnote[pos].kititem[0].padnote != NULL)
-                    && (partnote[posb].kititem[0].padnote != NULL))
+                    && (partnote[pos].kititem[0].padnote)
+                    && (partnote[posb].kititem[0].padnote))
                 {
                     partnote[pos].kititem[0].padnote->
                         PADlegatonote(notebasefreq, vel, portamento, note, true);
@@ -422,9 +422,9 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
                             : NUM_PART_EFX;
 
                     if ((kit[item].Padenabled)
-                        && (kit[item].adpars != NULL)
-                        && (partnote[pos].kititem[ci].adnote != NULL)
-                        && (partnote[posb].kititem[ci].adnote != NULL))
+                        && (kit[item].adpars)
+                        && (partnote[pos].kititem[ci].adnote)
+                        && (partnote[posb].kititem[ci].adnote))
                     {
                         partnote[pos].kititem[ci].adnote->
                             ADlegatonote(notebasefreq, vel, portamento, note, true);
@@ -432,9 +432,9 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
                             ADlegatonote(notebasefreq, vel, portamento, note, true);
                     }
                     if ((kit[item].Psubenabled)
-                        && (kit[item].subpars != NULL)
-                        && (partnote[pos].kititem[ci].subnote != NULL)
-                        && (partnote[posb].kititem[ci].subnote != NULL))
+                        && (kit[item].subpars)
+                        && (partnote[pos].kititem[ci].subnote)
+                        && (partnote[posb].kititem[ci].subnote))
                     {
                         partnote[pos].kititem[ci].subnote->
                             SUBlegatonote(notebasefreq, vel, portamento, note, true);
@@ -442,9 +442,9 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
                             SUBlegatonote(notebasefreq, vel, portamento, note, true);
                     }
                     if ((kit[item].Ppadenabled)
-                        && (kit[item].padpars != NULL)
-                        && (partnote[pos].kititem[ci].padnote != NULL)
-                        && (partnote[posb].kititem[ci].padnote != NULL))
+                        && (kit[item].padpars)
+                        && (partnote[pos].kititem[ci].padnote)
+                        && (partnote[posb].kititem[ci].padnote))
                     {
                         partnote[pos].kititem[ci].padnote->
                             PADlegatonote(notebasefreq, vel, portamento, note, true);
@@ -452,9 +452,9 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
                             PADlegatonote(notebasefreq, vel, portamento, note, true);
                     }
 
-                    if ((kit[item].adpars != NULL)
-                        || (kit[item].subpars != NULL)
-                        || (kit[item].padpars != NULL))
+                    if ((kit[item].adpars)
+                        || (kit[item].subpars)
+                        || (kit[item].padpars))
                     {
                         ci++;
                         if (Pkitmode == 2
@@ -533,18 +533,18 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
                         ? kit[item].Psendtoparteffect
                         : NUM_PART_EFX; // if this parameter is 127 for "unprocessed"
 
-                if (kit[item].adpars != NULL && kit[item].Padenabled)
+                if (kit[item].adpars && kit[item].Padenabled)
                 {
                     partnote[pos].kititem[ci].adnote =
                         new ADnote(kit[item].adpars, &ctl, notebasefreq, vel,
                                    portamento, note, false /*not silent*/);
                 }
-                if (kit[item].subpars != NULL && kit[item].Psubenabled)
+                if (kit[item].subpars && kit[item].Psubenabled)
                     partnote[pos].kititem[ci].subnote =
                         new SUBnote(kit[item].subpars, &ctl,notebasefreq, vel,
                                     portamento, note, false);
 
-                if (kit[item].padpars != NULL && kit[item].Ppadenabled)
+                if (kit[item].padpars && kit[item].Ppadenabled)
                     partnote[pos].kititem[ci].padnote =
                         new PADnote(kit[item].padpars, &ctl, notebasefreq, vel,
                                     portamento, note, false);
@@ -557,26 +557,26 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
                             ? kit[item].Psendtoparteffect
                             : NUM_PART_EFX; // if this parameter is 127 for "unprocessed"
 
-                    if (kit[item].adpars != NULL && kit[item].Padenabled)
+                    if (kit[item].adpars && kit[item].Padenabled)
                     {
                         partnote[posb].kititem[ci].adnote =
                             new ADnote(kit[item].adpars, &ctl, notebasefreq, vel,
                                        portamento, note, true /*silent*/);
                     }
-                    if (kit[item].subpars != NULL && kit[item].Psubenabled)
+                    if (kit[item].subpars && kit[item].Psubenabled)
                         partnote[posb].kititem[ci].subnote =
                             new SUBnote(kit[item].subpars, &ctl, notebasefreq,
                                         vel, portamento, note, true);
-                    if (kit[item].padpars != NULL && kit[item].Ppadenabled)
+                    if (kit[item].padpars && kit[item].Ppadenabled)
                         partnote[posb].kititem[ci].padnote =
                             new PADnote(kit[item].padpars, &ctl, notebasefreq,
                                         vel, portamento, note, true);
 
-                    if (kit[item].adpars != NULL || kit[item].subpars != NULL)
+                    if (kit[item].adpars || kit[item].subpars)
                         partnote[posb].itemsplaying++;
                 }
 
-                if (kit[item].adpars != NULL || kit[item].subpars != NULL)
+                if (kit[item].adpars || kit[item].subpars)
                 {
                     partnote[pos].itemsplaying++;
                     if (Pkitmode == 2 && (kit[item].Padenabled
@@ -685,7 +685,7 @@ void Part::SetController(unsigned int type, int par)
 
             for (int item = 0; item < NUM_KIT_ITEMS; ++item)
             {
-                if (kit[item].adpars == NULL)
+                if (!kit[item].adpars)
                     continue;
                 kit[item].adpars->GlobalPar.Reson->sendcontroller(C_resonance_center, 1.0);
                 kit[item].adpars->GlobalPar.Reson->sendcontroller(C_resonance_bandwidth, 1.0);
@@ -699,7 +699,7 @@ void Part::SetController(unsigned int type, int par)
             ctl.setresonancecenter(par);
             for (int item = 0; item < NUM_KIT_ITEMS; ++item)
             {
-                if (kit[item].adpars == NULL)
+                if (!kit[item].adpars)
                     continue;
                 kit[item].adpars->GlobalPar.Reson->sendcontroller(C_resonance_center,
                                                                   ctl.resonancecenter.relcenter);
@@ -766,15 +766,15 @@ void Part::RelaseNotePos(int pos)
 
     for (int j = 0; j < NUM_KIT_ITEMS; ++j)
     {
-        if (partnote[pos].kititem[j].adnote != NULL)
+        if (partnote[pos].kititem[j].adnote)
             if (partnote[pos].kititem[j].adnote)
                 partnote[pos].kititem[j].adnote->relasekey();
 
-        if (partnote[pos].kititem[j].subnote != NULL)
-            if (partnote[pos].kititem[j].subnote != NULL)
+        if (partnote[pos].kititem[j].subnote)
+            if (partnote[pos].kititem[j].subnote)
                 partnote[pos].kititem[j].subnote->relasekey();
 
-        if (partnote[pos].kititem[j].padnote != NULL)
+        if (partnote[pos].kititem[j].padnote)
             if (partnote[pos].kititem[j].padnote)
                 partnote[pos].kititem[j].padnote->relasekey();
     }
@@ -792,17 +792,17 @@ void Part::KillNotePos(int pos)
 
     for (int j = 0; j < NUM_KIT_ITEMS; ++j)
     {
-        if (partnote[pos].kititem[j].adnote != NULL)
+        if (partnote[pos].kititem[j].adnote)
         {
             delete partnote[pos].kititem[j].adnote;
             partnote[pos].kititem[j].adnote = NULL;
         }
-        if (partnote[pos].kititem[j].subnote != NULL)
+        if (partnote[pos].kititem[j].subnote)
         {
             delete partnote[pos].kititem[j].subnote;
             partnote[pos].kititem[j].subnote = NULL;
         }
-        if (partnote[pos].kititem[j].padnote != NULL)
+        if (partnote[pos].kititem[j].padnote)
         {
             delete partnote[pos].kititem[j].padnote;
             partnote[pos].kititem[j].padnote = NULL;
@@ -878,7 +878,7 @@ void Part::ComputePartSmps(void)
             SUBnote *subnote = partnote[k].kititem[item].subnote;
             PADnote *padnote = partnote[k].kititem[item].padnote;
             // get from the ADnote
-            if (adnote != NULL)
+            if (adnote)
             {
                 noteplay++;
                 if (adnote->ready)
@@ -900,7 +900,7 @@ void Part::ComputePartSmps(void)
                 }
             }
             // get from the SUBnote
-            if (subnote != NULL)
+            if (subnote)
             {
                 noteplay++;
                 if (subnote->ready)
@@ -922,7 +922,7 @@ void Part::ComputePartSmps(void)
                 }
             }
             // get from the PADnote
-            if (padnote != NULL)
+            if (padnote)
             {
                 noteplay++;
                 if (padnote->ready)
@@ -1027,11 +1027,11 @@ void Part::setkititemstatus(int kititem, int Penabled_)
     bool resetallnotes = false;
     if (!Penabled_)
     {
-        if (kit[kititem].adpars != NULL)
+        if (kit[kititem].adpars)
             delete (kit[kititem].adpars);
-        if (kit[kititem].subpars != NULL)
+        if (kit[kititem].subpars)
             delete (kit[kititem].subpars);
-        if (kit[kititem].padpars != NULL)
+        if (kit[kititem].padpars)
         {
             delete (kit[kititem].padpars);
             resetallnotes = true;
@@ -1041,11 +1041,11 @@ void Part::setkititemstatus(int kititem, int Penabled_)
         kit[kititem].padpars = NULL;
         kit[kititem].Pname.clear();
     } else {
-        if (kit[kititem].adpars == NULL)
+        if (!kit[kititem].adpars)
             kit[kititem].adpars = new ADnoteParameters(fft);
-        if (kit[kititem].subpars == NULL)
+        if (!kit[kititem].subpars)
             kit[kititem].subpars = new SUBnoteParameters();
-        if (kit[kititem].padpars == NULL)
+        if (!kit[kititem].padpars)
             kit[kititem].padpars = new PADnoteParameters(fft);
     }
 
@@ -1084,7 +1084,7 @@ void Part::add2XMLinstrument(XMLwrapper *xml)
             xml->addpar("send_to_instrument_effect", kit[i].Psendtoparteffect);
 
             xml->addparbool("add_enabled", kit[i].Padenabled);
-            if (kit[i].Padenabled && kit[i].adpars != NULL)
+            if (kit[i].Padenabled && kit[i].adpars)
             {
                 xml->beginbranch("ADD_SYNTH_PARAMETERS");
                 kit[i].adpars->add2XML(xml);
@@ -1092,7 +1092,7 @@ void Part::add2XMLinstrument(XMLwrapper *xml)
             }
 
             xml->addparbool("sub_enabled", kit[i].Psubenabled);
-            if (kit[i].Psubenabled && kit[i].subpars != NULL )
+            if (kit[i].Psubenabled && kit[i].subpars)
             {
                 xml->beginbranch("SUB_SYNTH_PARAMETERS");
                 kit[i].subpars->add2XML(xml);
@@ -1100,7 +1100,7 @@ void Part::add2XMLinstrument(XMLwrapper *xml)
             }
 
             xml->addparbool("pad_enabled", kit[i].Ppadenabled);
-            if (kit[i].Ppadenabled && kit[i].padpars != NULL)
+            if (kit[i].Ppadenabled && kit[i].padpars)
             {
                 xml->beginbranch("PAD_SYNTH_PARAMETERS");
                 kit[i].padpars->add2XML(xml);
@@ -1164,7 +1164,7 @@ void Part::add2XML(XMLwrapper *xml)
 bool Part::saveXML(string filename)
 {
     XMLwrapper *xml = new XMLwrapper();
-    if (NULL == xml)
+    if (!xml)
     {
         Runtime.Log("Error, Part::saveXML failed to instantiate new XMLwrapper");
         return false;
@@ -1181,7 +1181,7 @@ bool Part::saveXML(string filename)
 bool Part::loadXMLinstrument(string filename)
 {
     XMLwrapper *xml = new XMLwrapper();
-    if (NULL == xml)
+    if (!xml)
     {
         Runtime.Log("Error, Part failed to instantiate new XMLwrapper");
         return false;
@@ -1205,11 +1205,11 @@ bool Part::loadXMLinstrument(string filename)
 }
 
 
-void Part::applyparameters(void)
+void Part::applyparameters(bool islocked)
 {
     for (int n = 0; n < NUM_KIT_ITEMS; ++n)
-        if (kit[n].padpars != NULL && kit[n].Ppadenabled)
-            kit[n].padpars->applyparameters(true);
+        if (kit[n].padpars && kit[n].Ppadenabled)
+            kit[n].padpars->applyparameters(islocked);
 }
 
 

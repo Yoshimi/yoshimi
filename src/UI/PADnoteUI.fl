@@ -965,16 +965,20 @@ if (x==0) fixedfreqetdial->deactivate();
       }
       Fl_Button applybutton {
         label {Apply Changes}
-        callback {pars->applyparameters(true);
-o->color(FL_GRAY);
-if (oscui!=NULL) {
-	oscui->applybutton->color(FL_GRAY);
-	oscui->applybutton->redraw();
-};
-if (resui!=NULL) {
-	resui->applybutton->color(FL_GRAY);
-	resui->applybutton->redraw();
-};}
+        callback {//
+            pars->applyparameters(false);
+            o->color(FL_GRAY);
+            if (oscui)
+            {
+                oscui->applybutton->color(FL_GRAY);
+                oscui->applybutton->redraw();
+            }
+            if (resui)
+            {
+                resui->applybutton->color(FL_GRAY);
+                resui->applybutton->redraw();
+            }
+        }
         xywh {45 405 185 40} box THIN_UP_BOX labelfont 1 labelsize 16
         code0 {o->color(FL_RED);}
       }
@@ -995,8 +999,8 @@ if (resui!=NULL) {
       }
     }
   }
-  Function {refresh()} {} {
-    code {
+  Function {refresh(void)} {} {
+    code {//
         volume->value(pars->PVolume);
         vsns->value(pars->PAmpVelocityScaleFunction);
         pan->value(pars->PPanning);
@@ -1084,7 +1088,7 @@ if (resui!=NULL) {
         overtonepos->redraw();
         
         osc->redraw();
-        pars->applyparameters(true);
+        pars->applyparameters(false);
         applybutton->color(FL_GRAY);
         applybutton->parent()->redraw();
     } {}

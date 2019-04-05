@@ -83,10 +83,10 @@ class Bank
 
         string tmpinsname[BANK_SIZE]; // this keeps the numbered names
         struct bank_instrument_t {
-            bool used;
             string name;
             string filename;
-            bool PADsynth_used;
+            bool used;
+            unsigned char PADsynth_used;
         } bank_instrument[BANK_SIZE];
 
         list<bankstruct_t> bank_dir_list;

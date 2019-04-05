@@ -1,5 +1,5 @@
 /*
-  Config.h - Configuration file functions
+    Config.h - Configuration file functions
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -39,8 +39,6 @@ using namespace std;
 
 class Config
 {
-    private:
-
     public:
         Config();
         ~Config();

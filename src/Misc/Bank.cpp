@@ -50,7 +50,7 @@ Bank::Bank() :
     {
         bank_instrument[i].used = false;
         bank_instrument[i].filename.clear();
-        bank_instrument[i].PADsynth_used = false;
+        bank_instrument[i].PADsynth_used = 0;
     }
     dirname.clear();
     clearbank();
@@ -322,9 +322,9 @@ void Bank::swapslot(unsigned int n1, unsigned int n2)
         bool in_use = bank_instrument[n1].used;
         bank_instrument[n1].used = bank_instrument[n2].used;
         bank_instrument[n2].used = in_use;
-        in_use = bank_instrument[n1].PADsynth_used;
+        in_use = bank_instrument[n1].PADsynth_used != 0;
         bank_instrument[n1].PADsynth_used = bank_instrument[n2].PADsynth_used;
-        bank_instrument[n2].PADsynth_used = in_use;
+        bank_instrument[n2].PADsynth_used = (in_use) ? 1 : 0;
     }
 }
 
@@ -485,7 +485,7 @@ bool Bank::addtobank(int pos, const string filename, string name)
         delete xml;
     }
     else
-        bank_instrument[pos].PADsynth_used = false;
+        bank_instrument[pos].PADsynth_used = 0;
     return 0;
 }
 

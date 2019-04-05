@@ -42,7 +42,7 @@ EffectMgr::EffectMgr(const bool insertion_) :
 
 EffectMgr::~EffectMgr()
 {
-    if (efx != NULL)
+    if (efx)
         delete efx;
     delete [] efxoutl;
     delete [] efxoutr;
@@ -63,7 +63,7 @@ void EffectMgr::changeeffect(int _nefx)
     nefx = _nefx;
     memset(efxoutl, 0, buffersize * sizeof(float));
     memset(efxoutr, 0, buffersize * sizeof(float));
-    if (efx != NULL)
+    if (efx)
         delete efx;
     switch (nefx)
     {
@@ -96,7 +96,7 @@ void EffectMgr::changeeffect(int _nefx)
             efx = NULL;
             break; // no effect (thru)
     }
-    if (efx != NULL)
+    if (efx)
         filterpars = efx->filterpars;
 }
 
@@ -109,7 +109,7 @@ int EffectMgr::geteffect(void)
 // Cleanup the current effect
 void EffectMgr::cleanup(void)
 {
-    if (efx != NULL)
+    if (efx)
         efx->cleanup();
 }
 
@@ -117,7 +117,7 @@ void EffectMgr::cleanup(void)
 // Get the preset of the current effect
 unsigned char EffectMgr::getpreset(void)
 {
-    if (efx != NULL)
+    if (efx)
         return efx->Ppreset;
     else
         return 0;
@@ -126,7 +126,7 @@ unsigned char EffectMgr::getpreset(void)
 // Change the preset of the current effect
 void EffectMgr::changepreset_nolock(unsigned char npreset)
 {
-    if (efx != NULL)
+    if (efx)
         efx->setpreset(npreset);
 }
 
@@ -142,7 +142,7 @@ void EffectMgr::changepreset(unsigned char npreset)
 // Change a parameter of the current effect
 void EffectMgr::seteffectpar_nolock(int npar, unsigned char value)
 {
-    if (efx == NULL)
+    if (!efx)
         return;
     efx->changepar(npar, value);
 }
@@ -158,7 +158,7 @@ void EffectMgr::seteffectpar(int npar, unsigned char value)
 // Get a parameter of the current effect
 unsigned char EffectMgr::geteffectpar(int npar)
 {
-    if (efx == NULL)
+    if (!efx)
         return 0;
     return efx->getpar(npar);
 }
@@ -167,7 +167,7 @@ unsigned char EffectMgr::geteffectpar(int npar)
 // Apply the effect
 void EffectMgr::out(float *smpsl, float *smpsr)
 {
-    if (efx == NULL)
+    if (!efx)
     {
         if (!insertion)
         {
@@ -241,7 +241,7 @@ void EffectMgr::out(float *smpsl, float *smpsr)
 // Get the effect volume for the system effect
 float EffectMgr::sysefxgetvolume(void)
 {
-    return (efx == NULL) ? 1.0 : efx->outvolume;
+    return (!efx) ? 1.0 : efx->outvolume;
 }
 
 
@@ -261,7 +261,7 @@ void EffectMgr::add2XML(XMLwrapper *xml)
 {
     xml->addpar("type", geteffect());
 
-    if (efx == NULL || geteffect() == 0)
+    if (!efx || !geteffect())
         return;
     xml->addpar("preset", efx->Ppreset);
 
@@ -275,7 +275,7 @@ void EffectMgr::add2XML(XMLwrapper *xml)
         xml->addpar("par", par);
         xml->endbranch();
     }
-    if (filterpars != NULL)
+    if (filterpars)
     {
         xml->beginbranch("FILTER");
         filterpars->add2XML(xml);
@@ -287,7 +287,7 @@ void EffectMgr::add2XML(XMLwrapper *xml)
 void EffectMgr::getfromXML(XMLwrapper *xml)
 {
     changeeffect(xml->getpar127("type", geteffect()));
-    if (efx == NULL || geteffect() == 0)
+    if (!efx || !geteffect())
         return;
     efx->Ppreset = xml->getpar127("preset", efx->Ppreset);
 
@@ -302,7 +302,7 @@ void EffectMgr::getfromXML(XMLwrapper *xml)
             seteffectpar_nolock(n, xml->getpar127("par", par));
             xml->exitbranch();
         }
-        if (filterpars != NULL)
+        if (filterpars)
         {
             if (xml->enterbranch("FILTER"))
             {

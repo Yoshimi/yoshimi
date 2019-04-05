@@ -190,8 +190,8 @@ void Reverb::out(float *smps_l, float *smps_r)
     processmono(0, efxoutl); // left
     processmono(1, efxoutr); // right
 
-    float lvol = rs / REV_COMBS * pan;
-    float rvol = rs / REV_COMBS * (1.0 - pan);
+    float lvol = rs / REV_COMBS * (1.0 - pan);
+    float rvol = rs / REV_COMBS * pan;
     if (insertion != 0)
     {
         lvol *= 2.0;

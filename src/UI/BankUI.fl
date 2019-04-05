@@ -312,8 +312,8 @@ class BankUI {open : {public BankProcess_}
             // Re-read from slot
             zynMaster->actionLock(lockmute);
             bank->loadfromslot(slot, zynMaster->part[*npart]);
+            zynMaster->part[*npart]->applyparameters(true);
             zynMaster->actionLock(unlock);
-            zynMaster->part[*npart]->applyparameters();
             zynMaster->part[*npart]->Pname = bank->getname(slot);
             cbwig->do_callback();
         }
@@ -322,8 +322,8 @@ class BankUI {open : {public BankProcess_}
         {   // Reads from slot
             zynMaster->actionLock(lockmute);
             bank->loadfromslot(slot, zynMaster->part[*npart]);
+            zynMaster->part[*npart]->applyparameters(true);
             zynMaster->actionLock(unlock);
-            zynMaster->part[*npart]->applyparameters();
             zynMaster->part[*npart]->Pname = bank->getname(slot);
             cbwig->do_callback();
      
