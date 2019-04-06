@@ -1,5 +1,9 @@
 yoshimi 1.5.M
 
+2019-4-6 Will
+* Disable GUI Analog Phaser controls when not set.
+* Revised Gui Layout to make this more obvious.
+
 2019-4-3 Will
 * Converted Bank root control to MSB, LSB, OFF.
 * Undated docs.

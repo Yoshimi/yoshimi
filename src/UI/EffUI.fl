@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-Modified March 2019} {selected in_source in_header
+Modified April 2019} {selected in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -810,7 +810,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label LFO
         callback {//
         send_data(4, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {LFO function} xywh {314 60 50 16} down_box BORDER_BOX labelsize 10 align 130 textsize 8
+        tooltip {LFO function} xywh {318 20 50 15} down_box BORDER_BOX labelsize 10 align 129 textsize 8
       } {
         MenuItem {} {
           label SINE
@@ -852,7 +852,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Stages
         callback {//
         send_data(8, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        xywh {265 23 35 15} type Simple labelsize 11 align 1 minimum 0 maximum 127 step 1 textfont 1 textsize 11
+        xywh {265 20 35 15} type Simple labelsize 11 align 1 minimum 0 maximum 127 step 1 textfont 1 textsize 11
         code0 {o->range(1,MAX_PHASER_STAGES);}
       }
       Fl_Dial phaserp9 {
@@ -868,7 +868,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Subtract
         callback {//
         send_data(10, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {inverts output} xywh {314 9 40 16} down_box DOWN_BOX color 230 labelsize 11
+        tooltip {inverts output} xywh {354 40 17 16} down_box DOWN_BOX color 230 labelsize 11 align 4
       }
       Fl_Dial phaserp11 {
         label Phase
@@ -883,22 +883,22 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label hyper
         callback {//
         send_data(12, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {hyper-sine} xywh {314 25 55 15} down_box DOWN_BOX labelsize 11
+        tooltip {hyper-sine} xywh {354 72 17 15} down_box DOWN_BOX labelsize 11 align 4 deactivate
       }
       Fl_Dial phaserp13 {
         label dist
         callback {//
         int butt = 13;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip Distortion xywh {276 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        tooltip Distortion xywh {276 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127 deactivate
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
       Fl_Check_Button phaserp14 {
         label Analog
         callback {//
-        send_data(14, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {Emulates FET} xywh {314 40 70 15} down_box DOWN_BOX labelsize 11
+        send_data(14, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        tooltip {Emulates FET} xywh {354 56 17 15} down_box DOWN_BOX labelsize 11 align 4
       }
     }
   }
@@ -1676,6 +1676,16 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
                     break;
                 case 14:
                     phaserp14->value(value_int);
+                    if (value_int != 0)
+                    {
+                        phaserp12->activate();
+                        phaserp13->activate();
+                    }
+                    else
+                    {
+                        phaserp12->deactivate();
+                        phaserp13->deactivate();
+                    }
                     break;
                 case 16:
                     refresh();
@@ -2001,6 +2011,17 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             phaserp12->value(eff->geteffectpar(12));
             phaserp13->value(eff->geteffectpar(13));
             phaserp14->value(eff->geteffectpar(14));
+            if (phaserp14->value() != 0)
+            {
+                phaserp12->activate();
+                phaserp13->activate();
+            }
+            else
+            {
+                phaserp12->deactivate();
+                phaserp13->deactivate();
+            }
+
             effphaserwindow->show();
             break;
         case 5:
