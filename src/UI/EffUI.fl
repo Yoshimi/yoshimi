@@ -835,7 +835,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 6;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {LFO Depth} xywh {191 15 30 30} box ROUND_UP_BOX labelsize 11 align 1 maximum 127
+        tooltip {LFO Depth} xywh {286 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
@@ -860,7 +860,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 9;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {Channel Routing} xywh {286 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        tooltip {Channel Routing} xywh {191 15 30 30} box ROUND_UP_BOX labelsize 11 align 1 maximum 127
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
@@ -1678,12 +1678,14 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
                     phaserp14->value(value_int);
                     if (value_int != 0)
                     {
+                        phaserp9->deactivate();
                         phaserp11->deactivate();
                         phaserp12->activate();
                         phaserp13->activate();
                     }
                     else
                     {
+                        phaserp9->activate();
                         phaserp11->activate();
                         phaserp12->deactivate();
                         phaserp13->deactivate();
@@ -2015,12 +2017,14 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             phaserp14->value(eff->geteffectpar(14));
             if (phaserp14->value() != 0)
             {
+                phaserp9->deactivate();
                 phaserp11->deactivate();
                 phaserp12->activate();
                 phaserp13->activate();
             }
             else
             {
+                phaserp9->activate();
                 phaserp11->activate();
                 phaserp12->deactivate();
                 phaserp13->deactivate();
