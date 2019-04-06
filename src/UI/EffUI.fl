@@ -775,7 +775,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Vol
         callback {//
         send_data(0, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {Effect Volume} xywh {10 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        tooltip {Effect Volume} xywh {8 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->setValueType(VC_FXdefaultVol);}
         class WidgetPDial
       }
@@ -784,7 +784,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 1;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        xywh {48 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        xywh {46 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->setValueType(VC_PanningStd);}
         class WidgetPDial
       }
@@ -793,7 +793,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 2;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {LFO frequency} xywh {86 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        tooltip {LFO frequency} xywh {84 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->setValueType(VC_FXlfofreq);}
         class WidgetPDial
       }
@@ -802,15 +802,15 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 3;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {LFO randomness} xywh {124 50 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
+        tooltip {LFO randomness} xywh {122 50 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
       Fl_Choice phaserp4 {
-        label LFO
+        label {LFO Type}
         callback {//
         send_data(4, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {LFO function} xywh {318 20 50 15} down_box BORDER_BOX labelsize 10 align 129 textsize 8
+        tooltip {LFO function} xywh {156 62 50 18} down_box BORDER_BOX labelsize 10 align 2 textsize 8
       } {
         MenuItem {} {
           label SINE
@@ -826,7 +826,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 5;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {Left/Right Channel Phase Shift} xywh {162 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        tooltip {Left/Right Channel Phase Shift} xywh {210 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->setValueType(VC_FXlfoStereo);}
         class WidgetPDial
       }
@@ -835,7 +835,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 6;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {LFO Depth} xywh {181 15 30 30} box ROUND_UP_BOX labelsize 11 align 1 maximum 127
+        tooltip {LFO Depth} xywh {191 15 30 30} box ROUND_UP_BOX labelsize 11 align 1 maximum 127
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
@@ -844,7 +844,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 7;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip Feedback xywh {200 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        tooltip Feedback xywh {248 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->setValueType(VC_FXdefaultFb);}
         class WidgetPDial
       }
@@ -852,7 +852,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Stages
         callback {//
         send_data(8, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        xywh {265 20 35 15} type Simple labelsize 11 align 1 minimum 0 maximum 127 step 1 textfont 1 textsize 11
+        xywh {324 63 45 15} type Simple labelsize 11 minimum 0 maximum 127 step 1 textfont 1 textsize 11
         code0 {o->range(1,MAX_PHASER_STAGES);}
       }
       Fl_Dial phaserp9 {
@@ -860,22 +860,22 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 9;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {Channel Routing} xywh {238 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        tooltip {Channel Routing} xywh {286 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
       Fl_Check_Button phaserp10 {
-        label Subtract
+        label {Sub.}
         callback {//
         send_data(10, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {inverts output} xywh {354 40 17 16} down_box DOWN_BOX color 230 labelsize 11 align 4
+        tooltip {inverts output} xywh {354 42 17 16} down_box DOWN_BOX color 230 labelsize 11 align 4
       }
       Fl_Dial phaserp11 {
         label Phase
         callback {//
         int butt = 11;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        xywh {219 15 30 30} box ROUND_UP_BOX labelsize 11 align 1 maximum 127
+        xywh {229 15 30 30} box ROUND_UP_BOX labelsize 11 align 1 maximum 127
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
@@ -883,14 +883,14 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label hyper
         callback {//
         send_data(12, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {hyper-sine} xywh {354 72 17 15} down_box DOWN_BOX labelsize 11 align 4 deactivate
+        tooltip {hyper-sine} xywh {354 26 17 15} down_box DOWN_BOX labelsize 11 align 4 deactivate
       }
       Fl_Dial phaserp13 {
         label dist
         callback {//
         int butt = 13;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip Distortion xywh {276 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127 deactivate
+        tooltip Distortion xywh {267 15 30 30} box ROUND_UP_BOX labelsize 11 align 1 maximum 127 deactivate
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
@@ -898,7 +898,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Analog
         callback {//
         send_data(14, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
-        tooltip {Emulates FET} xywh {354 56 17 15} down_box DOWN_BOX labelsize 11 align 4
+        tooltip {Emulates FET} xywh {354 10 17 15} down_box DOWN_BOX labelsize 11 align 4
       }
     }
   }
@@ -1678,11 +1678,13 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
                     phaserp14->value(value_int);
                     if (value_int != 0)
                     {
+                        phaserp11->deactivate();
                         phaserp12->activate();
                         phaserp13->activate();
                     }
                     else
                     {
+                        phaserp11->activate();
                         phaserp12->deactivate();
                         phaserp13->deactivate();
                     }
@@ -2013,11 +2015,13 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             phaserp14->value(eff->geteffectpar(14));
             if (phaserp14->value() != 0)
             {
+                phaserp11->deactivate();
                 phaserp12->activate();
                 phaserp13->activate();
             }
             else
             {
+                phaserp11->activate();
                 phaserp12->deactivate();
                 phaserp13->deactivate();
             }
