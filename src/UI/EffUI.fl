@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-Modified April 2019} {selected in_source in_header
+Modified April 2019} {in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -202,7 +202,7 @@ eff = eff_;
   }
 }
 
-class EffUI {: {public Fl_Group,public PresetsUI_}
+class EffUI {selected : {public Fl_Group,public PresetsUI_}
 } {
   Function {EffUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
@@ -835,7 +835,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 6;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {LFO Depth} xywh {286 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        tooltip {LFO Depth} xywh {191 15 30 30} box ROUND_UP_BOX labelsize 11 align 1 maximum 127
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
@@ -860,7 +860,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 9;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {Channel Routing} xywh {191 15 30 30} box ROUND_UP_BOX labelsize 11 align 1 maximum 127
+        tooltip {Channel Routing} xywh {229 15 30 30} box ROUND_UP_BOX labelsize 11 align 1 maximum 127
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
@@ -875,7 +875,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 11;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        xywh {229 15 30 30} box ROUND_UP_BOX labelsize 11 align 1 maximum 127
+        xywh {286 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
@@ -1679,14 +1679,14 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
                     if (value_int != 0)
                     {
                         phaserp9->deactivate();
-                        phaserp11->deactivate();
+                        //phaserp11->deactivate();
                         phaserp12->activate();
                         phaserp13->activate();
                     }
                     else
                     {
                         phaserp9->activate();
-                        phaserp11->activate();
+                        //phaserp11->activate();
                         phaserp12->deactivate();
                         phaserp13->deactivate();
                     }
@@ -2018,14 +2018,14 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             if (phaserp14->value() != 0)
             {
                 phaserp9->deactivate();
-                phaserp11->deactivate();
+                //phaserp11->deactivate();
                 phaserp12->activate();
                 phaserp13->activate();
             }
             else
             {
                 phaserp9->activate();
-                phaserp11->activate();
+                //phaserp11->activate();
                 phaserp12->deactivate();
                 phaserp13->deactivate();
             }
