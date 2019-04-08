@@ -26,11 +26,6 @@ Realtime subnote
 
 Realtime filters
 
-Add 'Lock AddSynth Oscillator' checkbox to settings.
-
-Edit button
-+1 to 8 open addsynth voice window - could be 'interesting' :(
-
 Requested: auto 'apply' timer for padsynth.
 
 Do a dual scan for banks so that IDd ones are found first, then any new ones picked up on the second scan. This stops known ones being re-ordered when 'foreign' entries appear from outside Yoshimi.
@@ -47,8 +42,7 @@ Expand MIDI-learn to include:
 Make NRPN MIDI-learn able to be re-learned.
 
 LV2: internal sound banks do not appear to be exposed as LV2 presets
-
-Consider, Pitchwheel split range in Controllers, but that one seems a bit pointless to me!
+Visible in carla apparently.
 
 Make loading effect presets update the 'top' line.
 

@@ -102,14 +102,14 @@ bool FileMgr::isDirectory(string chkpath)
 /*
  * This is only intended for calls on the local filesystem
  * and to known locations, so buffer size should be adequate
- * and avoids dependency on unreliable macros.
+ * and it avoids dependency on unreliable macros.
  */
 string FileMgr::findfile(string path, string filename, string extension)
 {
     if (extension.at(0) != '.')
         extension = "." + extension;
     string command = "find " + path + " -name " + filename + extension + " 2>/dev/null -print -quit";
-#pragma message "Using '2>/dev/null' here suppresses *all* error messages"
+//#pragma message "Using '2>/dev/null' here suppresses *all* error messages"
     // it's done here to suppress warnings of invalid locations
     FILE *fp = popen(command.c_str(), "r");
     if (fp == NULL)

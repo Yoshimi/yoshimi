@@ -1,5 +1,10 @@
 yoshimi 1.5.M
 
+2019-4-8 Will
+* Removed /Misc/FileListItem.h
+  It was never called, referenced or included.
+* A few minor cleanups.
+
 2019-4-6 Will
 * Disable GUI Analog Phaser controls when not set.
 * Revised Gui Layout to make this more obvious.
