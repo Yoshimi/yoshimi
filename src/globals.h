@@ -44,9 +44,21 @@
 #define Fmul2I 1073741823
 #define Cshift2I 23
 
-// mult for LFO freq 12595212
-// turns 85.25 into 0x3fffffff
-
+/*
+ * proposed conversions from float to hi res int
+ * multiplier for LFO freq 1000000
+ * turns actual value 85.25 into 85250000
+ * current step size 0.06 becomes 6000
+ *
+ * scales A frequency should be restricted to +- 1 octave
+ * multiplier 100000
+ * 880 Hz becomes 880000000
+ * Resolution is 1/523274 cent
+ * Assumed detectable interval is 5 cents
+ *
+ * unspecified 0-127 integers
+ * multiplier 1000000
+*/
 
 
 // many of the following are for convenience and consistency
@@ -135,7 +147,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         config = 248 // F8
     };
 
-    // this pair critcally cannot be changed as
+    // this pair critically cannot be changed as
     // they rely on 'parameter' being < 64
     enum route : unsigned char {
         lowPriority = 128,
@@ -895,6 +907,14 @@ namespace EFFECT // usage EFFECT::type::none
         dynFilter
     };
 
+    enum control : unsigned char {
+        level = 0, // volume, wet/dry, gain for EQ
+        panning, // band for EQ
+        frequency, // time reverb, delay echo, L/R-mix dist, Not EQ
+        preset = 16, // not EQ
+        changed = 129 // not EQ
+    };
+
     enum sysIns : unsigned char {
         toEffect1 = 1, // system only
         toEffect2, // system only
@@ -908,6 +928,7 @@ namespace EFFECT // usage EFFECT::type::none
 union CommandBlock{
     struct{
         float value;
+//        unsigned char source;
         unsigned char type;
         unsigned char control;
         unsigned char part;
@@ -916,6 +937,9 @@ union CommandBlock{
         unsigned char insert;
         unsigned char parameter;
         unsigned char par2;
+//        unsigned char spare2;
+//        unsigned char spare1;
+//        unsigned char spare0;
     } data;
     char bytes [sizeof(data)];
 };

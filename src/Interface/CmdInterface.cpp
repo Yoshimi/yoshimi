@@ -625,20 +625,26 @@ int CmdInterface::effects(unsigned char controlType)
             return range_msg;
 
         if (value != nFX)
-        { // calls to update GUI
+        { // partially updates GUI
             nFX = value;
+            cout << "value " << value << endl;
             if (bitTest(context, LEVEL::Part))
             {
+                sendDirect(nFX, TOPLEVEL::type::Write, PART::control::effectNumber, npart, UNUSED, nFX, TOPLEVEL::insert::partEffectSelect);
                 nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
                 sendDirect(nFXtype, TOPLEVEL::type::Write, PART::control::effectType, npart, UNUSED, nFX, TOPLEVEL::insert::partEffectSelect);
             }
             else if (bitTest(context, LEVEL::InsFX))
             {
+                sendDirect(nFX, TOPLEVEL::type::Write, EFFECT::sysIns::effectNumber, TOPLEVEL::section::insertEffects, UNUSED, nFX);
+
                 nFXtype = synth->insefx[nFX]->geteffect();
                 sendDirect(nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::insertEffects, UNUSED, nFX);
             }
             else
             {
+                sendDirect(nFX, TOPLEVEL::type::Write, EFFECT::sysIns::effectNumber, TOPLEVEL::section::systemEffects, UNUSED, nFX);
+
                 nFXtype = synth->sysefx[nFX]->geteffect();
                 sendDirect(nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, nFX);
             }
@@ -663,6 +669,7 @@ int CmdInterface::effects(unsigned char controlType)
     }
     if (effType)
     {
+        //cout << "nfx " << nFX << endl;
         nFXpreset = 0; // always set this on type change
         if (bitTest(context, LEVEL::Part))
         {
@@ -672,7 +679,7 @@ int CmdInterface::effects(unsigned char controlType)
         else if (bitTest(context, LEVEL::InsFX))
             return sendNormal(nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::insertEffects, UNUSED, nFX);
         else
-            return sendNormal(nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, nFX);
+            return sendNormal(nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, nFX, UNUSED);
     }
 
     if (nFXtype > 0)
@@ -2105,31 +2112,38 @@ string CmdInterface::findStatus(bool show)
 
     if (bitTest(context, LEVEL::AllFX))
     {
+        int section;
+        int ctl = EFFECT::sysIns::effectType;
         if (bitTest(context, LEVEL::Part))
         {
             text = " p" + to_string(int(npart) + 1);
             if (readControl(PART::control::enable, npart))
                 text += "+";
-            nFXtype = readControl(PART::control::effectType, npart, UNUSED, nFX);
-            nFXpreset = readControl(16, npart,  EFFECT::type::none + nFXtype, nFX);
+            ctl = PART::control::effectType;
+            section = npart;
         }
         else if (bitTest(context, LEVEL::InsFX))
         {
             text += " Ins";
-            nFXtype = readControl(EFFECT::sysIns::effectType, TOPLEVEL::section::insertEffects, UNUSED, nFX);
-            nFXpreset = readControl(16, TOPLEVEL::section::insertEffects,  EFFECT::type::none + nFXtype, nFX);
+            section = TOPLEVEL::section::insertEffects;
         }
         else
         {
             text += " Sys";
-            nFXtype = readControl(EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, nFX);
-            nFXpreset = readControl(16, TOPLEVEL::section::systemEffects,  EFFECT::type::none + nFXtype, nFX);
+            section = TOPLEVEL::section::systemEffects;
         }
+        nFXtype = readControl(ctl, section, UNUSED, nFX);
         text += (" eff " + asString(nFX + 1) + " " + fx_list[nFXtype].substr(0, 6));
+        nFXpreset = readControl(EFFECT::control::preset, section,  EFFECT::type::none + nFXtype, nFX);
+
         if (bitTest(context, LEVEL::InsFX) && readControl(EFFECT::sysIns::effectDestination, TOPLEVEL::section::systemEffects, UNUSED, nFX) == -1)
             text += " Unrouted";
         else if (nFXtype > 0 && nFXtype != 7)
+        {
             text += ("-" + asString(nFXpreset + 1));
+            if (readControl(EFFECT::control::changed, section,  EFFECT::type::none + nFXtype, nFX))
+                text += "?";
+        }
         return text;
     }
 

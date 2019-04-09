@@ -1505,13 +1505,13 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         case EFFECT::type::reverb:
             switch (control)
             {
-                case 0:
+                case EFFECT::control::level:
                     revp0->value(value);
                     break;
-                case 1:
+                case EFFECT::control::panning:
                     revp1->value(value);
                     break;
-                case 2:
+                case EFFECT::control::frequency: // time here
                     revp2->value(value);
                     break;
                 case 3:
@@ -1548,7 +1548,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                 case 12:
                     revp12->value(value);
                     break;
-                case 16:
+                case EFFECT::control::preset:
                     refresh();
                     break;
             }
@@ -1559,13 +1559,13 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         case EFFECT::type::echo:
             switch (control)
             {
-                case 0:
+                case EFFECT::control::level:
                     echop0->value(value);
                     break;
-                case 1:
+                case EFFECT::control::panning:
                     echop1->value(value);
                     break;
-                case 2:
+                case EFFECT::control::frequency: // delay here
                     echop2->value(value);
                     break;
                 case 3:
@@ -1580,7 +1580,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                 case 6:
                     echop6->value(value);
                     break;
-                case 16:
+                case EFFECT::control::preset:
                     refresh();
                     break;
             }
@@ -1591,13 +1591,13 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         case EFFECT::type::chorus:
             switch (control)
             {
-                case 0:
+                case EFFECT::control::level:
                     chorusp0->value(value);
                     break;
-                case 1:
+                case EFFECT::control::panning:
                     chorusp1->value(value);
                     break;
-                case 2:
+                case EFFECT::control::frequency:
                     chorusp2->value(value);
                     break;
                 case 3:
@@ -1621,7 +1621,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                 case 11:
                     chorusp11->value(value_int);
                     break;
-                case 16:
+                case EFFECT::control::preset:
                     refresh();
                     break;
             }
@@ -1632,13 +1632,13 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         case EFFECT::type::phaser:
             switch (control)
             {
-                case 0:
+                case EFFECT::control::level:
                     phaserp0->value(value);
                     break;
-                case 1:
+                case EFFECT::control::panning:
                     phaserp1->value(value);
                     break;
-                case 2:
+                case EFFECT::control::frequency:
                     phaserp2->value(value);
                     break;
                 case 3:
@@ -1691,7 +1691,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                         phaserp13->deactivate();
                     }
                     break;
-                case 16:
+                case EFFECT::control::preset:
                     refresh();
                     break;
             }
@@ -1702,13 +1702,13 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         case EFFECT::type::alienWah:
             switch (control)
             {
-                case 0:
+                case EFFECT::control::level:
                     awp0->value(value);
                     break;
-                case 1:
+                case EFFECT::control::panning:
                     awp1->value(value);
                     break;
-                case 2:
+                case EFFECT::control::frequency:
                     awp2->value(value);
                     break;
                 case 3:
@@ -1735,7 +1735,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                 case 10:
                     awp10->value(value);
                     break;
-                case 16:
+                case EFFECT::control::preset:
                     refresh();
                     break;
             }
@@ -1746,13 +1746,13 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         case EFFECT::type::distortion:
             switch (control)
             {
-                case 0:
+                case EFFECT::control::level:
                     distp0->value(value);
                     break;
-                case 1:
+                case EFFECT::control::panning:
                     distp1->value(value);
                     break;
-                case 2:
+                case EFFECT::control::frequency: // LR-mix here
                     distp2->value(value);
                     break;
                 case 3:
@@ -1779,7 +1779,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                 case 10:
                     distp10->value(value_int);
                     break;
-                case 16:
+                case EFFECT::control::preset:
                     refresh();
                     break;
             }
@@ -1789,11 +1789,11 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
 
         case EFFECT::type::eq:
             //synth->getRuntime().Log("EQ " + to_string(value_int) + "  " + to_string(int(control)));
-            if(control == 0)
+            if(control == EFFECT::control::level)
             {
                 eqp0->value(value);
             }
-            else if (control == 1)
+            else if (control == EFFECT::control::panning) // band numnber here!
             {
                 eqband = value_int;
                 EQbandUpdate();
@@ -1841,13 +1841,13 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
             }
             switch (control)
             {
-                case 0:
+                case EFFECT::control::level:
                     dfp0->value(value);
                     break;
-                case 1:
+                case EFFECT::control::panning:
                     dfp1->value(value);
                     break;
-                case 2:
+                case EFFECT::control::frequency:
                     dfp2->value(value);
                     break;
                 case 3:
@@ -1871,7 +1871,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                 case 9:
                     dfp9->value(value);
                     break;
-                case 16:
+                case EFFECT::control::preset:
                     refresh();
                     break;
             }

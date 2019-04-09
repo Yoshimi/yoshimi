@@ -1,5 +1,11 @@
 yoshimi 1.5.M
 
+2019-4-9 Will
+* BugFix: CLI not setting effect numbers.
+* Added named effects controls replacing some numbers.
+* CLI now shows a '?' for changed effect presets.
+* Some doc updates.
+
 2019-4-8 Will
 * Removed /Misc/FileListItem.h
   It was never called, referenced or included.

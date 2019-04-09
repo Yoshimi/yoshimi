@@ -334,7 +334,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     int switchNum = npart;
     if (control == TOPLEVEL::control::errorMessage && insert != TOPLEVEL::insert::resonanceGraphInsert)
         switchNum = 256; // this is a bit hacky :(
-    bool testThing = false;
+    //bool testThing = false;
 
     switch(switchNum)
     {
@@ -994,8 +994,8 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     __sync_and_and_fetch(&blockRead, 0xfd);
     if (getData->data.parameter < TOPLEVEL::route::lowPriority)
     {
-        if (testThing)
-            cout << "test " << value << endl;
+        //if (testThing)
+            //cout << "test " << value << endl;
         if (jack_ringbuffer_write_space(returnsBuffer) >= commandSize)
         {
             getData->data.value = float(value);
@@ -3843,7 +3843,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
             contstr = " Unrecognised";
     }
 
-    if (kititem != EFFECT::type::eq && control == 16)
+    if (kititem != EFFECT::type::eq && control == EFFECT::control::preset)
     {
         contstr = " Preset " + to_string (lrint(value) + 1);
         showValue = false;
@@ -8095,7 +8095,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
         __sync_or_and_fetch(&blockRead, 1);
 
     int value_int = lrint(value);
-
+    //cout << "Value " << value_int << "  Control " << int(control) << "  Part " << int(npart) << "  Effnum " << int(effnum) << "  Insert " << int(insert) << endl;
     bool isSysEff = (npart == TOPLEVEL::section::systemEffects);
     if (isSysEff)
         effnum = synth->syseffnum;
@@ -8214,7 +8214,7 @@ void InterChange::commandEffects(CommandBlock *getData)
         filterReadWrite(getData, eff->filterpars,NULL,NULL);
         return;
     }
-    if (control > 128)
+    if (control >= EFFECT::control::changed)
     {
         if (!write)
         {
@@ -8244,7 +8244,7 @@ void InterChange::commandEffects(CommandBlock *getData)
         }
         else
         {
-            if (control == 16)
+            if (control == EFFECT::control::preset)
                 eff->changepreset(value_int);
             else
             {
@@ -8266,7 +8266,7 @@ void InterChange::commandEffects(CommandBlock *getData)
         }
         else
         {
-            if (control == 16)
+            if (control == EFFECT::control::preset)
                 value = eff->getpreset();
             else
                 value = eff->geteffectpar(control);
@@ -8275,8 +8275,6 @@ void InterChange::commandEffects(CommandBlock *getData)
 
     if (!write)
         getData->data.value = value;
-    //else
-        //cout << "Changed " << int(eff->geteffectpar(-1)) << endl;
 }
 
 // tests and returns corrected values
