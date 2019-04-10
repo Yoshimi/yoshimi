@@ -627,7 +627,6 @@ int CmdInterface::effects(unsigned char controlType)
         if (value != nFX)
         { // partially updates GUI
             nFX = value;
-            cout << "value " << value << endl;
             if (bitTest(context, LEVEL::Part))
             {
                 sendDirect(nFX, TOPLEVEL::type::Write, PART::control::effectNumber, npart, UNUSED, nFX, TOPLEVEL::insert::partEffectSelect);
