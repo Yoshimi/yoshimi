@@ -83,6 +83,9 @@ const int MIN_ENVELOPE_DB = -60;
 const int MAX_RESONANCE_POINTS = 256;
 const int MAX_KEY_SHIFT = 36;
 const int MIN_KEY_SHIFT = -36;
+const float A_MIN = 329.0f;
+const float A_MAX = 660.0f;
+
 
 const unsigned int MIN_OSCIL_SIZE = 256; // MAX_AD_HARMONICS * 2
 const unsigned int MAX_OSCIL_SIZE = 16384;

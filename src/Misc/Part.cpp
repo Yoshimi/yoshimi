@@ -955,6 +955,8 @@ void Part::ComputePartSmps(void)
         memset(partfxinputl[nefx], 0, synth->sent_bufferbytes);
         memset(partfxinputr[nefx], 0, synth->sent_bufferbytes);
     }
+    //if (Pvolume < 0.001)
+        //return;
 
     for (k = 0; k < POLIPHONY; ++k)
     {

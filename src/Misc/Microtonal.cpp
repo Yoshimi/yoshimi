@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified March 2019
+    Modified April 2019
 */
 
 #include <cmath>
@@ -806,9 +806,9 @@ float Microtonal::getLimits(CommandBlock *getData)
     switch (control)
     {
         case SCALES::control::Afrequency:
-            min = 1.0f;
+            min = 329.0f;
             def = 440.0f;
-            max = 20000.0f;
+            max = 660.0f;
             break;
         case SCALES::control::Anote:
             def = 69;
