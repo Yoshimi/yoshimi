@@ -53,6 +53,7 @@ namespace LEVEL{
         Vector,
         Scale,
         Learn,
+        MControl,
         AddSynth,
         SubSynth,
         PadSynth,
@@ -94,6 +95,7 @@ namespace LISTS {
     inseff,
     eff, // effect types
     part,
+    mcontrol,
     common,
     addsynth,
     subsynth,
@@ -218,14 +220,13 @@ static string configlist [] = {
 
 static string partlist [] = {
     "<n>",                 "select part number",
-    "ON/OFF",              "enables/disables the part",
+    "<ON/OFF>",              "enables/disables the part",
     "Volume <n>",          "volume",
     "Pan <n2>",            "panning",
     "VElocity <n>",        "velocity sensing sensitivity",
     "LEvel <n2>",          "velocity sense offset level",
     "MIn <[s][n]>",        "minimum MIDI note value (Last seen or 0-127)",
     "MAx <[s][n]>",        "maximum MIDI note value (Last seen or 0-127)",
-    "Breath <s>",          "breath control (ON, {other})",
     "POrtamento <s>",      "portamento (ON, {other})",
     "Mode <s>",            "key mode (Poly, Mono, Legato)",
     "Note <n2>",           "note polyphony",
@@ -242,7 +243,7 @@ static string partlist [] = {
     "kit mode entries","",
     "KIT",                 "access controls but don't change type",
     "   <n>",              "select kit item number (1-16)",
-    "   ON/OFF",           "enables/disables the kit item",
+    "   <ON/OFF>",           "enables/disables the kit item",
     "   MUlti",            "allow item overlaps",
     "   SIngle",           "lowest numbered item in key range",
     "   CRoss",            "cross fade pairs",
@@ -256,6 +257,42 @@ static string partlist [] = {
     "ADDsynth ...",        "Enter AddSynth context",
     "SUBsynth ...",        "Enter SubSynth context",
     "PADsynth ...",        "Enter PadSynth context",
+    "MCOntrol ...",        "Enter MIDI controllers context",
+    "end"
+};
+
+static string mcontrollist [] = {
+    "VOlume <ON/OFF>",          "enables/disables volume control (on)",
+    "VOlume <n>",               "volume range",
+    "PAn <n>",                  "Panning width",
+    "MOdwheel <ON/OFF>",        "enables/disables exponential modulation (on)",
+    "MOdwheel <n>",             "modulation control range",
+    "MOEmulate <n>",           "emulate modulation controller",
+    "EXpression <ON/OFF>",      "enables/disables volume control (on)",
+    "EXEmulate <n>",            "emulate expression controller",
+    "SUstain <ON/OFF>",         "enables/disables sustain control (on)",
+    "PWheel <n>",               "pitch wheel range",
+    "BReath <ON/OFF>",          "enables/disables breath control (on)",
+    "BREmulate <n>",            "emulate breath controller",
+    "FCutoff <n>",              "filter cutoff depth",
+    "FCEmulate <n>",            "emulate filter cutoff controller",
+    "FQ <n>",                   "filter Q depth",
+    "FQEmulate <n>",            "emulate filter Q controller",
+    "BAndwidth <ON/OFF>",       "enables/disables exponential bandwidth (off)",
+    "BAndwidth <n>",            "bandwidth control range",
+    "BAEmulate <n>",            "emulate bandwidth controller",
+    "FMamplitude <ON/OFF>",           "enables/disables FM amplitude control (on)",
+    "RCenter <n>",              "resonance center frequency",
+    "RBand <n>",                "resonance bandwidth",
+    "POrtamento <ON/OFF>",      "enables/disables portamento control (on)",
+    "PDifference <n>",          "maximim note distance for portamento",
+    "PInvert <ON/OFF>",         "change to minimum not distance (on)",
+    "PSweep <n>",               "portamento sweep speed",
+    "PRatio <n>",               "portamento up/down speed ratio",
+    "PProportional <ON/OFF",    "enables/disables proportional portamento (off)",
+    "PExtent <n>",              "distance to double change",
+    "POffset <n>",              "difference from non proportional",
+    "CLear",                    "set all controllers to defaults",
     "end"
 };
 
@@ -302,7 +339,7 @@ static string commonlist [] = {
 };
 
 static string addsynthlist [] = {
-    "ON/OFF",                   "enables/disables the part",
+    "<ON/OFF>",                   "enables/disables the part",
     "Volume <n>",               "volume",
     "Pan <n2>",                 "panning",
     "VElocity <n>",             "velocity sensing sensitivity",
@@ -330,7 +367,7 @@ static string addsynthlist [] = {
 
 static string addvoicelist [] = {
     "<n>",                  "select voice number",
-    "ON/OFF",               "enables/disables the part",
+    "<ON/OFF>",               "enables/disables the part",
     "Volume <n>",           "volume",
     "Pan <n2>",             "panning",
     "VElocity <n>",         "velocity sensing sensitivity",
@@ -384,11 +421,13 @@ static string addmodlist [] = {
 };
 
 static string subsynthlist [] = {
-    "ON/OFF",                   "enables/disables the part",
+    "<ON/OFF>",                   "enables/disables the part",
     "Volume <n>",               "volume",
     "Pan <n2>",                 "panning",
     "VElocity <n>",             "velocity sensing sensitivity",
     "STEreo <s>",               "ON, {other}",
+    "BENd Adjust <n>",          "pitch bend range",
+    "BENd Offset <n>",          "pitch bend shift",
     "DETune Fine <n>",          "fine frequency",
     "DETune Coarse <n>",        "coarse stepped frequency",
     "DETune Type <s>",          "type of coarse stepping",
@@ -414,7 +453,7 @@ static string subsynthlist [] = {
 };
 
 static string padsynthlist [] = {
-    "ON/OFF",                   "enables/disables the part",
+    "<ON/OFF>",                   "enables/disables the part",
     "Volume <n>",               "volume",
     "Pan <n2>",                 "panning",
     "VElocity <n>",             "velocity sensing sensitivity",
@@ -424,6 +463,8 @@ static string padsynthlist [] = {
     "PUnch Duration <n>",       "attack boost time",
     "PUnch Stretch <n>",        "attack boost extend",
     "PUnch Velocity <n>",       "attack boost velocity sensitivity",
+    "BENd Adjust <n>",          "pitch bend range",
+    "BENd Offset <n>",          "pitch bend shift",
     "DETune Fine <n>",          "fine frequency",
     "DETune Coarse <n>",        "coarse stepped frequency",
     "DETune Type <s>",          "type of coarse stepping",
@@ -917,6 +958,7 @@ class CmdInterface : private MiscFuncs, FileMgr
         void listCurrentParts(list<string>& msg_buf);
         int effectsList(bool presets = false);
         int effects(unsigned char controlType);
+        int midiControllers(unsigned char controlType);
         int partCommonControls(unsigned char controlType);
         int LFOselect(unsigned char controlType);
         int filterSelect(unsigned char controlType);

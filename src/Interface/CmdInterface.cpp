@@ -185,6 +185,8 @@ char CmdInterface::helpList(unsigned int local)
 
         else if (matchnMove(1, point, "part"))
             listnum = LISTS::part;
+        else if (matchnMove(2, point, "mcontrol"))
+            listnum = LISTS::mcontrol;
         else if (matchnMove(3, point, "common"))
             listnum = LISTS::common;
         else if (matchnMove(3, point, "addsynth"))
@@ -280,8 +282,8 @@ char CmdInterface::helpList(unsigned int local)
             listnum = LISTS::subsynth;
         else if (bitTest(local, LEVEL::PadSynth))
             listnum = LISTS::padsynth;
-        else if(bitTest(local, LEVEL::Resonance))
-            listnum = LISTS::resonance;
+        else if(bitTest(local, LEVEL::MControl))
+            listnum = LISTS::mcontrol;
 
         else if (bitTest(local, LEVEL::Part))
             listnum = LISTS::part;
@@ -320,6 +322,10 @@ char CmdInterface::helpList(unsigned int local)
         case LISTS::part:
             msg.push_back("Part: [n1] = part number");
             helpLoop(msg, partlist, 2);
+            break;
+        case LISTS::mcontrol:
+            msg.push_back("Midi Control:");
+            helpLoop(msg, mcontrollist, 2);
             break;
         case LISTS::common:
             msg.push_back("Part Common:");
@@ -935,6 +941,201 @@ int CmdInterface::effects(unsigned char controlType)
         return sendNormal(nFXpreset, TOPLEVEL::type::Write, 16, partno,  EFFECT::type::none + nFXtype, nFX);
     }
     return opp_msg;
+}
+
+
+int CmdInterface::midiControllers(unsigned char controlType)
+{
+    int value = -1;
+    int cmd = -1;
+    cout << "here" << endl;
+    if (matchnMove(2, point, "volume"))
+    {
+        value = toggle();
+        cmd = PART::control::volumeEnable;
+
+        if (value == -1)
+        {
+            value = string2int127(point);
+            cmd = PART::control::volumeRange;
+        }
+    }
+    if ((cmd == -1) && matchnMove(2, point, "pan"))
+    {
+        value = string2int127(point);
+        cmd = PART::control::panningWidth;
+    }
+    if ((cmd == -1) && matchnMove(2, point, "modwheel"))
+    {
+        value = toggle();
+        cmd = PART::control::exponentialModWheel;
+
+        if (value == -1)
+        {
+            value = string2int127(point);
+            cmd = PART::control::modWheelDepth;
+        }
+    }
+    if ((cmd == -1) && matchnMove(2, point, "expression"))
+    {
+        value = toggle();
+        if (value == -1)
+            return value_msg;
+        cmd = PART::control::expressionEnable;
+    }
+    if ((cmd == -1) && matchnMove(2, point, "sustain"))
+    {
+        value = toggle();
+        if (value == -1)
+            return value_msg;
+        cmd = PART::control::sustainPedalEnable;
+    }
+    if ((cmd == -1) && matchnMove(2, point, "pwheel"))
+    {
+        value = string2int(point);
+        cmd = PART::control::pitchWheelRange;
+    }
+    if ((cmd == -1) && matchnMove(2, point, "breath"))
+    {
+        value = toggle();
+        if (value == -1)
+            return value_msg;
+        cmd = PART::control::breathControlEnable;
+    }
+    if ((cmd == -1) && matchnMove(2, point, "fcutoff"))
+    {
+        value = string2int127(point);
+        cmd = PART::control::filterCutoffDepth;
+    }
+    if ((cmd == -1) && matchnMove(2, point, "fq"))
+    {
+        value = string2int127(point);
+        cmd = PART::control::filterQdepth;
+    }
+    if ((cmd == -1) && matchnMove(2, point, "bandwidth"))
+    {
+        value = toggle();
+        cmd = PART::control::exponentialBandwidth;
+
+        if (value == -1)
+        {
+            value = string2int127(point);
+            cmd = PART::control::bandwidthDepth;
+        }
+    }
+    if ((cmd == -1) && matchnMove(2, point, "fmamplitude"))
+    {
+        value = toggle();
+        if (value == -1)
+            return value_msg;
+        cmd = PART::control::FMamplitudeEnable;
+    }
+    if ((cmd == -1) && matchnMove(2, point, "rcenter"))
+    {
+        value = string2int127(point);
+        cmd = PART::control::resonanceCenterFrequencyDepth;
+    }
+    if ((cmd == -1) && matchnMove(2, point, "rband"))
+    {
+        value = string2int127(point);
+        cmd = PART::control::resonanceBandwidthDepth;
+    }
+
+    // portamento controls
+    if (cmd == -1)
+    {
+        if (matchnMove(2, point, "proportional"))
+        {
+            value = toggle();
+            if (value == -1)
+                return value_msg;
+            cmd = PART::control::receivePortamento;
+        }
+        else if(matchnMove(2, point, "psweep"))
+        {
+            value = string2int127(point);
+            cmd = PART::control::portamentoTime;
+        }
+        else if (matchnMove(2, point, "pratio"))
+        {
+            value = string2int127(point);
+            cmd = PART::control::portamentoTimeStretch;
+        }
+        else if (matchnMove(2, point, "pdifference"))
+        {
+            value = string2int127(point);
+            cmd = PART::control::portamentoThreshold;
+        }
+        else if (matchnMove(2, point, "pinvert"))
+        {
+            value = toggle();
+            if (value == -1)
+                return value_msg;
+            cmd = PART::control::portamentoThresholdType;
+        }
+        else if (matchnMove(2, point, "pproportional"))
+        {
+            value = toggle();
+            if (value == -1)
+                return value_msg;
+            cmd = PART::control::enableProportionalPortamento;
+        }
+        else if (matchnMove(2, point, "pextent"))
+        {
+            value = string2int127(point);
+            cmd = PART::control::proportionalPortamentoRate;
+        }
+        else if (matchnMove(2, point, "poffset"))
+        {
+            value = string2int127(point);
+            cmd = PART::control::proportionalPortamentoDepth;
+        }
+    }
+
+    if ((cmd == -1) && matchnMove(2, point, "clear"))
+    {
+        value = 0;
+        cmd = PART::control::resetAllControllers;
+    }
+
+    // midi controls
+    if (cmd == -1)
+    {
+        if (matchnMove(3, point, "moemulate"))
+        {
+            value = string2int127(point);
+            cmd = PART::control::midiModWheel;
+        }
+        else if (matchnMove(3, point, "exemulate"))
+        {
+            value = string2int127(point);
+            cmd = PART::control::midiExpression;
+        }
+        else if (matchnMove(3, point, "bremulate"))
+        {
+            value = string2int127(point);
+            cmd = PART::control::midiBreath;
+        }
+        else if (matchnMove(3, point, "fcemulate"))
+        {
+            value = string2int127(point);
+            cmd = PART::control::midiFilterCutoff;
+        }
+        else if (matchnMove(3, point, "fqemulate"))
+        {
+            value = string2int127(point);
+            cmd = PART::control::midiFilterQ;
+        }
+        else if (matchnMove(3, point, "baemulate"))
+        {
+            value = string2int127(point);
+            cmd = PART::control::midiBandwidth;
+        }
+    }
+
+    if (cmd > -1)
+        return sendNormal(value, controlType, cmd, npart);
+    return available_msg;
 }
 
 
@@ -2207,6 +2408,9 @@ string CmdInterface::findStatus(bool show)
         if (!show)
             return "";
 
+        if (bitFindHigh(context) == LEVEL::MControl)
+            return text +" Midi controllers";
+
         int engine = contextToEngines();
         switch (engine)
         {
@@ -3376,7 +3580,7 @@ int CmdInterface::addVoice(unsigned char controlType)
     if (value == -1)
         value = string2int(point);
     else if (value == 0xff)
-            value = -1; // special case for osc source
+            value = -1; // special case for oscillator source
     return sendNormal(value, controlType, cmd, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
 }
 
@@ -4265,6 +4469,12 @@ int CmdInterface::commandPart(unsigned char controlType)
         return padSynth(controlType);
     }
 
+    if (matchnMove(3, point, "mcontrol"))
+    {
+        bitSet(context, LEVEL::MControl);
+        return midiControllers(controlType);
+    }
+
     if (inKitEditor)
     {
         int value;
@@ -4340,8 +4550,6 @@ int CmdInterface::commandPart(unsigned char controlType)
         }
         return sendNormal(dest, controlType, PART::control::audioDestination, npart, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::adjustAndLoopback);
     }
-    if (matchnMove(1, point, "breath"))
-        return sendNormal((toggle() == 1), controlType, PART::control::breathControlEnable, npart);
     if (matchnMove(1, point, "note"))
     {
         int value = 0;
@@ -4462,6 +4670,8 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
         return subSynth(controlType);
     if (bitTest(context, LEVEL::PadSynth))
         return padSynth(controlType);
+    if (bitTest(context, LEVEL::MControl))
+        return midiControllers(controlType);
     if (bitTest(context, LEVEL::Part))
         return commandPart(controlType);
     if (bitTest(context, LEVEL::Vector))

@@ -1,5 +1,9 @@
 yoshimi 1.5.M
 
+2019-4-15 Will
+* Implemented CLI MIDI controllers.
+  This had been forgotten :(
+
 2019-4-14 Will
 * CLI part common control text copied to sections.
   Being separate was confusing in some situations
