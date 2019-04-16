@@ -1,6 +1,10 @@
 yoshimi 1.5.M
 
 2019-4-15 Will
+* Added first time start info window.
+* Further small CLI refinements.
+
+2019-4-15 Will
 * Implemented CLI MIDI controllers.
   This had been forgotten :(
 

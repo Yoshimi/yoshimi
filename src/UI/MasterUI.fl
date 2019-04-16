@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified March 2019} {in_source in_header
+Modified April 2019} {selected in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -98,7 +98,7 @@ decl {\#include "Interface/FileMgr.h"} {public local
 decl {\#include "MidiLearnUI.h"} {public local
 }
 
-class MasterUI {selected : {private GuiUpdates, FileMgr}
+class MasterUI {: {private GuiUpdates, FileMgr}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -249,7 +249,13 @@ class MasterUI {selected : {private GuiUpdates, FileMgr}
           //partui->instrumentkitlist->show();
       //if (partfxO)
           //partui->partfx->show();
-      if (synth->getRuntime().oldConfig)
+      if (NewWindows)
+      {
+          words->copy_label("As this is a first time start, please check 'Yoshimi->Settings' then save and restart. More information can be found in the manual.");
+          message->show();
+          message->position(masterwindow->x() + 36, masterwindow->y() + 170);
+      }
+      else if (synth->getRuntime().oldConfig)
       {
           string msg;
           msg = "Existing config older than V " + to_string(MIN_CONFIG_MAJOR) + "." + to_string(MIN_CONFIG_MINOR) + " \\nCheck settings, save and restart.";

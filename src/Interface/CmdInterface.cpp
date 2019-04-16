@@ -1098,7 +1098,7 @@ int CmdInterface::midiControllers(unsigned char controlType)
         cmd = PART::control::resetAllControllers;
     }
 
-    // midi controls
+    // midi controllers
     if (cmd == -1)
     {
         if (matchnMove(3, point, "moemulate"))
