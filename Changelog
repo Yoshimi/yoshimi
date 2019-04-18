@@ -1,5 +1,10 @@
 yoshimi 1.5.M
 
+2019-4-18 Will
+* Made 'A' frequency entry box wider.
+* Master VU now fullly cleared at startup.
+* Removed fake peak indication from disabled parts.
+
 2019-4-15 Will
 * Added first time start info window.
 * Further small CLI refinements.

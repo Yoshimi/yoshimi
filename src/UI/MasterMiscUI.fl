@@ -11,7 +11,7 @@ comment {MasterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2018, Will Godfrey
+Copyright 2014-2019, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
-Modified November 2018
+Modified April 2019
 } {selected in_source in_header
 }
 
@@ -252,8 +252,8 @@ class VUMeter {
     if (Vpeak < 0) // its a fake one
     {
         fl_rectf(ox, oy, lx, ly, 140, 140, 140);
-        int fakedb = Vpeak / 127.0 * (ly - 16); // fiddle to make it the same height as normal
-        fl_rectf(ox + 2, oy + ly + fakedb, lx - 4, -fakedb, 0, 0, 0);
+        //int fakedb = Vpeak / 127.0 * (ly - 16); // fiddle to make it the same height as normal
+        //fl_rectf(ox + 2, oy + ly + fakedb, lx - 4, -fakedb, 0, 0, 0);
         return;
     }
 
@@ -288,8 +288,7 @@ class VUMeter {
         draw_part();
     else
         draw_master();
-    GuiThreadMsg::sendMessage(synth, GuiThreadMsg::GuiCheck, 0);
-    } {}
+    GuiThreadMsg::sendMessage(synth, GuiThreadMsg::GuiCheck, 0);} {}
   }
   Function {tickdraw(VUMeter *o)} {return_type {static void}
   } {

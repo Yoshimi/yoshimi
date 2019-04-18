@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified March 2019
+    Modified April 2019
 */
 
 #include <stdio.h>
@@ -261,8 +261,12 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             Runtime.Log("Failed to allocate new Part");
             goto bail_out;
         }
-        VUpeak.values.parts[npart] = -0.2;
+        VUpeak.values.parts[npart] = -1;
     }
+    VUpeak.values.vuOutPeakL = 0;
+    VUpeak.values.vuOutPeakR = 0;
+    VUpeak.values.vuRmsPeakL = 0;
+    VUpeak.values.vuRmsPeakR = 0;
 
     // Insertion Effects init
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
@@ -2112,6 +2116,10 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                         VUpeak.values.parts[npart] = absval;
                 }
             }
+            else
+            {
+                VUpeak.values.parts[npart] = -1.0f;
+            }
         }
 
         VUcount += sent_buffersize;
@@ -2130,8 +2138,10 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             {
                 if (partLocal[npart])
                     VUpeak.values.parts[npart] = 1.0e-9f;
-                else if (VUpeak.values.parts[npart] < -2.2f) // fake peak is a negative value
-                    VUpeak.values.parts[npart]+= 2.0f;
+                else
+                {
+                    VUpeak.values.parts[npart] = -1.0f;
+                }
             }
         }
 /*
@@ -2177,11 +2187,16 @@ void SynthEngine::fetchMeterData()
 
     for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
     {
-        fade = VUdata.values.parts[npart];
-        if (VUcopy.values.parts[npart] > fade || VUcopy.values.parts[npart] < -0.1f)
-            VUdata.values.parts[npart] = VUcopy.values.parts[npart];
+        if (VUpeak.values.parts[npart] < 0.0)
+            VUdata.values.parts[npart] = -1.0f;
         else
-            VUdata.values.parts[npart] = fade * 0.85f;
+        {
+            fade = VUdata.values.parts[npart];
+            if (VUcopy.values.parts[npart] > fade)
+                VUdata.values.parts[npart] = VUcopy.values.parts[npart];
+            else
+                VUdata.values.parts[npart] = fade * 0.85f;
+        }
     }
     VUready = false;
 }

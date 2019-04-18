@@ -57,7 +57,7 @@ class MicrotonalUI {: {private MiscFuncs}
   Function {make_window()} {} {
     Fl_Window microtonaluiwindow {
       label Scales
-      xywh {239 417 410 485} type Double hide
+      xywh {28 43 410 485} type Double hide
     } {
       Fl_Group {} {
         tooltip {Center where the note's freqs. are turned upside-down} xywh {248 2 156 48} box ENGRAVED_FRAME
@@ -113,7 +113,7 @@ class MicrotonalUI {: {private MiscFuncs}
           Afreq = o->value();
           afreqset->show();
           AsetBack->show();}
-          tooltip {The frequency of "A" note (default=440.0)} xywh {118 20 45 20} labelsize 11 align 1 minimum 329 maximum 660 value 440 textfont 1 textsize 10
+          tooltip {The frequency of "A" note (default=440.0)} xywh {114 20 55 20} labelsize 11 align 1 minimum 329 maximum 660 value 440 textfont 1 textsize 10
           code0 {o->step(0.001, 1);}
           code1 {Afreq = microtonal->PAfreq;}
           code2 {o->value(Afreq);}
@@ -135,7 +135,7 @@ class MicrotonalUI {: {private MiscFuncs}
           o->hide();
 
           send_data(SCALES::control::Afrequency, Afreq, 0);}
-          xywh {166 19 18 17} box THIN_DOWN_BOX color 45 hide
+          xywh {171 22 14 17} box THIN_DOWN_BOX color 45 hide
         }
         Fl_Return_Button afreqset {
           callback {//
@@ -153,7 +153,7 @@ class MicrotonalUI {: {private MiscFuncs}
           o->hide();
 
           send_data(SCALES::control::Afrequency, Afreq, 0);}
-          xywh {163 17 12 18} box NO_BOX hide
+          xywh {166 20 14 18} box NO_BOX hide
         }
       }
       Fl_Group microtonalgroup {
