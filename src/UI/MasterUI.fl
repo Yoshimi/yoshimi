@@ -1625,8 +1625,6 @@ Nikita Zlobin
             }
             else
             {
-                //mastermono->value(0);
-                //mastermono->label("S");
                 vectorui->RefreshChans();
                 RecentParams->activate();
                 setMasterLabel(findleafname(name));
@@ -2039,7 +2037,7 @@ Nikita Zlobin
     }
     else
         fname = file;
-    // RecentScale->activate();
+
     send_data(MAIN::control::saveNamedPatchset, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(fname)));} {}
   }
   Function {refresh_master_ui(int type)} {} {

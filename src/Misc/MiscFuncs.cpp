@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>
 
-    Modifed March 2019
+    Modifed April 2019
 */
 
 //#define REPORT_MISCMSG
@@ -344,6 +344,13 @@ void MiscFuncs::miscMsgInit()
     for (int i = 0; i < NO_MSG; ++i)
         miscList.push_back("");
     // we use 255 to denote an invalid entry
+}
+
+void MiscFuncs::miscMsgClear()
+{ // catches messge leaks - shirley knot :@)
+    list<string>::iterator it = miscList.begin();
+    for (it = miscList.begin(); it != miscList.end(); ++it)
+        *it = "";
 }
 
 int MiscFuncs::miscMsgPush(string _text)

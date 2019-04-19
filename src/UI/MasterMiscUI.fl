@@ -120,17 +120,12 @@ class VUMeter {
     maxdbr = NO_DB;
     clipped = 0;
     plgroup = &synth->getGuiMaster()->panelgroup;
-    //synth->VUdata.values.vuOutPeakL = 0.0;
-    //synth->VUdata.values.vuOutPeakR = 0.0;
-    //synth->VUdata.values.vuRmsPeakL = 0.0;
-    //synth->VUdata.values.vuRmsPeakR = 0.0;
     for (int i = 0; i < NUM_MIDI_PARTS; i++)
     {
         panelpart.oldpeak[i] = 0;
         panelpart.oldpeakR[i] = 0;
         panelpart.clip[i] = false;
         panelpart.clipR[i] = false;
-        //synth->VUdata.values.parts[i] = 0.0;
     }} {}
   }
   Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED)} {return_type float
@@ -688,12 +683,12 @@ class ClearMenuBar {: {public Fl_Menu_Bar}
   Function {draw()} {return_type void
   } {
     code {//
-    int m = 10; //margin larger than border in any style
+    int m = 10; // margin larger than border in any style
     fl_push_clip(x(),y(),w(),h());
     fl_draw_box(box(), x() - m, y() - m, w() + 2 * m, h() + m, color());
     fl_pop_clip();
     Fl_Boxtype _box = box();
-    //Draw menu like normal, but without a box
+    // Draw menu like normal, but without a box
     box(FL_NO_BOX);
     Fl_Menu_Bar::draw();
     box(_box);} {}

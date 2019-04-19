@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified March 2019
+    Modified April 2019
 */
 
 #ifndef MISCFUNCS_H
@@ -68,6 +68,7 @@ class MiscFuncs
         bool matchnMove(int num, char *&pnt, const char *word);
 
         void miscMsgInit(void);
+        void miscMsgClear(void);
         int miscMsgPush(string text);
         string miscMsgPop(int pos);
 

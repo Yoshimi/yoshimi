@@ -868,8 +868,6 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = "READ";
                     value = miscMsgPush(text);
                     getData->data.par2 = miscMsgPush(text); // slightly odd case
-                    //getData->data.parameter -= TOPLEVEL::route::lowPriority;
-                    //    value = miscMsgPush(text);
                     break;
             }
 #ifdef GUI_FLTK
@@ -1114,7 +1112,7 @@ float InterChange::readAllData(CommandBlock *getData)
     reTry:
     memcpy(tryData.bytes, getData->bytes, sizeof(tryData));
     // a false positive here is not actually a problem.
-    while (blockRead)//__sync_or_and_fetch(&blockRead, 0) > 0) // just reading it
+    while (blockRead) // just reading it
         usleep(10);
     if (indirect)
     {
@@ -2199,7 +2197,6 @@ string InterChange::resolvePart(CommandBlock *getData)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
-    //unsigned char par2 = getData->data.par2;
     unsigned char effNum = engine;
 
     bool kitType = (insert == TOPLEVEL::insert::kitGroup);
@@ -3697,7 +3694,6 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
             break;
         case ENVELOPEINSERT::control::points:
             contstr = "Points";
-            //contstr += to_string((int) par2);
             break;
         case ENVELOPEINSERT::control::sustainPoint:
             contstr = "Sust";
@@ -4349,8 +4345,6 @@ void InterChange::commandMidi(CommandBlock *getData)
     unsigned char control = getData->data.control;
     unsigned char chan = getData->data.kit;
     unsigned int char1 = getData->data.engine;
-    //unsigned char char2 = getData->data.insert;
-    //unsigned char parameter = getData->data.parameter;
     unsigned char par2 = getData->data.par2;
 
     //cout << "value " << value_int << "  control " << int(control) << "  chan " << int(chan) << "  char1 " << char1 << "  char2 " << int(char2) << "  param " << int(parameter) << "  par2 " << int(par2) << endl;
@@ -5310,8 +5304,6 @@ void InterChange::commandPart(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-    //unsigned char par2 = getData->data.par2;
-    //unsigned char effNum = engine;
 
     bool write = (type & TOPLEVEL::type::Write) > 0;
     if (write)
@@ -8396,8 +8388,6 @@ float InterChange::returnLimits(CommandBlock *getData)
             return subpars->getLimits(getData);
         }
 
-        //if ((engine & 0x7f) == 0x7f && (kititem == UNUSED || insert == TOPLEVEL::insert::kitGroup))
-        // TODO why is engine not 0xff? it used to be.// part level controls
         if (insert == TOPLEVEL::insert::partEffectSelect || (engine == UNUSED && (kititem == UNUSED || insert == TOPLEVEL::insert::kitGroup)))
             return part->getLimits(getData);
 

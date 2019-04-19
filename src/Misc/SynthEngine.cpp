@@ -2271,6 +2271,7 @@ void SynthEngine::ShutUp(void)
         insefx[nefx]->cleanup();
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
         sysefx[nefx]->cleanup();
+    miscMsgClear();
 }
 
 

@@ -3,6 +3,9 @@ yoshimi 1.5.M
 2019-4-19 Will
 * Implemented separate L/R part VU metering.
 * Removed some direct calls from VU GUI to synth.
+* Added new miscMsgClear() function.
+  Called on major resets in case of message leaks.
+* Some code cleanups and doc updates.
 
 2019-4-18 Will
 * Made 'A' frequency entry box wider.

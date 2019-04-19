@@ -27,7 +27,7 @@ Y : 1 to 31 : 104 : 240 : 255 : 255 : 255 : 128 : 255 : Create new numbered inst
 n : 1 to 31 : 105 : 240 : 255 : 255 : 255 : 128 : 255 : Close numbered instance
 Y : any : 128 : 240 : 255 : 255 : 255 : 255 : 255 : Stop
 
-Y : any : 200 : 240 : 0 to 63 : 255 : 255 : 255 : 255 : Read part peak level
+Y : any : 200 : 240 : 0 to 63 : 0/1 : 255 : 255 : 255 : Read part L/R peak level
 Y : any : 201 : 240 : 0/1 : 255 : 255 : 255 : 255 : Read main L/R peak level
 Y : any : 202 : 240 : 0/1 : 255 : 255 : 255 : 255 : Read main L/R RMS level
 
