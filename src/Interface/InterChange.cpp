@@ -2155,7 +2155,11 @@ string InterChange::resolveMain(CommandBlock *getData)
 
         case MAIN::control::readPartPeak:
             showValue = false;
-            contstr = "Part " + to_string(int(kititem));
+            if (engine == 1)
+                contstr = "Part R";
+            else
+                contstr = "Part L";
+            contstr += to_string(int(kititem));
             if (value < 0.0f)
                 contstr += " silent ";
             contstr += (" peak level " + to_string(value));
@@ -5260,7 +5264,12 @@ void InterChange::commandMain(CommandBlock *getData)
 
         case MAIN::control::readPartPeak:
             if (!write && kititem < NUM_MIDI_PARTS)
-                value = synth->VUdata.values.parts[kititem];
+            {
+                if (engine == 1)
+                    value = synth->VUdata.values.partsR[kititem];
+                else
+                    value = synth->VUdata.values.parts[kititem];
+            }
             break;
         case MAIN::control::readMainLRpeak:
             if (!write)

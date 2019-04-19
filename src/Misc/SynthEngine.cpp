@@ -261,7 +261,8 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             Runtime.Log("Failed to allocate new Part");
             goto bail_out;
         }
-        VUpeak.values.parts[npart] = -1;
+        VUpeak.values.parts[npart] = -1.0f;
+        VUpeak.values.partsR[npart] = -1.0f;
     }
     VUpeak.values.vuOutPeakL = 0;
     VUpeak.values.vuOutPeakR = 0;
@@ -505,8 +506,6 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
         {
             if (partonoffRead(npart))
                 part[npart]->NoteOn(note, velocity);
-            else if (VUpeak.values.parts[npart] > (-velocity))
-                VUpeak.values.parts[npart] = -(0.2 + velocity); // ensure fake is always negative
         }
     }
 #ifdef REPORT_NOTEON
@@ -1792,7 +1791,10 @@ void SynthEngine::partonoffWrite(int npart, int what)
 
     part[npart]->Penabled = tmp;
     if (tmp == 1 && original != 1) // enable if it wasn't already on
+    {
         VUpeak.values.parts[npart] = 1e-9f;
+        VUpeak.values.partsR[npart] = 1e-9f;
+    }
     else if (tmp != 1 && original == 1) // disable if it wasn't already off
     {
         part[npart]->cleanup();
@@ -1801,7 +1803,8 @@ void SynthEngine::partonoffWrite(int npart, int what)
             if (Pinsparts[nefx] == npart)
                 insefx[nefx]->cleanup();
         }
-        VUpeak.values.parts[npart] = -0.2;
+        VUpeak.values.parts[npart] = -1.0f;
+        VUpeak.values.partsR[npart] = -1.0f;
     }
 }
 
@@ -2112,13 +2115,14 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                 {
                     if ((absval = fabsf(part[npart]->partoutl[idx])) > VUpeak.values.parts[npart])
                         VUpeak.values.parts[npart] = absval;
-                    if ((absval = fabsf(part[npart]->partoutr[idx])) > VUpeak.values.parts[npart])
-                        VUpeak.values.parts[npart] = absval;
+                    if ((absval = fabsf(part[npart]->partoutr[idx])) > VUpeak.values.partsR[npart])
+                        VUpeak.values.partsR[npart] = absval;
                 }
             }
             else
             {
                 VUpeak.values.parts[npart] = -1.0f;
+                VUpeak.values.partsR[npart] = -1.0f;
             }
         }
 
@@ -2137,11 +2141,16 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
             {
                 if (partLocal[npart])
+                {
                     VUpeak.values.parts[npart] = 1.0e-9f;
+                    VUpeak.values.partsR[npart] = 1.0e-9f;
+                }
                 else
                 {
                     VUpeak.values.parts[npart] = -1.0f;
+                    VUpeak.values.partsR[npart] = -1.0f;
                 }
+
             }
         }
 /*
@@ -2197,6 +2206,16 @@ void SynthEngine::fetchMeterData()
             else
                 VUdata.values.parts[npart] = fade * 0.85f;
         }
+        if (VUpeak.values.partsR[npart] < 0.0)
+            VUdata.values.partsR[npart] = -1.0f;
+        else
+        {
+            fade = VUdata.values.partsR[npart];
+            if (VUcopy.values.partsR[npart] > fade)
+                VUdata.values.partsR[npart] = VUcopy.values.partsR[npart];
+            else
+                VUdata.values.partsR[npart] = fade * 0.85f;
+        }
     }
     VUready = false;
 }
@@ -2245,7 +2264,8 @@ void SynthEngine::ShutUp(void)
     {
         part[npart]->legatoFading = 0;
         part[npart]->cleanup();
-        VUpeak.values.parts[npart] = -0.2;
+        VUpeak.values.parts[npart] = -1.0f;
+        VUpeak.values.partsR[npart] = -1.0f;
     }
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
         insefx[nefx]->cleanup();

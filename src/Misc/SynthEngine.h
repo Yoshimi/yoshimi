@@ -217,6 +217,7 @@ class SynthEngine : private SynthHelper, MiscFuncs, FileMgr
                 float vuRmsPeakL;
                 float vuRmsPeakR;
                 float parts[NUM_MIDI_PARTS];
+                float partsR[NUM_MIDI_PARTS];
                 int buffersize;
             } values;
             char bytes [sizeof(values)];
