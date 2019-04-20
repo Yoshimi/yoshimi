@@ -3,6 +3,9 @@ yoshimi 1.5.M
 2019-4-20 Will
 * BugFix: Adnote voice modulator damping incorrect.
 * Further work on auto single main instance.
+* Changed control block from 12 to 16 bytes.
+  This will enable us to split source from type
+  and miscMsg from par2. Also gives 2 spare bytes.
 
 2019-4-19 Will
 * Implemented separate L/R part VU metering.

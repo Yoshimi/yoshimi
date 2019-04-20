@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modifed March 2019
+    Modifed April 2019
 */
 
 #ifndef GLOBALS_H
@@ -933,6 +933,7 @@ union CommandBlock{
         float value;
 //        unsigned char source;
         unsigned char type;
+        unsigned char source;
         unsigned char control;
         unsigned char part;
         unsigned char kit;
@@ -940,9 +941,9 @@ union CommandBlock{
         unsigned char insert;
         unsigned char parameter;
         unsigned char par2;
-//        unsigned char spare2;
-//        unsigned char spare1;
-//        unsigned char spare0;
+        unsigned char miscmsg;
+        unsigned char spare1;
+        unsigned char spare0;
     } data;
     char bytes [sizeof(data)];
 };
