@@ -6346,9 +6346,9 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
         case ADDVOICE::control::modulatorHFdamping:
             if (write)
-                pars->VoicePar[nvoice].PFMVolumeDamp = value_int;
+                pars->VoicePar[nvoice].PFMVolumeDamp = value_int + 64;
             else
-                value = pars->VoicePar[nvoice].PFMVolumeDamp;
+                value = pars->VoicePar[nvoice].PFMVolumeDamp - 64;
             break;
         case ADDVOICE::control::enableModulatorAmplitudeEnvelope:
             if (write)

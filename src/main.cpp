@@ -365,20 +365,41 @@ void *commandThread(void *) // silence warning (was *arg = NULL)
 int main(int argc, char *argv[])
 {
 #ifdef AUTOSINGLE
-    char pidline[256];
-    memset(&pidline, 0, 255);
+    int pidSize = 63;
+    char pidline[pidSize + 1];
     // test for *exact* name and only the oldest occurrance
     FILE *fp = popen("pgrep -o -x yoshimi", "r");
-    fgets(pidline,255,fp);
-    //cout << "> " << pidline << " <" << endl;
+    fgets(pidline,pidSize,fp);
     pclose(fp);
-    int firstpid = stoi(pidline);
-    // we try to failsafe if no valid PID is returned
-    if (firstpid > 1 && firstpid != getpid())
+    string firstText = string(pidline);
+    int firstpid = stoi(firstText);
+
+    string test = "ps -o etime= -p " + firstText;
+    FILE *fp2 = popen(test.c_str(), "r");
+    fgets(pidline,pidSize,fp2);
+    pclose(fp2);
+    for (int i = 0; i < pidSize; ++ i)
     {
-        //cout << "got it" << endl;
-        kill(firstpid, SIGUSR2);
-        return 0;
+        if (pidline[i] == ':')
+            pidline[i] = '0';
+    }
+    int firstTime = stoi(pidline);
+
+    test = "ps -o etime= -p " + to_string(getpid());
+    FILE *fp3 = popen(test.c_str(), "r");
+    fgets(pidline,pidSize,fp3);
+    pclose(fp3);
+    for (int i = 0; i < pidSize; ++ i)
+    {
+        if (pidline[i] == ':')
+            pidline[i] = '0';
+    }
+    int secondTime = stoi(pidline);
+
+    if ((firstTime - secondTime) > 1)
+    {
+            kill(firstpid, SIGUSR2);
+            return 0;
     }
 #endif
     time(&old_father_time);
