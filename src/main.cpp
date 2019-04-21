@@ -365,7 +365,7 @@ void *commandThread(void *) // silence warning (was *arg = NULL)
 int main(int argc, char *argv[])
 {
 #ifdef AUTOSINGLE
-    int pidSize = 63;
+    const int pidSize = 63;
     char pidline[pidSize + 1];
     // test for *exact* name and only the oldest occurrance
     FILE *fp = popen("pgrep -o -x yoshimi", "r");

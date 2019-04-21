@@ -1,5 +1,10 @@
 yoshimi 1.5.M
 
+2019-4-21 Will
+* Set placeholders for new type/source bytes.
+* Applied warning patch in main.cpp from Hermann.
+* Doc updates
+
 2019-4-20 Will
 * BugFix: Adnote voice modulator damping incorrect.
 * Further work on auto single main instance.

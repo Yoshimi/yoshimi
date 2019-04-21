@@ -5,6 +5,6 @@ You can set these all singly, or any logical combination. On error, the returned
 
 You can also load a program from a file name by pushing it to a miscMsg and giving the returned ID to par2.
 
-All unused parameters should be set to 255.
+All unused parameters should be set to UNUSED (currently 255).
 
 If you are setting just root and bank (and it succeeds) only the bank will be named, but the root ID will be shown.

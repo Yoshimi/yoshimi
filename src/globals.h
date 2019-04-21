@@ -50,10 +50,10 @@
  * turns actual value 85.25 into 85250000
  * current step size 0.06 becomes 6000
  *
- * scales A frequency should be restricted to +- 1 octave
- * multiplier 100000
- * 880 Hz becomes 880000000
- * Resolution is 1/523274 cent
+ * scales A frequency should be restricted to +- .5 octave
+ * multiplier 1000000
+ * 660 Hz becomes 660000000
+ * Resolution is better than 1/523274 cent
  * Assumed detectable interval is 5 cents
  *
  * unspecified 0-127 integers
@@ -150,11 +150,10 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         config = 248 // F8
     };
 
-    // this pair critically cannot be changed as
-    // they rely on 'parameter' being < 64
     enum route : unsigned char {
-        lowPriority = 128,
-        adjustAndLoopback = 192
+        UpdateAfterSet, // GUI update
+        lowPriority = 128,      // This pair cannot be changed as they
+        adjustAndLoopback = 192 // rely on 'parameter' being < 64
     };
 
     // bit-wise type and source share the same byte
@@ -178,9 +177,27 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
     namespace source {
         // all used bit-wise
         const unsigned char MIDI = 8;
+        // future - use for type error?
         const unsigned char CLI = 16;
+        // future - use for type learn request?
         const unsigned char GUI = 32;
+        // future - use for type learnable?
         const unsigned char UpdateAfterSet = 48; // so gui can update
+        // future - merge into action?
+    }
+
+    namespace action { // This will become the 'source' byte
+        // bits 0 to 3
+        const unsigned char toAll = 0; // not MIDI
+        const unsigned char fromMIDI = 1; // These will
+        const unsigned char fromCLI = 2;  // replace the
+        const unsigned char fromGUI = 3;  // bits in 'type'
+        const unsigned char noAction = 15;
+        // remaining used bit-wise
+        const unsigned char forceUpdate = 32; // after set
+        const unsigned char adjustAndLoop = 64;
+        const unsigned char lowPrio = 128;
+
     }
 
     enum control : unsigned char {
