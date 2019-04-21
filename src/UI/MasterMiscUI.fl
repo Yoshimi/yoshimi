@@ -361,7 +361,7 @@ class VUMeter {
   decl {struct{
  int oldpeak[NUM_MIDI_PARTS]; int oldpeakR[NUM_MIDI_PARTS];
   bool clip[NUM_MIDI_PARTS];
- bool clipR[NUM_MIDI_PARTS]; } panelpart;} {private local
+ bool clipR[NUM_MIDI_PARTS]; } panelpart;} {public local
   }
   Function {resetPart(bool clipOnly = false)} {} {
     code {//
@@ -435,6 +435,11 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
             xywh {30 65 26 110} box FLAT_BOX color 0 selection_color 75 labelcolor 55 align 128
             code0 {partVUMeter->init(npart, synth);}
             class VUMeter
+          }
+          Fl_Button {} {
+            callback {partVUMeter->panelpart.clip[npart] = false;
+partVUMeter->panelpart.clipR[npart] = false;}
+            xywh {30 64 27 112} box NO_BOX
           }
         }
         Fl_Button {} {
