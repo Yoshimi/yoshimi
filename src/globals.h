@@ -46,20 +46,19 @@
 
 /*
  * proposed conversions from float to hi res int
- * multiplier for LFO freq 1000000
- * turns actual value 85.25 into 85250000
+ * multiplier is 1000000
+ *
+ * for LFO freq turns actual value 85.25 into 85250000
  * current step size 0.06 becomes 6000
  *
- * scales A frequency should be restricted to +- .5 octave
- * multiplier 1000000
- * 660 Hz becomes 660000000
- * Resolution is better than 1/523274 cent
+ * scales A frequency now restricted to +- 0.5 octave
+ * 660Hz becomes 660000000
+ * At 329Hz resolution is still better than 1/10000 cent
  * Assumed detectable interval is 5 cents
  *
- * unspecified 0-127 integers
- * multiplier 1000000
+ * also use for integers that need higher resolution
+ * such as unspecified 0-127 integers
 */
-
 
 // many of the following are for convenience and consistency
 // changing them is likely to have unpredicable consequences
@@ -91,9 +90,8 @@ const unsigned int MIN_OSCIL_SIZE = 256; // MAX_AD_HARMONICS * 2
 const unsigned int MAX_OSCIL_SIZE = 16384;
 const unsigned int MIN_BUFFER_SIZE = 16;
 const unsigned int MAX_BUFFER_SIZE = 8192;
-const unsigned char NO_MSG = 255; // these three may become different
+const unsigned char NO_MSG = 255; // these two may become different
 const unsigned char UNUSED = 255;
-const unsigned char NO_ACTION = 255;
 
 // GUI colours
 const unsigned int ADD_COLOUR = 0xdfafbf00;
@@ -151,7 +149,6 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
     };
 
     enum route : unsigned char {
-        UpdateAfterSet, // GUI update
         lowPriority = 128,      // This pair cannot be changed as they
         adjustAndLoopback = 192 // rely on 'parameter' being < 64
     };
@@ -161,7 +158,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
     namespace type {
         // bits 0, 1
         const unsigned char Adjust = 0;
-        const unsigned char Read = 0;
+        const unsigned char Read = 0; // i.e. !write
         const unsigned char Minimum = 1;
         const unsigned char Maximum = 2;
         const unsigned char Default = 3;
@@ -188,16 +185,15 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
 
     namespace action { // This will become the 'source' byte
         // bits 0 to 3
-        const unsigned char toAll = 0; // not MIDI
+        const unsigned char toAll = 0; // except MIDI
         const unsigned char fromMIDI = 1; // These will
         const unsigned char fromCLI = 2;  // replace the
         const unsigned char fromGUI = 3;  // bits in 'type'
-        const unsigned char noAction = 15;
+        const unsigned char noAction = 15; // internal use
         // remaining used bit-wise
-        const unsigned char forceUpdate = 32; // after set
-        const unsigned char adjustAndLoop = 64;
+        const unsigned char forceUpdate = 32; // update after set
         const unsigned char lowPrio = 128;
-
+        const unsigned char muteAndLoop = 192;
     }
 
     enum control : unsigned char {

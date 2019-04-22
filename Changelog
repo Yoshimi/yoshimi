@@ -1,5 +1,9 @@
 yoshimi 1.5.M
 
+2019-4-22 Will
+* Internal 'no action' moved to new source byte.
+* Adjustments to new placeholders.
+
 2019-4-21 Will
 * Set placeholders for new type/source bytes.
 * Applied warning patch in main.cpp from Hermann.

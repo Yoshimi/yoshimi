@@ -1142,7 +1142,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
 {
     float value = getData->data.value;
     unsigned char type = getData->data.type;
-    if (type == NO_ACTION)
+    if (getData->data.source == TOPLEVEL::action::noAction)
         return; // no further action
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -3975,7 +3975,7 @@ void InterChange::returns(CommandBlock *getData)
 {
     unsigned char type = getData->data.type; // back from synth
     synth->getRuntime().finishedCLI = true; // belt and braces :)
-    if (type == NO_ACTION)
+    if (getData->data.source == TOPLEVEL::action::noAction)
         return; // no further action
 
     if (getData->data.parameter < TOPLEVEL::route::lowPriority || getData->data.parameter >= TOPLEVEL::route::adjustAndLoopback)
@@ -4242,7 +4242,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     {
         if ((engine > PART::engine::addVoice8 && engine < PART::engine::addMod1) || engine > PART::engine::addMod8)
         {
-            getData->data.type = NO_ACTION;
+            getData->data.source = TOPLEVEL::action::noAction;
             synth->getRuntime().Log("Invalid voice number");
             synth->getRuntime().finishedCLI = true;
             __sync_and_and_fetch(&blockRead, 2);
@@ -4331,7 +4331,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         __sync_and_and_fetch(&blockRead, 2);
         return true;
     }
-    getData->data.type = NO_ACTION;
+    getData->data.source = TOPLEVEL::action::noAction;
     synth->getRuntime().Log("Invalid engine number");
     synth->getRuntime().finishedCLI = true;
     __sync_and_and_fetch(&blockRead, 2);
@@ -4359,12 +4359,12 @@ void InterChange::commandMidi(CommandBlock *getData)
         case MIDI::control::noteOn:
             synth->NoteOn(chan, char1, value_int);
             synth->getRuntime().finishedCLI = true;
-            getData->data.type = NO_ACTION; // till we know what to do!
+            getData->data.source = TOPLEVEL::action::noAction; // till we know what to do!
             break;
         case MIDI::control::noteOff:
             synth->NoteOff(chan, char1);
             synth->getRuntime().finishedCLI = true;
-            getData->data.type = NO_ACTION; // till we know what to do!
+            getData->data.source = TOPLEVEL::action::noAction; // till we know what to do!
             break;
         case MIDI::control::controller:
             //cout << "Midi controller ch " << to_string(int(chan)) << "  type " << to_string(int(char1)) << "  val " << to_string(value_int) << endl;
@@ -5213,14 +5213,14 @@ void InterChange::commandMain(CommandBlock *getData)
             if (write && (parameter == TOPLEVEL::route::adjustAndLoopback))
             {
                 synth->allStop(TOPLEVEL::muted::patchsetLoad | (par2 << 8) | (type << 24));
-                getData->data.type = NO_ACTION;
+                getData->data.source = TOPLEVEL::action::noAction;
             }
             break;
         case MAIN::control::loadNamedVector:
             if (write && (parameter == TOPLEVEL::route::adjustAndLoopback))
             {
                 synth->allStop(TOPLEVEL::muted::vectorLoad | (par2 << 8) | (insert << 16) | (type << 24));
-                getData->data.type = NO_ACTION;
+                getData->data.source = TOPLEVEL::action::noAction;
             }
             break;
         case MAIN::control::saveNamedVector: // done elsewhere
@@ -5233,7 +5233,7 @@ void InterChange::commandMain(CommandBlock *getData)
             if (write && (parameter == TOPLEVEL::route::adjustAndLoopback))
             {
                 synth->allStop(TOPLEVEL::muted::stateLoad | (par2 << 8) | (type << 24));
-                getData->data.type = NO_ACTION;
+                getData->data.source = TOPLEVEL::action::noAction;
             }
             break;
         case MAIN::control::saveNamedState: // done elsewhere
@@ -5243,7 +5243,7 @@ void InterChange::commandMain(CommandBlock *getData)
             if (write && (parameter == TOPLEVEL::route::adjustAndLoopback))
             {
                 synth->allStop(TOPLEVEL::muted::masterReset | (control << 8) | (type << 24));
-                getData->data.type = NO_ACTION;
+                getData->data.source = TOPLEVEL::action::noAction;
             }
             break;
         case MAIN::control::startInstance: // done elsewhere
@@ -5253,7 +5253,7 @@ void InterChange::commandMain(CommandBlock *getData)
         case MAIN::control::stopSound: // just stop
             if (write)
                 synth->allStop(TOPLEVEL::muted::stopSound);
-            getData->data.type = NO_ACTION;
+            getData->data.source = TOPLEVEL::action::noAction;
             break;
 
         case MAIN::control::readPartPeak:
@@ -5286,7 +5286,7 @@ void InterChange::commandMain(CommandBlock *getData)
 
         case 254:
             synth->Mute();
-            getData->data.type = NO_ACTION;
+            getData->data.source = TOPLEVEL::action::noAction;
             break;
     }
 
@@ -5313,7 +5313,7 @@ void InterChange::commandPart(CommandBlock *getData)
 
     if ( kitType && kititem >= NUM_KIT_ITEMS)
     {
-        getData->data.type = NO_ACTION;
+        getData->data.source = TOPLEVEL::action::noAction;
         synth->getRuntime().Log("Invalid kit number");
         return;
     }
@@ -5698,7 +5698,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 getData->data.parameter = TOPLEVEL::route::lowPriority;
             }
             else
-                getData->data.type = NO_ACTION;
+                getData->data.source = TOPLEVEL::action::noAction;
             break;
 
         case PART::control::audioDestination:
