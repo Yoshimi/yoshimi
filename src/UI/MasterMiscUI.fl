@@ -511,7 +511,6 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
           xywh {17 180 30 30} maximum 127 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Ppanning);}
           code1 {o->setValueType(VC_PanningStd);}
-          code2 {//o->init(64);}
           class WidgetPDial
         }
         Fl_Choice partrcv {

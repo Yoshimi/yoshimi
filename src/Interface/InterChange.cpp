@@ -152,7 +152,7 @@ bool InterChange::Init()
     jack_ringbuffer_reset(returnsBuffer);
 
 
-    if (!synth->getRuntime().startThread(&sortResultsThreadHandle, _sortResultsThread, this, false, 0, false, "CLI"))
+    if (!synth->getRuntime().startThread(&sortResultsThreadHandle, _sortResultsThread, this, false, 0, "CLI"))
     {
         synth->getRuntime().Log("Failed to start CLI resolve thread");
         goto bail_out;

@@ -23,8 +23,6 @@
 #define CMDINTERFACE_H
 #include <string>
 
-using namespace std;
-
 #include "Misc/MiscFuncs.h"
 #include "Interface/FileMgr.h"
 #include "Misc/SynthEngine.h"
@@ -125,7 +123,7 @@ namespace LISTS {
     };
 }
 
-static string basics [] = {
+static std::string basics [] = {
     "?  Help",                  "show commands",
     "STop",                     "all sound off",
     "RESet [s]",                "return to start-up conditions, 'ALL' clear MIDI-learn (if 'y')",
@@ -137,7 +135,7 @@ static string basics [] = {
     "end"
 };
 
-static string toplist [] = {
+static std::string toplist [] = {
     "ADD",                      "add paths and files",
     "  Root <s>",               "root path to list",
     "  Bank <s>",               "make new bank in current root",
@@ -178,7 +176,7 @@ static string toplist [] = {
     "end"
 };
 
-static string configlist [] = {
+static std::string configlist [] = {
     "Oscillator <n>",      "* Add/Pad size (power 2 256-16384)",
     "BUffer <n>",          "* internal size (power 2 16-4096)",
     "PAdsynth [s]",        "interpolation type (Linear, other = cubic)",
@@ -218,7 +216,7 @@ static string configlist [] = {
     "end"
 };
 
-static string partlist [] = {
+static std::string partlist [] = {
     "<n>",                 "select part number",
     "<ON/OFF>",              "enables/disables the part",
     "Volume <n>",          "volume",
@@ -261,7 +259,7 @@ static string partlist [] = {
     "end"
 };
 
-static string mcontrollist [] = {
+static std::string mcontrollist [] = {
     "VOlume <ON/OFF>",          "enables/disables volume control (on)",
     "VOlume <n>",               "volume range",
     "PAn <n>",                  "Panning width",
@@ -296,7 +294,7 @@ static string mcontrollist [] = {
     "end"
 };
 
-static string commonlist [] = {
+static std::string commonlist [] = {
     "ON @",                     "enables the part/kit item/engine/insert etc,",
     "OFF @",                    "disables as above",
     "Volume <n> @",             "volume",
@@ -338,7 +336,7 @@ static string commonlist [] = {
     "end"
 };
 
-static string addsynthlist [] = {
+static std::string addsynthlist [] = {
     "<ON/OFF>",                   "enables/disables the part",
     "Volume <n>",               "volume",
     "Pan <n2>",                 "panning",
@@ -365,7 +363,7 @@ static string addsynthlist [] = {
     "end"
 };
 
-static string addvoicelist [] = {
+static std::string addvoicelist [] = {
     "<n>",                  "select voice number",
     "<ON/OFF>",               "enables/disables the part",
     "Volume <n>",           "volume",
@@ -403,7 +401,7 @@ static string addvoicelist [] = {
     "end"
 };
 
-static string addmodlist [] = {
+static std::string addmodlist [] = {
     "OFF",                  "disable modulator",
     "   MOrph",             "types",
     "   RIng","",
@@ -420,7 +418,7 @@ static string addmodlist [] = {
     "end"
 };
 
-static string subsynthlist [] = {
+static std::string subsynthlist [] = {
     "<ON/OFF>",                   "enables/disables the part",
     "Volume <n>",               "volume",
     "Pan <n2>",                 "panning",
@@ -452,7 +450,7 @@ static string subsynthlist [] = {
     "end"
 };
 
-static string padsynthlist [] = {
+static std::string padsynthlist [] = {
     "<ON/OFF>",                   "enables/disables the part",
     "Volume <n>",               "volume",
     "Pan <n2>",                 "panning",
@@ -512,7 +510,7 @@ static string padsynthlist [] = {
 };
 
 
-static string  resonancelist [] = {
+static std::string  resonancelist [] = {
     "(enable) <s>",             "activate resonance (ON, {other})",
     "PRotect <s>",              "leave fundamental unchanged (ON, {other})",
     "Maxdb <n>",                "maximum attenuation of points",
@@ -525,7 +523,7 @@ static string  resonancelist [] = {
     "POints [<n1> [n2]]",       "show all or set/read n1 to n2",
     "end"
 };
-static string waveformlist [] = {
+static std::string waveformlist [] = {
     "SINe",                     "basic waveforms",
     "TRIangle","",
     "PULse","",
@@ -571,7 +569,7 @@ static string waveformlist [] = {
     "end"
 };
 
-static string LFOlist [] = {
+static std::string LFOlist [] = {
     "AMplitude ~",          "amplitude type",
     "FRequency ~",          "frequency type",
     "FIlter ~",             "filter type",
@@ -595,7 +593,7 @@ static string LFOlist [] = {
     "end"
 };
 
-static string filterlist [] = {
+static std::string filterlist [] = {
     "CEnter <n>",       "center frequency",
     "Q <n>",            "Q factor",
     "Velocity <n>",     "velocity sensitivity",
@@ -641,7 +639,7 @@ static string filterlist [] = {
     "end"
 };
 
-static string envelopelist [] = {
+static std::string envelopelist [] = {
     "types","",
     "AMplitude",              "amplitude type",
     "FRequency",              "frequency type",
@@ -676,7 +674,7 @@ static string envelopelist [] = {
 };
 
 
-static string reverblist [] = {
+static std::string reverblist [] = {
     "LEVel <n>",        "intensity",
     "PANning <n>",      "L/R panning",
     "TIMe <n>",         "reverb time",
@@ -691,7 +689,7 @@ static string reverblist [] = {
     "end"
 };
 
-static string echolist [] = {
+static std::string echolist [] = {
     "LEVel <n>",        "intensity",
     "PANning <n>",      "L/R panning",
     "DELay <n>",        "initial delay",
@@ -702,7 +700,7 @@ static string echolist [] = {
     "end"
 };
 
-static string choruslist [] = {
+static std::string choruslist [] = {
     "LEVel <n>",        "intensity",
     "PANning <n>",      "L/R panning",
     "FREquency <n>",    "LFO frequency",
@@ -717,7 +715,7 @@ static string choruslist [] = {
     "end"
 };
 
-static string phaserlist [] = {
+static std::string phaserlist [] = {
     "LEVel <n>",        "intensity",
     "PANning <n>",      "L/R panning",
     "FREquency <n>",    "LFO frequency",
@@ -735,7 +733,7 @@ static string phaserlist [] = {
     "end"
 };
 
-static string alienwahlist [] = {
+static std::string alienwahlist [] = {
     "LEVel <n>",        "intensity",
     "PANning <n>",      "L/R panning",
     "FREquency <n>",    "LFO frequency",
@@ -749,7 +747,7 @@ static string alienwahlist [] = {
     "end"
 };
 
-static string distortionlist [] = {
+static std::string distortionlist [] = {
     "LEVel <n>",        "intensity",
     "PANning <n>",      "L/R panning",
     "MIX <n>",          "L/R mix",
@@ -765,7 +763,7 @@ static string distortionlist [] = {
     "end"
 };
 
-static string eqlist [] = {
+static std::string eqlist [] = {
     "LEVel <n>",        "intensity",
     "BANd <n>",         "EQ band number for following controls",
     "  FILter <s>",       "filter type",
@@ -777,7 +775,7 @@ static string eqlist [] = {
     "end"
 };
 
-static string dynfilterlist [] = {
+static std::string dynfilterlist [] = {
     "LEVel <n>",        "intensity",
     "PANning <n>",      "L/R panning",
     "FREquency <n>",    "LFO frequency",
@@ -792,9 +790,9 @@ static string dynfilterlist [] = {
     "end"
 };
 
-static string filtershapes [] = {"OFF" ,"ATA", "ASY", "POW", "SIN", "QNT", "ZIG", "LMT", "ULM", "LLM", "ILM", "CLI", "CLI", "AS2", "PO2", "SGM", "end"};
+static std::string filtershapes [] = {"OFF" ,"ATA", "ASY", "POW", "SIN", "QNT", "ZIG", "LMT", "ULM", "LLM", "ILM", "CLI", "CLI", "AS2", "PO2", "SGM", "end"};
 
-static string learnlist [] = {
+static std::string learnlist [] = {
     "MUte <s>",         "completely ignore this line (ON, {other})",
     "SEven",            "set incoming NRPNs as 7 bit (ON, {other})",
     "CC <n2>",          "set incoming controller value",
@@ -806,7 +804,7 @@ static string learnlist [] = {
     "end"
 };
 
-static string vectlist [] = {
+static std::string vectlist [] = {
     "[X/Y] CC <n2>",            "CC n2 is used for X or Y axis sweep",
     "[X/Y] Features <n2> [s]",  "sets X or Y features 1-4 (ON, Reverse, {other})",
     "[X] PRogram <l/r> <n2>",   "X program change ID for LEFT or RIGHT part",
@@ -817,7 +815,7 @@ static string vectlist [] = {
     "end"
 };
 
-static string scalelist [] = {
+static std::string scalelist [] = {
     "FRequency <n>",            "'A' note actual frequency",
     "NOte <n>",                 "'A' note number",
     "Invert [s]",               "invert entire scale (ON, {other})",
@@ -838,7 +836,7 @@ static string scalelist [] = {
     "end"
 };
 
-static string loadlist [] = {
+static std::string loadlist [] = {
     "Instrument <s>",           "instrument to current part from named file",
     "SCale <s>",                "scale settings from named file",
     "VEctor [n] <s>",           "vector to channel n (or saved) from named file",
@@ -848,7 +846,7 @@ static string loadlist [] = {
     "end"
 };
 
-static string savelist [] = {
+static std::string savelist [] = {
     "Instrument <s>",           "current part to named file",
     "SCale <s>",                "current scale settings to named file",
     "VEctor <n> <s>",           "vector on channel n to named file",
@@ -859,7 +857,7 @@ static string savelist [] = {
     "end",
 };
 
-static string listlist [] = {
+static std::string listlist [] = {
     "Roots",                    "all available root paths",
     "Banks [n]",                "banks in root ID or current",
     "Instruments [n]",          "instruments in bank ID or current",
@@ -875,7 +873,7 @@ static string listlist [] = {
     "end"
 };
 
-static string replies [] = {
+static std::string replies [] = {
     "OK",
     "Done",
     "Value?",
@@ -895,7 +893,7 @@ static string replies [] = {
     "read only"
 };
 
-static string fx_list [] = {
+static std::string fx_list [] = {
     "OFF",
     "REverb",
     "ECho",
@@ -909,7 +907,7 @@ static string fx_list [] = {
 };
 
 
-static string fx_presets [] = {
+static std::string fx_presets [] = {
     "1, off",
     "13, cathedral 1, cathedral 2, cathedral 3, hall 1, hall 2, room 1, room 2, basement, tunnel, echoed 1, echoed 2, very long 1, very long 2",
     "8, echo 1, echo 2, simple echo, canyon, panning echo 1, panning echo 2, panning echo 3, feedback echo",
@@ -922,25 +920,25 @@ static string fx_presets [] = {
 };
 
 // effect controls
-static string effreverb [] = {"LEV", "PAN", "TIM", "DEL", "FEE", "none5", "none6", "LOW", "HIG", "DAM", "TYP", "ROO", "BAN", "end"};
-static string effecho [] = {"LEV", "PAN", "DEL", "LRD", "CRO", "FEE", "DAM",  "end"};
-static string effchorus [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "DEL", "FEE", "CRO", "none11", "SUB", "end"};
-static string effphaser [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "FEE", "STA", "CRO", "SUB", "REL", "HYP", "OVE", "ANA", "end"};
-static string effalienwah [] = {"LEV", "PAN", "FRE", "WAV", "SHI", "DEP", "FEE", "DEL", "CRO", "REL", "end"};
-static string effdistortion [] = {"LEV", "PAN", "MIX", "DRI", "OUT", "WAV", "INV", "LOW", "HIG", "STE", "FIL", "end"};
-static string effeq [] = {"LEV", "BAN", "FIL", "FRE", "GAI", "Q", "STA"};
-static string eqtypes [] = {"OFF", "LP1", "HP1", "LP2", "HP2", "BP2", "NOT", "PEA", "LOW", "HIG", "end"};
-static string effdynamicfilter [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "SEN", "INV", "RAT", "FIL", "end"};
+static std::string effreverb [] = {"LEV", "PAN", "TIM", "DEL", "FEE", "none5", "none6", "LOW", "HIG", "DAM", "TYP", "ROO", "BAN", "end"};
+static std::string effecho [] = {"LEV", "PAN", "DEL", "LRD", "CRO", "FEE", "DAM",  "end"};
+static std::string effchorus [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "DEL", "FEE", "CRO", "none11", "SUB", "end"};
+static std::string effphaser [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "FEE", "STA", "CRO", "SUB", "REL", "HYP", "OVE", "ANA", "end"};
+static std::string effalienwah [] = {"LEV", "PAN", "FRE", "WAV", "SHI", "DEP", "FEE", "DEL", "CRO", "REL", "end"};
+static std::string effdistortion [] = {"LEV", "PAN", "MIX", "DRI", "OUT", "WAV", "INV", "LOW", "HIG", "STE", "FIL", "end"};
+static std::string effeq [] = {"LEV", "BAN", "FIL", "FRE", "GAI", "Q", "STA"};
+static std::string eqtypes [] = {"OFF", "LP1", "HP1", "LP2", "HP2", "BP2", "NOT", "PEA", "LOW", "HIG", "end"};
+static std::string effdynamicfilter [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "SEN", "INV", "RAT", "FIL", "end"};
 
 // common controls
-static string detuneType [] = {"DEF", "L35", "L10", "E10", "E12", "end"};
+static std::string detuneType [] = {"DEF", "L35", "L10", "E10", "E12", "end"};
 
 // waveform controls
-static string waveshape [] = {"Sine", "Triangle", "Pulse", "Saw", "Power", "Gauss", "Diode", "AbsSine", "PulseSine", "StretchSine", "Chirp", "AbsStretchSine", "Chebyshev", "Square", "Spike", "Circle"};
-static string wavebase [] = {"SIN", "TRI", "PUL", "SAW", "POW", "GAU", "DIO", "ABS", "PSI", "SSI", "CHI", "ASI", "CHE", "SQU", "SPI", "CIR", "end"};
-static string basetypes [] = {"c2", "g2", "c3", "g3", "c4", "g4", "c5", "g5", "g6"};
-static string filtertype [] = {"OFF", "LP1", "HPA", "HPB", "BP1", "BS1", "LP2", "HP2", "BP2", "BS2", "COS", "SIN", "LSH", "SGM", "end"};
-static string adaptive [] = {"OFF", "ON", "SQU", "2XS", "2XA", "3XS", "3XA", "4XS", "4XA"};
+static std::string waveshape [] = {"Sine", "Triangle", "Pulse", "Saw", "Power", "Gauss", "Diode", "AbsSine", "PulseSine", "StretchSine", "Chirp", "AbsStretchSine", "Chebyshev", "Square", "Spike", "Circle"};
+static std::string wavebase [] = {"SIN", "TRI", "PUL", "SAW", "POW", "GAU", "DIO", "ABS", "PSI", "SSI", "CHI", "ASI", "CHE", "SQU", "SPI", "CIR", "end"};
+static std::string basetypes [] = {"c2", "g2", "c3", "g3", "c4", "g4", "c5", "g5", "g6"};
+static std::string filtertype [] = {"OFF", "LP1", "HPA", "HPB", "BP1", "BS1", "LP2", "HP2", "BP2", "BS2", "COS", "SIN", "LSH", "SGM", "end"};
+static std::string adaptive [] = {"OFF", "ON", "SQU", "2XS", "2XA", "3XS", "3XA", "4XS", "4XA"};
 
 
 class CmdInterface : private MiscFuncs, FileMgr
@@ -950,12 +948,12 @@ class CmdInterface : private MiscFuncs, FileMgr
         void cmdIfaceCommandLoop();
 
     private:
-        bool query(string text, bool priority);
-        void helpLoop(list<string>& msg, string *commands, int indent, bool single = false);
+        bool query(std::string text, bool priority);
+        void helpLoop(list<std::string>& msg, std::string *commands, int indent, bool single = false);
         char helpList(unsigned int local);
-        string historySelect(int listnum, int selection);
+        std::string historySelect(int listnum, int selection);
         void historyList(int listnum);
-        void listCurrentParts(list<string>& msg_buf);
+        void listCurrentParts(list<std::string>& msg_buf);
         int effectsList(bool presets = false);
         int effects(unsigned char controlType);
         int midiControllers(unsigned char controlType);
@@ -964,7 +962,7 @@ class CmdInterface : private MiscFuncs, FileMgr
         int filterSelect(unsigned char controlType);
         int envelopeSelect(unsigned char controlType);
         int commandList();
-        string findStatus(bool show);
+        std::string findStatus(bool show);
         int contextToEngines(void);
         int toggle(void);
         bool lineEnd(unsigned char controlType);
@@ -982,7 +980,7 @@ class CmdInterface : private MiscFuncs, FileMgr
         int commandPart(unsigned char controlType);
         int commandReadnSet(unsigned char controlType);
         float readControl(unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff);
-        string readControlText(unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff);
+        std::string readControlText(unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff);
         void readLimits(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2);
         int sendNormal(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff);
         int sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff, unsigned char request = 0xff);
@@ -992,7 +990,7 @@ class CmdInterface : private MiscFuncs, FileMgr
         SynthEngine *synth;
         char welcomeBuffer [128];
         int reply;
-        string replyString;
+        std::string replyString;
         int filterVowelNumber;
         int filterFormantNumber;
         int insertType;

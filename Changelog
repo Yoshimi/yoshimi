@@ -1,5 +1,12 @@
 yoshimi 1.5.M
 
+2019-4-23 Will
+* Removed redundant 'detach' thread element.
+* Started entering 'std::' not 'using namespace'.
+  This removes potential ambiguities, especially
+  as we are now using local namespaces heavily.
+* Some code cleanups.
+
 2019-4-22 Will
 * Internal 'no action' moved to new source byte.
 * Adjustments to new placeholders.

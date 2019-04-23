@@ -17,13 +17,12 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified March 2019
+    Modified April 2019
 */
 
 
 #define AUTOSINGLE
 // this is still slighty experimental
-
 
 // approx timeout in seconds.
 #define SPLASH_TIME 3
@@ -34,9 +33,6 @@
 #include <sys/types.h>
 #include <termios.h>
 #include <time.h>
-
-
-using namespace std;
 
 #include "Misc/Config.h"
 #include "Misc/SynthEngine.h"
@@ -60,8 +56,6 @@ using namespace std;
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <Interface/CmdInterface.h>
-
-CmdInterface commandInt;
 
 extern map<SynthEngine *, MusicClient *> synthInstances;
 extern SynthEngine *firstSynth;
@@ -202,7 +196,7 @@ static void *mainGuiThread(void *arg)
                 }
 
                 synthInstances.erase(it);
-                cout << "\nStopped " << instanceID << "\n";
+                std::cout << "\nStopped " << instanceID << "\n";
                 break;
             }
 #ifdef GUI_FLTK
@@ -322,10 +316,10 @@ int mainCreateNewInstance(unsigned int forceId, bool loadState)
     synth->Unmute();
 
     if (instanceID == 0)
-        cout << "\nYay! We're up and running :-)\n";
+        std::cout << "\nYay! We're up and running :-)\n";
     else
     {
-        cout << "\nStarted "<< instanceID << "\n";
+        std::cout << "\nStarted "<< instanceID << "\n";
         // following copied here for other instances
         synth->installBanks();
     }
@@ -358,7 +352,8 @@ bail_out:
 
 void *commandThread(void *) // silence warning (was *arg = NULL)
 {
-    commandInt.cmdIfaceCommandLoop();
+    CmdInterface commandInit;
+    commandInit.cmdIfaceCommandLoop();
     return 0;
 }
 
@@ -407,7 +402,7 @@ int main(int argc, char *argv[])
     struct termios  oldTerm;
     tcgetattr(0, &oldTerm);
 
-    cout << "Yoshimi " << YOSHIMI_VERSION << " is starting" << endl; // guaranteed start message
+    std::cout << "Yoshimi " << YOSHIMI_VERSION << " is starting" << std::endl; // guaranteed start message
     globalArgc = argc;
     globalArgv = argv;
     bool bExitSuccess = false;
@@ -433,7 +428,7 @@ int main(int argc, char *argv[])
     if (firstRuntime->oldConfig)
     {
 
-        cout << "\nExisting config older than " << MIN_CONFIG_MAJOR << "." << MIN_CONFIG_MINOR << "\nCheck settings, save and restart.\n"<< endl;
+        std::cout << "\nExisting config older than " << MIN_CONFIG_MAJOR << "." << MIN_CONFIG_MINOR << "\nCheck settings, save and restart.\n"<< std::endl;
     }
     if(sem_init(&semGui, 0, 0) == 0)
     {
@@ -451,7 +446,7 @@ int main(int argc, char *argv[])
 #ifdef GUI_FLTK
     if (!guiStarted)
     {
-        cout << "Yoshimi can't start main gui loop!" << endl;
+        std::cout << "Yoshimi can't start main gui loop!" << std::endl;
         goto bail_out;
     }
     sem_wait(&semGui);
@@ -496,7 +491,7 @@ int main(int argc, char *argv[])
     {
         goto bail_out;
     }
-    cout << "\nGoodbye - Play again soon?\n";
+    std::cout << "\nGoodbye - Play again soon?\n";
     bExitSuccess = true;
 
 bail_out:
