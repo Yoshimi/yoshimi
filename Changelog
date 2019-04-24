@@ -2,6 +2,12 @@ yoshimi 1.5.M
 
 2019-4-23 Will
 * Added tooltips to master and part VU meters.
+* Single main instance now seems correct.
+  A first start double-click will still start two
+  separate instances, but all other combinations
+  will start just one, without risk of a crash
+  through tring to start multiple instances at
+  the same time.
 
 2019-4-23 Will
 * Removed redundant 'detach' thread element.

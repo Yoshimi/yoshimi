@@ -70,6 +70,7 @@ static char **globalArgv = NULL;
 bool bShowGui = true;
 bool bShowCmdLine = true;
 bool splashSet = true;
+bool configuring = false;
 time_t old_father_time, here_and_now;
 
 //Andrew Deryabin: signal handling moved to main from Config Runtime
@@ -93,7 +94,11 @@ void yoshimiSigHandler(int sig)
             break;
 #ifdef AUTOSINGLE
         case SIGUSR2: // start next instance
-            mainCreateNewInstance(0, true);
+            if (!configuring)
+            {
+                configuring = true;
+                mainCreateNewInstance(0, true);
+            }
             sigaction(SIGUSR2, &yoshimiSigAction, NULL);
             break;
 #endif
@@ -154,7 +159,10 @@ static void *mainGuiThread(void *arg)
         for (int i = 1; i < 32; ++i)
         {
             if ((firstRuntime->activeInstance >> i) & 1)
+            {
+                configuring = true;
                 mainCreateNewInstance(i, true);
+            }
         }
     }
     while (firstRuntime->runSynth)
@@ -331,6 +339,7 @@ int mainCreateNewInstance(unsigned int forceId, bool loadState)
             mainRegisterAudioPort(synth, npart);
     }
     synth->getRuntime().activeInstance |= (1 << instanceID);
+    configuring = false;
     return instanceID;
 
 bail_out:
@@ -346,7 +355,7 @@ bail_out:
         synth->getRuntime().flushLog();
         delete synth;
     }
-
+    configuring = false;
     return -1;
 }
 
