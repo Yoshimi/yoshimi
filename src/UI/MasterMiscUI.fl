@@ -439,7 +439,7 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
           Fl_Button {} {
             callback {partVUMeter->panelpart.clip[npart] = false;
 partVUMeter->panelpart.clipR[npart] = false;}
-            xywh {30 64 27 112} box NO_BOX
+            tooltip {Click here to clear overload warning.} xywh {30 64 26 111} box NO_BOX
           }
         }
         Fl_Button {} {

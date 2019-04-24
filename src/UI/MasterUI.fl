@@ -873,6 +873,10 @@ paramsui->Show(XML_MICROTONAL);}
           code0 {o->init(-1, synth);}
           class VUMeter
         }
+        Fl_Button {} {
+          callback {vumeter->init(-1, synth);}
+          tooltip {Click here to clear VU peak reading and overload warning.} xywh {5 430 376 30} box NO_BOX
+        }
       }
       Fl_Button mastermono {
         label S
