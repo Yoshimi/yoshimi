@@ -3,6 +3,9 @@ yoshimi 1.5.M
 2019-4-25 Will
 * Added PART_POLIPONY to globals
   It had been defined numerically in two places!
+* Added PART_POLY, PART_MONO, PART_LEGATO, MIDI_LEGATO
+  MIDI_NOT_LEGATO to globals
+  These had been set numerically in multiple locations.
 
 2019-4-24 Will
 * Added tooltips to master and part VU meters.

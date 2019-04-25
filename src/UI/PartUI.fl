@@ -2110,7 +2110,7 @@ Offset}
   Function {updatecontrollers()} {} {
     code {//
     enportamento->value(0);
-    keymode->value(part->Pkeymode & 3);
+    keymode->value(part->Pkeymode & MIDI_NOT_LEGATO);
     expmwh->value(part->ctl->modwheel.exponential);
     modwh->value(part->ctl->modwheel.depth);
     expbw->value(part->ctl->bandwidth.exponential);

@@ -1887,7 +1887,7 @@ Nikita Zlobin
     partui->maxkcounter->value(synth->part[npart]->Pmaxkey);
     partui->enportamento->value(synth->part[npart]->ctl->portamento.portamento);
 
-    partui->keymode->value(synth->part[npart]->Pkeymode & 3);
+    partui->keymode->value(synth->part[npart]->Pkeymode & MIDI_NOT_LEGATO);
 
     maxparts->value(partmax);
     maxparts->redraw();

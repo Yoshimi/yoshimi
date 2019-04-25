@@ -980,25 +980,6 @@ bool SynthEngine::ReadPartPortamento(int npart)
 void SynthEngine::SetPartKeyMode(int npart, int mode)
 {
     part[npart]->Pkeymode = mode;
-
-/*    if (mode > 2)
-        mode = 2;
-    switch(mode)
-    {
-        case 2:
-            part[npart]->Ppolymode = 0;
-            part[npart]->Plegatomode = 1;
-            break;
-        case 1:
-            part[npart]->Ppolymode = 0;
-            part[npart]->Plegatomode = 0;
-            break;
-        case 0:
-        default:
-            part[npart]->Ppolymode = 1;
-            part[npart]->Plegatomode = 0;
-            break;
-    }*/
 }
 
 
