@@ -30,37 +30,35 @@
 
 #include "globals.h"
 
-using namespace std;
-
-static list<string> miscList;
+static std::list<std::string> miscList;
 
 class MiscFuncs
 {
     public:
         MiscFuncs() {sem_init(&miscmsglock, 0, 1);}
         ~MiscFuncs() {sem_destroy(&miscmsglock);}
-        string asString(int n);
-        string asString(long long n);
-        string asString(unsigned long n);
-        string asString(long n);
-        string asString(unsigned int n, unsigned int width = 0);
-        string asString(unsigned char c);// { return asString((unsigned int)c); }
-        string asString(float n);
-        string asLongString(float n);
-        string asHexString(int x);
-        string asHexString(unsigned int x);
-        string asAlignedString(int n, int len);
+        std::string asString(int n);
+        std::string asString(long long n);
+        std::string asString(unsigned long n);
+        std::string asString(long n);
+        std::string asString(unsigned int n, unsigned int width = 0);
+        std::string asString(unsigned char c);// { return asString((unsigned int)c); }
+        std::string asString(float n);
+        std::string asLongString(float n);
+        std::string asHexString(int x);
+        std::string asHexString(unsigned int x);
+        std::string asAlignedString(int n, int len);
 
-        static float string2float(string str);
-        static double string2double(string str);
-        static int string2int(string str);
-        static int string2int127(string str);
-        static unsigned int string2uint(string str);
+        static float string2float(std::string str);
+        static double string2double(std::string str);
+        static int string2int(std::string str);
+        static int string2int127(std::string str);
+        static unsigned int string2uint(std::string str);
 
-        int stringNumInList(string toFind, string *listname, int convert = 0);
+        int stringNumInList(std::string toFind, std::string *listname, int convert = 0);
 
-        bool isFifo(string chkpath);
-        int findSplitPoint(string name);
+        bool isFifo(std::string chkpath);
+        int findSplitPoint(std::string name);
 
         char *skipSpace(char *buf);
         char *skipChars(char *buf);
@@ -69,8 +67,8 @@ class MiscFuncs
 
         void miscMsgInit(void);
         void miscMsgClear(void);
-        int miscMsgPush(string text);
-        string miscMsgPop(int pos);
+        int miscMsgPush(std::string text);
+        std::string miscMsgPop(int pos);
 
         unsigned int nearestPowerOf2(unsigned int x, unsigned int min, unsigned int max);
         float limitsF(float value, float min, float max);
@@ -81,8 +79,8 @@ class MiscFuncs
         void bitClearHigh(unsigned int& value);
         void bitClearAbove(unsigned int& value, int bitLevel);
         bool bitTest(unsigned int value, unsigned int bit);
-        string lineInText(string text, size_t &point);
-        void C_lineInText(string text, size_t &point, char *line);
+        std::string lineInText(std::string text, size_t &point);
+        void C_lineInText(std::string text, size_t &point, char *line);
 
         float dB2rap(float dB);
         float rap2dB(float rap);
