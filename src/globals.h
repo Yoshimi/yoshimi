@@ -105,6 +105,7 @@ enum {XML_INSTRUMENT = 1, XML_PARAMETERS, XML_MICROTONAL, XML_STATE, XML_VECTOR,
 // these were previously (pointlessly) user configurable
 const unsigned char NUM_VOICES = 8;
 const unsigned char POLIPHONY = 80;
+const unsigned char PART_POLIPHONY = 60;
 const unsigned char NUM_SYS_EFX = 4;
 const unsigned char NUM_INS_EFX = 8;
 const unsigned char NUM_PART_EFX = 3;

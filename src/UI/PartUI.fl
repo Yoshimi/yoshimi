@@ -648,7 +648,7 @@ Offset}
           callback {//
           send_data(PART::control::maxNotes, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Maximum keys for this part} xywh {194 143 38 20} labelsize 10 value 20 textsize 11
-          code0 {o->range(1, POLIPHONY - 20); // enough for one part!}
+          code0 {o->range(1, PART_POLIPHONY); // enough for one part!}
           code1 {o->value(part->Pkeylimit);}
         }
         Fl_Spinner minkcounter {

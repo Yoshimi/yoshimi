@@ -1614,7 +1614,7 @@ float Part::getLimits(CommandBlock *getData)
 
         case PART::control::maxNotes:
             def = 20;
-            max = 60;
+            max = PART_POLIPHONY;
             break;
 
         case PART::control::keyShift:
