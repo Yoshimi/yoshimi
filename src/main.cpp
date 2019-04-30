@@ -364,56 +364,49 @@ void *commandThread(void *) // silence warning (was *arg = NULL)
     return 0;
 }
 
+string runCommand(string command, bool clean)
+{
+    const int lineLen = 63;
+    char returnLine[lineLen + 1];
+    FILE *fp = popen(command.c_str(), "r");
+    fgets(returnLine, lineLen, fp);
+    pclose(fp);
+    if (clean)
+    {
+        for (int i = 0; i < lineLen; ++ i)
+        {
+            if (returnLine[i] == ':')
+                returnLine[i] = '0';
+        }
+    }
+    return string(returnLine);
+}
+
 int main(int argc, char *argv[])
 {
     if (handleSingleMaster)
     {
     /*
-     * Can't make this call from file manager yet!
+     * Can't make this call from file manager
      */
         string chkpath = string(getenv("HOME")) + "/.yoshimiSingle";
         struct stat st;
         if (!stat(chkpath.c_str(), &st))
         {
             isSingleMaster = true;
-            const int pidSize = 63;
-            char pidline[pidSize + 1];
-            // test for *exact* name and only the oldest occurrance
-            FILE *fp = popen("pgrep -o -x yoshimi", "r");
-            fgets(pidline,pidSize,fp);
-            pclose(fp);
-            string firstText = string(pidline);
+            string firstText = runCommand("pgrep -o -x yoshimi", false);
             int firstpid = stoi(firstText);
-
-            string test = "ps -o etime= -p " + firstText;
-            FILE *fp2 = popen(test.c_str(), "r");
-            fgets(pidline,pidSize,fp2);
-            pclose(fp2);
-            for (int i = 0; i < pidSize; ++ i)
-            {
-                if (pidline[i] == ':')
-                    pidline[i] = '0';
-            }
-            int firstTime = stoi(pidline);
-
-            test = "ps -o etime= -p " + to_string(getpid());
-            FILE *fp3 = popen(test.c_str(), "r");
-            fgets(pidline,pidSize,fp3);
-            pclose(fp3);
-            for (int i = 0; i < pidSize; ++ i)
-            {
-                if (pidline[i] == ':')
-                    pidline[i] = '0';
-            }
-            int secondTime = stoi(pidline);
+            int firstTime = std::stoi(runCommand("ps -o etime= -p " + firstText, true));
+            int secondTime = std::stoi(runCommand("ps -o etime= -p " + to_string(getpid()), true));
 
             if ((firstTime - secondTime) > 0)
             {
-                    kill(firstpid, SIGUSR2);
+                    kill(firstpid, SIGUSR2); // this just sends a message
                     return 0;
             }
         }
     }
+
     time(&old_father_time);
     here_and_now = old_father_time;
     struct termios  oldTerm;
