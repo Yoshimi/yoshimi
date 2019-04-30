@@ -4,6 +4,7 @@ yoshimi 1.5.M
 * Single master instance now switchable from GUI.
   Also made some refinements to code allowing this
   to be hidden until certain it's safe.
+* BugFix: Crashes on some systems when opening the GUI.
 
 2019-4-25 Will
 * Added PART_POLIPONY to globals
