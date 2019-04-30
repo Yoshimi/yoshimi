@@ -20,10 +20,6 @@
     Modified April 2019
 */
 
-
-#define AUTOSINGLE
-// this is still slighty experimental
-
 // approx timeout in seconds.
 #define SPLASH_TIME 3
 
@@ -34,15 +30,19 @@
 #include <termios.h>
 #include <time.h>
 
-#include "Misc/Config.h"
-#include "Misc/SynthEngine.h"
-#include "MusicIO/MusicClient.h"
 #include <map>
 #include <list>
 #include <pthread.h>
 #include <semaphore.h>
 #include <cstdio>
 #include <unistd.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+
+#include "Misc/Config.h"
+#include "Misc/SynthEngine.h"
+#include "MusicIO/MusicClient.h"
+#include "Interface/CmdInterface.h"
 
 #ifdef GUI_FLTK
     #include "MasterUI.h"
@@ -52,10 +52,6 @@
     #include <FL/Fl_PNG_Image.H>
     #include "Misc/Splash.h"
 #endif
-
-#include <readline/readline.h>
-#include <readline/history.h>
-#include <Interface/CmdInterface.h>
 
 extern map<SynthEngine *, MusicClient *> synthInstances;
 extern SynthEngine *firstSynth;
@@ -67,6 +63,7 @@ int mainCreateNewInstance(unsigned int forceId, bool loadState);
 Config *firstRuntime = NULL;
 static int globalArgc = 0;
 static char **globalArgv = NULL;
+bool isSingleMaster = false;
 bool bShowGui = true;
 bool bShowCmdLine = true;
 bool splashSet = true;
@@ -92,16 +89,17 @@ void yoshimiSigHandler(int sig)
             firstRuntime->setLadi1Active();
             sigaction(SIGUSR1, &yoshimiSigAction, NULL);
             break;
-#ifdef AUTOSINGLE
         case SIGUSR2: // start next instance
-            if (!configuring)
+            if(isSingleMaster)
             {
-                configuring = true;
-                mainCreateNewInstance(0, true);
+                if (!configuring)
+                {
+                    configuring = true;
+                    mainCreateNewInstance(0, true);
+                }
             }
             sigaction(SIGUSR2, &yoshimiSigAction, NULL);
             break;
-#endif
         default:
             break;
     }
@@ -368,44 +366,54 @@ void *commandThread(void *) // silence warning (was *arg = NULL)
 
 int main(int argc, char *argv[])
 {
-#ifdef AUTOSINGLE
-    const int pidSize = 63;
-    char pidline[pidSize + 1];
-    // test for *exact* name and only the oldest occurrance
-    FILE *fp = popen("pgrep -o -x yoshimi", "r");
-    fgets(pidline,pidSize,fp);
-    pclose(fp);
-    string firstText = string(pidline);
-    int firstpid = stoi(firstText);
-
-    string test = "ps -o etime= -p " + firstText;
-    FILE *fp2 = popen(test.c_str(), "r");
-    fgets(pidline,pidSize,fp2);
-    pclose(fp2);
-    for (int i = 0; i < pidSize; ++ i)
+    if (handleSingleMaster)
     {
-        if (pidline[i] == ':')
-            pidline[i] = '0';
-    }
-    int firstTime = stoi(pidline);
+    /*
+     * Can't make this call from file manager yet!
+     */
+        string chkpath = string(getenv("HOME")) + "/.yoshimiSingle";
+        struct stat st;
+        if (!stat(chkpath.c_str(), &st))
+        {
+            isSingleMaster = true;
+            const int pidSize = 63;
+            char pidline[pidSize + 1];
+            // test for *exact* name and only the oldest occurrance
+            FILE *fp = popen("pgrep -o -x yoshimi", "r");
+            fgets(pidline,pidSize,fp);
+            pclose(fp);
+            string firstText = string(pidline);
+            int firstpid = stoi(firstText);
 
-    test = "ps -o etime= -p " + to_string(getpid());
-    FILE *fp3 = popen(test.c_str(), "r");
-    fgets(pidline,pidSize,fp3);
-    pclose(fp3);
-    for (int i = 0; i < pidSize; ++ i)
-    {
-        if (pidline[i] == ':')
-            pidline[i] = '0';
-    }
-    int secondTime = stoi(pidline);
+            string test = "ps -o etime= -p " + firstText;
+            FILE *fp2 = popen(test.c_str(), "r");
+            fgets(pidline,pidSize,fp2);
+            pclose(fp2);
+            for (int i = 0; i < pidSize; ++ i)
+            {
+                if (pidline[i] == ':')
+                    pidline[i] = '0';
+            }
+            int firstTime = stoi(pidline);
 
-    if ((firstTime - secondTime) > 1)
-    {
-            kill(firstpid, SIGUSR2);
-            return 0;
+            test = "ps -o etime= -p " + to_string(getpid());
+            FILE *fp3 = popen(test.c_str(), "r");
+            fgets(pidline,pidSize,fp3);
+            pclose(fp3);
+            for (int i = 0; i < pidSize; ++ i)
+            {
+                if (pidline[i] == ':')
+                    pidline[i] = '0';
+            }
+            int secondTime = stoi(pidline);
+
+            if ((firstTime - secondTime) > 0)
+            {
+                    kill(firstpid, SIGUSR2);
+                    return 0;
+            }
+        }
     }
-#endif
     time(&old_father_time);
     here_and_now = old_father_time;
     struct termios  oldTerm;

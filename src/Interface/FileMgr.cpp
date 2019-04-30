@@ -317,6 +317,13 @@ std::string FileMgr::loadText(std::string filename)
 }
 
 
+bool FileMgr::createEmptyFile(std::string filename)
+{
+    std::ofstream file {filename};
+    return 0; // TODO need a test for sucess
+}
+
+
 /*
  * The following two functions are currently identical for
  * linux but that may not always be true nor possibly other

@@ -1,5 +1,10 @@
 yoshimi 1.5.M
 
+2019-4-30 Will
+* Single master instance now switchable from GUI.
+  Also made some refinements to code allowing this
+  to be hidden until certain it's safe.
+
 2019-4-25 Will
 * Added PART_POLIPONY to globals
   It had been defined numerically in two places!

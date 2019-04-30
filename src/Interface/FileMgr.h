@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Created February 2019
+    Created April 2019
 */
 
 #ifndef FILEMGR_H
@@ -70,6 +70,7 @@ class FileMgr
         bool saveText(std::string text, std::string filename);
         char *loadGzipped(std::string _filename, std::string *report);
         std::string loadText(std::string filename);
+        bool createEmptyFile(std::string filename);
         bool deleteFile(std::string filename);
         bool deleteDir(std::string filename);
         bool renameFile(std::string oldname, std::string newname);
