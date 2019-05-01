@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified April 2019
+    Modified May 2019
 */
 
 #include "MusicIO/MusicClient.h"
@@ -29,12 +29,12 @@
 #include <set>
 #include <unistd.h>
 
-string audio_drivers_str [] = {"no_audio", "jack_audio"
+std::string audio_drivers_str [] = {"no_audio", "jack_audio"
 #if defined(HAVE_ALSA)
                                , "alsa_audio"
 #endif
                               };
-string midi_drivers_str [] = {"no_midi", "jack_midi"
+std::string midi_drivers_str [] = {"no_midi", "jack_midi"
 #if defined(HAVE_ALSA)
                               , "alsa_midi"
 #endif
@@ -280,7 +280,7 @@ int MusicClient::getBuffersize()
 }
 
 
-string MusicClient::audioClientName()
+std::string MusicClient::audioClientName()
 {
     if(audioIO)
     {
@@ -291,7 +291,7 @@ string MusicClient::audioClientName()
 }
 
 
-string MusicClient::midiClientName()
+std::string MusicClient::midiClientName()
 {
     if(midiIO)
     {

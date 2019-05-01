@@ -3,7 +3,7 @@
 
     Copyright 2009-2011, Alan Calvert
     Copyright 2009, James Morris
-    Copyright 2014-2018, Will Godfrey & others
+    Copyright 2014-2019, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -18,7 +18,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified June 2018
+    Modified May 2019
 */
 
 #ifndef MUSIC_IO_H
@@ -40,9 +40,9 @@ class MusicIO : virtual protected MiscFuncs
         virtual void Close(void) = 0;
         virtual bool openAudio(void) = 0;
         virtual bool openMidi(void) = 0;
-        virtual string audioClientName(void) = 0;
+        virtual std::string audioClientName(void) = 0;
         virtual int audioClientId(void) = 0;
-        virtual string midiClientName(void) = 0;
+        virtual std::string midiClientName(void) = 0;
         virtual int midiClientId(void) = 0;
         virtual void registerAudioPort(int) = 0;
 
