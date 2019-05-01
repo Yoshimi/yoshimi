@@ -27,8 +27,6 @@
 #include <bitset>
 #include <unistd.h>
 
-using namespace std;
-
 #include "Interface/InterChange.h"
 #include "Misc/MiscFuncs.h"
 #include "Misc/Microtonal.h"
@@ -218,9 +216,9 @@ void *InterChange::sortResultsThread(void)
         if (!(tick & 8191))
         {
             if (tick & 16383)
-                cout << "Tick" << endl;
+                std::cout << "Tick" << std::endl;
             else
-                cout << "Tock" << endl;
+                std::cout << "Tock" << std::endl;
         }*/
 
         // a false positive here is not actually a problem.
@@ -236,7 +234,7 @@ void *InterChange::sortResultsThread(void)
         else if (lockTime > 0 && (tick - lockTime) > 32766)
         { // about 4 seconds - may need improving
 
-            cout << "stuck read block cleared" << endl;
+            std::cout << "stuck read block cleared" << std::endl;
             blockRead = 0;//__sync_and_and_fetch(&blockRead, 0);
             lockTime = 0;
         }
@@ -316,20 +314,20 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
     unsigned char par2 = getData->data.par2;
-    //cout << "Indirect" << endl;
+    //std::cout << "Indirect" << std::endl;
     bool write = (type & TOPLEVEL::type::Write);
     if (write)
         __sync_or_and_fetch(&blockRead, 2);
     bool guiTo = false;
     guiTo = guiTo; // suppress warning when headless build
-    string text;
+    std::string text;
     if (getData->data.par2 != NO_MSG)
         text = miscMsgPop(getData->data.par2);
     else
         text = "";
     getData->data.par2 = NO_MSG; // this may be reset later
     unsigned int tmp;
-    string name;
+    std::string name;
 
     int switchNum = npart;
     if (control == TOPLEVEL::control::errorMessage && insert != TOPLEVEL::insert::resonanceGraphInsert)
@@ -358,7 +356,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         }
         case TOPLEVEL::section::midiIn: // program / bank / root
         {
-            //cout << " interchange prog " << value << "  chan " << int(kititem) << "  bank " << int(engine) << "  root " << int(insert) << "  named " << int(par2) << endl;
+            //std::cout << " interchange prog " << value << "  chan " << int(kititem) << "  bank " << int(engine) << "  root " << int(insert) << "  named " << int(par2) << std::endl;
             if (par2 != NO_MSG) // was named file not numbered
                 getData->data.par2 = miscMsgPush(text);
 
@@ -402,7 +400,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                             synth->microtonal.tuningtoline(i, buf, 100);
                             if (i > 0)
                                 text += "\n";
-                            text += string(buf);
+                            text += std::string(buf);
                         }
                         delete [] buf;
                     }
@@ -421,7 +419,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                             if (map == -1)
                                 text += 'x';
                             else
-                                text += to_string(map);
+                                text += std::to_string(map);
                         }
                         getData->data.kit = synth->microtonal.PAnote;
                         getData->data.engine = synth->microtonal.Pfirstkey;
@@ -520,8 +518,8 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     {
                         value = synth->getRuntime().currentPart;
                     }
-                    //cout << "\n\nRoot " << int(kititem) << "  Bank " << int(engine) << "  Part " << int(value) << "  Slot " << int(insert) << "  Par2 " << int(par2) << " \n\n" << endl;
-                    text = synth->part[value]->Pname + " to " + to_string(int(insert));
+                    //std::cout << "\n\nRoot " << int(kititem) << "  Bank " << int(engine) << "  Part " << int(value) << "  Slot " << int(insert) << "  Par2 " << int(par2) << " \n\n" << std::endl;
+                    text = synth->part[value]->Pname + " to " + std::to_string(int(insert));
                     if (synth->getBankRef().savetoslot(kititem, engine, insert, value))
                     {
                         text = "d " + text;
@@ -574,7 +572,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     if (tmp < NO_MSG)
                     {
                         getData->data.insert = tmp;
-                        text = "ed " + text + " to chan " + to_string(int(tmp + 1));
+                        text = "ed " + text + " to chan " + std::to_string(int(tmp + 1));
                     }
                     else
                         text = " FAILED " + text;
@@ -582,7 +580,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     break;
                 case MAIN::control::saveNamedVector:
                 {
-                    string oldname = synth->getRuntime().vectordata.Name[insert];
+                    std::string oldname = synth->getRuntime().vectordata.Name[insert];
                     int pos = oldname.find("No Name");
                     if (pos >=0 && pos < 2)
                         synth->getRuntime().vectordata.Name[insert] = findleafname(text);
@@ -649,20 +647,20 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     break;
                 case MAIN::control::openManualPDF: // display user guide
                 {
-                    string manfile = synth->manualname();
+                    std::string manfile = synth->manualname();
                     unsigned int pos = manfile.rfind(".") + 1;
-                    int wanted = stoi(manfile.substr(pos, 3));
+                    int wanted = std::stoi(manfile.substr(pos, 3));
                     int count = wanted + 1;
                     manfile = manfile.substr(0, pos);
-                    string path = "";
+                    std::string path = "";
                     while (path == "" && count >= 0) // scan current then older varsions
                     {
                         --count;
-                        path = findfile("/usr/", (manfile + to_string(count)).c_str(), "pdf");
+                        path = findfile("/usr/", (manfile + std::to_string(count)).c_str(), "pdf");
                         if (path == "")
-                        path = findfile("/usr/", (manfile + to_string(count)).c_str(), "pdf.gz");
+                        path = findfile("/usr/", (manfile + std::to_string(count)).c_str(), "pdf.gz");
                         if (path == "")
-                        path = findfile("/home/", (manfile + to_string(count)).c_str(), "pdf");
+                        path = findfile("/home/", (manfile + std::to_string(count)).c_str(), "pdf");
                     }
 
                     if (path == "")
@@ -671,7 +669,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         text = "Can't find current manual. Using older one";
                     if (path != "")
                     {
-                        string command = "xdg-open " + path + "&";
+                        std::string command = "xdg-open " + path + "&";
                         FILE *fp = popen(command.c_str(), "r");
                         if (fp == NULL)
                             text = "Can't find PDF reader :(";
@@ -694,7 +692,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     }
                     break;
                 case MAIN::control::stopInstance:
-                    text = to_string(value) + " ";
+                    text = std::to_string(value) + " ";
                     if (value < 0 || value >= 32)
                         text += "Out of range";
                     else
@@ -714,12 +712,12 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                 case MAIN::control::stopSound:
 #ifdef REPORT_NOTES_ON_OFF
                     // note test
-                    synth->getRuntime().Log("note on sent " + to_string(synth->getRuntime().noteOnSent));
-                    synth->getRuntime().Log("note on seen " + to_string(synth->getRuntime().noteOnSeen));
-                    synth->getRuntime().Log("note off sent " + to_string(synth->getRuntime().noteOffSent));
-                    synth->getRuntime().Log("note off seen " + to_string(synth->getRuntime().noteOffSeen));
-                    synth->getRuntime().Log("notes hanging sent " + to_string(synth->getRuntime().noteOnSent - synth->getRuntime().noteOffSent));
-                    synth->getRuntime().Log("notes hanging seen " + to_string(synth->getRuntime().noteOnSeen - synth->getRuntime().noteOffSeen));
+                    synth->getRuntime().Log("note on sent " + std::to_string(synth->getRuntime().noteOnSent));
+                    synth->getRuntime().Log("note on seen " + std::to_string(synth->getRuntime().noteOnSeen));
+                    synth->getRuntime().Log("note off sent " + std::to_string(synth->getRuntime().noteOffSent));
+                    synth->getRuntime().Log("note off seen " + std::to_string(synth->getRuntime().noteOffSeen));
+                    synth->getRuntime().Log("notes hanging sent " + std::to_string(synth->getRuntime().noteOnSent - synth->getRuntime().noteOffSent));
+                    synth->getRuntime().Log("notes hanging seen " + std::to_string(synth->getRuntime().noteOnSeen - synth->getRuntime().noteOffSeen));
 #endif
                     synth->ShutUp();
                     synth->Unmute();
@@ -746,7 +744,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         engine = synth->getRuntime().currentRoot;
                         getData->data.engine = engine;
                     }
-                    //cout << "Int swap 1 I " << int(value)  << "  B " << int(kititem) << "  R " << int(engine) << endl;
+                    //std::cout << "Int swap 1 I " << int(value)  << "  B " << int(kititem) << "  R " << int(engine) << std::endl;
                     swapInstrument1 = insert;
                     swapBank1 = kititem;
                     swapRoot1 = engine;
@@ -764,7 +762,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         engine = synth->getRuntime().currentRoot;
                         getData->data.engine = engine;
                     }
-                    //cout << "Int swap 2 I " << int(insert) << "  B " << int(kititem) << "  R " << int(engine) << endl;
+                    //std::cout << "Int swap 2 I " << int(insert) << "  B " << int(kititem) << "  R " << int(engine) << std::endl;
                     tmp = synth->bank.swapslot(swapInstrument1, insert, swapBank1, kititem, swapRoot1, engine);
                     if (tmp != 0)
                     {
@@ -968,7 +966,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     case PART::control::defaultInstrumentCopyright:
                         if (write)
                         {
-                            string name = synth->getRuntime().ConfigDir + "/copyright.txt";
+                            std::string name = synth->getRuntime().ConfigDir + "/copyright.txt";
                             if ((parameter & 0x7f) == 0) // load
                             {
                                 text = loadText(name); // TODO provide failure warning
@@ -993,7 +991,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     if (getData->data.parameter < TOPLEVEL::route::lowPriority)
     {
         //if (testThing)
-            //cout << "test " << value << endl;
+            //std::cout << "test " << value << std::endl;
         if (jack_ringbuffer_write_space(returnsBuffer) >= commandSize)
         {
             getData->data.value = float(value);
@@ -1020,15 +1018,15 @@ void InterChange::indirectTransfers(CommandBlock *getData)
 }
 
 
-string InterChange::formatScales(string text)
+std::string InterChange::formatScales(std::string text)
 {
     text.erase(remove(text.begin(), text.end(), ' '), text.end());
-    string delimiters = ",";
+    std::string delimiters = ",";
     size_t current;
     size_t next = -1;
     size_t found;
-    string word;
-    string newtext = "";
+    std::string word;
+    std::string newtext = "";
     do
     {
         current = next + 1;
@@ -1040,13 +1038,13 @@ string InterChange::formatScales(string text)
         {
             if (found < 4)
             {
-                string tmp (4 - found, '0'); // leading zeros
+                std::string tmp (4 - found, '0'); // leading zeros
                 word = tmp + word;
             }
             found = word.size();
             if ( found < 11)
             {
-                string tmp  (11 - found, '0'); // trailing zeros
+                std::string tmp  (11 - found, '0'); // trailing zeros
                 word += tmp;
             }
         }
@@ -1063,7 +1061,7 @@ float InterChange::readAllData(CommandBlock *getData)
 {
     if(getData->data.type & TOPLEVEL::type::Limits) // these are static
     {
-        //cout << "Read Control " << (int) getData->data.control << " Part " << (int) getData->data.part << "  Kit " << (int) getData->data.kit << " Engine " << (int) getData->data.engine << "  Insert " << (int) getData->data.insert << endl;
+        //std::cout << "Read Control " << (int) getData->data.control << " Part " << (int) getData->data.part << "  Kit " << (int) getData->data.kit << " Engine " << (int) getData->data.engine << "  Insert " << (int) getData->data.insert << std::endl;
         /*
          * commandtype limits values
          * 0    adjusted input value
@@ -1099,7 +1097,7 @@ float InterChange::readAllData(CommandBlock *getData)
         synth->fetchMeterData();
         return getData->data.value;
     }
-    //cout << "Read Control " << (int) getData->data.control << " Type " << (int) getData->data.type << " Part " << (int) getData->data.part << "  Kit " << (int) getData->data.kit << " Engine " << (int) getData->data.engine << "  Insert " << (int) getData->data.insert << " Parameter " << (int) getData->data.parameter << " Par2 " << (int) getData->data.par2 << endl;
+    //std::cout << "Read Control " << (int) getData->data.control << " Type " << (int) getData->data.type << " Part " << (int) getData->data.part << "  Kit " << (int) getData->data.kit << " Engine " << (int) getData->data.engine << "  Insert " << (int) getData->data.insert << " Parameter " << (int) getData->data.parameter << " Par2 " << (int) getData->data.par2 << std::endl;
     int npart = getData->data.part;
     bool indirect = ((getData->data.parameter & 0xc0) == TOPLEVEL::route::lowPriority);
     if (npart < NUM_MIDI_PARTS && synth->part[npart]->busy)
@@ -1169,11 +1167,11 @@ void InterChange::resolveReplies(CommandBlock *getData)
 
     bool isCli = ((type & (TOPLEVEL::source::CLI | TOPLEVEL::source::GUI )) == TOPLEVEL::source::CLI); // eliminate Gui redraw
     bool isGui = type & TOPLEVEL::source::GUI;
-    //cout << "Is CLI " << isCli << endl;
-    //cout << "Is GUI " << isGui << endl;
+    //std::cout << "Is CLI " << isCli << std::endl;
+    //std::cout << "Is GUI " << isGui << std::endl;
     char button = type & 3;
-    string isValue;
-    string commandName;
+    std::string isValue;
+    std::string commandName;
 
 #ifdef ENABLE_REPORTS
     if ((isGui && !(button & 1)) || (isCli && button == 1))
@@ -1185,14 +1183,14 @@ void InterChange::resolveReplies(CommandBlock *getData)
             isValue = "\n  Request set default";
         else
         {
-            isValue = "\n  Value      " + to_string(value);
+            isValue = "\n  Value      " + std::to_string(value);
             if (!(type & TOPLEVEL::type::Integer))
                 isValue += "f";
         }
-        string typemsg = "  Type       ";
+        std::string typemsg = "  Type       ";
         for (int i = 7; i > -1; -- i)
-            typemsg += to_string((type >> i) & 1);
-        list<string>msg;
+            typemsg += std::to_string((type >> i) & 1);
+        list<std::string>msg;
         msg.push_back(isValue);
         msg.push_back(typemsg);
         msg.push_back("  Control    0x" + asHexString(control) + "    " + asString(int(control)));
@@ -1230,24 +1228,24 @@ void InterChange::resolveReplies(CommandBlock *getData)
     else if (npart >= NUM_MIDI_PARTS)
     {
         showValue = false;
-        commandName = "Invalid part " + to_string(int(npart) + 1);
+        commandName = "Invalid part " + std::to_string(int(npart) + 1);
     }
 
     else if (kititem >= NUM_KIT_ITEMS && kititem < UNUSED)
     {
         showValue = false;
-        commandName = "Invalid kit " + to_string(int(kititem) + 1);
+        commandName = "Invalid kit " + std::to_string(int(kititem) + 1);
     }
 
     else if (kititem != 0 && engine != UNUSED && control != PART::control::enable && part->kit[kititem].Penabled == false)
-        commandName = "Part " + to_string(int(npart) + 1) + " Kit item " + to_string(int(kititem) + 1) + " not enabled";
+        commandName = "Part " + std::to_string(int(npart) + 1) + " Kit item " + std::to_string(int(kititem) + 1) + " not enabled";
 
     else if (kititem == UNUSED || insert == TOPLEVEL::insert::kitGroup)
     {
         if (control != PART::control::kitMode && kititem != UNUSED && part->Pkitmode == 0)
         {
             showValue = false;
-            commandName = "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
+            commandName = "Part " + std::to_string(int(npart) + 1) + " Kitmode not enabled";
         }
         else
             commandName = resolvePart(getData);
@@ -1255,7 +1253,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     else if (kititem > 0 && part->Pkitmode == 0)
     {
         showValue = false;
-        commandName = "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
+        commandName = "Part " + std::to_string(int(npart) + 1) + " Kitmode not enabled";
     }
 
     else if (engine == PART::engine::padSynth)
@@ -1391,18 +1389,18 @@ void InterChange::resolveReplies(CommandBlock *getData)
         }
     }
 
-    string actual = "";
+    std::string actual = "";
     if (showValue)
     {
         actual = " Value ";
         if (type & TOPLEVEL::type::Integer)
-            actual += to_string(lrint(value));
+            actual += std::to_string(lrint(value));
         else
-            actual += to_string(value);
+            actual += std::to_string(value);
     }
     if ((isGui || isCli) && button == 3)
     {
-        string toSend;
+        std::string toSend;
         size_t pos = commandName.find(" - ");
         if (pos < 1 || pos >= commandName.length())
             toSend = commandName;
@@ -1425,13 +1423,13 @@ void InterChange::resolveReplies(CommandBlock *getData)
 }
 
 
-string InterChange::resolveVector(CommandBlock *getData)
+std::string InterChange::resolveVector(CommandBlock *getData)
 {
     int value_int = lrint(getData->data.value);
     unsigned char control = getData->data.control;
     unsigned int chan = getData->data.insert;
 
-    string contstr = "";
+    std::string contstr = "";
     switch (control)
     {
         //case 0:
@@ -1486,7 +1484,7 @@ string InterChange::resolveVector(CommandBlock *getData)
             if (chan > NUM_MIDI_CHANNELS)
                 contstr = "all channels";
             else
-                contstr = "chan " + to_string(chan + 1);
+                contstr = "chan " + std::to_string(chan + 1);
             return("Vector cleared on " + contstr);
             break;
 
@@ -1501,9 +1499,9 @@ string InterChange::resolveVector(CommandBlock *getData)
     if (control == VECTOR::control::undefined)
     {
         showValue = false;
-        return("Vector " + contstr + " set to " + to_string(chan + 1));
+        return("Vector " + contstr + " set to " + std::to_string(chan + 1));
     }
-    string name = "Vector Chan " + to_string(chan + 1) + " ";
+    std::string name = "Vector Chan " + std::to_string(chan + 1) + " ";
     if (control == 127)
         name += " all ";
     else if (control >= VECTOR::control::Ycontroller)
@@ -1515,12 +1513,12 @@ string InterChange::resolveVector(CommandBlock *getData)
 }
 
 
-string InterChange::resolveMicrotonal(CommandBlock *getData)
+std::string InterChange::resolveMicrotonal(CommandBlock *getData)
 {
     int value = getData->data.value;
     unsigned char control = getData->data.control;
 
-    string contstr = "";
+    std::string contstr = "";
     switch (control)
     {
         case SCALES::control::Afrequency:
@@ -1573,11 +1571,11 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
             break;
 
         case SCALES::control::name:
-            contstr = "Name: " + string(synth->microtonal.Pname);
+            contstr = "Name: " + std::string(synth->microtonal.Pname);
             showValue = false;
             break;
         case SCALES::control::comment:
-            contstr = "Description: " + string(synth->microtonal.Pcomment);
+            contstr = "Description: " + std::string(synth->microtonal.Pcomment);
             showValue = false;
             break;
         case SCALES::control::retune:
@@ -1635,7 +1633,7 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
     return ("Scales " + contstr);
 }
 
-string InterChange::resolveConfig(CommandBlock *getData)
+std::string InterChange::resolveConfig(CommandBlock *getData)
 {
     float value = getData->data.value;
     unsigned char control = getData->data.control;
@@ -1643,7 +1641,7 @@ string InterChange::resolveConfig(CommandBlock *getData)
     int value_int = lrint(value);
     bool value_bool = YOSH::F2B(value);
     bool yesno = false;
-    string contstr = "";
+    std::string contstr = "";
     switch (control)
     {
         case CONFIG::control::oscillatorSize:
@@ -1893,7 +1891,7 @@ string InterChange::resolveConfig(CommandBlock *getData)
 
         case CONFIG::control::saveCurrentConfig:
         {
-            string name = miscMsgPop(value_int);
+            std::string name = miscMsgPop(value_int);
             if (write)
                 contstr += ("save" + name);
             else
@@ -1924,33 +1922,33 @@ string InterChange::resolveConfig(CommandBlock *getData)
 }
 
 
-string InterChange::resolveBank(CommandBlock *getData)
+std::string InterChange::resolveBank(CommandBlock *getData)
 {
     int value_int = lrint(getData->data.value);
     int control = getData->data.control;
     int kititem = getData->data.kit;
     int engine = getData->data.engine;
     int insert = getData->data.insert;
-    string name = miscMsgPop(value_int);
-    string contstr = "";
+    std::string name = miscMsgPop(value_int);
+    std::string contstr = "";
     showValue = false;
     switch(control)
     {
         case BANK::control::selectFirstInstrumentToSwap:
-            contstr = "Set Instrument ID " + to_string(insert + 1) + "  Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine) + " for swap";
+            contstr = "Set Instrument ID " + std::to_string(insert + 1) + "  Bank ID " + std::to_string(kititem) + "  Root ID " + std::to_string(engine) + " for swap";
             break;
         case BANK::control::selectSecondInstrumentAndSwap:
             if (name == "")
-                name = "ped with Instrument ID " + to_string(insert + 1) + "  Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine);
+                name = "ped with Instrument ID " + std::to_string(insert + 1) + "  Bank ID " + std::to_string(kititem) + "  Root ID " + std::to_string(engine);
             contstr = "Swap" + name;
             break;
 
         case BANK::control::selectFirstBankToSwap:
-            contstr = "Set Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine) + " for swap";
+            contstr = "Set Bank ID " + std::to_string(kititem) + "  Root ID " + std::to_string(engine) + " for swap";
             break;
         case BANK::control::selectSecondBankAndSwap:
             if (name == "")
-                name = "ped with Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine);
+                name = "ped with Bank ID " + std::to_string(kititem) + "  Root ID " + std::to_string(engine);
             contstr = "Swap" + name;
             break;
         default:
@@ -1960,7 +1958,7 @@ string InterChange::resolveBank(CommandBlock *getData)
     return ("Bank " + contstr);
 }
 
-string InterChange::resolveMain(CommandBlock *getData)
+std::string InterChange::resolveMain(CommandBlock *getData)
 {
     float value = getData->data.value;
     int value_int = lrint(value);
@@ -1969,8 +1967,8 @@ string InterChange::resolveMain(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
 //    unsigned char par2 = getData->data.par2;
-    string name;
-    string contstr = "";
+    std::string name;
+    std::string contstr = "";
     if (getData->data.part == TOPLEVEL::section::midiIn)
     {
         switch (control)
@@ -1982,7 +1980,7 @@ string InterChange::resolveMain(CommandBlock *getData)
                 showValue = false;
                 break;
             case MIDI::control::controller:
-                contstr = "CC " + to_string(int(engine)) + " ";
+                contstr = "CC " + std::to_string(int(engine)) + " ";
                 break;
             case MIDI::control::programChange:
                 showValue = false;
@@ -2000,7 +1998,7 @@ string InterChange::resolveMain(CommandBlock *getData)
 
         case MAIN::control::partNumber:
             showValue = false;
-            contstr = "Part Number " + to_string(value_int + 1);
+            contstr = "Part Number " + std::to_string(value_int + 1);
             break;
         case MAIN::control::availableParts:
             contstr = "Available Parts";
@@ -2049,7 +2047,7 @@ string InterChange::resolveMain(CommandBlock *getData)
             if (value_int > 127)
                 contstr += "undefined - set mode first";
             else
-                contstr += to_string(value_int);
+                contstr += std::to_string(value_int);
             break;
         case MAIN::control::exportBank:
             showValue = false;
@@ -2139,7 +2137,7 @@ string InterChange::resolveMain(CommandBlock *getData)
 
         case MAIN::control::startInstance:
             showValue = false;
-            contstr = "Start new instance " + to_string(value_int);
+            contstr = "Start new instance " + std::to_string(value_int);
             break;
         case MAIN::control::stopInstance:
             showValue = false;
@@ -2157,10 +2155,10 @@ string InterChange::resolveMain(CommandBlock *getData)
                 contstr = "Part R";
             else
                 contstr = "Part L";
-            contstr += to_string(int(kititem));
+            contstr += std::to_string(int(kititem));
             if (value < 0.0f)
                 contstr += " silent ";
-            contstr += (" peak level " + to_string(value));
+            contstr += (" peak level " + std::to_string(value));
             break;
         case MAIN::control::readMainLRpeak:
             showValue = false;
@@ -2168,7 +2166,7 @@ string InterChange::resolveMain(CommandBlock *getData)
                 contstr = "Right";
             else
                 contstr = "Left";
-            contstr += (" peak level " + to_string(value));
+            contstr += (" peak level " + std::to_string(value));
             break;
         case MAIN::control::readMainLRrms:
             showValue = false;
@@ -2176,7 +2174,7 @@ string InterChange::resolveMain(CommandBlock *getData)
                 contstr = "Right";
             else
                 contstr = "Left";
-            contstr += (" RMS level " + to_string(value));
+            contstr += (" RMS level " + std::to_string(value));
             break;
 
         default:
@@ -2188,7 +2186,7 @@ string InterChange::resolveMain(CommandBlock *getData)
 }
 
 
-string InterChange::resolvePart(CommandBlock *getData)
+std::string InterChange::resolvePart(CommandBlock *getData)
 {
     float value = getData->data.value;
     unsigned char control = getData->data.control;
@@ -2207,13 +2205,13 @@ string InterChange::resolvePart(CommandBlock *getData)
     if (control == UNUSED)
         return "Number of parts";
 
-    string kitnum;
+    std::string kitnum;
     if (kitType)
-        kitnum = " Kit " + to_string(kititem + 1) + " ";
+        kitnum = " Kit " + std::to_string(kititem + 1) + " ";
     else
         kitnum = " ";
 
-    string name = "";
+    std::string name = "";
     if (control >= PART::control::volumeRange && control <= PART::control::receivePortamento)
     {
         name = "Controller ";
@@ -2238,7 +2236,7 @@ string InterChange::resolvePart(CommandBlock *getData)
         }
     }
 
-    string contstr = "";
+    std::string contstr = "";
     switch (control)
     {
         case PART::control::volume:
@@ -2255,11 +2253,11 @@ string InterChange::resolvePart(CommandBlock *getData)
             break;
         case PART::control::midiChannel:
             showValue = false;
-            contstr = "Midi CH - " + to_string(value_int + 1);
+            contstr = "Midi CH - " + std::to_string(value_int + 1);
             if (value_int >= NUM_MIDI_CHANNELS * 2)
                 contstr += " Midi ignored";
             else if (value_int >= NUM_MIDI_CHANNELS)
-                contstr = contstr + " Note off only on CH " + to_string(value_int + 1 - NUM_MIDI_CHANNELS);
+                contstr = contstr + " Note off only on CH " + std::to_string(value_int + 1 - NUM_MIDI_CHANNELS);
             break;
         case PART::control::keyMode:
             showValue = false;
@@ -2370,13 +2368,13 @@ string InterChange::resolvePart(CommandBlock *getData)
             contstr = "Effect Number";
             break;
         case PART::control::effectType:
-            contstr = "Effect " + to_string(effNum + 1) + " Type";
+            contstr = "Effect " + std::to_string(effNum + 1) + " Type";
             break;
         case PART::control::effectDestination:
-            contstr = "Effect " + to_string(effNum + 1) + " Destination";
+            contstr = "Effect " + std::to_string(effNum + 1) + " Destination";
             break;
         case PART::control::effectBypass:
-            contstr = "Bypass Effect "+ to_string(effNum + 1);
+            contstr = "Bypass Effect "+ std::to_string(effNum + 1);
             break;
 
         case PART::control::defaultInstrument: // doClearPart
@@ -2549,23 +2547,23 @@ string InterChange::resolvePart(CommandBlock *getData)
             contstr += " - no";
         showValue = false;
     }
-    return ("Part " + to_string(npart + 1) + kitnum + name + contstr);
+    return ("Part " + std::to_string(npart + 1) + kitnum + name + contstr);
 }
 
 
-string InterChange::resolveAdd(CommandBlock *getData)
+std::string InterChange::resolveAdd(CommandBlock *getData)
 {
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
 
-    string name = "";
+    std::string name = "";
     if (control <= ADDSYNTH::control::panning)
         name = " Amplitude ";
     else if (control >= ADDSYNTH::control::detuneFrequency && control <= ADDSYNTH::control::relativeBandwidth)
         name = "Frequency";
 
-    string contstr = "";
+    std::string contstr = "";
 
     switch (control)
     {
@@ -2625,11 +2623,11 @@ string InterChange::resolveAdd(CommandBlock *getData)
             contstr = "Unrecognised";
     }
 
-    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " AddSynth " + name + contstr);
+    return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + " AddSynth " + name + contstr);
 }
 
 
-string InterChange::resolveAddVoice(CommandBlock *getData)
+std::string InterChange::resolveAddVoice(CommandBlock *getData)
 {
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -2641,7 +2639,7 @@ string InterChange::resolveAddVoice(CommandBlock *getData)
     else
         nvoice = engine - PART::engine::addVoice1;
 
-    string name = "";
+    std::string name = "";
     switch (control & 0xf0)
     {
         case ADDVOICE::control::volume:
@@ -2670,7 +2668,7 @@ string InterChange::resolveAddVoice(CommandBlock *getData)
             break;
     }
 
-    string contstr = "";
+    std::string contstr = "";
 
     switch (control)
     {
@@ -2831,11 +2829,11 @@ string InterChange::resolveAddVoice(CommandBlock *getData)
             contstr = "Unrecognised";
     }
 
-    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " Add Voice " + to_string(nvoice + 1) + name + contstr);
+    return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + " Add Voice " + std::to_string(nvoice + 1) + name + contstr);
 }
 
 
-string InterChange::resolveSub(CommandBlock *getData)
+std::string InterChange::resolveSub(CommandBlock *getData)
 {
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -2844,16 +2842,16 @@ string InterChange::resolveSub(CommandBlock *getData)
 
     if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     {
-        string Htype;
+        std::string Htype;
         if (insert == TOPLEVEL::insert::harmonicAmplitude)
             Htype = " Amplitude";
         else
             Htype = " Bandwidth";
 
-        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " SubSynth Harmonic " + to_string(control + 1) + Htype);
+        return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + " SubSynth Harmonic " + std::to_string(control + 1) + Htype);
     }
 
-    string name = "";
+    std::string name = "";
     switch (control & 0x70)
     {
         case SUBSYNTH::control::volume:
@@ -2873,7 +2871,7 @@ string InterChange::resolveSub(CommandBlock *getData)
             break;
     }
 
-    string contstr = "";
+    std::string contstr = "";
     switch (control)
     {
         case SUBSYNTH::control::volume:
@@ -2964,11 +2962,11 @@ string InterChange::resolveSub(CommandBlock *getData)
             contstr = "Unrecognised";
     }
 
-    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " SubSynth " + name + contstr);
+    return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + " SubSynth " + name + contstr);
 }
 
 
-string InterChange::resolvePad(CommandBlock *getData)
+std::string InterChange::resolvePad(CommandBlock *getData)
 {
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -2976,7 +2974,7 @@ string InterChange::resolvePad(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
-    string name = "";
+    std::string name = "";
     switch (control & 0x70)
     {
         case PADSYNTH::control::volume:
@@ -2999,7 +2997,7 @@ string InterChange::resolvePad(CommandBlock *getData)
             break;
     }
 
-    string contstr = "";
+    std::string contstr = "";
     switch (control)
     {
         case PADSYNTH::control::volume:
@@ -3140,15 +3138,15 @@ string InterChange::resolvePad(CommandBlock *getData)
             contstr = "Unrecognised";
     }
 
-    string isPad = "";
+    std::string isPad = "";
 
     if (write && ((control >= PADSYNTH::control::bandwidth && control <= PADSYNTH::control::spectrumMode) || (control >= PADSYNTH::control::overtoneParameter1 && control <= PADSYNTH::control::sampleSize)))
         isPad += " - Need to Apply";
-    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " PadSynth " + name + contstr + isPad);
+    return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + " PadSynth " + name + contstr + isPad);
 }
 
 
-string InterChange::resolveOscillator(CommandBlock *getData)
+std::string InterChange::resolveOscillator(CommandBlock *getData)
 {
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -3158,8 +3156,8 @@ string InterChange::resolveOscillator(CommandBlock *getData)
     unsigned char insert = getData->data.insert;
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
-    string isPad = "";
-    string eng_name;
+    std::string isPad = "";
+    std::string eng_name;
     if (engine == PART::engine::padSynth)
     {
         eng_name = " Padsysnth";
@@ -3173,21 +3171,21 @@ string InterChange::resolveOscillator(CommandBlock *getData)
             eng = engine - PART::engine::addMod1;
         else
             eng = engine - PART::engine::addVoice1;
-        eng_name = " Add Voice " + to_string(eng + 1);
+        eng_name = " Add Voice " + std::to_string(eng + 1);
         if (engine >= PART::engine::addMod1)
             eng_name += " Modulator";
     }
 
     if (insert == TOPLEVEL::insert::harmonicAmplitude)
     {
-        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + " Harmonic " + to_string((int)control + 1) + " Amplitude" + isPad);
+        return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + eng_name + " Harmonic " + std::to_string((int)control + 1) + " Amplitude" + isPad);
     }
     else if(insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     {
-        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + " Harmonic " + to_string((int)control + 1) + " Phase" + isPad);
+        return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + eng_name + " Harmonic " + std::to_string((int)control + 1) + " Phase" + isPad);
     }
 
-    string name;
+    std::string name;
     if (control >= OSCILLATOR::control::clearHarmonics || control <= OSCILLATOR::control::harmonicRandomnessType)
         name = " Oscillator";
     else if (control >= OSCILLATOR::control::harmonicShift)
@@ -3197,7 +3195,7 @@ string InterChange::resolveOscillator(CommandBlock *getData)
     else
         name = " Base Funct";
 
-    string contstr;
+    std::string contstr;
     switch (control)
     {
         case OSCILLATOR::control::phaseRandomness:
@@ -3308,11 +3306,11 @@ string InterChange::resolveOscillator(CommandBlock *getData)
             contstr = "Unrecognised";
     }
 
-    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + name + contstr + isPad);
+    return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + eng_name + name + contstr + isPad);
 }
 
 
-string InterChange::resolveResonance(CommandBlock *getData)
+std::string InterChange::resolveResonance(CommandBlock *getData)
 {
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -3322,8 +3320,8 @@ string InterChange::resolveResonance(CommandBlock *getData)
     unsigned char insert = getData->data.insert;
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
-    string name;
-    string isPad = "";
+    std::string name;
+    std::string isPad = "";
     if (engine == PART::engine::padSynth)
     {
         name = " PadSynth";
@@ -3337,12 +3335,12 @@ string InterChange::resolveResonance(CommandBlock *getData)
     {
         if (write == true && engine == PART::engine::padSynth)
             isPad = " - Need to Apply";
-        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Resonance Point " + to_string(control + 1) + isPad);
+        return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + name + " Resonance Point " + std::to_string(control + 1) + isPad);
     }
 
     if (write == true && engine == PART::engine::padSynth && control != 104)
         isPad = " - Need to Apply";
-    string contstr;
+    std::string contstr;
     switch (control)
     {
         case RESONANCE::control::maxDb:
@@ -3382,11 +3380,11 @@ string InterChange::resolveResonance(CommandBlock *getData)
             contstr = "Unrecognised";
     }
 
-    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Resonance " + contstr + isPad);
+    return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + name + " Resonance " + contstr + isPad);
 }
 
 
-string InterChange::resolveLFO(CommandBlock *getData)
+std::string InterChange::resolveLFO(CommandBlock *getData)
 {
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -3394,8 +3392,8 @@ string InterChange::resolveLFO(CommandBlock *getData)
     unsigned char engine = getData->data.engine;
     unsigned char insertParam = getData->data.parameter;
 
-    string name;
-    string lfo;
+    std::string name;
+    std::string lfo;
 
     if (engine == PART::engine::addSynth)
         name = " AddSynth";
@@ -3404,7 +3402,7 @@ string InterChange::resolveLFO(CommandBlock *getData)
     else if (engine >= PART::engine::addVoice1)
     {
         int nvoice = engine - PART::engine::addVoice1;
-        name = " Add Voice " + to_string(nvoice + 1);
+        name = " Add Voice " + std::to_string(nvoice + 1);
     }
 
     switch (insertParam)
@@ -3420,7 +3418,7 @@ string InterChange::resolveLFO(CommandBlock *getData)
             break;
     }
 
-    string contstr;
+    std::string contstr;
     switch (control)
     {
         case LFOINSERT::control::speed:
@@ -3456,11 +3454,11 @@ string InterChange::resolveLFO(CommandBlock *getData)
             contstr = "Unrecognised";
     }
 
-    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + lfo + " LFO " + contstr);
+    return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + name + lfo + " LFO " + contstr);
 }
 
 
-string InterChange::resolveFilter(CommandBlock *getData)
+std::string InterChange::resolveFilter(CommandBlock *getData)
 {
     int value_int = int(getData->data.value);
     unsigned char control = getData->data.control;
@@ -3472,7 +3470,7 @@ string InterChange::resolveFilter(CommandBlock *getData)
     int nformant = getData->data.parameter;
     int nvowel = getData->data.par2;
 
-    string name;
+    std::string name;
 
     if (engine == PART::engine::addSynth)
         name = " AddSynth";
@@ -3481,8 +3479,8 @@ string InterChange::resolveFilter(CommandBlock *getData)
     else if (engine == PART::engine::padSynth)
         name = " PadSynth";
     else if (engine >= PART::engine::addVoice1)
-        name = " Adsynth Voice " + to_string((engine - PART::engine::addVoice1) + 1);
-    string contstr;
+        name = " Adsynth Voice " + std::to_string((engine - PART::engine::addVoice1) + 1);
+    std::string contstr;
     switch (control)
     {
         case FILTERINSERT::control::centerFrequency:
@@ -3505,7 +3503,7 @@ string InterChange::resolveFilter(CommandBlock *getData)
             break;
         case FILTERINSERT::control::stages:
             showValue = false;
-            contstr = "Stages " + to_string(value_int + 1);
+            contstr = "Stages " + std::to_string(value_int + 1);
             break;
         case FILTERINSERT::control::baseType:
             contstr = "Filt Type";
@@ -3570,17 +3568,17 @@ string InterChange::resolveFilter(CommandBlock *getData)
             showValue = false;
             contstr = "Unrecognised";
     }
-    string extra = "";
+    std::string extra = "";
     if (control >= FILTERINSERT::control::formantFrequency && control <= FILTERINSERT::control::formantAmplitude)
-        extra ="Vowel " + to_string(nvowel) + " Formant " + to_string(nformant) + " ";
+        extra ="Vowel " + std::to_string(nvowel) + " Formant " + std::to_string(nformant) + " ";
     else if (control == FILTERINSERT::control::vowelPositionInSequence)
-        extra = "Seq Pos " + to_string(nseqpos) + " ";
+        extra = "Seq Pos " + std::to_string(nseqpos) + " ";
 
-    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Filter " + extra + contstr);
+    return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + name + " Filter " + extra + contstr);
 }
 
 
-string InterChange::resolveEnvelope(CommandBlock *getData)
+std::string InterChange::resolveEnvelope(CommandBlock *getData)
 {
     int value = lrint(getData->data.value);
     bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
@@ -3592,8 +3590,8 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
     unsigned char insertParam = getData->data.parameter;
     int par2 = getData->data.par2;
 
-    string env;
-    string name;
+    std::string env;
+    std::string name;
     if (engine == PART::engine::addSynth)
         name = " AddSynth";
     else if (engine == PART::engine::subSynth)
@@ -3609,7 +3607,7 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
             nvoice = engine - PART::engine::addMod1;
         else
             nvoice = engine - PART::engine::addVoice1;
-        name += to_string(nvoice + 1);
+        name += std::to_string(nvoice + 1);
         if (engine >= PART::engine::addMod1)
             name += " Modulator";
     }
@@ -3634,23 +3632,23 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
     {
         if (!write)
         {
-            return ("Freemode add/remove is write only. Current points " + to_string(int(par2)));
+            return ("Freemode add/remove is write only. Current points " + std::to_string(int(par2)));
         }
         if (par2 != UNUSED)
-            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Added Freemode Point " + to_string(int(control & 0x3f)) + " X increment " + to_string(int(par2)) + " Y");
+            return ("Part " + std::to_string(int(npart + 1)) + " Kit " + std::to_string(int(kititem + 1)) + name  + env + " Env Added Freemode Point " + std::to_string(int(control & 0x3f)) + " X increment " + std::to_string(int(par2)) + " Y");
         else
         {
             showValue = false;
-            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Removed Freemode Point " +  to_string(int(control)) + "  Remaining " +  to_string(value));
+            return ("Part " + std::to_string(int(npart + 1)) + " Kit " + std::to_string(int(kititem + 1)) + name  + env + " Env Removed Freemode Point " +  std::to_string(int(control)) + "  Remaining " +  std::to_string(value));
         }
     }
 
     if (insert == TOPLEVEL::insert::envelopePointChange)
     {
-        return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control)) + " X increment " + to_string(int(par2)) + " Y");
+        return ("Part " + std::to_string(int(npart + 1)) + " Kit " + std::to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  std::to_string(int(control)) + " X increment " + std::to_string(int(par2)) + " Y");
     }
 
-    string contstr;
+    std::string contstr;
     switch (control)
     {
         case ENVELOPEINSERT::control::attackLevel:
@@ -3704,11 +3702,11 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
             contstr = "Unrecognised";
     }
 
-    return ("Part " + to_string(npart + 1) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env " + contstr);
+    return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(int(kititem + 1)) + name  + env + " Env " + contstr);
 }
 
 
-string InterChange::resolveEffects(CommandBlock *getData)
+std::string InterChange::resolveEffects(CommandBlock *getData)
 {
     int value = lrint(getData->data.value);
     unsigned char control = getData->data.control;
@@ -3718,14 +3716,14 @@ string InterChange::resolveEffects(CommandBlock *getData)
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
 
-    string name;
-    string actual;
+    std::string name;
+    std::string actual;
     if (npart == TOPLEVEL::section::systemEffects)
         name = "System";
     else if (npart == TOPLEVEL::section::insertEffects)
         name = "Insert";
     else
-        name = "Part " + to_string(npart + 1);
+        name = "Part " + std::to_string(npart + 1);
 
     if (kititem == EFFECT::type::dynFilter && getData->data.insert != UNUSED)
     {
@@ -3733,15 +3731,15 @@ string InterChange::resolveEffects(CommandBlock *getData)
             name = "System";
         else if (npart == TOPLEVEL::section::insertEffects)
             name = "Insert";
-        else name = "Part " + to_string(npart + 1);
-        name += " Effect " + to_string(effnum + 1);
+        else name = "Part " + std::to_string(npart + 1);
+        name += " Effect " + std::to_string(effnum + 1);
 
-        return (name + " DynFilter ~ Filter Internal Control " + to_string(control));
+        return (name + " DynFilter ~ Filter Internal Control " + std::to_string(control));
     }
 
-    name += " Effect " + to_string(effnum + 1);
+    name += " Effect " + std::to_string(effnum + 1);
 
-    string effname = "";
+    std::string effname = "";
     if (npart < NUM_MIDI_PARTS && (control == PART::control::effectNumber || control == PART::control::effectDestination || control == PART::control::effectBypass))
     {
         if (control == PART::control::effectNumber)
@@ -3764,13 +3762,13 @@ string InterChange::resolveEffects(CommandBlock *getData)
     }
     else if (npart >= TOPLEVEL::section::systemEffects && kititem == UNUSED)
     {
-        string contstr;
-        string second = "";
+        std::string contstr;
+        std::string second = "";
         if (npart == TOPLEVEL::section::systemEffects && insert == TOPLEVEL::insert::systemEffectSend)
         {
             name = "System ";
-            contstr = "from Effect " + to_string(effnum + 1);
-            second = " to Effect " + to_string(control + 1);
+            contstr = "from Effect " + std::to_string(effnum + 1);
+            second = " to Effect " + std::to_string(control + 1);
             return (name + contstr + second);
         }
         if (npart == TOPLEVEL::section::insertEffects && control == EFFECT::sysIns::effectDestination)
@@ -3783,7 +3781,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
             else
             {
                 contstr += "Part ";
-                second = to_string(value + 1);
+                second = std::to_string(value + 1);
             }
             showValue = false;
             return ("Send " + name + contstr + second);
@@ -3795,7 +3793,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
             return (name + effname);
         }
     }
-    string contstr = "";
+    std::string contstr = "";
     if ((npart < NUM_MIDI_PARTS && control == PART::control::effectType) || (npart > TOPLEVEL::section::main && kititem == UNUSED && control == EFFECT::sysIns::effectType))
     {
         name += " set to";
@@ -3803,7 +3801,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
         showValue = false;
     }
     else
-        contstr = " Control " + to_string(control + 1);
+        contstr = " Control " + std::to_string(control + 1);
 
     switch (kititem)
     {
@@ -3832,7 +3830,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
         case EFFECT::type::eq:
             effname = " EQ";
             if (control > 1)
-                contstr = " (Band " + to_string(int(parameter)) + ") Control " + to_string(control);
+                contstr = " (Band " + std::to_string(int(parameter)) + ") Control " + std::to_string(control);
             break;
         case EFFECT::type::dynFilter:
             effname = " DynFilter";
@@ -3845,7 +3843,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
 
     if (kititem != EFFECT::type::eq && control == EFFECT::control::preset)
     {
-        contstr = " Preset " + to_string (lrint(value) + 1);
+        contstr = " Preset " + std::to_string (lrint(value) + 1);
         showValue = false;
     }
 
@@ -3988,7 +3986,7 @@ void InterChange::returns(CommandBlock *getData)
 
         if (synth->guiMaster && isOKtoRedraw)
         {
-            //cout << "writing to GUI" << endl;
+            //std::cout << "writing to GUI" << std::endl;
             if (jack_ringbuffer_write_space(toGUI) >= commandSize)
                 jack_ringbuffer_write(toGUI, (char*) getData->bytes, commandSize);
             else
@@ -4069,8 +4067,8 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     bool isGui = type & TOPLEVEL::source::GUI;
     char button = type & 3;
 
-    //cout << "Type " << int(type) << "  Control " << int(control) << "  Part " << int(npart) << "  Kit " << int(kititem) << "  Engine " << int(engine) << endl;
-    //cout  << "Insert " << int(insert)<< "  Parameter " << int(parameter) << "  Par2 " << int(par2) << endl;
+    //std::cout << "Type " << int(type) << "  Control " << int(control) << "  Part " << int(npart) << "  Kit " << int(kititem) << "  Engine " << int(engine) << std::endl;
+    //std::cout  << "Insert " << int(insert)<< "  Parameter " << int(parameter) << "  Par2 " << int(par2) << std::endl;
 
     if (!isGui && button == 1)
     {
@@ -4273,7 +4271,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                     if (control != 113)
                     {
                         int voicechange = part->kit[kititem].adpars->VoicePar[engine].PextFMoscil;
-                        //cout << "ext Mod osc " << voicechange << endl;
+                        //std::cout << "ext Mod osc " << voicechange << std::endl;
                         if (voicechange != -1)
                         {
                             engine = voicechange;
@@ -4289,7 +4287,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                     if (control != 137)
                     {
                         int voicechange = part->kit[kititem].adpars->VoicePar[engine].Pextoscil;
-                        //cout << "ext voice osc " << voicechange << endl;
+                        //std::cout << "ext voice osc " << voicechange << std::endl;
                         if (voicechange != -1)
                         {
                             engine = voicechange;
@@ -4347,7 +4345,7 @@ void InterChange::commandMidi(CommandBlock *getData)
     unsigned int char1 = getData->data.engine;
     unsigned char par2 = getData->data.par2;
 
-    //cout << "value " << value_int << "  control " << int(control) << "  chan " << int(chan) << "  char1 " << char1 << "  char2 " << int(char2) << "  param " << int(parameter) << "  par2 " << int(par2) << endl;
+    //std::cout << "value " << value_int << "  control " << int(control) << "  chan " << int(chan) << "  char1 " << char1 << "  char2 " << int(char2) << "  param " << int(parameter) << "  par2 " << int(par2) << std::endl;
 
     if (control == 2 && char1 >= 0x80)
     {
@@ -4367,7 +4365,7 @@ void InterChange::commandMidi(CommandBlock *getData)
             getData->data.source = TOPLEVEL::action::noAction; // till we know what to do!
             break;
         case MIDI::control::controller:
-            //cout << "Midi controller ch " << to_string(int(chan)) << "  type " << to_string(int(char1)) << "  val " << to_string(value_int) << endl;
+            //std::cout << "Midi controller ch " << std::to_string(int(chan)) << "  type " << std::to_string(int(char1)) << "  val " << std::to_string(value_int) << std::endl;
             __sync_or_and_fetch(&blockRead, 1);
             synth->SetController(chan, char1, value_int);
             break;
@@ -4405,7 +4403,7 @@ void InterChange::vectorClear(int Nvector)
         synth->getRuntime().vectordata.Xfeatures[ch] = 0;
         synth->getRuntime().vectordata.Yfeatures[ch] = 0;
         synth->getRuntime().vectordata.Enabled[ch] = false;
-        synth->getRuntime().vectordata.Name[ch] = "No Name " + to_string(ch + 1);
+        synth->getRuntime().vectordata.Name[ch] = "No Name " + std::to_string(ch + 1);
     }
 }
 
@@ -7791,8 +7789,8 @@ void InterChange::commandEnvelope(CommandBlock *getData)
     Part *part;
     part = synth->part[npart];
 
-    string env;
-    string name;
+    std::string env;
+    std::string name;
     if (engine == PART::engine::addSynth)
     {
         switch (insertParam)
@@ -8096,7 +8094,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
         __sync_or_and_fetch(&blockRead, 1);
 
     int value_int = lrint(value);
-    //cout << "Value " << value_int << "  Control " << int(control) << "  Part " << int(npart) << "  Effnum " << int(effnum) << "  Insert " << int(insert) << endl;
+    //std::cout << "Value " << value_int << "  Control " << int(control) << "  Part " << int(npart) << "  Effnum " << int(effnum) << "  Insert " << int(insert) << std::endl;
     bool isSysEff = (npart == TOPLEVEL::section::systemEffects);
     if (isSysEff)
         effnum = synth->syseffnum;
@@ -8221,7 +8219,7 @@ void InterChange::commandEffects(CommandBlock *getData)
         {
             value = eff->geteffectpar(-1);
             getData->data.value = value;
-            //cout << "Eff Changed " << int(value) << endl;
+            //std::cout << "Eff Changed " << int(value) << std::endl;
         }
         return; // specific for reading change status
     }
@@ -8256,7 +8254,7 @@ void InterChange::commandEffects(CommandBlock *getData)
                 eff->seteffectpar(control, value_int);
             }
         }
-        //cout << "eff value " << value << "  control " << int(control) << "  band " << synth->getRuntime().EQband << endl;
+        //std::cout << "eff value " << value << "  control " << int(control) << "  band " << synth->getRuntime().EQband << std::endl;
     }
     else
     {
@@ -8297,7 +8295,7 @@ void InterChange::testLimits(CommandBlock *getData)
         getData->data.par2 = NO_MSG; // just to be sure
         if (value > 119)
             return;
-        string text;
+        std::string text;
         if (control == CONFIG::control::bankRootCC)
         {
             text = synth->getRuntime().masterCCtest(int(value));
@@ -8340,9 +8338,9 @@ float InterChange::returnLimits(CommandBlock *getData)
     float value = getData->data.value;
     int request = int(getData->data.type & TOPLEVEL::type::Default); // catches Adj, Min, Max, Def
 
-    //cout << "Limits Control " << control << " Part " << npart << "  Kit " << kititem << " Engine " << engine << "  Insert " << insert << "  Parameter " << parameter << endl;
+    //std::cout << "Limits Control " << control << " Part " << npart << "  Kit " << kititem << " Engine " << engine << "  Insert " << insert << "  Parameter " << parameter << std::endl;
 
-    //cout << "Top request " << request << endl;
+    //std::cout << "Top request " << request << std::endl;
 
     getData->data.type &= 0x3f; //  clear top bits
     getData->data.type |= TOPLEVEL::type::Integer; // default is integer & not learnable
@@ -8417,7 +8415,7 @@ float InterChange::returnLimits(CommandBlock *getData)
             max = 127;
             def = 0;
 
-            cout << "Using engine defaults" << endl;
+            std::cout << "Using engine defaults" << std::endl;
             switch (request)
             {
                 case TOPLEVEL::type::Adjust:
@@ -8464,7 +8462,7 @@ float InterChange::returnLimits(CommandBlock *getData)
         min = 0;
         max = 127;
         def = 0;
-        cout << "Using insert defaults" << endl;
+        std::cout << "Using insert defaults" << std::endl;
 
             switch (request)
             {
@@ -8573,7 +8571,7 @@ float InterChange::returnLimits(CommandBlock *getData)
     min = 0;
     max = 127;
     def = 0;
-    cout << "Using unknown part number defaults" << endl;
+    std::cout << "Using unknown part number defaults" << std::endl;
 
     switch (request)
     {

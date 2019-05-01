@@ -25,8 +25,6 @@
 
 #include <jack/ringbuffer.h>
 
-using namespace std;
-
 #include "Misc/MiscFuncs.h"
 #include "Interface/FileMgr.h"
 #include "Params/LFOParams.h"
@@ -80,23 +78,23 @@ class InterChange : private MiscFuncs, FileMgr
         static void *_sortResultsThread(void *arg);
         pthread_t  sortResultsThreadHandle;
         void indirectTransfers(CommandBlock *getData);
-        string formatScales(string text);
-        string resolveVector(CommandBlock *getData);
-        string resolveMicrotonal(CommandBlock *getData);
-        string resolveConfig(CommandBlock *getData);
-        string resolveBank(CommandBlock *getData);
-        string resolveMain(CommandBlock *getData);
-        string resolvePart(CommandBlock *getData);
-        string resolveAdd(CommandBlock *getData);
-        string resolveAddVoice(CommandBlock *getData);
-        string resolveSub(CommandBlock *getData);
-        string resolvePad(CommandBlock *getData);
-        string resolveOscillator(CommandBlock *getData);
-        string resolveResonance(CommandBlock *getData);
-        string resolveLFO(CommandBlock *getData);
-        string resolveFilter(CommandBlock *getData);
-        string resolveEnvelope(CommandBlock *getData);
-        string resolveEffects(CommandBlock *getData);
+        std::string formatScales(std::string text);
+        std::string resolveVector(CommandBlock *getData);
+        std::string resolveMicrotonal(CommandBlock *getData);
+        std::string resolveConfig(CommandBlock *getData);
+        std::string resolveBank(CommandBlock *getData);
+        std::string resolveMain(CommandBlock *getData);
+        std::string resolvePart(CommandBlock *getData);
+        std::string resolveAdd(CommandBlock *getData);
+        std::string resolveAddVoice(CommandBlock *getData);
+        std::string resolveSub(CommandBlock *getData);
+        std::string resolvePad(CommandBlock *getData);
+        std::string resolveOscillator(CommandBlock *getData);
+        std::string resolveResonance(CommandBlock *getData);
+        std::string resolveLFO(CommandBlock *getData);
+        std::string resolveFilter(CommandBlock *getData);
+        std::string resolveEnvelope(CommandBlock *getData);
+        std::string resolveEffects(CommandBlock *getData);
         bool showValue;
         unsigned int lockTime;
 

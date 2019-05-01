@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified April 2019
+    Modified May 2019
 */
 
 // approx timeout in seconds.
@@ -126,7 +126,7 @@ static void *mainGuiThread(void *arg)
     Fl_Window winSplash(splashWidth, splashHeight, "yoshimi splash screen");
     Fl_Box box(0, 0, splashWidth,splashHeight);
     box.image(pix);
-    string startup = YOSHIMI_VERSION;
+    std::string startup = YOSHIMI_VERSION;
     startup = "V " + startup;
     Fl_Box boxLb(0, splashHeight - textY - textHeight, splashWidth, textHeight, startup.c_str());
     boxLb.box(FL_NO_BOX);
@@ -299,9 +299,9 @@ int mainCreateNewInstance(unsigned int forceId, bool loadState)
     loadState = synth->getRuntime().loadDefaultState;
     if (loadState)
     {
-        string name = synth->getRuntime().defaultStateName;
+        std::string name = synth->getRuntime().defaultStateName;
         if (instanceID > 0)
-            name = name + "-" + to_string(forceId);
+            name = name + "-" + std::to_string(forceId);
         synth->loadStateAndUpdate(name);
     }
 #ifdef GUI_FLTK
@@ -364,7 +364,7 @@ void *commandThread(void *) // silence warning (was *arg = NULL)
     return 0;
 }
 
-string runCommand(string command, bool clean)
+std::string runCommand(std::string command, bool clean)
 {
     const int lineLen = 63;
     char returnLine[lineLen + 1];
@@ -379,7 +379,7 @@ string runCommand(string command, bool clean)
                 returnLine[i] = '0';
         }
     }
-    return string(returnLine);
+    return std::string(returnLine);
 }
 
 int main(int argc, char *argv[])
@@ -389,15 +389,15 @@ int main(int argc, char *argv[])
     /*
      * Can't make this call from file manager
      */
-        string chkpath = string(getenv("HOME")) + "/.yoshimiSingle";
+        std::string chkpath = std::string(getenv("HOME")) + "/.yoshimiSingle";
         struct stat st;
         if (!stat(chkpath.c_str(), &st))
         {
             isSingleMaster = true;
-            string firstText = runCommand("pgrep -o -x yoshimi", false);
-            int firstpid = stoi(firstText);
+            std::string firstText = runCommand("pgrep -o -x yoshimi", false);
+            int firstpid = std::stoi(firstText);
             int firstTime = std::stoi(runCommand("ps -o etime= -p " + firstText, true));
-            int secondTime = std::stoi(runCommand("ps -o etime= -p " + to_string(getpid()), true));
+            int secondTime = std::stoi(runCommand("ps -o etime= -p " + std::to_string(getpid()), true));
 
             if ((firstTime - secondTime) > 0)
             {
