@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified April 2019
+    Modified May 2019
 */
 
 #include <iostream>
@@ -49,6 +49,7 @@
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
 extern int mainCreateNewInstance(unsigned int forceId, bool loadState);
 extern SynthEngine *firstSynth;
+extern std::string singlePath;
 
 int startInstance = 0;
 
@@ -155,6 +156,7 @@ bool InterChange::Init()
         synth->getRuntime().Log("Failed to start CLI resolve thread");
         goto bail_out;
     }
+    std::cout << singlePath << std::endl;
     return true;
 
 
@@ -4880,6 +4882,17 @@ void InterChange::commandConfig(CommandBlock *getData)
                 synth->getRuntime().autoInstance = value_bool;
             else
                 value = synth->getRuntime().autoInstance;
+            break;
+        case CONFIG::control::enableSinglePath:
+            if (write)
+            {
+                if (value_bool)
+                    createEmptyFile(singlePath);
+                else
+                    deleteFile(singlePath);
+            }
+            else
+                value = isRegFile(singlePath);
             break;
         case CONFIG::control::exposeStatus:
             if (write)

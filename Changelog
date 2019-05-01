@@ -3,6 +3,8 @@ yoshimi 1.5.M
 2019-5-1 Will
 * All Interface files have no 'using namespace std'
 * All MusicIO files have no 'using namespace std'
+* Single master instance now properly accessed.
+  Not CLI yet.
 
 2019-4-30 Will
 * Single master instance now switchable from GUI.

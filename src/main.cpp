@@ -64,6 +64,7 @@ Config *firstRuntime = NULL;
 static int globalArgc = 0;
 static char **globalArgv = NULL;
 bool isSingleMaster = false;
+std::string singlePath;
 bool bShowGui = true;
 bool bShowCmdLine = true;
 bool splashSet = true;
@@ -387,11 +388,12 @@ int main(int argc, char *argv[])
     if (handleSingleMaster)
     {
     /*
-     * Can't make this call from file manager
+     * Can't make this call from file manager and the file has to be in the
+     * home directory as it's the only one we can be certain exists at startup
      */
-        std::string chkpath = std::string(getenv("HOME")) + "/.yoshimiSingle";
+        singlePath = std::string(getenv("HOME")) + "/.yoshimiSingle";
         struct stat st;
-        if (!stat(chkpath.c_str(), &st))
+        if (!stat(singlePath.c_str(), &st))
         {
             isSingleMaster = true;
             std::string firstText = runCommand("pgrep -o -x yoshimi", false);

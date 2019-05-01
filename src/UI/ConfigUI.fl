@@ -23,7 +23,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified April 2019
+Modified May 2019
 } {selected in_source in_header
 }
 
@@ -329,16 +329,9 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
           Fl_Check_Button singleMaster {
             label {* Enable Single Master}
             callback {//
-          if (o->value())
-          {
-              createEmptyFile(string(getenv("HOME")) + "/.yoshimiSingle");
-          }
-          else
-          {
-              deleteFile(string(getenv("HOME")) + "/.yoshimiSingle");
-          }}
+          send_data(CONFIG::control::enableSinglePath, o->value(), TOPLEVEL::type::Integer);}
             tooltip {Redirect new start from desktop to create new instance instead.} xywh {270 240 27 25} down_box DOWN_BOX labelsize 12 align 4 hide
-            code0 {o->value(isRegFile(string(getenv("HOME")) + "/.yoshimiSingle"));}
+            code0 {o->value(fetchData(0, CONFIG::control::enableSinglePath, TOPLEVEL::section::config));}
           }
           Fl_Box {} {
             label {* Changing these settings requires a restart}
@@ -778,6 +771,11 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             type |= TOPLEVEL::type::Write;
             collect_data(synth, value, (Fl::event_button() | type), control, TOPLEVEL::section::config, UNUSED, UNUSED, UNUSED, par, par2);} {}
   }
+  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED, int request = UNUSED)} {return_type float
+  } {
+    code {//
+        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, par2, request);} {}
+  }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
             int value_int = lrint(getData->data.value);
@@ -1145,7 +1143,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
   Function {Show()} {} {
     code {//
                     configwindow->show();
-                    if (handleSingleMaster)
+                    if (!synth->getIsLV2Plugin() && handleSingleMaster)
                     	singleMaster->show();} {}
   }
   Function {Hide()} {} {

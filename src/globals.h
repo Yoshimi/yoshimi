@@ -264,6 +264,7 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         enableGUI,
         enableCLI,
         enableAutoInstance,
+        enableSinglePath,
         exposeStatus,
 
         // start of engine controls
