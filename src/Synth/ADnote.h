@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2017, Will Godfrey & others
+    Copyright 2014-2019, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is a derivative of a ZynAddSubFX original
-    Modified September 2017
+    Modified May 2019
 */
 
 #ifndef AD_NOTE_H
@@ -81,6 +81,7 @@ class ADnote : private SynthHelper, private Float2Int
 
         void computeVoiceNoise(int nvoice);
         void ComputeVoicePinkNoise(int nvoice);
+        void ComputeVoiceSpotNoise(int nvoice);
 
         void fadein(float *smps);
 

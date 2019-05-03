@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
-Modified April 2019
+Modified May 2019
 } {selected in_source in_header
 }
 
@@ -916,6 +916,10 @@ send_data(ADDVOICE::control::invertPhase, o->value(), TOPLEVEL::type::Integer);}
             label Noise
             xywh {25 25 100 20} labelfont 1 labelsize 11 labelcolor 5
           }
+          MenuItem {} {
+            label Noise
+            xywh {0 0 34 20} labelfont 1 labelsize 11 labelcolor 6
+          }
         }
         Fl_Group {} {
           xywh {69 35 95 35} box THIN_UP_FRAME
@@ -957,6 +961,10 @@ send_data(ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::Int
         o->copy_label("Pink Noise");
         o->labelcolor(5);
         break;
+    case 3:
+        o->copy_label("Spot Noise");
+        o->labelcolor(6);
+        break;
     default:
         o->hide();
         return;
@@ -964,7 +972,7 @@ send_data(ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::Int
 o->show();}
           xywh {105 497 400 65} labelfont 1 labelsize 50 labelcolor 7
           code0 {o->hide(); int tmp = pars->VoicePar[nvoice].Type;}
-          code1 {if (tmp == 1) {o->copy_label("White Noise"); o->labelcolor(7);} else if (tmp > 1) {o->copy_label("Pink Noise"); o->labelcolor(5);}}
+          code1 {if (tmp == 1) {o->copy_label("White Noise"); o->labelcolor(7);} else if (tmp == 2) {o->copy_label("Pink Noise"); o->labelcolor(5);} else {o->copy_label("Spot Noise"); o->labelcolor(6);}}
           code2 {if (tmp > 0) o->show();}
         }
       }

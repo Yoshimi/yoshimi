@@ -6,6 +6,7 @@ yoshimi 1.5.M
   It's not relevant to it at all.
 * CLI can now handle single master control.
 * Updated docs.
+* First trial of spot noise.
 
 2019-5-1 Will
 * All Interface files have no 'using namespace std'

@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of original ZynAddSubFX code.
-    Modified January 2019
+    Modified May 2019
 */
 
 #include <cmath>
@@ -1666,6 +1666,29 @@ void ADnote::ComputeVoicePinkNoise(int nvoice)
 }
 
 
+void ADnote::ComputeVoiceSpotNoise(int nvoice)
+{
+        static int spot = 0;
+    for (int k = 0; k < unison_size[nvoice]; ++k)
+    {
+        float *tw = tmpwave_unison[k];
+        for (int i = 0; i < synth->sent_buffersize; ++i)
+        {
+            if (spot <= 0)
+            {
+                tw[i] = synth->numRandom() * 6.0f - 3.0f;
+                spot = (synth->randomINT() >> 24);
+            }
+            else
+            {
+                tw[i] = 0.0f;
+                spot--;
+            }
+        }
+    }
+}
+
+
 // Compute the ADnote samples, returns 0 if the note is finished
 int ADnote::noteout(float *outl, float *outr)
 {
@@ -1719,9 +1742,12 @@ int ADnote::noteout(float *outl, float *outr)
             case 1:
                 computeVoiceNoise(nvoice); // white noise
                 break;
-            default:
+            case 2:
                 ComputeVoicePinkNoise(nvoice); // pink noise
                 break;
+            default:
+                ComputeVoiceSpotNoise(nvoice); // spot noise
+
         }
 
         // Mix subvoices into voice
