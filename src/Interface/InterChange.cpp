@@ -1710,6 +1710,10 @@ std::string InterChange::resolveConfig(CommandBlock *getData)
             contstr += "Autoload default state";
             yesno = true;
             break;
+        case CONFIG::control::enableSinglePath:
+            contstr += "Single master instance";
+            yesno = true;
+            break;
         case CONFIG::control::hideNonFatalErrors:
             contstr += "Hide non-fatal errors";
             yesno = true;

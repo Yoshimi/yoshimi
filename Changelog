@@ -1,7 +1,11 @@
 yoshimi 1.5.M
 
 2019-5-3 Will
-BugFix: Primary definition of singlePath in wrong file.
+* BugFix: Primary definition of singlePath in wrong file.
+* 'Enable Single Master' now always hidden for LV2.
+  It's not relevant to it at all.
+* CLI can now handle single master control.
+* Updated docs.
 
 2019-5-1 Will
 * All Interface files have no 'using namespace std'

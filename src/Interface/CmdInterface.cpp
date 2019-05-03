@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified April 2019
+    Modified May 2019
 */
 
 #include <iostream>
@@ -2992,6 +2992,11 @@ int CmdInterface::commandConfig(unsigned char controlType)
     else if (matchnMove(2, point, "state"))
     {
         command = CONFIG::control::defaultStateStart;
+        value = (toggle() == 1);
+    }
+    else if (matchnMove(2, point, "single"))
+    {
+        command = CONFIG::control::enableSinglePath;
         value = (toggle() == 1);
     }
     else if (matchnMove(1, point, "hide"))

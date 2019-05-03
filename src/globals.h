@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modifed April 2019
+    Modifed May 2019
 */
 
 #ifndef GLOBALS_H

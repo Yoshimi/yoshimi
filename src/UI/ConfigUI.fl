@@ -850,6 +850,9 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                 case CONFIG::control::enableAutoInstance:
                     enableAuto->value(value_bool);
                     break;
+                case CONFIG::control::enableSinglePath:
+                    singleMaster->value(value_bool);
+                    break;
 
                 case CONFIG::control::jackMidiSource:
                     jackSource->value(miscMsgPop(par2).c_str());
@@ -1142,9 +1145,12 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
   }
   Function {Show()} {} {
     code {//
-                    configwindow->show();
-                    if (!synth->getIsLV2Plugin() && handleSingleMaster)
-                    	singleMaster->show();} {}
+                    if (synth->getIsLV2Plugin() == false)
+                    {
+                        if(handleSingleMaster)
+                            singleMaster->show();
+                    }
+                    configwindow->show();} {}
   }
   Function {Hide()} {} {
     code {//

@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified April 2019
+    Modified May 2019
 */
 
 #ifndef CMDINTERFACE_H
@@ -187,6 +187,7 @@ static std::string configlist [] = {
     "EXPose <s>",          "Show current context level (ON, OFF, PRompt)",
 
     "STate [s]",           "* autoload default at start (ON, {other})",
+    "SIngle [s]",          "* force 2nd startup to open new instance instead (ON, {other})",
     "Hide [s]",            "non-fatal errors (ON, {other})",
     "Display [s]",         "GUI splash screen (ON, {other})",
     "Time [s]",            "add to instrument load message (ON, {other})",

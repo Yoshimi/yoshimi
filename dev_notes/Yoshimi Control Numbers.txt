@@ -54,6 +54,8 @@ Y : 0/1 : 20 : 248 : 255 : 255 : 255 : 255 : 255 : Log XML headers
 Y : 0/1 : 21 : 248 : 255 : 255 : 255 : 255 : 255 : Include disabled data in XML files
 Y : 0/1 : 22 : 248 : 255 : 255 : 255 : 255 : 255 : Enable GUI
 Y : 0/1 : 23 : 248 : 255 : 255 : 255 : 255 : 255 : Enable CLI
+Y : 0/1 : 24 : 248 : 255 : 255 : 255 : 255 : 255 : Enable Auto instance
+Y : 0/1 : 25 : 248 : 255 : 255 : 255 : 255 : 255 : Enable singe master instance
 
 Y : any : 32 : 248 : 255 : 255 : 255 : 128 : msg No. : Jack MIDI source
 Y : 0/1 : 33 : 248 : 255 : 255 : 255 : 255 : 255 : Set as preferred MIDI
