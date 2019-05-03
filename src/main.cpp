@@ -56,6 +56,7 @@
 extern map<SynthEngine *, MusicClient *> synthInstances;
 extern SynthEngine *firstSynth;
 extern int startInstance;
+extern std::string singlePath;
 
 void mainRegisterAudioPort(SynthEngine *s, int portnum);
 int mainCreateNewInstance(unsigned int forceId, bool loadState);
@@ -64,7 +65,6 @@ Config *firstRuntime = NULL;
 static int globalArgc = 0;
 static char **globalArgv = NULL;
 bool isSingleMaster = false;
-std::string singlePath;
 bool bShowGui = true;
 bool bShowCmdLine = true;
 bool splashSet = true;

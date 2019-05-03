@@ -1,5 +1,8 @@
 yoshimi 1.5.M
 
+2019-5-3 Will
+BugFix: Primary definition of singlePath in wrong file.
+
 2019-5-1 Will
 * All Interface files have no 'using namespace std'
 * All MusicIO files have no 'using namespace std'
