@@ -3493,6 +3493,8 @@ int CmdInterface::addVoice(unsigned char controlType)
                 value = 1;
             else if (matchnMove(1, point, "pink"))
                 value = 2;
+            else if (matchnMove(1, point, "spot"))
+                value = 3;
             else
                 return range_msg;
             cmd = ADDVOICE::control::soundType;

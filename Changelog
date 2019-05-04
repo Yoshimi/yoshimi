@@ -1,5 +1,8 @@
 yoshimi 1.5.M
 
+2019-5-4 Will
+* Added CLI access to sopt noise.
+
 2019-5-3 Will
 * BugFix: Primary definition of singlePath in wrong file.
 * 'Enable Single Master' now always hidden for LV2.
