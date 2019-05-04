@@ -1,7 +1,8 @@
 yoshimi 1.5.M
 
 2019-5-4 Will
-* Added CLI access to sopt noise.
+* Added CLI access to spot noise.
+* Linked spot noise appearance to single master feature.
 
 2019-5-3 Will
 * BugFix: Primary definition of singlePath in wrong file.

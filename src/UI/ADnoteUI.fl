@@ -916,9 +916,9 @@ send_data(ADDVOICE::control::invertPhase, o->value(), TOPLEVEL::type::Integer);}
             label Noise
             xywh {25 25 100 20} labelfont 1 labelsize 11 labelcolor 5
           }
-          MenuItem {} {
+          MenuItem spotnoise {
             label Noise
-            xywh {0 0 34 20} labelfont 1 labelsize 11 labelcolor 6
+            xywh {0 0 34 20} labelfont 1 labelsize 11 labelcolor 6 hide
           }
         }
         Fl_Group {} {
@@ -1383,6 +1383,8 @@ o->show();}
             ExtMod->deactivate();
             ExtModOsc->deactivate();
         }
+        if (handleSingleMaster == true)
+            spotnoise->show();
         ADnoteVoiceParameters->show();} {}
   }
   Function {~ADvoiceUI()} {} {
