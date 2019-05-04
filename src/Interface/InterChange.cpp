@@ -633,7 +633,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                 {
                     unsigned char partnum = parameter & 0x3f;
                     synth->partonoffWrite(partnum, -1);
-                    setpadparams(parameter | (kititem << 8));
+                    setpadparams(partnum, kititem);
                     if (synth->part[partnum]->kit[kititem].padpars->export2wav(text))
                         text = "d " + text;
                     else
@@ -913,7 +913,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     case PART::control::padsynthParameters:
                         if (write)
                         {
-                            setpadparams(npart | (kititem << 8));
+                            setpadparams(npart, kititem);
                             getData->data.parameter -= TOPLEVEL::route::lowPriority;
                         }
                         else
@@ -4007,11 +4007,8 @@ void InterChange::returns(CommandBlock *getData)
 }
 
 
-void InterChange::setpadparams(int point)
+void InterChange::setpadparams(int npart, int kititem)
 {
-    int npart = point & 0x3f;
-    int kititem = point >> 8;
-
     synth->part[npart]->busy = true;
     if (synth->part[npart]->kit[kititem].padpars != NULL)
         synth->part[npart]->kit[kititem].padpars->applyparameters();

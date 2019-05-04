@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified February 2019
+    Modified May 2019
 */
 
 #ifndef INTERCH_H
@@ -58,7 +58,7 @@ class InterChange : private MiscFuncs, FileMgr
         void mediate(void);
         void mutedDecode(unsigned int altData);
         void returns(CommandBlock *getData);
-        void setpadparams(int point);
+        void setpadparams(int npart, int kititem);
         void doClearPart(int npart);
         bool commandSend(CommandBlock *getData);
         float readAllData(CommandBlock *getData);

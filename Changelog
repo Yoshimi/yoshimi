@@ -3,6 +3,8 @@ yoshimi 1.5.M
 2019-5-4 Will
 * Added CLI access to spot noise.
 * Linked spot noise appearance to single master feature.
+* Rationalised interchange parameters for setpadparams.
+* Updated docs.
 
 2019-5-3 Will
 * BugFix: Primary definition of singlePath in wrong file.
