@@ -545,7 +545,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
 
                     if (ok)
                     {
-                        synth->addHistory(text, 1);
+                        synth->addHistory(setExtension(text, EXTEN::zynInst), TOPLEVEL::historyList::Instrument);
                         synth->part[value]->PyoshiType = (saveType & 2);
                         text = "d " + text;
                     }

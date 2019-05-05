@@ -243,6 +243,17 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         filter,
         bandwidth
     };
+
+    enum historyList : unsigned char {
+        undefined = 0,
+        Instrument, // individual externally sourced Instruments
+        Patch, //      full instrument Patch Sets
+        Scale, //      complete Microtonal settings
+        State, //      entire system State
+        Vector, //     per channel Vector settings
+        // insert any new lists here
+        MLearn //      learned MIDI CC lists
+    };
 }
 
 namespace CONFIG // usage CONFIG::control::oscillatorSize

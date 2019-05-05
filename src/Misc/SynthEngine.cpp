@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified April 2019
+    Modified May 2019
 */
 
 #include <stdio.h>
@@ -900,7 +900,7 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
                     if (ok)
                     {
                         if (par2 < 0xff)
-                            addHistory(setExtension(fname, EXTEN::zynInst), 1);
+                            addHistory(setExtension(fname, EXTEN::zynInst), TOPLEVEL::historyList::Instrument);
                         name = name + " to Part " + to_string(npart + 1);
                     }
                 }
@@ -2269,8 +2269,14 @@ bool SynthEngine::loadStateAndUpdate(string filename)
 {
     defaults();
     bool result = Runtime.loadState(filename);
-    if (result)
-        addHistory(filename, 4);
+    string name = Runtime.ConfigDir + "/yoshimi";
+    if (uniqueId > 0)
+        name += ("-" + to_string(uniqueId));
+    name += ".state";
+    //cout << "name " << name << endl;
+    //cout << "filename " << filename << endl;
+    if (result && (filename != name)) // never include default state
+        addHistory(filename, TOPLEVEL::historyList::State);
     ShutUp();
     Unmute();
     return result;
@@ -2285,8 +2291,10 @@ bool SynthEngine::saveState(string filename)
     if (uniqueId > 0)
         name += ("-" + to_string(uniqueId));
     name += ".state";
-    if (result && filename != name) // never list default state
-        addHistory(filename, 4);
+    //cout << "name " << name << endl;
+    //cout << "filename " << filename << endl;
+    if (result && (filename != name)) // never include default state
+        addHistory(filename, TOPLEVEL::historyList::State);
     return result;
 }
 
@@ -2300,7 +2308,7 @@ bool SynthEngine::loadPatchSetAndUpdate(string fname)
     if (result)
     {
         setAllPartMaps();
-        addHistory(fname, 2);
+        addHistory(fname, TOPLEVEL::historyList::Patch);
     }
     return result;
 }
@@ -2311,7 +2319,7 @@ bool SynthEngine::loadMicrotonal(string fname)
     bool ok = true;
     microtonal.defaults();
     if (microtonal.loadXML(setExtension(fname, EXTEN::scale)))
-        addHistory(fname, 3);
+        addHistory(fname, TOPLEVEL::historyList::Scale);
     else
         ok = false;
     return ok;
@@ -2321,7 +2329,7 @@ bool SynthEngine::saveMicrotonal(string fname)
 {
     bool ok = true;
     if (microtonal.saveXML(setExtension(fname, EXTEN::scale)))
-        addHistory(fname, 3);
+        addHistory(fname, TOPLEVEL::historyList::Scale);
     else
         ok = false;
     return ok;
@@ -2407,7 +2415,7 @@ void SynthEngine::newHistory(string name, int group)
 {
     if (findleafname(name) < "!")
         return;
-    if (group == 1 && (name.rfind(EXTEN::yoshInst) != string::npos))
+    if (group == TOPLEVEL::historyList::Instrument && (name.rfind(EXTEN::yoshInst) != string::npos))
         name = setExtension(name, EXTEN::zynInst);
     vector<string> &listType = *getHistory(group);
     listType.push_back(name);
@@ -2418,8 +2426,6 @@ void SynthEngine::addHistory(string name, int group)
 {
     if (findleafname(name) < "!")
         return;
-    if (group == 1 && (name.rfind(EXTEN::yoshInst) != string::npos))
-        name = setExtension(name, EXTEN::zynInst);
     vector<string> &listType = *getHistory(group);
     vector<string>::iterator itn = listType.begin();
     listType.insert(itn, name);
@@ -2531,33 +2537,33 @@ bool SynthEngine::loadHistory()
     string filetype;
     string type;
     string extension;
-    for (int count = 1; count < 7; ++count)
+    for (int count = TOPLEVEL::historyList::Instrument; count <= TOPLEVEL::historyList::MLearn; ++count)
     {
         switch (count)
         {
-            case 1:
+            case TOPLEVEL::historyList::Instrument:
                 type = "XMZ_INSTRUMENTS";
                 extension = "xiz_file";
                 break;
-            case 2:
+            case TOPLEVEL::historyList::Patch:
                 type = "XMZ_PATCH_SETS";
                 extension = "xmz_file";
                 break;
-            case 3:
+            case TOPLEVEL::historyList::Scale:
                 type = "XMZ_SCALE";
                 extension = "xsz_file";
                 break;
-            case 4:
+            case TOPLEVEL::historyList::State:
                 type = "XMZ_STATE";
                 extension = "state_file";
                 break;
-            case 5:
+            case TOPLEVEL::historyList::Vector:
                 type = "XMZ_VECTOR";
                 extension = "xvy_file";
                 break;
-            case 6:
+            case TOPLEVEL::historyList::MLearn:
                 type = "XMZ_MIDILEARN";
-                extension = "xvy_file";
+                extension = "xly_file";
                 break;
         }
         if (xml->enterbranch(type))
@@ -2603,33 +2609,33 @@ bool SynthEngine::saveHistory()
     {
         string type;
         string extension;
-        for (int count = 1; count < 7; ++count)
+        for (int count = TOPLEVEL::historyList::Instrument; count <= TOPLEVEL::historyList::MLearn; ++count)
         {
             switch (count)
             {
-                case 1:
+                case TOPLEVEL::historyList::Instrument:
                     type = "XMZ_INSTRUMENTS";
                     extension = "xiz_file";
                     break;
-                case 2:
+                case TOPLEVEL::historyList::Patch:
                     type = "XMZ_PATCH_SETS";
                     extension = "xmz_file";
                     break;
-                case 3:
+                case TOPLEVEL::historyList::Scale:
                     type = "XMZ_SCALE";
                     extension = "xsz_file";
                     break;
-                case 4:
+                case TOPLEVEL::historyList::State:
                     type = "XMZ_STATE";
                     extension = "state_file";
                     break;
-                case 5:
+                case TOPLEVEL::historyList::Vector:
                     type = "XMZ_VECTOR";
                     extension = "xvy_file";
                     break;
-                case 6:
+                case TOPLEVEL::historyList::MLearn:
                     type = "XMZ_MIDILEARN";
-                    extension = "xvy_file";
+                    extension = "xly_file";
                     break;
             }
             vector<string> listType = *getHistory(count);
@@ -2664,7 +2670,7 @@ unsigned char SynthEngine::loadVectorAndUpdate(unsigned char baseChan, string na
 {
     unsigned char result = loadVector(baseChan, name, true);
     if (result < 255)
-        addHistory(name, 5);
+        addHistory(name, TOPLEVEL::historyList::Vector);
     ShutUp();
     Unmute();
     return result;
@@ -2842,7 +2848,7 @@ unsigned char SynthEngine::saveVector(unsigned char baseChan, string name, bool 
     xml->endbranch();
 
     if (xml->saveXMLfile(file))
-        addHistory(file, 5);
+        addHistory(file, TOPLEVEL::historyList::Vector);
     else
     {
         Runtime.Log("Failed to save data to " + file, 2);
@@ -3016,7 +3022,7 @@ bool SynthEngine::savePatchesXML(string filename)
     bool result = xml->saveXMLfile(filename);
     delete xml;
     if (result)
-        addHistory(filename,2);
+        addHistory(filename,TOPLEVEL::historyList::Patch);
     return result;
 }
 

@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified February 2019
+    Modified May 2019
 */
 
 #include <iostream>
@@ -836,7 +836,7 @@ bool MidiLearn::saveList(string name)
     }
     bool ok = insertMidiListData(true,  xml);
     if (xml->saveXMLfile(file))
-        synth->addHistory(file, 6);
+        synth->addHistory(file, TOPLEVEL::historyList::MLearn);
     else
     {
         synth->getRuntime().Log("Failed to save data to " + file);
@@ -923,7 +923,7 @@ bool MidiLearn::loadList(string name)
     delete xml;
     if (!ok)
         return false;
-    synth->addHistory(file, 6);
+    synth->addHistory(file, TOPLEVEL::historyList::MLearn);
     return true;
 }
 
