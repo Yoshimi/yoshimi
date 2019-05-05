@@ -557,14 +557,20 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                 case MAIN::control::loadNamedPatchset:
                     vectorClear(NUM_MIDI_CHANNELS);
                     if(synth->loadPatchSetAndUpdate(text))
+                    {
+                        synth->addHistory(setExtension(text, EXTEN::patchset), TOPLEVEL::historyList::Patch);
                         text = "ed " + text;
+                    }
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
                     break;
                 case MAIN::control::saveNamedPatchset:
                     if(synth->savePatchesXML(text))
+                    {
+                        synth->addHistory(setExtension(text, EXTEN::patchset), TOPLEVEL::historyList::Patch);
                         text = "d " + text;
+                    }
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
@@ -574,6 +580,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     if (tmp < NO_MSG)
                     {
                         getData->data.insert = tmp;
+                        synth->addHistory(setExtension(text, EXTEN::vector), TOPLEVEL::historyList::Vector);
                         text = "ed " + text + " to chan " + std::to_string(int(tmp + 1));
                     }
                     else
@@ -588,7 +595,10 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         synth->getRuntime().vectordata.Name[insert] = findleafname(text);
                     tmp = synth->saveVector(insert, text, true);
                     if (tmp == NO_MSG)
+                    {
+                        synth->addHistory(setExtension(text, EXTEN::vector), TOPLEVEL::historyList::Vector);
                         text = "d " + text;
+                    }
                     else
                     {
                         name = miscMsgPop(tmp);
@@ -602,14 +612,20 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                 }
                 case MAIN::control::loadNamedScale:
                     if (synth->loadMicrotonal(text))
+                    {
+                        synth->addHistory(setExtension(text, EXTEN::scale), TOPLEVEL::historyList::Scale);
                         text = "ed " + text;
+                    }
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
                     break;
                 case MAIN::control::saveNamedScale:
                     if (synth->saveMicrotonal(text))
+                    {
+                        synth->addHistory(setExtension(text, EXTEN::scale), TOPLEVEL::historyList::Scale);
                         text = "d " + text;
+                    }
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
@@ -617,18 +633,37 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                 case MAIN::control::loadNamedState:
                     vectorClear(NUM_MIDI_CHANNELS);
                     if (synth->loadStateAndUpdate(text))
+                    {
+                        string name = synth->getRuntime().ConfigDir + "/yoshimi";
+                        if (synth != firstSynth)
+                            name += ("-" + to_string(synth->getUniqueId()));
+                        name += ".state";
+                        if ((text != name)) // never include default state
+                            synth->addHistory(text, TOPLEVEL::historyList::State);
                         text = "ed " + text;
+                    }
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
                     break;
                 case MAIN::control::saveNamedState:
-                    if (synth->saveState(text))
+                {
+                    string filename = setExtension(text, EXTEN::state);
+                    if (synth->saveState(filename))
+                    {
+                        string name = synth->getRuntime().ConfigDir + "/yoshimi";
+                        if (synth != firstSynth)
+                            name += ("-" + to_string(synth->getUniqueId()));
+                        name += ".state";
+                        if ((text != name)) // never include default state
+                            synth->addHistory(filename, TOPLEVEL::historyList::State);
                         text = "d " + text;
+                    }
                     else
                         text = " FAILED " + text;
                     value = miscMsgPush(text);
                     break;
+                }
                 case MAIN::control::exportPadSynthSamples:
                 {
                     unsigned char partnum = insert;

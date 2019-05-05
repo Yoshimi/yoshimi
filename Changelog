@@ -4,6 +4,9 @@ yoshimi 1.5.M
 * Completed padSynth parameter conversions.
 * Enumerated history lists.
 * Improved history list internal structures.
+* Moved most additions from synthEngine to Interchange.
+  This was done so that loading (say) a state file
+  didn't falsely update/corrupt other history lists.
 
 2019-5-4 Will
 * Added CLI access to spot noise.

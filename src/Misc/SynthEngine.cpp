@@ -2269,14 +2269,6 @@ bool SynthEngine::loadStateAndUpdate(string filename)
 {
     defaults();
     bool result = Runtime.loadState(filename);
-    string name = Runtime.ConfigDir + "/yoshimi";
-    if (uniqueId > 0)
-        name += ("-" + to_string(uniqueId));
-    name += ".state";
-    //cout << "name " << name << endl;
-    //cout << "filename " << filename << endl;
-    if (result && (filename != name)) // never include default state
-        addHistory(filename, TOPLEVEL::historyList::State);
     ShutUp();
     Unmute();
     return result;
@@ -2285,17 +2277,7 @@ bool SynthEngine::loadStateAndUpdate(string filename)
 
 bool SynthEngine::saveState(string filename)
 {
-    filename = setExtension(filename, EXTEN::state);
-    bool result = Runtime.saveState(filename);
-    string name = Runtime.ConfigDir + "/yoshimi";
-    if (uniqueId > 0)
-        name += ("-" + to_string(uniqueId));
-    name += ".state";
-    //cout << "name " << name << endl;
-    //cout << "filename " << filename << endl;
-    if (result && (filename != name)) // never include default state
-        addHistory(filename, TOPLEVEL::historyList::State);
-    return result;
+    return Runtime.saveState(filename);
 }
 
 
@@ -2306,33 +2288,19 @@ bool SynthEngine::loadPatchSetAndUpdate(string fname)
     result = loadXML(fname); // load the data
     Unmute();
     if (result)
-    {
         setAllPartMaps();
-        addHistory(fname, TOPLEVEL::historyList::Patch);
-    }
     return result;
 }
 
 
 bool SynthEngine::loadMicrotonal(string fname)
 {
-    bool ok = true;
-    microtonal.defaults();
-    if (microtonal.loadXML(setExtension(fname, EXTEN::scale)))
-        addHistory(fname, TOPLEVEL::historyList::Scale);
-    else
-        ok = false;
-    return ok;
+    return microtonal.loadXML(setExtension(fname, EXTEN::scale));
 }
 
 bool SynthEngine::saveMicrotonal(string fname)
 {
-    bool ok = true;
-    if (microtonal.saveXML(setExtension(fname, EXTEN::scale)))
-        addHistory(fname, TOPLEVEL::historyList::Scale);
-    else
-        ok = false;
-    return ok;
+    return microtonal.saveXML(setExtension(fname, EXTEN::scale));
 }
 
 
@@ -2669,8 +2637,6 @@ bool SynthEngine::saveHistory()
 unsigned char SynthEngine::loadVectorAndUpdate(unsigned char baseChan, string name)
 {
     unsigned char result = loadVector(baseChan, name, true);
-    if (result < 255)
-        addHistory(name, TOPLEVEL::historyList::Vector);
     ShutUp();
     Unmute();
     return result;
@@ -2680,7 +2646,7 @@ unsigned char SynthEngine::loadVectorAndUpdate(unsigned char baseChan, string na
 unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
 {
     bool a = full; full = a; // suppress warning
-    unsigned char actualBase = 255; // error!
+    unsigned char actualBase = NO_MSG; // error!
     if (name.empty())
     {
         Runtime.Log("No filename", 2);
@@ -2824,7 +2790,7 @@ unsigned char SynthEngine::extractVectorData(unsigned char baseChan, XMLwrapper 
 unsigned char SynthEngine::saveVector(unsigned char baseChan, string name, bool full)
 {
     bool a = full; full = a; // suppress warning
-    unsigned char result = 0xff; // ok
+    unsigned char result = NO_MSG; // ok
 
     if (baseChan >= NUM_MIDI_CHANNELS)
         return miscMsgPush("Invalid channel number");
@@ -2847,9 +2813,7 @@ unsigned char SynthEngine::saveVector(unsigned char baseChan, string name, bool 
         insertVectorData(baseChan, true, xml, findleafname(file));
     xml->endbranch();
 
-    if (xml->saveXMLfile(file))
-        addHistory(file, TOPLEVEL::historyList::Vector);
-    else
+    if (!xml->saveXMLfile(file))
     {
         Runtime.Log("Failed to save data to " + file, 2);
         result = miscMsgPush("FAIL");
@@ -3021,8 +2985,6 @@ bool SynthEngine::savePatchesXML(string filename)
     add2XML(xml);
     bool result = xml->saveXMLfile(filename);
     delete xml;
-    if (result)
-        addHistory(filename,TOPLEVEL::historyList::Patch);
     return result;
 }
 
