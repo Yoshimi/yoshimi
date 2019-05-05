@@ -3801,7 +3801,7 @@ int CmdInterface::padSynth(unsigned char controlType)
         if (point[0] == 0)
             return value_msg;
         std::string name = point;
-        sendDirect(0, controlType, MAIN::control::exportPadSynthSamples, TOPLEVEL::section::main, kitNumber, 2, UNUSED, TOPLEVEL::route::lowPriority + npart, miscMsgPush(name));
+        sendDirect(0, controlType, MAIN::control::exportPadSynthSamples, TOPLEVEL::section::main, kitNumber, 2, npart, TOPLEVEL::route::lowPriority, miscMsgPush(name));
         return done_msg;
     }
 

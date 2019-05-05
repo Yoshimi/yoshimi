@@ -631,7 +631,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     break;
                 case MAIN::control::exportPadSynthSamples:
                 {
-                    unsigned char partnum = parameter & 0x3f;
+                    unsigned char partnum = insert;
                     synth->partonoffWrite(partnum, -1);
                     setpadparams(partnum, kititem);
                     if (synth->part[partnum]->kit[kititem].padpars->export2wav(text))

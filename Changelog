@@ -1,5 +1,8 @@
 yoshimi 1.5.M
 
+2019-5-5 Will
+* Completed padSynth parameter conversions.
+
 2019-5-4 Will
 * Added CLI access to spot noise.
 * Linked spot noise appearance to single master feature.

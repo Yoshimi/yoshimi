@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-Modified April 2019
+Modified May 2019
 } {selected in_source in_header
 }
 
@@ -1030,22 +1030,22 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper, MiscFuncs}
         if (filename==NULL)
             return;
         fl_filename_setext(filename,"");
-        send_data(MAIN::control::exportPadSynthSamples, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, miscMsgPush(string(filename)));}
+        send_data(MAIN::control::exportPadSynthSamples, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, npart, miscMsgPush(string(filename)));}
         tooltip {Export samples as wav file} xywh {15 410 123 24} box THIN_UP_BOX color 51 labelfont 1 labelsize 12 align 128
       }
     }
   }
-  Function {send_data(int control, float value, int type, int par2 = UNUSED)} {} {
+  Function {send_data(int control, float value, int type, int insert = UNUSED, int par2 = UNUSED)} {} {
     code {//
     unsigned char partnum = npart;
     unsigned char parameter = UNUSED;
     if (par2 != UNUSED)
     {
         partnum = TOPLEVEL::section::main;
-        parameter = TOPLEVEL::route::lowPriority + npart;
+        parameter = TOPLEVEL::route::lowPriority;
     }
     type |= TOPLEVEL::type::Write;
-    collect_data(synth, value, (Fl::event_button() | type), control, partnum, kititem, 2, UNUSED, parameter, par2);} {}
+    collect_data(synth, value, (Fl::event_button() | type), control, partnum, kititem, 2, insert, parameter, par2);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
