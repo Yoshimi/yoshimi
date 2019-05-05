@@ -1,7 +1,7 @@
 /*
     MidiLearn.h
 
-    Copyright 2016-2017 Will Godfrey
+    Copyright 2016-2019 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified August 2017
+    Modified April 2019
 */
 
 #ifndef MIDILEARN_H
@@ -46,7 +46,6 @@ class MidiLearn : private MiscFuncs, FileMgr
         void add2XML(XMLwrapper *xml);
         void getfromXML(XMLwrapper *xml);
         CommandBlock commandData;
-        size_t commandSize = sizeof(commandData);
 
         struct Control{
             unsigned char type;
@@ -75,7 +74,7 @@ class MidiLearn : private MiscFuncs, FileMgr
         void setTransferBlock(CommandBlock *getData, string name);
 
         bool runMidiLearn(int _value, unsigned int CC, unsigned char chan, unsigned char category);
-        bool writeMidi(CommandBlock *putData, unsigned int writesize, bool in_place);
+        bool writeMidi(CommandBlock *putData, bool in_place);
         int findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned int CC, unsigned char chan, LearnBlock *block, bool show);
         int findSize();
         void listLine(int lineNo);

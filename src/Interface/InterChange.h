@@ -25,8 +25,10 @@
 
 #include <jack/ringbuffer.h>
 
+#include "globals.h"
 #include "Misc/MiscFuncs.h"
 #include "Interface/FileMgr.h"
+#include "Interface/RingBuffer.h"
 #include "Params/LFOParams.h"
 #include "Params/FilterParams.h"
 #include "Params/EnvelopeParams.h"
@@ -46,14 +48,14 @@ class InterChange : private MiscFuncs, FileMgr
         bool Init();
 
         CommandBlock commandData;
-        size_t commandSize = sizeof(commandData);
-
-        jack_ringbuffer_t *fromCLI;
-        jack_ringbuffer_t *decodeLoopback;
-        jack_ringbuffer_t *fromGUI;
-        jack_ringbuffer_t *toGUI;
-        jack_ringbuffer_t *fromMIDI;
-        jack_ringbuffer_t *returnsBuffer;
+#ifndef YOSHIMI_LV2_PLUGIN
+        ringBuff *fromCLI;
+#endif
+        ringBuff *decodeLoopback;
+        ringBuff *fromGUI;
+        ringBuff *toGUI;
+        ringBuff *fromMIDI;
+        ringBuff *returnsBuffer;
 
         void mediate(void);
         void mutedDecode(unsigned int altData);

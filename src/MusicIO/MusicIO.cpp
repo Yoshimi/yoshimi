@@ -66,7 +66,6 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
     bool inSync = LV2_engine || (synth->getRuntime().audioEngine == jack_audio && synth->getRuntime().midiEngine == jack_midi);
 
     CommandBlock putData;
-    unsigned int putSize = sizeof(putData);
 /*
  * This below is a much simpler (faster) way
  * to do note-on and note-off
@@ -101,7 +100,7 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
             putData.data.part = TOPLEVEL::section::midiIn;
             putData.data.kit = channel;
             putData.data.engine = par1;
-            synth->midilearn.writeMidi(&putData, putSize, false);
+            synth->midilearn.writeMidi(&putData, false);
         }
         return;
     }

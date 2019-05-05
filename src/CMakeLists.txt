@@ -370,6 +370,7 @@ set (Interface_Sources
     Interface/MidiLearn.cpp
     Interface/MidiDecode.cpp
     Interface/FileMgr.cpp
+    Interface/RingBuffer.cpp
 )
 
 set (Params_sources
