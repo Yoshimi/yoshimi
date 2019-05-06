@@ -159,6 +159,10 @@ struct ADnoteVoiceParam { // Voice parameters
     unsigned char PFilterVelocityScaleFunction;
 
 
+    short int     PVoice;     // Voice that I use as external oscillator.
+                              // It is -1 if I use OscilSmp(default).
+                              // It may not be equal or bigger than current voice
+
     // Modullator parameters
     unsigned char PFMEnabled; // 0 = off, 1 = Morph, 2 = RM, 3 = PM, 4 = FM, 5 = PWM
     short int     PFMVoice;   // Voice that I use as modullator instead of FMSmp.
@@ -169,6 +173,7 @@ struct ADnoteVoiceParam { // Voice parameters
     unsigned char      PFMVolume;                // Modulator Volume
     unsigned char      PFMVolumeDamp;            // Modulator damping at higher frequencies
     unsigned char      PFMVelocityScaleFunction; // Modulator Velocity Sensing
+    unsigned char      PFMDetuneFromBaseOsc;     // Whether we inherit the base oscillator's detuning
     unsigned short int PFMDetune;                // Fine Detune of the Modulator
     unsigned short int PFMCoarseDetune;          // Coarse Detune of the Modulator
     unsigned char      PFMDetuneType;            // The detune type

@@ -2450,6 +2450,9 @@ std::string CmdInterface::findStatus(bool show)
                 voiceFromNumber = readControl(ADDVOICE::control::voiceOscillatorSource, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
                 if (voiceFromNumber > -1)
                     text += (">" +std::to_string(voiceFromNumber + 1));
+                voiceFromNumber = readControl(ADDVOICE::control::externalOscillator, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
+                if (voiceFromNumber > -1)
+                    text += (">V" +std::to_string(voiceFromNumber + 1));
                 if (readControl(ADDVOICE::control::enableVoice, npart, kitNumber, PART::engine::addVoice1 + voiceNumber))
                     text += "+";
                 if (bitTest(context, LEVEL::AddMod))
@@ -5738,7 +5741,6 @@ int CmdInterface::sendNormal(float value, unsigned char type, unsigned char cont
     }
 
     CommandBlock putData;
-    size_t commandSize = sizeof(putData);
 
     putData.data.value = value;
     putData.data.type = type;
@@ -5782,10 +5784,9 @@ int CmdInterface::sendNormal(float value, unsigned char type, unsigned char cont
     }
 
     putData.data.type = type;
-    if (jack_ringbuffer_write_space(synth->interchange.fromCLI) >= commandSize)
+    if (synth->interchange.fromCLI->write(putData.bytes))
     {
         synth->getRuntime().finishedCLI = false;
-        jack_ringbuffer_write(synth->interchange.fromCLI, (char*) putData.bytes, commandSize);
     }
     else
     {
@@ -5801,7 +5802,6 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
     if (type >= TOPLEVEL::type::Limits && type <= TOPLEVEL::source::CLI)
         request = type & TOPLEVEL::type::Default;
     CommandBlock putData;
-    size_t commandSize = sizeof(putData);
 
     putData.data.value = value;
     putData.data.control = control;
@@ -5900,10 +5900,9 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
         return 0;
     }
 
-    if (jack_ringbuffer_write_space(synth->interchange.fromCLI) >= commandSize)
+    if (synth->interchange.fromCLI->write(putData.bytes))
     {
         synth->getRuntime().finishedCLI = false;
-        jack_ringbuffer_write(synth->interchange.fromCLI, (char*) putData.bytes, commandSize);
     }
     else
         synth->getRuntime().Log("Unable to write to fromCLI buffer");

@@ -1200,16 +1200,16 @@ void OscilGen::adaptiveharmonicpostprocess(float *f, int size)
 
 
 // Get the oscillator function
-int OscilGen::get(float *smps, float freqHz)
+void OscilGen::get(float *smps, float freqHz)
 {
-    return this->get(smps, freqHz, 0);
+    this->get(smps, freqHz, 0);
 }
 
 
 // Get the oscillator function
-int OscilGen::get(float *smps, float freqHz, int resonance)
+void OscilGen::get(float *smps, float freqHz, int resonance)
 {
-    int nyquist, outpos;
+    int nyquist;
 
     if (oldbasepar != Pbasefuncpar
         || oldbasefunc != Pcurrentbasefunc
@@ -1247,9 +1247,6 @@ int OscilGen::get(float *smps, float freqHz, int resonance)
 
     if (oscilprepared != 1)
         prepare();
-
-    outpos = (int)(prng.numRandom() * 2.0f - 1.0f) * synth->oscilsize_f * (Prand - 64.0f) / 64.0f;
-    outpos = (outpos + 2 * synth->oscilsize) % synth->oscilsize;
 
     memset(outoscilFFTfreqs.c, 0, synth->halfoscilsize * sizeof(float));
     memset(outoscilFFTfreqs.s, 0, synth->halfoscilsize * sizeof(float));
@@ -1366,11 +1363,17 @@ int OscilGen::get(float *smps, float freqHz, int resonance)
         for (int i = 0; i < synth->oscilsize; ++i)
             smps[i] *= 0.25f; // correct the amplitude
     }
+}
 
-    if (Prand < 64)
-        return outpos;
-    else
+int OscilGen::getPhase()
+{
+    if (Prand >= 64)
         return 0;
+
+    int outpos;
+    outpos = (int)(prng.numRandom() * 2.0f - 1.0f) * synth->oscilsize_f * (Prand - 64.0f) / 64.0f;
+    outpos = (outpos + 2 * synth->oscilsize) % synth->oscilsize;
+    return outpos;
 }
 
 
