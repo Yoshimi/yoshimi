@@ -970,7 +970,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         if (synth->getRuntime().showGui && write && guiTo)
             getData->data.par2 = miscMsgPush(text); // pass it on to GUI
 #endif
-        returnsBuffer->write(getData->bytes);
+        bool ok = returnsBuffer->write(getData->bytes);
 #ifdef GUI_FLTK
         if (synth->getRuntime().showGui && npart == TOPLEVEL::section::scales && control == SCALES::control::importScl)
         {   // loading a tuning includes a name and comment!
@@ -979,10 +979,10 @@ void InterChange::indirectTransfers(CommandBlock *getData)
             returnsBuffer->write(getData->bytes);
             getData->data.control = SCALES::control::comment;
             getData->data.par2 = miscMsgPush(synth->microtonal.Pcomment);
-            returnsBuffer->write(getData->bytes);
+            ok &= returnsBuffer->write(getData->bytes);
         }
 #endif
-        else
+        if (!ok)
             synth->getRuntime().Log("Unable to  write to returnsBuffer buffer");
     }
 }

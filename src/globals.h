@@ -24,7 +24,7 @@
 #define GLOBALS_H
 
 // this is still slighty experimental
-const bool handleSingleMaster = false;
+const bool handleSingleMaster = true;
 
 
 
