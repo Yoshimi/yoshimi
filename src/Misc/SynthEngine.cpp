@@ -261,13 +261,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             Runtime.Log("Failed to allocate new Part");
             goto bail_out;
         }
-        VUpeak.values.parts[npart] = -1.0f;
-        VUpeak.values.partsR[npart] = -1.0f;
     }
-    VUpeak.values.vuOutPeakL = 0;
-    VUpeak.values.vuOutPeakR = 0;
-    VUpeak.values.vuRmsPeakL = 0;
-    VUpeak.values.vuRmsPeakR = 0;
 
     // Insertion Effects init
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
@@ -419,11 +413,23 @@ void SynthEngine::defaults(void)
     setPvolume(90);
     TransVolume = Pvolume - 1; // ensure it is always set
     setPkeyshift(64);
+
+    VUpeak.values.vuOutPeakL = 0;
+    VUpeak.values.vuOutPeakR = 0;
+    VUpeak.values.vuRmsPeakL = 0;
+    VUpeak.values.vuRmsPeakR = 0;
+
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
         part[npart]->defaults();
         part[npart]->Prcvchn = npart % NUM_MIDI_CHANNELS;
     }
+    VUpeak.values.parts[0] = -1.0f;
+    VUpeak.values.partsR[0] = -1.0f;
+    VUdata.values.parts[0] = -1.0f;
+    VUdata.values.partsR[0] = -1.0f;
+    VUcopy.values.parts[0]= -1.0f;
+    VUcopy.values.partsR[0]= -1.0f;
 
     partonoffLock(0, 1); // enable the first part
     inseffnum = 0;

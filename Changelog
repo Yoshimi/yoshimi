@@ -1,4 +1,11 @@
-yoshimi 1.5.M
+yoshimi 1.5.11 rc1
+
+
+2019-5-6 Will
+* Improved new/multi instance behaviour.
+  There is still an issue with the gui causing
+  occasional crashes :(
+* Set version as 1.5.11 rc1
 
 2019-5-5 Will
 * Completed padSynth parameter conversions.

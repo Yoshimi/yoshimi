@@ -33,6 +33,7 @@
 #include <map>
 #include <list>
 #include <pthread.h>
+#include <thread>
 #include <semaphore.h>
 #include <cstdio>
 #include <unistd.h>
@@ -75,6 +76,30 @@ time_t old_father_time, here_and_now;
 //It's only suitable for single instance app support
 static struct sigaction yoshimiSigAction;
 
+
+void newBlock()
+{
+    for (int i = 1; i < 32; ++i)
+    {
+        if ((firstRuntime->activeInstance >> i) & 1)
+        {
+            while (configuring)
+                usleep(5000);
+            configuring = true;
+            mainCreateNewInstance(i, true);
+            configuring = false;
+        }
+    }
+}
+
+
+void newInstance()
+{
+    mainCreateNewInstance(0, true);
+    usleep (999000); // give time to settle
+    configuring = false;
+}
+
 void yoshimiSigHandler(int sig)
 {
     switch (sig)
@@ -93,11 +118,11 @@ void yoshimiSigHandler(int sig)
         case SIGUSR2: // start next instance
             if(isSingleMaster)
             {
-                if (!configuring)
-                {
-                    configuring = true;
-                    mainCreateNewInstance(0, true);
-                }
+                while (configuring)
+                    usleep (100000); // in case there is still a gui starting
+                configuring = true;
+                std::thread startNew(newInstance);
+                startNew.detach();
             }
             sigaction(SIGUSR2, &yoshimiSigAction, NULL);
             break;
@@ -154,15 +179,9 @@ static void *mainGuiThread(void *arg)
     GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::NewSynthEngine, 0);
 #endif
     if (firstRuntime->autoInstance)
-    {
-        for (int i = 1; i < 32; ++i)
-        {
-            if ((firstRuntime->activeInstance >> i) & 1)
-            {
-                configuring = true;
-                mainCreateNewInstance(i, true);
-            }
-        }
+    { // using thread so main instance not delayed.
+        std::thread startNewBlock(newBlock);
+        startNewBlock.detach();
     }
     while (firstRuntime->runSynth)
     {
@@ -224,6 +243,7 @@ static void *mainGuiThread(void *arg)
                 int testInstance = startInstance;
                 if (testInstance > 0xff)
                     startInstance = mainCreateNewInstance(testInstance & 0xff, false);
+                configuring = false;
             }
         }
 
@@ -338,7 +358,6 @@ int mainCreateNewInstance(unsigned int forceId, bool loadState)
             mainRegisterAudioPort(synth, npart);
     }
     synth->getRuntime().activeInstance |= (1 << instanceID);
-    configuring = false;
     return instanceID;
 
 bail_out:
@@ -354,7 +373,7 @@ bail_out:
         synth->getRuntime().flushLog();
         delete synth;
     }
-    configuring = false;
+
     return -1;
 }
 
