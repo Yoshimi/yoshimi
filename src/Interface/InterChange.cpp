@@ -47,7 +47,7 @@
 #endif
 
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
-extern int mainCreateNewInstance(unsigned int forceId, bool loadState);
+//extern int mainCreateNewInstance(unsigned int forceId, bool loadState);
 extern SynthEngine *firstSynth;
 
 std::string singlePath;

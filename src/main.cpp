@@ -70,6 +70,7 @@ bool bShowGui = true;
 bool bShowCmdLine = true;
 bool splashSet = true;
 bool configuring = false;
+bool newThread = false;
 time_t old_father_time, here_and_now;
 
 //Andrew Deryabin: signal handling moved to main from Config Runtime
@@ -83,8 +84,10 @@ void newBlock()
     {
         if ((firstRuntime->activeInstance >> i) & 1)
         {
+            usleep (999000); // give previous time to settle
             while (configuring)
-                usleep(5000);
+                usleep(1000);
+            // in case there is still an instance starting from elsewhere
             configuring = true;
             mainCreateNewInstance(i, true);
             configuring = false;
@@ -93,11 +96,22 @@ void newBlock()
 }
 
 
-void newInstance()
+void newInstance(int count)
 {
-    mainCreateNewInstance(0, true);
+    mainCreateNewInstance(count, true);
     usleep (999000); // give time to settle
     configuring = false;
+    newThread = false;
+}
+
+void applyNewInstance(int count)
+{
+    while (configuring)
+        usleep (1000);
+        // in case there is still an instance starting from elsewhere
+    configuring = true;
+    std::thread startNew(newInstance, count);
+    startNew.detach();
 }
 
 void yoshimiSigHandler(int sig)
@@ -116,13 +130,10 @@ void yoshimiSigHandler(int sig)
             sigaction(SIGUSR1, &yoshimiSigAction, NULL);
             break;
         case SIGUSR2: // start next instance
-            if(isSingleMaster)
+            if(isSingleMaster && newThread == false)
             {
-                while (configuring)
-                    usleep (100000); // in case there is still a gui starting
-                configuring = true;
-                std::thread startNew(newInstance);
-                startNew.detach();
+                newThread = true;
+                applyNewInstance(0);
             }
             sigaction(SIGUSR2, &yoshimiSigAction, NULL);
             break;
@@ -241,9 +252,13 @@ static void *mainGuiThread(void *arg)
             if (_synth == firstSynth)
             {
                 int testInstance = startInstance;
-                if (testInstance > 0xff)
-                    startInstance = mainCreateNewInstance(testInstance & 0xff, false);
-                configuring = false;
+                if (testInstance > 0xff && newThread == false)
+                {
+                    newThread = true;
+                    testInstance &= 0xff;
+                    applyNewInstance(testInstance);
+                    startInstance = testInstance; // to prevent repeats!
+                }
             }
         }
 
