@@ -1,10 +1,12 @@
-yoshimi 1.5.11 rc1
+yoshimi 1.5.11 rc2
 
 2019-5-7 Will
-* Further imprevements to instance behaviour.
+* Further improvements to instance behaviour.
   Time delays are almost entirely due to GUI
-  slow startup. This has been an issurue for
+  slow startup. This has been an issue for
   a very long time.
+* Put Autostart back on direct call.
+  Still problems with GUI when threaded.
 
 2019-5-6 Will
 * Improved new/multi instance behaviour.

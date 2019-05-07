@@ -61,7 +61,7 @@ extern std::string singlePath;
 
 void mainRegisterAudioPort(SynthEngine *s, int portnum);
 int mainCreateNewInstance(unsigned int forceId, bool loadState);
-
+SynthEngine *notReady;
 Config *firstRuntime = NULL;
 static int globalArgc = 0;
 static char **globalArgv = NULL;
@@ -84,7 +84,6 @@ void newBlock()
     {
         if ((firstRuntime->activeInstance >> i) & 1)
         {
-            usleep (999000); // give previous time to settle
             while (configuring)
                 usleep(1000);
             // in case there is still an instance starting from elsewhere
@@ -99,7 +98,6 @@ void newBlock()
 void newInstance(int count)
 {
     mainCreateNewInstance(count, true);
-    usleep (999000); // give time to settle
     configuring = false;
     newThread = false;
 }
@@ -190,9 +188,10 @@ static void *mainGuiThread(void *arg)
     GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::NewSynthEngine, 0);
 #endif
     if (firstRuntime->autoInstance)
-    { // using thread so main instance not delayed.
-        std::thread startNewBlock(newBlock);
-        startNewBlock.detach();
+    {
+        //std::thread startNewBlock(newBlock);
+        //startNewBlock.detach();
+        newBlock();
     }
     while (firstRuntime->runSynth)
     {
@@ -304,6 +303,7 @@ int mainCreateNewInstance(unsigned int forceId, bool loadState)
     MusicClient *musicClient = NULL;
     unsigned int instanceID;
     SynthEngine *synth = new SynthEngine(globalArgc, globalArgv, false, forceId);
+    notReady = synth;
     if (!synth->getRuntime().isRuntimeSetupCompleted())
         goto bail_out;
     instanceID = synth->getUniqueId();
@@ -365,6 +365,7 @@ int mainCreateNewInstance(unsigned int forceId, bool loadState)
         // following copied here for other instances
         synth->installBanks();
     }
+
     synthInstances.insert(std::make_pair(synth, musicClient));
     //register jack ports for enabled parts
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
