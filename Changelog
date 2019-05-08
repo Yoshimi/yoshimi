@@ -1,5 +1,11 @@
 yoshimi 1.5.11 rc2
 
+2019-5-8 Will
+* Trial of startup display
+  Currently disabled.
+* Some cleanups.
+* Corrected previous changelog message.
+
 2019-5-7 Will
 * Further improvements to instance behaviour.
   Time delays are almost entirely due to GUI
@@ -7,6 +13,7 @@ yoshimi 1.5.11 rc2
   a very long time.
 * Put Autostart back on direct call.
   Still problems with GUI when threaded.
+* Set version as 1.5.11 rc2
 
 2019-5-6 Will
 * Improved new/multi instance behaviour.

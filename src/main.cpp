@@ -61,7 +61,6 @@ extern std::string singlePath;
 
 void mainRegisterAudioPort(SynthEngine *s, int portnum);
 int mainCreateNewInstance(unsigned int forceId, bool loadState);
-SynthEngine *notReady;
 Config *firstRuntime = NULL;
 static int globalArgc = 0;
 static char **globalArgv = NULL;
@@ -71,7 +70,9 @@ bool bShowCmdLine = true;
 bool splashSet = true;
 bool configuring = false;
 bool newThread = false;
+#ifdef GUI_FLTK
 time_t old_father_time, here_and_now;
+#endif
 
 //Andrew Deryabin: signal handling moved to main from Config Runtime
 //It's only suitable for single instance app support
@@ -140,17 +141,40 @@ void yoshimiSigHandler(int sig)
     }
 }
 
-static void *mainGuiThread(void *arg)
-{
 #ifdef GUI_FLTK
-    Fl::lock();
+void do_start(void)
+{
+    std::string startup = YOSHIMI_VERSION;
+    startup = "Yoshimi V " + startup + " is starting";
+    int w = 300;
+    int h = 36;
+    int sx = (Fl::w() - w) / 2;
+    int sy = (Fl::h() - h) / 2;
+    Fl_Window window(sx, sy, w, h, "yoshimi start");
+    Fl_Box box(2, 2, w-4, h-4, startup.c_str());
+    box.box(FL_EMBOSSED_FRAME);
+    box.labelsize(16);
+    box.labelfont(FL_BOLD);
+    box.labelcolor(YOSHI_COLOUR);
+    window.end();
+    window.border(false);
+    window.show();
+
+    for (int i = 0; i < 20; ++i)
+    {
+        Fl::wait();
+    }
+}
 #endif
 
+static void *mainGuiThread(void *arg)
+{
     sem_post((sem_t *)arg);
 
     map<SynthEngine *, MusicClient *>::iterator it;
 
 #ifdef GUI_FLTK
+    Fl::lock();
     const int textHeight = 15;
     const int textY = 10;
     const unsigned char lred = 0xd7;
@@ -303,7 +327,6 @@ int mainCreateNewInstance(unsigned int forceId, bool loadState)
     MusicClient *musicClient = NULL;
     unsigned int instanceID;
     SynthEngine *synth = new SynthEngine(globalArgc, globalArgv, false, forceId);
-    notReady = synth;
     if (!synth->getRuntime().isRuntimeSetupCompleted())
         goto bail_out;
     instanceID = synth->getUniqueId();
@@ -443,9 +466,33 @@ int main(int argc, char *argv[])
             }
         }
     }
+#ifdef GUI_FLTK
+    bool on = true;
+    if (argc > 1)
+    {
+        for (int n = 1; n < argc; ++ n)
+            if (string(argv[n]) == "-i" || string(argv[n]) == "--no-gui" )
+            {
+                on = false;
+                break;
+            }
+    }
+    if (on)
+    {
+        ;//do_start();
+    }
+/*
+ * The call above locks until *any* window takes focus.
+ * I can't work out why.
+ * After that it displays until the main window shows - as wanted.
+ */
 
+    bool guiStarted = false;
     time(&old_father_time);
     here_and_now = old_father_time;
+#endif
+
+
     struct termios  oldTerm;
     tcgetattr(0, &oldTerm);
 
@@ -454,9 +501,7 @@ int main(int argc, char *argv[])
     globalArgv = argv;
     bool bExitSuccess = false;
     map<SynthEngine *, MusicClient *>::iterator it;
-#ifdef GUI_FLTK
-    bool guiStarted = false;
-#endif
+
     pthread_t thr;
     pthread_attr_t attr;
     sem_t semGui;
@@ -566,7 +611,6 @@ bail_out:
     }
     if(bShowCmdLine)
         tcsetattr(0, TCSANOW, &oldTerm);
-    munlockall(); // just to be sure
     if (bExitSuccess)
         exit(EXIT_SUCCESS);
     else
