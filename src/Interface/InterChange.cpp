@@ -47,7 +47,6 @@
 #endif
 
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
-extern int mainCreateNewInstance(unsigned int forceId, bool loadState);
 extern SynthEngine *firstSynth;
 
 std::string singlePath;
@@ -71,7 +70,7 @@ InterChange::InterChange(SynthEngine *_synth) :
     swapRoot1(UNUSED),
     swapBank1(UNUSED),
     swapInstrument1(UNUSED)
-{   // this is repeated here as it might somehow get called form LV2
+{   // this is repeated here as it might somehow get called from LV2
     singlePath = std::string(getenv("HOME")) + "/.yoshimiSingle";
 }
 
