@@ -58,6 +58,7 @@ extern map<SynthEngine *, MusicClient *> synthInstances;
 extern SynthEngine *firstSynth;
 extern int startInstance;
 extern std::string singlePath;
+extern std::string runGui;
 
 void mainRegisterAudioPort(SynthEngine *s, int portnum);
 int mainCreateNewInstance(unsigned int forceId, bool loadState);
@@ -158,10 +159,11 @@ void do_start(void)
     box.labelcolor(YOSHI_COLOUR);
     window.end();
     window.border(false);
-    window.show();
 
-    for (int i = 0; i < 20; ++i)
+    for (int i = 0; i < 10; ++i)
     {
+        window.show();
+        usleep(10000);
         Fl::wait();
     }
 }
@@ -450,6 +452,7 @@ int main(int argc, char *argv[])
      * home directory as it's the only one we can be certain exists at startup
      */
         singlePath = std::string(getenv("HOME")) + "/.yoshimiSingle";
+        runGui = std::string(getenv("HOME")) + "/.yoshimiGui";
         struct stat st;
         if (!stat(singlePath.c_str(), &st))
         {
@@ -467,25 +470,29 @@ int main(int argc, char *argv[])
         }
     }
 #ifdef GUI_FLTK
-    bool on = true;
+    runGui = std::string(getenv("HOME")) + "/.yoshimiGui";
+    struct stat st;
+    bool useGui = false;
+    if (!stat(runGui.c_str(), &st))
+        useGui = true;
     if (argc > 1)
     {
         for (int n = 1; n < argc; ++ n)
             if (string(argv[n]) == "-i" || string(argv[n]) == "--no-gui" )
             {
-                on = false;
+                useGui = false; // overRide saved settings
+                break;
+            }
+            else if (string(argv[n]) == "-I" || string(argv[n]) == "--gui" )
+            {
+                useGui = true; // overRide saved settings
                 break;
             }
     }
-    if (on)
+    if (useGui)
     {
-        ;//do_start();
+        do_start();
     }
-/*
- * The call above locks until *any* window takes focus.
- * I can't work out why.
- * After that it displays until the main window shows - as wanted.
- */
 
     bool guiStarted = false;
     time(&old_father_time);

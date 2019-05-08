@@ -26,8 +26,6 @@
 // this is still slighty experimental
 const bool handleSingleMaster = false;
 
-
-
 /*
  * For test purposes where you want guaranteed identical results, enable the
  * #define below.
