@@ -26,6 +26,7 @@
 #ifndef RANDOMGEN_H
 #define RANDOMGEN_H
 
+#include <sys/types.h>
 #include <stdint.h>
 #include <cstdlib>
 #include <cstring>
