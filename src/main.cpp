@@ -448,11 +448,11 @@ int main(int argc, char *argv[])
     if (handleSingleMaster)
     {
     /*
-     * Can't make this call from file manager and the file has to be in the
+     * Can't make these calls from file manager and the files have to be in the
      * home directory as it's the only one we can be certain exists at startup
      */
-        singlePath = std::string(getenv("HOME")) + "/.yoshimiSingle";
-        runGui = std::string(getenv("HOME")) + "/.yoshimiGui";
+        singlePath = std::string(getenv("HOME")) + SINGLE_MASTER;
+        runGui = std::string(getenv("HOME")) + ENABLE_GUI;
         struct stat st;
         if (!stat(singlePath.c_str(), &st))
         {
@@ -470,7 +470,7 @@ int main(int argc, char *argv[])
         }
     }
 #ifdef GUI_FLTK
-    runGui = std::string(getenv("HOME")) + "/.yoshimiGui";
+    runGui = std::string(getenv("HOME")) + ENABLE_GUI;
     struct stat st;
     bool useGui = false;
     if (!stat(runGui.c_str(), &st))

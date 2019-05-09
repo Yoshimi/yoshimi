@@ -1,5 +1,10 @@
 yoshimi 1.5.11 rc3
 
+2019-5-9 Will
+* Added code to ensure hidden gui enable is in sync.
+* Moved some mallocs to prevent memory leaks.
+  Would only occur under abort conditions.
+
 2019-5-8 Will
 * Trial of startup display
   Currently disabled.

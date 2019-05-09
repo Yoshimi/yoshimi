@@ -51,6 +51,7 @@ using namespace std;
 #include <unistd.h>
 
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
+extern std::string runGui;
 map<SynthEngine *, MusicClient *> synthInstances;
 SynthEngine *firstSynth = NULL;
 
@@ -210,20 +211,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 
     bufferbytes = buffersize * sizeof(float);
 
-    /*
-     * These replace local memory allocations that
-     * were being made every time an add or sub note
-     * was processed. Now global so treat with care!
-     */
-    Runtime.genTmp1 = (float*)fftwf_malloc(bufferbytes);
-    Runtime.genTmp2 = (float*)fftwf_malloc(bufferbytes);
-    Runtime.genTmp3 = (float*)fftwf_malloc(bufferbytes);
-    Runtime.genTmp4 = (float*)fftwf_malloc(bufferbytes);
-
-    // similar to above but for parts
-    Runtime.genMixl = (float*)fftwf_malloc(bufferbytes);
-    Runtime.genMixr = (float*)fftwf_malloc(bufferbytes);
-
     oscilsize_f = oscilsize = Runtime.Oscilsize;
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
     fadeStep = 10.0f / samplerate; // 100mS fade
@@ -282,6 +269,20 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             goto bail_out;
         }
     }
+
+    /*
+     * These replace local memory allocations that
+     * were being made every time an add or sub note
+     * was processed. Now global so treat with care!
+     */
+    Runtime.genTmp1 = (float*)fftwf_malloc(bufferbytes);
+    Runtime.genTmp2 = (float*)fftwf_malloc(bufferbytes);
+    Runtime.genTmp3 = (float*)fftwf_malloc(bufferbytes);
+    Runtime.genTmp4 = (float*)fftwf_malloc(bufferbytes);
+
+    // similar to above but for parts
+    Runtime.genMixl = (float*)fftwf_malloc(bufferbytes);
+    Runtime.genMixr = (float*)fftwf_malloc(bufferbytes);
 
     defaults();
     ClearNRPNs();
@@ -351,6 +352,15 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         }
         else
             cout << "Can't find path " << Runtime.rootDefine << endl;
+    }
+
+    // just to make sure we're in sync
+    if (uniqueId == 0)
+    {
+        if (Runtime.showGui)
+            createEmptyFile(runGui);
+        else
+            deleteFile(runGui);
     }
 
     // we seem to need this here only for first time startup :(
