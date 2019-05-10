@@ -50,6 +50,7 @@ extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
 extern SynthEngine *firstSynth;
 
 std::string singlePath;
+std::string runGui;
 int startInstance = 0;
 
 InterChange::InterChange(SynthEngine *_synth) :
@@ -95,7 +96,6 @@ bool InterChange::Init()
         synth->getRuntime().Log("Failed to start CLI resolve thread");
         goto bail_out;
     }
-    std::cout << singlePath << std::endl;
     return true;
 
 
@@ -4816,7 +4816,14 @@ void InterChange::commandConfig(CommandBlock *getData)
             break;
         case CONFIG::control::enableGUI:
             if (write)
+            {
+                cout << "here" << endl;
                 synth->getRuntime().showGui = value_bool;
+                if (value_bool)
+                    createEmptyFile(runGui);
+                else
+                    deleteFile(runGui);
+            }
             else
                 value = synth->getRuntime().showGui;
             break;

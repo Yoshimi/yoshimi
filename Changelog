@@ -1,10 +1,25 @@
-yoshimi 1.5.11 rc2
+yoshimi 1.5.11 rc4
+
+2019-5-xx Will
+* Final tweaks to code.
+* Applied rough fix to startup overloads.
+  Only applies to secondary instances.
+* Updated docs for release.
+* Updated meta-info.
+* Set version as 1.5.11 rc4
+
+2019-5-9 Will
+* Added code to ensure hidden gui enable is in sync.
+* Moved some mallocs to prevent memory leaks.
+  Would only occur under abort conditions.
 
 2019-5-8 Will
 * Trial of startup display
   Currently disabled.
 * Some cleanups.
 * Corrected previous changelog message.
+* Startup display now working.
+* Set version as 1.5.11 rc3
 
 2019-5-7 Will
 * Further improvements to instance behaviour.

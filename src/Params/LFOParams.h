@@ -22,11 +22,13 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified March 2019
+    Modified May 2019
 */
 
 #ifndef LFO_PARAMS_H
 #define LFO_PARAMS_H
+
+#include <sys/types.h>
 
 #include "Misc/XMLwrapper.h"
 #include "Params/Presets.h"

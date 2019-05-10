@@ -178,7 +178,7 @@ class MasterUI {: {private GuiUpdates, FileMgr}
           yoshiLog->Hide();
           delete yoshiLog;
       }
-      if (instance > 0)
+      if (instance == 0)
           Fl::unlock();
       delete masterwindow;} {}
   }

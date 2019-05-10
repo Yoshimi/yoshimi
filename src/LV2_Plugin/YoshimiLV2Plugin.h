@@ -31,6 +31,7 @@
 #include "lv2extui.h"
 #include "lv2extprg.h"
 
+#include <sys/types.h>
 #include <string>
 #include <vector>
 #include <semaphore.h>

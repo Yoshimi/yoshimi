@@ -58,6 +58,7 @@ extern map<SynthEngine *, MusicClient *> synthInstances;
 extern SynthEngine *firstSynth;
 extern int startInstance;
 extern std::string singlePath;
+extern std::string runGui;
 
 void mainRegisterAudioPort(SynthEngine *s, int portnum);
 int mainCreateNewInstance(unsigned int forceId, bool loadState);
@@ -158,10 +159,11 @@ void do_start(void)
     box.labelcolor(YOSHI_COLOUR);
     window.end();
     window.border(false);
-    window.show();
 
-    for (int i = 0; i < 20; ++i)
+    for (int i = 0; i < 10; ++i)
     {
+        window.show();
+        usleep(10000);
         Fl::wait();
     }
 }
@@ -169,12 +171,17 @@ void do_start(void)
 
 static void *mainGuiThread(void *arg)
 {
+    static bool first = true;
     sem_post((sem_t *)arg);
 
     map<SynthEngine *, MusicClient *>::iterator it;
 
 #ifdef GUI_FLTK
-    Fl::lock();
+    if (first)
+    {
+        first = false;
+        Fl::lock();
+    }
     const int textHeight = 15;
     const int textY = 10;
     const unsigned char lred = 0xd7;
@@ -222,8 +229,24 @@ static void *mainGuiThread(void *arg)
         if (firstSynth->getUniqueId() == 0)
         {
             firstRuntime->signalCheck();
+#ifdef GUI_FLTK
+            if (bShowGui)
+            {
+                if (splashSet)
+                {
+                    winSplash.show();
+                    usleep(1000);
+                    if(time(&here_and_now) < 0) // no time?
+                        here_and_now = old_father_time + SPLASH_TIME;
+                    if ((here_and_now - old_father_time) >= SPLASH_TIME)
+                    {
+                        splashSet = false;
+                        winSplash.hide();
+                    }
+                }
+            }
+#endif
         }
-
         for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
         {
             SynthEngine *_synth = it->first;
@@ -289,18 +312,6 @@ static void *mainGuiThread(void *arg)
 #ifdef GUI_FLTK
         if (bShowGui)
         {
-            if (splashSet)
-            {
-                winSplash.show();
-                usleep(1000);
-                if(time(&here_and_now) < 0) // no time?
-                    here_and_now = old_father_time + SPLASH_TIME;
-                if ((here_and_now - old_father_time) >= SPLASH_TIME)
-                {
-                    splashSet = false;
-                    winSplash.hide();
-                }
-            }
             Fl::wait(0.033333);
             GuiThreadMsg::processGuiMessages();
         }
@@ -446,10 +457,11 @@ int main(int argc, char *argv[])
     if (handleSingleMaster)
     {
     /*
-     * Can't make this call from file manager and the file has to be in the
+     * Can't make these calls from file manager and the files have to be in the
      * home directory as it's the only one we can be certain exists at startup
      */
-        singlePath = std::string(getenv("HOME")) + "/.yoshimiSingle";
+        singlePath = std::string(getenv("HOME")) + SINGLE_MASTER;
+        runGui = std::string(getenv("HOME")) + ENABLE_GUI;
         struct stat st;
         if (!stat(singlePath.c_str(), &st))
         {
@@ -467,25 +479,29 @@ int main(int argc, char *argv[])
         }
     }
 #ifdef GUI_FLTK
-    bool on = true;
+    runGui = std::string(getenv("HOME")) + ENABLE_GUI;
+    struct stat st;
+    bool useGui = false;
+    if (!stat(runGui.c_str(), &st))
+        useGui = true;
     if (argc > 1)
     {
         for (int n = 1; n < argc; ++ n)
             if (string(argv[n]) == "-i" || string(argv[n]) == "--no-gui" )
             {
-                on = false;
+                useGui = false; // overRide saved settings
+                break;
+            }
+            else if (string(argv[n]) == "-I" || string(argv[n]) == "--gui" )
+            {
+                useGui = true; // overRide saved settings
                 break;
             }
     }
-    if (on)
+    if (useGui)
     {
-        ;//do_start();
+        do_start();
     }
-/*
- * The call above locks until *any* window takes focus.
- * I can't work out why.
- * After that it displays until the main window shows - as wanted.
- */
 
     bool guiStarted = false;
     time(&old_father_time);

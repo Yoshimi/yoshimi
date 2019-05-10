@@ -19,13 +19,14 @@
 
     You should have received a copy of the GNU General Public License along with
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
-    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+    Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
     This file is derivative of original ZynAddSubFX code.
 
     Modified May 2019
 */
 
+#include <sys/types.h>
 #include <stdio.h>
 #include <sys/time.h>
 #include <set>
@@ -51,6 +52,7 @@ using namespace std;
 #include <unistd.h>
 
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
+extern std::string runGui;
 map<SynthEngine *, MusicClient *> synthInstances;
 SynthEngine *firstSynth = NULL;
 
@@ -210,20 +212,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 
     bufferbytes = buffersize * sizeof(float);
 
-    /*
-     * These replace local memory allocations that
-     * were being made every time an add or sub note
-     * was processed. Now global so treat with care!
-     */
-    Runtime.genTmp1 = (float*)fftwf_malloc(bufferbytes);
-    Runtime.genTmp2 = (float*)fftwf_malloc(bufferbytes);
-    Runtime.genTmp3 = (float*)fftwf_malloc(bufferbytes);
-    Runtime.genTmp4 = (float*)fftwf_malloc(bufferbytes);
-
-    // similar to above but for parts
-    Runtime.genMixl = (float*)fftwf_malloc(bufferbytes);
-    Runtime.genMixr = (float*)fftwf_malloc(bufferbytes);
-
     oscilsize_f = oscilsize = Runtime.Oscilsize;
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
     fadeStep = 10.0f / samplerate; // 100mS fade
@@ -282,6 +270,20 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             goto bail_out;
         }
     }
+
+    /*
+     * These replace local memory allocations that
+     * were being made every time an add or sub note
+     * was processed. Now global so treat with care!
+     */
+    Runtime.genTmp1 = (float*)fftwf_malloc(bufferbytes);
+    Runtime.genTmp2 = (float*)fftwf_malloc(bufferbytes);
+    Runtime.genTmp3 = (float*)fftwf_malloc(bufferbytes);
+    Runtime.genTmp4 = (float*)fftwf_malloc(bufferbytes);
+
+    // similar to above but for parts
+    Runtime.genMixl = (float*)fftwf_malloc(bufferbytes);
+    Runtime.genMixr = (float*)fftwf_malloc(bufferbytes);
 
     defaults();
     ClearNRPNs();
@@ -351,6 +353,15 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         }
         else
             cout << "Can't find path " << Runtime.rootDefine << endl;
+    }
+
+    // just to make sure we're in sync
+    if (uniqueId == 0)
+    {
+        if (Runtime.showGui)
+            createEmptyFile(runGui);
+        else
+            deleteFile(runGui);
     }
 
     // we seem to need this here only for first time startup :(
@@ -432,6 +443,7 @@ void SynthEngine::defaults(void)
     VUcopy.values.partsR[0]= -1.0f;
 
     partonoffLock(0, 1); // enable the first part
+
     inseffnum = 0;
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
     {
@@ -2156,7 +2168,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 
 
 void SynthEngine::fetchMeterData()
-{
+{ // overload protection below shouldn't be needed :(
     if (!VUready)
         return;
     float fade;
@@ -2164,21 +2176,42 @@ void SynthEngine::fetchMeterData()
     int buffsize;
     buffsize = VUcopy.values.buffersize;
     root = sqrt(VUcopy.values.vuRmsPeakL / buffsize);
-    VUdata.values.vuRmsPeakL = ((VUdata.values.vuRmsPeakL * 7) + root) / 8;
+    if (VUdata.values.vuRmsPeakL >= 1.0f) // overload protection
+        VUdata.values.vuRmsPeakL = root;
+    else
+        VUdata.values.vuRmsPeakL = ((VUdata.values.vuRmsPeakL * 7) + root) / 8;
+
     root = sqrt(VUcopy.values.vuRmsPeakR / buffsize);
-    VUdata.values.vuRmsPeakR = ((VUdata.values.vuRmsPeakR * 7) + root) / 8;
+    if (VUdata.values.vuRmsPeakR >= 1.0f) // overload protection
+        VUdata.values.vuRmsPeakR = root;
+    else
+        VUdata.values.vuRmsPeakR = ((VUdata.values.vuRmsPeakR * 7) + root) / 8;
 
     fade = VUdata.values.vuOutPeakL * 0.92f;//mult;
-    if (VUcopy.values.vuOutPeakL > fade)
-        VUdata.values.vuOutPeakL = VUcopy.values.vuOutPeakL;
+    if (fade >= 1.0f) // overload protection
+        fade = 0.0f;
+    if (VUcopy.values.vuOutPeakL > 1.8f) // overload protection
+        VUcopy.values.vuOutPeakL = fade;
     else
-        VUdata.values.vuOutPeakL = fade;
+    {
+        if (VUcopy.values.vuOutPeakL > fade)
+            VUdata.values.vuOutPeakL = VUcopy.values.vuOutPeakL;
+        else
+            VUdata.values.vuOutPeakL = fade;
+    }
 
     fade = VUdata.values.vuOutPeakR * 0.92f;//mult;
-    if (VUcopy.values.vuOutPeakR > fade)
-        VUdata.values.vuOutPeakR = VUcopy.values.vuOutPeakR;
+    if (fade >= 1.0f) // overload protection
+        fade = 00.f;
+    if (VUcopy.values.vuOutPeakR > 1.8f) // overload protection
+        VUcopy.values.vuOutPeakR = fade;
     else
-        VUdata.values.vuOutPeakR = fade;
+    {
+        if (VUcopy.values.vuOutPeakR > fade)
+            VUdata.values.vuOutPeakR = VUcopy.values.vuOutPeakR;
+        else
+            VUdata.values.vuOutPeakR = fade;
+    }
 
     for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
     {

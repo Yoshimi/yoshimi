@@ -22,9 +22,10 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified March 2019
+    Modified May 2019
 */
 
+#include <sys/types.h>
 #include <cmath>
 
 #include "Params/LFOParams.h"
