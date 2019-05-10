@@ -22,12 +22,13 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified March 2019
+    Modified May 2019
 */
 
 #ifndef SYNTHENGINE_H
 #define SYNTHENGINE_H
 
+#include <sys/types.h>
 #include <limits.h>
 #include <cstdlib>
 #include <semaphore.h>

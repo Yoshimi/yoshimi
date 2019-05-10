@@ -156,7 +156,6 @@ bool InterChange::Init()
         synth->getRuntime().Log("Failed to start CLI resolve thread");
         goto bail_out;
     }
-    std::cout << singlePath << std::endl;
     return true;
 
 

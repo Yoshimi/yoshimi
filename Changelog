@@ -1,4 +1,12 @@
-yoshimi 1.5.11 rc3
+yoshimi 1.5.11 rc4
+
+2019-5-xx Will
+* Final tweaks to code.
+* Applied rough fix to startup overloads.
+  Only applies to secondary instances.
+* Updated docs for release.
+* Updated meta-info.
+* Set version as 1.5.11 rc4
 
 2019-5-9 Will
 * Added code to ensure hidden gui enable is in sync.

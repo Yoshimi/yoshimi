@@ -23,9 +23,10 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified February 2019
+    Modified May 2019
 */
 
+#include <sys/types.h>
 #include <iostream>
 #include <fenv.h>
 #include <errno.h>
@@ -565,7 +566,10 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
     showSplash = xml->getparbool("enable_splash", showSplash);
     showCLI = xml->getparbool("enable_CLI", showCLI);
     autoInstance = xml->getparbool("enable_auto_instance", autoInstance);
-    activeInstance = xml->getparU("active_instances", 0);
+    if (autoInstance)
+        activeInstance = xml->getparU("active_instances", 0);
+    else
+        activeInstance = 1;
     showCLIcontext = xml->getpar("show_CLI_context", 1, 0, 2);
     xml->exitbranch(); // BaseParameters
     return true;

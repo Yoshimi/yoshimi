@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified April 2019
+    Modified May 2019
 */
 
 #include "YoshimiLV2Plugin.h"

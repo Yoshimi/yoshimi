@@ -22,9 +22,10 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified April 2019
+    Modified May 2019
 */
 
+#include <sys/types.h>
 #include <zlib.h>
 #include <sstream>
 #include <iostream>

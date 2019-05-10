@@ -171,12 +171,17 @@ void do_start(void)
 
 static void *mainGuiThread(void *arg)
 {
+    static bool first = true;
     sem_post((sem_t *)arg);
 
     map<SynthEngine *, MusicClient *>::iterator it;
 
 #ifdef GUI_FLTK
-    Fl::lock();
+    if (first)
+    {
+        first = false;
+        Fl::lock();
+    }
     const int textHeight = 15;
     const int textY = 10;
     const unsigned char lred = 0xd7;
@@ -224,8 +229,24 @@ static void *mainGuiThread(void *arg)
         if (firstSynth->getUniqueId() == 0)
         {
             firstRuntime->signalCheck();
+#ifdef GUI_FLTK
+            if (bShowGui)
+            {
+                if (splashSet)
+                {
+                    winSplash.show();
+                    usleep(1000);
+                    if(time(&here_and_now) < 0) // no time?
+                        here_and_now = old_father_time + SPLASH_TIME;
+                    if ((here_and_now - old_father_time) >= SPLASH_TIME)
+                    {
+                        splashSet = false;
+                        winSplash.hide();
+                    }
+                }
+            }
+#endif
         }
-
         for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
         {
             SynthEngine *_synth = it->first;
@@ -291,18 +312,6 @@ static void *mainGuiThread(void *arg)
 #ifdef GUI_FLTK
         if (bShowGui)
         {
-            if (splashSet)
-            {
-                winSplash.show();
-                usleep(1000);
-                if(time(&here_and_now) < 0) // no time?
-                    here_and_now = old_father_time + SPLASH_TIME;
-                if ((here_and_now - old_father_time) >= SPLASH_TIME)
-                {
-                    splashSet = false;
-                    winSplash.hide();
-                }
-            }
             Fl::wait(0.033333);
             GuiThreadMsg::processGuiMessages();
         }
