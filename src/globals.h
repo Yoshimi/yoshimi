@@ -24,7 +24,7 @@
 #define GLOBALS_H
 
 // this is still slighty experimental
-const bool handleSingleMaster = false;
+const bool handleSingleMaster = true;
 
 #define SINGLE_MASTER "/.yoshimiSingle"; // filename for hidden storage in 'HOME'
 #define ENABLE_GUI "/.yoshimiGui"; // filename for hidden storage in 'HOME'

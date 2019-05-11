@@ -2170,8 +2170,19 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 
 void SynthEngine::fetchMeterData()
 { // overload protection below shouldn't be needed :(
+    static int delay = 20;
     if (!VUready)
         return;
+    if (delay > 0)
+    {
+        --delay;
+        VUdata.values.vuOutPeakL = 0.0f;
+        VUdata.values.vuOutPeakR = 0.0f;
+        VUdata.values.vuRmsPeakL = 0.0f;
+        VUdata.values.vuRmsPeakR = 0.0f;
+        VUready = true;
+        return;
+    }
     float fade;
     float root;
     int buffsize;

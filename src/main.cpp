@@ -133,7 +133,8 @@ void yoshimiSigHandler(int sig)
             if(isSingleMaster && newThread == false)
             {
                 newThread = true;
-                applyNewInstance(0);
+                //applyNewInstance(0);
+                newInstance(0);
             }
             sigaction(SIGUSR2, &yoshimiSigAction, NULL);
             break;
@@ -302,7 +303,11 @@ static void *mainGuiThread(void *arg)
                 {
                     newThread = true;
                     testInstance &= 0xff;
-                    applyNewInstance(testInstance);
+                    //applyNewInstance(testInstance);
+                    while(configuring)
+                        usleep(1000);
+                    configuring = true;
+                    newInstance(testInstance);
                     startInstance = testInstance; // to prevent repeats!
                 }
             }

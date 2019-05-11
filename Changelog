@@ -1,6 +1,9 @@
 yoshimi 1.5.11 rc4
 
-2019-5-xx Will
+2019-5-11 Will
+* Further work to improve multi-instance.
+
+2019-5-10 Will
 * Final tweaks to code.
 * Applied rough fix to startup overloads.
   Only applies to secondary instances.
