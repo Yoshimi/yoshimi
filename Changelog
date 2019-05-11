@@ -2,6 +2,8 @@ yoshimi 1.5.11 rc4
 
 2019-5-11 Will
 * Further work to improve multi-instance.
+* Additional changes to thread code.
+  Also removed some poorly performing ideas.
 
 2019-5-10 Will
 * Final tweaks to code.

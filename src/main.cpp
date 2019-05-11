@@ -70,7 +70,6 @@ bool bShowGui = true;
 bool bShowCmdLine = true;
 bool splashSet = true;
 bool configuring = false;
-bool newThread = false;
 #ifdef GUI_FLTK
 time_t old_father_time, here_and_now;
 #endif
@@ -99,20 +98,14 @@ void newBlock()
 
 void newInstance(int count)
 {
+    while (configuring)
+        usleep(1000);
+    // in case there is still an instance starting from elsewhere
+    configuring = true;
     mainCreateNewInstance(count, true);
     configuring = false;
-    newThread = false;
 }
 
-void applyNewInstance(int count)
-{
-    while (configuring)
-        usleep (1000);
-        // in case there is still an instance starting from elsewhere
-    configuring = true;
-    std::thread startNew(newInstance, count);
-    startNew.detach();
-}
 
 void yoshimiSigHandler(int sig)
 {
@@ -130,12 +123,8 @@ void yoshimiSigHandler(int sig)
             sigaction(SIGUSR1, &yoshimiSigAction, NULL);
             break;
         case SIGUSR2: // start next instance
-            if(isSingleMaster && newThread == false)
-            {
-                newThread = true;
-                //applyNewInstance(0);
+            if(isSingleMaster)
                 newInstance(0);
-            }
             sigaction(SIGUSR2, &yoshimiSigAction, NULL);
             break;
         default:
@@ -299,14 +288,9 @@ static void *mainGuiThread(void *arg)
             if (_synth == firstSynth)
             {
                 int testInstance = startInstance;
-                if (testInstance > 0xff && newThread == false)
+                if (testInstance > 0xff)
                 {
-                    newThread = true;
                     testInstance &= 0xff;
-                    //applyNewInstance(testInstance);
-                    while(configuring)
-                        usleep(1000);
-                    configuring = true;
                     newInstance(testInstance);
                     startInstance = testInstance; // to prevent repeats!
                 }
