@@ -178,8 +178,8 @@ class MasterUI {: {private GuiUpdates, FileMgr}
           yoshiLog->Hide();
           delete yoshiLog;
       }
-      if (instance == 0)
-          Fl::unlock();
+      //if (instance == 0)
+          //Fl::unlock();
       delete masterwindow;} {}
   }
   Function {Init(const char *_label)} {} {
