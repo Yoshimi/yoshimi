@@ -1,13 +1,15 @@
-yoshimi 1.5.11
+yoshimi 1.5.11.1
 
 2019-5-12 Will
-* Moved hidden filenames fro globals to main.
+* Moved hidden filenames from globals to main.
   Only place they ever need to be identified.
 * Moved instance start out of loop.
   Slightly improves timing.
 * Added extra message when loading manual.
 * Edited docs.
 * Set release as 1.5.11
+* Added missing Manual :(
+* Set release as 1.5.11.1
 
 2019-5-11 Will
 * Further work to improve multi-instance.

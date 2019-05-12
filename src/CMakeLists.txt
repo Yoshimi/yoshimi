@@ -42,7 +42,7 @@ add_definitions(-Wall)
 #add_definitions(-Wextra)
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "1.5.11")
+set (YOSHIMI_VERSION "1.5.11.1")
 add_definitions (-DMIN_CONFIG_MAJOR=1)
 add_definitions (-DMIN_CONFIG_MINOR=5)
 
