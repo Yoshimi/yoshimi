@@ -96,25 +96,14 @@ void newBlock()
 }
 
 
-<<<<<<< HEAD
-void newInstance(int count)
-=======
 void newInstance()
->>>>>>> master
 {
     while (configuring)
         usleep(1000);
     // in case there is still an instance starting from elsewhere
     configuring = true;
-<<<<<<< HEAD
-    mainCreateNewInstance(count, true);
-    configuring = false;
-}
-
-=======
     startInstance = 0x81;
 }
->>>>>>> master
 
 
 void yoshimiSigHandler(int sig)
@@ -134,11 +123,7 @@ void yoshimiSigHandler(int sig)
             break;
         case SIGUSR2: // start next instance
             if(isSingleMaster)
-<<<<<<< HEAD
-                newInstance(0);
-=======
                 newInstance();
->>>>>>> master
             sigaction(SIGUSR2, &yoshimiSigAction, NULL);
             break;
         default:
@@ -292,19 +277,6 @@ static void *mainGuiThread(void *arg)
                 }
             }
 #endif
-<<<<<<< HEAD
-            if (_synth == firstSynth)
-            {
-                int testInstance = startInstance;
-                if (testInstance > 0xff)
-                {
-                    testInstance &= 0xff;
-                    newInstance(testInstance);
-                    startInstance = testInstance; // to prevent repeats!
-                }
-            }
-=======
->>>>>>> master
         }
 
         // where all the action is ...
