@@ -1116,7 +1116,7 @@ send_data(ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::Int
             }
             MenuItem spotnoise {
               label Noise
-              xywh {0 0 34 20} labelfont 1 labelsize 11 labelcolor 6 hide
+              xywh {0 0 34 20} labelfont 1 labelsize 11 labelcolor 6
             }
           }
         }
@@ -1645,8 +1645,6 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
             ExtMod->deactivate();
             ExtModOsc->deactivate();
         }
-        if (handleSingleMaster == true)
-            spotnoise->show();
         ADnoteVoiceParameters->show();} {}
   }
   Function {~ADvoiceUI()} {} {

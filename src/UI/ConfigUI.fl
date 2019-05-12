@@ -1145,11 +1145,8 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
   }
   Function {Show()} {} {
     code {//
-                    if (synth->getIsLV2Plugin() == false)
-                    {
-                        if(handleSingleMaster)
-                            singleMaster->show();
-                    }
+                    if (synth->getIsLV2Plugin() == false && synth->getUniqueId() == 0)
+                        singleMaster->show();
                     configwindow->show();} {}
   }
   Function {Hide()} {} {

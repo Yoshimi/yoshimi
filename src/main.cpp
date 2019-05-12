@@ -440,33 +440,30 @@ std::string runCommand(std::string command, bool clean)
 
 int main(int argc, char *argv[])
 {
-    if (handleSingleMaster)
+/*
+ * Can't make these calls from file manager and the files have to be in the
+ * home directory as it's the only one we can be certain exists at startup
+ */
+    singlePath = std::string(getenv("HOME")) + SINGLE_MASTER;
+    runGui = std::string(getenv("HOME")) + ENABLE_GUI;
+    struct stat st;
+    if (!stat(singlePath.c_str(), &st))
     {
-    /*
-     * Can't make these calls from file manager and the files have to be in the
-     * home directory as it's the only one we can be certain exists at startup
-     */
-        singlePath = std::string(getenv("HOME")) + SINGLE_MASTER;
-        runGui = std::string(getenv("HOME")) + ENABLE_GUI;
-        struct stat st;
-        if (!stat(singlePath.c_str(), &st))
-        {
-            isSingleMaster = true;
-            std::string firstText = runCommand("pgrep -o -x yoshimi", false);
-            int firstpid = std::stoi(firstText);
-            int firstTime = std::stoi(runCommand("ps -o etime= -p " + firstText, true));
-            int secondTime = std::stoi(runCommand("ps -o etime= -p " + std::to_string(getpid()), true));
+        isSingleMaster = true;
+        std::string firstText = runCommand("pgrep -o -x yoshimi", false);
+        int firstpid = std::stoi(firstText);
+        int firstTime = std::stoi(runCommand("ps -o etime= -p " + firstText, true));
+        int secondTime = std::stoi(runCommand("ps -o etime= -p " + std::to_string(getpid()), true));
 
-            if ((firstTime - secondTime) > 0)
-            {
-                    kill(firstpid, SIGUSR2); // this just sends a message
-                    return 0;
-            }
+        if ((firstTime - secondTime) > 0)
+        {
+                kill(firstpid, SIGUSR2); // this just sends a message
+                return 0;
         }
     }
 #ifdef GUI_FLTK
     runGui = std::string(getenv("HOME")) + ENABLE_GUI;
-    struct stat st;
+    //struct stat st;
     bool useGui = false;
     if (!stat(runGui.c_str(), &st))
         useGui = true;

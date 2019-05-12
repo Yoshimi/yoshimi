@@ -12,6 +12,7 @@ yoshimi 1.5.11 M
 * Added missing Manual :(
 * Set release as 1.5.11.1
 * Merged in Foward commits.
+* Made Instance control and Spot noise permanent.
 
 2019-5-11 Will
 * Further work to improve multi-instance.
