@@ -85,7 +85,7 @@ void newBlock()
     {
         if ((firstRuntime->activeInstance >> i) & 1)
         {
-            while (configuring)
+            while(configuring)
                 usleep(1000);
             // in case there is still an instance starting from elsewhere
             configuring = true;
@@ -96,15 +96,25 @@ void newBlock()
 }
 
 
+<<<<<<< HEAD
 void newInstance(int count)
+=======
+void newInstance()
+>>>>>>> master
 {
     while (configuring)
         usleep(1000);
     // in case there is still an instance starting from elsewhere
     configuring = true;
+<<<<<<< HEAD
     mainCreateNewInstance(count, true);
     configuring = false;
 }
+
+=======
+    startInstance = 0x81;
+}
+>>>>>>> master
 
 
 void yoshimiSigHandler(int sig)
@@ -124,7 +134,11 @@ void yoshimiSigHandler(int sig)
             break;
         case SIGUSR2: // start next instance
             if(isSingleMaster)
+<<<<<<< HEAD
                 newInstance(0);
+=======
+                newInstance();
+>>>>>>> master
             sigaction(SIGUSR2, &yoshimiSigAction, NULL);
             break;
         default:
@@ -209,34 +223,27 @@ static void *mainGuiThread(void *arg)
     GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::NewSynthEngine, 0);
 #endif
     if (firstRuntime->autoInstance)
-    {
-        //std::thread startNewBlock(newBlock);
-        //startNewBlock.detach();
         newBlock();
-    }
     while (firstRuntime->runSynth)
     {
-        if (firstSynth->getUniqueId() == 0)
-        {
-            firstRuntime->signalCheck();
+        firstRuntime->signalCheck();
 #ifdef GUI_FLTK
-            if (bShowGui)
+        if (bShowGui)
+        {
+            if (splashSet)
             {
-                if (splashSet)
+                winSplash.show();
+                usleep(1000);
+                if(time(&here_and_now) < 0) // no time?
+                    here_and_now = old_father_time + SPLASH_TIME;
+                if ((here_and_now - old_father_time) >= SPLASH_TIME)
                 {
-                    winSplash.show();
-                    usleep(1000);
-                    if(time(&here_and_now) < 0) // no time?
-                        here_and_now = old_father_time + SPLASH_TIME;
-                    if ((here_and_now - old_father_time) >= SPLASH_TIME)
-                    {
-                        splashSet = false;
-                        winSplash.hide();
-                    }
+                    splashSet = false;
+                    winSplash.hide();
                 }
             }
-#endif
         }
+#endif
         for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
         {
             SynthEngine *_synth = it->first;
@@ -285,6 +292,7 @@ static void *mainGuiThread(void *arg)
                 }
             }
 #endif
+<<<<<<< HEAD
             if (_synth == firstSynth)
             {
                 int testInstance = startInstance;
@@ -295,19 +303,33 @@ static void *mainGuiThread(void *arg)
                     startInstance = testInstance; // to prevent repeats!
                 }
             }
+=======
+>>>>>>> master
         }
 
         // where all the action is ...
-#ifdef GUI_FLTK
-        if (bShowGui)
+        if (startInstance > 0x80)
         {
-            Fl::wait(0.033333);
-            GuiThreadMsg::processGuiMessages();
+            int testInstance = startInstance &= 0x7f;
+            configuring = true;
+            mainCreateNewInstance(testInstance, true);
+            configuring = false;
+            startInstance = testInstance; // to prevent repeats!
         }
         else
+        {
+#ifdef GUI_FLTK
+            if (bShowGui)
+            {
+                Fl::wait(0.033333);
+                GuiThreadMsg::processGuiMessages();
+            }
+            else
 #endif
-            usleep(33333);
+                usleep(33333);
+        }
     }
+
     if (firstRuntime->configChanged && (bShowGui | bShowCmdLine)) // don't want this if no cli or gui
     {
         size_t tmpRoot = firstSynth->ReadBankRoot();
@@ -440,6 +462,9 @@ std::string runCommand(std::string command, bool clean)
     }
     return std::string(returnLine);
 }
+
+#define SINGLE_MASTER "/.yoshimiSingle"; // filename for hidden storage in 'HOME'
+#define ENABLE_GUI "/.yoshimiGui"; // filename for hidden storage in 'HOME'
 
 int main(int argc, char *argv[])
 {
