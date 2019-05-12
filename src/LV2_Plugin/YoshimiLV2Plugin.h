@@ -36,10 +36,11 @@
 #include <vector>
 #include <semaphore.h>
 #include <jack/jack.h>
-#include <jack/ringbuffer.h>
+//#include <jack/ringbuffer.h>
 
 #include "Misc/SynthEngine.h"
 #include "Interface/InterChange.h"
+#include "Interface/RingBuffer.h"
 #include "MusicIO/MusicIO.h"
 
 class YoshimiLV2Plugin : public MusicIO

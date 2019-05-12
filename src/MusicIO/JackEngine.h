@@ -27,7 +27,7 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <jack/jack.h>
-#include <jack/ringbuffer.h>
+//#include <jack/ringbuffer.h>
 
 #if defined(JACK_SESSION)
     #include <jack/session.h>

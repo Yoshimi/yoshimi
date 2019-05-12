@@ -24,7 +24,7 @@
 #define GLOBALS_H
 
 // this is still slighty experimental
-const bool handleSingleMaster = false;
+const bool handleSingleMaster = true;
 
 /*
  * For test purposes where you want guaranteed identical results, enable the
@@ -107,6 +107,9 @@ const unsigned int BASE_COLOUR = 0xbfbfbf00;
 const unsigned int SUB_COLOUR = 0xafcfdf00;
 const unsigned int PAD_COLOUR = 0xcfdfaf00;
 const unsigned int YOSHI_COLOUR = 0x0000e100;
+const unsigned int EXTOSC_COLOUR = 0x8fbfdf00;
+const unsigned int EXTVOICE_COLOUR = 0x9fdf8f00;
+const unsigned int MODOFF_COLOUR = 0x80808000;
 
 enum {XML_INSTRUMENT = 1, XML_PARAMETERS, XML_MICROTONAL, XML_STATE, XML_VECTOR, XML_MIDILEARN, XML_CONFIG, XML_PRESETS, XML_BANK, XML_HISTORY};
 
@@ -662,6 +665,7 @@ namespace ADDVOICE // usage ADDVOICE::control::volume
 
         modulatorType = 16, // Off, Morph, Ring, PM, FM, PWM
         externalModulator, // -1 local,  'n' voice
+        externalOscillator, // -1 local,  'n' voice
 
         detuneFrequency = 32,
         equalTemperVariation,
@@ -694,6 +698,7 @@ namespace ADDVOICE // usage ADDVOICE::control::volume
         modulatorHFdamping,
         enableModulatorAmplitudeEnvelope = 88,
         modulatorDetuneFrequency = 96,
+        modulatorDetuneFromBaseOsc = 97,
         modulatorFrequencyAs440Hz = 98,
         modulatorOctave,
         modulatorDetuneType, // Default, L35 cents, L10 cents, E100 cents, E1200 cents
@@ -965,7 +970,6 @@ namespace EFFECT // usage EFFECT::type::none
 union CommandBlock{
     struct{
         float value;
-//        unsigned char source;
         unsigned char type;
         unsigned char source;
         unsigned char control;
@@ -981,5 +985,9 @@ union CommandBlock{
     } data;
     char bytes [sizeof(data)];
 };
+/*
+ * it is ESSENTIAL that this is a power of 2
+ */
+const size_t commandBlockSize = sizeof(CommandBlock);
 
 #endif

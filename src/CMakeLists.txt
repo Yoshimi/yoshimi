@@ -37,12 +37,13 @@ add_definitions(-Wall)
 # vvv
 #add_definitions(-Wpedantic) # full ISO spec
 #add_definitions(-Werror) # warnings as errors
-#add_definitions(-Wfatal-errors) # stop on first
-#add_definitions(-Werror=format-security)
-#add_definitions(-Wextra)
+add_definitions(-Wfatal-errors) # stop on first
+add_definitions(-Werror=format-security)
+add_definitions(-Wextra)
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "1.5.11.1")
+set (YOSHIMI_VERSION "1.5.11 M")
+
 add_definitions (-DMIN_CONFIG_MAJOR=1)
 add_definitions (-DMIN_CONFIG_MINOR=5)
 
@@ -370,6 +371,7 @@ set (Interface_Sources
     Interface/MidiLearn.cpp
     Interface/MidiDecode.cpp
     Interface/FileMgr.cpp
+    Interface/RingBuffer.cpp
 )
 
 set (Params_sources
