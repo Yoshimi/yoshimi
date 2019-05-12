@@ -718,10 +718,10 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     if (synth == firstSynth)
                     {
                         if (value > 0 && value < 32)
-                            startInstance = value | 0x100;
+                            startInstance = value | 0x80;
                         else
-                            startInstance = 0x101; // next available
-                        while (startInstance > 0xff)
+                            startInstance = 0x81; // next available
+                        while (startInstance > 0x80)
                             usleep(1000);
                         value = startInstance; // actual instance found
                         startInstance = 0; // just to be sure

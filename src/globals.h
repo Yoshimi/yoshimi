@@ -26,9 +26,6 @@
 // this is still slighty experimental
 const bool handleSingleMaster = false;
 
-#define SINGLE_MASTER "/.yoshimiSingle"; // filename for hidden storage in 'HOME'
-#define ENABLE_GUI "/.yoshimiGui"; // filename for hidden storage in 'HOME'
-
 /*
  * For test purposes where you want guaranteed identical results, enable the
  * #define below.

@@ -348,7 +348,10 @@ class MasterUI {: {private GuiUpdates, FileMgr}
           MenuItem {} {
             label {&View Manual}
             callback {//
-            send_data(100, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
+            words->copy_label("Searching for the manual.");
+          message->show();
+          message->position(masterwindow->x() + 36, masterwindow->y() + 170);
+            send_data(MAIN::control::openManualPDF, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
             return;}
             xywh {0 0 34 20} labelsize 12
           }
@@ -1750,6 +1753,7 @@ Nikita Zlobin
             break;
 
         case MAIN::control::openManualPDF:
+            message->hide();
             if (par2 != NO_MSG)
                 fl_alert("%s", miscMsgPop(par2).c_str());
             break;
