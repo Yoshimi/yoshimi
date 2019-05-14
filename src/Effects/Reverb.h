@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2018, Will Godfrey
+    Copyright 2018-2019, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified February 2018
+    Modified march 2019
 */
 
 #ifndef REVERB_H
@@ -53,6 +53,7 @@ class Reverb : public Effect
 
     private:
         // Parametrii
+        bool Pchanged;
         unsigned char Pvolume;
         unsigned char Ptime;
         unsigned char Pidelay;

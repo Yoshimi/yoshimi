@@ -2,7 +2,7 @@
     JackEngine.cpp
 
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2018, Will Godfrey & others
+    Copyright 2014-2019, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified May 2018
+    Modified May 2019
 */
 
 #include <errno.h>
@@ -28,8 +28,6 @@
 #include <sys/stat.h>
 #include <sstream>
 #include <stdio.h>
-
-using namespace std;
 
 #include "Misc/Config.h"
 #include "MusicIO/JackEngine.h"
@@ -47,7 +45,7 @@ JackEngine::JackEngine(SynthEngine *_synth) : MusicIO(_synth), jackClient(NULL)
 }
 
 
-bool JackEngine::connectServer(string server)
+bool JackEngine::connectServer(std::string server)
 {
     for (int tries = 0; tries < 3 && !jackClient; ++tries)
     {
@@ -72,11 +70,11 @@ bool JackEngine::connectServer(string server)
 }
 
 
-bool JackEngine::openJackClient(string server)
+bool JackEngine::openJackClient(std::string server)
 {
     int jopts = JackNullOption;
     jack_status_t jstatus;
-    string clientname = "yoshimi";
+    std::string clientname = "yoshimi";
     if (synth->getRuntime().nameTag.size())
         clientname += ("-" + synth->getRuntime().nameTag);
 
@@ -231,7 +229,7 @@ void JackEngine::registerAudioPort(int partnum)
          * individual ports (at startup) if part is not configured for
          * direct O/P.
          */
-        string portName;
+        std::string portName;
         if(synth->part [partnum] && synth->partonoffRead(partnum) && (synth->part [partnum]->Paudiodest > 1))
         {
             portName = "track_" + asString(partnum + 1) + "_l";
@@ -318,14 +316,14 @@ bool JackEngine::connectJackPorts(void)
         {
             if(ret == EEXIST)
             {
-            synth->getRuntime().Log(string(port_name)
-                        + " is already connected to jack port " + string(playback_ports[port])
+            synth->getRuntime().Log(std::string(port_name)
+                        + " is already connected to jack port " + std::string(playback_ports[port])
                         + ", status " + asString(ret));
             }
             else
             {
-            synth->getRuntime().Log("Cannot connect " + string(port_name)
-                        + " to jack port " + string(playback_ports[port])
+            synth->getRuntime().Log("Cannot connect " + std::string(port_name)
+                        + " to jack port " + std::string(playback_ports[port])
                         + ", status " + asString(ret));
             return false;
             }
@@ -344,13 +342,13 @@ int JackEngine::clientId(void)
 }
 
 
-string JackEngine::clientName(void)
+std::string JackEngine::clientName(void)
 {
     if (jackClient)
-        return string(jack_get_client_name(jackClient));
+        return std::string(jack_get_client_name(jackClient));
     else
         synth->getRuntime().Log("clientName() with null jackClient");
-    return string("Oh, yoshimi :-(");
+    return std::string("Oh, yoshimi :-(");
 }
 
 
@@ -525,12 +523,12 @@ void JackEngine::_jsessionCallback(jack_session_event_t *event, void *arg)
 
 void JackEngine::jsessionCallback(jack_session_event_t *event)
 {
-    string uuid = string(event->client_uuid);
-    string filename = string("yoshimi-") + uuid + string(".xml");
-    string filepath = string(event->session_dir) + filename;
+    std::string uuid = std::string(event->client_uuid);
+    std::string filename = std::string("yoshimi-") + uuid + std::string(".xml");
+    std::string filepath = std::string(event->session_dir) + filename;
     synth->getRuntime().setJackSessionSave((int)event->type, filepath);
-    string cmd = synth->getRuntime().programCmd() + string(" -U ") + uuid
-                 + string(" -u ${SESSION_DIR}") + filename;
+    std::string cmd = synth->getRuntime().programCmd() + std::string(" -U ") + uuid
+                 + std::string(" -u ${SESSION_DIR}") + filename;
     event->command_line = strdup(cmd.c_str());
     if (jack_session_reply(jackClient, event))
         synth->getRuntime().Log("Jack session reply failed");

@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified February 2019
+    Modified May 2019
 */
 
 #include <iostream>
@@ -32,6 +32,7 @@ using namespace std;
 
 #include "Interface/MidiLearn.h"
 #include "Interface/InterChange.h"
+#include "Interface/RingBuffer.h"
 #include "Misc/MiscFuncs.h"
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
@@ -142,8 +143,7 @@ bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, un
         putData.data.insert = foundEntry.data.insert;
         putData.data.parameter = foundEntry.data.parameter;
         putData.data.par2 = foundEntry.data.par2;
-        unsigned int putSize = sizeof(putData);
-        if (writeMidi(&putData, putSize, category & 1))
+        if (writeMidi(&putData, category & 1))
         {
             if (firstLine && !(category & 1)) // not in_place
             // we only want to send an activity once
@@ -156,7 +156,7 @@ bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, un
                 putData.data.part = TOPLEVEL::section::midiLearn;
                 putData.data.kit = (CC & 0xff);
                 putData.data.engine = chan;
-                writeMidi(&putData, putSize, category & 1);
+                writeMidi(&putData, category & 1);
             }
         }
         if (lastpos == scan::listBlocked) // blocking all of this CC/chan pair
@@ -166,12 +166,8 @@ bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, un
 }
 
 
-bool MidiLearn::writeMidi(CommandBlock *putData, unsigned int writesize, bool in_place)
+bool MidiLearn::writeMidi(CommandBlock *putData, bool in_place)
 {
-    char *point = (char*) putData;
-    unsigned int towrite = writesize;
-    unsigned int wrote = 0;
-    unsigned int found;
     unsigned int tries = 0;
     bool ok = true;
     if (in_place)
@@ -181,23 +177,16 @@ bool MidiLearn::writeMidi(CommandBlock *putData, unsigned int writesize, bool in
     }
     else
     {
-        if (jack_ringbuffer_write_space(synth->interchange.fromMIDI) >= writesize)
+        do
         {
-            while (towrite && tries < 3)
-            {
-                found = jack_ringbuffer_write(synth->interchange.fromMIDI, point, towrite);
-                wrote += found;
-                point += found;
-                towrite -= found;
-                ++tries;
-            }
-            if (towrite)
-            {
-                ok = false;
-                    synth->getRuntime().Log("Unable to write data to fromMidi buffer", 2);
-            }
+            ++ tries;
+            ok = synth->interchange.fromMIDI->write(putData->bytes);
+            if (!ok)
+                usleep(1);
+        // we can afford a short delay for buffer to clear
         }
-        else
+        while (!ok && tries < 3);
+        if (!ok)
         {
             synth->getRuntime().Log("Midi buffer full!");
             ok = false;
@@ -652,7 +641,7 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
         putData.data.part = TOPLEVEL::section::midiIn;
         putData.data.parameter = 0x80;
         putData.data.par2 = miscMsgPush("Midi Learn full!");
-        writeMidi(&putData, putSize, false);
+        writeMidi(&putData, false);
         learning = false;
         return;
     }
@@ -726,26 +715,18 @@ void MidiLearn::writeToGui(CommandBlock *putData)
     if (!synth->getRuntime().showGui)
         return;
     putData->data.part = TOPLEVEL::section::midiLearn;
-    unsigned int writesize = sizeof(*putData);
-    char *point = (char*)putData;
-    unsigned int towrite = writesize;
-    unsigned int wrote = 0;
-    unsigned int found = 0;
-    unsigned int tries = 0;
-    if (jack_ringbuffer_write_space(synth->interchange.toGUI) >= writesize)
+    int tries = 0;
+    bool ok = false;
+    do
     {
-        while (towrite && tries < 3)
-        {
-            found = jack_ringbuffer_write(synth->interchange.toGUI, point, towrite);
-            wrote += found;
-            point += found;
-            towrite -= found;
-            ++tries;
-        }
-        if (towrite)
-            synth->getRuntime().Log("Unable to write data to toGui buffer", 2);
+        ok = synth->interchange.toGUI->write(putData->bytes);
+        ++tries;
+        if (!ok)
+                usleep(1);
+        // we can afford a short delay for buffer to clear
     }
-    else
+    while (!ok && tries < 3);
+    if(!ok)
         synth->getRuntime().Log("toGui buffer full!", 2);
 }
 
@@ -836,7 +817,7 @@ bool MidiLearn::saveList(string name)
     }
     bool ok = insertMidiListData(true,  xml);
     if (xml->saveXMLfile(file))
-        synth->addHistory(file, 6);
+        synth->addHistory(file, TOPLEVEL::historyList::MLearn);
     else
     {
         synth->getRuntime().Log("Failed to save data to " + file);
@@ -923,7 +904,7 @@ bool MidiLearn::loadList(string name)
     delete xml;
     if (!ok)
         return false;
-    synth->addHistory(file, 6);
+    synth->addHistory(file, TOPLEVEL::historyList::MLearn);
     return true;
 }
 

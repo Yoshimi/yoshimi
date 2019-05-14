@@ -5,7 +5,7 @@ code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014 -2018, Will Godfrey
+Copyright 2014 -2019, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -23,7 +23,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified October 2018
+Modified May 2019
 } {selected in_source in_header
 }
 
@@ -31,6 +31,9 @@ decl {\#include <cmath>} {public local
 }
 
 decl {\#include <FL/Fl_File_Chooser.H>} {public local
+}
+
+decl {\#include "Interface/FileMgr.h"} {public local
 }
 
 decl {\#include "Misc/Config.h"} {public local
@@ -48,7 +51,7 @@ decl {\#include "Misc/Bank.h"} {private local
 decl {\#include "MasterUI.h"} {private local
 }
 
-class ConfigUI {: {private MiscFuncs}
+class ConfigUI {: {private MiscFuncs, FileMgr}
 } {
   Function {make_window()} {} {
     Fl_Window configwindow {
@@ -303,7 +306,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                             send_data(CONFIG::control::enableGUI, o->value(), TOPLEVEL::type::Integer);
                         else
                             o->value(1);}
-            tooltip {Enable starting with this graphical  interface} xywh {270 200 27 25} down_box DOWN_BOX labelsize 12 align 4
+            tooltip {Enable starting with this graphical  interface} xywh {270 180 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showGui);}
             code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
           }
@@ -311,21 +314,28 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             label {* Enable CLI}
             callback {//
                         send_data(CONFIG::control::enableCLI, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Enable starting with interactive command line interface} xywh {270 220 27 25} down_box DOWN_BOX labelsize 12 align 4
+            tooltip {Enable starting with interactive command line interface} xywh {270 200 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showCLI);}
             code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
-          }
-          Fl_Box {} {
-            label {* Changing these settings requires a restart}
-            xywh {50 276 287 17} labelfont 1 labelsize 11 labelcolor 38 align 128
           }
           Fl_Check_Button enableAuto {
             label {Enable Auto Instance}
             callback {//
                         send_data(CONFIG::control::enableAutoInstance, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Allow main instance to start all those open when last closed.} xywh {270 240 27 25} down_box DOWN_BOX labelsize 12 align 4
+            tooltip {Allow main instance to start all those open when last closed.} xywh {270 220 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().autoInstance);}
             code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
+          }
+          Fl_Check_Button singleMaster {
+            label {* Enable Single Master}
+            callback {//
+          send_data(CONFIG::control::enableSinglePath, o->value(), TOPLEVEL::type::Integer);}
+            tooltip {Redirect new start from desktop to create new instance instead.} xywh {270 240 27 25} down_box DOWN_BOX labelsize 12 align 4 hide
+            code0 {o->value(fetchData(0, CONFIG::control::enableSinglePath, TOPLEVEL::section::config));}
+          }
+          Fl_Box {} {
+            label {* Changing these settings requires a restart}
+            xywh {50 276 287 17} labelfont 1 labelsize 11 labelcolor 38 align 128
           }
         }
         Fl_Group jackTab {
@@ -452,7 +462,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                             EPCspinner->value(EPCvalue);
                             EPCspinner->activate();
                         }
-                        BankRootvalue = synth->getRuntime().midi_bank_root;
+                        /*BankRootvalue = synth->getRuntime().midi_bank_root;
                         if (BankRootvalue >= 128)
                         {
                             BankRoot->value(0);
@@ -462,64 +472,64 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                         {
                             BankRoot->value(BankRootvalue);
                             BankRoot->activate();
-                        }}
+                        }*/}
           tooltip {MIDI CC preferences} xywh {5 25 381 275} labelsize 12 hide
           code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
           code1 {BankRootvalue = synth->getRuntime().midi_bank_root;}
         } {
-          Fl_Spinner BankRoot {
+          Fl_Choice bankrootchange {
             label {Bank Root Change}
-            callback {Rpend->show();}
-            xywh {235 50 50 18} labelsize 12 minimum 0 maximum 127 value 0 textfont 1 textsize 12
-            code0 {BankRootvalue = synth->getRuntime().midi_bank_root;}
-            code1 {if (BankRootvalue < 128) o->value(BankRootvalue); else o->value(0);}
-          }
-          Fl_Button Rpend {
-            label Pending
             callback {//
-                        int candidate = BankRoot->value();
-                        if (candidate == BankRootvalue)
+                        int candidate;
+                        switch (o->value())
                         {
-                            o->hide();
-                            return;
+                            case 0:
+                                candidate = 32;
+                                break;
+                            case 1:
+                                candidate = 0;
+                                break;
+                            default:
+                                candidate = 128;
+                                break;
                         }
                         string name = testCC(candidate, CONFIG::control::bankRootCC);
                         if (!name.empty())
                         {
-                            fl_alert("In use for %s",name.c_str());
-                            if (BankRootvalue < 128)
+                            o->value(oldBank);
+                            o->redraw();
+                            switch(oldBank)
                             {
-                                BankRoot->value(BankRootvalue);
-                                BankRoot->redraw();
+                                case 0:
+                                    candidate = 32;
+                                    break;
+                                case 1:
+                                    candidate = 0;
+                                    break;
+                                default:
+                                    candidate = 128;
+                                    break;
                             }
-                            return;
+                            fl_alert("In use for %s",name.c_str());
                         }
-                        BankRootvalue = candidate;
-                        o->hide();
-                        send_data(CONFIG::control::bankRootCC, BankRootvalue, TOPLEVEL::type::Integer);}
-            tooltip {Click to set} xywh {300 50 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
-          }
-          Fl_Check_Button rootcheck {
-            label {Enable Bank Root Change}
-            callback {//
-                        if (o->value() == 0)
-                        {
-                            BankRoot->value(0);
-                            BankRoot->deactivate();
-                            Rpend->hide();
-                            send_data(CONFIG::control::bankRootCC, 128, TOPLEVEL::type::Integer);
-                        }
-                        else
-                        {
-                            BankRoot->activate();
-                            BankRoot->value(0);
-                            BankRootvalue = 128;
-                            Rpend->show();
-                        }
-                        BankRoot->redraw();}
-            xywh {234 30 18 18} down_box DOWN_BOX labelsize 12 align 4
-            code0 {o->value((synth->getRuntime().midi_bank_root < 128));}
-            code1 {if (o->value() == 0) BankRoot->deactivate();}
+                        send_data(CONFIG::control::bankRootCC, candidate, TOPLEVEL::type::Integer);}
+            tooltip {CC0 = msb, CC32 = lsb} xywh {234 57 53 18} down_box BORDER_BOX labelsize 12 align 132 textfont 1 textsize 12
+            code0 {int bankRoot = synth->getRuntime().midi_bank_root;}
+            code1 {if (bankRoot == 32) o->value(0); else if (bankRoot == 0) o->value(1); else o->value(2);}
+            code2 {oldBank = o->value();}
+          } {
+            MenuItem bankrootlsb {
+              label LSB
+              xywh {10 10 34 20} labelfont 1 labelsize 12
+            }
+            MenuItem bankrootusb {
+              label MSB
+              xywh {10 10 34 20} labelfont 1 labelsize 12
+            }
+            MenuItem bankrootoff {
+              label Off
+              xywh {10 10 34 20} labelfont 1 labelsize 12
+            }
           }
           Fl_Choice bankchange {
             label {Bank Change}
@@ -761,6 +771,11 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             type |= TOPLEVEL::type::Write;
             collect_data(synth, value, (Fl::event_button() | type), control, TOPLEVEL::section::config, UNUSED, UNUSED, UNUSED, par, par2);} {}
   }
+  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED, int request = UNUSED)} {return_type float
+  } {
+    code {//
+        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, par2, request);} {}
+  }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
             int value_int = lrint(getData->data.value);
@@ -835,6 +850,9 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                 case CONFIG::control::enableAutoInstance:
                     enableAuto->value(value_bool);
                     break;
+                case CONFIG::control::enableSinglePath:
+                    singleMaster->value(value_bool);
+                    break;
 
                 case CONFIG::control::jackMidiSource:
                     jackSource->value(miscMsgPop(par2).c_str());
@@ -890,18 +908,17 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                 //case CONFIG::control::enableBankRootChange:
                     //break;
                 case CONFIG::control::bankRootCC:
-                    if (value_int >= 119)
+                    switch (value_int)
                     {
-                        BankRoot->value(0);
-                        BankRoot->deactivate();
-                        rootcheck->value(0);
-                    }
-                    else
-                    {
-                        BankRoot->value(value_int);
-                        BankRoot->activate();
-                        rootcheck->value(1);
-                    }
+                        case 0:
+                            bankrootchange->value(1);
+                            break;
+                        case 32:
+                            bankrootchange->value(0);
+                            break;
+                        default:
+                            bankrootchange->value(2);
+                            break;                    }
                     break;
 
                 case CONFIG::control::bankCC:
@@ -1066,20 +1083,18 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                     break;
 
                 case 4 : // MIDI
-                    tmp = synth->getRuntime().midi_bank_root;
-                    if (tmp == 128)
+                    switch (synth->getRuntime().midi_bank_root)
                     {
-                        BankRoot->value(0);
-                        BankRoot->deactivate();
-                        rootcheck->value(0);
+                        case 32:
+                            bankrootchange->value(0);
+                            break;
+                        case 0:
+                            bankrootchange->value(1);
+                            break;
+                        default:
+                            bankrootchange->value(2);
+                            break;
                     }
-                    else
-                    {
-                        BankRoot->value(tmp);
-                        BankRoot->activate();
-                        rootcheck->value(1);
-                    }
-                    Rpend->hide();
 
                     switch (synth->getRuntime().midi_bank_C)
                     {
@@ -1130,6 +1145,8 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
   }
   Function {Show()} {} {
     code {//
+                    if (synth->getIsLV2Plugin() == false && synth->getUniqueId() == 0)
+                        singleMaster->show();
                     configwindow->show();} {}
   }
   Function {Hide()} {} {

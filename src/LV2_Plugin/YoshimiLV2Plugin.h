@@ -31,14 +31,16 @@
 #include "lv2extui.h"
 #include "lv2extprg.h"
 
+#include <sys/types.h>
 #include <string>
 #include <vector>
 #include <semaphore.h>
 #include <jack/jack.h>
-#include <jack/ringbuffer.h>
+//#include <jack/ringbuffer.h>
 
 #include "Misc/SynthEngine.h"
 #include "Interface/InterChange.h"
+#include "Interface/RingBuffer.h"
 #include "MusicIO/MusicIO.h"
 
 class YoshimiLV2Plugin : public MusicIO

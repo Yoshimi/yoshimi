@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified February 2019
+    Modified March 2019
 */
 
 #ifndef PART_H
@@ -132,6 +132,7 @@ class Part : private MiscFuncs, SynthHelper, FileMgr
                                    // time 0 = off, the older will be released
         float         Pfrand;      // Part random frequency content
         unsigned char PbreathControl;
+        unsigned char Peffnum;
         int           Paudiodest;  // jack output routing
         string        Pname;
         struct {

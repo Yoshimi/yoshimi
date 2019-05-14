@@ -2,7 +2,7 @@
     AlsaEngine.h
 
     Copyright 2009-2010, Alan Calvert
-    Copyright 2014-2018, Will Godfrey & others
+    Copyright 2014-2019, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified May 2018
+    Modified May 2019
 */
 
 #if defined(HAVE_ALSA)
@@ -28,8 +28,6 @@
 #include <pthread.h>
 #include <string>
 #include <alsa/asoundlib.h>
-
-using namespace std;
 
 #include "MusicIO/MusicIO.h"
 
@@ -49,8 +47,8 @@ class AlsaEngine : public MusicIO
         unsigned int getSamplerate(void) { return audio.samplerate; }
         int getBuffersize(void) { return audio.period_size; }
 
-        string audioClientName(void);
-        string midiClientName(void);
+        std::string audioClientName(void);
+        std::string midiClientName(void);
         int audioClientId(void) { return audio.alsaId; }
         int midiClientId(void) { return midi.alsaId; }
         virtual void registerAudioPort(int )  {}
@@ -68,7 +66,7 @@ class AlsaEngine : public MusicIO
         void Write(snd_pcm_uframes_t towrite);
         bool Recover(int err);
         bool xrunRecover(void);
-        bool alsaBad(int op_result, string err_msg);
+        bool alsaBad(int op_result, std::string err_msg);
         void closeAudio(void);
         void closeMidi(void);
 
@@ -81,7 +79,7 @@ class AlsaEngine : public MusicIO
                                       snd_pcm_uframes_t nframes);
 
         struct {
-            string             device;
+            std::string             device;
             snd_pcm_t         *handle;
             unsigned int       period_count;
             unsigned int       samplerate;
@@ -93,7 +91,7 @@ class AlsaEngine : public MusicIO
         } audio;
 
         struct {
-            string              device;
+            std::string              device;
             snd_seq_t           *handle;
             snd_seq_addr_t      addr;
             int                 alsaId;

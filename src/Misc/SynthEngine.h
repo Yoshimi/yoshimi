@@ -22,12 +22,13 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified February 2019
+    Modified May 2019
 */
 
 #ifndef SYNTHENGINE_H
 #define SYNTHENGINE_H
 
+#include <sys/types.h>
 #include <limits.h>
 #include <cstdlib>
 #include <semaphore.h>
@@ -153,6 +154,7 @@ class SynthEngine : private SynthHelper, MiscFuncs, FileMgr
         void mutewrite(int what);
         bool isMuted(void);
         sem_t mutelock;
+        bool masterMono;
 
         float getLimits(CommandBlock *getData);
         float getVectorLimits(CommandBlock *getData);
@@ -195,6 +197,8 @@ class SynthEngine : private SynthHelper, MiscFuncs, FileMgr
         void setPaudiodest(int value);
 
         // effects
+        unsigned char  syseffnum;
+        unsigned char  inseffnum;
         EffectMgr *sysefx[NUM_SYS_EFX]; // system
         EffectMgr *insefx[NUM_INS_EFX]; // insertion
 
@@ -214,6 +218,7 @@ class SynthEngine : private SynthHelper, MiscFuncs, FileMgr
                 float vuRmsPeakL;
                 float vuRmsPeakR;
                 float parts[NUM_MIDI_PARTS];
+                float partsR[NUM_MIDI_PARTS];
                 int buffersize;
             } values;
             char bytes [sizeof(values)];

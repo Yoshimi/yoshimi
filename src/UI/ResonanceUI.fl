@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-Modified January 2019
+Modified April 2019
 } {selected in_source in_header
 }
 
@@ -470,7 +470,7 @@ class ResonanceUI {: PresetsUI_
               else
                   synth->getGuiMaster()->partui->padnoteui->padnotewindow->show();
           }}
-        xywh {700 285 74 16} box THIN_UP_BOX
+        tooltip {Right click: also reopen previous} xywh {700 285 74 16} box THIN_UP_BOX
       }
     }
   }

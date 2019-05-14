@@ -6,6 +6,7 @@ Y : 0 to 63 : 14 : 240 : 255 : 255 : 255 : 255 : 255 : Part number
 Y : 16, 32, 64 : 15 : 240 : 255 : 255 : 255 : 255 : 255 : Number of available parts
 YL : 0 to 127 : 32 : 240 : 255 : 255 : 255 : 128 : 255 : Detune frequency
 Y : -36 to 36 : 35 : 240 : 255 : 255 : 255 : 128 : 255 : Key shift
+Y : 0 / 1 : 36 : 240 : 255 : 255 : 255 : 255 : 255 : Mono/Stereo switch (master out only) - 1 = mono
 Y : 0 to 4 : 48 : 240 : 255 : 255 : 255 : 255 : 255 : Channel Switcher Type (Solo) - Off, Row, Column, Loop, TwoWay
 Y : 14 to 119 : 49 : 240 : 255 : 255 : 255 : 255 : 255 : Channel Switcher Incoming CC
 
@@ -19,14 +20,14 @@ Y : any : 88 : 240 : 255 : 255 : 255 : 128 : msg No. : Load named scale via misc
 Y : any : 89 : 240 : 255 : 255 : 255 : 128 : msg No. : Save named scale via miscMgs
 Y : any : 92 : 240 : 255 : 255 : 255 : 192 : msg No. : Load named state via miscMgs
 Y : any : 93 : 240 : 255 : 255 : 255 : 128 : msg No. : Save named state via miscMgs
-Y : any : 94 : 240 : 255 : 255 : 255 : 128 + 0 to 63: msg No. : Export PadSynth samples to named prefix via miscMsg
+Y : any : 94 : 240 : 0 to 15 : 255 : 0 to 63 : 128: msg No. : Export PadSynth samples to named prefix via miscMsg
 Y : any : 96 : 240 : 255 : 255 : 255 : 192 : 255 : Reset (clear all)
 Y : any : 97 : 240 : 255 : 255 : 255 : 192 : 255 : Reset including MIDI-learn
 Y : 1 to 31 : 104 : 240 : 255 : 255 : 255 : 128 : 255 : Create new numbered instance
 n : 1 to 31 : 105 : 240 : 255 : 255 : 255 : 128 : 255 : Close numbered instance
 Y : any : 128 : 240 : 255 : 255 : 255 : 255 : 255 : Stop
 
-Y : any : 200 : 240 : 0 to 63 : 255 : 255 : 255 : 255 : Read part peak level
+Y : any : 200 : 240 : 0 to 63 : 0/1 : 255 : 255 : 255 : Read part L/R peak level
 Y : any : 201 : 240 : 0/1 : 255 : 255 : 255 : 255 : Read main L/R peak level
 Y : any : 202 : 240 : 0/1 : 255 : 255 : 255 : 255 : Read main L/R RMS level
 
@@ -53,6 +54,8 @@ Y : 0/1 : 20 : 248 : 255 : 255 : 255 : 255 : 255 : Log XML headers
 Y : 0/1 : 21 : 248 : 255 : 255 : 255 : 255 : 255 : Include disabled data in XML files
 Y : 0/1 : 22 : 248 : 255 : 255 : 255 : 255 : 255 : Enable GUI
 Y : 0/1 : 23 : 248 : 255 : 255 : 255 : 255 : 255 : Enable CLI
+Y : 0/1 : 24 : 248 : 255 : 255 : 255 : 255 : 255 : Enable Auto instance
+Y : 0/1 : 25 : 248 : 255 : 255 : 255 : 255 : 255 : Enable singe master instance
 
 Y : any : 32 : 248 : 255 : 255 : 255 : 128 : msg No. : Jack MIDI source
 Y : 0/1 : 33 : 248 : 255 : 255 : 255 : 255 : 255 : Set as preferred MIDI
@@ -66,7 +69,7 @@ Y : any : 50 : 248 : 255 : 255 : 255 : 128 : msg No. : ALSA audio device
 Y : 0/1 : 51 : 248 : 255 : 255 : 255 : 255 : 255 : Set ALSA as preferred audio
 Y : 0 to 3 : 52 : 248 : 255 : 255 : 255 : 255 : 255 : ALSA sample rate – 192000, 96000, 48000, 44100
 
-Y : 0 to 119, other : 65 : 248 : 255 : 255 : 255 : 255 : 255 : Bank root CC – other = off
+Y : 0 32, other : 65 : 248 : 255 : 255 : 255 : 255 : 255 : Bank root CC – MSB, LSB, Off
 Y : 0, 32, other : 67 : 248 : 255 : 255 : 255 : 255 : 255 : Bank CC – MSB, LSB, Off
 Y : 0/1 : 68 : 248 : 255 : 255 : 255 : 255 : 255 : Enable program change
 Y : 0/1 : 69 : 248 : 255 : 255 : 255 : 255 : 255 : Enable part on program change

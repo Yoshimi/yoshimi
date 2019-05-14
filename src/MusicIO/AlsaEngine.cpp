@@ -17,12 +17,10 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified March 2019
+    Modified May 2019
 */
 
 #if defined(HAVE_ALSA)
-
-using namespace std;
 
 #include "Misc/Config.h"
 #include "Misc/SynthEngine.h"
@@ -175,17 +173,17 @@ void AlsaEngine::Close(void)
 }
 
 
-string AlsaEngine::audioClientName(void)
+std::string AlsaEngine::audioClientName(void)
 {
-    string name = "yoshimi";
+    std::string name = "yoshimi";
     if (!synth->getRuntime().nameTag.empty())
         name += ("-" + synth->getRuntime().nameTag);
     return name;
 }
 
-string AlsaEngine::midiClientName(void)
+std::string AlsaEngine::midiClientName(void)
 {
-    string name = "yoshimi";
+    std::string name = "yoshimi";
     if (!synth->getRuntime().nameTag.empty())
         name += ("-" + synth->getRuntime().nameTag);
     //Andrew Deryabin: for multi-instance support add unique id to
@@ -226,7 +224,7 @@ bool AlsaEngine::prepHwparams(void)
         {SND_PCM_FORMAT_UNKNOWN, 0, false, true}
     };
     int formidx;
-    string formattxt = "";
+    std::string formattxt = "";
     card_chans = 2; // got to start somewhere
 
     unsigned int ask_samplerate = audio.samplerate;
@@ -555,7 +553,7 @@ bool AlsaEngine::xrunRecover(void)
             if (!alsaBad(snd_pcm_prepare(audio.handle), "pcm prepare failed"))
                 isgood = true;
         synth->getRuntime().Log("Alsa xrun recovery "
-                    + ((isgood) ? string("good") : string("not good")));
+                    + ((isgood) ? std::string("good") : std::string("not good")));
     }
     return isgood;
 }
@@ -564,13 +562,13 @@ bool AlsaEngine::xrunRecover(void)
 bool AlsaEngine::Start(void)
 {
     if (NULL != midi.handle && !synth->getRuntime().startThread(&midi.pThread, _MidiThread,
-                                                    this, true, 1, false, "Alsa midi"))
+                                                    this, true, 1, "Alsa midi"))
     {
         synth->getRuntime().Log("Failed to start Alsa midi thread");
         goto bail_out;
     }
     if (NULL != audio.handle && !synth->getRuntime().startThread(&audio.pThread, _AudioThread,
-                                                     this, true, 0, false, "Alsa audio"))
+                                                     this, true, 0, "Alsa audio"))
     {
         synth->getRuntime().Log(" Failed to start Alsa audio thread");
         goto bail_out;
@@ -701,12 +699,12 @@ void *AlsaEngine::MidiThread(void)
 }
 
 
-bool AlsaEngine::alsaBad(int op_result, string err_msg)
+bool AlsaEngine::alsaBad(int op_result, std::string err_msg)
 {
     bool isbad = (op_result < 0);
     if (isbad)
         synth->getRuntime().Log("Error, alsa audio: " +err_msg + ": "
-                     + string(snd_strerror(op_result)));
+                     + std::string(snd_strerror(op_result)));
     return isbad;
 }
 

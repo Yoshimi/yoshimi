@@ -22,6 +22,7 @@ We now implement a build number. This is only bumped up when I push new commits 
 
 We won't normally accept fixes for spelling errors in the *code*
 For a start, from bitter experience it is fatally easy to change two variables to the same name! Also, there's no point, after all they are only a mnemonic for memory addresses etc. 'volume' and 'LFO' could just as well be 'turnyfing' and 'derfingwotwiggles'.
+
 Finally, some of these errors are in the identifier names of the saved XML files, and have been there since ZynAddSubFX Version 2.2.1 To change them would break all the instrument files that have been created since then.
 
 

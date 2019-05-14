@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2018, Will Godfrey
+    Copyright 2018-2019, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified February 2018
+    Modified March 2019
 */
 
 #ifndef ECHO_H
@@ -48,6 +48,7 @@ class Echo : public Effect
 
     private:
         // Parameters
+        bool Pchanged;
         unsigned char Pvolume;  // 1 Volume or Dry/Wetness
         unsigned char Pdelay;   // 3 Delay of the Echo
         unsigned char Plrdelay; // 4 L/R delay difference

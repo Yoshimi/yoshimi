@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2018, Will Godfrey
+    Copyright 2018-2019, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,11 +22,12 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified November 2018
+    Modified March 2019
 */
 
 #include "Misc/SynthEngine.h"
 #include "Effects/Echo.h"
+#include <iostream>
 
 static const int PRESET_SIZE = 7;
 static const int NUM_PRESETS = 9;
@@ -56,6 +57,7 @@ Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_, SynthEngine *_synt
     sethidamp(60);
     setpreset(Ppreset);
     changepar(4, 30); // lrcross
+    Pchanged = false;
     cleanup();
 }
 
@@ -213,11 +215,18 @@ void Echo::setpreset(unsigned char npreset)
         if (insertion && (param == 0))
             changepar(0, presets[preset][0] / 2);
     }
+    Pchanged = false;
 }
 
 
 void Echo::changepar(int npar, unsigned char value)
 {
+    if (npar == -1)
+    {
+        Pchanged = (value != 0);
+        return;
+    }
+    Pchanged = true;
     switch (npar)
     {
         case 0:
@@ -247,6 +256,8 @@ void Echo::changepar(int npar, unsigned char value)
         case 6:
             sethidamp(value);
             break;
+        default:
+            Pchanged = false;
     }
 }
 
@@ -255,6 +266,7 @@ unsigned char Echo::getpar(int npar)
 {
     switch (npar)
     {
+        case -1: return Pchanged;
         case 0: return Pvolume;
         case 1: return Ppanning;
         case 2: return Pdelay;

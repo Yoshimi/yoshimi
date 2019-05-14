@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified March 2019
+    Modified April 2019
 */
 
 #include <cstring>
@@ -115,7 +115,7 @@ void Part::defaults(void)
     Penabled = 0;
     Pminkey = 0;
     Pmaxkey = 127;
-    Pkeymode = 0; // poly
+    Pkeymode = PART_POLY;
     setVolume(96);
     TransVolume = 128; // ensure it always gets set
     Pkeyshift = 64;
@@ -128,6 +128,7 @@ void Part::defaults(void)
     Pkeylimit = 20;
     Pfrand = 0;
     PbreathControl = 2;
+    Peffnum = 0;
     legatoFading = 0;
     setDestination(1);
     busy = false;
@@ -251,7 +252,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
      * intemediate ones while going through a
      * legato fade between held and newest note.
      */
-    if (Pkeymode > 1 && legatoFading > 0)
+    if (Pkeymode > PART_MONO && legatoFading > 0)
         return;
     // Legato and MonoMem used vars:
     int posb = POLIPHONY - 1;     // Just a dummy initial value.
@@ -262,7 +263,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
     int lastnotecopy = lastnote;  // Useful after lastnote has been changed.
 
     // MonoMem stuff:
-    if (Pkeymode > 0) // if Poly is off
+    if (Pkeymode > PART_POLY) // if Poly is off
     {
         if (!renote)
             monomemnotes.push_back(note);        // Add note to the list.
@@ -288,7 +289,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
             break;
         }
     }
-    if (Pkeymode > 1 && !Pdrummode)
+    if (Pkeymode > PART_MONO && !Pdrummode)
     {
         // Legato mode is on and applicable.
         legatomodevalid = true;
@@ -324,7 +325,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
     else
     {
         // Legato mode is either off or non-applicable.
-        if ((Pkeymode & 3) == 1)
+        if ((Pkeymode & MIDI_NOT_LEGATO) == PART_MONO)
         {   // if the mode is 'mono' turn off all other notes
             for (int i = 0; i < POLIPHONY; ++i)
             {
@@ -379,7 +380,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
         // still held down or sustained for the Portamento to activate
         // (that's like Legato).
         int portamento = 0;
-        if (Pkeymode == 0 || !ismonofirstnote)
+        if (Pkeymode == PART_POLY || !ismonofirstnote)
         {
             // I added a third argument to the
             // ctl->initportamento(...) function to be able
@@ -699,7 +700,7 @@ void Part::NoteOff(int note) //release the key
         {
             if (!ctl->sustain.sustain)
             {   //the sustain pedal is not pushed
-                if (Pkeymode > 0  && !Pdrummode && !monomemnotes.empty())
+                if (Pkeymode > PART_POLY  && !Pdrummode && !monomemnotes.empty())
                     MonoMemRenote(); // To play most recent still held note.
                 else
                     ReleaseNotePos(i);
@@ -776,7 +777,7 @@ void Part::SetController(unsigned int type, int par)
             ReleaseSustainedKeys();
             setVolume(Pvolume);
             setPan(Ppanning);
-            Pkeymode &= 3; // clear temporary legato mode
+            Pkeymode &= MIDI_NOT_LEGATO; // clear temporary legato mode
             legatoFading = 0;
 
             for (int item = 0; item < NUM_KIT_ITEMS; ++item)
@@ -817,7 +818,7 @@ void Part::SetController(unsigned int type, int par)
 void Part::ReleaseSustainedKeys(void)
 {
     // Let's call MonoMemRenote() on some conditions:
-    if ((Pkeymode < 1 || Pkeymode > 2)&& (!monomemnotes.empty()))
+    if ((Pkeymode < PART_MONO || Pkeymode > PART_LEGATO) && (!monomemnotes.empty()))
         if (monomemnotes.back() != lastnote)
             // Sustain controller manipulation would cause repeated same note
             // respawn without this check.
@@ -913,7 +914,7 @@ void Part::setkeylimit(unsigned char Pkeylimit_)
     int keylimit = Pkeylimit;
 
     // release old keys if the number of notes>keylimit
-    if (Pkeymode == 0)
+    if (Pkeymode == PART_POLY)
     {
         int notecount = 0;
         for (int i = 0; i < POLIPHONY; ++i)
@@ -954,6 +955,8 @@ void Part::ComputePartSmps(void)
         memset(partfxinputl[nefx], 0, synth->sent_bufferbytes);
         memset(partfxinputr[nefx], 0, synth->sent_bufferbytes);
     }
+    //if (Pvolume < 0.001)
+        //return;
 
     for (k = 0; k < POLIPHONY; ++k)
     {
@@ -1263,8 +1266,8 @@ void Part::add2XML(XMLwrapper *xml, bool subset)
         xml->addpar("velocity_sensing", Pvelsns);
         xml->addpar("velocity_offset", Pveloffs);
     // the following two lines maintain backward compatibility
-        xml->addparbool("poly_mode", (Pkeymode & 3) == 0);
-        xml->addpar("legato_mode", (Pkeymode & 3) == 2);
+        xml->addparbool("poly_mode", (Pkeymode & MIDI_NOT_LEGATO) == PART_POLY);
+        xml->addpar("legato_mode", (Pkeymode & MIDI_NOT_LEGATO) == PART_LEGATO);
         xml->addpar("key_limit", Pkeylimit);
         xml->addpar("random_detune", Pfrand);
         xml->addpar("destination", Paudiodest);
@@ -1273,7 +1276,7 @@ void Part::add2XML(XMLwrapper *xml, bool subset)
     add2XMLinstrument(xml);
     if (subset)
     {
-        xml->addpar("key_mode", Pkeymode & 3);
+        xml->addpar("key_mode", Pkeymode & MIDI_NOT_LEGATO);
         xml->addpar("random_detune", Pfrand);
         xml->addparbool("breath_disable", PbreathControl != 2);
     }
@@ -1352,7 +1355,7 @@ int Part::loadXMLinstrument(string filename)
     getfromXMLinstrument(xml);
     if (hasYoshi)
     {
-        Pkeymode = xml->getpar("key_mode", Pkeymode, 0, 4);
+        Pkeymode = xml->getpar("key_mode", Pkeymode, PART_POLY, MIDI_LEGATO);
         Pfrand = xml->getpar127("random_detune", Pfrand);
         if (Pfrand > 50)
             Pfrand = 50;
@@ -1486,11 +1489,11 @@ void Part::getfromXML(XMLwrapper *xml)
     if (!Plegatomode)
         Plegatomode = xml->getpar127("legato_mode", Plegatomode);
     if (Plegatomode) // these lines are for backward compatibility
-        Pkeymode = 2;
+        Pkeymode = PART_LEGATO;
     else if (Ppolymode)
-        Pkeymode = 0;
+        Pkeymode = PART_POLY;
     else
-        Pkeymode = 1;
+        Pkeymode = PART_MONO;
 
     Pkeylimit = xml->getpar127("key_limit", Pkeylimit);
     if (Pkeylimit < 1)
@@ -1611,7 +1614,7 @@ float Part::getLimits(CommandBlock *getData)
 
         case PART::control::maxNotes:
             def = 20;
-            max = 60;
+            max = PART_POLIPHONY;
             break;
 
         case PART::control::keyShift:

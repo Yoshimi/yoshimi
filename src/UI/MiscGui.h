@@ -123,6 +123,7 @@ class GuiUpdates: public MiscFuncs{
 public:
     void read_updates(SynthEngine *synth);
 private:
+    void decode_envelope(SynthEngine *synth, CommandBlock *getData);
     void decode_updates(SynthEngine *synth, CommandBlock *getData);
 };
 

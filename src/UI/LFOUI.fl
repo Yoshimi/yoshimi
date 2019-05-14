@@ -11,7 +11,7 @@ comment {LFOUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009, Alan Calvert
-Copyright 2017-2018, Will Godfrey & others
+Copyright 2017-2019, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -28,8 +28,8 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
-Modified August 2018
-} {in_source in_header
+Modified March 2019
+} {selected in_source in_header
 }
 
 decl {\#include <iostream>} {public local
@@ -65,7 +65,7 @@ decl {\#include "Misc/SynthEngine.h"} {public global
 decl {\#include "MasterUI.h"} {private global
 }
 
-class LFOUI {selected : {public Fl_Group, PresetsUI_}
+class LFOUI {: {public Fl_Group, PresetsUI_}
 } {
   Function {LFOUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
@@ -204,7 +204,7 @@ pars=NULL;} {}
   }
   Function {refresh()} {} {
     code {//
-    freq->value(pars->Pfreq);
+    freq->value(pars->PfreqI / float(Fmul2I));
     intensity->value(pars->Pintensity);
     startphase->value(pars->Pstartphase);
     delay->value(pars->Pdelay);

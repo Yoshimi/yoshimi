@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2017-2018, Will Godfrey
+    Copyright 2017-2019, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,11 +22,13 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified July 2018
+    Modified May 2019
 */
 
 #ifndef LFO_PARAMS_H
 #define LFO_PARAMS_H
+
+#include <sys/types.h>
 
 #include "Misc/XMLwrapper.h"
 #include "Params/Presets.h"
@@ -43,9 +45,8 @@ class LFOParams : public Presets
 
         void add2XML(XMLwrapper *xml);
         void defaults(void);
+        void setPfreq(int32_t n);
         void getfromXML(XMLwrapper *xml);
-
-        void setPfreq(float n) { Pfreq = n; updated = true; }
         void setPintensity(unsigned char n) { Pintensity = n; updated = true; }
         void setPstartphase(unsigned char n) { Pstartphase = n; }
         void setPLFOtype(unsigned char n) { PLFOtype = n; updated = true; }
@@ -56,6 +57,7 @@ class LFOParams : public Presets
         void setPstretch(unsigned char n) { Pstretch = n; updated = true; }
 
         // MIDI Parameters
+        int32_t PfreqI;
         float Pfreq;
         unsigned char Pintensity;
         unsigned char Pstartphase;

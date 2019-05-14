@@ -17,10 +17,11 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>
 
-    Modifed January 2019
+    Modifed April 2019
 */
 
 //#define REPORT_MISCMSG
+// for testing message list leaks
 
 #include <sys/stat.h>
 #include <stdlib.h>
@@ -30,68 +31,66 @@
 #include <string.h>
 #include <limits.h>
 
-using namespace std;
-
 #include "Misc/MiscFuncs.h"
 
-string MiscFuncs::asString(int n)
+std::string MiscFuncs::asString(int n)
 {
-   ostringstream oss;
+   std::ostringstream oss;
    oss << n;
-   return string(oss.str());
+   return std::string(oss.str());
 }
 
 
-string MiscFuncs::asString(long long n)
+std::string MiscFuncs::asString(long long n)
 {
-   ostringstream oss;
+   std::ostringstream oss;
    oss << n;
-   return string(oss.str());
+   return std::string(oss.str());
 }
 
 
-string MiscFuncs::asString(unsigned long n)
+std::string MiscFuncs::asString(unsigned long n)
 {
-    ostringstream oss;
+    std::ostringstream oss;
     oss << n;
-    return string(oss.str());
+    return std::string(oss.str());
 }
 
 
-string MiscFuncs::asString(long n)
+std::string MiscFuncs::asString(long n)
 {
-   ostringstream oss;
+   std::ostringstream oss;
    oss << n;
-   return string(oss.str());
+   return std::string(oss.str());
 }
 
 
-string MiscFuncs::asString(unsigned int n, unsigned int width)
+std::string MiscFuncs::asString(unsigned int n, unsigned int width)
 {
-    ostringstream oss;
+    std::ostringstream oss;
     oss << n;
-    string val = string(oss.str());
+    std::string val = std::string(oss.str());
     if (width && val.size() < width)
     {
-        val = string("000000000") + val;
+        val = std::string("000000000") + val;
         return val.substr(val.size() - width);
     }
     return val;
 }
 
 
-string MiscFuncs::asString(unsigned char c)
+std::string MiscFuncs::asString(unsigned char c)
 {
-    ostringstream oss;
+    std::ostringstream oss;
     oss.width(1);
     oss << c;
     return oss.str();
 }
 
 
-string MiscFuncs::asString(float n)
+std::string MiscFuncs::asString(float n)
 {
-   ostringstream oss;
+   std::ostringstream oss;
    oss.precision(3);
    oss.width(3);
    oss << n;
@@ -99,9 +98,9 @@ string MiscFuncs::asString(float n)
 }
 
 
-string MiscFuncs::asLongString(float n)
+std::string MiscFuncs::asLongString(float n)
 {
-   ostringstream oss;
+   std::ostringstream oss;
    oss.precision(9);
    oss.width(9);
    oss << n;
@@ -109,31 +108,31 @@ string MiscFuncs::asLongString(float n)
 }
 
 
-string MiscFuncs::asHexString(int x)
+std::string MiscFuncs::asHexString(int x)
 {
-   ostringstream oss;
-   oss << hex << x;
-   string res = string(oss.str());
+   std::ostringstream oss;
+   oss << std::hex << x;
+   std::string res = std::string(oss.str());
    if (res.length() & 1)
        return "0"+res;
    return res;
 }
 
 
-string MiscFuncs::asHexString(unsigned int x)
+std::string MiscFuncs::asHexString(unsigned int x)
 {
-   ostringstream oss;
-   oss << hex << x;
-   string res = string(oss.str());
+   std::ostringstream oss;
+   oss << std::hex << x;
+   std::string res = std::string(oss.str());
    if (res.length() & 1)
        return "0"+res;
    return res;
 }
 
 
-string MiscFuncs::asAlignedString(int n, int len)
+std::string MiscFuncs::asAlignedString(int n, int len)
 {
-    string res = to_string(n);
+    std::string res = std::to_string(n);
     int size = res.length();
     if (size < len)
     {
@@ -144,27 +143,27 @@ string MiscFuncs::asAlignedString(int n, int len)
 }
 
 
-float MiscFuncs::string2float(string str)
+float MiscFuncs::string2float(std::string str)
 {
-    istringstream machine(str);
+    std::istringstream machine(str);
     float fval;
     machine >> fval;
     return fval;
 }
 
 
-double MiscFuncs::string2double(string str)
+double MiscFuncs::string2double(std::string str)
 {
-    istringstream machine(str);
+    std::istringstream machine(str);
     double dval;
     machine >> dval;
     return dval;
 }
 
 
-int MiscFuncs::string2int(string str)
+int MiscFuncs::string2int(std::string str)
 {
-    istringstream machine(str);
+    std::istringstream machine(str);
     int intval;
     machine >> intval;
     return intval;
@@ -172,9 +171,9 @@ int MiscFuncs::string2int(string str)
 
 
 // ensures MIDI compatible numbers without errors
-int MiscFuncs::string2int127(string str)
+int MiscFuncs::string2int127(std::string str)
 {
-    istringstream machine(str);
+    std::istringstream machine(str);
     int intval;
     machine >> intval;
     if (intval < 0)
@@ -185,26 +184,26 @@ int MiscFuncs::string2int127(string str)
 }
 
 
-unsigned int MiscFuncs::string2uint(string str)
+unsigned int MiscFuncs::string2uint(std::string str)
 {
-    istringstream machine(str);
+    std::istringstream machine(str);
     unsigned int intval;
     machine >> intval;
     return intval;
 }
 
 
-int MiscFuncs::stringNumInList(string toFind, string *listname, int convert)
+int MiscFuncs::stringNumInList(std::string toFind, std::string *listname, int convert)
 {
-    string copy = "";
+    std::string copy = "";
     switch (convert)
     {
         case -1:
-            for (string::size_type i = 0; i < toFind.length(); ++i)
+            for (std::string::size_type i = 0; i < toFind.length(); ++i)
                 copy += (char) tolower(toFind[i]);
             break;
         case 1:
-            for (string::size_type i = 0; i < toFind.length(); ++i)
+            for (std::string::size_type i = 0; i < toFind.length(); ++i)
                 copy+= (char) toupper(toFind[i]);
             break;
         default:
@@ -212,7 +211,7 @@ int MiscFuncs::stringNumInList(string toFind, string *listname, int convert)
             break; // change nothing
     }
     int count = -1;
-    string name;
+    std::string name;
     bool found = false;
     do
     {
@@ -229,7 +228,7 @@ int MiscFuncs::stringNumInList(string toFind, string *listname, int convert)
 
 
 // This is never called !
-bool MiscFuncs::isFifo(string chkpath)
+bool MiscFuncs::isFifo(std::string chkpath)
 {
     struct stat st;
     if (!stat(chkpath.c_str(), &st))
@@ -240,7 +239,7 @@ bool MiscFuncs::isFifo(string chkpath)
 
 
 // this is not actualy a file operation so stays here
-int MiscFuncs::findSplitPoint(string name)
+int MiscFuncs::findSplitPoint(std::string name)
 {
     unsigned int chk = 0;
     char ch = name.at(chk);
@@ -301,7 +300,7 @@ bool MiscFuncs::matchnMove(int num , char *&pnt, const char *word)
 }
 
 
-string MiscFuncs::lineInText(string text, size_t &point)
+std::string MiscFuncs::lineInText(std::string text, size_t &point)
 {
     size_t len = text.length();
     if (point >= len - 1)
@@ -309,15 +308,15 @@ string MiscFuncs::lineInText(string text, size_t &point)
     size_t it = 0;
     while (it < len - point && text.at(point + it) >= ' ')
         ++it;
-    string line = text.substr(point, it);
+    std::string line = text.substr(point, it);
     point += (it + 1);
     return line;
 }
 
 
-void MiscFuncs::C_lineInText(string text, size_t &point, char *line)
+void MiscFuncs::C_lineInText(std::string text, size_t &point, char *line)
 {
-    string found = lineInText(text, point);
+    std::string found = lineInText(text, point);
     if (found == "")
         line[0] = 0;
     else
@@ -345,14 +344,21 @@ void MiscFuncs::miscMsgInit()
     // we use 255 to denote an invalid entry
 }
 
-int MiscFuncs::miscMsgPush(string _text)
+void MiscFuncs::miscMsgClear()
+{ // catches messge leaks - shirley knot :@)
+    std::list<std::string>::iterator it = miscList.begin();
+    for (it = miscList.begin(); it != miscList.end(); ++it)
+        *it = "";
+}
+
+int MiscFuncs::miscMsgPush(std::string _text)
 {
     if (_text.empty())
         return NO_MSG;
     sem_wait(&miscmsglock);
 
-    string text = _text;
-    list<string>::iterator it = miscList.begin();
+    std::string text = _text;
+    std::list<std::string>::iterator it = miscList.begin();
     int idx = 0;
 
     while(it != miscList.end())
@@ -361,7 +367,7 @@ int MiscFuncs::miscMsgPush(string _text)
         {
             *it = text;
 #ifdef REPORT_MISCMSG
-            cout << "Msg In " << int(idx) << " >" << text << "<" << endl;
+            std::cout << "Msg In " << int(idx) << " >" << text << "<" << std::endl;
 #endif
             break;
         }
@@ -370,7 +376,7 @@ int MiscFuncs::miscMsgPush(string _text)
     }
     if (it == miscList.end())
     {
-        cerr << "miscMsg list full :(" << endl;
+        std::cerr << "miscMsg list full :(" << std::endl;
         idx = -1;
     }
 
@@ -380,14 +386,14 @@ int MiscFuncs::miscMsgPush(string _text)
 }
 
 
-string MiscFuncs::miscMsgPop(int _pos)
+std::string MiscFuncs::miscMsgPop(int _pos)
 {
     if (_pos >= NO_MSG)
         return "";
     sem_wait(&miscmsglock);
 
     int pos = _pos;
-    list<string>::iterator it = miscList.begin();
+    std::list<std::string>::iterator it = miscList.begin();
     int idx = 0;
 
     while(it != miscList.end())
@@ -395,14 +401,14 @@ string MiscFuncs::miscMsgPop(int _pos)
         if (idx == pos)
         {
 #ifdef REPORT_MISCMSG
-            cout << "Msg Out " << int(idx) << " >" << *it << "<" << endl;
+            std::cout << "Msg Out " << int(idx) << " >" << *it << "<" << std::endl;
 #endif
             break;
         }
         ++ it;
         ++ idx;
     }
-    string result = "";
+    std::string result = "";
     if (idx == pos)
     {
         swap (result, *it); // in case of a new entry before return

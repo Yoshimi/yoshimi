@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2017-2018, Will Godfrey
+    Copyright 2017-2019, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,13 +22,15 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified July 2018
+    Modified May 2019
 */
 
+#include <sys/types.h>
 #include <cmath>
 
 #include "Params/LFOParams.h"
 
+//#include <iostream>
 //int LFOParams::time = 0;
 
 LFOParams::LFOParams(float Pfreq_, unsigned char Pintensity_,
@@ -64,7 +66,7 @@ LFOParams::LFOParams(float Pfreq_, unsigned char Pintensity_,
 
 void LFOParams::defaults(void)
 {
-    Pfreq = Dfreq / 127.0f;
+    setPfreq(Dfreq << Cshift2I);
     Pintensity = Dintensity;
     Pstartphase = Dstartphase;
     PLFOtype = DLFOtype;
@@ -76,9 +78,19 @@ void LFOParams::defaults(void)
 }
 
 
+void LFOParams::setPfreq(int32_t n)
+{
+
+    PfreqI = n;
+    Pfreq = (powf(2.0f, (float(n) / float(Fmul2I)) * 10.0f) - 1.0f) / 12.0f;
+    updated = true;
+}
+
+
 void LFOParams::add2XML(XMLwrapper *xml)
 {
-    xml->addparreal("freq", Pfreq);
+    xml->addpar("freqI", PfreqI);
+    xml->addparreal("freq", float(PfreqI) / Fmul2I);
     xml->addpar("intensity", Pintensity);
     xml->addpar("start_phase", Pstartphase);
     xml->addpar("lfo_type", PLFOtype);
@@ -92,7 +104,11 @@ void LFOParams::add2XML(XMLwrapper *xml)
 
 void LFOParams::getfromXML(XMLwrapper *xml)
 {
-    Pfreq = xml->getparreal("freq", Pfreq, 0.0, 1.0);
+    //PfreqI = xml->getpar("freqI", -1, 0, Fmul2I);
+    //if (PfreqI == -1)
+    PfreqI = xml->getparreal("freq", Pfreq, 0.0, 1.0) * Fmul2I;
+    setPfreq(PfreqI);
+
     Pintensity = xml->getpar127("intensity", Pintensity);
     Pstartphase = xml->getpar127("start_phase", Pstartphase);
     PLFOtype = xml->getpar127("lfo_type", PLFOtype);

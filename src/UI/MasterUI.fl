@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified February 2019} {selected in_source in_header
+Modified May 2019} {selected in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -178,6 +178,8 @@ class MasterUI {: {private GuiUpdates, FileMgr}
           yoshiLog->Hide();
           delete yoshiLog;
       }
+      //if (instance == 0)
+          //Fl::unlock();
       delete masterwindow;} {}
   }
   Function {Init(const char *_label)} {} {
@@ -249,7 +251,13 @@ class MasterUI {: {private GuiUpdates, FileMgr}
           //partui->instrumentkitlist->show();
       //if (partfxO)
           //partui->partfx->show();
-      if (synth->getRuntime().oldConfig)
+      if (NewWindows)
+      {
+          words->copy_label("As this is a first time start, please check 'Yoshimi->Settings' then save and restart. More information can be found in the manual.");
+          message->show();
+          message->position(masterwindow->x() + 36, masterwindow->y() + 170);
+      }
+      else if (synth->getRuntime().oldConfig)
       {
           string msg;
           msg = "Existing config older than V " + to_string(MIN_CONFIG_MAJOR) + "." + to_string(MIN_CONFIG_MINOR) + " \\nCheck settings, save and restart.";
@@ -283,7 +291,7 @@ class MasterUI {: {private GuiUpdates, FileMgr}
       {
           synth->guiClosed(true);
       }}
-      xywh {300 438 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
+      xywh {231 433 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Box {} {
         xywh {279 28 103 85} box ENGRAVED_FRAME
@@ -340,7 +348,10 @@ class MasterUI {: {private GuiUpdates, FileMgr}
           MenuItem {} {
             label {&View Manual}
             callback {//
-            send_data(100, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
+            words->copy_label("Searching for the manual.");
+          message->show();
+          message->position(masterwindow->x() + 36, masterwindow->y() + 170);
+            send_data(MAIN::control::openManualPDF, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
             return;}
             xywh {0 0 34 20} labelsize 12
           }
@@ -867,9 +878,26 @@ paramsui->Show(XML_MICROTONAL);}
           code0 {o->init(-1, synth);}
           class VUMeter
         }
+        Fl_Button {} {
+          callback {vumeter->init(-1, synth);}
+          tooltip {Click here to clear VU peak reading and overload warning.} xywh {5 430 376 30} box NO_BOX
+        }
+      }
+      Fl_Button mastermono {
+        label S
+        callback {//
+        int tmp = 1 -  o->value();
+	o->value(tmp);
+	if (tmp == 0)
+	    o->label("S");
+	else
+	    o->label("M");
+        send_data(MAIN::control::mono,  tmp, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
+        tooltip {Master Mono/Stereo switch} xywh {285 88 23 20} box PLASTIC_UP_BOX color 228 selection_color 130 labelfont 1 labelsize 11
+        code0 {o->value(synth->masterMono);}
       }
       Fl_Spinner masterkeyshift {
-        label {Key Shift}
+        label Shift
         callback {//
         send_data(MAIN::control::keyShift, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);}
         tooltip {Shift pitch +/- N semitones} xywh {336 88 38 20} labelsize 10 minimum -36 maximum 36 textsize 10
@@ -897,14 +925,8 @@ paramsui->Show(XML_MICROTONAL);}
                 tmp = 64;
             else
                 tmp = 32;
-            o->value(tmp);
         }
-        partmax = tmp;
-        updatepart();
-        updatepanel();
-        setinspartlist();
-        vectorui->checkParts(tmp);
-        send_data(MAIN::control::availableParts, tmp, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
+        send_data(MAIN::control::availableParts, tmp, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main);}
         tooltip {Set the number of available parts} xywh {93 264 40 20} labelsize 11 minimum 16 maximum 64 step 16 value 16 textsize 11
         code0 {o->value(partmax);}
       }
@@ -1223,6 +1245,11 @@ Nikita Zlobin
 
         collect_data(synth, value, type, control, part, UNUSED, engine, insert, parameter, par2);} {}
   }
+  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED, int request = UNUSED)} {return_type float
+  } {
+    code {//
+        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, par2, request);} {}
+  }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
@@ -1345,7 +1372,6 @@ Nikita Zlobin
                             }
                             else
                                 partui->keymode->value(mode);
-                            //partui->keymode->damage(1);
                             break;
                         }
                         case MIDI::CC::filterQ:
@@ -1392,6 +1418,8 @@ Nikita Zlobin
                 nsyseff = engine;
                 sysefftype->value(synth->sysefx[nsyseff]->geteffect());
                 syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
+                syseffectui->UpdatePresetColour(parameter, sysefftype->value());
+
             }
             else if (control == EFFECT::sysIns::effectType)
             {
@@ -1399,6 +1427,7 @@ Nikita Zlobin
                 nsyseff = engine;
                 sysefftype->value(value_int);
                 syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
+                syseffectui->UpdatePresetColour(parameter, sysefftype->value());
                 showSysEfxUI();
             }
         }
@@ -1411,6 +1440,8 @@ Nikita Zlobin
             ninseff = engine;
             setInsEff(ninseff);
             showInsEfxUI();
+            inseffectui->UpdatePresetColour(parameter, insefftype->value());
+
         }
         else if (control == EFFECT::sysIns::effectType)
         {
@@ -1418,6 +1449,7 @@ Nikita Zlobin
             ninseff = engine;
             insefftype->value(value_int);
             setInsEff(ninseff);
+            inseffectui->UpdatePresetColour(parameter, insefftype->value());
             showInsEfxUI();
         }
         else if (control == EFFECT::sysIns::effectDestination)
@@ -1476,6 +1508,15 @@ Nikita Zlobin
         case MAIN::control::keyShift:
             masterkeyshift->value(value_int);
             break;
+
+        case MAIN::control::mono:
+            mastermono->value(value_int);
+            if (value_int)
+                mastermono->label("M");
+            else
+                mastermono->label("S");
+            break;
+
 
         case MAIN::control::soloType:
             channelswitch->value(value_int);
@@ -1712,6 +1753,7 @@ Nikita Zlobin
             break;
 
         case MAIN::control::openManualPDF:
+            message->hide();
             if (par2 != NO_MSG)
                 fl_alert("%s", miscMsgPop(par2).c_str());
             break;
@@ -1851,7 +1893,7 @@ Nikita Zlobin
     partui->maxkcounter->value(synth->part[npart]->Pmaxkey);
     partui->enportamento->value(synth->part[npart]->ctl->portamento.portamento);
 
-    partui->keymode->value(synth->part[npart]->Pkeymode & 3);
+    partui->keymode->value(synth->part[npart]->Pkeymode & MIDI_NOT_LEGATO);
 
     maxparts->value(partmax);
     maxparts->redraw();
@@ -2005,7 +2047,7 @@ Nikita Zlobin
     }
     else
         fname = file;
-    // RecentScale->activate();
+
     send_data(MAIN::control::saveNamedPatchset, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(fname)));} {}
   }
   Function {refresh_master_ui(int type)} {} {
@@ -2031,6 +2073,27 @@ Nikita Zlobin
     setInsEff(ninseff);
 
     sysinsgroup->value(SystemEffectsGrp);
+
+
+
+
+    bool status;
+    int efftype = fetchData(0, EFFECT::sysIns::effectType, 241, UNUSED, 0);
+    if (efftype > 0)
+    {
+        status = fetchData(0, 200, TOPLEVEL::section::systemEffects, efftype + EFFECT::type::none, ninseff);
+        syseffectui->UpdatePresetColour(status, sysefftype->value());
+    }
+    efftype = fetchData(0,EFFECT::sysIns::effectType, 242, UNUSED, 0);
+    if (efftype > 0)
+    {
+        status = fetchData(0, 200, TOPLEVEL::section::insertEffects, efftype + EFFECT::type::none, ninseff);
+        inseffectui->UpdatePresetColour(status, insefftype->value());
+    }
+
+
+
+
     showSysEfxUI();
 
     masterkeyshift->value(synth->Pkeyshift - 64);
@@ -2048,6 +2111,8 @@ Nikita Zlobin
         Reports->deactivate();
     else
         Reports->activate();
+    mastermono->value(0);
+    mastermono->label("S");
     if (type == 0x14)
     {
         for (int i = 1; i < 6; ++i)
@@ -2566,8 +2631,7 @@ Nikita Zlobin
                   + asString(O) + "\\n";
     fputs(tosend.c_str(), windows);} {}
   }
-  Function {checkBuffer(void)} {open
-  } {
+  Function {checkBuffer(void)} {} {
     code {//
 read_updates(synth);} {}
   }
@@ -2591,7 +2655,7 @@ read_updates(synth);} {}
   }
   decl {int activePart;} {public local
   }
-  decl {int nsyseff;} {private local
+  decl {int nsyseff;} {public local
   }
   decl {int partmax;} {
     comment {This is only public for vector control} public local

@@ -1,0 +1,29 @@
+V 1.5.10 Redwing
+An international singer
+
+Once again we concentrate mainly on the command line with the completion of all editor controls, and a greatly expanded and more intuitive help system.
+
+The command line script option now has a 'WAIT' command that can be used where a buffered command is followed by a related but unbuffered one.
+
+
+For the graphical interface we've tidied up a few loose ends, and also resolved the confusing situation where inactive controls where shown as active, leading people to wonder why they didn't seem to do anything. These are now correctly shown as inactive until such times as the appropriate selection activates them.
+
+Very occasionally the display used to show a corrupted window. The cause of this has now been found and resolved.
+
+
+Under the hood, we've revised the pseudo-random number generators to give them better performance and full portability. We've also added the ability to completely disable them for test purposes.
+
+For those interested in the details, there is now a new file '/src/Misc/RandomGen.h' where the type of PRNG is defined. There is the possibility here to change to more compact and faster routine, but be aware that this will produce very subtle differences in complex instruments.
+
+As one of Yoshimi's little band of helpers said:
+"Random numbers are too important to be left to chance!"
+
+
+Another of Yoshimi's little band of helpers has kindly provided us with a very nice classical-style composition so the 'examples' directory now has the state file and Rosegarden file for this, along with a brief explanatory note: 'synth_prelude_0.txt'.
+
+There are three new instrument patches in 'Will Godfrey Collection' these are:
+'Echo Mulitmod'
+'Multi Rushes'
+'Cathedral Pipe Organ'
+
+Finally, the documentation has been updated, including the comprehensive 'Yoshimi Advanced User Manual'.

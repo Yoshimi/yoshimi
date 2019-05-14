@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified January 2019
+    Modified March 2019
 */
 
 #include <fftw3.h>
@@ -152,33 +152,19 @@ unsigned char EffectMgr::getpreset(void)
 
 
 // Change the preset of the current effect
-void EffectMgr::changepreset_nolock(unsigned char npreset)
+void EffectMgr::changepreset(unsigned char npreset)
 {
     if (efx)
         efx->setpreset(npreset);
 }
 
 
-// Change the preset of the current effect(with thread locking)
-void EffectMgr::changepreset(unsigned char npreset)
-{
-    changepreset_nolock(npreset);
-}
-
-
 // Change a parameter of the current effect
-void EffectMgr::seteffectpar_nolock(int npar, unsigned char value)
+void EffectMgr::seteffectpar(int npar, unsigned char value)
 {
     if (!efx)
         return;
     efx->changepar(npar, value);
-}
-
-
-// Change a parameter of the current effect (with thread locking)
-void EffectMgr::seteffectpar(int npar, unsigned char value)
-{
-    seteffectpar_nolock(npar, value);
 }
 
 
@@ -314,19 +300,27 @@ void EffectMgr::getfromXML(XMLwrapper *xml)
     changeeffect(xml->getpar127("type", geteffect()));
     if (!efx || !geteffect())
         return;
-    efx->Ppreset = xml->getpar127("preset", efx->Ppreset);
+    changepreset(xml->getpar127("preset", efx->Ppreset));
 
+    bool isChanged = false;
     if (xml->enterbranch("EFFECT_PARAMETERS"))
     {
         for (int n = 0; n < 128; ++n)
         {
-            seteffectpar_nolock(n, 0); // erase effect parameter
+            int par = geteffectpar(n); // find default
+            seteffectpar(n, 0); // erase effect parameter
             if (xml->enterbranch("par_no", n) == 0)
                 continue;
-            int par = geteffectpar(n);
-            seteffectpar_nolock(n, xml->getpar127("par", par));
+            seteffectpar(n, xml->getpar127("par", par));
+            if (par != geteffectpar(n))
+            {
+                isChanged = true;
+                //cout << "changed par " << n << endl;
+                //may use this later to ID
+            }
             xml->exitbranch();
         }
+        seteffectpar(-1, isChanged);
         if (filterpars)
         {
             if (xml->enterbranch("FILTER"))
@@ -336,6 +330,8 @@ void EffectMgr::getfromXML(XMLwrapper *xml)
             }
         }
         xml->exitbranch();
+        //if(geteffectpar(-1))
+            //cout << "Some pars changed" << endl;
     }
     cleanup();
 }

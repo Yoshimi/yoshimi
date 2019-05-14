@@ -11,7 +11,7 @@ comment {SubNoteUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2015-2018, Will Godfrey & others
+Copyright 2015-2019, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-Modified October 2018} {selected in_source in_header
+Modified April 2019} {selected in_source in_header
 }
 
 decl {\#include "UI/MiscGui.h"} {public local
@@ -123,13 +123,13 @@ class SUBnoteharmonic {: {public Fl_Group}
       }
       Fl_Box {} {
         label 01
-        xywh {0 285 12 15} labelfont 1 labelsize 9 align 16
-        code0 {char tmp[10];snprintf(tmp,10,"%d",n+1);o->label(strdup(tmp));}
+        xywh {0 285 12 15} labelfont 1 labelsize 12 align 16
+        code0 {char tmp[12];snprintf(tmp,12,"%d",n+1);o->label(strdup(tmp));}
       }
       Fl_Box {} {
         label 01
-        xywh {0 0 12 15} labelfont 1 labelsize 9 align 16
-        code0 {char tmp[10];snprintf(tmp,10,"%d",n+1);o->label(strdup(tmp));}
+        xywh {0 0 12 15} labelfont 1 labelsize 12 align 16
+        code0 {char tmp[12];snprintf(tmp,12,"%d",n+1);o->label(strdup(tmp));}
       }
     }
   }
@@ -207,7 +207,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
             else
                 synth->getGuiMaster()->partui->instrumenteditwindow->show();
         }}
-        xywh {625 446 105 20} box THIN_UP_BOX labelfont 1 labelsize 11
+        tooltip {Right click: also reopen previous} xywh {625 446 105 20} box THIN_UP_BOX labelfont 1 labelsize 11
       }
       Fl_Group {} {
         label AMPLITUDE

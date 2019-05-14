@@ -23,9 +23,10 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified February 2019
+    Modified May 2019
 */
 
+#include <sys/types.h>
 #include <iostream>
 #include <fenv.h>
 #include <errno.h>
@@ -565,7 +566,10 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
     showSplash = xml->getparbool("enable_splash", showSplash);
     showCLI = xml->getparbool("enable_CLI", showCLI);
     autoInstance = xml->getparbool("enable_auto_instance", autoInstance);
-    activeInstance = xml->getparU("active_instances", 0);
+    if (autoInstance)
+        activeInstance = xml->getparU("active_instances", 0);
+    else
+        activeInstance = 1;
     showCLIcontext = xml->getpar("show_CLI_context", 1, 0, 2);
     xml->exitbranch(); // BaseParameters
     return true;
@@ -891,7 +895,7 @@ void Config::setRtprio(int prio)
 
 // general thread start service
 bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
-                         bool schedfifo, char priodec, bool create_detached, string name)
+                         bool schedfifo, char priodec, string name)
 {
     pthread_attr_t attr;
     int chk;
@@ -901,60 +905,51 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
     {
         if (!(chk = pthread_attr_init(&attr)))
         {
-            if (create_detached)
+
+            if (schedfifo)
             {
-               chk = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-            }
-            if (!chk)
-            {
-                if (schedfifo)
+                if ((chk = pthread_attr_setschedpolicy(&attr, SCHED_FIFO)))
                 {
-                    if ((chk = pthread_attr_setschedpolicy(&attr, SCHED_FIFO)))
-                    {
-                        Log("Failed to set SCHED_FIFO policy in thread attribute "
-                                    + string(strerror(errno))
-                                    + " (" + asString(chk) + ")", 1);
-                        schedfifo = false;
-                        continue;
-                    }
-                    if ((chk = pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED)))
-                    {
-                        Log("Failed to set inherit scheduler thread attribute "
-                                    + string(strerror(errno)) + " ("
-                                    + asString(chk) + ")", 1);
-                        schedfifo = false;
-                        continue;
-                    }
-                    sched_param prio_params;
-                    int prio = rtprio - priodec;
-                    if (prio < 1)
-                        prio = 1;
-                    Log(name + " priority is " + to_string(prio), 1);
-                    prio_params.sched_priority = prio;
-                    if ((chk = pthread_attr_setschedparam(&attr, &prio_params)))
-                    {
-                        Log("Failed to set thread priority attribute ("
-                                    + asString(chk) + ")  ", 3);
-                        schedfifo = false;
-                        continue;
-                    }
-                }
-                if (!(chk = pthread_create(pth, &attr, thread_fn, arg)))
-                {
-                    outcome = true;
-                    break;
-                }
-                else if (schedfifo)
-                {
+                    Log("Failed to set SCHED_FIFO policy in thread attribute "
+                                + string(strerror(errno))
+                                + " (" + asString(chk) + ")", 1);
                     schedfifo = false;
                     continue;
                 }
-                outcome = false;
+                if ((chk = pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED)))
+                {
+                    Log("Failed to set inherit scheduler thread attribute "
+                                + string(strerror(errno)) + " ("
+                                + asString(chk) + ")", 1);
+                    schedfifo = false;
+                    continue;
+                }
+                sched_param prio_params;
+                int prio = rtprio - priodec;
+                if (prio < 1)
+                    prio = 1;
+                Log(name + " priority is " + to_string(prio), 1);
+                prio_params.sched_priority = prio;
+                if ((chk = pthread_attr_setschedparam(&attr, &prio_params)))
+                {
+                    Log("Failed to set thread priority attribute ("
+                                + asString(chk) + ")  ", 3);
+                    schedfifo = false;
+                    continue;
+                }
+            }
+            if (!(chk = pthread_create(pth, &attr, thread_fn, arg)))
+            {
+                outcome = true;
                 break;
             }
-            else
-                Log("Failed to set thread detach state " + asString(chk), 1);
-            pthread_attr_destroy(&attr);
+            else if (schedfifo)
+            {
+                schedfifo = false;
+                continue;
+            }
+            outcome = false;
+            break;
         }
         else
             Log("Failed to initialise thread attributes " + asString(chk), 1);

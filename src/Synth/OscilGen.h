@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2017-2018 Will Godfrey & others.
+    Copyright 2017-2019 Will Godfrey & others.
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,12 +22,13 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified December 2018
+    Modified May 2019
 */
 
 #ifndef OSCIL_GEN_H
 #define OSCIL_GEN_H
 
+#include <sys/types.h>
 #include <limits.h>
 
 #include "Misc/RandomGen.h"
@@ -47,11 +48,14 @@ class OscilGen : public Presets, private WaveShapeSamples
 
         void prepare();
 
-        int get(float *smps, float freqHz);
+        void get(float *smps, float freqHz);
         // returns where should I start getting samples, used in block type randomness
 
-        int get(float *smps, float freqHz, int resonance);
+        void get(float *smps, float freqHz, int resonance);
         // if freqHz is smaller than 0, return the "un-randomized" sample for UI
+
+        // Get just the phase of the oscillator.
+        int getPhase();
 
         void getbasefunction(float *smps);
 

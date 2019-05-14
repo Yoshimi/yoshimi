@@ -9,6 +9,6 @@ To clear clip and peak level indication click on this area.
 As well as the peak level, the display shows a much slower responding RMS level, as a yellow line on top of the blue bar. This gives and indication of the apparent accoustic power.
 
 
-If you open the panel window you will see vertical bargraphs for each individual part. On these, the faint bars are 5dB steps and the bright ones 10dB. The peak leve isn't shown numerically, but if you exceed 0dB a thick red line will appear at the top of the bargraph. This is also cleared from the box in the main window.
+If you open the panel window you will see vertical bargraphs for each individual part. On these, the faint bars are 5dB steps and the bright ones 10dB. The peak level isn't shown numerically, but if you exceed 0dB a thick red line will appear at the top of the bargraph. This is also cleared from the box in the main window.
 
 {more}

@@ -2,7 +2,7 @@
     MusicClient.h
 
     Copyright 2009-2011, Alan Calvert
-    Copyright 2016-2018, Will Godfrey & others
+    Copyright 2016-2019, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified September 2018
+    Modified May 2019
 */
 
 #include "MusicIO/MusicClient.h"
@@ -29,12 +29,12 @@
 #include <set>
 #include <unistd.h>
 
-string audio_drivers_str [] = {"no_audio", "jack_audio"
+std::string audio_drivers_str [] = {"no_audio", "jack_audio"
 #if defined(HAVE_ALSA)
                                , "alsa_audio"
 #endif
                               };
-string midi_drivers_str [] = {"no_midi", "jack_midi"
+std::string midi_drivers_str [] = {"no_midi", "jack_midi"
 #if defined(HAVE_ALSA)
                               , "alsa_midi"
 #endif
@@ -225,7 +225,7 @@ bool MusicClient::Start()
         {
             return true;
         }
-        bAudio = synth->getRuntime().startThread(&timerThreadId, MusicClient::timerThread_fn, this, false, 0, false, "Timer?");
+        bAudio = synth->getRuntime().startThread(&timerThreadId, MusicClient::timerThread_fn, this, false, 0, "Timer?");
     }
 
     if(midiIO)
@@ -280,7 +280,7 @@ int MusicClient::getBuffersize()
 }
 
 
-string MusicClient::audioClientName()
+std::string MusicClient::audioClientName()
 {
     if(audioIO)
     {
@@ -291,7 +291,7 @@ string MusicClient::audioClientName()
 }
 
 
-string MusicClient::midiClientName()
+std::string MusicClient::midiClientName()
 {
     if(midiIO)
     {

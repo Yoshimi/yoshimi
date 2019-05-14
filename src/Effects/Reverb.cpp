@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2018, Will Godfrey
+    Copyright 2018-2019, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified December 2018
+    Modified April 2019
 */
 
 #include <cmath>
@@ -110,6 +110,7 @@ Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_
         ap[i] = NULL;
     }
     setpreset(Ppreset);
+    Pchanged = false;
     cleanup(); // do not call this before the comb initialisation
 }
 
@@ -455,11 +456,15 @@ void Reverb::settype(unsigned char Ptype_)
         bandwidth = new Unison(synth->buffersize / 4 + 1, 2.0f, synth);
         bandwidth->setSize(50);
         bandwidth->setBaseFrequency(1.0f);
-#pragma message "sa schimb size-ul"
+        /* This block is kept as it's a bit of Cal's humour :)
+         *
+#warning sa schimb size-ul
         //the size of the unison buffer may be too small, though this has
         //not been verified yet.
         //As this cannot be resized in a RT context, a good upper bound should
         //be found
+        *
+        */
     }
     settime(Ptime);
     cleanup();
@@ -511,11 +516,17 @@ void Reverb::setpreset(unsigned char npreset)
         if (insertion && (param == 0))
             changepar(0, presets[preset][0] / 2);
     }
+    Pchanged = false;
 }
 
 
 void Reverb::changepar(int npar, unsigned char value)
 {
+    if (npar == -1)
+    {
+        Pchanged = (value != 0);
+        return;
+    }
     switch (npar)
     {
         case 0:
@@ -556,6 +567,7 @@ void Reverb::changepar(int npar, unsigned char value)
             setbandwidth(value);
             break;
     }
+    Pchanged = true;
 }
 
 
@@ -563,6 +575,7 @@ unsigned char Reverb::getpar(int npar)
 {
     switch (npar)
     {
+        case -1: return Pchanged;
         case 0:  return Pvolume;
         case 1:  return Ppanning;
         case 2:  return Ptime;

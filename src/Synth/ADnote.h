@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2017, Will Godfrey & others
+    Copyright 2014-2019, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is a derivative of a ZynAddSubFX original
-    Modified September 2017
+    Modified May 2019
 */
 
 #ifndef AD_NOTE_H
@@ -50,7 +50,10 @@ class ADnote : private SynthHelper, private Float2Int
     public:
         ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_, float velocity_,
                int portamento_, int midinote_, bool besilent, SynthEngine *_synth);
+        ADnote(ADnote *parent, float freq_, int subVoiceNumber_, float *parentFMmod_);
         ~ADnote();
+
+        void construct();
 
         int noteout(float *outl, float *outr);
         void releasekey();
@@ -61,26 +64,41 @@ class ADnote : private SynthHelper, private Float2Int
 
     private:
 
-        void setfreq(int nvoice, float in_freq);
-        void setfreqFM(int nvoice, float in_freq);
+        void setfreq(int nvoice, float in_freq, float pitchdetune);
+        void setfreqFM(int nvoice, float in_freq, float pitchdetune);
+        void setPitchDetuneFromParent(float pitch)
+        {
+            detuneFromParent = pitch;
+        }
+        void setUnisonDetuneFromParent(float factor)
+        {
+            unisonDetuneFactorFromParent = factor;
+        }
         void computeUnisonFreqRap(int nvoice);
         void computeCurrentParameters(void);
         void initParameters(void);
+        void initSubVoices(void);
         void killVoice(int nvoice);
         void killNote(void);
         float getVoiceBaseFreq(int nvoice);
         float getFMVoiceBaseFreq(int nvoice);
         void computeVoiceOscillatorLinearInterpolation(int nvoice);
-        void computeVoiceOscillatorCubicInterpolation(int nvoice);
-        void computeVoiceOscillatorMorph(int nvoice);
-        void computeVoiceOscillatorRingModulation(int nvoice);
-        void computeVoiceOscillatorFrequencyModulation(int nvoice, int FMmode);
+        void applyVoiceOscillatorMorph(int nvoice);
+        void applyVoiceOscillatorRingModulation(int nvoice);
+        void computeVoiceModulator(int nvoice, int FMmode);
+        void computeVoiceModulatorLinearInterpolation(int nvoice);
+        void normalizeVoiceModulatorFrequencyModulation(int nvoice, int FMmode);
+        void computeVoiceModulatorFrequencyModulation(int nvoice, int FMmode);
+        void computeVoiceOscillatorFrequencyModulation(int nvoice);
             // FMmode = 0 for phase modulation, 1 for Frequency modulation
         //  void ComputeVoiceOscillatorFrequencyModulation(int nvoice);
         void computeVoiceOscillatorPitchModulation(int nvoice);
 
         void computeVoiceNoise(int nvoice);
         void ComputeVoicePinkNoise(int nvoice);
+        void ComputeVoiceSpotNoise(int nvoice);
+
+        void computeVoiceOscillator(int nvoice);
 
         void fadein(float *smps);
 
@@ -129,10 +147,11 @@ class ADnote : private SynthHelper, private Float2Int
         // Voice parameters
         struct ADnoteVoice {
             bool Enabled;
+            int Voice;        // Voice I use as source.
             int noisetype;    // (sound/noise)
             int filterbypass;
             int DelayTicks;
-            float *OscilSmp;  // Waveform of the Voice
+            float *OscilSmp;  // Waveform of the Voice. Shared with sub voices.
             int phase_offset; // PWM emulation
 
             // Frequency parameters
@@ -176,8 +195,9 @@ class ADnote : private SynthHelper, private Float2Int
             unsigned char FMFreqFixed;
             int    FMVoice;
             float *VoiceOut; // Voice Output used by other voices if use this as modullator
-            float *FMSmp;    // Wave of the Voice
+            float *FMSmp;    // Wave of the Voice. Shared by sub voices.
             float  FMVolume;
+            bool FMDetuneFromBaseOsc;  // Whether we inherit the base oscillator's detuning
             float  FMDetune; // in cents
             Envelope *FMFreqEnvelope;
             Envelope *FMAmpEnvelope;
@@ -191,7 +211,7 @@ class ADnote : private SynthHelper, private Float2Int
 
         int unison_size[NUM_VOICES]; // the size of unison for a single voice
 
-        float unison_stereo_spread[NUM_VOICES]; // stereo spread of subvoices (0.0=mono,1.0=max)
+        float unison_stereo_spread[NUM_VOICES]; // stereo spread of unison subvoices (0.0=mono,1.0=max)
 
         float *oscposlo[NUM_VOICES], *oscfreqlo[NUM_VOICES]; // fractional part (skip)
 
@@ -203,7 +223,11 @@ class ADnote : private SynthHelper, private Float2Int
 
         float *unison_freq_rap[NUM_VOICES]; // how the unison subvoice's frequency is changed (1.0 for no change)
 
-        bool *unison_invert_phase[NUM_VOICES]; // which subvoice has phase inverted
+        // These are set by parent voices.
+        float detuneFromParent;             // How much the voice should be detuned.
+        float unisonDetuneFactorFromParent; // How much the voice should be detuned from unison.
+
+        bool *unison_invert_phase[NUM_VOICES]; // which unison subvoice has phase inverted
 
         struct { // unison vibratto
             float  amplitude; // amplitude which be added to unison_freq_rap
@@ -222,13 +246,11 @@ class ADnote : private SynthHelper, private Float2Int
 
         float *FMoldsmp[NUM_VOICES]; // used by Frequency Modulation (for integration)
 
-        float *tmpwavel; // temporary buffers
-        float *tmpwaver;
         float **tmpwave_unison;
         int max_unison;
 
-        float *bypassl; // Filter bypass samples
-        float *bypassr;
+        float **tmpmod_unison;
+        bool freqbasedmod[NUM_VOICES];
 
         float globaloldamplitude; // interpolate the amplitudes
         float globalnewamplitude;
@@ -263,6 +285,17 @@ class ADnote : private SynthHelper, private Float2Int
 
         float pangainL;
         float pangainR;
+
+        ADnote **subVoice[NUM_VOICES];
+        ADnote **subFMVoice[NUM_VOICES];
+
+        int subVoiceNumber;
+        // For sub voices: The original, "topmost" voice that triggered this
+        // one.
+        ADnote *origVoice;
+        // For sub voices: Pointer to the closest parent that has
+        // phase/frequency modulation.
+        float *parentFMmod;
 
         SynthEngine *synth;
 };

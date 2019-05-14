@@ -19,13 +19,14 @@
 
     You should have received a copy of the GNU General Public License along with
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
-    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+    Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified March 2019
+    Modified May 2019
 */
 
+#include <sys/types.h>
 #include <stdio.h>
 #include <sys/time.h>
 #include <set>
@@ -51,6 +52,7 @@ using namespace std;
 #include <unistd.h>
 
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
+extern std::string runGui;
 map<SynthEngine *, MusicClient *> synthInstances;
 SynthEngine *firstSynth = NULL;
 
@@ -210,20 +212,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 
     bufferbytes = buffersize * sizeof(float);
 
-    /*
-     * These replace local memory allocations that
-     * were being made every time an add or sub note
-     * was processed. Now global so treat with care!
-     */
-    Runtime.genTmp1 = (float*)fftwf_malloc(bufferbytes);
-    Runtime.genTmp2 = (float*)fftwf_malloc(bufferbytes);
-    Runtime.genTmp3 = (float*)fftwf_malloc(bufferbytes);
-    Runtime.genTmp4 = (float*)fftwf_malloc(bufferbytes);
-
-    // similar to above but for parts
-    Runtime.genMixl = (float*)fftwf_malloc(bufferbytes);
-    Runtime.genMixr = (float*)fftwf_malloc(bufferbytes);
-
     oscilsize_f = oscilsize = Runtime.Oscilsize;
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
     fadeStep = 10.0f / samplerate; // 100mS fade
@@ -261,7 +249,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             Runtime.Log("Failed to allocate new Part");
             goto bail_out;
         }
-        VUpeak.values.parts[npart] = -0.2;
     }
 
     // Insertion Effects init
@@ -283,6 +270,20 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             goto bail_out;
         }
     }
+
+    /*
+     * These replace local memory allocations that
+     * were being made every time an add or sub note
+     * was processed. Now global so treat with care!
+     */
+    Runtime.genTmp1 = (float*)fftwf_malloc(bufferbytes);
+    Runtime.genTmp2 = (float*)fftwf_malloc(bufferbytes);
+    Runtime.genTmp3 = (float*)fftwf_malloc(bufferbytes);
+    Runtime.genTmp4 = (float*)fftwf_malloc(bufferbytes);
+
+    // similar to above but for parts
+    Runtime.genMixl = (float*)fftwf_malloc(bufferbytes);
+    Runtime.genMixr = (float*)fftwf_malloc(bufferbytes);
 
     defaults();
     ClearNRPNs();
@@ -354,6 +355,15 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             cout << "Can't find path " << Runtime.rootDefine << endl;
     }
 
+    // just to make sure we're in sync
+    if (uniqueId == 0)
+    {
+        if (Runtime.showGui)
+            createEmptyFile(runGui);
+        else
+            deleteFile(runGui);
+    }
+
     // we seem to need this here only for first time startup :(
     bank.setCurrentBankID(Runtime.tempBank);
     return true;
@@ -414,20 +424,36 @@ void SynthEngine::defaults(void)
     setPvolume(90);
     TransVolume = Pvolume - 1; // ensure it is always set
     setPkeyshift(64);
+
+    VUpeak.values.vuOutPeakL = 0;
+    VUpeak.values.vuOutPeakR = 0;
+    VUpeak.values.vuRmsPeakL = 0;
+    VUpeak.values.vuRmsPeakR = 0;
+
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
         part[npart]->defaults();
         part[npart]->Prcvchn = npart % NUM_MIDI_CHANNELS;
     }
+    VUpeak.values.parts[0] = -1.0f;
+    VUpeak.values.partsR[0] = -1.0f;
+    VUdata.values.parts[0] = -1.0f;
+    VUdata.values.partsR[0] = -1.0f;
+    VUcopy.values.parts[0]= -1.0f;
+    VUcopy.values.partsR[0]= -1.0f;
 
     partonoffLock(0, 1); // enable the first part
+
+    inseffnum = 0;
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
     {
         insefx[nefx]->defaults();
         Pinsparts[nefx] = -1;
     }
+    masterMono = false;
 
     // System Effects init
+    syseffnum = 0;
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
     {
         sysefx[nefx]->defaults();
@@ -498,8 +524,6 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
         {
             if (partonoffRead(npart))
                 part[npart]->NoteOn(note, velocity);
-            else if (VUpeak.values.parts[npart] > (-velocity))
-                VUpeak.values.parts[npart] = -(0.2 + velocity); // ensure fake is always negative
         }
     }
 #ifdef REPORT_NOTEON
@@ -743,7 +767,7 @@ void SynthEngine::SetZynControls(bool in_place)
     if (in_place)
         interchange.commandEffects(&putData);
     else // TODO next line is a hack!
-        midilearn.writeMidi(&putData, sizeof(putData), false);
+        midilearn.writeMidi(&putData, false);
 }
 
 
@@ -894,7 +918,7 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
                     if (ok)
                     {
                         if (par2 < 0xff)
-                            addHistory(setExtension(fname, EXTEN::zynInst), 1);
+                            addHistory(setExtension(fname, EXTEN::zynInst), TOPLEVEL::historyList::Instrument);
                         name = name + " to Part " + to_string(npart + 1);
                     }
                 }
@@ -974,25 +998,6 @@ bool SynthEngine::ReadPartPortamento(int npart)
 void SynthEngine::SetPartKeyMode(int npart, int mode)
 {
     part[npart]->Pkeymode = mode;
-
-/*    if (mode > 2)
-        mode = 2;
-    switch(mode)
-    {
-        case 2:
-            part[npart]->Ppolymode = 0;
-            part[npart]->Plegatomode = 1;
-            break;
-        case 1:
-            part[npart]->Ppolymode = 0;
-            part[npart]->Plegatomode = 0;
-            break;
-        case 0:
-        default:
-            part[npart]->Ppolymode = 1;
-            part[npart]->Plegatomode = 0;
-            break;
-    }*/
 }
 
 
@@ -1705,7 +1710,7 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
         putData.data.part = TOPLEVEL::section::midiIn;
         putData.data.kit = part;
         putData.data.parameter = TOPLEVEL::route::adjustAndLoopback;
-        midilearn.writeMidi(&putData, sizeof(putData), true);
+        midilearn.writeMidi(&putData, true);
     }
 }
 
@@ -1733,15 +1738,12 @@ void SynthEngine::resetAll(bool andML)
     __sync_and_and_fetch(&interchange.blockRead, 0);
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
         part[npart]->busy = false;
+    defaults();
+    ClearNRPNs();
     if (Runtime.loadDefaultState && isRegFile(Runtime.defaultStateName+ ".state"))
     {
         Runtime.StateFile = Runtime.defaultStateName;
         Runtime.stateRestore();
-    }
-    else
-    {
-        defaults();
-        ClearNRPNs();
     }
     if (andML)
         midilearn.generalOpps(0, 0, MIDILEARN::control::clearAll, TOPLEVEL::section::midiLearn, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED);
@@ -1788,7 +1790,10 @@ void SynthEngine::partonoffWrite(int npart, int what)
 
     part[npart]->Penabled = tmp;
     if (tmp == 1 && original != 1) // enable if it wasn't already on
+    {
         VUpeak.values.parts[npart] = 1e-9f;
+        VUpeak.values.partsR[npart] = 1e-9f;
+    }
     else if (tmp != 1 && original == 1) // disable if it wasn't already off
     {
         part[npart]->cleanup();
@@ -1797,7 +1802,8 @@ void SynthEngine::partonoffWrite(int npart, int what)
             if (Pinsparts[nefx] == npart)
                 insefx[nefx]->cleanup();
         }
-        VUpeak.values.parts[npart] = -0.2;
+        VUpeak.values.parts[npart] = -1.0f;
+        VUpeak.values.partsR[npart] = -1.0f;
     }
 }
 
@@ -1817,9 +1823,8 @@ void SynthEngine::SetMuteAndWait(void)
     putData.data.control = TOPLEVEL::control::errorMessage;
     putData.data.part = TOPLEVEL::section::main;
 #ifdef GUI_FLTK
-    if (jack_ringbuffer_write_space(interchange.fromGUI) >= sizeof(putData))
+    if (interchange.fromGUI ->write(putData.bytes))
     {
-        jack_ringbuffer_write(interchange.fromGUI, (char*) putData.bytes, sizeof(putData));
         while(isMuted() == 0)
             usleep (1000);
     }
@@ -2081,6 +2086,8 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                 mainR[idx] *= fadeLevel;
                 fadeLevel -= fadeStep;
             }
+            if (masterMono)
+                mainL[idx] = mainR[idx] = (mainL[idx] + mainR[idx]) / 2.0;
         }
 
         // Peak calculation for mixed outputs
@@ -2106,9 +2113,14 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                 {
                     if ((absval = fabsf(part[npart]->partoutl[idx])) > VUpeak.values.parts[npart])
                         VUpeak.values.parts[npart] = absval;
-                    if ((absval = fabsf(part[npart]->partoutr[idx])) > VUpeak.values.parts[npart])
-                        VUpeak.values.parts[npart] = absval;
+                    if ((absval = fabsf(part[npart]->partoutr[idx])) > VUpeak.values.partsR[npart])
+                        VUpeak.values.partsR[npart] = absval;
                 }
+            }
+            else
+            {
+                VUpeak.values.parts[npart] = -1.0f;
+                VUpeak.values.partsR[npart] = -1.0f;
             }
         }
 
@@ -2127,9 +2139,16 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
             {
                 if (partLocal[npart])
+                {
                     VUpeak.values.parts[npart] = 1.0e-9f;
-                else if (VUpeak.values.parts[npart] < -2.2f) // fake peak is a negative value
-                    VUpeak.values.parts[npart]+= 2.0f;
+                    VUpeak.values.partsR[npart] = 1.0e-9f;
+                }
+                else
+                {
+                    VUpeak.values.parts[npart] = -1.0f;
+                    VUpeak.values.partsR[npart] = -1.0f;
+                }
+
             }
         }
 /*
@@ -2149,37 +2168,84 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 
 
 void SynthEngine::fetchMeterData()
-{
+{ // overload protection below shouldn't be needed :(
+    static int delay = 20;
     if (!VUready)
         return;
+    if (delay > 0)
+    {
+        --delay;
+        VUdata.values.vuOutPeakL = 0.0f;
+        VUdata.values.vuOutPeakR = 0.0f;
+        VUdata.values.vuRmsPeakL = 0.0f;
+        VUdata.values.vuRmsPeakR = 0.0f;
+        VUready = true;
+        return;
+    }
     float fade;
     float root;
     int buffsize;
     buffsize = VUcopy.values.buffersize;
     root = sqrt(VUcopy.values.vuRmsPeakL / buffsize);
-    VUdata.values.vuRmsPeakL = ((VUdata.values.vuRmsPeakL * 7) + root) / 8;
+    if (VUdata.values.vuRmsPeakL >= 1.0f) // overload protection
+        VUdata.values.vuRmsPeakL = root;
+    else
+        VUdata.values.vuRmsPeakL = ((VUdata.values.vuRmsPeakL * 7) + root) / 8;
+
     root = sqrt(VUcopy.values.vuRmsPeakR / buffsize);
-    VUdata.values.vuRmsPeakR = ((VUdata.values.vuRmsPeakR * 7) + root) / 8;
+    if (VUdata.values.vuRmsPeakR >= 1.0f) // overload protection
+        VUdata.values.vuRmsPeakR = root;
+    else
+        VUdata.values.vuRmsPeakR = ((VUdata.values.vuRmsPeakR * 7) + root) / 8;
 
     fade = VUdata.values.vuOutPeakL * 0.92f;//mult;
-    if (VUcopy.values.vuOutPeakL > fade)
-        VUdata.values.vuOutPeakL = VUcopy.values.vuOutPeakL;
+    if (fade >= 1.0f) // overload protection
+        fade = 0.0f;
+    if (VUcopy.values.vuOutPeakL > 1.8f) // overload protection
+        VUcopy.values.vuOutPeakL = fade;
     else
-        VUdata.values.vuOutPeakL = fade;
+    {
+        if (VUcopy.values.vuOutPeakL > fade)
+            VUdata.values.vuOutPeakL = VUcopy.values.vuOutPeakL;
+        else
+            VUdata.values.vuOutPeakL = fade;
+    }
 
     fade = VUdata.values.vuOutPeakR * 0.92f;//mult;
-    if (VUcopy.values.vuOutPeakR > fade)
-        VUdata.values.vuOutPeakR = VUcopy.values.vuOutPeakR;
+    if (fade >= 1.0f) // overload protection
+        fade = 00.f;
+    if (VUcopy.values.vuOutPeakR > 1.8f) // overload protection
+        VUcopy.values.vuOutPeakR = fade;
     else
-        VUdata.values.vuOutPeakR = fade;
+    {
+        if (VUcopy.values.vuOutPeakR > fade)
+            VUdata.values.vuOutPeakR = VUcopy.values.vuOutPeakR;
+        else
+            VUdata.values.vuOutPeakR = fade;
+    }
 
     for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
     {
-        fade = VUdata.values.parts[npart];
-        if (VUcopy.values.parts[npart] > fade || VUcopy.values.parts[npart] < -0.1f)
-            VUdata.values.parts[npart] = VUcopy.values.parts[npart];
+        if (VUpeak.values.parts[npart] < 0.0)
+            VUdata.values.parts[npart] = -1.0f;
         else
-            VUdata.values.parts[npart] = fade * 0.85f;
+        {
+            fade = VUdata.values.parts[npart];
+            if (VUcopy.values.parts[npart] > fade)
+                VUdata.values.parts[npart] = VUcopy.values.parts[npart];
+            else
+                VUdata.values.parts[npart] = fade * 0.85f;
+        }
+        if (VUpeak.values.partsR[npart] < 0.0)
+            VUdata.values.partsR[npart] = -1.0f;
+        else
+        {
+            fade = VUdata.values.partsR[npart];
+            if (VUcopy.values.partsR[npart] > fade)
+                VUdata.values.partsR[npart] = VUcopy.values.partsR[npart];
+            else
+                VUdata.values.partsR[npart] = fade * 0.85f;
+        }
     }
     VUready = false;
 }
@@ -2228,12 +2294,14 @@ void SynthEngine::ShutUp(void)
     {
         part[npart]->legatoFading = 0;
         part[npart]->cleanup();
-        VUpeak.values.parts[npart] = -0.2;
+        VUpeak.values.parts[npart] = -1.0f;
+        VUpeak.values.partsR[npart] = -1.0f;
     }
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
         insefx[nefx]->cleanup();
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
         sysefx[nefx]->cleanup();
+    miscMsgClear();
 }
 
 
@@ -2248,9 +2316,8 @@ void SynthEngine::allStop(unsigned int stopType)
 
 bool SynthEngine::loadStateAndUpdate(string filename)
 {
+    defaults();
     bool result = Runtime.loadState(filename);
-    if (result)
-        addHistory(filename, 4);
     ShutUp();
     Unmute();
     return result;
@@ -2259,15 +2326,7 @@ bool SynthEngine::loadStateAndUpdate(string filename)
 
 bool SynthEngine::saveState(string filename)
 {
-    filename = setExtension(filename, EXTEN::state);
-    bool result = Runtime.saveState(filename);
-    string name = Runtime.ConfigDir + "/yoshimi";
-    if (uniqueId > 0)
-        name += ("-" + to_string(uniqueId));
-    name += ".state";
-    if (result && filename != name) // never list default state
-        addHistory(filename, 4);
-    return result;
+    return Runtime.saveState(filename);
 }
 
 
@@ -2278,33 +2337,19 @@ bool SynthEngine::loadPatchSetAndUpdate(string fname)
     result = loadXML(fname); // load the data
     Unmute();
     if (result)
-    {
         setAllPartMaps();
-        addHistory(fname, 2);
-    }
     return result;
 }
 
 
 bool SynthEngine::loadMicrotonal(string fname)
 {
-    bool ok = true;
-    microtonal.defaults();
-    if (microtonal.loadXML(setExtension(fname, EXTEN::scale)))
-        addHistory(fname, 3);
-    else
-        ok = false;
-    return ok;
+    return microtonal.loadXML(setExtension(fname, EXTEN::scale));
 }
 
 bool SynthEngine::saveMicrotonal(string fname)
 {
-    bool ok = true;
-    if (microtonal.saveXML(setExtension(fname, EXTEN::scale)))
-        addHistory(fname, 3);
-    else
-        ok = false;
-    return ok;
+    return microtonal.saveXML(setExtension(fname, EXTEN::scale));
 }
 
 
@@ -2387,7 +2432,7 @@ void SynthEngine::newHistory(string name, int group)
 {
     if (findleafname(name) < "!")
         return;
-    if (group == 1 && (name.rfind(EXTEN::yoshInst) != string::npos))
+    if (group == TOPLEVEL::historyList::Instrument && (name.rfind(EXTEN::yoshInst) != string::npos))
         name = setExtension(name, EXTEN::zynInst);
     vector<string> &listType = *getHistory(group);
     listType.push_back(name);
@@ -2398,8 +2443,6 @@ void SynthEngine::addHistory(string name, int group)
 {
     if (findleafname(name) < "!")
         return;
-    if (group == 1 && (name.rfind(EXTEN::yoshInst) != string::npos))
-        name = setExtension(name, EXTEN::zynInst);
     vector<string> &listType = *getHistory(group);
     vector<string>::iterator itn = listType.begin();
     listType.insert(itn, name);
@@ -2511,33 +2554,33 @@ bool SynthEngine::loadHistory()
     string filetype;
     string type;
     string extension;
-    for (int count = 1; count < 7; ++count)
+    for (int count = TOPLEVEL::historyList::Instrument; count <= TOPLEVEL::historyList::MLearn; ++count)
     {
         switch (count)
         {
-            case 1:
+            case TOPLEVEL::historyList::Instrument:
                 type = "XMZ_INSTRUMENTS";
                 extension = "xiz_file";
                 break;
-            case 2:
+            case TOPLEVEL::historyList::Patch:
                 type = "XMZ_PATCH_SETS";
                 extension = "xmz_file";
                 break;
-            case 3:
+            case TOPLEVEL::historyList::Scale:
                 type = "XMZ_SCALE";
                 extension = "xsz_file";
                 break;
-            case 4:
+            case TOPLEVEL::historyList::State:
                 type = "XMZ_STATE";
                 extension = "state_file";
                 break;
-            case 5:
+            case TOPLEVEL::historyList::Vector:
                 type = "XMZ_VECTOR";
                 extension = "xvy_file";
                 break;
-            case 6:
+            case TOPLEVEL::historyList::MLearn:
                 type = "XMZ_MIDILEARN";
-                extension = "xvy_file";
+                extension = "xly_file";
                 break;
         }
         if (xml->enterbranch(type))
@@ -2583,33 +2626,33 @@ bool SynthEngine::saveHistory()
     {
         string type;
         string extension;
-        for (int count = 1; count < 7; ++count)
+        for (int count = TOPLEVEL::historyList::Instrument; count <= TOPLEVEL::historyList::MLearn; ++count)
         {
             switch (count)
             {
-                case 1:
+                case TOPLEVEL::historyList::Instrument:
                     type = "XMZ_INSTRUMENTS";
                     extension = "xiz_file";
                     break;
-                case 2:
+                case TOPLEVEL::historyList::Patch:
                     type = "XMZ_PATCH_SETS";
                     extension = "xmz_file";
                     break;
-                case 3:
+                case TOPLEVEL::historyList::Scale:
                     type = "XMZ_SCALE";
                     extension = "xsz_file";
                     break;
-                case 4:
+                case TOPLEVEL::historyList::State:
                     type = "XMZ_STATE";
                     extension = "state_file";
                     break;
-                case 5:
+                case TOPLEVEL::historyList::Vector:
                     type = "XMZ_VECTOR";
                     extension = "xvy_file";
                     break;
-                case 6:
+                case TOPLEVEL::historyList::MLearn:
                     type = "XMZ_MIDILEARN";
-                    extension = "xvy_file";
+                    extension = "xly_file";
                     break;
             }
             vector<string> listType = *getHistory(count);
@@ -2643,8 +2686,6 @@ bool SynthEngine::saveHistory()
 unsigned char SynthEngine::loadVectorAndUpdate(unsigned char baseChan, string name)
 {
     unsigned char result = loadVector(baseChan, name, true);
-    if (result < 255)
-        addHistory(name, 5);
     ShutUp();
     Unmute();
     return result;
@@ -2654,7 +2695,7 @@ unsigned char SynthEngine::loadVectorAndUpdate(unsigned char baseChan, string na
 unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
 {
     bool a = full; full = a; // suppress warning
-    unsigned char actualBase = 255; // error!
+    unsigned char actualBase = NO_MSG; // error!
     if (name.empty())
     {
         Runtime.Log("No filename", 2);
@@ -2798,7 +2839,7 @@ unsigned char SynthEngine::extractVectorData(unsigned char baseChan, XMLwrapper 
 unsigned char SynthEngine::saveVector(unsigned char baseChan, string name, bool full)
 {
     bool a = full; full = a; // suppress warning
-    unsigned char result = 0xff; // ok
+    unsigned char result = NO_MSG; // ok
 
     if (baseChan >= NUM_MIDI_CHANNELS)
         return miscMsgPush("Invalid channel number");
@@ -2821,9 +2862,7 @@ unsigned char SynthEngine::saveVector(unsigned char baseChan, string name, bool 
         insertVectorData(baseChan, true, xml, findleafname(file));
     xml->endbranch();
 
-    if (xml->saveXMLfile(file))
-        addHistory(file, 5);
-    else
+    if (!xml->saveXMLfile(file))
     {
         Runtime.Log("Failed to save data to " + file, 2);
         result = miscMsgPush("FAIL");
@@ -2995,8 +3034,6 @@ bool SynthEngine::savePatchesXML(string filename)
     add2XML(xml);
     bool result = xml->saveXMLfile(filename);
     delete xml;
-    if (result)
-        addHistory(filename,2);
     return result;
 }
 
@@ -3248,7 +3285,6 @@ float SynthEngine::getLimits(CommandBlock *getData)
             break;
 
         case MAIN::control::partNumber:
-            min = 0;
             def = 0;
             max = Runtime.NumAvailableParts -1;
             break;
@@ -3268,6 +3304,11 @@ float SynthEngine::getLimits(CommandBlock *getData)
             max = 36;
             break;
 
+        case MAIN::control::mono:
+            def = 0; // off
+            max = 1;
+            break;
+
         case MAIN::control::soloType:
             def = 0; // Off
             max = 4;
@@ -3280,9 +3321,8 @@ float SynthEngine::getLimits(CommandBlock *getData)
             break;
 
         case MAIN::control::masterReset:
-            case MAIN::control::masterResetAndMlearn:
+        case MAIN::control::masterResetAndMlearn:
         case MAIN::control::stopSound:
-            min = 0;
             def = 0;
             max = 0;
             break;
@@ -3517,9 +3557,8 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
             max = 3;
             break;
 
-        //case CONFIG::control::enableBankRootChange:
-            //break;
         case CONFIG::control::bankRootCC: // runtime midi checked elsewhere
+            def = 0;
             max = 119;
             break;
         case CONFIG::control::bankCC: // runtime midi checked elsewhere

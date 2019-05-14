@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modifed February 2019
+    Modifed May 2019
 */
 
 #ifndef GLOBALS_H
@@ -37,6 +37,29 @@
 #define HALFPI 1.57079632679f
 #define LOG_2 0.693147181f
 
+/*
+ * we only use 23 bits as with 24 there is risk of
+ * an overflow when making float/int conversions
+ */
+#define Fmul2I 1073741823
+#define Cshift2I 23
+
+/*
+ * proposed conversions from float to hi res int
+ * multiplier is 1000000
+ *
+ * for LFO freq turns actual value 85.25 into 85250000
+ * current step size 0.06 becomes 6000
+ *
+ * scales A frequency now restricted to +- 0.5 octave
+ * 660Hz becomes 660000000
+ * At 329Hz resolution is still better than 1/10000 cent
+ * Assumed detectable interval is 5 cents
+ *
+ * also use for integers that need higher resolution
+ * such as unspecified 0-127 integers
+*/
+
 // many of the following are for convenience and consistency
 // changing them is likely to have unpredicable consequences
 
@@ -52,6 +75,11 @@ const unsigned char MAX_AD_HARMONICS = 128;
 const unsigned char MAX_SUB_HARMONICS = 64;
 const unsigned char PAD_MAX_SAMPLES = 96;
 const unsigned char NUM_MIDI_PARTS = 64;
+const unsigned char PART_POLY = 0;
+const unsigned char PART_MONO = 1;
+const unsigned char PART_LEGATO = 2;
+const unsigned char MIDI_NOT_LEGATO = 3;
+const unsigned char MIDI_LEGATO = 4;
 const unsigned char NUM_MIDI_CHANNELS = 16;
 const unsigned char MIDI_LEARN_BLOCK = 200;
 const int MAX_ENVELOPE_POINTS = 40;
@@ -59,14 +87,16 @@ const int MIN_ENVELOPE_DB = -60;
 const int MAX_RESONANCE_POINTS = 256;
 const int MAX_KEY_SHIFT = 36;
 const int MIN_KEY_SHIFT = -36;
+const float A_MIN = 329.0f;
+const float A_MAX = 660.0f;
+
 
 const unsigned int MIN_OSCIL_SIZE = 256; // MAX_AD_HARMONICS * 2
 const unsigned int MAX_OSCIL_SIZE = 16384;
 const unsigned int MIN_BUFFER_SIZE = 16;
 const unsigned int MAX_BUFFER_SIZE = 8192;
-const unsigned char NO_MSG = 255; // these three may become different
+const unsigned char NO_MSG = 255; // these two may become different
 const unsigned char UNUSED = 255;
-const unsigned char NO_ACTION = 255;
 
 // GUI colours
 const unsigned int ADD_COLOUR = 0xdfafbf00;
@@ -74,12 +104,16 @@ const unsigned int BASE_COLOUR = 0xbfbfbf00;
 const unsigned int SUB_COLOUR = 0xafcfdf00;
 const unsigned int PAD_COLOUR = 0xcfdfaf00;
 const unsigned int YOSHI_COLOUR = 0x0000e100;
+const unsigned int EXTOSC_COLOUR = 0x8fbfdf00;
+const unsigned int EXTVOICE_COLOUR = 0x9fdf8f00;
+const unsigned int MODOFF_COLOUR = 0x80808000;
 
 enum {XML_INSTRUMENT = 1, XML_PARAMETERS, XML_MICROTONAL, XML_STATE, XML_VECTOR, XML_MIDILEARN, XML_CONFIG, XML_PRESETS, XML_BANK, XML_HISTORY};
 
 // these were previously (pointlessly) user configurable
 const unsigned char NUM_VOICES = 8;
 const unsigned char POLIPHONY = 80;
+const unsigned char PART_POLIPHONY = 60;
 const unsigned char NUM_SYS_EFX = 4;
 const unsigned char NUM_INS_EFX = 8;
 const unsigned char NUM_PART_EFX = 3;
@@ -123,38 +157,53 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         config = 248 // F8
     };
 
-    // this pair critcally cannot be changed as
-    // they rely on 'parameter' being < 64
     enum route : unsigned char {
-        lowPriority = 128,
-        adjustAndLoopback = 192
+        lowPriority = 128,      // This pair cannot be changed as they
+        adjustAndLoopback = 192 // rely on 'parameter' being < 64
     };
 
     // bit-wise type and source share the same byte
     // but will eventually be split up
-    enum type : unsigned char {
+    namespace type {
         // bits 0, 1
-        Adjust = 0,
-        Read = 0,
-        Minimum,
-        Maximum,
-        Default,
-        LearnRequest = 3, // shared value
+        const unsigned char Adjust = 0;
+        const unsigned char Read = 0; // i.e. !write
+        const unsigned char Minimum = 1;
+        const unsigned char Maximum = 2;
+        const unsigned char Default = 3;
+        const unsigned char LearnRequest = 3; // shared value
         // remaining used bit-wise
-        Error = 4, // also identifes static limits
-        Limits = 4, // yes we can pair these - who knew?
-        Write = 64, // false = read
-        Learnable = 64, // shared value
-        Integer = 128 // false = float
-    };
+        const unsigned char Error = 4; // also identifes static limits
+        const unsigned char Limits = 4; // yes we can pair these - who knew?
+        const unsigned char Write = 64; // false = read
+        const unsigned char Learnable = 64; // shared value
+        const unsigned char Integer = 128; // false = float
+    }
 
-    enum source : unsigned char {
+    namespace source {
         // all used bit-wise
-        MIDI = 8,
-        CLI = 16,
-        GUI = 32,
-        UpdateAfterSet = 48 // so gui can update
-    };
+        const unsigned char MIDI = 8;
+        // future - use for type error?
+        const unsigned char CLI = 16;
+        // future - use for type learn request?
+        const unsigned char GUI = 32;
+        // future - use for type learnable?
+        const unsigned char UpdateAfterSet = 48; // so gui can update
+        // future - merge into action?
+    }
+
+    namespace action { // This will become the 'source' byte
+        // bits 0 to 3
+        const unsigned char toAll = 0; // except MIDI
+        const unsigned char fromMIDI = 1; // These will
+        const unsigned char fromCLI = 2;  // replace the
+        const unsigned char fromGUI = 3;  // bits in 'type'
+        const unsigned char noAction = 15; // internal use
+        // remaining used bit-wise
+        const unsigned char forceUpdate = 32; // update after set
+        const unsigned char lowPrio = 128;
+        const unsigned char muteAndLoop = 192;
+    }
 
     enum control : unsigned char {
         errorMessage = 254 // FE
@@ -192,6 +241,17 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         filter,
         bandwidth
     };
+
+    enum historyList : unsigned char {
+        undefined = 0,
+        Instrument, // individual externally sourced Instruments
+        Patch, //      full instrument Patch Sets
+        Scale, //      complete Microtonal settings
+        State, //      entire system State
+        Vector, //     per channel Vector settings
+        // insert any new lists here
+        MLearn //      learned MIDI CC lists
+    };
 }
 
 namespace CONFIG // usage CONFIG::control::oscillatorSize
@@ -213,6 +273,7 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         enableGUI,
         enableCLI,
         enableAutoInstance,
+        enableSinglePath,
         exposeStatus,
 
         // start of engine controls
@@ -228,7 +289,6 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         alsaSampleRate,
         // end of engine controls
 
-        //enableBankRootChange = 64,
         bankRootCC = 65,
         bankCC = 67,
         enableProgramChange,
@@ -409,6 +469,7 @@ namespace MAIN // usage MAIN::control::volume
         availableParts,
         detune = 32,
         keyShift = 35,
+        mono,
         soloType = 48,
         soloCC,
 
@@ -601,6 +662,7 @@ namespace ADDVOICE // usage ADDVOICE::control::volume
 
         modulatorType = 16, // Off, Morph, Ring, PM, FM, PWM
         externalModulator, // -1 local,  'n' voice
+        externalOscillator, // -1 local,  'n' voice
 
         detuneFrequency = 32,
         equalTemperVariation,
@@ -633,6 +695,7 @@ namespace ADDVOICE // usage ADDVOICE::control::volume
         modulatorHFdamping,
         enableModulatorAmplitudeEnvelope = 88,
         modulatorDetuneFrequency = 96,
+        modulatorDetuneFromBaseOsc = 97,
         modulatorFrequencyAs440Hz = 98,
         modulatorOctave,
         modulatorDetuneType, // Default, L35 cents, L10 cents, E100 cents, E1200 cents
@@ -883,6 +946,14 @@ namespace EFFECT // usage EFFECT::type::none
         dynFilter
     };
 
+    enum control : unsigned char {
+        level = 0, // volume, wet/dry, gain for EQ
+        panning, // band for EQ
+        frequency, // time reverb, delay echo, L/R-mix dist, Not EQ
+        preset = 16, // not EQ
+        changed = 129 // not EQ
+    };
+
     enum sysIns : unsigned char {
         toEffect1 = 1, // system only
         toEffect2, // system only
@@ -897,6 +968,7 @@ union CommandBlock{
     struct{
         float value;
         unsigned char type;
+        unsigned char source;
         unsigned char control;
         unsigned char part;
         unsigned char kit;
@@ -904,8 +976,15 @@ union CommandBlock{
         unsigned char insert;
         unsigned char parameter;
         unsigned char par2;
+        unsigned char miscmsg;
+        unsigned char spare1;
+        unsigned char spare0;
     } data;
     char bytes [sizeof(data)];
 };
+/*
+ * it is ESSENTIAL that this is a power of 2
+ */
+const size_t commandBlockSize = sizeof(CommandBlock);
 
 #endif

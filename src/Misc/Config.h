@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified March 2019
+    Modified May 2019
 */
 
 #ifndef CONFIG_H
@@ -50,9 +50,7 @@ class Config : public MiscFuncs, FileMgr
         Config(SynthEngine *_synth, int argc, char **argv);
         ~Config();
         bool Setup(int argc, char **argv);
-//#ifndef YOSHIMI_LV2_PLUGIN
         void StartupReport(string clientName);
-//#endif
         void Announce(void);
         void Usage(void);
         void Log(const string &msg, char tostderr = 0); // 1 = cli only ored 2 = hideable
@@ -65,7 +63,6 @@ class Config : public MiscFuncs, FileMgr
         string masterCCtest(int cc);
         bool saveConfig(void);
         bool loadConfig(void);
-        //bool saveState() { return saveSessionData(StateFile); }
         bool saveState(const string statefile)  { return saveSessionData(statefile); }
         bool loadState(const string statefile)
             { return restoreSessionData(statefile, false); }
@@ -80,7 +77,7 @@ class Config : public MiscFuncs, FileMgr
         void signalCheck(void);
         void setRtprio(int prio);
         bool startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
-                         bool schedfifo, char lowprio, bool create_detached = true, string name = "");
+                         bool schedfifo, char lowprio, string name = "");
         string programCmd(void) { return programcommand; }
 
         bool isRuntimeSetupCompleted() {return bRuntimeSetupCompleted;}

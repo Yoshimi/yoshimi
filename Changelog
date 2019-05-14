@@ -1,4 +1,266 @@
-yoshimi 1.5.10.2
+yoshimi 1.5.11 M
+
+
+2019-5-12 Will
+* Moved hidden filenames from globals to main.
+  Only place they ever need to be identified.
+* Moved instance start out of loop.
+  Slightly improves timing.
+* Added extra message when loading manual.
+* Edited docs.
+* Set release as 1.5.11
+* Added missing Manual :(
+* Set release as 1.5.11.1
+* Merged in Foward commits.
+* Made Instance control and Spot noise permanent.
+
+2019-5-11 Will
+* Further work to improve multi-instance.
+* Additional changes to thread code.
+  Also removed some poorly performing ideas.
+
+2019-5-10 Will
+* Final tweaks to code.
+* Applied rough fix to startup overloads.
+  Only applies to secondary instances.
+* Updated docs for release.
+* Updated meta-info.
+* Set version as 1.5.11 rc4
+
+2019-5-9 Will
+* Added code to ensure hidden gui enable is in sync.
+* Moved some mallocs to prevent memory leaks.
+  Would only occur under abort conditions.
+
+2019-5-8 Will
+* Trial of startup display
+  Currently disabled.
+* Some cleanups.
+* Corrected previous changelog message.
+* Startup display now working.
+* Set version as 1.5.11 rc3
+
+2019-5-7 Will
+* Further improvements to instance behaviour.
+  Time delays are almost entirely due to GUI
+  slow startup. This has been an issue for
+  a very long time.
+* Put Autostart back on direct call.
+  Still problems with GUI when threaded.
+* Set version as 1.5.11 rc2
+
+2019-5-6 Will
+* Improved new/multi instance behaviour.
+  There is still an issue with the gui causing
+  occasional crashes :(
+* Set version as 1.5.11 rc1
+
+2019-5-5 Will
+* Completed padSynth parameter conversions.
+* Enumerated history lists.
+* Improved history list internal structures.
+* Moved most additions from synthEngine to Interchange.
+  This was done so that loading (say) a state file
+  didn't falsely update/corrupt other history lists.
+
+2019-5-4 Will
+* Added CLI access to spot noise.
+* Linked spot noise appearance to single master feature.
+* Rationalised interchange parameters for setpadparams.
+* Updated docs.
+
+2019-5-3 Will
+* BugFix: Primary definition of singlePath in wrong file.
+* 'Enable Single Master' now always hidden for LV2.
+  It's not relevant to it at all.
+* CLI can now handle single master control.
+* Updated docs.
+* First trial of spot noise.
+
+2019-5-1 Will
+* All Interface files have no 'using namespace std'
+* All MusicIO files have no 'using namespace std'
+* Single master instance now properly accessed.
+  Not CLI yet.
+
+2019-4-30 Will
+* Single master instance now switchable from GUI.
+  Also made some refinements to code allowing this
+  to be hidden until certain it's safe.
+* BugFix: Crashes on some systems when opening the GUI.
+* Refined instance startup tests in main()
+
+2019-4-25 Will
+* Added PART_POLIPONY to globals
+  It had been defined numerically in two places!
+* Added PART_POLY, PART_MONO, PART_LEGATO, MIDI_LEGATO
+  MIDI_NOT_LEGATO to globals
+  These had been set numerically in multiple locations.
+* More transfers from 'using namespace' to 'std::'
+
+2019-4-24 Will
+* Added tooltips to master and part VU meters.
+* Single main instance now seems correct.
+  A first start double-click will still start two
+  separate instances, but all other combinations
+  will start just one, without risk of a crash
+  through tring to start multiple instances at
+  the same time.
+
+2019-4-23 Will
+* Removed redundant 'detach' thread element.
+* Started entering 'std::' not 'using namespace'.
+  This removes potential ambiguities, especially
+  as we are now using local namespaces heavily.
+* Some code cleanups.
+
+2019-4-22 Will
+* Internal 'no action' moved to new source byte.
+* Adjustments to new placeholders.
+
+2019-4-21 Will
+* Set placeholders for new type/source bytes.
+* Applied warning patch in main.cpp from Hermann.
+* Doc updates
+* Click on mixer part VU now cleared limit warning.
+
+2019-4-20 Will
+* BugFix: Adnote voice modulator damping incorrect.
+* Further work on auto single main instance.
+* Changed control block from 12 to 16 bytes.
+  This will enable us to split source from type
+  and miscMsg from par2. Also gives 2 spare bytes.
+
+2019-4-19 Will
+* Implemented separate L/R part VU metering.
+* Removed some direct calls from VU GUI to synth.
+* Added new miscMsgClear() function.
+  Called on major resets in case of message leaks.
+* Some code cleanups and doc updates.
+
+2019-4-18 Will
+* Made 'A' frequency entry box wider.
+* Master VU now fully cleared at startup.
+* Removed fake peak indication from disabled parts.
+
+2019-4-15 Will
+* Added first time start info window.
+* Further small CLI refinements.
+
+2019-4-15 Will
+* Implemented CLI MIDI controllers.
+  This had been forgotten :(
+
+2019-4-14 Will
+* CLI part common control text copied to sections.
+  Being separate was confusing in some situations
+  and not particularly helpful generally.
+
+2019-4-11 Will
+* Fix 'A' note range as 329 to 660 Hz.
+* Added note info to /doc
+
+2019-4-9 Will
+* BugFix: CLI not setting effect numbers.
+* Added named effects controls replacing some numbers.
+* CLI now shows a '?' for changed effect presets.
+* Some doc updates.
+
+2019-4-8 Will
+* Removed /Misc/FileListItem.h
+  It was never called, referenced or included.
+* A few minor cleanups.
+
+2019-4-6 Will
+* Disable GUI Analog Phaser controls when not set.
+* Revised Gui Layout to make this more obvious.
+* Further adustments - Phase disabled for Analog.
+* Re-ordered controls.
+* L/R also disabled for Analog.
+
+2019-4-3 Will
+* Converted Bank root control to MSB, LSB, OFF.
+* Undated docs.
+
+2019-4-1 Will
+* Added more informative tooltips.
+
+2019-3-27 Will
+* Completed GUi updates for effect controls.
+* Implemented master mono/stero switch.
+* Resets and state/patch loads clear mono/stero switch.
+
+2019-3-26 Will
+* BugFix: MIDI-learn now learn correct effect numbers.
+  GUI still not updated correctly yet.
+
+2019-3-23 Will
+* Corrected code indentation and missing bracket
+  in UI/MiscGui.cpp
+
+2019-3-22 will
+* Further adjustments to suppress GCC7 warnings.
+  Some global enums changed to const unsigned char.
+  CmdInterface/helplist() changed to char.
+* Added more warning/error traps to CMakeLists.
+* Removed some switch case dropthroughs.
+* Final GCC7 warnings suppressed?
+
+2019-3-21 Will
+* Bugfix: Insert effect part list out of step.
+* Sorted out potential GCC7 build warnings.
+
+2019-3-20 Will
+* Dynfilter insert done for local changes.
+  No idea how to set for patch loads :(
+
+2019-3-19 Will
+* Most effect warnings now correct.
+  Still incorrect when loading :(
+* All part warnings correct.
+* Sys/Ins warnings done too.
+  CLI not done though!
+* BugFix: Error loading instrument effects.
+  Preset and parameter in wrong order.
+
+2019-3-18 Will
+* More work on effect warnings.
+  Still more to do
+  CLI test messages in place
+
+2019-3-17 Will
+* Temporarily disalbled Hi Res LFO.
+  It will change!
+
+2019-3-16 Will
+* Effect change recognises intstrument loads.
+* BugFix: CLI distortion not seing preset change.
+* Effect change sets now sets colour of field.
+  Still some corner cases to correct.
+
+2019-3-15 Will
+* LFO conversion done
+  but CLI/GUI entries need improvenment.
+* Corrections in LFO conversions.
+* Effect change warning in place
+  but not yet exposed to GUI and CLI.
+
+2019-3-14 Will
+* Initial conversion of LFO speed toint32_t.
+
+2019-3-12 Will
+* Waveform window now warns of lower voice edit.
+  Doesn't yet say which one!
+* Voice and Modulator warnings done.
+
+2019-3-10 Will
+* BugFix: Limits default wrong on DynFilter.
+  System/Insert volumes reversed.
+* Set up label for lower voice oscillator warning.
+  Not yet in use. Need to work out how.
+
+2019-3-8 Will
+* Small improvement to CLI 'list' command.
 
 2019-3-4 Will.
 * Updated docs.

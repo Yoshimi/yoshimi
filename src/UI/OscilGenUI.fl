@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified January 2019
+Modified April 2019
 } {selected in_source in_header
 }
 
@@ -385,13 +385,13 @@ class Oscilharmonic {: {public Fl_Group}
       }
       Fl_Box {} {
         label 01
-        xywh {0 210 20 15} labelfont 1 labelsize 9 align 20
-        code0 {char tmp[10];snprintf(tmp,10,"%d",n+1);o->label(strdup(tmp));}
+        xywh {0 210 20 15} labelfont 1 labelsize 12 align 20
+        code0 {char tmp[12];snprintf(tmp,12,"%d",n+1);o->label(strdup(tmp));}
       }
       Fl_Box {} {
         label 01
-        xywh {0 0 20 15} labelfont 1 labelsize 9 align 20
-        code0 {char tmp[10];snprintf(tmp,10,"%d",n+1);o->label(strdup(tmp));}
+        xywh {0 0 20 15} labelfont 1 labelsize 12 align 20
+        code0 {char tmp[12];snprintf(tmp,12,"%d",n+1);o->label(strdup(tmp));}
       }
     }
   }
@@ -536,10 +536,6 @@ class OscilEditor {: {public PresetsUI_}
           }
         }
       }
-      Fl_Box {} {
-        label {Base Func.}
-        xywh {495 15 110 20} box FLAT_BOX labelfont 1
-      }
       Fl_Group basefuncdisplaygroup {
         xywh {365 5 360 300} box ENGRAVED_FRAME
       } {
@@ -630,7 +626,7 @@ class OscilEditor {: {public PresetsUI_}
           }
         }
         Fl_Box {} {
-          label {Base Func.}
+          label {Base Function}
           xywh {480 10 110 20} box FLAT_BOX labelfont 1 labelsize 12
         }
         Fl_Group {} {
@@ -696,6 +692,9 @@ class OscilEditor {: {public PresetsUI_}
           }
         }
       }
+      Fl_Output Warning {
+        xywh {234 8 238 20} box FLAT_BOX color 29 align 32 textfont 1 textcolor 1
+      }
       Fl_Choice magtype {
         label {Mag.Type}
         callback {//
@@ -740,7 +739,7 @@ class OscilEditor {: {public PresetsUI_}
             else
                 synth->getGuiMaster()->partui->adnoteui->ADnoteVoice->show();
         }}
-        xywh {668 565 62 25} box THIN_UP_BOX
+        tooltip {Right click: also reopen previous} xywh {668 565 62 25} box THIN_UP_BOX
       }
       Fl_Button clearHarm {
         label Clear
@@ -1389,6 +1388,11 @@ class OscilEditor {: {public PresetsUI_}
         }
     }} {}
   }
+  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED, int request = UNUSED)} {return_type float
+  } {
+    code {//
+        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, par2, request);} {}
+  }
   Function {OscilEditor(OscilGen *oscil_, Fl_Widget *oldosc_, Fl_Widget *cbwidget_, Fl_Widget *cbapplywidget_, SynthEngine *_synth, int npart_, int kititem_, int engine_)} {} {
     code {//
     synth = _synth;
@@ -1496,16 +1500,41 @@ class OscilEditor {: {public PresetsUI_}
   Function {setWindowTitle()} {} {
     code {//
         string tname;
+        string warnType = "";
         if (engine == 2)
+        {
             tname = "PadSynth Harmonic Content";
+            Warning->hide();
+        }
         else
         {
             tname = "AddSynth Voice ";
+            int sourceEngine = -1;
             if (engine <= PART::engine::addVoice8)
+            {
                 tname = tname + to_string((engine - PART::engine::addVoice1) + 1);
+                sourceEngine = fetchData(0, ADDVOICE::control::voiceOscillatorSource,npart,kititem, engine);
+                warnType = "Voice " + to_string(sourceEngine + 1);
+            }
             else
+            {
                 tname = tname + to_string((engine - PART::engine::addMod1) + 1) +  " Modulation";
+                if (fetchData(0, ADDVOICE::control::externalModulator,npart,kititem, engine) == -1)
+                {
+                    sourceEngine = fetchData(0, ADDVOICE::control::modulatorOscillatorSource,npart,kititem, engine);
+                    warnType = "Modulator " + to_string(sourceEngine + 1);
+                }
+            }
+
             tname += " Oscillator";
+            if (sourceEngine > -1)
+            {
+                Warning->show();
+                warnType = "WARNING: Editing " + warnType;
+                Warning->value(warnType.c_str());
+            }
+            else
+                Warning->hide();
         }
         osceditUI->copy_label(synth->getGuiMaster()->setPartWindowTitle(tname).c_str());} {}
   }

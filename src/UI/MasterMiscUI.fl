@@ -11,7 +11,7 @@ comment {MasterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2018, Will Godfrey
+Copyright 2014-2019, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
-Modified November 2018
+Modified April 2019
 } {selected in_source in_header
 }
 
@@ -120,15 +120,12 @@ class VUMeter {
     maxdbr = NO_DB;
     clipped = 0;
     plgroup = &synth->getGuiMaster()->panelgroup;
-    synth->VUdata.values.vuOutPeakL = 0.0;
-    synth->VUdata.values.vuOutPeakR = 0.0;
-    synth->VUdata.values.vuRmsPeakL = 0.0;
-    synth->VUdata.values.vuRmsPeakR = 0.0;
     for (int i = 0; i < NUM_MIDI_PARTS; i++)
     {
         panelpart.oldpeak[i] = 0;
+        panelpart.oldpeakR[i] = 0;
         panelpart.clip[i] = false;
-        synth->VUdata.values.parts[i] = 0.0;
+        panelpart.clipR[i] = false;
     }} {}
   }
   Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED)} {return_type float
@@ -244,43 +241,59 @@ class VUMeter {
             }} {}
   }
   Function {draw_part()} {} {
-    code {int ox = x()+2;
+    code {//
+    int ox = x()+2;
     int oy = y()+2;
     int lx = w()-4;
     int ly = h()-4;
+    int mid = (w() / 2) - 2;
     float Vpeak = fetchData(0, MAIN::control::readPartPeak, TOPLEVEL::section::main, npart + *plgroup);
-    if (Vpeak < 0) // its a fake one
+    if (Vpeak < 0) // its inactive
     {
         fl_rectf(ox, oy, lx, ly, 140, 140, 140);
-        int fakedb = Vpeak / 127.0 * (ly - 16); // fiddle to make it the same height as normal
-        fl_rectf(ox + 2, oy + ly + fakedb, lx - 4, -fakedb, 0, 0, 0);
-        return;
     }
-
-    if (Vpeak > 1.0)
-        panelpart.clip[npart + *plgroup] = true;
-
-    // draw the vu lines
-    float db = rap2dB(Vpeak);
-    db = (MIN_DB - db) / MIN_DB;
-    db = (db > 1.0) ? 1.0 : db;
-    db = db * ly - 2;
-    panelpart.oldpeak[npart + *plgroup] = (int) db;
-    fl_rectf(ox, oy, lx, ly, 0, 0, 0);
-    fl_rectf(ox, oy + ly - panelpart.oldpeak[npart + *plgroup], lx, panelpart.oldpeak[npart + *plgroup], 0, 200, 255);
-
-    // draw the scales
-    float tmp = ly * 1.0 / MIN_DB;
-    for (int i = 1; i < 1 - MIN_DB; ++i)
+    else
     {
-        int ty = ly + (int)(tmp * i);
-        if ( i % 5 == 0)
-            fl_rectf(ox, oy + ly - ty, lx, 1, 0, 160, 200);
-        if (i % 10 == 0)
-            fl_rectf(ox, oy + ly - ty, lx, 1, 0, 230, 240);
+
+        if (Vpeak > 1.0)
+            panelpart.clip[npart + *plgroup] = true;
+
+        // draw the vu lines
+        float db = rap2dB(Vpeak);
+        db = (MIN_DB - db) / MIN_DB;
+        db = (db > 1.0) ? 1.0 : db;
+        db = db * ly - 2;
+        panelpart.oldpeak[npart + *plgroup] = (int) db;
+        fl_rectf(ox, oy,mid, ly, 0, 0, 0);
+        fl_rectf(ox, oy + ly - panelpart.oldpeak[npart + *plgroup], mid, panelpart.oldpeak[npart + *plgroup], 0, 200, 255);
+        if (panelpart.clip[npart + *plgroup])
+            fl_rectf(ox, oy, mid, 4, 255, 0, 0);
+
+        Vpeak = fetchData(0, MAIN::control::readPartPeak, TOPLEVEL::section::main, npart + *plgroup, 1);
+        if (Vpeak > 1.0)
+            panelpart.clipR[npart + *plgroup] = true;
+        db = rap2dB(Vpeak);
+        db = (MIN_DB - db) / MIN_DB;
+        db = (db > 1.0) ? 1.0 : db;
+        db = db * ly - 2;
+        panelpart.oldpeakR[npart + *plgroup] = (int) db;
+        fl_rectf(ox + mid, oy,lx - mid, ly, 0, 0, 0);
+        fl_rectf(ox + mid, oy + ly - panelpart.oldpeakR[npart + *plgroup], lx - mid, panelpart.oldpeakR[npart + *plgroup], 0, 200, 255);
+        if (panelpart.clipR[npart + *plgroup])
+            fl_rectf(ox + mid, oy, lx - mid, 4, 255, 0, 0);
+
+        // draw the scales
+        float tmp = ly * 1.0 / MIN_DB;
+        for (int i = 1; i < 1 - MIN_DB; ++i)
+        {
+            int ty = ly + (int)(tmp * i);
+            if ( i % 5 == 0)
+                fl_rectf(ox, oy + ly - ty, lx, 1, 0, 160, 200);
+            if (i % 10 == 0)
+                fl_rectf(ox, oy + ly - ty, lx, 1, 0, 230, 240);
+        }
     }
-    if (panelpart.clip[npart + *plgroup])
-        fl_rectf(ox, oy, lx, 4, 255, 0, 0);} {}
+    fl_rectf(x() + mid, oy, 4, ly, 127, 127, 127);} {}
   }
   Function {draw()} {} {
     code {//
@@ -288,8 +301,7 @@ class VUMeter {
         draw_part();
     else
         draw_master();
-    GuiThreadMsg::sendMessage(synth, GuiThreadMsg::GuiCheck, 0);
-    } {}
+    GuiThreadMsg::sendMessage(synth, GuiThreadMsg::GuiCheck, 0);} {}
   }
   Function {tickdraw(VUMeter *o)} {return_type {static void}
   } {
@@ -347,19 +359,20 @@ class VUMeter {
   decl {SynthEngine *synth;} {private local
   }
   decl {struct{
-  int oldpeak[NUM_MIDI_PARTS];
+ int oldpeak[NUM_MIDI_PARTS]; int oldpeakR[NUM_MIDI_PARTS];
   bool clip[NUM_MIDI_PARTS];
-  } panelpart;} {private local
+ bool clipR[NUM_MIDI_PARTS]; } panelpart;} {public local
   }
   Function {resetPart(bool clipOnly = false)} {} {
     code {//
     for (int i = 0; i < NUM_MIDI_PARTS; i++)
     {
         panelpart.clip[i] = false;
+        panelpart.clipR[i] = false;
         if(!clipOnly)
         {
             panelpart.oldpeak[i] = 0;
-            synth->VUdata.values.parts[i] = 0.0;
+            panelpart.oldpeakR[i] = 0;
         }
     }} {}
   }
@@ -415,13 +428,18 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
         code1 {if (synth->getRuntime().audioEngine != jack_audio) audiosend->deactivate();}
       } {
         Fl_Group {} {
-          xywh {42 64 16 112} box ENGRAVED_FRAME
+          xywh {30 64 26 112} box ENGRAVED_FRAME
         } {
           Fl_Box partVUMeter {
             label {V U}
-            xywh {43 65 14 110} box FLAT_BOX color 0 selection_color 75 labelcolor 55 align 128
+            xywh {30 65 26 110} box FLAT_BOX color 0 selection_color 75 labelcolor 55 align 128
             code0 {partVUMeter->init(npart, synth);}
             class VUMeter
+          }
+          Fl_Button {} {
+            callback {partVUMeter->panelpart.clip[npart] = false;
+partVUMeter->panelpart.clipR[npart] = false;}
+            tooltip {Click here to clear overload warning.} xywh {30 64 26 111} box NO_BOX
           }
         }
         Fl_Button {} {
@@ -479,7 +497,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
         realvalue = o->value();
 
     send_data(PART::control::volume, realvalue, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
-          xywh {8 65 30 110} type {Vert Knob} box THIN_DOWN_BOX minimum 127 maximum 0 step 1
+          xywh {8 65 20 110} type {Vert Knob} box THIN_DOWN_BOX minimum 127 maximum 0 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Pvolume);}
           code1 {o->setValueType(VC_PartVolume); o->useCustomTip(true);}
           class mwheel_slider
@@ -493,7 +511,6 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
           xywh {17 180 30 30} maximum 127 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Ppanning);}
           code1 {o->setValueType(VC_PanningStd);}
-          code2 {//o->init(64);}
           class WidgetPDial
         }
         Fl_Choice partrcv {
@@ -670,12 +687,12 @@ class ClearMenuBar {: {public Fl_Menu_Bar}
   Function {draw()} {return_type void
   } {
     code {//
-    int m = 10; //margin larger than border in any style
+    int m = 10; // margin larger than border in any style
     fl_push_clip(x(),y(),w(),h());
     fl_draw_box(box(), x() - m, y() - m, w() + 2 * m, h() + m, color());
     fl_pop_clip();
     Fl_Boxtype _box = box();
-    //Draw menu like normal, but without a box
+    // Draw menu like normal, but without a box
     box(FL_NO_BOX);
     Fl_Menu_Bar::draw();
     box(_box);} {}

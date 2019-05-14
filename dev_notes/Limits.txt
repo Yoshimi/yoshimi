@@ -40,7 +40,7 @@ direct limit def 2 0 0 128
 
 TODO
 
-If an out of range setting is found part way along a command chain. 'value' will be set to the byte number where the error was encountered and 'type' bit 2 will be set (otherwise it will be cleared.
+If an out of range setting is found part way along a command chain. 'value' should be set to the byte number where the error was encountered and 'type' bit 2 will be set (otherwise it will be cleared.
 
 Numbers are:
 1   Control
@@ -53,9 +53,9 @@ Numbers are:
 
 e.g
 'part' was set to 70 (invalid part number)
-'value' will be returned as 2
+'value' should be returned as 2
 
 'part' set to 3 (valid) but control set to 200 (no such control at this level)
-'value' will be returned as 1
+'value' should be returned as 1
 
 Other numbers may be added later to give finer grading.

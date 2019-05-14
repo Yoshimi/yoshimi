@@ -2,7 +2,7 @@
     JackEngine.h
 
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2017, Will Godfrey & others
+    Copyright 2014-2019, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified January 2017
+    Modified May 2019
 */
 
 #ifndef JACK_ENGINE_H
@@ -27,13 +27,11 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <jack/jack.h>
-#include <jack/ringbuffer.h>
+//#include <jack/ringbuffer.h>
 
 #if defined(JACK_SESSION)
     #include <jack/session.h>
 #endif
-
-using namespace std;
 
 #include "MusicIO/MusicIO.h"
 
@@ -45,23 +43,23 @@ class JackEngine : public MusicIO
         JackEngine(SynthEngine *_synth);
         ~JackEngine() { Close(); }
         bool isConnected(void) { return (NULL != jackClient); }
-        bool connectServer(string server);
+        bool connectServer(std::string server);
         bool openAudio(void);
         bool openMidi(void);
         bool Start(void);
         void Close(void);
         unsigned int getSamplerate(void) { return audio.jackSamplerate; }
         int getBuffersize(void) { return audio.jackNframes; }
-        string clientName(void);
+        std::string clientName(void);
         int clientId(void);
-        virtual string audioClientName(void) { return clientName(); }
+        virtual std::string audioClientName(void) { return clientName(); }
         virtual int audioClientId(void) { return clientId(); }
-        virtual string midiClientName(void) { return clientName(); }
+        virtual std::string midiClientName(void) { return clientName(); }
         virtual int midiClientId(void) { return clientId(); }
         void registerAudioPort(int portnum);
 
     private:
-        bool openJackClient(string server);
+        bool openJackClient(std::string server);
         bool connectJackPorts(void);
         bool processAudio(jack_nframes_t nframes);
         void sendAudio(int framesize, unsigned int offset);

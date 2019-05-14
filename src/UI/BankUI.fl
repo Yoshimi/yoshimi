@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code.
 
-Modified March 2019
+Modified April 2019
 } {selected in_source in_header
 }
 
@@ -316,7 +316,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
             instrumentuiwindow->hide();
         }
         instFrom = 0;}
-        tooltip {Show root paths} xywh {350 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
+        tooltip {Show root paths. Right click: also close this} xywh {350 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
       Fl_Button {} {
         label Banks
@@ -328,7 +328,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
             instrumentuiwindow->hide();
         }
         instFrom = 0;}
-        tooltip {Show banks in current root} xywh {496 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
+        tooltip {Show banks in current root. Right click: also close this} xywh {496 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
       Fl_Text_Display {} {
         label {This column uses MIDI}
@@ -454,7 +454,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         }
         instFrom = 0; // to avoid later confusion!
         instrumentuiwindow->hide();}
-        xywh {665 539 70 24} box THIN_UP_BOX labelsize 12
+        tooltip {Right click: also reopen previous} xywh {665 539 70 24} box THIN_UP_BOX labelsize 12
       }
       Fl_Group engines {
         xywh {468 528 151 42} box ENGRAVED_FRAME
@@ -506,7 +506,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         }
         else
             rootFrom = 0;}
-        tooltip {Show root paths} xywh {248 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
+        tooltip {Show root paths. Right click: also close this} xywh {248 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
       Fl_Button {} {
         label {current bank}
@@ -530,7 +530,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         instrumentuiwindow->show();
         if (Fl::event_button() == 3)
             bankuiwindow->hide();}
-        tooltip {Show instruments in current bank} xywh {627 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
+        tooltip {Show instruments in current bank. Right click: also close this} xywh {627 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
       Fl_Group {} {
         xywh {5 34 766 491} box ENGRAVED_FRAME
@@ -664,7 +664,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
             }
             else
                 bankFrom = 0;}
-        xywh {647 538 70 24} box THIN_UP_BOX labelsize 12
+        tooltip {Right click: also reopen previous} xywh {647 538 70 24} box THIN_UP_BOX labelsize 12
       }
     }
     Fl_Window rootuiwindow {
@@ -744,7 +744,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         }
         else
             rootFrom = 0;}
-        xywh {265 225 75 35} box THIN_UP_BOX labelsize 12 align 128
+        tooltip {Right click: also close this} xywh {265 225 75 35} box THIN_UP_BOX labelsize 12 align 128
       }
       Fl_Button Pend {
         label Pending
@@ -784,7 +784,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         else
             rootFrom = 0;
         rootuiwindow->do_callback();}
-        xywh {402 268 51 20} box THIN_UP_BOX labelsize 12
+        tooltip {Right click: also reopen previous} xywh {402 268 51 20} box THIN_UP_BOX labelsize 12
       }
     }
   }

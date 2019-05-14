@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified February 2019
+    Modified May 2019
 */
 
 #include "YoshimiLV2Plugin.h"
@@ -367,7 +367,7 @@ bool YoshimiLV2Plugin::init()
 
     _synth->getRuntime().runSynth = true;
 
-    if (!_synth->getRuntime().startThread(&_pIdleThread, YoshimiLV2Plugin::static_idleThread, this, false, 0, false, "LV2 idle"))
+    if (!_synth->getRuntime().startThread(&_pIdleThread, YoshimiLV2Plugin::static_idleThread, this, false, 0, "LV2 idle"))
     {
         synth->getRuntime().Log("Failed to start idle thread");
         return false;

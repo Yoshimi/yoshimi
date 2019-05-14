@@ -20,9 +20,13 @@ After the main build information you will see the location of the Curses directo
 
 ---- Other Options ----
 
+'BuildWithFLTK' (normally on) - If disabled you get a headless build with no references to graphical libraries.
+
 There is a switch for building in jack session support.
 
 Yoshimi can be used as an LV2 plugin if switched on, otherwise the code will not be generated. Once again, there is also an editable location. The majority of installs want this located at 'lib/lv2' but if you need something different you can change it.
+
+'ReportNotes' is a developer's tool that counts note-on and note-off events passing through the system to check they tally.
 
 'ShowGuiReports' is intended as a tool for developers, and will show the command structure used when any GUI control is moved. If you press button 2 or 3 (middle/right) this will be the line you need if you want to duplicate the action from the command line's direct access. However, if you press any other button, or use the scroll wheel then you will get the message that MIDI-learn reports.
 

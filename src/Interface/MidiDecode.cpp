@@ -1,7 +1,7 @@
 /*
     MidiDecode.cpp
 
-    Copyright 2017-2018 Will Godfrey
+    Copyright 2017-2019 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified December 2018
+    Modified May 2019
 */
 
 #include <iostream>
@@ -27,7 +27,6 @@
 #include <string>
 #include <unistd.h>
 
-using namespace std;
 
 #include "Interface/MidiDecode.h"
 #include "Interface/InterChange.h"
@@ -107,7 +106,7 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
 {
     if (synth->getRuntime().monitorCCin)
     {
-        string ctltype;
+        std::string ctltype;
         switch (ctrl)
         {
             case MIDI::CC::null:
@@ -216,12 +215,12 @@ void MidiDecode::sendMidiCC(bool inSync, unsigned char chan, int type, short int
 {
     if (inSync) // no CLI or GUI updates needed
     {
-        //cout << "CC inSync" << endl;
+        //std::cout << "CC inSync" << std::endl;
         synth->SetController(chan, type, par);
         return;
     }
 
-    //cout << "CC buffered" << endl;
+    //std::cout << "CC buffered" << std::endl;
     CommandBlock putData;
     memset(&putData, 0xff, sizeof(putData));
     putData.data.value = par;
@@ -230,7 +229,7 @@ void MidiDecode::sendMidiCC(bool inSync, unsigned char chan, int type, short int
     putData.data.part = TOPLEVEL::section::midiIn;
     putData.data.kit = chan;
     putData.data.engine = type;
-    synth->midilearn.writeMidi(&putData, sizeof(putData), false);
+    synth->midilearn.writeMidi(&putData, false);
 }
 
 /*
@@ -567,10 +566,10 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
     }
     if (dHigh < 4)
         return;
-    //cout << "part " << int(putData.data.part) << "  Chan " << int(par) << endl;
+    //std::cout << "part " << int(putData.data.part) << "  Chan " << int(par) << std::endl;
     putData.data.type = 0xd0;
 
-    synth->midilearn.writeMidi(&putData, sizeof(putData), false);
+    synth->midilearn.writeMidi(&putData, false);
 }
 
 
@@ -640,7 +639,7 @@ void MidiDecode::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_pla
     if (in_place)
         synth->SetRBP(&putData, false);
     else
-        synth->midilearn.writeMidi(&putData, sizeof(putData), false);
+        synth->midilearn.writeMidi(&putData, false);
 }
 
 
@@ -682,7 +681,7 @@ void MidiDecode::setMidiProgram(unsigned char ch, int prg, bool in_place)
                 }
                 else
                 {
-                    synth->midilearn.writeMidi(&putData, sizeof(putData), false);
+                    synth->midilearn.writeMidi(&putData, false);
                 }
             }
         }
@@ -697,7 +696,7 @@ void MidiDecode::setMidiProgram(unsigned char ch, int prg, bool in_place)
             synth->SetRBP(&putData, false);
         }
         else
-            synth->midilearn.writeMidi(&putData, sizeof(putData), false);
+            synth->midilearn.writeMidi(&putData, false);
     }
 }
 

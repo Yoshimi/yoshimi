@@ -11,7 +11,7 @@ comment {EffUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2016-2018, Will Godfrey & others
+Copyright 2016-2019, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-Modified November 2018} {in_source in_header
+Modified April 2019} {selected in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -202,7 +202,7 @@ eff = eff_;
   }
 }
 
-class EffUI {selected : {public Fl_Group,public PresetsUI_}
+class EffUI {: {public Fl_Group,public PresetsUI_}
 } {
   Function {EffUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
@@ -543,7 +543,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
   }
   Function {make_chorus_window()} {} {
     Fl_Window effchoruswindow {
-      xywh {1007 275 379 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {1002 382 375 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Choice chorusp {
@@ -716,7 +716,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         label Preset
         callback {//
         send_data(16, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
-        xywh {80 21 82 15} box UP_BOX down_box BORDER_BOX color 31 selection_color 7 labelsize 11 align 1 textsize 11
+        xywh {80 21 82 15} box UP_BOX down_box BORDER_BOX color 14 selection_color 0 labelsize 11 align 1 textsize 11 textcolor 7
       } {
         MenuItem {} {
           label {Phaser 1}
@@ -775,7 +775,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         label Vol
         callback {//
         send_data(0, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {Effect Volume} xywh {10 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        tooltip {Effect Volume} xywh {8 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->setValueType(VC_FXdefaultVol);}
         class WidgetPDial
       }
@@ -784,7 +784,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 1;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        xywh {48 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        xywh {46 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->setValueType(VC_PanningStd);}
         class WidgetPDial
       }
@@ -793,7 +793,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 2;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {LFO frequency} xywh {86 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        tooltip {LFO frequency} xywh {84 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->setValueType(VC_FXlfofreq);}
         class WidgetPDial
       }
@@ -802,15 +802,15 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 3;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {LFO randomness} xywh {124 50 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
+        tooltip {LFO randomness} xywh {122 50 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
       Fl_Choice phaserp4 {
-        label LFO
+        label {LFO Type}
         callback {//
         send_data(4, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {LFO function} xywh {314 60 50 16} down_box BORDER_BOX labelsize 10 align 130 textsize 8
+        tooltip {LFO function} xywh {156 62 50 18} down_box BORDER_BOX labelsize 10 align 2 textsize 8
       } {
         MenuItem {} {
           label SINE
@@ -826,7 +826,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 5;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {Left/Right Channel Phase Shift} xywh {162 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        tooltip {Left/Right Channel Phase Shift} xywh {210 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->setValueType(VC_FXlfoStereo);}
         class WidgetPDial
       }
@@ -835,7 +835,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 6;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {LFO Depth} xywh {181 15 30 30} box ROUND_UP_BOX labelsize 11 align 1 maximum 127
+        tooltip {LFO Depth} xywh {191 15 30 30} box ROUND_UP_BOX labelsize 11 align 1 maximum 127
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
@@ -844,7 +844,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 7;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip Feedback xywh {200 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        tooltip Feedback xywh {248 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->setValueType(VC_FXdefaultFb);}
         class WidgetPDial
       }
@@ -852,7 +852,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         label Stages
         callback {//
         send_data(8, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        xywh {265 23 35 15} type Simple labelsize 11 align 1 minimum 0 maximum 127 step 1 textfont 1 textsize 11
+        xywh {324 63 45 15} type Simple labelsize 11 minimum 0 maximum 127 step 1 textfont 1 textsize 11
         code0 {o->range(1,MAX_PHASER_STAGES);}
       }
       Fl_Dial phaserp9 {
@@ -860,22 +860,22 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 9;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {Channel Routing} xywh {238 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        tooltip {Channel Routing} xywh {229 15 30 30} box ROUND_UP_BOX labelsize 11 align 1 maximum 127
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
       Fl_Check_Button phaserp10 {
-        label Subtract
+        label {Sub.}
         callback {//
         send_data(10, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {inverts output} xywh {314 9 40 16} down_box DOWN_BOX color 230 labelsize 11
+        tooltip {inverts output} xywh {354 42 17 16} down_box DOWN_BOX color 230 labelsize 11 align 4
       }
       Fl_Dial phaserp11 {
         label Phase
         callback {//
         int butt = 11;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        xywh {219 15 30 30} box ROUND_UP_BOX labelsize 11 align 1 maximum 127
+        xywh {286 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
@@ -883,28 +883,28 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         label hyper
         callback {//
         send_data(12, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {hyper-sine} xywh {314 25 55 15} down_box DOWN_BOX labelsize 11
+        tooltip {hyper-sine} xywh {354 26 17 15} down_box DOWN_BOX labelsize 11 align 4 deactivate
       }
       Fl_Dial phaserp13 {
         label dist
         callback {//
         int butt = 13;
         send_data(butt, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip Distortion xywh {276 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        tooltip Distortion xywh {267 15 30 30} box ROUND_UP_BOX labelsize 11 align 1 maximum 127 deactivate
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
       Fl_Check_Button phaserp14 {
         label Analog
         callback {//
-        send_data(14, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        tooltip {Emulates FET} xywh {314 40 70 15} down_box DOWN_BOX labelsize 11
+        send_data(14, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        tooltip {Emulates FET} xywh {354 10 17 15} down_box DOWN_BOX labelsize 11 align 4
       }
     }
   }
   Function {make_alienwah_window()} {} {
     Fl_Window effalienwahwindow {
-      xywh {1013 520 379 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {1013 520 375 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Choice awp {
@@ -1460,7 +1460,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
       xywh {1109 779 290 110} type Double hide
     } {
       Fl_Group fwin_filterui {
-        label {DynFilter effect  - Filter} open
+        label {DynFilter effect  - Filter}
         xywh {5 5 275 75} box FLAT_BOX color 50 labelsize 12 align 144
         code0 {o->init(eff->filterpars,NULL,NULL, npart, EFFECT::type::dynFilter, neff);}
         class FilterUI
@@ -1477,15 +1477,25 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
     type |= TOPLEVEL::type::Write;
     collect_data(synth, value, (Fl::event_button() | type), control, npart, group, neff);} {}
   }
+  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED, int request = UNUSED)} {return_type float
+  } {
+    code {//
+        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, par2, request);} {}
+  }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
     int value_int = int(value + 0.5f);
     unsigned char control = getData->data.control;
     unsigned char efftype = getData->data.kit;
-    bool isdynfilter = (getData->data.engine == EFFECT::type::dynFilter);
+    unsigned char effnum = getData->data.engine;
+    bool isdynfilter = (effnum == EFFECT::type::dynFilter);
     unsigned char secondary = getData->data.par2;
 
+    int textCol = 14;
+    if (fetchData(0, 200, getData->data.part, efftype, effnum) != 0)
+        textCol = FL_BLUE;
+    //cout << "colour " << textCol << endl;
     //cout << "cont " << (int)control << "  type " << (int)efftype << "  num " << (int)effnum << endl;
     switch(efftype)
     {
@@ -1495,13 +1505,13 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         case EFFECT::type::reverb:
             switch (control)
             {
-                case 0:
+                case EFFECT::control::level:
                     revp0->value(value);
                     break;
-                case 1:
+                case EFFECT::control::panning:
                     revp1->value(value);
                     break;
-                case 2:
+                case EFFECT::control::frequency: // time here
                     revp2->value(value);
                     break;
                 case 3:
@@ -1538,23 +1548,24 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                 case 12:
                     revp12->value(value);
                     break;
-                case 16:
-                refresh();
-                break;
-
+                case EFFECT::control::preset:
+                    refresh();
+                    break;
             }
+            revp->color(textCol);
+            revp->redraw();
             break;
 
         case EFFECT::type::echo:
             switch (control)
             {
-                case 0:
+                case EFFECT::control::level:
                     echop0->value(value);
                     break;
-                case 1:
+                case EFFECT::control::panning:
                     echop1->value(value);
                     break;
-                case 2:
+                case EFFECT::control::frequency: // delay here
                     echop2->value(value);
                     break;
                 case 3:
@@ -1569,22 +1580,24 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                 case 6:
                     echop6->value(value);
                     break;
-                case 16:
+                case EFFECT::control::preset:
                     refresh();
                     break;
             }
+            echop->color(textCol);
+            echop->redraw();
             break;
 
         case EFFECT::type::chorus:
             switch (control)
             {
-                case 0:
+                case EFFECT::control::level:
                     chorusp0->value(value);
                     break;
-                case 1:
+                case EFFECT::control::panning:
                     chorusp1->value(value);
                     break;
-                case 2:
+                case EFFECT::control::frequency:
                     chorusp2->value(value);
                     break;
                 case 3:
@@ -1608,22 +1621,24 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                 case 11:
                     chorusp11->value(value_int);
                     break;
-                case 16:
+                case EFFECT::control::preset:
                     refresh();
                     break;
             }
+            chorusp->color(textCol);
+            chorusp->redraw();
             break;
 
         case EFFECT::type::phaser:
             switch (control)
             {
-                case 0:
+                case EFFECT::control::level:
                     phaserp0->value(value);
                     break;
-                case 1:
+                case EFFECT::control::panning:
                     phaserp1->value(value);
                     break;
-                case 2:
+                case EFFECT::control::frequency:
                     phaserp2->value(value);
                     break;
                 case 3:
@@ -1661,23 +1676,39 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                     break;
                 case 14:
                     phaserp14->value(value_int);
+                    if (value_int != 0)
+                    {
+                        phaserp9->deactivate();
+                        //phaserp11->deactivate();
+                        phaserp12->activate();
+                        phaserp13->activate();
+                    }
+                    else
+                    {
+                        phaserp9->activate();
+                        //phaserp11->activate();
+                        phaserp12->deactivate();
+                        phaserp13->deactivate();
+                    }
                     break;
-                case 16:
+                case EFFECT::control::preset:
                     refresh();
                     break;
             }
+            phaserp->color(textCol);
+            phaserp->redraw();
             break;
 
         case EFFECT::type::alienWah:
             switch (control)
             {
-                case 0:
+                case EFFECT::control::level:
                     awp0->value(value);
                     break;
-                case 1:
+                case EFFECT::control::panning:
                     awp1->value(value);
                     break;
-                case 2:
+                case EFFECT::control::frequency:
                     awp2->value(value);
                     break;
                 case 3:
@@ -1704,22 +1735,24 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                 case 10:
                     awp10->value(value);
                     break;
-                case 16:
+                case EFFECT::control::preset:
                     refresh();
                     break;
             }
+            awp->color(textCol);
+            awp->redraw();
             break;
 
         case EFFECT::type::distortion:
             switch (control)
             {
-                case 0:
+                case EFFECT::control::level:
                     distp0->value(value);
                     break;
-                case 1:
+                case EFFECT::control::panning:
                     distp1->value(value);
                     break;
-                case 2:
+                case EFFECT::control::frequency: // LR-mix here
                     distp2->value(value);
                     break;
                 case 3:
@@ -1746,19 +1779,21 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                 case 10:
                     distp10->value(value_int);
                     break;
-                case 16:
+                case EFFECT::control::preset:
                     refresh();
                     break;
             }
+            distp->color(textCol);
+            distp->redraw();
             break;
 
         case EFFECT::type::eq:
             //synth->getRuntime().Log("EQ " + to_string(value_int) + "  " + to_string(int(control)));
-            if(control == 0)
+            if(control == EFFECT::control::level)
             {
                 eqp0->value(value);
             }
-            else if (control == 1)
+            else if (control == EFFECT::control::panning) // band numnber here!
             {
                 eqband = value_int;
                 EQbandUpdate();
@@ -1800,19 +1835,19 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
 
         case EFFECT::type::dynFilter:
             if(isdynfilter)
-            {
-                //synth->getRuntime().Log("DyneFilter" );
+            { // shouldn't get here
+                //cout << "DyneFilter" << endl;
                 return;
             }
             switch (control)
             {
-                case 0:
+                case EFFECT::control::level:
                     dfp0->value(value);
                     break;
-                case 1:
+                case EFFECT::control::panning:
                     dfp1->value(value);
                     break;
-                case 2:
+                case EFFECT::control::frequency:
                     dfp2->value(value);
                     break;
                 case 3:
@@ -1836,10 +1871,12 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
                 case 9:
                     dfp9->value(value);
                     break;
-                case 16:
+                case EFFECT::control::preset:
                     refresh();
                     break;
             }
+            dfp->color(textCol);
+            dfp->redraw();
             break;
     }} {}
   }
@@ -1978,6 +2015,21 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
             phaserp12->value(eff->geteffectpar(12));
             phaserp13->value(eff->geteffectpar(13));
             phaserp14->value(eff->geteffectpar(14));
+            if (phaserp14->value() != 0)
+            {
+                phaserp9->deactivate();
+                //phaserp11->deactivate();
+                phaserp12->activate();
+                phaserp13->activate();
+            }
+            else
+            {
+                phaserp9->activate();
+                //phaserp11->activate();
+                phaserp12->deactivate();
+                phaserp13->deactivate();
+            }
+
             effphaserwindow->show();
             break;
         case 5:
@@ -2058,6 +2110,47 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
   }
   Function {refresh()} {} {
     code {refresh(eff, npart, neff);} {}
+  }
+  Function {UpdatePresetColour(int changed, int efftype)} {} {
+    code {//
+    int textCol = 14;
+    if (changed)
+         textCol = FL_BLUE;
+
+    switch (efftype + EFFECT::type::none)
+    {
+        case EFFECT::type::reverb:
+            revp->color(textCol);
+            revp->redraw();
+            break;
+        case EFFECT::type::echo:
+            echop->color(textCol);
+            echop->redraw();
+            break;
+        case EFFECT::type::chorus:
+            chorusp->color(textCol);
+            chorusp->redraw();
+            break;
+        case EFFECT::type::phaser:
+            phaserp->color(textCol);
+            phaserp->redraw();
+            break;
+        case EFFECT::type::alienWah:
+            awp->color(textCol);
+            awp->redraw();
+            break;
+        case EFFECT::type::distortion:
+            distp->color(textCol);
+            distp->redraw();
+            break;
+        case EFFECT::type::eq:
+            break;
+        case EFFECT::type::dynFilter:
+            dfp->color(textCol);
+            dfp->redraw();
+            break;
+    }
+    //cout << "Col " << textCol << "  eff " << efftype << endl;} {}
   }
   Function {EQbandUpdate()} {} {
     code {//

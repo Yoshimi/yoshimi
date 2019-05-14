@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2017-2018 Will Godfrey
+    Copyright 2017-2019 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of ZynAddSubFX original code.
-    Modified August 2018
+    Modified May 2019
 */
 
 #include <iostream>
@@ -145,10 +145,12 @@ void ADnoteParameters::defaults(int n)
     VoicePar[nvoice].PFMFixedFreq = false;
 
     // I use the internal oscillator (-1)
+    VoicePar[nvoice].PVoice = -1;
     VoicePar[nvoice].PFMVoice = -1;
 
     VoicePar[nvoice].PFMVolume = 90;
     VoicePar[nvoice].PFMVolumeDamp = 64;
+    VoicePar[nvoice].PFMDetuneFromBaseOsc = 1;
     VoicePar[nvoice].PFMDetune = 8192;
     VoicePar[nvoice].PFMCoarseDetune = 0;
     VoicePar[nvoice].PFMDetuneType = 0;
@@ -316,6 +318,7 @@ void ADnoteParameters::add2XMLsection(XMLwrapper *xml, int n)
     xml->addpar("delay", VoicePar[nvoice].PDelay);
     xml->addparbool("resonance", VoicePar[nvoice].Presonance);
 
+    xml->addpar("input_voice", VoicePar[nvoice].PVoice);
     xml->addpar("ext_oscil", VoicePar[nvoice].Pextoscil);
     xml->addpar("ext_fm_oscil", VoicePar[nvoice].PextFMoscil);
 
@@ -422,6 +425,7 @@ void ADnoteParameters::add2XMLsection(XMLwrapper *xml, int n)
                 xml->endbranch();
             }
             xml->beginbranch("MODULATOR");
+                xml->addparbool("detune_from_base_osc", VoicePar[nvoice].PFMDetuneFromBaseOsc);
                 xml->addpar("detune", VoicePar[nvoice].PFMDetune);
                 xml->addpar("coarse_detune", VoicePar[nvoice].PFMCoarseDetune);
                 xml->addpar("detune_type", VoicePar[nvoice].PFMDetuneType);
@@ -640,6 +644,8 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper *xml, int n)
     VoicePar[nvoice].PDelay = xml->getpar127("delay", VoicePar[nvoice].PDelay);
     VoicePar[nvoice].Presonance = xml->getparbool("resonance", VoicePar[nvoice].Presonance);
 
+    VoicePar[nvoice].PVoice =
+        xml->getpar("input_voice", VoicePar[nvoice].PVoice, -1, nvoice - 1);
     VoicePar[nvoice].Pextoscil = xml->getpar("ext_oscil", -1, -1, nvoice - 1);
     VoicePar[nvoice].PextFMoscil = xml->getpar("ext_fm_oscil", -1, -1,nvoice - 1);
 
@@ -780,21 +786,55 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper *xml, int n)
 
         if (xml->enterbranch("MODULATOR"))
         {
-            VoicePar[nvoice].PFMDetune =
-                xml->getpar("detune",VoicePar[nvoice].PFMDetune, 0, 16383);
-            VoicePar[nvoice].PFMCoarseDetune =
-                xml->getpar("coarse_detune", VoicePar[nvoice].PFMCoarseDetune, 0, 16383);
-            VoicePar[nvoice].PFMDetuneType =
-                xml->getpar127("detune_type", VoicePar[nvoice].PFMDetuneType);
+            bool loadFMFreqParams = true;
+            VoicePar[nvoice].PFMDetuneFromBaseOsc =
+                xml->getparbool("detune_from_base_osc", 127);
+            if (VoicePar[nvoice].PFMDetuneFromBaseOsc == 127) {
+                // In the past it was not possible to choose whether to include
+                // detuning from the base oscillator. For local modulators it
+                // was always enabled, for imported voice modulators it was
+                // always disabled. To load old patches correctly, we apply this
+                // old behavior here if the XML element is missing from the
+                // patch. New patches will always save one or the other.
+                //
+                // In a similar fashion, it was not possible to apply frequency
+                // parameters to imported voice modulators in the past, however
+                // it was possible to save them if you edited them before
+                // switching to an imported voice. Now that frequency parameters
+                // are respected, we need to ignore those parameters for old
+                // instruments that saved them, but didn't use them, otherwise
+                // the instrument will sound different.
+                if (VoicePar[nvoice].PFMVoice >= 0) {
+                    VoicePar[nvoice].PFMDetuneFromBaseOsc = 0;
+                    loadFMFreqParams = false;
 
-            VoicePar[nvoice].PFMFreqEnvelopeEnabled =
-                xml->getparbool("freq_envelope_enabled",
-                                VoicePar[nvoice].PFMFreqEnvelopeEnabled);
-            VoicePar[nvoice].PFMFixedFreq = xml->getparbool("fixed_freq", VoicePar[nvoice].PFMFixedFreq);
-            if (xml->enterbranch("FREQUENCY_ENVELOPE"))
-            {
-                VoicePar[nvoice].FMFreqEnvelope->getfromXML(xml);
-                xml->exitbranch();
+                    // In the past the fixed frequency of the imported voice was
+                    // respected. Now, the fixed frequency of the modulator is
+                    // respected. So if we load an old patch, fetch that setting
+                    // from the imported voice.
+                    VoicePar[nvoice].PFMFixedFreq =
+                        VoicePar[VoicePar[nvoice].PFMVoice].Pfixedfreq;
+                } else {
+                    VoicePar[nvoice].PFMDetuneFromBaseOsc = 1;
+                }
+            }
+            if (loadFMFreqParams) {
+                VoicePar[nvoice].PFMDetune =
+                    xml->getpar("detune",VoicePar[nvoice].PFMDetune, 0, 16383);
+                VoicePar[nvoice].PFMCoarseDetune =
+                    xml->getpar("coarse_detune", VoicePar[nvoice].PFMCoarseDetune, 0, 16383);
+                VoicePar[nvoice].PFMDetuneType =
+                    xml->getpar127("detune_type", VoicePar[nvoice].PFMDetuneType);
+
+                VoicePar[nvoice].PFMFreqEnvelopeEnabled =
+                    xml->getparbool("freq_envelope_enabled",
+                                    VoicePar[nvoice].PFMFreqEnvelopeEnabled);
+                VoicePar[nvoice].PFMFixedFreq = xml->getparbool("fixed_freq", VoicePar[nvoice].PFMFixedFreq);
+                if (xml->enterbranch("FREQUENCY_ENVELOPE"))
+                {
+                    VoicePar[nvoice].FMFreqEnvelope->getfromXML(xml);
+                    xml->exitbranch();
+                }
             }
 
             if (xml->enterbranch("OSCIL"))
@@ -976,6 +1016,12 @@ float ADnoteParameters::getLimits(CommandBlock *getData)
             max = 6;
             break;
 
+        case ADDVOICE::control::externalOscillator:
+            min = -1;
+            def = -1;
+            max = 6;
+            break;
+
         case ADDVOICE::control::detuneFrequency:
             type |= learnable;
             min = -8192;
@@ -1104,6 +1150,10 @@ float ADnoteParameters::getLimits(CommandBlock *getData)
             min = -8192;
             max = 8191;
             break;
+        case ADDVOICE::control::modulatorDetuneFromBaseOsc:
+            def = 1;
+            max = 1;
+            break;
         case ADDVOICE::control::modulatorFrequencyAs440Hz:
             max = 1;
             break;
@@ -1160,7 +1210,7 @@ float ADnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case ADDVOICE::control::soundType:
-            max = 2;
+            max = 3;
             break;
 
         default:

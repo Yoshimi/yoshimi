@@ -11,7 +11,7 @@ comment {FilterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2016-2018 Will Godfrey
+Copyright 2016-2019 Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -29,7 +29,10 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-Modified August 2018} {in_source in_header
+Modified March 2019} {selected in_source in_header
+}
+
+decl {\#include <iostream>} {public local
 }
 
 decl {\#include "UI/MiscGui.h"} {public local
@@ -359,7 +362,7 @@ return Fl_Box::handle(event);} {}
   }
 }
 
-class FilterUI {selected : {public Fl_Group,PresetsUI_}
+class FilterUI {: {public Fl_Group,PresetsUI_}
 } {
   Function {FilterUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
@@ -823,6 +826,16 @@ pars=NULL;
 
     if (part != npart || (kititem != EFFECT::type::dynFilter && eng != engine))
         return;
+    if (kititem == EFFECT::type::dynFilter)
+    {
+        cout << "Dyn filter seen part " << int(part)<< endl;
+        if (part == TOPLEVEL::section::systemEffects)
+            synth->getGuiMaster()->syseffectui->UpdatePresetColour(1, EFFECT::type::dynFilter - EFFECT::type::none);
+        else if (part == TOPLEVEL::section::insertEffects)
+            synth->getGuiMaster()->inseffectui->UpdatePresetColour(1, EFFECT::type::dynFilter - EFFECT::type::none);
+        else
+           synth->getGuiMaster()->partui->inseffectui->UpdatePresetColour(1, EFFECT::type::dynFilter - EFFECT::type::none); // normal part effect
+    }
 
     switch(control)
     {

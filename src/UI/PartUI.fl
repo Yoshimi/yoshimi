@@ -11,7 +11,7 @@ comment {PartUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2018, Will Godfrey
+Copyright 2014-2019, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified October 2018
+Modified April 2019
 } {selected in_source in_header
 }
 
@@ -648,7 +648,7 @@ Offset}
           callback {//
           send_data(PART::control::maxNotes, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Maximum keys for this part} xywh {194 143 38 20} labelsize 10 value 20 textsize 11
-          code0 {o->range(1, POLIPHONY - 20); // enough for one part!}
+          code0 {o->range(1, PART_POLIPHONY); // enough for one part!}
           code1 {o->value(part->Pkeylimit);}
         }
         Fl_Spinner minkcounter {
@@ -1123,7 +1123,7 @@ Offset}
         partfx->hide();
         if ((Fl::event_button() == 3))
             synth->getGuiMaster()->partui->instrumenteditwindow->show();}
-        xywh {314 136 60 20} box THIN_UP_BOX
+        tooltip {Right click: also reopen previous} xywh {314 136 60 20} box THIN_UP_BOX
       }
       Fl_Choice sendtochoice {
         label To
@@ -1177,7 +1177,7 @@ Offset}
         instrumentkitlist->hide();
         if ((Fl::event_button() == 3))
         synth->getGuiMaster()->partui->instrumenteditwindow->show();}
-        xywh {569 348 63 20} box THIN_UP_BOX
+        tooltip {Right click: also reopen previous} xywh {569 348 63 20} box THIN_UP_BOX
       }
       Fl_Scroll kitlist {
         xywh {0 15 670 330} type VERTICAL box THIN_UP_BOX
@@ -1311,7 +1311,7 @@ Offset}
             seteditname();
             if ((Fl::event_button() == 3))
                 instrumenteditwindow->hide();}
-            xywh {15 281 80 34} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
+            tooltip {Right click: also close this} xywh {15 281 80 34} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
             code0 {if (part->kit[0].Padenabled==0) o->deactivate();}
           }
         }
@@ -1353,7 +1353,7 @@ Offset}
             seteditname();
             if ((Fl::event_button() == 3))
                 instrumenteditwindow->hide();}
-            xywh {115 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
+            tooltip {Right click: also close this} xywh {115 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
             code0 {if (part->kit[0].Psubenabled==0) o->deactivate();}
           }
         }
@@ -1395,7 +1395,7 @@ Offset}
             seteditname();
             if ((Fl::event_button() == 3))
                 instrumenteditwindow->hide();}
-            xywh {215 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
+            tooltip {Right click: also close this} xywh {215 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
             code0 {if (part->kit[0].Ppadenabled==0) o->deactivate();}
           }
         }
@@ -1405,7 +1405,7 @@ Offset}
           instrumentkitlist->show();
           if ((Fl::event_button() == 3))
               instrumenteditwindow->hide();}
-          xywh {310 245 80 35} box PLASTIC_UP_BOX color 238 selection_color 220 labelfont 1 align 128
+          tooltip {Right click: also close this} xywh {310 245 80 35} box PLASTIC_UP_BOX color 238 selection_color 220 labelfont 1 align 128
         }
         Fl_Button {} {
           label Effects
@@ -1413,7 +1413,7 @@ Offset}
           partfx->show();
           if ((Fl::event_button() == 3))
               instrumenteditwindow->hide();}
-          xywh {310 290 80 35} box PLASTIC_UP_BOX color 230 labelfont 1 labelsize 13
+          tooltip {Right click: also close this} xywh {310 290 80 35} box PLASTIC_UP_BOX color 230 labelfont 1 labelsize 13
         }
       }
       Fl_Group {} {
@@ -1574,6 +1574,11 @@ Offset}
         type |= TOPLEVEL::type::Write;
         collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, insert, parameter, par2);} {}
   }
+  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED, int request = UNUSED)} {return_type float
+  } {
+    code {//
+        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, par2, request);} {}
+  }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
@@ -1629,7 +1634,7 @@ Offset}
 
     if (npart != newpart)
         return;
-    bool sameEff = (engine == (inseffnocounter->value() - 1));
+    bool sameEff = (engine == ninseff);
     bool kitType = (insert == TOPLEVEL::insert::kitGroup);
     switch(control)
     {
@@ -1926,11 +1931,17 @@ Offset}
                 kitlist->deactivate();
             break;
 
+        case PART::control::effectNumber:
+            if (sameEff)
+                inseffectui->UpdatePresetColour(parameter, insefftype->value());
+            break;
+
         case PART::control::effectType:
             if (sameEff)
             {
                 insefftype->value(valInt);
                 part->partefx[engine]->geteffect();
+                inseffectui->UpdatePresetColour(parameter, insefftype->value());
                 inseffectui->refresh(part->partefx[engine], npart, engine);
             }
             break;
@@ -2099,7 +2110,7 @@ Offset}
   Function {updatecontrollers()} {} {
     code {//
     enportamento->value(0);
-    keymode->value(part->Pkeymode & 3);
+    keymode->value(part->Pkeymode & MIDI_NOT_LEGATO);
     expmwh->value(part->ctl->modwheel.exponential);
     modwh->value(part->ctl->modwheel.depth);
     expbw->value(part->ctl->bandwidth.exponential);
@@ -2146,6 +2157,12 @@ Offset}
     ninseff = 0;
     make_window();
     partgroup->position(this->parent()->x() + 2, this->parent()->y() + 2);
+    int efftype = fetchData(0, PART::control::effectType, npart, UNUSED, 0, TOPLEVEL::insert::partEffectSelect);
+    if (efftype > 0)
+    {
+        bool status = fetchData(0, 200, npart, efftype + EFFECT::type::none, ninseff);
+        inseffectui->UpdatePresetColour(status, insefftype->value());
+    }
     partgroup->show();
     lastkey = -1;
     end();} {}
@@ -2372,7 +2389,7 @@ Offset}
   }
   decl {int npart;} {public local
   }
-  decl {int ninseff;} {private local
+  decl {int ninseff;} {public local
   }
   decl {int lastkititem;} {public local
   }
