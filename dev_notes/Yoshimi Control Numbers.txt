@@ -246,7 +246,8 @@ YL : 0/1 : 8 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Voice enab
 YL : 0/1 : 9 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable amplitude LFO
 
 YL : 0 to 5 : 16 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator type – Off, Morph, Ring, PM, FM, PWM
-Y : -1 to 6 : 17 : 0 to 63 : 0 to 15 : 128 + (1 to 7) : 255 : 255 : 255 : External modulator (from lower numbered voice modulators) - off = -1
+Y : -1 to 6 : 17 : 0 to 63 : 0 to 15 : 128 + (1 to 7) : 255 : 255 : 255 : External modulator (from lower numbered voices) - off = -1
+Y : -1 to 6 : 18 : 0 to 63 : 0 to 15 : 128 + (1 to 7) : 255 : 255 : 255 : External voice (from lower numbered voices) - off = -1
 
 YL : -8192 to 8191 : 32 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Detune frequency
 YL : 0 to 127 : 33 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Equal temper variation
@@ -279,19 +280,20 @@ YL : 0 to 127 : 81 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modu
 YL : -64 to 63 : 82 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator HF damping
 YL : 0/1 : 88 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable modulator amplitude envelope
 YL : -8192 to 8191 : 96 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator detune frequency
+Y : 0/1 : 96 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator get detune from base oscillator
 Y : 0/1 : 98 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Set modulator frequency to 440Hz
 YL : -8 to 7 : 99 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator octave
 Y : 0 to 4 : 100 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator detune type – Default, L35 cents, L10 cents, E100 cents, E1200 cents
 Y : -64 to 63 : 101 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator coarse detune
 YL : 0/1 : 104 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable modulator frequency envelope
 YL : -64 to 63 : 112 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator oscillator phase
-Y : -1 to 6 : 113 : 0 to 63 : 0 to 15 : 128 + (1 to 7) : 255 : 255 : 255 : External modulator oscillator (from lower numbered voices) - off = -1
+Y : -1 to 6 : 113 : 0 to 63 : 0 to 15 : 128 + (1 to 7) : 255 : 255 : 255 : External modulator oscillator (from lower numbered modulators) - off = -1
 
 YL : 0 to 127 : 128 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Delay
 Y : 0/1 : 130 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Resonance enable (for this voice)
 YL : -64 to 63 : 136 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Voice oscillator phase
 Y : -1 to 6 : 137 : 0 to 63 : 0 to 15 : 128 + (1 to 7) : 255 : 255 : 255 : External voice oscillator (from lower numbered voices) - off = -1
-Y : 0 to 2 : 138 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Sound type – Oscillator, White noise, Pink noise
+Y : 0 to 2 : 138 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Sound type – Oscillator, White noise, Pink noise, Spot noise
 
 SubSynth
 YL : 0 to 127 : 0 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Volume

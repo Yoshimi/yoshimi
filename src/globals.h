@@ -695,8 +695,8 @@ namespace ADDVOICE // usage ADDVOICE::control::volume
         modulatorHFdamping,
         enableModulatorAmplitudeEnvelope = 88,
         modulatorDetuneFrequency = 96,
-        modulatorDetuneFromBaseOsc = 97,
-        modulatorFrequencyAs440Hz = 98,
+        modulatorDetuneFromBaseOsc,
+        modulatorFrequencyAs440Hz,
         modulatorOctave,
         modulatorDetuneType, // Default, L35 cents, L10 cents, E100 cents, E1200 cents
         modulatorCoarseDetune,
@@ -708,7 +708,7 @@ namespace ADDVOICE // usage ADDVOICE::control::volume
         enableResonance = 130, // for this voice
         voiceOscillatorPhase = 136,
         voiceOscillatorSource, // - 1 internal, 'n' external voice
-        soundType // Oscillator, White noise, Pink noise
+        soundType // Oscillator, White noise, Pink noise, Spot noise
     };
 }
 

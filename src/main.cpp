@@ -570,7 +570,7 @@ int main(int argc, char *argv[])
         {
             if (pthread_create(&cmdThr, &attr, commandThread, (void *)firstSynth) == 0)
             {
-
+                ;
             }
             pthread_attr_destroy(&attr);
         }

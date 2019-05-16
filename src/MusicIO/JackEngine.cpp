@@ -21,12 +21,14 @@
 */
 
 #include <errno.h>
+
 #include <unistd.h>
 #include <jack/midiport.h>
 #include <jack/thread.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sstream>
+#include <iostream>
 #include <stdio.h>
 
 #include "Misc/Config.h"
@@ -88,7 +90,7 @@ bool JackEngine::openJackClient(std::string server)
         snprintf(sUniqueId, sizeof(sUniqueId), "%d", synthUniqueId);
         clientname += ("-" + std::string(sUniqueId));
     }
-
+std::cout << " C name " << clientname << std::endl;
     bool named_server = server.size() > 0 && server.compare("default") != 0;
     if (named_server)
         jopts |= JackServerName;
@@ -193,6 +195,7 @@ void JackEngine::Close(void)
 
     if (NULL != jackClient)
     {
+        //std::cout << " C name " << clientName() << std::endl;
         int chk;
         for (int chan = 0; chan < (2*NUM_MIDI_PARTS+2); ++chan)
         {

@@ -19,4 +19,6 @@ You can also set the sample rate - bear in mind that not all cards can use all o
 If you set a MIDI device as well (such as a keyboard) Yoshimi will try to find and connect to this at startup.
 
 To find your MIDI devices try:
-grep Client /proc/asound/seq/clients
+cat /proc/asound/seq/clients
+or:
+aconnect --list

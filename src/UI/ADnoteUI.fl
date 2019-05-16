@@ -59,8 +59,8 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
 } {
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceListItem {
-      xywh {117 302 635 30} type Double box ENGRAVED_BOX
-      class Fl_Group visible
+      xywh {117 302 635 30} type Double box ENGRAVED_BOX hide
+      class Fl_Group
     } {
       Fl_Group voicelistitemgroup {
         xywh {38 1 593 25} box FLAT_BOX
@@ -360,7 +360,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
       label Voice
-      xywh {1366 264 760 610} type Double box NO_BOX hide
+      xywh {679 264 760 610} type Double box NO_BOX hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
       class Fl_Group
     } {
@@ -1407,6 +1407,11 @@ send_data(ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::Int
             ModDetune->value(value);
             fmdetunevalueoutput->do_callback();
             break;
+            
+        case ADDVOICE::control::modulatorDetuneFromBaseOsc:
+            detuneFromBaseOsc->value(value);
+            break;
+
 
         case ADDVOICE::control::modulatorFrequencyAs440Hz:
             tmp = (val_bool);
@@ -2063,8 +2068,8 @@ else if(voiceTabs->value() == g8)
     }
     Fl_Window ADnoteVoiceList {
       label {ADsynth Voices list} open
-      xywh {101 233 705 260} type Double
-      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice List").c_str());} visible
+      xywh {101 233 705 260} type Double hide
+      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice List").c_str());}
     } {
       Fl_Text_Display {} {
         label {No.}

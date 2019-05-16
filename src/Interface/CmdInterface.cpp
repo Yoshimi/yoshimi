@@ -2442,6 +2442,7 @@ std::string CmdInterface::findStatus(bool show)
                 text += ", A";
                 if (readControl(ADDSYNTH::control::enable, npart, kit, PART::engine::addSynth, insert))
                     text += "+";
+
                 if (bitFindHigh(context) == LEVEL::AddVoice)
                     text += ", Voice ";
                 else
@@ -2455,6 +2456,7 @@ std::string CmdInterface::findStatus(bool show)
                     text += (">V" +std::to_string(voiceFromNumber + 1));
                 if (readControl(ADDVOICE::control::enableVoice, npart, kitNumber, PART::engine::addVoice1 + voiceNumber))
                     text += "+";
+
                 if (bitTest(context, LEVEL::AddMod))
                 {
                     text += ", ";
@@ -2480,6 +2482,7 @@ std::string CmdInterface::findStatus(bool show)
                                 word = "Pulse";
                                 break;
                         }
+
                         if (bitFindHigh(context) == LEVEL::AddMod)
                             text += (word + " Mod ");
                         else
@@ -3383,7 +3386,33 @@ int CmdInterface::modulator(unsigned char controlType)
                 value -= 1;
             cmd = ADDVOICE::control::externalModulator;
         }
-        if (matchnMove(1, point, "volume"))
+
+        if (matchnMove(3, point, "oscillator"))
+        {
+            if (matchnMove(1, point, "internal"))
+                value = 0;
+            else
+            {
+                int tmp = point[0] - char('0');
+                if (tmp > 0)
+                    value = tmp;
+            }
+            if (value == -1 || value > voiceNumber)
+                return range_msg;
+            if (value == 0)
+                value = 0xff;
+            else
+                value -= 1;
+            cmd = ADDVOICE::control::modulatorOscillatorSource;
+        }
+
+        else if (matchnMove(3, point, "follow"))
+        {
+            value = (toggle() == 1);
+            cmd = ADDVOICE::control::modulatorDetuneFromBaseOsc;
+        }
+
+        else if (matchnMove(1, point, "volume"))
             cmd = ADDVOICE::control::modulatorAmplitude;
         else if(matchnMove(2, point, "velocity"))
             cmd = ADDVOICE::control::modulatorVelocitySense;
@@ -3502,7 +3531,7 @@ int CmdInterface::addVoice(unsigned char controlType)
                 return range_msg;
             cmd = ADDVOICE::control::soundType;
         }
-        else if (matchnMove(2, point, "source"))
+        else if (matchnMove(3, point, "oscillator"))
         {
             if (matchnMove(1, point, "internal"))
                 value = 0;
@@ -3519,6 +3548,24 @@ int CmdInterface::addVoice(unsigned char controlType)
             else
                 value -= 1;
             cmd = ADDVOICE::control::voiceOscillatorSource;
+        }
+        else if (matchnMove(3, point, "source"))
+        {
+            if (matchnMove(1, point, "local"))
+                value = 0;
+            else
+            {
+                int tmp = point[0] - char('0');
+                if (tmp > 0)
+                    value = tmp;
+            }
+            if (value == -1 || value > voiceNumber)
+                return range_msg;
+            if (value == 0)
+                value = 0xff;
+            else
+                value -= 1;
+            cmd = ADDVOICE::control::externalOscillator;
         }
         else if (matchnMove(1, point, "phase"))
             cmd = ADDVOICE::control::voiceOscillatorPhase;
@@ -3576,7 +3623,6 @@ int CmdInterface::addVoice(unsigned char controlType)
                         return value_msg;
                     cmd = ADDVOICE::control::unisonPhaseInvert;
                 }
-
             }
             if (cmd == -1)
                 return opp_msg;
@@ -3588,7 +3634,7 @@ int CmdInterface::addVoice(unsigned char controlType)
     if (value == -1)
         value = string2int(point);
     else if (value == 0xff)
-            value = -1; // special case for oscillator source
+            value = -1; // special case for voice and oscillator sources
     return sendNormal(value, controlType, cmd, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
 }
 
