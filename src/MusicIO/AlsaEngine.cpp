@@ -27,12 +27,17 @@
 #include "MusicIO/AlsaEngine.h"
 #include <iostream>
 
-AlsaEngine::AlsaEngine(SynthEngine *_synth) :MusicIO(_synth)
+AlsaEngine::AlsaEngine(SynthEngine *_synth) : MusicIO(_synth),
+    little_endian(synth->getRuntime().isLittleEndian),
+    card_endian(little_endian),
+    card_signed(true),
+    card_chans(2),
+    card_bits(8),
+    pcmWrite(NULL)
 {
     audio.handle = NULL;
     audio.period_count = 0; // re-used as number of periods
     audio.samplerate = 0;
-    audio.period_size = 0;
     audio.period_size = 0;
     audio.buffer_size = 0;
     audio.alsaId = -1;
@@ -41,7 +46,6 @@ AlsaEngine::AlsaEngine(SynthEngine *_synth) :MusicIO(_synth)
     midi.handle = NULL;
     midi.alsaId = -1;
     midi.pThread = 0;
-    little_endian = synth->getRuntime().isLittleEndian;
 }
 
 

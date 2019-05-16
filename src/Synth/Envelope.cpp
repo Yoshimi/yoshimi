@@ -83,6 +83,7 @@ Envelope::Envelope(EnvelopeParams *envpars, float basefreq, SynthEngine *_synth)
 
             default:
                 envval[i] = envpars->Penvval[i] / 127.0f;
+                break;
         }
     }
 

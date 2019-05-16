@@ -185,7 +185,6 @@ class SynthEngine : private SynthHelper, MiscFuncs, FileMgr
         float         TransVolume;
         float         Pvolume;
         float         ControlStep;
-        int           Paudiodest;
         int           Pkeyshift;
         unsigned char Psysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];
         unsigned char Psysefxsend[NUM_SYS_EFX][NUM_SYS_EFX];
@@ -195,7 +194,6 @@ class SynthEngine : private SynthHelper, MiscFuncs, FileMgr
         void setPkeyshift(int Pkeyshift_);
         void setPsysefxvol(int Ppart, int Pefx, char Pvol);
         void setPsysefxsend(int Pefxfrom, int Pefxto, char Pvol);
-        void setPaudiodest(int value);
 
         // effects
         unsigned char  syseffnum;

@@ -54,7 +54,6 @@
 #define YOSHIMI_LV2_STATE__StateChanged      "http://lv2plug.in/ns/ext/state#StateChanged"
 
 extern SynthEngine *firstSynth;
-extern int startInstance;
 
 typedef enum {
     LV2_OPTIONS_INSTANCE,
@@ -451,14 +450,6 @@ void YoshimiLV2Plugin::cleanup(LV2_Handle instance)
 }
 
 
-/*
-LV2_Worker_Interface yoshimi_wrk_iface =
-{
-    YoshimiLV2Plugin::lv2wrk_work,
-    YoshimiLV2Plugin::lv2wrk_response,
-    YoshimiLV2Plugin::lv2_wrk_end_run
-};
-*/
 
 LV2_Programs_Interface yoshimi_prg_iface =
 {
@@ -611,25 +602,6 @@ void YoshimiLV2Plugin::static_SelectProgramNew(LV2_Handle handle, unsigned char 
 }
 
 
-/*
-LV2_Worker_Status YoshimiLV2Plugin::lv2wrk_work(LV2_Handle instance, LV2_Worker_Respond_Function respond, LV2_Worker_Respond_Handle handle, uint32_t size, const void *data)
-{
-
-}
-
-
-LV2_Worker_Status YoshimiLV2Plugin::lv2wrk_response(LV2_Handle instance, uint32_t size, const void *body)
-{
-
-}
-
-
-LV2_Worker_Status YoshimiLV2Plugin::lv2_wrk_end_run(LV2_Handle instance)
-{
-
-}
-
-*/
 
 
 YoshimiLV2PluginUI::YoshimiLV2PluginUI(const char *, LV2UI_Write_Function write_function, LV2UI_Controller controller, LV2UI_Widget *widget, const LV2_Feature * const *features)

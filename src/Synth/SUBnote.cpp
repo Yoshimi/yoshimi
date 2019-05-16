@@ -740,7 +740,6 @@ int SUBnote::noteout(float *outl, float *outr)
                     break;
                 }
                 Legato.fade.m += Legato.fade.step;
-                Legato.fade.m = Legato.fade.m;
                 outl[i] *= Legato.fade.m;
                 outr[i] *= Legato.fade.m;
             }
@@ -772,7 +771,6 @@ int SUBnote::noteout(float *outl, float *outr)
                     break;
                 }
                 Legato.fade.m -= Legato.fade.step;
-                Legato.fade.m = Legato.fade.m;
                 outl[i] *= Legato.fade.m;
                 outr[i] *= Legato.fade.m;
             }
@@ -859,6 +857,7 @@ void SUBnote::initfilterbank(void)
 
             default:
                 hgain = 1.0f - hmagnew;
+                break;
         }
         gain *= hgain;
         reduceamp += hgain;

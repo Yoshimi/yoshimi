@@ -929,6 +929,7 @@ float ADnoteParameters::getLimits(CommandBlock *getData)
 
             case ADDSYNTH::control::dePop:
                 def = FADEIN_ADJUSTMENT_SCALE;
+                break;
 
             case ADDSYNTH::control::punchStrength: // just ensures it doesn't get caught by default
                 break;

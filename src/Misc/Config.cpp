@@ -336,6 +336,7 @@ string Config::testCCvalue(int cc)
 
         default:
             result = masterCCtest(cc);
+            break;
     }
     return result;
 }
@@ -399,7 +400,6 @@ string Config::masterCCtest(int cc)
             break;
 
         default:
-        {
             if (cc < 128) // don't compare with 'disabled' state
             {
                 if (cc == midi_bank_C)
@@ -411,7 +411,7 @@ string Config::masterCCtest(int cc)
                 else if (cc == channelSwitchCC)
                     result = "channel switcher";
             }
-        }
+            break;
     }
     return result;
 }
@@ -855,6 +855,7 @@ void Config::StartupReport(string clientName)
 
         default:
             report += "nada";
+            break;
     }
     report += (" -> '" + audioDevice + "'");
     Log(report, 2);
@@ -871,6 +872,7 @@ void Config::StartupReport(string clientName)
 
         default:
             report += "nada";
+            break;
     }
     if (!midiDevice.size())
         midiDevice = "default";

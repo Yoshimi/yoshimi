@@ -72,7 +72,6 @@ private:
 
    float *_bFreeWheel;
 
-   jack_ringbuffer_t *_midiRingBuf;
    pthread_t _pIdleThread;
 
    float *lv2Left [NUM_MIDI_PARTS + 1];

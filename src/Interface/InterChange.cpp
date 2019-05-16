@@ -67,6 +67,9 @@ InterChange::InterChange(SynthEngine *_synth) :
     returnsBuffer(NULL),
     blockRead(0),
     tick(0),
+    flagsValue(0xffffffff),
+    sortResultsThreadHandle(0),
+    showValue(false),
     lockTime(0),
     swapRoot1(UNUSED),
     swapBank1(UNUSED),
@@ -1479,6 +1482,7 @@ std::string InterChange::resolveVector(CommandBlock *getData)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
 
     if (control == VECTOR::control::undefined)
@@ -1576,6 +1580,7 @@ std::string InterChange::resolveMicrotonal(CommandBlock *getData)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
 
     }
 
@@ -1826,6 +1831,7 @@ std::string InterChange::resolveConfig(CommandBlock *getData)
                     break;
                 default:
                     contstr += "OFF";
+                    break;
             }
             showValue = false;
             break;
@@ -1842,6 +1848,7 @@ std::string InterChange::resolveConfig(CommandBlock *getData)
                     break;
                 default:
                     contstr += "OFF";
+                    break;
             }
             showValue = false;
             break;
@@ -2183,6 +2190,7 @@ std::string InterChange::resolveMain(CommandBlock *getData)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
 
     return ("Main " + contstr);
@@ -2539,7 +2547,7 @@ std::string InterChange::resolvePart(CommandBlock *getData)
         default:
             showValue = false;
             contstr = "Unrecognised";
-
+            break;
     }
 
     if (yesno)
@@ -2624,6 +2632,7 @@ std::string InterChange::resolveAdd(CommandBlock *getData)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
 
     return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + " AddSynth " + name + contstr);
@@ -2837,6 +2846,7 @@ std::string InterChange::resolveAddVoice(CommandBlock *getData)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
 
     return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + " Add Voice " + std::to_string(nvoice + 1) + name + contstr);
@@ -2970,6 +2980,7 @@ std::string InterChange::resolveSub(CommandBlock *getData)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
 
     return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + " SubSynth " + name + contstr);
@@ -3146,6 +3157,7 @@ std::string InterChange::resolvePad(CommandBlock *getData)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
 
     std::string isPad = "";
@@ -3314,6 +3326,7 @@ std::string InterChange::resolveOscillator(CommandBlock *getData)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
 
     return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + eng_name + name + contstr + isPad);
@@ -3388,6 +3401,7 @@ std::string InterChange::resolveResonance(CommandBlock *getData)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
 
     return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + name + " Resonance " + contstr + isPad);
@@ -3462,6 +3476,7 @@ std::string InterChange::resolveLFO(CommandBlock *getData)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
 
     return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + name + lfo + " LFO " + contstr);
@@ -3577,6 +3592,7 @@ std::string InterChange::resolveFilter(CommandBlock *getData)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
     std::string extra = "";
     if (control >= FILTERINSERT::control::formantFrequency && control <= FILTERINSERT::control::formantAmplitude)
@@ -3710,6 +3726,7 @@ std::string InterChange::resolveEnvelope(CommandBlock *getData)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
 
     return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(int(kititem + 1)) + name  + env + " Env " + contstr);
@@ -3849,6 +3866,7 @@ std::string InterChange::resolveEffects(CommandBlock *getData)
         default:
             showValue = false;
             contstr = " Unrecognised";
+            break;
     }
 
     if (kititem != EFFECT::type::eq && control == EFFECT::control::preset)
@@ -5914,7 +5932,7 @@ void InterChange::commandPart(CommandBlock *getData)
         case PART::control::instrumentName: // done elsewhere
             break;
         case PART::control::defaultInstrumentCopyright: // done elsewhere
-            ;
+            break;
         case PART::control::resetAllControllers:
             if (write)
                 part->SetController(0x79,0);

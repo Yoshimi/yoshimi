@@ -47,7 +47,6 @@ class InterChange : private MiscFuncs, FileMgr
         ~InterChange();
         bool Init();
 
-        CommandBlock commandData;
 #ifndef YOSHIMI_LV2_PLUGIN
         ringBuff *fromCLI;
 #endif

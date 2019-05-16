@@ -702,7 +702,6 @@ int CmdInterface::effects(unsigned char controlType)
         switch (nFXtype)
         {
             case 1:
-            {
                 selected = stringNumInList(name, effreverb, 1);
                 if (selected != 7) // EQ
                     nFXeqBand = 0;
@@ -719,12 +718,12 @@ int CmdInterface::effects(unsigned char controlType)
                         return value_msg;
                 }
                 break;
-            }
+
             case 2:
                 selected = stringNumInList(name, effecho, 1);
                 break;
+
             case 3:
-            {
                 selected = stringNumInList(name, effchorus, 1);
                 if (selected == 4) // filtershape
                 {
@@ -741,9 +740,8 @@ int CmdInterface::effects(unsigned char controlType)
                     value = (toggle() == 1);
                 }
                 break;
-            }
+
             case 4:
-            {
                 selected = stringNumInList(name, effphaser, 1);
                 if (selected == 4) // filtershape
                 {
@@ -760,9 +758,8 @@ int CmdInterface::effects(unsigned char controlType)
                     value = (toggle() == 1);
                 }
                 break;
-            }
+
             case 5:
-            {
                 selected = stringNumInList(name, effalienwah, 1);
                 if (selected == 3) // filtershape
                 {
@@ -774,9 +771,8 @@ int CmdInterface::effects(unsigned char controlType)
                     else return value_msg;
                 }
                 break;
-            }
+
             case 6:
-            {
                 selected = stringNumInList(name, effdistortion, 1);
                 if (selected == 5) // filtershape
                 {
@@ -792,9 +788,8 @@ int CmdInterface::effects(unsigned char controlType)
                     value = (toggle() == 1);
                 }
                 break;
-            }
+
             case 7: // TODO band and type no GUI update
-            {
                 selected = stringNumInList(name, effeq, 1);
                 if (selected == 1) // band
                 {
@@ -821,9 +816,8 @@ int CmdInterface::effects(unsigned char controlType)
                     selected += 8;
                 }
                 break;
-            }
+
             case 8:
-            {
                 selected = stringNumInList(name, effdynamicfilter, 1);
                 if (selected == 4) // filtershape
                 {
@@ -844,7 +838,7 @@ int CmdInterface::effects(unsigned char controlType)
                     bitSet(context, LEVEL::Filter);
                     return done_msg;
                 }
-            }
+                break;
         }
         if (selected > -1)
         {

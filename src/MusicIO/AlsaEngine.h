@@ -55,9 +55,9 @@ class AlsaEngine : public MusicIO
 
         bool little_endian;
         bool card_endian;
-        int card_bits;
         bool card_signed;
         unsigned int card_chans;
+        int card_bits;
 
     private:
         bool prepHwparams(void);
