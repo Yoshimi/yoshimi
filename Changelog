@@ -1,10 +1,13 @@
 yoshimi 1.5.11 M
 
+2019-5-17 Will
+* Started transfering Low prio and Loopback
+  from control block parameter byte to source byte
+
 2019-5-16 Will
 * Added CLI access to extended modulator control.
 * Added CLI access to Spot noise.
 * Updated docs.
-
 
 2019-5-12 Will
 * Moved hidden filenames from globals to main.

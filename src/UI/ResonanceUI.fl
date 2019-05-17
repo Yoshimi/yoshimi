@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-Modified April 2019
+Modified May 2019
 } {selected in_source in_header
 }
 
@@ -77,10 +77,10 @@ class ResonanceGraph {: {public Fl_Box}
     cbwidget=NULL;
     applybutton=NULL;} {}
   }
-  Function {send_data(int control, float value, int type)} {} {
+  Function {send_data(int action, int control, float value, int type)} {} {
     code {//
     type |= TOPLEVEL::type::Write;
-    collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, TOPLEVEL::insert::resonanceGraphInsert);} {}
+    collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, engine, TOPLEVEL::insert::resonanceGraphInsert);} {}
   }
   Function {init(Resonance *respar_, Fl_Value_Output *khzvalue_, Fl_Value_Output *dbvalue_, int npart_, int kititem_, int engine_)} {} {
     code {//
@@ -218,11 +218,11 @@ class ResonanceGraph {: {public Fl_Box}
             int sp=127 - (int)(y_ * 1.0 / h() * 127);
             if (YOSH::F2B(leftbutton))
             {
-                send_data(sn, sp, typeSent);
+                send_data(0, sn, sp, typeSent);
             }
             else
             {
-                send_data(sn, 64, typeSent);
+                send_data(0, sn, 64, typeSent);
             }
         }
         else
@@ -245,11 +245,11 @@ class ResonanceGraph {: {public Fl_Box}
                 int sp = 127 - (int)((y1 + yy) / h() * 127);
                 if (leftbutton!=0)
                 {
-                    send_data(sn, sp, typeSent);
+                    send_data(0, sn, sp, typeSent);
                 }
                 else
                 {
-                send_data(sn, 64, typeSent);
+                send_data(0, sn, 64, typeSent);
                 }
             }
         }
@@ -332,13 +332,13 @@ class ResonanceUI {: PresetsUI_
         Fl_Button {} {
           label Clear
           callback {//
-          send_data(RESONANCE::control::clearGraph, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data(0, RESONANCE::control::clearGraph, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Clear the resonance function} xywh {507 264 66 15} box THIN_UP_BOX labelfont 1 labelsize 12
         }
         Fl_Button {} {
           label Smooth
           callback {//
-          send_data(RESONANCE::control::smoothGraph, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data(0, RESONANCE::control::smoothGraph, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Smooth the resonance function} xywh {507 282 66 18} box THIN_UP_BOX labelfont 1 labelsize 12
         }
         Fl_Value_Output maxdbvo {
@@ -353,7 +353,7 @@ class ResonanceUI {: PresetsUI_
           if (Fl::event_button() == 3)
               o->value(20);
 
-          send_data(RESONANCE::control::maxDb, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data(0, RESONANCE::control::maxDb, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           xywh {77 282 98 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 minimum 1 maximum 90 step 1 value 30
           code0 {o->value(respar->PmaxdB);}
           class mwheel_slider_rev
@@ -370,7 +370,7 @@ class ResonanceUI {: PresetsUI_
           if (Fl::event_button() == 3)
               o->value(64);
 
-          send_data(RESONANCE::control::centerFrequency, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data(0, RESONANCE::control::centerFrequency, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           xywh {243 264 110 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 maximum 127 step 1
           code0 {o->value(respar->Pcenterfreq);}
           class mwheel_slider_rev
@@ -386,7 +386,7 @@ class ResonanceUI {: PresetsUI_
           if (Fl::event_button() == 3)
               o->value(64);
 
-          send_data(RESONANCE::control::octaves, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data(0, RESONANCE::control::octaves, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           xywh {243 282 110 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 maximum 127 step 1
           code0 {o->value(respar->Poctavesfreq);}
           class mwheel_slider_rev
@@ -394,25 +394,25 @@ class ResonanceUI {: PresetsUI_
         Fl_Button {} {
           label Rnd1
           callback {//
-          send_data(RESONANCE::control::randomType, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data(0, RESONANCE::control::randomType, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Randomize the resonance function} xywh {583 264 42 12} box THIN_UP_BOX labelfont 1 labelsize 10
         }
         Fl_Button {} {
           label Rnd2
           callback {//
-          send_data(RESONANCE::control::randomType, 1, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data(0, RESONANCE::control::randomType, 1, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Randomize the resonance function} xywh {583 276 42 12} box THIN_UP_BOX labelfont 1 labelsize 10
         }
         Fl_Button {} {
           label Rnd3
           callback {//
-          send_data(RESONANCE::control::randomType, 2, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data(0, RESONANCE::control::randomType, 2, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Randomize the resonance function} xywh {583 288 42 12} box THIN_UP_BOX labelfont 1 labelsize 10
         }
         Fl_Check_Button p1st {
           label {Prot.1st}
           callback {//
-          send_data(RESONANCE::control::protectFundamental, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data(0, RESONANCE::control::protectFundamental, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Protect the fundamental frequency (do not damp the first harmonic)} xywh {106 265 45 15} down_box DOWN_BOX labelsize 12
           code0 {o->value(respar->Pprotectthefundamental);}
         }
@@ -426,13 +426,13 @@ class ResonanceUI {: PresetsUI_
         Fl_Button {} {
           label S
           callback {//
-          send_data(RESONANCE::control::interpolatePeaks, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data(0, RESONANCE::control::interpolatePeaks, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Smooth interpolation} xywh {365 282 14 14} labelfont 1 labelsize 12
         }
         Fl_Button {} {
           label L
           callback {//
-          send_data(RESONANCE::control::interpolatePeaks, 1, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data(0, RESONANCE::control::interpolatePeaks, 1, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Linear interpolation} xywh {411 282 14 14} labelfont 1 labelsize 12
         }
         Fl_Button {} {
@@ -449,14 +449,14 @@ class ResonanceUI {: PresetsUI_
       Fl_Check_Button enabled {
         label Enable
         callback {//
-        send_data(RESONANCE::control::enableResonance, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        send_data(0, RESONANCE::control::enableResonance, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         xywh {6 265 78 15} down_box DOWN_BOX labelfont 1 labelsize 12
         code0 {o->value(respar->Penabled);}
       }
       Fl_Button applybutton {
         label Apply
         callback {//
-              send_data(PART::control::padsynthParameters, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+              send_data(0, PART::control::padsynthParameters, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         xywh {700 265 74 17} box THIN_UP_BOX down_box THIN_DOWN_BOX labelfont 1 labelsize 11
       }
       Fl_Button {} {
@@ -474,7 +474,7 @@ class ResonanceUI {: PresetsUI_
       }
     }
   }
-  Function {send_data(int control, float value, int type)} {} {
+  Function {send_data(int action, int control, float value, int type)} {} {
     code {//
     int insert;
     if (control == PART::control::padsynthParameters)
@@ -482,7 +482,7 @@ class ResonanceUI {: PresetsUI_
     else
         insert = TOPLEVEL::insert::resonanceGroup;
     type |= TOPLEVEL::type::Write;
-    collect_data(synth, value, (type | Fl::event_button()), control, npart, kititem, engine, insert);} {}
+    collect_data(synth, value, action, (type | Fl::event_button()), control, npart, kititem, engine, insert);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//

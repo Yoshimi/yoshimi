@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-Modified April 2019} {selected in_source in_header
+Modified May 2019} {selected in_source in_header
 }
 
 decl {\#include "UI/MiscGui.h"} {public local
@@ -85,7 +85,7 @@ class SUBnoteharmonic {: {public Fl_Group}
             o->value(127 - x);
         }
 
-        send_data(TOPLEVEL::insert::harmonicAmplitude, n, x, TOPLEVEL::type::Integer);
+        send_data(0, TOPLEVEL::insert::harmonicAmplitude, n, x, TOPLEVEL::type::Integer);
 
         if (x == 0)
             o->selection_color(0);
@@ -104,7 +104,7 @@ class SUBnoteharmonic {: {public Fl_Group}
         else
             o->value(x - 1);
 
-        send_data(TOPLEVEL::insert::harmonicPhaseBandwidth, n, x, TOPLEVEL::type::Integer);
+        send_data(0, TOPLEVEL::insert::harmonicPhaseBandwidth, n, x, TOPLEVEL::type::Integer);
 
         if (x == 64)
             o->selection_color(0);
@@ -136,10 +136,10 @@ class SUBnoteharmonic {: {public Fl_Group}
   Function {SUBnoteharmonic(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {n=0;} {}
   }
-  Function {send_data(int insert, int control, float value, int type)} {} {
+  Function {send_data(int action, int insert, int control, float value, int type)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, 1, insert);} {}
+        collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, 1, insert);} {}
   }
   Function {init(SUBnoteParameters *pars_, int n_, int npart_, int kititem_)} {} {
     code {//
@@ -216,7 +216,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Dial vol {
           label Volume
           callback {//
-          send_data (SUBSYNTH::control::volume, o->value(), TOPLEVEL::type::Integer);}
+          send_data (0, SUBSYNTH::control::volume, o->value(), TOPLEVEL::type::Integer);}
           tooltip Volume xywh {37 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_InstrumentVolume);}
           code1 {o->value(pars->PVolume);}
@@ -225,7 +225,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Dial vsns {
           label {Veloc Sens}
           callback {//
-          send_data (SUBSYNTH::control::velocitySense, o->value(), TOPLEVEL::type::Integer);}
+          send_data (0, SUBSYNTH::control::velocitySense, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Velocity sensing} xywh {98 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->PAmpVelocityScaleFunction);}
           code2 {o->setValueType(VC_AmpVelocitySense);}
@@ -235,7 +235,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
           label Pan
           callback {//
           randompan->value(o->value() < 1);
-          send_data (SUBSYNTH::control::panning, o->value(), TOPLEVEL::type::Integer);}
+          send_data (0, SUBSYNTH::control::panning, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Panning - zero/leftmost is Random} xywh {157 20 29 29} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
           code0 {o->setValueType(VC_PanningRandom);}
           code1 {o->value(pars->PPanning);}
@@ -246,7 +246,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
           callback {//
           pan->value(0);
           o->value(1);
-          send_data (SUBSYNTH::control::panning, 0, TOPLEVEL::type::Integer);}
+          send_data (0, SUBSYNTH::control::panning, 0, TOPLEVEL::type::Integer);}
           xywh {179 49 7 13} box NO_BOX color 35 selection_color 88 labelsize 10 align 8
           code0 {o->value(pars->randomPan());}
         }
@@ -263,14 +263,14 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Counter filterstages {
           label {Filter Stages}
           callback {//
-          send_data (SUBSYNTH::control::filterStages, o->value(), TOPLEVEL::type::Integer);}
+          send_data (0, SUBSYNTH::control::filterStages, o->value(), TOPLEVEL::type::Integer);}
           tooltip {How many times the noise is filtered} xywh {520 421 45 15} type Simple labelfont 1 labelsize 10 align 1 minimum 1 maximum 5 step 1 value 1 textsize 10
           code0 {o->value(pars->Pnumstages);}
         }
         Fl_Choice magtype {
           label {Mag.Type}
           callback {//
-          send_data (SUBSYNTH::control::magType, o->value(), TOPLEVEL::type::Integer);}
+          send_data (0, SUBSYNTH::control::magType, o->value(), TOPLEVEL::type::Integer);}
           xywh {590 421 65 15} down_box BORDER_BOX labelfont 1 labelsize 10 align 1 textsize 11
           code0 {o->value(pars->Phmagtype);}
         } {
@@ -298,7 +298,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Choice start {
           label Start
           callback {//
-          send_data (SUBSYNTH::control::startPosition, o->value(), TOPLEVEL::type::Integer);}
+          send_data (0, SUBSYNTH::control::startPosition, o->value(), TOPLEVEL::type::Integer);}
           xywh {670 421 50 15} down_box BORDER_BOX labelfont 1 labelsize 10 align 1 textsize 11
           code0 {o->value(pars->Pstart);}
         } {
@@ -336,14 +336,14 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
               freqenvelopegroup->activate();
           o->show();
           freqsettingsui->redraw();
-          send_data (SUBSYNTH::control::enableFrequencyEnvelope, o->value(), TOPLEVEL::type::Integer);}
+          send_data (0, SUBSYNTH::control::enableFrequencyEnvelope, o->value(), TOPLEVEL::type::Integer);}
           xywh {445 67 34 12} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
           code0 {o->value(pars->PFreqEnvelopeEnabled);}
         }
         Fl_Counter octave {
           label Octave
           callback {//
-          send_data (SUBSYNTH::control::octave, o->value(), TOPLEVEL::type::Integer);}
+          send_data (0, SUBSYNTH::control::octave, o->value(), TOPLEVEL::type::Integer);}
           tooltip Octave xywh {446 18 45 15} type Simple color 237 selection_color 0 labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
           code0 {int k=pars->PCoarseDetune/1024;if (k>=8) k-=16;}
           code2 {o->value(k);}
@@ -355,7 +355,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
           if (k < 0)
               k += 1024;
 
-          send_data (SUBSYNTH::control::coarseDetune, k, TOPLEVEL::type::Integer);}
+          send_data (0, SUBSYNTH::control::coarseDetune, k, TOPLEVEL::type::Integer);}
           tooltip {Coarse Detune} xywh {658 111 60 20} labelsize 10 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11
           code0 {int k=pars->PCoarseDetune%1024;if (k>=512) k-=1024;}
           code2 {o->value(k);}
@@ -363,7 +363,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
         }
         Fl_Slider detune {
           callback {//
-          send_data (SUBSYNTH::control::detuneFrequency, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data (0, SUBSYNTH::control::detuneFrequency, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {Fine Detune (cents)} xywh {491 47 234 15} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->PDetune-8192);}
           class mwheel_slider_rev
@@ -384,14 +384,14 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
               fixedfreqetdial->deactivate();
           else
               fixedfreqetdial->activate();
-          send_data (SUBSYNTH::control::baseFrequencyAs440Hz, x, TOPLEVEL::type::Integer);}
+          send_data (0, SUBSYNTH::control::baseFrequencyAs440Hz, x, TOPLEVEL::type::Integer);}
           tooltip {set the base frequency to 440Hz} xywh {620 24 48 15} down_box DOWN_BOX labelfont 1 labelsize 10 align 24
           code0 {o->value(pars->Pfixedfreq);}
         }
         Fl_Dial fixedfreqetdial {
           label {Eq.T.}
           callback {//
-          send_data (SUBSYNTH::control::equalTemperVariation, o->value(), TOPLEVEL::type::Integer);}
+          send_data (0, SUBSYNTH::control::equalTemperVariation, o->value(), TOPLEVEL::type::Integer);}
           tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {675 21 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
           code0 {o->value(pars->PfixedfreqET);}
           code1 {if (pars->Pfixedfreq==0) o->deactivate();}
@@ -402,7 +402,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
           label {Detune Type}
           callback {//
 
-          send_data (SUBSYNTH::control::detuneType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data (0, SUBSYNTH::control::detuneType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           xywh {655 78 70 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
           code1 {o->value(pars->PDetuneType-1);}
@@ -410,7 +410,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Dial bend {
           label Bend
           callback {//
-          send_data(SUBSYNTH::control::pitchBendAdjustment, o->value(), TOPLEVEL::type::Integer);}
+          send_data(0, SUBSYNTH::control::pitchBendAdjustment, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Pitch bend range scaling} xywh {500 21 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
           code0 {o->value(pars->PBendAdjust);}
           code1 {o->setValueType(VC_PitchBend);}
@@ -419,7 +419,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Dial offset {
           label Offset
           callback {//
-          send_data(SUBSYNTH::control::pitchBendOffset, o->value(), TOPLEVEL::type::Integer);}
+          send_data(0, SUBSYNTH::control::pitchBendOffset, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Offset of the frequency in Hz.} xywh {558 21 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
           code0 {o->value(pars->POffsetHz);}
           code1 {o->setValueType(VC_FreqOffsetHz);}
@@ -432,7 +432,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
       Fl_Check_Button stereo {
         label { Stereo}
         callback {//
-        send_data (SUBSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
+        send_data (0, SUBSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
         xywh {444 415 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
         code0 {o->value(pars->Pstereo);}
       }
@@ -452,7 +452,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
         h[0]->mag->selection_color(222);
         h[0]->mag->value(0);
         SUBparameters->redraw();
-        send_data (SUBSYNTH::control::clearHarmonics, o->value(), TOPLEVEL::type::Integer);}
+        send_data (0, SUBSYNTH::control::clearHarmonics, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Clear the harmonics} xywh {445 446 70 20} box THIN_UP_BOX labelfont 1 labelsize 11
       }
       Fl_Group bandwidthsettingsui {
@@ -475,14 +475,14 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
               bandwidthenvelopegroup->activate();
           o->show();
           bandwidthsettingsui->redraw();
-          send_data (SUBSYNTH::control::enableBandwidthEnvelope, o->value(), TOPLEVEL::type::Integer);}
+          send_data (0, SUBSYNTH::control::enableBandwidthEnvelope, o->value(), TOPLEVEL::type::Integer);}
           xywh {225 67 34 12} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
           code0 {o->value(pars->PBandWidthEnvelopeEnabled);}
         }
         Fl_Value_Slider bandwidth {
           label {Band Width}
           callback {//
-          send_data (SUBSYNTH::control::bandwidth, o->value(), TOPLEVEL::type::Integer);}
+          send_data (0, SUBSYNTH::control::bandwidth, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Base bandwidth, approximate} xywh {225 40 115 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->setValueType(VC_SubBandwidth);}
           code1 {o->useCustomTip(true);}
@@ -492,7 +492,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Value_Slider bwidthscale {
           label {B.Width Scale}
           callback {//
-          send_data (SUBSYNTH::control::bandwidthScale, o->value(), TOPLEVEL::type::Integer);}
+          send_data (0, SUBSYNTH::control::bandwidthScale, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Freq-dep. bw. scaling} xywh {344 40 90 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
           code0 {o->setValueType(VC_SubBandwidthScale); o->setGraphicsType(VC_SubBandwidthScale);}
           code1 {o->useCustomTip(true);}
@@ -527,7 +527,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
             globalfiltergroup->activate();
         o->show();
         globalfiltergroup->redraw();
-        send_data (SUBSYNTH::control::enableFilter, o->value(), TOPLEVEL::type::Integer);}
+        send_data (0, SUBSYNTH::control::enableFilter, o->value(), TOPLEVEL::type::Integer);}
         xywh {446 227 36 13} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11
         code0 {o->value(pars->PGlobalFilterEnabled);}
       }
@@ -548,7 +548,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Dial spreadpar1 {
           label Par1
           callback {//
-          send_data (SUBSYNTH::control::overtoneParameter1, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data (0, SUBSYNTH::control::overtoneParameter1, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           xywh {570 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par1);}
           class WidgetPDial
@@ -556,7 +556,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Dial spreadpar2 {
           label Par2
           callback {//
-          send_data (SUBSYNTH::control::overtoneParameter2, o->value(), TOPLEVEL::type::Integer);}
+          send_data (0, SUBSYNTH::control::overtoneParameter2, o->value(), TOPLEVEL::type::Integer);}
           xywh {625 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par2);}
           class WidgetPDial
@@ -564,7 +564,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Dial spreadpar3 {
           label ForceH
           callback {//
-          send_data (SUBSYNTH::control::overtoneForceHarmonics, o->value(), TOPLEVEL::type::Integer);}
+          send_data (0, SUBSYNTH::control::overtoneForceHarmonics, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Move towards closest harmonic} xywh {680 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par3);}
           code1 {o->setValueType(VC_percent255);}
@@ -574,7 +574,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
       Fl_Choice spreadtype {
         label {Overtone Positions}
         callback {//
-          send_data (SUBSYNTH::control::overtonePosition, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data (0, SUBSYNTH::control::overtonePosition, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         xywh {460 171 87 20} down_box BORDER_BOX labelsize 10 align 2 textsize 10
         code0 {o->value(pars->POvertoneSpread.type);}
         code1 {if (o->value() > 0) spreadGroup->activate(); else spreadGroup->deactivate();}
@@ -677,10 +677,10 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
     filterui->refresh();
     filterenv->refresh();} {}
   }
-  Function {send_data(int control, float value, int type)} {} {
+  Function {send_data(int action, int control, float value, int type)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, 1);} {}
+        collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, 1);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//

@@ -5786,10 +5786,14 @@ int CmdInterface::sendNormal(float value, unsigned char type, unsigned char cont
         return done_msg;
     }
 
+    unsigned char action = 0;
+    if (parameter != UNUSED && (parameter & 192))
+        action |= (parameter & 192); // transfer low prio and loopback
     CommandBlock putData;
 
     putData.data.value = value;
     putData.data.type = type;
+    putData.data.source = TOPLEVEL::action::fromCLI | action;
     putData.data.control = control;
     putData.data.part = part;
     putData.data.kit = kit;
@@ -5945,6 +5949,11 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
         synth->getRuntime().Log("In use by " + miscMsgPop(putData.data.par2) );
         return 0;
     }
+
+    unsigned char action = 0;
+    if (parameter != UNUSED && (parameter & 192))
+        action |= (parameter & 192); // transfer low prio and loopback
+    putData.data.source = TOPLEVEL::action::fromCLI | action;
 
     if (synth->interchange.fromCLI->write(putData.bytes))
     {

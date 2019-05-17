@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified April 2019
+    Modified May 2019
 */
 
 #include "Misc/SynthEngine.h"
@@ -59,7 +59,7 @@ float collect_readData(SynthEngine *synth, float value, unsigned char control, u
 
 }
 
-void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
+void collect_data(SynthEngine *synth, float value, unsigned char action, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
     if (part < NUM_MIDI_PARTS && engine == PART::engine::padSynth)
     {
@@ -124,8 +124,10 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
     type |= typetop;
 
     putData.data.type = type | TOPLEVEL::source::GUI;
-
-//cout << "collect_data value " << value << "  type " << int(type) << "  control " << int(control) << "  part " << int(part) << "  kit " << int(kititem) << "  engine " << int(engine) << "  insert " << int(insert)  << "  par " << int(parameter) << " par2 " << int(par2) << endl;
+    if (parameter != UNUSED && (parameter & 192))
+        action |= (parameter & 192); // transfer low prio and loopback
+    putData.data.source = TOPLEVEL::action:: fromGUI | action;
+//cout << "collect_data value " << value << "  action " << int(action)  << "  type " << int(type) << "  control " << int(control) << "  part " << int(part) << "  kit " << int(kititem) << "  engine " << int(engine) << "  insert " << int(insert)  << "  par " << int(parameter) << " par2 " << int(par2) << endl;
     if (!synth->interchange.fromGUI->write(putData.bytes))
         synth->getRuntime().Log("Unable to write to fromGUI buffer.");
 }

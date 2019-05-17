@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
-Modified April 2019
+Modified May 2019
 } {selected in_source in_header
 }
 
@@ -404,7 +404,7 @@ class SysEffSend {: {public WidgetPDial, private MiscFuncs}
   } {
     code {//
     if (event == FL_PUSH || event == FL_DRAG || event == FL_MOUSEWHEEL)
-        collect_data(synth, value(), (Fl::event_button() | TOPLEVEL::type::Write | TOPLEVEL::type::Integer), neff2, TOPLEVEL::section::systemEffects, UNUSED, neff1, TOPLEVEL::insert::systemEffectSend);
+        collect_data(synth, value(), 0, (Fl::event_button() | TOPLEVEL::type::Write | TOPLEVEL::type::Integer), neff2, TOPLEVEL::section::systemEffects, UNUSED, neff1, TOPLEVEL::insert::systemEffectSend);
     return WidgetPDial::handle(event);} {}
   }
   decl {int neff1;} {private local
@@ -496,7 +496,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     else
         realvalue = o->value();
 
-    send_data(PART::control::volume, realvalue, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+    send_data(0, PART::control::volume, realvalue, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           xywh {8 65 20 110} type {Vert Knob} box THIN_DOWN_BOX minimum 127 maximum 0 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Pvolume);}
           code1 {o->setValueType(VC_PartVolume); o->useCustomTip(true);}
@@ -507,7 +507,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     if (Fl::event_button() == 3)
         o->value(64);
 
-    send_data(PART::control::panning, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+    send_data(0, PART::control::panning, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           xywh {17 180 30 30} maximum 127 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Ppanning);}
           code1 {o->setValueType(VC_PanningStd);}
@@ -518,7 +518,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
       int tmp = o->value() & 0xf;
       o->textcolor(FL_BLACK);
 
-      send_data(PART::control::midiChannel, tmp, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+      send_data(0, PART::control::midiChannel, tmp, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           tooltip {receive from MIDI channel} xywh {8 210 50 15} down_box BORDER_BOX labelsize 10 align 5 textfont 9 textsize 10
           code0 {for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
             {
@@ -531,7 +531,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
         } {}
         Fl_Choice audiosend {
           callback {//
-    send_data(PART::control::audioDestination, o->value() + 1, TOPLEVEL::type::Integer, TOPLEVEL::route::adjustAndLoopback);}
+    send_data(0, PART::control::audioDestination, o->value() + 1, TOPLEVEL::type::Integer, TOPLEVEL::route::adjustAndLoopback);}
           tooltip {Set Audio Destination} xywh {8 229 50 15} box BORDER_BOX down_box BORDER_BOX labelsize 9 textfont 9 textsize 9
           code0 {if (synth->part[npart + *plgroup]->Paudiodest == 2) o->value(1); else if (synth->part[npart + *plgroup]->Paudiodest == 3) o->value(2); else o->value(0);}
         } {
@@ -556,16 +556,16 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
             synth->getGuiMaster()->activePart = npart + *plgroup;
         else
             synth->getGuiMaster()->activePart = UNUSED;
-    send_data(PART::control::enable, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+    send_data(0, PART::control::enable, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         xywh {5 0 45 20} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelsize 15 align 24
         code0 {o->value(synth->partonoffRead(npart + *plgroup));}
       }
     }
   }
-  Function {send_data(int control, float value, int type, int parameter = UNUSED)} {} {
+  Function {send_data(int action, int control, float value, int type, int parameter = UNUSED)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, (Fl::event_button() | type), control, npart + *plgroup, UNUSED, UNUSED, UNUSED, parameter);} {}
+        collect_data(synth, value, action, (Fl::event_button() | type), control, npart + *plgroup, UNUSED, UNUSED, UNUSED, parameter);} {}
   }
   Function {Panellistitem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//

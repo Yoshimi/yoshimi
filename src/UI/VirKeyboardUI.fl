@@ -12,7 +12,7 @@ comment {
 Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2014 -2018, Will Godfrey
+Copyright 2014 -2019, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of original ZynAddSubFX code
 
-Modified October 2018
+Modified May 2019
 } {selected in_source in_header
 }
 
@@ -155,10 +155,10 @@ class VirKeys {: {public Fl_Box}
         }
     }} {}
   }
-  Function {send_data(int control, float value, int type, int kititem = UNUSED, int engine = UNUSED)} {} {
+  Function {send_data(int action, int control, float value, int type, int kititem = UNUSED, int engine = UNUSED)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, (Fl::event_button() | type), control, TOPLEVEL::section::midiIn, kititem, engine);} {}
+        collect_data(synth, value, action, (Fl::event_button() | type), control, TOPLEVEL::section::midiIn, kititem, engine);} {}
   }
   Function {handle(int event)} {return_type int
   } {
@@ -283,7 +283,7 @@ class VirKeys {: {public Fl_Box}
     {
         vel = midivel * (127.0 - rndvelocity) / 127.0 + synth->numRandom() * rndvelocity;
     }
-    send_data(0, vel, TOPLEVEL::type::Integer, midich, nk + midioct * 12);} {}
+    send_data(0, 0, vel, TOPLEVEL::type::Integer, midich, nk + midioct * 12);} {}
   }
   Function {releasekey(int nk,int type)} {} {
     code {//
@@ -295,7 +295,7 @@ class VirKeys {: {public Fl_Box}
         return;
     pressed[nk] = 0;
     damage(1);
-    send_data(1, 0, TOPLEVEL::type::Integer, midich, nk + midioct * 12);} {}
+    send_data(0, 1, 0, TOPLEVEL::type::Integer, midich, nk + midioct * 12);} {}
   }
   Function {relaseallkeys(int type)} {} {
     code {//
@@ -404,7 +404,7 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         ctlval->do_callback();
         int ctl = midictl;
         virkeys->take_focus();
-        send_data(2, oldcontrol, TOPLEVEL::type::Integer, virkeys->midich, ctl);}
+        send_data(0, 2, oldcontrol, TOPLEVEL::type::Integer, virkeys->midich, ctl);}
         tooltip {Controller value} xywh {628 25 18 96} type {Vert Fill} box ENGRAVED_BOX color 229 labelsize 8 align 5 maximum 127 step 1 value 64
         code0 {o->value(127 - oldcontrol);}
         class mwheel_slider
@@ -538,7 +538,7 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
             o->damage();
         }
         virkeys->take_focus();
-        send_data(2, -old, TOPLEVEL::type::Integer, virkeys->midich, 128)}
+        send_data(0, 2, -old, TOPLEVEL::type::Integer, virkeys->midich, 128)}
         xywh {6 12 18 110} labelsize 8 align 1 minimum -8192 maximum 8191 step 1
         class mwheel_slider
       }
@@ -557,10 +557,10 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
     code {//
     delete virkeyboardwindow;} {}
   }
-  Function {send_data(int control, float value, int type, int kititem = UNUSED, int engine = UNUSED)} {} {
+  Function {send_data(int action, int control, float value, int type, int kititem = UNUSED, int engine = UNUSED)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, (Fl::event_button() | type), control, TOPLEVEL::section::midiIn, kititem, engine);} {}
+        collect_data(synth, value, action, (Fl::event_button() | type), control, TOPLEVEL::section::midiIn, kititem, engine);} {}
   }
   Function {Show()} {} {
     code {//

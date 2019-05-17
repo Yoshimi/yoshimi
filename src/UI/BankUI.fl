@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code.
 
-Modified April 2019
+Modified May 2019
 } {selected in_source in_header
 }
 
@@ -788,10 +788,10 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
       }
     }
   }
-  Function {send_data(int control, float value, int type, int part = UNUSED, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED)} {} {
+  Function {send_data(int action, int control, float value, int type, int part = UNUSED, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, type, control, part, kititem, engine, insert, parameter, par2);} {}
+        collect_data(synth, value, action, type, control, part, kititem, engine, insert, parameter, par2);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
@@ -887,7 +887,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
                 fl_alert("Active part disabled");
                 return;
             }
-            send_data(MAIN::control::loadInstrument, synth->getGuiMaster()->activePart, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, slot);
+            send_data(0, MAIN::control::loadInstrument, synth->getGuiMaster()->activePart, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, slot);
             // Reads from slot
             if (what == 3)
                 instrumentuiwindow->hide();
@@ -911,7 +911,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
                     else
                     {
                         synth->part[curPart]->Pname = newname;
-                        send_data(MAIN::control::saveInstrument, float(synth->getGuiMaster()->activePart), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, slot, TOPLEVEL::route::lowPriority);
+                        send_data(0, MAIN::control::saveInstrument, float(synth->getGuiMaster()->activePart), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, slot, TOPLEVEL::route::lowPriority);
                     }
                 }
             }
@@ -938,7 +938,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
             }
             if (doit)
             {
-                send_data(MAIN::control::saveInstrument, float(curPart), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, slot, TOPLEVEL::route::lowPriority);
+                send_data(0, MAIN::control::saveInstrument, float(curPart), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, slot, TOPLEVEL::route::lowPriority);
                 setread();
             }
         }
@@ -962,14 +962,14 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
             bool done = false;
             if (what == 1 && nselected >= 0)
             {
-                send_data(BANK::control::selectSecondInstrumentAndSwap, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::bank, UNUSED, UNUSED, slot, TOPLEVEL::route::lowPriority);
+                send_data(0, BANK::control::selectSecondInstrumentAndSwap, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::bank, UNUSED, UNUSED, slot, TOPLEVEL::route::lowPriority);
                 nselected = -1;
                 setread();
                 done = true;
             }
             if ((nselected < 0 || what == 2) && !done)
             {
-                send_data(BANK::control::selectFirstInstrumentToSwap, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::bank, UNUSED, UNUSED, slot, TOPLEVEL::route::lowPriority);
+                send_data(0, BANK::control::selectFirstInstrumentToSwap, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::bank, UNUSED, UNUSED, slot, TOPLEVEL::route::lowPriority);
                 nselected = slot;
             }
         }
@@ -1020,7 +1020,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
     	const char *dirname;
         dirname = fl_dir_chooser("Export a bank:",synth->getRuntime().userHome.c_str(), 0);
         if (dirname)
-            send_data(MAIN::control::exportBank, slot, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(dirname)));
+            send_data(0, MAIN::control::exportBank, slot, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(dirname)));
    	setrootread();
     }
 
@@ -1029,7 +1029,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
     	const char *dirname;
         dirname = fl_dir_chooser("Import a new bank:",synth->getRuntime().userHome.c_str(), 0);
         if (dirname)
-            send_data(MAIN::control::importBank, slot, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(dirname)));
+            send_data(0, MAIN::control::importBank, slot, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(dirname)));
    	setrootread();
     }
 
@@ -1096,7 +1096,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
                                     NULL, "STOP !", "Continue", count) > 1;
             if (clearit)
             {
-                send_data(MAIN::control::deleteBank, slot, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
+                send_data(0, MAIN::control::deleteBank, slot, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
             }
         }
         setrootread();
@@ -1109,7 +1109,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
             bool done = false;
             if (what == 1 && rselected >= 0)
             {
-                send_data(BANK::control::selectSecondBankAndSwap, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::bank, slot, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
+                send_data(0, BANK::control::selectSecondBankAndSwap, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::bank, slot, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
                 rselected = -1;
                 rescan_for_banks(false);
                 setrootread();
@@ -1117,7 +1117,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
             }
             if ((rselected < 0 || what == 2) && !done)
             {
-                send_data(BANK::control::selectFirstBankToSwap, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::bank, slot, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
+                send_data(0, BANK::control::selectFirstBankToSwap, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::bank, slot, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
                 rselected = slot;
                 rs[slot]->rootrefresh();
             }

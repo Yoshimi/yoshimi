@@ -17,7 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-Modified February 2019
+Modified May 2019
 } {selected in_source in_header
 }
 
@@ -125,13 +125,13 @@ class VectorUI {: {private MiscFuncs, FileMgr}
         MenuItem {} {
           label {Clear Chan}
           callback {//
-          send_data(VECTOR::control::erase, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan);}
+          send_data(0, VECTOR::control::erase, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan);}
           xywh {30 30 34 20} labelsize 12
         }
         MenuItem {} {
           label {Clear All}
           callback {//
-          send_data(VECTOR::control::erase, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data(0, VECTOR::control::erase, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
           xywh {40 40 34 20} labelsize 12
         }
       }
@@ -188,7 +188,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
               bitClear(Xf, 0);
           else
               bitSet(Xf, 0);
-          send_data(VECTOR::control::Xfeature0, o->value(), TOPLEVEL::type::Integer);}
+          send_data(0, VECTOR::control::Xfeature0, o->value(), TOPLEVEL::type::Integer);}
           xywh {208 53 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
           MenuItem {} {
@@ -211,7 +211,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
               if (o->value() == 2)
                   bitSet(Xf, 4);
           }
-          send_data(VECTOR::control::Xfeature1, o->value(), TOPLEVEL::type::Integer);}
+          send_data(0, VECTOR::control::Xfeature1, o->value(), TOPLEVEL::type::Integer);}
           xywh {302 53 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
           MenuItem {} {
@@ -238,7 +238,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
               if (o->value() == 2)
                   bitSet(Xf, 5);
           }
-          send_data(VECTOR::control::Xfeature2, o->value(), TOPLEVEL::type::Integer);}
+          send_data(0, VECTOR::control::Xfeature2, o->value(), TOPLEVEL::type::Integer);}
           xywh {208 115 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
           MenuItem {} {
@@ -265,7 +265,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
               if (o->value() == 2)
                   bitSet(Xf, 6);
           }
-          send_data(VECTOR::control::Xfeature3, o->value(), TOPLEVEL::type::Integer);}
+          send_data(0, VECTOR::control::Xfeature3, o->value(), TOPLEVEL::type::Integer);}
           xywh {302 115 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
           MenuItem {} {
@@ -292,7 +292,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
         if (tmp < 14)
         {
             Xcc = 0;
-            send_data(VECTOR::control::erase, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan);
+            send_data(0, VECTOR::control::erase, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan);
             return;
         }
 
@@ -304,7 +304,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
         }
 
         Xcc =  tmp;
-        send_data(VECTOR::control::Xcontroller, tmp, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        send_data(0, VECTOR::control::Xcontroller, tmp, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         tooltip {The MIDI CC this axis reponds to} xywh {110 85 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12
         code0 {//
         o->value(Xcc);}
@@ -368,7 +368,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
               bitClear(Yf, 0);
           else
               bitSet(Yf, 0);
-          send_data(VECTOR::control::Yfeature0, o->value(), TOPLEVEL::type::Integer);}
+          send_data(0, VECTOR::control::Yfeature0, o->value(), TOPLEVEL::type::Integer);}
           xywh {208 163 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
           MenuItem {} {
@@ -391,7 +391,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
               if (o->value() == 2)
                   bitSet(Yf, 4);
           }
-          send_data(VECTOR::control::Yfeature1, o->value(), TOPLEVEL::type::Integer);}
+          send_data(0, VECTOR::control::Yfeature1, o->value(), TOPLEVEL::type::Integer);}
           xywh {302 163 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
           MenuItem {} {
@@ -418,7 +418,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
               if (o->value() == 2)
                   bitSet(Yf, 5);
           }
-          send_data(VECTOR::control::Yfeature2, o->value(), TOPLEVEL::type::Integer);}
+          send_data(0, VECTOR::control::Yfeature2, o->value(), TOPLEVEL::type::Integer);}
           xywh {208 225 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
           MenuItem {} {
@@ -445,7 +445,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
               if (o->value() == 2)
                   bitSet(Yf, 6);
           }
-          send_data(VECTOR::control::Yfeature3, o->value(), TOPLEVEL::type::Integer);}
+          send_data(0, VECTOR::control::Yfeature3, o->value(), TOPLEVEL::type::Integer);}
           xywh {302 225 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
           MenuItem {} {
@@ -472,7 +472,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
         if (tmp < 14)
         {
             Ycc = 0;
-            send_data(VECTOR::control::Ycontroller, 0xff, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);
+            send_data(0, VECTOR::control::Ycontroller, 0xff, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);
             return;
         }
 
@@ -484,7 +484,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
         }
 
         Ycc =  tmp;
-        send_data(VECTOR::control::Ycontroller, tmp, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        send_data(0, VECTOR::control::Ycontroller, tmp, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
         tooltip {The MIDI CC this axis reponds to} xywh {110 195 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12 deactivate
         code0 {o->value(Ycc);}
       }
@@ -495,19 +495,19 @@ class VectorUI {: {private MiscFuncs, FileMgr}
         const char *tmp = NULL;
         tmp = fl_input("Vector name:", loadlabel[BaseChan].c_str());
         if (tmp != NULL && !string(tmp).empty())
-            send_data(VECTOR::control::name, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan, TOPLEVEL::route::lowPriority, miscMsgPush(string(tmp)));}
+            send_data(0, VECTOR::control::name, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan, TOPLEVEL::route::lowPriority, miscMsgPush(string(tmp)));}
         tooltip {Last saved or loaded vector file - click to change} xywh {45 265 198 20} box THIN_DOWN_BOX labelfont 1 labelsize 12
       }
     }
   }
-  Function {send_data(int control, float value, int type, int part = TOPLEVEL::section::vector, int kit = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED)} {} {
+  Function {send_data(int action, int control, float value, int type, int part = TOPLEVEL::section::vector, int kit = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED)} {} {
     code {//
         if (control != 84 && control != 85 && control != 96)
         {
             insert = BaseChan;
         }
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, (Fl::event_button() | type), control, part, kit, engine, insert, parameter, par2);} {}
+        collect_data(synth, value, action, (Fl::event_button() | type), control, part, kit, engine, insert, parameter, par2);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
@@ -878,7 +878,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
             return;
         fname = string(filename);
     }
-    send_data(MAIN::loadNamedVector, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, BaseChan, TOPLEVEL::route::adjustAndLoopback, miscMsgPush(fname));} {}
+    send_data(0, MAIN::loadNamedVector, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, BaseChan, TOPLEVEL::route::adjustAndLoopback, miscMsgPush(fname));} {}
   }
   Function {saveVector()} {} {
     code {//
@@ -898,7 +898,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
     int pos = loadlabel[BaseChan].find("No Name");
     if (pos >=0 && pos < 2)
         Loaded->copy_label(findleafname(filename).c_str());
-    send_data(MAIN::saveNamedVector, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, BaseChan, TOPLEVEL::route::lowPriority, miscMsgPush(filename));} {}
+    send_data(0, MAIN::saveNamedVector, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, BaseChan, TOPLEVEL::route::lowPriority, miscMsgPush(filename));} {}
   }
   Function {clearVector(int BaseC)} {} {
     code {//
