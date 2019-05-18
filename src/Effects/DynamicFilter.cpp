@@ -86,10 +86,10 @@ void DynamicFilter::out(float *smpsl, float *smpsr)
     float freq = filterpars->getfreq();
     float q = filterpars->getq();
 
-    for (int i = 0; i < synth->sent_buffersize; ++i)
+    for (int i = 0; i < synth->buffersize; ++i)
     {
-        memcpy(efxoutl, smpsl, synth->sent_bufferbytes);
-        memcpy(efxoutr, smpsr, synth->sent_bufferbytes);
+        memcpy(efxoutl, smpsl, synth->bufferbytes);
+        memcpy(efxoutr, smpsr, synth->bufferbytes);
         float x = (fabsf(smpsl[i]) + fabsf(smpsr[i])) * 0.5f;
         ms1 = ms1 * (1.0f - ampsmooth) + x * ampsmooth + 1e-10f;
     }
@@ -110,7 +110,7 @@ void DynamicFilter::out(float *smpsl, float *smpsr)
     filterr->filterout(efxoutr);
 
     // panning
-    for (int i = 0; i < synth->sent_buffersize; ++i)
+    for (int i = 0; i < synth->buffersize; ++i)
     {
         efxoutl[i] *= pangainL.getAndAdvanceValue();
         efxoutr[i] *= pangainR.getAndAdvanceValue();

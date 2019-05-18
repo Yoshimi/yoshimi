@@ -141,7 +141,7 @@ class SynthEngine : private SynthHelper, MiscFuncs, FileMgr
         void resetAll(bool andML);
         void ShutUp(void);
         void allStop(unsigned int stopType);
-        int MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process = 0);
+        int MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1]);
         void partonoffLock(int npart, int what);
         void partonoffWrite(int npart, int what);
         char partonoffRead(int npart);
@@ -179,9 +179,6 @@ class SynthEngine : private SynthHelper, MiscFuncs, FileMgr
         int halfoscilsize;
         float halfoscilsize_f;
 
-        int sent_buffersize; //used for variable length runs
-        int sent_bufferbytes; //used for variable length runs
-        float sent_buffersize_f; //used for variable length runs
         float         TransVolume;
         float         Pvolume;
         float         ControlStep;

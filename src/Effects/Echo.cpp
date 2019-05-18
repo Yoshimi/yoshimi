@@ -106,7 +106,7 @@ void Echo::out(float* smpsl, float* smpsr)
     float l, r;
     float ldl = ldelay[kl];
     float rdl = rdelay[kr];
-    for (int i = 0; i < synth->sent_buffersize; ++i)
+    for (int i = 0; i < synth->buffersize; ++i)
     {
         ldl = ldelay[kl];
         rdl = rdelay[kr];

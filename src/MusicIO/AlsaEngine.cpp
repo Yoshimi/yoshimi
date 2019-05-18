@@ -466,14 +466,14 @@ void *AlsaEngine::AudioThread(void)
             int offset = 0;
             while (alsa_buff - offset >= synth->buffersize)
             {
-                synth->MasterAudio(zynLeft, zynRight, synth->buffersize);
+                synth->MasterAudio(zynLeft, zynRight);
                 Interleave(offset, synth->buffersize);
                 offset += synth->buffersize;
             }
-            int remainder = alsa_buff - offset;
+            int remainder = alsa_buff - offset;    ////////////////////////TODO: handle discrepancy between SyntEngine::buffersize and output buffersize
             if ( remainder > 0)
             {
-                synth->MasterAudio(zynLeft, zynRight, remainder);
+                synth->MasterAudio(zynLeft, zynRight); ////////////////////TODO , remainder);
                 Interleave(offset, remainder);
             }
 

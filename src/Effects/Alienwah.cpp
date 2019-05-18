@@ -79,9 +79,9 @@ void Alienwah::out(float *smpsl, float *smpsr)
     clfol = complex<float>(cosf(lfol + phase) * fb, sinf(lfol + phase) * fb); //rework
     clfor = complex<float>(cosf(lfor + phase) * fb, sinf(lfor + phase) * fb); //rework
 
-    for (int i = 0; i < synth->sent_buffersize; ++i)
+    for (int i = 0; i < synth->buffersize; ++i)
     {
-        float x = (float)i / synth->sent_buffersize;
+        float x = (float)i / synth->buffersize;
         float x1 = 1.0f - x;
         // left
         tmp = clfol * x + oldclfol * x1;

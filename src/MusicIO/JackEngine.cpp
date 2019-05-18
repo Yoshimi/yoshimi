@@ -408,14 +408,14 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
     for (unsigned int pos = 0; pos < nframes; pos += synth->buffersize)
     {
         if (nframes < synth->buffersize)   //////////TODO comparison signed / unsigned; however, this whole "calculate remainder" approach is questionable...
-        {
-            synth->MasterAudio(zynLeft, zynRight, nframes);
+        {                    ////////////////////////TODO: handle discrepancy between SyntEngine::buffersize and output buffersize
+            synth->MasterAudio(zynLeft, zynRight); //TODO  , nframes);
             sendAudio(sizeof(float) * nframes, 0);
             break;
         }
         else
         {
-            synth->MasterAudio(zynLeft, zynRight, synth->buffersize);
+            synth->MasterAudio(zynLeft, zynRight);
             sendAudio(framesize, pos);
         }
     }

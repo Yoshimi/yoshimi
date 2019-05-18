@@ -103,7 +103,7 @@ void Chorus::out(float *smpsl, float *smpsr)
     dr2 = getdelay(lfor);
 
     float inL, inR, tmpL, tmpR, tmp;
-    for (int i = 0; i < synth->sent_buffersize; ++i)
+    for (int i = 0; i < synth->buffersize; ++i)
     {
         tmpL = smpsl[i];
         tmpR = smpsr[i];
@@ -145,13 +145,13 @@ void Chorus::out(float *smpsl, float *smpsr)
     }
 
     if (Poutsub)
-        for (int i = 0; i < synth->sent_buffersize; ++i)
+        for (int i = 0; i < synth->buffersize; ++i)
         {
             efxoutl[i] *= -1.0f;
             efxoutr[i] *= -1.0f;
         }
 
-    for (int i = 0; i < synth->sent_buffersize; ++i)
+    for (int i = 0; i < synth->buffersize; ++i)
     {
         efxoutl[i] *= pangainL.getAndAdvanceValue();
         efxoutr[i] *= pangainR.getAndAdvanceValue();

@@ -281,7 +281,7 @@ int Controller::initportamento(float oldfreq, float newfreq, bool in_progress)
         portamentotime *= powf(0.1f, (64.0f - portamento.updowntimestretch) / 64.0f);
     }
 
-    portamento.dx = synth->sent_buffersize_f / (portamentotime * synth->samplerate_f);
+    portamento.dx = synth->buffersize_f / (portamentotime * synth->samplerate_f);
     portamento.origfreqrap = oldfreq / newfreq;
 
     float tmprap = (portamento.origfreqrap > 1.0f)

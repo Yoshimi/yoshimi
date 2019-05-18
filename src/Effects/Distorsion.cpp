@@ -127,14 +127,14 @@ void Distorsion::out(float *smpsl, float *smpsr)
 
     if (Pstereo) // Stereo
     {
-        for (int i = 0; i < synth->sent_buffersize; ++i)
+        for (int i = 0; i < synth->buffersize; ++i)
         {
             efxoutl[i] = smpsl[i] * inputdrive * pangainL.getAndAdvanceValue();
             efxoutr[i] = smpsr[i] * inputdrive * pangainR.getAndAdvanceValue();
         }
     }
     else // Mono
-        for (int i = 0; i < synth->sent_buffersize; ++i)
+        for (int i = 0; i < synth->buffersize; ++i)
             efxoutl[i] = inputdrive * (smpsl[i] * pangainL.getAndAdvanceValue()
                                        + smpsr[i]* pangainR.getAndAdvanceValue())
                 * 0.7f;
@@ -149,9 +149,9 @@ void Distorsion::out(float *smpsl, float *smpsr)
     if (!Pprefiltering)
         applyfilters(efxoutl, efxoutr);
     if (!Pstereo)
-        memcpy(efxoutr, efxoutl, synth->sent_bufferbytes);
+        memcpy(efxoutr, efxoutl, synth->bufferbytes);
 
-    for (int i = 0; i < synth->sent_buffersize; ++i)
+    for (int i = 0; i < synth->buffersize; ++i)
     {
         float lvl = dB2rap(60.0f * level.getAndAdvanceValue() - 40.0f);
         float lout = efxoutl[i];

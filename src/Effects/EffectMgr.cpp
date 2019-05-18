@@ -184,28 +184,28 @@ void EffectMgr::out(float *smpsl, float *smpsr)
     {
         if (!insertion)
         {
-            memset(smpsl, 0, synth->sent_bufferbytes);
-            memset(smpsr, 0, synth->sent_bufferbytes);
-            memset(efxoutl, 0, synth->sent_bufferbytes);
-            memset(efxoutr, 0, synth->sent_bufferbytes);
+            memset(smpsl, 0, synth->bufferbytes);
+            memset(smpsr, 0, synth->bufferbytes);
+            memset(efxoutl, 0, synth->bufferbytes);
+            memset(efxoutr, 0, synth->bufferbytes);
         }
         return;
     }
-    memset(efxoutl, 0, synth->sent_bufferbytes);
-    memset(efxoutr, 0, synth->sent_bufferbytes);
+    memset(efxoutl, 0, synth->bufferbytes);
+    memset(efxoutr, 0, synth->bufferbytes);
     efx->out(smpsl, smpsr);
 
     if (nefx == 7)
     {   // this is need only for the EQ effect
-        memcpy(smpsl, efxoutl, synth->sent_bufferbytes);
-        memcpy(smpsr, efxoutr, synth->sent_bufferbytes);
+        memcpy(smpsl, efxoutl, synth->bufferbytes);
+        memcpy(smpsr, efxoutr, synth->bufferbytes);
         return;
     }
 
     // Insertion effect
     if (insertion != 0)
     {
-        for (int i = 0; i < synth->sent_buffersize; ++i)
+        for (int i = 0; i < synth->buffersize; ++i)
         {
             float volume = efx->volume.getAndAdvanceValue();
             float v1, v2;
@@ -234,7 +234,7 @@ void EffectMgr::out(float *smpsl, float *smpsr)
             }
         }
     } else { // System effect
-        for (int i = 0; i < synth->sent_buffersize; ++i)
+        for (int i = 0; i < synth->buffersize; ++i)
         {
             float volume = efx->volume.getAndAdvanceValue();
             efxoutl[i] *= 2.0f * volume;

@@ -117,9 +117,6 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     oscilsize_f(oscilsize),
     halfoscilsize(oscilsize / 2),
     halfoscilsize_f(halfoscilsize),
-    sent_buffersize(0),
-    sent_bufferbytes(0),
-    sent_buffersize_f(0),
     TransVolume(0.0),
     Pvolume(90),
     ControlStep(0.0),
@@ -1903,7 +1900,7 @@ void SynthEngine::mutewrite(int what)
 
 
 // Master audio out (the final sound)
-int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process)
+int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1])
 {
     static unsigned int VUperiod = samplerate / 20;
     /*
@@ -1915,18 +1912,8 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 
     float *tmpmixl = Runtime.genMixl;
     float *tmpmixr = Runtime.genMixr;
-    sent_buffersize = buffersize;
-    sent_bufferbytes = bufferbytes;
-    sent_buffersize_f = buffersize_f;
-    if (to_process < sent_buffersize)
-    {
-        sent_buffersize = to_process;
-        sent_bufferbytes = sent_buffersize * sizeof(float);
-        sent_buffersize_f = sent_buffersize;
-        //Runtime.Log("Buffer " + to_string(to_process));
-    }
-    memset(mainL, 0, sent_bufferbytes);
-    memset(mainR, 0, sent_bufferbytes);
+    memset(mainL, 0, bufferbytes);
+    memset(mainR, 0, bufferbytes);
 
     interchange.mediate();
     char partLocal[NUM_MIDI_PARTS]; // isolates loop from possible change
@@ -1939,8 +1926,8 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         {
             if (partLocal[npart])
             {
-                memset(outl[npart], 0, sent_bufferbytes);
-                memset(outr[npart], 0, sent_bufferbytes);
+                memset(outl[npart], 0, bufferbytes);
+                memset(outr[npart], 0, bufferbytes);
             }
         }
     }
@@ -1979,7 +1966,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                 continue;
 
             float Step = ControlStep;
-            for (int i = 0; i < sent_buffersize; ++i)
+            for (int i = 0; i < buffersize; ++i)
             {
                 if (part[npart]->Ppanning - part[npart]->TransPanning > Step)
                     part[npart]->checkPanning(Step);
@@ -2001,8 +1988,8 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                 continue; // is disabled
 
             // Clear the samples used by the system effects
-            memset(tmpmixl, 0, sent_bufferbytes);
-            memset(tmpmixr, 0, sent_bufferbytes);
+            memset(tmpmixl, 0, bufferbytes);
+            memset(tmpmixr, 0, bufferbytes);
 
             // Mix the channels according to the part settings about System Effect
             for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
@@ -2013,7 +2000,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                 {
                     // the output volume of each part to system effect
                     float vol = sysefxvol[nefx][npart];
-                    for (int i = 0; i < sent_buffersize; ++i)
+                    for (int i = 0; i < buffersize; ++i)
                     {
                         tmpmixl[i] += part[npart]->partoutl[i] * vol;
                         tmpmixr[i] += part[npart]->partoutr[i] * vol;
@@ -2027,7 +2014,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                 if (Psysefxsend[nefxfrom][nefx])
                 {
                     float v = sysefxsend[nefxfrom][nefx];
-                    for (int i = 0; i < sent_buffersize; ++i)
+                    for (int i = 0; i < buffersize; ++i)
                     {
                         tmpmixl[i] += sysefx[nefxfrom]->efxoutl[i] * v;
                         tmpmixr[i] += sysefx[nefxfrom]->efxoutr[i] * v;
@@ -2038,7 +2025,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 
             // Add the System Effect to sound output
             float outvol = sysefx[nefx]->sysefxgetvolume();
-            for (int i = 0; i < sent_buffersize; ++i)
+            for (int i = 0; i < buffersize; ++i)
             {
                 mainL[i] += tmpmixl[i] * outvol;
                 mainR[i] += tmpmixr[i] * outvol;
@@ -2049,7 +2036,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         {
             if (part[npart]->Paudiodest & 2){    // Copy separate parts
 
-                for (int i = 0; i < sent_buffersize; ++i)
+                for (int i = 0; i < buffersize; ++i)
                 {
                     outl[npart][i] = part[npart]->partoutl[i];
                     outr[npart][i] = part[npart]->partoutr[i];
@@ -2057,7 +2044,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             }
             if (part[npart]->Paudiodest & 1)    // Mix wanted parts to mains
             {
-                for (int i = 0; i < sent_buffersize; ++i)
+                for (int i = 0; i < buffersize; ++i)
                 {   // the volume did not change
                     mainL[i] += part[npart]->partoutl[i];
                     mainR[i] += part[npart]->partoutr[i];
@@ -2076,7 +2063,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 
         // Master volume, and all output fade
         float cStep = ControlStep;
-        for (int idx = 0; idx < sent_buffersize; ++idx)
+        for (int idx = 0; idx < buffersize; ++idx)
         {
             if (Pvolume - TransVolume > cStep)
             {
@@ -2110,7 +2097,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 
         // Peak calculation for mixed outputs
         float absval;
-        for (int idx = 0; idx < sent_buffersize; ++idx)
+        for (int idx = 0; idx < buffersize; ++idx)
         {
             if ((absval = fabsf(mainL[idx])) > VUpeak.values.vuOutPeakL)
                 VUpeak.values.vuOutPeakL = absval;
@@ -2127,7 +2114,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         {
             if (partLocal[npart])
             {
-                for (int idx = 0; idx < sent_buffersize; ++idx)
+                for (int idx = 0; idx < buffersize; ++idx)
                 {
                     if ((absval = fabsf(part[npart]->partoutl[idx])) > VUpeak.values.parts[npart])
                         VUpeak.values.parts[npart] = absval;
@@ -2142,7 +2129,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             }
         }
 
-        VUcount += sent_buffersize;
+        VUcount += buffersize;
         if ((VUcount >= VUperiod && !VUready) || VUcount > (samplerate << 2))
         // ensure this eventually clears if VUready fails
         {
@@ -2181,7 +2168,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             fadeAll = 0;
         }
     }
-    return sent_buffersize;
+    return buffersize;
 }
 
 

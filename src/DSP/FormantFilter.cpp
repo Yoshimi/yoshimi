@@ -194,23 +194,23 @@ void FormantFilter::setfreq_and_q(float frequency, float q_)
 
 void FormantFilter::filterout(float *smp)
 {
-    memcpy(inbuffer, smp, synth->sent_bufferbytes);
-    memset(smp, 0, synth->sent_bufferbytes);
+    memcpy(inbuffer, smp, synth->bufferbytes);
+    memset(smp, 0, synth->bufferbytes);
 
     for (int j = 0; j < numformants; ++j)
     {
-        for (int k = 0; k < synth->sent_buffersize; ++k)
+        for (int k = 0; k < synth->buffersize; ++k)
             tmpbuf[k] = inbuffer[k] * outgain;
         formant[j]->filterout(tmpbuf);
 
         if (aboveAmplitudeThreshold(oldformantamp[j], currentformants[j].amp))
-            for (int i = 0; i < synth->sent_buffersize; ++i)
+            for (int i = 0; i < synth->buffersize; ++i)
                 smp[i] += tmpbuf[i]
                           * interpolateAmplitude(oldformantamp[j],
                                                   currentformants[j].amp, i,
                                                   synth->buffersize);
         else
-            for (int i = 0; i < synth->sent_buffersize; ++i)
+            for (int i = 0; i < synth->buffersize; ++i)
                 smp[i] += tmpbuf[i] * currentformants[j].amp;
         oldformantamp[j] = currentformants[j].amp;
     }
