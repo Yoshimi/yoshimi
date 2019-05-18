@@ -404,10 +404,10 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
         return false;
     }
 
-    int framesize = sizeof(float) * ActualBufferSize;
-    for (unsigned int pos = 0; pos < nframes; pos += ActualBufferSize)
+    int framesize = sizeof(float) * synth->buffersize;
+    for (unsigned int pos = 0; pos < nframes; pos += synth->buffersize)
     {
-        if (nframes < ActualBufferSize)
+        if (nframes < synth->buffersize)   //////////TODO comparison signed / unsigned; however, this whole "calculate remainder" approach is questionable...
         {
             synth->MasterAudio(zynLeft, zynRight, nframes);
             sendAudio(sizeof(float) * nframes, 0);
@@ -415,7 +415,7 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
         }
         else
         {
-            synth->MasterAudio(zynLeft, zynRight, ActualBufferSize);
+            synth->MasterAudio(zynLeft, zynRight, synth->buffersize);
             sendAudio(framesize, pos);
         }
     }

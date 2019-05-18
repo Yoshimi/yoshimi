@@ -465,11 +465,11 @@ void *AlsaEngine::AudioThread(void)
         {
             int alsa_buff = audio.period_size;//audio.buffer_size;
             int offset = 0;
-            while (alsa_buff - offset >= ActualBufferSize)
+            while (alsa_buff - offset >= synth->buffersize)
             {
-                synth->MasterAudio(zynLeft, zynRight, ActualBufferSize);
-                Interleave(offset, ActualBufferSize);
-                offset += ActualBufferSize;
+                synth->MasterAudio(zynLeft, zynRight, synth->buffersize);
+                Interleave(offset, synth->buffersize);
+                offset += synth->buffersize;
             }
             int remainder = alsa_buff - offset;
             if ( remainder > 0)

@@ -138,11 +138,11 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
 
             if (next_frame >= sample_count)
                 continue;
-            while (processed < next_frame && to_process >= ActualBufferSize)
+            while (processed < next_frame && to_process >= synth->buffersize)
             {
-                _synth->MasterAudio(tmpLeft, tmpRight, ActualBufferSize);
-                processed += ActualBufferSize;
-                to_process -= ActualBufferSize;
+                _synth->MasterAudio(tmpLeft, tmpRight, synth->buffersize);
+                processed += synth->buffersize;
+                to_process -= synth->buffersize;
             }
             if (to_process > 0)
             {
@@ -158,16 +158,16 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
 
     if (to_process > 0)
     {
-        while (to_process >= ActualBufferSize)
+        while (to_process >= synth->buffersize)
         {
-            _synth->MasterAudio(tmpLeft, tmpRight, ActualBufferSize);
+            _synth->MasterAudio(tmpLeft, tmpRight, synth->buffersize);
             for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
             {
-                tmpLeft [i] += ActualBufferSize;
-                tmpRight [i] += ActualBufferSize;
+                tmpLeft [i] += synth->buffersize;
+                tmpRight [i] += synth->buffersize;
             }
-            processed += ActualBufferSize;
-            to_process -= ActualBufferSize;
+            processed += synth->buffersize;
+            to_process -= synth->buffersize;
         }
         if (to_process > 0)
         {

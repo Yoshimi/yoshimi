@@ -217,7 +217,7 @@ bool SynthEngine::Init(unsigned int audiosrate)
 {
     samplerate_f = samplerate = audiosrate;
     halfsamplerate_f = samplerate_f / 2;
-    buffersize = ActualBufferSize;
+    buffersize = Runtime.Buffersize;
     buffersize_f = float(buffersize);
     bufferbytes = buffersize * sizeof(float);
 
@@ -1915,7 +1915,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 
     float *tmpmixl = Runtime.genMixl;
     float *tmpmixr = Runtime.genMixr;
-    sent_buffersize = ActualBufferSize;
+    sent_buffersize = buffersize;
     sent_bufferbytes = bufferbytes;
     sent_buffersize_f = buffersize_f;
     if (to_process < sent_buffersize)

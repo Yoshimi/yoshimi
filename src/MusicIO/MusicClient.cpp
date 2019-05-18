@@ -269,17 +269,6 @@ unsigned int MusicClient::getSamplerate()
 }
 
 
-int MusicClient::getBuffersize()
-{
-    if(audioIO)
-    {
-        return audioIO->getBuffersize();
-    }
-
-    return synth->getRuntime().Buffersize;
-}
-
-
 std::string MusicClient::audioClientName()
 {
     if(audioIO)

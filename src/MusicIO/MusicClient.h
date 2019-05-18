@@ -68,7 +68,6 @@ public:
     bool Start(void);
     void Close(void);
     unsigned int getSamplerate(void);
-    int getBuffersize(void);
     std::string audioClientName(void);
     std::string midiClientName(void);
     int audioClientId(void);
