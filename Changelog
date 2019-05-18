@@ -3,6 +3,7 @@ yoshimi 1.5.11 M
 2019-5-18 Will
 * Low prio and Loopback transferred in Interchange.
   Copied across in CLI and GUI.
+* MIDI, CLI, GUI transfered from type to source.
 
 2019-5-17 Will
 * Started transfering Low prio and Loopback

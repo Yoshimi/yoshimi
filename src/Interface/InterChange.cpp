@@ -843,7 +843,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     break;
             }
 #ifdef GUI_FLTK
-            if (!(type & TOPLEVEL::source::GUI))
+            if ((getData->data.source & TOPLEVEL::action::noAction) != TOPLEVEL::action::fromGUI)
                 guiTo = true;
 #endif
             getData->data.source &= ~TOPLEVEL::action::lowPrio;
@@ -1097,7 +1097,7 @@ float InterChange::readAllData(CommandBlock *getData)
     if (blockRead)//__sync_or_and_fetch(&blockRead, 0) > 0)
         goto reTry; // it may have changed mid-process
 
-    if ((tryData.data.type & TOPLEVEL::source::CLI))
+    if ((tryData.data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromCLI)
         resolveReplies(&tryData);
 
 
@@ -1134,11 +1134,14 @@ void InterChange::resolveReplies(CommandBlock *getData)
     // this is unique and placed here to avoid Xruns
     if (npart == TOPLEVEL::section::scales && (control <= SCALES::control::tuning || control >= SCALES::control::retune))
         synth->setAllPartMaps();
+    int tmp = getData->data.source & TOPLEVEL::action::noAction;
+    bool isCli = false;
+    bool isGui = false;
+    if (tmp == TOPLEVEL::action::fromCLI)
+        isCli = true;
+    else if (tmp == TOPLEVEL::action::fromGUI)
+        isGui = true;
 
-    bool isCli = ((type & (TOPLEVEL::source::CLI | TOPLEVEL::source::GUI )) == TOPLEVEL::source::CLI); // eliminate Gui redraw
-    bool isGui = type & TOPLEVEL::source::GUI;
-    //std::cout << "Is CLI " << isCli << std::endl;
-    //std::cout << "Is GUI " << isGui << std::endl;
     char button = type & 3;
     std::string isValue;
     std::string commandName;
@@ -1936,11 +1939,11 @@ std::string InterChange::resolveMain(CommandBlock *getData)
 {
     float value = getData->data.value;
     int value_int = lrint(value);
-//    bool write = ((getData->data.type & TOPLEVEL::type::Write) != 0);
+
     unsigned char control = getData->data.control;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
-//    unsigned char par2 = getData->data.par2;
+
     std::string name;
     std::string contstr = "";
     if (getData->data.part == TOPLEVEL::section::midiIn)
@@ -3933,18 +3936,24 @@ void InterChange::returns(CommandBlock *getData)
 {
     unsigned char type = getData->data.type; // back from synth
     synth->getRuntime().finishedCLI = true; // belt and braces :)
-    if (getData->data.source == TOPLEVEL::action::noAction)
+    if ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::noAction)
+    {
+        cout << "no action" << endl;
         return; // no further action
+    }
 
     if (getData->data.source < TOPLEVEL::action::lowPrio)
     {
 #ifdef GUI_FLTK
-        bool isMidi = type & TOPLEVEL::source::MIDI;
+        int tmp = (getData->data.source & TOPLEVEL::action::noAction);
+
+        bool isMidi = (tmp == TOPLEVEL::action::fromMIDI);
         bool write = (type & TOPLEVEL::type::Write) > 0;
-        bool isCliOrGuiRedraw = type & TOPLEVEL::source::CLI; // separated out for clarity
+        bool isCliOrGuiRedraw = ((tmp == TOPLEVEL::action::fromCLI) || (getData->data.source & TOPLEVEL::action::forceUpdate)); // separated out for clarity
         bool isOKtoRedraw = (isCliOrGuiRedraw && write) || isMidi;
 
         if (synth->guiMaster && isOKtoRedraw)
+        //if (synth->guiMaster && ((tmp == TOPLEVEL::action::fromMIDI) || (write && ((tmp == TOPLEVEL::action::fromCLI) || (tmp == TOPLEVEL::action::fromGUI && (getData->data.source & TOPLEVEL::action::forceUpdate))))))
         {
             //std::cout << "writing to GUI" << std::endl;
             if (!toGUI->write(getData->bytes))
@@ -3990,7 +3999,7 @@ bool InterChange::commandSend(CommandBlock *getData)
             if (synth->part[npart]->Pname == "Simple Sound")
             {
                 synth->part[npart]->Pname ="No Title";
-                getData->data.type |= TOPLEVEL::source::GUI; // force GUI to update
+                getData->data.source |= TOPLEVEL::action::forceUpdate;
             }
         }
     }
@@ -4016,7 +4025,8 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-    bool isGui = type & TOPLEVEL::source::GUI;
+
+    bool isGui = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
     char button = type & 3;
 
     //std::cout << "Type " << int(type) << "  Control " << int(control) << "  Part " << int(npart) << "  Kit " << int(kititem) << "  Engine " << int(engine) << std::endl;
@@ -5164,7 +5174,7 @@ void InterChange::commandMain(CommandBlock *getData)
             getData->data.part = TOPLEVEL::section::midiIn;
             getData->data.kit = value_int;
             getData->data.value = par2;
-            getData->data.source = TOPLEVEL::action::lowPrio;
+            getData->data.source |= TOPLEVEL::action::lowPrio;
             getData->data.par2 = UNUSED;
             break;
         case MAIN::control::loadNamedInstrument: // load named instrument
@@ -5174,7 +5184,7 @@ void InterChange::commandMain(CommandBlock *getData)
             getData->data.part = TOPLEVEL::section::midiIn;
             getData->data.kit = value_int & 0x3f;
             getData->data.value = UNUSED;
-            getData->data.source = TOPLEVEL::action::lowPrio;
+            getData->data.source |= TOPLEVEL::action::lowPrio;
             break;
 
         case MAIN::control::loadNamedPatchset:
@@ -5630,7 +5640,8 @@ void InterChange::commandPart(CommandBlock *getData)
                 part->Peffnum = value_int;
                 getData->data.parameter = (part->partefx[value_int]->geteffectpar(-1) != 0);
                 getData->data.engine = value_int;
-                getData->data.type |= TOPLEVEL::source::CLI;
+                getData->data.type |= TOPLEVEL::source::CLI; // TODO why?
+
             }
             else
                 value = part->Peffnum;
@@ -8101,7 +8112,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
                         synth->inseffnum = value_int;
                         getData->data.parameter = (synth->insefx[value_int]->geteffectpar(-1) != 0);
                     }
-                    getData->data.type |= TOPLEVEL::source::CLI;
+                    getData->data.type |= TOPLEVEL::source::CLI; // TODO why?
                     getData->data.engine = value_int;
                 }
                 else
@@ -8173,7 +8184,7 @@ void InterChange::commandEffects(CommandBlock *getData)
     if (write)
     {
         __sync_or_and_fetch(&blockRead, 1);
-        getData->data.type |= TOPLEVEL::source::CLI;
+        getData->data.type |= TOPLEVEL::source::CLI; // TODO why?
     }
 
     EffectMgr *eff;

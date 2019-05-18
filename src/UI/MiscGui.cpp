@@ -79,7 +79,8 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
     putData.data.insert = insert;
     putData.data.parameter = parameter;
     putData.data.par2 = par2;
-
+    if ((type & TOPLEVEL::source::UpdateAfterSet) == TOPLEVEL::source::UpdateAfterSet)
+        action |= TOPLEVEL::action::forceUpdate;
     unsigned char typetop = type & 0xd0; // pass through redraws *after* command
     unsigned char buttons = type & 7;
     if (part == TOPLEVEL::section::main && (control > 48 || control == 14))
@@ -199,6 +200,9 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     unsigned char insertPar2 = getData->data.par2;
 
 //        cout << "Con " << int(control) << "  Kit " << int(kititem) << "  Eng " << int(engine) << "  Ins " << int(insert) << endl;
+
+    if (getData->data.source & TOPLEVEL::action::forceUpdate)
+        getData->data.type |= TOPLEVEL::source::CLI;
 
     if (control == TOPLEVEL::control::errorMessage && insert != TOPLEVEL::insert::resonanceGraphInsert) // just show a message
     {
