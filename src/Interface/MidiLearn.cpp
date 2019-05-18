@@ -136,6 +136,7 @@ bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, un
         putData.data.value = value;
         putData.data.type = 0x48 | (foundEntry.data.type & 0x80);
         // write command from midi with original integer / float type
+        putData.data.source = TOPLEVEL::action::fromMIDI;
         putData.data.control = foundEntry.data.control;
         putData.data.part = foundEntry.data.part;
         putData.data.kit = foundEntry.data.kit;

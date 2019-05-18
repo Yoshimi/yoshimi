@@ -5786,14 +5786,14 @@ int CmdInterface::sendNormal(float value, unsigned char type, unsigned char cont
         return done_msg;
     }
 
-    unsigned char action = 0;
-    if (parameter != UNUSED && (parameter & 192))
-        action |= (parameter & 192); // transfer low prio and loopback
+    unsigned char action = TOPLEVEL::action::fromCLI;
+    if (parameter != UNUSED && (parameter & TOPLEVEL::action::lowPrio))
+        action |= (parameter & TOPLEVEL::action::muteAndLoop); // transfer low prio and loopback
     CommandBlock putData;
 
     putData.data.value = value;
     putData.data.type = type;
-    putData.data.source = TOPLEVEL::action::fromCLI | action;
+    putData.data.source = action;
     putData.data.control = control;
     putData.data.part = part;
     putData.data.kit = kit;
@@ -5854,6 +5854,7 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
     CommandBlock putData;
 
     putData.data.value = value;
+    putData.data.source = TOPLEVEL::action::fromCLI;
     putData.data.control = control;
     putData.data.part = part;
     putData.data.kit = kit;
@@ -5950,10 +5951,10 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
         return 0;
     }
 
-    unsigned char action = 0;
-    if (parameter != UNUSED && (parameter & 192))
-        action |= (parameter & 192); // transfer low prio and loopback
-    putData.data.source = TOPLEVEL::action::fromCLI | action;
+    unsigned char action = TOPLEVEL::action::fromCLI;
+    if (parameter != UNUSED && (parameter & TOPLEVEL::action::lowPrio))
+        action |= (parameter & TOPLEVEL::action::muteAndLoop); // transfer low prio and loopback
+    putData.data.source = action;
 
     if (synth->interchange.fromCLI->write(putData.bytes))
     {

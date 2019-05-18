@@ -1,5 +1,9 @@
 yoshimi 1.5.11 M
 
+2019-5-18 Will
+* Low prio and Loopback transferred in Interchange.
+  Copied across in CLI and GUI.
+
 2019-5-17 Will
 * Started transfering Low prio and Loopback
   from control block parameter byte to source byte

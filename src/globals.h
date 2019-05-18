@@ -201,6 +201,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         const unsigned char noAction = 15; // internal use
         // remaining used bit-wise
         const unsigned char forceUpdate = 32; // update after set
+        const unsigned char loop = 64; // internal use
         const unsigned char lowPrio = 128;
         const unsigned char muteAndLoop = 192;
     }
