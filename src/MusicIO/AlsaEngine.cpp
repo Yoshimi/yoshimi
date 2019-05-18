@@ -319,7 +319,6 @@ bool AlsaEngine::prepHwparams(void)
     {
         synth->getRuntime().Log("Asked for buffersize " + asString(ask_buffersize, 2)
                     + ", Alsa dictates " + asString((unsigned int)audio.period_size), 2);
-        synth->getRuntime().Buffersize = audio.period_size; // we shouldn't need to do this :(
     }
     return true;
 
