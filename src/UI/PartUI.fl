@@ -1426,10 +1426,10 @@ Offset}
         Fl_Button {} {
           label Default
           callback {//
-            int param = 128;
+            int param = 0;
             if (Fl::event_state(FL_CTRL))
-            param = 129;
-            send_data(0, PART::control::defaultInstrumentCopyright, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, 255, 255, 255, param);}
+            param = 1;
+            send_data(TOPLEVEL::action::lowPrio, PART::control::defaultInstrumentCopyright, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, 255, 255, 255, param);}
           tooltip {Load default author & copyright\\n+Ctrl: save current text as default} xywh {327 25 63 20} labelsize 12
         }
         Fl_Input copyright {

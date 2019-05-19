@@ -256,7 +256,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     unsigned char par2 = getData->data.par2;
 
     bool write = (type & TOPLEVEL::type::Write);
-    if (write)
+    if (write) // TODO do we ever *not* see a write here?
         __sync_or_and_fetch(&blockRead, 2);
     bool guiTo = false;
     guiTo = guiTo; // suppress warning when headless build
@@ -938,23 +938,20 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         value = miscMsgPush(text);
                         break;
                     case PART::control::defaultInstrumentCopyright:
-                        if (write)
+                        std::string name = synth->getRuntime().ConfigDir + "/copyright.txt";
+                        if (parameter == 0) // load
                         {
-                            std::string name = synth->getRuntime().ConfigDir + "/copyright.txt";
-                            if ((parameter & 0x7f) == 0) // load
-                            {
-                                text = loadText(name); // TODO provide failure warning
-                                synth->part[npart]->info.Pauthor = text;
-                                guiTo = true;
-                            }
-                            else
-                            {
-                                text = synth->part[npart]->info.Pauthor;
-                                saveText(text, name);
-                            }
-                            getData->data.source &= ~TOPLEVEL::action::lowPrio;
-                            value = miscMsgPush(text);
+                            text = loadText(name); // TODO provide failure warning
+                            synth->part[npart]->info.Pauthor = text;
+                            guiTo = true;
                         }
+                        else
+                        {
+                            text = synth->part[npart]->info.Pauthor;
+                            saveText(text, name);
+                        }
+                        getData->data.source &= ~TOPLEVEL::action::lowPrio;
+                        value = miscMsgPush(text);
                         break;
                 }
             }
@@ -967,8 +964,11 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     {
         getData->data.value = float(value);
 #ifdef GUI_FLTK
-        if (synth->getRuntime().showGui && write && guiTo)
+        if (synth->getRuntime().showGui && (write || guiTo))
+        {
+            //std::cout << ">" << text << "<" << std::endl;
             getData->data.par2 = miscMsgPush(text); // pass it on to GUI
+        }
 #endif
         bool ok = returnsBuffer->write(getData->bytes);
 #ifdef GUI_FLTK
@@ -985,6 +985,8 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         if (!ok)
             synth->getRuntime().Log("Unable to  write to returnsBuffer buffer");
     }
+    else
+        std::cout << "No indirect return" << std::endl;
 }
 
 
@@ -3864,7 +3866,8 @@ void InterChange::mediate()
         if (fromMIDI->read(getData.bytes))
         {
             more = true;
-            if(getData.data.part != TOPLEVEL::section::midiLearn) // Not special midi-learn message
+            if(getData.data.part != TOPLEVEL::section::midiLearn)
+            // Normal MIDI message, not special midi-learn message
             {
                 commandSend(&getData);
                 returns(&getData);
@@ -3929,6 +3932,8 @@ void InterChange::mutedDecode(unsigned int altData)
             return;
             break;
     }
+    putData.data.source = TOPLEVEL::action::toAll;
+    // we want everyone to know about these!
     indirectTransfers(&putData);
 }
 
@@ -3938,22 +3943,16 @@ void InterChange::returns(CommandBlock *getData)
     synth->getRuntime().finishedCLI = true; // belt and braces :)
     if ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::noAction)
     {
-        cout << "no action" << endl;
+        //std::cout << "no action" << std::endl;
         return; // no further action
     }
 
     if (getData->data.source < TOPLEVEL::action::lowPrio)
-    {
+    { // currently only used by gui. this may change!
 #ifdef GUI_FLTK
         int tmp = (getData->data.source & TOPLEVEL::action::noAction);
-
-        bool isMidi = (tmp == TOPLEVEL::action::fromMIDI);
         bool write = (type & TOPLEVEL::type::Write) > 0;
-        bool isCliOrGuiRedraw = ((tmp == TOPLEVEL::action::fromCLI) || (getData->data.source & TOPLEVEL::action::forceUpdate)); // separated out for clarity
-        bool isOKtoRedraw = (isCliOrGuiRedraw && write) || isMidi;
-
-        if (synth->guiMaster && isOKtoRedraw)
-        //if (synth->guiMaster && ((tmp == TOPLEVEL::action::fromMIDI) || (write && ((tmp == TOPLEVEL::action::fromCLI) || (tmp == TOPLEVEL::action::fromGUI && (getData->data.source & TOPLEVEL::action::forceUpdate))))))
+        if (write && (tmp != TOPLEVEL::action::fromGUI || getData->data.source & TOPLEVEL::action::forceUpdate))
         {
             //std::cout << "writing to GUI" << std::endl;
             if (!toGUI->write(getData->bytes))
@@ -4828,7 +4827,6 @@ void InterChange::commandConfig(CommandBlock *getData)
         case CONFIG::control::enableGUI:
             if (write)
             {
-                cout << "here" << endl;
                 synth->getRuntime().showGui = value_bool;
                 if (value_bool)
                     createEmptyFile(runGui);
