@@ -1090,6 +1090,7 @@ float InterChange::readAllData(CommandBlock *getData)
          * This still isn't quite right there is a very
          * remote chance of getting garbled text :(
          */
+        //std::cout << "here" << std::endl;
         indirectTransfers(&tryData);
         synth->getRuntime().finishedCLI = true;
         return tryData.data.value;

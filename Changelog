@@ -2,6 +2,7 @@ yoshimi 1.5.11 M
 
 2019-5-18 Will
 * Some minor corrections to transferred controls.
+* Completed conversion for CLI.
 
 2019-5-18 Will
 * Low prio and Loopback transferred in Interchange.
