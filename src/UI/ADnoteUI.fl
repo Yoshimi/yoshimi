@@ -450,6 +450,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
                 callback {send_data(0, ADDVOICE::control::modulatorDetuneFromBaseOsc, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
                 tooltip {Apply all detuning in the voice oscillator to the modulator as well.} xywh {595 220 95 15} down_box DOWN_BOX labelsize 11
                 code0 {o->value(pars->VoicePar[nvoice].PFMDetuneFromBaseOsc);}
+                code1 {if (pars->VoicePar[nvoice].PFMFixedFreq) o->deactivate();}
               }
               Fl_Check_Button Mod440 {
                 label 440Hz
@@ -1420,6 +1421,10 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
                 fixedfreqetdial->deactivate();
             else
                 fixedfreqetdial->activate();
+            if (tmp != 0)
+                detuneFromBaseOsc->deactivate();
+            else
+                detuneFromBaseOsc->activate();
             break;
         case ADDVOICE::control::modulatorOctave:
             ModOctave->value((int) value);

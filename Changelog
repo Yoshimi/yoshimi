@@ -6,6 +6,8 @@ yoshimi 1.5.11 M
 * Almost completed conversions for GUI.
   Still to do UpdateAfterSet and returns detection
   of gui source - fiddled for now.
+* Applied New Modulation patch from Kristian.
+  Corrects several mistakes.
 
 2019-5-18 Will
 * Low prio and Loopback transferred in Interchange.

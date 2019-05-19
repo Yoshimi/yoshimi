@@ -1245,14 +1245,20 @@ float ADnote::getFMVoiceBaseFreq(int nvoice)
 {
     float detune = NoteVoicePar[nvoice].FMDetune / 100.0f;
     float freq;
-    if (NoteVoicePar[nvoice].FMDetuneFromBaseOsc)
-        freq = getVoiceBaseFreq(nvoice);
-    else
-        freq = basefreq;
+
     if (NoteVoicePar[nvoice].FMFreqFixed)
         return 440.0f * powf(2.0f, detune / 12.0f);
-    else
-        return freq * powf(2.0f, detune / 12.0f);
+
+    if (NoteVoicePar[nvoice].FMDetuneFromBaseOsc)
+        freq = getVoiceBaseFreq(nvoice);
+    else {
+        freq = basefreq;
+        // To avoid applying global detuning twice: Only detune in main voice
+        if (subVoiceNumber == -1)
+            detune += NoteGlobalPar.Detune / 100.0f;
+    }
+
+    return freq * powf(2.0f, detune / 12.0f);
 }
 
 
@@ -1470,7 +1476,9 @@ void ADnote::computeCurrentParameters(void)
             if (NoteVoicePar[nvoice].FMEnabled != NONE)
             {
                 float FMpitch;
-                if (NoteVoicePar[nvoice].FMDetuneFromBaseOsc)
+                if (NoteVoicePar[nvoice].FMFreqFixed)
+                    FMpitch = 0.0f;
+                else if (NoteVoicePar[nvoice].FMDetuneFromBaseOsc)
                     FMpitch = voicepitch;
                 else
                     FMpitch = basevoicepitch;
@@ -1486,15 +1494,19 @@ void ADnote::computeCurrentParameters(void)
                     // using getFMVoiceBaseFreq().
                 }
 
-                FMrelativepitch += NoteVoicePar[nvoice].FMDetune / 100.0f;
-
                 float FMfreq;
-                if (NoteVoicePar[nvoice].FMFreqFixed)
+                if (NoteVoicePar[nvoice].FMFreqFixed) {
+                    // Apply FM detuning since base frequency is 440Hz.
+                    FMrelativepitch += NoteVoicePar[nvoice].FMDetune / 100.0f;
                     FMfreq = powf(2.0f, FMrelativepitch / 12.0f) * 440.0f;
-                else if (NoteVoicePar[nvoice].FMDetuneFromBaseOsc)
+                } else if (NoteVoicePar[nvoice].FMDetuneFromBaseOsc) {
+                    // Apply FM detuning since base frequency is from main voice.
+                    FMrelativepitch += NoteVoicePar[nvoice].FMDetune / 100.0f;
                     FMfreq = powf(2.0f, FMrelativepitch / 12.0f) * voicefreq;
-                else {
-                    FMfreq = basefreq *
+                } else {
+                    // No need to apply FM detuning, since getFMVoiceBaseFreq()
+                    // takes it into account.
+                    FMfreq = getFMVoiceBaseFreq(nvoice) *
                         powf(2.0f, (basevoicepitch + globalpitch + FMrelativepitch) / 12.0f);
                     FMfreq *= portamentofreqrap;
                 }
