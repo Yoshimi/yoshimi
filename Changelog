@@ -3,6 +3,9 @@ yoshimi 1.5.11 M
 2019-5-18 Will
 * Some minor corrections to transferred controls.
 * Completed conversion for CLI.
+* Almost completed conversions for GUI.
+  Still to do UpdateAfterSet and returns detection
+  of gui source - fiddled for now.
 
 2019-5-18 Will
 * Low prio and Loopback transferred in Interchange.

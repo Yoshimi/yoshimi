@@ -157,11 +157,6 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         config = 248 // F8
     };
 
-    enum route : unsigned char {
-        lowPriority = 128,      // This pair cannot be changed as they
-        adjustAndLoopback = 192 // rely on 'parameter' being < 64
-    };
-
     // bit-wise type and source share the same byte
     // but will eventually be split up
     namespace type {

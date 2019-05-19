@@ -346,7 +346,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             label {Jack MIDI Source}
             callback {//
                         string tmp = string(o->value());
-                        send_data(0, CONFIG::control::jackMidiSource, 0, TOPLEVEL::type::Integer, TOPLEVEL::route::lowPriority, miscMsgPush(tmp));}
+                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::jackMidiSource, 0, TOPLEVEL::type::Integer, UNUSED, miscMsgPush(tmp));}
             tooltip {Device Jack tries to connect to for input.} xywh {195 62 120 22} labelsize 12 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().jackMidiDevice.c_str());}
           }
@@ -361,7 +361,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             label {Jack Server}
             callback {//
                         string tmp = string(o->value());
-                        send_data(0, CONFIG::control::jackServer, 0, TOPLEVEL::type::Integer, TOPLEVEL::route::lowPriority, miscMsgPush(tmp));}
+                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::jackServer, 0, TOPLEVEL::type::Integer, UNUSED, miscMsgPush(tmp));}
             tooltip {Name of the jack server to connect to - default, ...} xywh {195 182 120 22} labelsize 12 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().jackServer.c_str());}
           }
@@ -392,7 +392,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             label {Alsa MIDI Source}
             callback {//
                         string tmp = string(o->value());
-                        send_data(0, CONFIG::control::alsaMidiSource, 0, TOPLEVEL::type::Integer, TOPLEVEL::route::lowPriority, miscMsgPush(tmp));}
+                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::alsaMidiSource, 0, TOPLEVEL::type::Integer, UNUSED, miscMsgPush(tmp));}
             tooltip {Device Alsa tries to connect to for input.} xywh {195 52 120 22} labelsize 12 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().alsaMidiDevice.c_str());}
           }
@@ -407,7 +407,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             label {Alsa Audio Device}
             callback {//
                         string tmp = string(o->value());
-                        send_data(0, CONFIG::control::alsaAudioDevice, 0, TOPLEVEL::type::Integer, TOPLEVEL::route::lowPriority, miscMsgPush(tmp));}
+                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::alsaAudioDevice, 0, TOPLEVEL::type::Integer, UNUSED, miscMsgPush(tmp));}
             tooltip {Alsa audio device - default, hw:0, ...} xywh {195 143 120 22} labelsize 12 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().alsaAudioDevice.c_str());}
           }
@@ -692,7 +692,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
       Fl_Button {} {
         label {Save and Close}
         callback {//
-                    send_data(0, CONFIG::control::saveCurrentConfig, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::route::lowPriority, miscMsgPush("DUMMY"));
+                    send_data(TOPLEVEL::action::lowPrio, CONFIG::control::saveCurrentConfig, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, UNUSED, miscMsgPush("DUMMY"));
                     configwindow->do_callback();}
         xywh {155 305 105 20} box THIN_UP_BOX labelsize 12
       }

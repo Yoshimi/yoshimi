@@ -1710,7 +1710,6 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
         putData.data.control = 8;
         putData.data.part = TOPLEVEL::section::midiIn;
         putData.data.kit = part;
-//        putData.data.parameter = TOPLEVEL::route::adjustAndLoopback;
         midilearn.writeMidi(&putData, true);
     }
 }

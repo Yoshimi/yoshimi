@@ -163,14 +163,14 @@ class MicrotonalUI {: {private MiscFuncs}
         Fl_Input nameinput {
           label {Name:}
           callback {//
-          send_data(0, SCALES::control::name, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::route::lowPriority, miscMsgPush(string(o->value())));}
+          send_data(TOPLEVEL::action::lowPrio, SCALES::control::name, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, UNUSED, miscMsgPush(string(o->value())));}
           xywh {10 64 285 25} labelfont 1 labelsize 11 align 5
           code0 {o->value(microtonal->Pname.c_str());}
         }
         Fl_Input commentinput {
           label {Description:}
           callback {//
-          send_data(0, SCALES::control::comment, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::route::lowPriority, miscMsgPush(string(o->value())));}
+          send_data(TOPLEVEL::action::lowPrio, SCALES::control::comment, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, UNUSED, miscMsgPush(string(o->value())));}
           xywh {10 104 391 25} labelfont 1 labelsize 11 align 5
           code0 {o->value(microtonal->Pcomment.c_str());}
         }
@@ -210,7 +210,7 @@ class MicrotonalUI {: {private MiscFuncs}
             if (filename == NULL)
                 return;
 
-            send_data(0, SCALES::control::importScl, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::route::lowPriority, miscMsgPush(string(filename)));}
+            send_data(TOPLEVEL::action::lowPrio, SCALES::control::importScl, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, UNUSED, miscMsgPush(string(filename)));}
             tooltip {Inport Scala .scl file (tunnings)} xywh {85 417 100 20} box THIN_UP_BOX labelfont 1 labelsize 10
           }
         }
@@ -335,7 +335,7 @@ class MicrotonalUI {: {private MiscFuncs}
             if (filename == NULL)
                 return;
 
-            send_data(0, SCALES::control::importKbm, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::route::lowPriority, miscMsgPush(string(filename)));}
+            send_data(TOPLEVEL::action::lowPrio, SCALES::control::importKbm, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, UNUSED, miscMsgPush(string(filename)));}
             tooltip {Inport Scala .kbm file (keyboard mapping)} xywh {285 417 104 20} box THIN_UP_BOX labelfont 1 labelsize 10
           }
         }

@@ -5671,7 +5671,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                     {
                         param = string2int(point);
                         point = skipChars(point);
-                        if ((part == TOPLEVEL::section::main && (control == MAIN::control::loadNamedPatchset || control == MAIN::control::loadNamedScale)) || ((param & TOPLEVEL::lowPriority) && param != UNUSED && insert != TOPLEVEL::insert::resonanceGraphInsert))
+                        if ((part == TOPLEVEL::section::main && (control == MAIN::control::loadNamedPatchset || control == MAIN::control::loadNamedScale)) || ((param & TOPLEVEL::action::lowPrio) && param != UNUSED && insert != TOPLEVEL::insert::resonanceGraphInsert))
                         {
                             std::string name = std::string(point);
                             if (name > "!")

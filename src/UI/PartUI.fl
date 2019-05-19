@@ -137,7 +137,7 @@ class PartKitItem {: {public Fl_Group, private MiscFuncs}
           const char *tmp = fl_input("Kit item name:", part->kit[n].Pname.c_str());
           if (tmp != NULL)
           {
-              send_data(0, PART::control::instrumentName, 0, TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup, TOPLEVEL::route::lowPriority + 1, miscMsgPush(string(tmp)));
+              send_data(TOPLEVEL::action::lowPrio, PART::control::instrumentName, 0, TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup, 1, miscMsgPush(string(tmp)));
               o->copy_label(tmp);
           }}
           xywh {90 0 130 15} box THIN_DOWN_BOX down_box FLAT_BOX color 7 labelfont 1 labelsize 10 align 20
@@ -526,7 +526,7 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
                       else
                       {
                           unsigned char id = miscMsgPush(string(tmp));
-                          send_data(0, PART::control::instrumentName, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, id);
+                          send_data(TOPLEVEL::action::lowPrio, PART::control::instrumentName, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, UNUSED, UNUSED, UNUSED, UNUSED, id);
                       }
                   }
               }
@@ -638,7 +638,7 @@ Offset}
         Fl_Spinner partkeyshift {
           label {Key Shift}
           callback {//
-          send_data(0, PART::control::keyShift, o->value(), TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);}
+          send_data(TOPLEVEL::action::lowPrio, PART::control::keyShift, o->value(), TOPLEVEL::type::Integer);}
           xywh {194 111 38 20} labelsize 10 minimum -36 maximum 36 textsize 11
           code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
           code1 {o->value(part->Pkeyshift - 64);}

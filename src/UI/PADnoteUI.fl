@@ -1038,14 +1038,13 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper, MiscFuncs}
   Function {send_data(int action, int control, float value, int type, int insert = UNUSED, int par2 = UNUSED)} {} {
     code {//
     unsigned char partnum = npart;
-    unsigned char parameter = UNUSED;
     if (par2 != UNUSED)
     {
         partnum = TOPLEVEL::section::main;
-        parameter = TOPLEVEL::route::lowPriority;
+        action = TOPLEVEL::action::lowPrio;
     }
     type |= TOPLEVEL::type::Write;
-    collect_data(synth, value, action, (Fl::event_button() | type), control, partnum, kititem, 2, insert, parameter, par2);} {}
+    collect_data(synth, value, action, (Fl::event_button() | type), control, partnum, kititem, 2, insert, UNUSED, par2);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//

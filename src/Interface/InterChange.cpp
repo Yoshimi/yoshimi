@@ -3952,8 +3952,9 @@ void InterChange::returns(CommandBlock *getData)
     { // currently only used by gui. this may change!
 #ifdef GUI_FLTK
         int tmp = (getData->data.source & TOPLEVEL::action::noAction);
-        bool write = (type & TOPLEVEL::type::Write) > 0;
-        if (write && (tmp != TOPLEVEL::action::fromGUI || getData->data.source & TOPLEVEL::action::forceUpdate))
+        if (getData->data.source & TOPLEVEL::action::forceUpdate)
+            tmp = TOPLEVEL::action::toAll;
+        if ((type & TOPLEVEL::type::Write) && tmp != TOPLEVEL::action::fromGUI)
         {
             //std::cout << "writing to GUI" << std::endl;
             if (!toGUI->write(getData->bytes))

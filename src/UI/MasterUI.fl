@@ -332,7 +332,7 @@ class MasterUI {: {private GuiUpdates, FileMgr}
             unsigned int forceId = 0;
             if (sId)
                 forceId = string2uint(sId);
-            send_data(0, MAIN::control::startInstance, forceId, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);}
+            send_data(TOPLEVEL::action::lowPrio, MAIN::control::startInstance, forceId, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
             xywh {0 0 31 21} labelsize 12
           }
           MenuItem {} {
@@ -351,7 +351,7 @@ class MasterUI {: {private GuiUpdates, FileMgr}
             words->copy_label("Searching for the manual.");
           message->show();
           message->position(masterwindow->x() + 36, masterwindow->y() + 170);
-            send_data(0, MAIN::control::openManualPDF, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);
+            send_data(TOPLEVEL::action::lowPrio, MAIN::control::openManualPDF, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main);
             return;}
             xywh {0 0 34 20} labelsize 12
           }
@@ -407,7 +407,7 @@ class MasterUI {: {private GuiUpdates, FileMgr}
                 if (isRegFile(string(filename)))
                     if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                         return;
-                send_data(0, MAIN::control::saveNamedInstrument, float(npartcounter->value() - 1), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(filename)));
+                send_data(TOPLEVEL::action::lowPrio, MAIN::control::saveNamedInstrument, float(npartcounter->value() - 1), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, miscMsgPush(string(filename)));
                 return;}
             tooltip {Save current instrument to an .xi* file} xywh {20 20 100 20} labelsize 12
           }
@@ -527,7 +527,7 @@ class MasterUI {: {private GuiUpdates, FileMgr}
                 if (isRegFile(string(filename)))
                     if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                         return;
-                send_data(0, MAIN::control::saveNamedScale, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(filename)));}
+                send_data(TOPLEVEL::action::lowPrio, MAIN::control::saveNamedScale, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, miscMsgPush(string(filename)));}
             xywh {25 25 100 20} labelsize 12
           }
           MenuItem RecentScale {
@@ -586,7 +586,7 @@ paramsui->Show(XML_MICROTONAL);}
             char *fle = fl_file_chooser("Save:", exten.c_str(), lastname.c_str(), 0);
             if (fle)
             {
-                send_data(0, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(fle)));
+                send_data(TOPLEVEL::action::lowPrio, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, miscMsgPush(string(fle)));
                 RecentState->activate();
             }}
             tooltip {Save session state} xywh {10 10 34 21} labelsize 12
@@ -597,7 +597,7 @@ paramsui->Show(XML_MICROTONAL);}
                 string name = synth->getRuntime().defaultStateName;
                 if (instance > 0)
                     name += ("-" + to_string(instance));
-                send_data(0, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(name + ".state"));}
+                send_data(TOPLEVEL::action::lowPrio, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, miscMsgPush(name + ".state"));}
             tooltip {Save as default state (if load default checked)} xywh {0 0 34 21} labelsize 12
           }
           MenuItem RecentState {
@@ -616,7 +616,7 @@ paramsui->Show(XML_MICROTONAL);}
         Fl_Dial globalfinedetune {
           label Detune
           callback {//
-          send_data(0, MAIN::control::detune, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);}
+          send_data(TOPLEVEL::action::lowPrio, MAIN::control::detune, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
           tooltip {Global Fine Detune} xywh {286 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1 value 64
           code0 {o->setValueType(VC_GlobalFineDetune);}
           code1 {o->value(synth->microtonal.Pglobalfinedetune);}
@@ -629,9 +629,9 @@ paramsui->Show(XML_MICROTONAL);}
           if (fl_choice("Set *ALL* dynamic values to their defaults?", NULL, "No", "Yes") > 1)
           {
               if(wasCtrl || (Fl::event_state(FL_CTRL) != 0))
-                  send_data(0, MAIN::control::masterResetAndMlearn, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::adjustAndLoopback);
+                  send_data(TOPLEVEL::action::muteAndLoop, MAIN::control::masterResetAndMlearn, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main);
               else
-                  send_data(0, MAIN::control::masterReset, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::adjustAndLoopback);}}
+                  send_data(TOPLEVEL::action::muteAndLoop, MAIN::control::masterReset, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main);}}
           tooltip {Clear all dynamic settings
 (+Ctrl includes MIDI-learn)} xywh {7 60 70 24} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
         }
@@ -899,7 +899,7 @@ paramsui->Show(XML_MICROTONAL);}
       Fl_Spinner masterkeyshift {
         label Shift
         callback {//
-        send_data(0, MAIN::control::keyShift, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority);}
+        send_data(TOPLEVEL::action::lowPrio, MAIN::control::keyShift, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
         tooltip {Shift pitch +/- N semitones} xywh {336 88 38 20} labelsize 10 minimum -36 maximum 36 textsize 10
         code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
         code1 {o->value(synth->Pkeyshift - 64);}
@@ -1990,7 +1990,7 @@ Nikita Zlobin
   }
   Function {do_load_scale(string fname)} {} {
     code {//
-    send_data(0, MAIN::control::loadNamedScale, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(fname));} {}
+    send_data(TOPLEVEL::action::lowPrio, MAIN::control::loadNamedScale, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, miscMsgPush(fname));} {}
   }
   Function {do_load_instrument(string fname)} {} {
     code {//
@@ -2020,7 +2020,7 @@ Nikita Zlobin
         if (fname == NULL)
             return;
     }
-    send_data(0, MAIN::control::loadNamedPatchset, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::adjustAndLoopback, miscMsgPush(fname));} {}
+    send_data(TOPLEVEL::action::muteAndLoop, MAIN::control::loadNamedPatchset, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, miscMsgPush(fname));} {}
   }
   Function {do_save_master(const char* file = NULL)} {} {
     code {//
@@ -2048,7 +2048,7 @@ Nikita Zlobin
     else
         fname = file;
 
-    send_data(0, MAIN::control::saveNamedPatchset, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::lowPriority, miscMsgPush(string(fname)));} {}
+    send_data(TOPLEVEL::action::lowPrio, MAIN::control::saveNamedPatchset, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, miscMsgPush(string(fname)));} {}
   }
   Function {refresh_master_ui(int type)} {} {
     code {//
@@ -2226,7 +2226,7 @@ Nikita Zlobin
   }
   Function {setState(string filename)} {} {
     code {//
-    send_data(0, MAIN::control::loadNamedState, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, TOPLEVEL::route::adjustAndLoopback, miscMsgPush(filename));} {}
+    send_data(TOPLEVEL::action::muteAndLoop, MAIN::control::loadNamedState, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, miscMsgPush(filename));} {}
   }
   Function {setPartWindowTitle(string prefix)} {return_type string
   } {

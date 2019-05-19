@@ -44,7 +44,8 @@ float collect_readData(SynthEngine *synth, float value, unsigned char control, u
     CommandBlock putData;
 
     putData.data.value = value;
-    putData.data.type = type | TOPLEVEL::source::GUI;
+    putData.data.type = type;
+    putData.data.source = TOPLEVEL::action::fromGUI;
     putData.data.control = control;
     putData.data.part = part;
     putData.data.kit = kititem;
@@ -124,9 +125,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
     }
     type |= typetop;
 
-    putData.data.type = type | TOPLEVEL::source::GUI;
-    if (parameter != UNUSED && (parameter & TOPLEVEL::action::lowPrio))
-        action |= (parameter & TOPLEVEL::action::muteAndLoop); // transfer low prio and loopback
+    putData.data.type = type;
     putData.data.source = TOPLEVEL::action:: fromGUI | action;
 //cout << "collect_data value " << value << "  action " << int(action)  << "  type " << int(type) << "  control " << int(control) << "  part " << int(part) << "  kit " << int(kititem) << "  engine " << int(engine) << "  insert " << int(insert)  << "  par " << int(parameter) << " par2 " << int(par2) << endl;
     if (!synth->interchange.fromGUI->write(putData.bytes))
