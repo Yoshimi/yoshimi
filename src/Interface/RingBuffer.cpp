@@ -27,8 +27,12 @@
 #include "Interface/RingBuffer.h"
 
 /*
- * it is ESSENTIAL that all buffers and
+ * WARNING it is ESSENTIAL that all buffers and
  * data blocks are powers of 2
+ *
+ * NOTE
+ * buffer size is in terms of block size, not bytes
+ * while block size is in bytes
  */
 ringBuff::ringBuff(uint _bufferSize, uint _blockSize):
     bufferSize(_bufferSize),

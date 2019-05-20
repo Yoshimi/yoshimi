@@ -72,7 +72,7 @@ class MicrotonalUI {: {private MiscFuncs}
         }
         Fl_Check_Button invertKeys {
           callback {//
-          send_data(0, SCALES::control::invertScale, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data(TOPLEVEL::action::forceUpdate, SCALES::control::invertScale, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Turn upside-down the note frequencies} xywh {256 16 19 19} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 13 align 136
           code0 {o->value(microtonal->Pinvertupdown);}
         }
@@ -163,14 +163,14 @@ class MicrotonalUI {: {private MiscFuncs}
         Fl_Input nameinput {
           label {Name:}
           callback {//
-          send_data(TOPLEVEL::action::lowPrio, SCALES::control::name, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, UNUSED, miscMsgPush(string(o->value())));}
+          send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::name, 0, TOPLEVEL::type::Integer, UNUSED, miscMsgPush(string(o->value())));}
           xywh {10 64 285 25} labelfont 1 labelsize 11 align 5
           code0 {o->value(microtonal->Pname.c_str());}
         }
         Fl_Input commentinput {
           label {Description:}
           callback {//
-          send_data(TOPLEVEL::action::lowPrio, SCALES::control::comment, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, UNUSED, miscMsgPush(string(o->value())));}
+          send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::comment, 0, TOPLEVEL::type::Integer, UNUSED, miscMsgPush(string(o->value())));}
           xywh {10 104 391 25} labelfont 1 labelsize 11 align 5
           code0 {o->value(microtonal->Pcomment.c_str());}
         }
@@ -210,7 +210,7 @@ class MicrotonalUI {: {private MiscFuncs}
             if (filename == NULL)
                 return;
 
-            send_data(TOPLEVEL::action::lowPrio, SCALES::control::importScl, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, UNUSED, miscMsgPush(string(filename)));}
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importScl, 0, TOPLEVEL::type::Integer, UNUSED, miscMsgPush(string(filename)));}
             tooltip {Inport Scala .scl file (tunnings)} xywh {85 417 100 20} box THIN_UP_BOX labelfont 1 labelsize 10
           }
         }
@@ -335,7 +335,7 @@ class MicrotonalUI {: {private MiscFuncs}
             if (filename == NULL)
                 return;
 
-            send_data(TOPLEVEL::action::lowPrio, SCALES::control::importKbm, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, UNUSED, miscMsgPush(string(filename)));}
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importKbm, 0, TOPLEVEL::type::Integer, UNUSED, miscMsgPush(string(filename)));}
             tooltip {Inport Scala .kbm file (keyboard mapping)} xywh {285 417 104 20} box THIN_UP_BOX labelfont 1 labelsize 10
           }
         }
@@ -344,7 +344,7 @@ class MicrotonalUI {: {private MiscFuncs}
           callback {//
           o->show();
 
-          send_data(0, SCALES::control::enableKeyboardMap, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data(TOPLEVEL::action::forceUpdate, SCALES::control::enableKeyboardMap, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Enable the Mapping (otherwise the mapping is linear)} xywh {212 166 20 21} box THIN_UP_BOX down_box DOWN_BOX color 237 align 33
           code0 {o->value(microtonal->Pmappingenabled);}
           code1 {if (microtonal->Pmappingenabled==0) keymappinggroup->deactivate();}
@@ -368,7 +368,7 @@ class MicrotonalUI {: {private MiscFuncs}
       }
       Fl_Check_Button enableMicrotonal {
         callback {//
-        send_data(0, SCALES::control::enableMicrotonal, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        send_data(TOPLEVEL::action::forceUpdate, SCALES::control::enableMicrotonal, o->value(), TOPLEVEL::type::Integer);}
         xywh {4 13 21 22} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 align 148
         code0 {o->value(microtonal->Penabled);}
       }

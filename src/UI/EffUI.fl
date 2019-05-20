@@ -250,7 +250,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       Fl_Choice revp {
         label Preset
         callback {//
-        send_data(0, 16, o->value(), EFFECT::type::reverb, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), EFFECT::type::reverb, TOPLEVEL::type::Integer);}
         xywh {115 13 90 15} down_box BORDER_BOX color 14 selection_color 0 labelsize 11 textsize 11 textcolor 7
       } {
         MenuItem {} {
@@ -309,7 +309,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       Fl_Choice revp10 {
         label Type
         callback {//
-        send_data(0, 10, o->value(), EFFECT::type::reverb, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        send_data(TOPLEVEL::action::forceUpdate, 10, o->value(), EFFECT::type::reverb, TOPLEVEL::type::Integer);}
         xywh {240 13 75 15} down_box BORDER_BOX color 14 labelsize 11 textsize 11 textcolor 7
       } {
         MenuItem {} {
@@ -433,7 +433,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       Fl_Choice echop {
         label Preset
         callback {//
-        send_data(0, 16, o->value(), EFFECT::type::echo, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), EFFECT::type::echo, TOPLEVEL::type::Integer);}
         xywh {102 13 96 15} down_box BORDER_BOX color 14 selection_color 0 labelsize 11 textsize 11 textcolor 7
       } {
         MenuItem {} {
@@ -549,7 +549,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       Fl_Choice chorusp {
         label Preset
         callback {//
-        send_data(0, 16, o->value(), EFFECT::type::chorus, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), EFFECT::type::chorus, TOPLEVEL::type::Integer);}
         xywh {121 13 96 16} down_box BORDER_BOX color 14 selection_color 0 labelsize 11 textsize 11 textcolor 7
       } {
         MenuItem {} {
@@ -715,7 +715,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       Fl_Choice phaserp {
         label Preset
         callback {//
-        send_data(0, 16, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
         xywh {80 21 82 15} box UP_BOX down_box BORDER_BOX color 14 selection_color 0 labelsize 11 align 1 textsize 11 textcolor 7
       } {
         MenuItem {} {
@@ -897,7 +897,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       Fl_Check_Button phaserp14 {
         label Analog
         callback {//
-        send_data(0, 14, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        send_data(TOPLEVEL::action::forceUpdate, 14, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
         tooltip {Emulates FET} xywh {354 10 17 15} down_box DOWN_BOX labelsize 11 align 4
       }
     }
@@ -910,7 +910,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       Fl_Choice awp {
         label Preset
         callback {//
-        send_data(0, 16, o->value(), EFFECT::type::alienWah, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), EFFECT::type::alienWah, TOPLEVEL::type::Integer);}
         xywh {135 13 96 15} down_box BORDER_BOX color 14 selection_color 0 labelsize 11 textfont 1 textsize 11 textcolor 7
       } {
         MenuItem {} {
@@ -1037,7 +1037,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       Fl_Choice distp {
         label Preset
         callback {//
-        send_data(0, 16, o->value(), EFFECT::type::distortion, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), EFFECT::type::distortion, TOPLEVEL::type::Integer);}
         xywh {139 13 96 16} down_box BORDER_BOX color 14 selection_color 0 labelsize 11 textsize 11 textcolor 7
       } {
         MenuItem {} {
@@ -1226,7 +1226,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       Fl_Dial eqp0 {
         label Gain
         callback {//
-        send_data(0, 0, o->value(), EFFECT::type::eq, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        send_data(TOPLEVEL::action::forceUpdate, 0, o->value(), EFFECT::type::eq, TOPLEVEL::type::Integer);}
         xywh {10 41 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->setValueType(VC_FXEQgain);}
         class WidgetPDial
@@ -1234,7 +1234,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       Fl_Counter bandcounter {
         label {B.}
         callback {//
-        send_data(0, 1, o->value(), EFFECT::type::eq, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        send_data(TOPLEVEL::action::forceUpdate, 1, o->value(), EFFECT::type::eq, TOPLEVEL::type::Integer);}
         tooltip {Band no.} xywh {263 20 45 15} type Simple labelsize 11 align 1 minimum 0 maximum 1 step 1 textsize 11
         code0 {o->bounds(0,MAX_EQ_BANDS-1);}
       }
@@ -1245,7 +1245,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         Fl_Dial freqdial {
           label Freq
           callback {//;
-          send_data(0, 11, o->value(), EFFECT::type::eq, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data(TOPLEVEL::action::forceUpdate, 11, o->value(), EFFECT::type::eq, TOPLEVEL::type::Integer);}
           xywh {250 50 25 25} box ROUND_UP_BOX labelsize 10 when 3 maximum 127
           code0 {o->setValueType(VC_FXEQfreq);}
           class WidgetPDial
@@ -1253,7 +1253,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         Fl_Dial gaindial {
           label Gain
           callback {//
-          send_data(0, 12, o->value(), EFFECT::type::eq, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data(TOPLEVEL::action::forceUpdate, 12, o->value(), EFFECT::type::eq, TOPLEVEL::type::Integer);}
           xywh {280 50 25 25} box ROUND_UP_BOX labelsize 10 when 3 maximum 127 step 1
           code0 {o->setValueType(VC_FXEQfilterGain);}
           class WidgetPDial
@@ -1261,7 +1261,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         Fl_Dial qdial {
           label Q
           callback {//
-          send_data(0, 13, o->value(), EFFECT::type::eq, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data(TOPLEVEL::action::forceUpdate, 13, o->value(), EFFECT::type::eq, TOPLEVEL::type::Integer);}
           tooltip {Resonance/Bandwidth} xywh {310 50 25 25} box ROUND_UP_BOX labelsize 10 when 3 maximum 127
           code0 {o->setValueType(VC_FXEQq);}
           class WidgetPDial
@@ -1269,7 +1269,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         Fl_Counter stagescounter {
           label {St.}
           callback {//
-          send_data(0, 14, o->value(), EFFECT::type::eq, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data(TOPLEVEL::action::forceUpdate, 14, o->value(), EFFECT::type::eq, TOPLEVEL::type::Integer);}
           tooltip {Additional filter stages} xywh {340 60 30 15} type Simple labelsize 10 minimum 1 maximum 127 step 1 textfont 1 textsize 11
           code0 {o->bounds(0,MAX_FILTER_STAGES-1);}
         }
@@ -1277,7 +1277,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       Fl_Choice typechoice {
         label {T.}
         callback {//
-        send_data(0, 10, o->value(), EFFECT::type::eq, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        send_data(TOPLEVEL::action::forceUpdate, 10, o->value(), EFFECT::type::eq, TOPLEVEL::type::Integer);}
         tooltip Type xywh {323 20 40 15} down_box BORDER_BOX labelsize 11 align 1 when 6 textsize 11
       } {
         MenuItem {} {
@@ -1335,7 +1335,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       Fl_Choice dfp {
         label Preset
         callback {//
-        send_data(0, 16, o->value(), EFFECT::type::dynFilter, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), EFFECT::type::dynFilter, TOPLEVEL::type::Integer);}
         xywh {132 13 90 16} down_box BORDER_BOX color 14 selection_color 0 labelsize 10 textsize 10 textcolor 7
       } {
         MenuItem {} {

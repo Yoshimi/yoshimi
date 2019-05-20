@@ -1,6 +1,10 @@
 yoshimi 1.5.11 M
 
-2019-5-18 Will
+2019-5-20 Will
+* GUI updates almost complete.
+* Corrected date of previous commit.
+
+2019-5-19 Will
 * Some minor corrections to transferred controls.
 * Completed conversion for CLI.
 * Almost completed conversions for GUI.

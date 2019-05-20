@@ -80,8 +80,6 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
     putData.data.insert = insert;
     putData.data.parameter = parameter;
     putData.data.par2 = par2;
-    if ((type & TOPLEVEL::source::UpdateAfterSet) == TOPLEVEL::source::UpdateAfterSet)
-        action |= TOPLEVEL::action::forceUpdate;
     unsigned char typetop = type & 0xd0; // pass through redraws *after* command
     unsigned char buttons = type & 7;
     if (part == TOPLEVEL::section::main && (control > 48 || control == 14))
@@ -115,7 +113,8 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
             else
             {
                 putData.data.value = newValue;
-                type = TOPLEVEL::type::Write | TOPLEVEL::source::UpdateAfterSet;
+                type = TOPLEVEL::type::Write;
+                action |= TOPLEVEL::action::forceUpdate;
                 // has to be write as it's 'set default'
             }
         }
@@ -126,7 +125,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
     type |= typetop;
 
     putData.data.type = type;
-    putData.data.source = TOPLEVEL::action:: fromGUI | action;
+    putData.data.source = TOPLEVEL::action::fromGUI | action;
 //cout << "collect_data value " << value << "  action " << int(action)  << "  type " << int(type) << "  control " << int(control) << "  part " << int(part) << "  kit " << int(kititem) << "  engine " << int(engine) << "  insert " << int(insert)  << "  par " << int(parameter) << " par2 " << int(par2) << endl;
     if (!synth->interchange.fromGUI->write(putData.bytes))
         synth->getRuntime().Log("Unable to write to fromGUI buffer.");
@@ -202,7 +201,6 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 
     if (getData->data.source & TOPLEVEL::action::forceUpdate)
         getData->data.type |= TOPLEVEL::source::CLI;
-
     if (control == TOPLEVEL::control::errorMessage && insert != TOPLEVEL::insert::resonanceGraphInsert) // just show a message
     {
         synth->getGuiMaster()->words->copy_label(miscMsgPop(insertPar2).c_str());

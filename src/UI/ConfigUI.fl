@@ -205,7 +205,7 @@ class ConfigUI {: {private MiscFuncs, FileMgr}
           Fl_Choice reports {
             label {Send reports to:}
             callback {//
-                        send_data(0, CONFIG::control::reportsDestination, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+                        send_data(TOPLEVEL::action::forceUpdate, CONFIG::control::reportsDestination, o->value(), TOPLEVEL::type::Integer);}
             tooltip {Some system errors always go to stdout} xywh {200 195 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
             code0 {o->value(synth->getRuntime().toConsole);}
           } {
@@ -353,7 +353,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
           Fl_Check_Button jackMidi {
             label {Set as preferred MIDI}
             callback {//
-                        send_data(0, CONFIG::control::jackPreferredMidi, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+                        send_data(TOPLEVEL::action::forceUpdate, CONFIG::control::jackPreferredMidi, o->value(), TOPLEVEL::type::Integer);}
             xywh {195 88 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().midiEngine == jack_midi) o->value(1);}
           }
@@ -368,7 +368,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
           Fl_Check_Button jackAudio {
             label {Set as preferred audio}
             callback {//
-                        send_data(0, CONFIG::control::jackPreferredAudio, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+                        send_data(TOPLEVEL::action::forceUpdate, CONFIG::control::jackPreferredAudio, o->value(), TOPLEVEL::type::Integer);}
             xywh {195 209 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().audioEngine == jack_audio) o->value(1);}
           }
@@ -399,7 +399,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
           Fl_Check_Button alsaMidi {
             label {Set as preferred MIDI}
             callback {//
-                        send_data(0, CONFIG::control::alsaPreferredMidi, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+                        send_data(TOPLEVEL::action::forceUpdate, CONFIG::control::alsaPreferredMidi, o->value(), TOPLEVEL::type::Integer);}
             xywh {195 80 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().midiEngine == alsa_midi) o->value(1);}
           }
@@ -414,7 +414,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
           Fl_Check_Button alsaAudio {
             label {Set as preferred audio}
             callback {//
-                        send_data(0, CONFIG::control::alsaPreferredAudio, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+                        send_data(TOPLEVEL::action::forceUpdate, CONFIG::control::alsaPreferredAudio, o->value(), TOPLEVEL::type::Integer);}
             xywh {195 169 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().audioEngine == alsa_audio) o->value(1);}
           }
@@ -692,7 +692,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
       Fl_Button {} {
         label {Save and Close}
         callback {//
-                    send_data(TOPLEVEL::action::lowPrio, CONFIG::control::saveCurrentConfig, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, UNUSED, miscMsgPush("DUMMY"));
+                    send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, CONFIG::control::saveCurrentConfig, o->value(), TOPLEVEL::type::Integer, UNUSED, miscMsgPush("DUMMY"));
                     configwindow->do_callback();}
         xywh {155 305 105 20} box THIN_UP_BOX labelsize 12
       }

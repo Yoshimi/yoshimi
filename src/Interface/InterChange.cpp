@@ -3901,8 +3901,6 @@ void InterChange::mutedDecode(unsigned int altData)
     memset(&putData, 0xff, sizeof(putData));
     putData.data.part = TOPLEVEL::section::main;
 
-    putData.data.source = TOPLEVEL::action::lowPrio;
-
     switch (altData & 0xff)
     {
         case TOPLEVEL::muted::stopSound:

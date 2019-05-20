@@ -363,7 +363,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
         }
         Fl_Slider detune {
           callback {//
-          send_data (0, SUBSYNTH::control::detuneFrequency, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data (TOPLEVEL::action::forceUpdate, SUBSYNTH::control::detuneFrequency, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Fine Detune (cents)} xywh {491 47 234 15} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->PDetune-8192);}
           class mwheel_slider_rev
@@ -402,7 +402,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
           label {Detune Type}
           callback {//
 
-          send_data (0, SUBSYNTH::control::detuneType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data (TOPLEVEL::action::forceUpdate, SUBSYNTH::control::detuneType, o->value(), TOPLEVEL::type::Integer);}
           xywh {655 78 70 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
           code1 {o->value(pars->PDetuneType-1);}
@@ -548,7 +548,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Dial spreadpar1 {
           label Par1
           callback {//
-          send_data (0, SUBSYNTH::control::overtoneParameter1, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data (TOPLEVEL::action::forceUpdate, SUBSYNTH::control::overtoneParameter1, o->value(), TOPLEVEL::type::Integer);}
           xywh {570 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par1);}
           class WidgetPDial
@@ -574,7 +574,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
       Fl_Choice spreadtype {
         label {Overtone Positions}
         callback {//
-          send_data (0, SUBSYNTH::control::overtonePosition, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data (TOPLEVEL::action::forceUpdate, SUBSYNTH::control::overtonePosition, o->value(), TOPLEVEL::type::Integer);}
         xywh {460 171 87 20} down_box BORDER_BOX labelsize 10 align 2 textsize 10
         code0 {o->value(pars->POvertoneSpread.type);}
         code1 {if (o->value() > 0) spreadGroup->activate(); else spreadGroup->deactivate();}

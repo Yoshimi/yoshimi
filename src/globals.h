@@ -183,8 +183,6 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         // future - use for type learn request?
         const unsigned char GUI = 32;
         // future - use for type learnable?
-        const unsigned char UpdateAfterSet = 48; // so gui can update
-        // future - merge into action?
     }
 
     namespace action { // This will become the 'source' byte

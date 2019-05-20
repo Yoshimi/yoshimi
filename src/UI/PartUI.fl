@@ -66,7 +66,7 @@ class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
       Fl_Dial sysend {
         label 01
         callback {//
-        send_data(0, neff, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        send_data(TOPLEVEL::action::forceUpdate, neff, o->value(), TOPLEVEL::type::Integer);}
         xywh {0 0 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
         code0 {o->value(synth->Psysefxvol[neff][npart]);}
         code1 {o->copy_label(asString(neff + 1).c_str());}
@@ -408,7 +408,7 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
             {
                 send_data(0, PART::control::enable, 1, TOPLEVEL::type::Integer, UNUSED, 0);
                 adsynenabledcheck->value(1);
-                send_data(0, PART::control::volumeEnable, voiceNum, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);
+                send_data(TOPLEVEL::action::forceUpdate, PART::control::volumeEnable, voiceNum, TOPLEVEL::type::Integer);
                 //synth->getGuiMaster()->partui->adnoteui->advoice->nvoice = voiceNum;
                 //synth->getGuiMaster()->partui->adnoteui->advoice->voiceonbutton->value(1);
             }
@@ -526,7 +526,7 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
                       else
                       {
                           unsigned char id = miscMsgPush(string(tmp));
-                          send_data(TOPLEVEL::action::lowPrio, PART::control::instrumentName, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, UNUSED, UNUSED, UNUSED, UNUSED, id);
+                          send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, PART::control::instrumentName, 0, TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, id);
                       }
                   }
               }
@@ -885,7 +885,7 @@ Offset}
       Fl_Button {} {
         label {Reset all controllers}
         callback {//
-        send_data(0, PART::control::resetAllControllers, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        send_data(TOPLEVEL::action::forceUpdate, PART::control::resetAllControllers, o->value(), TOPLEVEL::type::Integer);}
         xywh {5 105 210 20} box THIN_UP_BOX
       }
       Fl_Group {} {
@@ -1067,7 +1067,7 @@ Offset}
       }
       Fl_Choice insefftype {
         callback {//
-        send_data(0, PART::control::effectType, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
+        send_data(TOPLEVEL::action::forceUpdate, PART::control::effectType, o->value(), TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
         tooltip {Effect Type} xywh {104 8 95 22} box UP_BOX down_box BORDER_BOX labelsize 11
         code0 {o->value(part->partefx[ninseff]->geteffect());}
       } {
@@ -1247,7 +1247,7 @@ Offset}
       Fl_Check_Button drumMode {
         label {Drum mode}
         callback {//
-        send_data(0, PART::control::drumMode, o->value(), TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        send_data(TOPLEVEL::action::forceUpdate, PART::control::drumMode, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Disables microtonal tuning} xywh {285 350 15 15} down_box DOWN_BOX labelsize 10
         code0 {o->value(part->Pdrummode);}
       }
@@ -1429,7 +1429,7 @@ Offset}
             int param = 0;
             if (Fl::event_state(FL_CTRL))
             param = 1;
-            send_data(TOPLEVEL::action::lowPrio, PART::control::defaultInstrumentCopyright, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, 255, 255, 255, param);}
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, PART::control::defaultInstrumentCopyright, 0, TOPLEVEL::type::Integer, 255, 255, 255, param);}
           tooltip {Load default author & copyright\\n+Ctrl: save current text as default} xywh {327 25 63 20} labelsize 12
         }
         Fl_Input copyright {

@@ -125,13 +125,13 @@ class VectorUI {: {private MiscFuncs, FileMgr}
         MenuItem {} {
           label {Clear Chan}
           callback {//
-          send_data(0, VECTOR::control::erase, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan);}
+          send_data(TOPLEVEL::action::forceUpdate, VECTOR::control::erase, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan);}
           xywh {30 30 34 20} labelsize 12
         }
         MenuItem {} {
           label {Clear All}
           callback {//
-          send_data(0, VECTOR::control::erase, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+          send_data(TOPLEVEL::action::forceUpdate, VECTOR::control::erase, 0, TOPLEVEL::type::Integer);}
           xywh {40 40 34 20} labelsize 12
         }
       }
@@ -292,7 +292,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
         if (tmp < 14)
         {
             Xcc = 0;
-            send_data(0, VECTOR::control::erase, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan);
+            send_data(TOPLEVEL::action::forceUpdate, VECTOR::control::erase, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan);
             return;
         }
 
@@ -304,7 +304,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
         }
 
         Xcc =  tmp;
-        send_data(0, VECTOR::control::Xcontroller, tmp, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        send_data(TOPLEVEL::action::forceUpdate, VECTOR::control::Xcontroller, tmp, TOPLEVEL::type::Integer);}
         tooltip {The MIDI CC this axis reponds to} xywh {110 85 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12
         code0 {//
         o->value(Xcc);}
@@ -472,7 +472,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
         if (tmp < 14)
         {
             Ycc = 0;
-            send_data(0, VECTOR::control::Ycontroller, 0xff, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);
+            send_data(0, VECTOR::control::Ycontroller, 0xff, TOPLEVEL::type::Integer);
             return;
         }
 
@@ -484,7 +484,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
         }
 
         Ycc =  tmp;
-        send_data(0, VECTOR::control::Ycontroller, tmp, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet);}
+        send_data(TOPLEVEL::action::forceUpdate, VECTOR::control::Ycontroller, tmp, TOPLEVEL::type::Integer);}
         tooltip {The MIDI CC this axis reponds to} xywh {110 195 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12 deactivate
         code0 {o->value(Ycc);}
       }
@@ -495,7 +495,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
         const char *tmp = NULL;
         tmp = fl_input("Vector name:", loadlabel[BaseChan].c_str());
         if (tmp != NULL && !string(tmp).empty())
-            send_data(TOPLEVEL::action::lowPrio, VECTOR::control::name, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan, UNUSED, miscMsgPush(string(tmp)));}
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, VECTOR::control::name, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan, UNUSED, miscMsgPush(string(tmp)));}
         tooltip {Last saved or loaded vector file - click to change} xywh {45 265 198 20} box THIN_DOWN_BOX labelfont 1 labelsize 12
       }
     }
@@ -878,7 +878,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
             return;
         fname = string(filename);
     }
-    send_data(TOPLEVEL::action::muteAndLoop, MAIN::loadNamedVector, 0, TOPLEVEL::type::Integer | TOPLEVEL::source::UpdateAfterSet, TOPLEVEL::section::main, UNUSED, UNUSED, BaseChan, UNUSED, miscMsgPush(fname));} {}
+    send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::loadNamedVector, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, BaseChan, UNUSED, miscMsgPush(fname));} {}
   }
   Function {saveVector()} {} {
     code {//
