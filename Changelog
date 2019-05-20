@@ -3,6 +3,7 @@ yoshimi 1.5.11 M
 2019-5-20 Will
 * GUI updates almost complete.
 * Corrected date of previous commit.
+* Fixed regression effects preset colour not changing.
 
 2019-5-19 Will
 * Some minor corrections to transferred controls.

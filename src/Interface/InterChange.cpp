@@ -5638,7 +5638,8 @@ void InterChange::commandPart(CommandBlock *getData)
                 part->Peffnum = value_int;
                 getData->data.parameter = (part->partefx[value_int]->geteffectpar(-1) != 0);
                 getData->data.engine = value_int;
-                getData->data.type |= TOPLEVEL::source::CLI; // TODO why?
+                getData->data.source |= getData->data.source |= TOPLEVEL::action::forceUpdate;
+                // the line above is to show it's changed from preset values
 
             }
             else
@@ -8110,7 +8111,8 @@ void InterChange::commandSysIns(CommandBlock *getData)
                         synth->inseffnum = value_int;
                         getData->data.parameter = (synth->insefx[value_int]->geteffectpar(-1) != 0);
                     }
-                    getData->data.type |= TOPLEVEL::source::CLI; // TODO why?
+                    getData->data.source |= getData->data.source |= TOPLEVEL::action::forceUpdate;
+                    // the line above is to show it's changed from preset values
                     getData->data.engine = value_int;
                 }
                 else
@@ -8182,7 +8184,8 @@ void InterChange::commandEffects(CommandBlock *getData)
     if (write)
     {
         __sync_or_and_fetch(&blockRead, 1);
-        getData->data.type |= TOPLEVEL::source::CLI; // TODO why?
+        getData->data.source |= getData->data.source |= TOPLEVEL::action::forceUpdate;
+        // the line above is to show it's changed from preset values
     }
 
     EffectMgr *eff;
