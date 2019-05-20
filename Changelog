@@ -4,6 +4,22 @@ yoshimi 1.5.11 M
 * GUI updates almost complete.
 * Corrected date of previous commit.
 * Fixed regression effects preset colour not changing.
+* Updates completed :)
+  'parameters' no longer doubles up for routing.
+
+  'type' no longer carries sources.
+  It currently has three spare bits but they will be
+  used to remove the doubling up of some functions.
+
+  'source' has up to 14 unique IDs + all and none.
+  It also now carries routing information and has
+  one spare bit.
+
+  The control block has three spare bytes.
+  One will be used for misc messages, separating
+  them from par2.
+  Another may be used as scratch space for private
+  controls applying only to specific sources.
 
 2019-5-19 Will
 * Some minor corrections to transferred controls.

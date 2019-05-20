@@ -1526,12 +1526,11 @@ void Part::getfromXML(XMLwrapper *xml)
 float Part::getLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    unsigned char type = getData->data.type;
-    int request = type & TOPLEVEL::type::Default;
+    int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
     int npart = getData->data.part;
 
-    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
+    unsigned char type = 0;
 
     // part defaults
     int min = 0;

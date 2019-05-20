@@ -834,7 +834,6 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
-    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char part = getData->data.part;
     unsigned char eng = getData->data.engine;
@@ -845,8 +844,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
     int value_int = lrint(value);
     bool value_bool = (value > 0.5);
     bool isFreemode = (freemodebutton->value() > 0.5);
-    //bool NotUs = ((type & 0x20) == 0);
-    bool NotUs = ((type & 0x18) != 0); // cli or midi
+    bool NotUs = ((getData->data.source & TOPLEVEL::action::noAction) != TOPLEVEL::action::fromGUI || (getData->data.source & TOPLEVEL::action::forceUpdate));
 
     if (part != npart || (eng >= 128 && eng != engine))
         return;

@@ -22,7 +22,7 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified March 2019
+    Modified May 2019
 */
 
 #include <cmath>
@@ -976,11 +976,10 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
 float PADnoteParameters::getLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    unsigned char type = getData->data.type;
-    int request = type & TOPLEVEL::type::Default;
+    int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
 
-    type &= (TOPLEVEL::source::MIDI || TOPLEVEL::source::CLI || TOPLEVEL::source::GUI); // source bits only
+    unsigned char type = 0;
 
     // padnote defaults
     int min = 0;

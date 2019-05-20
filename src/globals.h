@@ -175,25 +175,15 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         const unsigned char Integer = 128; // false = float
     }
 
-    namespace source {
-        // all used bit-wise
-        const unsigned char MIDI = 8;
-        // future - use for type error?
-        const unsigned char CLI = 16;
-        // future - use for type learn request?
-        const unsigned char GUI = 32;
-        // future - use for type learnable?
-    }
-
-    namespace action { // This will become the 'source' byte
+    namespace action {
         // bits 0 to 3
         const unsigned char toAll = 0; // except MIDI
-        const unsigned char fromMIDI = 1; // These will
-        const unsigned char fromCLI = 2;  // replace the
-        const unsigned char fromGUI = 3;  // bits in 'type'
+        const unsigned char fromMIDI = 1;
+        const unsigned char fromCLI = 2;
+        const unsigned char fromGUI = 3;
         const unsigned char noAction = 15; // internal use
         // remaining used bit-wise
-        const unsigned char forceUpdate = 32; // update after set
+        const unsigned char forceUpdate = 32;
         const unsigned char loop = 64; // internal use
         const unsigned char lowPrio = 128;
         const unsigned char muteAndLoop = 192;

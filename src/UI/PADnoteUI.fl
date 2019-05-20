@@ -1050,7 +1050,7 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper, MiscFuncs}
     code {//
     float value = getData->data.value;
     bool value_bool = YOSH::F2B(value);
-    bool wasFromHere = getData->data.type & TOPLEVEL::source::GUI;
+    bool wasFromHere = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
     unsigned char control = getData->data.control;
     unsigned char par2 = getData->data.par2;
     float result;

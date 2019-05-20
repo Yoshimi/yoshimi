@@ -853,12 +853,11 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper *xml, int n)
 float ADnoteParameters::getLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    unsigned char type = getData->data.type;
-    int request = type & TOPLEVEL::type::Default;
+    int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
     int engine = getData->data.engine;
 
-    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
+    unsigned char type = 0;
 
     // addnote defaults
     int min = 0;

@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2018, Will Godfrey
+    Copyright 2019, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified August 2018
+    Modified May 2019
 */
 
 #include <cmath>
@@ -300,8 +300,7 @@ void EnvelopeParams::store2defaults(void)
 float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    unsigned char type = getData->data.type;
-    int request = type & TOPLEVEL::type::Default;
+    int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
     int engine = getData->data.engine;
     if (engine >= PART::engine::addMod1 && engine <= PART::engine::addMod8)
@@ -310,7 +309,7 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
         engine = PART::engine::addVoice1;
     int parameter = getData->data.parameter;
 
-    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
+    unsigned char type = 0;
 
     // envelope defaults
     int min = 0;

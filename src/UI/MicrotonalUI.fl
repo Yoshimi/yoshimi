@@ -392,7 +392,7 @@ class MicrotonalUI {: {private MiscFuncs}
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
-    bool isGui = (getData->data.type & TOPLEVEL::source::GUI);
+    bool wasFromUs = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
     unsigned char control = getData->data.control;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
@@ -458,7 +458,7 @@ class MicrotonalUI {: {private MiscFuncs}
                 tuningsinput->value(msg.c_str());
                 octavesizeoutput->value(value_int);
             }
-            else if (isGui)
+            else if (wasFromUs)
                 errors(value_int, true);
             break;
         case SCALES::control::keyboardMap:
@@ -477,7 +477,7 @@ class MicrotonalUI {: {private MiscFuncs}
                     afreqinput->value(fetchData(0, 0, 232));
                 }
             }
-            else if (isGui)
+            else if (wasFromUs)
                 errors(value_int, true);
             break;
 

@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified April 2019
+    Modified May 2019
 */
 
 #include <cmath>
@@ -790,11 +790,10 @@ bool Microtonal::loadXML(string filename)
 float Microtonal::getLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    unsigned char type = getData->data.type;
     int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
 
-    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
+    unsigned char type = 0;
 
     // microtonal defaults
     int min = 0;

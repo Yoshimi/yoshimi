@@ -5779,7 +5779,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
 
 int CmdInterface::sendNormal(unsigned char action, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
-    if (type >= TOPLEVEL::type::Limits && type < TOPLEVEL::source::CLI && part != TOPLEVEL::section::midiLearn)
+    if (action == TOPLEVEL::action::fromMIDI && part != TOPLEVEL::section::midiLearn)
     {
         readLimits(value, type, control, part, kit, engine, insert, parameter, par2);
         return done_msg;
@@ -5787,12 +5787,11 @@ int CmdInterface::sendNormal(unsigned char action, float value, unsigned char ty
 
     action |= TOPLEVEL::action::fromCLI;
     if (parameter != UNUSED && (parameter & TOPLEVEL::action::lowPrio))
-        action |= (parameter & TOPLEVEL::action::muteAndLoop); // transfer low prio and loopback
+        action |= (parameter & TOPLEVEL::action::muteAndLoop);
     CommandBlock putData;
 
     putData.data.value = value;
     putData.data.type = type;
-    putData.data.source = action;
     putData.data.control = control;
     putData.data.part = part;
     putData.data.kit = kit;
@@ -5829,9 +5828,9 @@ int CmdInterface::sendNormal(unsigned char action, float value, unsigned char ty
                 synth->getRuntime().Log("Range adjusted");
             }
         }
-        type |= TOPLEVEL::source::CLI;
+        action |= TOPLEVEL::action::fromCLI;
     }
-
+    putData.data.source = action;
     putData.data.type = type;
     if (synth->interchange.fromCLI->write(putData.bytes))
     {
@@ -5848,12 +5847,11 @@ int CmdInterface::sendNormal(unsigned char action, float value, unsigned char ty
 
 int CmdInterface::sendDirect(unsigned char action, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2, unsigned char request)
 {
-    if (type >= TOPLEVEL::type::Limits && type <= TOPLEVEL::source::CLI)
+    if (action == TOPLEVEL::action::fromMIDI && part != TOPLEVEL::section::midiLearn)
         request = type & TOPLEVEL::type::Default;
     CommandBlock putData;
 
     putData.data.value = value;
-    putData.data.source = action | TOPLEVEL::action::fromCLI;
     putData.data.control = control;
     putData.data.part = part;
     putData.data.kit = kit;
@@ -5874,13 +5872,13 @@ int CmdInterface::sendDirect(unsigned char action, float value, unsigned char ty
     }
 
     if (part != TOPLEVEL::section::midiLearn)
-        type |= TOPLEVEL::source::CLI;
+        action |= TOPLEVEL::action::fromCLI;
     /*
      * MIDI learn is synced by the audio thread but
      * not passed on to any of the normal controls.
      * The type field is used for a different purpose.
      */
-
+    putData.data.source = action | TOPLEVEL::action::fromCLI;
     putData.data.type = type;
     if (request < TOPLEVEL::type::Limits)
     {
@@ -5950,7 +5948,6 @@ int CmdInterface::sendDirect(unsigned char action, float value, unsigned char ty
         return 0;
     }
 
-    //unsigned char action = TOPLEVEL::action::fromCLI;
     if (parameter != UNUSED && (parameter & TOPLEVEL::action::lowPrio))
         action |= (parameter & TOPLEVEL::action::muteAndLoop); // transfer low prio and loopback
     putData.data.source = action;

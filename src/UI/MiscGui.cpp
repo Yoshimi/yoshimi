@@ -199,8 +199,6 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 
 //        cout << "Con " << int(control) << "  Kit " << int(kititem) << "  Eng " << int(engine) << "  Ins " << int(insert) << endl;
 
-    if (getData->data.source & TOPLEVEL::action::forceUpdate)
-        getData->data.type |= TOPLEVEL::source::CLI;
     if (control == TOPLEVEL::control::errorMessage && insert != TOPLEVEL::insert::resonanceGraphInsert) // just show a message
     {
         synth->getGuiMaster()->words->copy_label(miscMsgPop(insertPar2).c_str());

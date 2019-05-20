@@ -123,13 +123,12 @@ void LFOParams::getfromXML(XMLwrapper *xml)
 float LFOlimit::getLFOlimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    unsigned char type = getData->data.type;
-    int request = type & TOPLEVEL::type::Default;
+    int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
     int engine = getData->data.engine;
     int insertType = getData->data.parameter;
 
-    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
+    unsigned char type =0;
 
     // LFO defaults
     int min = 0;

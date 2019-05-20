@@ -733,7 +733,7 @@ void SynthEngine::SetZynControls(bool in_place)
     putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
     // TODO the next line is wrong, it should really be
     // handled by MIDI
-    putData.data.type |= TOPLEVEL::source::CLI;
+    putData.data.source |= TOPLEVEL::action::fromCLI;
 
     if (group == 0x24)
     {
@@ -3263,11 +3263,10 @@ void SynthEngine::setWindowTitle(string _windowTitle)
 float SynthEngine::getLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    unsigned char type = getData->data.type;
-    int request = type & TOPLEVEL::type::Default;
+    int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
 
-    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
+    unsigned char type = 0;
 
     // defaults
     int min = 0;
@@ -3361,11 +3360,10 @@ float SynthEngine::getLimits(CommandBlock *getData)
 float SynthEngine::getVectorLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    unsigned char type = getData->data.type;
-    unsigned char request = getData->data.type  & TOPLEVEL::type::Default;
+    unsigned char request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
 
-    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
+    unsigned char type = 0;
 
     // vector defaults
     type |= TOPLEVEL::type::Integer;
@@ -3455,11 +3453,10 @@ float SynthEngine::getVectorLimits(CommandBlock *getData)
 float SynthEngine::getConfigLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
-    unsigned char type = getData->data.type;
-    int request = type & TOPLEVEL::type::Default;
+    int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
 
-    type &= (TOPLEVEL::source::MIDI | TOPLEVEL::source::CLI | TOPLEVEL::source::GUI); // source bits only
+    unsigned char type = 0;
 
     // config defaults
     int min = 0;
