@@ -80,23 +80,28 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
     putData.data.insert = insert;
     putData.data.parameter = parameter;
     putData.data.par2 = par2;
-    unsigned char typetop = type & 0xd0; // pass through redraws *after* command
-    unsigned char buttons = type & 7;
-    if (part == TOPLEVEL::section::main && (control > 48 || control == 14))
-        type = 1; // TODO fix this properly!
-    else if (part != TOPLEVEL::section::midiLearn)
-    {
+
+    if (part != TOPLEVEL::section::midiLearn)
+    { // midilearn must pass though un-modified
+        unsigned char typetop = type & 0xc0;
+        unsigned char buttons = type & 7;
+        if (part == TOPLEVEL::section::main && (control != MAIN::control::volume &&  control  != MAIN::control::detune))
+            type = 1;
+
         if (buttons == 3 && Fl::event_is_click())
         {
             float newValue;
             putData.data.type = 3 | TOPLEVEL::type::Limits;
             newValue = synth->interchange.readAllData(&putData);
-            //cout << "Gui limits new value " << newValue << endl;
+            if (newValue != value)
+                std::cout << "Gui limits " << value <<" to " << newValue << std::endl;
             if(Fl::event_state(FL_CTRL) != 0)
             {
                 if (putData.data.type & TOPLEVEL::type::Learnable)
-                    type = 3; // previous type is now irrelevant
+                {
                     // identifying this for button 3 as MIDI learn
+                    type = TOPLEVEL::type::LearnRequest;
+                }
                 else
                 {
                     synth->getGuiMaster()->words->copy_label("Can't learn this control");
@@ -119,13 +124,12 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
             }
         }
         else if(buttons > 2)
-            type = 1;
-            // change scroll wheel to button 1
+            type = 1; // change scroll wheel to button 1
+        type |= typetop;
     }
-    type |= typetop;
 
     putData.data.type = type;
-    putData.data.source = TOPLEVEL::action::fromGUI | action;
+    putData.data.source = action | TOPLEVEL::action::fromGUI;
 //cout << "collect_data value " << value << "  action " << int(action)  << "  type " << int(type) << "  control " << int(control) << "  part " << int(part) << "  kit " << int(kititem) << "  engine " << int(engine) << "  insert " << int(insert)  << "  par " << int(parameter) << " par2 " << int(par2) << endl;
     if (!synth->interchange.fromGUI->write(putData.bytes))
         synth->getRuntime().Log("Unable to write to fromGUI buffer.");

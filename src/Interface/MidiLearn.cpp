@@ -134,8 +134,9 @@ bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, un
 
         CommandBlock putData;
         putData.data.value = value;
-        putData.data.type = 0x48 | (foundEntry.data.type & 0x80);
+        putData.data.type = 0x40 | (foundEntry.data.type & 0x80);
         // write command from midi with original integer / float type
+        putData.data.source = 0;
         putData.data.control = foundEntry.data.control;
         putData.data.part = foundEntry.data.part;
         putData.data.kit = foundEntry.data.kit;
@@ -168,7 +169,7 @@ bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, un
 
 bool MidiLearn::writeMidi(CommandBlock *putData, bool in_place)
 {
-    putData->data.source = TOPLEVEL::action::fromMIDI;
+    putData->data.source |= TOPLEVEL::action::fromMIDI;
     unsigned int tries = 0;
     bool ok = true;
     if (in_place)
@@ -637,6 +638,7 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
         int putSize = sizeof(putData);
         memset(&putData, 0xff, putSize);
         putData.data.value = 0;
+        putData.data.source = 0;
         putData.data.type = 0xc8;
         putData.data.control = 0xfe; // TODO don't understand this :(
         putData.data.part = TOPLEVEL::section::midiIn;

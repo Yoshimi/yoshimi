@@ -5618,7 +5618,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         return what_msg;
     }
 
-    if (matchnMove(6, point, "direct"))
+    /*if (matchnMove(6, point, "direct"))
     {
         unsigned char request;
         float value;
@@ -5687,7 +5687,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         return done_msg;
     }
     else if (matchnMove(2, point, "zread"))
-    {
+    {*/
         /*
          * This is a very specific test for reading values and is intended to measure
          * the time these calls take. For that reason the return echos to the CLI and
@@ -5702,7 +5702,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
 
 
         // repeats, control, part, kit, engine, insert, parameter, par2
-        float result;
+        /*float result;
         unsigned char control, part;
         unsigned char kit = UNUSED;
         unsigned char engine = UNUSED;
@@ -5772,22 +5772,20 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         std::cout << "result " << result << std::endl;
         std::cout << "Loops " << repeats << "  Total time " << actual << "uS" << "  average call time " << actual/repeats * 1000.0f << "nS" << std::endl;
         return done_msg;
-    }
+    }*/
     return unrecognised_msg;
 }
 
 
 int CmdInterface::sendNormal(unsigned char action, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
-    if (action == TOPLEVEL::action::fromMIDI && part != TOPLEVEL::section::midiLearn)
+    if ((type & TOPLEVEL::type::Limits) && part != TOPLEVEL::section::midiLearn)
     {
         readLimits(value, type, control, part, kit, engine, insert, parameter, par2);
         return done_msg;
     }
-
     action |= TOPLEVEL::action::fromCLI;
-    if (parameter != UNUSED && (parameter & TOPLEVEL::action::lowPrio))
-        action |= (parameter & TOPLEVEL::action::muteAndLoop);
+
     CommandBlock putData;
 
     putData.data.value = value;
@@ -5808,9 +5806,9 @@ int CmdInterface::sendNormal(unsigned char action, float value, unsigned char ty
 
     if (part != TOPLEVEL::section::midiLearn)
     {
-        putData.data.type = TOPLEVEL::type::Limits;
+        putData.data.type |= TOPLEVEL::type::Limits;
         float newValue = synth->interchange.readAllData(&putData);
-        if (type == TOPLEVEL::type::LearnRequest)
+        if (type & TOPLEVEL::type::LearnRequest)
         {
             if ((putData.data.type & TOPLEVEL::type::Learnable) == 0)
             {

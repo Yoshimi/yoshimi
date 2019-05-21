@@ -1042,7 +1042,7 @@ float InterChange::readAllData(CommandBlock *getData)
          * 3    default
          *
          * tryData.data.type will be updated:
-         * bit 6 set    MIDI-learnable
+         * bit 5 set    MIDI-learnable
          * bit 7 set    Is an integer value
          */
         getData->data.type -= TOPLEVEL::type::Limits;
@@ -1090,7 +1090,6 @@ float InterChange::readAllData(CommandBlock *getData)
          * This still isn't quite right there is a very
          * remote chance of getting garbled text :(
          */
-        //std::cout << "here" << std::endl;
         indirectTransfers(&tryData);
         synth->getRuntime().finishedCLI = true;
         return tryData.data.value;
@@ -1121,7 +1120,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char insertParam = getData->data.parameter;
-    unsigned char insertPar2 = getData->data.par2;
+
     if (control == TOPLEVEL::control::errorMessage && insertParam != TOPLEVEL::insert::resonanceGraphInsert) // special case for simple messages
     {
         synth->getRuntime().Log(miscMsgPop(lrint(value)));
@@ -1138,52 +1137,9 @@ void InterChange::resolveReplies(CommandBlock *getData)
     if (npart == TOPLEVEL::section::scales && (control <= SCALES::control::tuning || control >= SCALES::control::retune))
         synth->setAllPartMaps();
     int tmp = getData->data.source & TOPLEVEL::action::noAction;
-    bool isCli = false;
-    bool isGui = false;
-    if (tmp == TOPLEVEL::action::fromCLI)
-        isCli = true;
-    else if (tmp == TOPLEVEL::action::fromGUI)
-        isGui = true;
-
-    char button = type & 3;
-    std::string isValue;
+    bool notMidi = (tmp == TOPLEVEL::action::fromCLI ||tmp == TOPLEVEL::action::fromGUI);
     std::string commandName;
 
-#ifdef ENABLE_REPORTS
-    if ((isGui && !(button & 1)) || (isCli && button == 1))
-#else
-    if (isCli && button == 1)
-#endif
-    {
-        if (button == 0)
-            isValue = "\n  Request set default";
-        else
-        {
-            isValue = "\n  Value      " + std::to_string(value);
-            if (!(type & TOPLEVEL::type::Integer))
-                isValue += "f";
-        }
-        std::string typemsg = "  Type       ";
-        for (int i = 7; i > -1; -- i)
-            typemsg += std::to_string((type >> i) & 1);
-        list<std::string>msg;
-        msg.push_back(isValue);
-        msg.push_back(typemsg);
-        msg.push_back("  Control    0x" + asHexString(control) + "    " + asString(int(control)));
-        msg.push_back("  Part       0x" + asHexString(npart) + "    " + asString(int(npart)));
-        msg.push_back("  Kit        0x" + asHexString(kititem) + "    " + asString(int(kititem)));
-        msg.push_back("  Engine     0x" + asHexString(engine) + "    " + asString(int(engine)));
-        msg.push_back("  Insert     0x" + asHexString(insert) + "    " + asString(int(insert)));
-        msg.push_back("  Parameter  0x" + asHexString(insertParam) + "    " + asString(int(insertParam)));
-        msg.push_back("  2nd Param  0x" + asHexString(insertPar2) + "    " + asString(int(insertPar2)));
-        synth->cliOutput(msg, 10);
-        if (isCli)
-        {
-            synth->getRuntime().finishedCLI = true;
-            return; // wanted for test only
-        }
-
-    }
     if (npart == TOPLEVEL::section::vector)
         commandName = resolveVector(getData);
     else if (npart == TOPLEVEL::section::scales)
@@ -1374,7 +1330,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
         else
             actual += std::to_string(value);
     }
-    if ((isGui || isCli) && button == 3)
+    if (type & TOPLEVEL::type::LearnRequest)
     {
         std::string toSend;
         size_t pos = commandName.find(" - ");
@@ -1392,7 +1348,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
         return;
     }
 
-    else if (isGui || isCli) // not midi !!!
+    else if (notMidi)
         synth->getRuntime().Log(commandName + actual);
 // in case it was called from CLI
     synth->getRuntime().finishedCLI = true;
@@ -1844,10 +1800,6 @@ std::string InterChange::resolveConfig(CommandBlock *getData)
             contstr += "Program change enables part";
             yesno = true;
             break;
-        /*case 70:
-            contstr += "Enable extended program change";
-            yesno = true;
-            break;*/
         case CONFIG::control::extendedProgramChangeCC:
             contstr += "CC for extended program change";
             break;
@@ -3905,7 +3857,7 @@ void InterChange::mutedDecode(unsigned int altData)
     {
         case TOPLEVEL::muted::stopSound:
             putData.data.control = MAIN::control::stopSound;
-            putData.data.type = 0xf0;
+            putData.data.type = TOPLEVEL::type::Write || TOPLEVEL::type::Integer;
             break;
         case TOPLEVEL::muted::masterReset:
             putData.data.control = (altData >> 8) & 0xff;
@@ -5012,8 +4964,6 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = synth->getRuntime().enable_part_on_voice_load;
             break;
-        //case CONFIG::control::enableExtendedProgramChange:
-            //break;
         case CONFIG::control::extendedProgramChangeCC:
             if (write)
             {
@@ -8319,7 +8269,7 @@ void InterChange::testLimits(CommandBlock *getData)
 float InterChange::returnLimits(CommandBlock *getData)
 {
     // intermediate bits of type are preserved so we know the source
-    // bit 6 set is used to denote midi learnable
+    // bit 5 set is used to denote midi learnable
     // bit 7 set denotes the value is used as an integer
 
     int control = (int) getData->data.control;

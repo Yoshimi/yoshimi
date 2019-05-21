@@ -157,21 +157,19 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         config = 248 // F8
     };
 
-    // bit-wise type and source share the same byte
-    // but will eventually be split up
     namespace type {
         // bits 0, 1
-        const unsigned char Adjust = 0;
+        const unsigned char Adjust = 0; // return value adjusted within limits
         const unsigned char Read = 0; // i.e. !write
-        const unsigned char Minimum = 1;
-        const unsigned char Maximum = 2;
-        const unsigned char Default = 3;
-        const unsigned char LearnRequest = 3; // shared value
+        const unsigned char Minimum = 1; // return this value
+        const unsigned char Maximum = 2; // return this value
+        const unsigned char Default = 3; // return this value
         // remaining used bit-wise
-        const unsigned char Error = 4; // also identifes static limits
-        const unsigned char Limits = 4; // yes we can pair these - who knew?
-        const unsigned char Write = 64; // false = read
-        const unsigned char Learnable = 64; // shared value
+        const unsigned char Limits = 4;
+        const unsigned char Error = 8;
+        const unsigned char LearnRequest = 16;
+        const unsigned char Learnable = 32;
+        const unsigned char Write = 64;
         const unsigned char Integer = 128; // false = float
     }
 

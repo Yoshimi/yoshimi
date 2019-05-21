@@ -3,6 +3,9 @@ yoshimi 1.5.11 M
 2019-5-21 Will
 * Fixed regression not muting when loading patch sets.
 * Resolved spurious EQ setting message when loading.
+* Rearanged 'type' bits removing doubling up.
+  This also permitted streamlining of much of the code.
+* Remove or commented redundant test routines and info.
 
 2019-5-20 Will
 * GUI updates almost complete.

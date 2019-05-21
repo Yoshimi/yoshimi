@@ -638,7 +638,7 @@ paramsui->Show(XML_MICROTONAL);}
         Fl_Button {} {
           label {Stop!}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, MAIN::control::stopSound, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
+          send_data(TOPLEVEL::action::muteAndLoop, MAIN::control::stopSound, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
           tooltip {Cease all sound immediately!} xywh {7 30 70 24} box PLASTIC_UP_BOX color 88 selection_color 0 labelfont 1 labelsize 11 align 16
         }
         Fl_Dial mastervolumedial {
