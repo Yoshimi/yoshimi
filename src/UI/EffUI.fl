@@ -2073,7 +2073,6 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             eqband = 0;
             eqp0->value(eff->geteffectpar(0));
             bandcounter->value(eqband);
-            bandcounter->do_callback();
             typechoice->value(eff->geteffectpar(10));
             eqgraph->redraw();
             freqdial->value(eff->geteffectpar(11));

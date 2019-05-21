@@ -4016,7 +4016,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         return false;
     }
 
-    if (getData->data.source >= TOPLEVEL::action::lowPrio)
+    if ((getData->data.source & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::lowPrio)
         return true; // indirect transfer
 
     unsigned char type = getData->data.type;

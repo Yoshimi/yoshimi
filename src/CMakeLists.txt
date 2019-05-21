@@ -95,7 +95,6 @@ option (BuildWithFLTK "Build with FLTK GUI" ON)
 option (LV2Plugin "Build yoshimi lv2 plugin interface" ON)
 
 # developer info
-option (ShowGuiReports "Enable GUI control reports" OFF)
 option (ShowNoteOnTimes "Report Note-On Times" OFF)
 option (ReportNotes "Report Notes On/Off" OFF)
 
@@ -440,10 +439,6 @@ add_definitions (
 
 add_definitions (-DYOSHIMI="yoshimi")
 
-if (ShowGuiReports)
-    add_definitions (-DENABLE_REPORTS)
-endif (ShowGuiReports)
-
 if (ShowNoteOnTimes)
     add_definitions (-DREPORT_NOTEON)
 endif (ShowNoteOnTimes)
@@ -513,7 +508,6 @@ set(ExternLibraries
     ${CURSES_LIBRARIES}
     ${Readline_LIBRARY}
     z
-    #dl
     ${LIBDL_LINUX}
 )
 
