@@ -224,7 +224,8 @@ void MidiDecode::sendMidiCC(bool inSync, unsigned char chan, int type, short int
     CommandBlock putData;
     memset(&putData, 0xff, sizeof(putData));
     putData.data.value = par;
-    putData.data.type = 0xc8;
+    putData.data.type = 0xc0;
+    putData.data.source = TOPLEVEL::action::toAll;
     putData.data.control = 2;
     putData.data.part = TOPLEVEL::section::midiIn;
     putData.data.kit = chan;
@@ -568,7 +569,7 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
         return;
     //std::cout << "part " << int(putData.data.part) << "  Chan " << int(par) << std::endl;
     putData.data.type = 0xc0;
-
+    putData.data.source = TOPLEVEL::action::toAll;
     synth->midilearn.writeMidi(&putData, false);
 }
 
@@ -626,6 +627,7 @@ void MidiDecode::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_pla
     memset(&putData, 0xff, sizeof(putData));
     putData.data.value = 0xff;
     putData.data.type = 0xc0;
+    putData.data.source = TOPLEVEL::action::toAll;
     putData.data.control = 8;
     putData.data.part = TOPLEVEL::section::midiIn;
     putData.data.kit = 0;
@@ -655,6 +657,7 @@ void MidiDecode::setMidiProgram(unsigned char ch, int prg, bool in_place)
     memset(&putData, 0xff, sizeof(putData));
     putData.data.value = prg;
     putData.data.type = 0xc0;
+    putData.data.source = TOPLEVEL::action::toAll;
     putData.data.control = 8;
     putData.data.part = TOPLEVEL::section::midiIn;
     putData.data.parameter = 0xc0;
