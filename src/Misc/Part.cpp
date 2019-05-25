@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified April 2019
+    Modified May 2019
 */
 
 #include <cstring>
@@ -955,8 +955,6 @@ void Part::ComputePartSmps(void)
         memset(partfxinputl[nefx], 0, synth->sent_bufferbytes);
         memset(partfxinputr[nefx], 0, synth->sent_bufferbytes);
     }
-    //if (Pvolume < 0.001)
-        //return;
 
     for (k = 0; k < POLIPHONY; ++k)
     {
@@ -1098,6 +1096,8 @@ void Part::checkVolume(float step)
 {
     TransVolume += step;
     volume = dB2rap((TransVolume - 96.0f) / 96.0f * 40.0f);
+    if (volume < 0.01015f) // done to get a smooth cutoff at what was - 40dB
+        volume = 0.0f;
 }
 
 

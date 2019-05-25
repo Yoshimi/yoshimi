@@ -691,7 +691,10 @@ string convert_value(ValueType type, float val)
             return(custom_value_units(-60.0f*(1.0f-(int)val/96.0f),"dB",1));
 
         case VC_ADDVoiceVolume:
-            return(custom_value_units(-60.0f*(1.0f-lrint(val)/127.0f),"dB",1));
+            if (val < 1)
+                return "-inf dB";
+            else
+                return(custom_value_units(-60.0f*(1.0f-lrint(val)/127.0f),"dB",1));
 
         case VC_ADDVoiceDelay:
             if((int) val == 0)
@@ -712,7 +715,10 @@ string convert_value(ValueType type, float val)
                     "\n(default: +/- " + custom_value_units(200 * f, "cents )");
 
         case VC_PartVolume:
-            return(custom_value_units((val-96.0f)/96.0f*40.0f,"dB",1));
+            if (val < 0.2f)
+                return "-inf dB";
+            else
+                return(custom_value_units((val-96.0f)/96.0f*40.0f,"dB",1));
 
         case VC_PanningRandom:
             i = lrint(val);

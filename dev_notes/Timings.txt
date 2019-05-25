@@ -1,3 +1,5 @@
+currently disabled and not fully updated
+
 There is a CLI only command that enables you to find out how long any unbuffered read takes. This has no error checks at all so you need to be sure you have it exactly right! It follows a similar pattern to direct access. Refer to the 'Yoshimi Control Numbers.ods' spreadsheet for values.
 
 'zread repeats control part kit engine insert parameter par2'

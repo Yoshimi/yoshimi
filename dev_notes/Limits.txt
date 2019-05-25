@@ -2,7 +2,7 @@ Updated 29/7/2018
 
 This structure is intended to enable you to traverse the controls structure testing/adjusting at each level on the tree.
 
-The function is called via the new 'readAllData' function with a command block 'value' and 'type' set appropriately - see 'Reading_Values'. It returns a float representing the wanted element.
+The function is called via the new 'readAllData' function with a command block 'value' and 'type' nad 'action' set appropriately - see 'Reading_Values'. It returns a float representing the wanted element.
 
 'type' is used to determine the operation.
 
@@ -13,30 +13,20 @@ values (& 3) {these will not be changed}
 3   return default
 
 flags
-bit 2   error (cleared on entry)
-bit 3   set = from midi \
-bit 4   set = from cli   >  these three are exclusive.
-bit 5   set = from gui  /
-bit 6   (returns) set = MIDI-learnable
+bit 2   set defines this as a limits test
+bit 3   (returns) set = error seen
+
+bit 5   (returns) set = MIDI-learnable
 bit 7   (returns) set = regard as integer
 
 Normal byte structure is used to determine how far down the tree to go for a value.
 
-e.g.
-      value  type & 3   command    part
-       200     0          0         240 {remainder all 255}
+e.g. on entry
+      value  type & 3   source   command     part    {remainder all 255}
+       200     0         (any)      0         240
 
 This would return 127 - the input value adusted to the maximium for master volume.
 
-       any     3         255         0 {remainder all 255}
-
-Min, max & default can be tested from the CLI as follows:
-
-direct limit min 0 0:
-  returns the minimum volume for parts
-
-direct limit def 2 0 0 128
-  retruns the default panning for parts addsyth voice
 
 TODO
 

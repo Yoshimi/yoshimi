@@ -1,3 +1,5 @@
+Currently commented out in the code and not fully updated.
+
 This is a test feature only accessible from the command line.
 
                             *** WARNING ***
@@ -14,15 +16,35 @@ This matches the results from using the middle mouse button in the GUI (assuming
 
 The format is:
 
-direct {value} {type} {control} {part} {kit} {engine} {insert} {parameter} {par2}
+direct {value} {type} {source} {control} {part} {kit} {engine} {insert} {parameter} {par2}
 
 direct = the actual command name, must be typed in full.
 
 value = the value that will be set, may be negative and/or floating point (looks for the decimal point).
 
-type = a subset of the command type: 0 for read and 64 for write.
-Sending 1 will just echo the bytes you sent.
-Sending 3 will turn it into a midi-learn command.
+type = a subset of the command type:
+0 for read and 64 for write.
+ORed with bit 5 will turn it into a MIDI learn request.
+
+alternatively if bit 2 is set
+values & 3:
+0 = adust within limits
+1 = return minimum value
+2 = return maximum value
+3 = return default value
+
+source = identity of were the command came from + action modifers.
+values & 15:
+ 0 = send response to all
+ 1 = from MIDI
+ 2 = from CLI
+ 3 = from GUI
+15 = no further action
+
+bit-wise ORed with above:
+32 = force update/redraw
+128 = low priority (separate thread)
+192 = mute then loop back for low priority
 
 control = the number representing the control being changed or queried.
 
@@ -42,15 +64,5 @@ parameter = subtype associated with some inserts.
 par2 = an offset for some parameters.
 
 In some situations par2 is used as a miscMsg ID for passing text values between threads but synchronised via the RT thread. A failed push will return 255 and trying to pop 255 will return an empty string.
-
-If parameter has bit 7 set the command is passed to an alternative low priority function as there will be considerable text manipulation. If bit 6 is also set it will pass through a fade down and mute operation to avoid writing data to the audio engine when active. The return will go via this alternative text heavy route.
-
-
-For limits testing send:
-    direct limit min
-    direct limit max
-    direct limit def (for the default value)
-
-These should be followed by values for the Control, Part, Kit etc.
 
 For further details see Limits.txt.

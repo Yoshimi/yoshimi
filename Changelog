@@ -1,5 +1,9 @@
 yoshimi 1.5.11 M
 
+2019-5-25 Will
+* Enabled part level sound cutoff instead of -40db.
+* Doc updates in dev_notes.
+
 2019-5-22 Will
 * BugFix: Midi CCs not updating GUI.
 
