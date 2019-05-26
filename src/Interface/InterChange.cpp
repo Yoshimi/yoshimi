@@ -5025,6 +5025,7 @@ void InterChange::commandMain(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
+    unsigned char parameter = getData->data.parameter;
     unsigned char par2 = getData->data.par2;
 
     bool write = (type & TOPLEVEL::type::Write) > 0;
@@ -5121,7 +5122,7 @@ void InterChange::commandMain(CommandBlock *getData)
             getData->data.control = 8;
             getData->data.part = TOPLEVEL::section::midiIn;
             getData->data.kit = value_int;
-            getData->data.value = par2;
+            getData->data.value = parameter;
             getData->data.source |= TOPLEVEL::action::lowPrio;
             getData->data.par2 = UNUSED;
             break;

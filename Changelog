@@ -1,5 +1,10 @@
 yoshimi 1.5.11 M
 
+2019-5-26 Will
+* BugFix: CLI load MIDI-learn list from history failed.
+* Moved some parameters out of par2.
+* Updated docs.
+
 2019-5-25 Will
 * Enabled part level sound cutoff instead of -40db.
 * Doc updates in dev_notes.

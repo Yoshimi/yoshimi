@@ -400,7 +400,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         }
         if (it == listtype.end())
         {
-            synth->getRuntime().Log("No entry for number " + to_string(int(par2 + 1)));
+            synth->getRuntime().Log("No entry for number " + to_string(int(value + 1)));
         }
         else
         {

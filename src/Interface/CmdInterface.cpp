@@ -4446,7 +4446,7 @@ int CmdInterface::commandPart(unsigned char controlType)
             tmp = string2int(point) - 1;
             if (tmp < 0 || tmp >= MAX_INSTRUMENTS_IN_BANK)
                 return range_msg;
-            sendDirect(0, npart, controlType, MAIN::control::loadInstrument, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, tmp);
+            sendDirect(0, npart, controlType, MAIN::control::loadInstrument, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, tmp);
             return done_msg;
         }
         else
@@ -5390,12 +5390,12 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                 tmp = string2int(point);
                 if (tmp == 0)
                     return value_msg;
-                sendNormal(0, 0, TOPLEVEL::type::Write, MIDILEARN::control::loadFromRecent, TOPLEVEL::section::midiLearn, 0, 0, 0, 0, tmp - 1);
+                sendNormal(0, tmp - 1, TOPLEVEL::type::Write, MIDILEARN::control::loadFromRecent, TOPLEVEL::section::midiLearn);
                 return done_msg;
             }
             if ((std::string) point == "")
                 return name_msg;
-            sendNormal(0, 0, TOPLEVEL::type::Write, MIDILEARN::control::loadList, TOPLEVEL::section::midiLearn, 0, 0, 0, 0, miscMsgPush((std::string) point));
+            sendNormal(0, 0, TOPLEVEL::type::Write, MIDILEARN::control::loadList, TOPLEVEL::section::midiLearn, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush((std::string) point));
             return done_msg;
         }
         if(matchnMove(2, point, "vector"))
