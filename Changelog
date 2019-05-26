@@ -1,5 +1,12 @@
 yoshimi 1.5.11 M
 
+2019-6-6 Hermann
+* Buffer-handling: use pull processing for sound output,
+  and let the SynthEngine always operate with a fixed,
+  configured calcualtion buffer size. This avoids sonic
+  changes due to dynamic buffer size changes, as could
+  happen with LV2, esp. with the Carla plugin host.
+
 2019-6-4 Will
 * Completed CLI bank slot deletions.
   Also integrated GUI controls.

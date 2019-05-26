@@ -32,11 +32,12 @@
 
 MusicIO::MusicIO(SynthEngine *_synth) :
     interleaved(NULL),
-    synth(_synth)
+    synth(_synth),
+    LV2_engine(synth->getIsLV2Plugin()),
+    samplesUsed(0)
 {
     memset(zynLeft, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
     memset(zynRight, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
-    LV2_engine = synth->getIsLV2Plugin();
 }
 
 
@@ -147,4 +148,38 @@ bail_out:
         interleaved = NULL;
     }
     return false;
+}
+
+
+/*
+ * Pull sound samples from the engine, possibly triggering sound synthesis calculations.
+ * The retrieved sound data will be sent to the output sink by calling pushOutput() at least once,
+ * but possibly several times. At the end, precisely the requested amount of samples will be sent
+ * to output. Param sample_count is a variable integer, not necessarily a power of two (due to LV2),
+ * and can possibly be zero. The only requirement is that sample_count <= output buffer size.
+ * Audio samples will be generated into the persistent buffers allocated for zynLeft | zynRight.
+ * If the SyntEngine::buffersize (calculation chunk size) does not match the requested output
+ * sample_count, some samples may be kept there to be used on the subsequent pullAudio() call.
+ */
+void MusicIO::pullAudio(uint32_t samples_to_send)
+{
+    uint32_t outputStart = 0;
+    while (samples_to_send > 0)
+    {
+        uint32_t chunk = synth->buffersize - samplesUsed;
+        if (chunk == 0)
+        {
+            synth->MasterAudio(zynLeft, zynRight);
+            chunk = synth->buffersize;
+            samplesUsed = 0;
+        }
+        if (chunk > samples_to_send)
+            {// send only some part of the calculated samples
+                chunk = samples_to_send;
+            }
+        pushOutput(outputStart, chunk);
+        samples_to_send -= chunk;
+        outputStart += chunk;
+        samplesUsed += chunk;
+    }
 }

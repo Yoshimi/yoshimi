@@ -47,14 +47,19 @@ class MusicIO : virtual protected MiscFuncs
         virtual void registerAudioPort(int) = 0;
 
     protected:
-        bool LV2_engine;
-        bool prepBuffers(void);
-        void setMidi(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place = false);
         float *zynLeft [NUM_MIDI_PARTS + 1];
         float *zynRight [NUM_MIDI_PARTS + 1];
         int *interleaved;
 
         SynthEngine *synth;
+        bool LV2_engine;
+        uint32_t samplesUsed;
+
+    protected:
+        bool prepBuffers(void);
+        void setMidi(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place = false);
+        void pullAudio(uint32_t samples_to_send);
+        virtual void pushOutput(uint32_t startpos, uint32_t sample_count)  =0;
 };
 
 #endif
