@@ -62,7 +62,7 @@ class JackEngine : public MusicIO
         bool openJackClient(std::string server);
         bool connectJackPorts(void);
         bool processAudio(jack_nframes_t nframes);
-        void sendAudio(int framesize, unsigned int offset);
+        void pushAudioOutput(uint32_t offset, uint32_t sample_count) override;
         bool processMidi(jack_nframes_t nframes);
         bool latencyPrep(void);
         int processCallback(jack_nframes_t nframes);

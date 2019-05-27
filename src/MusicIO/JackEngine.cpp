@@ -390,7 +390,7 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
             }
         }
     }
-    // And mixed outputs
+    // Mixed Master outputs
     audio.portBuffs[2 * NUM_MIDI_PARTS] = (float*)jack_port_get_buffer(audio.ports[2 * NUM_MIDI_PARTS], nframes);
     if (!audio.portBuffs[2 * NUM_MIDI_PARTS])
     {
@@ -404,27 +404,18 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
         return false;
     }
 
-    int framesize = sizeof(float) * synth->buffersize;
-    for (unsigned int pos = 0; pos < nframes; pos += synth->buffersize)
-    {
-        if (nframes < synth->buffersize)   //////////TODO comparison signed / unsigned; however, this whole "calculate remainder" approach is questionable...
-        {                    ////////////////////////TODO: handle discrepancy between SyntEngine::buffersize and output buffersize
-            synth->MasterAudio(zynLeft, zynRight); //TODO  , nframes);
-            sendAudio(sizeof(float) * nframes, 0);
-            break;
-        }
-        else
-        {
-            synth->MasterAudio(zynLeft, zynRight);
-            sendAudio(framesize, pos);
-        }
-    }
+    pullAudio(nframes);
     return true;
 }
 
-
-void JackEngine::sendAudio(int framesize, unsigned int offset)
+/* Invoked from MusicIO::pullAudio() possibly several times, after retrieving the audio samples from SynthEngine.
+ * After these invocations, together precisely nframes have been copied into the output buffer, which we assume
+ * to be large enough to hold this number of audio frames
+ */
+void JackEngine::pushAudioOutput(uint32_t offset, uint32_t sample_count)
 {
+    int bytes_to_send = sizeof(float) * sample_count;
+
     // Part outputs
     int currentmax = synth->getRuntime().NumAvailableParts;
     for (int port = 0, idx = 0; idx < 2 * NUM_MIDI_PARTS; port++ , idx += 2)
@@ -433,26 +424,30 @@ void JackEngine::sendAudio(int framesize, unsigned int offset)
         {
             if (jack_port_connected(audio.ports[idx])) // just a few % improvement.
             {
-                float *lpoint = audio.portBuffs[idx] + offset;
-                float *rpoint = audio.portBuffs[idx + 1] + offset;
+                float *destPartL = audio.portBuffs[idx] + offset;
+                float *destPartR = audio.portBuffs[idx + 1] + offset;
+                float *sourcePartL = zynLeft[port] + this->samplesUsed;
+                float *sourcePartR = zynRight[port] + this->samplesUsed;
                 if ((synth->part[port]->Paudiodest & 2) && port < currentmax)
                 {
-                    memcpy(lpoint, zynLeft[port], framesize);
-                    memcpy(rpoint, zynRight[port], framesize);
+                    memcpy(destPartL, sourcePartL, bytes_to_send);
+                    memcpy(destPartR, sourcePartR, bytes_to_send);
                 }
                 else
                 {
-                    memset(lpoint, 0, framesize);
-                    memset(rpoint, 0, framesize);
+                    memset(destPartL, 0, bytes_to_send);
+                    memset(destPartR, 0, bytes_to_send);
                 }
             }
         }
     }
-    // And mixed outputs
-    float *Lpoint = audio.portBuffs[2 * NUM_MIDI_PARTS] + offset;
-    float *Rpoint = audio.portBuffs[2 * NUM_MIDI_PARTS + 1] + offset;
-    memcpy(Lpoint, zynLeft[NUM_MIDI_PARTS], framesize);
-    memcpy(Rpoint, zynRight[NUM_MIDI_PARTS], framesize);
+    // Mixed Master outputs
+    float *destMasterL = audio.portBuffs[2 * NUM_MIDI_PARTS] + offset;
+    float *destMasterR = audio.portBuffs[2 * NUM_MIDI_PARTS + 1] + offset;
+    float *sourceMasterL = zynLeft[NUM_MIDI_PARTS] + this->samplesUsed;
+    float *sourceMasterR = zynRight[NUM_MIDI_PARTS] + this->samplesUsed;
+    memcpy(destMasterL, sourceMasterL, bytes_to_send);
+    memcpy(destMasterR, sourceMasterR, bytes_to_send);
 }
 
 

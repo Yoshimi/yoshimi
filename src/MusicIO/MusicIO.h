@@ -59,7 +59,7 @@ class MusicIO : virtual protected MiscFuncs
         bool prepBuffers(void);
         void setMidi(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place = false);
         void pullAudio(uint32_t samples_to_send);
-        virtual void pushOutput(uint32_t startpos, uint32_t sample_count)  =0;
+        virtual void pushAudioOutput(uint32_t offset, uint32_t sample_count)  =0;
 };
 
 #endif

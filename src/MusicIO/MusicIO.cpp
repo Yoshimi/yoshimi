@@ -153,7 +153,7 @@ bail_out:
 
 /*
  * Pull sound samples from the engine, possibly triggering sound synthesis calculations.
- * The retrieved sound data will be sent to the output sink by calling pushOutput() at least once,
+ * The retrieved sound data will be sent to the output sink by calling pushAudioOutput() at least once,
  * but possibly several times. At the end, precisely the requested amount of samples will be sent
  * to output. Param sample_count is a variable integer, not necessarily a power of two (due to LV2),
  * and can possibly be zero. The only requirement is that sample_count <= output buffer size.
@@ -177,7 +177,7 @@ void MusicIO::pullAudio(uint32_t samples_to_send)
             {// send only some part of the calculated samples
                 chunk = samples_to_send;
             }
-        pushOutput(outputStart, chunk);
+        pushAudioOutput(outputStart, chunk);
         samples_to_send -= chunk;
         outputStart += chunk;
         samplesUsed += chunk;
