@@ -1,5 +1,7 @@
 yoshimi 1.5.11 M
 
+2019-5-27 Will
+* BugFix: Start message lockup only on Gnome or KDE
 
 2019-5-12 Will
 * Moved hidden filenames from globals to main.
