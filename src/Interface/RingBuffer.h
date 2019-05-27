@@ -31,8 +31,8 @@
 class ringBuff
 {
     private:
-        std::atomic <uint> readPoint{0};
-        std::atomic <uint> writePoint{0};
+        std::atomic <uint32_t> readPoint{0};
+        std::atomic <uint32_t> writePoint{0};
         uint32_t bufferSize;
         uint32_t mask;
         char *buffer;
