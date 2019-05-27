@@ -358,19 +358,28 @@ bail_out:
 }
 
 
-void AlsaEngine::Interleave(int offset, int buffersize)
+
+/* Invoked from MusicIO::pullAudio(count) after retrieving the audio samples from SynthEngine.
+ * In case of ALSA, only the mixed master outputs are used, and they need to be interleaved
+ * into the common output buffer. Typically SynthEngine::buffersize will match the
+ * audio.period_size, and in this case offset==0 and sample_count == period_size.
+ */
+void AlsaEngine::pushAudioOutput(uint32_t offset, uint32_t sample_count)
 {
-    bool byte_swap = (little_endian != card_endian);
+    float *sourceL = zynLeft[NUM_MIDI_PARTS] + this->samplesUsed;
+    float *sourceR = zynRight[NUM_MIDI_PARTS] + this->samplesUsed;
+
+    bool endian_swap = (little_endian != card_endian);
 
     if (card_bits == 16)
     {
-        int chans = card_chans / 2; // because we're pairing them on a single integer
-        int idx = offset * chans;
-        for (int frame = 0; frame < buffersize; ++frame)
+        uint chans = card_chans / 2; // because we're pairing them on a single integer
+        uint32_t idx = offset * chans;
+        for (uint32_t frame = 0; frame < sample_count; ++frame)
         {
-            uint16_t tmp16a = uint16_t(zynLeft[NUM_MIDI_PARTS][frame] * float(0x7800));
-            uint16_t tmp16b = uint16_t(zynRight[NUM_MIDI_PARTS][frame] * float(0x7800));
-            if (byte_swap)
+            uint16_t tmp16a = uint16_t(sourceL[frame] * float(0x7800));
+            uint16_t tmp16b = uint16_t(sourceR[frame] * float(0x7800));
+            if (endian_swap)
             {
                 tmp16a = uint16_t((tmp16a >> 8) | (tmp16a << 8));
                 tmp16b = uint16_t((tmp16b >> 8) | (tmp16b << 8));
@@ -381,19 +390,16 @@ void AlsaEngine::Interleave(int offset, int buffersize)
     }
     else
     {
-        int idx = offset * card_chans;
-        float shift;
-        if (card_bits == 32)
-            shift = float(0x78000000);
-        else
-            shift = float(0x780000);
-        for (int frame = 0; frame < buffersize; ++frame)
+        float shift = (card_bits == 32)? float(0x78000000)
+                                       : float(0x780000);
+        uint32_t idx = offset * card_chans;
+        for (uint32_t frame = 0; frame < sample_count; ++frame)
         {
-            uint32_t tmp32a = uint32_t((zynLeft[NUM_MIDI_PARTS][frame] * shift));
-            uint32_t tmp32b = uint32_t((zynRight[NUM_MIDI_PARTS][frame] * shift));
+            uint32_t tmp32a = uint32_t((sourceL[frame] * shift));
+            uint32_t tmp32b = uint32_t((sourceR[frame] * shift));
             // how should we do an endian swap for 24 bit, 3 byte?
             // is it really the same, just swapping the 'unused' byte?
-            if (byte_swap)
+            if (endian_swap)
             {
                 tmp32a = (tmp32a >> 24) | ((tmp32a << 8) & 0x00FF0000) | ((tmp32a >> 8) & 0x0000FF00) | (tmp32a << 24);
                 tmp32b = (tmp32b >> 24) | ((tmp32b << 8) & 0x00FF0000) | ((tmp32b >> 8) & 0x0000FF00) | (tmp32b << 24);
@@ -462,22 +468,8 @@ void *AlsaEngine::AudioThread(void)
 
         if (audio.pcm_state == SND_PCM_STATE_RUNNING)
         {
-            int alsa_buff = audio.period_size;//audio.buffer_size;
-            int offset = 0;
-            while (alsa_buff - offset >= synth->buffersize)
-            {
-                synth->MasterAudio(zynLeft, zynRight);
-                Interleave(offset, synth->buffersize);
-                offset += synth->buffersize;
-            }
-            int remainder = alsa_buff - offset;    ////////////////////////TODO: handle discrepancy between SyntEngine::buffersize and output buffersize
-            if ( remainder > 0)
-            {
-                synth->MasterAudio(zynLeft, zynRight); ////////////////////TODO , remainder);
-                Interleave(offset, remainder);
-            }
-
-            Write(alsa_buff);
+            pullAudio(audio.period_size);
+            Write(audio.period_size);
         }
         else
             synth->getRuntime().Log("Audio pcm still not running");

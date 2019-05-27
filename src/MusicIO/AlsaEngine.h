@@ -62,7 +62,7 @@ class AlsaEngine : public MusicIO
     private:
         bool prepHwparams(void);
         bool prepSwparams(void);
-        void Interleave(int offset, int buffersize);
+        void pushAudioOutput(uint32_t offset, uint32_t sample_count) override;
         void Write(snd_pcm_uframes_t towrite);
         bool Recover(int err);
         bool xrunRecover(void);
