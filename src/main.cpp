@@ -153,7 +153,7 @@ void do_start(void)
     {
         window.show();
         usleep(10000);
-        Fl::wait();
+        Fl::check();
     }
 }
 #endif

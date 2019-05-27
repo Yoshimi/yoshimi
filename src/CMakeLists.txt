@@ -511,7 +511,6 @@ set(ExternLibraries
     ${LIBDL_LINUX}
 )
 
-
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
     link_directories(/usr/local/lib)
 endif()
