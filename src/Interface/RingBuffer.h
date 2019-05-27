@@ -38,7 +38,7 @@ class ringBuff
         char *buffer;
         uint8_t blockSize;
     public:
-        ringBuff(uint _bufferSize, uint _blockSize);
+        ringBuff(uint32_t _bufferSize, uint32_t _blockSize);
         ~ringBuff();
         bool write(char *writeData);
         bool read(char *readData);

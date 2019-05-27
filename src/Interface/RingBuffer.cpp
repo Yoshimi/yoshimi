@@ -30,7 +30,7 @@
  * it is ESSENTIAL that all buffers and
  * data blocks are powers of 2
  */
-ringBuff::ringBuff(uint _bufferSize, uint _blockSize):
+ringBuff::ringBuff(uint32_t _bufferSize, uint32_t _blockSize):
     bufferSize(_bufferSize),
     blockSize(_blockSize)
 {
