@@ -23,6 +23,7 @@
 #ifndef RINGBUFF_H
 #define RINGBUFF_H
 
+#include <sys/types.h>
 #include <atomic>
 #include <stdlib.h>
 
