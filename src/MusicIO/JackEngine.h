@@ -41,7 +41,7 @@ class JackEngine : public MusicIO
 {
     public:
         JackEngine(SynthEngine *_synth);
-        ~JackEngine() { Close(); }
+        virtual ~JackEngine() { Close(); }
         bool isConnected(void) { return (NULL != jackClient); }
         bool connectServer(std::string server);
         bool openAudio(void);

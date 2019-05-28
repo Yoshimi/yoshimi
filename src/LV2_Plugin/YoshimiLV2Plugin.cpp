@@ -103,94 +103,49 @@ LV2_Descriptor yoshimi_lv2_multi_desc =
 };
 
 
+/* Plugin processing function.
+ * Note: the way this plugin's descriptor is declared, the plugin allows
+ * sample_count to be any arbitrary number below the specified buffer size limit.
+ * Especially, this number need *not* be a power of two, and it can be zero, in
+ * which case we may sill receive MIDI messages and have to publish status updates
+ * to the host. In practice, most LV2 hosts will invoke with regular buffer sizes,
+ * however, we observed some hosts (most notably Carla, as of 2019) to send arbitrary
+ * requests, sometimes even as small as 3 samples.
+ * In any case, Yoshimi maintains its own pre-established calculation chunk size
+ * (which is SynthEngine::buffersize). Samples are "pulled" from the engine, possibly
+ * triggering calculation of the next full calculation chunk on demand.
+ * The field MusicIO::samplesUsed keeps track of the samples already sent to output.
+ * The MIDI messages (possibly queued within the plugin Host) are consumed prior to
+ * audio calculations; reception of a NOTE ON event allocates the respective note object,
+ * to become operative with the start of the next SynthEngine calculation chunk.
+ * Note, while MIDI events are received through different means for Jack, ALSA and LV2,
+ * the processing pattern described here is essentially the same for all three IO systems.
+ */
 void YoshimiLV2Plugin::process(uint32_t sample_count)
 {
-    if (sample_count == 0)
-        return;
-
-    float *tmpLeft [NUM_MIDI_PARTS + 1];
-    float *tmpRight [NUM_MIDI_PARTS + 1];
-    struct midi_event intMidiEvent;
-
-    for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
-    {
-        tmpLeft [i] = lv2Left [i];
-        if (tmpLeft [i] == NULL)
-            tmpLeft [i] = zynLeft [i];
-        tmpRight [i] = lv2Right [i];
-        if (tmpRight [i] == NULL)
-            tmpRight [i] = zynRight [i];
-    }
-    uint32_t next_frame = 0;
-    uint32_t to_process = sample_count;
-    uint32_t processed = 0;
+    // consume MIDI
     LV2_ATOM_SEQUENCE_FOREACH(_midiDataPort, event)
     {
         if (event == NULL)
             continue;
-        if (event->body.size >= sizeof(intMidiEvent.data))
+        if (event->body.size >= sizeof(midi_event::data))
             continue;
         if (event->body.type != _midi_event_id)
             continue;
-        {
-            next_frame = event->time.frames;
-            //process this midi event
 
-            if (next_frame >= sample_count)
-                continue;
-            while (processed < next_frame && to_process >= synth->buffersize)
-            {
-                _synth->MasterAudio(tmpLeft, tmpRight);
-                processed += synth->buffersize;
-                to_process -= synth->buffersize;
-            }
-            if (to_process > 0)    ////////////////////////TODO: handle discrepancy between SyntEngine::buffersize and output buffersize
-            {
-                _synth->MasterAudio(tmpLeft, tmpRight); ///TODO  , to_process);
-                processed += to_process;
-                to_process = 0;
-            }
-            const uint8_t *msg = (const uint8_t*)(event + 1);
-            if (_bFreeWheel != NULL)
-                processMidiMessage(msg);
-        }
+        //process this MIDI event
+        const uint8_t *msg = (const uint8_t*)(event + 1);
+        processMidiMessage(msg);
     }
 
-    if (to_process > 0)
-    {
-        while (to_process >= synth->buffersize)
-        {
-            _synth->MasterAudio(tmpLeft, tmpRight);
-            for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
-            {
-                tmpLeft [i] += synth->buffersize;
-                tmpRight [i] += synth->buffersize;
-            }
-            processed += synth->buffersize;
-            to_process -= synth->buffersize;
-        }
-        if (to_process > 0)
-        {
-            _synth->MasterAudio(tmpLeft, tmpRight);////////TODO  , to_process);
-            for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
-            {
-                tmpLeft [i] += to_process;
-                tmpRight [i] += to_process;
-            }
-            processed += to_process;
-            to_process = 0;
-        }
-    }
-    for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
-    {
-        tmpLeft [i] += processed;
-        tmpRight [i] += processed;
-    }
+    // generate audio
+    pullAudio(sample_count);
 
+    // notify host about plugin's changes
     LV2_Atom_Sequence *aSeq = static_cast<LV2_Atom_Sequence *>(_notifyDataPortOut);
     size_t neededAtomSize = sizeof(LV2_Atom_Event) + sizeof(LV2_Atom_Object_Body);
     size_t paddedSize = (neededAtomSize + 7U) & (~7U);
-    if(synth->getNeedsSaving() && _notifyDataPortOut && aSeq->atom.size >= paddedSize) //notify host about plugin's changes
+    if(synth->getNeedsSaving() && _notifyDataPortOut && aSeq->atom.size >= paddedSize)
     {
         synth->setNeedsSaving(false);
         aSeq->atom.type = _atom_type_sequence;
@@ -214,8 +169,38 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
 }
 
 
+/* This virtual function is invoked from MusicIO::pullAudio(count) possibly several times,
+ * after retrieving the audio samples from SynthEngine. After several such consecutive
+ * invocations, precisely the sample_count demanded by process(sample_count) has been
+ * transfered into the connected output buffers. This mechanism accommodates between the
+ * fixed SynthEngine calculation chunk size and the possibly flexible process() request.
+ */
+void YoshimiLV2Plugin::pushAudioOutput(uint32_t offset, uint32_t sample_count)
+{
+    int bytes_to_send = sizeof(float) * sample_count;
+    for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
+    {
+        if (lv2Left[i])
+        {
+            float *dst = lv2Left[i] + offset;
+            float *src = zynLeft[i] + this->samplesUsed;
+            memcpy(dst, src, bytes_to_send);
+        }
+        if (lv2Right[i])
+        {
+            float *dst = lv2Right[i] + offset;
+            float *src = zynRight[i] + this->samplesUsed;
+            memcpy(dst, src, bytes_to_send);
+        }
+    }
+}
+
+
+
 void YoshimiLV2Plugin::processMidiMessage(const uint8_t * msg)
 {
+    if (_bFreeWheel == NULL) return; // this indicates MIDI ports not properly initialised
+
     bool in_place = _bFreeWheel ? ((*_bFreeWheel == 0) ? false : true) : false;
     setMidi(msg[0], msg[1], msg[2], in_place);
 }
@@ -259,7 +244,9 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
     _offsetPos(0),
     _bFreeWheel(NULL),
     _pIdleThread(0),
-    _lv2_desc(desc)
+    _lv2_desc(desc),
+    lv2Left{0},
+    lv2Right{0}
 {
     flatbankprgs.clear();
     _uridMap.handle = NULL;
@@ -347,10 +334,6 @@ bool YoshimiLV2Plugin::init()
     }
 
     _synth->getRuntime().showGui = false;
-
-    memset(lv2Left, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
-    memset(lv2Right, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
-
     _synth->getRuntime().runSynth = true;
 
     if (!_synth->getRuntime().startThread(&_pIdleThread, YoshimiLV2Plugin::static_idleThread, this, false, 0, "LV2 idle"))
@@ -382,8 +365,6 @@ LV2_Handle	YoshimiLV2Plugin::instantiate (const struct _LV2_Descriptor *desc, do
 
 void YoshimiLV2Plugin::connect_port(LV2_Handle instance, uint32_t port, void *data_location)
 {
-    if (port > NUM_MIDI_PARTS + 2)
-        return;
      YoshimiLV2Plugin *inst = static_cast<YoshimiLV2Plugin *>(instance);
      if (port == 0)//atom midi event port
      {
@@ -406,19 +387,24 @@ void YoshimiLV2Plugin::connect_port(LV2_Handle instance, uint32_t port, void *da
          return;
      }
 
-     port -=2;
+    uint portIndex;
+    if (port == 2 || port == 3)
+    {   // master out L/R
+        portIndex = NUM_MIDI_PARTS;
+    }
+    else if (port >= 4 && port < 36)
+    {
+        portIndex = (port-4) / 2;
+    }
+    else // Note: the manifest 'yoshimi.ttl' defines only ports for the parts 1-16 (port index 4...35) 
+    {
+        inst->synth->getRuntime().Log("LV2-Plugin: invalid output port number encountered: port=" + inst->asString(port));
+        return;
+    }
 
-     if (port == 0) //main outl
-         port = NUM_MIDI_PARTS * 2;
-     else if (port == 1) //main outr
-         port = NUM_MIDI_PARTS * 2 + 1;
-     else
-         port -= 2;
-
-     int portIndex = static_cast<int>(floorf((float)port/2.0f));
-     if (port % 2 == 0) //left channel
+    if (port % 2 == 0) // connect part(1..16) left channel
          inst->lv2Left[portIndex] = static_cast<float *>(data_location);
-     else
+    else               // connect part(1..16) right channel
          inst->lv2Right[portIndex] = static_cast<float *>(data_location);
 }
 

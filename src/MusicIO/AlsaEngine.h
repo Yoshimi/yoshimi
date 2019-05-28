@@ -37,7 +37,7 @@ class AlsaEngine : public MusicIO
 {
     public:
         AlsaEngine(SynthEngine *_synth);
-        ~AlsaEngine() { }
+        virtual ~AlsaEngine() { }
 
         bool openAudio(void);
         bool openMidi(void);

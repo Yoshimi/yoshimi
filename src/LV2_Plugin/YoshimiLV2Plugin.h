@@ -73,15 +73,16 @@ private:
    float *_bFreeWheel;
 
    pthread_t _pIdleThread;
+   std::vector <LV2_Program_Descriptor> flatbankprgs;
+   const LV2_Descriptor *_lv2_desc;
 
    float *lv2Left [NUM_MIDI_PARTS + 1];
    float *lv2Right [NUM_MIDI_PARTS + 1];
 
    void process(uint32_t sample_count);
+   void pushAudioOutput(uint32_t offset, uint32_t sample_count) override;
    void processMidiMessage(const uint8_t *msg);
    void *idleThread(void);
-   std::vector <LV2_Program_Descriptor> flatbankprgs;
-   const LV2_Descriptor *_lv2_desc;
 public:
    YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const char *bundlePath, const LV2_Feature *const *features, const LV2_Descriptor *desc);
    virtual ~YoshimiLV2Plugin();
