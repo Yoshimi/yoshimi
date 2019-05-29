@@ -188,7 +188,7 @@ class JenkinsPRNG
         }
 
     private:
-        uint32_t rot(uint32_t x, uint k) { return (x << k)|(x >> (32-k)); }
+        uint32_t rot(uint32_t x, uint32_t k) { return (x << k)|(x >> (32-k)); }
 };
 
 

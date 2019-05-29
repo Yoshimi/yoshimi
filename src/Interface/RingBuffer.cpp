@@ -22,6 +22,7 @@
 
 #include <atomic>
 #include <stdlib.h>
+#include <iostream>
 #include "string.h" // needed for memcpy
 
 #include "Interface/RingBuffer.h"
@@ -34,13 +35,13 @@
  * buffer size is in terms of block size, not bytes
  * while block size is in bytes
  */
-ringBuff::ringBuff(uint _bufferSize, uint _blockSize):
+ringBuff::ringBuff(uint32_t _bufferSize, uint32_t _blockSize):
     bufferSize(_bufferSize),
     blockSize(_blockSize)
 {
     mask = bufferSize - 1;
     buffer = new char[bufferSize * blockSize];
-    //std::cout << "block size " << int(blockSize) << endl;
+    //std::cout << "buffer size " << int(bufferSize) << "   block " << int(blockSize) << std::endl;
 }
 
 ringBuff::~ringBuff()
@@ -55,7 +56,7 @@ bool ringBuff::write(char *writeData)
     uint32_t read = readPoint.load(std::memory_order_relaxed);
     if ((write - read) > (bufferSize - blockSize))
         return false;
-    //std::cout << "write " << write << "  read " << read << endl;
+    //std::cout << "write " << write << "  read " << read << std::endl;
     memcpy(buffer + blockSize + (write & mask), writeData, blockSize);
     writePoint.store(write + blockSize, std::memory_order_release);
     return true;
@@ -67,7 +68,7 @@ bool ringBuff::read(char *readData)
     uint32_t read = readPoint.load(std::memory_order_acquire);
     if ((write - read) < blockSize)
         return false;
-    //std::cout << "read " << read << "  write " << write << endl;
+    //std::cout << "read " << read << "  write " << write << std::endl;
     memcpy(readData, buffer + blockSize + (read & mask), blockSize);
     readPoint.store(read + blockSize, std::memory_order_release);
     return true;

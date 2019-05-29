@@ -31,14 +31,14 @@
 class ringBuff
 {
     private:
-        std::atomic <uint> readPoint{0};
-        std::atomic <uint> writePoint{0};
+        std::atomic <uint32_t> readPoint{0};
+        std::atomic <uint32_t> writePoint{0};
         uint32_t bufferSize;
         uint32_t mask;
         char *buffer;
         uint8_t blockSize;
     public:
-        ringBuff(uint _bufferSize, uint _blockSize);
+        ringBuff(uint32_t _bufferSize, uint32_t _blockSize);
         ~ringBuff();
         bool write(char *writeData);
         bool read(char *readData);

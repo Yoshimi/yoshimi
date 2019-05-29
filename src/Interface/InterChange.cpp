@@ -1110,10 +1110,17 @@ float InterChange::readAllData(CommandBlock *getData)
 
 void InterChange::resolveReplies(CommandBlock *getData)
 {
+    unsigned char source = getData->data.source & TOPLEVEL::action::noAction;
+    // making sure there are no stry top bits.
+    if (source == TOPLEVEL::action::noAction)
+    {
+        // in case it was originally called from CLI
+        synth->getRuntime().finishedCLI = true;
+        return; // no further action
+    }
+
     float value = getData->data.value;
     unsigned char type = getData->data.type;
-    if (getData->data.source == TOPLEVEL::action::noAction)
-        return; // no further action
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -1129,6 +1136,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     }
 
     showValue = true;
+    std::string commandName;
 
     Part *part;
     part = synth->part[npart];
@@ -1136,9 +1144,6 @@ void InterChange::resolveReplies(CommandBlock *getData)
     // this is unique and placed here to avoid Xruns
     if (npart == TOPLEVEL::section::scales && (control <= SCALES::control::tuning || control >= SCALES::control::retune))
         synth->setAllPartMaps();
-    int tmp = getData->data.source & TOPLEVEL::action::noAction;
-    bool notMidi = (tmp == TOPLEVEL::action::fromCLI ||tmp == TOPLEVEL::action::fromGUI);
-    std::string commandName;
 
     if (npart == TOPLEVEL::section::vector)
         commandName = resolveVector(getData);
@@ -1348,10 +1353,10 @@ void InterChange::resolveReplies(CommandBlock *getData)
         return;
     }
 
-    else if (notMidi)
+    if (source != TOPLEVEL::action::fromMIDI)
         synth->getRuntime().Log(commandName + actual);
-// in case it was called from CLI
-    synth->getRuntime().finishedCLI = true;
+    if (source == TOPLEVEL::action::fromCLI)
+        synth->getRuntime().finishedCLI = true;
 }
 
 
