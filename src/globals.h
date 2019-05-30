@@ -375,6 +375,7 @@ namespace MIDI // usage MIDI::control::noteOn
         noteOn = 0,
         noteOff,
         controller,
+        instrument = 7,
         programChange = 8// also bank and root - split?
     };
 // the following are actual MIDI numbers
@@ -466,7 +467,8 @@ namespace MAIN // usage MAIN::control::volume
         //deleteInstrument,
 
         setCurrentRootBank = 73,
-        loadInstrument,
+        loadInstrumentFromBank,
+        loadInstrumentByName,
         saveInstrument,
         loadNamedInstrument = 78,
         saveNamedInstrument,

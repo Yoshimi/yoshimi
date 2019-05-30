@@ -4446,7 +4446,7 @@ int CmdInterface::commandPart(unsigned char controlType)
             tmp = string2int(point) - 1;
             if (tmp < 0 || tmp >= MAX_INSTRUMENTS_IN_BANK)
                 return range_msg;
-            sendDirect(0, npart, controlType, MAIN::control::loadInstrument, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, tmp);
+            sendDirect(0, tmp, controlType, MAIN::control::loadInstrumentFromBank, TOPLEVEL::section::main, npart);
             return done_msg;
         }
         else

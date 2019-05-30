@@ -954,6 +954,80 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
 }
 
 
+
+
+
+int SynthEngine::setProgramFromBank(CommandBlock *getData, bool notinplace)
+{
+    struct timeval tv1, tv2;
+    if (notinplace && Runtime.showTimes)
+        gettimeofday(&tv1, NULL);
+
+    int instrument = int(getData->data.value);
+    int banknum = getData->data.engine;
+    if (banknum == UNUSED)
+        banknum = Runtime.currentBank;
+    int npart = getData->data.kit;
+    int root = getData->data.insert;
+    if (root == UNUSED)
+        root = Runtime.currentRoot;
+
+    bool ok;
+
+    string fname = bank.getFullPath(root, banknum, instrument);
+    string name = findleafname(fname);
+    if (name < "!")
+    {
+        ok = false;
+        if (notinplace)
+            name = "No instrument at " + to_string(instrument + 1) + " in this bank";
+    }
+    else
+    {
+        ok = setProgram(fname, npart);
+        if (notinplace)
+        {
+            if (!ok)
+                name = "Instrument " + name + "missing or corrupted";
+        }
+    }
+
+    int msgID = NO_MSG;
+    if (notinplace)
+    {
+        if (ok && Runtime.showTimes)
+        {
+            gettimeofday(&tv2, NULL);
+            if (tv1.tv_usec > tv2.tv_usec)
+            {
+                tv2.tv_sec--;
+                tv2.tv_usec += 1000000;
+            }
+            int actual = ((tv2.tv_sec - tv1.tv_sec) *1000 + (tv2.tv_usec - tv1.tv_usec)/ 1000.0f) + 0.5f;
+            name += ("  Time " + to_string(actual) + "mS");
+        }
+        msgID = miscMsgPush(name);
+    }
+    if (!ok)
+        msgID |= 0xFF0000;
+    return msgID;
+}
+
+
+bool SynthEngine::setProgram(string fname, int npart)
+{
+    bool ok = true;
+    part[npart]->legatoFading = 0;
+    if (!part[npart]->loadXMLinstrument(fname))
+        ok = false;
+    if (!ok)
+        partonoffLock(npart, 2); // as it was
+    else
+        partonoffLock(npart, 2 - Runtime.enable_part_on_voice_load); // always on if enabled
+    return ok;
+}
+
+
 int SynthEngine::ReadBankRoot(void)
 {
     return Runtime.currentRoot;

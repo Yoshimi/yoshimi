@@ -628,7 +628,7 @@ void MidiDecode::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_pla
     putData.data.value = 0xff;
     putData.data.type = 0xc0;
     putData.data.source = TOPLEVEL::action::toAll;
-    putData.data.control = 8;
+    putData.data.control = MIDI::control::programChange;
     putData.data.part = TOPLEVEL::section::midiIn;
     putData.data.kit = 0;
     putData.data.parameter = 0xc0;
@@ -640,6 +640,7 @@ void MidiDecode::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_pla
 
     if (in_place)
         synth->SetRBP(&putData, false);
+
     else
         synth->midilearn.writeMidi(&putData, false);
 }
@@ -658,9 +659,9 @@ void MidiDecode::setMidiProgram(unsigned char ch, int prg, bool in_place)
     putData.data.value = prg;
     putData.data.type = 0xc0;
     putData.data.source = TOPLEVEL::action::toAll;
-    putData.data.control = 8;
+    putData.data.control = MIDI::control::instrument;
     putData.data.part = TOPLEVEL::section::midiIn;
-    putData.data.parameter = 0xc0;
+    //putData.data.parameter = 0xc0;
 
     /*
      * This is a bit slow as we send each part individually
@@ -680,7 +681,7 @@ void MidiDecode::setMidiProgram(unsigned char ch, int prg, bool in_place)
                 if (in_place)
                 {
                     synth->partonoffLock(npart, -1);
-                    synth->SetRBP(&putData, false);
+                    synth->setProgramFromBank(&putData, false);
                 }
                 else
                 {
@@ -696,7 +697,7 @@ void MidiDecode::setMidiProgram(unsigned char ch, int prg, bool in_place)
         if (in_place)
         {
             synth->partonoffLock(ch, -1);
-            synth->SetRBP(&putData, false);
+            synth->setProgramFromBank(&putData, false);
         }
         else
             synth->midilearn.writeMidi(&putData, false);

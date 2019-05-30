@@ -1386,6 +1386,7 @@ Nikita Zlobin
                     }
                 }
                 break;
+            case MAIN::control::loadInstrumentFromBank:
             case MIDI::control::programChange:
                 if (insert != UNUSED)
                 {
@@ -1400,6 +1401,7 @@ Nikita Zlobin
                     updatepartprogram(kititem);
                     RecentInstruments->activate();
                 }
+                break;
         }
         return;
     }
@@ -1591,6 +1593,20 @@ Nikita Zlobin
                 ; // just bank
             }
             break;
+
+
+        case MAIN::control::loadInstrumentFromBank:
+            if (insert != UNUSED)
+            {
+                ;// updateBankRootDirs() // apparently not needed!
+            }
+            if (engine != UNUSED)
+                bankui->readbankcfg();
+            if (insert != UNUSED || engine != UNUSED)
+                bankui->rescan_for_banks(false);
+            updatepartprogram(kititem);
+            break;
+
         case MAIN::control::saveInstrument: // save instrument to bank
             name = miscMsgPop(par2);
             if (npart == parameter)

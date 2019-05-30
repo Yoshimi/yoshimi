@@ -253,7 +253,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
-    unsigned char par2 = getData->data.par2;
+    //unsigned char par2 = getData->data.par2;
 
     bool write = (type & TOPLEVEL::type::Write);
     if (write) // TODO do we ever *not* see a write here?
@@ -295,19 +295,32 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         }
         case TOPLEVEL::section::midiIn: // program / bank / root
         {
-            //std::cout << " interchange prog " << value << "  chan " << int(kititem) << "  bank " << int(engine) << "  root " << int(insert) << "  named " << int(par2) << std::endl;
-            if (par2 != NO_MSG) // was named file not numbered
-                getData->data.par2 = miscMsgPush(text);
+            //std::cout << " interchange prog " << value << "  chan " << int(kititem) << "  bank " << int(engine) << "  root " << int(insert) << std::endl;
 
-            int msgID = synth->SetRBP(getData);
-            if (msgID > NO_MSG)
-                text = "FAILED ";
+            int msgID;
+            if (control == MIDI::control::instrument)
+            {
+                msgID = synth->setProgramFromBank(getData);
+                getData->data.control = MAIN::control::loadInstrumentFromBank;
+                getData->data.part = TOPLEVEL::section::main;
+                // moved to 'main' for return updates.
+                if (msgID > NO_MSG)
+                    text = " FAILED " + text;
+                else
+                    text = "ed ";
+            }
             else
-                text = "";
+            {
+                msgID = synth->SetRBP(getData);
+                if (msgID > NO_MSG)
+                    text = "FAILED " + text;
+                else
+                    text = "";
+            }
             text += miscMsgPop(msgID & NO_MSG);
             value = miscMsgPush(text);
-            synth->getRuntime().finishedCLI = true; // temp
-            getData->data.source &= ~TOPLEVEL::action::lowPrio;
+            getData->data.source = TOPLEVEL::action::toAll;
+            // everyone will want to knopw about these!
             guiTo = true;
             break;
         }
@@ -440,6 +453,24 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     value = miscMsgPush(text);
                     break;
                 }
+
+                case MAIN::control::loadInstrumentFromBank:
+                {
+                    unsigned int result = synth->setProgramFromBank(getData);
+                    text = miscMsgPop(result & 0xff);
+                    if (result < 0x1000)
+                        text = "ed " + text;
+                    else
+                        text = " FAILED " + text;
+                    value = miscMsgPush(text);
+                    break;
+                }
+
+                //case MAIN::control::loadInstrumentByName:
+                //{
+                    //break;
+                //}
+
                 case MAIN::control::saveInstrument:
                 {
                     if (kititem == UNUSED)
@@ -1986,18 +2017,27 @@ std::string InterChange::resolveMain(CommandBlock *getData)
             else
                 contstr += std::to_string(value_int);
             break;
+
         case MAIN::control::exportBank:
             showValue = false;
             contstr = "Bank Export" + miscMsgPop(value_int);
             break;
+
         case MAIN::control::importBank:
             showValue = false;
             contstr = "Bank Import" + miscMsgPop(value_int);
             break;
+
         case MAIN::control::deleteBank:
             showValue = false;
             contstr = "Bank delete" + miscMsgPop(value_int);
             break;
+
+        case MAIN::control::loadInstrumentFromBank:
+            showValue = false;
+            contstr = "Part " + to_string (int(kititem + 1)) + " load" + miscMsgPop(value_int);
+            break;
+
         case MAIN::control::saveInstrument:
             showValue = false;
             contstr = "Bank Slot Save" + miscMsgPop(value_int);
@@ -2097,6 +2137,7 @@ std::string InterChange::resolveMain(CommandBlock *getData)
                 contstr += " silent ";
             contstr += (" peak level " + std::to_string(value));
             break;
+
         case MAIN::control::readMainLRpeak:
             showValue = false;
             if(kititem == 1)
@@ -2105,6 +2146,7 @@ std::string InterChange::resolveMain(CommandBlock *getData)
                 contstr = "Left";
             contstr += (" peak level " + std::to_string(value));
             break;
+
         case MAIN::control::readMainLRrms:
             showValue = false;
             if(kititem == 1)
@@ -4288,6 +4330,13 @@ void InterChange::commandMidi(CommandBlock *getData)
             synth->SetController(chan, char1, value_int);
             break;
 
+        case MIDI::control::instrument:
+            getData->data.source |= TOPLEVEL::action::lowPrio;
+            getData->data.part = TOPLEVEL::section::midiIn;
+            synth->partonoffLock(chan & 0x3f, -1);
+            synth->getRuntime().finishedCLI = true;
+            break;
+
         case MIDI::control::programChange: // Program / Bank / Root
             getData->data.source = TOPLEVEL::action::lowPrio;
             if ((value_int != UNUSED || par2 != NO_MSG) && chan < synth->getRuntime().NumAvailableParts)
@@ -5118,28 +5167,24 @@ void InterChange::commandMain(CommandBlock *getData)
             }
             break;
 
-        case MAIN::control::loadInstrument: // load instrument from ID
-            /*
-             * this is the lazy way to move all program changes
-             * to the new MIDI method.
-             */
-            synth->partonoffLock(value_int, -1);
-            getData->data.control = 8;
-            getData->data.part = TOPLEVEL::section::midiIn;
-            getData->data.kit = value_int;
-            getData->data.value = parameter;
-            getData->data.source |= TOPLEVEL::action::lowPrio;
-            getData->data.par2 = UNUSED;
-            break;
         case MAIN::control::loadNamedInstrument: // load named instrument
             synth->partonoffLock(value_int & 0x3f, -1);
-            // as above for named instruments :)
             getData->data.control = 8;
             getData->data.part = TOPLEVEL::section::midiIn;
             getData->data.kit = value_int & 0x3f;
             getData->data.value = UNUSED;
             getData->data.source |= TOPLEVEL::action::lowPrio;
             break;
+
+        case MAIN::control::loadInstrumentFromBank:
+            synth->partonoffLock(value_int, -1);
+            getData->data.source |= TOPLEVEL::action::lowPrio;
+            break;
+
+        //case MAIN::control::loadInstrumentByName:
+            //synth->partonoffLock(value_int, -1);
+            //getData->data.source |= TOPLEVEL::action::lowPrio;
+            //break;
 
         case MAIN::control::loadNamedPatchset:
             if (write && ((action & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::muteAndLoop))
@@ -5148,6 +5193,7 @@ void InterChange::commandMain(CommandBlock *getData)
                 getData->data.source = TOPLEVEL::action::noAction;
             }
             break;
+
         case MAIN::control::loadNamedVector:
             if (write && ((action & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::muteAndLoop))
             {
