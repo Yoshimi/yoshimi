@@ -467,10 +467,9 @@ namespace MAIN // usage MAIN::control::volume
         //deleteInstrument,
 
         setCurrentRootBank = 73,
-        loadInstrumentFromBank,
+        loadInstrumentFromBank = 76,
         loadInstrumentByName,
         saveInstrument,
-        loadNamedInstrument = 78,
         saveNamedInstrument,
         loadNamedPatchset,
         saveNamedPatchset,

@@ -1235,6 +1235,17 @@ Nikita Zlobin
   Function {send_data(int action, int control, float value, int type, int part = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
+        /*
+            The following variations are due to the way the section was built
+            up over time. It really needs the whole lot expanding for the calls
+            to natively include all parameters.
+        */
+        if (control == MAIN::control::loadInstrumentByName && part == TOPLEVEL::section::main && par2 < NO_MSG)
+        {
+            collect_data(synth, 0, action, type, control, part, engine, UNUSED, UNUSED, UNUSED, par2);
+            return;
+        }
+
         if (control <= MAIN::control::soloType)
             type |= Fl::event_button();
         if (parameter == 0)
@@ -1278,7 +1289,7 @@ Nikita Zlobin
         { // panel entries only
             for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
             {
-                if(true)//panellistitem[i]->partenabled->value() != 0)
+                if(panellistitem[i]->partenabled->value() != 0)
                 {
                     if((isSingle && i == (chan & mask)
                                  && panellistitem[i]->partrcv->value() == (chan & mask)
@@ -1386,7 +1397,6 @@ Nikita Zlobin
                     }
                 }
                 break;
-            case MAIN::control::loadInstrumentFromBank:
             case MIDI::control::programChange:
                 if (insert != UNUSED)
                 {
@@ -1399,7 +1409,6 @@ Nikita Zlobin
                 if (value_int != UNUSED || par2 != UNUSED)
                 {
                     updatepartprogram(kititem);
-                    RecentInstruments->activate();
                 }
                 break;
         }
@@ -1594,7 +1603,6 @@ Nikita Zlobin
             }
             break;
 
-
         case MAIN::control::loadInstrumentFromBank:
             if (insert != UNUSED)
             {
@@ -1607,6 +1615,11 @@ Nikita Zlobin
             updatepartprogram(kititem);
             break;
 
+        case MAIN::control::loadInstrumentByName:
+            updatepartprogram(kititem);
+            RecentInstruments->activate();
+            break;
+
         case MAIN::control::saveInstrument: // save instrument to bank
             name = miscMsgPop(par2);
             if (npart == parameter)
@@ -1616,15 +1629,6 @@ Nikita Zlobin
             if (kititem == synth->ReadBankRoot() && engine == synth->ReadBank())
                 bankui->refreshbankslot(insert);
         break;
-        case MAIN::control::loadNamedInstrument: // load instrument
-            if (name.find("FAILED") == 1)
-            {
-                if (wasFromHere)
-                    fl_alert("%s",name.c_str());
-            }
-            else
-                RecentInstruments->activate();
-            break;
 
         case MAIN::control::saveNamedInstrument: // save instrument
             name = miscMsgPop(par2);
@@ -2019,7 +2023,7 @@ Nikita Zlobin
     }
     partui->partGroupEnable->value(0);
     partui->partgroup->deactivate();
-    send_data(TOPLEVEL::action::forceUpdate, MAIN::control::loadNamedInstrument, npart, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, miscMsgPush(fname));} {}
+    send_data(TOPLEVEL::action::forceUpdate, MAIN::control::loadInstrumentByName, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, npart, UNUSED, UNUSED, miscMsgPush(fname));} {}
   }
   Function {do_load_master(const char* file)} {} {
     code {//

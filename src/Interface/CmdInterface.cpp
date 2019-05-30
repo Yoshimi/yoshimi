@@ -5542,7 +5542,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                     return name_msg;
             }
 
-            sendDirect(0, npart, TOPLEVEL::type::Write, MAIN::control::loadNamedInstrument, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(name));
+            sendDirect(0, 0, TOPLEVEL::type::Write, MAIN::control::loadInstrumentByName, TOPLEVEL::section::main, npart, UNUSED, UNUSED, UNUSED, miscMsgPush(name));
             return done_msg;
         }
         replyString = "load";

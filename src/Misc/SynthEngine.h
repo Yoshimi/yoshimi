@@ -118,6 +118,7 @@ class SynthEngine : private SynthHelper, MiscFuncs, FileMgr
         void SetZynControls(bool in_place);
         int RootBank(int rootnum, int banknum);
         int SetRBP(CommandBlock *getData, bool notinplace = true);
+        int setProgramByName(CommandBlock *getData);
         int setProgramFromBank(CommandBlock *getData, bool notinplace = true);
         bool setProgram(string fname, int npart);
         int ReadBankRoot(void);

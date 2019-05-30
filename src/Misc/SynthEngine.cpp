@@ -954,7 +954,43 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
 }
 
 
+int SynthEngine::setProgramByName(CommandBlock *getData)
+{
+    int msgID = NO_MSG;
+    bool ok = true;
+    int npart = int(getData->data.kit);
+    string fname = miscMsgPop(getData->data.par2);
+    string name = findleafname(fname);
+    if (name < "!")
+    {
+        name = "Invalid instrument name " + name;
+        ok = false;
+    }
+    if (ok && !isRegFile(fname.c_str()))
+    {
+        name = "Can't find " + fname;
+        ok = false;
+    }
+    if (ok)
+    {
+        ok = setProgram(fname, npart);
+        if (!ok)
+            name = "File " + name + "unrecognised or corrupted";
+    }
 
+    msgID = miscMsgPush(name);
+    if (!ok)
+    {
+        msgID |= 0xFF0000;
+        partonoffLock(npart, 2); // as it was
+    }
+    else
+    {
+        addHistory(setExtension(fname, EXTEN::zynInst), TOPLEVEL::historyList::Instrument);
+        partonoffLock(npart, 2 - Runtime.enable_part_on_voice_load); // always on if enabled
+    }
+    return msgID;
+}
 
 
 int SynthEngine::setProgramFromBank(CommandBlock *getData, bool notinplace)
@@ -1009,7 +1045,12 @@ int SynthEngine::setProgramFromBank(CommandBlock *getData, bool notinplace)
         msgID = miscMsgPush(name);
     }
     if (!ok)
+    {
         msgID |= 0xFF0000;
+        partonoffLock(npart, 2); // as it was
+    }
+    else
+        partonoffLock(npart, 2 - Runtime.enable_part_on_voice_load); // always on if enabled
     return msgID;
 }
 
@@ -1020,10 +1061,6 @@ bool SynthEngine::setProgram(string fname, int npart)
     part[npart]->legatoFading = 0;
     if (!part[npart]->loadXMLinstrument(fname))
         ok = false;
-    if (!ok)
-        partonoffLock(npart, 2); // as it was
-    else
-        partonoffLock(npart, 2 - Runtime.enable_part_on_voice_load); // always on if enabled
     return ok;
 }
 
