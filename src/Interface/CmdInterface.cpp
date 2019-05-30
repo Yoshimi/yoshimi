@@ -3185,7 +3185,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
     }
     else if (matchnMove(2, point, "activate"))
     {
-        command = CONFIG::control::programChangeEnablesPart;
+        command = CONFIG::control::instChangeEnablesPart;
         value = (toggle() == 1);
     }
     else if (matchnMove(3, point, "extend"))

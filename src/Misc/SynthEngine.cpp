@@ -771,35 +771,13 @@ void SynthEngine::SetZynControls(bool in_place)
 }
 
 
-int  SynthEngine::RootBank(int rootnum, int banknum)
+int SynthEngine::setRootBank(int root, int banknum, bool notinplace)
 {
-    CommandBlock getData;
-    memset(&getData, 0xff, sizeof(getData));
-    getData.data.value = 0xff;
-    getData.data.engine = banknum;
-    getData.data.insert = rootnum;
-    return SetRBP(&getData);
-}
-
-
-int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
-{
-    int program = lrint(getData->data.value);
-    int npart = getData->data.kit;
-    int banknum = getData->data.engine;
-    int root = getData->data.insert;
-    int par2 = getData->data.par2;
-
     string name = "";
     int foundRoot;
     int originalRoot = Runtime.currentRoot;
     int originalBank = Runtime.currentBank;
     bool ok = true;
-    bool hasProgChange = (program < 0xff || par2 != NO_MSG);
-
-    struct timeval tv1, tv2;
-    if (notinplace && Runtime.showTimes && hasProgChange)
-        gettimeofday(&tv1, NULL);
 
     if (root < 0x80)
     {
@@ -842,7 +820,7 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
         {
             if (notinplace)
             {
-                if (root < 0xff)
+                if (root < UNUSED)
                     name = "Root " + to_string(root) + ". ";
                 name = name + "Bank set to " + asString(banknum) + " \"" + bank.roots [originalRoot].banks [banknum].dirname + "\"";
             }
@@ -855,7 +833,7 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
             if (notinplace)
             {
                 name = "No bank " + asString(banknum);
-                if(root < 0xff)
+                if(root < UNUSED)
                     name += " in root " + to_string(root) + ".";
                 else
                     name += " in this root.";
@@ -863,91 +841,10 @@ int SynthEngine::SetRBP(CommandBlock *getData, bool notinplace)
             }
         }
     }
-    if (hasProgChange)
-    {
-        part[npart]->legatoFading = 0;
-        if (ok)
-        {
-            string fname;
-            if (program < 0xff)
-                fname = bank.getfilename(program);
-            else
-                fname = miscMsgPop(par2);
-            if (findleafname(fname) < "!") // can't get a program name less than this
-            {
-                if (notinplace)
-                {
-                    name = "Can't find instrument ";
-                    if (program < 0xff)
-                    name = findleafname(name) + asString(program + 1) + " in this bank";
-                    else
-                        name += fname;
-                }
-                ok = false;
-            }
-            else
-            {
-                if (notinplace)
-                {
-                    name = "";
-                    if (program < 0xff)
-                    {
-                        if (root < 0xff)
-                            name = "Root " + to_string(originalRoot) + ". ";
-                        if (banknum < 0xff)
-                            name = name + "Bank " + to_string(originalBank) + ". ";
-                    }
-                }
-                if (part[npart]->loadXMLinstrument(fname))
-                {
-                    if (notinplace)
-                        name += "Loaded ";
-                }
-                else
-                {
-                    if (notinplace)
-                        name += "Failed to load ";
-                    ok = false;
-                }
-                if (notinplace)
-                {
-                    if (program < 0xff)
-                        name += bank.getname(program);
-                    else
-                        name += fname;
-                    if (ok)
-                    {
-                        if (par2 < 0xff)
-                            addHistory(setExtension(fname, EXTEN::zynInst), TOPLEVEL::historyList::Instrument);
-                        name = name + " to Part " + to_string(npart + 1);
-                    }
-                }
-            }
-            if (!ok)
-                partonoffLock(npart, 2); // as it was
-            else
-                partonoffLock(npart, 2 - Runtime.enable_part_on_voice_load); // always on if enabled
-        }
-        else
-            partonoffLock(npart, 2); // as it was
-    }
 
-    int msgID = 0xff;
+    int msgID = NO_MSG;
     if (notinplace)
-    {
-        if (ok && Runtime.showTimes && hasProgChange)
-        {
-            gettimeofday(&tv2, NULL);
-            if (tv1.tv_usec > tv2.tv_usec)
-            {
-                tv2.tv_sec--;
-                tv2.tv_usec += 1000000;
-            }
-            int actual = ((tv2.tv_sec - tv1.tv_sec) *1000 + (tv2.tv_usec - tv1.tv_usec)/ 1000.0f) + 0.5f;
-            name += ("  Time " + to_string(actual) + "mS");
-        }
         msgID = miscMsgPush(name);
-    }
     if (!ok)
         msgID |= 0xFF0000;
     return msgID;
@@ -2506,7 +2403,7 @@ bool SynthEngine::installBanks()
     xml->exitbranch();
     delete xml;
     Runtime.Log("\nFound " + asString(bank.InstrumentsInBanks) + " instruments in " + asString(bank.BanksInRoots) + " banks");
-    Runtime.Log(miscMsgPop(RootBank(Runtime.tempRoot, Runtime.tempBank)& 0xff));
+    Runtime.Log(miscMsgPop(setRootBank(Runtime.tempRoot, Runtime.tempBank)& 0xff));
 #ifdef GUI_FLTK
     GuiThreadMsg::sendMessage((this), GuiThreadMsg::RefreshCurBank, 1);
 #endif
@@ -3675,7 +3572,7 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
             break;
         case CONFIG::control::enableProgramChange:
             break;
-        case CONFIG::control::programChangeEnablesPart:
+        case CONFIG::control::instChangeEnablesPart:
             def = 1;
             break;
         //case CONFIG::control::enableExtendedProgramChange:

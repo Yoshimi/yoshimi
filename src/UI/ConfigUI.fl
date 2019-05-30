@@ -594,7 +594,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
           Fl_Check_Button progpartenable {
             label {Enable Part On Program Change}
             callback {//
-                        send_data(0, CONFIG::control::programChangeEnablesPart, o->value(), TOPLEVEL::type::Integer);}
+                        send_data(0, CONFIG::control::instChangeEnablesPart, o->value(), TOPLEVEL::type::Integer);}
             tooltip {Part enabled if MIDI program changed} xywh {234 130 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().enable_part_on_voice_load);}
           }
@@ -938,7 +938,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                 case CONFIG::control::enableProgramChange:
                     progenable->value(value_bool);
                     break;
-                case CONFIG::control::programChangeEnablesPart:
+                case CONFIG::control::instChangeEnablesPart:
                     progpartenable->value(value_bool);
                     break;
                 //case CONFIG::control::enableExtendedProgramChange:

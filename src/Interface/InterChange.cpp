@@ -311,7 +311,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
             }
             else
             {
-                msgID = synth->SetRBP(getData);
+                msgID = synth->setRootBank(getData->data.insert, getData->data.engine);
                 if (msgID > NO_MSG)
                     text = "FAILED " + text;
                 else
@@ -1840,7 +1840,7 @@ std::string InterChange::resolveConfig(CommandBlock *getData)
             contstr += "Enable program change";
             yesno = true;
             break;
-        case CONFIG::control::programChangeEnablesPart:
+        case CONFIG::control::instChangeEnablesPart:
             contstr += "Program change enables part";
             yesno = true;
             break;
@@ -1958,7 +1958,7 @@ std::string InterChange::resolveMain(CommandBlock *getData)
             case MIDI::control::controller:
                 contstr = "CC " + std::to_string(int(engine)) + " ";
                 break;
-            case MIDI::control::programChange:
+            case MIDI::control::bankChange:
                 showValue = false;
                 contstr = miscMsgPop(value_int);
                 break;
@@ -4349,7 +4349,7 @@ void InterChange::commandMidi(CommandBlock *getData)
             synth->getRuntime().finishedCLI = true;
             break;
 
-        case MIDI::control::programChange: // Program / Bank / Root
+        case MIDI::control::bankChange:
             getData->data.source = TOPLEVEL::action::lowPrio;
             if ((value_int != UNUSED || par2 != NO_MSG) && chan < synth->getRuntime().NumAvailableParts)
             {
@@ -5024,7 +5024,7 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = synth->getRuntime().EnableProgChange;
             break;
-        case CONFIG::control::programChangeEnablesPart:
+        case CONFIG::control::instChangeEnablesPart:
             if (write)
                 synth->getRuntime().enable_part_on_voice_load = value_bool;
             else

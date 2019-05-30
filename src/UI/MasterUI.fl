@@ -1397,7 +1397,7 @@ Nikita Zlobin
                     }
                 }
                 break;
-            case MIDI::control::programChange:
+            case MIDI::control::bankChange:
                 if (insert != UNUSED)
                 {
                     ;// updateBankRootDirs() // apparently not needed!

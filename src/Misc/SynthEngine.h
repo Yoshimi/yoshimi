@@ -116,8 +116,7 @@ class SynthEngine : private SynthHelper, MiscFuncs, FileMgr
         int RunChannelSwitch(int value);
         void SetController(unsigned char chan, int CCtype, short int par);
         void SetZynControls(bool in_place);
-        int RootBank(int rootnum, int banknum);
-        int SetRBP(CommandBlock *getData, bool notinplace = true);
+        int setRootBank(int root, int bank, bool notinplace = true);
         int setProgramByName(CommandBlock *getData);
         int setProgramFromBank(CommandBlock *getData, bool notinplace = true);
         bool setProgram(string fname, int npart);

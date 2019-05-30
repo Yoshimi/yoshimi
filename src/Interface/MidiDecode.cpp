@@ -620,15 +620,26 @@ void MidiDecode::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_pla
             return; // nothing to do!
     }
     else
+    {
         if (bank_or_root_num == synth->getRuntime().currentBank)
             return; // still nothing to do!
+    }
+
+    if (in_place)
+    {
+        if (!setRootDir)
+            synth->setRootBank(UNUSED, bank_or_root_num, false);
+        else
+            synth->setRootBank(bank_or_root_num, UNUSED, false);
+        return;
+    }
 
     CommandBlock putData;
     memset(&putData, 0xff, sizeof(putData));
     putData.data.value = 0xff;
     putData.data.type = 0xc0;
     putData.data.source = TOPLEVEL::action::toAll;
-    putData.data.control = MIDI::control::programChange;
+    putData.data.control = MIDI::control::bankChange;
     putData.data.part = TOPLEVEL::section::midiIn;
     putData.data.kit = 0;
     putData.data.parameter = 0xc0;
@@ -638,11 +649,7 @@ void MidiDecode::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_pla
     else
         putData.data.engine = bank_or_root_num;
 
-    if (in_place)
-        synth->SetRBP(&putData, false);
-
-    else
-        synth->midilearn.writeMidi(&putData, false);
+    synth->midilearn.writeMidi(&putData, false);
 }
 
 

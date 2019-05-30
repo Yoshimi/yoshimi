@@ -274,7 +274,7 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         bankRootCC = 65,
         bankCC = 67,
         enableProgramChange,
-        programChangeEnablesPart,
+        instChangeEnablesPart,
         //enableExtendedProgramChange,
         extendedProgramChangeCC = 71,
         ignoreResetAllCCs,
@@ -376,7 +376,7 @@ namespace MIDI // usage MIDI::control::noteOn
         noteOff,
         controller,
         instrument = 7,
-        programChange = 8// also bank and root - split?
+        bankChange = 8
     };
 // the following are actual MIDI numbers
 // not to be confused with part controls!
