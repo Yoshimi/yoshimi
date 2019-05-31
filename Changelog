@@ -1,5 +1,13 @@
 yoshimi 1.5.11 M
 
+2019-5-31 Will
+* Merged in bank and program improvements.
+  Separated out:
+  Load instrument by name
+  Load instrument from bank
+  Set current root or bank
+  Updated docs
+
 2019-5-29 Will
 * BugFix: Several bad integer types for BSD
 * BugFix: CLI not seeing MIDI program changes.
