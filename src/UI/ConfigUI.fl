@@ -941,8 +941,6 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                 case CONFIG::control::instChangeEnablesPart:
                     progpartenable->value(value_bool);
                     break;
-                //case CONFIG::control::enableExtendedProgramChange:
-                    //break;
                 case CONFIG::control::extendedProgramChangeCC:
                     if (value_int > 119)
                     {

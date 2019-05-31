@@ -82,7 +82,7 @@ static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
     idMap.insert(nextId);
     return nextId;
 }
-//
+
 // histories
 static vector<string> InstrumentHistory;
 static vector<string> ParamsHistory;
@@ -133,7 +133,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
         uint32_t u32 = 0x11223344;
         uint8_t arr[4];
     } x;
-    //cout << "byte " << int(x.arr[0]) << endl;
+    //std::cout << "byte " << int(x.arr[0]) << std::endl;
     Runtime.isLittleEndian = (x.arr[0] == 0x44);
 
     if (bank.roots.empty())
@@ -642,7 +642,7 @@ void SynthEngine::SetController(unsigned char chan, int CCtype, short int par)
 {
     if (CCtype == Runtime.midi_bank_C)
     {
-        //shouldn't get here. Banks are set directly via SetBank method from MusicIO class
+        //shouldn't get here. Banks are set directly
         return;
     }
     if (CCtype <= 119 && CCtype == Runtime.channelSwitchCC)
@@ -679,11 +679,11 @@ void SynthEngine::SetController(unsigned char chan, int CCtype, short int par)
     }
 
     int npart;
-    //cout << "  min " << minPart<< "  max " << maxPart << "  Rec " << int(part[npart]->Prcvchn) << "  Chan " << int(chan) << endl;
+    //std::cout << "  min " << minPart<< "  max " << maxPart << "  Rec " << int(part[npart]->Prcvchn) << "  Chan " << int(chan) <<std::endl;
     for (npart = minPart; npart < maxPart; ++ npart)
     {   // Send the controller to all part assigned to the channel
         part[npart]->legatoFading = 0;
-        if (chan == part[npart]->Prcvchn)// && partonoffRead(npart))
+        if (chan == part[npart]->Prcvchn)
         {
             if (CCtype == part[npart]->PbreathControl) // breath
             {
@@ -700,7 +700,7 @@ void SynthEngine::SetController(unsigned char chan, int CCtype, short int par)
             }
             else
             {
-                //cout << "CCtype " << int(CCtype) << "  par " << int(par) << endl;
+                //std::cout << "CCtype " << int(CCtype) << "  par " << int(par) << std::endl;
                 part[npart]->SetController(CCtype, par);
             }
         }
@@ -751,7 +751,7 @@ void SynthEngine::SetZynControls(bool in_place)
     else
     {
         putData.data.part = TOPLEVEL::section::insertEffects;
-        //cout << "efftype " << int(efftype) << endl;
+        //std::cout << "efftype " << int(efftype) << std::endl;
         if (efftype == 0x40)
             putData.data.control = 1;
         else if (efftype == 0x60)
@@ -1828,7 +1828,7 @@ void SynthEngine::SetMuteAndWait(void)
     memset(&putData, 0xff, sizeof(putData));
     putData.data.value = 0;
     putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
-    putData.data.control = TOPLEVEL::control::errorMessage;
+    putData.data.control = TOPLEVEL::control::textMessage;
     putData.data.part = TOPLEVEL::section::main;
 #ifdef GUI_FLTK
     if (interchange.fromGUI ->write(putData.bytes))
@@ -2206,7 +2206,7 @@ void SynthEngine::fetchMeterData()
     else
         VUdata.values.vuRmsPeakR = ((VUdata.values.vuRmsPeakR * 7) + root) / 8;
 
-    fade = VUdata.values.vuOutPeakL * 0.92f;//mult;
+    fade = VUdata.values.vuOutPeakL * 0.92f;// mult;
     if (fade >= 1.0f) // overload protection
         fade = 0.0f;
     if (VUcopy.values.vuOutPeakL > 1.8f) // overload protection
@@ -2219,7 +2219,7 @@ void SynthEngine::fetchMeterData()
             VUdata.values.vuOutPeakL = fade;
     }
 
-    fade = VUdata.values.vuOutPeakR * 0.92f;//mult;
+    fade = VUdata.values.vuOutPeakR * 0.92f;// mult;
     if (fade >= 1.0f) // overload protection
         fade = 00.f;
     if (VUcopy.values.vuOutPeakR > 1.8f) // overload protection
@@ -3575,8 +3575,6 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
         case CONFIG::control::instChangeEnablesPart:
             def = 1;
             break;
-        //case CONFIG::control::enableExtendedProgramChange:
-            //break;
         case CONFIG::control::extendedProgramChangeCC: // runtime midi checked elsewhere
             def = 110;
             max = 119;

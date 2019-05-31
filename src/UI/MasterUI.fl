@@ -1398,18 +1398,9 @@ Nikita Zlobin
                 }
                 break;
             case MIDI::control::bankChange:
-                if (insert != UNUSED)
-                {
-                    ;// updateBankRootDirs() // apparently not needed!
-                }
                 if (engine != UNUSED)
                     bankui->readbankcfg();
-                if (insert != UNUSED || engine != UNUSED)
-                    bankui->rescan_for_banks(false);
-                if (value_int != UNUSED || par2 != UNUSED)
-                {
-                    updatepartprogram(kititem);
-                }
+                bankui->rescan_for_banks(false);
                 break;
         }
         return;
@@ -1418,7 +1409,7 @@ Nikita Zlobin
     {
         if (insert == TOPLEVEL::insert::systemEffectSend)
         {
-            if (true)//!wasFromHere) // TODO to sort this properly
+            if (!wasFromHere)
                 syseffsend[engine][control]->value(value);
         }
         else

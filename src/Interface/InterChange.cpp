@@ -270,7 +270,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     std::string name;
 
     int switchNum = npart;
-    if (control == TOPLEVEL::control::errorMessage && insert != TOPLEVEL::insert::resonanceGraphInsert)
+    if (control == TOPLEVEL::control::textMessage && insert != TOPLEVEL::insert::resonanceGraphInsert)
         switchNum = 256; // this is a bit hacky :(
 
     switch(switchNum)
@@ -1167,7 +1167,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     unsigned char insert = getData->data.insert;
     unsigned char insertParam = getData->data.parameter;
 
-    if (control == TOPLEVEL::control::errorMessage && insertParam != TOPLEVEL::insert::resonanceGraphInsert) // special case for simple messages
+    if (control == TOPLEVEL::control::textMessage && insertParam != TOPLEVEL::insert::resonanceGraphInsert) // special case for simple messages
     {
         synth->getRuntime().Log(miscMsgPop(lrint(value)));
         synth->getRuntime().finishedCLI = true;

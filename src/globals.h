@@ -188,7 +188,8 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
     }
 
     enum control : unsigned char {
-        errorMessage = 254 // FE
+        // insert any new entries here
+        textMessage = 254 // FE
     };
 
     enum muted : unsigned char {
@@ -275,7 +276,6 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         bankCC = 67,
         enableProgramChange,
         instChangeEnablesPart,
-        //enableExtendedProgramChange,
         extendedProgramChangeCC = 71,
         ignoreResetAllCCs,
         logIncomingCCs,
@@ -466,8 +466,8 @@ namespace MAIN // usage MAIN::control::volume
         //importInstrument,
         //deleteInstrument,
 
-        setCurrentRootBank = 73,
-        loadInstrumentFromBank = 76,
+        setCurrentRootBank = 75,
+        loadInstrumentFromBank,
         loadInstrumentByName,
         saveInstrument,
         saveNamedInstrument,
