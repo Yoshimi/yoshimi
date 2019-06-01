@@ -36,7 +36,7 @@
  * while block size is in bytes
  */
 ringBuff::ringBuff(uint32_t _bufferSize, uint32_t _blockSize):
-    bufferSize(_bufferSize),
+    bufferSize(_bufferSize * _blockSize),
     blockSize(_blockSize)
 {
     mask = bufferSize - 1;

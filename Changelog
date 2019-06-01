@@ -1,5 +1,8 @@
 yoshimi 1.5.11 M
 
+2019-6-1 Will
+* Corrected ringbufer size calculation.
+
 2019-5-31 Will
 * Merged in bank and program improvements.
   Separated out:
