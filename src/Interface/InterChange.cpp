@@ -3919,6 +3919,7 @@ void InterChange::mutedDecode(unsigned int altData)
             putData.data.type = TOPLEVEL::type::Write || TOPLEVEL::type::Integer;
             break;
         case TOPLEVEL::muted::masterReset:
+            miscMsgClear(); // make sure there are no hanging messages
             putData.data.control = (altData >> 8) & 0xff;
             putData.data.type = altData >> 24;
             break;

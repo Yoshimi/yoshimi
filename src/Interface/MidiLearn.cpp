@@ -747,14 +747,17 @@ void MidiLearn::updateGui(int opp)
     else if (opp == 255)
     {
         putData.data.control = MIDILEARN::control::cancelLearn;
-        putData.data.par2 = 0xff;
+        putData.data.par2 = NO_MSG;
     }
     else
     {
         putData.data.control = MIDILEARN::control::clearAll;
-        putData.data.par2 = 0xff;
+        putData.data.par2 = NO_MSG;
         if (opp == 2)
+        {
+            putData.data.part = TOPLEVEL::section::midiLearn;
             putData.data.kit = 2; // close editing window
+        }
     }
     putData.data.value = 0;
     writeToGui(&putData);
@@ -770,6 +773,7 @@ void MidiLearn::updateGui(int opp)
         unsigned int newCC = it->CC;
         putData.data.value = lineNo;
         putData.data.type = it->status;
+        putData.data.source = TOPLEVEL::action::toAll;
         putData.data.control = MIDILEARN::control::CCorChannel;
         putData.data.kit = (newCC & 0xff);
         putData.data.engine = it->chan;

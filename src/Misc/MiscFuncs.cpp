@@ -346,6 +346,9 @@ void MiscFuncs::miscMsgInit()
 
 void MiscFuncs::miscMsgClear()
 { // catches messge leaks - shirley knot :@)
+#ifdef REPORT_MISCMSG
+    std::cout << "Msg list cleared" << std::endl;
+#endif
     std::list<std::string>::iterator it = miscList.begin();
     for (it = miscList.begin(); it != miscList.end(); ++it)
         *it = "";
