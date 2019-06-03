@@ -5,6 +5,8 @@ yoshimi 1.5.11 M
 * BugFix: Message list clearing was too agressive.
   This prevented state loads from including mide-learn
   control names.
+* BugFix: Load instrument by name failed for yoshi type.
+  Unless there was also a zyn type.
 
 2019-6-1 Will
 * Corrected ringbufer size calculation.
