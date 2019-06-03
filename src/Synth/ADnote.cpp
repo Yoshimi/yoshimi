@@ -52,6 +52,7 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
     NoteEnabled(true),
     ctl(ctl_),
     time(0.0f),
+    forFM(false),
     portamento(portamento_),
     subVoiceNumber(-1),
     origVoice(NULL),
@@ -62,7 +63,8 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
     construct();
 }
 
-ADnote::ADnote(ADnote *orig, float freq_, int subVoiceNumber_, float *parentFMmod_) :
+ADnote::ADnote(ADnote *orig, float freq_, int subVoiceNumber_, float *parentFMmod_,
+               bool forFM_) :
     ready(0),
     adpars(orig->adpars),
     stereo(adpars->GlobalPar.PStereo),
@@ -72,6 +74,7 @@ ADnote::ADnote(ADnote *orig, float freq_, int subVoiceNumber_, float *parentFMmo
     NoteEnabled(true),
     ctl(orig->ctl),
     time(0.0f),
+    forFM(forFM_),
     portamento(orig->portamento),
     subVoiceNumber(subVoiceNumber_),
     origVoice(orig),
@@ -520,6 +523,19 @@ void ADnote::construct()
             (int)((expf(adpars->VoicePar[nvoice].PDelay / 127.0f
                          * logf(50.0f)) - 1.0f) / synth->sent_all_buffersize_f / 10.0f
                          * synth->samplerate_f);
+
+        if (parentFMmod != NULL && NoteVoicePar[nvoice].FMEnabled == FREQ_MOD) {
+            FMFMoldsmpModded[nvoice] = new float [unison];
+            memset(FMFMoldsmpModded[nvoice], 0, unison * sizeof(*FMFMoldsmpModded[nvoice]));
+            FMFMoldsmpOrig[nvoice] = new float [unison];
+            memset(FMFMoldsmpOrig[nvoice], 0, unison * sizeof(*FMFMoldsmpOrig[nvoice]));
+        }
+        if (parentFMmod != NULL && forFM) {
+            oscFMoldsmpModded[nvoice] = new float [unison];
+            memset(oscFMoldsmpModded[nvoice], 0, unison * sizeof(*oscFMoldsmpModded[nvoice]));
+            oscFMoldsmpOrig[nvoice] = new float [unison];
+            memset(oscFMoldsmpOrig[nvoice], 0, unison * sizeof(*oscFMoldsmpOrig[nvoice]));
+        }
     }
 
     max_unison = 1;
@@ -584,7 +600,7 @@ void ADnote::initSubVoices(void)
                 subVoice[nvoice][k] = new ADnote((origVoice != NULL) ? origVoice : this,
                                                  getVoiceBaseFreq(nvoice),
                                                  NoteVoicePar[nvoice].Voice,
-                                                 freqmod);
+                                                 freqmod, forFM);
             }
         }
 
@@ -610,12 +626,13 @@ void ADnote::initSubVoices(void)
                 || modHasFreqAdj
                 || modFreqSettingsDiffer))
         {
+            bool voiceForFM = NoteVoicePar[nvoice].FMEnabled == FREQ_MOD;
             subFMVoice[nvoice] = new ADnote*[unison_size[nvoice]];
             for (int k = 0; k < unison_size[nvoice]; ++k) {
                 subFMVoice[nvoice][k] = new ADnote((origVoice != NULL) ? origVoice : this,
                                                    getFMVoiceBaseFreq(nvoice),
                                                    NoteVoicePar[nvoice].FMVoice,
-                                                   parentFMmod);
+                                                   parentFMmod, voiceForFM);
             }
         }
     }
@@ -977,6 +994,15 @@ void ADnote::killVoice(int nvoice)
     if (NoteVoicePar[nvoice].VoiceOut)
         memset(NoteVoicePar[nvoice].VoiceOut, 0, synth->bufferbytes);
         // do not delete, yet: perhaps is used by another voice
+
+    if (parentFMmod != NULL && NoteVoicePar[nvoice].FMEnabled == FREQ_MOD) {
+        delete [] FMFMoldsmpModded[nvoice];
+        delete [] FMFMoldsmpOrig[nvoice];
+    }
+    if (parentFMmod != NULL && forFM) {
+        delete [] oscFMoldsmpModded[nvoice];
+        delete [] oscFMoldsmpOrig[nvoice];
+    }
 
     NoteVoicePar[nvoice].Enabled = false;
 }
@@ -1663,10 +1689,15 @@ void ADnote::computeVoiceModulator(int nvoice, int FMmode)
             memcpy(tmpmod_unison[k], smps, synth->bufferbytes);
         }
     }
-    else if (parentFMmod != NULL)
-        computeVoiceModulatorFrequencyModulation(nvoice, FMmode);
-    else
+    else if (parentFMmod != NULL) {
+        if (NoteVoicePar[nvoice].FMEnabled == FREQ_MOD) {
+            computeVoiceModulatorForFMFrequencyModulation(nvoice);
+        } else {
+            computeVoiceModulatorFrequencyModulation(nvoice, FMmode);
+        }
+    } else {
         computeVoiceModulatorLinearInterpolation(nvoice);
+    }
 
     // Amplitude interpolation
     if (aboveAmplitudeThreshold(FMoldamplitude[nvoice], FMnewamplitude[nvoice]))
@@ -1715,7 +1746,7 @@ void ADnote::normalizeVoiceModulatorFrequencyModulation(int nvoice, int FMmode)
             float  fmold = FMoldsmp[nvoice][k];
             for (int i = 0; i < synth->sent_buffersize; ++i)
             {
-                fmold = fmodf(fmold + tw[i] * normalize, synth->oscilsize_f);
+                fmold = fmold + tw[i] * normalize;
                 tw[i] = fmold;
             }
             FMoldsmp[nvoice][k] = fmold;
@@ -1787,12 +1818,21 @@ void ADnote::computeVoiceModulatorFrequencyModulation(int nvoice, int FMmode)
         float posloFM = oscposloFM[nvoice][k];
         int freqhiFM = oscfreqhiFM[nvoice][k];
         float freqloFM = oscfreqloFM[nvoice][k];
+        // When we have parent modulation, we want to maintain the same
+        // sound. However, if the carrier and modulator are very far apart in
+        // frequency, then the modulation will affect them very differently,
+        // since the phase difference is linear, not logarithmic. Compensate for
+        // this by favoring the carrier, and adjust the rate of modulation
+        // logarithmically, relative to this.
+        float oscVsFMratio = ((float)freqhiFM + freqloFM)
+            / ((float)oscfreqhi[nvoice][k] + oscfreqlo[nvoice][k]);
         const float *smps = NoteVoicePar[nvoice].FMSmp;
 
         for (int i = 0; i < synth->sent_buffersize; ++i)
         {
-            int FMmodfreqhi = int(parentFMmod[i]);
-            float FMmodfreqlo = parentFMmod[i]-FMmodfreqhi;
+            float pMod = parentFMmod[i] * oscVsFMratio;
+            int FMmodfreqhi = int(pMod);
+            float FMmodfreqlo = pMod-FMmodfreqhi;
             if (FMmodfreqhi < 0)
                 FMmodfreqlo++;
 
@@ -1824,6 +1864,134 @@ void ADnote::computeVoiceModulatorFrequencyModulation(int nvoice, int FMmode)
         }
         oscposhiFM[nvoice][k] = poshiFM;
         oscposloFM[nvoice][k] = posloFM;
+    }
+}
+
+void ADnote::computeVoiceModulatorForFMFrequencyModulation(int nvoice)
+{
+    // Here we have a tricky situation: We are generating a modulator which will
+    // be used for FM modulation, and the modulator itself is also modulated by
+    // a parent voice. Because FM modulation needs to be integrated (it is the
+    // derivative function of PM modulation), we cannot modulate the modulator
+    // in the same way as the others. Instead, we start with the original
+    // unmodulated function, and then integrate either backwards or forwards
+    // until we reach the phase offset from the parent modulation. Then we take
+    // the linear interpolation between the two nearest samples, and use that to
+    // construct the resulting curve. This is a lot more expensive than straight
+    // modulation, since we have to count every sample between the phase
+    // position we're at, and the one we're going to. However, it preserves the
+    // original sound well.
+    for (int k = 0; k < unison_size[nvoice]; ++k)
+    {
+        float *tw = tmpmod_unison[k];
+        int poshiFM = oscposhiFM[nvoice][k];
+        float posloFM = oscposloFM[nvoice][k];
+        int freqhiFM = oscfreqhiFM[nvoice][k];
+        float freqloFM = oscfreqloFM[nvoice][k];
+        float oscVsFMratio = ((float)freqhiFM + freqloFM)
+            / ((float)oscfreqhi[nvoice][k] + oscfreqlo[nvoice][k]);
+        const float *smps = NoteVoicePar[nvoice].FMSmp;
+        float oldsmpModded = FMFMoldsmpModded[nvoice][k];
+        float oldsmpOrig = FMFMoldsmpOrig[nvoice][k];
+
+        // Cache the samples we calculate for a certain nearby range. This is
+        // possible since the base frequency never changes within one
+        // `sent_buffersize`.
+        const int cacheSize = synth->samplerate * 2 + synth->sent_buffersize;
+        float cachedSamples[cacheSize];
+        int cachedBackwards, cachedForwards, cacheCenter;
+        cachedBackwards = cachedForwards = cacheCenter = cacheSize / 2 - 1;
+
+        // The last cached sample was the previous sample.
+        cachedSamples[cacheCenter++] = oldsmpOrig;
+
+        for (int i = 0; i < synth->sent_buffersize; ++i)
+        {
+            float pMod = parentFMmod[i] * oscVsFMratio;
+            float sampleDistanceF = pMod / ((float)freqhiFM + freqloFM);
+            int cachePosNear = cacheCenter + (int)roundf(sampleDistanceF);
+            int cachePosFar = cachePosNear + ((sampleDistanceF < 0) ? -1 : +1);
+
+            if (cachePosFar < 0 || cachePosFar >= cacheSize) {
+                // This is just a precaution to avoid blowing the boundaries of
+                // the cache. This was found by experimentation to only be hit
+                // on very extreme, low frequency modulations, at which point
+                // the usefulness for audio is questionable. At these rates it
+                // is ridiculously memory and CPU intensive to keep going, so
+                // just bail out with a zero curve instead.
+                memset(tw, 0, synth->sent_buffersize * sizeof(float));
+                return;
+            }
+
+            if (cacheCenter > cachedForwards) {
+                cachedSamples[cacheCenter] = cachedSamples[cachedForwards] +
+                    (smps[poshiFM] * (1.0f - posloFM)
+                     + smps[poshiFM + 1] * posloFM);
+                cachedForwards = cacheCenter;
+            }
+
+            int carposhi = poshiFM;
+            float carposlo = posloFM;
+
+            // Traverse samples backwards and forwards, and cache the results.
+            if (cachedBackwards > cachePosFar) {
+                for (int pos = cachedBackwards-1; pos >= cachePosFar; --pos) {
+                    carposhi -= freqhiFM;
+                    carposlo -= freqloFM;
+                    if (carposlo < 0) {
+                        carposlo++;
+                        carposhi--;
+                    }
+                    if (carposhi < 0)
+                        carposhi += synth->oscilsize;
+
+                    cachedSamples[pos] = cachedSamples[pos+1] -
+                        (smps[carposhi] * (1.0f - carposlo)
+                         + smps[carposhi + 1] * carposlo);
+                }
+                cachedBackwards = cachePosFar;
+            }
+
+            if (cachedForwards < cachePosFar) {
+                for (int pos = cachedForwards+1; pos <= cachePosFar; ++pos) {
+                    carposhi += freqhiFM;
+                    carposlo += freqloFM;
+                    if (carposlo >= 1.0f) {
+                        carposlo--;
+                        carposhi++;
+                    }
+                    carposhi &= synth->oscilsize - 1;
+
+                    cachedSamples[pos] = cachedSamples[pos-1] +
+                        (smps[carposhi] * (1.0f - carposlo)
+                         + smps[carposhi + 1] * carposlo);
+                }
+                cachedForwards = cachePosFar;
+            }
+
+            float interp = sampleDistanceF - truncf(sampleDistanceF);
+            float finalsmp = cachedSamples[cachePosNear] * (1.0f - interp) +
+                cachedSamples[cachePosFar] * interp;
+            tw[i] = finalsmp - oldsmpModded;
+            oldsmpModded = finalsmp;
+
+            // New center is one sample forward.
+            cacheCenter++;
+
+            posloFM += freqloFM;
+            if (posloFM >= 1.0f)
+            {
+                posloFM -= 1.0f;
+                poshiFM++;
+            }
+
+            poshiFM += freqhiFM;
+            poshiFM &= synth->oscilsize - 1;
+        }
+        oscposhiFM[nvoice][k] = poshiFM;
+        oscposloFM[nvoice][k] = posloFM;
+        FMFMoldsmpModded[nvoice][k] = oldsmpModded;
+        FMFMoldsmpOrig[nvoice][k] = cachedSamples[cacheCenter - 1];
     }
 }
 
@@ -1877,6 +2045,113 @@ void ADnote::computeVoiceOscillatorFrequencyModulation(int nvoice)
         oscposlo[nvoice][k] = poslo;
     }
 }
+
+void ADnote::computeVoiceOscillatorForFMFrequencyModulation(int nvoice)
+{
+    // See computeVoiceModulatorForFMFrequencyModulation for details on how this
+    // works.
+    for (int k = 0; k < unison_size[nvoice]; ++k)
+    {
+        float *tw = tmpwave_unison[k];
+        float *mod = freqbasedmod ? tmpmod_unison[k] : parentFMmod;
+        int poshi = oscposhi[nvoice][k];
+        float poslo = oscposlo[nvoice][k];
+        int freqhi = oscfreqhi[nvoice][k];
+        float freqlo = oscfreqlo[nvoice][k];
+        const float *smps = NoteVoicePar[nvoice].OscilSmp;
+        float oldsmpModded = oscFMoldsmpModded[nvoice][k];
+        float oldsmpOrig = oscFMoldsmpOrig[nvoice][k];
+
+        const int cacheSize = synth->samplerate * 2 + synth->sent_buffersize;
+        float cachedSamples[cacheSize];
+        int cachedBackwards, cachedForwards, cacheCenter;
+        cachedBackwards = cachedForwards = cacheCenter = cacheSize / 2 - 1;
+
+        cachedSamples[cacheCenter++] = oldsmpOrig;
+
+        for (int i = 0; i < synth->sent_buffersize; ++i)
+        {
+            float sampleDistanceF = mod[i] / ((float)freqhi + freqlo);
+            int cachePosNear = cacheCenter + (int)roundf(sampleDistanceF);
+            int cachePosFar = cachePosNear + ((sampleDistanceF < 0) ? -1 : +1);
+
+            if (cachePosFar < 0 || cachePosFar >= cacheSize) {
+                memset(tw, 0, synth->sent_buffersize * sizeof(float));
+                return;
+            }
+
+            if (cacheCenter > cachedForwards) {
+                cachedSamples[cacheCenter] = cachedSamples[cachedForwards] +
+                    (smps[poshi] * (1.0f - poslo)
+                     + smps[poshi + 1] * poslo);
+                cachedForwards = cacheCenter;
+            }
+
+            int carposhi = poshi;
+            float carposlo = poslo;
+
+            // Traverse samples backwards and forwards, and cache the results.
+            if (cachedBackwards > cachePosFar) {
+                for (int pos = cachedBackwards-1; pos >= cachePosFar; --pos) {
+                    carposhi -= freqhi;
+                    carposlo -= freqlo;
+                    if (carposlo < 0) {
+                        carposlo++;
+                        carposhi--;
+                    }
+                    if (carposhi < 0)
+                        carposhi += synth->oscilsize;
+
+                    cachedSamples[pos] = cachedSamples[pos+1] -
+                        (smps[carposhi] * (1.0f - carposlo)
+                         + smps[carposhi + 1] * carposlo);
+                }
+                cachedBackwards = cachePosFar;
+            }
+
+            if (cachedForwards < cachePosFar) {
+                for (int pos = cachedForwards+1; pos <= cachePosFar; ++pos) {
+                    carposhi += freqhi;
+                    carposlo += freqlo;
+                    if (carposlo >= 1.0f) {
+                        carposlo--;
+                        carposhi++;
+                    }
+                    carposhi &= synth->oscilsize - 1;
+
+                    cachedSamples[pos] = cachedSamples[pos-1] +
+                        (smps[carposhi] * (1.0f - carposlo)
+                         + smps[carposhi + 1] * carposlo);
+                }
+                cachedForwards = cachePosFar;
+            }
+
+            float interp = sampleDistanceF - truncf(sampleDistanceF);
+            float finalsmp = cachedSamples[cachePosNear] * (1.0f - interp) +
+                cachedSamples[cachePosFar] * interp;
+            tw[i] = finalsmp - oldsmpModded;
+            oldsmpModded = finalsmp;
+
+            // New center is one sample forward.
+            cacheCenter++;
+
+            poslo += freqlo;
+            if (poslo >= 1.0f)
+            {
+                poslo -= 1.0f;
+                poshi++;
+            }
+
+            poshi += freqhi;
+            poshi &= synth->oscilsize - 1;
+        }
+        oscposhi[nvoice][k] = poshi;
+        oscposlo[nvoice][k] = poslo;
+        oscFMoldsmpModded[nvoice][k] = oldsmpModded;
+        oscFMoldsmpOrig[nvoice][k] = cachedSamples[cacheCenter - 1];
+    }
+}
+
 
 
 // Computes the Noise
@@ -1950,7 +2225,9 @@ void ADnote::computeVoiceOscillator(int nvoice)
             case 0: //  sound
                 // There may be frequency modulation coming from the parent,
                 // even if this oscillator itself does not have it.
-                if (parentFMmod != NULL || freqbasedmod[nvoice])
+                if (parentFMmod != NULL && forFM)
+                    computeVoiceOscillatorForFMFrequencyModulation(nvoice);
+                else if (parentFMmod != NULL || freqbasedmod[nvoice])
                     computeVoiceOscillatorFrequencyModulation(nvoice);
                 else
                     computeVoiceOscillatorLinearInterpolation(nvoice);

@@ -1,5 +1,8 @@
 yoshimi 1.5.11 M
 
+2019-6-3 Will
+* Applied modulation patch from Kristian.
+
 2019-6-1 Will
 * Corrected ringbufer size calculation.
 

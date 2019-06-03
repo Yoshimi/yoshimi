@@ -40,6 +40,7 @@ add_definitions(-Wall)
 add_definitions(-Wfatal-errors) # stop on first
 add_definitions(-Werror=format-security)
 add_definitions(-Wextra)
+add_definitions(-Wno-vla) # Nothing wrong with variable length arrays
 # ^^^ comment these out on release pushes
 
 set (YOSHIMI_VERSION "1.5.11 M")
