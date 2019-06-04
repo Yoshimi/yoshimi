@@ -291,7 +291,7 @@ namespace BANK // usage BANK::control::
         selectInstrument = 0, // not yet
         renameInstrument, // not yet
         saveInstrument, // not yet
-        deleteInstrument, // not yet
+        deleteInstrument,
         selectFirstInstrumentToSwap,
         selectSecondInstrumentAndSwap,
 

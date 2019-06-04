@@ -801,6 +801,9 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
     string message = miscMsgPop(par2);
     switch(control)
     {
+        case BANK::control::deleteInstrument:
+            rescan_for_banks(false);
+            break;
         case BANK::control::selectFirstInstrumentToSwap:
             break;
         case BANK::control::selectSecondInstrumentAndSwap:

@@ -145,6 +145,7 @@ static std::string toplist [] = {
     "REMove",                   "remove paths, files and entries",
     "  Root <n>",               "de-list root path ID",
     "  Bank [s <n1>] <n2>",     "delete bank ID n2 (and all instruments) from current root (or 'Root' n1)",
+    "  INstrument <n>",         "delete instrument from slot (n) in current bank",
     "  YOshimi <n>",            "close instance ID",
     "  MLearn <s> [n]",         "delete midi learned 'ALL' whole list, or '@'(n) line",
     "Set/Read/MLearn",          "manage all main parameters",

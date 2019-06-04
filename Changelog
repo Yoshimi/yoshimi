@@ -1,6 +1,11 @@
 yoshimi 1.5.11 M
 
 2019-6-3 Will
+* CLI can now delete bank slot instruments.
+  Notifications not complete yet.
+* Updated docs.
+
+2019-6-3 Will
 * Applied modulation patch from Kristian.
 * BugFix: Message list clearing was too agressive.
   This prevented state loads from including mide-learn

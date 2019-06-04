@@ -745,6 +745,12 @@ void InterChange::indirectTransfers(CommandBlock *getData)
         {
             switch (control)
             {
+                case BANK::control::deleteInstrument:
+                {
+                    if (!synth->bank.clearslot(value))
+                        std::cout << "Failed to delete instrument from slot" << endl;
+                    break;
+                }
                 case BANK::control::selectFirstInstrumentToSwap:
                 {
                     if(kititem == UNUSED)
@@ -1910,6 +1916,9 @@ std::string InterChange::resolveBank(CommandBlock *getData)
     showValue = false;
     switch(control)
     {
+        case BANK::control::deleteInstrument:
+            contstr = name; //"Removed instrument from bank slot " + std::to_string(value_int + 1);
+            break;
         case BANK::control::selectFirstInstrumentToSwap:
             contstr = "Set Instrument ID " + std::to_string(insert + 1) + "  Bank ID " + std::to_string(kititem) + "  Root ID " + std::to_string(engine) + " for swap";
             break;
