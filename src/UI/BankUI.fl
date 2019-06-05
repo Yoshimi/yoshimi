@@ -798,11 +798,18 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
     //int value_int = getData->data.value;
     unsigned char control = getData->data.control;
     unsigned int par2 = getData->data.par2;
+    int source = getData->data.source & TOPLEVEL::action::noAction;
     string message = miscMsgPop(par2);
     switch(control)
     {
         case BANK::control::deleteInstrument:
-            rescan_for_banks(false);
+            if (message.find("FAILED") == 1)
+            {
+                if(source == TOPLEVEL::action::fromGUI)
+                    fl_alert("%s",message.c_str());
+            }
+            else
+                rescan_for_banks(false);
             break;
         case BANK::control::selectFirstInstrumentToSwap:
             break;
@@ -949,15 +956,8 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         if (mode == 3 && !bank->emptyslot(slot))
         {   // Clears the slot (choices reversed for 'No' priority)
             if (fl_choice("Clear the slot no. %d ?", NULL, "No", "Yes", slot + 1) > 1)
-            {
-                if (!bank->clearslot(slot))
-                    fl_alert("Could not clear this location");
-                else
-                    bs[slot]->refresh();
-                setread();
-            }
-            else
-                setread();
+                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::deleteInstrument, slot, TOPLEVEL::type::Write, TOPLEVEL::section::bank);
+            setread();
         }
 
         if (mode == 4)

@@ -46,6 +46,7 @@ using namespace std;
 #include "Misc/XMLwrapper.h"
 #include "Misc/Config.h"
 #include "Misc/Bank.h"
+#include "Interface/FileMgr.h"
 #include "Misc/SynthEngine.h"
 
 Bank::Bank(SynthEngine *_synth) :
@@ -183,32 +184,44 @@ bool Bank::emptyslot(unsigned int ninstrument)
 
 
 // Removes the instrument from the bank
-bool Bank::clearslot(unsigned int ninstrument)
+int Bank::clearslot(unsigned int ninstrument)
 {
     bool chk = true;
     bool chk2 = true; // to stop complaints
-    if (emptyslot(ninstrument))
-        return true;
-    string tmpfile = setExtension(getFullPath(synth->getRuntime().currentRoot, synth->getRuntime().currentBank, ninstrument), EXTEN::yoshInst);
+    if (emptyslot(ninstrument)) // this is not an error
+        return miscMsgPush(". None found at slot " + to_string(ninstrument + 1));
 
+    std::string tmpfile = setExtension(getFullPath(synth->getRuntime().currentRoot, synth->getRuntime().currentBank, ninstrument), EXTEN::yoshInst);
     if (isRegFile(tmpfile))
-    {
         chk = deleteFile(tmpfile);
-        if (!chk)
-            synth->getRuntime().Log(asString(ninstrument) + " Failed to remove " + tmpfile);
-    }
+
     tmpfile = setExtension(tmpfile, EXTEN::zynInst);
     if (isRegFile(tmpfile))
-    {
         chk2 = deleteFile(tmpfile);
-        if (chk2 == false)
-            synth->getRuntime().Log(asString(ninstrument) + " Failed to remove " + tmpfile);
+    std::string instName = getname(ninstrument);
+    std::string result;
+    if (chk && chk2)
+    {
+        deletefrombank(synth->getRuntime().currentRoot, synth->getRuntime().currentBank, ninstrument);
+        result = "d ";
     }
-    if (chk == false || chk2 == false)
-        return false;
-
-    deletefrombank(synth->getRuntime().currentRoot, synth->getRuntime().currentBank, ninstrument);
-    return true;
+    else
+    {
+        result = "Could not delete ";
+        if (chk && !chk2)
+            instName += EXTEN::zynInst;
+        else if (!chk && chk2)
+            instName += EXTEN::yoshInst;
+        /*
+         * done this way so that if only one type fails
+         * it is identified, but if both are present and
+         * can't be deleted it doesn't mark the extension.
+         */
+    }
+    int msgID = miscMsgPush(result + "'" + instName + "' from slot " + to_string(ninstrument + 1));
+    if (!chk || !chk2)
+        msgID |= 0xFF0000;
+    return msgID;
 }
 
 

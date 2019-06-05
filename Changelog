@@ -1,5 +1,9 @@
 yoshimi 1.5.11 M
 
+2019-6-4 Will
+* Completed CLI bank slot deletions.
+  Also integrated GUI controls.
+
 2019-6-3 Will
 * CLI can now delete bank slot instruments.
   Notifications not complete yet.
