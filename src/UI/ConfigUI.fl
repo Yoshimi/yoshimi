@@ -105,6 +105,55 @@ class ConfigUI {: {private MiscFuncs, FileMgr}
               xywh {75 75 100 20} labelfont 1 labelsize 12
             }
           }
+          Fl_Choice buff_size {
+            label {* Internal Buffer Size}
+            callback {//
+                        send_data(0, CONFIG::control::bufferSize, 16 << o->value(), TOPLEVEL::type::Integer);}
+            tooltip {Number of samples} xywh {249 75 100 20} down_box BORDER_BOX labelsize 12 textsize 12
+            code0 {o->value( (int)(logf(synth->getRuntime().Buffersize / 16.0f - 1.0f) / logf(2.0f)) + 1);}
+            code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
+          } {
+            MenuItem {} {
+              label 16
+              xywh {55 55 100 20} labelfont 1 labelsize 12
+            }
+            MenuItem {} {
+              label 32
+              xywh {45 45 100 20} labelfont 1 labelsize 12
+            }
+            MenuItem {} {
+              label 64
+              xywh {35 35 100 20} labelfont 1 labelsize 12
+            }
+            MenuItem {} {
+              label 128
+              xywh {45 45 100 20} labelfont 1 labelsize 12
+            }
+            MenuItem {} {
+              label 256
+              xywh {55 55 100 20} labelfont 1 labelsize 12
+            }
+            MenuItem {} {
+              label 512
+              xywh {55 55 100 20} labelfont 1 labelsize 12
+            }
+            MenuItem {} {
+              label 1024
+              xywh {65 65 100 20} labelfont 1 labelsize 12
+            }
+            MenuItem {} {
+              label 2048
+              xywh {65 65 100 20} labelfont 1 labelsize 12
+            }
+            MenuItem {} {
+              label 4096
+              xywh {65 65 100 20} labelfont 1 labelsize 12
+            }
+            MenuItem {} {
+              label 8192
+              xywh {65 65 100 20} labelfont 1 labelsize 12
+            }
+          }
           Fl_Choice pad_interpol {
             label {PADsynth Interpolation}
             callback {//
@@ -353,55 +402,6 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                         send_data(TOPLEVEL::action::forceUpdate, CONFIG::control::alsaPreferredMidi, o->value(), TOPLEVEL::type::Integer);}
             xywh {195 80 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().midiEngine == alsa_midi) o->value(1);}
-          }
-          Fl_Choice buff_size {
-            label {Buffer Size}
-            callback {//
-                        send_data(0, CONFIG::control::bufferSize, 16 << o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Number of samples} xywh {195 110 121 22} down_box BORDER_BOX labelsize 12 textsize 12
-            code0 {o->value( (int)(logf(synth->getRuntime().Buffersize / 16.0f - 1.0f) / logf(2.0f)) + 1);}
-            code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
-          } {
-            MenuItem {} {
-              label 16
-              xywh {60 60 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem {} {
-              label 32
-              xywh {50 50 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem {} {
-              label 64
-              xywh {40 40 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem {} {
-              label 128
-              xywh {50 50 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem {} {
-              label 256
-              xywh {60 60 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem {} {
-              label 512
-              xywh {60 60 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem {} {
-              label 1024
-              xywh {70 70 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem {} {
-              label 2048
-              xywh {70 70 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem {} {
-              label 4096
-              xywh {70 70 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem {} {
-              label 8192
-              xywh {70 70 100 20} labelfont 1 labelsize 12
-            }
           }
           Fl_Input alsaDevice {
             label {Alsa Audio Device}
@@ -1024,6 +1024,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             {
                 case 1 : // Main
                     osc_size->value( (int)(logf(synth->getRuntime().Oscilsize / 256.0f - 1.0f) / logf(2.0f)) + 1);
+                    buff_size->value( (int)(logf(synth->getRuntime().Buffersize / 16.0f - 1.0f) / logf(2.0f)) + 1);
                     pad_interpol->value(synth->getRuntime().Interpolation);
                     v_keyboard->value(synth->getRuntime().VirKeybLayout);
                     compression->value(synth->getRuntime().GzipCompression);
@@ -1054,7 +1055,6 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                             alsaMidi->value(1);
                             jackMidi->value(0);
                         }
-                        buff_size->value( (int)(logf(synth->getRuntime().Buffersize / 16.0f - 1.0f) / logf(2.0f)) + 1);
                         alsaDevice->value(synth->getRuntime().alsaAudioDevice.c_str());
                         if (synth->getRuntime().audioEngine == alsa_audio)
                         {
