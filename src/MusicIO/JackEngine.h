@@ -49,7 +49,7 @@ class JackEngine : public MusicIO
         bool Start(void);
         void Close(void);
         unsigned int getSamplerate(void) { return audio.jackSamplerate; }
-        int getBuffersize(void) { return audio.jackNframes; }
+        int getOutputBufferSize(void) { return audio.jackNframes; }
         std::string clientName(void);
         int clientId(void);
         virtual std::string audioClientName(void) { return clientName(); }

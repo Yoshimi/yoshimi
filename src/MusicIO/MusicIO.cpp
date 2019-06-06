@@ -110,7 +110,7 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
 
 bool MusicIO::prepBuffers(void)
 {
-    int buffersize = getBuffersize();
+    int buffersize = synth->getRuntime().Buffersize;
     if (buffersize > 0)
     {
         for (int part = 0; part < (NUM_MIDI_PARTS + 1); part++)

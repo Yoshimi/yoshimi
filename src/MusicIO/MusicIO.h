@@ -35,7 +35,7 @@ class MusicIO : virtual protected MiscFuncs
         MusicIO(SynthEngine *_synth);
         virtual ~MusicIO();
         virtual unsigned int getSamplerate(void) = 0;
-        virtual int getBuffersize(void) = 0;
+        virtual int getOutputBufferSize(void) = 0;
         virtual bool Start(void) = 0;
         virtual void Close(void) = 0;
         virtual bool openAudio(void) = 0;

@@ -250,7 +250,7 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
     MusicIO(synth),
     _synth(synth),
     _sampleRate(static_cast<uint32_t>(sampleRate)),
-    _bufferSize(0),
+    _maxOutputBufferSize(0),
     _bundlePath(bundlePath),
     _midiDataPort(NULL),
     _notifyDataPortOut(NULL),
@@ -299,16 +299,16 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
                 if ((options->key == minBufSz || options->key == maxBufSz) && options->type == atomInt)
                 {
                     uint32_t bufSz = *static_cast<const uint32_t *>(options->value);
-                    if (_bufferSize < bufSz)
-                        _bufferSize = bufSz;
+                    if (_maxOutputBufferSize < bufSz)
+                        _maxOutputBufferSize = bufSz;
                 }
             }
             ++options;
         }
     }
 
-    if (_bufferSize == 0)
-        _bufferSize = MAX_BUFFER_SIZE;
+    if (_maxOutputBufferSize == 0)
+        _maxOutputBufferSize = MAX_BUFFER_SIZE;
 }
 
 
@@ -330,7 +330,7 @@ YoshimiLV2Plugin::~YoshimiLV2Plugin()
 
 bool YoshimiLV2Plugin::init()
 {
-    if (_uridMap.map == NULL || _sampleRate == 0 || _bufferSize == 0 || _midi_event_id == 0 || _yoshimi_state_id == 0 || _atom_string_id == 0)
+    if (_uridMap.map == NULL || _sampleRate == 0 || _maxOutputBufferSize == 0 || _midi_event_id == 0 || _yoshimi_state_id == 0 || _atom_string_id == 0)
         return false;
     if (!prepBuffers())
         return false;

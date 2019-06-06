@@ -48,7 +48,7 @@ class YoshimiLV2Plugin : public MusicIO
 private:
    SynthEngine *_synth;
    uint32_t _sampleRate;
-   uint32_t _bufferSize;
+   uint32_t _maxOutputBufferSize;
    std::string _bundlePath;
    LV2_URID_Map _uridMap;
    LV2_Atom_Sequence *_midiDataPort;
@@ -89,7 +89,7 @@ public:
 
    //virtual methods from MusicIO
    unsigned int getSamplerate(void) {return _sampleRate; }
-   int getBuffersize(void) {return _bufferSize; }
+   int getOutputBufferSize(void) {return _maxOutputBufferSize; }
    bool Start(void) {synth->Unmute(); return true; }
    void Close(void) {synth->Mute();}
 
