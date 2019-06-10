@@ -1,5 +1,10 @@
 yoshimi 1.5.11 M
 
+2019-6-10 Will
+* Corrected actual ringbuffer sizes.
+  It was still multipying by blocksize after previous
+  correction to size calculation.
+
 2019-6-4 Will
 * Completed CLI bank slot deletions.
   Also integrated GUI controls.

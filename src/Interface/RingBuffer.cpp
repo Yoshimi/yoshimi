@@ -40,7 +40,7 @@ ringBuff::ringBuff(uint32_t _bufferSize, uint32_t _blockSize):
     blockSize(_blockSize)
 {
     mask = bufferSize - 1;
-    buffer = new char[bufferSize * blockSize];
+    buffer = new char[bufferSize];
     //std::cout << "buffer size " << int(bufferSize) << "   block " << int(blockSize) << std::endl;
 }
 
