@@ -1290,7 +1290,7 @@ void Part::add2XML(XMLwrapper *xml, bool subset)
 
 bool Part::saveXML(string filename, bool yoshiFormat)
 {
-    synth->getRuntime().xmlType = XML_INSTRUMENT;
+    synth->getRuntime().xmlType = TOPLEVEL::XML::Instrument;
     XMLwrapper *xml = new XMLwrapper(synth, yoshiFormat);
     if (!xml)
     {

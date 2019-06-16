@@ -1,5 +1,8 @@
 yoshimi 1.5.11 M
 
+2019-6-16 Will
+* Unified XML and history types.
+
 2019-6-10 Will
 * Corrected actual ringbuffer sizes.
   It was still multipying by blocksize after previous

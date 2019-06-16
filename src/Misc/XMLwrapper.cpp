@@ -96,7 +96,7 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
 
     info = addparams0("INFORMATION"); // specifications
 
-    if (synth->getUniqueId() == 0 && (synth->getRuntime().xmlType == XML_STATE || synth->getRuntime().xmlType == XML_CONFIG))
+    if (synth->getUniqueId() == 0 && (synth->getRuntime().xmlType == TOPLEVEL::XML::State || synth->getRuntime().xmlType == TOPLEVEL::XML::Config))
     {
         beginbranch("BASE_PARAMETERS");
             addpar("sample_rate", synth->getRuntime().Samplerate);
@@ -113,7 +113,7 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
         return;
     }
 
-    if (synth->getRuntime().xmlType <= XML_MICROTONAL || synth->getRuntime().xmlType == XML_PRESETS)
+    if (synth->getRuntime().xmlType <= TOPLEVEL::XML::Scale || synth->getRuntime().xmlType == TOPLEVEL::XML::Presets)
     {
             beginbranch("BASE_PARAMETERS");
                 addpar("max_midi_parts", NUM_MIDI_CHANNELS);
@@ -316,49 +316,45 @@ char *XMLwrapper::getXMLdata()
 
     switch (synth->getRuntime().xmlType)
     {
-        case 0:
-            addparstr("XMLtype", "Invalid");
-            break;
-
-        case XML_INSTRUMENT:
+        case TOPLEVEL::XML::Instrument:
             addparbool("ADDsynth_used", information.ADDsynth_used);
             addparbool("SUBsynth_used", information.SUBsynth_used);
             addparbool("PADsynth_used", information.PADsynth_used);
             break;
 
-        case XML_PARAMETERS:
+        case TOPLEVEL::XML::Patch:
             addparstr("XMLtype", "Parameters");
             break;
 
-        case XML_MICROTONAL:
+        case TOPLEVEL::XML::Scale:
             addparstr("XMLtype", "Scales");
             break;
 
-        case XML_STATE:
+        case TOPLEVEL::XML::State:
             addparstr("XMLtype", "Session");
             break;
 
-        case XML_VECTOR:
+        case TOPLEVEL::XML::Vector:
             addparstr("XMLtype", "Vector Control");
             break;
 
-        case XML_MIDILEARN:
+        case TOPLEVEL::XML::MLearn:
             addparstr("XMLtype", "Midi Learn");
             break;
 
-        case XML_CONFIG:
+        case TOPLEVEL::XML::Config:
             addparstr("XMLtype", "Config");
             break;
 
-        case XML_PRESETS:
+        case TOPLEVEL::XML::Presets:
             addparstr("XMLtype", "Presets");
             break;
 
-        case XML_BANK:
+        case TOPLEVEL::XML::Bank:
             addparstr("XMLtype", "Roots and Banks");
             break;
 
-        case XML_HISTORY:
+        case TOPLEVEL::XML::History:
             addparstr("XMLtype", "Recent Files");
             break;
 

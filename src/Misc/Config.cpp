@@ -662,7 +662,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
 bool Config::saveConfig(void)
 {
     bool result = false;
-    xmlType = XML_CONFIG;
+    xmlType = TOPLEVEL::XML::Config;
     XMLwrapper *xmltree = new XMLwrapper(synth, true);
     if (!xmltree)
     {
@@ -738,7 +738,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
 bool Config::saveSessionData(string savefile)
 {
     savefile = setExtension(savefile, EXTEN::state);
-    synth->getRuntime().xmlType = XML_STATE;
+    synth->getRuntime().xmlType = TOPLEVEL::XML::State;
     XMLwrapper *xmltree = new XMLwrapper(synth, true);
     if (!xmltree)
     {

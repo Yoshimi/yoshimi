@@ -886,7 +886,7 @@ int SynthEngine::setProgramByName(CommandBlock *getData)
     }
     else
     {
-        addHistory(setExtension(fname, EXTEN::zynInst), TOPLEVEL::historyList::Instrument);
+        addHistory(setExtension(fname, EXTEN::zynInst), TOPLEVEL::XML::Instrument);
         partonoffLock(npart, 2 - Runtime.enable_part_on_voice_load); // always on if enabled
     }
     return msgID;
@@ -1896,6 +1896,8 @@ void SynthEngine::mutewrite(int what)
 // Master audio out (the final sound)
 int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process)
 {
+    //if (to_process < 64)
+        //Runtime.Log("Process " + to_string(to_process));
     static unsigned int VUperiod = samplerate / 20;
     /*
      * The above line gives a VU refresh of at least 50mS
@@ -2417,7 +2419,7 @@ bool SynthEngine::saveBanks()
 {
     string name = Runtime.ConfigDir + '/' + YOSHIMI;
     string bankname = name + ".banks";
-    Runtime.xmlType = XML_BANK;
+    Runtime.xmlType = TOPLEVEL::XML::Bank;
 
     XMLwrapper *xmltree = new XMLwrapper(this, true);
     if (!xmltree)
@@ -2442,7 +2444,7 @@ void SynthEngine::newHistory(string name, int group)
 {
     if (findleafname(name) < "!")
         return;
-    if (group == TOPLEVEL::historyList::Instrument && (name.rfind(EXTEN::yoshInst) != string::npos))
+    if (group == TOPLEVEL::XML::Instrument && (name.rfind(EXTEN::yoshInst) != string::npos))
         name = setExtension(name, EXTEN::zynInst);
     vector<string> &listType = *getHistory(group);
     listType.push_back(name);
@@ -2471,22 +2473,22 @@ vector<string> * SynthEngine::getHistory(int group)
 {
     switch(group)
     {
-        case 1:
+        case TOPLEVEL::XML::Instrument:
             return &InstrumentHistory;
             break;
-        case 2:
+        case TOPLEVEL::XML::Patch:
             return &ParamsHistory;
             break;
-        case 3:
+        case TOPLEVEL::XML::Scale:
             return &ScaleHistory;
             break;
-        case 4:
+        case TOPLEVEL::XML::State:
             return &StateHistory;
             break;
-        case 5:
+        case TOPLEVEL::XML::Vector:
             return &VectorHistory;
             break;
-        case 6:
+        case TOPLEVEL::XML::MLearn:
             return &MidiLearnHistory;
             break;
         default:
@@ -2564,31 +2566,31 @@ bool SynthEngine::loadHistory()
     string filetype;
     string type;
     string extension;
-    for (int count = TOPLEVEL::historyList::Instrument; count <= TOPLEVEL::historyList::MLearn; ++count)
+    for (int count = TOPLEVEL::XML::Instrument; count <= TOPLEVEL::XML::MLearn; ++count)
     {
         switch (count)
         {
-            case TOPLEVEL::historyList::Instrument:
+            case TOPLEVEL::XML::Instrument:
                 type = "XMZ_INSTRUMENTS";
                 extension = "xiz_file";
                 break;
-            case TOPLEVEL::historyList::Patch:
+            case TOPLEVEL::XML::Patch:
                 type = "XMZ_PATCH_SETS";
                 extension = "xmz_file";
                 break;
-            case TOPLEVEL::historyList::Scale:
+            case TOPLEVEL::XML::Scale:
                 type = "XMZ_SCALE";
                 extension = "xsz_file";
                 break;
-            case TOPLEVEL::historyList::State:
+            case TOPLEVEL::XML::State:
                 type = "XMZ_STATE";
                 extension = "state_file";
                 break;
-            case TOPLEVEL::historyList::Vector:
+            case TOPLEVEL::XML::Vector:
                 type = "XMZ_VECTOR";
                 extension = "xvy_file";
                 break;
-            case TOPLEVEL::historyList::MLearn:
+            case TOPLEVEL::XML::MLearn:
                 type = "XMZ_MIDILEARN";
                 extension = "xly_file";
                 break;
@@ -2624,7 +2626,7 @@ bool SynthEngine::saveHistory()
 {
     string name = Runtime.ConfigDir + '/' + YOSHIMI;
     string historyname = name + ".history";
-    Runtime.xmlType = XML_HISTORY;
+    Runtime.xmlType = TOPLEVEL::XML::History;
 
     XMLwrapper *xmltree = new XMLwrapper(this, true);
     if (!xmltree)
@@ -2636,31 +2638,31 @@ bool SynthEngine::saveHistory()
     {
         string type;
         string extension;
-        for (int count = TOPLEVEL::historyList::Instrument; count <= TOPLEVEL::historyList::MLearn; ++count)
+        for (int count = TOPLEVEL::XML::Instrument; count <= TOPLEVEL::XML::MLearn; ++count)
         {
             switch (count)
             {
-                case TOPLEVEL::historyList::Instrument:
+                case TOPLEVEL::XML::Instrument:
                     type = "XMZ_INSTRUMENTS";
                     extension = "xiz_file";
                     break;
-                case TOPLEVEL::historyList::Patch:
+                case TOPLEVEL::XML::Patch:
                     type = "XMZ_PATCH_SETS";
                     extension = "xmz_file";
                     break;
-                case TOPLEVEL::historyList::Scale:
+                case TOPLEVEL::XML::Scale:
                     type = "XMZ_SCALE";
                     extension = "xsz_file";
                     break;
-                case TOPLEVEL::historyList::State:
+                case TOPLEVEL::XML::State:
                     type = "XMZ_STATE";
                     extension = "state_file";
                     break;
-                case TOPLEVEL::historyList::Vector:
+                case TOPLEVEL::XML::Vector:
                     type = "XMZ_VECTOR";
                     extension = "xvy_file";
                     break;
-                case TOPLEVEL::historyList::MLearn:
+                case TOPLEVEL::XML::MLearn:
                     type = "XMZ_MIDILEARN";
                     extension = "xly_file";
                     break;
@@ -2861,7 +2863,7 @@ unsigned char SynthEngine::saveVector(unsigned char baseChan, string name, bool 
     string file = setExtension(name, EXTEN::vector);
     legit_pathname(file);
 
-    Runtime.xmlType = XML_VECTOR;
+    Runtime.xmlType = TOPLEVEL::XML::Vector;
     XMLwrapper *xml = new XMLwrapper(this, true);
     if (!xml)
     {
@@ -3039,7 +3041,7 @@ void SynthEngine::putalldata(const char *data, int size)
 bool SynthEngine::savePatchesXML(string filename)
 {
     filename = setExtension(filename, EXTEN::patchset);
-    Runtime.xmlType = XML_PARAMETERS;
+    Runtime.xmlType = TOPLEVEL::XML::Patch;
     XMLwrapper *xml = new XMLwrapper(this, true);
     add2XML(xml);
     bool result = xml->saveXMLfile(filename);

@@ -108,8 +108,6 @@ const unsigned int EXTOSC_COLOUR = 0x8fbfdf00;
 const unsigned int EXTVOICE_COLOUR = 0x9fdf8f00;
 const unsigned int MODOFF_COLOUR = 0x80808000;
 
-enum {XML_INSTRUMENT = 1, XML_PARAMETERS, XML_MICROTONAL, XML_STATE, XML_VECTOR, XML_MIDILEARN, XML_CONFIG, XML_PRESETS, XML_BANK, XML_HISTORY};
-
 // these were previously (pointlessly) user configurable
 const unsigned char NUM_VOICES = 8;
 const unsigned char POLIPHONY = 80;
@@ -225,15 +223,18 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         bandwidth
     };
 
-    enum historyList : unsigned char {
-        undefined = 0,
-        Instrument, // individual externally sourced Instruments
+    enum XML : unsigned char { // file and history types
+        Instrument = 0, // individual externally sourced Instruments
         Patch, //      full instrument Patch Sets
         Scale, //      complete Microtonal settings
         State, //      entire system State
         Vector, //     per channel Vector settings
         // insert any new lists here
-        MLearn //      learned MIDI CC lists
+        MLearn, //     learned MIDI CC lists
+        Config, // only file types from here onwards
+        Presets,
+        Bank,
+        History,
     };
 }
 

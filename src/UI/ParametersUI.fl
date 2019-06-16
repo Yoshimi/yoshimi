@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
 Modified March 2018
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <set>} {public local
@@ -37,8 +37,7 @@ decl {\#include "MasterUI.h"} {private global
 decl {\#include "Misc/SynthEngine.h"} {public global
 }
 
-class ParametersUI {selected
-} {
+class ParametersUI {} {
   Function {make_window(void)} {} {
     Fl_Window Recent {
       label {Recent Parameters}
@@ -55,24 +54,24 @@ class ParametersUI {selected
         string fle = listType.at(o->value()-1);
         switch(H_type)
         {
-            case 1:
+            case TOPLEVEL::XML::Instrument:
             	synth->getGuiMaster()->do_load_instrument(fle);
             	break;
-            case 3:
+            case TOPLEVEL::XML::Scale:
                 synth->getGuiMaster()->do_load_scale(fle);
                 break;
-            case 6:
+            case TOPLEVEL::XML::MLearn:
                 synth->getGuiMaster()->midilearnui->loadMidi(fle);
                 break;
-            case 5:
+            case TOPLEVEL::XML::Vector:
                 synth->getGuiMaster()->vectorui->loadVector(fle);
                 break;
-            case 4:
+            case TOPLEVEL::XML::State:
                 synth->getGuiMaster()->setState(fle);
                 CloseRecent->hide();
                 Loading->show();
                 break;
-            case 2:
+            case TOPLEVEL::XML::Patch:
                 synth->getGuiMaster()->do_load_master(fle.c_str());
                 break;
         }
@@ -108,25 +107,26 @@ class ParametersUI {selected
 
     switch (H_type)
     {
-        case 1:
+        case TOPLEVEL::XML::Instrument:
             Recent->label("Recent Instruments");
             break;
-        case 3:
+        case TOPLEVEL::XML::Scale:
             Recent->label("Recent Scales");
             break;
-        case 6:
+        case TOPLEVEL::XML::MLearn:
             Recent->label("Recent MIDI Learn Lists");
             break;
-        case 5:
+        case TOPLEVEL::XML::Vector:
             Recent->label("Recent Vectors");
             break;
-        case 4:
+        case TOPLEVEL::XML::State:
             Recent->label("Recent States");
             break;
-        case 2:
-        default:
+        case TOPLEVEL::XML::Patch:
             Recent->label("Recent Patch Sets");
             break;
+        default:
+            Recent->label("Unknown!");
     }
 
     vector<string> listType = *synth->getHistory(H_type);

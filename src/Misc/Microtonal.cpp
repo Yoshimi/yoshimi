@@ -748,7 +748,7 @@ void Microtonal::getfromXML(XMLwrapper *xml)
 
 bool Microtonal::saveXML(string filename)
 {
-    synth->getRuntime().xmlType = XML_MICROTONAL;
+    synth->getRuntime().xmlType = TOPLEVEL::XML::Scale;
     XMLwrapper *xml = new XMLwrapper(synth);
 
     xml->beginbranch("MICROTONAL");

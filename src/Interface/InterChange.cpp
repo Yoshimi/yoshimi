@@ -521,7 +521,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
 
                     if (ok)
                     {
-                        synth->addHistory(setExtension(text, EXTEN::zynInst), TOPLEVEL::historyList::Instrument);
+                        synth->addHistory(setExtension(text, EXTEN::zynInst), TOPLEVEL::XML::Instrument);
                         synth->part[value]->PyoshiType = (saveType & 2);
                         text = "d " + text;
                     }
@@ -534,7 +534,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     vectorClear(NUM_MIDI_CHANNELS);
                     if(synth->loadPatchSetAndUpdate(text))
                     {
-                        synth->addHistory(setExtension(text, EXTEN::patchset), TOPLEVEL::historyList::Patch);
+                        synth->addHistory(setExtension(text, EXTEN::patchset), TOPLEVEL::XML::Patch);
                         text = "ed " + text;
                     }
                     else
@@ -544,7 +544,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                 case MAIN::control::saveNamedPatchset:
                     if(synth->savePatchesXML(text))
                     {
-                        synth->addHistory(setExtension(text, EXTEN::patchset), TOPLEVEL::historyList::Patch);
+                        synth->addHistory(setExtension(text, EXTEN::patchset), TOPLEVEL::XML::Patch);
                         text = "d " + text;
                     }
                     else
@@ -556,7 +556,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     if (tmp < NO_MSG)
                     {
                         getData->data.insert = tmp;
-                        synth->addHistory(setExtension(text, EXTEN::vector), TOPLEVEL::historyList::Vector);
+                        synth->addHistory(setExtension(text, EXTEN::vector), TOPLEVEL::XML::Vector);
                         text = "ed " + text + " to chan " + std::to_string(int(tmp + 1));
                     }
                     else
@@ -572,7 +572,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     tmp = synth->saveVector(insert, text, true);
                     if (tmp == NO_MSG)
                     {
-                        synth->addHistory(setExtension(text, EXTEN::vector), TOPLEVEL::historyList::Vector);
+                        synth->addHistory(setExtension(text, EXTEN::vector), TOPLEVEL::XML::Vector);
                         text = "d " + text;
                     }
                     else
@@ -589,7 +589,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                 case MAIN::control::loadNamedScale:
                     if (synth->loadMicrotonal(text))
                     {
-                        synth->addHistory(setExtension(text, EXTEN::scale), TOPLEVEL::historyList::Scale);
+                        synth->addHistory(setExtension(text, EXTEN::scale), TOPLEVEL::XML::Scale);
                         text = "ed " + text;
                     }
                     else
@@ -599,7 +599,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                 case MAIN::control::saveNamedScale:
                     if (synth->saveMicrotonal(text))
                     {
-                        synth->addHistory(setExtension(text, EXTEN::scale), TOPLEVEL::historyList::Scale);
+                        synth->addHistory(setExtension(text, EXTEN::scale), TOPLEVEL::XML::Scale);
                         text = "d " + text;
                     }
                     else
@@ -615,7 +615,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                             name += ("-" + to_string(synth->getUniqueId()));
                         name += ".state";
                         if ((text != name)) // never include default state
-                            synth->addHistory(text, TOPLEVEL::historyList::State);
+                            synth->addHistory(text, TOPLEVEL::XML::State);
                         text = "ed " + text;
                     }
                     else
@@ -632,7 +632,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                             name += ("-" + to_string(synth->getUniqueId()));
                         name += ".state";
                         if ((text != name)) // never include default state
-                            synth->addHistory(filename, TOPLEVEL::historyList::State);
+                            synth->addHistory(filename, TOPLEVEL::XML::State);
                         text = "d " + text;
                     }
                     else
@@ -4415,7 +4415,7 @@ void InterChange::commandVector(CommandBlock *getData)
     if (control == VECTOR::control::erase)
     {
         vectorClear(chan);
-        synth->setLastfileAdded(5, "");
+        synth->setLastfileAdded(TOPLEVEL::XML::Vector, "");
         return;
     }
     if (write)

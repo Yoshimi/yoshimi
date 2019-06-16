@@ -457,11 +457,11 @@ char CmdInterface::helpList(unsigned int local)
 void CmdInterface::historyList(int listnum)
 {
     list<std::string>msg;
-    int start = 1;
-    int end = 6;
+    int start = TOPLEVEL::XML::Instrument;
+    int end = TOPLEVEL::XML::MLearn;
     bool found = false;
 
-    if (listnum != 0)
+    if (listnum >= 0)
     {
         start = listnum;
         end = listnum;
@@ -474,22 +474,22 @@ void CmdInterface::historyList(int listnum)
             msg.push_back(" ");
             switch (type)
             {
-                case XML_INSTRUMENT:
+                case TOPLEVEL::XML::Instrument:
                     msg.push_back("Recent Instruments:");
                     break;
-                case XML_PARAMETERS:
+                case TOPLEVEL::XML::Patch:
                     msg.push_back("Recent Patch Sets:");
                     break;
-                case XML_MICROTONAL:
+                case TOPLEVEL::XML::Scale:
                     msg.push_back("Recent Scales:");
                     break;
-                case XML_STATE:
+                case TOPLEVEL::XML::State:
                     msg.push_back("Recent States:");
                     break;
-                case XML_VECTOR:
+                case TOPLEVEL::XML::Vector:
                     msg.push_back("Recent Vectors:");
                     break;
-                case XML_MIDILEARN:
+                case TOPLEVEL::XML::MLearn:
                     msg.push_back("Recent MIDI learned:");
                     break;
             }
@@ -2059,22 +2059,20 @@ int CmdInterface::commandList()
 
     if (matchnMove(1, point, "history"))
     {
-        if (point[0] == 0)
-            historyList(0);
-        else if (matchnMove(1, point, "instruments") || matchnMove(2, point, "program") )
-            historyList(XML_INSTRUMENT);
+        if (matchnMove(1, point, "instruments") || matchnMove(2, point, "program") )
+            historyList(TOPLEVEL::XML::Instrument);
         else if (matchnMove(1, point, "patchsets"))
-            historyList(XML_PARAMETERS);
+            historyList(TOPLEVEL::XML::Patch);
         else if (matchnMove(2, point, "scales"))
-            historyList(XML_MICROTONAL);
+            historyList(TOPLEVEL::XML::Scale);
         else if (matchnMove(2, point, "states"))
-            historyList(XML_STATE);
+            historyList(TOPLEVEL::XML::State);
         else if (matchnMove(1, point, "vectors"))
-            historyList(XML_VECTOR);
+            historyList(TOPLEVEL::XML::Vector);
         else if (matchnMove(2, point, "mlearn"))
-            historyList(XML_MIDILEARN);
+            historyList(TOPLEVEL::XML::MLearn);
         else
-            historyList(0);
+            historyList(-1);
         return done_msg;
     }
 

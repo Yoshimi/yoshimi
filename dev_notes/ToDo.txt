@@ -3,6 +3,8 @@ BUG! If jack is selected for audio but there are no physical ports Yoshimi quits
 
 Minor bug Multi instances produce jack error reports when main instance closed, even if they have been closed first - been there since V 1.4.1 :(
 
+Loading recent instrument doesn't correctly update the last used source - others OK.
+
 Master UI windows makes direct calls to FileMgr :(
 
 Revise GUI voice list related to voice editor.

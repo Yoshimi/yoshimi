@@ -372,7 +372,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
     if (control == MIDILEARN::control::clearAll)
     {
         midi_list.clear();
-        synth->setLastfileAdded(XML_MIDILEARN, "");
+        synth->setLastfileAdded(TOPLEVEL::XML::MLearn, "");
         updateGui();
         synth->getRuntime().Log("List cleared");
         return;
@@ -391,7 +391,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
     if (control == MIDILEARN::control::loadFromRecent)
     {
         int pos = 0;
-        vector<string> &listtype = *synth->getHistory(XML_MIDILEARN);
+        vector<string> &listtype = *synth->getHistory(TOPLEVEL::XML::MLearn);
         vector<string>::iterator it = listtype.begin();
         while (it != listtype.end() && pos != value)
         {
@@ -815,7 +815,7 @@ bool MidiLearn::saveList(string name)
     string file = setExtension(name, EXTEN::mlearn);
     legit_pathname(file);
 
-    synth->getRuntime().xmlType = XML_MIDILEARN;
+    synth->getRuntime().xmlType = TOPLEVEL::XML::MLearn;
     XMLwrapper *xml = new XMLwrapper(synth, true);
     if (!xml)
     {
@@ -824,7 +824,7 @@ bool MidiLearn::saveList(string name)
     }
     bool ok = insertMidiListData(true,  xml);
     if (xml->saveXMLfile(file))
-        synth->addHistory(file, TOPLEVEL::historyList::MLearn);
+        synth->addHistory(file, TOPLEVEL::XML::MLearn);
     else
     {
         synth->getRuntime().Log("Failed to save data to " + file);
@@ -911,7 +911,7 @@ bool MidiLearn::loadList(string name)
     delete xml;
     if (!ok)
         return false;
-    synth->addHistory(file, TOPLEVEL::historyList::MLearn);
+    synth->addHistory(file, TOPLEVEL::XML::MLearn);
     return true;
 }
 
