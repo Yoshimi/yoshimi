@@ -3934,6 +3934,7 @@ void InterChange::mutedDecode(unsigned int altData)
             miscMsgClear(); // make sure there are no hanging messages
             putData.data.control = (altData >> 8) & 0xff;
             putData.data.type = altData >> 24;
+            //std::cout << "ID " << int(synth->getUniqueId()) << std::endl;
             break;
         case TOPLEVEL::muted::patchsetLoad:
             putData.data.control = MAIN::control::loadNamedPatchset;

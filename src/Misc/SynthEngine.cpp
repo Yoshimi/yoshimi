@@ -1751,10 +1751,16 @@ void SynthEngine::resetAll(bool andML)
         part[npart]->busy = false;
     defaults();
     ClearNRPNs();
-    if (Runtime.loadDefaultState && isRegFile(Runtime.defaultStateName+ ".state"))
+    if (Runtime.loadDefaultState)
     {
-        Runtime.StateFile = Runtime.defaultStateName;
-        Runtime.stateRestore();
+        string filename = Runtime.defaultStateName;
+        if (this != firstSynth)
+            filename += ("-" + to_string(this->getUniqueId()));
+        if(isRegFile(filename + ".state"))
+        {
+            Runtime.StateFile = filename;
+            Runtime.stateRestore();
+        }
     }
     if (andML)
         midilearn.generalOpps(0, 0, MIDILEARN::control::clearAll, TOPLEVEL::section::midiLearn, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED);

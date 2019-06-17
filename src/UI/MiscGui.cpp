@@ -53,9 +53,7 @@ float collect_readData(SynthEngine *synth, float value, unsigned char control, u
     putData.data.insert = insert;
     putData.data.parameter = parameter;
     putData.data.par2 = par2;
-    Fl::lock();
     float result = synth->interchange.readAllData(&putData);
-    Fl::unlock();
     return result;
 
 }
@@ -140,15 +138,19 @@ void GuiUpdates::read_updates(SynthEngine *synth)
 {
     CommandBlock getData;
     bool isChanged = false;
-    Fl::lock();
     while (synth->interchange.toGUI->read(getData.bytes))
     {
+        Fl::lock();
         decode_updates(synth, &getData);
+        Fl::unlock();
         isChanged = true;
     }
     if (isChanged)
+    {
+        Fl::lock();
         Fl::check();
-    Fl::unlock();
+        Fl::unlock();
+    }
 }
 
 
