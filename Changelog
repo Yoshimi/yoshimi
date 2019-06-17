@@ -3,6 +3,9 @@ yoshimi 1.5.11 M
 2019-6-17 Will
 * BugFix: instances loading wrong default state on reset.
 * Refined FLTK locking in UI/MiscGui.cpp
+* Added recognition of files seen this session.
+  Currently only applied for enhanced Instrument save
+  protection but likely to be extended.
 
 2019-6-16 Will
 * Unified XML and history types.

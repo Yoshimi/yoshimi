@@ -475,8 +475,11 @@ void SynthEngine::defaults(void)
     Runtime.NumAvailableParts = NUM_MIDI_CHANNELS;
     ShutUp();
     Runtime.lastfileseen.clear();
-    for (int i = 0; i < 7; ++i)
+    for (int i = 0; i <= TOPLEVEL::XML::MLearn; ++i)
+    {
         Runtime.lastfileseen.push_back(Runtime.userHome);
+        Runtime.sessionSeen[i] = false;
+    }
 
 #ifdef REPORT_NOTES_ON_OFF
     Runtime.noteOnSent = 0; // note test
@@ -886,6 +889,7 @@ int SynthEngine::setProgramByName(CommandBlock *getData)
     }
     else
     {
+        Runtime.sessionSeen[TOPLEVEL::XML::Instrument] = true;
         addHistory(setExtension(fname, EXTEN::zynInst), TOPLEVEL::XML::Instrument);
         partonoffLock(npart, 2 - Runtime.enable_part_on_voice_load); // always on if enabled
     }
@@ -2506,6 +2510,9 @@ vector<string> * SynthEngine::getHistory(int group)
 
 string SynthEngine::lastItemSeen(int group)
 {
+    if (group == TOPLEVEL::XML::Instrument && Runtime.sessionSeen[group] == false)
+        return "";
+
     vector<string> &listType = *getHistory(group);
     vector<string>::iterator it = listType.begin();
     if (it == listType.end())

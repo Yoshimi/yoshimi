@@ -395,10 +395,14 @@ class MasterUI {: {private GuiUpdates, FileMgr}
                     fl_alert("Nothing to save!");
                     return;
                 }
-                string newname = synth->part[npart]->Pname;
-                if (newname < "!")
-                    return;
-                newname = synth->getRuntime().userHome + newname;
+                string newname = synth->lastItemSeen(TOPLEVEL::XML::Instrument);
+                if (newname == "")
+                {
+                    newname = synth->part[npart]->Pname;
+                    if (newname < "!")
+                        return;
+                    newname = synth->getRuntime().userHome + newname;
+                }
                 const char *filename;
                 string exten = "({*" + EXTEN::anyInst + "})";
                 filename = fl_file_chooser("Save:", exten.c_str(), newname.c_str(), 0);

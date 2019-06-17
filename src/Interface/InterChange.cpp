@@ -521,6 +521,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
 
                     if (ok)
                     {
+                        synth->getRuntime().sessionSeen[TOPLEVEL::XML::Instrument] = true;
                         synth->addHistory(setExtension(text, EXTEN::zynInst), TOPLEVEL::XML::Instrument);
                         synth->part[value]->PyoshiType = (saveType & 2);
                         text = "d " + text;
@@ -926,6 +927,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                         if (write)
                         {
                             doClearPart(npart);
+                            synth->getRuntime().sessionSeen[TOPLEVEL::XML::Instrument] = false;
                             getData->data.source &= ~TOPLEVEL::action::lowPrio;
                         }
                         break;

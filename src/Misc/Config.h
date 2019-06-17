@@ -134,6 +134,7 @@ class Config : public MiscFuncs, FileMgr
         int           Interpolation;
         string        presetsDirlist[MAX_PRESETS];
         list<string>  lastfileseen;
+        bool          sessionSeen[TOPLEVEL::XML::MLearn + 1];
         int           checksynthengines;
         int           xmlType;
         unsigned char instrumentFormat;
