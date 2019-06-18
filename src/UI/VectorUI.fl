@@ -511,7 +511,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
-    float value = getData->data.value;
+    float value = getData->data.value.F;
     unsigned char control = getData->data.control;
     unsigned char insert = getData->data.insert;
     unsigned char par2 = getData->data.par2;

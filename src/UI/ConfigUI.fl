@@ -778,7 +778,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
-            int value_int = lrint(getData->data.value);
+            int value_int = lrint(getData->data.value.F);
             bool wasFromHere = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
             unsigned char control = getData->data.control;
             unsigned char par2 = getData->data.par2;
@@ -1155,7 +1155,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
   } {
     code {//
             CommandBlock getData;
-            getData.data.value = value;
+            getData.data.value.F = value;
             getData.data.control = control;
             getData.data.part = 248;
             synth->interchange.testLimits(&getData);

@@ -394,7 +394,7 @@ void Controller::getfromXML(XMLwrapper *xml)
 
 float Controller::getLimits(CommandBlock *getData)
 {
-    float value = getData->data.value;
+    float value = getData->data.value.F;
     unsigned char type = getData->data.type;
     int request = type & TOPLEVEL::type::Default;
     int control = getData->data.control;

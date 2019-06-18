@@ -1267,7 +1267,7 @@ Nikita Zlobin
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
-    float value = getData->data.value;
+    float value = getData->data.value.F;
     bool wasFromHere = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
     unsigned char control = getData->data.control;
     unsigned char newpart = getData->data.part;

@@ -397,7 +397,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
-    int value = lrint(getData->data.value);
+    int value = lrint(getData->data.value.F);
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char kititem = getData->data.kit;
@@ -491,7 +491,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
   }
   Function {addLine(CommandBlock *getData)} {} {
     code {//
-    int lineNo = ((int)getData->data.value);
+    int lineNo = ((int)getData->data.value.F);
     int status = getData->data.type;
     string name = miscMsgPop(getData->data.par2);
     none->hide();

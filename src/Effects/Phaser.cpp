@@ -515,7 +515,7 @@ unsigned char Phaser::getpar(int npar)
 
 float Phaserlimit::getlimits(CommandBlock *getData)
 {
-    int value = getData->data.value;
+    int value = getData->data.value.F;
     int control = getData->data.control;
     int request = getData->data.type & 3; // clear upper bits
     int presetNum = getData->data.engine;

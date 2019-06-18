@@ -391,7 +391,7 @@ class MicrotonalUI {: {private MiscFuncs}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
-    float value = getData->data.value;
+    float value = getData->data.value.F;
     bool wasFromUs = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
     unsigned char control = getData->data.control;
     unsigned char kititem = getData->data.kit;

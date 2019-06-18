@@ -1484,7 +1484,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
-    float value = getData->data.value;
+    float value = getData->data.value.F;
     int value_int = int(value + 0.5f);
     unsigned char control = getData->data.control;
     unsigned char efftype = getData->data.kit;

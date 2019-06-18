@@ -1,5 +1,14 @@
 yoshimi 1.5.11 M
 
+2019-6-18 Will
+* Extended 'CommandBlock'
+  Changed value to union of float F & int32_t I
+    i.e.
+    union{
+        float F;
+        int32_t I;
+    } value;
+
 2019-6-17 Will
 * BugFix: instances loading wrong default state on reset.
 * Refined FLTK locking in UI/MiscGui.cpp

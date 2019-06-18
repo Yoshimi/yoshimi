@@ -1124,7 +1124,7 @@ class OscilEditor {: {public PresetsUI_}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
-    float value = getData->data.value;
+    float value = getData->data.value.F;
     unsigned char control = getData->data.control;
     unsigned char eng = getData->data.engine;
     unsigned char insert = getData->data.insert;

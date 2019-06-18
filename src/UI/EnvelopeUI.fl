@@ -833,7 +833,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
-    float value = getData->data.value;
+    float value = getData->data.value.F;
     unsigned char control = getData->data.control;
     unsigned char part = getData->data.part;
     unsigned char eng = getData->data.engine;

@@ -4666,7 +4666,7 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
 
 
     /*CommandBlock getData;
-    getData.data.value = 0;
+    getData.data.value.F = 0;
     getData.data.part = TOPLEVEL::section::copyPaste;
     getData.data.kit = 0;
     getData.data.engine = 135;
@@ -5754,7 +5754,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         }
 
         CommandBlock putData;
-        putData.data.value = 0;
+        putData.data.value.F = 0;
         putData.data.control = control;
         putData.data.part = part;
         putData.data.kit = kit;
@@ -5794,7 +5794,7 @@ int CmdInterface::sendNormal(unsigned char action, float value, unsigned char ty
 
     CommandBlock putData;
 
-    putData.data.value = value;
+    putData.data.value.F = value;
     putData.data.type = type;
     putData.data.control = control;
     putData.data.part = part;
@@ -5828,7 +5828,7 @@ int CmdInterface::sendNormal(unsigned char action, float value, unsigned char ty
                 return available_msg;
             if (newValue != value && (type & TOPLEVEL::type::Write))
             { // checking the original type not the reported one
-                putData.data.value = newValue;
+                putData.data.value.F = newValue;
                 synth->getRuntime().Log("Range adjusted");
             }
         }
@@ -5855,7 +5855,7 @@ int CmdInterface::sendDirect(unsigned char action, float value, unsigned char ty
         request = type & TOPLEVEL::type::Default;
     CommandBlock putData;
 
-    putData.data.value = value;
+    putData.data.value.F = value;
     putData.data.control = control;
     putData.data.part = part;
     putData.data.kit = kit;
@@ -5971,7 +5971,7 @@ float CmdInterface::readControl(unsigned char action, unsigned char control, uns
     float value;
     CommandBlock putData;
 
-    putData.data.value = 0;
+    putData.data.value.F = 0;
     putData.data.type = 0;
     putData.data.source = action;
     putData.data.control = control;
@@ -5994,7 +5994,7 @@ std::string CmdInterface::readControlText(unsigned char action, unsigned char co
     float value;
     CommandBlock putData;
 
-    putData.data.value = 0;
+    putData.data.value.F = 0;
     putData.data.type = 0;
     putData.data.source = action;
     putData.data.control = control;
@@ -6013,7 +6013,7 @@ void CmdInterface::readLimits(float value, unsigned char type, unsigned char con
 {
     CommandBlock putData;
 
-    putData.data.value = value;
+    putData.data.value.F = value;
     putData.data.type = type;
     putData.data.control = control;
     putData.data.part = part;

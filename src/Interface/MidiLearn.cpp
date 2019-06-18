@@ -133,7 +133,7 @@ bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, un
             value += minOut;
 
         CommandBlock putData;
-        putData.data.value = value;
+        putData.data.value.F = value;
         putData.data.type = 0x40 | (foundEntry.data.type & 0x80);
         // write command from midi with original integer / float type
         putData.data.source = TOPLEVEL::action::toAll;
@@ -565,7 +565,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         CommandBlock putData;
         memset(&putData.bytes, 255, sizeof(putData));
         // need to work on this more
-        putData.data.value = value;
+        putData.data.value.F = value;
         putData.data.type = type;
         putData.data.control = MIDILEARN::control::ignoreMove;
         putData.data.kit = kit;
@@ -637,7 +637,7 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
         CommandBlock putData;
         int putSize = sizeof(putData);
         memset(&putData, 0xff, putSize);
-        putData.data.value = 0;
+        putData.data.value.F = 0;
         putData.data.source = TOPLEVEL::action::toAll;
         putData.data.type = 0xc8;
         putData.data.control = 0xfe; // TODO don't understand this :(
@@ -759,7 +759,7 @@ void MidiLearn::updateGui(int opp)
             putData.data.kit = 2; // close editing window
         }
     }
-    putData.data.value = 0;
+    putData.data.value.F = 0;
     writeToGui(&putData);
 
     if (opp > 2) // sending back message gui
@@ -771,7 +771,7 @@ void MidiLearn::updateGui(int opp)
     while (it != midi_list.end())
     {
         unsigned int newCC = it->CC;
-        putData.data.value = lineNo;
+        putData.data.value.F = lineNo;
         putData.data.type = it->status;
         putData.data.source = TOPLEVEL::action::toAll;
         putData.data.control = MIDILEARN::control::CCorChannel;
@@ -986,7 +986,7 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
                 xml->exitbranch();
             xml->exitbranch();
             entry.status = status;
-            real.data.value = FLT_MAX;
+            real.data.value.F = FLT_MAX;
             real.data.type = 0;
             /*
              * Need to improve resolveReplies so that we can

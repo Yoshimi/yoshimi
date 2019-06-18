@@ -1581,7 +1581,7 @@ Offset}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
-    float value = getData->data.value;
+    float value = getData->data.value.F;
     unsigned char control = getData->data.control;
     unsigned char newpart = getData->data.part;
     unsigned char kititem = getData->data.kit;

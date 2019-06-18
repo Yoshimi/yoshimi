@@ -301,7 +301,7 @@ unsigned char Chorus::getpar(int npar)
 
 float Choruslimit::getlimits(CommandBlock *getData)
 {
-    int value = getData->data.value;
+    int value = getData->data.value.F;
     int control = getData->data.control;
     int request = getData->data.type & 3; // clear upper bits
     int npart = getData->data.part;

@@ -950,7 +950,10 @@ namespace EFFECT // usage EFFECT::type::none
 
 union CommandBlock{
     struct{
-        float value;
+        union{
+            float F;
+            int32_t I;
+        } value;
         unsigned char type;
         unsigned char source;
         unsigned char control;
