@@ -135,6 +135,7 @@ class Config : public MiscFuncs, FileMgr
         string        presetsDirlist[MAX_PRESETS];
         list<string>  lastfileseen;
         bool          sessionSeen[TOPLEVEL::XML::MLearn + 1];
+        bool          historyLock[TOPLEVEL::XML::MLearn + 1];
         int           checksynthengines;
         int           xmlType;
         unsigned char instrumentFormat;

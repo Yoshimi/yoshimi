@@ -703,7 +703,7 @@ int CmdInterface::effects(unsigned char controlType)
         {
             case 1:
             {
-                selected = stringNumInList(name, effreverb, 1);
+                selected = stringNumInList(name, effreverb, 3);
                 if (selected != 7) // EQ
                     nFXeqBand = 0;
                 if (selected == 10) // type
@@ -721,11 +721,11 @@ int CmdInterface::effects(unsigned char controlType)
                 break;
             }
             case 2:
-                selected = stringNumInList(name, effecho, 1);
+                selected = stringNumInList(name, effecho, 3);
                 break;
             case 3:
             {
-                selected = stringNumInList(name, effchorus, 1);
+                selected = stringNumInList(name, effchorus, 3);
                 if (selected == 4) // filtershape
                 {
                     point = skipChars(point);
@@ -744,7 +744,7 @@ int CmdInterface::effects(unsigned char controlType)
             }
             case 4:
             {
-                selected = stringNumInList(name, effphaser, 1);
+                selected = stringNumInList(name, effphaser, 3);
                 if (selected == 4) // filtershape
                 {
                     point = skipChars(point);
@@ -763,7 +763,7 @@ int CmdInterface::effects(unsigned char controlType)
             }
             case 5:
             {
-                selected = stringNumInList(name, effalienwah, 1);
+                selected = stringNumInList(name, effalienwah, 3);
                 if (selected == 3) // filtershape
                 {
                     point = skipChars(point);
@@ -777,12 +777,12 @@ int CmdInterface::effects(unsigned char controlType)
             }
             case 6:
             {
-                selected = stringNumInList(name, effdistortion, 1);
+                selected = stringNumInList(name, effdistortion, 3);
                 if (selected == 5) // filtershape
                 {
                     point = skipChars(point);
                     std::string name = std::string(point).substr(0,3);
-                    value = stringNumInList(name, filtershapes, 1) - 1;
+                    value = stringNumInList(name, filtershapes, 3) - 1;
                     if (value < 0)
                         return value_msg;
                 }
@@ -795,7 +795,7 @@ int CmdInterface::effects(unsigned char controlType)
             }
             case 7: // TODO band and type no GUI update
             {
-                selected = stringNumInList(name, effeq, 1);
+                selected = stringNumInList(name, effeq, 2);
                 if (selected == 1) // band
                 {
                     if (controlType == TOPLEVEL::type::Write)
@@ -811,7 +811,7 @@ int CmdInterface::effects(unsigned char controlType)
                 {
                     point = skipChars(point);
                     std::string name = std::string(point).substr(0,3);
-                    value = stringNumInList(name, eqtypes, 1);
+                    value = stringNumInList(name, eqtypes, 3);
                     if (value < 0)
                         return value_msg;
                 }
@@ -824,7 +824,7 @@ int CmdInterface::effects(unsigned char controlType)
             }
             case 8:
             {
-                selected = stringNumInList(name, effdynamicfilter, 1);
+                selected = stringNumInList(name, effdynamicfilter, 3);
                 if (selected == 4) // filtershape
                 {
                     point = skipChars(point);
@@ -1181,7 +1181,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
                 if (lineEnd(controlType))
                     return value_msg;
                 std::string name = std::string(point).substr(0,3);
-                value = stringNumInList(name, detuneType, 1);
+                value = stringNumInList(name, detuneType, 3);
                 if (value > -1 && engine < PART::engine::addVoice1)
                     value -= 1;
                 if (value == -1)
@@ -3217,6 +3217,21 @@ int CmdInterface::commandConfig(unsigned char controlType)
         value = (toggle() == 1);
     }
 
+    else if (matchnMove(3, point, "lock"))
+    {
+        command = MAIN::control::historyLock;
+        value = (toggle());
+        std::string name = std::string(point).substr(0,2);
+        int selected = stringNumInList(name, historyGroup, 2);
+        if (selected == -1)
+            return range_msg;
+        point = skipChars(point);
+        value = (toggle());
+        if (controlType == TOPLEVEL::type::Write && value == -1)
+            return value_msg;
+        return sendDirect(TOPLEVEL::action::lowPrio, value, controlType, command, TOPLEVEL::section::main, selected);
+    }
+
     else
         return  opp_msg;
 
@@ -4150,7 +4165,7 @@ int CmdInterface::waveform(unsigned char controlType)
     unsigned char insert = TOPLEVEL::insert::oscillatorGroup;
 
     std::string name = std::string(point).substr(0,3);
-    value = stringNumInList(name, wavebase, 1);
+    value = stringNumInList(name, wavebase, 3);
     if (value != -1)
         cmd = OSCILLATOR::control::baseFunctionType;
     else if (matchnMove(1, point, "harmonic"))
@@ -4202,7 +4217,7 @@ int CmdInterface::waveform(unsigned char controlType)
         if (matchnMove(1, point, "type"))
         {
             std::string name = std::string(point).substr(0,3);
-            value = stringNumInList(name, filtershapes, 1);
+            value = stringNumInList(name, filtershapes, 3);
             if (value == -1)
                 return value_msg;
             cmd = OSCILLATOR::control::waveshapeType;
@@ -4217,7 +4232,7 @@ int CmdInterface::waveform(unsigned char controlType)
         if (matchnMove(1, point, "type"))
         {
             std::string name = std::string(point).substr(0,3);
-            value = stringNumInList(name, filtertype, 1);
+            value = stringNumInList(name, filtertype, 3);
             if (value == -1)
                 return value_msg;
             cmd = OSCILLATOR::control::filterType;
@@ -4321,7 +4336,7 @@ int CmdInterface::waveform(unsigned char controlType)
         if (matchnMove(1, point, "type"))
         {
             std::string name = std::string(point).substr(0,3);
-            value = stringNumInList(name, adaptive, 1);
+            value = stringNumInList(name, adaptive, 3);
             if (value == -1)
                 return value_msg;
             cmd = OSCILLATOR::control::adaptiveHarmonicsType;

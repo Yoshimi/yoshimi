@@ -193,23 +193,17 @@ unsigned int MiscFuncs::string2uint(std::string str)
 }
 
 
-int MiscFuncs::stringNumInList(std::string toFind, std::string *listname, int convert)
+/*
+ * Finds the index number of an item in a string list. If 'min' <= 0 the
+ * input string must be an exact match of all characters and of equal length.
+ * Otherwise 'min' should be set to a value that provides the fewest tests
+ * for an unabiguous match.
+ * If a string in the list is shorter than 'min' then this length is used.
+ */
+int MiscFuncs::stringNumInList(std::string toFind, std::string *listname, size_t min)
 {
-    std::string copy = "";
-    switch (convert)
-    {
-        case -1:
-            for (std::string::size_type i = 0; i < toFind.length(); ++i)
-                copy += (char) tolower(toFind[i]);
-            break;
-        case 1:
-            for (std::string::size_type i = 0; i < toFind.length(); ++i)
-                copy+= (char) toupper(toFind[i]);
-            break;
-        default:
-            copy = toFind;
-            break; // change nothing
-    }
+    if (toFind.length() < min)
+        return -1;
     int count = -1;
     std::string name;
     bool found = false;
@@ -217,8 +211,24 @@ int MiscFuncs::stringNumInList(std::string toFind, std::string *listname, int co
     {
         ++ count;
         name = listname[count];
-        if (copy == name)
-            found = true;
+        if (min > 0)
+        {
+            size_t match = name.length();
+            if (match > min)
+                match = min;
+            int result = 0;
+            for (std::string::size_type i = 0; i < match; ++i)
+            {
+                result |= (tolower(toFind[i]) ^ tolower(name[i]));
+            }
+            if (result == 0)
+                found = true;
+        }
+        else // exact match
+        {
+            if (toFind == name)
+                found = true;
+        }
     }
     while (!found && name != "end");
     if (name == "end")

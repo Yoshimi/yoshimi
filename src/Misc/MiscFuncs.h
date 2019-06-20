@@ -55,7 +55,7 @@ class MiscFuncs
         static int string2int127(std::string str);
         static unsigned int string2uint(std::string str);
 
-        int stringNumInList(std::string toFind, std::string *listname, int convert = 0);
+        int stringNumInList(std::string toFind, std::string *listname, size_t match);
 
         bool isFifo(std::string chkpath);
         int findSplitPoint(std::string name);

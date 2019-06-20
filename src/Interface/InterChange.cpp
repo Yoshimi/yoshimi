@@ -641,6 +641,14 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     value = miscMsgPush(text);
                     break;
                 }
+                case MAIN::control::historyLock:
+                {
+                    if(write)
+                        synth->setHistoryLock(kititem, value);
+                    else
+                        value = synth->getHistoryLock(kititem);
+                    break;
+                }
                 case MAIN::control::exportPadSynthSamples:
                 {
                     unsigned char partnum = insert;
@@ -2118,6 +2126,18 @@ std::string InterChange::resolveMain(CommandBlock *getData)
             showValue = false;
             contstr = "State Save" + miscMsgPop(value_int);
             break;
+
+        case MAIN::control::historyLock:
+        {
+            std::string group[] = {"Instrument", "Patchset", "Scale", "State", "Vector", "Mlearn"};
+            showValue = false;
+            contstr = "History lock " + group[kititem];
+            if (value_int)
+                contstr += " On";
+            else
+                contstr += " Off";
+            break;
+        }
 
         case MAIN::control::exportPadSynthSamples:
             showValue = false;

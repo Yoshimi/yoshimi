@@ -196,6 +196,8 @@ static std::string configlist [] = {
     "Keep [s]",            "include inactive data on all file saves (ON, {other})",
     "Gui [s]",             "* Run with GUI (ON, OFF)",
     "Cli [s]",             "* Run with CLI (ON, OFF)",
+    "LOCk <s1> <s2>",      "lock history of group s1 (ON, OFF)",
+    "","INstrument, PAtchset, SCale, STate, VEctor, MLearn",
 
     "MIdi <s>",            "* connection type (Jack, Alsa)",
     "AUdio <s>",           "* connection type (Jack, Alsa)",
@@ -944,6 +946,8 @@ static std::string basetypes [] = {"c2", "g2", "c3", "g3", "c4", "g4", "c5", "g5
 static std::string filtertype [] = {"OFF", "LP1", "HPA", "HPB", "BP1", "BS1", "LP2", "HP2", "BP2", "BS2", "COS", "SIN", "LSH", "SGM", "end"};
 static std::string adaptive [] = {"OFF", "ON", "SQU", "2XS", "2XA", "3XS", "3XA", "4XS", "4XA"};
 
+// misc controls
+static std::string historyGroup [] = {"IN", "PA", "SC", "ST", "VE", "ML"};
 
 class CmdInterface : private MiscFuncs, FileMgr
 {

@@ -480,6 +480,7 @@ namespace MAIN // usage MAIN::control::volume
         saveNamedScale,
         loadNamedState = 92,
         saveNamedState,
+        historyLock,
         exportPadSynthSamples,
 
         masterReset = 96,

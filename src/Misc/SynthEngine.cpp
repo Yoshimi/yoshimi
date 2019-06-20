@@ -150,6 +150,9 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
         sysefx[nefx] = NULL;
     fadeAll = 0;
 
+    for (int i = 0; i <= TOPLEVEL::XML::MLearn; ++i)
+        Runtime.historyLock[i] = false;
+
     // seed the shared master random number generator
     prng.init(time(NULL));
 
@@ -2463,6 +2466,8 @@ void SynthEngine::newHistory(string name, int group)
 
 void SynthEngine::addHistory(string name, int group)
 {
+    if (Runtime.historyLock[group])
+        return;
     if (findleafname(name) < "!")
         return;
     vector<string> &listType = *getHistory(group);
@@ -2505,6 +2510,18 @@ vector<string> * SynthEngine::getHistory(int group)
             Runtime.Log("Unrecognised group " + to_string(group) + "\nUsing patchset history");
             return &ParamsHistory;
     }
+}
+
+
+void SynthEngine::setHistoryLock(int group, bool status)
+{
+    Runtime.historyLock[group] = status;
+}
+
+
+bool SynthEngine::getHistoryLock(int group)
+{
+    return Runtime.historyLock[group];
 }
 
 
@@ -2576,10 +2593,11 @@ bool SynthEngine::loadHistory()
         return false;
     }
     int hist_size;
+    int count;
     string filetype;
     string type;
     string extension;
-    for (int count = TOPLEVEL::XML::Instrument; count <= TOPLEVEL::XML::MLearn; ++count)
+    for (count = TOPLEVEL::XML::Instrument; count <= TOPLEVEL::XML::MLearn; ++count)
     {
         switch (count)
         {
@@ -2610,6 +2628,7 @@ bool SynthEngine::loadHistory()
         }
         if (xml->enterbranch(type))
         { // should never exceed max history as size trimmed on save
+            Runtime.historyLock[count] = xml->getparbool("lock_status", false);
             hist_size = xml->getpar("history_size", 0, 0, MAX_HISTORY);
             for (int i = 0; i < hist_size; ++i)
             {
@@ -2649,9 +2668,10 @@ bool SynthEngine::saveHistory()
     }
     xmltree->beginbranch("HISTORY");
     {
+        int count;
         string type;
         string extension;
-        for (int count = TOPLEVEL::XML::Instrument; count <= TOPLEVEL::XML::MLearn; ++count)
+        for (count = TOPLEVEL::XML::Instrument; count <= TOPLEVEL::XML::MLearn; ++count)
         {
             switch (count)
             {
@@ -2686,6 +2706,7 @@ bool SynthEngine::saveHistory()
                 unsigned int offset = 0;
                 int x = 0;
                 xmltree->beginbranch(type);
+                    xmltree->addparbool("lock_status", Runtime.historyLock[count]);
                     xmltree->addpar("history_size", listType.size());
                     if (listType.size() > MAX_HISTORY)
                         offset = listType.size() - MAX_HISTORY;

@@ -95,6 +95,8 @@ class SynthEngine : private SynthHelper, MiscFuncs, FileMgr
         void newHistory(string name, int group);
         void addHistory(string name, int group);
         vector<string> *getHistory(int group);
+        void setHistoryLock(int group, bool status);
+        bool getHistoryLock(int group);
         string lastItemSeen(int group);
         void setLastfileAdded(int group, string name);
         string getLastfileAdded(int group);

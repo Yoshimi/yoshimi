@@ -476,7 +476,10 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
         if(!jack_midi_event_get(&jEvent, portBuf, idx))
         {
             if (jEvent.size >= 1 && jEvent.size <= 4) // no interest in zero sized or long events
+            {
+                //std::cout << "Offset " << int(jEvent.time) << std::endl;
                 setMidi(jEvent.buffer[0], jEvent.buffer[1], jEvent.buffer[2]);
+            }
         }
     }
     return true;

@@ -1,5 +1,10 @@
 yoshimi 1.5.11 M
 
+2019-6-20 Will
+* Implemented recent file history locking.
+  Currently CLI only.
+* Improved string list searches.
+
 2019-6-18 Will
 * Extended 'CommandBlock'
   Changed value to union of float F & int32_t I
