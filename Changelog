@@ -4,6 +4,9 @@ yoshimi 1.5.11 M
 * Implemented recent file history locking.
   Currently CLI only.
 * Improved string list searches.
+* Completed locking including GUI controls.
+* Modified indirect controls for direct reads.
+* Updated docs.
 
 2019-6-18 Will
 * Extended 'CommandBlock'

@@ -3219,7 +3219,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
 
     else if (matchnMove(3, point, "lock"))
     {
-        command = MAIN::control::historyLock;
+        command = CONFIG::control::historyLock;
         value = (toggle());
         std::string name = std::string(point).substr(0,2);
         int selected = stringNumInList(name, historyGroup, 2);
@@ -3229,7 +3229,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
         value = (toggle());
         if (controlType == TOPLEVEL::type::Write && value == -1)
             return value_msg;
-        return sendDirect(TOPLEVEL::action::lowPrio, value, controlType, command, TOPLEVEL::section::main, selected);
+        return sendDirect(TOPLEVEL::action::lowPrio, value, controlType, command, TOPLEVEL::section::config, selected);
     }
 
     else

@@ -258,7 +258,8 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         enableCLI,
         enableAutoInstance,
         enableSinglePath,
-        exposeStatus,
+        historyLock,
+        exposeStatus, // CLI only
 
         // start of engine controls
         jackMidiSource = 32,
@@ -480,7 +481,6 @@ namespace MAIN // usage MAIN::control::volume
         saveNamedScale,
         loadNamedState = 92,
         saveNamedState,
-        historyLock,
         exportPadSynthSamples,
 
         masterReset = 96,

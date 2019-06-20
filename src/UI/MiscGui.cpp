@@ -36,16 +36,17 @@ SynthEngine *synth;
 
 float collect_readData(SynthEngine *synth, float value, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2, unsigned char request)
 {
-    unsigned char type;
+    unsigned char type = 0;
+    unsigned char action = TOPLEVEL::action::fromGUI;
     if (request < TOPLEVEL::type::Limits)
         type = request | TOPLEVEL::type::Limits; // its a limit test
-    else
-        type = 0;
+    else if (request != UNUSED)
+        action |= request;
     CommandBlock putData;
 
     putData.data.value.F = value;
     putData.data.type = type;
-    putData.data.source = TOPLEVEL::action::fromGUI;
+    putData.data.source = action;
     putData.data.control = control;
     putData.data.part = part;
     putData.data.kit = kititem;

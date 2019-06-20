@@ -253,7 +253,7 @@ class ConfigUI {: {private MiscFuncs, FileMgr}
             callback {//
                         send_data(0, CONFIG::control::defaultStateStart, o->value(), TOPLEVEL::type::Integer);}
             tooltip {If you change this you must re-save the default state
-or when that loads it will revert to the previous value} xywh {270 60 27 25} down_box DOWN_BOX labelsize 12 align 4
+or when that loads it will revert to the previous value} xywh {190 60 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().loadDefaultState);}
             code1 {if (synth->getIsLV2Plugin()) o->deactivate();}
           }
@@ -261,7 +261,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             label {Hide Non Fatal Errors}
             callback {//
                         send_data(0, CONFIG::control::hideNonFatalErrors, o->value(), TOPLEVEL::type::Integer);}
-            xywh {270 80 27 25} down_box DOWN_BOX labelsize 12 align 4
+            xywh {190 80 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().hideErrors);}
             code1 {if (synth->getIsLV2Plugin()) o->deactivate();}
           }
@@ -269,7 +269,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             label {Show Splash Screen}
             callback {//
                         send_data(0, CONFIG::control::showSplash, o->value(), TOPLEVEL::type::Integer);}
-            xywh {270 100 27 25} down_box DOWN_BOX labelsize 12 align 4
+            xywh {190 100 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showSplash);}
             code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
           }
@@ -277,22 +277,22 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             label {Log Load times}
             callback {//
                         send_data(0, CONFIG::control::logInstrumentLoadTimes, o->value(), TOPLEVEL::type::Integer);}
-            xywh {270 120 27 25} down_box DOWN_BOX labelsize 12 align 4
+            xywh {190 120 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showTimes);}
           }
           Fl_Check_Button logXML {
             label {Log XML Headers}
             callback {//
                         send_data(0, CONFIG::control::logXMLheaders, o->value(), TOPLEVEL::type::Integer);}
-            xywh {270 140 27 25} down_box DOWN_BOX labelsize 12 align 4
+            xywh {190 140 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().logXMLheaders);}
             code1 {if (synth->getIsLV2Plugin()) o->deactivate();}
           }
           Fl_Check_Button saveAllXML {
-            label {Include disabled data in XML files}
+            label {Include all data in XML files}
             callback {//
                         send_data(0, CONFIG::control::saveAllXMLdata, o->value(), TOPLEVEL::type::Integer);}
-            xywh {270 160 27 25} down_box DOWN_BOX labelsize 12 align 4
+            xywh {190 160 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().xmlmax);}
           }
           Fl_Check_Button enableGUI {
@@ -306,7 +306,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                             send_data(0, CONFIG::control::enableGUI, o->value(), TOPLEVEL::type::Integer);
                         else
                             o->value(1);}
-            tooltip {Enable starting with this graphical  interface} xywh {270 180 27 25} down_box DOWN_BOX labelsize 12 align 4
+            tooltip {Enable starting with this graphical  interface} xywh {190 180 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showGui);}
             code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
           }
@@ -314,7 +314,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             label {* Enable CLI}
             callback {//
                         send_data(0, CONFIG::control::enableCLI, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Enable starting with interactive command line interface} xywh {270 200 27 25} down_box DOWN_BOX labelsize 12 align 4
+            tooltip {Enable starting with interactive command line interface} xywh {190 200 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showCLI);}
             code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
           }
@@ -322,7 +322,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             label {Enable Auto Instance}
             callback {//
                         send_data(0, CONFIG::control::enableAutoInstance, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Allow main instance to start all those open when last closed.} xywh {270 220 27 25} down_box DOWN_BOX labelsize 12 align 4
+            tooltip {Allow main instance to start all those open when last closed.} xywh {190 220 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().autoInstance);}
             code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
           }
@@ -330,13 +330,62 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             label {* Enable Single Master}
             callback {//
           send_data(0, CONFIG::control::enableSinglePath, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Redirect new start from desktop to create new instance instead.} xywh {270 240 27 25} down_box DOWN_BOX labelsize 12 align 4 hide
+            tooltip {Redirect new start from desktop to create new instance instead.} xywh {190 240 27 25} down_box DOWN_BOX labelsize 12 align 4 hide
             code0 {o->value(fetchData(0, CONFIG::control::enableSinglePath, TOPLEVEL::section::config));}
+          }
+          Fl_Text_Display {} {
+            label {History Locks}
+            xywh {278 110 50 1} box NO_BOX align 129
+          }
+          Fl_Check_Button H_instrument {
+            label Instrument
+            callback {//
+                       send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::Instrument);}
+            xywh {240 120 27 25} down_box DOWN_BOX labelsize 12 align 8
+            code0 {o->value(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Instrument, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio) > 0.5f);}
+          }
+          Fl_Check_Button H_patchset {
+            label {Patch Set}
+            callback {//
+                       send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::Patch);}
+            xywh {240 140 27 25} down_box DOWN_BOX labelsize 12 align 8
+            code0 {o->value(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Patch, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio) > 0.5f);}
+          }
+          Fl_Check_Button H_scale {
+            label Scale
+            callback {//
+                       send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::Scale);}
+            xywh {240 160 27 25} down_box DOWN_BOX labelsize 12 align 8
+            code0 {o->value(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Scale, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio) > 0.5f);}
+          }
+          Fl_Check_Button H_state {
+            label State
+            callback {//
+                       send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::State);}
+            xywh {240 180 27 25} down_box DOWN_BOX labelsize 12 align 8
+            code0 {o->value(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::State, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio) > 0.5f);}
+          }
+          Fl_Check_Button H_vector {
+            label Vector
+            callback {//
+                       send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::Vector);}
+            xywh {240 200 27 25} down_box DOWN_BOX labelsize 12 align 8
+            code0 {o->value(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Vector, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio) > 0.5f);}
+          }
+          Fl_Check_Button H_mlearn {
+            label {Midi Learn}
+            callback {//
+                       send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::MLearn);}
+            xywh {240 220 27 25} down_box DOWN_BOX labelsize 12 align 8
+            code0 {o->value(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::MLearn, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio) > 0.5f);}
           }
           Fl_Box {} {
             label {* Changing these settings requires a restart}
             xywh {50 276 287 17} labelfont 1 labelsize 11 labelcolor 38 align 128
           }
+          Fl_Group {} {open
+            tooltip {When locked new entries will not not be added or change the list order} xywh {230 70 130 180} box EMBOSSED_FRAME
+          } {}
         }
         Fl_Group jackTab {
           label Jack
@@ -346,7 +395,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             label {Jack MIDI Source}
             callback {//
                         string tmp = string(o->value());
-                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::jackMidiSource, 0, TOPLEVEL::type::Integer, UNUSED, miscMsgPush(tmp));}
+                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::jackMidiSource, 0, TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(tmp));}
             tooltip {Device Jack tries to connect to for input.} xywh {195 62 120 22} labelsize 12 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().jackMidiDevice.c_str());}
           }
@@ -361,7 +410,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             label {Jack Server}
             callback {//
                         string tmp = string(o->value());
-                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::jackServer, 0, TOPLEVEL::type::Integer, UNUSED, miscMsgPush(tmp));}
+                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::jackServer, 0, TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(tmp));}
             tooltip {Name of the jack server to connect to - default, ...} xywh {195 182 120 22} labelsize 12 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().jackServer.c_str());}
           }
@@ -392,7 +441,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             label {Alsa MIDI Source}
             callback {//
                         string tmp = string(o->value());
-                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::alsaMidiSource, 0, TOPLEVEL::type::Integer, UNUSED, miscMsgPush(tmp));}
+                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::alsaMidiSource, 0, TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(tmp));}
             tooltip {Device Alsa tries to connect to for input.} xywh {195 52 120 22} labelsize 12 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().alsaMidiDevice.c_str());}
           }
@@ -407,7 +456,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             label {Alsa Audio Device}
             callback {//
                         string tmp = string(o->value());
-                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::alsaAudioDevice, 0, TOPLEVEL::type::Integer, UNUSED, miscMsgPush(tmp));}
+                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::alsaAudioDevice, 0, TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(tmp));}
             tooltip {Alsa audio device - default, hw:0, ...} xywh {195 143 120 22} labelsize 12 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().alsaAudioDevice.c_str());}
           }
@@ -692,7 +741,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
       Fl_Button {} {
         label {Save and Close}
         callback {//
-                    send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, CONFIG::control::saveCurrentConfig, o->value(), TOPLEVEL::type::Integer, UNUSED, miscMsgPush("DUMMY"));
+                    send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, CONFIG::control::saveCurrentConfig, o->value(), TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush("DUMMY"));
                     configwindow->do_callback();}
         xywh {155 305 105 20} box THIN_UP_BOX labelsize 12
       }
@@ -766,10 +815,12 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
       }
     }
   }
-  Function {send_data(int action, int control, float value, int type, int par = UNUSED, int par2 = UNUSED)} {} {
+  Function {send_data(int action, int control, float value, int type, int part = UNUSED, int kit = UNUSED, int engine = UNUSED, int insert = UNUSED, int par = UNUSED, int par2 = UNUSED)} {} {
     code {//
             type |= TOPLEVEL::type::Write;
-            collect_data(synth, value, action, (Fl::event_button() | type), control, TOPLEVEL::section::config, UNUSED, UNUSED, UNUSED, par, par2);} {}
+            if (part == UNUSED)
+                part = TOPLEVEL::section::config;
+            collect_data(synth, value, action, (Fl::event_button() | type), control, part, kit, engine, insert, par, par2);} {}
   }
   Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED, int request = UNUSED)} {return_type float
   } {
@@ -781,6 +832,7 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
             int value_int = lrint(getData->data.value.F);
             bool wasFromHere = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
             unsigned char control = getData->data.control;
+            unsigned char kititem = getData->data.kit;
             unsigned char par2 = getData->data.par2;
 
             bool value_bool = value_int > 0;
@@ -853,6 +905,34 @@ or when that loads it will revert to the previous value} xywh {270 60 27 25} dow
                 case CONFIG::control::enableSinglePath:
                     singleMaster->value(value_bool);
                     break;
+
+                case CONFIG::control::historyLock:
+                if (!wasFromHere)
+                {
+                    switch (kititem)
+                    {
+                        case TOPLEVEL::XML::Instrument:
+                            H_instrument->value(value_int);
+                            break;
+                        case TOPLEVEL::XML::Patch:
+                            H_patchset->value(value_int);
+                            break;
+                        case TOPLEVEL::XML::Scale:
+                            H_scale->value(value_int);
+                            break;
+                        case TOPLEVEL::XML::State:
+                            H_state->value(value_int);
+                            break;
+                        case TOPLEVEL::XML::Vector:
+                            H_vector->value(value_int);
+                            break;
+                        case TOPLEVEL::XML::MLearn:
+                            H_mlearn->value(value_int);
+                            break;
+                        default:
+                            break;
+                    }
+                }
 
                 case CONFIG::control::jackMidiSource:
                     jackSource->value(miscMsgPop(par2).c_str());

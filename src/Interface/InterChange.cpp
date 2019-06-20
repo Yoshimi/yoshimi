@@ -243,7 +243,7 @@ InterChange::~InterChange()
 }
 
 
-void InterChange::indirectTransfers(CommandBlock *getData)
+void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 {
     int value = lrint(getData->data.value.F);
     unsigned char type = getData->data.type;
@@ -256,7 +256,7 @@ void InterChange::indirectTransfers(CommandBlock *getData)
     //unsigned char par2 = getData->data.par2;
 
     bool write = (type & TOPLEVEL::type::Write);
-    if (write) // TODO do we ever *not* see a write here?
+    if (write)
         __sync_or_and_fetch(&blockRead, 2);
     bool guiTo = false;
     guiTo = guiTo; // suppress warning when headless build
@@ -641,14 +641,6 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     value = miscMsgPush(text);
                     break;
                 }
-                case MAIN::control::historyLock:
-                {
-                    if(write)
-                        synth->setHistoryLock(kititem, value);
-                    else
-                        value = synth->getHistoryLock(kititem);
-                    break;
-                }
                 case MAIN::control::exportPadSynthSamples:
                 {
                     unsigned char partnum = insert;
@@ -898,6 +890,14 @@ void InterChange::indirectTransfers(CommandBlock *getData)
                     value = miscMsgPush(text);
                     getData->data.par2 = miscMsgPush(text); // slightly odd case
                     break;
+                case CONFIG::control::historyLock:
+                {
+                    if(write)
+                        synth->setHistoryLock(kititem, value);
+                    else
+                        value = synth->getHistoryLock(kititem);
+                    break;
+                }
             }
 #ifdef GUI_FLTK
             if ((getData->data.source & TOPLEVEL::action::noAction) != TOPLEVEL::action::fromGUI)
@@ -1016,7 +1016,13 @@ void InterChange::indirectTransfers(CommandBlock *getData)
             break;
         }
     }
-    __sync_and_and_fetch(&blockRead, 0xfd);
+    if (noForward)
+    {
+        getData->data.value.F = float(value);
+        return;
+    }
+    if (write)
+        __sync_and_and_fetch(&blockRead, 0xfd);
 
     if (getData->data.source < TOPLEVEL::action::lowPrio)
     {
@@ -1148,7 +1154,7 @@ float InterChange::readAllData(CommandBlock *getData)
          * This still isn't quite right there is a very
          * remote chance of getting garbled text :(
          */
-        indirectTransfers(&tryData);
+        indirectTransfers(&tryData, true);
         synth->getRuntime().finishedCLI = true;
         return tryData.data.value.F;
     }
@@ -1632,6 +1638,7 @@ std::string InterChange::resolveConfig(CommandBlock *getData)
 {
     float value = getData->data.value.F;
     unsigned char control = getData->data.control;
+    unsigned char kititem = getData->data.kit;
     bool write = getData->data.type & TOPLEVEL::type::Write;
     int value_int = lrint(value);
     bool value_bool = YOSH::F2B(value);
@@ -1739,6 +1746,17 @@ std::string InterChange::resolveConfig(CommandBlock *getData)
             contstr += "Enable Auto Instance";
             yesno = true;
             break;
+        case CONFIG::control::historyLock:
+        {
+            std::string group[] = {"Instrument", "Patchset", "Scale", "State", "Vector", "Mlearn"};
+            showValue = false;
+            contstr = "History lock " + group[kititem];
+            if (value_int)
+                contstr += " On";
+            else
+                contstr += " Off";
+            break;
+        }
         case CONFIG::control::exposeStatus:
             showValue = false;
             contstr += "Show CLI context ";
@@ -2126,18 +2144,6 @@ std::string InterChange::resolveMain(CommandBlock *getData)
             showValue = false;
             contstr = "State Save" + miscMsgPop(value_int);
             break;
-
-        case MAIN::control::historyLock:
-        {
-            std::string group[] = {"Instrument", "Patchset", "Scale", "State", "Vector", "Mlearn"};
-            showValue = false;
-            contstr = "History lock " + group[kititem];
-            if (value_int)
-                contstr += " On";
-            else
-                contstr += " Off";
-            break;
-        }
 
         case MAIN::control::exportPadSynthSamples:
             showValue = false;

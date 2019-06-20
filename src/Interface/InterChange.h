@@ -79,7 +79,7 @@ class InterChange : private MiscFuncs, FileMgr
         void *sortResultsThread(void);
         static void *_sortResultsThread(void *arg);
         pthread_t  sortResultsThreadHandle;
-        void indirectTransfers(CommandBlock *getData);
+        void indirectTransfers(CommandBlock *getData, bool noForward = false);
         std::string formatScales(std::string text);
         std::string resolveVector(CommandBlock *getData);
         std::string resolveMicrotonal(CommandBlock *getData);
