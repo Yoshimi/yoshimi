@@ -266,6 +266,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     else
         text = "";
     getData->data.par2 = NO_MSG; // this may be reset later
+    unsigned char newMsg = false;//NO_MSG;
     unsigned int tmp;
     std::string name;
 
@@ -286,7 +287,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     }
                     else
                         text = synth->getRuntime().vectordata.Name[insert];
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     getData->data.source &= ~TOPLEVEL::action::lowPrio;
                     guiTo = true;
                     break;
@@ -318,7 +319,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     text = "";
             }
             text += miscMsgPop(msgID & NO_MSG);
-            value = miscMsgPush(text);
+            newMsg = true;
             getData->data.source = TOPLEVEL::action::toAll;
             // everyone will want to knopw about these!
             guiTo = true;
@@ -427,7 +428,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                         text = " " + text; // need the space
                     else
                         text = " FAILED " + text;
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     break;
                 }
 
@@ -439,7 +440,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                         text = "ed " + text;
                     else
                         text = " FAILED " + text;
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     break;
                 }
                 case MAIN::control::deleteBank:
@@ -450,7 +451,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                         text = "d " + text;
                     else
                         text = " FAILED " + text;
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     break;
                 }
 
@@ -462,7 +463,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                         text = "ed " + text;
                     else
                         text = " FAILED " + text;
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     break;
                 }
 
@@ -475,7 +476,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                         text = "ed " + text;
                     else
                         text = " FAILED " + text;
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     break;
                 }
 
@@ -506,7 +507,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     else
                         text = " FAILED " + text;
                     getData->data.parameter = value; // TODO find out what this does!
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     break;
                 }
                 case MAIN::control::saveNamedInstrument:
@@ -528,7 +529,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     }
                     else
                         text = " FAILED " + text;
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     break;
                 }
                 case MAIN::control::loadNamedPatchset:
@@ -540,7 +541,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     }
                     else
                         text = " FAILED " + text;
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     break;
                 case MAIN::control::saveNamedPatchset:
                     if(synth->savePatchesXML(text))
@@ -550,7 +551,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     }
                     else
                         text = " FAILED " + text;
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     break;
                 case MAIN::control::loadNamedVector:
                     tmp = synth->loadVectorAndUpdate(insert, text);
@@ -562,7 +563,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     }
                     else
                         text = " FAILED " + text;
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     break;
                 case MAIN::control::saveNamedVector:
                 {
@@ -584,7 +585,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                         else
                             text = " FAILED " + text;
                     }
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     break;
                 }
                 case MAIN::control::loadNamedScale:
@@ -595,7 +596,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     }
                     else
                         text = " FAILED " + text;
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     break;
                 case MAIN::control::saveNamedScale:
                     if (synth->saveMicrotonal(text))
@@ -605,7 +606,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     }
                     else
                         text = " FAILED " + text;
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     break;
                 case MAIN::control::loadNamedState:
                     vectorClear(NUM_MIDI_CHANNELS);
@@ -621,7 +622,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     }
                     else
                         text = " FAILED " + text;
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     break;
                 case MAIN::control::saveNamedState:
                 {
@@ -638,7 +639,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     }
                     else
                         text = " FAILED " + text;
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     break;
                 }
                 case MAIN::control::exportPadSynthSamples:
@@ -650,7 +651,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                         text = "d " + text;
                     else
                         text = " FAILED some samples " + text;
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     break;
                 }
                 case MAIN::control::masterReset:
@@ -689,7 +690,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                             text = "Can't find PDF reader :(";
                         pclose(fp);
                     }
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     break;
                 }
                 case MAIN::control::startInstance:
@@ -720,7 +721,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                             text += "Closed";
                         }
                     }
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     break;
 
                 case MAIN::control::stopSound:
@@ -752,7 +753,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     text = miscMsgPop(tmp & NO_MSG);
                     if (tmp > NO_MSG)
                         text = " FAILED " + text;
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     break;
                 }
                 case BANK::control::selectFirstInstrumentToSwap:
@@ -790,7 +791,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     if (tmp != 0)
                     {
                         text = " FAILED " + miscMsgPop(tmp & 0xfff);
-                        value = miscMsgPush(text);
+                        newMsg = true;
                         if (text.find("nothing", 0, 7) == string::npos)
                             synth->bank.rescanforbanks(); // might have corrupted it
                     }
@@ -820,7 +821,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     if (tmp >= 0x1000)
                     {
                         text = " FAILED " + miscMsgPop(tmp & 0xfff);
-                        value = miscMsgPush(text);
+                        newMsg = true;
                         if (text.find("nothing", 0, 7) == string::npos)
                             synth->bank.rescanforbanks(); // might have corrupted it
                     }
@@ -844,7 +845,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     }
                     else
                         text = synth->getRuntime().jackMidiDevice;
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     break;
                 case CONFIG::control::jackServer:
                     if (write)
@@ -854,7 +855,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     }
                     else
                         text = synth->getRuntime().jackServer;
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     break;
                 case CONFIG::control::alsaMidiSource:
                     if (write)
@@ -864,7 +865,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     }
                     else
                         text = synth->getRuntime().alsaMidiDevice;
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     break;
                 case CONFIG::control::alsaAudioDevice:
                     if (write)
@@ -874,7 +875,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     }
                     else
                         text = synth->getRuntime().alsaAudioDevice;
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     break;
                 case CONFIG::control::saveCurrentConfig:
                     if (write)
@@ -887,7 +888,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     }
                     else
                         text = "READ";
-                    value = miscMsgPush(text);
+                    newMsg = true;
                     getData->data.par2 = miscMsgPush(text); // slightly odd case
                     break;
                 case CONFIG::control::historyLock:
@@ -899,16 +900,14 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     break;
                 }
             }
-#ifdef GUI_FLTK
             if ((getData->data.source & TOPLEVEL::action::noAction) != TOPLEVEL::action::fromGUI)
                 guiTo = true;
-#endif
             getData->data.source &= ~TOPLEVEL::action::lowPrio;
             break;
         }
         case 256:
         {
-            value = miscMsgPush(text);
+            newMsg = true;
             getData->data.source &= ~TOPLEVEL::action::lowPrio;
             break;
         }
@@ -993,7 +992,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                         else
                             text = " FAILED Not in kit mode";
                         getData->data.source &= ~TOPLEVEL::action::lowPrio;
-                        value = miscMsgPush(text);
+                        newMsg = true;
                         break;
                     case PART::control::defaultInstrumentCopyright:
                         std::string name = synth->getRuntime().ConfigDir + "/copyright.txt";
@@ -1009,30 +1008,31 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                             saveText(text, name);
                         }
                         getData->data.source &= ~TOPLEVEL::action::lowPrio;
-                        value = miscMsgPush(text);
+                        newMsg = true;
                         break;
                 }
             }
             break;
         }
     }
-    if (noForward)
-    {
-        getData->data.value.F = float(value);
-        return;
-    }
+    //std::cout << ">" << text << "<" << std::endl;
+
+    if (newMsg)
+        value = miscMsgPush(text);
+// TODO need to inmprove message handling for multiple receivers
+
+    getData->data.value.F = float(value);
     if (write)
         __sync_and_and_fetch(&blockRead, 0xfd);
+    if (noForward)
+        return;
+
 
     if (getData->data.source < TOPLEVEL::action::lowPrio)
     {
-        getData->data.value.F = float(value);
 #ifdef GUI_FLTK
         if (synth->getRuntime().showGui && (write || guiTo))
-        {
-            //std::cout << ">" << text << "<" << std::endl;
             getData->data.par2 = miscMsgPush(text); // pass it on to GUI
-        }
 #endif
         bool ok = returnsBuffer->write(getData->bytes);
 #ifdef GUI_FLTK

@@ -1,5 +1,9 @@
 yoshimi 1.5.11 M
 
+2019-6-21 Will
+* Revised message handling in indirectTransfers(
+  More compact and easier to adjust.
+
 2019-6-20 Will
 * Implemented recent file history locking.
   Currently CLI only.
