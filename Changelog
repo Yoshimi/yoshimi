@@ -6,6 +6,9 @@ yoshimi 1.5.11 M
 * Implemented new NRPN for load from history.
   Not MLearn yet and Instruments only 16 parts.
 * Updated NRPN docs.
+* Improved history NRPNs.
+  Easier to use and greater flexibilty.
+* Updated docs (again!).
 
 2019-6-21 Will
 * Revised message handling in indirectTransfers(

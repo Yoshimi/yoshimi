@@ -485,6 +485,10 @@ void MidiDecode::nrpnProcessData(unsigned char chan, int type, int par, bool in_
         return;
     }
 
+    if (nHigh == 0x60)
+        if (nrpnProcessHistory(nLow, dHigh, par, in_place))
+            return;
+
     if (nHigh != 64 && nLow < 0x7f)
     {
         synth->getRuntime().Log("Go away NRPN 0x" + asHexString(nHigh) + " " + asHexString(nLow) +" We don't know you!");
@@ -501,24 +505,42 @@ void MidiDecode::nrpnProcessData(unsigned char chan, int type, int par, bool in_
 
     else if (nLow == 2) // system settings
         synth->SetSystemValue(dHigh, par); // *** CHANGE
-    else if (nLow == 3) // load from history
-    {
-        if (in_place)
-        { // not done yet
-            return;
-        }
-        CommandBlock putData;
-        memset(&putData, 0xff, sizeof(putData));
-        putData.data.type = TOPLEVEL::type::Integer;
-        putData.data.source = TOPLEVEL::action::fromMIDI;
-        putData.data.control = MAIN::control::loadFileFromList;
-        putData.data.part = TOPLEVEL::section::main;
-        putData.data.kit = dHigh & 0xf;
-        putData.data.engine = par;
-        if ((dHigh & 0xf) == 0 || (dHigh & 0xf) == 4) // instrument/vector
-            putData.data.insert = dHigh >> 4; // base channel
-        synth->interchange.fromMIDI->write(putData.bytes);
+}
+
+
+bool MidiDecode::nrpnProcessHistory(unsigned char nLow, unsigned char dHigh, unsigned char dLow, bool in_place)
+{
+    if (nLow > TOPLEVEL::XML::MLearn)
+        return false;
+    if (dLow >= MAX_HISTORY)
+        return true;// not an error but not wanted anyway!
+
+    if (in_place)
+    { // not done yet
+        return true;
     }
+    CommandBlock putData;
+    memset(&putData, 0xff, sizeof(putData));
+    putData.data.type = TOPLEVEL::type::Integer;
+    putData.data.source = TOPLEVEL::action::fromMIDI;
+    putData.data.control = MAIN::control::loadFileFromList;
+    putData.data.part = TOPLEVEL::section::main;
+    putData.data.kit = nLow;
+    putData.data.engine = dLow;
+    if (nLow == TOPLEVEL::XML::Vector && dHigh < NUM_MIDI_CHANNELS)
+        putData.data.insert = dHigh; // othewise set by file
+    else if (nLow == TOPLEVEL::XML::Instrument)
+    {
+        unsigned char tmp = synth->getRuntime().vectordata.Part;
+        if (dHigh >= NUM_MIDI_PARTS && tmp < NUM_MIDI_PARTS)
+            putData.data.insert = tmp; // last seen by part NRPN
+        else if (dHigh < NUM_MIDI_PARTS)
+            putData.data.insert = dHigh;
+        else
+            return true; // not an error but undefined
+    }
+    synth->interchange.fromMIDI->write(putData.bytes);
+    return true;
 }
 
 
