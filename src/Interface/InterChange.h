@@ -58,6 +58,7 @@ class InterChange : private MiscFuncs, FileMgr
         ringBuff *returnsBuffer;
 
         void mediate(void);
+        void historyActionCheck(CommandBlock *getData);
         void mutedDecode(unsigned int altData);
         void returns(CommandBlock *getData);
         void setpadparams(int npart, int kititem);

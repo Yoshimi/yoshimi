@@ -1544,6 +1544,17 @@ int SynthEngine::SetSystemValue(int type, int value)
 }
 
 
+int SynthEngine::LoadNumbered(unsigned char group, unsigned char entry)
+{
+    string filename;
+    vector<string> &listType = *getHistory(group);
+    if (size_t(entry) >= listType.size())
+        return (miscMsgPush(" FAILED: List entry " + to_string(int(entry)) + " out of range") | 0xFF0000);
+    filename = listType.at(entry);
+    return miscMsgPush(filename);
+}
+
+
 bool SynthEngine::vectorInit(int dHigh, unsigned char chan, int par)
 {
     string name = "";
@@ -1771,7 +1782,8 @@ void SynthEngine::resetAll(bool andML)
     }
     if (andML)
         midilearn.generalOpps(0, 0, MIDILEARN::control::clearAll, TOPLEVEL::section::midiLearn, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED);
-    Unmute();
+    while(isMuted())
+        Unmute(); // unwind all mute settings
 }
 
 
@@ -1849,7 +1861,7 @@ void SynthEngine::SetMuteAndWait(void)
 #ifdef GUI_FLTK
     if (interchange.fromGUI ->write(putData.bytes))
     {
-        while(isMuted() == 0)
+        while(isMuted() == 0) // TODO this seems screwy :(
             usleep (1000);
     }
 #endif
@@ -1878,25 +1890,25 @@ void SynthEngine::Mute()
 
 /*
  * Intelligent switch for unknown mute status that always
- * switches off and later returns original unknown state
+ * mutes and later returns original unknown state
  */
 void SynthEngine::mutewrite(int what)
 {
-    unsigned char original = muted;
-    unsigned char tmp = original;
+    //unsigned char original = muted;
+    unsigned char tmp = muted;
     switch (what)
     {
-        case 0: // always off
+        case 0: // always muted
             tmp = 0;
             break;
-        case 1: // always on
+        case 1: // always unmuted
             tmp = 1;
             break;
-        case -1: // further from on
+        case -1: // further from unmute
             tmp -= 1;
             break;
         case 2:
-            if (tmp != 1) // nearer to on
+            if (tmp != 1) // nearer to unmute
                 tmp += 1;
             break;
         default:
@@ -2332,6 +2344,12 @@ void SynthEngine::ShutUp(void)
 
 void SynthEngine::allStop(unsigned int stopType)
 {
+    if(isMuted()) // there's a hanging mute :(
+    {
+        fadeLevel = 0;
+        interchange.flagsWrite(stopType);
+        return;
+    }
     fadeAll = stopType;
     if (fadeLevel < 0.001)
         fadeLevel = 1.0f;

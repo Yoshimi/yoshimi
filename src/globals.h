@@ -195,7 +195,8 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         masterReset,
         patchsetLoad,
         vectorLoad,
-        stateLoad
+        stateLoad,
+        listLoad
     };
 
     // inserts are here as they are split between many
@@ -481,6 +482,7 @@ namespace MAIN // usage MAIN::control::volume
         saveNamedScale,
         loadNamedState = 92,
         saveNamedState,
+        loadFileFromList,
         exportPadSynthSamples,
 
         masterReset = 96,

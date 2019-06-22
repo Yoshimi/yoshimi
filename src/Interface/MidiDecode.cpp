@@ -501,6 +501,24 @@ void MidiDecode::nrpnProcessData(unsigned char chan, int type, int par, bool in_
 
     else if (nLow == 2) // system settings
         synth->SetSystemValue(dHigh, par); // *** CHANGE
+    else if (nLow == 3) // load from history
+    {
+        if (in_place)
+        { // not done yet
+            return;
+        }
+        CommandBlock putData;
+        memset(&putData, 0xff, sizeof(putData));
+        putData.data.type = TOPLEVEL::type::Integer;
+        putData.data.source = TOPLEVEL::action::fromMIDI;
+        putData.data.control = MAIN::control::loadFileFromList;
+        putData.data.part = TOPLEVEL::section::main;
+        putData.data.kit = dHigh & 0xf;
+        putData.data.engine = par;
+        if ((dHigh & 0xf) == 0 || (dHigh & 0xf) == 4) // instrument/vector
+            putData.data.insert = dHigh >> 4; // base channel
+        synth->interchange.fromMIDI->write(putData.bytes);
+    }
 }
 
 

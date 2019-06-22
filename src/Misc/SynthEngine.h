@@ -137,6 +137,7 @@ class SynthEngine : private SynthHelper, MiscFuncs, FileMgr
         bool SingleVector(list<string>& msg_buf, int chan);
         void ListSettings(list<string>& msg_buf);
         int SetSystemValue(int type, int value);
+        int LoadNumbered(unsigned char group, unsigned char entry);
         bool vectorInit(int dHigh, unsigned char chan, int par);
         void vectorSet(int dHigh, unsigned char chan, int par);
         void ClearNRPNs(void);

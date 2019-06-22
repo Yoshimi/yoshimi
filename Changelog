@@ -1,5 +1,12 @@
 yoshimi 1.5.11 M
 
+2019-6-22 Will
+* Clarifed system mute controls.
+  Also added extra sanity checks.
+* Implemented new NRPN for load from history.
+  Not MLearn yet and Instruments only 16 parts.
+* Updated NRPN docs.
+
 2019-6-21 Will
 * Revised message handling in indirectTransfers(
   More compact and easier to adjust.

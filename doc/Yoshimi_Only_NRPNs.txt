@@ -14,8 +14,24 @@ CC 99   CC 98
 MSB     LSB
 0x40    0       Direct part control
                     (see Direct_Part_Control.txt)
+
+
 0x40    1       Vector control
                     (see Vector_Control.txt)
+
+
 0x40    2       System settings
                     (see Dynamic System Settings)
 
+
+0x40    3       Load numbered files from history lists
+
+Dhi
+0   Not Used
+1   PatchSet
+2   Scale
+3   State
+4   Vector - top nibble = base channel
+5   Midi Learn (not yet)
+
+Dlo entry number in list (0-24)

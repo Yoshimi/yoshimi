@@ -260,13 +260,59 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
         __sync_or_and_fetch(&blockRead, 2);
     bool guiTo = false;
     guiTo = guiTo; // suppress warning when headless build
+    unsigned char newMsg = false;//NO_MSG;
+
+    if (npart == TOPLEVEL::section::main && control == MAIN::control::loadFileFromList)
+    {
+        //std::cout << "kit " << int(kititem) << "  engine " << int(engine) << "  insert " << int(insert) << std::endl;
+        int result = synth->LoadNumbered(kititem, engine);
+        if (result > NO_MSG)
+        {
+            synth->Unmute();
+            getData->data.par2 = result & NO_MSG;
+        }
+        else
+        {
+            getData->data.par2 = result;
+            switch (kititem) // group
+            {
+                case TOPLEVEL::XML::Instrument:
+                {
+                    control = MAIN::control::loadInstrumentByName;
+                    getData->data.kit = insert;
+                    break;
+                }
+                case TOPLEVEL::XML::Patch:
+                {
+                    control = MAIN::control::loadNamedPatchset;
+                    break;
+                }
+                case TOPLEVEL::XML::Scale:
+                {
+                    control = MAIN::control::loadNamedScale;
+                    break;
+                }
+                case TOPLEVEL::XML::State:
+                {
+                    control = MAIN::control::loadNamedState;
+                    break;
+                }
+                case TOPLEVEL::XML::Vector:
+                {
+                    control = MAIN::control::loadNamedVector;
+                    break;
+                }
+            }
+            getData->data.control = control;
+        }
+    }
+
     std::string text;
     if (getData->data.par2 != NO_MSG)
         text = miscMsgPop(getData->data.par2);
     else
         text = "";
     getData->data.par2 = NO_MSG; // this may be reset later
-    unsigned char newMsg = false;//NO_MSG;
     unsigned int tmp;
     std::string name;
 
@@ -642,6 +688,8 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     newMsg = true;
                     break;
                 }
+                case MAIN::control::loadFileFromList:
+                    break; // do nothimng here
                 case MAIN::control::exportPadSynthSamples:
                 {
                     unsigned char partnum = insert;
@@ -2143,6 +2191,11 @@ std::string InterChange::resolveMain(CommandBlock *getData)
         case MAIN::control::saveNamedState:
             showValue = false;
             contstr = "State Save" + miscMsgPop(value_int);
+            break;
+
+        case MAIN::control::loadFileFromList:
+            showValue = false;
+            contstr = "Load Recent" + miscMsgPop(value_int);
             break;
 
         case MAIN::control::exportPadSynthSamples:
@@ -3921,6 +3974,7 @@ void InterChange::mediate()
             if(getData.data.part != TOPLEVEL::section::midiLearn)
             // Normal MIDI message, not special midi-learn message
             {
+                historyActionCheck(&getData);
                 commandSend(&getData);
                 returns(&getData);
             }
@@ -3943,6 +3997,40 @@ void InterChange::mediate()
         }
     }
     while (more && synth->getRuntime().runSynth);
+}
+
+
+/*
+ * Currently this is only used by MIDI NRPNs but eventually
+ * be used as a unified way of catching all list loads.
+ */
+void InterChange::historyActionCheck(CommandBlock *getData)
+{
+    if (getData->data.part != TOPLEVEL::section::main || getData->data.control != MAIN::control::loadFileFromList)
+        return;
+    getData->data.type |= TOPLEVEL::type::Write; // just to be sure
+    switch (getData->data.kit)
+    {
+        case TOPLEVEL::XML::Instrument:
+            getData->data.source |= TOPLEVEL::action::lowPrio;
+            synth->partonoffWrite((getData->data.insert << 4), -1);
+            break;
+        case TOPLEVEL::XML::Patch:
+            getData->data.source |= TOPLEVEL::action::muteAndLoop;
+            break;
+        case TOPLEVEL::XML::Scale:
+            getData->data.source |= TOPLEVEL::action::lowPrio;
+            break;
+        case TOPLEVEL::XML::State:
+            getData->data.source |= TOPLEVEL::action::muteAndLoop;
+            break;
+        case TOPLEVEL::XML::Vector:
+            getData->data.source |= TOPLEVEL::action::muteAndLoop;
+            break;
+        //case TOPLEVEL::XML::MLearn:
+            //getData->data.source |= TOPLEVEL::action::lowPrio;
+            //break;
+    }
 }
 
 
@@ -3980,6 +4068,15 @@ void InterChange::mutedDecode(unsigned int altData)
             putData.data.type = altData >> 24;
             putData.data.par2 = (altData >> 8) & 0xff;
             break;
+        case TOPLEVEL::muted::listLoad:
+        {
+            putData.data.control = MAIN::control::loadFileFromList;
+            putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
+            putData.data.insert = (altData >> 24) & 0xff;
+            putData.data.engine  = (altData >> 16) & 0xff;
+            putData.data.kit = (altData >> 8) & 0xff;
+            break;
+        }
         default:
             return;
             break;
@@ -5260,6 +5357,11 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
         case MAIN::control::saveNamedState: // done elsewhere
             break;
+        case MAIN::control::loadFileFromList:
+            synth->allStop(TOPLEVEL::muted::listLoad | (kititem << 8) | (engine << 16) | (insert << 24));
+            getData->data.source = TOPLEVEL::action::noAction;
+            break;
+
         case MAIN::control::masterReset:
         case MAIN::control::masterResetAndMlearn:
             if (write && ((action & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::muteAndLoop))
