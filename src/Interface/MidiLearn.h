@@ -80,7 +80,7 @@ class MidiLearn : private MiscFuncs, FileMgr
         void listLine(int lineNo);
         void listAll(list<string>& msg_buf);
         bool remove(int itemNumber);
-        void generalOpps(int value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2);
+        void generalOperations(CommandBlock *getData);
         bool saveList(string name);
         bool insertMidiListData(bool full,  XMLwrapper *xml);
         bool loadList(string name);

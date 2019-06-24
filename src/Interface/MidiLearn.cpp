@@ -358,10 +358,18 @@ bool MidiLearn::remove(int itemNumber)
 }
 
 
-void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control, unsigned char part, unsigned char _kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
+void MidiLearn::generalOperations(CommandBlock *getData)
 {
-    unsigned int kit = part; // to silence warning
-    kit = _kit; // may need to set as an NRPN
+    int value = getData->data.value.F;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+//    unsigned char part = getData->data.part;
+    unsigned char kit = getData->data.kit; // may need to set as an NRPN
+    unsigned char engine = getData->data.engine;
+    unsigned char insert = getData->data.insert;
+    unsigned char parameter = getData->data.parameter;
+    unsigned char par2 = getData->data.par2;
+
     if (control == MIDILEARN::control::sendRefreshRequest)
     {
         updateGui();
@@ -986,14 +994,8 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
                 xml->exitbranch();
             xml->exitbranch();
             entry.status = status;
-            real.data.value.F = FLT_MAX;
             real.data.type = 0;
-            /*
-             * Need to improve resolveReplies so that we can
-             * get just the name without corrupting data
-             */
-            synth->interchange.resolveReplies(&real);
-            entry.name = miscMsgPop(real.data.par2);
+            entry.name = synth->interchange.resolveText(&real, false);
             midi_list.push_back(entry);
             ++ ID;
         }

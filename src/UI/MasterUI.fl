@@ -341,8 +341,9 @@ class MasterUI {: {private GuiUpdates, FileMgr}
             tooltip {View, change, save settings} xywh {25 25 100 20} labelsize 12
           }
           MenuItem {} {
-            label {&MIDI Learn...}
-            callback {midilearnui->Show();}
+            label {&Reports...}
+            callback {yoshiLog->Show();
+//midilearnui->Show();}
             xywh {0 0 34 20} labelsize 12
           }
           MenuItem {} {
@@ -667,12 +668,13 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
           panelwindow->show();}
           tooltip {Mixer Panel Window} xywh {85 30 110 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
-        Fl_Button Reports {
-          label Reports
+        Fl_Button {} {
+          label {Midi Learn}
           callback {//
-          yoshiLog->Show();}
+          midilearnui->Show();
+          //yoshiLog->Show();}
           tooltip {Message Log} xywh {203 60 70 24} box PLASTIC_UP_BOX color 228 labelsize 11
-          code0 {if (synth->getRuntime().toConsole == false){o->deactivate();yoshiLog->Hide();}}
+          code0 {/*if (synth->getRuntime().toConsole == false){o->deactivate();yoshiLog->Hide();}*/}
         }
         Fl_Button vectors {
           label Vectors
@@ -2122,10 +2124,10 @@ Nikita Zlobin
     if (type != 5)
         vectorui->RefreshChans();
     bankui->Hide();
-    if (synth->getRuntime().toConsole == false)
+    /*if (synth->getRuntime().toConsole == false)
         Reports->deactivate();
     else
-        Reports->activate();
+        Reports->activate();*/
     mastermono->value(0);
     mastermono->label("S");
     if (type == 0x14)
@@ -2310,12 +2312,12 @@ Nikita Zlobin
     code {//
     if (isConsole)
     {
-        Reports->activate();
+        //Reports->activate();
         yoshiLog->Show();
     }
     else
     {
-        Reports->deactivate();
+        //Reports->deactivate();
         yoshiLog->Hide();
     }} {}
   }

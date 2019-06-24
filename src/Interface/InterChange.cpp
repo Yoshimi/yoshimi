@@ -185,8 +185,8 @@ void *InterChange::sortResultsThread(void)
         CommandBlock getData;
         while (decodeLoopback->read(getData.bytes))
         {
-            if(getData.data.part == TOPLEVEL::section::midiLearn) // special midi-learn - needs improving
-                synth->midilearn.generalOpps(getData.data.value.F, getData.data.type, getData.data.control, getData.data.part, getData.data.kit, getData.data.engine, getData.data.insert, getData.data.parameter, getData.data.par2);
+            if(getData.data.part == TOPLEVEL::section::midiLearn)
+                synth->midilearn.generalOperations(&getData);
             else if (getData.data.source >= TOPLEVEL::action::lowPrio)
                 indirectTransfers(&getData);
             else
@@ -1223,14 +1223,38 @@ float InterChange::readAllData(CommandBlock *getData)
 void InterChange::resolveReplies(CommandBlock *getData)
 {
     unsigned char source = getData->data.source & TOPLEVEL::action::noAction;
-    // making sure there are no stry top bits.
+    // making sure there are no stray top bits.
     if (source == TOPLEVEL::action::noAction)
     {
         // in case it was originally called from CLI
         synth->getRuntime().finishedCLI = true;
         return; // no further action
     }
+    bool addValue = (source != TOPLEVEL::action::fromMIDI);
+    std::string commandName = resolveText(getData, addValue);
 
+
+    if (getData->data.type & TOPLEVEL::type::LearnRequest)
+    {
+        std::string toSend;
+        size_t pos = commandName.find(" - ");
+        if (pos < 1 || pos >= commandName.length())
+            toSend = commandName;
+        else
+            toSend = commandName.substr(0, pos);
+        synth->midilearn.setTransferBlock(getData, toSend);
+        return;
+    }
+
+    if (source != TOPLEVEL::action::fromMIDI)
+        synth->getRuntime().Log(commandName);
+    if (source == TOPLEVEL::action::fromCLI)
+        synth->getRuntime().finishedCLI = true;
+}
+
+
+std::string InterChange::resolveText(CommandBlock *getData, bool addValue)
+{
     float value = getData->data.value.F;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -1244,7 +1268,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     {
         synth->getRuntime().Log(miscMsgPop(lrint(value)));
         synth->getRuntime().finishedCLI = true;
-        return;
+        return "";
     }
 
     showValue = true;
@@ -1447,28 +1471,9 @@ void InterChange::resolveReplies(CommandBlock *getData)
         else
             actual += std::to_string(value);
     }
-    if (type & TOPLEVEL::type::LearnRequest)
-    {
-        std::string toSend;
-        size_t pos = commandName.find(" - ");
-        if (pos < 1 || pos >= commandName.length())
-            toSend = commandName;
-        else
-            toSend = commandName.substr(0, pos);
-        synth->midilearn.setTransferBlock(getData, toSend);
-        return;
-    }
-
-    if (value == FLT_MAX)
-    { // This corrupts par2 but it shouldn't matter if used as intended
-        getData->data.par2 = miscMsgPush(commandName);
-        return;
-    }
-
-    if (source != TOPLEVEL::action::fromMIDI)
-        synth->getRuntime().Log(commandName + actual);
-    if (source == TOPLEVEL::action::fromCLI)
-        synth->getRuntime().finishedCLI = true;
+    if (addValue)
+        commandName += actual;
+    return commandName;
 }
 
 

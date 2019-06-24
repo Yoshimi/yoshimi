@@ -66,6 +66,7 @@ class InterChange : private MiscFuncs, FileMgr
         bool commandSend(CommandBlock *getData);
         float readAllData(CommandBlock *getData);
         void resolveReplies(CommandBlock *getData);
+        std::string resolveText(CommandBlock *getData, bool addValue);
         void testLimits(CommandBlock *getData);
         float returnLimits(CommandBlock *getData);
         unsigned char blockRead;

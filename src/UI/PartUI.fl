@@ -390,7 +390,7 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
-      xywh {588 361 380 170} type Double box NO_BOX hide
+      xywh {996 337 380 170} type Double box NO_BOX hide
       class Fl_Group
     } {
       Fl_Group partgroupui {
@@ -580,7 +580,7 @@ Offset}
           label Portamento
           callback {//
           send_data(0, PART::control::portamento, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Enable/Disable the portamento} xywh {83 61 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 11 align 8
+          tooltip {Enable/Disable the portamento} xywh {86 61 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 11 align 8
           code0 {o->value(part->ctl->portamento.portamento);}
         }
         Fl_Spinner midich {
@@ -609,7 +609,7 @@ Offset}
           else
               legatoMode->labelcolor(FL_BLACK);
           send_data(0, PART::control::keyMode, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Poly, Mono or Legato mode} xywh {83 36 68 19} down_box BORDER_BOX selection_color 49 labelsize 11 align 8 textfont 1 textsize 11
+          tooltip {Poly, Mono or Legato mode} xywh {86 36 68 19} down_box BORDER_BOX selection_color 49 labelsize 11 align 8 textfont 1 textsize 11
           code0 {int tmp = synth->ReadPartKeyMode(npart);}
           code1 {if (tmp > 1) o->value(2); else o->value(tmp);}
         } {
@@ -633,7 +633,7 @@ Offset}
               ctlwindow->show();
           else
               ctlmidi->show();}
-          tooltip {Left mouse button: Controller range settings, Right mouse button: MIDI CCs} xywh {8 81 167 25} box PLASTIC_UP_BOX color 222 labelsize 12
+          tooltip {Left mouse button: Controller range settings, Right mouse button: MIDI CCs} xywh {8 81 166 25} box PLASTIC_UP_BOX color 228 labelsize 12
         }
         Fl_Spinner partkeyshift {
           label {Key Shift}

@@ -1781,7 +1781,15 @@ void SynthEngine::resetAll(bool andML)
         }
     }
     if (andML)
-        midilearn.generalOpps(0, 0, MIDILEARN::control::clearAll, TOPLEVEL::section::midiLearn, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED);
+    {
+        CommandBlock putData;
+        memset(&putData, 0xff, sizeof(putData));
+        putData.data.value.F = 0;
+        putData.data.type = 0;
+        putData.data.control = MIDILEARN::control::clearAll;
+        putData.data.part = TOPLEVEL::section::midiLearn;
+        midilearn.generalOperations(&putData);
+    }
     while(isMuted())
         Unmute(); // unwind all mute settings
 }
