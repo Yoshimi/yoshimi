@@ -4,6 +4,7 @@ yoshimi 1.5.11 M
 * Swapped menu entry Yoshimi/MIDI Learn ~ button-Reports.
 * Improved MIDI-Learn internal links.
 * Partially separated text replies from respondents.
+* BugFix: voicelist enable calling MIDI_learn.
 
 2019-6-22 Will
 * Clarifed system mute controls.

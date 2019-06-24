@@ -178,7 +178,7 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
         label 1
         callback {//
     bool enab = (o->value() > 0.5);
-    collect_data(synth, enab, 0, (Fl::event_button() | 0xd8), ADDVOICE::control::enableVoice, npart, kititem, PART::engine::addVoice1 + nvoice);}
+    collect_data(synth, enab, TOPLEVEL::action::forceUpdate, (Fl::event_button() | TOPLEVEL::type::Integer | TOPLEVEL::type::Write), ADDVOICE::control::enableVoice, npart, kititem, PART::engine::addVoice1 + nvoice);}
         xywh {20 3 20 20} box THIN_UP_BOX down_box DOWN_BOX color 237 labeltype EMBOSSED_LABEL labelfont 1 labelsize 12 align 4
         code0 {char tmp[12]; snprintf(tmp, 12, "%d", nvoice + 1); o->label(strdup(tmp));}
         code1 {o->value(pars->VoicePar[nvoice].Enabled);}
