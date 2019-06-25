@@ -1,5 +1,8 @@
 yoshimi 1.5.11 M
 
+2019-6-25 Will
+* Moved data->text conversions to new file 'Data2Text'.
+
 2019-6-24 Will
 * Swapped menu entry Yoshimi/MIDI Learn ~ button-Reports.
 * Improved MIDI-Learn internal links.

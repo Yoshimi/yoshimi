@@ -32,12 +32,14 @@ using namespace std;
 #include "Misc/MiscFuncs.h"
 #include "Interface/FileMgr.h"
 #include "Interface/InterChange.h"
+#include "Interface/Data2Text.h"
 
 class XMLwrapper;
 
 class SynthEngine;
+class DataText;
 
-class MidiLearn : private MiscFuncs, FileMgr
+class MidiLearn : private FileMgr, DataText
 {
     public:
         MidiLearn(SynthEngine *_synth);

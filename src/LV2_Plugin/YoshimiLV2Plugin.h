@@ -40,6 +40,7 @@
 
 #include "Misc/SynthEngine.h"
 #include "Interface/InterChange.h"
+#include "Interface/Data2Text.h"
 #include "Interface/RingBuffer.h"
 #include "MusicIO/MusicIO.h"
 

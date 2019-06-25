@@ -995,7 +995,7 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
             xml->exitbranch();
             entry.status = status;
             real.data.type = 0;
-            entry.name = synth->interchange.resolveText(&real, false);
+            entry.name = resolveAll(synth, &real, false);
             midi_list.push_back(entry);
             ++ ID;
         }

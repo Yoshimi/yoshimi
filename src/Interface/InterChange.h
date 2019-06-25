@@ -27,6 +27,7 @@
 
 #include "globals.h"
 #include "Misc/MiscFuncs.h"
+#include "Interface/Data2Text.h"
 #include "Interface/FileMgr.h"
 #include "Interface/RingBuffer.h"
 #include "Params/LFOParams.h"
@@ -36,9 +37,11 @@
 #include "Synth/Resonance.h"
 
 class SynthEngine;
+class DataText;
 
-class InterChange : private MiscFuncs, FileMgr
+class InterChange : private FileMgr, DataText
 {
+
     private:
         SynthEngine *synth;
 
@@ -83,23 +86,7 @@ class InterChange : private MiscFuncs, FileMgr
         pthread_t  sortResultsThreadHandle;
         void indirectTransfers(CommandBlock *getData, bool noForward = false);
         std::string formatScales(std::string text);
-        std::string resolveVector(CommandBlock *getData);
-        std::string resolveMicrotonal(CommandBlock *getData);
-        std::string resolveConfig(CommandBlock *getData);
-        std::string resolveBank(CommandBlock *getData);
-        std::string resolveMain(CommandBlock *getData);
-        std::string resolvePart(CommandBlock *getData);
-        std::string resolveAdd(CommandBlock *getData);
-        std::string resolveAddVoice(CommandBlock *getData);
-        std::string resolveSub(CommandBlock *getData);
-        std::string resolvePad(CommandBlock *getData);
-        std::string resolveOscillator(CommandBlock *getData);
-        std::string resolveResonance(CommandBlock *getData);
-        std::string resolveLFO(CommandBlock *getData);
-        std::string resolveFilter(CommandBlock *getData);
-        std::string resolveEnvelope(CommandBlock *getData);
-        std::string resolveEffects(CommandBlock *getData);
-        bool showValue;
+
         unsigned int lockTime;
 
         unsigned int swapRoot1;

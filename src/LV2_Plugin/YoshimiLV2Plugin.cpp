@@ -25,6 +25,7 @@
 #include "Misc/ConfBuild.h"
 #include "Misc/SynthEngine.h"
 #include "Interface/InterChange.h"
+#include "Interface/Data2Text.h"
 #include "Interface/MidiDecode.h"
 #include "MusicIO/MusicClient.h"
 #ifdef GUI_FLTK
