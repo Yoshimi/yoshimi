@@ -36,21 +36,21 @@ std::string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, boo
         synth->setAllPartMaps();
 
     if (npart == TOPLEVEL::section::vector)
-        commandName = resolveVector(getData);
+        commandName = resolveVector(getData, addValue);
     else if (npart == TOPLEVEL::section::scales)
-        commandName = resolveMicrotonal(getData);
+        commandName = resolveMicrotonal(getData, addValue);
     else if (npart == TOPLEVEL::section::config)
-        commandName = resolveConfig(getData);
+        commandName = resolveConfig(getData, addValue);
     else if (npart == TOPLEVEL::section::bank)
-        commandName = resolveBank(getData);
+        commandName = resolveBank(getData, addValue);
     else if (npart == TOPLEVEL::section::midiIn || npart == TOPLEVEL::section::main)
-        commandName = resolveMain(getData);
+        commandName = resolveMain(getData, addValue);
 
     else if (npart == TOPLEVEL::section::systemEffects || npart == TOPLEVEL::section::insertEffects)
-        commandName = resolveEffects(getData);
+        commandName = resolveEffects(getData, addValue);
 
     else if ((kititem >= EFFECT::type::none && kititem <= EFFECT::type::dynFilter) || (control >= PART::control::effectNumber && control <= PART::control::effectBypass && kititem == UNUSED))
-        commandName = resolveEffects(getData);
+        commandName = resolveEffects(getData, addValue);
 
     else if (npart >= NUM_MIDI_PARTS)
     {
@@ -75,7 +75,7 @@ std::string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, boo
             commandName = "Part " + std::to_string(int(npart) + 1) + " Kitmode not enabled";
         }
         else
-            commandName = resolvePart(getData);
+            commandName = resolvePart(getData, addValue);
     }
     else if (kititem > 0 && part->Pkitmode == 0)
     {
@@ -88,37 +88,37 @@ std::string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, boo
         switch(insert)
         {
             case UNUSED:
-                commandName = resolvePad(getData);
+                commandName = resolvePad(getData, addValue);
                 break;
             case TOPLEVEL::insert::LFOgroup:
-                commandName = resolveLFO(getData);
+                commandName = resolveLFO(getData, addValue);
                 break;
             case TOPLEVEL::insert::filterGroup:
-                commandName = resolveFilter(getData);
+                commandName = resolveFilter(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopeGroup:
-                commandName = resolveEnvelope(getData);
+                commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopePoints:
-                commandName = resolveEnvelope(getData);
+                commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopePointChange:
-                commandName = resolveEnvelope(getData);
+                commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::oscillatorGroup:
-                commandName = resolveOscillator(getData);
+                commandName = resolveOscillator(getData, addValue);
                 break;
             case TOPLEVEL::insert::harmonicAmplitude:
-                commandName = resolveOscillator(getData);
+                commandName = resolveOscillator(getData, addValue);
                 break;
             case TOPLEVEL::insert::harmonicPhaseBandwidth:
-                commandName = resolveOscillator(getData);
+                commandName = resolveOscillator(getData, addValue);
                 break;
             case TOPLEVEL::insert::resonanceGroup:
-                commandName = resolveResonance(getData);
+                commandName = resolveResonance(getData, addValue);
                 break;
             case TOPLEVEL::insert::resonanceGraphInsert:
-                commandName = resolveResonance(getData);
+                commandName = resolveResonance(getData, addValue);
                 break;
         }
     }
@@ -128,25 +128,25 @@ std::string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, boo
         switch (insert)
         {
             case UNUSED:
-                commandName = resolveSub(getData);
+                commandName = resolveSub(getData, addValue);
                 break;
             case TOPLEVEL::insert::harmonicAmplitude:
-                commandName = resolveSub(getData);
+                commandName = resolveSub(getData, addValue);
                 break;
             case TOPLEVEL::insert::harmonicPhaseBandwidth:
-                commandName = resolveSub(getData);
+                commandName = resolveSub(getData, addValue);
                 break;
             case TOPLEVEL::insert::filterGroup:
-                commandName = resolveFilter(getData);
+                commandName = resolveFilter(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopeGroup:
-                commandName = resolveEnvelope(getData);
+                commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopePoints:
-                commandName = resolveEnvelope(getData);
+                commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopePointChange:
-                commandName = resolveEnvelope(getData);
+                commandName = resolveEnvelope(getData, addValue);
                 break;
         }
     }
@@ -156,31 +156,31 @@ std::string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, boo
         switch (insert)
         {
             case UNUSED:
-                commandName = resolveAddVoice(getData);
+                commandName = resolveAddVoice(getData, addValue);
                 break;
             case TOPLEVEL::insert::LFOgroup:
-                commandName = resolveLFO(getData);
+                commandName = resolveLFO(getData, addValue);
                 break;
             case TOPLEVEL::insert::filterGroup:
-                commandName = resolveFilter(getData);
+                commandName = resolveFilter(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopeGroup:
-                commandName = resolveEnvelope(getData);
+                commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopePoints:
-                commandName = resolveEnvelope(getData);
+                commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopePointChange:
-                commandName = resolveEnvelope(getData);
+                commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::oscillatorGroup:
-                commandName = resolveOscillator(getData);
+                commandName = resolveOscillator(getData, addValue);
                 break;
             case TOPLEVEL::insert::harmonicAmplitude:
-                commandName = resolveOscillator(getData);
+                commandName = resolveOscillator(getData, addValue);
                 break;
             case TOPLEVEL::insert::harmonicPhaseBandwidth:
-                commandName = resolveOscillator(getData);
+                commandName = resolveOscillator(getData, addValue);
                 break;
         }
     }
@@ -190,28 +190,28 @@ std::string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, boo
         switch (insert)
         {
             case UNUSED:
-                commandName = resolveAdd(getData);
+                commandName = resolveAdd(getData, addValue);
                 break;
             case TOPLEVEL::insert::LFOgroup:
-                commandName = resolveLFO(getData);
+                commandName = resolveLFO(getData, addValue);
                 break;
             case TOPLEVEL::insert::filterGroup:
-                commandName = resolveFilter(getData);
+                commandName = resolveFilter(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopeGroup:
-                commandName = resolveEnvelope(getData);
+                commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopePoints:
-                commandName = resolveEnvelope(getData);
+                commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopePointChange:
-                commandName = resolveEnvelope(getData);
+                commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::resonanceGroup:
-                commandName = resolveResonance(getData);
+                commandName = resolveResonance(getData, addValue);
                 break;
             case TOPLEVEL::insert::resonanceGraphInsert:
-                commandName = resolveResonance(getData);
+                commandName = resolveResonance(getData, addValue);
                 break;
         }
     }
@@ -231,7 +231,7 @@ std::string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, boo
 }
 
 
-std::string DataText::resolveVector(CommandBlock *getData)
+std::string DataText::resolveVector(CommandBlock *getData, bool addValue)
 {
     int value_int = lrint(getData->data.value.F);
     unsigned char control = getData->data.control;
@@ -293,7 +293,8 @@ std::string DataText::resolveVector(CommandBlock *getData)
                 contstr = "all channels";
             else
                 contstr = "chan " + std::to_string(chan + 1);
-            return("Vector cleared on " + contstr);
+            if (addValue)
+                return("Vector cleared on " + contstr);
             break;
 
         case 127:
@@ -321,7 +322,7 @@ std::string DataText::resolveVector(CommandBlock *getData)
 }
 
 
-std::string DataText::resolveMicrotonal(CommandBlock *getData)
+std::string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
 {
     int value = getData->data.value.F;
     unsigned char control = getData->data.control;
@@ -379,11 +380,15 @@ std::string DataText::resolveMicrotonal(CommandBlock *getData)
             break;
 
         case SCALES::control::name:
-            contstr = "Name: " + std::string(synth->microtonal.Pname);
+            contstr = "Name: ";
+            if (addValue)
+                contstr += std::string(synth->microtonal.Pname);
             showValue = false;
             break;
         case SCALES::control::comment:
-            contstr = "Description: " + std::string(synth->microtonal.Pcomment);
+            contstr = "Description: ";
+            if (addValue)
+                contstr += std::string(synth->microtonal.Pcomment);
             showValue = false;
             break;
         case SCALES::control::retune:
@@ -441,7 +446,7 @@ std::string DataText::resolveMicrotonal(CommandBlock *getData)
     return ("Scales " + contstr);
 }
 
-std::string DataText::resolveConfig(CommandBlock *getData)
+std::string DataText::resolveConfig(CommandBlock *getData, bool addValue)
 {
     float value = getData->data.value.F;
     unsigned char control = getData->data.control;
@@ -461,28 +466,34 @@ std::string DataText::resolveConfig(CommandBlock *getData)
             break;
         case CONFIG::control::padSynthInterpolation:
             contstr = "PadSynth interpolation ";
-            if (value_bool)
-                contstr += "cubic";
-            else
-                contstr += "linear";
+            if (addValue)
+            {
+                if (value_bool)
+                    contstr += "cubic";
+                else
+                    contstr += "linear";
+            }
             showValue = false;
             break;
         case CONFIG::control::virtualKeyboardLayout:
             contstr = "Virtual keyboard ";
-            switch (value_int)
+            if (addValue)
             {
-                case 0:
-                    contstr += "QWERTY";
-                    break;
-                case 1:
-                    contstr += "Dvorak";
-                    break;
-                case 2:
-                    contstr += "QWERTZ";
-                    break;
-                case 3:
-                    contstr += "AZERTY";
-                    break;
+                switch (value_int)
+                {
+                    case 0:
+                        contstr += "QWERTY";
+                        break;
+                    case 1:
+                        contstr += "Dvorak";
+                        break;
+                    case 2:
+                        contstr += "QWERTZ";
+                        break;
+                    case 3:
+                        contstr += "AZERTY";
+                        break;
+                }
             }
             showValue = false;
             break;
@@ -491,25 +502,31 @@ std::string DataText::resolveConfig(CommandBlock *getData)
             break;
         case CONFIG::control::reportsDestination:
             contstr = "Reports to ";
-            if (value_bool)
-                contstr += "console window";
-            else
-                contstr += "stdout";
+            if (addValue)
+            {
+                if (value_bool)
+                    contstr += "console window";
+                else
+                    contstr += "stdout";
+            }
             showValue = false;
             break;
         case CONFIG::control::savedInstrumentFormat:
             contstr = "Saved Instrument Format ";
-            switch (value_int)
+            if (addValue)
             {
-                case 1:
-                    contstr += "Legacy (.xiz)";
-                    break;
-                case 2:
-                    contstr += "Yoshimi (.xiy)";
-                    break;
-                case 3:
-                    contstr += "Both";
-                    break;
+                switch (value_int)
+                {
+                    case 1:
+                        contstr += "Legacy (.xiz)";
+                        break;
+                    case 2:
+                        contstr += "Yoshimi (.xiy)";
+                        break;
+                    case 3:
+                        contstr += "Both";
+                        break;
+                }
             }
             showValue = false;
             break;
@@ -556,37 +573,37 @@ std::string DataText::resolveConfig(CommandBlock *getData)
         case CONFIG::control::historyLock:
         {
             std::string group[] = {"Instrument", "Patchset", "Scale", "State", "Vector", "Mlearn"};
-            showValue = false;
             contstr = "History lock " + group[kititem];
-            if (value_int)
-                contstr += " On";
-            else
-                contstr += " Off";
+            yesno = true;
             break;
         }
         case CONFIG::control::exposeStatus:
             showValue = false;
             contstr += "Show CLI context ";
-            switch (value_int)
+            if (addValue)
             {
-                case 0:
-                    contstr += "off";
-                    break;
-                case 1:
-                    contstr += "on";
-                    break;
-                case 2:
-                    contstr += "prompt";
-                    break;
-                default:
-                    contstr += "unrecognised";
-                    break;
+                switch (value_int)
+                {
+                    case 0:
+                        contstr += "off";
+                        break;
+                    case 1:
+                        contstr += "on";
+                        break;
+                    case 2:
+                        contstr += "prompt";
+                        break;
+                    default:
+                        contstr += "unrecognised";
+                        break;
+                }
             }
             break;
 
         case CONFIG::control::jackMidiSource:
             contstr += "JACK MIDI source: ";
-            contstr += miscMsgPop(value_int);
+            if (addValue)
+                contstr += miscMsgPop(value_int);
             showValue = false;
             break;
         case CONFIG::control::jackPreferredMidi:
@@ -595,7 +612,8 @@ std::string DataText::resolveConfig(CommandBlock *getData)
             break;
         case CONFIG::control::jackServer:
             contstr += "JACK server: ";
-            contstr += miscMsgPop(value_int);
+            if (addValue)
+                contstr += miscMsgPop(value_int);
             showValue = false;
             break;
         case CONFIG::control::jackPreferredAudio:
@@ -609,7 +627,8 @@ std::string DataText::resolveConfig(CommandBlock *getData)
 
         case CONFIG::control::alsaMidiSource:
             contstr += "ALSA MIDI source: ";
-            contstr += miscMsgPop(value_int);
+            if (addValue)
+                contstr += miscMsgPop(value_int);
             showValue = false;
             break;
         case CONFIG::control::alsaPreferredMidi:
@@ -618,7 +637,8 @@ std::string DataText::resolveConfig(CommandBlock *getData)
             break;
         case CONFIG::control::alsaAudioDevice:
             contstr += "ALSA audio device: ";
-            contstr += miscMsgPop(value_int);
+            if (addValue)
+                contstr += miscMsgPop(value_int);
             showValue = false;
             break;
         case CONFIG::control::alsaPreferredAudio:
@@ -627,56 +647,65 @@ std::string DataText::resolveConfig(CommandBlock *getData)
             break;
         case CONFIG::control::alsaSampleRate:
             contstr += "ALSA sample rate: ";
-            switch (value_int)
-            { // this is a hack :(
-                case 0:
-                case 192000:
-                    contstr += "0 (192000)";
-                    break;
-                case 1:
-                case 96000:
-                    contstr += "1 (96000)";
-                    break;
-                case 2:
-                case 48000:
-                    contstr += "2 (48000)";
-                    break;
-                case 3:
-                case 44100:
-                    contstr += "3 (44100)";
-                    break;
+            if (addValue)
+            {
+                switch (value_int)
+                { // this is a hack :(
+                    case 0:
+                    case 192000:
+                        contstr += "0 (192000)";
+                        break;
+                    case 1:
+                    case 96000:
+                        contstr += "1 (96000)";
+                        break;
+                    case 2:
+                    case 48000:
+                        contstr += "2 (48000)";
+                        break;
+                    case 3:
+                    case 44100:
+                        contstr += "3 (44100)";
+                        break;
+                }
             }
             showValue = false;
             break;
 
         case CONFIG::control::bankRootCC:
             contstr += "Bank root CC ";
-            switch (value_int)
+            if (addValue)
             {
-                case 0:
-                    contstr += "MSB";
-                    break;
-                case 32:
-                    contstr += "LSB";
-                    break;
-                default:
-                    contstr += "OFF";
+                switch (value_int)
+                {
+                    case 0:
+                        contstr += "MSB";
+                        break;
+                    case 32:
+                        contstr += "LSB";
+                        break;
+                    default:
+                        contstr += "OFF";
+                }
             }
             showValue = false;
             break;
 
         case CONFIG::control::bankCC:
             contstr += "Bank CC ";
-            switch (value_int)
+            if (addValue)
             {
-                case 0:
-                    contstr += "MSB";
-                    break;
-                case 32:
-                    contstr += "LSB";
-                    break;
-                default:
-                    contstr += "OFF";
+                switch (value_int)
+                {
+                    case 0:
+                        contstr += "MSB";
+                        break;
+                    case 32:
+                        contstr += "LSB";
+                        break;
+                    default:
+                        contstr += "OFF";
+                }
             }
             showValue = false;
             break;
@@ -730,19 +759,22 @@ std::string DataText::resolveConfig(CommandBlock *getData)
             break;
     }
 
-    if (yesno)
+    if(addValue)
     {
-        if (value_bool)
-            contstr += " - yes";
-        else
-            contstr += " - no";
-        showValue = false;
+        if (yesno)
+        {
+            if (value_bool)
+                contstr += " - on";
+            else
+                contstr += " - off";
+            showValue = false;
+        }
     }
     return ("Config " + contstr);
 }
 
 
-std::string DataText::resolveBank(CommandBlock *getData)
+std::string DataText::resolveBank(CommandBlock *getData, bool addValue)
 {
     int value_int = lrint(getData->data.value.F);
     int control = getData->data.control;
@@ -752,6 +784,7 @@ std::string DataText::resolveBank(CommandBlock *getData)
     std::string name = miscMsgPop(value_int);
     std::string contstr = "";
     showValue = false;
+    addValue = addValue; // suppress warning
     switch(control)
     {
         case BANK::control::deleteInstrument:
@@ -781,7 +814,7 @@ std::string DataText::resolveBank(CommandBlock *getData)
     return ("Bank " + contstr);
 }
 
-std::string DataText::resolveMain(CommandBlock *getData)
+std::string DataText::resolveMain(CommandBlock *getData, bool addValue)
 {
     float value = getData->data.value.F;
     int value_int = lrint(value);
@@ -836,41 +869,50 @@ std::string DataText::resolveMain(CommandBlock *getData)
         case MAIN::control::mono:
             contstr = "Master Mono/Stereo ";
             showValue = false;
-            if (value_int)
-                contstr += "Mono";
-            else
-                contstr += "Stereo";
+            if (addValue)
+            {
+                if (value_int)
+                    contstr += "Mono";
+                else
+                    contstr += "Stereo";
+            }
             break;
 
         case MAIN::control::soloType:
             showValue = false;
-            contstr = "Chan 'solo' Switch - ";
-            switch (value_int)
+            contstr = "Chan 'solo' Switch ";
+            if (addValue)
             {
-                case 0:
-                    contstr += "Off";
-                    break;
-                case 1:
-                    contstr += "Row";
-                    break;
-                case 2:
-                    contstr += "Column";
-                    break;
-                case 3:
-                    contstr += "Loop";
-                    break;
-                case 4:
-                    contstr += "Twoway";
-                    break;
+                switch (value_int)
+                {
+                    case 0:
+                        contstr += "Off";
+                        break;
+                    case 1:
+                        contstr += "Row";
+                        break;
+                    case 2:
+                        contstr += "Column";
+                        break;
+                    case 3:
+                        contstr += "Loop";
+                        break;
+                    case 4:
+                        contstr += "Twoway";
+                        break;
+                }
             }
             break;
         case MAIN::control::soloCC:
             showValue = false;
             contstr = "Chan 'solo' Switch CC ";
-            if (value_int > 127)
-                contstr += "undefined - set mode first";
-            else
-                contstr += std::to_string(value_int);
+            if (addValue)
+            {
+                if (value_int > 127)
+                    contstr += "undefined - set mode first";
+                else
+                    contstr += std::to_string(value_int);
+            }
             break;
 
         case MAIN::control::exportBank:
@@ -1029,7 +1071,7 @@ std::string DataText::resolveMain(CommandBlock *getData)
 }
 
 
-std::string DataText::resolvePart(CommandBlock *getData)
+std::string DataText::resolvePart(CommandBlock *getData, bool addValue)
 {
     float value = getData->data.value.F;
     unsigned char control = getData->data.control;
@@ -1096,47 +1138,58 @@ std::string DataText::resolvePart(CommandBlock *getData)
             break;
         case PART::control::midiChannel:
             showValue = false;
-            contstr = "Midi CH - " + std::to_string(value_int + 1);
-            if (value_int >= NUM_MIDI_CHANNELS * 2)
-                contstr += " Midi ignored";
-            else if (value_int >= NUM_MIDI_CHANNELS)
-                contstr = contstr + " Note off only on CH " + std::to_string(value_int + 1 - NUM_MIDI_CHANNELS);
+            contstr = "Midi CH ";
+            if (addValue)
+            {
+                contstr += std::to_string(value_int + 1);
+                if (value_int >= NUM_MIDI_CHANNELS * 2)
+                    contstr += " Midi ignored";
+                else if (value_int >= NUM_MIDI_CHANNELS)
+                    contstr = contstr + " Note off only from CH " + std::to_string(value_int + 1 - NUM_MIDI_CHANNELS);
+            }
             break;
         case PART::control::keyMode:
             showValue = false;
-            contstr = "Mode - ";
-            if (value_int == 0)
-                contstr += "Poly";
-            else if (value_int == 1)
-                contstr += "Mono";
-            else if (value_int >= 2)
-                contstr += "Legato";
+            contstr = "Mode ";
+            if (addValue)
+            {
+                if (value_int == 0)
+                    contstr += "Poly";
+                else if (value_int == 1)
+                    contstr += "Mono";
+                else if (value_int >= 2)
+                    contstr += "Legato";
+            }
             break;
         case PART::control::portamento:
             contstr = "Portamento Enable";
             yesno = true;
             break;
         case PART::control::enable:
-            contstr = "Enable";
             if (!kitType)
             {
                 switch(engine)
                 {
                     case PART::engine::addSynth:
-                        contstr = "AddSynth " + contstr;
+                        contstr += "AddSynth";
                         break;
                     case PART::engine::subSynth:
-                        contstr = "SubSynth " + contstr;
+                        contstr += "SubSynth";
                         break;
                     case PART::engine::padSynth:
-                        contstr = "PadSynth " + contstr;
+                        contstr += "PadSynth";
                         break;
                 }
             }
+            contstr+= " Enable";
+            yesno = true;
             break;
         case PART::control::kitItemMute:
             if (kitType)
+            {
                 contstr = "Mute";
+                yesno = true;
+            }
             break;
 
         case PART::control::minNote:
@@ -1190,20 +1243,23 @@ std::string DataText::resolvePart(CommandBlock *getData)
         case PART::control::kitMode:
             contstr = "Kit Mode ";
             showValue = false;
-            switch(value_int)
+            if (addValue)
             {
-                case 0:
-                    contstr += "off";
-                    break;
-                case 1:
-                    contstr += "multi";
-                    break;
-                case 2:
-                    contstr += "single";
-                    break;
-                case 3:
-                    contstr += "crossfade";
-                    break;
+                switch(value_int)
+                {
+                    case 0:
+                        contstr += "off";
+                        break;
+                    case 1:
+                        contstr += "multi";
+                        break;
+                    case 2:
+                        contstr += "single";
+                        break;
+                    case 3:
+                        contstr += "crossfade";
+                        break;
+                }
             }
             break;
 
@@ -1227,20 +1283,23 @@ std::string DataText::resolvePart(CommandBlock *getData)
         case PART::control::audioDestination:
             contstr = "Audio destination ";
             showValue = false;
-            switch(value_int)
+            if (addValue)
             {
-                case 3:
-                    contstr += "both";
-                    break;
-                case 2:
-                    contstr += "part";
-                    break;
-                case 1:
-                    contstr += "main";
-                    break;
-                default:
-                    contstr += "main";
-                    break;
+                switch(value_int)
+                {
+                    case 3:
+                        contstr += "both";
+                        break;
+                    case 2:
+                        contstr += "part";
+                        break;
+                    case 1:
+                        contstr += "main";
+                        break;
+                    default:
+                        contstr += "main";
+                        break;
+                }
             }
             break;
 
@@ -1382,24 +1441,27 @@ std::string DataText::resolvePart(CommandBlock *getData)
 
     }
 
-    if (yesno)
+    if(addValue)
     {
-        if (value_bool)
-            contstr += " - yes";
-        else
-            contstr += " - no";
-        showValue = false;
+        if (yesno)
+        {
+            if (value_bool)
+                contstr += " - on";
+            else
+                contstr += " - off";
+            showValue = false;
+        }
     }
     return ("Part " + std::to_string(npart + 1) + kitnum + name + contstr);
 }
 
 
-std::string DataText::resolveAdd(CommandBlock *getData)
+std::string DataText::resolveAdd(CommandBlock *getData, bool addValue)
 {
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
-
+    addValue = addValue; // suppress warning
     std::string name = "";
     if (control <= ADDSYNTH::control::panning)
         name = " Amplitude ";
@@ -1470,12 +1532,15 @@ std::string DataText::resolveAdd(CommandBlock *getData)
 }
 
 
-std::string DataText::resolveAddVoice(CommandBlock *getData)
+std::string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
 {
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
+
+    bool yesno = false;
+    bool value_bool = YOSH::F2B(getData->data.value.F);
     int nvoice;
     if (engine >= PART::engine::addMod1)
         nvoice = engine - PART::engine::addMod1;
@@ -1550,6 +1615,7 @@ std::string DataText::resolveAddVoice(CommandBlock *getData)
             break;
         case ADDVOICE::control::equalTemperVariation:
             contstr = "Eq T";
+            yesno = true;
             break;
         case ADDVOICE::control::baseFrequencyAs440Hz:
             contstr = "440Hz";
@@ -1679,17 +1745,30 @@ std::string DataText::resolveAddVoice(CommandBlock *getData)
             contstr = "Unrecognised";
     }
 
+    if(addValue)
+    {
+        if (yesno)
+        {
+            if (value_bool)
+                contstr += " - on";
+            else
+                contstr += " - off";
+            showValue = false;
+        }
+    }
     return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + " Add Voice " + std::to_string(nvoice + 1) + name + contstr);
 }
 
 
-std::string DataText::resolveSub(CommandBlock *getData)
+std::string DataText::resolveSub(CommandBlock *getData, bool addValue)
 {
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char insert = getData->data.insert;
 
+    bool yesno = false;
+    bool value_bool = YOSH::F2B(getData->data.value.F);
     if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     {
         std::string Htype;
@@ -1749,6 +1828,7 @@ std::string DataText::resolveSub(CommandBlock *getData)
             break;
         case SUBSYNTH::control::equalTemperVariation:
             contstr = "Eq T";
+            yesno = true;
             break;
         case SUBSYNTH::control::baseFrequencyAs440Hz:
             contstr = "440Hz";
@@ -1801,6 +1881,7 @@ std::string DataText::resolveSub(CommandBlock *getData)
 
         case SUBSYNTH::control::clearHarmonics:
             contstr = "Clear Harmonics";
+            showValue = false;
             break;
 
         case SUBSYNTH::control::stereo:
@@ -1812,11 +1893,22 @@ std::string DataText::resolveSub(CommandBlock *getData)
             contstr = "Unrecognised";
     }
 
+    if(addValue)
+    {
+        if (yesno)
+        {
+            if (value_bool)
+                contstr += " - on";
+            else
+                contstr += " - off";
+            showValue = false;
+        }
+    }
     return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + " SubSynth " + name + contstr);
 }
 
 
-std::string DataText::resolvePad(CommandBlock *getData)
+std::string DataText::resolvePad(CommandBlock *getData, bool addValue)
 {
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -1824,6 +1916,8 @@ std::string DataText::resolvePad(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
+    bool yesno = false;
+    bool value_bool = YOSH::F2B(getData->data.value.F);
     std::string name = "";
     switch (control & 0x70)
     {
@@ -1875,6 +1969,7 @@ std::string DataText::resolvePad(CommandBlock *getData)
             break;
         case PADSYNTH::control::equalTemperVariation:
             contstr = "Eq T";
+            yesno = true;
             break;
         case PADSYNTH::control::baseFrequencyAs440Hz:
             contstr = "440Hz";
@@ -1988,6 +2083,17 @@ std::string DataText::resolvePad(CommandBlock *getData)
             contstr = "Unrecognised";
     }
 
+    if(addValue)
+    {
+        if (yesno)
+        {
+            if (value_bool)
+                contstr += " - on";
+            else
+                contstr += " - off";
+            showValue = false;
+        }
+    }
     std::string isPad = "";
 
     if (write && ((control >= PADSYNTH::control::bandwidth && control <= PADSYNTH::control::spectrumMode) || (control >= PADSYNTH::control::overtoneParameter1 && control <= PADSYNTH::control::sampleSize)))
@@ -1996,7 +2102,7 @@ std::string DataText::resolvePad(CommandBlock *getData)
 }
 
 
-std::string DataText::resolveOscillator(CommandBlock *getData)
+std::string DataText::resolveOscillator(CommandBlock *getData, bool addValue)
 {
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -2006,6 +2112,7 @@ std::string DataText::resolveOscillator(CommandBlock *getData)
     unsigned char insert = getData->data.insert;
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
+    addValue = addValue; // suppress warning
     std::string isPad = "";
     std::string eng_name;
     if (engine == PART::engine::padSynth)
@@ -2160,7 +2267,7 @@ std::string DataText::resolveOscillator(CommandBlock *getData)
 }
 
 
-std::string DataText::resolveResonance(CommandBlock *getData)
+std::string DataText::resolveResonance(CommandBlock *getData, bool addValue)
 {
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -2170,6 +2277,7 @@ std::string DataText::resolveResonance(CommandBlock *getData)
     unsigned char insert = getData->data.insert;
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
+    addValue = addValue; // suppress warning
     std::string name;
     std::string isPad = "";
     if (engine == PART::engine::padSynth)
@@ -2234,7 +2342,7 @@ std::string DataText::resolveResonance(CommandBlock *getData)
 }
 
 
-std::string DataText::resolveLFO(CommandBlock *getData)
+std::string DataText::resolveLFO(CommandBlock *getData, bool addValue)
 {
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -2242,6 +2350,7 @@ std::string DataText::resolveLFO(CommandBlock *getData)
     unsigned char engine = getData->data.engine;
     unsigned char insertParam = getData->data.parameter;
 
+    addValue = addValue; // suppress warning
     std::string name;
     std::string lfo;
 
@@ -2308,7 +2417,7 @@ std::string DataText::resolveLFO(CommandBlock *getData)
 }
 
 
-std::string DataText::resolveFilter(CommandBlock *getData)
+std::string DataText::resolveFilter(CommandBlock *getData, bool addValue)
 {
     int value_int = int(getData->data.value.F);
     unsigned char control = getData->data.control;
@@ -2320,6 +2429,7 @@ std::string DataText::resolveFilter(CommandBlock *getData)
     int nformant = getData->data.parameter;
     int nvowel = getData->data.par2;
 
+    addValue = addValue; // suppress warning
     std::string name;
 
     if (engine == PART::engine::addSynth)
@@ -2428,7 +2538,7 @@ std::string DataText::resolveFilter(CommandBlock *getData)
 }
 
 
-std::string DataText::resolveEnvelope(CommandBlock *getData)
+std::string DataText::resolveEnvelope(CommandBlock *getData, bool addValue)
 {
     int value = lrint(getData->data.value.F);
     bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
@@ -2440,6 +2550,7 @@ std::string DataText::resolveEnvelope(CommandBlock *getData)
     unsigned char insertParam = getData->data.parameter;
     int par2 = getData->data.par2;
 
+    addValue = addValue; // suppress warning
     std::string env;
     std::string name;
     if (engine == PART::engine::addSynth)
@@ -2556,7 +2667,7 @@ std::string DataText::resolveEnvelope(CommandBlock *getData)
 }
 
 
-std::string DataText::resolveEffects(CommandBlock *getData)
+std::string DataText::resolveEffects(CommandBlock *getData, bool addValue)
 {
     int value = lrint(getData->data.value.F);
     unsigned char control = getData->data.control;
@@ -2566,6 +2677,7 @@ std::string DataText::resolveEffects(CommandBlock *getData)
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
 
+    addValue = addValue; // suppress warning
     std::string name;
     std::string actual;
     if (npart == TOPLEVEL::section::systemEffects)

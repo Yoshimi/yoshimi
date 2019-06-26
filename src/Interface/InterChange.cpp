@@ -1231,11 +1231,10 @@ void InterChange::resolveReplies(CommandBlock *getData)
         synth->getRuntime().finishedCLI = true;
         return; // no further action
     }
-    bool addValue = (source != TOPLEVEL::action::fromMIDI);
+    bool addValue = !(getData->data.type & TOPLEVEL::type::LearnRequest);
     std::string commandName = resolveAll(synth, getData, addValue);
 
-
-    if (getData->data.type & TOPLEVEL::type::LearnRequest)
+    if (!addValue)
     {
         std::string toSend;
         size_t pos = commandName.find(" - ");
