@@ -184,12 +184,12 @@ bool Bank::emptyslot(unsigned int ninstrument)
 
 
 // Removes the instrument from the bank
-int Bank::clearslot(unsigned int ninstrument)
+std::string Bank::clearslot(unsigned int ninstrument)
 {
     bool chk = true;
     bool chk2 = true; // to stop complaints
     if (emptyslot(ninstrument)) // this is not an error
-        return miscMsgPush(". None found at slot " + to_string(ninstrument + 1));
+        return (". None found at slot " + to_string(ninstrument + 1));
 
     std::string tmpfile = setExtension(getFullPath(synth->getRuntime().currentRoot, synth->getRuntime().currentBank, ninstrument), EXTEN::yoshInst);
     if (isRegFile(tmpfile))
@@ -207,7 +207,7 @@ int Bank::clearslot(unsigned int ninstrument)
     }
     else
     {
-        result = "Could not delete ";
+        result = " FAILED Could not delete ";
         if (chk && !chk2)
             instName += EXTEN::zynInst;
         else if (!chk && chk2)
@@ -218,10 +218,7 @@ int Bank::clearslot(unsigned int ninstrument)
          * can't be deleted it doesn't mark the extension.
          */
     }
-    int msgID = miscMsgPush(result + "'" + instName + "' from slot " + to_string(ninstrument + 1));
-    if (!chk || !chk2)
-        msgID |= 0xFF0000;
-    return msgID;
+    return (result + "'" + instName + "' from slot " + to_string(ninstrument + 1));
 }
 
 
@@ -417,7 +414,7 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
 
 
 // Creates an external bank and copies in the contents of the IDd one
-unsigned int Bank::exportBank(string exportdir, size_t rootID, unsigned int bankID)
+std::string Bank::exportBank(string exportdir, size_t rootID, unsigned int bankID)
 {
     if (rootID > 0x7f)
         rootID = synth->getRuntime().currentRoot;
@@ -478,20 +475,22 @@ unsigned int Bank::exportBank(string exportdir, size_t rootID, unsigned int bank
         }
     }
 
-    unsigned int msgID = miscMsgPush(name);
-    if (!ok)
-        msgID |= 0x1000;
-    return msgID;
+    if (ok)
+        name = " " + name; // need the extra space
+    else
+        name = " FAILED " + name;
+    return name;
 }
 
 
 // Creates a new bank and copies in the contents of the external one
-unsigned int Bank::importBank(string importdir, size_t rootID, unsigned int bankID)
+std::string Bank::importBank(string importdir, size_t rootID, unsigned int bankID)
 {
     if (rootID > 0x7f)
         rootID = synth->getRuntime().currentRoot;
     string name = "";
     bool ok = true;
+    bool partial = false;
     if (roots.count(rootID) == 0)
     {
         name = "Root ID " + to_string(int(rootID)) + " doesn't exist";
@@ -567,18 +566,29 @@ unsigned int Bank::importBank(string importdir, size_t rootID, unsigned int bank
                 }
                 name = importdir;
                 if (count == 0)
+                {
+                    partial = true;
                     name += " : No valid instruments found";
+                }
                 else if (missing)
+                {
+                    partial = true;
                     name += " : Failed to copy some instruments";
+                }
                 else if (count < total)
+                {
+                    partial = true;
                     name = name + " : Ignored " + to_string(total - count)  + " unrecognised items";
+                }
             }
         }
     }
-    unsigned int msgID = miscMsgPush(name);
+
     if (!ok)
-        msgID |= 0x1000;
-    return msgID;
+        name = " FAILED " + name;
+    else if (!partial)
+        name = " ed" + name;
+    return name;
 }
 
 
@@ -709,10 +719,11 @@ unsigned int Bank::removebank(unsigned int bankID, size_t rootID)
 
 
 // Swaps a slot with another
-unsigned int Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t bank2, size_t root1, size_t root2)
+std::string Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t bank2, size_t root1, size_t root2)
 {
     if (n1 == n2 && bank1 == bank2 && root1 == root2)
-        return true;
+
+        return " Can't swap with itself!";
     if (bank1 == 255)
         bank1 = synth->getRuntime().currentBank;
     if (bank2 == 255)
@@ -722,26 +733,30 @@ unsigned int Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size
     if (root2 == 255)
         root2 = root1;
 
-    cout << "first " << getname(n1, bank1, root1) << "   second " << getname(n2, bank2, root2) << endl;
+    //std::cout << "first " << getname(n1, bank1, root1) << "   second " << getname(n2, bank2, root2) << endl;
     /*
      * path entries will always have either .xiy or .xiz
      * otherwise they would not have been seen at all
      * however we test for, and move both if they exist
      */
-    cout << "first ref" << getFullPath(root1, bank1, n1) << endl;
+    //std::cout << "first ref" << getFullPath(root1, bank1, n1) << endl;
     string message = "";
+    bool ok = true;
 
     if (emptyslotWithID(root1, bank1, n1) && emptyslotWithID(root2, bank2, n2))
-        message = "nothing to swap!";
+        return " Nothing to swap!";
 
-    else if (emptyslotWithID(root1, bank1, n1) || emptyslotWithID(root2, bank2, n2))
+    if (emptyslotWithID(root1, bank1, n1) || emptyslotWithID(root2, bank2, n2))
     { // this is just a movement to an empty slot
         if (emptyslotWithID(root1, bank1, n1)) // make the empty slot the destination
         {
             if (!setname(n2, getname(n2, bank2, root2), n1, bank2, bank1, root2, root1))
             {
-                message = "can't write to " + getname(n2, bank2, root2);
+                ok = false;
+                message = " Can't write to " + getname(n2, bank2, root2);
             }
+            else
+                message = std::to_string(n2) + " " + getname(n2, bank2, root2);
             getInstrumentReference(root1, bank1, n1) = getInstrumentReference(root2, bank2, n2);
             getInstrumentReference(root2, bank2, n2).clear();
         }
@@ -749,41 +764,58 @@ unsigned int Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size
         {
             if (!setname(n1, getname(n1, bank1, root1), n2, bank1, bank2, root1, root2))
             {
-                message = "can't write to " + getname(n1, bank1, root1);
+                ok = false;
+                message = " Can't write to " + getname(n1, bank1, root1);
             }
+            else
+                message = std::to_string(n2) + " " + getname(n1, bank1, root1);
             getInstrumentReference(root2, bank2, n2) = getInstrumentReference(root1, bank1, n1);
             getInstrumentReference(root1, bank1, n1).clear();
         }
-        if (message > "")
-            return miscMsgPush(message) | 0x1000;
+        if (!ok)
+        {
+            rescanforbanks(); // might have corrupted it
+            return (" FAILED" + message);
+        }
         else
-            return 0;
+            return (" Moved to " + message);
     }
+
 
     // if both slots are used
     string firstName = getname(n1, bank1, root1);
     string secondName = getname(n2, bank2, root2);
     if (firstName == secondName)
-        message = "can't swap instruments with identical names.";
+        return " Can't swap instruments with identical names.";
+
+    InstrumentEntry &instrRef1 = getInstrumentReference(root1, bank1, n1);
+    InstrumentEntry &instrRef2 = getInstrumentReference(root2, bank2, n2);
+
+    if (!setname(n2, secondName, n1, bank2, bank1, root2, root1))
+    {
+        ok = false;
+        message = " Can't change " + secondName;
+    }
+
+    if (!setname(n1, firstName, n2, bank1, bank2, root1, root2))
+    {
+        ok = false;
+        message = " Can't change " + firstName;
+    }
     else
     {
-        InstrumentEntry &instrRef1 = getInstrumentReference(root1, bank1, n1);
-        InstrumentEntry &instrRef2 = getInstrumentReference(root2, bank2, n2);
-
-        if (!setname(n2, secondName, n1, bank2, bank1, root2, root1))
-            message = "can't change " + secondName;
-
-        if (!setname(n1, firstName, n2, bank1, bank2, root1, root2))
-            message = "can't change " + firstName;
-        {
-            InstrumentEntry instrTmp = instrRef1;
-            instrRef1 = instrRef2;
-            instrRef2 = instrTmp;
-        }
+        InstrumentEntry instrTmp = instrRef1;
+        instrRef1 = instrRef2;
+        instrRef2 = instrTmp;
     }
-    if (message > "")
-        return miscMsgPush(message) | 0x1000;
-    return 0;
+
+    if (!ok)
+    {
+        rescanforbanks(); // might have corrupted it
+        return (" FAILED" + message);
+    }
+
+    return ("ped " + firstName + " with " + secondName);
 }
 
 

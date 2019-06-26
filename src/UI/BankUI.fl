@@ -797,9 +797,8 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
     code {//
     //int value_int = getData->data.value.F;
     unsigned char control = getData->data.control;
-    unsigned int par2 = getData->data.par2;
     int source = getData->data.source & TOPLEVEL::action::noAction;
-    string message = miscMsgPop(par2);
+    string message = miscMsgPop(getData->data.par2);
     switch(control)
     {
         case BANK::control::deleteInstrument:
@@ -814,7 +813,8 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         case BANK::control::selectFirstInstrumentToSwap:
             break;
         case BANK::control::selectSecondInstrumentAndSwap:
-            if (message > "")
+
+            if (message.find("FAILED") != std::string::npos)
                 fl_alert("%s",message.c_str());
             rescan_for_banks(false);
             break;

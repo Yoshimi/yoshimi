@@ -119,9 +119,9 @@ class Bank : private MiscFuncs, FileMgr
         int engines_used(unsigned int ninstrument);
         bool emptyslotWithID(size_t rootID, size_t bankID, unsigned int ninstrument);
         bool emptyslot(unsigned int ninstrument);
-        int clearslot(unsigned int ninstrument);
+        std::string clearslot(unsigned int ninstrument);
         bool savetoslot(size_t rootID, size_t bankID, int ninstrument, int npart);
-        unsigned int swapslot(unsigned int n1, unsigned int n2, size_t bank1 = 0xff, size_t bank2 = 0xff, size_t root1 = 0xff, size_t root2 = 0xff);
+        std::string swapslot(unsigned int n1, unsigned int n2, size_t bank1 = 0xff, size_t bank2 = 0xff, size_t root1 = 0xff, size_t root2 = 0xff);
         unsigned int swapbanks(unsigned int firstID, unsigned int secondID, size_t firstRoot = 0xff, size_t secondRoot= 0xff);
         string getBankName(int bankID, size_t rootID = 0xff);
         string getBankIDname(int bankID);
@@ -129,8 +129,8 @@ class Bank : private MiscFuncs, FileMgr
         int getBankSize(int bankID);
         bool setbankname(unsigned int BankID, string newname);
         bool loadbank(size_t rootID, size_t banknum);
-        unsigned int exportBank(string exportdir, size_t rootID, unsigned int bankID);
-        unsigned int importBank(string importdir, size_t rootID, unsigned int bankID);
+        std::string exportBank(string exportdir, size_t rootID, unsigned int bankID);
+        std::string importBank(string importdir, size_t rootID, unsigned int bankID);
         bool isDuplicate(size_t rootID, size_t bankID, int pos, const string filename);
         bool newIDbank(string newbankdir, unsigned int bankID, size_t rootID = 0xff);
         bool newbankfile(string newbankdir, size_t rootID);

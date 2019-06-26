@@ -5,6 +5,10 @@ yoshimi 1.5.11 M
 * Refinements to data->text conversions.
   Specifically so that MIDI-learn text doesn't include
   the current value or such as 'on/off' responses.
+* Removed some bank message transfer conversions.
+  These are now entirely within one low priority context
+  so there is no need to use miscMsg functions.
+* Added copyright notices to Data2Text files.
 
 2019-6-25 Will
 * Moved data->text conversions to new file 'Data2Text'.

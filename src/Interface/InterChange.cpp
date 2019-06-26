@@ -469,24 +469,14 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 
                 case MAIN::control::exportBank:
                 {
-                    unsigned int result = synth->bank.exportBank(text, kititem, value);
-                    text = miscMsgPop(result & 0xff);
-                    if (result < 0x1000)
-                        text = " " + text; // need the space
-                    else
-                        text = " FAILED " + text;
+                    text = synth->bank.exportBank(text, kititem, value);
                     newMsg = true;
                     break;
                 }
 
                 case MAIN::control::importBank:
                 {
-                    unsigned int result = synth->bank.importBank(text, kititem, value);
-                    text = miscMsgPop(result & 0xff);
-                    if (result < 0x1000)
-                        text = "ed " + text;
-                    else
-                        text = " FAILED " + text;
+                    text = synth->bank.importBank(text, kititem, value);;
                     newMsg = true;
                     break;
                 }
@@ -798,10 +788,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
             {
                 case BANK::control::deleteInstrument:
                 {
-                    int tmp = synth->bank.clearslot(value);
-                    text = miscMsgPop(tmp & NO_MSG);
-                    if (tmp > NO_MSG)
-                        text = " FAILED " + text;
+                    text  = synth->bank.clearslot(value);
                     newMsg = true;
                     break;
                 }
@@ -836,17 +823,11 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                         getData->data.engine = engine;
                     }
                     //std::cout << "Int swap 2 I " << int(insert) << "  B " << int(kititem) << "  R " << int(engine) << std::endl;
-                    tmp = synth->bank.swapslot(swapInstrument1, insert, swapBank1, kititem, swapRoot1, engine);
-                    if (tmp != 0)
-                    {
-                        text = " FAILED " + miscMsgPop(tmp & 0xfff);
-                        newMsg = true;
-                        if (text.find("nothing", 0, 7) == string::npos)
-                            synth->bank.rescanforbanks(); // might have corrupted it
-                    }
+                    text = synth->bank.swapslot(swapInstrument1, insert, swapBank1, kititem, swapRoot1, engine);
                     swapInstrument1 = UNUSED;
                     swapBank1 = UNUSED;
                     swapRoot1 = UNUSED;
+                    newMsg = true;
                     guiTo = true;
                     break;
                 }
@@ -1080,8 +1061,10 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     if (getData->data.source < TOPLEVEL::action::lowPrio)
     {
 #ifdef GUI_FLTK
-        if (synth->getRuntime().showGui && (write || guiTo))
+        if (text != "" && synth->getRuntime().showGui && (write || guiTo))
+        {
             getData->data.par2 = miscMsgPush(text); // pass it on to GUI
+        }
 #endif
         bool ok = returnsBuffer->write(getData->bytes);
 #ifdef GUI_FLTK
