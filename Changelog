@@ -1,5 +1,8 @@
 yoshimi 1.5.11 M
 
+2019-6-27 Will
+* Removed remaining bank message transfer conversions.
+
 2019-6-26 Will
 * Added in missing new files :(
 * Refinements to data->text conversions.

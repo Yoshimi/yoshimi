@@ -482,12 +482,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                 }
                 case MAIN::control::deleteBank:
                 {
-                    unsigned int result = synth->bank.removebank(value, kititem);
-                    text = miscMsgPop(result & 0xff);
-                    if (result < 0x1000)
-                        text = "d " + text;
-                    else
-                        text = " FAILED " + text;
+                    text = synth->bank.removebank(value, kititem);
                     newMsg = true;
                     break;
                 }
@@ -495,7 +490,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                 case MAIN::control::loadInstrumentFromBank:
                 {
                     unsigned int result = synth->setProgramFromBank(getData);
-                    text = miscMsgPop(result & 0xff);
+                    text = miscMsgPop(result & NO_MSG);
                     if (result < 0x1000)
                         text = "ed " + text;
                     else
@@ -508,7 +503,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                 {
                     getData->data.par2 = miscMsgPush(text);
                     unsigned int result = synth->setProgramByName(getData);
-                    text = miscMsgPop(result & 0xff);
+                    text = miscMsgPop(result & NO_MSG);
                     if (result < 0x1000)
                         text = "ed " + text;
                     else
@@ -847,16 +842,10 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                         engine = synth->getRuntime().currentRoot;
                         getData->data.engine = engine;
                     }
-                    tmp = synth->bank.swapbanks(swapBank1, kititem, swapRoot1, engine);
-                    if (tmp >= 0x1000)
-                    {
-                        text = " FAILED " + miscMsgPop(tmp & 0xfff);
-                        newMsg = true;
-                        if (text.find("nothing", 0, 7) == string::npos)
-                            synth->bank.rescanforbanks(); // might have corrupted it
-                    }
+                    text = synth->bank.swapbanks(swapBank1, kititem, swapRoot1, engine);
                     swapBank1 = UNUSED;
                     swapRoot1 = UNUSED;
+                    newMsg = true;
                     guiTo = true;
                     break;
             }
@@ -5320,20 +5309,20 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
     unsigned char Xincrement = getData->data.par2;
 
     int envpoints = pars->Penvpoints;
-    bool isAddpoint = (Xincrement < 0xff);
+    bool isAddpoint = (Xincrement < UNUSED);
 
     if (insert == TOPLEVEL::insert::envelopePoints) // here be dragons :(
     {
         if (!pars->Pfreemode)
         {
-            getData->data.value.F = 0xff;
-            getData->data.par2 = 0xff;
+            getData->data.value.F = UNUSED;
+            getData->data.par2 = UNUSED;
             return;
         }
 
         if (!write || point == 0 || point >= envpoints)
         {
-            getData->data.value.F = 0xff;
+            getData->data.value.F = UNUSED;
             getData->data.par2 = envpoints;
             return;
         }
@@ -5361,13 +5350,13 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
                 getData->data.par2 = Xincrement;
             }
             else
-                getData->data.value.F = 0xff;
+                getData->data.value.F = UNUSED;
             return;
         }
         else if (envpoints < 4)
         {
-            getData->data.value.F = 0xff;
-            getData->data.par2 = 0xff;
+            getData->data.value.F = UNUSED;
+            getData->data.par2 = UNUSED;
             return; // can't have less than 4
         }
         else
@@ -5390,8 +5379,8 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
     {
         if (!pars->Pfreemode || point >= envpoints)
         {
-            getData->data.value.F = 0xff;
-            getData->data.par2 = 0xff;
+            getData->data.value.F = UNUSED;
+            getData->data.par2 = UNUSED;
             return;
         }
         if (write)
@@ -5493,8 +5482,8 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
         case ENVELOPEINSERT::control::points:
             if (!pars->Pfreemode)
             {
-                val = 0xff;
-                Xincrement = 0xff;
+                val = UNUSED;
+                Xincrement = UNUSED;
             }
             else
             {

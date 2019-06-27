@@ -802,7 +802,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
     switch(control)
     {
         case BANK::control::deleteInstrument:
-            if (message.find("FAILED") == 1)
+            if (message.find("FAILED") != std::string::npos)
             {
                 if(source == TOPLEVEL::action::fromGUI)
                     fl_alert("%s",message.c_str());
@@ -815,15 +815,17 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         case BANK::control::selectSecondInstrumentAndSwap:
 
             if (message.find("FAILED") != std::string::npos)
-                fl_alert("%s",message.c_str());
+                if(source == TOPLEVEL::action::fromGUI)
+                    fl_alert("%s",message.c_str());
             rescan_for_banks(false);
             break;
 
         case BANK::control::selectFirstBankToSwap:
             break;
         case BANK::control::selectSecondBankAndSwap:
-            if (message > "")
-                fl_alert("%s",message.c_str());
+            if (message.find("FAILED") != std::string::npos)
+                if(source == TOPLEVEL::action::fromGUI)
+                    fl_alert("%s",message.c_str());
             rescan_for_banks(false);
             break;
     }} {}
