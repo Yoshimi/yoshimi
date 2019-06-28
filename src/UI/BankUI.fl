@@ -801,6 +801,10 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
     string message = miscMsgPop(getData->data.par2);
     switch(control)
     {
+        case BANK::control::exportBank:
+            if(source == TOPLEVEL::action::fromGUI)
+                fl_alert("%s",message.c_str());
+        break;
         case BANK::control::deleteInstrument:
             if (message.find("FAILED") != std::string::npos)
             {
@@ -1025,7 +1029,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
     	const char *dirname;
         dirname = fl_dir_chooser("Export a bank:",synth->getRuntime().userHome.c_str(), 0);
         if (dirname)
-            send_data(TOPLEVEL::action::forceUpdate, MAIN::control::exportBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(string(dirname)));
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::exportBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(string(dirname)));
    	setrootread();
     }
 

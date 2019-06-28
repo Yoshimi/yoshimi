@@ -30,6 +30,12 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <set>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <stdlib.h>
+#include <unistd.h>
+
 
 using namespace std;
 
@@ -43,13 +49,6 @@ using namespace std;
 #include "Misc/Part.h"
 #include "Effects/EffectMgr.h"
 #include "Misc/XMLwrapper.h"
-
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sys/types.h>
-#include <stdlib.h>
-#include <unistd.h>
 
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
 extern std::string runGui;

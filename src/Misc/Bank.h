@@ -119,7 +119,7 @@ class Bank : private MiscFuncs, FileMgr
         int engines_used(unsigned int ninstrument);
         bool emptyslotWithID(size_t rootID, size_t bankID, unsigned int ninstrument);
         bool emptyslot(unsigned int ninstrument);
-        std::string clearslot(unsigned int ninstrument);
+        std::string clearslot(unsigned int ninstrument, size_t rootID, size_t bankID);
         bool savetoslot(size_t rootID, size_t bankID, int ninstrument, int npart);
         std::string swapslot(unsigned int n1, unsigned int n2, size_t bank1 = 0xff, size_t bank2 = 0xff, size_t root1 = 0xff, size_t root2 = 0xff);
         std::string swapbanks(unsigned int firstID, unsigned int secondID, size_t firstRoot = 0xff, size_t secondRoot= 0xff);

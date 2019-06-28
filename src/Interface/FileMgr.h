@@ -56,25 +56,25 @@ class FileMgr
         ~FileMgr(){ };
         bool TestFunc(int result);
 
-        void legit_filename(std::string& fname);
+        static void legit_filename(std::string& fname);
         void legit_pathname(std::string& fname);
-        bool isRegFile(std::string chkpath);
-        bool isDirectory(std::string chkpath);
+        static bool isRegFile(std::string chkpath);
+        static bool isDirectory(std::string chkpath);
         std::string findfile(std::string path, std::string filename, std::string extension);
-        std::string findleafname(std::string name);
-        std::string setExtension(std::string fname, std::string ext);
-        bool copyFile(std::string source, std::string destination);
-        std::string localPath(std::string leaf);
+        static std::string findleafname(std::string name);
+        static std::string setExtension(std::string fname, std::string ext);
+        static bool copyFile(std::string source, std::string destination);
+        static std::string localPath(std::string leaf);
         std::string saveGzipped(char *data, std::string filename, int compression);
         ssize_t saveData(char *buff, size_t bytes, std::string filename);
-        bool saveText(std::string text, std::string filename);
+        static bool saveText(std::string text, std::string filename);
         char *loadGzipped(std::string _filename, std::string *report);
         std::string loadText(std::string filename);
         bool createEmptyFile(std::string filename);
-        bool deleteFile(std::string filename);
-        bool deleteDir(std::string filename);
-        bool renameFile(std::string oldname, std::string newname);
-        bool renameDir(std::string oldname, std::string newname);
+        static bool deleteFile(std::string filename);
+        static bool deleteDir(std::string filename);
+        static bool renameFile(std::string oldname, std::string newname);
+        static bool renameDir(std::string oldname, std::string newname);
 };
 
 #endif

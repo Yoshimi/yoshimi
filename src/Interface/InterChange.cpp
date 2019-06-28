@@ -469,6 +469,8 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 
                 case MAIN::control::exportBank:
                 {
+                    if (kititem == UNUSED)
+                        kititem = synth->getRuntime().currentRoot;
                     text = synth->bank.exportBank(text, kititem, value);
                     newMsg = true;
                     break;
@@ -476,7 +478,9 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 
                 case MAIN::control::importBank:
                 {
-                    text = synth->bank.importBank(text, kititem, value);;
+                    if (kititem == UNUSED)
+                        kititem = synth->getRuntime().currentRoot;
+                    text = synth->bank.importBank(text, kititem, value);
                     newMsg = true;
                     break;
                 }
@@ -783,7 +787,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
             {
                 case BANK::control::deleteInstrument:
                 {
-                    text  = synth->bank.clearslot(value);
+                    text  = synth->bank.clearslot(value, synth->getRuntime().currentRoot,  synth->getRuntime().currentBank);
                     newMsg = true;
                     break;
                 }

@@ -33,8 +33,6 @@
 #include <cstring>
 
 #include "Interface/FileMgr.h"
-#include "Misc/MiscFuncs.h"
-#include "Misc/SynthEngine.h"
 
 bool FileMgr::TestFunc(int result)
 {
@@ -186,16 +184,16 @@ std::string FileMgr::setExtension(std::string fname, std::string ext)
 
 bool FileMgr::copyFile(std::string source, std::string destination)
 {
-    ifstream infile (source, ios::in|ios::binary|ios::ate);
+    std::ifstream infile (source, std::ios::in|std::ios::binary|std::ios::ate);
     if (!infile.is_open())
         return 1;
-    ofstream outfile (destination, ios::out|ios::binary);
+    std::ofstream outfile (destination, std::ios::out|std::ios::binary);
     if (!outfile.is_open())
         return 1;
 
-    streampos size = infile.tellg();
+    std::streampos size = infile.tellg();
     char *memblock = new char [size];
-    infile.seekg (0, ios::beg);
+    infile.seekg (0, std::ios::beg);
     infile.read(memblock, size);
     infile.close();
     outfile.write(memblock, size);

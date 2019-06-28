@@ -1,6 +1,14 @@
 yoshimi 1.5.11 M
 
 2019-6-27 Will
+* BugFix: GUI not exporting banks.
+  CLI was working fine.
+* Improved some bank error reports.
+* Made most filemanager methods static.
+  Used static calls instead of class in bank.
+* Most calls to bank now require implicit bank/root.
+
+2019-6-27 Will
 * Removed remaining bank message transfer conversions.
 
 2019-6-26 Will
