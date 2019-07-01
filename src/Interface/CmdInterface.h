@@ -159,6 +159,7 @@ static std::string toplist [] = {
     "  Root <n>",               "current root path to ID",
     "  Bank <n>",               "current bank to ID",
     "  SYStem effects [n]",     "enter effects context level",
+    "    <ON/OFF>",             "non-destructively enables/disables the effect",
     "    SEnd <n2> <n3>",       "send system effect to effect n2 at volume n3",
     "    (effect) <s>",         "the effect type",
     "    PREset <n2>",          "set numbered effect preset to n2",
@@ -222,7 +223,7 @@ static std::string configlist [] = {
 
 static std::string partlist [] = {
     "<n>",                 "select part number",
-    "<ON/OFF>",              "enables/disables the part",
+    "<ON/OFF>",            "enables/disables the part",
     "Volume <n>",          "volume",
     "Pan <n2>",            "panning",
     "VElocity <n>",        "velocity sensing sensitivity",
@@ -900,7 +901,7 @@ static std::string replies [] = {
 };
 
 static std::string fx_list [] = {
-    "OFF",
+    "UNset",
     "REverb",
     "ECho",
     "CHorus",

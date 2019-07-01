@@ -947,7 +947,8 @@ namespace EFFECT // usage EFFECT::type::none
         toEffect3, // system only
         effectNumber,
         effectType,
-        effectDestination // insert only
+        effectDestination, // insert only
+        effectEnable // system only
     };
 }
 

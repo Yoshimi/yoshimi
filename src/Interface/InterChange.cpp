@@ -5590,6 +5590,14 @@ void InterChange::commandSysIns(CommandBlock *getData)
                 else
                     value = synth->Pinsparts[effnum];
                 break;
+            case EFFECT::sysIns::effectEnable: // system only
+                if (write)
+                {
+                    synth->syseffEnable[effnum] = (value != 0);
+                }
+                else
+                    value = synth->syseffEnable[effnum];
+                break;
         }
     }
     else // system only
@@ -5933,6 +5941,10 @@ float InterChange::returnLimits(CommandBlock *getData)
                 max = 3;
                 break;
             case EFFECT::sysIns::effectType:
+                break;
+            case EFFECT::sysIns::effectEnable:
+                def = 1;
+                max = 1;
                 break;
         }
 

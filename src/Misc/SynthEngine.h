@@ -203,6 +203,7 @@ class SynthEngine : private SynthHelper, MiscFuncs, FileMgr
 
         // effects
         unsigned char  syseffnum;
+        bool syseffEnable[NUM_SYS_EFX];
         unsigned char  inseffnum;
         EffectMgr *sysefx[NUM_SYS_EFX]; // system
         EffectMgr *insefx[NUM_INS_EFX]; // insertion

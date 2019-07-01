@@ -2693,7 +2693,6 @@ std::string DataText::resolveEffects(CommandBlock *getData, bool addValue)
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
 
-    addValue = addValue; // suppress warning
     std::string name;
     std::string actual;
     if (npart == TOPLEVEL::section::systemEffects)
@@ -2742,12 +2741,29 @@ std::string DataText::resolveEffects(CommandBlock *getData, bool addValue)
     {
         std::string contstr;
         std::string second = "";
-        if (npart == TOPLEVEL::section::systemEffects && insert == TOPLEVEL::insert::systemEffectSend)
+        if (npart == TOPLEVEL::section::systemEffects)
         {
             name = "System ";
-            contstr = "from Effect " + std::to_string(effnum + 1);
-            second = " to Effect " + std::to_string(control + 1);
-            return (name + contstr + second);
+            if (insert == TOPLEVEL::insert::systemEffectSend)
+            {
+                contstr = "from Effect " + std::to_string(effnum + 1);
+                second = " to Effect " + std::to_string(control + 1);
+                return (name + contstr + second);
+            }
+            if (control == EFFECT::sysIns::effectEnable)
+            {
+                contstr += "effect " + std::to_string(effnum + 1);
+                if (addValue)
+                {
+                    showValue = false;
+                    if (value > 0)
+                        contstr += " - on";
+                    else
+                        contstr += " - off";
+                }
+                return (name + contstr);
+            }
+
         }
         if (npart == TOPLEVEL::section::insertEffects && control == EFFECT::sysIns::effectDestination)
         {

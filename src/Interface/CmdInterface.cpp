@@ -607,6 +607,9 @@ int CmdInterface::effects(unsigned char controlType)
     {
         nFXavail = NUM_SYS_EFX;
         nFXtype = synth->sysefx[nFX]->geteffect();
+        int tmp = toggle();
+        if (tmp >= 0)
+            return sendNormal(0, tmp, controlType, EFFECT::sysIns::effectEnable, TOPLEVEL::section::systemEffects, UNUSED, nFX);
     }
 
     if (lineEnd(controlType))
@@ -616,7 +619,7 @@ int CmdInterface::effects(unsigned char controlType)
 
     if (value > 128)
     {
-        std::cout << "Eff status " << int(readControl(0, value, npart,EFFECT::type::none + nFXtype, nFX)) << std::endl;
+        std::cout << "Eff status " << int(readControl(0, value, npart, EFFECT::type::none + nFXtype, nFX)) << std::endl;
         return done_msg;
     }
 

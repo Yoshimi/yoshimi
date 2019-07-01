@@ -458,6 +458,7 @@ void SynthEngine::defaults(void)
     syseffnum = 0;
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
     {
+        syseffEnable[nefx] = true;
         sysefx[nefx]->defaults();
         for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
             setPsysefxvol(npart, nefx, 0);
@@ -2030,6 +2031,8 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             // Clear the samples used by the system effects
             memset(tmpmixl, 0, sent_bufferbytes);
             memset(tmpmixr, 0, sent_bufferbytes);
+            if (!syseffEnable[nefx])
+                continue; // is off
 
             // Mix the channels according to the part settings about System Effect
             for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
@@ -2051,6 +2054,8 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             // system effect send to next ones
             for (int nefxfrom = 0; nefxfrom < nefx; ++nefxfrom)
             {
+                if (!syseffEnable[nefxfrom])
+                    continue; // is off
                 if (Psysefxsend[nefxfrom][nefx])
                 {
                     float v = sysefxsend[nefxfrom][nefx];

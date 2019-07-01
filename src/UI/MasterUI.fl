@@ -748,11 +748,21 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
               xywh {90 90 100 20} labelfont 1 labelsize 10
             }
           }
+          Fl_Check_Button SysEffOn {
+            label On
+            callback {//
+            if (o->value())
+                    sysefftype->activate();
+                else
+                    sysefftype->deactivate();
+            send_data(0, EFFECT::sysIns::effectEnable, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects, nsyseff);}
+            xywh {247 129 16 15} down_box DOWN_BOX value 1 labelfont 1 labelsize 11 align 4
+          }
           Fl_Button {} {
             label {Send to}
             callback {//
             syseffsendwindow->show();}
-            xywh {256 126 62 20} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 97
+            xywh {275 126 62 20} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 97
           }
           Fl_Button {} {
             label C
@@ -1427,7 +1437,11 @@ Nikita Zlobin
                 sysefftype->value(synth->sysefx[nsyseff]->geteffect());
                 syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
                 syseffectui->UpdatePresetColour(parameter, sysefftype->value());
-
+                SysEffOn->value(fetchData(0, EFFECT::sysIns::effectEnable, 241, UNUSED, 0));
+                if (SysEffOn->value())
+                    sysefftype->activate();
+                else
+                    sysefftype->deactivate();
             }
             else if (control == EFFECT::sysIns::effectType)
             {
@@ -1437,6 +1451,14 @@ Nikita Zlobin
                 syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
                 syseffectui->UpdatePresetColour(parameter, sysefftype->value());
                 showSysEfxUI();
+            }
+            else if (control == EFFECT::sysIns::effectEnable)
+            {
+               SysEffOn->value(value_int);
+               if (value_int)
+                    sysefftype->activate();
+                else
+                    sysefftype->deactivate();
             }
         }
         return;
@@ -2095,6 +2117,11 @@ Nikita Zlobin
 
 
     bool status;
+    SysEffOn->value(fetchData(0, EFFECT::sysIns::effectEnable, 241, UNUSED, 0));
+    if (SysEffOn->value())
+        sysefftype->activate();
+    else
+        sysefftype->deactivate();
     int efftype = fetchData(0, EFFECT::sysIns::effectType, 241, UNUSED, 0);
     if (efftype > 0)
     {
