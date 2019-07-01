@@ -932,6 +932,7 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
                         default:
                             break;
                     }
+                    break;
                 }
 
                 case CONFIG::control::jackMidiSource:
@@ -998,7 +999,8 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
                             break;
                         default:
                             bankrootchange->value(2);
-                            break;                    }
+                            break;
+                    }
                     break;
 
                 case CONFIG::control::bankCC:

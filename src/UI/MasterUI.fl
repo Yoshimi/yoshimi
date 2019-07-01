@@ -1437,7 +1437,7 @@ Nikita Zlobin
                 sysefftype->value(synth->sysefx[nsyseff]->geteffect());
                 syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
                 syseffectui->UpdatePresetColour(parameter, sysefftype->value());
-                SysEffOn->value(fetchData(0, EFFECT::sysIns::effectEnable, 241, UNUSED, 0));
+                SysEffOn->value(fetchData(0, EFFECT::sysIns::effectEnable, TOPLEVEL::section::systemEffects, UNUSED, 0));
                 if (SysEffOn->value())
                     sysefftype->activate();
                 else
@@ -2117,18 +2117,18 @@ Nikita Zlobin
 
 
     bool status;
-    SysEffOn->value(fetchData(0, EFFECT::sysIns::effectEnable, 241, UNUSED, 0));
+    SysEffOn->value(fetchData(0, EFFECT::sysIns::effectEnable, TOPLEVEL::section::systemEffects, UNUSED, 0));
     if (SysEffOn->value())
         sysefftype->activate();
     else
         sysefftype->deactivate();
-    int efftype = fetchData(0, EFFECT::sysIns::effectType, 241, UNUSED, 0);
+    int efftype = fetchData(0, EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, 0);
     if (efftype > 0)
     {
         status = fetchData(0, 200, TOPLEVEL::section::systemEffects, efftype + EFFECT::type::none, ninseff);
         syseffectui->UpdatePresetColour(status, sysefftype->value());
     }
-    efftype = fetchData(0,EFFECT::sysIns::effectType, 242, UNUSED, 0);
+    efftype = fetchData(0,EFFECT::sysIns::effectType, TOPLEVEL::section::insertEffects, UNUSED, 0);
     if (efftype > 0)
     {
         status = fetchData(0, 200, TOPLEVEL::section::insertEffects, efftype + EFFECT::type::none, ninseff);

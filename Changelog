@@ -3,6 +3,9 @@ yoshimi 1.5.11 M
 2019-7-1 Will
 * Implemented non-destructive system effect on/off.
 * Updated docs.
+* Some code cleanups.
+* Replaced more numbers with labels.
+* Added 0059 Rich Bass to Companion bank
 
 2019-6-27 Will
 * BugFix: GUI not exporting banks.
