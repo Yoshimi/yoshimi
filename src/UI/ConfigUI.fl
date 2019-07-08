@@ -907,33 +907,33 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
                     break;
 
                 case CONFIG::control::historyLock:
-                if (!wasFromHere)
-                {
-                    switch (kititem)
+                    if (!wasFromHere)
                     {
-                        case TOPLEVEL::XML::Instrument:
-                            H_instrument->value(value_int);
-                            break;
-                        case TOPLEVEL::XML::Patch:
-                            H_patchset->value(value_int);
-                            break;
-                        case TOPLEVEL::XML::Scale:
-                            H_scale->value(value_int);
-                            break;
-                        case TOPLEVEL::XML::State:
-                            H_state->value(value_int);
-                            break;
-                        case TOPLEVEL::XML::Vector:
-                            H_vector->value(value_int);
-                            break;
-                        case TOPLEVEL::XML::MLearn:
-                            H_mlearn->value(value_int);
-                            break;
-                        default:
-                            break;
+                        switch (kititem)
+                        {
+                            case TOPLEVEL::XML::Instrument:
+                                H_instrument->value(value_int);
+                                break;
+                            case TOPLEVEL::XML::Patch:
+                                H_patchset->value(value_int);
+                                break;
+                            case TOPLEVEL::XML::Scale:
+                                H_scale->value(value_int);
+                                break;
+                            case TOPLEVEL::XML::State:
+                                H_state->value(value_int);
+                                break;
+                            case TOPLEVEL::XML::Vector:
+                                H_vector->value(value_int);
+                                break;
+                            case TOPLEVEL::XML::MLearn:
+                                H_mlearn->value(value_int);
+                                break;
+                            default:
+                                break;
+                        }
                     }
                     break;
-                }
 
                 case CONFIG::control::jackMidiSource:
                     jackSource->value(miscMsgPop(par2).c_str());

@@ -1,5 +1,8 @@
 yoshimi 1.5.11 M
 
+2019-7-8 Will
+* Resolved potential ambiguity in GUI switch switch exit.
+
 2019-7-1 Will
 * Implemented non-destructive system effect on/off.
 * Updated docs.
