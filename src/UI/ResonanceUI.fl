@@ -504,25 +504,25 @@ class ResonanceUI {: PresetsUI_
     {
         switch(control)
         {
-            case 0:
+            case RESONANCE::control::maxDb:
                 maxdb->value(value);
                 maxdbvo->value(value);
                 break;
 
-            case 1:
+            case RESONANCE::control::centerFrequency:
                 centerfreq->value(value);
                 value = 10000.0 * powf(10.0f, - (1.0f - value / 127.0f) * 2.0f);
                 centerfreqvo->value(value/1000.0);
                 rg->redraw();
                 break;
 
-            case 2:
+            case RESONANCE::control::octaves:
                 octavesfreq->value(value);
                 octavesfreqvo->value(0.25 + 10.0 * value / 127.0);
                 rg->redraw();
                 break;
 
-            case 8:
+            case RESONANCE::control::enableResonance:
                 if (YOSH::F2B(value))
                 {
                     enabled->value(1);
@@ -535,23 +535,23 @@ class ResonanceUI {: PresetsUI_
                 }
                 break;
 
-            case 10:
+            case RESONANCE::control::randomType:
                 resonancewindow->redraw();
                 break;
 
-            case 20:
+            case RESONANCE::control::interpolatePeaks:
                 resonancewindow->redraw();
                 break;
 
-            case 21:
+            case RESONANCE::control::protectFundamental:
                 p1st->value(YOSH::F2B(value));
                 break;
 
-            case 96:
+            case RESONANCE::control::clearGraph:
                 resonancewindow->redraw();
                 break;
 
-            case 97:
+            case RESONANCE::control::smoothGraph:
                 resonancewindow->redraw();
                 break;
 
@@ -562,7 +562,7 @@ class ResonanceUI {: PresetsUI_
 
     if (set)
     {
-        if (eng == 2)
+        if (eng == PART::engine::padSynth)
             redrawPADnoteApply();
     }} {}
   }

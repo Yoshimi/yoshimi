@@ -2285,6 +2285,7 @@ std::string DataText::resolveOscillator(CommandBlock *getData, bool addValue)
 
 std::string DataText::resolveResonance(CommandBlock *getData, bool addValue)
 {
+    int value = int(getData->data.value.F + 0.5f);
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -2293,7 +2294,7 @@ std::string DataText::resolveResonance(CommandBlock *getData, bool addValue)
     unsigned char insert = getData->data.insert;
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
-    addValue = addValue; // suppress warning
+    bool yesno = false;
     std::string name;
     std::string isPad = "";
     if (engine == PART::engine::padSynth)
@@ -2329,23 +2330,42 @@ std::string DataText::resolveResonance(CommandBlock *getData, bool addValue)
 
         case RESONANCE::control::enableResonance:
             contstr = "Enable";
+            yesno = true;
             break;
 
         case RESONANCE::control::randomType:
             contstr = "Random";
+            showValue = false;
+            if (addValue)
+            {
+                if (value == 0)
+                    contstr += " - coarse";
+                else if (value == 1)
+                    contstr += " - medium";
+                else
+                    contstr += " - fine";
+            }
             break;
 
         case RESONANCE::control::interpolatePeaks:
             contstr = "Interpolate Peaks";
+            showValue = false;
+            if (addValue && value == 0)
+                contstr += " - smooth";
+            else
+                contstr += " - linear";
             break;
         case RESONANCE::control::protectFundamental:
             contstr = "Protect Fundamental";
+            yesno = true;
             break;
 
         case RESONANCE::control::clearGraph:
+            showValue = false;
             contstr = "Clear";
             break;
         case RESONANCE::control::smoothGraph:
+            showValue = false;
             contstr = "Smooth";
             break;
 
@@ -2353,7 +2373,17 @@ std::string DataText::resolveResonance(CommandBlock *getData, bool addValue)
             showValue = false;
             contstr = "Unrecognised";
     }
-
+    if(addValue)
+    {
+        if (yesno)
+        {
+            if (value > 0)
+                contstr += " - on";
+            else
+                contstr += " - off";
+            showValue = false;
+        }
+    }
     return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + name + " Resonance " + contstr + isPad);
 }
 
