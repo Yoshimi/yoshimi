@@ -433,7 +433,7 @@ void MidiLearn::generalOperations(CommandBlock *getData)
         learning = false;
         synth->getRuntime().finishedCLI = true;
         synth->getRuntime().Log("Midi Learn cancelled");
-        updateGui(control);
+        updateGui(MIDILEARN::control::cancelLearn);
         return;
     }
 
@@ -456,22 +456,22 @@ void MidiLearn::generalOperations(CommandBlock *getData)
         return;
     }
 
-    if (insert == 0xff) // don't change
+    if (insert == UNUSED) // don't change
         insert = it->min_in;
     else
         lineName = "Min = " + asString(float(insert / 2.0f)) + "%";
 
-    if (parameter == 0xff)
+    if (parameter == UNUSED)
         parameter = it->max_in;
     else
         lineName = "Max = " + asString(float(parameter / 2.0f)) + "%";
 
-    if (kit == 255 || it->CC > 0xff) // might be an NRPN
+    if (kit == UNUSED || it->CC > 0xff) // might be an NRPN
         kit = it->CC; // remember NRPN has a high bit set
     else
         lineName = "CC = " + to_string(int(kit));
 
-    if (engine == 255)
+    if (engine == UNUSED)
         engine = it->chan;
     else
     {
@@ -747,12 +747,12 @@ void MidiLearn::updateGui(int opp)
     if (!synth->getRuntime().showGui)
         return;
     CommandBlock putData;
-    if (opp == 21)
+    if (opp == MIDILEARN::control::sendLearnMessage)
     {
         putData.data.control = MIDILEARN::control::sendLearnMessage;
         putData.data.par2 = miscMsgPush("Learning " + learnedName);
     }
-    else if (opp == 255)
+    else if (opp == MIDILEARN::control::cancelLearn)
     {
         putData.data.control = MIDILEARN::control::cancelLearn;
         putData.data.par2 = NO_MSG;
@@ -761,16 +761,13 @@ void MidiLearn::updateGui(int opp)
     {
         putData.data.control = MIDILEARN::control::clearAll;
         putData.data.par2 = NO_MSG;
-        if (opp == 2)
-        {
-            putData.data.part = TOPLEVEL::section::midiLearn;
-            putData.data.kit = 2; // close editing window
-        }
+        if (opp == MIDILEARN::control::hideGUI)
+            return;
     }
     putData.data.value.F = 0;
     writeToGui(&putData);
 
-    if (opp > 2) // sending back message gui
+    if (opp >= MIDILEARN::control::hideGUI) // just sending back gui message
         return;
 
     int lineNo = 0;
@@ -798,7 +795,7 @@ void MidiLearn::updateGui(int opp)
         ++it;
         ++lineNo;
     }
-    if (opp == 1 && synth->getRuntime().showLearnedCC == true) // open the gui editing window
+    if (opp == MIDILEARN::control::showGUI && synth->getRuntime().showLearnedCC == true) // open the gui editing window
     {
         putData.data.control = MIDILEARN::control::sendRefreshRequest;
         writeToGui(&putData);

@@ -802,7 +802,7 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
                 synth->setAllPartMaps();
             bool oklearn = synth->midilearn.extractMidiListData(false, xml);
             if (oklearn)
-                synth->midilearn.updateGui(2);
+                synth->midilearn.updateGui(MIDILEARN::control::hideGUI);
                 // handles possibly undefined window
         }
     }

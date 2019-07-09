@@ -1,5 +1,8 @@
 yoshimi 1.5.11 M
 
+2019-7-9 Will
+* NRPN for load from history now includes MIDI learn.
+
 2019-7-8 Will
 * Resolved potential ambiguity in GUI switch switch exit.
 

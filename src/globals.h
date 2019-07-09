@@ -359,6 +359,8 @@ namespace MIDILEARN // usage MIDILEARN::control::block
         ignoreMove,
         deleteLine,
         nrpnDetected,
+        showGUI = 14,
+        hideGUI,
         CCorChannel = 16, // should probably split these
         findSize = 20, // not used yet
         sendLearnMessage, // currently GUI only

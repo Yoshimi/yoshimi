@@ -303,6 +303,15 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     control = MAIN::control::loadNamedVector;
                     break;
                 }
+                case TOPLEVEL::XML::MLearn:
+                { // this is a bit messy MIDI learn is an edge case
+                    getData->data.control = MIDILEARN::control::loadList;
+                    synth->midilearn.generalOperations(getData);
+                    synth->Unmute();
+                    __sync_and_and_fetch(&blockRead, 0xfd);
+                    return;
+                    break;
+                }
             }
             getData->data.control = control;
         }
