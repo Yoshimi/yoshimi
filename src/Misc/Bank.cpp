@@ -85,33 +85,18 @@ string Bank::getRootFileTitle()
 // Get the name of an instrument from the bank
 string Bank::getname(unsigned int ninstrument, size_t bank, size_t root)
 {
-    if (root == UNUSED)
-        root = synth->getRuntime().currentRoot;
-    if (bank == UNUSED)
-        bank = synth->getRuntime().currentBank;
     if (emptyslotWithID(root, bank, ninstrument))
         return defaultinsname;
     return getInstrumentReference(root, bank, ninstrument).name;
 }
 
 
-// Get the full path of an instrument from the current bank
-string Bank::getfilename(unsigned int ninstrument)
-{
-    string fname = "";
-
-    if (!emptyslot(ninstrument))
-        fname = getFullPath(synth->getRuntime().currentRoot, synth->getRuntime().currentBank, ninstrument);
-    return fname;
-}
-
-
 // Get the numbered name of an instrument from the bank
-string Bank::getnamenumbered(unsigned int ninstrument)
+string Bank::getnamenumbered(unsigned int ninstrument, size_t bank, size_t root)
 {
     if (emptyslot(ninstrument))
         return defaultinsname;
-    string strRet = asString(ninstrument + 1) + ". " + getname(ninstrument);
+    string strRet = asString(ninstrument + 1) + ". " + getname(ninstrument, bank, root);
     return strRet;
 }
 
@@ -198,7 +183,7 @@ std::string Bank::clearslot(unsigned int ninstrument, size_t rootID, size_t bank
     tmpfile = FileMgr::setExtension(tmpfile, EXTEN::zynInst);
     if (FileMgr::isRegFile(tmpfile))
         chk2 = FileMgr::deleteFile(tmpfile);
-    std::string instName = getname(ninstrument);
+    std::string instName = getname(ninstrument, bankID, rootID);
     std::string result;
     if (chk && chk2)
     {

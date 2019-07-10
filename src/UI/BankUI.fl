@@ -113,12 +113,11 @@ class BankSlot {: {public Fl_Button, BankProcess_}
         labelfont(0);
         labelsize(13);
         align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE|FL_ALIGN_CLIP);
-        highlight = 0;
-        refresh();} {}
+        highlight = 0;} {}
   }
-  Function {refresh()} {} {
+  Function {refresh(int bk, int rt)} {} {
     code {//
-    string instrName = bank->getnamenumbered(nslot);
+    string instrName = bank->getnamenumbered(nslot, bk, rt);
     copy_label(instrName.c_str());
     if (bank->engines_used(nslot) & 8)
         labelcolor(YOSHI_COLOUR);
@@ -301,8 +300,11 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         const BankEntry &bankEntry = bank->getBank(nbank);
         if (!bank->setCurrentBankID(nbank))
             fl_alert("Error: Could not load the bank from the directory\\n%s.", bankEntry.dirname.c_str());
+
+        int bk = fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank);
+        int rt = fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank);
         for (int i = 0; i < BANK_SIZE; ++i)
-            bs[i]->refresh();
+            bs[i]->refresh(bk, rt);
         refreshmainwindow();}
         xywh {5 8 199 20} down_box BORDER_BOX selection_color 7 labelfont 1 labelsize 12 align 0 textsize 12
       } {}
@@ -793,6 +795,11 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         type |= TOPLEVEL::type::Write;
         collect_data(synth, value, action, type, control, part, kititem, engine, insert, parameter, par2);} {}
   }
+  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED, int request = UNUSED)} {return_type float
+  } {
+    code {//
+        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, par2, request);} {}
+  }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
     //int value_int = getData->data.value.F;
@@ -895,7 +902,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
     code {//
         int slot = this->slot;
         int curPart = synth->getRuntime().currentPart;
-        string thisname =  bank->getname(slot);
+        string thisname =  bank->getname(slot, fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank), fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank));
         if ((what == 1 || what == 3) && mode == 1 && !bank->emptyslot(slot))
         {
             if (synth->getGuiMaster()->activePart == UNUSED)
@@ -1156,14 +1163,16 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
     code {//
     instrumentuiwindow->copy_label(bank->getBankFileTitle().c_str());
     bankuiwindow->copy_label(bank->getRootFileTitle().c_str());
+    int bk = fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank);
+    int rt = fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank);
     for (int i = 0; i < BANK_SIZE; ++i)
-        bs[i]->refresh();
+        bs[i]->refresh(bk, rt);
     for (int i = 0; i < ROOT_SIZE; ++i)
         rs[i]->rootrefresh();} {}
   }
-  Function {refreshbankslot(int ins)} {} {
+  Function {refreshbankslot(int ins, int bk, int rt)} {} {
     code {//
-bs[ins]->refresh();} {}
+        bs[ins]->refresh(bk, rt);} {}
   }
   Function {removeselection()} {} {
     code {//
@@ -1171,7 +1180,7 @@ bs[ins]->refresh();} {}
         {
             int ns = nselected;
             nselected = -1;
-            bs[ns]->refresh();
+            bs[ns]->refresh(fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank), fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank));
         }
         if (rselected >= 0)
         {
@@ -1187,14 +1196,14 @@ bs[ins]->refresh();} {}
     {
         bank->rescanforbanks();
     }
-    const BankEntryMap &banks = bank->getBanks(synth->getRuntime().currentRoot);
+    const BankEntryMap &banks = bank->getBanks(fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank));
     BankEntryMap::const_iterator it;
     for (it = banks.begin(); it != banks.end(); ++it)
     {
         if (!it->second.dirname.empty())
         {
             int n = banklist->add((asString(it->first) + ". " + it->second.dirname).c_str(), (const char *)0, (Fl_Callback*)0, reinterpret_cast<void *>(it->first));
-            if(it->first == synth->getRuntime().currentBank)
+            if(it->first == fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank))
             {
                 banklist->value(n); // ensure correct bank in list
             }
@@ -1204,7 +1213,7 @@ bs[ins]->refresh();} {}
   }
   Function {set_bank_slot()} {} {
     code {//
-    size_t curID = synth->getRuntime().currentBank;
+    size_t curID = fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank);
     const Fl_Menu_Item *curItem = 0;
     for(int i = 0; i < banklist->size(); i++)
     {
@@ -1253,7 +1262,7 @@ bs[ins]->refresh();} {}
         if (!it->second.path.empty())
         {
             tmp = asString(it->first) + ". " + it->second.path;
-            if(it->first == synth->getRuntime().currentRoot)
+            if(it->first == fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank))
             {
                 tmp += " *";
             }

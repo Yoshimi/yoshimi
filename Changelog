@@ -1,6 +1,11 @@
 yoshimi 1.5.11 M
 
 2019-7-9 Will
+* Implimented formal calls to read current root and bank.
+* All instrument name bank calls now require root and bank.
+  current values no longer assumed.
+
+2019-7-9 Will
 * NRPN for load from history now includes MIDI learn.
 * Found more magic numbers to convert in Resonance.
 * Improved Resonance CLI responses.

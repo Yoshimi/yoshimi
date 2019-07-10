@@ -99,6 +99,7 @@ class InterChange : private FileMgr, DataText
         void commandMicrotonal(CommandBlock *getData);
         void commandConfig(CommandBlock *getData);
         void commandMain(CommandBlock *getData);
+        void commandBank(CommandBlock *getData);
         void commandPart(CommandBlock *getData);
         void commandAdd(CommandBlock *getData);
         void commandAddVoice(CommandBlock *getData);

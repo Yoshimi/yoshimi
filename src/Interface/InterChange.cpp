@@ -1506,6 +1506,14 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         __sync_and_and_fetch(&blockRead, 2);
         return true;
     }
+    if (npart == TOPLEVEL::section::bank)
+    {
+        commandBank(getData);
+        __sync_and_and_fetch(&blockRead, 2);
+        return true;
+    }
+
+
     if ((npart == TOPLEVEL::section::systemEffects || npart == TOPLEVEL::section::insertEffects) && kititem == UNUSED)
     {
         commandSysIns(getData);
@@ -2706,6 +2714,34 @@ void InterChange::commandMain(CommandBlock *getData)
 
         case 254:
             synth->Mute();
+            getData->data.source = TOPLEVEL::action::noAction;
+            break;
+    }
+
+    if (!write)
+        getData->data.value.F = value;
+}
+
+
+void InterChange::commandBank(CommandBlock *getData)
+{
+    float value = getData->data.value.F;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+
+    bool write = (type & TOPLEVEL::type::Write) > 0;
+    if (write)
+        __sync_or_and_fetch(&blockRead, 1);
+
+    switch (control)
+    {
+        case BANK::control::selectBank:
+            value = synth->getRuntime().currentBank; // currently read only
+            break;
+        case BANK::control::selectRoot:
+            value = synth->getRuntime().currentRoot; // currently read only
+            break;
+        default:
             getData->data.source = TOPLEVEL::action::noAction;
             break;
     }
