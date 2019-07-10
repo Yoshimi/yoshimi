@@ -206,12 +206,12 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 {
     samplerate_f = samplerate = audiosrate;
     halfsamplerate_f = samplerate_f / 2;
-    buffersize_f = buffersize = Runtime.Buffersize;
-    if (buffersize_f > audiobufsize)
-        buffersize_f = audiobufsize;
-     // because its now *groups* of audio buffers.
-    sent_all_buffersize_f = buffersize_f;
 
+    buffersize = Runtime.Buffersize;
+    if (buffersize > audiobufsize)
+        buffersize = audiobufsize;
+    buffersize_f = buffersize;
+    sent_all_buffersize_f = buffersize_f;
     bufferbytes = buffersize * sizeof(float);
 
     oscilsize_f = oscilsize = Runtime.Oscilsize;
