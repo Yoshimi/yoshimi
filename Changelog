@@ -1,5 +1,9 @@
 yoshimi 1.5.11 M
 
+2019-7-14 Will
+ * Revised LV2 code Re. buffer sizes.
+ * Included corrected full explanation in code.
+
 2019-7-10 Will
 * Implimented formal calls to read current root and bank.
 * All instrument name bank calls now require root and bank.
