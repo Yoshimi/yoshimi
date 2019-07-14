@@ -5,6 +5,8 @@ yoshimi 1.5.11 M
  * Included corrected full explanation in code.
  * Made more bank calls require root and bank.
  * Further bank refinements and removed redundant code.
+ * Partially resolved LV2, Carla/Ardour now consistent.
+ * Updated /Miscellany/Images.
 
 2019-7-10 Will
 * Implimented formal calls to read current root and bank.

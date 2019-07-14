@@ -45,6 +45,7 @@
 
 #define YOSHIMI_LV2_BUF_SIZE__maxBlockLength      YOSHIMI_LV2_BUF_SIZE_PREFIX "maxBlockLength"
 #define YOSHIMI_LV2_BUF_SIZE__minBlockLength      YOSHIMI_LV2_BUF_SIZE_PREFIX "minBlockLength"
+#define YOSHIMI_LV2_BUF_SIZE__nominalBlockLength      YOSHIMI_LV2_BUF_SIZE_PREFIX "nominalBlockLength"
 
 #define YOSHIMI_LV2_OPTIONS_URI    "http://lv2plug.in/ns/ext/options"
 #define YOSHIMI_LV2_OPTIONS_PREFIX YOSHIMI_LV2_OPTIONS_URI "#"
@@ -111,18 +112,13 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     {
         return;
     }
-    //synth->sent_all_buffersize_f = min(sample_count, (uint32_t)synth->buffersize);
+
     /*
      * Our implimentation of LV2 has a problem with envelopes. In general
      * the bigger the buffer size the shorter the envelope, and whichever
      * is the smallest (host size or Yoshimi size) determines the time.
      *
      * However, Yoshimi is always correct when working standalone.
-     *
-     * The commented out code above causes envelopes in Carla to be much
-     * too *long* and variable. However, without it Ardour produces very
-     * short envelopes if Yoshimi's buffer is large, *regardless* of
-     * Ardour's buffer size.
      */
 
     int offs = 0;
@@ -297,6 +293,7 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
         ++features;
     }
 
+    uint32_t nomBufSize = 0;
     if (_uridMap.map != NULL && options != NULL)
     {
         _midi_event_id = _uridMap.map(_uridMap.handle, LV2_MIDI__MidiEvent);
@@ -304,6 +301,7 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
         _atom_string_id = _uridMap.map(_uridMap.handle, LV2_ATOM__String);
         LV2_URID maxBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__maxBlockLength);
         LV2_URID minBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__minBlockLength);
+        LV2_URID nomBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__nominalBlockLength);
         LV2_URID atomInt = _uridMap.map(_uridMap.handle, LV2_ATOM__Int);
         _atom_type_chunk = _uridMap.map(_uridMap.handle, LV2_ATOM__Chunk);
         _atom_type_sequence = _uridMap.map(_uridMap.handle, LV2_ATOM__Sequence);
@@ -320,12 +318,17 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
                     if (_bufferSize < bufSz)
                         _bufferSize = bufSz;
                 }
+                if (options->key == nomBufSz && options->type == atomInt)
+                    nomBufSize = *static_cast<const uint32_t *>(options->value);
             }
             ++options;
         }
     }
 
-    if (_bufferSize == 0)
+    //_synth->getRuntime().Log("Buffer size " + to_string(nomBufSize));;
+    if (nomBufSize > 0)
+        _bufferSize = nomBufSize;
+    else if (_bufferSize == 0)
         _bufferSize = MAX_BUFFER_SIZE;
 }
 
