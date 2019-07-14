@@ -494,7 +494,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
     Fl_Window bankuiwindow {
       label Root
       xywh {84 223 775 575} type Double labelsize 12 hide
-      code0 {o->copy_label(bank->getRootFileTitle().c_str());}
+      code0 {o->copy_label(bank->getRootFileTitle(fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank)).c_str());}
       code1 {if (synth->getUniqueId() == 0) rootmodeselect->show();}
     } {
       Fl_Button {} {
@@ -1161,10 +1161,13 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
   }
   Function {refreshmainwindow()} {} {
     code {//
-    instrumentuiwindow->copy_label(bank->getBankFileTitle().c_str());
-    bankuiwindow->copy_label(bank->getRootFileTitle().c_str());
     int bk = fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank);
     int rt = fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank);
+
+    instrumentuiwindow->copy_label(bank->getBankFileTitle(rt, bk).c_str());
+
+    bankuiwindow->copy_label(bank->getRootFileTitle(rt).c_str());
+
     for (int i = 0; i < BANK_SIZE; ++i)
         bs[i]->refresh(bk, rt);
     for (int i = 0; i < ROOT_SIZE; ++i)

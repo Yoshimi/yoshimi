@@ -154,8 +154,8 @@ class Bank : private MiscFuncs, FileMgr
         const RootEntryMap &getRoots();
         const BankEntry &getBank(size_t bankID);
 
-        string getBankFileTitle();
-        string getRootFileTitle();
+        string getBankFileTitle(size_t root, size_t bank);
+        string getRootFileTitle(size_t root);
         int InstrumentsInBanks;
         int BanksInRoots;
 

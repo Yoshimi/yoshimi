@@ -70,15 +70,15 @@ Bank::~Bank()
 }
 
 
-string Bank::getBankFileTitle()
+string Bank::getBankFileTitle(size_t root, size_t bank)
 {
-    return synth->makeUniqueName("Root " + asString(synth->getRuntime().currentRoot) + ", Bank " + asString(synth->getRuntime().currentBank) + " - " + getBankPath(synth->getRuntime().currentRoot, synth->getRuntime().currentBank));
+    return synth->makeUniqueName("Root " + asString(root) + ", Bank " + asString(bank) + " - " + getBankPath(root, bank));
 }
 
 
-string Bank::getRootFileTitle()
+string Bank::getRootFileTitle(size_t root)
 {
-    return synth->makeUniqueName("Root " + asString(synth->getRuntime().currentRoot) + " - " + getRootPath(synth->getRuntime().currentRoot));
+    return synth->makeUniqueName("Root " + asString(root) + " - " + getRootPath(root));
 }
 
 
