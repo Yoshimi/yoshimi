@@ -4,6 +4,7 @@ yoshimi 1.5.11 M
  * Revised LV2 code Re. buffer sizes.
  * Included corrected full explanation in code.
  * Made more bank calls require root and bank.
+ * Further bank refinements and removed redundant code.
 
 2019-7-10 Will
 * Implimented formal calls to read current root and bank.

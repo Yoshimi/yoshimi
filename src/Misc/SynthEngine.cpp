@@ -1145,7 +1145,7 @@ void SynthEngine::ListInstruments(int bankNum, list<string>& msg_buf)
                             + "/" + bank.roots [root].banks [bankNum].dirname);
             for (int idx = 0; idx < BANK_SIZE; ++ idx)
             {
-                if (!bank.emptyslotWithID(root, bankNum, idx))
+                if (!bank.emptyslot(root, bankNum, idx))
                 {
                     string suffix = "";
                     if (bank.roots [root].banks [bankNum].instruments [idx].ADDsynth_used)

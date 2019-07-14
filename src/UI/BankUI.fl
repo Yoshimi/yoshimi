@@ -119,12 +119,12 @@ class BankSlot {: {public Fl_Button, BankProcess_}
     code {//
     string instrName = bank->getnamenumbered(nslot, bk, rt);
     copy_label(instrName.c_str());
-    if (bank->engines_used(nslot) & 8)
+    rootID = rt;
+    bankID = bk;
+    if (bank->engines_used(rt, bk, nslot) & 8)
         labelcolor(YOSHI_COLOUR);
-        //labelfont(FL_TIMES_ITALIC);
     else
-        labelcolor(0);
-        //labelfont(FL_HELVETICA);} {}
+        labelcolor(0);} {}
   }
   decl {int *what, *whatslot, nslot, highlight, *nselected;} {private local
   }
@@ -141,14 +141,14 @@ class BankSlot {: {public Fl_Button, BankProcess_}
     if (type() == FL_HIDDEN_BUTTON) return;
     int acol, scol, pcol, bcol;
     int wid = w() * 0.334;
-    int engine = bank->engines_used(nslot);
+    int engine = bank->engines_used(rootID, bankID, nslot);
     if (*nselected == nslot)
     {
         acol = 6;
         scol = 6;
         pcol = 6;
     }
-    else if(bank->emptyslot(nslot))
+    else if(bank->emptyslot(rootID, bankID, nslot))
     {
         if (nslot < 128)
         {
@@ -203,6 +203,10 @@ class BankSlot {: {public Fl_Button, BankProcess_}
         draw_label();
 
     if (Fl::focus() == this) draw_focus();} {}
+  }
+  decl {int rootID;} {private local
+  }
+  decl {int bankID;} {private local
   }
 }
 
@@ -301,8 +305,8 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         if (!bank->setCurrentBankID(nbank))
             fl_alert("Error: Could not load the bank from the directory\\n%s.", bankEntry.dirname.c_str());
 
-        int bk = fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank);
         int rt = fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank);
+        int bk = fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank);
         for (int i = 0; i < BANK_SIZE; ++i)
             bs[i]->refresh(bk, rt);
         refreshmainwindow();}
@@ -902,8 +906,11 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
     code {//
         int slot = this->slot;
         int curPart = synth->getRuntime().currentPart;
-        string thisname =  bank->getname(slot, fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank), fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank));
-        if ((what == 1 || what == 3) && mode == 1 && !bank->emptyslot(slot))
+        int rt = fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank);
+        int bk = fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank);
+        bool slotFilled = !bank->emptyslot(rt, bk, slot);
+        string thisname =  bank->getname(slot, bk, rt);
+        if ((what == 1 || what == 3) && mode == 1 && slotFilled)
         {
             if (synth->getGuiMaster()->activePart == UNUSED)
             {
@@ -917,7 +924,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
             return;
         }
 
-        if (mode == 5 && !bank->emptyslot(slot))
+        if (mode == 5 && slotFilled)
         {   // Rename slot
             const char *newname = fl_input("Instrument name:", thisname.c_str());
             if (newname)
@@ -951,7 +958,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
                 setread();
                 doit = false;
             }
-            else if (!bank->emptyslot(slot))
+            else if (slotFilled)
             {
                 if (fl_choice("Overwrite the slot no. %d ?", NULL, "No", "Yes", slot + 1) < 2)
                 {
@@ -966,7 +973,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
             }
         }
 
-        if (mode == 3 && !bank->emptyslot(slot))
+        if (mode == 3 && slotFilled)
         {   // Clears the slot (choices reversed for 'No' priority)
             if (fl_choice("Clear the slot no. %d ?", NULL, "No", "Yes", slot + 1) > 1)
                 send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::deleteInstrument, slot, TOPLEVEL::type::Write, TOPLEVEL::section::bank);

@@ -115,9 +115,8 @@ class Bank : private MiscFuncs, FileMgr
         bool setname(unsigned int ninstrument, string newname, int newslot, size_t oldBank = 0xff, size_t newBank = 0xff, size_t oldRoot = 0xff, size_t newRoot = 0xff);
              // if newslot==-1 then this is ignored, else it will be put on that slot
 
-        int engines_used(unsigned int ninstrument);
-        bool emptyslotWithID(size_t rootID, size_t bankID, unsigned int ninstrument);
-        bool emptyslot(unsigned int ninstrument);
+        int engines_used(size_t rootID, size_t bankID, unsigned int ninstrument);
+        bool emptyslot(size_t rootID, size_t bankID, unsigned int ninstrument);
         std::string clearslot(unsigned int ninstrument, size_t rootID, size_t bankID);
         bool savetoslot(size_t rootID, size_t bankID, int ninstrument, int npart);
         std::string swapslot(unsigned int n1, unsigned int n2, size_t bank1 = 0xff, size_t bank2 = 0xff, size_t root1 = 0xff, size_t root2 = 0xff);
@@ -177,7 +176,6 @@ class Bank : private MiscFuncs, FileMgr
         RootEntryMap  roots;
         BankHintsMap hints;
 
-        InstrumentEntry &getInstrumentReference(size_t ninstrument );
         InstrumentEntry &getInstrumentReference(size_t rootID, size_t bankID, size_t ninstrument );
 
         void addDefaultRootDirs();

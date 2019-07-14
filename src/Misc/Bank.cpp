@@ -85,7 +85,7 @@ string Bank::getRootFileTitle(size_t root)
 // Get the name of an instrument from the bank
 string Bank::getname(unsigned int ninstrument, size_t bank, size_t root)
 {
-    if (emptyslotWithID(root, bank, ninstrument))
+    if (emptyslot(root, bank, ninstrument))
         return defaultinsname;
     return getInstrumentReference(root, bank, ninstrument).name;
 }
@@ -94,7 +94,7 @@ string Bank::getname(unsigned int ninstrument, size_t bank, size_t root)
 // Get the numbered name of an instrument from the bank
 string Bank::getnamenumbered(unsigned int ninstrument, size_t bank, size_t root)
 {
-    if (emptyslot(ninstrument))
+    if (emptyslot(root, bank, ninstrument))
         return defaultinsname;
     string strRet = asString(ninstrument + 1) + ". " + getname(ninstrument, bank, root);
     return strRet;
@@ -113,7 +113,7 @@ bool Bank::setname(unsigned int ninstrument, string newname, int newslot, size_t
     if (newRoot == UNUSED)
         newRoot = oldRoot;
 
-    if (emptyslotWithID(oldRoot, oldBank, ninstrument))
+    if (emptyslot(oldRoot, oldBank, ninstrument))
         return false;
 
     string newfilepath = getBankPath(newRoot, newBank);
@@ -149,7 +149,7 @@ bool Bank::setname(unsigned int ninstrument, string newname, int newslot, size_t
 
 
 // Check if there is no instrument on a slot from the bank
-bool Bank::emptyslotWithID(size_t rootID, size_t bankID, unsigned int ninstrument)
+bool Bank::emptyslot(size_t rootID, size_t bankID, unsigned int ninstrument)
 {
     if(roots.count(rootID) == 0 || roots [rootID].banks.count(bankID) == 0)
         return true;
@@ -162,18 +162,12 @@ bool Bank::emptyslotWithID(size_t rootID, size_t bankID, unsigned int ninstrumen
 }
 
 
-bool Bank::emptyslot(unsigned int ninstrument)
-{
-    return emptyslotWithID(synth->getRuntime().currentRoot, synth->getRuntime().currentBank, ninstrument);
-}
-
-
 // Removes the instrument from the bank
 std::string Bank::clearslot(unsigned int ninstrument, size_t rootID, size_t bankID)
 {
     bool chk = true;
     bool chk2 = true; // to stop complaints
-    if (emptyslot(ninstrument)) // this is not an error
+    if (emptyslot(rootID, bankID, ninstrument)) // this is not an error
         return (". None found at slot " + to_string(ninstrument + 1));
 
     std::string tmpfile = FileMgr::setExtension(getFullPath(rootID, bankID, ninstrument), EXTEN::yoshInst);
@@ -718,12 +712,12 @@ std::string Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_
     string message = "";
     bool ok = true;
 
-    if (emptyslotWithID(root1, bank1, n1) && emptyslotWithID(root2, bank2, n2))
+    if (emptyslot(root1, bank1, n1) && emptyslot(root2, bank2, n2))
         return " Nothing to swap!";
 
-    if (emptyslotWithID(root1, bank1, n1) || emptyslotWithID(root2, bank2, n2))
+    if (emptyslot(root1, bank1, n1) || emptyslot(root2, bank2, n2))
     { // this is just a movement to an empty slot
-        if (emptyslotWithID(root1, bank1, n1)) // make the empty slot the destination
+        if (emptyslot(root1, bank1, n1)) // make the empty slot the destination
         {
             if (!setname(n2, getname(n2, bank2, root2), n1, bank2, bank1, root2, root1))
             {
@@ -1074,7 +1068,7 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
         else
         {
             pos = BANK_SIZE-1;
-            while (!emptyslotWithID(rootID, bankID, pos))
+            while (!emptyslot(rootID, bankID, pos))
             {
                 pos -= 1;
                 if(pos < 0)
@@ -1152,11 +1146,6 @@ size_t Bank::add_bank(string name, string , size_t rootID)
     return newIndex;
 }
 
-
-InstrumentEntry &Bank::getInstrumentReference(size_t ninstrument)
-{
-    return getInstrumentReference(synth->getRuntime().currentRoot, synth->getRuntime().currentBank, ninstrument);
-}
 
 InstrumentEntry &Bank::getInstrumentReference(size_t rootID, size_t bankID, size_t ninstrument)
 {
@@ -1318,12 +1307,12 @@ const BankEntry &Bank::getBank(size_t bankID)
 }
 
 
-int Bank::engines_used(unsigned int ninstrument)
+int Bank::engines_used(size_t rootID, size_t bankID, unsigned int ninstrument)
 {
-    int tmp = getInstrumentReference(ninstrument).ADDsynth_used
-            | (getInstrumentReference(ninstrument).SUBsynth_used << 1)
-            | (getInstrumentReference(ninstrument).PADsynth_used << 2)
-            | (getInstrumentReference(ninstrument).yoshiType << 3);
+    int tmp = getInstrumentReference(rootID, bankID, ninstrument).ADDsynth_used
+            | (getInstrumentReference(rootID, bankID, ninstrument).SUBsynth_used << 1)
+            | (getInstrumentReference(rootID, bankID, ninstrument).PADsynth_used << 2)
+            | (getInstrumentReference(rootID, bankID, ninstrument).yoshiType << 3);
     return tmp;
 }
 
