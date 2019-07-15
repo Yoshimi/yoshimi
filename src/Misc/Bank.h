@@ -112,15 +112,15 @@ class Bank : private MiscFuncs, FileMgr
         ~Bank();
         string getname(unsigned int ninstrument, size_t bank, size_t root);
         string getnamenumbered(unsigned int ninstrument, size_t bank, size_t root);
-        bool setname(unsigned int ninstrument, string newname, int newslot, size_t oldBank = 0xff, size_t newBank = 0xff, size_t oldRoot = 0xff, size_t newRoot = 0xff);
+        bool setname(unsigned int ninstrument, string newname, int newslot, size_t oldBank, size_t newBank, size_t oldRoot, size_t newRoot);
              // if newslot==-1 then this is ignored, else it will be put on that slot
 
         int engines_used(size_t rootID, size_t bankID, unsigned int ninstrument);
         bool emptyslot(size_t rootID, size_t bankID, unsigned int ninstrument);
         std::string clearslot(unsigned int ninstrument, size_t rootID, size_t bankID);
         bool savetoslot(size_t rootID, size_t bankID, int ninstrument, int npart);
-        std::string swapslot(unsigned int n1, unsigned int n2, size_t bank1 = 0xff, size_t bank2 = 0xff, size_t root1 = 0xff, size_t root2 = 0xff);
-        std::string swapbanks(unsigned int firstID, unsigned int secondID, size_t firstRoot = 0xff, size_t secondRoot= 0xff);
+        std::string swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t bank2, size_t root1, size_t root2);
+        std::string swapbanks(unsigned int firstID, unsigned int secondID, size_t firstRoot, size_t secondRoot);
         string getBankName(int bankID, size_t rootID = 0xff);
         string getBankIDname(int bankID);
         bool isDuplicateBankName(size_t rootID, string name);
@@ -151,7 +151,7 @@ class Bank : private MiscFuncs, FileMgr
 
         const BankEntryMap &getBanks(size_t rootID);
         const RootEntryMap &getRoots();
-        const BankEntry &getBank(size_t bankID);
+        const BankEntry &getBank(size_t bankID, size_t rootID = UNUSED);
 
         string getBankFileTitle(size_t root, size_t bank);
         string getRootFileTitle(size_t root);

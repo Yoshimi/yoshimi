@@ -1,5 +1,8 @@
 yoshimi 1.5.11 M
 
+2019-7-15
+* Made more bank calls require root and bank.
+
 2019-7-14 Will
  * Revised LV2 code Re. buffer sizes.
  * Included corrected full explanation in code.

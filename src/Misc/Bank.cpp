@@ -104,15 +104,6 @@ string Bank::getnamenumbered(unsigned int ninstrument, size_t bank, size_t root)
 // Changes the name of an instrument (and the filename)
 bool Bank::setname(unsigned int ninstrument, string newname, int newslot, size_t oldBank, size_t newBank, size_t oldRoot, size_t newRoot)
 {
-    if (oldBank == UNUSED)
-        oldBank = synth->getRuntime().currentBank;
-    if (oldRoot == UNUSED)
-        oldRoot = synth->getRuntime().currentRoot;
-    if (newBank == UNUSED)
-        newBank = oldBank;
-    if (newRoot == UNUSED)
-        newRoot = oldRoot;
-
     if (emptyslot(oldRoot, oldBank, ninstrument))
         return false;
 
@@ -691,16 +682,7 @@ std::string Bank::removebank(unsigned int bankID, size_t rootID)
 std::string Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t bank2, size_t root1, size_t root2)
 {
     if (n1 == n2 && bank1 == bank2 && root1 == root2)
-
         return " Can't swap with itself!";
-    if (bank1 == UNUSED)
-        bank1 = synth->getRuntime().currentBank;
-    if (bank2 == UNUSED)
-        bank2 = bank1;
-    if (root1 == UNUSED)
-        root1 = synth->getRuntime().currentRoot;
-    if (root2 == UNUSED)
-        root2 = root1;
 
     //std::cout << "first " << getname(n1, bank1, root1) << "   second " << getname(n2, bank2, root2) << endl;
     /*
@@ -795,13 +777,7 @@ std::string Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t 
     std::string secondname;
     int moveType = 0;
 
-    if (firstRoot > 0x7f)
-        firstRoot = synth->getRuntime().currentRoot;
-    if (secondRoot > 0x7f)
-        secondRoot = firstRoot;
-
     if (firstID == secondID && firstRoot == secondRoot)
-
         return " Can't swap with itself!";
 
     firstname = getBankName(firstID, firstRoot);
@@ -1301,9 +1277,11 @@ const RootEntryMap &Bank::getRoots()
 }
 
 
-const BankEntry &Bank::getBank(size_t bankID)
+const BankEntry &Bank::getBank(size_t bankID, size_t rootID)
 {
-    return roots [synth->getRuntime().currentRoot].banks [bankID];
+    if (rootID == UNUSED)
+        rootID = synth->getRuntime().currentRoot;
+    return roots[rootID].banks[bankID];
 }
 
 

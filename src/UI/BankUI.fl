@@ -933,7 +933,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
                     fl_alert("Can't use name of default sound");
                 else if (strlen(newname) > 3)
                 {
-                    if (!bank->setname(slot, string(newname), -1))
+                    if (!bank->setname(slot, string(newname), slot, bk, bk, rt, rt))
                     {
                         setread();
                         fl_alert("Could not rename instrument %d to %s", slot, newname);
@@ -1003,12 +1003,13 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
   } {
     code {//
     unsigned int slot = this->slot;
-    string thisname = bank->getBankName(slot);
+    int rt = fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank);
+    string thisname = bank->getBankName(slot, rt);
 
     if ((what == 1 || what == 3) && r_mode == 1 && !thisname.empty())
     {
         // Selects from slot
-        const BankEntry &bankEntry = bank->getBank(slot);
+        const BankEntry &bankEntry = bank->getBank(slot, rt);
 
         if (!bank->setCurrentBankID(slot))
         {
