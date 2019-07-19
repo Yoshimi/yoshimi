@@ -1,6 +1,10 @@
 yoshimi 1.5.11 M
 
-2019-7-15
+2019-7-19 Will
+* Temporary install of provisional 1.6.0 manual
+  but named as 1.5.12
+
+2019-7-15 Will
 * Made more bank calls require root and bank.
 
 2019-7-14 Will

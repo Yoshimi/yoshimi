@@ -712,7 +712,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     std::string manfile = synth->manualname();
                     unsigned int pos = manfile.rfind(".") + 1;
                     int wanted = std::stoi(manfile.substr(pos, 3));
-                    int count = wanted + 1;
+                    int count = wanted + 2;
                     manfile = manfile.substr(0, pos);
                     std::string path = "";
                     while (path == "" && count >= 0) // scan current then older varsions
@@ -724,7 +724,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                         if (path == "")
                         path = findfile("/home/", (manfile + std::to_string(count)).c_str(), "pdf");
                     }
-
+                    std::cout << "man " << manfile << "\npath " << path << std::endl;
                     if (path == "")
                         text = "Can't find manual :(";
                     else if (count < wanted)
