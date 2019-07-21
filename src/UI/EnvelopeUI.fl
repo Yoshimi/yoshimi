@@ -226,20 +226,20 @@ return(nearestpoint);} {}
         string valDesc;
         float val = (float) env->Penvval[currentpoint];
         switch(env->Envmode){
-            case 1: //linear amplitude
-            case 2: //db amplitude
+            case ENVMODE::amplitudeLin: //linear amplitude
+            case ENVMODE::amplitudeLog: //db amplitude
                 if(env->Plinearenvelope)
                     valDesc = convert_value(VC_EnvelopeLinAmpSusVal, val);
                 else
                     valDesc = convert_value(VC_EnvelopeAmpSusVal, val);
                 break;
-            case 3: //frequency offset
+            case ENVMODE::frequency: //frequency offset
                 valDesc = convert_value(VC_EnvelopeFreqVal, val);
                 break;
-            case 4: //filter frequency offset
+            case ENVMODE::filter: //filter frequency offset
                 valDesc = convert_value(VC_EnvelopeFilterVal, val);
                 break;
-            case 5: //bandwidth offset (unformatted)
+            case ENVMODE::bandwidth: //bandwidth offset (unformatted)
                 valDesc = convert_value(VC_EnvelopeBandwidthVal, val);
                 break;
             default:
@@ -1048,9 +1048,9 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
 
     envwindow=NULL;
 
-    if (env->Envmode==3) envfreegroup->label("Frequency Env");
-    if (env->Envmode==4) envfreegroup->label("Filter Envelope");
-    if (env->Envmode==5) envfreegroup->label("Bandwidth Env");
+    if (env->Envmode == ENVMODE::frequency) envfreegroup->label("Frequency Env");
+    if (env->Envmode == ENVMODE::filter) envfreegroup->label("Filter Envelope");
+    if (env->Envmode == ENVMODE::bandwidth) envfreegroup->label("Bandwidth Env");
 
     freemodeeditwindow->label(this->label());
 
@@ -1151,8 +1151,8 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
     {
         switch(env->Envmode)
         {
-            case(1):
-            case(2):
+            case(ENVMODE::amplitudeLin):
+            case(ENVMODE::amplitudeLog):
                 e1adt->value(env->PA_dt);
                 e1ddt->value(env->PD_dt);
                 e1sval->value(env->PS_val);
@@ -1162,7 +1162,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
                 e1linearenvelope->value(env->Plinearenvelope);
                 e1forcedrelease->value(env->Pforcedrelease);
                 break;
-            case(3):
+            case(ENVMODE::frequency):
                 e2aval->value(env->PA_val);
                 e2adt->value(env->PA_dt);
                 e2rdt->value(env->PR_dt);
@@ -1170,7 +1170,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
                 e2envstretch->value(env->Penvstretch);
                 e2forcedrelease->value(env->Pforcedrelease);
                 break;
-            case(4):
+            case(ENVMODE::filter):
                 e3aval->value(env->PA_val);
                 e3adt->value(env->PA_dt);
                 e3dval->value(env->PD_val);
@@ -1180,7 +1180,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
                 e3envstretch->value(env->Penvstretch);
                 e3forcedrelease->value(env->Pforcedrelease);
                 break;
-            case(5):
+            case(ENVMODE::bandwidth):
                 e4aval->value(env->PA_val);
                 e4adt->value(env->PA_dt);
                 e4rdt->value(env->PR_dt);
@@ -1207,17 +1207,17 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
     {
         switch(env->Envmode)
         {
-            case(1):
-            case(2):
+            case(ENVMODE::amplitudeLin):
+            case(ENVMODE::amplitudeLog):
                 envwindow=envADSR;
                 break;
-            case(3):
+            case(ENVMODE::frequency):
                 envwindow=envASR;
                 break;
-            case(4):
+            case(ENVMODE::filter):
                 envwindow=envADSRfilter;
                 break;
-            case(5):
+            case(ENVMODE::bandwidth):
                 envwindow=envASRbw;
                 break;
             default:

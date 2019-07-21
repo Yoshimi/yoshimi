@@ -138,6 +138,16 @@ namespace YOSH
  * and new entries can be added between the group ends
  */
 
+
+namespace ENVMODE
+{
+    const unsigned char amplitudeLin = 1;
+    const unsigned char amplitudeLog = 2;
+    const unsigned char frequency = 3;
+    const unsigned char filter = 4;
+    const unsigned char bandwidth = 5;
+}
+
 namespace TOPLEVEL // usage TOPLEVEL::section::vector
 {
     enum section: unsigned char {
