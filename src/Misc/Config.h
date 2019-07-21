@@ -160,6 +160,7 @@ class Config : public MiscFuncs, FileMgr
         int           currentPart;
         unsigned int  currentBank;
         unsigned int  currentRoot;
+        int           currentPreset;
         int           tempBank;
         int           tempRoot;
         int           noteOnSent; // note test

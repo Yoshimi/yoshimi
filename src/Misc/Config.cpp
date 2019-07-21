@@ -147,6 +147,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     currentPart(0),
     currentBank(0),
     currentRoot(0),
+    currentPreset(0),
     tempBank(0),
     tempRoot(0),
     VUcount(0),
@@ -612,9 +613,12 @@ bool Config::extractConfigData(XMLwrapper *xml)
             xml->exitbranch();
         }
     }
-    if (!found)
+    if (found)
+        currentPreset = xml->getpar("presetsCurrentRootID", currentPreset, 0, MAX_PRESETS);
+    else
     {
         defaultPresets();
+        currentPreset = 0;
         configChanged = true; // give the user the choice
     }
 
@@ -705,6 +709,8 @@ void Config::addConfigXML(XMLwrapper *xmltree)
             xmltree->endbranch();
         }
     }
+    xmltree->addpar("presetsCurrentRootID", currentPreset);
+
     xmltree->addpar("defaultState", loadDefaultState);
     xmltree->addpar("interpolation", Interpolation);
 

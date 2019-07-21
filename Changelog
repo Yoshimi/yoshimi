@@ -1,5 +1,9 @@
 yoshimi 1.5.11 M
 
+2019-7-21 Will
+* Failed to actually add manual to commit :(
+* Preliminary ideas for preset roots.
+
 2019-7-19 Will
 * Temporary install of provisional 1.6.0 manual
   but named as 1.5.12

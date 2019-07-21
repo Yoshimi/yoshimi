@@ -29,6 +29,7 @@
 #include <sys/stat.h>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 
 #include "Misc/XMLwrapper.h"
 #include "Params/PresetsStore.h"
@@ -123,23 +124,27 @@ void PresetsStore::rescanforpresets(string type)
         if (synth->getRuntime().presetsDirlist[i].empty())
             continue;
         string dirname = synth->getRuntime().presetsDirlist[i];
+        //std::cout << "Preset root " << dirname << std::endl;
         DIR *dir = opendir(dirname.c_str());
         if (dir == NULL)
             continue;
-        struct dirent *fn;
-        while ((fn = readdir(dir)))
+        //if (i == synth->getRuntime().currentPreset)
         {
-            string filename = string(fn->d_name);
-            if (filename.find(ftype) == string::npos)
-                continue;
-            if (dirname.at(dirname.size() - 1) != '/')
-                dirname += "/";
-            presets[presetk].file = dirname + filename;
-            presets[presetk].name =
-                filename.substr(0, filename.find(ftype));
-            presetk++;
-            if (presetk >= MAX_PRESETS)
-                return;
+            struct dirent *fn;
+            while ((fn = readdir(dir)))
+            {
+                string filename = string(fn->d_name);
+                if (filename.find(ftype) == string::npos)
+                    continue;
+                if (dirname.at(dirname.size() - 1) != '/')
+                    dirname += "/";
+                presets[presetk].file = dirname + filename;
+                presets[presetk].name =
+                    filename.substr(0, filename.find(ftype));
+                presetk++;
+                if (presetk >= MAX_PRESETS)
+                    return;
+            }
         }
         closedir(dir);
     }
