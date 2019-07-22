@@ -11,7 +11,7 @@ comment {PresetsUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2017, Will Godfrey
+Copyright 2017-2019, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -29,7 +29,6 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified November 2017
 } {in_source in_header
 }
 
@@ -46,6 +45,9 @@ decl {\#include "Params/Presets.h"} {public local
 }
 
 decl {\#include "Misc/SynthEngine.h"} {public global
+}
+
+decl {extern SynthEngine *firstSynth;} {public local
 }
 
 class PresetsUI_ {} {
@@ -264,7 +266,7 @@ class PresetsUI {selected
     p->rescanforpresets();
     for (int i = 0; i < MAX_PRESETS; ++i)
     {
-        string name = synth->getPresetsStore().presets[i].name;
+        string name = firstSynth->getPresetsStore().presets[i].name;
         if (name.empty())
             break;
         copybrowse->add(name.c_str());

@@ -51,6 +51,9 @@ decl {\#include "Misc/Bank.h"} {private local
 decl {\#include "MasterUI.h"} {private local
 }
 
+decl {extern SynthEngine *firstSynth;} {private local
+}
+
 class ConfigUI {: {private MiscFuncs, FileMgr}
 } {
   Function {make_window()} {} {
@@ -780,21 +783,23 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
                     }
                     activatebutton_presetdir(false);
                     synth->getRuntime().configChanged = true;
-                    writepresetcfg();}
+                    readpresetcfg();}
         xywh {110 220 80 35} box THIN_UP_BOX labelsize 12 align 128
         code0 {o->deactivate();}
       }
       Fl_Button makedefaultpresetbutton {
-        label {Make default}
+        label {Make Current}
         callback {//
                     int n = presetbrowse->value();
-                    if (n != 0)
+                   /* if (n != 0)
                     {
                         presetbrowse->move(1, n);
                         presetbrowse->value(1);
                         presetbrowse->redraw();
                         writepresetcfg();
-                    }
+                    }*/
+                    synth->getRuntime().currentPreset = n - 1;
+                    readpresetcfg();
                     activatebutton_presetdir(true);
                     synth->getRuntime().configChanged = true;}
         xywh {210 220 80 35} box THIN_UP_BOX labelsize 12 align 128
@@ -1090,8 +1095,16 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
     code {//
             presetbrowse->clear();
             for (int i = 0; i < MAX_PRESET_DIRS; ++i)
-                if (synth->getRuntime().presetsDirlist[i].size())
-                    presetbrowse->add(synth->getRuntime().presetsDirlist[i].c_str());} {}
+                if (firstSynth->getRuntime().presetsDirlist[i].size())
+                {
+                    string name;
+                    if (i == synth->getRuntime().currentPreset)
+                        name = "* ";
+                    else
+                        name = "  ";
+                    name += firstSynth->getRuntime().presetsDirlist[i];
+                    presetbrowse->add(name.c_str());
+                }} {}
   }
   Function {writepresetcfg()} {} {
     code {//

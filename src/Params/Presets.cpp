@@ -21,12 +21,13 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of ZynAddSubFX original code.
-    Modified March 2019
 */
 #include <cstring>
 
 #include "Misc/SynthEngine.h"
 #include "Params/Presets.h"
+
+extern SynthEngine *firstSynth;
 
 Presets::Presets(SynthEngine *_synth) : nelement(-1), synth(_synth)
 {
@@ -68,7 +69,7 @@ void Presets::copy(const char *name)
     if (name == NULL)
         synth->getPresetsStore().copyclipboard(xml, type);
     else
-        synth->getPresetsStore().copypreset(xml, type,name);
+        firstSynth->getPresetsStore().copypreset(xml, type,name);
 
     delete(xml);
     nelement = -1;
@@ -97,14 +98,14 @@ void Presets::paste(int npreset)
             delete(xml);
             return;
         }
-        if (!synth->getPresetsStore().pasteclipboard(xml))
+        if (!firstSynth->getPresetsStore().pasteclipboard(xml))
         {
             delete(xml);
             nelement = -1;
             return;
         }
     } else {
-        if (!synth->getPresetsStore().pastepreset(xml, npreset))
+        if (!firstSynth->getPresetsStore().pastepreset(xml, npreset))
         {
             delete(xml);
             nelement = -1;
@@ -158,11 +159,11 @@ void Presets::rescanforpresets(void)
     strcpy(type, this->type);
     if (nelement != -1)
         strcat(type, "n");
-    synth->getPresetsStore().rescanforpresets(type);
+    firstSynth->getPresetsStore().rescanforpresets(type);
 }
 
 
 void Presets::deletepreset(int npreset)
 {
-    synth->getPresetsStore().deletepreset(npreset);
+    firstSynth->getPresetsStore().deletepreset(npreset);
 }

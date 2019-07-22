@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2010, Alan Calvert
-    Copyright 2017 Will Godfrey
+    Copyright 2017-2019 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -21,8 +21,6 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is a derivative of a ZynAddSubFX original.
-
-    Modified September 2017
 */
 
 #include <dirent.h>
@@ -34,6 +32,8 @@
 #include "Misc/XMLwrapper.h"
 #include "Params/PresetsStore.h"
 #include "Misc/SynthEngine.h"
+
+extern SynthEngine *firstSynth;
 
 PresetsStore::_clipboard PresetsStore::clipboard;
 
@@ -121,14 +121,14 @@ void PresetsStore::rescanforpresets(string type)
 
     for (int i = 0; i < MAX_PRESETS; ++i)
     {
-        if (synth->getRuntime().presetsDirlist[i].empty())
+        if (firstSynth->getRuntime().presetsDirlist[i].empty())
             continue;
-        string dirname = synth->getRuntime().presetsDirlist[i];
+        string dirname = firstSynth->getRuntime().presetsDirlist[i];
         //std::cout << "Preset root " << dirname << std::endl;
         DIR *dir = opendir(dirname.c_str());
         if (dir == NULL)
             continue;
-        //if (i == synth->getRuntime().currentPreset)
+        if (i == synth->getRuntime().currentPreset)
         {
             struct dirent *fn;
             while ((fn = readdir(dir)))
@@ -173,13 +173,13 @@ void PresetsStore::rescanforpresets(string type)
 
 void PresetsStore::copypreset(XMLwrapper *xml, string type, string name)
 {
-    if (synth->getRuntime().presetsDirlist[0].empty())
+    if (firstSynth->getRuntime().presetsDirlist[0].empty())
         return;
     synth->getRuntime().xmlType = TOPLEVEL::XML::Presets;
     synth->getRuntime().Log(name);
     string tmpfilename = name;
     legit_filename(tmpfilename);
-    string dirname = synth->getRuntime().presetsDirlist[0];
+    string dirname = synth->getRuntime().presetsDirlist[synth->getRuntime().currentPreset];
     if (dirname.find_last_of("/") != (dirname.size() - 1))
         dirname += "/";
     xml->saveXMLfile(dirname + tmpfilename + "." + type + preset_extension);

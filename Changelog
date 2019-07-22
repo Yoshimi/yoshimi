@@ -1,5 +1,11 @@
 yoshimi 1.5.11 M
 
+2020-7-21 Will
+* Preset directories now unified across instances.
+  Selectable without re-ordering but a lot of code
+  cleanup still needed.
+* Updated manual.
+
 2019-7-21 Will
 * Failed to actually add manual to commit :(
 * Preliminary ideas for preset roots.
