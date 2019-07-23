@@ -179,7 +179,7 @@ void PresetsStore::copypreset(XMLwrapper *xml, string type, string name)
     synth->getRuntime().Log(name);
     string tmpfilename = name;
     legit_filename(tmpfilename);
-    string dirname = synth->getRuntime().presetsDirlist[synth->getRuntime().currentPreset];
+    string dirname = firstSynth->getRuntime().presetsDirlist[synth->getRuntime().currentPreset];
     if (dirname.find_last_of("/") != (dirname.size() - 1))
         dirname += "/";
     xml->saveXMLfile(dirname + tmpfilename + "." + type + preset_extension);

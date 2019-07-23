@@ -1,6 +1,11 @@
 yoshimi 1.5.11 M
 
-2020-7-21 Will
+2019-7-23 Will
+* Corrected preset store save - was wiping out others :(
+* Added placeholders for better preset directory controls.
+* Corrected date of last changelog entry!
+
+2019-7-22 Will
 * Preset directories now unified across instances.
   Selectable without re-ordering but a lot of code
   cleanup still needed.

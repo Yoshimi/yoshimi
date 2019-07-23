@@ -284,7 +284,8 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         alsaPreferredAudio,
         alsaSampleRate,
         // end of engine controls
-
+        presetRootDir = 60,
+        currentPresetRoot,
         bankRootCC = 65,
         bankCC = 67,
         enableProgramChange,
