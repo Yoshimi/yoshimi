@@ -909,6 +909,58 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                         text = synth->getRuntime().alsaAudioDevice;
                     newMsg = true;
                     break;
+                case CONFIG::control::addPresetRootDir:
+                {
+                    bool isOK = false;
+                    if (isDirectory(text))
+                        isOK= true;
+                    else
+                    {
+                        if (createDir(text))
+                            text = " FAILED could not create " + text;
+                        else
+                            isOK = true;
+                    }
+                    if (isOK)
+                    {
+                        int i = 0;
+                        while (!firstSynth->getRuntime().presetsDirlist[i].empty())
+                            ++i;
+                        firstSynth->getRuntime().presetsDirlist[i] = text;
+                        text = "ed " + text;
+                    }
+                    newMsg = true;
+                    synth->getRuntime().configChanged = true;
+                    break;
+                }
+                case CONFIG::control::removePresetRootDir:
+                {
+                    int i = value;
+                    text = firstSynth->getRuntime().presetsDirlist[i];
+                    while (!firstSynth->getRuntime().presetsDirlist[i + 1].empty())
+                    {
+                        firstSynth->getRuntime().presetsDirlist[i] = firstSynth->getRuntime().presetsDirlist[i + 1];
+                        ++i;
+                    }
+                    firstSynth->getRuntime().presetsDirlist[i] = "";
+                    synth->getRuntime().currentPreset = 0;
+                    newMsg = true;
+                    synth->getRuntime().configChanged = true;
+                    break;
+                }
+                case CONFIG::control::currentPresetRoot:
+                {
+                    if (write)
+                    {
+                        synth->getRuntime().currentPreset = value;
+                        synth->getRuntime().configChanged = true;
+                    }
+                    else
+                        value = synth->getRuntime().currentPreset = value;
+                    text = firstSynth->getRuntime().presetsDirlist[value];
+                    newMsg = true;
+                    break;
+                }
                 case CONFIG::control::saveCurrentConfig:
                     if (write)
                     {

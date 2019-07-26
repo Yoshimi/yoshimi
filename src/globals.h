@@ -16,8 +16,6 @@
     You should have received a copy of the GNU General Public License along with
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-    Modifed May 2019
 */
 
 #ifndef GLOBALS_H
@@ -284,7 +282,8 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         alsaPreferredAudio,
         alsaSampleRate,
         // end of engine controls
-        presetRootDir = 60,
+        addPresetRootDir = 60,
+        removePresetRootDir,
         currentPresetRoot,
         bankRootCC = 65,
         bankCC = 67,

@@ -16,8 +16,6 @@
     You should have received a copy of the GNU General Public License along with
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-    Created April 2019
 */
 
 #ifndef FILEMGR_H
@@ -71,6 +69,7 @@ class FileMgr
         char *loadGzipped(std::string _filename, std::string *report);
         std::string loadText(std::string filename);
         bool createEmptyFile(std::string filename);
+        bool createDir(std::string filename);
         static bool deleteFile(std::string filename);
         static bool deleteDir(std::string filename);
         static bool renameFile(std::string oldname, std::string newname);

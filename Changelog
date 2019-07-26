@@ -1,5 +1,11 @@
 yoshimi 1.5.11 M
 
+2019-7-26 Will
+* Managing preset roots now use standard Yoshimi calls.
+  Not yet accessible to CLI.
+  Add root failure not yet reported to GUI.
+* Updated docs.
+
 2019-7-23 Will
 * Corrected preset store save - was wiping out others :(
 * Added placeholders for better preset directory controls.

@@ -22,8 +22,6 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
-
-Modified May 2019
 } {selected in_source in_header
 }
 
@@ -766,9 +764,8 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
                     dirname = fl_dir_chooser("Add a preset directory :", NULL, 0);
                     if (!dirname)
                         return;
-                    presetbrowse->add(dirname);
-                    synth->getRuntime().configChanged = true;
-                    writepresetcfg();
+
+                    send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate,CONFIG::control::addPresetRootDir, 0, TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(dirname));
                     if (presetbrowse->size() >= MAX_PRESET_DIRS)
                         o->deactivate();}
         xywh {10 220 80 35} box THIN_UP_BOX labelsize 12 align 128
@@ -777,31 +774,14 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
         label {Remove preset dir...}
         callback {//
                     if (presetbrowse->value() != 0)
-                    {
-                        presetbrowse->remove(presetbrowse->value());
-                        addpreset->activate();
-                    }
-                    activatebutton_presetdir(false);
-                    synth->getRuntime().configChanged = true;
-                    readpresetcfg();}
+                        send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate,CONFIG::control::removePresetRootDir, presetbrowse->value() - 1, TOPLEVEL::type::Integer);}
         xywh {110 220 80 35} box THIN_UP_BOX labelsize 12 align 128
         code0 {o->deactivate();}
       }
       Fl_Button makedefaultpresetbutton {
         label {Make Current}
         callback {//
-                    int n = presetbrowse->value();
-                   /* if (n != 0)
-                    {
-                        presetbrowse->move(1, n);
-                        presetbrowse->value(1);
-                        presetbrowse->redraw();
-                        writepresetcfg();
-                    }*/
-                    synth->getRuntime().currentPreset = n - 1;
-                    readpresetcfg();
-                    activatebutton_presetdir(true);
-                    synth->getRuntime().configChanged = true;}
+                    send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate,CONFIG::control::currentPresetRoot, presetbrowse->value() - 1, TOPLEVEL::type::Integer);}
         xywh {210 220 80 35} box THIN_UP_BOX labelsize 12 align 128
         code0 {o->deactivate();}
       }
@@ -990,7 +970,11 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
                             break;
                     }
                     break;
-
+                case CONFIG::control::addPresetRootDir:
+                case CONFIG::control::removePresetRootDir:
+                case CONFIG::control::currentPresetRoot:
+                    readpresetcfg();
+                    break;
                 //case CONFIG::control::enableBankRootChange:
                     //break;
                 case CONFIG::control::bankRootCC:
@@ -1105,12 +1089,6 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
                     name += firstSynth->getRuntime().presetsDirlist[i];
                     presetbrowse->add(name.c_str());
                 }} {}
-  }
-  Function {writepresetcfg()} {} {
-    code {//
-            synth->getRuntime().clearPresetsDirlist();
-            for (int n = 0; n < presetbrowse->size(); ++n)
-                synth->getRuntime().presetsDirlist[n] = string(presetbrowse->text(n + 1));} {}
   }
   Function {update_config(int tabnumber)} {} {
     code {//

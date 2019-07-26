@@ -16,8 +16,6 @@
     You should have received a copy of the GNU General Public License along with
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-    Created February 2019
 */
 
 #include <cerrno>
@@ -319,6 +317,12 @@ bool FileMgr::createEmptyFile(std::string filename)
 {
     std::ofstream file {filename};
     return 0; // TODO need a test for sucess
+}
+
+
+bool FileMgr::createDir(std::string filename)
+{
+    return mkdir(filename.c_str(), 0755);
 }
 
 

@@ -688,6 +688,25 @@ std::string DataText::resolveConfig(CommandBlock *getData, bool addValue)
             showValue = false;
             break;
 
+        case CONFIG::control::addPresetRootDir:
+            contstr += "Preset root add";
+            if (addValue)
+                contstr += miscMsgPop(value_int);
+            showValue = false;
+            break;
+        case CONFIG::control::removePresetRootDir:
+            contstr += "Preset root unlinked ";
+            if (addValue)
+                contstr += miscMsgPop(value_int);
+            showValue = false;
+            break;
+        case CONFIG::control::currentPresetRoot:
+            contstr += "Current preset root ";
+            if (addValue)
+                contstr += miscMsgPop(value_int);
+            showValue = false;
+            break;
+
         case CONFIG::control::bankRootCC:
             contstr += "Bank root CC ";
             if (addValue)
