@@ -917,7 +917,9 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     else
                     {
                         if (createDir(text))
+                        {
                             text = " FAILED could not create " + text;
+                        }
                         else
                             isOK = true;
                     }
@@ -926,8 +928,13 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                         int i = 0;
                         while (!firstSynth->getRuntime().presetsDirlist[i].empty())
                             ++i;
-                        firstSynth->getRuntime().presetsDirlist[i] = text;
-                        text = "ed " + text;
+                        if (i > (MAX_PRESETS - 2))
+                            text = " FAILED preset list full";
+                        else
+                        {
+                            firstSynth->getRuntime().presetsDirlist[i] = text;
+                            text = "ed " + text;
+                        }
                     }
                     newMsg = true;
                     synth->getRuntime().configChanged = true;

@@ -819,6 +819,7 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
             unsigned char control = getData->data.control;
             unsigned char kititem = getData->data.kit;
             unsigned char par2 = getData->data.par2;
+            string msg = miscMsgPop(par2);
 
             bool value_bool = value_int > 0;
             int tmp;
@@ -921,14 +922,14 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
                     break;
 
                 case CONFIG::control::jackMidiSource:
-                    jackSource->value(miscMsgPop(par2).c_str());
+                    jackSource->value(msg.c_str());
                     break;
                 case CONFIG::control::jackPreferredMidi:
                     jackMidi->value(value_bool);
                     alsaMidi->value(!value_bool);
                     break;
                 case CONFIG::control::jackServer:
-                    jackServer->value(miscMsgPop(par2).c_str());
+                    jackServer->value(msg.c_str());
                     break;
                 case CONFIG::control::jackPreferredAudio:
                     jackAudio->value(value_bool);
@@ -939,14 +940,14 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
                     break;
 
                 case CONFIG::control::alsaMidiSource:
-                    alsaSource->value(miscMsgPop(par2).c_str());
+                    alsaSource->value(msg.c_str());
                     break;
                 case CONFIG::control::alsaPreferredMidi:
                     alsaMidi->value(value_bool);
                     jackMidi->value(!value_bool);
                     break;
                 case CONFIG::control::alsaAudioDevice:
-                    alsaDevice->value(miscMsgPop(par2).c_str());
+                    alsaDevice->value(msg.c_str());
                     break;
                 case CONFIG::control::alsaPreferredAudio:
                     alsaAudio->value(value_bool);
@@ -973,8 +974,16 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
                 case CONFIG::control::addPresetRootDir:
                 case CONFIG::control::removePresetRootDir:
                 case CONFIG::control::currentPresetRoot:
-                    readpresetcfg();
+                {
+                    if (msg.find("FAILED") == 1)
+                    {
+                        if (wasFromHere)
+                            fl_alert("%s", msg.c_str());
+                    }
+                    else
+                        readpresetcfg();
                     break;
+                }
                 //case CONFIG::control::enableBankRootChange:
                     //break;
                 case CONFIG::control::bankRootCC:
@@ -1040,7 +1049,7 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
                     break;
 
                 case CONFIG::control::saveCurrentConfig:
-                    name = miscMsgPop(par2);
+                    name = msg;
                     if (wasFromHere && name.find("FAILED") == 1)
                         fl_alert("%s",name.c_str());
                     break;
