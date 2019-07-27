@@ -1,7 +1,7 @@
 /*
     UnifiedPresets.cpp - Presets and Clipboard management
 
-    Copyright 2018 Will Godfrey
+    Copyright 2018-2019 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -16,8 +16,6 @@
     You should have received a copy of the GNU General Public License along with
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-    Created November 2018
 */
 #include <cstring>
 #include <iostream>
@@ -40,7 +38,7 @@ string UnifiedPresets::findSectionName(CommandBlock *getData)
     if (engine >= PART::engine::addVoice1 && engine <= PART::engine::addVoice8)
     {
         string name = "VOICE id=\"" + to_string(int(engine - PART::engine::addVoice1)) + "\"";
-        return name; // do individual voices
+        return name;
     }
     switch (engine)
     {
@@ -69,17 +67,17 @@ string UnifiedPresets::findleafExtension(CommandBlock *getData)
         return name;
 
     if (engine >= PART::engine::addVoice1 && engine <= PART::engine::addVoice8)
-        return "addsynthn"; // all voices have the same extension
+        return "addsythn"; // all voices have the same extension
     switch (engine)
     {
         case PART::engine::addSynth:
-            return "addsynth";
+            return "addsyth";
             break;
         case PART::engine::subSynth:
-            return "subsynth";
+            return "subsyth";
             break;
         case PART::engine::padSynth:
-            return "padsynth";
+            return "padsyth";
             break;
     }
     return name;

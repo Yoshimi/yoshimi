@@ -23,6 +23,7 @@
     This file is derivative of ZynAddSubFX original code.
 */
 #include <cstring>
+#include <iostream>
 
 #include "Misc/SynthEngine.h"
 #include "Params/Presets.h"
@@ -113,18 +114,32 @@ void Presets::paste(int npreset)
         }
     }
 
+    string altType = "";
+    if (string(type) == "Padsyth")
+        altType = "ADnoteParameters";
+    else if (string(type) == "Padsythn")
+        altType = "ADnoteParametersn";
+    else if (string(type) == "Psubsyth")
+        altType = "SUBnoteParameters";
+    else if (string(type) == "Ppadsyth")
+        altType = "PADnoteParameters";
+
     if (xml->enterbranch(type) == 0)
+        if (altType.empty() || xml->enterbranch(altType) == 0)
     {
         nelement = -1;
         delete(xml);
         return;
     }
+
     synth->Mute();
     if (nelement == -1)
     {
         defaults();
         getfromXML(xml);
-    } else {
+    }
+    else
+    {
         defaults(nelement);
         getfromXMLsection(xml, nelement);
     }

@@ -43,7 +43,7 @@ using namespace std;
 
 PADnoteParameters::PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth) : Presets(_synth)
 {
-    setpresettype("PADnoteParameters");
+    setpresettype("Ppadsyth");
     fft = fft_;
 
     resonance = new Resonance(synth);

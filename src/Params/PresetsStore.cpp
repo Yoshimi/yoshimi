@@ -119,6 +119,16 @@ void PresetsStore::rescanforpresets(string type, int root)
     int presetk = 0;
     string ftype = "." + type + preset_extension;
 
+    //std::cout << "type " << type << std::endl;
+    string altType = "";
+    if (type == "Padsyth")
+        altType = ".ADnoteParameters" + preset_extension;
+    else if (type == "Padsythn")
+        altType = ".ADnoteParametersn" + preset_extension;
+    else if (type == "Psubsyth")
+        altType = ".SUBnoteParameters" + preset_extension;
+    else if (type == "Ppadsyth")
+        altType = ".PADnoteParameters" + preset_extension;
     string dirname = firstSynth->getRuntime().presetsDirlist[root];
     if (dirname.empty())
         return;
@@ -131,14 +141,24 @@ void PresetsStore::rescanforpresets(string type, int root)
     while ((fn = readdir(dir)))
     {
         string filename = string(fn->d_name);
+        //std::cout << "file " << filename << std::endl;
         if (filename.find(ftype) == string::npos)
-            continue;
+        {
+            if (altType.empty() || filename.find(altType) == string::npos)
+                continue;
+        }
         if (dirname.at(dirname.size() - 1) != '/')
             dirname += "/";
         presets[presetk].file = dirname + filename;
-        presets[presetk].name =
-            filename.substr(0, filename.find(ftype));
-            //std::cout << "Preset name " << presets[presetk].name << std::endl;
+        cout << ftype << "    " << altType << endl;
+
+        size_t endpos = filename.find(ftype);
+        if (endpos == string::npos)
+            if (!altType.empty())
+                endpos = filename.find(altType);
+        //presets[presetk].name = filename.substr(0, filename.find(ftype));
+        presets[presetk].name = filename.substr(0, endpos);
+        std::cout << "Preset name " << presets[presetk].name << std::endl;
         presetk++;
         if (presetk >= MAX_PRESETS)
             return;

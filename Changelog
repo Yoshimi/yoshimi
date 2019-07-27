@@ -4,6 +4,7 @@ yoshimi 1.5.11 M
 * Moved (now common) preset lists to base parameters.
 * Considerably re-factored copy-paste.
 * Added preset error reports to GUI.
+* Enabled management of old and new preset types.
 
 2019-7-26 Will
 * Managing preset roots now use standard Yoshimi calls.

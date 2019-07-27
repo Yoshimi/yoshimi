@@ -28,7 +28,7 @@
 
 SUBnoteParameters::SUBnoteParameters(SynthEngine *_synth) : Presets(_synth)
 {
-    setpresettype("SUBnoteParameters");
+    setpresettype("Psubsyth");
     AmpEnvelope = new EnvelopeParams(64, 1, synth);
     AmpEnvelope->ADSRinit_dB(0, 40, 127, 25);
     FreqEnvelope = new EnvelopeParams(64, 0, synth);
