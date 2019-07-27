@@ -22,8 +22,6 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of ZynAddSubFX original code.
-
-    Modified May 2019
 */
 
 #include <sys/types.h>
@@ -189,7 +187,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
 
 bool Config::Setup(int argc, char **argv)
 {
-    clearPresetsDirlist();
+    //clearPresetsDirlist();
     AntiDenormals(true);
 
     if (!loadConfig())
@@ -451,13 +449,15 @@ bool Config::loadConfig(void)
     if (thisInstance > 0)
         yoshimi += ("-" + asString(thisInstance));
     else
-        miscMsgInit(); // sneaked it in here so it's early
-    string presetDir = ConfigDir + "/presets";
-    if (!isDirectory(presetDir))
     {
-        cmd = string("mkdir -p ") + presetDir;
-        if ((chk = system(cmd.c_str())) < 0)
-            Log("Create preset directory " + presetDir + " failed, status " + asString(chk));
+        miscMsgInit(); // sneaked it in here so it's early
+        string presetDir = ConfigDir + "/presets";
+        if (!isDirectory(presetDir))
+        {
+            cmd = string("mkdir -p ") + presetDir;
+            if ((chk = system(cmd.c_str())) < 0)
+                Log("Create preset directory " + presetDir + " failed, status " + asString(chk));
+        }
     }
 
     ConfigFile = ConfigDir + yoshimi;
@@ -471,7 +471,8 @@ bool Config::loadConfig(void)
     if (!isRegFile(baseConfig))
     {
         Log("Basic configuration " + baseConfig + " not found, will use default settings");
-        defaultPresets();
+        if (thisInstance == 0)
+            defaultPresets();
     }
 
     bool isok = true;
@@ -532,14 +533,16 @@ void Config::defaultPresets(void)
         "end"
     };
     int i = 0;
+    int actual = 0;
     while (presetdirs[i] != "end")
     {
         if (isDirectory(presetdirs[i]))
         {
             Log(presetdirs[i], 2);
-            presetsDirlist[i] = presetdirs[i];
+            presetsDirlist[actual] = presetdirs[i];
+            ++actual;
         }
-        ++ i;
+        ++i;
     }
 }
 
@@ -572,6 +575,37 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
     else
         activeInstance = 1;
     showCLIcontext = xml->getpar("show_CLI_context", 1, 0, 2);
+   // xml->exitbranch(); // BaseParameters
+
+
+
+
+
+
+    // get preset dirs
+    int count = 0;
+    bool found = false;
+    for (int i = 0; i < MAX_PRESET_DIRS; ++i)
+    {
+        if (xml->enterbranch("PRESETSROOT", i))
+        {
+            string dir = xml->getparstr("presets_root");
+            if (isDirectory(dir))
+            {
+                presetsDirlist[count] = dir;
+                found = true;
+                ++count;
+            }
+            xml->exitbranch();
+        }
+    }
+    if (!found)
+    {
+        defaultPresets();
+        currentPreset = 0;
+        configChanged = true; // give the user the choice
+    }
+
     xml->exitbranch(); // BaseParameters
     return true;
 }
@@ -597,9 +631,8 @@ bool Config::extractConfigData(XMLwrapper *xml)
     VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 1, 6) - 1;
     xmlmax = xml->getpar("full_parameters", xmlmax, 0, 1);
 
-    // get preset dirs
+    // get legacy preset dirs
     int count = 0;
-    bool found = false;
     for (int i = 0; i < MAX_PRESET_DIRS; ++i)
     {
         if (xml->enterbranch("PRESETSROOT", i))
@@ -607,20 +640,14 @@ bool Config::extractConfigData(XMLwrapper *xml)
             string dir = xml->getparstr("presets_root");
             if (isDirectory(dir))
             {
-                presetsDirlist[count++] = dir;
-                found = true;
+                presetsDirlist[count] = dir;
+                ++count;
             }
             xml->exitbranch();
         }
     }
-    if (found)
-        currentPreset = xml->getpar("presetsCurrentRootID", currentPreset, 0, MAX_PRESETS);
-    else
-    {
-        defaultPresets();
-        currentPreset = 0;
-        configChanged = true; // give the user the choice
-    }
+
+    currentPreset = xml->getpar("presetsCurrentRootID", currentPreset, 0, MAX_PRESETS);
 
     loadDefaultState = xml->getpar("defaultState", loadDefaultState, 0, 1);
     Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
@@ -700,15 +727,6 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("virtual_keyboard_layout", VirKeybLayout + 1);
     xmltree->addpar("full_parameters", xmlmax);
 
-    for (int i = 0; i < MAX_PRESET_DIRS; ++i)
-    {
-        if (presetsDirlist[i].size())
-        {
-            xmltree->beginbranch("PRESETSROOT",i);
-            xmltree->addparstr("presets_root", presetsDirlist[i]);
-            xmltree->endbranch();
-        }
-    }
     xmltree->addpar("presetsCurrentRootID", currentPreset);
 
     xmltree->addpar("defaultState", loadDefaultState);

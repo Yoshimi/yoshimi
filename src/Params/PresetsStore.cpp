@@ -109,7 +109,7 @@ void PresetsStore::clearpresets(void)
 }
 
 
-void PresetsStore::rescanforpresets(string type)
+void PresetsStore::rescanforpresets(string type, int root)
 {
     for (int i = 0; i < MAX_PRESETS; ++i)
     {
@@ -119,35 +119,32 @@ void PresetsStore::rescanforpresets(string type)
     int presetk = 0;
     string ftype = "." + type + preset_extension;
 
-    for (int i = 0; i < MAX_PRESETS; ++i)
+    string dirname = firstSynth->getRuntime().presetsDirlist[root];
+    if (dirname.empty())
+        return;
+    //std::cout << "Preset root " << dirname << std::endl;
+    DIR *dir = opendir(dirname.c_str());
+    if (dir == NULL)
+        return;
+
+    struct dirent *fn;
+    while ((fn = readdir(dir)))
     {
-        if (firstSynth->getRuntime().presetsDirlist[i].empty())
+        string filename = string(fn->d_name);
+        if (filename.find(ftype) == string::npos)
             continue;
-        string dirname = firstSynth->getRuntime().presetsDirlist[i];
-        //std::cout << "Preset root " << dirname << std::endl;
-        DIR *dir = opendir(dirname.c_str());
-        if (dir == NULL)
-            continue;
-        if (i == synth->getRuntime().currentPreset)
-        {
-            struct dirent *fn;
-            while ((fn = readdir(dir)))
-            {
-                string filename = string(fn->d_name);
-                if (filename.find(ftype) == string::npos)
-                    continue;
-                if (dirname.at(dirname.size() - 1) != '/')
-                    dirname += "/";
-                presets[presetk].file = dirname + filename;
-                presets[presetk].name =
-                    filename.substr(0, filename.find(ftype));
-                presetk++;
-                if (presetk >= MAX_PRESETS)
-                    return;
-            }
-        }
-        closedir(dir);
+        if (dirname.at(dirname.size() - 1) != '/')
+            dirname += "/";
+        presets[presetk].file = dirname + filename;
+        presets[presetk].name =
+            filename.substr(0, filename.find(ftype));
+            //std::cout << "Preset name " << presets[presetk].name << std::endl;
+        presetk++;
+        if (presetk >= MAX_PRESETS)
+            return;
     }
+    closedir(dir);
+
     // sort the presets
     bool check = true;
     while (check)

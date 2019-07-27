@@ -21,8 +21,6 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of original ZynAddSubFX code.
-
-    Modified May 2019
 */
 
 #include <sys/types.h>
@@ -109,6 +107,17 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
             addparbool("enable_auto_instance", synth->getRuntime().autoInstance);
             addparU("active_instances", synth->getRuntime().activeInstance);
             addpar("show_CLI_context", synth->getRuntime().showCLIcontext);
+
+            for (int i = 0; i < MAX_PRESET_DIRS; ++i)
+            {
+                if (synth->getRuntime().presetsDirlist[i].size())
+                {
+                    beginbranch("PRESETSROOT",i);
+                    addparstr("presets_root", synth->getRuntime().presetsDirlist[i]);
+                    endbranch();
+                }
+            }
+
         endbranch();
         return;
     }

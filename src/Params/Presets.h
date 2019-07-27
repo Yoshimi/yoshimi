@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2018, Will Godfrey
+    Copyright 2018-2019, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -21,8 +21,6 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of ZynAddSubFX original code.
-
-    Modified March 2018
 */
 
 #ifndef PRESETS_H
@@ -44,7 +42,7 @@ class Presets
         bool checkclipboardtype(void);
         void deletepreset(int npreset);
         void setelement(int n);
-        void rescanforpresets(void);
+        void rescanforpresets(int root);
 
         SynthEngine *getSynthEngine() {return synth;}
 

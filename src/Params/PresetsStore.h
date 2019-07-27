@@ -21,8 +21,6 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is a derivative of a ZynAddSubFX original
-
-    Modified February 2019
 */
 
 #ifndef PRESETSSTORE_H
@@ -61,7 +59,7 @@ class PresetsStore : MiscFuncs, FileMgr
         };
         presetstruct presets[MAX_PRESETS];
 
-        void rescanforpresets(string type);
+        void rescanforpresets(string type, int root);
 
     private:
         void clearpresets(void);

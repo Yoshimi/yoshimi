@@ -153,13 +153,13 @@ void Presets::setelement(int n)
 }
 
 
-void Presets::rescanforpresets(void)
+void Presets::rescanforpresets(int root)
 {
     char type[MAX_PRESETTYPE_SIZE];
     strcpy(type, this->type);
     if (nelement != -1)
         strcat(type, "n");
-    firstSynth->getPresetsStore().rescanforpresets(type);
+    firstSynth->getPresetsStore().rescanforpresets(type, root);
 }
 
 
