@@ -17,7 +17,6 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified May 2019
 */
 
 #include <iostream>
@@ -254,7 +253,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
-    //unsigned char par2 = getData->data.miscmsg;
+    //unsigned char miscmsg = getData->data.miscmsg;
 
     bool write = (type & TOPLEVEL::type::Write);
     if (write)
@@ -542,7 +541,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     {
                         value = synth->getRuntime().currentPart;
                     }
-                    //std::cout << "\n\nRoot " << int(kititem) << "  Bank " << int(engine) << "  Part " << int(value) << "  Slot " << int(insert) << "  Par2 " << int(par2) << " \n\n" << std::endl;
+                    //std::cout << "\n\nRoot " << int(kititem) << "  Bank " << int(engine) << "  Part " << int(value) << "  Slot " << int(insert) << "  miscmsg " << int(miscmsg) << " \n\n" << std::endl;
                     text = synth->part[value]->Pname + " to " + std::to_string(int(insert));
                     if (synth->getBankRef().savetoslot(kititem, engine, insert, value))
                     {
@@ -1226,7 +1225,7 @@ float InterChange::readAllData(CommandBlock *getData)
         synth->fetchMeterData();
         return getData->data.value.F;
     }
-    //std::cout << "Read Control " << (int) getData->data.control << " Type " << (int) getData->data.type << " Part " << (int) getData->data.part << "  Kit " << (int) getData->data.kit << " Engine " << (int) getData->data.engine << "  Insert " << (int) getData->data.insert << " Parameter " << (int) getData->data.parameter << " Par2 " << (int) getData->data.miscmsg << std::endl;
+    //std::cout << "Read Control " << (int) getData->data.control << " Type " << (int) getData->data.type << " Part " << (int) getData->data.part << "  Kit " << (int) getData->data.kit << " Engine " << (int) getData->data.engine << "  Insert " << (int) getData->data.insert << " Parameter " << (int) getData->data.parameter << " miscmsg " << (int) getData->data.miscmsg << std::endl;
     int npart = getData->data.part;
     bool indirect = ((getData->data.source & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::lowPrio);
     if (npart < NUM_MIDI_PARTS && synth->part[npart]->busy)
@@ -1534,7 +1533,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     char button = type & 3;
 
     //std::cout << "Type " << int(type) << "  Control " << int(control) << "  Part " << int(npart) << "  Kit " << int(kititem) << "  Engine " << int(engine) << std::endl;
-    //std::cout  << "Insert " << int(insert)<< "  Parameter " << int(parameter) << "  Par2 " << int(par2) << std::endl;
+    //std::cout  << "Insert " << int(insert)<< "  Parameter " << int(parameter) << "  miscmsg " << int(miscmsg) << std::endl;
 
     if (!isGui && button == 1)
     {
@@ -1817,9 +1816,9 @@ void InterChange::commandMidi(CommandBlock *getData)
     unsigned char control = getData->data.control;
     unsigned char chan = getData->data.kit;
     unsigned int char1 = getData->data.engine;
-    unsigned char par2 = getData->data.miscmsg;
+    unsigned char miscmsg = getData->data.miscmsg;
 
-    //std::cout << "value " << value_int << "  control " << int(control) << "  chan " << int(chan) << "  char1 " << char1 << "  char2 " << int(char2) << "  param " << int(parameter) << "  par2 " << int(par2) << std::endl;
+    //std::cout << "value " << value_int << "  control " << int(control) << "  chan " << int(chan) << "  char1 " << char1 << "  char2 " << int(char2) << "  param " << int(parameter) << "  miscmsg " << int(miscmsg) << std::endl;
 
     if (control == 2 && char1 >= 0x80)
     {
@@ -1853,7 +1852,7 @@ void InterChange::commandMidi(CommandBlock *getData)
 
         case MIDI::control::bankChange:
             getData->data.source = TOPLEVEL::action::lowPrio;
-            if ((value_int != UNUSED || par2 != NO_MSG) && chan < synth->getRuntime().NumAvailableParts)
+            if ((value_int != UNUSED || miscmsg != NO_MSG) && chan < synth->getRuntime().NumAvailableParts)
             {
                 synth->partonoffLock(chan & 0x3f, -1);
                 synth->getRuntime().finishedCLI = true;
@@ -2593,7 +2592,7 @@ void InterChange::commandMain(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-    unsigned char par2 = getData->data.miscmsg;
+    unsigned char miscmsg = getData->data.miscmsg;
 
     bool write = (type & TOPLEVEL::type::Write) > 0;
     if (write)
@@ -2693,7 +2692,7 @@ void InterChange::commandMain(CommandBlock *getData)
         case MAIN::control::loadNamedPatchset:
             if (write && ((action & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::muteAndLoop))
             {
-                synth->allStop(TOPLEVEL::muted::patchsetLoad | (par2 << 8) | (type << 24));
+                synth->allStop(TOPLEVEL::muted::patchsetLoad | (miscmsg << 8) | (type << 24));
                 getData->data.source = TOPLEVEL::action::noAction;
             }
             break;
@@ -2701,7 +2700,7 @@ void InterChange::commandMain(CommandBlock *getData)
         case MAIN::control::loadNamedVector:
             if (write && ((action & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::muteAndLoop))
             {
-                synth->allStop(TOPLEVEL::muted::vectorLoad | (par2 << 8) | (insert << 16) | (type << 24));
+                synth->allStop(TOPLEVEL::muted::vectorLoad | (miscmsg << 8) | (insert << 16) | (type << 24));
                 getData->data.source = TOPLEVEL::action::noAction;
             }
             break;
@@ -2714,7 +2713,7 @@ void InterChange::commandMain(CommandBlock *getData)
         case MAIN::control::loadNamedState:
             if (write && ((action & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::muteAndLoop))
             {
-                synth->allStop(TOPLEVEL::muted::stateLoad | (par2 << 8) | (type << 24));
+                synth->allStop(TOPLEVEL::muted::stateLoad | (miscmsg << 8) | (type << 24));
                 getData->data.source = TOPLEVEL::action::noAction;
             }
             break;
@@ -5875,7 +5874,7 @@ float InterChange::returnLimits(CommandBlock *getData)
     int engine = (int) getData->data.engine;
     int insert = (int) getData->data.insert;
     int parameter = (int) getData->data.parameter;
-    int par2 = (int) getData->data.miscmsg;
+    int miscmsg = (int) getData->data.miscmsg;
 
     float value = getData->data.value.F;
     int request = int(getData->data.type & TOPLEVEL::type::Default); // catches Adj, Min, Max, Def
@@ -5931,7 +5930,7 @@ float InterChange::returnLimits(CommandBlock *getData)
         if (insert == TOPLEVEL::insert::partEffectSelect || (engine == UNUSED && (kititem == UNUSED || insert == TOPLEVEL::insert::kitGroup)))
             return part->getLimits(getData);
 
-        if ((insert == TOPLEVEL::insert::kitGroup || insert == UNUSED) && parameter == UNUSED && par2 == UNUSED)
+        if ((insert == TOPLEVEL::insert::kitGroup || insert == UNUSED) && parameter == UNUSED && miscmsg == UNUSED)
         {
             if (engine == PART::engine::addSynth || (engine >= PART::engine::addVoice1 && engine <= PART::engine::addMod8))
             {

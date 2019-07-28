@@ -16,7 +16,6 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified May 2019
 */
 
 #include <iostream>
@@ -1738,7 +1737,7 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
     float value = -1;
     int group = -1;
     unsigned char insert = TOPLEVEL::insert::envelopeGroup;
-    unsigned char par2 = UNUSED;
+    unsigned char miscmsg = UNUSED;
     if (lineEnd(controlType))
         return done_msg;
 
@@ -1873,7 +1872,7 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
                 if (lineEnd(controlType))
                     return value_msg;
 
-                par2 = string2int(point); // X
+                miscmsg = string2int(point); // X
                 point = skipChars(point);
                 if (lineEnd(controlType))
                     return value_msg;
@@ -1919,7 +1918,7 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
                 if (lineEnd(controlType))
                 return value_msg;
 
-                par2 = string2int(point); // X
+                miscmsg = string2int(point); // X
                 point = skipChars(point);
                 if (lineEnd(controlType))
                 return value_msg;
@@ -1968,7 +1967,7 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
 
     //std::cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  parameter " << int(insertType) << std::endl;
 
-    return sendNormal(0, string2float(point), controlType, cmd, npart, kitNumber, engine, insert, insertType, par2);
+    return sendNormal(0, string2float(point), controlType, cmd, npart, kitNumber, engine, insert, insertType, miscmsg);
 }
 
 
@@ -2943,7 +2942,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
     float value = 0;
     unsigned char command = UNUSED;
     unsigned char action = 0;
-    unsigned char par2 = UNUSED;
+    unsigned char miscmsg = UNUSED;
 
     if (matchnMove(1, point, "oscillator"))
     {
@@ -3065,7 +3064,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
             if (controlType != TOPLEVEL::type::Write || point[0] != 0)
             {
                 if (controlType == TOPLEVEL::type::Write)
-                    par2 = miscMsgPush(std::string(point));
+                    miscmsg = miscMsgPush(std::string(point));
             }
             else
                 return value_msg;
@@ -3077,7 +3076,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
             if (controlType != TOPLEVEL::type::Write || point[0] != 0)
             {
                 if (controlType == TOPLEVEL::type::Write)
-                    par2 = miscMsgPush(std::string(point));
+                    miscmsg = miscMsgPush(std::string(point));
             }
             else
                 return value_msg;
@@ -3100,7 +3099,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
             if (controlType != TOPLEVEL::type::Write || point[0] != 0)
             {
                 if (controlType == TOPLEVEL::type::Write)
-                    par2 = miscMsgPush(std::string(point));
+                    miscmsg = miscMsgPush(std::string(point));
             }
             else
                 return value_msg;
@@ -3112,7 +3111,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
             if (controlType != TOPLEVEL::type::Write || point[0] != 0)
             {
                 if (controlType == TOPLEVEL::type::Write)
-                    par2 = miscMsgPush(std::string(point));
+                    miscmsg = miscMsgPush(std::string(point));
             }
             else
                 return value_msg;
@@ -3238,7 +3237,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
     else
         return  opp_msg;
 
-    sendDirect(action, value, controlType, command, TOPLEVEL::section::config, UNUSED, UNUSED, UNUSED, UNUSED, par2);
+    sendDirect(action, value, controlType, command, TOPLEVEL::section::config, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
     return done_msg;
 }
 
@@ -3251,7 +3250,7 @@ int CmdInterface::commandScale(unsigned char controlType)
     float value = 0;
     unsigned char command = UNUSED;
     unsigned char action = 0;
-    unsigned char par2 = UNUSED;
+    unsigned char miscmsg = UNUSED;
     if (controlType != TOPLEVEL::type::Write)
         return done_msg;
 
@@ -3282,7 +3281,7 @@ int CmdInterface::commandScale(unsigned char controlType)
         if (name == "")
             return value_msg;
         action = TOPLEVEL::action::lowPrio;
-        par2 = miscMsgPush(name);
+        miscmsg = miscMsgPush(name);
     }
     else
     {
@@ -3348,7 +3347,7 @@ int CmdInterface::commandScale(unsigned char controlType)
             }
         }
     }
-    sendDirect(action, value, controlType, command, TOPLEVEL::section::scales, UNUSED, UNUSED, UNUSED, UNUSED, par2);
+    sendDirect(action, value, controlType, command, TOPLEVEL::section::scales, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
     return done_msg;
 }
 
@@ -4562,12 +4561,12 @@ int CmdInterface::commandPart(unsigned char controlType)
         }
         if (matchnMove(2, point,"name"))
         {
-            int par2 = NO_MSG;
+            int miscmsg = NO_MSG;
             if (lineEnd(controlType))
                 return value_msg;
             if (controlType == TOPLEVEL::type::Write)
-                par2 = miscMsgPush(point);
-            return sendNormal(TOPLEVEL::action::muteAndLoop, 0, controlType, PART::control::instrumentName, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup, UNUSED, par2);
+                miscmsg = miscMsgPush(point);
+            return sendNormal(TOPLEVEL::action::muteAndLoop, 0, controlType, PART::control::instrumentName, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup, UNUSED, miscmsg);
         }
     }
 
@@ -4654,7 +4653,7 @@ int CmdInterface::commandPart(unsigned char controlType)
     if (matchnMove(2, point, "name"))
     {
         std::string name;
-        unsigned char par2 = NO_MSG;
+        unsigned char miscmsg = NO_MSG;
         if (controlType == TOPLEVEL::type::Write)
         {
             name = (std::string) point;
@@ -4669,9 +4668,9 @@ int CmdInterface::commandPart(unsigned char controlType)
                 return done_msg;
             }
             else
-                par2 = miscMsgPush(name);
+                miscmsg = miscMsgPush(name);
         }
-        return sendNormal(TOPLEVEL::action::lowPrio, 0, controlType, PART::control::instrumentName, npart, UNUSED, UNUSED, UNUSED, UNUSED, par2);
+        return sendNormal(TOPLEVEL::action::lowPrio, 0, controlType, PART::control::instrumentName, npart, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
     }
     return opp_msg;
 }
@@ -5678,7 +5677,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         unsigned char engine = UNUSED;
         unsigned char insert = UNUSED;
         unsigned char param = UNUSED;
-        unsigned char par2 = UNUSED;
+        unsigned char miscmsg = UNUSED;
         if (point[0] != 0)
         {
             kit = string2int(point);
@@ -5699,15 +5698,15 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                         {
                             std::string name = std::string(point);
                             if (name > "!")
-                                par2 = miscMsgPush(name);
+                                miscmsg = miscMsgPush(name);
                         }
                         else if (point[0] != 0)
-                            par2 = string2int(point);
+                            miscmsg = string2int(point);
                     }
                 }
             }
         }
-        sendDirect(action, value, type, control, part, kit, engine, insert, param, par2, request);
+        sendDirect(action, value, type, control, part, kit, engine, insert, param, miscmsg, request);
         return done_msg;
     }
     else if (matchnMove(2, point, "zread"))
@@ -5725,14 +5724,14 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
          */
 
 
-        // repeats, control, part, kit, engine, insert, parameter, par2
+        // repeats, control, part, kit, engine, insert, parameter, miscmsg
         /*float result;
         unsigned char control, part;
         unsigned char kit = UNUSED;
         unsigned char engine = UNUSED;
         unsigned char insert = UNUSED;
         unsigned char parameter = UNUSED;
-        unsigned char par2 = UNUSED;
+        unsigned char miscmsg = UNUSED;
         int repeats;
         if (point[0] == 0)
             return value_msg;
@@ -5765,7 +5764,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                         parameter = string2int(point);
                         point = skipChars(point);
                         if (point[0] != 0)
-                            par2 = string2int(point);
+                            miscmsg = string2int(point);
                     }
                 }
             }
@@ -5779,7 +5778,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         putData.data.engine = engine;
         putData.data.insert = insert;
         putData.data.parameter = parameter;
-        putData.data.miscmsg = par2;
+        putData.data.miscmsg = miscmsg;
         putData.data.type = 0;
         struct timeval tv1, tv2;
         gettimeofday(&tv1, NULL);
@@ -5801,11 +5800,11 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
 }
 
 
-int CmdInterface::sendNormal(unsigned char action, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
+int CmdInterface::sendNormal(unsigned char action, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char miscmsg)
 {
     if ((type & TOPLEVEL::type::Limits) && part != TOPLEVEL::section::midiLearn)
     {
-        readLimits(value, type, control, part, kit, engine, insert, parameter, par2);
+        readLimits(value, type, control, part, kit, engine, insert, parameter, miscmsg);
         return done_msg;
     }
     action |= TOPLEVEL::action::fromCLI;
@@ -5820,7 +5819,7 @@ int CmdInterface::sendNormal(unsigned char action, float value, unsigned char ty
     putData.data.engine = engine;
     putData.data.insert = insert;
     putData.data.parameter = parameter;
-    putData.data.miscmsg = par2;
+    putData.data.miscmsg = miscmsg;
 
     /*
      * MIDI learn settings are synced by the audio thread
@@ -5867,7 +5866,7 @@ int CmdInterface::sendNormal(unsigned char action, float value, unsigned char ty
 }
 
 
-int CmdInterface::sendDirect(unsigned char action, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2, unsigned char request)
+int CmdInterface::sendDirect(unsigned char action, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char miscmsg, unsigned char request)
 {
     if (action == TOPLEVEL::action::fromMIDI && part != TOPLEVEL::section::midiLearn)
         request = type & TOPLEVEL::type::Default;
@@ -5880,7 +5879,7 @@ int CmdInterface::sendDirect(unsigned char action, float value, unsigned char ty
     putData.data.engine = engine;
     putData.data.insert = insert;
     putData.data.parameter = parameter;
-    putData.data.miscmsg = par2;
+    putData.data.miscmsg = miscmsg;
 
     if (type == TOPLEVEL::type::Default)
     {
@@ -5984,7 +5983,7 @@ int CmdInterface::sendDirect(unsigned char action, float value, unsigned char ty
 }
 
 
-float CmdInterface::readControl(unsigned char action, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
+float CmdInterface::readControl(unsigned char action, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char miscmsg)
 {
     float value;
     CommandBlock putData;
@@ -5998,7 +5997,7 @@ float CmdInterface::readControl(unsigned char action, unsigned char control, uns
     putData.data.engine = engine;
     putData.data.insert = insert;
     putData.data.parameter = parameter;
-    putData.data.miscmsg = par2;
+    putData.data.miscmsg = miscmsg;
     value = synth->interchange.readAllData(&putData);
     //if (putData.data.type & TOPLEVEL::type::Error)
         //return 0xfffff;
@@ -6027,7 +6026,7 @@ std::string CmdInterface::readControlText(unsigned char action, unsigned char co
 }
 
 
-void CmdInterface::readLimits(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
+void CmdInterface::readLimits(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char miscmsg)
 {
     CommandBlock putData;
 
@@ -6039,7 +6038,7 @@ void CmdInterface::readLimits(float value, unsigned char type, unsigned char con
     putData.data.engine = engine;
     putData.data.insert = insert;
     putData.data.parameter = parameter;
-    putData.data.miscmsg = par2;
+    putData.data.miscmsg = miscmsg;
 
     value = synth->interchange.readAllData(&putData);
     std::string name;

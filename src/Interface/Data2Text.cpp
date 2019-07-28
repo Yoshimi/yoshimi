@@ -16,6 +16,7 @@
     You should have received a copy of the GNU General Public License along with
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
  */
 
 #include "Interface/Data2Text.h"
@@ -2613,7 +2614,7 @@ std::string DataText::resolveEnvelope(CommandBlock *getData, bool addValue)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char insertParam = getData->data.parameter;
-    int par2 = getData->data.miscmsg;
+    int miscmsg = getData->data.miscmsg;
 
     addValue = addValue; // suppress warning
     std::string env;
@@ -2658,10 +2659,10 @@ std::string DataText::resolveEnvelope(CommandBlock *getData, bool addValue)
     {
         if (!write)
         {
-            return ("Freemode add/remove is write only. Current points " + std::to_string(int(par2)));
+            return ("Freemode add/remove is write only. Current points " + std::to_string(int(miscmsg)));
         }
-        if (par2 != UNUSED)
-            return ("Part " + std::to_string(int(npart + 1)) + " Kit " + std::to_string(int(kititem + 1)) + name  + env + " Env Added Freemode Point " + std::to_string(int(control & 0x3f)) + " X increment " + std::to_string(int(par2)) + " Y");
+        if (miscmsg != UNUSED)
+            return ("Part " + std::to_string(int(npart + 1)) + " Kit " + std::to_string(int(kititem + 1)) + name  + env + " Env Added Freemode Point " + std::to_string(int(control & 0x3f)) + " X increment " + std::to_string(int(miscmsg)) + " Y");
         else
         {
             showValue = false;
@@ -2671,7 +2672,7 @@ std::string DataText::resolveEnvelope(CommandBlock *getData, bool addValue)
 
     if (insert == TOPLEVEL::insert::envelopePointChange)
     {
-        return ("Part " + std::to_string(int(npart + 1)) + " Kit " + std::to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  std::to_string(int(control)) + " X increment " + std::to_string(int(par2)) + " Y");
+        return ("Part " + std::to_string(int(npart + 1)) + " Kit " + std::to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  std::to_string(int(control)) + " X increment " + std::to_string(int(miscmsg)) + " Y");
     }
 
     std::string contstr;
