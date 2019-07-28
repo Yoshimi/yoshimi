@@ -222,7 +222,7 @@ class PresetsUI {selected
     else
     {
         rescan();
-        copytypetext->label(&p->type[0]); // this was 1  Why?
+        copytypetext->label(&p->type[1]); // remove leading P
         copywin->show();
     }} {}
   }
@@ -241,7 +241,7 @@ class PresetsUI {selected
     else
     {
         rescan();
-        pastetypetext->label(&p->type[0]); // this was 1  Why?
+        pastetypetext->label(&p->type[1]); // remove leading P
         if (p->checkclipboardtype())
             pastebutton->activate();
         else

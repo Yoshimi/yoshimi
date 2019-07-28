@@ -150,15 +150,13 @@ void PresetsStore::rescanforpresets(string type, int root)
         if (dirname.at(dirname.size() - 1) != '/')
             dirname += "/";
         presets[presetk].file = dirname + filename;
-        cout << ftype << "    " << altType << endl;
 
         size_t endpos = filename.find(ftype);
         if (endpos == string::npos)
             if (!altType.empty())
                 endpos = filename.find(altType);
-        //presets[presetk].name = filename.substr(0, filename.find(ftype));
         presets[presetk].name = filename.substr(0, endpos);
-        std::cout << "Preset name " << presets[presetk].name << std::endl;
+//        std::cout << "Preset name " << presets[presetk].name << std::endl;
         presetk++;
         if (presetk >= MAX_PRESETS)
             return;
