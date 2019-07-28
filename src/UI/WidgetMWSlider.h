@@ -19,7 +19,8 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified March 2017
+    This file is a derivative of the ZynAddSubFX original
+
 */
 
 #ifndef WidgetMWSlider_h

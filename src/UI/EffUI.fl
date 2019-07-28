@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-Modified May 2019} {selected in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -1477,10 +1477,10 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     type |= TOPLEVEL::type::Write;
     collect_data(synth, value, action, (Fl::event_button() | type), control, npart, group, neff);} {}
   }
-  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED, int request = UNUSED)} {return_type float
+  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED, int request = UNUSED)} {return_type float
   } {
     code {//
-        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, par2, request);} {}
+        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, miscmsg, request);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//

@@ -29,7 +29,6 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified May 2019
 } {selected in_source in_header
 }
 
@@ -69,10 +68,10 @@ class EnvelopeFreeEdit {: {public Fl_Box}
     code {env=NULL;
 pair=NULL;} {}
   }
-  Function {send_data(int action, int control, int par2, float value, int type)} {} {
+  Function {send_data(int action, int control, int miscmsg, float value, int type)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, engine, TOPLEVEL::insert::envelopePointChange, group, par2);} {}
+        collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, engine, TOPLEVEL::insert::envelopePointChange, group, miscmsg);} {}
   }
   Function {init(EnvelopeParams *env_, int npart_, int kititem_, int engine_, int group_)} {} {
     code {//
@@ -356,9 +355,9 @@ delete (freemodeeditwindow);} {}
             return;
 
         int value = env->Penvval[curpoint];
-        int par2 = env->Penvdt[curpoint];
+        int miscmsg = env->Penvdt[curpoint];
 
-        send_data(TOPLEVEL::action::forceUpdate, group, curpoint, value, TOPLEVEL::type::Write, TOPLEVEL::insert::envelopePoints, par2);}
+        send_data(TOPLEVEL::action::forceUpdate, group, curpoint, value, TOPLEVEL::type::Write, TOPLEVEL::insert::envelopePoints, miscmsg);}
         xywh {115 155 80 20} box THIN_UP_BOX labelsize 11
         code0 {if (env->Pfreemode==0) o->hide();}
       }
@@ -827,9 +826,9 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
       }
     }
   }
-  Function {send_data(int action, int group, int control, float value, int type, int insert = TOPLEVEL::insert::envelopeGroup, int par2 = 255)} {} {
+  Function {send_data(int action, int group, int control, float value, int type, int insert = TOPLEVEL::insert::envelopeGroup, int miscmsg = 255)} {} {
     code {//
-    collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, engine, insert, group, par2);} {}
+    collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, engine, insert, group, miscmsg);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
@@ -839,7 +838,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
     unsigned char eng = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char par = getData->data.parameter;
-    unsigned char par2 = getData->data.miscmsg;
+    unsigned char miscmsg = getData->data.miscmsg;
 
     int value_int = lrint(value);
     bool value_bool = (value > 0.5);
@@ -853,7 +852,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
     {
         if (insert == TOPLEVEL::insert::envelopePointChange) // adjust point
             freeedit->lastpoint = control;
-        else if (par2 > 127) // delete point
+        else if (miscmsg > 127) // delete point
             freeedit->lastpoint -= 1;
         else // add point
             freeedit->lastpoint += 1;

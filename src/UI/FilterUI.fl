@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-Modified May 2019} {selected in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <iostream>} {public local
@@ -810,10 +810,10 @@ pars=NULL;
         }
         filterparamswindow->redraw();} {}
   }
-  Function {send_data(int action, int control, float value, int type, int parameter = UNUSED, int par2 = UNUSED)} {} {
+  Function {send_data(int action, int control, float value, int type, int parameter = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, engine, TOPLEVEL::insert::filterGroup, parameter, par2);} {}
+        collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, engine, TOPLEVEL::insert::filterGroup, parameter, miscmsg);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//

@@ -29,7 +29,6 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified May 2019
 } {selected in_source in_header
 }
 
@@ -334,10 +333,10 @@ class PartKitItem {: {public Fl_Group, private MiscFuncs}
       }
     }
   }
-  Function {send_data(int action, int control, float value, int type, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED)} {} {
+  Function {send_data(int action, int control, float value, int type, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, engine, insert, parameter, par2);} {}
+        collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, engine, insert, parameter, miscmsg);} {}
   }
   Function {PartKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
@@ -1569,15 +1568,15 @@ Offset}
         }
         return(ret);} {}
   }
-  Function {send_data(int action, int control, float value, int type, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED)} {} {
+  Function {send_data(int action, int control, float value, int type, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, engine, insert, parameter, par2);} {}
+        collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, engine, insert, parameter, miscmsg);} {}
   }
-  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED, int request = UNUSED)} {return_type float
+  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED, int request = UNUSED)} {return_type float
   } {
     code {//
-        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, par2, request);} {}
+        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, miscmsg, request);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
@@ -1588,12 +1587,12 @@ Offset}
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
-    unsigned char par2 = getData->data.miscmsg;
+    unsigned char miscmsg = getData->data.miscmsg;
     bool valBool = YOSH::F2B(value);
     int valInt = lrint(value);
     string text;
-    if (par2 != NO_MSG)
-        text = miscMsgPop(par2);
+    if (miscmsg != NO_MSG)
+        text = miscMsgPop(miscmsg);
 
     // these are specific to the mixer panel
     if (newpart >= *plgroup && newpart < (*plgroup + NUM_MIDI_CHANNELS))

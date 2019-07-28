@@ -24,7 +24,6 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-Modified May 2019
 } {selected in_source in_header
 }
 
@@ -391,9 +390,9 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
       }
     }
   }
-  Function {send_data(int action, int control, float value, int type, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED)} {} {
+  Function {send_data(int action, int control, float value, int type, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
-    collect_data(synth, value, action, type, control, TOPLEVEL::section::midiLearn, kititem, engine, insert, parameter, par2);} {}
+    collect_data(synth, value, action, type, control, TOPLEVEL::section::midiLearn, kititem, engine, insert, parameter, miscmsg);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
@@ -404,7 +403,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
-    unsigned char par2 = getData->data.miscmsg;
+    unsigned char miscmsg = getData->data.miscmsg;
     string hex;
     int nrpnTot;
     unsigned int IDold;
@@ -452,7 +451,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         case MIDILEARN::control::findSize: // not using this yet
             break;
         case MIDILEARN::control::sendLearnMessage:
-            synth->getGuiMaster()->words->copy_label(miscMsgPop(par2).c_str());
+            synth->getGuiMaster()->words->copy_label(miscMsgPop(miscmsg).c_str());
             synth->getGuiMaster()->cancel->show();
             synth->getGuiMaster()->message->position(Fl::event_x_root() + 16, Fl::event_y_root());
             synth->getGuiMaster()->message->show();

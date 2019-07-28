@@ -24,7 +24,6 @@
 
     This file is a derivative of the ZynAddSubFX original.
 
-    Modified August 2018
 */
 
 #include "WidgetPDial.h"

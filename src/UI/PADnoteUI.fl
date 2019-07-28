@@ -29,7 +29,6 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-Modified May 2019
 } {selected in_source in_header
 }
 
@@ -1035,16 +1034,16 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper, MiscFuncs}
       }
     }
   }
-  Function {send_data(int action, int control, float value, int type, int insert = UNUSED, int par2 = UNUSED)} {} {
+  Function {send_data(int action, int control, float value, int type, int insert = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
     unsigned char partnum = npart;
-    if (par2 != UNUSED)
+    if (miscmsg != UNUSED)
     {
         partnum = TOPLEVEL::section::main;
         action = TOPLEVEL::action::lowPrio;
     }
     type |= TOPLEVEL::type::Write;
-    collect_data(synth, value, action, (Fl::event_button() | type), control, partnum, kititem, 2, insert, UNUSED, par2);} {}
+    collect_data(synth, value, action, (Fl::event_button() | type), control, partnum, kititem, 2, insert, UNUSED, miscmsg);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
@@ -1052,7 +1051,7 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper, MiscFuncs}
     bool value_bool = YOSH::F2B(value);
     bool wasFromHere = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
     unsigned char control = getData->data.control;
-    unsigned char par2 = getData->data.miscmsg;
+    unsigned char miscmsg = getData->data.miscmsg;
     float result;
     string name;
 
@@ -1269,7 +1268,7 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper, MiscFuncs}
             break;
 
         case MAIN::control::exportPadSynthSamples:
-            name = miscMsgPop(par2);
+            name = miscMsgPop(miscmsg);
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)

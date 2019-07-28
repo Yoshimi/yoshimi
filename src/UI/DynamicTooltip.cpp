@@ -27,7 +27,6 @@
 
     This file is a derivative of the ZynAddSubFX original.
 
-    Modified March 2018
 */
 
 #include "DynamicTooltip.h"

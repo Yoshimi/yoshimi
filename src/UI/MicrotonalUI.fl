@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified May 2019} {selected in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <FL/Fl_File_Chooser.H>} {public local
@@ -379,15 +379,15 @@ class MicrotonalUI {: {private MiscFuncs}
       }
     }
   }
-  Function {send_data(int action, int control, float value, int type, int par = UNUSED, int par2 = UNUSED)} {} {
+  Function {send_data(int action, int control, float value, int type, int par = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, action, (Fl::event_button() | type), control, TOPLEVEL::section::scales, UNUSED, UNUSED, UNUSED, par, par2);} {}
+        collect_data(synth, value, action, (Fl::event_button() | type), control, TOPLEVEL::section::scales, UNUSED, UNUSED, UNUSED, par, miscmsg);} {}
   }
-  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int par2 = UNUSED, int request = UNUSED)} {return_type float
+  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED, int request = UNUSED)} {return_type float
   } {
     code {//
-        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, par2, request);} {}
+        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, miscmsg, request);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
@@ -399,7 +399,7 @@ class MicrotonalUI {: {private MiscFuncs}
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
 
-    unsigned char par2 = getData->data.miscmsg;
+    unsigned char miscmsg = getData->data.miscmsg;
     int value_int = lrint(value);
     bool value_bool = YOSH::F2B(value);
     string msg;
@@ -452,7 +452,7 @@ class MicrotonalUI {: {private MiscFuncs}
 
         case SCALES::control::tuning:
         case SCALES::control::importScl:
-            msg = (miscMsgPop(par2)); // must always fetch it
+            msg = (miscMsgPop(miscmsg)); // must always fetch it
             if (value_int > 0)
             {
                 tuningsinput->value(msg.c_str());
@@ -463,7 +463,7 @@ class MicrotonalUI {: {private MiscFuncs}
             break;
         case SCALES::control::keyboardMap:
         case SCALES::control::importKbm:
-            msg = (miscMsgPop(par2)); // must always fetch it
+            msg = (miscMsgPop(miscmsg)); // must always fetch it
             if (value_int > 0)
             {
                 mappinginput->value(msg.c_str());
@@ -482,10 +482,10 @@ class MicrotonalUI {: {private MiscFuncs}
             break;
 
         case SCALES::control::name:
-            nameinput->value(miscMsgPop(par2).c_str());
+            nameinput->value(miscMsgPop(miscmsg).c_str());
             break;
         case SCALES::control::comment:
-            commentinput->value(miscMsgPop(par2).c_str());
+            commentinput->value(miscMsgPop(miscmsg).c_str());
             break;
 
         case SCALES::control::clearAll:
