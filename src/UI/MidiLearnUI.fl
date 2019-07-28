@@ -404,7 +404,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
-    unsigned char par2 = getData->data.par2;
+    unsigned char par2 = getData->data.miscmsg;
     string hex;
     int nrpnTot;
     unsigned int IDold;
@@ -493,7 +493,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
     code {//
     int lineNo = ((int)getData->data.value.F);
     int status = getData->data.type;
-    string name = miscMsgPop(getData->data.par2);
+    string name = miscMsgPop(getData->data.miscmsg);
     none->hide();
     clear->activate();
     save->activate();

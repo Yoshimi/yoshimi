@@ -809,7 +809,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
     //int value_int = getData->data.value.F;
     unsigned char control = getData->data.control;
     int source = getData->data.source & TOPLEVEL::action::noAction;
-    string message = miscMsgPop(getData->data.par2);
+    string message = miscMsgPop(getData->data.miscmsg);
     switch(control)
     {
         case BANK::control::exportBank:

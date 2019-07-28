@@ -254,7 +254,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
-    //unsigned char par2 = getData->data.par2;
+    //unsigned char par2 = getData->data.miscmsg;
 
     bool write = (type & TOPLEVEL::type::Write);
     if (write)
@@ -270,11 +270,11 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
         if (result > NO_MSG)
         {
             synth->Unmute();
-            getData->data.par2 = result & NO_MSG;
+            getData->data.miscmsg = result & NO_MSG;
         }
         else
         {
-            getData->data.par2 = result;
+            getData->data.miscmsg = result;
             switch (kititem) // group
             {
                 case TOPLEVEL::XML::Instrument:
@@ -318,11 +318,11 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     }
 
     std::string text;
-    if (getData->data.par2 != NO_MSG)
-        text = miscMsgPop(getData->data.par2);
+    if (getData->data.miscmsg != NO_MSG)
+        text = miscMsgPop(getData->data.miscmsg);
     else
         text = "";
-    getData->data.par2 = NO_MSG; // this may be reset later
+    getData->data.miscmsg = NO_MSG; // this may be reset later
     unsigned int tmp;
     std::string name;
 
@@ -514,7 +514,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 
                 case MAIN::control::loadInstrumentByName:
                 {
-                    getData->data.par2 = miscMsgPush(text);
+                    getData->data.miscmsg = miscMsgPush(text);
                     unsigned int result = synth->setProgramByName(getData);
                     text = miscMsgPop(result & NO_MSG);
                     if (result < 0x1000)
@@ -980,7 +980,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     else
                         text = "READ";
                     newMsg = true;
-                    getData->data.par2 = miscMsgPush(text); // slightly odd case
+                    getData->data.miscmsg = miscMsgPush(text); // slightly odd case
                     break;
                 case CONFIG::control::historyLock:
                 {
@@ -1124,7 +1124,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 #ifdef GUI_FLTK
         if (text != "" && synth->getRuntime().showGui && (write || guiTo))
         {
-            getData->data.par2 = miscMsgPush(text); // pass it on to GUI
+            getData->data.miscmsg = miscMsgPush(text); // pass it on to GUI
         }
 #endif
         bool ok = returnsBuffer->write(getData->bytes);
@@ -1132,10 +1132,10 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
         if (synth->getRuntime().showGui && npart == TOPLEVEL::section::scales && control == SCALES::control::importScl)
         {   // loading a tuning includes a name and comment!
             getData->data.control = SCALES::control::name;
-            getData->data.par2 = miscMsgPush(synth->microtonal.Pname);
+            getData->data.miscmsg = miscMsgPush(synth->microtonal.Pname);
             returnsBuffer->write(getData->bytes);
             getData->data.control = SCALES::control::comment;
-            getData->data.par2 = miscMsgPush(synth->microtonal.Pcomment);
+            getData->data.miscmsg = miscMsgPush(synth->microtonal.Pcomment);
             ok &= returnsBuffer->write(getData->bytes);
         }
 #endif
@@ -1226,7 +1226,7 @@ float InterChange::readAllData(CommandBlock *getData)
         synth->fetchMeterData();
         return getData->data.value.F;
     }
-    //std::cout << "Read Control " << (int) getData->data.control << " Type " << (int) getData->data.type << " Part " << (int) getData->data.part << "  Kit " << (int) getData->data.kit << " Engine " << (int) getData->data.engine << "  Insert " << (int) getData->data.insert << " Parameter " << (int) getData->data.parameter << " Par2 " << (int) getData->data.par2 << std::endl;
+    //std::cout << "Read Control " << (int) getData->data.control << " Type " << (int) getData->data.type << " Part " << (int) getData->data.part << "  Kit " << (int) getData->data.kit << " Engine " << (int) getData->data.engine << "  Insert " << (int) getData->data.insert << " Parameter " << (int) getData->data.parameter << " Par2 " << (int) getData->data.miscmsg << std::endl;
     int npart = getData->data.part;
     bool indirect = ((getData->data.source & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::lowPrio);
     if (npart < NUM_MIDI_PARTS && synth->part[npart]->busy)
@@ -1410,18 +1410,18 @@ void InterChange::mutedDecode(unsigned int altData)
         case TOPLEVEL::muted::patchsetLoad:
             putData.data.control = MAIN::control::loadNamedPatchset;
             putData.data.type = altData >> 24;
-            putData.data.par2 = (altData >> 8) & 0xff;
+            putData.data.miscmsg = (altData >> 8) & 0xff;
             break;
         case TOPLEVEL::muted::vectorLoad:
             putData.data.control = MAIN::control::loadNamedVector;
             putData.data.type = altData >> 24;
             putData.data.insert = (altData >> 16) & 0xff;
-            putData.data.par2 = (altData >> 8) & 0xff;
+            putData.data.miscmsg = (altData >> 8) & 0xff;
             break;
         case TOPLEVEL::muted::stateLoad:
             putData.data.control = MAIN::control::loadNamedState;
             putData.data.type = altData >> 24;
-            putData.data.par2 = (altData >> 8) & 0xff;
+            putData.data.miscmsg = (altData >> 8) & 0xff;
             break;
         case TOPLEVEL::muted::listLoad:
         {
@@ -1817,7 +1817,7 @@ void InterChange::commandMidi(CommandBlock *getData)
     unsigned char control = getData->data.control;
     unsigned char chan = getData->data.kit;
     unsigned int char1 = getData->data.engine;
-    unsigned char par2 = getData->data.par2;
+    unsigned char par2 = getData->data.miscmsg;
 
     //std::cout << "value " << value_int << "  control " << int(control) << "  chan " << int(chan) << "  char1 " << char1 << "  char2 " << int(char2) << "  param " << int(parameter) << "  par2 " << int(par2) << std::endl;
 
@@ -2593,7 +2593,7 @@ void InterChange::commandMain(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-    unsigned char par2 = getData->data.par2;
+    unsigned char par2 = getData->data.miscmsg;
 
     bool write = (type & TOPLEVEL::type::Write) > 0;
     if (write)
@@ -5086,7 +5086,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
 
     int nseqpos = getData->data.parameter;
     int nformant = getData->data.parameter;
-    int nvowel = getData->data.par2;
+    int nvowel = getData->data.miscmsg;
 
     switch (getData->data.control)
     {
@@ -5414,7 +5414,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
 
     unsigned char point = getData->data.control;
     unsigned char insert = getData->data.insert;
-    unsigned char Xincrement = getData->data.par2;
+    unsigned char Xincrement = getData->data.miscmsg;
 
     int envpoints = pars->Penvpoints;
     bool isAddpoint = (Xincrement < UNUSED);
@@ -5424,14 +5424,14 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
         if (!pars->Pfreemode)
         {
             getData->data.value.F = UNUSED;
-            getData->data.par2 = UNUSED;
+            getData->data.miscmsg = UNUSED;
             return;
         }
 
         if (!write || point == 0 || point >= envpoints)
         {
             getData->data.value.F = UNUSED;
-            getData->data.par2 = envpoints;
+            getData->data.miscmsg = envpoints;
             return;
         }
 
@@ -5455,7 +5455,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
                 pars->Penvdt[point] = Xincrement;
                 pars->Penvval[point] = val;
                 getData->data.value.F = val;
-                getData->data.par2 = Xincrement;
+                getData->data.miscmsg = Xincrement;
             }
             else
                 getData->data.value.F = UNUSED;
@@ -5464,7 +5464,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
         else if (envpoints < 4)
         {
             getData->data.value.F = UNUSED;
-            getData->data.par2 = UNUSED;
+            getData->data.miscmsg = UNUSED;
             return; // can't have less than 4
         }
         else
@@ -5488,7 +5488,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
         if (!pars->Pfreemode || point >= envpoints)
         {
             getData->data.value.F = UNUSED;
-            getData->data.par2 = UNUSED;
+            getData->data.miscmsg = UNUSED;
             return;
         }
         if (write)
@@ -5505,7 +5505,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
             Xincrement = pars->Penvdt[point];
         }
         getData->data.value.F = val;
-        getData->data.par2 = Xincrement;
+        getData->data.miscmsg = Xincrement;
         return;
     }
 
@@ -5607,7 +5607,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
             break;
     }
     getData->data.value.F = val;
-    getData->data.par2 = Xincrement;
+    getData->data.miscmsg = Xincrement;
     return;
 }
 
@@ -5792,7 +5792,7 @@ void InterChange::commandEffects(CommandBlock *getData)
                 if (kititem == EFFECT::type::reverb && control == 10 && value_int == 2)
                     // this needs to use the defaults
                     // to all for future upgrades
-                    getData->data.par2 = 20;
+                    getData->data.miscmsg = 20;
                 eff->seteffectpar(control, value_int);
             }
         }
@@ -5834,7 +5834,7 @@ void InterChange::testLimits(CommandBlock *getData)
         || control == CONFIG::control::bankCC
         || control == CONFIG::control::extendedProgramChangeCC))
     {
-        getData->data.par2 = NO_MSG; // just to be sure
+        getData->data.miscmsg = NO_MSG; // just to be sure
         if (value > 119)
             return;
         std::string text;
@@ -5842,7 +5842,7 @@ void InterChange::testLimits(CommandBlock *getData)
         {
             text = synth->getRuntime().masterCCtest(int(value));
             if (text != "")
-                getData->data.par2 = miscMsgPush(text);
+                getData->data.miscmsg = miscMsgPush(text);
             return;
         }
         if(control == CONFIG::control::bankCC)
@@ -5851,12 +5851,12 @@ void InterChange::testLimits(CommandBlock *getData)
                 return;
             text = synth->getRuntime().masterCCtest(int(value));
             if (text != "")
-                getData->data.par2 = miscMsgPush(text);
+                getData->data.miscmsg = miscMsgPush(text);
             return;
         }
         text = synth->getRuntime().masterCCtest(int(value));
         if (text != "")
-            getData->data.par2 = miscMsgPush(text);
+            getData->data.miscmsg = miscMsgPush(text);
         return;
     }
 }
@@ -5875,7 +5875,7 @@ float InterChange::returnLimits(CommandBlock *getData)
     int engine = (int) getData->data.engine;
     int insert = (int) getData->data.insert;
     int parameter = (int) getData->data.parameter;
-    int par2 = (int) getData->data.par2;
+    int par2 = (int) getData->data.miscmsg;
 
     float value = getData->data.value.F;
     int request = int(getData->data.type & TOPLEVEL::type::Default); // catches Adj, Min, Max, Def

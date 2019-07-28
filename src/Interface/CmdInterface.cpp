@@ -5779,7 +5779,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         putData.data.engine = engine;
         putData.data.insert = insert;
         putData.data.parameter = parameter;
-        putData.data.par2 = par2;
+        putData.data.miscmsg = par2;
         putData.data.type = 0;
         struct timeval tv1, tv2;
         gettimeofday(&tv1, NULL);
@@ -5820,7 +5820,7 @@ int CmdInterface::sendNormal(unsigned char action, float value, unsigned char ty
     putData.data.engine = engine;
     putData.data.insert = insert;
     putData.data.parameter = parameter;
-    putData.data.par2 = par2;
+    putData.data.miscmsg = par2;
 
     /*
      * MIDI learn settings are synced by the audio thread
@@ -5880,7 +5880,7 @@ int CmdInterface::sendDirect(unsigned char action, float value, unsigned char ty
     putData.data.engine = engine;
     putData.data.insert = insert;
     putData.data.parameter = parameter;
-    putData.data.par2 = par2;
+    putData.data.miscmsg = par2;
 
     if (type == TOPLEVEL::type::Default)
     {
@@ -5964,9 +5964,9 @@ int CmdInterface::sendDirect(unsigned char action, float value, unsigned char ty
         return 0;
     }
 
-    if (part == TOPLEVEL::section::config && putData.data.par2 != UNUSED && (control == CONFIG::control::bankRootCC || control == CONFIG::control::bankCC || control == CONFIG::control::extendedProgramChangeCC))
+    if (part == TOPLEVEL::section::config && putData.data.miscmsg != UNUSED && (control == CONFIG::control::bankRootCC || control == CONFIG::control::bankCC || control == CONFIG::control::extendedProgramChangeCC))
     {
-        synth->getRuntime().Log("In use by " + miscMsgPop(putData.data.par2) );
+        synth->getRuntime().Log("In use by " + miscMsgPop(putData.data.miscmsg) );
         return 0;
     }
 
@@ -5998,7 +5998,7 @@ float CmdInterface::readControl(unsigned char action, unsigned char control, uns
     putData.data.engine = engine;
     putData.data.insert = insert;
     putData.data.parameter = parameter;
-    putData.data.par2 = par2;
+    putData.data.miscmsg = par2;
     value = synth->interchange.readAllData(&putData);
     //if (putData.data.type & TOPLEVEL::type::Error)
         //return 0xfffff;
@@ -6021,7 +6021,7 @@ std::string CmdInterface::readControlText(unsigned char action, unsigned char co
     putData.data.engine = engine;
     putData.data.insert = insert;
     putData.data.parameter = parameter;
-    putData.data.par2 = UNUSED;
+    putData.data.miscmsg = UNUSED;
     value = synth->interchange.readAllData(&putData);
     return miscMsgPop(value);
 }
@@ -6039,7 +6039,7 @@ void CmdInterface::readLimits(float value, unsigned char type, unsigned char con
     putData.data.engine = engine;
     putData.data.insert = insert;
     putData.data.parameter = parameter;
-    putData.data.par2 = par2;
+    putData.data.miscmsg = par2;
 
     value = synth->interchange.readAllData(&putData);
     std::string name;

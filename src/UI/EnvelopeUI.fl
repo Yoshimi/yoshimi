@@ -839,7 +839,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
     unsigned char eng = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char par = getData->data.parameter;
-    unsigned char par2 = getData->data.par2;
+    unsigned char par2 = getData->data.miscmsg;
 
     int value_int = lrint(value);
     bool value_bool = (value > 0.5);

@@ -862,7 +862,7 @@ int SynthEngine::setProgramByName(CommandBlock *getData)
     int msgID = NO_MSG;
     bool ok = true;
     int npart = int(getData->data.kit);
-    string fname = miscMsgPop(getData->data.par2);
+    string fname = miscMsgPop(getData->data.miscmsg);
     fname = setExtension(fname, EXTEN::yoshInst);
     if (!isRegFile(fname.c_str()))
         fname = setExtension(fname, EXTEN::zynInst);

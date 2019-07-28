@@ -399,7 +399,7 @@ class MicrotonalUI {: {private MiscFuncs}
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
 
-    unsigned char par2 = getData->data.par2;
+    unsigned char par2 = getData->data.miscmsg;
     int value_int = lrint(value);
     bool value_bool = YOSH::F2B(value);
     string msg;

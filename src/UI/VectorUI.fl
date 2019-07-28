@@ -514,7 +514,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
     float value = getData->data.value.F;
     unsigned char control = getData->data.control;
     unsigned char insert = getData->data.insert;
-    unsigned char par2 = getData->data.par2;
+    unsigned char par2 = getData->data.miscmsg;
     int value_int = lrint(value);
     string msg;
 

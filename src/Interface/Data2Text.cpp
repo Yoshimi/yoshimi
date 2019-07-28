@@ -2492,7 +2492,7 @@ std::string DataText::resolveFilter(CommandBlock *getData, bool addValue)
 
     int nseqpos = getData->data.parameter;
     int nformant = getData->data.parameter;
-    int nvowel = getData->data.par2;
+    int nvowel = getData->data.miscmsg;
 
     addValue = addValue; // suppress warning
     std::string name;
@@ -2613,7 +2613,7 @@ std::string DataText::resolveEnvelope(CommandBlock *getData, bool addValue)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char insertParam = getData->data.parameter;
-    int par2 = getData->data.par2;
+    int par2 = getData->data.miscmsg;
 
     addValue = addValue; // suppress warning
     std::string env;

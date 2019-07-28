@@ -2,6 +2,7 @@ yoshimi 1.5.11 M
 
 2019-7-28 Will
 * Copy-paste cleanups.
+* Started separating miscmsg from other controls.
 
 2019-7-27 Will
 * Moved (now common) preset lists to base parameters.

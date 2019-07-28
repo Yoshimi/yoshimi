@@ -53,7 +53,7 @@ float collect_readData(SynthEngine *synth, float value, unsigned char control, u
     putData.data.engine = engine;
     putData.data.insert = insert;
     putData.data.parameter = parameter;
-    putData.data.par2 = par2;
+    putData.data.miscmsg = par2;
     float result = synth->interchange.readAllData(&putData);
     return result;
 
@@ -78,7 +78,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
     putData.data.engine = engine;
     putData.data.insert = insert;
     putData.data.parameter = parameter;
-    putData.data.par2 = par2;
+    putData.data.miscmsg = par2;
 
     if (part != TOPLEVEL::section::midiLearn)
     { // midilearn must pass though un-modified
@@ -202,7 +202,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char insertParam = getData->data.parameter;
-    unsigned char insertPar2 = getData->data.par2;
+    unsigned char insertPar2 = getData->data.miscmsg;
 
 //        cout << "Con " << int(control) << "  Kit " << int(kititem) << "  Eng " << int(engine) << "  Ins " << int(insert) << endl;
 

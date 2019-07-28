@@ -143,7 +143,7 @@ bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, un
         putData.data.engine = foundEntry.data.engine;
         putData.data.insert = foundEntry.data.insert;
         putData.data.parameter = foundEntry.data.parameter;
-        putData.data.par2 = foundEntry.data.par2;
+        putData.data.miscmsg = foundEntry.data.miscmsg;
         if (writeMidi(&putData, category & 1))
         {
             if (firstLine && !(category & 1)) // not in_place
@@ -368,7 +368,7 @@ void MidiLearn::generalOperations(CommandBlock *getData)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
-    unsigned char par2 = getData->data.par2;
+    unsigned char par2 = getData->data.miscmsg;
 
     if (control == MIDILEARN::control::sendRefreshRequest)
     {
@@ -651,7 +651,7 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
         putData.data.control = 0xfe; // TODO don't understand this :(
         putData.data.part = TOPLEVEL::section::midiIn;
         putData.data.parameter = 0x80;
-        putData.data.par2 = miscMsgPush("Midi Learn full!");
+        putData.data.miscmsg = miscMsgPush("Midi Learn full!");
         writeMidi(&putData, false);
         learning = false;
         return;
@@ -685,7 +685,7 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
     entry.data.engine = learnTransferBlock.data.engine;
     entry.data.insert = learnTransferBlock.data.insert;
     entry.data.parameter = learnTransferBlock.data.parameter;
-    entry.data.par2 = learnTransferBlock.data.par2;
+    entry.data.miscmsg = learnTransferBlock.data.miscmsg;
 
     list<LearnBlock>::iterator it;
     it = midi_list.begin();
@@ -750,17 +750,17 @@ void MidiLearn::updateGui(int opp)
     if (opp == MIDILEARN::control::sendLearnMessage)
     {
         putData.data.control = MIDILEARN::control::sendLearnMessage;
-        putData.data.par2 = miscMsgPush("Learning " + learnedName);
+        putData.data.miscmsg = miscMsgPush("Learning " + learnedName);
     }
     else if (opp == MIDILEARN::control::cancelLearn)
     {
         putData.data.control = MIDILEARN::control::cancelLearn;
-        putData.data.par2 = NO_MSG;
+        putData.data.miscmsg = NO_MSG;
     }
     else
     {
         putData.data.control = MIDILEARN::control::clearAll;
-        putData.data.par2 = NO_MSG;
+        putData.data.miscmsg = NO_MSG;
         if (opp == MIDILEARN::control::hideGUI)
             return;
     }
@@ -784,7 +784,7 @@ void MidiLearn::updateGui(int opp)
         putData.data.engine = it->chan;
         putData.data.insert = it->min_in;
         putData.data.parameter = it->max_in;
-        putData.data.par2 = miscMsgPush(it->name);
+        putData.data.miscmsg = miscMsgPush(it->name);
         writeToGui(&putData);
         if (newCC > 0xff || (it->status & 8) > 0)
         { // status now used in case NRPN is < 0x100
@@ -879,7 +879,7 @@ bool MidiLearn::insertMidiListData(bool full,  XMLwrapper *xml)
                 xml->addpar("Engine", it->data.engine);
                 xml->addpar("Insert", it->data.insert);
                 xml->addpar("Parameter", it->data.parameter);
-                xml->addpar("Secondary_Parameter", it->data.par2);
+                xml->addpar("Secondary_Parameter", it->data.miscmsg);
                 xml->addparstr("Command_Name", it->name.c_str());
                 xml->endbranch();
             xml->endbranch();
@@ -987,7 +987,7 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
                 real.data.engine = entry.data.engine = xml->getpar255("Engine", 0);
                 real.data.insert = entry.data.insert = xml->getpar255("Insert", 0);
                 real.data.parameter = entry.data.parameter = xml->getpar255("Parameter", 0);
-                real.data.par2 = entry.data.par2 = xml->getpar255("Secondary_Parameter", 0);
+                real.data.miscmsg = entry.data.miscmsg = xml->getpar255("Secondary_Parameter", 0);
                 xml->exitbranch();
             xml->exitbranch();
             entry.status = status;

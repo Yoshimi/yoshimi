@@ -57,7 +57,7 @@ class MidiLearn : private FileMgr, DataText
             unsigned char engine;
             unsigned char insert;
             unsigned char parameter;
-            unsigned char par2;
+            unsigned char miscmsg;
         } data;
 
         struct LearnBlock{

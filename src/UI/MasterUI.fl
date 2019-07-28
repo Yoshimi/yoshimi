@@ -1287,7 +1287,7 @@ Nikita Zlobin
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
-    unsigned char par2 = getData->data.par2;
+    unsigned char par2 = getData->data.miscmsg;
     int value_int = lrint(value);
     int chan = kititem & 0x3f;
     bool isSingle = kititem >= 0x40;

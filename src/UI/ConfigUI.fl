@@ -818,7 +818,7 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
             bool wasFromHere = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
             unsigned char control = getData->data.control;
             unsigned char kititem = getData->data.kit;
-            unsigned char par2 = getData->data.par2;
+            unsigned char par2 = getData->data.miscmsg;
             string msg = miscMsgPop(par2);
 
             bool value_bool = value_int > 0;
@@ -1241,7 +1241,7 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
             getData.data.control = control;
             getData.data.part = 248;
             synth->interchange.testLimits(&getData);
-            return miscMsgPop(getData.data.par2);} {}
+            return miscMsgPop(getData.data.miscmsg);} {}
   }
   decl {SynthEngine *synth;} {private local
   }

@@ -1588,7 +1588,7 @@ Offset}
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
-    unsigned char par2 = getData->data.par2;
+    unsigned char par2 = getData->data.miscmsg;
     bool valBool = YOSH::F2B(value);
     int valInt = lrint(value);
     string text;

@@ -978,7 +978,7 @@ union CommandBlock{
         unsigned char engine;
         unsigned char insert;
         unsigned char parameter;
-        unsigned char par2;
+        unsigned char offset;
         unsigned char miscmsg;
         unsigned char spare1;
         unsigned char spare0;
