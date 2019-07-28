@@ -16,7 +16,6 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified May 2019
 */
 
 #ifndef CMDINTERFACE_H

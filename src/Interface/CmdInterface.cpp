@@ -460,7 +460,7 @@ void CmdInterface::historyList(int listnum)
     int end = TOPLEVEL::XML::MLearn;
     bool found = false;
 
-    if (listnum >= 0)
+    if (listnum >= 0) // its a single list we want
     {
         start = listnum;
         end = listnum;
@@ -507,7 +507,7 @@ void CmdInterface::historyList(int listnum)
 
 std::string CmdInterface::historySelect(int listnum, int selection)
 {
-    vector<std::string> listType = *synth->getHistory(listnum);
+    vector<std::string> listType = *synth->getHistory(listnum - 1);
     if (listType.size()== 0)
     {
         synth->getRuntime().Log("No saved entries");

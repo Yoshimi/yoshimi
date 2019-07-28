@@ -4,6 +4,7 @@ yoshimi 1.5.11 M
 * Copy-paste cleanups.
 * Started separating miscmsg from other controls.
 * Renamed all GUI par2 labels as miscmsg.
+* Fixed regression CLI off by 1 history list loading.
 
 2019-7-27 Will
 * Moved (now common) preset lists to base parameters.
