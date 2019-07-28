@@ -1,6 +1,9 @@
 yoshimi 1.5.11 M
 
 2019-7-28 Will
+* GUI offset added to collect_readData.
+
+2019-7-28 Will
 * Copy-paste cleanups.
 * Started separating miscmsg from other controls.
 * Renamed all GUI par2 labels as miscmsg.

@@ -801,7 +801,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
   Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED, int request = UNUSED)} {return_type float
   } {
     code {//
-        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, miscmsg, request);} {}
+        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, UNUSED, miscmsg, request);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//

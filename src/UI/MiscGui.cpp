@@ -33,7 +33,7 @@
 
 SynthEngine *synth;
 
-float collect_readData(SynthEngine *synth, float value, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char miscmsg, unsigned char request)
+float collect_readData(SynthEngine *synth, float value, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char offset, unsigned char miscmsg, unsigned char request)
 {
     unsigned char type = 0;
     unsigned char action = TOPLEVEL::action::fromGUI;
@@ -52,6 +52,7 @@ float collect_readData(SynthEngine *synth, float value, unsigned char control, u
     putData.data.engine = engine;
     putData.data.insert = insert;
     putData.data.parameter = parameter;
+    putData.data.offset = offset;
     putData.data.miscmsg = miscmsg;
     float result = synth->interchange.readAllData(&putData);
     return result;
@@ -62,7 +63,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
 {
     if (part < NUM_MIDI_PARTS && engine == PART::engine::padSynth)
     {
-        if (collect_readData(synth, 0, PART::control::partBusy, part, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED))
+        if (collect_readData(synth, 0, PART::control::partBusy, part))
         {
             fl_alert("Part %d is busy", int(part));
             return;
