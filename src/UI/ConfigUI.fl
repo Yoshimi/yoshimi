@@ -806,7 +806,7 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
             type |= TOPLEVEL::type::Write;
             if (part == UNUSED)
                 part = TOPLEVEL::section::config;
-            collect_data(synth, value, action, (Fl::event_button() | type), control, part, kit, engine, insert, par, miscmsg);} {}
+            collect_data(synth, value, action, (Fl::event_button() | type), control, part, kit, engine, insert, par, UNUSED, miscmsg);} {}
   }
   Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED, int request = UNUSED)} {return_type float
   } {

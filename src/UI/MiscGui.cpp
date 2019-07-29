@@ -59,7 +59,7 @@ float collect_readData(SynthEngine *synth, float value, unsigned char control, u
 
 }
 
-void collect_data(SynthEngine *synth, float value, unsigned char action, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char miscmsg)
+void collect_data(SynthEngine *synth, float value, unsigned char action, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char offset, unsigned char miscmsg)
 {
     if (part < NUM_MIDI_PARTS && engine == PART::engine::padSynth)
     {
@@ -78,6 +78,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
     putData.data.engine = engine;
     putData.data.insert = insert;
     putData.data.parameter = parameter;
+    putData.data.offset = offset;
     putData.data.miscmsg = miscmsg;
 
     if (part != TOPLEVEL::section::midiLearn)

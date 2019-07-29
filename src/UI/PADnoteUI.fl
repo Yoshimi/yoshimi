@@ -1043,7 +1043,7 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper, MiscFuncs}
         action = TOPLEVEL::action::lowPrio;
     }
     type |= TOPLEVEL::type::Write;
-    collect_data(synth, value, action, (Fl::event_button() | type), control, partnum, kititem, 2, insert, UNUSED, miscmsg);} {}
+    collect_data(synth, value, action, (Fl::event_button() | type), control, partnum, kititem, 2, insert, UNUSED, UNUSED, miscmsg);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//

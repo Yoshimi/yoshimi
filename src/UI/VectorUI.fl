@@ -506,7 +506,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
             insert = BaseChan;
         }
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, action, (Fl::event_button() | type), control, part, kit, engine, insert, parameter, miscmsg);} {}
+        collect_data(synth, value, action, (Fl::event_button() | type), control, part, kit, engine, insert, parameter, UNUSED, miscmsg);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//

@@ -71,7 +71,7 @@ pair=NULL;} {}
   Function {send_data(int action, int control, int miscmsg, float value, int type)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, engine, TOPLEVEL::insert::envelopePointChange, group, miscmsg);} {}
+        collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, engine, TOPLEVEL::insert::envelopePointChange, group, UNUSED, miscmsg);} {}
   }
   Function {init(EnvelopeParams *env_, int npart_, int kititem_, int engine_, int group_)} {} {
     code {//
@@ -828,7 +828,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
   }
   Function {send_data(int action, int group, int control, float value, int type, int insert = TOPLEVEL::insert::envelopeGroup, int miscmsg = 255)} {} {
     code {//
-    collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, engine, insert, group, miscmsg);} {}
+    collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, engine, insert, group, UNUSED, miscmsg);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
