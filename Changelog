@@ -4,6 +4,7 @@ yoshimi 1.5.11 M
 * GUI offset added to collect_readData.
 * GUI offset added to collect_data.
 * GUI offset added to fetchData.
+* BugFix: Memory overrun in ring buffer.
 
 2019-7-28 Will
 * Copy-paste cleanups.

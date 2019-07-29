@@ -17,7 +17,6 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Created April 2019
 */
 
 #include <atomic>
@@ -40,7 +39,8 @@ ringBuff::ringBuff(uint32_t _bufferSize, uint32_t _blockSize):
     blockSize(_blockSize)
 {
     mask = bufferSize - 1;
-    buffer = new char[bufferSize];
+    buffer = new char[bufferSize + blockSize];
+    // size seems wrong but there is an overrun without the extra block
     //std::cout << "buffer size " << int(bufferSize) << "   block " << int(blockSize) << std::endl;
 }
 
