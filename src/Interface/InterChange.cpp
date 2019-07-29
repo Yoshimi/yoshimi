@@ -5413,7 +5413,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
 
     unsigned char point = getData->data.control;
     unsigned char insert = getData->data.insert;
-    unsigned char Xincrement = getData->data.miscmsg;
+    unsigned char Xincrement = getData->data.offset;
 
     int envpoints = pars->Penvpoints;
     bool isAddpoint = (Xincrement < UNUSED);
@@ -5423,14 +5423,14 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
         if (!pars->Pfreemode)
         {
             getData->data.value.F = UNUSED;
-            getData->data.miscmsg = UNUSED;
+            getData->data.offset = UNUSED;
             return;
         }
 
         if (!write || point == 0 || point >= envpoints)
         {
             getData->data.value.F = UNUSED;
-            getData->data.miscmsg = envpoints;
+            getData->data.offset = envpoints;
             return;
         }
 
@@ -5454,7 +5454,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
                 pars->Penvdt[point] = Xincrement;
                 pars->Penvval[point] = val;
                 getData->data.value.F = val;
-                getData->data.miscmsg = Xincrement;
+                getData->data.offset = Xincrement;
             }
             else
                 getData->data.value.F = UNUSED;
@@ -5463,7 +5463,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
         else if (envpoints < 4)
         {
             getData->data.value.F = UNUSED;
-            getData->data.miscmsg = UNUSED;
+            getData->data.offset = UNUSED;
             return; // can't have less than 4
         }
         else
@@ -5487,7 +5487,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
         if (!pars->Pfreemode || point >= envpoints)
         {
             getData->data.value.F = UNUSED;
-            getData->data.miscmsg = UNUSED;
+            getData->data.offset = UNUSED;
             return;
         }
         if (write)
@@ -5504,7 +5504,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
             Xincrement = pars->Penvdt[point];
         }
         getData->data.value.F = val;
-        getData->data.miscmsg = Xincrement;
+        getData->data.offset = Xincrement;
         return;
     }
 
@@ -5606,7 +5606,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
             break;
     }
     getData->data.value.F = val;
-    getData->data.miscmsg = Xincrement;
+    getData->data.offset = Xincrement;
     return;
 }
 

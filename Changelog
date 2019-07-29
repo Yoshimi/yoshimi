@@ -1,10 +1,13 @@
 yoshimi 1.5.11 M
 
-2019-7-28 Will
+2019-7-29 Will
 * GUI offset added to collect_readData.
 * GUI offset added to collect_data.
 * GUI offset added to fetchData.
 * BugFix: Memory overrun in ring buffer.
+* Moved envelope 'X' from miscmsg to offset.
+* Updated docs.
+* Corrected date.
 
 2019-7-28 Will
 * Copy-paste cleanups.

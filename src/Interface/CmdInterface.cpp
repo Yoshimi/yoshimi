@@ -1737,7 +1737,7 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
     float value = -1;
     int group = -1;
     unsigned char insert = TOPLEVEL::insert::envelopeGroup;
-    unsigned char miscmsg = UNUSED;
+    unsigned char offset = UNUSED;
     if (lineEnd(controlType))
         return done_msg;
 
@@ -1872,7 +1872,7 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
                 if (lineEnd(controlType))
                     return value_msg;
 
-                miscmsg = string2int(point); // X
+                offset = string2int(point); // X
                 point = skipChars(point);
                 if (lineEnd(controlType))
                     return value_msg;
@@ -1918,7 +1918,7 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
                 if (lineEnd(controlType))
                 return value_msg;
 
-                miscmsg = string2int(point); // X
+                offset = string2int(point); // X
                 point = skipChars(point);
                 if (lineEnd(controlType))
                 return value_msg;
@@ -1967,7 +1967,7 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
 
     //std::cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  parameter " << int(insertType) << std::endl;
 
-    return sendNormal(0, string2float(point), controlType, cmd, npart, kitNumber, engine, insert, insertType, UNUSED, miscmsg);
+    return sendNormal(0, string2float(point), controlType, cmd, npart, kitNumber, engine, insert, insertType, offset);
 }
 
 
