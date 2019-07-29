@@ -3,6 +3,7 @@ yoshimi 1.5.11 M
 2019-7-28 Will
 * GUI offset added to collect_readData.
 * GUI offset added to collect_data.
+* GUI offset added to fetchData.
 
 2019-7-28 Will
 * Copy-paste cleanups.

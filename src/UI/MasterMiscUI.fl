@@ -128,10 +128,10 @@ class VUMeter {
         panelpart.clipR[i] = false;
     }} {}
   }
-  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED)} {return_type float
+  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int offset = UNUSED, int miscmsg = UNUSED)} {return_type float
   } {
     code {//
-        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, UNUSED, miscmsg);} {}
+        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, offset, miscmsg);} {}
   }
   Function {draw_master()} {} {
     code {//
