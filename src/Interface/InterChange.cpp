@@ -5085,7 +5085,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
 
     int nseqpos = getData->data.parameter;
     int nformant = getData->data.parameter;
-    int nvowel = getData->data.miscmsg;
+    int nvowel = getData->data.offset;
 
     switch (getData->data.control)
     {

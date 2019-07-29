@@ -8,6 +8,8 @@ yoshimi 1.5.11 M
 * Moved envelope 'X' from miscmsg to offset.
 * Updated docs.
 * Corrected date.
+* Moved formant vowel from miscmsg to offset.
+* Updated docs.
 
 2019-7-28 Will
 * Copy-paste cleanups.

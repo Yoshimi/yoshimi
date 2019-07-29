@@ -1668,7 +1668,7 @@ int CmdInterface::filterSelect(unsigned char controlType)
                 if (cmd == -1)
                     return range_msg;
                 value = string2int(point);
-                return sendNormal(0, value, controlType, cmd, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, filterFormantNumber, UNUSED, filterVowelNumber);
+                return sendNormal(0, value, controlType, cmd, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, filterFormantNumber, filterVowelNumber);
             }
         }
         else if (matchnMove(2, point, "type"))
