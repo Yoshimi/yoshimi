@@ -21,12 +21,14 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of original ZynAddSubFX code.
+
 */
 
 #include <sys/types.h>
 #include <zlib.h>
 #include <sstream>
 #include <iostream>
+#include <string>
 
 #include "Misc/Config.h"
 #include "Misc/XMLwrapper.h"
@@ -162,17 +164,20 @@ void XMLwrapper::checkfileinformation(const std::string& filename)
     information.yoshiType = (first!= NULL);
     char *start = strstr(xmldata, "<INFORMATION>");
     char *end = strstr(xmldata, "</INFORMATION>");
-    if (!start || !end || start >= end)
+    char *idx = start;
+    unsigned int names = 0;
+    /*if (!start || !end || start >= end)
     {
         slowinfosearch(xmldata);
         delete [] xmldata;
         return;
-    }
-
+    }*/
+    if (start && end && start < end)
+    {
     // Andrew: just make it simple
     // Will: but not too simple :)
-    char *idx = start;
-    unsigned short names = 0;
+    //idx = start;
+
 
     /* the following could be in any order. We are checking for
      * the actual existence of the fields as well as their value.
@@ -200,6 +205,12 @@ void XMLwrapper::checkfileinformation(const std::string& filename)
         if(strstr(idx, "name=\"PADsynth_used\" value=\"yes\""))
             information.PADsynth_used = 1;
     }
+    }
+    idx = xmldata;
+    char *newStart = strstr(xmldata, "<INFO>");
+    idx = strstr(newStart, "par name=\"type\" value=\"");
+    if (idx != NULL)
+        information.type = string2int(idx + 23);
 
     if (names != 7)
         slowinfosearch(xmldata);

@@ -22,7 +22,6 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified April 2019
 */
 
 #ifndef XML_WRAPPER_H
@@ -121,6 +120,7 @@ class XMLwrapper : private MiscFuncs, FileMgr
         bool minimal; // false if all parameters will be stored
 
         struct {
+            int type;
             unsigned char ADDsynth_used;
             unsigned char SUBsynth_used;
             unsigned char PADsynth_used;

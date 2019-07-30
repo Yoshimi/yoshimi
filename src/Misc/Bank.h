@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is a derivative of a ZynAddSubFX original.
-    Modified February 2019
+
 */
 
 #ifndef BANK_H
@@ -45,6 +45,7 @@ typedef struct _InstrumentEntry
 {
     string name;
     string filename;
+    int type;
     bool used;
     bool PADsynth_used;
     bool ADDsynth_used;
@@ -53,6 +54,7 @@ typedef struct _InstrumentEntry
     _InstrumentEntry()
         :name(""),
          filename(""),
+         type(0),
          used(false),
          PADsynth_used(false),
          ADDsynth_used(false),
@@ -110,6 +112,7 @@ class Bank : private MiscFuncs, FileMgr
     public:
         Bank(SynthEngine *_synth);
         ~Bank();
+        int getType(unsigned int ninstrument, size_t bank, size_t root);
         string getname(unsigned int ninstrument, size_t bank, size_t root);
         string getnamenumbered(unsigned int ninstrument, size_t bank, size_t root);
         bool setname(unsigned int ninstrument, string newname, int newslot, size_t oldBank, size_t newBank, size_t oldRoot, size_t newRoot);

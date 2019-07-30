@@ -291,7 +291,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
   Function {make_window()} {} {
     Fl_Window instrumentuiwindow {
       label Bank
-      xywh {84 346 780 575} type Double hide
+      xywh {119 271 780 575} type Double hide
     } {
       Fl_Choice banklist {
         callback {//
@@ -492,6 +492,158 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         Fl_Button {} {
           xywh {474 549 139 17} box THIN_UP_FRAME
         }
+      }
+      Fl_Button {} {
+        label Search
+        callback {//
+       searchwin->show();
+      /* for (int root = 0; root < 128; ++root)
+       {
+           for (int bank = 0; bank < 128; ++ bank)
+           {
+               for (int inst = 0; inst < 160; ++ inst)
+               {
+                   int ID = synth->getBankRef().getType(inst, bank, root);
+                   if (ID == 5)
+                        synth->getRuntime().Log("R " +to_string(root) + "  B " + to_string(bank) + "  I " + to_string(inst + 1) + "  " + synth->getBankRef().getname(inst, bank, root));
+               }
+           }
+       }*/}
+        tooltip {Show root paths. Right click: also close this} xywh {230 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
+      }
+    }
+    Fl_Window searchwin {
+      label {Bank Search}
+      xywh {444 123 305 490} type Double box PLASTIC_THIN_UP_BOX color 22 hide modal
+    } {
+      Fl_Browser searchbrowse {
+        callback {//
+        int result = o->value();
+        if (result < 0)
+        return;
+        string line = string(o->text(result));
+        int root = string2int(line.substr(0, 3));
+        int bank = string2int(line.substr(5, 3));
+        int inst = (string2int(line.substr(10, 3))) - 1;
+         //std::cout << root << "  " << bank << "  " << inst << std::endl;
+         send_data(TOPLEVEL::action::forceUpdate, MAIN::control::loadInstrumentFromBank, inst, TOPLEVEL::type::Integer, TOPLEVEL::section::main, synth->getGuiMaster()->activePart, bank, root);}
+        xywh {10 65 269 362} type Select labelfont 4
+      }
+      Fl_Button {} {
+        label Close
+        callback {//
+        searchwin->hide();}
+        xywh {231 456 65 24} align 192
+      }
+      Fl_Group {} {
+        xywh {25 1 210 33}
+      } {
+        Fl_Choice {} {
+          label {Type:}
+          callback {//
+          searchbrowse->clear();
+          int result = o->value();
+          if (result < 0)
+              return;
+          for (int root = 0; root < 128; ++root)
+          {
+              for (int bank = 0; bank < 128; ++ bank)
+              {
+                  for (int inst = 0; inst < 160; ++ inst)
+                  {
+                      int ID = synth->getBankRef().getType(inst, bank, root);
+                      if (ID == result)
+                      {
+
+                          string line = asString(root, 3) + ": " + asString(bank, 3) + ". " + asString(inst + 1, 3) + "  " + synth->getBankRef().getname(inst, bank, root);
+                          searchbrowse->add(line.c_str());
+                      }
+                  }
+              }
+          }}
+          xywh {70 12 140 24} down_box BORDER_BOX labelfont 1 labelsize 12 textsize 12
+        } {
+          MenuItem {} {
+            label {(undefined)}
+            xywh {25 25 140 20} labelfont 1 labelsize 11
+          }
+          MenuItem {} {
+            label Piano
+            xywh {15 15 140 20} labelfont 1 labelsize 11
+          }
+          MenuItem {} {
+            label {Chromatic Percussion}
+            xywh {25 25 140 20} labelfont 1 labelsize 11
+          }
+          MenuItem {} {
+            label Organ
+            xywh {35 35 140 20} labelfont 1 labelsize 11
+          }
+          MenuItem {} {
+            label Guitar
+            xywh {45 45 140 20} labelfont 1 labelsize 11
+          }
+          MenuItem {} {
+            label Bass
+            xywh {55 55 140 20} labelfont 1 labelsize 11
+          }
+          MenuItem {} {
+            label {Solo Strings}
+            xywh {65 65 140 20} labelfont 1 labelsize 11
+          }
+          MenuItem {} {
+            label Ensemble
+            xywh {75 75 140 20} labelfont 1 labelsize 11
+          }
+          MenuItem {} {
+            label Brass
+            xywh {85 85 140 20} labelfont 1 labelsize 11
+          }
+          MenuItem {} {
+            label Reed
+            xywh {95 95 140 20} labelfont 1 labelsize 11
+          }
+          MenuItem {} {
+            label Pipe
+            xywh {105 105 140 20} labelfont 1 labelsize 11
+          }
+          MenuItem {} {
+            label {Synth Lead}
+            xywh {115 115 140 20} labelfont 1 labelsize 11
+          }
+          MenuItem {} {
+            label {Synth Pad}
+            xywh {125 125 140 20} labelfont 1 labelsize 11
+          }
+          MenuItem {} {
+            label {Synth Effects}
+            xywh {135 135 140 20} labelfont 1 labelsize 11
+          }
+          MenuItem {} {
+            label Ethnic
+            xywh {145 145 140 20} labelfont 1 labelsize 11
+          }
+          MenuItem {} {
+            label Percussive
+            xywh {155 155 140 20} labelfont 1 labelsize 11
+          }
+          MenuItem {} {
+            label {Sound Effects}
+            xywh {165 165 140 20} labelfont 1 labelsize 11
+          }
+        }
+      }
+      Fl_Text_Display {} {
+        label Root
+        xywh {1 34 50 12} box NO_BOX labelfont 1 labelsize 11 align 2
+      }
+      Fl_Text_Display {} {
+        label Bank
+        xywh {40 34 50 12} box NO_BOX labelfont 1 labelsize 11 align 2
+      }
+      Fl_Text_Display {} {
+        label Instrument
+        xywh {100 35 50 12} box NO_BOX labelfont 1 labelsize 11 align 2
       }
     }
     Fl_Window bankuiwindow {

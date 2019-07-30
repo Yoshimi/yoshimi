@@ -22,7 +22,6 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified February 2019
 */
 
 #include <set>
@@ -76,9 +75,19 @@ string Bank::getBankFileTitle(size_t root, size_t bank)
 }
 
 
+
+
 string Bank::getRootFileTitle(size_t root)
 {
     return synth->makeUniqueName("Root " + asString(root) + " - " + getRootPath(root));
+}
+
+
+int Bank::getType(unsigned int ninstrument, size_t bank, size_t root)
+{
+    if (emptyslot(root, bank, ninstrument))
+        return -1;
+    return getInstrumentReference(root, bank, ninstrument).type;
 }
 
 
@@ -1075,11 +1084,13 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
             checkfile = setExtension(getFullPath(rootID, bankID, pos), EXTEN::zynInst);
         XMLwrapper *xml = new XMLwrapper(synth, true, false);
         xml->checkfileinformation(checkfile);
+        delete xml;
+
+        instrRef.type = xml->information.type;
         instrRef.PADsynth_used = xml->information.PADsynth_used;
         instrRef.ADDsynth_used = xml->information.ADDsynth_used;
         instrRef.SUBsynth_used = xml->information.SUBsynth_used;
         instrRef.yoshiType = xml->information.yoshiType;
-        delete xml;
     }
     InstrumentsInBanks += 1;
     return 0;
