@@ -491,6 +491,7 @@ void SynthEngine::defaults(void)
     Runtime.noteOffSeen = 0;
 #endif
 
+    Runtime.effectChange = UNUSED; // temporary fix
 }
 
 

@@ -1161,7 +1161,8 @@ Offset}
       Fl_Button {} {
         label P
         callback {//
-        synth->getGuiMaster()->getPresetsUi()->paste(part->partefx[ninseff], inseffectui);}
+        synth->getGuiMaster()->getPresetsUi()->paste(part->partefx[ninseff], inseffectui);
+        synth->getRuntime().effectChange = npart | (ninseff << 8); // temporary fix}
         xywh {350 19 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
     }
@@ -1630,7 +1631,7 @@ Offset}
                 synth->getGuiMaster()->panellistitem[displaypart]->audiosend->value(send);
         }
     }
-
+    //std::cout << "reached npart " << int(npart) << "  new " << int(newpart) <<std::endl;
     if (npart != newpart)
         return;
     bool sameEff = (engine == ninseff);

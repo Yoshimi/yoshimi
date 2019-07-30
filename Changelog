@@ -1,5 +1,8 @@
 yoshimi 1.5.11 M
 
+2019-7-30 Will
+* Applied work-round so paste updates GUI effects.
+
 2019-7-29 Will
 * GUI offset added to collect_readData.
 * GUI offset added to collect_data.

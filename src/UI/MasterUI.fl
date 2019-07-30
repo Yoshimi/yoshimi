@@ -772,7 +772,8 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
           Fl_Button {} {
             label P
             callback {//
-            presetsui->paste(synth->sysefx[nsyseff], syseffectui);}
+            presetsui->paste(synth->sysefx[nsyseff], syseffectui);
+            synth->getRuntime().effectChange = TOPLEVEL::section::systemEffects + (nsyseff << 8); // temporary fix}
             xywh {350 137 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
           }
         }
@@ -849,7 +850,8 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
           Fl_Button {} {
             label P
             callback {//
-            presetsui->paste(synth->insefx[ninseff], inseffectui);}
+            presetsui->paste(synth->insefx[ninseff], inseffectui);
+            synth->getRuntime().effectChange = TOPLEVEL::section::insertEffects + (ninseff << 8); // temporary fix}
             xywh {350 137 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
           }
         }

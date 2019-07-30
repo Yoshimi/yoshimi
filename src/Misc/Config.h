@@ -174,6 +174,7 @@ class Config : public MiscFuncs, FileMgr
         unsigned char dataL;
         unsigned char dataH;
         bool          nrpnActive;
+        int           effectChange; // temporary fix
 
         struct{
             unsigned char Xaxis[NUM_MIDI_CHANNELS];

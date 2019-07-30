@@ -1349,6 +1349,38 @@ void InterChange::mediate()
             returns(&getData);
             more = true;
         }
+
+
+        int effpar = synth->getRuntime().effectChange; // temporary fix block
+        if (effpar > 0xffff)
+        {
+            CommandBlock effData;
+            memset(&effData.bytes, 255, sizeof(effData));
+            unsigned char npart = effpar & 0xff;
+            unsigned char effnum = (effpar >> 8) & 0xff;
+            unsigned char efftype = 0;
+            if (npart == TOPLEVEL::section::systemEffects)
+                efftype = synth->sysefx[effnum]->geteffect();
+            else if (npart == TOPLEVEL::section::insertEffects)
+                efftype = synth->insefx[effnum]->geteffect();
+
+            effData.data.source = TOPLEVEL::action::fromGUI | TOPLEVEL::action::forceUpdate;
+            effData.data.type = TOPLEVEL::type::Write;
+            if (npart < NUM_MIDI_PARTS)
+            {
+                efftype = synth->part[npart]->partefx[effnum]->geteffect();
+                effData.data.control = PART::control::effectType;
+            }
+            else
+                effData.data.control = EFFECT::sysIns::effectType;
+            effData.data.value.F = efftype;
+            effData.data.part = npart;
+            effData.data.engine = effnum;
+            if (!toGUI->write(effData.bytes))
+                synth->getRuntime().Log("Unable to write to toGUI buffer");
+            synth->getRuntime().effectChange = UNUSED;
+        }
+
     }
     while (more && synth->getRuntime().runSynth);
 }
@@ -1456,6 +1488,7 @@ void InterChange::returns(CommandBlock *getData)
         int tmp = (getData->data.source & TOPLEVEL::action::noAction);
         if (getData->data.source & TOPLEVEL::action::forceUpdate)
             tmp = TOPLEVEL::action::toAll;
+
         if ((type & TOPLEVEL::type::Write) && tmp != TOPLEVEL::action::fromGUI)
         {
             //std::cout << "writing to GUI" << std::endl;

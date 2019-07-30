@@ -83,8 +83,11 @@ bool PresetsStore::pasteclipboard(XMLwrapper *xml)
     if (clipboard.data != NULL)
     {
         xml->putXMLdata(clipboard.data);
+        if (synth->getRuntime().effectChange != UNUSED)
+            synth->getRuntime().effectChange |= 0xff0000; // temporary fix
         return true;
     }
+    synth->getRuntime().effectChange = UNUSED; // temporary fix
     return false;
 }
 
@@ -208,6 +211,8 @@ bool PresetsStore::pastepreset(XMLwrapper *xml, int npreset)
     npreset--;
     if (presets[npreset].file.empty())
         return false;
+    if (synth->getRuntime().effectChange != UNUSED)
+        synth->getRuntime().effectChange |= 0xff0000; // temporary fix
     return xml->loadXMLfile(presets[npreset].file);
 }
 
