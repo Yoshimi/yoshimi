@@ -1350,7 +1350,6 @@ void InterChange::mediate()
             more = true;
         }
 
-
         int effpar = synth->getRuntime().effectChange; // temporary fix block
         if (effpar > 0xffff)
         {
@@ -1358,28 +1357,29 @@ void InterChange::mediate()
             memset(&effData.bytes, 255, sizeof(effData));
             unsigned char npart = effpar & 0xff;
             unsigned char effnum = (effpar >> 8) & 0xff;
-            unsigned char efftype = 0;
-            if (npart == TOPLEVEL::section::systemEffects)
-                efftype = synth->sysefx[effnum]->geteffect();
-            else if (npart == TOPLEVEL::section::insertEffects)
-                efftype = synth->insefx[effnum]->geteffect();
-
-            effData.data.source = TOPLEVEL::action::fromGUI | TOPLEVEL::action::forceUpdate;
-            effData.data.type = TOPLEVEL::type::Write;
+            unsigned char efftype;
             if (npart < NUM_MIDI_PARTS)
             {
                 efftype = synth->part[npart]->partefx[effnum]->geteffect();
                 effData.data.control = PART::control::effectType;
             }
             else
+            {
                 effData.data.control = EFFECT::sysIns::effectType;
+                if (npart == TOPLEVEL::section::systemEffects)
+                    efftype = synth->sysefx[effnum]->geteffect();
+                else
+                    efftype = synth->insefx[effnum]->geteffect();
+            }
+            effData.data.source = TOPLEVEL::action::fromGUI | TOPLEVEL::action::forceUpdate;
+            effData.data.type = TOPLEVEL::type::Write;
             effData.data.value.F = efftype;
             effData.data.part = npart;
             effData.data.engine = effnum;
             if (!toGUI->write(effData.bytes))
                 synth->getRuntime().Log("Unable to write to toGUI buffer");
             synth->getRuntime().effectChange = UNUSED;
-        }
+        } // end of temporary fix
 
     }
     while (more && synth->getRuntime().runSynth);

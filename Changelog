@@ -2,6 +2,7 @@ yoshimi 1.5.11 M
 
 2019-7-30 Will
 * Applied work-round so paste updates GUI effects.
+* Small optimisation in mediate.
 
 2019-7-29 Will
 * GUI offset added to collect_readData.
