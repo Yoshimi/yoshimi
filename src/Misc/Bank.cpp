@@ -1082,15 +1082,17 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
         string checkfile = setExtension(getFullPath(rootID, bankID, pos), EXTEN::yoshInst);
         if (!FileMgr::isRegFile(checkfile))
             checkfile = setExtension(getFullPath(rootID, bankID, pos), EXTEN::zynInst);
+        unsigned int names = 0;
+        int type = 0;
         XMLwrapper *xml = new XMLwrapper(synth, true, false);
-        xml->checkfileinformation(checkfile);
+        xml->checkfileinformation(checkfile, names, type);
         delete xml;
 
-        instrRef.type = xml->information.type;
-        instrRef.PADsynth_used = xml->information.PADsynth_used;
-        instrRef.ADDsynth_used = xml->information.ADDsynth_used;
-        instrRef.SUBsynth_used = xml->information.SUBsynth_used;
-        instrRef.yoshiType = xml->information.yoshiType;
+        instrRef.type = type;
+        instrRef.ADDsynth_used = (names & 1) > 0;
+        instrRef.SUBsynth_used = (names & 2) > 0;
+        instrRef.PADsynth_used = (names & 4) > 0;
+        instrRef.yoshiType = (names & 8) > 0;//xml->information.yoshiType;
     }
     InstrumentsInBanks += 1;
     return 0;

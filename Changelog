@@ -1,5 +1,9 @@
 yoshimi 1.5.11 M
 
+2019-7-31 Will
+* Small bank refinements.
+* Bank search window first starts with Piano.
+
 2019-7-30 Will
 * Applied work-round so paste updates GUI effects.
 * Small optimisation in mediate.

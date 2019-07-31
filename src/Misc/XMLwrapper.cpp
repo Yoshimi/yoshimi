@@ -145,16 +145,17 @@ XMLwrapper::~XMLwrapper()
 }
 
 
-void XMLwrapper::checkfileinformation(const std::string& filename)
+void XMLwrapper::checkfileinformation(const std::string& filename, unsigned int& names, int& type)
 {
-    stackpos = 0;
+    stackpos = 0; // we don't seem to be using any of this!
     memset(&parentstack, 0, sizeof(parentstack));
-    information.PADsynth_used = 0;
     if (tree)
         mxmlDelete(tree);
     tree = NULL;
+
+
     std::string report = "";
-    char *xmldata = loadGzipped(filename, &report);
+    char *xmldata = FileMgr::loadGzipped(filename, &report);
     if (report != "")
         synth->getRuntime().Log(report, 2);
     if (!xmldata)
@@ -165,57 +166,55 @@ void XMLwrapper::checkfileinformation(const std::string& filename)
     char *start = strstr(xmldata, "<INFORMATION>");
     char *end = strstr(xmldata, "</INFORMATION>");
     char *idx = start;
-    unsigned int names = 0;
-    /*if (!start || !end || start >= end)
-    {
-        slowinfosearch(xmldata);
-        delete [] xmldata;
-        return;
-    }*/
+    unsigned int seen = 0;
+
     if (start && end && start < end)
     {
-    // Andrew: just make it simple
-    // Will: but not too simple :)
-    //idx = start;
+        // Andrew: just make it simple
+        // Will: but not too simple :)
+        //idx = start;
 
 
-    /* the following could be in any order. We are checking for
-     * the actual existence of the fields as well as their value.
-     */
-    idx = strstr(start, "name=\"ADDsynth_used\"");
-    if (idx != NULL)
-    {
-        names |= 2;
-        if(strstr(idx, "name=\"ADDsynth_used\" value=\"yes\""))
-            information.ADDsynth_used = 1;
+        /*
+         * the following could be in any order. We are checking for
+        * the actual existence of the fields as well as their value.
+        */
+        idx = strstr(start, "name=\"ADDsynth_used\"");
+        if (idx != NULL)
+        {
+            seen |= 2;
+            if(strstr(idx, "name=\"ADDsynth_used\" value=\"yes\""))
+                information.ADDsynth_used = 1;
+        }
+
+        idx = strstr(start, "name=\"SUBsynth_used\"");
+        if (idx != NULL)
+        {
+            seen |= 4;
+            if(strstr(idx, "name=\"SUBsynth_used\" value=\"yes\""))
+                information.SUBsynth_used = 1;
+        }
+
+        idx = strstr(start, "name=\"PADsynth_used\"");
+        if (idx != NULL)
+        {
+            seen |= 1;
+            if(strstr(idx, "name=\"PADsynth_used\" value=\"yes\""))
+                information.PADsynth_used = 1;
+        }
     }
 
-    idx = strstr(start, "name=\"SUBsynth_used\"");
+    idx = strstr(xmldata, "<INFO>");
+    if (idx == NULL)
+        return;
+    idx = strstr(idx, "par name=\"type\" value=\"");
     if (idx != NULL)
-    {
-        names |= 4;
-        if(strstr(idx, "name=\"SUBsynth_used\" value=\"yes\""))
-            information.SUBsynth_used = 1;
-    }
+        type = string2int(idx + 23);
 
-    idx = strstr(start, "name=\"PADsynth_used\"");
-    if (idx != NULL)
-    {
-        names |= 1;
-        if(strstr(idx, "name=\"PADsynth_used\" value=\"yes\""))
-            information.PADsynth_used = 1;
-    }
-    }
-    idx = xmldata;
-    char *newStart = strstr(xmldata, "<INFO>");
-    idx = strstr(newStart, "par name=\"type\" value=\"");
-    if (idx != NULL)
-        information.type = string2int(idx + 23);
-
-    if (names != 7)
+    if (seen != 7) // at least one was missing
         slowinfosearch(xmldata);
-
     delete [] xmldata;
+    names = information.ADDsynth_used | (information.SUBsynth_used << 1) | (information.PADsynth_used << 2) | (information.yoshiType << 3);
     return;
 }
 
@@ -337,9 +336,9 @@ char *XMLwrapper::getXMLdata()
     switch (synth->getRuntime().xmlType)
     {
         case TOPLEVEL::XML::Instrument:
-            addparbool("ADDsynth_used", information.ADDsynth_used);
-            addparbool("SUBsynth_used", information.SUBsynth_used);
-            addparbool("PADsynth_used", information.PADsynth_used);
+            addparbool("ADDsynth_used", (information.ADDsynth_used != 0));
+            addparbool("SUBsynth_used", (information.SUBsynth_used != 0));
+            addparbool("PADsynth_used", (information.PADsynth_used != 0));
             break;
 
         case TOPLEVEL::XML::Patch:

@@ -128,8 +128,8 @@ class XMLwrapper : private MiscFuncs, FileMgr
         } information;
 
         // opens a file and parse only the "information" data on it
-        // returns "true" if all went ok or "false" on errors
-        void checkfileinformation(const std::string& filename);
+
+        void checkfileinformation(const std::string& filename, unsigned int& names, int& type);
         void slowinfosearch(char *idx);
 
     private:

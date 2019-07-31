@@ -47,18 +47,18 @@ typedef struct _InstrumentEntry
     string filename;
     int type;
     bool used;
-    bool PADsynth_used;
-    bool ADDsynth_used;
-    bool SUBsynth_used;
+    unsigned char PADsynth_used;
+    unsigned char ADDsynth_used;
+    unsigned char SUBsynth_used;
     bool yoshiType;
     _InstrumentEntry()
         :name(""),
          filename(""),
          type(0),
          used(false),
-         PADsynth_used(false),
-         ADDsynth_used(false),
-         SUBsynth_used(false),
+         PADsynth_used(0),
+         ADDsynth_used(0),
+         SUBsynth_used(0),
          yoshiType(false)
     {
 
@@ -68,9 +68,9 @@ typedef struct _InstrumentEntry
         used = false;
         name.clear();
         filename.clear();
-        PADsynth_used = false;
-        ADDsynth_used = false;
-        SUBsynth_used = false;
+        PADsynth_used = 0;
+        ADDsynth_used = 0;
+        SUBsynth_used = 0;
         yoshiType = false;
     }
 } InstrumentEntry; // Contains the leafname of the instrument.

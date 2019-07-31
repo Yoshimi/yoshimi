@@ -312,6 +312,17 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         xywh {5 8 199 20} down_box BORDER_BOX selection_color 7 labelfont 1 labelsize 12 align 0 textsize 12
       } {}
       Fl_Button {} {
+        label Search
+        callback {//
+       if (unsearched)
+       {
+           fillBrowser(1);
+           unsearched = false;
+       }
+       searchwin->show();}
+        tooltip {Show root paths. Right click: also close this} xywh {230 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
+      }
+      Fl_Button {} {
         label Roots
         callback {//
         rootuiwindow->show();
@@ -493,24 +504,6 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
           xywh {474 549 139 17} box THIN_UP_FRAME
         }
       }
-      Fl_Button {} {
-        label Search
-        callback {//
-       searchwin->show();
-      /* for (int root = 0; root < 128; ++root)
-       {
-           for (int bank = 0; bank < 128; ++ bank)
-           {
-               for (int inst = 0; inst < 160; ++ inst)
-               {
-                   int ID = synth->getBankRef().getType(inst, bank, root);
-                   if (ID == 5)
-                        synth->getRuntime().Log("R " +to_string(root) + "  B " + to_string(bank) + "  I " + to_string(inst + 1) + "  " + synth->getBankRef().getname(inst, bank, root));
-               }
-           }
-       }*/}
-        tooltip {Show root paths. Right click: also close this} xywh {230 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
-      }
     }
     Fl_Window searchwin {
       label {Bank Search}
@@ -527,40 +520,24 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         int inst = (string2int(line.substr(10, 3))) - 1;
          //std::cout << root << "  " << bank << "  " << inst << std::endl;
          send_data(TOPLEVEL::action::forceUpdate, MAIN::control::loadInstrumentFromBank, inst, TOPLEVEL::type::Integer, TOPLEVEL::section::main, synth->getGuiMaster()->activePart, bank, root);}
-        xywh {10 65 269 362} type Select labelfont 4
+        xywh {12 65 282 374} type Select labelfont 4
       }
       Fl_Button {} {
         label Close
         callback {//
         searchwin->hide();}
-        xywh {231 456 65 24} align 192
+        xywh {228 451 65 24} align 192
       }
       Fl_Group {} {
         xywh {25 1 210 33}
       } {
-        Fl_Choice {} {
+        Fl_Choice searchType {
           label {Type:}
           callback {//
           searchbrowse->clear();
           int result = o->value();
-          if (result < 0)
-              return;
-          for (int root = 0; root < 128; ++root)
-          {
-              for (int bank = 0; bank < 128; ++ bank)
-              {
-                  for (int inst = 0; inst < 160; ++ inst)
-                  {
-                      int ID = synth->getBankRef().getType(inst, bank, root);
-                      if (ID == result)
-                      {
-
-                          string line = asString(root, 3) + ": " + asString(bank, 3) + ". " + asString(inst + 1, 3) + "  " + synth->getBankRef().getname(inst, bank, root);
-                          searchbrowse->add(line.c_str());
-                      }
-                  }
-              }
-          }}
+          if (result >= 0)
+              fillBrowser(result);}
           xywh {70 12 140 24} down_box BORDER_BOX labelfont 1 labelsize 12 textsize 12
         } {
           MenuItem {} {
@@ -945,6 +922,25 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
       }
     }
   }
+  Function {fillBrowser(int group)} {} {
+    code {//
+          for (int root = 0; root < 128; ++root)
+          {
+              for (int bank = 0; bank < 128; ++ bank)
+              {
+                  for (int inst = 0; inst < 160; ++ inst)
+                  {
+                      int ID = synth->getBankRef().getType(inst, bank, root);
+                      if (ID == group)
+                      {
+
+                          string line = asString(root, 3) + ": " + asString(bank, 3) + ". " + asString(inst + 1, 3) + "  " + synth->getBankRef().getname(inst, bank, root);
+                          searchbrowse->add(line.c_str());
+                      }
+                  }
+              }
+          }} {}
+  }
   Function {send_data(int action, int control, float value, int type, int part = UNUSED, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
@@ -1050,7 +1046,9 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
   Function {init(Fl_Spinner *cbwig_)} {} {
     code {//
     cbwig = cbwig_;
-    rescan_for_banks(false);} {}
+    rescan_for_banks(false);
+    unsearched = true;
+    searchType->value(1);} {}
   }
   Function {process()} {return_type void
   } {
@@ -1474,5 +1472,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
   decl {int bankFrom;} {private local
   }
   decl {int instFrom;} {private local
+  }
+  decl {bool unsearched;} {public local
   }
 }
