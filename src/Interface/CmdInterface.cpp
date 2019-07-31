@@ -5065,7 +5065,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         std::string filename = std::string(point);
         if (filename > "!")
         {
-            char to_send[100];
+            char to_send[COMMAND_SIZE];
             char *mark;
             int count = 0;
             bool isok = true;
@@ -5077,7 +5077,8 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                 context = LEVEL::Top; // start from top level
                 while (linePoint < text.length() && isok)
                 {
-                    C_lineInText(text, linePoint, to_send);
+                    if (!C_lineInText(text, linePoint, to_send))
+                        Runtime.Log("*** Error: line " + to_string(count) + " too long");
                     ++ count;
                     mark = skipSpace(to_send);
                     if ( mark[0] < ' ' || mark [0] == '#')
@@ -6099,7 +6100,9 @@ void CmdInterface::cmdIfaceCommandLoop()
         cCmd = readline(welcomeBuffer);
         if (cCmd)
         {
-            if(cCmd[0] != 0)
+            if (strlen(cCmd) >= COMMAND_SIZE)
+                std::cout << "*** Error: line too long" << std::endl;
+            else if(cCmd[0] != 0)
             {
                 reply = todo_msg;
                 replyString = "";

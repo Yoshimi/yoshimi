@@ -62,7 +62,7 @@
 // changing them is likely to have unpredicable consequences
 
 // sizes
-const unsigned char COMMAND_SIZE = 80;
+const unsigned char COMMAND_SIZE = 252;
 const unsigned char MAX_HISTORY = 25;
 const int MAX_PRESETS = 1000;
 const unsigned char MAX_PRESET_DIRS = 128;

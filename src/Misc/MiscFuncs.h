@@ -80,7 +80,7 @@ class MiscFuncs
         void bitClearAbove(unsigned int& value, int bitLevel);
         bool bitTest(unsigned int value, unsigned int bit);
         std::string lineInText(std::string text, size_t &point);
-        void C_lineInText(std::string text, size_t &point, char *line);
+        bool C_lineInText(std::string text, size_t &point, char *line, size_t length = COMMAND_SIZE);
 
         float dB2rap(float dB);
         float rap2dB(float rap);

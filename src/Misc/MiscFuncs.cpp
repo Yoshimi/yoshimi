@@ -324,13 +324,23 @@ std::string MiscFuncs::lineInText(std::string text, size_t &point)
 }
 
 
-void MiscFuncs::C_lineInText(std::string text, size_t &point, char *line)
+bool MiscFuncs::C_lineInText(std::string text, size_t &point, char *line, size_t length)
 {
+    bool ok = true;
     std::string found = lineInText(text, point);
     if (found == "")
         line[0] = 0;
-    else
+    else if (found.length() < (length - 1))
+    {
         strcpy(line, found.c_str());
+        line[length] = 0;
+    }
+    else
+    {
+        ok = false;
+        line[0] = 0;
+    }
+    return ok;
 }
 
 
