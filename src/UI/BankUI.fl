@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <iostream>} {public local
@@ -286,7 +286,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
 }
 
-class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
+class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window instrumentuiwindow {
@@ -311,7 +311,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         refreshmainwindow();}
         xywh {5 8 199 20} down_box BORDER_BOX selection_color 7 labelfont 1 labelsize 12 align 0 textsize 12
       } {}
-      Fl_Button {} {
+      Fl_Button B_search {
         label Search
         callback {//
        if (unsearched)
@@ -480,6 +480,10 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
           callback {//
           synth->getRuntime().checksynthengines = (int) o->value();
           rescan_for_banks(true);
+          if (o->value())
+              B_search->activate();
+          else
+              B_search->deactivate();
           synth->getGuiMaster()->partui->checkEngines();
           synth->getRuntime().configChanged = true;}
           xywh {477 531 136 15} down_box DOWN_BOX labelsize 11
@@ -511,9 +515,11 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
     } {
       Fl_Browser searchbrowse {
         callback {//
+        if (!o->value())
+            return;
         int result = o->value();
         if (result < 0)
-        return;
+            return;
         string line = string(o->text(result));
         int root = string2int(line.substr(0, 3));
         int bank = string2int(line.substr(5, 3));
@@ -529,7 +535,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
         xywh {228 451 65 24} align 192
       }
       Fl_Group {} {
-        xywh {25 1 210 33}
+        xywh {25 1 210 35}
       } {
         Fl_Choice searchType {
           label {Type:}
@@ -537,7 +543,12 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
           searchbrowse->clear();
           int result = o->value();
           if (result >= 0)
-              fillBrowser(result);}
+          {
+              fillBrowser(result);
+              noEntries->hide();
+          }
+          else
+              noEntries->show();}
           xywh {70 12 140 24} down_box BORDER_BOX labelfont 1 labelsize 12 textsize 12
         } {
           MenuItem {} {
@@ -621,6 +632,10 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
       Fl_Text_Display {} {
         label Instrument
         xywh {100 35 50 12} box NO_BOX labelfont 1 labelsize 11 align 2
+      }
+      Fl_Text_Display noEntries {
+        label {No Entries}
+        xywh {70 195 177 0} labelfont 1 labelsize 30 labelcolor 88 hide deactivate
       }
     }
     Fl_Window bankuiwindow {
@@ -1048,7 +1063,11 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
     cbwig = cbwig_;
     rescan_for_banks(false);
     unsearched = true;
-    searchType->value(1);} {}
+    searchType->value(1);
+    if(synth->getRuntime().checksynthengines)
+        B_search->activate();
+    else
+        B_search->deactivate();} {}
   }
   Function {process()} {return_type void
   } {

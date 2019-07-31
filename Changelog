@@ -8,6 +8,8 @@ yoshimi 1.5.11 M
 * Added protection against overlength lines in CLI.
   Max size is set to 252 chars but longest Yoshim1 command
   is less than 180.
+* Disabled bank search window if not showing engine types.
+* Added warning if no entries in bank search window.
 
 2019-7-30 Will
 * Applied work-round so paste updates GUI effects.
