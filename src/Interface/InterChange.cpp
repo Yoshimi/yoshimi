@@ -3235,7 +3235,12 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case PART::control::effectBypass:
             if (write)
+            {
                 part->Pefxbypass[effNum] = value_bool;
+                if (!value_bool)
+                    part[npart].partefx[effNum]->cleanup();
+            }
+
             else
                 value = part->Pefxbypass[effNum];
             break;
@@ -5730,6 +5735,8 @@ void InterChange::commandSysIns(CommandBlock *getData)
                 if (write)
                 {
                     synth->syseffEnable[effnum] = (value != 0);
+                    if (value != 0)
+                        synth->sysefx[effnum]->cleanup();
                 }
                 else
                     value = synth->syseffEnable[effnum];

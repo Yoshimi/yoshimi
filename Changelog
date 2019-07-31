@@ -10,6 +10,9 @@ yoshimi 1.5.11 M
   is less than 180.
 * Disabled bank search window if not showing engine types.
 * Added warning if no entries in bank search window.
+* Re-enabling system effects does a cleanup first.
+  this is so you don't get any stale data sounding.
+* Cleanup also done when clearing bypass.
 
 2019-7-30 Will
 * Applied work-round so paste updates GUI effects.
