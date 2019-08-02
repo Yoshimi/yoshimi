@@ -4,6 +4,7 @@ yoshimi 1.5.11 M
 * Adjusted new instrument group controls to Yoshi standard.
 * Implemented CLI access to group controls.
 * Moved static lists from CmdInterface.h to TextLists.h
+* Moved reply enums into dedicated namespace.
 
 2019-7-31 Will
 * Small bank refinements.

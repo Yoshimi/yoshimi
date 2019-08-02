@@ -155,7 +155,7 @@ void CmdInterface::helpLoop(list<std::string>& msg, std::string *commands, int i
 char CmdInterface::helpList(unsigned int local)
 {
     if (!matchnMove(1, point, "help") && !matchnMove(1, point, "?"))
-        return todo_msg;
+        return REPLY::todo_msg;
 
     int listnum = -1;
     bool named = false;
@@ -450,7 +450,7 @@ char CmdInterface::helpList(unsigned int local)
         std::cout << "\nSet CONfig REPorts [s] - set report destination (gui/stderr)\n";
 
     synth->cliOutput(msg, LINES);
-    return exit_msg;
+    return REPLY::exit_msg;
 }
 
 
@@ -545,12 +545,12 @@ int CmdInterface::effectsList(bool presets)
     if (bitTest(context, LEVEL::AllFX) && presets == true)
     {
          synth->getRuntime().Log("Type " + fx_list[nFXtype] + "\nPresets -" + fx_presets[nFXtype].substr(fx_presets[nFXtype].find(',') + 1));
-         return done_msg;
+         return REPLY::done_msg;
     }
     else if (presets)
     {
         synth->getRuntime().Log("No effect selected");
-        return done_msg;
+        return REPLY::done_msg;
     }
     else
         all = matchnMove(1, point, "all");
@@ -581,7 +581,7 @@ int CmdInterface::effectsList(bool presets)
     }
 
     synth->cliOutput(msg, LINES);
-    return done_msg;
+    return REPLY::done_msg;
 }
 
 
@@ -613,14 +613,14 @@ int CmdInterface::effects(unsigned char controlType)
     }
 
     if (lineEnd(controlType))
-        return done_msg;
+        return REPLY::done_msg;
 
     value = string2int(point);
 
     if (value > 128)
     {
         std::cout << "Eff status " << int(readControl(0, value, npart, EFFECT::type::none + nFXtype, nFX)) << std::endl;
-        return done_msg;
+        return REPLY::done_msg;
     }
 
 
@@ -629,7 +629,7 @@ int CmdInterface::effects(unsigned char controlType)
         value -= 1;
         point = skipChars(point);
         if (value >= nFXavail)
-            return range_msg;
+            return REPLY::range_msg;
 
         if (value != nFX)
         { // partially updates GUI
@@ -658,7 +658,7 @@ int CmdInterface::effects(unsigned char controlType)
         if (lineEnd(controlType))
         {
             Runtime.Log("efx number set to " + asString(nFX + 1));
-            return done_msg;
+            return REPLY::done_msg;
         }
     }
 
@@ -680,7 +680,7 @@ int CmdInterface::effects(unsigned char controlType)
         if (bitTest(context, LEVEL::Part))
         {
             sendDirect(0, nFXtype, TOPLEVEL::type::Write, PART::control::effectType, npart, UNUSED, nFX);
-            return done_msg; // TODO find out why not sendNormal
+            return REPLY::done_msg; // TODO find out why not sendNormal
         }
         else if (bitTest(context, LEVEL::InsFX))
             return sendNormal(0, nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::insertEffects, UNUSED, nFX);
@@ -719,7 +719,7 @@ int CmdInterface::effects(unsigned char controlType)
                     else if (matchnMove(1, point, "bandwidth"))
                         value = 2;
                     else
-                        return value_msg;
+                        return REPLY::value_msg;
                 }
                 break;
             }
@@ -736,7 +736,7 @@ int CmdInterface::effects(unsigned char controlType)
                         value = 0;
                     else if (matchnMove(1, point, "triangle"))
                         value = 1;
-                    else return value_msg;
+                    else return REPLY::value_msg;
                 }
                 else if (selected == 11) // subtract
                 {
@@ -755,7 +755,7 @@ int CmdInterface::effects(unsigned char controlType)
                         value = 0;
                     else if (matchnMove(1, point, "triangle"))
                         value = 1;
-                    else return value_msg;
+                    else return REPLY::value_msg;
                 }
                 else if (selected == 10 || selected == 12 || selected == 14) // LFO, SUB, ANA
                 {
@@ -774,7 +774,7 @@ int CmdInterface::effects(unsigned char controlType)
                         value = 0;
                     else if (matchnMove(1, point, "triangle"))
                         value = 1;
-                    else return value_msg;
+                    else return REPLY::value_msg;
                 }
                 break;
             }
@@ -787,7 +787,7 @@ int CmdInterface::effects(unsigned char controlType)
                     std::string name = std::string(point).substr(0,3);
                     value = stringNumInList(name, filtershapes, 3) - 1;
                     if (value < 0)
-                        return value_msg;
+                        return REPLY::value_msg;
                 }
                 else if (selected == 6 || selected == 9 || selected == 10) // invert, stereo, prefilter
                 {
@@ -806,7 +806,7 @@ int CmdInterface::effects(unsigned char controlType)
                         point = skipChars(point);
                         value = string2int(point);
                         if (value < 0 || value >= MAX_EQ_BANDS)
-                            return range_msg;
+                            return REPLY::range_msg;
                         nFXeqBand = value;
                     }
                 }
@@ -816,7 +816,7 @@ int CmdInterface::effects(unsigned char controlType)
                     std::string name = std::string(point).substr(0,3);
                     value = stringNumInList(name, eqtypes, 3);
                     if (value < 0)
-                        return value_msg;
+                        return REPLY::value_msg;
                 }
 
                 if (selected > 1)
@@ -835,7 +835,7 @@ int CmdInterface::effects(unsigned char controlType)
                         value = 0;
                     else if (matchnMove(1, point, "triangle"))
                         value = 1;
-                    else return value_msg;
+                    else return REPLY::value_msg;
                 }
                 else if (selected == 8) // invert
                 {
@@ -845,7 +845,7 @@ int CmdInterface::effects(unsigned char controlType)
                 else if (selected == 10) // filter entry
                 {
                     bitSet(context, LEVEL::Filter);
-                    return done_msg;
+                    return REPLY::done_msg;
                 }
             }
         }
@@ -870,7 +870,7 @@ int CmdInterface::effects(unsigned char controlType)
     if (matchnMove(2, point, "send"))
     {
         if (lineEnd(controlType))
-            return parameter_msg;
+            return REPLY::parameter_msg;
 
         if (bitTest(context, LEVEL::InsFX))
         {
@@ -882,7 +882,7 @@ int CmdInterface::effects(unsigned char controlType)
             {
                 value = string2int(point) - 1;
                 if (value >= Runtime.NumAvailableParts || value < 0)
-                    return range_msg;
+                    return REPLY::range_msg;
             }
         }
         else
@@ -890,7 +890,7 @@ int CmdInterface::effects(unsigned char controlType)
             par = string2int(point) - 1;
             point = skipChars(point);
             if (lineEnd(controlType))
-                return value_msg;
+                return REPLY::value_msg;
             value = string2int127(point);
         }
 
@@ -913,7 +913,7 @@ int CmdInterface::effects(unsigned char controlType)
         else
         {
             if (par <= nFX || par >= NUM_SYS_EFX)
-                return range_msg;
+                return REPLY::range_msg;
             partno = TOPLEVEL::section::systemEffects;
             control = EFFECT::sysIns::toEffect1 + par - 1; // TODO this needs sorting
             engine = nFX;
@@ -941,7 +941,7 @@ int CmdInterface::effects(unsigned char controlType)
             partno = TOPLEVEL::section::systemEffects;
         return sendNormal(0, nFXpreset, TOPLEVEL::type::Write, 16, partno,  EFFECT::type::none + nFXtype, nFX);
     }
-    return opp_msg;
+    return REPLY::op_msg;
 }
 
 
@@ -981,14 +981,14 @@ int CmdInterface::midiControllers(unsigned char controlType)
     {
         value = toggle();
         if (value == -1)
-            return value_msg;
+            return REPLY::value_msg;
         cmd = PART::control::expressionEnable;
     }
     if ((cmd == -1) && matchnMove(2, point, "sustain"))
     {
         value = toggle();
         if (value == -1)
-            return value_msg;
+            return REPLY::value_msg;
         cmd = PART::control::sustainPedalEnable;
     }
     if ((cmd == -1) && matchnMove(2, point, "pwheel"))
@@ -1000,7 +1000,7 @@ int CmdInterface::midiControllers(unsigned char controlType)
     {
         value = toggle();
         if (value == -1)
-            return value_msg;
+            return REPLY::value_msg;
         cmd = PART::control::breathControlEnable;
     }
     if ((cmd == -1) && matchnMove(2, point, "fcutoff"))
@@ -1028,7 +1028,7 @@ int CmdInterface::midiControllers(unsigned char controlType)
     {
         value = toggle();
         if (value == -1)
-            return value_msg;
+            return REPLY::value_msg;
         cmd = PART::control::FMamplitudeEnable;
     }
     if ((cmd == -1) && matchnMove(2, point, "rcenter"))
@@ -1049,7 +1049,7 @@ int CmdInterface::midiControllers(unsigned char controlType)
         {
             value = toggle();
             if (value == -1)
-                return value_msg;
+                return REPLY::value_msg;
             cmd = PART::control::receivePortamento;
         }
         else if(matchnMove(2, point, "psweep"))
@@ -1071,14 +1071,14 @@ int CmdInterface::midiControllers(unsigned char controlType)
         {
             value = toggle();
             if (value == -1)
-                return value_msg;
+                return REPLY::value_msg;
             cmd = PART::control::portamentoThresholdType;
         }
         else if (matchnMove(2, point, "pproportional"))
         {
             value = toggle();
             if (value == -1)
-                return value_msg;
+                return REPLY::value_msg;
             cmd = PART::control::enableProportionalPortamento;
         }
         else if (matchnMove(2, point, "pextent"))
@@ -1136,7 +1136,7 @@ int CmdInterface::midiControllers(unsigned char controlType)
 
     if (cmd > -1)
         return sendNormal(0, value, controlType, cmd, npart);
-    return available_msg;
+    return REPLY::available_msg;
 }
 
 
@@ -1162,7 +1162,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
             if (matchnMove(1, point, "fine"))
             {
                 if (lineEnd(controlType))
-                    return value_msg;
+                    return REPLY::value_msg;
                 value = string2int(point);
                 if (engine >= PART::engine::addMod1)
                     cmd = ADDVOICE::control::modulatorDetuneFrequency;
@@ -1172,7 +1172,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
             else if (matchnMove(1, point, "coarse"))
             {
                 if (lineEnd(controlType))
-                    return value_msg;
+                    return REPLY::value_msg;
                 value = string2int(point);
                 if (engine >= PART::engine::addMod1)
                     cmd = ADDVOICE::control::modulatorCoarseDetune;
@@ -1182,13 +1182,13 @@ int CmdInterface::partCommonControls(unsigned char controlType)
             else if (matchnMove(1, point, "type"))
             {
                 if (lineEnd(controlType))
-                    return value_msg;
+                    return REPLY::value_msg;
                 std::string name = std::string(point).substr(0,3);
                 value = stringNumInList(name, detuneType, 3);
                 if (value > -1 && engine < PART::engine::addVoice1)
                     value -= 1;
                 if (value == -1)
-                    return range_msg;
+                    return REPLY::range_msg;
                 if (engine >= PART::engine::addMod1)
                     cmd = ADDVOICE::control::modulatorDetuneType;
                 else
@@ -1198,7 +1198,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
         else if (matchnMove(3, point, "octave"))
         {
             if (lineEnd(controlType))
-                return value_msg;
+                return REPLY::value_msg;
             value = string2int(point);
             if (engine >= PART::engine::addMod1)
                 cmd = ADDVOICE::control::modulatorOctave;
@@ -1209,7 +1209,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
         if (cmd == -1 && matchnMove(3, point, "lfo"))
         {
             if(engine == PART::engine::subSynth)
-                return available_msg;
+                return REPLY::available_msg;
             bitSet(context, LEVEL::LFO);
             return LFOselect(controlType);
         }
@@ -1251,7 +1251,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
             if (tmp_cmd > -1)
             {
                 if (lineEnd(controlType))
-                    return value_msg;
+                    return REPLY::value_msg;
                 value = string2int(point);
                 cmd = tmp_cmd;
             }
@@ -1276,7 +1276,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
             if (tmp_cmd > -1)
             {
                 if (lineEnd(controlType))
-                    return value_msg;
+                    return REPLY::value_msg;
                 value = string2int(point);
                 cmd = tmp_cmd;
             }
@@ -1306,7 +1306,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
                     else if(matchnMove(2, point, "shift"))
                         value = 7;
                     else
-                        return range_msg;
+                        return REPLY::range_msg;
                     cmd = SUBSYNTH::control::overtonePosition;
                 }
                 else
@@ -1320,7 +1320,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
                     if (cmd > -1)
                     {
                         if (lineEnd(controlType))
-                            return value_msg;
+                            return REPLY::value_msg;
                         value = string2int(point);
                     }
                 }
@@ -1330,7 +1330,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
         if (cmd > -1)
         {
             sendNormal(0, value, controlType, cmd, npart, kitNumber, engine);
-            return done_msg;
+            return REPLY::done_msg;
         }
     }
 
@@ -1344,7 +1344,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
     if (cmd != -1)
     {
         if (lineEnd(controlType))
-            return value_msg;
+            return REPLY::value_msg;
 
         if (bitFindHigh(context) == LEVEL::Part)
             kit = UNUSED;
@@ -1363,7 +1363,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
             if(controlType == TOPLEVEL::type::Write)
             {
                 if (lineEnd(controlType))
-                    return value_msg;
+                    return REPLY::value_msg;
                 if (matchnMove(1, point, "last"))
                 {
                     cmd = PART::control::minToLastKey;
@@ -1372,7 +1372,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
                 {
                     value = string2int(point);
                     if (value > synth->part[npart]->Pmaxkey)
-                        return high_msg;
+                        return REPLY::high_msg;
                 }
             }
 
@@ -1383,7 +1383,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
             if(controlType == TOPLEVEL::type::Write)
             {
                 if (lineEnd(controlType))
-                    return value_msg;
+                    return REPLY::value_msg;
                 if (matchnMove(1, point, "last"))
                 {
                     cmd = PART::control::maxToLastKey;
@@ -1392,7 +1392,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
                 {
                     value = string2int(point);
                     if (value < synth->part[npart]->Pminkey)
-                        return low_msg;
+                        return REPLY::low_msg;
                 }
             }
 
@@ -1407,7 +1407,7 @@ int CmdInterface::partCommonControls(unsigned char controlType)
         }
     }
     //std::cout << ">> value " << value << "  type " << controlType << "  cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  insert " << int(insert) << std::endl;
-    return todo_msg;
+    return REPLY::todo_msg;
 }
 
 
@@ -1417,7 +1417,7 @@ int CmdInterface::LFOselect(unsigned char controlType)
     float value = -1;
     int group = -1;
     if (lineEnd(controlType))
-        return done_msg;
+        return REPLY::done_msg;
 
     int engine = contextToEngines();
     if (engine == PART::engine::addVoice1)
@@ -1450,11 +1450,11 @@ int CmdInterface::LFOselect(unsigned char controlType)
     if (value > -1)
     {
         if (engine != PART::engine::addVoice1 + voiceNumber)
-            return available_msg;
+            return REPLY::available_msg;
         return sendNormal(0, value, controlType, cmd, npart, kitNumber, engine);
     }
     if (lineEnd(controlType))
-        return done_msg;
+        return REPLY::done_msg;
 
     value = -1;
     cmd = -1;
@@ -1477,7 +1477,7 @@ int CmdInterface::LFOselect(unsigned char controlType)
     else if (matchnMove(1, point, "type"))
     {
         if (lineEnd(controlType))
-            return what_msg;
+            return REPLY::what_msg;
         if (matchnMove(2, point, "sine"))
             value = 0;
         else if (matchnMove(1, point, "triangle"))
@@ -1515,7 +1515,7 @@ int CmdInterface::filterSelect(unsigned char controlType)
     int kit = kitNumber;
     int param = UNUSED;
     if (lineEnd(controlType))
-        return done_msg;
+        return REPLY::done_msg;
 
     int engine = contextToEngines();
     if (engine == PART::engine::addVoice1)
@@ -1582,13 +1582,13 @@ int CmdInterface::filterSelect(unsigned char controlType)
         else if(matchnMove(1, point, "state"))
             value = 2;
         else
-            return range_msg;
+            return REPLY::range_msg;
         cmd = FILTERINSERT::control::baseType;
     }
     else if (matchnMove(2, point, "stages"))
     {
         if (lineEnd(controlType))
-            return value_msg;
+            return REPLY::value_msg;
         value = string2int(point) - 1;
         cmd = FILTERINSERT::control::stages;
     }
@@ -1602,7 +1602,7 @@ int CmdInterface::filterSelect(unsigned char controlType)
             if (matchnMove(1, point, "invert"))
             {
                 if (lineEnd(controlType))
-                    return value_msg;
+                    return REPLY::value_msg;
                 value = (toggle() == 1);
                 cmd = FILTERINSERT::control::negateInput;
             }
@@ -1619,33 +1619,33 @@ int CmdInterface::filterSelect(unsigned char controlType)
             else if (matchnMove(2, point, "size"))
             {
                 if (lineEnd(controlType))
-                    return value_msg;
+                    return REPLY::value_msg;
                 value = string2int(point);
                 cmd = FILTERINSERT::control::sequenceSize;
             }
             else if (matchnMove(2, point, "count"))
             {
                 if (lineEnd(controlType))
-                    return value_msg;
+                    return REPLY::value_msg;
                 value = string2int(point);
                 cmd = FILTERINSERT::control::numberOfFormants;
             }
             else if (matchnMove(2, point, "vowel"))
             {
                 if (lineEnd(controlType))
-                    return value_msg;
+                    return REPLY::value_msg;
                 value = string2int(point);
                 filterVowelNumber = string2int(point);
                 filterFormantNumber = 0;
-                return done_msg;
+                return REPLY::done_msg;
             }
             else if (matchnMove(1, point, "point"))
             {
                 if (lineEnd(controlType))
-                    return value_msg;
+                    return REPLY::value_msg;
                 value = string2int(point);
                 if (lineEnd(controlType))
-                    return value_msg;
+                    return REPLY::value_msg;
                 point = skipChars(point);
                 int position = string2int(point);
                 //std::cout << "val " << value << "  pos " << position << std::endl;
@@ -1654,9 +1654,9 @@ int CmdInterface::filterSelect(unsigned char controlType)
             else if (matchnMove(2, point, "formant"))
             {
                 if (lineEnd(controlType))
-                    return value_msg;
+                    return REPLY::value_msg;
                 filterFormantNumber = string2int(point);
-                return done_msg;
+                return REPLY::done_msg;
             }
             else
             {
@@ -1667,7 +1667,7 @@ int CmdInterface::filterSelect(unsigned char controlType)
                 else if (matchnMove(2, point, "fgain"))
                     cmd = FILTERINSERT::control::formantAmplitude;
                 if (cmd == -1)
-                    return range_msg;
+                    return REPLY::range_msg;
                 value = string2int(point);
                 return sendNormal(0, value, controlType, cmd, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, filterFormantNumber, filterVowelNumber);
             }
@@ -1697,7 +1697,7 @@ int CmdInterface::filterSelect(unsigned char controlType)
                     else if (matchnMove(2, point, "hshelf"))
                         value = 8;
                     else
-                        return range_msg;
+                        return REPLY::range_msg;
                     cmd = FILTERINSERT::control::analogType;
                     break;
                 }
@@ -1712,12 +1712,12 @@ int CmdInterface::filterSelect(unsigned char controlType)
                     else if (matchnMove(1, point, "stop"))
                         value = 3;
                     else
-                        return range_msg;
+                        return REPLY::range_msg;
                     cmd = FILTERINSERT::control::stateVariableType;
                     break;
                 }
                 default:
-                    return available_msg;
+                    return REPLY::available_msg;
                     break;
             }
         }
@@ -1740,7 +1740,7 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
     unsigned char insert = TOPLEVEL::insert::envelopeGroup;
     unsigned char offset = UNUSED;
     if (lineEnd(controlType))
-        return done_msg;
+        return REPLY::done_msg;
 
     int engine = contextToEngines();
     if (engine == PART::engine::addVoice1 || engine == PART::engine::addMod1)
@@ -1757,7 +1757,7 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
         if(bitTest(context, LEVEL::SubSynth))
             group = TOPLEVEL::insertType::bandwidth;
         else
-            return available_msg;
+            return REPLY::available_msg;
     }
 
     if (group > -1)
@@ -1787,7 +1787,7 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
             break;
     }
     if (lineEnd(controlType))
-        return done_msg;
+        return REPLY::done_msg;
 
     value = toggle();
     if (value > -1)
@@ -1795,7 +1795,7 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
         if (engine != PART::engine::addSynth && engine != PART::engine::padSynth)
             return sendNormal(0, value, controlType, cmd, npart, kitNumber, engine);
         else
-            return available_msg;
+            return REPLY::available_msg;
     }
 
     if (matchnMove(2, point, "fmode"))
@@ -1833,20 +1833,20 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
         else if (matchnMove(1, point, "Sustain"))
         {
             if (lineEnd(controlType))
-                return value_msg;
+                return REPLY::value_msg;
             value = string2int(point);
             if (value == 0)
             {
                     synth->getRuntime().Log("Sustain can't be at first point");
-                    return done_msg;
+                    return REPLY::done_msg;
             }
             else if (value >= (pointCount - 1))
             {
                     synth->getRuntime().Log("Sustain can't be at last point");
-                    return done_msg;
+                    return REPLY::done_msg;
             }
             else if (value < 0)
-                return range_msg;
+                return REPLY::range_msg;
             cmd = ENVELOPEINSERT::control::sustainPoint;
         }
         else
@@ -1856,27 +1856,27 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
                 if ((MAX_ENVELOPE_POINTS - pointCount) < 2)
                 {
                     synth->getRuntime().Log("Max points already defined");
-                    return done_msg;
+                    return REPLY::done_msg;
                 }
                 if (lineEnd(controlType))
-                    return value_msg;
+                    return REPLY::value_msg;
 
                 cmd = string2int(point); // point number
                 if (cmd == 0)
                 {
                     synth->getRuntime().Log("Can't add at first point");
-                    return done_msg;
+                    return REPLY::done_msg;
                 }
                 if (cmd < 0 || cmd >= pointCount)
-                    return range_msg;
+                    return REPLY::range_msg;
                 point = skipChars(point);
                 if (lineEnd(controlType))
-                    return value_msg;
+                    return REPLY::value_msg;
 
                 offset = string2int(point); // X
                 point = skipChars(point);
                 if (lineEnd(controlType))
-                    return value_msg;
+                    return REPLY::value_msg;
 
                 value = string2int(point); // Y
                 insert = TOPLEVEL::insert::envelopePoints;
@@ -1887,42 +1887,42 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
                 if (pointCount <= 3)
                 {
                     synth->getRuntime().Log("Can't have less than three points");
-                    return done_msg;
+                    return REPLY::done_msg;
                 }
                 if (lineEnd(controlType))
-                    return value_msg;
+                    return REPLY::value_msg;
 
                 cmd = string2int(point); // point number
                 if (cmd == 0)
                 {
                     synth->getRuntime().Log("Can't delete first point");
-                    return done_msg;
+                    return REPLY::done_msg;
                 }
                 if (cmd >= (pointCount - 1))
                 {
                     synth->getRuntime().Log("Can't delete last point");
-                    return done_msg;
+                    return REPLY::done_msg;
                 }
                 if (cmd < 0 || cmd >= (MAX_ENVELOPE_POINTS - 1))
-                    return range_msg;
+                    return REPLY::range_msg;
                 insert = TOPLEVEL::insert::envelopePoints;
             }
             else if (matchnMove(1, point, "change"))
             {
                 if (lineEnd(controlType))
-                return value_msg;
+                return REPLY::value_msg;
 
                 cmd = string2int(point); // point number
                 if (cmd < 0 || cmd >= (pointCount - 1))
-                    return range_msg;
+                    return REPLY::range_msg;
                 point = skipChars(point);
                 if (lineEnd(controlType))
-                return value_msg;
+                return REPLY::value_msg;
 
                 offset = string2int(point); // X
                 point = skipChars(point);
                 if (lineEnd(controlType))
-                return value_msg;
+                return REPLY::value_msg;
 
                 value = string2int(point); // Y
                 insert = TOPLEVEL::insert::envelopePointChange;
@@ -1957,12 +1957,12 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
     }
 
     if (cmd == -1)
-        return opp_msg;
+        return REPLY::op_msg;
 
     if (value == -1)
     {
         if (lineEnd(controlType))
-            return value_msg;
+            return REPLY::value_msg;
         value = string2float(point);
     }
 
@@ -1983,7 +1983,7 @@ int CmdInterface::commandGroup()
             line = "  " + instrumentGroupType[i];
             synth->getRuntime().Log(line);
         }
-        return done_msg;
+        return REPLY::done_msg;
     }
 
 
@@ -1992,7 +1992,7 @@ int CmdInterface::commandGroup()
     value = stringNumInList(name, instrumentGroupType, 2) + 1;
     cout << value << endl;
     if (value < 1)
-        return range_msg;
+        return REPLY::range_msg;
 
 
     list<std::string> msg;
@@ -2017,7 +2017,7 @@ int CmdInterface::commandGroup()
         }
     } while (line != "*");
     synth->cliOutput(msg, LINES);
-    return done_msg;
+    return REPLY::done_msg;
 }
 
 
@@ -2036,7 +2036,7 @@ int CmdInterface::commandList()
             ID = string2int(point);
         synth->ListInstruments(ID, msg);
         synth->cliOutput(msg, LINES);
-        return done_msg;
+        return REPLY::done_msg;
     }
 
     if (matchnMove(1, point, "banks"))
@@ -2047,35 +2047,35 @@ int CmdInterface::commandList()
             ID = string2int(point);
         synth->ListBanks(ID, msg);
         synth->cliOutput(msg, LINES);
-        return done_msg;
+        return REPLY::done_msg;
     }
 
     if (matchnMove(1, point, "roots"))
     {
         synth->ListPaths(msg);
         synth->cliOutput(msg, LINES);
-        return done_msg;
+        return REPLY::done_msg;
     }
 
     if (matchnMove(1, point, "vectors"))
     {
         synth->ListVectors(msg);
         synth->cliOutput(msg, LINES);
-        return done_msg;
+        return REPLY::done_msg;
     }
 
     if (matchnMove(1, point, "parts"))
     {
         listCurrentParts(msg);
         synth->cliOutput(msg, LINES);
-        return done_msg;
+        return REPLY::done_msg;
     }
 
     if (matchnMove(1, point, "config"))
     {
         synth->ListSettings(msg);
         synth->cliOutput(msg, LINES);
-        return done_msg;
+        return REPLY::done_msg;
     }
 
     if (matchnMove(2, point, "mlearn"))
@@ -2088,25 +2088,25 @@ int CmdInterface::commandList()
             if (tmp > 0)
                 synth->midilearn.listLine(tmp - 1);
             else
-                return value_msg;
+                return REPLY::value_msg;
         }
         else
         {
             synth->midilearn.listAll(msg);
             synth->cliOutput(msg, LINES);
         }
-        return done_msg;
+        return REPLY::done_msg;
     }
 
     if (matchnMove(1, point, "tuning"))
     {
         Runtime.Log("Tuning:\n" + synth->microtonal.tuningtotext());
-        return done_msg;
+        return REPLY::done_msg;
     }
     if (matchnMove(1, point, "keymap"))
     {
         Runtime.Log("Keymap:\n" + synth->microtonal.keymaptotext());
-        return done_msg;
+        return REPLY::done_msg;
     }
 
     if (matchnMove(1, point, "history"))
@@ -2125,7 +2125,7 @@ int CmdInterface::commandList()
             historyList(TOPLEVEL::XML::MLearn);
         else
             historyList(-1);
-        return done_msg;
+        return REPLY::done_msg;
     }
 
     if (matchnMove(1, point, "effects") || matchnMove(1, point, "efx"))
@@ -2139,7 +2139,7 @@ int CmdInterface::commandList()
         // we need this in case someone is working headless
         std::cout << "\nSet CONfig REPorts [s] - set report destination (gui/stderr)\n";
     synth->cliOutput(msg, LINES);
-    return done_msg;
+    return REPLY::done_msg;
 }
 
 
@@ -2728,7 +2728,7 @@ int CmdInterface::commandMlearn(unsigned char controlType)
     if (controlType != TOPLEVEL::type::Write)
     {
         Runtime.Log("Write only");
-        return done_msg; // will eventually be readable
+        return REPLY::done_msg; // will eventually be readable
     }
 
     if (isdigit(point[0]) || point[0] == '-') // negative should never happen!
@@ -2736,7 +2736,7 @@ int CmdInterface::commandMlearn(unsigned char controlType)
         int lineNo = string2int(point);
         point = skipChars(point);
         if (lineNo <= 0)
-            return value_msg;
+            return REPLY::value_msg;
         else
             mline = lineNo -1;
     }
@@ -2748,10 +2748,10 @@ int CmdInterface::commandMlearn(unsigned char controlType)
         else
             Runtime.Log("Line " + std::to_string(mline + 1) + " Not found");
         mline = 0;
-        return (done_msg);
+        return (REPLY::done_msg);
     }
     if (lineEnd(controlType))
-        return done_msg;
+        return REPLY::done_msg;
     {
         unsigned char type = 0;
         unsigned char control = 0;
@@ -2763,12 +2763,12 @@ int CmdInterface::commandMlearn(unsigned char controlType)
         if (matchnMove(2, point, "cc"))
         {
             if (!isdigit(point[0]))
-                return value_msg;
+                return REPLY::value_msg;
             kit = string2int(point);
             if (kit > 129)
             {
                 Runtime.Log("Max CC value is 129");
-                return done_msg;
+                return REPLY::done_msg;
             }
             control = MIDILEARN::control::CCorChannel;
             Runtime.Log("Lines may be re-ordered");
@@ -2785,14 +2785,14 @@ int CmdInterface::commandMlearn(unsigned char controlType)
         {
             insert = int((string2float(point)* 2.0f) + 0.5f);
             if (insert > 200)
-                return value_msg;
+                return REPLY::value_msg;
             control = MIDILEARN::control::minimum;
         }
         else if (matchnMove(2, point, "maximum"))
         {
             parameter = int((string2float(point)* 2.0f) + 0.5f);
             if (parameter > 200)
-                return value_msg;
+                return REPLY::value_msg;
             control = MIDILEARN::control::maximum;
         }
         else if (matchnMove(2, point, "mute"))
@@ -2816,9 +2816,9 @@ int CmdInterface::commandMlearn(unsigned char controlType)
             control = MIDILEARN::control::sevenBit;
         }
         sendNormal(0, mline, type, control, TOPLEVEL::section::midiLearn, kit, engine, insert, parameter);
-        return done_msg;
+        return REPLY::done_msg;
     }
-    return opp_msg;
+    return REPLY::op_msg;
 }
 
 
@@ -2834,13 +2834,13 @@ int CmdInterface::commandVector(unsigned char controlType)
             synth->cliOutput(msg, LINES);
         else
             Runtime.Log("No vector on channel " + asString(chan + 1));
-        return done_msg;
+        return REPLY::done_msg;
     }
     if (lineEnd(controlType))
     {
         if (!Runtime.vectordata.Enabled[chan])
             Runtime.Log("No vector on channel " + asString(chan + 1));
-        return done_msg;
+        return REPLY::done_msg;
     }
 
     unsigned char ch = string2int127(point);
@@ -2848,7 +2848,7 @@ int CmdInterface::commandVector(unsigned char controlType)
     {
         ch -= 1;
         if (ch >= NUM_MIDI_CHANNELS)
-            return range_msg;
+            return REPLY::range_msg;
         point = skipChars(point);
         if (chan != ch)
         {
@@ -2864,7 +2864,7 @@ int CmdInterface::commandVector(unsigned char controlType)
         sendDirect(0, 0,controlType,VECTOR::control::erase, TOPLEVEL::section::vector, UNUSED, UNUSED, chan);
         axis = 0;
         bitClear(context, LEVEL::Vector);
-        return done_msg;
+        return REPLY::done_msg;
     }
     if (matchnMove(1, point, "xaxis"))
         axis = 0;
@@ -2873,43 +2873,43 @@ int CmdInterface::commandVector(unsigned char controlType)
         if (!Runtime.vectordata.Enabled[chan])
         {
             Runtime.Log("Vector X must be set first");
-            return done_msg;
+            return REPLY::done_msg;
         }
         axis = 1;
     }
 
     if (lineEnd(controlType))
-        return done_msg;
+        return REPLY::done_msg;
 
     if (matchnMove(2, point, "cc"))
     {
         if (lineEnd(controlType))
-            return value_msg;
+            return REPLY::value_msg;
 
         tmp = string2int(point);
         if (axis == 0)
         {
             sendDirect(0, tmp, controlType, VECTOR::control::Xcontroller, TOPLEVEL::section::vector, UNUSED, UNUSED, chan);
             bitSet(context, LEVEL::Vector);
-            return done_msg;
+            return REPLY::done_msg;
         }
         if (Runtime.vectordata.Enabled[chan])
         {
             sendDirect(0, tmp, controlType, VECTOR::control::Ycontroller, TOPLEVEL::section::vector, UNUSED, UNUSED, chan);
-            return done_msg;
+            return REPLY::done_msg;
         }
     }
 
     if (!Runtime.vectordata.Enabled[chan])
     {
         Runtime.Log("Vector X CC must be set first");
-        return done_msg;
+        return REPLY::done_msg;
     }
 
     if (axis == 1 && (Runtime.vectordata.Yaxis[chan] > 0x7f))
     {
         Runtime.Log("Vector Y CC must be set first");
-        return done_msg;
+        return REPLY::done_msg;
     }
 
     if (matchnMove(1, point, "name"))
@@ -2919,19 +2919,19 @@ int CmdInterface::commandVector(unsigned char controlType)
         {
             name = std::string(point);
             if (name <= "!")
-                return value_msg;
+                return REPLY::value_msg;
         }
         sendDirect(TOPLEVEL::action::lowPrio, 0, controlType, VECTOR::control::name, TOPLEVEL::section::vector, UNUSED, UNUSED, chan, UNUSED, UNUSED, miscMsgPush(name));
-        return done_msg;
+        return REPLY::done_msg;
     }
 
     if (matchnMove(1, point, "features"))
     {
         if (lineEnd(controlType))
-            return value_msg;
+            return REPLY::value_msg;
         int feat = string2int(point) - 1;
         if (feat < 0 || feat > 3)
-            return range_msg;
+            return REPLY::range_msg;
         point = skipChars(point);
         int enable = 0;
         if (toggle() == 1)
@@ -2939,7 +2939,7 @@ int CmdInterface::commandVector(unsigned char controlType)
         else if (feat > 1 && matchnMove(1, point, "reverse"))
             enable = 2;
         sendDirect(0, enable, controlType, VECTOR::control::Xfeature0 + (axis * (VECTOR::control::Ycontroller - VECTOR::control::Xcontroller)) + feat , TOPLEVEL::section::vector, UNUSED, UNUSED, chan);
-        return done_msg;
+        return REPLY::done_msg;
     }
 
     if (matchnMove(2, point, "program") || matchnMove(1, point, "instrument"))
@@ -2949,41 +2949,41 @@ int CmdInterface::commandVector(unsigned char controlType)
         if ((axis == 0 && (hand == 'd' || hand == 'u')) || (axis == 1 && (hand == 'l' || hand == 'r')))
         {
             Runtime.Log("Bad direction for this axis");
-            return done_msg;
+            return REPLY::done_msg;
         }
         if (hand == 'l' || hand == 'd')
             hand = 0;
         else if (hand == 'r' || hand == 'u')
             hand = 1;
         else
-            return opp_msg;
+            return REPLY::op_msg;
         tmp = string2int(point);
         sendDirect(0, tmp, controlType, VECTOR::control::XleftInstrument + hand + (axis * (VECTOR::control::Ycontroller - VECTOR::control::Xcontroller)), TOPLEVEL::section::vector, UNUSED, UNUSED, chan);
-        return done_msg;
+        return REPLY::done_msg;
     }
 
     // this disabled for now - needs a lot of work.
     /*if (!matchnMove(1, point, "control"))
-        return opp_msg;
+        return REPLY::op_msg;
     if(isdigit(point[0]))
     {
         int cmd = string2int(point);
         if (cmd < 2 || cmd > 4)
-            return range_msg;
+            return REPLY::range_msg;
         point = skipChars(point);
         if (lineEnd(controlType))
-            return value_msg;
+            return REPLY::value_msg;
         tmp = string2int(point);
         if (!synth->vectorInit(axis * 3 + cmd + 6, chan, tmp))
         {
             synth->vectorSet(axis * 3 + cmd + 6, chan, tmp);
-            return done_msg;
+            return REPLY::done_msg;
         }
         else
-            return value_msg;
+            return REPLY::value_msg;
     }*/
 
-    return opp_msg;
+    return REPLY::op_msg;
 }
 
 
@@ -2998,14 +2998,14 @@ int CmdInterface::commandConfig(unsigned char controlType)
     {
         command = CONFIG::control::oscillatorSize;
         if (controlType == TOPLEVEL::type::Write && point[0] == 0)
-            return value_msg;
+            return REPLY::value_msg;
         value = string2int(point);
     }
     else if (matchnMove(2, point, "buffer"))
     {
         command = CONFIG::control::bufferSize;
         if (controlType == TOPLEVEL::type::Write && point[0] == 0)
-            return value_msg;
+            return REPLY::value_msg;
         value = string2int(point);
     }
     else if (matchnMove(2, point, "padsynth"))
@@ -3017,14 +3017,14 @@ int CmdInterface::commandConfig(unsigned char controlType)
     {
         command = CONFIG::control::virtualKeyboardLayout;
         if (controlType == TOPLEVEL::type::Write && point[0] == 0)
-            return value_msg;
+            return REPLY::value_msg;
         value = string2int(point);
     }
     else if (matchnMove(1, point, "xml"))
     {
         command = CONFIG::control::XMLcompressionLevel;
         if (controlType == TOPLEVEL::type::Write && point[0] == 0)
-            return value_msg;
+            return REPLY::value_msg;
         value = string2int(point);
     }
     else if (matchnMove(2, point, "reports"))
@@ -3042,7 +3042,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
         else if (matchnMove(1, point, "both"))
             value = 3;
         else if (controlType == TOPLEVEL::type::Write)
-            return value_msg;
+            return REPLY::value_msg;
     }
 
     else if (matchnMove(2, point, "state"))
@@ -3085,14 +3085,14 @@ int CmdInterface::commandConfig(unsigned char controlType)
         command = CONFIG::control::enableGUI;
         value = toggle();
         if (value == -1)
-            return value_msg;
+            return REPLY::value_msg;
     }
     else if (matchnMove(1, point, "cli"))
     {
         command = CONFIG::control::enableCLI;
         value = toggle();
         if (value == -1)
-            return value_msg;
+            return REPLY::value_msg;
     }
 
     else if (matchnMove(3, point, "expose"))
@@ -3101,7 +3101,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
         if (value == -1 && matchnMove(2, point, "prompt"))
             value = 2;
         if (value == -1)
-            return value_msg;
+            return REPLY::value_msg;
         command = CONFIG::control::exposeStatus;
     }
 
@@ -3117,7 +3117,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
                     miscmsg = miscMsgPush(std::string(point));
             }
             else
-                return value_msg;
+                return REPLY::value_msg;
         }
         else if (matchnMove(1, point, "server"))
         {
@@ -3129,7 +3129,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
                     miscmsg = miscMsgPush(std::string(point));
             }
             else
-                return value_msg;
+                return REPLY::value_msg;
         }
         else if (matchnMove(1, point, "auto"))
         {
@@ -3137,7 +3137,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
             value = (toggle() == 1);
         }
         else
-            return opp_msg;
+            return REPLY::op_msg;
     }
 
     else if (matchnMove(2, point, "alsa"))
@@ -3152,7 +3152,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
                     miscmsg = miscMsgPush(std::string(point));
             }
             else
-                return value_msg;
+                return REPLY::value_msg;
         }
         else if (matchnMove(1, point, "audio"))
         {
@@ -3164,7 +3164,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
                     miscmsg = miscMsgPush(std::string(point));
             }
             else
-                return value_msg;
+                return REPLY::value_msg;
         }
         else if (matchnMove(1, point, "s"))
         {
@@ -3172,14 +3172,14 @@ int CmdInterface::commandConfig(unsigned char controlType)
             if (controlType == TOPLEVEL::type::Write)
             {
                 if (lineEnd(controlType))
-                    return value_msg;
+                    return REPLY::value_msg;
                 value = string2int(point);
                 if (value < 0 || value > 3)
-                    return range_msg;
+                    return REPLY::range_msg;
             }
         }
         else
-            return opp_msg;
+            return REPLY::op_msg;
     }
 
     else if (matchnMove(2, point, "midi"))
@@ -3190,7 +3190,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
         else if (controlType != TOPLEVEL::type::Write || matchnMove(1, point, "jack"))
             command = CONFIG::control::jackPreferredMidi;
         else
-            return value_msg;
+            return REPLY::value_msg;
     }
 
     else if (matchnMove(2, point, "audio"))
@@ -3201,7 +3201,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
         else if (controlType != TOPLEVEL::type::Write || matchnMove(1, point, "jack"))
             command = CONFIG::control::jackPreferredAudio;
         else
-            return value_msg;
+            return REPLY::value_msg;
     }
 
     else if (matchnMove(2, point, "root"))
@@ -3210,7 +3210,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
         //if (controlType != TOPLEVEL::type::Write)
             value = 128; // ignored by range check
         if (lineEnd(controlType))
-            return value_msg;
+            return REPLY::value_msg;
         if (matchnMove(1, point, "msb"))
             value = 0;
         else if (matchnMove(1, point, "lsb"))
@@ -3222,7 +3222,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
         //if (controlType != TOPLEVEL::type::Write)
             value = 128; // ignored by range check
         if (lineEnd(controlType))
-            return value_msg;
+            return REPLY::value_msg;
         if (matchnMove(1, point, "msb"))
             value = 0;
         else if (matchnMove(1, point, "lsb"))
@@ -3244,7 +3244,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
         if (controlType != TOPLEVEL::type::Write)
             value = 128; // ignored by range check
         else if (lineEnd(controlType))
-            return value_msg;
+            return REPLY::value_msg;
         else
             value = string2int(point);
     }
@@ -3276,33 +3276,33 @@ int CmdInterface::commandConfig(unsigned char controlType)
         std::string name = std::string(point).substr(0,2);
         int selected = stringNumInList(name, historyGroup, 2);
         if (selected == -1)
-            return range_msg;
+            return REPLY::range_msg;
         point = skipChars(point);
         value = (toggle());
         if (controlType == TOPLEVEL::type::Write && value == -1)
-            return value_msg;
+            return REPLY::value_msg;
         return sendDirect(TOPLEVEL::action::lowPrio, value, controlType, command, TOPLEVEL::section::config, selected);
     }
 
     else
-        return  opp_msg;
+        return  REPLY::op_msg;
 
     sendDirect(action, value, controlType, command, TOPLEVEL::section::config, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
-    return done_msg;
+    return REPLY::done_msg;
 }
 
 
 int CmdInterface::commandScale(unsigned char controlType)
 {
     if (lineEnd(controlType))
-        return done_msg;
+        return REPLY::done_msg;
     Config &Runtime = synth->getRuntime();
     float value = 0;
     unsigned char command = UNUSED;
     unsigned char action = 0;
     unsigned char miscmsg = UNUSED;
     if (controlType != TOPLEVEL::type::Write)
-        return done_msg;
+        return REPLY::done_msg;
 
     std::string name;
 
@@ -3320,7 +3320,7 @@ int CmdInterface::commandScale(unsigned char controlType)
         if (controlType != TOPLEVEL::type::Write && command <= SCALES::control::importKbm)
         {
             Runtime.Log("Write only - use list");
-            return done_msg;
+            return REPLY::done_msg;
         }
         if (command <= SCALES::control::keyboardMap)
         {
@@ -3329,7 +3329,7 @@ int CmdInterface::commandScale(unsigned char controlType)
         }
         name = (std::string)point;
         if (name == "")
-            return value_msg;
+            return REPLY::value_msg;
         action = TOPLEVEL::action::lowPrio;
         miscmsg = miscMsgPush(name);
     }
@@ -3381,31 +3381,31 @@ int CmdInterface::commandScale(unsigned char controlType)
             command = SCALES::control::clearAll;
         }
         else
-            return todo_msg;
+            return REPLY::todo_msg;
 
         if (controlType == TOPLEVEL::type::Write)
         {
             if (lineEnd(controlType))
-                return value_msg;
+                return REPLY::value_msg;
             if ((toggle() == 1))
                 value = 1;
             else//if (isdigit(point[0]))
             {
                 value = string2float(point);
                 if (value < min || value > max)
-                    return value_msg;
+                    return REPLY::value_msg;
             }
         }
     }
     sendDirect(action, value, controlType, command, TOPLEVEL::section::scales, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
-    return done_msg;
+    return REPLY::done_msg;
 }
 
 
 int CmdInterface::modulator(unsigned char controlType)
 {
     if (lineEnd(controlType))
-        return done_msg;
+        return REPLY::done_msg;
     int value = -1;
     int cmd = -1;
     if (matchnMove(3, point, "off"))
@@ -3425,7 +3425,7 @@ int CmdInterface::modulator(unsigned char controlType)
     if (cmd == -1)
     {
         if (readControl(0, ADDVOICE::control::modulatorType, npart, kitNumber, PART::engine::addVoice1 + voiceNumber) == 0)
-            return inactive_msg;
+            return REPLY::inactive_msg;
         if (matchnMove(2, point, "waveform"))
         {
             bitSet(context, LEVEL::Oscillator);
@@ -3443,7 +3443,7 @@ int CmdInterface::modulator(unsigned char controlType)
                     value = tmp;
             }
             if (value == -1 || value > voiceNumber)
-                return range_msg;
+                return REPLY::range_msg;
             if (value == 0)
                 value = 0xff;
             else
@@ -3462,7 +3462,7 @@ int CmdInterface::modulator(unsigned char controlType)
                     value = tmp;
             }
             if (value == -1 || value > voiceNumber)
-                return range_msg;
+                return REPLY::range_msg;
             if (value == 0)
                 value = 0xff;
             else
@@ -3487,7 +3487,7 @@ int CmdInterface::modulator(unsigned char controlType)
     if (cmd == -1)
     {
         if (readControl(0, ADDVOICE::control::externalModulator, npart, kitNumber, PART::engine::addVoice1 + voiceNumber) != -1)
-            return  inactive_msg;
+            return  REPLY::inactive_msg;
 
         if (matchnMove(2, point, "local"))
         {
@@ -3500,7 +3500,7 @@ int CmdInterface::modulator(unsigned char controlType)
                     value = tmp;
             }
             if (value == -1 || value > voiceNumber)
-                return range_msg;
+                return REPLY::range_msg;
             if (value == 0)
                 value = 0xff;
             else
@@ -3534,7 +3534,7 @@ int CmdInterface::modulator(unsigned char controlType)
     }
 
     if (cmd == -1)
-        return partCommonControls(controlType);//available_msg;
+        return partCommonControls(controlType);//REPLY::available_msg;
 
     return sendNormal(0, value, controlType, cmd, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
 }
@@ -3546,21 +3546,21 @@ int CmdInterface::addVoice(unsigned char controlType)
     {
         int tmp = string2int(point) - 1;
         if (tmp < 0 || tmp >= NUM_VOICES)
-            return range_msg;
+            return REPLY::range_msg;
         voiceNumber = tmp;
         point = skipChars(point);
     }
     if (lineEnd(controlType))
-        return done_msg;
+        return REPLY::done_msg;
 
     int enable = (toggle());
     if (enable > -1)
     {
         sendNormal(0, enable, controlType, ADDVOICE::control::enableVoice, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
-        return done_msg;
+        return REPLY::done_msg;
     }
     if (!lineEnd(controlType) && !readControl(0, ADDVOICE::control::enableVoice, npart, kitNumber, PART::engine::addVoice1 + voiceNumber))
-        return inactive_msg;
+        return REPLY::inactive_msg;
 
     if (matchnMove(2, point, "modulator"))
     {
@@ -3576,7 +3576,7 @@ int CmdInterface::addVoice(unsigned char controlType)
     int value = -1;
     int cmd = -1;
     int result = partCommonControls(controlType);
-    if (result != todo_msg)
+    if (result != REPLY::todo_msg)
         return result;
 
     if (cmd == -1)
@@ -3592,7 +3592,7 @@ int CmdInterface::addVoice(unsigned char controlType)
             else if (matchnMove(1, point, "spot"))
                 value = 3;
             else
-                return range_msg;
+                return REPLY::range_msg;
             cmd = ADDVOICE::control::soundType;
         }
         else if (matchnMove(3, point, "oscillator"))
@@ -3606,7 +3606,7 @@ int CmdInterface::addVoice(unsigned char controlType)
                     value = tmp;
             }
             if (value == -1 || value > voiceNumber)
-                return range_msg;
+                return REPLY::range_msg;
             if (value == 0)
                 value = 0xff;
             else
@@ -3624,7 +3624,7 @@ int CmdInterface::addVoice(unsigned char controlType)
                     value = tmp;
             }
             if (value == -1 || value > voiceNumber)
-                return range_msg;
+                return REPLY::range_msg;
             if (value == 0)
                 value = 0xff;
             else
@@ -3684,15 +3684,15 @@ int CmdInterface::addVoice(unsigned char controlType)
                     else if (matchnMove(1, point, "fifth"))
                         value = 5;
                     else
-                        return value_msg;
+                        return REPLY::value_msg;
                     cmd = ADDVOICE::control::unisonPhaseInvert;
                 }
             }
             if (cmd == -1)
-                return opp_msg;
+                return REPLY::op_msg;
         }
         else
-            return opp_msg;
+            return REPLY::op_msg;
     }
 
     if (value == -1)
@@ -3716,10 +3716,10 @@ int CmdInterface::addSynth(unsigned char controlType)
     if (enable > -1)
     {
         sendNormal(0, enable, controlType, PART::control::enable, npart, kit, PART::engine::addSynth, insert);
-        return done_msg;
+        return REPLY::done_msg;
     }
     if (!lineEnd(controlType) && !readControl(0, PART::control::enable, npart, kit, PART::engine::addSynth, insert))
-        return inactive_msg;
+        return REPLY::inactive_msg;
 
     if (matchnMove(2, point, "resonance"))
     {
@@ -3733,10 +3733,10 @@ int CmdInterface::addSynth(unsigned char controlType)
         return addVoice(controlType);
     }
     if (lineEnd(controlType))
-        return done_msg;
+        return REPLY::done_msg;
 
     int result = partCommonControls(controlType);
-    if (result != todo_msg)
+    if (result != REPLY::todo_msg)
         return result;
 
     int cmd = -1;
@@ -3744,19 +3744,19 @@ int CmdInterface::addSynth(unsigned char controlType)
     if (matchnMove(2, point, "bandwidth"))
     {
         if (lineEnd(controlType))
-            return value_msg;
+            return REPLY::value_msg;
         value = string2int(point);
         cmd = ADDSYNTH::control::relativeBandwidth;
     }
     else if (matchnMove(2, point, "group"))
     {
         if (lineEnd(controlType))
-            return value_msg;
+            return REPLY::value_msg;
         value = (toggle() == 1);
         cmd = ADDSYNTH::control::randomGroup;
     }
     if (cmd == -1)
-        return available_msg;
+        return REPLY::available_msg;
 
     return sendNormal(0, value, controlType, cmd, npart, kitNumber, PART::engine::addSynth);
 }
@@ -3775,15 +3775,15 @@ int CmdInterface::subSynth(unsigned char controlType)
     if (enable > -1)
     {
         sendNormal(0, enable, controlType, PART::control::enable, npart, kit, PART::engine::subSynth, insert);
-        return done_msg;
+        return REPLY::done_msg;
     }
     if (!lineEnd(controlType) && !readControl(0, PART::control::enable, npart, kit, PART::engine::subSynth, insert))
-        return inactive_msg;
+        return REPLY::inactive_msg;
 
     if (lineEnd(controlType))
-        return done_msg;
+        return REPLY::done_msg;
     int result = partCommonControls(controlType);
-    if (result != todo_msg)
+    if (result != REPLY::todo_msg)
         return result;
 
     int cmd = -1;
@@ -3798,7 +3798,7 @@ int CmdInterface::subSynth(unsigned char controlType)
         if (cmd != -1)
         {
             if (lineEnd(controlType))
-                return value_msg;
+                return REPLY::value_msg;
             return sendNormal(0, string2int(point), controlType, cmd, npart, kitNumber, PART::engine::subSynth);
         }
 
@@ -3806,7 +3806,7 @@ int CmdInterface::subSynth(unsigned char controlType)
         unsigned char insert = UNUSED;
         bool set = false;
         if (lineEnd(controlType))
-            return parameter_msg;
+            return REPLY::parameter_msg;
         control = string2int(point) - 1;
         point = skipChars(point);
         if (matchnMove(1, point, "amplitude"))
@@ -3822,7 +3822,7 @@ int CmdInterface::subSynth(unsigned char controlType)
         if (set)
         {
             if (lineEnd(controlType))
-                return value_msg;
+                return REPLY::value_msg;
             return sendNormal(0, string2int(point), controlType, control, npart, kitNumber, PART::engine::subSynth, insert);
         }
     }
@@ -3864,12 +3864,12 @@ int CmdInterface::subSynth(unsigned char controlType)
         if (value == -1)
         {
             if (lineEnd(controlType))
-                return value_msg;
+                return REPLY::value_msg;
             value = string2int(point);
         }
         return sendNormal(0, value, controlType, cmd, npart, kitNumber, PART::engine::subSynth);
     }
-    return available_msg;
+    return REPLY::available_msg;
 }
 
 
@@ -3886,10 +3886,10 @@ int CmdInterface::padSynth(unsigned char controlType)
     if (enable > -1)
     {
         sendNormal(0, enable, controlType, PART::control::enable, npart, kit, PART::engine::padSynth, insert);
-        return done_msg;
+        return REPLY::done_msg;
     }
     if (!lineEnd(controlType) && !readControl(0, PART::control::enable, npart, kit, PART::engine::padSynth, insert))
-        return inactive_msg;
+        return REPLY::inactive_msg;
 
     if (matchnMove(2, point, "resonance"))
     {
@@ -3902,20 +3902,20 @@ int CmdInterface::padSynth(unsigned char controlType)
         return waveform(controlType);
     }
     if (lineEnd(controlType))
-        return done_msg;
+        return REPLY::done_msg;
     int result = partCommonControls(controlType);
-    if (result != todo_msg)
+    if (result != REPLY::todo_msg)
         return result;
 
     if (matchnMove(2, point, "xport"))
     {
         if (controlType != TOPLEVEL::type::Write)
-            return writeOnly_msg;
+            return REPLY::writeOnly_msg;
         if (point[0] == 0)
-            return value_msg;
+            return REPLY::value_msg;
         std::string name = point;
         sendDirect(TOPLEVEL::action::lowPrio, 0, controlType, MAIN::control::exportPadSynthSamples, TOPLEVEL::section::main, kitNumber, 2, npart, UNUSED, UNUSED, miscMsgPush(name));
-        return done_msg;
+        return REPLY::done_msg;
     }
 
     int cmd = -1;
@@ -3929,7 +3929,7 @@ int CmdInterface::padSynth(unsigned char controlType)
         else if (matchnMove(1, point, "double"))
             value = 2;
         else
-            return value_msg;
+            return REPLY::value_msg;
 
         cmd = PADSYNTH::control::baseType;
     }
@@ -3962,7 +3962,7 @@ int CmdInterface::padSynth(unsigned char controlType)
         else if (matchnMove(1, point, "lower"))
             value = 2;
         else
-            return value_msg;
+            return REPLY::value_msg;
 
         cmd = PADSYNTH::control::harmonicSidebands;
     }
@@ -3977,7 +3977,7 @@ int CmdInterface::padSynth(unsigned char controlType)
         else if (matchnMove(1, point, "double"))
             value = 3;
         else
-            return value_msg;
+            return REPLY::value_msg;
 
         cmd = PADSYNTH::control::amplitudeMultiplier;
     }
@@ -3992,7 +3992,7 @@ int CmdInterface::padSynth(unsigned char controlType)
         else if (matchnMove(1, point, "d2"))
             value = 3;
         else
-            return value_msg;
+            return REPLY::value_msg;
 
         cmd = PADSYNTH::control::amplitudeMode;
     }
@@ -4022,7 +4022,7 @@ int CmdInterface::padSynth(unsigned char controlType)
             }
         }
         if (cmd == -1)
-            return range_msg;
+            return REPLY::range_msg;
     }
     else if (matchnMove(2, point, "samples"))
     {
@@ -4039,7 +4039,7 @@ int CmdInterface::padSynth(unsigned char controlType)
             }
         }
         if (cmd == -1)
-            return range_msg;
+            return REPLY::range_msg;
     }
     else if (matchnMove(2, point, "range"))
     {
@@ -4049,7 +4049,7 @@ int CmdInterface::padSynth(unsigned char controlType)
     {
         value = bitFindHigh(string2int(point)) - 4;
         if (value > 6)
-            return range_msg;
+            return REPLY::range_msg;
         cmd = PADSYNTH::control::sampleSize;
     }
     else if (matchnMove(2, point, "bandwidth"))
@@ -4075,7 +4075,7 @@ int CmdInterface::padSynth(unsigned char controlType)
         else if (matchnMove(1, point, "inversehalf"))
             value = 7;
         else
-            return range_msg;
+            return REPLY::range_msg;
 
         cmd = PADSYNTH::control::bandwidthScale;
     }
@@ -4088,7 +4088,7 @@ int CmdInterface::padSynth(unsigned char controlType)
         else if (matchnMove(1, point, "continuous"))
             value = 2;
         else
-            return range_msg;
+            return REPLY::range_msg;
 
         cmd = PADSYNTH::control::spectrumMode;
     }
@@ -4105,7 +4105,7 @@ int CmdInterface::padSynth(unsigned char controlType)
             value = string2int(point);
         return sendNormal(0, value, controlType, cmd, npart, kitNumber, PART::engine::padSynth);
     }
-    return available_msg;
+    return REPLY::available_msg;
 }
 
 
@@ -4118,10 +4118,10 @@ int CmdInterface::resonance(unsigned char controlType)
     if (value > -1)
     {
         sendNormal(0, value, controlType, RESONANCE::control::enableResonance, npart, kitNumber, engine, insert);
-        return done_msg;
+        return REPLY::done_msg;
     }
     if (lineEnd(controlType))
-        return done_msg;
+        return REPLY::done_msg;
 
     if (matchnMove(1, point, "random"))
     {
@@ -4132,7 +4132,7 @@ int CmdInterface::resonance(unsigned char controlType)
         else if (matchnMove(1, point, "fine"))
             value = 2;
         else
-            return value_msg;
+            return REPLY::value_msg;
         cmd = RESONANCE::control::randomType;
     }
     else if (matchnMove(2, point, "protect"))
@@ -4143,7 +4143,7 @@ int CmdInterface::resonance(unsigned char controlType)
     else if (matchnMove(1, point, "maxdb"))
     {
         if (lineEnd(controlType))
-            return value_msg;
+            return REPLY::value_msg;
         cmd = RESONANCE::control::maxDb;
         value = string2int(point);
     }
@@ -4163,7 +4163,7 @@ int CmdInterface::resonance(unsigned char controlType)
             value = 1;
         else if (matchnMove(1, point, "smooth"))
             value = 0;
-        else return value_msg;
+        else return REPLY::value_msg;
         cmd = RESONANCE::control::interpolatePeaks;
     }
     else if (matchnMove(1, point, "smooth"))
@@ -4190,27 +4190,27 @@ int CmdInterface::resonance(unsigned char controlType)
                     synth->getRuntime().Log(line);
                 }
             }
-            return done_msg;
+            return REPLY::done_msg;
         }
 
         cmd = string2int(point) - 1;
         if (cmd < 1 || cmd >= MAX_RESONANCE_POINTS)
-            return range_msg;
+            return REPLY::range_msg;
         point = skipChars(point);
         if (lineEnd(controlType))
-            return value_msg;
+            return REPLY::value_msg;
         value = string2int(point);
     }
     if (cmd > -1)
         return sendNormal(0, value, controlType, cmd, npart, kitNumber, engine, insert);
-    return available_msg;
+    return REPLY::available_msg;
 }
 
 
 int CmdInterface::waveform(unsigned char controlType)
 {
     if (lineEnd(controlType))
-        return done_msg;
+        return REPLY::done_msg;
     float value = -1;
     int cmd = -1;
     int engine = contextToEngines();
@@ -4223,7 +4223,7 @@ int CmdInterface::waveform(unsigned char controlType)
     else if (matchnMove(1, point, "harmonic"))
     {
         if (lineEnd(controlType))
-            return value_msg;
+            return REPLY::value_msg;
 
         if (matchnMove(1, point, "shift"))
             cmd = OSCILLATOR::control::harmonicShift;
@@ -4236,7 +4236,7 @@ int CmdInterface::waveform(unsigned char controlType)
         {
             cmd = string2int(point) - 1;
             if (cmd < 0 || cmd >= MAX_AD_HARMONICS)
-                return range_msg;
+                return REPLY::range_msg;
             point = skipChars(point);
 
             if (matchnMove(1, point, "amp"))
@@ -4245,7 +4245,7 @@ int CmdInterface::waveform(unsigned char controlType)
                 insert = TOPLEVEL::insert::harmonicPhaseBandwidth;
 
             if (lineEnd(controlType))
-                return value_msg;
+                return REPLY::value_msg;
         }
         if (value == -1)
             value = string2int(point);
@@ -4271,12 +4271,12 @@ int CmdInterface::waveform(unsigned char controlType)
             std::string name = std::string(point).substr(0,3);
             value = stringNumInList(name, filtershapes, 3);
             if (value == -1)
-                return value_msg;
+                return REPLY::value_msg;
             cmd = OSCILLATOR::control::waveshapeType;
         }
         else if (matchnMove(1, point, "par"))
             cmd = OSCILLATOR::control::waveshapeParameter;
-        else return opp_msg;
+        else return REPLY::op_msg;
     }
 
     else if (matchnMove(1, point, "filter"))
@@ -4286,7 +4286,7 @@ int CmdInterface::waveform(unsigned char controlType)
             std::string name = std::string(point).substr(0,3);
             value = stringNumInList(name, filtertype, 3);
             if (value == -1)
-                return value_msg;
+                return REPLY::value_msg;
             cmd = OSCILLATOR::control::filterType;
         }
         else if (matchnMove(1, point, "par"))
@@ -4300,7 +4300,7 @@ int CmdInterface::waveform(unsigned char controlType)
                     cmd = OSCILLATOR::control::filterParameter2;
                     break;
                 default:
-                    return opp_msg;
+                    return REPLY::op_msg;
             }
             point = skipChars(point);
         }
@@ -4309,7 +4309,7 @@ int CmdInterface::waveform(unsigned char controlType)
             value = (toggle() == 1);
             cmd = OSCILLATOR::control::filterBeforeWaveshape;
         }
-        else return opp_msg;
+        else return REPLY::op_msg;
     }
 
     else if (matchnMove(1, point, "base"))
@@ -4334,7 +4334,7 @@ int CmdInterface::waveform(unsigned char controlType)
                 else if(matchnMove(1, point, "Power"))
                     value = 3;
                 else
-                    return value_msg;
+                    return REPLY::value_msg;
                 cmd = OSCILLATOR::control::baseModulationType;
             }
             else if(matchnMove(1, point, "par"))
@@ -4351,15 +4351,15 @@ int CmdInterface::waveform(unsigned char controlType)
                         cmd = OSCILLATOR::control::baseModulationParameter3;
                         break;
                     default:
-                        return range_msg;
+                        return REPLY::range_msg;
                 }
                 point = skipChars(point);
             }
             else
-                return opp_msg;
+                return REPLY::op_msg;
         }
         else
-            return opp_msg;
+            return REPLY::op_msg;
     }
 
     else if (matchnMove(2, point, "spectrum"))
@@ -4375,12 +4375,12 @@ int CmdInterface::waveform(unsigned char controlType)
             else if (matchnMove(1, point, "Up"))
                 value = 3;
             else
-                return value_msg;
+                return REPLY::value_msg;
             cmd = OSCILLATOR::control::spectrumAdjustType;
         }
         else if (matchnMove(1, point, "par"))
             cmd = OSCILLATOR::control::spectrumAdjustParameter;
-        else return opp_msg;
+        else return REPLY::op_msg;
     }
 
     else if (matchnMove(2, point, "adaptive"))
@@ -4390,7 +4390,7 @@ int CmdInterface::waveform(unsigned char controlType)
             std::string name = std::string(point).substr(0,3);
             value = stringNumInList(name, adaptive, 3);
             if (value == -1)
-                return value_msg;
+                return REPLY::value_msg;
             cmd = OSCILLATOR::control::adaptiveHarmonicsType;
         }
         else if (matchnMove(1, point, "base"))
@@ -4400,19 +4400,19 @@ int CmdInterface::waveform(unsigned char controlType)
         else if (matchnMove(1, point, "par"))
             cmd = OSCILLATOR::control::adaptiveHarmonicsParameter;
         else
-            return opp_msg;
+            return REPLY::op_msg;
     }
 
     else if (matchnMove(2, point, "apply"))
     {
         if (engine != PART::engine::padSynth)
-            return available_msg;
+            return REPLY::available_msg;
         value = 0; // dummy
         insert = UNUSED;
         cmd = PADSYNTH::control::applyChanges;
     }
     if (cmd == -1)
-        return available_msg;
+        return REPLY::available_msg;
     if (value == -1)
         value = string2float(point);
     return sendNormal(0, value, controlType, cmd, npart, kitNumber, engine + voiceNumber, insert);
@@ -4426,7 +4426,7 @@ int CmdInterface::commandPart(unsigned char controlType)
     if (bitTest(context, LEVEL::AllFX))
         return effects(controlType);
     if (lineEnd(controlType))
-        return done_msg;
+        return REPLY::done_msg;
     if (kitMode == PART::kitType::Off)
         kitNumber = UNUSED; // always clear it if not kit mode
     if (matchnMove(2, point, "effects") || matchnMove(2, point, "efx"))
@@ -4449,7 +4449,7 @@ int CmdInterface::commandPart(unsigned char controlType)
                 if (tmp >= Runtime.NumAvailableParts)
                 {
                     Runtime.Log("Part number too high");
-                    return done_msg;
+                    return REPLY::done_msg;
                 }
 
                 if (npart != tmp)
@@ -4466,19 +4466,19 @@ int CmdInterface::commandPart(unsigned char controlType)
                     }
                 }
                 if (lineEnd(controlType))
-                    return done_msg;
+                    return REPLY::done_msg;
             }
             else
             {
                 if (controlType == TOPLEVEL::type::Write)
                 {
                     if (tmp >= NUM_KIT_ITEMS)
-                        return range_msg;
+                        return REPLY::range_msg;
                     kitNumber = tmp;
                     voiceNumber = 0;// to avoid confusion
                 }
                 Runtime.Log("Kit item number " + std::to_string(kitNumber + 1));
-                return done_msg;
+                return REPLY::done_msg;
             }
         }
     }
@@ -4499,12 +4499,12 @@ int CmdInterface::commandPart(unsigned char controlType)
         if (controlType != TOPLEVEL::type::Write)
         {
             Runtime.Log("Part name is " + synth->part[npart]->Pname);
-            return done_msg;
+            return REPLY::done_msg;
         }
         if (matchnMove(2, point, "clear"))
         {
             sendDirect(0, 0, controlType, PART::control::defaultInstrument, npart, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, tmp);
-            return done_msg;
+            return REPLY::done_msg;
         }
         if (point[0] != 0) // force part not channel number
         {
@@ -4513,12 +4513,12 @@ int CmdInterface::commandPart(unsigned char controlType)
                 if(instrumentGroup.empty())
                 {
                     Runtime.Log("No list entries, or list not seen");
-                    return done_msg;
+                    return REPLY::done_msg;
                 }
                 size_t value = string2int(point);
                 string line;
                 if(value < 1 || value > instrumentGroup.size())
-                    return range_msg;
+                    return REPLY::range_msg;
                 -- value;
 
                 std::list<string>:: iterator it = instrumentGroup.begin();
@@ -4529,7 +4529,7 @@ int CmdInterface::commandPart(unsigned char controlType)
                     ++ lineNo;
                 }
                 if (it == instrumentGroup.end())
-                    return range_msg;
+                    return REPLY::range_msg;
                 line = *it;
 
                 int root = string2int(line.substr(0, 3));
@@ -4537,21 +4537,21 @@ int CmdInterface::commandPart(unsigned char controlType)
                 int inst = (string2int(line.substr(10, 3))) - 1;
 
                 sendDirect(0, inst, controlType, MAIN::control::loadInstrumentFromBank, TOPLEVEL::section::main, npart, bank, root);
-                return done_msg;
+                return REPLY::done_msg;
             }
             tmp = string2int(point) - 1;
             if (tmp < 0 || tmp >= MAX_INSTRUMENTS_IN_BANK)
-                return range_msg;
+                return REPLY::range_msg;
             sendDirect(0, tmp, controlType, MAIN::control::loadInstrumentFromBank, TOPLEVEL::section::main, npart);
-            return done_msg;
+            return REPLY::done_msg;
         }
         else
-            return value_msg;
+            return REPLY::value_msg;
     }
 
 
     if (!readControl(0, PART::control::enable, npart))
-        return inactive_msg;
+        return REPLY::inactive_msg;
 
     tmp = -1;
     if (matchnMove(2, point, "disable"))
@@ -4565,9 +4565,9 @@ int CmdInterface::commandPart(unsigned char controlType)
     else if(matchnMove(3, point, "kit"))
     {
         if (kitMode == PART::kitType::Off)
-            return inactive_msg;
+            return REPLY::inactive_msg;
         inKitEditor = true;
-        return done_msg;
+        return REPLY::done_msg;
     }
 
     if (tmp != -1)
@@ -4586,12 +4586,12 @@ int CmdInterface::commandPart(unsigned char controlType)
             if (kitNumber == 0 && bitFindHigh(context) == LEVEL::Part)
             {
                 synth->getRuntime().Log("Kit item 1 always on.");
-                return done_msg;
+                return REPLY::done_msg;
             }
             sendNormal(0, value, controlType, PART::control::enable, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup);
         }
         if (!readControl(0, PART::control::enable, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup))
-            return inactive_msg;
+            return REPLY::inactive_msg;
     }
 
     if (bitTest(context, LEVEL::AllFX))
@@ -4634,17 +4634,17 @@ int CmdInterface::commandPart(unsigned char controlType)
         if (matchnMove(2, point,"effect"))
         {
             if (controlType == TOPLEVEL::type::Write && point[0] == 0)
-                return value_msg;
+                return REPLY::value_msg;
             value = string2int(point);
             if (value < 0 || value > NUM_PART_EFX)
-                return range_msg;
+                return REPLY::range_msg;
             return sendNormal(0, value, controlType, PART::control::kitEffectNum, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup);
         }
         if (matchnMove(2, point,"name"))
         {
             int miscmsg = NO_MSG;
             if (lineEnd(controlType))
-                return value_msg;
+                return REPLY::value_msg;
             if (controlType == TOPLEVEL::type::Write)
                 miscmsg = miscMsgPush(point);
             return sendNormal(TOPLEVEL::action::muteAndLoop, 0, controlType, PART::control::instrumentName, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup, UNUSED, UNUSED, miscmsg);
@@ -4652,13 +4652,13 @@ int CmdInterface::commandPart(unsigned char controlType)
     }
 
     tmp = partCommonControls(controlType);
-    if (tmp != todo_msg)
+    if (tmp != REPLY::todo_msg)
         return tmp;
 
     if (matchnMove(2, point, "shift"))
     {
         if (controlType == TOPLEVEL::type::Write && point[0] == 0)
-            return value_msg;
+            return REPLY::value_msg;
         int value = string2int(point);
         if (value < MIN_KEY_SHIFT)
             value = MIN_KEY_SHIFT;
@@ -4671,7 +4671,7 @@ int CmdInterface::commandPart(unsigned char controlType)
     {
         tmp = string2int127(point);
         if(controlType == TOPLEVEL::type::Write && tmp < 1)
-            return value_msg;
+            return REPLY::value_msg;
         return sendNormal(0, tmp, controlType, PART::control::velocityOffset, npart);
     }
 
@@ -4679,7 +4679,7 @@ int CmdInterface::commandPart(unsigned char controlType)
     {
         tmp = string2int127(point);
         if(controlType == TOPLEVEL::type::Write && tmp < 1)
-            return value_msg;
+            return REPLY::value_msg;
         tmp -= 1;
         return sendNormal(0, tmp, controlType, PART::control::midiChannel, npart);
     }
@@ -4695,7 +4695,7 @@ int CmdInterface::commandPart(unsigned char controlType)
             else if (matchnMove(1, point, "both"))
                 dest = 3;
             if (dest == 0)
-                return range_msg;
+                return REPLY::range_msg;
         }
         return sendNormal(TOPLEVEL::action::muteAndLoop, dest, controlType, PART::control::audioDestination, npart);
     }
@@ -4705,10 +4705,10 @@ int CmdInterface::commandPart(unsigned char controlType)
         if(controlType == TOPLEVEL::type::Write)
         {
             if (lineEnd(controlType))
-                return value_msg;
+                return REPLY::value_msg;
             value = string2int(point);
             if (value < 1 || (value > POLIPHONY - 20))
-                return range_msg;
+                return REPLY::range_msg;
         }
         return sendNormal(0, value, controlType, PART::control::maxNotes, npart);
     }
@@ -4725,7 +4725,7 @@ int CmdInterface::commandPart(unsigned char controlType)
             else if (matchnMove(1, point, "legato"))
                 value = 2;
             else
-                return name_msg;
+                return REPLY::name_msg;
         }
         return sendNormal(0, value, controlType, 6, npart);
     }
@@ -4741,19 +4741,19 @@ int CmdInterface::commandPart(unsigned char controlType)
             if (name.size() < 3)
             {
                 Runtime.Log("Name too short");
-                return done_msg;
+                return REPLY::done_msg;
             }
             else if ( name == "Simple Sound")
             {
                 Runtime.Log("Cant use name of default sound");
-                return done_msg;
+                return REPLY::done_msg;
             }
             else
                 miscmsg = miscMsgPush(name);
         }
         return sendNormal(TOPLEVEL::action::lowPrio, 0, controlType, PART::control::instrumentName, npart, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
     }
-    return opp_msg;
+    return REPLY::op_msg;
 }
 
 
@@ -4778,10 +4778,10 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
         {
             //Runtime.Log("Instance " + asString(currentInstance), 1);
             Runtime.Log("Instance " + std::to_string(synth->getUniqueId()));
-            return done_msg;
+            return REPLY::done_msg;
         }
         if (lineEnd(controlType))
-            return value_msg;
+            return REPLY::value_msg;
         currentInstance = string2int(point);
         synth = firstSynth->getSynthFromId(currentInstance);
         unsigned int newID = synth->getUniqueId();
@@ -4791,7 +4791,7 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
             currentInstance = newID;
         }
         defaults();
-        return done_msg;
+        return REPLY::done_msg;
     }
 
  // these must all be highest (relevant) bit first
@@ -4857,7 +4857,7 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
             else
                 name = " disabled";
             Runtime.Log("Current part " + asString(npart) + name, 1);
-            return done_msg;
+            return REPLY::done_msg;
         }
         context = LEVEL::Top;
         bitSet(context, LEVEL::Part);
@@ -4905,15 +4905,15 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
         if (controlType != TOPLEVEL::type::Write)
         {
             Runtime.Log("Root is ID " + asString(synth->ReadBankRoot()), 1);
-            return done_msg;
+            return REPLY::done_msg;
         }
         if (point[0] != 0)
         {
             sendDirect(TOPLEVEL::action::muteAndLoop, 255, controlType, 8, TOPLEVEL::section::midiIn, 0, UNUSED, string2int(point));
-            return done_msg;
+            return REPLY::done_msg;
         }
         else
-            return value_msg;
+            return REPLY::value_msg;
     }
 
     if (matchnMove(1, point, "bank"))
@@ -4921,34 +4921,34 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
         if (controlType != TOPLEVEL::type::Write)
         {
             Runtime.Log("Bank is ID " + asString(synth->ReadBank()), 1);
-            return done_msg;
+            return REPLY::done_msg;
         }
         if (point[0] != 0)
         {
             sendDirect(TOPLEVEL::action::muteAndLoop, 255, TOPLEVEL::type::Write, 8, TOPLEVEL::section::midiIn, 0, string2int(point));
-            return done_msg;
+            return REPLY::done_msg;
         }
         else
-            return value_msg;
+            return REPLY::value_msg;
     }
 
     if (matchnMove(1, point, "volume"))
     {
         if (lineEnd(controlType))
-            return value_msg;
+            return REPLY::value_msg;
         return sendNormal(0, string2int127(point), controlType, MAIN::control::volume, TOPLEVEL::section::main);
     }
     if (matchnMove(2, point, "detune"))
     {
         if (lineEnd(controlType))
-            return value_msg;
+            return REPLY::value_msg;
         return sendNormal(TOPLEVEL::action::lowPrio, string2int127(point), controlType, MAIN::control::detune, TOPLEVEL::section::main);
     }
 
     if (matchnMove(2, point, "shift"))
     {
         if (lineEnd(controlType))
-            return value_msg;
+            return REPLY::value_msg;
         int value = string2int(point);
         return sendNormal(TOPLEVEL::action::lowPrio, value, controlType, MAIN::control::keyShift, TOPLEVEL::section::main);
     }
@@ -4962,13 +4962,13 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
             if (controlType == TOPLEVEL::type::Write)
             {
                 if (lineEnd(controlType))
-                    return value_msg;
+                    return REPLY::value_msg;
                 value = string2int127(point);
                 std::string otherCC = Runtime.masterCCtest(value);
                 if (otherCC > "")
                 {
                     Runtime.Log("In use for " + otherCC);
-                    return done_msg;
+                    return REPLY::done_msg;
                 }
             }
             return sendNormal(0, value, controlType, MAIN::control::soloCC, TOPLEVEL::section::main);
@@ -4987,13 +4987,13 @@ int CmdInterface::commandReadnSet(unsigned char controlType)
     if (matchnMove(2, point, "available")) // 16, 32, 64
     {
         if (lineEnd(controlType))
-            return value_msg;
+            return REPLY::value_msg;
         int value = string2int(point);
         if (controlType == TOPLEVEL::type::Write && value != 16 && value != 32 && value != 64)
-            return range_msg;
+            return REPLY::range_msg;
         return sendNormal(0, value, controlType, MAIN::control::availableParts, TOPLEVEL::section::main);
     }
-    return opp_msg;
+    return REPLY::op_msg;
 }
 
 
@@ -5033,7 +5033,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         std::cout << "note off seen " << Runtime.noteOffSeen << std::endl;
         std::cout << "notes hanging sent " << Runtime.noteOnSent - Runtime.noteOffSent << std::endl;
         std::cout << "notes hanging seen " << Runtime.noteOnSeen - Runtime.noteOffSeen << std::endl;
-        return done_msg;
+        return REPLY::done_msg;
     }
 #endif
     if (matchnMove(2, point, "exit"))
@@ -5041,7 +5041,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         if (currentInstance > 0)
         {
             Runtime.Log("Can only exit from instance 0", 1);
-            return done_msg;
+            return REPLY::done_msg;
         }
         std::string message;
         if (Runtime.configChanged)
@@ -5053,9 +5053,9 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
             // this seems backwards but it *always* saves.
             // seeing configChanged makes it reload the old config first.
             Runtime.runSynth = false;
-            return exit_msg;
+            return REPLY::exit_msg;
         }
-        return done_msg;
+        return REPLY::done_msg;
     }
     if (point[0] == '/')
     {
@@ -5063,7 +5063,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         point = skipSpace(point);
         defaults();
         if (point[0] == 0)
-            return done_msg;
+            return REPLY::done_msg;
     }
 
     if (matchnMove(3, point, "reset"))
@@ -5076,7 +5076,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
             sendDirect(TOPLEVEL::action::muteAndLoop, 0, TOPLEVEL::type::Write, control, TOPLEVEL::section::main);
             defaults();
         }
-        return done_msg;
+        return REPLY::done_msg;
     }
     if (point[0] == '.' && point[1] == '.')
     {
@@ -5101,14 +5101,14 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                 {
                     tmp = string2int(point);
                     if (tmp < 1 || tmp > Runtime.NumAvailableParts)
-                        return range_msg;
+                        return REPLY::range_msg;
 
                     npart = tmp -1;
-                    return done_msg;
+                    return REPLY::done_msg;
                 }
             }
             else
-                return done_msg;
+                return REPLY::done_msg;
         }
 
         if (bitFindHigh(context) == LEVEL::AllFX || bitFindHigh(context) == LEVEL::InsFX)
@@ -5130,11 +5130,11 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
             bitClearHigh(context);
         }
         if (point[0] == 0)
-            return done_msg;
+            return REPLY::done_msg;
     }
 
     if (helpList(context))
-        return done_msg;
+        return REPLY::done_msg;
 
     if (matchnMove(2, point, "stop"))
         return sendNormal(0, 0, TOPLEVEL::type::Write,MAIN::control::stopSound, TOPLEVEL::section::main);
@@ -5190,7 +5190,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                         usleep(2000); // the loop is too fast otherwise!
                         reply = cmdIfaceProcessCommand(mark);
                     }
-                    if (reply > done_msg)
+                    if (reply > REPLY::done_msg)
                     {
                         isok = false;
                         Runtime.Log("*** Error: " + replies[reply] + " @ line " + std::to_string(count) + " ***");
@@ -5199,10 +5199,10 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
             }
             else
                 Runtime.Log("Can't read file " + filename);
-            return done_msg;
+            return REPLY::done_msg;
         }
         replyString = "Exec";
-        return what_msg;
+        return REPLY::what_msg;
     }
 
     if (matchnMove(1, point, "set"))
@@ -5212,7 +5212,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         else
         {
             replyString = "set";
-            return what_msg;
+            return REPLY::what_msg;
         }
     }
 
@@ -5223,7 +5223,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         else
         {
             replyString = "read";
-            return what_msg;
+            return REPLY::what_msg;
         }
     }
 
@@ -5234,7 +5234,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         else
         {
             replyString = "minimum";
-            return what_msg;
+            return REPLY::what_msg;
         }
     }
 
@@ -5245,7 +5245,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         else
         {
             replyString = "maximum";
-            return what_msg;
+            return REPLY::what_msg;
         }
     }
 
@@ -5256,7 +5256,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         else
         {
             replyString = "default";
-            return what_msg;
+            return REPLY::what_msg;
         }
     }
 
@@ -5267,7 +5267,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         else
         {
             replyString = "mlearn";
-            return what_msg;
+            return REPLY::what_msg;
         }
     }
 
@@ -5288,7 +5288,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                 synth->saveBanks();
             }
 #endif
-            return done_msg;
+            return REPLY::done_msg;
         }
         if (matchnMove(1, point, "bank"))
         {
@@ -5307,25 +5307,25 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
 #ifdef GUI_FLTK
             GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
 #endif
-            return done_msg;
+            return REPLY::done_msg;
         }
         if (matchnMove(2, point, "yoshimi"))
         {
             if (currentInstance !=0)
             {
                 Runtime.Log("Only instance 0 can start others");
-                return done_msg;
+                return REPLY::done_msg;
             }
             int forceId = string2int(point);
             if (forceId < 1 || forceId >= 32)
                 forceId = 0;
             sendDirect(TOPLEVEL::action::lowPrio, forceId, TOPLEVEL::type::Write, MAIN::control::startInstance, TOPLEVEL::section::main);
-            return done_msg;
+            return REPLY::done_msg;
         }
         else
         {
             replyString = "add";
-            return what_msg;
+            return REPLY::what_msg;
         }
     }
     if (matchWord(3, point, "import") || matchWord(3, point, "export") )
@@ -5357,11 +5357,11 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         point = skipChars(point);
         std::string name = std::string(point);
         if (root < 0 || (root > 127 && root != UNUSED) || value < 0 || value > 127 || name <="!")
-            return what_msg;
+            return REPLY::what_msg;
         else
         {
             sendDirect(TOPLEVEL::action::lowPrio, value, TOPLEVEL::type::Write, type, TOPLEVEL::section::main, root, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(name));
-            return done_msg;
+            return REPLY::done_msg;
         }
     }
 
@@ -5373,7 +5373,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
             {
                 int rootID = string2int(point);
                 if (rootID >= MAX_BANK_ROOT_DIRS)
-                    return range_msg;
+                    return REPLY::range_msg;
                 else
                 {
                     std::string rootname = synth->getBankRef().getRootPath(rootID);
@@ -5388,11 +5388,11 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                         Runtime.Log("Un-linked " + rootname);
                         synth->saveBanks();
                     }
-                    return done_msg;
+                    return REPLY::done_msg;
                 }
             }
             else
-                return value_msg;
+                return REPLY::value_msg;
         }
         if (matchnMove(1, point, "bank"))
         {
@@ -5402,14 +5402,14 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                 if (isdigit(point[0]))
                     rootID = string2int(point);
                 if (rootID >= MAX_BANK_ROOT_DIRS)
-                    return range_msg;
+                    return REPLY::range_msg;
             }
             if (isdigit(point[0]))
             {
                 point = skipChars(point);
                 int bankID = string2int(point);
                 if (bankID >= MAX_BANKS_IN_ROOT)
-                    return range_msg;
+                    return REPLY::range_msg;
                 else
                 {
                     std::string filename = synth->getBankRef().getBankName(bankID);
@@ -5433,17 +5433,17 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                     }
 
                 }
-                return done_msg;
+                return REPLY::done_msg;
             }
             else
-                return value_msg;
+                return REPLY::value_msg;
         }
         if(matchnMove(2, point, "yoshimi"))
         {
             if (point[0] == 0)
             {
                 replyString = "remove";
-                return what_msg;
+                return REPLY::what_msg;
             }
             else
             {
@@ -5456,7 +5456,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                 {
                     sendDirect(TOPLEVEL::action::lowPrio, to_close, TOPLEVEL::type::Write, MAIN::control::stopInstance, TOPLEVEL::section::main);
                 }
-                return done_msg;
+                return REPLY::done_msg;
             }
         }
         if (matchnMove(2, point, "mlearn"))
@@ -5464,7 +5464,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
             if (matchnMove(3, point, "all"))
             {
                 sendNormal(0, 0, 0, MIDILEARN::control::clearAll, TOPLEVEL::section::midiLearn);
-                return done_msg;
+                return REPLY::done_msg;
             }
             else if (point[0] == '@')
             {
@@ -5472,21 +5472,21 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                 point = skipSpace(point);
                 tmp = string2int(point);
                 if (tmp == 0)
-                    return value_msg;
+                    return REPLY::value_msg;
                 sendNormal(0, tmp - 1, 0, MIDILEARN::control::deleteLine, TOPLEVEL::section::midiLearn);
-                return done_msg;
+                return REPLY::done_msg;
             }
         }
         if (matchnMove(2, point, "instrument") || matchnMove(2, point, "program"))
         {
             tmp = string2int(point);
             if (tmp <= 0 || tmp >= MAX_INSTRUMENTS_IN_BANK)
-                    return range_msg;
+                    return REPLY::range_msg;
             sendDirect(TOPLEVEL::action::lowPrio, tmp - 1, TOPLEVEL::type::Write, BANK::control::deleteInstrument, TOPLEVEL::section::bank);
-            return done_msg;
+            return REPLY::done_msg;
         }
         replyString = "remove";
-        return what_msg;
+        return REPLY::what_msg;
     }
 
     else if (matchnMove(2, point, "load"))
@@ -5498,14 +5498,14 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                 point += 1;
                 tmp = string2int(point);
                 if (tmp == 0)
-                    return value_msg;
+                    return REPLY::value_msg;
                 sendNormal(0, tmp - 1, TOPLEVEL::type::Write, MIDILEARN::control::loadFromRecent, TOPLEVEL::section::midiLearn);
-                return done_msg;
+                return REPLY::done_msg;
             }
             if ((std::string) point == "")
-                return name_msg;
+                return REPLY::name_msg;
             sendNormal(0, 0, TOPLEVEL::type::Write, MIDILEARN::control::loadList, TOPLEVEL::section::midiLearn, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush((std::string) point));
-            return done_msg;
+            return REPLY::done_msg;
         }
         if(matchnMove(2, point, "vector"))
         {
@@ -5529,9 +5529,9 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                 loadChan = "source channel";
             }
             if (ch != UNUSED && ch >= NUM_MIDI_CHANNELS)
-                return range_msg;
+                return REPLY::range_msg;
             if (point[0] == 0)
-                return name_msg;
+                return REPLY::name_msg;
             std::string name;
             if (point[0] == '@')
             {
@@ -5539,24 +5539,24 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                 point = skipSpace(point);
                 tmp = string2int(point);
                 if (tmp <= 0)
-                    return value_msg;
+                    return REPLY::value_msg;
                 name = historySelect(5, tmp - 1);
                 if (name == "")
-                    return done_msg;
+                    return REPLY::done_msg;
             }
             else
             {
                 name = (std::string)point;
                 if (name == "")
-                    return name_msg;
+                    return REPLY::name_msg;
             }
             sendDirect(TOPLEVEL::action::muteAndLoop, 0, TOPLEVEL::type::Write, MAIN::control::loadNamedVector, TOPLEVEL::section::main, UNUSED, UNUSED, ch, UNUSED, UNUSED, miscMsgPush(name));
-            return done_msg;
+            return REPLY::done_msg;
         }
         if(matchnMove(2, point, "state"))
         {
             if (point[0] == 0)
-                return name_msg;
+                return REPLY::name_msg;
             std::string name;
             if (point[0] == '@')
             {
@@ -5564,24 +5564,24 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                 point = skipSpace(point);
                 tmp = string2int(point);
                 if (tmp <= 0)
-                    return value_msg;
+                    return REPLY::value_msg;
                 name = historySelect(4, tmp - 1);
                 if (name == "")
-                    return done_msg;
+                    return REPLY::done_msg;
             }
             else
             {
                 name = (std::string)point;
                 if (name == "")
-                        return name_msg;
+                        return REPLY::name_msg;
             }
             sendDirect(TOPLEVEL::action::muteAndLoop, 0, TOPLEVEL::type::Write, MAIN::control::loadNamedState, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(name));
-            return done_msg;
+            return REPLY::done_msg;
         }
         if (matchnMove(2, point, "scale"))
         {
             if (point[0] == 0)
-                return name_msg;
+                return REPLY::name_msg;
             std::string name;
             if (point[0] == '@')
             {
@@ -5589,24 +5589,24 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                 point = skipSpace(point);
                 tmp = string2int(point);
                 if (tmp <= 0)
-                    return value_msg;
+                    return REPLY::value_msg;
                 name = historySelect(3, tmp - 1);
                 if (name == "")
-                    return done_msg;
+                    return REPLY::done_msg;
             }
             else
             {
                 name = (std::string)point;
                 if (name == "")
-                    return name_msg;
+                    return REPLY::name_msg;
             }
             sendDirect(TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, MAIN::control::loadNamedScale, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(name));
-            return done_msg;
+            return REPLY::done_msg;
         }
         if (matchnMove(1, point, "patchset"))
         {
             if (point[0] == 0)
-                return name_msg;
+                return REPLY::name_msg;
             std::string name;
             if (point[0] == '@')
             {
@@ -5614,24 +5614,24 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                 point = skipSpace(point);
                 tmp = string2int(point);
                 if (tmp <= 0)
-                    return value_msg;
+                    return REPLY::value_msg;
                 name = historySelect(2, tmp - 1);
                 if (name == "")
-                    return done_msg;
+                    return REPLY::done_msg;
             }
             else
             {
                 name = (std::string)point;
                 if (name == "")
-                    return name_msg;
+                    return REPLY::name_msg;
             }
             sendDirect(TOPLEVEL::action::muteAndLoop, 0, TOPLEVEL::type::Write, MAIN::control::loadNamedPatchset, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(name));
-            return done_msg;
+            return REPLY::done_msg;
         }
         if (matchnMove(1, point, "instrument"))
         {
             if (point[0] == 0)
-                return name_msg;
+                return REPLY::name_msg;
             std::string name;
             if (point[0] == '@')
             {
@@ -5639,23 +5639,23 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                 point = skipSpace(point);
                 tmp = string2int(point);
                 if (tmp <= 0)
-                    return value_msg;
+                    return REPLY::value_msg;
                 name = historySelect(1, tmp - 1);
                 if (name == "")
-                    return done_msg;
+                    return REPLY::done_msg;
             }
             else
             {
                 name = (std::string)point;
                 if (name == "")
-                    return name_msg;
+                    return REPLY::name_msg;
             }
 
             sendDirect(0, 0, TOPLEVEL::type::Write, MAIN::control::loadInstrumentByName, TOPLEVEL::section::main, npart, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(name));
-            return done_msg;
+            return REPLY::done_msg;
         }
         replyString = "load";
-        return what_msg;
+        return REPLY::what_msg;
     }
 
     if (matchnMove(2, point, "save"))
@@ -5663,10 +5663,10 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         if(matchnMove(2, point, "mlearn"))
         {
             if (point[0] == 0)
-                return name_msg;
+                return REPLY::name_msg;
 
             sendNormal(0, 0, TOPLEVEL::type::Write, MIDILEARN::control::saveList, TOPLEVEL::section::midiLearn, 0, 0, 0, 0, UNUSED, miscMsgPush((std::string) point));
-            return done_msg;
+            return REPLY::done_msg;
         }
         if(matchnMove(2, point, "vector"))
         {
@@ -5677,54 +5677,54 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                 point = skipChars(point);
             }
             if (tmp >= NUM_MIDI_CHANNELS || tmp < 0)
-                return range_msg;
+                return REPLY::range_msg;
             if (point[0] == 0)
-                return name_msg;
+                return REPLY::name_msg;
             chan = tmp;
             sendDirect(TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, MAIN::control::saveNamedVector, TOPLEVEL::section::main, UNUSED, UNUSED, chan, UNUSED, UNUSED, miscMsgPush((std::string) point));
-            return done_msg;
+            return REPLY::done_msg;
         }
         if(matchnMove(2, point, "state"))
         {
             if (point[0] == 0)
-                return value_msg;
+                return REPLY::value_msg;
             sendDirect(TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, MAIN::control::saveNamedState, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(std::string(point)));
-            return done_msg;
+            return REPLY::done_msg;
         }
         if(matchnMove(1, point, "config"))
         {
             sendDirect(TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, CONFIG::control::saveCurrentConfig, TOPLEVEL::section::config, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush("DUMMY"));
-            return done_msg;
+            return REPLY::done_msg;
         }
 
         if (matchnMove(2, point, "scale"))
         {
             if (point[0] == 0)
-                return name_msg;
+                return REPLY::name_msg;
             sendDirect(TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, MAIN::control::saveNamedScale, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(std::string(point)));
-            return done_msg;
+            return REPLY::done_msg;
         }
         else if (matchnMove(1, point, "patchset"))
         {
             if (point[0] == 0)
-                return name_msg;
+                return REPLY::name_msg;
             sendDirect(TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, MAIN::control::saveNamedPatchset, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(std::string(point)));
-            return done_msg;
+            return REPLY::done_msg;
         }
         if (matchnMove(1, point, "instrument"))
         {
             if (synth->part[npart]->Pname == "Simple Sound")
             {
                 Runtime.Log("Nothing to save!");
-                return done_msg;
+                return REPLY::done_msg;
             }
             if (point[0] == 0)
-                return name_msg;
+                return REPLY::name_msg;
             sendDirect(TOPLEVEL::action::lowPrio, npart, TOPLEVEL::type::Write, MAIN::control::saveNamedInstrument, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(std::string(point)));
-            return done_msg;
+            return REPLY::done_msg;
         }
         replyString = "save";
-        return what_msg;
+        return REPLY::what_msg;
     }
 
     /*if (matchnMove(6, point, "direct"))
@@ -5793,7 +5793,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
             }
         }
         sendDirect(action, value, type, control, part, kit, engine, insert, param, UNUSED, miscmsg, request);
-        return done_msg;
+        return REPLY::done_msg;
     }
     else if (matchnMove(2, point, "zread"))
     {*/
@@ -5820,17 +5820,17 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         unsigned char miscmsg = UNUSED;
         int repeats;
         if (point[0] == 0)
-            return value_msg;
+            return REPLY::value_msg;
         repeats = string2int(point);
         if (repeats < 1)
             repeats = 1;
         point = skipChars(point);
         if (point[0] == 0)
-            return value_msg;
+            return REPLY::value_msg;
         control = string2int(point);
         point = skipChars(point);
         if (point[0] == 0)
-            return value_msg;
+            return REPLY::value_msg;
         part = string2int(point);
         point = skipChars(point);
         if (point[0] != 0)
@@ -5880,9 +5880,9 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         float actual = (tv2.tv_sec - tv1.tv_sec) *1000000 + (tv2.tv_usec - tv1.tv_usec);
         std::cout << "result " << result << std::endl;
         std::cout << "Loops " << repeats << "  Total time " << actual << "uS" << "  average call time " << actual/repeats * 1000.0f << "nS" << std::endl;
-        return done_msg;
+        return REPLY::done_msg;
     }*/
-    return unrecognised_msg;
+    return REPLY::unrecognised_msg;
 }
 
 
@@ -5891,7 +5891,7 @@ int CmdInterface::sendNormal(unsigned char action, float value, unsigned char ty
     if ((type & TOPLEVEL::type::Limits) && part != TOPLEVEL::section::midiLearn)
     {
         readLimits(value, type, control, part, kit, engine, insert, parameter, miscmsg);
-        return done_msg;
+        return REPLY::done_msg;
     }
     action |= TOPLEVEL::action::fromCLI;
 
@@ -5923,13 +5923,13 @@ int CmdInterface::sendNormal(unsigned char action, float value, unsigned char ty
             if ((putData.data.type & TOPLEVEL::type::Learnable) == 0)
             {
             synth->getRuntime().Log("Can't learn this control");
-            return failed_msg;
+            return REPLY::failed_msg;
             }
         }
         else
         {
             if (putData.data.type & TOPLEVEL::type::Error)
-                return available_msg;
+                return REPLY::available_msg;
             if (newValue != value && (type & TOPLEVEL::type::Write))
             { // checking the original type not the reported one
                 putData.data.value.F = newValue;
@@ -5947,9 +5947,9 @@ int CmdInterface::sendNormal(unsigned char action, float value, unsigned char ty
     else
     {
         synth->getRuntime().Log("Unable to write to fromCLI buffer");
-        return failed_msg;
+        return REPLY::failed_msg;
     }
-    return done_msg;
+    return REPLY::done_msg;
 }
 
 
@@ -6189,14 +6189,14 @@ void CmdInterface::cmdIfaceCommandLoop()
                 std::cout << "*** Error: line too long" << std::endl;
             else if(cCmd[0] != 0)
             {
-                reply = todo_msg;
+                reply = REPLY::todo_msg;
                 replyString = "";
                 int reply = cmdIfaceProcessCommand(cCmd);
-                exit = (reply == exit_msg);
+                exit = (reply == REPLY::exit_msg);
 
-                if (reply == what_msg)
-                    synth->getRuntime().Log(replyString + replies[what_msg]);
-                else if (reply > done_msg)
+                if (reply == REPLY::what_msg)
+                    synth->getRuntime().Log(replyString + replies[REPLY::what_msg]);
+                else if (reply > REPLY::done_msg)
                     synth->getRuntime().Log(replies[reply]);
                 add_history(cCmd);
             }
