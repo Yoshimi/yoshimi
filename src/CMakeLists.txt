@@ -373,6 +373,7 @@ set (Interface_Sources
     Interface/MidiDecode.cpp
     Interface/FileMgr.cpp
     Interface/RingBuffer.cpp
+    Interface/TextLists.h
 )
 
 set (Params_sources

@@ -44,6 +44,7 @@
 
 #include "Interface/InterChange.h"
 #include "Interface/CmdInterface.h"
+#include "Interface/TextLists.h"
 
 
 /*
