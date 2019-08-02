@@ -691,7 +691,7 @@ int CmdInterface::effects(unsigned char controlType)
     {
         int selected = -1;
         int value = -1;
-        std::string name = std::string(point).substr(0,3);
+        std::string name = std::string(point).substr(0, 3);
         /*
          * We can't do a skipChars here as we don't yet know
          * if 'selected' will be valid. For some controls we
@@ -1968,6 +1968,55 @@ int CmdInterface::envelopeSelect(unsigned char controlType)
     //std::cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  parameter " << int(insertType) << std::endl;
 
     return sendNormal(0, string2float(point), controlType, cmd, npart, kitNumber, engine, insert, insertType, offset);
+}
+
+int CmdInterface::commandGroup()
+{
+    string line;
+    float value = string2int(point);
+    if (point[0] == 0)
+    {
+        synth->getRuntime().Log("\nInstrument Groups");
+        for (int i = 0; i < 17; ++ i)
+        {
+            line = "  " + instrumentGroupType[i];
+            synth->getRuntime().Log(line);
+        }
+        return done_msg;
+    }
+
+
+
+    std::string name = std::string(point);
+    value = stringNumInList(name, instrumentGroupType, 2) + 1;
+    cout << value << endl;
+    if (value < 1)
+        return range_msg;
+
+
+    list<std::string> msg;
+    // having two lists is messy but the list routine clears 'msg'
+    // while we need 'instrumentGroup' kept for actual part loads
+    point = skipChars(point);
+    bool full = (matchnMove(1, point, "location"));
+
+    int count = 0;
+    if (!instrumentGroup.empty())
+        instrumentGroup.clear();
+    do {
+        ++ count;
+        line = miscMsgPop(readControl(0, BANK::control::findInstrumentName, TOPLEVEL::section::bank, UNUSED, UNUSED, UNUSED, value - 1));
+        if (line != "*")
+        {
+            instrumentGroup.push_back(line);
+            if (!full && line.length() > 16)
+                line = line.substr(15);
+            line = to_string(count) + "| " + line;
+            msg.push_back(line);
+        }
+    } while (line != "*");
+    synth->cliOutput(msg, LINES);
+    return done_msg;
 }
 
 
@@ -4444,7 +4493,7 @@ int CmdInterface::commandPart(unsigned char controlType)
         }
     }
 
-        if (matchnMove(2, point, "program") || matchnMove(1, point, "instrument"))
+    if (matchnMove(2, point, "program") || matchnMove(1, point, "instrument"))
     {
         if (controlType != TOPLEVEL::type::Write)
         {
@@ -4458,6 +4507,37 @@ int CmdInterface::commandPart(unsigned char controlType)
         }
         if (point[0] != 0) // force part not channel number
         {
+            if(matchnMove(1, point, "group"))
+            {
+                if(instrumentGroup.empty())
+                {
+                    Runtime.Log("No list entries, or list not seen");
+                    return done_msg;
+                }
+                size_t value = string2int(point);
+                string line;
+                if(value < 1 || value > instrumentGroup.size())
+                    return range_msg;
+                -- value;
+
+                std::list<string>:: iterator it = instrumentGroup.begin();
+                size_t lineNo = 0;
+                while (lineNo < value && it != instrumentGroup.end())
+                {
+                    ++ it;
+                    ++ lineNo;
+                }
+                if (it == instrumentGroup.end())
+                    return range_msg;
+                line = *it;
+
+                int root = string2int(line.substr(0, 3));
+                int bank = string2int(line.substr(5, 3));
+                int inst = (string2int(line.substr(10, 3))) - 1;
+
+                sendDirect(0, inst, controlType, MAIN::control::loadInstrumentFromBank, TOPLEVEL::section::main, npart, bank, root);
+                return done_msg;
+            }
             tmp = string2int(point) - 1;
             if (tmp < 0 || tmp >= MAX_INSTRUMENTS_IN_BANK)
                 return range_msg;
@@ -5058,7 +5138,11 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
     if (matchnMove(2, point, "stop"))
         return sendNormal(0, 0, TOPLEVEL::type::Write,MAIN::control::stopSound, TOPLEVEL::section::main);
     if (matchnMove(1, point, "list"))
+    {
+        if (matchnMove(1, point, "group"))
+            return commandGroup();
         return commandList();
+    }
 
     if (matchnMove(3, point, "run"))
     {

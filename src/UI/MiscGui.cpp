@@ -54,7 +54,14 @@ float collect_readData(SynthEngine *synth, float value, unsigned char control, u
     putData.data.parameter = parameter;
     putData.data.offset = offset;
     putData.data.miscmsg = miscmsg;
-    float result = synth->interchange.readAllData(&putData);
+    float result;
+    if (miscmsg != NO_MSG)
+    {
+        synth->interchange.readAllData(&putData);
+        result = putData.data.miscmsg;
+    }
+    else
+        result = synth->interchange.readAllData(&putData);
     return result;
 
 }

@@ -302,6 +302,7 @@ namespace BANK // usage BANK::control::
 {
     enum control : unsigned char {
         selectInstrument = 0, // not yet
+        findInstrumentName,
         renameInstrument, // not yet
         saveInstrument, // not yet
         deleteInstrument,

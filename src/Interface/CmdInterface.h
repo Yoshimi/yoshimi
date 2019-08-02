@@ -21,6 +21,7 @@
 #ifndef CMDINTERFACE_H
 #define CMDINTERFACE_H
 #include <string>
+#include <list>
 
 #include "Misc/MiscFuncs.h"
 #include "Interface/FileMgr.h"
@@ -238,7 +239,8 @@ static std::string partlist [] = {
     "  (effect) <s>",      "the effect type",
     "  PREset <n3>",       "set numbered effect preset to n3",
     "    -- ",             "effect dependedent controls",
-    "PRogram <[n2]/[s]>",  "loads instrument ID / CLear sets default",
+    "PRogram <[n2]/[s] [n3]>",  "loads instrument ID - CLear sets default,",
+    "","Group n3 selects from group list",
     "NAme <s>",            "sets the display name the part can be saved with",
     "Channel <n2>",        "MIDI channel (> 32 disables, > 16 note off only)",
     "Destination <s2>",    "jack audio destination (Main, Part, Both)",
@@ -867,6 +869,7 @@ static std::string listlist [] = {
     "Roots",                    "all available root paths",
     "Banks [n]",                "banks in root ID or current",
     "Instruments [n]",          "instruments in bank ID or current",
+    "Group <s> [s]",            "instruments by type grouping ('Location' for extra details)",
     "Parts [s]",                "parts with instruments installed ('More' for extra details)",
     "Vectors",                  "settings for all enabled vectors",
     "Tuning",                   "microtonal scale tunings",
@@ -948,6 +951,7 @@ static std::string adaptive [] = {"OFF", "ON", "SQU", "2XS", "2XA", "3XS", "3XA"
 
 // misc controls
 static std::string historyGroup [] = {"IN", "PA", "SC", "ST", "VE", "ML"};
+static std::string instrumentGroupType [] = {"UNdefined", "PIano", "CHromatic percussion", "ORgan", "GUitar", "BAss", "SIngle strings", "ENsemble", "BRass", "REed", "ACcustic pipe", "LEad synth", "PAd synth", "SYnth effects", "EThnic", "PErcussive", "SOund effects"};
 
 class CmdInterface : private MiscFuncs, FileMgr
 {
@@ -956,6 +960,7 @@ class CmdInterface : private MiscFuncs, FileMgr
         void cmdIfaceCommandLoop();
 
     private:
+        list<string>  instrumentGroup;
         bool query(std::string text, bool priority);
         void helpLoop(list<std::string>& msg, std::string *commands, int indent, bool single = false);
         char helpList(unsigned int local);
@@ -969,6 +974,7 @@ class CmdInterface : private MiscFuncs, FileMgr
         int LFOselect(unsigned char controlType);
         int filterSelect(unsigned char controlType);
         int envelopeSelect(unsigned char controlType);
+        int commandGroup();
         int commandList();
         std::string findStatus(bool show);
         int contextToEngines(void);

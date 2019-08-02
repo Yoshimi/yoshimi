@@ -2816,9 +2816,12 @@ void InterChange::commandMain(CommandBlock *getData)
 
 void InterChange::commandBank(CommandBlock *getData)
 {
-    float value = getData->data.value.F;
+    int value_int = int(getData->data.value.F + 0.5f);
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+    unsigned char parameter = getData->data.parameter;
 
     bool write = (type & TOPLEVEL::type::Write) > 0;
     if (write)
@@ -2826,11 +2829,51 @@ void InterChange::commandBank(CommandBlock *getData)
 
     switch (control)
     {
+        case BANK::control::findInstrumentName:
+        {
+            if (parameter == UNUSED) // return the name of a specific instrument.
+                miscMsgPush(synth->getBankRef().getname(value_int, kititem, engine));
+            else
+            {
+                static int inst = 0;
+                static int bank = 0;
+                static int root = 0;
+
+                /*
+                 * This version of the call is for building up lists of instruments that match the given type.
+                 * It will find the next in the series until the entire bank structure has been scanned.
+                 * It returns the terminator when this has been completed so the calling function knows the
+                 * entire list has been scanned, and resets ready for a new set of calls.
+                 */
+
+                do {
+                    do {
+                        do {
+                            if (synth->getBankRef().getType(inst, bank, root) == parameter)
+                            {
+                                miscMsgPush(asString(root, 3) + ": " + asString(bank, 3) + ". " + asString(inst + 1, 3) + "  " + synth->getBankRef().getname(inst, bank, root));
+                                ++ inst;
+                                return;
+                            }
+                            ++inst;
+                        } while (inst < 160);
+
+                        inst = 0;
+                        ++bank;
+                    } while (bank < 128);
+                    bank = 0;
+                    ++root;
+                } while (root < 128);
+                root = 0;
+                miscMsgPush("*");
+            }
+            break;
+        }
         case BANK::control::selectBank:
-            value = synth->getRuntime().currentBank; // currently read only
+            value_int = synth->getRuntime().currentBank; // currently read only
             break;
         case BANK::control::selectRoot:
-            value = synth->getRuntime().currentRoot; // currently read only
+            value_int = synth->getRuntime().currentRoot; // currently read only
             break;
         default:
             getData->data.source = TOPLEVEL::action::noAction;
@@ -2838,7 +2881,7 @@ void InterChange::commandBank(CommandBlock *getData)
     }
 
     if (!write)
-        getData->data.value.F = value;
+        getData->data.value.F = value_int;
 }
 
 

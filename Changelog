@@ -1,5 +1,9 @@
 yoshimi 1.5.11 M
 
+2019-8-1 Will
+* Adjusted new instrument group controls to Yoshi standard.
+* Implemented CLI access to group controls.
+
 2019-7-31 Will
 * Small bank refinements.
 * Bank search window first starts with Piano.
