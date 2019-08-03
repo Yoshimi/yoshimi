@@ -31,13 +31,40 @@
 class MiscCli : public MiscFuncs
 {
     public:
+        bool lineEnd(char *point, unsigned char controlType);
+        int toggle(char *point);
+        int contextToEngines(int context);
+        bool query(std::string text, bool priority);
+
         float readControl(SynthEngine *synth, unsigned char action, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char offset = 0xff, unsigned char miscmsg = 0xff);
         std::string readControlText(SynthEngine *synth, unsigned char action, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char offset = 0xff);
         void readLimits(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char miscmsg);
         int sendNormal(SynthEngine *synth, unsigned char action, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char offset = 0xff, unsigned char miscmsg = 0xff);
         int sendDirect(SynthEngine *synth, unsigned char action, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char offset = 0xff, unsigned char miscmsg = 0xff, unsigned char request = 0xff);
 
+        std::string findStatus(SynthEngine *synth, int context, bool show);
 
+        // all these are heavily used by the aboce function
+        int filterVowelNumber;
+        int filterFormantNumber;
+        int insertType;
+        int voiceNumber;
+        int voiceFromNumber;
+        int modulatorFromNumber;
+        int modulatorFromVoiceNumber;
+        int kitMode;
+        int kitNumber;
+        bool inKitEditor;
+        int npart;
+
+        int nFX;
+        int nFXtype;
+        int nFXpreset;
+        int nFXeqBand;
+        int chan;
+        int axis;
+        int mline;
+        unsigned int context;
 };
 
 #endif

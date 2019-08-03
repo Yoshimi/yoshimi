@@ -38,7 +38,6 @@ class CmdInterface : private  MiscCli, FileMgr
 
     private:
         list<string>  instrumentGroup;
-        bool query(std::string text, bool priority);
         void helpLoop(list<std::string>& msg, std::string *commands, int indent, bool single = false);
         char helpList(unsigned int local);
         std::string historySelect(int listnum, int selection);
@@ -53,10 +52,6 @@ class CmdInterface : private  MiscCli, FileMgr
         int envelopeSelect(unsigned char controlType);
         int commandGroup();
         int commandList();
-        std::string findStatus(bool show);
-        int contextToEngines(void);
-        int toggle(void);
-        bool lineEnd(unsigned char controlType);
         int commandMlearn(unsigned char controlType);
         int commandVector(unsigned char controlType);
         int commandConfig(unsigned char controlType);
@@ -77,26 +72,6 @@ class CmdInterface : private  MiscCli, FileMgr
         char welcomeBuffer [128];
         int reply;
         std::string replyString;
-        int filterVowelNumber;
-        int filterFormantNumber;
-        int insertType;
-        int voiceNumber;
-        int voiceFromNumber;
-        int modulatorFromNumber;
-        int modulatorFromVoiceNumber;
-        int kitMode;
-        int kitNumber;
-        bool inKitEditor;
-        int npart;
-
-        int nFX;
-        int nFXtype;
-        int nFXpreset;
-        int nFXeqBand;
-        int chan;
-        int axis;
-        int mline;
-        unsigned int context;
 };
 
 #endif
