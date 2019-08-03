@@ -26,10 +26,11 @@
 #include "Misc/MiscFuncs.h"
 #include "Interface/FileMgr.h"
 #include "Misc/SynthEngine.h"
+#include "CLI/MiscCLI.h"
 #include "Interface/InterChange.h"
 #include "Effects/EffectMgr.h"
 
-class CmdInterface : private MiscFuncs, FileMgr
+class CmdInterface : private  MiscCli, FileMgr
 {
     public:
         void defaults();
@@ -69,11 +70,6 @@ class CmdInterface : private MiscFuncs, FileMgr
         int waveform(unsigned char controlType);
         int commandPart(unsigned char controlType);
         int commandReadnSet(unsigned char controlType);
-        float readControl(unsigned char action, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char offset = 0xff, unsigned char miscmsg = 0xff);
-        std::string readControlText(unsigned char action, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char offset = 0xff);
-        void readLimits(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char miscmsg);
-        int sendNormal(unsigned char action, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char offset = 0xff, unsigned char miscmsg = 0xff);
-        int sendDirect(unsigned char action, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char offset = 0xff, unsigned char miscmsg = 0xff, unsigned char request = 0xff);
         int cmdIfaceProcessCommand(char *cCmd);
         char *cCmd;
         char *point;

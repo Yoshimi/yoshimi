@@ -4,6 +4,7 @@ yoshimi 1.5.11 M
 * Created new CLI directory.
   Moved main command line files there
   ready to split them up.
+* Moved buffered read and write from CmdInterface to MiscCLI
 
 2019-8-1 Will
 * Adjusted new instrument group controls to Yoshi standard.
