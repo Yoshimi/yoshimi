@@ -17,8 +17,6 @@
 #   You should have received a copy of the GNU General Public License
 #   along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-# Modified May 2019
-
 project (Yoshimi)
 cmake_minimum_required (VERSION 3.0)
 cmake_policy (VERSION 3.0)
@@ -366,7 +364,6 @@ set (Misc_sources
 )
 
 set (Interface_Sources
-    Interface/CmdInterface.cpp
     Interface/InterChange.cpp
     Interface/Data2Text.cpp
     Interface/MidiLearn.cpp
@@ -374,6 +371,10 @@ set (Interface_Sources
     Interface/FileMgr.cpp
     Interface/RingBuffer.cpp
     Interface/TextLists.h
+)
+
+set (CLI_Sources
+    CLI/CmdInterface.cpp
 )
 
 set (Params_sources
@@ -479,6 +480,7 @@ endif (HasJackLatency)
 
 set (ProgSources
     ${Interface_Sources}
+    ${CLI_Sources}
     ${Misc_sources}
     ${Params_sources}
     ${Synth_sources}

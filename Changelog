@@ -1,5 +1,10 @@
 yoshimi 1.5.11 M
 
+2019-8-2 Will
+* Created new CLI directory.
+  Moved main command line files there
+  ready to split them up.
+
 2019-8-1 Will
 * Adjusted new instrument group controls to Yoshi standard.
 * Implemented CLI access to group controls.

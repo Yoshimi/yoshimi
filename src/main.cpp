@@ -43,7 +43,7 @@
 #include "Misc/Config.h"
 #include "Misc/SynthEngine.h"
 #include "MusicIO/MusicClient.h"
-#include "Interface/CmdInterface.h"
+#include "CLI/CmdInterface.h"
 
 #ifdef GUI_FLTK
     #include "MasterUI.h"

@@ -43,7 +43,7 @@
 #include "Misc/Bank.h"
 
 #include "Interface/InterChange.h"
-#include "Interface/CmdInterface.h"
+#include "CLI/CmdInterface.h"
 #include "Interface/TextLists.h"
 
 
