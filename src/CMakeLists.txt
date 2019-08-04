@@ -375,6 +375,7 @@ set (Interface_Sources
 
 set (CLI_Sources
     CLI/CmdInterface.cpp
+    #CLI/ConfigCLI.cpp
     CLI/MiscCLI.cpp
 )
 

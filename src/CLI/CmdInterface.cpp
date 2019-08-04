@@ -20,7 +20,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <string>
 #include <cstdlib>
 #include <unistd.h>
 #include <pwd.h>
@@ -38,15 +37,10 @@
 #include <sstream>
 #include <sys/time.h>
 
-#include "Misc/SynthEngine.h"
-#include "Misc/MiscFuncs.h"
 #include "Misc/Bank.h"
 
-#include "Interface/InterChange.h"
-#include "CLI/MiscCLI.h"
 #include "CLI/CmdInterface.h"
 #include "Interface/TextLists.h"
-
 
 /*
  * There are two routes that 'write' commands can take.
@@ -69,8 +63,6 @@
 
 extern SynthEngine *firstSynth;
 static unsigned int currentInstance = 0;
-
-
 
 void CmdInterface::defaults()
 {

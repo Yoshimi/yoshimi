@@ -24,7 +24,6 @@
 
 
 #include "Misc/MiscFuncs.h"
-#include "Interface/FileMgr.h"
 #include "Misc/SynthEngine.h"
 #include "Interface/TextLists.h"
 

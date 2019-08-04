@@ -19,8 +19,6 @@
 */
 #include <readline/readline.h>
 
-#include "Misc/SynthEngine.h"
-#include "Misc/MiscFuncs.h"
 #include "CLI/MiscCLI.h"
 
 bool MiscCli::lineEnd(char * point, unsigned char controlType)

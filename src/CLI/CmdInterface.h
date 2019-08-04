@@ -23,9 +23,7 @@
 #include <string>
 #include <list>
 
-#include "Misc/MiscFuncs.h"
 #include "Interface/FileMgr.h"
-#include "Misc/SynthEngine.h"
 #include "CLI/MiscCLI.h"
 #include "Interface/InterChange.h"
 #include "Effects/EffectMgr.h"
