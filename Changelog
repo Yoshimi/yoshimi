@@ -3,6 +3,8 @@ yoshimi 1.5.11 M
 2019-8-4 Will
 * Reinstated Cormi_Sound bank.
   This seems to have been lost at some point.
+* Revised specimen presets.
+* Updated user guide.
 
 2019-8-2 Will
 * Created new CLI directory.
