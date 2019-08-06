@@ -39,8 +39,7 @@ ringBuff::ringBuff(uint32_t _bufferSize, uint32_t _blockSize):
     blockSize(_blockSize)
 {
     mask = bufferSize - 1;
-    buffer = new char[bufferSize + blockSize];
-    // size seems wrong but there is an overrun without the extra block
+    buffer = new char[bufferSize];
     //std::cout << "buffer size " << int(bufferSize) << "   block " << int(blockSize) << std::endl;
 }
 
@@ -54,11 +53,12 @@ bool ringBuff::write(char *writeData)
 {
     uint32_t write = writePoint.load(std::memory_order_acquire);
     uint32_t read = readPoint.load(std::memory_order_relaxed);
-    if ((write - read) > (bufferSize - blockSize))
+    if ((write - read) >= bufferSize)
         return false;
     //std::cout << "write " << write << "  read " << read << std::endl;
-    memcpy(buffer + blockSize + (write & mask), writeData, blockSize);
-    writePoint.store(write + blockSize, std::memory_order_release);
+    write = (write + blockSize) & mask;
+    memcpy((buffer + write), writeData, blockSize);
+    writePoint.store(write, std::memory_order_release);
     return true;
 }
 
@@ -69,7 +69,8 @@ bool ringBuff::read(char *readData)
     if ((write - read) < blockSize)
         return false;
     //std::cout << "read " << read << "  write " << write << std::endl;
-    memcpy(readData, buffer + blockSize + (read & mask), blockSize);
-    readPoint.store(read + blockSize, std::memory_order_release);
+    read = (read + blockSize) & mask;
+    memcpy(readData, (buffer + read), blockSize);
+    readPoint.store(read, std::memory_order_release);
     return true;
 }

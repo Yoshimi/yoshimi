@@ -70,6 +70,7 @@ class CmdInterface : private  MiscCli, FileMgr
         char welcomeBuffer [128];
         int reply;
         std::string replyString;
+        unsigned int context;
 };
 
 #endif

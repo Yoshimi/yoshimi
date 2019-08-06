@@ -35,15 +35,15 @@ class MiscCli : public MiscFuncs
         int contextToEngines(int context);
         bool query(std::string text, bool priority);
 
-        float readControl(SynthEngine *synth, unsigned char action, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char offset = 0xff, unsigned char miscmsg = 0xff);
-        std::string readControlText(SynthEngine *synth, unsigned char action, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char offset = 0xff);
+        float readControl(SynthEngine *synth, unsigned char action, unsigned char control, unsigned char part, unsigned char kit = UNUSED, unsigned char engine = UNUSED, unsigned char insert = UNUSED, unsigned char parameter = UNUSED, unsigned char offset = UNUSED, unsigned char miscmsg = NO_MSG);
+        std::string readControlText(SynthEngine *synth, unsigned char action, unsigned char control, unsigned char part, unsigned char kit = UNUSED, unsigned char engine = UNUSED, unsigned char insert = UNUSED, unsigned char parameter = UNUSED, unsigned char offset = UNUSED);
         void readLimits(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char miscmsg);
-        int sendNormal(SynthEngine *synth, unsigned char action, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char offset = 0xff, unsigned char miscmsg = 0xff);
-        int sendDirect(SynthEngine *synth, unsigned char action, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char offset = 0xff, unsigned char miscmsg = 0xff, unsigned char request = 0xff);
+        int sendNormal(SynthEngine *synth, unsigned char action, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = UNUSED, unsigned char engine = UNUSED, unsigned char insert = UNUSED, unsigned char parameter = UNUSED, unsigned char offset = UNUSED, unsigned char miscmsg = NO_MSG);
+        int sendDirect(SynthEngine *synth, unsigned char action, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = UNUSED, unsigned char engine = UNUSED, unsigned char insert = UNUSED, unsigned char parameter = UNUSED, unsigned char offset = UNUSED, unsigned char miscmsg = NO_MSG, unsigned char request = UNUSED);
 
         std::string findStatus(SynthEngine *synth, int context, bool show);
 
-        // all these are heavily used by the aboce function
+        // all these are heavily used by the above function
         int filterVowelNumber;
         int filterFormantNumber;
         int insertType;
@@ -60,10 +60,10 @@ class MiscCli : public MiscFuncs
         int nFXtype;
         int nFXpreset;
         int nFXeqBand;
+
         int chan;
         int axis;
         int mline;
-        unsigned int context;
 };
 
 #endif
