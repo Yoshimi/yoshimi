@@ -1,5 +1,5 @@
 /*
-    MiscCLI.cpp
+    CmdInterpreter.cpp
 
     Copyright 2019, Will Godfrey.
 
@@ -19,7 +19,7 @@
 */
 #include <readline/readline.h>
 
-#include "CLI/MiscCLI.h"
+#include "CLI/CmdInterpreter.h"
 #include "Misc/TextMsgBuffer.h"
 
 

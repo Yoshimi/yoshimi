@@ -1,5 +1,5 @@
 /*
-    MiscCLI.h
+    CmdInterpreter.h
 
     Copyright 2019, Will Godfrey.
 
@@ -18,8 +18,8 @@
 
 */
 
-#ifndef MISCCLI_H
-#define MISCCLI_H
+#ifndef CMDINTERPRETER_H
+#define CMDINTERPRETER_H
 
 
 
@@ -66,4 +66,4 @@ class MiscCli : public MiscFuncs
         int mline;
 };
 
-#endif
+#endif /*CMDINTERPRETER_H*/

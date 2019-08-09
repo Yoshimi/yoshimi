@@ -1,5 +1,5 @@
 /*
-    MiscFuncs.cpp
+    CliFuncs.h
 
     Copyright 2010, Alan Calvert
     Copyright 2014-2019, Will Godfrey
@@ -15,13 +15,20 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>
+    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modifed April 2019
+    Modified August 2019
 */
 
-//#define REPORT_MISCMSG
-// for testing message list leaks
+#ifndef CLIFUNCS_H
+#define CLIFUNCS_H
+
+#include <cmath>
+#include <string>
+#include <list>
+#include <semaphore.h>
+
+#include "globals.h"
 
 #include <sys/stat.h>
 #include <stdlib.h>
@@ -424,3 +431,6 @@ void invSignal(float *sig, size_t len)
     for(size_t i = 0; i < len; ++i)
         sig[i] *= -1.0f;
 }
+
+
+#endif /*CLIFUNCS_H*/
