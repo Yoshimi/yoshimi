@@ -297,7 +297,6 @@ float PADnoteParameters::getprofile(float *smp, int size)
     float max = 0.0f;
     for (int i = 0; i < size; ++i)
     {
-        smp[i] = smp[i];
         if (smp[i] > max)
             max = smp[i];
     }

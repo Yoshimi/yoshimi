@@ -810,7 +810,7 @@ std::string DataText::resolveConfig(CommandBlock *getData, bool addValue)
 }
 
 
-std::string DataText::resolveBank(CommandBlock *getData, bool addValue)
+std::string DataText::resolveBank(CommandBlock *getData, bool)
 {
     int value_int = lrint(getData->data.value.F);
     int control = getData->data.control;
@@ -820,7 +820,6 @@ std::string DataText::resolveBank(CommandBlock *getData, bool addValue)
     std::string name = miscMsgPop(value_int);
     std::string contstr = "";
     showValue = false;
-    addValue = addValue; // suppress warning
     switch(control)
     {
         case BANK::control::deleteInstrument:
@@ -1496,12 +1495,11 @@ std::string DataText::resolvePart(CommandBlock *getData, bool addValue)
 }
 
 
-std::string DataText::resolveAdd(CommandBlock *getData, bool addValue)
+std::string DataText::resolveAdd(CommandBlock *getData, bool)
 {
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
-    addValue = addValue; // suppress warning
     std::string name = "";
     if (control <= ADDSYNTH::control::panning)
         name = " Amplitude ";
@@ -2139,7 +2137,7 @@ std::string DataText::resolvePad(CommandBlock *getData, bool addValue)
 }
 
 
-std::string DataText::resolveOscillator(CommandBlock *getData, bool addValue)
+std::string DataText::resolveOscillator(CommandBlock *getData, bool)
 {
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -2149,7 +2147,6 @@ std::string DataText::resolveOscillator(CommandBlock *getData, bool addValue)
     unsigned char insert = getData->data.insert;
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
-    addValue = addValue; // suppress warning
     std::string isPad = "";
     std::string eng_name;
     if (engine == PART::engine::padSynth)
@@ -2409,7 +2406,7 @@ std::string DataText::resolveResonance(CommandBlock *getData, bool addValue)
 }
 
 
-std::string DataText::resolveLFO(CommandBlock *getData, bool addValue)
+std::string DataText::resolveLFO(CommandBlock *getData, bool)
 {
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -2417,7 +2414,6 @@ std::string DataText::resolveLFO(CommandBlock *getData, bool addValue)
     unsigned char engine = getData->data.engine;
     unsigned char insertParam = getData->data.parameter;
 
-    addValue = addValue; // suppress warning
     std::string name;
     std::string lfo;
 
@@ -2484,7 +2480,7 @@ std::string DataText::resolveLFO(CommandBlock *getData, bool addValue)
 }
 
 
-std::string DataText::resolveFilter(CommandBlock *getData, bool addValue)
+std::string DataText::resolveFilter(CommandBlock *getData, bool)
 {
     int value_int = int(getData->data.value.F);
     unsigned char control = getData->data.control;
@@ -2496,7 +2492,6 @@ std::string DataText::resolveFilter(CommandBlock *getData, bool addValue)
     int nformant = getData->data.parameter;
     int nvowel = getData->data.miscmsg;
 
-    addValue = addValue; // suppress warning
     std::string name;
 
     if (engine == PART::engine::addSynth)
@@ -2605,7 +2600,7 @@ std::string DataText::resolveFilter(CommandBlock *getData, bool addValue)
 }
 
 
-std::string DataText::resolveEnvelope(CommandBlock *getData, bool addValue)
+std::string DataText::resolveEnvelope(CommandBlock *getData, bool)
 {
     int value = lrint(getData->data.value.F);
     bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
@@ -2617,7 +2612,6 @@ std::string DataText::resolveEnvelope(CommandBlock *getData, bool addValue)
     unsigned char insertParam = getData->data.parameter;
     int miscmsg = getData->data.miscmsg;
 
-    addValue = addValue; // suppress warning
     std::string env;
     std::string name;
     if (engine == PART::engine::addSynth)
