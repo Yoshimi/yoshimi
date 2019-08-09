@@ -2575,12 +2575,12 @@ void SynthEngine::setLastfileAdded(int group, string name)
         name = Runtime.userHome;
     list<string>::iterator it = Runtime.lastfileseen.begin();
     int count = 0;
-    while (count < group && it != miscList.end())
+    while (count < group && it != Runtime.lastfileseen.end())
     {
         ++it;
         ++count;
     }
-    if (it != miscList.end())
+    if (it != Runtime.lastfileseen.end())
         *it = name;
 }
 
@@ -2589,12 +2589,12 @@ string SynthEngine::getLastfileAdded(int group)
 {
     list<string>::iterator it = Runtime.lastfileseen.begin();
     int count = 0;
-    while ( count < group && it != miscList.end())
+    while ( count < group && it != Runtime.lastfileseen.end())
     {
         ++it;
         ++count;
     }
-    if (it == miscList.end())
+    if (it == Runtime.lastfileseen.end())
         return "";
     return *it;
 }
