@@ -1266,7 +1266,7 @@ Offset}
     }
     Fl_Window instrumenteditwindow {
       label {Instrument Edit}
-      xywh {208 325 395 360} type Double hide
+      xywh {1245 202 395 385} type Double hide
       code0 {seteditname();}
       code1 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());}
     } {
@@ -1533,10 +1533,19 @@ Offset}
         code0 {o->value(part->Pfrand);}
         class mwheel_val_slider_rev
       }
+      Fl_Value_Slider velocityhumanise {
+        label Velocity
+        callback {//
+
+        send_data(0, PART::control::humanvelocity, o->value(), TOPLEVEL::type::Integer);}
+        tooltip {Random percentage velocity attenuation of whole part} xywh {8 359 201 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 8 maximum 50 step 1
+        code0 {o->value(part->Pvelrand);}
+        class mwheel_val_slider_rev
+      }
       Fl_Button {} {
         label Close
         callback {instrumenteditwindow->hide();}
-        xywh {311 335 80 21} box THIN_UP_BOX labelfont 1 labelsize 13
+        xywh {306 354 80 21} box THIN_UP_BOX labelfont 1 labelsize 13
       }
     }
   }
@@ -1912,6 +1921,11 @@ Offset}
         case PART::control::humanise:
             humanise->value(valInt);
             break;
+
+        case PART::control::humanvelocity:
+            velocityhumanise->value(valInt);
+            break;
+
 
         case PART::control::drumMode:
             drumMode->value(valBool);

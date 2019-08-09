@@ -3213,6 +3213,13 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->Pfrand;
             break;
 
+        case PART::control::humanvelocity:
+            if (write)
+                part->Pvelrand = value;
+            else
+                value = part->Pvelrand;
+            break;
+
         case PART::control::drumMode:
             if (write)
             {

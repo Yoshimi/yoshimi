@@ -22,7 +22,6 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified March 2019
 */
 
 #ifndef PART_H
@@ -131,6 +130,7 @@ class Part : private MiscFuncs, SynthHelper, FileMgr
         unsigned char Pkeylimit;   // how many keys can play simultaneously,
                                    // time 0 = off, the older will be released
         float         Pfrand;      // Part random frequency content
+        float         Pvelrand;    // Part random velocity content
         unsigned char PbreathControl;
         unsigned char Peffnum;
         int           Paudiodest;  // jack output routing

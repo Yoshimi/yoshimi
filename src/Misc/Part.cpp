@@ -23,7 +23,6 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified May 2019
 */
 
 #include <cstring>
@@ -127,6 +126,7 @@ void Part::defaults(void)
     Pveloffs = 64;
     Pkeylimit = 20;
     Pfrand = 0;
+    Pvelrand = 0;
     PbreathControl = 2;
     Peffnum = 0;
     legatoFading = 0;
@@ -159,6 +159,7 @@ void Part::defaultsinstrument(void)
     Pkitfade = false;
     Pdrummode = 0;
     Pfrand = 0;
+    Pvelrand = 0;
 
     for (int n = 0; n < NUM_KIT_ITEMS; ++n)
     {
@@ -354,7 +355,15 @@ void Part::NoteOn(int note, int velocity, bool renote)
         }
 
         // compute the velocity offset
-        float vel = velF(velocity / 127.0f, Pvelsns) + (Pveloffs - 64.0f) / 64.0f;
+        float newVel = velocity;
+        if (Pvelrand >= 1)
+        {
+            newVel *= (1 - (synth->numRandom() * Pvelrand * 0.0104f));
+            //std::cout << "Vel rand " << Pvelrand << "  result " << newVel << std::endl;
+        }
+
+
+        float vel = velF(newVel / 127.0f, Pvelsns) + (Pveloffs - 64.0f) / 64.0f;
         vel = (vel < 0.0f) ? 0.0f : vel;
         vel = (vel > 1.0f) ? 1.0f : vel;
 
