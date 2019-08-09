@@ -171,14 +171,14 @@ class MicrotonalUI {: {private MiscFuncs}
         Fl_Input nameinput {
           label {Name:}
           callback {//
-          send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::name, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.miscMsgPush(string(o->value())));}
+          send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::name, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(string(o->value())));}
           xywh {10 64 285 25} labelfont 1 labelsize 11 align 5
           code0 {o->value(microtonal->Pname.c_str());}
         }
         Fl_Input commentinput {
           label {Description:}
           callback {//
-          send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::comment, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.miscMsgPush(string(o->value())));}
+          send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::comment, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(string(o->value())));}
           xywh {10 104 391 25} labelfont 1 labelsize 11 align 5
           code0 {o->value(microtonal->Pcomment.c_str());}
         }
@@ -218,7 +218,7 @@ class MicrotonalUI {: {private MiscFuncs}
             if (filename == NULL)
                 return;
 
-            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importScl, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.miscMsgPush(string(filename)));}
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importScl, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(string(filename)));}
             tooltip {Inport Scala .scl file (tunnings)} xywh {85 417 100 20} box THIN_UP_BOX labelfont 1 labelsize 10
           }
         }
@@ -343,7 +343,7 @@ class MicrotonalUI {: {private MiscFuncs}
             if (filename == NULL)
                 return;
 
-            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importKbm, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.miscMsgPush(string(filename)));}
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importKbm, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(string(filename)));}
             tooltip {Inport Scala .kbm file (keyboard mapping)} xywh {285 417 104 20} box THIN_UP_BOX labelfont 1 labelsize 10
           }
         }
@@ -460,7 +460,7 @@ class MicrotonalUI {: {private MiscFuncs}
 
         case SCALES::control::tuning:
         case SCALES::control::importScl:
-            msg = (textMsgBuffer.miscMsgPop(miscmsg)); // must always fetch it
+            msg = (textMsgBuffer.fetch(miscmsg)); // must always fetch it
             if (value_int > 0)
             {
                 tuningsinput->value(msg.c_str());
@@ -471,7 +471,7 @@ class MicrotonalUI {: {private MiscFuncs}
             break;
         case SCALES::control::keyboardMap:
         case SCALES::control::importKbm:
-            msg = (textMsgBuffer.miscMsgPop(miscmsg)); // must always fetch it
+            msg = (textMsgBuffer.fetch(miscmsg)); // must always fetch it
             if (value_int > 0)
             {
                 mappinginput->value(msg.c_str());
@@ -490,10 +490,10 @@ class MicrotonalUI {: {private MiscFuncs}
             break;
 
         case SCALES::control::name:
-            nameinput->value(textMsgBuffer.miscMsgPop(miscmsg).c_str());
+            nameinput->value(textMsgBuffer.fetch(miscmsg).c_str());
             break;
         case SCALES::control::comment:
-            commentinput->value(textMsgBuffer.miscMsgPop(miscmsg).c_str());
+            commentinput->value(textMsgBuffer.fetch(miscmsg).c_str());
             break;
 
         case SCALES::control::clearAll:

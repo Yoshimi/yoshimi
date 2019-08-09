@@ -52,19 +52,19 @@
  */
 class TextMsgBuffer
 {
-        sem_t miscmsglock;
-        std::list<std::string> miscList;
+        sem_t lock;
+        std::list<std::string> buffer;
 
         TextMsgBuffer() :
-            miscmsglock{},
-            miscList{}
+            lock{},
+            buffer{}
         {
-            sem_init(&miscmsglock, 0, 1);
+            sem_init(&lock, 0, 1);
         }
 
         ~TextMsgBuffer()
         {
-            sem_destroy(&miscmsglock);
+            sem_destroy(&lock);
         }
 
     public:
@@ -75,46 +75,46 @@ class TextMsgBuffer
             return singleton;
         }
 
-        void miscMsgInit(void);
-        void miscMsgClear(void);
-        int miscMsgPush(std::string text);
-        std::string miscMsgPop(int pos);
+        void init(void);
+        void clear(void);
+        int push(std::string text);
+        std::string fetch(int pos);
 };
 
 
 
 
 
-inline void TextMsgBuffer::miscMsgInit()
+inline void TextMsgBuffer::init()
 {
     for (int i = 0; i < NO_MSG; ++i)
-        miscList.push_back("");
+        buffer.push_back("");
     // we use 255 to denote an invalid entry
 }
 
 
-inline void TextMsgBuffer::miscMsgClear()
+inline void TextMsgBuffer::clear()
 { // catches messge leaks - shirley knot :@)
 #ifdef REPORT_MISCMSG
-    std::cout << "Msg list cleared" << std::endl;
+    std::cout << "TextMsgBuffer cleared" << std::endl;
 #endif
-    std::list<std::string>::iterator it = miscList.begin();
-    for (it = miscList.begin(); it != miscList.end(); ++it)
+    std::list<std::string>::iterator it = buffer.begin();
+    for (it = buffer.begin(); it != buffer.end(); ++it)
         *it = "";
 }
 
 
-inline int TextMsgBuffer::miscMsgPush(std::string _text)
+inline int TextMsgBuffer::push(std::string _text)
 {
     if (_text.empty())
         return NO_MSG;
-    sem_wait(&miscmsglock);
+    sem_wait(&lock);
 
     std::string text = _text;
-    std::list<std::string>::iterator it = miscList.begin();
+    std::list<std::string>::iterator it = buffer.begin();
     int idx = 0;
 
-    while(it != miscList.end())
+    while(it != buffer.end())
     {
         if ( *it == "")
         {
@@ -127,29 +127,29 @@ inline int TextMsgBuffer::miscMsgPush(std::string _text)
         ++ it;
         ++ idx;
     }
-    if (it == miscList.end())
+    if (it == buffer.end())
     {
-        std::cerr << "miscMsg list full :(" << std::endl;
+        std::cerr << "TextMsgBuffer is full :(" << std::endl;
         idx = -1;
     }
 
     int result = idx; // in case of a new entry before return
-    sem_post(&miscmsglock);
+    sem_post(&lock);
     return result;
 }
 
 
-inline std::string TextMsgBuffer::miscMsgPop(int _pos)
+inline std::string TextMsgBuffer::fetch(int _pos)
 {
     if (_pos >= NO_MSG)
         return "";
-    sem_wait(&miscmsglock);
+    sem_wait(&lock);
 
     int pos = _pos;
-    std::list<std::string>::iterator it = miscList.begin();
+    std::list<std::string>::iterator it = buffer.begin();
     int idx = 0;
 
-    while(it != miscList.end())
+    while(it != buffer.end())
     {
         if (idx == pos)
         {
@@ -166,7 +166,7 @@ inline std::string TextMsgBuffer::miscMsgPop(int _pos)
     {
         swap (result, *it); // in case of a new entry before return
     }
-    sem_post(&miscmsglock);
+    sem_post(&lock);
     return result;
 }
 

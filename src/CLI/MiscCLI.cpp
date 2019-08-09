@@ -135,7 +135,7 @@ std::string MiscCli::readControlText(SynthEngine *synth, unsigned char action, u
     putData.data.offset = offset;
     putData.data.miscmsg = UNUSED;
     value = synth->interchange.readAllData(&putData);
-    return TextMsgBuffer::instance().miscMsgPop(value);
+    return TextMsgBuffer::instance().fetch(value);
 }
 
 
@@ -349,7 +349,7 @@ int MiscCli::sendDirect(SynthEngine *synth, unsigned char action, float value, u
 
     if (part == TOPLEVEL::section::config && putData.data.miscmsg != UNUSED && (control == CONFIG::control::bankRootCC || control == CONFIG::control::bankCC || control == CONFIG::control::extendedProgramChangeCC))
     {
-        synth->getRuntime().Log("In use by " + TextMsgBuffer::instance().miscMsgPop(putData.data.miscmsg) );
+        synth->getRuntime().Log("In use by " + TextMsgBuffer::instance().fetch(putData.data.miscmsg) );
         return 0;
     }
 

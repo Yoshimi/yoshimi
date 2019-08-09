@@ -502,7 +502,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
         const char *tmp = NULL;
         tmp = fl_input("Vector name:", loadlabel[BaseChan].c_str());
         if (tmp != NULL && !string(tmp).empty())
-            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, VECTOR::control::name, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan, UNUSED, textMsgBuffer.miscMsgPush(string(tmp)));}
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, VECTOR::control::name, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan, UNUSED, textMsgBuffer.push(string(tmp)));}
         tooltip {Last saved or loaded vector file - click to change} xywh {45 265 198 20} box THIN_DOWN_BOX labelfont 1 labelsize 12
       }
     }
@@ -528,7 +528,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
     switch (control)
     {
         case VECTOR::control::name:
-            msg = textMsgBuffer.miscMsgPop(miscmsg);;
+            msg = textMsgBuffer.fetch(miscmsg);;
             loadlabel[insert] = msg;
             Loaded->copy_label(msg.c_str());
             break;
@@ -885,7 +885,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
             return;
         fname = string(filename);
     }
-    send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::loadNamedVector, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, BaseChan, UNUSED, textMsgBuffer.miscMsgPush(fname));} {}
+    send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::loadNamedVector, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, BaseChan, UNUSED, textMsgBuffer.push(fname));} {}
   }
   Function {saveVector()} {} {
     code {//
@@ -905,7 +905,7 @@ class VectorUI {: {private MiscFuncs, FileMgr}
     int pos = loadlabel[BaseChan].find("No Name");
     if (pos >=0 && pos < 2)
         Loaded->copy_label(findleafname(filename).c_str());
-    send_data(TOPLEVEL::action::lowPrio, MAIN::saveNamedVector, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, BaseChan, UNUSED, textMsgBuffer.miscMsgPush(filename));} {}
+    send_data(TOPLEVEL::action::lowPrio, MAIN::saveNamedVector, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, BaseChan, UNUSED, textMsgBuffer.push(filename));} {}
   }
   Function {clearVector(int BaseC)} {} {
     code {//

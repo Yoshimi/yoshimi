@@ -397,7 +397,7 @@ void MidiLearn::generalOperations(CommandBlock *getData)
     string name;
     if (control == MIDILEARN::control::loadList)
     {
-        name = (textMsgBuffer.miscMsgPop(par2));
+        name = (textMsgBuffer.fetch(par2));
         if (loadList(name))
             synth->getRuntime().Log("Loaded " + name);
         updateGui();
@@ -430,7 +430,7 @@ void MidiLearn::generalOperations(CommandBlock *getData)
     }
     if (control == MIDILEARN::control::saveList)
     {
-        name = (textMsgBuffer.miscMsgPop(par2));
+        name = (textMsgBuffer.fetch(par2));
         if (saveList(name))
             synth->getRuntime().Log("Saved " + name);
         synth->getRuntime().finishedCLI = true;
@@ -659,7 +659,7 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
         putData.data.control = 0xfe; // TODO don't understand this :(
         putData.data.part = TOPLEVEL::section::midiIn;
         putData.data.parameter = 0x80;
-        putData.data.miscmsg = textMsgBuffer.miscMsgPush("Midi Learn full!");
+        putData.data.miscmsg = textMsgBuffer.push("Midi Learn full!");
         writeMidi(&putData, false);
         learning = false;
         return;
@@ -758,7 +758,7 @@ void MidiLearn::updateGui(int opp)
     if (opp == MIDILEARN::control::sendLearnMessage)
     {
         putData.data.control = MIDILEARN::control::sendLearnMessage;
-        putData.data.miscmsg = textMsgBuffer.miscMsgPush("Learning " + learnedName);
+        putData.data.miscmsg = textMsgBuffer.push("Learning " + learnedName);
     }
     else if (opp == MIDILEARN::control::cancelLearn)
     {
@@ -792,7 +792,7 @@ void MidiLearn::updateGui(int opp)
         putData.data.engine = it->chan;
         putData.data.insert = it->min_in;
         putData.data.parameter = it->max_in;
-        putData.data.miscmsg = textMsgBuffer.miscMsgPush(it->name);
+        putData.data.miscmsg = textMsgBuffer.push(it->name);
         writeToGui(&putData);
         if (newCC > 0xff || (it->status & 8) > 0)
         { // status now used in case NRPN is < 0x100

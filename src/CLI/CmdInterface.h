@@ -73,7 +73,6 @@ class CmdInterface : private  MiscCli, FileMgr
         char *cCmd;
         char *point;
         SynthEngine *synth;
-        char welcomeBuffer [128];
         int reply;
         std::string replyString;
         unsigned int context;

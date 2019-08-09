@@ -32,7 +32,6 @@
 #include <cairo.h>
 #include <cairo-xlib.h>
 
-SynthEngine *synth;
 
 namespace { // Implementation details...
 
@@ -223,7 +222,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 
     if (control == TOPLEVEL::control::textMessage && insert != TOPLEVEL::insert::resonanceGraphInsert) // just show a message
     {
-        synth->getGuiMaster()->words->copy_label(textMsgBuffer.miscMsgPop(miscmsg).c_str());
+        synth->getGuiMaster()->words->copy_label(textMsgBuffer.fetch(miscmsg).c_str());
         synth->getGuiMaster()->cancel->hide();
         synth->getGuiMaster()->message->show();
         return;
@@ -395,7 +394,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         }
         else if(miscmsg != NO_MSG)
         {
-            textMsgBuffer.miscMsgPop(miscmsg); // clear any text out.
+            textMsgBuffer.fetch(miscmsg); // clear any text out.
         }
         return;
     }

@@ -451,7 +451,7 @@ bool Config::loadConfig(void)
         yoshimi += ("-" + asString(thisInstance));
     else
     {
-        TextMsgBuffer::instance().miscMsgInit(); // sneaked it in here so it's early
+        TextMsgBuffer::instance().init(); // sneaked it in here so it's early
         string presetDir = ConfigDir + "/presets";
         if (!isDirectory(presetDir))
         {

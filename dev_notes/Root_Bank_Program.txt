@@ -3,7 +3,7 @@ The internal structure of this has changed so that you can set all three of thes
 
 You can set these all singly, or any logical combination. On error, the returned message will be the first failed one.
 
-You can also load a program from a file name by pushing it to a miscMsg and giving the returned ID to par2.
+You can also load a program from a file name by pushing it to the TextMsgBuffer and giving the returned ID to par2.
 
 All unused parameters should be set to UNUSED (currently 255).
 

@@ -144,7 +144,7 @@ class PartKitItem {: {public Fl_Group, private MiscFuncs}
           const char *tmp = fl_input("Kit item name:", part->kit[n].Pname.c_str());
           if (tmp != NULL)
           {
-              send_data(TOPLEVEL::action::lowPrio, PART::control::instrumentName, 0, TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup, 1, textMsgBuffer.miscMsgPush(string(tmp)));
+              send_data(TOPLEVEL::action::lowPrio, PART::control::instrumentName, 0, TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup, 1, textMsgBuffer.push(string(tmp)));
               o->copy_label(tmp);
           }}
           xywh {90 0 130 15} box THIN_DOWN_BOX down_box FLAT_BOX color 7 labelfont 1 labelsize 10 align 20
@@ -532,7 +532,7 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
                           fl_alert("Can't use name of default sound");
                       else
                       {
-                          unsigned char id = textMsgBuffer.miscMsgPush(string(tmp));
+                          unsigned char id = textMsgBuffer.push(string(tmp));
                           send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, PART::control::instrumentName, 0, TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, id);
                       }
                   }
@@ -1618,7 +1618,7 @@ Offset}
     int valInt = lrint(value);
     string text;
     if (miscmsg != NO_MSG)
-        text = textMsgBuffer.miscMsgPop(miscmsg);
+        text = textMsgBuffer.fetch(miscmsg);
 
     // these are specific to the mixer panel
     if (newpart >= *plgroup && newpart < (*plgroup + NUM_MIDI_CHANNELS))

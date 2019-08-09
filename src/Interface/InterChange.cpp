@@ -320,7 +320,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 
     std::string text;
     if (getData->data.miscmsg != NO_MSG)
-        text = textMsgBuffer.miscMsgPop(getData->data.miscmsg);
+        text = textMsgBuffer.fetch(getData->data.miscmsg);
     else
         text = "";
     getData->data.miscmsg = NO_MSG; // this may be reset later
@@ -375,7 +375,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                 else
                     text = "";
             }
-            text += textMsgBuffer.miscMsgPop(msgID & NO_MSG);
+            text += textMsgBuffer.fetch(msgID & NO_MSG);
             newMsg = true;
             getData->data.source = TOPLEVEL::action::toAll;
             // everyone will want to knopw about these!
@@ -504,7 +504,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                 case MAIN::control::loadInstrumentFromBank:
                 {
                     unsigned int result = synth->setProgramFromBank(getData);
-                    text = textMsgBuffer.miscMsgPop(result & NO_MSG);
+                    text = textMsgBuffer.fetch(result & NO_MSG);
                     if (result < 0x1000)
                         text = "ed " + text;
                     else
@@ -515,9 +515,9 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 
                 case MAIN::control::loadInstrumentByName:
                 {
-                    getData->data.miscmsg = textMsgBuffer.miscMsgPush(text);
+                    getData->data.miscmsg = textMsgBuffer.push(text);
                     unsigned int result = synth->setProgramByName(getData);
-                    text = textMsgBuffer.miscMsgPop(result & NO_MSG);
+                    text = textMsgBuffer.fetch(result & NO_MSG);
                     if (result < 0x1000)
                         text = "ed " + text;
                     else
@@ -625,7 +625,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     }
                     else
                     {
-                        name = textMsgBuffer.miscMsgPop(tmp);
+                        name = textMsgBuffer.fetch(tmp);
                         if (name != "FAIL")
                             text = " " + name;
                         else
@@ -981,7 +981,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     else
                         text = "READ";
                     newMsg = true;
-                    getData->data.miscmsg = textMsgBuffer.miscMsgPush(text); // slightly odd case
+                    getData->data.miscmsg = textMsgBuffer.push(text); // slightly odd case
                     break;
                 case CONFIG::control::historyLock:
                 {
@@ -1110,7 +1110,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     //std::cout << ">" << text << "<" << std::endl;
 
     if (newMsg)
-        value = textMsgBuffer.miscMsgPush(text);
+        value = textMsgBuffer.push(text);
 // TODO need to inmprove message handling for multiple receivers
 
     getData->data.value.F = float(value);
@@ -1125,7 +1125,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 #ifdef GUI_FLTK
         if (text != "" && synth->getRuntime().showGui && (write || guiTo))
         {
-            getData->data.miscmsg = textMsgBuffer.miscMsgPush(text); // pass it on to GUI
+            getData->data.miscmsg = textMsgBuffer.push(text); // pass it on to GUI
         }
 #endif
         bool ok = returnsBuffer->write(getData->bytes);
@@ -1133,10 +1133,10 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
         if (synth->getRuntime().showGui && npart == TOPLEVEL::section::scales && control == SCALES::control::importScl)
         {   // loading a tuning includes a name and comment!
             getData->data.control = SCALES::control::name;
-            getData->data.miscmsg = textMsgBuffer.miscMsgPush(synth->microtonal.Pname);
+            getData->data.miscmsg = textMsgBuffer.push(synth->microtonal.Pname);
             returnsBuffer->write(getData->bytes);
             getData->data.control = SCALES::control::comment;
-            getData->data.miscmsg = textMsgBuffer.miscMsgPush(synth->microtonal.Pcomment);
+            getData->data.miscmsg = textMsgBuffer.push(synth->microtonal.Pcomment);
             ok &= returnsBuffer->write(getData->bytes);
         }
 #endif
@@ -1435,7 +1435,7 @@ void InterChange::mutedDecode(unsigned int altData)
             putData.data.type = TOPLEVEL::type::Write || TOPLEVEL::type::Integer;
             break;
         case TOPLEVEL::muted::masterReset:
-            textMsgBuffer.miscMsgClear(); // make sure there are no hanging messages
+            textMsgBuffer.clear(); // make sure there are no hanging messages
             putData.data.control = (altData >> 8) & 0xff;
             putData.data.type = altData >> 24;
             //std::cout << "ID " << int(synth->getUniqueId()) << std::endl;
@@ -2834,7 +2834,7 @@ void InterChange::commandBank(CommandBlock *getData)
         case BANK::control::findInstrumentName:
         {
             if (parameter == UNUSED) // return the name of a specific instrument.
-                textMsgBuffer.miscMsgPush(synth->getBankRef().getname(value_int, kititem, engine));
+                textMsgBuffer.push(synth->getBankRef().getname(value_int, kititem, engine));
             else
             {
                 static int inst = 0;
@@ -2853,7 +2853,7 @@ void InterChange::commandBank(CommandBlock *getData)
                         do {
                             if (synth->getBankRef().getType(inst, bank, root) == parameter)
                             {
-                                textMsgBuffer.miscMsgPush(asString(root, 3) + ": " + asString(bank, 3) + ". " + asString(inst + 1, 3) + "  " + synth->getBankRef().getname(inst, bank, root));
+                                textMsgBuffer.push(asString(root, 3) + ": " + asString(bank, 3) + ". " + asString(inst + 1, 3) + "  " + synth->getBankRef().getname(inst, bank, root));
                                 ++ inst;
                                 return;
                             }
@@ -2867,7 +2867,7 @@ void InterChange::commandBank(CommandBlock *getData)
                     ++root;
                 } while (root < 128);
                 root = 0;
-                textMsgBuffer.miscMsgPush("*");
+                textMsgBuffer.push("*");
             }
             break;
         }
@@ -5933,7 +5933,7 @@ void InterChange::testLimits(CommandBlock *getData)
         {
             text = synth->getRuntime().masterCCtest(int(value));
             if (text != "")
-                getData->data.miscmsg = textMsgBuffer.miscMsgPush(text);
+                getData->data.miscmsg = textMsgBuffer.push(text);
             return;
         }
         if(control == CONFIG::control::bankCC)
@@ -5942,12 +5942,12 @@ void InterChange::testLimits(CommandBlock *getData)
                 return;
             text = synth->getRuntime().masterCCtest(int(value));
             if (text != "")
-                getData->data.miscmsg = textMsgBuffer.miscMsgPush(text);
+                getData->data.miscmsg = textMsgBuffer.push(text);
             return;
         }
         text = synth->getRuntime().masterCCtest(int(value));
         if (text != "")
-            getData->data.miscmsg = textMsgBuffer.miscMsgPush(text);
+            getData->data.miscmsg = textMsgBuffer.push(text);
         return;
     }
 }
