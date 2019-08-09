@@ -11,6 +11,7 @@ unsigned char   engine
 unsigned char   insert
 unsigned char   parameter
 unsigned char   par2
+unsigned char   miscMsg
 
 string          name - handled via simple message system.
 

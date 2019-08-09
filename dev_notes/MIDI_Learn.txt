@@ -44,7 +44,7 @@ kit         CC
 engine      channel
 insert      min_in
 parameter   max_in
-par2        text message number
+misMsg      text message number
 
 For NRPNs, CC has bit 16 set. This is so that even one with a current value less than 127 won't be mistaken for a normal CC when being matched.
 

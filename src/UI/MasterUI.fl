@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -98,7 +98,7 @@ decl {\#include "Interface/FileMgr.h"} {public local
 decl {\#include "MidiLearnUI.h"} {public local
 }
 
-class MasterUI {: {private GuiUpdates, FileMgr}
+class MasterUI {selected : {private GuiUpdates, FileMgr}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -949,6 +949,8 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
         code0 {o->value(partmax);}
       }
     }
+    comment {line spaces in boxes below are critical} {in_source in_header
+    }
     Fl_Window aboutwindow {
       label {About Yoshimi}
       xywh {46 64 365 290} type Double color 54 labelfont 13 labelsize 13 when 0 hide
@@ -1003,37 +1005,41 @@ Alan Calvert started the project}
           xywh {12 8 340 57} color 7 labelfont 9 labelsize 15 labelcolor 4
         }
         Fl_Box {} {
-          label {Chris Ahlstrom
-Kristian Amlie
-Jonathan Brickman
-Jeanette Claassen
-Rob Couto
-Andrew Deryabin
-Jörn Eichler
-Csaba Erdei
-James Fraser
-Will Godfrey
-Alexander Hirsch
-Jeremy Jongepier
-Tobias Kortkamp
-Tito Latini}
+          label {
+          Chris Ahlstrom
+          Kristian Amlie
+          Jonathan Brickman
+          Jeanette Claassen
+          Rob Couto
+          Andrew Deryabin
+          Jörn Eichler
+          Csaba Erdei
+          James Fraser
+          Will Godfrey
+          Alexander Hirsch
+          Jeremy Jongepier
+          Tobias Kortkamp
+          Tito Latini
+          }
           xywh {25 70 155 200} labelsize 12
         }
         Fl_Box {} {
-          label {Jesper Lloyd
-Lars Luthman
-Holger Marzen
-Lieven Moors
-Harry Nakos
-Iurie Nistor
-Stephen Parry
-Lorenzo Sutton
-Hermann Voßeler
-Nikita Zlobin
+          label {
+          Rainer Liffers
+          Jesper Lloyd
+          Lars Luthman
+          Holger Marzen
+          Lieven Moors
+          Harry Nakos
+          Iurie Nistor
+          Stephen Parry
+          Lorenzo Sutton
+          Hermann Voßeler
+          Nikita Zlobin
 
 
 
- }
+          }
           xywh {194 70 155 200} labelsize 12
         }
       }

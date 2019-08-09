@@ -1,4 +1,4 @@
-This is a list of the direct access envelope inserts. There are 4 types of these, some only having a few of the controls. They are shown below with their controls. 'Par' is the parameter number that must be sent and 'Con' is the control number.
+This is a list of the envelope inserts. There are 4 types of these, some only having a few of the controls. They are shown below with their controls. 'Par' is the parameter number that must be sent and 'Con' is the control number.
 
 Par     Con
 0   Amplitude

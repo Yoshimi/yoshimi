@@ -1,5 +1,9 @@
 yoshimi 1.5.11 M
 
+2019-8-9 Will
+* Added Rainer to people list in GUI.
+* Updated dev_notes.
+
 2019-8-6 Will
 * Further refinements to ring buffer code.
 

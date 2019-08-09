@@ -2,7 +2,7 @@ Updated 29/7/2018
 
 This structure is intended to enable you to traverse the controls structure testing/adjusting at each level on the tree.
 
-The function is called via the new 'readAllData' function with a command block 'value' and 'type' nad 'action' set appropriately - see 'Reading_Values'. It returns a float representing the wanted element.
+The function is called via the new 'readAllData' function with a command block 'value' and 'type' and 'action' set appropriately - see 'Reading_Values'. It returns a float representing the wanted element.
 
 'type' is used to determine the operation.
 

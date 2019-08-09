@@ -1,4 +1,4 @@
-This is intended primarily for direct transfers of text between non-RT threads, or operations that tend to be text heavy. Although sychronised and using miscMsg, these do not normally enter the Command functions. 'par2' is used to carry the ID of the message from miscMsgPush.
+This is intended primarily for direct transfers of text between non-RT threads, or operations that tend to be text heavy. Although sychronised and using miscMsg, these do not normally enter the Command functions. 'miscMsg' is used to carry the ID of the message from miscMsgPush.
 
 It is used mostly for setting names, but also for scales and keyboard mappings, which are string representations of number lists.
 

@@ -1,9 +1,9 @@
 
 Below are the ID numbers representing which history list is to be managed.
 
-1   InstrumentHistory   Individual externally sourced instruments
-2   ParamsHistory       Full instrument patch sets
-3   ScaleHistory        Complete microtonal settings
-4   StateHistory        Entire system state
-5   VectorHistory       Per channel Vector controls
-6   MidiLearnHistory    Learned MIDI CC lists
+0   Instrument History   Individual externally sourced instruments
+1   Patch History        Full instrument patch sets
+2   Scale History        Complete microtonal settings
+3   State History        Entire system state
+4   Vector History       Per channel Vector controls
+5   MidiLearn History    Learned MIDI CC lists
