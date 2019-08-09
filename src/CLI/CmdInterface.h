@@ -28,14 +28,18 @@
 #include "Interface/InterChange.h"
 #include "Effects/EffectMgr.h"
 
+class TextMsgBuffer;
+
+
 class CmdInterface : private  MiscCli, FileMgr
 {
     public:
+        CmdInterface();
+
         void defaults();
         void cmdIfaceCommandLoop();
 
     private:
-        list<string>  instrumentGroup;
         void helpLoop(list<std::string>& msg, std::string *commands, int indent, bool single = false);
         char helpList(unsigned int local);
         std::string historySelect(int listnum, int selection);
@@ -64,6 +68,8 @@ class CmdInterface : private  MiscCli, FileMgr
         int commandPart(unsigned char controlType);
         int commandReadnSet(unsigned char controlType);
         int cmdIfaceProcessCommand(char *cCmd);
+
+        list<string>  instrumentGroup;
         char *cCmd;
         char *point;
         SynthEngine *synth;
@@ -71,6 +77,7 @@ class CmdInterface : private  MiscCli, FileMgr
         int reply;
         std::string replyString;
         unsigned int context;
+        TextMsgBuffer& textMsgBuffer;
 };
 
 #endif

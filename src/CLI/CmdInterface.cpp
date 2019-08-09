@@ -41,6 +41,7 @@
 
 #include "CLI/CmdInterface.h"
 #include "Interface/TextLists.h"
+#include "Misc/TextMsgBuffer.h"
 
 /*
  * There are two routes that 'write' commands can take.
@@ -63,6 +64,20 @@
 
 extern SynthEngine *firstSynth;
 static unsigned int currentInstance = 0;
+
+
+CmdInterface::CmdInterface() :
+    instrumentGroup(),
+    cCmd(nullptr),
+    point(nullptr),
+    synth(nullptr),
+    reply(0),
+    replyString(),
+    context(0),
+    textMsgBuffer(TextMsgBuffer::instance())
+{
+}
+
 
 void CmdInterface::defaults()
 {
@@ -1966,7 +1981,7 @@ int CmdInterface::commandGroup()
         instrumentGroup.clear();
     do {
         ++ count;
-        line = miscMsgPop(readControl(synth, 0, BANK::control::findInstrumentName, TOPLEVEL::section::bank, UNUSED, UNUSED, UNUSED, value - 1));
+        line = textMsgBuffer.miscMsgPop(readControl(synth, 0, BANK::control::findInstrumentName, TOPLEVEL::section::bank, UNUSED, UNUSED, UNUSED, value - 1));
         if (line != "*")
         {
             instrumentGroup.push_back(line);
@@ -2514,7 +2529,7 @@ int CmdInterface::commandVector(unsigned char controlType)
             if (name <= "!")
                 return REPLY::value_msg;
         }
-        sendDirect(synth, TOPLEVEL::action::lowPrio, 0, controlType, VECTOR::control::name, TOPLEVEL::section::vector, UNUSED, UNUSED, chan, UNUSED, UNUSED, miscMsgPush(name));
+        sendDirect(synth, TOPLEVEL::action::lowPrio, 0, controlType, VECTOR::control::name, TOPLEVEL::section::vector, UNUSED, UNUSED, chan, UNUSED, UNUSED, textMsgBuffer.miscMsgPush(name));
         return REPLY::done_msg;
     }
 
@@ -2707,7 +2722,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
             if (controlType != TOPLEVEL::type::Write || point[0] != 0)
             {
                 if (controlType == TOPLEVEL::type::Write)
-                    miscmsg = miscMsgPush(std::string(point));
+                    miscmsg = textMsgBuffer.miscMsgPush(std::string(point));
             }
             else
                 return REPLY::value_msg;
@@ -2719,7 +2734,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
             if (controlType != TOPLEVEL::type::Write || point[0] != 0)
             {
                 if (controlType == TOPLEVEL::type::Write)
-                    miscmsg = miscMsgPush(std::string(point));
+                    miscmsg = textMsgBuffer.miscMsgPush(std::string(point));
             }
             else
                 return REPLY::value_msg;
@@ -2742,7 +2757,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
             if (controlType != TOPLEVEL::type::Write || point[0] != 0)
             {
                 if (controlType == TOPLEVEL::type::Write)
-                    miscmsg = miscMsgPush(std::string(point));
+                    miscmsg = textMsgBuffer.miscMsgPush(std::string(point));
             }
             else
                 return REPLY::value_msg;
@@ -2754,7 +2769,7 @@ int CmdInterface::commandConfig(unsigned char controlType)
             if (controlType != TOPLEVEL::type::Write || point[0] != 0)
             {
                 if (controlType == TOPLEVEL::type::Write)
-                    miscmsg = miscMsgPush(std::string(point));
+                    miscmsg = textMsgBuffer.miscMsgPush(std::string(point));
             }
             else
                 return REPLY::value_msg;
@@ -2924,7 +2939,7 @@ int CmdInterface::commandScale(unsigned char controlType)
         if (name == "")
             return REPLY::value_msg;
         action = TOPLEVEL::action::lowPrio;
-        miscmsg = miscMsgPush(name);
+        miscmsg = textMsgBuffer.miscMsgPush(name);
     }
     else
     {
@@ -3507,7 +3522,7 @@ int CmdInterface::padSynth(unsigned char controlType)
         if (point[0] == 0)
             return REPLY::value_msg;
         std::string name = point;
-        sendDirect(synth, TOPLEVEL::action::lowPrio, 0, controlType, MAIN::control::exportPadSynthSamples, TOPLEVEL::section::main, kitNumber, 2, npart, UNUSED, UNUSED, miscMsgPush(name));
+        sendDirect(synth, TOPLEVEL::action::lowPrio, 0, controlType, MAIN::control::exportPadSynthSamples, TOPLEVEL::section::main, kitNumber, 2, npart, UNUSED, UNUSED, textMsgBuffer.miscMsgPush(name));
         return REPLY::done_msg;
     }
 
@@ -4239,7 +4254,7 @@ int CmdInterface::commandPart(unsigned char controlType)
             if (lineEnd(point, controlType))
                 return REPLY::value_msg;
             if (controlType == TOPLEVEL::type::Write)
-                miscmsg = miscMsgPush(point);
+                miscmsg = textMsgBuffer.miscMsgPush(point);
             return sendNormal( synth, TOPLEVEL::action::muteAndLoop, 0, controlType, PART::control::instrumentName, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup, UNUSED, UNUSED, miscmsg);
         }
     }
@@ -4355,7 +4370,7 @@ int CmdInterface::commandPart(unsigned char controlType)
                 return REPLY::done_msg;
             }
             else
-                miscmsg = miscMsgPush(name);
+                miscmsg = textMsgBuffer.miscMsgPush(name);
         }
         return sendNormal( synth, TOPLEVEL::action::lowPrio, 0, controlType, PART::control::instrumentName, npart, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
     }
@@ -4966,7 +4981,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
             return REPLY::what_msg;
         else
         {
-            sendDirect(synth, TOPLEVEL::action::lowPrio, value, TOPLEVEL::type::Write, type, TOPLEVEL::section::main, root, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(name));
+            sendDirect(synth, TOPLEVEL::action::lowPrio, value, TOPLEVEL::type::Write, type, TOPLEVEL::section::main, root, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.miscMsgPush(name));
             return REPLY::done_msg;
         }
     }
@@ -5110,7 +5125,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
             }
             if ((std::string) point == "")
                 return REPLY::name_msg;
-            sendNormal( synth, 0, 0, TOPLEVEL::type::Write, MIDILEARN::control::loadList, TOPLEVEL::section::midiLearn, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush((std::string) point));
+            sendNormal( synth, 0, 0, TOPLEVEL::type::Write, MIDILEARN::control::loadList, TOPLEVEL::section::midiLearn, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.miscMsgPush((std::string) point));
             return REPLY::done_msg;
         }
         if(matchnMove(2, point, "vector"))
@@ -5156,7 +5171,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                 if (name == "")
                     return REPLY::name_msg;
             }
-            sendDirect(synth, TOPLEVEL::action::muteAndLoop, 0, TOPLEVEL::type::Write, MAIN::control::loadNamedVector, TOPLEVEL::section::main, UNUSED, UNUSED, ch, UNUSED, UNUSED, miscMsgPush(name));
+            sendDirect(synth, TOPLEVEL::action::muteAndLoop, 0, TOPLEVEL::type::Write, MAIN::control::loadNamedVector, TOPLEVEL::section::main, UNUSED, UNUSED, ch, UNUSED, UNUSED, textMsgBuffer.miscMsgPush(name));
             return REPLY::done_msg;
         }
         if(matchnMove(2, point, "state"))
@@ -5181,7 +5196,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                 if (name == "")
                         return REPLY::name_msg;
             }
-            sendDirect(synth, TOPLEVEL::action::muteAndLoop, 0, TOPLEVEL::type::Write, MAIN::control::loadNamedState, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(name));
+            sendDirect(synth, TOPLEVEL::action::muteAndLoop, 0, TOPLEVEL::type::Write, MAIN::control::loadNamedState, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.miscMsgPush(name));
             return REPLY::done_msg;
         }
         if (matchnMove(2, point, "scale"))
@@ -5206,7 +5221,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                 if (name == "")
                     return REPLY::name_msg;
             }
-            sendDirect(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, MAIN::control::loadNamedScale, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(name));
+            sendDirect(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, MAIN::control::loadNamedScale, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.miscMsgPush(name));
             return REPLY::done_msg;
         }
         if (matchnMove(1, point, "patchset"))
@@ -5231,7 +5246,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                 if (name == "")
                     return REPLY::name_msg;
             }
-            sendDirect(synth, TOPLEVEL::action::muteAndLoop, 0, TOPLEVEL::type::Write, MAIN::control::loadNamedPatchset, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(name));
+            sendDirect(synth, TOPLEVEL::action::muteAndLoop, 0, TOPLEVEL::type::Write, MAIN::control::loadNamedPatchset, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.miscMsgPush(name));
             return REPLY::done_msg;
         }
         if (matchnMove(1, point, "instrument"))
@@ -5257,7 +5272,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                     return REPLY::name_msg;
             }
 
-            sendDirect(synth, 0, 0, TOPLEVEL::type::Write, MAIN::control::loadInstrumentByName, TOPLEVEL::section::main, npart, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(name));
+            sendDirect(synth, 0, 0, TOPLEVEL::type::Write, MAIN::control::loadInstrumentByName, TOPLEVEL::section::main, npart, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.miscMsgPush(name));
             return REPLY::done_msg;
         }
         replyString = "load";
@@ -5271,7 +5286,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
             if (point[0] == 0)
                 return REPLY::name_msg;
 
-            sendNormal( synth, 0, 0, TOPLEVEL::type::Write, MIDILEARN::control::saveList, TOPLEVEL::section::midiLearn, 0, 0, 0, 0, UNUSED, miscMsgPush((std::string) point));
+            sendNormal( synth, 0, 0, TOPLEVEL::type::Write, MIDILEARN::control::saveList, TOPLEVEL::section::midiLearn, 0, 0, 0, 0, UNUSED, textMsgBuffer.miscMsgPush((std::string) point));
             return REPLY::done_msg;
         }
         if(matchnMove(2, point, "vector"))
@@ -5287,19 +5302,19 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
             if (point[0] == 0)
                 return REPLY::name_msg;
             chan = tmp;
-            sendDirect(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, MAIN::control::saveNamedVector, TOPLEVEL::section::main, UNUSED, UNUSED, chan, UNUSED, UNUSED, miscMsgPush((std::string) point));
+            sendDirect(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, MAIN::control::saveNamedVector, TOPLEVEL::section::main, UNUSED, UNUSED, chan, UNUSED, UNUSED, textMsgBuffer.miscMsgPush((std::string) point));
             return REPLY::done_msg;
         }
         if(matchnMove(2, point, "state"))
         {
             if (point[0] == 0)
                 return REPLY::value_msg;
-            sendDirect(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, MAIN::control::saveNamedState, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(std::string(point)));
+            sendDirect(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, MAIN::control::saveNamedState, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.miscMsgPush(std::string(point)));
             return REPLY::done_msg;
         }
         if(matchnMove(1, point, "config"))
         {
-            sendDirect(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, CONFIG::control::saveCurrentConfig, TOPLEVEL::section::config, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush("DUMMY"));
+            sendDirect(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, CONFIG::control::saveCurrentConfig, TOPLEVEL::section::config, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.miscMsgPush("DUMMY"));
             return REPLY::done_msg;
         }
 
@@ -5307,14 +5322,14 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
         {
             if (point[0] == 0)
                 return REPLY::name_msg;
-            sendDirect(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, MAIN::control::saveNamedScale, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(std::string(point)));
+            sendDirect(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, MAIN::control::saveNamedScale, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.miscMsgPush(std::string(point)));
             return REPLY::done_msg;
         }
         else if (matchnMove(1, point, "patchset"))
         {
             if (point[0] == 0)
                 return REPLY::name_msg;
-            sendDirect(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, MAIN::control::saveNamedPatchset, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(std::string(point)));
+            sendDirect(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, MAIN::control::saveNamedPatchset, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.miscMsgPush(std::string(point)));
             return REPLY::done_msg;
         }
         if (matchnMove(1, point, "instrument"))
@@ -5326,7 +5341,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
             }
             if (point[0] == 0)
                 return REPLY::name_msg;
-            sendDirect(synth, TOPLEVEL::action::lowPrio, npart, TOPLEVEL::type::Write, MAIN::control::saveNamedInstrument, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(std::string(point)));
+            sendDirect(synth, TOPLEVEL::action::lowPrio, npart, TOPLEVEL::type::Write, MAIN::control::saveNamedInstrument, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.miscMsgPush(std::string(point)));
             return REPLY::done_msg;
         }
         replyString = "save";

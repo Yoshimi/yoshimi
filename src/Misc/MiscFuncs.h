@@ -30,13 +30,12 @@
 
 #include "globals.h"
 
-static std::list<std::string> miscList;
 
 class MiscFuncs
 {
     public:
-        MiscFuncs() {sem_init(&miscmsglock, 0, 1);}
-        ~MiscFuncs() {sem_destroy(&miscmsglock);}
+        MiscFuncs() {}
+        ~MiscFuncs() {}
         std::string asString(int n);
         std::string asString(long long n);
         std::string asString(unsigned long n);
@@ -65,11 +64,6 @@ class MiscFuncs
         int matchWord(int numChars, char *point, const char *word);
         bool matchnMove(int num, char *&pnt, const char *word);
 
-        void miscMsgInit(void);
-        void miscMsgClear(void);
-        int miscMsgPush(std::string text);
-        std::string miscMsgPop(int pos);
-
         unsigned int nearestPowerOf2(unsigned int x, unsigned int min, unsigned int max);
         float limitsF(float value, float min, float max);
 
@@ -84,7 +78,6 @@ class MiscFuncs
 
         float dB2rap(float dB);
         float rap2dB(float rap);
-        sem_t miscmsglock;
 };
 
 void invSignal(float *sig, size_t len);

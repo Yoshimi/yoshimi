@@ -20,6 +20,8 @@
 #include <readline/readline.h>
 
 #include "CLI/MiscCLI.h"
+#include "Misc/TextMsgBuffer.h"
+
 
 bool MiscCli::lineEnd(char * point, unsigned char controlType)
 {
@@ -133,7 +135,7 @@ std::string MiscCli::readControlText(SynthEngine *synth, unsigned char action, u
     putData.data.offset = offset;
     putData.data.miscmsg = UNUSED;
     value = synth->interchange.readAllData(&putData);
-    return miscMsgPop(value);
+    return TextMsgBuffer::instance().miscMsgPop(value);
 }
 
 
@@ -347,7 +349,7 @@ int MiscCli::sendDirect(SynthEngine *synth, unsigned char action, float value, u
 
     if (part == TOPLEVEL::section::config && putData.data.miscmsg != UNUSED && (control == CONFIG::control::bankRootCC || control == CONFIG::control::bankCC || control == CONFIG::control::extendedProgramChangeCC))
     {
-        synth->getRuntime().Log("In use by " + miscMsgPop(putData.data.miscmsg) );
+        synth->getRuntime().Log("In use by " + TextMsgBuffer::instance().miscMsgPop(putData.data.miscmsg) );
         return 0;
     }
 

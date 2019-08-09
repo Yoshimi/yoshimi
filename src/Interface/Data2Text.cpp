@@ -21,7 +21,15 @@
 
 #include "Interface/Data2Text.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/TextMsgBuffer.h"
 #include "Misc/MiscFuncs.h"
+
+DataText::DataText() :
+    synth(nullptr),
+    showValue(false),
+    textMsgBuffer(TextMsgBuffer::instance())
+{
+}
 
 std::string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool addValue)
 {
@@ -37,7 +45,7 @@ std::string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, boo
 
     if (control == TOPLEVEL::control::textMessage && insertParam != TOPLEVEL::insert::resonanceGraphInsert) // special case for simple messages
     {
-        synth->getRuntime().Log(miscMsgPop(lrint(value)));
+        synth->getRuntime().Log(textMsgBuffer.miscMsgPop(lrint(value)));
         synth->getRuntime().finishedCLI = true;
         return "";
     }
@@ -265,7 +273,7 @@ std::string DataText::resolveVector(CommandBlock *getData, bool addValue)
             //break;
         case VECTOR::control::name:
             showValue = false;
-            contstr = "Name " + miscMsgPop(value_int);
+            contstr = "Name " + textMsgBuffer.miscMsgPop(value_int);
             break;
 
         case VECTOR::control::Xcontroller:
@@ -620,7 +628,7 @@ std::string DataText::resolveConfig(CommandBlock *getData, bool addValue)
         case CONFIG::control::jackMidiSource:
             contstr += "JACK MIDI source: ";
             if (addValue)
-                contstr += miscMsgPop(value_int);
+                contstr += textMsgBuffer.miscMsgPop(value_int);
             showValue = false;
             break;
         case CONFIG::control::jackPreferredMidi:
@@ -630,7 +638,7 @@ std::string DataText::resolveConfig(CommandBlock *getData, bool addValue)
         case CONFIG::control::jackServer:
             contstr += "JACK server: ";
             if (addValue)
-                contstr += miscMsgPop(value_int);
+                contstr += textMsgBuffer.miscMsgPop(value_int);
             showValue = false;
             break;
         case CONFIG::control::jackPreferredAudio:
@@ -645,7 +653,7 @@ std::string DataText::resolveConfig(CommandBlock *getData, bool addValue)
         case CONFIG::control::alsaMidiSource:
             contstr += "ALSA MIDI source: ";
             if (addValue)
-                contstr += miscMsgPop(value_int);
+                contstr += textMsgBuffer.miscMsgPop(value_int);
             showValue = false;
             break;
         case CONFIG::control::alsaPreferredMidi:
@@ -655,7 +663,7 @@ std::string DataText::resolveConfig(CommandBlock *getData, bool addValue)
         case CONFIG::control::alsaAudioDevice:
             contstr += "ALSA audio device: ";
             if (addValue)
-                contstr += miscMsgPop(value_int);
+                contstr += textMsgBuffer.miscMsgPop(value_int);
             showValue = false;
             break;
         case CONFIG::control::alsaPreferredAudio:
@@ -692,19 +700,19 @@ std::string DataText::resolveConfig(CommandBlock *getData, bool addValue)
         case CONFIG::control::addPresetRootDir:
             contstr += "Preset root add";
             if (addValue)
-                contstr += miscMsgPop(value_int);
+                contstr += textMsgBuffer.miscMsgPop(value_int);
             showValue = false;
             break;
         case CONFIG::control::removePresetRootDir:
             contstr += "Preset root unlinked ";
             if (addValue)
-                contstr += miscMsgPop(value_int);
+                contstr += textMsgBuffer.miscMsgPop(value_int);
             showValue = false;
             break;
         case CONFIG::control::currentPresetRoot:
             contstr += "Current preset root ";
             if (addValue)
-                contstr += miscMsgPop(value_int);
+                contstr += textMsgBuffer.miscMsgPop(value_int);
             showValue = false;
             break;
 
@@ -776,7 +784,7 @@ std::string DataText::resolveConfig(CommandBlock *getData, bool addValue)
 
         case CONFIG::control::saveCurrentConfig:
         {
-            std::string name = miscMsgPop(value_int);
+            std::string name = textMsgBuffer.miscMsgPop(value_int);
             if (write)
                 contstr += ("save" + name);
             else
@@ -817,7 +825,7 @@ std::string DataText::resolveBank(CommandBlock *getData, bool)
     int kititem = getData->data.kit;
     int engine = getData->data.engine;
     int insert = getData->data.insert;
-    std::string name = miscMsgPop(value_int);
+    std::string name = textMsgBuffer.miscMsgPop(value_int);
     std::string contstr = "";
     showValue = false;
     switch(control)
@@ -875,7 +883,7 @@ std::string DataText::resolveMain(CommandBlock *getData, bool addValue)
                 break;
             case MIDI::control::bankChange:
                 showValue = false;
-                contstr = miscMsgPop(value_int);
+                contstr = textMsgBuffer.miscMsgPop(value_int);
                 break;
         }
         return contstr;
@@ -952,91 +960,91 @@ std::string DataText::resolveMain(CommandBlock *getData, bool addValue)
 
         case MAIN::control::exportBank:
             showValue = false;
-            contstr = "Bank Export" + miscMsgPop(value_int);
+            contstr = "Bank Export" + textMsgBuffer.miscMsgPop(value_int);
             break;
 
         case MAIN::control::importBank:
             showValue = false;
-            contstr = "Bank Import" + miscMsgPop(value_int);
+            contstr = "Bank Import" + textMsgBuffer.miscMsgPop(value_int);
             break;
 
         case MAIN::control::deleteBank:
             showValue = false;
-            contstr = "Bank delete" + miscMsgPop(value_int);
+            contstr = "Bank delete" + textMsgBuffer.miscMsgPop(value_int);
             break;
 
         case MAIN::control::loadInstrumentFromBank:
             showValue = false;
-            contstr = "Part " + to_string (int(kititem + 1)) + " load" + miscMsgPop(value_int);
+            contstr = "Part " + to_string (int(kititem + 1)) + " load" + textMsgBuffer.miscMsgPop(value_int);
             break;
         case MAIN::control::loadInstrumentByName:
             showValue = false;
-            contstr = "Part " + to_string (int(kititem + 1)) + " load" + miscMsgPop(value_int);
+            contstr = "Part " + to_string (int(kititem + 1)) + " load" + textMsgBuffer.miscMsgPop(value_int);
             break;
 
         case MAIN::control::saveInstrument:
             showValue = false;
-            contstr = "Bank Slot Save" + miscMsgPop(value_int);
+            contstr = "Bank Slot Save" + textMsgBuffer.miscMsgPop(value_int);
             break;
 
         case MAIN::control::saveNamedInstrument:
             showValue = false;
-            contstr = "Instrument Save" + miscMsgPop(value_int);
+            contstr = "Instrument Save" + textMsgBuffer.miscMsgPop(value_int);
             break;
 
         case MAIN::control::loadNamedPatchset:
             showValue = false;
-            contstr = "Patchset Load" + miscMsgPop(value_int);
+            contstr = "Patchset Load" + textMsgBuffer.miscMsgPop(value_int);
             break;
 
         case MAIN::control::saveNamedPatchset:
             showValue = false;
-            contstr = "Patchset Save" + miscMsgPop(value_int);
+            contstr = "Patchset Save" + textMsgBuffer.miscMsgPop(value_int);
             break;
 
         case MAIN::control::loadNamedVector:
             showValue = false;
-            name = miscMsgPop(value_int);
+            name = textMsgBuffer.miscMsgPop(value_int);
             contstr = "Vector Load" + name;
             break;
 
         case MAIN::control::saveNamedVector:
             showValue = false;
-            name = miscMsgPop(value_int);
+            name = textMsgBuffer.miscMsgPop(value_int);
             contstr = "Vector Save" + name;
             break;
 
         case MAIN::control::loadNamedScale:
             showValue = false;
-            name = miscMsgPop(value_int);
+            name = textMsgBuffer.miscMsgPop(value_int);
             contstr = "Scale Load" + name;
             break;
 
         case MAIN::control::saveNamedScale:
             showValue = false;
-            name = miscMsgPop(value_int);
+            name = textMsgBuffer.miscMsgPop(value_int);
             contstr = "Scale Save" + name;
             break;
 
         case MAIN::control::loadNamedState:
             showValue = false;
-            name = miscMsgPop(value_int);
+            name = textMsgBuffer.miscMsgPop(value_int);
             contstr = "State Load" + name;
             break;
 
         case MAIN::control::saveNamedState:
             showValue = false;
-            contstr = "State Save" + miscMsgPop(value_int);
+            contstr = "State Save" + textMsgBuffer.miscMsgPop(value_int);
             break;
 
         case MAIN::control::loadFileFromList:
             showValue = false;
-            contstr = "Load Recent" + miscMsgPop(value_int);
+            contstr = "Load Recent" + textMsgBuffer.miscMsgPop(value_int);
             break;
 
         case MAIN::control::exportPadSynthSamples:
             showValue = false;
-            contstr = "PadSynth Samples Save" + miscMsgPop(value_int);
+            contstr = "PadSynth Samples Save" + textMsgBuffer.miscMsgPop(value_int);
             break;
 
         case MAIN::control::masterReset:
@@ -1050,7 +1058,7 @@ std::string DataText::resolveMain(CommandBlock *getData, bool addValue)
 
         case MAIN::control::openManualPDF:
             showValue = false;
-            contstr = "Open manual in PDF reader " + miscMsgPop(value_int);
+            contstr = "Open manual in PDF reader " + textMsgBuffer.miscMsgPop(value_int);
             break;
 
         case MAIN::control::startInstance:
@@ -1059,7 +1067,7 @@ std::string DataText::resolveMain(CommandBlock *getData, bool addValue)
             break;
         case MAIN::control::stopInstance:
             showValue = false;
-            contstr = "Close instance - " + miscMsgPop(value_int);
+            contstr = "Close instance - " + textMsgBuffer.miscMsgPop(value_int);
             break;
 
         case MAIN::control::stopSound:
@@ -1451,7 +1459,7 @@ std::string DataText::resolvePart(CommandBlock *getData, bool addValue)
             break;
         case PART::control::instrumentName:
             showValue = false;
-            contstr = "Name is: " + miscMsgPop(value_int);
+            contstr = "Name is: " + textMsgBuffer.miscMsgPop(value_int);
             break;
         case PART::control::defaultInstrumentCopyright:
             showValue = false;
@@ -1460,7 +1468,7 @@ std::string DataText::resolvePart(CommandBlock *getData, bool addValue)
                 contstr += "load:\n";
             else
                 contstr += "save:\n";
-            contstr += miscMsgPop(value_int);
+            contstr += textMsgBuffer.miscMsgPop(value_int);
             break;
         case PART::control::resetAllControllers:
             contstr = "Clear controllers";

@@ -47,6 +47,7 @@ using namespace std;
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
+#include "Misc/TextMsgBuffer.h"
 #ifdef GUI_FLTK
     #include "MasterUI.h"
 #endif
@@ -450,7 +451,7 @@ bool Config::loadConfig(void)
         yoshimi += ("-" + asString(thisInstance));
     else
     {
-        miscMsgInit(); // sneaked it in here so it's early
+        TextMsgBuffer::instance().miscMsgInit(); // sneaked it in here so it's early
         string presetDir = ConfigDir + "/presets";
         if (!isDirectory(presetDir))
         {

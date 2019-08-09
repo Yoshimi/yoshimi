@@ -34,10 +34,18 @@ using namespace std;
 #include "Interface/InterChange.h"
 #include "Interface/RingBuffer.h"
 #include "Misc/MiscFuncs.h"
+#include "Misc/TextMsgBuffer.h"
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
 
 enum scan : int { noList = -3, listEnd, listBlocked};
+
+
+namespace { // Implementation details...
+
+    TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
+}
+
 
 MidiLearn::MidiLearn(SynthEngine *_synth) :
     learning(false),
@@ -389,7 +397,7 @@ void MidiLearn::generalOperations(CommandBlock *getData)
     string name;
     if (control == MIDILEARN::control::loadList)
     {
-        name = (miscMsgPop(par2));
+        name = (textMsgBuffer.miscMsgPop(par2));
         if (loadList(name))
             synth->getRuntime().Log("Loaded " + name);
         updateGui();
@@ -422,7 +430,7 @@ void MidiLearn::generalOperations(CommandBlock *getData)
     }
     if (control == MIDILEARN::control::saveList)
     {
-        name = (miscMsgPop(par2));
+        name = (textMsgBuffer.miscMsgPop(par2));
         if (saveList(name))
             synth->getRuntime().Log("Saved " + name);
         synth->getRuntime().finishedCLI = true;
@@ -651,7 +659,7 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
         putData.data.control = 0xfe; // TODO don't understand this :(
         putData.data.part = TOPLEVEL::section::midiIn;
         putData.data.parameter = 0x80;
-        putData.data.miscmsg = miscMsgPush("Midi Learn full!");
+        putData.data.miscmsg = textMsgBuffer.miscMsgPush("Midi Learn full!");
         writeMidi(&putData, false);
         learning = false;
         return;
@@ -750,7 +758,7 @@ void MidiLearn::updateGui(int opp)
     if (opp == MIDILEARN::control::sendLearnMessage)
     {
         putData.data.control = MIDILEARN::control::sendLearnMessage;
-        putData.data.miscmsg = miscMsgPush("Learning " + learnedName);
+        putData.data.miscmsg = textMsgBuffer.miscMsgPush("Learning " + learnedName);
     }
     else if (opp == MIDILEARN::control::cancelLearn)
     {
@@ -784,7 +792,7 @@ void MidiLearn::updateGui(int opp)
         putData.data.engine = it->chan;
         putData.data.insert = it->min_in;
         putData.data.parameter = it->max_in;
-        putData.data.miscmsg = miscMsgPush(it->name);
+        putData.data.miscmsg = textMsgBuffer.miscMsgPush(it->name);
         writeToGui(&putData);
         if (newCC > 0xff || (it->status & 8) > 0)
         { // status now used in case NRPN is < 0x100

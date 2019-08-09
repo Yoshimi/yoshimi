@@ -63,6 +63,14 @@ decl {\#include "Misc/SynthEngine.h"} {public local
 decl {\#include "MasterUI.h"} {private local
 }
 
+decl {\#include "Misc/TextMsgBuffer.h"
+
+    namespace \{ // Implementation details...
+        TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
+    \}
+} {private local
+}
+
 class BankProcess_ {} {
   Function {process(void)} {return_type {virtual void}
   } {
@@ -960,7 +968,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
           string line;
           do
           {
-              line = miscMsgPop(fetchData(0, BANK::control::findInstrumentName, TOPLEVEL::section::bank, UNUSED, UNUSED, UNUSED, group));
+              line = textMsgBuffer.miscMsgPop(fetchData(0, BANK::control::findInstrumentName, TOPLEVEL::section::bank, UNUSED, UNUSED, UNUSED, group));
               if (line !="*")
                   searchbrowse->add(line.c_str());
           } while (line != "*");} {}
@@ -980,7 +988,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
     //int value_int = getData->data.value.F;
     unsigned char control = getData->data.control;
     int source = getData->data.source & TOPLEVEL::action::noAction;
-    string message = miscMsgPop(getData->data.miscmsg);
+    string message = textMsgBuffer.miscMsgPop(getData->data.miscmsg);
     switch(control)
     {
         case BANK::control::exportBank:
@@ -1221,7 +1229,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
     	const char *dirname;
         dirname = fl_dir_chooser("Export a bank:",synth->getRuntime().userHome.c_str(), 0);
         if (dirname)
-            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::exportBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(string(dirname)));
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::exportBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.miscMsgPush(string(dirname)));
    	setrootread();
     }
 
@@ -1230,7 +1238,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
     	const char *dirname;
         dirname = fl_dir_chooser("Import a new bank:",synth->getRuntime().userHome.c_str(), 0);
         if (dirname)
-            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::importBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, miscMsgPush(string(dirname)));
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::importBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.miscMsgPush(string(dirname)));
    	setrootread();
     }
 

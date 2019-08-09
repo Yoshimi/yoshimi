@@ -48,6 +48,7 @@ using namespace std;
 #include "Params/Controller.h"
 #include "Misc/Part.h"
 #include "Effects/EffectMgr.h"
+#include "Misc/TextMsgBuffer.h"
 #include "Misc/XMLwrapper.h"
 
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
@@ -101,6 +102,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     //unifiedpresets(this),
     Runtime(this, argc, argv),
     presetsstore(this),
+    textMsgBuffer(TextMsgBuffer::instance()),
     fadeAll(0),
     fadeLevel(0),
     samplerate(48000),
@@ -851,7 +853,7 @@ int SynthEngine::setRootBank(int root, int banknum, bool notinplace)
 
     int msgID = NO_MSG;
     if (notinplace)
-        msgID = miscMsgPush(name);
+        msgID = textMsgBuffer.miscMsgPush(name);
     if (!ok)
         msgID |= 0xFF0000;
     return msgID;
@@ -863,7 +865,7 @@ int SynthEngine::setProgramByName(CommandBlock *getData)
     int msgID = NO_MSG;
     bool ok = true;
     int npart = int(getData->data.kit);
-    string fname = miscMsgPop(getData->data.miscmsg);
+    string fname = textMsgBuffer.miscMsgPop(getData->data.miscmsg);
     fname = setExtension(fname, EXTEN::yoshInst);
     if (!isRegFile(fname.c_str()))
         fname = setExtension(fname, EXTEN::zynInst);
@@ -885,7 +887,7 @@ int SynthEngine::setProgramByName(CommandBlock *getData)
             name = "File " + name + "unrecognised or corrupted";
     }
 
-    msgID = miscMsgPush(name);
+    msgID = textMsgBuffer.miscMsgPush(name);
     if (!ok)
     {
         msgID |= 0xFF0000;
@@ -950,7 +952,7 @@ int SynthEngine::setProgramFromBank(CommandBlock *getData, bool notinplace)
             int actual = ((tv2.tv_sec - tv1.tv_sec) *1000 + (tv2.tv_usec - tv1.tv_usec)/ 1000.0f) + 0.5f;
             name += ("  Time " + to_string(actual) + "mS");
         }
-        msgID = miscMsgPush(name);
+        msgID = textMsgBuffer.miscMsgPush(name);
     }
     if (!ok)
     {
@@ -1550,9 +1552,9 @@ int SynthEngine::LoadNumbered(unsigned char group, unsigned char entry)
     string filename;
     vector<string> &listType = *getHistory(group);
     if (size_t(entry) >= listType.size())
-        return (miscMsgPush(" FAILED: List entry " + to_string(int(entry)) + " out of range") | 0xFF0000);
+        return (textMsgBuffer.miscMsgPush(" FAILED: List entry " + to_string(int(entry)) + " out of range") | 0xFF0000);
     filename = listType.at(entry);
-    return miscMsgPush(filename);
+    return textMsgBuffer.miscMsgPush(filename);
 }
 
 
@@ -2450,7 +2452,7 @@ bool SynthEngine::installBanks()
     xml->exitbranch();
     delete xml;
     Runtime.Log("\nFound " + asString(bank.InstrumentsInBanks) + " instruments in " + asString(bank.BanksInRoots) + " banks");
-    Runtime.Log(miscMsgPop(setRootBank(Runtime.tempRoot, Runtime.tempBank)& 0xff));
+    Runtime.Log(textMsgBuffer.miscMsgPop(setRootBank(Runtime.tempRoot, Runtime.tempBank)& 0xff));
 #ifdef GUI_FLTK
     GuiThreadMsg::sendMessage((this), GuiThreadMsg::RefreshCurBank, 1);
 #endif
@@ -2918,11 +2920,11 @@ unsigned char SynthEngine::saveVector(unsigned char baseChan, string name, bool 
     unsigned char result = NO_MSG; // ok
 
     if (baseChan >= NUM_MIDI_CHANNELS)
-        return miscMsgPush("Invalid channel number");
+        return textMsgBuffer.miscMsgPush("Invalid channel number");
     if (name.empty())
-        return miscMsgPush("No filename");
+        return textMsgBuffer.miscMsgPush("No filename");
     if (Runtime.vectordata.Enabled[baseChan] == false)
-        return miscMsgPush("No vector data on this channel");
+        return textMsgBuffer.miscMsgPush("No vector data on this channel");
 
     string file = setExtension(name, EXTEN::vector);
     legit_pathname(file);
@@ -2932,7 +2934,7 @@ unsigned char SynthEngine::saveVector(unsigned char baseChan, string name, bool 
     if (!xml)
     {
         Runtime.Log("Save Vector failed xmltree allocation", 2);
-        return miscMsgPush("FAIL");
+        return textMsgBuffer.miscMsgPush("FAIL");
     }
     xml->beginbranch("VECTOR");
         insertVectorData(baseChan, true, xml, findleafname(file));
@@ -2941,7 +2943,7 @@ unsigned char SynthEngine::saveVector(unsigned char baseChan, string name, bool 
     if (!xml->saveXMLfile(file))
     {
         Runtime.Log("Failed to save data to " + file, 2);
-        result = miscMsgPush("FAIL");
+        result = textMsgBuffer.miscMsgPush("FAIL");
     }
     delete xml;
     return result;
@@ -3596,14 +3598,14 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
 
         case CONFIG::control::jackMidiSource:
             min = 3; // anything greater than max
-            def = miscMsgPush("default");
+            def = textMsgBuffer.miscMsgPush("default");
             break;
         case CONFIG::control::jackPreferredMidi:
             def = 1;
             break;
         case CONFIG::control::jackServer:
             min = 3;
-            def = miscMsgPush("default");
+            def = textMsgBuffer.miscMsgPush("default");
             break;
         case CONFIG::control::jackPreferredAudio:
             def = 1;
@@ -3614,14 +3616,14 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
 
         case CONFIG::control::alsaMidiSource:
             min = 3;
-            def = miscMsgPush("default");
+            def = textMsgBuffer.miscMsgPush("default");
             break;
         case CONFIG::control::alsaPreferredMidi:
             def = 1;
             break;
         case CONFIG::control::alsaAudioDevice:
             min = 3;
-            def = miscMsgPush("default");
+            def = textMsgBuffer.miscMsgPush("default");
             break;
         case CONFIG::control::alsaPreferredAudio:
             break;

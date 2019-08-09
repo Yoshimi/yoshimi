@@ -55,6 +55,14 @@ decl {\#include "UI/MiscGui.h"
     \#include "Misc/MiscFuncs.h"} {public global
 }
 
+decl {\#include "Misc/TextMsgBuffer.h"
+
+    namespace \{ // Implementation details...
+        TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
+    \}
+} {private local
+}
+
 class MidiLearnKitItem {: {public Fl_Group}
 } {
   Function {make_window()} {} {
@@ -363,7 +371,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         filename = fl_file_chooser("Load:", exten.c_str(), lastname.c_str(), 0);
         if (filename == NULL)
             return;
-        send_data(0, MIDILEARN::control::saveList, 0, 0, 0, 0, 0, 0, miscMsgPush((string) filename));
+        send_data(0, MIDILEARN::control::saveList, 0, 0, 0, 0, 0, 0, textMsgBuffer.miscMsgPush((string) filename));
         recent->activate();
         setWindowTitle(findleafname(filename));}
         tooltip {Save complete learned list} xywh {130 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 deactivate
@@ -451,7 +459,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         case MIDILEARN::control::findSize: // not using this yet
             break;
         case MIDILEARN::control::sendLearnMessage:
-            synth->getGuiMaster()->words->copy_label(miscMsgPop(miscmsg).c_str());
+            synth->getGuiMaster()->words->copy_label(textMsgBuffer.miscMsgPop(miscmsg).c_str());
             synth->getGuiMaster()->cancel->show();
             synth->getGuiMaster()->message->position(Fl::event_x_root() + 16, Fl::event_y_root());
             synth->getGuiMaster()->message->show();
@@ -492,7 +500,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
     code {//
     int lineNo = ((int)getData->data.value.F);
     int status = getData->data.type;
-    string name = miscMsgPop(getData->data.miscmsg);
+    string name = textMsgBuffer.miscMsgPop(getData->data.miscmsg);
     none->hide();
     clear->activate();
     save->activate();
@@ -552,7 +560,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
   }
   Function {loadMidi(string file)} {} {
     code {//
-    send_data(0, MIDILEARN::control::loadList, 0, 0, 0, 0, 0, 0, miscMsgPush((string) file));
+    send_data(0, MIDILEARN::control::loadList, 0, 0, 0, 0, 0, 0, textMsgBuffer.miscMsgPush((string) file));
     recent->activate();
     setWindowTitle(findleafname(file));} {}
   }

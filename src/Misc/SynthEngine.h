@@ -54,6 +54,7 @@ class EffectMgr;
 class Part;
 class XMLwrapper;
 class Controller;
+class TextMsgBuffer;
 
 #ifdef GUI_FLTK
 class MasterUI;
@@ -74,6 +75,7 @@ class SynthEngine : private SynthHelper, MiscFuncs, FileMgr
     private:
         Config Runtime;
         PresetsStore presetsstore;
+        TextMsgBuffer& textMsgBuffer;
     public:
         SynthEngine(int argc, char **argv, bool _isLV2Plugin = false, unsigned int forceId = 0);
         ~SynthEngine();
