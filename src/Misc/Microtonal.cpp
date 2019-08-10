@@ -65,7 +65,7 @@ void Microtonal::defaults(void)
     for (int i = 0; i < 128; ++i)
         Pmapping[i] = i;
 
-    for (uint i = 0; i < MAX_OCTAVE_SIZE; ++i)
+    for (size_t i = 0; i < MAX_OCTAVE_SIZE; ++i)
     {
         octave[i].text = reformatline(std::to_string((i % octavesize + 1) * 100)+ ".0");
         octave[i].tuning = tmpoctave[i].tuning = pow(2.0, (i % octavesize + 1) / 12.0);
@@ -289,7 +289,7 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
 // Convert the text to tunings
 int Microtonal::texttotunings(const char *text)
 {
-    uint i;
+    size_t i;
     unsigned int k = 0, nl = 0;
     char *lin;
 
@@ -415,7 +415,7 @@ string Microtonal::tuningtotext()
 {
     string text;
     char *buff = new char[100];
-    for (uint i = 0; i < octavesize; ++i)
+    for (size_t i = 0; i < octavesize; ++i)
     {
         if (i > 0)
             text += "\n";
@@ -468,7 +468,7 @@ int Microtonal::loadscl(string filename)
     {
         nnotes = MAX_OCTAVE_SIZE;
         sscanf(&tmp[0], "%d", &nnotes);
-        if (uint(nnotes) > MAX_OCTAVE_SIZE || nnotes < 2)
+        if (size_t(nnotes) > MAX_OCTAVE_SIZE || nnotes < 2)
             err = -6;
     }
     if (err == 0)
@@ -642,7 +642,7 @@ void Microtonal::add2XML(XMLwrapper *xml)
 
         xml->beginbranch("OCTAVE");
         xml->addpar("octave_size", octavesize);
-        for (uint i = 0; i < octavesize; ++i)
+        for (size_t i = 0; i < octavesize; ++i)
         {
             xml->beginbranch("DEGREE", i);
             if (octave[i].type == 1)
@@ -701,7 +701,7 @@ void Microtonal::getfromXML(XMLwrapper *xml)
         if (xml->enterbranch("OCTAVE"))
         {
             octavesize = xml->getpar127("octave_size", octavesize);
-            for (uint i = 0; i < octavesize; ++i)
+            for (size_t i = 0; i < octavesize; ++i)
             {
                 if (!xml->enterbranch("DEGREE", i))
                     continue;
