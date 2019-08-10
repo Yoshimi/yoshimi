@@ -26,7 +26,7 @@
 #include "Misc/SynthEngine.h"
 #include "Interface/TextLists.h"
 
-class MiscCli
+class CmdInterpreter
 {
     public:
         bool lineEnd(char *point, unsigned char controlType);

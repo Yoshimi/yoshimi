@@ -34,7 +34,7 @@ using cli::matchnMove;
 using std::string;
 
 
-bool MiscCli::lineEnd(char * point, unsigned char controlType)
+bool CmdInterpreter::lineEnd(char * point, unsigned char controlType)
 {
     return (point[0] == 0 && controlType == TOPLEVEL::type::Write);
     // so all other controls aren't tested
@@ -42,7 +42,7 @@ bool MiscCli::lineEnd(char * point, unsigned char controlType)
 }
 
 
-int MiscCli::toggle(char *point)
+int CmdInterpreter::toggle(char *point)
 {
     if (matchnMove(2, point, "enable") || matchnMove(2, point, "on") || matchnMove(3, point, "yes"))
         return 1;
@@ -55,7 +55,7 @@ int MiscCli::toggle(char *point)
 }
 
 
-int MiscCli::contextToEngines(int context)
+int CmdInterpreter::contextToEngines(int context)
 {
     int engine = UNUSED;
     if (bitTest(context, LEVEL::SubSynth))
@@ -72,7 +72,7 @@ int MiscCli::contextToEngines(int context)
 }
 
 
-bool MiscCli::query(string text, bool priority)
+bool CmdInterpreter::query(string text, bool priority)
 {
     char *line = NULL;
     string suffix;
@@ -105,7 +105,7 @@ bool MiscCli::query(string text, bool priority)
 }
 
 
-float MiscCli::readControl(SynthEngine *synth, unsigned char action, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char offset, unsigned char miscmsg)
+float CmdInterpreter::readControl(SynthEngine *synth, unsigned char action, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char offset, unsigned char miscmsg)
 {
     float value;
     CommandBlock putData;
@@ -129,7 +129,7 @@ float MiscCli::readControl(SynthEngine *synth, unsigned char action, unsigned ch
 }
 
 
-string MiscCli::readControlText(SynthEngine *synth, unsigned char action, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char offset)
+string CmdInterpreter::readControlText(SynthEngine *synth, unsigned char action, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char offset)
 {
     float value;
     CommandBlock putData;
@@ -150,7 +150,7 @@ string MiscCli::readControlText(SynthEngine *synth, unsigned char action, unsign
 }
 
 
-void MiscCli::readLimits(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char miscmsg)
+void CmdInterpreter::readLimits(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char miscmsg)
 {
     CommandBlock putData;
 
@@ -193,7 +193,7 @@ void MiscCli::readLimits(SynthEngine *synth, float value, unsigned char type, un
 }
 
 
-int MiscCli::sendNormal(SynthEngine *synth, unsigned char action, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char offset, unsigned char miscmsg)
+int CmdInterpreter::sendNormal(SynthEngine *synth, unsigned char action, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char offset, unsigned char miscmsg)
 {
     if ((type & TOPLEVEL::type::Limits) && part != TOPLEVEL::section::midiLearn)
     {
@@ -260,7 +260,7 @@ int MiscCli::sendNormal(SynthEngine *synth, unsigned char action, float value, u
 }
 
 
-int MiscCli::sendDirect(SynthEngine *synth, unsigned char action, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char offset, unsigned char miscmsg, unsigned char request)
+int CmdInterpreter::sendDirect(SynthEngine *synth, unsigned char action, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char offset, unsigned char miscmsg, unsigned char request)
 {
     if (action == TOPLEVEL::action::fromMIDI && part != TOPLEVEL::section::midiLearn)
         request = type & TOPLEVEL::type::Default;
@@ -377,7 +377,7 @@ int MiscCli::sendDirect(SynthEngine *synth, unsigned char action, float value, u
     return 0; // no function for this yet
 }
 
-string MiscCli::findStatus(SynthEngine *synth, int context, bool show)
+string CmdInterpreter::findStatus(SynthEngine *synth, int context, bool show)
 {
     string text = "";
     int kit = UNUSED;

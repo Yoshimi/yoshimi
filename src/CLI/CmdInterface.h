@@ -31,7 +31,7 @@
 class TextMsgBuffer;
 
 
-class CmdInterface : private  MiscCli, FileMgr
+class CmdInterface : private  CmdInterpreter, FileMgr
 {
     public:
         CmdInterface();
