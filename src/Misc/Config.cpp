@@ -202,16 +202,12 @@ bool Config::Setup(int argc, char **argv)
     if (!loadConfig())
         return false;
 
-    if (synth->getIsLV2Plugin()) //skip further setup for lv2 plugin instance.
+    /* NOTE: we must not do any further init involving the SynthEngine here,
+     * since this code is invoked from within the SynthEngine-ctor.
+     */
+    if (synth->getIsLV2Plugin())
     {
-        /*
-         * These are needed here now, as for stand-alone they have
-         * been moved to main to give the users the impression of
-         * a faster startup, and reduce the likelihood of thinking
-         * they failed and trying to start again.
-         */
-        synth->installBanks();
-        synth->loadHistory();
+        //skip further setup, which is irrelevant for lv2 plugin instance.
         return true;
     }
 

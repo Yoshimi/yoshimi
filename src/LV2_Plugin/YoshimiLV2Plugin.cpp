@@ -383,8 +383,17 @@ bool YoshimiLV2Plugin::init()
 LV2_Handle	YoshimiLV2Plugin::instantiate (const struct _LV2_Descriptor *desc, double sample_rate, const char *bundle_path, const LV2_Feature *const *features)
 {
     SynthEngine *synth = new SynthEngine(0, NULL, true);
-    if (synth == NULL)
+    if (synth == NULL || !synth->getRuntime().isRuntimeSetupCompleted()){
         return NULL;
+    }
+    /*
+     * Perform further global initialisation.
+     * For stand-alone the equivalent init happens in main(),
+     * after mainCreateNewInstance() returned successfully.
+     */
+    synth->installBanks();
+    synth->loadHistory();
+
     YoshimiLV2Plugin *inst = new YoshimiLV2Plugin(synth, sample_rate, bundle_path, features, desc);
     if (inst->init())
         return static_cast<LV2_Handle>(inst);
