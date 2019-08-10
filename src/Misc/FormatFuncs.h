@@ -25,23 +25,14 @@
 
 #include <cmath>
 #include <string>
-#include <list>
-#include <semaphore.h>
-
-#include "globals.h"
-
-
-#include <sys/stat.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <sstream>
-#include <iostream>
-#include <string.h>
-#include <limits.h>
+#include <cstring>
 
-#include "Misc/MiscFuncs.h"
 
-std::string MiscFuncs::asString(int n)
+namespace func {
+
+
+inline std::string asString(int n)
 {
    std::ostringstream oss;
    oss << n;
@@ -49,7 +40,7 @@ std::string MiscFuncs::asString(int n)
 }
 
 
-std::string MiscFuncs::asString(long long n)
+inline std::string asString(long long n)
 {
    std::ostringstream oss;
    oss << n;
@@ -57,7 +48,7 @@ std::string MiscFuncs::asString(long long n)
 }
 
 
-std::string MiscFuncs::asString(unsigned long n)
+inline std::string asString(unsigned long n)
 {
     std::ostringstream oss;
     oss << n;
@@ -65,7 +56,7 @@ std::string MiscFuncs::asString(unsigned long n)
 }
 
 
-std::string MiscFuncs::asString(long n)
+inline std::string asString(long n)
 {
    std::ostringstream oss;
    oss << n;
@@ -73,7 +64,15 @@ std::string MiscFuncs::asString(long n)
 }
 
 
-std::string MiscFuncs::asString(unsigned int n, unsigned int width)
+inline std::string asString(unsigned int n)
+{
+   std::ostringstream oss;
+   oss << n;
+   return std::string(oss.str());
+}
+
+
+inline std::string asString(unsigned int n, unsigned int width)
 {
     std::ostringstream oss;
     oss << n;
@@ -87,7 +86,7 @@ std::string MiscFuncs::asString(unsigned int n, unsigned int width)
 }
 
 
-std::string MiscFuncs::asString(unsigned char c)
+inline std::string asString(unsigned char c)
 {
     std::ostringstream oss;
     oss.width(1);
@@ -96,7 +95,7 @@ std::string MiscFuncs::asString(unsigned char c)
 }
 
 
-std::string MiscFuncs::asString(float n)
+inline std::string asString(float n)
 {
    std::ostringstream oss;
    oss.precision(3);
@@ -106,7 +105,7 @@ std::string MiscFuncs::asString(float n)
 }
 
 
-std::string MiscFuncs::asLongString(float n)
+inline std::string asLongString(float n)
 {
    std::ostringstream oss;
    oss.precision(9);
@@ -116,7 +115,7 @@ std::string MiscFuncs::asLongString(float n)
 }
 
 
-std::string MiscFuncs::asHexString(int x)
+inline std::string asHexString(int x)
 {
    std::ostringstream oss;
    oss << std::hex << x;
@@ -127,7 +126,7 @@ std::string MiscFuncs::asHexString(int x)
 }
 
 
-std::string MiscFuncs::asHexString(unsigned int x)
+inline std::string asHexString(unsigned int x)
 {
    std::ostringstream oss;
    oss << std::hex << x;
@@ -138,20 +137,8 @@ std::string MiscFuncs::asHexString(unsigned int x)
 }
 
 
-std::string MiscFuncs::asAlignedString(int n, int len)
-{
-    std::string res = std::to_string(n);
-    int size = res.length();
-    if (size < len)
-    {
-        for (int i = size; i < len; ++ i)
-            res = " " + res;
-    }
-    return res;
-}
 
-
-float MiscFuncs::string2float(std::string str)
+inline float string2float(std::string str)
 {
     std::istringstream machine(str);
     float fval;
@@ -160,7 +147,7 @@ float MiscFuncs::string2float(std::string str)
 }
 
 
-double MiscFuncs::string2double(std::string str)
+inline double string2double(std::string str)
 {
     std::istringstream machine(str);
     double dval;
@@ -169,7 +156,7 @@ double MiscFuncs::string2double(std::string str)
 }
 
 
-int MiscFuncs::string2int(std::string str)
+inline int string2int(std::string str)
 {
     std::istringstream machine(str);
     int intval;
@@ -178,8 +165,8 @@ int MiscFuncs::string2int(std::string str)
 }
 
 
-// ensures MIDI compatible numbers without errors
-int MiscFuncs::string2int127(std::string str)
+/* ensures MIDI compatible numbers without errors */
+inline int string2int127(std::string str)
 {
     std::istringstream machine(str);
     int intval;
@@ -192,7 +179,7 @@ int MiscFuncs::string2int127(std::string str)
 }
 
 
-unsigned int MiscFuncs::string2uint(std::string str)
+inline unsigned int string2uint(std::string str)
 {
     std::istringstream machine(str);
     unsigned int intval;
@@ -201,63 +188,8 @@ unsigned int MiscFuncs::string2uint(std::string str)
 }
 
 
-/*
- * Finds the index number of an item in a string list. If 'min' <= 0 the
- * input string must be an exact match of all characters and of equal length.
- * Otherwise 'min' should be set to a value that provides the fewest tests
- * for an unabiguous match.
- * If a string in the list is shorter than 'min' then this length is used.
- */
-int MiscFuncs::stringNumInList(std::string toFind, std::string *listname, size_t min)
-{
-    if (toFind.length() < min)
-        return -1;
-    int count = -1;
-    std::string name;
-    bool found = false;
-    do
-    {
-        ++ count;
-        name = listname[count];
-        if (min > 0)
-        {
-            size_t match = name.length();
-            if (match > min)
-                match = min;
-            int result = 0;
-            for (std::string::size_type i = 0; i < match; ++i)
-            {
-                result |= (tolower(toFind[i]) ^ tolower(name[i]));
-            }
-            if (result == 0)
-                found = true;
-        }
-        else // exact match
-        {
-            if (toFind == name)
-                found = true;
-        }
-    }
-    while (!found && name != "end");
-    if (name == "end")
-        return -1;
-    return count;
-}
-
-
-// This is never called !
-bool MiscFuncs::isFifo(std::string chkpath)
-{
-    struct stat st;
-    if (!stat(chkpath.c_str(), &st))
-        if (S_ISFIFO(st.st_mode))
-            return true;
-    return false;
-}
-
-
-// this is not actualy a file operation so stays here
-int MiscFuncs::findSplitPoint(std::string name)
+/* this is not actually a file operation so we keep it here */
+inline int findSplitPoint(std::string name)
 {
     unsigned int chk = 0;
     char ch = name.at(chk);
@@ -275,50 +207,7 @@ int MiscFuncs::findSplitPoint(std::string name)
 }
 
 
-char *MiscFuncs::skipSpace(char *buf)
-{
-    while (buf[0] == 0x20)
-    {
-        ++ buf;
-    }
-    return buf;
-}
-
-
-char *MiscFuncs::skipChars(char *buf)
-{
-    while (buf[0] > 0x20) // will also stop on line ends
-    {
-        ++ buf;
-    }
-    if (buf[0] == 0x20) // now find the next word (if any)
-        buf = skipSpace(buf);
-    return buf;
-}
-
-
-int MiscFuncs::matchWord(int numChars, char *buf, const char *word)
-{
-    int newp = 0;
-    int size = strlen(word);
-    while (buf[newp] > 0x20 && buf[newp] < 0x7f && newp < size && (tolower(buf[newp])) == (tolower(word[newp])))
-            ++ newp;
-    if (newp >= numChars && (buf[newp] <= 0x20 || buf[newp] >= 0x7f))
-        return newp;
-    return 0;
-}
-
-
-bool MiscFuncs::matchnMove(int num , char *&pnt, const char *word)
-{
- bool found = matchWord(num, pnt, word);
- if (found)
-     pnt = skipChars(pnt);
- return found;
-}
-
-
-std::string MiscFuncs::lineInText(std::string text, size_t &point)
+inline std::string lineInText(std::string text, size_t &point)
 {
     size_t len = text.length();
     if (point >= len - 1)
@@ -332,7 +221,7 @@ std::string MiscFuncs::lineInText(std::string text, size_t &point)
 }
 
 
-bool MiscFuncs::C_lineInText(std::string text, size_t &point, char *line, size_t length)
+inline bool C_lineInText(std::string text, size_t &point, char *line, size_t length)
 {
     bool ok = true;
     std::string found = lineInText(text, point);
@@ -352,86 +241,5 @@ bool MiscFuncs::C_lineInText(std::string text, size_t &point, char *line, size_t
 }
 
 
-
-// no more than 32 bit please!
-unsigned int MiscFuncs::nearestPowerOf2(unsigned int x, unsigned int min, unsigned int max)
-{
-    if (x <= min)
-        return min;
-    if (x >= max)
-        return max;
-    --x;
-    x |= x >> 1;
-    x |= x >> 2;
-    x |= x >> 4;
-    x |= x >> 8;
-    x |= x >> 16;
-    return ++x;
-}
-
-
-float MiscFuncs::limitsF(float value, float min, float max)
-{
-    if (value > max)
-        value = max;
-    else if (value < min)
-        value = min;
-    return value;
-}
-
-
-unsigned int MiscFuncs::bitFindHigh(unsigned int value)
-{
-    int bit = 32;
-    while (bit >= 0)
-    {
-        bit --;
-        if ((value >> bit) == 1)
-            return bit;
-    }
-    return 0xff;
-}
-
-
-void MiscFuncs::bitSet(unsigned int& value, unsigned int bit)
-{
-    value |= (1 << bit);
-}
-
-
-void MiscFuncs::bitClear(unsigned int& value, unsigned int bit)
-{
-    unsigned int mask = -1;
-    mask ^= (1 << bit);
-    value &= mask;
-}
-
-
-void MiscFuncs::bitClearHigh(unsigned int& value)
-{
-    bitClear(value, bitFindHigh(value));
-}
-
-
-void MiscFuncs::bitClearAbove(unsigned int& value, int bitLevel)
-{
-    unsigned int mask = (0xffffffff << bitLevel);
-    value = (value & ~mask);
-}
-
-bool MiscFuncs::bitTest(unsigned int value, unsigned int bit)
-{
-    if (value & (1 << bit))
-        return true;
-    return false;
-}
-
-
-void invSignal(float *sig, size_t len)
-{
-    for(size_t i = 0; i < len; ++i)
-        sig[i] *= -1.0f;
-}
-
-
+}//(End)namespace func
 #endif /*FORMATFUNCS_H*/

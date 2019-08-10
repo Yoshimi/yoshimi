@@ -62,9 +62,6 @@ decl {\#include "PresetsUI.h"} {public local
 decl {\#include "Params/FilterParams.h"} {public local
 }
 
-decl {\#include "Misc/MiscFuncs.h"} {public local
-}
-
 decl {\#include <FL/Fl.H>} {private global
 }
 
@@ -80,7 +77,17 @@ decl {\#include "Misc/SynthEngine.h"} {public global
 decl {class FilterUI;} {public global
 }
 
-class FormantFilterGraph {: {public Fl_Box, MiscFuncs}
+decl {\#include "Misc/FormatFuncs.h"
+    using func::asString;
+} {private local
+}
+decl {\#include "Misc/NumericFuncs.h"
+    using func::rap2dB;
+    using func::limit;
+} {private local
+}
+
+class FormantFilterGraph {: {public Fl_Box}
 } {
   Function {FormantFilterGraph(int x, int y, int w, int h, FilterUI& parent_,
             FilterParams *pars_, int *nvowel_, int *nformant_):

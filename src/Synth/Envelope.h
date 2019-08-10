@@ -25,18 +25,14 @@
 #ifndef ENVELOPE_H
 #define ENVELOPE_H
 
-#include <cmath>
-
-#include "Misc/MiscFuncs.h"
+#include "globals.h"
 
 class EnvelopeParams;
-
 class SynthEngine;
 
-class Envelope : private MiscFuncs
+class Envelope
 {
     public:
-
         Envelope(EnvelopeParams *envpars, float basefreq, SynthEngine *_synth);
         ~Envelope() { };
         void releasekey(void);

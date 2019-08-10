@@ -24,7 +24,7 @@
 #include <list>
 
 #include "Interface/FileMgr.h"
-#include "CLI/MiscCLI.h"
+#include "CLI/CmdInterpreter.h"
 #include "Interface/InterChange.h"
 #include "Effects/EffectMgr.h"
 

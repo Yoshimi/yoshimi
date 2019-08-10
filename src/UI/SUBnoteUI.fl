@@ -50,9 +50,6 @@ decl {\#include "FilterUI.h"} {public local
 decl {\#include "PresetsUI.h"} {public local
 }
 
-decl {\#include "Misc/MiscFuncs.h"} {public local
-}
-
 decl {\#include "Misc/SynthHelper.h"} {public local
 }
 

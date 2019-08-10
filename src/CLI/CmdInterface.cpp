@@ -42,6 +42,28 @@
 #include "CLI/CmdInterface.h"
 #include "Interface/TextLists.h"
 #include "Misc/TextMsgBuffer.h"
+#include "Misc/NumericFuncs.h"
+#include "Misc/FormatFuncs.h"
+#include "Misc/CliFuncs.h"
+
+using func::bitSet;
+using func::bitTest;
+using func::bitClear;
+using func::bitClearHigh;
+using func::bitFindHigh;
+
+using func::asString;
+using func::string2int;
+using func::string2int127;
+using func::string2float;
+using func::C_lineInText;
+
+using cli::skipChars;
+using cli::skipSpace;
+using cli::matchWord;
+using cli::matchnMove;
+using cli::stringNumInList;
+using cli::asAlignedString;
 
 /*
  * There are two routes that 'write' commands can take.
@@ -4783,7 +4805,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
                 context = LEVEL::Top; // start from top level
                 while (linePoint < text.length() && isok)
                 {
-                    if (!C_lineInText(text, linePoint, to_send))
+                    if (!C_lineInText(text, linePoint, to_send, COMMAND_SIZE))
                         Runtime.Log("*** Error: line " + to_string(count) + " too long");
                     ++ count;
                     mark = skipSpace(to_send);

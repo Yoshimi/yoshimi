@@ -38,9 +38,6 @@ decl {\#include "Interface/FileMgr.h"} {public local
 decl {\#include "Misc/Config.h"} {public local
 }
 
-decl {\#include "Misc/MiscFuncs.h"} {public local
-}
-
 decl {\#include "Misc/SynthEngine.h"} {private local
 }
 
@@ -61,7 +58,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
 decl {extern SynthEngine *firstSynth;} {private local
 }
 
-class ConfigUI {: {private MiscFuncs, FileMgr}
+class ConfigUI {: {private FileMgr}
 } {
   Function {make_window()} {} {
     Fl_Window configwindow {

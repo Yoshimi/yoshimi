@@ -48,8 +48,7 @@ decl {\#include "UI/MiscGui.h"
     \#include "SUBnoteUI.h"
     \#include "PADnoteUI.h"
     \#include "UI/WidgetMWSlider.h"
-    \#include "Params/Controller.h"
-    \#include "Misc/MiscFuncs.h"} {public global
+    \#include "Params/Controller.h"} {public global
 }
 
 decl {\#include "Misc/TextMsgBuffer.h"
@@ -60,7 +59,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
 } {private local
 }
 
-class MicrotonalUI {: {private MiscFuncs}
+class MicrotonalUI {
 } {
   Function {make_window()} {} {
     Fl_Window microtonaluiwindow {

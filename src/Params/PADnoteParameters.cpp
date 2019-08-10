@@ -25,11 +25,6 @@
     Modified May 2019
 */
 
-#include <cmath>
-#include <iostream>
-
-using namespace std;
-
 #include "Misc/XMLwrapper.h"
 #include "DSP/FFTwrapper.h"
 #include "Synth/OscilGen.h"

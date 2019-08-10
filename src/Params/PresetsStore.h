@@ -27,17 +27,20 @@
 #define PRESETSSTORE_H
 
 #include "Misc/Config.h"
-#include "Misc/MiscFuncs.h"
 #include "Interface/FileMgr.h"
+
+#include <string>
+
+using std::string;
 
 #define MAX_PRESETTYPE_SIZE 30
 
 class XMLwrapper;
 class PresetsStore;
-
 class SynthEngine;
 
-class PresetsStore : MiscFuncs, FileMgr
+
+class PresetsStore : FileMgr
 {
     public:
         PresetsStore(SynthEngine *_synth);

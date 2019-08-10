@@ -26,8 +26,8 @@
 #define ALSA_ENGINE_H
 
 #include <pthread.h>
-#include <string>
 #include <alsa/asoundlib.h>
+#include <string>
 
 #include "MusicIO/MusicIO.h"
 
@@ -79,7 +79,7 @@ class AlsaEngine : public MusicIO
                                       snd_pcm_uframes_t nframes);
 
         struct {
-            std::string             device;
+            std::string        device;
             snd_pcm_t         *handle;
             unsigned int       period_count;
             unsigned int       samplerate;
@@ -91,11 +91,11 @@ class AlsaEngine : public MusicIO
         } audio;
 
         struct {
-            std::string              device;
-            snd_seq_t           *handle;
-            snd_seq_addr_t      addr;
-            int                 alsaId;
-            pthread_t           pThread;
+            std::string        device;
+            snd_seq_t         *handle;
+            snd_seq_addr_t     addr;
+            int                alsaId;
+            pthread_t          pThread;
         } midi;
 };
 

@@ -24,10 +24,7 @@
 */
 
 #include <dirent.h>
-#include <sys/stat.h>
-#include <cstdlib>
-#include <cstring>
-#include <iostream>
+//#include <iostream>
 
 #include "Misc/XMLwrapper.h"
 #include "Params/PresetsStore.h"
@@ -36,6 +33,7 @@
 extern SynthEngine *firstSynth;
 
 PresetsStore::_clipboard PresetsStore::clipboard;
+
 
 PresetsStore::PresetsStore(SynthEngine *_synth) :
     preset_extension(".xpz"),

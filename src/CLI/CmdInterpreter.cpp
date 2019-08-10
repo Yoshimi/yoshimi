@@ -21,6 +21,17 @@
 
 #include "CLI/CmdInterpreter.h"
 #include "Misc/TextMsgBuffer.h"
+#include "Misc/NumericFuncs.h"
+#include "Misc/FormatFuncs.h"
+#include "Misc/CliFuncs.h"
+
+using func::bitTest;
+using func::bitFindHigh;
+
+using func::asString;
+using cli::matchnMove;
+
+using std::string;
 
 
 bool MiscCli::lineEnd(char * point, unsigned char controlType)
@@ -61,10 +72,10 @@ int MiscCli::contextToEngines(int context)
 }
 
 
-bool MiscCli::query(std::string text, bool priority)
+bool MiscCli::query(string text, bool priority)
 {
     char *line = NULL;
-    std::string suffix;
+    string suffix;
     char result;
     char test;
 
@@ -118,7 +129,7 @@ float MiscCli::readControl(SynthEngine *synth, unsigned char action, unsigned ch
 }
 
 
-std::string MiscCli::readControlText(SynthEngine *synth, unsigned char action, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char offset)
+string MiscCli::readControlText(SynthEngine *synth, unsigned char action, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char offset)
 {
     float value;
     CommandBlock putData;
@@ -154,7 +165,7 @@ void MiscCli::readLimits(SynthEngine *synth, float value, unsigned char type, un
     putData.data.miscmsg = miscmsg;
 
     value = synth->interchange.readAllData(&putData);
-    std::string name;
+    string name;
     switch (type & 3)
     {
         case TOPLEVEL::type::Minimum:
@@ -289,7 +300,7 @@ int MiscCli::sendDirect(SynthEngine *synth, unsigned char action, float value, u
     {
         putData.data.type = request | TOPLEVEL::type::Limits;
         value = synth->interchange.readAllData(&putData);
-        std::string name;
+        string name;
         switch (request)
         {
             case TOPLEVEL::type::Minimum:
@@ -319,7 +330,7 @@ int MiscCli::sendDirect(SynthEngine *synth, unsigned char action, float value, u
 
     if (part == TOPLEVEL::section::main && (type & TOPLEVEL::type::Write) == 0 && control >= MAIN::control::readPartPeak && control <= MAIN::control::readMainLRrms)
     {
-        std::string name;
+        string name;
         switch (control)
         {
             case MAIN::control::readPartPeak:
@@ -366,9 +377,9 @@ int MiscCli::sendDirect(SynthEngine *synth, unsigned char action, float value, u
     return 0; // no function for this yet
 }
 
-std::string MiscCli::findStatus(SynthEngine *synth, int context, bool show)
+string MiscCli::findStatus(SynthEngine *synth, int context, bool show)
 {
-    std::string text = "";
+    string text = "";
     int kit = UNUSED;
     int insert = UNUSED;
 
@@ -428,8 +439,8 @@ std::string MiscCli::findStatus(SynthEngine *synth, int context, bool show)
             kit = kitNumber;
             insert = TOPLEVEL::insert::kitGroup;
             text += ", ";
-            std::string front = "";
-            std::string back = " ";
+            string front = "";
+            string back = " ";
             if (!inKitEditor)
             {
                 front = "(";
@@ -527,7 +538,7 @@ std::string MiscCli::findStatus(SynthEngine *synth, int context, bool show)
                     int tmp = readControl(synth, 0, ADDVOICE::control::modulatorType, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
                     if (tmp > 0)
                     {
-                        std::string word = "";
+                        string word = "";
                         switch (tmp)
                         {
                             case 1:

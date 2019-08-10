@@ -17,8 +17,8 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-#include <cstring>
-#include <iostream>
+
+#include <string>
 
 #include "Misc/SynthEngine.h"
 
@@ -37,7 +37,7 @@ string UnifiedPresets::findSectionName(CommandBlock *getData)
 
     if (engine >= PART::engine::addVoice1 && engine <= PART::engine::addVoice8)
     {
-        string name = "VOICE id=\"" + to_string(int(engine - PART::engine::addVoice1)) + "\"";
+        string name = "VOICE id=\"" + std::to_string(int(engine - PART::engine::addVoice1)) + "\"";
         return name;
     }
     switch (engine)

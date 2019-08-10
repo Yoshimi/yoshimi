@@ -17,26 +17,29 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified May 2019
+    Modified August 2019
 */
-
-#include <iostream>
-#include <cfloat>
-#include <bitset>
-#include <unistd.h>
-#include <list>
-#include <string>
-#include <unistd.h>
-
-using namespace std;
 
 #include "Interface/MidiLearn.h"
 #include "Interface/InterChange.h"
 #include "Interface/RingBuffer.h"
-#include "Misc/MiscFuncs.h"
+#include "Misc/FormatFuncs.h"
 #include "Misc/TextMsgBuffer.h"
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
+
+#include <list>
+#include <vector>
+#include <string>
+#include <unistd.h>  // for usleep()
+//#include <iostream>
+
+using func::asString;
+using func::asHexString;
+using std::to_string;
+using std::string;
+using std::vector;
+using std::list;
 
 enum scan : int { noList = -3, listEnd, listBlocked};
 
@@ -113,7 +116,7 @@ bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, un
         if (minIn > maxIn)
         {
             value = 127 - value;
-            swap(minIn, maxIn);
+            std::swap(minIn, maxIn);
         }
 
         if (minIn == maxIn)

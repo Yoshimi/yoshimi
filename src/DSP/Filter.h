@@ -25,7 +25,6 @@
 #ifndef FILTER_H
 #define FILTER_H
 
-#include "Misc/MiscFuncs.h"
 #include "DSP/Filter_.h"
 #include "DSP/AnalogFilter.h"
 #include "DSP/FormantFilter.h"
@@ -34,7 +33,7 @@
 
 class SynthEngine;
 
-class Filter : private MiscFuncs
+class Filter
 {
     public:
         Filter(FilterParams *pars, SynthEngine *_synth);

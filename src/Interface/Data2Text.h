@@ -24,14 +24,12 @@
 #include <string>
 
 #include "globals.h"
-#include "Misc/MiscFuncs.h"
 
 class SynthEngine;
-class MiscFuncs;
 class TextMsgBuffer;
 
 
-class DataText : public MiscFuncs
+class DataText
 {
 
     private:

@@ -42,7 +42,7 @@ std::string midi_drivers_str [] = {"no_midi", "jack_midi"
 
 MusicClient *MusicClient::newMusicClient(SynthEngine *_synth)
 {
-    set<music_clients> clSet;
+    std::set<music_clients> clSet;
     music_clients c1 = {0, _synth->getRuntime().audioEngine, _synth->getRuntime().midiEngine};
     clSet.insert(c1);
     music_clients c2 = {1, jack_audio, jack_midi};
@@ -58,7 +58,7 @@ MusicClient *MusicClient::newMusicClient(SynthEngine *_synth)
     music_clients c7 = {6, no_audio, no_midi}; //this one always will do the work :)
     clSet.insert(c7);
 
-    for(set<music_clients>::iterator it = clSet.begin(); it != clSet.end(); ++it)
+    for(std::set<music_clients>::iterator it = clSet.begin(); it != clSet.end(); ++it)
     {
         MusicClient *client = new MusicClient(_synth, it->audioDrv, it->midiDrv);
         if(client)

@@ -26,18 +26,10 @@
     Modified May 2019
 */
 
-#include <sys/types.h>
-#include <stdio.h>
 #include <sys/time.h>
 #include <set>
 #include <iostream>
-#include <fstream>
 #include <string>
-#include <stdlib.h>
-#include <unistd.h>
-
-
-using namespace std;
 
 #ifdef GUI_FLTK
     #include "MasterUI.h"
@@ -49,12 +41,34 @@ using namespace std;
 #include "Misc/Part.h"
 #include "Effects/EffectMgr.h"
 #include "Misc/TextMsgBuffer.h"
+#include "Misc/NumericFuncs.h"
+#include "Misc/FormatFuncs.h"
 #include "Misc/XMLwrapper.h"
 
+using func::dB2rap;
+using func::bitTest;
+using func::asString;
+
+using std::set;
+
+
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
+
+// defined in InterChange.cpp and also used in main.cpp
 extern std::string runGui;
+
 map<SynthEngine *, MusicClient *> synthInstances;
 SynthEngine *firstSynth = NULL;
+
+namespace { // Global implementation internal history data
+    static vector<string> InstrumentHistory;
+    static vector<string> ParamsHistory;
+    static vector<string> ScaleHistory;
+    static vector<string> StateHistory;
+    static vector<string> VectorHistory;
+    static vector<string> MidiLearnHistory;
+}
+
 
 static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
 {
@@ -83,13 +97,6 @@ static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
     return nextId;
 }
 
-// histories
-static vector<string> InstrumentHistory;
-static vector<string> ParamsHistory;
-static vector<string> ScaleHistory;
-static vector<string> StateHistory;
-static vector<string> VectorHistory;
-static vector<string> MidiLearnHistory;
 
 SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int forceId) :
     uniqueId(getRemoveSynthId(false, forceId)),

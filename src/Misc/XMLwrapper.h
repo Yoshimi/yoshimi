@@ -30,8 +30,6 @@
 #include <mxml.h>
 #include <string>
 
-
-#include "Misc/MiscFuncs.h"
 #include "Interface/FileMgr.h"
 
 // max tree depth
@@ -39,7 +37,7 @@
 
 class SynthEngine;
 
-class XMLwrapper : private MiscFuncs, FileMgr
+class XMLwrapper : private FileMgr
 {
     public:
         XMLwrapper(SynthEngine *_synth, bool _isYoshi = false, bool includeBase = true);
@@ -158,6 +156,8 @@ class XMLwrapper : private MiscFuncs, FileMgr
         // this is used to store the parents
         mxml_node_t *parentstack[STACKSIZE];
         int stackpos;
+        int xml_k;
+        char tabs[STACKSIZE + 2];
 
         void push(mxml_node_t *node);
         mxml_node_t *pop(void);

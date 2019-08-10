@@ -360,7 +360,7 @@ set (Effects_sources
 
 set (Misc_sources
     Misc/Config.cpp  Misc/SynthEngine.cpp  Misc/Bank.cpp  Misc/Splash.cpp
-    Misc/Microtonal.cpp   Misc/Part.cpp  Misc/XMLwrapper.cpp  Misc/MiscFuncs.cpp   Misc/WavFile.cpp
+    Misc/Microtonal.cpp   Misc/Part.cpp  Misc/XMLwrapper.cpp  Misc/WavFile.cpp
 )
 
 set (Interface_Sources
@@ -376,7 +376,7 @@ set (Interface_Sources
 set (CLI_Sources
     CLI/CmdInterface.cpp
     #CLI/ConfigCLI.cpp
-    CLI/MiscCLI.cpp
+    CLI/CmdInterpreter.cpp
 )
 
 set (Params_sources

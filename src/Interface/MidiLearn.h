@@ -27,17 +27,15 @@
 #include <list>
 #include <string>
 
-using namespace std;
-
-#include "Misc/MiscFuncs.h"
 #include "Interface/FileMgr.h"
 #include "Interface/InterChange.h"
 #include "Interface/Data2Text.h"
 
 class XMLwrapper;
-
 class SynthEngine;
 class DataText;
+
+using std::string;
 
 class MidiLearn : private FileMgr, DataText
 {
@@ -66,8 +64,8 @@ class MidiLearn : private FileMgr, DataText
             unsigned char min_in;
             unsigned char max_in;
             unsigned char status; // up to here must be specified on input
-            int min_out; // defined programaticly
-            int max_out; // defined programaticly
+            int min_out; // defined programmatically
+            int max_out; // defined programmatically
             Control data; // controller to learn
             string name; // derived from controller text
         };
@@ -77,10 +75,10 @@ class MidiLearn : private FileMgr, DataText
 
         bool runMidiLearn(int _value, unsigned int CC, unsigned char chan, unsigned char category);
         bool writeMidi(CommandBlock *putData, bool in_place);
-        int findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned int CC, unsigned char chan, LearnBlock *block, bool show);
+        int findEntry(std::list<LearnBlock> &midi_list, int lastpos, unsigned int CC, unsigned char chan, LearnBlock *block, bool show);
         int findSize();
         void listLine(int lineNo);
-        void listAll(list<string>& msg_buf);
+        void listAll(std::list<string>& msg_buf);
         bool remove(int itemNumber);
         void generalOperations(CommandBlock *getData);
         bool saveList(string name);
@@ -91,7 +89,7 @@ class MidiLearn : private FileMgr, DataText
 
 
     private:
-        list<LearnBlock> midi_list;
+        std::list<LearnBlock> midi_list;
         string learnedName;
         CommandBlock learnTransferBlock;
 

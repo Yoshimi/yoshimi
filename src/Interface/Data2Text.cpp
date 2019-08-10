@@ -22,7 +22,10 @@
 #include "Interface/Data2Text.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/TextMsgBuffer.h"
-#include "Misc/MiscFuncs.h"
+
+using std::string;
+using std::to_string;
+
 
 DataText::DataText() :
     synth(nullptr),
@@ -31,7 +34,7 @@ DataText::DataText() :
 {
 }
 
-std::string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool addValue)
+string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool addValue)
 {
     SynthEngine *synth = _synth;
     float value = getData->data.value.F;
@@ -51,7 +54,7 @@ std::string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, boo
     }
 
     showValue = true;
-    std::string commandName;
+    string commandName;
 
     Part *part;
     part = synth->part[npart];
@@ -80,24 +83,24 @@ std::string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, boo
     else if (npart >= NUM_MIDI_PARTS)
     {
         showValue = false;
-        commandName = "Invalid part " + std::to_string(int(npart) + 1);
+        commandName = "Invalid part " + to_string(int(npart) + 1);
     }
 
     else if (kititem >= NUM_KIT_ITEMS && kititem < UNUSED)
     {
         showValue = false;
-        commandName = "Invalid kit " + std::to_string(int(kititem) + 1);
+        commandName = "Invalid kit " + to_string(int(kititem) + 1);
     }
 
     else if (kititem != 0 && engine != UNUSED && control != PART::control::enable && part->kit[kititem].Penabled == false)
-        commandName = "Part " + std::to_string(int(npart) + 1) + " Kit item " + std::to_string(int(kititem) + 1) + " not enabled";
+        commandName = "Part " + to_string(int(npart) + 1) + " Kit item " + to_string(int(kititem) + 1) + " not enabled";
 
     else if (kititem == UNUSED || insert == TOPLEVEL::insert::kitGroup)
     {
         if (control != PART::control::kitMode && kititem != UNUSED && part->Pkitmode == 0)
         {
             showValue = false;
-            commandName = "Part " + std::to_string(int(npart) + 1) + " Kitmode not enabled";
+            commandName = "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
         }
         else
             commandName = resolvePart(getData, addValue);
@@ -105,7 +108,7 @@ std::string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, boo
     else if (kititem > 0 && part->Pkitmode == 0)
     {
         showValue = false;
-        commandName = "Part " + std::to_string(int(npart) + 1) + " Kitmode not enabled";
+        commandName = "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
     }
 
     else if (engine == PART::engine::padSynth)
@@ -241,14 +244,14 @@ std::string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, boo
         }
     }
 
-    std::string actual = "";
+    string actual = "";
     if (showValue)
     {
         actual = " Value ";
         if (type & TOPLEVEL::type::Integer)
-            actual += std::to_string(lrint(value));
+            actual += to_string(lrint(value));
         else
-            actual += std::to_string(value);
+            actual += to_string(value);
     }
     if (addValue)
         commandName += actual;
@@ -256,13 +259,13 @@ std::string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, boo
 }
 
 
-std::string DataText::resolveVector(CommandBlock *getData, bool addValue)
+string DataText::resolveVector(CommandBlock *getData, bool addValue)
 {
     int value_int = lrint(getData->data.value.F);
     unsigned char control = getData->data.control;
     unsigned int chan = getData->data.insert;
 
-    std::string contstr = "";
+    string contstr = "";
     switch (control)
     {
         //case 0:
@@ -317,7 +320,7 @@ std::string DataText::resolveVector(CommandBlock *getData, bool addValue)
             if (chan > NUM_MIDI_CHANNELS)
                 contstr = "all channels";
             else
-                contstr = "chan " + std::to_string(chan + 1);
+                contstr = "chan " + to_string(chan + 1);
             if (addValue)
                 return("Vector cleared on " + contstr);
             break;
@@ -333,9 +336,9 @@ std::string DataText::resolveVector(CommandBlock *getData, bool addValue)
     if (control == VECTOR::control::undefined)
     {
         showValue = false;
-        return("Vector " + contstr + " set to " + std::to_string(chan + 1));
+        return("Vector " + contstr + " set to " + to_string(chan + 1));
     }
-    std::string name = "Vector Chan " + std::to_string(chan + 1) + " ";
+    string name = "Vector Chan " + to_string(chan + 1) + " ";
     if (control == 127)
         name += " all ";
     else if (control >= VECTOR::control::Ycontroller)
@@ -347,12 +350,12 @@ std::string DataText::resolveVector(CommandBlock *getData, bool addValue)
 }
 
 
-std::string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
+string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
 {
     int value = getData->data.value.F;
     unsigned char control = getData->data.control;
 
-    std::string contstr = "";
+    string contstr = "";
     switch (control)
     {
         case SCALES::control::Afrequency:
@@ -407,13 +410,13 @@ std::string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
         case SCALES::control::name:
             contstr = "Name: ";
             if (addValue)
-                contstr += std::string(synth->microtonal.Pname);
+                contstr += string(synth->microtonal.Pname);
             showValue = false;
             break;
         case SCALES::control::comment:
             contstr = "Description: ";
             if (addValue)
-                contstr += std::string(synth->microtonal.Pcomment);
+                contstr += string(synth->microtonal.Pcomment);
             showValue = false;
             break;
         case SCALES::control::retune:
@@ -471,7 +474,7 @@ std::string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
     return ("Scales " + contstr);
 }
 
-std::string DataText::resolveConfig(CommandBlock *getData, bool addValue)
+string DataText::resolveConfig(CommandBlock *getData, bool addValue)
 {
     float value = getData->data.value.F;
     unsigned char control = getData->data.control;
@@ -480,7 +483,7 @@ std::string DataText::resolveConfig(CommandBlock *getData, bool addValue)
     int value_int = lrint(value);
     bool value_bool = YOSH::F2B(value);
     bool yesno = false;
-    std::string contstr = "";
+    string contstr = "";
     switch (control)
     {
         case CONFIG::control::oscillatorSize:
@@ -597,7 +600,7 @@ std::string DataText::resolveConfig(CommandBlock *getData, bool addValue)
             break;
         case CONFIG::control::historyLock:
         {
-            std::string group[] = {"Instrument", "Patchset", "Scale", "State", "Vector", "Mlearn"};
+            string group[] = {"Instrument", "Patchset", "Scale", "State", "Vector", "Mlearn"};
             contstr = "History lock " + group[kititem];
             yesno = true;
             break;
@@ -784,7 +787,7 @@ std::string DataText::resolveConfig(CommandBlock *getData, bool addValue)
 
         case CONFIG::control::saveCurrentConfig:
         {
-            std::string name = textMsgBuffer.fetch(value_int);
+            string name = textMsgBuffer.fetch(value_int);
             if (write)
                 contstr += ("save" + name);
             else
@@ -818,15 +821,15 @@ std::string DataText::resolveConfig(CommandBlock *getData, bool addValue)
 }
 
 
-std::string DataText::resolveBank(CommandBlock *getData, bool)
+string DataText::resolveBank(CommandBlock *getData, bool)
 {
     int value_int = lrint(getData->data.value.F);
     int control = getData->data.control;
     int kititem = getData->data.kit;
     int engine = getData->data.engine;
     int insert = getData->data.insert;
-    std::string name = textMsgBuffer.fetch(value_int);
-    std::string contstr = "";
+    string name = textMsgBuffer.fetch(value_int);
+    string contstr = "";
     showValue = false;
     switch(control)
     {
@@ -834,20 +837,20 @@ std::string DataText::resolveBank(CommandBlock *getData, bool)
             contstr = "Instrument delete" + name;
             break;
         case BANK::control::selectFirstInstrumentToSwap:
-            contstr = "Set Instrument ID " + std::to_string(insert + 1) + "  Bank ID " + std::to_string(kititem) + "  Root ID " + std::to_string(engine) + " for swap";
+            contstr = "Set Instrument ID " + to_string(insert + 1) + "  Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine) + " for swap";
             break;
         case BANK::control::selectSecondInstrumentAndSwap:
             if (name == "")
-                name = "ped with Instrument ID " + std::to_string(insert + 1) + "  Bank ID " + std::to_string(kititem) + "  Root ID " + std::to_string(engine);
+                name = "ped with Instrument ID " + to_string(insert + 1) + "  Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine);
             contstr = "Swap" + name;
             break;
 
         case BANK::control::selectFirstBankToSwap:
-            contstr = "Set Bank ID " + std::to_string(kititem) + "  Root ID " + std::to_string(engine) + " for swap";
+            contstr = "Set Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine) + " for swap";
             break;
         case BANK::control::selectSecondBankAndSwap:
             if (name == "")
-                name = "ped with Bank ID " + std::to_string(kititem) + "  Root ID " + std::to_string(engine);
+                name = "ped with Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine);
             contstr = "Swap" + name;
             break;
         default:
@@ -857,7 +860,7 @@ std::string DataText::resolveBank(CommandBlock *getData, bool)
     return ("Bank " + contstr);
 }
 
-std::string DataText::resolveMain(CommandBlock *getData, bool addValue)
+string DataText::resolveMain(CommandBlock *getData, bool addValue)
 {
     float value = getData->data.value.F;
     int value_int = lrint(value);
@@ -866,8 +869,8 @@ std::string DataText::resolveMain(CommandBlock *getData, bool addValue)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
 
-    std::string name;
-    std::string contstr = "";
+    string name;
+    string contstr = "";
     if (getData->data.part == TOPLEVEL::section::midiIn)
     {
         switch (control)
@@ -879,7 +882,7 @@ std::string DataText::resolveMain(CommandBlock *getData, bool addValue)
                 showValue = false;
                 break;
             case MIDI::control::controller:
-                contstr = "CC " + std::to_string(int(engine)) + " ";
+                contstr = "CC " + to_string(int(engine)) + " ";
                 break;
             case MIDI::control::bankChange:
                 showValue = false;
@@ -897,7 +900,7 @@ std::string DataText::resolveMain(CommandBlock *getData, bool addValue)
 
         case MAIN::control::partNumber:
             showValue = false;
-            contstr = "Part Number " + std::to_string(value_int + 1);
+            contstr = "Part Number " + to_string(value_int + 1);
             break;
         case MAIN::control::availableParts:
             contstr = "Available Parts";
@@ -954,7 +957,7 @@ std::string DataText::resolveMain(CommandBlock *getData, bool addValue)
                 if (value_int > 127)
                     contstr += "undefined - set mode first";
                 else
-                    contstr += std::to_string(value_int);
+                    contstr += to_string(value_int);
             }
             break;
 
@@ -1063,7 +1066,7 @@ std::string DataText::resolveMain(CommandBlock *getData, bool addValue)
 
         case MAIN::control::startInstance:
             showValue = false;
-            contstr = "Start new instance " + std::to_string(value_int);
+            contstr = "Start new instance " + to_string(value_int);
             break;
         case MAIN::control::stopInstance:
             showValue = false;
@@ -1081,10 +1084,10 @@ std::string DataText::resolveMain(CommandBlock *getData, bool addValue)
                 contstr = "Part R";
             else
                 contstr = "Part L";
-            contstr += std::to_string(int(kititem));
+            contstr += to_string(int(kititem));
             if (value < 0.0f)
                 contstr += " silent ";
-            contstr += (" peak level " + std::to_string(value));
+            contstr += (" peak level " + to_string(value));
             break;
 
         case MAIN::control::readMainLRpeak:
@@ -1093,7 +1096,7 @@ std::string DataText::resolveMain(CommandBlock *getData, bool addValue)
                 contstr = "Right";
             else
                 contstr = "Left";
-            contstr += (" peak level " + std::to_string(value));
+            contstr += (" peak level " + to_string(value));
             break;
 
         case MAIN::control::readMainLRrms:
@@ -1102,7 +1105,7 @@ std::string DataText::resolveMain(CommandBlock *getData, bool addValue)
                 contstr = "Right";
             else
                 contstr = "Left";
-            contstr += (" RMS level " + std::to_string(value));
+            contstr += (" RMS level " + to_string(value));
             break;
 
         default:
@@ -1114,7 +1117,7 @@ std::string DataText::resolveMain(CommandBlock *getData, bool addValue)
 }
 
 
-std::string DataText::resolvePart(CommandBlock *getData, bool addValue)
+string DataText::resolvePart(CommandBlock *getData, bool addValue)
 {
     float value = getData->data.value.F;
     unsigned char control = getData->data.control;
@@ -1133,13 +1136,13 @@ std::string DataText::resolvePart(CommandBlock *getData, bool addValue)
     if (control == UNUSED)
         return "Number of parts";
 
-    std::string kitnum;
+    string kitnum;
     if (kitType)
-        kitnum = " Kit " + std::to_string(kititem + 1) + " ";
+        kitnum = " Kit " + to_string(kititem + 1) + " ";
     else
         kitnum = " ";
 
-    std::string name = "";
+    string name = "";
     if (control >= PART::control::volumeRange && control <= PART::control::receivePortamento)
     {
         name = "Controller ";
@@ -1164,7 +1167,7 @@ std::string DataText::resolvePart(CommandBlock *getData, bool addValue)
         }
     }
 
-    std::string contstr = "";
+    string contstr = "";
     switch (control)
     {
         case PART::control::volume:
@@ -1184,11 +1187,11 @@ std::string DataText::resolvePart(CommandBlock *getData, bool addValue)
             contstr = "Midi CH ";
             if (addValue)
             {
-                contstr += std::to_string(value_int + 1);
+                contstr += to_string(value_int + 1);
                 if (value_int >= NUM_MIDI_CHANNELS * 2)
                     contstr += " Midi ignored";
                 else if (value_int >= NUM_MIDI_CHANNELS)
-                    contstr = contstr + " Note off only from CH " + std::to_string(value_int + 1 - NUM_MIDI_CHANNELS);
+                    contstr = contstr + " Note off only from CH " + to_string(value_int + 1 - NUM_MIDI_CHANNELS);
             }
             break;
         case PART::control::keyMode:
@@ -1314,13 +1317,13 @@ std::string DataText::resolvePart(CommandBlock *getData, bool addValue)
             contstr = "Effect Number";
             break;
         case PART::control::effectType:
-            contstr = "Effect " + std::to_string(effNum + 1) + " Type";
+            contstr = "Effect " + to_string(effNum + 1) + " Type";
             break;
         case PART::control::effectDestination:
-            contstr = "Effect " + std::to_string(effNum + 1) + " Destination";
+            contstr = "Effect " + to_string(effNum + 1) + " Destination";
             break;
         case PART::control::effectBypass:
-            contstr = "Bypass Effect "+ std::to_string(effNum + 1);
+            contstr = "Bypass Effect "+ to_string(effNum + 1);
             break;
 
         case PART::control::defaultInstrument: // doClearPart
@@ -1499,22 +1502,22 @@ std::string DataText::resolvePart(CommandBlock *getData, bool addValue)
             showValue = false;
         }
     }
-    return ("Part " + std::to_string(npart + 1) + kitnum + name + contstr);
+    return ("Part " + to_string(npart + 1) + kitnum + name + contstr);
 }
 
 
-std::string DataText::resolveAdd(CommandBlock *getData, bool)
+string DataText::resolveAdd(CommandBlock *getData, bool)
 {
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
-    std::string name = "";
+    string name = "";
     if (control <= ADDSYNTH::control::panning)
         name = " Amplitude ";
     else if (control >= ADDSYNTH::control::detuneFrequency && control <= ADDSYNTH::control::relativeBandwidth)
         name = "Frequency";
 
-    std::string contstr = "";
+    string contstr = "";
 
     switch (control)
     {
@@ -1574,11 +1577,11 @@ std::string DataText::resolveAdd(CommandBlock *getData, bool)
             contstr = "Unrecognised";
     }
 
-    return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + " AddSynth " + name + contstr);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " AddSynth " + name + contstr);
 }
 
 
-std::string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
+string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
 {
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -1593,7 +1596,7 @@ std::string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
     else
         nvoice = engine - PART::engine::addVoice1;
 
-    std::string name = "";
+    string name = "";
     switch (control & 0xf0)
     {
         case ADDVOICE::control::modulatorType:
@@ -1619,7 +1622,7 @@ std::string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
             break;
     }
 
-    std::string contstr = "";
+    string contstr = "";
 
     switch (control)
     {
@@ -1799,11 +1802,11 @@ std::string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
             showValue = false;
         }
     }
-    return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + " Add Voice " + std::to_string(nvoice + 1) + name + contstr);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " Add Voice " + to_string(nvoice + 1) + name + contstr);
 }
 
 
-std::string DataText::resolveSub(CommandBlock *getData, bool addValue)
+string DataText::resolveSub(CommandBlock *getData, bool addValue)
 {
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -1814,16 +1817,16 @@ std::string DataText::resolveSub(CommandBlock *getData, bool addValue)
     bool value_bool = YOSH::F2B(getData->data.value.F);
     if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     {
-        std::string Htype;
+        string Htype;
         if (insert == TOPLEVEL::insert::harmonicAmplitude)
             Htype = " Amplitude";
         else
             Htype = " Bandwidth";
 
-        return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + " SubSynth Harmonic " + std::to_string(control + 1) + Htype);
+        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " SubSynth Harmonic " + to_string(control + 1) + Htype);
     }
 
-    std::string name = "";
+    string name = "";
     switch (control & 0x70)
     {
         case SUBSYNTH::control::volume:
@@ -1843,7 +1846,7 @@ std::string DataText::resolveSub(CommandBlock *getData, bool addValue)
             break;
     }
 
-    std::string contstr = "";
+    string contstr = "";
     switch (control)
     {
         case SUBSYNTH::control::volume:
@@ -1947,11 +1950,11 @@ std::string DataText::resolveSub(CommandBlock *getData, bool addValue)
             showValue = false;
         }
     }
-    return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + " SubSynth " + name + contstr);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " SubSynth " + name + contstr);
 }
 
 
-std::string DataText::resolvePad(CommandBlock *getData, bool addValue)
+string DataText::resolvePad(CommandBlock *getData, bool addValue)
 {
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -1961,7 +1964,7 @@ std::string DataText::resolvePad(CommandBlock *getData, bool addValue)
 
     bool yesno = false;
     bool value_bool = YOSH::F2B(getData->data.value.F);
-    std::string name = "";
+    string name = "";
     switch (control & 0x70)
     {
         case PADSYNTH::control::volume:
@@ -1984,7 +1987,7 @@ std::string DataText::resolvePad(CommandBlock *getData, bool addValue)
             break;
     }
 
-    std::string contstr = "";
+    string contstr = "";
     switch (control)
     {
         case PADSYNTH::control::volume:
@@ -2137,15 +2140,15 @@ std::string DataText::resolvePad(CommandBlock *getData, bool addValue)
             showValue = false;
         }
     }
-    std::string isPad = "";
+    string isPad = "";
 
     if (write && ((control >= PADSYNTH::control::bandwidth && control <= PADSYNTH::control::spectrumMode) || (control >= PADSYNTH::control::overtoneParameter1 && control <= PADSYNTH::control::sampleSize)))
         isPad += " - Need to Apply";
-    return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + " PadSynth " + name + contstr + isPad);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " PadSynth " + name + contstr + isPad);
 }
 
 
-std::string DataText::resolveOscillator(CommandBlock *getData, bool)
+string DataText::resolveOscillator(CommandBlock *getData, bool)
 {
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -2155,8 +2158,8 @@ std::string DataText::resolveOscillator(CommandBlock *getData, bool)
     unsigned char insert = getData->data.insert;
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
-    std::string isPad = "";
-    std::string eng_name;
+    string isPad = "";
+    string eng_name;
     if (engine == PART::engine::padSynth)
     {
         eng_name = " Padsysnth";
@@ -2170,21 +2173,21 @@ std::string DataText::resolveOscillator(CommandBlock *getData, bool)
             eng = engine - PART::engine::addMod1;
         else
             eng = engine - PART::engine::addVoice1;
-        eng_name = " Add Voice " + std::to_string(eng + 1);
+        eng_name = " Add Voice " + to_string(eng + 1);
         if (engine >= PART::engine::addMod1)
             eng_name += " Modulator";
     }
 
     if (insert == TOPLEVEL::insert::harmonicAmplitude)
     {
-        return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + eng_name + " Harmonic " + std::to_string((int)control + 1) + " Amplitude" + isPad);
+        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + " Harmonic " + to_string((int)control + 1) + " Amplitude" + isPad);
     }
     else if(insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     {
-        return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + eng_name + " Harmonic " + std::to_string((int)control + 1) + " Phase" + isPad);
+        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + " Harmonic " + to_string((int)control + 1) + " Phase" + isPad);
     }
 
-    std::string name;
+    string name;
     if (control >= OSCILLATOR::control::clearHarmonics || control <= OSCILLATOR::control::harmonicRandomnessType)
         name = " Oscillator";
     else if (control >= OSCILLATOR::control::harmonicShift)
@@ -2194,7 +2197,7 @@ std::string DataText::resolveOscillator(CommandBlock *getData, bool)
     else
         name = " Base Funct";
 
-    std::string contstr;
+    string contstr;
     switch (control)
     {
         case OSCILLATOR::control::phaseRandomness:
@@ -2305,11 +2308,11 @@ std::string DataText::resolveOscillator(CommandBlock *getData, bool)
             contstr = "Unrecognised";
     }
 
-    return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + eng_name + name + contstr + isPad);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + name + contstr + isPad);
 }
 
 
-std::string DataText::resolveResonance(CommandBlock *getData, bool addValue)
+string DataText::resolveResonance(CommandBlock *getData, bool addValue)
 {
     int value = int(getData->data.value.F + 0.5f);
     unsigned char type = getData->data.type;
@@ -2321,8 +2324,8 @@ std::string DataText::resolveResonance(CommandBlock *getData, bool addValue)
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
     bool yesno = false;
-    std::string name;
-    std::string isPad = "";
+    string name;
+    string isPad = "";
     if (engine == PART::engine::padSynth)
     {
         name = " PadSynth";
@@ -2336,12 +2339,12 @@ std::string DataText::resolveResonance(CommandBlock *getData, bool addValue)
     {
         if (write == true && engine == PART::engine::padSynth)
             isPad = " - Need to Apply";
-        return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + name + " Resonance Point " + std::to_string(control + 1) + isPad);
+        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Resonance Point " + to_string(control + 1) + isPad);
     }
 
     if (write == true && engine == PART::engine::padSynth && control != 104)
         isPad = " - Need to Apply";
-    std::string contstr;
+    string contstr;
     switch (control)
     {
         case RESONANCE::control::maxDb:
@@ -2410,11 +2413,11 @@ std::string DataText::resolveResonance(CommandBlock *getData, bool addValue)
             showValue = false;
         }
     }
-    return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + name + " Resonance " + contstr + isPad);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Resonance " + contstr + isPad);
 }
 
 
-std::string DataText::resolveLFO(CommandBlock *getData, bool)
+string DataText::resolveLFO(CommandBlock *getData, bool)
 {
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -2422,8 +2425,8 @@ std::string DataText::resolveLFO(CommandBlock *getData, bool)
     unsigned char engine = getData->data.engine;
     unsigned char insertParam = getData->data.parameter;
 
-    std::string name;
-    std::string lfo;
+    string name;
+    string lfo;
 
     if (engine == PART::engine::addSynth)
         name = " AddSynth";
@@ -2432,7 +2435,7 @@ std::string DataText::resolveLFO(CommandBlock *getData, bool)
     else if (engine >= PART::engine::addVoice1)
     {
         int nvoice = engine - PART::engine::addVoice1;
-        name = " Add Voice " + std::to_string(nvoice + 1);
+        name = " Add Voice " + to_string(nvoice + 1);
     }
 
     switch (insertParam)
@@ -2448,7 +2451,7 @@ std::string DataText::resolveLFO(CommandBlock *getData, bool)
             break;
     }
 
-    std::string contstr;
+    string contstr;
     switch (control)
     {
         case LFOINSERT::control::speed:
@@ -2484,11 +2487,11 @@ std::string DataText::resolveLFO(CommandBlock *getData, bool)
             contstr = "Unrecognised";
     }
 
-    return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + name + lfo + " LFO " + contstr);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + lfo + " LFO " + contstr);
 }
 
 
-std::string DataText::resolveFilter(CommandBlock *getData, bool)
+string DataText::resolveFilter(CommandBlock *getData, bool)
 {
     int value_int = int(getData->data.value.F);
     unsigned char control = getData->data.control;
@@ -2500,7 +2503,7 @@ std::string DataText::resolveFilter(CommandBlock *getData, bool)
     int nformant = getData->data.parameter;
     int nvowel = getData->data.miscmsg;
 
-    std::string name;
+    string name;
 
     if (engine == PART::engine::addSynth)
         name = " AddSynth";
@@ -2509,8 +2512,8 @@ std::string DataText::resolveFilter(CommandBlock *getData, bool)
     else if (engine == PART::engine::padSynth)
         name = " PadSynth";
     else if (engine >= PART::engine::addVoice1)
-        name = " Adsynth Voice " + std::to_string((engine - PART::engine::addVoice1) + 1);
-    std::string contstr;
+        name = " Adsynth Voice " + to_string((engine - PART::engine::addVoice1) + 1);
+    string contstr;
     switch (control)
     {
         case FILTERINSERT::control::centerFrequency:
@@ -2533,7 +2536,7 @@ std::string DataText::resolveFilter(CommandBlock *getData, bool)
             break;
         case FILTERINSERT::control::stages:
             showValue = false;
-            contstr = "Stages " + std::to_string(value_int + 1);
+            contstr = "Stages " + to_string(value_int + 1);
             break;
         case FILTERINSERT::control::baseType:
             contstr = "Filt Type";
@@ -2598,17 +2601,17 @@ std::string DataText::resolveFilter(CommandBlock *getData, bool)
             showValue = false;
             contstr = "Unrecognised";
     }
-    std::string extra = "";
+    string extra = "";
     if (control >= FILTERINSERT::control::formantFrequency && control <= FILTERINSERT::control::formantAmplitude)
-        extra ="Vowel " + std::to_string(nvowel) + " Formant " + std::to_string(nformant) + " ";
+        extra ="Vowel " + to_string(nvowel) + " Formant " + to_string(nformant) + " ";
     else if (control == FILTERINSERT::control::vowelPositionInSequence)
-        extra = "Seq Pos " + std::to_string(nseqpos) + " ";
+        extra = "Seq Pos " + to_string(nseqpos) + " ";
 
-    return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(kititem + 1) + name + " Filter " + extra + contstr);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Filter " + extra + contstr);
 }
 
 
-std::string DataText::resolveEnvelope(CommandBlock *getData, bool)
+string DataText::resolveEnvelope(CommandBlock *getData, bool)
 {
     int value = lrint(getData->data.value.F);
     bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
@@ -2620,8 +2623,8 @@ std::string DataText::resolveEnvelope(CommandBlock *getData, bool)
     unsigned char insertParam = getData->data.parameter;
     int miscmsg = getData->data.miscmsg;
 
-    std::string env;
-    std::string name;
+    string env;
+    string name;
     if (engine == PART::engine::addSynth)
         name = " AddSynth";
     else if (engine == PART::engine::subSynth)
@@ -2637,7 +2640,7 @@ std::string DataText::resolveEnvelope(CommandBlock *getData, bool)
             nvoice = engine - PART::engine::addMod1;
         else
             nvoice = engine - PART::engine::addVoice1;
-        name += std::to_string(nvoice + 1);
+        name += to_string(nvoice + 1);
         if (engine >= PART::engine::addMod1)
             name += " Modulator";
     }
@@ -2662,23 +2665,23 @@ std::string DataText::resolveEnvelope(CommandBlock *getData, bool)
     {
         if (!write)
         {
-            return ("Freemode add/remove is write only. Current points " + std::to_string(int(miscmsg)));
+            return ("Freemode add/remove is write only. Current points " + to_string(int(miscmsg)));
         }
         if (miscmsg != UNUSED)
-            return ("Part " + std::to_string(int(npart + 1)) + " Kit " + std::to_string(int(kititem + 1)) + name  + env + " Env Added Freemode Point " + std::to_string(int(control & 0x3f)) + " X increment " + std::to_string(int(miscmsg)) + " Y");
+            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Added Freemode Point " + to_string(int(control & 0x3f)) + " X increment " + to_string(int(miscmsg)) + " Y");
         else
         {
             showValue = false;
-            return ("Part " + std::to_string(int(npart + 1)) + " Kit " + std::to_string(int(kititem + 1)) + name  + env + " Env Removed Freemode Point " +  std::to_string(int(control)) + "  Remaining " +  std::to_string(value));
+            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Removed Freemode Point " +  to_string(int(control)) + "  Remaining " +  to_string(value));
         }
     }
 
     if (insert == TOPLEVEL::insert::envelopePointChange)
     {
-        return ("Part " + std::to_string(int(npart + 1)) + " Kit " + std::to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  std::to_string(int(control)) + " X increment " + std::to_string(int(miscmsg)) + " Y");
+        return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control)) + " X increment " + to_string(int(miscmsg)) + " Y");
     }
 
-    std::string contstr;
+    string contstr;
     switch (control)
     {
         case ENVELOPEINSERT::control::attackLevel:
@@ -2732,11 +2735,11 @@ std::string DataText::resolveEnvelope(CommandBlock *getData, bool)
             contstr = "Unrecognised";
     }
 
-    return ("Part " + std::to_string(npart + 1) + " Kit " + std::to_string(int(kititem + 1)) + name  + env + " Env " + contstr);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env " + contstr);
 }
 
 
-std::string DataText::resolveEffects(CommandBlock *getData, bool addValue)
+string DataText::resolveEffects(CommandBlock *getData, bool addValue)
 {
     int value = lrint(getData->data.value.F);
     unsigned char control = getData->data.control;
@@ -2746,14 +2749,14 @@ std::string DataText::resolveEffects(CommandBlock *getData, bool addValue)
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
 
-    std::string name;
-    std::string actual;
+    string name;
+    string actual;
     if (npart == TOPLEVEL::section::systemEffects)
         name = "System";
     else if (npart == TOPLEVEL::section::insertEffects)
         name = "Insert";
     else
-        name = "Part " + std::to_string(npart + 1);
+        name = "Part " + to_string(npart + 1);
 
     if (kititem == EFFECT::type::dynFilter && getData->data.insert != UNUSED)
     {
@@ -2761,15 +2764,15 @@ std::string DataText::resolveEffects(CommandBlock *getData, bool addValue)
             name = "System";
         else if (npart == TOPLEVEL::section::insertEffects)
             name = "Insert";
-        else name = "Part " + std::to_string(npart + 1);
-        name += " Effect " + std::to_string(effnum + 1);
+        else name = "Part " + to_string(npart + 1);
+        name += " Effect " + to_string(effnum + 1);
 
-        return (name + " DynFilter ~ Filter Internal Control " + std::to_string(control));
+        return (name + " DynFilter ~ Filter Internal Control " + to_string(control));
     }
 
-    name += " Effect " + std::to_string(effnum + 1);
+    name += " Effect " + to_string(effnum + 1);
 
-    std::string effname = "";
+    string effname = "";
     if (npart < NUM_MIDI_PARTS && (control == PART::control::effectNumber || control == PART::control::effectDestination || control == PART::control::effectBypass))
     {
         if (control == PART::control::effectNumber)
@@ -2792,20 +2795,20 @@ std::string DataText::resolveEffects(CommandBlock *getData, bool addValue)
     }
     else if (npart >= TOPLEVEL::section::systemEffects && kititem == UNUSED)
     {
-        std::string contstr;
-        std::string second = "";
+        string contstr;
+        string second = "";
         if (npart == TOPLEVEL::section::systemEffects)
         {
             name = "System ";
             if (insert == TOPLEVEL::insert::systemEffectSend)
             {
-                contstr = "from Effect " + std::to_string(effnum + 1);
-                second = " to Effect " + std::to_string(control + 1);
+                contstr = "from Effect " + to_string(effnum + 1);
+                second = " to Effect " + to_string(control + 1);
                 return (name + contstr + second);
             }
             if (control == EFFECT::sysIns::effectEnable)
             {
-                contstr += "effect " + std::to_string(effnum + 1);
+                contstr += "effect " + to_string(effnum + 1);
                 if (addValue)
                 {
                     showValue = false;
@@ -2828,7 +2831,7 @@ std::string DataText::resolveEffects(CommandBlock *getData, bool addValue)
             else
             {
                 contstr += "Part ";
-                second = std::to_string(value + 1);
+                second = to_string(value + 1);
             }
             showValue = false;
             return ("Send " + name + contstr + second);
@@ -2840,7 +2843,7 @@ std::string DataText::resolveEffects(CommandBlock *getData, bool addValue)
             return (name + effname);
         }
     }
-    std::string contstr = "";
+    string contstr = "";
     if ((npart < NUM_MIDI_PARTS && control == PART::control::effectType) || (npart > TOPLEVEL::section::main && kititem == UNUSED && control == EFFECT::sysIns::effectType))
     {
         name += " set to";
@@ -2848,7 +2851,7 @@ std::string DataText::resolveEffects(CommandBlock *getData, bool addValue)
         showValue = false;
     }
     else
-        contstr = " Control " + std::to_string(control + 1);
+        contstr = " Control " + to_string(control + 1);
 
     switch (kititem)
     {
@@ -2877,7 +2880,7 @@ std::string DataText::resolveEffects(CommandBlock *getData, bool addValue)
         case EFFECT::type::eq:
             effname = " EQ";
             if (control > 1)
-                contstr = " (Band " + std::to_string(int(parameter)) + ") Control " + std::to_string(control);
+                contstr = " (Band " + to_string(int(parameter)) + ") Control " + to_string(control);
             break;
         case EFFECT::type::dynFilter:
             effname = " DynFilter";
@@ -2890,7 +2893,7 @@ std::string DataText::resolveEffects(CommandBlock *getData, bool addValue)
 
     if (kititem != EFFECT::type::eq && control == EFFECT::control::preset)
     {
-        contstr = " Preset " + std::to_string (lrint(value) + 1);
+        contstr = " Preset " + to_string (lrint(value) + 1);
         showValue = false;
     }
 

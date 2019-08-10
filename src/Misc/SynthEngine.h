@@ -33,10 +33,10 @@
 #include <cstdlib>
 #include <semaphore.h>
 #include <jack/ringbuffer.h>
+#include <string>
+#include <vector>
+#include <list>
 
-using namespace std;
-
-#include "Misc/MiscFuncs.h"
 #include "Misc/RandomGen.h"
 #include "Misc/SynthHelper.h"
 #include "Misc/Microtonal.h"
@@ -50,8 +50,8 @@ using namespace std;
 #include "Params/PresetsStore.h"
 #include "Params/UnifiedPresets.h"
 
-class EffectMgr;
 class Part;
+class EffectMgr;
 class XMLwrapper;
 class Controller;
 class TextMsgBuffer;
@@ -60,7 +60,10 @@ class TextMsgBuffer;
 class MasterUI;
 #endif
 
-class SynthEngine : private SynthHelper, MiscFuncs, FileMgr
+using std::string;
+
+
+class SynthEngine : private SynthHelper, FileMgr
 {
     private:
         unsigned int uniqueId;
@@ -96,7 +99,7 @@ class SynthEngine : private SynthHelper, MiscFuncs, FileMgr
         bool saveBanks(void);
         void newHistory(string name, int group);
         void addHistory(string name, int group);
-        vector<string> *getHistory(int group);
+        std::vector<string> *getHistory(int group);
         void setHistoryLock(int group, bool status);
         bool getHistoryLock(int group);
         string lastItemSeen(int group);
@@ -131,13 +134,13 @@ class SynthEngine : private SynthHelper, MiscFuncs, FileMgr
         bool ReadPartPortamento(int npart);
         void SetPartKeyMode(int npart, int mode);
         int  ReadPartKeyMode(int npart);
-        void cliOutput(list<string>& msg_buf, unsigned int lines);
-        void ListPaths(list<string>& msg_buf);
-        void ListBanks(int rootNum, list<string>& msg_buf);
-        void ListInstruments(int bankNum, list<string>& msg_buf);
-        void ListVectors(list<string>& msg_buf);
-        bool SingleVector(list<string>& msg_buf, int chan);
-        void ListSettings(list<string>& msg_buf);
+        void cliOutput(std::list<string>& msg_buf, unsigned int lines);
+        void ListPaths(std::list<string>& msg_buf);
+        void ListBanks(int rootNum, std::list<string>& msg_buf);
+        void ListInstruments(int bankNum, std::list<string>& msg_buf);
+        void ListVectors(std::list<string>& msg_buf);
+        bool SingleVector(std::list<string>& msg_buf, int chan);
+        void ListSettings(std::list<string>& msg_buf);
         int SetSystemValue(int type, int value);
         int LoadNumbered(unsigned char group, unsigned char entry);
         bool vectorInit(int dHigh, unsigned char chan, int par);

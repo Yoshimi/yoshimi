@@ -51,8 +51,12 @@ decl {\#include "UI/MiscGui.h"
     \#include "SUBnoteUI.h"
     \#include "PADnoteUI.h"
     \#include "UI/WidgetMWSlider.h"
-    \#include "Params/Controller.h"
-    \#include "Misc/MiscFuncs.h"} {public global
+    \#include "Params/Controller.h"} {public global
+}
+
+decl {\#include "Misc/FormatFuncs.h"
+    using func::asHexString;
+} {private local
 }
 
 decl {\#include "Misc/TextMsgBuffer.h"
@@ -290,7 +294,7 @@ class MidiLearnKitItem {: {public Fl_Group}
   }
 }
 
-class MidiLearnUI {: {private MiscFuncs, FileMgr}
+class MidiLearnUI {: {private FileMgr}
 } {
   Function {make_window()} {} {
     Fl_Window midilearnwindow {

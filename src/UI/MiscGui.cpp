@@ -24,8 +24,6 @@
 #include "MiscGui.h"
 #include "MasterUI.h"
 
-#include <iostream>
-
 #include <FL/Fl.H>
 #include <FL/fl_draw.H>
 

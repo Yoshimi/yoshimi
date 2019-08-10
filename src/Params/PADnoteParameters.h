@@ -27,10 +27,7 @@
 #ifndef PAD_NOTE_PARAMETERS_H
 #define PAD_NOTE_PARAMETERS_H
 
-using namespace std;
-
 #include "Params/Presets.h"
-#include "Misc/MiscFuncs.h"
 #include "Interface/FileMgr.h"
 
 class XMLwrapper;

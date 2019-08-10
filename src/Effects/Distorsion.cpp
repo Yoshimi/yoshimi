@@ -1,5 +1,5 @@
 /*
-    Distorsion.cpp - Distorsion effect
+    Distorsion.cpp - Distortion effect
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
@@ -27,10 +27,15 @@
 
 #include "Misc/SynthEngine.h"
 #include "Effects/Distorsion.h"
+#include "Misc/NumericFuncs.h"
 
-static const int PRESET_SIZE = 11;
-static const int NUM_PRESETS = 6;
-static int presets[NUM_PRESETS][PRESET_SIZE] = {
+using func::dB2rap;
+
+
+namespace { // Implementation details...
+    const int PRESET_SIZE = 11;
+    const int NUM_PRESETS = 6;
+    int presets[NUM_PRESETS][PRESET_SIZE] = {
         // Overdrive 1
         { 127, 64, 35, 56, 70, 0, 0, 96, 0, 0, 0 },
         // Overdrive 2
@@ -41,9 +46,11 @@ static int presets[NUM_PRESETS][PRESET_SIZE] = {
         { 64, 64, 35, 85, 62, 1, 0, 127, 118, 1, 0 },
         // Guitar Amp
         { 127, 64, 35, 63, 75, 2, 0, 55, 0, 0, 0 },
-        // Quantisize
+        // Quantise
         { 127, 64, 35, 88, 75, 4, 0, 127, 0, 1, 0 }
-};
+    };
+}
+
 
 Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
@@ -260,7 +267,7 @@ void Distorsion::changepar(int npar, unsigned char value)
 
         case 5:
             if (value > 13)
-                Ptype = 13; // this must be increased if more distorsion types are added
+                Ptype = 13; // this must be increased if more distortion types are added
             else
                 Ptype = value;
             break;

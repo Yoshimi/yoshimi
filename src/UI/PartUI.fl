@@ -44,8 +44,7 @@ decl {\#include "UI/MiscGui.h"
     \#include "SUBnoteUI.h"
     \#include "PADnoteUI.h"
     \#include "UI/WidgetMWSlider.h"
-    \#include "Params/Controller.h"
-    \#include "Misc/MiscFuncs.h"} {public global
+    \#include "Params/Controller.h"} {public global
 }
 
 decl {\#include "Misc/Part.h"
@@ -53,6 +52,11 @@ decl {\#include "Misc/Part.h"
 }
 
 decl {\#include "MasterUI.h"} {private global
+}
+
+decl {\#include "Misc/FormatFuncs.h"
+    using func::asString;
+} {private local
 }
 
 decl {\#include "Misc/TextMsgBuffer.h"
@@ -63,7 +67,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
 } {private local
 }
 
-class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
+class PartSysEffSend {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window syseffsend {
@@ -121,7 +125,7 @@ class PartUI_ {} {
   }
 }
 
-class PartKitItem {: {public Fl_Group, private MiscFuncs}
+class PartKitItem {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window partkititem {
@@ -393,7 +397,7 @@ class PartKitItem {: {public Fl_Group, private MiscFuncs}
   }
 }
 
-class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {: {public Fl_Group, PartUI_}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {

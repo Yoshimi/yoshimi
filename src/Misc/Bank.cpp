@@ -40,13 +40,22 @@
 #include <vector>
 #include <algorithm>
 
-using namespace std;
-
 #include "Misc/XMLwrapper.h"
 #include "Misc/Config.h"
 #include "Misc/Bank.h"
 #include "Interface/FileMgr.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/FormatFuncs.h"
+
+using func::asString;
+using func::string2int;
+using func::findSplitPoint;
+
+using std::to_string;
+using std::string;
+using std::cout;
+using std::endl;
+
 
 Bank::Bank(SynthEngine *_synth) :
     defaultinsname(string(" ")),
@@ -163,22 +172,22 @@ bool Bank::emptyslot(size_t rootID, size_t bankID, unsigned int ninstrument)
 
 
 // Removes the instrument from the bank
-std::string Bank::clearslot(unsigned int ninstrument, size_t rootID, size_t bankID)
+string Bank::clearslot(unsigned int ninstrument, size_t rootID, size_t bankID)
 {
     bool chk = true;
     bool chk2 = true; // to stop complaints
     if (emptyslot(rootID, bankID, ninstrument)) // this is not an error
         return (". None found at slot " + to_string(ninstrument + 1));
 
-    std::string tmpfile = FileMgr::setExtension(getFullPath(rootID, bankID, ninstrument), EXTEN::yoshInst);
+    string tmpfile = FileMgr::setExtension(getFullPath(rootID, bankID, ninstrument), EXTEN::yoshInst);
     if (FileMgr::isRegFile(tmpfile))
         chk = FileMgr::deleteFile(tmpfile);
 
     tmpfile = FileMgr::setExtension(tmpfile, EXTEN::zynInst);
     if (FileMgr::isRegFile(tmpfile))
         chk2 = FileMgr::deleteFile(tmpfile);
-    std::string instName = getname(ninstrument, bankID, rootID);
-    std::string result;
+    string instName = getname(ninstrument, bankID, rootID);
+    string result;
     if (chk && chk2)
     {
         deletefrombank(rootID, bankID, ninstrument);
@@ -393,7 +402,7 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
 
 
 // Creates an external bank and copies in the contents of the IDd one
-std::string Bank::exportBank(string exportdir, size_t rootID, unsigned int bankID)
+string Bank::exportBank(string exportdir, size_t rootID, unsigned int bankID)
 {
     string name = "";
     string sourcedir = "";
@@ -461,7 +470,7 @@ std::string Bank::exportBank(string exportdir, size_t rootID, unsigned int bankI
 
 
 // Creates a new bank and copies in the contents of the external one
-std::string Bank::importBank(string importdir, size_t rootID, unsigned int bankID)
+string Bank::importBank(string importdir, size_t rootID, unsigned int bankID)
 {
     string name = "";
     bool ok = true;
@@ -624,7 +633,7 @@ bool Bank::newbankfile(string newbankdir, size_t rootID)
 
 
 // Removes a bank and all its contents
-std::string Bank::removebank(unsigned int bankID, size_t rootID)
+string Bank::removebank(unsigned int bankID, size_t rootID)
 {
     if (rootID == UNUSED)
         rootID = synth->getRuntime().currentRoot;
@@ -640,8 +649,8 @@ std::string Bank::removebank(unsigned int bankID, size_t rootID)
     bool ck1 = true;
     bool ck2 = true;
     int chk = 0;
-    std::string name;
-    std::string failed;
+    string name;
+    string failed;
     for (int inst = 0; inst < BANK_SIZE; ++ inst)
     {
         if (!roots [rootID].banks [bankID].instruments [inst].name.empty())
@@ -688,7 +697,7 @@ std::string Bank::removebank(unsigned int bankID, size_t rootID)
 
 
 // Swaps a slot with another
-std::string Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t bank2, size_t root1, size_t root2)
+string Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t bank2, size_t root1, size_t root2)
 {
     if (n1 == n2 && bank1 == bank2 && root1 == root2)
         return " Can't swap with itself!";
@@ -780,10 +789,10 @@ std::string Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_
 
 
 // Intelligently moves or swaps banks preserving instrument details
-std::string Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t firstRoot, size_t secondRoot)
+string Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t firstRoot, size_t secondRoot)
 {
-    std::string firstname;
-    std::string secondname;
+    string firstname;
+    string secondname;
     int moveType = 0;
 
     if (firstID == secondID && firstRoot == secondRoot)
@@ -909,7 +918,7 @@ std::string Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t 
         return ("ped " + firstname + " with " + secondname);
 
     int destination;
-    std::string type = "slot ";
+    string type = "slot ";
     if (firstRoot == secondRoot)
     {
         if (moveType == 1)
@@ -1149,7 +1158,7 @@ void Bank::addDefaultRootDirs()
         "/usr/local/share/yoshimi/banks",
         "/usr/share/zynaddsubfx/banks",
         "/usr/local/share/zynaddsubfx/banks",
-        std::string(getenv("HOME")) + "/banks",
+        string(getenv("HOME")) + "/banks",
         FileMgr::localPath("/banks"),
         "end"
     };

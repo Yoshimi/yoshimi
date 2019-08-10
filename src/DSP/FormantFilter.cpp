@@ -25,8 +25,12 @@
 
 #include <fftw3.h>
 
-#include "Misc/SynthEngine.h"
 #include "DSP/FormantFilter.h"
+#include "Misc/SynthEngine.h"
+#include "Misc/NumericFuncs.h"
+
+using func::dB2rap;
+
 
 FormantFilter::FormantFilter(FilterParams *pars, SynthEngine *_synth):
     synth(_synth)

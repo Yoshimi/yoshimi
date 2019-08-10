@@ -25,14 +25,13 @@
     Modified May 2019
 */
 
-#include <cmath>
-#include <iostream>
-
-using namespace std;
-
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/NumericFuncs.h"
 #include "Params/FilterParams.h"
+
+using func::rap2dB;
+
 
 FilterParams::FilterParams(unsigned char Ptype_, unsigned char Pfreq_, unsigned  char Pq_, unsigned char Pfreqtrackoffset_, SynthEngine *_synth) :
     Presets(_synth),

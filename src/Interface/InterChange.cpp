@@ -28,7 +28,8 @@
 
 #include "Interface/InterChange.h"
 #include "Interface/Data2Text.h"
-#include "Misc/MiscFuncs.h"
+#include "Misc/NumericFuncs.h"
+#include "Misc/FormatFuncs.h"
 #include "Misc/Microtonal.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/Part.h"
@@ -47,9 +48,17 @@
     #include "MasterUI.h"
 #endif
 
+using func::bitSet;
+using func::bitClear;
+using func::nearestPowerOf2;
+
+using func::asString;
+
+
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
 extern SynthEngine *firstSynth;
 
+// used by main.cpp and SynthEngine.cpp
 std::string singlePath;
 std::string runGui;
 int startInstance = 0;
@@ -716,7 +725,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     int count = wanted + 2;
                     manfile = manfile.substr(0, pos);
                     std::string path = "";
-                    while (path == "" && count >= 0) // scan current then older varsions
+                    while (path == "" && count >= 0) // scan current first, then older versions
                     {
                         --count;
                         path = findfile("/usr/", (manfile + std::to_string(count)).c_str(), "pdf");

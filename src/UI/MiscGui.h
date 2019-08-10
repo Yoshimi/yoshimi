@@ -23,7 +23,6 @@
 #define MISCGUI_H
 
 #include "Misc/SynthEngine.h"
-#include "Misc/MiscFuncs.h"
 
 enum ValueType {
     VC_plainValue,
@@ -118,7 +117,7 @@ ValueType getLFOdepthType(int group);
 ValueType getFilterFreqType(int type);
 ValueType getFilterFreqTrackType(int offset);
 
-class GuiUpdates: public MiscFuncs{
+class GuiUpdates {
 
 public:
     void read_updates(SynthEngine *synth);

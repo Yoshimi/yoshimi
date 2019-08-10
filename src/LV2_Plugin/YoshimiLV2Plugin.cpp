@@ -31,11 +31,6 @@
 #ifdef GUI_FLTK
     #include "MasterUI.h"
 #endif
-#include <math.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
 
 
 #define YOSHIMI_STATE_URI "http://yoshimi.sourceforge.net/lv2_plugin#state"
@@ -56,7 +51,7 @@
 #define YOSHIMI_LV2_STATE__StateChanged      "http://lv2plug.in/ns/ext/state#StateChanged"
 
 extern SynthEngine *firstSynth;
-extern int startInstance;
+
 
 typedef enum {
     LV2_OPTIONS_INSTANCE,

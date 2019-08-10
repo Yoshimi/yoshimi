@@ -25,11 +25,6 @@
 
 */
 
-#include <cstring>
-#include <cmath>
-#include <iostream>
-
-using namespace std;
 
 #include "Params/ADnoteParameters.h"
 #include "Params/SUBnoteParameters.h"
@@ -43,8 +38,14 @@ using namespace std;
 #include "Misc/Microtonal.h"
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/NumericFuncs.h"
+#include "Misc/FormatFuncs.h"
 #include "Synth/Resonance.h"
 #include "Misc/Part.h"
+
+using func::dB2rap;
+using func::findSplitPoint;
+
 
 Part::Part(Microtonal *microtonal_, FFTwrapper *fft_, SynthEngine *_synth) :
     microtonal(microtonal_),

@@ -41,9 +41,6 @@ decl {\#include <iostream>} {public local
 decl {\#include <fstream>} {public local
 }
 
-decl {using namespace std;} {public local
-}
-
 decl {\#include "UI/MiscGui.h"} {public local
 }
 
@@ -89,13 +86,16 @@ decl {\#include "MasterMiscUI.h"} {public local
 decl {\#include "Misc/SynthEngine.h"} {public local
 }
 
-decl {\#include "Misc/MiscFuncs.h"} {public local
-}
-
 decl {\#include "Interface/FileMgr.h"} {public local
 }
 
 decl {\#include "MidiLearnUI.h"} {public local
+}
+
+decl {\#include "Misc/FormatFuncs.h"
+    using func::string2uint;
+    using func::asString;
+} {private local
 }
 
 decl {\#include "Misc/TextMsgBuffer.h"

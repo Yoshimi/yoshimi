@@ -63,6 +63,12 @@ decl {\#include "Misc/SynthEngine.h"} {public local
 decl {\#include "MasterUI.h"} {private local
 }
 
+decl {\#include "Misc/FormatFuncs.h"
+    using func::string2int;
+    using func::asString;
+} {private local
+}
+
 decl {\#include "Misc/TextMsgBuffer.h"
 
     namespace \{ // Implementation details...
@@ -297,7 +303,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
 }
 
-class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
+class BankUI {: {public BankProcess_, RootProcess_}
 } {
   Function {make_window()} {} {
     Fl_Window instrumentuiwindow {

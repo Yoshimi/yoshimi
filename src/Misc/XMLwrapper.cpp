@@ -33,9 +33,13 @@
 #include "Misc/Config.h"
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/FormatFuncs.h"
 
-int xml_k = 0;
-char tabs[STACKSIZE + 2];
+using func::string2int;
+using func::string2float;
+using func::asLongString;
+using func::asString;
+
 
 const char *XMLwrapper_whitespace_callback(mxml_node_t *node, int where)
 {
@@ -54,6 +58,7 @@ const char *XMLwrapper_whitespace_callback(mxml_node_t *node, int where)
 
 XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
     stackpos(0),
+    xml_k(0),
     isYoshi(_isYoshi),
     synth(_synth)
 {

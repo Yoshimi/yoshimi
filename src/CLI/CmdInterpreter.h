@@ -23,11 +23,10 @@
 
 
 
-#include "Misc/MiscFuncs.h"
 #include "Misc/SynthEngine.h"
 #include "Interface/TextLists.h"
 
-class MiscCli : public MiscFuncs
+class MiscCli
 {
     public:
         bool lineEnd(char *point, unsigned char controlType);
