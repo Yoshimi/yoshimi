@@ -237,6 +237,8 @@ static std::string partlist [] = {
     "PRogram <[n2]/[s] [n3]>",  "loads instrument ID - CLear sets default,",
     "","Group n3 selects from group list",
     "NAme <s>",            "sets the display name the part can be saved with",
+    "Humanise Pitch [n]",  "adds a small random pitch change at note_on",
+    "Humanise Velocity [n]",  "adds a small random velocity change at note_on",
     "Channel <n2>",        "MIDI channel (> 32 disables, > 16 note off only)",
     "Destination <s2>",    "jack audio destination (Main, Part, Both)",
     "kit mode entries","",

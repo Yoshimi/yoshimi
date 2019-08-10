@@ -1645,6 +1645,12 @@ float Part::getLimits(CommandBlock *getData)
             max = 50;
             break;
 
+        case PART::control::humanvelocity:
+            type |= learnable;
+            def = 0;
+            max = 50;
+            break;
+
         case PART::control::drumMode:
             def = 0;
             max = 1;

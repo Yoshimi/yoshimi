@@ -1525,11 +1525,11 @@ Offset}
         }
       }
       Fl_Value_Slider humanise {
-        label Humanise
+        label Detune
         callback {//
 
         send_data(0, PART::control::humanise, o->value(), TOPLEVEL::type::Integer);}
-        tooltip {Random detune of whole part in cents} xywh {8 337 201 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 8 maximum 50 step 1
+        tooltip {Random detune of whole part in cents} xywh {12 337 201 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 8 maximum 50 step 1
         code0 {o->value(part->Pfrand);}
         class mwheel_val_slider_rev
       }
@@ -1538,14 +1538,21 @@ Offset}
         callback {//
 
         send_data(0, PART::control::humanvelocity, o->value(), TOPLEVEL::type::Integer);}
-        tooltip {Random percentage velocity attenuation of whole part} xywh {8 359 201 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 8 maximum 50 step 1
+        tooltip {Random percentage velocity attenuation of whole part} xywh {12 359 201 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 8 maximum 50 step 1
         code0 {o->value(part->Pvelrand);}
         class mwheel_val_slider_rev
       }
       Fl_Button {} {
         label Close
         callback {instrumenteditwindow->hide();}
-        xywh {306 354 80 21} box THIN_UP_BOX labelfont 1 labelsize 13
+        xywh {294 358 80 21} box THIN_UP_BOX labelfont 1 labelsize 13
+      }
+      Fl_Box {} {
+        xywh {0 330 269 52} box ENGRAVED_FRAME labelfont 1 align 8
+      }
+      Fl_Text_Display {} {
+        label Humanise
+        xywh {274 347 78 7} box NO_BOX labelfont 1
       }
     }
   }
