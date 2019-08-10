@@ -1524,6 +1524,9 @@ Offset}
           }
         }
       }
+      Fl_Box {} {
+        xywh {0 330 268 52} box ENGRAVED_FRAME labelfont 1 align 8
+      }
       Fl_Value_Slider humanise {
         label Detune
         callback {//
@@ -1546,9 +1549,6 @@ Offset}
         label Close
         callback {instrumenteditwindow->hide();}
         xywh {294 358 80 21} box THIN_UP_BOX labelfont 1 labelsize 13
-      }
-      Fl_Box {} {
-        xywh {0 330 269 52} box ENGRAVED_FRAME labelfont 1 align 8
       }
       Fl_Text_Display {} {
         label Humanise
