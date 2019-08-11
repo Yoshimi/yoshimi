@@ -27,7 +27,6 @@
 #ifndef PAD_NOTE_H
 #define PAD_NOTE_H
 
-#include "Misc/SynthHelper.h"
 #include "Synth/LegatoTypes.h"
 
 class PADnoteParameters;
@@ -39,7 +38,7 @@ class Controller;
 
 class SynthEngine;
 
-class PADnote : private SynthHelper
+class PADnote
 {
     public:
         PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,

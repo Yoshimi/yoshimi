@@ -30,8 +30,7 @@
 
 #include <cmath>
 #include <string>
-
-#include "Interface/FileMgr.h"
+#include "globals.h"
 
 class SynthEngine;
 class XMLwrapper;
@@ -41,7 +40,7 @@ using std::string;
 const size_t MAX_OCTAVE_SIZE = 128;
 
 
-class Microtonal : private FileMgr
+class Microtonal
 {
     public:
         Microtonal(SynthEngine *_synth): synth(_synth) { defaults(); }

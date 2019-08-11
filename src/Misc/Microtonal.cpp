@@ -35,7 +35,10 @@
 #include "Misc/Microtonal.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/FormatFuncs.h"
+#include "Misc/FileMgrFuncs.h"
 
+using file::loadText;
+using file::findLeafName;
 using func::C_lineInText;
 using std::cout;
 using std::endl;
@@ -458,7 +461,7 @@ int Microtonal::loadscl(string filename)
         for (int i = 0; i < 500; ++i)
             if (tmp[i] < 32)
                 tmp[i] = 0;
-        Pname = findleafname(filename);
+        Pname = findLeafName(filename);
         Pcomment = string(tmp);
         // loads the number of the notes
         if (loadLine(text, point, tmp, BUFFSIZ))

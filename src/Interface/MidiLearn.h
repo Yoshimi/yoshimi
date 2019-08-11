@@ -27,7 +27,6 @@
 #include <list>
 #include <string>
 
-#include "Interface/FileMgr.h"
 #include "Interface/InterChange.h"
 #include "Interface/Data2Text.h"
 
@@ -37,7 +36,7 @@ class DataText;
 
 using std::string;
 
-class MidiLearn : private FileMgr, DataText
+class MidiLearn : private DataText
 {
     public:
         MidiLearn(SynthEngine *_synth);
@@ -56,7 +55,9 @@ class MidiLearn : private FileMgr, DataText
             unsigned char insert;
             unsigned char parameter;
             unsigned char miscmsg;
-        } data;
+        };
+
+        Control data;
 
         struct LearnBlock{
             unsigned int CC;

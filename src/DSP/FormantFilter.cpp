@@ -27,8 +27,11 @@
 
 #include "DSP/FormantFilter.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/SynthHelper.h"
 #include "Misc/NumericFuncs.h"
 
+using synth::aboveAmplitudeThreshold;
+using synth::interpolateAmplitude;
 using func::dB2rap;
 
 

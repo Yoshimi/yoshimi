@@ -51,6 +51,10 @@ decl {\#include "UI/MiscGui.h"
     \#include "Params/Controller.h"} {public global
 }
 
+decl {\#include "Misc/FileMgrFuncs.h"
+} {private local
+}
+
 decl {\#include "Misc/TextMsgBuffer.h"
 
     namespace \{ // Implementation details...

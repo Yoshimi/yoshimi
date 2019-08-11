@@ -29,9 +29,6 @@ decl {\#include "MasterUI.h"} {private global
 decl {\#include "Misc/SynthEngine.h"} {public global
 }
 
-decl {\#include "Interface/FileMgr.h"} {private global
-}
-
 decl {\#include "UI/MiscGui.h"} {public local
 }
 
@@ -39,6 +36,13 @@ decl {\#include "BankUI.h"} {public local
 }
 
 decl {\#include "ParametersUI.h"} {public local
+}
+
+decl {\#include "Misc/FileMgrFuncs.h"
+    using file::findLeafName;
+    using file::setExtension;
+    using file::isRegularFile;
+} {private local
 }
 
 decl {\#include "Misc/NumericFuncs.h"
@@ -56,7 +60,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
 } {private local
 }
 
-class VectorUI {: {private FileMgr}
+class VectorUI {
 } {
   Function {make_window(void)} {} {
     Fl_Window vectorwindow {
@@ -903,12 +907,12 @@ class VectorUI {: {private FileMgr}
         return;
 
     string filename = setExtension(string(file), "xvy");
-    if (isRegFile(filename))
+    if (isRegularFile(filename))
         if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
             return;
     int pos = loadlabel[BaseChan].find("No Name");
     if (pos >=0 && pos < 2)
-        Loaded->copy_label(findleafname(filename).c_str());
+        Loaded->copy_label(findLeafName(filename).c_str());
     send_data(TOPLEVEL::action::lowPrio, MAIN::saveNamedVector, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, BaseChan, UNUSED, textMsgBuffer.push(filename));} {}
   }
   Function {clearVector(int BaseC)} {} {

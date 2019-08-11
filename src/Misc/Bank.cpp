@@ -43,9 +43,22 @@
 #include "Misc/XMLwrapper.h"
 #include "Misc/Config.h"
 #include "Misc/Bank.h"
-#include "Interface/FileMgr.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/FileMgrFuncs.h"
 #include "Misc/FormatFuncs.h"
+
+using file::make_legit_filename;
+using file::isRegularFile;
+using file::isDirectory;
+using file::renameDir;
+using file::deleteDir;
+using file::copyFile;
+using file::renameFile;
+using file::deleteFile;
+using file::findLeafName;
+using file::setExtension;
+using file::extendLocalPath;
+using file::saveText;
 
 using func::asString;
 using func::string2int;
@@ -133,17 +146,17 @@ bool Bank::setname(unsigned int ninstrument, string newname, int newslot, size_t
     string filename = "0000" + asString(slot);
 
     filename = filename.substr(filename.size() - 4, 4) + "-" + newname + EXTEN::zynInst;
-    FileMgr::legit_filename(filename);
+    make_legit_filename(filename);
 
     bool chk = false;
     bool chk2 = false;
     newfilepath += filename;
-    string oldfilepath = FileMgr::setExtension(getFullPath(oldRoot, oldBank, ninstrument), EXTEN::zynInst);
-    chk = FileMgr::renameFile(oldfilepath, newfilepath);
+    string oldfilepath = setExtension(getFullPath(oldRoot, oldBank, ninstrument), EXTEN::zynInst);
+    chk = renameFile(oldfilepath, newfilepath);
 
-    newfilepath = FileMgr::setExtension(newfilepath, EXTEN::yoshInst);
-    oldfilepath = FileMgr::setExtension(oldfilepath, EXTEN::yoshInst);
-    chk2 = FileMgr::renameFile(oldfilepath, newfilepath);
+    newfilepath = setExtension(newfilepath, EXTEN::yoshInst);
+    oldfilepath = setExtension(oldfilepath, EXTEN::yoshInst);
+    chk2 = renameFile(oldfilepath, newfilepath);
 
     if (chk == false && chk2 == false)
     {
@@ -179,13 +192,13 @@ string Bank::clearslot(unsigned int ninstrument, size_t rootID, size_t bankID)
     if (emptyslot(rootID, bankID, ninstrument)) // this is not an error
         return (". None found at slot " + to_string(ninstrument + 1));
 
-    string tmpfile = FileMgr::setExtension(getFullPath(rootID, bankID, ninstrument), EXTEN::yoshInst);
-    if (FileMgr::isRegFile(tmpfile))
-        chk = FileMgr::deleteFile(tmpfile);
+    string tmpfile = setExtension(getFullPath(rootID, bankID, ninstrument), EXTEN::yoshInst);
+    if (isRegularFile(tmpfile))
+        chk = deleteFile(tmpfile);
 
-    tmpfile = FileMgr::setExtension(tmpfile, EXTEN::zynInst);
-    if (FileMgr::isRegFile(tmpfile))
-        chk2 = FileMgr::deleteFile(tmpfile);
+    tmpfile = setExtension(tmpfile, EXTEN::zynInst);
+    if (isRegularFile(tmpfile))
+        chk2 = deleteFile(tmpfile);
     string instName = getname(ninstrument, bankID, rootID);
     string result;
     if (chk && chk2)
@@ -220,15 +233,15 @@ bool Bank::savetoslot(size_t rootID, size_t bankID, int ninstrument, int npart)
     string filename = "0000" + asString(ninstrument + 1);
     filename = filename.substr(filename.size() - 4, 4)
                + "-" + name + EXTEN::zynInst;
-    FileMgr::legit_filename(filename);
+    make_legit_filename(filename);
 
     string fullpath = filepath + filename;
     bool ok1 = true;
     bool ok2 = true;
     int saveType = synth->getRuntime().instrumentFormat;
-    if (FileMgr::isRegFile(fullpath))
+    if (isRegularFile(fullpath))
     {
-        if (!FileMgr::deleteFile(fullpath))
+        if (!deleteFile(fullpath))
         {
             synth->getRuntime().Log("saveToSlot failed to unlink " + fullpath);
             return false;
@@ -237,10 +250,10 @@ bool Bank::savetoslot(size_t rootID, size_t bankID, int ninstrument, int npart)
     if (saveType & 1) // legacy
         ok2 = synth->part[npart]->saveXML(fullpath, false);
 
-    fullpath = FileMgr::setExtension(fullpath, EXTEN::yoshInst);
-    if (FileMgr::isRegFile(fullpath))
+    fullpath = setExtension(fullpath, EXTEN::yoshInst);
+    if (isRegularFile(fullpath))
     {
-        if (!FileMgr::deleteFile(fullpath))
+        if (!deleteFile(fullpath))
         {
             synth->getRuntime().Log("saveToSlot failed to unlink " + fullpath);
             return false;
@@ -252,7 +265,7 @@ bool Bank::savetoslot(size_t rootID, size_t bankID, int ninstrument, int npart)
     if (!ok1 || !ok2)
         return false;
 
-    FileMgr::saveText(string(YOSHIMI_VERSION), filepath + force_bank_dir_file);
+    saveText(string(YOSHIMI_VERSION), filepath + force_bank_dir_file);
     addtobank(rootID, bankID, ninstrument, filename, name);
     return true;
 }
@@ -313,9 +326,9 @@ bool Bank::setbankname(unsigned int bankID, string newname)
 {
     string filename = newname;
 
-    FileMgr::legit_filename(filename);
+    make_legit_filename(filename);
     string newfilepath = getRootPath(synth->getRuntime().currentRoot) + "/" + filename;
-    if (!FileMgr::renameDir(getBankPath(synth->getRuntime().currentRoot,bankID), newfilepath))
+    if (!renameDir(getBankPath(synth->getRuntime().currentRoot,bankID), newfilepath))
     {
         synth->getRuntime().Log("Failed to rename " + getBankName(bankID)
                                + " to " + newname);
@@ -361,9 +374,9 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
         if (chkpath.at(chkpath.size() - 1) != '/')
             chkpath += "/";
         chkpath += candidate;
-        if (FileMgr::isRegFile(chkpath))
+        if (isRegularFile(chkpath))
         {
-            if (chkpath.rfind(EXTEN::zynInst) != string::npos && FileMgr::isRegFile(FileMgr::setExtension(chkpath, EXTEN::yoshInst)))
+            if (chkpath.rfind(EXTEN::zynInst) != string::npos && isRegularFile(setExtension(chkpath, EXTEN::yoshInst)))
                 continue; // don't want .xiz if there is .xiy
 
             xizpos = candidate.rfind(EXTEN::yoshInst);
@@ -420,7 +433,7 @@ string Bank::exportBank(string exportdir, size_t rootID, unsigned int bankID)
     else
         sourcedir = getRootPath(rootID) + "/" + getBankName(bankID, rootID);
 
-    if (ok && FileMgr::isDirectory(exportdir))
+    if (ok && isDirectory(exportdir))
     {
         ok = false;
         name = "Can't overwrite existing directory";
@@ -430,7 +443,7 @@ string Bank::exportBank(string exportdir, size_t rootID, unsigned int bankID)
         int result = mkdir(exportdir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
         if (result < 0)
         {
-            name = "Can't create external bank " + FileMgr::findleafname(exportdir);
+            name = "Can't create external bank " + findLeafName(exportdir);
             ok = false;
         }
         else
@@ -442,7 +455,7 @@ string Bank::exportBank(string exportdir, size_t rootID, unsigned int bankID)
             while ((fn = readdir(dir)))
             {
                 string nextfile = string(fn->d_name);
-                if (FileMgr::copyFile(sourcedir + "/" + nextfile, exportdir + "/" + nextfile))
+                if (copyFile(sourcedir + "/" + nextfile, exportdir + "/" + nextfile))
                     ++missing;
                 else
                     ++count;
@@ -497,10 +510,10 @@ string Bank::importBank(string importdir, size_t rootID, unsigned int bankID)
         }
         else
         {
-            string bankname = FileMgr::findleafname(importdir);
+            string bankname = findLeafName(importdir);
             int repeats = 0;
             string suffix = "";
-            while (FileMgr::isDirectory(getRootPath(rootID) + "/" + bankname + suffix))
+            while (isDirectory(getRootPath(rootID) + "/" + bankname + suffix))
             {
                 ++repeats;
                 suffix = "~" + to_string(repeats);
@@ -532,13 +545,13 @@ string Bank::importBank(string importdir, size_t rootID, unsigned int bankID)
                         if (hyphen > slash && (hyphen - slash) <= 4)
                             pos = stoi(nextfile.substr(slash, hyphen)) - 1;
 
-                        if (FileMgr::copyFile(importdir + "/" + nextfile, exportfile + "/" + nextfile))
+                        if (copyFile(importdir + "/" + nextfile, exportfile + "/" + nextfile))
                             missing = true;
                         string stub;
                         if (pos >= -1)
-                            stub = FileMgr::findleafname(nextfile).substr(hyphen + 1);
+                            stub = findLeafName(nextfile).substr(hyphen + 1);
                         else
-                            stub = FileMgr::findleafname(nextfile);
+                            stub = findLeafName(nextfile);
                         if (!isDuplicate(rootID, bankID, pos, nextfile))
                         {
                             if (addtobank(rootID, bankID, pos, nextfile, stub))
@@ -578,9 +591,9 @@ bool Bank::isDuplicate(size_t rootID, size_t bankID, int pos, const string filen
 {
     //cout << filename << " count " << roots [rootID].banks.count(bankID) << endl;
     string path = getRootPath(rootID) + "/" + getBankName(bankID, rootID) + "/" + filename;
-    if (FileMgr::isRegFile(setExtension(path, EXTEN::yoshInst)) && filename.rfind(EXTEN::zynInst) < string::npos)
+    if (isRegularFile(setExtension(path, EXTEN::yoshInst)) && filename.rfind(EXTEN::zynInst) < string::npos)
         return 1;
-    if (FileMgr::isRegFile(setExtension(path, EXTEN::zynInst)) && filename.rfind(EXTEN::yoshInst) < string::npos)
+    if (isRegularFile(setExtension(path, EXTEN::zynInst)) && filename.rfind(EXTEN::yoshInst) < string::npos)
     {
         InstrumentEntry &Ref = getInstrumentReference(rootID, bankID, pos);
         Ref.yoshiType = true;
@@ -627,7 +640,7 @@ bool Bank::newbankfile(string newbankdir, size_t rootID)
     string forcefile = newbankpath;
     if (forcefile.at(forcefile.size() - 1) != '/')
         forcefile += "/";
-    FileMgr::saveText(string(YOSHIMI_VERSION), forcefile + force_bank_dir_file);
+    saveText(string(YOSHIMI_VERSION), forcefile + force_bank_dir_file);
     return true;
 }
 
@@ -643,7 +656,7 @@ string Bank::removebank(unsigned int bankID, size_t rootID)
     string bankName = getBankPath(rootID, bankID);
     // ID bank and test for writeable
     string IDfile = bankName + "/.bankdir";
-    if (!FileMgr::saveText(string(YOSHIMI_VERSION), IDfile))
+    if (!saveText(string(YOSHIMI_VERSION), IDfile))
         return (" FAILED Can't delete from this location.");
 
     bool ck1 = true;
@@ -656,14 +669,14 @@ string Bank::removebank(unsigned int bankID, size_t rootID)
         if (!roots [rootID].banks [bankID].instruments [inst].name.empty())
         {
             name = setExtension(getFullPath(synth->getRuntime().currentRoot, bankID, inst), EXTEN::yoshInst);
-            if (FileMgr::isRegFile(name))
-                ck1 = FileMgr::deleteFile(name);
+            if (isRegularFile(name))
+                ck1 = deleteFile(name);
             else
                 ck1 = true;
 
             name = setExtension(name, EXTEN::zynInst);
-            if (FileMgr::isRegFile(name))
-                ck2 = FileMgr::deleteFile(name);
+            if (isRegularFile(name))
+                ck2 = deleteFile(name);
             else
                 ck2 = true;
 
@@ -673,7 +686,7 @@ string Bank::removebank(unsigned int bankID, size_t rootID)
             {
                 ++ chk;
                 if (chk == 0) // only want to name one entry
-                    failed = (" FAILED Can't remove " + FileMgr::findleafname(name) + ". Others may also still exist.");
+                    failed = (" FAILED Can't remove " + findLeafName(name) + ". Others may also still exist.");
             }
         }
     }
@@ -681,11 +694,11 @@ string Bank::removebank(unsigned int bankID, size_t rootID)
         return failed;
 
     // ID file only removed when bank cleared
-    if (FileMgr::deleteFile(IDfile))
+    if (deleteFile(IDfile))
         chk = 1;
 
     if (chk > 0)
-    chk = FileMgr::deleteDir(bankName);
+    chk = deleteDir(bankName);
     if (chk == 0)
         return (" FAILED Can't remove " + bankName + ". Unrecognised contents may still exist.");
 
@@ -822,7 +835,7 @@ string Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t first
         string tempBankPath = getRootPath(firstRoot) + "/tempfile";
         if (secondBankPath == "") // move only
         {
-            if (!FileMgr::renameDir(firstBankPath, (getRootPath(secondRoot) + "/" + firstname)))
+            if (!renameDir(firstBankPath, (getRootPath(secondRoot) + "/" + firstname)))
             {
                 synth->getRuntime().Log("move to " + to_string(secondRoot) + ": " + string(strerror(errno)), 2);
                 return (" FAILED Can't move from root " + to_string(firstRoot) + " to " + to_string(secondRoot));
@@ -830,7 +843,7 @@ string Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t first
         }
         else if(firstBankPath == "") // move only
         {
-            if (!FileMgr::renameDir(secondBankPath, (getRootPath(firstRoot) + "/" + secondname)))
+            if (!renameDir(secondBankPath, (getRootPath(firstRoot) + "/" + secondname)))
             {
                 synth->getRuntime().Log("move to " + to_string(firstRoot) + ": " + string(strerror(errno)), 2);
                 return (" FAILED Can't move from root " + to_string(secondRoot) + " to " + to_string(firstRoot));
@@ -844,21 +857,21 @@ string Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t first
             //std::cout << "second " << secondBankPath << std::endl;
             //std::cout << "newfirst " << newfirstBankPath << std::endl;
             //std::cout << "newsecond " << newsecondBankPath << std::endl;
-            FileMgr::deleteDir(tempBankPath); // just to be sure
-            if (!FileMgr::renameDir(firstBankPath, tempBankPath))
+            deleteDir(tempBankPath); // just to be sure
+            if (!renameDir(firstBankPath, tempBankPath))
             {
                 synth->getRuntime().Log("failed move to temp dir", 2);
                 return(" FAILED Can't move from root " + to_string(firstRoot) + " to temp dir");
             }
 
-            if (!FileMgr::renameDir(secondBankPath,newsecondBankPath))
+            if (!renameDir(secondBankPath,newsecondBankPath))
             {
                 synth->getRuntime().Log("failed move to " + to_string(firstRoot), 2);
                 return(" FAILED Can't move from root " + to_string(secondRoot) + " to " + to_string(firstRoot));
             }
 
 
-            if (!FileMgr::renameDir(tempBankPath, newfirstBankPath))
+            if (!renameDir(tempBankPath, newfirstBankPath))
             {
                 synth->getRuntime().Log("failed move to " + to_string(secondRoot), 2);
                 return (" FAILED Can't move from temp dir to " + to_string(secondRoot));
@@ -962,7 +975,7 @@ void Bank::scanrootdir(int root_idx)
     map<string, string> bankDirsMap;
     string rootdir = roots [root_idx].path;
 
-    if (rootdir.empty() || !FileMgr::isDirectory(rootdir))
+    if (rootdir.empty() || !isDirectory(rootdir))
         return;
     DIR *dir = opendir(rootdir.c_str());
     if (dir == NULL)
@@ -1089,7 +1102,7 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
     if (synth->getRuntime().checksynthengines)
     {
         string checkfile = setExtension(getFullPath(rootID, bankID, pos), EXTEN::yoshInst);
-        if (!FileMgr::isRegFile(checkfile))
+        if (!isRegularFile(checkfile))
             checkfile = setExtension(getFullPath(rootID, bankID, pos), EXTEN::zynInst);
         unsigned int names = 0;
         int type = 0;
@@ -1159,7 +1172,7 @@ void Bank::addDefaultRootDirs()
         "/usr/share/zynaddsubfx/banks",
         "/usr/local/share/zynaddsubfx/banks",
         string(getenv("HOME")) + "/banks",
-        FileMgr::localPath("/banks"),
+        extendLocalPath("/banks"),
         "end"
     };
     int i = 0;
@@ -1407,7 +1420,7 @@ size_t Bank::getCurrentBankID()
 size_t Bank::addRootDir(string newRootDir)
 {
    // we need the size check to prevent weird behaviour if the name is just ./
-    if(!FileMgr::isDirectory(newRootDir) || newRootDir.length() < 4)
+    if(!isDirectory(newRootDir) || newRootDir.length() < 4)
     {
         return 0;
     }

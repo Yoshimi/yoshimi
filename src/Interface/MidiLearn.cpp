@@ -23,6 +23,7 @@
 #include "Interface/MidiLearn.h"
 #include "Interface/InterChange.h"
 #include "Interface/RingBuffer.h"
+#include "Misc/FileMgrFuncs.h"
 #include "Misc/FormatFuncs.h"
 #include "Misc/TextMsgBuffer.h"
 #include "Misc/XMLwrapper.h"
@@ -33,6 +34,11 @@
 #include <string>
 #include <unistd.h>  // for usleep()
 //#include <iostream>
+
+using file::isRegularFile;
+using file::make_legit_filename;
+using file::make_legit_pathname;
+using file::setExtension;
 
 using func::asString;
 using func::asHexString;
@@ -829,7 +835,7 @@ bool MidiLearn::saveList(string name)
     }
 
     string file = setExtension(name, EXTEN::mlearn);
-    legit_pathname(file);
+    make_legit_pathname(file);
 
     synth->getRuntime().xmlType = TOPLEVEL::XML::MLearn;
     XMLwrapper *xml = new XMLwrapper(synth, true);
@@ -910,8 +916,8 @@ bool MidiLearn::loadList(string name)
         return false;
     }
     string file = setExtension(name, EXTEN::mlearn);
-    legit_pathname(file);
-    if (!isRegFile(file))
+    make_legit_pathname(file);
+    if (!isRegularFile(file))
     {
         synth->getRuntime().Log("Can't find " + file);
         return false;

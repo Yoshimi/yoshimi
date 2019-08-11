@@ -45,6 +45,7 @@
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
+#include "Misc/FileMgrFuncs.h"
 #include "Misc/NumericFuncs.h"
 #include "Misc/FormatFuncs.h"
 #include "Misc/TextMsgBuffer.h"
@@ -52,6 +53,11 @@
     #include "MasterUI.h"
 #endif
 #include "ConfBuild.h"
+
+using file::isRegularFile;
+using file::isDirectory;
+using file::extendLocalPath;
+using file::setExtension;
 
 using func::nearestPowerOf2;
 using func::asString;
@@ -67,9 +73,9 @@ namespace { // constants used in the implementation
         "Copyright 2014-2019 Will Godfrey and others";
     const string argline = "Yoshimi " + (string) YOSHIMI_VERSION;
     const char* argp_program_version = argline.c_str();
-    
+
     string stateText = "load saved state, defaults to '$HOME/" + EXTEN::config + "/yoshimi/yoshimi.state'";
-    
+
     static struct argp_option cmd_options[] = {
         {"alsa-audio",        'A',  "<device>",   1,  "use alsa audio output", 0},
         {"alsa-midi",         'a',  "<device>",   1,  "use alsa midi input", 0},
@@ -262,7 +268,7 @@ bool Config::Setup(int argc, char **argv)
 
         StateFile = fp;
         free (fp);
-        if (!isRegFile(StateFile))
+        if (!isRegularFile(StateFile))
         {
             no_state: Log("Invalid state file specified for restore " + StateFile, 2);
             return true;
@@ -473,7 +479,7 @@ bool Config::loadConfig(void)
     else
         ConfigFile += EXTEN::instance;
 
-    if (!isRegFile(baseConfig))
+    if (!isRegularFile(baseConfig))
     {
         Log("Basic configuration " + baseConfig + " not found, will use default settings");
         if (thisInstance == 0)
@@ -481,7 +487,7 @@ bool Config::loadConfig(void)
     }
 
     bool isok = true;
-    if (!isRegFile(ConfigFile))
+    if (!isRegularFile(ConfigFile))
     {
         Log("Configuration " + ConfigFile + " not found, will use default settings");
         configChanged = true; // give the user the choice
@@ -534,7 +540,7 @@ void Config::defaultPresets(void)
         "/usr/share/zynaddsubfx/presets",
         "/usr/local/share/zynaddsubfx/presets",
         string(getenv("HOME")) + "/" + string(EXTEN::config) + "/yoshimi/presets",
-        localPath("/presets"),
+        extendLocalPath("/presets"),
         "end"
     };
     int i = 0;
@@ -796,9 +802,9 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
     XMLwrapper *xml = NULL;
     bool ok = false;
 
-    if (sessionfile.size() && !isRegFile(sessionfile))
+    if (sessionfile.size() && !isRegularFile(sessionfile))
         sessionfile = setExtension(sessionfile, EXTEN::state);
-    if (!sessionfile.size() || !isRegFile(sessionfile))
+    if (!sessionfile.size() || !isRegularFile(sessionfile))
     {
         Log("Session file " + sessionfile + " not available", 2);
         goto end_game;

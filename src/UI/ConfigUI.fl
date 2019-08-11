@@ -32,9 +32,6 @@ decl {\#include <cmath>} {public local
 decl {\#include <FL/Fl_File_Chooser.H>} {public local
 }
 
-decl {\#include "Interface/FileMgr.h"} {public local
-}
-
 decl {\#include "Misc/Config.h"} {public local
 }
 
@@ -45,6 +42,10 @@ decl {\#include "Misc/Bank.h"} {private local
 }
 
 decl {\#include "MasterUI.h"} {private local
+}
+
+decl {\#include "Misc/FileMgrFuncs.h"
+} {private local
 }
 
 decl {\#include "Misc/TextMsgBuffer.h"
@@ -58,7 +59,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
 decl {extern SynthEngine *firstSynth;} {private local
 }
 
-class ConfigUI {: {private FileMgr}
+class ConfigUI {
 } {
   Function {make_window()} {} {
     Fl_Window configwindow {

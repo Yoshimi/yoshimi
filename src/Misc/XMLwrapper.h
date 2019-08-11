@@ -30,14 +30,12 @@
 #include <mxml.h>
 #include <string>
 
-#include "Interface/FileMgr.h"
-
 // max tree depth
 #define STACKSIZE 128
 
 class SynthEngine;
 
-class XMLwrapper : private FileMgr
+class XMLwrapper
 {
     public:
         XMLwrapper(SynthEngine *_synth, bool _isYoshi = false, bool includeBase = true);

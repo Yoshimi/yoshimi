@@ -32,7 +32,6 @@
 #include <list>
 
 #include "MusicIO/MusicClient.h"
-#include "Interface/FileMgr.h"
 #include "FL/Fl.H"
 
 using std::string;
@@ -40,7 +39,7 @@ using std::string;
 class XMLwrapper;
 class SynthEngine;
 
-class Config : public FileMgr
+class Config
 {
     public:
         Config(SynthEngine *_synth, int argc, char **argv);

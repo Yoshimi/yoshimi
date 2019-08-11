@@ -38,14 +38,11 @@
 #include <list>
 
 #include "Misc/RandomGen.h"
-#include "Misc/SynthHelper.h"
 #include "Misc/Microtonal.h"
 #include "Misc/Bank.h"
-#include "Misc/SynthHelper.h"
 #include "Interface/InterChange.h"
 #include "Interface/MidiLearn.h"
 #include "Interface/MidiDecode.h"
-#include "Interface/FileMgr.h"
 #include "Misc/Config.h"
 #include "Params/PresetsStore.h"
 #include "Params/UnifiedPresets.h"
@@ -63,7 +60,7 @@ class MasterUI;
 using std::string;
 
 
-class SynthEngine : private SynthHelper, FileMgr
+class SynthEngine
 {
     private:
         unsigned int uniqueId;

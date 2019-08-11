@@ -27,19 +27,25 @@
 #include <cmath>
 #include <fftw3.h>
 #include <cassert>
-#include <iostream>
-
-using namespace std;
 
 #include "Synth/Envelope.h"
+#include "Synth/ADnote.h"
 #include "Synth/LFO.h"
 #include "DSP/Filter.h"
 #include "Params/ADnoteParameters.h"
 #include "Params/Controller.h"
 #include "Misc/SynthEngine.h"
-#include "Synth/ADnote.h"
+#include "Misc/SynthHelper.h"
 
 #include "globals.h"
+
+using synth::velF;
+using synth::getDetune;
+using synth::interpolateAmplitude;
+using synth::aboveAmplitudeThreshold;
+
+using std::isgreater;
+
 
 ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
                float velocity_, int portamento_, int midinote_, bool besilent, SynthEngine *_synth) :

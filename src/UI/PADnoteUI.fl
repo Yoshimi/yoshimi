@@ -45,12 +45,16 @@ decl {\#include <FL/Fl_Box.H>
     \#include "FilterUI.h"} {private global
 }
 
-decl {\#include "Misc/SynthHelper.h"
-    \#include "ResonanceUI.h"
+decl {\#include "ResonanceUI.h"
     \#include "OscilGenUI.h"} {public global
 }
 
 decl {\#include "MasterUI.h"} {private global
+}
+
+decl {\#include "Misc/SynthHelper.h"
+    using synth::getDetune;
+} {private local
 }
 
 decl {\#include "Misc/NumericFuncs.h"
@@ -247,7 +251,7 @@ this->pars=pars;} {}
   }
 }
 
-class PADnoteUI {: {public PresetsUI_, private SynthHelper}
+class PADnoteUI {: {public PresetsUI_}
 } {
   Function {make_window()} {} {
     Fl_Window padnotewindow {

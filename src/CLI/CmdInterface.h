@@ -23,7 +23,6 @@
 #include <string>
 #include <list>
 
-#include "Interface/FileMgr.h"
 #include "CLI/CmdInterpreter.h"
 #include "Interface/InterChange.h"
 #include "Effects/EffectMgr.h"
@@ -31,7 +30,7 @@
 class TextMsgBuffer;
 
 
-class CmdInterface : private  CmdInterpreter, FileMgr
+class CmdInterface : private  CmdInterpreter
 {
     public:
         CmdInterface();

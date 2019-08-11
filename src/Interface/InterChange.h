@@ -27,7 +27,6 @@
 
 #include "globals.h"
 #include "Interface/Data2Text.h"
-#include "Interface/FileMgr.h"
 #include "Interface/RingBuffer.h"
 #include "Params/LFOParams.h"
 #include "Params/FilterParams.h"
@@ -44,7 +43,7 @@ extern std::string runGui;
 extern int startInstance;
 
 
-class InterChange : private FileMgr, DataText
+class InterChange : private DataText
 {
 
     private:

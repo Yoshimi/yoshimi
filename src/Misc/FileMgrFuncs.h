@@ -21,96 +21,49 @@
 #ifndef FILEMGR_H
 #define FILEMGR_H
 
+#include <cerrno>
+#include <fcntl.h> // this affects error reporting
+#include <sys/stat.h>
+#include <cstring>
 #include <string>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <zlib.h>
 
 #include "globals.h"
 
-namespace EXTEN
-{
-    const std::string config =        ".config";
-    const std::string instance =      ".instance";
-    const std::string bank =          ".banks";
-    const std::string history =       ".history";
-    const std::string zynInst =       ".xiz";
-    const std::string yoshInst =      ".xiy";
-    const std::string anyInst =       ".xi*";
-    const std::string patchset =      ".xmz";
-    const std::string state =         ".state";
-    const std::string scale =         ".xsz";
-    const std::string scalaTuning =   ".scl";
-    const std::string scalaKeymap =   ".kbm";
-    const std::string vector =        ".xvy";
-    const std::string mlearn =        ".xly";
-    const std::string MSwave=         ".wav";
-    const std::string window =        ".windows";
-}
+namespace EXTEN {
 
-class SynthEngine;
+using std::string;
 
-class FileMgr
-{
-    public:
-        FileMgr(){ }
-        ~FileMgr(){ };
-        bool TestFunc(int result);
+const string config =        ".config";
+const string instance =      ".instance";
+const string bank =          ".banks";
+const string history =       ".history";
+const string zynInst =       ".xiz";
+const string yoshInst =      ".xiy";
+const string anyInst =       ".xi*";
+const string patchset =      ".xmz";
+const string state =         ".state";
+const string scale =         ".xsz";
+const string scalaTuning =   ".scl";
+const string scalaKeymap =   ".kbm";
+const string vector =        ".xvy";
+const string mlearn =        ".xly";
+const string MSwave=         ".wav";
+const string window =        ".windows";
 
-        static void legit_filename(std::string& fname);
-        void legit_pathname(std::string& fname);
-        static bool isRegFile(std::string chkpath);
-        static bool isDirectory(std::string chkpath);
-        std::string findfile(std::string path, std::string filename, std::string extension);
-        static std::string findleafname(std::string name);
-        static std::string setExtension(std::string fname, std::string ext);
-        static bool copyFile(std::string source, std::string destination);
-        static std::string localPath(std::string leaf);
-        std::string saveGzipped(char *data, std::string filename, int compression);
-        ssize_t saveData(char *buff, size_t bytes, std::string filename);
-        static bool saveText(std::string text, std::string filename);
-        char *loadGzipped(std::string _filename, std::string *report);
-        std::string loadText(std::string filename);
-        bool createEmptyFile(std::string filename);
-        bool createDir(std::string filename);
-        static bool deleteFile(std::string filename);
-        static bool deleteDir(std::string filename);
-        static bool renameFile(std::string oldname, std::string newname);
-        static bool renameDir(std::string oldname, std::string newname);
-};
+}//(End)namespace EXTEN
 
-/*
-    FileMgr.cpp - all file operations
 
-    Copyright 2019 Will Godfrey
+namespace file {
 
-    This file is part of yoshimi, which is free software: you can redistribute
-    it and/or modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either version 2 of
-    the License, or (at your option) any later version.
+using std::string;
+using std::stringstream;
 
-    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
-    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
-    later) for more details.
 
-    You should have received a copy of the GNU General Public License along with
-    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
-    Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
-#include <cerrno>
-#include <iostream>
-#include <zlib.h>
-#include <sstream>
-#include <fstream>
-#include <fcntl.h> // this affects error reporting
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <string>
-#include <cstring>
-
-#include "Interface/FileMgr.h"
-
-bool FileMgr::TestFunc(int result)
+inline bool TestFunc(int result)
 {
     std::cout << "***\nTest Function " << result << "\n***" << std::endl;
     return (result > 0);
@@ -118,7 +71,7 @@ bool FileMgr::TestFunc(int result)
 
 
 // make a filename legal
-void FileMgr::legit_filename(std::string& fname)
+inline void make_legit_filename(string& fname)
 {
     for (unsigned int i = 0; i < fname.size(); ++i)
     {
@@ -135,7 +88,7 @@ void FileMgr::legit_filename(std::string& fname)
 
 
 // make a complete path extra legal
-void FileMgr::legit_pathname(std::string& fname)
+inline void make_legit_pathname(string& fname)
 {
     for (unsigned int i = 0; i < fname.size(); ++i)
     {
@@ -151,7 +104,7 @@ void FileMgr::legit_pathname(std::string& fname)
 }
 
 
-bool FileMgr::isRegFile(std::string chkpath)
+inline bool isRegularFile(string chkpath)
 {
     struct stat st;
     if (!stat(chkpath.c_str(), &st))
@@ -161,7 +114,7 @@ bool FileMgr::isRegFile(std::string chkpath)
 }
 
 
-bool FileMgr::isDirectory(std::string chkpath)
+inline bool isDirectory(string chkpath)
 {
     struct stat st;
     if (!stat(chkpath.c_str(), &st))
@@ -176,11 +129,11 @@ bool FileMgr::isDirectory(std::string chkpath)
  * and to known locations, so buffer size should be adequate
  * and it avoids dependency on unreliable macros.
  */
-std::string FileMgr::findfile(std::string path, std::string filename, std::string extension)
+inline string findFile(string path, string filename, string extension)
 {
     if (extension.at(0) != '.')
         extension = "." + extension;
-    std::string command = "find " + path + " -name " + filename + extension + " 2>/dev/null -print -quit";
+    string command = "find " + path + " -name " + filename + extension + " 2>/dev/null -print -quit";
 //#pragma message "Using '2>/dev/null' here suppresses *all* error messages"
     // it's done here to suppress warnings of invalid locations
     FILE *fp = popen(command.c_str(), "r");
@@ -190,7 +143,7 @@ std::string FileMgr::findfile(std::string path, std::string filename, std::strin
     fscanf(fp,"%[^\n]", line);
     pclose(fp);
 
-    std::string fullName(line);
+    string fullName(line);
     unsigned int name_start = fullName.rfind("/") + 1;
     // Extension might contain a dot, like e.g. '.pdf.gz'
     unsigned int name_end = fullName.length() - extension.length();
@@ -201,7 +154,7 @@ std::string FileMgr::findfile(std::string path, std::string filename, std::strin
 }
 
 
-std::string FileMgr::findleafname(std::string name)
+inline string findLeafName(string name)
 {
     unsigned int name_start;
     unsigned int name_end;
@@ -213,20 +166,20 @@ std::string FileMgr::findleafname(std::string name)
 
 
 // adds or replaces wrong extension with the right one.
-std::string FileMgr::setExtension(std::string fname, std::string ext)
+inline string setExtension(string fname, string ext)
 {
     if (ext.at(0) != '.')
         ext = "." + ext;
-    std::string tmp;                         // return value
+    string tmp;                         // return value
     size_t ext_pos = fname.rfind('.');  // period, if any
     size_t slash_pos = fname.rfind('/'); // UNIX path-separator
-    if (slash_pos == std::string::npos)
+    if (slash_pos == string::npos)
     {
-        // There are no slashes in the std::string, therefore the last period, if
+        // There are no slashes in the string, therefore the last period, if
         // any, must be at the position of the extension period.
 
         ext_pos = fname.rfind('.');
-        if (ext_pos == std::string::npos || ext_pos == 0)
+        if (ext_pos == string::npos || ext_pos == 0)
         {
             // There is no period, therefore there is no extension.
             // Append the extension.
@@ -258,7 +211,7 @@ std::string FileMgr::setExtension(std::string fname, std::string ext)
 }
 
 
-bool FileMgr::copyFile(std::string source, std::string destination)
+inline bool copyFile(string source, string destination)
 {
     std::ifstream infile (source, std::ios::in|std::ios::binary|std::ios::ate);
     if (!infile.is_open())
@@ -279,7 +232,7 @@ bool FileMgr::copyFile(std::string source, std::string destination)
 }
 
 
-std::string FileMgr::saveGzipped(char *data, std::string filename, int compression)
+inline string saveGzipped(char *data, string filename, int compression)
 {
     char options[10];
     snprintf(options, 10, "wb%d", compression);
@@ -294,7 +247,7 @@ std::string FileMgr::saveGzipped(char *data, std::string filename, int compressi
 }
 
 
-ssize_t FileMgr::saveData(char *buff, size_t bytes, std::string filename)
+inline ssize_t saveData(char *buff, size_t bytes, string filename)
 {
     //std::cout << "filename " << filename << std::endl;
     int writefile = open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC,
@@ -310,7 +263,7 @@ ssize_t FileMgr::saveData(char *buff, size_t bytes, std::string filename)
 }
 
 
-bool FileMgr::saveText(std::string text, std::string filename)
+inline bool saveText(string text, string filename)
 {
     FILE *writefile = fopen(filename.c_str(), "w");
     if (!writefile)
@@ -322,21 +275,21 @@ bool FileMgr::saveText(std::string text, std::string filename)
 }
 
 
-char *FileMgr::loadGzipped(std::string _filename, std::string *report)
+inline char * loadGzipped(string _filename, string * report)
 {
-    std::string filename = _filename;
+    string filename = _filename;
     char *data = NULL;
     gzFile gzf  = gzopen(filename.c_str(), "rb");
     if (!gzf)
     {
-        *report = ("Failed to open file " + filename + " for load: " + std::string(strerror(errno)));
+        *report = ("Failed to open file " + filename + " for load: " + string(strerror(errno)));
         return NULL;
     }
     const int bufSize = 4096;
     char fetchBuf[4097];
     int this_read;
     int total_bytes = 0;
-    std::stringstream readStream;
+    stringstream readStream;
     for (bool quit = false; !quit;)
     {
         memset(fetchBuf, 0, sizeof(fetchBuf) * sizeof(char));
@@ -349,9 +302,9 @@ char *FileMgr::loadGzipped(std::string _filename, std::string *report)
         else if (this_read < 0)
         {
             int errnum;
-            *report = ("Read error in zlib: " + std::string(gzerror(gzf, &errnum)));
+            *report = ("Read error in zlib: " + string(gzerror(gzf, &errnum)));
             if (errnum == Z_ERRNO)
-                *report = ("Filesystem error: " + std::string(strerror(errno)));
+                *report = ("Filesystem error: " + string(strerror(errno)));
             quit = true;
         }
         else if (total_bytes > 0)
@@ -371,19 +324,19 @@ char *FileMgr::loadGzipped(std::string _filename, std::string *report)
 }
 
 
-std::string FileMgr::loadText(std::string filename)
+inline string loadText(string filename)
 {
     FILE *readfile = fopen(filename.c_str(), "r");
     if (!readfile)
         return "";
 
-    std::string text = "";
+    string text = "";
     char line [1024];
     // no Yoshimi text lines should get anywhere near this!
     while (!feof(readfile))
     {
         if(fgets(line , 1024 , readfile))
-            text += std::string(line);
+            text += string(line);
     }
     fclose (readfile);
     text.erase(text.find_last_not_of(" \n\r\t")+1);
@@ -391,14 +344,14 @@ std::string FileMgr::loadText(std::string filename)
 }
 
 
-bool FileMgr::createEmptyFile(std::string filename)
+inline bool createEmptyFile(string filename)
 {
     std::ofstream file {filename};
-    return 0; // TODO need a test for sucess
+    return 0; // TODO need a test for success
 }
 
 
-bool FileMgr::createDir(std::string filename)
+inline bool createDir(string filename)
 {
     return mkdir(filename.c_str(), 0755);
 }
@@ -409,14 +362,14 @@ bool FileMgr::createDir(std::string filename)
  * linux but that may not always be true nor possibly other
  * OSs/filers, so you should always use the correct one.
  */
-bool FileMgr::deleteFile(std::string filename)
+inline bool deleteFile(string filename)
 {
     bool isOk = remove(filename.c_str()) == 0;
     return isOk;
 }
 
 
-bool FileMgr::deleteDir(std::string filename)
+inline bool deleteDir(string filename)
 {
     bool isOk = remove(filename.c_str()) == 0;
     return isOk;
@@ -428,14 +381,14 @@ bool FileMgr::deleteDir(std::string filename)
  * linux but that may not always be true nor possibly other
  * OSs/filers, so you should always use the correct one.
  */
-bool FileMgr::renameFile(std::string oldname, std::string newname)
+inline bool renameFile(string oldname, string newname)
 {
     bool isOk = rename(oldname.c_str(), newname.c_str()) == 0;
     return isOk;
 }
 
 
-bool FileMgr::renameDir(std::string oldname, std::string newname)
+inline bool renameDir(string oldname, string newname)
 {
     bool isOk = rename(oldname.c_str(), newname.c_str()) == 0;
     return isOk;
@@ -443,23 +396,25 @@ bool FileMgr::renameDir(std::string oldname, std::string newname)
 
 // replace build directory with a different
 // one in the compilation directory
-std::string FileMgr::localPath(std::string leaf)
+inline string extendLocalPath(string leaf)
 {
     char *tmpath = getcwd (NULL, 0);
     if (tmpath == NULL)
        return "";
 
-    std::string path = (std::string) tmpath;
+    string path = (string) tmpath;
     free(tmpath);
     size_t found = path.rfind("yoshimi");
-    if (found == std::string::npos)
+    if (found == string::npos)
         return "";
 
     size_t next = path.find('/', found);
-    if (next == std::string::npos)
+    if (next == string::npos)
         return "";
 
     return path.substr(0, next) + leaf;
 }
 
+
+}//(End)namespace file
 #endif /*FILEMGR_H*/

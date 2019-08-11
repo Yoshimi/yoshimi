@@ -27,7 +27,6 @@
 #define PRESETSSTORE_H
 
 #include "Misc/Config.h"
-#include "Interface/FileMgr.h"
 
 #include <string>
 
@@ -40,7 +39,7 @@ class PresetsStore;
 class SynthEngine;
 
 
-class PresetsStore : FileMgr
+class PresetsStore
 {
     public:
         PresetsStore(SynthEngine *_synth);

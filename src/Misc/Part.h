@@ -29,9 +29,7 @@
 
 #include <list>
 #include <string>
-
-#include "Interface/FileMgr.h"
-#include "Misc/SynthHelper.h"
+#include "globals.h"
 
 class ADnoteParameters;
 class SUBnoteParameters;
@@ -47,7 +45,7 @@ class FFTwrapper;
 
 class SynthEngine;
 
-class Part : private SynthHelper, FileMgr
+class Part
 {
     public:
         enum NoteStatus { KEY_OFF, KEY_PLAYING, KEY_RELEASED_AND_SUSTAINED, KEY_RELEASED };
@@ -133,7 +131,7 @@ class Part : private SynthHelper, FileMgr
         unsigned char Peffnum;
         int           Paudiodest;  // jack output routing
         std::string   Pname;
-        
+
         struct Info {
             unsigned char Ptype;
             std::string   Pauthor;

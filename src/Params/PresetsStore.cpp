@@ -28,7 +28,11 @@
 
 #include "Misc/XMLwrapper.h"
 #include "Params/PresetsStore.h"
+#include "Misc/FileMgrFuncs.h"
 #include "Misc/SynthEngine.h"
+
+using file::make_legit_filename;
+
 
 extern SynthEngine *firstSynth;
 
@@ -194,7 +198,7 @@ void PresetsStore::copypreset(XMLwrapper *xml, string type, string name)
     synth->getRuntime().xmlType = TOPLEVEL::XML::Presets;
     synth->getRuntime().Log(name);
     string tmpfilename = name;
-    legit_filename(tmpfilename);
+    make_legit_filename(tmpfilename);
     string dirname = firstSynth->getRuntime().presetsDirlist[synth->getRuntime().currentPreset];
     if (dirname.find_last_of("/") != (dirname.size() - 1))
         dirname += "/";

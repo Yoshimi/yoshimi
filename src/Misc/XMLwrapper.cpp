@@ -33,8 +33,12 @@
 #include "Misc/Config.h"
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/FileMgrFuncs.h"
 #include "Misc/FormatFuncs.h"
 
+using file::saveText;
+using file::loadGzipped;
+using file::saveGzipped;
 using func::string2int;
 using func::string2float;
 using func::asLongString;
@@ -160,7 +164,7 @@ void XMLwrapper::checkfileinformation(const std::string& filename, unsigned int&
 
 
     std::string report = "";
-    char *xmldata = FileMgr::loadGzipped(filename, &report);
+    char *xmldata = loadGzipped(filename, &report);
     if (report != "")
         synth->getRuntime().Log(report, 2);
     if (!xmldata)

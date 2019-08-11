@@ -43,9 +43,8 @@ decl {\#include <FL/Fl_Box.H>
     \#include "PresetsUI.h"} {private global
 }
 
-decl {\#include "Misc/SynthHelper.h"
+decl {\#include <string>
     \#include "ResonanceUI.h"
-    \#include <string>
     \#include "EnvelopeUI.h"
     \#include "LFOUI.h"
     \#include "OscilGenUI.h"} {public global
@@ -54,12 +53,17 @@ decl {\#include "Misc/SynthHelper.h"
 decl {\#include "MasterUI.h"} {private global
 }
 
+decl {\#include "Misc/SynthHelper.h"
+    using synth::getDetune;
+} {private local
+}
+
 decl {\#include "Misc/FormatFuncs.h"
     using func::asString;
 } {private local
 }
 
-class ADvoicelistitem {: {public Fl_Group, SynthHelper}
+class ADvoicelistitem {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceListItem {
@@ -359,7 +363,7 @@ else
   }
 }
 
-class ADvoiceUI {: {public Fl_Group, SynthHelper}
+class ADvoiceUI {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
@@ -1688,7 +1692,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
   }
 }
 
-class ADnoteUI {: {public PresetsUI_, SynthHelper}
+class ADnoteUI {: {public PresetsUI_}
 } {
   Function {make_window()} {private
   } {

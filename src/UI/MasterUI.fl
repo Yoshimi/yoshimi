@@ -86,10 +86,13 @@ decl {\#include "MasterMiscUI.h"} {public local
 decl {\#include "Misc/SynthEngine.h"} {public local
 }
 
-decl {\#include "Interface/FileMgr.h"} {public local
+decl {\#include "MidiLearnUI.h"} {public local
 }
 
-decl {\#include "MidiLearnUI.h"} {public local
+decl {\#include "Misc/FileMgrFuncs.h"
+    using file::isRegularFile;
+    using file::findLeafName;
+} {private local
 }
 
 decl {\#include "Misc/FormatFuncs.h"
@@ -106,7 +109,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
 } {private local
 }
 
-class MasterUI {selected : {private GuiUpdates, FileMgr}
+class MasterUI {selected : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -417,7 +420,7 @@ class MasterUI {selected : {private GuiUpdates, FileMgr}
                 filename = fl_file_chooser("Save:", exten.c_str(), newname.c_str(), 0);
                 if (filename == NULL)
                     return;
-                if (isRegFile(string(filename)))
+                if (isRegularFile(string(filename)))
                     if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                         return;
                 send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedInstrument, float(npartcounter->value() - 1), TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(filename)));
@@ -537,7 +540,7 @@ class MasterUI {selected : {private GuiUpdates, FileMgr}
                 if (filename == NULL)
                     return;
                 filename = fl_filename_setext(filename, EXTEN::scale.c_str());
-                if (isRegFile(string(filename)))
+                if (isRegularFile(string(filename)))
                     if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                         return;
                 send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedScale, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(filename)));}
@@ -1695,7 +1698,7 @@ Alan Calvert started the project}
             {
                 vectorui->RefreshChans();
                 RecentParams->activate();
-                setMasterLabel(findleafname(name));
+                setMasterLabel(findLeafName(name));
                 refresh_master_ui(2);
             }
 
@@ -1710,7 +1713,7 @@ Alan Calvert started the project}
             }
             else
             {
-                setMasterLabel(findleafname(name));
+                setMasterLabel(findLeafName(name));
                 RecentParams->activate();
                 updatepanel(); // why?
             }
@@ -1726,7 +1729,7 @@ Alan Calvert started the project}
             else
             {
                 vectorui->setLoadLabelRemote(insert, synth->getRuntime().vectordata.Name[insert]);
-                setMasterLabel(findleafname(name) + " - Vector " + to_string(int(insert) + 1));
+                setMasterLabel(findLeafName(name) + " - Vector " + to_string(int(insert) + 1));
                 vectorui->recenthistory->activate();
                 refresh_master_ui(5);
             }
@@ -1741,7 +1744,7 @@ Alan Calvert started the project}
             }
             else
             {
-                setMasterLabel(findleafname(name) + " - Vector " + to_string(int(insert) + 1));
+                setMasterLabel(findLeafName(name) + " - Vector " + to_string(int(insert) + 1));
                 vectorui->recenthistory->activate();
             }
             break;
@@ -1778,7 +1781,7 @@ Alan Calvert started the project}
             }
             else
             {
-                setMasterLabel(findleafname(name) + " - State");
+                setMasterLabel(findLeafName(name) + " - State");
                 refresh_master_ui(0x14);
             }
             break;
@@ -1788,7 +1791,7 @@ Alan Calvert started the project}
             if (wasFromHere && name.find("FAILED") == 1)
                 fl_alert("%s",name.c_str());
             else
-                setMasterLabel(findleafname(name) + " - State");
+                setMasterLabel(findLeafName(name) + " - State");
             break;
 
         case MAIN::control::masterReset:
@@ -2096,7 +2099,7 @@ Alan Calvert started the project}
             return;
         tmp = fl_filename_setext(tmp, EXTEN::patchset.c_str());
         fname = tmp;
-        result = isRegFile(tmp);
+        result = isRegularFile(tmp);
         if (result)
         {
             result = false;

@@ -28,6 +28,7 @@
 
 #include "Interface/InterChange.h"
 #include "Interface/Data2Text.h"
+#include "Misc/FileMgrFuncs.h"
 #include "Misc/NumericFuncs.h"
 #include "Misc/FormatFuncs.h"
 #include "Misc/Microtonal.h"
@@ -47,6 +48,17 @@
 #ifdef GUI_FLTK
     #include "MasterUI.h"
 #endif
+
+using file::findFile;
+using file::isRegularFile;
+using file::createDir;
+using file::isDirectory;
+using file::setExtension;
+using file::findLeafName;
+using file::createEmptyFile;
+using file::deleteFile;
+using file::loadText;
+using file::saveText;
 
 using func::bitSet;
 using func::bitClear;
@@ -625,7 +637,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     std::string oldname = synth->getRuntime().vectordata.Name[insert];
                     int pos = oldname.find("No Name");
                     if (pos >=0 && pos < 2)
-                        synth->getRuntime().vectordata.Name[insert] = findleafname(text);
+                        synth->getRuntime().vectordata.Name[insert] = findLeafName(text);
                     tmp = synth->saveVector(insert, text, true);
                     if (tmp == NO_MSG)
                     {
@@ -728,11 +740,11 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     while (path == "" && count >= 0) // scan current first, then older versions
                     {
                         --count;
-                        path = findfile("/usr/", (manfile + std::to_string(count)).c_str(), "pdf");
+                        path = findFile("/usr/", (manfile + std::to_string(count)).c_str(), "pdf");
                         if (path == "")
-                        path = findfile("/usr/", (manfile + std::to_string(count)).c_str(), "pdf.gz");
+                        path = findFile("/usr/", (manfile + std::to_string(count)).c_str(), "pdf.gz");
                         if (path == "")
-                        path = findfile("/home/", (manfile + std::to_string(count)).c_str(), "pdf");
+                        path = findFile("/home/", (manfile + std::to_string(count)).c_str(), "pdf");
                     }
                     std::cout << "man " << manfile << "\npath " << path << std::endl;
                     if (path == "")
@@ -2420,7 +2432,7 @@ void InterChange::commandConfig(CommandBlock *getData)
                     deleteFile(singlePath);
             }
             else
-                value = isRegFile(singlePath);
+                value = isRegularFile(singlePath);
             break;
         case CONFIG::control::exposeStatus:
             if (write)

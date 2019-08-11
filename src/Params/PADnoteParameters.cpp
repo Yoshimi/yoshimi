@@ -33,8 +33,12 @@
 #include "Params/LFOParams.h"
 #include "Params/FilterParams.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/FileMgrFuncs.h"
 #include "Params/PADnoteParameters.h"
 #include "Misc/WavFile.h"
+
+using file::saveData;
+
 
 PADnoteParameters::PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth) : Presets(_synth)
 {
