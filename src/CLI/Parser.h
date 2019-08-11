@@ -1,5 +1,5 @@
 /*
-    CliFuncs.h
+    Parser.h
 
     Copyright 2010, Alan Calvert
     Copyright 2014-2019, Will Godfrey
@@ -20,8 +20,8 @@
     Modified August 2019
 */
 
-#ifndef CLIFUNCS_H
-#define CLIFUNCS_H
+#ifndef PARSER_H
+#define PARSER_H
 
 #include <cmath>
 #include <string>
@@ -153,4 +153,4 @@ inline int stringNumInList(std::string toFind, std::string * theList, size_t min
 
 
 }//(End)namespace cli
-#endif /*CLIFUNCS_H*/
+#endif /*PARSER_H*/

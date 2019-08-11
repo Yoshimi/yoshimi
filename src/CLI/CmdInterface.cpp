@@ -40,12 +40,12 @@
 #include "Misc/Bank.h"
 
 #include "CLI/CmdInterface.h"
+#include "CLI/Parser.h"
 #include "Interface/TextLists.h"
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/TextMsgBuffer.h"
 #include "Misc/NumericFuncs.h"
 #include "Misc/FormatFuncs.h"
-#include "Misc/CliFuncs.h"
 
 using file::loadText;
 

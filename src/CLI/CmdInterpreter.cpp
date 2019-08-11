@@ -21,10 +21,10 @@
 #include <cassert>
 
 #include "CLI/CmdInterpreter.h"
+#include "CLI/Parser.h"
 #include "Misc/TextMsgBuffer.h"
 #include "Misc/NumericFuncs.h"
 #include "Misc/FormatFuncs.h"
-#include "Misc/CliFuncs.h"
 
 using func::bitTest;
 using func::bitFindHigh;
