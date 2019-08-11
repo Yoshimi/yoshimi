@@ -4670,7 +4670,7 @@ int CmdInterface::cmdIfaceProcessCommand(char *cCmd)
 
     list<std::string> msg;
 
-    findStatus(synth, context, false);
+    buildStatus(synth, context, false);
 
 #ifdef REPORT_NOTES_ON_OFF
     if (matchnMove(3, point, "report")) // note test
@@ -5442,13 +5442,13 @@ void CmdInterface::cmdIfaceCommandLoop()
                 int expose = readControl(synth, 0, CONFIG::control::exposeStatus, TOPLEVEL::section::config);
                 if (expose == 1)
                 {
-                    std::string status = findStatus(synth, context, true);
+                    std::string status = buildStatus(synth, context, true);
                     if (status == "" )
                         status = " Top";
                     synth->getRuntime().Log("@" + status, 1);
                 }
                 else if (expose == 2)
-                    prompt += findStatus(synth, context, true);
+                    prompt += buildStatus(synth, context, true);
                 prompt += "> ";
                 sprintf(welcomeBuffer,"%s",prompt.c_str());
             }
