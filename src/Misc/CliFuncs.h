@@ -74,6 +74,27 @@ inline bool matchnMove(int num , char *& pnt, const char * word)
 }
 
 
+inline bool lineEnd(char * point, unsigned char controlType)
+{
+    return (point[0] == 0 && controlType == TOPLEVEL::type::Write);
+    // so all other controls aren't tested
+    // e.g. you don't need to send a value when you're reading it!
+}
+
+
+inline int toggle(char  *point)
+{
+    if (matchnMove(2, point, "enable") || matchnMove(2, point, "on") || matchnMove(3, point, "yes"))
+        return 1;
+    if (matchnMove(2, point, "disable") || matchnMove(3, point, "off") || matchnMove(2, point, "no") )
+        return 0;
+    return -1;
+    /*
+     * this allows you to specify enable or other, disable or other or must be those specifics
+     */
+}
+
+
 inline std::string asAlignedString(int n, int len)
 {
     std::string res = std::to_string(n);

@@ -29,8 +29,6 @@
 class CmdInterpreter
 {
     public:
-        bool lineEnd(char *point, unsigned char controlType);
-        int toggle(char *point);
         int contextToEngines(int context);
         bool query(std::string text, bool priority);
 

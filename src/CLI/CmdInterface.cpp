@@ -61,6 +61,8 @@ using func::string2int127;
 using func::string2float;
 using func::C_lineInText;
 
+using cli::toggle;
+using cli::lineEnd;
 using cli::skipChars;
 using cli::skipSpace;
 using cli::matchWord;
