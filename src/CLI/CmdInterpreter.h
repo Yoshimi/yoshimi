@@ -32,17 +32,19 @@ class CmdInterpreter
     public:
         CmdInterpreter();
 
-        std::string buildStatus(SynthEngine *synth, bool show);
+        std::string buildStatus(bool showPartDetails);
         int cmdIfaceProcessCommand(char *cCmd);
 
         unsigned int currentInstance;
         std::string replyString;
+        SynthEngine *synth;
 
     private:
-        std::string buildAllFXStatus(SynthEngine *synth);
-        std::string buildPartStatus(SynthEngine *synth, bool showPartDetails);
+        std::string buildAllFXStatus();
+        std::string buildPartStatus(bool showPartDetails);
 
         void defaults();
+        void resetInstance();
         bool query(std::string text, bool priority);
         void helpLoop(std::list<std::string>& msg, std::string *commands, int indent, bool single = false);
         char helpList(unsigned int local);
@@ -73,7 +75,6 @@ class CmdInterpreter
         int commandReadnSet(unsigned char controlType);
 
 
-        SynthEngine *synth;
         char *point;
         int reply;
         std::list<std::string>  instrumentGroup;

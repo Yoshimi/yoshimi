@@ -83,7 +83,7 @@ void CmdInterface::cmdIfaceCommandLoop()
     bool exit = false;
     char welcomeBuffer [128];
     sprintf(welcomeBuffer, "yoshimi> ");
-    SynthEngine* synth = firstSynth;
+    synth = firstSynth;
     while(!exit)
     {
         cCmd = readline(welcomeBuffer);
@@ -94,6 +94,10 @@ void CmdInterface::cmdIfaceCommandLoop()
             else if(cCmd[0] != 0)
             {
                 replyString = "";
+
+                // in case it's been changed from elsewhere
+                synth = firstSynth->getSynthFromId(currentInstance);
+
                 int reply = cmdIfaceProcessCommand(cCmd);
                 exit = (reply == REPLY::exit_msg);
 
@@ -122,13 +126,13 @@ void CmdInterface::cmdIfaceCommandLoop()
                 int expose = readControl(synth, 0, CONFIG::control::exposeStatus, TOPLEVEL::section::config);
                 if (expose == 1)
                 {
-                    string status = buildStatus(synth, true);
+                    string status = buildStatus(true);
                     if (status == "" )
                         status = " Top";
                     synth->getRuntime().Log("@" + status, 1);
                 }
                 else if (expose == 2)
-                    prompt += buildStatus(synth, true);
+                    prompt += buildStatus(true);
                 prompt += "> ";
                 sprintf(welcomeBuffer,"%s",prompt.c_str());
             }

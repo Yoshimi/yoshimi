@@ -106,27 +106,77 @@ extern SynthEngine *firstSynth;
 
 
 CmdInterpreter::CmdInterpreter() :
-    instrumentGroup(),
-    point(nullptr),
-    synth(nullptr),
-    reply(0),
-    replyString{},
-    context(0),
-    currentInstance(0),
-    textMsgBuffer(TextMsgBuffer::instance())
+    currentInstance{0},
+    replyString{""},
+    synth{nullptr},
+    point{nullptr},
+    reply{REPLY::todo_msg},
+    instrumentGroup{},
+    textMsgBuffer{TextMsgBuffer::instance()},
+
+    context{LEVEL::Top},
+    npart{0},
+    kitMode{PART::kitType::Off},
+    kitNumber{0},
+    inKitEditor{false},
+    voiceNumber{0},
+    insertType{0},
+    nFXtype{0},
+    nFXpreset{0},
+    nFXeqBand{0},
+    nFX{0},
+    filterVowelNumber{0},
+    filterFormantNumber{0},
+    chan{0},
+    axis{0},
+    mline{0}
 {
 }
 
+void CmdInterpreter::defaults()
+{
+    context = LEVEL::Top;
+    npart = 0;
+    kitMode = PART::kitType::Off;
+    kitNumber = 0;
+    inKitEditor = false;
+    voiceNumber = 0;
+    insertType = 0;
+    nFXtype = 0;
+    nFXpreset = 0;
+    nFXeqBand = 0;
+    nFX = 0;
+    filterVowelNumber = 0;
+    filterFormantNumber = 0;
+    chan = 0;
+    axis = 0;
+    mline = 0;
+}
 
-string CmdInterpreter::buildStatus(SynthEngine *synth, bool showPartDetails)
+
+void CmdInterpreter::resetInstance()
+{
+    currentInstance = string2int(point);
+    synth = firstSynth->getSynthFromId(currentInstance);
+    unsigned int newID = synth->getUniqueId();
+    if (newID != currentInstance)
+    {
+        synth->getRuntime().Log("Instance " + std::to_string(currentInstance) + " not found. Set to " + std::to_string(newID), 1);
+        currentInstance = newID;
+    }
+    defaults();
+}
+
+
+string CmdInterpreter::buildStatus(bool showPartDetails)
 {
     if (bitTest(context, LEVEL::AllFX))
     {
-        return buildAllFXStatus(synth);
+        return buildAllFXStatus();
     }
     if (bitTest(context, LEVEL::Part))
     {
-        return buildPartStatus(synth, showPartDetails);
+        return buildPartStatus(showPartDetails);
     }
 
     string result = "";
@@ -151,7 +201,7 @@ string CmdInterpreter::buildStatus(SynthEngine *synth, bool showPartDetails)
 
 
 
-string CmdInterpreter::buildAllFXStatus(SynthEngine *synth)
+string CmdInterpreter::buildAllFXStatus()
 {
     assert(bitTest(context, LEVEL::AllFX));
 
@@ -192,7 +242,7 @@ string CmdInterpreter::buildAllFXStatus(SynthEngine *synth)
 }
 
 
-string CmdInterpreter::buildPartStatus(SynthEngine *synth, bool showPartDetails)
+string CmdInterpreter::buildPartStatus(bool showPartDetails)
 {
     assert(bitTest(context, LEVEL::Part));
 
@@ -467,28 +517,6 @@ string CmdInterpreter::buildPartStatus(SynthEngine *synth, bool showPartDetails)
     }
 
     return result;
-}
-
-
-
-void CmdInterpreter::defaults()
-{
-    context = LEVEL::Top;
-    chan = 0;
-    axis = 0;
-    mline = 0;
-    npart = 0;
-    nFX = 0;
-    nFXtype = 0;
-    nFXpreset = 0;
-    nFXeqBand = 0;
-    kitMode = 0;
-    kitNumber = 0;
-    inKitEditor = false;
-    voiceNumber = 0;
-    insertType = 0;
-    filterVowelNumber = 0;
-    filterFormantNumber = 0;
 }
 
 
@@ -4828,15 +4856,8 @@ int CmdInterpreter::commandReadnSet(unsigned char controlType)
         }
         if (lineEnd(point, controlType))
             return REPLY::value_msg;
-        currentInstance = string2int(point);
-        synth = firstSynth->getSynthFromId(currentInstance);
-        unsigned int newID = synth->getUniqueId();
-        if (newID != currentInstance)
-        {
-            Runtime.Log("Instance " + std::to_string(currentInstance) + " not found. Set to " + std::to_string(newID), 1);
-            currentInstance = newID;
-        }
-        defaults();
+
+        resetInstance();
         return REPLY::done_msg;
     }
 
@@ -5047,8 +5068,6 @@ int CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
 {
     reply = REPLY::todo_msg;
 
-    // in case it's been changed from elsewhere
-    synth = firstSynth->getSynthFromId(currentInstance);
     unsigned int newID = synth->getUniqueId();
     if (newID != currentInstance)
     {
@@ -5068,9 +5087,7 @@ int CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
         -- tmp;
     }
 
-    list<string> msg;
-
-    buildStatus(synth, false);
+    buildStatus(false);
 
 #ifdef REPORT_NOTES_ON_OFF
     if (matchnMove(3, point, "report")) // note test
