@@ -40,23 +40,25 @@ class CmdInterpreter
 
         std::string findStatus(SynthEngine *synth, int context, bool show);
 
-        // all these are heavily used by the above function
-        int filterVowelNumber;
-        int filterFormantNumber;
-        int insertType;
-        int voiceNumber;
-        int voiceFromNumber;
-        int modulatorFromNumber;
-        int modulatorFromVoiceNumber;
+
+        /* == state fields == */  // all these are used by findStatus()
+
+        // the following are used pervasively
+        int npart;
         int kitMode;
         int kitNumber;
         bool inKitEditor;
-        int npart;
-
-        int nFX;
+        int voiceNumber;
+        int insertType;
         int nFXtype;
+
+        // the remaining ones are only used at some places
         int nFXpreset;
         int nFXeqBand;
+        int nFX;
+
+        int filterVowelNumber;
+        int filterFormantNumber;
 
         int chan;
         int axis;

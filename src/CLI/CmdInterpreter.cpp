@@ -502,7 +502,7 @@ string CmdInterpreter::findStatus(SynthEngine *synth, int context, bool show)
                 else
                     text += ", V";
                 text += std::to_string(voiceNumber + 1);
-                voiceFromNumber = readControl(synth, 0, ADDVOICE::control::voiceOscillatorSource, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
+                int voiceFromNumber = readControl(synth, 0, ADDVOICE::control::voiceOscillatorSource, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
                 if (voiceFromNumber > -1)
                     text += (">" +std::to_string(voiceFromNumber + 1));
                 voiceFromNumber = readControl(synth, 0, ADDVOICE::control::externalOscillator, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
@@ -542,12 +542,12 @@ string CmdInterpreter::findStatus(SynthEngine *synth, int context, bool show)
                         else
                             text += word.substr(0, 2);
 
-                        modulatorFromVoiceNumber = readControl(synth, 0, ADDVOICE::control::externalModulator, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
+                        int modulatorFromVoiceNumber = readControl(synth, 0, ADDVOICE::control::externalModulator, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
                         if (modulatorFromVoiceNumber > -1)
                             text += (">V" + std::to_string(modulatorFromVoiceNumber + 1));
                         else
                         {
-                            modulatorFromNumber = readControl(synth, 0, ADDVOICE::control::modulatorOscillatorSource, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
+                            int modulatorFromNumber = readControl(synth, 0, ADDVOICE::control::modulatorOscillatorSource, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
                             if (modulatorFromNumber > -1)
                                 text += (">" + std::to_string(modulatorFromNumber + 1));
                         }
