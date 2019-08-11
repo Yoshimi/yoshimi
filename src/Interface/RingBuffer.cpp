@@ -53,7 +53,7 @@ bool ringBuff::write(char *writeData)
 {
     uint32_t write = writePoint.load(std::memory_order_acquire);
     uint32_t read = readPoint.load(std::memory_order_relaxed);
-    if ((write - read) >= bufferSize)
+    if (((read - blockSize) & mask) == write)
         return false;
     //std::cout << "write " << write << "  read " << read << std::endl;
     write = (write + blockSize) & mask;

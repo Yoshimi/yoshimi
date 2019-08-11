@@ -731,6 +731,14 @@ string convert_value(ValueType type, float val)
             else
                 return(custom_value_units((val-96.0f)/96.0f*40.0f,"dB",1));
 
+        case VC_PartHumaniseVelocity:
+            s = "Attenuation: ";
+            i = (int) val;
+            if (i == 0)
+                return s + "disabled";
+            else
+                return s + "between 0 and " + to_string(i) + "%";
+
         case VC_PanningRandom:
             i = lrint(val);
             if(i==0)

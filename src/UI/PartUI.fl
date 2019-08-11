@@ -1541,8 +1541,9 @@ Offset}
         callback {//
 
         send_data(0, PART::control::humanvelocity, o->value(), TOPLEVEL::type::Integer);}
-        tooltip {Random percentage velocity attenuation of whole part} xywh {12 359 201 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 8 maximum 50 step 1
+        tooltip {Random velocity attenuation of whole part} xywh {12 359 201 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 8 maximum 50 step 1
         code0 {o->value(part->Pvelrand);}
+        code1 {o->setValueType(VC_PartHumaniseVelocity);o->useCustomTip(true);}
         class mwheel_val_slider_rev
       }
       Fl_Button {} {
