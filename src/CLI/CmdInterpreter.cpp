@@ -25,52 +25,18 @@
 #include "Misc/TextMsgBuffer.h"
 #include "Misc/NumericFuncs.h"
 #include "Misc/FormatFuncs.h"
+#include "Misc/CliFuncs.h"
 
 using func::bitTest;
 using func::bitFindHigh;
-
 using func::asString;
+
 using cli::matchnMove;
 
+using cli::readControl;
+using cli::contextToEngines;
+
 using std::string;
-
-
-
-
-bool CmdInterpreter::query(string text, bool priority)
-{
-    char *line = NULL;
-    string suffix;
-    char result;
-    char test;
-
-    priority = !priority; // so calls make more sense
-
-    if (priority)
-    {
-        suffix = " N/y? ";
-        test = 'n';
-    }
-    else
-    {
-        suffix = " Y/n? ";
-        test = 'y';
-    }
-    result = test;
-    text += suffix;
-    line = readline(text.c_str());
-    if (line)
-    {
-        if (line[0] != 0)
-            result = line[0];
-        free(line);
-        line = NULL;
-    }
-    return (((result | 32) == test) ^ priority);
-}
-
-
-
 
 
 string CmdInterpreter::buildStatus(SynthEngine *synth, int context, bool showPartDetails)

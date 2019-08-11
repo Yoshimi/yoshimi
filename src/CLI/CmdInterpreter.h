@@ -29,8 +29,6 @@
 class CmdInterpreter
 {
     public:
-        bool query(std::string text, bool priority);
-
         std::string buildStatus(SynthEngine *synth, int context, bool show);
         std::string buildAllFXStatus(SynthEngine *synth, int context);
         std::string buildPartStatus(SynthEngine *synth, int context, bool showPartDetails);
