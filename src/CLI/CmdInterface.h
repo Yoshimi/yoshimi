@@ -39,6 +39,7 @@ class CmdInterface : private  CmdInterpreter
         void cmdIfaceCommandLoop();
 
     private:
+        void query(string text, bool priority);
         void helpLoop(list<std::string>& msg, std::string *commands, int indent, bool single = false);
         char helpList(unsigned int local);
         std::string historySelect(int listnum, int selection);

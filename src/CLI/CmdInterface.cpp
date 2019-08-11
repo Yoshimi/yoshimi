@@ -127,6 +127,39 @@ void CmdInterface::defaults()
 }
 
 
+bool CmdInterface::query(string text, bool priority)
+{
+    char *line = NULL;
+    string suffix;
+    char result;
+    char test;
+
+    priority = !priority; // so calls make more sense
+
+    if (priority)
+    {
+        suffix = " N/y? ";
+        test = 'n';
+    }
+    else
+    {
+        suffix = " Y/n? ";
+        test = 'y';
+    }
+    result = test;
+    text += suffix;
+    line = readline(text.c_str());
+    if (line)
+    {
+        if (line[0] != 0)
+            result = line[0];
+        free(line);
+        line = NULL;
+    }
+    return (((result | 32) == test) ^ priority);
+}
+
+
 void CmdInterface::helpLoop(list<std::string>& msg, std::string *commands, int indent, bool single)
 {
     int word = 0;

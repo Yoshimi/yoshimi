@@ -29,14 +29,7 @@
 class CmdInterpreter
 {
     public:
-        int contextToEngines(int context);
         bool query(std::string text, bool priority);
-
-        float readControl(SynthEngine *synth, unsigned char action, unsigned char control, unsigned char part, unsigned char kit = UNUSED, unsigned char engine = UNUSED, unsigned char insert = UNUSED, unsigned char parameter = UNUSED, unsigned char offset = UNUSED, unsigned char miscmsg = NO_MSG);
-        std::string readControlText(SynthEngine *synth, unsigned char action, unsigned char control, unsigned char part, unsigned char kit = UNUSED, unsigned char engine = UNUSED, unsigned char insert = UNUSED, unsigned char parameter = UNUSED, unsigned char offset = UNUSED);
-        void readLimits(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char miscmsg);
-        int sendNormal(SynthEngine *synth, unsigned char action, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = UNUSED, unsigned char engine = UNUSED, unsigned char insert = UNUSED, unsigned char parameter = UNUSED, unsigned char offset = UNUSED, unsigned char miscmsg = NO_MSG);
-        int sendDirect(SynthEngine *synth, unsigned char action, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = UNUSED, unsigned char engine = UNUSED, unsigned char insert = UNUSED, unsigned char parameter = UNUSED, unsigned char offset = UNUSED, unsigned char miscmsg = NO_MSG, unsigned char request = UNUSED);
 
         std::string buildStatus(SynthEngine *synth, int context, bool show);
         std::string buildAllFXStatus(SynthEngine *synth, int context);
