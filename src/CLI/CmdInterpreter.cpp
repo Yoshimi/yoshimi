@@ -48,6 +48,13 @@
 #include "Misc/FormatFuncs.h"
 #include "Misc/CliFuncs.h"
 
+
+// global variable; see SynthEngine.cpp and main.cpp
+extern SynthEngine *firstSynth;
+
+
+namespace cli {
+
 using std::string;
 using std::vector;
 using std::list;
@@ -65,21 +72,6 @@ using func::string2int;
 using func::string2int127;
 using func::string2float;
 using func::C_lineInText;
-
-using cli::toggle;
-using cli::lineEnd;
-using cli::skipChars;
-using cli::skipSpace;
-using cli::matchWord;
-using cli::matchnMove;
-using cli::stringNumInList;
-using cli::asAlignedString;
-
-using cli::sendNormal;
-using cli::sendDirect;
-using cli::readControl;
-using cli::readControlText;
-using cli::contextToEngines;
 
 
 /*
@@ -101,8 +93,6 @@ using cli::contextToEngines;
  * some text items. It is not error checked.
  */
 
-
-extern SynthEngine *firstSynth;
 
 // predefined OK-Reply constant
 Reply Reply::DONE{REPLY::done_msg};
@@ -5784,3 +5774,4 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
 }
 
 
+}//(End)namespace cli

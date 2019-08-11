@@ -22,13 +22,10 @@
 #define CMDINTERFACE_H
 
 #include "CLI/CmdInterpreter.h"
-//#include "Interface/InterChange.h"
-//#include "Effects/EffectMgr.h"
-
-class TextMsgBuffer;
 
 
-class CmdInterface : private  CmdInterpreter
+
+class CmdInterface
 {
     public:
         CmdInterface();
@@ -37,7 +34,10 @@ class CmdInterface : private  CmdInterpreter
 
     private:
         char *cCmd;
+        cli::CmdInterpreter interpreter;
 
+        Config& getRuntime();
+        void Log(const string &, char tostderr =0);
 };
 
 #endif

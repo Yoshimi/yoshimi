@@ -27,6 +27,11 @@
 #include "Misc/SynthEngine.h"
 #include "Interface/TextLists.h"
 
+class TextMsgBuffer;
+
+
+
+namespace cli {
 
 
 struct Reply
@@ -133,4 +138,5 @@ class CmdInterpreter
         int mline;
 };
 
+}//(End)namespace cli
 #endif /*CMDINTERPRETER_H*/

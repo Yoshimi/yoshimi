@@ -57,8 +57,20 @@ extern SynthEngine *firstSynth;
 
 
 CmdInterface::CmdInterface() :
-    cCmd(nullptr)
+    cCmd{nullptr},
+    interpreter{}
 {
+}
+
+
+Config& CmdInterface::getRuntime()
+{
+    return interpreter.synth->getRuntime();
+}
+
+void CmdInterface::Log(const string &msg, char toStderr)
+{
+    getRuntime().Log(msg, toStderr);
 }
 
 
@@ -83,7 +95,7 @@ void CmdInterface::cmdIfaceCommandLoop()
     bool exit = false;
     char welcomeBuffer [128];
     sprintf(welcomeBuffer, "yoshimi> ");
-    synth = firstSynth;
+    interpreter.synth = firstSynth;
     while(!exit)
     {
         cCmd = readline(welcomeBuffer);
@@ -94,15 +106,15 @@ void CmdInterface::cmdIfaceCommandLoop()
             else if(cCmd[0] != 0)
             {
                 // in case it's been changed from elsewhere
-                synth = firstSynth->getSynthFromId(currentInstance);
+                interpreter.synth = firstSynth->getSynthFromId(interpreter.currentInstance);
 
-                Reply reply = cmdIfaceProcessCommand(cCmd);
+                cli::Reply reply = interpreter.cmdIfaceProcessCommand(cCmd);
                 exit = (reply.code == REPLY::exit_msg);
 
                 if (reply.code == REPLY::what_msg)
-                    synth->getRuntime().Log(reply.msg + replies[REPLY::what_msg]);
+                    Log(reply.msg + replies[REPLY::what_msg]);
                 else if (reply.code > REPLY::done_msg)
-                    synth->getRuntime().Log(replies[reply.code]);
+                    Log(replies[reply.code]);
                 add_history(cCmd);
             }
             free(cCmd);
@@ -114,28 +126,28 @@ void CmdInterface::cmdIfaceCommandLoop()
                 { // create enough delay for most ops to complete
                     usleep(2000);
                 }
-                while (synth->getRuntime().runSynth && !synth->getRuntime().finishedCLI);
+                while (getRuntime().runSynth && !getRuntime().finishedCLI);
             }
-            if (synth->getRuntime().runSynth)
+            if (getRuntime().runSynth)
             {
                 string prompt = "yoshimi";
-                if (currentInstance > 0)
-                    prompt += (":" + asString(currentInstance));
-                int expose = readControl(synth, 0, CONFIG::control::exposeStatus, TOPLEVEL::section::config);
+                if (interpreter.currentInstance > 0)
+                    prompt += (":" + asString(interpreter.currentInstance));
+                int expose = readControl(interpreter.synth, 0, CONFIG::control::exposeStatus, TOPLEVEL::section::config);
                 if (expose == 1)
                 {
-                    string status = buildStatus(true);
+                    string status = interpreter.buildStatus(true);
                     if (status == "" )
                         status = " Top";
-                    synth->getRuntime().Log("@" + status, 1);
+                    Log("@" + status, 1);
                 }
                 else if (expose == 2)
-                    prompt += buildStatus(true);
+                    prompt += interpreter.buildStatus(true);
                 prompt += "> ";
                 sprintf(welcomeBuffer,"%s",prompt.c_str());
             }
         }
-        if (!exit && synth->getRuntime().runSynth)
+        if (!exit && getRuntime().runSynth)
             usleep(20000);
     }
 
