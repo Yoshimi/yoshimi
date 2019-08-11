@@ -42,6 +42,15 @@ struct Reply
 
     // reassignment prohibited
     Reply& operator=(const Reply&)  = delete;
+
+
+    // some frequently used shortcuts
+    static Reply DONE;
+
+    static Reply what(std::string question)
+    {
+        return Reply{REPLY::what_msg, question};
+    }
 };
 
 

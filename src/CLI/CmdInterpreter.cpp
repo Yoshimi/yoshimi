@@ -104,6 +104,9 @@ using cli::contextToEngines;
 
 extern SynthEngine *firstSynth;
 
+// predefined OK-Reply constant
+Reply Reply::DONE{REPLY::done_msg};
+
 
 CmdInterpreter::CmdInterpreter() :
     currentInstance{0},
@@ -2838,7 +2841,7 @@ int CmdInterpreter::commandMlearn(unsigned char controlType)
             if (engine > 16)
                 engine = 16;
             control = MIDILEARN::control::CCorChannel;
-            Runtime.Log("Lines may be re-ordered");;
+            Runtime.Log("Lines may be re-ordered");
         }
         else if (matchnMove(2, point, "minimum"))
         {
@@ -5094,7 +5097,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
         std::cout << "note off seen " << Runtime.noteOffSeen << std::endl;
         std::cout << "notes hanging sent " << Runtime.noteOnSent - Runtime.noteOffSent << std::endl;
         std::cout << "notes hanging seen " << Runtime.noteOnSeen - Runtime.noteOffSeen << std::endl;
-        return Reply{REPLY::done_msg};
+        return Reply::DONE;
     }
 #endif
     if (matchnMove(2, point, "exit"))
@@ -5102,7 +5105,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
         if (currentInstance > 0)
         {
             Runtime.Log("Can only exit from instance 0", 1);
-            return Reply{REPLY::done_msg};
+            return Reply::DONE;
         }
         string message;
         if (Runtime.configChanged)
@@ -5116,7 +5119,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
             Runtime.runSynth = false;
             return Reply{REPLY::exit_msg};
         }
-        return Reply{REPLY::done_msg};
+        return Reply::DONE;
     }
     if (point[0] == '/')
     {
@@ -5124,7 +5127,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
         point = skipSpace(point);
         defaults();
         if (point[0] == 0)
-            return Reply{REPLY::done_msg};
+            return Reply::DONE;
     }
 
     if (matchnMove(3, point, "reset"))
@@ -5137,7 +5140,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
             sendDirect(synth, TOPLEVEL::action::muteAndLoop, 0, TOPLEVEL::type::Write, control, TOPLEVEL::section::main);
             defaults();
         }
-        return Reply{REPLY::done_msg};
+        return Reply::DONE;
     }
     if (point[0] == '.' && point[1] == '.')
     {
@@ -5165,11 +5168,11 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
                         return REPLY::range_msg;
 
                     npart = tmp -1;
-                    return Reply{REPLY::done_msg};
+                    return Reply::DONE;
                 }
             }
             else
-                return Reply{REPLY::done_msg};
+                return Reply::DONE;
         }
 
         if (bitFindHigh(context) == LEVEL::AllFX || bitFindHigh(context) == LEVEL::InsFX)
@@ -5191,11 +5194,11 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
             bitClearHigh(context);
         }
         if (point[0] == 0)
-            return Reply{REPLY::done_msg};
+            return Reply::DONE;
     }
 
     if (helpList(context))
-        return Reply{REPLY::done_msg};
+        return Reply::DONE;
 
     if (matchnMove(2, point, "stop"))
         return Reply{sendNormal( synth, 0, 0, TOPLEVEL::type::Write,MAIN::control::stopSound, TOPLEVEL::section::main)};
@@ -5262,9 +5265,9 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
             }
             else
                 Runtime.Log("Can't read file " + filename);
-            return Reply{REPLY::done_msg};
+            return Reply::DONE;
         }
-        return Reply{REPLY::what_msg, "Exec"};
+        return Reply::what("Exec");
     }
 
     if (matchnMove(1, point, "set"))
@@ -5272,7 +5275,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
         if (point[0] != 0)
             return Reply{commandReadnSet(TOPLEVEL::type::Write)};
         else
-            return Reply{REPLY::what_msg, "set"};
+            return Reply::what("set");
     }
 
     if (matchnMove(1, point, "read") || matchnMove(1, point, "get"))
@@ -5280,7 +5283,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
         if (point[0] != 0)
             return Reply{commandReadnSet(TOPLEVEL::type::Read)};
         else
-            return Reply{REPLY::what_msg, "read"};
+            return Reply::what("read");
     }
 
     if (matchnMove(3, point, "minimum"))
@@ -5289,7 +5292,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
             return Reply{commandReadnSet(TOPLEVEL::type::Minimum | TOPLEVEL::type::Limits)};
         else
         {
-            return Reply{REPLY::what_msg, "minimum"};
+            return Reply::what("minimum");
         }
     }
 
@@ -5299,7 +5302,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
             return Reply{commandReadnSet(TOPLEVEL::type::Maximum | TOPLEVEL::type::Limits)};
         else
         {
-            return Reply{REPLY::what_msg, "maximum"};
+            return Reply::what("maximum");
         }
     }
 
@@ -5309,7 +5312,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
             return Reply{commandReadnSet(TOPLEVEL::type::Default | TOPLEVEL::type::Limits)};
         else
         {
-            return Reply{REPLY::what_msg, "default"};
+            return Reply::what("default");
         }
     }
 
@@ -5319,7 +5322,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
             return Reply{commandReadnSet(TOPLEVEL::type::LearnRequest)};
         else
         {
-            return Reply{REPLY::what_msg, "mlearn"};
+            return Reply::what("mlearn");
         }
     }
 
@@ -5340,7 +5343,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
                 synth->saveBanks();
             }
 #endif
-            return Reply{REPLY::done_msg};
+            return Reply::DONE;
         }
         if (matchnMove(1, point, "bank"))
         {
@@ -5359,24 +5362,24 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
 #ifdef GUI_FLTK
             GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
 #endif
-            return Reply{REPLY::done_msg};
+            return Reply::DONE;
         }
         if (matchnMove(2, point, "yoshimi"))
         {
             if (currentInstance !=0)
             {
                 Runtime.Log("Only instance 0 can start others");
-                return Reply{REPLY::done_msg};
+                return Reply::DONE;
             }
             int forceId = string2int(point);
             if (forceId < 1 || forceId >= 32)
                 forceId = 0;
             sendDirect(synth, TOPLEVEL::action::lowPrio, forceId, TOPLEVEL::type::Write, MAIN::control::startInstance, TOPLEVEL::section::main);
-            return Reply{REPLY::done_msg};
+            return Reply::DONE;
         }
         else
         {
-            return Reply{REPLY::what_msg, "add"};
+            return Reply::what("add");
         }
     }
     if (matchWord(3, point, "import") || matchWord(3, point, "export") )
@@ -5440,7 +5443,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
                         Runtime.Log("Un-linked " + rootname);
                         synth->saveBanks();
                     }
-                    return Reply{REPLY::done_msg};
+                    return Reply::DONE;
                 }
             }
             else
@@ -5485,7 +5488,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
                     }
 
                 }
-                return Reply{REPLY::done_msg};
+                return Reply::DONE;
             }
             else
                 return Reply{REPLY::value_msg};
@@ -5494,7 +5497,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
         {
             if (point[0] == 0)
             {
-                return Reply{REPLY::what_msg, "remove"};
+                return Reply::what("remove");
             }
             else
             {
@@ -5507,7 +5510,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
                 {
                     sendDirect(synth, TOPLEVEL::action::lowPrio, to_close, TOPLEVEL::type::Write, MAIN::control::stopInstance, TOPLEVEL::section::main);
                 }
-                return Reply{REPLY::done_msg};
+                return Reply::DONE;
             }
         }
         if (matchnMove(2, point, "mlearn"))
@@ -5515,7 +5518,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
             if (matchnMove(3, point, "all"))
             {
                 sendNormal( synth, 0, 0, 0, MIDILEARN::control::clearAll, TOPLEVEL::section::midiLearn);
-                return Reply{REPLY::done_msg};
+                return Reply::DONE;
             }
             else if (point[0] == '@')
             {
@@ -5525,7 +5528,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
                 if (tmp == 0)
                     return Reply{REPLY::value_msg};
                 sendNormal( synth, 0, tmp - 1, 0, MIDILEARN::control::deleteLine, TOPLEVEL::section::midiLearn);
-                return Reply{REPLY::done_msg};
+                return Reply::DONE;
             }
         }
         if (matchnMove(2, point, "instrument") || matchnMove(2, point, "program"))
@@ -5534,9 +5537,9 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
             if (tmp <= 0 || tmp >= MAX_INSTRUMENTS_IN_BANK)
                     return Reply{REPLY::range_msg};
             sendDirect(synth, TOPLEVEL::action::lowPrio, tmp - 1, TOPLEVEL::type::Write, BANK::control::deleteInstrument, TOPLEVEL::section::bank);
-            return Reply{REPLY::done_msg};
+            return Reply::DONE;
         }
-        return Reply{REPLY::what_msg, "remove"};
+        return Reply::what("remove");
     }
 
     else if (matchnMove(2, point, "load"))
@@ -5550,12 +5553,12 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
                 if (tmp == 0)
                     return Reply{REPLY::value_msg};
                 sendNormal( synth, 0, tmp - 1, TOPLEVEL::type::Write, MIDILEARN::control::loadFromRecent, TOPLEVEL::section::midiLearn);
-                return Reply{REPLY::done_msg};
+                return Reply::DONE;
             }
             if ((string) point == "")
                 return Reply{REPLY::name_msg};
             sendNormal( synth, 0, 0, TOPLEVEL::type::Write, MIDILEARN::control::loadList, TOPLEVEL::section::midiLearn, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push((string) point));
-            return Reply{REPLY::done_msg};
+            return Reply::DONE;
         }
         if(matchnMove(2, point, "vector"))
         {
@@ -5592,7 +5595,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
                     return Reply{REPLY::value_msg};
                 name = historySelect(5, tmp - 1);
                 if (name == "")
-                    return Reply{REPLY::done_msg};
+                    return Reply::DONE;
             }
             else
             {
@@ -5601,7 +5604,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
                     return Reply{REPLY::name_msg};
             }
             sendDirect(synth, TOPLEVEL::action::muteAndLoop, 0, TOPLEVEL::type::Write, MAIN::control::loadNamedVector, TOPLEVEL::section::main, UNUSED, UNUSED, ch, UNUSED, UNUSED, textMsgBuffer.push(name));
-            return Reply{REPLY::done_msg};
+            return Reply::DONE;
         }
         if(matchnMove(2, point, "state"))
         {
@@ -5617,7 +5620,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
                     return Reply{REPLY::value_msg};
                 name = historySelect(4, tmp - 1);
                 if (name == "")
-                    return Reply{REPLY::done_msg};
+                    return Reply::DONE;
             }
             else
             {
@@ -5626,7 +5629,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
                         return Reply{REPLY::name_msg};
             }
             sendDirect(synth, TOPLEVEL::action::muteAndLoop, 0, TOPLEVEL::type::Write, MAIN::control::loadNamedState, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(name));
-            return Reply{REPLY::done_msg};
+            return Reply::DONE;
         }
         if (matchnMove(2, point, "scale"))
         {
@@ -5642,7 +5645,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
                     return Reply{REPLY::value_msg};
                 name = historySelect(3, tmp - 1);
                 if (name == "")
-                    return Reply{REPLY::done_msg};
+                    return Reply::DONE;
             }
             else
             {
@@ -5651,7 +5654,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
                     return Reply{REPLY::name_msg};
             }
             sendDirect(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, MAIN::control::loadNamedScale, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(name));
-            return Reply{REPLY::done_msg};
+            return Reply::DONE;
         }
         if (matchnMove(1, point, "patchset"))
         {
@@ -5667,7 +5670,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
                     return Reply{REPLY::value_msg};
                 name = historySelect(2, tmp - 1);
                 if (name == "")
-                    return Reply{REPLY::done_msg};
+                    return Reply::DONE;
             }
             else
             {
@@ -5676,7 +5679,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
                     return Reply{REPLY::name_msg};
             }
             sendDirect(synth, TOPLEVEL::action::muteAndLoop, 0, TOPLEVEL::type::Write, MAIN::control::loadNamedPatchset, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(name));
-            return Reply{REPLY::done_msg};
+            return Reply::DONE;
         }
         if (matchnMove(1, point, "instrument"))
         {
@@ -5692,7 +5695,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
                     return Reply{REPLY::value_msg};
                 name = historySelect(1, tmp - 1);
                 if (name == "")
-                    return Reply{REPLY::done_msg};
+                    return Reply::DONE;
             }
             else
             {
@@ -5702,9 +5705,9 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
             }
 
             sendDirect(synth, 0, 0, TOPLEVEL::type::Write, MAIN::control::loadInstrumentByName, TOPLEVEL::section::main, npart, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(name));
-            return Reply{REPLY::done_msg};
+            return Reply::DONE;
         }
-        return Reply{REPLY::what_msg, "load"};
+        return Reply::what("load");
     }
 
     if (matchnMove(2, point, "save"))
@@ -5715,7 +5718,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
                 return Reply{REPLY::name_msg};
 
             sendNormal( synth, 0, 0, TOPLEVEL::type::Write, MIDILEARN::control::saveList, TOPLEVEL::section::midiLearn, 0, 0, 0, 0, UNUSED, textMsgBuffer.push((string) point));
-            return Reply{REPLY::done_msg};
+            return Reply::DONE;
         }
         if(matchnMove(2, point, "vector"))
         {
@@ -5731,19 +5734,19 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
                 return Reply{REPLY::name_msg};
             chan = tmp;
             sendDirect(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, MAIN::control::saveNamedVector, TOPLEVEL::section::main, UNUSED, UNUSED, chan, UNUSED, UNUSED, textMsgBuffer.push((string) point));
-            return Reply{REPLY::done_msg};
+            return Reply::DONE;
         }
         if(matchnMove(2, point, "state"))
         {
             if (point[0] == 0)
                 return Reply{REPLY::value_msg};
             sendDirect(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, MAIN::control::saveNamedState, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(point)));
-            return Reply{REPLY::done_msg};
+            return Reply::DONE;
         }
         if(matchnMove(1, point, "config"))
         {
             sendDirect(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, CONFIG::control::saveCurrentConfig, TOPLEVEL::section::config, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push("DUMMY"));
-            return Reply{REPLY::done_msg};
+            return Reply::DONE;
         }
 
         if (matchnMove(2, point, "scale"))
@@ -5751,28 +5754,28 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
             if (point[0] == 0)
                 return Reply{REPLY::name_msg};
             sendDirect(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, MAIN::control::saveNamedScale, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(point)));
-            return Reply{REPLY::done_msg};
+            return Reply::DONE;
         }
         else if (matchnMove(1, point, "patchset"))
         {
             if (point[0] == 0)
                 return Reply{REPLY::name_msg};
             sendDirect(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, MAIN::control::saveNamedPatchset, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(point)));
-            return Reply{REPLY::done_msg};
+            return Reply::DONE;
         }
         if (matchnMove(1, point, "instrument"))
         {
             if (synth->part[npart]->Pname == "Simple Sound")
             {
                 Runtime.Log("Nothing to save!");
-                return Reply{REPLY::done_msg};
+                return Reply::DONE;
             }
             if (point[0] == 0)
                 return Reply{REPLY::name_msg};
             sendDirect(synth, TOPLEVEL::action::lowPrio, npart, TOPLEVEL::type::Write, MAIN::control::saveNamedInstrument, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(point)));
-            return Reply{REPLY::done_msg};
+            return Reply::DONE;
         }
-        return Reply{REPLY::what_msg, "save"};
+        return Reply::what("save");
     }
 
     // legacyCLIaccess goes here
