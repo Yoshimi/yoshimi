@@ -27,16 +27,34 @@
 #include "Misc/SynthEngine.h"
 #include "Interface/TextLists.h"
 
+
+
+struct Reply
+{
+    // note these are immutable
+    const int code;
+    const std::string msg;
+
+    Reply(int c, std::string m ="") :
+        code{c},
+        msg{m}
+    { }
+
+    // reassignment prohibited
+    Reply& operator=(const Reply&)  = delete;
+};
+
+
+
 class CmdInterpreter
 {
     public:
         CmdInterpreter();
 
         std::string buildStatus(bool showPartDetails);
-        int cmdIfaceProcessCommand(char *cCmd);
+        Reply cmdIfaceProcessCommand(char *cCmd);
 
         unsigned int currentInstance;
-        std::string replyString;
         SynthEngine *synth;
 
     private:
@@ -76,7 +94,6 @@ class CmdInterpreter
 
 
         char *point;
-        int reply;
         std::list<std::string>  instrumentGroup;
         TextMsgBuffer& textMsgBuffer;
 

@@ -93,18 +93,16 @@ void CmdInterface::cmdIfaceCommandLoop()
                 std::cout << "*** Error: line too long" << std::endl;
             else if(cCmd[0] != 0)
             {
-                replyString = "";
-
                 // in case it's been changed from elsewhere
                 synth = firstSynth->getSynthFromId(currentInstance);
 
-                int reply = cmdIfaceProcessCommand(cCmd);
-                exit = (reply == REPLY::exit_msg);
+                Reply reply = cmdIfaceProcessCommand(cCmd);
+                exit = (reply.code == REPLY::exit_msg);
 
-                if (reply == REPLY::what_msg)
-                    synth->getRuntime().Log(replyString + replies[REPLY::what_msg]);
-                else if (reply > REPLY::done_msg)
-                    synth->getRuntime().Log(replies[reply]);
+                if (reply.code == REPLY::what_msg)
+                    synth->getRuntime().Log(reply.msg + replies[REPLY::what_msg]);
+                else if (reply.code > REPLY::done_msg)
+                    synth->getRuntime().Log(replies[reply.code]);
                 add_history(cCmd);
             }
             free(cCmd);
