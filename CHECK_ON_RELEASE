@@ -2,9 +2,6 @@
     Ensure version number is correct.
     Disable extra compiler tests.
 
-
-    MUST RESTORE line 715 0f Interchange.cpp
-
 /desktop/yoshimi.1
     Ensure version number and dates are correct.
     Check for any changes in info or commands.
@@ -33,3 +30,4 @@ set tag to release version
 
 After commit
     Update wikipedia entry
+    Tell everyone :)

@@ -4320,10 +4320,23 @@ int CmdInterface::commandPart(unsigned char controlType)
             else
                 return REPLY::name_msg;
         }
-        return sendNormal( synth, 0, value, controlType, 6, npart);
+        return sendNormal( synth, 0, value, controlType, PART::control::keyMode, npart);
     }
     if (matchnMove(2, point, "portamento"))
         return sendNormal( synth, 0, (toggle(point) == 1), controlType, PART::control::portamento, npart);
+    if (matchnMove(1, point, "humanise"))
+    {
+        int cmd = -1;
+        if (matchnMove(1, point, "pitch"))
+            cmd = PART::control::humanise;
+        else if (matchnMove(1, point, "velocity"))
+            cmd = PART::control::humanvelocity;
+        else
+            return REPLY::op_msg;
+        if (lineEnd(point, controlType))
+            return REPLY::value_msg;
+        return sendNormal( synth, 0, string2int(point), controlType, cmd, npart);
+    }
     if (matchnMove(2, point, "name"))
     {
         std::string name;

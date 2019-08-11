@@ -23,7 +23,6 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified May 2019
 */
 
 #include <cstring>
@@ -127,6 +126,7 @@ void Part::defaults(void)
     Pveloffs = 64;
     Pkeylimit = 20;
     Pfrand = 0;
+    Pvelrand = 0;
     PbreathControl = 2;
     Peffnum = 0;
     legatoFading = 0;
@@ -159,6 +159,7 @@ void Part::defaultsinstrument(void)
     Pkitfade = false;
     Pdrummode = 0;
     Pfrand = 0;
+    Pvelrand = 0;
 
     for (int n = 0; n < NUM_KIT_ITEMS; ++n)
     {
@@ -354,7 +355,15 @@ void Part::NoteOn(int note, int velocity, bool renote)
         }
 
         // compute the velocity offset
-        float vel = velF(velocity / 127.0f, Pvelsns) + (Pveloffs - 64.0f) / 64.0f;
+        float newVel = velocity;
+        if (Pvelrand >= 1)
+        {
+            newVel *= (1 - (synth->numRandom() * Pvelrand * 0.0104f));
+            //std::cout << "Vel rand " << Pvelrand << "  result " << newVel << std::endl;
+        }
+
+
+        float vel = velF(newVel / 127.0f, Pvelsns) + (Pveloffs - 64.0f) / 64.0f;
         vel = (vel < 0.0f) ? 0.0f : vel;
         vel = (vel > 1.0f) ? 1.0f : vel;
 
@@ -1270,6 +1279,7 @@ void Part::add2XML(XMLwrapper *xml, bool subset)
         xml->addpar("legato_mode", (Pkeymode & MIDI_NOT_LEGATO) == PART_LEGATO);
         xml->addpar("key_limit", Pkeylimit);
         xml->addpar("random_detune", Pfrand);
+        xml->addpar("random_velocity", Pvelrand);
         xml->addpar("destination", Paudiodest);
     }
     xml->beginbranch("INSTRUMENT");
@@ -1278,6 +1288,7 @@ void Part::add2XML(XMLwrapper *xml, bool subset)
     {
         xml->addpar("key_mode", Pkeymode & MIDI_NOT_LEGATO);
         xml->addpar("random_detune", Pfrand);
+        xml->addpar("random_velocity", Pvelrand);
         xml->addparbool("breath_disable", PbreathControl != 2);
     }
     xml->endbranch();
@@ -1359,6 +1370,9 @@ int Part::loadXMLinstrument(string filename)
         Pfrand = xml->getpar127("random_detune", Pfrand);
         if (Pfrand > 50)
             Pfrand = 50;
+        Pvelrand = xml->getpar127("random_velocity", Pvelrand);
+        if (Pvelrand > 50)
+            Pvelrand = 50;
         PbreathControl = xml->getparbool("breath_disable", PbreathControl);
         if (PbreathControl)
             PbreathControl = 255; // impossible value
@@ -1507,6 +1521,9 @@ void Part::getfromXML(XMLwrapper *xml)
     Pfrand = xml->getpar127("random_detune", Pfrand);
     if (Pfrand > 50)
         Pfrand = 50;
+    Pvelrand = xml->getpar127("random_velocity", Pvelrand);
+    if (Pvelrand > 50)
+        Pvelrand = 50;
     setDestination(xml->getpar127("destination", Paudiodest));
 
     if (xml->enterbranch("INSTRUMENT"))
@@ -1631,6 +1648,12 @@ float Part::getLimits(CommandBlock *getData)
             break;
 
         case PART::control::humanise:
+            type |= learnable;
+            def = 0;
+            max = 50;
+            break;
+
+        case PART::control::humanvelocity:
             type |= learnable;
             def = 0;
             max = 50;

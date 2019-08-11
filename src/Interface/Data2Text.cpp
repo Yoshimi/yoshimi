@@ -1270,7 +1270,11 @@ std::string DataText::resolvePart(CommandBlock *getData, bool addValue)
             break;
 
         case PART::control::humanise:
-            contstr = "Humanise";
+            contstr = "Humanise Pitch";
+            break;
+
+        case PART::control::humanvelocity:
+            contstr = "Humanise Velocity";
             break;
 
         case PART::control::drumMode:

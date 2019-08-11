@@ -535,6 +535,7 @@ namespace PART // usage PART::control::volume
         partToSystemEffect3,
         partToSystemEffect4,
         humanise = 48,
+        humanvelocity,
         drumMode = 57,
         kitMode,
         effectNumber = 64,
