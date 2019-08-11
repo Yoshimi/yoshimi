@@ -368,7 +368,6 @@ set (Interface_Sources
     Interface/Data2Text.cpp
     Interface/MidiLearn.cpp
     Interface/MidiDecode.cpp
-    Interface/FileMgr.cpp
     Interface/RingBuffer.cpp
     Interface/TextLists.h
 )
