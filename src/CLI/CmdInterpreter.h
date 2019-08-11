@@ -21,7 +21,8 @@
 #ifndef CMDINTERPRETER_H
 #define CMDINTERPRETER_H
 
-
+#include <string>
+#include <list>
 
 #include "Misc/SynthEngine.h"
 #include "Interface/TextLists.h"
@@ -29,13 +30,61 @@
 class CmdInterpreter
 {
     public:
-        std::string buildStatus(SynthEngine *synth, int context, bool show);
-        std::string buildAllFXStatus(SynthEngine *synth, int context);
-        std::string buildPartStatus(SynthEngine *synth, int context, bool showPartDetails);
+        CmdInterpreter();
+
+        std::string buildStatus(SynthEngine *synth, bool show);
+        int cmdIfaceProcessCommand(char *cCmd);
+
+        unsigned int currentInstance;
+        std::string replyString;
+
+    private:
+        std::string buildAllFXStatus(SynthEngine *synth);
+        std::string buildPartStatus(SynthEngine *synth, bool showPartDetails);
+
+        void defaults();
+        bool query(std::string text, bool priority);
+        void helpLoop(std::list<std::string>& msg, std::string *commands, int indent, bool single = false);
+        char helpList(unsigned int local);
+        std::string historySelect(int listnum, int selection);
+        void historyList(int listnum);
+        void listCurrentParts(std::list<std::string>& msg_buf);
+        int effectsList(bool presets = false);
+        int effects(unsigned char controlType);
+        int midiControllers(unsigned char controlType);
+        int partCommonControls(unsigned char controlType);
+        int LFOselect(unsigned char controlType);
+        int filterSelect(unsigned char controlType);
+        int envelopeSelect(unsigned char controlType);
+        int commandGroup();
+        int commandList();
+        int commandMlearn(unsigned char controlType);
+        int commandVector(unsigned char controlType);
+        int commandConfig(unsigned char controlType);
+        int commandScale(unsigned char controlType);
+        int addSynth(unsigned char controlType);
+        int subSynth(unsigned char controlType);
+        int padSynth(unsigned char controlType);
+        int resonance(unsigned char controlType);
+        int addVoice(unsigned char controlType);
+        int modulator(unsigned char controlType);
+        int waveform(unsigned char controlType);
+        int commandPart(unsigned char controlType);
+        int commandReadnSet(unsigned char controlType);
+
+
+        SynthEngine *synth;
+        char *point;
+        int reply;
+        std::list<std::string>  instrumentGroup;
+        TextMsgBuffer& textMsgBuffer;
+
+
 
         /* == state fields == */  // all these are used by findStatus()
 
         // the following are used pervasively
+        unsigned int context;
         int npart;
         int kitMode;
         int kitNumber;
