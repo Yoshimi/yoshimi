@@ -1,5 +1,9 @@
 yoshimi 1.5.11 M
 
+2019-8-12
+* Updated Miscellany/Images/PartEdit.png
+* Removed incorrect attribution in Effects/Reverb.cpp
+
 2019-8-9 Will
 * Added Rainer to people list in GUI.
 * Updated dev_notes.

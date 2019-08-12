@@ -456,15 +456,10 @@ void Reverb::settype(unsigned char Ptype_)
         bandwidth = new Unison(synth->buffersize / 4 + 1, 2.0f, synth);
         bandwidth->setSize(50);
         bandwidth->setBaseFrequency(1.0f);
-        /* This block is kept as it's a bit of Cal's humour :)
-         *
-#warning sa schimb size-ul
-        //the size of the unison buffer may be too small, though this has
+        //TODO the size of the unison buffer may be too small, though this has
         //not been verified yet.
         //As this cannot be resized in a RT context, a good upper bound should
         //be found
-        *
-        */
     }
     settime(Ptime);
     cleanup();
