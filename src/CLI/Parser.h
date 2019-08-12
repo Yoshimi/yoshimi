@@ -26,9 +26,13 @@
 #include <cmath>
 #include <string>
 #include <cstring>
+#include <readline/readline.h>
+#include <readline/history.h>
 
 
 namespace cli {
+
+using std::string;
 
 
 inline char * skipSpace(char * buf)
@@ -95,9 +99,9 @@ inline int toggle(char  *point)
 }
 
 
-inline std::string asAlignedString(int n, int len)
+inline string asAlignedString(int n, int len)
 {
-    std::string res = std::to_string(n);
+    string res = std::to_string(n);
     int size = res.length();
     if (size < len)
     {
@@ -115,12 +119,12 @@ inline std::string asAlignedString(int n, int len)
  * for an unambiguous match.
  * If a string in the list is shorter than 'min' then this length is used.
  */
-inline int stringNumInList(std::string toFind, std::string * theList, size_t min)
+inline int stringNumInList(string toFind, string * theList, size_t min)
 {
     if (toFind.length() < min)
         return -1;
     int count = -1;
-    std::string name;
+    string name;
     bool found = false;
     do
     {
@@ -132,7 +136,7 @@ inline int stringNumInList(std::string toFind, std::string * theList, size_t min
             if (match > min)
                 match = min;
             int result = 0;
-            for (std::string::size_type i = 0; i < match; ++i)
+            for (string::size_type i = 0; i < match; ++i)
             {
                 result |= (tolower(toFind[i]) ^ tolower(name[i]));
             }
@@ -155,16 +159,23 @@ inline int stringNumInList(std::string toFind, std::string * theList, size_t min
 
 class Parser
 {
-    
+    char* buffer;
+    char* point;
+    string prompt;
+    string hist_filename;
+
     public:
-        Parser()
-        {
-            
-        }
-        
+        Parser() :
+            buffer{nullptr},
+            point{nullptr},
+            prompt{"yoshimi> "},
+            hist_filename{}
+        { }
+
        ~Parser()
         {
-            
+            writeHistory();
+            cleanUp();
         }
 
         // Parser is not copyable and can only be passed by reference
@@ -172,6 +183,76 @@ class Parser
         Parser(Parser&&) = delete;
         Parser& operator=(const Parser&) = delete;
         Parser& operator=(Parser&&) = delete;
+
+
+        // string conversion: get content after parsing point
+        operator string()  const
+        {
+            return string{isValid()? point : ""};
+        }
+
+        bool isValid()  const
+        {
+            return buffer && strlen(buffer) < COMMAND_SIZE;
+        }
+
+        bool isTooLarge()  const
+        {
+            return buffer && strlen(buffer) >= COMMAND_SIZE;
+        }
+
+
+        void setPrompt(string newPrompt)
+        {
+            prompt = newPrompt;
+        }
+
+        void readline()
+        {
+            cleanUp();
+            buffer = ::readline(prompt.c_str());
+            if (!isValid())
+                cleanUp();
+            else
+            {
+                point = buffer;
+                add_history(buffer);
+            }
+        }
+
+        void setHistoryFile(string filename)
+        {
+            if (filename.length() == 0)
+                return;
+            else
+                hist_filename = filename;
+
+            using_history();
+            stifle_history(80); // Never more than 80 commands
+            if (read_history(hist_filename.c_str()) != 0)
+            {   // reading failed
+                perror(hist_filename.c_str());
+                std::ofstream outfile (hist_filename.c_str()); // create an empty file
+            }
+        }
+
+    private:
+        void cleanUp()
+        {
+            if (buffer)
+                free(buffer);
+            buffer = point = nullptr;
+        }
+
+        void writeHistory()
+        {
+            if (hist_filename.length() == 0)
+                return;
+            if (write_history(hist_filename.c_str()) != 0)
+            {   // writing of history file failed
+                perror(hist_filename.c_str());
+            }
+        }
 };
 
 

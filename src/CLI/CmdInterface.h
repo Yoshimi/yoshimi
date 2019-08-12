@@ -33,7 +33,6 @@ class CmdInterface
         void cmdIfaceCommandLoop();
 
     private:
-        char *cCmd;
         cli::CmdInterpreter interpreter;
 
         Config& getRuntime();

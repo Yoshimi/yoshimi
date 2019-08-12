@@ -5055,7 +5055,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
 }
 
 
-Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input, char *cCmd)
+Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
 {
     unsigned int newID = synth->getUniqueId();
     if (newID != currentInstance)
@@ -5067,7 +5067,8 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input, char *cCmd)
     Config &Runtime = synth->getRuntime();
 
     int tmp;
-    point = cCmd;
+    char* cCmd = nullptr; ////////////////////////////TODO
+    point = nullptr;//////////////////////////////////TODO
     point = skipSpace(point); // just to be sure
     tmp = strlen(cCmd) - 1;
     while (point[tmp] < '!' && tmp > 0)
@@ -5205,7 +5206,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input, char *cCmd)
         if (filename > "!")
         {
             char to_send[COMMAND_SIZE];
-            char *mark;
+            char *mark;///////////////////////////////TODO
             int count = 0;
             bool isok = true;
 
@@ -5244,7 +5245,8 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input, char *cCmd)
                     else
                     {
                         usleep(2000); // the loop is too fast otherwise!
-                        replyCode = cmdIfaceProcessCommand(input, mark).code;
+                        ///////////////////////////////TODO find a replacement for mark
+                        replyCode = cmdIfaceProcessCommand(input).code;
                     }
                     if (replyCode > REPLY::done_msg)
                     {

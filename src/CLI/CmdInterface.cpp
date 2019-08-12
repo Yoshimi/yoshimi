@@ -46,7 +46,6 @@
 #include "Misc/CliFuncs.h"
 
 using std::string;
-using std::ofstream;
 
 using func::asString;
 
@@ -57,10 +56,8 @@ extern SynthEngine *firstSynth;
 
 
 CmdInterface::CmdInterface() :
-    cCmd{nullptr},
     interpreter{}
-{
-}
+{ }
 
 
 Config& CmdInterface::getRuntime()
@@ -84,76 +81,58 @@ void CmdInterface::cmdIfaceCommandLoop()
         struct passwd *pw = getpwuid(getuid());
         hist_filename = string(pw->pw_dir) + string("/.yoshimi_history");
     }
-    using_history();
-    stifle_history(80); // Never more than 80 commands
-    if (read_history(hist_filename.c_str()) != 0) // reading failed
-    {
-        perror(hist_filename.c_str());
-        ofstream outfile (hist_filename.c_str()); // create an empty file
-    }
-    cCmd = NULL;
-    bool exit = false;
     cli::Parser parser;
-    char welcomeBuffer [128];
-    sprintf(welcomeBuffer, "yoshimi> ");
+    parser.setHistoryFile(hist_filename);
     interpreter.synth = firstSynth;
+    bool exit = false;
     while(!exit)
     {
-        cCmd = readline(welcomeBuffer);
-        if (cCmd)
+        parser.readline();
+        if (parser.isTooLarge())
+            std::cout << "*** Error: line too long" << std::endl;
+        else if(parser.isValid())
         {
-            if (strlen(cCmd) >= COMMAND_SIZE)
-                std::cout << "*** Error: line too long" << std::endl;
-            else if(cCmd[0] != 0)
-            {
-                // in case it's been changed from elsewhere
-                interpreter.synth = firstSynth->getSynthFromId(interpreter.currentInstance);
+            // in case it's been changed from elsewhere
+            interpreter.synth = firstSynth->getSynthFromId(interpreter.currentInstance);
 
-                cli::Reply reply = interpreter.cmdIfaceProcessCommand(parser, cCmd);
-                exit = (reply.code == REPLY::exit_msg);
+            cli::Reply reply = interpreter.cmdIfaceProcessCommand(parser);
+            exit = (reply.code == REPLY::exit_msg);
 
-                if (reply.code == REPLY::what_msg)
-                    Log(reply.msg + replies[REPLY::what_msg]);
-                else if (reply.code > REPLY::done_msg)
-                    Log(replies[reply.code]);
-                add_history(cCmd);
-            }
-            free(cCmd);
-            cCmd = NULL;
-
-            if (!exit)
-            {
-                do
-                { // create enough delay for most ops to complete
-                    usleep(2000);
-                }
-                while (getRuntime().runSynth && !getRuntime().finishedCLI);
-            }
-            if (getRuntime().runSynth)
-            {
-                string prompt = "yoshimi";
-                if (interpreter.currentInstance > 0)
-                    prompt += (":" + asString(interpreter.currentInstance));
-                int expose = readControl(interpreter.synth, 0, CONFIG::control::exposeStatus, TOPLEVEL::section::config);
-                if (expose == 1)
-                {
-                    string status = interpreter.buildStatus(true);
-                    if (status == "" )
-                        status = " Top";
-                    Log("@" + status, 1);
-                }
-                else if (expose == 2)
-                    prompt += interpreter.buildStatus(true);
-                prompt += "> ";
-                sprintf(welcomeBuffer,"%s",prompt.c_str());
-            }
+            if (reply.code == REPLY::what_msg)
+                Log(reply.msg + replies[REPLY::what_msg]);
+            else if (reply.code > REPLY::done_msg)
+                Log(replies[reply.code]);
         }
+
+        if (!exit)
+        {
+            do
+            { // create enough delay for most ops to complete
+                usleep(2000);
+            }
+            while (getRuntime().runSynth && !getRuntime().finishedCLI);
+        }
+        if (getRuntime().runSynth)
+        {
+            string prompt = "yoshimi";
+            if (interpreter.currentInstance > 0)
+                prompt += (":" + asString(interpreter.currentInstance));
+            int expose = readControl(interpreter.synth, 0, CONFIG::control::exposeStatus, TOPLEVEL::section::config);
+            if (expose == 1)
+            {
+                string status = interpreter.buildStatus(true);
+                if (status == "" )
+                    status = " Top";
+                Log("@" + status, 1);
+            }
+            else if (expose == 2)
+                prompt += interpreter.buildStatus(true);
+            prompt += "> ";
+
+            parser.setPrompt(prompt);
+        }
+
         if (!exit && getRuntime().runSynth)
             usleep(20000);
-    }
-
-    if (write_history(hist_filename.c_str()) != 0) // writing of history file failed
-    {
-        perror(hist_filename.c_str());
     }
 }

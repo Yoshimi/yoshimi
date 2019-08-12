@@ -67,7 +67,7 @@ class CmdInterpreter
         CmdInterpreter();
 
         std::string buildStatus(bool showPartDetails);
-        Reply cmdIfaceProcessCommand(Parser& input, char *cCmd);
+        Reply cmdIfaceProcessCommand(Parser& input);
 
         unsigned int currentInstance;
         SynthEngine *synth;
