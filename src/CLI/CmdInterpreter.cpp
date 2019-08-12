@@ -1026,12 +1026,12 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
     {
         nFXavail = NUM_SYS_EFX;
         nFXtype = synth->sysefx[nFX]->geteffect();
-        int tmp = toggle(point);
+        int tmp = input.toggle();
         if (tmp >= 0)
             return sendNormal( synth, 0, tmp, controlType, EFFECT::sysIns::effectEnable, TOPLEVEL::section::systemEffects, UNUSED, nFX);
     }
 
-    if (lineEnd(point, controlType))
+    if (input.lineEnd(controlType))
         return REPLY::done_msg;
 
     value = string2int(point);
@@ -1046,7 +1046,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
     if (value > 0)
     {
         value -= 1;
-        point = skipChars(point);
+        input.skipChars();
         if (value >= nFXavail)
             return REPLY::range_msg;
 
@@ -1074,7 +1074,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                 sendDirect(synth, 0, nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, nFX);
             }
         }
-        if (lineEnd(point, controlType))
+        if (input.lineEnd(controlType))
         {
             Runtime.Log("efx number set to " + asString(nFX + 1));
             return REPLY::done_msg;
@@ -1130,7 +1130,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                     nFXeqBand = 0;
                 if (selected == 10) // type
                 {
-                    point = skipChars(point);
+                    input.skipChars();
                     if (input.matchnMove(1, "random"))
                         value = 0;
                     else if (input.matchnMove(1, "freeverb"))
@@ -1150,7 +1150,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                 selected = stringNumInList(name, effchorus, 3);
                 if (selected == 4) // filtershape
                 {
-                    point = skipChars(point);
+                    input.skipChars();
                     if (input.matchnMove(1, "sine"))
                         value = 0;
                     else if (input.matchnMove(1, "triangle"))
@@ -1159,8 +1159,8 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                 }
                 else if (selected == 11) // subtract
                 {
-                    point = skipChars(point);
-                    value = (toggle(point) == 1);
+                    input.skipChars();
+                    value = (input.toggle() == 1);
                 }
                 break;
             }
@@ -1169,7 +1169,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                 selected = stringNumInList(name, effphaser, 3);
                 if (selected == 4) // filtershape
                 {
-                    point = skipChars(point);
+                    input.skipChars();
                     if (input.matchnMove(1, "sine"))
                         value = 0;
                     else if (input.matchnMove(1, "triangle"))
@@ -1178,8 +1178,8 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                 }
                 else if (selected == 10 || selected == 12 || selected == 14) // LFO, SUB, ANA
                 {
-                    point = skipChars(point);
-                    value = (toggle(point) == 1);
+                    input.skipChars();
+                    value = (input.toggle() == 1);
                 }
                 break;
             }
@@ -1188,7 +1188,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                 selected = stringNumInList(name, effalienwah, 3);
                 if (selected == 3) // filtershape
                 {
-                    point = skipChars(point);
+                    input.skipChars();
                     if (input.matchnMove(1, "sine"))
                         value = 0;
                     else if (input.matchnMove(1, "triangle"))
@@ -1202,7 +1202,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                 selected = stringNumInList(name, effdistortion, 3);
                 if (selected == 5) // filtershape
                 {
-                    point = skipChars(point);
+                    input.skipChars();
                     string name = string(point).substr(0,3);
                     value = stringNumInList(name, filtershapes, 3) - 1;
                     if (value < 0)
@@ -1210,8 +1210,8 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                 }
                 else if (selected == 6 || selected == 9 || selected == 10) // invert, stereo, prefilter
                 {
-                    point = skipChars(point);
-                    value = (toggle(point) == 1);
+                    input.skipChars();
+                    value = (input.toggle() == 1);
                 }
                 break;
             }
@@ -1222,7 +1222,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                 {
                     if (controlType == TOPLEVEL::type::Write)
                     {
-                        point = skipChars(point);
+                        input.skipChars();
                         value = string2int(point);
                         if (value < 0 || value >= MAX_EQ_BANDS)
                             return REPLY::range_msg;
@@ -1231,7 +1231,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                 }
                 else if (selected == 2) // type
                 {
-                    point = skipChars(point);
+                    input.skipChars();
                     string name = string(point).substr(0,3);
                     value = stringNumInList(name, eqtypes, 3);
                     if (value < 0)
@@ -1249,7 +1249,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                 selected = stringNumInList(name, effdynamicfilter, 3);
                 if (selected == 4) // filtershape
                 {
-                    point = skipChars(point);
+                    input.skipChars();
                     if (input.matchnMove(1, "sine"))
                         value = 0;
                     else if (input.matchnMove(1, "triangle"))
@@ -1258,8 +1258,8 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                 }
                 else if (selected == 8) // invert
                 {
-                    point = skipChars(point);
-                    value = (toggle(point) == 1);
+                    input.skipChars();
+                    value = (input.toggle() == 1);
                 }
                 else if (selected == 10) // filter entry
                 {
@@ -1272,7 +1272,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
         {
             if (value == -1)
             {
-                point = skipChars(point);
+                input.skipChars();
                 value = string2int(point);
             }
             //std::cout << "Val " << value << "  type " << controlType << "  cont " << selected << "  part " << context << "  efftype " << int(nFXtype) << "  num " << int(nFX) << std::endl;
@@ -1288,7 +1288,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
 
     if (input.matchnMove(2, "send"))
     {
-        if (lineEnd(point, controlType))
+        if (input.lineEnd(controlType))
             return REPLY::parameter_msg;
 
         if (bitTest(context, LEVEL::InsFX))
@@ -1307,8 +1307,8 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
         else
         {
             par = string2int(point) - 1;
-            point = skipChars(point);
-            if (lineEnd(point, controlType))
+            input.skipChars();
+            if (input.lineEnd(controlType))
                 return REPLY::value_msg;
             value = string2int127(point);
         }
@@ -1371,7 +1371,7 @@ int CmdInterpreter::midiControllers(Parser& input, unsigned char controlType)
     std::cout << "here" << std::endl;
     if (input.matchnMove(2, "volume"))
     {
-        value = toggle(point);
+        value = input.toggle();
         cmd = PART::control::volumeEnable;
 
         if (value == -1)
@@ -1387,7 +1387,7 @@ int CmdInterpreter::midiControllers(Parser& input, unsigned char controlType)
     }
     if ((cmd == -1) && input.matchnMove(2, "modwheel"))
     {
-        value = toggle(point);
+        value = input.toggle();
         cmd = PART::control::exponentialModWheel;
 
         if (value == -1)
@@ -1398,14 +1398,14 @@ int CmdInterpreter::midiControllers(Parser& input, unsigned char controlType)
     }
     if ((cmd == -1) && input.matchnMove(2, "expression"))
     {
-        value = toggle(point);
+        value = input.toggle();
         if (value == -1)
             return REPLY::value_msg;
         cmd = PART::control::expressionEnable;
     }
     if ((cmd == -1) && input.matchnMove(2, "sustain"))
     {
-        value = toggle(point);
+        value = input.toggle();
         if (value == -1)
             return REPLY::value_msg;
         cmd = PART::control::sustainPedalEnable;
@@ -1417,7 +1417,7 @@ int CmdInterpreter::midiControllers(Parser& input, unsigned char controlType)
     }
     if ((cmd == -1) && input.matchnMove(2, "breath"))
     {
-        value = toggle(point);
+        value = input.toggle();
         if (value == -1)
             return REPLY::value_msg;
         cmd = PART::control::breathControlEnable;
@@ -1434,7 +1434,7 @@ int CmdInterpreter::midiControllers(Parser& input, unsigned char controlType)
     }
     if ((cmd == -1) && input.matchnMove(2, "bandwidth"))
     {
-        value = toggle(point);
+        value = input.toggle();
         cmd = PART::control::exponentialBandwidth;
 
         if (value == -1)
@@ -1445,7 +1445,7 @@ int CmdInterpreter::midiControllers(Parser& input, unsigned char controlType)
     }
     if ((cmd == -1) && input.matchnMove(2, "fmamplitude"))
     {
-        value = toggle(point);
+        value = input.toggle();
         if (value == -1)
             return REPLY::value_msg;
         cmd = PART::control::FMamplitudeEnable;
@@ -1466,7 +1466,7 @@ int CmdInterpreter::midiControllers(Parser& input, unsigned char controlType)
     {
         if (input.matchnMove(2, "proportional"))
         {
-            value = toggle(point);
+            value = input.toggle();
             if (value == -1)
                 return REPLY::value_msg;
             cmd = PART::control::receivePortamento;
@@ -1488,14 +1488,14 @@ int CmdInterpreter::midiControllers(Parser& input, unsigned char controlType)
         }
         else if (input.matchnMove(2, "pinvert"))
         {
-            value = toggle(point);
+            value = input.toggle();
             if (value == -1)
                 return REPLY::value_msg;
             cmd = PART::control::portamentoThresholdType;
         }
         else if (input.matchnMove(2, "pproportional"))
         {
-            value = toggle(point);
+            value = input.toggle();
             if (value == -1)
                 return REPLY::value_msg;
             cmd = PART::control::enableProportionalPortamento;
@@ -1580,7 +1580,7 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
         {
             if (input.matchnMove(1, "fine"))
             {
-                if (lineEnd(point, controlType))
+                if (input.lineEnd(controlType))
                     return REPLY::value_msg;
                 value = string2int(point);
                 if (engine >= PART::engine::addMod1)
@@ -1590,7 +1590,7 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
             }
             else if (input.matchnMove(1, "coarse"))
             {
-                if (lineEnd(point, controlType))
+                if (input.lineEnd(controlType))
                     return REPLY::value_msg;
                 value = string2int(point);
                 if (engine >= PART::engine::addMod1)
@@ -1600,7 +1600,7 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
             }
             else if (input.matchnMove(1, "type"))
             {
-                if (lineEnd(point, controlType))
+                if (input.lineEnd(controlType))
                     return REPLY::value_msg;
                 string name = string(point).substr(0,3);
                 value = stringNumInList(name, detuneType, 3);
@@ -1616,7 +1616,7 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
         }
         else if (input.matchnMove(3, "octave"))
         {
-            if (lineEnd(point, controlType))
+            if (input.lineEnd(controlType))
                 return REPLY::value_msg;
             value = string2int(point);
             if (engine >= PART::engine::addMod1)
@@ -1647,7 +1647,7 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
         if (cmd == -1 && (input.matchnMove(3, "stereo") && bitFindHigh(context) != LEVEL::AddVoice))
         {
             cmd = ADDSYNTH::control::stereo;
-            value = (toggle(point) == 1);
+            value = (input.toggle() == 1);
         }
         // not AddSynth
         if (cmd == -1 && (bitFindHigh(context) != LEVEL::AddSynth))
@@ -1655,7 +1655,7 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
             int tmp_cmd = -1;
             if (input.matchnMove(3, "fixed"))
             {
-                value = (toggle(point) == 1);
+                value = (input.toggle() == 1);
                 cmd = SUBSYNTH::control::baseFrequencyAs440Hz;
             }
             else if (input.matchnMove(3, "equal"))
@@ -1669,7 +1669,7 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
             }
             if (tmp_cmd > -1)
             {
-                if (lineEnd(point, controlType))
+                if (input.lineEnd(controlType))
                     return REPLY::value_msg;
                 value = string2int(point);
                 cmd = tmp_cmd;
@@ -1694,7 +1694,7 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
             }
             if (tmp_cmd > -1)
             {
-                if (lineEnd(point, controlType))
+                if (input.lineEnd(controlType))
                     return REPLY::value_msg;
                 value = string2int(point);
                 cmd = tmp_cmd;
@@ -1738,7 +1738,7 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
                         cmd = SUBSYNTH::control::overtoneForceHarmonics;
                     if (cmd > -1)
                     {
-                        if (lineEnd(point, controlType))
+                        if (input.lineEnd(controlType))
                             return REPLY::value_msg;
                         value = string2int(point);
                     }
@@ -1762,7 +1762,7 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
 
     if (cmd != -1)
     {
-        if (lineEnd(point, controlType))
+        if (input.lineEnd(controlType))
             return REPLY::value_msg;
 
         if (bitFindHigh(context) == LEVEL::Part)
@@ -1781,7 +1781,7 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
             cmd = PART::control::minNote;
             if(controlType == TOPLEVEL::type::Write)
             {
-                if (lineEnd(point, controlType))
+                if (input.lineEnd(controlType))
                     return REPLY::value_msg;
                 if (input.matchnMove(1, "last"))
                 {
@@ -1801,7 +1801,7 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
             cmd = PART::control::maxNote;
             if(controlType == TOPLEVEL::type::Write)
             {
-                if (lineEnd(point, controlType))
+                if (input.lineEnd(controlType))
                     return REPLY::value_msg;
                 if (input.matchnMove(1, "last"))
                 {
@@ -1835,7 +1835,7 @@ int CmdInterpreter::LFOselect(Parser& input, unsigned char controlType)
     int cmd = -1;
     float value = -1;
     int group = -1;
-    if (lineEnd(point, controlType))
+    if (input.lineEnd(controlType))
         return REPLY::done_msg;
 
     int engine = contextToEngines(context);
@@ -1865,14 +1865,14 @@ int CmdInterpreter::LFOselect(Parser& input, unsigned char controlType)
             break;
     }
 
-    value = toggle(point);
+    value = input.toggle();
     if (value > -1)
     {
         if (engine != PART::engine::addVoice1 + voiceNumber)
             return REPLY::available_msg;
         return sendNormal( synth, 0, value, controlType, cmd, npart, kitNumber, engine);
     }
-    if (lineEnd(point, controlType))
+    if (input.lineEnd(controlType))
         return REPLY::done_msg;
 
     value = -1;
@@ -1890,12 +1890,12 @@ int CmdInterpreter::LFOselect(Parser& input, unsigned char controlType)
         cmd = LFOINSERT::control::stretch;
     else if (input.matchnMove(1, "continuous"))
     {
-        value = (toggle(point) == 1);
+        value = (input.toggle() == 1);
         cmd = LFOINSERT::control::continuous;
     }
     else if (input.matchnMove(1, "type"))
     {
-        if (lineEnd(point, controlType))
+        if (input.lineEnd(controlType))
             return REPLY::what_msg;
         if (input.matchnMove(2, "sine"))
             value = 0;
@@ -1933,7 +1933,7 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
     int thisPart = npart;
     int kit = kitNumber;
     int param = UNUSED;
-    if (lineEnd(point, controlType))
+    if (input.lineEnd(controlType))
         return REPLY::done_msg;
 
     int engine = contextToEngines(context);
@@ -1957,7 +1957,7 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
 
     if (!isDyn && (engine == PART::engine::subSynth || engine == PART::engine::addVoice1 + voiceNumber))
     {
-        value = toggle(point);
+        value = input.toggle();
         if (value > -1)
         {
             if (engine == PART::engine::subSynth)
@@ -1985,7 +1985,7 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
         cmd = FILTERINSERT::control::frequencyTracking;
     else if (input.matchnMove(1, "range"))
     {
-        value = (toggle(point) == 1);
+        value = (input.toggle() == 1);
         cmd = FILTERINSERT::control::frequencyTrackingRange;
     }
     else if (input.matchnMove(2, "category"))
@@ -2006,7 +2006,7 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
     }
     else if (input.matchnMove(2, "stages"))
     {
-        if (lineEnd(point, controlType))
+        if (input.lineEnd(controlType))
             return REPLY::value_msg;
         value = string2int(point) - 1;
         cmd = FILTERINSERT::control::stages;
@@ -2020,9 +2020,9 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
         {
             if (input.matchnMove(1, "invert"))
             {
-                if (lineEnd(point, controlType))
+                if (input.lineEnd(controlType))
                     return REPLY::value_msg;
-                value = (toggle(point) == 1);
+                value = (input.toggle() == 1);
                 cmd = FILTERINSERT::control::negateInput;
             }
             else if (input.matchnMove(2, "fcenter"))
@@ -2037,21 +2037,21 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
                 cmd = FILTERINSERT::control::formantSlowness;
             else if (input.matchnMove(2, "size"))
             {
-                if (lineEnd(point, controlType))
+                if (input.lineEnd(controlType))
                     return REPLY::value_msg;
                 value = string2int(point);
                 cmd = FILTERINSERT::control::sequenceSize;
             }
             else if (input.matchnMove(2, "count"))
             {
-                if (lineEnd(point, controlType))
+                if (input.lineEnd(controlType))
                     return REPLY::value_msg;
                 value = string2int(point);
                 cmd = FILTERINSERT::control::numberOfFormants;
             }
             else if (input.matchnMove(2, "vowel"))
             {
-                if (lineEnd(point, controlType))
+                if (input.lineEnd(controlType))
                     return REPLY::value_msg;
                 value = string2int(point);
                 filterVowelNumber = string2int(point);
@@ -2060,19 +2060,19 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
             }
             else if (input.matchnMove(1, "point"))
             {
-                if (lineEnd(point, controlType))
+                if (input.lineEnd(controlType))
                     return REPLY::value_msg;
                 value = string2int(point);
-                if (lineEnd(point, controlType))
+                if (input.lineEnd(controlType))
                     return REPLY::value_msg;
-                point = skipChars(point);
+                input.skipChars();
                 int position = string2int(point);
                 //std::cout << "val " << value << "  pos " << position << std::endl;
                 return sendNormal( synth, 0, value, controlType, FILTERINSERT::control::vowelPositionInSequence, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, position);
             }
             else if (input.matchnMove(2, "formant"))
             {
-                if (lineEnd(point, controlType))
+                if (input.lineEnd(controlType))
                     return REPLY::value_msg;
                 filterFormantNumber = string2int(point);
                 return REPLY::done_msg;
@@ -2158,7 +2158,7 @@ int CmdInterpreter::envelopeSelect(Parser& input, unsigned char controlType)
     int group = -1;
     unsigned char insert = TOPLEVEL::insert::envelopeGroup;
     unsigned char offset = UNUSED;
-    if (lineEnd(point, controlType))
+    if (input.lineEnd(controlType))
         return REPLY::done_msg;
 
     int engine = contextToEngines(context);
@@ -2205,10 +2205,10 @@ int CmdInterpreter::envelopeSelect(Parser& input, unsigned char controlType)
             cmd = SUBSYNTH::control::enableBandwidthEnvelope;
             break;
     }
-    if (lineEnd(point, controlType))
+    if (input.lineEnd(controlType))
         return REPLY::done_msg;
 
-    value = toggle(point);
+    value = input.toggle();
     if (value > -1)
     {
         if (engine != PART::engine::addSynth && engine != PART::engine::padSynth)
@@ -2219,7 +2219,7 @@ int CmdInterpreter::envelopeSelect(Parser& input, unsigned char controlType)
 
     if (input.matchnMove(2, "fmode"))
     {
-        return sendNormal( synth, 0, (toggle(point) == 1), controlType, ENVELOPEINSERT::control::enableFreeMode, npart, kitNumber, engine, TOPLEVEL::insert::envelopeGroup, insertType);
+        return sendNormal( synth, 0, (input.toggle() == 1), controlType, ENVELOPEINSERT::control::enableFreeMode, npart, kitNumber, engine, TOPLEVEL::insert::envelopeGroup, insertType);
     }
 
     // common controls
@@ -2230,12 +2230,12 @@ int CmdInterpreter::envelopeSelect(Parser& input, unsigned char controlType)
     else if (input.matchnMove(1, "force"))
     {
         cmd = ENVELOPEINSERT::control::forcedRelease;
-        value = (toggle(point) == 1);
+        value = (input.toggle() == 1);
     }
     else if (input.matchnMove(2, "linear"))
     {
         cmd = ENVELOPEINSERT::control::linearEnvelope;
-        value = (toggle(point) == 1);
+        value = (input.toggle() == 1);
     }
 
     bool freeMode = readControl(synth, 0, ENVELOPEINSERT::control::enableFreeMode, npart, kitNumber, engine, TOPLEVEL::insert::envelopeGroup, insertType);
@@ -2251,7 +2251,7 @@ int CmdInterpreter::envelopeSelect(Parser& input, unsigned char controlType)
         }
         else if (input.matchnMove(1, "Sustain"))
         {
-            if (lineEnd(point, controlType))
+            if (input.lineEnd(controlType))
                 return REPLY::value_msg;
             value = string2int(point);
             if (value == 0)
@@ -2277,7 +2277,7 @@ int CmdInterpreter::envelopeSelect(Parser& input, unsigned char controlType)
                     synth->getRuntime().Log("Max points already defined");
                     return REPLY::done_msg;
                 }
-                if (lineEnd(point, controlType))
+                if (input.lineEnd(controlType))
                     return REPLY::value_msg;
 
                 cmd = string2int(point); // point number
@@ -2288,13 +2288,13 @@ int CmdInterpreter::envelopeSelect(Parser& input, unsigned char controlType)
                 }
                 if (cmd < 0 || cmd >= pointCount)
                     return REPLY::range_msg;
-                point = skipChars(point);
-                if (lineEnd(point, controlType))
+                input.skipChars();
+                if (input.lineEnd(controlType))
                     return REPLY::value_msg;
 
                 offset = string2int(point); // X
-                point = skipChars(point);
-                if (lineEnd(point, controlType))
+                input.skipChars();
+                if (input.lineEnd(controlType))
                     return REPLY::value_msg;
 
                 value = string2int(point); // Y
@@ -2308,7 +2308,7 @@ int CmdInterpreter::envelopeSelect(Parser& input, unsigned char controlType)
                     synth->getRuntime().Log("Can't have less than three points");
                     return REPLY::done_msg;
                 }
-                if (lineEnd(point, controlType))
+                if (input.lineEnd(controlType))
                     return REPLY::value_msg;
 
                 cmd = string2int(point); // point number
@@ -2328,19 +2328,19 @@ int CmdInterpreter::envelopeSelect(Parser& input, unsigned char controlType)
             }
             else if (input.matchnMove(1, "change"))
             {
-                if (lineEnd(point, controlType))
+                if (input.lineEnd(controlType))
                 return REPLY::value_msg;
 
                 cmd = string2int(point); // point number
                 if (cmd < 0 || cmd >= (pointCount - 1))
                     return REPLY::range_msg;
-                point = skipChars(point);
-                if (lineEnd(point, controlType))
+                input.skipChars();
+                if (input.lineEnd(controlType))
                 return REPLY::value_msg;
 
                 offset = string2int(point); // X
-                point = skipChars(point);
-                if (lineEnd(point, controlType))
+                input.skipChars();
+                if (input.lineEnd(controlType))
                 return REPLY::value_msg;
 
                 value = string2int(point); // Y
@@ -2380,7 +2380,7 @@ int CmdInterpreter::envelopeSelect(Parser& input, unsigned char controlType)
 
     if (value == -1)
     {
-        if (lineEnd(point, controlType))
+        if (input.lineEnd(controlType))
             return REPLY::value_msg;
         value = string2float(point);
     }
@@ -2417,7 +2417,7 @@ int CmdInterpreter::commandGroup(Parser& input)
     list<string> msg;
     // having two lists is messy but the list routine clears 'msg'
     // while we need 'instrumentGroup' kept for actual part loads
-    point = skipChars(point);
+    input.skipChars();
     bool full = (input.matchnMove(1, "location"));
 
     int count = 0;
@@ -2502,7 +2502,7 @@ int CmdInterpreter::commandList(Parser& input)
         if (point[0] == '@')
         {
             point += 1;
-            point = skipSpace(point);
+            input.skipSpace();
             tmp = string2int(point);
             if (tmp > 0)
                 synth->midilearn.listLine(tmp - 1);
@@ -2786,7 +2786,7 @@ int CmdInterpreter::commandMlearn(Parser& input, unsigned char controlType)
     if (isdigit(point[0]) || point[0] == '-') // negative should never happen!
     {
         int lineNo = string2int(point);
-        point = skipChars(point);
+        input.skipChars();
         if (lineNo <= 0)
             return REPLY::value_msg;
         else
@@ -2802,7 +2802,7 @@ int CmdInterpreter::commandMlearn(Parser& input, unsigned char controlType)
         mline = 0;
         return (REPLY::done_msg);
     }
-    if (lineEnd(point, controlType))
+    if (input.lineEnd(controlType))
         return REPLY::done_msg;
     {
         unsigned char type = 0;
@@ -2849,22 +2849,22 @@ int CmdInterpreter::commandMlearn(Parser& input, unsigned char controlType)
         }
         else if (input.matchnMove(2, "mute"))
         {
-            type = (toggle(point) == 1) * 4;
+            type = (input.toggle() == 1) * 4;
             control = MIDILEARN::control::mute;
         }
         else if (input.matchnMove(2, "limit"))
         {
-            type = (toggle(point) == 1) * 2;
+            type = (input.toggle() == 1) * 2;
             control = MIDILEARN::control::limit;
         }
         else if (input.matchnMove(2, "block"))
         {
-            type = (toggle(point) == 1);
+            type = (input.toggle() == 1);
             control = MIDILEARN::control::block;
         }
         else if (input.matchnMove(2, "seven"))
         {
-            type = (toggle(point) == 1) * 16;
+            type = (input.toggle() == 1) * 16;
             control = MIDILEARN::control::sevenBit;
         }
         sendNormal( synth, 0, mline, type, control, TOPLEVEL::section::midiLearn, kit, engine, insert, parameter);
@@ -2888,7 +2888,7 @@ int CmdInterpreter::commandVector(Parser& input, unsigned char controlType)
             Runtime.Log("No vector on channel " + asString(chan + 1));
         return REPLY::done_msg;
     }
-    if (lineEnd(point, controlType))
+    if (input.lineEnd(controlType))
     {
         if (!Runtime.vectordata.Enabled[chan])
             Runtime.Log("No vector on channel " + asString(chan + 1));
@@ -2901,7 +2901,7 @@ int CmdInterpreter::commandVector(Parser& input, unsigned char controlType)
         ch -= 1;
         if (ch >= NUM_MIDI_CHANNELS)
             return REPLY::range_msg;
-        point = skipChars(point);
+        input.skipChars();
         if (chan != ch)
         {
             chan = ch;
@@ -2911,7 +2911,7 @@ int CmdInterpreter::commandVector(Parser& input, unsigned char controlType)
         Runtime.Log("Vector channel set to " + asString(chan + 1));
     }
 
-    if (matchWord(1, point, "off"))
+    if (input.matchWord(1, "off"))
     {
         sendDirect(synth, 0, 0,controlType,VECTOR::control::erase, TOPLEVEL::section::vector, UNUSED, UNUSED, chan);
         axis = 0;
@@ -2930,12 +2930,12 @@ int CmdInterpreter::commandVector(Parser& input, unsigned char controlType)
         axis = 1;
     }
 
-    if (lineEnd(point, controlType))
+    if (input.lineEnd(controlType))
         return REPLY::done_msg;
 
     if (input.matchnMove(2, "cc"))
     {
-        if (lineEnd(point, controlType))
+        if (input.lineEnd(controlType))
             return REPLY::value_msg;
 
         tmp = string2int(point);
@@ -2979,14 +2979,14 @@ int CmdInterpreter::commandVector(Parser& input, unsigned char controlType)
 
     if (input.matchnMove(1, "features"))
     {
-        if (lineEnd(point, controlType))
+        if (input.lineEnd(controlType))
             return REPLY::value_msg;
         int feat = string2int(point) - 1;
         if (feat < 0 || feat > 3)
             return REPLY::range_msg;
-        point = skipChars(point);
+        input.skipChars();
         int enable = 0;
-        if (toggle(point) == 1)
+        if (input.toggle() == 1)
             enable = 1;
         else if (feat > 1 && input.matchnMove(1, "reverse"))
             enable = 2;
@@ -2997,7 +2997,7 @@ int CmdInterpreter::commandVector(Parser& input, unsigned char controlType)
     if (input.matchnMove(2, "program") || input.matchnMove(1, "instrument"))
     {
         int hand = point[0] | 32;
-        point = skipChars(point); // in case they type the entire word
+        input.skipChars(); // in case they type the entire word
         if ((axis == 0 && (hand == 'd' || hand == 'u')) || (axis == 1 && (hand == 'l' || hand == 'r')))
         {
             Runtime.Log("Bad direction for this axis");
@@ -3022,8 +3022,8 @@ int CmdInterpreter::commandVector(Parser& input, unsigned char controlType)
         int cmd = string2int(point);
         if (cmd < 2 || cmd > 4)
             return REPLY::range_msg;
-        point = skipChars(point);
-        if (lineEnd(point, controlType))
+        input.skipChars();
+        if (input.lineEnd(controlType))
             return REPLY::value_msg;
         tmp = string2int(point);
         if (!synth->vectorInit(axis * 3 + cmd + 6, chan, tmp))
@@ -3100,56 +3100,56 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
     else if (input.matchnMove(2, "state"))
     {
         command = CONFIG::control::defaultStateStart;
-        value = (toggle(point) == 1);
+        value = (input.toggle() == 1);
     }
     else if (input.matchnMove(2, "single"))
     {
         command = CONFIG::control::enableSinglePath;
-        value = (toggle(point) == 1);
+        value = (input.toggle() == 1);
     }
     else if (input.matchnMove(1, "hide"))
     {
         command = CONFIG::control::hideNonFatalErrors;
-        value = (toggle(point) == 1);
+        value = (input.toggle() == 1);
     }
     else if (input.matchnMove(1, "display"))
     {
         command = CONFIG::control::showSplash;
-        value = (toggle(point) == 1);
+        value = (input.toggle() == 1);
     }
     else if (input.matchnMove(1, "time"))
     {
         command = CONFIG::control::logInstrumentLoadTimes;
-        value = (toggle(point) == 1);
+        value = (input.toggle() == 1);
     }
     else if (input.matchnMove(1, "include"))
     {
         command = CONFIG::control::logXMLheaders;
-        value = (toggle(point) == 1);
+        value = (input.toggle() == 1);
     }
     else if (input.matchnMove(1, "keep"))
     {
         command = CONFIG::control::saveAllXMLdata;
-        value = (toggle(point) == 1);
+        value = (input.toggle() == 1);
     }
     else if (input.matchnMove(1, "gui"))
     {
         command = CONFIG::control::enableGUI;
-        value = toggle(point);
+        value = input.toggle();
         if (value == -1)
             return REPLY::value_msg;
     }
     else if (input.matchnMove(1, "cli"))
     {
         command = CONFIG::control::enableCLI;
-        value = toggle(point);
+        value = input.toggle();
         if (value == -1)
             return REPLY::value_msg;
     }
 
     else if (input.matchnMove(3, "expose"))
     {
-        value = toggle(point);
+        value = input.toggle();
         if (value == -1 && input.matchnMove(2, "prompt"))
             value = 2;
         if (value == -1)
@@ -3186,7 +3186,7 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
         else if (input.matchnMove(1, "auto"))
         {
             command = CONFIG::control::jackAutoConnectAudio;
-            value = (toggle(point) == 1);
+            value = (input.toggle() == 1);
         }
         else
             return REPLY::op_msg;
@@ -3223,7 +3223,7 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
             command = CONFIG::control::alsaSampleRate;
             if (controlType == TOPLEVEL::type::Write)
             {
-                if (lineEnd(point, controlType))
+                if (input.lineEnd(controlType))
                     return REPLY::value_msg;
                 value = string2int(point);
                 if (value < 0 || value > 3)
@@ -3261,7 +3261,7 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
         command = CONFIG::control::bankRootCC;
         //if (controlType != TOPLEVEL::type::Write)
             value = 128; // ignored by range check
-        if (lineEnd(point, controlType))
+        if (input.lineEnd(controlType))
             return REPLY::value_msg;
         if (input.matchnMove(1, "msb"))
             value = 0;
@@ -3273,7 +3273,7 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
         command = CONFIG::control::bankCC;
         //if (controlType != TOPLEVEL::type::Write)
             value = 128; // ignored by range check
-        if (lineEnd(point, controlType))
+        if (input.lineEnd(controlType))
             return REPLY::value_msg;
         if (input.matchnMove(1, "msb"))
             value = 0;
@@ -3283,19 +3283,19 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
     else if (input.matchnMove(2, "program") || input.matchnMove(2, "instrument"))
     {
         command = CONFIG::control::enableProgramChange;
-        value = (toggle(point) == 1);
+        value = (input.toggle() == 1);
     }
     else if (input.matchnMove(2, "activate"))
     {
         command = CONFIG::control::instChangeEnablesPart;
-        value = (toggle(point) == 1);
+        value = (input.toggle() == 1);
     }
     else if (input.matchnMove(3, "extend"))
     {
         command = CONFIG::control::extendedProgramChangeCC;
         if (controlType != TOPLEVEL::type::Write)
             value = 128; // ignored by range check
-        else if (lineEnd(point, controlType))
+        else if (input.lineEnd(controlType))
             return REPLY::value_msg;
         else
             value = string2int(point);
@@ -3303,34 +3303,34 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
     else if (input.matchnMove(1, "quiet"))
     {
         command = CONFIG::control::ignoreResetAllCCs;
-        value = (toggle(point) == 1);
+        value = (input.toggle() == 1);
     }
     else if (input.matchnMove(1, "log"))
     {
         command = CONFIG::control::logIncomingCCs;
-        value = (toggle(point) == 1);
+        value = (input.toggle() == 1);
     }
     else if (input.matchnMove(2, "show"))
     {
         command = CONFIG::control::showLearnEditor;
-        value = (toggle(point) == 1);
+        value = (input.toggle() == 1);
     }
     else if (input.matchnMove(1, "nrpn"))
     {
         command = CONFIG::control::enableNRPNs;
-        value = (toggle(point) == 1);
+        value = (input.toggle() == 1);
     }
 
     else if (input.matchnMove(3, "lock"))
     {
         command = CONFIG::control::historyLock;
-        value = (toggle(point));
+        value = (input.toggle());
         string name = string(point).substr(0,2);
         int selected = stringNumInList(name, historyGroup, 2);
         if (selected == -1)
             return REPLY::range_msg;
-        point = skipChars(point);
-        value = (toggle(point));
+        input.skipChars();
+        value = (input.toggle());
         if (controlType == TOPLEVEL::type::Write && value == -1)
             return REPLY::value_msg;
         return sendDirect(synth, TOPLEVEL::action::lowPrio, value, controlType, command, TOPLEVEL::section::config, selected);
@@ -3346,7 +3346,7 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
 
 int CmdInterpreter::commandScale(Parser& input, unsigned char controlType)
 {
-    if (lineEnd(point, controlType))
+    if (input.lineEnd(controlType))
         return REPLY::done_msg;
     Config &Runtime = synth->getRuntime();
     float value = 0;
@@ -3437,9 +3437,9 @@ int CmdInterpreter::commandScale(Parser& input, unsigned char controlType)
 
         if (controlType == TOPLEVEL::type::Write)
         {
-            if (lineEnd(point, controlType))
+            if (input.lineEnd(controlType))
                 return REPLY::value_msg;
-            if ((toggle(point) == 1))
+            if ((input.toggle() == 1))
                 value = 1;
             else//if (isdigit(point[0]))
             {
@@ -3456,7 +3456,7 @@ int CmdInterpreter::commandScale(Parser& input, unsigned char controlType)
 
 int CmdInterpreter::modulator(Parser& input, unsigned char controlType)
 {
-    if (lineEnd(point, controlType))
+    if (input.lineEnd(controlType))
         return REPLY::done_msg;
     int value = -1;
     int cmd = -1;
@@ -3524,7 +3524,7 @@ int CmdInterpreter::modulator(Parser& input, unsigned char controlType)
 
         else if (input.matchnMove(3, "follow"))
         {
-            value = (toggle(point) == 1);
+            value = (input.toggle() == 1);
             cmd = ADDVOICE::control::modulatorDetuneFromBaseOsc;
         }
 
@@ -3600,18 +3600,18 @@ int CmdInterpreter::addVoice(Parser& input, unsigned char controlType)
         if (tmp < 0 || tmp >= NUM_VOICES)
             return REPLY::range_msg;
         voiceNumber = tmp;
-        point = skipChars(point);
+        input.skipChars();
     }
-    if (lineEnd(point, controlType))
+    if (input.lineEnd(controlType))
         return REPLY::done_msg;
 
-    int enable = (toggle(point));
+    int enable = (input.toggle());
     if (enable > -1)
     {
         sendNormal( synth, 0, enable, controlType, ADDVOICE::control::enableVoice, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
         return REPLY::done_msg;
     }
-    if (!lineEnd(point, controlType) && !readControl(synth, 0, ADDVOICE::control::enableVoice, npart, kitNumber, PART::engine::addVoice1 + voiceNumber))
+    if (!input.lineEnd(controlType) && !readControl(synth, 0, ADDVOICE::control::enableVoice, npart, kitNumber, PART::engine::addVoice1 + voiceNumber))
         return REPLY::inactive_msg;
 
     if (input.matchnMove(2, "modulator"))
@@ -3687,24 +3687,24 @@ int CmdInterpreter::addVoice(Parser& input, unsigned char controlType)
             cmd = ADDVOICE::control::voiceOscillatorPhase;
         else if (input.matchnMove(1, "minus"))
         {
-            value = (toggle(point) == 1);
+            value = (input.toggle() == 1);
             cmd = ADDVOICE::control::invertPhase;
         }
         else if (input.matchnMove(3, "delay"))
             cmd = ADDVOICE::control::delay;
         else if (input.matchnMove(1, "resonance"))
         {
-            value = (toggle(point) == 1);
+            value = (input.toggle() == 1);
             cmd = ADDVOICE::control::enableResonance;
         }
         else if (input.matchnMove(2, "bypass"))
         {
-            value = (toggle(point) == 1);
+            value = (input.toggle() == 1);
             cmd = ADDVOICE::control::bypassGlobalFilter;
         }
         else if (input.matchnMove(1, "unison"))
         {
-            value = toggle(point);
+            value = input.toggle();
             if (value > -1)
                 cmd = ADDVOICE::control::enableUnison;
             else
@@ -3764,13 +3764,13 @@ int CmdInterpreter::addSynth(Parser& input, unsigned char controlType)
         kit = kitNumber;
         insert = TOPLEVEL::insert::kitGroup;
     }
-    int enable = (toggle(point));
+    int enable = (input.toggle());
     if (enable > -1)
     {
         sendNormal( synth, 0, enable, controlType, PART::control::enable, npart, kit, PART::engine::addSynth, insert);
         return REPLY::done_msg;
     }
-    if (!lineEnd(point, controlType) && !readControl(synth, 0, PART::control::enable, npart, kit, PART::engine::addSynth, insert))
+    if (!input.lineEnd(controlType) && !readControl(synth, 0, PART::control::enable, npart, kit, PART::engine::addSynth, insert))
         return REPLY::inactive_msg;
 
     if (input.matchnMove(2, "resonance"))
@@ -3784,7 +3784,7 @@ int CmdInterpreter::addSynth(Parser& input, unsigned char controlType)
         insertType = TOPLEVEL::insertType::amplitude;
         return addVoice(input, controlType);
     }
-    if (lineEnd(point, controlType))
+    if (input.lineEnd(controlType))
         return REPLY::done_msg;
 
     int result = partCommonControls(input, controlType);
@@ -3795,16 +3795,16 @@ int CmdInterpreter::addSynth(Parser& input, unsigned char controlType)
     int value;
     if (input.matchnMove(2, "bandwidth"))
     {
-        if (lineEnd(point, controlType))
+        if (input.lineEnd(controlType))
             return REPLY::value_msg;
         value = string2int(point);
         cmd = ADDSYNTH::control::relativeBandwidth;
     }
     else if (input.matchnMove(2, "group"))
     {
-        if (lineEnd(point, controlType))
+        if (input.lineEnd(controlType))
             return REPLY::value_msg;
-        value = (toggle(point) == 1);
+        value = (input.toggle() == 1);
         cmd = ADDSYNTH::control::randomGroup;
     }
     if (cmd == -1)
@@ -3823,16 +3823,16 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
         kit = kitNumber;
         insert = TOPLEVEL::insert::kitGroup;
     }
-    int enable = (toggle(point));
+    int enable = (input.toggle());
     if (enable > -1)
     {
         sendNormal( synth, 0, enable, controlType, PART::control::enable, npart, kit, PART::engine::subSynth, insert);
         return REPLY::done_msg;
     }
-    if (!lineEnd(point, controlType) && !readControl(synth, 0, PART::control::enable, npart, kit, PART::engine::subSynth, insert))
+    if (!input.lineEnd(controlType) && !readControl(synth, 0, PART::control::enable, npart, kit, PART::engine::subSynth, insert))
         return REPLY::inactive_msg;
 
-    if (lineEnd(point, controlType))
+    if (input.lineEnd(controlType))
         return REPLY::done_msg;
     int result = partCommonControls(input, controlType);
     if (result != REPLY::todo_msg)
@@ -3849,7 +3849,7 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
             cmd = SUBSYNTH::control::startPosition;
         if (cmd != -1)
         {
-            if (lineEnd(point, controlType))
+            if (input.lineEnd(controlType))
                 return REPLY::value_msg;
             return sendNormal( synth, 0, string2int(point), controlType, cmd, npart, kitNumber, PART::engine::subSynth);
         }
@@ -3857,10 +3857,10 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
         int control = -1;
         unsigned char insert = UNUSED;
         bool set = false;
-        if (lineEnd(point, controlType))
+        if (input.lineEnd(controlType))
             return REPLY::parameter_msg;
         control = string2int(point) - 1;
-        point = skipChars(point);
+        input.skipChars();
         if (input.matchnMove(1, "amplitude"))
         {
             insert = TOPLEVEL::insert::harmonicAmplitude;
@@ -3873,7 +3873,7 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
         }
         if (set)
         {
-            if (lineEnd(point, controlType))
+            if (input.lineEnd(controlType))
                 return REPLY::value_msg;
             return sendNormal( synth, 0, string2int(point), controlType, control, npart, kitNumber, PART::engine::subSynth, insert);
         }
@@ -3890,7 +3890,7 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
                 cmd = SUBSYNTH::control::bandwidthScale;
             else if (input.matchnMove(1, "envelope"))
             {
-                value = (toggle(point) == 1);
+                value = (input.toggle() == 1);
                 cmd = SUBSYNTH::control::enableBandwidthEnvelope;
             }
         }
@@ -3898,13 +3898,13 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
         {
             if (input.matchnMove(1, "envelope"))
             {
-                value = (toggle(point) == 1);
+                value = (input.toggle() == 1);
                 cmd = SUBSYNTH::control::enableFrequencyEnvelope;
             }
         }
         else if (input.matchnMove(2, "filter"))
         {
-            value = (toggle(point) == 1);
+            value = (input.toggle() == 1);
             cmd = SUBSYNTH::control::enableFilter;
         }
 
@@ -3915,7 +3915,7 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
         //std::cout << "control " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(PART::engine::subSynth) << std::endl;
         if (value == -1)
         {
-            if (lineEnd(point, controlType))
+            if (input.lineEnd(controlType))
                 return REPLY::value_msg;
             value = string2int(point);
         }
@@ -3934,13 +3934,13 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
         kit = kitNumber;
         insert = TOPLEVEL::insert::kitGroup;
     }
-    int enable = (toggle(point));
+    int enable = (input.toggle());
     if (enable > -1)
     {
         sendNormal( synth, 0, enable, controlType, PART::control::enable, npart, kit, PART::engine::padSynth, insert);
         return REPLY::done_msg;
     }
-    if (!lineEnd(point, controlType) && !readControl(synth, 0, PART::control::enable, npart, kit, PART::engine::padSynth, insert))
+    if (!input.lineEnd(controlType) && !readControl(synth, 0, PART::control::enable, npart, kit, PART::engine::padSynth, insert))
         return REPLY::inactive_msg;
 
     if (input.matchnMove(2, "resonance"))
@@ -3953,7 +3953,7 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
         bitSet(context, LEVEL::Oscillator);
         return waveform(input, controlType);
     }
-    if (lineEnd(point, controlType))
+    if (input.lineEnd(controlType))
         return REPLY::done_msg;
     int result = partCommonControls(input, controlType);
     if (result != REPLY::todo_msg)
@@ -4058,7 +4058,7 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
     }
     else if (input.matchnMove(2, "auto"))
     {
-        value = (toggle(point) > 0);
+        value = (input.toggle() > 0);
         cmd = PADSYNTH::control::autoscale;
     }
     else if (input.matchnMove(3, "base"))
@@ -4163,7 +4163,7 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
 
 int CmdInterpreter::resonance(Parser& input, unsigned char controlType)
 {
-    int value = toggle(point);
+    int value = input.toggle();
     int cmd = -1;
     int engine = contextToEngines(context);
     int insert = TOPLEVEL::insert::resonanceGroup;
@@ -4172,7 +4172,7 @@ int CmdInterpreter::resonance(Parser& input, unsigned char controlType)
         sendNormal( synth, 0, value, controlType, RESONANCE::control::enableResonance, npart, kitNumber, engine, insert);
         return REPLY::done_msg;
     }
-    if (lineEnd(point, controlType))
+    if (input.lineEnd(controlType))
         return REPLY::done_msg;
 
     if (input.matchnMove(1, "random"))
@@ -4189,12 +4189,12 @@ int CmdInterpreter::resonance(Parser& input, unsigned char controlType)
     }
     else if (input.matchnMove(2, "protect"))
     {
-        value = (toggle(point) == 1);
+        value = (input.toggle() == 1);
         cmd = RESONANCE::control::protectFundamental;
     }
     else if (input.matchnMove(1, "maxdb"))
     {
-        if (lineEnd(point, controlType))
+        if (input.lineEnd(controlType))
             return REPLY::value_msg;
         cmd = RESONANCE::control::maxDb;
         value = string2int(point);
@@ -4248,8 +4248,8 @@ int CmdInterpreter::resonance(Parser& input, unsigned char controlType)
         cmd = string2int(point) - 1;
         if (cmd < 1 || cmd >= MAX_RESONANCE_POINTS)
             return REPLY::range_msg;
-        point = skipChars(point);
-        if (lineEnd(point, controlType))
+        input.skipChars();
+        if (input.lineEnd(controlType))
             return REPLY::value_msg;
         value = string2int(point);
     }
@@ -4261,7 +4261,7 @@ int CmdInterpreter::resonance(Parser& input, unsigned char controlType)
 
 int CmdInterpreter::waveform(Parser& input, unsigned char controlType)
 {
-    if (lineEnd(point, controlType))
+    if (input.lineEnd(controlType))
         return REPLY::done_msg;
     float value = -1;
     int cmd = -1;
@@ -4274,14 +4274,14 @@ int CmdInterpreter::waveform(Parser& input, unsigned char controlType)
         cmd = OSCILLATOR::control::baseFunctionType;
     else if (input.matchnMove(1, "harmonic"))
     {
-        if (lineEnd(point, controlType))
+        if (input.lineEnd(controlType))
             return REPLY::value_msg;
 
         if (input.matchnMove(1, "shift"))
             cmd = OSCILLATOR::control::harmonicShift;
         else if (input.matchnMove(1, "before"))
         {
-            value = (toggle(point) == 1);
+            value = (input.toggle() == 1);
             cmd = OSCILLATOR::control::shiftBeforeWaveshapeAndFilter;
         }
         else
@@ -4289,14 +4289,14 @@ int CmdInterpreter::waveform(Parser& input, unsigned char controlType)
             cmd = string2int(point) - 1;
             if (cmd < 0 || cmd >= MAX_AD_HARMONICS)
                 return REPLY::range_msg;
-            point = skipChars(point);
+            input.skipChars();
 
             if (input.matchnMove(1, "amp"))
                 insert = TOPLEVEL::insert::harmonicAmplitude;
             else if (input.matchnMove(1, "phase"))
                 insert = TOPLEVEL::insert::harmonicPhaseBandwidth;
 
-            if (lineEnd(point, controlType))
+            if (input.lineEnd(controlType))
                 return REPLY::value_msg;
         }
         if (value == -1)
@@ -4354,11 +4354,11 @@ int CmdInterpreter::waveform(Parser& input, unsigned char controlType)
                 default:
                     return REPLY::op_msg;
             }
-            point = skipChars(point);
+            input.skipChars();
         }
         else if (input.matchnMove(1, "before"))
         {
-            value = (toggle(point) == 1);
+            value = (input.toggle() == 1);
             cmd = OSCILLATOR::control::filterBeforeWaveshape;
         }
         else return REPLY::op_msg;
@@ -4370,7 +4370,7 @@ int CmdInterpreter::waveform(Parser& input, unsigned char controlType)
             cmd = OSCILLATOR::control::baseFunctionParameter;
         else if (input.matchnMove(1, "convert"))
         {
-            value = (toggle(point) != 0);
+            value = (input.toggle() != 0);
             cmd = OSCILLATOR::control::useAsBaseFunction;
         }
         else if (input.matchnMove(1, "mod"))
@@ -4405,7 +4405,7 @@ int CmdInterpreter::waveform(Parser& input, unsigned char controlType)
                     default:
                         return REPLY::range_msg;
                 }
-                point = skipChars(point);
+                input.skipChars();
             }
             else
                 return REPLY::op_msg;
@@ -4477,7 +4477,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
     int tmp = -1;
     if (bitTest(context, LEVEL::AllFX))
         return effects(input, controlType);
-    if (lineEnd(point, controlType))
+    if (input.lineEnd(controlType))
         return REPLY::done_msg;
     if (kitMode == PART::kitType::Off)
         kitNumber = UNUSED; // always clear it if not kit mode
@@ -4492,7 +4492,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
     if (isdigit(point[0]))
     {
         tmp = string2int127(point);
-        point = skipChars(point);
+        input.skipChars();
         if (tmp > 0)
         {
             tmp -= 1;
@@ -4517,7 +4517,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
                         sendNormal( synth, 0, npart, TOPLEVEL::type::Write, MAIN::control::partNumber, TOPLEVEL::section::main);
                     }
                 }
-                if (lineEnd(point, controlType))
+                if (input.lineEnd(controlType))
                     return REPLY::done_msg;
             }
             else
@@ -4537,11 +4537,11 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
 
     if (!inKitEditor)
     {
-        int enable = toggle(point);
+        int enable = input.toggle();
         if (enable != -1)
         {
             int result = sendNormal( synth, 0, enable, controlType, PART::control::enable, npart);
-            if (lineEnd(point, controlType))
+            if (input.lineEnd(controlType))
                 return result;
         }
     }
@@ -4632,7 +4632,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
     }
     if (inKitEditor)
     {
-        int value = toggle(point);
+        int value = input.toggle();
         if (value >= 0)
         {
             if (kitNumber == 0 && bitFindHigh(context) == LEVEL::Part)
@@ -4680,9 +4680,9 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
     {
         int value;
         if (input.matchnMove(2, "drum"))
-            return sendNormal( synth, 0, (toggle(point) != 0), controlType, PART::control::drumMode, npart);
+            return sendNormal( synth, 0, (input.toggle() != 0), controlType, PART::control::drumMode, npart);
         if (input.matchnMove(2, "quiet"))
-            return sendNormal( synth, 0, (toggle(point) != 0), controlType, PART::control::kitItemMute, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup);
+            return sendNormal( synth, 0, (input.toggle() != 0), controlType, PART::control::kitItemMute, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup);
         if (matchnMove(2, point,"effect"))
         {
             if (controlType == TOPLEVEL::type::Write && point[0] == 0)
@@ -4695,7 +4695,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
         if (matchnMove(2, point,"name"))
         {
             int miscmsg = NO_MSG;
-            if (lineEnd(point, controlType))
+            if (input.lineEnd(controlType))
                 return REPLY::value_msg;
             if (controlType == TOPLEVEL::type::Write)
                 miscmsg = textMsgBuffer.push(point);
@@ -4756,7 +4756,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
         int value = 0;
         if(controlType == TOPLEVEL::type::Write)
         {
-            if (lineEnd(point, controlType))
+            if (input.lineEnd(controlType))
                 return REPLY::value_msg;
             value = string2int(point);
             if (value < 1 || (value > POLIPHONY - 20))
@@ -4782,7 +4782,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
         return sendNormal( synth, 0, value, controlType, PART::control::keyMode, npart);
     }
     if (input.matchnMove(2, "portamento"))
-        return sendNormal( synth, 0, (toggle(point) == 1), controlType, PART::control::portamento, npart);
+        return sendNormal( synth, 0, (input.toggle() == 1), controlType, PART::control::portamento, npart);
     if (input.matchnMove(1, "humanise"))
     {
         int cmd = -1;
@@ -4792,7 +4792,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
             cmd = PART::control::humanvelocity;
         else
             return REPLY::op_msg;
-        if (lineEnd(point, controlType))
+        if (input.lineEnd(controlType))
             return REPLY::value_msg;
         return sendNormal( synth, 0, string2int(point), controlType, cmd, npart);
     }
@@ -4845,7 +4845,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
             Runtime.Log("Instance " + std::to_string(synth->getUniqueId()));
             return REPLY::done_msg;
         }
-        if (lineEnd(point, controlType))
+        if (input.lineEnd(controlType))
             return REPLY::value_msg;
 
         resetInstance();
@@ -4888,7 +4888,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
 
     if (input.matchnMove(3, "mono"))
     {
-        return sendNormal( synth, 0, (toggle(point) == 1), controlType, MAIN::control::mono, TOPLEVEL::section::main);
+        return sendNormal( synth, 0, (input.toggle() == 1), controlType, MAIN::control::mono, TOPLEVEL::section::main);
     }
 
     if (input.matchnMove(2, "config"))
@@ -4992,20 +4992,20 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
 
     if (input.matchnMove(1, "volume"))
     {
-        if (lineEnd(point, controlType))
+        if (input.lineEnd(controlType))
             return REPLY::value_msg;
         return sendNormal( synth, 0, string2int127(point), controlType, MAIN::control::volume, TOPLEVEL::section::main);
     }
     if (input.matchnMove(2, "detune"))
     {
-        if (lineEnd(point, controlType))
+        if (input.lineEnd(controlType))
             return REPLY::value_msg;
         return sendNormal( synth, TOPLEVEL::action::lowPrio, string2int127(point), controlType, MAIN::control::detune, TOPLEVEL::section::main);
     }
 
     if (input.matchnMove(2, "shift"))
     {
-        if (lineEnd(point, controlType))
+        if (input.lineEnd(controlType))
             return REPLY::value_msg;
         int value = string2int(point);
         return sendNormal( synth, TOPLEVEL::action::lowPrio, value, controlType, MAIN::control::keyShift, TOPLEVEL::section::main);
@@ -5019,7 +5019,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
         {
             if (controlType == TOPLEVEL::type::Write)
             {
-                if (lineEnd(point, controlType))
+                if (input.lineEnd(controlType))
                     return REPLY::value_msg;
                 value = string2int127(point);
                 string otherCC = Runtime.masterCCtest(value);
@@ -5044,7 +5044,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
     }
     if (input.matchnMove(2, "available")) // 16, 32, 64
     {
-        if (lineEnd(point, controlType))
+        if (input.lineEnd(controlType))
             return REPLY::value_msg;
         int value = string2int(point);
         if (controlType == TOPLEVEL::type::Write && value != 16 && value != 32 && value != 64)
@@ -5069,7 +5069,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
     int tmp;
     char* cCmd = nullptr; ////////////////////////////TODO
     point = nullptr;//////////////////////////////////TODO
-    point = skipSpace(point); // just to be sure
+    input.skipSpace(); // just to be sure
     tmp = strlen(cCmd) - 1;
     while (point[tmp] < '!' && tmp > 0)  ///////////////////TODO: add trim operation to Parser class!
     {
@@ -5115,7 +5115,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
     if (point[0] == '/')
     {
         ++ point;
-        point = skipSpace(point);
+        input.skipSpace();
         defaults();
         if (point[0] == 0)
             return Reply::DONE;
@@ -5136,7 +5136,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
     if (point[0] == '.' && point[1] == '.')
     {
         point += 2;
-        point = skipSpace(point);
+        input.skipSpace();
         /*
          * kit mode is a pseudo context level so the code
          * below emulates normal 'back' actions
@@ -5374,7 +5374,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             return Reply::what("add");
         }
     }
-    if (matchWord(3, point, "import") || matchWord(3, point, "export") )
+    if (input.matchWord(3, "import") || input.matchWord(3, "export") )
     { // need the double test to find which then move along line
         int type = 0;
         string replyMsg;
@@ -5395,13 +5395,13 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             if (isdigit(point[0]))
             {
                 root = string2int(point);
-                point = skipChars(point);
+                input.skipChars();
             }
             else
                 root = 200; // force invalid root error
         }
         int value = string2int(point);
-        point = skipChars(point);
+        input.skipChars();
         string name = string(point);
         if (root < 0 || (root > 127 && root != UNUSED) || value < 0 || value > 127 || name <="!")
             return Reply{REPLY::what_msg};
@@ -5453,7 +5453,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             }
             if (isdigit(point[0]))
             {
-                point = skipChars(point);
+                input.skipChars();
                 int bankID = string2int(point);
                 if (bankID >= MAX_BANKS_IN_ROOT)
                     return Reply{REPLY::range_msg};
@@ -5515,7 +5515,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             else if (point[0] == '@')
             {
                 point += 1;
-                point = skipSpace(point);
+                input.skipSpace();
                 tmp = string2int(point);
                 if (tmp == 0)
                     return Reply{REPLY::value_msg};
@@ -5562,7 +5562,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
                 if (ch > 0)
                 {
                     ch -= 1;
-                    point = skipChars(point);
+                    input.skipChars();
                 }
                 else
                     ch = chan;
@@ -5581,7 +5581,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             if (point[0] == '@')
             {
                 point += 1;
-                point = skipSpace(point);
+                input.skipSpace();
                 tmp = string2int(point);
                 if (tmp <= 0)
                     return Reply{REPLY::value_msg};
@@ -5606,7 +5606,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             if (point[0] == '@')
             {
                 point += 1;
-                point = skipSpace(point);
+                input.skipSpace();
                 tmp = string2int(point);
                 if (tmp <= 0)
                     return Reply{REPLY::value_msg};
@@ -5631,7 +5631,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             if (point[0] == '@')
             {
                 point += 1;
-                point = skipSpace(point);
+                input.skipSpace();
                 tmp = string2int(point);
                 if (tmp <= 0)
                     return Reply{REPLY::value_msg};
@@ -5656,7 +5656,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             if (point[0] == '@')
             {
                 point += 1;
-                point = skipSpace(point);
+                input.skipSpace();
                 tmp = string2int(point);
                 if (tmp <= 0)
                     return Reply{REPLY::value_msg};
@@ -5681,7 +5681,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             if (point[0] == '@')
             {
                 point += 1;
-                point = skipSpace(point);
+                input.skipSpace();
                 tmp = string2int(point);
                 if (tmp <= 0)
                     return Reply{REPLY::value_msg};
@@ -5718,7 +5718,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             if(input.matchnMove(1, "channel"))
             {
                 tmp = string2int127(point) - 1;
-                point = skipChars(point);
+                input.skipChars();
             }
             if (tmp >= NUM_MIDI_CHANNELS || tmp < 0)
                 return Reply{REPLY::range_msg};

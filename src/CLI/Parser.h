@@ -243,6 +243,30 @@ class Parser
             return cli::matchnMove(num, point, word);
         }
 
+        int matchWord(int numChars, const char * word)
+        {
+            return cli::matchWord(numChars, point, word);
+        }
+
+        void skipSpace()
+        {
+            point = cli::skipSpace(point);
+        }
+
+        void skipChars()
+        {
+            point = cli::skipChars(point);
+        }
+
+        int toggle()
+        {
+            return cli::toggle(point);
+        }
+
+        bool lineEnd(unsigned char controlType)
+        {
+            return cli::lineEnd(point, controlType);
+        }
 
     private:
         void cleanUp()
