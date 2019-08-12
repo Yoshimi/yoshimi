@@ -236,6 +236,14 @@ class Parser
             }
         }
 
+        /* ==== Parsing API ==== */
+
+        bool matchnMove(int num, const char * word)
+        {
+            return cli::matchnMove(num, point, word);
+        }
+
+
     private:
         void cleanUp()
         {
