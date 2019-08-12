@@ -152,5 +152,28 @@ inline int stringNumInList(std::string toFind, std::string * theList, size_t min
 }
 
 
+
+class Parser
+{
+    
+    public:
+        Parser()
+        {
+            
+        }
+        
+       ~Parser()
+        {
+            
+        }
+
+        // Parser is not copyable and can only be passed by reference
+        Parser(const Parser&) = delete;
+        Parser(Parser&&) = delete;
+        Parser& operator=(const Parser&) = delete;
+        Parser& operator=(Parser&&) = delete;
+};
+
+
 }//(End)namespace cli
 #endif /*PARSER_H*/

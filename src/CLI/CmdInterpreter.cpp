@@ -571,7 +571,7 @@ void CmdInterpreter::helpLoop(list<string>& msg, string *commands, int indent, b
 }
 
 
-char CmdInterpreter::helpList(unsigned int local)
+char CmdInterpreter::helpList(Parser& input, unsigned int local)
 {
     if (!matchnMove(1, point, "help") && !matchnMove(1, point, "?"))
         return REPLY::todo_msg;
@@ -950,7 +950,7 @@ string CmdInterpreter::historySelect(int listnum, int selection)
 }
 
 
-int CmdInterpreter::effectsList(bool presets)
+int CmdInterpreter::effectsList(Parser& input, bool presets)
 {
     list<string>msg;
 
@@ -1004,7 +1004,7 @@ int CmdInterpreter::effectsList(bool presets)
 }
 
 
-int CmdInterpreter::effects(unsigned char controlType)
+int CmdInterpreter::effects(Parser& input, unsigned char controlType)
 {
     Config &Runtime = synth->getRuntime();
     int nFXavail;
@@ -1364,7 +1364,7 @@ int CmdInterpreter::effects(unsigned char controlType)
 }
 
 
-int CmdInterpreter::midiControllers(unsigned char controlType)
+int CmdInterpreter::midiControllers(Parser& input, unsigned char controlType)
 {
     int value = -1;
     int cmd = -1;
@@ -1559,7 +1559,7 @@ int CmdInterpreter::midiControllers(unsigned char controlType)
 }
 
 
-int CmdInterpreter::partCommonControls(unsigned char controlType)
+int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
 {
     // TODO integrate modulator controls properly
     int cmd = -1;
@@ -1630,17 +1630,17 @@ int CmdInterpreter::partCommonControls(unsigned char controlType)
             if(engine == PART::engine::subSynth)
                 return REPLY::available_msg;
             bitSet(context, LEVEL::LFO);
-            return LFOselect(controlType);
+            return LFOselect(input, controlType);
         }
         if (cmd == -1 && matchnMove(3, point, "filter"))
         {
             bitSet(context, LEVEL::Filter);
-            return filterSelect(controlType);
+            return filterSelect(input, controlType);
         }
         if (cmd == -1 && matchnMove(3, point, "envelope"))
         {
             bitSet(context, LEVEL::Envelope);
-            return envelopeSelect(controlType);
+            return envelopeSelect(input, controlType);
         }
 
         // not AddVoice
@@ -1830,7 +1830,7 @@ int CmdInterpreter::partCommonControls(unsigned char controlType)
 }
 
 
-int CmdInterpreter::LFOselect(unsigned char controlType)
+int CmdInterpreter::LFOselect(Parser& input, unsigned char controlType)
 {
     int cmd = -1;
     float value = -1;
@@ -1926,7 +1926,7 @@ int CmdInterpreter::LFOselect(unsigned char controlType)
 }
 
 
-int CmdInterpreter::filterSelect(unsigned char controlType)
+int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
 {
     int cmd = -1;
     float value = -1;
@@ -2151,7 +2151,7 @@ int CmdInterpreter::filterSelect(unsigned char controlType)
 }
 
 
-int CmdInterpreter::envelopeSelect(unsigned char controlType)
+int CmdInterpreter::envelopeSelect(Parser& input, unsigned char controlType)
 {
     int cmd = -1;
     float value = -1;
@@ -2390,7 +2390,7 @@ int CmdInterpreter::envelopeSelect(unsigned char controlType)
     return sendNormal( synth, 0, string2float(point), controlType, cmd, npart, kitNumber, engine, insert, insertType, offset);
 }
 
-int CmdInterpreter::commandGroup()
+int CmdInterpreter::commandGroup(Parser& input)
 {
     string line;
     float value = string2int(point);
@@ -2440,7 +2440,7 @@ int CmdInterpreter::commandGroup()
 }
 
 
-int CmdInterpreter::commandList()
+int CmdInterpreter::commandList(Parser& input)
 {
     Config &Runtime = synth->getRuntime();
     int ID;
@@ -2485,7 +2485,7 @@ int CmdInterpreter::commandList()
 
     if (matchnMove(1, point, "parts"))
     {
-        listCurrentParts(msg);
+        listCurrentParts(input, msg);
         synth->cliOutput(msg, LINES);
         return REPLY::done_msg;
     }
@@ -2548,9 +2548,9 @@ int CmdInterpreter::commandList()
     }
 
     if (matchnMove(1, point, "effects") || matchnMove(1, point, "efx"))
-        return effectsList();
+        return effectsList(input);
     if (matchnMove(3, point, "presets"))
-        return effectsList(true);
+        return effectsList(input, true);
 
     msg.push_back("Lists:");
     helpLoop(msg, listlist, 2);
@@ -2562,7 +2562,7 @@ int CmdInterpreter::commandList()
 }
 
 
-void CmdInterpreter::listCurrentParts(list<string>& msg_buf)
+void CmdInterpreter::listCurrentParts(Parser& input, list<string>& msg_buf)
 {
     int dest;
     string name = "";
@@ -2771,7 +2771,7 @@ void CmdInterpreter::listCurrentParts(list<string>& msg_buf)
 }
 
 
-int CmdInterpreter::commandMlearn(unsigned char controlType)
+int CmdInterpreter::commandMlearn(Parser& input, unsigned char controlType)
 {
     Config &Runtime = synth->getRuntime();
     list<string> msg;
@@ -2874,7 +2874,7 @@ int CmdInterpreter::commandMlearn(unsigned char controlType)
 }
 
 
-int CmdInterpreter::commandVector(unsigned char controlType)
+int CmdInterpreter::commandVector(Parser& input, unsigned char controlType)
 {
     Config &Runtime = synth->getRuntime();
     list<string> msg;
@@ -3039,7 +3039,7 @@ int CmdInterpreter::commandVector(unsigned char controlType)
 }
 
 
-int CmdInterpreter::commandConfig(unsigned char controlType)
+int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
 {
     float value = 0;
     unsigned char command = UNUSED;
@@ -3344,7 +3344,7 @@ int CmdInterpreter::commandConfig(unsigned char controlType)
 }
 
 
-int CmdInterpreter::commandScale(unsigned char controlType)
+int CmdInterpreter::commandScale(Parser& input, unsigned char controlType)
 {
     if (lineEnd(point, controlType))
         return REPLY::done_msg;
@@ -3454,7 +3454,7 @@ int CmdInterpreter::commandScale(unsigned char controlType)
 }
 
 
-int CmdInterpreter::modulator(unsigned char controlType)
+int CmdInterpreter::modulator(Parser& input, unsigned char controlType)
 {
     if (lineEnd(point, controlType))
         return REPLY::done_msg;
@@ -3481,7 +3481,7 @@ int CmdInterpreter::modulator(unsigned char controlType)
         if (matchnMove(2, point, "waveform"))
         {
             bitSet(context, LEVEL::Oscillator);
-            return waveform(controlType);
+            return waveform(input, controlType);
         }
 
         if (matchnMove(2, point, "source"))
@@ -3582,17 +3582,17 @@ int CmdInterpreter::modulator(unsigned char controlType)
     if (matchnMove(3, point, "envelope"))
     {
         bitSet(context, LEVEL::Envelope);
-        return envelopeSelect(controlType);
+        return envelopeSelect(input, controlType);
     }
 
     if (cmd == -1)
-        return partCommonControls(controlType);//REPLY::available_msg;
+        return partCommonControls(input, controlType);//REPLY::available_msg;
 
     return sendNormal( synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
 }
 
 
-int CmdInterpreter::addVoice(unsigned char controlType)
+int CmdInterpreter::addVoice(Parser& input, unsigned char controlType)
 {
     if (isdigit(point[0]))
     {
@@ -3617,17 +3617,17 @@ int CmdInterpreter::addVoice(unsigned char controlType)
     if (matchnMove(2, point, "modulator"))
     {
         bitSet(context, LEVEL::AddMod);
-        return modulator(controlType);
+        return modulator(input, controlType);
     }
     else if (matchnMove(2, point, "waveform"))
     {
         bitSet(context, LEVEL::Oscillator);
-        return waveform(controlType);
+        return waveform(input, controlType);
     }
 
     int value = -1;
     int cmd = -1;
-    int result = partCommonControls(controlType);
+    int result = partCommonControls(input, controlType);
     if (result != REPLY::todo_msg)
         return result;
 
@@ -3755,7 +3755,7 @@ int CmdInterpreter::addVoice(unsigned char controlType)
 }
 
 
-int CmdInterpreter::addSynth(unsigned char controlType)
+int CmdInterpreter::addSynth(Parser& input, unsigned char controlType)
 {
     int kit = UNUSED;
     int insert = UNUSED;
@@ -3776,18 +3776,18 @@ int CmdInterpreter::addSynth(unsigned char controlType)
     if (matchnMove(2, point, "resonance"))
     {
         bitSet(context, LEVEL::Resonance);
-        return resonance(controlType);
+        return resonance(input, controlType);
     }
     if (matchnMove(3, point, "voice"))
     {
         bitSet(context, LEVEL::AddVoice);
         insertType = TOPLEVEL::insertType::amplitude;
-        return addVoice(controlType);
+        return addVoice(input, controlType);
     }
     if (lineEnd(point, controlType))
         return REPLY::done_msg;
 
-    int result = partCommonControls(controlType);
+    int result = partCommonControls(input, controlType);
     if (result != REPLY::todo_msg)
         return result;
 
@@ -3814,7 +3814,7 @@ int CmdInterpreter::addSynth(unsigned char controlType)
 }
 
 
-int CmdInterpreter::subSynth(unsigned char controlType)
+int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
 {
     int kit = UNUSED;
     int insert = UNUSED;
@@ -3834,7 +3834,7 @@ int CmdInterpreter::subSynth(unsigned char controlType)
 
     if (lineEnd(point, controlType))
         return REPLY::done_msg;
-    int result = partCommonControls(controlType);
+    int result = partCommonControls(input, controlType);
     if (result != REPLY::todo_msg)
         return result;
 
@@ -3925,7 +3925,7 @@ int CmdInterpreter::subSynth(unsigned char controlType)
 }
 
 
-int CmdInterpreter::padSynth(unsigned char controlType)
+int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
 {
     int kit = UNUSED;
     int insert = UNUSED;
@@ -3946,16 +3946,16 @@ int CmdInterpreter::padSynth(unsigned char controlType)
     if (matchnMove(2, point, "resonance"))
     {
         bitSet(context, LEVEL::Resonance);
-        return resonance(controlType);
+        return resonance(input, controlType);
     }
     if (matchnMove(2, point, "waveform"))
     {
         bitSet(context, LEVEL::Oscillator);
-        return waveform(controlType);
+        return waveform(input, controlType);
     }
     if (lineEnd(point, controlType))
         return REPLY::done_msg;
-    int result = partCommonControls(controlType);
+    int result = partCommonControls(input, controlType);
     if (result != REPLY::todo_msg)
         return result;
 
@@ -4161,7 +4161,7 @@ int CmdInterpreter::padSynth(unsigned char controlType)
 }
 
 
-int CmdInterpreter::resonance(unsigned char controlType)
+int CmdInterpreter::resonance(Parser& input, unsigned char controlType)
 {
     int value = toggle(point);
     int cmd = -1;
@@ -4259,7 +4259,7 @@ int CmdInterpreter::resonance(unsigned char controlType)
 }
 
 
-int CmdInterpreter::waveform(unsigned char controlType)
+int CmdInterpreter::waveform(Parser& input, unsigned char controlType)
 {
     if (lineEnd(point, controlType))
         return REPLY::done_msg;
@@ -4471,12 +4471,12 @@ int CmdInterpreter::waveform(unsigned char controlType)
 }
 
 
-int CmdInterpreter::commandPart(unsigned char controlType)
+int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
 {
     Config &Runtime = synth->getRuntime();
     int tmp = -1;
     if (bitTest(context, LEVEL::AllFX))
-        return effects(controlType);
+        return effects(input, controlType);
     if (lineEnd(point, controlType))
         return REPLY::done_msg;
     if (kitMode == PART::kitType::Off)
@@ -4486,7 +4486,7 @@ int CmdInterpreter::commandPart(unsigned char controlType)
         context = LEVEL::Top;
         bitSet(context, LEVEL::AllFX);
         bitSet(context, LEVEL::Part);
-        return effects(controlType);
+        return effects(input, controlType);
     }
 
     if (isdigit(point[0]))
@@ -4647,33 +4647,33 @@ int CmdInterpreter::commandPart(unsigned char controlType)
     }
 
     if (bitTest(context, LEVEL::AllFX))
-        return effects(controlType);
+        return effects(input, controlType);
 
     if (matchnMove(3, point, "addsynth"))
     {
         bitSet(context, LEVEL::AddSynth);
         insertType = TOPLEVEL::insertType::amplitude;
-        return addSynth(controlType);
+        return addSynth(input, controlType);
     }
 
     if (matchnMove(3, point, "subsynth"))
     {
         bitSet(context, LEVEL::SubSynth);
         insertType = TOPLEVEL::insertType::amplitude;
-        return subSynth(controlType);
+        return subSynth(input, controlType);
     }
 
     if (matchnMove(3, point, "padsynth"))
     {
         bitSet(context, LEVEL::PadSynth);
         insertType = TOPLEVEL::insertType::amplitude;
-        return padSynth(controlType);
+        return padSynth(input, controlType);
     }
 
     if (matchnMove(3, point, "mcontrol"))
     {
         bitSet(context, LEVEL::MControl);
-        return midiControllers(controlType);
+        return midiControllers(input, controlType);
     }
 
     if (inKitEditor)
@@ -4703,7 +4703,7 @@ int CmdInterpreter::commandPart(unsigned char controlType)
         }
     }
 
-    tmp = partCommonControls(controlType);
+    tmp = partCommonControls(input, controlType);
     if (tmp != REPLY::todo_msg)
         return tmp;
 
@@ -4822,7 +4822,7 @@ int CmdInterpreter::commandPart(unsigned char controlType)
 }
 
 
-int CmdInterpreter::commandReadnSet(unsigned char controlType)
+int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
 {
     Config &Runtime = synth->getRuntime();
     string name;
@@ -4854,37 +4854,37 @@ int CmdInterpreter::commandReadnSet(unsigned char controlType)
 
  // these must all be highest (relevant) bit first
     if (bitTest(context, LEVEL::Config))
-        return commandConfig(controlType);
+        return commandConfig(input, controlType);
     if (bitTest(context, LEVEL::Scale))
-        return commandScale(controlType);
+        return commandScale(input, controlType);
     if (bitTest(context, LEVEL::Envelope))
-        return envelopeSelect(controlType);
+        return envelopeSelect(input, controlType);
     if (bitTest(context, LEVEL::Filter))
-        return filterSelect(controlType);
+        return filterSelect(input, controlType);
     if (bitTest(context, LEVEL::LFO))
-        return LFOselect(controlType);
+        return LFOselect(input, controlType);
     if (bitTest(context, LEVEL::Resonance))
-        return resonance(controlType);
+        return resonance(input, controlType);
     if (bitTest(context, LEVEL::Oscillator))
-        return waveform(controlType);
+        return waveform(input, controlType);
     if (bitTest(context, LEVEL::AddMod))
-        return modulator(controlType);
+        return modulator(input, controlType);
     if (bitTest(context, LEVEL::AddVoice))
-        return addVoice(controlType);
+        return addVoice(input, controlType);
     if (bitTest(context, LEVEL::AddSynth))
-        return addSynth(controlType);
+        return addSynth(input, controlType);
     if (bitTest(context, LEVEL::SubSynth))
-        return subSynth(controlType);
+        return subSynth(input, controlType);
     if (bitTest(context, LEVEL::PadSynth))
-        return padSynth(controlType);
+        return padSynth(input, controlType);
     if (bitTest(context, LEVEL::MControl))
-        return midiControllers(controlType);
+        return midiControllers(input, controlType);
     if (bitTest(context, LEVEL::Part))
-        return commandPart(controlType);
+        return commandPart(input, controlType);
     if (bitTest(context, LEVEL::Vector))
-        return commandVector(controlType);
+        return commandVector(input, controlType);
     if (bitTest(context, LEVEL::Learn))
-        return commandMlearn(controlType);
+        return commandMlearn(input, controlType);
 
     if (matchnMove(3, point, "mono"))
     {
@@ -4895,14 +4895,14 @@ int CmdInterpreter::commandReadnSet(unsigned char controlType)
     {
         context = LEVEL::Top;
         bitSet(context, LEVEL::Config);
-        return commandConfig(controlType);
+        return commandConfig(input, controlType);
     }
 
     if (matchnMove(1, point, "scale"))
     {
         context = LEVEL::Top;
         bitSet(context, LEVEL::Scale);
-        return commandScale(controlType);
+        return commandScale(input, controlType);
     }
 
     if (matchnMove(1, point, "part"))
@@ -4920,19 +4920,19 @@ int CmdInterpreter::commandReadnSet(unsigned char controlType)
         context = LEVEL::Top;
         bitSet(context, LEVEL::Part);
         nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
-        return commandPart(controlType);
+        return commandPart(input, controlType);
     }
 
     if (matchnMove(2, point, "vector"))
     {
         context = LEVEL::Top;
-        return commandVector(controlType);
+        return commandVector(input, controlType);
     }
 
     if (matchnMove(2, point, "mlearn"))
     {
         context = LEVEL::Top;
-        return commandMlearn(controlType);
+        return commandMlearn(input, controlType);
     }
 
     if ((context == LEVEL::Top || bitTest(context, LEVEL::InsFX)) && matchnMove(3, point, "system"))
@@ -4943,7 +4943,7 @@ int CmdInterpreter::commandReadnSet(unsigned char controlType)
         matchnMove(2, point, "effects"); // clear it if given
         matchnMove(2, point, "efx");
         nFXtype = synth->sysefx[nFX]->geteffect();
-        return effects(controlType);
+        return effects(input, controlType);
     }
     if ((context == LEVEL::Top || bitTest(context, LEVEL::AllFX)) && !bitTest(context, LEVEL::Part) && matchnMove(3, point, "insert"))
     {
@@ -4953,10 +4953,10 @@ int CmdInterpreter::commandReadnSet(unsigned char controlType)
         matchnMove(2, point, "effects"); // clear it if given
         matchnMove(2, point, "efx");
         nFXtype = synth->insefx[nFX]->geteffect();
-        return effects(controlType);
+        return effects(input, controlType);
     }
     if (bitTest(context, LEVEL::AllFX))
-        return effects(controlType);
+        return effects(input, controlType);
 
     if (matchnMove(1, point, "root"))
     {
@@ -5055,7 +5055,7 @@ int CmdInterpreter::commandReadnSet(unsigned char controlType)
 }
 
 
-Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
+Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input, char *cCmd)
 {
     unsigned int newID = synth->getUniqueId();
     if (newID != currentInstance)
@@ -5187,7 +5187,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
             return Reply::DONE;
     }
 
-    if (helpList(context))
+    if (helpList(input, context))
         return Reply::DONE;
 
     if (matchnMove(2, point, "stop"))
@@ -5195,8 +5195,8 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
     if (matchnMove(1, point, "list"))
     {
         if (matchnMove(1, point, "group"))
-            return Reply{commandGroup()};
-        return Reply{commandList()};
+            return Reply{commandGroup(input)};
+        return Reply{commandList(input)};
     }
 
     if (matchnMove(3, point, "run"))
@@ -5244,7 +5244,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
                     else
                     {
                         usleep(2000); // the loop is too fast otherwise!
-                        replyCode = cmdIfaceProcessCommand(mark).code;
+                        replyCode = cmdIfaceProcessCommand(input, mark).code;
                     }
                     if (replyCode > REPLY::done_msg)
                     {
@@ -5263,7 +5263,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
     if (matchnMove(1, point, "set"))
     {
         if (point[0] != 0)
-            return Reply{commandReadnSet(TOPLEVEL::type::Write)};
+            return Reply{commandReadnSet(input, TOPLEVEL::type::Write)};
         else
             return Reply::what("set");
     }
@@ -5271,7 +5271,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
     if (matchnMove(1, point, "read") || matchnMove(1, point, "get"))
     {
         if (point[0] != 0)
-            return Reply{commandReadnSet(TOPLEVEL::type::Read)};
+            return Reply{commandReadnSet(input, TOPLEVEL::type::Read)};
         else
             return Reply::what("read");
     }
@@ -5279,7 +5279,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
     if (matchnMove(3, point, "minimum"))
     {
         if (point[0] != 0)
-            return Reply{commandReadnSet(TOPLEVEL::type::Minimum | TOPLEVEL::type::Limits)};
+            return Reply{commandReadnSet(input, TOPLEVEL::type::Minimum | TOPLEVEL::type::Limits)};
         else
         {
             return Reply::what("minimum");
@@ -5289,7 +5289,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
     if (matchnMove(3, point, "maximum"))
     {
         if (point[0] != 0)
-            return Reply{commandReadnSet(TOPLEVEL::type::Maximum | TOPLEVEL::type::Limits)};
+            return Reply{commandReadnSet(input, TOPLEVEL::type::Maximum | TOPLEVEL::type::Limits)};
         else
         {
             return Reply::what("maximum");
@@ -5299,7 +5299,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
     if (matchnMove(3, point, "default"))
     {
         if (point[0] != 0)
-            return Reply{commandReadnSet(TOPLEVEL::type::Default | TOPLEVEL::type::Limits)};
+            return Reply{commandReadnSet(input, TOPLEVEL::type::Default | TOPLEVEL::type::Limits)};
         else
         {
             return Reply::what("default");
@@ -5309,7 +5309,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(char *cCmd)
     if (matchnMove(2, point, "mlearn"))
     {
         if (point[0] != 0)
-            return Reply{commandReadnSet(TOPLEVEL::type::LearnRequest)};
+            return Reply{commandReadnSet(input, TOPLEVEL::type::LearnRequest)};
         else
         {
             return Reply::what("mlearn");

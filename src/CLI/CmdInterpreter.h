@@ -58,6 +58,7 @@ struct Reply
     }
 };
 
+class Parser;
 
 
 class CmdInterpreter
@@ -66,7 +67,7 @@ class CmdInterpreter
         CmdInterpreter();
 
         std::string buildStatus(bool showPartDetails);
-        Reply cmdIfaceProcessCommand(char *cCmd);
+        Reply cmdIfaceProcessCommand(Parser& input, char *cCmd);
 
         unsigned int currentInstance;
         SynthEngine *synth;
@@ -79,32 +80,32 @@ class CmdInterpreter
         void resetInstance();
         bool query(std::string text, bool priority);
         void helpLoop(std::list<std::string>& msg, std::string *commands, int indent, bool single = false);
-        char helpList(unsigned int local);
+        char helpList(Parser& input, unsigned int local);
         std::string historySelect(int listnum, int selection);
         void historyList(int listnum);
-        void listCurrentParts(std::list<std::string>& msg_buf);
-        int effectsList(bool presets = false);
-        int effects(unsigned char controlType);
-        int midiControllers(unsigned char controlType);
-        int partCommonControls(unsigned char controlType);
-        int LFOselect(unsigned char controlType);
-        int filterSelect(unsigned char controlType);
-        int envelopeSelect(unsigned char controlType);
-        int commandGroup();
-        int commandList();
-        int commandMlearn(unsigned char controlType);
-        int commandVector(unsigned char controlType);
-        int commandConfig(unsigned char controlType);
-        int commandScale(unsigned char controlType);
-        int addSynth(unsigned char controlType);
-        int subSynth(unsigned char controlType);
-        int padSynth(unsigned char controlType);
-        int resonance(unsigned char controlType);
-        int addVoice(unsigned char controlType);
-        int modulator(unsigned char controlType);
-        int waveform(unsigned char controlType);
-        int commandPart(unsigned char controlType);
-        int commandReadnSet(unsigned char controlType);
+        void listCurrentParts(Parser& input, std::list<std::string>& msg_buf);
+        int effectsList(Parser& input, bool presets = false);
+        int effects(Parser& input, unsigned char controlType);
+        int midiControllers(Parser& input, unsigned char controlType);
+        int partCommonControls(Parser& input, unsigned char controlType);
+        int LFOselect(Parser& input, unsigned char controlType);
+        int filterSelect(Parser& input, unsigned char controlType);
+        int envelopeSelect(Parser& input, unsigned char controlType);
+        int commandGroup(Parser& input);
+        int commandList(Parser& input);
+        int commandMlearn(Parser& input, unsigned char controlType);
+        int commandVector(Parser& input, unsigned char controlType);
+        int commandConfig(Parser& input, unsigned char controlType);
+        int commandScale(Parser& input, unsigned char controlType);
+        int addSynth(Parser& input, unsigned char controlType);
+        int subSynth(Parser& input, unsigned char controlType);
+        int padSynth(Parser& input, unsigned char controlType);
+        int resonance(Parser& input, unsigned char controlType);
+        int addVoice(Parser& input, unsigned char controlType);
+        int modulator(Parser& input, unsigned char controlType);
+        int waveform(Parser& input, unsigned char controlType);
+        int commandPart(Parser& input, unsigned char controlType);
+        int commandReadnSet(Parser& input, unsigned char controlType);
 
 
         char *point;

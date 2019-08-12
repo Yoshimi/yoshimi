@@ -93,6 +93,7 @@ void CmdInterface::cmdIfaceCommandLoop()
     }
     cCmd = NULL;
     bool exit = false;
+    cli::Parser parser;
     char welcomeBuffer [128];
     sprintf(welcomeBuffer, "yoshimi> ");
     interpreter.synth = firstSynth;
@@ -108,7 +109,7 @@ void CmdInterface::cmdIfaceCommandLoop()
                 // in case it's been changed from elsewhere
                 interpreter.synth = firstSynth->getSynthFromId(interpreter.currentInstance);
 
-                cli::Reply reply = interpreter.cmdIfaceProcessCommand(cCmd);
+                cli::Reply reply = interpreter.cmdIfaceProcessCommand(parser, cCmd);
                 exit = (reply.code == REPLY::exit_msg);
 
                 if (reply.code == REPLY::what_msg)
