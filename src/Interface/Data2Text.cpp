@@ -1590,9 +1590,6 @@ std::string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
     std::string name = "";
     switch (control & 0xf0)
     {
-        case ADDVOICE::control::volume:
-            name = " Amplitude ";
-            break;
         case ADDVOICE::control::modulatorType:
             name = " Modulator ";
             break;
@@ -1612,7 +1609,7 @@ std::string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
             name = " Modulator Freq ";
             break;
         case ADDVOICE::control::modulatorOscillatorPhase:
-            name = " Modulator Osc ";
+            name = " Modulator Osc";
             break;
     }
 
@@ -1621,22 +1618,22 @@ std::string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
     switch (control)
     {
         case ADDVOICE::control::volume:
-            contstr = "Volume";
+            contstr = " Volume";
             break;
         case ADDVOICE::control::velocitySense:
-            contstr = "Vel Sens";
+            contstr = " Vel Sens";
             break;
         case ADDVOICE::control::panning:
-            contstr = "Panning";
+            contstr = " Panning";
             break;
         case ADDVOICE::control::invertPhase:
-            contstr = "Minus";
+            contstr = " Minus";
             break;
         case ADDVOICE::control::enableAmplitudeEnvelope:
-            contstr = "Enable Env";
+            contstr = " Amplitude Enable Env";
             break;
         case ADDVOICE::control::enableAmplitudeLFO:
-            contstr = "Enable LFO";
+            contstr = " Amplitude Enable LFO";
             break;
 
         case ADDVOICE::control::modulatorType:
@@ -1647,7 +1644,7 @@ std::string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
             break;
 
         case ADDVOICE::control::externalOscillator:
-            contstr = "Extern Osc";
+            contstr = " Extern Osc";
             break;
 
         case ADDVOICE::control::detuneFrequency:
