@@ -77,7 +77,7 @@ class CmdInterpreter
         std::string buildPartStatus(bool showPartDetails);
 
         void defaults();
-        void resetInstance();
+        void resetInstance(unsigned int newInstance);
         bool query(std::string text, bool priority);
         void helpLoop(std::list<std::string>& msg, std::string *commands, int indent, bool single = false);
         char helpList(Parser& input, unsigned int local);

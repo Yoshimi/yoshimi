@@ -69,12 +69,18 @@ inline int matchWord(int numChars, char * buf, const char * word)
 }
 
 
-inline bool matchnMove(int num , char *& pnt, const char * word)
+inline bool matchnMove(int num, char *& pnt, const char * word)
 {
  bool found = matchWord(num, pnt, word);
  if (found)
      pnt = skipChars(pnt);
  return found;
+}
+
+
+inline bool startsWith(const char *point, const char *prefix)
+{
+    return 0 == strncmp(prefix, point, strlen(prefix));
 }
 
 
@@ -258,6 +264,11 @@ class Parser
             point = cli::skipChars(point);
         }
 
+        void skip(int cnt)
+        {
+            point += cnt;
+        }
+
         int toggle()
         {
             return cli::toggle(point);
@@ -266,6 +277,31 @@ class Parser
         bool lineEnd(unsigned char controlType)
         {
             return cli::lineEnd(point, controlType);
+        }
+
+        bool isAtEnd()
+        {
+            return *point == '\0';
+        }
+
+        bool nextChar(char expected)
+        {
+            return *point == expected;
+        }
+
+        bool startsWith(const char *prefix)
+        {
+            return cli::startsWith(point, prefix);
+        }
+
+        bool isdigit()
+        {
+            return ::isdigit(*point);
+        }
+
+        char peek()
+        {
+            return *point;
         }
 
     private:
