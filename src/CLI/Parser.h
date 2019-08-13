@@ -166,6 +166,7 @@ class Parser
 {
     char* buffer;
     char* point;
+    char* mark;
     string prompt;
     string hist_filename;
 
@@ -173,6 +174,7 @@ class Parser
         Parser() :
             buffer{nullptr},
             point{nullptr},
+            mark{nullptr},
             prompt{"yoshimi> "},
             hist_filename{}
         { }
@@ -220,7 +222,7 @@ class Parser
                 cleanUp();
             else
             {
-                point = buffer;
+                point = mark = buffer;
                 add_history(buffer);
             }
         }
@@ -230,7 +232,7 @@ class Parser
         {
             if (!buffer || !*buffer) return;
             cleanUp();
-            point = buffer;
+            point = mark = buffer;
         }
 
         void setHistoryFile(string filename)
@@ -249,12 +251,22 @@ class Parser
             }
         }
 
+        void markPoint()
+        {
+            mark = point;
+        }
+
+        void reset_to_mark()
+        {
+            point = mark;
+        }
+
     private:
         void cleanUp()
         {
             if (buffer)
                 free(buffer);
-            buffer = point = nullptr;
+            buffer = mark = point = nullptr;
         }
 
         void writeHistory()

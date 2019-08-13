@@ -101,7 +101,6 @@ Reply Reply::DONE{REPLY::done_msg};
 CmdInterpreter::CmdInterpreter() :
     currentInstance{0},
     synth{nullptr},
-    point{nullptr},
     instrumentGroup{},
     textMsgBuffer{TextMsgBuffer::instance()},
 
@@ -5132,14 +5131,14 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         if (bitFindHigh(context) == LEVEL::Part && kitMode != PART::kitType::Off)
         {
             int newPart = npart;
-            char *oldPoint = point;
+            input.markPoint();
             defaults();
             npart = newPart;
             bitSet(context, LEVEL::Part);
             if (input.matchnMove(1, "set"))
             {
                 if (!input.isdigit())
-                    point = oldPoint;
+                    input.reset_to_mark();
                 else
                 {
                     int tmp = string2int(input);

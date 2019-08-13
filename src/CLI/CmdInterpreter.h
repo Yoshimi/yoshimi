@@ -108,7 +108,7 @@ class CmdInterpreter
         int commandReadnSet(Parser& input, unsigned char controlType);
 
 
-        char *point;
+    private:
         std::list<std::string>  instrumentGroup;
         TextMsgBuffer& textMsgBuffer;
 
