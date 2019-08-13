@@ -5055,25 +5055,15 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
 
 Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
 {
+    input.trim();
+
     unsigned int newID = synth->getUniqueId();
     if (newID != currentInstance)
     {
         currentInstance = newID;
         defaults();
     }
-
     Config &Runtime = synth->getRuntime();
-
-    int tmp;
-    char* cCmd = nullptr; ////////////////////////////TODO
-    point = nullptr;//////////////////////////////////TODO
-    input.skipSpace(); // just to be sure
-    tmp = strlen(cCmd) - 1;
-    while (point[tmp] < '!' && tmp > 0)  ///////////////////TODO: add trim operation to Parser class!
-    {
-        point[tmp] = 0; // also trailing spaces
-        -- tmp;
-    }
 
     buildStatus(false);
 
@@ -5152,7 +5142,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
                     point = oldPoint;
                 else
                 {
-                    tmp = string2int(input);
+                    int tmp = string2int(input);
                     if (tmp < 1 || tmp > Runtime.NumAvailableParts)
                         return REPLY::range_msg;
 
@@ -5462,7 +5452,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
                         Runtime.Log("No bank at this location");
                     else
                     {
-                        tmp = synth->getBankRef().getBankSize(bankID);
+                        int tmp = synth->getBankRef().getBankSize(bankID);
                         if (tmp)
                         {
                             Runtime.Log("Bank " + filename + " has " + asString(tmp) + " Instruments");
@@ -5514,7 +5504,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             {
                 input.skip(1);
                 input.skipSpace();
-                tmp = string2int(input);
+                int tmp = string2int(input);
                 if (tmp == 0)
                     return Reply{REPLY::value_msg};
                 sendNormal( synth, 0, tmp - 1, 0, MIDILEARN::control::deleteLine, TOPLEVEL::section::midiLearn);
@@ -5523,7 +5513,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         }
         if (input.matchnMove(2, "instrument") || input.matchnMove(2, "program"))
         {
-            tmp = string2int(input);
+            int tmp = string2int(input);
             if (tmp <= 0 || tmp >= MAX_INSTRUMENTS_IN_BANK)
                     return Reply{REPLY::range_msg};
             sendDirect(synth, TOPLEVEL::action::lowPrio, tmp - 1, TOPLEVEL::type::Write, BANK::control::deleteInstrument, TOPLEVEL::section::bank);
@@ -5539,7 +5529,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             if (input.nextChar('@'))
             {
                 input.skip(1);
-                tmp = string2int(input);
+                int tmp = string2int(input);
                 if (tmp == 0)
                     return Reply{REPLY::value_msg};
                 sendNormal( synth, 0, tmp - 1, TOPLEVEL::type::Write, MIDILEARN::control::loadFromRecent, TOPLEVEL::section::midiLearn);
@@ -5580,7 +5570,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             {
                 input.skip(1);
                 input.skipSpace();
-                tmp = string2int(input);
+                int tmp = string2int(input);
                 if (tmp <= 0)
                     return Reply{REPLY::value_msg};
                 name = historySelect(5, tmp - 1);
@@ -5605,7 +5595,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             {
                 input.skip(1);
                 input.skipSpace();
-                tmp = string2int(input);
+                int tmp = string2int(input);
                 if (tmp <= 0)
                     return Reply{REPLY::value_msg};
                 name = historySelect(4, tmp - 1);
@@ -5630,7 +5620,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             {
                 input.skip(1);
                 input.skipSpace();
-                tmp = string2int(input);
+                int tmp = string2int(input);
                 if (tmp <= 0)
                     return Reply{REPLY::value_msg};
                 name = historySelect(3, tmp - 1);
@@ -5655,7 +5645,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             {
                 input.skip(1);
                 input.skipSpace();
-                tmp = string2int(input);
+                int tmp = string2int(input);
                 if (tmp <= 0)
                     return Reply{REPLY::value_msg};
                 name = historySelect(2, tmp - 1);
@@ -5680,7 +5670,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             {
                 input.skip(1);
                 input.skipSpace();
-                tmp = string2int(input);
+                int tmp = string2int(input);
                 if (tmp <= 0)
                     return Reply{REPLY::value_msg};
                 name = historySelect(1, tmp - 1);
@@ -5712,7 +5702,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         }
         if(input.matchnMove(2, "vector"))
         {
-            tmp = chan;
+            int tmp = chan;
             if(input.matchnMove(1, "channel"))
             {
                 tmp = string2int127(input) - 1;

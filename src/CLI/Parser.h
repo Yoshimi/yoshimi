@@ -23,9 +23,9 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include <cmath>
 #include <string>
 #include <cstring>
+#include <cctype>
 #include <readline/readline.h>
 #include <readline/history.h>
 
@@ -37,7 +37,7 @@ using std::string;
 
 inline char * skipSpace(char * buf)
 {
-    while (buf[0] == 0x20)
+    while (isspace((unsigned char)*buf))
     {
         ++ buf;
     }
@@ -47,12 +47,11 @@ inline char * skipSpace(char * buf)
 
 inline char * skipChars(char * buf)
 {
-    while (buf[0] > 0x20) // will also stop on line ends
+    while (*buf && !isspace((unsigned char)*buf)) // will also stop on line ends
     {
         ++ buf;
     }
-    if (buf[0] == 0x20) // now find the next word (if any)
-        buf = skipSpace(buf);
+    buf = skipSpace(buf); // now find the next word (if any)
     return buf;
 }
 
@@ -242,6 +241,39 @@ class Parser
             }
         }
 
+    private:
+        void cleanUp()
+        {
+            if (buffer)
+                free(buffer);
+            buffer = point = nullptr;
+        }
+
+        void writeHistory()
+        {
+            if (hist_filename.length() == 0)
+                return;
+            if (write_history(hist_filename.c_str()) != 0)
+            {   // writing of history file failed
+                perror(hist_filename.c_str());
+            }
+        }
+
+
+    public:
+        void trim()
+        {
+            if (!point) return;
+            this->skipSpace();
+            char *end = point + strlen(point) - 1;
+            while (end > point && isspace((unsigned char)*end))
+            {
+                end--;
+            }
+            end[1] = '\0';  // place new end terminator
+        }
+
+
         /* ==== Parsing API ==== */
 
         bool matchnMove(int num, const char * word)
@@ -302,24 +334,6 @@ class Parser
         char peek()
         {
             return *point;
-        }
-
-    private:
-        void cleanUp()
-        {
-            if (buffer)
-                free(buffer);
-            buffer = point = nullptr;
-        }
-
-        void writeHistory()
-        {
-            if (hist_filename.length() == 0)
-                return;
-            if (write_history(hist_filename.c_str()) != 0)
-            {   // writing of history file failed
-                perror(hist_filename.c_str());
-            }
         }
 };
 
