@@ -198,12 +198,12 @@ class Parser
 
         bool isValid()  const
         {
-            return buffer && strlen(buffer) < COMMAND_SIZE;
+            return point && strlen(point) < COMMAND_SIZE;
         }
 
         bool isTooLarge()  const
         {
-            return buffer && strlen(buffer) >= COMMAND_SIZE;
+            return point && strlen(point) >= COMMAND_SIZE;
         }
 
 
@@ -216,13 +216,21 @@ class Parser
         {
             cleanUp();
             buffer = ::readline(prompt.c_str());
-            if (!isValid())
+            if (!buffer)
                 cleanUp();
             else
             {
                 point = buffer;
                 add_history(buffer);
             }
+        }
+
+        // initialise the parser with an externally owned and managed buffer
+        void initWithExternalBuffer(char* buffer)
+        {
+            if (!buffer || !*buffer) return;
+            cleanUp();
+            point = buffer;
         }
 
         void setHistoryFile(string filename)

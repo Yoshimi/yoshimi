@@ -5193,35 +5193,35 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         string filename(input);
         if (filename > "!")
         {
-            char to_send[COMMAND_SIZE];
-            char *mark;///////////////////////////////TODO
-            int count = 0;
-            bool isok = true;
 
             string text = loadText(filename);
             if (text != "")
             {
+                char parseBuffer[COMMAND_SIZE];
                 size_t linePoint = 0;
+                char *parsePoint;
+                int count = 0;
+                bool isok = true;
                 context = LEVEL::Top; // start from top level
                 while (linePoint < text.length() && isok)
                 {
                     int replyCode = REPLY::todo_msg;
 
-                    if (!C_lineInText(text, linePoint, to_send, COMMAND_SIZE))
+                    if (!C_lineInText(text, linePoint, parseBuffer, COMMAND_SIZE))
                         Runtime.Log("*** Error: line " + to_string(count) + " too long");
                     ++ count;
-                    mark = skipSpace(to_send);
-                    if ( mark[0] < ' ' || mark [0] == '#')
+                    parsePoint = skipSpace(parseBuffer);
+                    if ( parsePoint[0] < ' ' || parsePoint [0] == '#')
                         continue;
-                    if (matchnMove(3, mark, "run"))
+                    if (matchnMove(3, parsePoint, "run"))
                     {
                         isok = false;
                         Runtime.Log("*** Error: scripts are not recursive @ line " + std::to_string(count) + " ***");
                         continue;
                     }
-                    if (matchnMove(4, mark, "wait"))
+                    if (matchnMove(4, parsePoint, "wait"))
                     {
-                        int tmp = string2int(mark);
+                        int tmp = string2int(parsePoint);
                         if (tmp < 1)
                             tmp = 1;
                         else if (tmp > 1000)
@@ -5233,7 +5233,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
                     else
                     {
                         usleep(2000); // the loop is too fast otherwise!
-                        ///////////////////////////////TODO find a replacement for mark
+                        input.initWithExternalBuffer(parsePoint);
                         replyCode = cmdIfaceProcessCommand(input).code;
                     }
                     if (replyCode > REPLY::done_msg)
