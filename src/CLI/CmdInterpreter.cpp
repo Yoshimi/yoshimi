@@ -5052,6 +5052,86 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
 }
 
 
+Reply CmdInterpreter::processSrcriptFile(string filename)
+{
+    if (filename <= "!")
+        return Reply::what("Exec");
+
+    Config &Runtime = synth->getRuntime();
+    string text = loadText(filename);
+    if (text.length() == 0)
+    {
+        Runtime.Log("Can't read file " + filename);
+        return Reply::DONE;
+    }
+
+//  char parseBuffer[COMMAND_SIZE];
+    cli::Parser scriptParser;
+//  size_t linePoint = 0;
+//  char *parsePoint;
+    int count = 0;
+    bool isok = true;
+    context = LEVEL::Top; // start from top level
+
+    char delim ='\n';
+    stringstream ss (text);
+    string line;
+
+    while (isok && std::getline(ss, line, delim))
+//  while (linePoint < text.length() && isok)
+    {
+        int replyCode = REPLY::todo_msg;
+        scriptParser.initWithExternalBuffer(line);
+
+//      if (!C_lineInText(text, linePoint, parseBuffer, COMMAND_SIZE))
+        if (scriptParser.isTooLarge())
+        {
+            Runtime.Log("*** Error: line " + to_string(count) + " too long");
+            continue;
+        }
+        ++ count;
+//      parsePoint = skipSpace(parseBuffer);
+        scriptParser.skipSpace();
+//      if ( parsePoint[0] < ' ' || parsePoint [0] == '#')
+        if (scriptParser.peek() == '#' || iscntrl((unsigned char) scriptParser.peek()))
+            continue;
+//      if (matchnMove(3, parsePoint, "run"))
+        if (scriptParser.matchnMove(3, "run"))
+        {
+            isok = false;
+            Runtime.Log("*** Error: scripts are not recursive @ line " + std::to_string(count) + " ***");
+            continue;
+        }
+//      if (matchnMove(4, parsePoint, "wait"))
+        if (scriptParser.matchnMove(4, "wait"))
+        {
+//          int tmp = string2int(parsePoint);
+            int tmp = string2int(scriptParser);
+            if (tmp < 1)
+                tmp = 1;
+            else if (tmp > 1000)
+                tmp = 1000;
+            Runtime.Log("Waiting " + std::to_string(tmp) + "mS");
+            usleep((tmp - 1) * 1000);
+            // total processing may add up to another 1 mS
+        }
+        else
+        {
+            usleep(2000); // the loop is too fast otherwise!
+//            scriptParser.initWithExternalBuffer(parsePoint);
+            Runtime.Log(".........: executing: " + line);
+            replyCode = cmdIfaceProcessCommand(scriptParser).code;
+        }
+        if (replyCode > REPLY::done_msg)
+        {
+            isok = false;
+            Runtime.Log("*** Error: " + replies[replyCode] + " @ line " + std::to_string(count) + ": " + line + " ***");
+        }
+    }
+    return Reply::DONE;
+}
+
+
 Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
 {
     input.trim();
@@ -5189,64 +5269,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
 
     if (input.matchnMove(3, "run"))
     {
-        string filename(input);
-        if (filename > "!")
-        {
-
-            string text = loadText(filename);
-            if (text != "")
-            {
-                char parseBuffer[COMMAND_SIZE];
-                size_t linePoint = 0;
-                char *parsePoint;
-                int count = 0;
-                bool isok = true;
-                context = LEVEL::Top; // start from top level
-                while (linePoint < text.length() && isok)
-                {
-                    int replyCode = REPLY::todo_msg;
-
-                    if (!C_lineInText(text, linePoint, parseBuffer, COMMAND_SIZE))
-                        Runtime.Log("*** Error: line " + to_string(count) + " too long");
-                    ++ count;
-                    parsePoint = skipSpace(parseBuffer);
-                    if ( parsePoint[0] < ' ' || parsePoint [0] == '#')
-                        continue;
-                    if (matchnMove(3, parsePoint, "run"))
-                    {
-                        isok = false;
-                        Runtime.Log("*** Error: scripts are not recursive @ line " + std::to_string(count) + " ***");
-                        continue;
-                    }
-                    if (matchnMove(4, parsePoint, "wait"))
-                    {
-                        int tmp = string2int(parsePoint);
-                        if (tmp < 1)
-                            tmp = 1;
-                        else if (tmp > 1000)
-                            tmp = 1000;
-                        Runtime.Log("Waiting " + std::to_string(tmp) + "mS");
-                        usleep((tmp - 1) * 1000);
-                        // total processing may add up to another 1 mS
-                    }
-                    else
-                    {
-                        usleep(2000); // the loop is too fast otherwise!
-                        input.initWithExternalBuffer(parsePoint);
-                        replyCode = cmdIfaceProcessCommand(input).code;
-                    }
-                    if (replyCode > REPLY::done_msg)
-                    {
-                        isok = false;
-                        Runtime.Log("*** Error: " + replies[replyCode] + " @ line " + std::to_string(count) + " ***");
-                    }
-                }
-            }
-            else
-                Runtime.Log("Can't read file " + filename);
-            return Reply::DONE;
-        }
-        return Reply::what("Exec");
+        return processSrcriptFile(input);
     }
 
     if (input.matchnMove(1, "set"))

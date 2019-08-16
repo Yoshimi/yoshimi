@@ -228,11 +228,11 @@ class Parser
         }
 
         // initialise the parser with an externally owned and managed buffer
-        void initWithExternalBuffer(char* buffer)
+        void initWithExternalBuffer(string buffer)
         {
-            if (!buffer || !*buffer) return;
+            if (buffer.length() == 0) return;
             cleanUp();
-            point = mark = buffer;
+            point = mark = const_cast<char*>(buffer.data());
         }
 
         void setHistoryFile(string filename)

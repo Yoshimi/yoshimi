@@ -106,7 +106,7 @@ class CmdInterpreter
         int waveform(Parser& input, unsigned char controlType);
         int commandPart(Parser& input, unsigned char controlType);
         int commandReadnSet(Parser& input, unsigned char controlType);
-
+        Reply processSrcriptFile(string filename);
 
     private:
         std::list<std::string>  instrumentGroup;
