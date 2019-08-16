@@ -34,7 +34,6 @@
 #include <FL/Fl_Menu_Window.H>
 #include "UI/MiscGui.h"
 #include "UI/DynamicTooltip.h"
-#include "Misc/MiscFuncs.h"
 
 /*
   Dial widget with custom drawing and input handling.

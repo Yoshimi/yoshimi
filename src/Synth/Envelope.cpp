@@ -22,9 +22,14 @@
     This file is a derivative of a ZynAddSubFX original, modified January 2011
 */
 
-#include "Misc/SynthEngine.h"
-#include "Params/EnvelopeParams.h"
 #include "Synth/Envelope.h"
+#include "Misc/SynthEngine.h"
+#include "Misc/NumericFuncs.h"
+#include "Params/EnvelopeParams.h"
+
+using func::dB2rap;
+using func::rap2dB;
+
 
 Envelope::Envelope(EnvelopeParams *envpars, float basefreq, SynthEngine *_synth):
     synth(_synth)

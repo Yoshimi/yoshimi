@@ -25,11 +25,6 @@
     Modified May 2019
 */
 
-#include <cmath>
-#include <iostream>
-
-using namespace std;
-
 #include "Misc/XMLwrapper.h"
 #include "DSP/FFTwrapper.h"
 #include "Synth/OscilGen.h"
@@ -38,8 +33,12 @@ using namespace std;
 #include "Params/LFOParams.h"
 #include "Params/FilterParams.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/FileMgrFuncs.h"
 #include "Params/PADnoteParameters.h"
 #include "Misc/WavFile.h"
+
+using file::saveData;
+
 
 PADnoteParameters::PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth) : Presets(_synth)
 {
@@ -297,7 +296,6 @@ float PADnoteParameters::getprofile(float *smp, int size)
     float max = 0.0f;
     for (int i = 0; i < size; ++i)
     {
-        smp[i] = smp[i];
         if (smp[i] > max)
             max = smp[i];
     }

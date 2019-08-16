@@ -25,8 +25,6 @@
 */
 #include <cmath>
 
-using namespace std;
-
 #include "Misc/Config.h"
 #include "Params/PADnoteParameters.h"
 #include "Params/Controller.h"
@@ -35,7 +33,14 @@ using namespace std;
 #include "DSP/Filter.h"
 #include "Params/Controller.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/SynthHelper.h"
 #include "Synth/PADnote.h"
+
+using synth::velF;
+using synth::getDetune;
+using synth::interpolateAmplitude;
+using synth::aboveAmplitudeThreshold;
+
 
 PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
     float velocity, int portamento_, int midinote, bool besilent, SynthEngine *_synth) :
@@ -588,7 +593,6 @@ int PADnote::noteout(float *outl,float *outr)
                     break;
                 }
                 Legato.fade.m += Legato.fade.step;
-                Legato.fade.m = Legato.fade.m;
                 outl[i] *= Legato.fade.m;
                 outr[i] *= Legato.fade.m;
             }
@@ -621,7 +625,6 @@ int PADnote::noteout(float *outl,float *outr)
                     break;
                 }
                 Legato.fade.m -= Legato.fade.step;
-                Legato.fade.m = Legato.fade.m;
                 outl[i] *= Legato.fade.m;
                 outr[i] *= Legato.fade.m;
             }

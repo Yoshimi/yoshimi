@@ -895,7 +895,8 @@ static std::string replies [] = {
     "Control or section inactive",
     "Unable to complete",
     "write only",
-    "read only"
+    "read only",
+    "EXIT"
 };
 
 static std::string fx_list [] = {

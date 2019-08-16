@@ -86,9 +86,6 @@ decl {\#include "UI/WidgetMWSlider.h"} {private global
 decl {\#include "Misc/SynthEngine.h"} {public local
 }
 
-decl {\#include "Misc/MiscFuncs.h"} {public local
-}
-
 decl {\#include <FL/Fl_Menu_Bar.H>} {public global
 }
 
@@ -101,8 +98,19 @@ decl {\#define MIN_DB -48.0} {public local
 decl {\#define NO_DB -68.0} {public local
 }
 
+decl {\#include "Misc/NumericFuncs.h"
+    using func::dB2rap;
+    using func::rap2dB;
+} {private local
+}
+
+decl {\#include "Misc/FormatFuncs.h"
+    using func::asString;
+} {private local
+}
+
 class VUMeter {
-  comment {inherits MiscFuncs from GuiUpdates} : {public Fl_Box, private GuiUpdates}
+  : {public Fl_Box, private GuiUpdates}
 } {
   Function {VUMeter(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {npart=-1;} {}
@@ -378,7 +386,7 @@ class VUMeter {
   }
 }
 
-class SysEffSend {: {public WidgetPDial, private MiscFuncs}
+class SysEffSend {: {public WidgetPDial}
 } {
   Function {SysEffSend(int x,int y, int w, int h, const char *label=0):WidgetPDial(x,y,w,h,label)} {} {
     code {neff1=0; neff2=0;} {}
@@ -415,7 +423,7 @@ class SysEffSend {: {public WidgetPDial, private MiscFuncs}
   }
 }
 
-class Panellistitem {: {public Fl_Group, private MiscFuncs}
+class Panellistitem {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window panellistitem {

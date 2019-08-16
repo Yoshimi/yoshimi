@@ -1,5 +1,5 @@
 /*
-  EQ.h - EQ Effect
+  EQ.h - Equalizer Effect
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -28,13 +28,12 @@
 #ifndef EQ_H
 #define EQ_H
 
-#include "Misc/MiscFuncs.h"
 #include "DSP/AnalogFilter.h"
 #include "Effects/Effect.h"
 
 class SynthEngine;
 
-class EQ : public Effect, private MiscFuncs
+class EQ : public Effect
 {
     public:
         EQ(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth);

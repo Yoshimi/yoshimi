@@ -26,18 +26,10 @@
     Modified May 2019
 */
 
-#include <sys/types.h>
-#include <stdio.h>
 #include <sys/time.h>
 #include <set>
 #include <iostream>
-#include <fstream>
 #include <string>
-#include <stdlib.h>
-#include <unistd.h>
-
-
-using namespace std;
 
 #ifdef GUI_FLTK
     #include "MasterUI.h"
@@ -48,12 +40,43 @@ using namespace std;
 #include "Params/Controller.h"
 #include "Misc/Part.h"
 #include "Effects/EffectMgr.h"
+#include "Misc/TextMsgBuffer.h"
+#include "Misc/FileMgrFuncs.h"
+#include "Misc/NumericFuncs.h"
+#include "Misc/FormatFuncs.h"
 #include "Misc/XMLwrapper.h"
 
+using file::isRegularFile;
+using file::setExtension;
+using file::findLeafName;
+using file::createEmptyFile;
+using file::deleteFile;
+using file::make_legit_pathname;
+
+using func::dB2rap;
+using func::bitTest;
+using func::asString;
+
+using std::set;
+
+
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
+
+// defined in InterChange.cpp and also used in main.cpp
 extern std::string runGui;
+
 map<SynthEngine *, MusicClient *> synthInstances;
 SynthEngine *firstSynth = NULL;
+
+namespace { // Global implementation internal history data
+    static vector<string> InstrumentHistory;
+    static vector<string> ParamsHistory;
+    static vector<string> ScaleHistory;
+    static vector<string> StateHistory;
+    static vector<string> VectorHistory;
+    static vector<string> MidiLearnHistory;
+}
+
 
 static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
 {
@@ -82,13 +105,6 @@ static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
     return nextId;
 }
 
-// histories
-static vector<string> InstrumentHistory;
-static vector<string> ParamsHistory;
-static vector<string> ScaleHistory;
-static vector<string> StateHistory;
-static vector<string> VectorHistory;
-static vector<string> MidiLearnHistory;
 
 SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int forceId) :
     uniqueId(getRemoveSynthId(false, forceId)),
@@ -101,6 +117,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     //unifiedpresets(this),
     Runtime(this, argc, argv),
     presetsstore(this),
+    textMsgBuffer(TextMsgBuffer::instance()),
     fadeAll(0),
     fadeLevel(0),
     samplerate(48000),
@@ -851,7 +868,7 @@ int SynthEngine::setRootBank(int root, int banknum, bool notinplace)
 
     int msgID = NO_MSG;
     if (notinplace)
-        msgID = miscMsgPush(name);
+        msgID = textMsgBuffer.push(name);
     if (!ok)
         msgID |= 0xFF0000;
     return msgID;
@@ -863,17 +880,17 @@ int SynthEngine::setProgramByName(CommandBlock *getData)
     int msgID = NO_MSG;
     bool ok = true;
     int npart = int(getData->data.kit);
-    string fname = miscMsgPop(getData->data.miscmsg);
+    string fname = textMsgBuffer.fetch(getData->data.miscmsg);
     fname = setExtension(fname, EXTEN::yoshInst);
-    if (!isRegFile(fname.c_str()))
+    if (!isRegularFile(fname.c_str()))
         fname = setExtension(fname, EXTEN::zynInst);
-    string name = findleafname(fname);
+    string name = findLeafName(fname);
     if (name < "!")
     {
         name = "Invalid instrument name " + name;
         ok = false;
     }
-    if (ok && !isRegFile(fname.c_str()))
+    if (ok && !isRegularFile(fname.c_str()))
     {
         name = "Can't find " + fname;
         ok = false;
@@ -885,7 +902,7 @@ int SynthEngine::setProgramByName(CommandBlock *getData)
             name = "File " + name + "unrecognised or corrupted";
     }
 
-    msgID = miscMsgPush(name);
+    msgID = textMsgBuffer.push(name);
     if (!ok)
     {
         msgID |= 0xFF0000;
@@ -919,7 +936,7 @@ int SynthEngine::setProgramFromBank(CommandBlock *getData, bool notinplace)
     bool ok;
 
     string fname = bank.getFullPath(root, banknum, instrument);
-    string name = findleafname(fname);
+    string name = findLeafName(fname);
     if (name < "!")
     {
         ok = false;
@@ -950,7 +967,7 @@ int SynthEngine::setProgramFromBank(CommandBlock *getData, bool notinplace)
             int actual = ((tv2.tv_sec - tv1.tv_sec) *1000 + (tv2.tv_usec - tv1.tv_usec)/ 1000.0f) + 0.5f;
             name += ("  Time " + to_string(actual) + "mS");
         }
-        msgID = miscMsgPush(name);
+        msgID = textMsgBuffer.push(name);
     }
     if (!ok)
     {
@@ -1550,9 +1567,9 @@ int SynthEngine::LoadNumbered(unsigned char group, unsigned char entry)
     string filename;
     vector<string> &listType = *getHistory(group);
     if (size_t(entry) >= listType.size())
-        return (miscMsgPush(" FAILED: List entry " + to_string(int(entry)) + " out of range") | 0xFF0000);
+        return (textMsgBuffer.push(" FAILED: List entry " + to_string(int(entry)) + " out of range") | 0xFF0000);
     filename = listType.at(entry);
-    return miscMsgPush(filename);
+    return textMsgBuffer.push(filename);
 }
 
 
@@ -1775,7 +1792,7 @@ void SynthEngine::resetAll(bool andML)
         string filename = Runtime.defaultStateName;
         if (this != firstSynth)
             filename += ("-" + to_string(this->getUniqueId()));
-        if(isRegFile(filename + ".state"))
+        if(isRegularFile(filename + ".state"))
         {
             Runtime.StateFile = filename;
             Runtime.stateRestore();
@@ -2416,12 +2433,12 @@ bool SynthEngine::installBanks()
 
     string bankname = name + ".banks";
 //    Runtime.Log(bankname);
-    if (!isRegFile(bankname))
+    if (!isRegularFile(bankname))
     {
         banksFound = false;
         Runtime.Log("Missing bank file");
         bankname = name + ".config";
-        if (isRegFile(bankname))
+        if (isRegularFile(bankname))
             Runtime.Log("Copying data from config");
         else
         {
@@ -2450,7 +2467,7 @@ bool SynthEngine::installBanks()
     xml->exitbranch();
     delete xml;
     Runtime.Log("\nFound " + asString(bank.InstrumentsInBanks) + " instruments in " + asString(bank.BanksInRoots) + " banks");
-    Runtime.Log(miscMsgPop(setRootBank(Runtime.tempRoot, Runtime.tempBank)& 0xff));
+    Runtime.Log(textMsgBuffer.fetch(setRootBank(Runtime.tempRoot, Runtime.tempBank)& 0xff));
 #ifdef GUI_FLTK
     GuiThreadMsg::sendMessage((this), GuiThreadMsg::RefreshCurBank, 1);
 #endif
@@ -2485,7 +2502,7 @@ bool SynthEngine::saveBanks()
 
 void SynthEngine::newHistory(string name, int group)
 {
-    if (findleafname(name) < "!")
+    if (findLeafName(name) < "!")
         return;
     if (group == TOPLEVEL::XML::Instrument && (name.rfind(EXTEN::yoshInst) != string::npos))
         name = setExtension(name, EXTEN::zynInst);
@@ -2498,7 +2515,7 @@ void SynthEngine::addHistory(string name, int group)
 {
     if (Runtime.historyLock[group])
         return;
-    if (findleafname(name) < "!")
+    if (findLeafName(name) < "!")
         return;
     vector<string> &listType = *getHistory(group);
     vector<string>::iterator itn = listType.begin();
@@ -2575,12 +2592,12 @@ void SynthEngine::setLastfileAdded(int group, string name)
         name = Runtime.userHome;
     list<string>::iterator it = Runtime.lastfileseen.begin();
     int count = 0;
-    while (count < group && it != miscList.end())
+    while (count < group && it != Runtime.lastfileseen.end())
     {
         ++it;
         ++count;
     }
-    if (it != miscList.end())
+    if (it != Runtime.lastfileseen.end())
         *it = name;
 }
 
@@ -2589,12 +2606,12 @@ string SynthEngine::getLastfileAdded(int group)
 {
     list<string>::iterator it = Runtime.lastfileseen.begin();
     int count = 0;
-    while ( count < group && it != miscList.end())
+    while ( count < group && it != Runtime.lastfileseen.end())
     {
         ++it;
         ++count;
     }
-    if (it == miscList.end())
+    if (it == Runtime.lastfileseen.end())
         return "";
     return *it;
 }
@@ -2604,7 +2621,7 @@ bool SynthEngine::loadHistory()
 {
     string name = Runtime.ConfigDir + '/' + YOSHIMI;
     string historyname = name + ".history";
-    if (!isRegFile(historyname))
+    if (!isRegularFile(historyname))
     {
         Runtime.Log("Missing history file");
         return false;
@@ -2665,12 +2682,12 @@ bool SynthEngine::loadHistory()
                 if (xml->enterbranch("XMZ_FILE", i))
                 {
                     filetype = xml->getparstr(extension);
-                    if (extension == "xiz_file" && !isRegFile(filetype))
+                    if (extension == "xiz_file" && !isRegularFile(filetype))
                     {
                         if (filetype.rfind(EXTEN::zynInst) != string::npos)
                             filetype = setExtension(filetype, EXTEN::yoshInst);
                     }
-                    if (filetype.size() && isRegFile(filetype))
+                    if (filetype.size() && isRegularFile(filetype))
                         newHistory(filetype, count);
                     xml->exitbranch();
                 }
@@ -2778,8 +2795,8 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool 
         return actualBase;
     }
     string file = setExtension(name, EXTEN::vector);
-    legit_pathname(file);
-    if (!isRegFile(file))
+    make_legit_pathname(file);
+    if (!isRegularFile(file))
     {
         Runtime.Log("Can't find " + file, 2);
         return actualBase;
@@ -2798,7 +2815,7 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool 
     }
     else
     {
-        actualBase = extractVectorData(baseChan, xml, findleafname(name));
+        actualBase = extractVectorData(baseChan, xml, findLeafName(name));
         int lastPart = NUM_MIDI_PARTS;
         if (Runtime.vectordata.Yaxis[actualBase] >= 0x7f)
             lastPart = NUM_MIDI_CHANNELS * 2;
@@ -2918,30 +2935,30 @@ unsigned char SynthEngine::saveVector(unsigned char baseChan, string name, bool 
     unsigned char result = NO_MSG; // ok
 
     if (baseChan >= NUM_MIDI_CHANNELS)
-        return miscMsgPush("Invalid channel number");
+        return textMsgBuffer.push("Invalid channel number");
     if (name.empty())
-        return miscMsgPush("No filename");
+        return textMsgBuffer.push("No filename");
     if (Runtime.vectordata.Enabled[baseChan] == false)
-        return miscMsgPush("No vector data on this channel");
+        return textMsgBuffer.push("No vector data on this channel");
 
     string file = setExtension(name, EXTEN::vector);
-    legit_pathname(file);
+    make_legit_pathname(file);
 
     Runtime.xmlType = TOPLEVEL::XML::Vector;
     XMLwrapper *xml = new XMLwrapper(this, true);
     if (!xml)
     {
         Runtime.Log("Save Vector failed xmltree allocation", 2);
-        return miscMsgPush("FAIL");
+        return textMsgBuffer.push("FAIL");
     }
     xml->beginbranch("VECTOR");
-        insertVectorData(baseChan, true, xml, findleafname(file));
+        insertVectorData(baseChan, true, xml, findLeafName(file));
     xml->endbranch();
 
     if (!xml->saveXMLfile(file))
     {
         Runtime.Log("Failed to save data to " + file, 2);
-        result = miscMsgPush("FAIL");
+        result = textMsgBuffer.push("FAIL");
     }
     delete xml;
     return result;
@@ -3225,56 +3242,6 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
     return true;
 }
 
-
-float SynthHelper::getDetune(unsigned char type, unsigned short int coarsedetune,
-                             unsigned short int finedetune) const
-{
-    float det = 0.0f;
-    float octdet = 0.0f;
-    float cdet = 0.0f;
-    float findet = 0.0f;
-    int octave = coarsedetune / 1024; // get Octave
-
-    if (octave >= 8)
-        octave -= 16;
-    octdet = octave * 1200.0f;
-
-    int cdetune = coarsedetune % 1024; // coarse and fine detune
-    if (cdetune > 512)
-        cdetune -= 1024;
-    int fdetune = finedetune - 8192;
-
-    switch (type)
-    {
-        // case 1 is used for the default (see below)
-        case 2:
-            cdet = fabs(cdetune * 10.0f);
-            findet = fabs(fdetune / 8192.0f) * 10.0f;
-            break;
-
-        case 3:
-            cdet = fabsf(cdetune * 100.0f);
-            findet = powf(10.0f, fabs(fdetune / 8192.0f) * 3.0f) / 10.0f - 0.1f;
-            break;
-
-        case 4:
-            cdet = fabs(cdetune * 701.95500087f); // perfect fifth
-            findet = (powf(2.0f, fabs(fdetune / 8192.0f) * 12.0f) - 1.0f) / 4095.0f * 1200.0f;
-            break;
-
-            // case ...: need to update N_DETUNE_TYPES, if you'll add more
-        default:
-            cdet = fabs(cdetune * 50.0f);
-            findet = fabs(fdetune / 8192.0f) * 35.0f; // almost like "Paul's Sound Designer 2"
-            break;
-    }
-    if (finedetune < 8192)
-        findet = -findet;
-    if (cdetune < 0)
-        cdet = -cdet;
-    det = octdet + cdet + findet;
-    return det;
-}
 
 SynthEngine *SynthEngine::getSynthFromId(unsigned int uniqueId)
 {
@@ -3596,14 +3563,14 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
 
         case CONFIG::control::jackMidiSource:
             min = 3; // anything greater than max
-            def = miscMsgPush("default");
+            def = textMsgBuffer.push("default");
             break;
         case CONFIG::control::jackPreferredMidi:
             def = 1;
             break;
         case CONFIG::control::jackServer:
             min = 3;
-            def = miscMsgPush("default");
+            def = textMsgBuffer.push("default");
             break;
         case CONFIG::control::jackPreferredAudio:
             def = 1;
@@ -3614,14 +3581,14 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
 
         case CONFIG::control::alsaMidiSource:
             min = 3;
-            def = miscMsgPush("default");
+            def = textMsgBuffer.push("default");
             break;
         case CONFIG::control::alsaPreferredMidi:
             def = 1;
             break;
         case CONFIG::control::alsaAudioDevice:
             min = 3;
-            def = miscMsgPush("default");
+            def = textMsgBuffer.push("default");
             break;
         case CONFIG::control::alsaPreferredAudio:
             break;

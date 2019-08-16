@@ -41,9 +41,6 @@ decl {\#include <iostream>} {public local
 decl {\#include <fstream>} {public local
 }
 
-decl {using namespace std;} {public local
-}
-
 decl {\#include "UI/MiscGui.h"} {public local
 }
 
@@ -89,16 +86,30 @@ decl {\#include "MasterMiscUI.h"} {public local
 decl {\#include "Misc/SynthEngine.h"} {public local
 }
 
-decl {\#include "Misc/MiscFuncs.h"} {public local
-}
-
-decl {\#include "Interface/FileMgr.h"} {public local
-}
-
 decl {\#include "MidiLearnUI.h"} {public local
 }
 
-class MasterUI {selected : {private GuiUpdates, FileMgr}
+decl {\#include "Misc/FileMgrFuncs.h"
+    using file::isRegularFile;
+    using file::findLeafName;
+} {private local
+}
+
+decl {\#include "Misc/FormatFuncs.h"
+    using func::string2uint;
+    using func::asString;
+} {private local
+}
+
+decl {\#include "Misc/TextMsgBuffer.h"
+
+    namespace \{ // Implementation details...
+        TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
+    \}
+} {private local
+}
+
+class MasterUI {selected : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -409,10 +420,10 @@ class MasterUI {selected : {private GuiUpdates, FileMgr}
                 filename = fl_file_chooser("Save:", exten.c_str(), newname.c_str(), 0);
                 if (filename == NULL)
                     return;
-                if (isRegFile(string(filename)))
+                if (isRegularFile(string(filename)))
                     if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                         return;
-                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedInstrument, float(npartcounter->value() - 1), TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, miscMsgPush(string(filename)));
+                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedInstrument, float(npartcounter->value() - 1), TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(filename)));
                 return;}
             tooltip {Save current instrument to an .xi* file} xywh {20 20 100 20} labelsize 12
           }
@@ -529,10 +540,10 @@ class MasterUI {selected : {private GuiUpdates, FileMgr}
                 if (filename == NULL)
                     return;
                 filename = fl_filename_setext(filename, EXTEN::scale.c_str());
-                if (isRegFile(string(filename)))
+                if (isRegularFile(string(filename)))
                     if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                         return;
-                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedScale, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, miscMsgPush(string(filename)));}
+                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedScale, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(filename)));}
             xywh {25 25 100 20} labelsize 12
           }
           MenuItem RecentScale {
@@ -578,7 +589,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
                 RecentState->activate();
             }
             else
-                refresh_master_ui(0x80 | (miscMsgPush(" ") << 8));}
+                refresh_master_ui(0x80 | (textMsgBuffer.push(" ") << 8));}
             tooltip {Load session state} xywh {0 0 34 21} labelsize 12
           }
           MenuItem saveState {
@@ -591,7 +602,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
             char *fle = fl_file_chooser("Save:", exten.c_str(), lastname.c_str(), 0);
             if (fle)
             {
-                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, miscMsgPush(string(fle)));
+                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(fle)));
                 RecentState->activate();
             }}
             tooltip {Save session state} xywh {10 10 34 21} labelsize 12
@@ -602,7 +613,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
                 string name = synth->getRuntime().defaultStateName;
                 if (instance > 0)
                     name += ("-" + to_string(instance));
-                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, miscMsgPush(name + ".state"));}
+                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(name + ".state"));}
             tooltip {Save as default state (if load default checked)} xywh {0 0 34 21} labelsize 12
           }
           MenuItem RecentState {
@@ -1587,12 +1598,12 @@ Alan Calvert started the project}
             updatepanel();
             break;
         case MAIN::control::exportBank:
-            name = miscMsgPop(miscmsg);
+            name = textMsgBuffer.fetch(miscmsg);
             if (wasFromHere)
                 fl_alert("%s",name.c_str());
             break;
         case MAIN::control::importBank: // import bank
-            name = miscMsgPop(miscmsg);
+            name = textMsgBuffer.fetch(miscmsg);
             if (wasFromHere)
             {
                 if (name.find("FAILED") == 1)
@@ -1610,7 +1621,7 @@ Alan Calvert started the project}
             bankui->rescan_for_banks(false);
             break;
         case MAIN::control::deleteBank: // delete bank and contents
-            name = miscMsgPop(miscmsg);
+            name = textMsgBuffer.fetch(miscmsg);
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
@@ -1648,7 +1659,7 @@ Alan Calvert started the project}
             break;
 
         case MAIN::control::saveInstrument: // save instrument to bank
-            name = miscMsgPop(miscmsg);
+            name = textMsgBuffer.fetch(miscmsg);
             if (npart == parameter)
                 partui->setinstrumentlabel();
             if((parameter & 0x30) == panelgroup)
@@ -1662,7 +1673,7 @@ Alan Calvert started the project}
         break;
 
         case MAIN::control::saveNamedInstrument: // save instrument
-            name = miscMsgPop(miscmsg);
+            name = textMsgBuffer.fetch(miscmsg);
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
@@ -1677,7 +1688,7 @@ Alan Calvert started the project}
             break;
 
         case MAIN::control::loadNamedPatchset: // load patchset
-            name = miscMsgPop(miscmsg);
+            name = textMsgBuffer.fetch(miscmsg);
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
@@ -1687,14 +1698,14 @@ Alan Calvert started the project}
             {
                 vectorui->RefreshChans();
                 RecentParams->activate();
-                setMasterLabel(findleafname(name));
+                setMasterLabel(findLeafName(name));
                 refresh_master_ui(2);
             }
 
             break;
 
         case MAIN::control::saveNamedPatchset: // save patch set
-            name = miscMsgPop(miscmsg);
+            name = textMsgBuffer.fetch(miscmsg);
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
@@ -1702,14 +1713,14 @@ Alan Calvert started the project}
             }
             else
             {
-                setMasterLabel(findleafname(name));
+                setMasterLabel(findLeafName(name));
                 RecentParams->activate();
                 updatepanel(); // why?
             }
             break;
 
         case MAIN::control::loadNamedVector: // load vector
-            name = miscMsgPop(miscmsg);
+            name = textMsgBuffer.fetch(miscmsg);
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
@@ -1718,14 +1729,14 @@ Alan Calvert started the project}
             else
             {
                 vectorui->setLoadLabelRemote(insert, synth->getRuntime().vectordata.Name[insert]);
-                setMasterLabel(findleafname(name) + " - Vector " + to_string(int(insert) + 1));
+                setMasterLabel(findLeafName(name) + " - Vector " + to_string(int(insert) + 1));
                 vectorui->recenthistory->activate();
                 refresh_master_ui(5);
             }
             break;
 
         case MAIN::control::saveNamedVector: // save vector
-            name = miscMsgPop(miscmsg);
+            name = textMsgBuffer.fetch(miscmsg);
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
@@ -1733,13 +1744,13 @@ Alan Calvert started the project}
             }
             else
             {
-                setMasterLabel(findleafname(name) + " - Vector " + to_string(int(insert) + 1));
+                setMasterLabel(findLeafName(name) + " - Vector " + to_string(int(insert) + 1));
                 vectorui->recenthistory->activate();
             }
             break;
 
         case MAIN::control::loadNamedScale: // load scales
-            name = miscMsgPop(miscmsg);
+            name = textMsgBuffer.fetch(miscmsg);
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
@@ -1754,7 +1765,7 @@ Alan Calvert started the project}
             break;
 
         case MAIN::control::saveNamedScale: // save scales
-            name = miscMsgPop(miscmsg);
+            name = textMsgBuffer.fetch(miscmsg);
             if (wasFromHere && name.find("FAILED") == 1)
                 fl_alert("%s",name.c_str());
             else
@@ -1762,7 +1773,7 @@ Alan Calvert started the project}
             break;
 
         case MAIN::control::loadNamedState: // load state
-            name = miscMsgPop(miscmsg);
+            name = textMsgBuffer.fetch(miscmsg);
             if (wasFromHere && name.find("FAILED") == 1)
             {
                 fl_alert("%s",name.c_str());
@@ -1770,17 +1781,17 @@ Alan Calvert started the project}
             }
             else
             {
-                setMasterLabel(findleafname(name) + " - State");
+                setMasterLabel(findLeafName(name) + " - State");
                 refresh_master_ui(0x14);
             }
             break;
 
         case MAIN::control::saveNamedState: // save state
-            name = miscMsgPop(miscmsg);
+            name = textMsgBuffer.fetch(miscmsg);
             if (wasFromHere && name.find("FAILED") == 1)
                 fl_alert("%s",name.c_str());
             else
-                setMasterLabel(findleafname(name) + " - State");
+                setMasterLabel(findLeafName(name) + " - State");
             break;
 
         case MAIN::control::masterReset:
@@ -1806,7 +1817,7 @@ Alan Calvert started the project}
         case MAIN::control::openManualPDF:
             message->hide();
             if (miscmsg != NO_MSG)
-                fl_alert("%s", miscMsgPop(miscmsg).c_str());
+                fl_alert("%s", textMsgBuffer.fetch(miscmsg).c_str());
             break;
 
         case MAIN::control::startInstance: // new instance (do nothing here)
@@ -2041,7 +2052,7 @@ Alan Calvert started the project}
   }
   Function {do_load_scale(string fname)} {} {
     code {//
-    send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::loadNamedScale, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, miscMsgPush(fname));} {}
+    send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::loadNamedScale, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(fname));} {}
   }
   Function {do_load_instrument(string fname)} {} {
     code {//
@@ -2054,7 +2065,7 @@ Alan Calvert started the project}
     }
     partui->partGroupEnable->value(0);
     partui->partgroup->deactivate();
-    send_data(TOPLEVEL::action::forceUpdate, MAIN::control::loadInstrumentByName, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, npart, UNUSED, UNUSED, miscMsgPush(fname));} {}
+    send_data(TOPLEVEL::action::forceUpdate, MAIN::control::loadInstrumentByName, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, npart, UNUSED, UNUSED, textMsgBuffer.push(fname));} {}
   }
   Function {do_load_master(const char* file)} {} {
     code {//
@@ -2071,7 +2082,7 @@ Alan Calvert started the project}
         if (fname == NULL)
             return;
     }
-    send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::loadNamedPatchset, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, miscMsgPush(fname));} {}
+    send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::loadNamedPatchset, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(fname));} {}
   }
   Function {do_save_master(const char* file = NULL)} {} {
     code {//
@@ -2088,7 +2099,7 @@ Alan Calvert started the project}
             return;
         tmp = fl_filename_setext(tmp, EXTEN::patchset.c_str());
         fname = tmp;
-        result = isRegFile(tmp);
+        result = isRegularFile(tmp);
         if (result)
         {
             result = false;
@@ -2099,7 +2110,7 @@ Alan Calvert started the project}
     else
         fname = file;
 
-    send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedPatchset, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, miscMsgPush(string(fname)));} {}
+    send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedPatchset, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(fname)));} {}
   }
   Function {refresh_master_ui(int type)} {} {
     code {//
@@ -2157,7 +2168,7 @@ Alan Calvert started the project}
     globalfinedetune->value(synth->microtonal.Pglobalfinedetune);
     microtonalui = new MicrotonalUI(&synth->microtonal, synth);
     if (type & 0x80)
-        setMasterLabel(miscMsgPop((type >> 8) & UNUSED));
+        setMasterLabel(textMsgBuffer.fetch((type >> 8) & UNUSED));
     updatesendwindow();
     updatepanel(type > 0);
     if (type != 5)
@@ -2282,7 +2293,7 @@ Alan Calvert started the project}
   }
   Function {setState(string filename)} {} {
     code {//
-    send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::loadNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, miscMsgPush(filename));} {}
+    send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::loadNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));} {}
   }
   Function {setPartWindowTitle(string prefix)} {return_type string
   } {
@@ -2372,7 +2383,7 @@ Alan Calvert started the project}
     }} {}
   }
   Function {ShowAlert(int num)} {} {
-    code {fl_alert("%s", miscMsgPop(num).c_str());} {}
+    code {fl_alert("%s", textMsgBuffer.fetch(num).c_str());} {}
   }
   Function {getSynth()} {return_type {SynthEngine *}
   } {

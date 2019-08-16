@@ -50,12 +50,6 @@ decl {\#include "FilterUI.h"} {public local
 decl {\#include "PresetsUI.h"} {public local
 }
 
-decl {\#include "Misc/MiscFuncs.h"} {public local
-}
-
-decl {\#include "Misc/SynthHelper.h"} {public local
-}
-
 decl {\#include "Params/SUBnoteParameters.h"} {public local
 }
 
@@ -63,6 +57,11 @@ decl {\#include "Misc/SynthEngine.h"} {public global
 }
 
 decl {\#include "MasterUI.h"} {private global
+}
+
+decl {\#include "Misc/SynthHelper.h"
+    using synth::getDetune;
+} {private local
 }
 
 class SUBnoteharmonic {: {public Fl_Group}
@@ -175,7 +174,7 @@ class SUBnoteharmonic {: {public Fl_Group}
   }
 }
 
-class SUBnoteUI {: {public PresetsUI_, SynthHelper}
+class SUBnoteUI {: {public PresetsUI_}
 } {
   Function {make_window()} {} {
     Fl_Window SUBparameters {

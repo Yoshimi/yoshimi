@@ -48,7 +48,7 @@ class Phaser : public Effect
         void setdryonly(void);
 
     private:
-        // Parametrii Phaser
+        // Phaser Parameters
         bool Pchanged;
         EffectLFO lfo;           // <lfo-ul Phaser
         unsigned char Pvolume;
@@ -65,7 +65,7 @@ class Phaser : public Effect
         unsigned char Phyper;       //lfo^2 -- converts tri into hyper-sine
         unsigned char Panalog;
 
-        // Control Parametrii
+        // Control Parameters
         void setvolume(unsigned char Pvolume_);
         void setdepth(unsigned char Pdepth_);
         void setfb(unsigned char Pfb_);

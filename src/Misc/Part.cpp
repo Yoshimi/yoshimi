@@ -25,11 +25,6 @@
 
 */
 
-#include <cstring>
-#include <cmath>
-#include <iostream>
-
-using namespace std;
 
 #include "Params/ADnoteParameters.h"
 #include "Params/SUBnoteParameters.h"
@@ -43,8 +38,20 @@ using namespace std;
 #include "Misc/Microtonal.h"
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/SynthHelper.h"
+#include "Misc/FileMgrFuncs.h"
+#include "Misc/NumericFuncs.h"
+#include "Misc/FormatFuncs.h"
 #include "Synth/Resonance.h"
 #include "Misc/Part.h"
+
+using synth::velF;
+using file::isRegularFile;
+using file::setExtension;
+using file::findLeafName;
+using func::dB2rap;
+using func::findSplitPoint;
+
 
 Part::Part(Microtonal *microtonal_, FFTwrapper *fft_, SynthEngine *_synth) :
     microtonal(microtonal_),
@@ -1333,7 +1340,7 @@ int Part::loadXMLinstrument(string filename)
 {
     bool hasYoshi = true;
     filename = setExtension(filename, EXTEN::yoshInst);
-    if (!isRegFile(filename))
+    if (!isRegularFile(filename))
     {
         hasYoshi = false;
         filename = setExtension(filename, EXTEN::zynInst);
@@ -1359,7 +1366,7 @@ int Part::loadXMLinstrument(string filename)
     }
     defaultsinstrument();
     PyoshiType = xml->information.yoshiType;
-    Pname = findleafname(filename); // in case there's no internal
+    Pname = findLeafName(filename); // in case there's no internal
     int chk = findSplitPoint(Pname);
     if (chk > 0)
         Pname = Pname.substr(chk + 1, Pname.size() - chk - 1);

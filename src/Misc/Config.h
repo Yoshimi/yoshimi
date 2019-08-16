@@ -31,18 +31,15 @@
 #include <deque>
 #include <list>
 
-using namespace std;
-
 #include "MusicIO/MusicClient.h"
-#include "Misc/MiscFuncs.h"
-#include "Interface/FileMgr.h"
 #include "FL/Fl.H"
 
-class XMLwrapper;
+using std::string;
 
+class XMLwrapper;
 class SynthEngine;
 
-class Config : public MiscFuncs, FileMgr
+class Config
 {
     public:
         Config(SynthEngine *_synth, int argc, char **argv);
@@ -131,7 +128,7 @@ class Config : public MiscFuncs, FileMgr
         bool          loadDefaultState;
         int           Interpolation;
         string        presetsDirlist[MAX_PRESETS];
-        list<string>  lastfileseen;
+        std::list<string> lastfileseen;
         bool          sessionSeen[TOPLEVEL::XML::MLearn + 1];
         bool          historyLock[TOPLEVEL::XML::MLearn + 1];
         int           checksynthengines;
@@ -193,7 +190,7 @@ class Config : public MiscFuncs, FileMgr
             bool Enabled[NUM_MIDI_CHANNELS];
         }vectordata;
 
-        list<string> LogList;
+        std::list<string> LogList;
 
         /*
          * These replace local memory allocations that

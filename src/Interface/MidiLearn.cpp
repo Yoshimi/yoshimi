@@ -17,27 +17,44 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified May 2019
+    Modified August 2019
 */
-
-#include <iostream>
-#include <cfloat>
-#include <bitset>
-#include <unistd.h>
-#include <list>
-#include <string>
-#include <unistd.h>
-
-using namespace std;
 
 #include "Interface/MidiLearn.h"
 #include "Interface/InterChange.h"
 #include "Interface/RingBuffer.h"
-#include "Misc/MiscFuncs.h"
+#include "Misc/FileMgrFuncs.h"
+#include "Misc/FormatFuncs.h"
+#include "Misc/TextMsgBuffer.h"
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
 
+#include <list>
+#include <vector>
+#include <string>
+#include <unistd.h>  // for usleep()
+//#include <iostream>
+
+using file::isRegularFile;
+using file::make_legit_filename;
+using file::make_legit_pathname;
+using file::setExtension;
+
+using func::asString;
+using func::asHexString;
+using std::to_string;
+using std::string;
+using std::vector;
+using std::list;
+
 enum scan : int { noList = -3, listEnd, listBlocked};
+
+
+namespace { // Implementation details...
+
+    TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
+}
+
 
 MidiLearn::MidiLearn(SynthEngine *_synth) :
     learning(false),
@@ -105,7 +122,7 @@ bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, un
         if (minIn > maxIn)
         {
             value = 127 - value;
-            swap(minIn, maxIn);
+            std::swap(minIn, maxIn);
         }
 
         if (minIn == maxIn)
@@ -389,7 +406,7 @@ void MidiLearn::generalOperations(CommandBlock *getData)
     string name;
     if (control == MIDILEARN::control::loadList)
     {
-        name = (miscMsgPop(par2));
+        name = (textMsgBuffer.fetch(par2));
         if (loadList(name))
             synth->getRuntime().Log("Loaded " + name);
         updateGui();
@@ -422,7 +439,7 @@ void MidiLearn::generalOperations(CommandBlock *getData)
     }
     if (control == MIDILEARN::control::saveList)
     {
-        name = (miscMsgPop(par2));
+        name = (textMsgBuffer.fetch(par2));
         if (saveList(name))
             synth->getRuntime().Log("Saved " + name);
         synth->getRuntime().finishedCLI = true;
@@ -651,7 +668,7 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
         putData.data.control = 0xfe; // TODO don't understand this :(
         putData.data.part = TOPLEVEL::section::midiIn;
         putData.data.parameter = 0x80;
-        putData.data.miscmsg = miscMsgPush("Midi Learn full!");
+        putData.data.miscmsg = textMsgBuffer.push("Midi Learn full!");
         writeMidi(&putData, false);
         learning = false;
         return;
@@ -750,7 +767,7 @@ void MidiLearn::updateGui(int opp)
     if (opp == MIDILEARN::control::sendLearnMessage)
     {
         putData.data.control = MIDILEARN::control::sendLearnMessage;
-        putData.data.miscmsg = miscMsgPush("Learning " + learnedName);
+        putData.data.miscmsg = textMsgBuffer.push("Learning " + learnedName);
     }
     else if (opp == MIDILEARN::control::cancelLearn)
     {
@@ -784,7 +801,7 @@ void MidiLearn::updateGui(int opp)
         putData.data.engine = it->chan;
         putData.data.insert = it->min_in;
         putData.data.parameter = it->max_in;
-        putData.data.miscmsg = miscMsgPush(it->name);
+        putData.data.miscmsg = textMsgBuffer.push(it->name);
         writeToGui(&putData);
         if (newCC > 0xff || (it->status & 8) > 0)
         { // status now used in case NRPN is < 0x100
@@ -818,7 +835,7 @@ bool MidiLearn::saveList(string name)
     }
 
     string file = setExtension(name, EXTEN::mlearn);
-    legit_pathname(file);
+    make_legit_pathname(file);
 
     synth->getRuntime().xmlType = TOPLEVEL::XML::MLearn;
     XMLwrapper *xml = new XMLwrapper(synth, true);
@@ -899,8 +916,8 @@ bool MidiLearn::loadList(string name)
         return false;
     }
     string file = setExtension(name, EXTEN::mlearn);
-    legit_pathname(file);
-    if (!isRegFile(file))
+    make_legit_pathname(file);
+    if (!isRegularFile(file))
     {
         synth->getRuntime().Log("Can't find " + file);
         return false;

@@ -24,7 +24,11 @@
 
 #include "Misc/Config.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/FormatFuncs.h"
 #include "MusicIO/AlsaEngine.h"
+
+using func::asString;
+
 
 AlsaEngine::AlsaEngine(SynthEngine *_synth) :MusicIO(_synth)
 {

@@ -22,17 +22,17 @@
 
 #include <errno.h>
 
-#include <unistd.h>
 #include <jack/midiport.h>
 #include <jack/thread.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sstream>
-#include <iostream>
-#include <stdio.h>
+#include <unistd.h>     // for usleep()
 
 #include "Misc/Config.h"
+#include "Misc/FormatFuncs.h"
 #include "MusicIO/JackEngine.h"
+
+using func::asString;
+using func::asHexString;
+
 
 JackEngine::JackEngine(SynthEngine *_synth) : MusicIO(_synth), jackClient(NULL)
 {
@@ -126,7 +126,7 @@ bool JackEngine::openJackClient(std::string server)
     if (jackClient)
         return true;
     else
-        synth->getRuntime().Log("Failed jack_client_open(), status: " + synth->getRuntime().asHexString((int)jstatus), 1);
+        synth->getRuntime().Log("Failed jack_client_open(), status: " + asHexString((int)jstatus), 1);
     return false;
 }
 

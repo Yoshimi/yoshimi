@@ -28,10 +28,13 @@
 
 #include "Interface/InterChange.h"
 #include "Interface/Data2Text.h"
-#include "Misc/MiscFuncs.h"
+#include "Misc/FileMgrFuncs.h"
+#include "Misc/NumericFuncs.h"
+#include "Misc/FormatFuncs.h"
 #include "Misc/Microtonal.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/Part.h"
+#include "Misc/TextMsgBuffer.h"
 #include "Params/Controller.h"
 #include "Params/ADnoteParameters.h"
 #include "Params/SUBnoteParameters.h"
@@ -46,12 +49,32 @@
     #include "MasterUI.h"
 #endif
 
+using file::findFile;
+using file::isRegularFile;
+using file::createDir;
+using file::isDirectory;
+using file::setExtension;
+using file::findLeafName;
+using file::createEmptyFile;
+using file::deleteFile;
+using file::loadText;
+using file::saveText;
+
+using func::bitSet;
+using func::bitClear;
+using func::nearestPowerOf2;
+
+using func::asString;
+
+
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
 extern SynthEngine *firstSynth;
 
+// used by main.cpp and SynthEngine.cpp
 std::string singlePath;
 std::string runGui;
 int startInstance = 0;
+
 
 InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth),
@@ -318,7 +341,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 
     std::string text;
     if (getData->data.miscmsg != NO_MSG)
-        text = miscMsgPop(getData->data.miscmsg);
+        text = textMsgBuffer.fetch(getData->data.miscmsg);
     else
         text = "";
     getData->data.miscmsg = NO_MSG; // this may be reset later
@@ -373,7 +396,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                 else
                     text = "";
             }
-            text += miscMsgPop(msgID & NO_MSG);
+            text += textMsgBuffer.fetch(msgID & NO_MSG);
             newMsg = true;
             getData->data.source = TOPLEVEL::action::toAll;
             // everyone will want to knopw about these!
@@ -502,7 +525,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                 case MAIN::control::loadInstrumentFromBank:
                 {
                     unsigned int result = synth->setProgramFromBank(getData);
-                    text = miscMsgPop(result & NO_MSG);
+                    text = textMsgBuffer.fetch(result & NO_MSG);
                     if (result < 0x1000)
                         text = "ed " + text;
                     else
@@ -513,9 +536,9 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 
                 case MAIN::control::loadInstrumentByName:
                 {
-                    getData->data.miscmsg = miscMsgPush(text);
+                    getData->data.miscmsg = textMsgBuffer.push(text);
                     unsigned int result = synth->setProgramByName(getData);
-                    text = miscMsgPop(result & NO_MSG);
+                    text = textMsgBuffer.fetch(result & NO_MSG);
                     if (result < 0x1000)
                         text = "ed " + text;
                     else
@@ -614,7 +637,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     std::string oldname = synth->getRuntime().vectordata.Name[insert];
                     int pos = oldname.find("No Name");
                     if (pos >=0 && pos < 2)
-                        synth->getRuntime().vectordata.Name[insert] = findleafname(text);
+                        synth->getRuntime().vectordata.Name[insert] = findLeafName(text);
                     tmp = synth->saveVector(insert, text, true);
                     if (tmp == NO_MSG)
                     {
@@ -623,7 +646,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     }
                     else
                     {
-                        name = miscMsgPop(tmp);
+                        name = textMsgBuffer.fetch(tmp);
                         if (name != "FAIL")
                             text = " " + name;
                         else
@@ -714,14 +737,14 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     int count = wanted + 2;
                     manfile = manfile.substr(0, pos);
                     std::string path = "";
-                    while (path == "" && count >= 0) // scan current then older varsions
+                    while (path == "" && count >= 0) // scan current first, then older versions
                     {
                         --count;
-                        path = findfile("/usr/", (manfile + std::to_string(count)).c_str(), "pdf");
+                        path = findFile("/usr/", (manfile + std::to_string(count)).c_str(), "pdf");
                         if (path == "")
-                        path = findfile("/usr/", (manfile + std::to_string(count)).c_str(), "pdf.gz");
+                        path = findFile("/usr/", (manfile + std::to_string(count)).c_str(), "pdf.gz");
                         if (path == "")
-                        path = findfile("/home/", (manfile + std::to_string(count)).c_str(), "pdf");
+                        path = findFile("/home/", (manfile + std::to_string(count)).c_str(), "pdf");
                     }
                     std::cout << "man " << manfile << "\npath " << path << std::endl;
                     if (path == "")
@@ -979,7 +1002,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     else
                         text = "READ";
                     newMsg = true;
-                    getData->data.miscmsg = miscMsgPush(text); // slightly odd case
+                    getData->data.miscmsg = textMsgBuffer.push(text); // slightly odd case
                     break;
                 case CONFIG::control::historyLock:
                 {
@@ -1108,7 +1131,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     //std::cout << ">" << text << "<" << std::endl;
 
     if (newMsg)
-        value = miscMsgPush(text);
+        value = textMsgBuffer.push(text);
 // TODO need to inmprove message handling for multiple receivers
 
     getData->data.value.F = float(value);
@@ -1123,7 +1146,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 #ifdef GUI_FLTK
         if (text != "" && synth->getRuntime().showGui && (write || guiTo))
         {
-            getData->data.miscmsg = miscMsgPush(text); // pass it on to GUI
+            getData->data.miscmsg = textMsgBuffer.push(text); // pass it on to GUI
         }
 #endif
         bool ok = returnsBuffer->write(getData->bytes);
@@ -1131,10 +1154,10 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
         if (synth->getRuntime().showGui && npart == TOPLEVEL::section::scales && control == SCALES::control::importScl)
         {   // loading a tuning includes a name and comment!
             getData->data.control = SCALES::control::name;
-            getData->data.miscmsg = miscMsgPush(synth->microtonal.Pname);
+            getData->data.miscmsg = textMsgBuffer.push(synth->microtonal.Pname);
             returnsBuffer->write(getData->bytes);
             getData->data.control = SCALES::control::comment;
-            getData->data.miscmsg = miscMsgPush(synth->microtonal.Pcomment);
+            getData->data.miscmsg = textMsgBuffer.push(synth->microtonal.Pcomment);
             ok &= returnsBuffer->write(getData->bytes);
         }
 #endif
@@ -1433,7 +1456,7 @@ void InterChange::mutedDecode(unsigned int altData)
             putData.data.type = TOPLEVEL::type::Write || TOPLEVEL::type::Integer;
             break;
         case TOPLEVEL::muted::masterReset:
-            miscMsgClear(); // make sure there are no hanging messages
+            textMsgBuffer.clear(); // make sure there are no hanging messages
             putData.data.control = (altData >> 8) & 0xff;
             putData.data.type = altData >> 24;
             //std::cout << "ID " << int(synth->getUniqueId()) << std::endl;
@@ -2409,7 +2432,7 @@ void InterChange::commandConfig(CommandBlock *getData)
                     deleteFile(singlePath);
             }
             else
-                value = isRegFile(singlePath);
+                value = isRegularFile(singlePath);
             break;
         case CONFIG::control::exposeStatus:
             if (write)
@@ -2832,7 +2855,7 @@ void InterChange::commandBank(CommandBlock *getData)
         case BANK::control::findInstrumentName:
         {
             if (parameter == UNUSED) // return the name of a specific instrument.
-                miscMsgPush(synth->getBankRef().getname(value_int, kititem, engine));
+                textMsgBuffer.push(synth->getBankRef().getname(value_int, kititem, engine));
             else
             {
                 static int inst = 0;
@@ -2851,7 +2874,7 @@ void InterChange::commandBank(CommandBlock *getData)
                         do {
                             if (synth->getBankRef().getType(inst, bank, root) == parameter)
                             {
-                                miscMsgPush(asString(root, 3) + ": " + asString(bank, 3) + ". " + asString(inst + 1, 3) + "  " + synth->getBankRef().getname(inst, bank, root));
+                                textMsgBuffer.push(asString(root, 3) + ": " + asString(bank, 3) + ". " + asString(inst + 1, 3) + "  " + synth->getBankRef().getname(inst, bank, root));
                                 ++ inst;
                                 return;
                             }
@@ -2865,7 +2888,7 @@ void InterChange::commandBank(CommandBlock *getData)
                     ++root;
                 } while (root < 128);
                 root = 0;
-                miscMsgPush("*");
+                textMsgBuffer.push("*");
             }
             break;
         }
@@ -5931,7 +5954,7 @@ void InterChange::testLimits(CommandBlock *getData)
         {
             text = synth->getRuntime().masterCCtest(int(value));
             if (text != "")
-                getData->data.miscmsg = miscMsgPush(text);
+                getData->data.miscmsg = textMsgBuffer.push(text);
             return;
         }
         if(control == CONFIG::control::bankCC)
@@ -5940,12 +5963,12 @@ void InterChange::testLimits(CommandBlock *getData)
                 return;
             text = synth->getRuntime().masterCCtest(int(value));
             if (text != "")
-                getData->data.miscmsg = miscMsgPush(text);
+                getData->data.miscmsg = textMsgBuffer.push(text);
             return;
         }
         text = synth->getRuntime().masterCCtest(int(value));
         if (text != "")
-            getData->data.miscmsg = miscMsgPush(text);
+            getData->data.miscmsg = textMsgBuffer.push(text);
         return;
     }
 }

@@ -26,9 +26,7 @@
 #include <jack/ringbuffer.h>
 
 #include "globals.h"
-#include "Misc/MiscFuncs.h"
 #include "Interface/Data2Text.h"
-#include "Interface/FileMgr.h"
 #include "Interface/RingBuffer.h"
 #include "Params/LFOParams.h"
 #include "Params/FilterParams.h"
@@ -39,7 +37,13 @@
 class SynthEngine;
 class DataText;
 
-class InterChange : private FileMgr, DataText
+// used by main.cpp and SynthEngine.cpp
+extern std::string singlePath;
+extern std::string runGui;
+extern int startInstance;
+
+
+class InterChange : private DataText
 {
 
     private:

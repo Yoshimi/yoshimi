@@ -2,15 +2,15 @@ This is not intended to be used within the realtime threads as both push and pop
 
 There are three calls:
 
-void miscMsgClear()
+void TextMsgBuffer::clear()
 
-int miscMsgPush( string )
+int TextMsgBuffer::push( string )
 
-string miscMsgPop( int )
+string TextMsgBuffer::fetch( int )
 
 These calls are accessible to all parts of Yoshimi and provide a simple asynchonous means of passing text between threads and functions via just the integer ID.
 
-miscMsgClear() is only intended to be used internally on major resets and just adds a bit of insurance that there are no orphaned messages.
+TextMsgBuffer::clear() is only intended to be used internally on major resets and just adds a bit of insurance that there are no orphaned messages.
 
 Pushing a message will return the first available ID and Popping a message makes its ID available again.
 
@@ -19,3 +19,9 @@ There is a maximum of 254 possible entries at any one time, but it's unlikely th
 The ID 255 (which has the global ID of NO_MSG) is a 'do nothing' reserved for calls that might want to send a message... but then again might not :)
 
 If you push an empty string you'll get back NO_MSG, and popping NO_MSG will of course return an empty string.
+
+
+
+Remark by Ichthyo, 8/2019:
+In order to make MiscFuncs stateless, I have extracted these functions into a singleton TextMsgBuffer.
+Moreover, I renamed the "miscMsgPop" function into "fetch", since this obviously is not a stack, so the name "pop" might be misleading.

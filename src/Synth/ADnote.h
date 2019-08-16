@@ -27,9 +27,8 @@
 #ifndef AD_NOTE_H
 #define AD_NOTE_H
 
-#include "Misc/SynthHelper.h"
+#include "Params/ADnoteParameters.h"
 #include "Synth/LegatoTypes.h"
-#include "Misc/Float2Int.h"
 
 class ADnoteParameters;
 class Controller;
@@ -45,7 +44,7 @@ class Filter;
 
 class SynthEngine;
 
-class ADnote : private SynthHelper, private Float2Int
+class ADnote
 {
     public:
         ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_, float velocity_,

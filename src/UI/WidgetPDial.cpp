@@ -27,6 +27,7 @@
 */
 
 #include "WidgetPDial.h"
+#include "Misc/NumericFuncs.h"
 
 #include <FL/fl_draw.H>
 #include <FL/Fl_Tooltip.H>
@@ -34,6 +35,8 @@
 #include <FL/x.H>
 #include <cairo.h>
 #include <cairo-xlib.h>
+
+using func::limit;
 
 WidgetPDial::WidgetPDial(int x,int y, int w, int h, const char *label) : Fl_Dial(x,y,w,h,label)
 {

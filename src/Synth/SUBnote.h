@@ -27,7 +27,6 @@
 #ifndef SUB_NOTE_H
 #define SUB_NOTE_H
 
-#include "Misc/SynthHelper.h"
 #include "Synth/LegatoTypes.h"
 
 class SUBnoteParameters;
@@ -37,7 +36,7 @@ class Filter;
 
 class SynthEngine;
 
-class SUBnote : private SynthHelper
+class SUBnote
 {
     public:
         SUBnote(SUBnoteParameters *parameters, Controller *ctl_,

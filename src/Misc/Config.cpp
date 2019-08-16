@@ -42,53 +42,68 @@
 #include <jack/session.h>
 #endif
 
-using namespace std;
-
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
+#include "Misc/FileMgrFuncs.h"
+#include "Misc/NumericFuncs.h"
+#include "Misc/FormatFuncs.h"
+#include "Misc/TextMsgBuffer.h"
 #ifdef GUI_FLTK
     #include "MasterUI.h"
 #endif
 #include "ConfBuild.h"
 
-static char prog_doc[] =
-    "Yoshimi " YOSHIMI_VERSION ", a derivative of ZynAddSubFX - "
-    "Copyright 2002-2009 Nasca Octavian Paul and others, "
-    "Copyright 2009-2011 Alan Calvert, "
-    "Copyright 2012-2013 Jeremy Jongepier and others, "
-    "Copyright 2014-2019 Will Godfrey and others";
-string argline = "Yoshimi " + (string) YOSHIMI_VERSION;
-const char* argp_program_version = argline.c_str();
+using file::isRegularFile;
+using file::isDirectory;
+using file::extendLocalPath;
+using file::setExtension;
 
-string stateText = "load saved state, defaults to '$HOME/" + EXTEN::config + "/yoshimi/yoshimi.state'";
+using func::nearestPowerOf2;
+using func::asString;
+using func::string2int;
 
-static struct argp_option cmd_options[] = {
-    {"alsa-audio",        'A',  "<device>",   1,  "use alsa audio output", 0},
-    {"alsa-midi",         'a',  "<device>",   1,  "use alsa midi input", 0},
-    {"define-root",       'D',  "<path>",     0,  "define path to new bank root" , 0},
-    {"buffersize",        'b',  "<size>",     0,  "set internal buffer size", 0 },
-    {"no-gui",            'i',  NULL,         0,  "disable gui", 0},
-    {"gui",               'I',  NULL,         0,  "enable gui", 0},
-    {"no-cmdline",        'c',  NULL,         0,  "disable command line interface", 0},
-    {"cmdline",           'C',  NULL,         0,  "enable command line interface", 0},
-    {"jack-audio",        'J',  "<server>",   1,  "use jack audio output", 0},
-    {"jack-midi",         'j',  "<device>",   1,  "use jack midi input", 0},
-    {"autostart-jack",    'k',  NULL,         0,  "auto start jack server", 0},
-    {"auto-connect",      'K',  NULL,         0,  "auto connect jack audio", 0},
-    {"load",              'l',  "<file>",     0,  "load .xmz file", 0},
-    {"load-instrument",   'L',  "<file>",     0,  "load .xiz file", 0},
-    {"load-midilearn",    'M',  "<file>",     0,  "load .xly file", 0},
-    {"name-tag",          'N',  "<tag>",      0,  "add tag to clientname", 0},
-    {"samplerate",        'R',  "<rate>",     0,  "set alsa audio sample rate", 0},
-    {"oscilsize",         'o',  "<size>",     0,  "set AddSynth oscilator size", 0},
-    {"state",             'S',  "<file>",     1,  stateText.c_str(), 0},
-    #if defined(JACK_SESSION)
-        {"jack-session-uuid", 'U',  "<uuid>",     0,  "jack session uuid", 0},
-        {"jack-session-file", 'u',  "<file>",     0,  "load named jack session file", 0},
-    #endif
-    { 0, 0, 0, 0, 0, 0}
-};
+
+namespace { // constants used in the implementation
+    char prog_doc[] =
+        "Yoshimi " YOSHIMI_VERSION ", a derivative of ZynAddSubFX - "
+        "Copyright 2002-2009 Nasca Octavian Paul and others, "
+        "Copyright 2009-2011 Alan Calvert, "
+        "Copyright 2012-2013 Jeremy Jongepier and others, "
+        "Copyright 2014-2019 Will Godfrey and others";
+    const string argline = "Yoshimi " + (string) YOSHIMI_VERSION;
+    const char* argp_program_version = argline.c_str();
+
+    string stateText = "load saved state, defaults to '$HOME/" + EXTEN::config + "/yoshimi/yoshimi.state'";
+
+    static struct argp_option cmd_options[] = {
+        {"alsa-audio",        'A',  "<device>",   1,  "use alsa audio output", 0},
+        {"alsa-midi",         'a',  "<device>",   1,  "use alsa midi input", 0},
+        {"define-root",       'D',  "<path>",     0,  "define path to new bank root" , 0},
+        {"buffersize",        'b',  "<size>",     0,  "set internal buffer size", 0 },
+        {"no-gui",            'i',  NULL,         0,  "disable gui", 0},
+        {"gui",               'I',  NULL,         0,  "enable gui", 0},
+        {"no-cmdline",        'c',  NULL,         0,  "disable command line interface", 0},
+        {"cmdline",           'C',  NULL,         0,  "enable command line interface", 0},
+        {"jack-audio",        'J',  "<server>",   1,  "use jack audio output", 0},
+        {"jack-midi",         'j',  "<device>",   1,  "use jack midi input", 0},
+        {"autostart-jack",    'k',  NULL,         0,  "auto start jack server", 0},
+        {"auto-connect",      'K',  NULL,         0,  "auto connect jack audio", 0},
+        {"load",              'l',  "<file>",     0,  "load .xmz file", 0},
+        {"load-instrument",   'L',  "<file>",     0,  "load .xiz file", 0},
+        {"load-midilearn",    'M',  "<file>",     0,  "load .xly file", 0},
+        {"name-tag",          'N',  "<tag>",      0,  "add tag to clientname", 0},
+        {"samplerate",        'R',  "<rate>",     0,  "set alsa audio sample rate", 0},
+        {"oscilsize",         'o',  "<size>",     0,  "set AddSynth oscilator size", 0},
+        {"state",             'S',  "<file>",     1,  stateText.c_str(), 0},
+        #if defined(JACK_SESSION)
+            {"jack-session-uuid", 'U',  "<uuid>",     0,  "jack session uuid", 0},
+            {"jack-session-file", 'u',  "<file>",     0,  "load named jack session file", 0},
+        #endif
+        { 0, 0, 0, 0, 0, 0}
+    };
+}
+
 
 unsigned int Config::Samplerate = 48000;
 unsigned int Config::Buffersize = 256;
@@ -193,16 +208,12 @@ bool Config::Setup(int argc, char **argv)
     if (!loadConfig())
         return false;
 
-    if (synth->getIsLV2Plugin()) //skip further setup for lv2 plugin instance.
+    /* NOTE: we must not do any further init involving the SynthEngine here,
+     * since this code is invoked from within the SynthEngine-ctor.
+     */
+    if (synth->getIsLV2Plugin())
     {
-        /*
-         * These are needed here now, as for stand-alone they have
-         * been moved to main to give the users the impression of
-         * a faster startup, and reduce the likelihood of thinking
-         * they failed and trying to start again.
-         */
-        synth->installBanks();
-        synth->loadHistory();
+        //skip further setup, which is irrelevant for lv2 plugin instance.
         return true;
     }
 
@@ -257,7 +268,7 @@ bool Config::Setup(int argc, char **argv)
 
         StateFile = fp;
         free (fp);
-        if (!isRegFile(StateFile))
+        if (!isRegularFile(StateFile))
         {
             no_state: Log("Invalid state file specified for restore " + StateFile, 2);
             return true;
@@ -450,7 +461,7 @@ bool Config::loadConfig(void)
         yoshimi += ("-" + asString(thisInstance));
     else
     {
-        miscMsgInit(); // sneaked it in here so it's early
+        TextMsgBuffer::instance().init(); // sneaked it in here so it's early
         string presetDir = ConfigDir + "/presets";
         if (!isDirectory(presetDir))
         {
@@ -468,7 +479,7 @@ bool Config::loadConfig(void)
     else
         ConfigFile += EXTEN::instance;
 
-    if (!isRegFile(baseConfig))
+    if (!isRegularFile(baseConfig))
     {
         Log("Basic configuration " + baseConfig + " not found, will use default settings");
         if (thisInstance == 0)
@@ -476,7 +487,7 @@ bool Config::loadConfig(void)
     }
 
     bool isok = true;
-    if (!isRegFile(ConfigFile))
+    if (!isRegularFile(ConfigFile))
     {
         Log("Configuration " + ConfigFile + " not found, will use default settings");
         configChanged = true; // give the user the choice
@@ -529,7 +540,7 @@ void Config::defaultPresets(void)
         "/usr/share/zynaddsubfx/presets",
         "/usr/local/share/zynaddsubfx/presets",
         string(getenv("HOME")) + "/" + string(EXTEN::config) + "/yoshimi/presets",
-        localPath("/presets"),
+        extendLocalPath("/presets"),
         "end"
     };
     int i = 0;
@@ -791,9 +802,9 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
     XMLwrapper *xml = NULL;
     bool ok = false;
 
-    if (sessionfile.size() && !isRegFile(sessionfile))
+    if (sessionfile.size() && !isRegularFile(sessionfile))
         sessionfile = setExtension(sessionfile, EXTEN::state);
-    if (!sessionfile.size() || !isRegFile(sessionfile))
+    if (!sessionfile.size() || !isRegularFile(sessionfile))
     {
         Log("Session file " + sessionfile + " not available", 2);
         goto end_game;
@@ -1195,7 +1206,7 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
 
         case 'b':
             settings->configChanged = true;
-            settings->Buffersize = Config::string2int(string(arg));
+            settings->Buffersize = string2int(string(arg));
             break;
 
         case 'D':
@@ -1245,12 +1256,12 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
 
         case 'o':
             settings->configChanged = true;
-            settings->Oscilsize = Config::string2int(string(arg));
+            settings->Oscilsize = string2int(string(arg));
             break;
 
         case 'R':
             settings->configChanged = true;
-            num = (Config::string2int(string(arg)) / 48 ) * 48;
+            num = (string2int(string(arg)) / 48 ) * 48;
             if (num < 48000 || num > 192000)
                 num = 44100; // play safe
             settings->Samplerate = num;

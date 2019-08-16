@@ -20,10 +20,9 @@
 */
 
 #include "Misc/SynthEngine.h"
+#include "Misc/TextMsgBuffer.h"
 #include "MiscGui.h"
 #include "MasterUI.h"
-
-#include <iostream>
 
 #include <FL/Fl.H>
 #include <FL/fl_draw.H>
@@ -31,7 +30,12 @@
 #include <cairo.h>
 #include <cairo-xlib.h>
 
-SynthEngine *synth;
+
+namespace { // Implementation details...
+
+    TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
+}
+
 
 float collect_readData(SynthEngine *synth, float value, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char offset, unsigned char miscmsg, unsigned char request)
 {
@@ -216,7 +220,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 
     if (control == TOPLEVEL::control::textMessage && insert != TOPLEVEL::insert::resonanceGraphInsert) // just show a message
     {
-        synth->getGuiMaster()->words->copy_label(miscMsgPop(miscmsg).c_str());
+        synth->getGuiMaster()->words->copy_label(textMsgBuffer.fetch(miscmsg).c_str());
         synth->getGuiMaster()->cancel->hide();
         synth->getGuiMaster()->message->show();
         return;
@@ -388,7 +392,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         }
         else if(miscmsg != NO_MSG)
         {
-            miscMsgPop(miscmsg); // clear any text out.
+            textMsgBuffer.fetch(miscmsg); // clear any text out.
         }
         return;
     }

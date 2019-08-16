@@ -28,14 +28,15 @@
 #ifndef FILTER_PARAMS_H
 #define FILTER_PARAMS_H
 
-#include "Misc/MiscFuncs.h"
 #include "Params/Presets.h"
+#include "globals.h"
+
+#include <cmath>
 
 class XMLwrapper;
-
 class SynthEngine;
 
-class FilterParams : public Presets, private MiscFuncs
+class FilterParams : public Presets
 {
     public:
         FilterParams(unsigned char Ptype_, unsigned char Pfreq, unsigned char Pq_, unsigned char Pfreqtrackoffset_, SynthEngine *_synth);
@@ -84,7 +85,7 @@ class FilterParams : public Presets, private MiscFuncs
         unsigned char Pformantslowness; // how slow varies the formants
         unsigned char Pvowelclearness;  // how vowels are kept clean (how much try
                                         // to avoid "mixed" vowels)
-        unsigned char Pcenterfreq,Poctavesfreq; // the center frequency of the res.
+        unsigned char Pcenterfreq,Poctavesfreq; // the centre frequency of the res.
                                                 // func., and the number of octaves
         struct {
             struct {

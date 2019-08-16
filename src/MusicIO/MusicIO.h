@@ -27,9 +27,11 @@
 #include "globals.h"
 #include "Misc/SynthEngine.h"
 
+#include <string>
+
 class SynthEngine;
 
-class MusicIO : virtual protected MiscFuncs
+class MusicIO
 {
     public:
         MusicIO(SynthEngine *_synth);

@@ -33,9 +33,17 @@
 #include "Misc/Config.h"
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/FileMgrFuncs.h"
+#include "Misc/FormatFuncs.h"
 
-int xml_k = 0;
-char tabs[STACKSIZE + 2];
+using file::saveText;
+using file::loadGzipped;
+using file::saveGzipped;
+using func::string2int;
+using func::string2float;
+using func::asLongString;
+using func::asString;
+
 
 const char *XMLwrapper_whitespace_callback(mxml_node_t *node, int where)
 {
@@ -54,6 +62,7 @@ const char *XMLwrapper_whitespace_callback(mxml_node_t *node, int where)
 
 XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
     stackpos(0),
+    xml_k(0),
     isYoshi(_isYoshi),
     synth(_synth)
 {
@@ -155,7 +164,7 @@ void XMLwrapper::checkfileinformation(const std::string& filename, unsigned int&
 
 
     std::string report = "";
-    char *xmldata = FileMgr::loadGzipped(filename, &report);
+    char *xmldata = loadGzipped(filename, &report);
     if (report != "")
         synth->getRuntime().Log(report, 2);
     if (!xmldata)

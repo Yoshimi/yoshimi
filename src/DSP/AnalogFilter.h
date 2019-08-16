@@ -25,12 +25,12 @@
 #ifndef ANALOG_FILTER_H
 #define ANALOG_FILTER_H
 
-#include "Misc/MiscFuncs.h"
 #include "DSP/Filter_.h"
+#include "globals.h"
 
 class SynthEngine;
 
-class AnalogFilter : public Filter_, private MiscFuncs
+class AnalogFilter : public Filter_
 {
     public:
         AnalogFilter(unsigned char Ftype, float Ffreq, float Fq,

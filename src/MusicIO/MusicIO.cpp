@@ -19,16 +19,15 @@
     Modified May 2019
 */
 
-#include <errno.h>
-#include <cstring>
-#include <fftw3.h>
 
 #include "Misc/Config.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/FormatFuncs.h"
 #include "MusicIO/MusicIO.h"
 
-#include <unistd.h>
-#include <iostream>
+
+using func::asString;
+
 
 MusicIO::MusicIO(SynthEngine *_synth) :
     interleaved(NULL),

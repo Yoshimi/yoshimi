@@ -27,15 +27,13 @@
 #ifndef BANK_H
 #define BANK_H
 
-#include <list>
-
-using namespace std;
-
-#include "Misc/MiscFuncs.h"
-#include "Interface/FileMgr.h"
 #include "Misc/Part.h"
+
+#include <string>
 #include <map>
-#include <vector>
+
+using std::string;
+using std::map;
 
 #define ROOT_SIZE 128
 #define BANK_SIZE 160
@@ -101,13 +99,8 @@ typedef map<size_t, map<string, size_t> > BankHintsMap;
 
 class SynthEngine;
 
-class Bank : private MiscFuncs, FileMgr
+class Bank
 {
-/* this doesn't seem necessary
-#ifdef YOSHIMI_LV2_PLUGIN
-    friend class YoshimiLV2Plugin;
-#endif
-*/
     friend class SynthEngine;
     public:
         Bank(SynthEngine *_synth);
@@ -187,4 +180,4 @@ class Bank : private MiscFuncs, FileMgr
         size_t getNewBankIndex(size_t rootID);
 };
 
-#endif
+#endif /*BANK_H*/

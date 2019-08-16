@@ -71,9 +71,6 @@ decl {\#include "PresetsUI.h"} {public local
 decl {\#include "Synth/OscilGen.h"} {public local
 }
 
-decl {\#include "Misc/MiscFuncs.h"} {public local
-}
-
 decl {\#include "Misc/Config.h"} {public local
 }
 
@@ -83,7 +80,14 @@ decl {\#include "Misc/SynthEngine.h"} {public local
 decl {\#include "MasterUI.h"} {private global
 }
 
-class OscilSpectrum {: {public Fl_Box, MiscFuncs}
+decl {\#include "Misc/NumericFuncs.h"
+    using func::dB2rap;
+    using func::rap2dB;
+} {private local
+}
+
+
+class OscilSpectrum {: {public Fl_Box}
 } {
   Function {OscilSpectrum(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {oscil=NULL;} {}

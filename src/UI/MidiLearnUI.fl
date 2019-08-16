@@ -41,9 +41,6 @@ decl {\#include "MasterUI.h"} {private global
 decl {\#include "Misc/SynthEngine.h"} {private local
 }
 
-decl {\# include "Interface/FileMgr.h"} {private local
-}
-
 decl {\#include "UI/MiscGui.h"
     \#include "EffUI.h"
     \#include "BankUI.h"
@@ -51,8 +48,25 @@ decl {\#include "UI/MiscGui.h"
     \#include "SUBnoteUI.h"
     \#include "PADnoteUI.h"
     \#include "UI/WidgetMWSlider.h"
-    \#include "Params/Controller.h"
-    \#include "Misc/MiscFuncs.h"} {public global
+    \#include "Params/Controller.h"} {public global
+}
+
+decl {\#include "Misc/FileMgrFuncs.h"
+    using file::findLeafName;
+} {private local
+}
+
+decl {\#include "Misc/FormatFuncs.h"
+    using func::asHexString;
+} {private local
+}
+
+decl {\#include "Misc/TextMsgBuffer.h"
+
+    namespace \{ // Implementation details...
+        TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
+    \}
+} {private local
 }
 
 class MidiLearnKitItem {: {public Fl_Group}
@@ -282,7 +296,7 @@ class MidiLearnKitItem {: {public Fl_Group}
   }
 }
 
-class MidiLearnUI {: {private MiscFuncs, FileMgr}
+class MidiLearnUI {
 } {
   Function {make_window()} {} {
     Fl_Window midilearnwindow {
@@ -363,9 +377,9 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         filename = fl_file_chooser("Load:", exten.c_str(), lastname.c_str(), 0);
         if (filename == NULL)
             return;
-        send_data(0, MIDILEARN::control::saveList, 0, 0, 0, 0, 0, 0, miscMsgPush((string) filename));
+        send_data(0, MIDILEARN::control::saveList, 0, 0, 0, 0, 0, 0, textMsgBuffer.push((string) filename));
         recent->activate();
-        setWindowTitle(findleafname(filename));}
+        setWindowTitle(findLeafName(filename));}
         tooltip {Save complete learned list} xywh {130 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 deactivate
       }
       Fl_Button clear {
@@ -451,7 +465,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         case MIDILEARN::control::findSize: // not using this yet
             break;
         case MIDILEARN::control::sendLearnMessage:
-            synth->getGuiMaster()->words->copy_label(miscMsgPop(miscmsg).c_str());
+            synth->getGuiMaster()->words->copy_label(textMsgBuffer.fetch(miscmsg).c_str());
             synth->getGuiMaster()->cancel->show();
             synth->getGuiMaster()->message->position(Fl::event_x_root() + 16, Fl::event_y_root());
             synth->getGuiMaster()->message->show();
@@ -492,7 +506,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
     code {//
     int lineNo = ((int)getData->data.value.F);
     int status = getData->data.type;
-    string name = miscMsgPop(getData->data.miscmsg);
+    string name = textMsgBuffer.fetch(getData->data.miscmsg);
     none->hide();
     clear->activate();
     save->activate();
@@ -552,9 +566,9 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
   }
   Function {loadMidi(string file)} {} {
     code {//
-    send_data(0, MIDILEARN::control::loadList, 0, 0, 0, 0, 0, 0, miscMsgPush((string) file));
+    send_data(0, MIDILEARN::control::loadList, 0, 0, 0, 0, 0, 0, textMsgBuffer.push((string) file));
     recent->activate();
-    setWindowTitle(findleafname(file));} {}
+    setWindowTitle(findLeafName(file));} {}
   }
   Function {setWindowTitle(string name = "")} {} {
     code {//

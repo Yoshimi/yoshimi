@@ -23,6 +23,10 @@
 */
 
 #include "DSP/Filter.h"
+#include "Misc/NumericFuncs.h"
+
+using func::dB2rap;
+
 
 Filter::Filter(FilterParams *pars, SynthEngine *_synth):
     synth(_synth)

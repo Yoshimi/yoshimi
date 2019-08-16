@@ -34,7 +34,14 @@
 #include "Synth/Envelope.h"
 #include "DSP/Filter.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/SynthHelper.h"
 #include "Synth/SUBnote.h"
+
+using synth::velF;
+using synth::getDetune;
+using synth::interpolateAmplitude;
+using synth::aboveAmplitudeThreshold;
+
 
 SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
                  float velocity, int portamento_, int midinote, bool besilent, SynthEngine *_synth) :
@@ -740,7 +747,6 @@ int SUBnote::noteout(float *outl, float *outr)
                     break;
                 }
                 Legato.fade.m += Legato.fade.step;
-                Legato.fade.m = Legato.fade.m;
                 outl[i] *= Legato.fade.m;
                 outr[i] *= Legato.fade.m;
             }
@@ -772,7 +778,6 @@ int SUBnote::noteout(float *outl, float *outr)
                     break;
                 }
                 Legato.fade.m -= Legato.fade.step;
-                Legato.fade.m = Legato.fade.m;
                 outl[i] *= Legato.fade.m;
                 outr[i] *= Legato.fade.m;
             }

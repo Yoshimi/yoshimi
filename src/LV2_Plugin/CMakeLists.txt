@@ -38,14 +38,14 @@ file (GLOB yoshimi_effects_files
 file (GLOB yoshimi_misc_files
     ../Misc/Config.cpp ../Misc/Config.h ../ConfBuild.h
     ../Misc/SynthEngine.cpp  ../Misc/Bank.cpp  ../Misc/Microtonal.cpp
-    ../Misc/Part.cpp  ../Misc/XMLwrapper.cpp  ../Misc/MiscFuncs.cpp ../Misc/WavFile.cpp
+    ../Misc/Part.cpp  ../Misc/XMLwrapper.cpp  ../Misc/WavFile.cpp
     ../Misc/SynthEngine.h  ../Misc/Bank.h  ../Misc/Microtonal.h
-    ../Misc/Part.h  ../Misc/XMLwrapper.h  ../Misc/MiscFuncs.h ../Misc/WavFile.h)
+    ../Misc/Part.h  ../Misc/XMLwrapper.h  ../Misc/WavFile.h)
 file (GLOB yoshimi_interface_files
     ../Interface/MidiDecode.cpp ../Interface/MidiDecode.h
     ../Interface/InterChange.cpp ../Interface/InterChange.h
     ../Interface/Data2Text.cpp ../Interface/Data2text.h
-    ../Interface/RingBuffer.cpp ../Interface/FileMgr.cpp
+    ../Interface/RingBuffer.cpp
     ../Interface/MidiLearn.cpp ../Interface/MidiLearn.h
     ../UI/MiscGui.cpp ../UI/MiscGui.h)
 file (GLOB yoshimi_params_files

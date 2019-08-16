@@ -30,20 +30,21 @@
 
 #include "Interface/MidiDecode.h"
 #include "Interface/InterChange.h"
-#include "Misc/MiscFuncs.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/FormatFuncs.h"
+
+using func::asString;
+using func::asHexString;
+
 
 MidiDecode::MidiDecode(SynthEngine *_synth) :
     synth(_synth)
 {
- //init
-
 }
 
 
 MidiDecode::~MidiDecode()
 {
-    //close
 }
 
 

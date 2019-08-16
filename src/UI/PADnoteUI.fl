@@ -37,7 +37,6 @@ decl {\#include <FL/Fl_Box.H>
     \#include <FL/Fl_File_Chooser.H>
     \#include <FL/fl_draw.H>
     \#include "Params/PADnoteParameters.h"
-    \#include "Misc/MiscFuncs.h"
     \#include "UI/MiscGui.h"
     \#include "PresetsUI.h"
     \#include "UI/WidgetPDial.h"
@@ -46,12 +45,30 @@ decl {\#include <FL/Fl_Box.H>
     \#include "FilterUI.h"} {private global
 }
 
-decl {\#include "Misc/SynthHelper.h"
-    \#include "ResonanceUI.h"
+decl {\#include "ResonanceUI.h"
     \#include "OscilGenUI.h"} {public global
 }
 
 decl {\#include "MasterUI.h"} {private global
+}
+
+decl {\#include "Misc/SynthHelper.h"
+    using synth::getDetune;
+} {private local
+}
+
+decl {\#include "Misc/NumericFuncs.h"
+    using func::dB2rap;
+    using func::rap2dB;
+} {private local
+}
+
+decl {\#include "Misc/TextMsgBuffer.h"
+
+    namespace \{ // Implementation details...
+        TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
+    \}
+} {private local
 }
 
 class PADnoteHarmonicProfile {: {public Fl_Box}
@@ -134,7 +151,7 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
   }
 }
 
-class PADnoteOvertonePosition {: {public Fl_Box, private MiscFuncs}
+class PADnoteOvertonePosition {: {public Fl_Box}
 } {
   Function {PADnoteOvertonePosition(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {pars=NULL;} {}
@@ -234,7 +251,7 @@ this->pars=pars;} {}
   }
 }
 
-class PADnoteUI {: {public PresetsUI_, private SynthHelper, MiscFuncs}
+class PADnoteUI {: {public PresetsUI_}
 } {
   Function {make_window()} {} {
     Fl_Window padnotewindow {
@@ -1029,7 +1046,7 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper, MiscFuncs}
         if (filename==NULL)
             return;
         fl_filename_setext(filename,"");
-        send_data(TOPLEVEL::action::forceUpdate, MAIN::control::exportPadSynthSamples, 0, TOPLEVEL::type::Integer, npart, miscMsgPush(string(filename)));}
+        send_data(TOPLEVEL::action::forceUpdate, MAIN::control::exportPadSynthSamples, 0, TOPLEVEL::type::Integer, npart, textMsgBuffer.push(string(filename)));}
         tooltip {Export samples as wav file} xywh {15 410 123 24} box THIN_UP_BOX color 51 labelfont 1 labelsize 12 align 128
       }
     }
@@ -1268,7 +1285,7 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper, MiscFuncs}
             break;
 
         case MAIN::control::exportPadSynthSamples:
-            name = miscMsgPop(miscmsg);
+            name = textMsgBuffer.fetch(miscmsg);
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)

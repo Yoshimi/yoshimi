@@ -21,6 +21,9 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
+#include <cstdint>
+#include <cstddef>
+
 /*
  * For test purposes where you want guaranteed identical results, enable the
  * #define below.

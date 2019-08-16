@@ -27,11 +27,7 @@
 #ifndef PAD_NOTE_PARAMETERS_H
 #define PAD_NOTE_PARAMETERS_H
 
-using namespace std;
-
 #include "Params/Presets.h"
-#include "Misc/MiscFuncs.h"
-#include "Interface/FileMgr.h"
 
 class XMLwrapper;
 class FFTwrapper;
@@ -43,7 +39,7 @@ class FilterParams;
 
 class SynthEngine;
 
-class PADnoteParameters : public Presets, FileMgr
+class PADnoteParameters : public Presets
 {
     public:
         PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth);

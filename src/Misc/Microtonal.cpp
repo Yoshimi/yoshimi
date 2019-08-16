@@ -34,8 +34,56 @@
 #include "Misc/XMLwrapper.h"
 #include "Misc/Microtonal.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/FormatFuncs.h"
+#include "Misc/FileMgrFuncs.h"
 
-#define MAX_LINE_SIZE 80
+using file::loadText;
+using file::findLeafName;
+using std::cout;
+using std::endl;
+
+
+namespace { // local implementation details
+
+    const size_t BUFFSIZ = 500;      // for loading KBM or SCL settings from a file
+    const size_t MAX_LINE_SIZE = 80; // for converting text to mappings or tunings
+
+
+    inline std::string lineInText(std::string text, size_t &point)
+    {
+        size_t len = text.length();
+        if (point >= len - 1)
+            return "";
+        size_t it = 0;
+        while (it < len - point && text.at(point + it) >= ' ')
+            ++it;
+        std::string line = text.substr(point, it);
+        point += (it + 1);
+        return line;
+    }
+
+
+    inline bool C_lineInText(std::string text, size_t &point, char *line, size_t length)
+    {
+        bool ok = true;
+        std::string found = lineInText(text, point);
+        if (found == "")
+            line[0] = 0;
+        else if (found.length() < (length - 1))
+        {
+            strcpy(line, found.c_str());
+            line[length] = 0;
+        }
+        else
+        {
+            ok = false;
+            line[0] = 0;
+        }
+        return ok;
+    }
+
+}//(End)implementation details
+
 
 void Microtonal::defaults(void)
 {
@@ -56,9 +104,9 @@ void Microtonal::defaults(void)
     for (int i = 0; i < 128; ++i)
         Pmapping[i] = i;
 
-    for (int i = 0; i < MAX_OCTAVE_SIZE; ++i)
+    for (size_t i = 0; i < MAX_OCTAVE_SIZE; ++i)
     {
-        octave[i].text = reformatline(to_string((i % octavesize + 1) * 100)+ ".0");
+        octave[i].text = reformatline(std::to_string((i % octavesize + 1) * 100)+ ".0");
         octave[i].tuning = tmpoctave[i].tuning = pow(2.0, (i % octavesize + 1) / 12.0);
         octave[i].type = tmpoctave[i].type = 1;
         octave[i].x1 = tmpoctave[i].x1 = (i % octavesize + 1) * 100;
@@ -280,7 +328,7 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
 // Convert the text to tunings
 int Microtonal::texttotunings(const char *text)
 {
-    int i;
+    size_t i;
     unsigned int k = 0, nl = 0;
     char *lin;
 
@@ -358,7 +406,7 @@ int Microtonal::texttomapping(const char *text)
     if (tx)
     {
         Pmapsize = tx;
-        swap(Pmapping, tmpMap);
+        std::swap(Pmapping, tmpMap);
     }
     else
         return -6;
@@ -376,13 +424,13 @@ string Microtonal::keymaptotext(void)
         if (Pmapping[i] == -1)
             text += "x";
         else
-            text += to_string(Pmapping[i]);
+            text += std::to_string(Pmapping[i]);
     }
     return text;
 }
 
 // Convert tuning to text line
-void Microtonal::tuningtoline(int n, char *line, int maxn)
+void Microtonal::tuningtoline(unsigned int n, char *line, int maxn)
 {
     if (n > octavesize || n > MAX_OCTAVE_SIZE)
     {
@@ -406,7 +454,7 @@ string Microtonal::tuningtotext()
 {
     string text;
     char *buff = new char[100];
-    for (int i = 0; i < octavesize; ++i)
+    for (size_t i = 0; i < octavesize; ++i)
     {
         if (i > 0)
             text += "\n";
@@ -418,11 +466,11 @@ string Microtonal::tuningtotext()
 }
 
 
-int Microtonal::loadLine(string text, size_t &point, char *line)
+int Microtonal::loadLine(string text, size_t &point, char *line, size_t maxlen)
 {
     do {
         line[0] = 0;
-        C_lineInText(text, point, line);
+        C_lineInText(text, point, line, maxlen);
         if (line[0] == 0)
             return -5;
     } while (line[0] == '!');
@@ -436,30 +484,30 @@ int Microtonal::loadscl(string filename)
     string text = loadText(filename);
     if (text == "")
         return -3;
-    char tmp[500];
+    char tmp[BUFFSIZ];
     size_t point = 0;
     int err = 0;
     int nnotes;
 
     // loads the short description
-    if (loadLine(text, point, tmp))
+    if (loadLine(text, point, tmp, BUFFSIZ))
         err = -4;
     if (err == 0)
     {
         for (int i = 0; i < 500; ++i)
             if (tmp[i] < 32)
                 tmp[i] = 0;
-        Pname = findleafname(filename);
+        Pname = findLeafName(filename);
         Pcomment = string(tmp);
         // loads the number of the notes
-        if (loadLine(text, point, tmp))
+        if (loadLine(text, point, tmp, BUFFSIZ))
             err = -5;
     }
     if (err == 0)
     {
         nnotes = MAX_OCTAVE_SIZE;
         sscanf(&tmp[0], "%d", &nnotes);
-        if (nnotes > MAX_OCTAVE_SIZE || nnotes < 2)
+        if (size_t(nnotes) > MAX_OCTAVE_SIZE || nnotes < 2)
             err = -6;
     }
     if (err == 0)
@@ -467,7 +515,7 @@ int Microtonal::loadscl(string filename)
     // load the tunings
         for (int nline = 0; nline < nnotes; ++nline)
         {
-            err = loadLine(text, point, tmp);
+            err = loadLine(text, point, tmp, BUFFSIZ);
             if (err == 0)
                 err = linetotunings(nline, &tmp[0]);
             if (err < 0)
@@ -478,7 +526,7 @@ int Microtonal::loadscl(string filename)
         return err;
 
     octavesize = nnotes;
-    swap(octave, tmpoctave);
+    std::swap(octave, tmpoctave);
     synth->setAllPartMaps();
     return nnotes;
 }
@@ -490,12 +538,12 @@ int Microtonal::loadkbm(string filename)
     string text = loadText(filename);
     if (text == "")
         return -3;
-    char tmp[500];
+    char tmp[BUFFSIZ];
     size_t point = 0;
     int err = 0;
     int tmpMapSize;
     // loads the mapsize
-    if (loadLine(text, point, tmp))
+    if (loadLine(text, point, tmp, BUFFSIZ))
         err = -4;
     else if (!sscanf(&tmp[0], "%d",&tmpMapSize))
         err = -2;
@@ -510,7 +558,7 @@ int Microtonal::loadkbm(string filename)
     if (err == 0)
     {
         // loads first MIDI note to retune
-        if (loadLine(text, point, tmp))
+        if (loadLine(text, point, tmp, BUFFSIZ))
             err = -5;
         else if (!sscanf(&tmp[0], "%d", &tmpFirst))
             return -6;
@@ -522,7 +570,7 @@ int Microtonal::loadkbm(string filename)
     if (err == 0)
     {
         // loads last MIDI note to retune
-       if (loadLine(text, point, tmp))
+       if (loadLine(text, point, tmp, BUFFSIZ))
             err = -5;
         else if (!sscanf(&tmp[0], "%d", &tmpLast))
             return -6;
@@ -534,7 +582,7 @@ int Microtonal::loadkbm(string filename)
     if (err == 0)
     {
         // loads the middle note where scale fro scale degree=0
-       if (loadLine(text, point, tmp))
+       if (loadLine(text, point, tmp, BUFFSIZ))
             err = -5;
         else if (!sscanf(&tmp[0], "%d", &tmpMid))
             return -6;
@@ -546,7 +594,7 @@ int Microtonal::loadkbm(string filename)
     if (err == 0)
     {
         // loads the reference note
-       if (loadLine(text, point, tmp))
+       if (loadLine(text, point, tmp, BUFFSIZ))
             err = -5;
         else if (!sscanf(&tmp[0], "%d", &tmpNote))
             return -6;
@@ -558,7 +606,7 @@ int Microtonal::loadkbm(string filename)
     if (err == 0)
     {
         // loads the reference freq.
-        if (loadLine(text, point, tmp))
+        if (loadLine(text, point, tmp, BUFFSIZ))
             err = -6;
         else
         {
@@ -572,7 +620,7 @@ int Microtonal::loadkbm(string filename)
 
     // the scale degree(which is the octave) is not loaded
     // it is obtained by the tunings with getoctavesize() method
-    if (loadLine(text, point, tmp))
+    if (loadLine(text, point, tmp, BUFFSIZ))
         err = -6;
 
     // load the mappings
@@ -582,7 +630,7 @@ int Microtonal::loadkbm(string filename)
     {
         for (int nline = 0; nline < tmpMapSize; ++nline)
         {
-            if (loadLine(text, point, tmp))
+            if (loadLine(text, point, tmp, BUFFSIZ))
             {
                 err = -5;
                 break;
@@ -597,7 +645,7 @@ int Microtonal::loadkbm(string filename)
 
     Pmappingenabled = 1;
     Pmapsize = tmpMapSize;
-    swap(Pmapping, tmpMap);
+    std::swap(Pmapping, tmpMap);
     Pfirstkey = tmpFirst;
     Plastkey = tmpLast;
     Pmiddlenote = tmpMid;
@@ -633,7 +681,7 @@ void Microtonal::add2XML(XMLwrapper *xml)
 
         xml->beginbranch("OCTAVE");
         xml->addpar("octave_size", octavesize);
-        for (int i = 0; i < octavesize; ++i)
+        for (size_t i = 0; i < octavesize; ++i)
         {
             xml->beginbranch("DEGREE", i);
             if (octave[i].type == 1)
@@ -692,7 +740,7 @@ void Microtonal::getfromXML(XMLwrapper *xml)
         if (xml->enterbranch("OCTAVE"))
         {
             octavesize = xml->getpar127("octave_size", octavesize);
-            for (int i = 0; i < octavesize; ++i)
+            for (size_t i = 0; i < octavesize; ++i)
             {
                 if (!xml->enterbranch("DEGREE", i))
                     continue;

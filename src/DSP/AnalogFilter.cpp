@@ -25,8 +25,12 @@
 #include <cstring>
 #include <fftw3.h>
 
-#include "Misc/SynthEngine.h"
 #include "DSP/AnalogFilter.h"
+#include "Misc/SynthEngine.h"
+#include "Misc/NumericFuncs.h"
+
+using func::dB2rap;
+
 
 AnalogFilter::AnalogFilter(unsigned char Ftype, float Ffreq, float Fq, unsigned char Fstages, SynthEngine *_synth) :
     type(Ftype),
@@ -319,7 +323,7 @@ void AnalogFilter::setfreq(float frequency)
 
     if (!firsttime && (rap > 3.0f || nyquistthresh != 0))
     {   // if the frequency is changed fast, it needs interpolation
-        // (now, filter and coeficients backup)
+        // (now, filter and coefficients backup)
         interpolatenextbuffer();
     }
     freq = frequency;

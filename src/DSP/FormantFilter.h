@@ -25,15 +25,13 @@
 #ifndef FORMANT_FILTER_H
 #define FORMANT_FILTER_H
 
-#include "Misc/MiscFuncs.h"
-#include "Misc/SynthHelper.h"
 #include "DSP/Filter_.h"
 #include "DSP/AnalogFilter.h"
 #include "Params/FilterParams.h"
 
 class SynthEngine;
 
-class FormantFilter : public Filter_, private MiscFuncs, private SynthHelper
+class FormantFilter : public Filter_
 {
     public:
         FormantFilter(FilterParams *pars, SynthEngine *_synth);

@@ -25,12 +25,11 @@
 #ifndef SV_FILTER_H
 #define SV_FILTER_H
 
-#include "Misc/MiscFuncs.h"
 #include "DSP/Filter_.h"
 
 class SynthEngine;
 
-class SVFilter : public Filter_, private MiscFuncs
+class SVFilter : public Filter_
 {
     public:
         SVFilter(unsigned char Ftype, float Ffreq, float Fq, unsigned char Fstages, SynthEngine *_synth);

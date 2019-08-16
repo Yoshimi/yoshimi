@@ -24,18 +24,22 @@
 #include <string>
 
 #include "globals.h"
-#include "Misc/MiscFuncs.h"
 
 class SynthEngine;
-class MiscFuncs;
+class TextMsgBuffer;
 
-class DataText : public MiscFuncs
+
+class DataText
 {
 
     private:
         SynthEngine *synth;
+        bool showValue;
+    protected:
+        TextMsgBuffer& textMsgBuffer;
+
     public:
-        DataText(){ }
+        DataText();
         ~DataText(){ };
         std::string resolveAll(SynthEngine *_synth, CommandBlock *getData, bool addValue);
     private:
@@ -55,6 +59,5 @@ class DataText : public MiscFuncs
         std::string resolveFilter(CommandBlock *getData, bool addValue);
         std::string resolveEnvelope(CommandBlock *getData, bool addValue);
         std::string resolveEffects(CommandBlock *getData, bool addValue);
-        bool showValue;
 };
 #endif

@@ -27,12 +27,11 @@
 #include <list>
 #include <string>
 
-#include "Misc/MiscFuncs.h"
 #include "Interface/InterChange.h"
 
 class SynthEngine;
 
-class MidiDecode : private MiscFuncs
+class MidiDecode
 {
     public:
         MidiDecode(SynthEngine *_synth);

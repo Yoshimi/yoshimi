@@ -28,20 +28,19 @@
 #ifndef MICROTONAL_H
 #define MICROTONAL_H
 
+#include <cmath>
 #include <string>
-
-using namespace std;
-
-#include "Misc/MiscFuncs.h"
-#include "Interface/FileMgr.h"
-
-class XMLwrapper;
-
-#define MAX_OCTAVE_SIZE 128
+#include "globals.h"
 
 class SynthEngine;
+class XMLwrapper;
 
-class Microtonal : private MiscFuncs, FileMgr
+using std::string;
+
+const size_t MAX_OCTAVE_SIZE = 128;
+
+
+class Microtonal
 {
     public:
         Microtonal(SynthEngine *_synth): synth(_synth) { defaults(); }
@@ -75,7 +74,7 @@ class Microtonal : private MiscFuncs, FileMgr
         float Pglobalfinedetune;
 
         int getoctavesize(void);
-        void tuningtoline(int n, char *line, int maxn);
+        void tuningtoline(unsigned int n, char *line, int maxn);
         string tuningtotext(void);
         string keymaptotext(void);
         int loadscl(string filename); // load the tunings from a .scl file
@@ -95,20 +94,21 @@ class Microtonal : private MiscFuncs, FileMgr
         string reformatline(string text);
         bool validline(const char *line);
         int linetotunings(unsigned int nline, const char *line);
-        int loadLine(string text, size_t &point, char *line);
+        int loadLine(string text, size_t &point, char *line, size_t maxlen);
         // loads a line from the text file,
         // ignoring the lines beginning with "!"
-        int octavesize;
+        size_t octavesize;
 
-        struct {
+        struct Octave {
             unsigned char type; // 1 for cents or 2 for division
             double tuning;       // the real tuning (eg. +1.05946 for one halftone)
                                 // or 2.0 for one octave
             unsigned int x1; // the real tuning is x1 / x2
             unsigned int x2;
             string text;
-        } octave[MAX_OCTAVE_SIZE],
-          tmpoctave[MAX_OCTAVE_SIZE];
+        };
+        Octave octave[MAX_OCTAVE_SIZE];
+        Octave tmpoctave[MAX_OCTAVE_SIZE];
 
         float note_12et[128];
 

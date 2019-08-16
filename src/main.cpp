@@ -44,6 +44,7 @@
 #include "Misc/SynthEngine.h"
 #include "MusicIO/MusicClient.h"
 #include "CLI/CmdInterface.h"
+#include "Interface/InterChange.h"
 
 #ifdef GUI_FLTK
     #include "MasterUI.h"
@@ -56,9 +57,7 @@
 
 extern map<SynthEngine *, MusicClient *> synthInstances;
 extern SynthEngine *firstSynth;
-extern int startInstance;
-extern std::string singlePath;
-extern std::string runGui;
+
 
 void mainRegisterAudioPort(SynthEngine *s, int portnum);
 int mainCreateNewInstance(unsigned int forceId, bool loadState);

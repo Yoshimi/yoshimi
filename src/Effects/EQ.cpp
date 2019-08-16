@@ -1,5 +1,5 @@
 /*
-    EQ.cpp - EQ effect
+    EQ.cpp - Equalizer effect
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -22,11 +22,15 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified March 2019
+    Modified August 2019
 */
 
 #include "Misc/SynthEngine.h"
 #include "Effects/EQ.h"
+#include "Misc/NumericFuncs.h"
+
+using func::rap2dB;
+
 
 EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
@@ -164,7 +168,7 @@ void EQ::changepar(int npar, unsigned char value)
     int nb = (npar - 10) / 5; // number of the band (filter)
     if (nb >= MAX_EQ_BANDS)
         return;
-    int bp = npar % 5; // band paramenter
+    int bp = npar % 5; // band parameter
 
     float tmp;
     switch (bp)
@@ -227,7 +231,7 @@ unsigned char EQ::getpar(int npar)
     int nb = (npar - 10) / 5; // number of the band (filter)
     if (nb >= MAX_EQ_BANDS)
         return 0;
-    int bp = npar % 5; // band paramenter
+    int bp = npar % 5; // band parameter
     switch (bp)
     {
         case 0:
