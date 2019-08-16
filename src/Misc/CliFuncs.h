@@ -43,7 +43,6 @@ using func::bitTest;
 using func::bitFindHigh;
 
 using func::asString;
-using cli::matchnMove;
 
 using std::string;
 

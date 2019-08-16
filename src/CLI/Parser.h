@@ -35,75 +35,6 @@ namespace cli {
 using std::string;
 
 
-inline char * skipSpace(char * buf)
-{
-    while (isspace((unsigned char)*buf))
-    {
-        ++ buf;
-    }
-    return buf;
-}
-
-
-inline char * skipChars(char * buf)
-{
-    while (*buf && !isspace((unsigned char)*buf)) // will also stop on line ends
-    {
-        ++ buf;
-    }
-    buf = skipSpace(buf); // now find the next word (if any)
-    return buf;
-}
-
-
-inline int matchWord(int numChars, char * buf, const char * word)
-{
-    int newp = 0;
-    int size = strlen(word);
-    while (buf[newp] > 0x20 && buf[newp] < 0x7f && newp < size && (tolower(buf[newp])) == (tolower(word[newp])))
-            ++ newp;
-    if (newp >= numChars && (buf[newp] <= 0x20 || buf[newp] >= 0x7f))
-        return newp;
-    return 0;
-}
-
-
-inline bool matchnMove(int num, char *& pnt, const char * word)
-{
- bool found = matchWord(num, pnt, word);
- if (found)
-     pnt = skipChars(pnt);
- return found;
-}
-
-
-inline bool startsWith(const char *point, const char *prefix)
-{
-    return 0 == strncmp(prefix, point, strlen(prefix));
-}
-
-
-inline bool lineEnd(char * point, unsigned char controlType)
-{
-    return (point[0] == 0 && controlType == TOPLEVEL::type::Write);
-    // so all other controls aren't tested
-    // e.g. you don't need to send a value when you're reading it!
-}
-
-
-inline int toggle(char  *point)
-{
-    if (matchnMove(2, point, "enable") || matchnMove(2, point, "on") || matchnMove(3, point, "yes"))
-        return 1;
-    if (matchnMove(2, point, "disable") || matchnMove(3, point, "off") || matchnMove(2, point, "no") )
-        return 0;
-    return -1;
-    /*
-     * this allows you to specify enable or other, disable or other or must be those specifics
-     */
-}
-
-
 inline string asAlignedString(int n, int len)
 {
     string res = std::to_string(n);
@@ -200,12 +131,12 @@ class Parser
 
         bool isValid()  const
         {
-            return point && strlen(point) < COMMAND_SIZE;
+            return point && 0 < strlen(point) && strlen(point) <= COMMAND_SIZE;
         }
 
         bool isTooLarge()  const
         {
-            return point && strlen(point) >= COMMAND_SIZE;
+            return point && strlen(point) > COMMAND_SIZE;
         }
 
 
@@ -286,7 +217,7 @@ class Parser
             if (!point) return;
             this->skipSpace();
             char *end = point + strlen(point) - 1;
-            while (end > point && isspace((unsigned char)*end))
+            while (end > point && ::isspace((unsigned char)*end))
             {
                 end--;
             }
@@ -296,65 +227,85 @@ class Parser
 
         /* ==== Parsing API ==== */
 
-        bool matchnMove(int num, const char * word)
+        bool matchnMove(int prefixLen, const char * word)
         {
-            return cli::matchnMove(num, point, word);
+            bool found = matchWord(prefixLen, word);
+            if (found) skipChars();
+            return found;
         }
 
-        int matchWord(int numChars, const char * word)
+        bool matchWord(int prefixLen, const char * word)
         {
-            return cli::matchWord(numChars, point, word);
+            if (!point) return false;
+            char* oldPos = point;
+            bool matched = false;
+            for (int i=0, size = strlen(word);
+                 i < size && isprint() && tolower(*point) == tolower(word[i]); )
+            {
+                ++i; ++point;
+            }
+            // word must either match complete, or be abbreviated with at least prefixLen chars
+            if ((point - oldPos) >= prefixLen && (isspace() || iscntrl()))
+                matched = true;
+            point = oldPos;
+            return matched;
+        }
+
+        /* this allows you to specify enable or other, disable or other or must be those specifics */
+        int toggle()
+        {
+            if (matchnMove(2, "enable") || matchnMove(2, "on") || matchnMove(3, "yes"))
+                return 1;
+            if (matchnMove(2, "disable") || matchnMove(3, "off") || matchnMove(2, "no") )
+                return 0;
+            return -1;
         }
 
         void skipSpace()
         {
-            point = cli::skipSpace(point);
+            while (isspace()) ++point;
         }
 
         void skipChars()
         {
-            point = cli::skipChars(point);
+            if (!point) return;
+            while (*point && !isspace()) ++point;
+            // note: will also stop on line ends
+            skipSpace(); // now find the next word (if any)
         }
 
         void skip(int cnt)
         {
-            point += cnt;
-        }
-
-        int toggle()
-        {
-            return cli::toggle(point);
+            if (point) point += cnt;
         }
 
         bool lineEnd(unsigned char controlType)
         {
-            return cli::lineEnd(point, controlType);
+            return (isAtEnd() && controlType == TOPLEVEL::type::Write);
+            // so all other controls aren't tested
+            // e.g. you don't need to send a value when you're reading it!
         }
 
         bool isAtEnd()
         {
-            return *point == '\0';
+            return point && *point == '\0';
         }
 
         bool nextChar(char expected)
         {
-            return *point == expected;
+            return point && *point == expected;
         }
 
         bool startsWith(const char *prefix)
         {
-            return cli::startsWith(point, prefix);
+            return 0 == strncmp(prefix, point, strlen(prefix));
         }
 
-        bool isdigit()
-        {
-            return ::isdigit(*point);
-        }
-
-        char peek()
-        {
-            return *point;
-        }
+        char peek()    { return point? *point: '\0'; }
+        bool isdigit() { return point && ::isdigit((unsigned char) *point); }
+        bool isspace() { return point && ::isspace((unsigned char) *point); }
+        bool isprint() { return point && ::isprint((unsigned char) *point); }
+        bool iscntrl() { return point && ::iscntrl((unsigned char) *point); }
 };
 
 

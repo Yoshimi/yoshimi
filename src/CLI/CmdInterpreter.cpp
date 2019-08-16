@@ -71,7 +71,6 @@ using func::asString;
 using func::string2int;
 using func::string2int127;
 using func::string2float;
-using func::C_lineInText;
 
 
 /*

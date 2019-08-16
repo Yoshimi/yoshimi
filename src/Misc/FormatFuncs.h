@@ -207,39 +207,5 @@ inline int findSplitPoint(std::string name)
 }
 
 
-inline std::string lineInText(std::string text, size_t &point)
-{
-    size_t len = text.length();
-    if (point >= len - 1)
-        return "";
-    size_t it = 0;
-    while (it < len - point && text.at(point + it) >= ' ')
-        ++it;
-    std::string line = text.substr(point, it);
-    point += (it + 1);
-    return line;
-}
-
-
-inline bool C_lineInText(std::string text, size_t &point, char *line, size_t length)
-{
-    bool ok = true;
-    std::string found = lineInText(text, point);
-    if (found == "")
-        line[0] = 0;
-    else if (found.length() < (length - 1))
-    {
-        strcpy(line, found.c_str());
-        line[length] = 0;
-    }
-    else
-    {
-        ok = false;
-        line[0] = 0;
-    }
-    return ok;
-}
-
-
 }//(End)namespace func
 #endif /*FORMATFUNCS_H*/
