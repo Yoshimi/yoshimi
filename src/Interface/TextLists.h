@@ -423,6 +423,9 @@ static std::string addmodlist [] = {
     "end"
 };
 
+// need to find a way to avoid this kind of duplication
+static std::string addmodnameslist [] = {"Off", "Morph", "Ring", "Phase", "Frequency", "Pulsewidth"};
+
 static std::string subsynthlist [] = {
     "<ON/OFF>",                   "enables/disables the part",
     "Volume <n>",               "volume",

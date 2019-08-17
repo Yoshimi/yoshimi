@@ -20,12 +20,15 @@
  */
 
 #include "Interface/Data2Text.h"
+#include "Interface/TextLists.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/TextMsgBuffer.h"
+#include "Misc/FormatFuncs.h"
 
 using std::string;
 using std::to_string;
 
+using func::string2int;
 
 DataText::DataText() :
     synth(nullptr),
@@ -1590,6 +1593,7 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
 
     bool yesno = false;
     bool value_bool = YOSH::F2B(getData->data.value.F);
+    int value_int = lrint(getData->data.value.F);
     int nvoice;
     if (engine >= PART::engine::addMod1)
         nvoice = engine - PART::engine::addMod1;
@@ -1646,14 +1650,33 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
             break;
 
         case ADDVOICE::control::modulatorType:
-            contstr = "Type";
+            contstr = "Type ";
+            if (addValue)
+            {
+                showValue = false;
+                contstr += addmodnameslist[value_int];
+            }
             break;
         case ADDVOICE::control::externalModulator:
-            contstr = "Extern Mod";
+            if (addValue)
+            {
+                showValue = false;
+                if (value_int < 0)
+                    contstr = "Local";
+                else
+                    contstr = "Source Voice " + to_string(value_int + 1);
+            }
             break;
 
         case ADDVOICE::control::externalOscillator:
-            contstr = " Extern Osc";
+            if (addValue)
+            {
+                showValue = false;
+                if (value_int < 0)
+                    contstr = "Local";
+                else
+                    contstr = " Source " + to_string(value_int + 1);
+            }
             break;
 
         case ADDVOICE::control::detuneFrequency:
@@ -1764,7 +1787,14 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
             contstr = " Phase";
             break;
         case ADDVOICE::control::modulatorOscillatorSource:
-            contstr = " Source";
+            if (addValue)
+            {
+                showValue = false;
+                if (value_int < 0)
+                    contstr = " Internal";
+                else
+                    contstr = " from " + to_string(value_int + 1);
+            }
             break;
 
         case ADDVOICE::control::delay:
@@ -1780,7 +1810,14 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
             contstr = " Osc Phase";
             break;
         case ADDVOICE::control::voiceOscillatorSource:
-            contstr = " Osc Source";
+            if (addValue)
+            {
+                showValue = false;
+                if (value_int < 0)
+                    contstr = " Internal";
+                else
+                    contstr = " from " + to_string(value_int + 1);
+            }
             break;
         case ADDVOICE::control::soundType:
             contstr = " Sound type";
