@@ -1733,6 +1733,8 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
         }
     }
 
+    if (bitTest(context, LEVEL::AddMod))
+        return REPLY::available_msg; // volume and velocity handled locally
     if (input.matchnMove(1, "volume"))
         cmd = PART::control::volume;
     else if(input.matchnMove(1, "pan"))

@@ -3,6 +3,12 @@ yoshimi 1.5.11 M
 2019-8-17 Will
 * CLI osc and mod types show names not internal values.
 * Cleanups around CLI mod types.
+* Added missing merge reference to this file.
+* BugFix: segfault on CLI attempt to change modulator panning.
+  It doesn't exist!
+
+2019-8-16 Will
+* Merged extensive refactoring from Hermann into master.
 
 2019-8-15 Will
 * Doc updates
