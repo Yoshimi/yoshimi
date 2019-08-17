@@ -2,6 +2,7 @@ yoshimi 1.5.11 M
 
 2019-8-17 Will
 * CLI osc and mod types show names not internal values.
+* Cleanups around CLI mod types.
 
 2019-8-15 Will
 * Doc updates

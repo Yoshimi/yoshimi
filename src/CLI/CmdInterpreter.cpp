@@ -354,25 +354,7 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
                 int tmp = readControl(synth, 0, ADDVOICE::control::modulatorType, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
                 if (tmp > 0)
                 {
-                    string word = "";
-                    switch (tmp)
-                    {
-                        case 1:
-                            word = "Morph";
-                            break;
-                        case 2:
-                            word = "Ring";
-                            break;
-                        case 3:
-                            word = "Phase";
-                            break;
-                        case 4:
-                            word = "Freq";
-                            break;
-                        case 5:
-                            word = "Pulse";
-                            break;
-                    }
+                    string word = addmodnameslist[tmp];
 
                     if (bitFindHigh(context) == LEVEL::AddMod)
                         result += (word + " Mod ");
@@ -1823,7 +1805,7 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
             return sendNormal( synth, 0, value, controlType, cmd, npart, kit, UNUSED, insert);
         }
     }
-    //std::cout << ">> value " << value << "  type " << controlType << "  cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  insert " << int(insert) << std::endl;
+    //std::cout << ">>  type " << controlType << "  cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  insert " << int(insert) << std::endl;
     return REPLY::todo_msg;
 }
 
@@ -3456,22 +3438,13 @@ int CmdInterpreter::modulator(Parser& input, unsigned char controlType)
 {
     if (input.lineEnd(controlType))
         return REPLY::done_msg;
-    int value = -1;
+    int value;
     int cmd = -1;
-    if (input.matchnMove(3, "off"))
-            value = 0;
-        else if (input.matchnMove(2, "morph"))
-            value = 1;
-        else if (input.matchnMove(2, "ring"))
-            value = 2;
-        else if (input.matchnMove(2, "phase"))
-            value = 3;
-        else if (input.matchnMove(2, "frequency"))
-            value = 4;
-        else if (input.matchnMove(2, "pulse"))
-            value = 5;
-        if (value != -1)
-            cmd = ADDVOICE::control::modulatorType;
+    string name = string{input}.substr(0,3);
+    value = stringNumInList(name, addmodnameslist, 3);
+    if (value != -1)
+        cmd = ADDVOICE::control::modulatorType;
+
     if (cmd == -1)
     {
         if (readControl(synth, 0, ADDVOICE::control::modulatorType, npart, kitNumber, PART::engine::addVoice1 + voiceNumber) == 0)
