@@ -260,6 +260,7 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         XMLcompressionLevel,
         reportsDestination,
         savedInstrumentFormat,
+        showEnginesTypes,
         defaultStateStart = 16,
         hideNonFatalErrors,
         showSplash,

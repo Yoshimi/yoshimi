@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <iostream>} {public local
@@ -65,16 +65,14 @@ decl {\#include "MasterUI.h"} {private local
 
 decl {\#include "Misc/FormatFuncs.h"
     using func::string2int;
-    using func::asString;
-} {private local
+    using func::asString;} {private local
 }
 
 decl {\#include "Misc/TextMsgBuffer.h"
 
-    namespace \{ // Implementation details...
+    namespace { // Implementation details...
         TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
-    \}
-} {private local
+    }} {private local
 }
 
 class BankProcess_ {} {
@@ -303,7 +301,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
 }
 
-class BankUI {: {public BankProcess_, RootProcess_}
+class BankUI {selected : {public BankProcess_, RootProcess_}
 } {
   Function {make_window()} {} {
     Fl_Window instrumentuiwindow {
@@ -489,20 +487,13 @@ class BankUI {: {public BankProcess_, RootProcess_}
         instrumentuiwindow->hide();}
         tooltip {Right click: also reopen previous} xywh {665 539 70 24} box THIN_UP_BOX labelsize 12
       }
-      Fl_Group engines {
+      Fl_Group {} {
         xywh {468 528 151 42} box ENGRAVED_FRAME
       } {
-        Fl_Check_Button {} {
-          label {Show synth engines}
+        Fl_Check_Button enginecheck {
+          label {Show engines/types}
           callback {//
-          synth->getRuntime().checksynthengines = (int) o->value();
-          rescan_for_banks(true);
-          if (o->value())
-              B_search->activate();
-          else
-              B_search->deactivate();
-          synth->getGuiMaster()->partui->checkEngines();
-          synth->getRuntime().configChanged = true;}
+          send_data(TOPLEVEL::action::forceUpdate, CONFIG::control::showEnginesTypes, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config);}
           xywh {477 531 136 15} down_box DOWN_BOX labelsize 11
           code0 {o->value(synth->getRuntime().checksynthengines);}
         }

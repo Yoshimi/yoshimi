@@ -181,6 +181,7 @@ static std::string configlist [] = {
     "Xml <n>",             "compression (0-9)",
     "REports [s]",         "destination (Stdout, other = console)",
     "SAved [s]",           "Saved instrument type (Legacy {.xiz}, Yoshimi {.xiy}, Both)",
+    "ENGine [s]",          "Enable instrument engines and types info (OFF, {other})",
     "EXPose <s>",          "Show current context level (ON, OFF, PRompt)",
 
     "STate [s]",           "* autoload default at start (ON, {other})",

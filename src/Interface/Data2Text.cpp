@@ -561,6 +561,10 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
             }
             showValue = false;
             break;
+        case CONFIG::control::showEnginesTypes:
+            contstr = "Show Engines & Types";
+            yesno = true;
+            break;
         case CONFIG::control::defaultStateStart:
             contstr += "Autoload default state";
             yesno = true;

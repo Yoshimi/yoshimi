@@ -3078,6 +3078,11 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
         else if (controlType == TOPLEVEL::type::Write)
             return REPLY::value_msg;
     }
+    else if (input.matchnMove(3, "engines"))
+    {
+        command = CONFIG::control::showEnginesTypes;
+        value = (input.toggle() != 0);
+    }
 
     else if (input.matchnMove(2, "state"))
     {
@@ -4533,6 +4538,11 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
         {
             if(input.matchnMove(1, "group"))
             {
+                if (!readControl(synth, 0, CONFIG::control::showEnginesTypes, TOPLEVEL::section::config))
+                {
+                    synth->getRuntime().Log("Instrument engine aand type info must be enabled");
+                    return REPLY::done_msg;
+                }
                 if(instrumentGroup.empty())
                 {
                     Runtime.Log("No list entries, or list not seen");
@@ -5222,7 +5232,14 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
     if (input.matchnMove(1, "list"))
     {
         if (input.matchnMove(1, "group"))
+        {
+            if (!readControl(synth, 0, CONFIG::control::showEnginesTypes, TOPLEVEL::section::config))
+            {
+                synth->getRuntime().Log("Instrument engine and type info must be enabled");
+                return REPLY::done_msg;
+            }
             return Reply{commandGroup(input)};
+        }
         return Reply{commandList(input)};
     }
 

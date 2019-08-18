@@ -91,22 +91,19 @@ decl {\#include "MidiLearnUI.h"} {public local
 
 decl {\#include "Misc/FileMgrFuncs.h"
     using file::isRegularFile;
-    using file::findLeafName;
-} {private local
+    using file::findLeafName;} {private local
 }
 
 decl {\#include "Misc/FormatFuncs.h"
     using func::string2uint;
-    using func::asString;
-} {private local
+    using func::asString;} {private local
 }
 
 decl {\#include "Misc/TextMsgBuffer.h"
 
-    namespace \{ // Implementation details...
+    namespace { // Implementation details...
         TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
-    \}
-} {private local
+    }} {private local
 }
 
 class MasterUI {selected : {private GuiUpdates}
@@ -440,6 +437,18 @@ class MasterUI {selected : {private GuiUpdates}
             if(fl_choice("Clear parameters of instrument %d ?", NULL, "No", "Yes", partui->npart + 1) > 1)
                 send_data(TOPLEVEL::action::forceUpdate, PART::control::defaultInstrument,0, TOPLEVEL::type::Integer, partui->npart);}
             xywh {35 35 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label Search
+            callback {//
+        if (!synth->getRuntime().checksynthengines)
+        {
+            fl_alert("'Show engines/types' must be checked in Mixer Panel");
+            return;
+        }
+        bankui->B_search->do_callback();
+        bankui->searchwin->show();}
+            xywh {0 0 34 20} labelsize 12
           }
         }
         Submenu Parameters {
@@ -1910,6 +1919,17 @@ Alan Calvert started the project}
         CSpend->hide();
     }
     panelwindow->changed();} {}
+  }
+  Function {updateEngines(bool isOn)} {} {
+    code {//
+        bankui->rescan_for_banks(true);
+        bankui->enginecheck->value(isOn);
+        if (isOn)
+            bankui->B_search->activate();
+        else
+            bankui->B_search->deactivate();
+        partui->checkEngines();
+        updatepanel();} {}
   }
   Function {partNew(int _npart)} {} {
     code {//

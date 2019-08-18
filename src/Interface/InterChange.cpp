@@ -1954,7 +1954,7 @@ void InterChange::commandVector(CommandBlock *getData)
     if (write)
         __sync_or_and_fetch(&blockRead, 1);
 
-    unsigned int features;
+    unsigned int features = 0;
 
     if (control == VECTOR::control::erase)
     {
@@ -2361,6 +2361,12 @@ void InterChange::commandConfig(CommandBlock *getData)
                  synth->getRuntime().instrumentFormat = value_int;
             else
                 value = synth->getRuntime().instrumentFormat;
+            break;
+        case CONFIG::control::showEnginesTypes:
+            if (write)
+                 synth->getRuntime().checksynthengines = value_bool;
+            else
+                value = synth->getRuntime().checksynthengines;
             break;
 // switches
         case CONFIG::control::defaultStateStart:

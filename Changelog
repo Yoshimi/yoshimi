@@ -1,5 +1,10 @@
 yoshimi 1.5.11 M
 
+2019-8-18 Will
+* Implimented formal calls for instrument Engine/Type checks.
+* Implemented CLI access to instrument Engine/Type checks.
+* Updated docs.
+
 2019-8-17 Will
 * CLI osc and mod types show names not internal values.
 * Cleanups around CLI mod types.

@@ -3533,6 +3533,9 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
         case CONFIG::control::savedInstrumentFormat:
             max = 3;
             break;
+        case CONFIG::control::showEnginesTypes:
+            max = 1;
+            break;
 
         case CONFIG::control::defaultStateStart:
             break;

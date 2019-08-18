@@ -867,6 +867,9 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
                 case CONFIG::control::savedInstrumentFormat:
                     instrument->value(value_int - 1);
                     break;
+                case CONFIG::control::showEnginesTypes:
+                    synth->getGuiMaster()->updateEngines(value_bool);
+                    break;
 
                 case CONFIG::control::defaultStateStart:
                     setDefaultState->value(value_bool);
