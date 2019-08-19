@@ -15,7 +15,7 @@
     </p>
   </description>
   <releases>
-​    <release version="1.5.11" date="2019-05-14" />
+​    <release version="1.6.0" date="2019-09-01" />
 ​  </releases>
   <provides>
     <binary>yoshimi</binary>

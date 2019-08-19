@@ -1,4 +1,13 @@
-yoshimi 1.5.11 M
+yoshimi 1.6.0 rc1
+
+2019-8-19 Will
+* Added shortcut and ellipsis to GUI Instruments/Search entry.
+* Improved CLI instrument group comments.
+* Added error check for CLI bank/root CC selection.
+* Set version as 1.6.0 rc1
+  Yay :)
+* Set and updated manual version.
+* Updated docs and metadata.
 
 2019-8-18 Will
 * Implimented formal calls for instrument Engine/Type checks.

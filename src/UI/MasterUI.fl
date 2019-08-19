@@ -439,7 +439,7 @@ class MasterUI {selected : {private GuiUpdates}
             xywh {35 35 100 20} labelsize 12
           }
           MenuItem {} {
-            label Search
+            label {S&earch...}
             callback {//
         if (!synth->getRuntime().checksynthengines)
         {

@@ -2387,18 +2387,19 @@ int CmdInterpreter::commandGroup(Parser& input)
         return REPLY::done_msg;
     }
 
-
-
     string name = string{input};
     value = stringNumInList(name, instrumentGroupType, 2) + 1;
-    cout << value << endl;
+    //std::cout << value << std::endl;
     if (value < 1)
         return REPLY::range_msg;
 
-
     list<string> msg;
-    // having two lists is messy but the list routine clears 'msg'
-    // while we need 'instrumentGroup' kept for actual part loads
+    /*
+    * Having two lists is messy, but the list routine clears 'msg' and
+    * we need 'instrumentGroup' kept for later actual part loads.
+    * Also, the search list needs embeded root, bank, and instrument IDs
+    * but the reported one only wants the list number.
+    */
     input.skipChars();
     bool full = (input.matchnMove(1, "location"));
 
@@ -2412,8 +2413,8 @@ int CmdInterpreter::commandGroup(Parser& input)
         {
             instrumentGroup.push_back(line);
             if (!full && line.length() > 16)
-                line = line.substr(15);
-            line = to_string(count) + "| " + line;
+                line = line.substr(15); // remove root, bank, instrument IDs
+            line = to_string(count) + "| " + line; // replace with line count
             msg.push_back(line);
         }
     } while (line != "*");
@@ -3246,26 +3247,34 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
     else if (input.matchnMove(2, "root"))
     {
         command = CONFIG::control::bankRootCC;
-        //if (controlType != TOPLEVEL::type::Write)
-            value = 128; // ignored by range check
+        value = 128; // ignored by range check
         if (input.lineEnd(controlType))
             return REPLY::value_msg;
         if (input.matchnMove(1, "msb"))
             value = 0;
         else if (input.matchnMove(1, "lsb"))
             value = 32;
+        if (value != 128 && value == readControl(synth, 0, CONFIG::control::bankCC, TOPLEVEL::section::config))
+        {
+            synth->getRuntime().Log("In use for bank");
+            return REPLY::done_msg;
+        }
     }
     else if (input.matchnMove(2, "bank"))
     {
         command = CONFIG::control::bankCC;
-        //if (controlType != TOPLEVEL::type::Write)
-            value = 128; // ignored by range check
+        value = 128; // ignored by range check
         if (input.lineEnd(controlType))
             return REPLY::value_msg;
         if (input.matchnMove(1, "msb"))
             value = 0;
         else if (input.matchnMove(1, "lsb"))
             value = 32;
+        if (value != 128 && value == readControl(synth, 0, CONFIG::control::bankRootCC, TOPLEVEL::section::config))
+        {
+            synth->getRuntime().Log("In use for bank root");
+            return REPLY::done_msg;
+        }
     }
     else if (input.matchnMove(2, "program") || input.matchnMove(2, "instrument"))
     {

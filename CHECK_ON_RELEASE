@@ -1,3 +1,6 @@
+
+Ensure all new files have been added to commit!!!
+
 /src/CMakeLists.txt
     Ensure version number is correct.
     Disable extra compiler tests.
