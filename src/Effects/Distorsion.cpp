@@ -22,7 +22,6 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified March 2019
 */
 
 #include "Misc/SynthEngine.h"
@@ -332,8 +331,8 @@ float Distlimit::getlimits(CommandBlock *getData)
     int max = 127;
 
     int def = presets[presetNum][control];
-    bool canLearn = true;
-    bool isInteger = true;
+    unsigned char canLearn = TOPLEVEL::type::Learnable;
+    unsigned char isInteger = TOPLEVEL::type::Integer;
     switch (control)
     {
         case 0:
@@ -350,11 +349,11 @@ float Distlimit::getlimits(CommandBlock *getData)
             break;
         case 5:
             max = 13;
-            canLearn = false;
+            canLearn = 0;
             break;
         case 6:
             max = 1;
-            canLearn = false;
+            canLearn = 0;
             break;
         case 7:
             break;
@@ -363,11 +362,11 @@ float Distlimit::getlimits(CommandBlock *getData)
         case 9:
         case 10:
             max = 1;
-            canLearn = false;
+            canLearn = 0;
             break;
         case 16:
             max = 5;
-            canLearn = false;
+            canLearn = 0;
             break;
         default:
             getData->data.type |= TOPLEVEL::type::Error;
@@ -393,6 +392,6 @@ float Distlimit::getlimits(CommandBlock *getData)
             value = def;
             break;
     }
-    getData->data.type |= (canLearn * 64 + isInteger * 128);
+    getData->data.type |= (canLearn + isInteger);
     return float(value);
 }

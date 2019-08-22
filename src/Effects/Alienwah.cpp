@@ -22,7 +22,6 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified March 2019
 */
 
 using namespace std;
@@ -286,8 +285,8 @@ float Alienlimit::getlimits(CommandBlock *getData)
     int max = 127;
 
     int def = presets[presetNum][control];
-    bool canLearn = true;
-    bool isInteger = true;
+    unsigned char canLearn = TOPLEVEL::type::Learnable;
+    unsigned char isInteger = TOPLEVEL::type::Integer;
     switch (control)
     {
         case 0:
@@ -302,7 +301,7 @@ float Alienlimit::getlimits(CommandBlock *getData)
             break;
         case 4:
             max = 1;
-            canLearn = false;
+            canLearn = 0;
             break;
         case 5:
             break;
@@ -313,7 +312,7 @@ float Alienlimit::getlimits(CommandBlock *getData)
         case 8:
             min = 1;
             max = 100;
-            canLearn = false;
+            canLearn = 0;
             break;
         case 9:
             break;
@@ -321,7 +320,7 @@ float Alienlimit::getlimits(CommandBlock *getData)
             break;
         case 16:
             max = 3;
-            canLearn = false;
+            canLearn = 0;
             break;
         default:
             getData->data.type |= TOPLEVEL::type::Error; // error
@@ -347,7 +346,7 @@ float Alienlimit::getlimits(CommandBlock *getData)
             value = def;
             break;
     }
-    getData->data.type |= (canLearn * 64 + isInteger * 128);
+    getData->data.type |= (canLearn + isInteger);
     return float(value);
 }
 

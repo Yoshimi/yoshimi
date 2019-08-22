@@ -22,7 +22,6 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified March 2019
 */
 
 #include "Misc/SynthEngine.h"
@@ -310,8 +309,8 @@ float Choruslimit::getlimits(CommandBlock *getData)
     int max = 127;
 
     int def = presets[presetNum][control];
-    bool canLearn = true;
-    bool isInteger = true;
+    unsigned char canLearn = TOPLEVEL::type::Learnable;
+    unsigned char isInteger = TOPLEVEL::type::Integer;
     switch (control)
     {
         case 0:
@@ -326,7 +325,7 @@ float Choruslimit::getlimits(CommandBlock *getData)
             break;
         case 4:
             max = 1;
-            canLearn = false;
+            canLearn = 0;
             break;
         case 5:
             break;
@@ -340,11 +339,11 @@ float Choruslimit::getlimits(CommandBlock *getData)
             break;
         case 11:
             max = 1;
-            canLearn = false;
+            canLearn = 0;
             break;
         case 16:
             max = 9;
-            canLearn = false;
+            canLearn = 0;
             break;
         default:
             getData->data.type |= TOPLEVEL::type::Error;
@@ -370,7 +369,7 @@ float Choruslimit::getlimits(CommandBlock *getData)
             value = def;
             break;
     }
-    getData->data.type |= (canLearn * 64 + isInteger * 128);
+    getData->data.type |= (canLearn + isInteger);
     return float(value);
 }
 

@@ -22,7 +22,6 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified March 2019
 */
 
 #include "Misc/SynthEngine.h"
@@ -533,8 +532,8 @@ float Phaserlimit::getlimits(CommandBlock *getData)
     int max = 127;
 
     int def = presets[presetNum][control];
-    bool canLearn = true;
-    bool isInteger = true;
+    unsigned char canLearn = TOPLEVEL::type::Learnable;
+    unsigned char isInteger = TOPLEVEL::type::Integer;
     switch (control)
     {
         case 0:
@@ -547,7 +546,7 @@ float Phaserlimit::getlimits(CommandBlock *getData)
             break;
         case 4:
             max = 1;
-            canLearn = false;
+            canLearn = 0;
             break;
         case 5:
             break;
@@ -558,29 +557,29 @@ float Phaserlimit::getlimits(CommandBlock *getData)
         case 8:
             min = 1;
             max = 12;
-            canLearn = false;
+            canLearn = 0;
             break;
         case 9:
             break;
         case 10:
-            canLearn = false;
+            canLearn = 0;
             max = 1;
             break;
         case 11:
             break;
         case 12:
-            canLearn = false;
+            canLearn = 0;
             max = 1;
             break;
         case 13:
             break;
         case 14:
             max = 1;
-            canLearn = false;
+            canLearn = 0;
             break;
         case 16:
             max = 11;
-            canLearn = false;
+            canLearn = 0;
             break;
         default:
             getData->data.type |= TOPLEVEL::type::Error;
@@ -606,7 +605,7 @@ float Phaserlimit::getlimits(CommandBlock *getData)
             value = def;
             break;
     }
-    getData->data.type |= (canLearn * 64 + isInteger * 128);
+    getData->data.type |= (canLearn + isInteger);
     return float(value);
 }
 

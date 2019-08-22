@@ -6002,7 +6002,7 @@ float InterChange::returnLimits(CommandBlock *getData)
 
     //std::cout << "Top request " << request << std::endl;
 
-    getData->data.type &= 0x3f; //  clear top bits
+    getData->data.type &= 0x1f; //  clear top bits
     getData->data.type |= TOPLEVEL::type::Integer; // default is integer & not learnable
 
     if (npart == TOPLEVEL::section::config)

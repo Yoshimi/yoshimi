@@ -22,7 +22,6 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified August 2019
 */
 
 #include "Misc/SynthEngine.h"
@@ -281,8 +280,8 @@ float EQlimit::getlimits(CommandBlock *getData)
     int min = 0;
     int max = 127;
     int def = 0;
-    bool canLearn = true;
-    bool isInteger = true;
+    unsigned char canLearn = TOPLEVEL::type::Learnable;
+    unsigned char isInteger = TOPLEVEL::type::Integer;
 
     switch (control)
     {
@@ -291,11 +290,11 @@ float EQlimit::getlimits(CommandBlock *getData)
             break;
         case 1:
             max = 7;
-            canLearn = false;
+            canLearn = 0;
             break;
         case 10:
             max = 9;
-            canLearn = false;
+            canLearn = 0;
             break;
         case 11:
         case 12:
@@ -304,7 +303,7 @@ float EQlimit::getlimits(CommandBlock *getData)
             break;
         case 14:
             max = 4;
-            canLearn = false;
+            canLearn = 0;
             break;
         default:
             getData->data.type |= TOPLEVEL::type::Error;
@@ -330,7 +329,7 @@ float EQlimit::getlimits(CommandBlock *getData)
             value = def;
             break;
     }
-    getData->data.type |= (canLearn * 64 + isInteger * 128);
+    getData->data.type |= (canLearn + isInteger);
     return float(value);
 }
 
