@@ -17,7 +17,6 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified August 2019
 */
 
 #include "Interface/MidiLearn.h"
@@ -665,7 +664,7 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
         putData.data.value.F = 0;
         putData.data.source = TOPLEVEL::action::toAll;
         putData.data.type = 0xc8;
-        putData.data.control = 0xfe; // TODO don't understand this :(
+        putData.data.control = TOPLEVEL::control::textMessage;
         putData.data.part = TOPLEVEL::section::midiIn;
         putData.data.parameter = 0x80;
         putData.data.miscmsg = textMsgBuffer.push("Midi Learn full!");

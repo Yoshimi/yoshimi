@@ -1,10 +1,14 @@
-yoshimi 1.6.0 rc1
+yoshimi 1.6.0 rc2
 
 2019-8-22 Will
 * Fixed effects regression (not midi-learning)
   Found by Jesper, and caused by the change from numeric a
   value for the learn fag being changed to an enum with a
   different value.
+* Identified midi-learn GUI message control number.
+* BugFix: CLI not setting resonance point 1.
+  Further resonance issues to resolve.
+* Set version as 1.6.0 rc2
 
 2019-8-19 Will
 * Added shortcut and ellipsis to GUI Instruments/Search entry.

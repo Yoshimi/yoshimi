@@ -4231,7 +4231,7 @@ int CmdInterpreter::resonance(Parser& input, unsigned char controlType)
         }
 
         cmd = string2int(input) - 1;
-        if (cmd < 1 || cmd >= MAX_RESONANCE_POINTS)
+        if (cmd < 0 || cmd >= MAX_RESONANCE_POINTS)
             return REPLY::range_msg;
         input.skipChars();
         if (input.lineEnd(controlType))
