@@ -230,6 +230,7 @@ static std::string partlist [] = {
     "Mode <s>",            "key mode (Poly, Mono, Legato)",
     "Note <n2>",           "note polyphony",
     "SHift <n2>",          "key shift semitones (0 no shift)",
+    "BYpass <n> <s>",      "bypass part effect number n, (ON, {other})",
     "EFfects [n2]",        "enter effects context level",
     "  Send <n3> <n4>",    "send part to system effect n3 at volume n4",
     "  (effect) <s>",      "the effect type",

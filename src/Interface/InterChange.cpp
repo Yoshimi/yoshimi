@@ -3313,16 +3313,20 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->Pefxroute[effNum];
             break;
         case PART::control::effectBypass:
+        {
+            int tmp = part->Peffnum;
+            part->Peffnum = engine;
             if (write)
             {
-                part->Pefxbypass[effNum] = value_bool;
+                part->Pefxbypass[engine] = value_bool;
                 if (!value_bool)
-                    part[npart].partefx[effNum]->cleanup();
+                    part->partefx[engine]->cleanup();
             }
-
             else
-                value = part->Pefxbypass[effNum];
+                value = part->Pefxbypass[engine];
+            part->Peffnum = tmp; // leave it as it was before
             break;
+        }
 
         case PART::control::defaultInstrument: // doClearPart
             if(write)

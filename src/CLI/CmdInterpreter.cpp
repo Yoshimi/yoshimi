@@ -4466,10 +4466,23 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
     int tmp = -1;
     if (bitTest(context, LEVEL::AllFX))
         return effects(input, controlType);
+    if (input.matchnMove(2, "bypass"))
+    {
+        int effnum = string2int(input);
+        if (effnum < 1 || effnum > NUM_PART_EFX)
+            return REPLY::range_msg;
+        nFX = effnum - 1; // don't change it until it's valid
+        input.skipChars();
+        bool value = false;
+        if (!input.lineEnd(controlType))
+            value = (input.toggle() == 1);
+        return sendNormal(synth, 0, value, controlType, PART::control::effectBypass, npart, UNUSED, nFX, TOPLEVEL::insert::partEffectSelect);
+    }
     if (input.lineEnd(controlType))
         return REPLY::done_msg;
     if (kitMode == PART::kitType::Off)
         kitNumber = UNUSED; // always clear it if not kit mode
+
     if (input.matchnMove(2, "effects") || input.matchnMove(2, "efx"))
     {
         context = LEVEL::Top;

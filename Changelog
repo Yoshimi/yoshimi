@@ -1,4 +1,4 @@
-yoshimi 1.6.0 rc3
+yoshimi 1.6.0 rc4
 
 2019-8-23 Will
 * Fixed resonance regression (not recognising point 255)
@@ -6,6 +6,9 @@ yoshimi 1.6.0 rc3
   numbers. 'parameter' now used for point number.
 * Improved effects handling/reporting for CLI.
 * Set version as 1.6.0 rc3
+* BugFix: Crash when cancelling part >1 effect bypass.
+* Added missing CLI effect bypass control.
+* Set version as 1.6.0 rc4
 
 2019-8-22 Will
 * Fixed effects regression (not midi-learning)

@@ -1329,9 +1329,9 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
         case PART::control::effectDestination:
             contstr = "Effect " + to_string(effNum + 1) + " Destination";
             break;
-        case PART::control::effectBypass:
+        /*case PART::control::effectBypass:
             contstr = "Bypass Effect "+ to_string(effNum + 1);
-            break;
+            break;*/
 
         case PART::control::defaultInstrument: // doClearPart
             contstr = "Set Default Instrument";
@@ -2830,7 +2830,17 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
                 effname += "dry out";
         }
         if (control == PART::control::effectBypass)
-            effname = " bypassed";
+        {
+            effname = " Bypass";
+            showValue = false;
+            if (addValue)
+            {
+                if (value)
+                    effname += " - on";
+                else
+                    effname += " - off";
+            }
+        }
         else
             showValue = false;
         return (name + effname);
