@@ -1012,16 +1012,18 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
     }
 
     if (input.lineEnd(controlType))
-        return REPLY::done_msg;
-
-    value = string2int(input);
-
-    if (value > 128)
     {
-        std::cout << "Eff status " << int(readControl(synth, 0, value, npart, EFFECT::type::none + nFXtype, nFX)) << std::endl;
+        if (bitTest(context, LEVEL::Part))
+            dest = "Part" + to_string(int(npart + 1));
+        else if (bitTest(context, LEVEL::InsFX))
+            dest = "Insert";
+        else
+            dest = "System";
+        Runtime.Log(dest + " effect " + asString(nFX + 1));
         return REPLY::done_msg;
     }
 
+    value = string2int(input);
 
     if (value > 0)
     {
@@ -1035,24 +1037,22 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
             nFX = value;
             if (bitTest(context, LEVEL::Part))
             {
-                sendDirect(synth, 0, nFX, TOPLEVEL::type::Write, PART::control::effectNumber, npart, UNUSED, nFX, TOPLEVEL::insert::partEffectSelect);
+                sendNormal(synth, 0, nFX, TOPLEVEL::type::Write, PART::control::effectNumber, npart, UNUSED, nFX, TOPLEVEL::insert::partEffectSelect);
                 nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
-                sendDirect(synth, 0, nFXtype, TOPLEVEL::type::Write, PART::control::effectType, npart, UNUSED, nFX, TOPLEVEL::insert::partEffectSelect);
+                return sendNormal(synth, 0, nFXtype, TOPLEVEL::type::Write, PART::control::effectType, npart, UNUSED, nFX, TOPLEVEL::insert::partEffectSelect);
             }
-            else if (bitTest(context, LEVEL::InsFX))
+            if (bitTest(context, LEVEL::InsFX))
             {
-                sendDirect(synth, 0, nFX, TOPLEVEL::type::Write, EFFECT::sysIns::effectNumber, TOPLEVEL::section::insertEffects, UNUSED, nFX);
+                sendNormal(synth, 0, nFX, TOPLEVEL::type::Write, EFFECT::sysIns::effectNumber, TOPLEVEL::section::insertEffects, UNUSED, nFX);
 
                 nFXtype = synth->insefx[nFX]->geteffect();
-                sendDirect(synth, 0, nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::insertEffects, UNUSED, nFX);
+                return sendNormal(synth, 0, nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::insertEffects, UNUSED, nFX);
             }
-            else
-            {
-                sendDirect(synth, 0, nFX, TOPLEVEL::type::Write, EFFECT::sysIns::effectNumber, TOPLEVEL::section::systemEffects, UNUSED, nFX);
+
+                sendNormal(synth, 0, nFX, TOPLEVEL::type::Write, EFFECT::sysIns::effectNumber, TOPLEVEL::section::systemEffects, UNUSED, nFX);
 
                 nFXtype = synth->sysefx[nFX]->geteffect();
-                sendDirect(synth, 0, nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, nFX);
-            }
+                return sendNormal(synth, 0, nFXtype, TOPLEVEL::type::Write, EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, nFX);
         }
         if (input.lineEnd(controlType))
         {

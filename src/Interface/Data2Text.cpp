@@ -47,7 +47,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-    unsigned char insertParam = getData->data.parameter;
+//    unsigned char insertParam = getData->data.parameter;
 
     if (control == TOPLEVEL::control::textMessage) // special case for simple messages
     {
@@ -2841,10 +2841,9 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
         string second = "";
         if (npart == TOPLEVEL::section::systemEffects)
         {
-            name = "System ";
             if (insert == TOPLEVEL::insert::systemEffectSend)
             {
-                contstr = "from Effect " + to_string(effnum + 1);
+                contstr = " from Effect " + to_string(effnum + 1);
                 second = " to Effect " + to_string(control + 1);
                 return (name + contstr + second);
             }
