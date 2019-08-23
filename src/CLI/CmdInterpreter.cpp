@@ -4208,7 +4208,10 @@ int CmdInterpreter::resonance(Parser& input, unsigned char controlType)
     else if (input.matchnMove(1, "clear"))
         cmd = RESONANCE::control::clearGraph;
 
-    else if (input.matchnMove(2, "points"))
+    if (cmd > -1)
+        return sendNormal( synth, 0, value, controlType, cmd, npart, kitNumber, engine, insert);
+
+    if (input.matchnMove(2, "points"))
     {
         insert = TOPLEVEL::insert::resonanceGraphInsert;
         if (input.isAtEnd()) // need to catch reading as well
@@ -4222,24 +4225,25 @@ int CmdInterpreter::resonance(Parser& input, unsigned char controlType)
                     string line = asAlignedString(i + 1, 4) + ">";
                     for (int j = 0; j < (MAX_RESONANCE_POINTS / 32); ++ j)
                     {
-                        line += asAlignedString(readControl(synth, 0, i + j, npart, kitNumber, engine, insert), 4);
+                        line += asAlignedString(readControl(synth, 0, RESONANCE::control::graphPoint, npart, kitNumber, engine, insert, i + j), 4);
                     }
                     synth->getRuntime().Log(line);
                 }
             }
             return REPLY::done_msg;
         }
+        cmd = RESONANCE::control::graphPoint;
 
-        cmd = string2int(input) - 1;
-        if (cmd < 0 || cmd >= MAX_RESONANCE_POINTS)
+        int point = string2int(input) - 1;
+        if (point < 0 || point >= MAX_RESONANCE_POINTS)
             return REPLY::range_msg;
         input.skipChars();
         if (input.lineEnd(controlType))
             return REPLY::value_msg;
         value = string2int(input);
+        return sendNormal( synth, 0, value, controlType, cmd, npart, kitNumber, engine, insert, point);
     }
-    if (cmd > -1)
-        return sendNormal( synth, 0, value, controlType, cmd, npart, kitNumber, engine, insert);
+
     return REPLY::available_msg;
 }
 

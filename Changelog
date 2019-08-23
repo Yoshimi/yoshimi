@@ -1,5 +1,10 @@
 yoshimi 1.6.0 rc2
 
+2019-8-23 Will
+* Fixed resonance regression (not recognising poin 255)
+  Found by Jesper, caused by clash of numeric control
+  numbers. 'parameter' now used for point number.
+
 2019-8-22 Will
 * Fixed effects regression (not midi-learning)
   Found by Jesper, and caused by the change from numeric a

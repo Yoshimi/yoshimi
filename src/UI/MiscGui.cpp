@@ -218,7 +218,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 
 //        cout << "Con " << int(control) << "  Kit " << int(kititem) << "  Eng " << int(engine) << "  Ins " << int(insert) << endl;
 
-    if (control == TOPLEVEL::control::textMessage && insert != TOPLEVEL::insert::resonanceGraphInsert) // just show a message
+    if (control == TOPLEVEL::control::textMessage) // just show a message
     {
         synth->getGuiMaster()->words->copy_label(textMsgBuffer.fetch(miscmsg).c_str());
         synth->getGuiMaster()->cancel->hide();

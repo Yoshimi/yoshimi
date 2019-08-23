@@ -1887,7 +1887,7 @@ void SynthEngine::SetMuteAndWait(void)
 #ifdef GUI_FLTK
     if (interchange.fromGUI ->write(putData.bytes))
     {
-        while(isMuted() == 0) // TODO this seems screwy :(
+        while(!isMuted()) // TODO this seems screwy :(
             usleep (1000);
     }
 #endif

@@ -865,7 +865,8 @@ namespace RESONANCE // usage RESONANCE::control::maxDb
         interpolatePeaks = 20, // smooth, linear
         protectFundamental,
         clearGraph = 96,
-        smoothGraph
+        smoothGraph,
+        graphPoint
     };
 }
 

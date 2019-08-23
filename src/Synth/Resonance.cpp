@@ -22,7 +22,6 @@
 
     This file is a derivative of a ZynAddSubFX original
 
-    Modified May 2019
 */
 
 #include <sys/types.h>

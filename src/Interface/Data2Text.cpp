@@ -49,7 +49,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
     unsigned char insert = getData->data.insert;
     unsigned char insertParam = getData->data.parameter;
 
-    if (control == TOPLEVEL::control::textMessage && insertParam != TOPLEVEL::insert::resonanceGraphInsert) // special case for simple messages
+    if (control == TOPLEVEL::control::textMessage) // special case for simple messages
     {
         synth->getRuntime().Log(textMsgBuffer.fetch(lrint(value)));
         synth->getRuntime().finishedCLI = true;
@@ -2362,6 +2362,7 @@ string DataText::resolveResonance(CommandBlock *getData, bool addValue)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
+    unsigned char parameter = getData->data.parameter;
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
     bool yesno = false;
@@ -2380,7 +2381,7 @@ string DataText::resolveResonance(CommandBlock *getData, bool addValue)
     {
         if (write == true && engine == PART::engine::padSynth)
             isPad = " - Need to Apply";
-        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Resonance Point " + to_string(control + 1) + isPad);
+        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Resonance Point " + to_string(parameter + 1) + isPad);
     }
 
     if (write == true && engine == PART::engine::padSynth && control != 104)

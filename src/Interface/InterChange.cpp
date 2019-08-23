@@ -349,7 +349,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     std::string name;
 
     int switchNum = npart;
-    if (control == TOPLEVEL::control::textMessage && insert != TOPLEVEL::insert::resonanceGraphInsert)
+    if (control == TOPLEVEL::control::textMessage)
         switchNum = 256; // this is a bit hacky :(
 
     switch(switchNum)
@@ -2832,7 +2832,7 @@ void InterChange::commandMain(CommandBlock *getData)
             }
             break;
 
-        case 254:
+        case TOPLEVEL::control::textMessage:
             synth->Mute();
             getData->data.source = TOPLEVEL::action::noAction;
             break;
@@ -4950,6 +4950,7 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char insert = getData->data.insert;
+    unsigned char parameter = getData->data.parameter;
     int value_int = lrint(value);
     bool value_bool = YOSH::F2B(value);
     bool write = (type & TOPLEVEL::type::Write) > 0;
@@ -4959,9 +4960,9 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
     if (insert == TOPLEVEL::insert::resonanceGraphInsert)
     {
         if (write)
-            respar->setpoint(control, value_int);
+            respar->setpoint(parameter, value_int);
         else
-            getData->data.value.F = respar->Prespoints[control];
+            getData->data.value.F = respar->Prespoints[parameter];
         return;
     }
 
