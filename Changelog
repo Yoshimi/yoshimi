@@ -1,10 +1,11 @@
-yoshimi 1.6.0 rc2
+yoshimi 1.6.0 rc3
 
 2019-8-23 Will
 * Fixed resonance regression (not recognising point 255)
   Found by Jesper, caused by clash of numeric control
   numbers. 'parameter' now used for point number.
 * Improved effects handling/reporting for CLI.
+* Set version as 1.6.0 rc3
 
 2019-8-22 Will
 * Fixed effects regression (not midi-learning)
