@@ -995,16 +995,19 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
     if (bitTest(context, LEVEL::Part))
     {
         nFXavail = NUM_PART_EFX;
+        nFX = readControl(synth, 0, PART::control::effectNumber, npart, UNUSED, UNUSED, TOPLEVEL::insert::partEffectSelect);
         nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
     }
     else if (bitTest(context, LEVEL::InsFX))
     {
         nFXavail = NUM_INS_EFX;
+        nFX = readControl(synth, 0, EFFECT::sysIns::effectNumber, TOPLEVEL::section::insertEffects);
         nFXtype = synth->insefx[nFX]->geteffect();
     }
     else
     {
         nFXavail = NUM_SYS_EFX;
+        nFX = readControl(synth, 0, EFFECT::sysIns::effectNumber, TOPLEVEL::section::systemEffects);
         nFXtype = synth->sysefx[nFX]->geteffect();
         int tmp = input.toggle();
         if (tmp >= 0)
@@ -4471,12 +4474,11 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
         int effnum = string2int(input);
         if (effnum < 1 || effnum > NUM_PART_EFX)
             return REPLY::range_msg;
-        nFX = effnum - 1; // don't change it until it's valid
         input.skipChars();
         bool value = false;
         if (!input.lineEnd(controlType))
             value = (input.toggle() == 1);
-        return sendNormal(synth, 0, value, controlType, PART::control::effectBypass, npart, UNUSED, nFX, TOPLEVEL::insert::partEffectSelect);
+        return sendNormal(synth, 0, value, controlType, PART::control::effectBypass, npart, UNUSED, effnum - 1, TOPLEVEL::insert::partEffectSelect);
     }
     if (input.lineEnd(controlType))
         return REPLY::done_msg;
@@ -4914,7 +4916,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
 
     if (input.matchnMove(1, "part"))
     {
-        nFX = 0; // effects number limit changed
+        nFX = 0; // just to be sure
         if (controlType != TOPLEVEL::type::Write && input.isAtEnd())
         {
             if (synth->partonoffRead(npart))
@@ -4946,7 +4948,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
     {
         bitSet(context,LEVEL::AllFX);
         bitClear(context, LEVEL::InsFX);
-        nFX = 0; // effects number limit changed
+        nFX = 0; // just to be sure
         input.matchnMove(2, "effects"); // clear it if given
         input.matchnMove(2, "efx");
         nFXtype = synth->sysefx[nFX]->geteffect();
@@ -4956,7 +4958,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
     {
         bitSet(context,LEVEL::AllFX);
         bitSet(context,LEVEL::InsFX);
-        nFX = 0; // effects number limit changed
+        nFX = 0; // just to be sure
         input.matchnMove(2, "effects"); // clear it if given
         input.matchnMove(2, "efx");
         nFXtype = synth->insefx[nFX]->geteffect();

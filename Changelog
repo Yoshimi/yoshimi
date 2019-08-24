@@ -1,5 +1,8 @@
 yoshimi 1.6.0 rc4
 
+2019-8-24 Will
+* BugFix: CLI effects out of sync with GUI (and actual)
+
 2019-8-23 Will
 * Fixed resonance regression (not recognising point 255)
   Found by Jesper, caused by clash of numeric control
