@@ -236,7 +236,7 @@ static std::string partlist [] = {
     "  (effect) <s>",      "the effect type",
     "  PREset <n3>",       "set numbered effect preset to n3",
     "    -- ",             "effect dependedent controls",
-    "PRogram <[n2]/[s] [n3]>",  "loads instrument ID - CLear sets default,",
+    "PRogram <s>/[s]<n3>", "loads instrument ID - CLear sets default,",
     "","Group n3 selects from group list",
     "NAme <s>",            "sets the display name the part can be saved with",
     "Humanise Pitch [n]",  "adds a small random pitch change at note_on",

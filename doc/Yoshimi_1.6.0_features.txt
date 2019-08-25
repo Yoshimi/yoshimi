@@ -18,8 +18,8 @@ At part level and also in AddSynth Voice, the lowest possible setting now silenc
 Previously it was -40dB and -60dB respectively, and this could result in unwanted sound 'leakage'. This doesn't affect any higher volume settings so previously stored MIDI recordings will sound the same.
 
 
-There is a global bank search button in the main window instrument menu, and the instrument bank window.
-This opens a list by instrument type. It is derived from a scan of the entire bank structure. You can now very quickly try out a wide range from the list on the currently selected part. The Instrument names are prefaced with the bank root ID, bank ID and instrument number (as recognised by MIDI). As usual, we like to keep people informed with precise and relevant information :)
+There is a global bank search entry in the main window's instrument menu, and a button in the instrument bank window.
+This opens a list by instrument type. It is derived from a scan of the entire bank structure, so you can very quickly try out a wide range from this list on the currently selected part. The Instrument names are prefaced with the bank root ID, bank ID and instrument number (as recognised by MIDI). As usual, we like to keep people informed with precise and relevant information :)
 
 
 In the main window there is a button to temporarily disable an individual system effect.
@@ -29,7 +29,7 @@ With Insert effects, you can already use the 'Off' position in the destination w
 
 
 In the part editor window there is now a 'Velocity' slider as part of 'Humanise'.
-Thi operated in a similar way to the exisiting slider (renamed to 'Detune')
+This operates in a similar way to the exisiting slider (renamed to 'Detune')
 It gives a small random velocity reduction. As well as reducing the perceived volume it will affect any velocity sensitive feature such as filters.
 
 

@@ -1,6 +1,10 @@
 yoshimi 1.6.0 rc4
 
 2019-8-24 Will
+* Doc updates.
+* Minor correction to CLI test list.
+
+2019-8-24 Will
 * BugFix: CLI effects out of sync with GUI (and actual)
 
 2019-8-23 Will
