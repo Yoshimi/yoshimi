@@ -54,13 +54,11 @@ decl {\#include "MasterUI.h"} {private global
 }
 
 decl {\#include "Misc/SynthHelper.h"
-    using synth::getDetune;
-} {private local
+    using synth::getDetune;} {private local
 }
 
 decl {\#include "Misc/FormatFuncs.h"
-    using func::asString;
-} {private local
+    using func::asString;} {private local
 }
 
 class ADvoicelistitem {: {public Fl_Group}
@@ -130,8 +128,7 @@ class ADvoicelistitem {: {public Fl_Group}
         } {}
         Fl_Box noiselabel {
           label N
-          callback {//
-    update_noiselabel();
+          callback {update_noiselabel();
     int tmp = pars->VoicePar[nvoice].Type;
     if (tmp == 0)
     {
@@ -1123,15 +1120,16 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
               label Noise
               xywh {40 40 100 20} labelfont 1 labelsize 11 labelcolor 5
             }
-            MenuItem spotnoise {
+            MenuItem {} {
               label Noise
-              xywh {0 0 34 20} labelfont 1 labelsize 11 labelcolor 6
+              xywh {60 60 100 20} labelfont 1 labelsize 11 labelcolor 6
             }
           }
         }
         Fl_Box noiselabel {
           label Noise
-          callback {update_osclabels();}
+          callback {//
+                update_osclabels();}
           xywh {110 500 400 65} labelfont 1 labelsize 50 labelcolor 7
           code0 {update_osclabels();}
         }
@@ -1163,7 +1161,6 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
     unsigned char voice = getData->data.engine - PART::engine::addVoice1;
     int tmp;
     bool val_bool = YOSH::F2B(value);
-    //cout << "adnote return" << endl;
     //if (voice != nvoice && control != ADDVOICE::control::enableVoice)
         //return;
 
@@ -1557,7 +1554,8 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
     }} {}
   }
   Function {update_osclabels()} {} {
-    code {if (pars->VoicePar[nvoice].PVoice >= 0)
+    code {//
+    if (pars->VoicePar[nvoice].PVoice >= 0)
 {
     char str[15];
     snprintf(str, sizeof(str), "Voice %d", pars->VoicePar[nvoice].PVoice + 1);
@@ -2080,7 +2078,7 @@ else if(voiceTabs->value() == g8)
       }
     }
     Fl_Window ADnoteVoiceList {
-      label {ADsynth Voices list} open
+      label {ADsynth Voices list}
       xywh {101 233 705 260} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice List").c_str());}
     } {

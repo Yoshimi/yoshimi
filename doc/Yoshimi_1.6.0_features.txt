@@ -100,3 +100,4 @@ Thus not requiring any graphics capability beyond a simple shell, or indeed (as 
 The command line has additional protection against overlength lines, and corrupted data.
 Also one of Yoshimi's little band of helpers has done some major code re-factoring here, and in some low level functions.
 
+A few more bugs have been squashed, but these were mostly regressions since the release of V 1.5.11.
