@@ -1,25 +1,49 @@
-V1.5.11
+V1.6.0
 
-Main feature additions/improvements:
-
-The Mixer panel now presents parts with separate left and right VU meters.
-
-There is an overall mono/stereo button in the main window.
-
-If any controls in an effect are different from the listed preset, the colour of the preset background is changed to a strong blue.
-
-When an AddSynth voice or modulator is using the oscillator from a lower numbered one, on entering the waveform editor there is a warning in red at the top of the window.
-
-In the microtonal section the 'A' note frequency range has been fixed as 329Hz to 660Hz.
-
-All controls that operate only when others are in particular states are shown as inactive when not available.
-
-There is a small information window that opens instantly, and only remains visible until the main window is displayed.
-
-On a first time start there is a window overlaying the centre of the main one, prompting you to check settings via the Yoshimi drop-down menu.
+Yoshimi is now 10 years old and (while fully respecting its origins) is forging it's own path into the future. Do come along for the ride.
 
 
-More details in /doc/Yoshimi_1.5.11_features.txt
+Our headline feature is extensions to AddSynth voices and modulators.
+
+There is a new AddSynth noise type.
+
+There are extra mute options.
+
+There is a global bank search entry in the main window's instrument menu, and a button in the instrument bank window.
+
+Also in the main window there is a button to temporarily disable an individual system effect.
+
+In the part editor window there is now a 'Humanise Velocity' slider.
+
+We've made an improvement to the way recent histories are managed.
+
+All the above features are, of course, also available to the command line interface.
+
+'Reports' and 'Midi Learn' openers have been swapped.
+
+There is a new group of easy to use NRPNs.
+
+There have been improvements to Copy/Paste.
+
+There is tighter control of startup.
+
+Incidentally, whenever we add new features, the default is always to keep the existing behaviour.
+
+The Advanced User Manual has been considerably Expanded.
+
+
+Under the hood
+
+Ring buffers have now been changed to a bespoke type.
+
+Almost all file system operations have been moved to a single source file.
+
+As well as running headless, Yoshimi can now be built headless.
+
+The command line has additional protection against overlength lines, and corrupted data.
+
+
+More details in /doc/Yoshimi_1.6.0_features.txt
 
 
 Yoshimi source code is available from either:

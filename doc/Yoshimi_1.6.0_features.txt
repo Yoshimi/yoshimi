@@ -87,6 +87,10 @@ This capability can be set within 'config'.
 Incidentally, whenever we add new features, the default is always to keep the existing behaviour.
 
 
+The Advanced User Manual has been considarably expanded.
+There are corrections, updates (where features have changed) and a lot more descriptive detail. More attention has been given to explaining 'Why' as well as 'How' and 'What'.
+
+
 Under the hood
 Ring buffers have now been changed to a bespoke type.
 These are are used quite extensively in Yoshimi. They are now specifically tailored for Yoshimi. The code is self-contained, more efficient, and easier to use. It also removes a dependency.

@@ -1,4 +1,8 @@
-yoshimi 1.6.0 rc5
+yoshimi 1.6.0
+
+2019-9-1 Will
+* Final doc updates.
+* Set release version as 1.6.0
 
 2019-8-30 Will
 * Small GUI correction for AddSynth.
