@@ -1,8 +1,9 @@
-yoshimi 1.6.0
+yoshimi 1.6.0 M
 
 2019-9-1 Will
 * Final doc updates.
 * Set release version as 1.6.0
+* Merged in bugfix for BSD.
 
 2019-8-30 Will
 * Small GUI correction for AddSynth.
