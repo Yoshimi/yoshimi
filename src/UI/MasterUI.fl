@@ -214,15 +214,20 @@ class MasterUI {selected : {private GuiUpdates}
 
       make_window();
       loadWindowData();
+      string starterror = "";
       if(synth->getIsLV2Plugin())
       {
           masterwindow->label(_label);
       }
       else
       {
+          starterror = textMsgBuffer.fetch(0);
           setMasterLabel(synth->getRuntime().paramsLoad);
       }
       masterwindow->show();
+      if (starterror.find("Could not") != std::string::npos)
+          fl_alert("%s", starterror.c_str());
+
       // these don't have access to synth ->
       microtonalui->microtonaluiwindow->copy_label(synth->makeUniqueName("Scales").c_str());
       yoshiLog->logConsole->copy_label(synth->makeUniqueName("Console").c_str());

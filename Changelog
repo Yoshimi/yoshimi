@@ -1,5 +1,9 @@
 yoshimi 1.6.0 M
 
+2019-9-6 Will
+* A corrupted config file no longer aborts.
+  A message is given stating defaults are used.
+
 2019-9-1 Will
 * Final doc updates.
 * Set release version as 1.6.0

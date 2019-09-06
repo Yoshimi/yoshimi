@@ -206,7 +206,12 @@ bool Config::Setup(int argc, char **argv)
     AntiDenormals(true);
 
     if (!loadConfig())
-        return false;
+    {
+        string message = "Could not load config. Using default values. Using defaults.";
+        TextMsgBuffer::instance().push(message);
+        Log("\n\n" + message + "\n");
+        //return false;
+    }
 
     /* NOTE: we must not do any further init involving the SynthEngine here,
      * since this code is invoked from within the SynthEngine-ctor.
