@@ -239,6 +239,9 @@ static std::string partlist [] = {
     "PRogram <s>/[s]<n3>", "loads instrument ID - CLear sets default,",
     "","Group n3 selects from group list",
     "NAme <s>",            "sets the display name the part can be saved with",
+    "TYPe <s>",            "sets the instrument type",
+    "COPyright <s>",       "sets the instrument coyright message",
+    "INFo <s>",            "fills the comments info entry",
     "Humanise Pitch [n]",  "adds a small random pitch change at note_on",
     "Humanise Velocity [n]",  "adds a small random velocity change at note_on",
     "Channel <n2>",        "MIDI channel (> 32 disables, > 16 note off only)",
@@ -914,6 +917,27 @@ static std::string fx_list [] = {
     "DIstortion",
     "EQ",
     "DYnfilter",
+    "end"
+};
+
+static std::string type_list [] = {
+    "undefined",
+    "Piano",
+    "Chromatic Percussion",
+    "Organ",
+    "Guitar",
+    "Bass",
+    "Solo Strings",
+    "Ensemble",
+    "Brass",
+    "Reed",
+    "Pipe",
+    "Synth Lead",
+    "Synth Pad",
+    "Synth Effects",
+    "Ethnic",
+    "Percussive",
+    "Sound Effects",
     "end"
 };
 

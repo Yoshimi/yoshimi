@@ -1107,6 +1107,16 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                         getData->data.source &= ~TOPLEVEL::action::lowPrio;
                         newMsg = true;
                         break;
+                    case PART::control::instrumentType:
+                        if (write)
+                        {
+                            synth->part[npart]->info.Ptype = value;
+                            guiTo = true;
+                        }
+                        else
+                            value = synth->part[npart]->info.Ptype;
+                        getData->data.source &= ~TOPLEVEL::action::lowPrio;
+                        break;
                     case PART::control::defaultInstrumentCopyright:
                         std::string name = synth->getRuntime().ConfigDir + "/copyright.txt";
                         if (parameter == 0) // load
@@ -3554,6 +3564,8 @@ void InterChange::commandPart(CommandBlock *getData)
             ; // not yet
             break;
         case PART::control::instrumentName: // done elsewhere
+            break;
+        case PART::control::instrumentType:// done elsewhere
             break;
         case PART::control::defaultInstrumentCopyright: // done elsewhere
             ;

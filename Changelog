@@ -1,5 +1,10 @@
 yoshimi 1.6.0 M
 
+2019-9-7 Will
+* CLI can now set instrument type.
+* Removed outdated 'Yoshimi Control Numbers.txt'
+* Updated 'Yoshimi Control Numbers.ods'
+
 2019-9-6 Will
 * A corrupted config file no longer aborts.
   A message is given stating defaults are used.

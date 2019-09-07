@@ -591,6 +591,7 @@ namespace PART // usage PART::control::volume
         instrumentCopyright = 220,
         instrumentComments,
         instrumentName,
+        instrumentType,
         defaultInstrumentCopyright, // this needs to be split into two for load/save
         resetAllControllers, // this needs to bump up 1 to make space
         partBusy = 252 // internally generated - read only

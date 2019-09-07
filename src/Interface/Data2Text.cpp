@@ -1471,6 +1471,10 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
             showValue = false;
             contstr = "Name is: " + textMsgBuffer.fetch(value_int);
             break;
+        case PART::control::instrumentType:
+            showValue = false;
+            contstr = "Type is: " + type_list[value_int];
+            break;
         case PART::control::defaultInstrumentCopyright:
             showValue = false;
             contstr = "Copyright ";

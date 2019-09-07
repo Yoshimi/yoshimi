@@ -1728,6 +1728,8 @@ float Part::getLimits(CommandBlock *getData)
             break;
         case PART::control::instrumentName:
             break;
+            case PART::control::instrumentType:
+            break;
         case PART::control::defaultInstrumentCopyright:
             break;
 

@@ -55,16 +55,14 @@ decl {\#include "MasterUI.h"} {private global
 }
 
 decl {\#include "Misc/FormatFuncs.h"
-    using func::asString;
-} {private local
+    using func::asString;} {private local
 }
 
 decl {\#include "Misc/TextMsgBuffer.h"
 
-    namespace \{ // Implementation details...
+    namespace { // Implementation details...
         TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
-    \}
-} {private local
+    }} {private local
 }
 
 class PartSysEffSend {: {public Fl_Group}
@@ -1459,15 +1457,15 @@ Offset}
           code0 {o->maximum_size(MAX_INFO_TEXT_SIZE);}
           code1 {o->value(part->info.Pcomments.c_str());}
         }
-        Fl_Choice {} {
+        Fl_Choice instrumentType {
           label {Type:}
           callback {//
-          part->info.Ptype=o->value();}
+              send_data(TOPLEVEL::action::lowPrio, PART::control::instrumentType, o->value(), TOPLEVEL::type::Integer);}
           xywh {5 25 155 20} down_box BORDER_BOX labelfont 1 labelsize 11 align 5 textsize 10
           code0 {o->value(part->info.Ptype);}
         } {
           MenuItem {} {
-            label {--------------------------}
+            label {undefined}
             xywh {20 20 100 20} labelfont 1 labelsize 11
           }
           MenuItem {} {
@@ -2121,6 +2119,9 @@ Offset}
                 checkEngines(text);
             else
                 partkititem[kititem]->labelbutton->copy_label(text.c_str());
+            break;
+        case PART::control::instrumentType:
+            instrumentType->value(value);
             break;
         case PART::control::defaultInstrumentCopyright:
             if(parameter == 0)

@@ -4827,6 +4827,24 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
         }
         return sendNormal( synth, TOPLEVEL::action::lowPrio, 0, controlType, PART::control::instrumentName, npart, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
     }
+    if (input.matchnMove(3,"type"))
+    {
+        if (input.lineEnd(controlType))
+            return REPLY::value_msg;
+        int pos = 0;
+        if (controlType == TOPLEVEL::type::Write)
+        {
+            string name = type_list[pos];
+            while (name != "end" && !input.matchnMove(3, name.c_str()))
+            {
+                ++ pos;
+                name = type_list[pos];
+            }
+            if (name == "end")
+                pos = 0; // undefined
+        }
+        return sendNormal(synth, TOPLEVEL::action::lowPrio, pos, controlType, PART::control::instrumentType, npart);
+    }
     return REPLY::op_msg;
 }
 
