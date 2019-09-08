@@ -1465,7 +1465,8 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
             ; // not yet
             break;
         case PART::control::instrumentComments:
-            ; // not yet
+            showValue = false;
+            contstr = "Comment: " + textMsgBuffer.fetch(value_int);
             break;
         case PART::control::instrumentName:
             showValue = false;

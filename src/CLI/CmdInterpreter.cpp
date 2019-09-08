@@ -4825,7 +4825,19 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
             else
                 miscmsg = textMsgBuffer.push(name);
         }
-        return sendNormal( synth, TOPLEVEL::action::lowPrio, 0, controlType, PART::control::instrumentName, npart, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
+        return sendNormal(synth, TOPLEVEL::action::lowPrio, 0, controlType, PART::control::instrumentName, npart, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
+    }
+    if (input.matchnMove(3,"info"))
+    {
+        string name;
+        if (controlType == TOPLEVEL::type::Write)
+        {
+            name = string{input};
+            if (name.size() < 2)
+                return REPLY::value_msg;
+        }
+        unsigned char miscmsg = textMsgBuffer.push(name);
+        return sendNormal(synth, TOPLEVEL::action::lowPrio, 0, controlType, PART::control::instrumentComments, npart, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
     }
     if (input.matchnMove(3,"type"))
     {

@@ -206,6 +206,36 @@ inline int findSplitPoint(std::string name)
     return chk;
 }
 
+/*
+ * This is principally used to format strings for the GUI
+ * where they are fitted into windows with limited width.
+ * However, it may be useful elsewhere.
+ */
+inline std::string formatTextLines(std::string text, size_t maxLen)
+{
+    size_t lineLen = text.length();
+    if (lineLen < maxLen)
+        return text;
+    const char lineEnd = char(10);
+    size_t pos = maxLen;
+    size_t oldPos = 0;
+
+    while (pos < lineLen && pos > oldPos)
+    {
+        pos = text.rfind(' ', pos);
+        if(pos < oldPos)
+        {
+            pos = oldPos + maxLen + 1; // inserted char
+            text.insert(pos, 1, lineEnd);
+        }
+        else
+            text.replace(pos, 1, 1, lineEnd);
+        oldPos = pos;
+        pos += maxLen + 1; // replaced char
+        lineLen += 1;
+    }
+    return text;
+}
 
 }//(End)namespace func
 #endif /*FORMATFUNCS_H*/

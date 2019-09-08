@@ -3,6 +3,7 @@ yoshimi 1.6.0 M
 2019-9-8 Will
 * BugFix: Loading files failed with mxml V 3.1 :(
 * Set version as 1.6.0.1
+* CLI can now set instrument comments.
 
 2019-9-7 Will
 * CLI can now set instrument type.

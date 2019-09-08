@@ -1072,6 +1072,17 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                             getData->data.source &= ~TOPLEVEL::action::lowPrio;
                         }
                         break;
+                    case PART::control::instrumentComments:
+                        if (write)
+                        {
+                            synth->part[npart]->info.Pcomments = text;
+                            guiTo = true;
+                        }
+                        else
+                            text = synth->part[npart]->info.Pcomments;
+                        getData->data.source &= ~TOPLEVEL::action::lowPrio;
+                        newMsg = true;
+                        break;
                     case PART::control::instrumentName: // part or kit item names
                         if (kititem == UNUSED)
                         {
@@ -3560,8 +3571,8 @@ void InterChange::commandPart(CommandBlock *getData)
         case PART::control::instrumentCopyright:
             ; // not yet
             break;
-        case PART::control::instrumentComments:
-            ; // not yet
+        case PART::control::instrumentComments: // done elsewhere
+            ;
             break;
         case PART::control::instrumentName: // done elsewhere
             break;
