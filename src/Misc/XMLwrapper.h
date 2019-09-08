@@ -69,6 +69,10 @@ class XMLwrapper
         // this must be called after each branch (nodes that contains child nodes)
         void endbranch(void);
 
+        // we always save with a blank first line
+        const char *removeBlanks(const char *c)
+        {while(isspace(*c)) ++c; return c;}
+
         // LOAD from XML
         bool loadXMLfile(const std::string& filename); // true if loaded ok
 

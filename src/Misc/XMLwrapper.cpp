@@ -460,7 +460,6 @@ void XMLwrapper::endbranch()
     node = pop();
 }
 
-
 // LOAD XML members
 bool XMLwrapper::loadXMLfile(const std::string& filename)
 {
@@ -481,7 +480,7 @@ bool XMLwrapper::loadXMLfile(const std::string& filename)
         synth->getRuntime().Log("XML: Could not load xml file: " + filename, 2);
          return false;
     }
-    root = tree = mxmlLoadString(NULL, xmldata, MXML_OPAQUE_CALLBACK);
+    root = tree = mxmlLoadString(NULL, removeBlanks(xmldata), MXML_OPAQUE_CALLBACK);
     delete [] xmldata;
     if (!tree)
     {
