@@ -195,7 +195,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
      * is no issue with +- zero.
      */
 
-    cerr.precision(4);
+    std::cerr.precision(4);
     bRuntimeSetupCompleted = Setup(argc, argv);
 }
 
@@ -305,7 +305,7 @@ void Config::flushLog(void)
     {
         while (LogList.size())
         {
-            cerr << LogList.front() << endl;
+            std::cerr << LogList.front() << std::endl;
             LogList.pop_front();
         }
     }
@@ -698,7 +698,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     if (tempRoot == 0)
         tempRoot = xml->getpar("root_current_ID", 0, 0, 127);
     //else
-        //cout << "root? " << xml->getpar("root_current_ID", 0, 0, 127) << endl;
+        //cout << "root? " << xml->getpar("root_current_ID", 0, 0, 127) << std::endl;
     if (tempBank == 0)
     tempBank = xml->getpar("bank_current_ID", 0, 0, 127);
     xml->exitbranch(); // CONFIGURATION
@@ -861,10 +861,10 @@ void Config::Log(const string &msg, char tostderr)
     if (showGui && !(tostderr & 1) && toConsole)
         LogList.push_back(msg);
     else if (!tostderr & 1)
-        cout << msg << endl; // normal log
+        std::cout << msg << std::endl; // normal log
 
     else
-        cerr << msg << endl; // error log
+        std::cerr << msg << std::endl; // error log
 }
 
 void Config::LogError(const string &msg)
@@ -1324,7 +1324,7 @@ void GuiThreadMsg::processGuiMessages()
         {
             // This *defines* guiMaster
             if (!guiMaster)
-                cerr << "Error starting Main UI!" << endl;
+                std::cerr << "Error starting Main UI!" << std::endl;
             else
                 guiMaster->Init(guiMaster->getSynth()->getWindowTitle().c_str());
         }

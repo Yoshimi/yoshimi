@@ -7,6 +7,8 @@ yoshimi 1.6.0 M
   It doesn't work (in either location), but nor
   does V 1.4.1 where it used to, and was first
   implemented.
+* BugFix: Config.cpp orphaned cout, cerr, endl
+  when 'using' changed in header.
 
 2019-9-8 Will
 * BugFix: Loading files failed with mxml V 3.1 :(
