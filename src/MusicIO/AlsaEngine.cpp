@@ -17,7 +17,6 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified May 2019
 */
 
 #if defined(HAVE_ALSA)
@@ -86,13 +85,13 @@ bail_out:
 
 bool AlsaEngine::openMidi(void)
 {
-    midi.device = synth->getRuntime().midiDevice;
     const char* port_name = "input";
     int port_num;
     if (snd_seq_open(&midi.handle, "default", SND_SEQ_OPEN_INPUT, SND_SEQ_NONBLOCK) != 0)
     {
         synth->getRuntime().Log("Failed to open alsa midi");
-        goto bail_out;
+        Close();
+        return false;
     }
     snd_seq_client_info_t *seq_info;
     snd_seq_client_info_alloca(&seq_info);
@@ -123,26 +122,53 @@ bool AlsaEngine::openMidi(void)
     if (port_num < 0)
     {
         synth->getRuntime().Log("Failed to acquire alsa midi port");
-        goto bail_out;
+        Close();
+        return false;
     }
-    if (!midi.device.empty() && midi.device != "default")
-    {
-        bool midiSource = false;
-        if (snd_seq_parse_address(midi.handle,&midi.addr,midi.device.c_str()) == 0)
-        {
-            midiSource = (snd_seq_connect_from(midi.handle, port_num, midi.addr.client, midi.addr.port) == 0);
-        }
-        if (!midiSource)
-        {
-            synth->getRuntime().Log("Didn't find alsa MIDI source '" + midi.device + "'");
-            synth->getRuntime().midiDevice = "";
-        }
-    }
-    return true;
 
-bail_out:
-    Close();
-    return false;
+    std::string midilist = synth->getRuntime().midiDevice;
+    std::string found = "";
+    if (!midilist.empty() && midilist != "default")
+    {
+        while (!midilist.empty())
+        {
+            string tmp;
+            while (midilist.find(' ') == 0 || midilist.find(',') == 0)
+                midilist.erase(0,1); // make entry clean
+            if (midilist.empty())
+                break;
+
+            size_t pos = midilist.find(',');
+            if (pos == std::string::npos)
+            {
+                tmp = midilist;
+                midilist = "";
+            }
+            else
+            {
+                tmp = midilist.substr(0, pos);
+                midilist = midilist.substr(pos + 1);
+            }
+            pos = tmp.find_last_not_of(' ');
+            tmp = tmp.substr(0, pos + 1);
+            midi.device = tmp;
+
+            bool midiSource = false;
+            if (snd_seq_parse_address(midi.handle,&midi.addr,midi.device.c_str()) == 0)
+            {
+                midiSource = (snd_seq_connect_from(midi.handle, port_num, midi.addr.client, midi.addr.port) == 0);
+            }
+            if (!midiSource)
+            {
+                synth->getRuntime().Log("Didn't find alsa MIDI source '" + midi.device + "'");
+            }
+            else
+                found += (", " + tmp);
+        }
+    }
+    if (found.substr(0, 2) == ", ")
+        synth->getRuntime().midiDevice = found.substr(2);
+    return true;
 }
 
 

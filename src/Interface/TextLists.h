@@ -198,7 +198,7 @@ static std::string configlist [] = {
 
     "MIdi <s>",            "* connection type (Jack, Alsa)",
     "AUdio <s>",           "* connection type (Jack, Alsa)",
-    "ALsa Midi <s>",       "* name of source",
+    "ALsa Midi <s>",       "* comma separated source name list",
     "ALsa Audio <s>",      "* name of hardware device",
     "ALsa Sample <n>",     "* rate (0 = 192000, 1 = 96000, 2 = 48000, 3 = 44100)",
     "Jack Midi <s>",       "* name of source",
