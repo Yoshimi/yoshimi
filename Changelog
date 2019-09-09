@@ -3,6 +3,10 @@ yoshimi 1.6.0 M
 2019-9-9 Will
 * ALSA can autoconnect to multiple MIDI inputs :)
   Now uses a comma separated list.
+* Moved Jack MIDI aoutconnect to correct place.
+  It doesn't work (in either location), but nor
+  does V 1.4.1 where it used to, and was first
+  implemented.
 
 2019-9-8 Will
 * BugFix: Loading files failed with mxml V 3.1 :(

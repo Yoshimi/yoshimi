@@ -17,10 +17,10 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified May 2019
 */
 
 #include <errno.h>
+#include <iostream>
 
 #include <jack/midiport.h>
 #include <jack/thread.h>
@@ -167,17 +167,24 @@ bool JackEngine::Start(void)
         synth->getRuntime().Log("Failed to activate jack client");
         goto bail_out;
     }
+    /*
+     * TODO fix this - now moved to where it should be.
+     * Shows identical results but doesn't connect.
+     * Original 1.4.1 version also fails - it used to work.
+     */
 
     // style-wise I think the next bit is the wrong place
-    if (synth->getRuntime().midiEngine  == jack_midi
-      && synth->getRuntime().midiDevice.size()
-      && synth->getRuntime().midiDevice != "default"
-      && jack_connect(jackClient,synth->getRuntime().midiDevice.c_str(),jack_port_name(midi.port)))
+    /*if (synth->getRuntime().midiEngine  == jack_midi
+      && !synth->getRuntime().midiDevice.empty()
+      && synth->getRuntime().midiDevice != "default")
     {
-        synth->getRuntime().Log("Didn't find jack MIDI source '"
-        + synth->getRuntime().midiDevice + "'", 1);
-        synth->getRuntime().midiDevice = "";
-    }
+        if(jack_connect(jackClient, synth->getRuntime().midiDevice.c_str(), jack_port_name(midi.port)))
+        {
+            synth->getRuntime().Log("Didn't find jack MIDI source '"
+            + synth->getRuntime().midiDevice + "'", 1);
+            synth->getRuntime().midiDevice = "";
+        }
+    }*/
     return true;
 
 bail_out:
@@ -297,6 +304,15 @@ bool JackEngine::openMidi(void)
         synth->getRuntime().Log("Failed to register jack midi port");
         return false;
     }
+
+    std::cout << "client " << jackClient<< "  device " << synth->getRuntime().midiDevice << "  port " << jack_port_name(midi.port) << std::endl;
+    if(jack_connect(jackClient, synth->getRuntime().midiDevice.c_str(), jack_port_name(midi.port)))
+        {
+            synth->getRuntime().Log("Didn't find jack MIDI source '"
+            + synth->getRuntime().midiDevice + "'");
+            //synth->getRuntime().midiDevice = "";
+        }
+
     return true;
 }
 
