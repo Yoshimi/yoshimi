@@ -879,7 +879,7 @@ void Config::StartupReport(string clientName)
     if (fullInfo)
     {
         Log(argline);
-        Log("Build Number " + to_string(BUILD_NUMBER), 1);
+        Log("Build Number " + std::to_string(BUILD_NUMBER), 1);
     }
     Log("Clientname: " + clientName);
     string report = "Audio: ";
@@ -968,7 +968,7 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
                 int prio = rtprio - priodec;
                 if (prio < 1)
                     prio = 1;
-                Log(name + " priority is " + to_string(prio), 1);
+                Log(name + " priority is " + std::to_string(prio), 1);
                 prio_params.sched_priority = prio;
                 if ((chk = pthread_attr_setschedparam(&attr, &prio_params)))
                 {

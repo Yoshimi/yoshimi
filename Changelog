@@ -9,6 +9,9 @@ yoshimi 1.6.0 M
   implemented.
 * BugFix: Config.cpp orphaned cout, cerr, endl
   when 'using' changed in header.
+* BugFix: Config.cpp orphaned to_string
+  when 'using' changed in header.
+* Improved CLI part instrument type controls.
 
 2019-9-8 Will
 * BugFix: Loading files failed with mxml V 3.1 :(

@@ -2389,13 +2389,12 @@ int CmdInterpreter::commandGroup(Parser& input)
         }
         return REPLY::done_msg;
     }
-
     string name = string{input};
     value = stringNumInList(name, instrumentGroupType, 2) + 1;
     //std::cout << value << std::endl;
     if (value < 1)
         return REPLY::range_msg;
-
+    synth->getRuntime().Log("\n" + type_list[int(value - 1)] + " Instruments");
     list<string> msg;
     /*
     * Having two lists is messy, but the list routine clears 'msg' and
@@ -5297,6 +5296,19 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
                 return REPLY::done_msg;
             }
             return Reply{commandGroup(input)};
+        }
+        else if (input.matchnMove(1, "type"))
+        {
+            synth->getRuntime().Log("Instrument Types:");
+            int idx = 0;
+            std::string name = type_list[idx];
+            while ( name != "end")
+            {
+                synth->getRuntime().Log(name);
+                ++ idx;
+                name = type_list[idx];
+            }
+            return Reply::DONE;
         }
         return Reply{commandList(input)};
     }
