@@ -850,6 +850,7 @@ static std::string scalelist [] = {
 
 static std::string loadlist [] = {
     "Instrument <s>",           "instrument to current part from named file",
+    "Default",                   "default copyright to current part",
     "SCale <s>",                "scale settings from named file",
     "VEctor [n] <s>",           "vector to channel n (or saved) from named file",
     "Patchset <s>",             "complete set of instruments from named file",
@@ -860,6 +861,7 @@ static std::string loadlist [] = {
 
 static std::string savelist [] = {
     "Instrument <s>",           "current part to named file",
+    "Default",                   "current part copyright as default",
     "SCale <s>",                "current scale settings to named file",
     "VEctor <n> <s>",           "vector on channel n to named file",
     "Patchset <s>",             "complete set of instruments to named file",

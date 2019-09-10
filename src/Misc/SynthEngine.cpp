@@ -23,7 +23,6 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified May 2019
 */
 
 #include <sys/time.h>
@@ -1279,9 +1278,9 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
     msg_buf.push_back("  Number of available parts "
                     + asString(Runtime.NumAvailableParts));
 
-    msg_buf.push_back("  Current part " + asString(Runtime.currentPart));
+    msg_buf.push_back("  Current part " + asString(Runtime.currentPart + 1));
 
-    msg_buf.push_back("  Current part's channel " + asString((int)part[Runtime.currentPart]->Prcvchn));
+    msg_buf.push_back("  Current part's channel " + asString((int)part[Runtime.currentPart]->Prcvchn + 1));
 
     if (Runtime.midi_bank_root > 119)
         msg_buf.push_back("  MIDI Root Change off");

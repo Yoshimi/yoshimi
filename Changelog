@@ -2,6 +2,10 @@ yoshimi 1.6.0 M
 
 2019-9-10 Will
 * CLI can now set copyright field.
+* CLI can now load/save default copyright.
+* Corrected config list values.
+  part and channel numbers off by 1.
+* Updated docs.
 
 2019-9-9 Will
 * ALSA can autoconnect to multiple MIDI inputs :)
