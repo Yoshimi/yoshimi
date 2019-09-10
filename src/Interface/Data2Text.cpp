@@ -1462,7 +1462,8 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
             break;
 
         case PART::control::instrumentCopyright:
-            ; // not yet
+            showValue = false;
+            contstr = "Copyright: " + textMsgBuffer.fetch(value_int);
             break;
         case PART::control::instrumentComments:
             showValue = false;

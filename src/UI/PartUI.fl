@@ -1444,7 +1444,7 @@ Offset}
         }
         Fl_Input copyright {
           callback {//
-          part->info.Pauthor = string(o->value());}
+           send_data(TOPLEVEL::action::lowPrio, PART::control::instrumentCopyright, 0, TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(o->value())));}
           xywh {5 49 385 55} type Multiline color 26 labelsize 12 align 9
           code0 {o->maximum_size(MAX_INFO_TEXT_SIZE);}
           code1 {o->value(part->info.Pauthor.c_str());}
@@ -1452,8 +1452,7 @@ Offset}
         Fl_Input commentField {
           label Comments
           callback {//
-          send_data(TOPLEVEL::action::lowPrio, PART::control::instrumentComments, 0, TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(o->value())));
-          //part->info.Pcomments = string(o->value());}
+          send_data(TOPLEVEL::action::lowPrio, PART::control::instrumentComments, 0, TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(o->value())));}
           xywh {5 123 385 91} type Multiline color 26 labelsize 12 align 5
           code0 {o->maximum_size(MAX_INFO_TEXT_SIZE);}
           code1 {o->value(func::formatTextLines(part->info.Pcomments, 58).c_str());}
@@ -2115,6 +2114,9 @@ Offset}
             masterbandwidth->value(value);
             break;
 
+        case PART::control::instrumentCopyright:
+            copyright->value(func::formatTextLines(text, 58).c_str());
+            break;
         case PART::control::instrumentComments:
             commentField->value(func::formatTextLines(text, 58).c_str());
             break;

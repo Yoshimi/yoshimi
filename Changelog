@@ -1,5 +1,8 @@
 yoshimi 1.6.0 M
 
+2019-9-10 Will
+* CLI can now set copyright field.
+
 2019-9-9 Will
 * ALSA can autoconnect to multiple MIDI inputs :)
   Now uses a comma separated list.

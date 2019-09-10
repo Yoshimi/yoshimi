@@ -1072,6 +1072,17 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                             getData->data.source &= ~TOPLEVEL::action::lowPrio;
                         }
                         break;
+                    case PART::control::instrumentCopyright:
+                        if (write)
+                        {
+                            synth->part[npart]->info.Pauthor = text;
+                            guiTo = true;
+                        }
+                        else
+                            text = synth->part[npart]->info.Pauthor;
+                        getData->data.source &= ~TOPLEVEL::action::lowPrio;
+                        newMsg = true;
+                        break;
                     case PART::control::instrumentComments:
                         if (write)
                         {
@@ -3568,11 +3579,9 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->ctl->bandwidth.data;
             break;
 
-        case PART::control::instrumentCopyright:
-            ; // not yet
+        case PART::control::instrumentCopyright: // done elsewhere
             break;
         case PART::control::instrumentComments: // done elsewhere
-            ;
             break;
         case PART::control::instrumentName: // done elsewhere
             break;
