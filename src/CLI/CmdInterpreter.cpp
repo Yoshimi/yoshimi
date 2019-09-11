@@ -5768,7 +5768,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             return Reply::DONE;
         }
         if  (input.matchnMove(1, "default"))
-            sendNormal(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, PART::control::defaultInstrumentCopyright, TOPLEVEL::section::part1 + npart, UNUSED, UNUSED, UNUSED, 0);
+            return sendNormal(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, PART::control::defaultInstrumentCopyright, TOPLEVEL::section::part1 + npart, UNUSED, UNUSED, UNUSED, 0);
         return Reply::what("load");
     }
 
@@ -5838,7 +5838,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             return Reply::DONE;
         }
         if  (input.matchnMove(1, "default"))
-            sendNormal(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, PART::control::defaultInstrumentCopyright, TOPLEVEL::section::part1 + npart, UNUSED, UNUSED, UNUSED, 1);
+            return sendNormal(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, PART::control::defaultInstrumentCopyright, TOPLEVEL::section::part1 + npart, UNUSED, UNUSED, UNUSED, 1);
         return Reply::what("save");
     }
 

@@ -1,5 +1,8 @@
 yoshimi 1.6.0 M
 
+2019-9-11 Will
+* Forgot CLI 'return' for default copyright :(
+
 2019-9-10 Will
 * CLI can now set copyright field.
 * CLI can now load/save default copyright.
