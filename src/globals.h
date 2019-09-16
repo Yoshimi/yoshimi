@@ -313,7 +313,7 @@ namespace BANK // usage BANK::control::
         selectFirstInstrumentToSwap,
         selectSecondInstrumentAndSwap,
 
-        selectBank = 16, // not yet
+        selectBank = 16,
         renameBank, // not yet
         saveBank, // not yet
         createBank, // not yet

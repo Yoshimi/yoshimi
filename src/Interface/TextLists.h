@@ -29,7 +29,7 @@
  * is set so you can then step back up the level tree.
  * It is also possible to zero it so that you immediately go to
  * the top level. Therefore, the sequence is important.
- * 18 bits are currently defined out of a possible 32.
+ * 19 bits are currently defined out of a possible 32.
  *
  * Top, AllFX and InsFX MUST be the first three
  */
@@ -40,6 +40,7 @@ namespace LEVEL{
         AllFX = 1, // bits from here on
         InsFX,
         Part,
+        Bank,
         Config,
         Vector,
         Scale,
@@ -215,6 +216,14 @@ static std::string configlist [] = {
     "Log [s]",             "incoming MIDI CCs (ON, {other})",
     "SHow [s]",            "GUI MIDI learn editor (ON, {other})",
     "end"
+};
+
+static std::string banklist [] = {
+    "<n>",                   "set current bank to number n",
+    "Root <n>",              "set current bank root number",
+    "Change <n1> <n2>",      "change bank ID from n1 to n2",
+    "Change Root <n1> <n2>", "change bank root ID from n1 to n2",
+    "Swap <n1> [n2]",        "Swap current bank with bank n1, (opt. in root n2)",
 };
 
 static std::string partlist [] = {

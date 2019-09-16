@@ -172,6 +172,10 @@ string CmdInterpreter::buildStatus(bool showPartDetails)
 
     if (bitTest(context, LEVEL::Scale))
         result += " Scale ";
+    else if (bitTest(context, LEVEL::Bank))
+    {
+        result += " Bank " + to_string(int(readControl(synth, 0, BANK::control::selectBank, TOPLEVEL::section::bank)));
+    }
     else if (bitTest(context, LEVEL::Config))
         result += " Config ";
     else if (bitTest(context, LEVEL::Vector))
@@ -1351,7 +1355,6 @@ int CmdInterpreter::midiControllers(Parser& input, unsigned char controlType)
 {
     int value = -1;
     int cmd = -1;
-    std::cout << "here" << std::endl;
     if (input.matchnMove(2, "volume"))
     {
         value = input.toggle();
@@ -3020,6 +3023,21 @@ int CmdInterpreter::commandVector(Parser& input, unsigned char controlType)
             return REPLY::value_msg;
     }*/
 
+    return REPLY::op_msg;
+}
+
+
+int CmdInterpreter::commandBank(Parser& input, unsigned char controlType)
+{
+    bitSet(context, LEVEL::Bank);
+    if (input.isdigit())
+    {
+        int tmp = string2int127(input);
+        input.skipChars();
+        sendDirect(synth, 0, tmp, controlType, BANK::control::selectBank, TOPLEVEL::section::bank);
+        if (input.lineEnd(controlType))
+            return REPLY::done_msg;
+    }
     return REPLY::op_msg;
 }
 
@@ -4905,6 +4923,8 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
  // these must all be highest (relevant) bit first
     if (bitTest(context, LEVEL::Config))
         return commandConfig(input, controlType);
+    if (bitTest(context, LEVEL::Bank))
+        return commandBank(input, controlType);
     if (bitTest(context, LEVEL::Scale))
         return commandScale(input, controlType);
     if (bitTest(context, LEVEL::Envelope))
@@ -4946,6 +4966,13 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
         context = LEVEL::Top;
         bitSet(context, LEVEL::Config);
         return commandConfig(input, controlType);
+    }
+
+    if (input.matchnMove(2, "bank"))
+    {
+        context = LEVEL::Top;
+        bitSet(context, LEVEL::Bank);
+        return commandBank(input, controlType);
     }
 
     if (input.matchnMove(1, "scale"))

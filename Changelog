@@ -1,5 +1,10 @@
 yoshimi 1.6.0 M
 
+2019-9-16 Will
+* Started revision of bank controls.
+  Some CLI stuff not yet done properly.
+* Updated docs.
+
 2019-9-11 Will
 * Forgot CLI 'return' for default copyright :(
 

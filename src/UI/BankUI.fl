@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <iostream>} {public local
@@ -301,7 +301,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
 }
 
-class BankUI {selected : {public BankProcess_, RootProcess_}
+class BankUI {: {public BankProcess_, RootProcess_}
 } {
   Function {make_window()} {} {
     Fl_Window instrumentuiwindow {
@@ -1008,6 +1008,10 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
             if (message.find("FAILED") != std::string::npos)
                 if(source == TOPLEVEL::action::fromGUI)
                     fl_alert("%s",message.c_str());
+            rescan_for_banks(false);
+            break;
+
+        case BANK::control::selectBank:
             rescan_for_banks(false);
             break;
 

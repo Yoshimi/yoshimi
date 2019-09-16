@@ -2931,7 +2931,12 @@ void InterChange::commandBank(CommandBlock *getData)
             break;
         }
         case BANK::control::selectBank:
-            value_int = synth->getRuntime().currentBank; // currently read only
+            if (write)
+            {
+                synth->getBankRef().setCurrentBankID(value_int, true);
+                getData->data.value.F = synth->ReadBank(); // always return actual value
+            }
+            value_int = synth->ReadBank();
             break;
         case BANK::control::selectRoot:
             value_int = synth->getRuntime().currentRoot; // currently read only

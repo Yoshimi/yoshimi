@@ -852,6 +852,10 @@ string DataText::resolveBank(CommandBlock *getData, bool)
             contstr = "Swap" + name;
             break;
 
+        case BANK::control::selectBank:
+            contstr = "selected " + to_string(value_int);
+            break;
+
         case BANK::control::selectFirstBankToSwap:
             contstr = "Set Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine) + " for swap";
             break;
