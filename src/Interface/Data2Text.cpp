@@ -855,9 +855,6 @@ string DataText::resolveBank(CommandBlock *getData, bool)
         case BANK::control::selectBank:
             contstr = name;
             break;
-        case BANK::control::selectRoot:
-            contstr = name;
-            break;
 
         case BANK::control::selectFirstBankToSwap:
             contstr = "Set Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine) + " for swap";
@@ -869,6 +866,14 @@ string DataText::resolveBank(CommandBlock *getData, bool)
             break;
         default:
             contstr = "Unrecognised";
+            break;
+
+        case BANK::control::selectRoot:
+            contstr = name;
+            break;
+
+        case BANK::control::changeRootId:
+            contstr = "Root ID changed " + to_string(engine) + " > " + to_string(value_int);
             break;
     }
     return ("Bank " + contstr);

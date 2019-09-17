@@ -3056,6 +3056,12 @@ int CmdInterpreter::commandBank(Parser& input, unsigned char controlType)
         if (input.lineEnd(controlType))
             return REPLY::done_msg;
     }
+    if (input.matchnMove(2, "ID"))
+    {
+        int tmp = string2int127(input);
+        if (isRoot)
+            return sendNormal(synth, TOPLEVEL::action::lowPrio, tmp, controlType, BANK::control::changeRootId, TOPLEVEL::section::bank);
+    }
     return REPLY::op_msg;
 }
 

@@ -218,10 +218,9 @@ static std::string configlist [] = {
 };
 
 static std::string banklist [] = {
-    "<n>",                   "set current bank to number n",
-    "Root <n>",              "set current bank root number",
-//    "Change <n1> <n2>",      "change bank ID from n1 to n2",
-//    "Change Root <n1> <n2>", "change bank root ID from n1 to n2",
+    "<n>",                 "set current bank to number n",
+    "Root <n>",            "set current bank root number",
+    "Root ID <n>",         "change current bank root ID to n",
 //    "Swap <n1> [n2]",        "Swap current bank with bank n1, (opt. in root n2)",
     "end"
 };

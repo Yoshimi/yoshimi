@@ -5,6 +5,8 @@ yoshimi 1.6.0 M
   Listing not done.
 * Activated CLI bank lisiting for defined entries.
 * Converted GUI entries for bank & root selection.
+* Implemented change root ID for CLI.
+* Converted GUI entry for change root ID.
 
 2019-9-16 Will
 * Started revision of bank controls.

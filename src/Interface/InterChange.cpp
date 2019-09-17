@@ -812,6 +812,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                 guiTo = true;
             break;
         }
+
         case TOPLEVEL::section::bank: // instrument / bank
         {
             switch (control)
@@ -866,17 +867,6 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     text = textMsgBuffer.fetch(synth->setRootBank(UNUSED, value) & NO_MSG);
                     newMsg = true;
                     break;
-
-                case BANK::control::selectRoot:
-                {
-                    int msgID = synth->setRootBank(value, UNUSED);
-                    if (msgID < NO_MSG)
-                        synth->saveBanks(); // do we need this when only selecting?
-                    text = textMsgBuffer.fetch(msgID & NO_MSG);
-                    newMsg = true;
-                    break;
-                }
-
                 case BANK::control::selectFirstBankToSwap:
                     if(engine == UNUSED)
                     {
@@ -898,10 +888,28 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     newMsg = true;
                     guiTo = true;
                     break;
+
+                case BANK::control::selectRoot:
+                {
+                    int msgID = synth->setRootBank(value, UNUSED);
+                    if (msgID < NO_MSG)
+                        synth->saveBanks(); // do we need this when only selecting?
+                    text = textMsgBuffer.fetch(msgID & NO_MSG);
+                    newMsg = true;
+                    break;
+                }
+                case BANK::control::changeRootId:
+                {
+                    if (engine == UNUSED)
+                        getData->data.engine = synth->getRuntime().currentRoot;
+                    synth->bank.changeRootID(getData->data.engine, value);
+                    synth->saveBanks();
+                }
             }
             getData->data.source &= ~TOPLEVEL::action::lowPrio;
             break;
         }
+
         case TOPLEVEL::section::config:
         {
             switch (control)

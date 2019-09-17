@@ -905,10 +905,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         }
         if (selectedRootID >= 0)
         {
-            synth->getBankRef().changeRootID(selectedRootID, tmp);
-            synth->saveBanks();
-            readbankcfg();
-            rescan_for_banks(true);
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::changeRootId, tmp, TOPLEVEL::type::Integer, TOPLEVEL::section::bank, UNUSED, selectedRootID);
         }
         oldrootID = tmp;
         activatebutton_rootdir(false);
@@ -1005,10 +1002,6 @@ class BankUI {: {public BankProcess_, RootProcess_}
         case BANK::control::selectBank:
             rescan_for_banks(false);
             break;
-        case BANK::control::selectRoot:
-            readbankcfg();
-            rescan_for_banks(false);
-            break;
 
         case BANK::control::selectFirstBankToSwap:
             break;
@@ -1016,6 +1009,15 @@ class BankUI {: {public BankProcess_, RootProcess_}
             if (message.find("FAILED") != std::string::npos)
                 if(source == TOPLEVEL::action::fromGUI)
                     fl_alert("%s",message.c_str());
+            rescan_for_banks(false);
+            break;
+
+        case BANK::control::selectRoot:
+            readbankcfg();
+            rescan_for_banks(false);
+            break;
+        case BANK::control::changeRootId:
+            readbankcfg();
             rescan_for_banks(false);
             break;
     }} {}
