@@ -853,7 +853,10 @@ string DataText::resolveBank(CommandBlock *getData, bool)
             break;
 
         case BANK::control::selectBank:
-            contstr = "selected " + to_string(value_int);
+            contstr = name;
+            break;
+        case BANK::control::selectRoot:
+            contstr = name;
             break;
 
         case BANK::control::selectFirstBankToSwap:

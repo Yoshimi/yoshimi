@@ -174,7 +174,7 @@ string CmdInterpreter::buildStatus(bool showPartDetails)
         result += " Scale ";
     else if (bitTest(context, LEVEL::Bank))
     {
-        result += " Bank " + to_string(int(readControl(synth, 0, BANK::control::selectBank, TOPLEVEL::section::bank)));
+        result += " Bank " + to_string(int(readControl(synth, 0, BANK::control::selectBank, TOPLEVEL::section::bank))) + " (root " + to_string(int(readControl(synth, 0, BANK::control::selectRoot, TOPLEVEL::section::bank))) + ")";
     }
     else if (bitTest(context, LEVEL::Config))
         result += " Config ";
@@ -3030,11 +3030,18 @@ int CmdInterpreter::commandVector(Parser& input, unsigned char controlType)
 int CmdInterpreter::commandBank(Parser& input, unsigned char controlType)
 {
     bitSet(context, LEVEL::Bank);
+    int isRoot = false;
+    if (input.matchnMove(1, "root"))
+        isRoot = true;
+    if (input.lineEnd(controlType))
+        return REPLY::done_msg;
     if (input.isdigit())
     {
         int tmp = string2int127(input);
         input.skipChars();
-        sendDirect(synth, 0, tmp, controlType, BANK::control::selectBank, TOPLEVEL::section::bank);
+        if (isRoot)
+            return sendNormal(synth, TOPLEVEL::action::lowPrio, tmp, controlType, BANK::control::selectRoot, TOPLEVEL::section::bank);
+        return sendNormal(synth, TOPLEVEL::action::lowPrio, tmp, controlType, BANK::control::selectBank, TOPLEVEL::section::bank);
         if (input.lineEnd(controlType))
             return REPLY::done_msg;
     }
@@ -4968,7 +4975,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
         return commandConfig(input, controlType);
     }
 
-    if (input.matchnMove(2, "bank"))
+    if (input.matchnMove(1, "bank"))
     {
         context = LEVEL::Top;
         bitSet(context, LEVEL::Bank);
@@ -5034,38 +5041,6 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
     }
     if (bitTest(context, LEVEL::AllFX))
         return effects(input, controlType);
-
-    if (input.matchnMove(1, "root"))
-    {
-        if (controlType != TOPLEVEL::type::Write)
-        {
-            Runtime.Log("Root is ID " + asString(synth->ReadBankRoot()), 1);
-            return REPLY::done_msg;
-        }
-        if (!input.isAtEnd())
-        {
-            sendDirect(synth, TOPLEVEL::action::muteAndLoop, 255, controlType, 8, TOPLEVEL::section::midiIn, 0, UNUSED, string2int(input));
-            return REPLY::done_msg;
-        }
-        else
-            return REPLY::value_msg;
-    }
-
-    if (input.matchnMove(1, "bank"))
-    {
-        if (controlType != TOPLEVEL::type::Write)
-        {
-            Runtime.Log("Bank is ID " + asString(synth->ReadBank()), 1);
-            return REPLY::done_msg;
-        }
-        if (!input.isAtEnd())
-        {
-            sendDirect(synth, TOPLEVEL::action::muteAndLoop, 255, TOPLEVEL::type::Write, 8, TOPLEVEL::section::midiIn, 0, string2int(input));
-            return REPLY::done_msg;
-        }
-        else
-            return REPLY::value_msg;
-    }
 
     if (input.matchnMove(1, "volume"))
     {

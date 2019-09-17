@@ -862,6 +862,16 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     break;
                 }
 
+                case BANK::control::selectBank:
+                    text = textMsgBuffer.fetch(synth->setRootBank(UNUSED, value) & NO_MSG);
+                    newMsg = true;
+                    break;
+
+                case BANK::control::selectRoot:
+                    text = textMsgBuffer.fetch(synth->setRootBank(value, UNUSED) & NO_MSG);
+                    newMsg = true;
+                    break;
+
                 case BANK::control::selectFirstBankToSwap:
                     if(engine == UNUSED)
                     {
@@ -2930,12 +2940,7 @@ void InterChange::commandBank(CommandBlock *getData)
             }
             break;
         }
-        case BANK::control::selectBank:
-            if (write)
-            {
-                synth->getBankRef().setCurrentBankID(value_int, true);
-                getData->data.value.F = synth->ReadBank(); // always return actual value
-            }
+        case BANK::control::selectBank: // done elsewhere for write
             value_int = synth->ReadBank();
             break;
         case BANK::control::selectRoot:
@@ -6050,6 +6055,9 @@ float InterChange::returnLimits(CommandBlock *getData)
     if (npart == TOPLEVEL::section::config)
         return synth->getConfigLimits(getData);
 
+    if (npart == TOPLEVEL::section::bank)
+        return value;
+
     if (npart == TOPLEVEL::section::main)
         return synth->getLimits(getData);
 
@@ -6277,7 +6285,7 @@ float InterChange::returnLimits(CommandBlock *getData)
     min = 0;
     max = 127;
     def = 0;
-    std::cout << "Using unknown part number defaults" << std::endl;
+    std::cout << "Using unknown defaults" << std::endl;
 
     switch (request)
     {

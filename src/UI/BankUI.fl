@@ -1014,6 +1014,9 @@ class BankUI {: {public BankProcess_, RootProcess_}
         case BANK::control::selectBank:
             rescan_for_banks(false);
             break;
+        case BANK::control::selectRoot:
+            rescan_for_banks(false);
+            break;
 
         case BANK::control::selectFirstBankToSwap:
             break;

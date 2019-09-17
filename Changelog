@@ -1,5 +1,9 @@
 yoshimi 1.6.0 M
 
+2019-9-17 Will
+* CLI conversion done for select bank & root
+  Listing not done.
+
 2019-9-16 Will
 * Started revision of bank controls.
   Some CLI stuff not yet done properly.

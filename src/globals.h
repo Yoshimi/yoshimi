@@ -323,7 +323,7 @@ namespace BANK // usage BANK::control::
         importBank, // not yet
         exportBank, // not yet
 
-        selectRoot = 32, // not yet
+        selectRoot = 32,
         changeRootId // not yet
     };
 }
