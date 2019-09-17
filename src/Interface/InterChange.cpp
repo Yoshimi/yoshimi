@@ -868,9 +868,14 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     break;
 
                 case BANK::control::selectRoot:
-                    text = textMsgBuffer.fetch(synth->setRootBank(value, UNUSED) & NO_MSG);
+                {
+                    int msgID = synth->setRootBank(value, UNUSED);
+                    if (msgID < NO_MSG)
+                        synth->saveBanks(); // do we need this when only selecting?
+                    text = textMsgBuffer.fetch(msgID & NO_MSG);
                     newMsg = true;
                     break;
+                }
 
                 case BANK::control::selectFirstBankToSwap:
                     if(engine == UNUSED)

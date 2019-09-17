@@ -623,6 +623,8 @@ char CmdInterpreter::helpList(Parser& input, unsigned int local)
             listnum = LISTS::list;
         else if (input.matchnMove(1, "config"))
             listnum = LISTS::config;
+        else if (input.matchnMove(1, "bank"))
+            listnum = LISTS::bank;
         else if (input.matchnMove(1, "mlearn"))
             listnum = LISTS::mlearn;
         if (listnum != -1)
@@ -692,6 +694,8 @@ char CmdInterpreter::helpList(Parser& input, unsigned int local)
             listnum = LISTS::vector;
         else if (bitTest(local, LEVEL::Scale))
             listnum = LISTS::scale;
+        else if (bitTest(local, LEVEL::Bank))
+            listnum = LISTS::bank;
         else if (bitTest(local, LEVEL::Config))
             listnum = LISTS::config;
         else if (bitTest(local, LEVEL::Learn))
@@ -714,6 +718,7 @@ char CmdInterpreter::helpList(Parser& input, unsigned int local)
             msg.push_back("  SCale       ...             - scale (microtonal) operations");
             msg.push_back("  MLearn [n1] ...             - MIDI learn operations");
             msg.push_back("  COnfig      ...             - configuration settings");
+            msg.push_back("  BAnk        ...             - root and bank settings");
             msg.push_back("  LIst        ...             - various available parameters");
             msg.push_back("  LOad        ...             - load various files");
             msg.push_back("  SAve        ...             - save various files");
@@ -830,6 +835,10 @@ char CmdInterpreter::helpList(Parser& input, unsigned int local)
         case LISTS::list:
             msg.push_back("List:");
             helpLoop(msg, listlist, 2);
+            break;
+        case LISTS::bank:
+            msg.push_back("Bank:");
+            helpLoop(msg, banklist, 2);
             break;
         case LISTS::config:
             msg.push_back("Config:");
@@ -3031,6 +3040,8 @@ int CmdInterpreter::commandBank(Parser& input, unsigned char controlType)
 {
     bitSet(context, LEVEL::Bank);
     int isRoot = false;
+    if  (input.matchnMove(1, "bank"))
+        isRoot = false; // does nothing as we're already at bank level :)
     if (input.matchnMove(1, "root"))
         isRoot = true;
     if (input.lineEnd(controlType))

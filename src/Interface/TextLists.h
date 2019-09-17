@@ -114,6 +114,7 @@ namespace LISTS {
     load,
     save,
     list,
+    bank,
     config,
     mlearn
     };
@@ -152,8 +153,6 @@ static std::string toplist [] = {
     "  MLearn",                 "enter editor context level",
     "  COnfig",                 "enter context level",
     "  MONo <s>",               "main output mono/stereo (ON = mono, {other})",
-    "  Root <n>",               "current root path to ID",
-    "  Bank <n>",               "current bank to ID",
     "  SYStem effects [n]",     "enter effects context level",
     "    <ON/OFF>",             "non-destructively enables/disables the effect",
     "    SEnd <n2> <n3>",       "send system effect to effect n2 at volume n3",
@@ -221,9 +220,10 @@ static std::string configlist [] = {
 static std::string banklist [] = {
     "<n>",                   "set current bank to number n",
     "Root <n>",              "set current bank root number",
-    "Change <n1> <n2>",      "change bank ID from n1 to n2",
-    "Change Root <n1> <n2>", "change bank root ID from n1 to n2",
-    "Swap <n1> [n2]",        "Swap current bank with bank n1, (opt. in root n2)",
+//    "Change <n1> <n2>",      "change bank ID from n1 to n2",
+//    "Change Root <n1> <n2>", "change bank root ID from n1 to n2",
+//    "Swap <n1> [n2]",        "Swap current bank with bank n1, (opt. in root n2)",
+    "end"
 };
 
 static std::string partlist [] = {

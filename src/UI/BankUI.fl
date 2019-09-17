@@ -313,17 +313,10 @@ class BankUI {: {public BankProcess_, RootProcess_}
         int n = o->value();
         if (n < 0)
             return;
+
         const Fl_Menu_Item &item = o->menu()[n];
         int nbank = reinterpret_cast<long>(item.user_data());
-        const BankEntry &bankEntry = bank->getBank(nbank);
-        if (!bank->setCurrentBankID(nbank))
-            fl_alert("Error: Could not load the bank from the directory\\n%s.", bankEntry.dirname.c_str());
-
-        int rt = fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank);
-        int bk = fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank);
-        for (int i = 0; i < BANK_SIZE; ++i)
-            bs[i]->refresh(bk, rt);
-        refreshmainwindow();}
+        send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::selectBank, nbank, TOPLEVEL::type::Integer, TOPLEVEL::section::bank);}
         xywh {5 8 199 20} down_box BORDER_BOX selection_color 7 labelfont 1 labelsize 12 align 0 textsize 12
       } {}
       Fl_Button B_search {
@@ -879,10 +872,8 @@ class BankUI {: {public BankProcess_, RootProcess_}
         callback {//
         if (selectedRootID >= 0)
         {
-            synth->getBankRef().setCurrentRootID(selectedRootID);
-            synth->saveBanks();
-            readbankcfg();
-            rescan_for_banks(false);
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::selectRoot, selectedRootID, TOPLEVEL::type::Integer, TOPLEVEL::section::bank);
+
             banklist->value(0);
         }
         activatebutton_rootdir(false);
@@ -1015,6 +1006,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             rescan_for_banks(false);
             break;
         case BANK::control::selectRoot:
+            readbankcfg();
             rescan_for_banks(false);
             break;
 
@@ -1198,15 +1190,8 @@ class BankUI {: {public BankProcess_, RootProcess_}
     if ((what == 1 || what == 3) && r_mode == 1 && !thisname.empty())
     {
         // Selects from slot
-        const BankEntry &bankEntry = bank->getBank(slot, rt);
+        send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::selectBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::bank);
 
-        if (!bank->setCurrentBankID(slot))
-        {
-            fl_alert("Error: Could not load the bank from the directory\\n%s.",
-                    bankEntry.dirname.c_str());
-            setrootread();
-            return;
-        }
         instFrom = 2;
         if (what == 3)
             bankuiwindow->hide();
