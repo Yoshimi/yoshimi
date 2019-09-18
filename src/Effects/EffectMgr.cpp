@@ -22,7 +22,6 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified March 2019
 */
 
 #include <fftw3.h>
@@ -378,6 +377,8 @@ float LimitMgr::geteffectlimits(CommandBlock *getData)
             Dynamlimit dyn;
             value = dyn.getlimits(getData);
             break;
+        default:
+            value = EFFECT::type::count - EFFECT::type::none;
     }
     return value;
 }

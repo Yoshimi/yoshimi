@@ -3042,6 +3042,16 @@ int CmdInterpreter::commandBank(Parser& input, unsigned char controlType)
     int isRoot = false;
     if  (input.matchnMove(1, "bank"))
         isRoot = false; // does nothing as we're already at bank level :)
+    if (input.matchnMove(1, "name"))
+    {
+        string name = string{input};
+        if (name <= "!")
+            return REPLY::value_msg;
+        int miscMsg = textMsgBuffer.push(string(input));
+        int tmp = readControl(synth, 0, BANK::control::selectBank, TOPLEVEL::section::bank);
+        sendNormal(synth, TOPLEVEL::action::lowPrio, tmp, controlType, BANK::control::renameBank, TOPLEVEL::section::bank, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsg);
+    }
+
     if (input.matchnMove(1, "root"))
         isRoot = true;
     if (input.lineEnd(controlType))
@@ -5332,7 +5342,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         {
             synth->getRuntime().Log("Instrument Types:");
             int idx = 0;
-            std::string name = type_list[idx];
+            string name = type_list[idx];
             while ( name != "end")
             {
                 synth->getRuntime().Log(name);

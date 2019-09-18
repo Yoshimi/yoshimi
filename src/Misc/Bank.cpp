@@ -44,6 +44,7 @@
 #include "Misc/Config.h"
 #include "Misc/Bank.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/TextMsgBuffer.h"
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/FormatFuncs.h"
 
@@ -282,17 +283,6 @@ string Bank::getBankName(int bankID, size_t rootID)
 }
 
 
-//Gets a bank name with ID
-string Bank::getBankIDname(int bankID)
-{
-    string retname = getBankName(bankID);
-
-    if (!retname.empty())
-        retname = asString(bankID) + ". " + retname;
-    return retname;
-}
-
-
 bool Bank::isDuplicateBankName(size_t rootID, string name)
 {
     //if(roots.count(rootID) == 0)
@@ -321,24 +311,29 @@ int Bank::getBankSize(int bankID)
 }
 
 
-// Changes a bank name 'in place' and updates the filename
-bool Bank::setbankname(unsigned int bankID, string newname)
+int Bank::changeBankName(size_t rootID, size_t bankID, string newName)
 {
-    string filename = newname;
-
+    std::string filename = newName;
+    std::string oldName = getBankName(bankID, rootID);
     make_legit_filename(filename);
-    string newfilepath = getRootPath(synth->getRuntime().currentRoot) + "/" + filename;
+    std::string newfilepath = getRootPath(synth->getRuntime().currentRoot) + "/" + filename;
+    std::string reply = "";
+    bool failed = false;
     if (!renameDir(getBankPath(synth->getRuntime().currentRoot,bankID), newfilepath))
     {
-        synth->getRuntime().Log("Failed to rename " + getBankName(bankID)
-                               + " to " + newname);
-        return false;
+        reply = "Could not change bank '" + oldName + "' in root " + to_string(rootID);
+        failed = true;
     }
-    synth->getRuntime().Log("Renaming " + getBankName(bankID)
-                               + " to " + newname);
+    else
+    {
+        roots [synth->getRuntime().currentRoot].banks [bankID].dirname = newName;
+        reply = "Changed " + oldName + " to " + newName;
+    }
 
-    roots [synth->getRuntime().currentRoot].banks [bankID].dirname = newname;
-    return true;
+    int msgID = synth->textMsgBuffer.push(reply);
+    if (failed)
+        msgID |= 0xFF0000;
+    return msgID;
 }
 
 

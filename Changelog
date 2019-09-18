@@ -1,5 +1,10 @@
 yoshimi 1.6.0 M
 
+2019-9-18 Will
+* CLI can now set bank names.
+* Converted GUI bank name controls.
+* Updated docs.
+
 2019-9-17 Will
 * CLI conversion done for select bank & root.
   Listing not done.

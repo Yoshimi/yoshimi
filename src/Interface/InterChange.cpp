@@ -823,6 +823,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     newMsg = true;
                     break;
                 }
+
                 case BANK::control::selectFirstInstrumentToSwap:
                 {
                     if(kititem == UNUSED)
@@ -867,6 +868,20 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     text = textMsgBuffer.fetch(synth->setRootBank(UNUSED, value) & NO_MSG);
                     newMsg = true;
                     break;
+                case BANK::control::renameBank:
+                {
+                    if (engine == UNUSED)
+                        engine = getData->data.engine = synth->getRuntime().currentRoot;
+                    int tmp = synth->bank.changeBankName(getData->data.engine, value, text);
+                    text = textMsgBuffer.fetch(tmp & NO_MSG);
+                    if (tmp > NO_MSG)
+                        text = "FAILED: " + text;
+                    std::cout << text << std::endl;
+                    newMsg = true;
+                    guiTo = true;
+                    break;
+                }
+
                 case BANK::control::selectFirstBankToSwap:
                     if(engine == UNUSED)
                     {

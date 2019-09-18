@@ -314,7 +314,7 @@ namespace BANK // usage BANK::control::
         selectSecondInstrumentAndSwap,
 
         selectBank = 16,
-        renameBank, // not yet
+        renameBank,
         saveBank, // not yet
         createBank, // not yet
         deleteBank, // not yet
@@ -324,7 +324,7 @@ namespace BANK // usage BANK::control::
         exportBank, // not yet
 
         selectRoot = 32,
-        changeRootId // not yet
+        changeRootId
     };
 }
 
@@ -950,7 +950,8 @@ namespace EFFECT // usage EFFECT::type::none
         alienWah,
         distortion,
         eq,
-        dynFilter
+        dynFilter,
+        count // this must be the last item!
     };
 
     enum control : unsigned char {
