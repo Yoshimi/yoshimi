@@ -865,22 +865,38 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                 }
 
                 case BANK::control::selectBank:
-                    text = textMsgBuffer.fetch(synth->setRootBank(UNUSED, value) & NO_MSG);
+                    if (engine == UNUSED)
+                        engine = getData->data.engine = synth->getRuntime().currentRoot;
+                    if (write)
+                    {
+                        text = textMsgBuffer.fetch(synth->setRootBank(engine, value) & NO_MSG);
+
+                    }
+                    else
+                    {
+                        int tmp = synth->getRuntime().currentBank;
+                        text = "Current: " +(to_string(tmp)) + " " + synth->bank.getBankName(tmp, getData->data.engine);
+                    }
                     newMsg = true;
                     break;
                 case BANK::control::renameBank:
-                {
                     if (engine == UNUSED)
                         engine = getData->data.engine = synth->getRuntime().currentRoot;
-                    int tmp = synth->bank.changeBankName(getData->data.engine, value, text);
-                    text = textMsgBuffer.fetch(tmp & NO_MSG);
-                    if (tmp > NO_MSG)
-                        text = "FAILED: " + text;
-                    std::cout << text << std::endl;
+                    if (write)
+                    {
+                        int tmp = synth->bank.changeBankName(getData->data.engine, value, text);
+                        text = textMsgBuffer.fetch(tmp & NO_MSG);
+                        if (tmp > NO_MSG)
+                            text = "FAILED: " + text;
+                        //std::cout << text << std::endl;
+                        guiTo = true;
+                    }
+                    else
+                    {
+                        text = " Name: " + synth->bank.getBankName(value, getData->data.engine);
+                    }
                     newMsg = true;
-                    guiTo = true;
                     break;
-                }
 
                 case BANK::control::selectFirstBankToSwap:
                     if(engine == UNUSED)
@@ -905,14 +921,20 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     break;
 
                 case BANK::control::selectRoot:
-                {
-                    int msgID = synth->setRootBank(value, UNUSED);
-                    if (msgID < NO_MSG)
-                        synth->saveBanks(); // do we need this when only selecting?
-                    text = textMsgBuffer.fetch(msgID & NO_MSG);
+                    if (write)
+                    {
+                        int msgID = synth->setRootBank(value, UNUSED);
+                        if (msgID < NO_MSG)
+                            synth->saveBanks(); // do we need this when only selecting?
+                        text = textMsgBuffer.fetch(msgID & NO_MSG);
+                    }
+                    else
+                    {
+                        int tmp = synth->getRuntime().currentRoot;
+                        text = "Current Root: " +(to_string(tmp)) + " " + synth->bank.getRootPath(tmp);
+                    }
                     newMsg = true;
                     break;
-                }
                 case BANK::control::changeRootId:
                 {
                     if (engine == UNUSED)

@@ -95,7 +95,7 @@ class CmdInterpreter
         int commandList(Parser& input);
         int commandMlearn(Parser& input, unsigned char controlType);
         int commandVector(Parser& input, unsigned char controlType);
-        int commandBank(Parser& input, unsigned char controlType);
+        int commandBank(Parser& input, unsigned char controlType, bool justEntered = false);
         int commandConfig(Parser& input, unsigned char controlType);
         int commandScale(Parser& input, unsigned char controlType);
         int addSynth(Parser& input, unsigned char controlType);

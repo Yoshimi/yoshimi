@@ -1,5 +1,11 @@
 yoshimi 1.6.0 M
 
+2019-9-19 Will
+* Improved CLI bank controls and lists.
+* Removed requirement for CLI 'read' suffix.
+  Some contexts can now give useful information
+  with a simple 'read'.
+
 2019-9-18 Will
 * CLI can now set bank names.
 * Converted GUI bank name controls.

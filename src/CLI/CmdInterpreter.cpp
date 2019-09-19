@@ -2455,20 +2455,21 @@ int CmdInterpreter::commandList(Parser& input)
         return REPLY::done_msg;
     }
 
-    if (input.matchnMove(1, "banks"))
+    if (input.matchnMove(1, "roots")) // must be before bank
     {
-        if (input.isAtEnd())
-            ID = 128;
-        else
-            ID = string2int(input);
-        synth->ListBanks(ID, msg);
+        synth->ListPaths(msg);
         synth->cliOutput(msg, LINES);
         return REPLY::done_msg;
     }
 
-    if (input.matchnMove(1, "roots"))
+    if (input.matchnMove(1, "banks")
+        || (bitFindHigh(context) == LEVEL::Bank && (input.isAtEnd() || input.isdigit())))
     {
-        synth->ListPaths(msg);
+        if (input.isAtEnd() | !input.isdigit())
+            ID = 128;
+        else
+            ID = string2int(input);
+        synth->ListBanks(ID, msg);
         synth->cliOutput(msg, LINES);
         return REPLY::done_msg;
     }
@@ -3036,32 +3037,36 @@ int CmdInterpreter::commandVector(Parser& input, unsigned char controlType)
 }
 
 
-int CmdInterpreter::commandBank(Parser& input, unsigned char controlType)
+int CmdInterpreter::commandBank(Parser& input, unsigned char controlType, bool justEntered)
 {
     bitSet(context, LEVEL::Bank);
     int isRoot = false;
     if  (input.matchnMove(1, "bank"))
-        isRoot = false; // does nothing as we're already at bank level :)
+        isRoot = false; // changes nothing as we're already at bank level :)
     if (input.matchnMove(1, "name"))
     {
         string name = string{input};
-        if (name <= "!")
+        if (controlType != TOPLEVEL::type::Read && name <= "!")
             return REPLY::value_msg;
         int miscMsg = textMsgBuffer.push(string(input));
         int tmp = readControl(synth, 0, BANK::control::selectBank, TOPLEVEL::section::bank);
-        sendNormal(synth, TOPLEVEL::action::lowPrio, tmp, controlType, BANK::control::renameBank, TOPLEVEL::section::bank, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsg);
+        return sendNormal(synth, TOPLEVEL::action::lowPrio, tmp, controlType, BANK::control::renameBank, TOPLEVEL::section::bank, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsg);
     }
 
     if (input.matchnMove(1, "root"))
         isRoot = true;
     if (input.lineEnd(controlType))
         return REPLY::done_msg;
-    if (input.isdigit())
+    if (input.isdigit() || controlType == TOPLEVEL::type::Read)
     {
         int tmp = string2int127(input);
         input.skipChars();
         if (isRoot)
+        {
             return sendNormal(synth, TOPLEVEL::action::lowPrio, tmp, controlType, BANK::control::selectRoot, TOPLEVEL::section::bank);
+        }
+        if (justEntered)
+            return REPLY::done_msg;
         return sendNormal(synth, TOPLEVEL::action::lowPrio, tmp, controlType, BANK::control::selectBank, TOPLEVEL::section::bank);
         if (input.lineEnd(controlType))
             return REPLY::done_msg;
@@ -5006,7 +5011,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
     {
         context = LEVEL::Top;
         bitSet(context, LEVEL::Bank);
-        return commandBank(input, controlType);
+        return commandBank(input, controlType, true);
     }
 
     if (input.matchnMove(1, "scale"))
@@ -5369,10 +5374,11 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
 
     if (input.matchnMove(1, "read") || input.matchnMove(1, "get"))
     {
-        if (!input.isAtEnd())
-            return Reply{commandReadnSet(input, TOPLEVEL::type::Read)};
-        else
-            return Reply::what("read");
+        /*
+         * we no longer test for line end as some contexts can return
+         * useful information with a simple read.
+         */
+        return Reply{commandReadnSet(input, TOPLEVEL::type::Read)};
     }
 
     if (input.matchnMove(3, "minimum"))
