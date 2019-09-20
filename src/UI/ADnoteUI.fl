@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/Fl_Box.H>
@@ -1690,18 +1690,18 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
   }
 }
 
-class ADnoteUI {: {public PresetsUI_}
+class ADnoteUI {open : {public PresetsUI_}
 } {
-  Function {make_window()} {private
+  Function {make_window()} {open private
   } {
     Fl_Window ADnoteGlobalParameters {
-      label {ADsynth Global Parameters of the Instrument}
+      label {ADsynth Global Parameters of the Instrument} open
       xywh {151 81 535 405} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
       code1 {o->position(synth->getGuiMaster()->addNoteX, synth->getGuiMaster()->addNoteY);}
     } {
       Fl_Group {} {
-        label FREQUENCY
+        label FREQUENCY open
         xywh {5 255 525 115} box THIN_UP_BOX labelfont 1 labelsize 12 align 17
       } {
         Fl_Group freqenv {
@@ -2222,7 +2222,8 @@ switch (num)
     type |= TOPLEVEL::type::Write;
     collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, 0);} {}
   }
-  Function {returns_update(CommandBlock *getData)} {} {
+  Function {returns_update(CommandBlock *getData)} {open
+  } {
     code {//
     float value = getData->data.value.F;
     unsigned char control = getData->data.control;
@@ -2253,7 +2254,7 @@ switch (num)
             break;
 
         case ADDSYNTH::control::detuneType:
-            detunetype->value((int) value);
+            detunetype->value(int(value) -1);
             break;
 
         case ADDSYNTH::control::coarseDetune:
@@ -2292,7 +2293,8 @@ switch (num)
             pvel->value(value);
             break;
 
-    }} {}
+    }} {selected
+    }
   }
   Function {ADnoteUI(ADnoteParameters *parameters, int npart_, int kititem_)} {} {
     code {//

@@ -1,5 +1,8 @@
 yoshimi 1.6.0 M
 
+2019-9-20 Will
+* BugFix: CLI detune type inconsistencies.
+
 2019-9-19 Will
 * Improved CLI bank controls and lists.
 * Removed requirement for CLI 'read' suffix.

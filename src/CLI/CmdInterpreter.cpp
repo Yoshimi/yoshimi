@@ -1597,10 +1597,15 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
             {
                 if (input.lineEnd(controlType))
                     return REPLY::value_msg;
-                string name = string{input}.substr(0,3);
-                value = stringNumInList(name, detuneType, 3);
-                if (value > -1 && engine < PART::engine::addVoice1)
-                    value -= 1;
+                if (controlType == TOPLEVEL::type::Read)
+                    value = 2; // dummy value
+                else
+                {
+                    string name = string{input}.substr(0,3);
+                    value = stringNumInList(name, detuneType, 3);
+                }
+                if (engine == PART::engine::subSynth || engine == PART::engine::padSynth)
+                    value -=1;
                 if (value == -1)
                     return REPLY::range_msg;
                 if (engine >= PART::engine::addMod1)

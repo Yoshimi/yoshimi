@@ -3729,9 +3729,20 @@ void InterChange::commandAdd(CommandBlock *getData)
         }
         case ADDSYNTH::control::detuneType:
             if (write)
-                pars->GlobalPar.PDetuneType = value_int;
+            {
+                if (value_int < 1) // can't be default for addsynth
+                {
+                    getData->data.value.F = 1;
+                    value_int = 1;
+                }
+                pars->GlobalPar.PDetuneType = value_int +1;
+            }
             else
-                value = pars->GlobalPar.PDetuneType;
+            {
+                value = pars->GlobalPar.PDetuneType -1;
+                if (value < 1)
+                    value = 1;
+            }
             break;
         case ADDSYNTH::control::coarseDetune:
         {
@@ -4344,7 +4355,7 @@ void InterChange::commandSub(CommandBlock *getData)
             if (write)
                 pars->PDetuneType = value_int + 1;
             else
-                value = pars->PDetuneType;
+                value = pars->PDetuneType - 1;
             break;
         case SUBSYNTH::control::coarseDetune:
         {

@@ -1534,8 +1534,9 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
 }
 
 
-string DataText::resolveAdd(CommandBlock *getData, bool)
+string DataText::resolveAdd(CommandBlock *getData, bool addValue)
 {
+    float value = getData->data.value.F;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -1568,7 +1569,10 @@ string DataText::resolveAdd(CommandBlock *getData, bool)
             contstr = "Octave";
             break;
         case ADDSYNTH::control::detuneType:
-            contstr = "Det type";
+            contstr = "Det type ";
+            showValue = false;
+            if (addValue)
+                contstr+= detuneType [int(value)];
             break;
         case ADDSYNTH::control::coarseDetune:
             contstr = "Coarse Det";
@@ -1611,14 +1615,15 @@ string DataText::resolveAdd(CommandBlock *getData, bool)
 
 string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
 {
+    float value = getData->data.value.F;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
 
     bool yesno = false;
-    bool value_bool = YOSH::F2B(getData->data.value.F);
-    int value_int = lrint(getData->data.value.F);
+    bool value_bool = YOSH::F2B(value);
+    int value_int = lrint(value);
     int nvoice;
     if (engine >= PART::engine::addMod1)
         nvoice = engine - PART::engine::addMod1;
@@ -1718,7 +1723,10 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
             contstr = "Octave";
             break;
         case ADDVOICE::control::detuneType:
-            contstr = "Det type";
+            contstr = "Det type ";
+            showValue = false;
+            if (addValue)
+                contstr+= detuneType [int(value)];
             break;
         case ADDVOICE::control::coarseDetune:
             contstr = "Coarse Det";
@@ -1799,7 +1807,10 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
             contstr = "Octave";
             break;
         case ADDVOICE::control::modulatorDetuneType:
-            contstr = "Det type";
+            contstr = "Det type ";
+            showValue = false;
+            if (addValue)
+                contstr+= detuneType [int(value)];
             break;
         case ADDVOICE::control::modulatorCoarseDetune:
             contstr = "Coarse Det";
@@ -1870,13 +1881,14 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
 
 string DataText::resolveSub(CommandBlock *getData, bool addValue)
 {
+    float value = getData->data.value.F;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char insert = getData->data.insert;
 
     bool yesno = false;
-    bool value_bool = YOSH::F2B(getData->data.value.F);
+    bool value_bool = YOSH::F2B(value);
     if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     {
         string Htype;
@@ -1945,7 +1957,10 @@ string DataText::resolveSub(CommandBlock *getData, bool addValue)
             contstr = "Octave";
             break;
         case SUBSYNTH::control::detuneType:
-            contstr = "Det type";
+            contstr = "Det type ";
+            showValue = false;
+            if (addValue)
+                contstr+= detuneType [int(value) +1];
             break;
         case SUBSYNTH::control::coarseDetune:
             contstr = "Coarse Det";
@@ -2018,6 +2033,7 @@ string DataText::resolveSub(CommandBlock *getData, bool addValue)
 
 string DataText::resolvePad(CommandBlock *getData, bool addValue)
 {
+    float value = getData->data.value.F;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -2025,7 +2041,7 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
     bool yesno = false;
-    bool value_bool = YOSH::F2B(getData->data.value.F);
+    bool value_bool = YOSH::F2B(value);
     string name = "";
     switch (control & 0x70)
     {
@@ -2086,7 +2102,10 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
             contstr = "Octave";
             break;
         case PADSYNTH::control::detuneType:
-            contstr = "Det type";
+            contstr = "Det type ";
+            showValue = false;
+            if (addValue)
+                contstr+= detuneType [int(value) +1];
             break;
         case PADSYNTH::control::coarseDetune:
             contstr = "Coarse Det";
