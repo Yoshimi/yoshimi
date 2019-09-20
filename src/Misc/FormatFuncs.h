@@ -17,7 +17,6 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified August 2019
 */
 
 #ifndef FORMATFUNCS_H
@@ -185,6 +184,23 @@ inline unsigned int string2uint(std::string str)
     unsigned int intval;
     machine >> intval;
     return intval;
+}
+
+
+inline string stringCaps(std::string str, int count)
+{
+    int idx = 0;
+    char c;
+    while (str[idx])
+    {
+        c = str[idx];
+        if (idx < count)
+            str.replace(idx, 1, 1, toupper(c));
+        else
+            str.replace(idx, 1, 1, tolower(c));
+        idx ++;
+    }
+    return str;
 }
 
 

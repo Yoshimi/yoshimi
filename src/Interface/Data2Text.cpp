@@ -29,6 +29,7 @@ using std::string;
 using std::to_string;
 
 using func::string2int;
+using func::stringCaps;
 
 DataText::DataText() :
     synth(nullptr),
@@ -1249,7 +1250,7 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
                         break;
                 }
             }
-            contstr+= " Enable";
+            contstr += " Enable";
             yesno = true;
             break;
         case PART::control::kitItemMute:
@@ -1572,7 +1573,7 @@ string DataText::resolveAdd(CommandBlock *getData, bool addValue)
             contstr = "Det type ";
             showValue = false;
             if (addValue)
-                contstr+= detuneType [int(value)];
+                contstr += detuneType [int(value)];
             break;
         case ADDSYNTH::control::coarseDetune:
             contstr = "Coarse Det";
@@ -1726,7 +1727,7 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
             contstr = "Det type ";
             showValue = false;
             if (addValue)
-                contstr+= detuneType [int(value)];
+                contstr += detuneType [int(value)];
             break;
         case ADDVOICE::control::coarseDetune:
             contstr = "Coarse Det";
@@ -1810,7 +1811,7 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
             contstr = "Det type ";
             showValue = false;
             if (addValue)
-                contstr+= detuneType [int(value)];
+                contstr += detuneType [int(value)];
             break;
         case ADDVOICE::control::modulatorCoarseDetune:
             contstr = "Coarse Det";
@@ -1960,7 +1961,7 @@ string DataText::resolveSub(CommandBlock *getData, bool addValue)
             contstr = "Det type ";
             showValue = false;
             if (addValue)
-                contstr+= detuneType [int(value) +1];
+                contstr += detuneType [int(value) +1];
             break;
         case SUBSYNTH::control::coarseDetune:
             contstr = "Coarse Det";
@@ -2105,7 +2106,7 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
             contstr = "Det type ";
             showValue = false;
             if (addValue)
-                contstr+= detuneType [int(value) +1];
+                contstr += detuneType [int(value) +1];
             break;
         case PADSYNTH::control::coarseDetune:
             contstr = "Coarse Det";
@@ -2229,8 +2230,9 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
 }
 
 
-string DataText::resolveOscillator(CommandBlock *getData, bool)
+string DataText::resolveOscillator(CommandBlock *getData, bool addValue)
 {
+    float value = getData->data.value.F;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -2298,7 +2300,10 @@ string DataText::resolveOscillator(CommandBlock *getData, bool)
             contstr = " Par";
             break;
         case OSCILLATOR::control::baseFunctionType:
-            contstr = " Type";
+            contstr = " Type ";
+            showValue = false;
+            if (addValue)
+                contstr += stringCaps(waveformlist[int(value) * 2], 1);
             break;
         case OSCILLATOR::control::baseModulationParameter1:
             contstr = " Mod Par 1";
@@ -2573,7 +2578,7 @@ string DataText::resolveLFO(CommandBlock *getData, bool)
 }
 
 
-string DataText::resolveFilter(CommandBlock *getData, bool)
+string DataText::resolveFilter(CommandBlock *getData, bool addValue)
 {
     int value_int = int(getData->data.value.F);
     unsigned char control = getData->data.control;
@@ -2621,14 +2626,49 @@ string DataText::resolveFilter(CommandBlock *getData, bool)
             contstr = "Stages " + to_string(value_int + 1);
             break;
         case FILTERINSERT::control::baseType:
-            contstr = "Filt Type";
+            contstr = "Filt Cat ";
+            showValue = false;
+            switch (value_int)
+            {
+                case 0:
+                    contstr += "Anlog";
+                    break;
+                case 1:
+                    contstr += "Form";
+                    break;
+                case 2:
+                    contstr += "StVar";
+                    break;
+                default:
+                    contstr += "unrecognised";
+                    break;
+            }
             break;
         case FILTERINSERT::control::analogType:
-            contstr = "An Type";
+        {
+            contstr = "An Type ";
+            showValue = false;
+            int idx = 0;
+            if (addValue)
+            {
+                while (filterlist [idx] != "l1")
+                    idx += 2;
+                contstr += filterlist [idx + (value_int * 2)];
+            }
             break;
+        }
         case FILTERINSERT::control::stateVariableType:
+        {
             contstr = "SV Type";
+            int idx = 0;
+            if (addValue)
+            {
+                while (filterlist [idx] != "low")
+                    idx += 2;
+                contstr += filterlist [idx + (value_int * 2)];
+            }
             break;
+        }
         case FILTERINSERT::control::frequencyTrackingRange:
             contstr = "Fre Trk Offs";
             break;
@@ -2685,7 +2725,7 @@ string DataText::resolveFilter(CommandBlock *getData, bool)
     }
     string extra = "";
     if (control >= FILTERINSERT::control::formantFrequency && control <= FILTERINSERT::control::formantAmplitude)
-        extra ="Vowel " + to_string(nvowel) + " Formant " + to_string(nformant) + " ";
+        extra = "Vowel " + to_string(nvowel) + " Formant " + to_string(nformant) + " ";
     else if (control == FILTERINSERT::control::vowelPositionInSequence)
         extra = "Seq Pos " + to_string(nseqpos) + " ";
 

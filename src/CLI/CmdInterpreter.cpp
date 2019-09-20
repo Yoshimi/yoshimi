@@ -1992,18 +1992,23 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
     }
     else if (input.matchnMove(2, "category"))
     {
-        if (input.matchnMove(1, "analog"))
-            value = 0;
-        else if(input.matchnMove(1, "formant"))
-        {
-            value = 1;
-            filterVowelNumber = 0;
-            filterFormantNumber = 0;
-        }
-        else if(input.matchnMove(1, "state"))
-            value = 2;
+        if (controlType == TOPLEVEL::type::Read && input.isAtEnd())
+                value = 0; // dummy value
         else
-            return REPLY::range_msg;
+        {
+            if (input.matchnMove(1, "analog"))
+                value = 0;
+            else if(input.matchnMove(1, "formant"))
+            {
+                value = 1;
+                filterVowelNumber = 0;
+                filterFormantNumber = 0;
+            }
+            else if(input.matchnMove(1, "state"))
+                value = 2;
+            else
+                return REPLY::range_msg;
+        }
         cmd = FILTERINSERT::control::baseType;
     }
     else if (input.matchnMove(2, "stages"))
@@ -2095,45 +2100,57 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
         }
         else if (input.matchnMove(2, "type"))
         {
+            if (controlType == TOPLEVEL::type::Read && input.isAtEnd())
+                value = 0;
             switch (baseType)
             {
                 case 0: // analog
                 {
-                    if (input.matchnMove(2, "l1"))
-                        value = 0;
-                    else if (input.matchnMove(2, "h1"))
-                        value = 1;
-                    else if (input.matchnMove(2, "l2"))
-                        value = 2;
-                    else if (input.matchnMove(2, "h2"))
-                        value = 3;
-                    else if (input.matchnMove(2, "bpass"))
-                        value = 4;
-                    else if (input.matchnMove(2, "stop"))
-                        value = 5;
-                    else if (input.matchnMove(2, "peak"))
-                        value = 6;
-                    else if (input.matchnMove(2, "lshelf"))
-                        value = 7;
-                    else if (input.matchnMove(2, "hshelf"))
-                        value = 8;
-                    else
-                        return REPLY::range_msg;
+                    if (value == -1)
+                    {
+                        int idx = 0;
+                        while (filterlist [idx] != "l1")
+                            idx += 2;
+                        int start = idx;
+                        while (filterlist [idx] != "hshelf")
+                            idx += 2;
+                        int end = idx;
+                        idx = start;
+                        while (idx <= end)
+                        {
+                            if (input.matchnMove(2, filterlist[idx].c_str()))
+                                break;
+                            idx += 2;
+                        }
+                        if (idx > end)
+                            return REPLY::range_msg;
+                        value = (idx - start) / 2;
+                    }
                     cmd = FILTERINSERT::control::analogType;
                     break;
                 }
                 case 2: // state variable
                 {
-                    if (input.matchnMove(1, "low"))
-                        value = 0;
-                    else if (input.matchnMove(1, "high"))
-                        value = 1;
-                    else if (input.matchnMove(1, "band"))
-                        value = 2;
-                    else if (input.matchnMove(1, "stop"))
-                        value = 3;
-                    else
-                        return REPLY::range_msg;
+                    if (value == -1)
+                    {
+                        int idx = 0;
+                        while (filterlist [idx] != "low")
+                            idx += 2;
+                        int start = idx;
+                        while (filterlist [idx] != "stop")
+                            idx += 2;
+                        int end = idx;
+                        idx = start;
+                        while (idx <= end)
+                        {
+                            if (input.matchnMove(2, filterlist[idx].c_str()))
+                                break;
+                            idx += 2;
+                        }
+                        if (idx > end)
+                            return REPLY::range_msg;
+                        value = (idx - start) / 2;
+                    }
                     cmd = FILTERINSERT::control::stateVariableType;
                     break;
                 }
@@ -4321,8 +4338,14 @@ int CmdInterpreter::waveform(Parser& input, unsigned char controlType)
     int engine = contextToEngines(context);
     unsigned char insert = TOPLEVEL::insert::oscillatorGroup;
 
-    string name = string{input}.substr(0,3);
-    value = stringNumInList(name, wavebase, 3);
+    if (controlType == TOPLEVEL::type::Read && input.isAtEnd())
+        value = 0; // dummy value
+    else
+    {
+        string name = string{input}.substr(0,3);
+        value = stringNumInList(name, wavebase, 3);
+    }
+
     if (value != -1)
         cmd = OSCILLATOR::control::baseFunctionType;
     else if (input.matchnMove(1, "harmonic"))

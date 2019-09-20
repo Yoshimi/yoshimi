@@ -2,6 +2,8 @@ yoshimi 1.6.0 M
 
 2019-9-20 Will
 * BugFix: CLI detune type inconsistencies.
+* CLI reports waveform text instead of number.
+* CLI filter category/type also reports text.
 
 2019-9-19 Will
 * Improved CLI bank controls and lists.
