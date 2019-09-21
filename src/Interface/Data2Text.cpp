@@ -2504,8 +2504,9 @@ string DataText::resolveResonance(CommandBlock *getData, bool addValue)
 }
 
 
-string DataText::resolveLFO(CommandBlock *getData, bool)
+string DataText::resolveLFO(CommandBlock *getData, bool addValue)
 {
+    int value_int = int(getData->data.value.F);
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -2557,8 +2558,18 @@ string DataText::resolveLFO(CommandBlock *getData, bool)
             contstr = "AmpRand";
             break;
         case LFOINSERT::control::type:
-            contstr = "Type";
+        {
+            contstr = "Type ";
+            showValue = false;
+            int idx = 1;
+            if (addValue)
+            {
+                while (LFOlist [idx] != "SIne")
+                    idx += 2;
+                contstr += stringCaps(LFOlist[idx + (value_int * 2)], 1);
+            }
             break;
+        }
         case LFOINSERT::control::continuous:
             contstr = "Cont";
             break;

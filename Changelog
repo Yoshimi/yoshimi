@@ -5,6 +5,7 @@ yoshimi 1.6.0 M
 * Rationalised detune type values.
   No more shuffling between CLI, GUI and engines.
 * Updated docs
+* CLI reports LFO text instead of number.
 
 2019-9-20 Will
 * BugFix: CLI detune type inconsistencies.

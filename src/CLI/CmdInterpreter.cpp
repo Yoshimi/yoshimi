@@ -1895,22 +1895,28 @@ int CmdInterpreter::LFOselect(Parser& input, unsigned char controlType)
     }
     else if (input.matchnMove(1, "type"))
     {
-        if (input.lineEnd(controlType))
-            return REPLY::what_msg;
-        if (input.matchnMove(2, "sine"))
+        if (controlType == TOPLEVEL::type::Read && input.isAtEnd())
             value = 0;
-        else if (input.matchnMove(1, "triangle"))
-            value = 1;
-        else if (input.matchnMove(2, "square"))
-            value = 2;
-        else if (input.matchnMove(2, "rup"))
-            value = 3;
-        else if (input.matchnMove(2, "rdown"))
-            value = 4;
-        else if (input.matchnMove(1, "e1dn"))
-            value = 5;
-        else if (input.matchnMove(1, "e2dn"))
-            value = 6;
+        else
+        {
+            int idx = 1;
+            while (LFOlist [idx] != "SIne")
+                idx += 2;
+            int start = idx;
+            while (LFOlist [idx] != "E2down")
+                idx += 2;
+            int end = idx;
+            idx = start;
+            while (idx <=end)
+            {
+                if (input.matchnMove(2, LFOlist[idx].c_str()))
+                    break;
+                idx += 2;
+            }
+            if (idx > end)
+                return REPLY::range_msg;
+            value = (idx - start) / 2;
+        }
         cmd = LFOINSERT::control::type;
     }
     else if (input.matchnMove(2, "ar"))
