@@ -1117,6 +1117,8 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
          * If it's not valid we don't block, but pass on to
          * other command tests routines.
          */
+        if (controlType == TOPLEVEL::type::Read)
+            value = 0; // dummy value
         switch (nFXtype)
         {
             case 1:
@@ -1124,7 +1126,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                 selected = stringNumInList(name, effreverb, 3);
                 if (selected != 7) // EQ
                     nFXeqBand = 0;
-                if (selected == 10) // type
+                if (selected == 10 && value == -1) // type
                 {
                     input.skipChars();
                     if (input.matchnMove(1, "random"))
@@ -1144,7 +1146,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
             case 3:
             {
                 selected = stringNumInList(name, effchorus, 3);
-                if (selected == 4) // filtershape
+                if (selected == 4 && value == -1) // filtershape
                 {
                     input.skipChars();
                     if (input.matchnMove(1, "sine"))
@@ -1163,7 +1165,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
             case 4:
             {
                 selected = stringNumInList(name, effphaser, 3);
-                if (selected == 4) // filtershape
+                if (selected == 4 && value == -1) // filtershape
                 {
                     input.skipChars();
                     if (input.matchnMove(1, "sine"))
@@ -1182,7 +1184,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
             case 5:
             {
                 selected = stringNumInList(name, effalienwah, 3);
-                if (selected == 3) // filtershape
+                if (selected == 4 && value == -1) // filtershape
                 {
                     input.skipChars();
                     if (input.matchnMove(1, "sine"))
@@ -1196,7 +1198,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
             case 6:
             {
                 selected = stringNumInList(name, effdistortion, 3);
-                if (selected == 5) // filtershape
+                if (selected == 5 && value == -1) // filtershape
                 {
                     input.skipChars();
                     string name = string{input}.substr(0,3);
@@ -1225,7 +1227,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                         nFXeqBand = value;
                     }
                 }
-                else if (selected == 2) // type
+                else if (selected == 2 && value == -1) // type
                 {
                     input.skipChars();
                     string name = string{input}.substr(0,3);
@@ -1243,7 +1245,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
             case 8:
             {
                 selected = stringNumInList(name, effdynamicfilter, 3);
-                if (selected == 4) // filtershape
+                if (selected == 4 && value == -1) // filtershape
                 {
                     input.skipChars();
                     if (input.matchnMove(1, "sine"))

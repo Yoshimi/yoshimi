@@ -759,6 +759,7 @@ static std::string alienwahlist [] = {
     "LEVel <n>",        "intensity",
     "PANning <n>",      "L/R panning",
     "FREquency <n>",    "LFO frequency",
+    "RANdom",           "LFO randomness",
     "WAVe <s>",         "LFO waveshape (sine, triangle)",
     "SHIft <n>",        "L/R phase shift",
     "DEPth <n>",        "LFO depth",
@@ -971,7 +972,7 @@ static std::string effreverb [] = {"LEV", "PAN", "TIM", "DEL", "FEE", "none5", "
 static std::string effecho [] = {"LEV", "PAN", "DEL", "LRD", "CRO", "FEE", "DAM",  "end"};
 static std::string effchorus [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "DEL", "FEE", "CRO", "none11", "SUB", "end"};
 static std::string effphaser [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "FEE", "STA", "CRO", "SUB", "REL", "HYP", "OVE", "ANA", "end"};
-static std::string effalienwah [] = {"LEV", "PAN", "FRE", "WAV", "SHI", "DEP", "FEE", "DEL", "CRO", "REL", "end"};
+static std::string effalienwah [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "FEE", "DEL", "CRO", "REL", "end"};
 static std::string effdistortion [] = {"LEV", "PAN", "MIX", "DRI", "OUT", "WAV", "INV", "LOW", "HIG", "STE", "FIL", "end"};
 static std::string effeq [] = {"LEV", "BAN", "FIL", "FRE", "GAI", "Q", "STA"};
 static std::string eqtypes [] = {"OFF", "LP1", "HP1", "LP2", "HP2", "BP2", "NOT", "PEA", "LOW", "HIG", "end"};

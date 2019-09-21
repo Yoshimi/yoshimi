@@ -6,6 +6,8 @@ yoshimi 1.6.0 M
   No more shuffling between CLI, GUI and engines.
 * Updated docs
 * CLI reports LFO text instead of number.
+* BugFix: CLI alienwah missing random entry.
+  This could cause a segfault.
 
 2019-9-20 Will
 * BugFix: CLI detune type inconsistencies.
