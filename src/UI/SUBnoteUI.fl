@@ -401,10 +401,10 @@ class SUBnoteUI {: {public PresetsUI_}
           label {Detune Type}
           callback {//
 
-          send_data (TOPLEVEL::action::forceUpdate, SUBSYNTH::control::detuneType, o->value(), TOPLEVEL::type::Integer);}
+          send_data (TOPLEVEL::action::forceUpdate, SUBSYNTH::control::detuneType, o->value() + 1, TOPLEVEL::type::Integer);}
           xywh {655 78 70 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
-          code1 {o->value(pars->PDetuneType-1);}
+          code1 {o->value(pars->PDetuneType - 1);}
         } {}
         Fl_Dial bend {
           label Bend
@@ -752,7 +752,7 @@ class SUBnoteUI {: {public PresetsUI_}
             break;
 
         case SUBSYNTH::control::detuneType:
-            detunetype->value(value);
+            detunetype->value(value - 1);
             break;
 
         case SUBSYNTH::control::coarseDetune:

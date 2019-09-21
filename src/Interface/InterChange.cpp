@@ -4353,9 +4353,16 @@ void InterChange::commandSub(CommandBlock *getData)
         }
         case SUBSYNTH::control::detuneType:
             if (write)
-                pars->PDetuneType = value_int + 1;
+            {
+                if (value_int < 1) // can't be default for subsynth
+                {
+                    getData->data.value.F = 1;
+                    value_int = 1;
+                }
+                pars->PDetuneType = value_int;
+            }
             else
-                value = pars->PDetuneType - 1;
+                value = pars->PDetuneType;
             break;
         case SUBSYNTH::control::coarseDetune:
         {
@@ -4578,9 +4585,16 @@ void InterChange::commandPad(CommandBlock *getData)
             break;
         case PADSYNTH::control::detuneType:
             if (write)
-                 pars->PDetuneType = value_int + 1;
+            {
+                if (value_int < 1) // can't be default for padsynth
+                {
+                    getData->data.value.F = 1;
+                    value_int = 1;
+                }
+                 pars->PDetuneType = value_int;
+            }
             else
-                value =  pars->PDetuneType - 1;
+                value =  pars->PDetuneType;
             break;
         case PADSYNTH::control::coarseDetune:
             if (write)

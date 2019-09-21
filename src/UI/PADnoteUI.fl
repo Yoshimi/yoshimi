@@ -53,22 +53,19 @@ decl {\#include "MasterUI.h"} {private global
 }
 
 decl {\#include "Misc/SynthHelper.h"
-    using synth::getDetune;
-} {private local
+    using synth::getDetune;} {private local
 }
 
 decl {\#include "Misc/NumericFuncs.h"
     using func::dB2rap;
-    using func::rap2dB;
-} {private local
+    using func::rap2dB;} {private local
 }
 
 decl {\#include "Misc/TextMsgBuffer.h"
 
-    namespace \{ // Implementation details...
+    namespace { // Implementation details...
         TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
-    \}
-} {private local
+    }} {private local
 }
 
 class PADnoteHarmonicProfile {: {public Fl_Box}
@@ -840,10 +837,10 @@ class PADnoteUI {: {public PresetsUI_}
             Fl_Choice detunetype {
               label {Detune Type}
               callback {//
-              send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::detuneType, o->value(), TOPLEVEL::type::Integer);}
+              send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::detuneType, o->value() + 1, TOPLEVEL::type::Integer);}
               xywh {450 345 75 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
               code0 {o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
-              code1 {o->value(pars->PDetuneType-1);}
+              code1 {o->value(pars->PDetuneType - 1);}
             } {}
             Fl_Check_Button hz440 {
               label 440Hz
@@ -1145,7 +1142,7 @@ class PADnoteUI {: {public PresetsUI_}
             break;
 
         case PADSYNTH::control::detuneType:
-            detunetype->value(lrint(value));
+            detunetype->value(lrint(value) - 1);
             break;
 
         case PADSYNTH::control::coarseDetune:

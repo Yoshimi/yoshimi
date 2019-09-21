@@ -904,7 +904,8 @@ float ADnoteParameters::getLimits(CommandBlock *getData)
                 break;
 
             case ADDSYNTH::control::detuneType:
-                max = 3;
+                min = 1;
+                max = 4;
                 break;
 
             case ADDSYNTH::control::coarseDetune:

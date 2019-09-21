@@ -1604,8 +1604,6 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
                     string name = string{input}.substr(0,3);
                     value = stringNumInList(name, detuneType, 3);
                 }
-                if (engine == PART::engine::subSynth || engine == PART::engine::padSynth)
-                    value -=1;
                 if (value == -1)
                     return REPLY::range_msg;
                 if (engine >= PART::engine::addMod1)

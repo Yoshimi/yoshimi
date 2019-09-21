@@ -978,7 +978,7 @@ static std::string eqtypes [] = {"OFF", "LP1", "HP1", "LP2", "HP2", "BP2", "NOT"
 static std::string effdynamicfilter [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "SEN", "INV", "RAT", "FIL", "end"};
 
 // common controls
-static std::string detuneType [] = {"DEF", "L35", "L10", "E10", "E12", "end"};
+static std::string detuneType [] = {"DEFault", "L35", "L10", "E100", "E1200", "end"};
 
 // waveform controls
 static std::string waveshape [] = {"Sine", "Triangle", "Pulse", "Saw", "Power", "Gauss", "Diode", "AbsSine", "PulseSine", "StretchSine", "Chirp", "AbsStretchSine", "Chebyshev", "Square", "Spike", "Circle"};

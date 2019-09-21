@@ -1545,7 +1545,7 @@ string DataText::resolveAdd(CommandBlock *getData, bool addValue)
     if (control <= ADDSYNTH::control::panning)
         name = " Amplitude ";
     else if (control >= ADDSYNTH::control::detuneFrequency && control <= ADDSYNTH::control::relativeBandwidth)
-        name = "Frequency";
+        name = "Frequency ";
 
     string contstr = "";
 
@@ -1727,7 +1727,7 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
             contstr = "Det type ";
             showValue = false;
             if (addValue)
-                contstr += detuneType [int(value)];
+                contstr += stringCaps(detuneType [int(value)], 1);
             break;
         case ADDVOICE::control::coarseDetune:
             contstr = "Coarse Det";
@@ -1961,7 +1961,7 @@ string DataText::resolveSub(CommandBlock *getData, bool addValue)
             contstr = "Det type ";
             showValue = false;
             if (addValue)
-                contstr += detuneType [int(value) +1];
+                contstr += detuneType [int(value)];
             break;
         case SUBSYNTH::control::coarseDetune:
             contstr = "Coarse Det";
@@ -2106,7 +2106,7 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
             contstr = "Det type ";
             showValue = false;
             if (addValue)
-                contstr += detuneType [int(value) +1];
+                contstr += detuneType [int(value)];
             break;
         case PADSYNTH::control::coarseDetune:
             contstr = "Coarse Det";

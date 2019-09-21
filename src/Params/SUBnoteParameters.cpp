@@ -461,7 +461,8 @@ float SUBnoteParameters::getLimits(CommandBlock *getData)
 
         case SUBSYNTH::control::detuneType:
             type &= ~learnable;
-            max = 3;
+            min = 1;
+            max = 4;
             break;
 
         case SUBSYNTH::control::coarseDetune:

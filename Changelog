@@ -1,5 +1,11 @@
 yoshimi 1.6.0 M
 
+2019-9-21 Will
+* Further refinements to listing / text lists.
+* Rationalised detune type values.
+  No more shuffling between CLI, GUI and engines.
+* Updated docs
+
 2019-9-20 Will
 * BugFix: CLI detune type inconsistencies.
 * CLI reports waveform text instead of number.

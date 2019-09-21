@@ -1047,8 +1047,8 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case PADSYNTH::control::detuneType:
-            def = 0;
-            max = 3;
+            def = 1;
+            max = 4;
             break;
 
         case PADSYNTH::control::coarseDetune:
