@@ -45,7 +45,6 @@ void Presets::setpresettype(const char *type_)
 void Presets::copy(const char *name)
 {
     XMLwrapper *xml = new XMLwrapper(synth);
-    bool oldMinimal = xml->minimal;
     // used only for the clipboard
     if (name == NULL)
         xml->minimal = false;
@@ -74,7 +73,6 @@ void Presets::copy(const char *name)
 
     delete(xml);
     nelement = -1;
-    xml->minimal = oldMinimal;
 }
 
 
