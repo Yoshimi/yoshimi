@@ -49,9 +49,9 @@ const char *XMLwrapper_whitespace_callback(mxml_node_t *node, int where)
 {
     const char *name = mxmlGetElement(node);
 
-    if (where == MXML_WS_BEFORE_OPEN && !strcmp(name, "?xml"))
+    if (where == MXML_WS_BEFORE_OPEN && !strncmp(name, "?xml", 4))
         return NULL;
-    if (where == MXML_WS_BEFORE_CLOSE && !strcmp(name, "string"))
+    if (where == MXML_WS_BEFORE_CLOSE && !strncmp(name, "string", 6))
         return NULL;
 
     if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
