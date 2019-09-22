@@ -2881,6 +2881,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
     unsigned char effnum = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
+    unsigned char offset = getData->data.offset;
 
     string name;
     string actual;
@@ -2993,8 +2994,8 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
         showValue = false;
     }
     else
-        contstr = " Control " + to_string(control + 1);
-
+        contstr = ""; //" Control " + to_string(control + 1);
+    string controlType = "";
     switch (kititem)
     {
         case EFFECT::type::none:
@@ -3002,35 +3003,106 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
             contstr = " ";
             break;
         case EFFECT::type::reverb:
-            effname = " Reverb";
+            effname = " Reverb ";
+            controlType = reverblist[(control & 0xf) * 2];
             break;
         case EFFECT::type::echo:
-            effname = " Echo";
+            effname = " Echo ";
+            controlType = echolist[(control & 0xf) * 2];
             break;
         case EFFECT::type::chorus:
-            effname = " Chorus";
+            effname = " Chorus ";
+            controlType = choruslist[(control & 0xf) * 2];
+            if (control == 4 && addValue == true)
+            {
+                showValue = false;
+                if (value)
+                    contstr = " Triangle";
+                else
+                    contstr = " Sine";
+            }
             break;
         case EFFECT::type::phaser:
-            effname = " Phaser";
+            effname = " Phaser ";
+            controlType = phaserlist[(control & 0xf) * 2];
+            if (control == 4 && addValue == true)
+            {
+                showValue = false;
+                if (value)
+                    contstr = " Triangle";
+                else
+                    contstr = " Sine";
+            }
             break;
         case EFFECT::type::alienWah:
-            effname = " AlienWah";
+            effname = " AlienWah ";
+            controlType = alienwahlist[(control & 0xf) * 2];
+            if (control == 4 && addValue == true)
+            {
+                showValue = false;
+                if (value)
+                    contstr = " Triangle";
+                else
+                    contstr = " Sine";
+            }
             break;
         case EFFECT::type::distortion:
-            effname = " Distortion";
+        {
+            effname = " Distortion ";
+            int ref = control & 0xf;
+            if (ref > 5) // TODO sort this properly
+                ++ ref;
+
+            switch (ref)
+            {
+                case 5:
+                    contstr = " " + stringCaps(effdistypes[value], 1);
+                    showValue = false;
+                    break;
+                case 11:
+                    contstr = " Pre dist.";
+                    // fallthrough intended
+                case 7:
+                case 10:
+                {
+                    if (value)
+                        contstr += " On";
+                    else
+                        contstr+= " Off";
+                    showValue = false;
+                    break;
+                }
+            }
+            controlType = distortionlist[ref * 2];
             break;
+        }
         case EFFECT::type::eq:
-            effname = " EQ";
+            effname = " EQ ";
+            controlType = eqlist[(control & 0xf) * 2];
             if (control > 1)
                 contstr = " (Band " + to_string(int(parameter)) + ") Control " + to_string(control);
             break;
         case EFFECT::type::dynFilter:
-            effname = " DynFilter";
+            effname = " DynFilter ";
+            controlType = dynfilterlist[(control & 0xf) * 2];
+            if (control == 4 && addValue == true)
+            {
+                showValue = false;
+                if (value)
+                    contstr = " Triangle";
+                else
+                    contstr = " Sine";
+            }
             break;
 
         default:
             showValue = false;
             contstr = " Unrecognised";
+    }
+    if (offset)
+    {
+        controlType = controlType.substr(0, controlType.find(' '));
+        effname += stringCaps(controlType , 1);
     }
 
     if (kititem != EFFECT::type::eq && control == EFFECT::control::preset)

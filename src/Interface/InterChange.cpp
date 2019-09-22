@@ -3394,6 +3394,7 @@ void InterChange::commandPart(CommandBlock *getData)
             else
                 value = part->partefx[effNum]->geteffect();
             getData->data.parameter = (part->partefx[effNum]->geteffectpar(-1) != 0);
+            getData->data.offset = 0;
             break;
         case PART::control::effectDestination:
             if (write)
@@ -5913,6 +5914,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
                         synth->insefx[effnum]->changeeffect(value_int);
                         getData->data.parameter = (synth->insefx[effnum]->geteffectpar(-1) != 0);
                     }
+                    getData->data.offset = 0;
                 }
                 else
                 {

@@ -1,5 +1,9 @@
 yoshimi 1.6.0 M
 
+2019-9-22 Will
+* Most CLI effects switches reported as text.
+* Updated docs.
+
 2019-9-21 Will
 * Further refinements to listing / text lists.
 * Rationalised detune type values.
