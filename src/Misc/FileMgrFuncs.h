@@ -228,7 +228,7 @@ inline bool copyFile(string source, string destination)
     infile.close();
     outfile.write(memblock, size);
     outfile.close();
-    delete memblock;
+    delete[] memblock;
     return 0;
 }
 
