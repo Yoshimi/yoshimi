@@ -228,7 +228,7 @@ float OscilGen::basefunc_triangle(float x, float a)
         x = (1.0f - x) * 4.0f - 1.0f;
     x /= -a;
     if (x < -1.0f)
-        x =- 1.0f;
+        x = -1.0f;
     if (x > 1.0f)
         x = 1.0f;
     return x;
@@ -1005,7 +1005,7 @@ void OscilGen::prepare(void)
         }
 
         if (Phmag[i] < 64)
-            hmag[i] =- hmag[i];
+            hmag[i] = -hmag[i];
     }
 
     // remove the harmonics where Phmag[i]==64
