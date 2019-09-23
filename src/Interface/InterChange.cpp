@@ -1545,7 +1545,7 @@ void InterChange::mutedDecode(unsigned int altData)
     {
         case TOPLEVEL::muted::stopSound:
             putData.data.control = MAIN::control::stopSound;
-            putData.data.type = TOPLEVEL::type::Write || TOPLEVEL::type::Integer;
+            putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
             break;
         case TOPLEVEL::muted::masterReset:
             textMsgBuffer.clear(); // make sure there are no hanging messages
