@@ -2059,7 +2059,7 @@ void ADnote::computeVoiceOscillatorForFMFrequencyModulation(int nvoice)
     for (int k = 0; k < unison_size[nvoice]; ++k)
     {
         float *tw = tmpwave_unison[k];
-        float *mod = freqbasedmod ? tmpmod_unison[k] : parentFMmod;
+        float *mod = freqbasedmod[nvoice] ? tmpmod_unison[k] : parentFMmod;
         int poshi = oscposhi[nvoice][k];
         float poslo = oscposlo[nvoice][k];
         int freqhi = oscfreqhi[nvoice][k];
