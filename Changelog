@@ -2,6 +2,7 @@ yoshimi 1.6.0 M
 
 2019-9-24 Will
 * All CLI effects correctly reporting.
+* Corrected anomaly CLI with sys/ins send.
 
 2019-9-22 Will
 * Most CLI effects switches reported as text.

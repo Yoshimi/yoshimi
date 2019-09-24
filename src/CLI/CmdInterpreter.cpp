@@ -1118,7 +1118,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
          * other command tests routines.
          */
         if (controlType == TOPLEVEL::type::Read)
-            value = 0; // dummy value
+            value = 1; // dummy value
         switch (nFXtype)
         {
             case 1:
@@ -1286,10 +1286,19 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
 
     if (input.matchnMove(2, "send"))
     {
+        bool isWrite = (controlType == TOPLEVEL::type::Write);
         if (input.lineEnd(controlType))
             return REPLY::parameter_msg;
 
-        if (bitTest(context, LEVEL::InsFX))
+        if (!bitTest(context, LEVEL::InsFX))
+        {
+            par = string2int(input) - 1;
+            input.skipChars();
+            if (input.lineEnd(controlType))
+                return REPLY::value_msg;
+            value = string2int127(input);
+        }
+        else if (isWrite) // system effects
         {
             if (input.matchnMove(1, "master"))
                 value = -2;
@@ -1302,15 +1311,9 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                     return REPLY::range_msg;
             }
         }
-        else
-        {
-            par = string2int(input) - 1;
-            input.skipChars();
-            if (input.lineEnd(controlType))
-                return REPLY::value_msg;
-            value = string2int127(input);
-        }
 
+        if (!isWrite)
+            value = 1; // dummy
         int control;
         int partno;
         int engine = nFX;
@@ -1336,7 +1339,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
             engine = nFX;
             insert = TOPLEVEL::insert::systemEffectSend;
         }
-        return sendNormal( synth, 0, value, TOPLEVEL::type::Write, control, partno, UNUSED, engine, insert);
+        return sendNormal( synth, 0, value, controlType, control, partno, UNUSED, engine, insert);
     }
 
     if (input.matchnMove(3, "preset"))
@@ -1356,7 +1359,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
             partno = TOPLEVEL::section::insertEffects;
         else
             partno = TOPLEVEL::section::systemEffects;
-        return sendNormal( synth, 0, nFXpreset, TOPLEVEL::type::Write, 16, partno,  EFFECT::type::none + nFXtype, nFX);
+        return sendNormal( synth, 0, nFXpreset, controlType, 16, partno,  EFFECT::type::none + nFXtype, nFX);
     }
     return REPLY::op_msg;
 }
