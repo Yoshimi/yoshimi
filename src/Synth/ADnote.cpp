@@ -155,6 +155,7 @@ void ADnote::construct()
         NoteVoicePar[nvoice].FMSmp = NULL;
         NoteVoicePar[nvoice].VoiceOut = NULL;
 
+        NoteVoicePar[nvoice].FMEnabled = NONE;
         NoteVoicePar[nvoice].FMVoice = -1;
         unison_size[nvoice] = 1;
 
