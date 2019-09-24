@@ -749,6 +749,7 @@ static std::string phaserlist [] = {
     "STAges <n>",       "filter stages",
     "CROssover <n>",    "L/R routing",
     "SUBtract <s>",     "invert output (ON {other})",
+    "RELative <n>",        "relative phase",
     "HYPer <s>",        "hyper ?  (ON {other})",
     "OVErdrive <n>",    "distortion",
     "ANAlog <s>",       "analog emulation (ON {other})",
@@ -789,12 +790,12 @@ static std::string distortionlist [] = {
 static std::string eqlist [] = {
     "LEVel <n>",        "intensity",
     "BANd <n>",         "EQ band number for following controls",
-    "  FILter <s>",       "filter type",
+    "FILter <s>",       "filter type",
     "","(LP1, HP1, LP2, HP2, NOT, PEA, LOW, HIG)",
-    "  FREquency <n>",  "cutoff/band frequency",
-    "  GAIn <n>",       "makeup gain",
-    "  Q <n>",          "filter Q",
-    "  STAges <n>",     "filter stages",
+    "FREquency <n>",    "cutoff/band frequency",
+    "GAIn <n>",         "makeup gain",
+    "Q <n>",            "filter Q",
+    "STAges <n>",       "filter stages",
     "end"
 };
 
@@ -976,7 +977,7 @@ static std::string effalienwah [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "
 static std::string effdistortion [] = {"LEV", "PAN", "MIX", "DRI", "OUT", "WAV", "INV", "LOW", "HIG", "STE", "FIL", "end"};
 static std::string effdistypes [] = {"ATAn", "ASYm1", "POWer", "SINe", "QNTs", "ZIGzag", "LMT", "ULMt", "LLMt", "ILMt", "CLIp", "AS2", "PO2", "SGM", "end"};
 static std::string effeq [] = {"LEV", "BAN", "FIL", "FRE", "GAI", "Q", "STA"};
-static std::string eqtypes [] = {"OFF", "LP1", "HP1", "LP2", "HP2", "BP2", "NOT", "PEA", "LOW", "HIG", "end"};
+static std::string eqtypes [] = {"OFF", "LP1", "HP1", "LP2", "HP2", "BP2", "NOT", "PEAk", "LOW shelf", "HIGh shelf", "end"};
 static std::string effdynamicfilter [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "SEN", "INV", "RAT", "FIL", "end"};
 
 // common controls

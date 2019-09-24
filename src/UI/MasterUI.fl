@@ -1043,13 +1043,14 @@ Alan Calvert started the project}
           Will Godfrey
           Alexander Hirsch
           Jeremy Jongepier
+          Iain King-Speir
           Tobias Kortkamp
-          Tito Latini
           }
           xywh {25 70 155 200} labelsize 12
         }
         Fl_Box {} {
           label {
+          Tito Latini
           Rainer Liffers
           Jesper Lloyd
           Lars Luthman
@@ -1061,7 +1062,6 @@ Alan Calvert started the project}
           Lorenzo Sutton
           Hermann Voßeler
           Nikita Zlobin
-
 
 
           }
