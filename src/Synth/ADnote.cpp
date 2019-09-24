@@ -950,14 +950,14 @@ void ADnote::killVoice(int nvoice)
     if (subVoice[nvoice] != NULL) {
         for (int k = 0; k < unison_size[nvoice]; ++k)
             delete subVoice[nvoice][k];
-        delete subVoice[nvoice];
+        delete [] subVoice[nvoice];
     }
     subVoice[nvoice] = NULL;
 
     if (subFMVoice[nvoice] != NULL) {
         for (int k = 0; k < unison_size[nvoice]; ++k)
             delete subFMVoice[nvoice][k];
-        delete subFMVoice[nvoice];
+        delete [] subFMVoice[nvoice];
     }
     subFMVoice[nvoice] = NULL;
 
