@@ -437,8 +437,6 @@ endif(BuildWithFLTK)
 add_definitions (
     -D'YOSHIMI_VERSION="${YOSHIMI_VERSION}"'
     -D'BASE_INSTALL_DIR="${CMAKE_INSTALL_PREFIX}"'
-    ${ALSA_LDFLAGS}
-    ${JACK_LDFLAGS}
     -DYOSHI_FIFO_DIR="${FifoDirectory}"
 )
 
