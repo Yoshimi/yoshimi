@@ -164,22 +164,7 @@ if (NOT LIBC_HAS_ARGP)
 endif(NOT LIBC_HAS_ARGP)
 
 # libz
-set (CMAKE_REQUIRED_LIBRARIES z)
-check_c_source_compiles (
-    "#include <zlib.h>
-     #include <stdlib.h>
-     int main(int argc, char **argv) {
-         gzFile zzz  = gzopen(\"/dev/null\", \"rb\");
-         if (NULL != zzz)
-            gzclose(zzz);
-         return 0;
-     }" HAS_LIBZ
-)
-if (HAS_LIBZ)
-    message(STATUS "Found libz")
-else (HAS_LIBZ)
-    message(FATAL_ERROR "libz required but not found: ${HAS_LIBZ}")
-endif (HAS_LIBZ)
+find_package(ZLIB REQUIRED)
 
 # fftw3f
 pkg_check_modules (FFTW3F REQUIRED fftw3f>=0.22)
@@ -448,6 +433,7 @@ include_directories (AFTER
     ${FFTW3F_INC_DIR}
     ${LIBCAIRO_INCLUDE_DIRS}
     ${Readline_INCLUDE_DIR}
+    ${ZLIB_INCLUDE_DIRS}
 )
 
 set(ExternLibraries
@@ -461,7 +447,7 @@ set(ExternLibraries
     ${LIBCAIRO_LIBRARIES}
     ${CURSES_LIBRARIES}
     ${Readline_LIBRARY}
-    z
+    ${ZLIB_LIBRARIES}
     ${LIBDL_LINUX}
 )
 
