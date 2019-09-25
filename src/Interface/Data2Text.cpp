@@ -60,6 +60,9 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
     showValue = true;
     string commandName;
 
+    Part *part;
+    part = synth->part[npart];
+
     // this is unique and placed here to avoid Xruns
     if (npart == TOPLEVEL::section::scales && (control <= SCALES::control::tuning || control >= SCALES::control::retune))
         synth->setAllPartMaps();
@@ -93,30 +96,23 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
         commandName = "Invalid kit " + to_string(int(kititem) + 1);
     }
 
-    else if (kititem != 0)
+    else if (kititem != 0 && engine != UNUSED && control != PART::control::enable && part->kit[kititem].Penabled == false)
+        commandName = "Part " + to_string(int(npart) + 1) + " Kit item " + to_string(int(kititem) + 1) + " not enabled";
+
+    else if (kititem == UNUSED || insert == TOPLEVEL::insert::kitGroup)
     {
-        Part *part;
-        part = synth->part[npart];
-
-        if (engine != UNUSED && control != PART::control::enable && part->kit[kititem].Penabled == false)
-            commandName = "Part " + to_string(int(npart) + 1) + " Kit item " + to_string(int(kititem) + 1) + " not enabled";
-
-        else if (kititem == UNUSED || insert == TOPLEVEL::insert::kitGroup)
-        {
-            if (control != PART::control::kitMode && kititem != UNUSED && part->Pkitmode == 0)
-            {
-                showValue = false;
-                commandName = "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
-            }
-            else
-                commandName = resolvePart(getData, addValue);
-        }
-
-        else if (part->Pkitmode == 0)
+        if (control != PART::control::kitMode && kititem != UNUSED && part->Pkitmode == 0)
         {
             showValue = false;
             commandName = "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
         }
+        else
+            commandName = resolvePart(getData, addValue);
+    }
+    else if (kititem > 0 && part->Pkitmode == 0)
+    {
+        showValue = false;
+        commandName = "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
     }
 
     else if (engine == PART::engine::padSynth)
