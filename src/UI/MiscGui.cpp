@@ -252,8 +252,6 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         return;
     }
 
-    Part *part = synth->part[npart];
-
     if (kititem >= EFFECT::type::none && kititem != UNUSED) // effects
     {
         if (npart == TOPLEVEL::section::systemEffects)
@@ -321,6 +319,8 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     }
     if (kititem == UNUSED || insert == TOPLEVEL::insert::kitGroup) // part
     {
+        Part *part = synth->part[npart];
+
         if (control != PART::control::kitMode && kititem != UNUSED && part->Pkitmode == 0)
             return; // invalid access
         synth->getGuiMaster()->partui->returns_update(getData);

@@ -209,7 +209,8 @@ float Microtonal::getNoteFreq(int note, int keyshift)
     {
         int nt = note - PAnote + scaleshift;
         int ntkey = (nt + octavesize * 100) % octavesize;
-        int ntoct = (nt - ntkey) / octavesize;
+        // cast octavesize to a signed type so the expression stays signed
+        int ntoct = (nt - ntkey) / int(octavesize);
 
         float oct  = octave[octavesize - 1].tuning;
         freq = octave[(ntkey + octavesize - 1) % octavesize].tuning

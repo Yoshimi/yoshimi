@@ -155,6 +155,7 @@ void ADnote::construct()
         NoteVoicePar[nvoice].FMSmp = NULL;
         NoteVoicePar[nvoice].VoiceOut = NULL;
 
+        NoteVoicePar[nvoice].FMEnabled = NONE;
         NoteVoicePar[nvoice].FMVoice = -1;
         unison_size[nvoice] = 1;
 
@@ -588,25 +589,27 @@ void ADnote::initSubVoices(void)
             || adpars->VoicePar[nvoice].POffsetHz != 64
             || adpars->VoicePar[nvoice].PfixedfreqET != 0;
 
-        bool oscFreqSettingsDiffer =
-               (adpars->VoicePar[nvoice].PBendAdjust
-                != adpars->VoicePar[NoteVoicePar[nvoice].Voice].PBendAdjust)
-            || (adpars->VoicePar[nvoice].Pfixedfreq
-                != adpars->VoicePar[NoteVoicePar[nvoice].Voice].Pfixedfreq);
+        if (NoteVoicePar[nvoice].Voice != -1)
+        {
+            bool oscFreqSettingsDiffer =
+                   (adpars->VoicePar[nvoice].PBendAdjust
+                    != adpars->VoicePar[NoteVoicePar[nvoice].Voice].PBendAdjust)
+                || (adpars->VoicePar[nvoice].Pfixedfreq
+                    != adpars->VoicePar[NoteVoicePar[nvoice].Voice].Pfixedfreq);
 
-        if (NoteVoicePar[nvoice].Voice != -1
-            && (subVoiceNumber != -1
+            if (subVoiceNumber != -1
                 || oscHasFreqAdj
                 || oscFreqSettingsDiffer
-                || freqbasedmod[nvoice]))
-        {
-            subVoice[nvoice] = new ADnote*[unison_size[nvoice]];
-            for (int k = 0; k < unison_size[nvoice]; ++k) {
-                float *freqmod = freqbasedmod[nvoice] ? tmpmod_unison[k] : parentFMmod;
-                subVoice[nvoice][k] = new ADnote((origVoice != NULL) ? origVoice : this,
-                                                 getVoiceBaseFreq(nvoice),
-                                                 NoteVoicePar[nvoice].Voice,
-                                                 freqmod, forFM);
+                || freqbasedmod[nvoice])
+            {
+                subVoice[nvoice] = new ADnote*[unison_size[nvoice]];
+                for (int k = 0; k < unison_size[nvoice]; ++k) {
+                    float *freqmod = freqbasedmod[nvoice] ? tmpmod_unison[k] : parentFMmod;
+                    subVoice[nvoice][k] = new ADnote((origVoice != NULL) ? origVoice : this,
+                                                     getVoiceBaseFreq(nvoice),
+                                                     NoteVoicePar[nvoice].Voice,
+                                                     freqmod, forFM);
+                }
             }
         }
 
@@ -617,28 +620,30 @@ void ADnote::initSubVoices(void)
             || adpars->VoicePar[nvoice].PFMCoarseDetune != 0
             || adpars->VoicePar[nvoice].PFMDetune != 8192;
 
-        bool modFreqSettingsDiffer =
-               (adpars->VoicePar[nvoice].PBendAdjust
-                != adpars->VoicePar[NoteVoicePar[nvoice].FMVoice].PBendAdjust)
-            || (adpars->VoicePar[nvoice].PFMFixedFreq
-                != adpars->VoicePar[NoteVoicePar[nvoice].FMVoice].Pfixedfreq)
-            || (NoteVoicePar[nvoice].FMDetuneFromBaseOsc
-                && (adpars->VoicePar[nvoice].Pfixedfreq
-                    != adpars->VoicePar[NoteVoicePar[nvoice].FMVoice].Pfixedfreq));
-
-        if (NoteVoicePar[nvoice].FMVoice != -1
-            && (subVoiceNumber != -1
-                || (NoteVoicePar[nvoice].FMDetuneFromBaseOsc && oscHasFreqAdj)
-                || modHasFreqAdj
-                || modFreqSettingsDiffer))
+        if (NoteVoicePar[nvoice].FMVoice != -1)
         {
-            bool voiceForFM = NoteVoicePar[nvoice].FMEnabled == FREQ_MOD;
-            subFMVoice[nvoice] = new ADnote*[unison_size[nvoice]];
-            for (int k = 0; k < unison_size[nvoice]; ++k) {
-                subFMVoice[nvoice][k] = new ADnote((origVoice != NULL) ? origVoice : this,
-                                                   getFMVoiceBaseFreq(nvoice),
-                                                   NoteVoicePar[nvoice].FMVoice,
-                                                   parentFMmod, voiceForFM);
+            bool modFreqSettingsDiffer =
+                   (adpars->VoicePar[nvoice].PBendAdjust
+                    != adpars->VoicePar[NoteVoicePar[nvoice].FMVoice].PBendAdjust)
+                || (adpars->VoicePar[nvoice].PFMFixedFreq
+                    != adpars->VoicePar[NoteVoicePar[nvoice].FMVoice].Pfixedfreq)
+                || (NoteVoicePar[nvoice].FMDetuneFromBaseOsc
+                    && (adpars->VoicePar[nvoice].Pfixedfreq
+                        != adpars->VoicePar[NoteVoicePar[nvoice].FMVoice].Pfixedfreq));
+
+            if (subVoiceNumber != -1
+                    || (NoteVoicePar[nvoice].FMDetuneFromBaseOsc && oscHasFreqAdj)
+                    || modHasFreqAdj
+                    || modFreqSettingsDiffer)
+            {
+                bool voiceForFM = NoteVoicePar[nvoice].FMEnabled == FREQ_MOD;
+                subFMVoice[nvoice] = new ADnote*[unison_size[nvoice]];
+                for (int k = 0; k < unison_size[nvoice]; ++k) {
+                    subFMVoice[nvoice][k] = new ADnote((origVoice != NULL) ? origVoice : this,
+                                                       getFMVoiceBaseFreq(nvoice),
+                                                       NoteVoicePar[nvoice].FMVoice,
+                                                       parentFMmod, voiceForFM);
+                }
             }
         }
     }
@@ -946,14 +951,14 @@ void ADnote::killVoice(int nvoice)
     if (subVoice[nvoice] != NULL) {
         for (int k = 0; k < unison_size[nvoice]; ++k)
             delete subVoice[nvoice][k];
-        delete subVoice[nvoice];
+        delete [] subVoice[nvoice];
     }
     subVoice[nvoice] = NULL;
 
     if (subFMVoice[nvoice] != NULL) {
         for (int k = 0; k < unison_size[nvoice]; ++k)
             delete subFMVoice[nvoice][k];
-        delete subFMVoice[nvoice];
+        delete [] subFMVoice[nvoice];
     }
     subFMVoice[nvoice] = NULL;
 

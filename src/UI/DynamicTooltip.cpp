@@ -61,6 +61,7 @@ DynTooltip::DynTooltip():Fl_Menu_Window(1,1)
 
     valueType = VC_plainValue;
     graphicsType = VC_plainValue;
+    onlyValue = false;
 
     positioned = false;
     yoffs = 20;
