@@ -80,7 +80,7 @@ class VectorUI {
       Fl_Menu_Button {} {
         label Options
         xywh {275 12 74 20} labelsize 12 textsize 12
-        code0 {o = o; // suppress warning}
+        code0 {(void) o; // suppress warning}
         code1 {vector <string> listType = *synth->getHistory(TOPLEVEL::XML::Vector);}
         code2 {if (listType.size() == 0) recenthistory->deactivate(); else recenthistory->activate();}
       } {
@@ -168,7 +168,7 @@ class VectorUI {
         }
         Fl_Button XL {
           callback {//
-          Fl_Button *a = o; o = a; // suppress warning
+          (void) o; // suppress warning
           synth->getGuiMaster()->activePart = BaseChan;
           bankui->Show();}
           tooltip {Part corresponding to joystick 'left' position} xywh {20 53 160 20} box UP_FRAME color 51 labelsize 12 align 64
@@ -187,7 +187,7 @@ class VectorUI {
         }
         Fl_Button XR {
           callback {//
-          Fl_Button *a = o; o = a; // suppress warning
+          (void) o; // suppress warning
           synth->getGuiMaster()->activePart = BaseChan + NUM_MIDI_CHANNELS;
           bankui->Show();}
           tooltip {Part corresponding to joystick 'right' position} xywh {20 115 160 20} box UP_FRAME color 51 labelsize 12 align 64
@@ -348,7 +348,7 @@ class VectorUI {
         }
         Fl_Button YU {
           callback {//
-          Fl_Button *a = o; o = a; // suppress warning
+          (void) o; // suppress warning
           synth->getGuiMaster()->activePart = BaseChan + NUM_MIDI_CHANNELS * 2;
           bankui->Show();}
           tooltip {Part corresponding to joystick 'up' position} xywh {20 163 160 20} box UP_FRAME color 51 labelsize 12 align 64
@@ -367,7 +367,7 @@ class VectorUI {
         }
         Fl_Button YD {
           callback {//
-          Fl_Button *a = o; o = a; // suppress warning
+          (void) o; // suppress warning
           synth->getGuiMaster()->activePart = BaseChan + NUM_MIDI_CHANNELS * 3;
           bankui->Show();}
           tooltip {Part corresponding to joystick 'down'position} xywh {20 225 160 20} box UP_FRAME color 51 labelsize 12 align 64
@@ -506,7 +506,7 @@ class VectorUI {
       Fl_Button Loaded {
         label {No Name}
         callback {//
-        Fl_Button *a = o; o = a; // suppress warning
+        (void) o; // suppress warning
         const char *tmp = NULL;
         tmp = fl_input("Vector name:", loadlabel[BaseChan].c_str());
         if (tmp != NULL && !string(tmp).empty())

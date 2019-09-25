@@ -282,7 +282,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     if (write)
         __sync_or_and_fetch(&blockRead, 2);
     bool guiTo = false;
-    guiTo = guiTo; // suppress warning when headless build
+    (void) guiTo; // suppress warning when headless build
     unsigned char newMsg = false;//NO_MSG;
 
     if (npart == TOPLEVEL::section::main && control == MAIN::control::loadFileFromList)

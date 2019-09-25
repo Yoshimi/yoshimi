@@ -835,7 +835,7 @@ class OscilEditor {: {public PresetsUI_}
       Fl_Light_Button autoclearbutton {
         label {Clr.}
         callback {// not used directly now
-        Fl_Light_Button *a = o; o = a; // suppress warning
+        (void) o; // suppress warning
         //send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::autoClear, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Auto clear when using the oscillator as base function} xywh {95 313 35 20} box THIN_UP_BOX value 1 labelfont 1 labelsize 10
       }
