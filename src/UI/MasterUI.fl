@@ -378,7 +378,7 @@ class MasterUI {selected : {private GuiUpdates}
         Submenu Instruments {
           label {&Instruments}
           xywh {0 0 100 20} labelsize 12
-          code0 {o = o; // suppress warning}
+          code0 {(void) o; // suppress warning}
           code1 {vector <string> listType = *synth->getHistory(TOPLEVEL::XML::Instrument);}
           code2 {if (listType.size() == 0) RecentInstruments->deactivate(); else RecentInstruments->activate();}
         } {
@@ -459,7 +459,7 @@ class MasterUI {selected : {private GuiUpdates}
         Submenu Parameters {
           label {&Patch Sets}
           xywh {0 0 70 20} labelsize 12
-          code0 {o = o; // suppress warning}
+          code0 {(void) o; // suppress warning}
           code1 {vector <string> listType = *synth->getHistory(TOPLEVEL::XML::Patch);}
           code2 {if (listType.size() == 0) RecentParams->deactivate(); else RecentParams->activate();}
         } {
@@ -519,7 +519,7 @@ class MasterUI {selected : {private GuiUpdates}
         Submenu Scales {
           label {&Scales}
           tooltip {Clear all parameters to default settings} xywh {0 0 60 20} labelsize 12
-          code0 {o = o; // suppress warning}
+          code0 {(void) o; // suppress warning}
           code1 {vector <string> listType = *synth->getHistory(TOPLEVEL::XML::Scale);}
           code2 {if (listType.size() == 0) RecentScale->deactivate(); else RecentScale->activate();}
         } {
@@ -585,7 +585,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
         Submenu {} {
           label {S&tate}
           xywh {0 0 60 20} labelsize 12
-          code0 {o = o; // suppress warning}
+          code0 {(void) o; // suppress warning}
           code1 {vector <string> listType = *synth->getHistory(TOPLEVEL::XML::State);}
           code2 {if (listType.size() == 0) RecentState->deactivate(); else RecentState->activate();}
         } {

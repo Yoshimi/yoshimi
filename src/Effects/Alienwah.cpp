@@ -24,10 +24,10 @@
 
 */
 
-using namespace std;
-
 #include "Misc/SynthEngine.h"
 #include "Effects/Alienwah.h"
+
+using namespace std;
 
 static const int PRESET_SIZE = 11;
 static const int NUM_PRESETS = 4;
