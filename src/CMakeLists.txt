@@ -138,6 +138,11 @@ if (BuildWithFLTK)
 endif(BuildWithFLTK)
 
 find_package (PkgConfig REQUIRED)
+if (PKG_CONFIG_FOUND)
+    message(STATUS "Found pkg-config ${PKG_CONFIG_EXECUTABLE}")
+else (PKG_CONFIG_FOUND)
+    message(FATAL_ERROR "pkg-config required but not found")
+endif (PKG_CONFIG_FOUND)
 
 include (CheckFunctionExists)
 
@@ -161,20 +166,56 @@ check_c_source_compiles (
 if (NOT LIBC_HAS_ARGP)
     message(STATUS "libc does not have argp")
     find_library (ARGP_LIB argp REQUIRED)
+    if (ARGP_LIB)
+        message(STATUS "Found libargp")
+    else(ARGP_LIB)
+        message(FATAL_ERROR "libargp required but not found")
+    endif(ARGP_LIB)
 endif(NOT LIBC_HAS_ARGP)
 
 # libz
-find_package(ZLIB REQUIRED)
+set (CMAKE_REQUIRED_LIBRARIES z)
+check_c_source_compiles (
+    "#include <zlib.h>
+     #include <stdlib.h>
+     int main(int argc, char **argv) {
+         gzFile zzz  = gzopen(\"/dev/null\", \"rb\");
+         if (NULL != zzz)
+            gzclose(zzz);
+         return 0;
+     }" HAS_LIBZ
+)
+if (HAS_LIBZ)
+    message(STATUS "Found libz")
+else (HAS_LIBZ)
+    message(FATAL_ERROR "libz required but not found: ${HAS_LIBZ}")
+endif (HAS_LIBZ)
 
 # fftw3f
 pkg_check_modules (FFTW3F REQUIRED fftw3f>=0.22)
+if (FFTW3F_FOUND)
+    set (FFTW3F_LIBRARIES "${FFTW3F_LIBRARIES}")
+    message (STATUS "Found fftw3f ${FFTW3F_VERSION}")
+else (FFTW3F_FOUND)
+    message (FATAL_ERROR "fftw3f >=0.22 required but not found")
+endif (FFTW3F_FOUND)
 
 # mxml
 pkg_check_modules (MXML REQUIRED mxml>=2.5)
+if (MXML_FOUND)
+    message(STATUS "Found mxml ${MXML_VERSION}")
+else (MXML_FOUND)
+    message(FATAL_ERROR "mxml >=2.5 required but not found")
+endif (MXML_FOUND)
 
 # Alsa
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
     pkg_check_modules (ALSA REQUIRED alsa>=1.0.17)
+    if (ALSA_FOUND)
+	message(STATUS "Found Alsa ${ALSA_VERSION}")
+    else (ALSA_FOUND)
+	message(FATAL_ERROR "Alsa >=1.0.17 required but not found")
+    endif (ALSA_FOUND)
     add_definitions(-DHAVE_ALSA)
     FIND_LIBRARY(LIBDL_LINUX NAMES dl)
 else()
@@ -183,18 +224,38 @@ endif()
 
 # Jack
 pkg_check_modules (JACK REQUIRED jack>=0.115.6)
+if (JACK_FOUND)
+    message(STATUS "Found jack ${JACK_VERSION}")
+else (JACK_FOUND)
+    message(FATAL_ERROR "Jack >=0.115.6 required but not found")
+endif (JACK_FOUND)
 
 # fontconfig
 pkg_check_modules (FONTCONFIG REQUIRED fontconfig>=0.22)
 mark_as_advanced(FONTCONFIG_LIBRARIES)
+if(FONTCONFIG_FOUND)
+    message (STATUS "Found fontconfig ${FONTCONFIG_VERSION}")
+else(FONTCONFIG_FOUND)
+    message (FATAL_ERROR "fontconfig>=0.22 required but not found")
+endif(FONTCONFIG_FOUND)
 
 
 if (BuildWithFLTK)
 # libcairo
     pkg_check_modules (LIBCAIRO REQUIRED cairo)
+    if (LIBCAIRO_FOUND)
+        message (STATUS "Found libcairo ${LIBCAIRO_VERSION}")
+    else (LIBCAIRO_FOUND)
+        message (FATAL_ERROR "libcairo required but not found")
+    endif (LIBCAIRO_FOUND)
 
 # fltk
     find_package (FLTK REQUIRED)
+    if (FLTK_FOUND)
+        message (STATUS "Found FLTK")
+    else (FLTK_FOUND)
+        message (FATAL_ERROR "FLTK required but not found")
+    endif (FLTK_FOUND)
     mark_as_advanced (FLTK_DIR)
     mark_as_advanced (FLTK_FLUID_EXECUTABLE)
     mark_as_advanced (FLTK_MATH_LIBRARY)
@@ -204,9 +265,47 @@ endif(BuildWithFLTK)
 # libncurses / libcursesw
 set(CURSES_NEED_NCURSES TRUE)
 find_package (Curses REQUIRED)
+if (CURSES_FOUND)
+    message(STATUS "Found libncurses or libncursesw")
+else (CURSES_FOUND)
+    message(FATAL_ERROR "libncurses or libncursesw required but not found")
+endif (CURSES_FOUND)
 
-# readline
-pkg_check_modules(READLINE REQUIRED readline)
+find_path(Readline_ROOT_DIR
+    NAMES include/readline/readline.h
+)
+
+find_path(Readline_INCLUDE_DIR
+    NAMES readline/readline.h
+    HINTS ${Readline_ROOT_DIR}/include
+)
+
+find_library(Readline_LIBRARY
+    NAMES readline
+    HINTS ${Readline_ROOT_DIR}/lib
+)
+
+#find_package(PkgConfig REQUIRED)
+if(Readline_INCLUDE_DIR AND Readline_LIBRARY AND CURSES_LIBRARY)
+  set(READLINE_FOUND TRUE)
+else(Readline_INCLUDE_DIR AND Readline_LIBRARY AND CURSES_LIBRARY)
+  FIND_LIBRARY(Readline_LIBRARY NAMES readline)
+  include(FindPackageHandleStandardArgs)
+  FIND_PACKAGE_HANDLE_STANDARD_ARGS(Readline DEFAULT_MSG Readline_INCLUDE_DIR Readline_LIBRARY )
+  MARK_AS_ADVANCED(Readline_INCLUDE_DIR Readline_LIBRARY)
+endif(Readline_INCLUDE_DIR AND Readline_LIBRARY AND CURSES_LIBRARY)
+
+mark_as_advanced(
+    Readline_ROOT_DIR
+    Readline_INCLUDE_DIR
+    Readline_LIBRARY
+)
+
+if(READLINE_FOUND)
+    message (STATUS "Readline library found" )
+else(READLINE_FOUND)
+    message( FATAL_ERROR "Readline library not found! Please install development components (libreadline-dev)" )
+endif(READLINE_FOUND)
 
 # set platform specific compiler flags
 if (BuildFor0ld_X86)
@@ -338,6 +437,8 @@ endif(BuildWithFLTK)
 add_definitions (
     -D'YOSHIMI_VERSION="${YOSHIMI_VERSION}"'
     -D'BASE_INSTALL_DIR="${CMAKE_INSTALL_PREFIX}"'
+    ${ALSA_LDFLAGS}
+    ${JACK_LDFLAGS}
     -DYOSHI_FIFO_DIR="${FifoDirectory}"
 )
 
@@ -399,7 +500,6 @@ include_directories (AFTER
     ${FFTW3F_INC_DIR}
     ${LIBCAIRO_INCLUDE_DIRS}
     ${Readline_INCLUDE_DIR}
-    ${ZLIB_INCLUDE_DIRS}
 )
 
 set(ExternLibraries
@@ -413,7 +513,7 @@ set(ExternLibraries
     ${LIBCAIRO_LIBRARIES}
     ${CURSES_LIBRARIES}
     ${Readline_LIBRARY}
-    ${ZLIB_LIBRARIES}
+    z
     ${LIBDL_LINUX}
 )
 
@@ -527,5 +627,10 @@ if (LV2Plugin)
     endif()
 
     pkg_check_modules(LV2 REQUIRED lv2>=1.0.0)
+    if (LV2_FOUND)
+        message (STATUS "Found lv2 package ${LV2_VERSION}")
+    else (LV2_FOUND)
+        message (FATAL_ERROR "lv2 package required but not found (version 1.0.0 needed)")
+    endif (LV2_FOUND)
     add_subdirectory(LV2_Plugin)
 endif (LV2Plugin)
