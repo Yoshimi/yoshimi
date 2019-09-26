@@ -4578,12 +4578,16 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
     if (kitMode == PART::kitType::Off)
         kitNumber = UNUSED; // always clear it if not kit mode
 
-    if (input.matchnMove(2, "effects") || input.matchnMove(2, "efx"))
+    // This is for actual effect definition and editing. See below for kit selection.
+    if (!inKitEditor)
     {
-        context = LEVEL::Top;
-        bitSet(context, LEVEL::AllFX);
-        bitSet(context, LEVEL::Part);
-        return effects(input, controlType);
+        if (input.matchnMove(2, "effects") || input.matchnMove(2, "efx"))
+        {
+            context = LEVEL::Top;
+            bitSet(context, LEVEL::AllFX);
+            bitSet(context, LEVEL::Part);
+            return effects(input, controlType);
+        }
     }
 
     if (input.isdigit())
@@ -4785,6 +4789,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
             return sendNormal( synth, 0, (input.toggle() != 0), controlType, PART::control::drumMode, npart);
         if (input.matchnMove(2, "quiet"))
             return sendNormal( synth, 0, (input.toggle() != 0), controlType, PART::control::kitItemMute, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup);
+         // This is for selection from 3 part effects. See above for definitions.
         if (input.matchnMove(2,"effect"))
         {
             if (controlType == TOPLEVEL::type::Write && input.isAtEnd())
@@ -4792,7 +4797,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
             value = string2int(input);
             if (value < 0 || value > NUM_PART_EFX)
                 return REPLY::range_msg;
-            return sendNormal( synth, 0, value, controlType, PART::control::kitEffectNum, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup);
+            return sendNormal( synth, 0, value, controlType | TOPLEVEL::type::Integer, PART::control::kitEffectNum, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup);
         }
         if (input.matchnMove(2,"name"))
         {

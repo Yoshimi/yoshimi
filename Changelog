@@ -1,7 +1,10 @@
 yoshimi 1.6.0 M
 
-2019-9-2 Will
+2019-9-26 Will
 * Refined data2text to clarify structure.
+* BugFix: CLI not selecting which kit item effect
+  from the three part effects.
+  It was changing the actual effect instead.
 
 2019-9-25 Will
 * Reverted cmake change from Iain
