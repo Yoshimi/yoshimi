@@ -43,6 +43,7 @@ class DataText
         ~DataText(){ };
         std::string resolveAll(SynthEngine *_synth, CommandBlock *getData, bool addValue);
     private:
+        std::string withValue(std::string resolved, unsigned char type, bool showValue, bool addValue, float value);
         std::string resolveVector(CommandBlock *getData, bool addValue);
         std::string resolveMicrotonal(CommandBlock *getData, bool addValue);
         std::string resolveConfig(CommandBlock *getData, bool addValue);

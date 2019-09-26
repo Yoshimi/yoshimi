@@ -38,6 +38,22 @@ DataText::DataText() :
 {
 }
 
+std::string DataText::withValue(std::string resolved, unsigned char type, bool showValue, bool addValue, float value)
+{
+    std::string actual = "";
+    if (showValue)
+    {
+        actual = " Value ";
+        if (type & TOPLEVEL::type::Integer)
+            actual += to_string(lrint(value));
+        else
+            actual += to_string(value);
+    }
+    if (addValue)
+        resolved += actual;
+    return resolved;
+}
+
 string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool addValue)
 {
     SynthEngine *synth = _synth;
@@ -48,7 +64,6 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-//    unsigned char insertParam = getData->data.parameter;
 
     if (control == TOPLEVEL::control::textMessage) // special case for simple messages
     {
@@ -60,62 +75,74 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
     showValue = true;
     string commandName;
 
-    Part *part;
-    part = synth->part[npart];
-
-    // this is unique and placed here to avoid Xruns
+   // this is unique and placed here to avoid Xruns
     if (npart == TOPLEVEL::section::scales && (control <= SCALES::control::tuning || control >= SCALES::control::retune))
         synth->setAllPartMaps();
 
     if (npart == TOPLEVEL::section::vector)
+    {
         commandName = resolveVector(getData, addValue);
-    else if (npart == TOPLEVEL::section::scales)
+        return withValue(commandName, type, showValue, addValue, value);
+    }
+    if (npart == TOPLEVEL::section::scales)
+    {
         commandName = resolveMicrotonal(getData, addValue);
-    else if (npart == TOPLEVEL::section::config)
+        return withValue(commandName, type, showValue, addValue, value);
+    }
+    if (npart == TOPLEVEL::section::config)
+    {
         commandName = resolveConfig(getData, addValue);
-    else if (npart == TOPLEVEL::section::bank)
+        return withValue(commandName, type, showValue, addValue, value);
+    }
+    if (npart == TOPLEVEL::section::bank)
+    {
         commandName = resolveBank(getData, addValue);
-    else if (npart == TOPLEVEL::section::midiIn || npart == TOPLEVEL::section::main)
+        return withValue(commandName, type, showValue, addValue, value);
+    }
+    if (npart == TOPLEVEL::section::midiIn || npart == TOPLEVEL::section::main)
+    {
         commandName = resolveMain(getData, addValue);
-
-    else if (npart == TOPLEVEL::section::systemEffects || npart == TOPLEVEL::section::insertEffects)
-        commandName = resolveEffects(getData, addValue);
-
-    else if ((kititem >= EFFECT::type::none && kititem <= EFFECT::type::dynFilter) || (control >= PART::control::effectNumber && control <= PART::control::effectBypass && kititem == UNUSED))
-        commandName = resolveEffects(getData, addValue);
-
-    else if (npart >= NUM_MIDI_PARTS)
-    {
-        showValue = false;
-        commandName = "Invalid part " + to_string(int(npart) + 1);
+        return withValue(commandName, type, showValue, addValue, value);
     }
 
-    else if (kititem >= NUM_KIT_ITEMS && kititem < UNUSED)
+    if (npart == TOPLEVEL::section::systemEffects || npart == TOPLEVEL::section::insertEffects)
     {
-        showValue = false;
-        commandName = "Invalid kit " + to_string(int(kititem) + 1);
+        commandName = resolveEffects(getData, addValue);
+        return withValue(commandName, type, showValue, addValue, value);
     }
 
-    else if (kititem != 0 && engine != UNUSED && control != PART::control::enable && part->kit[kititem].Penabled == false)
-        commandName = "Part " + to_string(int(npart) + 1) + " Kit item " + to_string(int(kititem) + 1) + " not enabled";
+    if ((kititem >= EFFECT::type::none && kititem <= EFFECT::type::dynFilter) || (control >= PART::control::effectNumber && control <= PART::control::effectBypass && kititem == UNUSED))
+    {
+        commandName = resolveEffects(getData, addValue);
+        return withValue(commandName, type, showValue, addValue, value);
+    }
 
-    else if (kititem == UNUSED || insert == TOPLEVEL::insert::kitGroup)
+    if (npart >= NUM_MIDI_PARTS)
+        return "Invalid part " + to_string(int(npart) + 1);
+
+    if (kititem >= NUM_KIT_ITEMS && kititem < UNUSED)
+        return "Invalid kit " + to_string(int(kititem) + 1);
+
+    Part *part;
+    part = synth->part[npart];
+
+    if (kititem > 0 && engine != UNUSED && control != PART::control::enable && part->kit[kititem].Penabled == false)
+        return "Part " + to_string(int(npart) + 1) + " Kit item " + to_string(int(kititem) + 1) + " not enabled";
+
+    if (kititem == UNUSED || insert == TOPLEVEL::insert::kitGroup)
     {
         if (control != PART::control::kitMode && kititem != UNUSED && part->Pkitmode == 0)
-        {
-            showValue = false;
-            commandName = "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
-        }
+            return  "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
         else
+        {
             commandName = resolvePart(getData, addValue);
+            return withValue(commandName, type, showValue, addValue, value);
+        }
     }
-    else if (kititem > 0 && part->Pkitmode == 0)
-    {
-        showValue = false;
-        commandName = "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
-    }
+    if (kititem > 0 && part->Pkitmode == 0)
+        return "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
 
-    else if (engine == PART::engine::padSynth)
+    if (engine == PART::engine::padSynth)
     {
         switch(insert)
         {
@@ -153,9 +180,10 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
                 commandName = resolveResonance(getData, addValue);
                 break;
         }
+        return withValue(commandName, type, showValue, addValue, value);
     }
 
-    else if (engine == PART::engine::subSynth)
+    if (engine == PART::engine::subSynth)
     {
         switch (insert)
         {
@@ -181,9 +209,10 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
                 commandName = resolveEnvelope(getData, addValue);
                 break;
         }
+        return withValue(commandName, type, showValue, addValue, value);
     }
 
-    else if (engine >= PART::engine::addVoice1)
+    if (engine >= PART::engine::addVoice1)
     {
         switch (insert)
         {
@@ -215,9 +244,10 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
                 commandName = resolveOscillator(getData, addValue);
                 break;
         }
+        return withValue(commandName, type, showValue, addValue, value);
     }
 
-    else if (engine == PART::engine::addSynth)
+    if (engine == PART::engine::addSynth)
     {
         switch (insert)
         {
@@ -247,19 +277,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
                 break;
         }
     }
-
-    string actual = "";
-    if (showValue)
-    {
-        actual = " Value ";
-        if (type & TOPLEVEL::type::Integer)
-            actual += to_string(lrint(value));
-        else
-            actual += to_string(value);
-    }
-    if (addValue)
-        commandName += actual;
-    return commandName;
+    return withValue(commandName, type, showValue, addValue, value);
 }
 
 

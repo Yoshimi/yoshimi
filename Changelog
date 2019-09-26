@@ -1,5 +1,8 @@
 yoshimi 1.6.0 M
 
+2019-9-2 Will
+* Refined data2text to clarify structure.
+
 2019-9-25 Will
 * Reverted cmake change from Iain
   With GCC it breaks on readline :(
