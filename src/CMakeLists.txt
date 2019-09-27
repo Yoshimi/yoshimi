@@ -105,22 +105,22 @@ set (BuildOptions_X86
 
 set (BuildOptions_X86_64AMD
     "-march=athlon64 -m64 -Wall -msse -msse2 -mfpmath=sse -ffast-math -fno-finite-math-only -fomit-frame-pointer"
-  CACHE STRING "X86_64 compiler options"
+    CACHE STRING "X86_64 compiler options"
 )
 
 set (BuildOptions_X86_64Core2
     "-march=core2 -m64 -Wall -msse -msse2 -mfpmath=sse -ffast-math -fno-finite-math-only -fomit-frame-pointer"
-  CACHE STRING "X86_64 compiler options"
+    CACHE STRING "X86_64 compiler options"
 )
 
 set (BuildOptions_NEON
     "-march=armv7-a -mfloat-abi=hard -mfpu=neon -mcpu=cortex-a9 -mtune=cortex-a9 -pipe -mvectorize-with-neon-quad -funsafe-loop-optimizations"
-  CACHE STRING "Cortex_a9 compiler options"
+    CACHE STRING "Cortex_a9 compiler options"
 )
 
 set (BuildOptionsThisCPU
     "-march=native -mtune=native -Wall"
-  CACHE STRING "Current CPU compiler options"
+    CACHE STRING "Current CPU compiler options"
 )
 
 set (BuildOptionsBasic
@@ -150,12 +150,12 @@ endif()
 check_c_source_compiles (
     "#include <argp.h>
     #include <stdlib.h>
-     int main () {
-         int argc=1;
-         char *argv[]={\"test\"};
-         argp_parse(0,argc,argv,0,0,0);
-         return 0;
-     }" LIBC_HAS_ARGP
+    int main () {
+        int argc=1;
+        char *argv[]={\"test\"};
+        argp_parse(0,argc,argv,0,0,0);
+        return 0;
+    }" LIBC_HAS_ARGP
 )
 
 if (NOT LIBC_HAS_ARGP)
@@ -221,12 +221,12 @@ find_library(Readline_LIBRARY
 
 #find_package(PkgConfig REQUIRED)
 if(Readline_INCLUDE_DIR AND Readline_LIBRARY AND CURSES_LIBRARY)
-  set(READLINE_FOUND TRUE)
+    set(READLINE_FOUND TRUE)
 else()
-  FIND_LIBRARY(Readline_LIBRARY NAMES readline)
-  include(FindPackageHandleStandardArgs)
-  FIND_PACKAGE_HANDLE_STANDARD_ARGS(Readline DEFAULT_MSG Readline_INCLUDE_DIR Readline_LIBRARY )
-  MARK_AS_ADVANCED(Readline_INCLUDE_DIR Readline_LIBRARY)
+    FIND_LIBRARY(Readline_LIBRARY NAMES readline)
+    include(FindPackageHandleStandardArgs)
+    FIND_PACKAGE_HANDLE_STANDARD_ARGS(Readline DEFAULT_MSG Readline_INCLUDE_DIR Readline_LIBRARY )
+    MARK_AS_ADVANCED(Readline_INCLUDE_DIR Readline_LIBRARY)
 endif()
 
 mark_as_advanced(
