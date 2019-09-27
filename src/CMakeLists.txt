@@ -23,10 +23,10 @@ cmake_policy (VERSION 3.0)
 cmake_policy (SET CMP0004 NEW)
 if (POLICY CMP0046)
     cmake_policy (SET CMP0046 NEW)
-endif (POLICY CMP0046) # opengl version
+endif() # opengl version
 if (POLICY CMP0072)
     cmake_policy (SET CMP0072 OLD)
-endif (POLICY CMP0072)
+endif()
 set (CMAKE_CXX_STANDARD 11) # we seem to need both for
 add_definitions(-std=gnu++11) # various versions of cmake
 
@@ -76,9 +76,9 @@ check_c_source_compiles (
 
 if (HasJackSession)
     option (JackSessionSupport "Include Jack Session Support" ON)
-else (HasJackSession)
+else()
     set (JackSessionSupport OFF)
-endif (HasJackSession)
+endif()
 
 option (BuildFor0ld_X86 "Build for legacy x86 system" OFF)
 
@@ -135,7 +135,7 @@ set (BuildOptionsRelease
 
 if (BuildWithFLTK)
     add_definitions (-DGUI_FLTK)
-endif(BuildWithFLTK)
+endif()
 
 find_package (PkgConfig REQUIRED)
 
@@ -145,7 +145,7 @@ check_function_exists(exp10f EXP10F)
 
 if(EXP10F)
     add_definitions(-DHAVE_EXP10F)
-endif(EXP10F)
+endif()
 
 check_c_source_compiles (
     "#include <argp.h>
@@ -161,7 +161,7 @@ check_c_source_compiles (
 if (NOT LIBC_HAS_ARGP)
     message(STATUS "libc does not have argp")
     find_library (ARGP_LIB argp REQUIRED)
-endif(NOT LIBC_HAS_ARGP)
+endif()
 
 # libz
 find_package(ZLIB REQUIRED)
@@ -198,7 +198,7 @@ if (BuildWithFLTK)
     mark_as_advanced (FLTK_DIR)
     mark_as_advanced (FLTK_FLUID_EXECUTABLE)
     mark_as_advanced (FLTK_MATH_LIBRARY)
-endif(BuildWithFLTK)
+endif()
 
 
 # libncurses / libcursesw
@@ -222,12 +222,12 @@ find_library(Readline_LIBRARY
 #find_package(PkgConfig REQUIRED)
 if(Readline_INCLUDE_DIR AND Readline_LIBRARY AND CURSES_LIBRARY)
   set(READLINE_FOUND TRUE)
-else(Readline_INCLUDE_DIR AND Readline_LIBRARY AND CURSES_LIBRARY)
+else()
   FIND_LIBRARY(Readline_LIBRARY NAMES readline)
   include(FindPackageHandleStandardArgs)
   FIND_PACKAGE_HANDLE_STANDARD_ARGS(Readline DEFAULT_MSG Readline_INCLUDE_DIR Readline_LIBRARY )
   MARK_AS_ADVANCED(Readline_INCLUDE_DIR Readline_LIBRARY)
-endif(Readline_INCLUDE_DIR AND Readline_LIBRARY AND CURSES_LIBRARY)
+endif()
 
 mark_as_advanced(
     Readline_ROOT_DIR
@@ -237,43 +237,35 @@ mark_as_advanced(
 
 if(READLINE_FOUND)
     message (STATUS "Readline library found" )
-else(READLINE_FOUND)
+else()
     message( FATAL_ERROR "Readline library not found! Please install development components (libreadline-dev)" )
-endif(READLINE_FOUND)
+endif()
 
 # set platform specific compiler flags
 if (BuildFor0ld_X86)
     set (OurCxxFlags ${BuildOptions_X86})
-else (BuildFor0ld_X86)
-    if (BuildForAMD_X86_64)
-        set (OurCxxFlags ${BuildOptions_X86_64AMD})
-    else (BuildForAMD_X86_64)
-        if (BuildForCore2_X86_64)
-            set (OurCxxFlags ${BuildOptions_X86_64Core2})
-        else (BuildForCore2_X86_64)
-            if (BuildForNEON)
-                set (OurCxxFlags ${BuildOptions_NEON})
-            else (BuildForNEON)
-                if (BuildForThisCPU)
-                    set (OurCxxFlags ${BuildOptionsThisCPU})
-                else (BuildForThisCPU)
-                    set (OurCxxFlags ${BuildOptionsBasic})
-                endif (BuildForThisCPU)
-            endif (BuildForNEON)
-        endif (BuildForCore2_X86_64)
-    endif (BuildForAMD_X86_64)
-endif (BuildFor0ld_X86)
+elseif (BuildForAMD_X86_64)
+    set (OurCxxFlags ${BuildOptions_X86_64AMD})
+elseif (BuildForCore2_X86_64)
+    set (OurCxxFlags ${BuildOptions_X86_64Core2})
+elseif (BuildForNEON)
+    set (OurCxxFlags ${BuildOptions_NEON})
+elseif (BuildForThisCPU)
+    set (OurCxxFlags ${BuildOptionsThisCPU})
+else()
+    set (OurCxxFlags ${BuildOptionsBasic})
+endif()
 set (CMAKE_CXX_FLAGS "${OurCxxFlags} ${CMAKE_CXX_FLAGS}")
 
 if (BuildForDebug)
     set (CMAKE_BUILD_TYPE "Debug")
     set (CMAKE_CXX_FLAGS_DEBUG ${BuildOptionsDebug})
     message (STATUS "DEBUG Build, flags: ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG}")
-else (BuildForDebug)
+else()
     set (CMAKE_BUILD_TYPE "Release")
     set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsRelease})
     message (STATUS "RELEASE Build, flags: ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
-endif (BuildForDebug)
+endif()
 
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.desktop.in"
@@ -367,7 +359,7 @@ if (BuildWithFLTK)
         UI/MiscGui.cpp
     )
     set (YOSHI_INCLUDES ${FLTK_INCLUDE_DIR})
-endif(BuildWithFLTK)
+endif()
 
 add_definitions (
     -D'YOSHIMI_VERSION="${YOSHIMI_VERSION}"'
@@ -379,11 +371,11 @@ add_definitions (-DYOSHIMI="yoshimi")
 
 if (ShowNoteOnTimes)
     add_definitions (-DREPORT_NOTEON)
-endif (ShowNoteOnTimes)
+endif()
 
 if (ReportNotes)
     add_definitions (-DREPORT_NOTES_ON_OFF)
-endif (ReportNotes)
+endif()
 
 add_definitions(-DDEFAULT_AUDIO=jack_audio)
 
@@ -392,9 +384,9 @@ add_definitions(-DDEFAULT_MIDI=jack_midi)
 if (JackSessionSupport)
     message(STATUS "With jack session support")
     add_definitions(-DJACK_SESSION)
-else (JackSessionSupport)
+else()
     message(STATUS "Without jack session support")
-endif (JackSessionSupport)
+endif()
 
 # Check for jack latency API >= 0.120.1
 check_c_source_compiles (
@@ -410,7 +402,7 @@ check_c_source_compiles (
 
 if (HasJackLatency)
     add_definitions(-DJACK_LATENCY)
-endif (HasJackLatency)
+endif()
 
 set (ProgSources
     ${Interface_Sources}
@@ -462,7 +454,7 @@ target_link_libraries (yoshimi ${ExternLibraries})
 
 if (ARGP_LIB)
     target_link_libraries (yoshimi ${ARGP_LIB})
-endif(ARGP_LIB)
+endif()
 
 install (TARGETS yoshimi RUNTIME DESTINATION bin)
 
@@ -562,4 +554,4 @@ if (LV2Plugin)
 
     pkg_check_modules(LV2 REQUIRED lv2>=1.0.0)
     add_subdirectory(LV2_Plugin)
-endif (LV2Plugin)
+endif()
