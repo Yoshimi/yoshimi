@@ -159,12 +159,11 @@ void do_start(void)
 
 static void *mainGuiThread(void *arg)
 {
-    static bool first = true;
     sem_post((sem_t *)arg);
-
     map<SynthEngine *, MusicClient *>::iterator it;
 
 #ifdef GUI_FLTK
+    static bool first = true;
     if (first)
     {
         first = false;

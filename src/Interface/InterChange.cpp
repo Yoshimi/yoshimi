@@ -1589,7 +1589,6 @@ void InterChange::mutedDecode(unsigned int altData)
 
 void InterChange::returns(CommandBlock *getData)
 {
-    unsigned char type = getData->data.type; // back from synth
     synth->getRuntime().finishedCLI = true; // belt and braces :)
     if ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::noAction)
     {
@@ -1600,6 +1599,7 @@ void InterChange::returns(CommandBlock *getData)
     if (getData->data.source < TOPLEVEL::action::lowPrio)
     { // currently only used by gui. this may change!
 #ifdef GUI_FLTK
+        unsigned char type = getData->data.type; // back from synth
         int tmp = (getData->data.source & TOPLEVEL::action::noAction);
         if (getData->data.source & TOPLEVEL::action::forceUpdate)
             tmp = TOPLEVEL::action::toAll;

@@ -1,5 +1,8 @@
 yoshimi 1.6.0 M
 
+2019-10-11 Will
+* Minor corrections for headless build.
+
 2019-9-26 Will
 * Refined data2text to clarify structure.
 * BugFix: CLI not selecting which kit item effect

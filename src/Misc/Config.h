@@ -264,7 +264,9 @@ public:
         msg->data = _data;
         msg->type = _type;
         msg->index = _index;
-        Fl::awake((void *)msg);
+#ifdef GUI_FLTK
+        Fl::awake((void *)msg); // we probably need to review all of this :(
+#endif
     }
     static void processGuiMessages();
 };
