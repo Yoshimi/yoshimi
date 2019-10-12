@@ -32,6 +32,7 @@
 
 LFO::LFO(LFOParams *_lfopars, float _basefreq, SynthEngine *_synth):
     lfopars(_lfopars),
+    lfoUpdate(lfopars),
     basefreq(_basefreq),
     synth(_synth)
 {
@@ -114,7 +115,7 @@ inline void LFO::RecomputeFreq(void)
 // LFO out
 float LFO::lfoout(void)
 {
-    if (lfopars->updated)
+    if (lfoUpdate.checkUpdated())
         Recompute();
 
     float out;

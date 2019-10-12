@@ -40,6 +40,7 @@ class LFO
         float amplfoout(void);
     private:
         LFOParams *lfopars;
+        Presets::PresetsUpdate lfoUpdate;
         void Recompute(void);
         void RecomputeFreq(void);
         void computenextincrnd(void);

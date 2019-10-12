@@ -26,6 +26,7 @@
 #define ENVELOPE_H
 
 #include "globals.h"
+#include "Params/Presets.h"
 
 class EnvelopeParams;
 class SynthEngine;
@@ -36,11 +37,14 @@ class Envelope
         Envelope(EnvelopeParams *envpars, float basefreq, SynthEngine *_synth);
         ~Envelope() { };
         void releasekey(void);
+        void recomputePoints(void);
         float envout(void);
         float envout_dB(void);
         int finished(void) { return envfinish; };
 
     private:
+        EnvelopeParams *_envpars;
+        Presets::PresetsUpdate envUpdate;
         int envpoints;
         int envsustain;   // "-1" means disabled
         float envdt[MAX_ENVELOPE_POINTS];  // milliseconds

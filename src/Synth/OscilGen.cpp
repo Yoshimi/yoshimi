@@ -1173,6 +1173,10 @@ void OscilGen::get(float *smps, float freqHz, int resonance)
 {
     int nyquist;
 
+    // randseed was drawn in ADnote::ADnote()
+    // see also comment at top of OscilGen::prepare()
+    harmonicPrng.init(randseed);
+
     if (oldbasepar != params->Pbasefuncpar
         || oldbasefunc != params->Pcurrentbasefunc
         || oldhmagtype != params->Phmagtype
@@ -1247,7 +1251,7 @@ void OscilGen::get(float *smps, float freqHz, int resonance)
         rnd = PI * powf((params->Prand - 64.0f) / 64.0f, 2.0f);
         for (int i = 1; i < nyquist - 1; ++i)
         {   // to Nyquist only for AntiAliasing
-            angle = rnd * i * prng.numRandom();
+            angle = rnd * i * harmonicPrng.numRandom();
             a = outoscilFFTfreqs.c[i];
             b = outoscilFFTfreqs.s[i];
             c = cosf(angle);
@@ -1260,10 +1264,6 @@ void OscilGen::get(float *smps, float freqHz, int resonance)
     // Harmonic Amplitude Randomness
     if (freqHz > 0.1 && !params->ADvsPAD)
     {
-        // randseed was drawn in ADnote::ADnote()
-        // see also comment at top of OscilGen::prepare()
-        harmonicPrng.init(randseed);
-
         float power = params->Pamprandpower / 127.0f;
         float normalize = 1.0f / (1.2f - power);
         switch (params->Pamprandtype)
