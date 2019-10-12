@@ -133,8 +133,33 @@ string Bank::getnamenumbered(unsigned int ninstrument, size_t bank, size_t root)
 }
 
 
-// Changes the name of an instrument (and the filename)
-bool Bank::setname(unsigned int ninstrument, string newname, int newslot, size_t oldBank, size_t newBank, size_t oldRoot, size_t newRoot)
+// Changes the instrument name in place
+int Bank::setInstrumentName(string name, int slot, size_t bank, size_t root)
+{
+    string result;
+    string slotNum = to_string(slot + 1) + ". ";
+    bool fail = false;
+    if (emptyslot(root, bank, slot))
+    {
+        result = "No instrument on slot " + slotNum;
+        fail = true;
+    }
+    else if (!moveInstrument(slot, name, slot, bank, bank, root, root))
+    {
+        result = "Could not change name of slot " + slotNum;
+        fail = true;
+    }
+    else
+        result = slotNum + name;
+    int msgID = synth->textMsgBuffer.push(result);
+    if (fail)
+        msgID |= 0xFF0000;
+    return msgID;
+}
+
+
+// Changes the name and location of an instrument (and the filename)
+bool Bank::moveInstrument(unsigned int ninstrument, string newname, int newslot, size_t oldBank, size_t newBank, size_t oldRoot, size_t newRoot)
 {
     if (emptyslot(oldRoot, oldBank, ninstrument))
         return false;
@@ -161,7 +186,7 @@ bool Bank::setname(unsigned int ninstrument, string newname, int newslot, size_t
 
     if (chk == false && chk2 == false)
     {
-        synth->getRuntime().Log("setName failed renaming " + oldfilepath + " -> " + newfilepath + ": " + string(strerror(errno)));
+        synth->getRuntime().Log("failed changing " + oldfilepath + " to " + newfilepath + ": " + string(strerror(errno)));
         return false;
     }
     InstrumentEntry &instrRef = getInstrumentReference(oldRoot, oldBank, ninstrument);
@@ -727,7 +752,7 @@ string Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t ban
     { // this is just a movement to an empty slot
         if (emptyslot(root1, bank1, n1)) // make the empty slot the destination
         {
-            if (!setname(n2, getname(n2, bank2, root2), n1, bank2, bank1, root2, root1))
+            if (!moveInstrument(n2, getname(n2, bank2, root2), n1, bank2, bank1, root2, root1))
             {
                 ok = false;
                 message = " Can't write to " + getname(n2, bank2, root2);
@@ -739,7 +764,7 @@ string Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t ban
         }
         else
         {
-            if (!setname(n1, getname(n1, bank1, root1), n2, bank1, bank2, root1, root2))
+            if (!moveInstrument(n1, getname(n1, bank1, root1), n2, bank1, bank2, root1, root2))
             {
                 ok = false;
                 message = " Can't write to " + getname(n1, bank1, root1);
@@ -768,13 +793,13 @@ string Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t ban
     InstrumentEntry &instrRef1 = getInstrumentReference(root1, bank1, n1);
     InstrumentEntry &instrRef2 = getInstrumentReference(root2, bank2, n2);
 
-    if (!setname(n2, secondName, n1, bank2, bank1, root2, root1))
+    if (!moveInstrument(n2, secondName, n1, bank2, bank1, root2, root1))
     {
         ok = false;
         message = " Can't change " + secondName;
     }
 
-    if (!setname(n1, firstName, n2, bank1, bank2, root1, root2))
+    if (!moveInstrument(n1, firstName, n2, bank1, bank2, root1, root2))
     {
         ok = false;
         message = " Can't change " + firstName;

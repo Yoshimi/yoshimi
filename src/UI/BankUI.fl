@@ -962,6 +962,10 @@ class BankUI {: {public BankProcess_, RootProcess_}
     code {//
     //int value_int = getData->data.value.F;
     unsigned char control = getData->data.control;
+    //unsigned char kititem = getData->data.kit;
+    //unsigned char engine= getData->data.engine;
+    unsigned char insert = getData->data.insert;
+
     int source = getData->data.source & TOPLEVEL::action::noAction;
     string message = textMsgBuffer.fetch(getData->data.miscmsg);
     switch(control)
@@ -969,7 +973,16 @@ class BankUI {: {public BankProcess_, RootProcess_}
         case BANK::control::exportBank:
             if(source == TOPLEVEL::action::fromGUI)
                 fl_alert("%s",message.c_str());
-        break;
+            break;
+        case BANK::control::renameInstrument:
+            if (message.find("FAILED") != std::string::npos)
+            {
+                if(source == TOPLEVEL::action::fromGUI)
+                    fl_alert("%s",message.c_str());
+            }
+            else
+                bs[insert]->copy_label(message.c_str());
+            break;
         case BANK::control::deleteInstrument:
             if (message.find("FAILED") != std::string::npos)
             {
@@ -1104,29 +1117,20 @@ class BankUI {: {public BankProcess_, RootProcess_}
             return;
         }
 
-        if (mode == 5 && slotFilled)
+        if (mode == 5)
         {   // Rename slot
-            const char *newname = fl_input("Instrument name:", thisname.c_str());
-            if (newname)
+            if (slotFilled)
             {
-                if (string(newname) == "Simple Sound")
-                    fl_alert("Can't use name of default sound");
-                else if (strlen(newname) > 3)
+                const char *newname = fl_input("Instrument name:", thisname.c_str());
+                if (newname)
                 {
-                    if (!bank->setname(slot, string(newname), slot, bk, bk, rt, rt))
-                    {
-                        setread();
-                        fl_alert("Could not rename instrument %d to %s", slot, newname);
-                    }
-                    else
-                    {
-                        synth->part[curPart]->Pname = newname;
-                        send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveInstrument, float(synth->getGuiMaster()->activePart), TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, slot);
-                    }
+                    if (string(newname) == "Simple Sound")
+                        fl_alert("Can't use name of default sound");
+                    else if (strlen(newname) > 3)
+                        send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::renameInstrument, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::bank, UNUSED, UNUSED, slot, UNUSED, synth->textMsgBuffer.push(newname));
                 }
             }
             setread();
-            cbwig->do_callback();
         }
 
         if (mode == 2)
@@ -1153,10 +1157,13 @@ class BankUI {: {public BankProcess_, RootProcess_}
             }
         }
 
-        if (mode == 3 && slotFilled)
+        if (mode == 3)
         {   // Clears the slot (choices reversed for 'No' priority)
-            if (fl_choice("Clear the slot no. %d ?", NULL, "No", "Yes", slot + 1) > 1)
-                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::deleteInstrument, slot, TOPLEVEL::type::Write, TOPLEVEL::section::bank);
+            if (slotFilled)
+            {
+                if (fl_choice("Clear the slot no. %d ?", NULL, "No", "Yes", slot + 1) > 1)
+                    send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::deleteInstrument, slot, TOPLEVEL::type::Write, TOPLEVEL::section::bank);
+            }
             setread();
         }
 

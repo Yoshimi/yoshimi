@@ -3084,6 +3084,24 @@ int CmdInterpreter::commandBank(Parser& input, unsigned char controlType, bool j
         return sendNormal(synth, TOPLEVEL::action::lowPrio, tmp, controlType, BANK::control::renameBank, TOPLEVEL::section::bank, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscMsg);
     }
 
+    if (input.matchnMove(2, "instrument"))
+    {
+        if (input.matchnMove(1, "rename"))
+        {
+            if (controlType != TOPLEVEL::type::Write)
+                return REPLY::available_msg;
+            if (!input.isdigit())
+                return REPLY::value_msg;
+            int tmp = string2int(input) - 1; // could be up to 160
+            input.skipChars();
+            string name = string{input};
+            if (name <= "!")
+                return REPLY::value_msg;
+            int miscMsg = textMsgBuffer.push(name);
+            return sendNormal(synth, TOPLEVEL::action::lowPrio, 0, controlType, BANK::control::renameInstrument, TOPLEVEL::section::bank, UNUSED, UNUSED, tmp, UNUSED, UNUSED, miscMsg);
+        }
+        return REPLY::done_msg;
+    }
     if (input.matchnMove(1, "root"))
         isRoot = true;
     if (input.lineEnd(controlType))

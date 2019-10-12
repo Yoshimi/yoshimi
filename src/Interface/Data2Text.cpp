@@ -859,6 +859,11 @@ string DataText::resolveBank(CommandBlock *getData, bool)
     showValue = false;
     switch(control)
     {
+        case BANK::control::renameInstrument:
+        {
+            contstr = "Instrument Rename " + name;
+            break;
+        }
         case BANK::control::deleteInstrument:
             contstr = "Instrument delete" + name;
             break;

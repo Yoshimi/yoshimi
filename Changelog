@@ -1,5 +1,11 @@
 yoshimi 1.6.0 M
 
+2019-10-12 Will
+* CLI can now change bank instrument names.
+* Revised GUI bank instrument names.
+  Previously a rename performed a complete
+  bank refetch. Now set the name in place.
+
 2019-10-11 Will
 * Minor corrections for headless build.
 

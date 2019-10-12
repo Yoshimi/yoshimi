@@ -108,7 +108,8 @@ class Bank
         int getType(unsigned int ninstrument, size_t bank, size_t root);
         string getname(unsigned int ninstrument, size_t bank, size_t root);
         string getnamenumbered(unsigned int ninstrument, size_t bank, size_t root);
-        bool setname(unsigned int ninstrument, string newname, int newslot, size_t oldBank, size_t newBank, size_t oldRoot, size_t newRoot);
+        int setInstrumentName(string name, int slot, size_t bank, size_t root);
+        bool moveInstrument(unsigned int ninstrument, string newname, int newslot, size_t oldBank, size_t newBank, size_t oldRoot, size_t newRoot);
              // if newslot==-1 then this is ignored, else it will be put on that slot
 
         int engines_used(size_t rootID, size_t bankID, unsigned int ninstrument);

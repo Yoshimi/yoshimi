@@ -817,6 +817,27 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
         {
             switch (control)
             {
+                case BANK::control::renameInstrument:
+                {
+                    if(kititem == UNUSED)
+                    {
+                        kititem = synth->getRuntime().currentBank;
+                        getData->data.kit = kititem;
+                    }
+                    if(engine == UNUSED)
+                    {
+                        engine = synth->getRuntime().currentRoot;
+                        getData->data.engine = engine;
+                    }
+                    int msgID = synth->bank.setInstrumentName(text, insert, kititem, engine);
+                    if (msgID > NO_MSG)
+                        text = " FAILED ";
+                    else
+                        text = "";
+                    text += textMsgBuffer.fetch(msgID & NO_MSG);
+                    newMsg = true;
+                    break;
+                }
                 case BANK::control::deleteInstrument:
                 {
                     text  = synth->bank.clearslot(value, synth->getRuntime().currentRoot,  synth->getRuntime().currentBank);
