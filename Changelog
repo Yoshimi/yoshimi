@@ -5,6 +5,8 @@ yoshimi 1.6.0 M
 * Revised GUI bank instrument names.
   Previously a rename performed a complete
   bank refetch. Now set the name in place.
+* Corrected accidental variable name change.
+* Revised example presets.
 
 2019-10-11 Will
 * Minor corrections for headless build.

@@ -84,15 +84,15 @@ class PresetsUI {selected
         callback {int val = o->value();
     if (val)
     {
-      premoveInstrument->cut(0, premoveInstrument->maximum_size());
-      premoveInstrument->insert(o->text(val));
+      presetname->cut(0, presetname->maximum_size());
+      presetname->insert(o->text(val));
     }}
         xywh {10 25 245 320} type Select
       }
       Fl_Button copypbutton {
         label {Copy to Preset}
         callback {//
-        const char *tmp = premoveInstrument->value();
+        const char *tmp = presetname->value();
         if (tmp != NULL)
         {
         if (strlen(tmp) > 0)
@@ -123,7 +123,7 @@ class PresetsUI {selected
       Fl_Box copytypetext {
         xywh {50 5 205 15} box FLAT_BOX color 238 labelfont 1 labelsize 11 align 20
       }
-      Fl_Input premoveInstrument {
+      Fl_Input presetname {
         callback {//
         const char *tmp = o->value();
         if (tmp == NULL)
@@ -216,7 +216,7 @@ class PresetsUI {selected
     this->p = p;
     this->pui = NULL;
     bool but = (Fl::event_button() != FL_LEFT_MOUSE);
-    premoveInstrument->cut(0, premoveInstrument->maximum_size());
+    presetname->cut(0, presetname->maximum_size());
     if (but)
         p->copy(NULL);
     else
