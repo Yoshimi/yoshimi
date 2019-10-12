@@ -7,6 +7,8 @@ yoshimi 1.6.0 M
   bank refetch. Now set the name in place.
 * Corrected accidental variable name change.
 * Revised example presets.
+* Further small refinements to CLI.
+  Also added comments to globals.h
 
 2019-10-11 Will
 * Minor corrections for headless build.

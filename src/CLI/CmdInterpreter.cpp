@@ -3093,6 +3093,8 @@ int CmdInterpreter::commandBank(Parser& input, unsigned char controlType, bool j
             if (!input.isdigit())
                 return REPLY::value_msg;
             int tmp = string2int(input) - 1; // could be up to 160
+            if (tmp < 0 || tmp >= MAX_INSTRUMENTS_IN_BANK)
+                return REPLY::range_msg;
             input.skipChars();
             string name = string{input};
             if (name <= "!")
@@ -5689,9 +5691,10 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         if (input.matchnMove(2, "instrument") || input.matchnMove(2, "program"))
         {
             int tmp = string2int(input);
-            if (tmp <= 0 || tmp >= MAX_INSTRUMENTS_IN_BANK)
+            if (tmp <= 0 || tmp > MAX_INSTRUMENTS_IN_BANK)
                     return Reply{REPLY::range_msg};
-            sendDirect(synth, TOPLEVEL::action::lowPrio, tmp - 1, TOPLEVEL::type::Write, BANK::control::deleteInstrument, TOPLEVEL::section::bank);
+            if (query("Permanently remove instrument " + to_string(tmp) + " from bank", false))
+                sendDirect(synth, TOPLEVEL::action::lowPrio, tmp - 1, TOPLEVEL::type::Write, BANK::control::deleteInstrument, TOPLEVEL::section::bank);
             return Reply::DONE;
         }
         return Reply::what("remove");
@@ -5922,7 +5925,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         }
         if (input.matchnMove(1, "instrument"))
         {
-            if (synth->part[npart]->Pname == "Simple Sound")
+            if (readControlText(synth, TOPLEVEL::action::lowPrio, PART::control::instrumentName, TOPLEVEL::section::part1 + npart) == "Simple Sound")
             {
                 Runtime.Log("Nothing to save!");
                 return Reply::DONE;

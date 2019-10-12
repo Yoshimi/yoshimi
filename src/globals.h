@@ -28,7 +28,7 @@
  * For test purposes where you want guaranteed identical results, enable the
  * #define below.
  * Be aware this does strange things to both subSynth and padSynth as they
- * require randomness to produce normal sounds.
+ * actually *require* randomness to produce normal sounds.
  */
 //#define NORANDOM ON
 
@@ -130,6 +130,7 @@ const unsigned char MAX_ALIENWAH_DELAY = 100;
 namespace YOSH
 {
     // float to bool done this way to ensure consistency
+    // we are always using positive values
     inline bool F2B(float value) {return value > 0.5f;}
 }
 
@@ -305,7 +306,7 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
 namespace BANK // usage BANK::control::
 {
     enum control : unsigned char {
-        selectInstrument = 0, // not yet
+        selectInstrument = 0, // not yet (effectively done by part)
         findInstrumentName,
         renameInstrument,
         saveInstrument, // not yet
@@ -320,8 +321,8 @@ namespace BANK // usage BANK::control::
         deleteBank, // not yet
         selectFirstBankToSwap,
         selectSecondBankAndSwap,
-        importBank, // not yet
-        exportBank, // not yet
+        importBank, // not yet (currently done in main)
+        exportBank, // not yet (currently done in main)
 
         selectRoot = 32,
         changeRootId
