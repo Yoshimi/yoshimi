@@ -46,8 +46,9 @@ PADnoteParameters::PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth) : Pr
     fft = fft_;
 
     resonance = new Resonance(synth);
-    oscilgen = new OscilGen(fft_, resonance, synth);
-    oscilgen->ADvsPAD = true;
+    POscil = new OscilParameters(synth);
+    POscil->ADvsPAD = true;
+    oscilgen = new OscilGen(fft_, resonance, synth, POscil);
 
     FreqEnvelope = new EnvelopeParams(0, 0, synth);
     FreqEnvelope->ASRinit(64, 50, 64, 60);
@@ -73,6 +74,7 @@ PADnoteParameters::~PADnoteParameters()
 {
     deletesamples();
     delete oscilgen;
+    delete POscil;
     delete resonance;
     delete FreqEnvelope;
     delete FreqLfo;
@@ -775,7 +777,7 @@ void PADnoteParameters::add2XML(XMLwrapper *xml)
     xml->endbranch();
 
     xml->beginbranch("OSCIL");
-        oscilgen->add2XML(xml);
+        POscil->add2XML(xml);
     xml->endbranch();
 
     xml->beginbranch("RESONANCE");
@@ -877,7 +879,7 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
 
     if (xml->enterbranch("OSCIL"))
     {
-        oscilgen->getfromXML(xml);
+        POscil->getfromXML(xml);
         xml->exitbranch();
     }
 

@@ -200,6 +200,9 @@ class ADvoicelistitem {: {public Fl_Group}
     npart = npart_;
     kititem = kititem_;
     nvoice = nvoice_;
+    fft = new FFTwrapper(synth->oscilsize);
+    oscil = new OscilGen(fft, NULL, synth, parameters->VoicePar[nvoice].POscil);
+    oscilFM = new OscilGen(fft, NULL, synth, parameters->VoicePar[nvoice].POscilFM);
     make_window();
     if (pars->VoicePar[nvoice].PFreqLfoEnabled > 0)
         voicelistvibratto->activate();
@@ -223,7 +226,8 @@ class ADvoicelistitem {: {public Fl_Group}
                 nvp = nvs = pars->VoicePar[nvs].PVoice;
         else if (pars->VoicePar[nvoice].Pextoscil != -1)
             nvs = pars->VoicePar[nvoice].Pextoscil;
-        osc->init(pars->VoicePar[nvs].OscilSmp, 0, pars->VoicePar[nvp].Poscilphase, synth);
+        oscil->changeParams(pars->VoicePar[nvs].POscil);
+        osc->init(oscil, 0, pars->VoicePar[nvp].Poscilphase, synth);
         if (pars->VoicePar[nvoice].Enabled == 0)
             voicelistitemgroup->deactivate();
         else
@@ -242,7 +246,8 @@ if (pars->VoicePar[nvoice].PVoice != -1)
         nvp = nvs = pars->VoicePar[nvs].PVoice;
 else if (pars->VoicePar[nvoice].Pextoscil != -1)
     nvs = pars->VoicePar[nvoice].Pextoscil;
-osc->init(pars->VoicePar[nvs].OscilSmp,0,pars->VoicePar[nvp].Poscilphase, synth);
+oscil->changeParams(pars->VoicePar[nvs].POscil);
+osc->init(oscil,0,pars->VoicePar[nvp].Poscilphase, synth);
 
 if (pars->VoicePar[nvoice].PVoice >= 0 || pars->VoicePar[nvoice].Type != 0)
     voiceoscil->deactivate();
@@ -295,11 +300,13 @@ if (pars->VoicePar[nvoice].PFMVoice != -1) {
     nvp = nvs = pars->VoicePar[nvs].PFMVoice;
     while (pars->VoicePar[nvs].PVoice != -1)
         nvp = nvs = pars->VoicePar[nvs].PVoice;
-    modosc->init(pars->VoicePar[nvs].OscilSmp,0,pars->VoicePar[nvp].Poscilphase, synth);
+    oscilFM->changeParams(pars->VoicePar[nvs].POscil);
+    modosc->init(oscilFM,0,pars->VoicePar[nvp].Poscilphase, synth);
 } else {
     if (pars->VoicePar[nvoice].PextFMoscil != -1)
         nvs = pars->VoicePar[nvoice].PextFMoscil;
-    modosc->init(pars->VoicePar[nvs].FMSmp,0,pars->VoicePar[nvp].PFMoscilphase, synth);
+    oscilFM->changeParams(pars->VoicePar[nvs].POscilFM);
+    modosc->init(oscilFM,0,pars->VoicePar[nvp].PFMoscilphase, synth);
 }
 
 if (pars->VoicePar[nvoice].PFMEnabled == NONE || pars->VoicePar[nvoice].PFMVoice >= 0)
@@ -342,11 +349,20 @@ else
   }
   Function {~ADvoicelistitem()} {} {
     code {//
-        ADnoteVoiceListItem->hide();} {}
+        ADnoteVoiceListItem->hide();
+        delete oscil;
+        delete oscilFM;
+        delete fft;} {}
   }
   decl {ADnoteParameters *pars;} {private local
   }
   decl {int nvoice;} {public local
+  }
+  decl {FFTwrapper *fft;} {private local
+  }
+  decl {OscilGen *oscil;} {private local
+  }
+  decl {OscilGen *oscilFM;} {private local
   }
   decl {Oscilloscope *osc;} {private local
   }
@@ -537,7 +553,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                     int nv = nvoice;
                     if (pars->VoicePar[nvoice].PextFMoscil >= 0)
                         nv = pars->VoicePar[nvoice].PextFMoscil;
-                    oscedit = new OscilEditor(pars->VoicePar[nv].FMSmp, modOscDisplay, NULL, NULL, synth, npart, kititem, nvoice + PART::engine::addMod1);
+                    oscedit = new OscilEditor(pars->VoicePar[nv].POscilFM, modOscDisplay, NULL, NULL, synth, npart, kititem, nvoice + PART::engine::addMod1);
                     if ((Fl::event_button() == 3))
                         synth->getGuiMaster()->partui->adnoteui->ADnoteVoice->hide();}
                   xywh {666 372 62 12} box THIN_UP_BOX labelfont 1 labelsize 9
@@ -778,7 +794,7 @@ Oscillator}
     int nv = nvoice;
     if (pars->VoicePar[nvoice].Pextoscil >= 0)
         nv=pars->VoicePar[nvoice].Pextoscil;
-    oscedit = new OscilEditor(pars->VoicePar[nv].OscilSmp, oscDisplay, NULL, NULL, synth, npart, kititem, nvoice + PART::engine::addVoice1);
+    oscedit = new OscilEditor(pars->VoicePar[nv].POscil, oscDisplay, NULL, NULL, synth, npart, kititem, nvoice + PART::engine::addVoice1);
     if ((Fl::event_button() == 3))
         synth->getGuiMaster()->partui->adnoteui->ADnoteVoice->hide();}
                   xywh {10 534 70 21} box THIN_UP_BOX labelfont 1 labelsize 11
@@ -1629,7 +1645,8 @@ if (pars->VoicePar[nvoice].PVoice != -1)
         nvp = nvs = pars->VoicePar[nvs].PVoice;
 else if (pars->VoicePar[nvoice].Pextoscil != -1)
     nvs = pars->VoicePar[nvoice].Pextoscil;
-osc->init(pars->VoicePar[nvs].OscilSmp,0,pars->VoicePar[nvp].Poscilphase, synth);} {}
+oscil->changeParams(pars->VoicePar[nvs].POscil);
+osc->init(oscil,0,pars->VoicePar[nvp].Poscilphase, synth);} {}
   }
   Function {update_fmoscil()} {} {
     code {int nv=nvoice;
@@ -1638,21 +1655,26 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
     while (pars->VoicePar[nv].PVoice >= 0) {
         nv = pars->VoicePar[nv].PVoice;
     }
-    oscFM->init(pars->VoicePar[nv].OscilSmp,0,pars->VoicePar[nv].Poscilphase, synth);
+    oscilFM->changeParams(pars->VoicePar[nv].POscil);
+    oscFM->init(oscilFM,0,pars->VoicePar[nv].Poscilphase, synth);
 } else {
     if (pars->VoicePar[nvoice].PextFMoscil >= 0) {
         nv = pars->VoicePar[nvoice].PextFMoscil;
     }
-    oscFM->init(pars->VoicePar[nv].FMSmp,0,pars->VoicePar[nvoice].PFMoscilphase, synth);
+    oscilFM->changeParams(pars->VoicePar[nv].POscilFM);
+    oscFM->init(oscilFM,0,pars->VoicePar[nvoice].PFMoscilphase, synth);
 }} {}
   }
   Function {init(ADnoteParameters *parameters,int npart_, int kititem_, int nvoice_)} {} {
     code {//
-    synth = parameters->getSynthEngine();
+        synth = parameters->getSynthEngine();
         pars = parameters;
         npart = npart_;
         kititem = kititem_;
         nvoice = nvoice_;
+        fft = new FFTwrapper(synth->oscilsize);
+        oscil = new OscilGen(fft, NULL, synth, parameters->VoicePar[nvoice].POscil);
+        oscilFM = new OscilGen(fft, NULL, synth, parameters->VoicePar[nvoice].POscilFM);
         make_window();
         end();
         if (nvoice == 0)
@@ -1670,7 +1692,10 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
         if (oscedit)
         {
             delete oscedit;
-        }} {}
+        }
+        delete oscil;
+        delete oscilFM;
+        delete fft;} {}
   }
   decl {int nvoice;} {public local
   }
@@ -1681,6 +1706,12 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
   decl {ADnoteParameters *pars;} {private local
   }
   decl {OscilEditor *oscedit;} {public local
+  }
+  decl {FFTwrapper *fft;} {private local
+  }
+  decl {OscilGen *oscil;} {private local
+  }
+  decl {OscilGen *oscilFM;} {private local
   }
   decl {Oscilloscope *osc;} {private local
   }

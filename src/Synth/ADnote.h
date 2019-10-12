@@ -29,6 +29,7 @@
 
 #include "Params/ADnoteParameters.h"
 #include "Synth/LegatoTypes.h"
+#include "Misc/RandomGen.h"
 
 class ADnoteParameters;
 class Controller;

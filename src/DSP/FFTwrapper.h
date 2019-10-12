@@ -38,8 +38,8 @@ class FFTwrapper
     public:
         FFTwrapper(int fftsize_);
         ~FFTwrapper();
-        void smps2freqs(float *smps, FFTFREQS *freqs);
-        void freqs2smps(FFTFREQS *freqs, float *smps);
+        void smps2freqs(const float *smps, FFTFREQS *freqs);
+        void freqs2smps(const FFTFREQS *freqs, float *smps);
         static void newFFTFREQS(FFTFREQS *f, int size);
         static void deleteFFTFREQS(FFTFREQS *f);
 

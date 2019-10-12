@@ -1192,7 +1192,7 @@ void ADnote::initParameters(void)
                 vc = adpars->VoicePar[nvoice].PextFMoscil;
 
             float freqtmp = 1.0f;
-            if (adpars->VoicePar[vc].FMSmp->Padaptiveharmonics != 0
+            if (adpars->VoicePar[vc].POscilFM->Padaptiveharmonics != 0
                || (NoteVoicePar[nvoice].FMEnabled == MORPH)
                || (NoteVoicePar[nvoice].FMEnabled == RING_MOD))
                freqtmp = getFMVoiceBaseFreq(nvoice);
