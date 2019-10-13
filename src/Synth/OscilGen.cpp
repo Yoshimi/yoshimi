@@ -647,7 +647,15 @@ void OscilGen::oscilfilter(void)
 // Change the base function
 void OscilGen::changebasefunction(void)
 {
-    if (params->Pcurrentbasefunc != 0)
+    if (params->Pcurrentbasefunc == 127)
+    {
+        // User base function
+        memcpy(oscilFFTfreqs.c, params->getbasefuncFFTfreqs()->c,
+               synth->halfoscilsize * sizeof(float));
+        memcpy(oscilFFTfreqs.s, params->getbasefuncFFTfreqs()->s,
+               synth->halfoscilsize * sizeof(float));
+    }
+    else if (params->Pcurrentbasefunc != 0)
     {
         getbasefunction(tmpsmps);
         fft->smps2freqs(tmpsmps, &oscilFFTfreqs);
