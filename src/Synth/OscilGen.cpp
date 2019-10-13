@@ -1326,7 +1326,7 @@ int OscilGen::getPhase()
         return 0;
 
     int outpos;
-    outpos = (int)(prng.numRandom() * 2.0f - 1.0f) * synth->oscilsize_f * (params->Prand - 64.0f) / 64.0f;
+    outpos = (prng.numRandom() * 2.0f - 1.0f) * synth->oscilsize_f * (params->Prand - 64.0f) / 64.0f;
     outpos = (outpos + 2 * synth->oscilsize) % synth->oscilsize;
     return outpos;
 }
