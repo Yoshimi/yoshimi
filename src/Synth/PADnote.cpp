@@ -52,6 +52,7 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
     nsample(0),
     portamento(portamento_),
     ctl(ctl_),
+    padSynthUpdate(parameters),
     synth(_synth)
 
 {
@@ -70,75 +71,13 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
 
     this->velocity = velocity;
 
-    if (pars->Pfixedfreq == 0)
-        basefreq = freq;
-    else
-    {
-        basefreq = 440.0f;
-        int fixedfreqET = pars->PfixedfreqET;
-        if (fixedfreqET != 0)
-        {   // if the frequency varies according the keyboard note
-            float tmp = (midinote - 69.0f) / 12.0f
-                              * (powf(2.0f, (fixedfreqET - 1) / 63.0f) - 1.0f);
-            if (fixedfreqET <= 64)
-                basefreq *= powf(2.0f, tmp);
-            else
-                basefreq *= powf(3.0f, tmp);
-        }
-    }
-
-    int BendAdj = pars->PBendAdjust - 64;
-    if (BendAdj % 24 == 0)
-        BendAdjust = BendAdj / 24;
-    else
-        BendAdjust = BendAdj / 24.0f;
-    float offset_val = (pars->POffsetHz - 64)/64.0f;
-    OffsetHz = 15.0f*(offset_val * sqrtf(fabsf(offset_val)));
+    setBaseFreq();
 
     realfreq = basefreq;
-    NoteGlobalPar.Detune = getDetune(pars->PDetuneType, pars->PCoarseDetune, pars->PDetune);
 
-    // find out the closest note
-    float logfreq = logf(basefreq * powf(2.0f, NoteGlobalPar.Detune / 1200.0f));
-    float mindist = fabsf(logfreq - logf(pars->sample[0].basefreq + 0.0001f));
-    for (int i = 1; i < PAD_MAX_SAMPLES; ++i)
-    {
-        if (pars->sample[i].smp == NULL)
-            break;
-        float dist = fabsf(logfreq - logf(pars->sample[i].basefreq + 0.0001f));
-//	printf("(mindist=%g) %i %g                  %g\n",mindist,i,dist,pars->sample[i].basefreq);
-
-        if (dist < mindist)
-        {
-            nsample = i;
-            mindist = dist;
-        }
-    }
-
-    int size = pars->sample[nsample].size;
-    if (size == 0)
-        size = 1;
-
-    poshi_l = int(synth->numRandom() * (size - 1));
-    if (pars->PStereo != 0)
-        poshi_r = (poshi_l + size / 2) % size;
-    else
-        poshi_r = poshi_l;
-    poslo = 0.0f;
-
-    if (pars->randomPan())
-    {
-        float t = synth->numRandom();
-        randpanL = cosf(t * HALFPI);
-        randpanR = cosf((1.0f - t) * HALFPI);
-    }
-    else
-        randpanL = randpanR = 0.7f;
-
-    NoteGlobalPar.FilterCenterPitch =
-        pars->GlobalFilter->getfreq() + // center freq
-            pars->PFilterVelocityScale / 127.0 * 6.0
-            * (velF(velocity, pars->PFilterVelocityScaleFunction) - 1); // velocity sensing
+    float t = synth->numRandom();
+    randpanL = cosf(t * HALFPI);
+    randpanR = cosf((1.0f - t) * HALFPI);
 
     NoteGlobalPar.Fadein_adjustment =
             pars->Fadein_adjustment / (float)FADEIN_ADJUSTMENT_SCALE;
@@ -163,15 +102,7 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
     NoteGlobalPar.AmpEnvelope = new Envelope(pars->AmpEnvelope, basefreq, synth);
     NoteGlobalPar.AmpLfo = new LFO(pars->AmpLfo, basefreq, synth);
 
-    NoteGlobalPar.Volume =
-        4.0f * powf(0.1f, 3.0f * (1.0f - pars->PVolume / 96.0f)) //-60 dB .. 0 dB
-        * velF(velocity, pars->PAmpVelocityScaleFunction); // velocity sensing
-
     NoteGlobalPar.AmpEnvelope->envout_dB(); // discard the first envelope output
-    globaloldamplitude =
-        globalnewamplitude = NoteGlobalPar.Volume
-        * NoteGlobalPar.AmpEnvelope->envout_dB()
-        * NoteGlobalPar.AmpLfo->amplfoout();
 
     NoteGlobalPar.GlobalFilterL =
         new Filter(pars->GlobalFilter, synth);
@@ -180,8 +111,24 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
 
     NoteGlobalPar.FilterEnvelope = new Envelope(pars->FilterEnvelope, basefreq, synth);
     NoteGlobalPar.FilterLfo = new LFO(pars->FilterLfo, basefreq, synth);
-    NoteGlobalPar.FilterQ = pars->GlobalFilter->getq();
-    NoteGlobalPar.FilterFreqTracking=pars->GlobalFilter->getfreqtracking(basefreq);
+
+    computeNoteParameters();
+
+    globaloldamplitude =
+        globalnewamplitude = NoteGlobalPar.Volume
+        * NoteGlobalPar.AmpEnvelope->envout_dB()
+        * NoteGlobalPar.AmpLfo->amplfoout();
+
+    int size = pars->sample[nsample].size;
+    if (size == 0)
+        size = 1;
+
+    poshi_l = int(synth->numRandom() * (size - 1));
+    if (pars->PStereo != 0)
+        poshi_r = (poshi_l + size / 2) % size;
+    else
+        poshi_r = poshi_l;
+    poslo = 0.0f;
 
     ready = true; ///sa il pun pe asta doar cand e chiar gata
 
@@ -235,74 +182,19 @@ void PADnote::PADlegatonote(float freq, float velocity,
     this->velocity = velocity;
     finished_ = false;
 
-    if (pars->Pfixedfreq == 0)
-        basefreq = freq;
-    else {
-        basefreq = 440.0;
-        int fixedfreqET = pars->PfixedfreqET;
-        if (fixedfreqET != 0)
-        {   // if the frequency varies according the keyboard note
-            float tmp = (midinote - 69.0) / 12.0
-                               * (powf(2.0f, (fixedfreqET - 1) / 63.0) - 1.0);
-            if (fixedfreqET <= 64)
-                basefreq *= powf(2.0f, tmp);
-            else
-                basefreq *= powf(3.0f, tmp);
-        }
-    }
+    setBaseFreq();
 
     released = false;
     realfreq = basefreq;
 
-    getDetune(pars->PDetuneType, pars->PCoarseDetune, pars->PDetune);
-
-    // find out the closest note
-    float logfreq = logf(basefreq * powf(2.0f, NoteGlobalPar.Detune / 1200.0));
-    float mindist = fabsf(logfreq - logf(pars->sample[0].basefreq + 0.0001));
-    nsample = 0;
-    for (int i = 1; i < PAD_MAX_SAMPLES; ++i)
-    {
-        if (pars->sample[i].smp == NULL)
-            break;
-        float dist = fabsf(logfreq - logf(pars->sample[i].basefreq + 0.0001));
-
-        if (dist < mindist)
-        {
-            nsample = i;
-            mindist = dist;
-        }
-    }
-
-    int size = pars->sample[nsample].size;
-    if (size == 0)
-        size = 1;
-
-    if (pars->randomPan())
-    {
-        float t = synth->numRandom();
-        randpanL = cosf(t * HALFPI);
-        randpanR = cosf((1.0f - t) * HALFPI);
-    }
-    else
-        randpanL = randpanR = 0.7f;
-
-    NoteGlobalPar.FilterCenterPitch =
-        pars->GlobalFilter->getfreq() // center freq
-        + pars->PFilterVelocityScale / 127.0 * 6.0 // velocity sensing
-        * (velF(velocity, pars->PFilterVelocityScaleFunction) - 1);
-
-    NoteGlobalPar.Volume =
-        4.0 * powf(0.1f, 3.0 * (1.0 - pars->PVolume / 96.0)) // -60 dB .. 0 dB
-        * velF(velocity, pars->PAmpVelocityScaleFunction); // velocity sensing
-
     NoteGlobalPar.AmpEnvelope->envout_dB(); // discard the first envelope output
+
+    computeNoteParameters();
+
     globaloldamplitude =
         globalnewamplitude =
             NoteGlobalPar.Volume * NoteGlobalPar.AmpEnvelope->envout_dB()
                 * NoteGlobalPar.AmpLfo->amplfoout();
-
-    NoteGlobalPar.FilterQ = pars->GlobalFilter->getq();
-    NoteGlobalPar.FilterFreqTracking = pars->GlobalFilter->getfreqtracking(basefreq);
 
     if (parameters->sample[nsample].smp == NULL)
     {
@@ -325,6 +217,26 @@ PADnote::~PADnote()
 }
 
 
+void PADnote::setBaseFreq()
+{
+    if (pars->Pfixedfreq == 0)
+        basefreq = Legato.param.freq;
+    else
+    {
+        basefreq = 440.0f;
+        int fixedfreqET = pars->PfixedfreqET;
+        if (fixedfreqET != 0)
+        {   // if the frequency varies according the keyboard note
+            float tmp = (Legato.param.midinote - 69.0f) / 12.0f
+                              * (powf(2.0f, (fixedfreqET - 1) / 63.0f) - 1.0f);
+            if (fixedfreqET <= 64)
+                basefreq *= powf(2.0f, tmp);
+            else
+                basefreq *= powf(3.0f, tmp);
+        }
+    }
+}
+
 inline void PADnote::fadein(float *smps)
 {
     int zerocrossings = 0;
@@ -345,6 +257,52 @@ inline void PADnote::fadein(float *smps)
         float tmp = 0.5 - cosf((float)i / (float) n * PI) * 0.5f;
         smps[i] *= tmp;
     }
+}
+
+
+void PADnote::computeNoteParameters()
+{
+    setBaseFreq();
+
+    int BendAdj = pars->PBendAdjust - 64;
+    if (BendAdj % 24 == 0)
+        BendAdjust = BendAdj / 24;
+    else
+        BendAdjust = BendAdj / 24.0f;
+    float offset_val = (pars->POffsetHz - 64)/64.0f;
+    OffsetHz = 15.0f*(offset_val * sqrtf(fabsf(offset_val)));
+
+    NoteGlobalPar.Detune = getDetune(pars->PDetuneType, pars->PCoarseDetune, pars->PDetune);
+
+    // find out the closest note
+    float logfreq = logf(basefreq * powf(2.0f, NoteGlobalPar.Detune / 1200.0f));
+    float mindist = fabsf(logfreq - logf(pars->sample[0].basefreq + 0.0001f));
+    nsample = 0;
+    for (int i = 1; i < PAD_MAX_SAMPLES; ++i)
+    {
+        if (pars->sample[i].smp == NULL)
+            break;
+        float dist = fabsf(logfreq - logf(pars->sample[i].basefreq + 0.0001f));
+//	printf("(mindist=%g) %i %g                  %g\n",mindist,i,dist,pars->sample[i].basefreq);
+
+        if (dist < mindist)
+        {
+            nsample = i;
+            mindist = dist;
+        }
+    }
+
+    NoteGlobalPar.FilterCenterPitch =
+        pars->GlobalFilter->getfreq() + // center freq
+            pars->PFilterVelocityScale / 127.0 * 6.0
+            * (velF(velocity, pars->PFilterVelocityScaleFunction) - 1); // velocity sensing
+
+    NoteGlobalPar.Volume =
+        4.0f * powf(0.1f, 3.0f * (1.0f - pars->PVolume / 96.0f)) //-60 dB .. 0 dB
+        * velF(velocity, pars->PAmpVelocityScaleFunction); // velocity sensing
+
+    NoteGlobalPar.FilterQ = pars->GlobalFilter->getq();
+    NoteGlobalPar.FilterFreqTracking=pars->GlobalFilter->getfreqtracking(basefreq);
 }
 
 
@@ -471,6 +429,9 @@ int PADnote::Compute_Cubic(float *outl, float *outr, int freqhi, float freqlo)
 
 int PADnote::noteout(float *outl,float *outr)
 {
+    if (padSynthUpdate.checkUpdated())
+        computeNoteParameters();
+
     computecurrentparameters();
     float *smps = pars->sample[nsample].smp;
     if (smps == NULL)

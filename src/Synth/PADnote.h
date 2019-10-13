@@ -56,7 +56,9 @@ class PADnote
 
     private:
         void fadein(float *smps);
+        void computeNoteParameters();
         void computecurrentparameters();
+        void setBaseFreq();
         bool finished_;
         PADnoteParameters *pars;
 
@@ -151,6 +153,8 @@ class PADnote
                 int midinote;
             } param;
         } Legato;
+
+        Presets::PresetsUpdate padSynthUpdate;
 
         SynthEngine *synth;
 };
