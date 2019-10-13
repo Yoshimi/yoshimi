@@ -56,7 +56,7 @@ OscilGen::OscilGen(FFTwrapper *fft_, Resonance *res_, SynthEngine *_synth, Oscil
     else
         memset(tmpsmps, 0, synth->oscilsize * sizeof(float));
     FFTwrapper::newFFTFREQS(&oscilFFTfreqs, synth->halfoscilsize);
-    defaults();
+    genDefaults();
 }
 
 OscilGen::~OscilGen()
@@ -77,6 +77,12 @@ void OscilGen::changeParams(OscilParameters *params_)
 
 void OscilGen::defaults(void)
 {
+    params->defaults();
+    genDefaults();
+}
+
+void OscilGen::genDefaults(void)
+{
     oldbasefunc = 0;
     oldbasepar = 64;
     oldhmagtype = 0;
@@ -94,8 +100,6 @@ void OscilGen::defaults(void)
 
     memset(hmag, 0, MAX_AD_HARMONICS * sizeof(float));
     memset(hphase, 0, MAX_AD_HARMONICS * sizeof(float));
-
-    params->defaults();
 
     memset(oscilFFTfreqs.s, 0, synth->halfoscilsize * sizeof(float));
     memset(oscilFFTfreqs.c, 0, synth->halfoscilsize * sizeof(float));
@@ -926,13 +930,7 @@ void OscilGen::prepare(void)
     // because it is essentially random at which cycle position the global PRNG is just now
     prng.init(synth->randomINT() + INT_MAX/2);
 
-    if (oldbasepar != params->Pbasefuncpar
-        || oldbasefunc != params->Pcurrentbasefunc
-        || oldbasefuncmodulation != params->Pbasefuncmodulation
-        || oldbasefuncmodulationpar1 != params->Pbasefuncmodulationpar1
-        || oldbasefuncmodulationpar2 != params->Pbasefuncmodulationpar2
-        || oldbasefuncmodulationpar3 != params->Pbasefuncmodulationpar3)
-        changebasefunction();
+    changebasefunction();
 
     for (int i = 0; i < MAX_AD_HARMONICS; ++i)
         hphase[i] = (params->Phphase[i] - 64.0f) / 64.0f * PI / (i + 1);

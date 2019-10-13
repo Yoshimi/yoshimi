@@ -65,6 +65,7 @@ class OscilGen : private WaveShapeSamples
         void getcurrentbasefunction(float *smps);
         void useasbase(void);
 
+        void genDefaults(void);
         void defaults(void);
         void convert2sine();
 
