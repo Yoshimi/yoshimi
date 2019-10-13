@@ -58,7 +58,7 @@ class SUBnote
         void computecurrentparameters(void);
         void initparameters(float freq);
         void KillNote(void);
-        void initfilterbank(void);
+        void updatefilterbank(void);
 
         SUBnoteParameters *pars;
 
@@ -107,11 +107,16 @@ class SUBnote
             float yn2;   // filter internal values
         };
 
-        void initfilter(bpfilter &filter, float freq, float bw, float amp, float mag);
+        void initfilters();
+        void initfilter(bpfilter &filter, float mag);
         float computerolloff(float freq);
+        void computeallfiltercoefs();
         void computefiltercoefs(bpfilter &filter, float freq, float bw, float gain);
+        void computeNoteParameters();
+        void setBaseFreq();
         void filter(bpfilter &filter, float *smps);
         void filterVarRun(bpfilter &filter, float *smps);
+        float getHgain(int harmonic);
 
         bpfilter *lfilter;
         bpfilter *rfilter;
@@ -153,6 +158,8 @@ class SUBnote
         const float log_0_001;   // logf(0.001);
         const float log_0_0001;  // logf(0.0001);
         const float log_0_00001; // logf(0.00001);
+
+        Presets::PresetsUpdate subNoteChange;
 
         SynthEngine *synth;
         int filterStep;

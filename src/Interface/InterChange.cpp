@@ -1849,6 +1849,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                 commandResonance(getData, part->kit[kititem].padpars->resonance);
                 break;
         }
+        part->kit[kititem].padpars->presetsUpdated();
         return true;
     }
 
@@ -1878,6 +1879,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                 commandEnvelope(getData);
                 break;
         }
+        part->kit[kititem].subpars->presetsUpdated();
         return true;
     }
 
