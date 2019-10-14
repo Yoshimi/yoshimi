@@ -5,6 +5,8 @@ yoshimi 1.6.0 M
 * CLI can now save to banks slot.
 * Revised instrument save to bank.
 * Updated docs.
+* Removed redundant labels in globals.h
+* Corrected docs.
 
 2019-10-12 Will
 * CLI can now change bank instrument names.

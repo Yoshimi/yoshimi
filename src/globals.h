@@ -307,7 +307,7 @@ namespace BANK // usage BANK::control::
 {
     enum control : unsigned char {
         readInstrumentName = 0,
-        findInstrumentName,
+        findInstrumentName, // next in list or '*' if at end
         renameInstrument,
         saveInstrument,
         deleteInstrument,
@@ -325,7 +325,9 @@ namespace BANK // usage BANK::control::
         exportBank, // not yet (currently done in main)
 
         selectRoot = 32,
-        changeRootId
+        changeRootId,
+        addNamedRoot, // not yet
+        deselectRoot // not yet (currently done in main)
     };
 }
 
@@ -477,15 +479,9 @@ namespace MAIN // usage MAIN::control::volume
         soloType = 48,
         soloCC,
 
-        addNamedRoot = 56, // some of these should be in 'bank'
-        delistRootId,
-        changeRootId,
-        exportBank,
+        exportBank = 60, // some of these should be in 'bank'
         importBank,
         deleteBank,
-        //addEmptyBank,
-        //importInstrument,
-        //deleteInstrument,
 
         setCurrentRootBank = 75,
         loadInstrumentFromBank,
