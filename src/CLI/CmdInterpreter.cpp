@@ -3102,6 +3102,23 @@ int CmdInterpreter::commandBank(Parser& input, unsigned char controlType, bool j
             int miscMsg = textMsgBuffer.push(name);
             return sendNormal(synth, TOPLEVEL::action::lowPrio, 0, controlType, BANK::control::renameInstrument, TOPLEVEL::section::bank, UNUSED, UNUSED, tmp, UNUSED, UNUSED, miscMsg);
         }
+        if (input.matchnMove(1, "save"))
+        {
+            if (controlType != TOPLEVEL::type::Write)
+                return REPLY::available_msg;
+            if (!input.isdigit())
+                return REPLY::value_msg;
+            int tmp = string2int(input) - 1; // could be up to 160
+            if (tmp < 0 || tmp >= MAX_INSTRUMENTS_IN_BANK)
+                return REPLY::range_msg;
+            string line = textMsgBuffer.fetch(readControl(synth, 0, BANK::control::readInstrumentName, TOPLEVEL::section::bank, UNUSED, UNUSED, UNUSED, tmp));
+            if (line > "!")
+            {
+                if (!query("Slot " + to_string(tmp + 1) + " contains '" + line + "'. Overwrite", false))
+                    return REPLY::done_msg;
+            }
+            return sendNormal(synth, TOPLEVEL::action::lowPrio, 0, controlType, BANK::control::saveInstrument, TOPLEVEL::section::bank, UNUSED, UNUSED, tmp);
+        }
         return REPLY::done_msg;
     }
     if (input.matchnMove(1, "root"))

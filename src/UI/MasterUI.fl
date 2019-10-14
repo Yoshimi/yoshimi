@@ -1672,20 +1672,6 @@ Alan Calvert started the project}
             RecentInstruments->activate();
             break;
 
-        case MAIN::control::saveInstrument: // save instrument to bank
-            name = textMsgBuffer.fetch(miscmsg);
-            if (npart == parameter)
-                partui->setinstrumentlabel();
-            if((parameter & 0x30) == panelgroup)
-                panellistitem[parameter % NUM_MIDI_CHANNELS]->setPartLabel(parameter);
-            if (kititem == synth->ReadBankRoot() && engine == synth->ReadBank())
-            {
-                int bk = fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank);
-                int rt = fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank);
-                bankui->refreshbankslot(insert, bk, rt);
-            }
-        break;
-
         case MAIN::control::saveNamedInstrument: // save instrument
             name = textMsgBuffer.fetch(miscmsg);
             if (name.find("FAILED") == 1)

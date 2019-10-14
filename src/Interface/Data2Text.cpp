@@ -861,7 +861,12 @@ string DataText::resolveBank(CommandBlock *getData, bool)
     {
         case BANK::control::renameInstrument:
         {
-            contstr = "Instrument Rename " + name;
+            contstr = "Instrument Rename" + name;
+            break;
+        }
+        case BANK::control::saveInstrument:
+        {
+            contstr = "Instrument Save to slot " + name;
             break;
         }
         case BANK::control::deleteInstrument:
@@ -1029,11 +1034,6 @@ string DataText::resolveMain(CommandBlock *getData, bool addValue)
         case MAIN::control::loadInstrumentByName:
             showValue = false;
             contstr = "Part " + to_string (int(kititem + 1)) + " load" + textMsgBuffer.fetch(value_int);
-            break;
-
-        case MAIN::control::saveInstrument:
-            showValue = false;
-            contstr = "Bank Slot Save" + textMsgBuffer.fetch(value_int);
             break;
 
         case MAIN::control::saveNamedInstrument:

@@ -983,6 +983,15 @@ class BankUI {: {public BankProcess_, RootProcess_}
             else
                 bs[insert]->copy_label(message.c_str());
             break;
+        case BANK::control::saveInstrument:
+            if (message.find("FAILED") != std::string::npos)
+            {
+                if(source == TOPLEVEL::action::fromGUI)
+                    fl_alert("%s",message.c_str());
+            }
+            else
+                bs[insert]->copy_label(message.c_str());
+            break;
         case BANK::control::deleteInstrument:
             if (message.find("FAILED") != std::string::npos)
             {
@@ -1152,7 +1161,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             }
             if (doit)
             {
-                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveInstrument, float(curPart), TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, slot);
+                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::saveInstrument, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::bank, UNUSED, UNUSED, slot);
                 setread();
             }
         }

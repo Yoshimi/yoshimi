@@ -306,10 +306,10 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
 namespace BANK // usage BANK::control::
 {
     enum control : unsigned char {
-        selectInstrument = 0, // not yet (effectively done by part)
+        readInstrumentName = 0,
         findInstrumentName,
         renameInstrument,
-        saveInstrument, // not yet
+        saveInstrument,
         deleteInstrument,
         selectFirstInstrumentToSwap,
         selectSecondInstrumentAndSwap,
@@ -490,7 +490,6 @@ namespace MAIN // usage MAIN::control::volume
         setCurrentRootBank = 75,
         loadInstrumentFromBank,
         loadInstrumentByName,
-        saveInstrument,
         saveNamedInstrument,
         loadNamedPatchset,
         saveNamedPatchset,

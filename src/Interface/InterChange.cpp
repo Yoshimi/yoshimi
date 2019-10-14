@@ -547,36 +547,6 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     break;
                 }
 
-                case MAIN::control::saveInstrument:
-                {
-                    if (kititem == UNUSED)
-                    {
-                        kititem = synth->ReadBankRoot();
-                        getData->data.kit = kititem;
-                    }
-
-                    if (engine == UNUSED)
-                    {
-                        engine = synth->ReadBank();
-                        getData->data.engine = engine;
-                    }
-                    if (value >= 64)
-                    {
-                        value = synth->getRuntime().currentPart;
-                    }
-                    //std::cout << "\n\nRoot " << int(kititem) << "  Bank " << int(engine) << "  Part " << int(value) << "  Slot " << int(insert) << "  miscmsg " << int(miscmsg) << " \n\n" << std::endl;
-                    text = synth->part[value]->Pname + " to " + std::to_string(int(insert));
-                    if (synth->getBankRef().savetoslot(kititem, engine, insert, value))
-                    {
-                        text = "d " + text;
-                        synth->part[value]->PyoshiType = (synth->getRuntime().instrumentFormat > 1);
-                    }
-                    else
-                        text = " FAILED " + text;
-                    getData->data.parameter = value; // TODO find out what this does!
-                    newMsg = true;
-                    break;
-                }
                 case MAIN::control::saveNamedInstrument:
                 {
                     bool ok = true;
@@ -819,12 +789,12 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
             {
                 case BANK::control::renameInstrument:
                 {
-                    if(kititem == UNUSED)
+                    if (kititem == UNUSED)
                     {
                         kititem = synth->getRuntime().currentBank;
                         getData->data.kit = kititem;
                     }
-                    if(engine == UNUSED)
+                    if (engine == UNUSED)
                     {
                         engine = synth->getRuntime().currentRoot;
                         getData->data.engine = engine;
@@ -833,8 +803,35 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     if (msgID > NO_MSG)
                         text = " FAILED ";
                     else
-                        text = "";
+                        text = " ";
                     text += textMsgBuffer.fetch(msgID & NO_MSG);
+                    newMsg = true;
+                    break;
+                }
+                case BANK::control::saveInstrument:
+                {
+                    if (kititem == UNUSED)
+                    {
+                        kititem = synth->getRuntime().currentBank;
+                        getData->data.kit = kititem;
+                    }
+                    if (engine == UNUSED)
+                    {
+                        engine = synth->getRuntime().currentRoot;
+                        getData->data.engine = engine;
+                    }
+                    if (parameter == UNUSED)
+                    {
+                        parameter = synth->getRuntime().currentPart;
+                        getData->data.parameter = parameter;
+                    }
+                    text = synth->part[parameter]->Pname;
+                    if (text == "Simple Sound")
+                        text = "FAILED Can't save default instrument type";
+                    else if (!synth->bank.savetoslot(engine, kititem, insert, parameter))
+                        text = "FAILED Could not save " + text + " to " + to_string(insert + 1);
+                    else
+                        text = "" + to_string(insert + 1) +". " + text;
                     newMsg = true;
                     break;
                 }
@@ -847,12 +844,12 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 
                 case BANK::control::selectFirstInstrumentToSwap:
                 {
-                    if(kititem == UNUSED)
+                    if (kititem == UNUSED)
                     {
                         kititem = synth->getRuntime().currentBank;
                         getData->data.kit = kititem;
                     }
-                    if(engine == UNUSED)
+                    if (engine == UNUSED)
                     {
                         engine = synth->getRuntime().currentRoot;
                         getData->data.engine = engine;
@@ -865,12 +862,12 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                 }
                 case BANK::control::selectSecondInstrumentAndSwap:
                 {
-                    if(kititem == UNUSED)
+                    if (kititem == UNUSED)
                     {
                         kititem = synth->getRuntime().currentBank;
                         getData->data.kit = kititem;
                     }
-                    if(engine == UNUSED)
+                    if (engine == UNUSED)
                     {
                         engine = synth->getRuntime().currentRoot;
                         getData->data.engine = engine;
@@ -920,7 +917,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     break;
 
                 case BANK::control::selectFirstBankToSwap:
-                    if(engine == UNUSED)
+                    if (engine == UNUSED)
                     {
                         engine = synth->getRuntime().currentRoot;
                         getData->data.engine = engine;
@@ -929,7 +926,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     swapRoot1 = engine;
                     break;
                 case BANK::control::selectSecondBankAndSwap:
-                    if(engine == UNUSED)
+                    if (engine == UNUSED)
                     {
                         engine = synth->getRuntime().currentRoot;
                         getData->data.engine = engine;
@@ -2971,6 +2968,21 @@ void InterChange::commandBank(CommandBlock *getData)
 
     switch (control)
     {
+        case BANK::control::readInstrumentName:
+        {
+            if (kititem == UNUSED)
+            {
+                kititem = synth->getRuntime().currentBank;
+                getData->data.kit = kititem;
+            }
+            if (engine == UNUSED)
+            {
+                engine = synth->getRuntime().currentRoot;
+                getData->data.engine = engine;
+            }
+            textMsgBuffer.push(synth->getBankRef().getname(parameter, kititem, engine));
+            break;
+        }
         case BANK::control::findInstrumentName:
         {
             if (parameter == UNUSED) // return the name of a specific instrument.

@@ -2,6 +2,9 @@ yoshimi 1.6.0 M
 
 2019-10-14 Will
 * Ensure report to stdout when running headless.
+* CLI can now save to banks slot.
+* Revised instrument save to bank.
+* Updated docs.
 
 2019-10-12 Will
 * CLI can now change bank instrument names.
