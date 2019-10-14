@@ -404,7 +404,7 @@ class MasterUI {selected : {private GuiUpdates}
           MenuItem {} {
             label {&Save External...}
             callback {//
-                if (synth->part[npart]->Pname == "Simple Sound")
+                if (synth->part[npart]->Pname == DEFAULT_NAME)
                 {
                     fl_alert("Nothing to save!");
                     return;
@@ -480,7 +480,7 @@ class MasterUI {selected : {private GuiUpdates}
             callback {//
             bool valid = false;
             for(int npart = 0; npart < NUM_MIDI_PARTS; npart ++)
-                if (synth->part[npart]->Pname != "Simple Sound")
+                if (synth->part[npart]->Pname != DEFAULT_NAME)
                 {
                     valid = true;
                     npart = NUM_MIDI_PARTS;

@@ -1103,15 +1103,17 @@ class BankUI {: {public BankProcess_, RootProcess_}
     else
         B_search->deactivate();} {}
   }
-  Function {process()} {return_type void
+  Function {process()} {open return_type void
   } {
     code {//
         int slot = this->slot;
         int curPart = synth->getRuntime().currentPart;
-        int rt = fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank);
-        int bk = fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank);
-        bool slotFilled = !bank->emptyslot(rt, bk, slot);
-        string thisname =  bank->getname(slot, bk, rt);
+        //int rt = fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank);
+        //int bk = fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank);
+        //bool slotFilled = !bank->emptyslot(rt, bk, slot);
+        //string thisname =  bank->getname(slot, bk, rt);
+        string thisname =  textMsgBuffer.fetch(fetchData(0, BANK::control::readInstrumentName, TOPLEVEL::section::bank, UNUSED, UNUSED, UNUSED, slot));
+        bool slotFilled = (thisname > "!");
         if ((what == 1 || what == 3) && mode == 1 && slotFilled)
         {
             if (synth->getGuiMaster()->activePart == UNUSED)
@@ -1133,7 +1135,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
                 const char *newname = fl_input("Instrument name:", thisname.c_str());
                 if (newname)
                 {
-                    if (string(newname) == "Simple Sound")
+                    if (string(newname) == DEFAULT_NAME)
                         fl_alert("Can't use name of default sound");
                     else if (strlen(newname) > 3)
                         send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::renameInstrument, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::bank, UNUSED, UNUSED, slot, UNUSED, synth->textMsgBuffer.push(newname));
@@ -1145,7 +1147,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         if (mode == 2)
         {   // save(write) to slot (choices reversed for 'No' priority)
             bool doit = true;
-            if (synth->part[curPart]->Pname == "Simple Sound")
+            if (synth->part[curPart]->Pname == DEFAULT_NAME)
             {
                 fl_alert("Can't store instrument with default name");
                 setread();

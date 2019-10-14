@@ -112,7 +112,7 @@ class VectorUI {
                   size = NUM_MIDI_CHANNELS * 2;
               for (int i = 0; i < size; i += NUM_MIDI_CHANNELS)
               {
-                  if (synth->part[BaseChan + i]->Pname != "Simple Sound")
+                  if (synth->part[BaseChan + i]->Pname != DEFAULT_NAME)
                       count += NUM_MIDI_CHANNELS;
               }
               if (count != size)

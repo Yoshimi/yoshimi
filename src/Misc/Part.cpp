@@ -156,7 +156,7 @@ void Part::setNoteMap(int keyshift)
 
 void Part::defaultsinstrument(void)
 {
-    Pname = "Simple Sound";
+    Pname = DEFAULT_NAME;
     PyoshiType = 0;
     info.Ptype = 0;
     info.Pauthor.clear();
@@ -1196,7 +1196,7 @@ void Part::add2XMLinstrument(XMLwrapper *xml)
     xml->addparstr("comments", info.Pcomments);
     xml->addpar("type",info.Ptype);
     xml->endbranch();
-    if (Pname == "Simple Sound")
+    if (Pname == DEFAULT_NAME)
         return;
 
 
@@ -1316,7 +1316,7 @@ bool Part::saveXML(string filename, bool yoshiFormat)
         return false;
     }
     if (Pname < "!") // this shouldn't be possible
-        Pname = "No Title";
+        Pname = UNTITLED;
 
     if (yoshiFormat)
     {
@@ -1407,8 +1407,8 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
         //synth->getRuntime().Log("name <" + tempname + ">");
         if (tempname > "!")
             Pname = tempname;
-        if (Pname <= "!" || Pname == "Simple Sound")
-            Pname = "No Title";
+        if (Pname <= "!" || Pname == DEFAULT_NAME)
+            Pname = UNTITLED;
         info.Pauthor = xml->getparstr("author");
         info.Pcomments = xml->getparstr("comments");
         info.Ptype = xml->getpar("type", info.Ptype, 0, 16);

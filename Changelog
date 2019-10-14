@@ -7,6 +7,9 @@ yoshimi 1.6.0 M
 * Updated docs.
 * Removed redundant labels in globals.h
 * Corrected docs.
+* Small revision to BankUI instrument control.
+* Replaced all refs to "Simple Sound" and "No Title"
+  with constants.
 
 2019-10-12 Will
 * CLI can now change bank instrument names.

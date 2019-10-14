@@ -2694,7 +2694,7 @@ void CmdInterpreter::listCurrentParts(Parser& input, list<string>& msg_buf)
     {
         string text = readControlText(synth, TOPLEVEL::action::lowPrio, PART::control::instrumentName, TOPLEVEL::section::part1 + partno);
         bool enabled = readControl(synth, 0, PART::control::enable, TOPLEVEL::section::part1 + partno);
-        if (text != "Simple Sound" || enabled)
+        if (text != DEFAULT_NAME || enabled)
         {
             if (partno < 9)
                 name = " ";
@@ -4952,7 +4952,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
                 Runtime.Log("Name too short");
                 return REPLY::done_msg;
             }
-            else if ( name == "Simple Sound")
+            else if ( name == DEFAULT_NAME)
             {
                 Runtime.Log("Cant use name of default sound");
                 return REPLY::done_msg;
@@ -5942,7 +5942,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         }
         if (input.matchnMove(1, "instrument"))
         {
-            if (readControlText(synth, TOPLEVEL::action::lowPrio, PART::control::instrumentName, TOPLEVEL::section::part1 + npart) == "Simple Sound")
+            if (readControlText(synth, TOPLEVEL::action::lowPrio, PART::control::instrumentName, TOPLEVEL::section::part1 + npart) == DEFAULT_NAME)
             {
                 Runtime.Log("Nothing to save!");
                 return Reply::DONE;

@@ -23,6 +23,7 @@
 
 #include <cstdint>
 #include <cstddef>
+#include <string>
 
 /*
  * For test purposes where you want guaranteed identical results, enable the
@@ -126,6 +127,9 @@ const unsigned char FF_MAX_FORMANTS = 12;
 const unsigned char FF_MAX_SEQUENCE = 8;
 const unsigned char MAX_PHASER_STAGES = 12;
 const unsigned char MAX_ALIENWAH_DELAY = 100;
+
+const std::string DEFAULT_NAME = "Simple Sound";
+const std::string UNTITLED = "No Title";
 
 namespace YOSH
 {

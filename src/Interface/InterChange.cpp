@@ -826,7 +826,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                         getData->data.parameter = parameter;
                     }
                     text = synth->part[parameter]->Pname;
-                    if (text == "Simple Sound")
+                    if (text == DEFAULT_NAME)
                         text = "FAILED Can't save default instrument type";
                     else if (!synth->bank.savetoslot(engine, kititem, insert, parameter))
                         text = "FAILED Could not save " + text + " to " + to_string(insert + 1);
@@ -1665,9 +1665,9 @@ bool InterChange::commandSend(CommandBlock *getData)
         unsigned char insert = getData->data.insert;
         if (npart < NUM_MIDI_PARTS && (insert != UNUSED || (control != PART::control::enable && control != PART::control::instrumentName)))
         {
-            if (synth->part[npart]->Pname == "Simple Sound")
+            if (synth->part[npart]->Pname == DEFAULT_NAME)
             {
-                synth->part[npart]->Pname ="No Title";
+                synth->part[npart]->Pname = UNTITLED;
                 getData->data.source |= TOPLEVEL::action::forceUpdate;
             }
         }

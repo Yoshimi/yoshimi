@@ -314,8 +314,8 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 
     if (insert != UNUSED || (control != PART::control::enable && control != PART::control::instrumentName))
     {
-        if (synth->getGuiMaster()->partui->partname == "Simple Sound")
-            synth->getGuiMaster()->partui->checkEngines("No Title");
+        if (synth->getGuiMaster()->partui->partname == DEFAULT_NAME)
+            synth->getGuiMaster()->partui->checkEngines(UNTITLED);
     }
     if (kititem == UNUSED || insert == TOPLEVEL::insert::kitGroup) // part
     {
