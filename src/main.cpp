@@ -368,6 +368,10 @@ int mainCreateNewInstance(unsigned int forceId, bool loadState)
         if (synth->getRuntime().midiEngine < 1)
             fl_alert("Yoshimi can't find an input system. Running with no MIDI");
     }
+    else
+        synth->getRuntime().toConsole = false;
+#else
+    synth->getRuntime().toConsole = false;
 #endif
     synth->getRuntime().StartupReport(musicClient->midiClientName());
     synth->Unmute();
