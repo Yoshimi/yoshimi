@@ -60,8 +60,7 @@ decl {\#include "MasterUI.h"} {private global
 }
 
 decl {\#include "Misc/SynthHelper.h"
-    using synth::getDetune;
-} {private local
+    using synth::getDetune;} {private local
 }
 
 class SUBnoteharmonic {: {public Fl_Group}
@@ -69,7 +68,7 @@ class SUBnoteharmonic {: {public Fl_Group}
   Function {make_window()} {private
   } {
     Fl_Window harmonic {
-      xywh {791 751 90 310} type Double hide
+      xywh {801 500 50 300} type Double box NO_BOX hide
       class Fl_Group
     } {
       Fl_Slider mag {
@@ -90,7 +89,7 @@ class SUBnoteharmonic {: {public Fl_Group}
             o->selection_color(0);
         else
             o->selection_color(222);}
-        tooltip {Harmonic's magnitude} xywh {0 15 12 131} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 127
+        tooltip {Harmonic's magnitude} xywh {0 2 15 131} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 127
         code0 {o->value(127-pars->Phmag[n]);}
         code1 {if (pars->Phmag[n]==0) o->selection_color(0);}
         class mwheel_slider
@@ -109,7 +108,7 @@ class SUBnoteharmonic {: {public Fl_Group}
             o->selection_color(0);
         else
             o->selection_color(222);}
-        tooltip {Harmonic's bandwidth multiplier} xywh {0 156 12 126} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 63
+        tooltip {Harmonic's bandwidth multiplier} xywh {0 166 15 126} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 63
         code0 {o->setValueType(VC_SubBandwidthRel);}
         code1 {o->useCustomTip(true);}
         code2 {o->value(127-pars->Phrelbw[n]);}
@@ -117,17 +116,12 @@ class SUBnoteharmonic {: {public Fl_Group}
         class mwheel_slider
       }
       Fl_Box {} {
-        xywh {12 217 5 3} box FLAT_BOX color 39
+        xywh {15 228 5 3} box FLAT_BOX color 39
         code0 {if (n+1==MAX_SUB_HARMONICS) o->hide();}
       }
       Fl_Box {} {
         label 01
-        xywh {0 285 12 15} labelfont 1 labelsize 12 align 16
-        code0 {char tmp[12];snprintf(tmp,12,"%d",n+1);o->label(strdup(tmp));}
-      }
-      Fl_Box {} {
-        label 01
-        xywh {0 0 12 15} labelfont 1 labelsize 12 align 16
+        xywh {0 142 15 15} labelfont 1 labelsize 12 align 16
         code0 {char tmp[12];snprintf(tmp,12,"%d",n+1);o->label(strdup(tmp));}
       }
     }
@@ -179,17 +173,17 @@ class SUBnoteUI {: {public PresetsUI_}
   Function {make_window()} {} {
     Fl_Window SUBparameters {
       label {SUBsynth Parameters}
-      xywh {1 21 735 475} type Double hide
+      xywh {1 21 735 470} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
       code1 {o->position(synth->getGuiMaster()->subNoteX, synth->getGuiMaster()->subNoteY);}
     } {
       Fl_Scroll {} {
-        xywh {5 140 435 330} type HORIZONTAL box THIN_UP_BOX when 1
+        xywh {5 140 435 326} type HORIZONTAL box THIN_UP_BOX when 1
       } {
         Fl_Pack harmonics {
-          xywh {5 148 435 300} type HORIZONTAL
+          xywh {5 148 435 290} type HORIZONTAL
           code0 {new Fl_Box(0,0,9,o->h());}
-          code1 {for (int i=0;i<MAX_SUB_HARMONICS;i++){h[i]=new SUBnoteharmonic(0,0,17,o->h(),"");h[i]->init(pars, i, npart, kititem);}}
+          code1 {for (int i=0;i<MAX_SUB_HARMONICS;i++){h[i]=new SUBnoteharmonic(0,0,20,o->h(),"");h[i]->init(pars, i, npart, kititem);}}
           code2 {new Fl_Box(0,0,3,o->h());}
         } {}
       }

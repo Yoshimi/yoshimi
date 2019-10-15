@@ -1,5 +1,9 @@
 yoshimi 1.6.0 M
 
+2019-10-15 Will
+* Revised SubSynth and Oscillator Harmonics GUI.
+  Central numbering and wider subsynth spacing.
+
 2019-10-14 Will
 * Ensure report to stdout when running headless.
 * CLI can now save to banks slot.
