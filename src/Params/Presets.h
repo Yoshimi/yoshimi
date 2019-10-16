@@ -93,8 +93,11 @@ class Presets
 
                 void changePresets(const Presets *presets_)
                 {
-                    presets = presets_;
-                    forceUpdate();
+                    if (presets != presets_)
+                    {
+                        presets = presets_;
+                        forceUpdate();
+                    }
                 }
 
             private:
