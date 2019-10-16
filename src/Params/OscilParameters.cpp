@@ -35,6 +35,7 @@ OscilParameters::OscilParameters(SynthEngine *_synth) :
 {
     setpresettype("Poscilgen");
     FFTwrapper::newFFTFREQS(&basefuncFFTfreqs, MAX_OSCIL_SIZE);
+    defaults();
 }
 
 OscilParameters::~OscilParameters()
