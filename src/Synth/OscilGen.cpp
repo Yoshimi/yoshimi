@@ -669,7 +669,6 @@ void OscilGen::changebasefunction(void)
     }
     params->updatebasefuncFFTfreqs(&oscilFFTfreqs, synth->halfoscilsize);
 
-    oscilupdate.forceUpdate();
     oldbasefunc = params->Pcurrentbasefunc;
     oldbasepar = params->Pbasefuncpar;
     oldbasefuncmodulation = params->Pbasefuncmodulation;
