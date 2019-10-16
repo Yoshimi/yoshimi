@@ -75,7 +75,7 @@ class Presets
             public:
                 PresetsUpdate(const Presets *presets_) :
                     presets(presets_),
-                    lastUpdated(-1)
+                    lastUpdated(presets->updatedAt)
                 {}
 
                 // Checks if presets have been updated and resets counter.
