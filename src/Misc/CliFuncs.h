@@ -16,7 +16,6 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified August 2019
 */
 
 #ifndef CLIFUNCS_H
@@ -323,7 +322,12 @@ inline int sendDirect(SynthEngine *synth,
         switch (control)
         {
             case MAIN::control::readPartPeak:
-                name = "part " + std::to_string(int(kit)) + " peak ";
+                name = "part " + std::to_string(int(kit));
+                if (engine == 0)
+                    name += "L ";
+                else
+                    name += "R ";
+                name += "peak ";
                 break;
             case MAIN::control::readMainLRpeak:
                 name = "main ";

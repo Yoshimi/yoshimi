@@ -32,7 +32,9 @@
 #include <list>
 
 #include "MusicIO/MusicClient.h"
+#ifdef GUI_FLTK
 #include "FL/Fl.H"
+#endif
 
 using std::string;
 

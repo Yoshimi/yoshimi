@@ -9,7 +9,7 @@ Some of these will pull in other ones.
     libcairo2-dev   not needed if compiling headless
     libfftw3-dev
     libfltk1.3-dev  not needed if compiling headless
-    libglu1-mesa-dev
+    libglu1-mesa-dev  not needed if compiling headless
     libjack-jackd2-dev
     libmxml-dev
     libncurses5-dev

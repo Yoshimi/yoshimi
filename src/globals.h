@@ -320,7 +320,6 @@ namespace BANK // usage BANK::control::
 
         selectBank = 16,
         renameBank,
-        saveBank, // not yet
         createBank, // not yet
         deleteBank, // not yet
         selectFirstBankToSwap,
@@ -508,7 +507,7 @@ namespace MAIN // usage MAIN::control::volume
         startInstance = 104,
         stopInstance,
         stopSound = 128,
-        readPartPeak = 200,
+        readPartPeak = 200, // now does L/R
         readMainLRpeak,
         readMainLRrms
     };
