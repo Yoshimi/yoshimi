@@ -462,9 +462,11 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 
                 case SCALES::control::name:
                     synth->microtonal.Pname = text;
+                    newMsg = true;
                     break;
                 case SCALES::control::comment:
                     synth->microtonal.Pcomment = text;
+                    newMsg = true;
                     break;
             }
             getData->data.source &= ~TOPLEVEL::action::lowPrio;

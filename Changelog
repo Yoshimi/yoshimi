@@ -1,6 +1,9 @@
 yoshimi 1.6.0 M
 
-2019-10-15 Will
+2019-10-18 Will
+* BugFix: segfault changing scale name or description.
+
+2019-10-16 Will
 * Missing include in main.cpp when compiling headless.
 * FLTK ref. in Misc/config.cpp when compiling headless.
 * Changed CliFuncs readPartPeak to allow left/right.

@@ -432,13 +432,15 @@ string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
         case SCALES::control::name:
             contstr = "Name: ";
             if (addValue)
-                contstr += string(synth->microtonal.Pname);
+                //contstr += string(synth->microtonal.Pname);
+                contstr += textMsgBuffer.fetch(lrint(value));
             showValue = false;
             break;
         case SCALES::control::comment:
             contstr = "Description: ";
             if (addValue)
-                contstr += string(synth->microtonal.Pcomment);
+                //contstr += string(synth->microtonal.Pcomment);
+                contstr += textMsgBuffer.fetch(lrint(value));
             showValue = false;
             break;
         case SCALES::control::retune:
