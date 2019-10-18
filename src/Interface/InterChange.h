@@ -31,7 +31,7 @@
 #include "Params/LFOParams.h"
 #include "Params/FilterParams.h"
 #include "Params/EnvelopeParams.h"
-#include "Synth/OscilGen.h"
+#include "Params/OscilParameters.h"
 #include "Synth/Resonance.h"
 
 class SynthEngine;
@@ -109,7 +109,7 @@ class InterChange : private DataText
         void commandAddVoice(CommandBlock *getData);
         void commandSub(CommandBlock *getData);
         void commandPad(CommandBlock *getData);
-        void commandOscillator(CommandBlock *getData, OscilGen *oscil);
+        void commandOscillator(CommandBlock *getData, OscilParameters *oscil);
         void commandResonance(CommandBlock *getData, Resonance *respar);
         void commandLFO(CommandBlock *getData);
         void lfoReadWrite(CommandBlock *getData, LFOParams *pars);

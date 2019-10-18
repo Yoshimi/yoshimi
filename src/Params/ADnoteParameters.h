@@ -30,8 +30,9 @@
 #include "Params/EnvelopeParams.h"
 #include "Params/LFOParams.h"
 #include "Params/FilterParams.h"
-#include "Synth/OscilGen.h"
+#include "Params/OscilParameters.h"
 #include "Synth/Resonance.h"
+#include "Synth/OscilGen.h"
 #include "Misc/XMLwrapper.h"
 #include "DSP/FFTwrapper.h"
 #include "Params/Presets.h"
@@ -101,12 +102,13 @@ struct ADnoteVoiceParam { // Voice parameters
     unsigned char PDelay;                   // Voice Delay
     unsigned char Presonance;               // If resonance is enabled for this voice
     short int     Pextoscil,                // What external oscil should I use,
-                  PextFMoscil;              // -1 for internal OscilSmp & FMSmp
+                  PextFMoscil;              // -1 for internal POscil & POscilFM
                                             // it is not allowed that the externoscil,
                                             // externFMoscil => current voice
     unsigned char Poscilphase, PFMoscilphase; // oscillator phases
     unsigned char Pfilterbypass;            // filter bypass
-    OscilGen     *OscilSmp;
+    OscilParameters *POscil;
+    OscilGen        *OscilSmp;
 
     // Frequency parameters
     unsigned char Pfixedfreq;   // If the base frequency is fixed to 440 Hz
@@ -160,15 +162,16 @@ struct ADnoteVoiceParam { // Voice parameters
 
 
     short int     PVoice;     // Voice that I use as external oscillator.
-                              // It is -1 if I use OscilSmp(default).
+                              // It is -1 if I use POscil(default).
                               // It may not be equal or bigger than current voice
 
     // Modullator parameters
     unsigned char PFMEnabled; // 0 = off, 1 = Morph, 2 = RM, 3 = PM, 4 = FM, 5 = PWM
-    short int     PFMVoice;   // Voice that I use as modullator instead of FMSmp.
-                              // It is -1 if I use FMSmp(default).
+    short int     PFMVoice;   // Voice that I use as modullator instead of POscilFM.
+                              // It is -1 if I use POscilFM(default).
                               // It may not be equal or bigger than current voice
-    OscilGen *FMSmp;          // Modullator oscillator
+    OscilParameters *POscilFM;// Modullator oscillator
+    OscilGen        *FMSmp;
 
     unsigned char      PFMVolume;                // Modulator Volume
     unsigned char      PFMVolumeDamp;            // Modulator damping at higher frequencies

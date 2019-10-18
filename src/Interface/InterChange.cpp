@@ -1826,13 +1826,13 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                 commandEnvelope(getData);
                 break;
             case TOPLEVEL::insert::oscillatorGroup:
-                commandOscillator(getData,  part->kit[kititem].padpars->oscilgen);
+                commandOscillator(getData,  part->kit[kititem].padpars->POscil);
                 break;
             case TOPLEVEL::insert::harmonicAmplitude:
-                commandOscillator(getData,  part->kit[kititem].padpars->oscilgen);
+                commandOscillator(getData,  part->kit[kititem].padpars->POscil);
                 break;
             case TOPLEVEL::insert::harmonicPhaseBandwidth:
-                commandOscillator(getData,  part->kit[kititem].padpars->oscilgen);
+                commandOscillator(getData,  part->kit[kititem].padpars->POscil);
                 break;
             case TOPLEVEL::insert::resonanceGroup:
                 commandResonance(getData, part->kit[kititem].padpars->resonance);
@@ -1918,7 +1918,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                         }   // force it to external mod
                     }
 
-                    commandOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine].FMSmp);
+                    commandOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine].POscilFM);
                 }
                 else
                 {
@@ -1934,7 +1934,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                         }   // force it to external voice
                     }
 
-                    commandOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine].OscilSmp);
+                    commandOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine].POscil);
                 }
                 break;
         }
@@ -4837,7 +4837,7 @@ void InterChange::commandPad(CommandBlock *getData)
 }
 
 
-void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
+void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *oscil)
 {
     float value = getData->data.value.F;
     unsigned char type = getData->data.type;
@@ -4857,7 +4857,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             oscil->Phmag[control] = value_int;
             if (value_int == 64)
                 oscil->Phphase[control] = 64;
-            oscil->prepare();
+            oscil->presetsUpdated();
         }
         else
             getData->data.value.F = oscil->Phmag[control];
@@ -4868,7 +4868,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
         if (write)
         {
             oscil->Phphase[control] = value_int;
-            oscil->prepare();
+            oscil->presetsUpdated();
         }
         else
             getData->data.value.F = oscil->Phphase[control];
@@ -4944,7 +4944,9 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
         case OSCILLATOR::control::useAsBaseFunction:
             if (write)
             {
-                oscil->useasbase();
+                FFTwrapper fft(synth->oscilsize);
+                OscilGen gen(&fft, NULL, synth, oscil);
+                gen.useasbase();
                 if (value_bool)
                 {
                     for (int i = 0; i < MAX_AD_HARMONICS; ++ i)
@@ -4958,7 +4960,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
                     oscil->Pfiltertype = 0;
                     oscil->Psatype = 0;
                 }
-                oscil->prepare();
+                oscil->presetsUpdated();
             }
             break;
 
@@ -5086,12 +5088,17 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
                     oscil->Phphase[i]=64;
                 }
                 oscil->Phmag[0]=127;
-                oscil->prepare();
+                oscil->presetsUpdated();
             }
             break;
         case OSCILLATOR::control::convertToSine:
             if (write)
-                oscil->convert2sine();
+            {
+                FFTwrapper fft(synth->oscilsize);
+                OscilGen gen(&fft, NULL, synth, oscil);
+                gen.convert2sine();
+                oscil->presetsUpdated();
+            }
             break;
     }
     if (!write)
@@ -6258,7 +6265,7 @@ float InterChange::returnLimits(CommandBlock *getData)
         }
         if (insert >= TOPLEVEL::insert::oscillatorGroup && insert <= TOPLEVEL::insert::harmonicPhaseBandwidth)
         {
-            return part->kit[0].adpars->VoicePar[0].OscilSmp->getLimits(getData);
+            return part->kit[0].adpars->VoicePar[0].POscil->getLimits(getData);
             // we also use this for pad limits
             // as oscillator values identical
         }

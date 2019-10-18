@@ -69,7 +69,7 @@ void FFTwrapper::deleteFFTFREQS(FFTFREQS *f)
 
 
 // Fast Fourier Transform
-void FFTwrapper::smps2freqs(float *smps, FFTFREQS *freqs)
+void FFTwrapper::smps2freqs(const float *smps, FFTFREQS *freqs)
 {
     memcpy(data1, smps, fftsize * sizeof(float));
     fftwf_execute(planBasic);
@@ -81,7 +81,7 @@ void FFTwrapper::smps2freqs(float *smps, FFTFREQS *freqs)
 
 
 // Inverse Fast Fourier Transform
-void FFTwrapper::freqs2smps(FFTFREQS *freqs, float *smps)
+void FFTwrapper::freqs2smps(const FFTFREQS *freqs, float *smps)
 {
     memcpy(data2, freqs->c, half_fftsize * sizeof(float));
     data2[half_fftsize] = 0.0;

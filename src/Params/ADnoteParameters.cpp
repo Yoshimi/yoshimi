@@ -158,8 +158,8 @@ void ADnoteParameters::defaults(int n)
     VoicePar[nvoice].PFMAmpEnvelopeEnabled = 0;
     VoicePar[nvoice].PFMVelocityScaleFunction = 64;
 
-    VoicePar[nvoice].OscilSmp->defaults();
-    VoicePar[nvoice].FMSmp->defaults();
+    VoicePar[nvoice].POscil->defaults();
+    VoicePar[nvoice].POscilFM->defaults();
 
     VoicePar[nvoice].AmpEnvelope->defaults();
     VoicePar[nvoice].AmpLfo->defaults();
@@ -179,8 +179,10 @@ void ADnoteParameters::defaults(int n)
 // Init the voice parameters
 void ADnoteParameters::enableVoice(int nvoice)
 {
-    VoicePar[nvoice].OscilSmp = new OscilGen(fft, GlobalPar.Reson, synth);
-    VoicePar[nvoice].FMSmp = new OscilGen(fft, NULL, synth);
+    VoicePar[nvoice].POscil = new OscilParameters(synth);
+    VoicePar[nvoice].POscilFM = new OscilParameters(synth);
+    VoicePar[nvoice].OscilSmp = new OscilGen(fft, GlobalPar.Reson, synth, VoicePar[nvoice].POscil);
+    VoicePar[nvoice].FMSmp = new OscilGen(fft, NULL, synth, VoicePar[nvoice].POscilFM);
 
     VoicePar[nvoice].AmpEnvelope = new EnvelopeParams(64, 1, synth);
     VoicePar[nvoice].AmpEnvelope->ADSRinit_dB(0, 100, 127, 100);
@@ -225,6 +227,8 @@ void ADnoteParameters::killVoice(int nvoice)
 {
     delete VoicePar[nvoice].OscilSmp;
     delete VoicePar[nvoice].FMSmp;
+    delete VoicePar[nvoice].POscil;
+    delete VoicePar[nvoice].POscilFM;
 
     delete VoicePar[nvoice].AmpEnvelope;
     delete VoicePar[nvoice].AmpLfo;
@@ -331,7 +335,7 @@ void ADnoteParameters::add2XMLsection(XMLwrapper *xml, int n)
     xml->addpar("fm_enabled", VoicePar[nvoice].PFMEnabled);
 
     xml->beginbranch("OSCIL");
-        VoicePar[nvoice].OscilSmp->add2XML(xml);
+        VoicePar[nvoice].POscil->add2XML(xml);
     xml->endbranch();
 
 
@@ -440,7 +444,7 @@ void ADnoteParameters::add2XMLsection(XMLwrapper *xml, int n)
                 }
 
                 xml->beginbranch("OSCIL");
-                    VoicePar[nvoice].FMSmp->add2XML(xml);
+                    VoicePar[nvoice].POscilFM->add2XML(xml);
                 xml->endbranch();
 
             xml->endbranch();
@@ -663,7 +667,7 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper *xml, int n)
 
     if (xml->enterbranch("OSCIL"))
     {
-        VoicePar[nvoice].OscilSmp->getfromXML(xml);
+        VoicePar[nvoice].POscil->getfromXML(xml);
         xml->exitbranch();
     }
 
@@ -839,7 +843,7 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper *xml, int n)
 
             if (xml->enterbranch("OSCIL"))
             {
-                VoicePar[nvoice].FMSmp->getfromXML(xml);
+                VoicePar[nvoice].POscilFM->getfromXML(xml);
                 xml->exitbranch();
             }
 

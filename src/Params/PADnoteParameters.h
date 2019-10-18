@@ -32,6 +32,7 @@
 class XMLwrapper;
 class FFTwrapper;
 class OscilGen;
+class OscilParameters;
 class Resonance;
 class EnvelopeParams;
 class LFOParams;
@@ -154,6 +155,7 @@ class PADnoteParameters : public Presets
         void applyparameters(void);
         bool export2wav(std::string basefilename);
 
+        OscilParameters *POscil;
         OscilGen *oscilgen;
         Resonance *resonance;
 

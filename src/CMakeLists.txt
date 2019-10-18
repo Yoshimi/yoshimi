@@ -384,6 +384,7 @@ set (Params_sources
     Params/SUBnoteParameters.cpp  Params/PADnoteParameters.cpp
     Params/Controller.cpp  Params/Presets.cpp
     Params/PresetsStore.cpp  Params/UnifiedPresets.cpp
+    Params/OscilParameters.cpp
 )
 
 set (Synth_sources

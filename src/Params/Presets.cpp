@@ -30,7 +30,10 @@
 
 extern SynthEngine *firstSynth;
 
-Presets::Presets(SynthEngine *_synth) : nelement(-1), synth(_synth)
+Presets::Presets(SynthEngine *_synth) :
+    nelement(-1),
+    synth(_synth),
+    updatedAt(0)
 {
     type[0] = 0;
 }

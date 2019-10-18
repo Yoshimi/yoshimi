@@ -62,6 +62,53 @@ class Presets
 
     protected:
         SynthEngine *synth;
+
+    private:
+        int updatedAt; // Monotonically increasing counter that tracks last
+                       // change.  Users of the parameters compare their last
+                       // update to this counter. This can overflow, what's
+                       // important is that it's different.
+
+    public:
+        class PresetsUpdate
+        {
+            public:
+                PresetsUpdate(const Presets *presets_) :
+                    presets(presets_),
+                    lastUpdated(presets->updatedAt)
+                {}
+
+                // Checks if presets have been updated and resets counter.
+                bool checkUpdated()
+                {
+                    bool result = presets->updatedAt != lastUpdated;
+                    lastUpdated = presets->updatedAt;
+                    return result;
+                }
+
+                void forceUpdate()
+                {
+                    lastUpdated = presets->updatedAt - 1;
+                }
+
+                void changePresets(const Presets *presets_)
+                {
+                    if (presets != presets_)
+                    {
+                        presets = presets_;
+                        forceUpdate();
+                    }
+                }
+
+            private:
+                const Presets *presets;
+                int lastUpdated;
+        };
+
+        void presetsUpdated()
+        {
+            updatedAt++;
+        }
 };
 
 #endif
