@@ -1,7 +1,11 @@
-yoshimi 1.6.0 M
+yoshimi 1.6.0.2
 
 2019-10-18 Will
 * BugFix: segfault changing scale name or description.
+* Added instant close of all instances to CLI exit command.
+* Improved CLI description for scale/keymap imports.
+* Set bugfix release 1.6.0.2
+  (includes Kristians oscillator fixes)
 
 2019-10-16 Will
 * Missing include in main.cpp when compiling headless.

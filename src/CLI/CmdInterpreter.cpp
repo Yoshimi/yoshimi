@@ -5311,6 +5311,11 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
 #endif
     if (input.matchnMove(2, "exit"))
     {
+        if (input.matchnMove(1, "force"))
+        {
+            firstSynth->getRuntime().runSynth = false;
+            return Reply::DONE;
+        }
         if (currentInstance > 0)
         {
             Runtime.Log("Can only exit from instance 0", 1);

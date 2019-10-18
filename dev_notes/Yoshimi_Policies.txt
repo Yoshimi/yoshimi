@@ -1,6 +1,6 @@
 Yes! We actually have Yoshimi code policies. Look how many there are :)
 
-If the version string contains a 4th number this will always be just a bugfix, and should not have features added or changed from the main version.
+If the version string contains a 4th number this will always be just a bugfix. Previously it was intended that it should not have features added since the main version, but this has proved to be impractical, so now we just won't tell anyone about them till the next release :P
 
 e.g
 yoshimi-1.3.5   {main version}
