@@ -1781,7 +1781,9 @@ void SynthEngine::ClearNRPNs(void)
 
 void SynthEngine::resetAll(bool andML)
 {
-    __sync_and_and_fetch(&interchange.blockRead, 0);
+    //__sync_and_and_fetch(&interchange.blockRead, 0);
+    interchange.syncWrite = false;
+    interchange.lowPrioWrite = false;
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
         part[npart]->busy = false;
     defaults();

@@ -89,6 +89,8 @@ InterChange::InterChange(SynthEngine *_synth) :
     fromMIDI(NULL),
     returnsBuffer(NULL),
     blockRead(0),
+    syncWrite(false),
+    lowPrioWrite(false),
     tick(0),
     lockTime(0),
     swapRoot1(UNUSED),
@@ -278,9 +280,12 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     unsigned char parameter = getData->data.parameter;
     //unsigned char miscmsg = getData->data.miscmsg;
 
+    while(syncWrite)
+        usleep(10);
     bool write = (type & TOPLEVEL::type::Write);
     if (write)
-        __sync_or_and_fetch(&blockRead, 2);
+        //__sync_or_and_fetch(&blockRead, 2);
+        lowPrioWrite = true;
     bool guiTo = false;
     (void) guiTo; // suppress warning when headless build
     unsigned char newMsg = false;//NO_MSG;
@@ -330,7 +335,8 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     getData->data.control = MIDILEARN::control::loadList;
                     synth->midilearn.generalOperations(getData);
                     synth->Unmute();
-                    __sync_and_and_fetch(&blockRead, 0xfd);
+                    //__sync_and_and_fetch(&blockRead, 0xfd);
+                    lowPrioWrite = false;
                     return;
                     break;
                 }
@@ -1248,7 +1254,8 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 
     getData->data.value.F = float(value);
     if (write)
-        __sync_and_and_fetch(&blockRead, 0xfd);
+        //__sync_and_and_fetch(&blockRead, 0xfd);
+        lowPrioWrite = false;
     if (noForward)
         return;
 
@@ -1373,7 +1380,8 @@ float InterChange::readAllData(CommandBlock *getData)
     reTry:
     memcpy(tryData.bytes, getData->bytes, sizeof(tryData));
     // a false positive here is not actually a problem.
-    while (blockRead) // just reading it
+    //while (blockRead) // just reading it
+    while (syncWrite || lowPrioWrite)
         usleep(10);
     if (indirect)
     {
@@ -1387,7 +1395,8 @@ float InterChange::readAllData(CommandBlock *getData)
     }
     else
         commandSendReal(&tryData);
-    if (blockRead)//__sync_or_and_fetch(&blockRead, 0) > 0)
+    //if (blockRead)//__sync_or_and_fetch(&blockRead, 0) > 0)
+    if (syncWrite || lowPrioWrite)
         goto reTry; // it may have changed mid-process
 
     if ((tryData.data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromCLI)
@@ -1435,6 +1444,7 @@ void InterChange::mediate()
 {
     CommandBlock getData;
     bool more;
+    syncWrite = true;
     do
     {
         more = false;
@@ -1518,6 +1528,7 @@ void InterChange::mediate()
 
     }
     while (more && synth->getRuntime().runSynth);
+    syncWrite = false;
 }
 
 
@@ -1705,20 +1716,20 @@ bool InterChange::commandSendReal(CommandBlock *getData)
 
     if (!isGui && button == 1)
     {
-        __sync_and_and_fetch(&blockRead, 2); // just to be sure
+        //__sync_and_and_fetch(&blockRead, 2); // just to be sure
         return false;
     }
 
     if (npart == TOPLEVEL::section::vector)
     {
         commandVector(getData);
-        __sync_and_and_fetch(&blockRead, 2);
+        //__sync_and_and_fetch(&blockRead, 2);
         return true;
     }
     if (npart == TOPLEVEL::section::scales)
     {
         commandMicrotonal(getData);
-        __sync_and_and_fetch(&blockRead, 2);
+        //__sync_and_and_fetch(&blockRead, 2);
         return true;
     }
     if (npart == TOPLEVEL::section::config)
@@ -1729,13 +1740,13 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     if (npart == TOPLEVEL::section::main)
     {
         commandMain(getData);
-        __sync_and_and_fetch(&blockRead, 2);
+        //__sync_and_and_fetch(&blockRead, 2);
         return true;
     }
     if (npart == TOPLEVEL::section::bank)
     {
         commandBank(getData);
-        __sync_and_and_fetch(&blockRead, 2);
+        //__sync_and_and_fetch(&blockRead, 2);
         return true;
     }
 
@@ -1743,25 +1754,25 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     if ((npart == TOPLEVEL::section::systemEffects || npart == TOPLEVEL::section::insertEffects) && kititem == UNUSED)
     {
         commandSysIns(getData);
-        __sync_and_and_fetch(&blockRead, 2);
+        //__sync_and_and_fetch(&blockRead, 2);
         return true;
     }
     if (kititem >= EFFECT::type::none && kititem <= EFFECT::type::dynFilter)
     {
         commandEffects(getData);
-        __sync_and_and_fetch(&blockRead, 2);
+        //__sync_and_and_fetch(&blockRead, 2);
         return true;
     }
 
     if (npart >= NUM_MIDI_PARTS)
     {
-        __sync_and_and_fetch(&blockRead, 2);
+        //__sync_and_and_fetch(&blockRead, 2);
         return false; // invalid part number
     }
 
     if (kititem >= NUM_KIT_ITEMS && kititem != UNUSED)
     {
-        __sync_and_and_fetch(&blockRead, 2);
+        //__sync_and_and_fetch(&blockRead, 2);
         return false; // invalid kit number
     }
 
@@ -1783,7 +1794,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     }
     if (kititem != UNUSED && kititem != 0 && engine != UNUSED && control != 8 && part->kit[kititem].Penabled == false)
     {
-        __sync_and_and_fetch(&blockRead, 2);
+        //__sync_and_and_fetch(&blockRead, 2);
         return false; // attempt to access not enabled kititem
     }
 
@@ -1791,17 +1802,17 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     {
         if (control != PART::control::kitMode && kititem != UNUSED && part->Pkitmode == 0)
         {
-            __sync_and_and_fetch(&blockRead, 2);
+            //__sync_and_and_fetch(&blockRead, 2);
             return false;
         }
         commandPart(getData);
-        __sync_and_and_fetch(&blockRead, 2);
+        //__sync_and_and_fetch(&blockRead, 2);
         return true;
     }
 
     if (kititem > 0 && kititem != UNUSED && part->Pkitmode == 0)
     {
-        __sync_and_and_fetch(&blockRead, 2);
+        //__sync_and_and_fetch(&blockRead, 2);
         return false;
     }
 
@@ -1843,7 +1854,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                 commandResonance(getData, part->kit[kititem].padpars->resonance);
                 break;
         }
-        __sync_and_and_fetch(&blockRead, 2);
+        //__sync_and_and_fetch(&blockRead, 2);
         return true;
     }
 
@@ -1873,7 +1884,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                 commandEnvelope(getData);
                 break;
         }
-        __sync_and_and_fetch(&blockRead, 2);
+        //__sync_and_and_fetch(&blockRead, 2);
         return true;
     }
 
@@ -1884,7 +1895,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
             getData->data.source = TOPLEVEL::action::noAction;
             synth->getRuntime().Log("Invalid voice number");
             synth->getRuntime().finishedCLI = true;
-            __sync_and_and_fetch(&blockRead, 2);
+            //__sync_and_and_fetch(&blockRead, 2);
             return false;
         }
         switch (insert)
@@ -1940,7 +1951,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                 }
                 break;
         }
-        __sync_and_and_fetch(&blockRead, 2);
+        //__sync_and_and_fetch(&blockRead, 2);
         return true;
     }
 
@@ -1967,13 +1978,13 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                 commandResonance(getData, part->kit[kititem].adpars->GlobalPar.Reson);
                 break;
         }
-        __sync_and_and_fetch(&blockRead, 2);
+        //__sync_and_and_fetch(&blockRead, 2);
         return true;
     }
     getData->data.source = TOPLEVEL::action::noAction;
     synth->getRuntime().Log("Invalid engine number");
     synth->getRuntime().finishedCLI = true;
-    __sync_and_and_fetch(&blockRead, 2);
+    //__sync_and_and_fetch(&blockRead, 2);
     return false;
 }
 
@@ -2007,7 +2018,7 @@ void InterChange::commandMidi(CommandBlock *getData)
             break;
         case MIDI::control::controller:
             //std::cout << "Midi controller ch " << std::to_string(int(chan)) << "  type " << std::to_string(int(char1)) << "  val " << std::to_string(value_int) << std::endl;
-            __sync_or_and_fetch(&blockRead, 1);
+            // __sync_or_and_fetch(&blockRead, 1);
             synth->SetController(chan, char1, value_int);
             break;
 
@@ -2063,8 +2074,8 @@ void InterChange::commandVector(CommandBlock *getData)
     unsigned char control = getData->data.control;
     unsigned int chan = getData->data.insert;
     bool write = (type & TOPLEVEL::type::Write) > 0;
-    if (write)
-        __sync_or_and_fetch(&blockRead, 1);
+    //if (write)
+        //__sync_or_and_fetch(&blockRead, 1);
 
     unsigned int features = 0;
 
@@ -2259,8 +2270,8 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
     unsigned char control = getData->data.control;
 
     bool write = (type & TOPLEVEL::type::Write) > 0;
-    if (write)
-        __sync_or_and_fetch(&blockRead, 1);
+    //if (write)
+        //__sync_or_and_fetch(&blockRead, 1);
 
     int value_int = lrint(value);
     bool value_bool = YOSH::F2B(value);
@@ -2414,8 +2425,8 @@ void InterChange::commandConfig(CommandBlock *getData)
     unsigned char control = getData->data.control;
 
     bool write = (type & TOPLEVEL::type::Write) > 0;
-    if (write)
-        __sync_or_and_fetch(&blockRead, 1);
+    //if (write)
+        //__sync_or_and_fetch(&blockRead, 1);
 
     bool mightChange = true;
     int value_int = lrint(value);
@@ -2749,7 +2760,7 @@ void InterChange::commandConfig(CommandBlock *getData)
             mightChange = false;
         break;
     }
-    __sync_and_and_fetch(&blockRead, 2);
+    //__sync_and_and_fetch(&blockRead, 2);
     if (!write)
         getData->data.value.F = value;
     else if (mightChange)
@@ -2769,8 +2780,8 @@ void InterChange::commandMain(CommandBlock *getData)
     unsigned char miscmsg = getData->data.miscmsg;
 
     bool write = (type & TOPLEVEL::type::Write) > 0;
-    if (write)
-        __sync_or_and_fetch(&blockRead, 1);
+    //if (write)
+        //__sync_or_and_fetch(&blockRead, 1);
     int value_int = lrint(value);
 
     switch (control)
@@ -2965,8 +2976,8 @@ void InterChange::commandBank(CommandBlock *getData)
     unsigned char parameter = getData->data.parameter;
 
     bool write = (type & TOPLEVEL::type::Write) > 0;
-    if (write)
-        __sync_or_and_fetch(&blockRead, 1);
+    //if (write)
+        //__sync_or_and_fetch(&blockRead, 1);
 
     switch (control)
     {
@@ -3052,8 +3063,8 @@ void InterChange::commandPart(CommandBlock *getData)
     unsigned char insert = getData->data.insert;
 
     bool write = (type & TOPLEVEL::type::Write) > 0;
-    if (write)
-        __sync_or_and_fetch(&blockRead, 1);
+    //if (write)
+        //__sync_or_and_fetch(&blockRead, 1);
 
     bool kitType = (insert == TOPLEVEL::insert::kitGroup);
 
@@ -3705,8 +3716,8 @@ void InterChange::commandAdd(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
 
     bool write = (type & TOPLEVEL::type::Write) > 0;
-    if (write)
-        __sync_or_and_fetch(&blockRead, 1);
+    //if (write)
+        //__sync_or_and_fetch(&blockRead, 1);
 
     int value_int = lrint(value);
     char value_bool = YOSH::F2B(value);
@@ -3873,8 +3884,8 @@ void InterChange::commandAddVoice(CommandBlock *getData)
         nvoice = engine - PART::engine::addVoice1;
 
     bool write = (type & TOPLEVEL::type::Write) > 0;
-    if (write)
-        __sync_or_and_fetch(&blockRead, 1);
+    //if (write)
+        //__sync_or_and_fetch(&blockRead, 1);
 
     int value_int = lrint(value);
     char value_bool = YOSH::F2B(value);
@@ -4275,8 +4286,8 @@ void InterChange::commandSub(CommandBlock *getData)
     unsigned char insert = getData->data.insert & 0x1f; // ensure no stray filter
 
     bool write = (type & TOPLEVEL::type::Write) > 0;
-    if (write)
-        __sync_or_and_fetch(&blockRead, 1);
+    //if (write)
+        //__sync_or_and_fetch(&blockRead, 1);
 
     int value_int = lrint(value);
     char value_bool = YOSH::F2B(value);
@@ -4534,8 +4545,8 @@ void InterChange::commandPad(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
 
     bool write = (type & TOPLEVEL::type::Write) > 0;
-    if (write)
-        __sync_or_and_fetch(&blockRead, 1);
+    //if (write)
+        //__sync_or_and_fetch(&blockRead, 1);
 
     int value_int = lrint(value);
     char value_bool = YOSH::F2B(value);
@@ -4849,8 +4860,8 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
     int value_int = lrint(value);
     bool value_bool = YOSH::F2B(value);
     bool write = (type & TOPLEVEL::type::Write) > 0;
-    if (write)
-        __sync_or_and_fetch(&blockRead, 1);
+    //if (write)
+        //__sync_or_and_fetch(&blockRead, 1);
 
     if (insert == TOPLEVEL::insert::harmonicAmplitude)
     {
@@ -5118,8 +5129,8 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
     int value_int = lrint(value);
     bool value_bool = YOSH::F2B(value);
     bool write = (type & TOPLEVEL::type::Write) > 0;
-    if (write)
-        __sync_or_and_fetch(&blockRead, 1);
+    //if (write)
+        //__sync_or_and_fetch(&blockRead, 1);
 
     if (insert == TOPLEVEL::insert::resonanceGraphInsert)
     {
@@ -5251,8 +5262,8 @@ void InterChange::commandLFO(CommandBlock *getData)
 void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
 {
     bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
-    if (write)
-        __sync_or_and_fetch(&blockRead, 1);
+    //if (write)
+        //__sync_or_and_fetch(&blockRead, 1);
 
     float val = getData->data.value.F;
 
@@ -5359,8 +5370,8 @@ void InterChange::commandFilter(CommandBlock *getData)
 void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, unsigned char *velsnsamp, unsigned char *velsns)
 {
     bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
-    if (write)
-        __sync_or_and_fetch(&blockRead, 1);
+    //if (write)
+        //__sync_or_and_fetch(&blockRead, 1);
 
     float val = getData->data.value.F;
     int value_int = lrint(val);
@@ -5690,8 +5701,8 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
 {
     int val = lrint(getData->data.value.F); // these are all integers or bool
     bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
-    if (write)
-        __sync_or_and_fetch(&blockRead, 1);
+    //if (write)
+        //__sync_or_and_fetch(&blockRead, 1);
 
     unsigned char point = getData->data.control;
     unsigned char insert = getData->data.insert;
@@ -5903,8 +5914,8 @@ void InterChange::commandSysIns(CommandBlock *getData)
     unsigned char insert = getData->data.insert;
 
     bool write = (type & TOPLEVEL::type::Write) > 0;
-    if (write)
-        __sync_or_and_fetch(&blockRead, 1);
+    //if (write)
+        //__sync_or_and_fetch(&blockRead, 1);
 
     int value_int = lrint(value);
     //std::cout << "Value " << value_int << "  Control " << int(control) << "  Part " << int(npart) << "  Effnum " << int(effnum) << "  Insert " << int(insert) << std::endl;
@@ -6014,7 +6025,7 @@ void InterChange::commandEffects(CommandBlock *getData)
     bool write = (type & TOPLEVEL::type::Write) > 0;
     if (write)
     {
-        __sync_or_and_fetch(&blockRead, 1);
+        //__sync_or_and_fetch(&blockRead, 1);
         getData->data.source |= getData->data.source |= TOPLEVEL::action::forceUpdate;
         // the line above is to show it's changed from preset values
     }

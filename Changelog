@@ -1,4 +1,4 @@
-yoshimi 1.6.0.2
+yoshimi 1.6.0 M
 
 2019-10-18 Will
 * BugFix: segfault changing scale name or description.
