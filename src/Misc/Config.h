@@ -231,6 +231,9 @@ class Config
         bool bRuntimeSetupCompleted;
 
         friend class YoshimiLV2Plugin;
+
+    public:
+        int exitType;
 };
 
 

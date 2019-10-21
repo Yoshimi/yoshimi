@@ -4,6 +4,7 @@ yoshimi 1.6.0 M
 * Added 'CMakeListsOLD.txt'
   Done in case of unexpected issues with merge
   from Iain -  cmake has a bad rep for that :(
+* Forced CLI exit from Yoshimi returns 16 instead of 0
 
 2019-10-18 Will
 * BugFix: segfault changing scale name or description.

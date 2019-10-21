@@ -5313,6 +5313,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
     {
         if (input.matchnMove(1, "force"))
         {
+            firstSynth->getRuntime().exitType = 16;
             firstSynth->getRuntime().runSynth = false;
             return Reply::DONE;
         }

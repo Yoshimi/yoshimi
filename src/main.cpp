@@ -614,7 +614,7 @@ bail_out:
     if(bShowCmdLine)
         tcsetattr(0, TCSANOW, &oldTerm);
     if (bExitSuccess)
-        exit(EXIT_SUCCESS);
+        exit(firstSynth->getRuntime().exitType);
     else
         exit(EXIT_FAILURE);
 }
