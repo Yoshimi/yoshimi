@@ -81,14 +81,14 @@ inline unsigned int nearestPowerOf2(unsigned int x, unsigned int min, unsigned i
 
 inline unsigned int bitFindHigh(unsigned int value)
 {
-    int bit = 32;
-    while (bit >= 0)
-    {
-        bit --;
-        if ((value >> bit) == 1)
-            return bit;
-    }
-    return 0xff;
+    if (value == 0)
+        return 0xff;
+
+    int bit = sizeof(unsigned int) * 8 - 1;
+    while (!(value & (1 << bit)))
+        --bit;
+
+    return bit;
 }
 
 
