@@ -1,4 +1,9 @@
-yoshimi 1.6.0.2
+yoshimi 1.6.0 M
+
+* Revised CLI lists for consistency.
+* Added 'CMakeListsOLD.txt'
+  Done in case of unexpected issues with merge
+  from Iain -  cmake has a bad rep for that :(
 
 2019-10-18 Will
 * BugFix: segfault changing scale name or description.
