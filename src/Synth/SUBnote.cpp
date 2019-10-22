@@ -85,41 +85,22 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
     randpanL = cosf(t * HALFPI);
     randpanR = cosf((1.0f - t) * HALFPI);
 
-    setBaseFreq();
-
-    // select only harmonics that desire to compute
     numharmonics = 0;
-    for (int n = 0; n < MAX_SUB_HARMONICS; ++n)
-    {
-        if (pars->Phmag[n] == 0)
-            continue;
-        if (n * basefreq > synth->halfsamplerate_f)
-            break; // remove the freqs above the Nyquist freq
-        pos[numharmonics++] = n;
-    }
-    firstnumharmonics = numharmonics; // (gf)Useful in legato mode.
+    lfilter = NULL;
+    rfilter = NULL;
 
-    if (numharmonics == 0)
-    {
-        NoteEnabled = false;
-        return;
-    }
-
-    lfilter = new bpfilter[numstages * numharmonics];
-    if (stereo != 0)
-        rfilter = new bpfilter[numstages * numharmonics];
+    setBaseFreq();
 
     oldpitchwheel = 0;
     oldbandwidth = 64;
-
-    computeNoteParameters();
-
-    initfilters();
 
     if (pars->Pfixedfreq == 0)
         initparameters(basefreq);
     else
         initparameters(basefreq / 440.0f * freq);
+
+    computeNoteParameters();
+    computecurrentparameters();
 
     oldamplitude = newamplitude;
     ready = 1;
@@ -165,32 +146,10 @@ void SUBnote::SUBlegatonote(float freq, float velocity,
 
     setBaseFreq();
 
-    int legatonumharmonics = 0;
-    for (int n = 0; n < MAX_SUB_HARMONICS; ++n)
-    {
-        if (pars->Phmag[n] == 0)
-            continue;
-        if (n * basefreq > synth->samplerate_f / 2.0f)
-            break; // remove the freqs above the Nyquist freq
-        pos[legatonumharmonics++] = n;
-    }
-    if (legatonumharmonics > firstnumharmonics)
-        numharmonics = firstnumharmonics;
-    else
-        numharmonics = legatonumharmonics;
-
-    if (numharmonics == 0)
-    {
-        NoteEnabled = false;
-        return;
-    }
-
     oldpitchwheel = 0;
     oldbandwidth = 64;
 
     computeNoteParameters();
-
-    initfilters();
 
     oldamplitude = newamplitude;
 
@@ -224,6 +183,46 @@ void SUBnote::KillNote(void)
     }
 }
 
+void SUBnote::initNewFilters()
+{
+    bool alreadyEnabled[MAX_SUB_HARMONICS];
+    memset(alreadyEnabled, 0, sizeof(alreadyEnabled));
+    for (int p = 0; p < numharmonics; ++p)
+        alreadyEnabled[pos[p]] = true;
+
+    // select only harmonics that desire to compute
+    int origNumHarmonics = numharmonics;
+    for (int n = 0; n < MAX_SUB_HARMONICS; ++n)
+    {
+        if (pars->Phmag[n] == 0 || alreadyEnabled[n])
+            continue;
+        if (n * basefreq > synth->halfsamplerate_f)
+            break; // remove the freqs above the Nyquist freq
+        pos[numharmonics++] = n;
+        alreadyEnabled[n] = true;
+    }
+
+    bpfilter *newFilter = new bpfilter[numstages * numharmonics];
+    if (lfilter != NULL)
+    {
+        memcpy(newFilter, lfilter, numstages * origNumHarmonics * sizeof(bpfilter));
+        delete [] lfilter;
+    }
+    lfilter = newFilter;
+    if (stereo != 0)
+    {
+        newFilter = new bpfilter[numstages * numharmonics];
+        if (rfilter != NULL)
+        {
+            memcpy(newFilter, rfilter, numstages * origNumHarmonics * sizeof(bpfilter));
+            delete [] rfilter;
+        }
+        rfilter = newFilter;
+    }
+
+    initfilters(origNumHarmonics);
+}
+
 void SUBnote::setBaseFreq()
 {
     if (pars->Pfixedfreq == 0)
@@ -242,14 +241,16 @@ void SUBnote::setBaseFreq()
                 basefreq *= powf(3.0f, tmp);
         }
     }
+
+    float detune = getDetune(pars->PDetuneType, pars->PCoarseDetune, pars->PDetune);
+    basefreq *= powf(2.0f, detune / 1200.0f); // detune
+//    basefreq*=ctl->pitchwheel.relfreq;//pitch wheel
 }
 
 void SUBnote::computeNoteParameters()
 {
     volume = powf(0.1f, 3.0f * (1.0f - pars->PVolume / 96.0f)); // -60 dB .. 0 dB
     volume *= velF(Legato.param.vel, pars->PAmpVelocityScaleFunction);
-
-    setBaseFreq();
 
     int BendAdj = pars->PBendAdjust - 64;
     if (BendAdj % 24 == 0)
@@ -258,10 +259,6 @@ void SUBnote::computeNoteParameters()
         BendAdjust = BendAdj / 24.0f;
     float offset_val = (pars->POffsetHz - 64)/64.0f;
     OffsetHz = 15.0f*(offset_val * sqrtf(fabsf(offset_val)));
-
-    float detune = getDetune(pars->PDetuneType, pars->PCoarseDetune, pars->PDetune);
-    basefreq *= powf(2.0f, detune / 1200.0f); // detune
-//    basefreq*=ctl->pitchwheel.relfreq;//pitch wheel
 
     // global filter
     GlobalFilterCenterPitch =
@@ -306,9 +303,9 @@ void SUBnote::computefiltercoefs(bpfilter &filter, float freq, float bw, float g
 
 
 // Initialise the filters
-void SUBnote::initfilters()
+void SUBnote::initfilters(int startIndex)
 {
-    for (int n = 0; n < numharmonics; ++n)
+    for (int n = startIndex; n < numharmonics; ++n)
     {
         float hgain = getHgain(n);
 
@@ -348,8 +345,6 @@ void SUBnote::initfilter(bpfilter &filter, float mag)
             filter.yn2 = 0.0f;
         }
     }
-
-    computefiltercoefs(filter, filter.freq, filter.bw, 1.0f);
 }
 
 
@@ -471,7 +466,6 @@ void SUBnote::initparameters(float freq)
             GlobalFilterR = new Filter(pars->GlobalFilter, synth);
         GlobalFilterEnvelope = new Envelope(pars->GlobalFilterEnvelope, freq, synth);
     }
-    computecurrentparameters();
 }
 //end of port
 
@@ -607,7 +601,10 @@ int SUBnote::noteout(float *outl, float *outr)
         return 0;
 
     if (subNoteChange.checkUpdated())
+    {
+        setBaseFreq();
         computeNoteParameters();
+    }
 
     // left channel
     for (int i = 0; i < synth->sent_buffersize; ++i)
@@ -835,6 +832,8 @@ float SUBnote::getHgain(int harmonic)
 
 void SUBnote::updatefilterbank(void)
 {
+    initNewFilters();
+
     // moved from noteon
     // how much the amplitude is normalised (because the harmonics)
     float reduceamp = 0.0;

@@ -66,7 +66,6 @@ class SUBnote
         int pos[MAX_SUB_HARMONICS]; // chart of non-zero harmonic locations
         int numstages; // number of stages of filters
         int numharmonics; // number of harmonics (after the too higher hamonics are removed)
-        int firstnumharmonics; // To keep track of the first note's numharmonics value, useful in legato mode.
         int start; // how the harmonics start
         float basefreq;
         float BendAdjust;
@@ -107,7 +106,8 @@ class SUBnote
             float yn2;   // filter internal values
         };
 
-        void initfilters();
+        void initNewFilters();
+        void initfilters(int startIndex);
         void initfilter(bpfilter &filter, float mag);
         float computerolloff(float freq);
         void computeallfiltercoefs();
