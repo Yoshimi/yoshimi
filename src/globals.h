@@ -131,6 +131,8 @@ const unsigned char MAX_ALIENWAH_DELAY = 100;
 const std::string DEFAULT_NAME = "Simple Sound";
 const std::string UNTITLED = "No Title";
 
+const unsigned char FORCED_EXIT = 16;
+
 namespace YOSH
 {
     // float to bool done this way to ensure consistency
@@ -203,7 +205,8 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
 
     enum control : unsigned char {
         // insert any new entries here
-        textMessage = 254 // FE
+        textMessage = 254, // FE
+        forceExit // this is effective from *any* section!
     };
 
     enum muted : unsigned char {
@@ -330,7 +333,7 @@ namespace BANK // usage BANK::control::
         selectRoot = 32,
         changeRootId,
         addNamedRoot, // not yet
-        deselectRoot // not yet (currently done in main)
+        deselectRoot // not yet
     };
 }
 
@@ -391,7 +394,7 @@ namespace MIDILEARN // usage MIDILEARN::control::block
         loadList = 241,
         loadFromRecent,
         saveList = 245,
-        cancelLearn = 255
+        cancelLearn = 250
     };
 }
 
@@ -486,7 +489,7 @@ namespace MAIN // usage MAIN::control::volume
         importBank,
         deleteBank,
 
-        setCurrentRootBank = 75,
+        setCurrentRootBank = 75,  // only used in gui
         loadInstrumentFromBank,
         loadInstrumentByName,
         saveNamedInstrument,

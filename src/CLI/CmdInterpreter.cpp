@@ -5311,10 +5311,9 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
 #endif
     if (input.matchnMove(2, "exit"))
     {
-        if (input.matchnMove(1, "force"))
+        if (input.matchnMove(2, "force"))
         {
-            firstSynth->getRuntime().exitType = 16;
-            firstSynth->getRuntime().runSynth = false;
+            sendDirect(synth, 0, 0, TOPLEVEL::type::Write, TOPLEVEL::control::forceExit, UNUSED);
             return Reply::DONE;
         }
         if (currentInstance > 0)

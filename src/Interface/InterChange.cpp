@@ -1687,6 +1687,13 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         __sync_and_and_fetch(&blockRead, 2); // clear it now it's done
         return false;
     }
+    if (getData->data.control == TOPLEVEL::control::forceExit)
+    {
+        getData->data.source = TOPLEVEL::action::noAction;
+        firstSynth->getRuntime().exitType = FORCED_EXIT;
+        firstSynth->getRuntime().runSynth = false;
+        return false;
+    }
 
     if ((getData->data.source & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::lowPrio)
         return true; // indirect transfer

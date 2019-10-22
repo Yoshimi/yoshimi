@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -106,7 +106,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {selected : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -302,6 +302,9 @@ class MasterUI {selected : {private GuiUpdates}
       }
       if (close)
       {
+          if (Fl::event_state(FL_CTRL))
+              send_data(0, TOPLEVEL::control::forceExit, 0, UNUSED);
+
           synth->guiClosed(true);
       }}
       xywh {231 433 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
