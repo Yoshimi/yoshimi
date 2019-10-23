@@ -1,5 +1,8 @@
 yoshimi 1.6.0 M
 
+2019-10-23 Will
+* Further CLI test list revision.
+
 2019-10-22 Will
 * Instant (forced) exit also available from GUI.
   Hit ctrl with menu exit, just before with WM exit.
