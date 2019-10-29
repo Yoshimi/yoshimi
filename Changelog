@@ -1,5 +1,9 @@
 yoshimi 1.6.0 M
 
+2019-10-29
+* Restored original ALSA audio thread.
+  We need these messages for Raspberry Pi.
+
 2019-10-23 Will
 * Further CLI test list revision.
 
