@@ -269,8 +269,10 @@ bool MidiDecode::nrpnDecode(unsigned char ch, int ctrl, int param, bool in_place
                     }
                     return true;
                 }
-                if (type == 0x44 && param == 0x44)
+                if (type == 0x44 && (param == 0x44 || param == 0x45))
                 {
+                    if (param == 0x45)
+                        synth->getRuntime().exitType = FORCED_EXIT;
                     synth->getRuntime().runSynth = false;
                     return true; // bye bye everyone
                 }

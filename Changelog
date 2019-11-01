@@ -1,6 +1,10 @@
 yoshimi 1.6.0 M
 
-2019-10-29
+2019-11-1 Will
+* NRPN can shutdown with exit value 16.
+* Updated docs.
+
+2019-10-29 Will
 * Restored original ALSA audio thread.
   We need these messages for Raspberry Pi.
 
