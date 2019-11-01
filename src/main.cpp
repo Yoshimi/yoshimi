@@ -585,7 +585,6 @@ int main(int argc, char *argv[])
     {
         goto bail_out;
     }
-    std::cout << "\nGoodbye - Play again soon?\n";
     bExitSuccess = true;
 
 bail_out:
@@ -614,7 +613,14 @@ bail_out:
     if(bShowCmdLine)
         tcsetattr(0, TCSANOW, &oldTerm);
     if (bExitSuccess)
-        exit(EXIT_SUCCESS);
+    {
+        int type = firstSynth->getRuntime().exitType;
+        if (type == FORCED_EXIT)
+            std::cout << "\nExit was forced :(" << std::endl;
+        else
+            std::cout << "\nGoodbye - Play again soon?"<< std::endl;
+        exit(type);
+    }
     else
         exit(EXIT_FAILURE);
 }

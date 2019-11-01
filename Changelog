@@ -1,5 +1,24 @@
 yoshimi 1.6.0 M
 
+2019-10-29
+* Restored original ALSA audio thread.
+  We need these messages for Raspberry Pi.
+
+2019-10-23 Will
+* Further CLI test list revision.
+
+2019-10-22 Will
+* Instant (forced) exit also available from GUI.
+  Hit ctrl with menu exit, just before with WM exit.
+  This will not save any pending changes.
+
+2019-10-21 Will
+* Revised CLI lists for consistency.
+* Added 'CMakeListsOLD.txt'
+  Done in case of unexpected issues with merge
+  from Iain -  cmake has a bad rep for that :(
+* Forced CLI exit from Yoshimi returns 16 instead of 0
+
 2019-10-18 Will
 * BugFix: segfault changing scale name or description.
 * Added instant close of all instances to CLI exit command.

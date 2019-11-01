@@ -175,7 +175,8 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     sse_level(0),
     programcommand(string("yoshimi")),
     synth(_synth),
-    bRuntimeSetupCompleted(false)
+    bRuntimeSetupCompleted(false),
+    exitType(EXIT_SUCCESS)
 {
     if (synth->getIsLV2Plugin())
     {

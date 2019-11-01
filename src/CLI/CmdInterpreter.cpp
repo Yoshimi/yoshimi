@@ -817,7 +817,7 @@ char CmdInterpreter::helpList(Parser& input, unsigned int local)
             break;
 
         case LISTS::vector:
-            msg.push_back("Vector: [n1] = base channel:");
+            msg.push_back("Vector:");
             helpLoop(msg, vectlist, 2);
             break;
         case LISTS::scale:
@@ -846,7 +846,7 @@ char CmdInterpreter::helpList(Parser& input, unsigned int local)
             msg.push_back("'*' entries need to be saved and Yoshimi restarted to activate");
             break;
         case LISTS::mlearn:
-            msg.push_back("Mlearn: [n1] = line number");
+            msg.push_back("Mlearn:");
             helpLoop(msg, learnlist, 2);
             break;
     }
@@ -5311,9 +5311,9 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
 #endif
     if (input.matchnMove(2, "exit"))
     {
-        if (input.matchnMove(1, "force"))
+        if (input.matchnMove(2, "force"))
         {
-            firstSynth->getRuntime().runSynth = false;
+            sendDirect(synth, 0, 0, TOPLEVEL::type::Write, TOPLEVEL::control::forceExit, UNUSED);
             return Reply::DONE;
         }
         if (currentInstance > 0)
