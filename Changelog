@@ -1,5 +1,10 @@
 yoshimi 1.6.0 M
 
+2019-11-2 Will
+* Finding bank name needs specific root ID.
+* Revised CLI bank removal code.
+* Query message goes to current destination.
+
 2019-11-1 Will
 * NRPN can shutdown with exit value 16.
 * Updated docs.

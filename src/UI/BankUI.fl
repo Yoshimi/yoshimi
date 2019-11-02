@@ -264,7 +264,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
         (rp->*fnr)();
     return tmp;} {}
   }
-  Function {init(int nslot_, int *what_, int *whatslot_, void (RootProcess_:: *fnr_)(void), RootProcess_ *rp_, Bank *root_, int *rselected_, int bs)} {} {
+  Function {init(int nslot_, int *what_, int *whatslot_, void (RootProcess_:: *fnr_)(void), RootProcess_ *rp_, Bank *root_, int *rselected_)} {} {
     code {//
         nslot = nslot_;
         what = what_;
@@ -277,12 +277,11 @@ class RootSlot {: {public Fl_Button, RootProcess_}
         labelfont(0);
         labelsize(13);
         align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE|FL_ALIGN_CLIP);
-        highlight = 0;
-        rootrefresh(bs);} {}
+        highlight = 0;} {}
   }
-  Function {rootrefresh(unsigned int currentBank)} {} {
+  Function {rootrefresh(unsigned int currentBank, unsigned int rootID)} {} {
     code {//
-        string bankName = root->getBankName(nslot);
+        string bankName = root->getBankName(nslot, rootID);
         if (bankName.empty())
             color(46);
         else
@@ -698,7 +697,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             {
                 rs[i] = new RootSlot (0, 0, o->w(), 15, " ");
                 rs[i]->init(i, &what, &slot, &RootProcess_::rootprocess,
-                            (RootProcess_ *)this, bank, &rselected, bankS);
+                            (RootProcess_ *)this, bank, &rselected);
 
           }}
         } {}
@@ -710,7 +709,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             {
                 rs[i] = new RootSlot (0, 0, o->w(), 15, " ");
                 rs[i]->init(i, &what, &slot, &RootProcess_::rootprocess,
-                            (RootProcess_ *)this, bank, &rselected, bankS);
+                            (RootProcess_ *)this, bank, &rselected);
 
           }}
         } {}
@@ -722,7 +721,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             {
                 rs[i] = new RootSlot (0, 0, o->w(), 15, " ");
                 rs[i]->init(i, &what, &slot, &RootProcess_::rootprocess,
-                            (RootProcess_ *)this, bank, &rselected, bankS);
+                            (RootProcess_ *)this, bank, &rselected);
 
           }}
         } {}
@@ -734,7 +733,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             {
                 rs[i] = new RootSlot (0, 0, o->w(), 15, " ");
                 rs[i]->init(i, &what, &slot, &RootProcess_::rootprocess,
-                            (RootProcess_ *)this, bank, &rselected, bankS);
+                            (RootProcess_ *)this, bank, &rselected);
 
           }}
         } {}
@@ -1103,7 +1102,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     else
         B_search->deactivate();} {}
   }
-  Function {process()} {open return_type void
+  Function {process()} {return_type void
   } {
     code {//
         int slot = this->slot;
@@ -1281,7 +1280,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             return;
         }
         bank->setCurrentBankID(slot);
-        rs[slot]->rootrefresh(bt);
+        rs[slot]->rootrefresh(bt, rt);
         rescan_for_banks(false);
         set_bank_slot();
         setrootread();
@@ -1293,7 +1292,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         if (fl_choice("Completely remove %s?", NULL, "No", "Yes", thisname.c_str()) > 1)
         {
             int clearit = true;
-            int count = bank->getBankSize(slot);
+            int count = bank->getBankSize(slot, rt);
             if (count > 1)
                 clearit = fl_choice("There are %d instruments in this bank\\nThey will be permanently deleted",
                                     NULL, "STOP !", "Continue", count) > 1;
@@ -1322,7 +1321,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             {
                 send_data(TOPLEVEL::action::lowPrio, BANK::control::selectFirstBankToSwap, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::bank, slot);
                 rselected = slot;
-                rs[slot]->rootrefresh(bt);
+                rs[slot]->rootrefresh(bt, rt);
             }
     }} {}
   }
@@ -1358,7 +1357,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     for (int i = 0; i < BANK_SIZE; ++i)
         bs[i]->refresh(bk, rt);
     for (int i = 0; i < ROOT_SIZE; ++i)
-        rs[i]->rootrefresh(bk);} {}
+        rs[i]->rootrefresh(bk, rt);} {}
   }
   Function {refreshbankslot(int ins, int bk, int rt)} {} {
     code {//
@@ -1376,7 +1375,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         {
             int rsel = rselected;
             rselected = -1;
-            rs[rsel]->rootrefresh(fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank));
+            rs[rsel]->rootrefresh(fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank), fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank));
         }} {}
   }
   Function {rescan_for_banks(bool reload)} {} {

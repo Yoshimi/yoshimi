@@ -316,8 +316,8 @@ namespace BANK // usage BANK::control::
         readInstrumentName = 0,
         findInstrumentName, // next in list or '*' if at end
         renameInstrument,
-        saveInstrument,
-        deleteInstrument,
+        saveInstrument, // to bank
+        deleteInstrument, // from bank
         selectFirstInstrumentToSwap,
         selectSecondInstrumentAndSwap,
 

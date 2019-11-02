@@ -142,7 +142,7 @@ static std::string toplist [] = {
     "EXPort [s <n1>] <n2> <s>", "export bank at slot n2 of current root, (or 'Root' n1) to named directory",
     "REMove",                   "remove paths, files and entries",
     "  Root <n>",               "de-list root path ID",
-    "  Bank [s <n1>] <n2>",     "delete bank ID n2 (and all instruments) from current root (or 'Root' n1)",
+    "  Bank <n1> [s <n2>]",     "delete bank ID n1 (and all instruments) from current root (or 'Root' n2)",
     "  INstrument <n>",         "delete instrument from slot (n) in current bank",
     "  YOshimi <n>",            "close instance ID",
     "  MLearn <s> [n]",         "delete midi learned 'ALL' whole list, or '@'(n) line",

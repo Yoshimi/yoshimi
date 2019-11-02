@@ -118,9 +118,9 @@ class Bank
         bool savetoslot(size_t rootID, size_t bankID, int ninstrument, int npart);
         std::string swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t bank2, size_t root1, size_t root2);
         std::string swapbanks(unsigned int firstID, unsigned int secondID, size_t firstRoot, size_t secondRoot);
-        string getBankName(int bankID, size_t rootID = 0xff);
+        string getBankName(int bankID, size_t rootID);
         bool isDuplicateBankName(size_t rootID, string name);
-        int getBankSize(int bankID);
+        int getBankSize(int bankID, size_t rootID);
         int changeBankName(size_t rootID, size_t bankID, string newName);
         bool loadbank(size_t rootID, size_t banknum);
         std::string exportBank(string exportdir, size_t rootID, unsigned int bankID);

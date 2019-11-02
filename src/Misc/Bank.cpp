@@ -325,12 +325,12 @@ bool Bank::isDuplicateBankName(size_t rootID, string name)
 
 
 // finds the number of instruments in a bank
-int Bank::getBankSize(int bankID)
+int Bank::getBankSize(int bankID, size_t rootID)
 {
     int found = 0;
 
     for (int i = 0; i < BANK_SIZE; ++ i)
-        if (!roots [synth->getRuntime().currentRoot].banks [bankID].instruments [i].name.empty())
+        if (!roots [rootID].banks [bankID].instruments [i].name.empty())
             found += 1;
     return found;
 }
