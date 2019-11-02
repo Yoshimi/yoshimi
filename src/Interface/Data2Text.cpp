@@ -376,18 +376,35 @@ string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
 {
     int value = getData->data.value.F;
     unsigned char control = getData->data.control;
+    unsigned char parameter = getData->data.parameter;
+    bool yesno = false;
 
     string contstr = "";
     switch (control)
     {
         case SCALES::control::Afrequency:
-            contstr = "'A' Frequency";
+            if (addValue)
+            {
+                if (parameter >= 21 && parameter <= 84)
+                    contstr = noteslist[parameter - 21];
+                else
+                    contstr = to_string(parameter);
+            }
+            contstr += " Frequency";
             break;
         case SCALES::control::Anote:
-            contstr = "'A' Note";
+            showValue = false;
+            contstr = "Ref note ";
+            if (addValue)
+            {
+                contstr += to_string(value);
+                if (value >= 21 && value <= 84)
+                    contstr = contstr + " " + noteslist[value - 21];
+            }
             break;
         case SCALES::control::invertScale:
             contstr = "Invert Keys";
+            yesno = true;
             break;
         case SCALES::control::invertedScaleCenter:
             contstr = "Key Center";
@@ -397,10 +414,12 @@ string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
             break;
         case SCALES::control::enableMicrotonal:
             contstr = "Enable Microtonal";
+            yesno = true;
             break;
 
         case SCALES::control::enableKeyboardMap:
             contstr = "Enable Keyboard Mapping";
+            yesno = true;
             break;
         case SCALES::control::lowKey:
             contstr = "Keyboard First Note";
@@ -432,14 +451,12 @@ string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
         case SCALES::control::name:
             contstr = "Name: ";
             if (addValue)
-                //contstr += string(synth->microtonal.Pname);
                 contstr += textMsgBuffer.fetch(lrint(value));
             showValue = false;
             break;
         case SCALES::control::comment:
             contstr = "Description: ";
             if (addValue)
-                //contstr += string(synth->microtonal.Pcomment);
                 contstr += textMsgBuffer.fetch(lrint(value));
             showValue = false;
             break;
@@ -495,6 +512,19 @@ string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
                 break;
         }
     }
+
+    if(addValue)
+    {
+        if (yesno)
+        {
+            if (value)
+                contstr += " - on";
+            else
+                contstr += " - off";
+            showValue = false;
+        }
+    }
+
     return ("Scales " + contstr);
 }
 

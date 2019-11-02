@@ -461,11 +461,19 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     break;
 
                 case SCALES::control::name:
-                    synth->microtonal.Pname = text;
+                    if (write)
+                    {
+                        synth->microtonal.Pname = text;
+                    }
+                    else
+                        text = synth->microtonal.Pname;
                     newMsg = true;
                     break;
                 case SCALES::control::comment:
-                    synth->microtonal.Pcomment = text;
+                    if (write)
+                        synth->microtonal.Pcomment = text;
+                    else
+                        text = synth->microtonal.Pcomment;
                     newMsg = true;
                     break;
             }
@@ -2285,6 +2293,7 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
             }
             else
                 value = synth->microtonal.PAfreq;
+            getData->data.parameter = synth->microtonal.PAnote;
             break;
 
         case SCALES::control::Anote:

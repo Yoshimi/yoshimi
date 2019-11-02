@@ -3479,8 +3479,6 @@ int CmdInterpreter::commandScale(Parser& input, unsigned char controlType)
     unsigned char command = UNUSED;
     unsigned char action = 0;
     unsigned char miscmsg = UNUSED;
-    if (controlType != TOPLEVEL::type::Write)
-        return REPLY::done_msg;
 
     string name;
 
@@ -3497,7 +3495,7 @@ int CmdInterpreter::commandScale(Parser& input, unsigned char controlType)
     {
         if (controlType != TOPLEVEL::type::Write && command <= SCALES::control::importKbm)
         {
-            Runtime.Log("Write only - use list");
+            Runtime.Log("Write only - use 'list'");
             return REPLY::done_msg;
         }
         if (command <= SCALES::control::keyboardMap)
@@ -3506,7 +3504,7 @@ int CmdInterpreter::commandScale(Parser& input, unsigned char controlType)
                 command += (SCALES::control::importKbm - SCALES::control::keyboardMap);
         }
         name = string{input};
-        if (name == "")
+        if (name == "" && controlType == TOPLEVEL::type::Write)
             return REPLY::value_msg;
         action = TOPLEVEL::action::lowPrio;
         miscmsg = textMsgBuffer.push(name);

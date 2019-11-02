@@ -8,6 +8,9 @@ yoshimi 1.6.0 M
   Note range is now 24 to 84.
   Frequency range 30Hz to 1.1 kHz.
 * Added more labels for new bank commands.
+* CLI reports Ref. note and numbers.
+* CLI reports on/off for scale switches.
+* CLI can read scale name and description.
 
 2019-11-1 Will
 * NRPN can shutdown with exit value 16.
