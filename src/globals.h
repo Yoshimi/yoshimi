@@ -314,16 +314,19 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
 namespace BANK // usage BANK::control::
 {
     enum control : unsigned char {
-        readInstrumentName = 0,
+        // instrument selection done in 'part'
+        // actual control should probably be here
+        readInstrumentName = 0, // in bank, by ID
         findInstrumentName, // next in list or '*' if at end
-        renameInstrument,
+        renameInstrument, // not yet
         saveInstrument, // to bank
         deleteInstrument, // from bank
         selectFirstInstrumentToSwap,
         selectSecondInstrumentAndSwap,
 
-        selectBank = 16,
-        renameBank,
+        selectBank = 16, // in root, by ID
+        readBankName, // not yet
+        renameBank, // not yet
         createBank, // not yet
         deleteBank, // not yet
         selectFirstBankToSwap,
@@ -331,8 +334,9 @@ namespace BANK // usage BANK::control::
         importBank, // not yet (currently done in main)
         exportBank, // not yet (currently done in main)
 
-        selectRoot = 32,
-        changeRootId,
+        selectRoot = 32, // by ID
+        readRootPath, // not yet
+        changeRootId, // not yet
         addNamedRoot, // not yet
         deselectRoot // not yet
     };
