@@ -854,12 +854,14 @@ float Microtonal::getLimits(CommandBlock *getData)
     switch (control)
     {
         case SCALES::control::Afrequency:
-            min = 329.0f;
-            def = 440.0f;
-            max = 660.0f;
+            min = A_MIN;
+            def = A_DEF;
+            max = A_MAX;
             break;
         case SCALES::control::Anote:
+            min = 24;
             def = 69;
+            max = 84;
             type |= learnable;
             break;
         case SCALES::control::invertScale:

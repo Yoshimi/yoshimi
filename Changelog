@@ -4,6 +4,9 @@ yoshimi 1.6.0 M
 * Finding bank name needs specific root ID.
 * Revised CLI bank removal code.
 * Query message goes to current destination.
+* Reverted 'A' note limits and corrected terminology.
+  Note range is now 24 to 84.
+  Frequency range 30Hz to 1.1 kHz.
 
 2019-11-1 Will
 * NRPN can shutdown with exit value 16.
