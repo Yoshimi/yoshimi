@@ -76,7 +76,6 @@ class InterChange : private DataText
         std::string resolveText(CommandBlock *getData, bool addValue);
         void testLimits(CommandBlock *getData);
         float returnLimits(CommandBlock *getData);
-        unsigned char blockRead;
         void flagsWrite(unsigned int val){__sync_and_and_fetch(&flagsValue, val);}
         std::atomic<bool> syncWrite;
         std::atomic<bool> lowPrioWrite;

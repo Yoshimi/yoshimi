@@ -1,5 +1,8 @@
 yoshimi 1.6.0 M
 
+2019-11-4 Will
+* Code cleaups after merging in locks branch.
+
 2019-11-2 Will
 * Finding bank name needs specific root ID.
 * Revised CLI bank removal code.
