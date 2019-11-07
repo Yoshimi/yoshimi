@@ -3103,6 +3103,8 @@ int SynthEngine::getalldata(char **data)
 
 void SynthEngine::putalldata(const char *data, int size)
 {
+    while(isspace(*data))
+        ++data;
     int a = size; size = a; // suppress warning (may be used later)
     XMLwrapper *xml = new XMLwrapper(this, true);
     if (!xml->putXMLdata(data))

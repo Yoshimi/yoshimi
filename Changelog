@@ -1,5 +1,8 @@
 yoshimi 1.6.0 M
 
+2019-11-7 Will
+* Proposed fix for mxml 3.1 failure with LV2.
+
 2019-11-4 Will
 * Code cleaups after merging in locks branch.
 

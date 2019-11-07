@@ -2,5 +2,4 @@
     ConfBuild.h
 */
 
-#define BUILD_NUMBER 1698
-
+#define BUILD_NUMBER 1699
