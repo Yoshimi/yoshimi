@@ -283,7 +283,8 @@ class MasterUI {: {private GuiUpdates}
       label {Yoshimi meets ZynAddSubFX}
       callback {//
       bool close = true;
-      if (synth->getRuntime().configChanged)
+      bool force = Fl::event_state(FL_CTRL);
+      if (!force && synth->getRuntime().configChanged)
       {
           int r = fl_choice("Parameters Changed", "Save Changes", "Cancel", "Don't Save");
           switch (r)
@@ -302,7 +303,7 @@ class MasterUI {: {private GuiUpdates}
       }
       if (close)
       {
-          if (Fl::event_state(FL_CTRL))
+          if (force)
               send_data(0, TOPLEVEL::control::forceExit, 0, UNUSED);
 
           synth->guiClosed(true);
