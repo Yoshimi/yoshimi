@@ -44,23 +44,20 @@ decl {\#include "Misc/Bank.h"} {private local
 decl {\#include "MasterUI.h"} {private local
 }
 
-decl {\#include "Misc/FileMgrFuncs.h"
-} {private local
+decl {\#include "Misc/FileMgrFuncs.h"} {private local
 }
 
 decl {\#include "Misc/TextMsgBuffer.h"
 
-    namespace \{ // Implementation details...
+    namespace { // Implementation details...
         TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
-    \}
-} {private local
+    }} {private local
 }
 
 decl {extern SynthEngine *firstSynth;} {private local
 }
 
-class ConfigUI {
-} {
+class ConfigUI {} {
   Function {make_window()} {} {
     Fl_Window configwindow {
       label {Yoshimi Settings}
@@ -246,9 +243,26 @@ class ConfigUI {
               xywh {20 20 34 20} labelfont 1 labelsize 12
             }
           }
+          Fl_Choice PanelLayout {
+            label {Saved Instrument Format}
+            callback {//
+    synth->getRuntime().single_row_panel = o->value()  != 0;
+    synth->getGuiMaster()->updatepanel();}
+            xywh {200 255 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
+            code0 {o->value(synth->getRuntime().single_row_panel);}
+          } {
+            MenuItem {} {
+              label {2 row x 8 entries}
+              xywh {20 20 34 20} labelfont 1 labelsize 12
+            }
+            MenuItem {} {
+              label {1 row x 16 entries}
+              xywh {20 20 34 20} labelfont 1 labelsize 12
+            }
+          }
           Fl_Box settingsNote {
             label {* Changing these settings requires a restart}
-            xywh {50 276 287 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+            xywh {50 280 287 17} labelfont 1 labelsize 11 labelcolor 38 align 128
             code0 {if (synth->getUniqueId() != 0) o->hide();}
           }
         }

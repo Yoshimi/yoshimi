@@ -1,5 +1,9 @@
 yoshimi 1.6.0 M
 
+2019-11-8 Will
+* Mixer Panel format can be changed from config.
+  This alows control form typical 7in displays.
+
 2019-11-7 Will
 * Proposed fix for mxml 3.1 failure with LV2.
 
