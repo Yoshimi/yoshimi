@@ -1,5 +1,10 @@
 yoshimi 1.6.0 M
 
+2019-11-10 Will
+* Fixed forced shudown failure from GUI in ALSA.
+  It's rather a hack in UI/MasterUI.fl
+  Look for 'if (force)' for details.
+
 2019-11-8 Will
 * Mixer Panel format can be changed from config.
   This alows control form typical 7in displays.

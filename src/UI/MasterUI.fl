@@ -304,7 +304,15 @@ class MasterUI {: {private GuiUpdates}
       if (close)
       {
           if (force)
-              send_data(0, TOPLEVEL::control::forceExit, 0, UNUSED);
+              firstSynth->getRuntime().exitType = FORCED_EXIT;
+              /*
+               * The above line shouldn't be necessary!
+               * It works fine on jack but fails on ALSA.
+               * My best guess is that ALSA shuts down so quickly
+               * that one of the ringbuffers carrying the command
+               * is deleted before it can be read.
+               */
+              //send_data(0, TOPLEVEL::control::forceExit, 0, UNUSED);
 
           synth->guiClosed(true);
       }}
