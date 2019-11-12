@@ -1,4 +1,8 @@
-yoshimi 1.6.0 M
+yoshimi 1.6.0.3
+
+2019-11-12 Will.
+* Confirmed mxml fix for LV2.
+* Set bugfix version 1.6.0.3
 
 2019-11-10 Will
 * Fixed forced shudown failure from GUI in ALSA.
