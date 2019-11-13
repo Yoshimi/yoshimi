@@ -1370,18 +1370,21 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
 
 int CmdInterpreter::midiControllers(Parser& input, unsigned char controlType)
 {
+    if (input.isAtEnd())
+        return REPLY::done_msg;
     int value = -1;
     int cmd = -1;
+    bool isWrite = (controlType == TOPLEVEL::type::Write);
+
     if (input.matchnMove(2, "volume"))
     {
-        value = input.toggle();
+        value = !(input.toggle() == 0);
         cmd = PART::control::volumeEnable;
-
-        if (value == -1)
-        {
-            value = string2int127(input);
-            cmd = PART::control::volumeRange;
-        }
+    }
+    if ((cmd == -1) && input.matchnMove(2, "VRange"))
+    {
+        value = string2int127(input);
+        cmd = PART::control::volumeRange;
     }
     if ((cmd == -1) && input.matchnMove(2, "pan"))
     {
@@ -1390,27 +1393,22 @@ int CmdInterpreter::midiControllers(Parser& input, unsigned char controlType)
     }
     if ((cmd == -1) && input.matchnMove(2, "modwheel"))
     {
-        value = input.toggle();
+        value = (input.toggle() == 1);
         cmd = PART::control::exponentialModWheel;
-
-        if (value == -1)
-        {
-            value = string2int127(input);
-            cmd = PART::control::modWheelDepth;
-        }
+    }
+    if ((cmd == -1) && input.matchnMove(2, "mrange"))
+    {
+        value = string2int127(input);
+        cmd = PART::control::modWheelDepth;
     }
     if ((cmd == -1) && input.matchnMove(2, "expression"))
     {
-        value = input.toggle();
-        if (value == -1)
-            return REPLY::value_msg;
+        value = !(input.toggle() == 0);
         cmd = PART::control::expressionEnable;
     }
     if ((cmd == -1) && input.matchnMove(2, "sustain"))
     {
-        value = input.toggle();
-        if (value == -1)
-            return REPLY::value_msg;
+        value = !(input.toggle() == 0);
         cmd = PART::control::sustainPedalEnable;
     }
     if ((cmd == -1) && input.matchnMove(2, "pwheel"))
@@ -1420,37 +1418,32 @@ int CmdInterpreter::midiControllers(Parser& input, unsigned char controlType)
     }
     if ((cmd == -1) && input.matchnMove(2, "breath"))
     {
-        value = input.toggle();
-        if (value == -1)
-            return REPLY::value_msg;
+        value = !(input.toggle() == 0);
         cmd = PART::control::breathControlEnable;
     }
-    if ((cmd == -1) && input.matchnMove(2, "fcutoff"))
+    if ((cmd == -1) && input.matchnMove(2, "cutoff"))
     {
         value = string2int127(input);
         cmd = PART::control::filterCutoffDepth;
     }
-    if ((cmd == -1) && input.matchnMove(2, "fq"))
+    if ((cmd == -1) && input.matchnMove(2, "q"))
     {
         value = string2int127(input);
         cmd = PART::control::filterQdepth;
     }
-    if ((cmd == -1) && input.matchnMove(2, "bandwidth"))
+    if ((cmd == -1) && input.matchnMove(3, "bandwidth"))
     {
-        value = input.toggle();
+        value = (input.toggle() == 1);
         cmd = PART::control::exponentialBandwidth;
-
-        if (value == -1)
-        {
-            value = string2int127(input);
-            cmd = PART::control::bandwidthDepth;
-        }
+    }
+    if ((cmd == -1) && input.matchnMove(3, "barange"))
+    {
+        value = string2int127(input);
+        cmd = PART::control::bandwidthDepth;
     }
     if ((cmd == -1) && input.matchnMove(2, "fmamplitude"))
     {
-        value = input.toggle();
-        if (value == -1)
-            return REPLY::value_msg;
+        value = !(input.toggle() == 0);
         cmd = PART::control::FMamplitudeEnable;
     }
     if ((cmd == -1) && input.matchnMove(2, "rcenter"))
@@ -1467,40 +1460,34 @@ int CmdInterpreter::midiControllers(Parser& input, unsigned char controlType)
     // portamento controls
     if (cmd == -1)
     {
-        if (input.matchnMove(2, "proportional"))
+        if (input.matchnMove(2, "portamento"))
         {
-            value = input.toggle();
-            if (value == -1)
-                return REPLY::value_msg;
+            value = !(input.toggle() == 0);
             cmd = PART::control::receivePortamento;
         }
-        else if(input.matchnMove(2, "psweep"))
+        else if(input.matchnMove(2, "ptime"))
         {
             value = string2int127(input);
             cmd = PART::control::portamentoTime;
         }
-        else if (input.matchnMove(2, "pratio"))
+        else if (input.matchnMove(2, "pdownup"))
         {
             value = string2int127(input);
             cmd = PART::control::portamentoTimeStretch;
         }
-        else if (input.matchnMove(2, "pdifference"))
+        else if (input.matchnMove(2, "pstep"))
         {
             value = string2int127(input);
             cmd = PART::control::portamentoThreshold;
         }
-        else if (input.matchnMove(2, "pinvert"))
+        else if (input.matchnMove(2, "pminimum"))
         {
-            value = input.toggle();
-            if (value == -1)
-                return REPLY::value_msg;
+            value = !(input.toggle() == 0);
             cmd = PART::control::portamentoThresholdType;
         }
         else if (input.matchnMove(2, "pproportional"))
         {
-            value = input.toggle();
-            if (value == -1)
-                return REPLY::value_msg;
+            value = (input.toggle() == 1);
             cmd = PART::control::enableProportionalPortamento;
         }
         else if (input.matchnMove(2, "pextent"))
@@ -1508,7 +1495,7 @@ int CmdInterpreter::midiControllers(Parser& input, unsigned char controlType)
             value = string2int127(input);
             cmd = PART::control::proportionalPortamentoRate;
         }
-        else if (input.matchnMove(2, "poffset"))
+        else if (input.matchnMove(2, "prange"))
         {
             value = string2int127(input);
             cmd = PART::control::proportionalPortamentoDepth;
@@ -1517,47 +1504,51 @@ int CmdInterpreter::midiControllers(Parser& input, unsigned char controlType)
 
     if ((cmd == -1) && input.matchnMove(2, "clear"))
     {
+        if (isWrite)
+            return REPLY::writeOnly_msg;
         value = 0;
         cmd = PART::control::resetAllControllers;
     }
 
     // midi controllers
-    if (cmd == -1)
+    if (cmd == -1 && input.matchnMove(1, "e"))
     {
-        if (input.matchnMove(3, "moemulate"))
+        if (input.matchnMove(1, "modulation"))
         {
             value = string2int127(input);
             cmd = PART::control::midiModWheel;
         }
-        else if (input.matchnMove(3, "exemulate"))
+        else if (input.matchnMove(1, "expression"))
         {
             value = string2int127(input);
             cmd = PART::control::midiExpression;
         }
-        else if (input.matchnMove(3, "bremulate"))
+        else if (input.matchnMove(2, "breath"))
         {
             value = string2int127(input);
             cmd = PART::control::midiBreath;
         }
-        else if (input.matchnMove(3, "fcemulate"))
+        else if (input.matchnMove(1, "cutoff"))
         {
             value = string2int127(input);
             cmd = PART::control::midiFilterCutoff;
         }
-        else if (input.matchnMove(3, "fqemulate"))
+        else if (input.matchnMove(1, "q"))
         {
             value = string2int127(input);
             cmd = PART::control::midiFilterQ;
         }
-        else if (input.matchnMove(3, "baemulate"))
+        else if (input.matchnMove(2, "bandwidth"))
         {
             value = string2int127(input);
             cmd = PART::control::midiBandwidth;
         }
     }
 
+    if ( value == -1 && controlType != TOPLEVEL::type::Write)
+        value = 0;
     if (cmd > -1)
-        return sendNormal( synth, 0, value, controlType, cmd, npart);
+        return sendNormal(synth, 0, value, controlType, cmd, npart);
     return REPLY::available_msg;
 }
 

@@ -1,6 +1,9 @@
-yoshimi 1.6.0.3
+yoshimi 1.6.0 M
 
-2019-11-12 Will.
+2019-11-13 Will
+* Revised CLI part controllers code and messages.
+
+2019-11-12 Will
 * Confirmed mxml fix for LV2.
 * Set bugfix version 1.6.0.3
 

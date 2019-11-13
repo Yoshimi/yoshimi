@@ -1441,16 +1441,16 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
             contstr = "Pan Width";
             break;
         case PART::control::modWheelDepth:
-            contstr = "Mod Wheel Depth";
+            contstr = "Mod Wheel Range";
             break;
         case PART::control::exponentialModWheel:
-            contstr = "Exp Mod Wheel";
+            contstr = "Exponent Mod Wheel";
             break;
         case PART::control::bandwidthDepth:
-            contstr = "Bandwidth depth";
+            contstr = "Bandwidth range";
             break;
         case PART::control::exponentialBandwidth:
-            contstr = "Exp Bandwidth";
+            contstr = "Exponent Bandwidth";
             break;
         case PART::control::expressionEnable:
             contstr = "Expression Enable";
@@ -1465,10 +1465,10 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
             contstr = "Pitch Wheel Range";
             break;
         case PART::control::filterQdepth:
-            contstr = "Filter Q Depth";
+            contstr = "Filter Q Range";
             break;
         case PART::control::filterCutoffDepth:
-            contstr = "Filter Cutoff Depth";
+            contstr = "Filter Cutoff Range";
             break;
         case PART::control::breathControlEnable:
             yesno = true;
@@ -1476,17 +1476,17 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
             break;
 
         case PART::control::resonanceCenterFrequencyDepth:
-            contstr = "Res Cent Freq Depth";
+            contstr = "Res Cent Freq Range";
             break;
         case PART::control::resonanceBandwidthDepth:
-            contstr = "Res Band Depth";
+            contstr = "Res Band Range";
             break;
 
         case PART::control::portamentoTime:
             contstr = "Time";
             break;
         case PART::control::portamentoTimeStretch:
-            contstr = "Tme Stretch";
+            contstr = "Time Stretch";
             break;
         case PART::control::portamentoThreshold:
             contstr = "Threshold";
