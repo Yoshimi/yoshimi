@@ -1250,6 +1250,7 @@ class OscilEditor {: {public PresetsUI_}
                         h[i]->phase->selection_color(222);
                 }
                 baseSet = true;
+                set = false;
                 break;
 
             case OSCILLATOR::control::waveshapeParameter:

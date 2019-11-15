@@ -5,6 +5,8 @@ yoshimi 1.6.0 M
 * Minor correction to CLI info lists.
 * Further small adustment to OscilGenUI.
   Confirmed OK on Raspberry Pi.
+* Revised CMakeLists.txt NEON changed to RasPi4.
+  (it never worked before anyway!)
 
 2019-11-13 Will
 * Revised CLI part controllers code and messages.
