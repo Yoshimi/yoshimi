@@ -81,13 +81,13 @@ eff = eff_;
                     fl_color(FL_WHITE);
                 else
                     fl_color(205, 205, 205);
-                fl_line_style(FL_SOLID);
+                //fl_line_style(FL_SOLID);
                 break;
             case 1:
-                fl_line_style(FL_DOT);
+                //fl_line_style(FL_DOT);
                 break;
             case 2:
-                fl_line_style(FL_DASH);
+                //fl_line_style(FL_DASH);
                 break;
         }
 
@@ -108,7 +108,7 @@ eff = eff_;
         // draw the lines
         fl_color(FL_GRAY);
 
-        fl_line_style(FL_SOLID);
+        //fl_line_style(FL_SOLID);
         fl_line(ox + 2, oy + ly / 2, ox + lx - 2, oy + ly / 2);
 
         freqx = getfreqpos(1000.0);
@@ -140,7 +140,7 @@ eff = eff_;
         draw_freq_line(10000.0, 0);
         draw_freq_line(20000.0, 1);
 
-        fl_line_style(FL_DOT);
+        //fl_line_style(FL_DOT);
         int GY = 6;
         if (ly < GY * 3)
             GY = -1;
@@ -155,7 +155,7 @@ eff = eff_;
             fl_color(FL_YELLOW);
         else
             fl_color(200, 200, 80);
-        fl_line_style(FL_SOLID);
+        //fl_line_style(FL_SOLID);
         oiy = getresponse(ly, getfreqx(0.0));
         float half_samplerate_f = synth->samplerate_f * 0.5f;
         for (i = 1; i < lx; ++i)

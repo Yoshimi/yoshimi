@@ -7,6 +7,9 @@ yoshimi 1.6.0 M
   Confirmed OK on Raspberry Pi.
 * Revised CMakeLists.txt NEON changed to RasPi4.
   (it never worked before anyway!)
+* Disabled all references to fl_line_style.
+  Now always solid lines, can't see dots and dashes
+  anyway, and they slowed down the raspberry pi.
 
 2019-11-13 Will
 * Revised CLI part controllers code and messages.

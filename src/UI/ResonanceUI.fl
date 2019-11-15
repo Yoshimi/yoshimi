@@ -96,7 +96,7 @@ class ResonanceGraph {: {public Fl_Box}
   Function {draw_freq_line(float freq,int type)} {} {
     code {//
     float freqx=respar->getfreqpos(freq);
-    switch(type){
+    /*switch(type){
         case 0:
             fl_line_style(FL_SOLID);
             break;
@@ -106,7 +106,7 @@ class ResonanceGraph {: {public Fl_Box}
         case 2:
             fl_line_style(FL_DASH);
             break;
-    }
+    }*/
 
     if ((freqx>0.0)&&(freqx<1.0))
         fl_line(x()+(int) (freqx*w()),y(),
@@ -131,7 +131,7 @@ class ResonanceGraph {: {public Fl_Box}
     //draw the lines
     fl_color(FL_GRAY);
 
-    fl_line_style(FL_SOLID);
+    //fl_line_style(FL_SOLID);
     fl_line(ox+2,oy+ly/2,ox+lx-2,oy+ly/2);
 
     freqx=respar->getfreqpos(1000.0);
@@ -160,7 +160,7 @@ class ResonanceGraph {: {public Fl_Box}
     draw_freq_line(10000.0,0);
     draw_freq_line(20000.0,1);
 
-    fl_line_style(FL_DOT);
+    //fl_line_style(FL_DOT);
     int GY=10;
     if (ly<GY*3)
         GY=-1;
@@ -172,7 +172,7 @@ class ResonanceGraph {: {public Fl_Box}
 
     //draw the data
     fl_color(FL_RED);
-    fl_line_style(FL_SOLID);
+    //fl_line_style(FL_SOLID);
     oiy=(int)(respar->Prespoints[0]/128.0*ly);
     for (i=1;i<MAX_RESONANCE_POINTS;i++)
     {
