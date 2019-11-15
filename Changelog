@@ -3,6 +3,8 @@ yoshimi 1.6.0 M
 2019-11-15 Will
 * Applied experimental optinisations to OscilGenUI.
 * Minor correction to CLI info lists.
+* Further small adustment to OscilGenUI.
+  Confirmed OK on Raspberry Pi.
 
 2019-11-13 Will
 * Revised CLI part controllers code and messages.

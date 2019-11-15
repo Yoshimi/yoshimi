@@ -1362,10 +1362,11 @@ class OscilEditor {: {public PresetsUI_}
                 break;
 
             case OSCILLATOR::control::convertToSine:
-                //basefuncdisplaygroup->redraw();
                 bftype->value(0);
                 for (int i = 0; i < MAX_AD_HARMONICS; ++i)
                     h[i]->refresh();
+                baseSet = true;
+                set = false;
                 break;
 
             default:
@@ -1374,13 +1375,11 @@ class OscilEditor {: {public PresetsUI_}
     }
     if (baseSet)
     {
-        //basefuncdisplaygroup->redraw();
         basewave->redraw();
         baseharm->redraw();
-        }
+    }
     if (set)
     {
-        //oscildisplaygroup->redraw();
         waveformgroup->redraw();
         harmonicgroup->redraw();
         oldosc->redraw();
@@ -1500,8 +1499,6 @@ class OscilEditor {: {public PresetsUI_}
         h[i]->refresh();
 
     oscilSmp->prepare();
-
-    //basefuncdisplaygroup->redraw();
     basewave->redraw();
     baseharm->redraw();
     redrawoscil();} {}
@@ -1549,7 +1546,6 @@ class OscilEditor {: {public PresetsUI_}
   }
   Function {redrawoscil()} {} {
     code {//
-    //oscildisplaygroup->redraw();
     waveformgroup->redraw();
     harmonicgroup->redraw();
     oldosc->redraw();
