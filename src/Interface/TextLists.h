@@ -301,7 +301,7 @@ static std::string mcontrollist [] = {
     "PStep <n>",                "maximim note distance for portamento",
     "PMinimum <s>",             "change step to minimum not maximum (OFF {other})",
     "PTime <n>",                "portamento sweep time",
-    "PStretch <n>",             "portamento time stretch - down/up ratio",
+    "PDownup <n>",              "portamento time stretch - down/up ratio",
     "PProportional <s",         "enables/disables proportional portamento (ON {other})",
     "PExtent <n>",              "distance to double change",
     "PRange <n>",               "difference from non proportional",

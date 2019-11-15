@@ -158,6 +158,10 @@ void GuiUpdates::read_updates(SynthEngine *synth)
         Fl::unlock();
         isChanged = true;
     }
+    /*
+     * we perform all the updates that have occured in this refresh
+     * period then do just a single FLTK check for 'damage'
+     */
     if (isChanged)
     {
         Fl::lock();

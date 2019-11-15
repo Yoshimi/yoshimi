@@ -139,7 +139,7 @@ class OscilSpectrum {: {public Fl_Box}
 
     for (int i = 1; i < maxdb / 10; ++i)
     {
-        int ky = (int)((float)i * ly * 10.0 / maxdb) / 2;
+        int ky = int((float)i * ly * 10.0 / maxdb) / 2;
         ky *= 2;
         fl_line(ox, oy + ky - 1, ox + lx - 2, oy + ky - 1);
     }
@@ -170,7 +170,7 @@ class OscilSpectrum {: {public Fl_Box}
         else
             x = 0;
 
-        int val = (int)((ly - 2) * x);
+        int val = int((ly - 2) * x);
         if (val > 0)
             fl_line(ox + tmp, oy + ly - 2 - val, ox + tmp, oy + ly - 2);
     }
@@ -286,7 +286,7 @@ class Oscilloscope {: {public Fl_Box}
         GX = -1;
     for (int i = 1; i < GX; i++)
     {
-        int tmp = (int)(lx / (float)GX * i);
+        int tmp = int(lx / (float)GX * i);
         fl_line(ox + tmp, oy + 2, ox + tmp, oy + ly - 2);
     }
     int GY = 8;
@@ -294,7 +294,7 @@ class Oscilloscope {: {public Fl_Box}
         GY = -1;
     for (int i = 1; i < GY; i++)
     {
-        int tmp = (int)(ly / (float)GY * i);
+        int tmp = int(ly / (float)GY * i);
         fl_line(ox + 2, oy + tmp, ox + lx - 2, oy + tmp);
     }
 
@@ -307,15 +307,15 @@ class Oscilloscope {: {public Fl_Box}
         fl_color(this->parent()->labelcolor());
     int lw = 1;
     fl_line_style(0, lw);
-    int ph = lrint((phase - 64.0) / 128.0 * synth->oscilsize_f + synth->oscilsize_f);
+    int ph = int((phase - 64.0) / 128.0 * synth->oscilsize_f + synth->oscilsize_f);
     for (int i = 1; i < lx; ++i)
     {
-        int k1 = lrint(synth->oscilsize_f * (i - 1) / lx) + ph;
-        int k2 = lrint(synth->oscilsize_f * i / lx) + ph;
+        int k1 = int(synth->oscilsize_f * (i - 1) / lx) + ph;
+        int k2 = int(synth->oscilsize_f * i / lx) + ph;
         float y1 = smps[k1 % synth->oscilsize] / max;
         float y2 = smps[k2 % synth->oscilsize] / max;
-        fl_line(i - 1 + ox, (int)(y1 * ly / 2.0) + oy + ly / 2, i + ox,
-                (int)(y2 * ly / 2.0) + oy + ly / 2);
+        fl_line(i - 1 + ox, int(y1 * ly / 2.0) + oy + ly / 2, i + ox,
+                int(y2 * ly / 2.0) + oy + ly / 2);
             }} {}
   }
   decl {OscilGen *oscilSmp;} {private local
@@ -475,27 +475,12 @@ class OscilEditor {: {public PresetsUI_}
       Fl_Group oscildisplaygroup {
         xywh {5 5 360 300} box ENGRAVED_FRAME
       } {
-        Fl_Group {} {
+        Fl_Group waveformgroup {
           xywh {10 85 350 190} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179
           code0 {Oscilloscope *osc=new Oscilloscope(o->x(),o->y(),o->w(),o->h(),"");}
           code1 {osc->init(oscilSmp, synth);}
         } {}
-        Fl_Box {} {
-          label Oscillator
-          xywh {120 10 110 20} box FLAT_BOX labelfont 1 labelsize 12
-        }
-        Fl_Value_Slider rndslider {
-          label {Phase Randomness}
-          callback {//
-          if (Fl::event_button() == 3)
-              o->value(0);
-
-          send_data(0, OSCILLATOR::control::phaseRandomness, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Oscilator Phase Randomness: smaller than 0 is "group", larger than 0 is for each harmonic} xywh {140 285 100 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
-          code0 {if (oscil->ADvsPAD) o->hide();}
-          class mwheel_val_slider_rev
-        }
-        Fl_Group {} {
+        Fl_Group harmonicgroup {
           xywh {10 30 350 50} box THIN_DOWN_BOX color 32 selection_color 218 labelcolor 63
           code0 {OscilSpectrum *spc=new OscilSpectrum(o->x(),o->y(),o->w(),o->h(),"");}
           code1 {spc->init(oscilSmp,0, synth);}
@@ -531,10 +516,25 @@ class OscilEditor {: {public PresetsUI_}
           }
         }
       }
+      Fl_Box {} {
+        label Oscillator
+        xywh {120 10 110 20} labelfont 1 labelsize 12
+      }
+      Fl_Value_Slider rndslider {
+        label {Phase Randomness}
+        callback {//
+          if (Fl::event_button() == 3)
+              o->value(0);
+
+          send_data(0, OSCILLATOR::control::phaseRandomness, o->value(), TOPLEVEL::type::Integer);}
+        tooltip {Oscilator Phase Randomness: smaller than 0 is "group", larger than 0 is for each harmonic} xywh {140 285 100 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
+        code0 {if (oscil->ADvsPAD) o->hide();}
+        class mwheel_val_slider_rev
+      }
       Fl_Group basefuncdisplaygroup {
         xywh {365 5 360 300} box ENGRAVED_FRAME
       } {
-        Fl_Group {} {
+        Fl_Group basewave {
           xywh {370 85 350 190} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179
           code0 {Oscilloscope *osc=new Oscilloscope(o->x(),o->y(),o->w(),o->h(),"");}
           code1 {osc->init(oscilSmp,1, synth);}
@@ -624,7 +624,7 @@ class OscilEditor {: {public PresetsUI_}
           label {Base Function}
           xywh {480 10 110 20} box FLAT_BOX labelfont 1 labelsize 12
         }
-        Fl_Group {} {
+        Fl_Group baseharm {
           xywh {370 30 350 50} box THIN_DOWN_BOX color 32 selection_color 218 labelcolor 63
           code0 {OscilSpectrum *spc=new OscilSpectrum (o->x(),o->y(),o->w(),o->h(),"");}
           code1 {spc->init(oscilSmp,1, synth);}
@@ -1129,6 +1129,7 @@ class OscilEditor {: {public PresetsUI_}
 
     int tmp;
     bool set = true;
+    bool baseSet = false;
     if (insert == TOPLEVEL::insert::harmonicAmplitude)
     {
         h[control]->mag->value(127 - value);
@@ -1174,7 +1175,7 @@ class OscilEditor {: {public PresetsUI_}
             case OSCILLATOR::control::baseFunctionParameter:
                 bfslider->value(value);
                 bfparval->value(value);
-                basefuncdisplaygroup->redraw();
+                baseSet = true;
                 break;
 
             case OSCILLATOR::control::baseFunctionType:
@@ -1187,24 +1188,24 @@ class OscilEditor {: {public PresetsUI_}
                     basefuncmodulation->deactivate();
                 else
                     basefuncmodulation->activate();
-                basefuncdisplaygroup->redraw();
+                baseSet = true;
                 break;
 
             case OSCILLATOR::control::baseModulationParameter1:
                 bfmodpar1->value(value);
-                basefuncdisplaygroup->redraw();
+                baseSet = true;
                 redrawoscil();
                 break;
 
             case OSCILLATOR::control::baseModulationParameter2:
                 bfmodpar2->value(value);
-                basefuncdisplaygroup->redraw();
+                baseSet = true;
                 redrawoscil();
                 break;
 
             case OSCILLATOR::control::baseModulationParameter3:
                 bfmodpar3->value(value);
-                basefuncdisplaygroup->redraw();
+                baseSet = true;
                 redrawoscil();
                 break;
 
@@ -1214,7 +1215,7 @@ class OscilEditor {: {public PresetsUI_}
                     baseFuncPars->deactivate();
                 else
                     baseFuncPars->activate();
-                basefuncdisplaygroup->redraw();
+                baseSet = true;
                 redrawoscil();
                 break;
 
@@ -1248,7 +1249,7 @@ class OscilEditor {: {public PresetsUI_}
                     else
                         h[i]->phase->selection_color(222);
                 }
-                basefuncdisplaygroup->redraw();
+                baseSet = true;
                 break;
 
             case OSCILLATOR::control::waveshapeParameter:
@@ -1361,7 +1362,7 @@ class OscilEditor {: {public PresetsUI_}
                 break;
 
             case OSCILLATOR::control::convertToSine:
-                basefuncdisplaygroup->redraw();
+                //basefuncdisplaygroup->redraw();
                 bftype->value(0);
                 for (int i = 0; i < MAX_AD_HARMONICS; ++i)
                     h[i]->refresh();
@@ -1371,10 +1372,17 @@ class OscilEditor {: {public PresetsUI_}
                 set = false;
         }
     }
-
+    if (baseSet)
+    {
+        //basefuncdisplaygroup->redraw();
+        basewave->redraw();
+        baseharm->redraw();
+        }
     if (set)
     {
-        oscildisplaygroup->redraw();
+        //oscildisplaygroup->redraw();
+        waveformgroup->redraw();
+        harmonicgroup->redraw();
         oldosc->redraw();
         if (eng == 2)
         {
@@ -1493,7 +1501,9 @@ class OscilEditor {: {public PresetsUI_}
 
     oscilSmp->prepare();
 
-    basefuncdisplaygroup->redraw();
+    //basefuncdisplaygroup->redraw();
+    basewave->redraw();
+    baseharm->redraw();
     redrawoscil();} {}
   }
   Function {setWindowTitle()} {} {
@@ -1539,7 +1549,9 @@ class OscilEditor {: {public PresetsUI_}
   }
   Function {redrawoscil()} {} {
     code {//
-    oscildisplaygroup->redraw();
+    //oscildisplaygroup->redraw();
+    waveformgroup->redraw();
+    harmonicgroup->redraw();
     oldosc->redraw();
     if (cbwidget!=NULL) {
         cbwidget->do_callback();
