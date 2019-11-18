@@ -3,6 +3,8 @@ yoshimi 1.6.0 M
 2019-11-18 Will
 * Corrected some minor errors in CLI lists.
 * Updated local copy of user guide.
+* Removed redundtant CLI command.
+* Further updates to user guide.
 
 2019-11-15 Will
 * Applied experimental optinisations to OscilGenUI.

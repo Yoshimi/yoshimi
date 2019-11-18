@@ -3415,7 +3415,11 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
         else if (input.lineEnd(controlType))
             return REPLY::value_msg;
         else
+        {
             value = string2int(input);
+            if (value > 128)
+                value = 128;
+        }
     }
     else if (input.matchnMove(1, "quiet"))
     {
@@ -5418,19 +5422,6 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
                 return REPLY::done_msg;
             }
             return Reply{commandGroup(input)};
-        }
-        else if (input.matchnMove(1, "type"))
-        {
-            synth->getRuntime().Log("Instrument Types:");
-            int idx = 0;
-            string name = type_list[idx];
-            while ( name != "end")
-            {
-                synth->getRuntime().Log(name);
-                ++ idx;
-                name = type_list[idx];
-            }
-            return Reply::DONE;
         }
         return Reply{commandList(input)};
     }

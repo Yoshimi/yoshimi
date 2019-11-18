@@ -212,7 +212,7 @@ static std::string configlist [] = {
     "BAnk [s]",            "bank CC (Msb, Lsb, Off)",
     "PRogram [s]",         "program change (ON, {other})",
     "ACtivate [s]",        "program change activates part (ON, {other})",
-    "EXTended [s]",        "extended program change (ON, {other})",
+    "EXTended [n]",        "CC value for extended program change >= 128 is off",
     "Quiet [s]",           "ignore 'reset all controllers' (ON, {other})",
     "Nrpn [s]",            "incoming NRPN (ON, {other})",
     "Log [s]",             "incoming MIDI CCs (ON, {other})",
@@ -835,7 +835,7 @@ static std::string learnlist [] = {
 
 static std::string vectlist [] = {
     "<n>",                      "set current base channel",
-    "[X/Y] CC <n>",             "CC n2 is used for X or Y axis sweep",
+    "[X/Y] CC <n>",             "CC n is used for X or Y axis sweep",
     "[X/Y] Features <n> [s]",   "sets X or Y features 1-4 (ON, Reverse, {other})",
     "[X] PRogram <l/r> <n>",    "X program change ID for LEFT or RIGHT part",
     "[Y] PRogram <d/u> <n>",    "Y program change ID for DOWN or UP part",
@@ -905,7 +905,6 @@ static std::string listlist [] = {
     "Instruments [n]",  "instruments in bank ID or current",
     "Group <s1> [s2]",  "instruments by type grouping ('Location' for extra details)",
     "Parts [s]",        "parts with instruments installed ('More' for extra details)",
-    "Type [s]",         "current part instrument type",
     "Vectors",          "settings for all enabled vectors",
     "Tuning",           "microtonal scale tunings",
     "Keymap",           "microtonal scale keyboard map",
