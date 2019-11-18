@@ -154,6 +154,7 @@ static std::string toplist [] = {
     "  MLearn ...",             "enter editor context level",
     "  Bank ...",               "enter context level",
     "  COnfig ...",             "enter context level",
+    "  YOshimi <n>",            "read current instance or change to n",
     "  MONo <s>",               "main output mono/stereo (ON = mono, {other})",
     "  SYStem effects [n]",     "enter effects context level",
     "    <ON/OFF>",             "non-destructively enables/disables the effect",
@@ -257,7 +258,7 @@ static std::string partlist [] = {
     "INFo <s>",            "fills the comments info entry",
     "Humanise Pitch [n]",  "adds a small random pitch change at note_on",
     "Humanise Velocity [n]",  "adds a small random velocity change at note_on",
-    "Channel <n2>",        "MIDI channel (> 32 disables, > 16 note off only)",
+    "Channel <n>",         "MIDI channel (> 32 disables, > 16 note off only)",
     "Destination <s>",     "jack audio destination (Main, Part, Both)",
     "kit mode entries","",
     "KIT",                 "access controls but don't change type",
@@ -305,6 +306,7 @@ static std::string mcontrollist [] = {
     "PProportional <s",         "enables/disables proportional portamento (ON {other})",
     "PExtent <n>",              "distance to double change",
     "PRange <n>",               "difference from non proportional",
+    "CLear",                    "set all controllers to defaults",
     "  emulators","",
     "E Modulation <n>",         "emulate modulation controller",
     "E Expression <n>",         "emulate expression controller",
@@ -312,7 +314,6 @@ static std::string mcontrollist [] = {
     "E Cutoff <n>",             "emulate filter cutoff controller",
     "E Q <n>",                  "emulate filter Q controller",
     "E BAndwidth <n>",          "emulate bandwidth controller",
-    "CLear",                    "set all controllers to defaults",
     "end"
 };
 
