@@ -1475,14 +1475,17 @@ int CmdInterpreter::midiControllers(Parser& input, unsigned char controlType)
             value = string2int127(input);
             cmd = PART::control::portamentoTimeStretch;
         }
-        else if (input.matchnMove(2, "pstep"))
+        else if (input.matchnMove(2, "pgate"))
         {
             value = string2int127(input);
             cmd = PART::control::portamentoThreshold;
         }
-        else if (input.matchnMove(2, "pminimum"))
+        else if (input.matchnMove(2, "pform"))
         {
-            value = !(input.toggle() == 0);
+            if (input.matchnMove(1, "start"))
+                value = 0;
+            else if (input.matchnMove(1, "end"))
+                value = 1;
             cmd = PART::control::portamentoThresholdType;
         }
         else if (input.matchnMove(2, "pproportional"))
@@ -3951,17 +3954,36 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
     int cmd = -1;
     if (input.matchnMove(2, "harmonic"))
     {
+        int value = -1;
         if (input.matchnMove(1, "stages"))
+        {
             cmd = SUBSYNTH::control::filterStages;
+            value = string2int(input);
+        }
         else if (input.matchnMove(1, "mag"))
+        {
             cmd = SUBSYNTH::control::magType;
+            if (controlType == TOPLEVEL::type::Write)
+            {
+                string name = string{input}.substr(0, 2);
+                value = stringNumInList(name, subMagType, 2);
+            }
+        }
         else if (input.matchnMove(1, "position"))
+        {
             cmd = SUBSYNTH::control::startPosition;
+            if (input.matchnMove(1, "Zero"))
+                value = 0;
+            else if (input.matchnMove(1, "Random"))
+                value = 1;
+            else if (input.matchnMove(1, "Maximum"))
+                value = 2;
+        }
         if (cmd != -1)
         {
-            if (input.lineEnd(controlType))
+            if (value < 0 && controlType == TOPLEVEL::type::Write)
                 return REPLY::value_msg;
-            return sendNormal( synth, 0, string2int(input), controlType, cmd, npart, kitNumber, PART::engine::subSynth);
+            return sendNormal( synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::subSynth);
         }
 
         int control = -1;

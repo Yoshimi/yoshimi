@@ -3,6 +3,9 @@ yoshimi 1.6.0 M
 2019-11-19 Will
 * Revised text reporting of on/off values.
 * Revised text reporting of integer/float values.
+* Further reporting improvements.
+* More CLI named entries (not PadSynth yet).
+* Updated local copy of user guide.
 
 2019-11-18 Will
 * Corrected some minor errors in CLI lists.

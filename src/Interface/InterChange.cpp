@@ -4477,6 +4477,8 @@ void InterChange::commandSub(CommandBlock *getData)
         case SUBSYNTH::control::magType:
             if (write)
                 pars->Phmagtype = value_int;
+            else
+                value = pars->Phmagtype;
             break;
         case SUBSYNTH::control::startPosition:
             if (write)

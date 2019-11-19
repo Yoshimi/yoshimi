@@ -299,8 +299,8 @@ static std::string mcontrollist [] = {
     "RCenter <n>",              "resonance center frequency",
     "RBand <n>",                "resonance bandwidth",
     "POrtamento <s>",           "enables/disables portamento control (OFF {other})",
-    "PStep <n>",                "maximim note distance for portamento",
-    "PMinimum <s>",             "change step to minimum not maximum (OFF {other})",
+    "PGate <n>",                "point when portamento starts or ends",
+    "PForm <s>",                "whether portamento is from or to (Start / End)",
     "PTime <n>",                "portamento sweep time",
     "PDownup <n>",              "portamento time stretch - down/up ratio",
     "PProportional <s",         "enables/disables proportional portamento (ON {other})",
@@ -472,8 +472,9 @@ static std::string subsynthlist [] = {
     "HArmonic <n1> Amp <n2>",   "set harmonic n1 to n2 intensity",
     "HArmonic <n1> Band <n2>",  "set harmonic n1 to n2 width",
     "HArmonic Stages <n>",      "number of stages",
-    "HArmonic Mag <n>",         "harmonics filtering type",
-    "HArmonic Position <n>",    "start position",
+    "HArmonic Mag <s>",         "harmonics filtering type",
+    "", "Linear, 40dB, 60dB, 80dB, 100dB",
+    "HArmonic Position <s>",    "start position (Zero, Random, Maximum)",
     "BAnd Width <n>",           "common bandwidth",
     "BAnd Scale <n>",           "bandwidth slope v frequency",
     "FILter ...",               "enter Filter insert context",
@@ -1008,5 +1009,7 @@ static std::string adaptive [] = {"OFF", "ON", "SQU", "2XS", "2XA", "3XS", "3XA"
 // misc controls
 static std::string historyGroup [] = {"IN", "PA", "SC", "ST", "VE", "ML"};
 static std::string instrumentGroupType [] = {"UNdefined", "PIano", "CHromatic percussion", "ORgan", "GUitar", "BAss", "SIngle strings", "ENsemble", "BRass", "REed", "ACcustic pipe", "LEad synth", "PAd synth", "SYnth effects", "EThnic", "PErcussive", "SOund effects"};
+
+static std::string subMagType [] = {"Linear", "40dB", "60dB", "80dB", "100dB"};
 
 #endif
