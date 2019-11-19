@@ -34,23 +34,35 @@ using func::stringCaps;
 DataText::DataText() :
     synth(nullptr),
     showValue(false),
+    yesno(false),
     textMsgBuffer(TextMsgBuffer::instance())
 {
 }
 
 std::string DataText::withValue(std::string resolved, unsigned char type, bool showValue, bool addValue, float value)
 {
-    std::string actual = "";
+    if (!addValue)
+        return resolved;
+
+    if (yesno)
+    {
+        if (value)
+            resolved += " - on";
+        else
+            resolved += " - off";
+        return resolved;
+    }
+
     if (showValue)
     {
-        actual = " Value ";
+        resolved += " Value ";
         if (type & TOPLEVEL::type::Integer)
-            actual += to_string(lrint(value));
+            resolved += to_string(lrint(value));
         else
-            actual += to_string(value);
+            resolved += to_string(value);
+        return resolved;
     }
-    if (addValue)
-        resolved += actual;
+
     return resolved;
 }
 
@@ -73,6 +85,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
     }
 
     showValue = true;
+    yesno = false;
     string commandName;
 
    // this is unique and placed here to avoid Xruns
@@ -377,7 +390,6 @@ string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
     int value = getData->data.value.F;
     unsigned char control = getData->data.control;
     unsigned char parameter = getData->data.parameter;
-    bool yesno = false;
 
     string contstr = "";
     switch (control)
@@ -513,18 +525,6 @@ string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
         }
     }
 
-    if(addValue)
-    {
-        if (yesno)
-        {
-            if (value)
-                contstr += " - on";
-            else
-                contstr += " - off";
-            showValue = false;
-        }
-    }
-
     return ("Scales " + contstr);
 }
 
@@ -536,7 +536,7 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
     bool write = getData->data.type & TOPLEVEL::type::Write;
     int value_int = lrint(value);
     bool value_bool = YOSH::F2B(value);
-    bool yesno = false;
+
     string contstr = "";
     switch (control)
     {
@@ -864,17 +864,6 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
             break;
     }
 
-    if(addValue)
-    {
-        if (yesno)
-        {
-            if (value_bool)
-                contstr += " - on";
-            else
-                contstr += " - off";
-            showValue = false;
-        }
-    }
     return ("Config " + contstr);
 }
 
@@ -1209,7 +1198,6 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
     bool kitType = (insert == TOPLEVEL::insert::kitGroup);
     int value_int = lrint(value);
     bool value_bool = YOSH::F2B(value);
-    bool yesno = false;
 
     if (control == UNUSED)
         return "Number of parts";
@@ -1575,17 +1563,6 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
 
     }
 
-    if(addValue)
-    {
-        if (yesno)
-        {
-            if (value_bool)
-                contstr += " - on";
-            else
-                contstr += " - off";
-            showValue = false;
-        }
-    }
     return ("Part " + to_string(npart + 1) + kitnum + name + contstr);
 }
 
@@ -1677,8 +1654,6 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
 
-    bool yesno = false;
-    bool value_bool = YOSH::F2B(value);
     int value_int = lrint(value);
     int nvoice;
     if (engine >= PART::engine::addMod1)
@@ -1920,17 +1895,6 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
             contstr = "Unrecognised";
     }
 
-    if(addValue)
-    {
-        if (yesno)
-        {
-            if (value_bool)
-                contstr += " - on";
-            else
-                contstr += " - off";
-            showValue = false;
-        }
-    }
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " Add Voice " + to_string(nvoice + 1) + name + contstr);
 }
 
@@ -1943,8 +1907,6 @@ string DataText::resolveSub(CommandBlock *getData, bool addValue)
     unsigned char kititem = getData->data.kit;
     unsigned char insert = getData->data.insert;
 
-    bool yesno = false;
-    bool value_bool = YOSH::F2B(value);
     if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     {
         string Htype;
@@ -2072,17 +2034,6 @@ string DataText::resolveSub(CommandBlock *getData, bool addValue)
             contstr = "Unrecognised";
     }
 
-    if(addValue)
-    {
-        if (yesno)
-        {
-            if (value_bool)
-                contstr += " - on";
-            else
-                contstr += " - off";
-            showValue = false;
-        }
-    }
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " SubSynth " + name + contstr);
 }
 
@@ -2096,8 +2047,6 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
     unsigned char kititem = getData->data.kit;
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
-    bool yesno = false;
-    bool value_bool = YOSH::F2B(value);
     string name = "";
     switch (control & 0x70)
     {
@@ -2266,17 +2215,6 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
             contstr = "Unrecognised";
     }
 
-    if(addValue)
-    {
-        if (yesno)
-        {
-            if (value_bool)
-                contstr += " - on";
-            else
-                contstr += " - off";
-            showValue = false;
-        }
-    }
     string isPad = "";
 
     if (write && ((control >= PADSYNTH::control::bandwidth && control <= PADSYNTH::control::spectrumMode) || (control >= PADSYNTH::control::overtoneParameter1 && control <= PADSYNTH::control::sampleSize)))
@@ -2465,7 +2403,6 @@ string DataText::resolveResonance(CommandBlock *getData, bool addValue)
     unsigned char parameter = getData->data.parameter;
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
-    bool yesno = false;
     string name;
     string isPad = "";
     if (engine == PART::engine::padSynth)
@@ -2544,17 +2481,7 @@ string DataText::resolveResonance(CommandBlock *getData, bool addValue)
             showValue = false;
             contstr = "Unrecognised";
     }
-    if(addValue)
-    {
-        if (yesno)
-        {
-            if (value > 0)
-                contstr += " - on";
-            else
-                contstr += " - off";
-            showValue = false;
-        }
-    }
+
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Resonance " + contstr + isPad);
 }
 

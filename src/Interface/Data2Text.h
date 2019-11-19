@@ -35,6 +35,7 @@ class DataText
     private:
         SynthEngine *synth;
         bool showValue;
+        bool yesno;
     protected:
         TextMsgBuffer& textMsgBuffer;
 
