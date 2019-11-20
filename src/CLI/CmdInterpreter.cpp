@@ -1708,24 +1708,14 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
             {
                 if (input.matchnMove(1, "Position"))
                 {
-                    if (input.matchnMove(2, "harmonic"))
-                        value = 0;
-                    else if(input.matchnMove(2, "usine"))
-                        value = 1;
-                    else if(input.matchnMove(2, "lsine"))
-                        value = 2;
-                    else if(input.matchnMove(2, "upower"))
-                        value = 3;
-                    else if(input.matchnMove(2, "lpower"))
-                        value = 4;
-                    else if(input.matchnMove(2, "sine"))
-                        value = 5;
-                    else if(input.matchnMove(2, "power"))
-                        value = 6;
-                    else if(input.matchnMove(2, "shift"))
-                        value = 7;
+                    if (controlType == TOPLEVEL::type::Read)
+                        value = 1; // dummy value
                     else
-                        return REPLY::range_msg;
+                    {
+                        value = stringNumInList(string{input}.substr(0, 2), subPadPosition, 2);
+                        if (value == -1)
+                            return REPLY::range_msg;
+                    }
                     cmd = SUBSYNTH::control::overtonePosition;
                 }
                 else
@@ -3153,6 +3143,8 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
     unsigned char action = 0;
     unsigned char miscmsg = UNUSED;
 
+    if (input.isAtEnd())
+        return REPLY::done_msg; // someone just came in for a look :)
     if (input.matchnMove(1, "oscillator"))
     {
         command = CONFIG::control::oscillatorSize;
@@ -3836,21 +3828,15 @@ int CmdInterpreter::addVoice(Parser& input, unsigned char controlType)
                     cmd = ADDVOICE::control::unisonVibratoSpeed;
                 else if(input.matchnMove(1, "invert"))
                 {
-                    if (input.matchnMove(1, "none"))
-                        value = 0;
-                    else if (input.matchnMove(1, "random"))
-                        value = 1;
-                    else if (input.matchnMove(1, "half"))
-                        value = 2;
-                    else if (input.matchnMove(1, "third"))
-                        value = 3;
-                    else if (input.matchnMove(1, "quarter"))
-                        value = 4;
-                    else if (input.matchnMove(1, "fifth"))
-                        value = 5;
+                    if (controlType == TOPLEVEL::type::Read)
+                        value = 1; // dummy value
                     else
-                        return REPLY::value_msg;
-                    cmd = ADDVOICE::control::unisonPhaseInvert;
+                    {
+                        value = stringNumInList(string{input}.substr(0, 1), unisonPhase, 1);
+                        if (value == -1)
+                            return REPLY::range_msg;
+                    }
+                     cmd = ADDVOICE::control::unisonPhaseInvert;
                 }
             }
             if (cmd == -1)
@@ -4720,7 +4706,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
             {
                 if (!readControl(synth, 0, CONFIG::control::showEnginesTypes, TOPLEVEL::section::config))
                 {
-                    synth->getRuntime().Log("Instrument engine aand type info must be enabled");
+                    synth->getRuntime().Log("Instrument engine and type info must be enabled");
                     return REPLY::done_msg;
                 }
                 if(instrumentGroup.empty())
@@ -5056,41 +5042,60 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
         return REPLY::done_msg;
     }
 
- // these must all be highest (relevant) bit first
-    if (bitTest(context, LEVEL::Config))
-        return commandConfig(input, controlType);
-    if (bitTest(context, LEVEL::Bank))
-        return commandBank(input, controlType);
-    if (bitTest(context, LEVEL::Scale))
-        return commandScale(input, controlType);
-    if (bitTest(context, LEVEL::Envelope))
-        return envelopeSelect(input, controlType);
-    if (bitTest(context, LEVEL::Filter))
-        return filterSelect(input, controlType);
-    if (bitTest(context, LEVEL::LFO))
-        return LFOselect(input, controlType);
-    if (bitTest(context, LEVEL::Resonance))
-        return resonance(input, controlType);
-    if (bitTest(context, LEVEL::Oscillator))
-        return waveform(input, controlType);
-    if (bitTest(context, LEVEL::AddMod))
-        return modulator(input, controlType);
-    if (bitTest(context, LEVEL::AddVoice))
-        return addVoice(input, controlType);
-    if (bitTest(context, LEVEL::AddSynth))
-        return addSynth(input, controlType);
-    if (bitTest(context, LEVEL::SubSynth))
-        return subSynth(input, controlType);
-    if (bitTest(context, LEVEL::PadSynth))
-        return padSynth(input, controlType);
-    if (bitTest(context, LEVEL::MControl))
-        return midiControllers(input, controlType);
-    if (bitTest(context, LEVEL::Part))
-        return commandPart(input, controlType);
-    if (bitTest(context, LEVEL::Vector))
-        return commandVector(input, controlType);
-    if (bitTest(context, LEVEL::Learn))
-        return commandMlearn(input, controlType);
+    switch (bitFindHigh(context))
+    {
+        case LEVEL::Config:
+            return commandConfig(input, controlType);
+            break;
+        case LEVEL::Bank:
+            return commandBank(input, controlType);
+            break;
+        case LEVEL::Scale:
+            return commandScale(input, controlType);
+            break;
+        case LEVEL::Envelope:
+            return envelopeSelect(input, controlType);
+            break;
+        case LEVEL::Filter:
+            return filterSelect(input, controlType);
+            break;
+        case LEVEL::LFO:
+            return LFOselect(input, controlType);
+            break;
+        case LEVEL::Resonance:
+            return resonance(input, controlType);
+            break;
+        case LEVEL::Oscillator:
+            return waveform(input, controlType);
+            break;
+        case LEVEL::AddMod:
+            return modulator(input, controlType);
+            break;
+        case LEVEL::AddVoice:
+            return addVoice(input, controlType);
+            break;
+        case LEVEL::AddSynth:
+            return addSynth(input, controlType);
+            break;
+        case LEVEL::SubSynth:
+            return subSynth(input, controlType);
+            break;
+        case LEVEL::PadSynth:
+            return padSynth(input, controlType);
+            break;
+        case LEVEL::MControl:
+            return midiControllers(input, controlType);
+            break;
+        case LEVEL::Part:
+            return commandPart(input, controlType);
+            break;
+        case LEVEL::Vector:
+            return commandVector(input, controlType);
+            break;
+        case LEVEL::Learn:
+            return commandMlearn(input, controlType);
+            break;
+    }
 
     if (input.matchnMove(3, "mono"))
     {

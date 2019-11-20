@@ -1,5 +1,8 @@
 yoshimi 1.6.0 M
 
+2019-11-20 Will
+* CLI code refinements.
+
 2019-11-19 Will
 * Revised text reporting of on/off values.
 * Revised text reporting of integer/float values.

@@ -1841,28 +1841,7 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
             break;
         case ADDVOICE::control::unisonPhaseInvert:
             showValue = false;
-            contstr = "Invert ";
-            switch (value_int)
-            {
-                case 0:
-                    contstr += "None";
-                    break;
-                case 1:
-                    contstr += "Random";
-                    break;
-                case 2:
-                    contstr += "Half";
-                    break;
-                case 3:
-                    contstr += "Third";
-                    break;
-                case 4:
-                    contstr += "Quarter";
-                    break;
-                case 5:
-                    contstr += "Fifth";
-                    break;
-            }
+            contstr = "Invert " + unisonPhase[value_int];
             break;
         case ADDVOICE::control::enableUnison:
             contstr = "Enable";
@@ -2084,35 +2063,8 @@ string DataText::resolveSub(CommandBlock *getData, bool addValue)
             contstr = "Force H";
             break;
         case SUBSYNTH::control::overtonePosition:
-            contstr = "Position ";
+            contstr = "Position " + subPadPosition[value_int];
             showValue = false;
-            switch (value_int)
-            {
-                case 0:
-                    contstr += "Harmonic";
-                    break;
-                case 1:
-                    contstr += "Ushift";
-                    break;
-                case 2:
-                    contstr += "Lshift";
-                    break;
-                case 3:
-                    contstr += "Upower";
-                    break;
-                case 4:
-                    contstr += "Lpower";
-                    break;
-                case 5:
-                    contstr += "Sine";
-                    break;
-                case 6:
-                    contstr += "Power";
-                    break;
-                case 7:
-                    contstr += "Shift";
-                    break;
-            }
             break;
 
         case SUBSYNTH::control::enableFilter:
@@ -2172,6 +2124,7 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
     unsigned char kititem = getData->data.kit;
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
+    int value_int = int(value);
     string name = "";
     switch (control & 0x70)
     {
@@ -2258,7 +2211,8 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
             contstr = "Force H";
             break;
         case PADSYNTH::control::overtonePosition:
-            contstr = "Position";
+            contstr = "Position " + subPadPosition[value_int];
+            showValue = false;
             break;
 
         case PADSYNTH::control::baseWidth:
