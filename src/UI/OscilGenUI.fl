@@ -135,7 +135,6 @@ class OscilSpectrum {: {public Fl_Box}
         fl_color(this->parent()->selection_color());
     else
         fl_color(this->parent()->color());
-    //fl_line_style(FL_DOT);
 
     for (int i = 1; i < maxdb / 10; ++i)
     {
@@ -147,17 +146,12 @@ class OscilSpectrum {: {public Fl_Box}
     for (int i = 2; i < n; ++i)
     {
         int tmp = i * GX - 2;
-        /*if (i % 10 == 1)
-            fl_line_style(0);
-        else
-            fl_line_style(FL_DOT);*/
         fl_line(ox + tmp, oy + 2, ox + tmp, oy + ly - 2);
     }
     if (this->active_r())
         fl_color(this->parent()->labelcolor());
     else
         fl_color(this->parent()->color());
-    //fl_line_style(0);
 
     // draws the spectrum
     for (int i = 0; i < n; ++i)
@@ -276,7 +270,6 @@ class Oscilloscope {: {public Fl_Box}
     max = -max * 1.05;
 
     // draw
-    //fl_line_style(FL_DASH);
     if (this->active_r())
         fl_color(this->parent()->labelcolor());
     else
@@ -299,14 +292,11 @@ class Oscilloscope {: {public Fl_Box}
     }
 
     // draw the function
-    //fl_line_style(0, 1);
     fl_line(ox + 2, oy + ly / 2, ox + lx - 2, oy + ly / 2);
     if (this->active_r())
         fl_color(this->parent()->selection_color());
     else
         fl_color(this->parent()->labelcolor());
-    int lw = 1;
-    //fl_line_style(0, lw);
     int ph = int((phase - 64.0) / 128.0 * synth->oscilsize_f + synth->oscilsize_f);
     for (int i = 1; i < lx; ++i)
     {

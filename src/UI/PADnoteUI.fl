@@ -90,12 +90,10 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
             fl_color(220,220,220);
         else
             fl_color(160,165,165);
-        //fl_line_style(0);
         int rbw = (int)(realbw * (lx - 1.0) / 2.0);
         for (int i = lx / 2 - rbw; i < (lx / 2 + rbw); i++)
             fl_line(ox+i, oy, ox+i, oy + ly - 1);
 
-        //fl_line_style(0);
         if (active)
             fl_color(200, 200, 200);
         else
@@ -112,11 +110,9 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
         }
 
         fl_color(120, 120, 120);
-        //fl_line_style(FL_DOT);
         fl_line(ox + lx / 2, oy, ox + lx / 2, oy + ly);
 
         //draw the graph
-        //fl_line_style(0);
         int old = 0;
         for (int i = 0; i < lx; i++)
         {
@@ -135,14 +131,12 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
             old = val;
         }
 
-        //fl_line_style(FL_DASH);
         if (active)
             fl_color(0, 100, 220);
         else
             fl_color(150, 160, 170);
         fl_line(ox + lx / 2 - rbw, oy, ox + lx / 2 - rbw, oy + ly - 1);
-        fl_line(ox + lx / 2 + rbw, oy, ox + lx / 2 + rbw, oy + ly - 1);
-        //fl_line_style(0);} {}
+        fl_line(ox + lx / 2 + rbw, oy, ox + lx / 2 + rbw, oy + ly - 1);} {}
   }
   decl {PADnoteParameters *pars;} {public local
   }
@@ -167,9 +161,6 @@ this->pars=pars;} {}
         for (int i = 1; i < maxharmonic; i++)
         {
             fl_color(200, 200, 200);
-            //fl_line_style(FL_DOT);
-            //if (i % 5 == 0)
-                //fl_line_style(0);
             if (i % 10 == 0)
                 fl_color(160, 160, 160);
             int kx = (int)(lx / (float)maxharmonic * i);
@@ -208,7 +199,6 @@ this->pars=pars;} {}
         }
 
         fl_color(180, 0, 0);
-        //fl_line_style(0);
 
         if (pars->Pmode == 2)
         {

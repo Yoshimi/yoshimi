@@ -334,9 +334,8 @@ namespace BANK // usage BANK::control::
         importBank, // not yet (currently done in main)
         exportBank, // not yet (currently done in main)
 
-        selectRoot = 32, // by ID
-        readRootPath, // not yet
-        changeRootId, // not yet
+        selectRoot = 32, // by ID - also reads the current one
+        changeRootId, // change ID of current root
         addNamedRoot, // not yet
         deselectRoot // not yet
     };

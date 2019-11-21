@@ -224,6 +224,7 @@ static std::string banklist [] = {
     "<n>",                       "set current bank to number n",
     "Name <s>",                  "change the name of the current bank",
     "Root <n>",                  "set current bank root number",
+    " ", "or read current full path",
     "Root ID <n>",               "change current bank root ID to n",
 //    "Swap <n1> [n2]",            "Swap current bank with bank n1, (opt. in root n2)",
     "INstrument Rename <n> <s>", "change the name of slot n in the current bank",

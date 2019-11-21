@@ -155,8 +155,6 @@ return(nearestpoint);} {}
 
     //draw the lines
     fl_color(FL_GRAY);
-
-    //fl_line_style(FL_SOLID);
     fl_line(ox + 2, oy + ly / 2, ox + lx - 2, oy + ly / 2);
 
     //draws the evelope points and lines

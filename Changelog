@@ -1,5 +1,9 @@
 yoshimi 1.6.0 M
 
+2019-11-21 Will
+* Removed redundant code.
+* Improved CLI bank info.
+
 2019-11-20 Will
 * CLI code refinements.
 

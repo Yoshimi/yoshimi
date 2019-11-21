@@ -222,6 +222,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 
 //        cout << "Con " << int(control) << "  Kit " << int(kititem) << "  Eng " << int(engine) << "  Ins " << int(insert) << endl;
 
+    fl_line_style(FL_SOLID); // probably not needed
     if (control == TOPLEVEL::control::textMessage) // just show a message
     {
         synth->getGuiMaster()->words->copy_label(textMsgBuffer.fetch(miscmsg).c_str());
@@ -1209,7 +1210,6 @@ void custom_graphics(ValueType vt, float val,int W,int H)
         /* Scale lines */
 
         fl_font(fl_font(),8);
-        //fl_line_style(0);
         for(i = 0; i < 4; i++) /* 10x / 10%, 100x / 1% ... */
         {
             y = ry * (i + 1);
