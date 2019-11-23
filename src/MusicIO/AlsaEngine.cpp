@@ -25,6 +25,7 @@
 #include "Misc/SynthEngine.h"
 #include "Misc/FormatFuncs.h"
 #include "MusicIO/AlsaEngine.h"
+#include <iostream>
 
 using func::asString;
 
@@ -82,6 +83,39 @@ bail_out:
     return false;
 }
 
+std::string AlsaEngine::findMidiClients(snd_seq_t *seq)
+{
+    string result = "";
+    snd_seq_client_info_t *cinfo;
+    snd_seq_port_info_t *pinfo;
+
+    snd_seq_client_info_alloca(&cinfo);
+    snd_seq_port_info_alloca(&pinfo);
+    snd_seq_client_info_set_client(cinfo, -1);
+    while (snd_seq_query_next_client(seq, cinfo) >= 0) {
+        int client = snd_seq_client_info_get_client(cinfo);
+
+        if (client == SND_SEQ_CLIENT_SYSTEM)
+            continue; // don't show system timer and announce ports
+        snd_seq_port_info_set_client(pinfo, client);
+        snd_seq_port_info_set_port(pinfo, -1);
+        while (snd_seq_query_next_port(seq, pinfo) >= 0) {
+            // port must understand MIDI messages
+            if (!(snd_seq_port_info_get_type(pinfo)
+                  & SND_SEQ_PORT_TYPE_MIDI_GENERIC))
+                continue;
+            // we need both READ and SUBS_READ
+            if ((snd_seq_port_info_get_capability(pinfo)
+                 & (SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ))
+                != (SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ))
+                continue;
+            if (std::string(snd_seq_client_info_get_name(cinfo)) == "Midi Through")
+                continue; // don't want midi through
+            result = result + snd_seq_client_info_get_name(cinfo) + ", ";
+        }
+    }
+    return result;
+}
 
 bool AlsaEngine::openMidi(void)
 {
@@ -126,7 +160,19 @@ bool AlsaEngine::openMidi(void)
         return false;
     }
 
-    std::string midilist = synth->getRuntime().midiDevice;
+    std::string midilist;
+    switch(synth->getRuntime().alsaMidiType)
+    {
+        case 0:
+            midilist = synth->getRuntime().midiDevice;
+            break;
+        case 1:
+            midilist = findMidiClients(midi.handle);
+            break;
+        default:
+            synth->getRuntime().midiDevice = "";
+            return true;
+    }
     std::string found = "";
     if (!midilist.empty() && midilist != "default")
     {
@@ -160,14 +206,17 @@ bool AlsaEngine::openMidi(void)
             }
             if (!midiSource)
             {
-                synth->getRuntime().Log("Didn't find alsa MIDI source '" + midi.device + "'");
+                //synth->getRuntime().Log("Didn't find alsa MIDI source '" + midi.device + "'");
             }
             else
                 found += (", " + tmp);
         }
     }
+    synth->getRuntime().Log(found);
     if (found.substr(0, 2) == ", ")
         synth->getRuntime().midiDevice = found.substr(2);
+    else
+        synth->getRuntime().midiDevice = "No MIDI sources seen";
     return true;
 }
 

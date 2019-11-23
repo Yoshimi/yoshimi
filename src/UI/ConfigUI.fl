@@ -65,6 +65,7 @@ class ConfigUI {} {
       xywh {120 89 390 330} type Double hide
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
+      code2 {int tmp = fetchData (0, CONFIG::control::alsaMidiType,TOPLEVEL::section::config); alsaType->value(tmp); if (tmp == 0) alsaSource->activate(); else alsaSource->deactivate();}
     } {
       Fl_Tabs {} {
         xywh {5 5 385 298}
@@ -244,11 +245,11 @@ class ConfigUI {} {
             }
           }
           Fl_Choice PanelLayout {
-            label {Saved Instrument Format}
+            label {Mixer Panel Layout}
             callback {//
     synth->getRuntime().single_row_panel = o->value()  != 0;
     synth->getGuiMaster()->updatepanel();}
-            xywh {200 255 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
+            tooltip {Select single row or compact format} xywh {200 255 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
             code0 {o->value(synth->getRuntime().single_row_panel);}
           } {
             MenuItem {} {
@@ -456,22 +457,46 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
           }
         }
         Fl_Group alsaTab {
-          label Alsa
+          label Alsa open
           xywh {5 25 384 277} labelsize 12 hide
         } {
+          Fl_Choice alsaType {
+            label {Alsa Connection Type}
+            callback {if (o->value() == 0) // fixed
+    alsaSource->activate();
+else
+     alsaSource->deactivate();
+
+
+send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config);}
+            xywh {195 45 120 22} box DOWN_BOX down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+          } {
+            MenuItem {} {
+              label Fixed
+              xywh {0 0 34 20} labelfont 1 labelsize 12
+            }
+            MenuItem {} {
+              label Search
+              xywh {10 10 34 20} labelfont 1 labelsize 12
+            }
+            MenuItem {} {
+              label External
+              xywh {20 20 34 20} labelfont 1 labelsize 12
+            }
+          }
           Fl_Input alsaSource {
             label {Alsa MIDI Source}
             callback {//
                         string tmp = string(o->value());
                         send_data(TOPLEVEL::action::lowPrio, CONFIG::control::alsaMidiSource, 0, TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(tmp));}
-            tooltip {Device Alsa tries to connect to for input.} xywh {195 52 120 22} labelsize 12 textfont 1 textsize 12
+            tooltip {Device Alsa tries to connect to for input.} xywh {195 80 120 22} labelsize 12 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().alsaMidiDevice.c_str());}
           }
           Fl_Check_Button alsaMidi {
             label {Set as preferred MIDI}
             callback {//
                         send_data(TOPLEVEL::action::forceUpdate, CONFIG::control::alsaPreferredMidi, o->value(), TOPLEVEL::type::Integer);}
-            xywh {195 80 37 26} down_box DOWN_BOX labelsize 12 align 4
+            xywh {195 110 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().midiEngine == alsa_midi) o->value(1);}
           }
           Fl_Input alsaDevice {
@@ -969,6 +994,13 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
                 case CONFIG::control::alsaPreferredMidi:
                     alsaMidi->value(value_bool);
                     jackMidi->value(!value_bool);
+                    break;
+                case CONFIG::control::alsaMidiType:
+                    alsaType->value(value_int);
+                    if (value_int == 0) // fixed
+                        alsaSource->activate();
+                    else
+                        alsaSource->deactivate();
                     break;
                 case CONFIG::control::alsaAudioDevice:
                     alsaDevice->value(msg.c_str());

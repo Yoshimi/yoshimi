@@ -2604,6 +2604,13 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = (synth->getRuntime().midiEngine == alsa_midi);
             break;
+        case CONFIG::control::alsaMidiType:
+            if (write)
+                synth->getRuntime().alsaMidiType = value_int;
+            else
+                value = synth->getRuntime().alsaMidiType;
+            break;
+
         case CONFIG::control::alsaAudioDevice: // done elsewhere
             break;
         case CONFIG::control::alsaPreferredAudio:

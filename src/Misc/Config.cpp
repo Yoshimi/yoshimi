@@ -126,6 +126,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     VirKeybLayout(0),
     audioEngine(DEFAULT_AUDIO),
     midiEngine(DEFAULT_MIDI),
+    alsaMidiType(1), // search
     audioDevice("default"),
     midiDevice("default"),
     jackServer("default"),
@@ -672,6 +673,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     // engines
     audioEngine = (audio_drivers)xml->getpar("audio_engine", audioEngine, no_audio, alsa_audio);
     midiEngine = (midi_drivers)xml->getpar("midi_engine", midiEngine, no_midi, alsa_midi);
+    alsaMidiType = xml->getpar("alsa_midi_type", 0, 0, 2);
 
     // alsa settings
     alsaAudioDevice = xml->getparstr("linux_alsa_audio_dev");
@@ -751,6 +753,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
 
     xmltree->addpar("audio_engine", synth->getRuntime().audioEngine);
     xmltree->addpar("midi_engine", synth->getRuntime().midiEngine);
+    xmltree->addpar("alsa_midi_type", synth->getRuntime().alsaMidiType);
 
     xmltree->addparstr("linux_alsa_audio_dev", alsaAudioDevice);
     xmltree->addparstr("linux_alsa_midi_dev", alsaMidiDevice);

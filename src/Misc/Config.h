@@ -114,6 +114,7 @@ class Config
 
         audio_drivers audioEngine;
         midi_drivers  midiEngine;
+        int           alsaMidiType;
         string        audioDevice;
         string        midiDevice;
 

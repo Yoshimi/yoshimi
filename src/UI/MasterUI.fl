@@ -1005,7 +1005,7 @@ ZynAddSubFX}
           label {Copyright 2002-2009, Nasca O. Paul and others
 Copyright 2009-2011, Alan Calvert
 Copyright 2012-2013, Jeremy Jongepier and others
-Copyright 2014-2018, Will Godfrey and others
+Copyright 2014-2019, Will Godfrey and others
 LV2 plugin Copyright 2014, Andrew Deryabin
 Splash Image Copyright 2017, Jesper Lloyd}
           xywh {25 90 315 91} color 51 selection_color 30 labelfont 13 labelsize 11

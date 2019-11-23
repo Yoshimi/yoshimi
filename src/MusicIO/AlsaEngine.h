@@ -70,6 +70,8 @@ class AlsaEngine : public MusicIO
         void closeAudio(void);
         void closeMidi(void);
 
+        std::string findMidiClients(snd_seq_t *seq);
+
         void *AudioThread(void);
         static void *_AudioThread(void *arg);
         void *MidiThread(void);

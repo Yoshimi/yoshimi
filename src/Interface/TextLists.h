@@ -202,6 +202,7 @@ static std::string configlist [] = {
     "MIdi <s>",            "* connection type (Jack, Alsa)",
     "AUdio <s>",           "* connection type (Jack, Alsa)",
     "ALsa Midi <s>",       "* comma separated source name list",
+    "ALsa Type <n>",       "* midi connection type (Fixed, Search, External)",
     "ALsa Audio <s>",      "* name of hardware device",
     "ALsa Sample <n>",     "* rate (0 = 192000, 1 = 96000, 2 = 48000, 3 = 44100)",
     "Jack Midi <s>",       "* name of source",
@@ -222,7 +223,9 @@ static std::string configlist [] = {
 
 static std::string banklist [] = {
     "<n>",                       "set current bank to number n",
+    " ", "or read current ID and name",
     "Name <s>",                  "change the name of the current bank",
+    " ", "or read current name only",
     "Root <n>",                  "set current bank root number",
     " ", "or read current full path",
     "Root ID <n>",               "change current bank root ID to n",

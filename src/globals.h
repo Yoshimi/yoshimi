@@ -291,6 +291,7 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         jackAutoConnectAudio,
         alsaMidiSource = 48,
         alsaPreferredMidi,
+        alsaMidiType,
         alsaAudioDevice,
         alsaPreferredAudio,
         alsaSampleRate,
@@ -324,11 +325,10 @@ namespace BANK // usage BANK::control::
         selectFirstInstrumentToSwap,
         selectSecondInstrumentAndSwap,
 
-        selectBank = 16, // in root, by ID
-        readBankName, // not yet
-        renameBank, // not yet
-        createBank, // not yet
-        deleteBank, // not yet
+        selectBank = 16, // in root, by ID or read ID + name
+        renameBank, // or rerad just the name
+        createBank, // not yet - currently add at top level
+        deleteBank, // not yet - currently remove at top level
         selectFirstBankToSwap,
         selectSecondBankAndSwap,
         importBank, // not yet (currently done in main)
@@ -336,8 +336,8 @@ namespace BANK // usage BANK::control::
 
         selectRoot = 32, // by ID - also reads the current one
         changeRootId, // change ID of current root
-        addNamedRoot, // not yet
-        deselectRoot // not yet
+        addNamedRoot, // not yet - currently add at top level
+        deselectRoot // not yet - currently remove at top level
     };
 }
 

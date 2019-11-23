@@ -743,6 +743,22 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
             contstr += "Start with ALSA MIDI";
             yesno = true;
             break;
+        case CONFIG::control::alsaMidiType:
+            contstr += "ALSA MIDI connection type ";
+            switch (value_int)
+            {
+                case 0:
+                    contstr += "Fixed";
+                    break;
+                case 1:
+                    contstr += "Search";
+                    break;
+                default:
+                    contstr += "External";
+                    break;
+            }
+            showValue = false;
+            break;
         case CONFIG::control::alsaAudioDevice:
             contstr += "ALSA audio device: ";
             if (addValue)

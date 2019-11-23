@@ -3298,7 +3298,19 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
 
     else if (input.matchnMove(2, "alsa"))
     {
-        if (input.matchnMove(1, "midi"))
+        if (input.matchnMove(1, "type"))
+        {
+            command = CONFIG::control::alsaMidiType;
+            if (input.matchnMove(1, "fixed"))
+                value = 0;
+            else if (input.matchnMove(1, "search"))
+                value = 1;
+            else if (input.matchnMove(1, "external"))
+                value = 2;
+            else
+                return REPLY::value_msg;
+        }
+        else if (input.matchnMove(1, "midi"))
         {
             command = CONFIG::control::alsaMidiSource;
             action = TOPLEVEL::action::lowPrio;
