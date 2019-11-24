@@ -111,7 +111,7 @@ std::string AlsaEngine::findMidiClients(snd_seq_t *seq)
                 continue;
             if (std::string(snd_seq_client_info_get_name(cinfo)) == "Midi Through")
                 continue; // don't want midi through
-            result = result + snd_seq_client_info_get_name(cinfo) + ", ";
+            result = result + snd_seq_client_info_get_name(cinfo) + ":" + std::to_string(snd_seq_port_info_get_port(pinfo)) + ", ";
         }
     }
     return result;

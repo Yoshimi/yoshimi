@@ -1,6 +1,9 @@
 yoshimi 1.6.0 M
 
 2019-11-23 Will
+* ALSA search connects to all ports, not just 0.
+
+2019-11-23 Will
 * Implemented search feature for ALSA MIDI input.
 * Updated docs.
 * Updated local copy of User Guide.

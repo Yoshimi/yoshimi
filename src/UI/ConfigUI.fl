@@ -65,7 +65,6 @@ class ConfigUI {} {
       xywh {120 89 390 330} type Double hide
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
-      code2 {int tmp = fetchData (0, CONFIG::control::alsaMidiType,TOPLEVEL::section::config); alsaType->value(tmp); if (tmp == 0) alsaSource->activate(); else alsaSource->deactivate();}
     } {
       Fl_Tabs {} {
         xywh {5 5 385 298}
@@ -457,7 +456,7 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
           }
         }
         Fl_Group alsaTab {
-          label Alsa open
+          label Alsa
           xywh {5 25 384 277} labelsize 12 hide
         } {
           Fl_Choice alsaType {
@@ -1116,7 +1115,13 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             synth = _synth;
             make_window();
             readpresetcfg();
-            selectedRootID = -1;} {}
+            selectedRootID = -1;
+            int tmp = fetchData (0, CONFIG::control::alsaMidiType,TOPLEVEL::section::config);
+            alsaType->value(tmp);
+            if (tmp == 0)
+                alsaSource->activate();
+            else
+                alsaSource->deactivate();} {}
   }
   Function {activatebutton_presetdir(bool active)} {} {
     code {//
