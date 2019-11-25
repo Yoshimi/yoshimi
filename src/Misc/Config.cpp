@@ -689,7 +689,6 @@ bool Config::saveConfig(bool master)
             Log("saveConfig failed xmltree allocation", 2);
             return result;
         }
-        addConfigXML(xmltree);
         string resConfigFile = baseConfig;
 
         if (xmltree->saveXMLfile(resConfigFile))
@@ -718,7 +717,7 @@ bool Config::saveConfig(bool master)
         result = true;
     }
     else
-        Log("Failed to save config to " + resConfigFile, 2);
+        Log("Failed to save instance to " + resConfigFile, 2);
 
     delete xmltree;
     return result;

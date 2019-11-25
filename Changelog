@@ -6,6 +6,7 @@ yoshimi 1.6.0 M
   there is a new yoshimi-o.instance file
   no instance files include base parameters
   no state files include base paramters
+* Removed extra redundant config code.
 
 2019-11-23 Will
 * ALSA search connects to all ports, not just 0.
