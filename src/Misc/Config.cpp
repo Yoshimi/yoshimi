@@ -482,20 +482,27 @@ bool Config::loadConfig(void)
             Log("loadConfig failed XMLwrapper allocation");
         else
         {
-            if (!xml->loadXMLfile(baseConfig))
-            {
-                Log("loadConfig loadXMLfile failed");
-                return false;
-            }
-            isok = extractBaseParameters(xml);
+            // get base first
+            isok = xml->loadXMLfile(baseConfig);
+            if (isok)
+                isok = extractBaseParameters(xml);
+            else
+                Log("loadConfig load base failed");
             delete xml;
+
+            // now the instance data
             if (isok)
             {
                 XMLwrapper *xml = new XMLwrapper(synth, true);
-                isok = xml->loadXMLfile(ConfigFile);
-                if (isok)
+                if (!xml)
+                    Log("loadConfig failed XMLwrapper allocation");
+                else
                 {
-                    isok = extractConfigData(xml);
+                    isok = xml->loadXMLfile(ConfigFile);
+                    if (isok)
+                        isok = extractConfigData(xml);
+                    else
+                        Log("loadConfig load instance failed");
                     delete xml;
                 }
             }
