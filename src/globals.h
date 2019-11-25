@@ -253,6 +253,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         // insert any new lists here
         MLearn, //     learned MIDI CC lists
         Config, // only file types from here onwards
+        MasterConfig,
         Presets,
         Bank,
         History,

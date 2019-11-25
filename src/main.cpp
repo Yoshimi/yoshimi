@@ -309,7 +309,7 @@ static void *mainGuiThread(void *arg)
         firstSynth->setRootBank(tmpRoot, tmpBank); // but keep current root and bank
     }
 
-    firstRuntime->saveConfig();
+    firstRuntime->saveConfig(true);
     firstSynth->saveHistory();
     firstSynth->saveBanks();
     return NULL;

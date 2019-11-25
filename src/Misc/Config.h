@@ -58,7 +58,7 @@ class Config
 
         string testCCvalue(int cc);
         string masterCCtest(int cc);
-        bool saveConfig(void);
+        bool saveConfig(bool master = false);
         bool loadConfig(void);
         bool saveState(const string statefile)  { return saveSessionData(statefile); }
         bool loadState(const string statefile)

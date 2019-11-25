@@ -116,6 +116,8 @@ bool         Config::autoInstance = false;
 unsigned int Config::activeInstance = 0;
 int          Config::showCLIcontext = 1;
 
+static string baseConfig;
+
 Config::Config(SynthEngine *_synth, int argc, char **argv) :
     restoreState(false),
     stateChanged(false),
@@ -260,37 +262,6 @@ bool Config::Setup(int argc, char **argv)
     loadCmdArgs(argc, argv);
     Oscilsize = nearestPowerOf2(Oscilsize, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
     Buffersize = nearestPowerOf2(Buffersize, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
-    //Log(asString(Oscilsize));
-    //Log(asString(Buffersize));
-
-    if (restoreState)
-    {
-        char *fp = NULL;
-        if (!StateFile.size())
-            goto no_state;
-
-        fp = realpath (StateFile.c_str(), NULL);
-        if (fp == NULL)
-            goto no_state;
-
-        StateFile = fp;
-        free (fp);
-        if (!isRegularFile(StateFile))
-        {
-            no_state: Log("Invalid state file specified for restore " + StateFile, 2);
-            return true;
-        }
-        Log("Using " + StateFile);
-        restoreSessionData(StateFile, true);
-        /* There is a single state file that contains both startup config
-         * data that must be set early, and runtime data that must be set
-         * after synth has been initialised.
-         *
-         * We open it here and fetch just the essential BASE_PARAMETERS;
-         * buffer size, oscillator size, sample rate. We then reopen it
-         * in synth and fetch the remaining settings from CONFIG.
-         */
-    }
     return true;
 }
 
@@ -462,11 +433,10 @@ bool Config::loadConfig(void)
     }
     string yoshimi = "/" + string(YOSHIMI);
 
-    string baseConfig = ConfigDir + yoshimi + string(EXTEN::config);
+    baseConfig = ConfigDir + yoshimi + string(EXTEN::config);
     int thisInstance = synth->getUniqueId();
-    if (thisInstance > 0)
-        yoshimi += ("-" + asString(thisInstance));
-    else
+    yoshimi += ("-" + asString(thisInstance));
+    if (thisInstance == 0)
     {
         TextMsgBuffer::instance().init(); // sneaked it in here so it's early
         string presetDir = ConfigDir + "/presets";
@@ -482,9 +452,15 @@ bool Config::loadConfig(void)
     StateFile = ConfigDir + yoshimi + string(".state");
 
     if (thisInstance == 0)
-        ConfigFile = baseConfig;
-    else
-        ConfigFile += EXTEN::instance;
+    {
+        string newInstance0 = ConfigDir + yoshimi + EXTEN::instance;
+        if (isRegularFile(baseConfig) && !isRegularFile(newInstance0))
+        {
+            file::copyFile(baseConfig, newInstance0);
+            Log("Reorganising config files.");
+        }
+    }
+    ConfigFile += EXTEN::instance;
 
     if (!isRegularFile(baseConfig))
     {
@@ -508,11 +484,8 @@ bool Config::loadConfig(void)
         {
             if (!xml->loadXMLfile(baseConfig))
             {
-                if (thisInstance > 0)
-                {
-                    Log("loadConfig loadXMLfile failed");
-                    return false;
-                }
+                Log("loadConfig loadXMLfile failed");
+                return false;
             }
             isok = extractBaseParameters(xml);
             delete xml;
@@ -593,12 +566,6 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
     else
         activeInstance = 1;
     showCLIcontext = xml->getpar("show_CLI_context", 1, 0, 2);
-   // xml->exitbranch(); // BaseParameters
-
-
-
-
-
 
     // get preset dirs
     int count = 0;
@@ -701,7 +668,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     if (tempRoot == 0)
         tempRoot = xml->getpar("root_current_ID", 0, 0, 127);
     //else
-        //cout << "root? " << xml->getpar("root_current_ID", 0, 0, 127) << std::endl;
+        //std::cout << "root? " << xml->getpar("root_current_ID", 0, 0, 127) << std::endl;
     if (tempBank == 0)
     tempBank = xml->getpar("bank_current_ID", 0, 0, 127);
     xml->exitbranch(); // CONFIGURATION
@@ -709,9 +676,32 @@ bool Config::extractConfigData(XMLwrapper *xml)
 }
 
 
-bool Config::saveConfig(void)
+bool Config::saveConfig(bool master)
 {
     bool result = false;
+    if (master)
+    {
+        //std::cout << "saving master" << std::endl;
+        xmlType = TOPLEVEL::XML::MasterConfig;
+        XMLwrapper *xmltree = new XMLwrapper(synth, true);
+        if (!xmltree)
+        {
+            Log("saveConfig failed xmltree allocation", 2);
+            return result;
+        }
+        addConfigXML(xmltree);
+        string resConfigFile = baseConfig;
+
+        if (xmltree->saveXMLfile(resConfigFile))
+        {
+            configChanged = false;
+            result = true;
+        }
+        else
+            Log("Failed to save master config to " + resConfigFile, 2);
+
+        delete xmltree;
+    }
     xmlType = TOPLEVEL::XML::Config;
     XMLwrapper *xmltree = new XMLwrapper(synth, true);
     if (!xmltree)
@@ -876,7 +866,6 @@ void Config::LogError(const string &msg)
     Log("[ERROR] " + msg, 1);
 }
 
-//#ifndef YOSHIMI_LV2_PLUGIN
 void Config::StartupReport(string clientName)
 {
     bool fullInfo = (synth->getUniqueId() == 0);
@@ -927,7 +916,6 @@ void Config::StartupReport(string clientName)
         Log("Period size: " + asString(synth->buffersize), 2);
     }
 }
-//#endif
 
 
 void Config::setRtprio(int prio)

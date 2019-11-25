@@ -79,14 +79,14 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
 
     if (isYoshi)
     {
-        //std::cout << "Our doctype" << endl;
+        //std::cout << "Our doctype" << std::endl;
         mxmlElementSetAttr(doctype, "Yoshimi-data", NULL);
         root = mxmlNewElement(tree, "Yoshimi-data");
         information.yoshiType = 1;
     }
     else
     {
-        //std::cout << "Zyn doctype" << endl;
+        //std::cout << "Zyn doctype" << std::endl;
         mxmlElementSetAttr(doctype, "ZynAddSubFX-data", NULL);
         root = mxmlNewElement(tree, "ZynAddSubFX-data");
         mxmlElementSetAttr(root, "version-major", "3");
@@ -105,7 +105,7 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
 
     info = addparams0("INFORMATION"); // specifications
 
-    if (synth->getUniqueId() == 0 && (synth->getRuntime().xmlType == TOPLEVEL::XML::State || synth->getRuntime().xmlType == TOPLEVEL::XML::Config))
+    if (synth->getRuntime().xmlType == TOPLEVEL::XML::MasterConfig)
     {
         beginbranch("BASE_PARAMETERS");
             addpar("sample_rate", synth->getRuntime().Samplerate);
@@ -181,8 +181,6 @@ void XMLwrapper::checkfileinformation(const std::string& filename, unsigned int&
     {
         // Andrew: just make it simple
         // Will: but not too simple :)
-        //idx = start;
-
 
         /*
          * the following could be in any order. We are checking for

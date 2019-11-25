@@ -1116,12 +1116,12 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             make_window();
             readpresetcfg();
             selectedRootID = -1;
-            int tmp = fetchData (0, CONFIG::control::alsaMidiType,TOPLEVEL::section::config);
-            alsaType->value(tmp);
-            if (tmp == 0)
-                alsaSource->activate();
-            else
-                alsaSource->deactivate();} {}
+            //int tmp = fetchData (0, CONFIG::control::alsaMidiType,TOPLEVEL::section::config);
+            //alsaType->value(tmp);
+            //if (tmp == 0)
+                //alsaSource->activate();
+            //else
+                //alsaSource->deactivate();} {}
   }
   Function {activatebutton_presetdir(bool active)} {} {
     code {//
@@ -1288,6 +1288,12 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
     code {//
                     if (synth->getIsLV2Plugin() == false && synth->getUniqueId() == 0)
                         singleMaster->show();
+                    int tmp = fetchData (0, CONFIG::control::alsaMidiType,TOPLEVEL::section::config);
+                    alsaType->value(tmp);
+                    if (tmp == 0)
+                        alsaSource->activate();
+                    else
+                        alsaSource->deactivate();
                     configwindow->show();} {}
   }
   Function {Hide()} {} {
