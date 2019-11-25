@@ -2,3 +2,9 @@
 Out_There.mid & Out_There.xmz
 
 This MIDI file and Yoshimi patch set will play a complex 12 part tune.
+
+Load the patchset into youshimi then, in a terminal window enter:
+
+aplaymidid -p yoshimi /usr/local/share/yoshimi/examples/Out_There.mid
+
+Depending how Yoshimi was installed, 'examples' may be at a different location.

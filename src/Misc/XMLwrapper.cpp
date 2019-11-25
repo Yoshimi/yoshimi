@@ -368,8 +368,12 @@ char *XMLwrapper::getXMLdata()
             addparstr("XMLtype", "Midi Learn");
             break;
 
+        case TOPLEVEL::XML::MasterConfig:
+            addparstr("XMLtype", "Config Base");
+            break;
+
         case TOPLEVEL::XML::Config:
-            addparstr("XMLtype", "Config");
+            addparstr("XMLtype", "Config Instance");
             break;
 
         case TOPLEVEL::XML::Presets:

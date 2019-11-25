@@ -60,7 +60,8 @@ class Config
         string masterCCtest(int cc);
         bool saveConfig(bool master = false);
         bool loadConfig(void);
-        bool saveState(const string statefile)  { return saveSessionData(statefile); }
+        bool saveState(const string statefile)
+            { return saveSessionData(statefile); }
         bool loadState(const string statefile)
             { return restoreSessionData(statefile, false); }
         bool stateRestore(void)

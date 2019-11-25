@@ -211,7 +211,7 @@ bool Config::Setup(int argc, char **argv)
 
     if (!loadConfig())
     {
-        string message = "Could not load config. Using default values. Using defaults.";
+        string message = "Could not load config. Using default values.";
         TextMsgBuffer::instance().push(message);
         Log("\n\n" + message + "\n");
         //return false;

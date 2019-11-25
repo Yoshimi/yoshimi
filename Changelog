@@ -9,6 +9,8 @@ yoshimi 1.6.0 M
 * Removed extra redundant config code.
 * Further refinements to startup config.
 * Fixed potential memory leak.
+* Small code cleanups.
+* Doc updates.
 
 2019-11-23 Will
 * ALSA search connects to all ports, not just 0.
