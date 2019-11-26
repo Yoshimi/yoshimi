@@ -1,5 +1,9 @@
 yoshimi 1.6.0 M
 
+2019-11-26 Will
+* Updated local copy of User Guide.
+* Removed test messages from ALSAEngine.cpp
+
 2019-11-25 Will
 * Performed major reoganisation of config files.
   yoshimi.config only has base parameters

@@ -204,15 +204,10 @@ bool AlsaEngine::openMidi(void)
             {
                 midiSource = (snd_seq_connect_from(midi.handle, port_num, midi.addr.client, midi.addr.port) == 0);
             }
-            if (!midiSource)
-            {
-                //synth->getRuntime().Log("Didn't find alsa MIDI source '" + midi.device + "'");
-            }
-            else
+            if (midiSource)
                 found += (", " + tmp);
         }
     }
-    synth->getRuntime().Log(found);
     if (found.substr(0, 2) == ", ")
         synth->getRuntime().midiDevice = found.substr(2);
     else
