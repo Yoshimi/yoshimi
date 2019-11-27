@@ -1,5 +1,9 @@
 yoshimi 1.6.0 M
 
+2019-11-27 Will.
+* Added version numbering to the banks file.
+  This will be relevant with coming changes.
+
 2019-11-26 Will
 * Updated local copy of User Guide.
 * Removed test messages from ALSAEngine.cpp

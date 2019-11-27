@@ -153,6 +153,11 @@ class Bank
         string getRootFileTitle(size_t root);
         int InstrumentsInBanks;
         int BanksInRoots;
+        int readVersion(void)
+            {return BanksVersion;}
+        void writeVersion(int version)
+            {BanksVersion = version;}
+        int BanksVersion;
 
     private:
         bool addtobank(size_t rootID, size_t bankID, int pos, const string filename, const string name);

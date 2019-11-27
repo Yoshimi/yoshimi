@@ -381,8 +381,11 @@ char *XMLwrapper::getXMLdata()
             break;
 
         case TOPLEVEL::XML::Bank:
+        {
             addparstr("XMLtype", "Roots and Banks");
+            addpar("Banks_Version", synth->bank.readVersion());
             break;
+        }
 
         case TOPLEVEL::XML::History:
             addparstr("XMLtype", "Recent Files");

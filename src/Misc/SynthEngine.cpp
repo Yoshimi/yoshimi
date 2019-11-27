@@ -55,6 +55,7 @@ using file::make_legit_pathname;
 using func::dB2rap;
 using func::bitTest;
 using func::asString;
+using func::string2int;
 
 using std::set;
 
@@ -2458,6 +2459,14 @@ bool SynthEngine::installBanks()
         return false;
     }
     xml->loadXMLfile(bankname);
+    if (branch == "BANKLIST")
+    {
+        if (xml->enterbranch("INFORMATION"))
+        {
+            bank.writeVersion(xml->getpar("Banks_Version", 1, 1, 9));
+            xml->exitbranch();
+        }
+    }
     if (!xml->enterbranch(branch))
     {
         Runtime.Log("extractConfigData, no " + branch + " branch");

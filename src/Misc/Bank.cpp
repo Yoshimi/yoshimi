@@ -78,6 +78,7 @@ Bank::Bank(SynthEngine *_synth) :
                                     // it doesn't contain an instrument file
     synth(_synth)
 {
+    BanksVersion = 1;
     InstrumentsInBanks = 0,
     BanksInRoots = 0;
     roots.clear();
@@ -1454,6 +1455,7 @@ void Bank::parseConfigFile(XMLwrapper *xml)
 {
     roots.clear();
     hints.clear();
+
     string nodename = "BANKROOT";
     for (size_t i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
     {
