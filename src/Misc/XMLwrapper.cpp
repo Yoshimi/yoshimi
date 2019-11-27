@@ -108,9 +108,6 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
     if (synth->getRuntime().xmlType == TOPLEVEL::XML::MasterConfig)
     {
         beginbranch("BASE_PARAMETERS");
-            addpar("sample_rate", synth->getRuntime().Samplerate);
-            addpar("sound_buffer_size", synth->getRuntime().Buffersize);
-            addpar("oscil_size", synth->getRuntime().Oscilsize);
             addpar("gzip_compression", synth->getRuntime().GzipCompression);
             addparbool("enable_gui", synth->getRuntime().showGui);
             addparbool("enable_splash", synth->getRuntime().showSplash);

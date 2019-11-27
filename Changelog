@@ -3,6 +3,15 @@ yoshimi 1.6.0 M
 2019-11-27 Will.
 * Added version numbering to the banks file.
   This will be relevant with coming changes.
+* Reinstated instance control of Sample Rate.
+* Reinstated instance control of Buffer Size.
+* Reinstated instance control of Osc. Size.
+  These are actually needed for Jack session
+  control and startup state.
+* Rationalised state/session files.
+  Still not correct though :(
+  Placed too late in the startup sequence but
+  segfaults if put in the 'logical' place.
 
 2019-11-26 Will
 * Updated local copy of User Guide.

@@ -221,6 +221,14 @@ SynthEngine::~SynthEngine()
 
 bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 {
+    int found = 0;
+
+    if (!interchange.Init())
+    {
+        Runtime.LogError("interChange init failed");
+        goto bail_out;
+    }
+
     samplerate_f = samplerate = audiosrate;
     halfsamplerate_f = samplerate_f / 2;
 
@@ -235,13 +243,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
     fadeStep = 10.0f / samplerate; // 100mS fade
     ControlStep = (127.0f / samplerate) * 5.0f; // 200mS for 0 to 127
-    int found = 0;
-
-    if (!interchange.Init())
-    {
-        Runtime.LogError("interChange init failed");
-        goto bail_out;
-    }
 
     if (oscilsize < (buffersize / 2))
     {
@@ -314,14 +315,13 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             defaults();
         }
     }
-    else if (Runtime.restoreState)
+    else if (!Runtime.restoreSessionData(Runtime.StateFile, false))
     {
-        if (!Runtime.stateRestore())
-         {
-             Runtime.Log("Restore state failed. Using defaults");
-             defaults();
-         }
+        Runtime.Log("Restore state failed. Using defaults");
+        //defaults();
+        std::cout << "Failed " << Runtime.StateFile << std::endl;
     }
+    std::cout << "Good? " << Runtime.StateFile << std::endl;
 
     if (Runtime.paramsLoad.size())
     {
@@ -1796,7 +1796,7 @@ void SynthEngine::resetAll(bool andML)
         if(isRegularFile(filename + ".state"))
         {
             Runtime.StateFile = filename;
-            Runtime.stateRestore();
+            Runtime.restoreSessionData(Runtime.StateFile, false);
         }
     }
     if (andML)
@@ -2390,7 +2390,7 @@ void SynthEngine::allStop(unsigned int stopType)
 bool SynthEngine::loadStateAndUpdate(string filename)
 {
     defaults();
-    bool result = Runtime.loadState(filename);
+    bool result = Runtime.restoreSessionData(filename, false);
     ShutUp();
     Unmute();
     return result;
@@ -2399,7 +2399,7 @@ bool SynthEngine::loadStateAndUpdate(string filename)
 
 bool SynthEngine::saveState(string filename)
 {
-    return Runtime.saveState(filename);
+    return Runtime.saveSessionData(filename);
 }
 
 

@@ -60,12 +60,8 @@ class Config
         string masterCCtest(int cc);
         bool saveConfig(bool master = false);
         bool loadConfig(void);
-        bool saveState(const string statefile)
-            { return saveSessionData(statefile); }
-        bool loadState(const string statefile)
-            { return restoreSessionData(statefile, false); }
-        bool stateRestore(void)
-            { return restoreSessionData(StateFile, false); }
+        bool saveSessionData(string savefile);
+        bool restoreSessionData(string sessionfile, bool startup);
         bool restoreJsession(void);
         void setJackSessionSave(int event_type, string session_file);
 
@@ -216,8 +212,6 @@ class Config
         bool extractBaseParameters(XMLwrapper *xml);
         bool extractConfigData(XMLwrapper *xml);
         void addConfigXML(XMLwrapper *xml);
-        bool saveSessionData(string savefile);
-        bool restoreSessionData(string sessionfile, bool startup);
         int SSEcapability(void);
         void AntiDenormals(bool set_daz_ftz);
         void saveJackSession(void);

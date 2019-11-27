@@ -615,6 +615,9 @@ bool Config::extractConfigData(XMLwrapper *xml)
         Log("Running with defaults");
         return true;
     }
+    Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 192000);
+    Buffersize = xml->getpar("sound_buffer_size", Buffersize, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
+    Oscilsize = xml->getpar("oscil_size", Oscilsize, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
     single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);
     toConsole = xml->getpar("reports_destination", toConsole, 0, 1);
     hideErrors = xml->getpar("hide_system_errors", hideErrors, 0, 1);
@@ -734,6 +737,10 @@ bool Config::saveConfig(bool master)
 void Config::addConfigXML(XMLwrapper *xmltree)
 {
     xmltree->beginbranch("CONFIGURATION");
+    xmltree->addpar("sample_rate", synth->getRuntime().Samplerate);
+    xmltree->addpar("sound_buffer_size", synth->getRuntime().Buffersize);
+    xmltree->addpar("oscil_size", synth->getRuntime().Oscilsize);
+
     xmltree->addpar("single_row_panel", single_row_panel);
     xmltree->addpar("reports_destination", toConsole);
     xmltree->addpar("hide_system_errors", hideErrors);
