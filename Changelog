@@ -1,6 +1,9 @@
 yoshimi 1.6.0 M
 
-2019-11-27 Will.
+2019-11-28 Will
+* Began state machine for all session managment.
+
+2019-11-27 Will
 * Added version numbering to the banks file.
   This will be relevant with coming changes.
 * Reinstated instance control of Sample Rate.

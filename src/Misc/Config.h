@@ -126,6 +126,7 @@ class Config
         string        nameTag;
 
         bool          loadDefaultState;
+        int           sessionStage;
         int           Interpolation;
         string        presetsDirlist[MAX_PRESETS];
         std::list<string> lastfileseen;

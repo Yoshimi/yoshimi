@@ -307,6 +307,10 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 
     defaults();
     ClearNRPNs();
+
+    if (Runtime.sessionStage == 1)
+        Runtime.restoreSessionData(Runtime.StateFile, false);
+
     if (Runtime.restoreJackSession) // the following are not fatal if failed
     {
         if (!Runtime.restoreJsession())
@@ -315,14 +319,16 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             defaults();
         }
     }
-    else if (!Runtime.restoreSessionData(Runtime.StateFile, false))
+    else if (Runtime.restoreState)
     {
-        Runtime.Log("Restore state failed. Using defaults");
-        //defaults();
-        std::cout << "Failed " << Runtime.StateFile << std::endl;
+        if (!Runtime.restoreSessionData(Runtime.StateFile, false))
+        {
+            Runtime.Log("Restore state failed. Using defaults");
+            defaults();
+            std::cout << "Failed " << Runtime.StateFile << std::endl;
+        }
+        std::cout << "Good? " << Runtime.StateFile << std::endl;
     }
-    std::cout << "Good? " << Runtime.StateFile << std::endl;
-
     if (Runtime.paramsLoad.size())
     {
         string file = setExtension(Runtime.paramsLoad, EXTEN::patchset);

@@ -138,6 +138,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     alsaAudioDevice("default"),
     alsaMidiDevice("default"),
     loadDefaultState(false),
+    sessionStage(0),
     Interpolation(0),
     checksynthengines(1),
     xmlType(0),
@@ -449,7 +450,6 @@ bool Config::loadConfig(void)
     }
 
     ConfigFile = ConfigDir + yoshimi;
-    StateFile = ConfigDir + yoshimi + string(".state");
 
     if (thisInstance == 0)
     {
@@ -513,6 +513,24 @@ bool Config::loadConfig(void)
                 else
                     oldConfig = false;
             }
+        }
+    }
+
+    if (sessionStage == 1)
+    {
+        Log("Loading default state");
+        StateFile = defaultStateName + "-" + asString(thisInstance) + ".state";
+        XMLwrapper *xml = new XMLwrapper(synth, true);
+        if (!xml)
+            Log("loadConfig failed XMLwrapper allocation");
+        else
+        {
+            isok = xml->loadXMLfile(StateFile);
+            if (isok)
+                isok = extractConfigData(xml);
+            else
+                Log("loadConfig load instance failed");
+            delete xml;
         }
     }
     return isok;
@@ -615,6 +633,21 @@ bool Config::extractConfigData(XMLwrapper *xml)
         Log("Running with defaults");
         return true;
     }
+    /*
+     * default state must be first test as we need to abort
+     * and fetch this instead
+     */
+    if (sessionStage == 0)
+    {
+        loadDefaultState = xml->getpar("defaultState", loadDefaultState, 0, 1);
+        if (loadDefaultState)
+        {
+            sessionStage = 1;
+            xml->exitbranch(); // CONFIGURATION
+            return true;
+        }
+    }
+
     Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 192000);
     Buffersize = xml->getpar("sound_buffer_size", Buffersize, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
     Oscilsize = xml->getpar("oscil_size", Oscilsize, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
@@ -644,7 +677,6 @@ bool Config::extractConfigData(XMLwrapper *xml)
 
     currentPreset = xml->getpar("presetsCurrentRootID", currentPreset, 0, MAX_PRESETS);
 
-    loadDefaultState = xml->getpar("defaultState", loadDefaultState, 0, 1);
     Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
 
     // engines
