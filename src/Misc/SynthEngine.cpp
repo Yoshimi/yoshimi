@@ -308,7 +308,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     defaults();
     ClearNRPNs();
 
-    if (Runtime.sessionStage == 1)
+    if (Runtime.sessionStage == Session::Default)
         Runtime.restoreSessionData(Runtime.StateFile, false);
 
     if (Runtime.restoreJackSession) // the following are not fatal if failed

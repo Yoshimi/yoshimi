@@ -60,9 +60,10 @@ class Config
         string masterCCtest(int cc);
         bool saveConfig(bool master = false);
         bool loadConfig(void);
+        void restoreConfig(SynthEngine *_synth);
         bool saveSessionData(string savefile);
         bool restoreSessionData(string sessionfile, bool startup);
-        bool restoreJsession(void);
+        bool restoreJsession();
         void setJackSessionSave(int event_type, string session_file);
 
         static void sigHandler(int sig);
@@ -79,6 +80,7 @@ class Config
         string        userHome;
         string        ConfigDir;
         string        defaultStateName;
+        string        defaultSession;
         string        ConfigFile;
         string        paramsLoad;
         string        instrumentLoad;

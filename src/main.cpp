@@ -235,12 +235,7 @@ static void *mainGuiThread(void *arg)
             if (!_synth->getRuntime().runSynth && _synth->getUniqueId() > 0)
             {
                 if (_synth->getRuntime().configChanged)
-                {
-                    size_t tmpRoot = _synth->ReadBankRoot();
-                    size_t tmpBank = _synth->ReadBank();
-                    _synth->getRuntime().loadConfig(); // restore old settings
-                    _synth->setRootBank(tmpRoot, tmpBank); // but keep current root and bank
-                }
+                    _synth->getRuntime().restoreConfig(_synth);
                 _synth->getRuntime().saveConfig();
                 unsigned int instanceID =  _synth->getUniqueId();
                 if (_client)
@@ -302,12 +297,7 @@ static void *mainGuiThread(void *arg)
     }
 
     if (firstRuntime->configChanged && (bShowGui | bShowCmdLine)) // don't want this if no cli or gui
-    {
-        size_t tmpRoot = firstSynth->ReadBankRoot();
-        size_t tmpBank = firstSynth->ReadBank();
-        firstRuntime->loadConfig(); // restore old settings
-        firstSynth->setRootBank(tmpRoot, tmpBank); // but keep current root and bank
-    }
+        firstSynth->getRuntime().restoreConfig(firstSynth);
 
     firstRuntime->saveConfig(true);
     firstSynth->saveHistory();

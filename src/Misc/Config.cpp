@@ -423,6 +423,7 @@ bool Config::loadConfig(void)
     userHome = homedir + '/';
     ConfigDir = homedir + "/" + string(EXTEN::config) + "/" + YOSHIMI;
     defaultStateName = ConfigDir + "/yoshimi";
+
     if (!isDirectory(ConfigDir))
     {
         cmd = string("mkdir -p ") + ConfigDir;
@@ -436,8 +437,9 @@ bool Config::loadConfig(void)
 
     baseConfig = ConfigDir + yoshimi + string(EXTEN::config);
     int thisInstance = synth->getUniqueId();
+    defaultSession = defaultStateName + "-" + asString(thisInstance) + EXTEN::state;
     yoshimi += ("-" + asString(thisInstance));
-    if (thisInstance == 0)
+    if (thisInstance == 0 && sessionStage != Session::RestoreConf)
     {
         TextMsgBuffer::instance().init(); // sneaked it in here so it's early
         string presetDir = ConfigDir + "/presets";
@@ -451,7 +453,7 @@ bool Config::loadConfig(void)
 
     ConfigFile = ConfigDir + yoshimi;
 
-    if (thisInstance == 0)
+    if (thisInstance == 0 && sessionStage != Session::RestoreConf)
     {
         string newInstance0 = ConfigDir + yoshimi + EXTEN::instance;
         if (isRegularFile(baseConfig) && !isRegularFile(newInstance0))
@@ -506,7 +508,7 @@ bool Config::loadConfig(void)
                     delete xml;
                 }
             }
-            if (thisInstance == 0)
+            if (thisInstance == 0 && sessionStage != Session::RestoreConf)
             {
                 if (lastXMLmajor < MIN_CONFIG_MAJOR || lastXMLminor < MIN_CONFIG_MINOR)
                     oldConfig = true;
@@ -516,10 +518,11 @@ bool Config::loadConfig(void)
         }
     }
 
-    if (sessionStage == 1)
+    if(sessionStage == Session::RestoreConf)
+        return true;
+
+    if (sessionStage != Session::Normal && sessionStage != Session::InProgram)
     {
-        Log("Loading default state");
-        StateFile = defaultStateName + "-" + asString(thisInstance) + ".state";
         XMLwrapper *xml = new XMLwrapper(synth, true);
         if (!xml)
             Log("loadConfig failed XMLwrapper allocation");
@@ -534,6 +537,22 @@ bool Config::loadConfig(void)
         }
     }
     return isok;
+}
+
+void Config::restoreConfig(SynthEngine *_synth)
+{
+    size_t tmpRoot = _synth->ReadBankRoot();
+    size_t tmpBank = _synth->ReadBank();
+    int tmpChanged = configChanged;
+    sessionStage = Session::RestoreConf;
+
+    // restore old settings
+    loadConfig();
+
+    // but keep current root and bank
+    _synth->setRootBank(tmpRoot, tmpBank);
+    // and ESPECIALLY 'load as default' status!
+    configChanged = tmpChanged;
 }
 
 
@@ -637,13 +656,16 @@ bool Config::extractConfigData(XMLwrapper *xml)
      * default state must be first test as we need to abort
      * and fetch this instead
      */
-    if (sessionStage == 0)
+    if (sessionStage == Session::Normal)
     {
         loadDefaultState = xml->getpar("defaultState", loadDefaultState, 0, 1);
         if (loadDefaultState)
         {
-            sessionStage = 1;
             xml->exitbranch(); // CONFIGURATION
+            configChanged = true;
+            sessionStage = Session::Default;
+            StateFile = defaultSession;
+            Log("Loading default state");
             return true;
         }
     }

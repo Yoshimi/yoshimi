@@ -134,6 +134,18 @@ const std::string UNTITLED = "No Title";
 
 const unsigned char FORCED_EXIT = 16;
 
+
+enum Session : unsigned char {
+    Normal = 0,
+    Default,
+    JackFirst,
+    JackSecond,
+    StartupFirst,
+    StartupSecond,
+    InProgram,
+    RestoreConf
+};
+
 namespace YOSH
 {
     // float to bool done this way to ensure consistency
@@ -159,7 +171,7 @@ namespace ENVMODE
 
 namespace TOPLEVEL // usage TOPLEVEL::section::vector
 {
-    enum section: unsigned char {
+    enum section : unsigned char {
         part1 = 0,
         part64 = 63,
         copyPaste = 72, // 48 (not yet!)
