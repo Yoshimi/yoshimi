@@ -35,6 +35,7 @@
 #ifdef GUI_FLTK
 #include "FL/Fl.H"
 #endif
+#include "globals.h"
 
 using std::string;
 
@@ -56,15 +57,16 @@ class Config
 
         void clearPresetsDirlist(void);
 
-        string testCCvalue(int cc);
-        string masterCCtest(int cc);
         bool saveConfig(bool master = false);
         bool loadConfig(void);
         void restoreConfig(SynthEngine *_synth);
         bool saveSessionData(string savefile);
-        bool restoreSessionData(string sessionfile, bool startup);
+        bool restoreSessionData(string sessionfile);
         bool restoreJsession();
         void setJackSessionSave(int event_type, string session_file);
+
+        string testCCvalue(int cc);
+        string masterCCtest(int cc);
 
         static void sigHandler(int sig);
         void setInterruptActive(void);

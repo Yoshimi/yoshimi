@@ -46,6 +46,7 @@
 #include "Misc/Config.h"
 #include "Params/PresetsStore.h"
 #include "Params/UnifiedPresets.h"
+#include "globals.h"
 
 class Part;
 class EffectMgr;

@@ -666,8 +666,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     if (synth->loadStateAndUpdate(text))
                     {
                         string name = synth->getRuntime().ConfigDir + "/yoshimi";
-                        if (synth != firstSynth)
-                            name += ("-" + to_string(synth->getUniqueId()));
+                        name += ("-" + to_string(synth->getUniqueId()));
                         name += ".state";
                         if ((text != name)) // never include default state
                             synth->addHistory(text, TOPLEVEL::XML::State);
@@ -683,8 +682,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     if (synth->saveState(filename))
                     {
                         string name = synth->getRuntime().ConfigDir + "/yoshimi";
-                        if (synth != firstSynth)
-                            name += ("-" + to_string(synth->getUniqueId()));
+                        name += ("-" + to_string(synth->getUniqueId()));
                         name += ".state";
                         if ((text != name)) // never include default state
                             synth->addHistory(filename, TOPLEVEL::XML::State);

@@ -308,27 +308,9 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     defaults();
     ClearNRPNs();
 
-    if (Runtime.sessionStage == Session::Default)
-        Runtime.restoreSessionData(Runtime.StateFile, false);
+    if (Runtime.sessionStage == Session::Default || Runtime.sessionStage == Session::StartupSecond || Runtime.sessionStage == Session::JackFirst)
+        Runtime.restoreSessionData(Runtime.StateFile);
 
-    if (Runtime.restoreJackSession) // the following are not fatal if failed
-    {
-        if (!Runtime.restoreJsession())
-        {
-            Runtime.Log("Restore jack session failed. Using defaults");
-            defaults();
-        }
-    }
-    else if (Runtime.restoreState)
-    {
-        if (!Runtime.restoreSessionData(Runtime.StateFile, false))
-        {
-            Runtime.Log("Restore state failed. Using defaults");
-            defaults();
-            std::cout << "Failed " << Runtime.StateFile << std::endl;
-        }
-        std::cout << "Good? " << Runtime.StateFile << std::endl;
-    }
     if (Runtime.paramsLoad.size())
     {
         string file = setExtension(Runtime.paramsLoad, EXTEN::patchset);
@@ -1802,7 +1784,7 @@ void SynthEngine::resetAll(bool andML)
         if(isRegularFile(filename + ".state"))
         {
             Runtime.StateFile = filename;
-            Runtime.restoreSessionData(Runtime.StateFile, false);
+            Runtime.restoreSessionData(Runtime.StateFile);
         }
     }
     if (andML)
@@ -2396,7 +2378,9 @@ void SynthEngine::allStop(unsigned int stopType)
 bool SynthEngine::loadStateAndUpdate(string filename)
 {
     defaults();
-    bool result = Runtime.restoreSessionData(filename, false);
+    Runtime.sessionStage = Session::InProgram;
+    Runtime.stateChanged = true;
+    bool result = Runtime.restoreSessionData(filename);
     ShutUp();
     Unmute();
     return result;

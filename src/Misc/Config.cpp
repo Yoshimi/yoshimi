@@ -138,7 +138,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     alsaAudioDevice("default"),
     alsaMidiDevice("default"),
     loadDefaultState(false),
-    sessionStage(0),
+    sessionStage(Session::Normal),
     Interpolation(0),
     checksynthengines(1),
     xmlType(0),
@@ -209,7 +209,8 @@ bool Config::Setup(int argc, char **argv)
 {
     //clearPresetsDirlist();
     AntiDenormals(true);
-
+    if (!synth->getIsLV2Plugin())
+        loadCmdArgs(argc, argv);
     if (!loadConfig())
     {
         string message = "Could not load config. Using default values.";
@@ -260,7 +261,6 @@ bool Config::Setup(int argc, char **argv)
     }
     if (!midiDevice.size())
         midiDevice = "";
-    loadCmdArgs(argc, argv);
     Oscilsize = nearestPowerOf2(Oscilsize, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
     Buffersize = nearestPowerOf2(Buffersize, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
     return true;
@@ -283,126 +283,6 @@ void Config::flushLog(void)
             LogList.pop_front();
         }
     }
-}
-
-
-string Config::testCCvalue(int cc)
-{
-    string result = "";
-    switch (cc)
-    {
-        case 1:
-            result = "mod wheel";
-            break;
-
-        case 11:
-            result = "expression";
-            break;
-
-        case 71:
-            result = "filter Q";
-            break;
-
-        case 74:
-            result = "filter cutoff";
-            break;
-
-        case 75:
-            result = "bandwidth";
-            break;
-
-        case 76:
-            result = "FM amplitude";
-            break;
-
-        case 77:
-            result = "resonance center";
-            break;
-
-        case 78:
-            result = "resonance bandwidth";
-            break;
-
-        default:
-            result = masterCCtest(cc);
-    }
-    return result;
-}
-
-
-string Config::masterCCtest(int cc)
-{
-    string result = "";
-    switch (cc)
-    {
-         case 6:
-            result = "data msb";
-            break;
-
-        case 7:
-            result = "volume";
-            break;
-
-        case 10:
-            result = "panning";
-            break;
-
-        case 38:
-            result = "data lsb";
-            break;
-
-        case 64:
-            result = "sustain pedal";
-            break;
-
-        case 65:
-            result = "portamento";
-            break;
-
-        case 96:
-            result = "data increment";
-            break;
-
-        case 97:
-            result = "data decrement";
-            break;
-
-        case 98:
-            result = "NRPN lsb";
-            break;
-
-        case 99:
-            result = "NRPN msb";
-            break;
-
-        case 120:
-            result = "all sounds off";
-            break;
-
-        case 121:
-            result = "reset all controllers";
-            break;
-
-        case 123:
-            result = "all notes off";
-            break;
-
-        default:
-        {
-            if (cc < 128) // don't compare with 'disabled' state
-            {
-                if (cc == midi_bank_C)
-                    result = "bank change";
-                else if (cc == midi_bank_root)
-                    result = "bank root change";
-                else if (cc == midi_upper_voice_C)
-                    result = "extended program change";
-                else if (cc == channelSwitchCC)
-                    result = "channel switcher";
-            }
-        }
-    }
-    return result;
 }
 
 
@@ -518,10 +398,12 @@ bool Config::loadConfig(void)
         }
     }
 
+    //std::cout << "Session Stage " << sessionStage << std::endl;
+
     if(sessionStage == Session::RestoreConf)
         return true;
 
-    if (sessionStage != Session::Normal && sessionStage != Session::InProgram)
+    if (sessionStage != Session::Normal)
     {
         XMLwrapper *xml = new XMLwrapper(synth, true);
         if (!xml)
@@ -530,7 +412,13 @@ bool Config::loadConfig(void)
         {
             isok = xml->loadXMLfile(StateFile);
             if (isok)
+            {
+                if (sessionStage == Session::StartupFirst)
+                    sessionStage = Session::StartupSecond;
+                else if (sessionStage == Session::JackFirst)
+                    sessionStage = Session::JackSecond;
                 isok = extractConfigData(xml);
+            }
             else
                 Log("loadConfig load instance failed");
             delete xml;
@@ -641,6 +529,7 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
 
 bool Config::extractConfigData(XMLwrapper *xml)
 {
+    //std::cout << "Session Stage " << sessionStage << std::endl;
     if (!xml)
     {
         Log("extractConfigData on NULL");
@@ -670,62 +559,66 @@ bool Config::extractConfigData(XMLwrapper *xml)
         }
     }
 
-    Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 192000);
-    Buffersize = xml->getpar("sound_buffer_size", Buffersize, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
-    Oscilsize = xml->getpar("oscil_size", Oscilsize, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
-    single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);
-    toConsole = xml->getpar("reports_destination", toConsole, 0, 1);
-    hideErrors = xml->getpar("hide_system_errors", hideErrors, 0, 1);
-    showTimes = xml->getpar("report_load_times", showTimes, 0, 1);
-    logXMLheaders = xml->getpar("report_XMLheaders", logXMLheaders, 0, 1);
-    VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 1, 6) - 1;
-    xmlmax = xml->getpar("full_parameters", xmlmax, 0, 1);
-
-    // get legacy preset dirs
-    int count = 0;
-    for (int i = 0; i < MAX_PRESET_DIRS; ++i)
+    if (sessionStage != Session::InProgram)
     {
-        if (xml->enterbranch("PRESETSROOT", i))
+
+        Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 192000);
+        Buffersize = xml->getpar("sound_buffer_size", Buffersize, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
+        Oscilsize = xml->getpar("oscil_size", Oscilsize, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
+        single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);
+        toConsole = xml->getpar("reports_destination", toConsole, 0, 1);
+        hideErrors = xml->getpar("hide_system_errors", hideErrors, 0, 1);
+        showTimes = xml->getpar("report_load_times", showTimes, 0, 1);
+        logXMLheaders = xml->getpar("report_XMLheaders", logXMLheaders, 0, 1);
+        VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 1, 6) - 1;
+        xmlmax = xml->getpar("full_parameters", xmlmax, 0, 1);
+
+        // get legacy preset dirs
+        int count = 0;
+        for (int i = 0; i < MAX_PRESET_DIRS; ++i)
         {
-            string dir = xml->getparstr("presets_root");
-            if (isDirectory(dir))
+            if (xml->enterbranch("PRESETSROOT", i))
             {
-                presetsDirlist[count] = dir;
-                ++count;
+                string dir = xml->getparstr("presets_root");
+                if (isDirectory(dir))
+                {
+                    presetsDirlist[count] = dir;
+                    ++count;
+                }
+                xml->exitbranch();
             }
-            xml->exitbranch();
         }
+
+        currentPreset = xml->getpar("presetsCurrentRootID", currentPreset, 0, MAX_PRESETS);
+
+        Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
+
+        // engines
+        audioEngine = (audio_drivers)xml->getpar("audio_engine", audioEngine, no_audio, alsa_audio);
+        midiEngine = (midi_drivers)xml->getpar("midi_engine", midiEngine, no_midi, alsa_midi);
+        alsaMidiType = xml->getpar("alsa_midi_type", 0, 0, 2);
+
+        // alsa settings
+        alsaAudioDevice = xml->getparstr("linux_alsa_audio_dev");
+        alsaMidiDevice = xml->getparstr("linux_alsa_midi_dev");
+
+        // jack settings
+        jackServer = xml->getparstr("linux_jack_server");
+        jackMidiDevice = xml->getparstr("linux_jack_midi_dev");
+        connectJackaudio = xml->getpar("connect_jack_audio", connectJackaudio, 0, 1);
+
+        // midi options
+        midi_bank_root = xml->getpar("midi_bank_root", midi_bank_root, 0, 128);
+        midi_bank_C = xml->getpar("midi_bank_C", midi_bank_C, 0, 128);
+        midi_upper_voice_C = xml->getpar("midi_upper_voice_C", midi_upper_voice_C, 0, 128);
+        EnableProgChange = 1 - xml->getpar("ignore_program_change", EnableProgChange, 0, 1); // inverted for Zyn compatibility
+        enable_part_on_voice_load = xml->getpar("enable_part_on_voice_load", enable_part_on_voice_load, 0, 1);
+        instrumentFormat = xml->getpar("saved_instrument_format",instrumentFormat, 1, 3);
+        enable_NRPN = xml->getparbool("enable_incoming_NRPNs", enable_NRPN);
+        ignoreResetCCs = xml->getpar("ignore_reset_all_CCs",ignoreResetCCs,0, 1);
+        monitorCCin = xml->getparbool("monitor-incoming_CCs", monitorCCin);
+        showLearnedCC = xml->getparbool("open_editor_on_learned_CC", showLearnedCC);
     }
-
-    currentPreset = xml->getpar("presetsCurrentRootID", currentPreset, 0, MAX_PRESETS);
-
-    Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
-
-    // engines
-    audioEngine = (audio_drivers)xml->getpar("audio_engine", audioEngine, no_audio, alsa_audio);
-    midiEngine = (midi_drivers)xml->getpar("midi_engine", midiEngine, no_midi, alsa_midi);
-    alsaMidiType = xml->getpar("alsa_midi_type", 0, 0, 2);
-
-    // alsa settings
-    alsaAudioDevice = xml->getparstr("linux_alsa_audio_dev");
-    alsaMidiDevice = xml->getparstr("linux_alsa_midi_dev");
-
-    // jack settings
-    jackServer = xml->getparstr("linux_jack_server");
-    jackMidiDevice = xml->getparstr("linux_jack_midi_dev");
-    connectJackaudio = xml->getpar("connect_jack_audio", connectJackaudio, 0, 1);
-
-    // midi options
-    midi_bank_root = xml->getpar("midi_bank_root", midi_bank_root, 0, 128);
-    midi_bank_C = xml->getpar("midi_bank_C", midi_bank_C, 0, 128);
-    midi_upper_voice_C = xml->getpar("midi_upper_voice_C", midi_upper_voice_C, 0, 128);
-    EnableProgChange = 1 - xml->getpar("ignore_program_change", EnableProgChange, 0, 1); // inverted for Zyn compatibility
-    enable_part_on_voice_load = xml->getpar("enable_part_on_voice_load", enable_part_on_voice_load, 0, 1);
-    instrumentFormat = xml->getpar("saved_instrument_format",instrumentFormat, 1, 3);
-    enable_NRPN = xml->getparbool("enable_incoming_NRPNs", enable_NRPN);
-    ignoreResetCCs = xml->getpar("ignore_reset_all_CCs",ignoreResetCCs,0, 1);
-    monitorCCin = xml->getparbool("monitor-incoming_CCs", monitorCCin);
-    showLearnedCC = xml->getparbool("open_editor_on_learned_CC", showLearnedCC);
 
     //misc
     checksynthengines = xml->getpar("check_pad_synth", checksynthengines, 0, 1);
@@ -791,6 +684,8 @@ bool Config::saveConfig(bool master)
 void Config::addConfigXML(XMLwrapper *xmltree)
 {
     xmltree->beginbranch("CONFIGURATION");
+    xmltree->addpar("defaultState", loadDefaultState);
+
     xmltree->addpar("sample_rate", synth->getRuntime().Samplerate);
     xmltree->addpar("sound_buffer_size", synth->getRuntime().Buffersize);
     xmltree->addpar("oscil_size", synth->getRuntime().Oscilsize);
@@ -805,7 +700,6 @@ void Config::addConfigXML(XMLwrapper *xmltree)
 
     xmltree->addpar("presetsCurrentRootID", currentPreset);
 
-    xmltree->addpar("defaultState", loadDefaultState);
     xmltree->addpar("interpolation", Interpolation);
 
     xmltree->addpar("audio_engine", synth->getRuntime().audioEngine);
@@ -863,7 +757,7 @@ bool Config::saveSessionData(string savefile)
 }
 
 
-bool Config::restoreSessionData(string sessionfile, bool startup)
+bool Config::restoreSessionData(string sessionfile)
 {
     XMLwrapper *xml = NULL;
     bool ok = false;
@@ -885,28 +779,27 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
         Log("Failed to load xml file " + sessionfile, 2);
         goto end_game;
     }
-    if (startup)
-        ok = extractBaseParameters(xml);
-    else
+
+
+    ok = extractConfigData(xml);
+    if (ok)
     {
-        ok = extractConfigData(xml); // this still needs improving
-        if (ok)
-        { // mark as soon as anything changes
-            synth->getRuntime().stateChanged = true;
-            for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
-            {
-                synth->part[npart]->defaults();
-                synth->part[npart]->Prcvchn = npart % NUM_MIDI_CHANNELS;
-            }
-            ok = synth->getfromXML(xml);
-            if (ok)
-                synth->setAllPartMaps();
-            bool oklearn = synth->midilearn.extractMidiListData(false, xml);
-            if (oklearn)
-                synth->midilearn.updateGui(MIDILEARN::control::hideGUI);
-                // handles possibly undefined window
+        // mark as soon as anything changes
+        synth->getRuntime().stateChanged = true;
+        for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
+        {
+            synth->part[npart]->defaults();
+            synth->part[npart]->Prcvchn = npart % NUM_MIDI_CHANNELS;
         }
-    }
+        ok = synth->getfromXML(xml);
+        if (ok)
+            synth->setAllPartMaps();
+        bool oklearn = synth->midilearn.extractMidiListData(false, xml);
+        if (oklearn)
+            synth->midilearn.updateGui(MIDILEARN::control::hideGUI);
+            // handles possibly undefined window
+        }
+
 
 end_game:
     if (xml)
@@ -1123,7 +1016,7 @@ void Config::setLadi1Active(void)
 bool Config::restoreJsession(void)
 {
     #if defined(JACK_SESSION)
-        return restoreSessionData(jackSessionFile, false);
+        return restoreSessionData(jackSessionFile);
     #else
         return false;
     #endif
@@ -1135,6 +1028,126 @@ void Config::setJackSessionSave(int event_type, string session_file)
     jackSessionFile = session_file;
     __sync_and_and_fetch(&jsessionSave, 0);
     __sync_or_and_fetch(&jsessionSave, event_type);
+}
+
+
+string Config::testCCvalue(int cc)
+{
+    string result = "";
+    switch (cc)
+    {
+        case 1:
+            result = "mod wheel";
+            break;
+
+        case 11:
+            result = "expression";
+            break;
+
+        case 71:
+            result = "filter Q";
+            break;
+
+        case 74:
+            result = "filter cutoff";
+            break;
+
+        case 75:
+            result = "bandwidth";
+            break;
+
+        case 76:
+            result = "FM amplitude";
+            break;
+
+        case 77:
+            result = "resonance center";
+            break;
+
+        case 78:
+            result = "resonance bandwidth";
+            break;
+
+        default:
+            result = masterCCtest(cc);
+    }
+    return result;
+}
+
+
+string Config::masterCCtest(int cc)
+{
+    string result = "";
+    switch (cc)
+    {
+         case 6:
+            result = "data msb";
+            break;
+
+        case 7:
+            result = "volume";
+            break;
+
+        case 10:
+            result = "panning";
+            break;
+
+        case 38:
+            result = "data lsb";
+            break;
+
+        case 64:
+            result = "sustain pedal";
+            break;
+
+        case 65:
+            result = "portamento";
+            break;
+
+        case 96:
+            result = "data increment";
+            break;
+
+        case 97:
+            result = "data decrement";
+            break;
+
+        case 98:
+            result = "NRPN lsb";
+            break;
+
+        case 99:
+            result = "NRPN msb";
+            break;
+
+        case 120:
+            result = "all sounds off";
+            break;
+
+        case 121:
+            result = "reset all controllers";
+            break;
+
+        case 123:
+            result = "all notes off";
+            break;
+
+        default:
+        {
+            if (cc < 128) // don't compare with 'disabled' state
+            {
+                if (cc == midi_bank_C)
+                    result = "bank change";
+                else if (cc == midi_bank_root)
+                    result = "bank root change";
+                else if (cc == midi_upper_voice_C)
+                    result = "extended program change";
+                else if (cc == channelSwitchCC)
+                    result = "channel switcher";
+            }
+        }
+    }
+    return result;
 }
 
 
@@ -1332,16 +1345,26 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             break;
 
         case 'S':
-            settings->configChanged = true;
-            settings->restoreState = true;
-            if (arg)
-                settings->StateFile = string(arg);
+            if (settings->sessionStage != Session::JackFirst)
+            {
+                settings->sessionStage = Session::StartupFirst;
+                // jack session takes priority
+                settings->configChanged = true;
+                settings->restoreState = true;
+                settings->sessionStage = Session::StartupFirst;
+                if (arg)
+                    settings->StateFile = string(arg);
+            }
             break;
 
 #if defined(JACK_SESSION)
         case 'u':
             if (arg)
-                settings->jackSessionFile = string(arg);
+            {
+                settings->sessionStage = Session::JackFirst;
+                settings->configChanged = true;
+                settings->StateFile = file::setExtension(string(arg), EXTEN::state);
+            }
             break;
 
         case 'U':
