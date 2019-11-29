@@ -119,7 +119,7 @@ int          Config::showCLIcontext = 1;
 static string baseConfig;
 
 Config::Config(SynthEngine *_synth, int argc, char **argv) :
-    restoreState(false),
+//    restoreState(false),
     stateChanged(false),
     restoreJackSession(false),
     oldConfig(false),
@@ -1350,7 +1350,6 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
                 settings->sessionStage = Session::StartupFirst;
                 // jack session takes priority
                 settings->configChanged = true;
-                settings->restoreState = true;
                 settings->sessionStage = Session::StartupFirst;
                 if (arg)
                     settings->StateFile = string(arg);
@@ -1390,7 +1389,7 @@ static struct argp cmd_argp = { cmd_options, parse_cmds, prog_doc, 0, 0, 0, 0};
 void Config::loadCmdArgs(int argc, char **argv)
 {
     argp_parse(&cmd_argp, argc, argv, 0, 0, this);
-    if (jackSessionUuid.size() && jackSessionFile.size())
+    //if (jackSessionUuid.size() && jackSessionFile.size())
         restoreJackSession = true;
 }
 

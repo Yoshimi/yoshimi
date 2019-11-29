@@ -88,7 +88,6 @@ class Config
         string        instrumentLoad;
         string        midiLearnLoad;
         string        rootDefine;
-        bool          restoreState;
         bool          stateChanged;
         string        StateFile;
         bool          restoreJackSession;

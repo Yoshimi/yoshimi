@@ -4,6 +4,7 @@ yoshimi 1.6.0 M
 * State fully integrated in session management.
 * Jack session almost completly done.
   Seem to have broken saving :(
+* Temporary fix for Jack session save.
 
 2019-11-28 Will
 * Began state machine for all session managment.
