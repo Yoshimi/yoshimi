@@ -116,9 +116,7 @@ bool         Config::autoInstance = false;
 unsigned int Config::activeInstance = 0;
 int          Config::showCLIcontext = 1;
 
-static string baseConfig;
-
-static string jUuid;
+string jUuid = "";
 
 Config::Config(SynthEngine *_synth, int argc, char **argv) :
     stateChanged(false),
@@ -208,7 +206,6 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
 
 bool Config::Setup(int argc, char **argv)
 {
-    //clearPresetsDirlist();
     AntiDenormals(true);
     if (!synth->getIsLV2Plugin())
         loadCmdArgs(argc, argv);
@@ -217,7 +214,6 @@ bool Config::Setup(int argc, char **argv)
         string message = "Could not load config. Using default values.";
         TextMsgBuffer::instance().push(message);
         Log("\n\n" + message + "\n");
-        //return false;
     }
 
     /* NOTE: we must not do any further init involving the SynthEngine here,
@@ -264,8 +260,9 @@ bool Config::Setup(int argc, char **argv)
         midiDevice = "";
     Oscilsize = nearestPowerOf2(Oscilsize, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
     Buffersize = nearestPowerOf2(Buffersize, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
-    //loadCmdArgs(argc, argv);
-    jackSessionUuid = jUuid;
+
+    if (!jUuid.empty())
+        jackSessionUuid = jUuid;
     return true;
 }
 
@@ -627,8 +624,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     checksynthengines = xml->getpar("check_pad_synth", checksynthengines, 0, 1);
     if (tempRoot == 0)
         tempRoot = xml->getpar("root_current_ID", 0, 0, 127);
-    //else
-        //std::cout << "root? " << xml->getpar("root_current_ID", 0, 0, 127) << std::endl;
+
     if (tempBank == 0)
     tempBank = xml->getpar("bank_current_ID", 0, 0, 127);
     xml->exitbranch(); // CONFIGURATION
@@ -1348,14 +1344,11 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             break;
 
         case 'S':
-            if (settings->sessionStage != Session::JackFirst)
+            if (arg)
             {
                 settings->sessionStage = Session::StartupFirst;
-                // jack session takes priority
                 settings->configChanged = true;
-                settings->sessionStage = Session::StartupFirst;
-                if (arg)
-                    settings->StateFile = string(arg);
+                settings->StateFile = string(arg);
             }
             break;
 
@@ -1392,7 +1385,7 @@ static struct argp cmd_argp = { cmd_options, parse_cmds, prog_doc, 0, 0, 0, 0};
 void Config::loadCmdArgs(int argc, char **argv)
 {
     argp_parse(&cmd_argp, argc, argv, 0, 0, this);
-    //if (jackSessionUuid.size() && jackSessionFile.size())
+    if (jackSessionUuid.size() && jackSessionFile.size())
         restoreJackSession = true;
 }
 

@@ -2,6 +2,7 @@ yoshimi 1.6.0 M
 
 2019-12-01 Will
 * Found way to defer UUid message after setup.
+* Some final? cleanups to session management.
 
 2019-11-29 Will
 * State fully integrated in session management.

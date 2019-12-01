@@ -226,6 +226,7 @@ class Config
         int jsessionSave;
         const string programcommand;
         string jackSessionDir;
+        string baseConfig;
 
         SynthEngine *synth;
         bool bRuntimeSetupCompleted;
