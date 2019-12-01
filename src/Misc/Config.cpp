@@ -118,8 +118,9 @@ int          Config::showCLIcontext = 1;
 
 static string baseConfig;
 
+static string jUuid;
+
 Config::Config(SynthEngine *_synth, int argc, char **argv) :
-//    restoreState(false),
     stateChanged(false),
     restoreJackSession(false),
     oldConfig(false),
@@ -263,6 +264,8 @@ bool Config::Setup(int argc, char **argv)
         midiDevice = "";
     Oscilsize = nearestPowerOf2(Oscilsize, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
     Buffersize = nearestPowerOf2(Buffersize, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
+    //loadCmdArgs(argc, argv);
+    jackSessionUuid = jUuid;
     return true;
 }
 
@@ -1368,7 +1371,7 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
 
         case 'U':
                 if (arg)
-                    settings->jackSessionUuid = string(arg);
+                    jUuid = string(arg);
         break;
 #endif
 
