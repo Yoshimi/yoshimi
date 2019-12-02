@@ -58,6 +58,7 @@ using file::isRegularFile;
 using file::isDirectory;
 using file::extendLocalPath;
 using file::setExtension;
+using file::renameFile;
 
 using func::nearestPowerOf2;
 using func::asString;
@@ -340,6 +341,14 @@ bool Config::loadConfig(void)
         {
             file::copyFile(baseConfig, newInstance0);
             Log("Reorganising config files.");
+            if (isRegularFile(defaultStateName + EXTEN::state))
+            {
+                if(!isRegularFile(defaultSession))
+                {
+                    renameFile(defaultStateName + EXTEN::state, defaultSession);
+                    Log("Moving default state file.");
+                }
+            }
         }
     }
     ConfigFile += EXTEN::instance;
@@ -1358,7 +1367,7 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             {
                 settings->sessionStage = Session::JackFirst;
                 settings->configChanged = true;
-                settings->StateFile = file::setExtension(string(arg), EXTEN::state);
+                settings->StateFile = setExtension(string(arg), EXTEN::state);
             }
             break;
 
