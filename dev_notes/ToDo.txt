@@ -36,8 +36,6 @@ Make NRPN MIDI-learn able to be re-learned.
 LV2: internal sound banks do not appear to be exposed as LV2 presets
 Visible in carla apparently.
 
-Startup state load doesn't set buffersize correctly - partially resolved. Size is ignored if loaded when already running (which is reasonable).
-
 Make stored values of things like Echo delay 32 bit unsigned integers.
 
 Consider enabling and disabling tooltips.
