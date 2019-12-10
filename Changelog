@@ -2,6 +2,7 @@ yoshimi 1.6.1 rc1
 
 2019-12-10 Will
 * Updated documentation.
+* Reinstated undocumented "zread" CLI time test.
 
 2019-12-02 Will
 * yoshimi.state auto-moved to yoshimi-0.state.

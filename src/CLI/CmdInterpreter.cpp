@@ -5995,6 +5995,96 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         return Reply::what("save");
     }
 
+    if (input.matchnMove(2, "zread"))
+    {
+        /*
+         * This is a very specific test for reading values and is intended to measure
+         * the time these calls take. For that reason the return echos to the CLI and
+         * GUI are suppressed, and all results are sent to the CLI only.
+         *
+         * It is only the selection time we are measuring, and that the correct
+         * value is returned.
+         *
+         * The limit to the number of repeats is INT max. Using high repeat numbers
+         * reduces the effect of the processing overhead outside the call loop itself.
+         */
+
+        std::cout << "here" << std::endl;
+
+        // repeats, control, part, kit, engine, insert, parameter, miscmsg
+        float result;
+        unsigned char control, part;
+        unsigned char kit = UNUSED;
+        unsigned char engine = UNUSED;
+        unsigned char insert = UNUSED;
+        unsigned char parameter = UNUSED;
+        unsigned char miscmsg = UNUSED;
+        int repeats;
+        if (input.isAtEnd())
+            return REPLY::value_msg;
+        repeats = string2int(input);
+        if (repeats < 1)
+            repeats = 1;
+        input.skipChars();
+        if (input.isAtEnd())
+            return REPLY::value_msg;
+        control = string2int(input);
+        input.skipChars();
+        if (input.isAtEnd())
+            return REPLY::value_msg;
+        part = string2int(input);
+        input.skipChars();
+        if (!input.isAtEnd())
+        {
+            kit = string2int(input);
+            input.skipChars();
+            if (!input.isAtEnd())
+            {
+                engine = string2int(input);
+                input.skipChars();
+                if (!input.isAtEnd())
+                {
+                    insert = string2int(input);
+                    input.skipChars();
+                    if (!input.isAtEnd())
+                    {
+                        parameter = string2int(input);
+                        input.skipChars();
+                        if (!input.isAtEnd())
+                            miscmsg = string2int(input);
+                    }
+                }
+            }
+        }
+
+        CommandBlock putData;
+        putData.data.value.F = 0;
+        putData.data.control = control;
+        putData.data.part = part;
+        putData.data.kit = kit;
+        putData.data.engine = engine;
+        putData.data.insert = insert;
+        putData.data.parameter = parameter;
+        putData.data.miscmsg = miscmsg;
+        putData.data.type = 0;
+        putData.data.source = 0;
+        struct timeval tv1, tv2;
+        gettimeofday(&tv1, NULL);
+        for (int i = 0; i < repeats; ++ i)
+            result = synth->interchange.readAllData(&putData);
+        gettimeofday(&tv2, NULL);
+
+        if (tv1.tv_usec > tv2.tv_usec)
+        {
+            tv2.tv_sec--;
+            tv2.tv_usec += 1000000;
+            }
+        float actual = (tv2.tv_sec - tv1.tv_sec) *1000000 + (tv2.tv_usec - tv1.tv_usec);
+        std::cout << "result " << result << std::endl;
+        std::cout << "Loops " << repeats << "  Total time " << actual << "uS" << "  average call time " << actual/repeats * 1000.0f << "nS" << std::endl;
+        return REPLY::done_msg;
+    }
+
     // legacyCLIaccess goes here
 
     return REPLY::unrecognised_msg;

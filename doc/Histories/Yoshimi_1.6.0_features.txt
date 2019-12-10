@@ -1,0 +1,107 @@
+1.6.0 Reed Warbler - an original voice modulator.
+
+Yoshimi is now 10 years old and (while fully respecting its origins) is forging it's own path into the future. Do come along for the ride.
+
+
+Our headline feature is extensions to AddSynth voices and modulators.
+You can now use an entire lower numbered voice as a voice source. Previously you could only use the voice oscillator itself, but now there is the ability to include all filters, LFOs and unison. Even the voice's modulation will be included, so extremely complex sounds can be created. Also, modulators using a voice for their oscillator can now enable the modulator frequency controls instead of the voice ones, giving yet further variation.
+
+
+There is a new AddSynth sound type, 'Spot Noise'.
+This is a very rough sounding noise and, with careful application of an amplitude envelope, is useful for adding a sort of 'grittiness' or sizzle to some sounds - especially percussion.
+
+These features are partly backward compatible in that they will work and give reasonable results, but obviously won't sound the same.
+
+
+There are extra mute options.
+At part level and also in AddSynth Voice, the lowest possible setting now silences the output.
+Previously it was -40dB and -60dB respectively, and this could result in unwanted sound 'leakage'. This doesn't affect any higher volume settings so previously stored MIDI recordings will sound the same.
+
+
+There is a global bank search entry in the main window's instrument menu, and a button in the instrument bank window.
+This opens a list by instrument type. It is derived from a scan of the entire bank structure, so you can very quickly try out a wide range from this list on the currently selected part. The Instrument names are prefaced with the bank root ID, bank ID and instrument number (as recognised by MIDI). As usual, we like to keep people informed with precise and relevant information :)
+
+
+In the main window there is a button to temporarily disable an individual system effect.
+This covers a bit of an oversight. Previously you could only use the 'No Effect' position in the type list, but doing that lost any previous settings, and the only way to get them back was to re-load the patchset / state. This could get quite tedious and also was a bit of a problem if you hadn't at that point saved them!
+
+With Insert effects, you can already use the 'Off' position in the destination without losing the settings, and for part effects the same applies using 'Bypass'.
+
+
+In the part editor window there is now a 'Velocity' slider as part of 'Humanise'.
+This operates in a similar way to the exisiting slider (renamed to 'Detune')
+It gives a small random velocity reduction. As well as reducing the perceived volume it will affect any velocity sensitive feature such as filters.
+
+
+We've made an improvement to the way recent histories are managed.
+In all of these, the last used file is placed at the top of the list. This works well, as the reorganisation means your favourites will always be the easiest to reach. However, this 'mobility' isn't always what you want - especially if you are working from the command line.
+
+There now is a set of config switches so that you can independently lock each of these lists against change. In the locked state loading or saving new files will not update the associated history list at all. At any time, you can of course unlock the list again.
+
+Also, the history file is unique in that it is entirely internally generated, and the file is common across all instances. Although treated as a config setting, the new switch settings are actually embedded in the history file itself, which ensures consistency.
+
+
+All the above features are, of course, also available to the command line interface.
+
+
+'Reports' and 'Midi Learn' openers have been swapped.
+We generally try to avoid changing the GUI, but users tend to just leave 'Reports' passively open (or not used at all). However, the 'Midi Learn' window is actively used a great deal. It now has the button on the main window.
+
+There is a new group of easy to use NRPNs.
+Those who have been using Yoshimi for a long time will remember how changing the bank structure enabled us to reliably make bank and program changes via MIDI. Well, the same is now true of all of these histories.
+Specifically the following:
+
+NRPN high (CC99) - 96
+NRPN low (CC 98) - list type
+0 - Instrument
+1 - patch set
+2 - scale
+3 - state
+4 - vector
+5 - MIDI learn
+
+DATA low (CC38) - list entry number (counting from zero)
+
+DATA high (CC6)
+For Instruments, it's the part number to load it to. If a number greater than 63 is set the instrument will be loaded to the last part number (if any) seen by previous NRPNs. If there is no previous part, the control will be ignored on the basis that no change is better than an undefined one.
+
+For Vectors its the base channel. If a number greater than 15 is set, the vector will be loaded to the channel it was originally saved from.
+
+For the other lists it is advisable to set CC6 to zero, in case we make use of this parameter at a later date.
+
+As usual, all numbering starts from zero.
+
+All of the lists can have up to 25 entries, so for live gigging musicians, it is now possible to set switches on a hardware MIDI controller to send these NRPNs. At the touch of a button you can (for example) change patch sets, or entire states on the fly - and without so much as a faint click :)
+
+
+There have been improvements to Copy/Paste.
+Over time changes had been made that resulted in altered saved types and confusing titles. These have been sorted out, and for compatibility, where types were changed both are now recognised. Also the preset roots follow a similiar structure to that of banks, and you see only the ones in the *current* root, so no longer have the confusion of seeing identical names in different locations - possibly with quite different contents.
+
+
+There is tighter control of startup.
+A new feature is the ability to configure Yoshimi so that on a desktop startup it checks to see if there is a main instance already running. If there is, the new one sends the running one a message to open the next available instance, then gracefully exits. This is not only a more efficient way of working but makes session saving simpler (especially if instance autostart is enabled). It also gives protection against bank structures getting out of sync.
+
+This capability can be set within 'config'.
+
+
+Incidentally, whenever we add new features, the default is always to keep the existing behaviour.
+
+
+The Advanced User Manual has been considarably expanded.
+There are corrections, updates (where features have changed) and a lot more descriptive detail. More attention has been given to explaining 'Why' as well as 'How' and 'What'.
+
+
+Under the hood
+Ring buffers have now been changed to a bespoke type.
+These are are used quite extensively in Yoshimi. They are now specifically tailored for Yoshimi. The code is self-contained, more efficient, and easier to use. It also removes a dependency.
+
+Almost all file system operations have been moved to a single source file.
+Eventually the remainder will go there too. This will mean that future possible file system changes will only need updates in one place.
+
+As well as running headless, Yoshimi can now be built headless.
+Thus not requiring any graphics capability beyond a simple shell, or indeed (as a simple performance unit) entirely controlled by MIDI.
+
+The command line has additional protection against overlength lines, and corrupted data.
+Also one of Yoshimi's little band of helpers has done some major code re-factoring here, and in some low level functions.
+
+A few more bugs have been squashed, but these were mostly regressions since the release of V 1.5.11.
