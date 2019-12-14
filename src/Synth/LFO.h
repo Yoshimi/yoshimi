@@ -51,7 +51,7 @@ class LFO
         float lfointensity;
         float lfornd;
         float lfofreqrnd;
-        float lfodelay;
+        float lfoelapsed;
         char lfotype;
         int freqrndenabled;
 

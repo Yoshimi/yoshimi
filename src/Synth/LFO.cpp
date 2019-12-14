@@ -54,7 +54,7 @@ LFO::LFO(LFOParams *_lfopars, float _basefreq, SynthEngine *_synth):
         x = fmodf((((int)lfopars->Pstartphase - 64) / 127.0f + 1.0f + tmp), 1.0f);
     }
 
-    lfodelay = lfopars->Pdelay / 127.0f * 4.0f; // 0..4 sec
+    lfoelapsed = 0.0f;
     incrnd = nextincrnd = 1.0f;
 
     Recompute();
@@ -161,7 +161,8 @@ float LFO::lfoout(void)
         out *= lfointensity * (amp1 + x * (amp2 - amp1));
     else
         out *= lfointensity * amp2;
-    if (lfodelay < 0.00001f)
+    float lfodelay = lfopars->Pdelay / 127.0f * 4.0f; // 0..4 sec
+    if (lfoelapsed >= lfodelay)
     {
         if (!freqrndenabled)
             x += incx;
@@ -179,7 +180,7 @@ float LFO::lfoout(void)
             computenextincrnd();
         }
     } else
-        lfodelay -= synth->sent_all_buffersize_f / synth->samplerate_f;
+        lfoelapsed += synth->sent_all_buffersize_f / synth->samplerate_f;
 
     return out;
 }

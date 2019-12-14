@@ -31,9 +31,10 @@ using func::dB2rap;
 using func::rap2dB;
 
 
-Envelope::Envelope(EnvelopeParams *envpars, float basefreq, SynthEngine *_synth):
+Envelope::Envelope(EnvelopeParams *envpars, float basefreq_, SynthEngine *_synth):
     _envpars(envpars),
     envUpdate(envpars),
+    basefreq(basefreq_),
     synth(_synth)
 {
     envpoints = envpars->Penvpoints;
@@ -41,7 +42,6 @@ Envelope::Envelope(EnvelopeParams *envpars, float basefreq, SynthEngine *_synth)
         envpoints = MAX_ENVELOPE_POINTS;
     envsustain = (envpars->Penvsustain == 0) ? -1 : envpars->Penvsustain;
     forcedrelase = envpars->Pforcedrelease;
-    envstretch = powf(440.0f / basefreq, envpars->Penvstretch / 64.0f);
     linearenvelope = envpars->Plinearenvelope;
 
     recomputePoints();
@@ -50,7 +50,6 @@ Envelope::Envelope(EnvelopeParams *envpars, float basefreq, SynthEngine *_synth)
     keyreleased = 0;
     t = 0.0f;
     envfinish = 0;
-    inct = envdt[1];
     envoutval = 0.0f;
 }
 
@@ -77,6 +76,8 @@ void Envelope::recomputePoints()
         mode = ENVMODE::amplitudeLog; // change to log envelope
     if (mode == ENVMODE::amplitudeLog && linearenvelope != 0)
         mode = ENVMODE::amplitudeLin; // change to linear
+
+    envstretch = powf(440.0f / basefreq, _envpars->Penvstretch / 64.0f);
 
     float bufferdt = synth->sent_all_buffersize_f / synth->samplerate_f;
 
@@ -151,19 +152,18 @@ float Envelope::envout(void)
             currentpoint = envsustain + 2;
             forcedrelase = 0;
             t = 0.0f;
-            inct = envdt[currentpoint];
             if (currentpoint >= envpoints || envsustain < 0)
                 envfinish = 1;
         }
         return out;
     }
-    if (inct >= 1.0f)
+    if (envdt[currentpoint] >= 1.0f)
         out = envval[currentpoint];
     else
         out = envval[currentpoint - 1] + (envval[currentpoint]
               - envval[currentpoint - 1]) * t;
 
-    t += inct;
+    t += envdt[currentpoint];
     if (t >= 1.0f)
     {
         if (currentpoint >= envpoints - 1)
@@ -171,7 +171,6 @@ float Envelope::envout(void)
         else
             currentpoint++;
         t = 0.0f;
-        inct = envdt[currentpoint];
     }
 
     envoutval = out;
@@ -195,11 +194,10 @@ float Envelope::envout_dB(void)
         float v2 = dB2rap(envval[1]);
         out = v1 + (v2 - v1) * t;
 
-        t += inct;
+        t += envdt[1];
         if (t >= 1.0f)
         {
             t = 0.0f;
-            inct = envdt[2];
             currentpoint++;
             out = v2;
         }

@@ -34,7 +34,7 @@ class SynthEngine;
 class Envelope
 {
     public:
-        Envelope(EnvelopeParams *envpars, float basefreq, SynthEngine *_synth);
+        Envelope(EnvelopeParams *envpars, float basefreq_, SynthEngine *_synth);
         ~Envelope() { };
         void releasekey(void);
         void recomputePoints(void);
@@ -52,12 +52,12 @@ class Envelope
         float envstretch;
         int linearenvelope;
 
+        float basefreq;
         int currentpoint; // current envelope point (starts from 1)
         int forcedrelase;
         char keyreleased; // if the key was released
         char envfinish;
         float t;          // the time from the last point
-        float inct;       // the time increment
         float envoutval;  // used to do the forced release
 
         SynthEngine *synth;
