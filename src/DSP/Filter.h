@@ -36,7 +36,7 @@ class SynthEngine;
 class Filter
 {
     public:
-        Filter(FilterParams *pars, SynthEngine *_synth);
+        Filter(FilterParams *pars_, SynthEngine *_synth);
         ~Filter();
         void filterout(float *smp);
         void setfreq(float frequency);
@@ -45,6 +45,10 @@ class Filter
         float getrealfreq(float freqpitch);
 
     private:
+        void updateCurrentParameters();
+
+        FilterParams *pars;
+        Presets::PresetsUpdate parsUpdate;
         Filter_ *filter;
         unsigned char category;
 

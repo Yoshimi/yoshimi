@@ -40,7 +40,6 @@ class SVFilter : public Filter_
         void setq(float q_);
 
         void settype(int type_);
-        void setgain(float dBgain);
         void setstages(int stages_);
         void cleanup();
 
@@ -59,7 +58,6 @@ class SVFilter : public Filter_
         int stages;    // how many times the filter is applied (0->1,1->2,etc.)
         float freq; // Frequency given in Hz
         float q;    // Q factor (resonance or Q factor)
-        float gain; // the gain of the filter (if are shelf/peak) filters
 
         int abovenq;   // this is 1 if the frequency is above the nyquist
         int oldabovenq;
