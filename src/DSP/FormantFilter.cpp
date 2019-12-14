@@ -35,7 +35,9 @@ using synth::interpolateAmplitude;
 using func::dB2rap;
 
 
-FormantFilter::FormantFilter(FilterParams *pars, SynthEngine *_synth):
+FormantFilter::FormantFilter(FilterParams *pars_, SynthEngine *_synth):
+    pars(pars_),
+    parsUpdate(pars_),
     synth(_synth)
 {
     numformants = pars->Pnumformants;
@@ -45,13 +47,6 @@ FormantFilter::FormantFilter(FilterParams *pars, SynthEngine *_synth):
     inbuffer = (float*)fftwf_malloc(synth->bufferbytes);
     tmpbuf = (float*)fftwf_malloc(synth->bufferbytes);
 
-    for (int j = 0; j < FF_MAX_VOWELS; ++j)
-        for (int i = 0; i < numformants; ++i)
-        {
-            formantpar[j][i].freq = pars->getformantfreq(pars->Pvowels[j].formants[i].freq);
-            formantpar[j][i].amp = pars->getformantamp(pars->Pvowels[j].formants[i].amp);
-            formantpar[j][i].q = pars->getformantq(pars->Pvowels[j].formants[i].q);
-        }
     for (int i = 0; i < FF_MAX_FORMANTS; ++i)
         oldformantamp[i] = 1.0f;
     for (int i = 0; i < numformants; ++i)
@@ -61,26 +56,20 @@ FormantFilter::FormantFilter(FilterParams *pars, SynthEngine *_synth):
         currentformants[i].q = 2.0f;
     }
 
-    formantslowness = powf(1.0f - (pars->Pformantslowness / 128.0f), 3.0f);
-
     sequencesize = pars->Psequencesize;
     if (sequencesize == 0)
         sequencesize = 1;
     for (int k = 0; k < sequencesize; ++k)
         sequence[k].nvowel = pars->Psequence[k].nvowel;
 
-    vowelclearness = powf(10.0f, (pars->Pvowelclearness - 32.0f) / 48.0f);
-
-    sequencestretch = powf(0.1f, (pars->Psequencestretch - 32.0f) / 48.0f);
-    if (pars->Psequencereversed)
-        sequencestretch *= -1.0f;
-
-    outgain = dB2rap(pars->getgain());
-
     oldinput = -1.0f;
-    Qfactor = pars->getq();
     oldQfactor = Qfactor;
     firsttime = 1;
+
+    // Prevent parameter update happening next time.
+    parsUpdate.checkUpdated();
+    // And do it now.
+    updateCurrentParameters();
 }
 
 
@@ -103,14 +92,18 @@ void FormantFilter::cleanup()
 void FormantFilter::setpos(float input)
 {
     int p1, p2;
+    bool needsUpdate = parsUpdate.checkUpdated();
+
+    if (needsUpdate)
+        updateCurrentParameters();
 
     if (firsttime)
         slowinput = input;
     else
         slowinput = slowinput * (1.0f - formantslowness) + input * formantslowness;
 
-    if ((fabsf(oldinput-input) < 0.001f) && (fabsf(slowinput - input) < 0.001f) &&
-            (fabsf(Qfactor - oldQfactor) < 0.001f))
+    if (!needsUpdate && (fabsf(oldinput-input) < 0.001f) &&
+            (fabsf(slowinput - input) < 0.001f) && (fabsf(Qfactor - oldQfactor) < 0.001f))
     {
         //	oldinput=input; daca setez asta, o sa faca probleme la schimbari foarte lente
         firsttime = 0;
@@ -173,6 +166,29 @@ void FormantFilter::setpos(float input)
         }
     }
     oldQfactor = Qfactor;
+}
+
+void FormantFilter::updateCurrentParameters()
+{
+    for (int j = 0; j < FF_MAX_VOWELS; ++j)
+        for (int i = 0; i < numformants; ++i)
+        {
+            formantpar[j][i].freq = pars->getformantfreq(pars->Pvowels[j].formants[i].freq);
+            formantpar[j][i].amp = pars->getformantamp(pars->Pvowels[j].formants[i].amp);
+            formantpar[j][i].q = pars->getformantq(pars->Pvowels[j].formants[i].q);
+        }
+
+    formantslowness = powf(1.0f - (pars->Pformantslowness / 128.0f), 3.0f);
+
+    vowelclearness = powf(10.0f, (pars->Pvowelclearness - 32.0f) / 48.0f);
+
+    sequencestretch = powf(0.1f, (pars->Psequencestretch - 32.0f) / 48.0f);
+    if (pars->Psequencereversed)
+        sequencestretch *= -1.0f;
+
+    outgain = dB2rap(pars->getgain());
+
+    Qfactor = pars->getq();
 }
 
 

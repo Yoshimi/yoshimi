@@ -34,7 +34,7 @@ class SynthEngine;
 class FormantFilter : public Filter_
 {
     public:
-        FormantFilter(FilterParams *pars, SynthEngine *_synth);
+        FormantFilter(FilterParams *pars_, SynthEngine *_synth);
         ~FormantFilter();
         void filterout(float *smp);
         void setfreq(float frequency);
@@ -44,7 +44,10 @@ class FormantFilter : public Filter_
 
     private:
         void setpos(float input);
+        void updateCurrentParameters();
 
+        FilterParams *pars;
+        Presets::PresetsUpdate parsUpdate;
 
         AnalogFilter *formant[FF_MAX_FORMANTS];
         float *inbuffer, *tmpbuf;
