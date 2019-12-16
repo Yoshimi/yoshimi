@@ -637,8 +637,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
             label {Save as &Default}
             callback {//
                 string name = synth->getRuntime().defaultStateName;
-                if (instance > 0)
-                    name += ("-" + to_string(instance));
+                name += ("-" + to_string(instance));
                 send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(name + ".state"));}
             tooltip {Save as default state (if load default checked)} xywh {0 0 34 21} labelsize 12
           }
