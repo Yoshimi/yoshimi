@@ -8,7 +8,7 @@ There has been a correction to Scales note and frequency allocation terminology.
 
 The mixer panel format can now be changed from Yoshimi->Settings. This is to allow for use on very low resolution screens and window managers that try to be clever and centre windows that are taller than the screen, chopping off both the top and bottom. Exactly where 'Close' icons tend to be.
 
-The CLI now has additional controls, particularly in banks and roots management. There are still a few missing, but not many!
+The CLI now has additional controls, particularly in banks and roots management. There are still a few missing, but not many! Also some of these have been changed for better consistency.
 
 
 Other stuff.
@@ -17,7 +17,7 @@ We've had to do an update to allow for the change in the MXML API. That one came
 
 Quite a lot of the drawn graphics were using dots and dashes. These were virtually invisible, looking just like solid lines, but FLTKs handling of them has a significant processing overhead on machines with limited or no GPU control. These are now all solid lines.
 
-Session/State/Config managment is now unified, and more system settings can be changed by these files as Yoshimi instances start. For this it was necessary to change the config and instance files slightly, but they are examined at startup and changed if necessary, so transparent to the user.
+Session/State/Config managment is now unified, and more system settings can be changed by these files as Yoshimi instances start. For this it was necessary to change the config and instance files slightly, but they are examined at startup and modified as necessary, so transparent to the user.
 
 
-And finally, The Advanced User Manual has been significantly updated.
+And finally, The Advanced User Guide has been significantly updated.

@@ -53,9 +53,8 @@
  * for LFO freq turns actual value 85.25 into 85250000
  * current step size 0.06 becomes 6000
  *
- * scales A frequency now restricted to +- 0.5 octave
- * 660Hz becomes 660000000
- * At 329Hz resolution is still better than 1/10000 cent
+ * scales reference frequency 440Hz becomes 440000000
+ * At 20Hz resolution is still better than 1/1000 cent
  * Assumed detectable interval is 5 cents
  *
  * also use for integers that need higher resolution
@@ -194,7 +193,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         const unsigned char Maximum = 2; // return this value
         const unsigned char Default = 3; // return this value
         // remaining used bit-wise
-        const unsigned char Limits = 4;
+        const unsigned char Limits = 4; // read above limits
         const unsigned char Error = 8;
         const unsigned char LearnRequest = 16;
         const unsigned char Learnable = 32;
@@ -208,6 +207,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         const unsigned char fromMIDI = 1;
         const unsigned char fromCLI = 2;
         const unsigned char fromGUI = 3;
+        // space for any other sources
         const unsigned char noAction = 15; // internal use
         // remaining used bit-wise
         const unsigned char forceUpdate = 32;
@@ -332,16 +332,16 @@ namespace BANK // usage BANK::control::
         // actual control should probably be here
         readInstrumentName = 0, // in bank, by ID
         findInstrumentName, // next in list or '*' if at end
-        renameInstrument, // not yet
+        renameInstrument, // in bank
         saveInstrument, // to bank
         deleteInstrument, // from bank
         selectFirstInstrumentToSwap,
         selectSecondInstrumentAndSwap,
 
         selectBank = 16, // in root, by ID or read ID + name
-        renameBank, // or rerad just the name
-        createBank, // not yet - currently add at top level
-        deleteBank, // not yet - currently remove at top level
+        renameBank, // or read just the name
+        createBank, // not yet - currently 'add' at top level
+        deleteBank, // not yet - currently 'remove' at top level
         selectFirstBankToSwap,
         selectSecondBankAndSwap,
         importBank, // not yet (currently done in main)
@@ -466,11 +466,11 @@ namespace MIDI // usage MIDI::control::noteOn
     };
 }
 
-namespace SCALES // usage SCALES::control::Afrequency
+namespace SCALES // usage SCALES::control::refFrequency
 {
     enum control : unsigned char {
-        Afrequency = 0,
-        Anote,
+        refFrequency = 0,
+        refNote,
         invertScale,
         invertedScaleCenter,
         scaleShift,

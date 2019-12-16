@@ -91,8 +91,8 @@ void Microtonal::defaults(void)
     Pinvertupdowncenter = 60;
     octavesize = 12;
     Penabled = 0;
-    PAnote = 69;
-    PAfreq = 440.0f;
+    PrefNote = 69;
+    PrefFreq = 440.0f;
     Pscaleshift = 64;
 
     Pfirstkey = 0;
@@ -163,7 +163,7 @@ float Microtonal::getNoteFreq(int note, int keyshift)
             return -1.0f;
         // Compute how many mapped keys are from middle note to reference note
         // and find out the proportion between the freq. of middle note and "A" note
-        int tmp = PAnote - Pmiddlenote, minus = 0;
+        int tmp = PrefNote - Pmiddlenote, minus = 0;
         if (tmp < 0)
         {
             tmp   = -tmp;
@@ -203,18 +203,18 @@ float Microtonal::getNoteFreq(int note, int keyshift)
 
         freq = (degkey == 0) ? (1.0f) : octave[degkey - 1].tuning;
         freq *= powf(octave[octavesize - 1].tuning, degoct);
-        freq *= PAfreq / rap_anote_middlenote;
+        freq *= PrefFreq / rap_anote_middlenote;
     }
     else // if the mapping is disabled
     {
-        int nt = note - PAnote + scaleshift;
+        int nt = note - PrefNote + scaleshift;
         int ntkey = (nt + octavesize * 100) % octavesize;
         // cast octavesize to a signed type so the expression stays signed
         int ntoct = (nt - ntkey) / int(octavesize);
 
         float oct  = octave[octavesize - 1].tuning;
         freq = octave[(ntkey + octavesize - 1) % octavesize].tuning
-               * powf(oct, ntoct) * PAfreq;
+               * powf(oct, ntoct) * PrefFreq;
         if (ntkey == 0)
             freq /= oct;
     }
@@ -603,7 +603,7 @@ int Microtonal::loadkbm(string filename)
             err = -7;
     }
 
-    float tmpPAfreq;
+    float tmpPrefFreq;
     if (err == 0)
     {
         // loads the reference freq.
@@ -612,9 +612,9 @@ int Microtonal::loadkbm(string filename)
         else
         {
 
-            if (!sscanf(&tmp[0], "%f", &tmpPAfreq))
+            if (!sscanf(&tmp[0], "%f", &tmpPrefFreq))
                 err = -6;
-            else if (tmpPAfreq < 1 || tmpPAfreq > 20000)
+            else if (tmpPrefFreq < 1 || tmpPrefFreq > 20000)
                 err = -8;
         }
     }
@@ -650,8 +650,8 @@ int Microtonal::loadkbm(string filename)
     Pfirstkey = tmpFirst;
     Plastkey = tmpLast;
     Pmiddlenote = tmpMid;
-    PAnote = tmpNote;
-    PAfreq = tmpPAfreq;
+    PrefNote = tmpNote;
+    PrefFreq = tmpPrefFreq;
     synth->setAllPartMaps();
     return tmpMapSize;
 }
@@ -668,8 +668,8 @@ void Microtonal::add2XML(XMLwrapper *xml)
     xml->addparbool("enabled", Penabled);
     xml->addpar("global_fine_detune", lrint(Pglobalfinedetune));
 
-    xml->addpar("a_note", PAnote);
-    xml->addparreal("a_freq", PAfreq);
+    xml->addpar("a_note", PrefNote);
+    xml->addparreal("a_freq", PrefFreq);
 
     if (!Penabled && xml->minimal)
         return;
@@ -728,8 +728,8 @@ void Microtonal::getfromXML(XMLwrapper *xml)
     Penabled=xml->getparbool("enabled", Penabled);
     Pglobalfinedetune = xml->getpar127("global_fine_detune", Pglobalfinedetune);
 
-    PAnote = xml->getpar127("a_note", PAnote);
-    PAfreq = xml->getparreal("a_freq", PAfreq, 1.0, 10000.0);
+    PrefNote = xml->getpar127("a_note", PrefNote);
+    PrefFreq = xml->getparreal("a_freq", PrefFreq, 1.0, 10000.0);
 
     if (xml->enterbranch("SCALE"))
     {
@@ -853,12 +853,12 @@ float Microtonal::getLimits(CommandBlock *getData)
 
     switch (control)
     {
-        case SCALES::control::Afrequency:
+        case SCALES::control::refFrequency:
             min = A_MIN;
             def = A_DEF;
             max = A_MAX;
             break;
-        case SCALES::control::Anote:
+        case SCALES::control::refNote:
             min = 24;
             def = 69;
             max = 84;

@@ -1,49 +1,24 @@
-V1.6.0
+V1.6.1
 
-Yoshimi is now 10 years old and (while fully respecting its origins) is forging it's own path into the future. Do come along for the ride.
+For ALSA MIDI there is a search mode where Yoshimi will connect to every readable source it can find.
 
+There has been a correction to Scales note and frequency allocation terminology.
 
-Our headline feature is extensions to AddSynth voices and modulators.
+The mixer panel format can now be changed from Yoshimi->Settings.
 
-There is a new AddSynth noise type.
+The CLI has additional controls, particularly in banks and roots management.
 
-There are extra mute options.
+Other stuff.
 
-There is a global bank search entry in the main window's instrument menu, and a button in the instrument bank window.
+We've had to do an update to allow for the change in the MXML API.
 
-Also in the main window there is a button to temporarily disable an individual system effect.
+Dots and dashes in grids are now solid lines. They render much faster.
 
-In the part editor window there is now a 'Humanise Velocity' slider.
+Session/State/Config managment is now unified. More system settings can be changed by these files as Yoshimi instances start.
 
-We've made an improvement to the way recent histories are managed.
+The Advanced User Manual has been significantly updated.
 
-All the above features are, of course, also available to the command line interface.
-
-'Reports' and 'Midi Learn' openers have been swapped.
-
-There is a new group of easy to use NRPNs.
-
-There have been improvements to Copy/Paste.
-
-There is tighter control of startup.
-
-Incidentally, whenever we add new features, the default is always to keep the existing behaviour.
-
-The Advanced User Manual has been considerably Expanded.
-
-
-Under the hood
-
-Ring buffers have now been changed to a bespoke type.
-
-Almost all file system operations have been moved to a single source file.
-
-As well as running headless, Yoshimi can now be built headless.
-
-The command line has additional protection against overlength lines, and corrupted data.
-
-
-More details in /doc/Yoshimi_1.6.0_features.txt
+More details on all of these are in /doc/Yoshimi_1.6.1_features.txt
 
 
 Yoshimi source code is available from either:

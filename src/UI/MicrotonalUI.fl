@@ -115,56 +115,56 @@ class MicrotonalUI {} {
         }
         Fl_Spinner anotecounter {
           callback {//
-          send_data(0, SCALES::control::Anote, o->value(), TOPLEVEL::type::Integer);}
+          send_data(0, SCALES::control::refNote, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Midi note range: 24 (C1) to 84 (C6)} xywh {192 23 45 17} box FLAT_BOX labelsize 11 align 1 minimum 24 maximum 84 value 69 textfont 1 textsize 11
-          code0 {o->value(microtonal->PAnote);}
+          code0 {o->value(microtonal->PrefNote);}
         }
         Fl_Value_Input afreqinput {
           label {Freq.}
           callback {//
-          Afreq = o->value();
+          refFreq = o->value();
           afreqset->show();
           AsetBack->show();}
           tooltip {The frequency of the reference note (default: A4=440.0)} xywh {114 20 55 20} labelsize 11 align 1 minimum 30 maximum 1100 value 440 textfont 1 textsize 10
           code0 {o->step(0.001, 1);}
-          code1 {Afreq = microtonal->PAfreq;}
-          code2 {o->value(Afreq);}
+          code1 {refFreq = microtonal->PrefFreq;}
+          code2 {o->value(refFreq);}
         }
         Fl_Button AsetBack {
           callback {//
-          if(Afreq < A_MIN)
+          if(refFreq < A_MIN)
           {
-              Afreq = A_MIN;
-              afreqinput->value(Afreq);
+              refFreq = A_MIN;
+              afreqinput->value(refFreq);
           }
-          else if(Afreq > A_MAX)
+          else if(refFreq > A_MAX)
           {
-              Afreq = A_MAX;
-              afreqinput->value(Afreq);
+              refFreq = A_MAX;
+              afreqinput->value(refFreq);
           }
 
           afreqset->hide();
           o->hide();
 
-          send_data(0, SCALES::control::Afrequency, Afreq, 0);}
+          send_data(0, SCALES::control::refFrequency, refFreq, 0);}
           xywh {171 22 14 17} box THIN_DOWN_BOX color 45 hide
         }
         Fl_Return_Button afreqset {
           callback {//
-          if(Afreq < A_MIN)
+          if(refFreq < A_MIN)
           {
-              Afreq = A_MIN;
-              afreqinput->value(Afreq);
+              refFreq = A_MIN;
+              afreqinput->value(refFreq);
           }
-          else if(Afreq > A_MAX)
+          else if(refFreq > A_MAX)
           {
-              Afreq = A_MAX;
-              afreqinput->value(Afreq);
+              refFreq = A_MAX;
+              afreqinput->value(refFreq);
           }
           AsetBack->hide();
           o->hide();
 
-          send_data(0, SCALES::control::Afrequency, Afreq, 0);}
+          send_data(0, SCALES::control::refFrequency, refFreq, 0);}
           xywh {166 20 14 18} box NO_BOX hide
         }
       }
@@ -418,10 +418,10 @@ class MicrotonalUI {} {
 
     switch (control)
     {
-        case SCALES::control::Afrequency:
+        case SCALES::control::refFrequency:
             afreqinput->value(value);
             break;
-        case SCALES::control::Anote:
+        case SCALES::control::refNote:
             anotecounter->value(value_int);
             break;
         case SCALES::control::invertScale:
@@ -632,7 +632,7 @@ class MicrotonalUI {} {
   }
   decl {SynthEngine *synth;} {private local
   }
-  decl {float Afreq;} {private local
+  decl {float refFreq;} {private local
   }
   decl {int oldFirst;} {private local
   }

@@ -1,5 +1,5 @@
 
-Shortform (doesn't use the data bytes).
+Shortform (doesn't use the data bytes)
 CC 99   CC 98
 MSB     LSB
 0x41    0-0x1f  set channel switch row mode
@@ -10,7 +10,7 @@ MSB     LSB
 0x44    0x45    Shutdown Yoshimi immediately but with exit value 16
 
 
-Full
+Full (requires data bytes)
 CC 99   CC 98
 MSB     LSB
 0x40    0       Direct part control

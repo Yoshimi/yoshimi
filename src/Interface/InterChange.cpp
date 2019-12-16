@@ -458,7 +458,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                             else
                                 text += std::to_string(map);
                         }
-                        getData->data.kit = synth->microtonal.PAnote;
+                        getData->data.kit = synth->microtonal.PrefNote;
                         getData->data.engine = synth->microtonal.Pfirstkey;
                         getData->data.insert = synth->microtonal.Pmiddlenote;
                         getData->data.parameter |= synth->microtonal.Plastkey; // need to keep top bit
@@ -2262,25 +2262,25 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
 
     switch (control)
     {
-        case SCALES::control::Afrequency:
+        case SCALES::control::refFrequency:
             if (write)
             {
                 if (value > 2000)
                     value = 2000;
                 else if (value < 1)
                     value = 1;
-                synth->microtonal.PAfreq = value;
+                synth->microtonal.PrefFreq = value;
             }
             else
-                value = synth->microtonal.PAfreq;
-            getData->data.parameter = synth->microtonal.PAnote;
+                value = synth->microtonal.PrefFreq;
+            getData->data.parameter = synth->microtonal.PrefNote;
             break;
 
-        case SCALES::control::Anote:
+        case SCALES::control::refNote:
             if (write)
-                synth->microtonal.PAnote = value_int;
+                synth->microtonal.PrefNote = value_int;
             else
-                value = synth->microtonal.PAnote;
+                value = synth->microtonal.PrefNote;
             break;
         case SCALES::control::invertScale:
             if (write)

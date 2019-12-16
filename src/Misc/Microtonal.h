@@ -54,9 +54,9 @@ class Microtonal
         unsigned char Pinvertupdown;
         int           Pinvertupdowncenter;
         unsigned char Penabled;
-        int           PAnote;
+        int           PrefNote;
         int           Pscaleshift;
-        float         PAfreq;
+        float         PrefFreq;
 
         // first and last key (to retune)
         int Pfirstkey;
@@ -122,7 +122,7 @@ inline int Microtonal::getoctavesize(void)
 
 inline float Microtonal::getFixedNoteFreq(int note)
 {
-    return powf(2.0f, (float)(note - PAnote) / 12.0f) * PAfreq;
+    return powf(2.0f, (float)(note - PrefNote) / 12.0f) * PrefFreq;
 }
 
 

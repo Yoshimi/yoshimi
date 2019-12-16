@@ -1,4 +1,10 @@
-yoshimi 1.6.1 rc1
+yoshimi 1.6.1
+
+2019-12-15 Will
+* Minor text/info corrections and updates
+* Changed Anote, Afreq to refNote, refFreq
+  saved XML label NOT changed!
+* Set release version as 1.6.1
 
 2019-12-10 Will
 * Updated documentation.

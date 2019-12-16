@@ -416,7 +416,7 @@ string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
     string contstr = "";
     switch (control)
     {
-        case SCALES::control::Afrequency:
+        case SCALES::control::refFrequency:
             if (addValue)
             {
                 if (parameter >= 21 && parameter <= 84)
@@ -426,7 +426,7 @@ string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
             }
             contstr += " Frequency";
             break;
-        case SCALES::control::Anote:
+        case SCALES::control::refNote:
             showValue = false;
             contstr = "Ref note ";
             if (addValue)

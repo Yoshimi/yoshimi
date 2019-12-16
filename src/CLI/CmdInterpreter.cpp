@@ -3517,13 +3517,13 @@ int CmdInterpreter::commandScale(Parser& input, unsigned char controlType)
         int max = 127;
         if (input.matchnMove(2, "frequency"))
         {
-            command = SCALES::control::Afrequency;
+            command = SCALES::control::refFrequency;
             min = 1;
             max = 20000;
             controlType &= ~TOPLEVEL::type::Integer; // float
         }
         else if(input.matchnMove(2, "note"))
-            command = SCALES::control::Anote;
+            command = SCALES::control::refNote;
         else if(input.matchnMove(1, "invert"))
         {
             command = SCALES::control::invertScale;
