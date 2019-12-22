@@ -2,7 +2,7 @@
 <!-- Copyright 2016-2019 Yoshimi project <willgodfrey@musically.me.uk> -->
 <component type="desktop">
   <id>yoshimi.desktop</id>
-  <metadata_license>CC-4.0</metadata_license>
+  <metadata_license>CC-BY-4.0</metadata_license>
   <project_license>GPL-2.0+</project_license>
   <name>Yoshimi</name>
   <summary>A Software Synthesizer for Linux</summary>
