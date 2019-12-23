@@ -3188,8 +3188,15 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
                         showValue = false;
                         break;
                     case 11:
+                    {
                         contstr = " Pre dist.";
-                        // fallthrough intended
+                        if (value)
+                            contstr += " - on";
+                        else
+                            contstr+= " - off";
+                        showValue = false;
+                        break;
+                    }
                     case 7:
                     case 10:
                     {

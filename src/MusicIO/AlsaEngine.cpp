@@ -498,12 +498,12 @@ void *AlsaEngine::AudioThread(void)
                 case SND_PCM_STATE_SUSPENDED:
                     if (!xrunRecover())
                         break;
-                    // else fall through to ...
+                    /* falls through */
                 case SND_PCM_STATE_SETUP:
                     if (alsaBad(snd_pcm_prepare(audio.handle),
                                 "alsa audio pcm prepare failed"))
                         break;
-                    // and again
+                    /* falls through */
                 case SND_PCM_STATE_PREPARED:
                     alsaBad(snd_pcm_start(audio.handle), "pcm start failed");
                     break;

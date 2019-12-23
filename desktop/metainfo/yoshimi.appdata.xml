@@ -23,7 +23,7 @@
 
   <screenshots>
     <screenshot type="default">
-       <image>https://a.fsdn.com/con/app/proj/yoshimi/screenshots/Main.png</image>
+       <image>https://a.fsdn.com/con/app/proj/yoshimi/screenshots/Front.png</image>
        <caption>The main window showing Yoshimi running</caption>
     </screenshot>
     <screenshot>
@@ -36,5 +36,4 @@
     </screenshot>
   </screenshots>
   <url type="homepage">https://sourceforge.net/projects/yoshimi/</url>
-  <updatecontact>willgodfrey@musically.me.uk</updatecontact>
 </component>

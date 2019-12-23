@@ -1,5 +1,9 @@
 yoshimi 1.6.1 M
 
+2019-12-23 Will
+* Resolved warnings given by GCC V8.
+* Corrected appdata errors reported by debian.
+
 2019-12-21 Will
 * Small adjustment to User manual.
 * Updated ToDo list.
