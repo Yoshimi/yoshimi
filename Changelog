@@ -1,5 +1,9 @@
 yoshimi 1.6.1 M
 
+2019-12-28 Will
+* Removed modal from instrument search window.
+  Should never have been set! No need to block.
+
 2019-12-23 Will
 * Resolved warnings given by GCC V8.
 * Corrected appdata errors reported by debian.

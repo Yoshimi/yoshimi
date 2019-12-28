@@ -515,7 +515,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     }
     Fl_Window searchwin {
       label {Bank Search}
-      xywh {444 123 305 490} type Double box PLASTIC_THIN_UP_BOX color 22 hide modal
+      xywh {444 123 305 490} type Double box PLASTIC_THIN_UP_BOX color 22 hide
     } {
       Fl_Browser searchbrowse {
         callback {//
