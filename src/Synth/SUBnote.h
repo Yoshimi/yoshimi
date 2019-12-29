@@ -106,7 +106,9 @@ class SUBnote
             float yn2;   // filter internal values
         };
 
-        void initNewFilters();
+        // Returns the number of new filters created
+        int createNewFilters();
+
         void initfilters(int startIndex);
         void initfilter(bpfilter &filter, float mag);
         float computerolloff(float freq);

@@ -183,7 +183,7 @@ void SUBnote::KillNote(void)
     }
 }
 
-void SUBnote::initNewFilters()
+int SUBnote::createNewFilters()
 {
     bool alreadyEnabled[MAX_SUB_HARMONICS];
     memset(alreadyEnabled, 0, sizeof(alreadyEnabled));
@@ -201,6 +201,9 @@ void SUBnote::initNewFilters()
         pos[numharmonics++] = n;
         alreadyEnabled[n] = true;
     }
+
+    if (numharmonics == origNumHarmonics)
+        return 0;
 
     bpfilter *newFilter = new bpfilter[numstages * numharmonics];
     if (lfilter != NULL)
@@ -220,7 +223,7 @@ void SUBnote::initNewFilters()
         rfilter = newFilter;
     }
 
-    initfilters(origNumHarmonics);
+    return numharmonics - origNumHarmonics;
 }
 
 void SUBnote::setBaseFreq()
@@ -832,7 +835,7 @@ float SUBnote::getHgain(int harmonic)
 
 void SUBnote::updatefilterbank(void)
 {
-    initNewFilters();
+    int createdFilters = createNewFilters();
 
     // moved from noteon
     // how much the amplitude is normalised (because the harmonics)
@@ -883,6 +886,7 @@ void SUBnote::updatefilterbank(void)
         }
     }
 
+    initfilters(numharmonics - createdFilters);
     computeallfiltercoefs();
 
     if (reduceamp < 0.001f)
