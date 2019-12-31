@@ -348,7 +348,6 @@ void ADnote::construct()
     }
 
     initParameters();
-    computeNoteParameters();
     initSubVoices();
 
     globalnewamplitude = NoteGlobalPar.Volume
@@ -527,6 +526,14 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
                     adpars->VoicePar[vc].FMSmp->newrandseed();
             }
         }
+    }
+
+    computeNoteParameters();
+
+    for (nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
+    {
+        if (!NoteVoicePar[nvoice].Enabled)
+            continue;
 
         FMnewamplitude[nvoice] = NoteVoicePar[nvoice].FMVolume * ctl->fmamp.relamp;
 
@@ -535,8 +542,6 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
             FMnewamplitude[nvoice] *=
                 NoteVoicePar[nvoice].FMAmpEnvelope->envout_dB();
     }
-
-    computeNoteParameters();
 
     globalnewamplitude = NoteGlobalPar.Volume
                          * NoteGlobalPar.AmpEnvelope->envout_dB()
@@ -805,14 +810,24 @@ void ADnote::initParameters(void)
                 new Envelope(adpars->VoicePar[nvoice].FMFreqEnvelope,
                              basefreq, synth);
 
-        FMnewamplitude[nvoice] = NoteVoicePar[nvoice].FMVolume
-                                 * ctl->fmamp.relamp;
-
         if (adpars->VoicePar[nvoice].PFMAmpEnvelopeEnabled != 0)
-        {
             NoteVoicePar[nvoice].FMAmpEnvelope =
                 new Envelope(adpars->VoicePar[nvoice].FMAmpEnvelope,
                              basefreq, synth);
+    }
+
+    computeNoteParameters();
+
+    for (nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
+    {
+        if (!NoteVoicePar[nvoice].Enabled)
+            continue;
+
+        FMnewamplitude[nvoice] = NoteVoicePar[nvoice].FMVolume
+                                 * ctl->fmamp.relamp;
+
+        if (NoteVoicePar[nvoice].FMAmpEnvelope != NULL)
+        {
             FMnewamplitude[nvoice] *=
                 NoteVoicePar[nvoice].FMAmpEnvelope->envout_dB();
         }
