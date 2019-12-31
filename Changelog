@@ -1,5 +1,10 @@
 yoshimi 1.6.1 M
 
+2019-12-31 Will
+* Made slider knobs respond to mouse clicks.
+  Why was this missed for so long?
+* Added names to Yoshimi Control Numbers.ods
+
 2019-12-28 Will
 * Removed modal from instrument search window.
   Should never have been set! No need to block.
