@@ -7,3 +7,5 @@ Below are the ID numbers representing which history list is to be managed.
 3   State History        Entire system state
 4   Vector History       Per channel Vector controls
 5   MidiLearn History    Learned MIDI CC lists
+
+These values have now been superceeded by named constants in globals.h

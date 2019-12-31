@@ -8,4 +8,4 @@ channel aftertouch
 D0 = DF
 becomes CC 641
 
-This is now implemented for MIDI learn, and is translated as CC 129.
+This is now implemented for MIDI learn, and is further translated as CC 129.

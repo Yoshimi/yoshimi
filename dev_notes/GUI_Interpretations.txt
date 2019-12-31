@@ -12,6 +12,8 @@ unsigned char   insert
 unsigned char   parameter
 unsigned char   par2
 unsigned char   miscMsg
+unsigned char   spare1
+unsigned char   spare0
 
 string          name - handled via simple message system.
 
@@ -104,4 +106,4 @@ parameter
                 filter sequence position
 
 par2
-    used for offsets to some parameters, and for text messge ID numbers
+    used for offsets to some parameters
