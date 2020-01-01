@@ -47,14 +47,14 @@ class LFOParams : public Presets
         void defaults(void);
         void setPfreq(int32_t n);
         void getfromXML(XMLwrapper *xml);
-        void setPintensity(unsigned char n) { Pintensity = n; updated = true; }
+        void setPintensity(unsigned char n) { Pintensity = n; presetsUpdated(); }
         void setPstartphase(unsigned char n) { Pstartphase = n; }
-        void setPLFOtype(unsigned char n) { PLFOtype = n; updated = true; }
-        void setPrandomness(unsigned char n) { Prandomness = n; updated = true; }
-        void setPfreqrand(unsigned char n) { Pfreqrand = n; updated = true; }
+        void setPLFOtype(unsigned char n) { PLFOtype = n; presetsUpdated(); }
+        void setPrandomness(unsigned char n) { Prandomness = n; presetsUpdated(); }
+        void setPfreqrand(unsigned char n) { Pfreqrand = n; presetsUpdated(); }
         void setPdelay(unsigned char n) { Pdelay = n; }
-        void setPcontinous(unsigned char n) { Pcontinous = n; updated = true; }
-        void setPstretch(unsigned char n) { Pstretch = n; updated = true; }
+        void setPcontinous(unsigned char n) { Pcontinous = n; presetsUpdated(); }
+        void setPstretch(unsigned char n) { Pstretch = n; presetsUpdated(); }
 
         // MIDI Parameters
         int32_t PfreqI;
@@ -70,7 +70,6 @@ class LFOParams : public Presets
 
         int fel;         // kind of LFO - 0 frequency, 1 amplitude, 2 filter
        // static int time; // used by Pcontinous - moved to SynthEngine to make it per-instance
-        bool updated;
 
     private:
         // Default parameters

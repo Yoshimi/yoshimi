@@ -31,7 +31,10 @@ using func::dB2rap;
 using func::rap2dB;
 
 
-Envelope::Envelope(EnvelopeParams *envpars, float basefreq, SynthEngine *_synth):
+Envelope::Envelope(EnvelopeParams *envpars, float basefreq_, SynthEngine *_synth):
+    _envpars(envpars),
+    envUpdate(envpars),
+    basefreq(basefreq_),
     synth(_synth)
 {
     envpoints = envpars->Penvpoints;
@@ -39,63 +42,14 @@ Envelope::Envelope(EnvelopeParams *envpars, float basefreq, SynthEngine *_synth)
         envpoints = MAX_ENVELOPE_POINTS;
     envsustain = (envpars->Penvsustain == 0) ? -1 : envpars->Penvsustain;
     forcedrelase = envpars->Pforcedrelease;
-    envstretch = powf(440.0f / basefreq, envpars->Penvstretch / 64.0f);
     linearenvelope = envpars->Plinearenvelope;
 
-    if (!envpars->Pfreemode)
-        envpars->converttofree();
-
-    float bufferdt = synth->sent_all_buffersize_f / synth->samplerate_f;
-
-    int mode = envpars->Envmode;
-
-    // for amplitude envelopes
-    if (mode == ENVMODE::amplitudeLin && linearenvelope == 0)
-        mode = ENVMODE::amplitudeLog; // change to log envelope
-    if (mode == ENVMODE::amplitudeLog && linearenvelope != 0)
-        mode = ENVMODE::amplitudeLin; // change to linear
-
-    for (int i = 0; i < MAX_ENVELOPE_POINTS; ++i)
-    {
-        float tmp = envpars->getdt(i) / 1000.0f * envstretch;
-        if (tmp > bufferdt)
-            envdt[i] = bufferdt / tmp;
-        else
-            envdt[i] = 2.0f; // any value larger than 1
-
-        switch (mode)
-        {
-            case 2:
-                envval[i] = (1.0f - envpars->Penvval[i] / 127.0f) * MIN_ENVELOPE_DB;
-                break;
-
-            case 3:
-                envval[i] =
-                    (powf(2.0f, 6.0f * fabsf(envpars->Penvval[i] - 64.0f) / 64.0f) - 1.0f) * 100.0f;
-                if (envpars->Penvval[i] < 64)
-                    envval[i] = -envval[i];
-                break;
-
-            case 4:
-                envval[i] = (envpars->Penvval[i] - 64.0f) / 64.0f * 6.0f; // 6 octaves (filtru)
-                break;
-
-            case 5:
-                envval[i] = (envpars->Penvval[i] - 64.0f) / 64.0f * 10.0f;
-                break;
-
-            default:
-                envval[i] = envpars->Penvval[i] / 127.0f;
-        }
-    }
-
-    envdt[0] = 1.0f;
+    recomputePoints();
 
     currentpoint = 1; // the envelope starts from 1
     keyreleased = 0;
     t = 0.0f;
     envfinish = 0;
-    inct = envdt[1];
     envoutval = 0.0f;
 }
 
@@ -110,10 +64,66 @@ void Envelope::releasekey(void)
         t = 0.0f;
 }
 
+void Envelope::recomputePoints()
+{
+    if (!_envpars->Pfreemode)
+        _envpars->converttofree();
+
+    int mode = _envpars->Envmode;
+
+    // for amplitude envelopes
+    if (mode == ENVMODE::amplitudeLin && linearenvelope == 0)
+        mode = ENVMODE::amplitudeLog; // change to log envelope
+    if (mode == ENVMODE::amplitudeLog && linearenvelope != 0)
+        mode = ENVMODE::amplitudeLin; // change to linear
+
+    envstretch = powf(440.0f / basefreq, _envpars->Penvstretch / 64.0f);
+
+    float bufferdt = synth->sent_all_buffersize_f / synth->samplerate_f;
+
+    for (int i = 0; i < MAX_ENVELOPE_POINTS; ++i)
+    {
+        float tmp = _envpars->getdt(i) / 1000.0f * envstretch;
+        if (tmp > bufferdt)
+            envdt[i] = bufferdt / tmp;
+        else
+            envdt[i] = 2.0f; // any value larger than 1
+
+        switch (mode)
+        {
+            case 2:
+                envval[i] = (1.0f - _envpars->Penvval[i] / 127.0f) * MIN_ENVELOPE_DB;
+                break;
+
+            case 3:
+                envval[i] =
+                    (powf(2.0f, 6.0f * fabsf(_envpars->Penvval[i] - 64.0f) / 64.0f) - 1.0f) * 100.0f;
+                if (_envpars->Penvval[i] < 64)
+                    envval[i] = -envval[i];
+                break;
+
+            case 4:
+                envval[i] = (_envpars->Penvval[i] - 64.0f) / 64.0f * 6.0f; // 6 octaves (filtru)
+                break;
+
+            case 5:
+                envval[i] = (_envpars->Penvval[i] - 64.0f) / 64.0f * 10.0f;
+                break;
+
+            default:
+                envval[i] = _envpars->Penvval[i] / 127.0f;
+        }
+    }
+
+    envdt[0] = 1.0f;
+}
 
 // Envelope Output
 float Envelope::envout(void)
 {
+    if (envUpdate.checkUpdated())
+        recomputePoints();
+
     float out;
     if (envfinish)
     {   // if the envelope is finished
@@ -142,19 +152,18 @@ float Envelope::envout(void)
             currentpoint = envsustain + 2;
             forcedrelase = 0;
             t = 0.0f;
-            inct = envdt[currentpoint];
             if (currentpoint >= envpoints || envsustain < 0)
                 envfinish = 1;
         }
         return out;
     }
-    if (inct >= 1.0f)
+    if (envdt[currentpoint] >= 1.0f)
         out = envval[currentpoint];
     else
         out = envval[currentpoint - 1] + (envval[currentpoint]
               - envval[currentpoint - 1]) * t;
 
-    t += inct;
+    t += envdt[currentpoint];
     if (t >= 1.0f)
     {
         if (currentpoint >= envpoints - 1)
@@ -162,7 +171,6 @@ float Envelope::envout(void)
         else
             currentpoint++;
         t = 0.0f;
-        inct = envdt[currentpoint];
     }
 
     envoutval = out;
@@ -173,6 +181,9 @@ float Envelope::envout(void)
 // Envelope Output (dB)
 float Envelope::envout_dB(void)
 {
+    if (envUpdate.checkUpdated())
+        recomputePoints();
+
     float out;
     if (linearenvelope != 0)
         return envout();
@@ -183,11 +194,10 @@ float Envelope::envout_dB(void)
         float v2 = dB2rap(envval[1]);
         out = v1 + (v2 - v1) * t;
 
-        t += inct;
+        t += envdt[1];
         if (t >= 1.0f)
         {
             t = 0.0f;
-            inct = envdt[2];
             currentpoint++;
             out = v2;
         }

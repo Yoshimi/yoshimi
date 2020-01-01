@@ -46,7 +46,6 @@ class SUBnoteParameters : public Presets
         void getfromXML(XMLwrapper *xml);
         float getLimits(CommandBlock *getData);
         void updateFrequencyMultipliers(void);
-        void postrender(void);
 
         // Amplitude Parametrers
         bool Pstereo; // true = stereo, false = mono

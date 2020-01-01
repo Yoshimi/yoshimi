@@ -1245,21 +1245,3 @@ float ADnoteParameters::getLimits(CommandBlock *getData)
     }
     return value;
 }
-
-void ADnoteParameters::postrender(void)
-{
-    // loop over our gathered dirty flags and unset them for the next period
-      GlobalPar.AmpLfo->updated
-    = GlobalPar.FilterLfo->updated
-    = GlobalPar.FreqLfo->updated
-    = false;
-    for (int i = 0; i < NUM_VOICES; ++i)
-    {
-        if (VoicePar[i].Enabled)
-              VoicePar[i].AmpLfo->updated
-            = VoicePar[i].FilterLfo->updated
-            = VoicePar[i].FreqLfo->updated
-            = false;
-
-    }
-}

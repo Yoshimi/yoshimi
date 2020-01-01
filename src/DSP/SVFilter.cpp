@@ -38,7 +38,6 @@ SVFilter::SVFilter(unsigned char Ftype, float Ffreq, float Fq,
     stages(Fstages),
     freq(Ffreq),
     q(Fq),
-    gain(1.0f),
     needsinterpolation(0),
     firsttime(1),
     synth(_synth)
@@ -122,13 +121,6 @@ void SVFilter::setq(float q_)
 void SVFilter::settype(int type_)
 {
     type = type_;
-    computefiltercoefs();
-}
-
-
-void SVFilter::setgain(float dBgain)
-{
-    gain = dB2rap(dBgain);
     computefiltercoefs();
 }
 

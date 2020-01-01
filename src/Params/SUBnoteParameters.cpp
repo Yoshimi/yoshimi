@@ -554,8 +554,3 @@ float SUBnoteParameters::getLimits(CommandBlock *getData)
     }
     return value;
 }
-
-void SUBnoteParameters::postrender(void)
-{
-    return;
-}

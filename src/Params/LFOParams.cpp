@@ -60,7 +60,7 @@ LFOParams::LFOParams(float Pfreq_, unsigned char Pintensity_,
             break;
     };
     defaults();
-    updated = true;
+    presetsUpdated();
 }
 
 
@@ -83,7 +83,7 @@ void LFOParams::setPfreq(int32_t n)
 
     PfreqI = n;
     Pfreq = (powf(2.0f, (float(n) / float(Fmul2I)) * 10.0f) - 1.0f) / 12.0f;
-    updated = true;
+    presetsUpdated();
 }
 
 
@@ -117,7 +117,7 @@ void LFOParams::getfromXML(XMLwrapper *xml)
     Pdelay = xml->getpar127("delay", Pdelay);
     Pstretch = xml->getpar127("stretch", Pstretch);
     Pcontinous = xml->getparbool("continous", Pcontinous);
-    updated = true;
+    presetsUpdated();
 }
 
 float LFOlimit::getLFOlimits(CommandBlock *getData)

@@ -1849,6 +1849,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                 commandResonance(getData, part->kit[kititem].padpars->resonance);
                 break;
         }
+        part->kit[kititem].padpars->presetsUpdated();
         return true;
     }
 
@@ -1878,6 +1879,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                 commandEnvelope(getData);
                 break;
         }
+        part->kit[kititem].subpars->presetsUpdated();
         return true;
     }
 
@@ -1943,6 +1945,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                 }
                 break;
         }
+        part->kit[kititem].adpars->presetsUpdated();
         return true;
     }
 
@@ -1969,6 +1972,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                 commandResonance(getData, part->kit[kititem].adpars->GlobalPar.Reson);
                 break;
         }
+        part->kit[kititem].adpars->presetsUpdated();
         return true;
     }
     getData->data.source = TOPLEVEL::action::noAction;
@@ -5296,7 +5300,9 @@ void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
             break;
     }
 
-    if (!write)
+    if (write)
+        pars->presetsUpdated();
+    else
         getData->data.value.F = val;
 }
 
@@ -5567,7 +5573,9 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             break;
     }
 
-    if (!write)
+    if (write)
+        pars->presetsUpdated();
+    else
         getData->data.value.F = val;
 }
 
@@ -5865,6 +5873,8 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
                 val = pars->Penvsustain;
             break;
     }
+    if (write)
+        pars->presetsUpdated();
     getData->data.value.F = val;
     getData->data.offset = Xincrement;
     return;

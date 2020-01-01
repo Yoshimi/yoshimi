@@ -1048,15 +1048,6 @@ void Part::ComputePartSmps(void)
             KillNotePos(k);
     }
 
-    for (int item = 0; item < NUM_KIT_ITEMS; ++item)
-    {
-        if (kit[item].adpars)
-            kit[item].adpars->postrender();
-        if (kit[item].subpars)
-            kit[item].subpars->postrender();
-        if (kit[item].padpars)
-            kit[item].padpars->postrender();
-    }
     // Apply part's effects and mix them
     for (int nefx = 0; nefx < NUM_PART_EFX; ++nefx)
     {

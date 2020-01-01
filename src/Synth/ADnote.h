@@ -76,7 +76,8 @@ class ADnote
             unisonDetuneFactorFromParent = factor;
         }
         void computeUnisonFreqRap(int nvoice);
-        void computeCurrentParameters(void);
+        void computeNoteParameters(void);
+        void computeWorkingParameters(void);
         void initParameters(void);
         void initSubVoices(void);
         void killVoice(int nvoice);
@@ -199,6 +200,7 @@ class ADnote
             int    FMVoice;
             float *VoiceOut; // Voice Output used by other voices if use this as modullator
             float *FMSmp;    // Wave of the Voice. Shared by sub voices.
+            int    FMphase_offset;
             float  FMVolume;
             bool FMDetuneFromBaseOsc;  // Whether we inherit the base oscillator's detuning
             float  FMDetune; // in cents
@@ -208,6 +210,12 @@ class ADnote
 
         // Internal values of the note and of the voices
         float time; // time from the start of the note
+
+        RandomGen paramRNG; // A preseeded random number generator, reseeded
+                            // with a known seed every time parameters are
+                            // updated. This allows parameters to be changed
+                            // smoothly. New notes will get a new seed.
+        uint32_t paramSeed; // The seed for paramRNG.
 
         //pinking filter (Paul Kellet)
         float pinking[NUM_VOICES][14];
@@ -305,6 +313,8 @@ class ADnote
         // For sub voices: Pointer to the closest parent that has
         // phase/frequency modulation.
         float *parentFMmod;
+
+        Presets::PresetsUpdate paramsUpdate;
 
         SynthEngine *synth;
 };

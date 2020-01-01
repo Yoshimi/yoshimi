@@ -240,9 +240,6 @@ void OscilParameters::getfromXML(XMLwrapper *xml)
         xml->exitbranch();
     }
 
-    if (Pcurrentbasefunc != 0)
-        presetsUpdated();
-
     if (xml->enterbranch("BASE_FUNCTION"))
     {
         for (int i = 1; i < synth->halfoscilsize; ++i)
@@ -278,6 +275,8 @@ void OscilParameters::getfromXML(XMLwrapper *xml)
                 basefuncFFTfreqs.s[i] /= max;
         }
     }
+
+    presetsUpdated();
 }
 
 float OscilParameters::getLimits(CommandBlock *getData)
