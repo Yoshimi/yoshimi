@@ -1,4 +1,9 @@
-yoshimi 1.6.1 M
+yoshimi 1.7.0 rc1
+
+2020-1-1 Will
+* Updated copyright notices
+* Updated local copy of advanced user manual
+* Set version as 1.7.0 rc1
 
 2019-12-31 Will
 * Made slider knobs respond to mouse clicks.

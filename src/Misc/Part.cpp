@@ -6,6 +6,7 @@
     Copyright 2009, James Morris
     Copyright 2009-2011, Alan Calvert
     Copyright 2014-2019, Will Godfrey
+    Copyright 2020 Kristian Amlie
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
