@@ -53,6 +53,8 @@ Filter::Filter(FilterParams *pars_, SynthEngine *_synth):
             filter = new AnalogFilter(Ftype, 1000.0f, pars->getq(), Fstages, synth);
             break;
     }
+
+    updateCurrentParameters();
 }
 
 
