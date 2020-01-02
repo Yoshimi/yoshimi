@@ -1,4 +1,10 @@
-yoshimi 1.7.0 rc1
+yoshimi 1.7.0 rc2
+
+2020-1-2 Will
+* Merged in filter bugfix.
+* BugFix: M-learn window not auto opening.
+* Included new user guide.
+* Set version as 1.7.0 rc2
 
 2020-1-1 Will
 * Updated copyright notices
