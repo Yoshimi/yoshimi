@@ -152,6 +152,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     //std::cout << "byte " << int(x.arr[0]) << std::endl;
     Runtime.isLittleEndian = (x.arr[0] == 0x44);
 
+    audio.store(muteState::Idle);
     if (bank.roots.empty())
         bank.addDefaultRootDirs();
 
@@ -1956,18 +1957,46 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
     {
         sent_buffersize = to_process;
         sent_bufferbytes = sent_buffersize * sizeof(float);
-        sent_buffersize_f = sent_buffersize;;
+        sent_buffersize_f = sent_buffersize;
     }
 
     memset(mainL, 0, sent_bufferbytes);
     memset(mainR, 0, sent_bufferbytes);
+
+    unsigned char muted = audio.load();
+    switch (muted)
+    {
+        case muteState::Pending:
+            fadeLevel = 1.0f;
+            audio.store(muteState::Fading);
+            muted = muteState::Fading;
+            //std::cout << "here fading" << std:: endl;
+            break;
+        case muteState::Fading:
+            if (fadeLevel < 0.001f)
+            {
+                audio.store(muteState::Active);
+                muted = muteState::Active;
+                fadeLevel = 0;
+            }
+            break;
+        case muteState::Active:
+            // done by resolver
+            break;
+        case muteState::Complete:
+            audio.store(muteState::Idle);
+            break;
+        default:
+            break;
+    }
+
 
     interchange.mediate();
     char partLocal[NUM_MIDI_PARTS]; // isolates loop from possible change
     for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
             partLocal[npart] = partonoffRead(npart);
 
-    if (isMuted())
+    if (muted == muteState::Active)
     {
         for (int npart = 0; npart < (Runtime.NumAvailableParts); ++npart)
         {
@@ -2128,7 +2157,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             }
             mainL[idx] *= volume; // apply Master Volume
             mainR[idx] *= volume;
-            if (fadeAll) // fadeLevel must also have been set
+            if (muted == muteState::Fading) // fadeLevel must also have been set
             {
                 for (int npart = 0; npart < (Runtime.NumAvailableParts); ++npart)
                 {
@@ -2211,13 +2240,13 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
  * This has to be at the end of the audio loop to
  * ensure no contention with VU updates etc.
  */
-        if (fadeAll && fadeLevel <= 0.001f)
+        /*if (fadeAll && fadeLevel <= 0.001f)
         {
             Mute();
             fadeLevel = 0; // just to be sure
             interchange.flagsWrite(fadeAll);
             fadeAll = 0;
-        }
+        }*/
     }
     return sent_buffersize;
 }

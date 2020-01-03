@@ -63,6 +63,7 @@ class InterChange : private DataText
         ringBuff *toGUI;
         ringBuff *fromMIDI;
         ringBuff *returnsBuffer;
+        ringBuff *muteQueue;
 
         void mediate(void);
         void historyActionCheck(CommandBlock *getData);
@@ -90,6 +91,7 @@ class InterChange : private DataText
         void *sortResultsThread(void);
         static void *_sortResultsThread(void *arg);
         pthread_t  sortResultsThreadHandle;
+        void muteQueueWrite(CommandBlock *getData);
         void indirectTransfers(CommandBlock *getData, bool noForward = false);
         std::string formatScales(std::string text);
 

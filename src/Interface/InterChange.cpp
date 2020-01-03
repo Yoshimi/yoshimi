@@ -116,6 +116,8 @@ bool InterChange::Init()
 
     returnsBuffer = new ringBuff(1024, commandBlockSize);
 
+    muteQueue = new ringBuff(16, commandBlockSize);
+
     if (!synth->getRuntime().startThread(&sortResultsThreadHandle, _sortResultsThread, this, false, 0, "CLI"))
     {
         synth->getRuntime().Log("Failed to start CLI resolve thread");
@@ -158,6 +160,11 @@ bail_out:
     {
         delete(returnsBuffer);
         returnsBuffer = NULL;
+    }
+    if (muteQueue)
+    {
+        delete(muteQueue);
+        muteQueue = NULL;
     }
     return false;
 }
@@ -211,6 +218,16 @@ void *InterChange::sortResultsThread(void)
         }
 
         CommandBlock getData;
+
+        while (synth->audio.load() == muteState::Active)
+        {
+            //std::cout << "here fetching" << std:: endl;
+            if (muteQueue->read(getData.bytes))
+                indirectTransfers(&getData);
+            else
+                synth->audio.store(muteState::Complete);
+        }
+
         while (decodeLoopback->read(getData.bytes))
         {
             if(getData.data.part == TOPLEVEL::section::midiLearn)
@@ -227,9 +244,9 @@ void *InterChange::sortResultsThread(void)
          * but isolated from the main audio thread.
          */
 
-        unsigned int flag = flagsReadClear();
+        /*unsigned int flag = flagsReadClear();
         if (flag < 0xffffffff)
-            mutedDecode(flag);
+            mutedDecode(flag);*/
     }
     return NULL;
 }
@@ -251,6 +268,11 @@ InterChange::~InterChange()
         delete(decodeLoopback);
         decodeLoopback = NULL;
     }
+    if (muteQueue)
+    {
+        delete(muteQueue);
+        muteQueue = NULL;
+    }
 #ifdef GUI_FLTK
     if (fromGUI)
     {
@@ -267,6 +289,21 @@ InterChange::~InterChange()
     {
         delete(fromMIDI);
         fromMIDI = NULL;
+    }
+}
+
+
+void InterChange::muteQueueWrite(CommandBlock *getData)
+{
+    if (!muteQueue->write(getData->bytes))
+    {
+        std::cout << "failed to write to muteQueue" << std::endl;
+        return;
+    }
+    if (synth->audio.load() == muteState::Idle)
+    {
+        //std::cout << "here pending" << std:: endl;
+        synth->audio.store(muteState::Pending);
     }
 }
 
@@ -2869,7 +2906,8 @@ void InterChange::commandMain(CommandBlock *getData)
         case MAIN::control::loadNamedPatchset:
             if (write && ((action & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::muteAndLoop))
             {
-                synth->allStop(TOPLEVEL::muted::patchsetLoad | (miscmsg << 8) | (type << 24));
+                muteQueueWrite(getData);
+                //synth->allStop(TOPLEVEL::muted::patchsetLoad | (miscmsg << 8) | (type << 24));
                 getData->data.source = TOPLEVEL::action::noAction;
             }
             break;
@@ -2877,7 +2915,8 @@ void InterChange::commandMain(CommandBlock *getData)
         case MAIN::control::loadNamedVector:
             if (write && ((action & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::muteAndLoop))
             {
-                synth->allStop(TOPLEVEL::muted::vectorLoad | (miscmsg << 8) | (insert << 16) | (type << 24));
+                muteQueueWrite(getData);
+                //synth->allStop(TOPLEVEL::muted::vectorLoad | (miscmsg << 8) | (insert << 16) | (type << 24));
                 getData->data.source = TOPLEVEL::action::noAction;
             }
             break;
@@ -2890,14 +2929,16 @@ void InterChange::commandMain(CommandBlock *getData)
         case MAIN::control::loadNamedState:
             if (write && ((action & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::muteAndLoop))
             {
-                synth->allStop(TOPLEVEL::muted::stateLoad | (miscmsg << 8) | (type << 24));
+                muteQueueWrite(getData);
+                //synth->allStop(TOPLEVEL::muted::stateLoad | (miscmsg << 8) | (type << 24));
                 getData->data.source = TOPLEVEL::action::noAction;
             }
             break;
         case MAIN::control::saveNamedState: // done elsewhere
             break;
         case MAIN::control::loadFileFromList:
-            synth->allStop(TOPLEVEL::muted::listLoad | (kititem << 8) | (engine << 16) | (insert << 24));
+            muteQueueWrite(getData);
+            //synth->allStop(TOPLEVEL::muted::listLoad | (kititem << 8) | (engine << 16) | (insert << 24));
             getData->data.source = TOPLEVEL::action::noAction;
             break;
 
@@ -2905,7 +2946,8 @@ void InterChange::commandMain(CommandBlock *getData)
         case MAIN::control::masterResetAndMlearn:
             if (write && ((action & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::muteAndLoop))
             {
-                synth->allStop(TOPLEVEL::muted::masterReset | (control << 8) | (type << 24));
+                muteQueueWrite(getData);
+                //synth->allStop(TOPLEVEL::muted::masterReset | (control << 8) | (type << 24));
                 getData->data.source = TOPLEVEL::action::noAction;
             }
             break;
@@ -2915,7 +2957,8 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
         case MAIN::control::stopSound: // just stop
             if (write)
-                synth->allStop(TOPLEVEL::muted::stopSound);
+                muteQueueWrite(getData);
+                //synth->allStop(TOPLEVEL::muted::stopSound);
             getData->data.source = TOPLEVEL::action::noAction;
             break;
 

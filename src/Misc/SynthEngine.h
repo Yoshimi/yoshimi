@@ -68,6 +68,7 @@ class SynthEngine
         bool isLV2Plugin;
         bool needsSaving;
     public:
+        std::atomic <uint8_t> audio;
         Bank bank;
         InterChange interchange;
         MidiLearn midilearn;
