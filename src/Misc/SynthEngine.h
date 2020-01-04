@@ -67,7 +67,7 @@ class SynthEngine
         bool isLV2Plugin;
         bool needsSaving;
     public:
-        std::atomic <uint8_t> audio;
+        std::atomic <uint8_t> audioOut;
         Bank bank;
         InterChange interchange;
         MidiLearn midilearn;
@@ -156,7 +156,6 @@ class SynthEngine
         void setPartMap(int npart);
         void setAllPartMaps(void);
 
-        void SetMuteAndWait(void);
         bool masterMono;
 
         float getLimits(CommandBlock *getData);

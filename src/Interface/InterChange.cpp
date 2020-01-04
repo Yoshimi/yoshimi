@@ -219,13 +219,13 @@ void *InterChange::sortResultsThread(void)
 
         CommandBlock getData;
 
-        while (synth->audio.load() == muteState::Active)
+        while (synth->audioOut.load() == muteState::Active)
         {
             //std::cout << "here fetching" << std:: endl;
             if (muteQueue->read(getData.bytes))
                 indirectTransfers(&getData);
             else
-                synth->audio.store(muteState::Complete);
+                synth->audioOut.store(muteState::Complete);
         }
 
         while (decodeLoopback->read(getData.bytes))
@@ -291,10 +291,10 @@ void InterChange::muteQueueWrite(CommandBlock *getData)
         std::cout << "failed to write to muteQueue" << std::endl;
         return;
     }
-    if (synth->audio.load() == muteState::Idle)
+    if (synth->audioOut.load() == muteState::Idle)
     {
         //std::cout << "here pending" << std:: endl;
-        synth->audio.store(muteState::Pending);
+        synth->audioOut.store(muteState::Pending);
     }
 }
 

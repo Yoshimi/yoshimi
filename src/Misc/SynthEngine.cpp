@@ -152,7 +152,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     //std::cout << "byte " << int(x.arr[0]) << std::endl;
     Runtime.isLittleEndian = (x.arr[0] == 0x44);
 
-    audio.store(muteState::Active);
+    audioOut.store(muteState::Active);
     if (bank.roots.empty())
         bank.addDefaultRootDirs();
 
@@ -1862,24 +1862,6 @@ char SynthEngine::partonoffRead(int npart)
 }
 
 
-void SynthEngine::SetMuteAndWait(void)
-{
-    CommandBlock putData;
-    memset(&putData, 0xff, sizeof(putData));
-    putData.data.value.F = 0;
-    putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
-    putData.data.control = TOPLEVEL::control::textMessage;
-    putData.data.part = TOPLEVEL::section::main;
-#ifdef GUI_FLTK
-    if (interchange.fromGUI ->write(putData.bytes))
-    {
-        //while(!isMuted()) // TODO this seems screwy :(
-            //usleep (1000);
-    }
-#endif
-}
-
-
 // Master audio out (the final sound)
 int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process)
 {
@@ -1909,19 +1891,19 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
     memset(mainL, 0, sent_bufferbytes);
     memset(mainR, 0, sent_bufferbytes);
 
-    unsigned char muted = audio.load();
+    unsigned char muted = audioOut.load();
     switch (muted)
     {
         case muteState::Pending:
             fadeLevel = 1.0f;
-            audio.store(muteState::Fading);
+            audioOut.store(muteState::Fading);
             muted = muteState::Fading;
             //std::cout << "here fading" << std:: endl;
             break;
         case muteState::Fading:
             if (fadeLevel < 0.001f)
             {
-                audio.store(muteState::Active);
+                audioOut.store(muteState::Active);
                 muted = muteState::Active;
                 fadeLevel = 0;
             }
@@ -1930,7 +1912,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             // done by resolver
             break;
         case muteState::Complete:
-            audio.store(muteState::Idle);
+            audioOut.store(muteState::Idle);
             break;
         default:
             break;

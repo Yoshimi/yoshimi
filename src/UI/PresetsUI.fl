@@ -168,7 +168,6 @@ class PresetsUI {selected
             pastewin->hide();
             return;
         }
-        synth->SetMuteAndWait();
         p->paste(n);
         pastewin->hide();
         pui->refresh();}
@@ -177,7 +176,6 @@ class PresetsUI {selected
       Fl_Button pastebutton {
         label {Paste from Clipboard}
         callback {//
-        synth->SetMuteAndWait();
         p->paste(0);
         pastewin->hide();
         pui->refresh();}
