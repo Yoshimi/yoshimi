@@ -1,7 +1,7 @@
 /*
     InterChange.h - General communications
 
-    Copyright 2016-2019 Will Godfrey
+    Copyright 2016-2020 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -17,7 +17,6 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified May 2019
 */
 
 #ifndef INTERCH_H
@@ -67,7 +66,6 @@ class InterChange : private DataText
 
         void mediate(void);
         void historyActionCheck(CommandBlock *getData);
-        void mutedDecode(unsigned int altData);
         void returns(CommandBlock *getData);
         void setpadparams(int npart, int kititem);
         void doClearPart(int npart);

@@ -92,8 +92,8 @@ public:
    //virtual methods from MusicIO
    unsigned int getSamplerate(void) {return _sampleRate; }
    int getBuffersize(void) {return _bufferSize; }
-   bool Start(void) {synth->Unmute(); return true; }
-   void Close(void) {synth->Mute();}
+   bool Start(void) { return true; }
+   void Close(void){;}
 
    bool openAudio() { return true; }
    bool openMidi() { return true; }

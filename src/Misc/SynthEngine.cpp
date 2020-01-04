@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2009, James Morris
-    Copyright 2014-2019, Will Godfrey & others
+    Copyright 2014-2020, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -152,7 +152,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     //std::cout << "byte " << int(x.arr[0]) << std::endl;
     Runtime.isLittleEndian = (x.arr[0] == 0x44);
 
-    audio.store(muteState::Idle);
+    audio.store(muteState::Active);
     if (bank.roots.empty())
         bank.addDefaultRootDirs();
 
@@ -213,7 +213,6 @@ SynthEngine::~SynthEngine()
         delete fft;
 
     sem_destroy(&partlock);
-    sem_destroy(&mutelock);
     if (ctl)
         delete ctl;
     getRemoveSynthId(true, uniqueId);
@@ -260,7 +259,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     }
 
     sem_init(&partlock, 0, 1);
-    sem_init(&mutelock, 0, 1);
 
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
@@ -1798,8 +1796,6 @@ void SynthEngine::resetAll(bool andML)
         putData.data.part = TOPLEVEL::section::midiLearn;
         midilearn.generalOperations(&putData);
     }
-    while(isMuted())
-        Unmute(); // unwind all mute settings
 }
 
 
@@ -1877,60 +1873,10 @@ void SynthEngine::SetMuteAndWait(void)
 #ifdef GUI_FLTK
     if (interchange.fromGUI ->write(putData.bytes))
     {
-        while(!isMuted()) // TODO this seems screwy :(
-            usleep (1000);
+        //while(!isMuted()) // TODO this seems screwy :(
+            //usleep (1000);
     }
 #endif
-}
-
-
-bool SynthEngine::isMuted(void)
-{
-    return (muted < 1);
-}
-
-
-void SynthEngine::Unmute()
-{
-    sem_wait(&mutelock);
-    mutewrite(2);
-    sem_post(&mutelock);
-}
-
-void SynthEngine::Mute()
-{
-    sem_wait(&mutelock);
-    mutewrite(-1);
-    sem_post(&mutelock);
-}
-
-/*
- * Intelligent switch for unknown mute status that always
- * mutes and later returns original unknown state
- */
-void SynthEngine::mutewrite(int what)
-{
-    //unsigned char original = muted;
-    unsigned char tmp = muted;
-    switch (what)
-    {
-        case 0: // always muted
-            tmp = 0;
-            break;
-        case 1: // always unmuted
-            tmp = 1;
-            break;
-        case -1: // further from unmute
-            tmp -= 1;
-            break;
-        case 2:
-            if (tmp != 1) // nearer to unmute
-                tmp += 1;
-            break;
-        default:
-            return;
-    }
-    muted = tmp;
 }
 
 
@@ -2236,17 +2182,6 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 
             }
         }
-/*
- * This has to be at the end of the audio loop to
- * ensure no contention with VU updates etc.
- */
-        /*if (fadeAll && fadeLevel <= 0.001f)
-        {
-            Mute();
-            fadeLevel = 0; // just to be sure
-            interchange.flagsWrite(fadeAll);
-            fadeAll = 0;
-        }*/
     }
     return sent_buffersize;
 }
@@ -2389,21 +2324,6 @@ void SynthEngine::ShutUp(void)
 }
 
 
-void SynthEngine::allStop(unsigned int stopType)
-{
-    if(isMuted()) // there's a hanging mute :(
-    {
-        fadeLevel = 0;
-        interchange.flagsWrite(stopType);
-        return;
-    }
-    fadeAll = stopType;
-    if (fadeLevel < 0.001)
-        fadeLevel = 1.0f;
-    // don't reset if it's already fading.
-}
-
-
 bool SynthEngine::loadStateAndUpdate(string filename)
 {
     defaults();
@@ -2411,7 +2331,6 @@ bool SynthEngine::loadStateAndUpdate(string filename)
     Runtime.stateChanged = true;
     bool result = Runtime.restoreSessionData(filename);
     ShutUp();
-    Unmute();
     return result;
 }
 
@@ -2427,7 +2346,6 @@ bool SynthEngine::loadPatchSetAndUpdate(string fname)
     bool result;
     fname = setExtension(fname, EXTEN::patchset);
     result = loadXML(fname); // load the data
-    Unmute();
     if (result)
         setAllPartMaps();
     return result;
@@ -2808,7 +2726,6 @@ unsigned char SynthEngine::loadVectorAndUpdate(unsigned char baseChan, string na
 {
     unsigned char result = loadVector(baseChan, name, true);
     ShutUp();
-    Unmute();
     return result;
 }
 

@@ -171,8 +171,7 @@ class PresetsUI {selected
         synth->SetMuteAndWait();
         p->paste(n);
         pastewin->hide();
-        pui->refresh();
-        synth->Unmute();}
+        pui->refresh();}
         xywh {10 355 160 20} box THIN_UP_BOX
       }
       Fl_Button pastebutton {
@@ -181,8 +180,7 @@ class PresetsUI {selected
         synth->SetMuteAndWait();
         p->paste(0);
         pastewin->hide();
-        pui->refresh();
-        synth->Unmute();}
+        pui->refresh();}
         xywh {25 385 90 35} box THIN_UP_BOX align 192
       }
       Fl_Button {} {
