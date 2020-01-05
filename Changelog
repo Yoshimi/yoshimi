@@ -1,4 +1,11 @@
-yoshimi 1.7.0 rc2
+yoshimi 1.7.0 rc3
+
+2020-1-5 Will
+* BugFix: State load not updating MIDI_learn GUI.
+* Removed legacy min/max double check.
+  It created a corner case error when
+  min/max are reversed.
+* Set version as 1.7.0 rc3
 
 2020-1-2 Will
 * Merged in filter bugfix.
