@@ -354,6 +354,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     getData->data.miscmsg = NO_MSG; // this may be reset later
     unsigned int tmp;
     std::string name;
+    bool learnUpdate = false;
 
     int switchNum = npart;
     if (control == TOPLEVEL::control::textMessage)
@@ -672,6 +673,11 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                         if ((text != name)) // never include default state
                             synth->addHistory(text, TOPLEVEL::XML::State);
                         text = "ed " + text;
+                        learnUpdate = true;
+                        /*
+                         * This needs improving. We should only set it
+                         * when the state file contains a learn list.
+                         */
                     }
                     else
                         text = " FAILED " + text;
@@ -695,7 +701,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     break;
                 }
                 case MAIN::control::loadFileFromList:
-                    break; // do nothimng here
+                    break; // do nothing here
                 case MAIN::control::exportPadSynthSamples:
                 {
                     unsigned char partnum = insert;
@@ -1285,6 +1291,8 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
             getData->data.miscmsg = textMsgBuffer.push(synth->microtonal.Pcomment);
             ok &= returnsBuffer->write(getData->bytes);
         }
+        if (synth->getRuntime().showGui && learnUpdate)
+            synth->midilearn.updateGui();
 #endif
         if (!ok)
             synth->getRuntime().Log("Unable to  write to returnsBuffer buffer");
