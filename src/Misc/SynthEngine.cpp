@@ -1895,6 +1895,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
     switch (muted)
     {
         case muteState::Pending:
+            // set by resolver
             fadeLevel = 1.0f;
             audioOut.store(muteState::Fading);
             muted = muteState::Fading;
@@ -1909,10 +1910,20 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             }
             break;
         case muteState::Active:
-            // done by resolver
+            // cleared by resolver
             break;
         case muteState::Complete:
+            // set by resolver
             audioOut.store(muteState::Idle);
+            break;
+        case muteState::Request:
+            // set by paste routine
+            audioOut.store(muteState::Immediate);
+            muted = muteState::Active;
+            break;
+        case muteState::Immediate:
+            // cleared by paste routine
+            muted = muteState::Active;
             break;
         default:
             break;

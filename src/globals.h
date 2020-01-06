@@ -134,7 +134,7 @@ const std::string UNTITLED = "No Title";
 const unsigned char FORCED_EXIT = 16;
 
 
-enum muteState {Idle, Pending, Fading, Active, Complete};
+enum muteState {Idle, Pending, Fading, Active, Complete, Request, Immediate};
 
 enum Session : unsigned char {
     Normal = 0,
