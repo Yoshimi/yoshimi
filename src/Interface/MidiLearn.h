@@ -1,7 +1,7 @@
 /*
     MidiLearn.h
 
-    Copyright 2016-2019 Will Godfrey
+    Copyright 2016-2020 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -17,13 +17,11 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified April 2019
 */
 
 #ifndef MIDILEARN_H
 #define MIDILEARN_H
 
-#include <jack/ringbuffer.h>
 #include <list>
 #include <string>
 
@@ -35,6 +33,7 @@ class SynthEngine;
 class DataText;
 
 using std::string;
+using std::list;
 
 class MidiLearn : private DataText
 {
@@ -68,33 +67,33 @@ class MidiLearn : private DataText
             int min_out; // defined programmatically
             int max_out; // defined programmatically
             Control data; // controller to learn
-            string name; // derived from controller text
         };
         bool learning;
 
-        void setTransferBlock(CommandBlock *getData, string name);
+        void setTransferBlock(CommandBlock *getData);
 
         bool runMidiLearn(int _value, unsigned int CC, unsigned char chan, unsigned char category);
         bool writeMidi(CommandBlock *putData, bool in_place);
-        int findEntry(std::list<LearnBlock> &midi_list, int lastpos, unsigned int CC, unsigned char chan, LearnBlock *block, bool show);
+        int findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned int CC, unsigned char chan, LearnBlock *block, bool show);
         int findSize();
         void listLine(int lineNo);
-        void listAll(std::list<string>& msg_buf);
+        void listAll(list<string>& msg_buf);
         bool remove(int itemNumber);
         void generalOperations(CommandBlock *getData);
         bool saveList(string name);
-        bool insertMidiListData(bool full,  XMLwrapper *xml);
+        bool insertMidiListData(XMLwrapper *xml);
         bool loadList(string name);
         bool extractMidiListData(bool full,  XMLwrapper *xml);
         void updateGui(int opp = 0);
 
 
     private:
-        std::list<LearnBlock> midi_list;
+        list<LearnBlock> midi_list;
         string learnedName;
         CommandBlock learnTransferBlock;
 
-        void insert(unsigned int CC, unsigned char chan);
+        string findName(list<LearnBlock>::iterator it);
+        void insertLine(unsigned int CC, unsigned char chan, bool isNRPN);
         SynthEngine *synth;
         void writeToGui(CommandBlock *putData);
 };

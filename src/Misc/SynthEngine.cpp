@@ -3032,7 +3032,7 @@ int SynthEngine::getalldata(char **data)
 {
     XMLwrapper *xml = new XMLwrapper(this, true);
     add2XML(xml);
-    midilearn.insertMidiListData(false, xml);
+    midilearn.insertMidiListData(xml);
     *data = xml->getXMLdata();
     delete xml;
     return strlen(*data) + 1;

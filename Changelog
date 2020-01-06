@@ -1,6 +1,14 @@
 yoshimi 1.7.0 rc3
 
-2020-1-5 Will
+2020-1-6 Will
+* BugFix: Editing MIDI-learn lost NRPN status.
+* Removed legacy NRPN detection.
+* Revised MIDI-Learn internal data blocks.
+  Uses resolveAll function, not embedded text.
+* Removed redundant MIDI-Learn code.
+* Set version as 1.7.0 rc4
+
+2020-1-6 Will
 * BugFix: State load not updating MIDI_learn GUI.
 * Removed legacy min/max double check.
   It created a corner case error when
