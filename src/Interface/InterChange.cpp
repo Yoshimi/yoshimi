@@ -1429,23 +1429,16 @@ void InterChange::resolveReplies(CommandBlock *getData)
         synth->getRuntime().finishedCLI = true;
         return; // no further action
     }
-    bool addValue = !(getData->data.type & TOPLEVEL::type::LearnRequest);
-    std::string commandName = resolveAll(synth, getData, addValue);
 
-    if (!addValue)
+    if (getData->data.type & TOPLEVEL::type::LearnRequest)
     {
-        std::string toSend;
-        size_t pos = commandName.find(" - ");
-        if (pos < 1 || pos >= commandName.length())
-            toSend = commandName;
-        else
-            toSend = commandName.substr(0, pos);
-        synth->midilearn.setTransferBlock(getData, toSend);
+        synth->midilearn.setTransferBlock(getData);
         return;
     }
 
     if (source != TOPLEVEL::action::fromMIDI)
-        synth->getRuntime().Log(commandName);
+        synth->getRuntime().Log(resolveAll(synth, getData, true));
+
     if (source == TOPLEVEL::action::fromCLI)
         synth->getRuntime().finishedCLI = true;
 }

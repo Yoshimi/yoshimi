@@ -1,7 +1,7 @@
 /*
     MidiLearn.cpp
 
-    Copyright 2016-2019 Will Godfrey
+    Copyright 2016-2020 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -69,14 +69,14 @@ MidiLearn::~MidiLearn()
 }
 
 
-void MidiLearn::setTransferBlock(CommandBlock *getData, string name)
+void MidiLearn::setTransferBlock(CommandBlock *getData)
 {
     //cout << "MIDI Control " << (int) getData->data.control << " Part " << (int) getData->data.part << "  Kit " << (int) getData->data.kit << " Engine " << (int) getData->data.engine << "  Insert " << (int) getData->data.insert << endl;
 
     memcpy(learnTransferBlock.bytes, getData->bytes, sizeof(learnTransferBlock));
-    learnedName = name;
+    learnedName = resolveAll(synth, getData, false);
     learning = true;
-    synth->getRuntime().Log("Learning");
+    synth->getRuntime().Log("Learning " + learnedName);
     updateGui(MIDILEARN::control::sendLearnMessage);
 }
 
@@ -85,7 +85,7 @@ bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, un
 {
     if (learning)
     {
-        insert(CC, chan);
+        insertLine(CC, chan, (category & 2) != 0);
         return true; // block while learning
     }
 
@@ -166,7 +166,7 @@ bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, un
             // we only want to send an activity once
             // and it's not relevant to jack freewheeling
             {
-                if (CC > 0xff)
+                if (category & 2)
                     putData.data.type |= 0x10; // mark as NRPN
                 firstLine = false;
                 putData.data.control = MIDILEARN::control::reportActivity;
@@ -244,7 +244,7 @@ int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned int 
         if ((it->chan >= 16 || chan == it->chan) && CC == it->CC)
         {
             if (show)
-                synth->getRuntime().Log("Found line " + it->name + "  at " + to_string(newpos)); // a test!
+                synth->getRuntime().Log("Found line " + findName(it) + "  at " + to_string(newpos)); // a test!
             block->chan = it->chan;
             block->CC = it->CC;
             block->min_in = it->min_in;
@@ -319,7 +319,7 @@ void MidiLearn::listLine(int lineNo)
                 + chan
                 + "  Min " + asString(float(it->min_in / 2.0f)) + "%"
                 + "  Max " + asString(float(it->max_in / 2.0f)) + "%"
-                + limit + block + nrpn + "  " + it->name);
+                + limit + block + nrpn + "  " + findName(it));
     }
 }
 
@@ -349,7 +349,7 @@ void MidiLearn::listAll(list<string>& msg_buf)
         else
             chan += to_string(int(it->chan + 1));
 
-        msg_buf.push_back("Line " + to_string(lineNo + 1) + "  CC " + CCtype + chan + "  " + it->name);
+        msg_buf.push_back("Line " + to_string(lineNo + 1) + "  CC " + CCtype + chan + "  " + findName(it));
         ++ it;
         ++ lineNo;
     }
@@ -380,7 +380,7 @@ void MidiLearn::generalOperations(CommandBlock *getData)
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
 //    unsigned char part = getData->data.part;
-    unsigned char kit = getData->data.kit; // may need to set as an NRPN
+    unsigned int kit = getData->data.kit; // may need to set as an NRPN
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
@@ -497,7 +497,6 @@ void MidiLearn::generalOperations(CommandBlock *getData)
             lineName = "Chan = " + to_string(int(engine) + 1);
     }
 
-
     if (control == MIDILEARN::control::CCorChannel)
     {
         bool moveLine = true;
@@ -586,6 +585,7 @@ void MidiLearn::generalOperations(CommandBlock *getData)
                 name += " disabled";
             synth->getRuntime().Log("Line " + to_string(lineNo + 1) + " " + name);
         }
+
         CommandBlock putData;
         memset(&putData.bytes, 255, sizeof(putData));
         // need to work on this more
@@ -614,7 +614,6 @@ void MidiLearn::generalOperations(CommandBlock *getData)
         entry.status = type;
         entry.min_out = it->min_out;
         entry.max_out = it->max_out;
-        entry.name = it->name;
         entry.data = it->data;
         unsigned int CC = entry.CC;
         int chan = entry.chan;
@@ -650,7 +649,25 @@ void MidiLearn::generalOperations(CommandBlock *getData)
 }
 
 
-void MidiLearn::insert(unsigned int CC, unsigned char chan)
+string MidiLearn::findName(list<LearnBlock>::iterator it)
+{
+    CommandBlock putData;
+    putData.data.value.I = 0;
+    putData.data.source = 0;
+
+    putData.data.type = it->data.type;
+    putData.data.control = it->data.control;
+    putData.data.part = it->data.part;
+    putData.data.kit = it->data.kit;
+    putData.data.engine = it->data.engine;
+    putData.data.insert = it->data.insert;
+    putData.data.parameter = it->data.parameter;
+    putData.data.offset = UNUSED;
+    string name = resolveAll(synth, &putData, false);;
+    return name;
+}
+
+void MidiLearn::insertLine(unsigned int CC, unsigned char chan, bool isNRPN)
 {
     /*
      * This will eventually be part of a paging system of
@@ -673,16 +690,15 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
         return;
     }
 
-    unsigned char stat = 0;
-    if (CC > 0xff)
-        stat |= 9; // mark as NRPN and set 'block'
+    unsigned char status = 0;
+    if (isNRPN)
+        status |= 9; // mark as NRPN and set 'block'
     LearnBlock entry;
     entry.chan = chan;
     entry.CC = CC;
     entry.min_in = 0;
     entry.max_in = 200;
-    entry.status = stat;
-    entry.name = learnedName;
+    entry.status = status;
 
     //cout << "SEND Control " << (int) learnTransferBlock.data.control << " Part " << (int) learnTransferBlock.data.part << "  Kit " << (int) learnTransferBlock.data.kit << " Engine " << (int) learnTransferBlock.data.engine << "  Insert " << (int) learnTransferBlock.data.insert << endl;
 
@@ -724,14 +740,14 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
     else
         midi_list.insert(it, entry);
 
-    synth->getRuntime().Log("Learned ");
+    //synth->getRuntime().Log("Learned ");
     unsigned int CCh = entry.CC;
     string CCtype;
     if (CCh < 0xff)
         CCtype = "CC " + to_string(CCh);
     else
         CCtype = "NRPN " + asHexString((CCh >> 7) & 0x7f) + " " + asHexString(CCh & 0x7f);
-    synth->getRuntime().Log(CCtype + "  Chan " + to_string((int)entry.chan + 1) + "  " + entry.name);
+    synth->getRuntime().Log("Learned " + CCtype + "  Chan " + to_string((int)entry.chan + 1) + "  " + learnedName);
     updateGui(MIDILEARN::control::limit);
     learning = false;
 }
@@ -800,9 +816,9 @@ void MidiLearn::updateGui(int opp)
         putData.data.engine = it->chan;
         putData.data.insert = it->min_in;
         putData.data.parameter = it->max_in;
-        putData.data.miscmsg = textMsgBuffer.push(it->name);
+        putData.data.miscmsg = textMsgBuffer.push(findName(it));
         writeToGui(&putData);
-        if (newCC > 0xff || (it->status & 8) > 0)
+        if (it->status & 8)
         { // status now used in case NRPN is < 0x100
             putData.data.control = MIDILEARN::control::nrpnDetected; // it's an NRPN
             putData.data.engine = ((newCC >> 8) & 0xff);
@@ -843,7 +859,7 @@ bool MidiLearn::saveList(string name)
         synth->getRuntime().Log("Save Midi Learn failed xmltree allocation");
         return false;
     }
-    bool ok = insertMidiListData(true,  xml);
+    bool ok = insertMidiListData(xml);
     if (xml->saveXMLfile(file))
         synth->addHistory(file, TOPLEVEL::XML::MLearn);
     else
@@ -856,12 +872,11 @@ bool MidiLearn::saveList(string name)
 }
 
 
-bool MidiLearn::insertMidiListData(bool full,  XMLwrapper *xml)
+bool MidiLearn::insertMidiListData(XMLwrapper *xml)
 {
-    int ID = full; // to silence warning
     if (midi_list.size() == 0)
         return false;
-    ID = 0;
+    int ID = 0;
     list<LearnBlock>::iterator it;
     it = midi_list.begin();
     xml->beginbranch("MIDILEARN");
@@ -896,7 +911,7 @@ bool MidiLearn::insertMidiListData(bool full,  XMLwrapper *xml)
                 xml->addpar("Insert", it->data.insert);
                 xml->addpar("Parameter", it->data.parameter);
                 xml->addpar("Secondary_Parameter", it->data.miscmsg);
-                xml->addparstr("Command_Name", it->name.c_str());
+                xml->addparstr("Command_Name",findName(it).c_str());
                 xml->endbranch();
             xml->endbranch();
             ++it;
@@ -946,7 +961,6 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
         return false;
     }
     LearnBlock entry;
-    CommandBlock real;
     midi_list.clear();
     int ID = 0;
     int status;
@@ -963,19 +977,13 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
                 status |= 4;
             if (xml->getparbool("NRPN", 0))
             {
-                ent = 0x10000; // set top bit for NRPN comparison
+                ent = 0x10000; // set top bit for NRPN indication
                 status |= 8;
             }
             if (xml->getparbool("7_bit",0))
                 status |= 16;
 
-            ent |= xml->getpar("Midi_Controller", 0, 0, 0xfffff);
-            if (ent > 0xff) // belt & braces!
-            {
-                ent |= 0x10000;
-                status |= 8;
-            }
-            entry.CC = ent;
+            entry.CC = ent | xml->getpar("Midi_Controller", 0, 0, 0xfffff);
 
             entry.chan = xml->getpar127("Midi_Channel", 0);
 
@@ -993,18 +1001,16 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
             entry.max_out = xml->getpar("Convert_Max", 0, -16384, 16383);
             xml->enterbranch("COMMAND");
                 entry.data.type = xml->getpar255("Type", 0); // ??
-                real.data.control = entry.data.control = xml->getpar255("Control", 0);
-                real.data.part = entry.data.part = xml->getpar255("Part", 0);
-                real.data.kit = entry.data.kit = xml->getpar255("Kit_Item", 0);
-                real.data.engine = entry.data.engine = xml->getpar255("Engine", 0);
-                real.data.insert = entry.data.insert = xml->getpar255("Insert", 0);
-                real.data.parameter = entry.data.parameter = xml->getpar255("Parameter", 0);
-                real.data.miscmsg = entry.data.miscmsg = xml->getpar255("Secondary_Parameter", 0);
+                entry.data.control = xml->getpar255("Control", 0);
+                entry.data.part = xml->getpar255("Part", 0);
+                entry.data.kit = xml->getpar255("Kit_Item", 0);
+                entry.data.engine = xml->getpar255("Engine", 0);
+                entry.data.insert = xml->getpar255("Insert", 0);
+                entry.data.parameter = xml->getpar255("Parameter", 0);
+                entry.data.miscmsg = xml->getpar255("Secondary_Parameter", 0);
                 xml->exitbranch();
             xml->exitbranch();
             entry.status = status;
-            real.data.type = 0;
-            entry.name = resolveAll(synth, &real, false);
             midi_list.push_back(entry);
             ++ ID;
         }

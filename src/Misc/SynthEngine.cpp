@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2009, James Morris
-    Copyright 2014-2019, Will Godfrey & others
+    Copyright 2014-2020, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -3093,7 +3093,7 @@ int SynthEngine::getalldata(char **data)
 {
     XMLwrapper *xml = new XMLwrapper(this, true);
     add2XML(xml);
-    midilearn.insertMidiListData(false, xml);
+    midilearn.insertMidiListData(xml);
     *data = xml->getXMLdata();
     delete xml;
     return strlen(*data) + 1;
