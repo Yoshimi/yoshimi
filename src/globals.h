@@ -462,6 +462,9 @@ namespace MIDI // usage MIDI::control::noteOn
         keyPressure,
 
         programchange = 999,
+
+        maxNRPN = 0x7fff,
+        identNRPN = 0x8000,
         null
     };
 }

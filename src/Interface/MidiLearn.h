@@ -59,7 +59,7 @@ class MidiLearn : private DataText
         Control data;
 
         struct LearnBlock{
-            unsigned int CC;
+            unsigned short int CC;
             unsigned char chan;
             unsigned char min_in;
             unsigned char max_in;
@@ -72,15 +72,14 @@ class MidiLearn : private DataText
 
         void setTransferBlock(CommandBlock *getData);
 
-        bool runMidiLearn(int _value, unsigned int CC, unsigned char chan, unsigned char category);
+        bool runMidiLearn(int _value, unsigned short int CC, unsigned char chan, bool in_place);
         bool writeMidi(CommandBlock *putData, bool in_place);
-        int findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned int CC, unsigned char chan, LearnBlock *block, bool show);
+
         int findSize();
         void listLine(int lineNo);
         void listAll(list<string>& msg_buf);
         bool remove(int itemNumber);
         void generalOperations(CommandBlock *getData);
-        bool saveList(string name);
         bool insertMidiListData(XMLwrapper *xml);
         bool loadList(string name);
         bool extractMidiListData(bool full,  XMLwrapper *xml);
@@ -91,9 +90,10 @@ class MidiLearn : private DataText
         list<LearnBlock> midi_list;
         string learnedName;
         CommandBlock learnTransferBlock;
-
+        int findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned short int CC, unsigned char chan, LearnBlock *block, bool show);
         string findName(list<LearnBlock>::iterator it);
-        void insertLine(unsigned int CC, unsigned char chan, bool isNRPN);
+        void insertLine(unsigned short int CC, unsigned char chan);
+        bool saveList(string name);
         SynthEngine *synth;
         void writeToGui(CommandBlock *putData);
 };
