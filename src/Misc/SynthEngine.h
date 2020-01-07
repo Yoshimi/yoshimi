@@ -254,7 +254,6 @@ class SynthEngine
         void setNeedsSaving(bool ns) { needsSaving = ns; }
         bool getNeedsSaving() { return needsSaving; }
     private:
-        int muted;
         float volume;
         float sysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];
         float sysefxsend[NUM_SYS_EFX][NUM_SYS_EFX];

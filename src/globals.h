@@ -224,15 +224,6 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         forceExit // this is effective from *any* section!
     };
 
-    enum muted : unsigned char {
-        stopSound = 1,
-        masterReset,
-        patchsetLoad,
-        vectorLoad,
-        stateLoad,
-        listLoad
-    };
-
     // inserts are here as they are split between many
     // sections but must remain distinct.
     enum insert : unsigned char {

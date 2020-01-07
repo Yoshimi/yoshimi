@@ -135,8 +135,6 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     ctl(NULL),
     microtonal(this),
     fft(NULL),
-    muted(0),
-    //stateXMLtree(NULL),
 #ifdef GUI_FLTK
     guiMaster(NULL),
     guiClosedCallback(NULL),
@@ -1891,21 +1889,21 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
     memset(mainL, 0, sent_bufferbytes);
     memset(mainR, 0, sent_bufferbytes);
 
-    unsigned char muted = audioOut.load();
-    switch (muted)
+    unsigned char sound = audioOut.load();
+    switch (sound)
     {
         case muteState::Pending:
             // set by resolver
             fadeLevel = 1.0f;
             audioOut.store(muteState::Fading);
-            muted = muteState::Fading;
+            sound = muteState::Fading;
             //std::cout << "here fading" << std:: endl;
             break;
         case muteState::Fading:
             if (fadeLevel < 0.001f)
             {
                 audioOut.store(muteState::Active);
-                muted = muteState::Active;
+                sound = muteState::Active;
                 fadeLevel = 0;
             }
             break;
@@ -1915,15 +1913,17 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         case muteState::Complete:
             // set by resolver
             audioOut.store(muteState::Idle);
+            //std::cout << "here complete" << std:: endl;
             break;
         case muteState::Request:
             // set by paste routine
             audioOut.store(muteState::Immediate);
-            muted = muteState::Active;
+            sound = muteState::Active;
+            //std::cout << "here requesting" << std:: endl;
             break;
         case muteState::Immediate:
             // cleared by paste routine
-            muted = muteState::Active;
+            sound = muteState::Active;
             break;
         default:
             break;
@@ -1935,7 +1935,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
     for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
             partLocal[npart] = partonoffRead(npart);
 
-    if (muted == muteState::Active)
+    if (sound == muteState::Active)
     {
         for (int npart = 0; npart < (Runtime.NumAvailableParts); ++npart)
         {
@@ -2096,7 +2096,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             }
             mainL[idx] *= volume; // apply Master Volume
             mainR[idx] *= volume;
-            if (muted == muteState::Fading) // fadeLevel must also have been set
+            if (sound == muteState::Fading) // fadeLevel must also have been set
             {
                 for (int npart = 0; npart < (Runtime.NumAvailableParts); ++npart)
                 {
