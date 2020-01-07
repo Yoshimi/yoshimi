@@ -1,4 +1,9 @@
-yoshimi 1.7.0 rc3
+yoshimi 1.7.0 rc5
+
+2020-1-7 Will
+* More MIDI_learn refinements.
+* Corrected wrongly reported NRPN values.
+* Set version as 1.7.0 rc5
 
 2020-1-6 Will
 * BugFix: Editing MIDI-learn lost NRPN status.

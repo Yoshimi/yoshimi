@@ -1,7 +1,7 @@
 /*
     MidiDecode.cpp
 
-    Copyright 2017-2019 Will Godfrey
+    Copyright 2017-2020 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -17,7 +17,6 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified May 2019
 */
 
 #include <iostream>
@@ -190,9 +189,8 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
      *
      * Some controller values are >= 640 so they will be ignored by
      * later calls, but are passed as 128+ for this call.
-     * Pitch wheel is 640 and is 14 bit. It sets bit 1 of 'category'
      */
-    if (synth->midilearn.runMidiLearn(param, ctrl & 0xff, ch, in_place | ((ctrl == 640) << 1)))
+    if (synth->midilearn.runMidiLearn(param, ctrl & 0xff, ch, in_place))
         return; // blocking while learning
 
     /*
@@ -474,7 +472,7 @@ void MidiDecode::nrpnProcessData(unsigned char chan, int type, int par, bool in_
     */
 
     // For NRPNs midi learn must come before everything else
-    if (synth->midilearn.runMidiLearn(dHigh << 7 | par, 0x10000 | (nHigh << 7) | nLow , chan, in_place | 2))
+   if (synth->midilearn.runMidiLearn(dHigh << 7 | par, MIDI::CC::identNRPN | (nHigh << 7) | nLow , chan, in_place))
         return; // blocking while learning
 
     if (nLow < nHigh && (nHigh == 4 || nHigh == 8 ))

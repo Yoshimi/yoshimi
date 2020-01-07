@@ -81,13 +81,16 @@ void MidiLearn::setTransferBlock(CommandBlock *getData)
 }
 
 
-bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, unsigned char category)
+bool MidiLearn::runMidiLearn(int _value, unsigned short int CC, unsigned char chan, bool in_place)
 {
     if (learning)
     {
-        insertLine(CC, chan, (category & 2) != 0);
+        insertLine(CC, chan);
         return true; // block while learning
     }
+
+    if (findSize() == 0)
+        return false; // don't bother if there's no list!
 
     int lastpos = scan::listBlocked;
     LearnBlock foundEntry;
@@ -106,7 +109,7 @@ bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, un
  * equivalent of 0 to 127 under all conditions
  */
         float value; // needs to be refetched each loop
-        if (category & 2)
+        if (CC >= MIDI::CC::identNRPN || CC == MIDI::CC::pitchWheelInner)
         {
             if (status & 16) // 7 bit NRPN
                 value = float(_value & 0x7f);
@@ -160,20 +163,20 @@ bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, un
         putData.data.insert = foundEntry.data.insert;
         putData.data.parameter = foundEntry.data.parameter;
         putData.data.miscmsg = foundEntry.data.miscmsg;
-        if (writeMidi(&putData, category & 1))
+        if (writeMidi(&putData, in_place))
         {
-            if (firstLine && !(category & 1)) // not in_place
+            if (firstLine && !(in_place)) // not in_place
             // we only want to send an activity once
             // and it's not relevant to jack freewheeling
             {
-                if (category & 2)
+                if (CC >= MIDI::CC::identNRPN)
                     putData.data.type |= 0x10; // mark as NRPN
                 firstLine = false;
                 putData.data.control = MIDILEARN::control::reportActivity;
                 putData.data.part = TOPLEVEL::section::midiLearn;
                 putData.data.kit = (CC & 0xff);
                 putData.data.engine = chan;
-                writeMidi(&putData, category & 1);
+                writeMidi(&putData, in_place);
             }
         }
         if (lastpos == scan::listBlocked) // blocking all of this CC/chan pair
@@ -218,7 +221,7 @@ bool MidiLearn::writeMidi(CommandBlock *putData, bool in_place)
  * This will only be called by incoming midi. It is the only function that
  * needs to be really quick
  */
-int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned int CC, unsigned char chan, LearnBlock *block, bool show)
+int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned short int CC, unsigned char chan, LearnBlock *block, bool show)
 {
     int newpos = 0; // 'last' comes in at listBlocked for the first call
     list<LearnBlock>::iterator it = midi_list.begin();
@@ -314,8 +317,14 @@ void MidiLearn::listLine(int lineNo)
             chan += "All";
         else
             chan += to_string(int(it->chan + 1));
+        string  CCtype;
+        int CC = it->CC;
+        if (CC < 0xff)
+            CCtype = to_string(CC);
+        else
+            CCtype = asHexString((CC >> 7) & 0x7f) + asHexString(CC & 0x7f) + " h";
         synth->getRuntime().Log("Line " + to_string(lineNo + 1) + mute
-                + "  CC " + to_string(int(it->CC))
+                + "  CC " + CCtype
                 + chan
                 + "  Min " + asString(float(it->min_in / 2.0f)) + "%"
                 + "  Max " + asString(float(it->max_in / 2.0f)) + "%"
@@ -342,7 +351,7 @@ void MidiLearn::listAll(list<string>& msg_buf)
         if (CC < 0xff)
             CCtype = to_string(CC);
         else
-            CCtype = asHexString((CC >> 8) & 0x7f) + asHexString(CC & 0x7f) + " h";
+            CCtype = asHexString((CC >> 7) & 0x7f) + asHexString(CC & 0x7f) + " h";
         string chan = "  Chan ";
         if ((it->chan) >= NUM_MIDI_CHANNELS)
             chan += "All";
@@ -667,7 +676,7 @@ string MidiLearn::findName(list<LearnBlock>::iterator it)
     return name;
 }
 
-void MidiLearn::insertLine(unsigned int CC, unsigned char chan, bool isNRPN)
+void MidiLearn::insertLine(unsigned short int CC, unsigned char chan)
 {
     /*
      * This will eventually be part of a paging system of
@@ -691,7 +700,7 @@ void MidiLearn::insertLine(unsigned int CC, unsigned char chan, bool isNRPN)
     }
 
     unsigned char status = 0;
-    if (isNRPN)
+    if (CC >= MIDI::CC::identNRPN)
         status |= 9; // mark as NRPN and set 'block'
     LearnBlock entry;
     entry.chan = chan;
@@ -807,7 +816,7 @@ void MidiLearn::updateGui(int opp)
     it = midi_list.begin();
     while (it != midi_list.end())
     {
-        unsigned int newCC = it->CC;
+        unsigned short int newCC = (it->CC) & MIDI::CC::maxNRPN;
         putData.data.value.F = lineNo;
         putData.data.type = it->status;
         putData.data.source = TOPLEVEL::action::toAll;
@@ -819,9 +828,9 @@ void MidiLearn::updateGui(int opp)
         putData.data.miscmsg = textMsgBuffer.push(findName(it));
         writeToGui(&putData);
         if (it->status & 8)
-        { // status now used in case NRPN is < 0x100
+        { // status used in case NRPN is < 0x100
             putData.data.control = MIDILEARN::control::nrpnDetected; // it's an NRPN
-            putData.data.engine = ((newCC >> 8) & 0xff);
+            putData.data.engine = (newCC >> 8);
             writeToGui(&putData);
         }
         ++it;
@@ -964,11 +973,11 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
     midi_list.clear();
     int ID = 0;
     int status;
-    unsigned int ent;
+    unsigned int ident;
     while (true)
     {
         status = 0;
-        ent = 0;
+        ident = 0;
         if (!xml->enterbranch("LINE", ID))
             break;
         else
@@ -977,13 +986,13 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
                 status |= 4;
             if (xml->getparbool("NRPN", 0))
             {
-                ent = 0x10000; // set top bit for NRPN indication
+                ident = MIDI::CC::identNRPN; // set top bit for NRPN indication
                 status |= 8;
             }
             if (xml->getparbool("7_bit",0))
                 status |= 16;
 
-            entry.CC = ent | xml->getpar("Midi_Controller", 0, 0, 0xfffff);
+            entry.CC = ident | xml->getpar("Midi_Controller", 0, 0, MIDI::CC::maxNRPN);
 
             entry.chan = xml->getpar127("Midi_Channel", 0);
 

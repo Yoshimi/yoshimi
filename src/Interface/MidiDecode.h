@@ -1,7 +1,7 @@
 /*
     MidiDecode.h
 
-    Copyright 2017 - 2019 Will Godfrey
+    Copyright 2017 - 2020 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -17,7 +17,6 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified May 2019
 */
 
 #ifndef MIDIDECODE_H
@@ -37,7 +36,6 @@ class MidiDecode
         MidiDecode(SynthEngine *_synth);
         ~MidiDecode();
         void midiProcess(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place, bool inSync = false);
-        void midiReturn(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place = false);
         void setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place = false, bool setRootDir = false);
         void setMidiProgram(unsigned char ch, int prg, bool in_place = false);
 
