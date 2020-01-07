@@ -81,13 +81,6 @@ Bank::Bank(SynthEngine *_synth) :
     BanksVersion = 2;
     InstrumentsInBanks = 0,
     BanksInRoots = 0;
-    roots.clear();
-}
-
-
-Bank::~Bank()
-{
-    roots.clear();
 }
 
 
@@ -95,8 +88,6 @@ string Bank::getBankFileTitle(size_t root, size_t bank)
 {
     return synth->makeUniqueName("Root " + asString(root) + ", Bank " + asString(bank) + " - " + getBankPath(root, bank));
 }
-
-
 
 
 string Bank::getRootFileTitle(size_t root)
