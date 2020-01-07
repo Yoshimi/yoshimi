@@ -174,7 +174,7 @@ bool AlsaEngine::openMidi(void)
             return true;
     }
     std::string found = "";
-    if (!midilist.empty() && midilist != "default")
+    if (midilist != "default")
     {
         while (!midilist.empty())
         {
