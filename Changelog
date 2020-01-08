@@ -1,4 +1,9 @@
-yoshimi 1.7.0 rc5
+yoshimi 1.7.0 rc6
+
+2020-1-8 Will
+* Fixed regression. Some startup arguments not seen.
+* Other refinements to config files.
+* Set version as 1.7.0 rc6
 
 2020-1-7 Will
 * More MIDI_learn refinements.

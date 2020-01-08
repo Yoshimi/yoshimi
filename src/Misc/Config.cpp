@@ -105,14 +105,7 @@ namespace { // constants used in the implementation
     };
 }
 
-
-unsigned int Config::Samplerate = 48000;
-unsigned int Config::Buffersize = 256;
-unsigned int Config::Oscilsize = 512;
-unsigned int Config::GzipCompression = 3;
-bool         Config::showGui = true;
 bool         Config::showSplash = true;
-bool         Config::showCLI = true;
 bool         Config::autoInstance = false;
 unsigned int Config::activeInstance = 0;
 int          Config::showCLIcontext = 1;
@@ -127,7 +120,9 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     finishedCLI(true),
     VirKeybLayout(0),
     audioEngine(DEFAULT_AUDIO),
+    engineChanged(false),
     midiEngine(DEFAULT_MIDI),
+    midiChanged(false),
     alsaMidiType(1), // search
     audioDevice("default"),
     midiDevice("default"),
@@ -149,6 +144,17 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     showTimes(0),
     logXMLheaders(0),
     xmlmax(0),
+    GzipCompression(3),
+    Samplerate(48000),
+    rateChanged(false),
+    Buffersize(256),
+    bufferChanged(false),
+    Oscilsize(512),
+    oscilChanged(false),
+    showGui(true),
+    guiChanged(false),
+    showCli(true),
+    cliChanged(false),
     configChanged(false),
     rtprio(40),
     midi_bank_root(0), // 128 is used as 'disabled'
@@ -296,6 +302,7 @@ void Config::clearPresetsDirlist(void)
 
 bool Config::loadConfig(void)
 {
+    //std::cout << "here load config" << std::endl;
     string cmd;
     int chk;
     string homedir = string(getenv("HOME"));
@@ -481,6 +488,7 @@ void Config::defaultPresets(void)
 
 bool Config::extractBaseParameters(XMLwrapper *xml)
 {
+    //std::cout << "here load base" << std::endl;
     if (synth->getUniqueId() != 0)
         return true;
 
@@ -494,13 +502,21 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
         Log("extractConfigData, no BASE_PARAMETERS branch");
         return false;
     }
-    Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 192000);
-    Buffersize = xml->getpar("sound_buffer_size", Buffersize, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
-    Oscilsize = xml->getpar("oscil_size", Oscilsize, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
+
+    // the following three retained here for compatibility with old config type
+    if(!rateChanged)
+        Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 192000);
+    if (!bufferChanged)
+        Buffersize = xml->getpar("sound_buffer_size", Buffersize, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
+    if (!oscilChanged)
+        Oscilsize = xml->getpar("oscil_size", Oscilsize, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
+
     GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
-    showGui = xml->getparbool("enable_gui", showGui);
+    if (!guiChanged)
+        showGui = xml->getparbool("enable_gui", showGui);
     showSplash = xml->getparbool("enable_splash", showSplash);
-    showCLI = xml->getparbool("enable_CLI", showCLI);
+    if (!cliChanged)
+        showCli = xml->getparbool("enable_CLI", showCli);
     autoInstance = xml->getparbool("enable_auto_instance", autoInstance);
     if (autoInstance)
         activeInstance = xml->getparU("active_instances", 0);
@@ -571,9 +587,12 @@ bool Config::extractConfigData(XMLwrapper *xml)
     if (sessionStage != Session::InProgram)
     {
 
-        Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 192000);
-        Buffersize = xml->getpar("sound_buffer_size", Buffersize, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
-        Oscilsize = xml->getpar("oscil_size", Oscilsize, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
+        if(!rateChanged)
+            Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 192000);
+        if (!bufferChanged)
+            Buffersize = xml->getpar("sound_buffer_size", Buffersize, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
+        if (!oscilChanged)
+            Oscilsize = xml->getpar("oscil_size", Oscilsize, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
         single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);
         toConsole = xml->getpar("reports_destination", toConsole, 0, 1);
         hideErrors = xml->getpar("hide_system_errors", hideErrors, 0, 1);
@@ -603,8 +622,10 @@ bool Config::extractConfigData(XMLwrapper *xml)
         Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
 
         // engines
-        audioEngine = (audio_drivers)xml->getpar("audio_engine", audioEngine, no_audio, alsa_audio);
-        midiEngine = (midi_drivers)xml->getpar("midi_engine", midiEngine, no_midi, alsa_midi);
+        if(!engineChanged)
+            audioEngine = (audio_drivers)xml->getpar("audio_engine", audioEngine, no_audio, alsa_audio);
+        if (!midiChanged)
+            midiEngine = (midi_drivers)xml->getpar("midi_engine", midiEngine, no_midi, alsa_midi);
         alsaMidiType = xml->getpar("alsa_midi_type", 0, 0, 2);
 
         // alsa settings
@@ -1273,6 +1294,7 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
 
         case 'A':
             settings->configChanged = true;
+            settings->engineChanged = true;
             settings->audioEngine = alsa_audio;
             if (arg)
                 settings->audioDevice = string(arg);
@@ -1282,6 +1304,7 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
 
         case 'a':
             settings->configChanged = true;
+            settings->midiChanged = true;
             settings->midiEngine = alsa_midi;
             if (arg)
                 settings->midiDevice = string(arg);
@@ -1291,6 +1314,7 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
 
         case 'b':
             settings->configChanged = true;
+            settings->bufferChanged = true;
             settings->Buffersize = string2int(string(arg));
             break;
 
@@ -1301,26 +1325,31 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
 
         case 'c':
             settings->configChanged = true;
-            settings->showCLI = false;
+            settings->cliChanged = true;
+            settings->showCli = false;
             break;
 
         case 'C':
             settings->configChanged = true;
-            settings->showCLI = true;
+            settings->cliChanged = true;
+            settings->showCli = true;
             break;
 
         case 'i':
             settings->configChanged = true;
+            settings->guiChanged = true;
             settings->showGui = false;
             break;
 
         case 'I':
             settings->configChanged = true;
+            settings->guiChanged = true;
             settings->showGui = true;
             break;
 
         case 'J':
             settings->configChanged = true;
+            settings->engineChanged = true;
             settings->audioEngine = jack_audio;
             if (arg)
                 settings->audioDevice = string(arg);
@@ -1328,6 +1357,7 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
 
         case 'j':
             settings->configChanged = true;
+            settings->midiChanged = true;
             settings->midiEngine = jack_midi;
             if (arg)
                 settings->midiDevice = string(arg);
@@ -1341,11 +1371,13 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
 
         case 'o':
             settings->configChanged = true;
+            settings->oscilChanged = true;
             settings->Oscilsize = string2int(string(arg));
             break;
 
         case 'R':
             settings->configChanged = true;
+            settings->rateChanged = true;
             num = (string2int(string(arg)) / 48 ) * 48;
             if (num < 48000 || num > 192000)
                 num = 44100; // play safe

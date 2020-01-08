@@ -2531,9 +2531,9 @@ void InterChange::commandConfig(CommandBlock *getData)
             break;
         case CONFIG::control::enableCLI:
             if (write)
-                synth->getRuntime().showCLI = value_bool;
+                synth->getRuntime().showCli = value_bool;
             else
-                value = synth->getRuntime().showCLI;
+                value = synth->getRuntime().showCli;
             break;
         case CONFIG::control::enableAutoInstance:
             if (write)

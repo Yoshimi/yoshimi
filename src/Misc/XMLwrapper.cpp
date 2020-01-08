@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2019, Will Godfrey
+    Copyright 2014-2020, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -111,7 +111,7 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
             addpar("gzip_compression", synth->getRuntime().GzipCompression);
             addparbool("enable_gui", synth->getRuntime().showGui);
             addparbool("enable_splash", synth->getRuntime().showSplash);
-            addparbool("enable_CLI", synth->getRuntime().showCLI);
+            addparbool("enable_CLI", synth->getRuntime().showCli);
             addparbool("enable_auto_instance", synth->getRuntime().autoInstance);
             addparU("active_instances", synth->getRuntime().activeInstance);
             addpar("show_CLI_context", synth->getRuntime().showCLIcontext);

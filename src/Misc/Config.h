@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2019, Will Godfrey & others
+    Copyright 2014-2020, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -96,13 +96,7 @@ class Config
         int           lastXMLminor;
         bool          oldConfig;
 
-        static unsigned int  Samplerate;
-        static unsigned int  Buffersize;
-        static unsigned int  Oscilsize;
-        static unsigned int  GzipCompression;
-        static bool          showGui;
         static bool          showSplash;
-        static bool          showCLI;
         static bool          autoInstance;
         static unsigned int  activeInstance;
         static int           showCLIcontext;
@@ -113,7 +107,9 @@ class Config
         int           VirKeybLayout;
 
         audio_drivers audioEngine;
+        bool          engineChanged;
         midi_drivers  midiEngine;
+        bool          midiChanged;
         int           alsaMidiType;
         string        audioDevice;
         string        midiDevice;
@@ -144,7 +140,20 @@ class Config
         bool          showTimes;
         bool          logXMLheaders;
         bool          xmlmax;
+        unsigned int  GzipCompression;
+
+        unsigned int  Samplerate;
+        bool          rateChanged;
+        unsigned int  Buffersize;
+        bool          bufferChanged;
+        unsigned int  Oscilsize;
+        bool          oscilChanged;
+        bool          showGui;
+        bool          guiChanged;
+        bool          showCli;
+        bool          cliChanged;
         bool          configChanged;
+
         int           rtprio;
         int           midi_bank_root;
         int           midi_bank_C;

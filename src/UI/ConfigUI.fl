@@ -5,7 +5,7 @@ code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014 -2019, Will Godfrey
+Copyright 2014 -2020, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -336,7 +336,7 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
             callback {//
                         send_data(0, CONFIG::control::enableCLI, o->value(), TOPLEVEL::type::Integer);}
             tooltip {Enable starting with interactive command line interface} xywh {190 200 27 25} down_box DOWN_BOX labelsize 12 align 4
-            code0 {o->value(synth->getRuntime().showCLI);}
+            code0 {o->value(synth->getRuntime().showCli);}
             code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
           }
           Fl_Check_Button enableAuto {
@@ -1272,7 +1272,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                     logXML->value(synth->getRuntime().logXMLheaders);
                     saveAllXML->value(synth->getRuntime().xmlmax);
                     enableGUI->value(synth->getRuntime().showGui);
-                    enableCLI->value(synth->getRuntime().showCLI);
+                    enableCLI->value(synth->getRuntime().showCli);
                     break;
     }} {}
   }

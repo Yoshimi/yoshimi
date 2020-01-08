@@ -2,7 +2,7 @@
     main.cpp
 
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2019, Will Godfrey & others
+    Copyright 2014-2020, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,6 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified May 2019
 */
 
 // approx timeout in seconds.
@@ -497,7 +496,7 @@ int main(int argc, char *argv[])
     firstRuntime = &it->first->getRuntime();
     firstSynth = it->first;
     bShowGui = firstRuntime->showGui;
-    bShowCmdLine = firstRuntime->showCLI;
+    bShowCmdLine = firstRuntime->showCli;
 
     if (firstRuntime->oldConfig)
     {
