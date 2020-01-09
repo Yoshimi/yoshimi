@@ -116,8 +116,9 @@ class Config
 
         string        jackServer;
         string        jackMidiDevice;
-        bool          startJack;        // false
+        bool          startJack;
         bool          connectJackaudio;
+        bool          connectJackChanged;
         string        jackSessionUuid;
 
         string        alsaAudioDevice;

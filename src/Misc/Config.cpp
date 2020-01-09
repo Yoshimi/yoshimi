@@ -130,6 +130,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     jackMidiDevice("default"),
     startJack(false),
     connectJackaudio(true),
+    connectJackChanged(false),
     alsaAudioDevice("default"),
     alsaMidiDevice("default"),
     loadDefaultState(false),
@@ -635,7 +636,8 @@ bool Config::extractConfigData(XMLwrapper *xml)
         // jack settings
         jackServer = xml->getparstr("linux_jack_server");
         jackMidiDevice = xml->getparstr("linux_jack_midi_dev");
-        connectJackaudio = xml->getpar("connect_jack_audio", connectJackaudio, 0, 1);
+        if(!connectJackChanged)
+            connectJackaudio = xml->getpar("connect_jack_audio", connectJackaudio, 0, 1);
 
         // midi options
         midi_bank_root = xml->getpar("midi_bank_root", midi_bank_root, 0, 128);
@@ -1365,9 +1367,15 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
                 settings->midiDevice = string(settings->jackMidiDevice);
             break;
 
-        case 'k': settings->startJack = true; break;
+        case 'k':
+            settings->startJack = true;
+            break;
 
-        case 'K': settings->connectJackaudio = true; break;
+        case 'K':
+            settings->configChanged = true;
+            settings->connectJackChanged = true;
+            settings->connectJackaudio = true;
+            break;
 
         case 'o':
             settings->configChanged = true;
