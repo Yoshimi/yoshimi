@@ -1,0 +1,21 @@
+1.7.0 - Pipit
+Small but with a big voice
+
+There is only one real feature change here, but it is certainly good enough to warrant a full point release.
+
+Up till now, only a few controls gave an instat response when Yoshimi is playing. The rest only took effect with the next note played.
+
+Thanks to the work of one Yoshimi's 'little band of helpers' this has now been turned on its head. Now almost all controls will give an immediate response, and so will many of the switches, and menus in the engines. The exception is the PadSynth harmonic structure. This is due to the way it generates sets of samples to play.
+
+With a combination of MIDI-learn and external automation, there is an almost limitless range of sounds ans effects possible.
+
+Other bits.
+There was a mistake made with V1.6.1 where some startup arguments were lost - Will puts his hand up to that - and this has now been put right.
+
+There have been internal improvements in the MIDI-learn code.
+
+All slider knobs now respond correctly to mouse clicks (not just drags).
+
+Instrument search window is no longer modal, so doesn't block the GUI from other actions when open.
+
+No longer gives build warnings on GCC8 (a moving target!)

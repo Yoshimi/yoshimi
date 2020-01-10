@@ -1,4 +1,8 @@
-yoshimi 1.7.0 rc6
+yoshimi 1.7.0 rc7
+
+2020-1-10 Will
+* Final doc updates ready for release.
+* Set version as 1.7.0 rc7
 
 2020-1-9 Will
 * Corrected jack autoconnect.
