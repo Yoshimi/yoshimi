@@ -728,9 +728,11 @@ bool PADnoteParameters::export2wav(std::string basefilename)
         memcpy(buffer + 22, &sBlock, 2);
         block = synth->samplerate;
         memcpy(buffer + 24, &block, 4);
-        block = synth->samplerate * 2; // ByteRate (SampleRate * NumChannels * BitsPerSample) / 8
+        block = synth->samplerate * 2; // ByteRate
+                // (SampleRate * NumChannels * BitsPerSample) / 8
         memcpy(buffer + 28, &block, 4);
-        sBlock = 2; // BlockAlign (bitsPerSample * channels) / 8
+        sBlock = 2; // BlockAlign
+                // (bitsPerSample * channels) / 8
         memcpy(buffer + 32, &sBlock, 2);
         sBlock = 16; // BitsPerSample
         memcpy(buffer + 34, &sBlock, 2);
@@ -744,7 +746,13 @@ bool PADnoteParameters::export2wav(std::string basefilename)
             buffer [44 + i * 2] = sBlock & 0xff;
             buffer [45 + i * 2] = (sBlock >> 8) & 0xff;
         }
-        isOK = (saveData(buffer, buffSize, filename) == buffSize);
+        /*
+         * The file manager can return a negative number on error,
+         * so the comparison in the line below must be as integers.
+         * This is safe here as the maximum possible buffer size
+         * is well below the size of an integer.
+         */
+        isOK = (saveData(buffer, buffSize, filename) == int(buffSize));
         free (buffer);
 
     }

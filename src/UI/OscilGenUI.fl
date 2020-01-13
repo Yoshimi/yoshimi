@@ -678,7 +678,7 @@ class OscilEditor {: {public PresetsUI_}
         }
       }
       Fl_Output Warning {
-        xywh {234 8 238 20} box FLAT_BOX color 29 align 32 textfont 1 textcolor 1
+        xywh {224 8 248 20} box FLAT_BOX color 29 align 32 textfont 1 textcolor 1
       }
       Fl_Choice magtype {
         label {Mag.Type}
@@ -1520,8 +1520,9 @@ class OscilEditor {: {public PresetsUI_}
                 {
                     sourceEngine = fetchData(0, ADDVOICE::control::modulatorOscillatorSource,npart,kititem, engine);
                     warnType = "Modulator " + to_string(sourceEngine + 1);
-                }
+                };
             }
+            Warning->redraw();
 
             tname += " Oscillator";
             if (sourceEngine > -1)

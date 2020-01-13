@@ -1,5 +1,9 @@
 yoshimi 1.7.0 rc7
 
+2020-1-13 Will
+* Mod. oscillator warning number out of field.
+* Fixed compiler warning from PadSynth.
+
 2020-1-10 Will
 * Final doc updates ready for release.
 * Set version as 1.7.0 rc7
