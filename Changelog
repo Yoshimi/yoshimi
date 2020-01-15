@@ -1,4 +1,10 @@
-yoshimi 1.7.0 rc7
+yoshimi 1.7.0 rc8
+
+2020-1-15 Will
+* GUI no longer changes part when changing bank.
+* Removed redundant bank code.
+* CLI now tracks part number when set elsewhere.
+* Set version as 1.7.0 rc8
 
 2020-1-13 Will
 * Mod. oscillator warning number out of field.

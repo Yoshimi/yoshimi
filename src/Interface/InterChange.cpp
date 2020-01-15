@@ -2847,15 +2847,6 @@ void InterChange::commandMain(CommandBlock *getData)
             }
             break;
 
-        case MAIN::control::setCurrentRootBank: // set current root and bank
-            if (write)
-            {
-                if (kititem < 0x80) // should test for success
-                    synth->getBankRef().setCurrentRootID(kititem);
-                if (engine < 0x80) // should test for success
-                    synth->getBankRef().setCurrentBankID(engine, true);
-            }
-            break;
 
         case MAIN::control::loadInstrumentFromBank:
             synth->partonoffLock(kititem, -1);

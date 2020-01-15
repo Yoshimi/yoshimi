@@ -509,8 +509,7 @@ namespace MAIN // usage MAIN::control::volume
         importBank,
         deleteBank,
 
-        setCurrentRootBank = 75,  // only used in gui
-        loadInstrumentFromBank,
+        loadInstrumentFromBank = 76,
         loadInstrumentByName,
         saveNamedInstrument,
         loadNamedPatchset,

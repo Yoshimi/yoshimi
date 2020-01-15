@@ -244,6 +244,8 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
     bool justPart = false;
     string result = " p";
 
+    npart = readControl(synth, 0, MAIN::control::partNumber, TOPLEVEL::section::main);
+
     kitMode = readControl(synth, 0, PART::control::kitMode, npart);
     if (bitFindHigh(context) == LEVEL::Part)
     {

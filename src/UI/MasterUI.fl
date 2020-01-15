@@ -367,8 +367,7 @@ class MasterUI {: {private GuiUpdates}
           }
           MenuItem {} {
             label {&Reports...}
-            callback {yoshiLog->Show();
-//midilearnui->Show();}
+            callback {yoshiLog->Show();}
             xywh {0 0 34 20} labelsize 12
           }
           MenuItem {} {
@@ -941,11 +940,11 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
         label S
         callback {//
         int tmp = 1 -  o->value();
-	o->value(tmp);
-	if (tmp == 0)
-	    o->label("S");
-	else
-	    o->label("M");
+        o->value(tmp);
+        if (tmp == 0)
+            o->label("S");
+        else
+            o->label("M");
         send_data(0, MAIN::control::mono,  tmp, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
         tooltip {Master Mono/Stereo switch} xywh {285 88 23 20} box PLASTIC_UP_BOX color 228 selection_color 130 labelfont 1 labelsize 11
         code0 {o->value(synth->masterMono);}
@@ -1548,15 +1547,16 @@ Alan Calvert started the project}
             break;
 
         case MAIN::control::partNumber:
+            if ((getData->data.source & TOPLEVEL::action::noAction) != TOPLEVEL::action::fromGUI)
+                activePart = value_int;
             partuigroup->remove(partui);
             delete partui;
             partui = new PartUI(0, 0, 765, 525);
             partuigroup->add(partui);
-            partui->init(synth->part[value_int], value_int, bankui);
+            partui->init(synth->part[activePart], activePart, bankui);
             partui->redraw();
-            partui->npart = value_int;
-            activePart = value_int;
-            npartcounter->value(value_int + 1);
+            partui->npart = activePart;
+            npartcounter->value(activePart + 1);
             npartcounter->redraw();
             updatepanel();
             if (openedit)
@@ -1654,16 +1654,6 @@ Alan Calvert started the project}
             }
             bankui->rescan_for_banks(false);
             bankui->set_bank_slot();
-            break;
-        case MAIN::control::setCurrentRootBank: // set current root and/or bank
-            if (kititem != UNUSED)
-            {
-                ; // do both
-            }
-            else if (engine != UNUSED)
-            {
-                ; // just bank
-            }
             break;
 
         case MAIN::control::loadInstrumentFromBank:
