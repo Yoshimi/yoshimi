@@ -1963,7 +1963,12 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
     memset(mainR, 0, sent_bufferbytes);
 
     interchange.mediate();
-    char partLocal[NUM_MIDI_PARTS]; // isolates loop from possible change
+    char partLocal[NUM_MIDI_PARTS];
+    /*
+     * This isolates the loop from part changes so that when a low
+     * prio thread completes and re-enables the part, it will not
+     * actually be seen until the start of the next period.
+     */
     for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
             partLocal[npart] = partonoffRead(npart);
 

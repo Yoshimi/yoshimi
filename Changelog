@@ -1,4 +1,9 @@
-yoshimi 1.7.0 rc8
+yoshimi 1.7.0
+
+2020-1-18 Will
+* Added explanatary comments to code.
+* Doc updates.
+* Set release version 1.7.0
 
 2020-1-15 Will
 * GUI no longer changes part when changing bank.

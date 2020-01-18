@@ -1,24 +1,9 @@
-V1.6.1
+V1.7.0
 
-For ALSA MIDI there is a search mode where Yoshimi will connect to every readable source it can find.
+Just one visible change, but a major one.
+Instead of a few controls giving an immediate response, there are only a few that don't :)
 
-There has been a correction to Scales note and frequency allocation terminology.
-
-The mixer panel format can now be changed from Yoshimi->Settings.
-
-The CLI has additional controls, particularly in banks and roots management.
-
-Other stuff.
-
-We've had to do an update to allow for the change in the MXML API.
-
-Dots and dashes in grids are now solid lines. They render much faster.
-
-Session/State/Config managment is now unified. More system settings can be changed by these files as Yoshimi instances start.
-
-The Advanced User Manual has been significantly updated.
-
-More details on all of these are in /doc/Yoshimi_1.6.1_features.txt
+More details are in /doc/Yoshimi_1.7.0_features.txt
 
 
 Yoshimi source code is available from either:

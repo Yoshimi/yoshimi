@@ -16,7 +16,6 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified August 2019
 */
 
 #ifndef TEXTMSGBUFFER_H
@@ -89,7 +88,13 @@ inline void TextMsgBuffer::init()
 {
     for (int i = 0; i < NO_MSG; ++i)
         buffer.push_back("");
-    // we use 255 to denote an invalid entry
+    /*
+     * We immediately fill the list, as we use the list position
+     * to provide the ID for reading. Therefore once it has been
+     * started entries can only be modified in-place nat added
+     * ar removed.
+     * We use 255 (NO_MSG) to denote an invalid entry.
+     */
 }
 
 

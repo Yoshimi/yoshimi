@@ -8,7 +8,7 @@ comment {MidiLearnUI.h} {not_in_source in_header
 comment {MidiLearnUI.cc} {in_source not_in_header
 }
 
-comment {Copyright (C) 2016-2019, Will Godfrey
+comment {Copyright (C) 2016-2020, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
