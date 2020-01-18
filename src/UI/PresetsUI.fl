@@ -38,6 +38,9 @@ decl {\#include <FL/fl_ask.H>} {public local
 decl {\#include <string>} {public global
 }
 
+decl {\#include <unistd.h>} {public global
+}
+
 decl {using namespace std;} {public global
 }
 
@@ -168,21 +171,27 @@ class PresetsUI {selected
             pastewin->hide();
             return;
         }
-        synth->SetMuteAndWait();
+        synth->audioOut.store(muteState::Request);
+        while(synth->audioOut.load() == muteState::Request)
+            usleep (1000); // wait for full mute
         p->paste(n);
         pastewin->hide();
         pui->refresh();
-        synth->Unmute();}
+        if (synth->audioOut.load() == muteState::Immediate)
+            synth->audioOut.store(muteState::Complete);}
         xywh {10 355 160 20} box THIN_UP_BOX
       }
       Fl_Button pastebutton {
         label {Paste from Clipboard}
         callback {//
-        synth->SetMuteAndWait();
+        synth->audioOut.store(muteState::Request);
+        while(synth->audioOut.load() == muteState::Request)
+            usleep (1000); // wait for full mute
         p->paste(0);
         pastewin->hide();
         pui->refresh();
-        synth->Unmute();}
+        if (synth->audioOut.load() == muteState::Immediate)
+            synth->audioOut.store(muteState::Complete);}
         xywh {25 385 90 35} box THIN_UP_BOX align 192
       }
       Fl_Button {} {

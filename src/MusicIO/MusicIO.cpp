@@ -2,7 +2,7 @@
     MusicIO.cpp
 
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2019, Will Godfrey & others
+    Copyright 2014-2020, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -16,7 +16,7 @@
 
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
-    Modified May 2019
+
 */
 
 
@@ -59,7 +59,7 @@ MusicIO::~MusicIO()
 
 void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place)
 {
-    if (synth->isMuted())
+    if (synth->audioOut.load() != muteState::Idle)
         return; // nobody listening!
 
     bool inSync = LV2_engine || (synth->getRuntime().audioEngine == jack_audio && synth->getRuntime().midiEngine == jack_midi);

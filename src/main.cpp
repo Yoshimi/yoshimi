@@ -354,7 +354,6 @@ int mainCreateNewInstance(unsigned int forceId)
     synth->getRuntime().toConsole = false;
 #endif
     synth->getRuntime().StartupReport(musicClient->midiClientName());
-    synth->Unmute();
 
     if (instanceID == 0)
         std::cout << "\nYay! We're up and running :-)\n";

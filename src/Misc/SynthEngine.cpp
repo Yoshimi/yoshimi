@@ -135,8 +135,6 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     ctl(NULL),
     microtonal(this),
     fft(NULL),
-    muted(0),
-    //stateXMLtree(NULL),
 #ifdef GUI_FLTK
     guiMaster(NULL),
     guiClosedCallback(NULL),
@@ -152,6 +150,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     //std::cout << "byte " << int(x.arr[0]) << std::endl;
     Runtime.isLittleEndian = (x.arr[0] == 0x44);
 
+    audioOut.store(muteState::Active);
     if (bank.roots.empty())
         bank.addDefaultRootDirs();
 
@@ -212,7 +211,6 @@ SynthEngine::~SynthEngine()
         delete fft;
 
     sem_destroy(&partlock);
-    sem_destroy(&mutelock);
     if (ctl)
         delete ctl;
     getRemoveSynthId(true, uniqueId);
@@ -259,7 +257,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     }
 
     sem_init(&partlock, 0, 1);
-    sem_init(&mutelock, 0, 1);
 
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
@@ -1797,8 +1794,6 @@ void SynthEngine::resetAll(bool andML)
         putData.data.part = TOPLEVEL::section::midiLearn;
         midilearn.generalOperations(&putData);
     }
-    while(isMuted())
-        Unmute(); // unwind all mute settings
 }
 
 
@@ -1865,74 +1860,6 @@ char SynthEngine::partonoffRead(int npart)
 }
 
 
-void SynthEngine::SetMuteAndWait(void)
-{
-    CommandBlock putData;
-    memset(&putData, 0xff, sizeof(putData));
-    putData.data.value.F = 0;
-    putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
-    putData.data.control = TOPLEVEL::control::textMessage;
-    putData.data.part = TOPLEVEL::section::main;
-#ifdef GUI_FLTK
-    if (interchange.fromGUI ->write(putData.bytes))
-    {
-        while(!isMuted()) // TODO this seems screwy :(
-            usleep (1000);
-    }
-#endif
-}
-
-
-bool SynthEngine::isMuted(void)
-{
-    return (muted < 1);
-}
-
-
-void SynthEngine::Unmute()
-{
-    sem_wait(&mutelock);
-    mutewrite(2);
-    sem_post(&mutelock);
-}
-
-void SynthEngine::Mute()
-{
-    sem_wait(&mutelock);
-    mutewrite(-1);
-    sem_post(&mutelock);
-}
-
-/*
- * Intelligent switch for unknown mute status that always
- * mutes and later returns original unknown state
- */
-void SynthEngine::mutewrite(int what)
-{
-    //unsigned char original = muted;
-    unsigned char tmp = muted;
-    switch (what)
-    {
-        case 0: // always muted
-            tmp = 0;
-            break;
-        case 1: // always unmuted
-            tmp = 1;
-            break;
-        case -1: // further from unmute
-            tmp -= 1;
-            break;
-        case 2:
-            if (tmp != 1) // nearer to unmute
-                tmp += 1;
-            break;
-        default:
-            return;
-    }
-    muted = tmp;
-}
-
-
 // Master audio out (the final sound)
 int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process)
 {
@@ -1956,11 +1883,52 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
     {
         sent_buffersize = to_process;
         sent_bufferbytes = sent_buffersize * sizeof(float);
-        sent_buffersize_f = sent_buffersize;;
+        sent_buffersize_f = sent_buffersize;
     }
 
     memset(mainL, 0, sent_bufferbytes);
     memset(mainR, 0, sent_bufferbytes);
+
+    unsigned char sound = audioOut.load();
+    switch (sound)
+    {
+        case muteState::Pending:
+            // set by resolver
+            fadeLevel = 1.0f;
+            audioOut.store(muteState::Fading);
+            sound = muteState::Fading;
+            //std::cout << "here fading" << std:: endl;
+            break;
+        case muteState::Fading:
+            if (fadeLevel < 0.001f)
+            {
+                audioOut.store(muteState::Active);
+                sound = muteState::Active;
+                fadeLevel = 0;
+            }
+            break;
+        case muteState::Active:
+            // cleared by resolver
+            break;
+        case muteState::Complete:
+            // set by resolver
+            audioOut.store(muteState::Idle);
+            //std::cout << "here complete" << std:: endl;
+            break;
+        case muteState::Request:
+            // set by paste routine
+            audioOut.store(muteState::Immediate);
+            sound = muteState::Active;
+            //std::cout << "here requesting" << std:: endl;
+            break;
+        case muteState::Immediate:
+            // cleared by paste routine
+            sound = muteState::Active;
+            break;
+        default:
+            break;
+    }
+
 
     interchange.mediate();
     char partLocal[NUM_MIDI_PARTS];
@@ -1972,7 +1940,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
     for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
             partLocal[npart] = partonoffRead(npart);
 
-    if (isMuted())
+    if (sound == muteState::Active)
     {
         for (int npart = 0; npart < (Runtime.NumAvailableParts); ++npart)
         {
@@ -2133,7 +2101,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             }
             mainL[idx] *= volume; // apply Master Volume
             mainR[idx] *= volume;
-            if (fadeAll) // fadeLevel must also have been set
+            if (sound == muteState::Fading) // fadeLevel must also have been set
             {
                 for (int npart = 0; npart < (Runtime.NumAvailableParts); ++npart)
                 {
@@ -2211,17 +2179,6 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                 }
 
             }
-        }
-/*
- * This has to be at the end of the audio loop to
- * ensure no contention with VU updates etc.
- */
-        if (fadeAll && fadeLevel <= 0.001f)
-        {
-            Mute();
-            fadeLevel = 0; // just to be sure
-            interchange.flagsWrite(fadeAll);
-            fadeAll = 0;
         }
     }
     return sent_buffersize;
@@ -2365,21 +2322,6 @@ void SynthEngine::ShutUp(void)
 }
 
 
-void SynthEngine::allStop(unsigned int stopType)
-{
-    if(isMuted()) // there's a hanging mute :(
-    {
-        fadeLevel = 0;
-        interchange.flagsWrite(stopType);
-        return;
-    }
-    fadeAll = stopType;
-    if (fadeLevel < 0.001)
-        fadeLevel = 1.0f;
-    // don't reset if it's already fading.
-}
-
-
 bool SynthEngine::loadStateAndUpdate(string filename)
 {
     defaults();
@@ -2387,7 +2329,6 @@ bool SynthEngine::loadStateAndUpdate(string filename)
     Runtime.stateChanged = true;
     bool result = Runtime.restoreSessionData(filename);
     ShutUp();
-    Unmute();
     return result;
 }
 
@@ -2403,7 +2344,6 @@ bool SynthEngine::loadPatchSetAndUpdate(string fname)
     bool result;
     fname = setExtension(fname, EXTEN::patchset);
     result = loadXML(fname); // load the data
-    Unmute();
     if (result)
         setAllPartMaps();
     return result;
@@ -2784,7 +2724,6 @@ unsigned char SynthEngine::loadVectorAndUpdate(unsigned char baseChan, string na
 {
     unsigned char result = loadVector(baseChan, name, true);
     ShutUp();
-    Unmute();
     return result;
 }
 

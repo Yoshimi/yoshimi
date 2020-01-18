@@ -134,6 +134,8 @@ const std::string UNTITLED = "No Title";
 const unsigned char FORCED_EXIT = 16;
 
 
+enum muteState {Idle, Pending, Fading, Active, Complete, Request, Immediate};
+
 enum Session : unsigned char {
     Normal = 0,
     Default,
@@ -220,15 +222,6 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         // insert any new entries here
         textMessage = 254, // FE
         forceExit // this is effective from *any* section!
-    };
-
-    enum muted : unsigned char {
-        stopSound = 1,
-        masterReset,
-        patchsetLoad,
-        vectorLoad,
-        stateLoad,
-        listLoad
     };
 
     // inserts are here as they are split between many
