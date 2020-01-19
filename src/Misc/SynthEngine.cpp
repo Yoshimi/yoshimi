@@ -1911,7 +1911,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             // cleared by resolver
             break;
         case muteState::Complete:
-            // set by resolver
+            // set by resolver and paste
             audioOut.store(muteState::Idle);
             //std::cout << "here complete" << std:: endl;
             break;

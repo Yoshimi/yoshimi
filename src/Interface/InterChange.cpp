@@ -181,7 +181,7 @@ void *InterChange::sortResultsThread(void)
     while(synth->getRuntime().runSynth)
     {
         /*
-         * To maitain portability we synthesise a very simple low accuracy
+         * To maintain portability we synthesise a very simple low accuracy
          * timer based on the loop time of this function. As it makes no system
          * calls apart from usleep() it is lightweight and should have no thread
          * safety issues. It is used mostly for timeouts.
@@ -372,17 +372,20 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 
     std::string text;
     if (getData->data.miscmsg != NO_MSG)
+    {
         text = textMsgBuffer.fetch(getData->data.miscmsg);
+        getData->data.miscmsg = NO_MSG; // this may be reset later
+    }
     else
         text = "";
-    getData->data.miscmsg = NO_MSG; // this may be reset later
+
     unsigned int tmp;
     std::string name;
     bool learnUpdate = false;
 
     int switchNum = npart;
     if (control == TOPLEVEL::control::textMessage)
-        switchNum = 256; // this is a bit hacky :(
+        switchNum = TOPLEVEL::section::message; // this is a bit hacky :(
 
     switch(switchNum)
     {
@@ -1140,7 +1143,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
             getData->data.source &= ~TOPLEVEL::action::lowPrio;
             break;
         }
-        case 256:
+        case TOPLEVEL::section::message:
         {
             newMsg = true;
             getData->data.source &= ~TOPLEVEL::action::lowPrio;

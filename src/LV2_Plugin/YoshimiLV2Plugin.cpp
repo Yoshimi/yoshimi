@@ -2,7 +2,7 @@
     YoshimiLV2Plugin
 
     Copyright 2014, Andrew Deryabin <andrewderyabin@gmail.com>
-    Copyright 2016-2019, Will Godfrey & others.
+    Copyright 2016-2020, Will Godfrey & others.
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,6 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified May 2019
 */
 
 #include "YoshimiLV2Plugin.h"
@@ -386,6 +385,7 @@ LV2_Handle	YoshimiLV2Plugin::instantiate (const struct _LV2_Descriptor *desc, do
     if (synth == NULL || !synth->getRuntime().isRuntimeSetupCompleted()){
         return NULL;
     }
+    Fl::lock();
     /*
      * Perform further global initialisation.
      * For stand-alone the equivalent init happens in main(),
@@ -781,12 +781,7 @@ void YoshimiLV2PluginUI::show()
         return;
     }
     if (bInit)
-    {
-        Fl::lock();
-        Fl::unlock();
         _masterUI->Init(uiHost.plugin_human_id);
-    }
-
 }
 
 

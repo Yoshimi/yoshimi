@@ -1,4 +1,11 @@
-yoshimi 1.7.0
+yoshimi 1.7.0 M
+
+2020-1-19 Will
+* New master mute system now in place.
+* Moved location of Fl::Lock() in LV2
+  As suggested by Rob to resolve odd CLI output.
+* Some minor adjustments in indirectTransfers.
+  Gets rid of magic number.
 
 2020-1-18 Will
 * Added explanatary comments to code.

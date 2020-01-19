@@ -184,7 +184,8 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         systemEffects,
         insertEffects,
         bank = 244, // F4
-        config = 248 // F8
+        config = 248, // F8
+        message = 250 // FA
     };
 
     namespace type {
