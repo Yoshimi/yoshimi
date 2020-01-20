@@ -330,7 +330,7 @@ int Bank::getBankSize(int bankID, size_t rootID)
 {
     int found = 0;
 
-    for (int i = 0; i < BANK_SIZE; ++ i)
+    for (int i = 0; i < MAX_INSTRUMENTS_IN_BANK; ++ i)
         if (!roots [rootID].banks [bankID].instruments [i].name.empty())
             found += 1;
     return found;
@@ -685,7 +685,7 @@ string Bank::removebank(unsigned int bankID, size_t rootID)
     int chk = 0;
     string name;
     string failed;
-    for (int inst = 0; inst < BANK_SIZE; ++ inst)
+    for (int inst = 0; inst < MAX_INSTRUMENTS_IN_BANK; ++ inst)
     {
         if (!roots [rootID].banks [bankID].instruments [inst].name.empty())
         {
@@ -920,7 +920,7 @@ string Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t first
         hints [secondRoot] [secondname] = firstID; // why do we need these?
         hints [firstRoot] [firstname] = secondID;
 
-        for(int pos = 0; pos < BANK_SIZE; ++ pos)
+        for(int pos = 0; pos < MAX_INSTRUMENTS_IN_BANK; ++ pos)
         {
             InstrumentEntry &instrRef_1 = getInstrumentReference(firstRoot, firstID, pos);
             InstrumentEntry &instrRef_2 = getInstrumentReference(secondRoot, secondID, pos);
@@ -1076,26 +1076,26 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
 {
     BankEntry &bank = roots [rootID].banks [bankID];
 
-    if (pos >= 0 && pos < BANK_SIZE)
+    if (pos >= 0 && pos < MAX_INSTRUMENTS_IN_BANK)
     {
         if (bank.instruments [pos].used)
         {
             pos = -1; // force it to find a new free position
         }
     }
-    else if (pos >= BANK_SIZE)
+    else if (pos >= MAX_INSTRUMENTS_IN_BANK)
         pos = -1;
 
     if (pos < 0)
     {
 
-        if(!bank.instruments.empty() && bank.instruments.size() > BANK_SIZE)
+        if(!bank.instruments.empty() && bank.instruments.size() > MAX_INSTRUMENTS_IN_BANK)
         {
             pos = bank.instruments.rbegin()->first + 1;
         }
         else
         {
-            pos = BANK_SIZE-1;
+            pos = MAX_INSTRUMENTS_IN_BANK-1;
             while (!emptyslot(rootID, bankID, pos))
             {
                 pos -= 1;
@@ -1144,10 +1144,10 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
 
 void Bank::deletefrombank(size_t rootID, size_t bankID, unsigned int pos)
 {
-    if (pos >= BANK_SIZE)
+    if (pos >= MAX_INSTRUMENTS_IN_BANK)
     {
-        synth->getRuntime().Log("Error, deletefrombank pos " + asString(pos) + " > BANK_SIZE"
-                    + asString(BANK_SIZE));
+        synth->getRuntime().Log("Error, deletefrombank pos " + asString(pos) + " > MAX_INSTRUMENTS_IN_BANK"
+                    + asString(MAX_INSTRUMENTS_IN_BANK));
         return;
     }
     getInstrumentReference(rootID, bankID, pos).clear();
@@ -1470,7 +1470,7 @@ void Bank::parseConfigFile(XMLwrapper *xml)
                 {
                     changeRootID(newIndex, i);
                 }
-                for(size_t k = 0; k < BANK_SIZE; k++)
+                for(size_t k = 0; k < MAX_INSTRUMENTS_IN_BANK; k++)
                 {
                     if(xml->enterbranch("bank_id", k))
                     {

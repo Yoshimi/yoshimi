@@ -1354,9 +1354,9 @@ class BankUI {: {public BankProcess_, RootProcess_}
 
     bankuiwindow->copy_label(bank->getRootFileTitle(rt).c_str());
 
-    for (int i = 0; i < BANK_SIZE; ++i)
+    for (int i = 0; i < MAX_INSTRUMENTS_IN_BANK; ++i)
         bs[i]->refresh(bk, rt);
-    for (int i = 0; i < ROOT_SIZE; ++i)
+    for (int i = 0; i < MAX_BANKS_IN_ROOT; ++i)
         rs[i]->rootrefresh(bk, rt);} {}
   }
   Function {refreshbankslot(int ins, int bk, int rt)} {} {
@@ -1468,9 +1468,9 @@ class BankUI {: {public BankProcess_, RootProcess_}
     }
     return 0;} {}
   }
-  decl {BankSlot *bs[BANK_SIZE];} {private local
+  decl {BankSlot *bs[MAX_INSTRUMENTS_IN_BANK];} {private local
   }
-  decl {RootSlot *rs[ROOT_SIZE];} {private local
+  decl {RootSlot *rs[MAX_BANKS_IN_ROOT];} {private local
   }
   decl {int slot, what; // "what" = what button is pressed} {private local
   }

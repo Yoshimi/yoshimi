@@ -1146,7 +1146,7 @@ void SynthEngine::ListInstruments(int bankNum, list<string>& msg_buf)
                             + ", Bank ID " + asString(bankNum));
             msg_buf.push_back("    " + label
                             + "/" + bank.roots [root].banks [bankNum].dirname);
-            for (int idx = 0; idx < BANK_SIZE; ++ idx)
+            for (int idx = 0; idx < MAX_INSTRUMENTS_IN_BANK; ++ idx)
             {
                 if (!bank.emptyslot(root, bankNum, idx))
                 {

@@ -35,9 +35,6 @@
 using std::string;
 using std::map;
 
-#define ROOT_SIZE 128
-#define BANK_SIZE 160
-
 typedef struct _InstrumentEntry
 {
     string name;
