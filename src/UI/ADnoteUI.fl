@@ -11,7 +11,7 @@ comment {ADNoteUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2019, Will Godfrey
+Copyright 2014-2020, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -1174,11 +1174,16 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
     code {//
     float value = getData->data.value.F;
     unsigned char control = getData->data.control;
-    unsigned char voice = getData->data.engine - PART::engine::addVoice1;
+    unsigned char voice = getData->data.engine;
+    //std::cout << "voice " << int(voice) << "   nvoice " << int(nvoice) << std::endl;
+    if (voice >= PART::engine::addMod1)
+        voice -= PART::engine::addMod1;
+    else if (voice >= PART::engine::addVoice1)
+        voice -= PART::engine::addVoice1;
     int tmp;
     bool val_bool = YOSH::F2B(value);
-    //if (voice != nvoice && control != ADDVOICE::control::enableVoice)
-        //return;
+    if (voice != nvoice)
+        return;
 
     switch(control)
     {

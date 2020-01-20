@@ -1,5 +1,8 @@
 yoshimi 1.7.0 M
 
+2020-1-20 Will
+BugFix: AddVoice GUI update not right from CLI/MIDI.
+
 2020-1-19 Will
 * New master mute system now in place.
 * Moved location of Fl::Lock() in LV2
