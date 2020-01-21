@@ -865,7 +865,7 @@ bool MidiLearn::saveList(string name)
     XMLwrapper *xml = new XMLwrapper(synth, true);
     if (!xml)
     {
-        synth->getRuntime().Log("Save Midi Learn failed xmltree allocation");
+        synth->getRuntime().Log("Save Midi Learn failed xml allocation");
         return false;
     }
     bool ok = insertMidiListData(xml);

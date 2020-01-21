@@ -2425,20 +2425,20 @@ bool SynthEngine::saveBanks()
     string bankname = name + ".banks";
     Runtime.xmlType = TOPLEVEL::XML::Bank;
 
-    XMLwrapper *xmltree = new XMLwrapper(this, true);
-    if (!xmltree)
+    XMLwrapper *xml = new XMLwrapper(this, true);
+    if (!xml)
     {
-        Runtime.Log("saveBanks failed xmltree allocation");
+        Runtime.Log("saveBanks failed xml allocation");
         return false;
     }
-    xmltree->beginbranch("BANKLIST");
-    bank.saveToConfigFile(xmltree);
-    xmltree->endbranch();
+    xml->beginbranch("BANKLIST");
+    bank.saveToConfigFile(xml);
+    xml->endbranch();
 
-    if (!xmltree->saveXMLfile(bankname))
+    if (!xml->saveXMLfile(bankname))
         Runtime.Log("Failed to save config to " + bankname);
 
-    delete xmltree;
+    delete xml;
 
     return true;
 }
@@ -2651,13 +2651,13 @@ bool SynthEngine::saveHistory()
     string historyname = name + ".history";
     Runtime.xmlType = TOPLEVEL::XML::History;
 
-    XMLwrapper *xmltree = new XMLwrapper(this, true);
-    if (!xmltree)
+    XMLwrapper *xml = new XMLwrapper(this, true);
+    if (!xml)
     {
-        Runtime.Log("saveHistory failed xmltree allocation");
+        Runtime.Log("saveHistory failed xml allocation");
         return false;
     }
-    xmltree->beginbranch("HISTORY");
+    xml->beginbranch("HISTORY");
     {
         int count;
         string type;
@@ -2696,26 +2696,26 @@ bool SynthEngine::saveHistory()
             {
                 unsigned int offset = 0;
                 int x = 0;
-                xmltree->beginbranch(type);
-                    xmltree->addparbool("lock_status", Runtime.historyLock[count]);
-                    xmltree->addpar("history_size", listType.size());
+                xml->beginbranch(type);
+                    xml->addparbool("lock_status", Runtime.historyLock[count]);
+                    xml->addpar("history_size", listType.size());
                     if (listType.size() > MAX_HISTORY)
                         offset = listType.size() - MAX_HISTORY;
                     for (vector<string>::iterator it = listType.begin(); it != listType.end() - offset; ++it)
                     {
-                        xmltree->beginbranch("XMZ_FILE", x);
-                            xmltree->addparstr(extension, *it);
-                        xmltree->endbranch();
+                        xml->beginbranch("XMZ_FILE", x);
+                            xml->addparstr(extension, *it);
+                        xml->endbranch();
                         ++x;
                     }
-                xmltree->endbranch();
+                xml->endbranch();
             }
         }
     }
-    xmltree->endbranch();
-    if (!xmltree->saveXMLfile(historyname))
+    xml->endbranch();
+    if (!xml->saveXMLfile(historyname))
         Runtime.Log("Failed to save data to " + historyname);
-    delete xmltree;
+    delete xml;
     return true;
 }
 
@@ -2891,7 +2891,7 @@ unsigned char SynthEngine::saveVector(unsigned char baseChan, string name, bool 
     XMLwrapper *xml = new XMLwrapper(this, true);
     if (!xml)
     {
-        Runtime.Log("Save Vector failed xmltree allocation", 2);
+        Runtime.Log("Save Vector failed xml allocation", 2);
         return textMsgBuffer.push("FAIL");
     }
     xml->beginbranch("VECTOR");

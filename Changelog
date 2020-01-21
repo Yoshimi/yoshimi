@@ -1,8 +1,12 @@
 yoshimi 1.7.0 M
 
+2020-1-21 Will
+* Unified xml pointer names.
+  Makes code a bit easier to follow.
+
 2020-1-20 Will
-BugFix: AddVoice GUI update not right from CLI/MIDI.
-Combined definition of sizes in Bank.h with globals.h
+* BugFix: AddVoice GUI update not right from CLI/MIDI.
+* Combined definition of sizes in Bank.h with globals.h
 
 2020-1-19 Will
 * New master mute system now in place.

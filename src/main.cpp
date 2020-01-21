@@ -163,12 +163,12 @@ static void *mainGuiThread(void *arg)
     map<SynthEngine *, MusicClient *>::iterator it;
 
 #ifdef GUI_FLTK
-    static bool first = true;
+/*    static bool first = true;
     if (first)
     {
         first = false;
         Fl::lock();
-    }
+    }*/
     const int textHeight = 15;
     const int textY = 10;
     const unsigned char lred = 0xd7;
@@ -464,6 +464,7 @@ int main(int argc, char *argv[])
     }
     if (useGui)
     {
+        Fl::lock();
         do_start();
     }
 
