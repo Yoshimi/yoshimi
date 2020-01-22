@@ -2208,15 +2208,6 @@ int ADnote::noteout(float *outl, float *outr)
         if (!NoteVoicePar[nvoice].Enabled || NoteVoicePar[nvoice].DelayTicks > 0)
             continue;
 
-        if (NoteVoicePar[nvoice].Volume == 0.0f
-            && NoteVoicePar[nvoice].VoiceOut == NULL) {
-
-            // If the voice is muted and we are not producing sound for any sub
-            // voices, then save the cycles.
-            killVoice(nvoice);
-            continue;
-        }
-
         if (NoteVoicePar[nvoice].FMEnabled != NONE)
             computeVoiceModulator(nvoice, NoteVoicePar[nvoice].FMEnabled);
 
