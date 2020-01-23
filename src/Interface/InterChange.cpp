@@ -71,9 +71,6 @@ using func::asString;
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
 extern SynthEngine *firstSynth;
 
-// used by main.cpp and SynthEngine.cpp
-std::string singlePath;
-std::string runGui;
 int startInstance = 0;
 
 
@@ -96,8 +93,7 @@ InterChange::InterChange(SynthEngine *_synth) :
     swapRoot1(UNUSED),
     swapBank1(UNUSED),
     swapInstrument1(UNUSED)
-{   // this is repeated here as it might somehow get called from LV2
-    singlePath = std::string(getenv("HOME")) + "/.yoshimiSingle";
+{
 }
 
 
@@ -2493,13 +2489,7 @@ void InterChange::commandConfig(CommandBlock *getData)
             break;
         case CONFIG::control::enableGUI:
             if (write)
-            {
                 synth->getRuntime().showGui = value_bool;
-                if (value_bool)
-                    createEmptyFile(runGui);
-                else
-                    deleteFile(runGui);
-            }
             else
                 value = synth->getRuntime().showGui;
             break;
@@ -2517,14 +2507,9 @@ void InterChange::commandConfig(CommandBlock *getData)
             break;
         case CONFIG::control::enableSinglePath:
             if (write)
-            {
-                if (value_bool)
-                    createEmptyFile(singlePath);
-                else
-                    deleteFile(singlePath);
-            }
+                synth->getRuntime().singlePath = value;
             else
-                value = isRegularFile(singlePath);
+                value = synth->getRuntime().singlePath;
             break;
         case CONFIG::control::exposeStatus:
             if (write)

@@ -153,6 +153,7 @@ class Config
         bool          guiChanged;
         bool          showCli;
         bool          cliChanged;
+        bool          singlePath;
         bool          configChanged;
 
         int           rtprio;

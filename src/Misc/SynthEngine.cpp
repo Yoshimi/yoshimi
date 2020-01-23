@@ -62,9 +62,6 @@ using std::set;
 
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
 
-// defined in InterChange.cpp and also used in main.cpp
-extern std::string runGui;
-
 map<SynthEngine *, MusicClient *> synthInstances;
 SynthEngine *firstSynth = NULL;
 
@@ -360,13 +357,13 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     }
 
     // just to make sure we're in sync
-    if (uniqueId == 0)
+    /*if (uniqueId == 0)
     {
         if (Runtime.showGui)
             createEmptyFile(runGui);
         else
             deleteFile(runGui);
-    }
+    }*/
 
     // we seem to need this here only for first time startup :(
     bank.setCurrentBankID(Runtime.tempBank);

@@ -156,6 +156,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     guiChanged(false),
     showCli(true),
     cliChanged(false),
+    singlePath(false),
     configChanged(false),
     rtprio(40),
     midi_bank_root(0), // 128 is used as 'disabled'
@@ -504,26 +505,19 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
         return false;
     }
 
-    // the following three retained here for compatibility with old config type
-    if(!rateChanged)
-        Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 192000);
-    if (!bufferChanged)
-        Buffersize = xml->getpar("sound_buffer_size", Buffersize, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
-    if (!oscilChanged)
-        Oscilsize = xml->getpar("oscil_size", Oscilsize, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
-
-    GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
     if (!guiChanged)
         showGui = xml->getparbool("enable_gui", showGui);
     showSplash = xml->getparbool("enable_splash", showSplash);
     if (!cliChanged)
         showCli = xml->getparbool("enable_CLI", showCli);
+    singlePath = xml->getparbool("enable_single_master", singlePath);
     autoInstance = xml->getparbool("enable_auto_instance", autoInstance);
     if (autoInstance)
         activeInstance = xml->getparU("active_instances", 0);
     else
         activeInstance = 1;
     showCLIcontext = xml->getpar("show_CLI_context", 1, 0, 2);
+    GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
 
     // get preset dirs
     int count = 0;
@@ -548,6 +542,15 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
         currentPreset = 0;
         configChanged = true; // give the user the choice
     }
+
+    // the following three retained here for compatibility with old config type
+    if(!rateChanged)
+        Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 192000);
+    if (!bufferChanged)
+        Buffersize = xml->getpar("sound_buffer_size", Buffersize, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
+    if (!oscilChanged)
+        Oscilsize = xml->getpar("oscil_size", Oscilsize, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
+
 
     xml->exitbranch(); // BaseParameters
     return true;
@@ -679,7 +682,7 @@ bool Config::saveConfig(bool master)
         }
         string resConfigFile = baseConfig;
 
-        if (xml->saveXMLfile(resConfigFile))
+        if (xml->saveXMLfile(resConfigFile, false))
         {
             configChanged = false;
             result = true;

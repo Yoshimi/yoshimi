@@ -24,6 +24,7 @@
 
 #include <sys/mman.h>
 #include <iostream>
+#include <string>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -45,6 +46,8 @@
 #include "MusicIO/MusicClient.h"
 #include "CLI/CmdInterface.h"
 #include "Interface/InterChange.h"
+#include "Misc/FileMgrFuncs.h"
+#include "Misc/FormatFuncs.h"
 
 #ifdef GUI_FLTK
     #include "MasterUI.h"
@@ -67,6 +70,7 @@ static char **globalArgv = NULL;
 bool isSingleMaster = false;
 bool bShowGui = true;
 bool bShowCmdLine = true;
+bool showSplash = false;
 bool splashSet = true;
 bool configuring = false;
 #ifdef GUI_FLTK
@@ -163,12 +167,12 @@ static void *mainGuiThread(void *arg)
     map<SynthEngine *, MusicClient *>::iterator it;
 
 #ifdef GUI_FLTK
-/*    static bool first = true;
+    static bool first = true;
     if (first)
     {
         first = false;
         Fl::lock();
-    }*/
+    }
     const int textHeight = 15;
     const int textY = 10;
     const unsigned char lred = 0xd7;
@@ -189,7 +193,7 @@ static void *mainGuiThread(void *arg)
     boxLb.labelcolor(fl_rgb_color(lred, lgreen, lblue));
     boxLb.labelfont(FL_HELVETICA | FL_BOLD);
     winSplash.border(false);
-    if (splashSet && bShowGui && firstRuntime->showSplash)
+    if (splashSet && bShowGui && showSplash)
     {
         winSplash.position((Fl::w() - winSplash.w()) / 2, (Fl::h() - winSplash.h()) / 2);
     }
@@ -416,21 +420,56 @@ std::string runCommand(std::string command, bool clean)
     return std::string(returnLine);
 }
 
-#define SINGLE_MASTER "/.yoshimiSingle"; // filename for hidden storage in 'HOME'
-#define ENABLE_GUI "/.yoshimiGui"; // filename for hidden storage in 'HOME'
-
 int main(int argc, char *argv[])
 {
-/*
- * Can't make these calls from file manager and the files have to be in the
- * home directory as it's the only one we can be certain exists at startup
- */
-    singlePath = std::string(getenv("HOME")) + SINGLE_MASTER;
-    runGui = std::string(getenv("HOME")) + ENABLE_GUI;
-    struct stat st;
-    if (!stat(singlePath.c_str(), &st))
+    /*
+     * The following is a way to quickly identify and read key config startup values
+     * before the synth engine has started, or any of the normal functions have been
+     * identified. The base config file is quite small and is always uncompressed
+     * (regardless of settings) as it is useful to be able to read and/or manually
+     * change settings under fault conditions.
+     */
+    std::string Home = getenv("HOME");
+    std::string Config = file::loadText(Home + "/.config/yoshimi/yoshimi.config");
+    bool runGui = false;
+    if (Config.empty())
     {
-        isSingleMaster = true;
+        std::cout << "Not there" << std::endl;
+        runGui = true;
+        showSplash = true;
+    }
+    else
+    {
+        int count = 0;
+        int found = 0;
+        while (!Config.empty() && count < 16 && found < 3)
+        { // no need to count beyond 16 lines!
+            std::string line = func::nextLine(Config);
+            //std::cout << count << "  " << line  << std::endl;
+            ++ count;
+
+            if (line.find("enable_gui") != std::string::npos)
+            {
+                ++ found;
+                if (line.find("yes") != std::string::npos)
+                    runGui = true;
+            }
+            if (line.find("enable_splash") != std::string::npos)
+            {
+                ++ found;
+                if (line.find("yes") != std::string::npos)
+                    showSplash = true;
+            }
+            if (line.find("enable_single_master") != std::string::npos)
+            {
+                ++ found;
+                if (line.find("yes") != std::string::npos)
+                    isSingleMaster = true;
+            }
+        }
+    }
+    if (isSingleMaster)
+    {
         std::string firstText = runCommand("pgrep -o -x yoshimi", false);
         int firstpid = std::stoi(firstText);
         int firstTime = std::stoi(runCommand("ps -o etime= -p " + firstText, true));
@@ -443,10 +482,8 @@ int main(int argc, char *argv[])
         }
     }
 #ifdef GUI_FLTK
-    runGui = std::string(getenv("HOME")) + ENABLE_GUI;
-    //struct stat st;
     bool useGui = false;
-    if (!stat(runGui.c_str(), &st))
+    if (runGui)
         useGui = true;
     if (argc > 1)
     {
@@ -463,10 +500,7 @@ int main(int argc, char *argv[])
             }
     }
     if (useGui)
-    {
-        Fl::lock();
         do_start();
-    }
 
     bool guiStarted = false;
     time(&old_father_time);

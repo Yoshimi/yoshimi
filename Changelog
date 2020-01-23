@@ -1,5 +1,9 @@
 yoshimi 1.7.0 M
 
+2020-1-23 Will
+* Revised essential config parameters.
+  Main no longer needs complex saved hidden files.
+
 2020-1-21 Will
 * Unified xml pointer names.
   Makes code a bit easier to follow.

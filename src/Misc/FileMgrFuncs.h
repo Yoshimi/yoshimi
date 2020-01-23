@@ -1,7 +1,7 @@
 /*
     FileMgr.h - all file operations
 
-    Copyright 2019 Will Godfrey
+    Copyright 2020 Will Godfrey and others.
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -324,7 +324,11 @@ inline char * loadGzipped(string _filename, string * report)
     return data;
 }
 
-
+/*
+ * This is used for text files, preseving individual lines. These can
+ * then be split up by the receiving functions without needing a file
+ * handle, or any knowledge of the file system.
+ */
 inline string loadText(string filename)
 {
     FILE *readfile = fopen(filename.c_str(), "r");

@@ -2,7 +2,7 @@
     FormatFuncs.h
 
     Copyright 2010, Alan Calvert
-    Copyright 2014-2019, Will Godfrey
+    Copyright 2014-2020, Will Godfrey and others.
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -251,6 +251,28 @@ inline std::string formatTextLines(std::string text, size_t maxLen)
         lineLen += 1;
     }
     return text;
+}
+
+
+inline std::string nextLine(std::string& list) // this is destructive
+{
+    size_t pos = list.find('\n');
+    std::string line = "";
+    if (pos == std::string::npos)
+    {
+        line = list;
+        list = "";
+    }
+    else
+    {
+        line = list.substr(0, pos);
+        ++pos;
+        if (pos > list.size())
+            list = "";
+        else
+            list = list.substr(pos);
+    }
+    return line;
 }
 
 }//(End)namespace func

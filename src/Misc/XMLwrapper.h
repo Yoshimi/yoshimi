@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2019, Will Godfrey
+    Copyright 2014-2020, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -42,7 +42,7 @@ class XMLwrapper
         ~XMLwrapper();
 
         // SAVE to XML
-        bool saveXMLfile(std::string _filename); // return true if ok, false otherwise
+        bool saveXMLfile(std::string _filename, bool useCompression = true); // return true if ok, false otherwise
 
         // returns the new allocated string that contains the XML data (used for clipboard)
         // the string is NULL terminated

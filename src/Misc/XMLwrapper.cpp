@@ -108,13 +108,14 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
     if (synth->getRuntime().xmlType == TOPLEVEL::XML::MasterConfig)
     {
         beginbranch("BASE_PARAMETERS");
-            addpar("gzip_compression", synth->getRuntime().GzipCompression);
             addparbool("enable_gui", synth->getRuntime().showGui);
             addparbool("enable_splash", synth->getRuntime().showSplash);
             addparbool("enable_CLI", synth->getRuntime().showCli);
+            addparbool("enable_single_master", synth->getRuntime().singlePath);
             addparbool("enable_auto_instance", synth->getRuntime().autoInstance);
             addparU("active_instances", synth->getRuntime().activeInstance);
             addpar("show_CLI_context", synth->getRuntime().showCLIcontext);
+            addpar("gzip_compression", synth->getRuntime().GzipCompression);
 
             for (int i = 0; i < MAX_PRESET_DIRS; ++i)
             {
@@ -294,7 +295,7 @@ void XMLwrapper::slowinfosearch(char *idx)
 
 // SAVE XML members
 
-bool XMLwrapper::saveXMLfile(std::string _filename)
+bool XMLwrapper::saveXMLfile(std::string _filename, bool useCompression)
 {
     std::string filename = _filename;
     char *xmldata = getXMLdata();
@@ -305,7 +306,9 @@ bool XMLwrapper::saveXMLfile(std::string _filename)
         return false;
     }
 
-    unsigned int compression = synth->getRuntime().GzipCompression;
+    unsigned int compression = 0;
+    if (useCompression)
+        compression = synth->getRuntime().GzipCompression;
     if (compression <= 0)
     {
         if (!saveText(xmldata, filename))
