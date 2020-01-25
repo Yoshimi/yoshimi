@@ -1,5 +1,8 @@
 yoshimi 1.7.0 M
 
+2020-1-25 Will
+* BugFix: GUI 'Save External' using wrong name.
+
 2020-1-23 Will
 * Revised essential config parameters.
   Main no longer needs complex saved hidden files.

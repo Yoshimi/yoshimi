@@ -11,7 +11,7 @@ comment {MasterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2019, Will Godfrey & others
+Copyright 2014-2020, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -415,15 +415,15 @@ class MasterUI {: {private GuiUpdates}
           MenuItem {} {
             label {&Save External...}
             callback {//
-                if (synth->part[npart]->Pname == DEFAULT_NAME)
+                if (synth->part[activePart]->Pname == DEFAULT_NAME)
                 {
                     fl_alert("Nothing to save!");
                     return;
                 }
                 string newname = synth->lastItemSeen(TOPLEVEL::XML::Instrument);
-                if (newname == "")
+                if (newname == "" || findLeafName(newname) != synth->part[activePart]->Pname)
                 {
-                    newname = synth->part[npart]->Pname;
+                    newname = synth->part[activePart]->Pname;
                     if (newname < "!")
                         return;
                     newname = synth->getRuntime().userHome + newname;
@@ -436,7 +436,7 @@ class MasterUI {: {private GuiUpdates}
                 if (isRegularFile(string(filename)))
                     if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                         return;
-                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedInstrument, float(npartcounter->value() - 1), TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(filename)));
+                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedInstrument, activePart, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(filename)));
                 return;}
             tooltip {Save current instrument to an .xi* file} xywh {20 20 100 20} labelsize 12
           }
