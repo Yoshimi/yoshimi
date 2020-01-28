@@ -1,5 +1,11 @@
 yoshimi 1.7.0 M
 
+2020-1-28 Will
+* Created new presets dir in .local/yoshimi
+  This will be populated from non-writable
+  default directories, and new build ones.
+* Doc updates.
+
 2020-1-25 Will
 * BugFix: GUI 'Save External' using wrong name.
 

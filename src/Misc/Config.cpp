@@ -55,6 +55,8 @@
 #include "ConfBuild.h"
 
 using file::isRegularFile;
+using file::createDir;
+using file::copyDir;
 using file::isDirectory;
 using file::extendLocalPath;
 using file::setExtension;
@@ -306,20 +308,29 @@ bool Config::loadConfig(void)
 {
     //std::cout << "here load config" << std::endl;
     string cmd;
-    int chk;
     string homedir = string(getenv("HOME"));
     if (homedir.empty() || !isDirectory(homedir))
+    {
         homedir = string("/tmp");
+        Log ("Failed to find 'Home' directory - using tmp.\nSettings will be lost on computer shutdown.");
+    }
     userHome = homedir + '/';
-    ConfigDir = homedir + "/" + string(EXTEN::config) + "/" + YOSHIMI;
+    string localDir = userHome + ".local/yoshimi";
+    if (!isDirectory(localDir))
+    {
+        if (createDir(localDir))
+        {
+            Log("Failed to create local yoshimi directory.");
+        }
+    }
+    ConfigDir = userHome + string(EXTEN::config) + "/" + YOSHIMI;
     defaultStateName = ConfigDir + "/yoshimi";
 
     if (!isDirectory(ConfigDir))
     {
-        cmd = string("mkdir -p ") + ConfigDir;
-        if ((chk = system(cmd.c_str())) < 0)
+        if (createDir(ConfigDir))
         {
-            Log("Create config directory " + ConfigDir + " failed, status " + asString(chk));
+            Log("Failed to create config directory '" + ConfigDir + "'");
             return false;
         }
     }
@@ -332,12 +343,23 @@ bool Config::loadConfig(void)
     if (thisInstance == 0 && sessionStage != Session::RestoreConf)
     {
         TextMsgBuffer::instance().init(); // sneaked it in here so it's early
-        string presetDir = ConfigDir + "/presets";
+        string presetDir = localDir + "/presets";
         if (!isDirectory(presetDir))
         {
-            cmd = string("mkdir -p ") + presetDir;
-            if ((chk = system(cmd.c_str())) < 0)
-                Log("Create preset directory " + presetDir + " failed, status " + asString(chk));
+            if (createDir(presetDir))
+            {
+                Log("Failed to create presets directory '" + presetDir + "'");
+            }
+            else
+            {
+                defaultPresets();
+                int i = 1;
+                while (!presetsDirlist[i].empty())
+                {
+                    copyDir(presetsDirlist[i], presetDir);
+                    ++i;
+                }
+            }
         }
     }
 
@@ -365,7 +387,6 @@ bool Config::loadConfig(void)
     if (!isRegularFile(baseConfig))
     {
         Log("Basic configuration " + baseConfig + " not found, will use default settings");
-        if (thisInstance == 0)
             defaultPresets();
     }
 
@@ -465,12 +486,17 @@ void Config::restoreConfig(SynthEngine *_synth)
 void Config::defaultPresets(void)
 {
     string presetdirs[]  = {
+        string(getenv("HOME")) + "/.local/yoshimi/presets",
+        extendLocalPath("/presets"),
+        // The following is not a default one.
+        //string(getenv("HOME")) + "/" + string(EXTEN::config) + "/yoshimi/presets",
         "/usr/share/yoshimi/presets",
         "/usr/local/share/yoshimi/presets",
+        /*
+         * We no longer include zyn presets as they changed the filenames.
         "/usr/share/zynaddsubfx/presets",
         "/usr/local/share/zynaddsubfx/presets",
-        string(getenv("HOME")) + "/" + string(EXTEN::config) + "/yoshimi/presets",
-        extendLocalPath("/presets"),
+        */
         "end"
     };
     int i = 0;

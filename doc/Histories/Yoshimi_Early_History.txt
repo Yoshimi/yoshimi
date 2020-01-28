@@ -1,0 +1,29 @@
+Written in 2013
+
+Zyn was originally written by Paul Nasca when he was in his early 20s, as a linux stand-alone synth. The Windows port was a later bolt-on, as was support for the Jack sound server. My understanding is that many of the later problems were due to the compromises made then.
+
+V2.2 of Zyn had been dormant for a very long time, as Paul was working on other things. Eventually he opened the window inviting others to contribute, and showed interest in the idea of someone else taking lead role.
+
+Alan (Cal) made a number of suggestions which at first seemed to be ignored. Mark dived in and soon took lead. He then started bouncing around lots of ideas that many of us thought were really diversions, and didn't seem to be paying attention to the real problems Zyn had. Cal eventually lost his patience saying he didn't have time for all this politics (few of us knew at that time he meant it quite literally) so was forking Zyn.
+
+In the mean time Mark had pushed out Zyn 2.4.1, which to my mind was a total disaster. He'd eliminated freezes by killing the audio output where mutex issues were imminent. This meant that there where horrible glitches if you tried to run a complicated patch at any speed. It remained like that for a long time and possibly did Zyn's credibility a lot of harm. This was later put right.
+
+Meanwhile in a short space of time Cal made improvements to the stability of the synth now named Yoshimi. Yoshimi is Linux only. Stripping out the Windows code made a big difference. The next thing he did was add in a decent set of compile-time optimisations, which made a dramatic difference. He then steadily improved the overall efficiency, eliminated crashes when very large patch sets were loaded (still not sorted in Zyn) and behind the scenes, tidied up the codebase. I've been looking through it recently to try to do some work on it myself and compared to Zyn it is far more elegant (that's the only way I can describe it).
+
+A major problem in Yoshi that cropped up was what we called the Heffalump bug. It was eventually identified by Lars Luthman and was due to dnormal behaviour (I don't understand the full details), and I think was related to Cal bringing in the boost library. This worried Cal for a long time and I think also occurred at a critical time.
+
+As his illness progressed Cal had more difficulty concentrating, was able to spend less and less time on Yoshi and was beginning to make unfortunate mistakes. I was in frequent contact with him and regarded him as a real friend, but eventually there were no more emails and we found out he'd died. He was 61. That was coming up for 2 years ago and it still gets me sometimes.
+
+Since then there have been sporadic efforts by a number of us to keep Yoshi going - although the current lead dev wants to back out. There have been bug fixes and a few feature additions. There are two outstanding non-critical bugs I know of and one odditiy, otherwise it is rock solid and still manages to be more processor efficient than Zyn, especially on complex stuff.
+
+My tune 'Ride With Yoshimi' on a single pass, uses just two instances with different voice patches on all 32 possible channels. Last time I tried Zyn couldn't get through the first section of the tune - and I had to load each patch individually, as it crashed when trying to load such large patch sets.
+
+Zyn has some additional features that haven't been ported to Yoshi yet (nobody to do it) and Mark is in the process of a total rewrite of Zyn. I have no idea how long that will take, nor what the eventual result will be, but I will be keeping an eye on it.
+
+There have been many criticisms of the GUI some quite valid, but it is an insanely complex synth and IMO the only way to manage this is some form of paging, although maybe not to the same depth as currently. Zyn/Yoshi is the only soft synth that I know of that lets you take baby steps at first and eases you fairly naturally into the hard stuff. As a comparison Phasex (also linux only) has a single panel with row upon row of controls. I can't use it at all.
+
+A few facts about Cal himself:
+He married his childhood sweetheart. However she died when their only child was still a toddler. He brought her up single-handed - never remarried, and according to his daughter, never even looked at another woman. When he was diagnosed with pancreatic cancer nobody thought he'd survive long enough to see his first grandson born. To everyone's astonishment, he actually fought it off for FIVE years, so not only saw, but got to know both of the boys. Through all this, he never lost his sense of humour. For a while there was a picture on the Yoshimi website of Peta and the boys, simply titled:
+"Three reasons to be cheerful".
+
+Survival rate for this cancer is very low, life expectancy usually less than 6 months. However, it wasn't this that killed him, but in his weakened state he developed another type of cancer.

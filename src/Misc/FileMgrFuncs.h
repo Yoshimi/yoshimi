@@ -29,6 +29,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <dirent.h>
 #include <unistd.h>
 #include <zlib.h>
 
@@ -230,6 +231,26 @@ inline bool copyFile(string source, string destination)
     outfile.close();
     delete[] memblock;
     return 0;
+}
+
+
+inline bool copyDir(string source, string destination)
+{
+    //std::cout << "source file " << source << "  to " << destination << std::endl;
+    DIR *dir = opendir(source.c_str());
+    struct dirent *fn;
+    int count = 0;
+    int missing = 0;
+    while ((fn = readdir(dir)))
+    {
+        string nextfile = string(fn->d_name);
+        if (copyFile(source + "/" + nextfile, destination + "/" + nextfile))
+            ++missing;
+        else
+            ++count;
+    }
+
+    return true;
 }
 
 
