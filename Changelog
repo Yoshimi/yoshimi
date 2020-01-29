@@ -1,5 +1,8 @@
 yoshimi 1.7.0 M
 
+2020-1-29 Will
+* Started pulling direct file access out of Bank(
+
 2020-1-28 Will
 * Created new presets dir in .local/yoshimi
   This will be populated from non-writable

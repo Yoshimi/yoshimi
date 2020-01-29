@@ -52,7 +52,9 @@ using file::make_legit_filename;
 using file::isRegularFile;
 using file::isDirectory;
 using file::renameDir;
+using file::createDir;
 using file::deleteDir;
+using file::copyDir;
 using file::copyFile;
 using file::renameFile;
 using file::deleteFile;
@@ -461,7 +463,7 @@ string Bank::exportBank(string exportdir, size_t rootID, unsigned int bankID)
     }
     if (ok)
     {
-        int result = mkdir(exportdir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        int result = createDir(exportdir);
         if (result < 0)
         {
             name = "Can't create external bank " + findLeafName(exportdir);
@@ -469,23 +471,15 @@ string Bank::exportBank(string exportdir, size_t rootID, unsigned int bankID)
         }
         else
         {
-            DIR *dir = opendir(sourcedir.c_str());
-            struct dirent *fn;
-            int count = 0;
-            int missing = 0;
-            while ((fn = readdir(dir)))
+            uint32_t result = copyDir(sourcedir, exportdir);
+
+            if (result > 0)
             {
-                string nextfile = string(fn->d_name);
-                if (copyFile(sourcedir + "/" + nextfile, exportdir + "/" + nextfile))
-                    ++missing;
-                else
-                    ++count;
-            }
-            if (count > 0)
-            {
-                name = "Copied out " + to_string(count) + " files to " + exportdir + " ";
-                if (missing > 2) // seem to get 2 phantoms :(
-                    name +=( "but failed to transfer" + to_string(missing));
+                name = "Copied out " + to_string(result & 0xffff) + " files to " + exportdir + " ";
+                result = result >> 16;
+                if (result > 2) // seem to get 2 phantoms :(
+                    name +=( "but failed to transfer" + to_string(result));
+                std::cout << "missing " << result << std::endl;
             }
             else
             {
@@ -650,14 +644,14 @@ bool Bank::newbankfile(string newbankdir, size_t rootID)
     if (newbankpath.at(newbankpath.size() - 1) != '/')
         newbankpath += "/";
     newbankpath += newbankdir;
-    int result = mkdir(newbankpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    int result = createDir(newbankpath);
     if (result < 0)
     {
-        synth->getRuntime().Log("Failed to mkdir " + newbankpath);
+        synth->getRuntime().Log("Failed to create " + newbankpath);
         return false;
     }
     else
-        synth->getRuntime().Log("mkdir " + newbankpath + " succeeded");
+        synth->getRuntime().Log("create " + newbankpath + " succeeded");
     string forcefile = newbankpath;
     if (forcefile.at(forcefile.size() - 1) != '/')
         forcefile += "/";

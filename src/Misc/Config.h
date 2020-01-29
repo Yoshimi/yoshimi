@@ -81,6 +81,7 @@ class Config
 
         string        userHome;
         string        ConfigDir;
+        string        localDir;
         string        defaultStateName;
         string        defaultSession;
         string        ConfigFile;

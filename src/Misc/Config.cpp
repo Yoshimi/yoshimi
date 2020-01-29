@@ -315,12 +315,13 @@ bool Config::loadConfig(void)
         Log ("Failed to find 'Home' directory - using tmp.\nSettings will be lost on computer shutdown.");
     }
     userHome = homedir + '/';
-    string localDir = userHome + ".local/yoshimi";
+    localDir = userHome + ".local/yoshimi";
     if (!isDirectory(localDir))
     {
         if (createDir(localDir))
         {
             Log("Failed to create local yoshimi directory.");
+            return false;
         }
     }
     ConfigDir = userHome + string(EXTEN::config) + "/" + YOSHIMI;

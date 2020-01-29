@@ -234,7 +234,7 @@ inline bool copyFile(string source, string destination)
 }
 
 
-inline bool copyDir(string source, string destination)
+inline uint32_t copyDir(string source, string destination)
 {
     //std::cout << "source file " << source << "  to " << destination << std::endl;
     DIR *dir = opendir(source.c_str());
@@ -250,7 +250,7 @@ inline bool copyDir(string source, string destination)
             ++count;
     }
 
-    return true;
+    return count | (missing << 16);
 }
 
 
@@ -379,7 +379,7 @@ inline bool createEmptyFile(string filename)
 
 inline bool createDir(string filename)
 {
-    return mkdir(filename.c_str(), 0755);
+    return mkdir(filename.c_str(), 0755);//, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 }
 
 
