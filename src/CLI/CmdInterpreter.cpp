@@ -5346,6 +5346,18 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         return Reply::DONE;
     }
 #endif
+
+    if (input.matchnMove(4, "test"))
+    {
+        list<string>testlist;
+        int count = file::listDir(&testlist, "/home/will/yoshimi-code/banks");
+        testlist.sort();
+        for(list<string>::iterator it = testlist.begin(); it != testlist.end(); ++ it)
+            std::cout << *it << std::endl;
+        std::cout << "total found " << count << std::endl;
+        return Reply::DONE;
+    }
+
     if (input.matchnMove(2, "exit"))
     {
         if (input.matchnMove(2, "force"))

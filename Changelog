@@ -1,5 +1,9 @@
 yoshimi 1.7.0 M
 
+2020-1-30 Will
+* Added std::list for directories in file manager.
+  This will mostly be used by Bank(
+
 2020-1-29 Will
 * Started pulling direct file access out of Bank(
 

@@ -254,6 +254,24 @@ inline uint32_t copyDir(string source, string destination)
 }
 
 
+inline int listDir(std::list<string>* dirList, string dirName)
+{
+    DIR *dir = opendir(dirName.c_str());
+    struct dirent *fn;
+    int count = 0;
+    while ((fn = readdir(dir)))
+    {
+        string name = fn->d_name;
+        if (!name.empty() && name != "." && name != "..")
+        {
+            dirList->push_back(name);
+            ++count;
+        }
+    }
+    return count;
+}
+
+
 inline string saveGzipped(char *data, string filename, int compression)
 {
     char options[10];
