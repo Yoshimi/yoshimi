@@ -3,7 +3,7 @@ yoshimi 1.7.0 M
 2020-1-31 Will
 * Changed .bankdir references in Bank( to validBank label.
 * Added 1st version .bankdir file to all default banks.
-* importbank, loadback use new listDir(
+* importbank, loadbank use new listDir(
 
 2020-1-30 Will
 * Added std::list for directories in file manager.
