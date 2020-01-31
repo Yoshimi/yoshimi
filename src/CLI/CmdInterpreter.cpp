@@ -5365,6 +5365,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         for(list<string>::iterator it = testlist.begin(); it != testlist.end(); ++ it)
             std::cout << *it << std::endl;
         std::cout << "total found " << count << std::endl;
+        testlist.clear();
         return Reply::DONE;
     }
 

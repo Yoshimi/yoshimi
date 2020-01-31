@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2010, Alan Calvert
-    Copyright 2014-2019, Will Godfrey & others
+    Copyright 2014-2020, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -54,6 +54,7 @@ using file::isDirectory;
 using file::renameDir;
 using file::createDir;
 using file::deleteDir;
+using file::listDir;
 using file::copyDir;
 using file::copyFile;
 using file::renameFile;
@@ -374,24 +375,23 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
     {
         return false;
     }
-    DIR *dir = opendir(bankdirname.c_str());
-    if (dir == NULL)
+
+    roots [rootID].banks [banknum].instruments.clear();
+
+    string chkpath;
+    string candidate;
+    size_t xizpos;
+    std::list<string> thisBank;
+    int found = listDir(&thisBank, bankdirname);
+    if (found == 0)
     {
         synth->getRuntime().Log("Failed to open bank directory " + bankdirname);
         return false;
     }
-    roots [rootID].banks [banknum].instruments.clear();
-
-    struct dirent *fn;
-    string chkpath;
-    string candidate;
-    size_t xizpos;
-    while ((fn = readdir(dir)))
+    for(list<string>::iterator it = thisBank.begin(); it != thisBank.end(); ++ it)
     {
-        candidate = string(fn->d_name);
-        if (candidate == "."
-            || candidate == ".."
-            || candidate.size() <= (EXTEN::zynInst.size() + 2)) // actually a 3 char filename!
+        candidate = *it;
+        if (candidate.size() <= (EXTEN::zynInst.size() + 2)) // actually a 3 char filename!
             continue;
         chkpath = bankdirname;
         if (chkpath.at(chkpath.size() - 1) != '/')
@@ -432,7 +432,7 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
             }
         }
     }
-    closedir(dir);
+    thisBank.clear();
     return true;
 }
 
@@ -477,9 +477,9 @@ string Bank::exportBank(string exportdir, size_t rootID, unsigned int bankID)
             {
                 name = "Copied out " + to_string(result & 0xffff) + " files to " + exportdir + " ";
                 result = result >> 16;
-                if (result > 2) // seem to get 2 phantoms :(
+                if (result > 0)
                     name +=( "but failed to transfer" + to_string(result));
-                std::cout << "missing " << result << std::endl;
+                //std::cout << "missing " << result << std::endl;
             }
             else
             {
@@ -517,10 +517,11 @@ string Bank::importBank(string importdir, size_t rootID, unsigned int bankID)
 
     if (ok)
     {
-        DIR *dir = opendir(importdir.c_str());
-        if (dir == NULL)
+        std::list<string> thisBank;
+        int found = listDir(&thisBank, importdir);
+        if (found == 0)
         {
-            name = "Can't find " + importdir;
+            synth->getRuntime().Log("Can't find " + importdir);
             ok = false;
         }
         else
@@ -542,13 +543,13 @@ string Bank::importBank(string importdir, size_t rootID, unsigned int bankID)
             else
             {
                 int count = 0;
-                int total = -2; // seem to get 2 phantoms :(
+                int total = 0;
                 bool missing = false;
-                struct dirent *fn;
                 string exportfile = getRootPath(rootID) + "/" + getBankName(bankID, rootID);
-                while ((fn = readdir(dir)))
+                for(list<string>::iterator it = thisBank.begin(); it != thisBank.end(); ++ it)
                 {
-                    string nextfile = string(fn->d_name);                    if (nextfile.rfind(EXTEN::validBank) != string::npos)
+                    string nextfile = *it;
+                    if (nextfile.rfind(EXTEN::validBank) != string::npos)
                         continue; // new version will be generated
                     ++total;
                     if (nextfile.rfind(EXTEN::yoshInst) != string::npos || nextfile.rfind(EXTEN::zynInst) != string::npos)
@@ -592,6 +593,7 @@ string Bank::importBank(string importdir, size_t rootID, unsigned int bankID)
                 }
             }
         }
+        thisBank.clear();
     }
 
     if (!ok)

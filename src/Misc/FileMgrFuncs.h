@@ -244,6 +244,8 @@ inline uint32_t copyDir(string source, string destination)
     while ((fn = readdir(dir)))
     {
         string nextfile = string(fn->d_name);
+        if (nextfile == "." || nextfile == "..")
+            continue;
         if (copyFile(source + "/" + nextfile, destination + "/" + nextfile))
             ++missing;
         else
