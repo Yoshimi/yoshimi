@@ -2640,13 +2640,8 @@ string DataText::resolveLFO(CommandBlock *getData, bool addValue)
         {
             contstr = "Type ";
             showValue = false;
-            int idx = 1;
             if (addValue)
-            {
-                while (LFOlist [idx] != "SIne")
-                    idx += 2;
-                contstr += stringCaps(LFOlist[idx + (value_int * 2)], 1);
-            }
+                contstr += stringCaps(LFOtype[value_int], 1);
             break;
         }
         case LFOINSERT::control::continuous:

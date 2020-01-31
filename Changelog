@@ -1,9 +1,11 @@
-yoshimi 1.7.0 M
+yoshimi 1.7.0.1
 
 2020-1-31 Will
 * Changed .bankdir references in Bank( to validBank label.
 * Added 1st version .bankdir file to all default banks.
 * importbank, loadbank use new listDir(
+* BugFix: Segfault changing LFO type.
+* Set bugfix version as 1.7.0.1
 
 2020-1-30 Will
 * Added std::list for directories in file manager.

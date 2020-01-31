@@ -1893,23 +1893,18 @@ int CmdInterpreter::LFOselect(Parser& input, unsigned char controlType)
             value = 0;
         else
         {
-            int idx = 1;
-            while (LFOlist [idx] != "SIne")
-                idx += 2;
-            int start = idx;
-            while (LFOlist [idx] != "E2down")
-                idx += 2;
-            int end = idx;
-            idx = start;
-            while (idx <=end)
+            int idx = 0;
+            while (LFOtype [idx] != "end")
             {
-                if (input.matchnMove(2, LFOlist[idx].c_str()))
+                if (input.matchnMove(2, LFOtype[idx].c_str()))
+                {
+                    value = idx;
                     break;
-                idx += 2;
+                }
+                ++idx;
             }
-            if (idx > end)
+            if (value == -1)
                 return REPLY::range_msg;
-            value = (idx - start) / 2;
         }
         cmd = LFOINSERT::control::type;
     }

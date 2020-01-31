@@ -624,6 +624,10 @@ static std::string LFOlist [] = {
     "e.g. S FI T RU",     "set filter type ramp up",
     "end"
 };
+// TODO need to find a way to safely (and efficiently) combine these
+static std::string LFOtype [] = {
+    "SIne", "TRiangle", "SQuare", "RUp (ramp up)", "RDown (ramp down)", "E1down", "E2down", "end"
+};
 
 static std::string filterlist [] = {
     "CEnter <n>",       "center frequency",
