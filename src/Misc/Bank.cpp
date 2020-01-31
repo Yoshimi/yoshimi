@@ -75,7 +75,7 @@ using std::endl;
 
 Bank::Bank(SynthEngine *_synth) :
     defaultinsname(string(" ")),
-    force_bank_dir_file(".bankdir"), // if this file exists in a directory, the
+    force_bank_dir_file(EXTEN::validBank), // if this file exists in a directory, the
                                     // directory is considered a bank, even if
                                     // it doesn't contain an instrument file
     synth(_synth)
@@ -548,7 +548,7 @@ string Bank::importBank(string importdir, size_t rootID, unsigned int bankID)
                 string exportfile = getRootPath(rootID) + "/" + getBankName(bankID, rootID);
                 while ((fn = readdir(dir)))
                 {
-                    string nextfile = string(fn->d_name);                    if (nextfile.rfind(".bankdir") != string::npos)
+                    string nextfile = string(fn->d_name);                    if (nextfile.rfind(EXTEN::validBank) != string::npos)
                         continue; // new version will be generated
                     ++total;
                     if (nextfile.rfind(EXTEN::yoshInst) != string::npos || nextfile.rfind(EXTEN::zynInst) != string::npos)
@@ -670,7 +670,7 @@ string Bank::removebank(unsigned int bankID, size_t rootID)
 
     string bankName = getBankPath(rootID, bankID);
     // ID bank and test for writeable
-    string IDfile = bankName + "/.bankdir";
+    string IDfile = bankName + "/" + EXTEN::validBank;
     if (!saveText(string(YOSHIMI_VERSION), IDfile))
         return (" FAILED Can't delete from this location.");
 
@@ -1014,7 +1014,7 @@ void Bank::scanrootdir(int root_idx)
         lstat(chkdir.c_str(), &st);
         if (!S_ISDIR(st.st_mode))
             continue;
-        // check if directory contains an instrument or .bankdir
+        // check if directory contains an instrument or EXTEN::validBank
         DIR *d = opendir(chkdir.c_str());
         if (d == NULL)
         {
@@ -1028,7 +1028,7 @@ void Bank::scanrootdir(int root_idx)
             if (possible == "." || possible == "..")
                 continue;
             if (possible == force_bank_dir_file)
-            {   // .bankdir file exists, so add the bank
+            {   // EXTEN::validBank file exists, so add the bank
                 bankDirsMap [candidate] = chkdir;
                 break;
             }

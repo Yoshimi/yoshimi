@@ -5352,6 +5352,16 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         list<string>testlist;
         int count = file::listDir(&testlist, "/home/will/yoshimi-code/banks");
         testlist.sort();
+
+        // safe removal
+        std::list<string>::iterator r_it = testlist.end();
+        while (r_it != testlist.begin())
+        {
+            string name = *--r_it;
+            if (name.substr(0, 2) == ("Re"))
+                r_it = testlist.erase(r_it);
+        }
+
         for(list<string>::iterator it = testlist.begin(); it != testlist.end(); ++ it)
             std::cout << *it << std::endl;
         std::cout << "total found " << count << std::endl;

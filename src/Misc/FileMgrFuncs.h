@@ -41,7 +41,7 @@ using std::string;
 
 const string config =        ".config";
 const string instance =      ".instance";
-const string bank =          ".banks";
+const string validBank =     ".bankdir";
 const string history =       ".history";
 const string zynInst =       ".xiz";
 const string yoshInst =      ".xiy";
