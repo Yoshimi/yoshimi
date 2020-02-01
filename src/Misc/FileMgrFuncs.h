@@ -120,8 +120,10 @@ inline bool isDirectory(string chkpath)
 {
     struct stat st;
     if (!stat(chkpath.c_str(), &st))
+    {
         if (S_ISDIR(st.st_mode))
             return true;
+    }
     return false;
 }
 
@@ -238,6 +240,8 @@ inline uint32_t copyDir(string source, string destination)
 {
     //std::cout << "source file " << source << "  to " << destination << std::endl;
     DIR *dir = opendir(source.c_str());
+    if (dir == NULL)
+        return 0xffffffff;
     struct dirent *fn;
     int count = 0;
     int missing = 0;
@@ -259,6 +263,8 @@ inline uint32_t copyDir(string source, string destination)
 inline int listDir(std::list<string>* dirList, string dirName)
 {
     DIR *dir = opendir(dirName.c_str());
+    if (dir == NULL)
+        return 0xffffffff;
     struct dirent *fn;
     int count = 0;
     while ((fn = readdir(dir)))
@@ -391,15 +397,19 @@ inline string loadText(string filename)
 
 
 inline bool createEmptyFile(string filename)
-{
-    std::ofstream file {filename};
-    return 0; // TODO need a test for success
+{ // not currently used now
+    std::fstream file;
+    file.open(filename, std::ios::out);
+    if (!file)
+        return false;
+    file.close();
+    return true;
 }
 
 
 inline bool createDir(string filename)
 {
-    return mkdir(filename.c_str(), 0755);//, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    return mkdir(filename.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 }
 
 

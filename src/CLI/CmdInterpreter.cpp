@@ -5345,7 +5345,13 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
     if (input.matchnMove(4, "test"))
     {
         list<string>testlist;
-        int count = file::listDir(&testlist, "/home/will/yoshimi-code/banks");
+        string testdir = "/home/will/yoshimi-code/banks/chip";
+        uint32_t count = file::listDir(&testlist, testdir);
+        if (count == 0xffffffff)
+        {
+            std::cout << "no such directory" << std::endl;
+            return Reply::DONE;
+        }
         testlist.sort();
 
         // safe removal
@@ -5358,7 +5364,14 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         }
 
         for(list<string>::iterator it = testlist.begin(); it != testlist.end(); ++ it)
-            std::cout << *it << std::endl;
+        {
+            string name = *it;
+            if (file::isDirectory(testdir + "/" + name))
+            {
+                name += " - Dir";
+            }
+            std::cout << name << std::endl;
+        }
         std::cout << "total found " << count << std::endl;
         testlist.clear();
         return Reply::DONE;

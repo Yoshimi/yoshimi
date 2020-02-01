@@ -382,8 +382,8 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
     string candidate;
     size_t xizpos;
     std::list<string> thisBank;
-    int found = listDir(&thisBank, bankdirname);
-    if (found == 0)
+    uint32_t found = listDir(&thisBank, bankdirname);
+    if (found == 0xffffffff)
     {
         synth->getRuntime().Log("Failed to open bank directory " + bankdirname);
         return false;
@@ -464,7 +464,7 @@ string Bank::exportBank(string exportdir, size_t rootID, unsigned int bankID)
     if (ok)
     {
         int result = createDir(exportdir);
-        if (result < 0)
+        if (result != 0)
         {
             name = "Can't create external bank " + findLeafName(exportdir);
             ok = false;
@@ -473,13 +473,12 @@ string Bank::exportBank(string exportdir, size_t rootID, unsigned int bankID)
         {
             uint32_t result = copyDir(sourcedir, exportdir);
 
-            if (result > 0)
+            if (result != 0)
             {
-                name = "Copied out " + to_string(result & 0xffff) + " files to " + exportdir + " ";
+                name = "Copied out " + to_string(result & 0xffff) + " files to " + exportdir + ". ";
                 result = result >> 16;
                 if (result > 0)
-                    name +=( "but failed to transfer" + to_string(result));
-                //std::cout << "missing " << result << std::endl;
+                    name +=( "Failed to transfer" + to_string(result));
             }
             else
             {
@@ -518,8 +517,8 @@ string Bank::importBank(string importdir, size_t rootID, unsigned int bankID)
     if (ok)
     {
         std::list<string> thisBank;
-        int found = listDir(&thisBank, importdir);
-        if (found == 0)
+        uint32_t found = listDir(&thisBank, importdir);
+        if (found == 0xffffffff)
         {
             synth->getRuntime().Log("Can't find " + importdir);
             ok = false;
@@ -647,7 +646,7 @@ bool Bank::newbankfile(string newbankdir, size_t rootID)
         newbankpath += "/";
     newbankpath += newbankdir;
     int result = createDir(newbankpath);
-    if (result < 0)
+    if (result != 0)
     {
         synth->getRuntime().Log("Failed to create " + newbankpath);
         return false;
@@ -994,39 +993,38 @@ void Bank::scanrootdir(int root_idx)
 
     if (rootdir.empty() || !isDirectory(rootdir))
         return;
-    DIR *dir = opendir(rootdir.c_str());
-    if (dir == NULL)
+    std::list<string> thisRoot;
+    uint32_t found = listDir(&thisRoot, rootdir);
+    if (found == 0xffffffff)
     {
         synth->getRuntime().Log("No such directory, root bank entry " + rootdir);
         return;
     }
-    struct dirent *fn;
-    struct stat st;
     size_t xizpos;
     roots [root_idx].banks.clear();
-    while ((fn = readdir(dir)))
+    for(list<string>::iterator it = thisRoot.begin(); it != thisRoot.end(); ++ it)
     {
-        string candidate = string(fn->d_name);
+        //string candidate = string(fn->d_name);
+        string candidate = *it;
         if (candidate == "." || candidate == "..")
             continue;
         string chkdir = rootdir;
         if (chkdir.at(chkdir.size() - 1) != '/')
             chkdir += "/";
         chkdir += candidate;
-        lstat(chkdir.c_str(), &st);
-        if (!S_ISDIR(st.st_mode))
+        if (!isDirectory(chkdir))
             continue;
         // check if directory contains an instrument or EXTEN::validBank
-        DIR *d = opendir(chkdir.c_str());
-        if (d == NULL)
+        std::list<string> tryBank;
+        uint32_t tried = listDir(&tryBank, chkdir);
+        if (tried == 0xffffffff)
         {
             synth->getRuntime().Log("Failed to open bank directory candidate " + chkdir);
             continue;
         }
-        struct dirent *fname;
-        while ((fname = readdir(d)))
+        for(list<string>::iterator it_b = tryBank.begin(); it_b != tryBank.end(); ++ it_b)
         {
-            string possible = string(fname->d_name);
+            string possible = *it_b;
             if (possible == "." || possible == "..")
                 continue;
             if (possible == force_bank_dir_file)
@@ -1035,8 +1033,7 @@ void Bank::scanrootdir(int root_idx)
                 break;
             }
             string chkpath = chkdir + "/" + possible;
-            lstat(chkpath.c_str(), &st);
-            if (st.st_mode & (S_IFREG | S_IRGRP))
+            if(isRegularFile(chkpath))
             {
                 // check for .xiz extension
                 if ((xizpos = possible.rfind(EXTEN::zynInst)) != string::npos)
@@ -1049,9 +1046,7 @@ void Bank::scanrootdir(int root_idx)
                 }
             }
         }
-        closedir(d);
     }
-    closedir(dir);
     size_t idStep = (size_t)128 / (bankDirsMap.size() + 2);
     if(idStep > 1)
     {
