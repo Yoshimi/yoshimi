@@ -375,7 +375,6 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
 
     string chkpath;
     string candidate;
-    size_t xizpos;
     std::list<string> thisBank;
     uint32_t found = listDir(&thisBank, bankdirname);
     if (found == 0xffffffff)
@@ -383,47 +382,37 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
         synth->getRuntime().Log("Failed to open bank directory " + bankdirname);
         return false;
     }
+
+    if (bankdirname.at(bankdirname.size() - 1) != '/')
+        bankdirname += '/';
     for(list<string>::iterator it = thisBank.begin(); it != thisBank.end(); ++ it)
     {
         candidate = *it;
         if (candidate.size() <= (EXTEN::zynInst.size() + 2)) // actually a 3 char filename!
             continue;
-        chkpath = bankdirname;
-        if (chkpath.at(chkpath.size() - 1) != '/')
-            chkpath += "/";
-        chkpath += candidate;
+        chkpath = bankdirname + candidate;
         if (isRegularFile(chkpath))
         {
-            if (chkpath.rfind(EXTEN::zynInst) != string::npos && isRegularFile(setExtension(chkpath, EXTEN::yoshInst)))
+            string exten = file::findExtension(chkpath);
+            if (exten != EXTEN::yoshInst && exten != EXTEN::zynInst)
+                continue;
+            if (exten == EXTEN::zynInst && isRegularFile(setExtension(chkpath, EXTEN::yoshInst)))
                 continue; // don't want .xiz if there is .xiy
 
-            xizpos = candidate.rfind(EXTEN::yoshInst);
-            if (xizpos == string::npos)
-                xizpos = candidate.rfind(EXTEN::zynInst);
-
-            if (xizpos != string::npos)
+            int chk = findSplitPoint(candidate);
+            if (chk > 0)
             {
-                if (EXTEN::zynInst.size() == (candidate.size() - xizpos))
-                {
-                    // just NNNN-<name>.xiz files please
-                    // sa verific daca e si extensia dorita
+                int instnum = string2int(candidate.substr(0, chk));
 
-                    // sorry Cal. They insisted :(
-                    int chk = findSplitPoint(candidate);
-                    if (chk > 0)
-                    {
-                        int instnum = string2int(candidate.substr(0, chk));
-                        // remove "NNNN-" and .xiz extension for instrument name
-                        // modified for numbered instruments with < 4 digits
-                        string instname = candidate.substr(chk + 1, candidate.size() - EXTEN::zynInst.size() - chk - 1);
-                        addtobank(rootID, banknum, instnum - 1, candidate, instname);
-                    }
-                    else
-                    {
-                        string instname = candidate.substr(0, candidate.size() -  EXTEN::zynInst.size());
-                        addtobank(rootID, banknum, -1, candidate, instname);
-                    }
-                }
+                // remove "NNNN-" and extension for instrument name
+                string instname = candidate.substr(chk + 1, candidate.size() - exten.size() - chk - 1);
+                addtobank(rootID, banknum, instnum - 1, candidate, instname);
+            }
+            else
+            {
+                // not numbered so just extension to remove
+                string instname = candidate.substr(0, candidate.size() -  exten.size());
+                addtobank(rootID, banknum, -1, candidate, instname);
             }
         }
     }
@@ -996,11 +985,14 @@ void Bank::scanrootdir(int root_idx)
         return;
     }
     roots [root_idx].banks.clear();
+    if (rootdir.at(rootdir.size() - 1) != '/')
+        rootdir += '/';
     for(list<string>::iterator it = thisRoot.begin(); it != thisRoot.end(); ++ it)
     {
         string candidate = *it;
-        if(isValidBank(rootdir, candidate))
-            bankDirsMap [candidate] = rootdir + "/" + candidate;
+        string chkdir = rootdir + candidate;
+        if(isValidBank(chkdir))
+            bankDirsMap [candidate] = chkdir;
     }
     size_t idStep = (size_t)128 / (bankDirsMap.size() + 2);
     if(idStep > 1)
@@ -1018,12 +1010,8 @@ void Bank::scanrootdir(int root_idx)
 }
 
 
-bool Bank::isValidBank(string rootdir, string candidate)
+bool Bank::isValidBank(string chkdir)
 {
-    string chkdir = rootdir;
-    if (chkdir.at(chkdir.size() - 1) != '/')
-        chkdir += "/";
-    chkdir += candidate;
     if (!isDirectory(chkdir))
         return false;
     // check if directory contains an instrument or EXTEN::validBank

@@ -5,6 +5,8 @@ yoshimi 1.7.0 M
 * Revised bank and file permissions.
 * Revised & simplified fresh population of banks.
 * Removed redundant code.
+* Revised and sinplified loadbank(
+* Further revision of bank population.
 
 2020-1-31 Will
 * Changed .bankdir references in Bank( to validBank label.

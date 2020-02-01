@@ -163,7 +163,7 @@ class Bank
 
         void deletefrombank(size_t rootID, size_t bankID, unsigned int pos);
         void scanrootdir(int root_idx); // scans a root dir for banks
-        bool isValidBank(string rootdir, string candidate);
+        bool isValidBank(string chkdir);
         size_t add_bank(string name, string, size_t rootID);
         bool check_bank_duplicate(string alias);
 
