@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2010, Alan Calvert
-    Copyright 2014-2019 Will Godfrey & others
+    Copyright 2014-2020 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -163,12 +163,12 @@ class Bank
 
         void deletefrombank(size_t rootID, size_t bankID, unsigned int pos);
         void scanrootdir(int root_idx); // scans a root dir for banks
+        bool isValidBank(string rootdir, string candidate);
         size_t add_bank(string name, string, size_t rootID);
         bool check_bank_duplicate(string alias);
 
         //string dirname;
         const string defaultinsname;
-        const string force_bank_dir_file;
         SynthEngine *synth;
 
         RootEntryMap  roots;

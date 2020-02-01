@@ -167,8 +167,6 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
 
     // seed the shared master random number generator
     prng.init(time(NULL));
-
-    //TestFunc(123); // just for testing
 }
 
 

@@ -76,17 +76,12 @@ using std::endl;
 
 Bank::Bank(SynthEngine *_synth) :
     defaultinsname(string(" ")),
-    force_bank_dir_file(EXTEN::validBank), // if this file exists in a directory, the
-                                    // directory is considered a bank, even if
-                                    // it doesn't contain an instrument file
     synth(_synth)
 {
     BanksVersion = 1;
     InstrumentsInBanks = 0,
     BanksInRoots = 0;
     roots.clear();
-
-    //TestFunc(456); // just for testing
 }
 
 
@@ -295,7 +290,7 @@ bool Bank::savetoslot(size_t rootID, size_t bankID, int ninstrument, int npart)
     if (!ok1 || !ok2)
         return false;
 
-    saveText(string(YOSHIMI_VERSION), filepath + force_bank_dir_file);
+    saveText(string(YOSHIMI_VERSION), filepath + EXTEN::validBank);
     addtobank(rootID, bankID, ninstrument, filename, name);
     return true;
 }
@@ -656,7 +651,7 @@ bool Bank::newbankfile(string newbankdir, size_t rootID)
     string forcefile = newbankpath;
     if (forcefile.at(forcefile.size() - 1) != '/')
         forcefile += "/";
-    saveText(string(YOSHIMI_VERSION), forcefile + force_bank_dir_file);
+    saveText(string(YOSHIMI_VERSION), forcefile + EXTEN::validBank);
     return true;
 }
 
@@ -1000,52 +995,12 @@ void Bank::scanrootdir(int root_idx)
         synth->getRuntime().Log("No such directory, root bank entry " + rootdir);
         return;
     }
-    size_t xizpos;
     roots [root_idx].banks.clear();
     for(list<string>::iterator it = thisRoot.begin(); it != thisRoot.end(); ++ it)
     {
-        //string candidate = string(fn->d_name);
         string candidate = *it;
-        if (candidate == "." || candidate == "..")
-            continue;
-        string chkdir = rootdir;
-        if (chkdir.at(chkdir.size() - 1) != '/')
-            chkdir += "/";
-        chkdir += candidate;
-        if (!isDirectory(chkdir))
-            continue;
-        // check if directory contains an instrument or EXTEN::validBank
-        std::list<string> tryBank;
-        uint32_t tried = listDir(&tryBank, chkdir);
-        if (tried == 0xffffffff)
-        {
-            synth->getRuntime().Log("Failed to open bank directory candidate " + chkdir);
-            continue;
-        }
-        for(list<string>::iterator it_b = tryBank.begin(); it_b != tryBank.end(); ++ it_b)
-        {
-            string possible = *it_b;
-            if (possible == "." || possible == "..")
-                continue;
-            if (possible == force_bank_dir_file)
-            {   // EXTEN::validBank file exists, so add the bank
-                bankDirsMap [candidate] = chkdir;
-                break;
-            }
-            string chkpath = chkdir + "/" + possible;
-            if(isRegularFile(chkpath))
-            {
-                // check for .xiz extension
-                if ((xizpos = possible.rfind(EXTEN::zynInst)) != string::npos)
-                {
-                    if (EXTEN::zynInst.size() == (possible.size() - xizpos))
-                    {   // is an instrument, so add the bank
-                        bankDirsMap [candidate] = chkdir;
-                        break;
-                    }
-                }
-            }
-        }
+        if(isValidBank(rootdir, candidate))
+            bankDirsMap [candidate] = rootdir + "/" + candidate;
     }
     size_t idStep = (size_t)128 / (bankDirsMap.size() + 2);
     if(idStep > 1)
@@ -1060,6 +1015,37 @@ void Bank::scanrootdir(int root_idx)
         BanksInRoots += 1;
     }
     roots [root_idx].bankIdStep = 0;
+}
+
+
+bool Bank::isValidBank(string rootdir, string candidate)
+{
+    string chkdir = rootdir;
+    if (chkdir.at(chkdir.size() - 1) != '/')
+        chkdir += "/";
+    chkdir += candidate;
+    if (!isDirectory(chkdir))
+        return false;
+    // check if directory contains an instrument or EXTEN::validBank
+    std::list<string> tryBank;
+    uint32_t tried = listDir(&tryBank, chkdir);
+    if (tried == 0xffffffff)
+    {
+        synth->getRuntime().Log("Failed to open bank directory candidate " + chkdir);
+        return false;
+    }
+    chkdir += "/";
+    for(list<string>::iterator it_b = tryBank.begin(); it_b != tryBank.end(); ++ it_b)
+    {
+        string chkpath = chkdir + *it_b;
+        if(isRegularFile(chkpath))
+        {
+            string tryext = file::findExtension(chkpath);
+            if (tryext == EXTEN::validBank || tryext == EXTEN::yoshInst || tryext == EXTEN::zynInst)
+                return true;
+        }
+    }
+    return false;
 }
 
 

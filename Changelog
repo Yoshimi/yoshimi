@@ -3,6 +3,8 @@ yoshimi 1.7.0 M
 2020-2-1 Will
 * Building bank root uses new listDir(
 * Revised bank and file permissions.
+* Revised & simplified fresh population of banks.
+* Removed redundant code.
 
 2020-1-31 Will
 * Changed .bankdir references in Bank( to validBank label.

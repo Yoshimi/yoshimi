@@ -1,7 +1,7 @@
 /*
     FileMgr.h - all file operations
 
-    Copyright 2020 Will Godfrey and others.
+    Copyright 2019-2020 Will Godfrey and others.
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -63,13 +63,6 @@ namespace file {
 
 using std::string;
 using std::stringstream;
-
-
-inline bool TestFunc(int result)
-{
-    std::cout << "***\nTest Function " << result << "\n***" << std::endl;
-    return (result > 0);
-}
 
 
 // make a filename legal
@@ -166,6 +159,14 @@ inline string findLeafName(string name)
     name_start = name.rfind("/");
     name_end = name.rfind(".");
     return name.substr(name_start + 1, name_end - name_start - 1);
+}
+
+inline string findExtension(string name)
+{
+    size_t point = name.rfind('.');
+    if (point == string::npos)
+        return "";
+    return name.substr(point);
 }
 
 
