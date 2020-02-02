@@ -1153,6 +1153,7 @@ InstrumentEntry &Bank::getInstrumentReference(size_t rootID, size_t bankID, size
 void Bank::addDefaultRootDirs()
 {
     string bankdirs[] = {
+        string(getenv("HOME")) + "/.local/yoshimi/banks"
         "/usr/share/yoshimi/banks",
         "/usr/local/share/yoshimi/banks",
         "/usr/share/zynaddsubfx/banks",
