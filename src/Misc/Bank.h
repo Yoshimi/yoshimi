@@ -136,6 +136,8 @@ class Bank
         size_t getCurrentBankID();
         size_t addRootDir(string newRootDir);
         void parseConfigFile(XMLwrapper *xml);
+        bool installRoots();
+        bool installNewRoot(size_t rootID, string rootdir, bool reload = false);
         void saveToConfigFile(XMLwrapper *xml);
 
         string getBankPath(size_t rootID, size_t bankID);

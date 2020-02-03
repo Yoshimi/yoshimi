@@ -958,6 +958,7 @@ string Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t first
 // Re-scan for directories containing instrument banks
 void Bank::rescanforbanks(void)
 {
+    return;
     RootEntryMap::const_iterator it;
     InstrumentsInBanks = 0;
     BanksInRoots = 0;
@@ -994,7 +995,7 @@ void Bank::scanrootdir(int root_idx)
         if(isValidBank(chkdir))
             bankDirsMap [candidate] = chkdir;
     }
-    size_t idStep = (size_t)128 / (bankDirsMap.size() + 2);
+    size_t idStep = (size_t)MAX_BANKS_IN_ROOT / (bankDirsMap.size() + 2);
     if(idStep > 1)
     {
         roots [root_idx].bankIdStep = idStep;
@@ -1153,6 +1154,7 @@ InstrumentEntry &Bank::getInstrumentReference(size_t rootID, size_t bankID, size
 void Bank::addDefaultRootDirs()
 {
     string bankdirs[] = {
+        string(getenv("HOME")) + "/.local/yoshimi/banks",
         "/usr/share/yoshimi/banks",
         "/usr/local/share/yoshimi/banks",
         "/usr/share/zynaddsubfx/banks",
@@ -1174,7 +1176,7 @@ void Bank::addDefaultRootDirs()
         changeRootID(i, (i * 5) + 5);
         -- i;
     }
-    rescanforbanks();
+    //rescanforbanks();
 }
 
 
@@ -1441,6 +1443,7 @@ void Bank::parseConfigFile(XMLwrapper *xml)
                     {
                         string bankDirname = xml->getparstr("dirname");
                         hints [i] [bankDirname] = k;
+                        roots[i].banks[k].dirname = bankDirname;
                         xml->exitbranch();
                     }
                 }
@@ -1453,8 +1456,129 @@ void Bank::parseConfigFile(XMLwrapper *xml)
     {
         addDefaultRootDirs();
     }
+    installRoots();
+}
 
-    rescanforbanks();
+
+bool Bank::installRoots(void)
+{
+    RootEntryMap::const_iterator it;
+    InstrumentsInBanks = 0;
+    BanksInRoots = 0;
+    for (it = roots.begin(); it != roots.end(); ++it)
+    {
+        size_t rootID = it->first;
+        string rootdir = roots [rootID].path;
+        if (!rootdir.empty() && !isDirectory(rootdir))
+            roots [rootID].banks.clear();
+        // the directory has been removed since the bank root was created
+        if (rootdir.empty() || !isDirectory(rootdir))
+            continue;
+        installNewRoot(rootID, rootdir, true);
+    }
+    return true;
+}
+
+
+bool Bank::installNewRoot(size_t rootID, string rootdir, bool reload)
+{
+    std::list<string> thisRoot;
+    uint32_t found = listDir(&thisRoot, rootdir);
+    if (found == 0xffffffff)
+    { // should never see this!
+        synth->getRuntime().Log("No such directory, root bank entry " + rootdir);
+        return false;
+    }
+
+    if (rootdir.at(rootdir.size() - 1) != '/')
+        rootdir += '/';
+
+    if (!reload)
+        roots [rootID].banks.clear(); // it's a completely new root
+
+    map<string, string> bankDirsMap;
+
+    int validBanks = 0;
+    for(list<string>::iterator it = thisRoot.begin(); it != thisRoot.end(); ++ it)
+    {
+        string candidate = *it;
+        string chkdir = rootdir + candidate;
+        if(isValidBank(chkdir))
+        {
+            bankDirsMap [candidate] = chkdir;
+            ++ validBanks;
+        }
+    }
+    if (validBanks >= MAX_BANKS_IN_ROOT)
+        synth->getRuntime().Log("Warning: There are " + to_string(validBanks - MAX_BANKS_IN_ROOT) + " too many valid bank candidates");
+
+    bool banksSet[MAX_BANKS_IN_ROOT];
+    int banksFound = 0;
+    for (int i = 0; i < MAX_BANKS_IN_ROOT; ++i)
+        banksSet[i] = false;
+    if(reload)
+    {
+        map<string, string>::iterator it_b = bankDirsMap.begin();
+        while (it_b != bankDirsMap.end())
+        {
+            bool b_set = false;
+            string trybank = it_b->first;
+            for (size_t id = 0; id < MAX_BANKS_IN_ROOT; ++id)
+            {
+                if (roots[rootID].banks[id].dirname == trybank)
+                {
+                    //cout << ">" << trybank;
+                    banksSet[id] = true;
+                    roots [rootID].banks [id].dirname = it_b->first;
+                    loadbank(rootID, id);
+                    b_set = true;
+                    ++ banksFound;
+                    break;
+                }
+            }
+            if (b_set)
+                it_b = bankDirsMap.erase(it_b);
+            else
+                ++it_b;
+            if (banksFound >= MAX_BANKS_IN_ROOT)
+                break; // root is full!
+        }
+    }
+    BanksInRoots += banksFound;
+    if (banksFound >= MAX_BANKS_IN_ROOT)
+        return false;
+    if(bankDirsMap.empty())
+        return true;
+
+    int stepStart [] = {5, 7, 9, 3, 6, 8, 2, 4, 1};
+    int stepPos = 0;
+    size_t idStep = stepStart [0];
+    size_t newIndex = stepStart [stepPos];
+    cout << "*** " << bankDirsMap.size() << " ***" << endl;
+    map<string, string>::iterator it = bankDirsMap.begin();
+    while(it != bankDirsMap.end())
+    {
+        while (banksSet[newIndex] == true)
+        {
+            if (banksFound >= MAX_BANKS_IN_ROOT)
+                break;
+            newIndex += idStep;
+            if (newIndex >= MAX_BANKS_IN_ROOT)
+            {
+                ++ stepPos;
+                newIndex = stepStart [stepPos];
+            }
+        }
+        roots [rootID].banks [newIndex].dirname = it->first;
+        loadbank(rootID, newIndex);
+        banksSet[newIndex] = true;
+        ++ banksFound;
+        BanksInRoots += 1; // this is the total of all banks
+        if (banksFound >= MAX_BANKS_IN_ROOT)
+            break; // root is full!
+        ++ it;
+    }
+    return true;
 }
 
 

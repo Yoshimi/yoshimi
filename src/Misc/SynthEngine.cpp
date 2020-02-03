@@ -349,6 +349,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         {
             cout << "Defined new root ID " << asString(found) << " as " << Runtime.rootDefine << endl;
             bank.scanrootdir(found);
+
         }
         else
             cout << "Can't find path " << Runtime.rootDefine << endl;
@@ -2368,7 +2369,7 @@ bool SynthEngine::installBanks()
     {
         banksFound = false;
         Runtime.Log("Missing bank file");
-        bankname = name + ".config";
+        /*bankname = name + ".config";
         if (isRegularFile(bankname))
             Runtime.Log("Copying data from config");
         else
@@ -2376,7 +2377,8 @@ bool SynthEngine::installBanks()
             Runtime.Log("Scanning for banks");
             bank.rescanforbanks();
             return false;
-        }
+        }*/
+        bank.installRoots();
     }
     if (banksFound)
         branch = "BANKLIST";

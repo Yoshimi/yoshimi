@@ -1,5 +1,11 @@
 yoshimi 1.7.0 M
 
+2020-2-3 Will
+:rebank:  basic structure now in place.
+
+2020-2-2 Will
+:rebank: started new root/bank structure.
+
 2020-2-1 Will
 * Building bank root uses new listDir(
 * Revised bank and file permissions.

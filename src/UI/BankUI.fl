@@ -849,10 +849,10 @@ class BankUI {: {public BankProcess_, RootProcess_}
         dirname = fl_dir_chooser("Add a root directory for banks:", NULL, 0);
         if (!dirname)
             return;
-        synth->getBankRef().addRootDir(dirname);
+        size_t idx = synth->getBankRef().addRootDir(dirname);
+        synth->getBankRef().installNewRoot(idx, dirname);
         synth->saveBanks();
         readbankcfg();
-        rescan_for_banks(true);
         Pend->hide();}
         xywh {10 225 75 35} box THIN_UP_BOX labelsize 12 align 128 hide
       }
