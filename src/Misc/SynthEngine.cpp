@@ -2353,16 +2353,7 @@ bool SynthEngine::installBanks()
     if (!isRegularFile(bankname))
     {
         banksFound = false;
-        Runtime.Log("Missing bank file");
-        /*bankname = name + ".config";
-        if (isRegularFile(bankname))
-            Runtime.Log("Copying data from config");
-        else
-        {
-            Runtime.Log("Scanning for banks");
-            bank.rescanforbanks();
-            return false;
-        }*/
+        Runtime.Log("Missing bank file\nRebilding");
         bank.installRoots();
     }
     if (banksFound)

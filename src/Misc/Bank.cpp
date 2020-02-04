@@ -755,7 +755,7 @@ string Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t ban
         }
         if (!ok)
         {
-            rescanforbanks(); // might have corrupted it
+            //rescanforbanks(); // might have corrupted it
             return (" FAILED" + message);
         }
         else
@@ -792,7 +792,7 @@ string Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t ban
 
     if (!ok)
     {
-        rescanforbanks(); // might have corrupted it
+        //rescanforbanks(); // might have corrupted it
         return (" FAILED" + message);
     }
 
@@ -951,62 +951,7 @@ string Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t first
     return (" Moved " + firstname + " to " + type + to_string(destination));
 }
 
-
-// Re-scan for directories containing instrument banks
-void Bank::rescanforbanks(void)
-{
-    return;
-    RootEntryMap::const_iterator it;
-    InstrumentsInBanks = 0;
-    BanksInRoots = 0;
-    for (it = roots.begin(); it != roots.end(); ++it)
-    {
-        scanrootdir(it->first);
-    }
-    //cout << "ins " << InstrumentsInBanks << "  Ban " << BanksInRoots << endl;
-}
-
 // private affairs
-
-void Bank::scanrootdir(int root_idx)
-{
-    map<string, string> bankDirsMap;
-    string rootdir = roots [root_idx].path;
-
-    if (rootdir.empty() || !isDirectory(rootdir))
-        return;
-    std::list<string> thisRoot;
-    uint32_t found = listDir(&thisRoot, rootdir);
-    if (found == 0xffffffff)
-    {
-        synth->getRuntime().Log("No such directory, root bank entry " + rootdir);
-        return;
-    }
-    roots [root_idx].banks.clear();
-    if (rootdir.at(rootdir.size() - 1) != '/')
-        rootdir += '/';
-    for(list<string>::iterator it = thisRoot.begin(); it != thisRoot.end(); ++ it)
-    {
-        string candidate = *it;
-        string chkdir = rootdir + candidate;
-        if(isValidBank(chkdir))
-            bankDirsMap [candidate] = chkdir;
-    }
-    size_t idStep = (size_t)MAX_BANKS_IN_ROOT / (bankDirsMap.size() + 2);
-    if(idStep > 1)
-    {
-        roots [root_idx].bankIdStep = idStep;
-    }
-
-    map<string, string>::iterator it;
-    for(it = bankDirsMap.begin(); it != bankDirsMap.end(); ++it)
-    {
-        add_bank(it->first, it->second, root_idx);
-        BanksInRoots += 1;
-    }
-    roots [root_idx].bankIdStep = 0;
-}
-
 
 bool Bank::isValidBank(string chkdir)
 {

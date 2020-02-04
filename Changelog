@@ -2,8 +2,11 @@ yoshimi 1.7.0 M
 
 
 2020-2-4 Will
-:rebank:  basic structure mostly copmplete.
-Testing for defects and redundant code.
+:rebank: Basic structure mostly complete.
+:rebank: Testing for defects and redundant code.
+:rebank: Removed considerable redundant code.
+:rebank: Define bank root at strartup restored.
+    This appears to have been lost some time ago.
 
 2020-2-3 Will
 :rebank:  basic structure now in place.

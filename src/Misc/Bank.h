@@ -124,7 +124,6 @@ class Bank
         bool newIDbank(string newbankdir, unsigned int bankID, size_t rootID = 0xff);
         bool newbankfile(string newbankdir, size_t rootID);
         std::string removebank(unsigned int bankID, size_t rootID = 0xff);
-        void rescanforbanks(void);
         void clearBankrootDirlist(void);
         void removeRoot(size_t rootID);
         bool changeRootID(size_t oldID, size_t newID);
@@ -162,7 +161,6 @@ class Bank
              // returns true if the instrument was added
 
         void deletefrombank(size_t rootID, size_t bankID, unsigned int pos);
-        void scanrootdir(int root_idx); // scans a root dir for banks
         bool isValidBank(string chkdir);
         size_t add_bank(string name, string, size_t rootID);
         bool check_bank_duplicate(string alias);

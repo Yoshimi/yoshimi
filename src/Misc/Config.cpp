@@ -1514,7 +1514,7 @@ void GuiThreadMsg::processGuiMessages()
                         {
                             // special case for first synth startup
                             guiMaster->bankui->readbankcfg();
-                            guiMaster->bankui->rescan_for_banks(false);
+                            guiMaster->bankui->rescan_for_banks();
                         }
                         guiMaster->bankui->set_bank_slot();
                         guiMaster->bankui->refreshmainwindow();
