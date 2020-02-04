@@ -1,5 +1,19 @@
 yoshimi 1.7.0 M
 
+
+2020-2-4 Will
+:rebank: Basic structure mostly complete.
+:rebank: Testing for defects and redundant code.
+:rebank: Removed considerable redundant code.
+:rebank: Define bank root at strartup restored.
+    This appears to have been lost some time ago.
+
+2020-2-3 Will
+:rebank:  basic structure now in place.
+
+2020-2-2 Will
+:rebank: started new root/bank structure.
+
 2020-2-1 Will
 * Building bank root uses new listDir(
 * Revised bank and file permissions.

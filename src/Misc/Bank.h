@@ -91,8 +91,6 @@ typedef struct _RootEntry
 
 typedef map<size_t, RootEntry> RootEntryMap; // Maps root id to root entry.
 
-typedef map<size_t, map<string, size_t> > BankHintsMap;
-
 class SynthEngine;
 
 class Bank
@@ -126,7 +124,6 @@ class Bank
         bool newIDbank(string newbankdir, unsigned int bankID, size_t rootID = 0xff);
         bool newbankfile(string newbankdir, size_t rootID);
         std::string removebank(unsigned int bankID, size_t rootID = 0xff);
-        void rescanforbanks(void);
         void clearBankrootDirlist(void);
         void removeRoot(size_t rootID);
         bool changeRootID(size_t oldID, size_t newID);
@@ -136,6 +133,8 @@ class Bank
         size_t getCurrentBankID();
         size_t addRootDir(string newRootDir);
         void parseConfigFile(XMLwrapper *xml);
+        bool installRoots();
+        bool installNewRoot(size_t rootID, string rootdir, bool reload = false);
         void saveToConfigFile(XMLwrapper *xml);
 
         string getBankPath(size_t rootID, size_t bankID);
@@ -162,7 +161,6 @@ class Bank
              // returns true if the instrument was added
 
         void deletefrombank(size_t rootID, size_t bankID, unsigned int pos);
-        void scanrootdir(int root_idx); // scans a root dir for banks
         bool isValidBank(string chkdir);
         size_t add_bank(string name, string, size_t rootID);
         bool check_bank_duplicate(string alias);
@@ -172,7 +170,6 @@ class Bank
         SynthEngine *synth;
 
         RootEntryMap  roots;
-        BankHintsMap hints;
 
         InstrumentEntry &getInstrumentReference(size_t rootID, size_t bankID, size_t ninstrument );
 

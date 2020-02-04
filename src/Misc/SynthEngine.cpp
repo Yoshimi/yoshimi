@@ -214,8 +214,6 @@ SynthEngine::~SynthEngine()
 
 bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 {
-    int found = 0;
-
     if (!interchange.Init())
     {
         Runtime.LogError("interChange init failed");
@@ -340,18 +338,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             Runtime.Log("Failed to load midiLearn file " + feml);
             Runtime.midiLearnLoad = "";
         }
-    }
-
-    if (Runtime.rootDefine.size())
-    {
-        found = bank.addRootDir(Runtime.rootDefine);
-        if (found)
-        {
-            cout << "Defined new root ID " << asString(found) << " as " << Runtime.rootDefine << endl;
-            bank.scanrootdir(found);
-        }
-        else
-            cout << "Can't find path " << Runtime.rootDefine << endl;
     }
 
     // just to make sure we're in sync
@@ -2367,16 +2353,8 @@ bool SynthEngine::installBanks()
     if (!isRegularFile(bankname))
     {
         banksFound = false;
-        Runtime.Log("Missing bank file");
-        bankname = name + ".config";
-        if (isRegularFile(bankname))
-            Runtime.Log("Copying data from config");
-        else
-        {
-            Runtime.Log("Scanning for banks");
-            bank.rescanforbanks();
-            return false;
-        }
+        Runtime.Log("Missing bank file\nRebilding");
+        bank.installRoots();
     }
     if (banksFound)
         branch = "BANKLIST";

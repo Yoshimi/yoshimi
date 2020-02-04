@@ -1459,7 +1459,7 @@ Alan Calvert started the project}
             case MIDI::control::bankChange:
                 if (engine != UNUSED)
                     bankui->readbankcfg();
-                bankui->rescan_for_banks(false);
+                bankui->rescan_for_banks();
                 break;
         }
         return;
@@ -1643,7 +1643,7 @@ Alan Calvert started the project}
                     }
                 }
             }
-            bankui->rescan_for_banks(false);
+            bankui->rescan_for_banks();
             break;
         case MAIN::control::deleteBank: // delete bank and contents
             name = textMsgBuffer.fetch(miscmsg);
@@ -1652,7 +1652,7 @@ Alan Calvert started the project}
                 if (wasFromHere)
                     fl_alert("%s",name.c_str());
             }
-            bankui->rescan_for_banks(false);
+            bankui->rescan_for_banks();
             bankui->set_bank_slot();
             break;
 
@@ -1664,7 +1664,7 @@ Alan Calvert started the project}
             if (engine != UNUSED)
                 bankui->readbankcfg();
             if (insert != UNUSED || engine != UNUSED)
-                bankui->rescan_for_banks(false);
+                bankui->rescan_for_banks();
             updatepartprogram(kititem);
             break;
 
@@ -1914,7 +1914,7 @@ Alan Calvert started the project}
   }
   Function {updateEngines(bool isOn)} {} {
     code {//
-        bankui->rescan_for_banks(true);
+        bankui->rescan_for_banks();
         bankui->enginecheck->value(isOn);
         if (isOn)
             bankui->B_search->activate();
@@ -2391,7 +2391,7 @@ Alan Calvert started the project}
     if (type == 0)
     {
         bankui->readbankcfg();
-        bankui-> rescan_for_banks(false);
+        bankui-> rescan_for_banks();
     }} {}
   }
   Function {ShowAlert(int num)} {} {
