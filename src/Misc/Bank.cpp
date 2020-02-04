@@ -1322,13 +1322,6 @@ bool Bank::setCurrentBankID(size_t newBankID, bool ignoreMissing)
 }
 
 
-size_t Bank::getCurrentBankID()
-{// This is only used by the root section of BankUI
-    return synth->getRuntime().currentBank;
-
-}
-
-
 size_t Bank::addRootDir(string newRootDir)
 {
    // we need the size check to prevent weird behaviour if the name is just ./

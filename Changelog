@@ -8,6 +8,9 @@ yoshimi 1.7.0 M
 :rebank: Define bank root at strartup restored.
     This appears to have been lost some time ago.
 
+* Completed merge of rebank.
+* Found and removed aditional redundant code.
+
 2020-2-3 Will
 :rebank:  basic structure now in place.
 

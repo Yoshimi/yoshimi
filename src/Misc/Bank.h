@@ -130,7 +130,6 @@ class Bank
 
         bool setCurrentRootID(size_t newRootID);
         bool setCurrentBankID(size_t newBankID, bool ignoreMissing = false);
-        size_t getCurrentBankID();
         size_t addRootDir(string newRootDir);
         void parseConfigFile(XMLwrapper *xml);
         bool installRoots();
