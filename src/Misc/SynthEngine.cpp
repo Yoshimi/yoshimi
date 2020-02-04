@@ -214,8 +214,6 @@ SynthEngine::~SynthEngine()
 
 bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 {
-    int found = 0;
-
     if (!interchange.Init())
     {
         Runtime.LogError("interChange init failed");
@@ -340,19 +338,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             Runtime.Log("Failed to load midiLearn file " + feml);
             Runtime.midiLearnLoad = "";
         }
-    }
-
-    if (Runtime.rootDefine.size())
-    {
-        found = bank.addRootDir(Runtime.rootDefine);
-        if (found)
-        {
-            cout << "Defined new root ID " << asString(found) << " as " << Runtime.rootDefine << endl;
-            bank.scanrootdir(found);
-
-        }
-        else
-            cout << "Can't find path " << Runtime.rootDefine << endl;
     }
 
     // just to make sure we're in sync
