@@ -1,5 +1,10 @@
 yoshimi 1.7.0 M
 
+2020-2-6 Will
+* .local/yoshimi now changed as /local/share/yoshimi
+* Copyfile can now copy only if newer.
+  Also passed through copydir.
+* Copying defaults to .local/share/yoshimi uses 'newer'
 
 2020-2-4 Will
 :rebank: Basic structure mostly complete.

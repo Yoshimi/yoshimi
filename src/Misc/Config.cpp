@@ -315,7 +315,7 @@ bool Config::loadConfig(void)
         Log ("Failed to find 'Home' directory - using tmp.\nSettings will be lost on computer shutdown.");
     }
     userHome = homedir + '/';
-    localDir = userHome + ".local/yoshimi";
+    localDir = userHome + ".local/share/yoshimi";
     if (!isDirectory(localDir))
     {
         if (createDir(localDir))
@@ -344,9 +344,10 @@ bool Config::loadConfig(void)
     if (thisInstance == 0 && sessionStage != Session::RestoreConf)
     {
         TextMsgBuffer::instance().init(); // sneaked it in here so it's early
-        string presetDir = localDir + "/presets";
+
+        presetDir = localDir + "/presets";
         if (!isDirectory(presetDir))
-        {
+        { // only ever want to do this once
             if (createDir(presetDir))
             {
                 Log("Failed to create presets directory '" + presetDir + "'");
@@ -357,11 +358,12 @@ bool Config::loadConfig(void)
                 int i = 1;
                 while (!presetsDirlist[i].empty())
                 {
-                    copyDir(presetsDirlist[i], presetDir);
+                    copyDir(presetsDirlist[i], presetDir, true);
                     ++i;
                 }
             }
         }
+        //cout << presetDir << endl;
     }
 
     ConfigFile = ConfigDir + yoshimi;
@@ -487,7 +489,8 @@ void Config::restoreConfig(SynthEngine *_synth)
 void Config::defaultPresets(void)
 {
     string presetdirs[]  = {
-        string(getenv("HOME")) + "/.local/yoshimi/presets",
+        //string(getenv("HOME")) + "/.local/yoshimi/presets",
+        presetDir,
         extendLocalPath("/presets"),
         // The following is not a default one.
         //string(getenv("HOME")) + "/" + string(EXTEN::config) + "/yoshimi/presets",

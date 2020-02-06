@@ -216,8 +216,24 @@ inline string setExtension(string fname, string ext)
 }
 
 
-inline bool copyFile(string source, string destination)
+inline bool copyFile(string source, string destination, bool newer = false)
 {
+    struct stat sourceInfo;
+    stat(source.c_str(), &sourceInfo);
+    if (newer)
+    {
+        if (isRegularFile(destination))
+        {
+            struct stat destInfo;
+            stat(destination.c_str(), &destInfo);
+            if (sourceInfo.st_mtime <= destInfo.st_mtime)
+            {
+                //std::cout << source << " Not newer" << std::endl;
+                return 0; // it's already the newest
+            }
+        }
+    }
+
     std::ifstream infile (source, std::ios::in|std::ios::binary|std::ios::ate);
     if (!infile.is_open())
         return 1;
@@ -233,11 +249,19 @@ inline bool copyFile(string source, string destination)
     outfile.write(memblock, size);
     outfile.close();
     delete[] memblock;
+
+    if(newer)
+    {
+        struct timespec ts[2];
+        ts[1].tv_sec = (sourceInfo.st_mtime % 10000000000);
+        ts[1].tv_nsec = (sourceInfo.st_mtime / 10000000000);
+        utimensat(0, destination.c_str(), ts, 0);
+    }
     return 0;
 }
 
 
-inline uint32_t copyDir(string source, string destination)
+inline uint32_t copyDir(string source, string destination, bool newer = false)
 {
     //std::cout << "source file " << source << "  to " << destination << std::endl;
     DIR *dir = opendir(source.c_str());
@@ -251,7 +275,7 @@ inline uint32_t copyDir(string source, string destination)
         string nextfile = string(fn->d_name);
         if (nextfile == "." || nextfile == "..")
             continue;
-        if (copyFile(source + "/" + nextfile, destination + "/" + nextfile))
+        if (copyFile(source + "/" + nextfile, destination + "/" + nextfile, newer))
             ++missing;
         else
             ++count;
@@ -410,6 +434,8 @@ inline bool createEmptyFile(string filename)
 
 inline bool createDir(string filename)
 {
+    if (isDirectory(filename))
+        return false; // it's already here
     return mkdir(filename.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 }
 

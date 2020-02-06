@@ -239,6 +239,7 @@ class Config
         const string programcommand;
         string jackSessionDir;
         string baseConfig;
+        string presetDir;
 
         SynthEngine *synth;
         bool bRuntimeSetupCompleted;
