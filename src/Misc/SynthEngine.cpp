@@ -350,7 +350,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     }*/
 
     // we seem to need this here only for first time startup :(
-    bank.setCurrentBankID(Runtime.tempBank);
+    bank.setCurrentBankID(Runtime.tempBank, false);
     return true;
 
 
@@ -806,7 +806,7 @@ int SynthEngine::setRootBank(int root, int banknum, bool notinplace)
 
     if (ok && (banknum < 0x80))
     {
-        if (bank.setCurrentBankID(banknum, true))
+        if (bank.setCurrentBankID(banknum))
         {
             if (notinplace)
             {

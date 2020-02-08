@@ -3117,8 +3117,6 @@ int CmdInterpreter::commandBank(Parser& input, unsigned char controlType, bool j
         {
             return sendNormal(synth, TOPLEVEL::action::lowPrio, tmp, controlType, BANK::control::selectRoot, TOPLEVEL::section::bank);
         }
-        if (justEntered)
-            return REPLY::done_msg;
         return sendNormal(synth, TOPLEVEL::action::lowPrio, tmp, controlType, BANK::control::selectBank, TOPLEVEL::section::bank);
         if (input.lineEnd(controlType))
             return REPLY::done_msg;
@@ -3129,6 +3127,8 @@ int CmdInterpreter::commandBank(Parser& input, unsigned char controlType, bool j
         if (isRoot)
             return sendNormal(synth, TOPLEVEL::action::lowPrio, tmp, controlType, BANK::control::changeRootId, TOPLEVEL::section::bank);
     }
+    if (justEntered)
+        return REPLY::done_msg;
     return REPLY::op_msg;
 }
 

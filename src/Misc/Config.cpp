@@ -364,6 +364,19 @@ bool Config::loadConfig(void)
             }
         }
         //cout << presetDir << endl;
+        definedBankRoot = localDir + "/found/";
+        if (!isDirectory(definedBankRoot))
+        { // only ever want to do this once
+            if (createDir(definedBankRoot))
+            {
+                Log("Failed to create root directory '" + definedBankRoot + "'");
+            }
+            else
+            {
+                ;
+            }
+        cout << definedBankRoot << endl;
+        }
     }
 
     ConfigFile = ConfigDir + yoshimi;

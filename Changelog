@@ -1,5 +1,12 @@
 yoshimi 1.7.0 M
 
+2020-2-8 Will
+
+* Corrected CLI not setting bank from top level.
+* Further improvements to missing root/bank handling.
+* Transfer of default banks to .local in place.
+  Still some corner cases to be sorted.
+
 2020-2-6 Will
 * .local/yoshimi now changed as /local/share/yoshimi
 * Copyfile can now copy only if newer.

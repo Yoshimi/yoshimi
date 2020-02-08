@@ -247,6 +247,7 @@ class Config
         friend class YoshimiLV2Plugin;
 
     public:
+        string definedBankRoot;
         int exitType;
 };
 
