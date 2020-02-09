@@ -148,8 +148,8 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     Runtime.isLittleEndian = (x.arr[0] == 0x44);
 
     audioOut.store(muteState::Active);
-    if (bank.roots.empty())
-        bank.addDefaultRootDirs();
+    //if (bank.roots.empty())
+        //bank.addDefaultRootDirs();
 
     ctl = new Controller(this);
     for (int i = 0; i < NUM_MIDI_CHANNELS; ++ i)
@@ -2341,48 +2341,26 @@ bool SynthEngine::saveMicrotonal(string fname)
     return microtonal.saveXML(setExtension(fname, EXTEN::scale));
 }
 
-
 bool SynthEngine::installBanks()
 {
-    bool banksFound = true;
-    string branch;
     string name = Runtime.ConfigDir + '/' + YOSHIMI;
-
     string bankname = name + ".banks";
 //    Runtime.Log(bankname);
-    if (!isRegularFile(bankname))
+    bool banksGood = false;
+    if (isRegularFile(bankname))
     {
-        banksFound = false;
-        Runtime.Log("Missing bank file\nRebilding");
-        bank.installRoots();
-    }
-    if (banksFound)
-        branch = "BANKLIST";
-    else
-        branch = "CONFIGURATION";
-    XMLwrapper *xml = new XMLwrapper(this);
-    if (!xml)
-    {
-        Runtime.Log("loadConfig failed XMLwrapper allocation");
-        return false;
-    }
-    xml->loadXMLfile(bankname);
-    if (branch == "BANKLIST")
-    {
-        if (xml->enterbranch("INFORMATION"))
+        XMLwrapper *xml = new XMLwrapper(this);
+        if (xml)
         {
-            bank.writeVersion(xml->getpar("Banks_Version", 1, 1, 9));
-            xml->exitbranch();
+            banksGood = true;
+            xml->loadXMLfile(bankname);
+            bank.parseConfigFile(xml);
+            delete xml;
         }
     }
-    if (!xml->enterbranch(branch))
-    {
-        Runtime.Log("extractConfigData, no " + branch + " branch");
-        return false;
-    }
-    bank.parseConfigFile(xml);
-    xml->exitbranch();
-    delete xml;
+    if (!banksGood)
+       bank.parseConfigFile(NULL);
+
     Runtime.Log("\nFound " + asString(bank.InstrumentsInBanks) + " instruments in " + asString(bank.BanksInRoots) + " banks");
     Runtime.Log(textMsgBuffer.fetch(setRootBank(Runtime.tempRoot, Runtime.tempBank)& 0xff));
 #ifdef GUI_FLTK

@@ -124,14 +124,13 @@ class Bank
         bool newIDbank(string newbankdir, unsigned int bankID, size_t rootID = 0xff);
         bool newbankfile(string newbankdir, size_t rootID);
         std::string removebank(unsigned int bankID, size_t rootID = 0xff);
-        void clearBankrootDirlist(void);
         void removeRoot(size_t rootID);
         bool changeRootID(size_t oldID, size_t newID);
 
         bool setCurrentRootID(size_t newRootID);
         bool setCurrentBankID(size_t newBankID, bool ignoreMissing = true);
         size_t addRootDir(string newRootDir);
-        void parseConfigFile(XMLwrapper *xml);
+        bool parseConfigFile(XMLwrapper *xml);
         bool installRoots();
         bool installNewRoot(size_t rootID, string rootdir, bool reload = false);
         void saveToConfigFile(XMLwrapper *xml);

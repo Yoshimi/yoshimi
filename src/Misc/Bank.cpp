@@ -81,7 +81,7 @@ Bank::Bank(SynthEngine *_synth) :
     BanksVersion = 2;
     InstrumentsInBanks = 0,
     BanksInRoots = 0;
-    roots.clear();
+    //roots.clear();
 }
 
 
@@ -1094,7 +1094,7 @@ void Bank::addDefaultRootDirs()
     string ourDir = synth->getRuntime().definedBankRoot;
     if (isDirectory(ourDir))
     {
-        if (!isDirectory(ourDir + "yoshimi/banks"))
+        if (!isDirectory(ourDir + "yoshimi/banks") && (isDirectory(bankdirs[0]) || isDirectory(bankdirs[1])))
         {
             createDir(ourDir + "yoshimi");
             createDir(ourDir + "yoshimi/banks");
@@ -1137,7 +1137,7 @@ void Bank::addDefaultRootDirs()
                 yoshBank.clear();
             ++tot;
         }
-        if (!isDirectory(ourDir + "zynaddsubfx/banks"))
+        if (!isDirectory(ourDir + "zynaddsubfx/banks") && (isDirectory(bankdirs[2]) || isDirectory(bankdirs[3])))
         {
             createDir(ourDir + "zynaddsubfx");
             createDir(ourDir + "zynaddsubfx/banks");
@@ -1321,12 +1321,6 @@ int Bank::engines_used(size_t rootID, size_t bankID, unsigned int ninstrument)
 }
 
 
-void Bank::clearBankrootDirlist(void)
-{
-    roots.clear();
-}
-
-
 void Bank::removeRoot(size_t rootID)
 {
     if(rootID == synth->getRuntime().currentRoot)
@@ -1407,44 +1401,61 @@ size_t Bank::addRootDir(string newRootDir)
 }
 
 
-void Bank::parseConfigFile(XMLwrapper *xml)
+bool Bank::parseConfigFile(XMLwrapper *xml)
 {
+    bool newRoots = true;
     roots.clear();
 
-    string nodename = "BANKROOT";
-    for (size_t i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+    if (xml)
     {
-
-        if (xml->enterbranch(nodename, i))
+        if (xml->enterbranch("INFORMATION"))
         {
-            string dir = xml->getparstr("bank_root");
-            if(!dir.empty())
-            {
-                size_t newIndex = addRootDir(dir);
-                if(newIndex != i)
-                {
-                    changeRootID(newIndex, i);
-                }
-                for(size_t k = 0; k < MAX_INSTRUMENTS_IN_BANK; k++)
-                {
-                    if(xml->enterbranch("bank_id", k))
-                    {
-                        string bankDirname = xml->getparstr("dirname");
-                        roots[i].banks[k].dirname = bankDirname;
-                        xml->exitbranch();
-                    }
-                }
-            }
+            writeVersion(xml->getpar("Banks_Version", 1, 1, 9));
             xml->exitbranch();
         }
+        if (xml->enterbranch("BANKLIST"))
+            newRoots = false;
     }
 
-    if (roots.size() == 0)
+    if (!newRoots)
     {
-        addDefaultRootDirs();
+        string nodename = "BANKROOT";
+        for (size_t i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+        {
+            if (xml->enterbranch(nodename, i))
+            {
+                string dir = xml->getparstr("bank_root");
+                if(!dir.empty())
+                {
+                    size_t newIndex = addRootDir(dir);
+                    if(newIndex != i)
+                    {
+                        changeRootID(newIndex, i);
+                    }
+                    for(size_t k = 0; k < MAX_INSTRUMENTS_IN_BANK; k++)
+                    {
+                        if(xml->enterbranch("bank_id", k))
+                        {
+                            string bankDirname = xml->getparstr("dirname");
+                            roots[i].banks[k].dirname = bankDirname;
+                            xml->exitbranch();
+                        }
+                    }
+                }
+                xml->exitbranch();
+            }
+        }
+        xml->exitbranch();
     }
 
-    // CLI new root entry
+    if (newRoots)
+    {
+        roots.clear();
+        addDefaultRootDirs();
+        synth->getRuntime().currentRoot = 5;
+        synth->getRuntime().currentBank = 5;
+    }
+
     if (!synth->getRuntime().rootDefine.empty())
     {
         string found = synth->getRuntime().rootDefine;
@@ -1453,6 +1464,7 @@ void Bank::parseConfigFile(XMLwrapper *xml)
         cout << "Defined new root ID " << asString(newIndex) << " as " << found << endl;
     }
     installRoots();
+    return newRoots;
 }
 
 
