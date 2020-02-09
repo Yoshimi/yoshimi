@@ -3,6 +3,8 @@ yoshimi 1.7.0 M
 2020-2-9 Will
 * More revision of banks code.
   Still some startup anomallies.
+* Provisional fix for CLI part setting oddity.
+  Need to do more on this.
 
 2020-2-8 Will
 * Corrected CLI not setting bank from top level.

@@ -4655,7 +4655,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
                     return REPLY::done_msg;
                 }
 
-                if (npart != tmp)
+                //if (npart != tmp) // TODO sort this properly!
                 {
                     npart = tmp;
                     if (controlType == TOPLEVEL::type::Write)
@@ -5135,15 +5135,16 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
     if (input.matchnMove(1, "part"))
     {
         nFX = 0; // just to be sure
-        if (controlType != TOPLEVEL::type::Write && input.isAtEnd())
+        // TODO get correct part number
+        /*if (controlType != TOPLEVEL::type::Write && input.isAtEnd())
         {
             if (synth->partonoffRead(npart))
                 name = " enabled";
             else
                 name = " disabled";
-            Runtime.Log("Current part " + asString(npart) + name, 1);
+            Runtime.Log("Current part " + asString(npart + 1) + name, 1);
             return REPLY::done_msg;
-        }
+        }*/
         context = LEVEL::Top;
         bitSet(context, LEVEL::Part);
         nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
