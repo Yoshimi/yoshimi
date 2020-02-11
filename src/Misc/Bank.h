@@ -128,6 +128,7 @@ class Bank
         bool changeRootID(size_t oldID, size_t newID);
 
         bool setCurrentRootID(size_t newRootID);
+        unsigned int findFirstBank(size_t newRootID);
         bool setCurrentBankID(size_t newBankID, bool ignoreMissing = true);
         size_t addRootDir(string newRootDir);
         bool parseConfigFile(XMLwrapper *xml);
@@ -171,7 +172,9 @@ class Bank
 
         InstrumentEntry &getInstrumentReference(size_t rootID, size_t bankID, size_t ninstrument );
 
-        void addDefaultRootDirs();
+        bool transferDefaultDirs(string bankdirs[]);
+        bool transferOneDir(string bankdirs[], int baseNumber, int listNumber);
+        void addDefaultRootDirs(string bankdirs[]);
 
         size_t getNewRootIndex();
         size_t getNewBankIndex(size_t rootID);

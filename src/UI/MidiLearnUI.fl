@@ -52,21 +52,18 @@ decl {\#include "UI/MiscGui.h"
 }
 
 decl {\#include "Misc/FileMgrFuncs.h"
-    using file::findLeafName;
-} {private local
+    using file::findLeafName;} {private local
 }
 
 decl {\#include "Misc/FormatFuncs.h"
-    using func::asHexString;
-} {private local
+    using func::asHexString;} {private local
 }
 
 decl {\#include "Misc/TextMsgBuffer.h"
 
-    namespace \{ // Implementation details...
+    namespace { // Implementation details...
         TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
-    \}
-} {private local
+    }} {private local
 }
 
 class MidiLearnKitItem {: {public Fl_Group}
@@ -296,11 +293,10 @@ class MidiLearnKitItem {: {public Fl_Group}
   }
 }
 
-class MidiLearnUI {
-} {
+class MidiLearnUI {} {
   Function {make_window()} {} {
     Fl_Window midilearnwindow {
-      label {Midi Learn} open
+      label {Midi Learn}
       tooltip {Editor for all learned controllers.
 CTRL-right click on any knob/slider/button to learn.
 Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {7 694 820 285} type Double hide
@@ -374,7 +370,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
             lastname = synth->getRuntime().userHome;
         char *filename;
         string exten = "({*" + EXTEN::mlearn + "})";
-        filename = fl_file_chooser("Load:", exten.c_str(), lastname.c_str(), 0);
+        filename = fl_file_chooser("Save:", exten.c_str(), lastname.c_str(), 0);
         if (filename == NULL)
             return;
         send_data(0, MIDILEARN::control::saveList, 0, 0, 0, 0, 0, 0, textMsgBuffer.push((string) filename));

@@ -1,5 +1,11 @@
 yoshimi 1.7.0 M
 
+2020-2-11 Will
+* Corrected MIDI-Learn save title bar.
+* New bank structure almost complete.
+  There is a workround for an anomaly where
+  startup seems to create phantom empty banks.
+
 2020-2-9 Will
 * More revision of banks code.
   Still some startup anomallies.

@@ -375,7 +375,7 @@ bool Config::loadConfig(void)
             {
                 ;
             }
-        cout << definedBankRoot << endl;
+        //cout << definedBankRoot << endl;
         }
     }
 

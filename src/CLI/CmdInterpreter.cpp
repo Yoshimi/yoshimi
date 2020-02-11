@@ -6043,7 +6043,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
          * reduces the effect of the processing overhead outside the call loop itself.
          */
 
-        std::cout << "here" << std::endl;
+        std::cout << "here zread" << std::endl;
 
         // repeats, control, part, kit, engine, insert, parameter, miscmsg
         float result;

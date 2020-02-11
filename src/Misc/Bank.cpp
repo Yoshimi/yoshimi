@@ -81,7 +81,7 @@ Bank::Bank(SynthEngine *_synth) :
     BanksVersion = 2;
     InstrumentsInBanks = 0,
     BanksInRoots = 0;
-    //roots.clear();
+    roots.clear();
 }
 
 
@@ -1077,128 +1077,83 @@ InstrumentEntry &Bank::getInstrumentReference(size_t rootID, size_t bankID, size
 }
 
 
-void Bank::addDefaultRootDirs()
+bool Bank::transferDefaultDirs(string bankdirs[])
 {
-    string bankdirs[] = {
-        "/usr/share/yoshimi/banks",
-        "/usr/local/share/yoshimi/banks",
-        "/usr/share/zynaddsubfx/banks",
-        "/usr/local/share/zynaddsubfx/banks",
-        extendLocalPath("/banks"),
-        // The following is not a default one.
-        //string(getenv("HOME")) + "/banks",
-        "end"
-    };
-
-    int tot = 0;
     string ourDir = synth->getRuntime().definedBankRoot;
-    if (isDirectory(ourDir))
+    if (!isDirectory(ourDir))
+        return false;
+
+    // always want these
+    createDir(ourDir + "yoshimi");
+    createDir(ourDir + "yoshimi/banks");
+    if (isDirectory(bankdirs[6]))
+        transferOneDir(bankdirs, 0, 6);
+    if (isDirectory(bankdirs[1]) || isDirectory(bankdirs[2]))
     {
-        if (!isDirectory(ourDir + "yoshimi/banks") && (isDirectory(bankdirs[0]) || isDirectory(bankdirs[1])))
-        {
-            createDir(ourDir + "yoshimi");
-            createDir(ourDir + "yoshimi/banks");
-            std::list<string> yoshBank;
-            uint32_t count = listDir(& yoshBank, ourDir + "yoshimi/banks");
-            if (count == 0)
-            {
-                //cout << "empty" << endl;
-                std::list<string> ourYoshBank;
-                uint32_t c2 = listDir(& ourYoshBank, bankdirs[0]);
-                //cout << "here 1 " << c2 << endl;
-                if (c2 > 0 && c2 < 0xffffffff)
-                {
-                    for(list<string>::iterator it = ourYoshBank.begin(); it != ourYoshBank.end(); ++ it)
-                    {
-                        string oldBank = bankdirs[0] + "/" + *it;
-                        string newBank = ourDir + "yoshimi/banks/" + *it;
-                        //cout << oldBank << "  " << newBank << endl;
-                        createDir(newBank);
-                        copyDir(oldBank, newBank, true);
-                    }
-                    ourYoshBank.clear();
-                }
-                c2 = listDir(& ourYoshBank, bankdirs[1]);
-                //cout << "here 2 " << c2 << endl;
-                if (c2 > 0 && c2 < 0xffffffff)
-                {
-                    for(list<string>::iterator it = ourYoshBank.begin(); it != ourYoshBank.end(); ++ it)
-                    {
-                        string oldBank = bankdirs[1] + "/" + *it;
-                        string newBank = ourDir + "yoshimi/banks/" + *it;
-                        //cout << oldBank << "  " << newBank << endl;
-                        createDir(newBank);
-                        copyDir(oldBank, newBank, true);
-                    }
-                    ourYoshBank.clear();
-                }
-            }
-            else
-                yoshBank.clear();
-            ++tot;
-        }
-        if (!isDirectory(ourDir + "zynaddsubfx/banks") && (isDirectory(bankdirs[2]) || isDirectory(bankdirs[3])))
-        {
-            createDir(ourDir + "zynaddsubfx");
-            createDir(ourDir + "zynaddsubfx/banks");
-            std::list<string> zynBank;
-            uint32_t count = listDir(& zynBank, ourDir + "zynaddsubfx/banks");
-            if (count == 0)
-            {
-                //cout << "empty" << endl;
-                std::list<string> ourZynBank;
-                uint32_t c2 = listDir(& ourZynBank, bankdirs[2]);
-                //cout << "here 3 " << c2 << endl;
-                if (c2 > 0 && c2 < 0xffffffff)
-                {
-                    for(list<string>::iterator it = ourZynBank.begin(); it != ourZynBank.end(); ++ it)
-                    {
-                        string oldBank = bankdirs[2] + "/" + *it;
-                        string newBank = ourDir + "zynaddsubfx/banks/" + *it;
-                        //cout << oldBank << "  " << newBank << endl;
-                        createDir(newBank);
-                        copyDir(oldBank, newBank, true);
-                    }
-                    ourZynBank.clear();
-                }
-                c2 = listDir(& ourZynBank, bankdirs[3]);
-                //cout << "here 4 " << c2 << endl;
-                if (c2 > 0 && c2 < 0xffffffff)
-                {
-                    for(list<string>::iterator it = ourZynBank.begin(); it != ourZynBank.end(); ++ it)
-                    {
-                        string oldBank = bankdirs[3] + "/" + *it;
-                        string newBank = ourDir + "zynaddsubfx/banks/" + *it;
-                        //cout << oldBank << "  " << newBank << endl;
-                        createDir(newBank);
-                        copyDir(oldBank, newBank, true);
-                    }
-                    ourZynBank.clear();
-                }
-            }
-            else
-                zynBank.clear();
-            ++tot;
-        }
+        transferOneDir(bankdirs, 0, 1);
+        transferOneDir(bankdirs, 0, 2);
     }
-    addRootDir(ourDir + "yoshimi/banks");
-    addRootDir(ourDir + "zynaddsubfx/banks");
-    int i = 0;
-    while (bankdirs [i] != "end")
+
+    //might not have these
+    if (isDirectory(bankdirs[3]) || isDirectory(bankdirs[4]))
     {
-        addRootDir(bankdirs [i]);
-        ++tot;
+        createDir(ourDir + "zynaddsubfx");
+        createDir(ourDir + "zynaddsubfx/banks");
+        transferOneDir(bankdirs, 5, 3);
+        transferOneDir(bankdirs, 5, 4);
+    }
+    return true;
+}
+
+
+bool Bank::transferOneDir(string bankdirs[], int baseNumber, int listNumber)
+{
+    std::list<string> thisBankDir;
+    uint32_t copyList = listDir(& thisBankDir, bankdirs[listNumber]);
+    if (copyList > 0 && copyList < 0xffffffff)
+    {
+        for(list<string>::iterator it = thisBankDir.begin(); it != thisBankDir.end(); ++ it)
+        {
+            string oldBank = bankdirs[listNumber] + "/" + *it;
+            string newBank = bankdirs[baseNumber] + "/" + *it;
+            //cout << oldBank << "  " << newBank << endl;
+            createDir(newBank);
+            copyDir(oldBank, newBank, true);
+        }
+        thisBankDir.clear();
+    }
+return true;
+}
+
+
+void Bank::addDefaultRootDirs(string bankdirs[])
+{
+    string ourDir = synth->getRuntime().definedBankRoot;
+    int tot = 0;
+    int i = 0;
+    while (bankdirs[i] != "end")
+    {
+        if (isDirectory(bankdirs[i]))
+        {
+            //cout << "idx" << i << "  dir " << bankdirs[i] << endl;
+            addRootDir(bankdirs [i]);
+            ++tot;
+        }
         ++ i;
     }
-    for (int i = 0; i < tot; ++i)
-        changeRootID(i, (i * 5) + 5);
+
+    for (int i = tot; i > 0; --i)
+    {
+        //cout << "ID " << i << "  new " << i * 5 << endl;
+        changeRootID(i, i * 5);
+    }
 }
 
 
 size_t Bank::getNewRootIndex()
 {
     if(roots.empty())
-        return 0;
+        return 1;
 
     return roots.rbegin()->first + 1;
 }
@@ -1366,13 +1321,38 @@ bool Bank::setCurrentRootID(size_t newRootID)
     {
         if (roots [newRootID].banks.count(id) == 0)
         {
-            setCurrentBankID(id, false);
+            findFirstBank(newRootID);
             return true;
+        }
+        if (roots [newRootID].banks.count(id) == 1)
+        {
+            if (roots [newRootID].banks [id].dirname.empty())
+            {
+                findFirstBank(newRootID);
+                return true;
+            }
         }
     }
     if (synth->getRuntime().currentRoot != oldRoot)
-        setCurrentBankID(0, false);
+        findFirstBank(newRootID);
     return true;
+}
+
+unsigned int Bank::findFirstBank(size_t newRootID)
+{
+    for (size_t i = 0; i < MAX_BANKS_IN_ROOT; ++i)
+    {
+        if (roots [newRootID].banks.count(i) != 0)
+        {
+            if (!roots [newRootID].banks [i].dirname.empty())
+            {
+                synth->getRuntime().currentBank = i;
+                //cout << "bank " << i << endl;
+                break;
+            }
+        }
+    }
+    return 0;
 }
 
 
@@ -1403,6 +1383,29 @@ size_t Bank::addRootDir(string newRootDir)
 
 bool Bank::parseConfigFile(XMLwrapper *xml)
 {
+    string localDir = synth->getRuntime().definedBankRoot;
+    /*
+     * This list is used in transferDefaultDirs( to find and copy
+     * bank lists into $HOME/.local.yoshimi
+     * This is refreshed at each startup to update existing entries
+     * or add new ones.
+     *
+     * It is also used by addDefaultRootDirs( to populate the bank
+     * roots, in the event of a missing list.
+     */
+    string bankdirs[] = {
+        localDir + "yoshimi/banks",
+        "/usr/share/yoshimi/banks",
+        "/usr/local/share/yoshimi/banks",
+        "/usr/share/zynaddsubfx/banks",
+        "/usr/local/share/zynaddsubfx/banks",
+        localDir + "zynaddsubfx/banks",
+        extendLocalPath("/banks"),
+        "end"
+    };
+
+    transferDefaultDirs(bankdirs);
+
     bool newRoots = true;
     roots.clear();
 
@@ -1451,9 +1454,8 @@ bool Bank::parseConfigFile(XMLwrapper *xml)
     if (newRoots)
     {
         roots.clear();
-        addDefaultRootDirs();
-        synth->getRuntime().currentRoot = 5;
-        synth->getRuntime().currentBank = 5;
+        addDefaultRootDirs(bankdirs);
+        //synth->getRuntime().currentRoot = 5;
     }
 
     if (!synth->getRuntime().rootDefine.empty())
@@ -1535,14 +1537,13 @@ bool Bank::installNewRoot(size_t rootID, string rootdir, bool reload)
         while (b_it != thisRoot.begin())
         {
             string trybank = *--b_it;
-
+            //cout << ">" << trybank;
             for (size_t id = 0; id < MAX_BANKS_IN_ROOT; ++id)
             {
                 if (roots [rootID].banks.count(id) == 0)
                     continue;
                 if (roots[rootID].banks[id].dirname == trybank)
                 {
-                    //cout << ">" << trybank;
                     banksSet[id] = true;
                     roots [rootID].banks [id].dirname = trybank;
                     loadbank(rootID, id);
@@ -1559,7 +1560,11 @@ bool Bank::installNewRoot(size_t rootID, string rootdir, bool reload)
         }
     }
     BanksInRoots += banksFound;
-    //cout << "*** " << thisRoot.size() << endl;
+    size_t toFetch = thisRoot.size();
+    if (toFetch > 0)
+    {
+        synth->getRuntime().Log("Found " + to_string(toFetch) + " new banks in root " + roots [rootID].path);
+    }
 
     if (thisRoot.size() != 0)
     {
@@ -1574,7 +1579,7 @@ bool Bank::installNewRoot(size_t rootID, string rootdir, bool reload)
 
         for (list<string>::iterator it = thisRoot.begin(); it != thisRoot.end(); ++it)
         {
-            //cout << *it << endl;
+            //cout << ">" << *it << "<" << endl;
             while (banksSet[newIndex] == true)
             {
                 newIndex += idStep;
@@ -1597,14 +1602,21 @@ bool Bank::installNewRoot(size_t rootID, string rootdir, bool reload)
         }
     }
 
-    return result;
     // remove orphans
     for (size_t id = 0; id < MAX_BANKS_IN_ROOT; ++id)
     {
-        if (!banksSet[id] && roots [rootID].banks.count(id) == 1)
+        if (roots [rootID].banks.count(id) == 1)
         {
-            //cout << "Removed orphan bank" << roots [rootID].banks [id].dirname << endl;
-            roots [rootID].banks.erase(id);
+            if (roots [rootID].banks [id].dirname.empty())
+            {
+                cout << "Removed unnamed bank " << id << "  in root " << rootID << endl;
+                roots [rootID].banks.erase(id);
+            }
+            else if (!banksSet[id])
+            {
+                synth->getRuntime().Log("Removed orphan bank " +to_string(id) + " in root " + to_string(rootID) + " " + roots [rootID].banks [id].dirname);
+                roots [rootID].banks.erase(id);
+            }
         }
     }
     if (thisRoot.size())

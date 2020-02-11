@@ -2347,6 +2347,7 @@ bool SynthEngine::installBanks()
     string bankname = name + ".banks";
 //    Runtime.Log(bankname);
     bool banksGood = false;
+    bool newBanks;
     if (isRegularFile(bankname))
     {
         XMLwrapper *xml = new XMLwrapper(this);
@@ -2354,15 +2355,21 @@ bool SynthEngine::installBanks()
         {
             banksGood = true;
             xml->loadXMLfile(bankname);
-            bank.parseConfigFile(xml);
+            newBanks = bank.parseConfigFile(xml);
             delete xml;
         }
     }
-    if (!banksGood)
-       bank.parseConfigFile(NULL);
+    if (!banksGood){
+       newBanks = bank.parseConfigFile(NULL);
+       Runtime.currentRoot = 5;
+    }
 
     Runtime.Log("\nFound " + asString(bank.InstrumentsInBanks) + " instruments in " + asString(bank.BanksInRoots) + " banks");
-    Runtime.Log(textMsgBuffer.fetch(setRootBank(Runtime.tempRoot, Runtime.tempBank)& 0xff));
+    if (newBanks)
+        Runtime.Log(textMsgBuffer.fetch(setRootBank(5, 5) & 0xff));
+        //bank.setCurrentRootID(0);
+    else
+        Runtime.Log(textMsgBuffer.fetch(setRootBank(Runtime.tempRoot, Runtime.tempBank) & 0xff));
 #ifdef GUI_FLTK
     GuiThreadMsg::sendMessage((this), GuiThreadMsg::RefreshCurBank, 1);
 #endif
