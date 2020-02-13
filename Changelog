@@ -3,6 +3,8 @@ yoshimi 1.7.0 M
 2020-2-13 Will.
 * BugFix: MIDI-learn crash if accessing non-exisitent effect.
   This need more work to correctly report to the CLI.
+* Suppressed test message in filterUI.
+* Updated docs.
 
 2020-2-11 Will
 * Corrected MIDI-Learn save title bar.

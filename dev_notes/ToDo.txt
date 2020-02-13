@@ -1,4 +1,5 @@
 BUG! Trying to access a MIDI-learned part effect that no longer exists crashes.
+This is now fixed, but calls from the CLI can still produce odd (but not fatal results)
 
 BUG! If jack is selected for audio but there are no physical ports Yoshimi quits with CLI warning - should run with gui warning as well, or better still loop back to try alsa.
 
