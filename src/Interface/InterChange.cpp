@@ -5965,7 +5965,17 @@ void InterChange::commandEffects(CommandBlock *getData)
     else
         return; // invalid part number
     if (kititem > EFFECT::type::dynFilter)
+        return; // invalid kit number
+    //cout << "here "  << int(getData->data.source & TOPLEVEL::action::noAction) << "  kit " << int(kititem & 127) << "  eff " << eff->geteffect() << endl;
+    if (control != PART::control::effectType && (kititem & 127) != eff->geteffect())
+    {
+        if ((getData->data.source & TOPLEVEL::action::noAction) != TOPLEVEL::action::fromMIDI)
+            synth->getRuntime().Log("Not Available"); // TODO sort this better for CLI as well as MIDI
+        getData->data.source = TOPLEVEL::action::noAction;
         return;
+    }
+
+
     if (kititem == EFFECT::type::dynFilter && getData->data.insert != UNUSED)
     {
         if (write)

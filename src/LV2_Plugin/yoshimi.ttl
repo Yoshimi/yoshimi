@@ -252,7 +252,7 @@
         lv2:symbol "track_16_r" ;
         lv2:name "Track 16 right" ;
     ];
-    
+
     lv2:port [
 	a lv2:OutputPort,  atom:AtomPort ;
 	atom:bufferType atom:Sequence ;
@@ -313,7 +313,7 @@
         lv2:symbol "outr" ;
         lv2:name "Main right" ;
     ];
-    
+
     lv2:port [
 	a lv2:OutputPort,  atom:AtomPort ;
 	atom:bufferType atom:Sequence ;

@@ -1392,6 +1392,9 @@ bool Bank::parseConfigFile(XMLwrapper *xml)
      *
      * It is also used by addDefaultRootDirs( to populate the bank
      * roots, in the event of a missing list.
+     *
+     * The list is in the order the roots will appear to the user,
+     * and the numbering in addDefaultRootDirs is the same.
      */
     string bankdirs[] = {
         localDir + "yoshimi/banks",
