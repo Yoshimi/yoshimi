@@ -1,6 +1,12 @@
 yoshimi 1.7.0 M
 
-2020-2-13 Will.
+
+2020-2-14 Will
+* If no banks are found at startup a new one is generated.
+  This will be in the .local directory and will contain one
+  subsynth instrument.
+
+2020-2-13 Will
 * BugFix: MIDI-learn crash if accessing non-exisitent effect.
   This need more work to correctly report to the CLI.
 * Suppressed test message in filterUI.

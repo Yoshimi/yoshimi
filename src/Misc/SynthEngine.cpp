@@ -2355,12 +2355,12 @@ bool SynthEngine::installBanks()
         {
             banksGood = true;
             xml->loadXMLfile(bankname);
-            newBanks = bank.parseConfigFile(xml);
+            newBanks = bank.parseBanksFile(xml);
             delete xml;
         }
     }
     if (!banksGood){
-       newBanks = bank.parseConfigFile(NULL);
+       newBanks = bank.parseBanksFile(NULL);
        Runtime.currentRoot = 5;
     }
 

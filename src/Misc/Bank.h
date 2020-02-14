@@ -131,7 +131,7 @@ class Bank
         unsigned int findFirstBank(size_t newRootID);
         bool setCurrentBankID(size_t newBankID, bool ignoreMissing = true);
         size_t addRootDir(string newRootDir);
-        bool parseConfigFile(XMLwrapper *xml);
+        bool parseBanksFile(XMLwrapper *xml);
         bool installRoots();
         bool installNewRoot(size_t rootID, string rootdir, bool reload = false);
         void saveToConfigFile(XMLwrapper *xml);
@@ -161,7 +161,6 @@ class Bank
 
         void deletefrombank(size_t rootID, size_t bankID, unsigned int pos);
         bool isValidBank(string chkdir);
-        size_t add_bank(string name, string, size_t rootID);
         bool check_bank_duplicate(string alias);
 
         //string dirname;
@@ -175,6 +174,7 @@ class Bank
         bool transferDefaultDirs(string bankdirs[]);
         bool transferOneDir(string bankdirs[], int baseNumber, int listNumber);
         void addDefaultRootDirs(string bankdirs[]);
+        void generateSingleRoot();
 
         size_t getNewRootIndex();
         size_t getNewBankIndex(size_t rootID);

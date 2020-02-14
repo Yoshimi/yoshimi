@@ -1466,6 +1466,28 @@ void InterChange::resolveReplies(CommandBlock *getData)
 }
 
 
+// This is only used by bank when no banks can be found
+void InterChange::generateSpecialInstrument(int npart, std::string name)
+{
+    synth->part[npart]->Pname = name;
+    Part *part;
+    part = synth->part[npart];
+    part->partefx[0]->changeeffect(1);
+    part->kit[0].Padenabled = false;
+    part->kit[0].Psubenabled = true;
+
+    SUBnoteParameters *pars;
+    pars = part->kit[0].subpars;
+    pars->Phmag[1] = 75;
+    pars->Phmag[2] = 40;
+    pars->Pbandwidth = 60;
+
+    //EffectMgr *eff;
+    //eff = synth->part[npart]->partefx[0];
+
+}
+
+
 void InterChange::mediate()
 {
     CommandBlock getData;

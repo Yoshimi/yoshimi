@@ -64,6 +64,7 @@ class InterChange : private DataText
         ringBuff *returnsBuffer;
         ringBuff *muteQueue;
 
+        void generateSpecialInstrument(int npart, std::string name);
         void mediate(void);
         void historyActionCheck(CommandBlock *getData);
         void returns(CommandBlock *getData);
