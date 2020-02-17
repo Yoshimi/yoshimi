@@ -1,6 +1,6 @@
 Banks and Presets update
 
-Initially, existing users should see no difference, apart from a slightly quicker startup if they have a very large number of banks and roots. New users will see all the bankroots that Yoshimi can find, and this will include "$HOME/.local/share/yoshimi/found/" with either/or "yoshimi/banks" "zynaddsubfx/banks" if these are found in the default locations.
+Initially, existing users should see no difference, apart from a slightly quicker startup if they have a very large number of banks and roots. New users will see all the bank roots that Yoshimi can find, and this will include "$HOME/.local/share/yoshimi/found/" with "yoshimi/banks" and/or "zynaddsubfx/banks" if these are found in the default locations.
 
 Unlike the actual defaults, these will be editable. They are also kept up to date if any default ones are improved or added to.
 
@@ -13,13 +13,16 @@ There is a really strange anomaly where phantom empty banks sometimes get added 
 
 Work rounds have been created to hide these (and not include them when the master file is saved), but still report them to the CLI. Also there is nothing to stop you adding real ones at these locations. We don't recommend it as many sequencers try to set root and bank zero with every program change unless you keep resetting them yourself. This is a ridiculous waste of bandwith and is *not* a requirement in the MIDI spec.
 
-Yoshimi reports, but ignores unrecognised locations (and repeat calls to the same ones are reported as done but ignored).
+Yoshimi reports, but ignores unrecognised locations. Repeat calls to the same ones are reported as done, but ignored.
 
 
-The complete routes to add these editble 'defaults' manually are:
+The complete routes to add these editable 'defaults' manually are:
 
 $HOME/.local/share/yoshimi/found/yoshimi/banks
 $HOME/.local/share/yoshimi/found/zynaddsubfx/banks
+
+Further to this, at one time some distributions either didn't include the default banks of instruments, or put them in unusual locations, so yoishimi didn't find them on a first time startup. It's not known if this still happens, but if Yoshimi can't find any it will still create the "$HOME/.local/share/yoshimi/found/yoshimi/banks" root with the ID of 5. It will then go on to create a bank "newBank" also with an ID of 5, and in this it will create a SubSynth instrument called "First Instrument" with a prefix of "0005-".
+
 
 There is also a new editable presets directory:
 $HOME/.local/share/yoshimi/presets

@@ -67,7 +67,7 @@ void OscilParameters::defaults()
     else
         Prand = 64; // no randomness
 
-    Pcurrentbasefunc = 0;
+    Pcurrentbasefunc = OSCILLATOR::wave::sine;
     Pbasefuncpar = 64;
 
     Pbasefuncmodulation = 0;
@@ -344,7 +344,7 @@ float OscilParameters::getLimits(CommandBlock *getData)
             max = 63;
             break;
         case OSCILLATOR::control::baseFunctionType:
-            max = 15;
+            max = OSCILLATOR::wave::hyperSec;
             type &= ~learnable;
             break;
         case OSCILLATOR::control::baseModulationParameter1:

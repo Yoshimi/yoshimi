@@ -390,7 +390,13 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
         result += "+";
     }
     else if (bitTest(context, LEVEL::Oscillator))
-        result += (" " + waveshape[(int)readControl(synth, 0, OSCILLATOR::control::baseFunctionType, npart, kitNumber, engine + voiceNumber, TOPLEVEL::insert::oscillatorGroup)]);
+    {
+        int type = (int)readControl(synth, 0, OSCILLATOR::control::baseFunctionType, npart, kitNumber, engine + voiceNumber, TOPLEVEL::insert::oscillatorGroup);
+        if (type > OSCILLATOR::wave::hyperSec)
+            result += " user";
+        else
+            result += (" " + waveshape[type]);
+    }
 
     if (bitTest(context, LEVEL::LFO))
     {

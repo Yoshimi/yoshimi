@@ -869,6 +869,26 @@ namespace OSCILLATOR // usage OSCILLATOR::control::phaseRandomness
         clearHarmonics = 96,
         convertToSine
     };
+    enum wave : unsigned char {
+        sine = 0,
+        triangle,
+         pulse,
+         saw,
+         power,
+         gauss,
+         diode,
+         absSine,
+         pulseSine,
+         stretchSine,
+         chirp,
+         absStretchSine,
+         chebyshev,
+         square,
+         spike,
+         circle,
+         hyperSec,
+         user
+    };
 }
 
 namespace RESONANCE // usage RESONANCE::control::maxDb

@@ -576,6 +576,7 @@ static std::string waveformlist [] = {
     "SQUare","",
     "SPIke","",
     "CIRcle","",
+    "HYPersec","",
     "Harmonic <n1> Amp <n2>",   "harmonic n1 to n2 intensity",
     "Harmonic <n1> Phase <n2>", "harmonic n1 to n2 phase",
     "Harmonic Shift <n>",       "amount harmonics are moved",
@@ -1008,8 +1009,8 @@ static std::string effdynamicfilter [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SH
 static std::string detuneType [] = {"DEFault", "L35", "L10", "E100", "E1200", "end"};
 
 // waveform controls
-static std::string waveshape [] = {"Sine", "Triangle", "Pulse", "Saw", "Power", "Gauss", "Diode", "AbsSine", "PulseSine", "StretchSine", "Chirp", "AbsStretchSine", "Chebyshev", "Square", "Spike", "Circle"};
-static std::string wavebase [] = {"SIN", "TRI", "PUL", "SAW", "POW", "GAU", "DIO", "ABS", "PSI", "SSI", "CHI", "ASI", "CHE", "SQU", "SPI", "CIR", "end"};
+static std::string waveshape [] = {"Sine", "Triangle", "Pulse", "Saw", "Power", "Gauss", "Diode", "AbsSine", "PulseSine", "StretchSine", "Chirp", "AbsStretchSine", "Chebyshev", "Square", "Spike", "Circle", "HyperSec"};
+static std::string wavebase [] = {"SIN", "TRI", "PUL", "SAW", "POW", "GAU", "DIO", "ABS", "PSI", "SSI", "CHI", "ASI", "CHE", "SQU", "SPI", "CIR", "HYP", "end"};
 static std::string basetypes [] = {"c2", "g2", "c3", "g3", "c4", "g4", "c5", "g5", "g6"};
 static std::string filtertype [] = {"OFF", "LP1", "HPA", "HPB", "BP1", "BS1", "LP2", "HP2", "BP2", "BS2", "COS", "SIN", "LSH", "SGM", "end"};
 static std::string adaptive [] = {"OFF", "ON", "SQU", "2XS", "2XA", "3XS", "3XA", "4XS", "4XA"};

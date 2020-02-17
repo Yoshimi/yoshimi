@@ -606,6 +606,10 @@ class OscilEditor {: {public PresetsUI_}
             xywh {122 142 100 20} labelfont 1 labelsize 11
           }
           MenuItem {} {
+            label HyperpSec
+            xywh {0 0 36 21} labelfont 1 labelsize 11
+          }
+          MenuItem {} {
             label User
             xywh {122 152 100 20} labelfont 1 labelsize 11 hide
           }
@@ -628,7 +632,7 @@ class OscilEditor {: {public PresetsUI_}
         }
         Fl_Group basefuncmodulation {
           xywh {550 276 169 25} box ENGRAVED_BOX
-          code0 {if ((oscil->Pcurrentbasefunc==0)||(oscil->Pcurrentbasefunc==127)) basefuncmodulation->deactivate();}
+          code0 {if ((oscil->Pcurrentbasefunc == OSCILLATOR::wave::sine)||(oscil->Pcurrentbasefunc > OSCILLATOR::wave::hyperSec)) basefuncmodulation->deactivate();}
         } {
           Fl_Group baseFuncPars {
             xywh {652 278 66 21}
@@ -1170,11 +1174,11 @@ class OscilEditor {: {public PresetsUI_}
 
             case OSCILLATOR::control::baseFunctionType:
                 bftype->value(value);
-                if (value < 0.5f)
+                if (value < OSCILLATOR::wave::triangle)
                     bfslider->deactivate();
                 else
                     bfslider->activate();
-                if ((oscil->Pcurrentbasefunc==0)||(oscil->Pcurrentbasefunc==127))
+                if ((oscil->Pcurrentbasefunc == OSCILLATOR::wave::triangle)||(oscil->Pcurrentbasefunc > OSCILLATOR::wave::hyperSec))
                     basefuncmodulation->deactivate();
                 else
                     basefuncmodulation->activate();
@@ -1210,7 +1214,7 @@ class OscilEditor {: {public PresetsUI_}
                 break;
 
             case OSCILLATOR::control::useAsBaseFunction:
-                bftype->value(16);
+                bftype->value(OSCILLATOR::wave::hyperSec + 1);
                 tmp = (value != 0);
                 autoclearbutton->value(tmp);
                 if (tmp)
@@ -1421,11 +1425,11 @@ class OscilEditor {: {public PresetsUI_}
         hrnddial->activate();
     hrnddial->value(oscil->Pamprandpower);
 
-    if (oscil->Pcurrentbasefunc == 127)
-        bftype->value(16);
+    if (oscil->Pcurrentbasefunc > OSCILLATOR::wave::hyperSec)
+        bftype->value(OSCILLATOR::wave::user);
     else
         bftype->value(oscil->Pcurrentbasefunc);
-    if (bftype->value() == 0)
+    if (bftype->value() == OSCILLATOR::wave::sine)
         bfslider->deactivate();
     else
         bfslider->activate();

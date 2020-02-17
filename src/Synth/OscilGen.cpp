@@ -6,7 +6,7 @@
     Copyright 2009-2011 Alan Calvert
     Copyright 2009 James Morris
     Copyright 2016-2019 Will Godfrey & others
-    Copyright 2020 Kristian Amlie
+    Copyright 2020 Kristian Amlie & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -359,6 +359,13 @@ float OscilGen::basefunc_circle(float x, float a)
     }
     return y;
 }
+
+
+float OscilGen::basefunc_hypsec(float x, float a)
+{
+    x = (fmodf(x, 1.0f) - 0.5f) * expf(1.2f * (a - 0.2f) * logf(128.0f));
+    return 1.0f/coshf(x * PI);
+}
 // Base Functions - END
 
 
@@ -429,67 +436,71 @@ void OscilGen::getbasefunction(float *smps)
 
             switch (params->Pcurrentbasefunc)
             {
-                case 1:
+                case OSCILLATOR::wave::triangle:
                     smps[i] = basefunc_triangle(t, par);
                     break;
 
-                case 2:
+                case OSCILLATOR::wave::pulse:
                     smps[i] = basefunc_pulse(t, par);
                     break;
 
-                case 3:
+                case OSCILLATOR::wave::saw:
                     smps[i] = basefunc_saw(t, par);
                     break;
 
-                case 4:
+                case OSCILLATOR::wave::power:
                     smps[i] = basefunc_power(t, par);
                     break;
 
-                case 5:
+                case OSCILLATOR::wave::gauss:
                     smps[i] = basefunc_gauss(t, par);
                     break;
 
-                case 6:
+                case OSCILLATOR::wave::diode:
                     smps[i] = basefunc_diode(t, par);
                     break;
 
-                case 7:
+                case OSCILLATOR::wave::absSine:
                     smps[i] = basefunc_abssine(t, par);
                     break;
 
-                case 8:
+                case OSCILLATOR::wave::pulseSine:
                     smps[i] = basefunc_pulsesine(t, par);
                     break;
 
-                case 9:
+                case OSCILLATOR::wave::stretchSine:
                     smps[i] = basefunc_stretchsine(t, par);
                     break;
 
-                case 10:
+                case OSCILLATOR::wave::chirp:
                     smps[i] = basefunc_chirp(t, par);
                     break;
 
-                case 11:
+                case OSCILLATOR::wave::absStretchSine:
                     smps[i] = basefunc_absstretchsine(t, par);
                     break;
 
-                case 12:
+                case OSCILLATOR::wave::chebyshev:
                     smps[i] = basefunc_chebyshev(t, par);
                     break;
 
-                case 13:
+                case OSCILLATOR::wave::square:
                     smps[i] = basefunc_sqr(t, par);
                     break;
 
-                case 14:
+                case OSCILLATOR::wave::spike:
                     smps[i] = basefunc_spike(t, par);
                     break;
 
-                case 15:
+                case OSCILLATOR::wave::circle:
                     smps[i] = basefunc_circle(t, par);
                     break;
 
-                default:
+                case OSCILLATOR::wave::hyperSec:
+                    smps[i] = basefunc_hypsec(t, par);
+                    break;
+
+                default: // sine
                     smps[i] = -sinf(TWOPI * (float)i / synth->oscilsize_f);
         }
     }
@@ -647,7 +658,7 @@ void OscilGen::oscilfilter(void)
 // Change the base function
 void OscilGen::changebasefunction(void)
 {
-    if (params->Pcurrentbasefunc == 127)
+    if (params->Pcurrentbasefunc > OSCILLATOR::wave::hyperSec)
     {
         // User base function
         memcpy(oscilFFTfreqs.c, params->getbasefuncFFTfreqs()->c,

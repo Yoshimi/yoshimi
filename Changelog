@@ -1,5 +1,9 @@
 yoshimi 1.7.0 M
 
+2020-2-17 Will
+* Implemented Hyperbolic Secant Waveform option.
+* Converted waveshape numbers to labels.
+* Adjusted some CLI text.
 
 2020-2-14 Will
 * If no banks are found at startup a new one is generated.
