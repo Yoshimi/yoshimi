@@ -66,6 +66,7 @@ using func::nearestPowerOf2;
 using func::asString;
 using func::string2int;
 
+unsigned char panLaw = 1;
 
 namespace { // constants used in the implementation
     char prog_doc[] =

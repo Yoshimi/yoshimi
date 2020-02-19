@@ -28,10 +28,14 @@
 
 #include <cmath>
 #include <stdlib.h>
+#include "Misc/NumericFuncs.h"
 
 using namespace std;
+using func::setAllPan;
 
 #include "Params/ADnoteParameters.h"
+
+extern unsigned char panLaw;
 
 int ADnoteParameters::ADnote_unison_sizes[] =
 {2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 0};
@@ -266,9 +270,10 @@ void ADnoteParameters::setGlobalPan(char pan)
     GlobalPar.PPanning = pan;
     if (!randomGlobalPan())
     {
-        float t = (float)(GlobalPar.PPanning - 1) / 126.0f;
-        GlobalPar.pangainL = cosf(t * HALFPI);
-        GlobalPar.pangainR = cosf((1.0f - t) * HALFPI);
+        //float t = (float)(GlobalPar.PPanning - 1) / 126.0f;
+        //GlobalPar.pangainL = cosf(t * HALFPI);
+        //GlobalPar.pangainR = cosf((1.0f - t) * HALFPI);
+        setAllPan(GlobalPar.PPanning, GlobalPar.pangainL, GlobalPar.pangainR, panLaw);
     }
     else
         GlobalPar.pangainL = GlobalPar.pangainR = 0.7f;
@@ -280,9 +285,10 @@ void ADnoteParameters::setVoicePan(int nvoice, char pan)
     VoicePar[nvoice].PPanning = pan;
     if (!randomVoicePan(nvoice))
     {
-        float t = (float)(VoicePar[nvoice].PPanning - 1) / 126.0f;
-        VoicePar[nvoice].pangainL = cosf(t * HALFPI);
-        VoicePar[nvoice].pangainR = cosf((1.0f - t) * HALFPI);
+        //float t = (float)(VoicePar[nvoice].PPanning - 1) / 126.0f;
+        //VoicePar[nvoice].pangainL = cosf(t * HALFPI);
+        //VoicePar[nvoice].pangainR = cosf((1.0f - t) * HALFPI);
+        setAllPan(VoicePar[nvoice].PPanning, VoicePar[nvoice].pangainL, VoicePar[nvoice].pangainR, panLaw);
     }
     else
         VoicePar[nvoice].pangainL = VoicePar[nvoice].pangainR = 0.7f;

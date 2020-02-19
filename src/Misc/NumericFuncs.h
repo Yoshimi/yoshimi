@@ -2,7 +2,7 @@
     NumericFuncs.h
 
     Copyright 2010, Alan Calvert
-    Copyright 2014-2019, Will Godfrey
+    Copyright 2014-2020, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,15 +17,15 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified August 2019
 */
 
 #ifndef NUMERICFUNCS_H
 #define NUMERICFUNCS_H
 
+
 #include <cmath>
 #include <cstddef>
-
+#include "globals.h"
 
 namespace func {
 
@@ -125,6 +125,37 @@ inline bool bitTest(unsigned int value, unsigned int bit)
     return false;
 }
 
+
+inline void setAllPan(float position, float& left, float& right, unsigned char compensation)
+{
+    float t = ((position > 0) ? (position - 1) : 0.0f) / 126.0f;
+    switch (compensation)
+    {
+        case 0: // ZynAddSubFX - per side 0dB mono -6dB
+            if (t > 0.5f)
+            {
+                right = 0.5f;
+                left = (1.0f - t);
+            }
+            else
+            {
+                right = t;
+                left = 0.5f;
+            }
+            break;
+        case 1: // Yoshimi - per side + 3dB mono -3dB
+            left = cosf(t * HALFPI);
+            right = sinf(t * HALFPI);
+            break;
+        case 2: // boost - per side + 6dB mono 0dB
+            left = t;
+            right = (1.0 - t);
+            break;
+        default: // no panning
+            left = 1;
+            right = 1;
+    }
+}
 
 }//(End)namespace func
 #endif /*NUMERICFUNCS_H*/

@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009, Alan Calvert
     Copyright 2017-2019, Will Godfrey
-    Copyright 2020 Kristian Amlie
+    Copyright 2020 Kristian Amlie & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -26,6 +26,11 @@
 */
 
 #include "Params/SUBnoteParameters.h"
+#include "Misc/NumericFuncs.h"
+
+using func::setAllPan;
+
+extern unsigned char panLaw;
 
 SUBnoteParameters::SUBnoteParameters(SynthEngine *_synth) : Presets(_synth)
 {
@@ -107,9 +112,10 @@ void SUBnoteParameters::setPan(char pan)
     PPanning = pan;
     if (!randomPan())
     {
-        float t = (float)(PPanning - 1) / 126.0f;
-        pangainL = cosf(t * HALFPI);
-        pangainR = cosf((1.0f - t) * HALFPI);
+        //float t = (float)(PPanning - 1) / 126.0f;
+        //pangainL = cosf(t * HALFPI);
+        //pangainR = cosf((1.0f - t) * HALFPI);
+        setAllPan(PPanning, pangainL, pangainR, panLaw);
     }
     else
         pangainL = pangainR = 0.7f;

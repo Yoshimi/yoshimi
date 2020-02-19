@@ -6,7 +6,7 @@
     Copyright 2009, James Morris
     Copyright 2009-2011, Alan Calvert
     Copyright 2014-2019, Will Godfrey
-    Copyright 2020 Kristian Amlie
+    Copyright 2020 Kristian Amlie & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -52,7 +52,9 @@ using file::setExtension;
 using file::findLeafName;
 using func::dB2rap;
 using func::findSplitPoint;
+using func::setAllPan;
 
+extern unsigned char panLaw;
 
 Part::Part(Microtonal *microtonal_, FFTwrapper *fft_, SynthEngine *_synth) :
     microtonal(microtonal_),
@@ -1270,11 +1272,12 @@ void Part::setPan(float value)
 
 void Part::checkPanning(float step)
 {
-    float t;
+    //float t;
     TransPanning += step;
-    t = ((TransPanning > 0) ? (TransPanning - 1) : 0.0f) / 126.0f;
-    pangainL = cosf(t * HALFPI);
-    pangainR = cosf((1.0f - t) * HALFPI);
+    setAllPan(TransPanning, pangainL,pangainR, panLaw);
+    //t = ((TransPanning > 0) ? (TransPanning - 1) : 0.0f) / 126.0f;
+    //pangainL = cosf(t * HALFPI);
+    //pangainR = cosf((1.0f - t) * HALFPI);
 }
 
 

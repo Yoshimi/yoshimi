@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2011, Alan Calvert
+    Copyright 2020, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -23,8 +24,13 @@
 */
 
 #include "Effects/Effect.h"
+#include "Misc/NumericFuncs.h"
 
 #define DEFAULT_PARAM_INTERPOLATION_LENGTH_MSECS 10.0f
+
+using func::setAllPan;
+
+extern unsigned char panLaw;
 
 float InterpolatedParameter::sampleRate = 0;
 
@@ -99,9 +105,14 @@ Effect::Effect(bool insertion_, float *efxoutl_, float *efxoutr_,
 void Effect::setpanning(char Ppanning_)
 {
     Ppanning = Ppanning_;
-    float t = (Ppanning > 0) ? (float)(Ppanning - 1) / 126.0f : 0.0f;
-    pangainL.setTargetValue(cosf(t * HALFPI));
-    pangainR.setTargetValue(cosf((1.0f - t) * HALFPI));
+    float left = 0;
+    float right = 0;
+    setAllPan(Ppanning, left, right, panLaw);
+    pangainL.setTargetValue(left);
+    pangainR.setTargetValue(right);
+    //float t = (Ppanning > 0) ? (float)(Ppanning - 1) / 126.0f : 0.0f;
+    //pangainL.setTargetValue(cosf(t * HALFPI));
+    //pangainR.setTargetValue(cosf((1.0f - t) * HALFPI));
 }
 
 
