@@ -413,13 +413,15 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
             if (NoteVoicePar[nvoice].Enabled) {
                 if (subVoice[nvoice] != NULL)
                     for (int k = 0; k < unison_size[nvoice]; ++k) {
-                        subVoice[nvoice][k]->ADlegatonote(freq_, velocity_, portamento_,
-                                                        midinote_, externcall);
+                        subVoice[nvoice][k]->ADlegatonote(getVoiceBaseFreq(nvoice),
+                                                          velocity_, portamento_,
+                                                          midinote_, externcall);
                     }
                 if (subFMVoice[nvoice] != NULL)
                     for (int k = 0; k < unison_size[nvoice]; ++k) {
-                        subFMVoice[nvoice][k]->ADlegatonote(freq_, velocity_, portamento_,
-                                                          midinote_, externcall);
+                        subFMVoice[nvoice][k]->ADlegatonote(getFMVoiceBaseFreq(nvoice),
+                                                            velocity_, portamento_,
+                                                            midinote_, externcall);
                     }
             }
         }
