@@ -935,6 +935,21 @@ void ADnote::computeNoteParameters(void)
             (adpars->VoicePar[nvoice].PFMDetuneFromBaseOsc != 0);
         NoteVoicePar[nvoice].FMFreqFixed  = adpars->VoicePar[nvoice].PFMFixedFreq;
 
+        if (subVoice[nvoice] != NULL)
+        {
+            float basefreq = getVoiceBaseFreq(nvoice);
+            if (basefreq != subVoice[nvoice][0]->basefreq)
+                for (int k = 0; k < unison_size[nvoice]; ++k)
+                    subVoice[nvoice][k]->basefreq = basefreq;
+        }
+        if (subFMVoice[nvoice] != NULL)
+        {
+            float basefreq = getFMVoiceBaseFreq(nvoice);
+            if (basefreq != subFMVoice[nvoice][0]->basefreq)
+                for (int k = 0; k < unison_size[nvoice]; ++k)
+                    subFMVoice[nvoice][k]->basefreq = basefreq;
+        }
+
         // Compute the Voice's modulator volume (incl. damping)
         float fmvoldamp = powf(440.0f / getVoiceBaseFreq(nvoice),
                                adpars->VoicePar[nvoice].PFMVolumeDamp
