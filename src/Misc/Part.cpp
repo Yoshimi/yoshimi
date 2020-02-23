@@ -858,6 +858,8 @@ void Part::ReleaseAllKeys(void)
             && partnote[i].status != KEY_OFF) //thanks to Frank Neumann
             ReleaseNotePos(i);
     }
+    // Clear legato notes, if any.
+    monomemnotes.clear();
 }
 
 
