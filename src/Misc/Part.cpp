@@ -710,6 +710,8 @@ void Part::NoteOff(int note) //release the key
     // This note is released, so we remove it from the list.
     if (!monomemnotes.empty())
         monomemnotes.remove(note);
+    if (monomemnotes.empty())
+        legatoFading = 0;
 
     for ( i = POLIPHONY - 1; i >= 0; i--)
     {   //first note in, is first out if there are same note multiple times
@@ -856,6 +858,8 @@ void Part::ReleaseAllKeys(void)
             && partnote[i].status != KEY_OFF) //thanks to Frank Neumann
             ReleaseNotePos(i);
     }
+    // Clear legato notes, if any.
+    monomemnotes.clear();
 }
 
 
