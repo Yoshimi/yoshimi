@@ -806,6 +806,9 @@ void SUBnote::releasekey(void)
 
 float SUBnote::getHgain(int harmonic)
 {
+    if (pars->Phmag[pos[harmonic]] == 0)
+        return 0.0f;
+
     float hmagnew = 1.0f - pars->Phmag[pos[harmonic]] / 127.0f;
     float hgain;
 
