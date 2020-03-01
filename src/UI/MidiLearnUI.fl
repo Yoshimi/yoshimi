@@ -300,7 +300,7 @@ class MidiLearnUI {} {
       tooltip {Editor for all learned controllers.
 CTRL-right click on any knob/slider/button to learn.
 Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {7 694 820 285} type Double hide
-      code0 {//send_data(0, MIDILEARN::control::sendRefreshRequest, 0, 3); // why were we doing this? it's wrong!}
+      code0 {send_data(TOPLEVEL::action::lowPrio, MIDILEARN::control::sendRefreshRequest, 0, 3);}
     } {
       Fl_Scroll kitlist {
         tooltip {Editor for all learned controllers.

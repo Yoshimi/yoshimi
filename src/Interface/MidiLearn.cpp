@@ -417,7 +417,6 @@ void MidiLearn::generalOperations(CommandBlock *getData)
         name = (textMsgBuffer.fetch(par2));
         if (loadList(name))
             synth->getRuntime().Log("Loaded " + name);
-        updateGui();
         synth->getRuntime().finishedCLI = true;
         return;
     }
