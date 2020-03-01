@@ -1,5 +1,8 @@
 yoshimi 1.7.0 M
 
+2020-3-1 Will
+* Improved code for spacing new bank IDs.
+
 2020-2-17 Will
 * Implemented Hyperbolic Secant Waveform option.
 * Converted waveshape numbers to labels.

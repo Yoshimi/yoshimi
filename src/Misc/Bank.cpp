@@ -1603,37 +1603,39 @@ bool Bank::installNewRoot(size_t rootID, string rootdir, bool reload)
 
     if (thisRoot.size() != 0)
     {
-        // install completely new banks
-        int stepStart [] = {5, 7, 9, 3, 6, 8, 2, 4, 1};
-        int stepPos = 0;
-        size_t idStep = stepStart [0];
-        size_t newIndex = stepStart [stepPos];
+        /*
+         * install completely new banks
+         *
+         * This sequence spreads new banks as evenly as possible
+         * through the root, avoiding collisions with possible
+         * existing banks, and at the same time ensuring that
+         * ID zero is the last possible entry.
+         */
+        size_t idStep = 5;
+        size_t newIndex = idStep;
 
         // try to keep new banks in a sensible order
         thisRoot.sort();
 
         for (list<string>::iterator it = thisRoot.begin(); it != thisRoot.end(); ++it)
         {
-            //cout << ">" << *it << "<" << endl;
-            while (banksSet[newIndex] == true)
-            {
-                newIndex += idStep;
-                if (newIndex >= MAX_BANKS_IN_ROOT)
-                {
-                    ++ stepPos;
-                    newIndex = stepStart [stepPos];
-                }
-            }
-            roots [rootID].banks [newIndex].dirname = *it;
-            loadbank(rootID, newIndex);
-            banksSet[newIndex] = true;
-            ++ banksFound;
-            BanksInRoots += 1; // this is the total of all banks
             if (banksFound >= MAX_BANKS_IN_ROOT)
             {
                 result = false;
                 break; // root is full!
             }
+            //cout << ">" << *it << "<" << endl;
+            while (banksSet[newIndex] == true)
+            {
+                newIndex += idStep;
+                newIndex &= (MAX_BANKS_IN_ROOT - 1);
+            }
+            roots [rootID].banks [newIndex].dirname = *it;
+            loadbank(rootID, newIndex);
+            banksSet[newIndex] = true;
+            //cout << "ID " << newIndex << endl;
+            ++ banksFound;
+            BanksInRoots += 1; // this is the total of all banks
         }
     }
 
