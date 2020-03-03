@@ -601,6 +601,8 @@ int main(int argc, char *argv[])
     bExitSuccess = true;
 
 bail_out:
+    // firstSynth is freed in the for loop below, so save this for later
+    int exitType = firstSynth->getRuntime().exitType;
     for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
     {
         SynthEngine *_synth = it->first;
@@ -627,12 +629,11 @@ bail_out:
         tcsetattr(0, TCSANOW, &oldTerm);
     if (bExitSuccess)
     {
-        int type = firstSynth->getRuntime().exitType;
-        if (type == FORCED_EXIT)
+        if (exitType == FORCED_EXIT)
             std::cout << "\nExit was forced :(" << std::endl;
         else
             std::cout << "\nGoodbye - Play again soon?"<< std::endl;
-        exit(type);
+        exit(exitType);
     }
     else
         exit(EXIT_FAILURE);

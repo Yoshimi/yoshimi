@@ -193,7 +193,7 @@ this->pars=pars;} {}
         {
             float nhr = pars->getNhr(i);
             int kx = (int)(lx / (float)maxharmonic * nhr);
-            if (kx < 0 || kx > lx)
+            if (kx < 0 || kx >= lx)
                 continue;
             spectrum[kx] = spc[i - 1] / max + 1e-9;
         }

@@ -192,27 +192,41 @@ void ADnote::construct()
         unison_vibratto[nvoice].step = new float[unison];
         unison_vibratto[nvoice].position = new float[unison];
 
-        for (int k = 0; k < unison; ++k)
+        if (unison >> is_pwm > 1)
         {
-            unison_vibratto[nvoice].position[k] = synth->numRandom() * 1.8f - 0.9f;
+            for (int k = 0; k < unison; ++k)
+            {
+                unison_vibratto[nvoice].position[k] = synth->numRandom() * 1.8f - 0.9f;
 
-            // Ugly, but the alternative is likely uglier.
-            if (is_pwm)
-                for (int i = 0; i < unison; i += 2)
-                    unison_vibratto[nvoice].position[i+1] =
-                        unison_vibratto[nvoice].position[i];
+                // Give step a random direction. The amplitude doesn't matter right
+                // now, only the sign, which will be preserved in
+                // computeNoteParameters().
+                if (synth->numRandom() < 0.5f)
+                    unison_vibratto[nvoice].step[k] = -1.0f;
+                else
+                    unison_vibratto[nvoice].step[k] = 1.0f;
 
-            // Give step a random direction. The amplitude doesn't matter right
-            // now, only the sign, which will be preserved in
-            // computeNoteParameters().
-            if (synth->numRandom() < 0.5f)
-                unison_vibratto[nvoice].position[k] = -1.0f;
-            else
-                unison_vibratto[nvoice].position[k] = 1.0f;
+                if (is_pwm)
+                {
+                    // Set the next position the same as this one.
+                    unison_vibratto[nvoice].position[k+1] =
+                        unison_vibratto[nvoice].position[k];
+                    ++k; // Skip an iteration.
+                    // step and amplitude are handled in computeNoteParameters.
+                }
+            }
         }
-
-        if (unison <= 2) // no vibratto for a single voice
-            unison_vibratto[nvoice].position[1] = 0.0f;
+        else // No vibrato for a single voice
+        {
+            if (is_pwm)
+            {
+                unison_vibratto[nvoice].position[1] = 0.0f;
+            }
+            if (is_pwm || unison == 1)
+            {
+                unison_vibratto[nvoice].position[0] = 0.0f;
+            }
+        }
 
         oscfreqhi[nvoice] = new int[unison];
         oscfreqlo[nvoice] = new float[unison];
@@ -1061,7 +1075,7 @@ void ADnote::computeNoteParameters(void)
         float unison_real_spread = powf(2.0f, (unison_spread * 0.5f) / 1200.0f);
         float unison_vibratto_a = adpars->VoicePar[nvoice].Unison_vibratto / 127.0f;                                  //0.0 .. 1.0
 
-        int true_unison = unison / (is_pwm ? 2 : 1);
+        int true_unison = unison >> is_pwm;
         switch (true_unison)
         {
             case 1: // if no unison, set the subvoice to the default note
@@ -1110,45 +1124,45 @@ void ADnote::computeNoteParameters(void)
             }
 
         // unison vibrattos
-        if(unison > 2 || (!is_pwm && unison > 1))
+        if(true_unison > 1)
         {
             for (int k = 0; k < unison; ++k) // reduce the frequency difference
                                              // for larger vibrattos
                 unison_base_freq_rap[nvoice][k] =
                     1.0f + (unison_base_freq_rap[nvoice][k] - 1.0f)
                     * (1.0f - unison_vibratto_a);
+
+            unison_vibratto[nvoice].amplitude = (unison_real_spread - 1.0f) * unison_vibratto_a;
+
+            float increments_per_second = synth->samplerate_f / synth->sent_all_buffersize_f;
+            const float vib_speed = adpars->VoicePar[nvoice].Unison_vibratto_speed / 127.0f;
+            float vibratto_base_period  = 0.25f * powf(2.0f, (1.0f - vib_speed) * 4.0f);
+            for (int k = 0; k < unison; ++k)
+            {
+                // make period to vary randomly from 50% to 200% vibratto base period
+                float vibratto_period = vibratto_base_period * powf(2.0f, paramRNG.numRandom() * 2.0f - 1.0f);
+                float m = 4.0f / (vibratto_period * increments_per_second);
+                if (unison_vibratto[nvoice].step[k] < 0.0f)
+                    m = -m;
+                unison_vibratto[nvoice].step[k] = m;
+
+                if (is_pwm)
+                {
+                    // Set the next position the same as this one.
+                    unison_vibratto[nvoice].step[k+1] =
+                        unison_vibratto[nvoice].step[k];
+                    ++k; // Skip an iteration.
+                }
+            }
         }
-        unison_vibratto[nvoice].amplitude = (unison_real_spread - 1.0f) * unison_vibratto_a;
-
-        float increments_per_second = synth->samplerate_f / synth->sent_all_buffersize_f;
-        const float vib_speed = adpars->VoicePar[nvoice].Unison_vibratto_speed / 127.0f;
-        float vibratto_base_period  = 0.25f * powf(2.0f, (1.0f - vib_speed) * 4.0f);
-        for (int k = 0; k < unison; ++k)
+        else // No vibrato for a single voice
         {
-            // make period to vary randomly from 50% to 200% vibratto base period
-            float vibratto_period = vibratto_base_period * powf(2.0f, paramRNG.numRandom() * 2.0f - 1.0f);
-            float m = 4.0f / (vibratto_period * increments_per_second);
-            if (unison_vibratto[nvoice].step[k] < 0.0f)
-                m = -m;
-            unison_vibratto[nvoice].step[k] = m;
+            unison_vibratto[nvoice].step[0] = 0.0f;
+            unison_vibratto[nvoice].amplitude = 0.0f;
 
-            // Ugly, but the alternative is likely uglier.
-            if (is_pwm)
-                for (int i = 0; i < unison; i += 2)
-                    unison_vibratto[nvoice].step[i+1] =
-                        unison_vibratto[nvoice].step[i];
-        }
-
-        if (unison <= 2) // no vibratto for a single voice
-        {
             if (is_pwm)
             {
                 unison_vibratto[nvoice].step[1]     = 0.0f;
-            }
-            if (is_pwm || unison == 1)
-            {
-                unison_vibratto[nvoice].step[0] = 0.0f;
-                unison_vibratto[nvoice].amplitude = 0.0f;
             }
         }
 
