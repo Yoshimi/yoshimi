@@ -269,7 +269,6 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
     _pIdleThread(0),
     _lv2_desc(desc)
 {
-    flatbankprgs.clear();
     _uridMap.handle = NULL;
     _uridMap.map = NULL;
     const LV2_Feature *f = NULL;

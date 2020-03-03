@@ -2439,8 +2439,7 @@ int CmdInterpreter::commandGroup(Parser& input)
     bool full = (input.matchnMove(1, "location"));
 
     int count = 0;
-    if (!instrumentGroup.empty())
-        instrumentGroup.clear();
+    instrumentGroup.clear();
     do {
         ++ count;
         line = textMsgBuffer.fetch(readControl(synth, 0, BANK::control::findInstrumentName, TOPLEVEL::section::bank, UNUSED, UNUSED, UNUSED, value - 1));

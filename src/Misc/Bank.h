@@ -99,7 +99,6 @@ class Bank
 
     public:
         Bank(SynthEngine *_synth);
-        ~Bank();
         int getType(unsigned int ninstrument, size_t bank, size_t root);
         string getname(unsigned int ninstrument, size_t bank, size_t root);
         string getnamenumbered(unsigned int ninstrument, size_t bank, size_t root);

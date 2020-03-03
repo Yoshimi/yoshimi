@@ -285,8 +285,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
     }
     else // Poly mode is On, so just make sure the list is empty.
     {
-        if (!monomemnotes.empty())
-            monomemnotes.clear();
+        monomemnotes.clear();
     }
     lastnote = note;
     int pos = -1;
@@ -708,8 +707,7 @@ void Part::NoteOff(int note) //release the key
 {
     int i;
     // This note is released, so we remove it from the list.
-    if (!monomemnotes.empty())
-        monomemnotes.remove(note);
+    monomemnotes.remove(note);
     if (monomemnotes.empty())
         legatoFading = 0;
 
