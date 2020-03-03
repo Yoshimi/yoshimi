@@ -1104,7 +1104,7 @@ bool Bank::transferOneDir(string bankdirs[], int baseNumber, int listNumber)
             string newBank = bankdirs[baseNumber] + "/" + *it;
             //cout << oldBank << "  " << newBank << endl;
             createDir(newBank);
-            uint32_t inside = copyDir(oldBank, newBank, true);
+            uint32_t inside = copyDir(oldBank, newBank, 1);
             if (inside > 0 && inside < 0xffffffff)
                 found = true;
         }

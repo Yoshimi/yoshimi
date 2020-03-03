@@ -358,7 +358,7 @@ bool Config::loadConfig(void)
                 int i = 1;
                 while (!presetsDirlist[i].empty())
                 {
-                    copyDir(presetsDirlist[i], presetDir, true);
+                    copyDir(presetsDirlist[i], presetDir, 1);
                     ++i;
                 }
             }

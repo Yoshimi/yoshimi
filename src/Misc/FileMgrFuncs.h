@@ -216,11 +216,26 @@ inline string setExtension(string fname, string ext)
 }
 
 
-inline bool copyFile(string source, string destination, bool newer = false)
+inline bool copyFile(string source, string destination, char option = 0)
 {
+    // options
+    // 0 = always write / overwrite
+    // 1 = only write if not already present
+    // 2 = only write if newer
+
+    if (option == 0 && isRegularFile(destination))
+    {
+        //std::cout << "Writing " << destination << std::endl;
+        return 0; // counts as a successful write
+    }
+
+    //if (option == 1 && isRegularFile(destination))
+        //std::cout << "Exists " << destination << std::endl;
+
+
     struct stat sourceInfo;
     stat(source.c_str(), &sourceInfo);
-    if (newer)
+    if (option == 2)
     {
         if (isRegularFile(destination))
         {
@@ -250,7 +265,7 @@ inline bool copyFile(string source, string destination, bool newer = false)
     outfile.close();
     delete[] memblock;
 
-    if(newer)
+    if(option == 2)
     {
         struct timespec ts[2];
         ts[1].tv_sec = (sourceInfo.st_mtime % 10000000000);
@@ -261,7 +276,7 @@ inline bool copyFile(string source, string destination, bool newer = false)
 }
 
 
-inline uint32_t copyDir(string source, string destination, bool newer = false)
+inline uint32_t copyDir(string source, string destination, char option = 0)
 {
     //std::cout << "source file " << source << "  to " << destination << std::endl;
     DIR *dir = opendir(source.c_str());
@@ -275,12 +290,12 @@ inline uint32_t copyDir(string source, string destination, bool newer = false)
         string nextfile = string(fn->d_name);
         if (nextfile == "." || nextfile == "..")
             continue;
-        if (copyFile(source + "/" + nextfile, destination + "/" + nextfile, newer))
+        if (copyFile(source + "/" + nextfile, destination + "/" + nextfile, option))
             ++missing;
         else
             ++count;
     }
-
+    closedir(dir);
     return count | (missing << 16);
 }
 
