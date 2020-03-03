@@ -301,6 +301,7 @@ inline int listDir(std::list<string>* dirList, string dirName)
             ++count;
         }
     }
+    closedir(dir);
     return count;
 }
 
