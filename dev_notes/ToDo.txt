@@ -13,8 +13,6 @@ Revise GUI voice list related to voice editor.
 
 Complete effect change warning for dynfitter insert.
 
-Sort out bank properly.
-
 CLI sys/ins updates wrong.
 
 Some CLI addvoice kit mode controls don't update the GUI.

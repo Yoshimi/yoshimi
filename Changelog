@@ -1,5 +1,8 @@
 yoshimi 1.7.0 M
 
+2020-3-4 Will
+* Revised Solo switch selection for performance and clarity.
+
 2020-3-3 Will
 * Merged in various fixes from Iain.
 * BugFix: not closing directories after use :(

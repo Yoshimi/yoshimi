@@ -552,19 +552,42 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
 
 int SynthEngine::RunChannelSwitch(int value)
 {
+    enum {row = 1, column, loop, twoway};
     static unsigned int timer = 0;
-    if ((interchange.tick - timer) > 511) // approx 60mS
-        timer = interchange.tick;
-    else if (Runtime.channelSwitchType > 2)
-        return 0; // de-bounced
 
-    switch (Runtime.channelSwitchType)
+    int switchtype = Runtime.channelSwitchType;
+    if (switchtype >= loop)
     {
-        case 1: // single row
+        if (switchtype <= twoway)
+        {
+            if (value == 0)
+                return 0; // we ignore switch off for these
+    /*
+     * loop and twoway are increment counters
+     * we assume nobody can repeat a switch press within 60mS!
+     */
+            if ((interchange.tick - timer) > 511) // approx 60mS
+                timer = interchange.tick;
+            else
+                return 0; // de-bounced
+        }
+        if (value >= 64)
+            value = 1;
+        else if (switchtype == twoway)
+            value = -1;
+        else
+            value = 0;
+    }
+    else if (value == Runtime.channelSwitchValue)
+        return 0; // nothing changed
+
+    switch (switchtype)
+    {
+        case row:
             if (value >= NUM_MIDI_CHANNELS)
                 return 1; // out of range
             break;
-        case 2: // columns
+        case column:
         {
             if (value >= NUM_MIDI_PARTS)
                 return 1; // out of range
@@ -580,27 +603,20 @@ int SynthEngine::RunChannelSwitch(int value)
             return 0; // all OK
             break;
         }
-        case 3: // loop
-            if (value == 0)
-                return 0; // do nothing - it's a switch off
+        case loop:
             value = (Runtime.channelSwitchValue + 1) % NUM_MIDI_CHANNELS;
             break;
-        case 4: // twoway
-            if (value == 0)
-                return 0; // do nothing - it's a switch off
-            if (value >= 64)
-                value = (Runtime.channelSwitchValue + 1) % NUM_MIDI_CHANNELS;
-            else
-                value = (Runtime.channelSwitchValue + NUM_MIDI_CHANNELS - 1) % NUM_MIDI_CHANNELS;
-            // add in NUM_MIDI_CHANNELS so always positive
+        case twoway:
+            value = (Runtime.channelSwitchValue + NUM_MIDI_CHANNELS + value) % NUM_MIDI_CHANNELS;
+            // we add in NUM_MIDI_CHANNELS so it's always positive
             break;
         default:
             return 2; // unknown
     }
     // vvv column mode never gets here vvv
-    Runtime.channelSwitchValue = value;
     for (int ch = 0; ch < NUM_MIDI_CHANNELS; ++ch)
     {
+        Runtime.channelSwitchValue = value;
         bool isVector = Runtime.vectordata.Enabled[ch];
         if (ch != value)
         {
