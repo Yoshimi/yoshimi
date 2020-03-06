@@ -171,7 +171,7 @@ static std::string toplist [] = {
     "  Volume <n>",             "master volume",
     "  SHift <n>",              "master key shift semitones (0 no shift)",
     "  DEtune <n>",             "master fine detune",
-    "  SOlo [s] [n]",           "channel 'solo' switcher (Row, Column, Loop, Twoway, CC, {other} off)",
+    "  SOlo [s] [n]",           "channel 'solo' switcher (Row, Column, Loop, Twoway, Channel, CC, {other} off)",
     "      CC <n>",             "incoming 'solo' CC number (type must be set first)",
     "end"
 };

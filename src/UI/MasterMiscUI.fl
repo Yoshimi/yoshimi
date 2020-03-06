@@ -602,16 +602,18 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     partvolume->value(synth->part[setpart]->Pvolume);
     partpanning->value(synth->part[setpart]->Ppanning);
     int tmpch = synth->part[setpart]->Prcvchn;
+
     if (tmpch < NUM_MIDI_CHANNELS)
     {
         partrcv->value(tmpch);
-        if (synth->getRuntime().channelSwitchType & 5 && setpart < NUM_MIDI_CHANNELS)
+        if (setpart < NUM_MIDI_CHANNELS) // synth->getRuntime().channelSwitchType & 6 &&
             partrcv->textcolor(FL_BLUE);
         else
             partrcv->textcolor(FL_BLACK);
     }
     else
         partrcv->textcolor(FL_WHITE);
+
     partname->copy_label(synth->part[setpart]->Pname.c_str());
     int tmp = synth->part[setpart]->Paudiodest - 1;
     if (tmp < 0 or tmp > 3)

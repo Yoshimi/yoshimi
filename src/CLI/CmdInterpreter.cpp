@@ -5214,7 +5214,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
 
     if (input.matchnMove(2, "solo"))
     {
-        int value = 0; // disable
+        int value = MIDI::SoloType::Disabled;
 
         if (input.matchnMove(2, "cc"))
         {
@@ -5234,13 +5234,15 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
         }
 
         else if (input.matchnMove(1, "row"))
-            value = 1;
+            value = MIDI::SoloType::Row;
         else if (input.matchnMove(1, "column"))
-            value = 2;
+            value = MIDI::SoloType::Column;
         else if (input.matchnMove(1, "loop"))
-            value = 3;
+            value = MIDI::SoloType::Loop;
         else if (input.matchnMove(1, "twoway"))
-            value = 4;
+            value = MIDI::SoloType::TwoWay;
+        else if (input.matchnMove(1, "channel"))
+            value = MIDI::SoloType::Channel;
         return sendNormal( synth, 0, value, controlType, MAIN::control::soloType, TOPLEVEL::section::main);
     }
     if (input.matchnMove(2, "available")) // 16, 32, 64

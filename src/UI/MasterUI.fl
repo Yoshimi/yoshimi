@@ -1260,10 +1260,14 @@ Alan Calvert started the project}
         }
         MenuItem switchloop {
           label Loop
-          xywh {0 0 34 20} labelsize 12
+          xywh {40 40 34 20} labelsize 12
         }
         MenuItem switchtwoway {
           label TwoWay
+          xywh {40 40 34 20} labelsize 12
+        }
+        MenuItem switchchannel {
+          label Channel
           xywh {0 0 34 20} labelsize 12
         }
       }
@@ -1378,7 +1382,7 @@ Alan Calvert started the project}
                     int newch = partui->midich->value() - 1;
                     switch (synth->getRuntime().channelSwitchType)
                     {
-                        case 1: // row
+                        case MIDI::SoloType::Row:
                             if (npart < NUM_MIDI_CHANNELS)
                             {
                                 if (npart != value_int)
@@ -1388,15 +1392,15 @@ Alan Calvert started the project}
                             }
                             break;
 
-                        case 2: // column
+                        case MIDI::SoloType::Column:
                             if(value_int == npart)
                                 newch = (value_int & mask);
                             else if((value_int & mask) == (npart & mask))
                                 newch = (value_int & mask) + NUM_MIDI_CHANNELS;
                             break;
 
-                        case 3: // loop
-                        case 4: // twoway
+                        case MIDI::SoloType::Loop:
+                        case MIDI::SoloType::TwoWay:
                             if (npart < NUM_MIDI_CHANNELS)
                             {
                                 if (npart == synth->getRuntime().channelSwitchValue)
@@ -1405,6 +1409,15 @@ Alan Calvert started the project}
                                     newch = NUM_MIDI_CHANNELS;
                             }
                             break;
+
+                        case MIDI::SoloType::Channel:
+                            //int ch = value_int % NUM_MIDI_CHANNELS;
+                            if (newch == chan || newch == chan + NUM_MIDI_CHANNELS)
+                                newch = chan;
+                            else
+                                newch = newch + NUM_MIDI_CHANNELS;
+                            break;
+
                     }
                     partui->midich->value(newch + 1);
 
@@ -1590,7 +1603,6 @@ Alan Calvert started the project}
             else
                 mastermono->label("S");
             break;
-
 
         case MAIN::control::soloType:
             channelswitch->value(value_int);
@@ -1890,9 +1902,9 @@ Alan Calvert started the project}
         oldswitch = channelswitch->value(); // disables 'pending'
         CS_CC = synth->getRuntime().channelSwitchCC;
     }
-    if (synth->getRuntime().channelSwitchType > 0)
+    if (synth->getRuntime().channelSwitchType > MIDI::SoloType::Disabled)
     {
-        if (oldswitch == 0)
+        if (oldswitch == MIDI::SoloType::Disabled)
         {
             CSspinner->value(115);
             CSpend->show();

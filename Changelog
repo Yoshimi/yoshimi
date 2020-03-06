@@ -1,5 +1,9 @@
 yoshimi 1.7.0 M
 
+2020-3-6 Will
+* Patched in additional Solo type 'Channel' from Matthew.
+  Made a few minor corrections.
+
 2020-3-4 Will
 * Revised Solo switch selection for performance and clarity.
 

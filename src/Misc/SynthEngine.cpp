@@ -454,7 +454,7 @@ void SynthEngine::defaults(void)
     VUready = false;
     Runtime.currentPart = 0;
     Runtime.VUcount = 0;
-    Runtime.channelSwitchType = 0;
+    Runtime.channelSwitchType = MIDI::SoloType::Disabled;
     Runtime.channelSwitchCC = 128;
     Runtime.channelSwitchValue = 0;
     //CmdInterface.defaults(); // **** need to work out how to call this
@@ -550,15 +550,17 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
 }
 
 
-int SynthEngine::RunChannelSwitch(int value)
+int SynthEngine::RunChannelSwitch(unsigned char chan, int value)
 {
-    enum {row = 1, column, loop, twoway};
     static unsigned int timer = 0;
 
     int switchtype = Runtime.channelSwitchType;
-    if (switchtype >= loop)
+    if (switchtype > MIDI::SoloType::Channel)
+        return 2; // unknown
+
+    if (switchtype >= MIDI::SoloType::Loop)
     {
-        if (switchtype <= twoway)
+        if (switchtype != MIDI::SoloType::Channel)
         {
             if (value == 0)
                 return 0; // we ignore switch off for these
@@ -573,7 +575,7 @@ int SynthEngine::RunChannelSwitch(int value)
         }
         if (value >= 64)
             value = 1;
-        else if (switchtype == twoway)
+        else if (switchtype == MIDI::SoloType::TwoWay)
             value = -1;
         else
             value = 0;
@@ -583,11 +585,11 @@ int SynthEngine::RunChannelSwitch(int value)
 
     switch (switchtype)
     {
-        case row:
+        case MIDI::SoloType::Row:
             if (value >= NUM_MIDI_CHANNELS)
                 return 1; // out of range
             break;
-        case column:
+        case MIDI::SoloType::Column:
         {
             if (value >= NUM_MIDI_PARTS)
                 return 1; // out of range
@@ -603,17 +605,43 @@ int SynthEngine::RunChannelSwitch(int value)
             return 0; // all OK
             break;
         }
-        case loop:
+        case MIDI::SoloType::Loop:
             value = (Runtime.channelSwitchValue + 1) % NUM_MIDI_CHANNELS;
             break;
-        case twoway:
+
+        case MIDI::SoloType::TwoWay:
             value = (Runtime.channelSwitchValue + NUM_MIDI_CHANNELS + value) % NUM_MIDI_CHANNELS;
             // we add in NUM_MIDI_CHANNELS so it's always positive
             break;
-        default:
-            return 2; // unknown
+
+        case MIDI::SoloType::Channel:
+            // if the CC value is 64-127 Solo Parts on the Channel of the CC
+            if (value)
+            {
+                for (int p = 0; p < NUM_MIDI_PARTS; ++p)
+                {
+                    if (part[p]->Prcvchn == chan || part[p]->Prcvchn == (chan | NUM_MIDI_CHANNELS))
+                        part[p]->Prcvchn = chan;
+                    else
+                        part[p]->Prcvchn = part[p]->Prcvchn | NUM_MIDI_CHANNELS;
+                }
+            }
+            else // if the CC value is 0-63 un-Solo Parts on all Channels
+            {
+                for (int c = 0; c < NUM_MIDI_CHANNELS; ++c)
+                {
+                    for (int p = 0; p < NUM_MIDI_PARTS; ++p)
+                    {
+                        if (part[p]->Prcvchn == c || part[p]->Prcvchn == (c | NUM_MIDI_CHANNELS))
+                            part[p]->Prcvchn = c;
+                    }
+                }
+            }
+            Runtime.channelSwitchValue = value;
+            return 0; // all ok
+            break;
     }
-    // vvv column mode never gets here vvv
+    // vvv column and channel modes never get here vvv
     for (int ch = 0; ch < NUM_MIDI_CHANNELS; ++ch)
     {
         Runtime.channelSwitchValue = value;
@@ -653,7 +681,7 @@ void SynthEngine::SetController(unsigned char chan, int CCtype, short int par)
     }
     if (CCtype <= 119 && CCtype == Runtime.channelSwitchCC)
     {
-        RunChannelSwitch(par);
+        RunChannelSwitch(chan, par);
         return;
     }
     if (CCtype == MIDI::CC::allSoundOff)
@@ -3081,7 +3109,7 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
     Runtime.NumAvailableParts = xml->getpar("current_midi_parts", NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS, NUM_MIDI_PARTS);
     setPvolume(xml->getpar127("volume", Pvolume));
     setPkeyshift(xml->getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64));
-    Runtime.channelSwitchType = xml->getpar("channel_switch_type", Runtime.channelSwitchType, 0, 4);
+    Runtime.channelSwitchType = xml->getpar("channel_switch_type", Runtime.channelSwitchType, 0, 5);
     Runtime.channelSwitchCC = xml->getpar("channel_switch_CC", Runtime.channelSwitchCC, 0, 128);
     Runtime.channelSwitchValue = 0;
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
@@ -3272,7 +3300,7 @@ float SynthEngine::getLimits(CommandBlock *getData)
 
         case MAIN::control::soloType:
             def = 0; // Off
-            max = 4;
+            max = 5;
             break;
 
         case MAIN::control::soloCC:

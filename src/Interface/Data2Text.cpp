@@ -1041,20 +1041,23 @@ string DataText::resolveMain(CommandBlock *getData, bool addValue)
             {
                 switch (value_int)
                 {
-                    case 0:
+                    case MIDI::SoloType::Disabled:
                         contstr += "Off";
                         break;
-                    case 1:
+                    case MIDI::SoloType::Row:
                         contstr += "Row";
                         break;
-                    case 2:
+                    case MIDI::SoloType::Column:
                         contstr += "Column";
                         break;
-                    case 3:
+                    case MIDI::SoloType::Loop:
                         contstr += "Loop";
                         break;
-                    case 4:
+                    case MIDI::SoloType::TwoWay:
                         contstr += "Twoway";
+                        break;
+                    case MIDI::SoloType::Channel:
+                        contstr += "Channel";
                         break;
                 }
             }

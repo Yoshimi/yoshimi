@@ -2791,23 +2791,46 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
 
         case MAIN::control::soloType: // solo mode
-            if (write && value_int <= 4)
+            if (write && value_int <= MIDI::SoloType::Channel)
             {
                 synth->getRuntime().channelSwitchType = value_int;
                 synth->getRuntime().channelSwitchCC = 128;
                 synth->getRuntime().channelSwitchValue = 0;
-                if ((value_int & 5) == 0)
+                switch (value_int)
                 {
-                    for (int i = 0; i < NUM_MIDI_PARTS; ++i)
-                        synth->part[i]->Prcvchn = (i & 15);
-                }
-                else
-                {
-                    for (int i = 1; i < NUM_MIDI_CHANNELS; ++i)
-                    {
-                        synth->part[i]->Prcvchn = 16;
-                    }
-                    synth->part[0]->Prcvchn = 0;
+                    case MIDI::SoloType::Disabled: // disabled
+                        break;
+
+                    case MIDI::SoloType::Row: // row
+                        for (int i = 1; i < NUM_MIDI_CHANNELS; ++i)
+                        {
+                            synth->part[i]->Prcvchn = NUM_MIDI_CHANNELS;
+                        }
+                        synth->part[0]->Prcvchn = 0;
+                        break;
+
+                    case MIDI::SoloType::Column: // column
+                        for (int i = 0; i < NUM_MIDI_PARTS; ++i)
+                            synth->part[i]->Prcvchn = (i & (NUM_MIDI_CHANNELS - 1));
+                        break;
+
+                    case MIDI::SoloType::Loop: // loop
+                    case MIDI::SoloType::TwoWay: // twoway
+                        for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
+                                synth->part[i]->Prcvchn = NUM_MIDI_CHANNELS;
+                        synth->part[0]->Prcvchn = 0;
+                        break;
+
+                    case MIDI::SoloType::Channel: // channel
+                        for (int c = 0; c < NUM_MIDI_CHANNELS; ++c)
+                        {
+                            for (int p = 0; p < NUM_MIDI_PARTS; ++p)
+                            {
+                                if (synth->part[p]->Prcvchn == c || synth->part[p]->Prcvchn == (c | NUM_MIDI_CHANNELS))
+                                    synth->part[p]->Prcvchn = c;
+                            }
+                        }
+                        break;
                 }
             }
             else

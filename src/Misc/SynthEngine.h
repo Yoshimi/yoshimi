@@ -119,7 +119,7 @@ class SynthEngine
 
         void NoteOn(unsigned char chan, unsigned char note, unsigned char velocity);
         void NoteOff(unsigned char chan, unsigned char note);
-        int RunChannelSwitch(int value);
+        int RunChannelSwitch(unsigned char chan, int value);
         void SetController(unsigned char chan, int CCtype, short int par);
         void SetZynControls(bool in_place);
         int setRootBank(int root, int bank, bool notinplace = true);

@@ -462,6 +462,15 @@ namespace MIDI // usage MIDI::control::noteOn
         identNRPN = 0x8000,
         null
     };
+
+    enum SoloType : unsigned char {
+        Disabled = 0,
+        Row,
+        Column,
+        Loop,
+        TwoWay,
+        Channel
+    };
 }
 
 namespace SCALES // usage SCALES::control::refFrequency
