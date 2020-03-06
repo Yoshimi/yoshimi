@@ -16,6 +16,10 @@ Loop mode is a variation of this, and if set then sending any value except zero 
 
 Two Way is similar to Loop, except if it sees a value between 1 and 63 it decrements the active part, looping round to number 16.
 
+Channel allows the user to Solo all parts set to a given channel. When activated only parts assigned to the desired channel will sound. Parts assigned to other channels will go silent. The channel of the incoming MIDI CC event determines the desired channel and the value determines On or Off. Such that a CC of 115 (default) with value greater than 63 on channel 1 will Solo all parts assigned to channel 1. A subsequent CC of 115 with value greater than 63 on channel 2 will switch the Solo to all parts on channel 2, and silence the parts on channel 1 in the process.
+
+Note that a CC of 115 with value 0 on ANY channel will deactivate the Solo on ALL channels. This allows for assigning an arbitrary number of parts to any channel and works with all 16 channels and all parts. This option is best used with a MIDI controller in OMNI mode that supports Latch mode CC buttons or footswitch and is suitable for both automation and live performance.
+
 
 For running Solo in Column mode you need to have 32 or (preferably) 64 parts set, like this you can have up to 4 parts switched per channel - independently of any other channel. However, this works more like vector control in that you have to switch in steps of 16. For example, to control the channel 4 column you would send 4, 20, 36, 52 to select the wanted part. This is more appropriate for post recording MIDI automation.
 

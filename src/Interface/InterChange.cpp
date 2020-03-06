@@ -2,7 +2,7 @@
     InterChange.cpp - General communications
 
     Copyright 2016-2019, Will Godfrey & others
-    Copyright 2020 Kristian Amlie, Will Godfrey
+    Copyright 2020 Kristian Amlie, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -2790,7 +2790,7 @@ void InterChange::commandMain(CommandBlock *getData)
                 value = synth->masterMono;
             break;
 
-        case MAIN::control::soloType: // solo mode
+        case MAIN::control::soloType:
             if (write && value_int <= MIDI::SoloType::Channel)
             {
                 synth->getRuntime().channelSwitchType = value_int;
@@ -2798,10 +2798,10 @@ void InterChange::commandMain(CommandBlock *getData)
                 synth->getRuntime().channelSwitchValue = 0;
                 switch (value_int)
                 {
-                    case MIDI::SoloType::Disabled: // disabled
+                    case MIDI::SoloType::Disabled:
                         break;
 
-                    case MIDI::SoloType::Row: // row
+                    case MIDI::SoloType::Row:
                         for (int i = 1; i < NUM_MIDI_CHANNELS; ++i)
                         {
                             synth->part[i]->Prcvchn = NUM_MIDI_CHANNELS;
@@ -2809,26 +2809,23 @@ void InterChange::commandMain(CommandBlock *getData)
                         synth->part[0]->Prcvchn = 0;
                         break;
 
-                    case MIDI::SoloType::Column: // column
+                    case MIDI::SoloType::Column:
                         for (int i = 0; i < NUM_MIDI_PARTS; ++i)
                             synth->part[i]->Prcvchn = (i & (NUM_MIDI_CHANNELS - 1));
                         break;
 
-                    case MIDI::SoloType::Loop: // loop
-                    case MIDI::SoloType::TwoWay: // twoway
+                    case MIDI::SoloType::Loop:
+                    case MIDI::SoloType::TwoWay:
                         for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
-                                synth->part[i]->Prcvchn = NUM_MIDI_CHANNELS;
+                            synth->part[i]->Prcvchn = NUM_MIDI_CHANNELS;
                         synth->part[0]->Prcvchn = 0;
                         break;
 
-                    case MIDI::SoloType::Channel: // channel
-                        for (int c = 0; c < NUM_MIDI_CHANNELS; ++c)
+                    case MIDI::SoloType::Channel:
+                        for (int p = 0; p < NUM_MIDI_PARTS; ++p)
                         {
-                            for (int p = 0; p < NUM_MIDI_PARTS; ++p)
-                            {
-                                if (synth->part[p]->Prcvchn == c || synth->part[p]->Prcvchn == (c | NUM_MIDI_CHANNELS))
-                                    synth->part[p]->Prcvchn = c;
-                            }
+                            if (synth->part[p]->Prcvchn >= NUM_MIDI_CHANNELS)
+                                synth->part[p]->Prcvchn = p &(NUM_MIDI_CHANNELS - 1);
                         }
                         break;
                 }

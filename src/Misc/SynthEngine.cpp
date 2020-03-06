@@ -580,7 +580,7 @@ int SynthEngine::RunChannelSwitch(unsigned char chan, int value)
         else
             value = 0;
     }
-    else if (value == Runtime.channelSwitchValue)
+    if ((switchtype <= MIDI::SoloType::Column || switchtype == MIDI::SoloType::Channel) && value == Runtime.channelSwitchValue)
         return 0; // nothing changed
 
     switch (switchtype)
@@ -620,21 +620,18 @@ int SynthEngine::RunChannelSwitch(unsigned char chan, int value)
             {
                 for (int p = 0; p < NUM_MIDI_PARTS; ++p)
                 {
-                    if (part[p]->Prcvchn == chan || part[p]->Prcvchn == (chan | NUM_MIDI_CHANNELS))
-                        part[p]->Prcvchn = chan;
+                    if ((part[p]->Prcvchn & (NUM_MIDI_CHANNELS - 1)) == chan)
+                        part[p]->Prcvchn &= (NUM_MIDI_CHANNELS - 1);
                     else
                         part[p]->Prcvchn = part[p]->Prcvchn | NUM_MIDI_CHANNELS;
                 }
             }
             else // if the CC value is 0-63 un-Solo Parts on all Channels
             {
-                for (int c = 0; c < NUM_MIDI_CHANNELS; ++c)
+                for (int p = 0; p < NUM_MIDI_PARTS; ++p)
                 {
-                    for (int p = 0; p < NUM_MIDI_PARTS; ++p)
-                    {
-                        if (part[p]->Prcvchn == c || part[p]->Prcvchn == (c | NUM_MIDI_CHANNELS))
-                            part[p]->Prcvchn = c;
-                    }
+                    if (part[p]->Prcvchn >= NUM_MIDI_CHANNELS)
+                        part[p]->Prcvchn &= (NUM_MIDI_CHANNELS - 1);
                 }
             }
             Runtime.channelSwitchValue = value;
