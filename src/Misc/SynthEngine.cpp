@@ -671,6 +671,12 @@ int SynthEngine::RunChannelSwitch(unsigned char chan, int value)
 // Controllers
 void SynthEngine::SetController(unsigned char chan, int CCtype, short int par)
 {
+    if (CCtype == MIDI::keyPressure)
+    {
+        // This is a reporting placeholder for poly aftertouch
+        std::cout << "Poly chan " << int(chan + 1) << "  note " << int(par & 0xff) << "  pres " << int(par >> 8) << std::endl;
+        return;
+    }
     if (CCtype == Runtime.midi_bank_C)
     {
         //shouldn't get here. Banks are set directly

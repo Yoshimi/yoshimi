@@ -1,5 +1,9 @@
 yoshimi 1.7.0 M
 
+2020-3-7 Will
+* Installed full placeholder for key pressure detection.
+* Provided emulator for key pressure in MusicIO.cpp.
+
 2020-3-6 Will
 * Patched in additional Solo type 'Channel' from Matthew.
   Made a few minor corrections.

@@ -58,15 +58,8 @@ void MidiDecode::midiProcess(unsigned char par0, unsigned char par1, unsigned ch
     switch (ev)
     {
         case 0xA0: // key aftertouch
-            ctrltype = MIDI::CC::channelPressure;
-            /*
-             * temporarily pretend it's a channel aftertouch
-             * need to work out how to use key numbers (par1)
-             * for actual key pressure sensing.
-             *
-             * ctrltype = MIDI::CC::keyPressure;
-             */
-            par = par2;
+            ctrltype = MIDI::CC::keyPressure;
+            par = par1 | (par2<< 8);
             setMidiController(channel, ctrltype, par, in_place);
             break;
 
@@ -203,9 +196,8 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
         sendMidiCC(inSync, ch, ctrl, param);
         return;
     }
-
     // do what's left!
-    if (ctrl < 0x80) // don't want to pick up strays
+    if (ctrl < 0x80 || ctrl == MIDI::CC::keyPressure) // don't want to pick up strays
         sendMidiCC(inSync, ch, ctrl, param);
 }
 

@@ -19,6 +19,8 @@
 
 */
 
+// uncomment the following line to emulate poly aftertouch
+//#define POLY_EMULATE ON
 
 #include "Misc/Config.h"
 #include "Misc/SynthEngine.h"
@@ -65,13 +67,36 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
     bool inSync = LV2_engine || (synth->getRuntime().audioEngine == jack_audio && synth->getRuntime().midiEngine == jack_midi);
 
     CommandBlock putData;
+
+    unsigned int event = par0 & 0xf0;
+    unsigned char channel = par0 & 0xf;
+
+
+#ifdef POLY_EMULATE
+    /*
+     * To get the impression of note aftertouch you need two keyboards
+     * one set to CH1 the other to CH2. Press a key on the CH1 keyboard, then press the *same* key number on the CH2 keyboard.
+     * The second keyboard's note on velocity becomes the aftertouch
+     * for that note. Repeat the CH2 press for different amounts.
+     */
+    if (channel == 1) // user channel 2
+    {
+        if (event == 0x90) // note on
+        {
+            par0 = 0xa0; // change to chanel 1 poly aftertouch
+            synth->mididecode.midiProcess(par0, par1, par2, in_place, inSync);
+
+        }
+        return;
+    }
+#endif
+
 /*
  * This below is a much simpler (faster) way
  * to do note-on and note-off
  * Tested on ALSA JACK and LV2 all combinations!
  */
-    unsigned int event = par0 & 0xf0;
-    unsigned char channel = par0 & 0xf;
+
     if (event == 0x80 || event == 0x90)
     {
         if (par2 < 1) // zero volume note on.
