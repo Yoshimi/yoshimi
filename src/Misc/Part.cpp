@@ -249,6 +249,19 @@ Part::~Part()
         delete ctl;
 }
 
+void Part::setPolyAT(int note, int type, int value)
+{
+    if (note < Pminkey || note > Pmaxkey)
+        return;
+    for (int i = 0; i < POLIPHONY; ++i)
+    {
+        if (partnote[i].status != KEY_OFF && partnote[i].note == note)
+        {
+            partnote[i].polyATtype = type;
+            partnote[i].polyATvalue = value;
+        }
+    }
+}
 
 // Note On Messages
 void Part::NoteOn(int note, int velocity, bool renote)
@@ -355,6 +368,8 @@ void Part::NoteOn(int note, int velocity, bool renote)
         // start the note
         partnote[pos].status = KEY_PLAYING;
         partnote[pos].note = note;
+        partnote[pos].polyATtype = 0;
+        partnote[pos].polyATvalue = 0;
         if (legatomodevalid)
         {
             partnote[posb].status = KEY_PLAYING;
@@ -977,10 +992,20 @@ void Part::ComputePartSmps(void)
 
     for (k = 0; k < POLIPHONY; ++k)
     {
+        int oldCutoff;
         if (partnote[k].status == KEY_OFF)
             continue;
         noteplay = 0;
         partnote[k].time++;
+        int polyATtype = partnote[k].polyATtype;
+        int polyATvalue = partnote[k].polyATvalue;
+        if (polyATtype == 1) // filter cutoff
+        {
+            oldCutoff = ctl->filtercutoff.data;
+            float adjust = oldCutoff / 127.0f;
+            ctl->setfiltercutoff(oldCutoff + polyATvalue * adjust);
+        }
+
         // get the sampledata of the note and kill it if it's finished
         for (int item = 0; item < partnote[k].itemsplaying; ++item)
         {
@@ -1049,6 +1074,8 @@ void Part::ComputePartSmps(void)
         // Kill note if there is no synth on that note
         if (noteplay == 0)
             KillNotePos(k);
+        if (polyATtype == 1)
+            ctl->setfiltercutoff(oldCutoff);
     }
 
     // Apply part's effects and mix them

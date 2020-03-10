@@ -673,8 +673,13 @@ void SynthEngine::SetController(unsigned char chan, int CCtype, short int par)
 {
     if (CCtype == MIDI::keyPressure)
     {
-        // This is a reporting placeholder for poly aftertouch
-        std::cout << "Poly chan " << int(chan + 1) << "  note " << int(par & 0xff) << "  pres " << int(par >> 8) << std::endl;
+        int note = par & 0xff;
+        int value = par >> 8;
+        int type = 1;
+        if (value == 0)
+            type = 0;
+        std::cout << "Poly chan " << chan + 1 << "  note " << note << "  pres " << value << std::endl;
+        part[chan]->setPolyAT(note, type, value);
         return;
     }
     if (CCtype == Runtime.midi_bank_C)

@@ -81,8 +81,10 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
      */
     if (channel == 1) // user channel 2
     {
-        if (event == 0x90) // note on
+        if (event == 0x90 || event == 0x80) // note on/off
         {
+            if (event == 0x80)
+                par2 = 0;
             par0 = 0xa0; // change to chanel 1 poly aftertouch
             synth->mididecode.midiProcess(par0, par1, par2, in_place, inSync);
 

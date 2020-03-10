@@ -60,6 +60,7 @@ class Part
         void cleanup(void);
 
         // Midi commands implemented
+        void setPolyAT(int note, int type, int value);
         void NoteOn(int note, int velocity, bool renote = false);
         void NoteOff(int note);
         void AllNotesOff(void) { killallnotes = true; }; // panic, prepare all notes to be turned off
@@ -171,6 +172,8 @@ class Part
             NoteStatus status;
             int note;          // if there is no note playing, "note" = -1
             int itemsplaying;
+            int polyATtype;
+            int polyATvalue;
             struct Kititem {
                 ADnote *adnote;
                 SUBnote *subnote;
