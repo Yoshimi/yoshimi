@@ -1,5 +1,10 @@
 yoshimi 1.7.0 M
 
+2020-3/10 Will
+* Merged in first trial of PolyAT.
+  Currently fixed as filter cutoff.
+* Corrected Mixer channel colours for Solo.
+
 2020-3-7 Will
 * Installed full placeholder for key pressure detection.
 * Provided emulator for key pressure in MusicIO.cpp.
