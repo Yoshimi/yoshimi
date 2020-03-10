@@ -368,7 +368,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
         // start the note
         partnote[pos].status = KEY_PLAYING;
         partnote[pos].note = note;
-        partnote[pos].polyATtype = 0;
+        partnote[pos].polyATtype = PART::polyATtype::off;
         partnote[pos].polyATvalue = 0;
         if (legatomodevalid)
         {
@@ -999,11 +999,27 @@ void Part::ComputePartSmps(void)
         partnote[k].time++;
         int polyATtype = partnote[k].polyATtype;
         int polyATvalue = partnote[k].polyATvalue;
-        if (polyATtype == 1) // filter cutoff
+        switch (polyATtype)
         {
-            oldCutoff = ctl->filtercutoff.data;
-            float adjust = oldCutoff / 127.0f;
-            ctl->setfiltercutoff(oldCutoff + polyATvalue * adjust);
+            case PART::polyATtype::filterCutoffUp:
+            {
+                oldCutoff = ctl->filtercutoff.data;
+                float adjust = oldCutoff / 127.0f;
+                ctl->setfiltercutoff(oldCutoff + (polyATvalue * adjust));
+                break;
+            }
+
+            case PART::polyATtype::filterCutoffDown:
+            {
+                oldCutoff = ctl->filtercutoff.data;
+                float adjust = oldCutoff / 127.0f;
+                ctl->setfiltercutoff(oldCutoff - (polyATvalue * adjust));
+                break;
+            }
+
+            case PART::polyATtype::off:
+            default:
+                ; // do nothing
         }
 
         // get the sampledata of the note and kill it if it's finished
@@ -1074,8 +1090,19 @@ void Part::ComputePartSmps(void)
         // Kill note if there is no synth on that note
         if (noteplay == 0)
             KillNotePos(k);
-        if (polyATtype == 1)
-            ctl->setfiltercutoff(oldCutoff);
+
+        switch (polyATtype)
+        {
+            case PART::polyATtype::filterCutoffUp:
+                ctl->setfiltercutoff(oldCutoff);
+                break;
+            case PART::polyATtype::filterCutoffDown:
+                ctl->setfiltercutoff(oldCutoff);
+                break;
+            case PART::polyATtype::off:
+            default:
+                ; // do nothing
+        }
     }
 
     // Apply part's effects and mix them

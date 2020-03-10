@@ -4,6 +4,8 @@ yoshimi 1.7.0 M
 * Merged in first trial of PolyAT.
   Currently fixed as filter cutoff.
 * Corrected Mixer channel colours for Solo.
+* PolyAT can do lowering as well as raising filter cutoff.
+* Defined some PolyAT types in globals.h
 
 2020-3-7 Will
 * Installed full placeholder for key pressure detection.

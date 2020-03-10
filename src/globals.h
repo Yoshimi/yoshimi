@@ -629,6 +629,15 @@ namespace PART // usage PART::control::volume
         CrossFade
     };
 
+    enum polyATtype : int {
+        off = 0,
+        filterCutoffUp,
+        filterCutoffDown,
+        gain,
+        pitchbendUp,
+        pitchbendDown
+    };
+
     enum engine : unsigned char {
         addSynth = 0,
         subSynth,
