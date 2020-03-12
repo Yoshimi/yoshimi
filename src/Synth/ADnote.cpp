@@ -67,7 +67,6 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
     paramsUpdate(adpars),
     synth(_synth)
 {
-    Legato.silent = besilent;
     construct();
 }
 
@@ -90,8 +89,296 @@ ADnote::ADnote(ADnote *orig, float freq_, int subVoiceNumber_, float *parentFMmo
     paramsUpdate(adpars),
     synth(orig->synth)
 {
-    Legato.silent = orig->Legato.silent;
     construct();
+}
+
+// Copy constructor, currently only exists for legato
+ADnote::ADnote(const ADnote &orig, ADnote *parent, float *parentFMmod_) :
+    // Is ready used for synchronization? Everything that can
+    // currently access it runs on the same thread, and it needs to be
+    // accessed atomically if this is the case. It only gets set in
+    // one place: at the end of construct()
+    ready(orig.ready),
+    adpars(orig.adpars), // Probably okay for legato?
+    stereo(orig.stereo),
+    midinote(orig.midinote),
+    velocity(orig.velocity),
+    basefreq(orig.basefreq),
+    NoteEnabled(orig.NoteEnabled),
+    ctl(orig.ctl),
+    NoteGlobalPar(orig.NoteGlobalPar),
+    time(orig.time), // This is incremented, but never actually used for some reason
+    paramRNG(orig.paramRNG),
+    paramSeed(orig.paramSeed),
+    detuneFromParent(orig.detuneFromParent),
+    unisonDetuneFactorFromParent(orig.unisonDetuneFactorFromParent),
+    forFM(orig.forFM),
+    max_unison(orig.max_unison),
+    globaloldamplitude(orig.globaloldamplitude),
+    globalnewamplitude(orig.globalnewamplitude),
+    portamento(orig.portamento),
+    bandwidthDetuneMultiplier(orig.bandwidthDetuneMultiplier),
+    legatoFade(0.0f), // Silent by default
+    legatoFadeStep(0.0f), // Legato disabled
+    pangainL(orig.pangainL),
+    pangainR(orig.pangainR),
+    subVoiceNumber(orig.subVoiceNumber),
+    origVoice(parent),
+    parentFMmod(parentFMmod_),
+    paramsUpdate(adpars),
+    synth(orig.synth)
+{
+    auto &oldgpar = orig.NoteGlobalPar;
+    NoteGlobalPar.FreqEnvelope = new Envelope(*oldgpar.FreqEnvelope);
+    NoteGlobalPar.FreqLfo = new LFO(*oldgpar.FreqLfo);
+    NoteGlobalPar.AmpEnvelope = new Envelope(*oldgpar.AmpEnvelope);
+    NoteGlobalPar.AmpLfo = new LFO(*oldgpar.AmpLfo);
+    NoteGlobalPar.FilterEnvelope = new Envelope(*oldgpar.FilterEnvelope);
+    NoteGlobalPar.FilterLfo = new LFO(*oldgpar.FilterLfo);
+
+    NoteGlobalPar.GlobalFilterL = new Filter(*oldgpar.GlobalFilterL);
+    if (stereo)
+        NoteGlobalPar.GlobalFilterR = new Filter(*oldgpar.GlobalFilterR);
+
+    // These are all arrays, so sizeof is correct
+    memcpy(pinking, orig.pinking, sizeof(pinking));
+    memcpy(unison_size, orig.unison_size, sizeof(unison_size));
+    memcpy(unison_stereo_spread, orig.unison_stereo_spread,
+        sizeof(unison_stereo_spread));
+    memcpy(freqbasedmod, orig.freqbasedmod, sizeof(freqbasedmod));
+    memcpy(firsttick, orig.firsttick, sizeof(firsttick));
+
+    tmpwave_unison = new float*[max_unison];
+    tmpmod_unison = new float*[max_unison];
+
+    for (int i = 0; i < max_unison; ++i)
+    {
+        tmpwave_unison[i] = (float*)fftwf_malloc(synth->bufferbytes);
+        tmpmod_unison[i] = (float*)fftwf_malloc(synth->bufferbytes);
+    }
+
+    if (parent != NULL && parent->origVoice != NULL)
+        origVoice = parent->origVoice;
+
+    for (int i = 0; i < NUM_VOICES; ++i)
+    {
+        auto &oldvpar = orig.NoteVoicePar[i];
+        auto &vpar = NoteVoicePar[i];
+
+        vpar.OscilSmp = NULL;
+        vpar.FMSmp = NULL;
+        vpar.VoiceOut = NULL;
+        vpar.FMEnabled = oldvpar.FMEnabled;
+
+        // The above vars are checked in killNote() even when the voice is
+        // disabled, so short-circuit only after they are set
+        vpar.Enabled = oldvpar.Enabled;
+        if (!vpar.Enabled)
+            continue;
+
+        // First, copy over everything that isn't behind a pointer
+        vpar.Voice = oldvpar.Voice;
+        vpar.noisetype = oldvpar.noisetype;
+        vpar.filterbypass = oldvpar.filterbypass;
+        vpar.DelayTicks = oldvpar.DelayTicks;
+        vpar.phase_offset = oldvpar.phase_offset;
+
+        vpar.fixedfreq = oldvpar.fixedfreq;
+        vpar.fixedfreqET = oldvpar.fixedfreqET;
+
+        vpar.Detune = oldvpar.Detune;
+        vpar.FineDetune = oldvpar.FineDetune;
+        vpar.BendAdjust = oldvpar.BendAdjust;
+        vpar.OffsetHz = oldvpar.OffsetHz;
+
+        vpar.Volume = oldvpar.Volume;
+        vpar.Panning = oldvpar.Panning;
+        vpar.randpanL = oldvpar.randpanL;
+        vpar.randpanR = oldvpar.randpanR;
+
+        vpar.Punch = oldvpar.Punch;
+
+        vpar.FilterCenterPitch = oldvpar.FilterCenterPitch;
+        vpar.FilterFreqTracking = oldvpar.FilterFreqTracking;
+        vpar.FMFreqFixed = oldvpar.FMFreqFixed;
+        vpar.FMVoice = oldvpar.FMVoice;
+        vpar.FMphase_offset = oldvpar.FMphase_offset;
+        vpar.FMVolume = oldvpar.FMVolume;
+        vpar.FMDetuneFromBaseOsc = oldvpar.FMDetuneFromBaseOsc;
+        vpar.FMDetune = oldvpar.FMDetune;
+
+        // Now handle allocations
+        if (subVoiceNumber == -1)
+        {
+            size_t size = synth->oscilsize + OSCIL_SMP_EXTRA_SAMPLES;
+
+            if (oldvpar.OscilSmp != NULL)
+            {
+                vpar.OscilSmp = new float[size];
+                memcpy(vpar.OscilSmp, oldvpar.OscilSmp, size * sizeof(float));
+            }
+
+            if (oldvpar.FMSmp != NULL)
+            {
+                vpar.FMSmp = (float*)fftwf_malloc(size * sizeof(float));
+                memcpy(vpar.FMSmp, oldvpar.FMSmp, size * sizeof(float));
+            }
+        } else {
+            vpar.OscilSmp = origVoice->NoteVoicePar[i].OscilSmp;
+        }
+
+        vpar.FreqEnvelope = oldvpar.FreqEnvelope != NULL ?
+            new Envelope(*oldvpar.FreqEnvelope) :
+            NULL;
+        vpar.FreqLfo = oldvpar.FreqLfo != NULL ?
+            new LFO(*oldvpar.FreqLfo) :
+            NULL;
+
+        vpar.AmpEnvelope = oldvpar.AmpEnvelope != NULL ?
+            new Envelope(*oldvpar.AmpEnvelope) :
+            NULL;
+        vpar.AmpLfo = oldvpar.AmpLfo != NULL ?
+            new LFO(*oldvpar.AmpLfo) :
+            NULL;
+
+        if (adpars->VoicePar[i].PFilterEnabled)
+        {
+            vpar.VoiceFilterL = new Filter(*oldvpar.VoiceFilterL);
+            vpar.VoiceFilterR = new Filter(*oldvpar.VoiceFilterR);
+        }
+        else
+        {
+            vpar.VoiceFilterL = NULL;
+            vpar.VoiceFilterR = NULL;
+        }
+
+        vpar.FilterEnvelope = oldvpar.FilterEnvelope != NULL ?
+            new Envelope(*oldvpar.FilterEnvelope) :
+            NULL;
+        vpar.FilterLfo = oldvpar.FilterLfo != NULL ?
+            new LFO(*oldvpar.FilterLfo) :
+            NULL;
+
+        vpar.FMFreqEnvelope = oldvpar.FMFreqEnvelope != NULL ?
+            new Envelope(*oldvpar.FMFreqEnvelope) :
+            NULL;
+        vpar.FMAmpEnvelope = oldvpar.FMAmpEnvelope != NULL ?
+            new Envelope(*oldvpar.FMAmpEnvelope) :
+            NULL;
+
+        if (oldvpar.VoiceOut != NULL) {
+            vpar.VoiceOut = (float*)fftwf_malloc(synth->bufferbytes);
+            // Not sure the memcpy is necessary
+            memcpy(vpar.VoiceOut, oldvpar.VoiceOut, synth->bufferbytes);
+        }
+        // NoteVoicePar done
+
+        int unison = adpars->VoicePar[i].Unison_size;
+
+        oscfreqhi[i] = new int[unison];
+        memcpy(oscfreqhi[i], orig.oscfreqhi[i], unison * sizeof(int));
+
+        oscfreqlo[i] = new float[unison];
+        memcpy(oscfreqlo[i], orig.oscfreqlo[i], unison * sizeof(float));
+
+        oscfreqhiFM[i] = new unsigned int[unison];
+        memcpy(oscfreqhiFM[i], orig.oscfreqhiFM[i], unison * sizeof(unsigned int));
+
+        oscfreqloFM[i] = new float[unison];
+        memcpy(oscfreqloFM[i], orig.oscfreqloFM[i], unison * sizeof(float));
+
+        oscposhi[i] = new int[unison];
+        memcpy(oscposhi[i], orig.oscposhi[i], unison * sizeof(int));
+
+        oscposlo[i] = new float[unison];
+        memcpy(oscposlo[i], orig.oscposlo[i], unison * sizeof(float));
+
+        oscposhiFM[i] = new unsigned int[unison];
+        memcpy(oscposhiFM[i], orig.oscposhiFM[i], unison * sizeof(unsigned int));
+
+        oscposloFM[i] = new float[unison];
+        memcpy(oscposloFM[i], orig.oscposloFM[i], unison * sizeof(float));
+
+
+        unison_base_freq_rap[i] = new float[unison];
+        memcpy(unison_base_freq_rap[i], orig.unison_base_freq_rap[i],
+            unison * sizeof(float));
+
+        unison_freq_rap[i] = new float[unison];
+        memcpy(unison_freq_rap[i], orig.unison_freq_rap[i],
+            unison * sizeof(float));
+
+        unison_invert_phase[i] = new bool[unison];
+        memcpy(unison_invert_phase[i], orig.unison_invert_phase[i],
+            unison * sizeof(bool));
+
+        unison_vibratto[i].amplitude = orig.unison_vibratto[i].amplitude;
+
+        unison_vibratto[i].step = new float[unison];
+        memcpy(unison_vibratto[i].step,
+            orig.unison_vibratto[i].step, unison * sizeof(float));
+
+        unison_vibratto[i].position = new float[unison];
+        memcpy(unison_vibratto[i].position,
+            orig.unison_vibratto[i].position, unison * sizeof(float));
+
+
+        FMoldsmp[i] = new float[unison];
+        memcpy(FMoldsmp[i], orig.unison_vibratto[i].position,
+            unison * sizeof(float));
+
+        if (parentFMmod != NULL)
+        {
+            if (NoteVoicePar[i].FMEnabled == FREQ_MOD)
+            {
+                FMFMoldsmpModded[i] = new float[unison];
+                memcpy(FMFMoldsmpModded[i], orig.FMFMoldsmpModded[i],
+                    unison * sizeof(float));
+
+                FMFMoldsmpOrig[i] = new float[unison];
+                memcpy(FMFMoldsmpOrig[i], orig.FMFMoldsmpOrig[i],
+                    unison * sizeof(float));
+            }
+
+            if (forFM)
+            {
+                oscFMoldsmpModded[i] = new float[unison];
+                memcpy(oscFMoldsmpModded[i], orig.oscFMoldsmpModded[i],
+                    unison * sizeof(float));
+
+                oscFMoldsmpOrig[i] = new float[unison];
+                memcpy(oscFMoldsmpOrig[i], orig.oscFMoldsmpOrig[i],
+                    unison * sizeof(float));
+            }
+        }
+
+        oldamplitude[i] = orig.oldamplitude[i];
+        newamplitude[i] = orig.newamplitude[i];
+        FMoldamplitude[i] = orig.FMoldamplitude[i];
+        FMnewamplitude[i] = orig.FMnewamplitude[i];
+
+        if (orig.subVoice[i] != NULL)
+        {
+            subVoice[i] = new ADnote*[orig.unison_size[i]];
+            for (int k = 0; k < orig.unison_size[i]; ++k)
+            {
+                subVoice[i][k] = new ADnote(*orig.subVoice[i][k], this, freqbasedmod[i] ? tmpmod_unison[k] : parentFMmod);
+            }
+        }
+        else
+            subVoice[i] = NULL;
+
+        if (orig.subFMVoice[i] != NULL)
+        {
+            subFMVoice[i] = new ADnote*[orig.unison_size[i]];
+            for (int k = 0; k < orig.unison_size[i]; ++k)
+            {
+                subFMVoice[i][k] = new ADnote(*orig.subVoice[i][k], this, parentFMmod);
+            }
+        }
+        else
+            subFMVoice[i] = NULL;
+    }
 }
 
 void ADnote::construct()
@@ -100,16 +387,8 @@ void ADnote::construct()
         velocity = 1.0f;
 
     // Initialise some legato-specific vars
-    Legato.msg = LM_Norm;
-    Legato.fade.length = int(synth->samplerate_f * 0.005f); // 0.005 seems ok.
-    if (Legato.fade.length < 1)  // (if something's fishy)
-        Legato.fade.length = 1;
-    Legato.fade.step = (1.0f / Legato.fade.length);
-    Legato.decounter = -10;
-    Legato.param.freq = basefreq;
-    Legato.param.vel = velocity;
-    Legato.param.portamento = portamento;
-    Legato.param.midinote = midinote;
+    legatoFade = 1.0f; // Full volume
+    legatoFadeStep = 0.0f; // Legato disabled
 
     paramSeed = synth->randomINT();
 
@@ -405,166 +684,140 @@ void ADnote::initSubVoices(void)
     }
 }
 
-
-// ADlegatonote: This function is (mostly) a copy of ADnote(...) and
-// initParameters() stuck together with some lines removed so that it
-// only alter the already playing note (to perform legato). It is
-// possible I left stuff that is not required for this.
-void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
-                          int midinote_, bool externcall)
+void ADnote::legatoFadeIn(float freq_, float velocity_, int portamento_, int midinote_)
 {
     basefreq = freq_;
     velocity = velocity_;
     if (velocity > 1.0)
-        velocity = 1.0f;
+        velocity = 1.0;
     portamento = portamento_;
     midinote = midinote_;
 
-    // Manage legato stuff
-    if (externcall) {
-        Legato.msg = LM_Norm;
-        for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice) {
-            if (NoteVoicePar[nvoice].Enabled) {
-                if (subVoice[nvoice] != NULL)
-                    for (int k = 0; k < unison_size[nvoice]; ++k) {
-                        subVoice[nvoice][k]->ADlegatonote(getVoiceBaseFreq(nvoice),
-                                                          velocity_, portamento_,
-                                                          midinote_, externcall);
-                    }
-                if (subFMVoice[nvoice] != NULL)
-                    for (int k = 0; k < unison_size[nvoice]; ++k) {
-                        subFMVoice[nvoice][k]->ADlegatonote(getFMVoiceBaseFreq(nvoice),
-                                                            velocity_, portamento_,
-                                                            midinote_, externcall);
-                    }
-            }
-        }
-    }
-    if (Legato.msg != LM_CatchUp)
+    if (!portamento) // Do not crossfade portamento
     {
-        Legato.lastfreq = Legato.param.freq;
-        Legato.param.freq = freq_;
-        Legato.param.vel = velocity_;
-        Legato.param.portamento = portamento_;
-        Legato.param.midinote = midinote_;
-        if (Legato.msg == LM_Norm)
-        {
-            if (Legato.silent)
-            {
-                Legato.fade.m = 0.0f;
-                Legato.msg = LM_FadeIn;
-            }
-            else
-            {
-                Legato.fade.m = 1.0f;
-                Legato.msg = LM_FadeOut;
-                return;
-            }
-        }
-        if (Legato.msg == LM_ToNorm)
-            Legato.msg = LM_Norm;
-    }
-
-    for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
-    {
-        if (NoteVoicePar[nvoice].Enabled == 0)
-            continue; //(gf) Stay the same as first note in legato.
-
-        // Only generate oscillator for original voices. In sub voices we use
-        // the parents' voices, so they are already generated.
-        if (subVoiceNumber == -1) {
-            // Get the voice's oscil or external's voice oscil
-            int vc = nvoice;
-            if (adpars->VoicePar[nvoice].Pextoscil != -1)
-                vc = adpars->VoicePar[nvoice].Pextoscil;
-            if (!adpars->GlobalPar.Hrandgrouping)
-                adpars->VoicePar[vc].OscilSmp->newrandseed();
-        }
-
-        NoteVoicePar[nvoice].DelayTicks =
-            int((expf(adpars->VoicePar[nvoice].PDelay / 127.0f
-                         * logf(50.0f)) - 1.0f) / synth->sent_all_buffersize_f / 10.0f
-                         * synth->samplerate_f);
-    }
-
-    ///////////////
-    // Altered content of initParameters():
-
-    int nvoice, i;
-
-    NoteGlobalPar.FilterQ = adpars->GlobalPar.GlobalFilter->getq();
-    NoteGlobalPar.FilterFreqTracking =
-        adpars->GlobalPar.GlobalFilter->getfreqtracking(basefreq);
-
-    // Forbids the Modulation Voice to be greater or equal than voice
-    for (i = 0; i < NUM_VOICES; ++i)
-        if (NoteVoicePar[i].FMVoice >= i)
-            NoteVoicePar[i].FMVoice = -1;
-
-    // Voice Parameter init
-    for (nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
-    {
-        if (!NoteVoicePar[nvoice].Enabled)
-            continue;
-
-        NoteVoicePar[nvoice].noisetype = adpars->VoicePar[nvoice].Type;
-        float t = synth->numRandom();
-        NoteVoicePar[nvoice].randpanL = cosf(t * HALFPI);
-        NoteVoicePar[nvoice].randpanR = cosf((1.0f - t) * HALFPI);
-
-        newamplitude[nvoice] = 1.0f;
-        if (adpars->VoicePar[nvoice].PAmpEnvelopeEnabled
-           && NoteVoicePar[nvoice].AmpEnvelope)
-            newamplitude[nvoice] *= NoteVoicePar[nvoice].AmpEnvelope->envout_dB();
-
-        if (adpars->VoicePar[nvoice].PAmpLfoEnabled
-             && NoteVoicePar[nvoice].AmpLfo)
-            newamplitude[nvoice] *= NoteVoicePar[nvoice].AmpLfo->amplfoout();
-
-        NoteVoicePar[nvoice].FilterFreqTracking =
-            adpars->VoicePar[nvoice].VoiceFilter->getfreqtracking(basefreq);
-
-        // Voice Modulation Parameters Init
-        if (NoteVoicePar[nvoice].FMEnabled != NONE
-            && NoteVoicePar[nvoice].FMVoice < 0)
-        {
-            // Only generate modulator oscillator for original voices. In sub
-            // voices we use the parents' voices, so they are already generated.
-            if (subVoiceNumber == -1) {
-                adpars->VoicePar[nvoice].FMSmp->newrandseed();
-
-                //Perform Anti-aliasing only on MORPH or RING MODULATION
-
-                int vc = nvoice;
-                if (adpars->VoicePar[nvoice].PextFMoscil != -1)
-                    vc = adpars->VoicePar[nvoice].PextFMoscil;
-
-                if (!adpars->GlobalPar.Hrandgrouping)
-                    adpars->VoicePar[vc].FMSmp->newrandseed();
-            }
-        }
+        legatoFade = 0.0f; // Start silent
+        legatoFadeStep = 1.0f / (synth->samplerate_f * 0.005f); // 5ms fade, positive steps
     }
 
     computeNoteParameters();
+}
 
-    for (nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
+// This exists purely to avoid boilerplate. It might be useful
+// elsewhere, but converting the relevant code to be more
+// RAII-friendly would probably be more worthwhile.
+template<class T> inline void copyOrAssign(T *lhs, const T *rhs)
+{
+        if (rhs != NULL)
+        {
+            if (lhs != NULL)
+                *lhs = *rhs;
+            else
+                lhs = new T(*rhs);
+        }
+        else
+        {
+            delete lhs;
+            lhs = NULL;
+        }
+}
+
+void ADnote::legatoFadeOut(const ADnote &orig)
+{
+    basefreq = orig.basefreq;
+    velocity = orig.velocity;
+    portamento = orig.portamento;
+    midinote = orig.midinote;
+
+    auto &gpar = NoteGlobalPar;
+    auto &oldgpar = orig.NoteGlobalPar;
+
+    // These should never be null
+    *gpar.FreqEnvelope = *oldgpar.FreqEnvelope;
+    *gpar.FreqLfo = *oldgpar.FreqLfo;
+    *gpar.AmpEnvelope = *oldgpar.AmpEnvelope;
+    *gpar.AmpLfo = *oldgpar.AmpLfo;
+    *gpar.FilterEnvelope = *oldgpar.FilterEnvelope;
+    *gpar.FilterLfo = *oldgpar.FilterLfo;
+
+    gpar.Fadein_adjustment = oldgpar.Fadein_adjustment;
+    gpar.Punch = oldgpar.Punch;
+
+    paramSeed = orig.paramSeed;
+
+    globalnewamplitude = orig.globalnewamplitude;
+    globaloldamplitude = orig.globaloldamplitude;
+
+    // Supporting virtual copy assignment would be hairy
+    // so we have to use the copy constructor here
+    delete gpar.GlobalFilterL;
+    gpar.GlobalFilterL = new Filter(*oldgpar.GlobalFilterL);
+    if (stereo)
     {
-        if (!NoteVoicePar[nvoice].Enabled)
-            continue;
-
-        FMnewamplitude[nvoice] = NoteVoicePar[nvoice].FMVolume * ctl->fmamp.relamp;
-
-        if (adpars->VoicePar[nvoice].PFMAmpEnvelopeEnabled
-           && NoteVoicePar[nvoice].FMAmpEnvelope != NULL)
-            FMnewamplitude[nvoice] *=
-                NoteVoicePar[nvoice].FMAmpEnvelope->envout_dB();
+        delete gpar.GlobalFilterR;
+        gpar.GlobalFilterR = new Filter(*oldgpar.GlobalFilterR);
     }
 
-    globalnewamplitude = NoteGlobalPar.Volume
-                         * NoteGlobalPar.AmpEnvelope->envout_dB()
-                         * NoteGlobalPar.AmpLfo->amplfoout();
+    memcpy(pinking, orig.pinking, sizeof(pinking));
+    memcpy(firsttick, orig.firsttick, sizeof(firsttick));
 
-    // End of the ADlegatonote function.
+    memcpy(oldamplitude, orig.oldamplitude, sizeof(oldamplitude));
+    memcpy(newamplitude, orig.newamplitude, sizeof(newamplitude));
+    memcpy(FMoldamplitude, orig.FMoldamplitude, sizeof(FMoldamplitude));
+    memcpy(FMnewamplitude, orig.FMnewamplitude, sizeof(FMnewamplitude));
+
+    for (int i = 0; i < NUM_VOICES; ++i)
+    {
+        auto &vpar = NoteVoicePar[i];
+        auto &oldvpar = orig.NoteVoicePar[i];
+
+        vpar.Enabled = oldvpar.Enabled;
+        if (!vpar.Enabled)
+            continue;
+
+        vpar.DelayTicks = oldvpar.DelayTicks;
+        vpar.Punch = oldvpar.Punch;
+        vpar.phase_offset = oldvpar.phase_offset;
+
+        int unison = adpars->VoicePar[i].Unison_size;
+        memcpy(oscposhi[i], orig.oscposhi[i], unison * sizeof(int));
+        memcpy(oscposlo[i], orig.oscposlo[i], unison * sizeof(float));
+        memcpy(oscposhiFM[i], orig.oscposhiFM[i], unison * sizeof(int));
+        memcpy(oscposloFM[i], orig.oscposloFM[i], unison * sizeof(float));
+
+        copyOrAssign(vpar.FreqLfo, oldvpar.FreqLfo);
+        copyOrAssign(vpar.FreqEnvelope, oldvpar.FreqEnvelope);
+
+        copyOrAssign(vpar.AmpLfo, oldvpar.AmpLfo);
+        copyOrAssign(vpar.AmpEnvelope, oldvpar.AmpEnvelope);
+
+        delete vpar.VoiceFilterL;
+        vpar.VoiceFilterL = NULL;
+        if (oldvpar.VoiceFilterL != NULL)
+            vpar.VoiceFilterL = new Filter(*oldvpar.VoiceFilterL);
+        delete vpar.VoiceFilterR;
+        vpar.VoiceFilterR = NULL;
+        if (oldvpar.VoiceFilterR != NULL)
+            vpar.VoiceFilterR = new Filter(*oldvpar.VoiceFilterR);
+
+        copyOrAssign(vpar.FilterLfo, oldvpar.FilterLfo);
+        copyOrAssign(vpar.FilterEnvelope, oldvpar.FilterEnvelope);
+
+        copyOrAssign(vpar.FMFreqEnvelope, oldvpar.FMFreqEnvelope);
+        copyOrAssign(vpar.FMAmpEnvelope, oldvpar.FMAmpEnvelope);
+
+        if (vpar.Enabled)
+        {
+            if (subVoice[i] != NULL)
+                for (int k = 0; k < unison_size[i]; ++k)
+                    subVoice[i][k]->legatoFadeOut(*orig.subVoice[i][k]);
+            else if (subFMVoice[i] != NULL)
+                for (int k = 0; k < unison_size[i]; ++k)
+                    subFMVoice[i][k]->legatoFadeOut(*orig.subFMVoice[i][k]);
+        }
+    }
+
+    legatoFade = 1.0f; // Start at full volume
+    legatoFadeStep = -1.0f / (synth->samplerate_f * 0.005f); // 5ms fade, negative steps
 }
 
 
@@ -2223,6 +2476,8 @@ int ADnote::noteout(float *outl, float *outr)
 
     if (!NoteEnabled)
         return 0;
+    if (legatoFade == 0.0f && legatoFadeStep == 0.0f)
+        return 1; // No need to process more, but don't kill the note
 
     if (subVoiceNumber == -1) {
         memset(bypassl, 0, synth->sent_bufferbytes);
@@ -2502,92 +2757,31 @@ int ADnote::noteout(float *outl, float *outr)
             }
         }
 
-        // Apply legato-specific sound signal modifications
-        if (Legato.silent)    // Silencer
-            if (Legato.msg != LM_FadeIn)
-            {
-                memset(outl, 0, synth->sent_bufferbytes);
-                memset(outr, 0, synth->sent_bufferbytes);
-            }
-        switch(Legato.msg)
+        // Apply legato fading if any
+        if (legatoFadeStep != 0.0f)
         {
-            case LM_CatchUp:  // Continue the catch-up...
-                if (Legato.decounter == -10)
-                    Legato.decounter = Legato.fade.length;
-                for (i = 0; i < synth->sent_buffersize; ++i)
-                { // Yea, could be done without the loop...
-                    Legato.decounter--;
-                    if (Legato.decounter < 1)
-                    {
-                        synth->part[synth->legatoPart]->legatoFading &= 6;
-                        // Catching-up done, we can finally set
-                        // the note to the actual parameters.
-                        Legato.decounter = -10;
-                        Legato.msg = LM_ToNorm;
-                        ADlegatonote(Legato.param.freq,
-                                     Legato.param.vel,
-                                     Legato.param.portamento,
-                                     Legato.param.midinote,
-                                     false);
-                        break;
-                    }
-                }
-                break;
-
-            case LM_FadeIn:  // Fade-in
-                if (Legato.decounter == -10)
-                    Legato.decounter = Legato.fade.length;
-                Legato.silent = false;
-                for (i = 0; i < synth->sent_buffersize; ++i)
+            for (int i = 0; i < synth->sent_buffersize; ++i)
+            {
+                legatoFade += legatoFadeStep;
+                if (legatoFade <= 0.0f)
                 {
-                    Legato.decounter--;
-                    if (Legato.decounter < 1)
-                    {
-                        Legato.decounter = -10;
-                        Legato.msg = LM_Norm;
-                        break;
-                    }
-                    Legato.fade.m += Legato.fade.step;
-                    outl[i] *= Legato.fade.m;
-                    outr[i] *= Legato.fade.m;
+                    legatoFade = 0.0f;
+                    legatoFadeStep = 0.0f;
+                    memset(outl + i, 0, (synth->sent_buffersize - i) * sizeof(float));
+                    memset(outr + i, 0, (synth->sent_buffersize - i) * sizeof(float));
+                    break;
                 }
-                break;
-
-            case LM_FadeOut:  // Fade-out, then set the catch-up
-                if (Legato.decounter == -10)
-                    Legato.decounter = Legato.fade.length;
-                for (i = 0; i < synth->sent_buffersize; ++i)
+                else if (legatoFade >= 1.0f)
                 {
-                    Legato.decounter--;
-                    if (Legato.decounter < 1)
-                    {
-                        for (int j = i; j < synth->sent_buffersize; j++)
-                            outl[j] = outr[j] = 0.0f;
-                        Legato.decounter = -10;
-                        Legato.silent = true;
-                        // Fading-out done, now set the catch-up :
-                        Legato.decounter = Legato.fade.length;
-                        Legato.msg = LM_CatchUp;
-                        float catchupfreq =
-                            Legato.param.freq * (Legato.param.freq / Legato.lastfreq);
-                        // This freq should make this now silent note to catch-up
-                        //  (or should I say resync ?) with the heard note for the
-                        // same length it stayed at the previous freq during the fadeout.
-                        ADlegatonote(catchupfreq, Legato.param.vel, Legato.param.portamento,
-                                     Legato.param.midinote, false);
-                        break;
-                    }
-                    Legato.fade.m -= Legato.fade.step;
-                    outl[i] *= Legato.fade.m;
-                    outr[i] *= Legato.fade.m;
+                    legatoFade = 1.0f;
+                    legatoFadeStep = 0.0f;
+                    break;
                 }
-                break;
-
-            default:
-                break;
+                outl[i] *= legatoFade;
+                outr[i] *= legatoFade;
+            }
         }
     }
-
 
     // Check if the global amplitude is finished.
     // If it does, disable the note

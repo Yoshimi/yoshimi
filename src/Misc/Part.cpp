@@ -274,6 +274,11 @@ void Part::NoteOn(int note, int velocity, bool renote)
      * note played, so it is acceptable to lose
      * intemediate ones while going through a
      * legato fade between held and newest note.
+     *
+     * The newer legato logic should work fine even
+     * during an existing fade; the existing fade
+     * just skips to the end, which is probably
+     * better than ignoring the NoteOn entirely.
      */
     if (Pkeymode > PART_MONO && legatoFading > 0)
         return;
@@ -434,12 +439,14 @@ void Part::NoteOn(int note, int velocity, bool renote)
                     && (partnote[pos].kititem[0].adnote)
                     && (partnote[posb].kititem[0].adnote))
                 {
+                    // Set posb to clone state from pos and fade out...
+                    if (!portamento) // ...but only if portamento isn't in effect
+                        partnote[posb].kititem[0].adnote->
+                            legatoFadeOut(*partnote[pos].kititem[0].adnote);
+                    // Then set pos to the new note and fade in.
+                    // This function skips the fade if portamento is active.
                     partnote[pos].kititem[0].adnote->
-                        ADlegatonote(notebasefreq, vel, portamento, note, true);
-                    partnote[posb].kititem[0].adnote->
-                        ADlegatonote(notebasefreq, vel, portamento, note, true);
-                            // 'true' is to tell it it's being called from here.
-                        legatoFading |= 1;
+                        legatoFadeIn(notebasefreq, vel, portamento, note);
                 }
 
                 if ((kit[0].Psubenabled)
@@ -493,11 +500,14 @@ void Part::NoteOn(int note, int velocity, bool renote)
                         && (partnote[pos].kititem[ci].adnote)
                         && (partnote[posb].kititem[ci].adnote))
                     {
+                        // Set posb to clone state from pos and fade out...
+                        if (!portamento) // ...but only if portamento isn't in effect
+                            partnote[posb].kititem[ci].adnote->
+                                legatoFadeOut(*partnote[pos].kititem[ci].adnote);
+                        // Then set pos to the new note and fade in.
+                        // This function skips the fade if portamento is active.
                         partnote[pos].kititem[ci].adnote->
-                            ADlegatonote(notebasefreq, vel, portamento, note, true);
-                        partnote[posb].kititem[ci].adnote->
-                            ADlegatonote(notebasefreq, vel, portamento, note, true);
-                        legatoFading |= 1;
+                            legatoFadeIn(notebasefreq, vel, portamento, note);
                     }
                     if ((kit[item].Psubenabled)
                         && (kit[item].subpars)
@@ -572,8 +582,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
                 partnote[posb].kititem[0].sendtoparteffect = 0;
                 if (kit[0].Padenabled)
                     partnote[posb].kititem[0].adnote =
-                        new ADnote(kit[0].adpars, ctl, notebasefreq, vel,
-                                    portamento, note, true, synth); // silent
+                        new ADnote(*partnote[pos].kititem[0].adnote);
                 if (kit[0].Psubenabled)
                     partnote[posb].kititem[0].subnote =
                         new SUBnote(kit[0].subpars, ctl, notebasefreq, vel,
@@ -685,8 +694,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
                     if (kit[item].adpars && kit[item].Padenabled)
                     {
                         partnote[posb].kititem[ci].adnote =
-                            new ADnote(kit[item].adpars, ctl, notebasefreq,
-                                        vel, portamento, note, true, synth); // silent
+                            new ADnote(*partnote[pos].kititem[ci].adnote);
                     }
                     if (kit[item].subpars && kit[item].Psubenabled)
                         partnote[posb].kititem[ci].subnote =
