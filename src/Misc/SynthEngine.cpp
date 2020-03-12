@@ -675,7 +675,7 @@ void SynthEngine::SetController(unsigned char chan, int CCtype, short int par)
     {
         int note = par & 0xff;
         int value = par >> 8;
-        int type = PART::polyATtype::filterCutoffUp;
+        int type = PART::polyATtype::filterCutoff;
         if (value == 0)
             type = 0;
         std::cout << "Poly chan " << chan + 1 << "  note " << note << "  pres " << value << std::endl;
@@ -732,7 +732,7 @@ void SynthEngine::SetController(unsigned char chan, int CCtype, short int par)
                 part[npart]->SetController(MIDI::CC::volume, 64 + par / 2);
                 part[npart]->SetController(MIDI::CC::filterCutoff, par);
             }
-            else if (CCtype == 0x44) // legato switch
+            else if (CCtype == MIDI::CC::legato)
             {
                 int mode = (ReadPartKeyMode(npart) & 3);
                 if (par < 64)

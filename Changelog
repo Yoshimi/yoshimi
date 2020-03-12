@@ -1,6 +1,9 @@
 yoshimi 1.7.0 M
 
-2020-3/10 Will
+2020-3-12 Will
+* Small refinements to PolyAT.
+
+2020-3-10 Will
 * Merged in first trial of PolyAT.
   Currently fixed as filter cutoff.
 * Corrected Mixer channel colours for Solo.

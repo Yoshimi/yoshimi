@@ -992,34 +992,30 @@ void Part::ComputePartSmps(void)
 
     for (k = 0; k < POLIPHONY; ++k)
     {
-        int oldCutoff;
+        int oldState;
         if (partnote[k].status == KEY_OFF)
             continue;
         noteplay = 0;
         partnote[k].time++;
         int polyATtype = partnote[k].polyATtype;
         int polyATvalue = partnote[k].polyATvalue;
-        switch (polyATtype)
+        if (polyATtype & PART::polyATtype::filterCutoff)
         {
-            case PART::polyATtype::filterCutoffUp:
-            {
-                oldCutoff = ctl->filtercutoff.data;
-                float adjust = oldCutoff / 127.0f;
-                ctl->setfiltercutoff(oldCutoff + (polyATvalue * adjust));
-                break;
-            }
-
-            case PART::polyATtype::filterCutoffDown:
-            {
-                oldCutoff = ctl->filtercutoff.data;
-                float adjust = oldCutoff / 127.0f;
-                ctl->setfiltercutoff(oldCutoff - (polyATvalue * adjust));
-                break;
-            }
-
-            case PART::polyATtype::off:
-            default:
-                ; // do nothing
+            oldState = ctl->filtercutoff.data;
+            float adjust = oldState / 127.0f;
+            if (polyATtype & PART::polyATtype::filterCutoffDown)
+                ctl->setfiltercutoff(oldState - (polyATvalue * adjust));
+            else
+                ctl->setfiltercutoff(oldState + (polyATvalue * adjust));
+        }
+        if (polyATtype & PART::polyATtype::pitchBend)
+        {
+            polyATvalue *= 64.0f;
+            oldState = ctl->pitchwheel.data;
+            if (polyATtype & PART::polyATtype::pitchBendDown)
+                ctl->setpitchwheel(-polyATvalue);
+            else
+                ctl->setpitchwheel(polyATvalue);
         }
 
         // get the sampledata of the note and kill it if it's finished
@@ -1091,18 +1087,10 @@ void Part::ComputePartSmps(void)
         if (noteplay == 0)
             KillNotePos(k);
 
-        switch (polyATtype)
-        {
-            case PART::polyATtype::filterCutoffUp:
-                ctl->setfiltercutoff(oldCutoff);
-                break;
-            case PART::polyATtype::filterCutoffDown:
-                ctl->setfiltercutoff(oldCutoff);
-                break;
-            case PART::polyATtype::off:
-            default:
-                ; // do nothing
-        }
+        if (polyATtype & PART::polyATtype::filterCutoff)
+            ctl->setfiltercutoff(oldState);
+        if (polyATtype & PART::polyATtype::pitchBend)
+            ctl->setpitchwheel(oldState);
     }
 
     // Apply part's effects and mix them

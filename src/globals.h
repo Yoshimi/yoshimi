@@ -629,15 +629,6 @@ namespace PART // usage PART::control::volume
         CrossFade
     };
 
-    enum polyATtype : int {
-        off = 0,
-        filterCutoffUp,
-        filterCutoffDown,
-        gain,
-        pitchbendUp,
-        pitchbendDown
-    };
-
     enum engine : unsigned char {
         addSynth = 0,
         subSynth,
@@ -661,6 +652,15 @@ namespace PART // usage PART::control::volume
         addMod7,
         addMod8
     };
+
+    namespace polyATtype {
+        const unsigned int off = 0;
+        const unsigned int filterCutoff = 1;
+        const unsigned int filterCutoffDown = 2;
+        const unsigned int pitchBend = 4;
+        const unsigned int pitchBendDown = 8;
+        const unsigned int volume = 16;
+    }
 }
 
 namespace ADDSYNTH // usage ADDSYNTH::control::volume
