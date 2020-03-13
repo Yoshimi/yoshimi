@@ -58,6 +58,37 @@ AnalogFilter::AnalogFilter(unsigned char Ftype, float Ffreq, float Fq, unsigned 
 }
 
 
+AnalogFilter::AnalogFilter(const AnalogFilter &orig) :
+    type(orig.type),
+    stages(orig.stages),
+    freq(orig.freq),
+    q(orig.q),
+    gain(orig.gain),
+    order(orig.order),
+    needsinterpolation(orig.needsinterpolation),
+    firsttime(orig.firsttime),
+    abovenq(orig.abovenq),
+    oldabovenq(orig.oldabovenq),
+    synth(orig.synth)
+{
+    outgain = orig.outgain;
+
+    memcpy(x, orig.x, sizeof(x));
+    memcpy(y, orig.y, sizeof(y));
+    memcpy(oldx, orig.oldx, sizeof(oldx));
+    memcpy(oldy, orig.oldy, sizeof(oldy));
+    memcpy(c, orig.c, sizeof(c));
+    memcpy(d, orig.d, sizeof(d));
+    memcpy(oldc, orig.oldc, sizeof(oldc));
+    memcpy(oldd, orig.oldd, sizeof(oldd));
+    memcpy(xd, orig.xd, sizeof(xd));
+    memcpy(yd, orig.yd, sizeof(yd));
+
+    // No need to memcpy as this is always memcpy'd to before use
+    tmpismp = (float*)fftwf_malloc(synth->bufferbytes);
+}
+
+
 AnalogFilter::~AnalogFilter()
 {
     if (tmpismp)
