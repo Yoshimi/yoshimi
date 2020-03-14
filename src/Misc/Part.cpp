@@ -453,11 +453,11 @@ void Part::NoteOn(int note, int velocity, bool renote)
                     && (partnote[pos].kititem[0].subnote)
                     && (partnote[posb].kititem[0].subnote))
                 {
+                    if (!portamento)
+                        partnote[posb].kititem[0].subnote->
+                            legatoFadeOut(*partnote[pos].kititem[0].subnote);
                     partnote[pos].kititem[0].subnote->
-                        SUBlegatonote(notebasefreq, vel, portamento, note, true);
-                    partnote[posb].kititem[0].subnote->
-                        SUBlegatonote(notebasefreq, vel, portamento, note, true);
-                    legatoFading |= 2;
+                        legatoFadeIn(notebasefreq, vel, portamento, note);
                 }
 
                 if ((kit[0].Ppadenabled)
@@ -514,11 +514,11 @@ void Part::NoteOn(int note, int velocity, bool renote)
                         && (partnote[pos].kititem[ci].subnote)
                         && (partnote[posb].kititem[ci].subnote))
                     {
+                        if (!portamento)
+                            partnote[posb].kititem[ci].subnote->
+                                legatoFadeOut(*partnote[pos].kititem[ci].subnote);
                         partnote[pos].kititem[ci].subnote->
-                            SUBlegatonote(notebasefreq, vel, portamento, note, true);
-                        partnote[posb].kititem[ci].subnote->
-                            SUBlegatonote(notebasefreq, vel, portamento, note, true);
-                        legatoFading |= 2;
+                            legatoFadeIn(notebasefreq, vel, portamento, note);
                     }
                     if ((kit[item].Ppadenabled)
                         && (kit[item].padpars)
@@ -585,8 +585,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
                         new ADnote(*partnote[pos].kititem[0].adnote);
                 if (kit[0].Psubenabled)
                     partnote[posb].kititem[0].subnote =
-                        new SUBnote(kit[0].subpars, ctl, notebasefreq, vel,
-                                    portamento, note, true, synth);
+                        new SUBnote(*partnote[pos].kititem[0].subnote);
                 if (kit[0].Ppadenabled)
                     partnote[posb].kititem[0].padnote =
                         new PADnote(kit[0].padpars, ctl, notebasefreq, vel,
@@ -698,8 +697,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
                     }
                     if (kit[item].subpars && kit[item].Psubenabled)
                         partnote[posb].kititem[ci].subnote =
-                            new SUBnote(kit[item].subpars, ctl, notebasefreq,
-                                        vel, portamento, note, true, synth);
+                            new SUBnote(*partnote[pos].kititem[ci].subnote);
                     if (kit[item].padpars && kit[item].Ppadenabled)
                         partnote[posb].kititem[ci].padnote =
                             new PADnote(kit[item].padpars, ctl, notebasefreq,

@@ -45,12 +45,14 @@ using synth::aboveAmplitudeThreshold;
 
 
 SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
-                 float velocity, int portamento_, int midinote, bool besilent, SynthEngine *_synth) :
+                 float velocity_, int portamento_, int midinote_, bool besilent, SynthEngine *_synth) :
     pars(parameters),
+    velocity(velocity_ > 1.0f ? 1.0f : velocity_),
+    portamento(portamento_),
+    midinote(midinote_),
     GlobalFilterL(NULL),
     GlobalFilterR(NULL),
     GlobalFilterEnvelope(NULL),
-    portamento(portamento_),
     ctl(ctl_),
     log_0_01(logf(0.01f)),
     log_0_001(logf(0.001f)),
@@ -60,20 +62,12 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
     synth(_synth),
     filterStep(0)
 {
+    // This probably isn't correct, see the ADnote copy constructor
     ready = 0;
 
     // Initialise some legato-specific vars
-    Legato.msg = LM_Norm;
-    Legato.fade.length = int(synth->samplerate_f * 0.005f); // 0.005 seems ok.
-    if (Legato.fade.length < 1)
-        Legato.fade.length = 1;// (if something's fishy)
-    Legato.fade.step = (1.0f / Legato.fade.length);
-    Legato.decounter = -10;
-    Legato.param.freq = freq;
-    Legato.param.vel = velocity;
-    Legato.param.portamento = portamento_;
-    Legato.param.midinote = midinote;
-    Legato.silent = besilent;
+    legatoFade = 1.0f; // Full volume
+    legatoFadeStep = 0.0f; // Legato disabled
 
     NoteEnabled = true;
 
@@ -90,7 +84,7 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
     lfilter = NULL;
     rfilter = NULL;
 
-    setBaseFreq();
+    setBaseFreq(freq);
 
     oldpitchwheel = 0;
     oldbandwidth = 64;
@@ -108,53 +102,166 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
 }
 
 
-// SUBlegatonote: This function is (mostly) a copy of SUBnote(...) and
-// initparameters(...) stuck together with some lines removed so that
-// it only alter the already playing note (to perform legato). It is
-// possible I left stuff that is not required for this.
-void SUBnote::SUBlegatonote(float freq, float velocity,
-                            int portamento_, int midinote, bool externcall)
+// Copy constructor, currently only exists for legato
+SUBnote::SUBnote(const SUBnote &orig) :
+    ready(1),
+    pars(orig.pars),
+    stereo(orig.stereo),
+    numstages(orig.numstages),
+    numharmonics(orig.numharmonics),
+    start(orig.start),
+    basefreq(orig.basefreq),
+    velocity(orig.velocity),
+    portamento(orig.portamento),
+    midinote(orig.midinote),
+    BendAdjust(orig.BendAdjust),
+    OffsetHz(orig.OffsetHz),
+    randpanL(orig.randpanL),
+    randpanR(orig.randpanR),
+    FreqEnvelope(NULL),
+    BandWidthEnvelope(NULL),
+    GlobalFilterL(NULL),
+    GlobalFilterR(NULL),
+    GlobalFilterEnvelope(NULL),
+    NoteEnabled(orig.NoteEnabled),
+    firsttick(orig.firsttick),
+    volume(orig.volume),
+    oldamplitude(orig.oldamplitude),
+    newamplitude(orig.newamplitude),
+    GlobalFilterCenterPitch(orig.GlobalFilterCenterPitch),
+    GlobalFilterFreqTracking(orig.GlobalFilterFreqTracking),
+    lfilter(NULL),
+    rfilter(NULL),
+    ctl(orig.ctl),
+    oldpitchwheel(orig.oldpitchwheel),
+    oldbandwidth(orig.oldbandwidth),
+    globalfiltercenterq(orig.globalfiltercenterq),
+    legatoFade(0.0f), // Silent by default
+    legatoFadeStep(0.0f), // Legato disabled
+    log_0_01(logf(0.01f)), //TODO: make these static
+    log_0_001(logf(0.001f)),
+    log_0_0001(logf(0.0001f)),
+    log_0_00001(logf(0.00001f)),
+    subNoteChange(pars),
+    synth(orig.synth),
+    filterStep(orig.filterStep)
 {
-    // Manage legato stuff
-    if (externcall)
-        Legato.msg = LM_Norm;
-    if (Legato.msg != LM_CatchUp)
+    memcpy(pos, orig.pos, MAX_SUB_HARMONICS * sizeof(int));
+    memcpy(overtone_rolloff, orig.overtone_rolloff,
+        numharmonics * sizeof(float));
+    memcpy(overtone_freq, orig.overtone_freq,
+        numharmonics * sizeof(float));
+
+    AmpEnvelope = new Envelope(*orig.AmpEnvelope);
+
+    if (orig.FreqEnvelope != NULL)
+        FreqEnvelope = new Envelope(*orig.FreqEnvelope);
+    if (orig.BandWidthEnvelope != NULL)
+        BandWidthEnvelope = new Envelope(*orig.BandWidthEnvelope);
+    if (pars->PGlobalFilterEnabled != 0)
     {
-        Legato.lastfreq = Legato.param.freq;
-        Legato.param.freq = freq;
-        Legato.param.vel = velocity;
-        Legato.param.portamento = portamento_;
-        Legato.param.midinote = midinote;
-        if (Legato.msg == LM_Norm)
-        {
-            if (Legato.silent)
-            {
-                Legato.fade.m = 0.0f;
-                Legato.msg = LM_FadeIn;
-            }
-            else
-            {
-                Legato.fade.m = 1.0;
-                Legato.msg = LM_FadeOut;
-                return;
-            }
-        }
-        if (Legato.msg == LM_ToNorm)
-            Legato.msg = LM_Norm;
+        GlobalFilterL = new Filter(*orig.GlobalFilterL);
+        GlobalFilterR = new Filter(*orig.GlobalFilterR);
+        GlobalFilterEnvelope = new Envelope(*orig.GlobalFilterEnvelope);
     }
 
+    if (orig.lfilter != NULL)
+    {
+        lfilter = new bpfilter[numstages * numharmonics];
+        memcpy(lfilter, orig.lfilter,
+            numstages * numharmonics * sizeof(bpfilter));
+    }
+    if (orig.rfilter != NULL)
+    {
+        rfilter = new bpfilter[numstages * numharmonics];
+        memcpy(rfilter, orig.rfilter,
+            numstages * numharmonics * sizeof(bpfilter));
+    }
+}
+
+
+void SUBnote::legatoFadeIn(float freq_, float velocity_, int portamento_, int midinote_)
+{
+    velocity = velocity_ > 1.0f ? 1.0f : velocity_;
     portamento = portamento_;
+    midinote = midinote_;
 
-    setBaseFreq();
+    setBaseFreq(freq_);
 
-    oldpitchwheel = 0;
-    oldbandwidth = 64;
+    if (!portamento) // Do not crossfade portamento
+    {
+        legatoFade = 0.0f; // Start silent
+        legatoFadeStep = 1.0f / (synth->samplerate_f * 0.005f); // 5ms fade, positive steps
+
+        // I'm not sure if these are necessary or even beneficial
+        oldpitchwheel = 0;
+        oldbandwidth = 64;
+        oldamplitude = newamplitude;
+
+    }
 
     computeNoteParameters();
+}
 
-    oldamplitude = newamplitude;
 
-    // End of the SUBlegatonote function.
+void SUBnote::legatoFadeOut(const SUBnote &orig)
+{
+    velocity = orig.velocity;
+    portamento = orig.portamento;
+    midinote = orig.midinote;
+
+    firsttick = orig.firsttick;
+    volume = orig.volume;
+
+    basefreq = orig.basefreq;
+
+    // Not sure if this is necessary
+    oldamplitude = orig.oldamplitude;
+    newamplitude = orig.newamplitude;
+
+    // AmpEnvelope should never be null
+    *AmpEnvelope = *orig.AmpEnvelope;
+
+    if (orig.FreqEnvelope != NULL)
+        *FreqEnvelope = *orig.FreqEnvelope;
+    if (orig.BandWidthEnvelope != NULL)
+        *BandWidthEnvelope = *orig.BandWidthEnvelope;
+    if (pars->PGlobalFilterEnabled)
+    {
+        GlobalFilterCenterPitch = orig.GlobalFilterCenterPitch;
+        GlobalFilterFreqTracking = orig.GlobalFilterFreqTracking;
+        *GlobalFilterEnvelope = *orig.GlobalFilterEnvelope;
+
+        // Supporting virtual copy assignment would be hairy
+        // so we have to use the copy constructor here
+        delete GlobalFilterL;
+        GlobalFilterL = new Filter(*orig.GlobalFilterL);
+        delete GlobalFilterR;
+        GlobalFilterR = new Filter(*orig.GlobalFilterR);
+    }
+
+    // This assumes that numstages and numharmonics don't change
+    // while notes exist, or if they do change, they change for
+    // all notes equally and simultaneously. If this is ever not
+    // the case, this code needs to be changed.
+    if (orig.lfilter != NULL)
+    {
+        memcpy(lfilter, orig.lfilter,
+            numstages * numharmonics * sizeof(bpfilter));
+    }
+    if (orig.rfilter != NULL)
+    {
+        memcpy(rfilter, orig.rfilter,
+            numstages * numharmonics * sizeof(bpfilter));
+    }
+
+    memcpy(overtone_rolloff, orig.overtone_rolloff,
+        numharmonics * sizeof(float));
+    memcpy(overtone_freq, orig.overtone_freq,
+        numharmonics * sizeof(float));
+
+    legatoFade = 1.0f; // Start at full volume
+    legatoFadeStep = -1.0f / (synth->samplerate_f * 0.005f); // 5ms fade, negative steps
 }
 
 
@@ -227,10 +334,10 @@ int SUBnote::createNewFilters()
     return numharmonics - origNumHarmonics;
 }
 
-void SUBnote::setBaseFreq()
+void SUBnote::setBaseFreq(float basefreq_)
 {
     if (pars->Pfixedfreq == 0)
-        basefreq = Legato.param.freq;
+        basefreq = basefreq_;
     else
     {
         basefreq = 440.0f;
@@ -238,7 +345,7 @@ void SUBnote::setBaseFreq()
         if (fixedfreqET)
         {   // if the frequency varies according the keyboard note
             float tmp =
-                (Legato.param.midinote - 69.0f) / 12.0f * powf(2.0f, (((fixedfreqET - 1) / 63.0f) - 1.0f));
+                (midinote - 69.0f) / 12.0f * powf(2.0f, (((fixedfreqET - 1) / 63.0f) - 1.0f));
             if (fixedfreqET <= 64)
                 basefreq *= powf(2.0f, tmp);
             else
@@ -254,7 +361,7 @@ void SUBnote::setBaseFreq()
 void SUBnote::computeNoteParameters()
 {
     volume = powf(0.1f, 3.0f * (1.0f - pars->PVolume / 96.0f)); // -60 dB .. 0 dB
-    volume *= velF(Legato.param.vel, pars->PAmpVelocityScaleFunction);
+    volume *= velF(velocity, pars->PAmpVelocityScaleFunction);
 
     int BendAdj = pars->PBendAdjust - 64;
     if (BendAdj % 24 == 0)
@@ -270,7 +377,7 @@ void SUBnote::computeNoteParameters()
         + // center freq
           (pars->PGlobalFilterVelocityScale / 127.0f * 6.0f)
         * // velocity sensing
-          (velF(Legato.param.vel, pars->PGlobalFilterVelocityScaleFunction) - 1);
+          (velF(velocity, pars->PGlobalFilterVelocityScaleFunction) - 1);
 
     updatefilterbank();
 
@@ -603,10 +710,12 @@ int SUBnote::noteout(float *outl, float *outr)
     memset(outr, 0, synth->sent_bufferbytes);
     if (!NoteEnabled)
         return 0;
+    if (legatoFade == 0.0f && legatoFadeStep == 0.0f)
+        return 1; // No need to process more, but don't kill the note
 
     if (subNoteChange.checkUpdated())
     {
-        setBaseFreq();
+        setBaseFreq(basefreq);
         computeNoteParameters();
     }
 
@@ -691,90 +800,29 @@ int SUBnote::noteout(float *outl, float *outr)
     oldamplitude = newamplitude;
     computecurrentparameters();
 
-    // Apply legato-specific sound signal modifications
-    if (Legato.silent)
-    {   // Silencer
-        if (Legato.msg != LM_FadeIn)
-        {
-            memset(outl, 0, synth->sent_bufferbytes);
-            memset(outr, 0, synth->sent_bufferbytes);
-        }
-    }
-    switch (Legato.msg)
+    // Apply legato fading if any
+    if (legatoFadeStep != 0.0f)
     {
-        case LM_CatchUp : // Continue the catch-up...
-            if (Legato.decounter == -10)
-                Legato.decounter = Legato.fade.length;
-            for (int i = 0; i < synth->sent_buffersize; ++i)
-            {   // Yea, could be done without the loop...
-                Legato.decounter--;
-                if (Legato.decounter < 1)
-                {
-                    synth->part[synth->legatoPart]->legatoFading &= 5;
-                    // Catching-up done, we can finally set
-                    // the note to the actual parameters.
-                    Legato.decounter = -10;
-                    Legato.msg = LM_ToNorm;
-                    SUBlegatonote(Legato.param.freq, Legato.param.vel,
-                                  Legato.param.portamento, Legato.param.midinote,
-                                  false);
-                    break;
-                }
-            }
-            break;
-
-        case LM_FadeIn : // Fade-in
-            if (Legato.decounter == -10)
-                Legato.decounter = Legato.fade.length;
-            Legato.silent = false;
-            for (int i = 0; i < synth->sent_buffersize; ++i)
+        for (int i = 0; i < synth->sent_buffersize; ++i)
+        {
+            legatoFade += legatoFadeStep;
+            if (legatoFade <= 0.0f)
             {
-                Legato.decounter--;
-                if (Legato.decounter < 1)
-                {
-                    Legato.decounter = -10;
-                    Legato.msg = LM_Norm;
-                    break;
-                }
-                Legato.fade.m += Legato.fade.step;
-                outl[i] *= Legato.fade.m;
-                outr[i] *= Legato.fade.m;
+                legatoFade = 0.0f;
+                legatoFadeStep = 0.0f;
+                memset(outl + i, 0, (synth->sent_buffersize - i) * sizeof(float));
+                memset(outr + i, 0, (synth->sent_buffersize - i) * sizeof(float));
+                break;
             }
-            break;
-
-        case LM_FadeOut : // Fade-out, then set the catch-up
-            if (Legato.decounter == -10)
-                Legato.decounter = Legato.fade.length;
-            for (int i = 0; i < synth->sent_buffersize; ++i)
+            else if (legatoFade >= 1.0f)
             {
-                Legato.decounter--;
-                if (Legato.decounter < 1)
-                {
-                    for (int j = i; j < synth->sent_buffersize; ++j)
-                        outl[j] = outr[j] = 0.0f;
-                    Legato.decounter = -10;
-                    Legato.silent = true;
-                    // Fading-out done, now set the catch-up :
-                    Legato.decounter = Legato.fade.length;
-                    Legato.msg = LM_CatchUp;
-                    // This freq should make this now silent note to catch-up
-                    // (or should I say resync ?) with the heard note for the same
-                    // length it stayed at the previous freq during the fadeout.
-                    float catchupfreq =
-                        Legato.param.freq * (Legato.param.freq / Legato.lastfreq);
-                    SUBlegatonote(catchupfreq, Legato.param.vel,
-                                 Legato.param.portamento, Legato.param.midinote,
-                                 false);
-                    break;
-                }
-                Legato.fade.m -= Legato.fade.step;
-                outl[i] *= Legato.fade.m;
-                outr[i] *= Legato.fade.m;
+                legatoFade = 1.0f;
+                legatoFadeStep = 0.0f;
+                break;
             }
-            break;
-
-        default :
-            break;
+            outl[i] *= legatoFade;
+            outr[i] *= legatoFade;
+        }
     }
 
     // Check if the note needs to be computed more

@@ -41,12 +41,13 @@ class SUBnote
 {
     public:
         SUBnote(SUBnoteParameters *parameters, Controller *ctl_,
-                float freq, float velocity, int portamento_,
-                int midinote, bool besilent, SynthEngine *_synth);
+                float freq_, float velocity_, int portamento_,
+                int midinote_, bool besilent, SynthEngine *_synth);
+        SUBnote(const SUBnote &rhs);
         ~SUBnote();
 
-        void SUBlegatonote(float freq, float velocity,
-                           int portamento_, int midinote, bool externcall);
+        void legatoFadeIn(float freq_, float velocity_, int portamento_, int midinote_);
+        void legatoFadeOut(const SUBnote &syncwith);
 
         int noteout(float *outl,float *outr); // note output, return 0 if the
                                               // note is finished
@@ -69,6 +70,9 @@ class SUBnote
         int numharmonics; // number of harmonics (after the too higher hamonics are removed)
         int start; // how the harmonics start
         float basefreq;
+        float velocity;
+        int portamento;
+        int midinote;
         float BendAdjust;
         float OffsetHz;
         float randpanL;
@@ -85,7 +89,6 @@ class SUBnote
         // internal values
         bool NoteEnabled;
         int firsttick;
-        int portamento;
         float volume;
         float oldamplitude;
         float newamplitude;
@@ -116,7 +119,7 @@ class SUBnote
         void computeallfiltercoefs();
         void computefiltercoefs(bpfilter &filter, float freq, float bw, float gain);
         void computeNoteParameters();
-        void setBaseFreq();
+        void setBaseFreq(float basefreq_);
         void filter(bpfilter &filter, float *smps);
         void filterVarRun(bpfilter &filter, float *smps);
         float getHgain(int harmonic);
@@ -136,26 +139,8 @@ class SUBnote
         float globalfiltercenterq;
 
         // Legato vars
-        struct {
-            bool silent;
-            float lastfreq;
-            LegatoMsg msg;
-            int decounter;
-            struct {
-                // Fade In/Out vars
-                int length;
-                float m;
-                float step;
-            } fade;
-
-            struct {
-                // Note parameters
-                float freq;
-                float vel;
-                int portamento;
-                int midinote;
-            } param;
-        } Legato;
+        float legatoFade;
+        float legatoFadeStep;
 
         const float log_0_01;    // logf(0.01);
         const float log_0_001;   // logf(0.001);
