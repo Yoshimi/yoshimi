@@ -112,7 +112,6 @@ class Part
         float         TransVolume;
         float         Ppanning;
         float         TransPanning;
-        unsigned char legatoFading;
         char Penabled; // this *must* be signed
         unsigned char Pminkey;
         unsigned char Pmaxkey;

@@ -724,7 +724,6 @@ void SynthEngine::SetController(unsigned char chan, int CCtype, short int par)
     //std::cout << "  min " << minPart<< "  max " << maxPart << "  Rec " << int(part[npart]->Prcvchn) << "  Chan " << int(chan) <<std::endl;
     for (npart = minPart; npart < maxPart; ++ npart)
     {   // Send the controller to all part assigned to the channel
-        part[npart]->legatoFading = 0;
         if (chan == part[npart]->Prcvchn)
         {
             if (CCtype == part[npart]->PbreathControl) // breath
@@ -1001,7 +1000,6 @@ int SynthEngine::setProgramFromBank(CommandBlock *getData, bool notinplace)
 bool SynthEngine::setProgram(string fname, int npart)
 {
     bool ok = true;
-    part[npart]->legatoFading = 0;
     if (!part[npart]->loadXMLinstrument(fname))
         ok = false;
     return ok;
@@ -2343,7 +2341,6 @@ void SynthEngine::ShutUp(void)
 
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
-        part[npart]->legatoFading = 0;
         part[npart]->cleanup();
         VUpeak.values.parts[npart] = -1.0f;
         VUpeak.values.partsR[npart] = -1.0f;

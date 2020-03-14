@@ -138,7 +138,6 @@ void Part::defaults(void)
     Pvelrand = 0;
     PbreathControl = 2;
     Peffnum = 0;
-    legatoFading = 0;
     setDestination(1);
     busy = false;
     defaultsinstrument();
@@ -269,19 +268,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
 {
     if (note < Pminkey || note > Pmaxkey)
         return;
-    /*
-     * In legato mode we only ever hear the newest
-     * note played, so it is acceptable to lose
-     * intemediate ones while going through a
-     * legato fade between held and newest note.
-     *
-     * The newer legato logic should work fine even
-     * during an existing fade; the existing fade
-     * just skips to the end, which is probably
-     * better than ignoring the NoteOn entirely.
-     */
-    if (Pkeymode > PART_MONO && legatoFading > 0)
-        return;
+
     // Legato and MonoMem used vars:
     int posb = POLIPHONY - 1;     // Just a dummy initial value.
     bool legatomodevalid = false; // true when legato mode is determined applicable.
@@ -429,7 +416,6 @@ void Part::NoteOn(int note, int velocity, bool renote)
             ctl->portamento.noteusing = pos;
         oldfreq = notebasefreq;
         lastpos = pos; // Keep a trace of used pos.
-        legatoFading = 0; // just to be sure
         if (doinglegato)
         {
             // Do Legato note
@@ -728,8 +714,6 @@ void Part::NoteOff(int note) //release the key
     int i;
     // This note is released, so we remove it from the list.
     monomemnotes.remove(note);
-    if (monomemnotes.empty())
-        legatoFading = 0;
 
     for ( i = POLIPHONY - 1; i >= 0; i--)
     {   //first note in, is first out if there are same note multiple times
@@ -815,7 +799,6 @@ void Part::SetController(unsigned int type, int par)
             setVolume(Pvolume);
             setPan(Ppanning);
             Pkeymode &= MIDI_NOT_LEGATO; // clear temporary legato mode
-            legatoFading = 0;
 
             for (int item = 0; item < NUM_KIT_ITEMS; ++item)
             {
