@@ -142,11 +142,6 @@ class SUBnote
         float legatoFade;
         float legatoFadeStep;
 
-        const float log_0_01;    // logf(0.01);
-        const float log_0_001;   // logf(0.001);
-        const float log_0_0001;  // logf(0.0001);
-        const float log_0_00001; // logf(0.00001);
-
         Presets::PresetsUpdate subNoteChange;
 
         SynthEngine *synth;

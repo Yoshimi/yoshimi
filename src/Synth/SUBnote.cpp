@@ -44,6 +44,18 @@ using synth::interpolateAmplitude;
 using synth::aboveAmplitudeThreshold;
 
 
+// These have little reason to exist, as GCC actually performs constant folding
+// on logf even on -O0 and Clang (currently, as of 9.0.1) constant-folds these
+// on -O1 and above. These used to be members of SUBnote initialized on note
+// construction. Thankfully constant folding would still occur, but it wasn't
+// ideal. Older compilers might generate library calls, so there might still be
+// some justification for this.
+const float LOG_0_01 = logf(0.01f);
+const float LOG_0_001 = logf(0.001f);
+const float LOG_0_0001 = logf(0.0001f);
+const float LOG_0_00001 = logf(0.00001f);
+
+
 SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
                  float velocity_, int portamento_, int midinote_, SynthEngine *_synth) :
     pars(parameters),
@@ -54,10 +66,6 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
     GlobalFilterR(NULL),
     GlobalFilterEnvelope(NULL),
     ctl(ctl_),
-    log_0_01(logf(0.01f)),
-    log_0_001(logf(0.001f)),
-    log_0_0001(logf(0.0001f)),
-    log_0_00001(logf(0.00001f)),
     subNoteChange(parameters),
     synth(_synth),
     filterStep(0)
@@ -138,10 +146,6 @@ SUBnote::SUBnote(const SUBnote &orig) :
     globalfiltercenterq(orig.globalfiltercenterq),
     legatoFade(0.0f), // Silent by default
     legatoFadeStep(0.0f), // Legato disabled
-    log_0_01(logf(0.01f)), //TODO: make these static
-    log_0_001(logf(0.001f)),
-    log_0_0001(logf(0.0001f)),
-    log_0_00001(logf(0.00001f)),
     subNoteChange(pars),
     synth(orig.synth),
     filterStep(orig.filterStep)
@@ -863,19 +867,19 @@ float SUBnote::getHgain(int harmonic)
     switch (pars->Phmagtype)
     {
         case 1:
-            hgain = expf(hmagnew * log_0_01);
+            hgain = expf(hmagnew * LOG_0_01);
             break;
 
         case 2:
-            hgain = expf(hmagnew * log_0_001);
+            hgain = expf(hmagnew * LOG_0_001);
             break;
 
         case 3:
-            hgain = expf(hmagnew * log_0_0001);
+            hgain = expf(hmagnew * LOG_0_0001);
             break;
 
         case 4:
-            hgain = expf(hmagnew * log_0_00001);
+            hgain = expf(hmagnew * LOG_0_00001);
             break;
 
         default:
