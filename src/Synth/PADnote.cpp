@@ -45,7 +45,6 @@ using synth::aboveAmplitudeThreshold;
 
 PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
     float velocity, int portamento_, int midinote_, SynthEngine *_synth) :
-    ready(false),
     finished_(false),
     pars(parameters),
     firsttime(true),
@@ -121,8 +120,6 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
         poshi_r = poshi_l;
     poslo = 0.0f;
 
-    ready = true; ///sa il pun pe asta doar cand e chiar gata
-
     if (parameters->sample[nsample].smp == NULL)
     {
         finished_ = true;
@@ -133,7 +130,6 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
 
 // Copy constructor, currently only used for legato
 PADnote::PADnote(const PADnote &orig) :
-    ready(1),
     finished_(orig.finished_),
     pars(orig.pars),
     poshi_l(orig.poshi_l),
@@ -497,7 +493,7 @@ int PADnote::noteout(float *outl,float *outr)
 
     computecurrentparameters();
     float *smps = pars->sample[nsample].smp;
-    if (smps == NULL || (legatoFade == 0.0f && legatoFadeStep == 0.0f))
+    if (smps == NULL)
     {
         memset(outl, 0, synth->sent_buffersize * sizeof(float));
         memset(outr, 0, synth->sent_buffersize * sizeof(float));

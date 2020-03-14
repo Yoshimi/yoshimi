@@ -1024,7 +1024,7 @@ void Part::ComputePartSmps(void)
             if (adnote)
             {
                 noteplay++;
-                if (adnote->ready)
+                if (adnote->ready())
                 {
                     adnote->noteout(tmpoutl, tmpoutr);
                     for (int i = 0; i < synth->sent_buffersize; ++i)
@@ -1043,7 +1043,7 @@ void Part::ComputePartSmps(void)
             if (subnote)
             {
                 noteplay++;
-                if (subnote->ready)
+                if (subnote->ready())
                 {
                     subnote->noteout(tmpoutl, tmpoutr);
                     for (int i = 0; i < synth->sent_buffersize; ++i)
@@ -1062,7 +1062,7 @@ void Part::ComputePartSmps(void)
             if (padnote)
             {
                 noteplay++;
-                if (padnote->ready)
+                if (padnote->ready())
                 {
                     padnote->noteout(tmpoutl, tmpoutr);
                     for (int i = 0 ; i < synth->sent_buffersize; ++i)

@@ -54,7 +54,9 @@ class SUBnote
         void releasekey(void);
         bool finished(void) { return !NoteEnabled; }
 
-        bool ready; // if I can get the sampledata
+        // Whether the note has samples to output.
+        // Currently only used for dormant legato notes.
+        bool ready() { return legatoFade != 0.0f || legatoFadeStep != 0.0f; };
 
     private:
         void computecurrentparameters(void);

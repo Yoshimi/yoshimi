@@ -70,9 +70,6 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
     synth(_synth),
     filterStep(0)
 {
-    // This probably isn't correct, see the ADnote copy constructor
-    ready = 0;
-
     // Initialise some legato-specific vars
     legatoFade = 1.0f; // Full volume
     legatoFadeStep = 0.0f; // Legato disabled
@@ -106,13 +103,11 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
     computecurrentparameters();
 
     oldamplitude = newamplitude;
-    ready = 1;
 }
 
 
 // Copy constructor, currently only exists for legato
 SUBnote::SUBnote(const SUBnote &orig) :
-    ready(1),
     pars(orig.pars),
     stereo(orig.stereo),
     numstages(orig.numstages),
@@ -714,8 +709,6 @@ int SUBnote::noteout(float *outl, float *outr)
     memset(outr, 0, synth->sent_bufferbytes);
     if (!NoteEnabled)
         return 0;
-    if (legatoFade == 0.0f && legatoFadeStep == 0.0f)
-        return 1; // No need to process more, but don't kill the note
 
     if (subNoteChange.checkUpdated())
     {

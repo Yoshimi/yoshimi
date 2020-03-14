@@ -50,7 +50,6 @@ using std::isgreater;
 
 ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
                float velocity_, int portamento_, int midinote_, SynthEngine *_synth) :
-    ready(0),
     adpars(adpars_),
     stereo(adpars->GlobalPar.PStereo),
     midinote(midinote_),
@@ -72,7 +71,6 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
 
 ADnote::ADnote(ADnote *orig, float freq_, int subVoiceNumber_, float *parentFMmod_,
                bool forFM_) :
-    ready(0),
     adpars(orig->adpars),
     stereo(adpars->GlobalPar.PStereo),
     midinote(orig->midinote),
@@ -94,11 +92,6 @@ ADnote::ADnote(ADnote *orig, float freq_, int subVoiceNumber_, float *parentFMmo
 
 // Copy constructor, currently only exists for legato
 ADnote::ADnote(const ADnote &orig, ADnote *parent, float *parentFMmod_) :
-    // Is ready used for synchronization? Everything that can
-    // currently access it runs on the same thread, and it needs to be
-    // accessed atomically if this is the case. It only gets set in
-    // one place: at the end of construct()
-    ready(orig.ready),
     adpars(orig.adpars), // Probably okay for legato?
     stereo(orig.stereo),
     midinote(orig.midinote),
@@ -647,8 +640,6 @@ void ADnote::construct()
     globalnewamplitude = NoteGlobalPar.Volume
                          * NoteGlobalPar.AmpEnvelope->envout_dB()
                          * NoteGlobalPar.AmpLfo->amplfoout();
-
-    ready = 1;
 }
 
 void ADnote::initSubVoices(void)
@@ -2476,8 +2467,6 @@ int ADnote::noteout(float *outl, float *outr)
 
     if (!NoteEnabled)
         return 0;
-    if (legatoFade == 0.0f && legatoFadeStep == 0.0f)
-        return 1; // No need to process more, but don't kill the note
 
     if (subVoiceNumber == -1) {
         memset(bypassl, 0, synth->sent_bufferbytes);

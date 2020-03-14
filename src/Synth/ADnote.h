@@ -63,7 +63,10 @@ class ADnote
         int finished() const;
         void legatoFadeIn(float freq_, float velocity_, int portamento_, int midinote_);
         void legatoFadeOut(const ADnote &syncwith);
-        char ready;
+
+        // Whether the note has samples to output.
+        // Currently only used for dormant legato notes.
+        bool ready() { return legatoFade != 0.0f || legatoFadeStep != 0.0f; };
 
     private:
 

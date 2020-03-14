@@ -54,7 +54,9 @@ class PADnote
         bool finished(void) { return finished_; };
         void releasekey(void);
 
-        bool ready;
+        // Whether the note has samples to output.
+        // Currently only used for dormant legato notes.
+        bool ready() { return legatoFade != 0.0f || legatoFadeStep != 0.0f; };
 
     private:
         void fadein(float *smps);
