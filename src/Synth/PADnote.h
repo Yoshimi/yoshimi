@@ -43,11 +43,12 @@ class PADnote
 {
     public:
         PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
-                float velocity, int portamento_, int midinote, bool besilent, SynthEngine *_synth);
+                float velocity, int portamento_, int midinote_, bool besilent, SynthEngine *_synth);
+        PADnote(const PADnote &orig);
         ~PADnote();
 
-        void PADlegatonote(float freq, float velocity,
-                           int portamento_, int midinote, bool externcall);
+        void legatoFadeIn(float freq_, float velocity_, int portamento_, int midinote_);
+        void legatoFadeOut(const PADnote &orig);
 
         int noteout(float *outl,float *outr);
         bool finished(void) { return finished_; };
@@ -59,7 +60,7 @@ class PADnote
         void fadein(float *smps);
         void computeNoteParameters();
         void computecurrentparameters();
-        void setBaseFreq();
+        void setBaseFreq(float basefreq_);
         bool finished_;
         PADnoteParameters *pars;
 
@@ -73,7 +74,7 @@ class PADnote
         bool firsttime;
         bool released;
 
-        int nsample, portamento;
+        int nsample, portamento, midinote;
 
         int Compute_Linear(float *outl, float *outr, int freqhi,
                            float freqlo);
@@ -134,26 +135,8 @@ class PADnote
         float randpanR;
 
         // Legato vars
-        struct {
-            bool silent;
-            float lastfreq;
-            LegatoMsg msg;
-            int decounter;
-            struct {
-                // Fade In/Out vars
-                int length;
-                float m;
-                float step;
-            } fade;
-
-            struct {
-                // Note parameters
-                float freq;
-                float vel;
-                int portamento;
-                int midinote;
-            } param;
-        } Legato;
+        float legatoFade;
+        float legatoFadeStep;
 
         Presets::PresetsUpdate padSynthUpdate;
 
