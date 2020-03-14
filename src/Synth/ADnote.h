@@ -50,7 +50,7 @@ class ADnote
 {
     public:
         ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_, float velocity_,
-               int portamento_, int midinote_, bool besilent, SynthEngine *_synth);
+               int portamento_, int midinote_, SynthEngine *_synth);
         ADnote(ADnote *parent, float freq_, int subVoiceNumber_, float *parentFMmod_,
                bool forFM_);
         ADnote(const ADnote &orig, ADnote *parent = NULL, float *parentFMmod = NULL);

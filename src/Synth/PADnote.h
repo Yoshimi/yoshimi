@@ -43,7 +43,7 @@ class PADnote
 {
     public:
         PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
-                float velocity, int portamento_, int midinote_, bool besilent, SynthEngine *_synth);
+                float velocity, int portamento_, int midinote_, SynthEngine *_synth);
         PADnote(const PADnote &orig);
         ~PADnote();
 

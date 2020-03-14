@@ -44,7 +44,7 @@ using synth::aboveAmplitudeThreshold;
 
 
 PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
-    float velocity, int portamento_, int midinote_, bool besilent, SynthEngine *_synth) :
+    float velocity, int portamento_, int midinote_, SynthEngine *_synth) :
     ready(false),
     finished_(false),
     pars(parameters),

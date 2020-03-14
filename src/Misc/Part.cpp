@@ -564,15 +564,15 @@ void Part::NoteOn(int note, int velocity, bool renote)
             if (kit[0].Padenabled)
                 partnote[pos].kititem[0].adnote =
                     new ADnote(kit[0].adpars, ctl, notebasefreq, vel,
-                                portamento, note, false, synth); // not silent
+                                portamento, note, synth);
             if (kit[0].Psubenabled)
                 partnote[pos].kititem[0].subnote =
                     new SUBnote(kit[0].subpars, ctl, notebasefreq, vel,
-                                portamento, note, false, synth);
+                                portamento, note, synth);
             if (kit[0].Ppadenabled)
                 partnote[pos].kititem[0].padnote =
                     new PADnote(kit[0].padpars, ctl, notebasefreq, vel,
-                                portamento, note, false, synth);
+                                portamento, note, synth);
             if (kit[0].Padenabled || kit[0].Psubenabled || kit[0].Ppadenabled)
                 partnote[pos].itemsplaying++;
 
@@ -669,17 +669,17 @@ void Part::NoteOn(int note, int velocity, bool renote)
                 {
                     partnote[pos].kititem[ci].adnote =
                         new ADnote(kit[item].adpars, ctl, notebasefreq, vel,
-                                    portamento, note, false, synth); // not silent
+                                    portamento, note, synth);
                 }
                 if (kit[item].subpars && kit[item].Psubenabled)
                     partnote[pos].kititem[ci].subnote =
                         new SUBnote(kit[item].subpars, ctl, notebasefreq, vel,
-                                    portamento, note, false, synth);
+                                    portamento, note, synth);
 
                 if (kit[item].padpars && kit[item].Ppadenabled)
                     partnote[pos].kititem[ci].padnote =
                         new PADnote(kit[item].padpars, ctl, notebasefreq, vel,
-                                    portamento, note, false, synth);
+                                    portamento, note, synth);
 
                 // Spawn another note (but silent) if legatomodevalid==true
                 if (legatomodevalid)

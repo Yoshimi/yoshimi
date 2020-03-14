@@ -42,7 +42,7 @@ class SUBnote
     public:
         SUBnote(SUBnoteParameters *parameters, Controller *ctl_,
                 float freq_, float velocity_, int portamento_,
-                int midinote_, bool besilent, SynthEngine *_synth);
+                int midinote_, SynthEngine *_synth);
         SUBnote(const SUBnote &rhs);
         ~SUBnote();
 

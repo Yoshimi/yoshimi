@@ -45,7 +45,7 @@ using synth::aboveAmplitudeThreshold;
 
 
 SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
-                 float velocity_, int portamento_, int midinote_, bool besilent, SynthEngine *_synth) :
+                 float velocity_, int portamento_, int midinote_, SynthEngine *_synth) :
     pars(parameters),
     velocity(velocity_ > 1.0f ? 1.0f : velocity_),
     portamento(portamento_),

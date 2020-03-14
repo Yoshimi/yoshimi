@@ -49,7 +49,7 @@ using std::isgreater;
 
 
 ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
-               float velocity_, int portamento_, int midinote_, bool besilent, SynthEngine *_synth) :
+               float velocity_, int portamento_, int midinote_, SynthEngine *_synth) :
     ready(0),
     adpars(adpars_),
     stereo(adpars->GlobalPar.PStereo),
