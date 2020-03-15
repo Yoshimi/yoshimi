@@ -1041,7 +1041,7 @@ Offset}
         label Minus
         callback {//
                 setPoly(PART::polyATtype::filterCutoffDown, o->value());}
-        xywh {150 45 70 15} down_box DOWN_BOX deactivate
+        xywh {150 45 70 15} down_box DOWN_BOX hide deactivate
       }
       Fl_Check_Button polypitchbend {
         label {Pitch Bend}

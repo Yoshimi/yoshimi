@@ -4,6 +4,9 @@ yoshimi 1.7.0 M
 * Created GUI for PolyAT.
   Can't yet run two effects at the same time.
 * PolyAT saved in patch sets.
+* Temporarly hid PolyAT negative filter cutoff.
+  It doesn't work at all well :(
+* Both PolyAT effect can now be run together.
 
 2020-3-12 Will
 * Small refinements to PolyAT.

@@ -993,7 +993,8 @@ void Part::ComputePartSmps(void)
 
     for (k = 0; k < POLIPHONY; ++k)
     {
-        int oldState;
+        int oldFilterState;
+        int oldBendState;
         if (partnote[k].status == KEY_OFF)
             continue;
         noteplay = 0;
@@ -1002,17 +1003,17 @@ void Part::ComputePartSmps(void)
         int polyATvalue = partnote[k].polyATvalue;
         if (polyATtype & PART::polyATtype::filterCutoff)
         {
-            oldState = ctl->filtercutoff.data;
-            float adjust = oldState / 127.0f;
+            oldFilterState = ctl->filtercutoff.data;
+            float adjust = oldFilterState / 127.0f;
             if (polyATtype & PART::polyATtype::filterCutoffDown)
-                ctl->setfiltercutoff(oldState - (polyATvalue * adjust));
+                ctl->setfiltercutoff(oldFilterState - (polyATvalue * adjust));
             else
-                ctl->setfiltercutoff(oldState + (polyATvalue * adjust));
+                ctl->setfiltercutoff(oldFilterState + (polyATvalue * adjust));
         }
         if (polyATtype & PART::polyATtype::pitchBend)
         {
             polyATvalue *= 64.0f;
-            oldState = ctl->pitchwheel.data;
+            oldBendState = ctl->pitchwheel.data;
             if (polyATtype & PART::polyATtype::pitchBendDown)
                 ctl->setpitchwheel(-polyATvalue);
             else
@@ -1089,9 +1090,9 @@ void Part::ComputePartSmps(void)
             KillNotePos(k);
 
         if (polyATtype & PART::polyATtype::filterCutoff)
-            ctl->setfiltercutoff(oldState);
+            ctl->setfiltercutoff(oldFilterState);
         if (polyATtype & PART::polyATtype::pitchBend)
-            ctl->setpitchwheel(oldState);
+            ctl->setpitchwheel(oldBendState);
     }
 
     // Apply part's effects and mix them
