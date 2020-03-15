@@ -196,8 +196,6 @@ void PADnote::legatoFadeIn(float freq_, float velocity_, int portamento_, int mi
 
     setBaseFreq(freq_);
 
-    computeNoteParameters();
-
     globalnewamplitude = NoteGlobalPar.Volume
         * NoteGlobalPar.AmpEnvelope->envout_dB()
         * NoteGlobalPar.AmpLfo->amplfoout();
@@ -207,6 +205,8 @@ void PADnote::legatoFadeIn(float freq_, float velocity_, int portamento_, int mi
     {
         legatoFade = 0.0f; // Start silent
         legatoFadeStep = synth->fadeStepShort; // Positive steps
+
+        computeNoteParameters();
     }
 }
 
