@@ -1,7 +1,7 @@
 /*
     Data2Text.cpp - conversion of commandBlock entries to text
 
-    Copyright 2019 Will Godfrey
+    Copyright 2020 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -1312,6 +1312,30 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
                     contstr += "Mono";
                 else if (value_int >= 2)
                     contstr += "Legato";
+            }
+            break;
+        case PART::control::polyATset:
+            showValue = false;
+            contstr = "PolyAT";
+            if (addValue)
+            {
+                if (value_int == PART::polyATtype::off)
+                    contstr += " Off";
+                else
+                {
+                    if (value_int & PART::polyATtype::filterCutoff)
+                    {
+                        contstr += "\n Filter Cutoff";
+                        if (value_int & PART::polyATtype::filterCutoffDown)
+                            contstr += " Minus";
+                    }
+                    if (value_int & PART::polyATtype::pitchBend)
+                    {
+                        contstr += "\n Pitch Bend";
+                        if (value_int & PART::polyATtype::pitchBendDown)
+                            contstr += " Minus";
+                    }
+                }
             }
             break;
         case PART::control::portamento:

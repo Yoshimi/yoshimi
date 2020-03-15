@@ -123,6 +123,7 @@ void Part::defaults(void)
     Pminkey = 0;
     Pmaxkey = 127;
     Pkeymode = PART_POLY;
+    PpolyATchoice = 0;
     setVolume(96);
     TransVolume = 128; // ensure it always gets set
     Pkeyshift = 64;
@@ -1320,6 +1321,7 @@ void Part::add2XML(XMLwrapper *xml, bool subset)
     // the following two lines maintain backward compatibility
         xml->addparbool("poly_mode", (Pkeymode & MIDI_NOT_LEGATO) == PART_POLY);
         xml->addpar("legato_mode", (Pkeymode & MIDI_NOT_LEGATO) == PART_LEGATO);
+        xml->addpar("polyphonic_aftertouch", PpolyATchoice);
         xml->addpar("key_limit", Pkeylimit);
         xml->addpar("random_detune", Pfrand);
         xml->addpar("random_velocity", Pvelrand);
@@ -1551,6 +1553,8 @@ void Part::getfromXML(XMLwrapper *xml)
         Pkeymode = PART_POLY;
     else
         Pkeymode = PART_MONO;
+
+    PpolyATchoice = xml->getpar("polyphonic_aftertouch", PpolyATchoice, 0, 255);
 
     Pkeylimit = xml->getpar127("key_limit", Pkeylimit);
     if (Pkeylimit < 1)

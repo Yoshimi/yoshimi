@@ -3096,6 +3096,12 @@ void InterChange::commandPart(CommandBlock *getData)
             else
                 value = (synth->ReadPartKeyMode(npart)) & 3; // clear out temporary legato
             break;
+        case PART::control::polyATset:
+            if (write)
+                part->PpolyATchoice = value_int;
+            else
+                value = part->PpolyATchoice;
+            break;
         case PART::control::portamento:
             if (write)
                 part->ctl->portamento.portamento = value_bool;

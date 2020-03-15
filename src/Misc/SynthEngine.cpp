@@ -675,7 +675,7 @@ void SynthEngine::SetController(unsigned char chan, int CCtype, short int par)
     {
         int note = par & 0xff;
         int value = par >> 8;
-        int type = PART::polyATtype::filterCutoff;
+        int type = part[chan]->PpolyATchoice;
         if (value == 0)
             type = 0;
         std::cout << "Poly chan " << chan + 1 << "  note " << note << "  pres " << value << std::endl;

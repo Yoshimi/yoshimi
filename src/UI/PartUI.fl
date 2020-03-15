@@ -11,7 +11,7 @@ comment {PartUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2019, Will Godfrey
+Copyright 2014-2020, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -776,7 +776,7 @@ Offset}
     }
     Fl_Window ctlwindow {
       label Controllers
-      xywh {756 52 505 130} type Double hide
+      xywh {748 171 505 130} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Controllers").c_str());}
       code1 {o->position(synth->getGuiMaster()->controllersX, synth->getGuiMaster()->controllersY);}
     } {
@@ -888,6 +888,7 @@ Offset}
       Fl_Button {} {
         label Close
         callback {//
+        polyphonicaftertouch->hide();
         ctlwindow->hide();}
         xywh {405 105 95 20} box THIN_UP_BOX
       }
@@ -999,6 +1000,74 @@ Offset}
           code2 {else {propta->deactivate();proptb->deactivate();}}
         }
       }
+      Fl_Button polyat {
+        label {Poly Aftertouch}
+        callback {//
+                polyphonicaftertouch->show();}
+        xywh {245 105 130 20}
+      }
+    }
+    Fl_Window polyphonicaftertouch {
+      label {Poly Aftertouch}
+      xywh {192 26 275 125} type Double hide
+    } {
+      Fl_Button polyoff {
+        label Off
+        callback {//
+                polyfiltercutoff->value(0);
+                polyfilterCminus->value(0);
+                polyfilterCminus->deactivate();
+                polypitchbend->value(0);
+                polypitchBminus->value(0);
+                polypitchBminus->deactivate();
+
+                setPoly(PART::polyATtype::off, true);}
+        xywh {55 20 48 20}
+      }
+      Fl_Check_Button polyfiltercutoff {
+        label {Filter Cutoff}
+        callback {//
+                if (o->value())
+                    polyfilterCminus->activate();
+                else
+                {
+                    polyfilterCminus->value(0);
+                    polyfilterCminus->deactivate();
+                }
+                setPoly(PART::polyATtype::filterCutoff, o->value());}
+        xywh {25 45 70 15} down_box DOWN_BOX
+      }
+      Fl_Check_Button polyfilterCminus {
+        label Minus
+        callback {//
+                setPoly(PART::polyATtype::filterCutoffDown, o->value());}
+        xywh {150 45 70 15} down_box DOWN_BOX deactivate
+      }
+      Fl_Check_Button polypitchbend {
+        label {Pitch Bend}
+        callback {//
+                if (o->value())
+                    polypitchBminus->activate();
+                else
+                {
+                    polypitchBminus->value(0);
+                    polypitchBminus->deactivate();
+                }
+                setPoly(PART::polyATtype::pitchBend, o->value());}
+        xywh {25 65 70 15} down_box DOWN_BOX
+      }
+      Fl_Check_Button polypitchBminus {
+        label Minus
+        callback {//
+                setPoly(PART::polyATtype::pitchBendDown, o->value());}
+        xywh {150 65 70 15} down_box DOWN_BOX deactivate
+      }
+      Fl_Button {} {
+        label Close
+        callback {//
+        polyphonicaftertouch->hide();}
+        xywh {217 97 50 20} box THIN_UP_BOX
+      }
     }
     Fl_Window ctlmidi {
       label {MIDI Controls}
@@ -1048,8 +1117,8 @@ Offset}
       }
       Fl_Button {} {
         label Close
-        callback {//
-        ctlmidi->hide();}
+        callback {//;
+                ctlmidi->hide();}
         xywh {309 35 50 20} box THIN_UP_BOX
       }
     }
@@ -1060,17 +1129,17 @@ Offset}
     } {
       Fl_Spinner inseffnocounter {
         callback {//
-        ninseff = o->value() - 1;
-        insefftype->value(part->partefx[ninseff]->geteffect());
+                ninseff = o->value() - 1;
+                insefftype->value(part->partefx[ninseff]->geteffect());
 
-        inseffectui->refresh(part->partefx[ninseff], npart, ninseff);
-        int x = part->Pefxroute[ninseff];
-        if (x == 127)
-            x = 1;
-        bypasseff->value(part->Pefxbypass[ninseff]);
-        sendtochoice->value(x);
+                inseffectui->refresh(part->partefx[ninseff], npart, ninseff);
+                int x = part->Pefxroute[ninseff];
+                if (x == 127)
+                    x = 1;
+                bypasseff->value(part->Pefxbypass[ninseff]);
+                sendtochoice->value(x);
 
-        send_data(0, PART::control::effectNumber, ninseff, TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
+                send_data(0, PART::control::effectNumber, ninseff, TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
         tooltip {Effect No.} xywh {35 8 35 22} labelsize 12 maximum 3 textsize 11
         code1 {o->value(ninseff+1);}
       }
@@ -1702,6 +1771,11 @@ Offset}
             keymode->damage(1);
             break;
 
+        case PART::control::polyATset:
+            polyATselection = valInt;
+            fetchPoly();
+            break;
+
         case PART::control::portamento:
             enportamento->value(valBool);
             break;
@@ -2188,6 +2262,49 @@ Offset}
     thtype->value(part->ctl->portamento.pitchthreshtype);
     proptb->value(part->ctl->portamento.propDepth);} {}
   }
+  Function {fetchPoly()} {} {
+    code {//
+            polyfiltercutoff->value(0); // clear settings first
+            polyfilterCminus->value(0);
+            polyfilterCminus->deactivate();
+            polypitchbend->value(0);
+            polypitchBminus->value(0);
+            polypitchBminus->deactivate();
+
+    if (polyATselection & PART::polyATtype::filterCutoff)
+    {
+         polyfiltercutoff->value(1);
+         polyfilterCminus->activate();
+         if (polyATselection & PART::polyATtype::filterCutoffDown)
+             polyfilterCminus->value(1);
+    }
+    if (polyATselection & PART::polyATtype::pitchBend)
+    {
+        polypitchbend->value(1);
+         polypitchBminus->activate();
+        if (polyATselection & PART::polyATtype::pitchBendDown)
+            polypitchBminus->value(1);
+    }} {}
+  }
+  Function {setPoly(int type, int state)} {} {
+    code {//
+        if (type == PART::polyATtype::off)
+            polyATselection = 0;
+        else
+        {
+            if (state > 0)
+                polyATselection |= type;
+            else
+            {
+                polyATselection &= ~type;
+                if (type == PART::polyATtype::filterCutoff)
+                    polyATselection &= ~PART::polyATtype::filterCutoffDown;
+                else if (type == PART::polyATtype::pitchBend)
+                    polyATselection &= ~PART::polyATtype::pitchBendDown;
+            }
+        }
+        send_data(0, PART::polyATset, polyATselection, TOPLEVEL::type::Integer);} {}
+  }
   Function {init(Part *part_,int npart_,BankUI *bankui_)} {} {
     code {//
     synth = part_->getSynthEngine();
@@ -2204,6 +2321,9 @@ Offset}
         bool status = fetchData(0, 200, npart, efftype + EFFECT::type::none, ninseff);
         inseffectui->UpdatePresetColour(status, insefftype->value());
     }
+
+    polyATselection = int(fetchData(0, PART::control::polyATset, npart));
+    fetchPoly();
     partgroup->show();
     lastkey = -1;
     end();} {}
@@ -2405,6 +2525,8 @@ Offset}
     if (padnoteui)
         delete padnoteui;
     partgroup->hide();
+    polyphonicaftertouch->hide();
+    delete polyphonicaftertouch;
     ctlwindow->hide();
     delete ctlwindow;
     ctlmidi->hide();
@@ -2449,5 +2571,7 @@ Offset}
   decl {bool partKitOn;} {public local
   }
   decl {int lastkey;} {private local
+  }
+  decl {int polyATselection;} {private local
   }
 }
