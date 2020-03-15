@@ -688,9 +688,27 @@ void ADnote::legatoFadeIn(float freq_, float velocity_, int portamento_, int mid
     {
         legatoFade = 0.0f; // Start silent
         legatoFadeStep = synth->fadeStepShort; // Positive steps
-    }
 
-    computeNoteParameters();
+        // Re-randomize harmonics, but only if we're not doing portamento
+        if (subVoiceNumber == -1)
+            for (int i = 0; i < NUM_VOICES; ++i)
+            {
+                adpars->VoicePar[i].OscilSmp->newrandseed();
+                auto &extoscil = adpars->VoicePar[i].Pextoscil;
+                if (extoscil != -1 && !adpars->GlobalPar.Hrandgrouping)
+                    adpars->VoicePar[extoscil].OscilSmp->newrandseed();
+            }
+
+        // This recalculates certain things like harmonic phase/amplitude randomness,
+        // which we probably don't want with portamento. This may not even be
+        // desirable with plain legato, but it at least makes some sense in that
+        // case. Portamento should be a smooth change in pitch, with no change in
+        // timbre, or at least a gradual one. It may be desirable to have base
+        // frequency sensitive things like filter scaling and envelope stretching
+        // take portamento into account, but to do this properly would require more
+        // than just recalculating based on basefreq.
+        computeNoteParameters();
+    }
 }
 
 // This exists purely to avoid boilerplate. It might be useful
