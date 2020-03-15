@@ -190,7 +190,7 @@ void SUBnote::legatoFadeIn(float freq_, float velocity_, int portamento_, int mi
     if (!portamento) // Do not crossfade portamento
     {
         legatoFade = 0.0f; // Start silent
-        legatoFadeStep = 1.0f / (synth->samplerate_f * 0.005f); // 5ms fade, positive steps
+        legatoFadeStep = synth->fadeStepShort; // Positive steps
 
         // I'm not sure if these are necessary or even beneficial
         oldpitchwheel = 0;
@@ -260,7 +260,7 @@ void SUBnote::legatoFadeOut(const SUBnote &orig)
         numharmonics * sizeof(float));
 
     legatoFade = 1.0f; // Start at full volume
-    legatoFadeStep = -1.0f / (synth->samplerate_f * 0.005f); // 5ms fade, negative steps
+    legatoFadeStep = -synth->fadeStepShort; // Negative steps
 }
 
 

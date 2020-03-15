@@ -164,7 +164,11 @@ class SynthEngine
 
         Part *part[NUM_MIDI_PARTS];
         unsigned int fadeAll;
+        // Per sample change in gain calculated whenever samplerate changes (which
+        // is currently only on init). fadeStep is used in SynthEngine, while
+        // fadeStepShort is used directly by notes, currently only for legato.
         float fadeStep;
+        float fadeStepShort;
         float fadeLevel;
 
         // parameters

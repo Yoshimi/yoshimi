@@ -232,8 +232,17 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 
     oscilsize_f = oscilsize = Runtime.Oscilsize;
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
-    fadeStep = 10.0f / samplerate; // 100mS fade
-    ControlStep = (127.0f / samplerate) * 5.0f; // 200mS for 0 to 127
+    // distance / duration / second = distance / (duration * second)
+    // While some might prefer to write this as the latter, when distance and
+    // duration are constants the latter incurs two roundings while the former
+    // brings the constants together, allowing constant-folding. -ffast-math
+    // produces the same assembly in both cases, and we normally compile with it
+    // enabled, but it's probably a bad habit to rely on non-IEEE float math too
+    // much. If we were doing integer division, even -ffast-math wouldn't save
+    // us, and the rounding behaviour would actually be important.
+    fadeStep = 1.0f / 0.1f / samplerate_f; // 100ms for 0 to 1
+    fadeStepShort = 1.0f / 0.005f / samplerate_f; // 5ms for 0 to 1
+    ControlStep = 127.0f / 0.2f / samplerate_f; // 200ms for 0 to 127
 
     if (oscilsize < (buffersize / 2))
     {

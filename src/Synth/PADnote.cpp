@@ -206,7 +206,7 @@ void PADnote::legatoFadeIn(float freq_, float velocity_, int portamento_, int mi
     if (!portamento) // Do not crossfade portamento
     {
         legatoFade = 0.0f; // Start silent
-        legatoFadeStep = 1.0f / (synth->samplerate_f * 0.005f); // 5ms fade, positive steps
+        legatoFadeStep = synth->fadeStepShort; // Positive steps
     }
 }
 
@@ -259,7 +259,7 @@ void PADnote::legatoFadeOut(const PADnote &orig)
     gpar.GlobalFilterR = new Filter(*oldgpar.GlobalFilterR);
 
     legatoFade = 1.0f; // Start at full volume
-    legatoFadeStep = -1.0f / (synth->samplerate_f * 0.005f); // 5ms fade, negative steps
+    legatoFadeStep = -synth->fadeStepShort; // Negative steps
 }
 
 
