@@ -610,7 +610,7 @@ void PADnoteParameters::applyparameters()
         samplemax = 1;
 
     // prepare a BIG FFT stuff
-    FFTwrapper *fft = new FFTwrapper(samplesize);
+    FFTwrapper fft = FFTwrapper(samplesize);
     FFTFREQS fftfreqs;
     FFTwrapper::newFFTFREQS(&fftfreqs, samplesize / 2);
 
@@ -641,7 +641,7 @@ void PADnoteParameters::applyparameters()
             fftfreqs.c[i] = spectrum[i] * cosf(phase);
             fftfreqs.s[i] = spectrum[i] * sinf(phase);
         }
-        fft->freqs2smps(&fftfreqs, newsample.smp);
+        fft.freqs2smps(&fftfreqs, newsample.smp);
         // that's all; here is the only ifft for the whole sample; no windows are used ;-)
 
         // normalize(rms)
@@ -666,7 +666,6 @@ void PADnoteParameters::applyparameters()
         sample[nsample].basefreq = basefreq * basefreqadjust;
         newsample.smp = NULL;
     }
-    delete fft;
     FFTwrapper::deleteFFTFREQS(&fftfreqs);
 
     // delete the additional samples that might exists and are not useful
