@@ -74,7 +74,7 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
     legatoFade = 1.0f; // Full volume
     legatoFadeStep = 0.0f; // Legato disabled
 
-    NoteEnabled = true;
+    NoteStatus = NOTE_ENABLED;
 
     numstages = pars->Pnumstages;
     stereo = pars->Pstereo;
@@ -126,7 +126,9 @@ SUBnote::SUBnote(const SUBnote &orig) :
     GlobalFilterL(NULL),
     GlobalFilterR(NULL),
     GlobalFilterEnvelope(NULL),
-    NoteEnabled(orig.NoteEnabled),
+    // For legato. Move this somewhere else if copying
+    // notes gets used for another purpose
+    NoteStatus(NOTE_KEEPALIVE),
     firsttick(orig.firsttick),
     volume(orig.volume),
     oldamplitude(orig.oldamplitude),
@@ -266,15 +268,14 @@ void SUBnote::legatoFadeOut(const SUBnote &orig)
 
 SUBnote::~SUBnote()
 {
-    if (NoteEnabled)
-        KillNote();
+    KillNote();
 }
 
 
 // Kill the note
 void SUBnote::KillNote(void)
 {
-    if (NoteEnabled)
+    if (NoteStatus != NOTE_DISABLED)
     {
         delete [] lfilter;
         lfilter = NULL;
@@ -286,7 +287,7 @@ void SUBnote::KillNote(void)
             delete FreqEnvelope;
         if (BandWidthEnvelope != NULL)
             delete BandWidthEnvelope;
-        NoteEnabled = false;
+        NoteStatus = NOTE_DISABLED;
     }
 }
 
@@ -707,7 +708,7 @@ int SUBnote::noteout(float *outl, float *outr)
     tmprnd = synth->getRuntime().genTmp2;
     memset(outl, 0, synth->sent_bufferbytes);
     memset(outr, 0, synth->sent_bufferbytes);
-    if (!NoteEnabled)
+    if (NoteStatus == NOTE_DISABLED)
         return 0;
 
     if (subNoteChange.checkUpdated())
@@ -847,6 +848,8 @@ void SUBnote::releasekey(void)
         BandWidthEnvelope->releasekey();
     if (GlobalFilterEnvelope != NULL)
         GlobalFilterEnvelope->releasekey();
+    if (NoteStatus == NOTE_KEEPALIVE)
+        NoteStatus = NOTE_ENABLED;
 }
 
 float SUBnote::getHgain(int harmonic)

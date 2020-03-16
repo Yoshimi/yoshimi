@@ -60,7 +60,11 @@ class ADnote
 
         int noteout(float *outl, float *outr);
         void releasekey();
-        int finished() const;
+        bool finished() const
+        {
+            return NoteStatus == NOTE_DISABLED ||
+                (NoteStatus != NOTE_KEEPALIVE && legatoFade == 0.0f);
+        }
         void legatoFadeIn(float freq_, float velocity_, int portamento_, int midinote_);
         void legatoFadeOut(const ADnote &syncwith);
 
@@ -119,7 +123,11 @@ class ADnote
         float velocity;
         float basefreq;
 
-        bool NoteEnabled;
+        enum {
+            NOTE_DISABLED,
+            NOTE_ENABLED,
+            NOTE_KEEPALIVE
+        } NoteStatus;
         Controller *ctl;
 
         // Global parameters
@@ -306,11 +314,5 @@ class ADnote
 
         SynthEngine *synth;
 };
-
-
-inline int ADnote::finished() const // Check if the note is finished
-{
-    return (NoteEnabled) ? 0 : 1;
-}
 
 #endif

@@ -55,7 +55,7 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
     midinote(midinote_),
     velocity(velocity_),
     basefreq(freq_),
-    NoteEnabled(true),
+    NoteStatus(NOTE_ENABLED),
     ctl(ctl_),
     time(0.0f),
     forFM(false),
@@ -76,7 +76,7 @@ ADnote::ADnote(ADnote *orig, float freq_, int subVoiceNumber_, float *parentFMmo
     midinote(orig->midinote),
     velocity(orig->velocity),
     basefreq(freq_),
-    NoteEnabled(true),
+    NoteStatus(NOTE_ENABLED),
     ctl(orig->ctl),
     time(0.0f),
     forFM(forFM_),
@@ -97,7 +97,9 @@ ADnote::ADnote(const ADnote &orig, ADnote *parent, float *parentFMmod_) :
     midinote(orig.midinote),
     velocity(orig.velocity),
     basefreq(orig.basefreq),
-    NoteEnabled(orig.NoteEnabled),
+    // For legato. Move this somewhere else if copying
+    // notes gets used for another purpose
+    NoteStatus(NOTE_KEEPALIVE),
     ctl(orig.ctl),
     NoteGlobalPar(orig.NoteGlobalPar),
     time(orig.time), // This is incremented, but never actually used for some reason
@@ -949,13 +951,13 @@ void ADnote::killNote()
     delete NoteGlobalPar.FilterEnvelope;
     delete NoteGlobalPar.FilterLfo;
 
-    NoteEnabled = false;
+    NoteStatus = NOTE_DISABLED;
 }
 
 
 ADnote::~ADnote()
 {
-    if (NoteEnabled)
+    if (NoteStatus != NOTE_DISABLED)
         killNote();
 
     for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
@@ -2483,7 +2485,7 @@ int ADnote::noteout(float *outl, float *outr)
         memset(outr, 0, synth->sent_bufferbytes);
     }
 
-    if (!NoteEnabled)
+    if (NoteStatus == NOTE_DISABLED)
         return 0;
 
     if (subVoiceNumber == -1) {
@@ -2836,6 +2838,8 @@ void ADnote::releasekey(void)
     NoteGlobalPar.FreqEnvelope->releasekey();
     NoteGlobalPar.FilterEnvelope->releasekey();
     NoteGlobalPar.AmpEnvelope->releasekey();
+    if (NoteStatus == NOTE_KEEPALIVE)
+        NoteStatus = NOTE_ENABLED;
 }
 
 // for future reference ... re replacing pow(x, y) by exp(y * log(x))

@@ -45,7 +45,7 @@ using synth::aboveAmplitudeThreshold;
 
 PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
     float velocity, int portamento_, int midinote_, SynthEngine *_synth) :
-    finished_(false),
+    NoteStatus(NOTE_ENABLED),
     pars(parameters),
     firsttime(true),
     released(false),
@@ -122,7 +122,7 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
 
     if (parameters->sample[nsample].smp == NULL)
     {
-        finished_ = true;
+        NoteStatus = NOTE_DISABLED;
         return;
     }
 }
@@ -130,7 +130,9 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
 
 // Copy constructor, currently only used for legato
 PADnote::PADnote(const PADnote &orig) :
-    finished_(orig.finished_),
+    // For legato. Move this somewhere else if copying
+    // notes gets used for another purpose
+    NoteStatus(NOTE_KEEPALIVE),
     pars(orig.pars),
     poshi_l(orig.poshi_l),
     poshi_r(orig.poshi_r),
@@ -186,7 +188,7 @@ void PADnote::legatoFadeIn(float freq_, float velocity_, int portamento_, int mi
 {
     if (pars->sample[nsample].smp == NULL)
     {
-        finished_ = true;
+        NoteStatus = NOTE_DISABLED;
         return;
     }
 
@@ -411,7 +413,7 @@ int PADnote::Compute_Linear(float *outl, float *outr, int freqhi, float freqlo)
     float *smps = pars->sample[nsample].smp;
     if (smps == NULL)
     {
-        finished_ = true;
+        NoteStatus = NOTE_DISABLED;
         return 1;
     }
     int size = pars->sample[nsample].size;
@@ -442,7 +444,7 @@ int PADnote::Compute_Cubic(float *outl, float *outr, int freqhi, float freqlo)
     float *smps = pars->sample[nsample].smp;
     if (smps == NULL)
     {
-        finished_ = true;
+        NoteStatus = NOTE_DISABLED;
         return 1;
     }
     int size = pars->sample[nsample].size;
@@ -602,7 +604,7 @@ int PADnote::noteout(float *outl,float *outr)
             outl[i] *= tmp;
             outr[i] *= tmp;
         }
-        finished_ = 1;
+        NoteStatus = NOTE_DISABLED;
     }
     return 1;
 }
@@ -613,4 +615,6 @@ void PADnote::releasekey()
     NoteGlobalPar.FreqEnvelope->releasekey();
     NoteGlobalPar.FilterEnvelope->releasekey();
     NoteGlobalPar.AmpEnvelope->releasekey();
+    if (NoteStatus == NOTE_KEEPALIVE)
+        NoteStatus = NOTE_ENABLED;
 }

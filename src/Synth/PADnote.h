@@ -51,7 +51,11 @@ class PADnote
         void legatoFadeOut(const PADnote &orig);
 
         int noteout(float *outl,float *outr);
-        bool finished(void) { return finished_; };
+        bool finished() const
+        {
+            return NoteStatus == NOTE_DISABLED ||
+                (NoteStatus != NOTE_KEEPALIVE && legatoFade == 0.0f);
+        }
         void releasekey(void);
 
         // Whether the note has samples to output.
@@ -63,7 +67,11 @@ class PADnote
         void computeNoteParameters();
         void computecurrentparameters();
         void setBaseFreq(float basefreq_);
-        bool finished_;
+        enum {
+            NOTE_DISABLED,
+            NOTE_ENABLED,
+            NOTE_KEEPALIVE
+        } NoteStatus;
         PADnoteParameters *pars;
 
         int poshi_l;

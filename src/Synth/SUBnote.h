@@ -52,7 +52,11 @@ class SUBnote
         int noteout(float *outl,float *outr); // note output, return 0 if the
                                               // note is finished
         void releasekey(void);
-        bool finished(void) { return !NoteEnabled; }
+        bool finished() const
+        {
+            return NoteStatus == NOTE_DISABLED ||
+                (NoteStatus != NOTE_KEEPALIVE && legatoFade == 0.0f);
+        }
 
         // Whether the note has samples to output.
         // Currently only used for dormant legato notes.
@@ -89,7 +93,11 @@ class SUBnote
         Envelope *GlobalFilterEnvelope;
 
         // internal values
-        bool NoteEnabled;
+        enum {
+            NOTE_DISABLED,
+            NOTE_ENABLED,
+            NOTE_KEEPALIVE
+        } NoteStatus;
         int firsttick;
         float volume;
         float oldamplitude;
