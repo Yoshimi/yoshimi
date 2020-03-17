@@ -1,5 +1,8 @@
 yoshimi 1.7.0 M
 
+2020-3-17 Will
+* Implemented Modulation PolyAT.
+
 2020-3-15 Will
 * Created GUI for PolyAT.
   Can't yet run two effects at the same time.

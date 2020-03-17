@@ -660,7 +660,7 @@ namespace PART // usage PART::control::volume
         const unsigned int filterCutoffDown = 2;
         const unsigned int pitchBend = 4;
         const unsigned int pitchBendDown = 8;
-        const unsigned int volume = 16;
+        const unsigned int modulation = 16;
     }
 }
 

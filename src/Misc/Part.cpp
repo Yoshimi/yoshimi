@@ -995,6 +995,7 @@ void Part::ComputePartSmps(void)
     {
         int oldFilterState;
         int oldBendState;
+        int oldModulationState;
         if (partnote[k].status == KEY_OFF)
             continue;
         noteplay = 0;
@@ -1018,6 +1019,11 @@ void Part::ComputePartSmps(void)
                 ctl->setpitchwheel(-polyATvalue);
             else
                 ctl->setpitchwheel(polyATvalue);
+        }
+        if (polyATtype & PART::polyATtype::modulation)
+        {
+            oldModulationState = ctl->modwheel.data;
+            ctl->setmodwheel(polyATvalue);
         }
 
         // get the sampledata of the note and kill it if it's finished
@@ -1093,6 +1099,8 @@ void Part::ComputePartSmps(void)
             ctl->setfiltercutoff(oldFilterState);
         if (polyATtype & PART::polyATtype::pitchBend)
             ctl->setpitchwheel(oldBendState);
+        if (polyATtype & PART::polyATtype::modulation)
+            ctl->setmodwheel(oldModulationState);
     }
 
     // Apply part's effects and mix them

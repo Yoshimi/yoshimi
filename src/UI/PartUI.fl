@@ -1020,7 +1020,7 @@ Offset}
                 polypitchbend->value(0);
                 polypitchBminus->value(0);
                 polypitchBminus->deactivate();
-
+                polymodulation->value(0);
                 setPoly(PART::polyATtype::off, true);}
         xywh {55 20 48 20}
       }
@@ -1061,6 +1061,12 @@ Offset}
         callback {//
                 setPoly(PART::polyATtype::pitchBendDown, o->value());}
         xywh {150 65 70 15} down_box DOWN_BOX deactivate
+      }
+      Fl_Check_Button polymodulation {
+        label Modulation
+        callback {//
+                setPoly(PART::polyATtype::modulation, o->value());}
+        xywh {25 85 70 15} down_box DOWN_BOX
       }
       Fl_Button {} {
         label Close
@@ -2270,6 +2276,7 @@ Offset}
             polypitchbend->value(0);
             polypitchBminus->value(0);
             polypitchBminus->deactivate();
+            polymodulation->value(0);
 
     if (polyATselection & PART::polyATtype::filterCutoff)
     {
@@ -2284,7 +2291,9 @@ Offset}
          polypitchBminus->activate();
         if (polyATselection & PART::polyATtype::pitchBendDown)
             polypitchBminus->value(1);
-    }} {}
+    }
+    if (polyATselection & PART::polyATtype::modulation)
+        polymodulation->value(1);} {}
   }
   Function {setPoly(int type, int state)} {} {
     code {//

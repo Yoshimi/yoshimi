@@ -1335,6 +1335,8 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
                         if (value_int & PART::polyATtype::pitchBendDown)
                             contstr += " Minus";
                     }
+                    if (value_int & PART::polyATtype::modulation)
+                        contstr += "\n Modulation";
                 }
             }
             break;
