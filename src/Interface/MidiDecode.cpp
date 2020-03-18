@@ -197,7 +197,7 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
         return;
     }
     // do what's left!
-    if (ctrl < 0x80 || ctrl == MIDI::CC::keyPressure) // don't want to pick up strays
+    if (ctrl < 0x80 || ctrl == MIDI::CC::channelPressure || ctrl == MIDI::CC::keyPressure) // don't want to pick up strays
         sendMidiCC(inSync, ch, ctrl, param);
 }
 
