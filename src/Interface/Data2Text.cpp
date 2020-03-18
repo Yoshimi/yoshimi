@@ -1342,7 +1342,7 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
             break;
         case PART::control::keyATset:
             showValue = false;
-            contstr = "PolyAT";
+            contstr = "KeyAT";
             if (addValue)
             {
                 if (value_int == PART::aftertouchType::off)

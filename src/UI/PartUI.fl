@@ -1025,7 +1025,7 @@ Offset}
                 channelpitchBminus->value(0);
                 channelpitchBminus->deactivate();
                 channelmodulation->value(0);
-                setChannel(PART::aftertouchType::off, true);}
+                setATchannel(PART::aftertouchType::off, true);}
         xywh {55 40 48 20}
       }
       Fl_Check_Button channelfiltercutoff {
@@ -1038,13 +1038,13 @@ Offset}
                     channelfilterCminus->value(0);
                     channelfilterCminus->deactivate();
                 }
-                setChannel(PART::aftertouchType::filterCutoff, o->value());}
+                setATchannel(PART::aftertouchType::filterCutoff, o->value());}
         xywh {25 65 70 15} down_box DOWN_BOX
       }
       Fl_Check_Button channelfilterCminus {
         label Minus
         callback {//
-                setChannel(PART::aftertouchType::filterCutoffDown, o->value());}
+                setATchannel(PART::aftertouchType::filterCutoffDown, o->value());}
         xywh {150 65 70 15} down_box DOWN_BOX hide deactivate
       }
       Fl_Check_Button channelpitchbend {
@@ -1057,19 +1057,19 @@ Offset}
                     channelpitchBminus->value(0);
                     channelpitchBminus->deactivate();
                 }
-                setChannel(PART::aftertouchType::pitchBend, o->value());}
+                setATchannel(PART::aftertouchType::pitchBend, o->value());}
         xywh {25 85 70 15} down_box DOWN_BOX
       }
       Fl_Check_Button channelpitchBminus {
         label Minus
         callback {//
-                setChannel(PART::aftertouchType::pitchBendDown, o->value());}
+                setATchannel(PART::aftertouchType::pitchBendDown, o->value());}
         xywh {150 85 70 15} down_box DOWN_BOX deactivate
       }
       Fl_Check_Button channelmodulation {
         label Modulation
         callback {//
-                setChannel(PART::aftertouchType::modulation, o->value());}
+                setATchannel(PART::aftertouchType::modulation, o->value());}
         xywh {25 105 70 15} down_box DOWN_BOX
       }
       Fl_Box {} {
@@ -1086,7 +1086,7 @@ Offset}
                 polypitchBminus->value(0);
                 polypitchBminus->deactivate();
                 polymodulation->value(0);
-                setPoly(PART::aftertouchType::off, true);}
+                setATkey(PART::aftertouchType::off, true);}
         xywh {300 40 48 20}
       }
       Fl_Check_Button polyfiltercutoff {
@@ -1099,13 +1099,13 @@ Offset}
                     polyfilterCminus->value(0);
                     polyfilterCminus->deactivate();
                 }
-                setPoly(PART::aftertouchType::filterCutoff, o->value());}
+                setATkey(PART::aftertouchType::filterCutoff, o->value());}
         xywh {270 65 70 15} down_box DOWN_BOX
       }
       Fl_Check_Button polyfilterCminus {
         label Minus
         callback {//
-                setPoly(PART::aftertouchType::filterCutoffDown, o->value());}
+                setATkey(PART::aftertouchType::filterCutoffDown, o->value());}
         xywh {395 65 70 15} down_box DOWN_BOX hide deactivate
       }
       Fl_Check_Button polypitchbend {
@@ -1118,19 +1118,19 @@ Offset}
                     polypitchBminus->value(0);
                     polypitchBminus->deactivate();
                 }
-                setPoly(PART::aftertouchType::pitchBend, o->value());}
+                setATkey(PART::aftertouchType::pitchBend, o->value());}
         xywh {270 85 70 15} down_box DOWN_BOX
       }
       Fl_Check_Button polypitchBminus {
         label Minus
         callback {//
-                setPoly(PART::aftertouchType::pitchBendDown, o->value());}
+                setATkey(PART::aftertouchType::pitchBendDown, o->value());}
         xywh {395 85 70 15} down_box DOWN_BOX deactivate
       }
       Fl_Check_Button polymodulation {
         label Modulation
         callback {//
-                setPoly(PART::aftertouchType::modulation, o->value());}
+                setATkey(PART::aftertouchType::modulation, o->value());}
         xywh {270 105 70 15} down_box DOWN_BOX
       }
       Fl_Button {} {
@@ -1847,7 +1847,7 @@ Offset}
             break;
         case PART::control::keyATset:
             keyATselection = valInt;
-            fetchPoly();
+            fetchKey();
             break;
 
         case PART::control::portamento:
@@ -2363,7 +2363,7 @@ Offset}
     if (channelATselection & PART::aftertouchType::modulation)
         channelmodulation->value(1);} {}
   }
-  Function {fetchPoly()} {} {
+  Function {fetchKey()} {} {
     code {//
             polyfiltercutoff->value(0); // clear settings first
             polyfilterCminus->value(0);
@@ -2390,14 +2390,22 @@ Offset}
     if (keyATselection & PART::aftertouchType::modulation)
         polymodulation->value(1);} {}
   }
-  Function {setChannel(int type, int state)} {} {
+  Function {setATchannel(int type, int state)} {} {
     code {//
         if (type == PART::aftertouchType::off)
             channelATselection = 0;
         else
         {
             if (state > 0)
+            {
                 channelATselection |= type;
+                if (keyATselection & type)
+                {
+                    keyATselection &= ~type;
+                    fetchKey();
+                }
+
+            }
             else
             {
                 channelATselection &= ~type;
@@ -2409,14 +2417,21 @@ Offset}
         }
         send_data(0, PART::channelATset, channelATselection, TOPLEVEL::type::Integer);} {}
   }
-  Function {setPoly(int type, int state)} {} {
+  Function {setATkey(int type, int state)} {} {
     code {//
         if (type == PART::aftertouchType::off)
             keyATselection = 0;
         else
         {
             if (state > 0)
+            {
                 keyATselection |= type;
+                if (channelATselection & type)
+                {
+                    channelATselection &= ~type;
+                    fetchChannel();
+                }
+            }
             else
             {
                 keyATselection &= ~type;
@@ -2448,7 +2463,7 @@ Offset}
     channelATselection = int(fetchData(0, PART::control::channelATset, npart));
     fetchChannel();
     keyATselection = int(fetchData(0, PART::control::keyATset, npart));
-    fetchPoly();
+    fetchKey();
     partgroup->show();
     lastkey = -1;
     end();} {}
