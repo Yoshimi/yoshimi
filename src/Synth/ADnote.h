@@ -50,19 +50,27 @@ class ADnote
 {
     public:
         ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_, float velocity_,
-               int portamento_, int midinote_, bool besilent, SynthEngine *_synth);
+               int portamento_, int midinote_, SynthEngine *_synth);
         ADnote(ADnote *parent, float freq_, int subVoiceNumber_, float *parentFMmod_,
                bool forFM_);
+        ADnote(const ADnote &orig, ADnote *parent = NULL, float *parentFMmod = NULL);
         ~ADnote();
 
         void construct();
 
         int noteout(float *outl, float *outr);
         void releasekey();
-        int finished() const;
-        void ADlegatonote(float freq_, float velocity_, int portamento_,
-                          int midinote_, bool externcall);
-        char ready;
+        bool finished() const
+        {
+            return NoteStatus == NOTE_DISABLED ||
+                (NoteStatus != NOTE_KEEPALIVE && legatoFade == 0.0f);
+        }
+        void legatoFadeIn(float freq_, float velocity_, int portamento_, int midinote_);
+        void legatoFadeOut(const ADnote &syncwith);
+
+        // Whether the note has samples to output.
+        // Currently only used for dormant legato notes.
+        bool ready() { return legatoFade != 0.0f || legatoFadeStep != 0.0f; };
 
     private:
 
@@ -115,7 +123,11 @@ class ADnote
         float velocity;
         float basefreq;
 
-        bool NoteEnabled;
+        enum {
+            NOTE_DISABLED,
+            NOTE_ENABLED,
+            NOTE_KEEPALIVE
+        } NoteStatus;
         Controller *ctl;
 
         // Global parameters
@@ -281,25 +293,8 @@ class ADnote
         float bandwidthDetuneMultiplier; // how the fine detunes are made bigger or smaller
 
         // Legato vars
-        struct {
-            bool silent;
-            float lastfreq;
-            LegatoMsg msg;
-            int decounter;
-            struct {
-                // Fade In/Out vars
-                int length;
-                float m;
-                float step;
-            } fade;
-            struct {
-                // Note parameters
-                float freq;
-                float vel;
-                int portamento;
-                int midinote;
-            } param;
-        } Legato;
+        float legatoFade;
+        float legatoFadeStep;
 
         float pangainL;
         float pangainR;
@@ -319,11 +314,5 @@ class ADnote
 
         SynthEngine *synth;
 };
-
-
-inline int ADnote::finished() const // Check if the note is finished
-{
-    return (NoteEnabled) ? 0 : 1;
-}
 
 #endif

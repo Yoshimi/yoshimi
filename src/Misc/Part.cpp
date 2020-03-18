@@ -138,7 +138,6 @@ void Part::defaults(void)
     Pvelrand = 0;
     PbreathControl = 2;
     Peffnum = 0;
-    legatoFading = 0;
     setDestination(1);
     busy = false;
     defaultsinstrument();
@@ -269,14 +268,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
 {
     if (note < Pminkey || note > Pmaxkey)
         return;
-    /*
-     * In legato mode we only ever hear the newest
-     * note played, so it is acceptable to lose
-     * intemediate ones while going through a
-     * legato fade between held and newest note.
-     */
-    if (Pkeymode > PART_MONO && legatoFading > 0)
-        return;
+
     // Legato and MonoMem used vars:
     int posb = POLIPHONY - 1;     // Just a dummy initial value.
     bool legatomodevalid = false; // true when legato mode is determined applicable.
@@ -424,7 +416,6 @@ void Part::NoteOn(int note, int velocity, bool renote)
             ctl->portamento.noteusing = pos;
         oldfreq = notebasefreq;
         lastpos = pos; // Keep a trace of used pos.
-        legatoFading = 0; // just to be sure
         if (doinglegato)
         {
             // Do Legato note
@@ -434,34 +425,36 @@ void Part::NoteOn(int note, int velocity, bool renote)
                     && (partnote[pos].kititem[0].adnote)
                     && (partnote[posb].kititem[0].adnote))
                 {
+                    // Set posb to clone state from pos and fade out...
+                    if (!portamento) // ...but only if portamento isn't in effect
+                        partnote[posb].kititem[0].adnote->
+                            legatoFadeOut(*partnote[pos].kititem[0].adnote);
+                    // Then set pos to the new note and fade in.
+                    // This function skips the fade if portamento is active.
                     partnote[pos].kititem[0].adnote->
-                        ADlegatonote(notebasefreq, vel, portamento, note, true);
-                    partnote[posb].kititem[0].adnote->
-                        ADlegatonote(notebasefreq, vel, portamento, note, true);
-                            // 'true' is to tell it it's being called from here.
-                        legatoFading |= 1;
+                        legatoFadeIn(notebasefreq, vel, portamento, note);
                 }
 
                 if ((kit[0].Psubenabled)
                     && (partnote[pos].kititem[0].subnote)
                     && (partnote[posb].kititem[0].subnote))
                 {
+                    if (!portamento)
+                        partnote[posb].kititem[0].subnote->
+                            legatoFadeOut(*partnote[pos].kititem[0].subnote);
                     partnote[pos].kititem[0].subnote->
-                        SUBlegatonote(notebasefreq, vel, portamento, note, true);
-                    partnote[posb].kititem[0].subnote->
-                        SUBlegatonote(notebasefreq, vel, portamento, note, true);
-                    legatoFading |= 2;
+                        legatoFadeIn(notebasefreq, vel, portamento, note);
                 }
 
                 if ((kit[0].Ppadenabled)
                     && (partnote[pos].kititem[0].padnote)
                     && (partnote[posb].kititem[0].padnote))
                 {
+                    if (!portamento)
+                        partnote[posb].kititem[0].padnote->
+                            legatoFadeOut(*partnote[pos].kititem[0].padnote);
                     partnote[pos].kititem[0].padnote->
-                        PADlegatonote(notebasefreq, vel, portamento, note, true);
-                    partnote[posb].kititem[0].padnote->
-                        PADlegatonote(notebasefreq, vel, portamento, note, true);
-                    legatoFading |= 4;
+                        legatoFadeIn(notebasefreq, vel, portamento, note);
                 }
 
             }
@@ -493,33 +486,36 @@ void Part::NoteOn(int note, int velocity, bool renote)
                         && (partnote[pos].kititem[ci].adnote)
                         && (partnote[posb].kititem[ci].adnote))
                     {
+                        // Set posb to clone state from pos and fade out...
+                        if (!portamento) // ...but only if portamento isn't in effect
+                            partnote[posb].kititem[ci].adnote->
+                                legatoFadeOut(*partnote[pos].kititem[ci].adnote);
+                        // Then set pos to the new note and fade in.
+                        // This function skips the fade if portamento is active.
                         partnote[pos].kititem[ci].adnote->
-                            ADlegatonote(notebasefreq, vel, portamento, note, true);
-                        partnote[posb].kititem[ci].adnote->
-                            ADlegatonote(notebasefreq, vel, portamento, note, true);
-                        legatoFading |= 1;
+                            legatoFadeIn(notebasefreq, vel, portamento, note);
                     }
                     if ((kit[item].Psubenabled)
                         && (kit[item].subpars)
                         && (partnote[pos].kititem[ci].subnote)
                         && (partnote[posb].kititem[ci].subnote))
                     {
+                        if (!portamento)
+                            partnote[posb].kititem[ci].subnote->
+                                legatoFadeOut(*partnote[pos].kititem[ci].subnote);
                         partnote[pos].kititem[ci].subnote->
-                            SUBlegatonote(notebasefreq, vel, portamento, note, true);
-                        partnote[posb].kititem[ci].subnote->
-                            SUBlegatonote(notebasefreq, vel, portamento, note, true);
-                        legatoFading |= 2;
+                            legatoFadeIn(notebasefreq, vel, portamento, note);
                     }
                     if ((kit[item].Ppadenabled)
                         && (kit[item].padpars)
                         && (partnote[pos].kititem[ci].padnote)
                         && (partnote[posb].kititem[ci].padnote))
                     {
+                        if (!portamento)
+                            partnote[posb].kititem[ci].padnote->
+                                legatoFadeOut(*partnote[pos].kititem[ci].padnote);
                         partnote[pos].kititem[ci].padnote->
-                            PADlegatonote(notebasefreq, vel, portamento, note, true);
-                        partnote[posb].kititem[ci].padnote->
-                            PADlegatonote(notebasefreq, vel, portamento, note, true);
-                        legatoFading |= 4;
+                            legatoFadeIn(notebasefreq, vel, portamento, note);
                     }
 
                     if ((kit[item].adpars)
@@ -554,15 +550,15 @@ void Part::NoteOn(int note, int velocity, bool renote)
             if (kit[0].Padenabled)
                 partnote[pos].kititem[0].adnote =
                     new ADnote(kit[0].adpars, ctl, notebasefreq, vel,
-                                portamento, note, false, synth); // not silent
+                                portamento, note, synth);
             if (kit[0].Psubenabled)
                 partnote[pos].kititem[0].subnote =
                     new SUBnote(kit[0].subpars, ctl, notebasefreq, vel,
-                                portamento, note, false, synth);
+                                portamento, note, synth);
             if (kit[0].Ppadenabled)
                 partnote[pos].kititem[0].padnote =
                     new PADnote(kit[0].padpars, ctl, notebasefreq, vel,
-                                portamento, note, false, synth);
+                                portamento, note, synth);
             if (kit[0].Padenabled || kit[0].Psubenabled || kit[0].Ppadenabled)
                 partnote[pos].itemsplaying++;
 
@@ -572,16 +568,13 @@ void Part::NoteOn(int note, int velocity, bool renote)
                 partnote[posb].kititem[0].sendtoparteffect = 0;
                 if (kit[0].Padenabled)
                     partnote[posb].kititem[0].adnote =
-                        new ADnote(kit[0].adpars, ctl, notebasefreq, vel,
-                                    portamento, note, true, synth); // silent
+                        new ADnote(*partnote[pos].kititem[0].adnote);
                 if (kit[0].Psubenabled)
                     partnote[posb].kititem[0].subnote =
-                        new SUBnote(kit[0].subpars, ctl, notebasefreq, vel,
-                                    portamento, note, true, synth);
+                        new SUBnote(*partnote[pos].kititem[0].subnote);
                 if (kit[0].Ppadenabled)
                     partnote[posb].kititem[0].padnote =
-                        new PADnote(kit[0].padpars, ctl, notebasefreq, vel,
-                                    portamento, note, true, synth);
+                        new PADnote(*partnote[pos].kititem[0].padnote);
                 if (kit[0].Padenabled || kit[0].Psubenabled || kit[0].Ppadenabled)
                     partnote[posb].itemsplaying++;
             }
@@ -662,17 +655,17 @@ void Part::NoteOn(int note, int velocity, bool renote)
                 {
                     partnote[pos].kititem[ci].adnote =
                         new ADnote(kit[item].adpars, ctl, notebasefreq, vel,
-                                    portamento, note, false, synth); // not silent
+                                    portamento, note, synth);
                 }
                 if (kit[item].subpars && kit[item].Psubenabled)
                     partnote[pos].kititem[ci].subnote =
                         new SUBnote(kit[item].subpars, ctl, notebasefreq, vel,
-                                    portamento, note, false, synth);
+                                    portamento, note, synth);
 
                 if (kit[item].padpars && kit[item].Ppadenabled)
                     partnote[pos].kititem[ci].padnote =
                         new PADnote(kit[item].padpars, ctl, notebasefreq, vel,
-                                    portamento, note, false, synth);
+                                    portamento, note, synth);
 
                 // Spawn another note (but silent) if legatomodevalid==true
                 if (legatomodevalid)
@@ -685,17 +678,14 @@ void Part::NoteOn(int note, int velocity, bool renote)
                     if (kit[item].adpars && kit[item].Padenabled)
                     {
                         partnote[posb].kititem[ci].adnote =
-                            new ADnote(kit[item].adpars, ctl, notebasefreq,
-                                        vel, portamento, note, true, synth); // silent
+                            new ADnote(*partnote[pos].kititem[ci].adnote);
                     }
                     if (kit[item].subpars && kit[item].Psubenabled)
                         partnote[posb].kititem[ci].subnote =
-                            new SUBnote(kit[item].subpars, ctl, notebasefreq,
-                                        vel, portamento, note, true, synth);
+                            new SUBnote(*partnote[pos].kititem[ci].subnote);
                     if (kit[item].padpars && kit[item].Ppadenabled)
                         partnote[posb].kititem[ci].padnote =
-                            new PADnote(kit[item].padpars, ctl, notebasefreq,
-                                        vel, portamento, note, true, synth);
+                            new PADnote(*partnote[pos].kititem[ci].padnote);
 
                     if (kit[item].adpars || kit[item].subpars)
                         partnote[posb].itemsplaying++;
@@ -724,8 +714,6 @@ void Part::NoteOff(int note) //release the key
     int i;
     // This note is released, so we remove it from the list.
     monomemnotes.remove(note);
-    if (monomemnotes.empty())
-        legatoFading = 0;
 
     for ( i = POLIPHONY - 1; i >= 0; i--)
     {   //first note in, is first out if there are same note multiple times
@@ -811,7 +799,6 @@ void Part::SetController(unsigned int type, int par)
             setVolume(Pvolume);
             setPan(Ppanning);
             Pkeymode &= MIDI_NOT_LEGATO; // clear temporary legato mode
-            legatoFading = 0;
 
             for (int item = 0; item < NUM_KIT_ITEMS; ++item)
             {
@@ -1037,7 +1024,7 @@ void Part::ComputePartSmps(void)
             if (adnote)
             {
                 noteplay++;
-                if (adnote->ready)
+                if (adnote->ready())
                 {
                     adnote->noteout(tmpoutl, tmpoutr);
                     for (int i = 0; i < synth->sent_buffersize; ++i)
@@ -1056,7 +1043,7 @@ void Part::ComputePartSmps(void)
             if (subnote)
             {
                 noteplay++;
-                if (subnote->ready)
+                if (subnote->ready())
                 {
                     subnote->noteout(tmpoutl, tmpoutr);
                     for (int i = 0; i < synth->sent_buffersize; ++i)
@@ -1075,7 +1062,7 @@ void Part::ComputePartSmps(void)
             if (padnote)
             {
                 noteplay++;
-                if (padnote->ready)
+                if (padnote->ready())
                 {
                     padnote->noteout(tmpoutl, tmpoutr);
                     for (int i = 0 ; i < synth->sent_buffersize; ++i)

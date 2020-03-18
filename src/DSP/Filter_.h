@@ -32,6 +32,7 @@ class Filter_
     public:
         Filter_() { };
         virtual ~Filter_() { };
+        virtual Filter_* clone() = 0;
         virtual void filterout(float *smp) = 0;
         virtual void setfreq(float frequency) = 0;
         virtual void setfreq_and_q(float frequency, float q_) = 0;

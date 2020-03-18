@@ -25,6 +25,8 @@
 
 */
 
+#include <memory>
+
 #include "Misc/XMLwrapper.h"
 #include "DSP/FFTwrapper.h"
 #include "Synth/OscilGen.h"
@@ -586,7 +588,9 @@ void PADnoteParameters::applyparameters()
 {
     const int samplesize = (((int)1) << (Pquality.samplesize + 14));
     int spectrumsize = samplesize / 2;
-    float spectrum[spectrumsize];
+    // spectrumsize can be quite large (up to 2MiB) and this is not a hot
+    // function, so allocate this on the heap
+    std::unique_ptr<float[]> spectrum(new float[spectrumsize]);
     int profilesize = 512;
     float profile[profilesize];
 
@@ -610,7 +614,7 @@ void PADnoteParameters::applyparameters()
         samplemax = 1;
 
     // prepare a BIG FFT stuff
-    FFTwrapper *fft = new FFTwrapper(samplesize);
+    FFTwrapper fft = FFTwrapper(samplesize);
     FFTFREQS fftfreqs;
     FFTwrapper::newFFTFREQS(&fftfreqs, samplesize / 2);
 
@@ -623,11 +627,11 @@ void PADnoteParameters::applyparameters()
         float basefreqadjust = powf(2.0f, tmp);
 
         if (Pmode == 0)
-            generatespectrum_bandwidthMode(spectrum, spectrumsize,
+            generatespectrum_bandwidthMode(&spectrum[0], spectrumsize,
                                            basefreq * basefreqadjust, profile,
                                            profilesize, bwadjust);
         else
-            generatespectrum_otherModes(spectrum, spectrumsize,
+            generatespectrum_otherModes(&spectrum[0], spectrumsize,
                                         basefreq * basefreqadjust);
 
         const int extra_samples = 5; // the last samples contains the first
@@ -641,7 +645,7 @@ void PADnoteParameters::applyparameters()
             fftfreqs.c[i] = spectrum[i] * cosf(phase);
             fftfreqs.s[i] = spectrum[i] * sinf(phase);
         }
-        fft->freqs2smps(&fftfreqs, newsample.smp);
+        fft.freqs2smps(&fftfreqs, newsample.smp);
         // that's all; here is the only ifft for the whole sample; no windows are used ;-)
 
         // normalize(rms)
@@ -666,7 +670,6 @@ void PADnoteParameters::applyparameters()
         sample[nsample].basefreq = basefreq * basefreqadjust;
         newsample.smp = NULL;
     }
-    delete fft;
     FFTwrapper::deleteFFTFREQS(&fftfreqs);
 
     // delete the additional samples that might exists and are not useful

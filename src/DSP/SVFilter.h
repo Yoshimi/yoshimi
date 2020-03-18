@@ -34,7 +34,9 @@ class SVFilter : public Filter_
 {
     public:
         SVFilter(unsigned char Ftype, float Ffreq, float Fq, unsigned char Fstages, SynthEngine *_synth);
+        SVFilter(const SVFilter &orig);
         ~SVFilter();
+        Filter_* clone() { return new SVFilter(*this); };
         void filterout(float *smp);
         void setfreq(float frequency);
         void setfreq_and_q(float frequency, float q_);

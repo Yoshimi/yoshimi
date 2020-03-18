@@ -38,6 +38,14 @@ class Filter
 {
     public:
         Filter(FilterParams *pars_, SynthEngine *_synth);
+        Filter(const Filter &orig) :
+            pars(orig.pars),
+            parsUpdate(orig.parsUpdate),
+            category(orig.category),
+            synth(orig.synth)
+        {
+            filter = orig.filter->clone();
+        };
         ~Filter();
         void filterout(float *smp);
         void setfreq(float frequency);

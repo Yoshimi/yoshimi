@@ -35,7 +35,9 @@ class AnalogFilter : public Filter_
     public:
         AnalogFilter(unsigned char Ftype, float Ffreq, float Fq,
                      unsigned char Fstages, SynthEngine *_synth);
+        AnalogFilter(const AnalogFilter &orig);
         ~AnalogFilter();
+        Filter_* clone() { return new AnalogFilter(*this); };
         void filterout(float *smp);
         void setfreq(float frequency);
         void setfreq_and_q(float frequency, float q_);

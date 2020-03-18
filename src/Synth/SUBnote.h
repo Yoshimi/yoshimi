@@ -41,19 +41,26 @@ class SUBnote
 {
     public:
         SUBnote(SUBnoteParameters *parameters, Controller *ctl_,
-                float freq, float velocity, int portamento_,
-                int midinote, bool besilent, SynthEngine *_synth);
+                float freq_, float velocity_, int portamento_,
+                int midinote_, SynthEngine *_synth);
+        SUBnote(const SUBnote &rhs);
         ~SUBnote();
 
-        void SUBlegatonote(float freq, float velocity,
-                           int portamento_, int midinote, bool externcall);
+        void legatoFadeIn(float freq_, float velocity_, int portamento_, int midinote_);
+        void legatoFadeOut(const SUBnote &syncwith);
 
         int noteout(float *outl,float *outr); // note output, return 0 if the
                                               // note is finished
         void releasekey(void);
-        bool finished(void) { return !NoteEnabled; }
+        bool finished() const
+        {
+            return NoteStatus == NOTE_DISABLED ||
+                (NoteStatus != NOTE_KEEPALIVE && legatoFade == 0.0f);
+        }
 
-        bool ready; // if I can get the sampledata
+        // Whether the note has samples to output.
+        // Currently only used for dormant legato notes.
+        bool ready() { return legatoFade != 0.0f || legatoFadeStep != 0.0f; };
 
     private:
         void computecurrentparameters(void);
@@ -69,6 +76,9 @@ class SUBnote
         int numharmonics; // number of harmonics (after the too higher hamonics are removed)
         int start; // how the harmonics start
         float basefreq;
+        float velocity;
+        int portamento;
+        int midinote;
         float BendAdjust;
         float OffsetHz;
         float randpanL;
@@ -83,9 +93,12 @@ class SUBnote
         Envelope *GlobalFilterEnvelope;
 
         // internal values
-        bool NoteEnabled;
+        enum {
+            NOTE_DISABLED,
+            NOTE_ENABLED,
+            NOTE_KEEPALIVE
+        } NoteStatus;
         int firsttick;
-        int portamento;
         float volume;
         float oldamplitude;
         float newamplitude;
@@ -116,7 +129,7 @@ class SUBnote
         void computeallfiltercoefs();
         void computefiltercoefs(bpfilter &filter, float freq, float bw, float gain);
         void computeNoteParameters();
-        void setBaseFreq();
+        void setBaseFreq(float basefreq_);
         void filter(bpfilter &filter, float *smps);
         void filterVarRun(bpfilter &filter, float *smps);
         float getHgain(int harmonic);
@@ -136,31 +149,8 @@ class SUBnote
         float globalfiltercenterq;
 
         // Legato vars
-        struct {
-            bool silent;
-            float lastfreq;
-            LegatoMsg msg;
-            int decounter;
-            struct {
-                // Fade In/Out vars
-                int length;
-                float m;
-                float step;
-            } fade;
-
-            struct {
-                // Note parameters
-                float freq;
-                float vel;
-                int portamento;
-                int midinote;
-            } param;
-        } Legato;
-
-        const float log_0_01;    // logf(0.01);
-        const float log_0_001;   // logf(0.001);
-        const float log_0_0001;  // logf(0.0001);
-        const float log_0_00001; // logf(0.00001);
+        float legatoFade;
+        float legatoFadeStep;
 
         Presets::PresetsUpdate subNoteChange;
 

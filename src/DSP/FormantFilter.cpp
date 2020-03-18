@@ -74,6 +74,37 @@ FormantFilter::FormantFilter(FilterParams *pars_, SynthEngine *_synth):
 }
 
 
+FormantFilter::FormantFilter(const FormantFilter &orig) :
+    pars(orig.pars),
+    parsUpdate(orig.parsUpdate),
+    sequencesize(orig.sequencesize),
+    numformants(orig.numformants),
+    firsttime(orig.firsttime),
+    oldinput(orig.oldinput),
+    slowinput(orig.slowinput),
+    Qfactor(orig.Qfactor),
+    formantslowness(orig.formantslowness),
+    oldQfactor(orig.oldQfactor),
+    vowelclearness(orig.vowelclearness),
+    sequencestretch(orig.sequencestretch),
+    synth(orig.synth)
+{
+    outgain = orig.outgain;
+
+    memcpy(formantpar, orig.formantpar, sizeof(formantpar));
+    memcpy(currentformants, orig.currentformants, sizeof(currentformants));
+    memcpy(sequence, orig.sequence, sizeof(sequence));
+    memcpy(oldformantamp, orig.oldformantamp, sizeof(oldformantamp));
+
+    for (int i = 0; i < numformants; ++i)
+        formant[i] = new AnalogFilter(*orig.formant[i]);
+
+    // These don't hold persistent state and don't need a memcpy
+    inbuffer = (float*)fftwf_malloc(synth->bufferbytes);
+    tmpbuf = (float*)fftwf_malloc(synth->bufferbytes);
+}
+
+
 FormantFilter::~FormantFilter()
 {
     for (int i = 0; i < numformants; ++i)

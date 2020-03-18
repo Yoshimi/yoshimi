@@ -43,24 +43,35 @@ class PADnote
 {
     public:
         PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
-                float velocity, int portamento_, int midinote, bool besilent, SynthEngine *_synth);
+                float velocity, int portamento_, int midinote_, SynthEngine *_synth);
+        PADnote(const PADnote &orig);
         ~PADnote();
 
-        void PADlegatonote(float freq, float velocity,
-                           int portamento_, int midinote, bool externcall);
+        void legatoFadeIn(float freq_, float velocity_, int portamento_, int midinote_);
+        void legatoFadeOut(const PADnote &orig);
 
         int noteout(float *outl,float *outr);
-        bool finished(void) { return finished_; };
+        bool finished() const
+        {
+            return NoteStatus == NOTE_DISABLED ||
+                (NoteStatus != NOTE_KEEPALIVE && legatoFade == 0.0f);
+        }
         void releasekey(void);
 
-        bool ready;
+        // Whether the note has samples to output.
+        // Currently only used for dormant legato notes.
+        bool ready() { return legatoFade != 0.0f || legatoFadeStep != 0.0f; };
 
     private:
         void fadein(float *smps);
         void computeNoteParameters();
         void computecurrentparameters();
-        void setBaseFreq();
-        bool finished_;
+        void setBaseFreq(float basefreq_);
+        enum {
+            NOTE_DISABLED,
+            NOTE_ENABLED,
+            NOTE_KEEPALIVE
+        } NoteStatus;
         PADnoteParameters *pars;
 
         int poshi_l;
@@ -73,7 +84,7 @@ class PADnote
         bool firsttime;
         bool released;
 
-        int nsample, portamento;
+        int nsample, portamento, midinote;
 
         int Compute_Linear(float *outl, float *outr, int freqhi,
                            float freqlo);
@@ -134,26 +145,8 @@ class PADnote
         float randpanR;
 
         // Legato vars
-        struct {
-            bool silent;
-            float lastfreq;
-            LegatoMsg msg;
-            int decounter;
-            struct {
-                // Fade In/Out vars
-                int length;
-                float m;
-                float step;
-            } fade;
-
-            struct {
-                // Note parameters
-                float freq;
-                float vel;
-                int portamento;
-                int midinote;
-            } param;
-        } Legato;
+        float legatoFade;
+        float legatoFadeStep;
 
         Presets::PresetsUpdate padSynthUpdate;
 
