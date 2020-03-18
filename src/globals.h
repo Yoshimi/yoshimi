@@ -548,7 +548,8 @@ namespace PART // usage PART::control::volume
         velocityOffset = 4,
         midiChannel,
         keyMode,
-        polyATset,
+        channelATset,
+        keyATset,
         portamento,
         enable,
         kitItemMute,
@@ -654,7 +655,7 @@ namespace PART // usage PART::control::volume
         addMod8
     };
 
-    namespace polyATtype {
+    namespace aftertouchType {
         const unsigned int off = 0;
         const unsigned int filterCutoff = 1;
         const unsigned int filterCutoffDown = 2;

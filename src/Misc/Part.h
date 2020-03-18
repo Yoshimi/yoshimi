@@ -60,7 +60,8 @@ class Part
         void cleanup(void);
 
         // Midi commands implemented
-        void setPolyAT(int note, int type, int value);
+        void setChannelAT(int type, int value);
+        void setKeyAT(int note, int type, int value);
         void NoteOn(int note, int velocity, bool renote = false);
         void NoteOff(int note);
         void AllNotesOff(void) { killallnotes = true; }; // panic, prepare all notes to be turned off
@@ -123,7 +124,8 @@ class Part
         bool          Pkitfade;    // enables cross fading
         unsigned char Pdrummode;   // if all keys are mapped and the system is 12tET (used for drums)
         unsigned char Pkeymode;    // 0 = poly, 1 = mono, > 1 = legato;
-        unsigned int  PpolyATchoice;
+        unsigned int  PchannelATchoice;
+        unsigned int  PkeyATchoice;
         unsigned char Pkeylimit;   // how many keys can play simultaneously,
                                    // time 0 = off, the older will be released
         float         Pfrand;      // Part random frequency content
@@ -172,8 +174,8 @@ class Part
             NoteStatus status;
             int note;          // if there is no note playing, "note" = -1
             int itemsplaying;
-            int polyATtype;
-            int polyATvalue;
+            int keyATtype;
+            int keyATvalue;
             struct Kititem {
                 ADnote *adnote;
                 SUBnote *subnote;
@@ -189,6 +191,10 @@ class Part
         int lastpos;              // previous pos and posb.
         int lastposb;             // ^^
         bool lastlegatomodevalid; // previous legatomodevalid.
+
+        int oldFilterState; // these three for channel aftertouch
+        int oldBendState;
+        int oldModulationState;
 
         float *tmpoutl;
         float *tmpoutr;

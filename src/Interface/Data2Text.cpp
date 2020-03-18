@@ -1314,28 +1314,54 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
                     contstr += "Legato";
             }
             break;
-        case PART::control::polyATset:
+        case PART::control::channelATset:
+            showValue = false;
+            contstr = "ChannelAT";
+            if (addValue)
+            {
+                if (value_int == PART::aftertouchType::off)
+                    contstr += " Off";
+                else
+                {
+                    if (value_int & PART::aftertouchType::filterCutoff)
+                    {
+                        contstr += "\n Filter Cutoff";
+                        if (value_int & PART::aftertouchType::filterCutoffDown)
+                            contstr += " Minus";
+                    }
+                    if (value_int & PART::aftertouchType::pitchBend)
+                    {
+                        contstr += "\n Pitch Bend";
+                        if (value_int & PART::aftertouchType::pitchBendDown)
+                            contstr += " Minus";
+                    }
+                    if (value_int & PART::aftertouchType::modulation)
+                        contstr += "\n Modulation";
+                }
+            }
+            break;
+        case PART::control::keyATset:
             showValue = false;
             contstr = "PolyAT";
             if (addValue)
             {
-                if (value_int == PART::polyATtype::off)
+                if (value_int == PART::aftertouchType::off)
                     contstr += " Off";
                 else
                 {
-                    if (value_int & PART::polyATtype::filterCutoff)
+                    if (value_int & PART::aftertouchType::filterCutoff)
                     {
                         contstr += "\n Filter Cutoff";
-                        if (value_int & PART::polyATtype::filterCutoffDown)
+                        if (value_int & PART::aftertouchType::filterCutoffDown)
                             contstr += " Minus";
                     }
-                    if (value_int & PART::polyATtype::pitchBend)
+                    if (value_int & PART::aftertouchType::pitchBend)
                     {
                         contstr += "\n Pitch Bend";
-                        if (value_int & PART::polyATtype::pitchBendDown)
+                        if (value_int & PART::aftertouchType::pitchBendDown)
                             contstr += " Minus";
                     }
-                    if (value_int & PART::polyATtype::modulation)
+                    if (value_int & PART::aftertouchType::modulation)
                         contstr += "\n Modulation";
                 }
             }

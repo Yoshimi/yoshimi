@@ -680,15 +680,22 @@ int SynthEngine::RunChannelSwitch(unsigned char chan, int value)
 // Controllers
 void SynthEngine::SetController(unsigned char chan, int CCtype, short int par)
 {
+    if (CCtype == MIDI::channelPressure)
+    {
+        int type = part[chan]->PchannelATchoice;
+        std::cout << "Channel " << chan + 1 << "  pres " << par << std::endl;
+        part[chan]->setChannelAT(type, par);
+        return;
+    }
     if (CCtype == MIDI::keyPressure)
     {
         int note = par & 0xff;
         int value = par >> 8;
-        int type = part[chan]->PpolyATchoice;
+        int type = part[chan]->PkeyATchoice;
         if (value == 0)
             type = 0;
         std::cout << "Poly chan " << chan + 1 << "  note " << note << "  pres " << value << std::endl;
-        part[chan]->setPolyAT(note, type, value);
+        part[chan]->setKeyAT(note, type, value);
         return;
     }
     if (CCtype == Runtime.midi_bank_C)

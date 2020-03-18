@@ -1,5 +1,10 @@
 yoshimi 1.7.0 M
 
+2020-3018 Will
+* Merged in revised legato code from Iain.
+* Implemented Channel aftertouch.
+  More to do on this.
+
 2020-3-17 Will
 * Implemented Modulation PolyAT.
 

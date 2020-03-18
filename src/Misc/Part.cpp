@@ -123,12 +123,16 @@ void Part::defaults(void)
     Pminkey = 0;
     Pmaxkey = 127;
     Pkeymode = PART_POLY;
-    PpolyATchoice = 0;
+    PchannelATchoice = 0;
+    PkeyATchoice = 0;
     setVolume(96);
     TransVolume = 128; // ensure it always gets set
     Pkeyshift = 64;
     PmapOffset = 0;
     Prcvchn = 0;
+    oldFilterState = -1;
+    oldBendState = -1;
+    oldModulationState = -1;
     setPan(Ppanning = 64);
     TransPanning = 128; // ensure it always gets set
     Pvelsns = 64;
@@ -249,7 +253,65 @@ Part::~Part()
         delete ctl;
 }
 
-void Part::setPolyAT(int note, int type, int value)
+
+void Part::setChannelAT(int type, int value)
+{
+    if (type & PART::aftertouchType::filterCutoff)
+    {
+        if (value > 0)
+        {
+            if(oldFilterState == -1)
+                oldFilterState = ctl->filtercutoff.data;
+            float adjust = oldFilterState / 127.0f;
+            if (type & PART::aftertouchType::filterCutoffDown)
+                ctl->setfiltercutoff(oldFilterState - (value * adjust));
+            else
+                ctl->setfiltercutoff(oldFilterState + (value * adjust));
+        }
+        else
+        {
+            ctl->setfiltercutoff(oldFilterState);
+            oldFilterState = -1;
+        }
+    }
+
+    if (type & PART::aftertouchType::pitchBend)
+    {
+        if (value > 0)
+        {
+            if (oldBendState == -1)
+                oldBendState = ctl->pitchwheel.data;
+            value *= 64.0f;
+            if (type & PART::aftertouchType::pitchBendDown)
+                ctl->setpitchwheel(-value);
+            else
+                ctl->setpitchwheel(value);
+        }
+        else
+        {
+            ctl->setpitchwheel(oldBendState);
+            oldBendState = -1;
+        }
+    }
+
+    if (type & PART::aftertouchType::modulation)
+    {
+        if (value > 0)
+        {
+            if (oldModulationState == -1)
+                oldModulationState = ctl->modwheel.data;
+            ctl->setmodwheel(value);
+        }
+        else
+        {
+            ctl->setmodwheel(oldModulationState);
+            oldModulationState = -1;
+        }
+    }
+}
+
+
+void Part::setKeyAT(int note, int type, int value)
 {
     if (note < Pminkey || note > Pmaxkey)
         return;
@@ -257,11 +319,12 @@ void Part::setPolyAT(int note, int type, int value)
     {
         if (partnote[i].status != KEY_OFF && partnote[i].note == note)
         {
-            partnote[i].polyATtype = type;
-            partnote[i].polyATvalue = value;
+            partnote[i].keyATtype = type;
+            partnote[i].keyATvalue = value;
         }
     }
 }
+
 
 // Note On Messages
 void Part::NoteOn(int note, int velocity, bool renote)
@@ -361,8 +424,8 @@ void Part::NoteOn(int note, int velocity, bool renote)
         // start the note
         partnote[pos].status = KEY_PLAYING;
         partnote[pos].note = note;
-        partnote[pos].polyATtype = PART::polyATtype::off;
-        partnote[pos].polyATvalue = 0;
+        partnote[pos].keyATtype = PART::aftertouchType::off;
+        partnote[pos].keyATvalue = 0;
         if (legatomodevalid)
         {
             partnote[posb].status = KEY_PLAYING;
@@ -987,30 +1050,30 @@ void Part::ComputePartSmps(void)
             continue;
         noteplay = 0;
         partnote[k].time++;
-        int polyATtype = partnote[k].polyATtype;
-        int polyATvalue = partnote[k].polyATvalue;
-        if (polyATtype & PART::polyATtype::filterCutoff)
+        int keyATtype = partnote[k].keyATtype;
+        int keyATvalue = partnote[k].keyATvalue;
+        if (keyATtype & PART::aftertouchType::filterCutoff)
         {
             oldFilterState = ctl->filtercutoff.data;
             float adjust = oldFilterState / 127.0f;
-            if (polyATtype & PART::polyATtype::filterCutoffDown)
-                ctl->setfiltercutoff(oldFilterState - (polyATvalue * adjust));
+            if (keyATtype & PART::aftertouchType::filterCutoffDown)
+                ctl->setfiltercutoff(oldFilterState - (keyATvalue * adjust));
             else
-                ctl->setfiltercutoff(oldFilterState + (polyATvalue * adjust));
+                ctl->setfiltercutoff(oldFilterState + (keyATvalue * adjust));
         }
-        if (polyATtype & PART::polyATtype::pitchBend)
+        if (keyATtype & PART::aftertouchType::pitchBend)
         {
-            polyATvalue *= 64.0f;
+            keyATvalue *= 64.0f;
             oldBendState = ctl->pitchwheel.data;
-            if (polyATtype & PART::polyATtype::pitchBendDown)
-                ctl->setpitchwheel(-polyATvalue);
+            if (keyATtype & PART::aftertouchType::pitchBendDown)
+                ctl->setpitchwheel(-keyATvalue);
             else
-                ctl->setpitchwheel(polyATvalue);
+                ctl->setpitchwheel(keyATvalue);
         }
-        if (polyATtype & PART::polyATtype::modulation)
+        if (keyATtype & PART::aftertouchType::modulation)
         {
             oldModulationState = ctl->modwheel.data;
-            ctl->setmodwheel(polyATvalue);
+            ctl->setmodwheel(keyATvalue);
         }
 
         // get the sampledata of the note and kill it if it's finished
@@ -1082,11 +1145,11 @@ void Part::ComputePartSmps(void)
         if (noteplay == 0)
             KillNotePos(k);
 
-        if (polyATtype & PART::polyATtype::filterCutoff)
+        if (keyATtype & PART::aftertouchType::filterCutoff)
             ctl->setfiltercutoff(oldFilterState);
-        if (polyATtype & PART::polyATtype::pitchBend)
+        if (keyATtype & PART::aftertouchType::pitchBend)
             ctl->setpitchwheel(oldBendState);
-        if (polyATtype & PART::polyATtype::modulation)
+        if (keyATtype & PART::aftertouchType::modulation)
             ctl->setmodwheel(oldModulationState);
     }
 
@@ -1317,7 +1380,8 @@ void Part::add2XML(XMLwrapper *xml, bool subset)
     // the following two lines maintain backward compatibility
         xml->addparbool("poly_mode", (Pkeymode & MIDI_NOT_LEGATO) == PART_POLY);
         xml->addpar("legato_mode", (Pkeymode & MIDI_NOT_LEGATO) == PART_LEGATO);
-        xml->addpar("polyphonic_aftertouch", PpolyATchoice);
+        xml->addpar("channel_aftertouch", PchannelATchoice);
+        xml->addpar("key_aftertouch", PkeyATchoice);
         xml->addpar("key_limit", Pkeylimit);
         xml->addpar("random_detune", Pfrand);
         xml->addpar("random_velocity", Pvelrand);
@@ -1550,7 +1614,8 @@ void Part::getfromXML(XMLwrapper *xml)
     else
         Pkeymode = PART_MONO;
 
-    PpolyATchoice = xml->getpar("polyphonic_aftertouch", PpolyATchoice, 0, 255);
+    PchannelATchoice = xml->getpar("channel_aftertouch", PchannelATchoice, 0, 255);
+    PkeyATchoice = xml->getpar("key_aftertouch", PkeyATchoice, 0, 255);
 
     Pkeylimit = xml->getpar127("key_limit", Pkeylimit);
     if (Pkeylimit < 1)
