@@ -1,6 +1,9 @@
 yoshimi 1.7.0 M
 
-2020-3018 Will
+2020-3-19 Will
+* Stop state file opening an empty MIDI learn window.
+
+2020-3-18 Will
 * Merged in revised legato code from Iain.
 * Implemented Channel aftertouch.
   More to do on this.

@@ -835,7 +835,7 @@ void MidiLearn::updateGui(int opp)
         ++it;
         ++lineNo;
     }
-    if (synth->getRuntime().showLearnedCC == true) // open the gui editing window
+    if (synth->getRuntime().showLearnedCC == true && !midi_list.empty()) // open the gui editing window
     {
         putData.data.control = MIDILEARN::control::sendRefreshRequest;
         writeToGui(&putData);
