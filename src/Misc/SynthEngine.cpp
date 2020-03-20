@@ -680,24 +680,6 @@ int SynthEngine::RunChannelSwitch(unsigned char chan, int value)
 // Controllers
 void SynthEngine::SetController(unsigned char chan, int CCtype, short int par)
 {
-    if (CCtype == MIDI::CC::channelPressure)
-    {
-        int type = part[chan]->PchannelATchoice;
-        //std::cout << "ChannelAT " << chan + 1 << "  pres " << par << std::endl;
-        part[chan]->setChannelAT(type, par);
-        return;
-    }
-    if (CCtype == MIDI::CC::keyPressure)
-    {
-        int note = par & 0xff;
-        int value = par >> 8;
-        int type = part[chan]->PkeyATchoice;
-        if (value == 0)
-            type = 0;
-        //std::cout << "KeyAT chan " << chan + 1 << "  note " << note << "  pres " << value << std::endl;
-        part[chan]->setKeyAT(note, type, value);
-        return;
-    }
     if (CCtype == Runtime.midi_bank_C)
     {
         //shouldn't get here. Banks are set directly
@@ -736,11 +718,12 @@ void SynthEngine::SetController(unsigned char chan, int CCtype, short int par)
             chan &= 0xf;
     }
 
-    int npart;
-    //std::cout << "  min " << minPart<< "  max " << maxPart << "  Rec " << int(part[npart]->Prcvchn) << "  Chan " << int(chan) <<std::endl;
-    for (npart = minPart; npart < maxPart; ++ npart)
+
+    for (int npart = minPart; npart < maxPart; ++ npart)
     {   // Send the controller to all part assigned to the channel
-        if (chan == part[npart]->Prcvchn)
+
+        //std::cout << "  min " << minPart<< "  max " << maxPart << "  Rec " << int(part[npart]->Prcvchn) << "  Chan " << int(chan) <<std::endl;
+        if (part[npart]->Prcvchn == chan)
         {
             if (CCtype == part[npart]->PbreathControl) // breath
             {

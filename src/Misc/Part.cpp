@@ -883,16 +883,29 @@ void Part::SetController(unsigned int type, int par)
             {
                 if (!kit[item].adpars)
                     continue;
-                kit[item].adpars->GlobalPar.Reson->sendcontroller(MIDI::CC::resonanceCenter,
-                                                                  ctl->resonancecenter.relcenter);
+                kit[item].adpars->GlobalPar.Reson->sendcontroller(MIDI::CC::resonanceCenter, ctl->resonancecenter.relcenter);
             }
             break;
 
         case MIDI::CC::resonanceBandwidth:
             ctl->setresonancebw(par);
-            kit[0].adpars->GlobalPar.Reson->sendcontroller(MIDI::CC::resonanceBandwidth,
-                                                           ctl->resonancebandwidth.relbw);
+            kit[0].adpars->GlobalPar.Reson->sendcontroller(MIDI::CC::resonanceBandwidth, ctl->resonancebandwidth.relbw);
             break;
+
+        case MIDI::CC::channelPressure:
+            setChannelAT(PchannelATchoice, par);
+            break;
+
+        case MIDI::CC::keyPressure:
+        {
+            int note = par & 0xff;
+            int value = (par >> 8) & 0xff;
+            int type = PkeyATchoice;
+            if (value == 0)
+                type = 0;
+            setKeyAT(note, type, value);
+            break;
+        }
     }
 }
 

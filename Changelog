@@ -1,5 +1,9 @@
 yoshimi 1.7.0 M
 
+2020-3-20 Will
+* Move aftertouch CC selection fully into 'part'.
+  This enusres all parts independently see it.
+
 2020-3-19 Will
 * Stop state file opening an empty MIDI learn window.
 
