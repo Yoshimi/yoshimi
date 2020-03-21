@@ -3100,7 +3100,14 @@ void InterChange::commandPart(CommandBlock *getData)
             if (write)
             {
                 part->PchannelATchoice = value_int;
-                part->PkeyATchoice &= ~value_int; // can't have the same
+                int tmp1, tmp2;
+                tmp1 = tmp2 = part->PkeyATchoice;
+                tmp1 &= ~value_int;
+                if (tmp1 != tmp2)
+                {
+                    part->PkeyATchoice = tmp1; // can't have the same
+                    getData->data.parameter = tmp1; // send possible correction
+                }
             }
             else
                 value = part->PchannelATchoice;
@@ -3109,7 +3116,14 @@ void InterChange::commandPart(CommandBlock *getData)
             if (write)
             {
                 part->PkeyATchoice = value_int;
-                part->PchannelATchoice &= ~value_int; // can't have the same
+                int tmp1, tmp2;
+                tmp1 = tmp2 = part->PchannelATchoice;
+                tmp1 &= ~value_int;
+                if (tmp1 != tmp2)
+                {
+                    part->PchannelATchoice = tmp1; // can't have the same
+                    getData->data.parameter = tmp1; // send possible correction
+                }
             }
             else
                 value = part->PkeyATchoice;

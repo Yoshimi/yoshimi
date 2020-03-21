@@ -4897,6 +4897,33 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
         tmp -= 1;
         return sendNormal( synth, 0, tmp, controlType, PART::control::midiChannel, npart);
     }
+    if (input.matchnMove(2, "aftertouch"))
+    {
+        int tmp = 64;
+        int cmd = PART::control::channelATset;
+        if (input.matchnMove(1, "key"))
+            cmd = PART::control::keyATset;
+        else if (!input.matchnMove(1, "chan"))
+            return REPLY::op_msg;
+        if (input.matchnMove(1, "Off"))
+            tmp = PART::aftertouchType::off;
+        else
+        {
+            if (input.matchnMove(1, "Filter"))
+                tmp = PART::aftertouchType::filterCutoff;
+            if (input.matchnMove(1, "Pitch"))
+            {
+                tmp |= PART::aftertouchType::pitchBend;
+                if (input.matchnMove(1, "Down"))
+                    tmp |= PART::aftertouchType::pitchBendDown;
+            }
+            if (input.matchnMove(1, "Modulation"))
+                tmp |= PART::aftertouchType::modulation;
+        }
+        if (tmp == 64 && controlType != TOPLEVEL::type::Read)
+            return REPLY::value_msg;
+        return sendNormal( synth, 0, tmp & 63, controlType, cmd, npart);
+    }
     if (input.matchnMove(1, "destination"))
     {
         int dest = 0;

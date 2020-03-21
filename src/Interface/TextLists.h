@@ -1,7 +1,7 @@
 /*
     TextLists.h
 
-    Copyright 2019, Will Godfrey
+    Copyright 2019-2020, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -263,6 +263,8 @@ static std::string partlist [] = {
     "Humanise Pitch [n]",  "adds a small random pitch change at note_on",
     "Humanise Velocity [n]",  "adds a small random velocity change at note_on",
     "Channel <n>",         "MIDI channel (> 32 disables, > 16 note off only)",
+    "AFtertouch Chan <s1> [s2]", "Off, Filter + Pitch (Down) + Modulation",
+    "AFtertouch Key <s1> [s2]",  "Off, Filter + Pitch (Down) + Modulation",
     "Destination <s>",     "jack audio destination (Main, Part, Both)",
     "kit mode entries","",
     "KIT",                 "access controls but don't change type",

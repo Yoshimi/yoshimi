@@ -1042,7 +1042,7 @@ Offset}
         xywh {25 65 70 15} down_box DOWN_BOX
       }
       Fl_Check_Button channelfilterCminus {
-        label Minus
+        label Down
         callback {//
                 setATchannel(PART::aftertouchType::filterCutoffDown, o->value());}
         xywh {150 65 70 15} down_box DOWN_BOX hide deactivate
@@ -1061,7 +1061,7 @@ Offset}
         xywh {25 85 70 15} down_box DOWN_BOX
       }
       Fl_Check_Button channelpitchBminus {
-        label Minus
+        label Down
         callback {//
                 setATchannel(PART::aftertouchType::pitchBendDown, o->value());}
         xywh {150 85 70 15} down_box DOWN_BOX deactivate
@@ -1103,7 +1103,7 @@ Offset}
         xywh {270 65 70 15} down_box DOWN_BOX
       }
       Fl_Check_Button polyfilterCminus {
-        label Minus
+        label Down
         callback {//
                 setATkey(PART::aftertouchType::filterCutoffDown, o->value());}
         xywh {395 65 70 15} down_box DOWN_BOX hide deactivate
@@ -1122,7 +1122,7 @@ Offset}
         xywh {270 85 70 15} down_box DOWN_BOX
       }
       Fl_Check_Button polypitchBminus {
-        label Minus
+        label Down
         callback {//
                 setATkey(PART::aftertouchType::pitchBendDown, o->value());}
         xywh {395 85 70 15} down_box DOWN_BOX deactivate
@@ -1844,10 +1844,20 @@ Offset}
         case PART::control::channelATset:
             channelATselection = valInt;
             fetchChannel();
+            if (parameter != UNUSED)
+            {
+                keyATselection = parameter;
+                fetchKey();
+            }
             break;
         case PART::control::keyATset:
             keyATselection = valInt;
             fetchKey();
+            if (parameter != UNUSED)
+            {
+                channelATselection = parameter;
+                fetchChannel();
+            }
             break;
 
         case PART::control::portamento:

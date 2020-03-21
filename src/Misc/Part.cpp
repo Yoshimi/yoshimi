@@ -1704,6 +1704,13 @@ float Part::getLimits(CommandBlock *getData)
             max = 16; // disabled
             break;
 
+        case PART::control::channelATset:
+        case PART::control::keyATset:
+            min = 0;
+            def = 0;
+            max = 31;
+            break;
+
         case PART::control::keyMode:
             def = 0;
             max = 2;

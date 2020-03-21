@@ -1225,6 +1225,39 @@ string DataText::resolveMain(CommandBlock *getData, bool addValue)
 }
 
 
+string DataText::resolveAftertouch(bool type, int value, bool addValue)
+{
+    std::string contstr;
+    if (type)
+        contstr = "ChannelAT";
+    else
+        contstr = "KeyAT";
+    if (!addValue)
+        return contstr;
+
+    if (value == PART::aftertouchType::off)
+        contstr += " Off";
+    else
+    {
+        if (value & PART::aftertouchType::filterCutoff)
+        {
+            contstr += "\n Filter Cutoff";
+            if (value & PART::aftertouchType::filterCutoffDown)
+                contstr += " Down";
+        }
+        if (value & PART::aftertouchType::pitchBend)
+        {
+            contstr += "\n Pitch Bend";
+            if (value & PART::aftertouchType::pitchBendDown)
+                contstr += " Down";
+        }
+        if (value & PART::aftertouchType::modulation)
+            contstr += "\n Modulation";
+    }
+    return contstr;
+}
+
+
 string DataText::resolvePart(CommandBlock *getData, bool addValue)
 {
     float value = getData->data.value.F;
@@ -1316,55 +1349,15 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
             break;
         case PART::control::channelATset:
             showValue = false;
-            contstr = "ChannelAT";
-            if (addValue)
-            {
-                if (value_int == PART::aftertouchType::off)
-                    contstr += " Off";
-                else
-                {
-                    if (value_int & PART::aftertouchType::filterCutoff)
-                    {
-                        contstr += "\n Filter Cutoff";
-                        if (value_int & PART::aftertouchType::filterCutoffDown)
-                            contstr += " Minus";
-                    }
-                    if (value_int & PART::aftertouchType::pitchBend)
-                    {
-                        contstr += "\n Pitch Bend";
-                        if (value_int & PART::aftertouchType::pitchBendDown)
-                            contstr += " Minus";
-                    }
-                    if (value_int & PART::aftertouchType::modulation)
-                        contstr += "\n Modulation";
-                }
-            }
+            contstr = resolveAftertouch(true, value_int, addValue);
+            if (parameter != UNUSED)
+                contstr = contstr + "\n" + resolveAftertouch(false, parameter, addValue);
             break;
         case PART::control::keyATset:
             showValue = false;
-            contstr = "KeyAT";
-            if (addValue)
-            {
-                if (value_int == PART::aftertouchType::off)
-                    contstr += " Off";
-                else
-                {
-                    if (value_int & PART::aftertouchType::filterCutoff)
-                    {
-                        contstr += "\n Filter Cutoff";
-                        if (value_int & PART::aftertouchType::filterCutoffDown)
-                            contstr += " Minus";
-                    }
-                    if (value_int & PART::aftertouchType::pitchBend)
-                    {
-                        contstr += "\n Pitch Bend";
-                        if (value_int & PART::aftertouchType::pitchBendDown)
-                            contstr += " Minus";
-                    }
-                    if (value_int & PART::aftertouchType::modulation)
-                        contstr += "\n Modulation";
-                }
-            }
+            contstr = resolveAftertouch(false, value_int, addValue);
+            if (parameter != UNUSED)
+                contstr = contstr + "\n" + resolveAftertouch(true, parameter, addValue);
             break;
         case PART::control::portamento:
             contstr = "Portamento Enable";
