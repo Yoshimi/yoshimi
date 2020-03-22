@@ -356,9 +356,10 @@ ADnote::ADnote(const ADnote &orig, ADnote *parent, float *parentFMmod_) :
         if (orig.subVoice[i] != NULL)
         {
             subVoice[i] = new ADnote*[orig.unison_size[i]];
+            ADnote *parentVoice = (origVoice != NULL) ? origVoice : this;
             for (int k = 0; k < orig.unison_size[i]; ++k)
             {
-                subVoice[i][k] = new ADnote(*orig.subVoice[i][k], this, freqbasedmod[i] ? tmpmod_unison[k] : parentFMmod);
+                subVoice[i][k] = new ADnote(*orig.subVoice[i][k], parentVoice, freqbasedmod[i] ? tmpmod_unison[k] : parentFMmod);
             }
         }
         else
@@ -367,9 +368,10 @@ ADnote::ADnote(const ADnote &orig, ADnote *parent, float *parentFMmod_) :
         if (orig.subFMVoice[i] != NULL)
         {
             subFMVoice[i] = new ADnote*[orig.unison_size[i]];
+            ADnote *parentVoice = (origVoice != NULL) ? origVoice : this;
             for (int k = 0; k < orig.unison_size[i]; ++k)
             {
-                subFMVoice[i][k] = new ADnote(*orig.subVoice[i][k], this, parentFMmod);
+                subFMVoice[i][k] = new ADnote(*orig.subVoice[i][k], parentVoice, parentFMmod);
             }
         }
         else
