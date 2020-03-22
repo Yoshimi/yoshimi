@@ -220,6 +220,7 @@ ADnote::ADnote(const ADnote &orig, ADnote *parent, float *parentFMmod_) :
             }
         } else {
             vpar.OscilSmp = origVoice->NoteVoicePar[i].OscilSmp;
+            vpar.FMSmp = origVoice->NoteVoicePar[i].FMSmp;
         }
 
         vpar.FreqEnvelope = oldvpar.FreqEnvelope != NULL ?
