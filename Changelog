@@ -1,6 +1,11 @@
 yoshimi 1.7.0 M
 
-2020-3021 Will
+2020-3-22 Will
+* Added Filter Q to aftertouch.
+* Re-enabled negative filter cutoff.
+* Updated docs.
+
+2020-3-21 Will
 * Enabled CLI access to aftertouch.
 * Updated docs.
 

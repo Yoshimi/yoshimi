@@ -20,7 +20,7 @@
 */
 
 // uncomment the following line to emulate poly aftertouch
-//#define AFTERTOUCH_EMULATE ON
+#define AFTERTOUCH_EMULATE ON
 
 #include "Misc/Config.h"
 #include "Misc/SynthEngine.h"

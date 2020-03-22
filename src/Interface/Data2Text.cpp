@@ -1245,9 +1245,15 @@ string DataText::resolveAftertouch(bool type, int value, bool addValue)
             if (value & PART::aftertouchType::filterCutoffDown)
                 contstr += " Down";
         }
+        if (value & PART::aftertouchType::filterQ)
+        {
+            contstr += "\n Peak";
+            if (value & PART::aftertouchType::filterQdown)
+                contstr += " Down";
+        }
         if (value & PART::aftertouchType::pitchBend)
         {
-            contstr += "\n Pitch Bend";
+            contstr += "\n Bend";
             if (value & PART::aftertouchType::pitchBendDown)
                 contstr += " Down";
         }

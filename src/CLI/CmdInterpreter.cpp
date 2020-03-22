@@ -4899,7 +4899,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
     }
     if (input.matchnMove(2, "aftertouch"))
     {
-        int tmp = 64;
+        int tmp = PART::aftertouchType::modulation * 2;
         int cmd = PART::control::channelATset;
         if (input.matchnMove(1, "key"))
             cmd = PART::control::keyATset;
@@ -4910,8 +4910,18 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
         else
         {
             if (input.matchnMove(1, "Filter"))
+            {
                 tmp = PART::aftertouchType::filterCutoff;
-            if (input.matchnMove(1, "Pitch"))
+                if (input.matchnMove(1, "Down"))
+                    tmp |= PART::aftertouchType::filterCutoffDown;
+            }
+            if (input.matchnMove(1, "Peak"))
+            {
+                tmp = PART::aftertouchType::filterQ;
+                if (input.matchnMove(1, "Down"))
+                    tmp |= PART::aftertouchType::filterQdown;
+            }
+            if (input.matchnMove(1, "Bend"))
             {
                 tmp |= PART::aftertouchType::pitchBend;
                 if (input.matchnMove(1, "Down"))
@@ -4920,9 +4930,9 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
             if (input.matchnMove(1, "Modulation"))
                 tmp |= PART::aftertouchType::modulation;
         }
-        if (tmp == 64 && controlType != TOPLEVEL::type::Read)
+        if (tmp == PART::aftertouchType::modulation * 2 && controlType != TOPLEVEL::type::Read)
             return REPLY::value_msg;
-        return sendNormal( synth, 0, tmp & 63, controlType, cmd, npart);
+        return sendNormal( synth, 0, tmp & (PART::aftertouchType::modulation * 2 - 1), controlType, cmd, npart);
     }
     if (input.matchnMove(1, "destination"))
     {

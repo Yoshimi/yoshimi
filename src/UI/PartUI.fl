@@ -888,7 +888,7 @@ Offset}
       Fl_Button {} {
         label Close
         callback {//
-        polyphonicaftertouch->hide();
+        aftertouchcontrol->hide();
         ctlwindow->hide();}
         xywh {405 105 95 20} box THIN_UP_BOX
       }
@@ -1003,13 +1003,13 @@ Offset}
       Fl_Button aftertouch {
         label Aftertouch
         callback {//
-                polyphonicaftertouch->show();}
+                aftertouchcontrol->show();}
         xywh {245 105 130 20}
       }
     }
-    Fl_Window polyphonicaftertouch {
+    Fl_Window aftertouchcontrol {
       label Aftertouch
-      xywh {211 180 505 135} type Double hide
+      xywh {1050 146 505 155} type Double hide
     } {
       Fl_Box {} {
         label Channel
@@ -1021,6 +1021,9 @@ Offset}
                 channelfiltercutoff->value(0);
                 channelfilterCminus->value(0);
                 channelfilterCminus->deactivate();
+                channelfilterQ->value(0);
+                channelfilterQminus->value(0);
+                channelfilterQminus->deactivate();
                 channelpitchbend->value(0);
                 channelpitchBminus->value(0);
                 channelpitchBminus->deactivate();
@@ -1045,7 +1048,26 @@ Offset}
         label Down
         callback {//
                 setATchannel(PART::aftertouchType::filterCutoffDown, o->value());}
-        xywh {150 65 70 15} down_box DOWN_BOX hide deactivate
+        xywh {150 65 70 15} down_box DOWN_BOX deactivate
+      }
+      Fl_Check_Button channelfilterQ {
+        label {Filter Q}
+        callback {//
+                if (o->value())
+                    channelfilterQminus->activate();
+                else
+                {
+                    channelfilterQminus->value(0);
+                    channelfilterQminus->deactivate();
+                }
+                setATchannel(PART::aftertouchType::filterQ, o->value());}
+        xywh {25 85 70 15} down_box DOWN_BOX
+      }
+      Fl_Check_Button channelfilterQminus {
+        label Down
+        callback {//
+                setATchannel(PART::aftertouchType::filterQdown, o->value());}
+        xywh {150 85 70 15} down_box DOWN_BOX deactivate
       }
       Fl_Check_Button channelpitchbend {
         label {Pitch Bend}
@@ -1058,19 +1080,19 @@ Offset}
                     channelpitchBminus->deactivate();
                 }
                 setATchannel(PART::aftertouchType::pitchBend, o->value());}
-        xywh {25 85 70 15} down_box DOWN_BOX
+        xywh {25 105 70 15} down_box DOWN_BOX
       }
       Fl_Check_Button channelpitchBminus {
         label Down
         callback {//
                 setATchannel(PART::aftertouchType::pitchBendDown, o->value());}
-        xywh {150 85 70 15} down_box DOWN_BOX deactivate
+        xywh {150 105 70 15} down_box DOWN_BOX deactivate
       }
       Fl_Check_Button channelmodulation {
         label Modulation
         callback {//
                 setATchannel(PART::aftertouchType::modulation, o->value());}
-        xywh {25 105 70 15} down_box DOWN_BOX
+        xywh {25 125 70 15} down_box DOWN_BOX
       }
       Fl_Box {} {
         label Key
@@ -1082,6 +1104,9 @@ Offset}
                 polyfiltercutoff->value(0);
                 polyfilterCminus->value(0);
                 polyfilterCminus->deactivate();
+                polyfilterQ->value(0);
+                polyfilterQminus->value(0);
+                polyfilterQminus->deactivate();
                 polypitchbend->value(0);
                 polypitchBminus->value(0);
                 polypitchBminus->deactivate();
@@ -1106,7 +1131,26 @@ Offset}
         label Down
         callback {//
                 setATkey(PART::aftertouchType::filterCutoffDown, o->value());}
-        xywh {395 65 70 15} down_box DOWN_BOX hide deactivate
+        xywh {395 65 70 15} down_box DOWN_BOX deactivate
+      }
+      Fl_Check_Button polyfilterQ {
+        label {Filter Q}
+        callback {//
+                if (o->value())
+                    polyfilterQminus->activate();
+                else
+                {
+                    polyfilterQminus->value(0);
+                    polyfilterQminus->deactivate();
+                }
+                setATkey(PART::aftertouchType::filterQ, o->value());}
+        xywh {270 85 70 15} down_box DOWN_BOX
+      }
+      Fl_Check_Button polyfilterQminus {
+        label Down
+        callback {//
+                setATkey(PART::aftertouchType::filterQdown, o->value());}
+        xywh {395 85 70 15} down_box DOWN_BOX deactivate
       }
       Fl_Check_Button polypitchbend {
         label {Pitch Bend}
@@ -1119,25 +1163,25 @@ Offset}
                     polypitchBminus->deactivate();
                 }
                 setATkey(PART::aftertouchType::pitchBend, o->value());}
-        xywh {270 85 70 15} down_box DOWN_BOX
+        xywh {270 105 70 15} down_box DOWN_BOX
       }
       Fl_Check_Button polypitchBminus {
         label Down
         callback {//
                 setATkey(PART::aftertouchType::pitchBendDown, o->value());}
-        xywh {395 85 70 15} down_box DOWN_BOX deactivate
+        xywh {395 105 70 15} down_box DOWN_BOX deactivate
       }
       Fl_Check_Button polymodulation {
         label Modulation
         callback {//
                 setATkey(PART::aftertouchType::modulation, o->value());}
-        xywh {270 105 70 15} down_box DOWN_BOX
+        xywh {270 125 70 15} down_box DOWN_BOX
       }
       Fl_Button {} {
         label Close
         callback {//
-        polyphonicaftertouch->hide();}
-        xywh {445 105 50 20} box THIN_UP_BOX
+        aftertouchcontrol->hide();}
+        xywh {445 125 50 20} box THIN_UP_BOX
       }
     }
     Fl_Window ctlmidi {
@@ -2351,6 +2395,9 @@ Offset}
             channelfiltercutoff->value(0); // clear settings first
             channelfilterCminus->value(0);
             channelfilterCminus->deactivate();
+            channelfilterQ->value(0);
+            channelfilterQminus->value(0);
+            channelfilterQminus->deactivate();
             channelpitchbend->value(0);
             channelpitchBminus->value(0);
             channelpitchBminus->deactivate();
@@ -2362,6 +2409,13 @@ Offset}
          channelfilterCminus->activate();
          if (channelATselection & PART::aftertouchType::filterCutoffDown)
              channelfilterCminus->value(1);
+    }
+    if (channelATselection & PART::aftertouchType::filterQ)
+    {
+         channelfilterQ->value(1);
+         channelfilterQminus->activate();
+         if (channelATselection & PART::aftertouchType::filterQdown)
+             channelfilterQminus->value(1);
     }
     if (channelATselection & PART::aftertouchType::pitchBend)
     {
@@ -2378,6 +2432,9 @@ Offset}
             polyfiltercutoff->value(0); // clear settings first
             polyfilterCminus->value(0);
             polyfilterCminus->deactivate();
+            polyfilterQ->value(0);
+            polyfilterQminus->value(0);
+            polyfilterQminus->deactivate();
             polypitchbend->value(0);
             polypitchBminus->value(0);
             polypitchBminus->deactivate();
@@ -2389,6 +2446,13 @@ Offset}
          polyfilterCminus->activate();
          if (keyATselection & PART::aftertouchType::filterCutoffDown)
              polyfilterCminus->value(1);
+    }
+    if (keyATselection & PART::aftertouchType::filterQ)
+    {
+         polyfilterQ->value(1);
+         polyfilterQminus->activate();
+         if (keyATselection & PART::aftertouchType::filterQdown)
+             polyfilterQminus->value(1);
     }
     if (keyATselection & PART::aftertouchType::pitchBend)
     {
@@ -2675,8 +2739,8 @@ Offset}
     if (padnoteui)
         delete padnoteui;
     partgroup->hide();
-    polyphonicaftertouch->hide();
-    delete polyphonicaftertouch;
+    aftertouchcontrol->hide();
+    delete aftertouchcontrol;
     ctlwindow->hide();
     delete ctlwindow;
     ctlmidi->hide();

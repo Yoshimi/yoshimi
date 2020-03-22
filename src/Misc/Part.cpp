@@ -275,6 +275,25 @@ void Part::setChannelAT(int type, int value)
         }
     }
 
+    if (type & PART::aftertouchType::filterQ)
+    {
+        if (value > 0)
+        {
+            if(oldFilterQstate == -1)
+                oldFilterQstate = ctl->filtercutoff.data;
+            float adjust = oldFilterQstate / 127.0f;
+            if (type & PART::aftertouchType::filterQdown)
+                ctl->setfilterq(oldFilterQstate - (value * adjust));
+            else
+                ctl->setfilterq(oldFilterQstate + (value * adjust));
+        }
+        else
+        {
+            ctl->setfilterq(oldFilterQstate);
+            oldFilterQstate = -1;
+        }
+    }
+
     if (type & PART::aftertouchType::pitchBend)
     {
         if (value > 0)
@@ -1074,6 +1093,15 @@ void Part::ComputePartSmps(void)
             else
                 ctl->setfiltercutoff(oldFilterState + (keyATvalue * adjust));
         }
+        if (keyATtype & PART::aftertouchType::filterQ)
+        {
+            oldFilterQstate = ctl->filterq.data;
+            float adjust = oldFilterQstate / 127.0f;
+            if (keyATtype & PART::aftertouchType::filterQdown)
+                ctl->setfilterq(oldFilterQstate - (keyATvalue * adjust));
+            else
+                ctl->setfilterq(oldFilterQstate + (keyATvalue * adjust));
+        }
         if (keyATtype & PART::aftertouchType::pitchBend)
         {
             keyATvalue *= 64.0f;
@@ -1160,6 +1188,8 @@ void Part::ComputePartSmps(void)
 
         if (keyATtype & PART::aftertouchType::filterCutoff)
             ctl->setfiltercutoff(oldFilterState);
+        if (keyATtype & PART::aftertouchType::filterQ)
+            ctl->setfilterq(oldFilterQstate);
         if (keyATtype & PART::aftertouchType::pitchBend)
             ctl->setpitchwheel(oldBendState);
         if (keyATtype & PART::aftertouchType::modulation)
@@ -1708,7 +1738,7 @@ float Part::getLimits(CommandBlock *getData)
         case PART::control::keyATset:
             min = 0;
             def = 0;
-            max = 31;
+            max = PART::aftertouchType::modulation * 2;
             break;
 
         case PART::control::keyMode:

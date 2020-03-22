@@ -655,13 +655,15 @@ namespace PART // usage PART::control::volume
         addMod8
     };
 
-    namespace aftertouchType {
+    namespace aftertouchType { // all powers of 2 handled bit-wise
         const unsigned int off = 0;
         const unsigned int filterCutoff = 1;
         const unsigned int filterCutoffDown = 2;
-        const unsigned int pitchBend = 4;
-        const unsigned int pitchBendDown = 8;
-        const unsigned int modulation = 16;
+        const unsigned int filterQ = 4;
+        const unsigned int filterQdown = 8;
+        const unsigned int pitchBend = 16;
+        const unsigned int pitchBendDown = 32;
+        const unsigned int modulation = 64; // this must be highest bit
     }
 }
 
