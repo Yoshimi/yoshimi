@@ -19,8 +19,13 @@
 
 */
 
-// uncomment the following line to emulate poly aftertouch
-#define AFTERTOUCH_EMULATE ON
+/*
+ * Uncomment the following define to emulate poly aftertouch
+ * To get the impression of channel aftertouch we change the
+ * event of the specified controller number.
+ * Change the value to suit your circumstances.
+ */
+//#define AFTERTOUCH_EMULATE 94
 
 #include "Misc/Config.h"
 #include "Misc/SynthEngine.h"
@@ -72,11 +77,8 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
 
 
 #ifdef AFTERTOUCH_EMULATE
-    /*
-     * To get the impression of channel aftertouch we change the event of
-     * controller number 94
-     */
-    if (event == 0xb0 && par1 == 94)
+
+    if (event == 0xb0 && par1 == AFTERTOUCH_EMULATE)
     {
         par0 = 0xd0 | channel; // change to chanel aftertouch
         par1 = par2; // shift parameter across

@@ -4,6 +4,7 @@ yoshimi 1.7.0 M
 * Added Filter Q to aftertouch.
 * Re-enabled negative filter cutoff.
 * Updated docs.
+* Made channel AT emulation in MusicIO.cpp configurable.
 
 2020-3-21 Will
 * Enabled CLI access to aftertouch.
