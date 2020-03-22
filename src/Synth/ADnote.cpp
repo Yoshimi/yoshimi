@@ -714,6 +714,21 @@ void ADnote::legatoFadeIn(float freq_, float velocity_, int portamento_, int mid
         // than just recalculating based on basefreq.
         computeNoteParameters();
     }
+
+    for (int i = 0; i < NUM_VOICES; ++i)
+    {
+        auto &vpar = NoteVoicePar[i];
+
+        if (!vpar.Enabled)
+            continue;
+
+        if (subVoice[i] != NULL)
+            for (int k = 0; k < unison_size[i]; ++k)
+                subVoice[i][k]->legatoFadeIn(getVoiceBaseFreq(i), velocity_, portamento_, midinote_);
+        else if (subFMVoice[i] != NULL)
+            for (int k = 0; k < unison_size[i]; ++k)
+                subFMVoice[i][k]->legatoFadeIn(getFMVoiceBaseFreq(i), velocity_, portamento_, midinote_);
+    }
 }
 
 // This exists purely to avoid boilerplate. It might be useful
