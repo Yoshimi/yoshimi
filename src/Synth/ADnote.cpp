@@ -834,15 +834,12 @@ void ADnote::legatoFadeOut(const ADnote &orig)
         copyOrAssign(vpar.FMFreqEnvelope, oldvpar.FMFreqEnvelope);
         copyOrAssign(vpar.FMAmpEnvelope, oldvpar.FMAmpEnvelope);
 
-        if (vpar.Enabled)
-        {
-            if (subVoice[i] != NULL)
-                for (int k = 0; k < unison_size[i]; ++k)
-                    subVoice[i][k]->legatoFadeOut(*orig.subVoice[i][k]);
-            else if (subFMVoice[i] != NULL)
-                for (int k = 0; k < unison_size[i]; ++k)
-                    subFMVoice[i][k]->legatoFadeOut(*orig.subFMVoice[i][k]);
-        }
+        if (subVoice[i] != NULL)
+            for (int k = 0; k < unison_size[i]; ++k)
+                subVoice[i][k]->legatoFadeOut(*orig.subVoice[i][k]);
+        else if (subFMVoice[i] != NULL)
+            for (int k = 0; k < unison_size[i]; ++k)
+                subFMVoice[i][k]->legatoFadeOut(*orig.subFMVoice[i][k]);
     }
 
     legatoFade = 1.0f; // Start at full volume
