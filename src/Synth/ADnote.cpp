@@ -220,6 +220,7 @@ ADnote::ADnote(const ADnote &orig, ADnote *parent, float *parentFMmod_) :
             }
         } else {
             vpar.OscilSmp = origVoice->NoteVoicePar[i].OscilSmp;
+            vpar.FMSmp = origVoice->NoteVoicePar[i].FMSmp;
         }
 
         vpar.FreqEnvelope = oldvpar.FreqEnvelope != NULL ?
@@ -355,9 +356,10 @@ ADnote::ADnote(const ADnote &orig, ADnote *parent, float *parentFMmod_) :
         if (orig.subVoice[i] != NULL)
         {
             subVoice[i] = new ADnote*[orig.unison_size[i]];
+            ADnote *parentVoice = (origVoice != NULL) ? origVoice : this;
             for (int k = 0; k < orig.unison_size[i]; ++k)
             {
-                subVoice[i][k] = new ADnote(*orig.subVoice[i][k], this, freqbasedmod[i] ? tmpmod_unison[k] : parentFMmod);
+                subVoice[i][k] = new ADnote(*orig.subVoice[i][k], parentVoice, freqbasedmod[i] ? tmpmod_unison[k] : parentFMmod);
             }
         }
         else
@@ -366,9 +368,10 @@ ADnote::ADnote(const ADnote &orig, ADnote *parent, float *parentFMmod_) :
         if (orig.subFMVoice[i] != NULL)
         {
             subFMVoice[i] = new ADnote*[orig.unison_size[i]];
+            ADnote *parentVoice = (origVoice != NULL) ? origVoice : this;
             for (int k = 0; k < orig.unison_size[i]; ++k)
             {
-                subFMVoice[i][k] = new ADnote(*orig.subVoice[i][k], this, parentFMmod);
+                subFMVoice[i][k] = new ADnote(*orig.subVoice[i][k], parentVoice, parentFMmod);
             }
         }
         else
@@ -711,6 +714,21 @@ void ADnote::legatoFadeIn(float freq_, float velocity_, int portamento_, int mid
         // than just recalculating based on basefreq.
         computeNoteParameters();
     }
+
+    for (int i = 0; i < NUM_VOICES; ++i)
+    {
+        auto &vpar = NoteVoicePar[i];
+
+        if (!vpar.Enabled)
+            continue;
+
+        if (subVoice[i] != NULL)
+            for (int k = 0; k < unison_size[i]; ++k)
+                subVoice[i][k]->legatoFadeIn(getVoiceBaseFreq(i), velocity_, portamento_, midinote_);
+        else if (subFMVoice[i] != NULL)
+            for (int k = 0; k < unison_size[i]; ++k)
+                subFMVoice[i][k]->legatoFadeIn(getFMVoiceBaseFreq(i), velocity_, portamento_, midinote_);
+    }
 }
 
 // This exists purely to avoid boilerplate. It might be useful
@@ -816,15 +834,12 @@ void ADnote::legatoFadeOut(const ADnote &orig)
         copyOrAssign(vpar.FMFreqEnvelope, oldvpar.FMFreqEnvelope);
         copyOrAssign(vpar.FMAmpEnvelope, oldvpar.FMAmpEnvelope);
 
-        if (vpar.Enabled)
-        {
-            if (subVoice[i] != NULL)
-                for (int k = 0; k < unison_size[i]; ++k)
-                    subVoice[i][k]->legatoFadeOut(*orig.subVoice[i][k]);
-            else if (subFMVoice[i] != NULL)
-                for (int k = 0; k < unison_size[i]; ++k)
-                    subFMVoice[i][k]->legatoFadeOut(*orig.subFMVoice[i][k]);
-        }
+        if (subVoice[i] != NULL)
+            for (int k = 0; k < unison_size[i]; ++k)
+                subVoice[i][k]->legatoFadeOut(*orig.subVoice[i][k]);
+        else if (subFMVoice[i] != NULL)
+            for (int k = 0; k < unison_size[i]; ++k)
+                subFMVoice[i][k]->legatoFadeOut(*orig.subFMVoice[i][k]);
     }
 
     legatoFade = 1.0f; // Start at full volume
