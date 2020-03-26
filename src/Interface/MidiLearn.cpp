@@ -71,7 +71,7 @@ MidiLearn::~MidiLearn()
 
 void MidiLearn::setTransferBlock(CommandBlock *getData)
 {
-    //cout << "MIDI Control " << (int) getData->data.control << " Part " << (int) getData->data.part << "  Kit " << (int) getData->data.kit << " Engine " << (int) getData->data.engine << "  Insert " << (int) getData->data.insert << endl;
+    //std::cout << "MIDI Control " << (int) getData->data.control << " Part " << (int) getData->data.part << "  Kit " << (int) getData->data.kit << " Engine " << (int) getData->data.engine << "  Insert " << (int) getData->data.insert << std::std::endl;
 
     memcpy(learnTransferBlock.bytes, getData->bytes, sizeof(learnTransferBlock));
     learnedName = resolveAll(synth, getData, false);
@@ -116,8 +116,10 @@ bool MidiLearn::runMidiLearn(int _value, unsigned short int CC, unsigned char ch
             else
                 value = _value / 128.999f; // convert from 14 bit
         }
-        else
+        else if (CC != MIDI::CC::keyPressureInner)
             value = float(_value);
+        else
+            value = float(_value >> 8);
 
         float minIn = foundEntry.min_in / 1.5748f;
         float maxIn = foundEntry.max_in / 1.5748f;
@@ -699,8 +701,10 @@ void MidiLearn::insertLine(unsigned short int CC, unsigned char chan)
     }
 
     unsigned char status = 0;
+    if (CC >= MIDI::CC::channelPressureInner)
+        status |= 1; // set 'block'
     if (CC >= MIDI::CC::identNRPN)
-        status |= 9; // mark as NRPN and set 'block'
+        status |= 8; // mark as NRPN
     LearnBlock entry;
     entry.chan = chan;
     entry.CC = CC;
@@ -708,7 +712,7 @@ void MidiLearn::insertLine(unsigned short int CC, unsigned char chan)
     entry.max_in = 200;
     entry.status = status;
 
-    //cout << "SEND Control " << (int) learnTransferBlock.data.control << " Part " << (int) learnTransferBlock.data.part << "  Kit " << (int) learnTransferBlock.data.kit << " Engine " << (int) learnTransferBlock.data.engine << "  Insert " << (int) learnTransferBlock.data.insert << endl;
+    //std::cout << "SEND Control " << (int) learnTransferBlock.data.control << " Part " << (int) learnTransferBlock.data.part << "  Kit " << (int) learnTransferBlock.data.kit << " Engine " << (int) learnTransferBlock.data.engine << "  Insert " << (int) learnTransferBlock.data.insert << std::std::endl;
 
     unsigned char type = learnTransferBlock.data.type & 0x80;
     learnTransferBlock.data.type = (type &0xf8) | 5; // min

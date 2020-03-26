@@ -1003,7 +1003,9 @@ Offset}
       Fl_Button aftertouch {
         label Aftertouch
         callback {//
-                aftertouchcontrol->show();}
+                aftertouchcontrol->show();
+                if ((Fl::event_button() == 3))
+                    ctlwindow->hide();}
         xywh {245 105 130 20}
       }
     }
@@ -1180,6 +1182,8 @@ Offset}
       Fl_Button {} {
         label Close
         callback {//
+        if ((Fl::event_button() == 3))
+            ctlwindow->show();
         aftertouchcontrol->hide();}
         xywh {445 125 50 20} box THIN_UP_BOX
       }

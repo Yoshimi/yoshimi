@@ -15,3 +15,5 @@ The Pitch Bend effect normally goes upward with increasing pressure, but if you 
 Similarly, Modulation assumes the physical control is at zero. Its range is from zero to the setting of the part's frequency LFO Depth.
 
 These controls are set per part, but are actually per channel. The physical aftertouch action will affect all parts on that channel, but the effects can be different for each part (or remain off).
+
+These controls can both still be overridden by MIDI-learn. Like NRPNs, by default these will be set to block normal operation.

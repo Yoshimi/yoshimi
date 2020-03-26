@@ -1,5 +1,11 @@
 yoshimi 1.7.0 M
 
+2020-3-26 Will
+* Aftertouch fully MIDI-learnable.
+  Also blocks normal control action by default.
+* AT GUI follows standard right button close practice.
+* Updated docs.
+
 2020-3-22 Will
 * Added Filter Q to aftertouch.
 * Re-enabled negative filter cutoff.
