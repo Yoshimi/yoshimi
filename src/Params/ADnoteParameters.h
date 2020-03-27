@@ -200,8 +200,8 @@ class ADnoteParameters : public Presets
         float getLimits(CommandBlock *getData);
         float getBandwidthDetuneMultiplier(void);
         float getUnisonFrequencySpreadCents(int nvoice);
-        void setGlobalPan(char pan);
-        void setVoicePan(int voice, char pan);
+        void setGlobalPan(char pan, unsigned char panLaw);
+        void setVoicePan(int voice, char pan, unsigned char panLaw);
         bool randomGlobalPan(void) { return !GlobalPar.PPanning; }
         bool randomVoicePan(int nvoice) { return !VoicePar[nvoice].PPanning; }
         ADnoteGlobalParam GlobalPar;

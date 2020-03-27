@@ -43,8 +43,6 @@
 using file::saveData;
 using func::setAllPan;
 
-extern unsigned char panLaw;
-
 PADnoteParameters::PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth) : Presets(_synth)
 {
     setpresettype("Ppadsyth");
@@ -137,7 +135,7 @@ void PADnoteParameters::defaults(void)
 
     // Amplitude Global Parameters
     PVolume = 90;
-    setPan(PPanning = 64); // center
+    setPan(PPanning = 64, synth->getRuntime().panLaw); // center
     PAmpVelocityScaleFunction = 64;
     AmpEnvelope->defaults();
     AmpLfo->defaults();
@@ -682,7 +680,7 @@ void PADnoteParameters::applyparameters()
 }
 
 
-void PADnoteParameters::setPan(char pan)
+void PADnoteParameters::setPan(char pan, unsigned char panLaw)
 {
     PPanning = pan;
     if (!randomPan())
@@ -925,7 +923,7 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
     if (xml->enterbranch("AMPLITUDE_PARAMETERS"))
     {
         PVolume=xml->getpar127("volume",PVolume);
-        setPan(xml->getpar127("panning",PPanning));
+        setPan(xml->getpar127("panning",PPanning), synth->getRuntime().panLaw);
         PAmpVelocityScaleFunction=xml->getpar127("velocity_sensing",PAmpVelocityScaleFunction);
         Fadein_adjustment = xml->getpar127("fadein_adjustment", Fadein_adjustment);
         PPunchStrength=xml->getpar127("punch_strength",PPunchStrength);

@@ -218,7 +218,6 @@ class ADvoicelistitem {: {public Fl_Group}
         voicevolume->value(pars->VoicePar[nvoice].PVolume);
         voicedetune->value(pars->VoicePar[nvoice].PDetune - 8192);
         voicepanning->value(pars->VoicePar[nvoice].PPanning);
-        pars->setVoicePan(nvoice, voicepanning->value());
         voicelistvibratto->value(pars->VoicePar[nvoice].FreqLfo->Pintensity);
         int nvs = nvoice, nvp = nvoice;
         if (pars->VoicePar[nvoice].PVoice != -1)

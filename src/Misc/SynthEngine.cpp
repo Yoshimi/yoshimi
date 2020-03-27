@@ -2010,6 +2010,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         }
 
         // Apply the part volumes and pannings (after insertion effects)
+        unsigned char panLaw = Runtime.panLaw;
         for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
         {
             if (!partLocal[npart])
@@ -2019,9 +2020,9 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             for (int i = 0; i < sent_buffersize; ++i)
             {
                 if (part[npart]->Ppanning - part[npart]->TransPanning > Step)
-                    part[npart]->checkPanning(Step);
+                    part[npart]->checkPanning(Step, panLaw);
                 else if (part[npart]->TransPanning - part[npart]->Ppanning > Step)
-                    part[npart]->checkPanning(-Step);
+                    part[npart]->checkPanning(-Step, panLaw);
                 if (part[npart]->Pvolume - part[npart]->TransVolume > Step)
                     part[npart]->checkVolume(Step);
                 else if (part[npart]->TransVolume - part[npart]->Pvolume > Step)
@@ -3470,6 +3471,11 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
             def = 512;
             max = MAX_BUFFER_SIZE;
            break;
+        case CONFIG::control::panLawType:
+            min = CONFIG::panningType::cut;
+            def = CONFIG::panningType::normal;
+            max = CONFIG::panningType::boost;
+            break;
         case CONFIG::control::padSynthInterpolation:
             break;
         case CONFIG::control::virtualKeyboardLayout:

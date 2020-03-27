@@ -33,9 +33,8 @@
 using namespace std;
 using func::setAllPan;
 
+#include "Misc/SynthEngine.h"
 #include "Params/ADnoteParameters.h"
-
-extern unsigned char panLaw;
 
 int ADnoteParameters::ADnote_unison_sizes[] =
 {2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 0};
@@ -78,7 +77,7 @@ void ADnoteParameters::defaults(void)
 
     // Amplitude Global Parameters
     GlobalPar.PVolume = 90;
-    setGlobalPan(GlobalPar.PPanning = 64); // center
+    setGlobalPan(GlobalPar.PPanning = 64, synth->getRuntime().panLaw); // center
     GlobalPar.PAmpVelocityScaleFunction = 64;
     GlobalPar.AmpEnvelope->defaults();
     GlobalPar.AmpLfo->defaults();
@@ -131,7 +130,7 @@ void ADnoteParameters::defaults(int n)
     VoicePar[nvoice].PDelay = 0;
     VoicePar[nvoice].PVolume = 100;
     VoicePar[nvoice].PVolumeminus = 0;
-    setVoicePan(nvoice, VoicePar[nvoice].PPanning = 64); // center
+    setVoicePan(nvoice, VoicePar[nvoice].PPanning = 64, synth->getRuntime().panLaw); // center
     VoicePar[nvoice].PDetune = 8192; // 8192 = 0
     VoicePar[nvoice].PCoarseDetune = 0;
     VoicePar[nvoice].PDetuneType = 0;
@@ -265,7 +264,7 @@ ADnoteParameters::~ADnoteParameters()
 }
 
 
-void ADnoteParameters::setGlobalPan(char pan)
+void ADnoteParameters::setGlobalPan(char pan, unsigned char panLaw)
 {
     GlobalPar.PPanning = pan;
     if (!randomGlobalPan())
@@ -280,7 +279,7 @@ void ADnoteParameters::setGlobalPan(char pan)
 }
 
 
-void ADnoteParameters::setVoicePan(int nvoice, char pan)
+void ADnoteParameters::setVoicePan(int nvoice, char pan, unsigned char panLaw)
 {
     VoicePar[nvoice].PPanning = pan;
     if (!randomVoicePan(nvoice))
@@ -540,7 +539,7 @@ void ADnoteParameters::getfromXML(XMLwrapper *xml)
     if (xml->enterbranch("AMPLITUDE_PARAMETERS"))
     {
         GlobalPar.PVolume = xml->getpar127("volume", GlobalPar.PVolume);
-        setGlobalPan(xml->getpar127("panning", GlobalPar.PPanning));
+        setGlobalPan(xml->getpar127("panning", GlobalPar.PPanning), synth->getRuntime().panLaw);
         GlobalPar.PAmpVelocityScaleFunction =
             xml->getpar127("velocity_sensing", GlobalPar.PAmpVelocityScaleFunction);
         GlobalPar.Fadein_adjustment = xml->getpar127("fadein_adjustment", GlobalPar.Fadein_adjustment);
@@ -679,7 +678,7 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper *xml, int n)
 
     if (xml->enterbranch("AMPLITUDE_PARAMETERS"))
     {
-        setVoicePan(nvoice, xml->getpar127("panning", VoicePar[nvoice].PPanning));
+        setVoicePan(nvoice, xml->getpar127("panning", VoicePar[nvoice].PPanning), synth->getRuntime().panLaw);
         VoicePar[nvoice].PVolume = xml->getpar127("volume", VoicePar[nvoice].PVolume);
         VoicePar[nvoice].PVolumeminus =
             xml->getparbool("volume_minus", VoicePar[nvoice].PVolumeminus);

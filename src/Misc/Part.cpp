@@ -54,7 +54,7 @@ using func::dB2rap;
 using func::findSplitPoint;
 using func::setAllPan;
 
-extern unsigned char panLaw;
+//extern unsigned char panLaw;
 
 Part::Part(Microtonal *microtonal_, FFTwrapper *fft_, SynthEngine *_synth) :
     microtonal(microtonal_),
@@ -1270,7 +1270,7 @@ void Part::setPan(float value)
 }
 
 
-void Part::checkPanning(float step)
+void Part::checkPanning(float step, unsigned char panLaw)
 {
     //float t;
     TransPanning += step;

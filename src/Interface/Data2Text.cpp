@@ -568,6 +568,27 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
         case CONFIG::control::bufferSize:
             contstr = "Internal buffer size";
             break;
+        case CONFIG::control::panLawType:
+            contstr = "Panning Law ";
+            if (addValue)
+            {
+                switch (value_int)
+                {
+                    case CONFIG::panningType::cut:
+                        contstr += "cut";
+                        break;
+                    case CONFIG::panningType::normal:
+                        contstr += "default";
+                        break;
+                    case CONFIG::panningType::boost:
+                        contstr += "boost";
+                        break;
+                    default:
+                        contstr += "unrecognised";
+                }
+            }
+            showValue = false;
+            break;
         case CONFIG::control::padSynthInterpolation:
             contstr = "PadSynth interpolation ";
             if (addValue)

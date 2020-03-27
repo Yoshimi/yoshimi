@@ -48,7 +48,7 @@ class PADnoteParameters : public Presets
         ~PADnoteParameters();
 
         void defaults(void);
-        void setPan(char pan);
+        void setPan(char pan, unsigned char panLaw);
         bool randomPan(void) { return !PPanning; }
 
         void add2XML(XMLwrapper *xml);

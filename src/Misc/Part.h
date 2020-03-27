@@ -102,7 +102,7 @@ class Part
         void setVolume(float value);
         void checkVolume(float step);
         void setDestination(int value);
-        void checkPanning(float step);
+        void checkPanning(float step, unsigned char panLaw);
 
         SynthEngine *getSynthEngine() {return synth;}
 

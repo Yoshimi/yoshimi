@@ -23,7 +23,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <cmath>} {public local
@@ -57,12 +57,13 @@ decl {\#include "Misc/TextMsgBuffer.h"
 decl {extern SynthEngine *firstSynth;} {private local
 }
 
-class ConfigUI {} {
+class ConfigUI {selected
+} {
   Function {make_window()} {} {
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {o->hide();}
-      xywh {120 89 390 330} type Double hide
+      xywh {507 87 390 330} type Double hide
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
     } {
@@ -77,7 +78,7 @@ class ConfigUI {} {
             label {* AddSynth Oscillator Size}
             callback {//
                         send_data(0, CONFIG::control::oscillatorSize, 256 << o->value(), TOPLEVEL::type::Integer);}
-            tooltip {ADSynth Oscillator Size (samples)} xywh {250 45 100 20} down_box BORDER_BOX labelsize 12 textsize 11
+            tooltip {ADSynth Oscillator Size (samples)} xywh {250 32 100 20} down_box BORDER_BOX labelsize 12 textsize 11
             code0 {o->value( (int)(logf(synth->getRuntime().Oscilsize / 256.0f - 1.0f) / logf(2.0f)) + 1);}
           } {
             MenuItem {} {
@@ -113,7 +114,7 @@ class ConfigUI {} {
             label {* Internal Buffer Size}
             callback {//
                         send_data(0, CONFIG::control::bufferSize, 16 << o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Number of samples} xywh {249 75 100 20} down_box BORDER_BOX labelsize 12 textsize 12
+            tooltip {Number of samples} xywh {249 60 100 20} down_box BORDER_BOX labelsize 12 textsize 12
             code0 {o->value( (int)(logf(synth->getRuntime().Buffersize / 16.0f - 1.0f) / logf(2.0f)) + 1);}
             code1 {if (synth->getIsLV2Plugin()) o->deactivate();}
           } {
@@ -162,7 +163,7 @@ class ConfigUI {} {
             label {PADsynth Interpolation}
             callback {//
                         send_data(0, CONFIG::control::padSynthInterpolation, o->value(), TOPLEVEL::type::Integer);}
-            xywh {250 105 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            xywh {250 88 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().Interpolation);}
           } {
             MenuItem {} {
@@ -174,11 +175,31 @@ class ConfigUI {} {
               xywh {10 10 100 20} labelfont 1 labelsize 11
             }
           }
+          Fl_Choice panning_law {
+            label {Panning Law}
+            callback {//
+                       send_data(0, CONFIG::control::panLawType, o->value(), TOPLEVEL::type::Integer);}
+            tooltip {Values: Per side | Mono Equivalent} xywh {190 116 160 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            code0 {o->value(fetchData(0, CONFIG::control::panLawType, TOPLEVEL::section::config));}
+          } {
+            MenuItem {} {
+              label {Cut: 0dB | -6dB}
+              xywh {10 10 100 20} labelfont 1 labelsize 11
+            }
+            MenuItem {} {
+              label {Default: +3dB | -3dB}
+              xywh {20 20 100 20} labelfont 1 labelsize 11
+            }
+            MenuItem {} {
+              label {Boost: +6dB | 0dB}
+              tooltip {Per side + 6dB, Mono 0dB} xywh {30 30 100 20} labelfont 1 labelsize 11
+            }
+          }
           Fl_Choice v_keyboard {
             label {Virtual Keyboard Layout}
             callback {//
                         send_data(0, CONFIG::control::virtualKeyboardLayout, o->value(), TOPLEVEL::type::Integer);}
-            xywh {250 135 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
+            xywh {250 144 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
             code0 {o->value(synth->getRuntime().VirKeybLayout);}
           } {
             MenuItem {} {
@@ -202,7 +223,7 @@ class ConfigUI {} {
             label {XML Compression Level}
             callback {//
                         send_data(0, CONFIG::control::XMLcompressionLevel, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {gzip compression level (0 - uncompressed)} xywh {284 165 65 20} type Simple labelsize 12 align 4 minimum 0 maximum 9 step 1 textfont 1 textsize 12
+            tooltip {gzip compression level (0 - uncompressed)} xywh {284 172 65 20} type Simple labelsize 12 align 4 minimum 0 maximum 9 step 1 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().GzipCompression);}
             code1 {if (synth->getUniqueId() != 0) o->hide();}
           }
@@ -210,7 +231,7 @@ class ConfigUI {} {
             label {Send reports to:}
             callback {//
                         send_data(TOPLEVEL::action::forceUpdate, CONFIG::control::reportsDestination, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Some system errors always go to stdout} xywh {200 195 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
+            tooltip {Some system errors always go to stdout} xywh {200 200 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
             code0 {o->value(synth->getRuntime().toConsole);}
           } {
             MenuItem {} {
@@ -226,7 +247,7 @@ class ConfigUI {} {
             label {Saved Instrument Format}
             callback {//
                         send_data(0, CONFIG::control::savedInstrumentFormat, o->value() + 1, TOPLEVEL::type::Integer);}
-            tooltip {Yoshimi format includes Controllers and Humanise} xywh {200 225 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
+            tooltip {Yoshimi format includes Controllers and Humanise} xywh {200 228 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
             code0 {o->value(synth->getRuntime().instrumentFormat - 1);}
           } {
             MenuItem {} {
@@ -247,7 +268,7 @@ class ConfigUI {} {
             callback {//
     synth->getRuntime().single_row_panel = o->value()  != 0;
     synth->getGuiMaster()->updatepanel();}
-            tooltip {Select single row or compact format} xywh {200 255 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
+            tooltip {Select single row or compact format} xywh {200 256 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
             code0 {o->value(synth->getRuntime().single_row_panel);}
           } {
             MenuItem {} {
@@ -886,6 +907,9 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                         ++ tmp; // count the bits for switch number
                     }
                     buff_size->value(tmp);
+                    break;
+                case CONFIG::control::panLawType:
+                    panning_law->value(value_int);
                     break;
                 case CONFIG::control::padSynthInterpolation:
                     pad_interpol->value(value_int);

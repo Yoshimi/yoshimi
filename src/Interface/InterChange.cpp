@@ -2436,6 +2436,12 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = synth->getRuntime().Buffersize;
             break;
+        case CONFIG::control::panLawType:
+            if (write)
+                synth->getRuntime().panLaw = value_int;
+            else
+                value = synth->getRuntime().panLaw;
+            break;
         case CONFIG::control::padSynthInterpolation:
             if (write)
                  synth->getRuntime().Interpolation = value_bool;
@@ -3750,7 +3756,7 @@ void InterChange::commandAdd(CommandBlock *getData)
             break;
         case ADDSYNTH::control::panning:
             if (write)
-                pars->setGlobalPan(value_int);
+                pars->setGlobalPan(value_int, synth->getRuntime().panLaw);
             else
                 value = pars->GlobalPar.PPanning;
             break;
@@ -3916,7 +3922,7 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
         case ADDVOICE::control::panning:
             if (write)
-                 pars->setVoicePan(nvoice, value_int);
+                 pars->setVoicePan(nvoice, value_int, synth->getRuntime().panLaw);
             else
                 value = pars->VoicePar[nvoice].PPanning;
             break;
@@ -4340,7 +4346,7 @@ void InterChange::commandSub(CommandBlock *getData)
             break;
         case SUBSYNTH::control::panning:
             if (write)
-                pars->setPan(value);
+                pars->setPan(value, synth->getRuntime().panLaw);
             else
                 value = pars->PPanning;
             break;
@@ -4575,7 +4581,7 @@ void InterChange::commandPad(CommandBlock *getData)
             break;
         case PADSYNTH::control::panning:
             if (write)
-                pars->setPan(value);
+                pars->setPan(value, synth->getRuntime().panLaw);
             else
                 value = pars->PPanning;
             break;

@@ -272,6 +272,7 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         oscillatorSize = 0,
         bufferSize,
         padSynthInterpolation,
+        panLawType,
         virtualKeyboardLayout,
         XMLcompressionLevel,
         reportsDestination,
@@ -316,6 +317,11 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         showLearnEditor,
         enableNRPNs,
         saveCurrentConfig = 80
+    };
+    enum panningType : unsigned char {
+        cut = 0,
+        normal,
+        boost
     };
 }
 

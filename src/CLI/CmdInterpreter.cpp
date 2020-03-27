@@ -3161,6 +3161,18 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
             return REPLY::value_msg;
         value = string2int(input);
     }
+    else if (input.matchnMove(3, "panning"))
+    {
+        if(input.matchnMove(1, "cut"))
+            value = CONFIG::panningType::cut;
+        else if (input.matchnMove(1, "default"))
+            value = CONFIG::panningType::normal;
+        else if (input.matchnMove(1, "boost"))
+            value = CONFIG::panningType::boost;
+        else if (controlType == TOPLEVEL::type::Write)
+            return REPLY::range_msg;
+        command = CONFIG::control::panLawType;
+    }
     else if (input.matchnMove(2, "padsynth"))
     {
         command = CONFIG::control::padSynthInterpolation;

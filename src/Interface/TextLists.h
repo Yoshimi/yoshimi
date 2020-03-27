@@ -179,6 +179,7 @@ static std::string toplist [] = {
 static std::string configlist [] = {
     "Oscillator <n>",      "* Add/Pad size (power 2 256-16384)",
     "BUffer <n>",          "* internal size (power 2 16-4096)",
+    "PANning <n>",         "panning type (Cut, Default, Boost)",
     "PAdsynth [s]",        "interpolation type (Linear, other = cubic)",
     "Virtual <n>",         "keyboard (0 = QWERTY, 1 = Dvorak, 2 = QWERTZ, 3 = AZERTY)",
     "Xml <n>",             "compression (0-9)",

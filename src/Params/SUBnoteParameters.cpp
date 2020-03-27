@@ -25,12 +25,11 @@
 
 */
 
+#include "Misc/SynthEngine.h"
 #include "Params/SUBnoteParameters.h"
 #include "Misc/NumericFuncs.h"
 
 using func::setAllPan;
-
-extern unsigned char panLaw;
 
 SUBnoteParameters::SUBnoteParameters(SynthEngine *_synth) : Presets(_synth)
 {
@@ -52,7 +51,7 @@ SUBnoteParameters::SUBnoteParameters(SynthEngine *_synth) : Presets(_synth)
 void SUBnoteParameters::defaults(void)
 {
     PVolume = 96;
-    setPan(PPanning = 64);
+    setPan(PPanning = 64, synth->getRuntime().panLaw);
     PAmpVelocityScaleFunction = 90;
     Pfixedfreq = 0;
     PfixedfreqET = 0;
@@ -107,7 +106,7 @@ SUBnoteParameters::~SUBnoteParameters()
 }
 
 
-void SUBnoteParameters::setPan(char pan)
+void SUBnoteParameters::setPan(char pan, unsigned char panLaw)
 {
     PPanning = pan;
     if (!randomPan())
@@ -296,7 +295,7 @@ void SUBnoteParameters::getfromXML(XMLwrapper *xml)
         int xpar = xml->getparbool("stereo", (Pstereo) ? 1 : 0);
         Pstereo = (xpar != 0) ? true : false;
         PVolume=xml->getpar127("volume",PVolume);
-        setPan(xml->getpar127("panning",PPanning));
+        setPan(xml->getpar127("panning",PPanning), synth->getRuntime().panLaw);
         PAmpVelocityScaleFunction=xml->getpar127("velocity_sensing",PAmpVelocityScaleFunction);
         if (xml->enterbranch("AMPLITUDE_ENVELOPE"))
         {
