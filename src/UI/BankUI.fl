@@ -490,7 +490,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           label {Show engines/types}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, CONFIG::control::showEnginesTypes, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config);}
-          xywh {477 531 136 15} down_box DOWN_BOX labelsize 11
+          xywh {477 531 136 15} down_box DOWN_BOX labelsize 11 hide
           code0 {o->value(synth->getRuntime().checksynthengines);}
         }
         Fl_Button addpatch {

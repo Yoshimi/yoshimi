@@ -100,17 +100,14 @@ decl {\#define NO_DB -68.0} {public local
 
 decl {\#include "Misc/NumericFuncs.h"
     using func::dB2rap;
-    using func::rap2dB;
-} {private local
+    using func::rap2dB;} {private local
 }
 
 decl {\#include "Misc/FormatFuncs.h"
-    using func::asString;
-} {private local
+    using func::asString;} {private local
 }
 
-class VUMeter {
-  : {public Fl_Box, private GuiUpdates}
+class VUMeter {: {public Fl_Box, private GuiUpdates}
 } {
   Function {VUMeter(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {npart=-1;} {}

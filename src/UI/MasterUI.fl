@@ -194,11 +194,7 @@ class MasterUI {: {private GuiUpdates}
     code {//
       instance = synth->getUniqueId();
 
-      filename = synth->getRuntime().ConfigDir + "/" +synth->getRuntime().programCmd();
-      if (instance > 0)
-      {
-          filename += ("-" + asString(instance));
-      }
+      filename = synth->getRuntime().ConfigDir + "/" +synth->getRuntime().programCmd() + "-" + to_string(instance);
       partmax = synth->getRuntime().NumAvailableParts;
       filename += EXTEN::window;
       microtonalui = new MicrotonalUI(&synth->microtonal, synth);

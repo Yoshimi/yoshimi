@@ -3,6 +3,9 @@ yoshimi 1.7.0 M
 2020-3-28 Will
 * Merged in panning law control.
 * Added 'Yet Another Flute" to 'Companion' bank.
+* Temporarily disabled hiding engine type colours.
+  Related code will be removed later if no objections.
+* Unified GUI numbering of config window files.
 
 2020-3-26 Will
 * Aftertouch fully MIDI-learnable.

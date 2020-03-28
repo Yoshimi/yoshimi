@@ -3209,11 +3209,11 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
         else if (controlType == TOPLEVEL::type::Write)
             return REPLY::value_msg;
     }
-    else if (input.matchnMove(3, "engines"))
+    /*else if (input.matchnMove(3, "engines"))
     {
         command = CONFIG::control::showEnginesTypes;
         value = (input.toggle() != 0);
-    }
+    }*/
 
     else if (input.matchnMove(2, "state"))
     {

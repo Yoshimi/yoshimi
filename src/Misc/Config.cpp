@@ -702,7 +702,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     }
 
     //misc
-    checksynthengines = xml->getpar("check_pad_synth", checksynthengines, 0, 1);
+    //checksynthengines = xml->getpar("check_pad_synth", checksynthengines, 0, 1);
     if (tempRoot == 0)
         tempRoot = xml->getpar("root_current_ID", 0, 0, 127);
 
