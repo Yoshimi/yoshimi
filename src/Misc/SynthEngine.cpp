@@ -468,6 +468,7 @@ void SynthEngine::defaults(void)
     Runtime.channelSwitchValue = 0;
     //CmdInterface.defaults(); // **** need to work out how to call this
     Runtime.NumAvailableParts = NUM_MIDI_CHANNELS;
+    Runtime.panLaw = MAIN::panningType::normal;
     ShutUp();
     Runtime.lastfileseen.clear();
     for (int i = 0; i <= TOPLEVEL::XML::MLearn; ++i)
@@ -2974,6 +2975,7 @@ void SynthEngine::add2XML(XMLwrapper *xml)
 {
     xml->beginbranch("MASTER");
     xml->addpar("current_midi_parts", Runtime.NumAvailableParts);
+    xml->addpar("panning_law", Runtime.panLaw);
     xml->addpar("volume", Pvolume);
     xml->addpar("key_shift", Pkeyshift);
     xml->addpar("channel_switch_type", Runtime.channelSwitchType);
@@ -3112,6 +3114,7 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
         return false;
     }
     Runtime.NumAvailableParts = xml->getpar("current_midi_parts", NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS, NUM_MIDI_PARTS);
+    Runtime.panLaw = xml->getpar("panning_law", Runtime.panLaw, MAIN::panningType::cut, MAIN::panningType::boost);
     setPvolume(xml->getpar127("volume", Pvolume));
     setPkeyshift(xml->getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64));
     Runtime.channelSwitchType = xml->getpar("channel_switch_type", Runtime.channelSwitchType, 0, 5);
@@ -3287,6 +3290,11 @@ float SynthEngine::getLimits(CommandBlock *getData)
             min = 16;
             def = 16;
             max = 64;
+            break;
+        case MAIN::control::panLawType:
+            min = MAIN::panningType::cut;
+            def = MAIN::panningType::normal;
+            max = MAIN::panningType::boost;
             break;
 
         case MAIN::control::detune:
@@ -3471,11 +3479,6 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
             def = 512;
             max = MAX_BUFFER_SIZE;
            break;
-        case CONFIG::control::panLawType:
-            min = CONFIG::panningType::cut;
-            def = CONFIG::panningType::normal;
-            max = CONFIG::panningType::boost;
-            break;
         case CONFIG::control::padSynthInterpolation:
             break;
         case CONFIG::control::virtualKeyboardLayout:

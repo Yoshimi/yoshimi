@@ -642,7 +642,6 @@ bool Config::extractConfigData(XMLwrapper *xml)
             Buffersize = xml->getpar("sound_buffer_size", Buffersize, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
         if (!oscilChanged)
             Oscilsize = xml->getpar("oscil_size", Oscilsize, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
-        panLaw = xml->getpar("panning_law", panLaw, CONFIG::panningType::cut, CONFIG::panningType::boost);
         single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);
         toConsole = xml->getpar("reports_destination", toConsole, 0, 1);
         hideErrors = xml->getpar("hide_system_errors", hideErrors, 0, 1);
@@ -769,7 +768,6 @@ void Config::addConfigXML(XMLwrapper *xml)
     xml->addpar("sample_rate", synth->getRuntime().Samplerate);
     xml->addpar("sound_buffer_size", synth->getRuntime().Buffersize);
     xml->addpar("oscil_size", synth->getRuntime().Oscilsize);
-    xml->addpar("panning_law", panLaw);
 
     xml->addpar("single_row_panel", single_row_panel);
     xml->addpar("reports_destination", toConsole);

@@ -2436,12 +2436,6 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = synth->getRuntime().Buffersize;
             break;
-        case CONFIG::control::panLawType:
-            if (write)
-                synth->getRuntime().panLaw = value_int;
-            else
-                value = synth->getRuntime().panLaw;
-            break;
         case CONFIG::control::padSynthInterpolation:
             if (write)
                  synth->getRuntime().Interpolation = value_bool;
@@ -2783,6 +2777,13 @@ void InterChange::commandMain(CommandBlock *getData)
             else
                 value = synth->getRuntime().NumAvailableParts;
             break;
+        case MAIN::control::panLawType:
+            if (write)
+                synth->getRuntime().panLaw = value_int;
+            else
+                value = synth->getRuntime().panLaw;
+            break;
+
 
         case MAIN::control::detune: // done elsewhere
             break;

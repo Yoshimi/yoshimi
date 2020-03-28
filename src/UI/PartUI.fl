@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -69,14 +69,13 @@ class PartSysEffSend {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window syseffsend {
-      xywh {916 904 50 80} type Double hide
+      xywh {916 486 30 30} type Double hide
       class Fl_Group
     } {
       Fl_Dial sysend {
-        label 01
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, neff, o->value(), TOPLEVEL::type::Integer);}
-        xywh {0 0 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+        xywh {0 0 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
         code0 {o->value(synth->Psysefxvol[neff][npart]);}
         code1 {o->copy_label(asString(neff + 1).c_str());}
         code2 {o->setValueType(VC_FXSysSend);}
@@ -395,11 +394,11 @@ class PartKitItem {: {public Fl_Group}
   }
 }
 
-class PartUI {selected : {public Fl_Group, PartUI_}
+class PartUI {: {public Fl_Group, PartUI_}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
-      xywh {996 337 380 170} type Double box NO_BOX hide
+      xywh {1112 270 380 170} type Double box NO_BOX hide
       class Fl_Group
     } {
       Fl_Group partgroupui {
@@ -543,21 +542,19 @@ class PartUI {selected : {public Fl_Group, PartUI_}
           tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 7 192 20} box THIN_DOWN_FRAME labeltype NO_LABEL labelsize 12 align 16
         }
         Fl_Dial velocitysense {
-          label {Velocity
-Sense}
+          label {Vel. Sens}
           callback {//
           send_data(0, PART::control::velocitySense, o->value(), TOPLEVEL::type::Integer);}
-          xywh {200 40 28 28} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          xywh {192 34 32 32} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Pvelsns);}
           code2 {o->setValueType(VC_AmpVelocitySense);}
           class WidgetPDial
         }
         Fl_Dial velocityoffset {
-          label {Velocity
-Offset}
+          label {Vel. Offs}
           callback {//
           send_data(0, PART::control::velocityOffset, o->value(), TOPLEVEL::type::Integer);}
-          xywh {244 40 28 28} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          xywh {242 34 32 32} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Pveloffs);}
           class WidgetPDial
         }
@@ -568,7 +565,7 @@ Offset}
               synth->getGuiMaster()->setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, o->value());
 
           send_data(0, PART::control::panning, o->value(), 0);}
-          xywh {289 39 32 32} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          xywh {289 34 32 32} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_PanningStd);}
           code1 {o->value(part->Ppanning);}
           class WidgetPDial
@@ -580,7 +577,7 @@ Offset}
           synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, o->value());
 
           send_data(0, 0, o->value(), 0);}
-          xywh {335 39 32 32} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          xywh {335 34 32 32} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_PartVolume);}
           code1 {o->value(part->Pvolume);}
           class WidgetPDial
@@ -589,7 +586,7 @@ Offset}
           label Portamento
           callback {//
           send_data(0, PART::control::portamento, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Enable/Disable the portamento} xywh {86 61 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 11 align 8
+          tooltip {Enable/Disable the portamento} xywh {82 61 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 11 align 8
           code0 {o->value(part->ctl->portamento.portamento);}
         }
         Fl_Spinner midich {
@@ -618,7 +615,7 @@ Offset}
           else
               legatoMode->labelcolor(FL_BLACK);
           send_data(0, PART::control::keyMode, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Poly, Mono or Legato mode} xywh {86 36 68 19} down_box BORDER_BOX selection_color 49 labelsize 11 align 8 textfont 1 textsize 11
+          tooltip {Poly, Mono or Legato mode} xywh {82 36 68 19} down_box BORDER_BOX selection_color 49 labelsize 11 align 8 textfont 1 textsize 11
           code0 {int tmp = synth->ReadPartKeyMode(npart);}
           code1 {if (tmp > 1) o->value(2); else o->value(tmp);}
         } {
@@ -642,7 +639,7 @@ Offset}
               ctlwindow->show();
           else
               ctlmidi->show();}
-          tooltip {Left mouse button: Controller range settings, Right mouse button: MIDI CCs} xywh {8 81 166 25} box PLASTIC_UP_BOX color 228 labelsize 12
+          tooltip {Left mouse button: Controller range settings, Right mouse button: MIDI CCs} xywh {8 81 139 25} box PLASTIC_UP_BOX color 228 labelsize 12
         }
         Fl_Spinner partkeyshift {
           label {Key Shift}
@@ -718,9 +715,32 @@ Offset}
           send_data(0, PART::control::maxToLastKey, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Set maximum note to the last note played} xywh {104 147 30 16} box PLASTIC_UP_BOX labelsize 10
         }
-        Fl_Box {} {
-          xywh {240 96 134 69} box ENGRAVED_FRAME
+        Fl_Pack toSysEfx {
+          label {To Sys Efx}
+          xywh {246 122 122 39} type HORIZONTAL labeltype NO_LABEL labelsize 10 align 0
+          code0 {o->spacing(7);}
+          code1 {//
+              for (int i = 0; i < NUM_SYS_EFX; ++i)
+            {
+              psyef[i] = new PartSysEffSend(0, 0, 25, 25);
+              psyef[i]->init(npart, i, synth);
+            }}
+          code2 {if (part->Penabled != 1)
+        {
+            toSysEfx->deactivate();
         }
+        else
+        {
+           toSysEfx->activate();
+        }}
+        } {}
+        Fl_Box {} {
+          xywh {240 106 134 62} box ENGRAVED_FRAME labelsize 11 align 2
+        }
+      }
+      Fl_Text_Display {} {
+        label {System Effect Sends}
+        xywh {255 134 103 15} box NO_BOX labelsize 11 align 2
       }
       Fl_Check_Button partGroupEnable {
         label Enabled
@@ -749,36 +769,12 @@ Offset}
         xywh {58 59 20 20} down_box DOWN_BOX labelsize 11 align 4
         code0 {o->value(part->Penabled == 1);}
       }
-      Fl_Scroll toSysEfx {
-        label {System Effect Sends}
-        xywh {245 114 125 48} labelsize 11
-        code0 {if (part->Penabled != 1)
-        {
-            toSysEfx->deactivate();
-        }
-        else
-        {
-           toSysEfx->activate();
-        }}
-      } {
-        Fl_Pack {} {
-          label {To Sys Efx}
-          xywh {247 118 122 39} type HORIZONTAL labeltype NO_LABEL labelsize 11 align 0
-          code0 {o->spacing(7);}
-          code1 {//
-              for (int i = 0; i < NUM_SYS_EFX; ++i)
-            {
-              psyef[i] = new PartSysEffSend(0, 0, 25, 25);
-              psyef[i]->init(npart, i, synth);
-            }}
-        } {}
-      }
     }
     Fl_Window ctlwindow {
       label Controllers
-      xywh {748 171 505 130} type Double
+      xywh {748 171 505 130} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Controllers").c_str());}
-      code1 {o->position(synth->getGuiMaster()->controllersX, synth->getGuiMaster()->controllersY);} visible
+      code1 {o->position(synth->getGuiMaster()->controllersX, synth->getGuiMaster()->controllersY);}
     } {
       Fl_Dial volrng {
         label {Vol Rng}

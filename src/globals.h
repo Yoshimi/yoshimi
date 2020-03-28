@@ -272,7 +272,6 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         oscillatorSize = 0,
         bufferSize,
         padSynthInterpolation,
-        panLawType,
         virtualKeyboardLayout,
         XMLcompressionLevel,
         reportsDestination,
@@ -317,11 +316,6 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         showLearnEditor,
         enableNRPNs,
         saveCurrentConfig = 80
-    };
-    enum panningType : unsigned char {
-        cut = 0,
-        normal,
-        boost
     };
 }
 
@@ -509,6 +503,7 @@ namespace MAIN // usage MAIN::control::volume
         volume = 0,
         partNumber = 14,
         availableParts,
+        panLawType,
         detune = 32,
         keyShift = 35,
         mono,
@@ -543,6 +538,13 @@ namespace MAIN // usage MAIN::control::volume
         readMainLRpeak,
         readMainLRrms
     };
+
+    enum panningType : unsigned char {
+        cut = 0,
+        normal,
+        boost
+    };
+
 }
 
 namespace PART // usage PART::control::volume

@@ -23,7 +23,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <cmath>} {public local
@@ -57,8 +57,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
 decl {extern SynthEngine *firstSynth;} {private local
 }
 
-class ConfigUI {selected
-} {
+class ConfigUI {} {
   Function {make_window()} {} {
     Fl_Window configwindow {
       label {Yoshimi Settings}
@@ -173,26 +172,6 @@ class ConfigUI {selected
             MenuItem {} {
               label {Cubic(slow)}
               xywh {10 10 100 20} labelfont 1 labelsize 11
-            }
-          }
-          Fl_Choice panning_law {
-            label {Panning Law}
-            callback {//
-                       send_data(0, CONFIG::control::panLawType, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Relative values when panned to extremes: \n   Per side | Equivalent Mono} xywh {190 116 160 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
-            code0 {o->value(fetchData(0, CONFIG::control::panLawType, TOPLEVEL::section::config));}
-          } {
-            MenuItem {} {
-              label {Cut: 0dB | -6dB}
-              xywh {10 10 100 20} labelfont 1 labelsize 11
-            }
-            MenuItem {} {
-              label {Default: +3dB | -3dB}
-              xywh {20 20 100 20} labelfont 1 labelsize 11
-            }
-            MenuItem {} {
-              label {Boost: +6dB | 0dB}
-              tooltip {Per side + 6dB, Mono 0dB} xywh {30 30 100 20} labelfont 1 labelsize 11
             }
           }
           Fl_Choice v_keyboard {
@@ -907,9 +886,6 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                         ++ tmp; // count the bits for switch number
                     }
                     buff_size->value(tmp);
-                    break;
-                case CONFIG::control::panLawType:
-                    panning_law->value(value_int);
                     break;
                 case CONFIG::control::padSynthInterpolation:
                     pad_interpol->value(value_int);

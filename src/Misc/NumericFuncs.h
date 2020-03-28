@@ -131,7 +131,7 @@ inline void setAllPan(float position, float& left, float& right, unsigned char c
     float t = ((position > 0) ? (position - 1) : 0.0f) / 126.0f;
     switch (compensation)
     {
-        case CONFIG::panningType::cut: // ZynAddSubFX - per side 0dB mono -6dB
+        case MAIN::panningType::cut: // ZynAddSubFX - per side 0dB mono -6dB
             if (t > 0.5f)
             {
                 right = 0.5f;
@@ -143,11 +143,11 @@ inline void setAllPan(float position, float& left, float& right, unsigned char c
                 left = 0.5f;
             }
             break;
-        case CONFIG::panningType::normal: // Yoshimi - per side + 3dB mono -3dB
+        case MAIN::panningType::normal: // Yoshimi - per side + 3dB mono -3dB
             left = cosf(t * HALFPI);
             right = sinf(t * HALFPI);
             break;
-        case CONFIG::panningType::boost: // boost - per side + 6dB mono 0dB
+        case MAIN::panningType::boost: // boost - per side + 6dB mono 0dB
             left = t;
             right = (1.0 - t);
             break;

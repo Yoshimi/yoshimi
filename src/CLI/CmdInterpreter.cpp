@@ -3161,18 +3161,6 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
             return REPLY::value_msg;
         value = string2int(input);
     }
-    else if (input.matchnMove(3, "panning"))
-    {
-        if(input.matchnMove(1, "cut"))
-            value = CONFIG::panningType::cut;
-        else if (input.matchnMove(1, "default"))
-            value = CONFIG::panningType::normal;
-        else if (input.matchnMove(1, "boost"))
-            value = CONFIG::panningType::boost;
-        else if (controlType == TOPLEVEL::type::Write)
-            return REPLY::range_msg;
-        command = CONFIG::control::panLawType;
-    }
     else if (input.matchnMove(2, "padsynth"))
     {
         command = CONFIG::control::padSynthInterpolation;
@@ -5302,6 +5290,17 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
         if (controlType == TOPLEVEL::type::Write && value != 16 && value != 32 && value != 64)
             return REPLY::range_msg;
         return sendNormal( synth, 0, value, controlType, MAIN::control::availableParts, TOPLEVEL::section::main);
+    }
+    if (input.matchnMove(3, "panning"))
+    {
+        int value = MAIN::panningType::normal;
+        if(input.matchnMove(1, "cut"))
+            value = MAIN::panningType::cut;
+        else if (input.matchnMove(1, "boost"))
+            value = MAIN::panningType::boost;
+        else if (!input.matchnMove(1, "default") && controlType == TOPLEVEL::type::Write)
+            return REPLY::range_msg;
+        return sendNormal( synth, 0, value, controlType, MAIN::control::panLawType, TOPLEVEL::section::main);
     }
     return REPLY::op_msg;
 }

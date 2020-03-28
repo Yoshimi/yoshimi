@@ -105,7 +105,7 @@ void Effect::setpanning(char Ppanning_)
     Ppanning = Ppanning_;
     float left = 0;
     float right = 0;
-    setAllPan(Ppanning, left, right, CONFIG::panningType::normal);
+    setAllPan(Ppanning, left, right, MAIN::panningType::normal);
     /*
      * we fix panning as 'normal' for effects, because this has
      * never been any different, and we don't know what subtle

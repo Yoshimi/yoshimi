@@ -224,7 +224,7 @@ class MasterUI {: {private GuiUpdates}
       masterwindow->show();
       if (starterror.find("Could not") != std::string::npos)
           fl_alert("%s", starterror.c_str());
-
+      std::cout << "Law " <<  panning_law->value() << std::endl;
       // these don't have access to synth ->
       microtonalui->microtonaluiwindow->copy_label(synth->makeUniqueName("Scales").c_str());
       yoshiLog->logConsole->copy_label(synth->makeUniqueName("Console").c_str());
@@ -313,7 +313,7 @@ class MasterUI {: {private GuiUpdates}
 
           synth->guiClosed(true);
       }}
-      xywh {231 433 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
+      xywh {6 423 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Box {} {
         xywh {279 28 103 85} box ENGRAVED_FRAME
@@ -910,10 +910,10 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
         } {}
       }
       Fl_Group partuigroup {
-        xywh {3 255 380 170} box ENGRAVED_FRAME
+        xywh {3 255 380 172} box ENGRAVED_FRAME
       } {
         Fl_Group partui {
-          xywh {3 255 379 170} color 47
+          xywh {3 255 379 172} color 47
           code0 {o->init(synth->part[0],0,bankui);}
           code1 {o->show();}
           class PartUI
@@ -979,6 +979,27 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
         send_data(TOPLEVEL::action::forceUpdate, MAIN::control::availableParts, tmp, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
         tooltip {Set the number of available parts} xywh {93 264 40 20} labelsize 11 minimum 16 maximum 64 step 16 value 16 textsize 11
         code0 {o->value(partmax);}
+      }
+      Fl_Choice panning_law {
+        label {Pan Law}
+        callback {//
+                       send_data(0, MAIN::control::panLawType, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
+        tooltip {Relative values when panned to extremes:
+   Per side | Equivalent Mono} xywh {219 340 160 20} down_box BORDER_BOX color 41 selection_color 0 labelsize 12 textfont 1 textsize 12 textcolor 255
+        code0 {o->value(fetchData(0, MAIN::control::panLawType, TOPLEVEL::section::main));}
+      } {
+        MenuItem {} {
+          label {Cut: 0dB | -6dB}
+          xywh {15 15 100 20} labelfont 1 labelsize 11
+        }
+        MenuItem {} {
+          label {Default: +3dB | -3dB}
+          xywh {25 25 100 20} labelfont 1 labelsize 11
+        }
+        MenuItem {} {
+          label {Boost: +6dB | 0dB}
+          tooltip {Per side + 6dB, Mono 0dB} xywh {35 35 100 20} labelfont 1 labelsize 11
+        }
       }
     }
     comment {line spaces in boxes below are critical} {in_source in_header
@@ -1584,6 +1605,9 @@ Alan Calvert started the project}
             setinspartlist();
             vectorui->checkParts(value_int);
             break;
+        case MAIN::control::panLawType:
+            panning_law->value(value_int);
+            break;
 
         case MAIN::control::detune:
             globalfinedetune->value(value);
@@ -2140,6 +2164,7 @@ Alan Calvert started the project}
     partmax = synth->getRuntime().NumAvailableParts;
     maxparts->value(partmax);
     checkmaxparts();
+    panning_law->value(fetchData(0, MAIN::control::panLawType, TOPLEVEL::section::main));
 
     npartcounter->value((synth->getRuntime().currentPart) + 1);
     int nval = synth->getRuntime().currentPart;

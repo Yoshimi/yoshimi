@@ -568,27 +568,6 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
         case CONFIG::control::bufferSize:
             contstr = "Internal buffer size";
             break;
-        case CONFIG::control::panLawType:
-            contstr = "Panning Law ";
-            if (addValue)
-            {
-                switch (value_int)
-                {
-                    case CONFIG::panningType::cut:
-                        contstr += "cut";
-                        break;
-                    case CONFIG::panningType::normal:
-                        contstr += "default";
-                        break;
-                    case CONFIG::panningType::boost:
-                        contstr += "boost";
-                        break;
-                    default:
-                        contstr += "unrecognised";
-                }
-            }
-            showValue = false;
-            break;
         case CONFIG::control::padSynthInterpolation:
             contstr = "PadSynth interpolation ";
             if (addValue)
@@ -1037,6 +1016,27 @@ string DataText::resolveMain(CommandBlock *getData, bool addValue)
             contstr = "Available Parts";
             break;
 
+        case MAIN::control::panLawType:
+            contstr = "Panning Law ";
+            if (addValue)
+            {
+                switch (value_int)
+                {
+                    case MAIN::panningType::cut:
+                        contstr += "cut";
+                        break;
+                    case MAIN::panningType::normal:
+                        contstr += "default";
+                        break;
+                    case MAIN::panningType::boost:
+                        contstr += "boost";
+                        break;
+                    default:
+                        contstr += "unrecognised";
+                }
+            }
+            showValue = false;
+            break;
         case MAIN::control::detune:
             contstr = "Detune";
             break;

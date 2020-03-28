@@ -168,6 +168,7 @@ static std::string toplist [] = {
     "    PREset <n>",           "set numbered effect preset to n",
     "    -- ",                  "effect dependedent controls",
     "  AVailable <n>",          "available parts (16, 32, 64)",
+    "  PANning <n>",            "panning type (Cut, Default, Boost)",
     "  Volume <n>",             "master volume",
     "  SHift <n>",              "master key shift semitones (0 no shift)",
     "  DEtune <n>",             "master fine detune",
@@ -179,7 +180,6 @@ static std::string toplist [] = {
 static std::string configlist [] = {
     "Oscillator <n>",      "* Add/Pad size (power 2 256-16384)",
     "BUffer <n>",          "* internal size (power 2 16-4096)",
-    "PANning <n>",         "panning type (Cut, Default, Boost)",
     "PAdsynth [s]",        "interpolation type (Linear, other = cubic)",
     "Virtual <n>",         "keyboard (0 = QWERTY, 1 = Dvorak, 2 = QWERTZ, 3 = AZERTY)",
     "Xml <n>",             "compression (0-9)",
