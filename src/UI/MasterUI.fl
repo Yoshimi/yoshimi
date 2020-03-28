@@ -2538,7 +2538,7 @@ Alan Calvert started the project}
 
    if (windows != NULL)
         fclose(windows);
-
+    int fetchX, fetchY;
     masterwindow->position(masterX, masterY);
     panelwindow->position(panelX, panelY);
     bankui->instrumentuiwindow->position(instrumentsX, instrumentsY);
@@ -2551,8 +2551,12 @@ Alan Calvert started the project}
     yoshiLog->logConsole->position(yoshiLogX, yoshiLogY);
     vectorui->vectorwindow->position(vectorX, vectorY);
     midilearnui->midilearnwindow->position(mlearnX, mlearnY);
-    partui->ctlwindow->position(controllersX, controllersY);
-    partui->ctlmidi->position(midictlX, midictlY);
+
+    loadWin(synth, fetchX, fetchY, "ctlWin");
+    partui->ctlwindow->position(fetchX, fetchY);
+    loadWin(synth, fetchX, fetchY, "ctlmidi");
+    partui->ctlmidi->position(fetchX, fetchY);
+
     partui->instrumenteditwindow->position(inseditX, inseditY);
     partui->instrumentkitlist->position(kitlistX, kitlistY);
     partui->partfx->position(partfxX, partfxY);} {}

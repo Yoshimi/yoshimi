@@ -22,7 +22,13 @@
 #ifndef MISCGUI_H
 #define MISCGUI_H
 
+#include <string>
+
 #include "Misc/SynthEngine.h"
+#include "Misc/FileMgrFuncs.h"
+
+using file::saveText;
+using file::loadText;
 
 enum ValueType {
     VC_plainValue,
@@ -125,5 +131,38 @@ private:
     void decode_envelope(SynthEngine *synth, CommandBlock *getData);
     void decode_updates(SynthEngine *synth, CommandBlock *getData);
 };
+
+inline void saveWin(SynthEngine *synth, int x, int y, std::string filename)
+{
+    std::string ID = std::to_string(synth->getUniqueId()) + "-";
+    std::string values =  std::to_string(x) + " " + std::to_string(y);
+    //std::cout << values << std::endl;
+    saveText(values, synth->getRuntime().ConfigDir + "/windows/" + ID + filename);
+}
+
+inline void loadWin(SynthEngine *synth, int& x, int& y, std::string filename)
+{
+    std::string ID = std::to_string(synth->getUniqueId()) + "-";;
+    std::string values = loadText(synth->getRuntime().ConfigDir + "/windows/" + ID + filename);
+    if (values == "")
+        x = y = 80;
+    else
+    {
+        size_t pos = values.find(' ');
+        if (pos == string::npos)
+            x = y = 80;
+        else
+        {
+            x = stoi(values.substr(0, pos));
+            if (x < 10)
+                x = 10;
+            y = stoi(values.substr(pos));
+            if (y < 10)
+                y = 10;
+            //std::cout << "x " << x << "   y " << y << std::endl;
+        }
+    }
+}
+
 
 #endif

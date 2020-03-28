@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -395,7 +395,7 @@ class PartKitItem {: {public Fl_Group}
   }
 }
 
-class PartUI {: {public Fl_Group, PartUI_}
+class PartUI {selected : {public Fl_Group, PartUI_}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
@@ -776,9 +776,9 @@ Offset}
     }
     Fl_Window ctlwindow {
       label Controllers
-      xywh {748 171 505 130} type Double hide
+      xywh {748 171 505 130} type Double
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Controllers").c_str());}
-      code1 {o->position(synth->getGuiMaster()->controllersX, synth->getGuiMaster()->controllersY);}
+      code1 {o->position(synth->getGuiMaster()->controllersX, synth->getGuiMaster()->controllersY);} visible
     } {
       Fl_Dial volrng {
         label {Vol Rng}
@@ -888,6 +888,8 @@ Offset}
       Fl_Button {} {
         label Close
         callback {//
+	saveWin(synth,aftertouchcontrol->x(), aftertouchcontrol->y(), "afterT");
+	saveWin(synth,ctlwindow->x(), ctlwindow->y(), "ctlWin");
         aftertouchcontrol->hide();
         ctlwindow->hide();}
         xywh {405 105 95 20} box THIN_UP_BOX
@@ -1003,7 +1005,10 @@ Offset}
       Fl_Button aftertouch {
         label Aftertouch
         callback {//
+                int x, y;
+                loadWin(synth, x, y, "afterT");
                 aftertouchcontrol->show();
+                aftertouchcontrol->position(x, y);
                 if ((Fl::event_button() == 3))
                     ctlwindow->hide();}
         xywh {245 105 130 20}
@@ -1182,6 +1187,7 @@ Offset}
       Fl_Button {} {
         label Close
         callback {//
+	saveWin(synth,aftertouchcontrol->x(), aftertouchcontrol->y(), "afterT");
         if ((Fl::event_button() == 3))
             ctlwindow->show();
         aftertouchcontrol->hide();}
@@ -1237,6 +1243,7 @@ Offset}
       Fl_Button {} {
         label Close
         callback {//;
+		saveWin(synth,ctlmidi->x(), ctlmidi->y(), "ctlmidi");
                 ctlmidi->hide();}
         xywh {309 35 50 20} box THIN_UP_BOX
       }
