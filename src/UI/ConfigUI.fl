@@ -179,7 +179,7 @@ class ConfigUI {selected
             label {Panning Law}
             callback {//
                        send_data(0, CONFIG::control::panLawType, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Values: Per side | Mono Equivalent} xywh {190 116 160 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            tooltip {Relative values when panned to extremes: \n   Per side | Equivalent Mono} xywh {190 116 160 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
             code0 {o->value(fetchData(0, CONFIG::control::panLawType, TOPLEVEL::section::config));}
           } {
             MenuItem {} {

@@ -242,6 +242,7 @@ string Bank::clearslot(unsigned int ninstrument, size_t rootID, size_t bankID)
 bool Bank::savetoslot(size_t rootID, size_t bankID, int ninstrument, int npart)
 {
     string filepath = getBankPath(rootID, bankID);
+    //std::cout << filepath << std::endl;
     string name = synth->part[npart]->Pname;
     if (filepath.at(filepath.size() - 1) != '/')
         filepath += "/";
@@ -1227,6 +1228,7 @@ string Bank::getBankPath(size_t rootID, size_t bankID)
     {
         return string("");
     }
+    //std::cout << getRootPath(rootID) << std::endl;
     string chkdir = getRootPath(rootID) + string("/") + roots [rootID].banks [bankID].dirname;
     if(chkdir.at(chkdir.size() - 1) == '/')
     {

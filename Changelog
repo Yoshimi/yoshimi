@@ -1,5 +1,9 @@
 yoshimi 1.7.0 M
 
+2020-3-28 Will
+* Merged in panning law control.
+* Added 'Yet Another Flute" to 'Companion' bank.
+
 2020-3-26 Will
 * Aftertouch fully MIDI-learnable.
   Also blocks normal control action by default.
