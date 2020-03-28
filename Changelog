@@ -8,6 +8,7 @@ yoshimi 1.7.0 M
 * Unified GUI numbering of config window files.
 * First trial of improved GUI window positioning.
   Only controller windows so far.
+* Create GUI window diretory!
 
 2020-3-26 Will
 * Aftertouch fully MIDI-learnable.

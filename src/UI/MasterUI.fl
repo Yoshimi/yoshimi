@@ -207,7 +207,8 @@ class MasterUI {: {private GuiUpdates}
       midilearnui = new MidiLearnUI(synth);
       yoshiLog = new ConsoleUI();
       openedit = false;
-
+      if (instance == 0)
+          file::createDir(synth->getRuntime().ConfigDir + "/windows");
       make_window();
       loadWindowData();
       string starterror = "";
