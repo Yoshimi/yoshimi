@@ -2,7 +2,7 @@
 version 1.0304
 header_name {.h}
 code_name {.cc}
-comment {Copyright 2016-2019, Will Godfrey
+comment {Copyright 2016-2020, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -41,26 +41,23 @@ decl {\#include "ParametersUI.h"} {public local
 decl {\#include "Misc/FileMgrFuncs.h"
     using file::findLeafName;
     using file::setExtension;
-    using file::isRegularFile;
-} {private local
+    using file::isRegularFile;} {private local
 }
 
 decl {\#include "Misc/NumericFuncs.h"
     using func::bitClear;
     using func::bitTest;
-    using func::bitSet;
-} {private local
+    using func::bitSet;} {private local
 }
 
 decl {\#include "Misc/TextMsgBuffer.h"
 
-    namespace \{ // Implementation details...
+    namespace { // Implementation details...
         TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
-    \}
-} {private local
+    }} {private local
 }
 
-class VectorUI {
+class VectorUI {open
 } {
   Function {make_window(void)} {} {
     Fl_Window vectorwindow {
@@ -651,15 +648,9 @@ class VectorUI {
   }
   Function {~VectorUI()} {} {
     code {//
-    vectorwindow->hide();} {}
-  }
-  Function {Show()} {} {
-    code {//
-    vectorwindow->show();} {}
-  }
-  Function {Hide()} {} {
-    code {//
-    vectorwindow->hide();} {}
+    saveWin(synth, vectorwindow->x(), vectorwindow->y(), vectorwindow->visible(), "vector");  
+    vectorwindow->hide();
+    delete  vectorwindow;} {}
   }
   Function {updateAll(bool everything = true)} {} {
     code {//

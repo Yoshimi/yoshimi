@@ -635,10 +635,18 @@ class PartUI {: {public Fl_Group, PartUI_}
         Fl_Button {} {
           label Controllers
           callback {//
+          int fetchX, fetchY, fetchO;
           if (Fl::event_button() != 3)
+          {
+              loadWin(synth, fetchX, fetchY, fetchO, "ctlWin");
+              ctlwindow->position(fetchX, fetchY);
               ctlwindow->show();
+          }
           else
-              ctlmidi->show();}
+          {
+              loadWin(synth, fetchX, fetchY, fetchO, "ctlmidi");
+              ctlmidi->position(fetchX, fetchY);
+              ctlmidi->show();}}
           tooltip {Left mouse button: Controller range settings, Right mouse button: MIDI CCs} xywh {8 81 139 25} box PLASTIC_UP_BOX color 228 labelsize 12
         }
         Fl_Spinner partkeyshift {
@@ -884,8 +892,6 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Button {} {
         label Close
         callback {//
-	saveWin(synth,aftertouchcontrol->x(), aftertouchcontrol->y(), "afterT");
-	saveWin(synth,ctlwindow->x(), ctlwindow->y(), "ctlWin");
         aftertouchcontrol->hide();
         ctlwindow->hide();}
         xywh {405 105 95 20} box THIN_UP_BOX
@@ -1001,12 +1007,13 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Button aftertouch {
         label Aftertouch
         callback {//
-                int x, y;
-                loadWin(synth, x, y, "afterT");
+                int X, Y, O;
+                loadWin(synth, X, Y, O, "afterT");
                 aftertouchcontrol->show();
-                aftertouchcontrol->position(x, y);
+                aftertouchcontrol->position(X, Y);
                 if ((Fl::event_button() == 3))
-                    ctlwindow->hide();}
+                {
+                    ctlwindow->hide();}}
         xywh {245 105 130 20}
       }
     }
@@ -1183,7 +1190,6 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Button {} {
         label Close
         callback {//
-	saveWin(synth,aftertouchcontrol->x(), aftertouchcontrol->y(), "afterT");
         if ((Fl::event_button() == 3))
             ctlwindow->show();
         aftertouchcontrol->hide();}
@@ -1239,7 +1245,6 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Button {} {
         label Close
         callback {//;
-		saveWin(synth,ctlmidi->x(), ctlmidi->y(), "ctlmidi");
                 ctlmidi->hide();}
         xywh {309 35 50 20} box THIN_UP_BOX
       }
@@ -2746,10 +2751,13 @@ class PartUI {: {public Fl_Group, PartUI_}
     if (padnoteui)
         delete padnoteui;
     partgroup->hide();
+    saveWin(synth, aftertouchcontrol->x(), aftertouchcontrol->y(), aftertouchcontrol->visible(), "afterT");
     aftertouchcontrol->hide();
     delete aftertouchcontrol;
+    saveWin(synth, ctlwindow->x(), ctlwindow->y(), ctlwindow->visible(), "ctlWin");
     ctlwindow->hide();
     delete ctlwindow;
+    saveWin(synth, ctlmidi->x(), ctlmidi->y(), ctlmidi->visible(), "ctlmidi");
     ctlmidi->hide();
     delete ctlmidi;
     partfx->hide();

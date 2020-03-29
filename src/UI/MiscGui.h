@@ -132,15 +132,15 @@ private:
     void decode_updates(SynthEngine *synth, CommandBlock *getData);
 };
 
-inline void saveWin(SynthEngine *synth, int x, int y, std::string filename)
+inline void saveWin(SynthEngine *synth, int x, int y, int o, std::string filename)
 {
     std::string ID = std::to_string(synth->getUniqueId()) + "-";
-    std::string values =  std::to_string(x) + " " + std::to_string(y);
+    std::string values =  std::to_string(x) + " " + std::to_string(y) + " " + std::to_string(o);
     //std::cout << values << std::endl;
     saveText(values, synth->getRuntime().ConfigDir + "/windows/" + ID + filename);
 }
 
-inline void loadWin(SynthEngine *synth, int& x, int& y, std::string filename)
+inline void loadWin(SynthEngine *synth, int& x, int& y, int& o, std::string filename)
 {
     std::string ID = std::to_string(synth->getUniqueId()) + "-";;
     std::string values = loadText(synth->getRuntime().ConfigDir + "/windows/" + ID + filename);
@@ -159,7 +159,8 @@ inline void loadWin(SynthEngine *synth, int& x, int& y, std::string filename)
             y = stoi(values.substr(pos));
             if (y < 10)
                 y = 10;
-            //std::cout << "x " << x << "   y " << y << std::endl;
+            o = stoi(values.substr(values.rfind(' ')));
+            //std::cout << "x " << x << "   y " << y <<  "   o " << o << std::endl;
         }
     }
 }

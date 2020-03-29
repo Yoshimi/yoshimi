@@ -534,15 +534,9 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
     num = 0;} {}
   }
   Function {~MidiLearnUI()} {} {
-    code {;} {}
-  }
-  Function {Show()} {} {
-    code {//
-    midilearnwindow->show();} {}
-  }
-  Function {Hide()} {} {
-    code {//
-    midilearnwindow->hide();} {}
+    code {saveWin(synth, midilearnwindow->x(), midilearnwindow->y(), midilearnwindow->visible(), "midiLearn");
+midilearnwindow->hide();
+delete midilearnwindow;} {}
   }
   Function {clearAll(bool empty)} {} {
     code {//
@@ -562,7 +556,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
   }
   Function {loadMidi(string file)} {} {
     code {//
-    send_data(0, MIDILEARN::control::loadList, 0, 0, 0, 0, 0, 0, textMsgBuffer.push((string) file));
+    send_data(TOPLEVEL::action::forceUpdate, MIDILEARN::control::loadList, 0, 0, 0, 0, 0, 0, textMsgBuffer.push((string) file));
     recent->activate();
     setWindowTitle(findLeafName(file));} {}
   }

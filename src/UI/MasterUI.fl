@@ -171,23 +171,15 @@ class MasterUI {: {private GuiUpdates}
           delete paramsui;
       }
       if (vectorui)
-      {
-          vectorui->Hide();
           delete vectorui;
-      }
       if (midilearnui)
-      {
-          midilearnui->Hide();
           delete midilearnui;
-      }
 
       if (yoshiLog)
       {
           yoshiLog->Hide();
           delete yoshiLog;
       }
-      //if (instance == 0)
-          //Fl::unlock();
       delete masterwindow;} {}
   }
   Function {Init(const char *_label)} {} {
@@ -224,7 +216,7 @@ class MasterUI {: {private GuiUpdates}
       masterwindow->show();
       if (starterror.find("Could not") != std::string::npos)
           fl_alert("%s", starterror.c_str());
-      std::cout << "Law " <<  panning_law->value() << std::endl;
+
       // these don't have access to synth ->
       microtonalui->microtonaluiwindow->copy_label(synth->makeUniqueName("Scales").c_str());
       yoshiLog->logConsole->copy_label(synth->makeUniqueName("Console").c_str());
@@ -247,14 +239,6 @@ class MasterUI {: {private GuiUpdates}
           configui->Show();
       if (yoshiLogO)
           yoshiLog->Show();
-      if (vectorO)
-          vectorui->Show();
-      if (mlearnO)
-          midilearnui->Show();
-      if (controllersO)
-          partui->ctlwindow->show();
-      if (midictlO)
-          partui->ctlmidi->show();
       if (inseditO)
           partui->instrumenteditwindow->show();
       //if (kitlistO)
@@ -703,15 +687,14 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
         Fl_Button {} {
           label {Midi Learn}
           callback {//
-          midilearnui->Show();
-          //yoshiLog->Show();}
+                midilearnui->midilearnwindow->show();}
           tooltip {Message Log} xywh {203 60 70 24} box PLASTIC_UP_BOX color 228 labelsize 11
           code0 {/*if (synth->getRuntime().toConsole == false){o->deactivate();yoshiLog->Hide();}*/}
         }
         Fl_Button vectors {
           label Vectors
           callback {//
-          vectorui->Show();}
+          vectorui->vectorwindow->show();}
           tooltip {Vector Setup Window} xywh {203 30 70 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
       }
@@ -1844,7 +1827,7 @@ Alan Calvert started the project}
             refresh_master_ui(1);
             resetPartsClip();
             if (midilearnui)
-                midilearnui->Hide();
+                midilearnui->midilearnwindow->hide();//Hide();
             setMasterLabel("");
             break;
 
@@ -2564,7 +2547,7 @@ Alan Calvert started the project}
 
    if (windows != NULL)
         fclose(windows);
-    int fetchX, fetchY;
+    int fetchX, fetchY, fetchO;
     masterwindow->position(masterX, masterY);
     panelwindow->position(panelX, panelY);
     bankui->instrumentuiwindow->position(instrumentsX, instrumentsY);
@@ -2575,13 +2558,31 @@ Alan Calvert started the project}
     virkeyboard->virkeyboardwindow->position(virkbdX, virkbdY);
     configui->configwindow->position(settingsX, settingsY);
     yoshiLog->logConsole->position(yoshiLogX, yoshiLogY);
-    vectorui->vectorwindow->position(vectorX, vectorY);
-    midilearnui->midilearnwindow->position(mlearnX, mlearnY);
-
-    loadWin(synth, fetchX, fetchY, "ctlWin");
+    loadWin(synth, fetchX, fetchY, fetchO, "vector");
+    vectorui->vectorwindow->position(fetchX, fetchY);
+    if (fetchO)
+        vectorui->vectorwindow->show();
+    loadWin(synth, fetchX, fetchY, fetchO, "midiLearn");
+    midilearnui->midilearnwindow->position(fetchX, fetchY);
+    if (fetchO)
+        midilearnui->midilearnwindow->show();
+    loadWin(synth, fetchX, fetchY, fetchO, "ctlWin");
     partui->ctlwindow->position(fetchX, fetchY);
-    loadWin(synth, fetchX, fetchY, "ctlmidi");
+    if (fetchO)
+    {
+        partui->ctlwindow->show();
+        loadWin(synth, fetchX, fetchY, fetchO, "afterT");
+        if (fetchO)
+        {
+            partui->aftertouchcontrol->position(fetchX, fetchY);
+            if (fetchO)
+                partui->aftertouchcontrol->show();
+        }
+    }
+    loadWin(synth, fetchX, fetchY, fetchO, "ctlmidi");
     partui->ctlmidi->position(fetchX, fetchY);
+    if (fetchO)
+        partui->ctlmidi->show();
 
     partui->instrumenteditwindow->position(inseditX, inseditY);
     partui->instrumentkitlist->position(kitlistX, kitlistY);
