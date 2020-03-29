@@ -11,7 +11,7 @@ comment {SubNoteUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2015-2019, Will Godfrey & others
+Copyright 2015-2020, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -175,7 +175,7 @@ class SUBnoteUI {: {public PresetsUI_}
       label {SUBsynth Parameters}
       xywh {1 21 735 470} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
-      code1 {o->position(synth->getGuiMaster()->subNoteX, synth->getGuiMaster()->subNoteY);}
+      code1 {int fetchX, fetchY, fetchO;loadWin(synth, fetchX, fetchY, fetchO, "sub");o->position(fetchX, fetchY);}
     } {
       Fl_Scroll {} {
         xywh {5 140 435 326} type HORIZONTAL box THIN_UP_BOX when 1
@@ -838,6 +838,7 @@ class SUBnoteUI {: {public PresetsUI_}
   Function {~SUBnoteUI()} {return_type virtual
   } {
     code {//
+    saveWin(synth, SUBparameters->x(),SUBparameters->y(), SUBparameters->visible(), "sub");
     SUBparameters->hide();
     delete(SUBparameters);} {}
   }

@@ -5,6 +5,7 @@ yoshimi 1.7.0 M
 * MIDIlearn and Vector added to improved GUI windowing.
 * Mixer, Banks, VertKeyb added to improved GUI windowing.
 * Console, Scales added to improved GUI windowing.
+* ADnote, PADnote, Subnote added to improved GUI windowing.
 
 2020-3-28 Will
 * Merged in panning law control.

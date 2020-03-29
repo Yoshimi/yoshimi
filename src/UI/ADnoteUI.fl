@@ -1733,7 +1733,7 @@ class ADnoteUI {: {public PresetsUI_}
       label {ADsynth Global Parameters of the Instrument}
       xywh {151 81 535 405} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
-      code1 {o->position(synth->getGuiMaster()->addNoteX, synth->getGuiMaster()->addNoteY);}
+      code1 {int fetchX, fetchY, fetchO;loadWin(synth, fetchX, fetchY, fetchO, "adGlobal");o->position(fetchX, fetchY);}
     } {
       Fl_Group {} {
         label FREQUENCY
@@ -1939,6 +1939,10 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
         callback {//
             for (int i = 0; i < NUM_VOICES; ++i)
                 voicelistitem[i]->refreshlist();
+            int fetchX, fetchY, fetchO;
+            loadWin(synth, fetchX, fetchY, fetchO, "adList");
+            ADnoteVoiceList->position(fetchX, fetchY);
+            listSeen = true;
             ADnoteVoiceList->show();
             if (Fl::event_button() == 3)
                 ADnoteGlobalParameters->hide();}
@@ -1948,6 +1952,10 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
         label {Show Voice Parameters}
         callback {//
     voicelistitem[nvoice]->refreshlist();
+    int fetchX, fetchY, fetchO;
+    loadWin(synth, fetchX, fetchY, fetchO, "adVoice");
+    ADnoteVoice->position(fetchX, fetchY);
+    voiceSeen = true;
     ADnoteVoice->show();
     ADnoteVoice->redraw();
     synth->getGuiMaster()->partui->adnoteui->fromVoiceList = false;
@@ -2337,13 +2345,20 @@ switch (num)
         kititem = kititem_;
         nvoice = 0;
         resui = new ResonanceUI(pars->GlobalPar.Reson, npart, kititem, 0);
+        voiceSeen = false;
+        listSeen = false;
         make_window();} {}
   }
   Function {~ADnoteUI()} {return_type virtual
   } {
     code {//
+        if (listSeen)
+            saveWin(synth, ADnoteVoiceList->x(), ADnoteVoiceList->y(), ADnoteVoiceList->visible(), "adList");
         ADnoteVoiceList->hide();
+        saveWin(synth, ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(), ADnoteGlobalParameters->visible(), "adGlobal");
         ADnoteGlobalParameters->hide();
+        if (voiceSeen)
+            saveWin(synth, ADnoteVoice->x(), ADnoteVoice->y(), ADnoteVoice->visible(), "adVoice");
         ADnoteVoice->hide();
         delete ADnoteVoiceList;
         delete ADnoteGlobalParameters;
@@ -2405,6 +2420,10 @@ switch (num)
         ADnoteVoice->show();} {}
   }
   decl {ADnoteParameters *pars;} {private local
+  }
+  decl {bool voiceSeen;} {public local
+  }
+  decl {bool listSeen;} {public local
   }
   decl {ResonanceUI *resui;} {public local
   }

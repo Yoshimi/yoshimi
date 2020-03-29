@@ -144,6 +144,7 @@ inline void loadWin(SynthEngine *synth, int& x, int& y, int& o, std::string file
 {
     std::string ID = std::to_string(synth->getUniqueId()) + "-";;
     std::string values = loadText(synth->getRuntime().ConfigDir + "/windows/" + ID + filename);
+    //std::cout << synth->getRuntime().ConfigDir << "/windows/" << ID << filename << std::endl;
     if (values == "")
         x = y = 80;
     else

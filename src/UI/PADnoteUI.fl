@@ -245,7 +245,7 @@ class PADnoteUI {: {public PresetsUI_}
       label {PAD synth Parameters}
       xywh {143 20 535 450} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
-      code1 {o->position(synth->getGuiMaster()->padNoteX, synth->getGuiMaster()->padNoteY);}
+      code1 {int fetchX, fetchY, fetchO;loadWin(synth, fetchX, fetchY, fetchO, "pad");o->position(fetchX, fetchY);}
     } {
       Fl_Tabs {} {
         callback {//
@@ -1348,7 +1348,7 @@ class PADnoteUI {: {public PresetsUI_}
     code {//
     delete(oscui);
     delete(resui);
-
+    saveWin(synth, padnotewindow->x(),padnotewindow->y(), padnotewindow->visible(), "pad");
     padnotewindow->hide();
     delete(padnotewindow);} {}
   }
