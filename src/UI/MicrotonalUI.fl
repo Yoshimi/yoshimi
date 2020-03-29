@@ -11,7 +11,7 @@ comment {Microtonal.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009, Alan Calvert
-Copyright 2016-2019, Will Godfrey
+Copyright 2016-2020, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -501,7 +501,7 @@ class MicrotonalUI {} {
             break;
 
         case SCALES::control::clearAll:
-            Hide();
+            microtonaluiwindow->hide();
             make_window();
             break;
 }} {}
@@ -543,16 +543,11 @@ class MicrotonalUI {} {
   }
   Function {~MicrotonalUI()} {} {
     code {//
+    saveWin(synth, microtonaluiwindow->x(), microtonaluiwindow->y(), microtonaluiwindow->visible(), "scales");
     microtonaluiwindow->hide();
-    delete(microtonaluiwindow);} {}
-  }
-  Function {Show()} {} {
-    code {//
-    microtonaluiwindow->show();} {}
-  }
-  Function {Hide()} {} {
-    code {//
-    microtonaluiwindow->hide();} {}
+    delete tuningsinput;
+    delete mappinginput;
+    delete microtonaluiwindow;} {}
   }
   Function {apply()} {} {
     code {//

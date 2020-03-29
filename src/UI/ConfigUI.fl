@@ -1115,6 +1115,12 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             readpresetcfg();
             selectedRootID = -1;} {}
   }
+  Function {~ConfigUI()} {} {
+    code {//
+        saveWin(synth,configwindow->x(), configwindow->y(), configwindow->visible(), "config");
+        configwindow->hide();
+        delete configwindow;;} {}
+  }
   Function {activatebutton_presetdir(bool active)} {} {
     code {//
             if (active)
@@ -1287,10 +1293,6 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                     else
                         alsaSource->deactivate();
                     configwindow->show();} {}
-  }
-  Function {Hide()} {} {
-    code {//
-                    configwindow->hide();} {}
   }
   Function {testCC(int value, int control)} {return_type string
   } {

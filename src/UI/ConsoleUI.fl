@@ -3,7 +3,7 @@ version 1.0304
 header_name {.h}
 code_name {.cc}
 comment {Copyright 2011, Alan Calvert
-Copyright 2015-2017, Will Godfrey
+Copyright 2015-2020, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -18,7 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <set>} {public local
@@ -76,16 +76,13 @@ class ConsoleUI {} {
     txtbuf = new Fl_Text_Buffer(bufsize);
     logText->buffer(txtbuf);} {}
   }
-  Function {Show()} {} {
-    code {logConsole->show();} {}
-  }
-  Function {Hide()} {} {
-    code {logConsole->hide();} {}
-  }
   Function {~ConsoleUI()} {} {
-    code {logConsole->hide();
-      if (NULL != txtbuf)
-        delete txtbuf;} {}
+    code {//
+      //if (NULL != txtbuf)
+         // delete txtbuf;
+
+      logConsole->hide();
+      delete logConsole;} {}
   }
   Function {log(string msg)} {} {
     code {//

@@ -143,20 +143,15 @@ class MasterUI {: {private GuiUpdates}
       panelwindow->hide();
       delete panelwindow;
       if (microtonalui)
-      {
-          microtonalui->Hide();
           delete microtonalui;
-      }
       if (bankui)
           delete bankui;
       if (virkeyboard)
           delete virkeyboard;
 
       if (configui)
-      {
-          configui->Hide();
           delete configui;
-      }
+
       if (presetsui)
       {
           presetsui->Hide();
@@ -174,7 +169,7 @@ class MasterUI {: {private GuiUpdates}
 
       if (yoshiLog)
       {
-          yoshiLog->Hide();
+          saveWin(synth, yoshiLog->logConsole->x(),yoshiLog->logConsole->y(), yoshiLog->logConsole->visible(), "log");
           delete yoshiLog;
       }
       delete masterwindow;} {}
@@ -218,12 +213,6 @@ class MasterUI {: {private GuiUpdates}
       microtonalui->microtonaluiwindow->copy_label(synth->makeUniqueName("Scales").c_str());
       yoshiLog->logConsole->copy_label(synth->makeUniqueName("Console").c_str());
 
-      if (scalesO)
-          microtonalui->microtonaluiwindow->show();
-      if (settingsO)
-          configui->Show();
-      if (yoshiLogO)
-          yoshiLog->Show();
       if (inseditO)
           partui->instrumenteditwindow->show();
       //if (kitlistO)
@@ -333,7 +322,7 @@ class MasterUI {: {private GuiUpdates}
           }
           MenuItem {} {
             label {&Reports...}
-            callback {yoshiLog->Show();}
+            callback {yoshiLog->logConsole->show();}
             xywh {0 0 34 20} labelsize 12
           }
           MenuItem {} {
@@ -503,7 +492,7 @@ class MasterUI {: {private GuiUpdates}
           MenuItem {} {
             label {S&how Settings...}
             callback {//
-            microtonalui->Show();}
+            microtonalui->microtonaluiwindow->show();}
             xywh {20 20 100 20} labelsize 12
           }
           MenuItem {} {
@@ -1761,7 +1750,7 @@ Alan Calvert started the project}
             else
             {
                 RecentScale->activate();
-                microtonalui->Hide();
+                microtonalui->microtonaluiwindow->hide();
                 microtonalui->make_window();
             }
             break;
@@ -2375,15 +2364,10 @@ Alan Calvert started the project}
   Function {setLogging(bool isConsole)} {} {
     code {//
     if (isConsole)
-    {
-        //Reports->activate();
-        yoshiLog->Show();
-    }
+        yoshiLog->logConsole->show();
     else
-    {
-        //Reports->deactivate();
-        yoshiLog->Hide();
-    }} {}
+        yoshiLog->logConsole->hide();
+    } {}
   }
   Function {updateBankRootDirs()} {} {
     code {bankui->readbankcfg();} {}
@@ -2555,12 +2539,18 @@ Alan Calvert started the project}
     virkeyboard->virkeyboardwindow->position(fetchX, fetchY);
     if (fetchO)
         virkeyboard->virkeyboardwindow->show();
-
-    configui->presets->position(presetsX, presetsY);
-    configui->configwindow->position(settingsX, settingsY);
-    yoshiLog->logConsole->position(yoshiLogX, yoshiLogY);
-
-    microtonalui->microtonaluiwindow->position(scalesX, scalesY);
+    loadWin(synth, fetchX, fetchY, fetchO, "config");
+    configui->configwindow->position(fetchX, fetchY);
+    if (fetchO)
+        configui->Show(); // this does some initialising
+    loadWin(synth, fetchX, fetchY, fetchO, "log");
+    yoshiLog->logConsole->position(fetchX, fetchY);
+    if (fetchO)
+        yoshiLog->logConsole->show();
+    loadWin(synth, fetchX, fetchY, fetchO, "scales");
+    microtonalui->microtonaluiwindow->position(fetchX, fetchY);
+    if (fetchO)
+        microtonalui->microtonaluiwindow->show();
     loadWin(synth, fetchX, fetchY, fetchO, "vector");
     vectorui->vectorwindow->position(fetchX, fetchY);
     if (fetchO)

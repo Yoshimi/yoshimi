@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>} {public local
@@ -58,13 +58,13 @@ class PresetsUI_ {} {
   } {
     code {;} {}
   }
-  Function {~PresetsUI_()} {} {
+  Function {~PresetsUI_()} {open
+  } {
     code {;} {}
   }
 }
 
-class PresetsUI {selected
-} {
+class PresetsUI {} {
   Function {PresetsUI(SynthEngine *_synth)} {} {
     code {//
     synth = _synth;
