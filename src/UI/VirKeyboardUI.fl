@@ -12,7 +12,7 @@ comment {
 Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2014 -2019, Will Godfrey
+Copyright 2014 -2020, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -554,16 +554,14 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
   }
   Function {~VirKeyboard()} {} {
     code {//
+    saveWin(synth, virkeyboardwindow->x(), virkeyboardwindow->y(), virkeyboardwindow->visible(), "vertKeyb");
+    virkeyboardwindow->hide();
     delete virkeyboardwindow;} {}
   }
   Function {send_data(int action, int control, float value, int type, int kititem = UNUSED, int engine = UNUSED)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
         collect_data(synth, value, action, (Fl::event_button() | type), control, TOPLEVEL::section::midiIn, kititem, engine);} {}
-  }
-  Function {Show()} {} {
-    code {//
-    virkeyboardwindow->show();} {}
   }
   Function {Hide()} {} {
     code {//

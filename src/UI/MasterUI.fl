@@ -133,11 +133,13 @@ class MasterUI {: {private GuiUpdates}
   Function {~MasterUI()} {} {
     code {//
       saveWindowData();
+      saveWin(synth, masterwindow->x(), masterwindow->y(), 1, "master");
       masterwindow->hide();
       aboutwindow->hide();
       delete aboutwindow;
       syseffsendwindow->hide();
       delete syseffsendwindow;
+      saveWin(synth, panelwindow->x(), panelwindow->y(), panelwindow->visible(), "mixer");
       panelwindow->hide();
       delete panelwindow;
       if (microtonalui)
@@ -146,15 +148,10 @@ class MasterUI {: {private GuiUpdates}
           delete microtonalui;
       }
       if (bankui)
-      {
-          bankui->Hide();
           delete bankui;
-      }
       if (virkeyboard)
-      {
-          virkeyboard->Hide();
           delete virkeyboard;
-      }
+
       if (configui)
       {
           configui->Hide();
@@ -221,20 +218,8 @@ class MasterUI {: {private GuiUpdates}
       microtonalui->microtonaluiwindow->copy_label(synth->makeUniqueName("Scales").c_str());
       yoshiLog->logConsole->copy_label(synth->makeUniqueName("Console").c_str());
 
-      if (panelO)
-          mixerpanel->do_callback();
-      if (instrumentsO)
-          bankui->Show();
-      if (banksO)
-          bankui->bankuiwindow->show();
-      if (presetsO)
-          configui->presets->show();
-      if (rootsO)
-          bankui->rootuiwindow->show();
       if (scalesO)
           microtonalui->microtonaluiwindow->show();
-      if (virkbdO)
-          virkeyboard->Show();
       if (settingsO)
           configui->Show();
       if (yoshiLogO)
@@ -674,7 +659,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
         Fl_Button {} {
           label {Virtual Keyboard}
           callback {//
-          virkeyboard->Show();}
+          virkeyboard->virkeyboardwindow->show();}
           tooltip {Virtual Keyboard} xywh {85 60 110 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
         Fl_Button mixerpanel {
@@ -2202,7 +2187,7 @@ Alan Calvert started the project}
     updatepanel(type > 0);
     if (type != 5)
         vectorui->RefreshChans();
-    bankui->Hide();
+    //bankui->Hide();
     /*if (synth->getRuntime().toConsole == false)
         Reports->deactivate();
     else
@@ -2548,16 +2533,34 @@ Alan Calvert started the project}
    if (windows != NULL)
         fclose(windows);
     int fetchX, fetchY, fetchO;
-    masterwindow->position(masterX, masterY);
-    panelwindow->position(panelX, panelY);
-    bankui->instrumentuiwindow->position(instrumentsX, instrumentsY);
+    loadWin(synth, fetchX, fetchY, fetchO, "master");
+    masterwindow->position(fetchX, fetchY);
+    loadWin(synth, fetchX, fetchY, fetchO, "mixer");
+    panelwindow->position(fetchX, fetchY);
+    if (fetchO)
+        mixerpanel->do_callback();
+    loadWin(synth, fetchX, fetchY, fetchO, "bankInst");
+    bankui->instrumentuiwindow->position(fetchX, fetchY);
+    if (fetchO)
+        bankui->instrumentuiwindow->show();
+    loadWin(synth, fetchX, fetchY, fetchO, "bankBank");
     bankui->bankuiwindow->position(banksX, banksY);
+    if (fetchO)
+    bankui->bankuiwindow->show();
+    loadWin(synth, fetchX, fetchY, fetchO, "bankRoot");
     bankui->rootuiwindow->position(rootsX, rootsY);
+    if (fetchO)
+        bankui->rootuiwindow->show();
+    loadWin(synth, fetchX, fetchY, fetchO, "vertKeyb");
+    virkeyboard->virkeyboardwindow->position(fetchX, fetchY);
+    if (fetchO)
+        virkeyboard->virkeyboardwindow->show();
+
     configui->presets->position(presetsX, presetsY);
-    microtonalui->microtonaluiwindow->position(scalesX, scalesY);
-    virkeyboard->virkeyboardwindow->position(virkbdX, virkbdY);
     configui->configwindow->position(settingsX, settingsY);
     yoshiLog->logConsole->position(yoshiLogX, yoshiLogY);
+
+    microtonalui->microtonaluiwindow->position(scalesX, scalesY);
     loadWin(synth, fetchX, fetchY, fetchO, "vector");
     vectorui->vectorwindow->position(fetchX, fetchY);
     if (fetchO)

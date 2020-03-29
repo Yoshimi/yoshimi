@@ -57,8 +57,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class VectorUI {open
-} {
+class VectorUI {} {
   Function {make_window(void)} {} {
     Fl_Window vectorwindow {
       label {Yoshimi : Vectors}

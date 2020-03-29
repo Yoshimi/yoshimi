@@ -154,8 +154,8 @@ inline void loadWin(SynthEngine *synth, int& x, int& y, int& o, std::string file
         else
         {
             x = stoi(values.substr(0, pos));
-            if (x < 10)
-                x = 10;
+            if (x < 4)
+                x = 4;
             y = stoi(values.substr(pos));
             if (y < 10)
                 y = 10;
