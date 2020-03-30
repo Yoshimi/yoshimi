@@ -80,7 +80,7 @@ void Envelope::recomputePoints()
 
     envstretch = powf(440.0f / basefreq, _envpars->Penvstretch / 64.0f);
 
-    float bufferdt = synth->sent_all_buffersize_f / synth->samplerate_f;
+    float bufferdt = synth->fixed_sample_step_f;
 
     for (int i = 0; i < MAX_ENVELOPE_POINTS; ++i)
     {

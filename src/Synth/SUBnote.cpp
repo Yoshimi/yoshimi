@@ -27,9 +27,9 @@
 */
 
 #include <cmath>
-#include <fftw3.h>
 #include <iostream>
 
+#include "DSP/FFTwrapper.h"
 #include "Params/SUBnoteParameters.h"
 #include "Params/Controller.h"
 #include "Synth/Envelope.h"

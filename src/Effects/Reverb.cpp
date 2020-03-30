@@ -25,10 +25,10 @@
 */
 
 #include <cmath>
-#include <fftw3.h>
 
 using namespace std;
 
+#include "DSP/FFTwrapper.h"
 #include "DSP/Unison.h"
 #include "DSP/AnalogFilter.h"
 #include "Misc/SynthEngine.h"

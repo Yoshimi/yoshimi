@@ -1,5 +1,14 @@
 yoshimi 1.7.0 M
 
+2020-3-31 Will
+* fftw3.h now only included in DSP/FFTwrapper.h
+  All other uses refer back to this.
+* Fixed sample step size now only calculated in one place.
+  Previously done in many places requiring two indirect
+  fetches and a division. Now just one indirect fetch.
+* sent_all_buffersize_f renamed to fixed_buffersize_f
+  The previous name was confusingly incorrect.
+
 2020-3-30 Will
 * Completed transfers to improved GUI windowing.
   Some tidying yet to do.

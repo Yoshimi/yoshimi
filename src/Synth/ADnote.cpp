@@ -26,9 +26,9 @@
 */
 
 #include <cmath>
-#include <fftw3.h>
 #include <cassert>
 
+#include "DSP/FFTwrapper.h"
 #include "Synth/Envelope.h"
 #include "Synth/ADnote.h"
 #include "Synth/LFO.h"
@@ -607,8 +607,7 @@ void ADnote::construct()
         firsttick[nvoice] = 1;
         NoteVoicePar[nvoice].DelayTicks =
             (int)((expf(adpars->VoicePar[nvoice].PDelay / 127.0f
-                         * logf(50.0f)) - 1.0f) / synth->sent_all_buffersize_f / 10.0f
-                         * synth->samplerate_f);
+            * logf(50.0f)) - 1.0f) / synth->fixed_sample_step_f / 10.0f);
 
         if (parentFMmod != NULL && NoteVoicePar[nvoice].FMEnabled == FREQ_MOD) {
             FMFMoldsmpModded[nvoice] = new float [unison];
@@ -1413,7 +1412,7 @@ void ADnote::computeNoteParameters(void)
 
             unison_vibratto[nvoice].amplitude = (unison_real_spread - 1.0f) * unison_vibratto_a;
 
-            float increments_per_second = synth->samplerate_f / synth->sent_all_buffersize_f;
+            float increments_per_second = 1 / synth->fixed_sample_step_f;
             const float vib_speed = adpars->VoicePar[nvoice].Unison_vibratto_speed / 127.0f;
             float vibratto_base_period  = 0.25f * powf(2.0f, (1.0f - vib_speed) * 4.0f);
             for (int k = 0; k < unison; ++k)
