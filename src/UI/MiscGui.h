@@ -146,7 +146,10 @@ inline void loadWin(SynthEngine *synth, int& x, int& y, int& o, std::string file
     std::string values = loadText(synth->getRuntime().ConfigDir + "/windows/" + ID + filename);
     //std::cout << synth->getRuntime().ConfigDir << "/windows/" << ID << filename << std::endl;
     if (values == "")
+    {
         x = y = 80;
+        o = 0;
+    }
     else
     {
         size_t pos = values.find(' ');

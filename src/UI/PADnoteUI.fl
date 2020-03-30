@@ -1003,8 +1003,6 @@ class PADnoteUI {: {public PresetsUI_}
       Fl_Button {} {
         label Close
         callback {//
-        synth->getGuiMaster()->padNoteX = padnotewindow->x();
-        synth->getGuiMaster()->padNoteY = padnotewindow->y();
         padnotewindow->hide();
         if ((Fl::event_button() == 3))
         {

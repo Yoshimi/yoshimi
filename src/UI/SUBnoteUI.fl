@@ -190,8 +190,6 @@ class SUBnoteUI {: {public PresetsUI_}
       Fl_Button {} {
         label Close
         callback {//
-        synth->getGuiMaster()->subNoteX = SUBparameters->x();
-        synth->getGuiMaster()->subNoteY = SUBparameters->y();
         SUBparameters->hide();
         if ((Fl::event_button() == 3))
         {

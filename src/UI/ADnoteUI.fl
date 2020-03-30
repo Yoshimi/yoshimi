@@ -1966,8 +1966,6 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
       Fl_Button {} {
         label Close
         callback {//
-            synth->getGuiMaster()->addNoteX = ADnoteGlobalParameters->x();
-            synth->getGuiMaster()->addNoteY = ADnoteGlobalParameters->y();
             ADnoteGlobalParameters->hide();
             if (Fl::event_button() == 3)
             {

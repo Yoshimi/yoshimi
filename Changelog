@@ -1,5 +1,9 @@
 yoshimi 1.7.0 M
 
+2020-3-30 Will
+* Completed transfers to improved GUI windowing.
+  Some tidying yet to do.
+
 2020-3-29 Will
 * Fixed regresssion. Loading MIDIlearn not displaying.
 * MIDIlearn and Vector added to improved GUI windowing.
