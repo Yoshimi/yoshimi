@@ -371,7 +371,7 @@ ADnote::ADnote(const ADnote &orig, ADnote *parent, float *parentFMmod_) :
             ADnote *parentVoice = (origVoice != NULL) ? origVoice : this;
             for (int k = 0; k < orig.unison_size[i]; ++k)
             {
-                subFMVoice[i][k] = new ADnote(*orig.subVoice[i][k], parentVoice, parentFMmod);
+                subFMVoice[i][k] = new ADnote(*orig.subFMVoice[i][k], parentVoice, parentFMmod);
             }
         }
         else
