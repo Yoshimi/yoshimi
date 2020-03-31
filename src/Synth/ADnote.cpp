@@ -269,7 +269,7 @@ ADnote::ADnote(const ADnote &orig, ADnote *parent, float *parentFMmod_) :
         }
         // NoteVoicePar done
 
-        int unison = adpars->VoicePar[i].Unison_size;
+        int unison = unison_size[i];
 
         oscfreqhi[i] = new int[unison];
         memcpy(oscfreqhi[i], orig.oscfreqhi[i], unison * sizeof(int));
