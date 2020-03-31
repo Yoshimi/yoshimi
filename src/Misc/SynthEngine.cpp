@@ -227,12 +227,12 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     if (buffersize > audiobufsize)
         buffersize = audiobufsize;
     buffersize_f = buffersize;
-    fixed_buffersize_f = buffersize_f;
-    fixed_sample_step_f = fixed_buffersize_f / samplerate_f;
+    fixed_sample_step_f = buffersize_f / samplerate_f;
     bufferbytes = buffersize * sizeof(float);
 
     oscilsize_f = oscilsize = Runtime.Oscilsize;
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
+    oscil_sample_step_f = oscilsize_f / samplerate_f;
     // distance / duration / second = distance / (duration * second)
     // While some might prefer to write this as the latter, when distance and
     // duration are constants the latter incurs two roundings while the former

@@ -8,6 +8,7 @@ yoshimi 1.7.0 M
   fetches and a division. Now just one indirect fetch.
 * sent_all_buffersize_f renamed to fixed_buffersize_f
   The previous name was confusingly incorrect.
+* Applied similar optimisations to oscllator code.
 
 2020-3-30 Will
 * Completed transfers to improved GUI windowing.

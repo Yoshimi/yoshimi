@@ -1540,7 +1540,7 @@ void ADnote::setfreq(int nvoice, float in_freq, float pitchdetune)
             subVoice[nvoice][k]->setPitchDetuneFromParent(pitchdetune);
             subVoice[nvoice][k]->setUnisonDetuneFromParent(detunefactor);
         }
-        float speed = freq * synth->oscilsize_f / synth->samplerate_f;
+        float speed = freq * synth->oscil_sample_step_f;
         if (isgreater(speed, synth->oscilsize_f))
             speed = synth->oscilsize_f;
         int tmp = int(speed);
@@ -1563,7 +1563,7 @@ void ADnote::setfreqFM(int nvoice, float in_freq, float pitchdetune)
             subFMVoice[nvoice][k]->setPitchDetuneFromParent(pitchdetune);
             subFMVoice[nvoice][k]->setUnisonDetuneFromParent(detunefactor);
         }
-        float speed = freq * synth->oscilsize_f / synth->samplerate_f;
+        float speed = freq * synth->oscil_sample_step_f;
         if (isgreater(speed, synth->oscilsize_f))
             speed = synth->oscilsize_f;
         int tmp = int(speed);
@@ -1943,7 +1943,15 @@ void ADnote::normalizeVoiceModulatorFrequencyModulation(int nvoice, int FMmode)
     // normalize: makes all sample-rates, oscil_sizes to produce same sound
     if (FMmode == FREQ_MOD) // Frequency modulation
     {
-        float normalize = synth->oscilsize_f / 262144.0f * 44100.0f / synth->samplerate_f;
+        float normalize = synth->oscil_sample_step_f * 0.168228149f;
+        /*
+         * This optimisation changes two indirect fetches and several
+         * multiplications and divisions into a single indirect fetch and
+         * multiplication. However this obscures the intent so we retain
+         * the original below for comparison.
+         *
+         * float normalize = synth->oscilsize_f / 262144.0f * 44100.0f / synth->samplerate_f;
+         */
         for (int k = 0; k < unison_size[nvoice]; ++k)
         {
             float *tw = tmpmod_unison[k];

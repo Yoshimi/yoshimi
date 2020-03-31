@@ -182,11 +182,11 @@ class SynthEngine
         float oscilsize_f;
         int halfoscilsize;
         float halfoscilsize_f;
+        float oscil_sample_step_f;
 
-        int sent_buffersize; //used for variable length runs
-        int sent_bufferbytes; //used for variable length runs
-        float sent_buffersize_f; //used for variable length runs
-        float fixed_buffersize_f;
+        int           sent_buffersize; //used for variable length runs
+        int           sent_bufferbytes; //used for variable length runs
+        float         sent_buffersize_f; //used for variable length runs
         float         fixed_sample_step_f;
         float         TransVolume;
         float         Pvolume;

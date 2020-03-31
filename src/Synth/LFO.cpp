@@ -106,7 +106,7 @@ inline void LFO::RecomputeFreq(void)
         powf(basefreq / 440.0f, (float)((int)lfopars->Pstretch - 64) / 63.0f); // max 2x/octave
 
     float lfofreq = lfopars->Pfreq * lfostretch;
-    incx = fabsf(lfofreq) * synth->buffersize_f / synth->samplerate_f;
+    incx = fabsf(lfofreq) * synth->fixed_sample_step_f;
 
     // Limit the Frequency (or else...)
     if (incx > 0.49999999f)
