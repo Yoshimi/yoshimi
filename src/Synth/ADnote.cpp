@@ -61,7 +61,7 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
     forFM(false),
     portamento(portamento_),
     subVoiceNumber(-1),
-    origVoice(NULL),
+    origVoice(this),
     parentFMmod(NULL),
     paramsUpdate(adpars),
     synth(_synth)
@@ -118,7 +118,7 @@ ADnote::ADnote(const ADnote &orig, ADnote *origVoice_, float *parentFMmod_) :
     pangainL(orig.pangainL),
     pangainR(orig.pangainR),
     subVoiceNumber(orig.subVoiceNumber),
-    origVoice(origVoice_),
+    origVoice((origVoice_ != NULL) ? origVoice_ : this),
     parentFMmod(parentFMmod_),
     paramsUpdate(adpars),
     synth(orig.synth)
@@ -353,10 +353,9 @@ ADnote::ADnote(const ADnote &orig, ADnote *origVoice_, float *parentFMmod_) :
         if (orig.subVoice[i] != NULL)
         {
             subVoice[i] = new ADnote*[orig.unison_size[i]];
-            ADnote *parentVoice = (origVoice != NULL) ? origVoice : this;
             for (int k = 0; k < orig.unison_size[i]; ++k)
             {
-                subVoice[i][k] = new ADnote(*orig.subVoice[i][k], parentVoice, freqbasedmod[i] ? tmpmod_unison[k] : parentFMmod);
+                subVoice[i][k] = new ADnote(*orig.subVoice[i][k], origVoice, freqbasedmod[i] ? tmpmod_unison[k] : parentFMmod);
             }
         }
         else
@@ -365,10 +364,9 @@ ADnote::ADnote(const ADnote &orig, ADnote *origVoice_, float *parentFMmod_) :
         if (orig.subFMVoice[i] != NULL)
         {
             subFMVoice[i] = new ADnote*[orig.unison_size[i]];
-            ADnote *parentVoice = (origVoice != NULL) ? origVoice : this;
             for (int k = 0; k < orig.unison_size[i]; ++k)
             {
-                subFMVoice[i][k] = new ADnote(*orig.subFMVoice[i][k], parentVoice, parentFMmod);
+                subFMVoice[i][k] = new ADnote(*orig.subFMVoice[i][k], origVoice, parentFMmod);
             }
         }
         else
@@ -655,7 +653,7 @@ void ADnote::initSubVoices(void)
             subVoice[nvoice] = new ADnote*[unison_size[nvoice]];
             for (int k = 0; k < unison_size[nvoice]; ++k) {
                 float *freqmod = freqbasedmod[nvoice] ? tmpmod_unison[k] : parentFMmod;
-                subVoice[nvoice][k] = new ADnote((origVoice != NULL) ? origVoice : this,
+                subVoice[nvoice][k] = new ADnote(origVoice,
                                                  getVoiceBaseFreq(nvoice),
                                                  NoteVoicePar[nvoice].Voice,
                                                  freqmod, forFM);
@@ -667,7 +665,7 @@ void ADnote::initSubVoices(void)
             bool voiceForFM = NoteVoicePar[nvoice].FMEnabled == FREQ_MOD;
             subFMVoice[nvoice] = new ADnote*[unison_size[nvoice]];
             for (int k = 0; k < unison_size[nvoice]; ++k) {
-                subFMVoice[nvoice][k] = new ADnote((origVoice != NULL) ? origVoice : this,
+                subFMVoice[nvoice][k] = new ADnote(origVoice,
                                                    getFMVoiceBaseFreq(nvoice),
                                                    NoteVoicePar[nvoice].FMVoice,
                                                    parentFMmod, voiceForFM);
