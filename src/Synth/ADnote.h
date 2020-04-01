@@ -53,7 +53,7 @@ class ADnote
                int portamento_, int midinote_, SynthEngine *_synth);
         ADnote(ADnote *parent, float freq_, int subVoiceNumber_, float *parentFMmod_,
                bool forFM_);
-        ADnote(const ADnote &orig, ADnote *parent = NULL, float *parentFMmod = NULL);
+        ADnote(const ADnote &orig, ADnote *origVoice_ = NULL, float *parentFMmod_ = NULL);
         ~ADnote();
 
         void construct();

@@ -91,7 +91,7 @@ ADnote::ADnote(ADnote *orig, float freq_, int subVoiceNumber_, float *parentFMmo
 }
 
 // Copy constructor, currently only exists for legato
-ADnote::ADnote(const ADnote &orig, ADnote *parent, float *parentFMmod_) :
+ADnote::ADnote(const ADnote &orig, ADnote *origVoice_, float *parentFMmod_) :
     adpars(orig.adpars), // Probably okay for legato?
     stereo(orig.stereo),
     midinote(orig.midinote),
@@ -118,7 +118,7 @@ ADnote::ADnote(const ADnote &orig, ADnote *parent, float *parentFMmod_) :
     pangainL(orig.pangainL),
     pangainR(orig.pangainR),
     subVoiceNumber(orig.subVoiceNumber),
-    origVoice(parent),
+    origVoice(origVoice_),
     parentFMmod(parentFMmod_),
     paramsUpdate(adpars),
     synth(orig.synth)
@@ -151,9 +151,6 @@ ADnote::ADnote(const ADnote &orig, ADnote *parent, float *parentFMmod_) :
         tmpwave_unison[i] = (float*)fftwf_malloc(synth->bufferbytes);
         tmpmod_unison[i] = (float*)fftwf_malloc(synth->bufferbytes);
     }
-
-    if (parent != NULL && parent->origVoice != NULL)
-        origVoice = parent->origVoice;
 
     for (int i = 0; i < NUM_VOICES; ++i)
     {
