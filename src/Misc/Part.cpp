@@ -451,6 +451,8 @@ void Part::NoteOn(int note, int velocity, bool renote)
         {
             partnote[posb].status = KEY_PLAYING;
             partnote[posb].note = note;
+            partnote[posb].keyATtype = PART::aftertouchType::off;
+            partnote[posb].keyATvalue = 0;
         }
 
         // compute the velocity offset
