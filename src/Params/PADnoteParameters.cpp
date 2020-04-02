@@ -656,7 +656,7 @@ void PADnoteParameters::applyparameters()
         rms = sqrtf(rms);
         if (rms < 0.000001)
             rms = 1.0;
-        rms *= sqrtf(262144.0f / samplesize);
+        rms *= sqrtf(float(1024 * 256) / samplesize);
         for (int i = 0; i < samplesize; ++i)
             newsample.smp[i] *= 1.0f / rms * 50.0f;
 
