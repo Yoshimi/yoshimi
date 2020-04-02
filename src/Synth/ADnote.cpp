@@ -1938,23 +1938,13 @@ void ADnote::normalizeVoiceModulatorFrequencyModulation(int nvoice, int FMmode)
     // normalize: makes all sample-rates, oscil_sizes to produce same sound
     if (FMmode == FREQ_MOD) // Frequency modulation
     {
-        float normalize = synth->oscil_sample_step_f
-            * (synth->samplerate_ref_f / synth->oscilsize_ref_f);
-        /*
-         * This optimisation changes two indirect fetches and several
-         * multiplications and divisions into a single indirect fetch and
-         * multiplication. However this obscures the intent so we retain
-         * the original below for comparison.
-         *
-         * float normalize = synth->oscilsize_f / 262144.0f * 44100.0f / synth->samplerate_f;
-         */
         for (int k = 0; k < unison_size[nvoice]; ++k)
         {
             float *tw = tmpmod_unison[k];
             float  fmold = FMoldsmp[nvoice][k];
             for (int i = 0; i < synth->sent_buffersize; ++i)
             {
-                fmold = fmold + tw[i] * normalize;
+                fmold = fmold + tw[i] * synth->oscil_norm_factor_fm;
                 tw[i] = fmold;
             }
             FMoldsmp[nvoice][k] = fmold;
@@ -1962,12 +1952,11 @@ void ADnote::normalizeVoiceModulatorFrequencyModulation(int nvoice, int FMmode)
     }
     else  // Phase or PWM modulation
     {
-        float normalize = synth->oscilsize / synth->oscilsize_ref_f;
         for (int k = 0; k < unison_size[nvoice]; ++k)
         {
             float *tw = tmpmod_unison[k];
             for (int i = 0; i < synth->sent_buffersize; ++i)
-                tw[i] *= normalize;
+                tw[i] *= synth->oscil_norm_factor_pm;
         }
     }
 
