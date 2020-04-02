@@ -997,12 +997,16 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     newMsg = true;
                     break;
                 case BANK::control::changeRootId:
-                {
                     if (engine == UNUSED)
                         getData->data.engine = synth->getRuntime().currentRoot;
                     synth->bank.changeRootID(getData->data.engine, value);
                     synth->saveBanks();
-                }
+                    break;
+                case BANK::control::refreshDefaults:
+                    if (value)
+                        synth->bank.checkLocalBanks();
+                    synth->getRuntime().banksChecked = true;
+                break;
             }
             getData->data.source &= ~TOPLEVEL::action::lowPrio;
             break;

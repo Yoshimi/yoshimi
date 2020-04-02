@@ -1037,6 +1037,9 @@ class BankUI {: {public BankProcess_, RootProcess_}
             readbankcfg();
             rescan_for_banks();
             break;
+        case BANK::control::refreshDefaults:
+            readbankcfg();
+            break;
     }} {}
   }
   Function {BankUI(SynthEngine *_synth)} {} {

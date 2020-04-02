@@ -152,6 +152,7 @@ class Bank
         void writeVersion(int version)
             {BanksVersion = version;}
         int BanksVersion;
+        void checkLocalBanks(void);
 
     private:
         bool addtobank(size_t rootID, size_t bankID, int pos, const string filename, const string name);
@@ -172,6 +173,7 @@ class Bank
 
         bool transferDefaultDirs(string bankdirs[]);
         bool transferOneDir(string bankdirs[], int baseNumber, int listNumber);
+
         void addDefaultRootDirs(string bankdirs[]);
         void generateSingleRoot();
 

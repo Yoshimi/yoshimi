@@ -155,6 +155,7 @@ class Config
         bool          showCli;
         bool          cliChanged;
         bool          singlePath;
+        bool          banksChecked;
         unsigned char panLaw;
         bool          configChanged;
 

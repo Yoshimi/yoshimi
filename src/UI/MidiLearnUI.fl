@@ -548,8 +548,6 @@ delete midilearnwindow;} {}
         none->show();
         clear->deactivate();
         save->deactivate();
-        synth->getGuiMaster()->cancel->hide();
-        synth->getGuiMaster()->message->hide();
     }
     kitlist->redraw();
     kitlist->show();} {}

@@ -345,7 +345,8 @@ namespace BANK // usage BANK::control::
         changeRootId, // change ID of current root
         addNamedRoot, // not yet - currently add at top level
         deselectRoot, // not yet - currently remove at top level
-        installBanks
+        installBanks,
+        refreshDefaults
     };
 }
 
@@ -406,7 +407,8 @@ namespace MIDILEARN // usage MIDILEARN::control::block
         loadList = 241,
         loadFromRecent,
         saveList = 245,
-        cancelLearn = 250
+        cancelLearn = 250,
+        learned
     };
 }
 

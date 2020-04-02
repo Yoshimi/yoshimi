@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -106,7 +106,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {selected : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -176,10 +176,9 @@ class MasterUI {selected : {private GuiUpdates}
   Function {Init(const char *_label)} {} {
     code {//
       instance = synth->getUniqueId();
+      file::createDir(synth->getRuntime().ConfigDir + "/windows");
 
-      filename = synth->getRuntime().ConfigDir + "/" +synth->getRuntime().programCmd() + "-" + to_string(instance);
       partmax = synth->getRuntime().NumAvailableParts;
-      filename += EXTEN::window;
       microtonalui = new MicrotonalUI(&synth->microtonal, synth);
       bankui = new BankUI(synth);
       virkeyboard = new VirKeyboard(synth);
@@ -221,7 +220,7 @@ class MasterUI {selected : {private GuiUpdates}
       {
           words->copy_label("As this is a first time start, please check 'Yoshimi->Settings' then save and restart. More information can be found in the manual.");
           message->show();
-          message->position(masterwindow->x() + 36, masterwindow->y() + 170);
+          message->position(masterwindow->x() + 38, masterwindow->y() + 170);
       }
       else if (synth->getRuntime().oldConfig)
       {
@@ -229,6 +228,15 @@ class MasterUI {selected : {private GuiUpdates}
           msg = "Existing config older than V " + to_string(MIN_CONFIG_MAJOR) + "." + to_string(MIN_CONFIG_MINOR) + " \\nCheck settings, save and restart.";
           message->position(masterwindow->x() + masterwindow->w() / 2 - message->w() / 2, masterwindow->y() + masterwindow->h() / 2 - message->h() / 2);
           words->copy_label(msg.c_str());
+          }
+      else if (instance == 0 && synth->getRuntime().banksChecked == false)
+      {
+          string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
+          words->copy_label(msg.c_str());
+          yesdoit->show();
+          dontdoit->show();
+          dolater->show();
+          closebutton->hide();
           message->show();}} {}
   }
   Function {make_window()} {} {
@@ -1254,17 +1262,43 @@ Alan Calvert started the project}
         label {?}
         xywh {5 9 280 45} color 55 selection_color 55 labelfont 1 labelsize 12 align 149
       }
-      Fl_Button {} {
-        label Close
-        callback {message->hide();}
-        xywh {211 60 70 20}
+      Fl_Button yesdoit {
+        label Yes
+        callback {//
+                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::refreshDefaults, 1, TOPLEVEL::type::Integer, TOPLEVEL::section::bank);
+                closebutton->do_callback();}
+        xywh {49 60 70 20} hide
+      }
+      Fl_Button dontdoit {
+        label No
+        callback {//
+                send_data(TOPLEVEL::action::lowPrio, BANK::control::refreshDefaults, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::bank);
+                closebutton->do_callback();}
+        xywh {130 60 70 20} hide
       }
       Fl_Button cancel {
         label Cancel
         callback {//
-        send_data(0, MIDILEARN::control::cancelLearn, 0, 3, TOPLEVEL::section::midiLearn);
-        o->hide();}
+                send_data(0, MIDILEARN::control::cancelLearn, 0, 3, TOPLEVEL::section::midiLearn);
+                closebutton->do_callback();}
         xywh {130 60 70 20} hide
+      }
+      Fl_Button dolater {
+        label Later
+        callback {//
+                closebutton->do_callback();}
+        xywh {211 60 70 20} hide
+      }
+      Fl_Button closebutton {
+        label Close
+        callback {//
+                o->show(); // just in case
+                yesdoit->hide();
+                dontdoit->hide();
+                cancel->hide();
+                dolater->hide();
+                message->hide();}
+        xywh {211 60 70 20}
       }
     }
   }

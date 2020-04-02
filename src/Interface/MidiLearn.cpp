@@ -784,6 +784,7 @@ void MidiLearn::writeToGui(CommandBlock *putData)
         // we can afford a short delay for buffer to clear
     }
     while (!ok && tries < 3);
+
     if(!ok)
         synth->getRuntime().Log("toGui buffer full!", 2);
 }
@@ -802,6 +803,11 @@ void MidiLearn::updateGui(int opp)
     else if (opp == MIDILEARN::control::cancelLearn)
     {
         putData.data.control = MIDILEARN::control::cancelLearn;
+        putData.data.miscmsg = NO_MSG;
+    }
+    else if (opp == MIDILEARN::control::limit)
+    {
+        putData.data.control = TOPLEVEL::control::textMessage;
         putData.data.miscmsg = NO_MSG;
     }
     else

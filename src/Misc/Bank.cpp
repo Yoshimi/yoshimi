@@ -1115,6 +1115,22 @@ return found;
 }
 
 
+void Bank::checkLocalBanks()
+{
+    string localDir = synth->getRuntime().definedBankRoot;
+    if (isDirectory(localDir + "yoshimi/banks")) // yoshi
+    {
+        //cout << "idx" << i << "  dir " << bankdirs[i] << endl;
+        addRootDir(localDir + "yoshimi/banks");
+    }
+    if (isDirectory(localDir + "zynaddsubfx/banks"))
+    {
+        //cout << "idx" << i << "  dir " << bankdirs[i] << endl;
+        addRootDir(localDir + "zynaddsubfx/banks"); // zyn
+    }
+
+}
+
 void Bank::addDefaultRootDirs(string bankdirs[])
 {
     string ourDir = synth->getRuntime().definedBankRoot;
@@ -1453,6 +1469,7 @@ bool Bank::parseBanksFile(XMLwrapper *xml)
         else
             generateSingleRoot();
         synth->getRuntime().currentRoot = 5;
+        synth->getRuntime().banksChecked = true;
     }
 
 

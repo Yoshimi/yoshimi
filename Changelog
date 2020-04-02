@@ -1,5 +1,9 @@
 yoshimi 1.7.0 M
 
+2020-4-2 Will
+* BugFix: MIDI-learn initialsing killing GUI startup warnings.
+* Imroved first time startup messages and bank actions.
+
 2020-3-31 Will
 * fftw3.h now only included in DSP/FFTwrapper.h
   All other uses refer back to this.

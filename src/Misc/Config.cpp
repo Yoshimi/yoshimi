@@ -160,6 +160,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     showCli(true),
     cliChanged(false),
     singlePath(false),
+    banksChecked(false),
     panLaw(1),
     configChanged(false),
     rtprio(40),
@@ -556,6 +557,7 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
     if (!cliChanged)
         showCli = xml->getparbool("enable_CLI", showCli);
     singlePath = xml->getparbool("enable_single_master", singlePath);
+    banksChecked = xml->getparbool("banks_checked", banksChecked);
     autoInstance = xml->getparbool("enable_auto_instance", autoInstance);
     if (autoInstance)
         activeInstance = xml->getparU("active_instances", 0);
