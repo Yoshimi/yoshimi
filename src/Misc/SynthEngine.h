@@ -184,6 +184,10 @@ class SynthEngine
         float halfoscilsize_f;
         float oscil_sample_step_f;
 
+        // Reference values used for normalization
+        static constexpr float samplerate_ref_f = 44100.0f;
+        static constexpr float oscilsize_ref_f = float(1024 * 256);
+
         int           sent_buffersize; //used for variable length runs
         int           sent_bufferbytes; //used for variable length runs
         float         sent_buffersize_f; //used for variable length runs
