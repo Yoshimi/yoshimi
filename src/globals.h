@@ -681,7 +681,8 @@ namespace PART // usage PART::control::volume
         const unsigned int filterQdown = 8;
         const unsigned int pitchBend = 16;
         const unsigned int pitchBendDown = 32;
-        const unsigned int modulation = 64; // this must be highest bit
+        const unsigned int volume = 64;
+        const unsigned int modulation = 128; // this must be highest bit
     }
 }
 

@@ -1278,6 +1278,8 @@ string DataText::resolveAftertouch(bool type, int value, bool addValue)
             if (value & PART::aftertouchType::pitchBendDown)
                 contstr += " Down";
         }
+        if (value & PART::aftertouchType::volume)
+            contstr += "\n Volume";
         if (value & PART::aftertouchType::modulation)
             contstr += "\n Modulation";
     }

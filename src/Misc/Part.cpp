@@ -134,6 +134,8 @@ void Part::defaults(void)
     Prcvchn = 0;
     oldFilterState = -1;
     oldBendState = -1;
+    oldVolumeState = -1;
+    oldVolumeAdjust = 0;
     oldModulationState = -1;
     setPan(Ppanning = 64);
     TransPanning = 128; // ensure it always gets set
@@ -312,6 +314,26 @@ void Part::setChannelAT(int type, int value)
         {
             ctl->setpitchwheel(oldBendState);
             oldBendState = -1;
+        }
+    }
+
+    if (type & PART::aftertouchType::volume)
+    {
+        if (value > 0)
+        {
+            //float adjust = 0;
+            if (oldVolumeState == -1)
+            {
+                oldVolumeState = Pvolume;
+                oldVolumeAdjust = 127 - oldVolumeState;
+            }
+            //adjust = 127 - oldVolumeState;
+            setVolume(oldVolumeState + (value / 127.0f * oldVolumeAdjust));
+        }
+        else
+        {
+            setVolume(oldVolumeState);
+            oldVolumeState = -1;
         }
     }
 

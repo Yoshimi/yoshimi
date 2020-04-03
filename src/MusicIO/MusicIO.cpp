@@ -25,7 +25,7 @@
  * event of the specified controller number.
  * Change the value to suit your circumstances.
  */
-//#define AFTERTOUCH_EMULATE 94
+#define AFTERTOUCH_EMULATE 94
 
 #include "Misc/Config.h"
 #include "Misc/SynthEngine.h"

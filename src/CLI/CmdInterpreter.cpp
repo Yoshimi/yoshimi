@@ -4927,6 +4927,8 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
                 if (input.matchnMove(1, "Down"))
                     tmp |= PART::aftertouchType::pitchBendDown;
             }
+            if (input.matchnMove(1, "Volume"))
+                tmp |= PART::aftertouchType::volume;
             if (input.matchnMove(1, "Modulation"))
                 tmp |= PART::aftertouchType::modulation;
         }

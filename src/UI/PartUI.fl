@@ -1011,7 +1011,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     }
     Fl_Window aftertouchcontrol {
       label Aftertouch
-      xywh {1050 146 505 155} type Double hide
+      xywh {1207 59 485 180} type Double hide
       code1 {int X, Y, O; loadWin(synth, X, Y, O, "afterT"); o->position(X, Y); ATSeen = true;}
     } {
       Fl_Box {} {
@@ -1031,6 +1031,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                 channelpitchBminus->value(0);
                 channelpitchBminus->deactivate();
                 channelmodulation->value(0);
+                channelvolume->value(0);
                 setATchannel(PART::aftertouchType::off, true);}
         xywh {55 40 48 20}
       }
@@ -1096,6 +1097,12 @@ class PartUI {: {public Fl_Group, PartUI_}
         callback {//
                 setATchannel(PART::aftertouchType::modulation, o->value());}
         xywh {25 125 70 15} down_box DOWN_BOX
+      }
+      Fl_Check_Button channelvolume {
+        label Volume
+        callback {//
+                setATchannel(PART::aftertouchType::volume, o->value());}
+        xywh {25 145 70 15} down_box DOWN_BOX
       }
       Fl_Box {} {
         label Key
@@ -1186,7 +1193,13 @@ class PartUI {: {public Fl_Group, PartUI_}
         if ((Fl::event_button() == 3))
             ctlwindow->show();
         aftertouchcontrol->hide();}
-        xywh {445 125 50 20} box THIN_UP_BOX
+        xywh {420 154 50 20} box THIN_UP_BOX
+      }
+      Fl_Box {} {
+        xywh {9 5 228 171} box ENGRAVED_FRAME
+      }
+      Fl_Box {} {
+        xywh {241 5 234 143} box ENGRAVED_FRAME
       }
     }
     Fl_Window ctlmidi {
@@ -2417,6 +2430,8 @@ class PartUI {: {public Fl_Group, PartUI_}
             channelpitchBminus->value(0);
             channelpitchBminus->deactivate();
             channelmodulation->value(0);
+            channelvolume->value(0);
+
 
     if (channelATselection & PART::aftertouchType::filterCutoff)
     {
@@ -2440,7 +2455,9 @@ class PartUI {: {public Fl_Group, PartUI_}
             channelpitchBminus->value(1);
     }
     if (channelATselection & PART::aftertouchType::modulation)
-        channelmodulation->value(1);} {}
+        channelmodulation->value(1);
+    if (channelATselection & PART::aftertouchType::volume)
+        channelvolume->value(1);} {}
   }
   Function {fetchKey()} {} {
     code {//

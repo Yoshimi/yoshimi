@@ -3,6 +3,7 @@ yoshimi 1.7.0 M
 2020-4-2 Will
 * More refimentments to the text messaging and actions.
   Not yet available to the CLI.
+* Added Volume to channel aftertouch.
 
 2020-4-2 Will
 * BugFix: MIDI-learn initialsing killing GUI startup warnings.

@@ -192,9 +192,11 @@ class Part
         int lastposb;             // ^^
         bool lastlegatomodevalid; // previous legatomodevalid.
 
-        int oldFilterState; // these four for channel aftertouch
+        int oldFilterState; // these for channel aftertouch
         int oldFilterQstate;
         int oldBendState;
+        float oldVolumeState;
+        float oldVolumeAdjust;
         int oldModulationState;
 
         float *tmpoutl;
