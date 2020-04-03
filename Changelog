@@ -1,6 +1,10 @@
 yoshimi 1.7.0 M
 
 2020-4-2 Will
+* More refimentments to the text messaging and actions.
+  Not yet available to the CLI.
+
+2020-4-2 Will
 * BugFix: MIDI-learn initialsing killing GUI startup warnings.
 * Imroved first time startup messages and bank actions.
 

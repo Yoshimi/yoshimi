@@ -218,65 +218,58 @@ class MasterUI {: {private GuiUpdates}
 
       if (!foundWindows)
       {
-          words->copy_label("As this is a first time start, please check 'Yoshimi->Settings' then save and restart. More information can be found in the manual.");
-          message->show();
-          message->position(masterwindow->x() + 38, masterwindow->y() + 170);
+          string msg = "As this is a first time start, please check 'Yoshimi->Settings' then save and restart. More information can be found in the manual.";
+          setmessage(UNUSED, true, msg, "Close");
       }
       else if (synth->getRuntime().oldConfig)
       {
           string msg;
           msg = "Existing config older than V " + to_string(MIN_CONFIG_MAJOR) + "." + to_string(MIN_CONFIG_MINOR) + " \\nCheck settings, save and restart.";
-          message->position(masterwindow->x() + masterwindow->w() / 2 - message->w() / 2, masterwindow->y() + masterwindow->h() / 2 - message->h() / 2);
-          words->copy_label(msg.c_str());
-          }
+          setmessage(UNUSED, true, msg, "Close");
+      }
       else if (instance == 0 && synth->getRuntime().banksChecked == false)
       {
           string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
-          words->copy_label(msg.c_str());
-          yesdoit->show();
-          dontdoit->show();
-          dolater->show();
-          closebutton->hide();
-          message->show();}} {}
+          setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
   }
   Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
-      bool close = true;
-      bool force = Fl::event_state(FL_CTRL);
-      if (!force && synth->getRuntime().configChanged)
-      {
-          int r = fl_choice("Parameters Changed", "Save Changes", "Cancel", "Don't Save");
-          switch (r)
-          {
-              case 0:
-                  synth->getRuntime().configChanged = false;
-                  // this seems backwards but it *always* saves.
-                  // seeing configChanged makes it reload the old settings first.
-                  break;
-              case 2:
-                  break;
-              default:
-                  close = false;
-                  break;
-          }
-      }
-      if (close)
-      {
-          if (force)
-              firstSynth->getRuntime().exitType = FORCED_EXIT;
-              /*
-               * The above line shouldn't be necessary!
-               * It works fine on jack but fails on ALSA.
-               * My best guess is that ALSA shuts down so quickly
-               * that one of the ringbuffers carrying the command
-               * is deleted before it can be read.
-               */
-              //send_data(0, TOPLEVEL::control::forceExit, 0, UNUSED);
+            bool close = true;
+            bool force = Fl::event_state(FL_CTRL);
+            if (!force && synth->getRuntime().configChanged)
+            {
+                int r = fl_choice("Parameters Changed", "Save Changes", "Cancel", "Don't Save");
+                switch (r)
+                {
+                    case 0:
+                        synth->getRuntime().configChanged = false;
+                        // this seems backwards but it *always* saves.
+                        // seeing configChanged makes it reload the old settings first.
+                        break;
+                    case 2:
+                        break;
+                    default:
+                        close = false;
+                        break;
+                }
+            }
+            if (close)
+            {
+                if (force)
+                    firstSynth->getRuntime().exitType = FORCED_EXIT;
+                    /*
+                    * The above line shouldn't be necessary!
+                    * It works fine on jack but fails on ALSA.
+                    * My best guess is that ALSA shuts down so quickly
+                    * that one of the ringbuffers carrying the command
+                    * is deleted before it can be read.
+                    */
+                    //send_data(0, TOPLEVEL::control::forceExit, 0, UNUSED);
 
-          synth->guiClosed(true);
-      }}
+                synth->guiClosed(true);
+            }}
       xywh {6 423 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Box {} {
@@ -1269,34 +1262,21 @@ Alan Calvert started the project}
                 closebutton->do_callback();}
         xywh {49 60 70 20} hide
       }
-      Fl_Button dontdoit {
-        label No
-        callback {//
-                send_data(TOPLEVEL::action::lowPrio, BANK::control::refreshDefaults, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::bank);
-                closebutton->do_callback();}
-        xywh {130 60 70 20} hide
-      }
       Fl_Button cancel {
         label Cancel
         callback {//
-                send_data(0, MIDILEARN::control::cancelLearn, 0, 3, TOPLEVEL::section::midiLearn);
+                if (msgGroup == TOPLEVEL::msgResponse::refreshBankDefaults)
+                    send_data(TOPLEVEL::action::lowPrio, BANK::control::refreshDefaults, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::bank);
+                else
+                    send_data(0, MIDILEARN::control::cancelLearn, 0, 3, TOPLEVEL::section::midiLearn);
                 closebutton->do_callback();}
         xywh {130 60 70 20} hide
-      }
-      Fl_Button dolater {
-        label Later
-        callback {//
-                closebutton->do_callback();}
-        xywh {211 60 70 20} hide
       }
       Fl_Button closebutton {
         label Close
         callback {//
-                o->show(); // just in case
                 yesdoit->hide();
-                dontdoit->hide();
                 cancel->hide();
-                dolater->hide();
                 message->hide();}
         xywh {211 60 70 20}
       }
@@ -1852,6 +1832,31 @@ Alan Calvert started the project}
             resetPartsClip();
             break;
     }} {}
+  }
+  Function {setmessage(int group, bool fixedPos, string text, string B1 = "Close", string B2 = "", string B3 = "")} {} {
+    code {//
+        msgGroup = group;
+        if (B3.empty())
+            yesdoit->hide();
+        else
+        {
+            yesdoit->copy_label(B3.c_str());
+            yesdoit->show();
+        }
+        if (B2.empty())
+            cancel->hide();
+        else
+        {
+            cancel->copy_label(B2.c_str());
+            cancel->show();
+        }
+        closebutton->copy_label(B1.c_str());
+        if (fixedPos)
+            message->position(masterwindow->x() + masterwindow->w() / 2 - message->w() / 2, masterwindow->y() + masterwindow->h() / 2 - message->h() / 2);
+        else
+            message->position(Fl::event_x_root() + 16, Fl::event_y_root());
+        words->copy_label(text.c_str());
+        message->show();} {}
   }
   Function {updatesendwindow()} {} {
     code {//
@@ -2529,6 +2534,8 @@ read_updates(synth);} {}
   decl {FILE *windows;} {private local
   }
   decl {string filename;} {private local
+  }
+  decl {int msgGroup;} {private local
   }
   decl {bool openedit;} {public local
   }

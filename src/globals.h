@@ -225,6 +225,14 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         forceExit // this is effective from *any* section!
     };
 
+    enum msgResponse : unsigned char {
+        refreshBankDefaults,
+        cancelBankDefaults,
+        cancelMidiLearn
+        // any other value = no response
+        // but there may still be a message
+    };
+
     // inserts are here as they are split between many
     // sections but must remain distinct.
     enum insert : unsigned char {

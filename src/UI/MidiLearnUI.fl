@@ -461,10 +461,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         case MIDILEARN::control::findSize: // not using this yet
             break;
         case MIDILEARN::control::sendLearnMessage:
-            synth->getGuiMaster()->words->copy_label(textMsgBuffer.fetch(miscmsg).c_str());
-            synth->getGuiMaster()->cancel->show();
-            synth->getGuiMaster()->message->position(Fl::event_x_root() + 16, Fl::event_y_root());
-            synth->getGuiMaster()->message->show();
+            synth->getGuiMaster()->setmessage(UNUSED, false, textMsgBuffer.fetch(miscmsg), "Close", "Cancel");
             break;
         case MIDILEARN::control::sendRefreshRequest:
             midilearnwindow->show();
@@ -492,9 +489,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
             clearAll(value == 0);
             break;
         case MIDILEARN::control::cancelLearn:
-            synth->getGuiMaster()->cancel->hide();
-            synth->getGuiMaster()->words->copy_label("Learn cancelled");
-            synth->getGuiMaster()->message->show();
+            synth->getGuiMaster()->setmessage(UNUSED, false, "Learn cancelled", "Close");
             break;
     }} {}
   }

@@ -115,9 +115,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
                 }
                 else
                 {
-                    synth->getGuiMaster()->words->copy_label("Can't learn this control");
-                    synth->getGuiMaster()->message->show();
-                    synth->getGuiMaster()->message->position(Fl::event_x_root() + 16, Fl::event_y_root());
+                    synth->getGuiMaster()->setmessage(UNUSED, false, "Can't learn this control");
                     synth->getRuntime().Log("Can't MIDI-learn this control");
                     /* can't use fl_alert here.
                      * For some reason it goes into a loop on spin boxes
