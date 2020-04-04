@@ -51,9 +51,9 @@ class ADnote
     public:
         ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_, float velocity_,
                int portamento_, int midinote_, SynthEngine *_synth);
-        ADnote(ADnote *orig, float freq_, int subVoiceNumber_, float *parentFMmod_,
+        ADnote(ADnote *topVoice_, float freq_, int subVoiceNumber_, float *parentFMmod_,
                bool forFM_);
-        ADnote(const ADnote &orig, ADnote *origVoice_ = NULL, float *parentFMmod_ = NULL);
+        ADnote(const ADnote &orig, ADnote *topVoice_ = NULL, float *parentFMmod_ = NULL);
         ~ADnote();
 
         void construct();
@@ -305,7 +305,7 @@ class ADnote
         int subVoiceNumber;
         // For sub voices: The original, "topmost" voice that triggered this
         // one.
-        ADnote *origVoice;
+        ADnote *topVoice;
         // For sub voices: Pointer to the closest parent that has
         // phase/frequency modulation.
         float *parentFMmod;
