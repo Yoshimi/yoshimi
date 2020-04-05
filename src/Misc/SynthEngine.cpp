@@ -2763,7 +2763,6 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool 
     if (!xml->enterbranch("VECTOR"))
     {
             Runtime. Log("Extract Data, no VECTOR branch", 2);
-            delete xml;
     }
     else
     {
