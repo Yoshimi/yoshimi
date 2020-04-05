@@ -2480,7 +2480,6 @@ void SynthEngine::addHistory(string name, int group)
             listType.erase(it);
     }
     setLastfileAdded(group, name);
-    return;
 }
 
 
