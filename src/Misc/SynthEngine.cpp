@@ -29,6 +29,8 @@
 #include <set>
 #include <iostream>
 #include <string>
+#include <algorithm>
+#include <iterator>
 
 #ifdef GUI_FLTK
     #include "MasterUI.h"
@@ -2398,7 +2400,7 @@ bool SynthEngine::installBanks()
     string bankname = name + ".banks";
 //    Runtime.Log(bankname);
     bool banksGood = false;
-    bool newBanks;
+    bool newBanks = false;
     if (isRegularFile(bankname))
     {
         XMLwrapper *xml = new XMLwrapper(this);
@@ -2473,14 +2475,10 @@ void SynthEngine::addHistory(string name, int group)
     vector<string> &listType = *getHistory(group);
     vector<string>::iterator itn = listType.begin();
     listType.insert(itn, name);
-
-    for (vector<string>::iterator it = listType.begin() + 1; it < listType.end(); ++ it)
-    {
-        if (*it == name)
-            listType.erase(it);
-    }
+    itn = listType.begin(); // reinitialize after insertion
+    std::advance(itn, 1); // skip first entry
+    listType.erase(std::remove(itn, listType.end(), name), listType.end()); // remove all matches
     setLastfileAdded(group, name);
-    return;
 }
 
 
@@ -2763,7 +2761,6 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool 
     if (!xml->enterbranch("VECTOR"))
     {
             Runtime. Log("Extract Data, no VECTOR branch", 2);
-            delete xml;
     }
     else
     {
