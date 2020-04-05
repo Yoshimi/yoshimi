@@ -2398,7 +2398,7 @@ bool SynthEngine::installBanks()
     string bankname = name + ".banks";
 //    Runtime.Log(bankname);
     bool banksGood = false;
-    bool newBanks;
+    bool newBanks = false;
     if (isRegularFile(bankname))
     {
         XMLwrapper *xml = new XMLwrapper(this);
