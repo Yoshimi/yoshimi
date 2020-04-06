@@ -794,6 +794,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
       label Presets
       xywh {5 437 460 295} type Double hide
       code0 {o->copy_label(synth->makeUniqueName("Presets").c_str());}
+      code1 {int fetchX, fetchY, fetchO;loadWin(synth, fetchX, fetchY, fetchO, "presets");o->position(fetchX, fetchY); presetseen = true;}
     } {
       Fl_Browser presetbrowse {
         callback {//
@@ -1113,13 +1114,16 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             synth = _synth;
             make_window();
             readpresetcfg();
+            presetseen = false;
             selectedRootID = -1;} {}
   }
   Function {~ConfigUI()} {} {
     code {//
         saveWin(synth,configwindow->x(), configwindow->y(), configwindow->visible(), "config");
+        if (presetseen)
+            saveWin(synth, presets->x(), presets->y(), presets->visible(), "presets");
         configwindow->hide();
-        delete configwindow;;} {}
+        delete configwindow;} {}
   }
   Function {activatebutton_presetdir(bool active)} {} {
     code {//
@@ -1315,5 +1319,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   decl {int oldBank;} {private local
   }
   decl {int oldrootID;} {private local
+  }
+  decl {bool presetseen;} {private local
   }
 }
