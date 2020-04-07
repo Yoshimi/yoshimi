@@ -1,5 +1,8 @@
 yoshimi 1.7.0 M
 
+2020-4-7 Will
+* Corrected direction of Pan Law Boost.
+
 2020-4-6 Will
 * Added presets broweser to remembered positions.
 * Disabled aftercouch emulation.

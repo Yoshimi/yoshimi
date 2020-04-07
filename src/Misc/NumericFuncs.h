@@ -148,8 +148,8 @@ inline void setAllPan(float position, float& left, float& right, unsigned char c
             right = sinf(t * HALFPI);
             break;
         case MAIN::panningType::boost: // boost - per side + 6dB mono 0dB
-            left = t;
-            right = (1.0 - t);
+            left = (1.0 - t);
+            right = t;
             break;
         default: // no panning
             left = 0.7;
