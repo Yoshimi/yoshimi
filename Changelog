@@ -1,5 +1,9 @@
 yoshimi 1.7.0 M
 
+2020-4-8 Will
+* Corrected Part panning range.
+  Didn't quite reduce extreme left to zero.
+
 2020-4-7 Will
 * Corrected direction of Pan Law Boost.
 

@@ -1298,7 +1298,9 @@ void Part::checkPanning(float step, unsigned char panLaw)
 {
     //float t;
     TransPanning += step;
-    setAllPan(TransPanning, pangainL,pangainR, panLaw);
+    float actualPan = ((TransPanning + 1.0f) * (126.0f / 127.0f));
+     // resolves min value full Left
+    setAllPan(actualPan, pangainL,pangainR, panLaw);
     //t = ((TransPanning > 0) ? (TransPanning - 1) : 0.0f) / 126.0f;
     //pangainL = cosf(t * HALFPI);
     //pangainR = cosf((1.0f - t) * HALFPI);
