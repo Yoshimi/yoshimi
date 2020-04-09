@@ -1470,7 +1470,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
 }
 
 
-// This is only used by bank when no banks can be found
+// This is only used when no valid banks can be found
 void InterChange::generateSpecialInstrument(int npart, std::string name)
 {
     synth->part[npart]->Pname = name;

@@ -1,6 +1,10 @@
 yoshimi 1.7.0 M
 
 2020-4-8 Will
+* Adding new bank roots will offer to create them if missing.
+  Not CLI yet.
+
+2020-4-8 Will
 * Corrected Part panning range.
   Didn't quite reduce extreme left to zero.
 

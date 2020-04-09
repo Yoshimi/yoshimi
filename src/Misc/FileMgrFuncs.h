@@ -448,11 +448,29 @@ inline bool createEmptyFile(string filename)
 }
 
 
-inline bool createDir(string filename)
+inline bool createDir(string dirname)
 {
-    if (isDirectory(filename))
-        return false; // it's already here
-    return mkdir(filename.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    if (isDirectory(dirname))
+        return false; // don't waste time. it's already here!
+    size_t pos = 1;
+    size_t oldPos = pos;
+    string nextDir;
+    bool failed = false;
+    while (pos != string::npos && failed == false)
+    {
+
+        pos = dirname.find("/", oldPos);
+        if (pos == string::npos)
+            nextDir = dirname;
+        else
+        {
+            nextDir = dirname.substr(0, pos).c_str();
+            oldPos = pos + 1;
+        }
+        if (!isDirectory(nextDir))
+            failed = mkdir(nextDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    }
+    return failed;
 }
 
 
