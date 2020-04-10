@@ -1879,14 +1879,6 @@ void ADnote::computeVoiceModulator(int nvoice, int FMmode)
             // if are using stereo. See same section in computeVoiceOscillator.
             memcpy(tmpmod_unison[k], smps, synth->bufferbytes);
         }
-    } else if (NoteVoicePar[nvoice].FMVoice >= 0) {
-        // if I use VoiceOut[] as modulator
-        for (int k = 0; k < unison_size[nvoice]; ++k) {
-            const float *smps = NoteVoicePar[NoteVoicePar[nvoice].FMVoice].VoiceOut;
-            // For historical/compatibility reasons we do not reduce volume here
-            // if are using stereo. See same section in computeVoiceOscillator.
-            memcpy(tmpmod_unison[k], smps, synth->bufferbytes);
-        }
     }
     else if (parentFMmod != NULL) {
         if (NoteVoicePar[nvoice].FMEnabled == FREQ_MOD) {
@@ -2402,19 +2394,6 @@ void ADnote::computeVoiceOscillator(int nvoice)
             // Sub voices use VoiceOut, so just pass NULL.
             subVoice[nvoice][k]->noteout(NULL, NULL);
             const float *smps = subVoice[nvoice][k]->NoteVoicePar[subVoiceNumber].VoiceOut;
-            float *tw = tmpwave_unison[k];
-            if (stereo) {
-                // Reduce volume due to stereo being combined to mono.
-                for (int i = 0; i < synth->buffersize; ++i) {
-                    tw[i] = smps[i] * 0.5f;
-                }
-            } else {
-                memcpy(tw, smps, synth->bufferbytes);
-            }
-        }
-    } else if (NoteVoicePar[nvoice].Voice >= 0) {
-        for (int k = 0; k < unison_size[nvoice]; ++k) {
-            const float *smps = NoteVoicePar[NoteVoicePar[nvoice].Voice].VoiceOut;
             float *tw = tmpwave_unison[k];
             if (stereo) {
                 // Reduce volume due to stereo being combined to mono.
