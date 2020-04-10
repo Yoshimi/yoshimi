@@ -235,6 +235,19 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     oscilsize_f = oscilsize = Runtime.Oscilsize;
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
     oscil_sample_step_f = oscilsize_f / samplerate_f;
+
+    // Phase and frequency modulation are calculated in terms of samples, not
+    // angle/frequency, so modulation must be normalized to reference values of
+    // angle/sample and time/sample.
+
+    // oscilsize is one wavelength worth of samples, so
+    // phase modulation should scale proportionally
+    oscil_norm_factor_pm = oscilsize_f / oscilsize_ref_f;
+    // FM also depends on samples/wavelength as well as samples/time,
+    // so scale FM inversely with the sample rate.
+    oscil_norm_factor_fm =
+        oscil_norm_factor_pm * (samplerate_ref_f / samplerate_f);
+
     // distance / duration / second = distance / (duration * second)
     // While some might prefer to write this as the latter, when distance and
     // duration are constants the latter incurs two roundings while the former
