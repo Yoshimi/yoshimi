@@ -1898,7 +1898,19 @@ void ADnote::computeVoiceModulator(int nvoice, int FMmode)
         computeVoiceModulatorLinearInterpolation(nvoice);
     }
 
-    // Amplitude interpolation
+    if (freqbasedmod[nvoice])
+    {
+        applyAmplitudeOnVoiceModulator(nvoice);
+        normalizeVoiceModulatorFrequencyModulation(nvoice, FMmode);
+
+        // Ring and morph modulation do not need normalization, and they take
+        // amplitude into account themselves.
+    }
+}
+
+void ADnote::applyAmplitudeOnVoiceModulator(int nvoice)
+{
+   // Amplitude interpolation
     if (aboveAmplitudeThreshold(FMoldamplitude[nvoice], FMnewamplitude[nvoice]))
     {
         for (int k = 0; k < unison_size[nvoice]; ++k)
@@ -1919,9 +1931,6 @@ void ADnote::computeVoiceModulator(int nvoice, int FMmode)
                 tw[i] *= FMnewamplitude[nvoice];
         }
     }
-
-    if (freqbasedmod[nvoice])
-        normalizeVoiceModulatorFrequencyModulation(nvoice, FMmode);
 }
 
 // Normalize the modulator for phase/frequency modulation

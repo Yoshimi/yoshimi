@@ -97,6 +97,7 @@ class ADnote
         void applyVoiceOscillatorRingModulation(int nvoice);
         void computeVoiceModulator(int nvoice, int FMmode);
         void computeVoiceModulatorLinearInterpolation(int nvoice);
+        void applyAmplitudeOnVoiceModulator(int nvoice);
         void normalizeVoiceModulatorFrequencyModulation(int nvoice, int FMmode);
         void computeVoiceModulatorFrequencyModulation(int nvoice, int FMmode);
         void computeVoiceModulatorForFMFrequencyModulation(int nvoice);
