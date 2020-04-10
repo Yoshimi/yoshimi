@@ -270,10 +270,13 @@ class ADnote
 
         float *FMoldsmp[NUM_VOICES]; // used by Frequency Modulation (for integration)
 
-        float *FMFMoldsmpModded[NUM_VOICES]; // use when rendering FM modulator with parent FM
-        float *FMFMoldsmpOrig[NUM_VOICES];
-        float *oscFMoldsmpModded[NUM_VOICES]; // use when rendering oscillator for FM with parent FM
-        float *oscFMoldsmpOrig[NUM_VOICES];
+        float *FMFMoldPhase[NUM_VOICES]; // use when rendering FM modulator with parent FM
+        float *FMFMoldInterpPhase[NUM_VOICES];
+        float *FMFMoldPMod[NUM_VOICES];
+        float *oscFMoldPhase[NUM_VOICES]; // use when rendering oscil with parent FM that will
+                                         // be used for FM
+        float *oscFMoldInterpPhase[NUM_VOICES];
+        float *oscFMoldPMod[NUM_VOICES];
         bool forFM; // Whether this voice will be used for FM modulation.
 
         float **tmpwave_unison;
