@@ -20,7 +20,7 @@
 */
 
 /*
- * Uncomment the following define to emulate poly aftertouch
+ * Uncomment the following define to emulate aftertouch
  * To get the impression of channel aftertouch we change the
  * event of the specified controller number.
  * Change the value to suit your circumstances.

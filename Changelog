@@ -1,6 +1,11 @@
-yoshimi 1.7.0 M
+yoshimi 1.7.1 rc1
 
-2020-4-8 Will
+2020-4-11 Will
+* Aftertouch Modulation temporarily hidden.
+  Not satisfied with it's operation.
+* Set version as 1.7.1 rc1
+
+2020-4-9 Will
 * Adding new bank roots will offer to create them if missing.
   Not CLI yet.
 

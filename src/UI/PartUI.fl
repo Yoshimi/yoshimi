@@ -1096,7 +1096,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         label Modulation
         callback {//
                 setATchannel(PART::aftertouchType::modulation, o->value());}
-        xywh {25 125 70 15} down_box DOWN_BOX
+        xywh {25 125 70 15} down_box DOWN_BOX hide deactivate
       }
       Fl_Check_Button channelvolume {
         label Volume
@@ -1185,7 +1185,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         label Modulation
         callback {//
                 setATkey(PART::aftertouchType::modulation, o->value());}
-        xywh {270 125 70 15} down_box DOWN_BOX
+        xywh {270 125 70 15} down_box DOWN_BOX hide deactivate
       }
       Fl_Button {} {
         label Close
