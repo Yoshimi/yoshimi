@@ -316,7 +316,7 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
             break;
     }
 
-    tmpoctave[nline].text = reformatline(string(line));
+    tmpoctave[nline].text = reformatline(line);
     tmpoctave[nline].tuning = tuning;
     tmpoctave[nline].type = type;
     tmpoctave[nline].x1 = x1;
@@ -467,7 +467,7 @@ string Microtonal::tuningtotext()
 }
 
 
-int Microtonal::loadLine(string text, size_t &point, char *line, size_t maxlen)
+int Microtonal::loadLine(const string& text, size_t &point, char *line, size_t maxlen)
 {
     do {
         line[0] = 0;
@@ -480,7 +480,7 @@ int Microtonal::loadLine(string text, size_t &point, char *line, size_t maxlen)
 
 
 // Loads the tunings from a scl file
-int Microtonal::loadscl(string filename)
+int Microtonal::loadscl(const string& filename)
 {
     string text = loadText(filename);
     if (text == "")
@@ -534,7 +534,7 @@ int Microtonal::loadscl(string filename)
 
 
 // Loads the mapping from a kbm file
-int Microtonal::loadkbm(string filename)
+int Microtonal::loadkbm(const string& filename)
 {
     string text = loadText(filename);
     if (text == "")
@@ -795,7 +795,7 @@ void Microtonal::getfromXML(XMLwrapper *xml)
 }
 
 
-bool Microtonal::saveXML(string filename)
+bool Microtonal::saveXML(const string& filename)
 {
     synth->getRuntime().xmlType = TOPLEVEL::XML::Scale;
     XMLwrapper *xml = new XMLwrapper(synth);
@@ -810,7 +810,7 @@ bool Microtonal::saveXML(string filename)
 }
 
 
-bool Microtonal::loadXML(string filename)
+bool Microtonal::loadXML(const string& filename)
 {
     XMLwrapper *xml = new XMLwrapper(synth);
     if (NULL == xml)

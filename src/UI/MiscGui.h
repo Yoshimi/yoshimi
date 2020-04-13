@@ -115,8 +115,8 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
 
 string convert_value(ValueType type, float val);
 
-string variable_prec_units(float v, string u, int maxPrec, bool roundup = false);
-string custom_value_units(float v, string u, int prec=0);
+string variable_prec_units(float v, const string& u, int maxPrec, bool roundup = false);
+string custom_value_units(float v, const string& u, int prec=0);
 void  custom_graph_dimensions(ValueType vt, int& w, int& h);
 void custom_graphics(ValueType vt, float val,int W,int H);
 ValueType getLFOdepthType(int group);

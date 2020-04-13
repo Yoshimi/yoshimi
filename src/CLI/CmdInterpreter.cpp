@@ -5308,7 +5308,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
 }
 
 
-Reply CmdInterpreter::processSrcriptFile(string filename)
+Reply CmdInterpreter::processSrcriptFile(const string& filename)
 {
     if (filename <= "!")
         return Reply::what("Exec");

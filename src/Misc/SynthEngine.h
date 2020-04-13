@@ -88,16 +88,16 @@ class SynthEngine
         string manualname();
         void defaults(void);
 
-        bool loadXML(string filename);
-        bool loadStateAndUpdate(string filename);
-        bool saveState(string filename);
+        bool loadXML(const string& filename);
+        bool loadStateAndUpdate(const string& filename);
+        bool saveState(const string& filename);
         bool loadPatchSetAndUpdate(string filename);
-        bool loadMicrotonal(string fname);
-        bool saveMicrotonal(string fname);
+        bool loadMicrotonal(const string& fname);
+        bool saveMicrotonal(const string& fname);
         bool installBanks(void);
         bool saveBanks(void);
         void newHistory(string name, int group);
-        void addHistory(string name, int group);
+        void addHistory(const string& name, int group);
         std::vector<string> *getHistory(int group);
         void setHistoryLock(int group, bool status);
         bool getHistoryLock(int group);
@@ -106,11 +106,11 @@ class SynthEngine
         string getLastfileAdded(int group);
         bool loadHistory(void);
         bool saveHistory(void);
-        unsigned char loadVectorAndUpdate(unsigned char baseChan, string name);
-        unsigned char loadVector(unsigned char baseChan, string name, bool full);
-        unsigned char extractVectorData(unsigned char baseChan, XMLwrapper *xml, string name);
-        unsigned char saveVector(unsigned char baseChan, string name, bool full);
-        bool insertVectorData(unsigned char baseChan, bool full, XMLwrapper *xml, string name);
+        unsigned char loadVectorAndUpdate(unsigned char baseChan, const string& name);
+        unsigned char loadVector(unsigned char baseChan, const string& name, bool full);
+        unsigned char extractVectorData(unsigned char baseChan, XMLwrapper *xml, const string& name);
+        unsigned char saveVector(unsigned char baseChan, const string& name, bool full);
+        bool insertVectorData(unsigned char baseChan, bool full, XMLwrapper *xml, const string& name);
 
         bool getfromXML(XMLwrapper *xml);
 
@@ -125,7 +125,7 @@ class SynthEngine
         int setRootBank(int root, int bank, bool notinplace = true);
         int setProgramByName(CommandBlock *getData);
         int setProgramFromBank(CommandBlock *getData, bool notinplace = true);
-        bool setProgram(string fname, int npart);
+        bool setProgram(const string& fname, int npart);
         int ReadBankRoot(void);
         int ReadBank(void);
         void SetPartChan(unsigned char npart, unsigned char nchan);
@@ -255,13 +255,13 @@ class SynthEngine
         }
         void closeGui();
         int getLFOtime() {return LFOtime;}
-        string makeUniqueName(string name);
+        string makeUniqueName(const string& name);
 
         Bank &getBankRef() {return bank;}
         Bank *getBankPtr() {return &bank;}
 
         string getWindowTitle() {return windowTitle;}
-        void setWindowTitle(string _windowTitle = "");
+        void setWindowTitle(const string& _windowTitle = "");
         void setNeedsSaving(bool ns) { needsSaving = ns; }
         bool getNeedsSaving() { return needsSaving; }
     private:

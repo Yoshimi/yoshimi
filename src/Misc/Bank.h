@@ -102,8 +102,8 @@ class Bank
         int getType(unsigned int ninstrument, size_t bank, size_t root);
         string getname(unsigned int ninstrument, size_t bank, size_t root);
         string getnamenumbered(unsigned int ninstrument, size_t bank, size_t root);
-        int setInstrumentName(string name, int slot, size_t bank, size_t root);
-        bool moveInstrument(unsigned int ninstrument, string newname, int newslot, size_t oldBank, size_t newBank, size_t oldRoot, size_t newRoot);
+        int setInstrumentName(const string& name, int slot, size_t bank, size_t root);
+        bool moveInstrument(unsigned int ninstrument, const string& newname, int newslot, size_t oldBank, size_t newBank, size_t oldRoot, size_t newRoot);
              // if newslot==-1 then this is ignored, else it will be put on that slot
 
         int engines_used(size_t rootID, size_t bankID, unsigned int ninstrument);
@@ -113,15 +113,15 @@ class Bank
         std::string swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t bank2, size_t root1, size_t root2);
         std::string swapbanks(unsigned int firstID, unsigned int secondID, size_t firstRoot, size_t secondRoot);
         string getBankName(int bankID, size_t rootID);
-        bool isDuplicateBankName(size_t rootID, string name);
+        bool isDuplicateBankName(size_t rootID, const string& name);
         int getBankSize(int bankID, size_t rootID);
-        int changeBankName(size_t rootID, size_t bankID, string newName);
+        int changeBankName(size_t rootID, size_t bankID, const string& newName);
         bool loadbank(size_t rootID, size_t banknum);
-        std::string exportBank(string exportdir, size_t rootID, unsigned int bankID);
-        std::string importBank(string importdir, size_t rootID, unsigned int bankID);
+        std::string exportBank(const string& exportdir, size_t rootID, unsigned int bankID);
+        std::string importBank(const string& importdir, size_t rootID, unsigned int bankID);
         bool isDuplicate(size_t rootID, size_t bankID, int pos, const string filename);
-        bool newIDbank(string newbankdir, unsigned int bankID, size_t rootID = 0xff);
-        bool newbankfile(string newbankdir, size_t rootID);
+        bool newIDbank(const string& newbankdir, unsigned int bankID, size_t rootID = 0xff);
+        bool newbankfile(const string& newbankdir, size_t rootID);
         std::string removebank(unsigned int bankID, size_t rootID = 0xff);
         void removeRoot(size_t rootID);
         bool changeRootID(size_t oldID, size_t newID);
@@ -129,7 +129,7 @@ class Bank
         bool setCurrentRootID(size_t newRootID);
         unsigned int findFirstBank(size_t newRootID);
         bool setCurrentBankID(size_t newBankID, bool ignoreMissing = true);
-        size_t addRootDir(string newRootDir);
+        size_t addRootDir(const string& newRootDir);
         bool parseBanksFile(XMLwrapper *xml);
         bool installRoots();
         bool installNewRoot(size_t rootID, string rootdir, bool reload = false);
@@ -153,7 +153,7 @@ class Bank
             {BanksVersion = version;}
         int BanksVersion;
         void checkLocalBanks(void);
-        void generateSingleRoot(string newRoot, bool clear = true);
+        void generateSingleRoot(const string& newRoot, bool clear = true);
 
     private:
         bool addtobank(size_t rootID, size_t bankID, int pos, const string filename, const string name);
@@ -162,7 +162,6 @@ class Bank
 
         void deletefrombank(size_t rootID, size_t bankID, unsigned int pos);
         bool isValidBank(string chkdir);
-        bool check_bank_duplicate(string alias);
 
         //string dirname;
         const string defaultinsname;

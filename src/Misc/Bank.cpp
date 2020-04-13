@@ -124,7 +124,7 @@ string Bank::getnamenumbered(unsigned int ninstrument, size_t bank, size_t root)
 
 
 // Changes the instrument name in place
-int Bank::setInstrumentName(string name, int slot, size_t bank, size_t root)
+int Bank::setInstrumentName(const string& name, int slot, size_t bank, size_t root)
 {
     string result;
     string slotNum = to_string(slot + 1) + ". ";
@@ -149,7 +149,7 @@ int Bank::setInstrumentName(string name, int slot, size_t bank, size_t root)
 
 
 // Changes the name and location of an instrument (and the filename)
-bool Bank::moveInstrument(unsigned int ninstrument, string newname, int newslot, size_t oldBank, size_t newBank, size_t oldRoot, size_t newRoot)
+bool Bank::moveInstrument(unsigned int ninstrument, const string& newname, int newslot, size_t oldBank, size_t newBank, size_t oldRoot, size_t newRoot)
 {
     if (emptyslot(oldRoot, oldBank, ninstrument))
         return false;
@@ -299,7 +299,7 @@ string Bank::getBankName(int bankID, size_t rootID)
 }
 
 
-bool Bank::isDuplicateBankName(size_t rootID, string name)
+bool Bank::isDuplicateBankName(size_t rootID, const string& name)
 {
     for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
     {
@@ -325,7 +325,7 @@ int Bank::getBankSize(int bankID, size_t rootID)
 }
 
 
-int Bank::changeBankName(size_t rootID, size_t bankID, string newName)
+int Bank::changeBankName(size_t rootID, size_t bankID, const string& newName)
 {
     std::string filename = newName;
     std::string oldName = getBankName(bankID, rootID);
@@ -412,7 +412,7 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
 
 
 // Creates an external bank and copies in the contents of the IDd one
-string Bank::exportBank(string exportdir, size_t rootID, unsigned int bankID)
+string Bank::exportBank(const string& exportdir, size_t rootID, unsigned int bankID)
 {
     string name = "";
     string sourcedir = "";
@@ -471,7 +471,7 @@ string Bank::exportBank(string exportdir, size_t rootID, unsigned int bankID)
 
 
 // Creates a new bank and copies in the contents of the external one
-string Bank::importBank(string importdir, size_t rootID, unsigned int bankID)
+string Bank::importBank(const string& importdir, size_t rootID, unsigned int bankID)
 {
     string name = "";
     bool ok = true;
@@ -594,7 +594,7 @@ bool Bank::isDuplicate(size_t rootID, size_t bankID, int pos, const string filen
 
 
 // Makes a new bank with known ID. Does *not* make it current
-bool Bank::newIDbank(string newbankdir, unsigned int bankID, size_t rootID)
+bool Bank::newIDbank(const string& newbankdir, unsigned int bankID, size_t rootID)
 {
     if (rootID == UNUSED)
         rootID = synth->getRuntime().currentRoot; // shouldn't be needed!
@@ -607,7 +607,7 @@ bool Bank::newIDbank(string newbankdir, unsigned int bankID, size_t rootID)
 
 
 // Performs the actual file operation for new banks
-bool Bank::newbankfile(string newbankdir, size_t rootID)
+bool Bank::newbankfile(const string& newbankdir, size_t rootID)
 {
      if (getRootPath(synth->getRuntime().currentRoot).empty())
     {
@@ -1155,7 +1155,7 @@ void Bank::addDefaultRootDirs(string bankdirs[])
 }
 
 
-void Bank::generateSingleRoot(string newRoot, bool clear)
+void Bank::generateSingleRoot(const string& newRoot, bool clear)
 {
     /*cout << "generating" << endl;
     string ourDir = synth->getRuntime().definedBankRoot;
@@ -1408,7 +1408,7 @@ bool Bank::setCurrentBankID(size_t newBankID, bool ignoreMissing)
 }
 
 
-size_t Bank::addRootDir(string newRootDir)
+size_t Bank::addRootDir(const string& newRootDir)
 {
    // we need the size check to prevent weird behaviour if the name is just ./
     if(!isDirectory(newRootDir) || newRootDir.length() < 4)
