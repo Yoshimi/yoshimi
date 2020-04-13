@@ -24,6 +24,8 @@ We now implement a build number. This is only bumped up when I push new commits 
 We won't normally accept fixes for spelling errors in the *code*
 For a start, from bitter experience it is fatally easy to change two variables to the same name! Also, there's no point, after all they are only a mnemonic for memory addresses etc. 'volume' and 'LFO' could just as well be 'turnyfing' and 'derfingwotwiggles'.
 
+We do however accept some name changes where the orginal name is ambiguous or no longer appropriate.
+
 Finally, some of these errors are in the identifier names of the saved XML files, and have been there since ZynAddSubFX Version 2.2.1 To change them would break all the instrument files that have been created since then.
 
 
@@ -36,7 +38,7 @@ Please follow the coding style throughout Yoshimi. In particular:
 Also, try to avoid creating trailing whitespace.
 
 
-We used to adjust the "modified" date onfile changes. This is no longer done as it can cause problems when multipe changes come from different developers. This date can no longer be relied on, and the information will probably be removed completely at some point. Change information is still available in the changelog, and also from the repository itself.
+We used to adjust the "modified" date onfile changes. This is no longer done as it can cause problems when multipe changes come from different developers. This date can no longer be relied on, and the information will be removed completely at some point. Change information is still available in the changelog, and also from the repository itself.
 
 
 There seems to be no easy way to copy commit messages to the changelog, and people downloading releases won't see them, so please update this using the following as an example.
@@ -48,3 +50,5 @@ There seems to be no easy way to copy commit messages to the changelog, and peop
   But could be improved.
 
 Lines without '*' are continuations/extra info keeping the line length short, and are not usually included in commit messages.
+
+Alternatively, please send me a brief description to include when I next update.

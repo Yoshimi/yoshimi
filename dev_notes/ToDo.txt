@@ -6,7 +6,7 @@ Minor bug Multi instances produce jack error reports when main instance closed, 
 
 Revise GUI voice list related to voice editor.
 
-Complete effect change warning for dynfitter insert.
+Effect change warning for dynfilter insert not yet done.
 
 CLI sys/ins updates wrong.
 
@@ -26,8 +26,6 @@ Make NRPN MIDI-learn able to be re-learned.
 
 LV2: internal sound banks do not appear to be exposed as LV2 presets
 Visible in carla apparently.
-
-Make stored values of things like Echo delay 32 bit unsigned integers.
 
 Consider enabling and disabling tooltips.
 
