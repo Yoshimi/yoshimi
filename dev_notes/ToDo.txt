@@ -19,7 +19,7 @@ Find out why reporting errors in 'Bank' is very slow.
 Requested: auto 'apply' timer for padsynth.
 
 Expand MIDI-learn to include:
-    learn groups
+    learn groups (paging)
     GUI view by group but CLI and running search only by CC & chan
 
 Make NRPN MIDI-learn able to be re-learned.

@@ -28,21 +28,17 @@ partonoffRead(int npart)
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Audio system Mute() / Unmute() / isMuted()
-Although carying no parameters, Mute and Unmute behave in exactly the inverse way as PartonoffLock with 2 / -1.
+Audio system muting during critical operations is handled by a single atomic variable 'audioOut'
+This will be one of:
 
-mutewrite(int what) gives the full access as before, and isMuted() returns the current state.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-flagsWrite()
-flagsRead()
-flagsReadClear()
-
-These functions provide a link from the realtime thread, to a low priority one.
-
-This is now used for all the commands that need a fade-down and system mute. The flag is set with the required command at the end of the audio thread.
+muteState::Idle
+muteState::Pending
+muteState::Fading
+muteState::Active
+muteState::Complete
+muteState::Request
+muteState::Immediate
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There is an integer written by the low priority 'indirect' thread and read only by main. This is only invoked when a new instance is started.
+There is a pointer '*firstSynth' used in various places identifying the primary instance. It is written either by main, or the LV2 code at startup.

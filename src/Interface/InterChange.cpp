@@ -99,7 +99,6 @@ InterChange::InterChange(SynthEngine *_synth) :
 
 bool InterChange::Init()
 {
-    flagsValue = 0xffffffff;
 #ifndef YOSHIMI_LV2_PLUGIN
     fromCLI = new ringBuff(256, commandBlockSize);
 #endif

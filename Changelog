@@ -1,4 +1,12 @@
-yoshimi 1.7.1 rc1
+yoshimi 1.7.1 rc2
+
+2020-4-15 Will
+* Minor correction to AddSynth Voice/List window position fetch.
+  They were refetching last saved position even when moved.
+* Removed some redundant code.
+* Cleared pedantic error/warning traps in CMakeLists.txt
+* Further doc updates.
+* Set version as 1.7.1 rc2
 
 2020-4-13 Will
 * Doc updates - no code changes.

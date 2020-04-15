@@ -12,10 +12,10 @@ The controls are found in a new Aftertouch window, which is reached from the Con
 Both Key and Channel aftertouch can also be overridden by MIDI-learn.
 
 
-There is a new waveform shape - Hyperbolic Secant. This is similar to Gauss but has a subtly different harmonic distribution.
+There is a new waveform shape available to AddSynth and PadSynth - Hyperbolic Secant. This is similar to Gauss but has a subtly different harmonic distribution.
 
 
-There is a new channel based setting for Solo. In this case you can mute all parts except the ones receiving the channel sending the command.
+There is a new channel based setting for Solo. In this case you can mute all parts except the ones receiving the channel sending the command. This requires a toggle type switch operation. i.e. CC value greater than 63 to solo, and less than 64 to return to normal. If the 'on' message comes though on a different channel then this 'takes over' the solo state, but any channel sending the 'off' state will return Yoshimi to normal.
 
 
 Another significant but less obvious development is a complete revision of how we handle Legato. The code is slimmer and gives far smoother performance.
@@ -27,7 +27,9 @@ What happens now is that it installs the already known ones first in their origi
 
 A further refinement is that '/usr' directories are scanned for banks, and if found, they're copied into 'HOME/{user}/.local/yoshimi/found' this provides an editable form while preseving the originals. The final detail is that if no banks can be found at all, Yoshimi will create one bank root, with one bank, with one SubSynth instrument!
 
-A similar action is performed for presets directores, and although existing users will still see ones in 'HOME/{user}/.config/yoshimi' they won't be put there for new users.
+A similar action is performed for presets directories, and although existing users will still see ones in 'HOME/{user}/.config/yoshimi' they won't be put there for new users.
+
+Storing GUI window positioning has been improved so it's more reliable, has better defaults, and allows the user to fix the position of more of them.
 
 
 As you can see, Yoshimi's little band of helpers have been very busy and apart from all the above, general code cleanups and improvements are continuing.
